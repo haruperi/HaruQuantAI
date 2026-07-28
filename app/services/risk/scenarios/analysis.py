@@ -14,7 +14,8 @@ from app.services.risk.contracts import (
     ScenarioDefinition,
     ScenarioResult,
 )
-from app.utils import logger
+from app.services.risk.contracts.responses import guard_risk_boundary
+from app.utils import RiskLevel, logger
 
 if TYPE_CHECKING:
     from app.services.risk.config import RiskConfig
@@ -153,6 +154,7 @@ def _validate_bounds(
         )
 
 
+@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
 def run_risk_scenario_analysis(
     snapshot: PortfolioRiskSnapshot,
     scenarios: Sequence[ScenarioDefinition],

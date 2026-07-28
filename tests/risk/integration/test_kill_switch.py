@@ -31,23 +31,29 @@ def test_kill_switch_command_blocks_trading_without_execution_mutation() -> None
         workflow_id=examples.WORKFLOW_ID,
         correlation_id=examples.CORRELATION_ID,
     )
-    active = apply_kill_switch_command(
-        command,
-        examples._inactive_state(),
-        examples._auth(config),
-        approvals,
-        audit,
-        store,
-        config,
-        now=examples.NOW,
+    active = examples.unwrap_risk_response(
+        apply_kill_switch_command(
+            command,
+            examples._inactive_state(),
+            examples._auth(config),
+            approvals,
+            audit,
+            store,
+            config,
+            now=examples.NOW,
+        ),
+        operation="apply_kill_switch_command",
     )
-    decision = check_risk_kill_switch(
-        (active,),
-        {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
-        config,
-        examples._auth(config),
-        reconciled=False,
-        now=examples.NOW,
+    decision = examples.unwrap_risk_response(
+        check_risk_kill_switch(
+            (active,),
+            {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
+            config,
+            examples._auth(config),
+            reconciled=False,
+            now=examples.NOW,
+        ),
+        operation="check_risk_kill_switch",
     )
     assert active.state == "active"
     assert decision.state is DecisionState.BLOCK

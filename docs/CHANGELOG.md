@@ -10,7 +10,7 @@ Central environment configuration is grouped into logical sections, while provid
 
 - Added the immutable generic `StandardResponse v1`, exact structured error and execution metadata contracts, approved-code catalogue validation, monotonic millisecond timing, and lossless raw-data/extension preservation foundation in Utils.
 
-#### Changed (16)
+#### Changed (17)
 
 - Migrated the immutable Brokers capability catalogue to `StandardResponse` and added JSON-only mapping-proxy serialization that preserves raw runtime identity while emitting a detached bounded mapping.
 - Migrated the Brokers registered-profile listing to `StandardResponse[tuple[BrokerId, ...]]` while retaining the stable provider tuple directly in `data` and preserving SDK-free discovery.
@@ -28,6 +28,7 @@ Central environment configuration is grouped into logical sections, while provid
 - Migrated the 28 qualifying Analytics package-root operations to Utils-owned `StandardResponse[T]`, preserved raw analytical data in `data`, and updated callers, tests, usage evidence, and the Analytics API registry.
 - Migrated the qualifying Simulation validation, timeline, accounting, execution, journal, reporting, run, ledger, and Trading-simulation seams to `StandardResponse[T]`, preserving raw results in `data` and updating callers and usage evidence.
 - Migrated qualifying Trading public operations to Utils `StandardResponse[T]`, preserving raw DTOs, fail-closed unknown-outcome receipt evidence, and canonical symbolic error details.
+- Migrated qualifying Risk public operations to Utils `StandardResponse[T]`, preserved decision states inside raw response data, and added the immutable Risk error catalogue and boundary usage evidence.
 
 ## 2.2.11
 

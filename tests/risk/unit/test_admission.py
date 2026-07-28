@@ -3,7 +3,6 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-import pytest
 from app.services.data import (
     MarketContextEvidence,
 )
@@ -12,10 +11,10 @@ from app.services.risk.config import RiskConfig
 from app.services.risk.contracts import (
     DecisionState,
     RiskAuditRecord,
-    RiskDomainError,
     StrategyOperationalEligibilityDecision,
     StrategyOperationalEligibilityRequest,
 )
+from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.strategy import (
     StrategyEnvironment,
     StrategyLifecycleStatus,
@@ -24,6 +23,8 @@ from app.services.strategy import (
     StrategyValidationPolicy,
     ValidatedStrategyRef,
 )
+
+from tests.risk._support import _risk_success
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 HASH_A = "a" * 64
@@ -67,7 +68,7 @@ class _Audit:
         """Initialize an empty event list."""
         self.records: list[RiskAuditRecord] = []
 
-    def append(self, record: RiskAuditRecord) -> RiskAuditRecord:
+    def append(self, record: RiskAuditRecord):
         """Capture one admission event.
 
         Args:
@@ -77,7 +78,7 @@ class _Audit:
             Captured event.
         """
         self.records.append(record)
-        return record
+        return _risk_success(record)
 
 
 def _config() -> RiskConfig:
@@ -194,14 +195,17 @@ def test_admission_never_mutates_strategy_state() -> None:
     before = registration.model_dump(mode="json")
     store = _EligibilityStore()
     audit = _Audit()
-    decision = review_strategy_admission(
-        _request(),
-        registration,
-        _market(),
-        _config(),
-        store,
-        audit,  # type: ignore[arg-type]
-        now=NOW,
+    decision = unwrap_risk_response(
+        review_strategy_admission(
+            _request(),
+            registration,
+            _market(),
+            _config(),
+            store,
+            audit,  # type: ignore[arg-type]
+            now=NOW,
+        ),
+        operation="review_strategy_admission",
     )
     assert decision.state is DecisionState.APPROVE
     assert decision.suspended is False
@@ -213,29 +217,22 @@ def test_admission_never_mutates_strategy_state() -> None:
 def test_admission_fails_closed_on_evidence_or_identity_conflict() -> None:
     """Reject unbound market evidence and duplicate durable decision identity."""
     request = _request().model_copy(update={"evidence_refs": {"market": "wrong"}})
-    with pytest.raises(RiskDomainError):
-        review_strategy_admission(
-            request,
-            _registration(),
-            _market(),
-            _config(),
-            _EligibilityStore(),
-            _Audit(),  # type: ignore[arg-type]
-            now=NOW,
-        )
-
-    store = _EligibilityStore()
-    audit = _Audit()
-    review_strategy_admission(
-        _request(),
+    response = review_strategy_admission(
+        request,
         _registration(),
         _market(),
         _config(),
-        store,
-        audit,  # type: ignore[arg-type]
+        _EligibilityStore(),
+        _Audit(),  # type: ignore[arg-type]
         now=NOW,
     )
-    with pytest.raises(RiskDomainError):
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "MISSING_EVIDENCE"
+
+    store = _EligibilityStore()
+    audit = _Audit()
+    first = unwrap_risk_response(
         review_strategy_admission(
             _request(),
             _registration(),
@@ -244,4 +241,19 @@ def test_admission_fails_closed_on_evidence_or_identity_conflict() -> None:
             store,
             audit,  # type: ignore[arg-type]
             now=NOW,
-        )
+        ),
+        operation="review_strategy_admission",
+    )
+    assert first.state is DecisionState.APPROVE
+    response = review_strategy_admission(
+        _request(),
+        _registration(),
+        _market(),
+        _config(),
+        store,
+        audit,  # type: ignore[arg-type]
+        now=NOW,
+    )
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "STORAGE_ERROR"

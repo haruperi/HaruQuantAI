@@ -13,7 +13,7 @@ from app.services.risk import (
     check_risk_kill_switch,
 )
 from app.utils import canonical_json
-from tests.risk.usage.workflows._support import examples
+from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-009"
 STAGES = (
@@ -58,26 +58,32 @@ def main() -> None:
     print("Principal:", examples._auth(config).principal_id)
     # Stage 3: Apply through the Risk-owned mutation boundary.
     _stage(3)
-    active = apply_kill_switch_command(
-        command,
-        examples._inactive_state(),
-        examples._auth(config),
-        approvals,
-        audit,
-        store,
-        config,
-        now=examples.NOW,
+    active = unwrap_risk_response(
+        apply_kill_switch_command(
+            command,
+            examples._inactive_state(),
+            examples._auth(config),
+            approvals,
+            audit,
+            store,
+            config,
+            now=examples.NOW,
+        ),
+        operation="apply_kill_switch_command",
     )
     print("Persisted state:", active.state)
     # Stage 4: Check applicable hierarchy.
     _stage(4)
-    decision = check_risk_kill_switch(
-        (active,),
-        {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
-        config,
-        examples._auth(config),
-        reconciled=False,
-        now=examples.NOW,
+    decision = unwrap_risk_response(
+        check_risk_kill_switch(
+            (active,),
+            {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
+            config,
+            examples._auth(config),
+            reconciled=False,
+            now=examples.NOW,
+        ),
+        operation="check_risk_kill_switch",
     )
     print("Decision:", decision.state)
     # Stage 5 — OUTPUT BOUNDARY: Return canonical state/decision; execution untouched.

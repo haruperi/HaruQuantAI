@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.risk import DecisionState
-from tests.risk.usage.workflows._support import examples
+from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-004"
 STAGES = (
@@ -41,15 +41,18 @@ def main() -> None:
     print("Proposal intent:", examples._proposal(config).intent.intent_id)
     # Stage 3: Governor evaluates every applicable limit.
     _stage(3)
-    decision = governor.review_trade_risk(
-        examples._proposal(config),
-        examples._snapshot(config),
-        examples._market(),
-        examples._regime(),
-        (active,),
-        examples._auth(config),
-        attestation=examples._attestation(config),
-        now=examples.NOW,
+    decision = unwrap_risk_response(
+        governor.review_trade_risk(
+            examples._proposal(config),
+            examples._snapshot(config),
+            examples._market(),
+            examples._regime(),
+            (active,),
+            examples._auth(config),
+            attestation=examples._attestation(config),
+            now=examples.NOW,
+        ),
+        operation="risk_governor.review_trade_risk",
     )
     print("Verdict:", decision.state)
     # Stage 4: Verify auditable ordered failure evidence.

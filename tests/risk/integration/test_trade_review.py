@@ -13,15 +13,18 @@ def test_trade_review_uses_fixed_precedence_and_fails_closed() -> None:
     active = examples._inactive_state().model_copy(
         update={"state": "active", "reason": "global safety stop"}
     )
-    decision = governor.review_trade_risk(
-        examples._proposal(config),
-        examples._snapshot(config),
-        policy_examples._market(),
-        examples._regime(),
-        (active,),
-        examples._auth(config),
-        attestation=examples._attestation(config),
-        now=examples.NOW,
+    decision = examples.unwrap_risk_response(
+        governor.review_trade_risk(
+            examples._proposal(config),
+            examples._snapshot(config),
+            policy_examples._market(),
+            examples._regime(),
+            (active,),
+            examples._auth(config),
+            attestation=examples._attestation(config),
+            now=examples.NOW,
+        ),
+        operation="risk_governor.review_trade_risk",
     )
     assert decision.state is DecisionState.BLOCK
     assert decision.primary_failure_limit == "kill_switch"

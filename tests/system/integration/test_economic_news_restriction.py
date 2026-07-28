@@ -12,11 +12,11 @@ from app.services.data import (
 from app.services.risk import (
     DecisionState,
     KillSwitchState,
+    LimitStatus,
+    RiskConfig,
     RiskDecisionPackage,
+    evaluate_market_context,
 )
-from app.services.risk.config import RiskConfig
-from app.services.risk.contracts import LimitStatus
-from app.services.risk.limits import evaluate_market_context
 from app.services.trading import (
     RouteSnapshot,
     TradingRequest,
@@ -155,7 +155,10 @@ def _switch() -> KillSwitchState:
 def test_high_impact_event_blocks_risk_and_trading_readiness() -> None:
     """Risk consumes Data calendar evidence and Trading consumes only Risk."""
     evidence = populate_market_context_calendar(_market(), events=[_event()])
-    limit_results = evaluate_market_context(evidence, _risk_config(), now=_NOW)
+    limit_response = evaluate_market_context(evidence, _risk_config(), now=_NOW)
+    assert limit_response.status == "success"
+    assert limit_response.data is not None
+    limit_results = limit_response.data
     calendar = next(result for result in limit_results if result.limit_id == "calendar")
     assert calendar.status is LimitStatus.BLOCKED
 

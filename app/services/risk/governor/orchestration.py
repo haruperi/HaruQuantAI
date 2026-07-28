@@ -25,8 +25,12 @@ from app.services.risk.contracts import (
     RiskErrorCode,
     RiskLimitResult,
 )
+from app.services.risk.contracts.responses import (
+    guard_risk_boundary,
+    unwrap_risk_response,
+)
 from app.services.risk.limits import evaluate_market_context, evaluate_portfolio_limits
-from app.utils import AuthContext, canonical_json, logger
+from app.utils import AuthContext, RiskLevel, canonical_json, logger
 
 if TYPE_CHECKING:
     from app.services.data import (
@@ -370,6 +374,35 @@ class RiskGovernor:
         self._clock = clock
         self._capacity_guard = capacity_guard
 
+    def _config_hash(self) -> str:
+        """Return the current configuration hash after response validation.
+
+        Returns:
+            The exact current Risk configuration hash.
+
+        Raises:
+            RiskDomainError: If configuration hashing fails.
+        """
+        return unwrap_risk_response(
+            compute_config_hash(self._config), operation="compute_config_hash"
+        )
+
+    def _append_audit(self, record: RiskAuditRecord) -> RiskAuditRecord:
+        """Append one governor audit record and fail closed on persistence errors.
+
+        Args:
+            record: Unsealed governor audit record.
+
+        Returns:
+            Durable sealed audit record.
+
+        Raises:
+            RiskDomainError: If audit persistence fails.
+        """
+        return unwrap_risk_response(
+            self._audit.append(record), operation="risk_audit.append"
+        )
+
     def _validate_common(
         self,
         snapshot: PortfolioRiskSnapshot,
@@ -393,7 +426,7 @@ class RiskGovernor:
         )
         if abs(now - checked_clock) > tolerance:
             raise ValueError("governor clock skew exceeded")
-        if snapshot.config_hash != compute_config_hash(self._config):
+        if snapshot.config_hash != self._config_hash():
             raise ValueError("snapshot configuration binding conflicts")
         if auth.tenant_or_environment != self._config.profile:
             raise ValueError("authenticated environment conflicts with Risk profile")
@@ -432,7 +465,7 @@ class RiskGovernor:
             "capacity",
             {
                 "intent_id": proposal.intent.intent_id,
-                "config_hash": compute_config_hash(self._config),
+                "config_hash": self._config_hash(),
                 "size": capped_size,
             },
         )
@@ -552,12 +585,23 @@ class RiskGovernor:
             ),
             _regime_result(regime, live=self._config.profile == "live", precedence=1),
         ]
-        portfolio = evaluate_portfolio_limits(snapshot, self._config, now=now)
-        market_results = evaluate_market_context(market, self._config, now=now)
+        portfolio = unwrap_risk_response(
+            evaluate_portfolio_limits(snapshot, self._config, now=now),
+            operation="evaluate_portfolio_limits",
+        )
+        market_results = unwrap_risk_response(
+            evaluate_market_context(market, self._config, now=now),
+            operation="evaluate_market_context",
+        )
         checks.extend(_reindex(portfolio, len(checks)))
         checks.extend(_reindex(market_results, len(checks)))
         return checks
 
+    @guard_risk_boundary(
+        risk_level=RiskLevel.CRITICAL,
+        read_only=False,
+        modifies_database=True,
+    )
     def review_trade_risk(
         self,
         proposal: ProposedTrade,
@@ -630,7 +674,7 @@ class RiskGovernor:
             if state is DecisionState.NEEDS_APPROVAL:
                 primary = "approval_required"
                 flags = (*flags, "approval_required")
-            config_hash = compute_config_hash(self._config)
+            config_hash = self._config_hash()
             decision_id = _identity(
                 "trade.decision",
                 {
@@ -679,11 +723,14 @@ class RiskGovernor:
             )
             if state is DecisionState.APPROVE and risk_increasing:
                 required_attestation = _require_attestation(attestation)
-                token = self._approvals.issue(
-                    decision, required_attestation, now=checked_now
+                token = unwrap_risk_response(
+                    self._approvals.issue(
+                        decision, required_attestation, now=checked_now
+                    ),
+                    operation="approval_tokens.issue",
                 )
                 decision = decision.model_copy(update={"token": token})
-            self._audit.append(_audit_input(decision, checked_now))
+            self._append_audit(_audit_input(decision, checked_now))
             logger.bind(
                 request_id=decision.request_id,
                 workflow_id=decision.workflow_id,
@@ -712,6 +759,11 @@ class RiskGovernor:
                 "trade Risk governor failed closed",
             ) from error
 
+    @guard_risk_boundary(
+        risk_level=RiskLevel.CRITICAL,
+        read_only=False,
+        modifies_database=True,
+    )
     def run_portfolio_risk_governor(
         self,
         snapshot: PortfolioRiskSnapshot,
@@ -749,7 +801,7 @@ class RiskGovernor:
             )
             state = _state_for_results(checks)
             primary, flags = _failures(checks)
-            config_hash = compute_config_hash(self._config)
+            config_hash = self._config_hash()
             decision = RiskDecisionPackage(
                 decision_id=_identity(
                     "portfolio.decision",
@@ -786,7 +838,7 @@ class RiskGovernor:
                 workflow_id=auth.workflow_id,
                 correlation_id=auth.correlation_id,
             )
-            self._audit.append(_audit_input(decision, checked_now))
+            self._append_audit(_audit_input(decision, checked_now))
             logger.bind(
                 request_id=decision.request_id,
                 workflow_id=decision.workflow_id,

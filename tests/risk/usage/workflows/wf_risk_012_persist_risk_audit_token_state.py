@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from tests.risk.usage.workflows._support import examples
+from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-012"
 STAGES = (
@@ -33,15 +33,21 @@ def main() -> None:
     print("Input decision:", decision.decision_id)
     # Stage 2: ApprovalTokenService canonicalizes signed token/audit material.
     _stage(2)
-    token = service.issue(decision, attestation, now=examples.NOW)
+    token = unwrap_risk_response(
+        service.issue(decision, attestation, now=examples.NOW),
+        operation="approval_tokens.issue",
+    )
     print("Token hash/signature present:", bool(token.signature))
     # Stage 3: Issuance and audit state are durable before return.
     _stage(3)
     print("Persisted token:", token.token_id in store.tokens)
     # Stage 4: Validate and consume to prove durable state path.
     _stage(4)
-    result = service.validate_reserve_and_consume(
-        token, attestation, examples._expected(token), now=examples.NOW
+    result = unwrap_risk_response(
+        service.validate_reserve_and_consume(
+            token, attestation, examples._expected(token), now=examples.NOW
+        ),
+        operation="approval_tokens.validate_reserve_and_consume",
     )
     print("Durable consumption:", result.consumed, token.token_id in store.consumed)
     # Stage 5 — OUTPUT BOUNDARY: Return persisted token/audit truth.

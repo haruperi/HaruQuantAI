@@ -9,7 +9,8 @@ from threading import RLock
 from typing import TYPE_CHECKING
 
 from app.services.risk.contracts import RiskAuditRecord, RiskDomainError, RiskErrorCode
-from app.utils import logger, redact_mapping_value
+from app.services.risk.contracts.responses import guard_risk_boundary
+from app.utils import RiskLevel, logger, redact_mapping_value
 
 if TYPE_CHECKING:
     from app.services.risk.audit.storage import _KillSwitchStateStore, _RiskAuditStore
@@ -171,6 +172,11 @@ class RiskAuditChain:
         )
         return RiskAuditRecord.model_validate(values)
 
+    @guard_risk_boundary(
+        risk_level=RiskLevel.CRITICAL,
+        read_only=False,
+        modifies_database=True,
+    )
     def append(self, record: RiskAuditRecord) -> RiskAuditRecord:
         """Seal and durably append one unsealed Risk audit record.
 
@@ -189,6 +195,11 @@ class RiskAuditChain:
         with self._lock:
             return self._append_locked(record)
 
+    @guard_risk_boundary(
+        risk_level=RiskLevel.CRITICAL,
+        read_only=False,
+        modifies_database=True,
+    )
     def append_kill_switch_transition(
         self,
         record: RiskAuditRecord,
@@ -357,6 +368,7 @@ class RiskAuditChain:
             RiskErrorCode.STORAGE_ERROR, "audit append conflict exhausted"
         )
 
+    @guard_risk_boundary(risk_level=RiskLevel.CRITICAL, read_only=True)
     def verify(self, records: Sequence[RiskAuditRecord]) -> bool:
         """Verify genesis, sequence, continuity, and every record hash.
 

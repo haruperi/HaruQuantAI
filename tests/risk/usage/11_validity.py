@@ -25,13 +25,14 @@ from app.services.risk import (
     RiskAuditChain,
     RiskAuditRecord,
     RiskConfig,
-    RiskDomainError,
     RiskGovernor,
     compute_config_hash,
     revalidate_risk_decision,
 )
 from app.services.strategy import TradeIntent
 from app.utils import AuthContext, canonical_json
+
+from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
@@ -186,7 +187,9 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
         gaps=(),
         regime=None,
         as_of=NOW,
-        config_hash=compute_config_hash(config),
+        config_hash=unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        ),
         evidence_refs={"account": "account-evidence-1"},
         request_id=REQUEST_ID,
         workflow_id=WORKFLOW_ID,
@@ -305,7 +308,9 @@ def _attestation(config: RiskConfig) -> ApprovalAttestation:
         principal_id="operator-1",
         action="submit_order",
         scope={"account_id": "account-1", "symbol": "EURUSD"},
-        policy_ref=compute_config_hash(config),
+        policy_ref=unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        ),
         policy_version=config.policy_version,
         issued_at=NOW,
         expires_at=NOW + timedelta(minutes=1),
@@ -338,30 +343,33 @@ def fr_risk_042() -> None:
 
     proposal = _proposal(config)
     snapshot = _snapshot(config)
-    decision = governor.review_trade_risk(
-        proposal,
-        snapshot,
-        _market(),
-        _regime(),
-        (_inactive_kill_switch(),),
-        _auth(config),
-        attestation=_attestation(config),
-        now=NOW,
+    decision = unwrap_risk_response(
+        governor.review_trade_risk(
+            proposal,
+            snapshot,
+            _market(),
+            _regime(),
+            (_inactive_kill_switch(),),
+            _auth(config),
+            attestation=_attestation(config),
+            now=NOW,
+        ),
+        operation="risk_governor.review_trade_risk",
     )
 
-    reuse = revalidate_risk_decision(decision, proposal, snapshot, config, now=NOW)
+    reuse = unwrap_risk_response(
+        revalidate_risk_decision(decision, proposal, snapshot, config, now=NOW),
+        operation="revalidate_risk_decision",
+    )
     print(
         f"Unchanged proposal reusable: {reuse.reusable}, "
         f"refresh required: {reuse.refresh_required}"
     )
 
     changed = proposal.model_copy(update={"requested_size": Decimal(2)})
-    try:
-        revalidate_risk_decision(decision, changed, snapshot, config, now=NOW)
-    except RiskDomainError as failure:
-        print(
-            f"Material size change blocked reuse with code: {failure.risk_code.value}"
-        )
+    response = revalidate_risk_decision(decision, changed, snapshot, config, now=NOW)
+    if response.status == "error" and response.error is not None:
+        print(f"Material size change blocked reuse with code: {response.error.code}")
 
 
 def main() -> None:

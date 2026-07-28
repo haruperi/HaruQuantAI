@@ -22,8 +22,12 @@ from app.services.risk.contracts import (
     RiskDomainError,
     RiskErrorCode,
 )
+from app.services.risk.contracts.responses import (
+    guard_risk_boundary,
+    unwrap_risk_response,
+)
 from app.services.risk.limits import evaluate_market_context
-from app.utils import canonical_json, logger
+from app.utils import RiskLevel, canonical_json, logger
 
 if TYPE_CHECKING:
     from app.services.data import (
@@ -237,6 +241,11 @@ def _audit_record(
     )
 
 
+@guard_risk_boundary(
+    risk_level=RiskLevel.HIGH,
+    read_only=False,
+    modifies_database=True,
+)
 def review_allocation_proposal(
     request: AllocationReviewRequest,
     snapshot: PortfolioRiskSnapshot,
@@ -267,7 +276,9 @@ def review_allocation_proposal(
     logger.info("Reviewing self-contained allocation Risk proposal")
     started_at = monotonic()
     checked_now = _utc(now)
-    config_hash = compute_config_hash(config)
+    config_hash = unwrap_risk_response(
+        compute_config_hash(config), operation="compute_config_hash"
+    )
     bound = (
         request.requested_at <= checked_now
         and request.runtime_profile == config.profile
@@ -283,7 +294,10 @@ def review_allocation_proposal(
             "allocation evidence or runtime binding is incompatible",
         )
     components = _parse_components(request.ordered_components)
-    market_results = evaluate_market_context(market, config, now=checked_now)
+    market_results = unwrap_risk_response(
+        evaluate_market_context(market, config, now=checked_now),
+        operation="evaluate_market_context",
+    )
     requested = {dimension: weight for _, dimension, weight in components}
     capped = {
         dimension: min(weight, _cap_for(dimension, config))
@@ -346,16 +360,19 @@ def review_allocation_proposal(
             RiskErrorCode.STORAGE_ERROR,
             "allocation review identity conflict",
         )
-    audit.append(
-        _audit_record(
-            record_id=audit_ref,
-            event_type="risk.allocation_review",
-            decision=decision,
-            config_hash=config_hash,
-            request_id=request.request_id,
-            correlation_id=request.correlation_id,
-            now=checked_now,
-        )
+    unwrap_risk_response(
+        audit.append(
+            _audit_record(
+                record_id=audit_ref,
+                event_type="risk.allocation_review",
+                decision=decision,
+                config_hash=config_hash,
+                request_id=request.request_id,
+                correlation_id=request.correlation_id,
+                now=checked_now,
+            )
+        ),
+        operation="risk_audit.append",
     )
     logger.bind(
         request_id=request.request_id,
@@ -426,7 +443,10 @@ def _validate_activation(
         and decision.state is DecisionState.APPROVE
         and not decision.active
         and decision.policy_version == config.policy_version
-        and decision.evidence_refs.get("config") == compute_config_hash(config)
+        and decision.evidence_refs.get("config")
+        == unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        )
         and not _kill_switch_blocks(states, request.scope)
     )
     if not valid:
@@ -436,6 +456,11 @@ def _validate_activation(
         )
 
 
+@guard_risk_boundary(
+    risk_level=RiskLevel.CRITICAL,
+    read_only=False,
+    modifies_database=True,
+)
 def activate_allocation_budget(
     request: AllocationBudgetActivationRequest,
     decision: AllocationRiskDecision,
@@ -506,17 +531,22 @@ def activate_allocation_budget(
             RiskErrorCode.STORAGE_ERROR,
             "allocation budget activation conflict",
         )
-    config_hash = compute_config_hash(config)
-    audit.append(
-        _audit_record(
-            record_id=f"risk-allocation-activate-{request.request_id}",
-            event_type="risk.allocation_activation",
-            decision=active,
-            config_hash=config_hash,
-            request_id=request.request_id,
-            correlation_id=request.correlation_id,
-            now=checked_now,
-        )
+    config_hash = unwrap_risk_response(
+        compute_config_hash(config), operation="compute_config_hash"
+    )
+    unwrap_risk_response(
+        audit.append(
+            _audit_record(
+                record_id=f"risk-allocation-activate-{request.request_id}",
+                event_type="risk.allocation_activation",
+                decision=active,
+                config_hash=config_hash,
+                request_id=request.request_id,
+                correlation_id=request.correlation_id,
+                now=checked_now,
+            )
+        ),
+        operation="risk_audit.append",
     )
     logger.bind(
         request_id=request.request_id,

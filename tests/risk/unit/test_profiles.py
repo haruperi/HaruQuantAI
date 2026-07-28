@@ -6,7 +6,8 @@ from pathlib import Path
 import pytest
 import yaml
 from app.services.risk.config import RiskConfig, compute_config_hash, load_risk_config
-from app.services.risk.contracts import RiskDomainError, RiskErrorCode
+from app.services.risk.contracts import RiskErrorCode
+from app.services.risk.contracts.responses import unwrap_risk_response
 from pydantic import ValidationError
 
 
@@ -50,16 +51,19 @@ def test_live_profile_requires_all_safety_values() -> None:
 
 def test_missing_live_profile_fails_closed(tmp_path: Path) -> None:
     """Map a missing selected profile to the canonical configuration error."""
-    with pytest.raises(RiskDomainError) as captured:
-        load_risk_config("live", tmp_path)
-    assert captured.value.risk_code is RiskErrorCode.INVALID_RISK_CONFIG
+    response = load_risk_config("live", tmp_path)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == RiskErrorCode.INVALID_RISK_CONFIG.value
 
 
 def test_selected_profile_loads_from_bounded_root(tmp_path: Path) -> None:
     """Load only the matching selected YAML document."""
     profile_path = tmp_path / "research.yaml"
     profile_path.write_text(yaml.safe_dump(_yaml_values()), encoding="utf-8")
-    config = load_risk_config("research", tmp_path)
+    config = unwrap_risk_response(
+        load_risk_config("research", tmp_path), operation="load_risk_config"
+    )
     assert config.profile == "research"
     assert config.approval_token_ttl_seconds == Decimal(60)
 
@@ -71,5 +75,14 @@ def test_config_hash_is_stable_and_sensitive() -> None:
     changed_values = _config_values()
     changed_values["max_daily_loss"] = Decimal("0.04")
     changed = RiskConfig.model_validate(changed_values)
-    assert compute_config_hash(config) == compute_config_hash(same)
-    assert compute_config_hash(config) != compute_config_hash(changed)
+    first = unwrap_risk_response(
+        compute_config_hash(config), operation="compute_config_hash"
+    )
+    second = unwrap_risk_response(
+        compute_config_hash(same), operation="compute_config_hash"
+    )
+    third = unwrap_risk_response(
+        compute_config_hash(changed), operation="compute_config_hash"
+    )
+    assert first == second
+    assert first != third

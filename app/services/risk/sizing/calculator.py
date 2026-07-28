@@ -10,7 +10,8 @@ from app.services.risk.contracts import (
     RiskDomainError,
     RiskErrorCode,
 )
-from app.utils import logger
+from app.services.risk.contracts.responses import guard_risk_boundary
+from app.utils import RiskLevel, logger
 
 
 def _risk_per_unit(
@@ -298,6 +299,7 @@ def _validate_raw_size(raw_size: Decimal) -> Decimal:
     return raw_size
 
 
+@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
 def calculate_position_size(
     request: PositionSizingRequest,
     snapshot: PortfolioRiskSnapshot,

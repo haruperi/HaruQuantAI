@@ -3,7 +3,6 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-import pytest
 from app.services.data import (
     MarketContextEvidence,
 )
@@ -20,8 +19,10 @@ from app.services.risk.contracts import (
     KillSwitchState,
     PortfolioRiskSnapshot,
     RiskAuditRecord,
-    RiskDomainError,
 )
+from app.services.risk.contracts.responses import unwrap_risk_response
+
+from tests.risk._support import _risk_success
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
@@ -107,7 +108,7 @@ class _Audit:
         """Initialize empty captured records."""
         self.records: list[RiskAuditRecord] = []
 
-    def append(self, record: RiskAuditRecord) -> RiskAuditRecord:
+    def append(self, record: RiskAuditRecord):
         """Capture and return one allocation event.
 
         Args:
@@ -117,7 +118,7 @@ class _Audit:
             Captured event.
         """
         self.records.append(record)
-        return record
+        return _risk_success(record)
 
 
 def _config() -> RiskConfig:
@@ -168,7 +169,9 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
         gaps=(),
         regime=None,
         as_of=NOW,
-        config_hash=compute_config_hash(config),
+        config_hash=unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        ),
         evidence_refs={"account": "account-evidence-1"},
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
@@ -215,7 +218,11 @@ def _review_request(config: RiskConfig) -> AllocationReviewRequest:
         account_evidence_ref="account-evidence-1",
         market_evidence_ref=MARKET_REQUEST_ID,
         fx_evidence_refs=(),
-        evidence_hashes={"snapshot_config": compute_config_hash(config)},
+        evidence_hashes={
+            "snapshot_config": unwrap_risk_response(
+                compute_config_hash(config), operation="compute_config_hash"
+            )
+        },
         runtime_profile="simulation",
         execution_route="sim",
         approval_refs=(),
@@ -231,14 +238,17 @@ def test_allocation_review_enforces_caps() -> None:
     config = _config()
     store = _AllocationStore()
     audit = _Audit()
-    decision = review_allocation_proposal(
-        _review_request(config),
-        _snapshot(config),
-        _market(),
-        config,
-        store,
-        audit,  # type: ignore[arg-type]
-        now=NOW,
+    decision = unwrap_risk_response(
+        review_allocation_proposal(
+            _review_request(config),
+            _snapshot(config),
+            _market(),
+            config,
+            store,
+            audit,  # type: ignore[arg-type]
+            now=NOW,
+        ),
+        operation="review_allocation_proposal",
     )
     assert decision.state is DecisionState.REJECT
     assert decision.capped_weights["symbol:EURUSD"] == Decimal("0.10")
@@ -253,16 +263,18 @@ def test_allocation_rejects_malformed_component_schema() -> None:
     malformed = _review_request(config).model_copy(
         update={"ordered_components": ({"component_id": "only-id"},)}
     )
-    with pytest.raises(RiskDomainError):
-        review_allocation_proposal(
-            malformed,
-            _snapshot(config),
-            _market(),
-            config,
-            _AllocationStore(),
-            _Audit(),  # type: ignore[arg-type]
-            now=NOW,
-        )
+    response = review_allocation_proposal(
+        malformed,
+        _snapshot(config),
+        _market(),
+        config,
+        _AllocationStore(),
+        _Audit(),  # type: ignore[arg-type]
+        now=NOW,
+    )
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "INVALID_INPUT"
 
 
 def test_budget_activation_is_version_exact_and_atomic() -> None:
@@ -270,14 +282,17 @@ def test_budget_activation_is_version_exact_and_atomic() -> None:
     config = _config()
     review_store = _AllocationStore()
     audit = _Audit()
-    reviewed = review_allocation_proposal(
-        _review_request(config),
-        _snapshot(config),
-        _market(),
-        config,
-        review_store,
-        audit,  # type: ignore[arg-type]
-        now=NOW,
+    reviewed = unwrap_risk_response(
+        review_allocation_proposal(
+            _review_request(config),
+            _snapshot(config),
+            _market(),
+            config,
+            review_store,
+            audit,  # type: ignore[arg-type]
+            now=NOW,
+        ),
+        operation="review_allocation_proposal",
     )
     values = reviewed.model_dump(mode="python")
     values.update(state=DecisionState.APPROVE, conditions=())
@@ -306,39 +321,42 @@ def test_budget_activation_is_version_exact_and_atomic() -> None:
     mismatch = AllocationBudgetActivationRequest(
         **{**base, "allocation_version": "wrong-version"}
     )
-    with pytest.raises(RiskDomainError):
-        activate_allocation_budget(
-            mismatch,
-            approved,
-            (inactive,),
-            config,
-            activation_store,
-            audit,  # type: ignore[arg-type]
-            now=NOW,
-        )
-    assert activation_store.activation_calls == 0
-
-    active_switch = inactive.model_copy(update={"state": "active"})
-    with pytest.raises(RiskDomainError):
-        activate_allocation_budget(
-            AllocationBudgetActivationRequest(**base),
-            approved,
-            (active_switch,),
-            config,
-            activation_store,
-            audit,  # type: ignore[arg-type]
-            now=NOW,
-        )
-    assert activation_store.activation_calls == 0
-
-    active = activate_allocation_budget(
-        AllocationBudgetActivationRequest(**base),
+    response = activate_allocation_budget(
+        mismatch,
         approved,
         (inactive,),
         config,
         activation_store,
         audit,  # type: ignore[arg-type]
         now=NOW,
+    )
+    assert response.status == "error"
+    assert activation_store.activation_calls == 0
+
+    active_switch = inactive.model_copy(update={"state": "active"})
+    response = activate_allocation_budget(
+        AllocationBudgetActivationRequest(**base),
+        approved,
+        (active_switch,),
+        config,
+        activation_store,
+        audit,  # type: ignore[arg-type]
+        now=NOW,
+    )
+    assert response.status == "error"
+    assert activation_store.activation_calls == 0
+
+    active = unwrap_risk_response(
+        activate_allocation_budget(
+            AllocationBudgetActivationRequest(**base),
+            approved,
+            (inactive,),
+            config,
+            activation_store,
+            audit,  # type: ignore[arg-type]
+            now=NOW,
+        ),
+        operation="activate_allocation_budget",
     )
     assert active.active is True
     assert activation_store.active == active

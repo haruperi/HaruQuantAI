@@ -13,7 +13,7 @@ from app.services.risk import (
 )
 from app.utils import canonical_json
 from tests.risk.integration.test_strategy_admission import _AuditStore
-from tests.risk.usage.workflows._support import examples
+from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-006"
 STAGES = (
@@ -60,19 +60,27 @@ def main() -> None:
     eligibility_store = examples._EligibilityStore()
     # Stage 3: Execute the public admission review.
     _stage(3)
-    decision = review_strategy_admission(
-        request,
-        examples._registration(),
-        examples._market(),
-        config,
-        eligibility_store,
-        audit,
-        now=examples.NOW,
+    decision = unwrap_risk_response(
+        review_strategy_admission(
+            request,
+            examples._registration(),
+            examples._market(),
+            config,
+            eligibility_store,
+            audit,
+            now=examples.NOW,
+        ),
+        operation="review_strategy_admission",
     )
     print("Decision:", decision.state)
     # Stage 4: Verify persisted sealed evidence.
     _stage(4)
-    print("Audit valid:", audit.verify(tuple(audit_store.records)))
+    print(
+        "Audit valid:",
+        unwrap_risk_response(
+            audit.verify(tuple(audit_store.records)), operation="risk_audit.verify"
+        ),
+    )
     # Stage 5 — OUTPUT BOUNDARY: Return typed eligibility decision.
     _stage(5)
     print("Output:", type(decision).__name__, decision.decision_id)

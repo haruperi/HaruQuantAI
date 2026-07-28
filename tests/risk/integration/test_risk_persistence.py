@@ -98,14 +98,17 @@ def _eligible_decision(config_hash: str) -> RiskDecisionPackage:
     """
     config = decision_examples._config()
     governor, _, _ = decision_examples._services(config)
-    pending = governor.review_trade_risk(
-        decision_examples._proposal(config),
-        decision_examples._snapshot(config),
-        policy_examples._market(),
-        decision_examples._regime(),
-        (decision_examples._inactive_state(),),
-        decision_examples._auth(config),
-        now=decision_examples.NOW,
+    pending = decision_examples.unwrap_risk_response(
+        governor.review_trade_risk(
+            decision_examples._proposal(config),
+            decision_examples._snapshot(config),
+            policy_examples._market(),
+            decision_examples._regime(),
+            (decision_examples._inactive_state(),),
+            decision_examples._auth(config),
+            now=decision_examples.NOW,
+        ),
+        operation="risk_governor.review_trade_risk",
     )
     values = pending.model_dump(mode="python")
     values.update(
@@ -136,10 +139,18 @@ def test_audit_and_token_state_fail_closed_atomically() -> None:
         lambda evidence: evidence.principal_id == "operator-1",
     )
     with pytest.raises(RiskDomainError) as captured:
-        service.issue(
-            _eligible_decision(policy_examples.compute_config_hash(config)),
-            decision_examples._attestation(config),
-            now=decision_examples.NOW,
+        decision_examples.unwrap_risk_response(
+            service.issue(
+                _eligible_decision(
+                    decision_examples.unwrap_risk_response(
+                        policy_examples.compute_config_hash(config),
+                        operation="compute_config_hash",
+                    )
+                ),
+                decision_examples._attestation(config),
+                now=decision_examples.NOW,
+            ),
+            operation="approval_token_service.issue",
         )
     assert captured.value.risk_code is RiskErrorCode.STORAGE_ERROR
     assert len(token_store.tokens) == 1
@@ -174,7 +185,9 @@ def test_kill_switch_clearance_audit_failure_leaves_state_unchanged() -> None:
         principal_id="operator-2",
         action="risk.kill.clear",
         scope={"global": "*"},
-        policy_ref=compute_config_hash(config),
+        policy_ref=decision_examples.unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        ),
         policy_version=config.policy_version,
         issued_at=decision_examples.NOW,
         expires_at=decision_examples.NOW + timedelta(minutes=1),
@@ -184,16 +197,19 @@ def test_kill_switch_clearance_audit_failure_leaves_state_unchanged() -> None:
     )
 
     with pytest.raises(RiskDomainError) as captured:
-        apply_kill_switch_command(
-            command,
-            current,
-            decision_examples._auth(config, clearance=True),
-            approvals,
-            audit,
-            store,
-            config,
-            attestation=attestation,
-            now=decision_examples.NOW,
+        decision_examples.unwrap_risk_response(
+            apply_kill_switch_command(
+                command,
+                current,
+                decision_examples._auth(config, clearance=True),
+                approvals,
+                audit,
+                store,
+                config,
+                attestation=attestation,
+                now=decision_examples.NOW,
+            ),
+            operation="apply_kill_switch_command",
         )
 
     assert captured.value.risk_code is RiskErrorCode.STORAGE_ERROR

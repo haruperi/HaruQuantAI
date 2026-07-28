@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from app.services.risk.contracts import DecisionState, RiskDomainError, RiskErrorCode
+from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.risk.governor import RiskGovernor
 
 from tests.risk import _support as examples
@@ -27,28 +28,34 @@ def test_trade_review_truth_table_and_precedence() -> None:
     governor, _, _ = examples._services(config)
     proposal = examples._proposal(config)
     snapshot = examples._snapshot(config)
-    pending = governor.review_trade_risk(
-        proposal,
-        snapshot,
-        policy_examples._market(),
-        examples._regime(),
-        (examples._inactive_state(),),
-        examples._auth(config),
-        now=examples.NOW,
+    pending = unwrap_risk_response(
+        governor.review_trade_risk(
+            proposal,
+            snapshot,
+            policy_examples._market(),
+            examples._regime(),
+            (examples._inactive_state(),),
+            examples._auth(config),
+            now=examples.NOW,
+        ),
+        operation="risk_governor.review_trade_risk",
     )
     assert pending.state is DecisionState.NEEDS_APPROVAL
     active = examples._inactive_state().model_copy(
         update={"state": "active", "reason": "operator stop"}
     )
-    blocked = governor.review_trade_risk(
-        proposal,
-        snapshot,
-        policy_examples._market(),
-        examples._regime(),
-        (active,),
-        examples._auth(config),
-        attestation=examples._attestation(config),
-        now=examples.NOW,
+    blocked = unwrap_risk_response(
+        governor.review_trade_risk(
+            proposal,
+            snapshot,
+            policy_examples._market(),
+            examples._regime(),
+            (active,),
+            examples._auth(config),
+            attestation=examples._attestation(config),
+            now=examples.NOW,
+        ),
+        operation="risk_governor.review_trade_risk",
     )
     assert blocked.state is DecisionState.BLOCK
     assert blocked.ordered_checks[0].limit_id == "kill_switch"
@@ -61,13 +68,16 @@ def test_portfolio_governor_no_execution_mutation() -> None:
     governor, _, _ = examples._services(config)
     snapshot = examples._snapshot(config)
     before = snapshot.model_dump(mode="python")
-    decision = governor.run_portfolio_risk_governor(
-        snapshot,
-        policy_examples._market(),
-        examples._regime(),
-        (examples._inactive_state(),),
-        examples._auth(config),
-        now=examples.NOW,
+    decision = unwrap_risk_response(
+        governor.run_portfolio_risk_governor(
+            snapshot,
+            policy_examples._market(),
+            examples._regime(),
+            (examples._inactive_state(),),
+            examples._auth(config),
+            now=examples.NOW,
+        ),
+        operation="risk_governor.run_portfolio_risk_governor",
     )
     assert decision.state is DecisionState.APPROVE
     assert snapshot.model_dump(mode="python") == before
@@ -79,14 +89,17 @@ def test_governor_logs_structured_material_decision_evidence() -> None:
     config = examples._config()
     governor, _, _ = examples._services(config)
     with patch("app.services.risk.governor.orchestration.logger") as mocked_logger:
-        decision = governor.review_trade_risk(
-            examples._proposal(config),
-            examples._snapshot(config),
-            policy_examples._market(),
-            examples._regime(),
-            (examples._inactive_state(),),
-            examples._auth(config),
-            now=examples.NOW,
+        decision = unwrap_risk_response(
+            governor.review_trade_risk(
+                examples._proposal(config),
+                examples._snapshot(config),
+                policy_examples._market(),
+                examples._regime(),
+                (examples._inactive_state(),),
+                examples._auth(config),
+                now=examples.NOW,
+            ),
+            operation="risk_governor.review_trade_risk",
         )
     context = mocked_logger.bind.call_args.kwargs
     assert context["request_id"] == decision.request_id

@@ -78,30 +78,39 @@ def test_strategy_operational_eligibility_end_to_end() -> None:
     audit_store = _AuditStore()
     audit = RiskAuditChain(config, audit_store, lambda: examples.NOW, canonical_json)
     eligibility_store = examples._EligibilityStore()
-    decision = review_strategy_admission(
-        StrategyOperationalEligibilityRequest(
-            strategy_id="mean-reversion",
-            strategy_version="1.0.0",
-            runtime_profile="simulation",
-            execution_route="sim",
-            policy_version="policy-1",
-            registration_ref=examples.HASH_B,
-            evidence_refs={"market": examples.MARKET_REQUEST_ID},
-            approval_refs=(),
-            requested_scope={"symbol": "EURUSD"},
-            requested_at=examples.NOW,
-            request_id=examples.REQUEST_ID,
-            workflow_id=examples.WORKFLOW_ID,
-            correlation_id=examples.CORRELATION_ID,
+    decision = examples.unwrap_risk_response(
+        review_strategy_admission(
+            StrategyOperationalEligibilityRequest(
+                strategy_id="mean-reversion",
+                strategy_version="1.0.0",
+                runtime_profile="simulation",
+                execution_route="sim",
+                policy_version="policy-1",
+                registration_ref=examples.HASH_B,
+                evidence_refs={"market": examples.MARKET_REQUEST_ID},
+                approval_refs=(),
+                requested_scope={"symbol": "EURUSD"},
+                requested_at=examples.NOW,
+                request_id=examples.REQUEST_ID,
+                workflow_id=examples.WORKFLOW_ID,
+                correlation_id=examples.CORRELATION_ID,
+            ),
+            examples._registration(),
+            examples._market(),
+            config,
+            eligibility_store,
+            audit,
+            now=examples.NOW,
         ),
-        examples._registration(),
-        examples._market(),
-        config,
-        eligibility_store,
-        audit,
-        now=examples.NOW,
+        operation="review_strategy_admission",
     )
     assert decision.state is DecisionState.APPROVE
     assert eligibility_store.decision == decision
-    assert audit.verify(tuple(audit_store.records)) is True
+    assert (
+        examples.unwrap_risk_response(
+            audit.verify(tuple(audit_store.records)),
+            operation="risk_audit_chain.verify",
+        )
+        is True
+    )
     assert audit_store.records[0].sealed is True

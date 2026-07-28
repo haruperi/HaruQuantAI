@@ -17,9 +17,9 @@ from app.services.risk.contracts import (
     RiskApprovalToken,
     RiskAuditRecord,
     RiskDecisionPackage,
-    RiskDomainError,
     RiskErrorCode,
 )
+from app.services.risk.contracts.responses import unwrap_risk_response
 from app.utils import canonical_json
 
 NOW = datetime(2026, 7, 19, 5, tzinfo=UTC)
@@ -187,7 +187,9 @@ def _decision(config: RiskConfig) -> RiskDecisionPackage:
         primary_failure_limit=None,
         composite_breach_flags=(),
         evidence_refs={"portfolio": "snapshot-1"},
-        config_hash=compute_config_hash(config),
+        config_hash=unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        ),
         concurrency_disclosure="risk_store",
         recommendations=(),
         issued_at=NOW,
@@ -206,7 +208,9 @@ def _attestation(config: RiskConfig) -> ApprovalAttestation:
         principal_id="approver-1",
         action="submit_order",
         scope={"account_id": "account-1", "symbol": "EURUSD"},
-        policy_ref=compute_config_hash(config),
+        policy_ref=unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        ),
         policy_version=config.policy_version,
         issued_at=NOW - timedelta(seconds=1),
         expires_at=NOW + timedelta(seconds=120),
@@ -259,10 +263,14 @@ def test_issue_requires_valid_ui_approval_attestation() -> None:
     audit_store = _AuditStore()
     service = _service(config, store, audit_store)
     invalid = _attestation(config).model_copy(update={"principal_id": "intruder"})
-    with pytest.raises(RiskDomainError) as captured:
-        service.issue(_decision(config), invalid, now=NOW)
-    assert captured.value.risk_code is RiskErrorCode.PERMISSION_DENIED
-    token = service.issue(_decision(config), _attestation(config), now=NOW)
+    response = service.issue(_decision(config), invalid, now=NOW)
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == RiskErrorCode.PERMISSION_DENIED.value
+    token = unwrap_risk_response(
+        service.issue(_decision(config), _attestation(config), now=NOW),
+        operation="approval_tokens.issue",
+    )
     assert token.token_id in store.tokens
     assert audit_store.records[-1].event_type == "risk.approval_token.issued"
 
@@ -273,17 +281,23 @@ def test_concurrent_reservation_succeeds_once() -> None:
     store = _TokenStore()
     service = _service(config, store, _AuditStore())
     attestation = _attestation(config)
-    token = service.issue(_decision(config), attestation, now=NOW)
+    token = unwrap_risk_response(
+        service.issue(_decision(config), attestation, now=NOW),
+        operation="approval_tokens.issue",
+    )
 
     def consume() -> str:
         """Attempt one concurrent token consumption."""
-        try:
-            result = service.validate_reserve_and_consume(
-                token, attestation, _expected(token), now=NOW
+        response = service.validate_reserve_and_consume(
+            token, attestation, _expected(token), now=NOW
+        )
+        if response.status == "success":
+            return (
+                "consumed"
+                if response.data is not None and response.data.valid
+                else "invalid"
             )
-            return "consumed" if result.valid else "invalid"
-        except RiskDomainError as error:
-            return error.risk_code.value
+        return response.error.code if response.error is not None else "UNKNOWN_ERROR"
 
     with ThreadPoolExecutor(max_workers=2) as executor:
         outcomes = list(executor.map(lambda _: consume(), range(2)))
@@ -297,18 +311,25 @@ def test_kill_switch_revokes_affected_scope() -> None:
     store = _TokenStore()
     service = _service(config, store, _AuditStore())
     attestation = _attestation(config)
-    token = service.issue(_decision(config), attestation, now=NOW)
+    token = unwrap_risk_response(
+        service.issue(_decision(config), attestation, now=NOW),
+        operation="approval_tokens.issue",
+    )
     assert (
-        service.revoke_scope(
-            {"account_id": "account-1"}, "kill switch activated", now=NOW
+        unwrap_risk_response(
+            service.revoke_scope(
+                {"account_id": "account-1"}, "kill switch activated", now=NOW
+            ),
+            operation="approval_tokens.revoke_scope",
         )
         == 1
     )
-    with pytest.raises(RiskDomainError) as captured:
-        service.validate_reserve_and_consume(
-            token, attestation, _expected(token), now=NOW
-        )
-    assert captured.value.risk_code is RiskErrorCode.APPROVAL_TOKEN_REVOKED
+    response = service.validate_reserve_and_consume(
+        token, attestation, _expected(token), now=NOW
+    )
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == RiskErrorCode.APPROVAL_TOKEN_REVOKED.value
 
 
 def test_tampered_token_fails_closed_before_consumption() -> None:
@@ -317,13 +338,17 @@ def test_tampered_token_fails_closed_before_consumption() -> None:
     store = _TokenStore()
     service = _service(config, store, _AuditStore())
     attestation = _attestation(config)
-    token = service.issue(_decision(config), attestation, now=NOW)
+    token = unwrap_risk_response(
+        service.issue(_decision(config), attestation, now=NOW),
+        operation="approval_tokens.issue",
+    )
     tampered = token.model_copy(update={"signature": "0" * 64})
-    with pytest.raises(RiskDomainError) as captured:
-        service.validate_reserve_and_consume(
-            tampered, attestation, _expected(tampered), now=NOW
-        )
-    assert captured.value.risk_code is RiskErrorCode.APPROVAL_TOKEN_INVALID
+    response = service.validate_reserve_and_consume(
+        tampered, attestation, _expected(tampered), now=NOW
+    )
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == RiskErrorCode.APPROVAL_TOKEN_INVALID.value
     assert token.token_id not in store.consumed
 
 

@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.risk import DecisionState
-from tests.risk.usage.workflows._support import examples
+from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-005"
 STAGES = (
@@ -37,13 +37,16 @@ def main() -> None:
     print("Input snapshot:", snapshot.snapshot_id)
     # Stage 2: Execute portfolio compliance validation.
     _stage(2)
-    decision = governor.run_portfolio_risk_governor(
-        snapshot,
-        examples._market(),
-        examples._regime(),
-        (examples._inactive_state(),),
-        examples._auth(config),
-        now=examples.NOW,
+    decision = unwrap_risk_response(
+        governor.run_portfolio_risk_governor(
+            snapshot,
+            examples._market(),
+            examples._regime(),
+            (examples._inactive_state(),),
+            examples._auth(config),
+            now=examples.NOW,
+        ),
+        operation="risk_governor.run_portfolio_risk_governor",
     )
     print("Decision:", decision.state)
     # Stage 3: Verify no execution or snapshot mutation.

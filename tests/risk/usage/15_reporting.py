@@ -13,6 +13,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.risk import PortfolioRiskSnapshot, RiskConfig, generate_risk_report
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
@@ -81,7 +83,10 @@ def fr_risk_046() -> None:
         report_timeout_seconds=Decimal(5),
     )
 
-    report = generate_risk_report(_snapshot(), "markdown", config, now=NOW)
+    report = unwrap_risk_response(
+        generate_risk_report(_snapshot(), "markdown", config, now=NOW),
+        operation="generate_risk_report",
+    )
     print(
         f"Generated report format: {report.format}, "
         f"approval_claimed: {report.approval_claimed}"

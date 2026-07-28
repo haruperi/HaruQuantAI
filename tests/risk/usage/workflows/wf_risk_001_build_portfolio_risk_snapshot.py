@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.risk import build_portfolio_risk_snapshot
+from tests.risk._support import unwrap_risk_response
 from tests.risk.unit.test_snapshot import NOW, _config, _state
 
 WORKFLOW_ID = "WF-RISK-001"
@@ -40,7 +41,10 @@ def main() -> None:
     before = state.model_dump(mode="python")
     # Stage 4: Build all supported portfolio calculations.
     _stage(4)
-    snapshot = build_portfolio_risk_snapshot(state, config, now=NOW)
+    snapshot = unwrap_risk_response(
+        build_portfolio_risk_snapshot(state, config, now=NOW),
+        operation="build_portfolio_risk_snapshot",
+    )
     print("Coverage:", dict(snapshot.coverage))
     # Stage 5 — OUTPUT BOUNDARY: Return Risk-owned immutable snapshot or RiskDomainError.
     _stage(5)

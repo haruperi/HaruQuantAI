@@ -23,6 +23,8 @@ from app.services.risk import (
 )
 from app.services.strategy import TradeIntent
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
 
@@ -132,7 +134,10 @@ def example_contracts() -> None:
         missing_fields=(),
         request_id=MARKET_REQUEST_ID,
     )
-    validate_market_context_evidence(market, now=NOW)
+    unwrap_risk_response(
+        validate_market_context_evidence(market, now=NOW),
+        operation="validate_market_context_evidence",
+    )
     print(f"Validated consumed market-context evidence for symbol: {market.symbol}")
 
 

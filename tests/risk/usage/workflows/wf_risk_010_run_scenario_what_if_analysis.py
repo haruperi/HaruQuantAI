@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.risk import ScenarioDefinition, run_risk_scenario_analysis
-from tests.risk.usage.workflows._support import examples
+from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-010"
 STAGES = (
@@ -47,8 +47,9 @@ def main() -> None:
     print("Shocks:", dict(scenario.shocks))
     # Stage 3: Run the public deterministic analyzer.
     _stage(3)
-    results = run_risk_scenario_analysis(
-        snapshot, (scenario,), config, now=examples.NOW
+    results = unwrap_risk_response(
+        run_risk_scenario_analysis(snapshot, (scenario,), config, now=examples.NOW),
+        operation="run_risk_scenario_analysis",
     )
     print("Results:", len(results))
     # Stage 4: Verify advisory/no-mutation boundary.

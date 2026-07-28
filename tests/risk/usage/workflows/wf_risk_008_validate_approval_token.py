@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from tests.risk.usage.workflows._support import examples
+from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-008"
 STAGES = (
@@ -33,7 +33,10 @@ def main() -> None:
     print("Input decision:", decision.decision_id)
     # Stage 2: Issue through ApprovalTokenService.
     _stage(2)
-    token = service.issue(decision, attestation, now=examples.NOW)
+    token = unwrap_risk_response(
+        service.issue(decision, attestation, now=examples.NOW),
+        operation="approval_tokens.issue",
+    )
     print("Issued:", token.token_id)
     # Stage 3: Build exact expected binding.
     _stage(3)
@@ -41,8 +44,11 @@ def main() -> None:
     print("Expected action:", expected["action"])
     # Stage 4: Validate, reserve, consume, and audit atomically.
     _stage(4)
-    result = service.validate_reserve_and_consume(
-        token, attestation, expected, now=examples.NOW
+    result = unwrap_risk_response(
+        service.validate_reserve_and_consume(
+            token, attestation, expected, now=examples.NOW
+        ),
+        operation="approval_tokens.validate_reserve_and_consume",
     )
     print("Consumed:", result.consumed, token.token_id in store.consumed)
     # Stage 5 — OUTPUT BOUNDARY: Return ApprovalValidationResult only.

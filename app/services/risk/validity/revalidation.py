@@ -12,7 +12,11 @@ from app.services.risk.contracts import (
     RiskDomainError,
     RiskErrorCode,
 )
-from app.utils import logger
+from app.services.risk.contracts.responses import (
+    guard_risk_boundary,
+    unwrap_risk_response,
+)
+from app.utils import RiskLevel, logger
 
 
 def _utc(value: datetime) -> datetime:
@@ -128,6 +132,7 @@ def _validate_reuse_state(
         )
 
 
+@guard_risk_boundary(risk_level=RiskLevel.HIGH, read_only=True)
 def revalidate_risk_decision(
     decision: RiskDecisionPackage,
     proposal: ProposedTrade,
@@ -156,7 +161,9 @@ def revalidate_risk_decision(
     started_at = monotonic()
     try:
         checked_now = _utc(now)
-        config_hash = compute_config_hash(config)
+        config_hash = unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        )
         _validate_reuse_state(
             decision, proposal, snapshot, config, config_hash, checked_now
         )

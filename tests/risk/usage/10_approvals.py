@@ -26,6 +26,8 @@ from app.services.risk import (
 )
 from app.utils import canonical_json
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, 5, tzinfo=UTC)
 
 
@@ -169,7 +171,9 @@ def example_approvals() -> None:
         lambda _: b"example-risk-signing-key-material-32-bytes",
         lambda evidence: evidence.principal_id == "approver-1",
     )
-    config_hash = compute_config_hash(config)
+    config_hash = unwrap_risk_response(
+        compute_config_hash(config), operation="compute_config_hash"
+    )
     decision = RiskDecisionPackage(
         decision_id="decision-1",
         intent_id="intent-1",
@@ -205,7 +209,10 @@ def example_approvals() -> None:
     )
 
     # 1. Issue token
-    token = service.issue(decision, attestation, now=NOW)
+    token = unwrap_risk_response(
+        service.issue(decision, attestation, now=NOW),
+        operation="approval_tokens.issue",
+    )
     print(f"Issued Approval Token ID: {token.token_id}, action: {token.action}")
 
     # 2. Validate and consume
@@ -218,7 +225,10 @@ def example_approvals() -> None:
         "correlation_id": token.correlation_id,
         **dict(token.scope),
     }
-    result = service.validate_reserve_and_consume(token, attestation, expected, now=NOW)
+    result = unwrap_risk_response(
+        service.validate_reserve_and_consume(token, attestation, expected, now=NOW),
+        operation="approval_tokens.validate_reserve_and_consume",
+    )
     print(f"Validation result valid: {result.valid}")
 
 

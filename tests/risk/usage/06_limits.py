@@ -19,6 +19,8 @@ from app.services.risk import (
     evaluate_portfolio_limits,
 )
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
 
@@ -109,11 +111,17 @@ def example_limits() -> None:
     snapshot = _snapshot()
     config = _config()
 
-    portfolio_results = evaluate_portfolio_limits(snapshot, config, now=NOW)
+    portfolio_results = unwrap_risk_response(
+        evaluate_portfolio_limits(snapshot, config, now=NOW),
+        operation="evaluate_portfolio_limits",
+    )
     print(f"Evaluated portfolio limit results: {len(portfolio_results)}")
     print(f"Ordered portfolio statuses: {[r.status for r in portfolio_results]}")
 
-    market_results = evaluate_market_context(_market(), config, now=NOW)
+    market_results = unwrap_risk_response(
+        evaluate_market_context(_market(), config, now=NOW),
+        operation="evaluate_market_context",
+    )
     print(f"Evaluated market-context results: {len(market_results)}")
     print(f"Ordered market statuses: {[r.status for r in market_results]}")
 
@@ -152,9 +160,20 @@ def fr_risk_028() -> None:
     _demonstrate_once()
 
 
+def fr_risk_062() -> None:
+    """FR-RISK-062: Consume only Data-normalized calendar state and exact
+    blackout provenance, block configured release states, pass authoritative open
+    evidence, and apply `missing_calendar_mode` to unavailable evidence; Risk
+    remains the sole news-trading policy authority."""
+    _header(
+        "FR-RISK-062: Consume only Data-normalized calendar state and exact blackout provenance, block configured release states, pass authoritative open evidence, and apply missing_calendar_mode to unavailable evidence; Risk remains the sole news-trading policy authority."
+    )
+    _demonstrate_once()
+
+
 def main() -> None:
     """Run every functional-requirement demonstration for Risk limits."""
-    for demonstrate in (fr_risk_027, fr_risk_028):
+    for demonstrate in (fr_risk_027, fr_risk_028, fr_risk_062):
         demonstrate()
 
 

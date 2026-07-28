@@ -32,6 +32,8 @@ from app.services.risk import (
 from app.services.strategy import TradeIntent
 from app.utils import AuthContext, canonical_json
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
 REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
@@ -197,7 +199,9 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
         gaps=(),
         regime=None,
         as_of=NOW,
-        config_hash=compute_config_hash(config),
+        config_hash=unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        ),
         evidence_refs={"account": "account-evidence-1"},
         request_id=REQUEST_ID,
         workflow_id=WORKFLOW_ID,
@@ -320,7 +324,9 @@ def _attestation(config: RiskConfig) -> ApprovalAttestation:
         principal_id="operator-1",
         action="submit_order",
         scope={"account_id": "account-1", "symbol": "EURUSD"},
-        policy_ref=compute_config_hash(config),
+        policy_ref=unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        ),
         policy_version=config.policy_version,
         issued_at=NOW,
         expires_at=NOW + timedelta(minutes=1),
@@ -353,15 +359,18 @@ def example_governor() -> None:
     governor = _governor(config)
     snapshot = _snapshot(config)
 
-    decision = governor.review_trade_risk(
-        _proposal(config),
-        snapshot,
-        _market(),
-        _regime(),
-        (_inactive_kill_switch(),),
-        _auth(config),
-        attestation=_attestation(config),
-        now=NOW,
+    decision = unwrap_risk_response(
+        governor.review_trade_risk(
+            _proposal(config),
+            snapshot,
+            _market(),
+            _regime(),
+            (_inactive_kill_switch(),),
+            _auth(config),
+            attestation=_attestation(config),
+            now=NOW,
+        ),
+        operation="risk_governor.review_trade_risk",
     )
     print(f"Trade review verdict: {decision.state}")
     print(
@@ -369,13 +378,16 @@ def example_governor() -> None:
         f"primary failure: {decision.primary_failure_limit}"
     )
 
-    current = governor.run_portfolio_risk_governor(
-        snapshot,
-        _market(),
-        _regime(),
-        (_inactive_kill_switch(),),
-        _auth(config),
-        now=NOW,
+    current = unwrap_risk_response(
+        governor.run_portfolio_risk_governor(
+            snapshot,
+            _market(),
+            _regime(),
+            (_inactive_kill_switch(),),
+            _auth(config),
+            now=NOW,
+        ),
+        operation="risk_governor.run_portfolio_risk_governor",
     )
     print(f"Portfolio governor verdict: {current.state}")
     print(f"Current-state approved size is absent: {current.approved_size is None}")

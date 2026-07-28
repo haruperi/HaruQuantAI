@@ -13,6 +13,7 @@ from app.services.data import (
 )
 from app.services.risk.config import RiskConfig
 from app.services.risk.contracts import PortfolioState
+from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.risk.portfolio import build_portfolio_risk_snapshot
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
@@ -141,7 +142,10 @@ def _state() -> PortfolioState:
 
 def test_snapshot_includes_pending_and_conversion_evidence() -> None:
     """Include full pending exposure and exact quote conversion evidence."""
-    snapshot = build_portfolio_risk_snapshot(_state(), _config(), now=NOW)
+    snapshot = unwrap_risk_response(
+        build_portfolio_risk_snapshot(_state(), _config(), now=NOW),
+        operation="build_portfolio_risk_snapshot",
+    )
     assert snapshot.gross_exposure == Decimal(111000)
     assert snapshot.net_exposure == Decimal(109000)
     assert snapshot.daily_loss == Decimal(200)

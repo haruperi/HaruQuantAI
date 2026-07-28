@@ -16,7 +16,11 @@ from app.services.risk.contracts import (
     RiskDomainError,
     RiskErrorCode,
 )
-from app.utils import logger
+from app.services.risk.contracts.responses import (
+    guard_risk_boundary,
+    unwrap_risk_response,
+)
+from app.utils import RiskLevel, logger
 
 _MIN_SAMPLE_SIZE = 2
 
@@ -423,7 +427,9 @@ def _build_snapshot(
         if correlation > config.max_correlation
         else LimitStatus.PASS
     )
-    config_hash = compute_config_hash(config)
+    config_hash = unwrap_risk_response(
+        compute_config_hash(config), operation="compute_config_hash"
+    )
     snapshot_key = (
         f"{state.account_snapshot.account_id}|{state.as_of.isoformat()}|{config_hash}"
     )
@@ -478,6 +484,7 @@ def _build_snapshot(
     )
 
 
+@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
 def build_portfolio_risk_snapshot(
     state: PortfolioState, config: RiskConfig, *, now: datetime
 ) -> PortfolioRiskSnapshot:

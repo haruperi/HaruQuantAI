@@ -79,7 +79,10 @@ def test_supported_scenario_and_position_workload_completes() -> None:
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
-    snapshot = build_portfolio_risk_snapshot(state, config, now=examples.NOW)
+    snapshot = examples.unwrap_risk_response(
+        build_portfolio_risk_snapshot(state, config, now=examples.NOW),
+        operation="build_portfolio_risk_snapshot",
+    )
     scenarios = tuple(
         ScenarioDefinition(
             scenario_id=f"scenario-{index:03d}",
@@ -90,7 +93,10 @@ def test_supported_scenario_and_position_workload_completes() -> None:
         )
         for index in range(100)
     )
-    results = run_risk_scenario_analysis(snapshot, scenarios, config, now=examples.NOW)
+    results = examples.unwrap_risk_response(
+        run_risk_scenario_analysis(snapshot, scenarios, config, now=examples.NOW),
+        operation="run_risk_scenario_analysis",
+    )
     assert len(account.positions) == 500
     assert len(return_timestamps) == 5_000
     assert (

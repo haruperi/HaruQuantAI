@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from decimal import Decimal
 
 from app.services.risk import PositionSizingRequest, calculate_position_size
+from tests.risk._support import unwrap_risk_response
 from tests.risk.usage.workflows._support import examples
 
 WORKFLOW_ID = "WF-RISK-002"
@@ -60,7 +61,10 @@ def main() -> None:
     print("Snapshot:", snapshot.snapshot_id, snapshot.equity)
     # Stage 3: Execute the selected calculator.
     _stage(3)
-    result = calculate_position_size(request, snapshot, config)
+    result = unwrap_risk_response(
+        calculate_position_size(request, snapshot, config),
+        operation="calculate_position_size",
+    )
     print("Calculated size:", result.calculated_size)
     # Stage 4: Report the applied constraint/fallback evidence.
     _stage(4)

@@ -13,18 +13,22 @@ def test_report_separates_evidence_and_decision() -> None:
     active = decision_examples._inactive_state().model_copy(
         update={"state": "active", "reason": "operator safety stop"}
     )
-    decision = governor.review_trade_risk(
-        decision_examples._proposal(config),
-        decision_examples._snapshot(config),
-        policy_examples._market(),
-        decision_examples._regime(),
-        (active,),
-        decision_examples._auth(config),
-        attestation=decision_examples._attestation(config),
-        now=decision_examples.NOW,
+    decision = decision_examples.unwrap_risk_response(
+        governor.review_trade_risk(
+            decision_examples._proposal(config),
+            decision_examples._snapshot(config),
+            policy_examples._market(),
+            decision_examples._regime(),
+            (active,),
+            decision_examples._auth(config),
+            attestation=decision_examples._attestation(config),
+            now=decision_examples.NOW,
+        ),
+        operation="risk_governor.review_trade_risk",
     )
-    report = generate_risk_report(
-        decision, "markdown", config, now=decision_examples.NOW
+    report = decision_examples.unwrap_risk_response(
+        generate_risk_report(decision, "markdown", config, now=decision_examples.NOW),
+        operation="generate_risk_report",
     )
     assert report.evidence != report.decision
     assert report.decision[0] == "primary_failure=kill_switch"

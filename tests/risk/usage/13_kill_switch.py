@@ -27,6 +27,8 @@ from app.services.risk import (
 )
 from app.utils import AuthContext, canonical_json, generate_id
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 REQUEST_ID = generate_id("req")
 WORKFLOW_ID = generate_id("wf")
@@ -199,15 +201,18 @@ def example_kill_switch() -> None:
         workflow_id=WORKFLOW_ID,
         correlation_id=CORRELATION_ID,
     )
-    result_state = apply_kill_switch_command(
-        command,
-        inactive_state,
-        auth,
-        approvals,
-        audit,
-        kill_store,
-        config,
-        now=NOW,
+    result_state = unwrap_risk_response(
+        apply_kill_switch_command(
+            command,
+            inactive_state,
+            auth,
+            approvals,
+            audit,
+            kill_store,
+            config,
+            now=NOW,
+        ),
+        operation="apply_kill_switch_command",
     )
     print(
         f"Activated kill switch state: {result_state.state}, "
@@ -242,7 +247,9 @@ def example_kill_switch() -> None:
         principal_id="operator-2",
         action="risk.kill.clear",
         scope={"global": "*"},
-        policy_ref=compute_config_hash(config),
+        policy_ref=unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        ),
         policy_version=config.policy_version,
         issued_at=NOW,
         expires_at=NOW + timedelta(minutes=1),
@@ -250,27 +257,33 @@ def example_kill_switch() -> None:
         workflow_id=clear_workflow_id,
         correlation_id=clear_correlation_id,
     )
-    cleared_state = apply_kill_switch_command(
-        clear_command,
-        result_state,
-        clear_auth,
-        approvals,
-        audit,
-        kill_store,
-        config,
-        attestation=attestation,
-        now=NOW,
+    cleared_state = unwrap_risk_response(
+        apply_kill_switch_command(
+            clear_command,
+            result_state,
+            clear_auth,
+            approvals,
+            audit,
+            kill_store,
+            config,
+            attestation=attestation,
+            now=NOW,
+        ),
+        operation="apply_kill_switch_command",
     )
     print(f"Distinct-principal clearance state: {cleared_state.state}")
 
     # 3. Check kill switch status
-    decision_package = check_risk_kill_switch(
-        (cleared_state,),
-        {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
-        config,
-        auth,
-        reconciled=True,
-        now=NOW,
+    decision_package = unwrap_risk_response(
+        check_risk_kill_switch(
+            (cleared_state,),
+            {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
+            config,
+            auth,
+            reconciled=True,
+            now=NOW,
+        ),
+        operation="check_risk_kill_switch",
     )
     print(f"Checked kill switch decision state: {decision_package.state.value}")
 

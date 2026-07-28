@@ -15,6 +15,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from app.services.risk import RiskAuditChain, RiskAuditRecord, RiskConfig
 from app.utils import canonical_json
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
@@ -95,7 +97,7 @@ def example_audit() -> None:
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
-    sealed = chain.append(record)
+    sealed = unwrap_risk_response(chain.append(record), operation="risk_audit.append")
     print(
         f"Sealed Audit Record sequence: {sealed.sequence}, hash: {sealed.record_hash}"
     )

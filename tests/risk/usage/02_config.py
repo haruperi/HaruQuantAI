@@ -12,6 +12,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.risk import RiskConfig, compute_config_hash
 
+from tests.risk._support import unwrap_risk_response
+
 
 def _header(title: str) -> None:
     """Print one example heading."""
@@ -49,7 +51,9 @@ def example_config() -> None:
     )
 
     # 2. Compute config hash
-    digest = compute_config_hash(config)
+    digest = unwrap_risk_response(
+        compute_config_hash(config), operation="compute_config_hash"
+    )
     print(f"Computed RiskConfig SHA256 digest: {digest}")
 
 

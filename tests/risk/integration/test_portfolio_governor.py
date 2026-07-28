@@ -13,13 +13,16 @@ def test_portfolio_governor_has_no_execution_side_effect() -> None:
     snapshot = examples._snapshot(config)
     before = snapshot.model_dump(mode="python")
     execution_state = {"orders_cancelled": False, "positions_closed": False}
-    decision = governor.run_portfolio_risk_governor(
-        snapshot,
-        policy_examples._market(),
-        examples._regime(),
-        (examples._inactive_state(),),
-        examples._auth(config),
-        now=examples.NOW,
+    decision = examples.unwrap_risk_response(
+        governor.run_portfolio_risk_governor(
+            snapshot,
+            policy_examples._market(),
+            examples._regime(),
+            (examples._inactive_state(),),
+            examples._auth(config),
+            now=examples.NOW,
+        ),
+        operation="risk_governor.run_portfolio_risk_governor",
     )
     assert decision.state is DecisionState.APPROVE
     assert snapshot.model_dump(mode="python") == before

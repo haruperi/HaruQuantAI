@@ -24,8 +24,9 @@ from app.services.data import (
 )
 from app.services.risk.contracts.enums import LimitStatus, RiskErrorCode
 from app.services.risk.contracts.errors import RiskDomainError
+from app.services.risk.contracts.responses import guard_risk_boundary
+from app.utils import RiskLevel, logger, validate_id
 from app.utils import ValidationError as UtilsValidationError
-from app.utils import logger, validate_id
 
 _CURRENCY_CODE_LENGTH = 3
 _CORRELATION_PAIR_SIZE = 2
@@ -664,6 +665,7 @@ class PortfolioRiskSnapshot(_EvidenceModel):
         return dict(value)
 
 
+@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
 def validate_market_context_evidence(
     evidence: MarketContextEvidence, *, now: datetime
 ) -> None:

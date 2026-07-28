@@ -3,7 +3,8 @@
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Literal, cast
+from time import perf_counter_ns
+from typing import Literal, TypeVar, cast
 
 from app.services.data import MarketContextEvidence
 from app.services.risk import (
@@ -22,6 +23,8 @@ from app.services.risk import (
     RiskAuditRecord,
     RiskConfig,
     RiskDecisionPackage,
+    RiskDomainError,
+    RiskErrorCode,
     RiskGovernor,
     StrategyOperationalEligibilityDecision,
     calculate_position_size,
@@ -36,7 +39,43 @@ from app.services.strategy import (
     TradeIntent,
     ValidatedStrategyRef,
 )
-from app.utils import AuthContext, canonical_json
+from app.utils import (
+    AuthContext,
+    RiskLevel,
+    StandardResponse,
+    build_response_metadata,
+    canonical_json,
+    success_response,
+)
+
+_ResponseValue = TypeVar("_ResponseValue")
+
+
+def unwrap_risk_response(
+    response: StandardResponse[_ResponseValue], *, operation: str
+) -> _ResponseValue:
+    """Unwrap a successful public Risk response in test support code.
+
+    Args:
+        response: Standard response returned by a Risk public operation.
+        operation: Operation name used in the diagnostic if the response fails.
+
+    Returns:
+        Raw Risk result stored in ``data``.
+
+    Raises:
+        RiskDomainError: If the response carries a coded Risk failure.
+        TypeError: If the response is not a StandardResponse.
+    """
+    if not isinstance(response, StandardResponse):
+        message = f"{operation} returned a non-standard response"
+        raise TypeError(message)
+    if response.status != "success" or response.error is not None:
+        code = response.error.code if response.error is not None else "UNKNOWN_ERROR"
+        message = f"{operation} failed"
+        raise RiskDomainError(RiskErrorCode(code), message)
+    return cast("_ResponseValue", response.data)
+
 
 NOW = datetime(2026, 7, 19, 5, tzinfo=UTC)
 MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
@@ -47,6 +86,41 @@ WORKFLOW_ID = "wf-22222222-2222-4222-8222-222222222222"
 CORRELATION_ID = "cor-33333333-3333-4333-8333-333333333333"
 
 
+def _risk_value(response: object, operation: str) -> object:
+    """Unwrap one successful Risk response for test fixture construction.
+
+    Args:
+        response: Standard response returned by a public Risk operation.
+        operation: Stable operation name used for failure diagnostics.
+
+    Returns:
+        The raw successful Risk result.
+    """
+    return unwrap_risk_response(response, operation=operation)  # type: ignore[arg-type]
+
+
+def _risk_success[T](data: T) -> StandardResponse[T]:
+    """Build a valid successful response for a test double boundary.
+
+    Returns:
+        Validated successful response containing ``data``.
+    """
+    metadata = build_response_metadata(
+        name="tests.risk.audit.append",
+        domain="risk",
+        risk_level=RiskLevel.CRITICAL,
+        request_id=REQUEST_ID,
+        correlation_id=CORRELATION_ID,
+        start_time=perf_counter_ns(),
+        read_only=False,
+        writes_file=False,
+        modifies_database=True,
+        places_trade=False,
+        requires_network=False,
+    )
+    return success_response(data, message="test double completed", metadata=metadata)
+
+
 class _Audit:
     """Example audit receiver that captures material events."""
 
@@ -54,7 +128,7 @@ class _Audit:
         """Initialize empty captured events."""
         self.records: list[RiskAuditRecord] = []
 
-    def append(self, record: RiskAuditRecord) -> RiskAuditRecord:
+    def append(self, record: RiskAuditRecord) -> StandardResponse[RiskAuditRecord]:
         """Capture one unsealed event.
 
         Args:
@@ -64,7 +138,7 @@ class _Audit:
             Captured event.
         """
         self.records.append(record)
-        return record
+        return _risk_success(record)
 
 
 class _AuditStore:
@@ -422,7 +496,7 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
         gaps=(),
         regime=None,
         as_of=NOW,
-        config_hash=compute_config_hash(config),
+        config_hash=_risk_value(compute_config_hash(config), "compute_config_hash"),
         evidence_refs={"account": "account-evidence-1"},
         request_id=REQUEST_ID,
         workflow_id=WORKFLOW_ID,
@@ -502,7 +576,11 @@ def _allocation_request(config: RiskConfig) -> AllocationReviewRequest:
         account_evidence_ref="account-evidence-1",
         market_evidence_ref=MARKET_REQUEST_ID,
         fx_evidence_refs=(),
-        evidence_hashes={"snapshot_config": compute_config_hash(config)},
+        evidence_hashes={
+            "snapshot_config": _risk_value(
+                compute_config_hash(config), "compute_config_hash"
+            )
+        },
         runtime_profile="simulation",
         execution_route="sim",
         approval_refs=(),
@@ -707,7 +785,7 @@ def _attestation(config: RiskConfig) -> ApprovalAttestation:
         principal_id="operator-1",
         action="submit_order",
         scope={"account_id": "account-1", "symbol": "EURUSD"},
-        policy_ref=compute_config_hash(config),
+        policy_ref=_risk_value(compute_config_hash(config), "compute_config_hash"),
         policy_version=config.policy_version,
         issued_at=NOW,
         expires_at=NOW + timedelta(minutes=1),
@@ -762,7 +840,7 @@ def _values(
         lambda _: b"example-risk-signing-key-material-32-bytes",
         lambda evidence: evidence.principal_id == "approver-1",
     )
-    config_hash = compute_config_hash(config)
+    config_hash = _risk_value(compute_config_hash(config), "compute_config_hash")
     decision = RiskDecisionPackage(
         decision_id="decision-1",
         intent_id="intent-1",
@@ -844,7 +922,10 @@ def run_position_size_test() -> None:
         evidence_refs={"snapshot": snapshot.snapshot_id},
         request_id=REQUEST_ID,
     )
-    result = calculate_position_size(request, snapshot, _config())
+    result = _risk_value(
+        calculate_position_size(request, snapshot, _config()),
+        "calculate_position_size",
+    )
     if result.normalized_size != Decimal(1):
         raise AssertionError("Fixed-risk example size did not normalize to one lot")
     if result.approved:

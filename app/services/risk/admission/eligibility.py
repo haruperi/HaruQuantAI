@@ -17,13 +17,17 @@ from app.services.risk.contracts import (
     StrategyOperationalEligibilityDecision,
     StrategyOperationalEligibilityRequest,
 )
+from app.services.risk.contracts.responses import (
+    guard_risk_boundary,
+    unwrap_risk_response,
+)
 from app.services.risk.limits import evaluate_market_context
 from app.services.strategy import (
     StrategyEnvironment,
     StrategyLifecycleStatus,
     ValidatedStrategyRef,
 )
-from app.utils import canonical_json, logger
+from app.utils import RiskLevel, canonical_json, logger
 
 if TYPE_CHECKING:
     from app.services.data import (
@@ -183,6 +187,11 @@ def _audit_record(
     )
 
 
+@guard_risk_boundary(
+    risk_level=RiskLevel.HIGH,
+    read_only=False,
+    modifies_database=True,
+)
 def review_strategy_admission(
     request: StrategyOperationalEligibilityRequest,
     registration: ValidatedStrategyRef,
@@ -219,11 +228,16 @@ def review_strategy_admission(
             RiskErrorCode.MISSING_EVIDENCE,
             "strategy admission market evidence is not request-bound",
         )
-    market_results = evaluate_market_context(market, config, now=checked_now)
+    market_results = unwrap_risk_response(
+        evaluate_market_context(market, config, now=checked_now),
+        operation="evaluate_market_context",
+    )
     state, suspended, conditions = _decision_state(
         tuple(result.status for result in market_results)
     )
-    config_hash = compute_config_hash(config)
+    config_hash = unwrap_risk_response(
+        compute_config_hash(config), operation="compute_config_hash"
+    )
     decision_id = _identity(request, registration, config_hash)
     audit_ref = f"risk-admission-{decision_id}"
     decision = StrategyOperationalEligibilityDecision(
@@ -259,7 +273,10 @@ def review_strategy_admission(
             RiskErrorCode.STORAGE_ERROR,
             "strategy eligibility identity conflict",
         )
-    audit.append(_audit_record(decision, request, config_hash))
+    unwrap_risk_response(
+        audit.append(_audit_record(decision, request, config_hash)),
+        operation="risk_audit.append",
+    )
     logger.bind(
         request_id=request.request_id,
         workflow_id=request.workflow_id,

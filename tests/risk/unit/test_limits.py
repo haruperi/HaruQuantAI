@@ -3,7 +3,6 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-import pytest
 from app.services.data import (
     EconomicEvent,
     EventImpact,
@@ -11,11 +10,8 @@ from app.services.data import (
     populate_market_context_calendar,
 )
 from app.services.risk.config import RiskConfig, compute_config_hash
-from app.services.risk.contracts import (
-    LimitStatus,
-    PortfolioRiskSnapshot,
-    RiskDomainError,
-)
+from app.services.risk.contracts import LimitStatus, PortfolioRiskSnapshot
+from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.risk.limits import (
     evaluate_market_context,
     evaluate_portfolio_limits,
@@ -93,7 +89,9 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
         gaps=(),
         regime=None,
         as_of=NOW,
-        config_hash=compute_config_hash(config),
+        config_hash=unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        ),
         evidence_refs={"account": "account-evidence-1"},
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
@@ -135,7 +133,10 @@ def _market(*, timezone: str = "UTC") -> MarketContextEvidence:
 def test_limit_order_and_composite_failures() -> None:
     """Return exact precedence with every simultaneous breach preserved."""
     config = _config()
-    results = evaluate_portfolio_limits(_snapshot(config), config, now=NOW)
+    results = unwrap_risk_response(
+        evaluate_portfolio_limits(_snapshot(config), config, now=NOW),
+        operation="evaluate_portfolio_limits",
+    )
     assert [item.precedence for item in results] == list(range(len(results)))
     assert [item.limit_id for item in results[:5]] == [
         "freshness",
@@ -160,10 +161,13 @@ def test_limit_order_and_composite_failures() -> None:
 
 def test_timezone_failure_blocks_live() -> None:
     """Block a live review when supplied timezone conversion is impossible."""
-    results = evaluate_market_context(
-        _market(timezone="Mars/Nowhere"),
-        _config(live=True),
-        now=NOW,
+    results = unwrap_risk_response(
+        evaluate_market_context(
+            _market(timezone="Mars/Nowhere"),
+            _config(live=True),
+            now=NOW,
+        ),
+        operation="evaluate_market_context",
     )
     assert results[1].limit_id == "session"
     assert results[1].status is LimitStatus.BLOCKED
@@ -180,7 +184,10 @@ def test_market_context_applies_missing_modes_units_and_availability() -> None:
             "liquidity": None,
         }
     )
-    results = evaluate_market_context(missing, config, now=NOW)
+    results = unwrap_risk_response(
+        evaluate_market_context(missing, config, now=NOW),
+        operation="evaluate_market_context",
+    )
     assert results[1].status is LimitStatus.NEEDS_MORE_EVIDENCE
     assert results[2].status is LimitStatus.BLOCKED
     assert results[3].status is LimitStatus.FAIL
@@ -189,7 +196,10 @@ def test_market_context_applies_missing_modes_units_and_availability() -> None:
     blocked = _market().model_copy(
         update={"session_state": "closed", "calendar_state": "event"}
     )
-    blocked_results = evaluate_market_context(blocked, config, now=NOW)
+    blocked_results = unwrap_risk_response(
+        evaluate_market_context(blocked, config, now=NOW),
+        operation="evaluate_market_context",
+    )
     assert blocked_results[1].status is LimitStatus.BLOCKED
     assert blocked_results[2].status is LimitStatus.BLOCKED
 
@@ -206,13 +216,25 @@ def test_calendar_limit_consumes_data_derived_event_and_open_evidence() -> None:
         scheduled_at=NOW + timedelta(minutes=5),
         impact=EventImpact.HIGH,
     )
-    blocked_evidence = populate_market_context_calendar(_market(), events=[event])
-    blocked = evaluate_market_context(blocked_evidence, _config(), now=NOW)
+    blocked_evidence = unwrap_risk_response(
+        populate_market_context_calendar(_market(), events=[event]),
+        operation="populate_market_context_calendar",
+    )
+    blocked = unwrap_risk_response(
+        evaluate_market_context(blocked_evidence, _config(), now=NOW),
+        operation="evaluate_market_context",
+    )
     assert blocked[2].limit_id == "calendar"
     assert blocked[2].status is LimitStatus.BLOCKED
 
-    open_evidence = populate_market_context_calendar(_market(), events=[])
-    opened = evaluate_market_context(open_evidence, _config(), now=NOW)
+    open_evidence = unwrap_risk_response(
+        populate_market_context_calendar(_market(), events=[]),
+        operation="populate_market_context_calendar",
+    )
+    opened = unwrap_risk_response(
+        evaluate_market_context(open_evidence, _config(), now=NOW),
+        operation="evaluate_market_context",
+    )
     assert open_evidence.calendar_state == "open"
     assert opened[2].status is LimitStatus.PASS
 
@@ -220,5 +242,5 @@ def test_calendar_limit_consumes_data_derived_event_and_open_evidence() -> None:
 def test_portfolio_limits_require_freshness_configuration() -> None:
     """Fail closed when the canonical portfolio freshness key is absent."""
     config = _config().model_copy(update={"evidence_max_age_seconds": {"market": 30}})
-    with pytest.raises(RiskDomainError):
-        evaluate_portfolio_limits(_snapshot(_config()), config, now=NOW)
+    response = evaluate_portfolio_limits(_snapshot(_config()), config, now=NOW)
+    assert response.status == "error"

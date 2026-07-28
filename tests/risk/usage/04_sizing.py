@@ -18,6 +18,8 @@ from app.services.risk import (
     calculate_position_size,
 )
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
@@ -110,7 +112,10 @@ def fr_risk_026() -> None:
         evidence_refs={"snapshot": snapshot.snapshot_id},
         request_id="req-11111111-1111-4111-8111-111111111111",
     )
-    result = calculate_position_size(request, snapshot, _config())
+    result = unwrap_risk_response(
+        calculate_position_size(request, snapshot, _config()),
+        operation="calculate_position_size",
+    )
     print(
         f"Calculated normalized size: {result.normalized_size}, "
         f"approved: {result.approved}"

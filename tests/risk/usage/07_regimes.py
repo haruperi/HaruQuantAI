@@ -16,6 +16,8 @@ from app.services.data import (
 )
 from app.services.risk import PortfolioRiskSnapshot, RiskConfig, assess_risk_regime
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
@@ -104,7 +106,10 @@ def fr_risk_031() -> None:
         report_timeout_seconds=Decimal(5),
     )
 
-    assessment = assess_risk_regime(_snapshot(), _market(), config, now=NOW)
+    assessment = unwrap_risk_response(
+        assess_risk_regime(_snapshot(), _market(), config, now=NOW),
+        operation="assess_risk_regime",
+    )
     print(
         f"Assessed volatility state: {assessment.states.get('volatility')}, "
         f"modifiers: {assessment.modifiers}"

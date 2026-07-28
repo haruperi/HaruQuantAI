@@ -3,6 +3,7 @@
 from decimal import Decimal
 
 from app.services.risk.config import RiskConfig
+from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.risk.regimes import assess_risk_regime
 
 from tests.risk import _support as examples
@@ -32,7 +33,10 @@ def test_high_risk_modifiers_only_tighten() -> None:
             "portfolio_correlation": Decimal("0.80"),
         }
     )
-    assessment = assess_risk_regime(snapshot, market, config, now=examples.NOW)
+    assessment = unwrap_risk_response(
+        assess_risk_regime(snapshot, market, config, now=examples.NOW),
+        operation="assess_risk_regime",
+    )
     assert set(assessment.states.values()) == {"high"}
     assert set(assessment.modifiers.values()) == {Decimal("0.50")}
     assert all(
@@ -44,11 +48,14 @@ def test_high_risk_modifiers_only_tighten() -> None:
 def test_disabled_assessment_is_explicit() -> None:
     """Return explicit unknown states and no modifier when disabled."""
     config = examples._config()
-    assessment = assess_risk_regime(
-        examples._snapshot(config),
-        examples._market(),
-        config,
-        now=examples.NOW,
+    assessment = unwrap_risk_response(
+        assess_risk_regime(
+            examples._snapshot(config),
+            examples._market(),
+            config,
+            now=examples.NOW,
+        ),
+        operation="assess_risk_regime",
     )
     assert set(assessment.states.values()) == {"unknown"}
     assert assessment.modifiers == {}

@@ -22,8 +22,14 @@ def test_scenario_analysis_is_deterministic_and_advisory() -> None:
         seed=None,
         assumptions=("declared aggregate stress",),
     )
-    first = run_risk_scenario_analysis(snapshot, (scenario,), config, now=examples.NOW)
-    second = run_risk_scenario_analysis(snapshot, (scenario,), config, now=examples.NOW)
+    first = examples.unwrap_risk_response(
+        run_risk_scenario_analysis(snapshot, (scenario,), config, now=examples.NOW),
+        operation="run_risk_scenario_analysis",
+    )
+    second = examples.unwrap_risk_response(
+        run_risk_scenario_analysis(snapshot, (scenario,), config, now=examples.NOW),
+        operation="run_risk_scenario_analysis",
+    )
     assert first == second
     assert first[0].advisory_only is True
     assert first[0].approved is False

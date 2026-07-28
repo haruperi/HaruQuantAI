@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.risk import assess_risk_regime
-from tests.risk.usage.workflows._support import examples
+from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-003"
 STAGES = (
@@ -40,7 +40,10 @@ def main() -> None:
     print("Evidence time:", market.as_of)
     # Stage 3: Run the public classifier.
     _stage(3)
-    assessment = assess_risk_regime(snapshot, market, config, now=examples.NOW)
+    assessment = unwrap_risk_response(
+        assess_risk_regime(snapshot, market, config, now=examples.NOW),
+        operation="assess_risk_regime",
+    )
     print("States:", dict(assessment.states))
     # Stage 4: Preserve modifiers and transitions.
     _stage(4)

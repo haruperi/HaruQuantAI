@@ -29,6 +29,8 @@ from app.services.risk import (
 )
 from app.utils import canonical_json
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
 
@@ -178,7 +180,9 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
         gaps=(),
         regime=None,
         as_of=NOW,
-        config_hash=compute_config_hash(config),
+        config_hash=unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        ),
         evidence_refs={"account": "account-evidence-1"},
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
@@ -204,7 +208,11 @@ def _review_request(config: RiskConfig) -> AllocationReviewRequest:
         account_evidence_ref="account-evidence-1",
         market_evidence_ref=MARKET_REQUEST_ID,
         fx_evidence_refs=(),
-        evidence_hashes={"snapshot_config": compute_config_hash(config)},
+        evidence_hashes={
+            "snapshot_config": unwrap_risk_response(
+                compute_config_hash(config), operation="compute_config_hash"
+            )
+        },
         runtime_profile="simulation",
         execution_route="sim",
         approval_refs=(),
@@ -237,14 +245,17 @@ def example_allocation() -> None:
     store = _ExampleAllocationStore()
     audit = RiskAuditChain(config, _ExampleAuditStore(), lambda: NOW, canonical_json)
 
-    decision = review_allocation_proposal(
-        _review_request(config),
-        _snapshot(config),
-        _market(),
-        config,
-        store,
-        audit,
-        now=NOW,
+    decision = unwrap_risk_response(
+        review_allocation_proposal(
+            _review_request(config),
+            _snapshot(config),
+            _market(),
+            config,
+            store,
+            audit,
+            now=NOW,
+        ),
+        operation="review_allocation_proposal",
     )
     print(f"Allocation verdict: {decision.state}")
     print(
@@ -263,14 +274,17 @@ def example_allocation() -> None:
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
-    active = activate_allocation_budget(
-        activation,
-        decision,
-        (_inactive_kill_switch(),),
-        config,
-        store,
-        audit,
-        now=NOW,
+    active = unwrap_risk_response(
+        activate_allocation_budget(
+            activation,
+            decision,
+            (_inactive_kill_switch(),),
+            config,
+            store,
+            audit,
+            now=NOW,
+        ),
+        operation="activate_allocation_budget",
     )
     print(f"Activated version: {active.reviewed_version}")
     print(f"Durably active: {store.active is not None}")

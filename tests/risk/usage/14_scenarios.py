@@ -18,6 +18,8 @@ from app.services.risk import (
     run_risk_scenario_analysis,
 )
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
@@ -94,7 +96,10 @@ def fr_risk_045() -> None:
         ),
     )
 
-    results = run_risk_scenario_analysis(_snapshot(), scenarios, config, now=NOW)
+    results = unwrap_risk_response(
+        run_risk_scenario_analysis(_snapshot(), scenarios, config, now=NOW),
+        operation="run_risk_scenario_analysis",
+    )
     print(
         f"Scenario result count: {len(results)}, seed: {results[0].seed}, "
         f"approved: {results[0].approved}"

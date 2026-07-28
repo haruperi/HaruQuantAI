@@ -21,7 +21,11 @@ from app.services.risk.contracts import (
     RiskErrorCode,
     RiskLimitResult,
 )
-from app.utils import AuthContext, canonical_json, logger
+from app.services.risk.contracts.responses import (
+    guard_risk_boundary,
+    unwrap_risk_response,
+)
+from app.utils import AuthContext, RiskLevel, canonical_json, logger
 
 if TYPE_CHECKING:
     from app.services.risk.approvals import ApprovalTokenService
@@ -146,7 +150,10 @@ def _authorized(
         attestation.principal_id != auth.principal_id
         and attestation.action == "risk.kill.clear"
         and dict(attestation.scope) == scope
-        and attestation.policy_ref == compute_config_hash(config)
+        and attestation.policy_ref
+        == unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        )
         and attestation.policy_version == config.policy_version
         and attestation.issued_at <= now < attestation.expires_at
         and attestation.request_id == command.request_id
@@ -262,6 +269,11 @@ def _validate_check_request(
         )
 
 
+@guard_risk_boundary(
+    risk_level=RiskLevel.CRITICAL,
+    read_only=False,
+    modifies_database=True,
+)
 def apply_kill_switch_command(
     command: KillSwitchCommand,
     current: KillSwitchState,
@@ -325,15 +337,25 @@ def apply_kill_switch_command(
         )
         revoked_count = 0
         if command.action == "activate":
-            revoked_count = approvals.revoke_scope(
-                _revocation_scope(scope), command.reason, now=checked_now
+            revoked_count = unwrap_risk_response(
+                approvals.revoke_scope(
+                    _revocation_scope(scope), command.reason, now=checked_now
+                ),
+                operation="approval_tokens.revoke_scope",
             )
-        config_hash = compute_config_hash(config)
-        audit.append_kill_switch_transition(
-            _audit_input(command, new_state, config_hash, revoked_count, checked_now),
-            new_state,
-            store,
-            expected_version=current.version,
+        config_hash = unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        )
+        unwrap_risk_response(
+            audit.append_kill_switch_transition(
+                _audit_input(
+                    command, new_state, config_hash, revoked_count, checked_now
+                ),
+                new_state,
+                store,
+                expected_version=current.version,
+            ),
+            operation="risk_audit.append_kill_switch_transition",
         )
         logger.bind(
             request_id=command.request_id,
@@ -377,6 +399,7 @@ def _applicable_states(
     return tuple(sorted(selected, key=lambda item: _SCOPE_PRECEDENCE[item.scope_level]))
 
 
+@guard_risk_boundary(risk_level=RiskLevel.CRITICAL, read_only=True)
 def check_risk_kill_switch(
     states: Sequence[KillSwitchState],
     scope: Mapping[str, str],
@@ -429,7 +452,9 @@ def check_risk_kill_switch(
             evidence_refs=refs,
             precedence=0,
         )
-        config_hash = compute_config_hash(config)
+        config_hash = unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        )
         decision_id = _identity(
             "kill_switch.check",
             {

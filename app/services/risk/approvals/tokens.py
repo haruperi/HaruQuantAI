@@ -22,7 +22,11 @@ from app.services.risk.contracts import (
     RiskDomainError,
     RiskErrorCode,
 )
-from app.utils import canonical_json, generate_id, logger
+from app.services.risk.contracts.responses import (
+    guard_risk_boundary,
+    unwrap_risk_response,
+)
+from app.utils import RiskLevel, canonical_json, generate_id, logger
 
 if TYPE_CHECKING:
     from app.services.risk.approvals.state import _TokenStateStore
@@ -241,6 +245,22 @@ class ApprovalTokenService:
         self._secret_resolver = secret_resolver
         self._authorization_verifier = authorization_verifier
 
+    def _append_audit(self, record: RiskAuditRecord) -> RiskAuditRecord:
+        """Append one audit record and fail closed on response errors.
+
+        Args:
+            record: Unsealed Risk audit record.
+
+        Returns:
+            Durable sealed audit record.
+
+        Raises:
+            RiskDomainError: If audit persistence fails or returns an error.
+        """
+        return unwrap_risk_response(
+            self._audit.append(record), operation="risk_audit.append"
+        )
+
     def _checked_now(self, now: datetime) -> datetime:
         """Validate supplied time against the injected service clock.
 
@@ -325,7 +345,9 @@ class ApprovalTokenService:
             Whether all bindings and external authorization are valid.
         """
         logger.debug("Verifying exact approval attestation bindings")
-        current_hash = compute_config_hash(self._config)
+        current_hash = unwrap_risk_response(
+            compute_config_hash(self._config), operation="compute_config_hash"
+        )
         return (
             decision.state is DecisionState.APPROVE
             and decision.token is None
@@ -342,6 +364,11 @@ class ApprovalTokenService:
             and self._authorization_verifier(attestation)
         )
 
+    @guard_risk_boundary(
+        risk_level=RiskLevel.CRITICAL,
+        read_only=False,
+        modifies_database=True,
+    )
     def issue(
         self,
         decision: RiskDecisionPackage,
@@ -426,7 +453,7 @@ class ApprovalTokenService:
             raise RiskDomainError(
                 RiskErrorCode.STORAGE_ERROR, "approval token state conflict"
             )
-        self._audit.append(
+        self._append_audit(
             _audit_record(
                 record_id=_hash_identity("approval.issued", token.token_id),
                 event_type="risk.approval_token.issued",
@@ -536,7 +563,9 @@ class ApprovalTokenService:
             Whether the current policy explicitly accepts the hash.
         """
         logger.debug("Checking explicit approval-token config compatibility")
-        current = compute_config_hash(self._config)
+        current = unwrap_risk_response(
+            compute_config_hash(self._config), operation="compute_config_hash"
+        )
         return (
             token_hash == current
             or token_hash in self._config.compatible_config_hashes.get(current, ())
@@ -559,7 +588,7 @@ class ApprovalTokenService:
             RiskDomainError: Always, after durable audit append.
         """
         logger.warning("Auditing failed Risk approval-token validation")
-        self._audit.append(
+        self._append_audit(
             _audit_record(
                 record_id=_hash_identity(
                     "approval.validation_failed",
@@ -579,6 +608,11 @@ class ApprovalTokenService:
         )
         raise RiskDomainError(code, "approval token validation failed")
 
+    @guard_risk_boundary(
+        risk_level=RiskLevel.CRITICAL,
+        read_only=False,
+        modifies_database=True,
+    )
     def validate_reserve_and_consume(
         self,
         token: RiskApprovalToken,
@@ -677,7 +711,7 @@ class ApprovalTokenService:
             workflow_id=token.workflow_id,
             correlation_id=token.correlation_id,
         )
-        sealed = self._audit.append(
+        sealed = self._append_audit(
             _audit_record(
                 record_id=_hash_identity("approval.consumed", reservation_id),
                 event_type="risk.approval_token.consumed",
@@ -722,6 +756,11 @@ class ApprovalTokenService:
         ).info("Completed atomic Risk approval-token consumption decision")
         return result
 
+    @guard_risk_boundary(
+        risk_level=RiskLevel.CRITICAL,
+        read_only=False,
+        modifies_database=True,
+    )
     def revoke_scope(
         self, scope: Mapping[str, str], reason: str, *, now: datetime
     ) -> int:
@@ -762,11 +801,13 @@ class ApprovalTokenService:
             raise RiskDomainError(
                 RiskErrorCode.STORAGE_ERROR, "approval revocation result invalid"
             )
-        config_hash = compute_config_hash(self._config)
+        config_hash = unwrap_risk_response(
+            compute_config_hash(self._config), operation="compute_config_hash"
+        )
         request_id = generate_id("req")
         workflow_id = generate_id("wf")
         correlation_id = generate_id("cor")
-        self._audit.append(
+        self._append_audit(
             _audit_record(
                 record_id=_hash_identity(
                     "approval.revoked",

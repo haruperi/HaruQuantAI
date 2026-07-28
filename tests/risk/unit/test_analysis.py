@@ -2,12 +2,11 @@
 
 from decimal import Decimal
 
-import pytest
 from app.services.risk.contracts import (
-    RiskDomainError,
     RiskErrorCode,
     ScenarioDefinition,
 )
+from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.risk.scenarios import run_risk_scenario_analysis
 
 from tests.risk import _support as examples
@@ -29,11 +28,13 @@ def test_analysis_is_immutable_and_deterministic() -> None:
     config = examples._config()
     snapshot = examples._snapshot(config)
     before = snapshot.model_dump(mode="python")
-    first = run_risk_scenario_analysis(
-        snapshot, (_scenario(),), config, now=examples.NOW
+    first = unwrap_risk_response(
+        run_risk_scenario_analysis(snapshot, (_scenario(),), config, now=examples.NOW),
+        operation="run_risk_scenario_analysis",
     )
-    second = run_risk_scenario_analysis(
-        snapshot, (_scenario(),), config, now=examples.NOW
+    second = unwrap_risk_response(
+        run_risk_scenario_analysis(snapshot, (_scenario(),), config, now=examples.NOW),
+        operation="run_risk_scenario_analysis",
     )
     assert first == second
     assert first[0].projected["equity"] == Decimal(9000)
@@ -45,11 +46,12 @@ def test_analysis_is_immutable_and_deterministic() -> None:
 def test_analysis_enforces_configured_payload_bound() -> None:
     """Reject scenario counts above the active configured bound."""
     config = examples._config().model_copy(update={"max_scenarios_per_run": 1})
-    with pytest.raises(RiskDomainError) as captured:
-        run_risk_scenario_analysis(
-            examples._snapshot(config),
-            (_scenario(), _scenario().model_copy(update={"scenario_id": "stress-2"})),
-            config,
-            now=examples.NOW,
-        )
-    assert captured.value.risk_code is RiskErrorCode.PAYLOAD_TOO_LARGE
+    response = run_risk_scenario_analysis(
+        examples._snapshot(config),
+        (_scenario(), _scenario().model_copy(update={"scenario_id": "stress-2"})),
+        config,
+        now=examples.NOW,
+    )
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == RiskErrorCode.PAYLOAD_TOO_LARGE.value

@@ -15,7 +15,11 @@ from app.services.risk.contracts import (
     RiskErrorCode,
     validate_market_context_evidence,
 )
-from app.utils import canonical_json, logger
+from app.services.risk.contracts.responses import (
+    guard_risk_boundary,
+    unwrap_risk_response,
+)
+from app.utils import RiskLevel, canonical_json, logger
 
 if TYPE_CHECKING:
     from app.services.data import (
@@ -272,6 +276,7 @@ def _require_live_evidence(config: RiskConfig, missing: tuple[str, ...]) -> None
         )
 
 
+@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
 def assess_risk_regime(
     snapshot: PortfolioRiskSnapshot,
     evidence: MarketContextEvidence,
@@ -296,9 +301,14 @@ def assess_risk_regime(
     logger.info("Assessing deterministic supplied-evidence Risk regime")
     try:
         checked_now = _utc(now)
-        validate_market_context_evidence(evidence, now=checked_now)
+        unwrap_risk_response(
+            validate_market_context_evidence(evidence, now=checked_now),
+            operation="validate_market_context_evidence",
+        )
         _validate_freshness(snapshot, config, checked_now)
-        config_hash = compute_config_hash(config)
+        config_hash = unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        )
         if config.regime_assessment_enabled:
             states = _enabled_states(snapshot, evidence, config, checked_now)
             missing = tuple(

@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.risk import generate_risk_report
-from tests.risk.usage.workflows._support import examples
+from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-011"
 STAGES = (
@@ -35,20 +35,26 @@ def main() -> None:
     active = examples._inactive_state().model_copy(
         update={"state": "active", "reason": "operator safety stop"}
     )
-    decision = governor.review_trade_risk(
-        examples._proposal(config),
-        examples._snapshot(config),
-        examples._market(),
-        examples._regime(),
-        (active,),
-        examples._auth(config),
-        attestation=examples._attestation(config),
-        now=examples.NOW,
+    decision = unwrap_risk_response(
+        governor.review_trade_risk(
+            examples._proposal(config),
+            examples._snapshot(config),
+            examples._market(),
+            examples._regime(),
+            (active,),
+            examples._auth(config),
+            attestation=examples._attestation(config),
+            now=examples.NOW,
+        ),
+        operation="risk_governor.review_trade_risk",
     )
     print("Input decision:", decision.decision_id)
     # Stage 2: Public report builder separates evidence.
     _stage(2)
-    report = generate_risk_report(decision, "markdown", config, now=examples.NOW)
+    report = unwrap_risk_response(
+        generate_risk_report(decision, "markdown", config, now=examples.NOW),
+        operation="generate_risk_report",
+    )
     print("Evidence lines:", len(report.evidence))
     # Stage 3: Primary failure precedes verdict.
     _stage(3)

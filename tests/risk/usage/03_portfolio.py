@@ -17,6 +17,8 @@ from app.services.data import (
 )
 from app.services.risk import PortfolioState, RiskConfig, build_portfolio_risk_snapshot
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
@@ -93,7 +95,10 @@ def fr_risk_025() -> None:
         report_timeout_seconds=Decimal(5),
     )
 
-    snapshot = build_portfolio_risk_snapshot(state, config, now=NOW)
+    snapshot = unwrap_risk_response(
+        build_portfolio_risk_snapshot(state, config, now=NOW),
+        operation="build_portfolio_risk_snapshot",
+    )
     print(
         f"Snapshot account ID: {snapshot.account_id}, "
         f"gross exposure: {snapshot.gross_exposure}"

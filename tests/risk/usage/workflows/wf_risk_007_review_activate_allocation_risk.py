@@ -15,7 +15,7 @@ from app.services.risk import (
 )
 from app.utils import canonical_json
 from tests.risk.integration.test_strategy_admission import _AuditStore
-from tests.risk.usage.workflows._support import examples
+from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-007"
 STAGES = (
@@ -46,14 +46,17 @@ def main() -> None:
     print("Input:", request.portfolio_id, request.portfolio_version)
     # Stage 2: Review and persist Risk-owned allocation truth.
     _stage(2)
-    decision = review_allocation_proposal(
-        request,
-        examples._snapshot(config),
-        examples._market(),
-        config,
-        store,
-        audit,
-        now=examples.NOW,
+    decision = unwrap_risk_response(
+        review_allocation_proposal(
+            request,
+            examples._snapshot(config),
+            examples._market(),
+            config,
+            store,
+            audit,
+            now=examples.NOW,
+        ),
+        operation="review_allocation_proposal",
     )
     print("Review:", decision.state)
     # Stage 3: Bind activation to exact decision.
@@ -82,10 +85,19 @@ def main() -> None:
     )
     # Stage 4: Activate through public CAS boundary.
     _stage(4)
-    active = activate_allocation_budget(
-        activation, decision, states, config, store, audit, now=examples.NOW
+    active = unwrap_risk_response(
+        activate_allocation_budget(
+            activation, decision, states, config, store, audit, now=examples.NOW
+        ),
+        operation="activate_allocation_budget",
     )
-    print("Active/audit:", active.active, audit.verify(tuple(audit_store.records)))
+    print(
+        "Active/audit:",
+        active.active,
+        unwrap_risk_response(
+            audit.verify(tuple(audit_store.records)), operation="risk_audit.verify"
+        ),
+    )
     # Stage 5 — OUTPUT BOUNDARY: Return authoritative Risk budget projection.
     _stage(5)
     print("Output:", type(active).__name__, active.decision_id)

@@ -17,7 +17,11 @@ from app.services.risk.contracts import (
     RiskLimitResult,
     validate_market_context_evidence,
 )
-from app.utils import logger
+from app.services.risk.contracts.responses import (
+    guard_risk_boundary,
+    unwrap_risk_response,
+)
+from app.utils import RiskLevel, logger
 
 if TYPE_CHECKING:
     from app.services.data import (
@@ -206,7 +210,10 @@ def _consistency_result(
         snapshot.equity <= 0
         or bool(snapshot.gaps)
         or any(item in failing_statuses for item in snapshot.limit_statuses.values())
-        or snapshot.config_hash != compute_config_hash(config)
+        or snapshot.config_hash
+        != unwrap_risk_response(
+            compute_config_hash(config), operation="compute_config_hash"
+        )
     )
     return _result(
         "consistency",
@@ -268,6 +275,7 @@ def _concentration_results(
     return tuple(results)
 
 
+@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
 def evaluate_portfolio_limits(
     snapshot: PortfolioRiskSnapshot,
     config: RiskConfig,
@@ -541,6 +549,7 @@ def _spread_result(
     return _threshold_result("spread", evidence.spread, threshold, evidence_refs, 3)
 
 
+@guard_risk_boundary(risk_level=RiskLevel.MEDIUM, read_only=True)
 def evaluate_market_context(
     evidence: MarketContextEvidence,
     config: RiskConfig,
@@ -562,7 +571,10 @@ def evaluate_market_context(
     """
     logger.info("Evaluating supplied market-context Policy limits")
     checked_now = _utc(now)
-    validate_market_context_evidence(evidence, now=checked_now)
+    unwrap_risk_response(
+        validate_market_context_evidence(evidence, now=checked_now),
+        operation="validate_market_context_evidence",
+    )
     try:
         max_age = config.evidence_max_age_seconds["market"]
         evidence_refs = (evidence.request_id,)

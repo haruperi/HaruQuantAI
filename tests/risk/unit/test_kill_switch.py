@@ -2,16 +2,15 @@
 
 from datetime import timedelta
 
-import pytest
 from app.services.risk import RiskAuditChain
 from app.services.risk.config import compute_config_hash
 from app.services.risk.contracts import (
     ApprovalAttestation,
     DecisionState,
     KillSwitchCommand,
-    RiskDomainError,
     RiskErrorCode,
 )
+from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.risk.kill_switch import (
     apply_kill_switch_command,
     check_risk_kill_switch,
@@ -28,13 +27,16 @@ def test_child_clear_cannot_override_active_parent() -> None:
         update={"state": "active", "reason": "global safety stop"}
     )
     child = examples._inactive_state("symbol")
-    decision = check_risk_kill_switch(
-        (child, parent),
-        {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
-        config,
-        examples._auth(config),
-        reconciled=True,
-        now=examples.NOW,
+    decision = unwrap_risk_response(
+        check_risk_kill_switch(
+            (child, parent),
+            {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
+            config,
+            examples._auth(config),
+            reconciled=True,
+            now=examples.NOW,
+        ),
+        operation="check_risk_kill_switch",
     )
     assert decision.state is DecisionState.BLOCK
     assert decision.ordered_checks[0].evidence_refs[0] == parent.state_id
@@ -44,21 +46,27 @@ def test_recovery_requires_clear_hierarchy_and_reconciliation() -> None:
     """Require all applicable states inactive plus Trading reconciliation."""
     config = examples._config()
     states = (examples._inactive_state(), examples._inactive_state("symbol"))
-    unreconciled = check_risk_kill_switch(
-        states,
-        {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
-        config,
-        examples._auth(config),
-        reconciled=False,
-        now=examples.NOW,
+    unreconciled = unwrap_risk_response(
+        check_risk_kill_switch(
+            states,
+            {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
+            config,
+            examples._auth(config),
+            reconciled=False,
+            now=examples.NOW,
+        ),
+        operation="check_risk_kill_switch",
     )
-    recovered = check_risk_kill_switch(
-        states,
-        {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
-        config,
-        examples._auth(config),
-        reconciled=True,
-        now=examples.NOW,
+    recovered = unwrap_risk_response(
+        check_risk_kill_switch(
+            states,
+            {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
+            config,
+            examples._auth(config),
+            reconciled=True,
+            now=examples.NOW,
+        ),
+        operation="check_risk_kill_switch",
     )
     assert unreconciled.state is DecisionState.BLOCK
     assert recovered.state is DecisionState.APPROVE
@@ -85,7 +93,35 @@ def test_clearance_requires_matching_current_attestation() -> None:
         workflow_id=examples.WORKFLOW_ID,
         correlation_id=examples.CORRELATION_ID,
     )
-    with pytest.raises(RiskDomainError) as captured:
+    response = apply_kill_switch_command(
+        command,
+        current,
+        examples._auth(config, clearance=True),
+        approvals,
+        audit,
+        store,
+        config,
+        now=examples.NOW,
+    )
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == RiskErrorCode.PERMISSION_DENIED.value
+    attestation = ApprovalAttestation(
+        attestation_id="clearance-1",
+        principal_id="operator-2",
+        action="risk.kill.clear",
+        scope={"global": "*"},
+        policy_ref=examples._risk_value(
+            compute_config_hash(config), "compute_config_hash"
+        ),
+        policy_version=config.policy_version,
+        issued_at=examples.NOW,
+        expires_at=examples.NOW + timedelta(minutes=1),
+        request_id=examples.REQUEST_ID,
+        workflow_id=examples.WORKFLOW_ID,
+        correlation_id=examples.CORRELATION_ID,
+    )
+    cleared = unwrap_risk_response(
         apply_kill_switch_command(
             command,
             current,
@@ -94,32 +130,10 @@ def test_clearance_requires_matching_current_attestation() -> None:
             audit,
             store,
             config,
+            attestation=attestation,
             now=examples.NOW,
-        )
-    assert captured.value.risk_code is RiskErrorCode.PERMISSION_DENIED
-    attestation = ApprovalAttestation(
-        attestation_id="clearance-1",
-        principal_id="operator-2",
-        action="risk.kill.clear",
-        scope={"global": "*"},
-        policy_ref=compute_config_hash(config),
-        policy_version=config.policy_version,
-        issued_at=examples.NOW,
-        expires_at=examples.NOW + timedelta(minutes=1),
-        request_id=examples.REQUEST_ID,
-        workflow_id=examples.WORKFLOW_ID,
-        correlation_id=examples.CORRELATION_ID,
-    )
-    cleared = apply_kill_switch_command(
-        command,
-        current,
-        examples._auth(config, clearance=True),
-        approvals,
-        audit,
-        store,
-        config,
-        attestation=attestation,
-        now=examples.NOW,
+        ),
+        operation="apply_kill_switch_command",
     )
     assert cleared.state == "inactive"
     assert store.state == cleared
@@ -152,7 +166,9 @@ def test_clearance_requires_distinct_principal() -> None:
         principal_id="operator-1",
         action="risk.kill.clear",
         scope={"global": "*"},
-        policy_ref=compute_config_hash(config),
+        policy_ref=examples._risk_value(
+            compute_config_hash(config), "compute_config_hash"
+        ),
         policy_version=config.policy_version,
         issued_at=examples.NOW,
         expires_at=examples.NOW + timedelta(minutes=1),
@@ -161,20 +177,21 @@ def test_clearance_requires_distinct_principal() -> None:
         correlation_id=examples.CORRELATION_ID,
     )
 
-    with pytest.raises(RiskDomainError) as captured:
-        apply_kill_switch_command(
-            command,
-            current,
-            examples._auth(config, clearance=True),
-            approvals,
-            audit,
-            store,
-            config,
-            attestation=attestation,
-            now=examples.NOW,
-        )
+    response = apply_kill_switch_command(
+        command,
+        current,
+        examples._auth(config, clearance=True),
+        approvals,
+        audit,
+        store,
+        config,
+        attestation=attestation,
+        now=examples.NOW,
+    )
 
-    assert captured.value.risk_code is RiskErrorCode.PERMISSION_DENIED
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == RiskErrorCode.PERMISSION_DENIED.value
     assert store.state is None
     assert store.records == []
 
@@ -183,24 +200,30 @@ def test_missing_or_unknown_state_blocks() -> None:
     """Treat absent and explicit unknown applicable state as fail-closed."""
     config = examples._config()
     scope = {"portfolio_id": "portfolio-1", "symbol": "EURUSD"}
-    missing = check_risk_kill_switch(
-        (),
-        scope,
-        config,
-        examples._auth(config),
-        reconciled=True,
-        now=examples.NOW,
+    missing = unwrap_risk_response(
+        check_risk_kill_switch(
+            (),
+            scope,
+            config,
+            examples._auth(config),
+            reconciled=True,
+            now=examples.NOW,
+        ),
+        operation="check_risk_kill_switch",
     )
     unknown_state = examples._inactive_state().model_copy(
         update={"state": "unknown", "reason": "state store unavailable"}
     )
-    unknown = check_risk_kill_switch(
-        (unknown_state,),
-        scope,
-        config,
-        examples._auth(config),
-        reconciled=True,
-        now=examples.NOW,
+    unknown = unwrap_risk_response(
+        check_risk_kill_switch(
+            (unknown_state,),
+            scope,
+            config,
+            examples._auth(config),
+            reconciled=True,
+            now=examples.NOW,
+        ),
+        operation="check_risk_kill_switch",
     )
     assert missing.ordered_checks[0].reason_code is RiskErrorCode.KILL_SWITCH_UNKNOWN
     assert unknown.ordered_checks[0].reason_code is RiskErrorCode.KILL_SWITCH_UNKNOWN

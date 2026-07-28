@@ -8,6 +8,7 @@ import pytest
 from app.services.risk.audit import RiskAuditChain
 from app.services.risk.config import RiskConfig
 from app.services.risk.contracts import RiskAuditRecord, RiskDomainError, RiskErrorCode
+from app.services.risk.contracts.responses import unwrap_risk_response
 from app.utils import canonical_json
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
@@ -138,29 +139,41 @@ def test_append_hashes_and_fails_closed() -> None:
     """Seal idempotently and map unavailable durable storage to STORAGE_ERROR."""
     store = _MemoryAuditStore()
     chain = RiskAuditChain(_config(), store, lambda: NOW, canonical_json)
-    sealed = chain.append(_record())
+    sealed = unwrap_risk_response(
+        chain.append(_record()), operation="risk_audit.append"
+    )
     assert sealed.sealed is True
     assert sealed.sequence == 0
     assert sealed.previous_hash == "0" * 64
     assert len(str(sealed.record_hash)) == 64
-    assert chain.append(_record()) == sealed
+    repeated = unwrap_risk_response(
+        chain.append(_record()), operation="risk_audit.append"
+    )
+    assert repeated == sealed
 
     unavailable = RiskAuditChain(
         _config(), _MemoryAuditStore(unavailable=True), lambda: NOW, canonical_json
     )
-    with pytest.raises(RiskDomainError) as captured:
-        unavailable.append(_record("audit-2"))
-    assert captured.value.code == RiskErrorCode.STORAGE_ERROR.value
+    response = unavailable.append(_record("audit-2"))
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == RiskErrorCode.STORAGE_ERROR.value
 
 
 def test_verify_detects_tamper() -> None:
     """Verify a valid chain and deterministically reject changed hash evidence."""
     store = _MemoryAuditStore()
     chain = RiskAuditChain(_config(), store, lambda: NOW, canonical_json)
-    sealed = chain.append(_record())
-    assert chain.verify((sealed,)) is True
+    sealed = unwrap_risk_response(
+        chain.append(_record()), operation="risk_audit.append"
+    )
+    assert (
+        unwrap_risk_response(chain.verify((sealed,)), operation="risk_audit.verify")
+        is True
+    )
 
     tampered = sealed.model_copy(update={"record_hash": "f" * 64})
-    with pytest.raises(RiskDomainError) as captured:
-        chain.verify((tampered,))
-    assert captured.value.code == RiskErrorCode.AUDIT_CHAIN_TAMPER_DETECTED.value
+    response = chain.verify((tampered,))
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == RiskErrorCode.AUDIT_CHAIN_TAMPER_DETECTED.value

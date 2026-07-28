@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/risk`
 > **Status:** `Completed`
-> **Last updated:** `2026-07-24`
+> **Last updated:** `2026-07-28`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -570,7 +570,12 @@ with one usage-example program under `tests/risk/usage/`.
 
 ### 4.1 `contracts/` — Versioned Contracts and Deterministic Errors
 
-**Purpose:** Define strict Pydantic V2 contracts, exact Decimal serialization, canonical enums, and one coded domain exception without business I/O.
+**Purpose:** Define strict Pydantic V2 contracts, exact Decimal serialization, canonical enums, one coded domain exception, and the public response boundary without business I/O.
+
+The response boundary is implemented by `catalog.py` (the immutable
+`RISK_ERROR_CATALOG`) and `responses.py` (`guard_risk_boundary` and
+`unwrap_risk_response`). These files are infrastructure for the domain's
+public response contract; they do not add a second feature implementation.
 
 **Module flow:** `untrusted mapping → strict contract/version/finite-value validation → immutable typed value or coded error`
 
@@ -1346,10 +1351,48 @@ Risk does not invent an unstated distribution or synthetic path.
 ### 4.16 Public Risk API
 
 Risk exposes only the typed domain operations defined by the owning capability
-modules. Public operations accept Risk-owned contracts, return Risk-owned results,
-and surface `RiskDomainError` failures. No wrapper-only API, metadata catalog, or
-parallel payload-mapping layer exists. UI/API alone adapts Risk results to external
-transport responses.
+modules. Every qualifying public operation returns `StandardResponse[T]` from
+`app.utils`, with the raw Risk DTO or scalar result directly in `data` on success.
+The response envelope has exactly five fields: `status`, `message`, `data`,
+`error`, and `metadata`. Domain decisions such as `approve`, `warn`, `reject`,
+and `block` remain inside the raw DTO in `data`; they are not converted into
+transport success or failure statuses.
+
+The Risk boundary maps `RiskDomainError` through the immutable
+`RISK_ERROR_CATALOG` in `app/services/risk/contracts/catalog.py`, and maps
+unexpected failures to the catalogued `UNKNOWN_ERROR` code. Response metadata
+identifies `domain="risk"` and declares the operation's read/mutation and
+network/trading side-effect posture. Risk operations never place trades,
+open broker connections, or bypass the kill switch.
+
+Public response signatures:
+
+| Operation | Return type |
+|---|---|
+| `load_risk_config` | `StandardResponse[RiskConfig]` |
+| `compute_config_hash` | `StandardResponse[str]` |
+| `validate_market_context_evidence` | `StandardResponse[None]` |
+| `build_portfolio_risk_snapshot` | `StandardResponse[PortfolioRiskSnapshot]` |
+| `calculate_position_size` | `StandardResponse[PositionSizingResult]` |
+| `evaluate_portfolio_limits` | `StandardResponse[tuple[RiskLimitResult, ...]]` |
+| `evaluate_market_context` | `StandardResponse[tuple[RiskLimitResult, ...]]` |
+| `assess_risk_regime` | `StandardResponse[RegimeAssessment]` |
+| `review_strategy_admission` | `StandardResponse[StrategyOperationalEligibilityDecision]` |
+| `review_allocation_proposal` | `StandardResponse[AllocationRiskDecision]` |
+| `activate_allocation_budget` | `StandardResponse[AllocationRiskDecision]` |
+| `RiskAuditChain.append` | `StandardResponse[RiskAuditRecord]` |
+| `RiskAuditChain.append_kill_switch_transition` | `StandardResponse[RiskAuditRecord]` |
+| `RiskAuditChain.verify` | `StandardResponse[bool]` |
+| `ApprovalTokenService.issue` | `StandardResponse[RiskApprovalToken]` |
+| `ApprovalTokenService.validate_reserve_and_consume` | `StandardResponse[ApprovalValidationResult]` |
+| `ApprovalTokenService.revoke_scope` | `StandardResponse[int]` |
+| `revalidate_risk_decision` | `StandardResponse[DecisionReuseValidationResult]` |
+| `RiskGovernor.review_trade_risk` | `StandardResponse[RiskDecisionPackage]` |
+| `RiskGovernor.run_portfolio_risk_governor` | `StandardResponse[RiskDecisionPackage]` |
+| `apply_kill_switch_command` | `StandardResponse[KillSwitchState]` |
+| `check_risk_kill_switch` | `StandardResponse[RiskDecisionPackage]` |
+| `run_risk_scenario_analysis` | `StandardResponse[tuple[ScenarioResult, ...]]` |
+| `generate_risk_report` | `StandardResponse[RiskReport]` |
 ---
 
 ## 5. Package-Wide Requirements and Shared Configuration

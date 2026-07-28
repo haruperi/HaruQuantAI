@@ -13,6 +13,7 @@ from app.services.risk.contracts import (
     RiskDomainError,
     validate_market_context_evidence,
 )
+from app.services.risk.contracts.responses import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 REQUEST_ID = "req-12345678-1234-4234-8234-123456789abc"
@@ -120,12 +121,17 @@ def test_market_context_uses_data_owned_contract() -> None:
         missing_fields=("session", "calendar"),
         request_id=REQUEST_ID,
     )
-    validate_market_context_evidence(evidence, now=NOW)
+    response = validate_market_context_evidence(evidence, now=NOW)
+    assert response.status == "success"
+    response = validate_market_context_evidence(
+        evidence,
+        now=NOW + timedelta(minutes=2),
+    )
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "STALE_EVIDENCE"
     with pytest.raises(RiskDomainError):
-        validate_market_context_evidence(
-            evidence,
-            now=NOW + timedelta(minutes=2),
-        )
+        unwrap_risk_response(response, operation="validate_market_context_evidence")
 
 
 """Unit tests for Risk evidence and snapshot contracts."""

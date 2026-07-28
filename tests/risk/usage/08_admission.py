@@ -32,6 +32,8 @@ from app.services.strategy import (
 )
 from app.utils import canonical_json
 
+from tests.risk._support import unwrap_risk_response
+
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
 HASH_A = "a" * 64
@@ -214,14 +216,17 @@ def fr_risk_029() -> None:
     store = _ExampleEligibilityStore()
     audit = RiskAuditChain(config, _ExampleAuditStore(), lambda: NOW, canonical_json)
 
-    decision = review_strategy_admission(
-        _request(),
-        _registration(),
-        _market(),
-        config,
-        store,
-        audit,
-        now=NOW,
+    decision = unwrap_risk_response(
+        review_strategy_admission(
+            _request(),
+            _registration(),
+            _market(),
+            config,
+            store,
+            audit,
+            now=NOW,
+        ),
+        operation="review_strategy_admission",
     )
     print(f"Eligibility verdict: {decision.state}, suspended: {decision.suspended}")
     print(
