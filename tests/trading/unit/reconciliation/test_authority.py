@@ -148,9 +148,12 @@ def test_unknown_outcome_cannot_blind_retry() -> None:
         store,
         lambda _route: _snapshot(),
     )
-    assert resolution.transition == "retry_locked"
-    assert not resolution.retry_allowed
-    assert resolution.remaining_unresolved_scope == ("order:order-internal",)
+    assert resolution.status == "success"
+    assert resolution.data is not None
+    resolved = resolution.data
+    assert resolved.transition == "retry_locked"
+    assert not resolved.retry_allowed
+    assert resolved.remaining_unresolved_scope == ("order:order-internal",)
     assert [event.event_type for event in store.events[-2:]] == [
         "incident_recorded",
         "reconciliation_transitioned",
@@ -165,8 +168,9 @@ def test_resolution_requires_approved_transition() -> None:
         no_approval_store,
         lambda _route: _snapshot(),
     )
-    assert no_approval.transition == "resolved_no_retry"
-    assert not no_approval.retry_allowed
+    assert no_approval.data is not None
+    assert no_approval.data.transition == "resolved_no_retry"
+    assert not no_approval.data.retry_allowed
     approved_store = _Store(
         _projection(
             authority_state={
@@ -183,8 +187,9 @@ def test_resolution_requires_approved_transition() -> None:
         approved_store,
         lambda _route: _snapshot(),
     )
-    assert approved.transition == "approved_retry"
-    assert approved.retry_allowed
+    assert approved.data is not None
+    assert approved.data.transition == "approved_retry"
+    assert approved.data.retry_allowed
     with pytest.raises(ValidationError):
         AuthorityResolution(
             resolution_id="resolution-invalid",

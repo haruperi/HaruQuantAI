@@ -6,12 +6,11 @@ from typing import TYPE_CHECKING
 
 from app.services.trading.contracts import (
     ExecutionEvidenceReport,
-    StandardTradingEnvelope,
     TradingError,
     TradingRequest,
 )
-from app.services.trading.contracts.errors import _redacted_envelope_data
-from app.utils import logger, to_json_safe
+from app.services.trading.contracts.responses import success_trading_response
+from app.utils import RiskLevel, StandardResponse, logger, to_json_safe
 
 if TYPE_CHECKING:
     from app.services.trading.contracts.models import JsonValue
@@ -30,10 +29,10 @@ _REQUIRED_EVIDENCE = frozenset(
 )
 
 
-def build_trading_report(
+def _build_trading_report_value(
     request: TradingRequest,
     store: TradingStateStore,
-) -> StandardTradingEnvelope:
+) -> StandardResponse[ExecutionEvidenceReport]:
     """Package exact stored Trading facts without deriving performance metrics.
 
     Args:
@@ -77,21 +76,38 @@ def build_trading_report(
         workflow_id=request.workflow_id,
         correlation_id=request.correlation_id,
     )
-    data = _redacted_envelope_data({"report": report.model_dump(mode="json")})
-    return StandardTradingEnvelope(
-        status="success",
-        message="Immutable Trading execution evidence packaged",
-        data=data,
-        errors=(),
-        warnings=(),
-        audit_metadata={
-            "operation": "build_trading_report",
+    return success_trading_response(
+        report,
+        risk_level=RiskLevel.LOW,
+        legacy_status="packaged",
+        extensions={
             "request_id": request.request_id,
             "workflow_id": request.workflow_id,
             "correlation_id": request.correlation_id,
             "redaction_applied": True,
         },
     )
+
+
+def build_trading_report(
+    request: TradingRequest,
+    store: TradingStateStore,
+) -> StandardResponse[ExecutionEvidenceReport]:
+    """Build the official Trading report in a standard response.
+
+    Args:
+        request: Governed report request and exact state scope.
+        store: Injected Trading state query port.
+
+    Returns:
+        Canonical response containing the exact stored evidence report.
+    """
+    try:
+        return _build_trading_report_value(request, store)
+    except Exception as error:  # noqa: BLE001 - normalize report boundary errors.
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
 
 
 __all__ = ["build_trading_report"]

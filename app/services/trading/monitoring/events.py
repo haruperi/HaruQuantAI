@@ -17,24 +17,27 @@ from pydantic import (
 from app.services.trading.contracts import (
     ExecutionReceipt,
     TradingError,
-    redact_trading_payload,
 )
+from app.services.trading.contracts.errors import _redact_trading_payload_value
 from app.services.trading.contracts.models import (
     TRADING_CONTRACT_VERSION,
     JsonValue,
     _validate_trace_id,
     _validation_field_name,
 )
+from app.services.trading.contracts.responses import success_trading_response
 from app.utils import (
-    ValidationError as UtilsValidationError,
-)
-from app.utils import (
+    RiskLevel,
+    StandardResponse,
     canonical_json,
     is_sensitive_key,
     logger,
     redact_text_value,
     to_json_safe,
     validate_id,
+)
+from app.utils import (
+    ValidationError as UtilsValidationError,
 )
 
 type OperationalEventType = Literal[
@@ -171,7 +174,7 @@ class OperationalEvent(BaseModel):
         safe = to_json_safe(value)
         if not isinstance(safe, dict):
             raise TypeError("operational event facts must be a mapping")
-        redacted = redact_trading_payload(safe)
+        redacted = _redact_trading_payload_value(safe)
         if not isinstance(redacted, dict):
             raise TypeError("operational event facts must be a mapping")
         return MappingProxyType(redacted)
@@ -286,7 +289,7 @@ def _validate_unknown_event_source(
     )
 
 
-def build_broker_state_unknown_event(
+def _build_broker_state_unknown_event_value(
     receipt: ExecutionReceipt,
     *,
     incident_id: str,
@@ -382,7 +385,7 @@ def _delivery_failure_event(event: OperationalEvent) -> OperationalEvent:
     )
 
 
-def emit_runtime_event(
+def _emit_runtime_event_value(
     event: OperationalEvent,
     sink: Callable[[OperationalEvent], None],
 ) -> None:
@@ -421,6 +424,73 @@ def emit_runtime_event(
                 "incident_type": "EVENT_DELIVERY_FAILED",
             },
         ) from error
+
+
+def build_broker_state_unknown_event(
+    receipt: ExecutionReceipt,
+    *,
+    incident_id: str,
+    unresolved_scope: Sequence[str],
+    occurred_at: datetime,
+    workflow_id: str,
+) -> StandardResponse[OperationalEvent]:
+    """Build unknown-outcome evidence in a standard response.
+
+    Args:
+        receipt: Authoritative unknown-outcome execution receipt.
+        incident_id: Persisted Trading incident identity.
+        unresolved_scope: Ordered unresolved reconciliation identities.
+        occurred_at: Persisted transition occurrence time.
+        workflow_id: Originating canonical workflow trace.
+
+    Returns:
+        Canonical response containing the operational event or a mapped error.
+    """
+    try:
+        event = _build_broker_state_unknown_event_value(
+            receipt,
+            incident_id=incident_id,
+            unresolved_scope=unresolved_scope,
+            occurred_at=occurred_at,
+            workflow_id=workflow_id,
+        )
+    except TradingError as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"incident_id": incident_id})
+    return success_trading_response(
+        event,
+        risk_level=RiskLevel.CRITICAL,
+        legacy_status="unknown_outcome",
+        extensions={"incident_id": incident_id},
+    )
+
+
+def emit_runtime_event(
+    event: OperationalEvent,
+    sink: Callable[[OperationalEvent], None],
+) -> StandardResponse[None]:
+    """Publish runtime evidence in a standard response.
+
+    Args:
+        event: Validated Trading operational evidence.
+        sink: Composition-owned synchronous publication boundary.
+
+    Returns:
+        Successful empty response or a canonical mapped Trading error.
+    """
+    try:
+        _emit_runtime_event_value(event, sink)
+    except TradingError as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"event_id": event.event_id})
+    return success_trading_response(
+        None,
+        risk_level=RiskLevel.HIGH,
+        legacy_status="emitted",
+        extensions={"event_id": event.event_id},
+    )
 
 
 __all__ = [

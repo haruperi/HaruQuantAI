@@ -8,10 +8,11 @@ from typing import Literal, Self
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from app.services.trading.contracts import TradingError, TradingRequest
+from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.state.stores import (
     TradingStateStore,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import canonical_json, logger
+from app.utils import RiskLevel, StandardResponse, canonical_json, logger
 
 type ReservationStatus = Literal[
     "new",
@@ -120,7 +121,7 @@ class IdempotencyReservation(BaseModel):
         return self
 
 
-def reserve_idempotency(
+def _reserve_idempotency_value(
     request: TradingRequest,
     store: TradingStateStore,
     *,
@@ -202,6 +203,46 @@ def reserve_idempotency(
             trace_context={"request_id": request.request_id},
         )
     return reservation
+
+
+def reserve_idempotency(
+    request: TradingRequest,
+    store: TradingStateStore,
+    *,
+    reservation_time: datetime,
+    retention_seconds: int,
+    concurrency_lock_timeout_seconds: Decimal,
+) -> StandardResponse[IdempotencyReservation]:
+    """Reserve caller key and return the reservation in a standard response.
+
+    Args:
+        request: Validated governed Trading request.
+        store: Injected atomic Trading state store.
+        reservation_time: Injected aware UTC reservation time.
+        retention_seconds: Exact positive reservation lifetime.
+        concurrency_lock_timeout_seconds: Exact positive active-lock age bound.
+
+    Returns:
+        Canonical response containing the reservation or a mapped Trading error.
+    """
+    try:
+        reservation = _reserve_idempotency_value(
+            request,
+            store,
+            reservation_time=reservation_time,
+            retention_seconds=retention_seconds,
+            concurrency_lock_timeout_seconds=concurrency_lock_timeout_seconds,
+        )
+    except TradingError as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
+    return success_trading_response(
+        reservation,
+        risk_level=RiskLevel.HIGH,
+        legacy_status=reservation.status,
+        extensions={"request_id": request.request_id},
+    )
 
 
 __all__ = ["IdempotencyReservation", "reserve_idempotency"]

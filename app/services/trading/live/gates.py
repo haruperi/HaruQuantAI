@@ -3,7 +3,6 @@
 from collections.abc import Mapping
 
 from app.services.trading.contracts import (
-    StandardTradingEnvelope,
     TradingError,
     TradingRequest,
 )
@@ -11,6 +10,7 @@ from app.services.trading.contracts.errors import _redacted_envelope_data
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
 )
+from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.live.session import (
     LiveSession,  # noqa: TC001 - runtime annotation and model resolution
 )
@@ -22,7 +22,7 @@ from app.services.trading.validation.authority import (
     validate_kill_switch_hierarchy,
     validate_risk_authority,
 )
-from app.utils import logger
+from app.utils import RiskLevel, StandardResponse, logger
 
 
 def _gate_envelope(
@@ -31,7 +31,7 @@ def _gate_envelope(
     status: str,
     message: str,
     data: Mapping[str, JsonValue],
-) -> StandardTradingEnvelope:
+) -> StandardResponse[Mapping[str, JsonValue]]:
     """Build one canonical live-gate result envelope.
 
     Args:
@@ -45,28 +45,31 @@ def _gate_envelope(
     """
     logger.debug("Building live-gate envelope for request %s", request.request_id)
     redacted_data = _redacted_envelope_data(data)
-    return StandardTradingEnvelope(
-        status=status,  # type: ignore[arg-type]
+    return success_trading_response(
+        redacted_data,
+        operation="trading.evaluate_live_gate",
         message=message,
-        data=redacted_data,
-        errors=(),
-        warnings=(),
-        audit_metadata={
-            "operation": "evaluate_live_gate",
-            "request_id": request.request_id,
-            "correlation_id": request.correlation_id,
-            "route": request.route,
+        risk_level=RiskLevel.CRITICAL,
+        request_id=request.request_id,
+        correlation_id=request.correlation_id,
+        read_only=False,
+        modifies_database=True,
+        places_trade=True,
+        requires_network=request.route.value in {"paper", "live"},
+        legacy_status=status,
+        extensions={
+            "route": request.route.value,
             "provider_id": request.provider_id,
             "redaction_applied": True,
         },
     )
 
 
-async def evaluate_live_gate(
+async def _evaluate_live_gate_value(  # noqa: C901, PLR0912
     request: TradingRequest,
     evidence: Mapping[str, JsonValue],
     session: LiveSession,
-) -> StandardTradingEnvelope:
+) -> StandardResponse[Mapping[str, JsonValue]]:
     """Run the mandatory fail-fast gate sequence before route mutation.
 
     Args:
@@ -95,22 +98,42 @@ async def evaluate_live_gate(
             message="Live mutation is disabled; request remains packaged",
             data={"dispatch_allowed": False, "gate": "enablement"},
         )
-    policy = validate_action_policy(request, session.action_policy_for(request), now)
-    decision = validate_risk_authority(request, session.risk_decision_for(request), now)
+    policy_response = session.action_policy_for(request)
+    decision_response = session.risk_decision_for(request)
+    switches_response = session.kill_switches_for(request)
+    readiness_response = session.readiness_for(request, evidence)
+    capability_response = session.adapter_capability_for(request)
+    for response in (
+        policy_response,
+        decision_response,
+        switches_response,
+        readiness_response,
+        capability_response,
+    ):
+        if response.status == "error":
+            raise TradingError("GATE_BLOCKED", "Live gate authority read failed")
+    if policy_response.data is None or decision_response.data is None:
+        raise TradingError("GATE_BLOCKED", "Risk gate authority is absent")
+    if switches_response.data is None or readiness_response.data is None:
+        raise TradingError("GATE_BLOCKED", "Live gate state is absent")
+    if capability_response.data is None:
+        raise TradingError("ADAPTER_INCOMPATIBLE", "Adapter capability is absent")
+    policy = validate_action_policy(request, policy_response.data, now)
+    decision = validate_risk_authority(request, decision_response.data, now)
     validate_kill_switch_hierarchy(
         request,
-        session.kill_switches_for(request),
+        switches_response.data,
         session.config.max_staleness_seconds["kill_switch"],
         now,
     )
-    readiness = session.readiness_for(request, evidence)
+    readiness = readiness_response.data
     if not readiness.passed:
         raise TradingError(
             "GATE_BLOCKED",
             "Execution readiness failed",
             trace_context={"failed_checks": list(readiness.failed_check_codes)},
         )
-    reservation = reserve_idempotency(
+    reservation_response = reserve_idempotency(
         request,
         session.store,
         reservation_time=now,
@@ -119,6 +142,12 @@ async def evaluate_live_gate(
             session.config.concurrency_lock_timeout_seconds
         ),
     )
+    if reservation_response.status == "error" or reservation_response.data is None:
+        raise TradingError(
+            "TRADING_CONCURRENCY_CONFLICT",
+            "Idempotency reservation failed",
+        )
+    reservation = reservation_response.data
     if reservation.status in {
         "duplicate_active",
         "conflict",
@@ -144,7 +173,7 @@ async def evaluate_live_gate(
             "Reconciliation authority is not ready",
         )
     try:
-        session.write_pre_audit(
+        audit_response = session.write_pre_audit(
             request,
             _redacted_envelope_data(
                 {
@@ -157,14 +186,23 @@ async def evaluate_live_gate(
                 }
             ),
         )
+        if audit_response.status == "error":
+            raise TradingError(  # noqa: TRY301
+                "AUDIT_FAILED", "Pre-mutation audit write failed"
+            )
     except Exception as error:
         raise TradingError("AUDIT_FAILED", "Pre-mutation audit write failed") from error
-    intent = build_execution_plan(request, readiness)
-    validate_adapter_capability(
+    plan_response = build_execution_plan(request, readiness)
+    if plan_response.status == "error" or plan_response.data is None:
+        raise TradingError("GATE_BLOCKED", "Execution plan could not be built")
+    intent = plan_response.data
+    capability_validation = validate_adapter_capability(
         intent,
-        session.adapter_capability_for(request),
+        capability_response.data,
         operation_timeout_seconds=session.config.broker_operation_timeout_seconds,
     )
+    if capability_validation.status == "error":
+        raise TradingError("ADAPTER_INCOMPATIBLE", "Adapter capability is unsafe")
     return _gate_envelope(
         request,
         status="success",
@@ -174,6 +212,32 @@ async def evaluate_live_gate(
             "intent": intent.model_dump(mode="json"),
         },
     )
+
+
+async def evaluate_live_gate(
+    request: TradingRequest,
+    evidence: Mapping[str, JsonValue],
+    session: LiveSession,
+) -> StandardResponse[Mapping[str, JsonValue]]:
+    """Run live gates and return a standard response.
+
+    Returns:
+        Standard response containing gate evidence or a canonical error.
+    """
+    try:
+        return await _evaluate_live_gate_value(request, evidence, session)
+    except TradingError as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(
+            error,
+            {
+                "operation": "trading.evaluate_live_gate",
+                "request_id": request.request_id,
+                "correlation_id": request.correlation_id,
+                "route": request.route.value,
+            },
+        )
 
 
 __all__ = ["evaluate_live_gate"]

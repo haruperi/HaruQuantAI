@@ -5,17 +5,16 @@ from types import MappingProxyType
 
 from pydantic import ValidationError as PydanticValidationError
 
-from app.services.trading.contracts.errors import (
-    TradingError,
-    _redacted_envelope_data,
-)
 from app.services.trading.contracts.models import (
     TRADING_CONTRACT_VERSION,
     JsonValue,
-    StandardTradingEnvelope,
     TradingRequest,
 )
-from app.utils import logger, to_json_safe
+from app.services.trading.contracts.responses import (
+    error_trading_response,
+    success_trading_response,
+)
+from app.utils import RiskLevel, StandardResponse, logger, redact_text_value
 
 
 def _contract_entry(
@@ -97,10 +96,10 @@ def _build_public_contracts() -> tuple[Mapping[str, JsonValue], ...]:
             idempotency="caller_key",
         ),
         _contract_entry(
-            "StandardTradingEnvelope",
-            "model",
-            "trading.standard_envelope.v1",
-            statuses=_ENVELOPE_STATUSES,
+            "StandardResponse",
+            "response",
+            "utils.standard_response.v1",
+            statuses=["success", "error"],
         ),
         _contract_entry(
             "OrderIntent",
@@ -155,19 +154,25 @@ def _build_public_contracts() -> tuple[Mapping[str, JsonValue], ...]:
     )
 
 
-def get_public_contracts() -> tuple[Mapping[str, JsonValue], ...]:
+def get_public_contracts() -> StandardResponse[tuple[Mapping[str, JsonValue], ...]]:
     """Return the exact stable Trading contracts API catalog.
 
     Returns:
         Immutable ordered public-contract entries.
     """
     logger.debug("Returning the Trading public-contract catalog")
-    return _build_public_contracts()
+    return success_trading_response(
+        _build_public_contracts(),
+        operation="trading.get_public_contracts",
+        message="Trading public contracts returned",
+        risk_level=RiskLevel.LOW,
+        read_only=True,
+    )
 
 
 def create_trading_action_draft(
     request: Mapping[str, JsonValue],
-) -> StandardTradingEnvelope:
+) -> StandardResponse[TradingRequest]:
     """Validate and package a request without invoking route authority.
 
     Args:
@@ -182,36 +187,48 @@ def create_trading_action_draft(
     logger.info("Creating a non-executable Trading action draft")
     try:
         validated = TradingRequest.model_validate(dict(request))
-    except PydanticValidationError as error:
+    except PydanticValidationError:
         logger.warning("Rejecting invalid Trading draft material")
-        raise TradingError(
-            "INVALID_DRAFT",
-            "Trading draft material is invalid",
-            trace_context={
-                "request_id": request.get("request_id"),
-                "correlation_id": request.get("correlation_id"),
+        return error_trading_response(
+            code="INVALID_DRAFT",
+            details={
+                "request_id": request.get("request_id")
+                if isinstance(request.get("request_id"), str)
+                else None,
+                "correlation_id": request.get("correlation_id")
+                if isinstance(request.get("correlation_id"), str)
+                else None,
             },
-        ) from error
-    data = _redacted_envelope_data(validated.model_dump(mode="json"))
-    return StandardTradingEnvelope(
-        status="packaged",
+            operation="trading.create_trading_action_draft",
+            message="Trading draft material is invalid",
+            risk_level=RiskLevel.HIGH,
+            read_only=True,
+        )
+    safe_validated = validated
+    if validated.control_reason is not None:
+        safe_validated = validated.model_copy(
+            update={
+                "control_reason": str(redact_text_value(validated.control_reason).value)
+            }
+        )
+    return success_trading_response(
+        safe_validated,
+        operation="trading.create_trading_action_draft",
         message="Trading action draft packaged without execution",
-        data=data,
-        errors=(),
-        warnings=(),
-        audit_metadata={
-            "operation": "create_trading_action_draft",
-            "request_id": validated.request_id,
-            "correlation_id": validated.correlation_id,
-            "route": validated.route.value,
-            "provider_id": validated.provider_id,
-            "approval_token_ref": validated.approval_token_ref,
-            "risk_decision_id": validated.risk_decision_id,
+        risk_level=RiskLevel.HIGH,
+        request_id=safe_validated.request_id,
+        correlation_id=safe_validated.correlation_id,
+        read_only=True,
+        legacy_status="packaged",
+        extensions={
+            "route": safe_validated.route.value,
+            "provider_id": safe_validated.provider_id,
+            "approval_token_ref": safe_validated.approval_token_ref,
+            "risk_decision_id": safe_validated.risk_decision_id,
             "risk_classification": "risk_approved",
             "side_effect_classification": "none",
-            "idempotency_key": validated.idempotency_key,
-            "payload_version": validated.canonical_material_version,
-            "created_at": to_json_safe(validated.system_time),
+            "idempotency_key": safe_validated.idempotency_key,
+            "payload_version": safe_validated.canonical_material_version,
             "redaction_applied": True,
         },
     )

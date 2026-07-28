@@ -21,7 +21,7 @@ from app.services.risk import (
     RiskApprovalToken,
     RiskDecisionPackage,
 )
-from app.services.trading.contracts import TradingError, TradingRequest, TradingRoute
+from app.services.trading.contracts import TradingRequest, TradingRoute
 from app.services.trading.live import LiveSession, evaluate_live_gate
 from app.services.trading.state import IdempotencyReservation, TradingStateStore
 from app.services.trading.validation import ReadinessAssessment
@@ -369,12 +369,14 @@ async def test_real_risk_decision_is_mandatory() -> None:
             "startup_evidence_fresh": True,
         },
     )
-    with pytest.raises(TradingError, match="GATE_BLOCKED"):
-        await evaluate_live_gate(
-            _request(),
-            {"caller_claimed_risk_approval": True},
-            session,
-        )
+    blocked = await evaluate_live_gate(
+        _request(),
+        {"caller_claimed_risk_approval": True},
+        session,
+    )
+    assert blocked.status == "error"
+    assert blocked.error is not None
+    assert blocked.error.code == "GATE_BLOCKED"
 
 
 @pytest.mark.anyio
@@ -409,6 +411,7 @@ async def test_gate_passes_every_typed_authority_in_order() -> None:
     )
     result = await evaluate_live_gate(_request(), {"route": "fresh"}, session)
     assert result.status == "success"
+    assert result.data is not None
     assert result.data["dispatch_allowed"] is True
 
 
@@ -486,5 +489,7 @@ async def test_stale_kill_switch_evidence_blocks_dispatch() -> None:
         },
     )
     assert stale_switch.state == "inactive"
-    with pytest.raises(TradingError, match="KILL_SWITCH_STALE"):
-        await evaluate_live_gate(_request(), {"route": "fresh"}, session)
+    blocked = await evaluate_live_gate(_request(), {"route": "fresh"}, session)
+    assert blocked.status == "error"
+    assert blocked.error is not None
+    assert blocked.error.code == "KILL_SWITCH_STALE"

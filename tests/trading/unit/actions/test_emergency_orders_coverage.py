@@ -101,9 +101,10 @@ def test_bulk_cancellation_and_closure_edge_cases() -> None:
         deps.clock.return_value = 100
         deps.store.load_projection.return_value = None
 
-        with pytest.raises(TradingError) as exc_info:
-            await cancel_all_orders(request, deps)
-        assert exc_info.value.code == "RECONCILIATION_REQUIRED"
+        result = await cancel_all_orders(request, deps)
+        assert result.status == "error"
+        assert result.error is not None
+        assert result.error.code == "RECONCILIATION_REQUIRED"
 
         # Oversized orders exceeding limit -> GATE_BLOCKED
         deps.account_state_source.return_value = MagicMock(
@@ -114,9 +115,10 @@ def test_bulk_cancellation_and_closure_edge_cases() -> None:
         )
         deps.store.load_projection.return_value = MagicMock(orders={})
 
-        with pytest.raises(TradingError) as exc_info:
-            await cancel_all_orders(request, deps)
-        assert exc_info.value.code == "GATE_BLOCKED"
+        result = await cancel_all_orders(request, deps)
+        assert result.status == "error"
+        assert result.error is not None
+        assert result.error.code == "GATE_BLOCKED"
 
         # Close all positions oversized -> GATE_BLOCKED
         req_close = request.model_copy(update={"action": "close_all_positions"})
@@ -124,9 +126,10 @@ def test_bulk_cancellation_and_closure_edge_cases() -> None:
             positions=[MagicMock(), MagicMock()]
         )
 
-        with pytest.raises(TradingError) as exc_info:
-            await close_all_positions(req_close, deps)
-        assert exc_info.value.code == "GATE_BLOCKED"
+        result = await close_all_positions(req_close, deps)
+        assert result.status == "error"
+        assert result.error is not None
+        assert result.error.code == "GATE_BLOCKED"
 
         # Cancel orders loop with cancellable order
         from unittest.mock import AsyncMock, patch

@@ -36,16 +36,20 @@ def test_malformed_success_is_unknown_outcome() -> None:
         _raw(),
         POLICY,  # type: ignore[arg-type]
     )
-    assert receipt.status == "unknown_outcome"
-    assert receipt.reconciliation_required
-    assert not receipt.retry_safe
+    assert receipt.status == "success"
+    assert receipt.data is not None
+    classified_receipt = receipt.data
+    assert classified_receipt.status == "unknown_outcome"
+    assert classified_receipt.reconciliation_required
+    assert not classified_receipt.retry_safe
     rate_limited = _raw()
     rate_limited.update({"rate_limited": True, "status": "rejected"})
     limited_receipt = classify_authority_response(  # type: ignore[arg-type]
         rate_limited,
         POLICY,  # type: ignore[arg-type]
     )
-    assert limited_receipt.response_classification == "rate_limited"
+    assert limited_receipt.data is not None
+    assert limited_receipt.data.response_classification == "rate_limited"
     classified_cases = (
         ("accepted", "0", "broker-order-001", "accepted"),
         ("partial", "0.50", "broker-order-001", "partial"),
@@ -67,14 +71,16 @@ def test_malformed_success_is_unknown_outcome() -> None:
             response,
             POLICY,  # type: ignore[arg-type]
         )
-        assert classified.status == expected
+        assert classified.status == "success"
+        assert classified.data is not None
+        assert classified.data.status == expected
     timed_out = _raw()
     timed_out["timed_out"] = True
     assert (
         classify_authority_response(  # type: ignore[arg-type]
             timed_out,
             POLICY,  # type: ignore[arg-type]
-        ).response_classification
+        ).data.response_classification  # type: ignore[union-attr]
         == "timeout"
     )
     ambiguous = _raw()
@@ -83,6 +89,6 @@ def test_malformed_success_is_unknown_outcome() -> None:
         classify_authority_response(  # type: ignore[arg-type]
             ambiguous,
             POLICY,  # type: ignore[arg-type]
-        ).response_classification
+        ).data.response_classification  # type: ignore[union-attr]
         == "ambiguous"
     )

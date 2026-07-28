@@ -1,5 +1,7 @@
 """Trading runtime controls and Risk-owned kill-switch transition verbs."""
 
+# ruff: noqa: BLE001 - public boundaries normalize every failure.
+
 from __future__ import annotations
 
 from hashlib import sha256
@@ -8,22 +10,22 @@ from typing import TYPE_CHECKING
 from app.services.risk import ActionPolicyVerdict, KillSwitchCommand
 from app.services.trading.actions._shared import authority_id, require_action
 from app.services.trading.contracts import (
-    StandardTradingEnvelope,
     TradingError,
     TradingRequest,
 )
 from app.services.trading.contracts.errors import _redacted_envelope_data
-from app.services.trading.reconciliation import compare_authority_state
+from app.services.trading.contracts.responses import success_trading_response
+from app.services.trading.reconciliation.compare import _compare_authority_state_value
 from app.services.trading.state import (
     TradingEvent,
     TradingProjection,
-    apply_execution_event,
 )
+from app.services.trading.state.projections import _apply_execution_event_value
 from app.services.trading.validation.authority import (
     validate_action_policy,
     validate_kill_switch_hierarchy,
 )
-from app.utils import canonical_json, logger
+from app.utils import RiskLevel, StandardResponse, canonical_json, logger
 
 if TYPE_CHECKING:
     from app.services.trading.actions.dependencies import TradingDependencies
@@ -96,13 +98,13 @@ def _record_control(
         causation_id=request.causation_id,
         payload=_redacted_envelope_data(facts),
     )
-    return apply_execution_event(event, deps.store)
+    return _apply_execution_event_value(event, deps.store)
 
 
 def _control_envelope(
     request: TradingRequest,
     data: dict[str, JsonValue],
-) -> StandardTradingEnvelope:
+) -> StandardResponse[dict[str, JsonValue]]:
     """Package a successful control result.
 
     Args:
@@ -114,24 +116,23 @@ def _control_envelope(
     """
     logger.debug("Packaging Trading control result")
     redacted_data = _redacted_envelope_data(data)
-    return StandardTradingEnvelope(
-        status="success",
+    return success_trading_response(
+        redacted_data,
+        operation=f"trading.{request.action}",
         message="Trading control transition completed",
-        data=redacted_data,
-        errors=(),
-        warnings=(),
-        audit_metadata={
-            "operation": request.action,
-            "request_id": request.request_id,
-            "correlation_id": request.correlation_id,
-            "redaction_applied": True,
-        },
+        risk_level=RiskLevel.HIGH,
+        request_id=request.request_id,
+        correlation_id=request.correlation_id,
+        read_only=False,
+        modifies_database=True,
+        legacy_status="success",
+        extensions={"redaction_applied": True},
     )
 
 
-async def pause_strategy(
+async def _pause_strategy_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[dict[str, JsonValue]]:
     """Pause Trading admission without changing Strategy lifecycle state.
 
     Args:
@@ -152,9 +153,9 @@ async def pause_strategy(
     return _control_envelope(request, {"projection_version": projection.version})
 
 
-async def resume_strategy(
+async def _resume_strategy_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[dict[str, JsonValue]]:
     """Resume Trading admission after policy, switch, and readiness checks.
 
     Args:
@@ -180,7 +181,7 @@ async def resume_strategy(
     current = deps.store.load_projection(
         (request.route, request.account_id, authority_id(request))
     )
-    if current is None or compare_authority_state(snapshot, current).unresolved:
+    if current is None or _compare_authority_state_value(snapshot, current).unresolved:
         raise TradingError("RECONCILIATION_REQUIRED", "Route state is not reconciled")
     projection = _record_control(
         request,
@@ -190,9 +191,9 @@ async def resume_strategy(
     return _control_envelope(request, {"projection_version": projection.version})
 
 
-async def sync_positions(
+async def _sync_positions_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[dict[str, JsonValue]]:
     """Synchronize Trading projections from read-only route truth.
 
     Args:
@@ -211,7 +212,7 @@ async def sync_positions(
     unresolved = (
         True
         if current is None
-        else compare_authority_state(snapshot, current).unresolved
+        else _compare_authority_state_value(snapshot, current).unresolved
     )
     projection = _record_control(
         request,
@@ -258,9 +259,9 @@ def _kill_switch_command(request: TradingRequest, action: str) -> KillSwitchComm
     )
 
 
-async def trigger_kill_switch(
+async def _trigger_kill_switch_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[dict[str, JsonValue]]:
     """Request one scoped Risk-owned kill-switch activation.
 
     Args:
@@ -278,9 +279,9 @@ async def trigger_kill_switch(
     return _control_envelope(request, {"kill_switch": state.model_dump(mode="json")})
 
 
-async def clear_kill_switch(
+async def _clear_kill_switch_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[dict[str, JsonValue]]:
     """Request Risk-authorized clearance without overriding active parents.
 
     Args:
@@ -313,6 +314,86 @@ async def clear_kill_switch(
         _kill_switch_command(request, "clear"), _policy(request, deps)
     )
     return _control_envelope(request, {"kill_switch": state.model_dump(mode="json")})
+
+
+async def pause_strategy(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[dict[str, JsonValue]]:
+    """Pause strategy admission and return a standard response.
+
+    Returns:
+        Standard response containing control evidence or an error.
+    """
+    try:
+        return await _pause_strategy_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
+
+
+async def resume_strategy(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[dict[str, JsonValue]]:
+    """Resume strategy admission and return a standard response.
+
+    Returns:
+        Standard response containing control evidence or an error.
+    """
+    try:
+        return await _resume_strategy_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
+
+
+async def sync_positions(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[dict[str, JsonValue]]:
+    """Synchronize route positions and return a standard response.
+
+    Returns:
+        Standard response containing synchronization evidence or an error.
+    """
+    try:
+        return await _sync_positions_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
+
+
+async def trigger_kill_switch(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[dict[str, JsonValue]]:
+    """Trigger a kill switch and return a standard response.
+
+    Returns:
+        Standard response containing transition evidence or an error.
+    """
+    try:
+        return await _trigger_kill_switch_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
+
+
+async def clear_kill_switch(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[dict[str, JsonValue]]:
+    """Clear a kill switch and return a standard response.
+
+    Returns:
+        Standard response containing transition evidence or an error.
+    """
+    try:
+        return await _clear_kill_switch_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
 
 
 __all__ = [

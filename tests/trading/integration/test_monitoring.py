@@ -1,11 +1,9 @@
 """Workflow integration for budget and monitoring delivery failures."""
 
 # ruff: noqa: INP001
-import pytest
 from app.services.trading import (
     BudgetGate,
     OperationalEvent,
-    TradingError,
     emit_runtime_event,
 )
 from tests.trading.conftest import (
@@ -19,19 +17,21 @@ from tests.trading.conftest import (
 def test_budget_and_event_delivery_failures_emit_incidents() -> None:
     """Budget mismatch blocks and event-delivery failure attempts an incident."""
     item = monitoring_request()
-    with pytest.raises(TradingError, match="BUDGET_BLOCKED"):
-        BudgetGate.validate(
-            item,
-            monitoring_allocation(),
-            type(monitoring_verdict(item)).model_validate(
-                {
-                    **monitoring_verdict(item).model_dump(mode="python"),
-                    "allowed": False,
-                    "reasons": ("blocked",),
-                }
-            ),
-            now=NOW,
-        )
+    budget_result = BudgetGate.validate(
+        item,
+        monitoring_allocation(),
+        type(monitoring_verdict(item)).model_validate(
+            {
+                **monitoring_verdict(item).model_dump(mode="python"),
+                "allowed": False,
+                "reasons": ("blocked",),
+            }
+        ),
+        now=NOW,
+    )
+    assert budget_result.status == "error"
+    assert budget_result.error is not None
+    assert budget_result.error.code == "BUDGET_BLOCKED"
     delivered = []
     event = OperationalEvent(
         event_id="event-001",
@@ -50,8 +50,10 @@ def test_budget_and_event_delivery_failures_emit_incidents() -> None:
         delivered.append(value)
         raise RuntimeError("sink unavailable")
 
-    with pytest.raises(TradingError, match="SERVICE_UNAVAILABLE"):
-        emit_runtime_event(event, sink)
+    event_result = emit_runtime_event(event, sink)
+    assert event_result.status == "error"
+    assert event_result.error is not None
+    assert event_result.error.code == "SERVICE_UNAVAILABLE"
     assert [value.event_type for value in delivered] == [
         "COST_OBSERVED",
         "EVENT_DELIVERY_FAILED",

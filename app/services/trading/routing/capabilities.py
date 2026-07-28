@@ -7,7 +7,8 @@ from app.services.trading.contracts import OrderIntent, TradingError
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import logger
+from app.services.trading.contracts.responses import success_trading_response
+from app.utils import RiskLevel, StandardResponse, logger
 
 BROKER_OPERATION_TIMEOUT_SECONDS = Decimal(10)
 
@@ -92,7 +93,7 @@ def _validate_timeout(
         raise TradingError("ADAPTER_INCOMPATIBLE", "Authority timeout is not approved")
 
 
-def validate_adapter_capability(
+def _validate_adapter_capability_value(
     intent: OrderIntent,
     capability: Mapping[str, JsonValue],
     *,
@@ -139,6 +140,43 @@ def validate_adapter_capability(
         raise TradingError("ADAPTER_INCOMPATIBLE", "Mutation retry policy is unsafe")
     if capability.get("redaction_applied") is not True:
         raise TradingError("ADAPTER_INCOMPATIBLE", "Redaction evidence is required")
+
+
+def validate_adapter_capability(
+    intent: OrderIntent,
+    capability: Mapping[str, JsonValue],
+    *,
+    operation_timeout_seconds: Decimal,
+) -> StandardResponse[None]:
+    """Validate authority capability evidence and return a standard response.
+
+    Args:
+        intent: Complete deterministic executable intent.
+        capability: Approved Broker feature and adapter policy evidence.
+        operation_timeout_seconds: Validated exact runtime timeout.
+
+    Returns:
+        Successful response with no payload, or a canonical Trading error.
+    """
+    try:
+        _validate_adapter_capability_value(
+            intent,
+            capability,
+            operation_timeout_seconds=operation_timeout_seconds,
+        )
+    except TradingError as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(
+            error,
+            {"client_order_id": intent.client_order_id},
+        )
+    return success_trading_response(
+        None,
+        risk_level=RiskLevel.HIGH,
+        legacy_status="validated",
+        extensions={"provider_id": intent.provider_id},
+    )
 
 
 __all__ = ["BROKER_OPERATION_TIMEOUT_SECONDS", "validate_adapter_capability"]

@@ -14,5 +14,7 @@ async def test_live_startup_requires_reconciliation() -> None:
         return False
 
     session = live_session(startup_reconcile=incomplete)
-    assert (await session.start(live_config(), live_evidence())).status == "blocked"
+    result = await session.start(live_config(), live_evidence())
+    assert result.status == "success"
+    assert result.metadata.extensions["legacy_status"] == "blocked"
     assert not session.admission_enabled

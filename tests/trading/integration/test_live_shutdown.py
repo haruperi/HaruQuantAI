@@ -16,5 +16,7 @@ async def test_shutdown_reports_unresolved_work() -> None:
     session = live_session(flush_evidence=failed)
     await session.start(live_config(), live_evidence())
     outcome = await session.stop()
-    assert outcome.status == "partial"
+    assert outcome.status == "success"
+    assert outcome.metadata.extensions["legacy_status"] == "partial"
+    assert outcome.data is not None
     assert "flush_evidence" in outcome.data["unresolved_steps"]

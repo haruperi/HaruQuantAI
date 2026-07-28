@@ -42,7 +42,7 @@ async def dispatch_order_intent(
     simulation_dispatch: Callable[[OrderIntent], Awaitable[ExecutionReceipt]] | None,
 ) -> ExecutionReceipt:
     """Invoke the public dispatcher with explicit deterministic runtime policy."""
-    return await _dispatch_order_intent(
+    result = await _dispatch_order_intent(
         intent,
         connection,
         broker_adapter,
@@ -50,6 +50,10 @@ async def dispatch_order_intent(
         operation_timeout_seconds=Decimal(10),
         clock=lambda: NOW,
     )
+    if result.status == "error" or not isinstance(result.data, ExecutionReceipt):
+        code = "UNKNOWN_ERROR" if result.error is None else result.error.code
+        raise TradingError(code, "Dispatcher response failed")
+    return result.data
 
 
 def _intent(*, route: str = "paper", action: str = "submit_order") -> OrderIntent:
@@ -308,16 +312,21 @@ def test_dispatch_has_single_mutation_boundary() -> None:
     )
     assert rejected.status == "rejected"
     limited_adapter = _ErrorAdapter(BrokerErrorCode.BROKER_RATE_LIMITED)
-    limited = asyncio.run(
-        dispatch_order_intent(
+    limited_response = asyncio.run(
+        _dispatch_order_intent(
             _intent(),
             _connection(),
             cast("BrokerAdapter", limited_adapter),
             None,
+            operation_timeout_seconds=Decimal(10),
+            clock=lambda: NOW,
         )
     )
-    assert limited.status == "unknown_outcome"
-    assert limited.response_classification == "rate_limited"
+    assert limited_response.status == "error"
+    assert limited_response.data is None
+    assert limited_response.error is not None
+    assert limited_response.error.code == "UNKNOWN_OUTCOME"
+    assert limited_response.metadata.extensions["legacy_status"] == "unknown_outcome"
 
     simulation_calls = 0
 
@@ -425,7 +434,9 @@ def test_timeout_replay_has_deterministic_receipt_identity() -> None:
 
     async def timeout_once() -> ExecutionReceipt:
         """Dispatch one intentionally timed-out Broker placement."""
-        return await _dispatch_order_intent(
+        from app.services.trading.routing.dispatcher import _dispatch_order_intent_value
+
+        return await _dispatch_order_intent_value(
             _intent(),
             _connection(),
             cast("BrokerAdapter", _TimeoutAdapter()),
@@ -443,15 +454,19 @@ def test_timeout_replay_has_deterministic_receipt_identity() -> None:
 
 def test_provider_exception_becomes_redacted_unknown_receipt() -> None:
     """Unexpected provider exceptions never cross the Trading public boundary."""
-    receipt = asyncio.run(
-        dispatch_order_intent(
+    response = asyncio.run(
+        _dispatch_order_intent(
             _intent(),
             _connection(),
             cast("BrokerAdapter", _RaisingAdapter()),
             None,
+            operation_timeout_seconds=Decimal(10),
+            clock=lambda: NOW,
         )
     )
-    assert receipt.status == "unknown_outcome"
-    assert receipt.response_classification == "malformed_response"
-    assert receipt.reconciliation_required
-    assert "hunter2" not in receipt.model_dump_json()
+    assert response.status == "error"
+    assert response.data is None
+    assert response.error is not None
+    assert response.error.code == "UNKNOWN_OUTCOME"
+    assert response.metadata.extensions["legacy_status"] == "unknown_outcome"
+    assert "hunter2" not in response.model_dump_json()

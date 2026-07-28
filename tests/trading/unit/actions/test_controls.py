@@ -13,7 +13,6 @@ from app.services.trading.actions import (
     sync_positions,
     trigger_kill_switch,
 )
-from app.services.trading.contracts import TradingError
 from app.services.trading.reconciliation import AuthoritySnapshot
 from app.services.trading.state import TradingProjection
 
@@ -97,8 +96,10 @@ async def test_resume_requires_cleared_hierarchy_and_reconciliation() -> None:
     states = list(kill_switch_states(item))
     states[0] = states[0].model_copy(update={"state": "active"})
     deps = replace(deps, kill_switch_state_source=lambda value: tuple(states))
-    with pytest.raises(TradingError, match="KILL_SWITCH_ACTIVE"):
-        await resume_strategy(item, deps)
+    result = await resume_strategy(item, deps)
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "KILL_SWITCH_ACTIVE"
 
 
 @pytest.mark.anyio
@@ -111,8 +112,10 @@ async def test_resume_rejects_incomplete_kill_switch_hierarchy() -> None:
         kill_switch_state_source=lambda value: incomplete,
         reconciliation_source=lambda value: authority(),
     )
-    with pytest.raises(TradingError, match="KILL_SWITCH_UNKNOWN"):
-        await resume_strategy(item, deps)
+    result = await resume_strategy(item, deps)
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "KILL_SWITCH_UNKNOWN"
 
 
 @pytest.mark.anyio
@@ -137,6 +140,7 @@ async def test_sync_is_route_read_only() -> None:
     deps = replace(dependencies(), reconciliation_source=lambda value: authority())
     outcome = await sync_positions(request(action="sync_positions"), deps)
     assert outcome.status == "success"
+    assert outcome.data is not None
     assert outcome.data["unresolved"] is True
 
 
@@ -149,8 +153,10 @@ async def test_request_text_cannot_self_classify_emergency() -> None:
         control_reason="emergency",
     )
     deps = replace(dependencies(), action_policy_source=lambda value: None)
-    with pytest.raises(TradingError, match="PERMISSION_DENIED"):
-        await trigger_kill_switch(item, deps)
+    result = await trigger_kill_switch(item, deps)
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "PERMISSION_DENIED"
 
 
 @pytest.mark.anyio
@@ -165,5 +171,7 @@ async def test_clear_cannot_override_active_parent() -> None:
     states = list(kill_switch_states(item))
     states[0] = states[0].model_copy(update={"state": "active"})
     deps = replace(deps, kill_switch_state_source=lambda value: tuple(states))
-    with pytest.raises(TradingError, match="KILL_SWITCH_ACTIVE"):
-        await clear_kill_switch(item, deps)
+    result = await clear_kill_switch(item, deps)
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "KILL_SWITCH_ACTIVE"

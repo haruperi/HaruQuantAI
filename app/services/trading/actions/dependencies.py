@@ -39,7 +39,7 @@ from app.services.trading.contracts import (
 )
 from app.services.trading.contracts.models import JsonValue
 from app.services.trading.reconciliation import AuthoritySnapshot
-from app.utils import logger
+from app.utils import StandardResponse, logger
 
 if TYPE_CHECKING:
     from app.services.trading.live import LiveSession
@@ -47,7 +47,9 @@ if TYPE_CHECKING:
     from app.services.trading.state import TradingStateStore
 
 type SymbolCapability = tuple[Mapping[str, JsonValue], BrokerSymbolInfo]
-type SimulationDispatch = Callable[[OrderIntent], Awaitable[ExecutionReceipt]]
+type SimulationDispatch = Callable[
+    [OrderIntent], Awaitable[StandardResponse[ExecutionReceipt]]
+]
 type AccountStateSource = Callable[[TradingRequest], AccountStateSnapshot]
 type SymbolCapabilitySource = Callable[
     [TradingRoute, str | None, str], SymbolCapability

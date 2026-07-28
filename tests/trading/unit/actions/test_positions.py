@@ -8,7 +8,6 @@ from app.services.trading.actions import (
     modify_position,
     reduce_exposure,
 )
-from app.services.trading.contracts import TradingError
 
 from tests.trading.unit.actions.test_dependencies import (
     dependencies,
@@ -46,7 +45,8 @@ async def test_partial_close_preserves_position_identity() -> None:
     outcome = await close_position(
         position_request("close_position", quantity=Decimal(1)), position_dependencies()
     )
-    assert outcome.status == "sent"
+    assert outcome.status == "success"
+    assert outcome.metadata.extensions["legacy_status"] == "sent"
 
 
 @pytest.mark.anyio
@@ -61,8 +61,10 @@ async def test_modify_position_rejects_unapproved_field() -> None:
     deps = position_dependencies(
         action_policy=policy("modify_position", mutable_fields="take_profit")
     )
-    with pytest.raises(TradingError, match="SCOPE_MISMATCH"):
-        await modify_position(item, deps)
+    result = await modify_position(item, deps)
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "SCOPE_MISMATCH"
 
 
 @pytest.mark.anyio
@@ -77,19 +79,25 @@ async def test_modify_position_accepts_approved_stop_scope() -> None:
     deps = position_dependencies(
         action_policy=policy("modify_position", mutable_fields="stop_loss")
     )
-    assert (await modify_position(item, deps)).status == "sent"
+    result = await modify_position(item, deps)
+    assert result.status == "success"
+    assert result.metadata.extensions["legacy_status"] == "sent"
 
 
 @pytest.mark.anyio
 async def test_reduce_exposure_cannot_increase() -> None:
     """A reduction larger than current exposure is rejected before dispatch."""
     item = position_request("reduce_exposure", quantity=Decimal(3))
-    with pytest.raises(TradingError, match="VALIDATION_FAILED"):
-        await reduce_exposure(item, position_dependencies())
+    result = await reduce_exposure(item, position_dependencies())
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "VALIDATION_FAILED"
 
 
 @pytest.mark.anyio
 async def test_reduce_exposure_executes_exact_approved_quantity() -> None:
     """An in-bounds exact Risk-approved reduction dispatches once."""
     item = position_request("reduce_exposure", quantity=Decimal("0.50"))
-    assert (await reduce_exposure(item, position_dependencies())).status == "sent"
+    result = await reduce_exposure(item, position_dependencies())
+    assert result.status == "success"
+    assert result.metadata.extensions["legacy_status"] == "sent"

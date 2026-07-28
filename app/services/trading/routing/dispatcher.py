@@ -1,5 +1,7 @@
 """Single asynchronous authority mutation boundary for Trading intents."""
 
+# ruff: noqa: BLE001 - the authority boundary normalizes provider failures.
+
 import asyncio
 from collections.abc import Awaitable, Callable, Mapping
 from datetime import datetime
@@ -19,8 +21,18 @@ from app.services.brokers import (
     BrokerPositionModificationRequest,
 )
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent, TradingError
-from app.services.trading.routing.responses import classify_authority_response
-from app.utils import StandardResponse, canonical_json, logger, parse_utc_timestamp
+from app.services.trading.contracts.responses import (
+    error_trading_response,
+    success_trading_response,
+)
+from app.services.trading.routing.responses import _classify_authority_response_value
+from app.utils import (
+    RiskLevel,
+    StandardResponse,
+    canonical_json,
+    logger,
+    parse_utc_timestamp,
+)
 
 if TYPE_CHECKING:
     from app.services.trading.contracts.models import JsonValue
@@ -374,7 +386,7 @@ def _timeout_receipt(intent: OrderIntent, observed_at: datetime) -> ExecutionRec
         observed_at,
     )
     raw.update({"timed_out": True, "filled_quantity": "0"})
-    return classify_authority_response(raw, _CLASSIFICATION_POLICY)
+    return _classify_authority_response_value(raw, _CLASSIFICATION_POLICY)
 
 
 def _uncertain_failure_receipt(
@@ -398,7 +410,7 @@ def _uncertain_failure_receipt(
         observed_at,
     )
     raw.update({"authority_failure": True, "filled_quantity": "0"})
-    return classify_authority_response(raw, _CLASSIFICATION_POLICY)
+    return _classify_authority_response_value(raw, _CLASSIFICATION_POLICY)
 
 
 def _validate_dispatch_policy(operation_timeout_seconds: Decimal) -> None:
@@ -419,11 +431,14 @@ def _validate_dispatch_policy(operation_timeout_seconds: Decimal) -> None:
         raise TradingError("CONFIGURATION_INVALID", "Dispatch timeout is invalid")
 
 
-async def dispatch_order_intent(  # noqa: C901, PLR0912
+async def _dispatch_order_intent_value(  # noqa: C901, PLR0912
     intent: OrderIntent,
     connection: BrokerConnectionConfig | None,
     broker_adapter: BrokerAdapter | None,
-    simulation_dispatch: Callable[[OrderIntent], Awaitable[ExecutionReceipt]] | None,
+    simulation_dispatch: Callable[
+        [OrderIntent], Awaitable[StandardResponse[ExecutionReceipt] | ExecutionReceipt]
+    ]
+    | None,
     *,
     operation_timeout_seconds: Decimal,
     clock: Callable[[], datetime],
@@ -458,13 +473,23 @@ async def dispatch_order_intent(  # noqa: C901, PLR0912
             )
         try:
             async with asyncio.timeout(float(operation_timeout_seconds)):
-                receipt = await simulation_dispatch(intent)
+                simulation_response = await simulation_dispatch(intent)
         except TimeoutError:
             return _timeout_receipt(intent, clock())
         except TradingError:
             raise
-        except Exception:  # noqa: BLE001 - normalize authority-boundary failures.
+        except Exception:
             return _uncertain_failure_receipt(intent, clock())
+        if isinstance(simulation_response, ExecutionReceipt):
+            receipt = simulation_response
+        elif simulation_response.status != "success" or not isinstance(
+            simulation_response.data, ExecutionReceipt
+        ):
+            raise TradingError(
+                "MALFORMED_RECEIPT", "Simulation returned an unsuccessful response"
+            )
+        else:
+            receipt = simulation_response.data
         if (
             receipt.client_order_id != intent.client_order_id
             or receipt.intent_id != intent.source_intent_id
@@ -501,7 +526,7 @@ async def dispatch_order_intent(  # noqa: C901, PLR0912
             "INVALID_REQUEST",
             "Broker mutation request is invalid",
         ) from error
-    except Exception:  # noqa: BLE001 - normalize authority-boundary failures.
+    except Exception:
         return _uncertain_failure_receipt(intent, clock())
     broker, _, environment, _ = _broker_evidence(result)
     if (
@@ -509,9 +534,77 @@ async def dispatch_order_intent(  # noqa: C901, PLR0912
         or environment != selected_connection.environment.value
     ):
         raise TradingError("MALFORMED_RECEIPT", "Broker result scope mismatches")
-    return classify_authority_response(
+    return _classify_authority_response_value(
         _broker_raw_response(intent, result, clock()),
         _CLASSIFICATION_POLICY,
+    )
+
+
+async def dispatch_order_intent(
+    intent: OrderIntent,
+    connection: BrokerConnectionConfig | None,
+    broker_adapter: BrokerAdapter | None,
+    simulation_dispatch: Callable[
+        [OrderIntent], Awaitable[StandardResponse[ExecutionReceipt] | ExecutionReceipt]
+    ]
+    | None,
+    *,
+    operation_timeout_seconds: Decimal,
+    clock: Callable[[], datetime],
+) -> StandardResponse[ExecutionReceipt]:
+    """Dispatch one intent and preserve the raw receipt in response data.
+
+    Args:
+        intent: Complete deterministic executable intent.
+        connection: Broker connection material for paper/live routes.
+        broker_adapter: Broker mutation authority for paper/live routes.
+        simulation_dispatch: Simulation mutation callback for sim routes.
+        operation_timeout_seconds: Validated exact Broker operation timeout.
+        clock: Injected aware UTC receipt clock.
+
+    Returns:
+        Successful receipt response, or an error response for unknown outcomes.
+    """
+    try:
+        receipt = await _dispatch_order_intent_value(
+            intent,
+            connection,
+            broker_adapter,
+            simulation_dispatch,
+            operation_timeout_seconds=operation_timeout_seconds,
+            clock=clock,
+        )
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"client_order_id": intent.client_order_id})
+    if receipt.status == "unknown_outcome":
+        return error_trading_response(
+            code="UNKNOWN_OUTCOME",
+            details={"receipt": receipt.model_dump(mode="json")},
+            operation="trading.dispatch_order_intent",
+            message="Trading authority outcome requires reconciliation",
+            risk_level=RiskLevel.CRITICAL,
+            request_id=receipt.request_id,
+            correlation_id=receipt.correlation_id,
+            read_only=False,
+            modifies_database=True,
+            places_trade=intent.route.value in {"paper", "live"},
+            requires_network=intent.route.value in {"paper", "live"},
+            legacy_status="unknown_outcome",
+        )
+    return success_trading_response(
+        receipt,
+        operation="trading.dispatch_order_intent",
+        message="Trading authority receipt received",
+        risk_level=RiskLevel.CRITICAL,
+        request_id=receipt.request_id,
+        correlation_id=receipt.correlation_id,
+        read_only=False,
+        modifies_database=True,
+        places_trade=intent.route.value in {"paper", "live"},
+        requires_network=intent.route.value in {"paper", "live"},
+        legacy_status=receipt.status,
     )
 
 

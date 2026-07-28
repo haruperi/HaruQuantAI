@@ -11,14 +11,15 @@ from app.services.trading.contracts import (
     PortfolioRebalanceExecutionRequest,
     TradingError,
 )
-from app.utils import logger
+from app.services.trading.contracts.responses import success_trading_response
+from app.utils import RiskLevel, StandardResponse, logger
 
 
 class BudgetGate:
     """Validate current Risk-owned budget evidence without calculating policy."""
 
     @staticmethod
-    def validate(
+    def _validate_value(
         request: PortfolioRebalanceExecutionRequest,
         allocation: AllocationRiskDecision,
         verdict: PortfolioBudgetExecutionVerdict,
@@ -68,6 +69,38 @@ class BudgetGate:
                     "allocation_decision_id": request.allocation_decision_id,
                 },
             )
+
+    @staticmethod
+    def validate(
+        request: PortfolioRebalanceExecutionRequest,
+        allocation: AllocationRiskDecision,
+        verdict: PortfolioBudgetExecutionVerdict,
+        *,
+        now: datetime,
+    ) -> StandardResponse[None]:
+        """Validate budget authority and return a standard response.
+
+        Args:
+            request: Trading-owned canonical rebalance execution request.
+            allocation: Current Risk-owned allocation decision.
+            verdict: Current Risk-owned execution-time budget verdict.
+            now: Injected aware UTC evaluation time.
+
+        Returns:
+            Successful empty response or a canonical mapped Trading error.
+        """
+        try:
+            BudgetGate._validate_value(request, allocation, verdict, now=now)
+        except TradingError as error:
+            from app.services.trading.contracts.errors import map_trading_error
+
+            return map_trading_error(error, {"plan_id": request.plan_id})
+        return success_trading_response(
+            None,
+            risk_level=RiskLevel.HIGH,
+            legacy_status="approved",
+            extensions={"plan_id": request.plan_id},
+        )
 
 
 __all__ = ["BudgetGate"]

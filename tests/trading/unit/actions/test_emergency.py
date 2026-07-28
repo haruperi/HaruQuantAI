@@ -131,7 +131,8 @@ async def test_cancel_all_preserves_uncertain_results() -> None:
     deps = emergency_dependencies("cancel_all_orders")
     deps = replace(deps, simulation_dispatch=unknown_dispatch)
     outcome = await cancel_all_orders(request(action="cancel_all_orders"), deps)
-    assert outcome.status == "partial"
+    assert outcome.status == "success"
+    assert outcome.metadata.extensions["legacy_status"] == "partial"
     assert outcome.data["results"][0]["status"] == "unknown_outcome"
     assert outcome.data["skipped"] == [{"order_id": "order-filled", "state": "FILLED"}]
 
@@ -187,5 +188,7 @@ async def test_bulk_children_receive_distinct_canonical_request_ids(
 async def test_bulk_ceiling_blocks_before_children() -> None:
     """Risk max_children is enforced before any bulk mutation."""
     deps = dependencies(action_policy=policy("cancel_all_orders", max_children="0"))
-    with pytest.raises(TradingError, match="PERMISSION_DENIED"):
-        await cancel_all_orders(request(action="cancel_all_orders"), deps)
+    result = await cancel_all_orders(request(action="cancel_all_orders"), deps)
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "PERMISSION_DENIED"

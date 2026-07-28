@@ -210,15 +210,21 @@ def example_state() -> None:
         retention_seconds=300,
         concurrency_lock_timeout_seconds=Decimal(30),
     )
-    print(f"Idempotency reservation status: {res.status}")
+    assert res.status == "success"
+    reservation = res.data
+    assert reservation is not None
+    print(f"Idempotency reservation status: {reservation.status}")
     store.complete_idempotency(
-        res.key,
-        res.material_hash,
+        reservation.key,
+        reservation.material_hash,
         "usage-receipt-001",
         NOW,
         status="completed",
     )
-    print(f"Completed reservation receipt: {store.reservations[res.key].receipt_id}")
+    print(
+        "Completed reservation receipt: "
+        f"{store.reservations[reservation.key].receipt_id}"
+    )
 
     # 2. Append and apply event
     event = _event()
@@ -226,12 +232,18 @@ def example_state() -> None:
     print(f"Appended event type: {event.event_type}, version: {event.event_version}")
 
     updated_proj = apply_execution_event(event, store)
-    print(f"Applied execution event updated projection version: {updated_proj.version}")
+    assert updated_proj.status == "success"
+    projection = updated_proj.data
+    assert projection is not None
+    print(f"Applied execution event updated projection version: {projection.version}")
 
     # 3. Schema versions and migrations
     print(f"Trading schema version: {TRADING_SCHEMA_VERSION}")
     migrations = get_trading_migrations()
-    print(f"Trading migrations domain: {migrations[0].domain}")
+    assert migrations.status == "success"
+    migration_steps = migrations.data
+    assert migration_steps is not None
+    print(f"Trading migrations domain: {migration_steps[0].domain}")
 
 
 def fr_trd_037() -> None:

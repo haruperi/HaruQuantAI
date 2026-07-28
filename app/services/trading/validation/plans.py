@@ -3,13 +3,14 @@
 from hashlib import sha256
 
 from app.services.trading.contracts import OrderIntent, TradingError, TradingRequest
+from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.validation.readiness import (
     ReadinessAssessment,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import canonical_json, logger
+from app.utils import RiskLevel, StandardResponse, canonical_json, logger
 
 
-def build_execution_plan(
+def _build_execution_plan_value(
     request: TradingRequest,
     readiness: ReadinessAssessment,
 ) -> OrderIntent:
@@ -114,6 +115,44 @@ def build_execution_plan(
         approval_token_ref=request.approval_token_ref,
         created_at=request.system_time,
         valid_until=request.valid_until,
+    )
+
+
+def build_execution_plan(
+    request: TradingRequest,
+    readiness: ReadinessAssessment,
+) -> StandardResponse[OrderIntent]:
+    """Build a deterministic execution plan in standard response data.
+
+    Returns:
+        Standard response containing the executable intent or an error.
+    """
+    try:
+        value = _build_execution_plan_value(request, readiness)
+    except TradingError as error:
+        from typing import cast
+
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return cast(
+            "StandardResponse[OrderIntent]",
+            map_trading_error(
+                error,
+                {
+                    "operation": "trading.build_execution_plan",
+                    "request_id": request.request_id,
+                    "correlation_id": request.correlation_id,
+                },
+            ),
+        )
+    return success_trading_response(
+        value,
+        operation="trading.build_execution_plan",
+        message="Trading execution plan built",
+        risk_level=RiskLevel.HIGH,
+        request_id=request.request_id,
+        correlation_id=request.correlation_id,
+        read_only=True,
     )
 
 

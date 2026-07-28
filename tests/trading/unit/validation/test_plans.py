@@ -4,8 +4,7 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-import pytest
-from app.services.trading.contracts import TradingError, TradingRequest
+from app.services.trading.contracts import TradingRequest
 from app.services.trading.validation import ReadinessAssessment, build_execution_plan
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
@@ -44,17 +43,22 @@ def test_plan_is_deterministic() -> None:
     )
     first = build_execution_plan(request, readiness)
     second = build_execution_plan(request, readiness)
-    assert first == second
-    assert first.approved_volume == first.risk_approved_volume
-    assert first.order_type == request.order_type
-    assert first.quantity_unit == request.quantity_unit
+    assert first.status == "success"
+    assert second.status == "success"
+    assert first.data == second.data
+    assert first.data is not None
+    assert first.data.approved_volume == first.data.risk_approved_volume
+    assert first.data.order_type == request.order_type
+    assert first.data.quantity_unit == request.quantity_unit
     blocked = readiness.model_copy(
         update={"passed": False, "failed_check_codes": ("BLOCKED",)}
     )
-    with pytest.raises(TradingError) as blocked_error:
-        build_execution_plan(request, blocked)
-    assert blocked_error.value.trading_code == "GATE_BLOCKED"
+    blocked_error = build_execution_plan(request, blocked)
+    assert blocked_error.status == "error"
+    assert blocked_error.error is not None
+    assert blocked_error.error.code == "GATE_BLOCKED"
     missing = request.model_copy(update={"quantity": None})
-    with pytest.raises(TradingError) as invalid_error:
-        build_execution_plan(missing, readiness)
-    assert invalid_error.value.trading_code == "INVALID_REQUEST"
+    invalid_error = build_execution_plan(missing, readiness)
+    assert invalid_error.status == "error"
+    assert invalid_error.error is not None
+    assert invalid_error.error.code == "INVALID_REQUEST"

@@ -16,11 +16,12 @@ from app.services.risk import (
 from app.services.strategy import TradeIntent
 from app.services.trading.actions import run_live_evaluation_cycle
 from app.services.trading.contracts import (
-    StandardTradingEnvelope,
     TradingError,
     TradingRequest,
 )
+from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.state import TradingProjection
+from app.utils import RiskLevel
 
 from tests.trading.unit.actions.test_dependencies import (
     NOW,
@@ -185,18 +186,22 @@ async def test_cycle_never_generates_or_sizes_signals(monkeypatch) -> None:
     async def execute(item, supplied_deps, supplied_evidence):
         """Capture the already-approved canonical request."""
         captured["quantity"] = item.quantity
-        return StandardTradingEnvelope(
-            status="sent",
+        return success_trading_response(
+            {"request_id": item.request_id},
             message="captured",
-            data={"request_id": item.request_id},
-            errors=(),
-            warnings=(),
-            audit_metadata={"operation": "test", "redaction_applied": True},
+            operation="trading.test",
+            risk_level=RiskLevel.HIGH,
+            request_id=item.request_id,
+            correlation_id=item.correlation_id,
+            read_only=False,
+            places_trade=True,
+            legacy_status="sent",
         )
 
     monkeypatch.setattr(runtime_module, "_execute_request", execute)
     outcome = await run_live_evaluation_cycle(deps, evidence())
-    assert outcome.status == "sent"
+    assert outcome.status == "success"
+    assert outcome.metadata.extensions["legacy_status"] == "sent"
     assert calls == [
         "data.market",
         "data.account",

@@ -11,9 +11,10 @@ from app.services.trading.contracts import (
     TradingError,
     TradingRoute,
 )
+from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.reconciliation.compare import (
     ReconciliationReport,
-    compare_authority_state,
+    _compare_authority_state_value,
 )
 from app.services.trading.reconciliation.snapshots import (
     AuthoritySnapshot,  # noqa: TC001 - runtime annotation and model resolution
@@ -22,9 +23,9 @@ from app.services.trading.state import (
     TradingEvent,
     TradingProjection,
     TradingStateStore,
-    apply_execution_event,
 )
-from app.utils import canonical_json, logger
+from app.services.trading.state.projections import _apply_execution_event_value
+from app.utils import RiskLevel, StandardResponse, canonical_json, logger
 
 
 class AuthorityResolution(BaseModel):
@@ -247,7 +248,7 @@ def _load_context(
     return projection, attempt
 
 
-def resolve_unknown_outcome(
+def _resolve_unknown_outcome_value(
     receipt: ExecutionReceipt,
     store: TradingStateStore,
     snapshot_source: Callable[[TradingRoute], AuthoritySnapshot],
@@ -280,7 +281,7 @@ def resolve_unknown_outcome(
         raise TradingError("SCOPE_MISMATCH", "Authority route does not match receipt")
     projection, attempt = _load_context(receipt, authority, store)
     workflow_id = attempt.workflow_id
-    report = compare_authority_state(authority, projection)
+    report = _compare_authority_state_value(authority, projection)
     unresolved_scope = _unresolved_scope(report)
     approval_reference = _approved_retry_reference(receipt, projection)
     if unresolved_scope:
@@ -313,7 +314,7 @@ def resolve_unknown_outcome(
             "unresolved_scope": list(unresolved_scope),
         },
     )
-    projected = apply_execution_event(incident, store)
+    projected = _apply_execution_event_value(incident, store)
     transition_event = TradingEvent(
         event_id=_event_id(receipt, "reconciliation_transitioned"),
         event_type="reconciliation_transitioned",
@@ -338,7 +339,7 @@ def resolve_unknown_outcome(
             ),
         },
     )
-    apply_execution_event(transition_event, store)
+    _apply_execution_event_value(transition_event, store)
     resolution_digest = sha256(
         canonical_json(
             {
@@ -357,6 +358,35 @@ def resolve_unknown_outcome(
         incident_reference=incident_id,
         approved_transition_reference=approval_reference,
         remaining_unresolved_scope=unresolved_scope,
+    )
+
+
+def resolve_unknown_outcome(
+    receipt: ExecutionReceipt,
+    store: TradingStateStore,
+    snapshot_source: Callable[[TradingRoute], AuthoritySnapshot],
+) -> StandardResponse[AuthorityResolution]:
+    """Resolve an unknown outcome and return the transition response.
+
+    Args:
+        receipt: Unknown-outcome receipt requiring reconciliation.
+        store: Injected Trading-owned persistence port.
+        snapshot_source: Route-authority snapshot reader.
+
+    Returns:
+        Canonical response containing the resolution or a mapped Trading error.
+    """
+    try:
+        resolution = _resolve_unknown_outcome_value(receipt, store, snapshot_source)
+    except TradingError as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"receipt_id": receipt.receipt_id})
+    return success_trading_response(
+        resolution,
+        risk_level=RiskLevel.CRITICAL,
+        legacy_status=resolution.transition,
+        extensions={"receipt_id": receipt.receipt_id},
     )
 
 

@@ -10,7 +10,7 @@ Central environment configuration is grouped into logical sections, while provid
 
 - Added the immutable generic `StandardResponse v1`, exact structured error and execution metadata contracts, approved-code catalogue validation, monotonic millisecond timing, and lossless raw-data/extension preservation foundation in Utils.
 
-#### Changed (10)
+#### Changed (16)
 
 - Migrated the immutable Brokers capability catalogue to `StandardResponse` and added JSON-only mapping-proxy serialization that preserves raw runtime identity while emitting a detached bounded mapping.
 - Migrated the Brokers registered-profile listing to `StandardResponse[tuple[BrokerId, ...]]` while retaining the stable provider tuple directly in `data` and preserving SDK-free discovery.
@@ -22,6 +22,12 @@ Central environment configuration is grouped into logical sections, while provid
 - Added thirty-three standalone Simulator, Optimization, Portfolio, and Research workflow programs with registry-ordered runners, README evidence mappings, exact stage labels, parity tests, and bounded genuine MT5 demo market evidence.
 - Migrated the Indicators Core and twenty-one official formula operations to Utils-owned `StandardResponse[T]` with the exact twenty-two-code catalogue, response metadata, nested-response unwrapping, and updated consumers and usage evidence.
 - Migrated all twenty-three Strategy public operations and evaluator boundaries to Utils-owned `StandardResponse[T]` with raw payloads, trace metadata, explicit upstream-response unwrapping, and an immutable twenty-nine-code Strategy error catalogue.
+- Migrated the ten official Optimization operations to Utils-owned `StandardResponse[T]` with direct raw advisory data, an immutable ten-code Optimization catalogue, safe upstream response unwrapping, and updated callers and usage evidence.
+- Migrated the classified Research Edge Lab operation to `StandardResponse[ResearchReport]` with direct report data, Research-owned error definitions, safe advisory metadata, and updated API consumers.
+- Migrated the Portfolio public facade and `PortfolioError.to_payload` to Utils-owned `StandardResponse[T]`, preserved raw allocation/rebalance state and execution truth, and removed the legacy `PortfolioOutcome` boundary.
+- Migrated the 28 qualifying Analytics package-root operations to Utils-owned `StandardResponse[T]`, preserved raw analytical data in `data`, and updated callers, tests, usage evidence, and the Analytics API registry.
+- Migrated the qualifying Simulation validation, timeline, accounting, execution, journal, reporting, run, ledger, and Trading-simulation seams to `StandardResponse[T]`, preserving raw results in `data` and updating callers and usage evidence.
+- Migrated qualifying Trading public operations to Utils `StandardResponse[T]`, preserving raw DTOs, fail-closed unknown-outcome receipt evidence, and canonical symbolic error details.
 
 ## 2.2.11
 

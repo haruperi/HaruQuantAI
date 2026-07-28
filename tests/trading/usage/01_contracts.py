@@ -17,7 +17,6 @@ from app.services.trading import (
     ExecutionReceipt,
     OrderIntent,
     PortfolioRebalanceExecutionRequest,
-    StandardTradingEnvelope,
     TradeRecord,
     TradingError,
     TradingRequest,
@@ -27,7 +26,12 @@ from app.services.trading import (
     map_trading_error,
     redact_trading_payload,
 )
-from app.utils import canonical_json
+from app.utils import (
+    RiskLevel,
+    StandardResponse,
+    build_response_metadata,
+    canonical_json,
+)
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 
@@ -135,15 +139,25 @@ def example_contracts() -> None:
     request = TradingRequest.model_validate(_request_data())
     print(f"Validated TradingRequest risk_decision_id: {request.risk_decision_id}")
 
-    envelope = StandardTradingEnvelope(
+    envelope = StandardResponse(
         status="success",
         message="Trading contract validated",
         data={"route": "sim"},
-        errors=(),
-        warnings=(),
-        audit_metadata={"operation": "usage_example"},
+        error=None,
+        metadata=build_response_metadata(
+            name="trading.usage_contract",
+            domain="trading",
+            risk_level=RiskLevel.LOW,
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            start_time=1,
+            read_only=True,
+            writes_file=False,
+            modifies_database=False,
+            places_trade=False,
+            requires_network=False,
+        ),
     )
-    print(f"StandardTradingEnvelope status: {envelope.status}")
+    print(f"StandardResponse status: {envelope.status}")
 
     intent = OrderIntent(
         client_order_id="usage-order-001",
@@ -205,10 +219,10 @@ def example_contracts() -> None:
     print(f"Mapped trading error envelope status: {mapped.status}")
 
     redacted = redact_trading_payload({"credentials": {"api_key": "secret"}})
-    print(f"Redacted payload: {redacted}")
+    print(f"Redacted payload: {redacted.data}")
 
     contracts = get_public_contracts()
-    print(f"Discovered public contracts count: {len(contracts)}")
+    print(f"Discovered public contracts count: {len(contracts.data or ())}")
 
     draft = create_trading_action_draft(_request_data())
     print(f"Created action draft status: {draft.status}")

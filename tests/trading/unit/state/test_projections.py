@@ -4,7 +4,6 @@
 from datetime import UTC, datetime
 
 import pytest
-from app.services.trading.contracts import TradingError
 from app.services.trading.state import (
     TradingEvent,
     TradingProjection,
@@ -93,16 +92,19 @@ def _event(
 def test_apply_event_rejects_stale_version() -> None:
     """Stale aggregate versions fail before any event is persisted."""
     store = _ProjectionStore()
-    with pytest.raises(TradingError) as captured:
-        apply_execution_event(_event(aggregate_version=1), store)  # type: ignore[arg-type]
-    assert captured.value.trading_code == "VERSION_CONFLICT"
+    captured = apply_execution_event(_event(aggregate_version=1), store)  # type: ignore[arg-type]
+    assert captured.status == "error"
+    assert captured.error is not None
+    assert captured.error.code == "VERSION_CONFLICT"
     assert store.events == []
-    with pytest.raises(TradingError) as read_failure:
-        apply_execution_event(_event(), _ProjectionStore(fail_read=True))  # type: ignore[arg-type]
-    assert read_failure.value.trading_code == "PERSISTENCE_FAILED"
-    with pytest.raises(TradingError) as write_failure:
-        apply_execution_event(_event(), _ProjectionStore(fail_write=True))  # type: ignore[arg-type]
-    assert write_failure.value.trading_code == "PERSISTENCE_FAILED"
+    read_failure = apply_execution_event(_event(), _ProjectionStore(fail_read=True))  # type: ignore[arg-type]
+    assert read_failure.status == "error"
+    assert read_failure.error is not None
+    assert read_failure.error.code == "PERSISTENCE_FAILED"
+    write_failure = apply_execution_event(_event(), _ProjectionStore(fail_write=True))  # type: ignore[arg-type]
+    assert write_failure.status == "error"
+    assert write_failure.error is not None
+    assert write_failure.error.code == "PERSISTENCE_FAILED"
     foreign = TradingProjection(
         route="sim",
         tenant_id="other-tenant",
@@ -115,12 +117,13 @@ def test_apply_event_rejects_stale_version() -> None:
         authority_state={},
         updated_at=NOW,
     )
-    with pytest.raises(TradingError) as scope_failure:
-        apply_execution_event(
-            _event(),
-            _ProjectionStore(foreign_projection=foreign),  # type: ignore[arg-type]
-        )
-    assert scope_failure.value.trading_code == "SCOPE_MISMATCH"
+    scope_failure = apply_execution_event(
+        _event(),
+        _ProjectionStore(foreign_projection=foreign),  # type: ignore[arg-type]
+    )
+    assert scope_failure.status == "error"
+    assert scope_failure.error is not None
+    assert scope_failure.error.code == "SCOPE_MISMATCH"
 
 
 def test_projection_requires_scope_and_version() -> None:
@@ -139,11 +142,15 @@ def test_projection_requires_scope_and_version() -> None:
             updated_at=NOW,
         )
     store = _ProjectionStore()
-    projected = apply_execution_event(_event(), store)  # type: ignore[arg-type]
-    duplicate = apply_execution_event(_event(), store)  # type: ignore[arg-type]
+    projected_response = apply_execution_event(_event(), store)  # type: ignore[arg-type]
+    duplicate_response = apply_execution_event(_event(), store)  # type: ignore[arg-type]
+    assert projected_response.data is not None
+    assert duplicate_response.data is not None
+    projected = projected_response.data
+    duplicate = duplicate_response.data
     assert projected.version == 1
     assert duplicate == projected
-    receipt = apply_execution_event(
+    receipt_response = apply_execution_event(
         _event(
             event_id="event-002",
             event_type="receipt_recorded",
@@ -152,7 +159,7 @@ def test_projection_requires_scope_and_version() -> None:
         ),
         store,  # type: ignore[arg-type]
     )
-    fill = apply_execution_event(
+    fill_response = apply_execution_event(
         _event(
             event_id="event-003",
             event_type="fill_recorded",
@@ -161,7 +168,7 @@ def test_projection_requires_scope_and_version() -> None:
         ),
         store,  # type: ignore[arg-type]
     )
-    reconciled = apply_execution_event(
+    reconciled_response = apply_execution_event(
         _event(
             event_id="event-004",
             event_type="reconciliation_transitioned",
@@ -170,6 +177,12 @@ def test_projection_requires_scope_and_version() -> None:
         ),
         store,  # type: ignore[arg-type]
     )
+    assert receipt_response.data is not None
+    assert fill_response.data is not None
+    assert reconciled_response.data is not None
+    receipt = receipt_response.data
+    fill = fill_response.data
+    reconciled = reconciled_response.data
     assert receipt.unresolved_attempt_ids == ()
     assert fill.positions["position-001"] == {"size": "1.00"}
     assert reconciled.version == 4

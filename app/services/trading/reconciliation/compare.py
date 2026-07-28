@@ -7,16 +7,24 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from app.services.trading.contracts import TradingError
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
 )
+from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.reconciliation.snapshots import (
     AuthoritySnapshot,  # noqa: TC001 - runtime annotation and model resolution
 )
 from app.services.trading.state import (
     TradingProjection,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import canonical_json, logger, to_json_safe
+from app.utils import (
+    RiskLevel,
+    StandardResponse,
+    canonical_json,
+    logger,
+    to_json_safe,
+)
 
 type DiscrepancyClass = Literal[
     "missing_internal",
@@ -166,7 +174,7 @@ def _scoped_facts(
     }
 
 
-def compare_authority_state(
+def _compare_authority_state_value(
     authority: AuthoritySnapshot,
     internal: TradingProjection,
 ) -> ReconciliationReport:
@@ -245,6 +253,33 @@ def compare_authority_state(
         severity=severity,
         evidence_refs=evidence,
         unresolved=bool(classes),
+    )
+
+
+def compare_authority_state(
+    authority: AuthoritySnapshot,
+    internal: TradingProjection,
+) -> StandardResponse[ReconciliationReport]:
+    """Compare authority truth and return a standard response.
+
+    Args:
+        authority: Normalized route-authority evidence.
+        internal: Trading-owned projection for the same scope.
+
+    Returns:
+        Canonical response containing the deterministic reconciliation report.
+    """
+    try:
+        report = _compare_authority_state_value(authority, internal)
+    except (TradingError, ValueError) as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"authority_id": authority.authority_id})
+    return success_trading_response(
+        report,
+        risk_level=RiskLevel.HIGH if report.unresolved else RiskLevel.LOW,
+        legacy_status="discrepancy" if report.unresolved else "consistent",
+        extensions={"report_id": report.report_id},
     )
 
 

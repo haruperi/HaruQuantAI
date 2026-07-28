@@ -1,5 +1,7 @@
 """Thin live/paper evaluation-cycle orchestration through public domain APIs."""
 
+# ruff: noqa: BLE001 - public boundaries normalize every failure.
+
 from __future__ import annotations
 
 import asyncio
@@ -13,14 +15,13 @@ from pydantic import ValidationError as PydanticValidationError
 from app.services.risk import DecisionState
 from app.services.trading.actions.orders import _execute_request
 from app.services.trading.contracts import (
-    StandardTradingEnvelope,
     TradingError,
     TradingRequest,
     TradingRoute,
 )
-from app.services.trading.contracts.errors import _redacted_envelope_data
+from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.monitoring import OperationalEvent, emit_runtime_event
-from app.utils import canonical_json, logger
+from app.utils import RiskLevel, StandardResponse, canonical_json, logger
 
 if TYPE_CHECKING:
     from app.services.risk import RiskDecisionPackage
@@ -282,7 +283,7 @@ def _check_timeout(
         return
     material = {"started_at": started_at, "observed_at": now}
     digest = sha256(canonical_json(material).encode("utf-8")).hexdigest()
-    emit_runtime_event(
+    event_response = emit_runtime_event(
         OperationalEvent(
             event_id=f"trd-runtime-{digest}",
             event_type="WORKFLOW_TIMEOUT",
@@ -296,13 +297,15 @@ def _check_timeout(
         ),
         deps.event_sink,
     )
+    if event_response.status == "error":
+        raise TradingError("SERVICE_UNAVAILABLE", "Workflow timeout evidence failed")
     raise TradingError("WORKFLOW_TIMEOUT", "Evaluation cycle exceeded its bound")
 
 
-async def run_live_evaluation_cycle(
+async def _run_live_evaluation_cycle_value(
     deps: TradingDependencies,
     evidence: Mapping[str, JsonValue],
-) -> StandardTradingEnvelope:
+) -> StandardResponse[object]:
     """Run one Data-to-Indicators-to-Strategy-to-Risk evaluation cycle.
 
     Args:
@@ -328,19 +331,16 @@ async def run_live_evaluation_cycle(
             indicators = await deps.indicator_source(dataset, evidence)
             intent = await deps.strategy_source(dataset, account, indicators, evidence)
             if intent is None:
-                data = _redacted_envelope_data({"mutation_performed": False})
-                return StandardTradingEnvelope(
-                    status="success",
+                return success_trading_response(
+                    {"mutation_performed": False},
+                    operation="trading.run_live_evaluation_cycle",
                     message="Strategy produced a neutral no-action outcome",
-                    data=data,
-                    errors=(),
-                    warnings=(),
-                    audit_metadata={
-                        "operation": "run_live_evaluation_cycle",
-                        "request_id": _required_text(evidence, "request_id"),
-                        "correlation_id": _required_text(evidence, "correlation_id"),
-                        "redaction_applied": True,
-                    },
+                    risk_level=RiskLevel.HIGH,
+                    request_id=_required_text(evidence, "request_id"),
+                    correlation_id=_required_text(evidence, "correlation_id"),
+                    read_only=True,
+                    legacy_status="success",
+                    extensions={"redaction_applied": True},
                 )
             decision = await deps.risk_source(intent, account, market_context, evidence)
             request = _approved_request(intent, decision, deps, evidence)
@@ -351,6 +351,25 @@ async def run_live_evaluation_cycle(
         raise TradingError(
             "WORKFLOW_TIMEOUT", "Evaluation cycle exceeded its bound"
         ) from error
+
+
+async def run_live_evaluation_cycle(
+    deps: TradingDependencies,
+    evidence: Mapping[str, JsonValue],
+) -> StandardResponse[object]:
+    """Run one evaluation cycle and return a standard response.
+
+    Returns:
+        Standard response containing cycle evidence or an error.
+    """
+    try:
+        return await _run_live_evaluation_cycle_value(deps, evidence)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(
+            error, {"operation": "trading.run_live_evaluation_cycle"}
+        )
 
 
 __all__ = ["run_live_evaluation_cycle"]

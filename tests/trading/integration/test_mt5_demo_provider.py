@@ -25,12 +25,12 @@ async def _exercise_trading_demo_dispatch() -> None:
     settings = _require_demo_settings()
     connection = _connection_config(settings)
     created = create_broker_adapter(BrokerId.MT5, connection)
-    assert created.is_success, created.error
+    assert created.status == "success", created.error
     adapter = created.data
     assert adapter is not None
 
     connected = await adapter.connect()
-    assert connected.is_success, connected.error
+    assert connected.status == "success", connected.error
     original_orders: set[str] | None = None
     original_positions: set[str] | None = None
     try:
@@ -75,7 +75,7 @@ async def _exercise_trading_demo_dispatch() -> None:
             "operation=minimum_pending_order cleanup=cancel_and_reconcile"
         )
 
-        receipt = await dispatch_order_intent(
+        dispatch_response = await dispatch_order_intent(
             intent,
             connection,
             adapter,
@@ -84,6 +84,9 @@ async def _exercise_trading_demo_dispatch() -> None:
             clock=lambda: datetime.now(UTC),
         )
 
+        assert dispatch_response.status == "success", dispatch_response.error
+        receipt = dispatch_response.data
+        assert receipt is not None
         assert receipt.status == "accepted"
         assert receipt.provider_order_id is not None
         assert not receipt.reconciliation_required

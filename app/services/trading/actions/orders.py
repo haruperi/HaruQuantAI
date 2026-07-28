@@ -1,5 +1,7 @@
 """Route-aware public order action verbs."""
 
+# ruff: noqa: BLE001 - public boundaries normalize every failure.
+
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -10,24 +12,27 @@ from app.services.trading.actions._shared import authority_id, require_action
 from app.services.trading.contracts import (
     ExecutionReceipt,
     OrderIntent,
-    StandardTradingEnvelope,
     TradeRecord,
     TradingError,
     TradingRequest,
 )
 from app.services.trading.contracts.errors import _redacted_envelope_data
+from app.services.trading.contracts.responses import (
+    error_trading_response,
+    success_trading_response,
+)
 from app.services.trading.live import evaluate_live_gate
 from app.services.trading.monitoring import (
     build_broker_state_unknown_event,
     emit_runtime_event,
 )
 from app.services.trading.reconciliation import resolve_unknown_outcome
-from app.services.trading.routing import dispatch_order_intent
+from app.services.trading.routing.dispatcher import _dispatch_order_intent_value
 from app.services.trading.state import (
     TradingEvent,
-    apply_execution_event,
-    reserve_idempotency,
 )
+from app.services.trading.state.idempotency import _reserve_idempotency_value
+from app.services.trading.state.projections import _apply_execution_event_value
 from app.services.trading.validation import (
     ReadinessAssessment,
     build_execution_plan,
@@ -38,7 +43,7 @@ from app.services.trading.validation.authority import (
     validate_kill_switch_hierarchy,
     validate_risk_authority,
 )
-from app.utils import canonical_json, logger
+from app.utils import RiskLevel, StandardResponse, canonical_json, logger
 
 if TYPE_CHECKING:
     from app.services.trading.actions.dependencies import TradingDependencies
@@ -48,7 +53,7 @@ if TYPE_CHECKING:
 def _envelope(
     request: TradingRequest,
     receipt: ExecutionReceipt,
-) -> StandardTradingEnvelope:
+) -> StandardResponse[object]:
     """Package one authority receipt in the standard envelope.
 
     Args:
@@ -59,6 +64,21 @@ def _envelope(
         Immutable JSON-safe Trading envelope.
     """
     logger.debug("Packaging Trading authority receipt")
+    if receipt.status == "unknown_outcome":
+        return error_trading_response(
+            code="UNKNOWN_OUTCOME",
+            details={"receipt": receipt.model_dump(mode="json")},
+            operation=f"trading.{request.action}",
+            message="Trading authority outcome requires reconciliation",
+            risk_level=RiskLevel.CRITICAL,
+            request_id=request.request_id,
+            correlation_id=request.correlation_id,
+            read_only=False,
+            modifies_database=True,
+            places_trade=request.route.value in {"paper", "live"},
+            requires_network=request.route.value in {"paper", "live"},
+            legacy_status="unknown_outcome",
+        )
     status_map = {
         "accepted": "sent",
         "rejected": "rejected",
@@ -67,19 +87,19 @@ def _envelope(
         "cancelled": "cancelled",
         "unknown_outcome": "unknown_outcome",
     }
-    data = _redacted_envelope_data({"receipt": receipt.model_dump(mode="json")})
-    return StandardTradingEnvelope(
-        status=status_map[receipt.status],  # type: ignore[arg-type]
+    return success_trading_response(
+        receipt,
+        operation=f"trading.{request.action}",
         message="Trading authority receipt recorded",
-        data=data,
-        errors=(),
-        warnings=(
-            ({"code": "RECONCILIATION_REQUIRED"},)
-            if receipt.reconciliation_required
-            else ()
-        ),
-        audit_metadata={
-            "operation": request.action,
+        risk_level=RiskLevel.CRITICAL,
+        request_id=request.request_id,
+        correlation_id=request.correlation_id,
+        read_only=False,
+        modifies_database=True,
+        places_trade=request.route.value in {"paper", "live"},
+        requires_network=request.route.value in {"paper", "live"},
+        legacy_status=status_map[receipt.status],
+        extensions={
             "request_id": request.request_id,
             "workflow_id": request.workflow_id,
             "correlation_id": request.correlation_id,
@@ -152,7 +172,7 @@ def _record_send_attempt(
             }
         ),
     )
-    apply_execution_event(event, deps.store)
+    _apply_execution_event_value(event, deps.store)
     return event_id
 
 
@@ -217,7 +237,7 @@ def _record_receipt(
         causation_id=request.causation_id,
         payload=payload,
     )
-    apply_execution_event(event, deps.store)
+    _apply_execution_event_value(event, deps.store)
     for deal_id in receipt.provider_deal_ids:
         projection = deps.store.load_projection(scope)
         fill_version = 0 if projection is None else projection.version
@@ -247,7 +267,7 @@ def _record_receipt(
                 ),
             },
         )
-        apply_execution_event(fill, deps.store)
+        _apply_execution_event_value(fill, deps.store)
 
 
 def _require_clear_authority_scope(
@@ -319,22 +339,36 @@ def _resolve_unknown(
         request: Source governed request.
         receipt: Persisted unknown-outcome receipt.
         deps: Injected action dependencies.
+
+    Raises:
+        TradingError: If reconciliation or critical-event persistence fails.
     """
-    resolution = resolve_unknown_outcome(
+    resolution_response = resolve_unknown_outcome(
         receipt,
         deps.store,
         lambda _route: deps.reconciliation_source(request),
     )
+    if resolution_response.status == "error" or resolution_response.data is None:
+        raise TradingError("RECONCILIATION_REQUIRED", "Unknown outcome remains locked")
+    resolution = resolution_response.data
     if resolution.transition != "retry_locked":
         return
-    event = build_broker_state_unknown_event(
+    event_response = build_broker_state_unknown_event(
         receipt,
         incident_id=resolution.incident_reference,
         unresolved_scope=resolution.remaining_unresolved_scope,
         occurred_at=deps.clock(),
         workflow_id=request.workflow_id,
     )
-    emit_runtime_event(event, deps.event_sink)
+    if event_response.status == "error" or event_response.data is None:
+        raise TradingError(
+            "SERVICE_UNAVAILABLE", "Unknown outcome incident was not built"
+        )
+    emit_response = emit_runtime_event(event_response.data, deps.event_sink)
+    if emit_response.status == "error":
+        raise TradingError(
+            "SERVICE_UNAVAILABLE", "Unknown outcome incident was not emitted"
+        )
 
 
 def _passed_readiness(request: TradingRequest) -> ReadinessAssessment:
@@ -357,7 +391,7 @@ def _passed_readiness(request: TradingRequest) -> ReadinessAssessment:
 
 def _intent_from_gate(
     request: TradingRequest,
-    gate: StandardTradingEnvelope,
+    gate: StandardResponse[Mapping[str, JsonValue]],
 ) -> OrderIntent | None:
     """Read canonical intent evidence from a successful live gate.
 
@@ -372,6 +406,8 @@ def _intent_from_gate(
         TradingError: If successful dispatch evidence is malformed.
     """
     logger.debug("Reading executable intent from live gate evidence")
+    if gate.status == "error":
+        raise TradingError("GATE_BLOCKED", "Live gate rejected the order")
     data = gate.data
     if not isinstance(data, dict) or data.get("dispatch_allowed") is not True:
         return None
@@ -388,7 +424,7 @@ async def _execute_request(
     request: TradingRequest,
     deps: TradingDependencies,
     evidence: Mapping[str, JsonValue] | None = None,
-) -> StandardTradingEnvelope:
+) -> StandardResponse[object]:
     """Validate, gate, dispatch, and persist one canonical request.
 
     Args:
@@ -409,7 +445,9 @@ async def _execute_request(
     capability, _symbol_info = deps.symbol_capability_source(
         request.route, request.provider_id, request.symbol
     )
-    validate_order_request(request, account_state, capability)
+    validation_response = validate_order_request(request, account_state, capability)
+    if validation_response.status == "error":
+        raise TradingError("VALIDATION_FAILED", "Order validation failed")
     _require_clear_authority_scope(request, deps)
     intent: OrderIntent | None
     if request.route.value in {"paper", "live"}:
@@ -418,7 +456,7 @@ async def _execute_request(
         gate = await evaluate_live_gate(request, evidence or {}, deps.live_session)
         intent = _intent_from_gate(request, gate)
         if intent is None:
-            return gate
+            return gate  # type: ignore[return-value]
     else:
         now = deps.clock()
         validate_action_policy(request, deps.action_policy_source(request), now)
@@ -431,34 +469,36 @@ async def _execute_request(
             deps.max_staleness_seconds["kill_switch"],
             now,
         )
-        reservation = reserve_idempotency(
+        reservation_response = _reserve_idempotency_value(
             request,
             deps.store,
             reservation_time=deps.clock(),
             retention_seconds=deps.idempotency_retention_seconds,
             concurrency_lock_timeout_seconds=(deps.concurrency_lock_timeout_seconds),
         )
+        reservation = reservation_response
         if reservation.status == "duplicate_completed":
-            data = _redacted_envelope_data({"receipt_id": reservation.receipt_id})
-            return StandardTradingEnvelope(
-                status="success",
+            return success_trading_response(
+                reservation,
+                operation=f"trading.{request.action}",
                 message="Completed idempotent request requires no dispatch",
-                data=data,
-                errors=(),
-                warnings=(),
-                audit_metadata={
-                    "operation": request.action,
-                    "request_id": request.request_id,
-                    "redaction_applied": True,
-                },
+                risk_level=RiskLevel.HIGH,
+                request_id=request.request_id,
+                correlation_id=request.correlation_id,
+                read_only=False,
+                modifies_database=True,
+                legacy_status="duplicate_completed",
             )
         if reservation.status != "new":
             raise TradingError(
                 "TRADING_CONCURRENCY_CONFLICT", "Request is already unresolved"
             )
-        intent = build_execution_plan(request, _passed_readiness(request))
+        plan_response = build_execution_plan(request, _passed_readiness(request))
+        if plan_response.status == "error" or plan_response.data is None:
+            raise TradingError("GATE_BLOCKED", "Execution plan construction failed")
+        intent = plan_response.data
     attempt_event_id = _record_send_attempt(request, intent, deps)
-    receipt = await dispatch_order_intent(
+    receipt = await _dispatch_order_intent_value(
         intent,
         deps.connection,
         deps.broker_adapter,
@@ -507,9 +547,9 @@ def _require_order_target_state(
         )
 
 
-async def submit_order(
+async def _submit_order_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[object]:
     """Submit one validated Risk-approved order.
 
     Args:
@@ -524,9 +564,9 @@ async def submit_order(
     return await _execute_request(request, deps)
 
 
-async def modify_order(
+async def _modify_order_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[object]:
     """Modify one order within approved identity and version scope.
 
     Args:
@@ -547,9 +587,9 @@ async def modify_order(
     return await _execute_request(request, deps)
 
 
-async def cancel_order(
+async def _cancel_order_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[object]:
     """Cancel one pending order after ordinary gates.
 
     Args:
@@ -568,6 +608,54 @@ async def cancel_order(
         raise TradingError("INVALID_REQUEST", "Cancellation requires target order")
     _require_order_target_state(request, deps)
     return await _execute_request(request, deps)
+
+
+async def submit_order(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[object]:
+    """Submit one governed order and return its canonical response.
+
+    Returns:
+        Standard response containing the raw receipt or an error.
+    """
+    try:
+        return await _submit_order_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
+
+
+async def modify_order(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[object]:
+    """Modify one governed order and return its canonical response.
+
+    Returns:
+        Standard response containing the raw receipt or an error.
+    """
+    try:
+        return await _modify_order_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
+
+
+async def cancel_order(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[object]:
+    """Cancel one governed order and return its canonical response.
+
+    Returns:
+        Standard response containing the raw receipt or an error.
+    """
+    try:
+        return await _cancel_order_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
 
 
 __all__ = ["cancel_order", "modify_order", "submit_order"]

@@ -5,7 +5,6 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
 
-import pytest
 from app.services.risk import (
     AllocationRiskDecision,
     DecisionState,
@@ -13,7 +12,6 @@ from app.services.risk import (
 )
 from app.services.trading.contracts import (
     PortfolioRebalanceExecutionRequest,
-    TradingError,
     TradingRoute,
 )
 from app.services.trading.monitoring import BudgetGate
@@ -123,12 +121,15 @@ def test_budget_gate_requires_exact_plan_binding() -> None:
     logger.debug("Testing exact budget-gate plan binding")
     request = _request()
     mismatched = _verdict(request).model_copy(update={"plan_hash": "b" * 64})
-    with pytest.raises(TradingError, match="BUDGET_BLOCKED"):
-        BudgetGate.validate(request, _allocation(), mismatched, now=NOW)
+    result = BudgetGate.validate(request, _allocation(), mismatched, now=NOW)
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "BUDGET_BLOCKED"
 
 
 def test_budget_gate_accepts_current_risk_authority() -> None:
     """Accept exact active allocation and execution-time budget authority."""
     logger.debug("Testing current budget authority acceptance")
     request = _request()
-    BudgetGate.validate(request, _allocation(), _verdict(request), now=NOW)
+    result = BudgetGate.validate(request, _allocation(), _verdict(request), now=NOW)
+    assert result.status == "success"

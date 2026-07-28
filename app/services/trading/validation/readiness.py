@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from datetime import datetime
 from decimal import Decimal
 from types import MappingProxyType
-from typing import Self
+from typing import Self, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -17,10 +17,11 @@ from app.services.trading.contracts import TradingError, TradingRequest
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
 )
+from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.validation.snapshots import (
     RouteSnapshot,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import logger, to_json_safe
+from app.utils import RiskLevel, StandardResponse, logger, to_json_safe
 
 _MAX_FAILED_CHECKS = 32
 
@@ -208,7 +209,7 @@ def _append_policy_failures(
         failed.append("ACTION_POLICY_STALE")
 
 
-def assess_execution_readiness(
+def _assess_execution_readiness_value(
     request: TradingRequest,
     snapshot: RouteSnapshot,
     risk_decision: RiskDecisionPackage,
@@ -269,6 +270,53 @@ def assess_execution_readiness(
             "action_policy_verdict_id": action_policy.get("verdict_id"),
         },
         assessed_at=request.system_time,
+    )
+
+
+def assess_execution_readiness(
+    request: TradingRequest,
+    snapshot: RouteSnapshot,
+    risk_decision: RiskDecisionPackage,
+    kill_switch_state: KillSwitchState,
+    action_policy: Mapping[str, JsonValue],
+    max_staleness_seconds: Mapping[str, Decimal],
+) -> StandardResponse[ReadinessAssessment]:
+    """Assess readiness and return the raw assessment in ``data``.
+
+    Returns:
+        Standard response containing the readiness assessment or an error.
+    """
+    try:
+        value = _assess_execution_readiness_value(
+            request,
+            snapshot,
+            risk_decision,
+            kill_switch_state,
+            action_policy,
+            max_staleness_seconds,
+        )
+    except TradingError as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return cast(
+            "StandardResponse[ReadinessAssessment]",
+            map_trading_error(
+                error,
+                {
+                    "operation": "trading.assess_execution_readiness",
+                    "request_id": request.request_id,
+                    "correlation_id": request.correlation_id,
+                },
+            ),
+        )
+    return success_trading_response(
+        value,
+        operation="trading.assess_execution_readiness",
+        message="Trading execution readiness assessed",
+        risk_level=RiskLevel.HIGH,
+        request_id=request.request_id,
+        correlation_id=request.correlation_id,
+        read_only=True,
     )
 
 

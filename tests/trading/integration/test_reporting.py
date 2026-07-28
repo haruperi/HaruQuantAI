@@ -10,8 +10,10 @@ def test_report_contains_only_execution_evidence() -> None:
     outcome = build_trading_report(
         trading_request(action="sync_positions"), ReportStore()
     )
-    assert outcome.data["report"]["schema_id"] == "trading.execution_evidence_report.v1"
-    assert set(outcome.data["report"]["evidence"]) == {
+    assert outcome.status == "success"
+    assert outcome.data is not None
+    assert outcome.data.schema_id == "trading.execution_evidence_report.v1"
+    assert set(outcome.data.evidence) == {
         "incidents",
         "readiness",
         "receipts",

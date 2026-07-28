@@ -34,4 +34,6 @@ def test_unavailable_route_fact_fails_readiness() -> None:
             "kill_switch": Decimal(30),
         },
     )
-    assert "ROUTE_EVIDENCE_UNAVAILABLE" in result.failed_check_codes
+    assert result.status == "success"
+    assert result.data is not None
+    assert "ROUTE_EVIDENCE_UNAVAILABLE" in result.data.failed_check_codes

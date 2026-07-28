@@ -5,7 +5,8 @@ from hashlib import sha256
 from app.services.data import (
     MigrationStep,
 )
-from app.utils import logger
+from app.services.trading.contracts.responses import success_trading_response
+from app.utils import RiskLevel, StandardResponse, logger
 
 TRADING_SCHEMA_VERSION = "v1"
 
@@ -56,7 +57,7 @@ def _migration_checksum(statements: tuple[str, ...]) -> str:
     return sha256(material).hexdigest()
 
 
-def get_trading_migrations() -> tuple[MigrationStep, ...]:
+def _get_trading_migrations_value() -> tuple[MigrationStep, ...]:
     """Return additive Trading migration definitions without opening storage.
 
     Returns:
@@ -70,6 +71,19 @@ def get_trading_migrations() -> tuple[MigrationStep, ...]:
             checksum=_migration_checksum(_TRADING_SCHEMA_STATEMENTS),
             statements=_TRADING_SCHEMA_STATEMENTS,
         ),
+    )
+
+
+def get_trading_migrations() -> StandardResponse[tuple[MigrationStep, ...]]:
+    """Return Trading migration definitions in a standard response.
+
+    Returns:
+        Canonical response containing immutable additive migration contracts.
+    """
+    return success_trading_response(
+        _get_trading_migrations_value(),
+        risk_level=RiskLevel.LOW,
+        legacy_status="available",
     )
 
 

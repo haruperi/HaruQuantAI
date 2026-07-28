@@ -17,11 +17,14 @@ def validate_adapter_capability(
     intent: OrderIntent, capability: dict[str, object]
 ) -> None:
     """Validate capability with the explicit ratified runtime timeout."""
-    _validate_adapter_capability(
+    result = _validate_adapter_capability(
         intent,
         capability,  # type: ignore[arg-type]
         operation_timeout_seconds=Decimal(10),
     )
+    if result.status == "error":
+        code = "UNKNOWN_ERROR" if result.error is None else result.error.code
+        raise TradingError(code, "Capability response failed")
 
 
 def _intent() -> OrderIntent:

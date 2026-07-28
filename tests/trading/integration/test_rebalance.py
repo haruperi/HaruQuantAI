@@ -14,4 +14,6 @@ async def test_authorized_rebalance_uses_existing_order_path() -> None:
     """Every approved correction returns an ordinary authority receipt outcome."""
     item = rebalance_request()
     outcome = await execute_portfolio_rebalance(item, rebalance_dependencies(item))
+    assert outcome.status == "success"
+    assert outcome.data is not None
     assert outcome.data["outcomes"][0]["status"] == "sent"

@@ -122,7 +122,9 @@ async def _async_example() -> None:
 
     # Session status
     status_res = session.status()
-    print(f"LiveSession status health: {status_res.data['health']}")
+    status_data = status_res.data
+    assert status_data is not None
+    print(f"LiveSession status health: {status_data['health']}")
 
     # Evaluate live gate
     request = TradingRequest(

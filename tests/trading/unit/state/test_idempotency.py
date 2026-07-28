@@ -5,7 +5,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.trading.contracts import TradingError, TradingRequest
+from app.services.trading.contracts import TradingRequest
 from app.services.trading.state import IdempotencyReservation, reserve_idempotency
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
@@ -86,16 +86,19 @@ def test_same_key_different_material_rejected() -> None:
         retention_seconds=300,
         concurrency_lock_timeout_seconds=Decimal(30),
     )
-    assert first.status == "new"
-    with pytest.raises(TradingError) as captured:
-        reserve_idempotency(
-            _request(symbol="GBPUSD"),
-            store,  # type: ignore[arg-type]
-            reservation_time=NOW,
-            retention_seconds=300,
-            concurrency_lock_timeout_seconds=Decimal(30),
-        )
-    assert captured.value.trading_code == "IDEMPOTENCY_CONFLICT"
+    assert first.status == "success"
+    assert first.data is not None
+    assert first.data.status == "new"
+    captured = reserve_idempotency(
+        _request(symbol="GBPUSD"),
+        store,  # type: ignore[arg-type]
+        reservation_time=NOW,
+        retention_seconds=300,
+        concurrency_lock_timeout_seconds=Decimal(30),
+    )
+    assert captured.status == "error"
+    assert captured.error is not None
+    assert captured.error.code == "IDEMPOTENCY_CONFLICT"
 
 
 def test_reservation_states_are_finite() -> None:
@@ -121,19 +124,23 @@ def test_active_lock_exact_bound_passes_and_past_bound_fails() -> None:
         retention_seconds=300,
         concurrency_lock_timeout_seconds=Decimal(30),
     )
-    exact = reserve_idempotency(
+    exact_response = reserve_idempotency(
         _request(),
         store,  # type: ignore[arg-type]
         reservation_time=NOW + timedelta(seconds=30),
         retention_seconds=300,
         concurrency_lock_timeout_seconds=Decimal(30),
     )
-    assert exact.status == "duplicate_active"
-    with pytest.raises(TradingError, match="TRADING_CONCURRENCY_CONFLICT"):
-        reserve_idempotency(
-            _request(),
-            store,  # type: ignore[arg-type]
-            reservation_time=NOW + timedelta(seconds=31),
-            retention_seconds=300,
-            concurrency_lock_timeout_seconds=Decimal(30),
-        )
+    assert exact_response.status == "success"
+    assert exact_response.data is not None
+    assert exact_response.data.status == "duplicate_active"
+    stale = reserve_idempotency(
+        _request(),
+        store,  # type: ignore[arg-type]
+        reservation_time=NOW + timedelta(seconds=31),
+        retention_seconds=300,
+        concurrency_lock_timeout_seconds=Decimal(30),
+    )
+    assert stale.status == "error"
+    assert stale.error is not None
+    assert stale.error.code == "TRADING_CONCURRENCY_CONFLICT"

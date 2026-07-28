@@ -11,10 +11,10 @@ from app.services.trading.contracts import (
     ExecutionReceipt,
     OrderIntent,
     PortfolioRebalanceExecutionRequest,
-    StandardTradingEnvelope,
     TradeRecord,
     TradingRequest,
     TradingRoute,
+    redact_trading_payload,
 )
 from app.utils import canonical_json
 from pydantic import ValidationError
@@ -128,31 +128,28 @@ def test_trading_request_requires_governed_evidence() -> None:
         TradingRequest.model_validate(unsafe)
 
 
-def test_standard_envelope_status_contract() -> None:
-    """Failure statuses require structured failure evidence."""
-    with pytest.raises(ValidationError):
-        StandardTradingEnvelope(
-            status="error",
-            message="Trading failed",
-            data=None,
-            errors=(),
-            warnings=(),
-            audit_metadata={"operation": "unit_test"},
-        )
+def test_standard_response_error_contract() -> None:
+    """Trading failures use StandardResponse with no error data payload."""
+    from app.services.trading.contracts.responses import error_trading_response
 
-
-def test_envelope_rejects_unredacted_sensitive_keys() -> None:
-    """Sensitive nested values are redacted at the public envelope boundary."""
-    envelope = StandardTradingEnvelope(
-        status="success",
-        message="Unsafe evidence",
-        data={"nested": {"access_token": "secret"}},
-        errors=(),
-        warnings=(),
-        audit_metadata={"operation": "unit", "redaction_applied": True},
+    response = error_trading_response(
+        code="INVALID_REQUEST",
+        details={"field": "action"},
+        operation="trading.unit_test",
     )
-    assert "secret" not in str(envelope.data)
-    assert "[REDACTED]" in str(envelope.data)
+    assert response.status == "error"
+    assert response.data is None
+    assert response.error is not None
+    assert response.error.code == "INVALID_REQUEST"
+
+
+def test_redaction_preserves_standard_response_data_boundary() -> None:
+    """Sensitive nested values are redacted before standard response data."""
+    response = redact_trading_payload({"nested": {"access_token": "secret"}})
+    assert response.status == "success"
+    assert response.data is not None
+    assert "secret" not in str(response.data)
+    assert "[REDACTED]" in str(response.data)
 
 
 def test_contract_version_is_canonical() -> None:

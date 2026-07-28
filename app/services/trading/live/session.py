@@ -1,5 +1,7 @@
 """Stateful Trading live/paper lifecycle with injected authority dependencies."""
 
+# ruff: noqa: BLE001 - lifecycle boundaries normalize injected failures.
+
 from __future__ import annotations
 
 import asyncio
@@ -18,13 +20,13 @@ from app.services.risk import (
     KillSwitchState,
     RiskDecisionPackage,
 )
-from app.services.trading.contracts import StandardTradingEnvelope, TradingError
+from app.services.trading.contracts import TradingError
 from app.services.trading.contracts.errors import _redacted_envelope_data
 from app.services.trading.contracts.models import (
-    EnvelopeStatus,
     JsonValue,
     TradingRequest,
 )
+from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.live.config import _LiveRuntimeConfig, _validate_live_config
 from app.services.trading.monitoring import (
     OperationalEvent,
@@ -34,6 +36,8 @@ from app.services.trading.validation import ReadinessAssessment
 from app.utils import (
     AuditEvent,
     AuthContext,
+    RiskLevel,
+    StandardResponse,
     canonical_json,
     generate_id,
     logger,
@@ -184,7 +188,9 @@ class LiveSession:
         logger.debug("Reading LiveSession state-store port")
         return self._store
 
-    def risk_decision_for(self, request: TradingRequest) -> RiskDecisionPackage | None:
+    def risk_decision_for(
+        self, request: TradingRequest
+    ) -> StandardResponse[RiskDecisionPackage | None]:
         """Read the current Risk decision for a request.
 
         Args:
@@ -194,9 +200,19 @@ class LiveSession:
             Current Risk decision or ``None``.
         """
         logger.debug("Reading LiveSession Risk decision")
-        return self._risk_decision_source(request)
+        try:
+            value = self._risk_decision_source(request)
+        except Exception as error:
+            from app.services.trading.contracts.errors import map_trading_error
 
-    def action_policy_for(self, request: TradingRequest) -> ActionPolicyVerdict | None:
+            return map_trading_error(error, {"request_id": request.request_id})
+        return success_trading_response(
+            value, operation="trading.live.risk_decision_for", legacy_status="available"
+        )
+
+    def action_policy_for(
+        self, request: TradingRequest
+    ) -> StandardResponse[ActionPolicyVerdict | None]:
         """Read the current Risk action-policy verdict.
 
         Args:
@@ -206,9 +222,19 @@ class LiveSession:
             Current action-policy verdict or ``None``.
         """
         logger.debug("Reading LiveSession action-policy verdict")
-        return self._action_policy_source(request)
+        try:
+            value = self._action_policy_source(request)
+        except Exception as error:
+            from app.services.trading.contracts.errors import map_trading_error
 
-    def kill_switches_for(self, request: TradingRequest) -> Sequence[KillSwitchState]:
+            return map_trading_error(error, {"request_id": request.request_id})
+        return success_trading_response(
+            value, operation="trading.live.action_policy_for", legacy_status="available"
+        )
+
+    def kill_switches_for(
+        self, request: TradingRequest
+    ) -> StandardResponse[Sequence[KillSwitchState]]:
         """Read every applicable Risk kill-switch scope.
 
         Args:
@@ -218,13 +244,21 @@ class LiveSession:
             Applicable canonical switch states.
         """
         logger.debug("Reading LiveSession kill-switch hierarchy")
-        return self._kill_switch_source(request)
+        try:
+            value = self._kill_switch_source(request)
+        except Exception as error:
+            from app.services.trading.contracts.errors import map_trading_error
+
+            return map_trading_error(error, {"request_id": request.request_id})
+        return success_trading_response(
+            value, operation="trading.live.kill_switches_for", legacy_status="available"
+        )
 
     def readiness_for(
         self,
         request: TradingRequest,
         evidence: Mapping[str, JsonValue],
-    ) -> ReadinessAssessment:
+    ) -> StandardResponse[ReadinessAssessment]:
         """Assess current execution readiness through the injected source.
 
         Args:
@@ -235,12 +269,20 @@ class LiveSession:
             Current deterministic readiness assessment.
         """
         logger.debug("Reading LiveSession execution readiness")
-        return self._readiness_source(request, evidence)
+        try:
+            value = self._readiness_source(request, evidence)
+        except Exception as error:
+            from app.services.trading.contracts.errors import map_trading_error
+
+            return map_trading_error(error, {"request_id": request.request_id})
+        return success_trading_response(
+            value, operation="trading.live.readiness_for", legacy_status="assessed"
+        )
 
     def adapter_capability_for(
         self,
         request: TradingRequest,
-    ) -> Mapping[str, JsonValue]:
+    ) -> StandardResponse[Mapping[str, JsonValue]]:
         """Read normalized adapter capability for one request.
 
         Args:
@@ -250,9 +292,19 @@ class LiveSession:
             Current normalized capability evidence.
         """
         logger.debug("Reading LiveSession adapter capability")
-        return self._adapter_capability_source(request)
+        try:
+            value = self._adapter_capability_source(request)
+        except Exception as error:
+            from app.services.trading.contracts.errors import map_trading_error
 
-    def write_pre_audit(
+            return map_trading_error(error, {"request_id": request.request_id})
+        return success_trading_response(
+            value,
+            operation="trading.live.adapter_capability_for",
+            legacy_status="available",
+        )
+
+    def _write_pre_audit_value(
         self,
         request: TradingRequest,
         evidence: Mapping[str, JsonValue],
@@ -292,6 +344,31 @@ class LiveSession:
         )
         self._pre_audit_sink(event)
 
+    def write_pre_audit(
+        self,
+        request: TradingRequest,
+        evidence: Mapping[str, JsonValue],
+    ) -> StandardResponse[None]:
+        """Write pre-mutation audit evidence in a standard response.
+
+        Returns:
+            Standard response containing no data or a canonical error.
+        """
+        try:
+            self._write_pre_audit_value(request, evidence)
+        except Exception as error:
+            from app.services.trading.contracts.errors import map_trading_error
+
+            return map_trading_error(error, {"request_id": request.request_id})
+        return success_trading_response(
+            None,
+            operation="trading.live.write_pre_audit",
+            risk_level=RiskLevel.CRITICAL,
+            read_only=False,
+            writes_file=True,
+            legacy_status="audited",
+        )
+
     def now(self) -> datetime:
         """Read the injected current UTC time.
 
@@ -305,10 +382,10 @@ class LiveSession:
         self,
         *,
         operation: str,
-        status: EnvelopeStatus,
+        status: str,
         message: str,
         data: Mapping[str, JsonValue],
-    ) -> StandardTradingEnvelope:
+    ) -> StandardResponse[Mapping[str, JsonValue]]:
         """Build a canonical lifecycle envelope.
 
         Args:
@@ -322,16 +399,24 @@ class LiveSession:
         """
         logger.debug("Building LiveSession envelope for %s", operation)
         redacted_data = _redacted_envelope_data(data)
-        return StandardTradingEnvelope(
-            status=status,
+        return success_trading_response(
+            redacted_data,
+            operation=operation,
             message=message,
-            data=redacted_data,
-            errors=(),
-            warnings=(),
-            audit_metadata={
-                "operation": operation,
-                "route": self._config.execution_route if self._config else None,
-                "redaction_applied": True,
+            risk_level=RiskLevel.CRITICAL,
+            request_id=self._lifecycle_request_id,
+            correlation_id=self._lifecycle_correlation_id,
+            read_only=operation.endswith(".status"),
+            modifies_database=not operation.endswith(".status"),
+            places_trade=(
+                not operation.endswith(".status")
+                and self._config is not None
+                and self._config.execution_route == "live"
+            ),
+            requires_network=not operation.endswith(".status"),
+            legacy_status=status,
+            extensions={
+                "route": self._config.execution_route if self._config else None
             },
         )
 
@@ -340,13 +425,16 @@ class LiveSession:
 
         Args:
             state: Actual session health state.
+
+        Raises:
+            TradingError: If health evidence cannot be published.
         """
         logger.info("Publishing LiveSession health state %s", state)
         now = self._clock()
         digest = sha256(
             canonical_json({"state": state, "occurred_at": now}).encode()
         ).hexdigest()
-        emit_runtime_event(
+        event_response = emit_runtime_event(
             OperationalEvent(
                 event_id=f"trd-live-{digest}",
                 event_type="HEALTH_CHANGED",
@@ -360,6 +448,8 @@ class LiveSession:
             ),
             self._event_sink,
         )
+        if event_response.status == "error":
+            raise TradingError("SERVICE_UNAVAILABLE", "Lifecycle health event failed")
 
     def _validate_authorities(self, evidence: Mapping[str, JsonValue]) -> None:
         """Validate injected Brokers/Data authority evidence.
@@ -399,11 +489,11 @@ class LiveSession:
         if evidence.get("startup_evidence_fresh") is not True:
             raise TradingError("STALE_EVIDENCE", "Startup evidence is not current")
 
-    async def start(
+    async def _start_value(
         self,
         config: Mapping[str, JsonValue],
         evidence: Mapping[str, JsonValue],
-    ) -> StandardTradingEnvelope:
+    ) -> StandardResponse[Mapping[str, JsonValue]]:
         """Validate configuration and reconcile before enabling admission.
 
         Args:
@@ -475,7 +565,7 @@ class LiveSession:
             "unresolved_steps": list(self._unresolved_steps),
         }
 
-    def status(self) -> StandardTradingEnvelope:
+    def status(self) -> StandardResponse[Mapping[str, JsonValue]]:
         """Return actual session readiness without side effects.
 
         Returns:
@@ -522,7 +612,7 @@ class LiveSession:
             logger.exception("LiveSession shutdown step failed: %s", name)
             return False
 
-    async def stop(self) -> StandardTradingEnvelope:
+    async def _stop_value(self) -> StandardResponse[Mapping[str, JsonValue]]:
         """Stop admission, drain/flush, reconcile, and report incomplete work.
 
         Returns:
@@ -566,6 +656,36 @@ class LiveSession:
             ),
             data=self._status_data(),
         )
+
+    async def start(
+        self,
+        config: Mapping[str, JsonValue],
+        evidence: Mapping[str, JsonValue],
+    ) -> StandardResponse[Mapping[str, JsonValue]]:
+        """Start the session and return a canonical lifecycle response.
+
+        Returns:
+            Standard response containing lifecycle evidence or an error.
+        """
+        try:
+            return await self._start_value(config, evidence)
+        except Exception as error:
+            from app.services.trading.contracts.errors import map_trading_error
+
+            return map_trading_error(error, {"operation": "live_session.start"})
+
+    async def stop(self) -> StandardResponse[Mapping[str, JsonValue]]:
+        """Stop the session and return a canonical lifecycle response.
+
+        Returns:
+            Standard response containing shutdown evidence or an error.
+        """
+        try:
+            return await self._stop_value()
+        except Exception as error:
+            from app.services.trading.contracts.errors import map_trading_error
+
+            return map_trading_error(error, {"operation": "live_session.stop"})
 
 
 __all__ = ["LiveSession"]

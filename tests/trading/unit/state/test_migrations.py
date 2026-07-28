@@ -17,6 +17,9 @@ def test_schema_version_matches_events() -> None:
 def test_migrations_are_additive_and_ordered() -> None:
     """Migration definitions are owned, ordered, and free of destructive SQL."""
     steps = get_trading_migrations()
+    assert steps.status == "success"
+    assert steps.data is not None
+    steps = steps.data
     assert tuple(step.migration_id for step in steps) == tuple(
         sorted(step.migration_id for step in steps)
     )

@@ -27,7 +27,10 @@ def example_reporting() -> None:
     req = request(action="sync_positions")
     outcome = build_trading_report(req, ReportStore())
     print(f"Trading report outcome status: {outcome.status}")
-    print(f"Report schema ID: {outcome.data['report']['schema_id']}")
+    assert outcome.status == "success"
+    report = outcome.data
+    assert report is not None
+    print(f"Report schema ID: {report.schema_id}")
 
 
 def fr_trd_049() -> None:

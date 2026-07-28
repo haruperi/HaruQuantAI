@@ -217,7 +217,8 @@ async def test_rebalance_preserves_prior_outcomes_and_marks_remaining_skipped() 
         replace(deps, rebalance_action_resolver=fail_second),
     )
 
-    assert outcome.status == "partial"
+    assert outcome.status == "success"
+    assert outcome.metadata.extensions["legacy_status"] == "partial"
     assert [entry["status"] for entry in outcome.data["outcomes"]] == [
         "sent",
         "error",

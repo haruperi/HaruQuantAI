@@ -53,7 +53,7 @@ def fr_trd_068() -> OperationalEvent:
         request_id=REQUEST_ID,
         correlation_id=CORRELATION_ID,
     )
-    event = build_broker_state_unknown_event(
+    event_response = build_broker_state_unknown_event(
         receipt,
         incident_id="usage-incident-unknown",
         unresolved_scope=("order:usage-order",),
@@ -61,7 +61,11 @@ def fr_trd_068() -> OperationalEvent:
         workflow_id=WORKFLOW_ID,
     )
     published: list[OperationalEvent] = []
-    emit_runtime_event(event, published.append)
+    assert event_response.status == "success"
+    event = event_response.data
+    assert event is not None
+    emit_response = emit_runtime_event(event, published.append)
+    assert emit_response.status == "success"
     assert published == [event]
     return event
 
@@ -98,7 +102,7 @@ def example_monitoring() -> None:
         facts={"health": "ready"},
         source_refs={"session": "session-001"},
     )
-    emit_runtime_event(event2, published.append)
+    assert emit_runtime_event(event2, published.append).status == "success"
     print(f"Published runtime events count: {len(published)}")
 
     # 3. Budget gate

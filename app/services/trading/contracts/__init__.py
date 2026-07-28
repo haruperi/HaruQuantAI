@@ -11,7 +11,6 @@ from app.services.trading.contracts.models import (
     ExecutionReceipt,
     OrderIntent,
     PortfolioRebalanceExecutionRequest,
-    StandardTradingEnvelope,
     TradeRecord,
     TradingRequest,
     TradingRoute,
@@ -20,6 +19,7 @@ from app.services.trading.contracts.registry import (
     create_trading_action_draft,
     get_public_contracts,
 )
+from app.utils import StandardResponse
 
 __all__ = [
     "TRADING_CONTRACT_VERSION",
@@ -27,7 +27,7 @@ __all__ = [
     "ExecutionReceipt",
     "OrderIntent",
     "PortfolioRebalanceExecutionRequest",
-    "StandardTradingEnvelope",
+    "StandardResponse",
     "TradeRecord",
     "TradingError",
     "TradingRequest",

@@ -1,5 +1,7 @@
 """Route-aware public position action verbs."""
 
+# ruff: noqa: BLE001 - public boundaries normalize every failure.
+
 from __future__ import annotations
 
 from decimal import Decimal
@@ -8,11 +10,10 @@ from typing import TYPE_CHECKING
 from app.services.trading.actions._shared import authority_id, require_action
 from app.services.trading.actions.orders import _execute_request
 from app.services.trading.contracts import (
-    StandardTradingEnvelope,
     TradingError,
     TradingRequest,
 )
-from app.utils import logger
+from app.utils import StandardResponse, logger
 
 if TYPE_CHECKING:
     from app.services.trading.actions.dependencies import TradingDependencies
@@ -67,9 +68,9 @@ def _current_position_quantity(
     raise TradingError("RECONCILIATION_REQUIRED", "Position target is unavailable")
 
 
-async def close_position(
+async def _close_position_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[object]:
     """Close an addressed position fully or partially.
 
     Args:
@@ -90,9 +91,9 @@ async def close_position(
     return await _execute_request(request, deps)
 
 
-async def modify_position(
+async def _modify_position_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[object]:
     """Modify only Risk-approved stop fields for one position.
 
     Args:
@@ -129,9 +130,9 @@ async def modify_position(
     return await _execute_request(request, deps)
 
 
-async def reduce_exposure(
+async def _reduce_exposure_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[object]:
     """Execute exactly one Risk-approved exposure reduction.
 
     Args:
@@ -150,6 +151,54 @@ async def reduce_exposure(
     if request.quantity is None or request.quantity <= 0 or request.quantity > current:
         raise TradingError("VALIDATION_FAILED", "Reduction cannot increase exposure")
     return await _execute_request(request, deps)
+
+
+async def close_position(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[object]:
+    """Close a governed position and return a standard response.
+
+    Returns:
+        Standard response containing the raw receipt or an error.
+    """
+    try:
+        return await _close_position_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
+
+
+async def modify_position(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[object]:
+    """Modify a governed position and return a standard response.
+
+    Returns:
+        Standard response containing the raw receipt or an error.
+    """
+    try:
+        return await _modify_position_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
+
+
+async def reduce_exposure(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[object]:
+    """Reduce governed exposure and return a standard response.
+
+    Returns:
+        Standard response containing the raw receipt or an error.
+    """
+    try:
+        return await _reduce_exposure_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
 
 
 __all__ = ["close_position", "modify_position", "reduce_exposure"]

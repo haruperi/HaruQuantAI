@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
-from app.services.trading.contracts import ExecutionReceipt, TradingError
+from app.services.trading.contracts import ExecutionReceipt
 from app.services.trading.monitoring import (
     OperationalEvent,
     build_broker_state_unknown_event,
@@ -88,8 +88,10 @@ def test_event_delivery_failure_is_incident() -> None:
             raise OSError("sink unavailable")
         delivered.append(event)
 
-    with pytest.raises(TradingError, match="SERVICE_UNAVAILABLE"):
-        emit_runtime_event(_event(), flaky_sink)
+    result = emit_runtime_event(_event(), flaky_sink)
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "SERVICE_UNAVAILABLE"
     assert delivered[-1].event_type == "EVENT_DELIVERY_FAILED"
 
 
@@ -135,14 +137,18 @@ def test_unknown_broker_state_event_is_critical_and_traceable() -> None:
         workflow_id=WORKFLOW_ID,
     )
 
-    assert first == second
-    assert first.event_type == "BROKER_STATE_UNKNOWN"
-    assert first.severity == "critical"
-    assert first.facts == {
+    assert first.status == "success"
+    assert second.status == "success"
+    assert first.data == second.data
+    assert first.data is not None
+    event = first.data
+    assert event.event_type == "BROKER_STATE_UNKNOWN"
+    assert event.severity == "critical"
+    assert event.facts == {
         "retry_locked": True,
         "unresolved_scope": "order:order-001",
     }
-    assert first.source_refs == {
+    assert event.source_refs == {
         "receipt_id": "receipt-unknown-001",
         "incident_id": "incident-001",
     }
@@ -158,11 +164,13 @@ def test_unknown_broker_state_event_rejects_non_unknown_receipt() -> None:
         }
     )
 
-    with pytest.raises(TradingError, match="VALIDATION_FAILED"):
-        build_broker_state_unknown_event(
-            receipt,
-            incident_id="incident-001",
-            unresolved_scope=("order:order-001",),
-            occurred_at=NOW,
-            workflow_id=WORKFLOW_ID,
-        )
+    result = build_broker_state_unknown_event(
+        receipt,
+        incident_id="incident-001",
+        unresolved_scope=("order:order-001",),
+        occurred_at=NOW,
+        workflow_id=WORKFLOW_ID,
+    )
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "VALIDATION_FAILED"

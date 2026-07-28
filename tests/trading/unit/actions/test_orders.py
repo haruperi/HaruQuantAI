@@ -7,7 +7,6 @@ import pytest
 from app.services.trading.actions import cancel_order, modify_order, submit_order
 from app.services.trading.contracts import (
     ExecutionReceipt,
-    TradingError,
     TradingRoute,
 )
 from app.services.trading.monitoring import OperationalEvent
@@ -30,10 +29,13 @@ def anyio_backend() -> str:
 async def test_submit_order_route_parity() -> None:
     """Simulation dispatches while a Broker route without a session fails closed."""
     outcome = await submit_order(request(), dependencies())
-    assert outcome.status == "sent"
+    assert outcome.status == "success"
+    assert outcome.metadata.extensions["legacy_status"] == "sent"
     live = request(route=TradingRoute.LIVE, provider_id="mt5")
-    with pytest.raises(TradingError, match="SERVICE_UNAVAILABLE"):
-        await submit_order(live, dependencies())
+    result = await submit_order(live, dependencies())
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "SERVICE_UNAVAILABLE"
 
 
 @pytest.mark.anyio
@@ -56,11 +58,11 @@ async def test_completed_idempotency_replay_does_not_dispatch() -> None:
     first = await submit_order(item, deps)
     replay = await submit_order(item, deps)
 
-    assert first.status == "sent"
+    assert first.status == "success"
+    assert first.metadata.extensions["legacy_status"] == "sent"
     assert replay.status == "success"
-    assert (
-        replay.data["receipt_id"] == store.reservations[item.idempotency_key].receipt_id
-    )
+    assert replay.data is not None
+    assert replay.data.receipt_id == store.reservations[item.idempotency_key].receipt_id
     assert calls == 1
 
 
@@ -71,8 +73,10 @@ async def test_simulation_requires_current_typed_risk_authority() -> None:
         dependencies(),
         execution_risk_decision_source=lambda _item: None,
     )
-    with pytest.raises(TradingError, match="GATE_BLOCKED"):
-        await submit_order(request(), deps)
+    result = await submit_order(request(), deps)
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "GATE_BLOCKED"
 
 
 @pytest.mark.anyio
@@ -122,7 +126,11 @@ async def test_unknown_outcome_persists_lock_before_critical_event() -> None:
 
     outcome = await submit_order(item, deps)
 
-    assert outcome.status == "unknown_outcome"
+    assert outcome.status == "error"
+    assert outcome.error is not None
+    assert outcome.error.code == "UNKNOWN_OUTCOME"
+    assert outcome.metadata.extensions["legacy_status"] == "unknown_outcome"
+    assert "receipt" in outcome.error.details
     assert store.reservations[item.idempotency_key].status == "reconciliation_required"
     assert store.projection is not None
     assert store.projection.unresolved_attempt_ids
@@ -138,8 +146,10 @@ async def test_modify_order_rejects_stale_version() -> None:
         target_broker_order_id="order-001",
         expected_version=None,
     )
-    with pytest.raises(TradingError, match="VERSION_CONFLICT"):
-        await modify_order(item, dependencies())
+    result = await modify_order(item, dependencies())
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "VERSION_CONFLICT"
 
 
 @pytest.mark.anyio
@@ -154,9 +164,12 @@ async def test_cancel_order_is_idempotent() -> None:
         expected_version=1,
     )
     first = await cancel_order(item, deps)
-    assert first.status == "sent"
-    with pytest.raises(TradingError, match="VERSION_CONFLICT"):
-        await cancel_order(item, deps)
+    assert first.status == "success"
+    assert first.metadata.extensions["legacy_status"] == "sent"
+    replay = await cancel_order(item, deps)
+    assert replay.status == "error"
+    assert replay.error is not None
+    assert replay.error.code == "VERSION_CONFLICT"
     assert tuple(event.event_type for event in store.events) == (
         "send_attempted",
         "receipt_recorded",
@@ -166,5 +179,7 @@ async def test_cancel_order_is_idempotent() -> None:
 @pytest.mark.anyio
 async def test_order_verbs_reject_mismatched_actions() -> None:
     """Each order verb accepts only its exact canonical action."""
-    with pytest.raises(TradingError, match="INVALID_REQUEST"):
-        await cancel_order(request(), dependencies())
+    result = await cancel_order(request(), dependencies())
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "INVALID_REQUEST"

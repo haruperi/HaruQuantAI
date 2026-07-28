@@ -19,6 +19,8 @@ from app.services.trading import (
     dispatch_order_intent,
     validate_adapter_capability,
 )
+from app.services.trading.contracts.responses import success_trading_response
+from app.utils import RiskLevel
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 
@@ -87,7 +89,7 @@ def example_routing() -> None:
     print("Trading Example 4: Adapter Capabilities and Order Dispatch")
 
     # 1. Validate adapter capability
-    validate_adapter_capability(  # type: ignore[arg-type]
+    capability_result = validate_adapter_capability(  # type: ignore[arg-type]
         _paper_intent(),
         _capability(),
         operation_timeout_seconds=Decimal(10),
@@ -110,15 +112,19 @@ def example_routing() -> None:
         "authority_timestamp": NOW.isoformat(),
         "received_at": NOW.isoformat(),
     }
-    receipt = classify_authority_response(  # type: ignore[arg-type]
+    receipt_result = classify_authority_response(  # type: ignore[arg-type]
         raw,
         _capability(),  # type: ignore[arg-type]
     )
+    assert capability_result.status == "success"
+    assert receipt_result.status == "success"
+    receipt = receipt_result.data
+    assert receipt is not None
     print(f"Classified authority response status: {receipt.status}")
 
     # 3. Dispatch order intent
-    async def simulation_dispatch(intent: OrderIntent) -> ExecutionReceipt:
-        return ExecutionReceipt(
+    async def simulation_dispatch(intent: OrderIntent):
+        receipt = ExecutionReceipt(
             receipt_id="usage-sim-receipt-001",
             intent_id=intent.source_intent_id,
             client_order_id=intent.client_order_id,
@@ -136,6 +142,16 @@ def example_routing() -> None:
             request_id=intent.request_id,
             correlation_id=intent.correlation_id,
         )
+        return success_trading_response(
+            receipt,
+            operation="trading.usage_simulation_dispatch",
+            message="Usage simulation receipt",
+            risk_level=RiskLevel.HIGH,
+            request_id=receipt.request_id,
+            correlation_id=receipt.correlation_id,
+            read_only=False,
+            places_trade=True,
+        )
 
     dispatched_receipt = asyncio.run(
         dispatch_order_intent(
@@ -147,7 +163,10 @@ def example_routing() -> None:
             clock=lambda: NOW,
         )
     )
-    print(f"Dispatched order intent receipt status: {dispatched_receipt.status}")
+    assert dispatched_receipt.status == "success"
+    dispatched = dispatched_receipt.data
+    assert dispatched is not None
+    print(f"Dispatched order intent receipt status: {dispatched.status}")
 
 
 def fr_trd_029() -> None:

@@ -1,21 +1,24 @@
 """Authorized portfolio rebalance execution through ordinary Trading actions."""
 
+# ruff: noqa: BLE001 - public boundaries normalize every failure.
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
 
 from app.services.risk import DecisionState
+from app.services.trading.actions._shared import response_data_json
 from app.services.trading.actions.positions import reduce_exposure
 from app.services.trading.contracts import (
     PortfolioRebalanceExecutionRequest,
-    StandardTradingEnvelope,
     TradingError,
     TradingRequest,
 )
 from app.services.trading.contracts.errors import _redacted_envelope_data
+from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.monitoring import BudgetGate
 from app.services.trading.validation.authority import validate_kill_switch_hierarchy
-from app.utils import logger
+from app.utils import RiskLevel, StandardResponse, logger
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -90,10 +93,10 @@ def _validate_resolved_action(
         )
 
 
-async def execute_portfolio_rebalance(
+async def _execute_portfolio_rebalance_value(
     request: PortfolioRebalanceExecutionRequest,
     deps: TradingDependencies,
-) -> StandardTradingEnvelope:
+) -> StandardResponse[dict[str, JsonValue]]:
     """Execute an authorized immutable reduce-only rebalance plan.
 
     Args:
@@ -115,7 +118,9 @@ async def execute_portfolio_rebalance(
     budget = deps.budget_verdict_source(request)
     if allocation is None or budget is None:
         raise TradingError("PERMISSION_DENIED", "Rebalance budget authority is absent")
-    BudgetGate.validate(request, allocation, budget, now=now)
+    budget_response = BudgetGate.validate(request, allocation, budget, now=now)
+    if budget_response.status == "error":
+        raise TradingError("BUDGET_BLOCKED", "Rebalance budget authority is blocked")
     _validate_eligibility(request, deps, now)
     outcomes: list[dict[str, JsonValue]] = []
     for raw_action in request.actions:
@@ -131,14 +136,17 @@ async def execute_portfolio_rebalance(
                 deps.clock(),
             )
             outcome = await reduce_exposure(child, deps)
+            child_status = outcome.metadata.extensions.get("legacy_status")
+            if not isinstance(child_status, str):
+                child_status = outcome.status
             outcomes.append(
                 {
                     "action_id": child.request_id,
-                    "status": outcome.status,
-                    "data": outcome.data,
+                    "status": child_status,
+                    "data": response_data_json(outcome.data),
                 }
             )
-            if outcome.status == "unknown_outcome":
+            if outcome.metadata.extensions.get("legacy_status") == "unknown_outcome":
                 break
         except TradingError as error:
             outcomes.append(
@@ -166,19 +174,37 @@ async def execute_portfolio_rebalance(
     data = _redacted_envelope_data(
         {"plan_id": request.plan_id, "outcomes": cast("JsonValue", outcomes)}
     )
-    return StandardTradingEnvelope(
-        status="partial" if partial else "success",
+    return success_trading_response(
+        data,
+        operation="trading.execute_portfolio_rebalance",
         message="Authorized rebalance actions executed through ordinary Trading gates",
-        data=data,
-        errors=(),
-        warnings=({"code": "PARTIAL_COMPLETION"},) if partial else (),
-        audit_metadata={
-            "operation": "execute_portfolio_rebalance",
-            "request_id": request.request_id,
-            "correlation_id": request.correlation_id,
-            "redaction_applied": True,
-        },
+        risk_level=RiskLevel.CRITICAL,
+        request_id=request.request_id,
+        correlation_id=request.correlation_id,
+        read_only=False,
+        modifies_database=True,
+        places_trade=True,
+        requires_network=request.route.value in {"paper", "live"},
+        legacy_status="partial" if partial else "success",
+        extensions={"redaction_applied": True},
     )
+
+
+async def execute_portfolio_rebalance(
+    request: PortfolioRebalanceExecutionRequest,
+    deps: TradingDependencies,
+) -> StandardResponse[dict[str, JsonValue]]:
+    """Execute a portfolio rebalance and return a standard response.
+
+    Returns:
+        Standard response containing ordered child results or an error.
+    """
+    try:
+        return await _execute_portfolio_rebalance_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
 
 
 __all__ = ["execute_portfolio_rebalance"]

@@ -3,8 +3,6 @@
 # ruff: noqa: INP001
 import json
 
-import pytest
-from app.services.trading.contracts import TradingError
 from app.services.trading.reporting import build_trading_report
 from tests.trading.unit.actions.test_dependencies import MemoryStore, request
 
@@ -40,21 +38,24 @@ def test_report_does_not_compute_analytics_metrics() -> None:
     """Report returns exact factual costs without deriving PnL or TCA."""
     store = ReportStore()
     outcome = build_trading_report(request(action="sync_positions"), store)
-    report = outcome.data["report"]
-    evidence = report["evidence"]
+    assert outcome.data is not None
+    report = outcome.data
+    evidence = report.evidence
     assert evidence["trade_records"] == [{"commission": "1.25", "cost_unit": "USD"}]
     assert "pnl" not in str(outcome.data).lower()
     assert "tca" not in str(outcome.data).lower()
     assert store.report_scope == ("sim", "account-001", "simulation")
-    assert report["contract_version"] == "v1"
-    assert report["schema_id"] == "trading.execution_evidence_report.v1"
+    assert report.contract_version == "v1"
+    assert report.schema_id == "trading.execution_evidence_report.v1"
 
 
 def test_report_fails_closed_on_missing_evidence() -> None:
     """Missing official evidence is explicit and blocks packaging."""
     store = ReportStore(evidence={"receipts": []})
-    with pytest.raises(TradingError, match="RECONCILIATION_REQUIRED"):
-        build_trading_report(request(action="sync_positions"), store)
+    result = build_trading_report(request(action="sync_positions"), store)
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "RECONCILIATION_REQUIRED"
 
 
 def test_report_redacts_stored_sensitive_evidence() -> None:
@@ -67,4 +68,4 @@ def test_report_redacts_stored_sensitive_evidence() -> None:
     serialized = json.dumps(outcome.model_dump(mode="json"))
     assert '"p"' not in serialized
     assert '"t"' not in serialized
-    assert outcome.audit_metadata["redaction_applied"] is True
+    assert outcome.metadata.extensions["redaction_applied"] is True

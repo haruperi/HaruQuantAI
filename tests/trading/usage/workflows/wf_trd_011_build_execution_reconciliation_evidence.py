@@ -50,7 +50,7 @@ def main() -> None:
         "contains performance:",
         "performance" in str(report).lower(),
     )
-    # Stage 5 — OUTPUT BOUNDARY: Return StandardTradingEnvelope with immutable report.
+    # Stage 5 — OUTPUT BOUNDARY: Return StandardResponse with immutable report data.
     _stage(5)
     print("Output:", type(outcome).__name__, outcome.status)
 

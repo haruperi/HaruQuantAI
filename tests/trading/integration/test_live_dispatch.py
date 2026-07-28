@@ -15,7 +15,6 @@ from app.services.brokers import (
 from app.services.trading import (
     LiveSession,
     ReadinessAssessment,
-    TradingError,
     evaluate_live_gate,
     submit_order,
 )
@@ -111,8 +110,12 @@ async def test_live_dispatch_requires_real_risk_decision() -> None:
     session = live_gate_session(risk_decision=None)
     config = {**live_config(), "ALLOW_LIVE_MUTATIONS": True}
     await session.start(config, live_evidence())
-    with pytest.raises(TradingError, match="GATE_BLOCKED"):
-        await evaluate_live_gate(live_gate_request(), {"risk_approved": True}, session)
+    blocked_gate = await evaluate_live_gate(
+        live_gate_request(), {"risk_approved": True}, session
+    )
+    assert blocked_gate.status == "error"
+    assert blocked_gate.error is not None
+    assert blocked_gate.error.code == "GATE_BLOCKED"
 
 
 @pytest.mark.anyio
@@ -143,7 +146,8 @@ async def test_live_dispatch_completes_single_broker_mutation() -> None:
     outcome = await submit_order(request, deps)
 
     assert adapter.calls == 1
-    assert outcome.status == "sent"
+    assert outcome.status == "success"
+    assert outcome.metadata.extensions["legacy_status"] == "sent"
     assert [event.event_type for event in store.events] == [
         "send_attempted",
         "receipt_recorded",
@@ -162,6 +166,8 @@ async def test_live_dispatch_completes_single_broker_mutation() -> None:
         simulation_dispatch=None,
         live_session=blocked_session,
     )
-    with pytest.raises(TradingError, match="GATE_BLOCKED"):
-        await submit_order(request, blocked_deps)
+    blocked = await submit_order(request, blocked_deps)
+    assert blocked.status == "error"
+    assert blocked.error is not None
+    assert blocked.error.code == "GATE_BLOCKED"
     assert blocked_adapter.calls == 0

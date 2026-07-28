@@ -12,7 +12,6 @@ from app.services.brokers import (
     BrokerEnvironment,
     BrokerFeatureFlags,
 )
-from app.services.trading.contracts import TradingError
 from app.services.trading.live import LiveSession
 from app.services.trading.monitoring import OperationalEvent
 from app.services.trading.state import TradingStateStore
@@ -166,8 +165,10 @@ async def test_required_runtime_bound_cannot_be_omitted(
     """Each required safety bound fails closed when omitted from configuration."""
     config = _config()
     del config[required_setting]
-    with pytest.raises(TradingError, match="CONFIGURATION_INVALID"):
-        await _session().start(config, _evidence())
+    result = await _session().start(config, _evidence())
+    assert result.status == "error"
+    assert result.error is not None
+    assert result.error.code == "CONFIGURATION_INVALID"
 
 
 @pytest.mark.anyio
@@ -175,7 +176,9 @@ async def test_session_starts_package_only() -> None:
     """Keep live mutations disabled when the master switch is false."""
     logger.debug("Testing package-only LiveSession startup")
     result = await _session().start(_config(), _evidence())
-    assert result.status == "packaged"
+    assert result.status == "success"
+    assert result.metadata.extensions["legacy_status"] == "packaged"
+    assert result.data is not None
     assert result.data["admission_enabled"] is False
 
 
@@ -195,7 +198,8 @@ async def test_start_never_enables_before_reconciliation() -> None:
 
     session = _session(startup_reconcile=incomplete)
     result = await session.start(_config(), _evidence())
-    assert result.status == "blocked"
+    assert result.status == "success"
+    assert result.metadata.extensions["legacy_status"] == "blocked"
     assert session.admission_enabled is False
 
 
@@ -206,6 +210,7 @@ async def test_status_never_overstates_readiness() -> None:
     session = _session()
     await session.start(_config(), _evidence())
     result = session.status()
+    assert result.data is not None
     assert result.data["health"] == "package_only"
     assert result.data["reconciliation_ready"] is True
 
@@ -227,5 +232,7 @@ async def test_stop_reports_flush_and_reconciliation_failure() -> None:
     session = _session(flush_evidence=failed_flush)
     await session.start(_config(), _evidence())
     result = await session.stop()
-    assert result.status == "partial"
+    assert result.status == "success"
+    assert result.metadata.extensions["legacy_status"] == "partial"
+    assert result.data is not None
     assert "flush_evidence" in result.data["unresolved_steps"]

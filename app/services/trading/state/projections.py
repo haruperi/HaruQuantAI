@@ -11,13 +11,14 @@ from app.services.trading.contracts import TradingError, TradingRoute
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
 )
+from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.state.events import (
     TradingEvent,  # noqa: TC001 - runtime annotation and model resolution
 )
 from app.services.trading.state.stores import (
     TradingStateStore,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import logger, to_json_safe
+from app.utils import RiskLevel, StandardResponse, logger, to_json_safe
 
 
 def _freeze_mapping(value: Mapping[str, object]) -> Mapping[str, JsonValue]:
@@ -280,7 +281,7 @@ def _project_event(
     )
 
 
-def apply_execution_event(
+def _apply_execution_event_value(
     event: TradingEvent,
     store: TradingStateStore,
 ) -> TradingProjection:
@@ -331,6 +332,33 @@ def apply_execution_event(
             trace_context={"event_id": event.event_id},
         ) from error
     return projected
+
+
+def apply_execution_event(
+    event: TradingEvent,
+    store: TradingStateStore,
+) -> StandardResponse[TradingProjection]:
+    """Apply one execution event and return the projection response.
+
+    Args:
+        event: Versioned event to apply.
+        store: Injected Trading state store.
+
+    Returns:
+        Canonical response containing the existing or newly saved projection.
+    """
+    try:
+        projection = _apply_execution_event_value(event, store)
+    except TradingError as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"event_id": event.event_id})
+    return success_trading_response(
+        projection,
+        risk_level=RiskLevel.HIGH,
+        legacy_status="applied",
+        extensions={"event_id": event.event_id},
+    )
 
 
 __all__ = ["TradingProjection", "apply_execution_event"]

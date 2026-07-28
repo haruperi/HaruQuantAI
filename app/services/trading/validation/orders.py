@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from decimal import ROUND_HALF_EVEN, Decimal, localcontext
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from app.services.trading.contracts import TradingError, TradingRequest
-from app.utils import logger
+from app.services.trading.contracts.responses import success_trading_response
+from app.utils import RiskLevel, StandardResponse, logger
 
 if TYPE_CHECKING:
     from app.services.data import AccountStateSnapshot
@@ -280,7 +281,7 @@ def _validate_symbol_capability(
         )
 
 
-def validate_order_request(
+def _validate_order_request_value(
     request: TradingRequest,
     account_state: AccountStateSnapshot,
     symbol_capability: Mapping[str, JsonValue],
@@ -316,6 +317,43 @@ def validate_order_request(
     _validate_price_geometry(request)
     _validate_operation(request, account_state)
     return request
+
+
+def validate_order_request(
+    request: TradingRequest,
+    account_state: AccountStateSnapshot,
+    symbol_capability: Mapping[str, JsonValue],
+) -> StandardResponse[TradingRequest]:
+    """Validate an order request and return the raw request in ``data``.
+
+    Returns:
+        Standard response containing the validated request or an error.
+    """
+    try:
+        value = _validate_order_request_value(request, account_state, symbol_capability)
+    except TradingError as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return cast(
+            "StandardResponse[TradingRequest]",
+            map_trading_error(
+                error,
+                {
+                    "operation": "trading.validate_order_request",
+                    "request_id": request.request_id,
+                    "correlation_id": request.correlation_id,
+                },
+            ),
+        )
+    return success_trading_response(
+        value,
+        operation="trading.validate_order_request",
+        message="Trading order request validated",
+        risk_level=RiskLevel.HIGH,
+        request_id=request.request_id,
+        correlation_id=request.correlation_id,
+        read_only=True,
+    )
 
 
 __all__ = ["validate_order_request"]

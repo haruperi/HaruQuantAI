@@ -31,19 +31,6 @@ TRADING_CONTRACT_VERSION: Final = "v1"
 type JsonValue = (
     None | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
 )
-type EnvelopeStatus = Literal[
-    "success",
-    "rejected",
-    "blocked",
-    "pending_approval",
-    "packaged",
-    "sent",
-    "partial",
-    "filled",
-    "cancelled",
-    "unknown_outcome",
-    "error",
-]
 type TradingAction = Literal[
     "submit_order",
     "modify_order",
@@ -658,147 +645,6 @@ class TradingRequest(_TradingModel):
             and self.instrument_min_quantity > self.instrument_max_quantity
         ):
             raise ValueError("instrument quantity bounds are inverted")
-        return self
-
-
-class StandardTradingEnvelope(_TradingModel):
-    """Finite JSON-safe result envelope returned by Trading.
-
-    Attributes:
-        status: Canonical finite outcome state.
-        message: Bounded human-readable summary.
-        data: Optional JSON-safe result data.
-        errors: Structured redacted errors.
-        warnings: Structured redacted warnings.
-        audit_metadata: Required trace and operation evidence.
-    """
-
-    status: EnvelopeStatus
-    message: str
-    data: JsonValue | None
-    errors: tuple[Mapping[str, JsonValue], ...]
-    warnings: tuple[Mapping[str, JsonValue], ...]
-    audit_metadata: Mapping[str, JsonValue]
-
-    @field_validator("message")
-    @classmethod
-    def _validate_message(cls, value: str) -> str:
-        """Validate envelope message.
-
-        Args:
-            value: Candidate message.
-
-        Returns:
-            Validated message.
-
-        Raises:
-            ValueError: If the message is blank or untrimmed.
-        """
-        logger.debug("Validating StandardTradingEnvelope message")
-        return _validate_text(value, "message")
-
-    @field_validator("data", mode="before")
-    @classmethod
-    def _validate_data(cls, value: object) -> JsonValue:
-        """Convert envelope data to JSON-safe form.
-
-        Args:
-            value: Candidate result data.
-
-        Returns:
-            JSON-safe result data.
-        """
-        logger.debug("Validating StandardTradingEnvelope data")
-        return _redact_json_value(value)
-
-    @field_validator("errors", "warnings", mode="before")
-    @classmethod
-    def _validate_evidence_rows(
-        cls, value: tuple[Mapping[str, object], ...]
-    ) -> tuple[Mapping[str, JsonValue], ...]:
-        """Validate and freeze envelope evidence rows.
-
-        Args:
-            value: Candidate evidence rows.
-
-        Returns:
-            Immutable JSON-safe evidence rows.
-
-        Raises:
-            TypeError: If redacted evidence is not a sequence of mappings.
-        """
-        logger.debug("Validating StandardTradingEnvelope evidence rows")
-        redacted = _redact_json_value(list(value))
-        if not isinstance(redacted, list) or any(
-            not isinstance(row, dict) for row in redacted
-        ):
-            raise TypeError("envelope evidence rows must be mappings")
-        rows: list[Mapping[str, JsonValue]] = []
-        for row in redacted:
-            if not isinstance(row, dict):
-                raise TypeError("envelope evidence rows must be mappings")
-            rows.append(_freeze_json_mapping(row))
-        return tuple(rows)
-
-    @field_validator("audit_metadata", mode="before")
-    @classmethod
-    def _validate_audit_metadata(
-        cls, value: Mapping[str, object]
-    ) -> Mapping[str, JsonValue]:
-        """Validate required audit metadata.
-
-        Args:
-            value: Candidate audit metadata.
-
-        Returns:
-            Immutable JSON-safe audit metadata.
-
-        Raises:
-            TypeError: If metadata does not remain a mapping after redaction.
-            ValueError: If metadata is absent or not JSON-safe.
-        """
-        logger.debug("Validating StandardTradingEnvelope audit metadata")
-        if not value:
-            raise ValueError("audit_metadata must not be empty")
-        redacted = _redact_json_value(value)
-        if not isinstance(redacted, dict):
-            raise TypeError("audit_metadata must be a mapping")
-        return _freeze_json_mapping(redacted)
-
-    @model_validator(mode="after")
-    def _validate_status_evidence(self) -> Self:
-        """Validate status and error consistency.
-
-        Returns:
-            Validated envelope.
-
-        Raises:
-            ValueError: If success/error evidence conflicts with status.
-        """
-        logger.debug("Validating StandardTradingEnvelope status evidence")
-        if self.status == "error" and not self.errors:
-            raise ValueError("error status requires error evidence")
-        if (
-            self.status
-            not in {
-                "error",
-                "rejected",
-                "blocked",
-                "unknown_outcome",
-            }
-            and self.errors
-        ):
-            raise ValueError("non-failure status cannot contain errors")
-        material = to_json_safe(
-            {
-                "data": self.data,
-                "errors": self.errors,
-                "warnings": self.warnings,
-                "audit_metadata": self.audit_metadata,
-            }
-        )
-        if _contains_sensitive_key(material):
-            raise ValueError("Trading envelope contains unredacted sensitive keys")
         return self
 
 
@@ -1808,7 +1654,6 @@ __all__ = [
     "JsonValue",
     "OrderIntent",
     "PortfolioRebalanceExecutionRequest",
-    "StandardTradingEnvelope",
     "TradeRecord",
     "TradingRequest",
     "TradingRoute",

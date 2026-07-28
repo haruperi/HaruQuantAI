@@ -109,7 +109,8 @@ async def test_cycle_submits_intent_and_never_sizes() -> None:
 
     outcome = await run_live_evaluation_cycle(deps, evaluation_evidence())
 
-    assert outcome.status == "sent"
+    assert outcome.status == "success"
+    assert outcome.metadata.extensions["legacy_status"] == "sent"
     assert calls == [
         "data.market",
         "data.account",

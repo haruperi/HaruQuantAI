@@ -23,8 +23,10 @@ def test_unknown_outcome_blocks_retry() -> None:
     result = resolve_unknown_outcome(
         authority_receipt(), store, lambda route: authority_snapshot()
     )
-    assert result.transition == "retry_locked"
-    assert not result.retry_allowed
+    assert result.status == "success"
+    assert result.data is not None
+    assert result.data.transition == "retry_locked"
+    assert not result.data.retry_allowed
 
 
 def test_unknown_outcome_emits_critical_operational_event() -> None:
@@ -55,10 +57,12 @@ def test_unknown_outcome_emits_critical_operational_event() -> None:
         store,
         lambda route: authority_snapshot(),
     )
-    event = build_broker_state_unknown_event(
+    assert resolution.data is not None
+    resolution_data = resolution.data
+    event_response = build_broker_state_unknown_event(
         receipt,
-        incident_id=resolution.incident_reference,
-        unresolved_scope=resolution.remaining_unresolved_scope,
+        incident_id=resolution_data.incident_reference,
+        unresolved_scope=resolution_data.remaining_unresolved_scope,
         occurred_at=authority_snapshot().observed_at,
         workflow_id=workflow_id,
     )
@@ -68,8 +72,10 @@ def test_unknown_outcome_emits_critical_operational_event() -> None:
         assert store.events[-1].event_type == "reconciliation_transitioned"
         published.append(value)
 
-    emit_runtime_event(event, sink)
+    assert event_response.data is not None
+    event = event_response.data
+    assert emit_runtime_event(event, sink).status == "success"
 
-    assert resolution.transition == "retry_locked"
+    assert resolution_data.transition == "retry_locked"
     assert published == [event]
     assert event.event_type == "BROKER_STATE_UNKNOWN"

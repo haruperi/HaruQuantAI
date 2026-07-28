@@ -22,6 +22,15 @@ BOUNDS = {
 }
 
 
+def _assess_readiness(*args: object, **kwargs: object) -> ReadinessAssessment:
+    """Unwrap the public readiness response for legacy DTO-focused assertions."""
+    response = assess_execution_readiness(*args, **kwargs)  # type: ignore[arg-type]
+    if response.status == "error" or response.data is None:
+        code = "UNKNOWN_ERROR" if response.error is None else response.error.code
+        raise TradingError(code, "Readiness response failed")
+    return response.data
+
+
 def _request() -> TradingRequest:
     """Build canonical readiness request material."""
     return TradingRequest(
@@ -106,7 +115,7 @@ def _switch(state: str = "inactive") -> KillSwitchState:
 
 def test_readiness_fails_on_any_missing_evidence() -> None:
     """Any missing mandatory policy evidence produces a failed assessment."""
-    assessment = assess_execution_readiness(
+    assessment = _assess_readiness(
         _request(),
         _snapshot(),
         _risk(),
@@ -122,7 +131,7 @@ def test_readiness_fails_on_any_missing_evidence() -> None:
     assert not assessment.passed
     assert "KILL_SWITCH_BLOCKING" in assessment.failed_check_codes
     request = _request()
-    failed = assess_execution_readiness(
+    failed = _assess_readiness(
         request,
         _snapshot().model_copy(
             update={
@@ -153,7 +162,7 @@ def test_readiness_fails_on_any_missing_evidence() -> None:
     assert not failed.passed
     assert "ROUTE_EVIDENCE_UNAVAILABLE" in failed.failed_check_codes
     assert "RISK_NOT_APPROVED" in failed.failed_check_codes
-    no_expiry = assess_execution_readiness(
+    no_expiry = _assess_readiness(
         request,
         _snapshot(),
         _risk(),
@@ -171,7 +180,7 @@ def test_readiness_fails_on_any_missing_evidence() -> None:
 
 def test_far_future_expiry_cannot_bypass_age_bound() -> None:
     """Old observations fail even when their declared expiry is far in the future."""
-    assessment = assess_execution_readiness(
+    assessment = _assess_readiness(
         _request(),
         _snapshot().model_copy(
             update={
@@ -197,7 +206,7 @@ def test_readiness_fails_on_stale_kill_switch_evidence() -> None:
     stale_switch = _switch().model_copy(
         update={"updated_at": NOW - timedelta(seconds=31)}
     )
-    assessment = assess_execution_readiness(
+    assessment = _assess_readiness(
         _request(),
         _snapshot(),
         _risk(),
@@ -218,7 +227,7 @@ def test_readiness_fails_on_stale_kill_switch_evidence() -> None:
 def test_readiness_requires_kill_switch_staleness_bound() -> None:
     """Omitting the kill-switch bound fails configuration rather than passing open."""
     with pytest.raises(TradingError, match="CONFIGURATION_INVALID"):
-        assess_execution_readiness(
+        _assess_readiness(
             _request(),
             _snapshot(),
             _risk(),

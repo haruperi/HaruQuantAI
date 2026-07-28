@@ -29,24 +29,26 @@ def test_map_trading_error_redacts_provider_exception() -> None:
         },
     )
     serialized = envelope.model_dump_json()
-    assert envelope.status == "unknown_outcome"
+    assert envelope.status == "error"
+    assert envelope.error is not None
+    assert envelope.error.code == "UNKNOWN_OUTCOME"
     assert raw_secret not in serialized
     assert "top-secret" not in serialized
     classifications = (
-        (ValueError("unsafe detail"), "VALIDATION_FAILED", "error"),
-        (PermissionError("unsafe detail"), "PERMISSION_DENIED", "error"),
-        (OSError("unsafe detail"), "PERSISTENCE_FAILED", "error"),
-        (RuntimeError("unsafe detail"), "UNKNOWN_ERROR", "error"),
+        (ValueError("unsafe detail"), "VALIDATION_FAILED"),
+        (PermissionError("unsafe detail"), "PERMISSION_DENIED"),
+        (OSError("unsafe detail"), "PERSISTENCE_FAILED"),
+        (RuntimeError("unsafe detail"), "UNKNOWN_ERROR"),
         (
             TradingError("UNKNOWN_OUTCOME", "Authority state is unknown"),
             "UNKNOWN_OUTCOME",
-            "unknown_outcome",
         ),
     )
-    for error, code, status in classifications:
+    for error, code in classifications:
         classified = map_trading_error(error, {"operation": "unit_test"})
-        assert classified.status == status
-        assert classified.errors[0]["code"] == code
+        assert classified.status == "error"
+        assert classified.error is not None
+        assert classified.error.code == code
 
 
 def test_redaction_is_recursive_and_case_insensitive() -> None:
@@ -58,7 +60,7 @@ def test_redaction_is_recursive_and_case_insensitive() -> None:
         }
     }
     redacted = redact_trading_payload(payload)
-    rendered = str(redacted)
+    rendered = str(redacted.data)
     assert "secret-one" not in rendered
     assert "secret-two" not in rendered
     assert rendered.count("[REDACTED]") == 2
@@ -72,7 +74,7 @@ def test_redaction_removes_embedded_secret_text() -> None:
             "nested": ["token=very-secret"],
         }
     )
-    rendered = str(redacted)
+    rendered = str(redacted.data)
     assert "hunter2" not in rendered
     assert "abcd" not in rendered
     assert "very-secret" not in rendered

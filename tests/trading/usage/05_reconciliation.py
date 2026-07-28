@@ -12,10 +12,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.trading import (
-    AuthorityResolution,
     AuthoritySnapshot,
     ExecutionReceipt,
-    ReconciliationReport,
     TradingEvent,
     TradingProjection,
     compare_authority_state,
@@ -149,16 +147,22 @@ def example_reconciliation() -> None:
     proj = _projection()
     print(f"Authority snapshot source_id: {snap.source_id}")
 
-    report: ReconciliationReport = compare_authority_state(snap, proj)
+    report_response = compare_authority_state(snap, proj)
+    assert report_response.status == "success"
+    report = report_response.data
+    assert report is not None
     print(
         f"Reconciliation severity: {report.severity}, unresolved: {report.unresolved}"
     )
 
-    resolution: AuthorityResolution = resolve_unknown_outcome(  # type: ignore[arg-type]
+    resolution_response = resolve_unknown_outcome(  # type: ignore[arg-type]
         _receipt(),
         _Store(),
         lambda _route: snap,
     )
+    assert resolution_response.status == "success"
+    resolution = resolution_response.data
+    assert resolution is not None
     print(f"Unknown outcome resolution transition: {resolution.transition}")
     print(f"Retry allowed: {resolution.retry_allowed}")
 

@@ -1,5 +1,7 @@
 """Explicit gated Trading bulk cancellation and closure workflows."""
 
+# ruff: noqa: BLE001 - public boundaries normalize every failure.
+
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -8,16 +10,20 @@ from typing import TYPE_CHECKING, cast
 from pydantic import ValidationError as PydanticValidationError
 
 from app.services.risk import DecisionState
-from app.services.trading.actions._shared import authority_id, require_action
+from app.services.trading.actions._shared import (
+    authority_id,
+    require_action,
+    response_data_json,
+)
 from app.services.trading.actions.orders import cancel_order
 from app.services.trading.actions.positions import close_position
 from app.services.trading.contracts import (
-    StandardTradingEnvelope,
     TradingError,
     TradingRequest,
 )
 from app.services.trading.contracts.errors import _redacted_envelope_data
-from app.utils import generate_id, logger
+from app.services.trading.contracts.responses import success_trading_response
+from app.utils import RiskLevel, StandardResponse, generate_id, logger
 
 if TYPE_CHECKING:
     from app.services.trading.actions.dependencies import TradingDependencies
@@ -144,7 +150,7 @@ def _bulk_envelope(
     request: TradingRequest,
     results: list[dict[str, JsonValue]],
     skipped: list[dict[str, JsonValue]],
-) -> StandardTradingEnvelope:
+) -> StandardResponse[dict[str, JsonValue]]:
     """Package all child and skipped bulk outcomes.
 
     Args:
@@ -165,24 +171,25 @@ def _bulk_envelope(
             "skipped": cast("JsonValue", skipped),
         }
     )
-    return StandardTradingEnvelope(
-        status="partial" if partial else "success",
+    return success_trading_response(
+        data,
+        operation=f"trading.{request.action}",
         message="Trading bulk action retained every child result",
-        data=data,
-        errors=(),
-        warnings=({"code": "PARTIAL_COMPLETION"},) if partial else (),
-        audit_metadata={
-            "operation": request.action,
-            "request_id": request.request_id,
-            "correlation_id": request.correlation_id,
-            "redaction_applied": True,
-        },
+        risk_level=RiskLevel.CRITICAL,
+        request_id=request.request_id,
+        correlation_id=request.correlation_id,
+        read_only=False,
+        modifies_database=True,
+        places_trade=True,
+        requires_network=request.route.value in {"paper", "live"},
+        legacy_status="partial" if partial else "success",
+        extensions={"redaction_applied": True},
     )
 
 
-async def cancel_all_orders(
+async def _cancel_all_orders_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[dict[str, JsonValue]]:
     """Cancel every eligible order through the normal cancellation path.
 
     Args:
@@ -252,11 +259,14 @@ async def cancel_all_orders(
         try:
             child = _bind_child_authority(child, deps)
             outcome = await cancel_order(child, deps)
+            child_status = outcome.metadata.extensions.get("legacy_status")
+            if not isinstance(child_status, str):
+                child_status = outcome.status
             results.append(
                 {
                     "order_id": order.order_id,
-                    "status": outcome.status,
-                    "data": outcome.data,
+                    "status": child_status,
+                    "data": response_data_json(outcome.data),
                 }
             )
         except TradingError as error:
@@ -267,9 +277,9 @@ async def cancel_all_orders(
     return _bulk_envelope(request, results, skipped)
 
 
-async def close_all_positions(
+async def _close_all_positions_value(
     request: TradingRequest, deps: TradingDependencies
-) -> StandardTradingEnvelope:
+) -> StandardResponse[dict[str, JsonValue]]:
     """Close every position through the normal position-close path.
 
     Args:
@@ -335,11 +345,14 @@ async def close_all_positions(
         try:
             child = _bind_child_authority(child, deps)
             outcome = await close_position(child, deps)
+            child_status = outcome.metadata.extensions.get("legacy_status")
+            if not isinstance(child_status, str):
+                child_status = outcome.status
             results.append(
                 {
                     "position_id": position.position_id,
-                    "status": outcome.status,
-                    "data": outcome.data,
+                    "status": child_status,
+                    "data": response_data_json(outcome.data),
                 }
             )
         except TradingError as error:
@@ -352,6 +365,38 @@ async def close_all_positions(
                 }
             )
     return _bulk_envelope(request, results, [])
+
+
+async def cancel_all_orders(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[dict[str, JsonValue]]:
+    """Cancel eligible orders and return a standard bulk response.
+
+    Returns:
+        Standard response containing ordered child results or an error.
+    """
+    try:
+        return await _cancel_all_orders_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
+
+
+async def close_all_positions(
+    request: TradingRequest, deps: TradingDependencies
+) -> StandardResponse[dict[str, JsonValue]]:
+    """Close eligible positions and return a standard bulk response.
+
+    Returns:
+        Standard response containing ordered child results or an error.
+    """
+    try:
+        return await _close_all_positions_value(request, deps)
+    except Exception as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(error, {"request_id": request.request_id})
 
 
 __all__ = ["cancel_all_orders", "close_all_positions"]

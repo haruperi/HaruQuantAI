@@ -19,7 +19,6 @@ from app.services.risk import ActionPolicyVerdict, RiskDecisionPackage
 from app.services.trading import (
     LiveSession,
     ReadinessAssessment,
-    TradingError,
     TradingProjection,
     cancel_all_orders,
     resume_strategy,
@@ -200,15 +199,17 @@ async def test_kill_switch_blocks_and_reports_partial_emergency_results() -> Non
         blocked,
         kill_switch_state_source=lambda item: tuple(active_states),
     )
-    with pytest.raises(TradingError, match="KILL_SWITCH_ACTIVE"):
-        await resume_strategy(blocked_request, blocked)
+    blocked_result = await resume_strategy(blocked_request, blocked)
+    assert blocked_result.status == "error"
+    assert blocked_result.error is not None
+    assert blocked_result.error.code == "KILL_SWITCH_ACTIVE"
     emergency = replace(
         emergency_dependencies("cancel_all_orders"),
         simulation_dispatch=unknown_dispatch,
     )
     assert (
         await cancel_all_orders(trading_request(action="cancel_all_orders"), emergency)
-    ).status == "partial"
+    ).metadata.extensions["legacy_status"] == "partial"
 
 
 @pytest.mark.anyio
@@ -231,7 +232,8 @@ async def test_paper_bulk_cancel_binds_each_child_risk_authority() -> None:
 
     outcome = await cancel_all_orders(item, deps)
 
-    assert outcome.status == "partial"
+    assert outcome.status == "success"
+    assert outcome.metadata.extensions["legacy_status"] == "partial"
     assert adapter.calls == 1
     assert len(outcome.data["results"]) == 2
     assert outcome.data["results"][0]["status"] == "cancelled"

@@ -1,18 +1,25 @@
 """Finite Trading error taxonomy, mapping, and redaction boundary."""
 
+from __future__ import annotations
+
 import re
 from collections.abc import Mapping
+from typing import TYPE_CHECKING
 
 from pydantic import ValidationError as PydanticValidationError
 
-from app.services.trading.contracts.models import (
-    EnvelopeStatus,
-    JsonValue,
-    StandardTradingEnvelope,
+from app.services.trading.contracts.responses import (
+    error_trading_response,
+    success_trading_response,
 )
+
+if TYPE_CHECKING:
+    from app.services.trading.contracts.models import JsonValue
 from app.utils import (
     ExternalServiceError,
     HaruQuantError,
+    RiskLevel,
+    StandardResponse,
     logger,
     redact_mapping_value,
     redact_text_value,
@@ -77,7 +84,7 @@ def _safe_detail_token(details: str) -> str:
     return f"DETAIL_{token}"[:128] if token else "TRADING_DOMAIN_ERROR"
 
 
-def redact_trading_payload(payload: JsonValue) -> JsonValue:
+def _redact_trading_payload_value(payload: JsonValue) -> JsonValue:
     """Recursively redact a JSON-safe Trading boundary payload.
 
     Args:
@@ -107,6 +114,25 @@ def redact_trading_payload(payload: JsonValue) -> JsonValue:
     return to_json_safe(result["value"])
 
 
+def redact_trading_payload(payload: JsonValue) -> StandardResponse[JsonValue]:
+    """Redact one Trading payload and return it in ``StandardResponse.data``.
+
+    Args:
+        payload: JSON-safe payload to protect.
+
+    Returns:
+        Standard response containing the redacted raw payload.
+    """
+    safe = _redact_trading_payload_value(payload)
+    return success_trading_response(
+        safe,
+        operation="trading.redact_trading_payload",
+        message="Trading payload redacted",
+        risk_level=RiskLevel.LOW,
+        read_only=True,
+    )
+
+
 def _redacted_envelope_data(
     data: Mapping[str, JsonValue],
 ) -> dict[str, JsonValue]:
@@ -122,7 +148,7 @@ def _redacted_envelope_data(
         TradingError: If redaction does not produce a mapping.
     """
     logger.debug("Redacting Trading envelope data immediately before emission")
-    result = redact_trading_payload(dict(data))
+    result = _redact_trading_payload_value(dict(data))
     if not isinstance(result, dict):
         raise TradingError(
             "PAYLOAD_NOT_JSON_SAFE",
@@ -162,7 +188,7 @@ class TradingError(HaruQuantError):
         if code not in _TRADING_ERROR_CODES:
             raise ValueError("code must be a registered Trading error code")
         redacted_details = str(redact_text_value(details).value)
-        safe_context = redact_trading_payload(dict(trace_context or {}))
+        safe_context = _redact_trading_payload_value(dict(trace_context or {}))
         if not isinstance(safe_context, dict):
             raise TradingError(
                 "PAYLOAD_NOT_JSON_SAFE",
@@ -174,99 +200,74 @@ class TradingError(HaruQuantError):
         super().__init__(code, _safe_detail_token(redacted_details))
 
 
-def _classify_error(error: Exception) -> tuple[str, str, bool, EnvelopeStatus]:
+def _classify_error(error: Exception) -> tuple[str, str]:
     """Classify an exception without exposing its raw message.
 
     Args:
         error: Exception crossing the Trading boundary.
 
     Returns:
-        Error code, safe message, retry flag, and envelope status.
+        Error code and safe message.
     """
     logger.debug("Classifying a Trading boundary failure")
-    status: EnvelopeStatus
     if isinstance(error, TradingError):
         code = error.trading_code
         message = error.details
-        retryable = False
-        status = "unknown_outcome" if code == "UNKNOWN_OUTCOME" else "error"
     elif isinstance(error, PydanticValidationError | ValueError | TypeError):
         code = "VALIDATION_FAILED"
         message = "Trading input validation failed"
-        retryable = False
-        status = "error"
     elif isinstance(error, PermissionError):
         code = "PERMISSION_DENIED"
         message = "Trading permission was denied"
-        retryable = False
-        status = "error"
     elif isinstance(error, TimeoutError):
-        code = "TIMEOUT"
+        code = "UNKNOWN_OUTCOME"
         message = "Trading authority timed out"
-        retryable = False
-        status = "unknown_outcome"
     elif isinstance(error, ExternalServiceError | ConnectionError):
-        code = "PROVIDER_ERROR"
+        code = "UNKNOWN_OUTCOME"
         message = "Trading provider failed"
-        retryable = False
-        status = "unknown_outcome"
     elif isinstance(error, OSError):
         code = "PERSISTENCE_FAILED"
         message = "Trading persistence failed"
-        retryable = False
-        status = "error"
     else:
         code = "UNKNOWN_ERROR"
         message = "Trading failed safely"
-        retryable = False
-        status = "error"
-    return code, message, retryable, status
+    return code, message
 
 
-def map_trading_error(
+def map_trading_error[T](
     error: Exception,
     context: Mapping[str, JsonValue],
-) -> StandardTradingEnvelope:
-    """Map a failure to the canonical envelope without raw exceptions.
+) -> StandardResponse[T]:
+    """Map a failure to a redacted standard Trading response.
 
     Args:
         error: Failure crossing a Trading boundary.
         context: Operation and trace evidence for the failure.
 
     Returns:
-        Canonical redacted failure envelope.
+        Canonical redacted failure response.
     """
     logger.warning("Mapping a Trading failure to its canonical envelope")
-    safe_context = redact_trading_payload(dict(context))
+    safe_context = _redact_trading_payload_value(dict(context))
     if not isinstance(safe_context, dict):
         safe_context = {}
-    code, message, retryable, status = _classify_error(error)
-    error_row: dict[str, JsonValue] = {
-        "code": code,
-        "message": message,
-        "field_path": safe_context.get("field_path"),
-        "severity": "error",
-        "retryable": retryable,
-        "route": safe_context.get("route"),
-        "provider_id": safe_context.get("provider_id"),
-        "request_id": safe_context.get("request_id"),
-        "correlation_id": safe_context.get("correlation_id"),
-    }
-    audit_metadata: dict[str, JsonValue] = {
-        "operation": safe_context.get("operation", "unknown"),
-        "request_id": safe_context.get("request_id"),
-        "correlation_id": safe_context.get("correlation_id"),
-        "route": safe_context.get("route"),
-        "provider_id": safe_context.get("provider_id"),
-        "redaction_applied": True,
-    }
-    return StandardTradingEnvelope(
-        status=status,
+    code, message = _classify_error(error)
+    details: dict[str, JsonValue] = dict(safe_context)
+    if isinstance(error, TradingError):
+        details["detail"] = error.details
+        details.update(error.trace_context)
+    request_id = safe_context.get("request_id")
+    correlation_id = safe_context.get("correlation_id")
+    return error_trading_response(
+        code=code,
+        details=details,
+        operation=str(safe_context.get("operation", "trading.map_trading_error")),
         message=message,
-        data=None,
-        errors=(error_row,),
-        warnings=(),
-        audit_metadata=audit_metadata,
+        risk_level=RiskLevel.HIGH,
+        request_id=request_id if isinstance(request_id, str) else None,
+        correlation_id=(correlation_id if isinstance(correlation_id, str) else None),
+        read_only=True,
+        legacy_status="unknown_outcome" if code == "UNKNOWN_OUTCOME" else None,
     )
 
 

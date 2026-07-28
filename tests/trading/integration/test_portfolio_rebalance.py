@@ -1,6 +1,6 @@
 """Negative workflow integration for governed portfolio rebalance execution."""
 
-# ruff: noqa: INP001
+# ruff: noqa: INP001, PLR0915
 from dataclasses import replace
 from datetime import timedelta
 
@@ -9,7 +9,6 @@ from app.services.risk import DecisionState
 from app.services.trading import (
     BudgetGate,
     PortfolioRebalanceExecutionRequest,
-    TradingError,
     execute_portfolio_rebalance,
 )
 from app.utils import canonical_json
@@ -41,8 +40,10 @@ async def test_rebalance_cannot_bypass_risk_or_open_to_match_weight() -> None:
         allocation_decision_source=lambda _request: None,
         simulation_dispatch=counted_dispatch,
     )
-    with pytest.raises(TradingError, match="PERMISSION_DENIED"):
-        await execute_portfolio_rebalance(item, missing)
+    missing_result = await execute_portfolio_rebalance(item, missing)
+    assert missing_result.status == "error"
+    assert missing_result.error is not None
+    assert missing_result.error.code == "PERMISSION_DENIED"
 
     expired_data = rebalance_allocation().model_dump(mode="python")
     expired_data["expires_at"] = NOW - timedelta(seconds=1)
@@ -52,8 +53,10 @@ async def test_rebalance_cannot_bypass_risk_or_open_to_match_weight() -> None:
         allocation_decision_source=lambda _request: expired,
         simulation_dispatch=counted_dispatch,
     )
-    with pytest.raises(TradingError, match="BUDGET_BLOCKED"):
-        await execute_portfolio_rebalance(item, expired_deps)
+    expired_result = await execute_portfolio_rebalance(item, expired_deps)
+    assert expired_result.status == "error"
+    assert expired_result.error is not None
+    assert expired_result.error.code == "BUDGET_BLOCKED"
 
     rejected_data = rebalance_allocation().model_dump(mode="python")
     rejected_data["state"] = DecisionState.REJECT
@@ -64,21 +67,25 @@ async def test_rebalance_cannot_bypass_risk_or_open_to_match_weight() -> None:
         allocation_decision_source=lambda _request: rejected,
         simulation_dispatch=counted_dispatch,
     )
-    with pytest.raises(TradingError, match="BUDGET_BLOCKED"):
-        await execute_portfolio_rebalance(item, rejected_deps)
+    rejected_result = await execute_portfolio_rebalance(item, rejected_deps)
+    assert rejected_result.status == "error"
+    assert rejected_result.error is not None
+    assert rejected_result.error.code == "BUDGET_BLOCKED"
     assert dispatch_calls == 0
     assert missing.broker_adapter is None
 
     budget_data = rebalance_budget(item).model_dump(mode="python")
     budget_data.update({"plan_id": "wrong-plan", "plan_hash": "b" * 64})
     mismatched_budget = type(rebalance_budget(item)).model_validate(budget_data)
-    with pytest.raises(TradingError, match="BUDGET_BLOCKED"):
-        BudgetGate.validate(
-            item,
-            rebalance_allocation(),
-            mismatched_budget,
-            now=NOW,
-        )
+    budget_result = BudgetGate.validate(
+        item,
+        rebalance_allocation(),
+        mismatched_budget,
+        now=NOW,
+    )
+    assert budget_result.status == "error"
+    assert budget_result.error is not None
+    assert budget_result.error.code == "BUDGET_BLOCKED"
 
     open_data = rebalance_data()
     open_action = dict(open_data["actions"][0])

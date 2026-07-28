@@ -8,7 +8,8 @@ from app.services.trading.contracts import ExecutionReceipt, TradingError
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import logger
+from app.services.trading.contracts.responses import success_trading_response
+from app.utils import RiskLevel, StandardResponse, logger
 
 _RECEIPT_TEXT_FIELDS = (
     "receipt_id",
@@ -218,7 +219,7 @@ def _classify_status(
     return "unknown_outcome", "malformed_response", True
 
 
-def classify_authority_response(
+def _classify_authority_response_value(
     raw: JsonValue,
     capability: Mapping[str, JsonValue],
 ) -> ExecutionReceipt:
@@ -270,6 +271,36 @@ def classify_authority_response(
         reconciliation_required=reconciliation_required,
         request_id=_require_text(response, "request_id"),
         correlation_id=_require_text(response, "correlation_id"),
+    )
+
+
+def classify_authority_response(
+    raw: JsonValue,
+    capability: Mapping[str, JsonValue],
+) -> StandardResponse[ExecutionReceipt]:
+    """Classify an authority response into standard response data.
+
+    Returns:
+        Standard response containing the raw execution receipt.
+    """
+    try:
+        receipt = _classify_authority_response_value(raw, capability)
+    except TradingError as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return map_trading_error(
+            error,
+            {"operation": "trading.classify_authority_response"},
+        )
+    return success_trading_response(
+        receipt,
+        operation="trading.classify_authority_response",
+        message="Trading authority response classified",
+        risk_level=RiskLevel.HIGH,
+        request_id=receipt.request_id,
+        correlation_id=receipt.correlation_id,
+        read_only=True,
+        legacy_status=receipt.status,
     )
 
 

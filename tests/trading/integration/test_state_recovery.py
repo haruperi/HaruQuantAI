@@ -22,5 +22,9 @@ def test_recovery_preserves_unresolved_attempt() -> None:
         payload={"client_order_id": "client-001"},
     )
     projection = apply_execution_event(event, store)
-    assert projection.unresolved_attempt_ids == ("attempt-001",)
-    assert store.load_projection(("sim", "account-001", "simulation")) == projection
+    assert projection.status == "success"
+    assert projection.data is not None
+    assert projection.data.unresolved_attempt_ids == ("attempt-001",)
+    assert (
+        store.load_projection(("sim", "account-001", "simulation")) == projection.data
+    )

@@ -164,14 +164,20 @@ def example_validation() -> None:
 
     # 1. Validate order request
     validated = validate_order_request(req, _account(), _symbol_capability())
-    print(f"Validated order request quantity: {validated.quantity}")
+    assert validated.status == "success"
+    validated_request = validated.data
+    assert validated_request is not None
+    print(f"Validated order request quantity: {validated_request.quantity}")
 
     # 2. Get route snapshot
     def source(_route: object, _provider: object) -> dict[str, object]:
         return _snapshot().model_dump(mode="python")
 
     route_snap = get_route_snapshot(req, source)  # type: ignore[arg-type]
-    print(f"Route snapshot available: {route_snap.available}")
+    assert route_snap.status == "success"
+    snapshot = route_snap.data
+    assert snapshot is not None
+    print(f"Route snapshot available: {snapshot.available}")
 
     # 3. Execution readiness assessment
     assessment = assess_execution_readiness(
@@ -186,7 +192,10 @@ def example_validation() -> None:
             "kill_switch": Decimal(30),
         },
     )
-    print(f"Execution readiness passed: {assessment.passed}")
+    assert assessment.status == "success"
+    readiness_assessment = assessment.data
+    assert readiness_assessment is not None
+    print(f"Execution readiness passed: {readiness_assessment.passed}")
 
     # 4. Build execution plan
     readiness = ReadinessAssessment(
@@ -196,7 +205,10 @@ def example_validation() -> None:
         assessed_at=NOW,
     )
     plan = build_execution_plan(req, readiness)
-    print(f"Built execution plan route: {plan.route.value}")
+    assert plan.status == "success"
+    execution_plan = plan.data
+    assert execution_plan is not None
+    print(f"Built execution plan route: {execution_plan.route.value}")
 
 
 def fr_trd_024() -> None:

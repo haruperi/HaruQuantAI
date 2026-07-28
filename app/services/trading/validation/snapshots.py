@@ -3,7 +3,7 @@
 from collections.abc import Callable, Mapping
 from datetime import datetime, timedelta
 from types import MappingProxyType
-from typing import Self
+from typing import Self, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -11,7 +11,8 @@ from app.services.trading.contracts import TradingError, TradingRequest, Trading
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import logger, to_json_safe
+from app.services.trading.contracts.responses import success_trading_response
+from app.utils import RiskLevel, StandardResponse, logger, to_json_safe
 
 
 class RouteSnapshot(BaseModel):
@@ -154,7 +155,7 @@ class RouteSnapshot(BaseModel):
         return self
 
 
-def get_route_snapshot(
+def _get_route_snapshot_value(
     request: TradingRequest,
     source: Callable[[TradingRoute, str | None], Mapping[str, JsonValue]],
 ) -> RouteSnapshot:
@@ -194,6 +195,43 @@ def get_route_snapshot(
     ):
         raise TradingError("SCOPE_MISMATCH", "Route snapshot scope does not match")
     return snapshot
+
+
+def get_route_snapshot(
+    request: TradingRequest,
+    source: Callable[[TradingRoute, str | None], Mapping[str, JsonValue]],
+) -> StandardResponse[RouteSnapshot]:
+    """Read route facts and return the raw snapshot in ``data``.
+
+    Returns:
+        Standard response containing the route snapshot or an error.
+    """
+    try:
+        value = _get_route_snapshot_value(request, source)
+    except TradingError as error:
+        from app.services.trading.contracts.errors import map_trading_error
+
+        return cast(
+            "StandardResponse[RouteSnapshot]",
+            map_trading_error(
+                error,
+                {
+                    "operation": "trading.get_route_snapshot",
+                    "request_id": request.request_id,
+                    "correlation_id": request.correlation_id,
+                },
+            ),
+        )
+    return success_trading_response(
+        value,
+        operation="trading.get_route_snapshot",
+        message="Trading route snapshot returned",
+        risk_level=RiskLevel.HIGH,
+        request_id=request.request_id,
+        correlation_id=request.correlation_id,
+        read_only=True,
+        requires_network=True,
+    )
 
 
 __all__ = ["RouteSnapshot", "get_route_snapshot"]

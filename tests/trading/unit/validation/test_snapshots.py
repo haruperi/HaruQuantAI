@@ -4,7 +4,7 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from app.services.trading.contracts import TradingError, TradingRequest
+from app.services.trading.contracts import TradingRequest
 from app.services.trading.validation import RouteSnapshot, get_route_snapshot
 from pydantic import ValidationError
 
@@ -61,22 +61,26 @@ def test_snapshot_never_substitutes_neutral_defaults() -> None:
     """Unavailable source evidence raises instead of returning neutral facts."""
     data = _snapshot_data()
     data["available"] = False
-    with pytest.raises(TradingError) as captured:
-        get_route_snapshot(_request(), lambda _route, _provider: data)  # type: ignore[arg-type,return-value]
-    assert captured.value.trading_code == "SERVICE_UNAVAILABLE"
-    with pytest.raises(TradingError) as malformed:
-        get_route_snapshot(_request(), lambda _route, _provider: {})
-    assert malformed.value.trading_code == "SERVICE_UNAVAILABLE"
+    captured = get_route_snapshot(_request(), lambda _route, _provider: data)  # type: ignore[arg-type,return-value]
+    assert captured.status == "error"
+    assert captured.error is not None
+    assert captured.error.code == "SERVICE_UNAVAILABLE"
+    malformed = get_route_snapshot(_request(), lambda _route, _provider: {})
+    assert malformed.status == "error"
+    assert malformed.error is not None
+    assert malformed.error.code == "SERVICE_UNAVAILABLE"
     stale = _snapshot_data()
     stale["fresh"] = False
-    with pytest.raises(TradingError) as stale_error:
-        get_route_snapshot(_request(), lambda _route, _provider: stale)  # type: ignore[arg-type,return-value]
-    assert stale_error.value.trading_code == "STALE_EVIDENCE"
+    stale_error = get_route_snapshot(_request(), lambda _route, _provider: stale)  # type: ignore[arg-type,return-value]
+    assert stale_error.status == "error"
+    assert stale_error.error is not None
+    assert stale_error.error.code == "STALE_EVIDENCE"
     wrong_scope = _snapshot_data()
     wrong_scope["account_id"] = "other-account"
-    with pytest.raises(TradingError) as scope_error:
-        get_route_snapshot(_request(), lambda _route, _provider: wrong_scope)  # type: ignore[arg-type,return-value]
-    assert scope_error.value.trading_code == "SCOPE_MISMATCH"
+    scope_error = get_route_snapshot(_request(), lambda _route, _provider: wrong_scope)  # type: ignore[arg-type,return-value]
+    assert scope_error.status == "error"
+    assert scope_error.error is not None
+    assert scope_error.error.code == "SCOPE_MISMATCH"
 
 
 def test_route_snapshot_requires_provenance() -> None:

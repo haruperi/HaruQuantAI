@@ -4,13 +4,12 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-import pytest
 from app.services.data.evidence.account_contracts import (
     AccountOrder,
     AccountPosition,
     AccountStateSnapshot,
 )
-from app.services.trading.contracts import TradingError, TradingRequest
+from app.services.trading.contracts import TradingRequest
 from app.services.trading.validation import validate_order_request
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
@@ -73,9 +72,10 @@ def _account() -> AccountStateSnapshot:
 def test_invalid_order_never_reaches_authority() -> None:
     """Missing precision evidence rejects before any authority interaction."""
     authority_calls = 0
-    with pytest.raises(TradingError) as captured:
-        validate_order_request(_request(), _account(), _symbol_capability())
-    assert captured.value.trading_code == "VALIDATION_FAILED"
+    captured = validate_order_request(_request(), _account(), _symbol_capability())
+    assert captured.status == "error"
+    assert captured.error is not None
+    assert captured.error.code == "VALIDATION_FAILED"
     assert authority_calls == 0
     valid = _request().model_copy(
         update={
@@ -84,7 +84,9 @@ def test_invalid_order_never_reaches_authority() -> None:
             "instrument_quantity_step": Decimal("0.01"),
         }
     )
-    assert validate_order_request(valid, _account(), _symbol_capability()) is valid
+    validated = validate_order_request(valid, _account(), _symbol_capability())
+    assert validated.status == "success"
+    assert validated.data == valid
     invalid_requests = (
         valid.model_copy(update={"quantity": Decimal("11.00")}),
         valid.model_copy(update={"quantity": Decimal("1.005")}),
@@ -98,19 +100,21 @@ def test_invalid_order_never_reaches_authority() -> None:
         ),
     )
     for invalid in invalid_requests:
-        with pytest.raises(TradingError):
-            validate_order_request(invalid, _account(), _symbol_capability())
+        result = validate_order_request(invalid, _account(), _symbol_capability())
+        assert result.status == "error"
     unsupported = {"supported_order_types": ["LIMIT"], "quantity_unit": "units"}
-    with pytest.raises(TradingError) as unsupported_error:
-        validate_order_request(valid, _account(), unsupported)
-    assert unsupported_error.value.trading_code == "VALIDATION_FAILED"
+    unsupported_error = validate_order_request(valid, _account(), unsupported)
+    assert unsupported_error.status == "error"
+    assert unsupported_error.error is not None
+    assert unsupported_error.error.code == "VALIDATION_FAILED"
     mismatched_unit = {
         "supported_order_types": ["MARKET"],
         "quantity_unit": "lots",
     }
-    with pytest.raises(TradingError) as unit_error:
-        validate_order_request(valid, _account(), mismatched_unit)
-    assert unit_error.value.trading_code == "VALIDATION_FAILED"
+    unit_error = validate_order_request(valid, _account(), mismatched_unit)
+    assert unit_error.status == "error"
+    assert unit_error.error is not None
+    assert unit_error.error.code == "VALIDATION_FAILED"
     order = AccountOrder(
         order_id="order-001",
         symbol="EURUSD",
@@ -134,13 +138,14 @@ def test_invalid_order_never_reaches_authority() -> None:
             "target_broker_order_id": "broker-order-001",
         }
     )
-    with pytest.raises(TradingError) as missing_version:
-        validate_order_request(
-            modify_order,
-            addressed_account,
-            _symbol_capability(),
-        )
-    assert missing_version.value.trading_code == "VERSION_CONFLICT"
+    missing_version = validate_order_request(
+        modify_order,
+        addressed_account,
+        _symbol_capability(),
+    )
+    assert missing_version.status == "error"
+    assert missing_version.error is not None
+    assert missing_version.error.code == "VERSION_CONFLICT"
     close_position = valid.model_copy(
         update={
             "action": "close_position",
@@ -148,9 +153,11 @@ def test_invalid_order_never_reaches_authority() -> None:
             "target_broker_position_id": "broker-position-missing",
         }
     )
-    with pytest.raises(TradingError, match="VALIDATION_FAILED"):
-        validate_order_request(
-            close_position,
-            addressed_account,
-            _symbol_capability(),
-        )
+    close_result = validate_order_request(
+        close_position,
+        addressed_account,
+        _symbol_capability(),
+    )
+    assert close_result.status == "error"
+    assert close_result.error is not None
+    assert close_result.error.code == "VALIDATION_FAILED"

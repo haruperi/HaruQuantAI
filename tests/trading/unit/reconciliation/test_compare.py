@@ -54,7 +54,10 @@ def _projection() -> TradingProjection:
 
 def test_unresolved_mismatch_stays_unresolved() -> None:
     """Missing and mismatched facts remain explicit and unresolved."""
-    report = compare_authority_state(_snapshot(), _projection())
+    response = compare_authority_state(_snapshot(), _projection())
+    assert response.status == "success"
+    assert response.data is not None
+    report = response.data
     assert report.unresolved
     assert report.severity == "critical"
     assert report.missing_internal_ids == ("order:order-authority",)
@@ -65,7 +68,8 @@ def test_unresolved_mismatch_stays_unresolved() -> None:
 def test_report_cannot_claim_false_resolution() -> None:
     """A discrepancy-bearing report cannot claim resolved status."""
     valid = compare_authority_state(_snapshot(), _projection())
-    data = valid.model_dump()
+    assert valid.data is not None
+    data = valid.data.model_dump()
     data["unresolved"] = False
     with pytest.raises(ValidationError):
         ReconciliationReport.model_validate(data)
