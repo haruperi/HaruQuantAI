@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from app.services.analytics import compare_performance_reports
 from app.utils import logger
-from tests.analytics._support import _report
+from tests.analytics._support import _report, unwrap
 
 
 def test_report_comparison_uses_actual_common_metrics() -> None:
@@ -13,5 +13,5 @@ def test_report_comparison_uses_actual_common_metrics() -> None:
     logger.debug("Testing Analytics actual comparison workflow")
     reference, _ = _report(profit=Decimal(10))
     candidate, _ = _report(profit=Decimal(30))
-    section = compare_performance_reports(reference, candidate)
+    section = unwrap(compare_performance_reports(reference, candidate))
     assert any(metric.value == Decimal(20) for metric in section.metrics)

@@ -42,11 +42,13 @@ def main() -> None:
     print("UTC strategy points:", len(strategy))
     # Stage 3: Align through the public deterministic operation.
     _stage(3)
-    aligned_strategy, aligned_benchmark = align_benchmark_series(strategy, points)
+    aligned_strategy, aligned_benchmark = examples.unwrap(
+        align_benchmark_series(strategy, points)
+    )
     print("Aligned:", len(aligned_strategy), len(aligned_benchmark))
     # Stage 4: Calculate approved benchmark evidence.
     _stage(4)
-    section = calculate_benchmark_evidence(result, config=config)
+    section = examples.unwrap(calculate_benchmark_evidence(result, config=config))
     print("Metrics:", tuple(metric.metric_key for metric in section.metrics))
     # Stage 5 — OUTPUT BOUNDARY: Return benchmark SectionEvidence.
     _stage(5)

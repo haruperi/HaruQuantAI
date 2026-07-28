@@ -39,7 +39,7 @@ def main() -> None:
     before = repr(reference)
     # Stage 3: Public comparer matches approved common metrics.
     _stage(3)
-    comparison = compare_performance_reports(reference, candidate)
+    comparison = examples.unwrap(compare_performance_reports(reference, candidate))
     print("Common metrics:", len(comparison.metrics))
     # Stage 4: Show real nonzero delta evidence.
     _stage(4)

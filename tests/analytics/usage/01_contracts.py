@@ -37,6 +37,7 @@ from app.services.analytics import (
     validate_contract_version,
     validate_metric_catalog,
 )
+from tests.analytics.usage._support import unwrap
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 HASH = "0" * 64
@@ -99,7 +100,7 @@ def example_contracts() -> None:
     print("Analytics Example 1: Contracts and Serialization")
 
     # 1. Contract version validation
-    status = validate_contract_version("simulation.result", "v1")
+    status = unwrap(validate_contract_version("simulation.result", "v1"))
     print(f"Contract simulation.result v1 compatibility status: {status}")
     print(
         "Contract/catalog policies: "
@@ -112,7 +113,7 @@ def example_contracts() -> None:
     )
 
     # 2. Metric definition catalog
-    validate_metric_catalog(METRIC_DEFINITION_CATALOG)
+    unwrap(validate_metric_catalog(METRIC_DEFINITION_CATALOG))
     print(f"Catalog contains {len(METRIC_DEFINITION_CATALOG)} defined metric keys.")
 
     # 3. ClosedTrade PnL
@@ -120,19 +121,23 @@ def example_contracts() -> None:
     print(f"ClosedTrade net PnL: {trade.net_trade_pnl}")
 
     # 4. Warnings and Quality Flags via build_warning and build_quality_flag
-    warning = build_warning(
-        "insufficient_samples",
-        section="trades",
-        source_context="usage",
-        detail={"observed_count": 1, "required_count": 10},
-        max_detail_bytes=1024,
+    warning = unwrap(
+        build_warning(
+            "insufficient_samples",
+            section="trades",
+            source_context="usage",
+            detail={"observed_count": 1, "required_count": 10},
+            max_detail_bytes=1024,
+        )
     )
-    qflag = build_quality_flag(
-        "sample_below_threshold",
-        section="trades",
-        source_context="usage",
-        detail={"observed_count": 1, "required_count": 10},
-        max_detail_bytes=1024,
+    qflag = unwrap(
+        build_quality_flag(
+            "sample_below_threshold",
+            section="trades",
+            source_context="usage",
+            detail={"observed_count": 1, "required_count": 10},
+            max_detail_bytes=1024,
+        )
     )
     warning = AnalyticsWarning(**dict(warning.__dict__))
     qflag = QualityFlag(**dict(qflag.__dict__))
@@ -166,15 +171,17 @@ def example_contracts() -> None:
         precision_metadata={"decimal_places": 8},
     )
 
-    json_report = to_report_json_safe(report)
+    json_report = unwrap(to_report_json_safe(report))
     print(
         "PerformanceReport serialized to JSON-safe dict, keys: "
         f"{list(json_report.keys())}"
     )
 
     # 6. Error conversion
-    err_payload = to_analytics_error_payload(
-        AnalyticsValidationError("Invalid input schema"), max_detail_bytes=128
+    err_payload = unwrap(
+        to_analytics_error_payload(
+            AnalyticsValidationError("Invalid input schema"), max_detail_bytes=128
+        )
     )
     base_error = AnalyticsError("Controlled Analytics failure")
     print(f"Analytics error payload: {err_payload['code']} - {err_payload['message']}")

@@ -36,12 +36,14 @@ def main() -> None:
     # Stage 1 — INPUT BOUNDARY: Caller supplies validated result/report.
     _stage(1)
     report, config = examples._report()
-    result = adapt_trading_result(
-        examples._source(),
-        source_contract="simulation.result",
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=config,
+    result = examples.unwrap(
+        adapt_trading_result(
+            examples._source(),
+            source_contract="simulation.result",
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=config,
+        )
     )
     print("Input:", result.source_id, report.report_id)
     # Stage 2: Canonical JSON policy is applied internally.
@@ -49,11 +51,13 @@ def main() -> None:
     print("Canonical schema:", report.schema_id)
     # Stage 3: Compute complete reproducibility hashes.
     _stage(3)
-    hashes = compute_reproducibility_hashes(result, report)
+    hashes = examples.unwrap(compute_reproducibility_hashes(result, report))
     print("Report hash:", hashes.report_hash)
     # Stage 4: Serialize without filesystem writes.
     _stage(4)
-    serialized = serialize_report(report, format_name="json", config=config)
+    serialized = examples.unwrap(
+        serialize_report(report, format_name="json", config=config)
+    )
     print("Serialized bytes:", len(serialized))
     # Stage 5 — OUTPUT BOUNDARY: Return hashes and in-memory serialization.
     _stage(5)

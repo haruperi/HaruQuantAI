@@ -37,7 +37,7 @@ def main() -> None:
     print("Execution hash:", request.trading_execution_hash)
     # Stage 3: Calculate non-binding measurement evidence.
     _stage(3)
-    evidence = build_portfolio_rebalance_measurement(request)
+    evidence = examples.unwrap(build_portfolio_rebalance_measurement(request))
     print("Successful actions:", evidence.summary["successful_action_count"])
     # Stage 4: Preserve immutable Trading references.
     _stage(4)

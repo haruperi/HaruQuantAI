@@ -3,7 +3,7 @@
 # ruff: noqa: INP001
 from app.services.analytics import run_statistical_validation
 from app.utils import logger
-from tests.analytics._support import _configured_result
+from tests.analytics._support import _configured_result, unwrap
 
 
 def test_seeded_validation_is_reproducible() -> None:
@@ -11,6 +11,6 @@ def test_seeded_validation_is_reproducible() -> None:
     logger.debug("Testing Analytics statistical workflow reproducibility")
     _, config = _configured_result()
     values = tuple(float(index - 15) for index in range(30))
-    assert run_statistical_validation(
-        values, config=config
-    ) == run_statistical_validation(values, config=config)
+    assert unwrap(run_statistical_validation(values, config=config)) == unwrap(
+        run_statistical_validation(values, config=config)
+    )

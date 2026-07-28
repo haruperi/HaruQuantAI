@@ -12,7 +12,7 @@ from app.services.analytics import (
     build_portfolio_rebalance_measurement,
 )
 from app.utils import logger
-from tests.analytics._support import _measurement_request, _report
+from tests.analytics._support import _measurement_request, _report, unwrap
 
 
 def test_allocation_evidence_builder_is_package_root_public() -> None:
@@ -25,7 +25,7 @@ def test_rebalance_measurement_builder_is_package_root_public() -> None:
     """WF-ANLT-014 measures genuine hash-bound reconciled Trading facts."""
     logger.info("Testing Analytics post-trade rebalance measurement workflow")
     request = _measurement_request()
-    evidence = build_portfolio_rebalance_measurement(request)
+    evidence = unwrap(build_portfolio_rebalance_measurement(request))
     assert evidence.request_id == request.request_id
     assert evidence.trading_execution_ref == request.trading_execution_ref
     assert evidence.trading_execution_hash == request.trading_execution_hash
@@ -72,12 +72,14 @@ def test_evidence_is_non_binding_and_fx_provenanced() -> None:
     logger.debug("Testing Analytics allocation-evidence workflow")
     first, config = _report(source_id="simulation-result-1")
     second, _ = _report(profit=Decimal(20), source_id="simulation-result-2")
-    evidence = build_portfolio_allocation_evidence(
-        (first, second),
-        base_currency="USD",
-        fx_evidence=None,
-        config=config,
-        portfolio_simulation_result=_portfolio_fixture(),
+    evidence = unwrap(
+        build_portfolio_allocation_evidence(
+            (first, second),
+            base_currency="USD",
+            fx_evidence=None,
+            config=config,
+            portfolio_simulation_result=_portfolio_fixture(),
+        )
     )
     assert evidence.non_binding is True
     assert evidence.fx_lineage.source_contract == "identity_currency"

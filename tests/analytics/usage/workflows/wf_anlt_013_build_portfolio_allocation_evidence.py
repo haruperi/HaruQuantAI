@@ -47,18 +47,22 @@ def main() -> None:
     )
     # Stage 3: Demonstrate internal currency-safe aggregation.
     _stage(3)
-    portfolio = build_portfolio_performance_report(
-        (first, second), base_currency="USD", fx_evidence=None, config=config
+    portfolio = examples.unwrap(
+        build_portfolio_performance_report(
+            (first, second), base_currency="USD", fx_evidence=None, config=config
+        )
     )
     print("Internal portfolio sections:", len(portfolio.sections))
     # Stage 4: Project complete allocation evidence.
     _stage(4)
-    evidence = build_portfolio_allocation_evidence(
-        (first, second),
-        base_currency="USD",
-        fx_evidence=None,
-        config=config,
-        portfolio_simulation_result=simulation,
+    evidence = examples.unwrap(
+        build_portfolio_allocation_evidence(
+            (first, second),
+            base_currency="USD",
+            fx_evidence=None,
+            config=config,
+            portfolio_simulation_result=simulation,
+        )
     )
     print(
         "Dependence/concentration:",

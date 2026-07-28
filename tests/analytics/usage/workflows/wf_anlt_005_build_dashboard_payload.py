@@ -34,7 +34,7 @@ def main() -> None:
     print("Input report:", report.report_id)
     # Stage 2: Project without recomputation.
     _stage(2)
-    payload = build_dashboard_payload(report)
+    payload = examples.unwrap(build_dashboard_payload(report))
     print(
         "Projected classes:",
         tuple(section["payload_class"] for section in payload.sections),
@@ -42,7 +42,9 @@ def main() -> None:
     # Stage 3: Demonstrate deterministic point bounding.
     _stage(3)
     result, _ = examples._configured_result()
-    selected, metadata = truncate_series(result.equity_curve, max_points=2)
+    truncation_response = truncate_series(result.equity_curve, max_points=2)
+    selected = examples.unwrap(truncation_response)
+    metadata = truncation_response.metadata.extensions["truncation"]
     print("Selected points:", len(selected), metadata)
     # Stage 4: Preserve report warnings/quality evidence.
     _stage(4)

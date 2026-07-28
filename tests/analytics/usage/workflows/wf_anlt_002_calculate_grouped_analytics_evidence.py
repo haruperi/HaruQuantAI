@@ -37,7 +37,7 @@ def main() -> None:
     print("Directions:", tuple(trade.type for trade in result.trades))
     # Stage 3: Execute public grouped metric calculation.
     _stage(3)
-    sections = calculate_grouped_evidence(result, config=config)
+    sections = examples.unwrap(calculate_grouped_evidence(result, config=config))
     print("Sections:", tuple(section.section_key for section in sections))
     # Stage 4: Show explicit metric statuses.
     _stage(4)

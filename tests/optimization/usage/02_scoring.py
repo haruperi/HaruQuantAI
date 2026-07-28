@@ -30,6 +30,7 @@ from app.services.optimization.scoring import (
     select_pareto_candidates,
 )
 from app.utils import generate_id
+from tests.analytics.usage._support import unwrap
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -123,15 +124,17 @@ def example_scoring() -> None:
         "quality_metadata": {},
         "source_metadata": {},
     }
-    report = build_performance_report(
-        source,
-        source_contract="simulation.result",
-        request_id=generate_id("req"),
-        correlation_id=generate_id("cor"),
-        created_at=NOW,
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=_config(),
+    report = unwrap(
+        build_performance_report(
+            source,
+            source_contract="simulation.result",
+            request_id=generate_id("req"),
+            correlation_id=generate_id("cor"),
+            created_at=NOW,
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=_config(),
+        )
     )
     score_res = calculate_candidate_score(
         report,

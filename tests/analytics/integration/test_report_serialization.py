@@ -3,7 +3,7 @@
 # ruff: noqa: INP001
 from app.services.analytics import serialize_report
 from app.utils import generate_id, logger
-from tests.analytics._support import _report
+from tests.analytics._support import _report, unwrap
 
 
 def test_serialization_and_hashes_are_deterministic() -> None:
@@ -14,6 +14,6 @@ def test_serialization_and_hashes_are_deterministic() -> None:
     second, _ = _report(request_id=request_id)
     assert first == second
     assert first.hashes.report_hash is not None
-    assert serialize_report(
-        first, format_name="json", config=config
-    ) == serialize_report(second, format_name="json", config=config)
+    assert unwrap(serialize_report(first, format_name="json", config=config)) == unwrap(
+        serialize_report(second, format_name="json", config=config)
+    )

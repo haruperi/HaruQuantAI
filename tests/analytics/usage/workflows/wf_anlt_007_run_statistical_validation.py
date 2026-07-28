@@ -42,11 +42,11 @@ def main() -> None:
     )
     # Stage 3: Run public statistical validation.
     _stage(3)
-    first = run_statistical_validation(values, config=config)
+    first = examples.unwrap(run_statistical_validation(values, config=config))
     print("Metrics:", tuple(metric.metric_key for metric in first.metrics))
     # Stage 4: Verify seeded reproducibility.
     _stage(4)
-    second = run_statistical_validation(values, config=config)
+    second = examples.unwrap(run_statistical_validation(values, config=config))
     print("Reproducible:", first == second)
     # Stage 5 — OUTPUT BOUNDARY: Return deterministic SectionEvidence.
     _stage(5)

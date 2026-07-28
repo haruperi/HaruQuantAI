@@ -40,8 +40,10 @@ def main() -> None:
     print("Base currency:", "USD", "FX evidence:", None)
     # Stage 4: Execute public portfolio aggregation.
     _stage(4)
-    portfolio = build_portfolio_performance_report(
-        (report,), base_currency="USD", fx_evidence=None, config=config
+    portfolio = examples.unwrap(
+        build_portfolio_performance_report(
+            (report,), base_currency="USD", fx_evidence=None, config=config
+        )
     )
     print("Portfolio sections:", len(portfolio.sections))
     # Stage 5 — OUTPUT BOUNDARY: Return internal currency-safe report.

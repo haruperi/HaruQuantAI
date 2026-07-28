@@ -40,29 +40,33 @@ def main() -> None:
     print("Input:", source["schema_id"], len(source["closed_trades"]))
     # Stage 2: Adapt through the public receiver boundary.
     _stage(2)
-    result = adapt_trading_result(
-        source,
-        source_contract="simulation.result",
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=config,
+    result = examples.unwrap(
+        adapt_trading_result(
+            source,
+            source_contract="simulation.result",
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=config,
+        )
     )
     print("Adapted:", result.schema_id, len(result.trades))
     # Stage 3: Calculate approved grouped evidence.
     _stage(3)
-    sections = calculate_grouped_evidence(result, config=config)
+    sections = examples.unwrap(calculate_grouped_evidence(result, config=config))
     print("Metric sections:", tuple(section.section_key for section in sections))
     # Stage 4: Compose the canonical report.
     _stage(4)
-    report = build_performance_report(
-        source,
-        source_contract="simulation.result",
-        request_id=generate_id("req"),
-        correlation_id=generate_id("cor"),
-        created_at=examples.NOW,
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=config,
+    report = examples.unwrap(
+        build_performance_report(
+            source,
+            source_contract="simulation.result",
+            request_id=generate_id("req"),
+            correlation_id=generate_id("cor"),
+            created_at=examples.NOW,
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=config,
+        )
     )
     print("Report sections:", len(report.sections), "hash:", report.hashes.report_hash)
     # Stage 5 — OUTPUT BOUNDARY: Return PerformanceReport v1; Analytics writes nothing.

@@ -40,6 +40,7 @@ from app.services.trading import (
 )
 
 from tests.analytics import _support as analytics_examples
+from tests.analytics.usage._support import unwrap
 from tests.indicators.helpers import unwrap_response
 from tests.risk import _support as risk_examples
 from tests.simulator.unit.test_orchestrator import (
@@ -394,13 +395,17 @@ def _analytics_report(
         "quality_metadata": {"status": "passed"},
         "source_metadata": {"request_hash": result.request_hash},
     }
-    return build_performance_report(
-        source,
-        source_contract="simulation.result",
-        request_id=request.request_id,
-        initial_balance=result.initial_balance,
-        account_currency=result.account_currency,
-        config=analytics_examples._configured(),
+    return unwrap(
+        build_performance_report(
+            source,
+            source_contract="simulation.result",
+            request_id=request.request_id,
+            correlation_id=request.correlation_id,
+            created_at=request.end,
+            initial_balance=result.initial_balance,
+            account_currency=result.account_currency,
+            config=analytics_examples._configured(),
+        )
     )
 
 

@@ -4,6 +4,7 @@ from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
+from typing import cast
 
 from app.services.analytics import (
     AnalyticsRunConfig,
@@ -16,9 +17,26 @@ from app.services.analytics import (
     build_performance_report,
 )
 from app.services.data import DataQualityReport, MarketDataset, OHLCVRecord
-from app.utils import canonical_json, generate_id, logger
+from app.utils import StandardResponse, canonical_json, generate_id, logger
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
+
+
+def unwrap[T](response: StandardResponse[T]) -> T:
+    """Return successful response data for test fixtures.
+
+    Args:
+        response: Analytics public-port response.
+
+    Returns:
+        Raw Analytics value stored in ``data``.
+
+    Raises:
+        AssertionError: If the operation returned an error response.
+    """
+    if response.status != "success":
+        raise AssertionError(response.error)
+    return cast("T", response.data)
 
 
 def _config() -> AnalyticsRunConfig:
@@ -146,15 +164,17 @@ def _report(
     config = _configured()
     source = _source_with_profit(profit)
     source["source_id"] = source_id
-    report = build_performance_report(
-        source,
-        source_contract="simulation.result",
-        request_id=request_id or generate_id("req"),
-        correlation_id=generate_id("cor"),
-        created_at=NOW,
-        initial_balance=Decimal(1000),
-        account_currency=account_currency,
-        config=config,
+    report = unwrap(
+        build_performance_report(
+            source,
+            source_contract="simulation.result",
+            request_id=request_id or generate_id("req"),
+            correlation_id=generate_id("cor"),
+            created_at=NOW,
+            initial_balance=Decimal(1000),
+            account_currency=account_currency,
+            config=config,
+        )
     )
     return report, config
 
@@ -242,13 +262,15 @@ def _configured_result(
         if benchmark
         else None
     )
-    result = adapt_trading_result(
-        _source(),
-        source_contract="simulation.result",
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=config,
-        benchmark=benchmark_evidence,
+    result = unwrap(
+        adapt_trading_result(
+            _source(),
+            source_contract="simulation.result",
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=config,
+            benchmark=benchmark_evidence,
+        )
     )
     return result, config
 

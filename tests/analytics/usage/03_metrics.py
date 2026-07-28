@@ -31,6 +31,7 @@ from app.services.analytics import (
     run_statistical_validation,
 )
 from tests.analytics._support import _configured_result
+from tests.analytics.usage._support import unwrap
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -113,61 +114,69 @@ def example_metrics() -> None:
         "quality_metadata": {},
         "source_metadata": {},
     }
-    result = adapt_trading_result(
-        source,
-        source_contract="simulation.result",
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=config,
+    result = unwrap(
+        adapt_trading_result(
+            source,
+            source_contract="simulation.result",
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=config,
+        )
     )
 
     daily_returns = (0.01, -0.005, 0.008)
 
-    trade_evidence = calculate_trade_evidence(result, config=config)
+    trade_evidence = unwrap(calculate_trade_evidence(result, config=config))
     print(
         f"Trade section key: {trade_evidence.section_key}, "
         f"status: {trade_evidence.status}"
     )
 
-    return_evidence = calculate_return_evidence(result, config=config)
+    return_evidence = unwrap(calculate_return_evidence(result, config=config))
     print(
         f"Return section key: {return_evidence.section_key}, "
         f"status: {return_evidence.status}"
     )
 
-    drawdown_evidence = calculate_drawdown_evidence(result, config=config)
+    drawdown_evidence = unwrap(calculate_drawdown_evidence(result, config=config))
     print(
         f"Drawdown section key: {drawdown_evidence.section_key}, "
         f"status: {drawdown_evidence.status}"
     )
 
-    risk_evidence = calculate_risk_evidence(daily_returns, config=config)
+    risk_evidence = unwrap(calculate_risk_evidence(daily_returns, config=config))
     print(
         f"Risk section key: {risk_evidence.section_key}, status: {risk_evidence.status}"
     )
 
-    ratio_evidence = calculate_ratio_evidence(result, daily_returns, config=config)
+    ratio_evidence = unwrap(
+        calculate_ratio_evidence(result, daily_returns, config=config)
+    )
     print(
         f"Ratio section key: {ratio_evidence.section_key}, "
         f"status: {ratio_evidence.status}"
     )
 
-    cost_evidence = calculate_cost_efficiency_evidence(result, config=config)
+    cost_evidence = unwrap(calculate_cost_efficiency_evidence(result, config=config))
     print(
         f"Cost/Efficiency section key: {cost_evidence.section_key}, "
         f"status: {cost_evidence.status}"
     )
 
-    dist_evidence = calculate_distribution_evidence(daily_returns, config=config)
+    dist_evidence = unwrap(
+        calculate_distribution_evidence(daily_returns, config=config)
+    )
     print(
         f"Distribution section key: {dist_evidence.section_key}, "
         f"status: {dist_evidence.status}"
     )
-    grouped = calculate_grouped_evidence(result, config=config)
+    grouped = unwrap(calculate_grouped_evidence(result, config=config))
     print(f"Grouped section count: {len(grouped)}")
-    statistical = run_statistical_validation(
-        tuple(float(index - 15) for index in range(30)),
-        config=config,
+    statistical = unwrap(
+        run_statistical_validation(
+            tuple(float(index - 15) for index in range(30)),
+            config=config,
+        )
     )
     print(f"Statistical section status: {statistical.status}")
     benchmark_result, benchmark_config = _configured_result(benchmark=True)
@@ -178,14 +187,18 @@ def example_metrics() -> None:
         {"timestamp": point["timestamp"], "value": 0.01}
         for point in benchmark_result.daily_equity_curve
     )
-    aligned = align_benchmark_series(
-        strategy_points,
-        benchmark_points["points"],
+    aligned = unwrap(
+        align_benchmark_series(
+            strategy_points,
+            benchmark_points["points"],
+        )
     )
     print(f"Aligned benchmark observations: {len(aligned[0])}")
-    benchmark_evidence = calculate_benchmark_evidence(
-        benchmark_result,
-        config=benchmark_config,
+    benchmark_evidence = unwrap(
+        calculate_benchmark_evidence(
+            benchmark_result,
+            config=benchmark_config,
+        )
     )
     print(f"Benchmark section status: {benchmark_evidence.status}")
 

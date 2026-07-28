@@ -22,6 +22,7 @@ from app.services.analytics import (
     truncate_series,
 )
 from app.utils import generate_id
+from tests.analytics.usage._support import unwrap
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -92,7 +93,9 @@ def example_dashboards() -> None:
         {"timestamp": NOW + timedelta(minutes=i), "value": float(i % 5)}
         for i in range(20)
     )
-    selected, metadata = truncate_series(points, max_points=6)
+    truncation_response = truncate_series(points, max_points=6)
+    selected = unwrap(truncation_response)
+    metadata = truncation_response.metadata.extensions["truncation"]
     print(
         f"Original points: {len(points)}, Truncated points: {len(selected)}, "
         f"Truncated flag: {metadata['truncated']}"
@@ -116,18 +119,20 @@ def example_dashboards() -> None:
         "quality_metadata": {},
         "source_metadata": {},
     }
-    report = build_performance_report(
-        source,
-        source_contract="simulation.result",
-        request_id=generate_id("req"),
-        correlation_id=generate_id("cor"),
-        created_at=NOW,
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=config,
+    report = unwrap(
+        build_performance_report(
+            source,
+            source_contract="simulation.result",
+            request_id=generate_id("req"),
+            correlation_id=generate_id("cor"),
+            created_at=NOW,
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=config,
+        )
     )
 
-    payload = build_dashboard_payload(report)
+    payload = unwrap(build_dashboard_payload(report))
     payload = DashboardPayload(**dict(payload.__dict__))
     print(f"Dashboard Payload schema: {payload.schema_id}")
     print(f"Non-binding: {payload.non_binding}")

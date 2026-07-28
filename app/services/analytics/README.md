@@ -5,7 +5,7 @@
 > **Status:** `Completed` — all active contracts, adapters, metric kernels, report
 > operations, allocation evidence, dashboard projection, package exports, and
 > non-excluded workflows satisfy the Section 7 validation gate.
-> **Last updated:** `2026-07-24`
+> **Last updated:** `2026-07-28`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -120,6 +120,27 @@ Package
         └── Public Class / Function / Method / Constant
 ```
 
+### ANL-001 response boundary
+
+The package root is the stable public port. Every qualifying operation in the
+28-operation migration inventory returns `StandardResponse[T]`; the existing
+feature implementation remains raw behind that boundary. Successful raw
+reports, evidence DTOs, series, hashes, strings, and JSON-safe mappings are
+stored directly in `data`. Truncation metadata is stored in
+`metadata.extensions["truncation"]`; results are never duplicated there.
+
+| Operation group | Public operations and response signature |
+|---|---|
+| Contracts and adapters | `validate_contract_version(...)`, `validate_metric_catalog(...)`, `build_quality_flag(...)`, `build_warning(...)`, `to_analytics_error_payload(...)`, `to_report_json_safe(...)`, `adapt_trading_result(...)`, and `build_closed_trade_equity_curve(...)` → `StandardResponse[T]` |
+| Metrics | `align_benchmark_series(...)`, `calculate_benchmark_evidence(...)`, `calculate_cost_efficiency_evidence(...)`, `calculate_distribution_evidence(...)`, `calculate_drawdown_evidence(...)`, `calculate_grouped_evidence(...)`, `calculate_ratio_evidence(...)`, `calculate_return_evidence(...)`, `calculate_risk_evidence(...)`, `calculate_trade_evidence(...)`, and `run_statistical_validation(...)` → `StandardResponse[T]` |
+| Reports | `build_performance_report(...)`, `build_portfolio_allocation_evidence(...)`, `build_portfolio_performance_report(...)`, `build_portfolio_rebalance_measurement(...)`, `compare_performance_reports(...)`, `compute_reproducibility_hashes(...)`, and `serialize_report(...)` → `StandardResponse[T]` |
+| Dashboards | `build_dashboard_payload(...)` and `truncate_series(...)` → `StandardResponse[T]` |
+
+The response envelope uses Utils-owned `status`, `message`, `data`, `error`,
+and `metadata` fields. Analytics errors use the approved
+`ANALYTICS_VALIDATION_FAILED` and `ANALYTICS_EXECUTION_FAILED` catalogue codes;
+public callers must inspect `status` and unwrap `data` explicitly.
+
 ### Package capability map
 
 ```mermaid
@@ -216,6 +237,7 @@ dashboard, and grouped-evidence functions remain focused feature APIs.
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `__init__.py` | Sole public import boundary for every documented direct Analytics contract, constant, catalog, validator, adapter, calculation, report, and dashboard operation. No private helper or implementation model is exported. | `ANALYTICS_SCHEMA_VERSION`, `ANNUALIZATION_POLICY`, `BREAKEVEN_EPSILON`, `CONTRACT_COMPATIBILITY_MATRIX`, `EVIDENCE_CATALOG`, `METRIC_DEFINITION_CATALOG`, `MIN_METRIC_SAMPLES`, `AnalyticsError`, `AnalyticsRunConfig`, `AnalyticsValidationError`, `AnalyticsWarning`, `ClosedTrade`, `DashboardPayload`, `Lineage`, `MetricEvidence`, `PerformanceReport`, `PortfolioAllocationEvidence`, `PortfolioPerformanceReport`, `PortfolioRebalanceMeasurementEvidence`, `PortfolioRebalanceMeasurementRequest`, `QualityFlag`, `ReproducibilityHashes`, `RiskFreeRateEvidence`, `SectionEvidence`, `StatisticalValidationConfig`, `TradingResult`, `adapt_trading_result`, `align_benchmark_series`, `build_closed_trade_equity_curve`, `build_dashboard_payload`, `build_performance_report`, `build_portfolio_allocation_evidence`, `build_portfolio_performance_report`, `build_portfolio_rebalance_measurement`, `build_quality_flag`, `build_warning`, `calculate_benchmark_evidence`, `calculate_cost_efficiency_evidence`, `calculate_distribution_evidence`, `calculate_drawdown_evidence`, `calculate_grouped_evidence`, `calculate_ratio_evidence`, `calculate_return_evidence`, `calculate_risk_evidence`, `calculate_trade_evidence`, `compare_performance_reports`, `compute_reproducibility_hashes`, `run_statistical_validation`, `serialize_report`, `to_analytics_error_payload`, `to_report_json_safe`, `truncate_series`, `validate_contract_version`, `validate_metric_catalog` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** explicit imports from registered feature ports only |
+| Completed | `contracts/responses.py` | Shared Analytics response boundary, approved error catalogue, identifier handling, and monotonic response metadata construction. | `ANALYTICS_ERROR_CATALOG`, `run_analytics_operation` | **Standard library:** `time`<br>**Required third-party:** None<br>**Local:** `app.utils → StandardResponse, response factories, metadata, logger` |
 | Completed | `README.md` | Define the final Analytics requirements, structure, implementation order, workflows, public symbols, tests, status, and exclusions. | None | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None |
 
 ### Module dependency diagram

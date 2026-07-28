@@ -35,12 +35,14 @@ def main() -> None:
     print("Input:", source["source_id"], source["schema_id"])
     # Stage 2: Validate at public adapter boundary.
     _stage(2)
-    result = adapt_trading_result(
-        source,
-        source_contract="simulation.result",
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=config,
+    result = examples.unwrap(
+        adapt_trading_result(
+            source,
+            source_contract="simulation.result",
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=config,
+        )
     )
     print("Validated:", result.source_contract_version)
     # Stage 3: Inspect preserved canonical mapping/lineage.
@@ -48,8 +50,10 @@ def main() -> None:
     print("Mapped trades:", len(result.trades), "lineage:", result.lineage.source_ids)
     # Stage 4: Derive both documented curves explicitly.
     _stage(4)
-    curve, daily = build_closed_trade_equity_curve(
-        result.trades, initial_balance=result.initial_balance, config=config
+    curve, daily = examples.unwrap(
+        build_closed_trade_equity_curve(
+            result.trades, initial_balance=result.initial_balance, config=config
+        )
     )
     print("Curves:", len(curve), len(daily), curve[0]["curve_basis"])
     # Stage 5 — OUTPUT BOUNDARY: Return canonical TradingResult.

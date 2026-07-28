@@ -35,6 +35,7 @@ from tests.analytics._support import (
     _measurement_request,
     _portfolio_simulation_result,
 )
+from tests.analytics.usage._support import unwrap
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 
@@ -137,71 +138,83 @@ def example_reports() -> None:
     }
 
     # 1. Build performance reports
-    report1 = build_performance_report(
-        source1,
-        source_contract="simulation.result",
-        request_id=generate_id("req"),
-        correlation_id=generate_id("cor"),
-        created_at=NOW,
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=config,
+    report1 = unwrap(
+        build_performance_report(
+            source1,
+            source_contract="simulation.result",
+            request_id=generate_id("req"),
+            correlation_id=generate_id("cor"),
+            created_at=NOW,
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=config,
+        )
     )
     report1 = PerformanceReport(**dict(report1.__dict__))
     print(f"Report 1 ID: {report1.report_id}, sections count: {len(report1.sections)}")
 
-    report2 = build_performance_report(
-        source2,
-        source_contract="simulation.result",
-        request_id=generate_id("req"),
-        correlation_id=generate_id("cor"),
-        created_at=NOW,
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=config,
+    report2 = unwrap(
+        build_performance_report(
+            source2,
+            source_contract="simulation.result",
+            request_id=generate_id("req"),
+            correlation_id=generate_id("cor"),
+            created_at=NOW,
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=config,
+        )
     )
     print(f"Report 2 ID: {report2.report_id}, sections count: {len(report2.sections)}")
 
     # 2. Compare reports
-    comparison = compare_performance_reports(report1, report2)
+    comparison = unwrap(compare_performance_reports(report1, report2))
     print(
         f"Report comparison section: {comparison.section_key}, "
         f"status: {comparison.status}"
     )
 
     # 3. Serialize report
-    serialized_json = serialize_report(report1, format_name="json", config=config)
+    serialized_json = unwrap(
+        serialize_report(report1, format_name="json", config=config)
+    )
     print(f"Serialized report JSON length: {len(serialized_json)} chars")
 
-    result = adapt_trading_result(
-        source1,
-        source_contract="simulation.result",
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=config,
+    result = unwrap(
+        adapt_trading_result(
+            source1,
+            source_contract="simulation.result",
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=config,
+        )
     )
-    hashes = compute_reproducibility_hashes(result, report1)
+    hashes = unwrap(compute_reproducibility_hashes(result, report1))
     print(f"Report reproducibility hash present: {hashes.report_hash is not None}")
-    portfolio = build_portfolio_performance_report(
-        (report1, report2),
-        base_currency="USD",
-        fx_evidence=None,
-        config=config,
+    portfolio = unwrap(
+        build_portfolio_performance_report(
+            (report1, report2),
+            base_currency="USD",
+            fx_evidence=None,
+            config=config,
+        )
     )
     portfolio = PortfolioPerformanceReport(**dict(portfolio.__dict__))
     print(f"Portfolio report ID: {portfolio.report_id}")
-    allocation = build_portfolio_allocation_evidence(
-        (report1, report2),
-        base_currency="USD",
-        fx_evidence=None,
-        config=config,
-        portfolio_simulation_result=_portfolio_simulation_result(),
+    allocation = unwrap(
+        build_portfolio_allocation_evidence(
+            (report1, report2),
+            base_currency="USD",
+            fx_evidence=None,
+            config=config,
+            portfolio_simulation_result=_portfolio_simulation_result(),
+        )
     )
     allocation = PortfolioAllocationEvidence(**dict(allocation.__dict__))
     print(f"Allocation evidence ID: {allocation.evidence_id}")
     request = _measurement_request()
     request = PortfolioRebalanceMeasurementRequest(**dict(request.__dict__))
-    measurement = build_portfolio_rebalance_measurement(request)
+    measurement = unwrap(build_portfolio_rebalance_measurement(request))
     measurement = PortfolioRebalanceMeasurementEvidence(**dict(measurement.__dict__))
     print(f"Rebalance measurement ID: {measurement.evidence_id}")
 

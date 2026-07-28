@@ -1,9 +1,7 @@
 """Integration evidence for Analytics portfolio composition."""
 
 # ruff: noqa: INP001
-import pytest
 from app.services.analytics import (
-    AnalyticsValidationError,
     build_portfolio_performance_report,
 )
 from app.utils import logger
@@ -15,7 +13,9 @@ def test_portfolio_report_fails_closed_without_fx() -> None:
     logger.debug("Testing Analytics portfolio FX workflow")
     usd, config = _report(account_currency="USD")
     eur, _ = _report(account_currency="EUR")
-    with pytest.raises(AnalyticsValidationError, match="FX"):
-        build_portfolio_performance_report(
-            (usd, eur), base_currency="USD", fx_evidence=None, config=config
-        )
+    response = build_portfolio_performance_report(
+        (usd, eur), base_currency="USD", fx_evidence=None, config=config
+    )
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "ANALYTICS_VALIDATION_FAILED"

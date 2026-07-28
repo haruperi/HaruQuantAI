@@ -19,6 +19,7 @@ from app.services.analytics import (
     adapt_trading_result,
     build_closed_trade_equity_curve,
 )
+from tests.analytics.usage._support import unwrap
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -83,8 +84,10 @@ def example_adapters() -> None:
     config = _config()
 
     # 1. Closed-trade equity curve building
-    curve, daily = build_closed_trade_equity_curve(
-        (trade,), initial_balance=Decimal(1000), config=config
+    curve, daily = unwrap(
+        build_closed_trade_equity_curve(
+            (trade,), initial_balance=Decimal(1000), config=config
+        )
     )
     print(f"Equity curve points: {len(curve)}, Basis: {curve[0]['curve_basis']}")
     print(f"Daily equity curve points: {len(daily)}")
@@ -105,12 +108,14 @@ def example_adapters() -> None:
         "quality_metadata": {},
         "source_metadata": {},
     }
-    result = adapt_trading_result(
-        source,
-        source_contract="simulation.result",
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=config,
+    result = unwrap(
+        adapt_trading_result(
+            source,
+            source_contract="simulation.result",
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=config,
+        )
     )
     reconstructed = TradingResult(**dict(result.__dict__))
     print(f"Adapted TradingResult contract_version: {result.contract_version}")

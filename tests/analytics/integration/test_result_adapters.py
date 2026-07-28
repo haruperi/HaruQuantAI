@@ -12,6 +12,7 @@ from app.services.analytics import (
     build_closed_trade_equity_curve,
 )
 from app.utils import logger
+from tests.analytics._support import unwrap
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -67,8 +68,10 @@ def _trade() -> ClosedTrade:
 def _results_build_equity_curve() -> None:
     """Build both documented closed-trade curves."""
     logger.debug("Running Analytics equity-curve usage")
-    curve, daily = build_closed_trade_equity_curve(
-        (_trade(),), initial_balance=Decimal(1000), config=_config()
+    curve, daily = unwrap(
+        build_closed_trade_equity_curve(
+            (_trade(),), initial_balance=Decimal(1000), config=_config()
+        )
     )
     assert curve[0]["curve_basis"] == "closed_trade"
     assert len(daily) == 1
@@ -93,12 +96,14 @@ def _results_adapt_trading_result() -> None:
         "quality_metadata": {},
         "source_metadata": {},
     }
-    result = adapt_trading_result(
-        source,
-        source_contract="simulation.result",
-        initial_balance=Decimal(1000),
-        account_currency="USD",
-        config=_config(),
+    result = unwrap(
+        adapt_trading_result(
+            source,
+            source_contract="simulation.result",
+            initial_balance=Decimal(1000),
+            account_currency="USD",
+            config=_config(),
+        )
     )
     assert result.schema_id == "analytics.trading_result.v1"
 
