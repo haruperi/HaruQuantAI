@@ -15,6 +15,14 @@ Broker credentials are now owned by the Brokers domain through a public settings
 
 - Fixed the Data composition root silently ignoring `settings.mt5.*` in `app/configs/env.json` because `_ProviderRuntimeSettings` extended `BaseSettings` instead of `AppSettings` and therefore read only the process environment; real-MT5 retrieval through the Data path now honors the central settings file.
 
+### Add governed experiment design and Simulation coordination
+
+The Agentic firm can now pre-register an experiment protocol, run it through the receiver that owns it, and bind a verdict to what that run actually returned.
+
+#### Added (1)
+
+- `FEAT-AGT-14` Experiment and Simulation Coordination: protocols are pre-registered and hashed before any run, so a falsification criterion rewritten afterwards produces a different digest; the receiver's request is submitted unchanged and its result verified to bind to it rather than reconciled, with the package importing neither Simulation contract; conclusions are keyed by the run identifier the receiver returned, never by one a model supplied; and holdout is claimed once per protocol, refused in-process before the receiver is reached and enforced durably by the experiment ledger's primary key.
+
 ### Begin Agentic Firm implementation
 
 The Agentic package now delivers its complete control-plane foundation — contracts, governance, runtime, orchestration, permissions, governed memory, and bounded deliberation — while every agent role and consequential capability remains unimplemented.

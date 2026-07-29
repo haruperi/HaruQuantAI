@@ -103,7 +103,16 @@
   approvals, and both take their evidence references from the packs actually
   supplied rather than from model output. Unresolved deliberation dissent forces a
   `contested` stance regardless of what a model declares, so agreement alone never
-  promotes a proposal. `FEAT-AGT-09`, `10`, and `14`–`22` remain `Missing`.
+  promotes a proposal. `FEAT-AGT-14` adds the first Agentic feature that both
+  persists and coordinates a receiver: a protocol is pre-registered and hashed
+  before any run, so a falsification criterion rewritten afterwards yields a
+  different digest and cannot be passed off as the one registered; the
+  receiver's request is submitted unchanged and its result checked for binding
+  rather than reconciled, with the package importing neither Simulation
+  contract so there is no site at which one could be authored; and holdout is
+  claimed once per protocol, enforced in-process before the receiver is called
+  and durably by the ledger's primary key. `FEAT-AGT-09`, `10`, and `15`–`22`
+  remain `Missing`.
   Google ADK 2.x is adopted behind a scoped `requests` override, documented in
   `pyproject.toml` with the condition for its removal. Its hybrid layout keeps ten shared control-plane features as focused root packages and places twelve role-bearing features under registered `agents/<department>/<agent_name>/` leaf packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, feature schemas, and only specification-required optional files. Specialized leadership, market-intelligence, technical, quantitative, strategy/trader, experimentation, engineering, portfolio/risk-advisory, and operations roles may dynamically collaborate, simulate, optimize, code, and submit typed proposals. Google ADK 2.x is the selected runtime behind provider-neutral HaruQuantAI contracts. Agentic has no broker credential, direct broker route, risk approval, kill-switch authority, or execution authority; consequential proposals traverse the normal deterministic pipeline.
 * `app/utils/` is a partial implementation baseline for shared v1 contracts,

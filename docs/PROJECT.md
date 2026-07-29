@@ -306,12 +306,14 @@ Domains are listed in dependency order, from lowest dependency to highest depend
   context and governed memory, `FEAT-AGT-07` bounded deliberation, `FEAT-AGT-08` the first registered
   leaf agent package, `FEAT-AGT-11` the first agent package with governed
   tool adapters, `FEAT-AGT-12` quantitative research grounded in the Analytics
-  metric catalog, and `FEAT-AGT-13` hypothesis and strategy-thesis development.
-  `FEAT-AGT-03` runtime is `Completed`: provider-neutral
+  metric catalog, `FEAT-AGT-13` hypothesis and strategy-thesis development, and
+  `FEAT-AGT-14` pre-registered experiment protocols with governed Simulation
+  coordination. `FEAT-AGT-03` runtime is `Completed`: provider-neutral
   model profiles, governed invocation, upgrade gating, and the Google ADK 2.x
   binding all exist behind the agent-graph port. The binding is structurally
-  verified; no live provider call has been made. `FEAT-AGT-09`, `10`, `14`–`22`
-  remain `Missing`, so eight agent roles, lifecycle, operations, and the operator
+  verified; no live provider call has been made, and no backtest has been
+  executed through the Simulation port. `FEAT-AGT-09`, `10`, `15`–`22`
+  remain `Missing`, so seven agent roles, lifecycle, operations, and the operator
   API are unavailable and no Agentic system workflow is complete. `FEAT-AGT-09`
   and `10` stay blocked on `FEAT-DATA-16` and `FEAT-RES-13`.
 * **Documentation**: `app/agentic/README.md`
