@@ -9,7 +9,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 
-from app.services.brokers import BrokerCapabilityId, BrokerErrorCode, BrokerId
+from app.services.brokers.contracts import BrokerCapabilityId, BrokerErrorCode, BrokerId
 from tests.brokers.usage._support import (
     create_real_adapter,
     require_error,

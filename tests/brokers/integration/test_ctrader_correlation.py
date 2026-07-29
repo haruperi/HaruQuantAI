@@ -2,11 +2,11 @@
 
 import asyncio
 
-from app.services.brokers import (
+from app.services.brokers import create_broker_adapter
+from app.services.brokers.contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
-    create_broker_adapter,
 )
 
 

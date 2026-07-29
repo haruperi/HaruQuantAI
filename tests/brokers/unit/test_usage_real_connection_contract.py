@@ -5,7 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-from app.services.brokers import BrokerEnvironment, BrokerId
+from app.services.brokers.contracts import BrokerEnvironment, BrokerId
 from pydantic import SecretStr
 
 from tests.brokers.usage import _support

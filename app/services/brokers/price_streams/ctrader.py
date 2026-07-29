@@ -12,7 +12,9 @@ from app.services.brokers.contracts import (
     BrokerQuote,
     BrokerSubscription,
     BrokerSubscriptionInfo,
+    StandardResponse,
 )
+
 from app.services.brokers.ctrader_session.mapping import (
     _field,
     _map_quote,

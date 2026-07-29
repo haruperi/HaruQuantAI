@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,

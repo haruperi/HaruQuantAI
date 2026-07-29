@@ -1,6 +1,6 @@
 """Redaction and secret-handling tests (NFR-BRK-007)."""
 
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerError,

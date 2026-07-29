@@ -8,7 +8,8 @@ from decimal import Decimal
 from typing import cast
 
 import pytest
-from app.services.brokers import (
+from app.services.brokers.adapter_runtime.subscription import _BrokerSubscription
+from app.services.brokers.contracts import (
     AccountProvider,
     BrokerAdapter,
     BrokerCapability,
@@ -17,6 +18,7 @@ from app.services.brokers import (
     BrokerConnectionEvent,
     BrokerConnectionState,
     BrokerEnvironment,
+    BrokerError,
     BrokerErrorCode,
     BrokerId,
     BrokerOrderRequest,
@@ -27,9 +29,8 @@ from app.services.brokers import (
     MarketDataProvider,
     TradeExecutionProvider,
 )
-from app.services.brokers.adapter_runtime.subscription import _BrokerSubscription
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
-from app.utils import StandardResponse
+from app.utils.responses.models import StandardResponse
 
 from tests.brokers.response_factory import broker_response
 
@@ -492,7 +493,6 @@ def test_adapter_connect_failure_returns_canonical_error() -> None:
 
     class _FailingAdapter(_ContextAdapter):
         async def connect(self) -> StandardResponse[None]:
-            from app.services.brokers import BrokerError
 
             return broker_response(
                 BrokerCapabilityId.CONNECT,

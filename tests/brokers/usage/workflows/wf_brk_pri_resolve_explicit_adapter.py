@@ -8,11 +8,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.brokers import (
-    BrokerErrorCode,
-    BrokerId,
     create_broker_adapter,
     get_registered_brokers,
 )
+from app.services.brokers.contracts import BrokerErrorCode, BrokerId
 from tests.brokers.usage._support import config, require_error, require_success
 
 WORKFLOW_ID = "WF-BRK-PRI"

@@ -3,7 +3,11 @@
 import asyncio
 
 import pytest
-from app.services.brokers import BrokerConnectionConfig, BrokerEnvironment, BrokerId
+from app.services.brokers.contracts import (
+    BrokerConnectionConfig,
+    BrokerEnvironment,
+    BrokerId,
+)
 from app.services.brokers.ctrader_session.transport import _CTraderTransport
 
 

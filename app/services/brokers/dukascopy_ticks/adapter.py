@@ -14,6 +14,7 @@ from app.services.brokers.contracts import (
     BrokerPlatformInfo,
     BrokerSymbolInfo,
     BrokerTick,
+    StandardResponse,
 )
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
 from app.services.brokers.dukascopy_ticks.candle_transport import (

@@ -3,7 +3,7 @@
 import asyncio
 import logging
 
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,

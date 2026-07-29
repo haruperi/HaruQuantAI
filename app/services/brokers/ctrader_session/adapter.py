@@ -21,6 +21,7 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerPlatformInfo,
     BrokerQuote,
+    StandardResponse,
 )
 from app.services.brokers.contracts.protocols import (
     _UnsupportedAdapterBase,

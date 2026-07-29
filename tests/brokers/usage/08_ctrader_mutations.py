@@ -6,13 +6,15 @@ from decimal import Decimal
 import _support  # noqa: F401
 from _support import real_session, require_error, require_success
 from app.services.brokers import (
+    get_broker_capability_catalogue,
+    get_registered_brokers,
+)
+from app.services.brokers.contracts import (
     BrokerAdapter,
     BrokerErrorCode,
     BrokerId,
     BrokerMarginRequest,
     BrokerProfitRequest,
-    get_broker_capability_catalogue,
-    get_registered_brokers,
 )
 
 

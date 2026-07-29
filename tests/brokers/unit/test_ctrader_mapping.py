@@ -3,7 +3,7 @@
 from datetime import UTC, datetime
 from decimal import Decimal
 
-from app.services.brokers import BrokerErrorCode
+from app.services.brokers.contracts import BrokerErrorCode
 from app.services.brokers.ctrader_session.mapping import (
     _map_error_code,
     _map_order,

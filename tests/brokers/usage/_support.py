@@ -11,14 +11,16 @@ from typing import TypeVar
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.brokers import (
+    create_broker_adapter,
+)
+from app.services.brokers.contracts import (
     BrokerAdapter,
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
-    create_broker_adapter,
 )
-from app.utils import StandardResponse
+from app.utils.responses.models import StandardResponse
 from pydantic import SecretStr
 
 from tests.brokers.provider_settings import ProviderTestSettings

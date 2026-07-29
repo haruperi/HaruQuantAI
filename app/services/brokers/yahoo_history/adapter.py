@@ -19,6 +19,7 @@ from app.services.brokers.contracts import (
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
 from app.services.brokers.yahoo_history.mapping import _map_history, _provider_interval
 from app.services.brokers.yahoo_history.transport import _YahooTransport
+from app.utils.responses.models import StandardResponse
 
 
 class YahooBrokerAdapter(_UnsupportedAdapterBase):

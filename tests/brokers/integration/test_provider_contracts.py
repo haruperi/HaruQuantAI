@@ -1,12 +1,14 @@
 """Every registered provider adapter satisfies the canonical BrokerAdapter contract."""
 
 from app.services.brokers import (
+    create_broker_adapter,
+    get_registered_brokers,
+)
+from app.services.brokers.contracts import (
     BrokerAdapter,
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
-    create_broker_adapter,
-    get_registered_brokers,
 )
 from pydantic import SecretStr
 

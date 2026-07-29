@@ -9,7 +9,7 @@ from _support import (
     require_error,
     require_success,
 )
-from app.services.brokers import BrokerAdapter, BrokerErrorCode, BrokerId
+from app.services.brokers.contracts import BrokerAdapter, BrokerErrorCode, BrokerId
 
 
 def _header(title: str) -> None:

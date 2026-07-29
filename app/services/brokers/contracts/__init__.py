@@ -54,6 +54,7 @@ from app.services.brokers.contracts.protocols import (
     MarketDataProvider,
     TradeExecutionProvider,
 )
+from app.utils.responses.models import StandardResponse
 
 __all__: list[str] = [
     "BROKER_ERROR_CATALOG",
@@ -103,5 +104,6 @@ __all__: list[str] = [
     "BrokerTradingSession",
     "CalculationProvider",
     "MarketDataProvider",
+    "StandardResponse",
     "TradeExecutionProvider",
 ]

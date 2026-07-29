@@ -4,14 +4,14 @@ import asyncio
 from decimal import Decimal
 
 import pytest
-from app.services.brokers import (
+from app.services.brokers import create_broker_adapter
+from app.services.brokers.contracts import (
     BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
     BrokerOrderRequest,
-    create_broker_adapter,
 )
 from pydantic import SecretStr
 

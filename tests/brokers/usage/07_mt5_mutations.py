@@ -10,7 +10,7 @@ from _support import (
     require_error,
     require_success,
 )
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     BrokerAdapter,
     BrokerEnvironment,
     BrokerErrorCode,

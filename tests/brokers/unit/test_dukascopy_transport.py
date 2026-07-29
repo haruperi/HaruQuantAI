@@ -6,7 +6,11 @@ from datetime import UTC, datetime
 from typing import Self
 
 import pytest
-from app.services.brokers import BrokerConnectionConfig, BrokerEnvironment, BrokerId
+from app.services.brokers.contracts import (
+    BrokerConnectionConfig,
+    BrokerEnvironment,
+    BrokerId,
+)
 from app.services.brokers.dukascopy_ticks.transport import _DukascopyTransport
 
 

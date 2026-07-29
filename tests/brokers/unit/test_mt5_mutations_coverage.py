@@ -22,7 +22,7 @@ from app.services.brokers.mt5_account.adapter import (
 from app.services.brokers.mt5_mutations.operations import (
     _provider_ticket,
 )
-from app.utils import StandardResponse
+from app.utils.responses.models import StandardResponse
 
 from tests.brokers.response_factory import broker_response
 

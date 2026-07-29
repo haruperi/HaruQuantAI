@@ -1,6 +1,6 @@
 """Read (Data) and write (Trading) capability traits stay structurally separate."""
 
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     AccountProvider,
     CalculationProvider,
     MarketDataProvider,

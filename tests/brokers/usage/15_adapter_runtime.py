@@ -4,7 +4,7 @@ import asyncio
 
 import _support  # noqa: F401
 from _support import real_session, require_success
-from app.services.brokers import BrokerId
+from app.services.brokers.contracts import BrokerId
 
 
 async def _run() -> None:

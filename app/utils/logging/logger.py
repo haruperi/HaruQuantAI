@@ -327,18 +327,18 @@ class _RouteFilter(logging.Filter):
         return record.levelno >= logging.ERROR
 
 
-def get_logger(name: str) -> logging.Logger:
+def get_logger(name: str) -> BoundLogger:
     """Return a stable child logger without configuring handlers.
 
     Args:
         name: Logger name or existing ``haruquant`` child name.
 
     Returns:
-        Stable named logger.
+        Stable named logger facade.
     """
     if name == _LOGGER_ROOT or name.startswith(f"{_LOGGER_ROOT}."):
-        return logging.getLogger(name)
-    return logging.getLogger(f"{_LOGGER_ROOT}.{name}")
+        return BoundLogger(name)
+    return BoundLogger(f"{_LOGGER_ROOT}.{name}")
 
 
 class BoundLogger:
@@ -399,7 +399,7 @@ class BoundLogger:
                 "_source_line": caller.f_lineno,
             }
         )
-        get_logger(self._name).log(
+        logging.getLogger(self._name).log(
             level,
             message,
             *args,

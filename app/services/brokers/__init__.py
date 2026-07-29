@@ -1,68 +1,66 @@
-"""Canonical Brokers domain API."""
+"""Approved Brokers domain package-root public API.
 
-import importlib
-from typing import TYPE_CHECKING
+Every cross-domain consumer must import these standalone functions from
+``app.services.brokers``. The public API surface consists exclusively of
+standalone functions. Classes, contracts, DTOs, enums, and protocols remain
+internal implementation details.
+"""
 
-if TYPE_CHECKING:
-    from app.services.brokers.binance_session import BinanceBrokerAdapter
-    from app.services.brokers.ctrader_session import CTraderBrokerAdapter
-    from app.services.brokers.dukascopy_ticks import DukascopyBrokerAdapter
-    from app.services.brokers.mt5_account import MT5BrokerAdapter
-    from app.services.brokers.yahoo_history import YahooBrokerAdapter
-
-from app.services.brokers.contracts.enums import (
-    BrokerCapabilityId,
-    BrokerConnectionState,
-    BrokerEnvironment,
-    BrokerErrorCode,
-    BrokerId,
-)
-from app.services.brokers.contracts.error_catalog import BROKER_ERROR_CATALOG
-from app.services.brokers.contracts.models import (
-    BrokerAccountInfo,
-    BrokerAccountTransaction,
-    BrokerAssetInfo,
-    BrokerBalance,
-    BrokerBar,
-    BrokerCapability,
-    BrokerConnectionConfig,
-    BrokerConnectionEvent,
-    BrokerConnectionStatus,
-    BrokerDeal,
-    BrokerError,
-    BrokerFeatureFlags,
-    BrokerFeeEstimate,
-    BrokerMarginRequest,
-    BrokerMarketStatus,
-    BrokerOrder,
-    BrokerOrderBook,
-    BrokerOrderCheck,
-    BrokerOrderFilter,
-    BrokerOrderModificationRequest,
-    BrokerOrderRequest,
-    BrokerOrderResult,
-    BrokerPage,
-    BrokerPermissions,
-    BrokerPlatformInfo,
-    BrokerPosition,
-    BrokerPositionCloseRequest,
-    BrokerPositionFilter,
-    BrokerPositionModificationRequest,
-    BrokerProfitRequest,
-    BrokerQuote,
-    BrokerServerTime,
-    BrokerSubscriptionInfo,
-    BrokerSymbolInfo,
-    BrokerTick,
-    BrokerTradingSession,
-)
-from app.services.brokers.contracts.protocols import (
-    AccountProvider,
-    BrokerAdapter,
-    BrokerSubscription,
-    CalculationProvider,
-    MarketDataProvider,
-    TradeExecutionProvider,
+from app.services.brokers.contracts.error_catalog import get_broker_error_catalog
+from app.services.brokers.operations import (
+    build_broker_connection_config,
+    build_broker_margin_request,
+    build_broker_order_filter,
+    build_broker_order_modification_request,
+    build_broker_order_request,
+    build_broker_position_close_request,
+    build_broker_position_filter,
+    build_broker_position_modification_request,
+    build_broker_profit_request,
+    calculate_broker_margin,
+    calculate_broker_profit,
+    cancel_broker_order,
+    check_broker_order,
+    close_broker_position,
+    connect_broker,
+    disconnect_broker,
+    get_broker_account_info,
+    get_broker_balances,
+    get_broker_connection_status,
+    get_broker_deal,
+    get_broker_feature_flags,
+    get_broker_historical_bars,
+    get_broker_last_error,
+    get_broker_market_status,
+    get_broker_order,
+    get_broker_order_book,
+    get_broker_orders,
+    get_broker_permissions,
+    get_broker_platform_info,
+    get_broker_position,
+    get_broker_positions,
+    get_broker_quote,
+    get_broker_spread,
+    get_broker_symbol_info,
+    get_broker_symbols,
+    get_broker_ticks,
+    get_broker_trading_sessions,
+    is_broker_connected,
+    list_broker_account_transactions,
+    list_broker_deal_history,
+    list_broker_order_history,
+    list_broker_subscriptions,
+    modify_broker_order,
+    modify_broker_position,
+    ping_broker,
+    place_broker_order,
+    reconnect_broker,
+    select_broker_symbol,
+    subscribe_broker_bars,
+    subscribe_broker_order_book,
+    subscribe_broker_quotes,
+    supports_broker_capability,
+    unsubscribe_broker,
 )
 from app.services.brokers.registry.catalogue import (
     get_broker_capability_catalogue,
@@ -71,91 +69,67 @@ from app.services.brokers.registry.factory import (
     create_broker_adapter,
     get_registered_brokers,
 )
-
-_LAZY_ADAPTERS = {
-    "MT5BrokerAdapter": "app.services.brokers.mt5_account",
-    "CTraderBrokerAdapter": "app.services.brokers.ctrader_session",
-    "BinanceBrokerAdapter": "app.services.brokers.binance_session",
-    "DukascopyBrokerAdapter": "app.services.brokers.dukascopy_ticks",
-    "YahooBrokerAdapter": "app.services.brokers.yahoo_history",
-}
-
-__all__ = (
-    "BROKER_ERROR_CATALOG",
-    "AccountProvider",
-    "BinanceBrokerAdapter",
-    "BrokerAccountInfo",
-    "BrokerAccountTransaction",
-    "BrokerAdapter",
-    "BrokerAssetInfo",
-    "BrokerBalance",
-    "BrokerBar",
-    "BrokerCapability",
-    "BrokerCapabilityId",
-    "BrokerConnectionConfig",
-    "BrokerConnectionEvent",
-    "BrokerConnectionState",
-    "BrokerConnectionStatus",
-    "BrokerDeal",
-    "BrokerEnvironment",
-    "BrokerError",
-    "BrokerErrorCode",
-    "BrokerFeatureFlags",
-    "BrokerFeeEstimate",
-    "BrokerId",
-    "BrokerMarginRequest",
-    "BrokerMarketStatus",
-    "BrokerOrder",
-    "BrokerOrderBook",
-    "BrokerOrderCheck",
-    "BrokerOrderFilter",
-    "BrokerOrderModificationRequest",
-    "BrokerOrderRequest",
-    "BrokerOrderResult",
-    "BrokerPage",
-    "BrokerPermissions",
-    "BrokerPlatformInfo",
-    "BrokerPosition",
-    "BrokerPositionCloseRequest",
-    "BrokerPositionFilter",
-    "BrokerPositionModificationRequest",
-    "BrokerProfitRequest",
-    "BrokerQuote",
-    "BrokerServerTime",
-    "BrokerSubscription",
-    "BrokerSubscriptionInfo",
-    "BrokerSymbolInfo",
-    "BrokerTick",
-    "BrokerTradingSession",
-    "CTraderBrokerAdapter",
-    "CalculationProvider",
-    "DukascopyBrokerAdapter",
-    "MT5BrokerAdapter",
-    "MarketDataProvider",
-    "TradeExecutionProvider",
-    "YahooBrokerAdapter",
-    "create_broker_adapter",
-    "get_broker_capability_catalogue",
-    "get_registered_brokers",
+from app.services.brokers.testing import (
+    create_fake_broker_adapter,
 )
 
-
-def __getattr__(name: str) -> object:
-    """Resolve one approved adapter type without importing SDKs eagerly.
-
-    Args:
-            name: Requested package attribute.
-
-    Returns:
-            Approved concrete adapter class.
-
-    Raises:
-            AttributeError: If `
-    ame`` is not an approved lazy export.
-    """
-    module_name = _LAZY_ADAPTERS.get(name)
-    if module_name is None:
-        raise AttributeError(name)
-    value = getattr(importlib.import_module(module_name), name)
-    globals()[name] = value
-    return value
+__all__ = (
+    "build_broker_connection_config",
+    "build_broker_margin_request",
+    "build_broker_order_filter",
+    "build_broker_order_modification_request",
+    "build_broker_order_request",
+    "build_broker_position_close_request",
+    "build_broker_position_filter",
+    "build_broker_position_modification_request",
+    "build_broker_profit_request",
+    "calculate_broker_margin",
+    "calculate_broker_profit",
+    "cancel_broker_order",
+    "check_broker_order",
+    "close_broker_position",
+    "connect_broker",
+    "create_broker_adapter",
+    "create_fake_broker_adapter",
+    "disconnect_broker",
+    "get_broker_account_info",
+    "get_broker_balances",
+    "get_broker_capability_catalogue",
+    "get_broker_connection_status",
+    "get_broker_deal",
+    "get_broker_error_catalog",
+    "get_broker_feature_flags",
+    "get_broker_historical_bars",
+    "get_broker_last_error",
+    "get_broker_market_status",
+    "get_broker_order",
+    "get_broker_order_book",
+    "get_broker_orders",
+    "get_broker_permissions",
+    "get_broker_platform_info",
+    "get_broker_position",
+    "get_broker_positions",
+    "get_broker_quote",
+    "get_broker_spread",
+    "get_broker_symbol_info",
+    "get_broker_symbols",
+    "get_broker_ticks",
+    "get_broker_trading_sessions",
+    "get_registered_brokers",
+    "is_broker_connected",
+    "list_broker_account_transactions",
+    "list_broker_deal_history",
+    "list_broker_order_history",
+    "list_broker_subscriptions",
+    "modify_broker_order",
+    "modify_broker_position",
+    "ping_broker",
+    "place_broker_order",
+    "reconnect_broker",
+    "select_broker_symbol",
+    "subscribe_broker_bars",
+    "subscribe_broker_order_book",
+    "subscribe_broker_quotes",
+    "supports_broker_capability",
+    "unsubscribe_broker",
+)

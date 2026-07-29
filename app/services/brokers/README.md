@@ -261,7 +261,8 @@ Each registered feature owns exactly one production folder and exactly one numbe
 
 ```text
 brokers/
-├── __init__.py                         # Canonical domain exports only
+├── __init__.py                         # Function-Only Public Surface (58 standalone functions in __all__)
+
 ├── README.md
 ├── contracts/                          # Canonical provider-neutral boundary
 │   ├── __init__.py

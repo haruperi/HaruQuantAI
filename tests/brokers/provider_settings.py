@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from app.utils import AppSettings
+from app.utils.settings.models import AppSettings
 from pydantic import SecretStr
 
 

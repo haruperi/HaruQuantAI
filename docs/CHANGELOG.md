@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+### Refactor Brokers domain to Function-Only Public Surface
+
+The Brokers domain API was refactored to enforce Package-Root Export Gate, Domain-Root Imports Only, and Function-Only Public API Surface standards.
+
+#### Changed (3)
+
+- Refactored `app/services/brokers/__init__.py` to expose 58 standalone functions in `__all__`, encapsulating all internal classes, DTOs, enums, protocols, and raw dict constants within `app.services.brokers.contracts`.
+- Updated all unit, integration, usage evidence, and workflow tests across `tests/brokers/` to import DTOs and contracts strictly from `app.services.brokers.contracts` and domain operations from `app.services.brokers`.
+- Updated `app/services/brokers/README.md` to document the Package-Root Export Gate and Function-Only Public Surface architecture.
+
+
+
 ### Define the complete Agentic Firm end state
 
 The fourteenth domain is specified as a full multi-agent research, engineering, advisory, and proposal firm while deterministic domains retain all consequential authority.

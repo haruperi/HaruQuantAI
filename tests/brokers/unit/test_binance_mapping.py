@@ -1,11 +1,11 @@
 """Binance mapping tests."""
 
-from app.services.brokers import BrokerErrorCode
 from app.services.brokers.binance_session.mapping import (
     _map_error_code,
     _map_kline,
     _provider_interval,
 )
+from app.services.brokers.contracts import BrokerErrorCode
 
 
 def test_binance_mapping_preserves_product_units() -> None:

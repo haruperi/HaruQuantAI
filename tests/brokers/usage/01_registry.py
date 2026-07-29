@@ -5,6 +5,11 @@ from decimal import Decimal
 import _support  # noqa: F401
 from _support import config
 from app.services.brokers import (
+    create_broker_adapter,
+    get_broker_capability_catalogue,
+    get_registered_brokers,
+)
+from app.services.brokers.contracts import (
     AccountProvider,
     BrokerFeeEstimate,
     BrokerMarginRequest,
@@ -12,9 +17,6 @@ from app.services.brokers import (
     CalculationProvider,
     MarketDataProvider,
     TradeExecutionProvider,
-    create_broker_adapter,
-    get_broker_capability_catalogue,
-    get_registered_brokers,
 )
 
 

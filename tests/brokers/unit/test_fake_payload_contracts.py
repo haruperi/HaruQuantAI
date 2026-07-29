@@ -1,7 +1,7 @@
 """Validate operation-specific FakeBrokerAdapter success payloads."""
 
 import pytest
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerEnvironment,

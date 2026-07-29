@@ -308,4 +308,10 @@ BROKER_ERROR_CATALOG = MappingProxyType(
     {definition.code: definition for definition in _ERROR_DEFINITIONS}
 )
 
-__all__ = ["BROKER_ERROR_CATALOG"]
+
+def get_broker_error_catalog() -> MappingProxyType[str, ErrorDefinition]:
+    """Return the authoritative immutable Brokers error catalogue."""
+    return BROKER_ERROR_CATALOG
+
+
+__all__ = ["BROKER_ERROR_CATALOG", "get_broker_error_catalog"]

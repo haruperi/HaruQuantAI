@@ -1,6 +1,7 @@
 """Broker import and export boundary tests."""
 
 import importlib
+import inspect
 import sys
 
 
@@ -10,6 +11,17 @@ def test_contract_exports_are_exact() -> None:
     assert len(contracts.__all__) == 48
 
 
+def test_root_exports_are_function_only() -> None:
+    """Every symbol re-exported from app.services.brokers is a standalone function."""
+    brokers = importlib.import_module("app.services.brokers")
+    assert len(brokers.__all__) > 0
+    for symbol_name in brokers.__all__:
+        attr = getattr(brokers, symbol_name)
+        assert inspect.isfunction(attr), (
+            f"Exported symbol {symbol_name!r} must be a function, but got {type(attr)}"
+        )
+
+
 def test_root_exports_and_lazy_imports_are_exact() -> None:
     """Ordinary root import leaves every provider SDK unloaded."""
     modules_to_check = ["MetaTrader5", "binance", "yfinance"]
@@ -17,8 +29,7 @@ def test_root_exports_and_lazy_imports_are_exact() -> None:
         name: sys.modules.pop(name) for name in modules_to_check if name in sys.modules
     }
     try:
-        brokers = importlib.import_module("app.services.brokers")
-        assert "FakeBrokerAdapter" not in brokers.__all__
+        importlib.import_module("app.services.brokers")
         assert "MetaTrader5" not in sys.modules
         assert "binance" not in sys.modules
         assert "yfinance" not in sys.modules
@@ -33,9 +44,9 @@ def test_runtime_package_is_private() -> None:
 
 
 def test_testing_export_is_exact_and_unregistered() -> None:
-    """The fake exists only in the explicit testing utility package."""
+    """The fake testing utility package exports only approved symbols."""
     testing = importlib.import_module("app.services.brokers.testing")
-    assert testing.__all__ == ["FakeBrokerAdapter"]
+    assert set(testing.__all__) == {"FakeBrokerAdapter", "create_fake_broker_adapter"}
 
 
 def test_mt5_export_is_exact() -> None:

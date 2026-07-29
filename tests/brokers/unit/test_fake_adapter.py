@@ -4,7 +4,7 @@ import asyncio
 from datetime import UTC, datetime
 from decimal import Decimal
 
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     BrokerAdapter,
     BrokerCapability,
     BrokerCapabilityId,

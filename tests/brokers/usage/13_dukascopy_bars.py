@@ -5,7 +5,7 @@ from datetime import UTC, datetime, timedelta
 
 import _support  # noqa: F401
 from _support import real_session, require_success
-from app.services.brokers import BrokerAdapter, BrokerId
+from app.services.brokers.contracts import BrokerAdapter, BrokerId
 
 
 def _header(title: str) -> None:

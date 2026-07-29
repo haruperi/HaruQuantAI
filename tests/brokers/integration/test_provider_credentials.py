@@ -5,11 +5,11 @@ import sys
 from collections.abc import Iterator
 
 import pytest
-from app.services.brokers import (
+from app.services.brokers import create_broker_adapter
+from app.services.brokers.contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
-    create_broker_adapter,
 )
 
 from tests.brokers.provider_settings import ProviderTestSettings

@@ -4,7 +4,8 @@ import asyncio
 import contextlib
 from datetime import UTC, datetime
 
-from app.services.brokers import (
+from app.services.brokers.adapter_runtime.subscription import _BrokerSubscription
+from app.services.brokers.contracts import (
     BrokerCapabilityId,
     BrokerEnvironment,
     BrokerError,
@@ -12,7 +13,6 @@ from app.services.brokers import (
     BrokerId,
     BrokerSubscriptionInfo,
 )
-from app.services.brokers.adapter_runtime.subscription import _BrokerSubscription
 
 
 def test_subscription_overflow_is_terminal_and_requires_resync() -> None:

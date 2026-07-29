@@ -7,7 +7,7 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,

@@ -8,10 +8,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.brokers import (
-    BrokerId,
     get_broker_capability_catalogue,
     get_registered_brokers,
 )
+from app.services.brokers.contracts import BrokerId
 
 WORKFLOW_ID = "WF-BRK-010"
 STAGES = (

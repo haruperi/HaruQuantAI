@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 import pytest
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
@@ -664,7 +664,7 @@ def test_adapter_ping_unsupported_if_terminal_none() -> None:
 
     transport = _NoTerminalTransport()
     adapter = MT5BrokerAdapter(_config(), transport=transport)
-    from app.services.brokers import BrokerConnectionState
+    from app.services.brokers.contracts import BrokerConnectionState
 
     async def exercise() -> None:
         await adapter.connect()

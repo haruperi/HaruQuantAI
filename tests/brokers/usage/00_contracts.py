@@ -5,6 +5,9 @@ from decimal import Decimal
 
 import _support  # noqa: F401
 from app.services.brokers import (
+    get_registered_brokers,
+)
+from app.services.brokers.contracts import (
     BrokerAccountInfo,
     BrokerAccountTransaction,
     BrokerAssetInfo,
@@ -41,7 +44,6 @@ from app.services.brokers import (
     BrokerSymbolInfo,
     BrokerTick,
     BrokerTradingSession,
-    get_registered_brokers,
 )
 
 _NOW = datetime(2026, 1, 1, tzinfo=UTC)

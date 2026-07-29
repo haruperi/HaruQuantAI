@@ -22,7 +22,7 @@ from app.services.brokers.contracts.protocols import _RequestValidationError
 from app.services.brokers.ctrader_session.adapter import (
     CTraderBrokerAdapter as _CTraderMutationsMixin,
 )
-from app.utils import StandardResponse
+from app.utils.responses.models import StandardResponse
 
 from tests.brokers.response_factory import broker_response
 

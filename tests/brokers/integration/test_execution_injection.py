@@ -1,12 +1,12 @@
 """WF-BRK-009: inject a capability-scoped adapter into execution."""
 
-from app.services.brokers import (
+from app.services.brokers import create_broker_adapter
+from app.services.brokers.contracts import (
     BrokerAdapter,
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
     TradeExecutionProvider,
-    create_broker_adapter,
 )
 
 

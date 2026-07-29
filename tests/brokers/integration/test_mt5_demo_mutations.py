@@ -6,18 +6,22 @@ import asyncio
 from decimal import ROUND_DOWN, Decimal
 
 import pytest
-from app.services.brokers import (
+from app.services.brokers import create_broker_adapter
+from app.services.brokers.contracts import (
     BrokerAdapter,
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
     BrokerOrderRequest,
     BrokerPositionCloseRequest,
-    create_broker_adapter,
 )
-from app.utils import generate_id, load_settings, logger
+from app.utils.identity import generate_id
+from app.utils.logging import get_logger
+from app.utils.settings import load_settings
 
 from tests.brokers.provider_settings import ProviderTestSettings
+
+logger = get_logger("tests.brokers.integration.test_mt5_demo_mutations")
 
 _SYMBOL = "EURUSD"
 _STATE_LIMIT = 1_000

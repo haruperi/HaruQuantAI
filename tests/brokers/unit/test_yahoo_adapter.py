@@ -4,7 +4,7 @@ import asyncio
 from datetime import UTC, datetime
 
 import pytest
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,

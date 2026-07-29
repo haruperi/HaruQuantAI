@@ -1,7 +1,6 @@
-type StandardResponse[T] = (
-    Any  # mypy: disable-error-code="attr-defined,no-any-return,has-type"
-)
 """MT5 provider-native calculation operations."""
+
+from __future__ import annotations
 
 from decimal import Decimal
 
@@ -10,6 +9,7 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerMarginRequest,
     BrokerProfitRequest,
+    StandardResponse,
 )
 from app.services.brokers.contracts.protocols import (
     _RequestValidationError,

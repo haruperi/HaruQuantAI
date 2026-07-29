@@ -1,12 +1,12 @@
 """Unsupported operation behavior tests."""
 
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     BrokerCapabilityId,
     BrokerEnvironment,
     BrokerId,
 )
 from app.services.brokers.contracts.unsupported import _unsupported_result
-from app.utils import StandardResponse
+from app.utils.responses.models import StandardResponse
 
 REQUEST_ID = "req-b4b8aa60-ba17-4561-884b-138c6074c5fb"
 

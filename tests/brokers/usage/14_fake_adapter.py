@@ -7,13 +7,16 @@ from decimal import Decimal
 import _support  # noqa: F401
 from _support import config, require_error, require_success
 from app.services.brokers import (
+    create_broker_adapter,
+    create_fake_broker_adapter,
+)
+from app.services.brokers.contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerError,
     BrokerErrorCode,
     BrokerId,
     BrokerQuote,
-    create_broker_adapter,
 )
 from app.services.brokers.testing import FakeBrokerAdapter
 
@@ -94,12 +97,13 @@ async def fr_brokers_135(adapter: FakeBrokerAdapter) -> None:
     _header("FR-BRK-135: Preserve the package-root API boundary export.")
     print("Result root export verified", callable(create_broker_adapter))
     assert callable(create_broker_adapter)
+    assert callable(create_fake_broker_adapter)
 
 
 async def _run() -> None:
     """Execute the feature whose explicit purpose is deterministic fake behavior."""
     quote = _quote()
-    adapter = FakeBrokerAdapter(
+    adapter = create_fake_broker_adapter(
         config(BrokerId.YAHOO),
         _capabilities(),
         fixtures={BrokerCapabilityId.GET_QUOTE: quote},

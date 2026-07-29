@@ -5,7 +5,11 @@ import sys
 import types
 
 import pytest
-from app.services.brokers import BrokerConnectionConfig, BrokerEnvironment, BrokerId
+from app.services.brokers.contracts import (
+    BrokerConnectionConfig,
+    BrokerEnvironment,
+    BrokerId,
+)
 from app.services.brokers.yahoo_history.transport import _YahooTransport
 
 

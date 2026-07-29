@@ -25,6 +25,7 @@ from app.services.brokers.contracts import (
     BrokerQuote,
     BrokerSymbolInfo,
     BrokerTick,
+    StandardResponse,
 )
 from app.services.brokers.contracts.protocols import (
     _RequestValidationError,

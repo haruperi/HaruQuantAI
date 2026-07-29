@@ -2,12 +2,12 @@
 
 import asyncio
 
-from app.services.brokers import (
+from app.services.brokers import create_broker_adapter
+from app.services.brokers.contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
-    create_broker_adapter,
 )
 
 _SYMBOL = "AAPL"

@@ -34,6 +34,7 @@ from app.services.brokers.contracts import (
     BrokerServerTime,
     BrokerSymbolInfo,
     BrokerTick,
+    StandardResponse,
 )
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
 from app.services.brokers.price_streams.binance import _BinancePriceStreamsMixin

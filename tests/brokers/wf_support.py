@@ -8,16 +8,17 @@ from pathlib import Path
 from pydantic import SecretStr
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     BrokerConnectionConfig,
     BrokerConnectionStatus,
     BrokerEnvironment,
     BrokerId,
 )
-from app.utils import StandardResponse, settings
+from app.utils.responses.models import StandardResponse
+from app.utils.settings.models import AppSettings
 
 
-class _WorkflowSettings(settings.AppSettings):
+class _WorkflowSettings(AppSettings):
     """Local runtime settings for workflow examples with MT5 credentials."""
 
     mt5_environment: str = "demo"

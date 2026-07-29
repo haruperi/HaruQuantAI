@@ -3,7 +3,7 @@
 import asyncio
 
 import pytest
-from app.services.brokers import (
+from app.services.brokers.contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,

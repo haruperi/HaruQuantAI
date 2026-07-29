@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.brokers import BrokerId
+from app.services.brokers.contracts import BrokerId
 from tests.brokers.usage._support import create_real_adapter, require_success
 
 WORKFLOW_ID = "WF-BRK-007"
