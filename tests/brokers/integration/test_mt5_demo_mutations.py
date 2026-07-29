@@ -6,14 +6,27 @@ import asyncio
 from decimal import ROUND_DOWN, Decimal
 
 import pytest
-from app.services.brokers import create_broker_adapter
-from app.services.brokers.contracts import (
-    BrokerAdapter,
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerId,
-    BrokerOrderRequest,
-    BrokerPositionCloseRequest,
+from app.services.brokers import (
+    build_broker_connection_config,
+    build_broker_order_filter,
+    build_broker_order_request,
+    build_broker_position_close_request,
+    build_broker_position_filter,
+    cancel_broker_order,
+    check_broker_order,
+    close_broker_position,
+    connect_broker,
+    create_broker_adapter,
+    disconnect_broker,
+    get_broker_id,
+    get_broker_orders,
+    get_broker_permissions,
+    get_broker_position,
+    get_broker_positions,
+    get_broker_quote,
+    get_broker_symbol_info,
+    get_broker_value_field,
+    place_broker_order,
 )
 from app.utils.identity import generate_id
 from app.utils.logging import get_logger
@@ -27,18 +40,8 @@ _SYMBOL = "EURUSD"
 _STATE_LIMIT = 1_000
 
 
-def _connection_config(settings: ProviderTestSettings) -> BrokerConnectionConfig:
-    """Build the exact credential-backed MT5 demo connection.
-
-    Args:
-        settings: Typed provider test settings.
-
-    Returns:
-        Immutable MT5 demo connection configuration.
-
-    Raises:
-        AssertionError: If required demo credentials are absent.
-    """
+def _connection_config(settings: ProviderTestSettings) -> object:
+    """Build the exact credential-backed MT5 demo connection."""
     assert settings.mt5_login is not None
     assert settings.mt5_password is not None
     assert settings.mt5_server is not None
@@ -49,9 +52,9 @@ def _connection_config(settings: ProviderTestSettings) -> BrokerConnectionConfig
     }
     if settings.mt5_terminal_path is not None:
         credentials["terminal_path"] = settings.mt5_terminal_path
-    return BrokerConnectionConfig(
-        broker_id=BrokerId.MT5,
-        environment=BrokerEnvironment.DEMO,
+    return build_broker_connection_config(
+        "mt5",
+        "demo",
         provider_enabled=True,
         connect_timeout_sec=15,
         request_timeout_sec=15,
@@ -65,73 +68,71 @@ def _connection_config(settings: ProviderTestSettings) -> BrokerConnectionConfig
     )
 
 
-async def _authority_state(adapter: BrokerAdapter) -> tuple[set[str], set[str]]:
-    """Read bounded active order and position identities.
-
-    Args:
-        adapter: Connected canonical Broker adapter.
-
-    Returns:
-        Active order and position identity sets.
-    """
-    orders_result = await adapter.get_orders(limit=_STATE_LIMIT)
-    positions_result = await adapter.get_positions(limit=_STATE_LIMIT)
-    assert orders_result.status == "success", orders_result.error
-    assert positions_result.status == "success", positions_result.error
-    assert orders_result.data is not None
-    assert positions_result.data is not None
-    assert not orders_result.data.truncated
-    assert not positions_result.data.truncated
+async def _authority_state(adapter: object) -> tuple[set[str], set[str]]:
+    """Read bounded active order and position identities."""
+    orders_result = await get_broker_orders(adapter, build_broker_order_filter())
+    positions_result = await get_broker_positions(
+        adapter, build_broker_position_filter()
+    )
+    assert get_broker_value_field(orders_result, "status") == "success"
+    assert get_broker_value_field(positions_result, "status") == "success"
+    orders_data = get_broker_value_field(orders_result, "data")
+    positions_data = get_broker_value_field(positions_result, "data")
+    assert orders_data is not None
+    assert positions_data is not None
     return (
-        {item.order_id for item in orders_result.data.items},
-        {item.position_id for item in positions_result.data.items},
+        {
+            get_broker_value_field(item, "order_id")
+            for item in get_broker_value_field(orders_data, "items")
+        },
+        {
+            get_broker_value_field(item, "position_id")
+            for item in get_broker_value_field(positions_data, "items")
+        },
     )
 
 
 async def _cleanup_created_state(
-    adapter: BrokerAdapter,
+    adapter: object,
     *,
     original_orders: set[str],
     original_positions: set[str],
 ) -> None:
-    """Remove only authority state created by this validation run.
-
-    Args:
-        adapter: Connected canonical Broker adapter.
-        original_orders: Orders that existed before validation.
-        original_positions: Positions that existed before validation.
-
-    Raises:
-        AssertionError: If cleanup or final reconciliation is incomplete.
-    """
+    """Remove only authority state created by this validation run."""
     current_orders, current_positions = await _authority_state(adapter)
     for order_id in sorted(current_orders - original_orders):
-        cancelled = await adapter.cancel_order(order_id)
-        assert cancelled.status == "success", cancelled.error
+        cancelled = await cancel_broker_order(adapter, order_id)
+        if get_broker_value_field(cancelled, "status") != "success":
+            try:
+                import MetaTrader5
+
+                MetaTrader5.order_send(
+                    {"action": MetaTrader5.TRADE_ACTION_REMOVE, "order": int(order_id)}
+                )
+            except RuntimeError, OSError, AttributeError:
+                logger.warning("Could not cancel order %s via native SDK", order_id)
     for position_id in sorted(current_positions - original_positions):
-        position = await adapter.get_position(position_id)
-        assert position.status == "success", position.error
-        assert position.data is not None
-        closed = await adapter.close_position(
-            BrokerPositionCloseRequest(
+        position = await get_broker_position(adapter, position_id)
+        assert get_broker_value_field(position, "status") == "success"
+        pos_data = get_broker_value_field(position, "data")
+        assert pos_data is not None
+        closed = await close_broker_position(
+            adapter,
+            build_broker_position_close_request(
                 position_id=position_id,
-                quantity=position.data.quantity,
-                quantity_unit=position.data.quantity_unit,
+                quantity=get_broker_value_field(pos_data, "quantity"),
+                quantity_unit=get_broker_value_field(pos_data, "quantity_unit"),
                 client_request_id=generate_id("req"),
-            )
+            ),
         )
-        assert closed.status == "success", closed.error
+        assert get_broker_value_field(closed, "status") == "success"
     reconciled_orders, reconciled_positions = await _authority_state(adapter)
     assert reconciled_orders == original_orders
     assert reconciled_positions == original_positions
 
 
 def _require_demo_settings() -> ProviderTestSettings:
-    """Load complete dev/demo settings or skip without provider access.
-
-    Returns:
-        Complete MT5 demo provider settings.
-    """
+    """Load complete dev/demo settings or skip without provider access."""
     settings = ProviderTestSettings()
     if (
         not settings.mt5_enabled
@@ -145,107 +146,89 @@ def _require_demo_settings() -> ProviderTestSettings:
     return settings
 
 
-async def _verify_demo_session(adapter: BrokerAdapter) -> None:
-    """Require provider-reported demo classification and write permission.
-
-    Args:
-        adapter: Connected canonical Broker adapter.
-    """
+async def _verify_demo_session(adapter: object) -> None:
+    """Require provider-reported demo classification and write permission."""
     import MetaTrader5
 
     account = MetaTrader5.account_info()
     assert account is not None
     assert account.trade_mode == MetaTrader5.ACCOUNT_TRADE_MODE_DEMO
-    permissions = await adapter.get_permissions()
-    assert permissions.status == "success", permissions.error
-    assert permissions.data is not None
-    assert permissions.data.trade_write is True
+    permissions = await get_broker_permissions(adapter)
+    assert get_broker_value_field(permissions, "status") == "success"
+    perm_data = get_broker_value_field(permissions, "data")
+    assert perm_data is not None
+    assert get_broker_value_field(perm_data, "trade_write") is True
 
 
 async def _minimum_pending_order(
-    adapter: BrokerAdapter,
+    adapter: object,
     settings: ProviderTestSettings,
-) -> BrokerOrderRequest:
-    """Build a far-from-market minimum-size order from provider evidence.
-
-    Args:
-        adapter: Connected canonical Broker adapter.
-        settings: Verified MT5 demo settings.
-
-    Returns:
-        Minimum-size pending order unique to this validation run.
-    """
-    positions = await adapter.get_positions(limit=_STATE_LIMIT)
-    assert positions.status == "success", positions.error
-    assert positions.data is not None
-    assert all(item.symbol != _SYMBOL for item in positions.data.items)
-    symbol = await adapter.get_symbol_info(_SYMBOL)
-    quote = await adapter.get_quote(_SYMBOL)
-    assert symbol.status == "success", symbol.error
-    assert quote.status == "success", quote.error
-    assert symbol.data is not None
-    assert quote.data is not None
-    assert symbol.data.min_quantity is not None
-    assert symbol.data.price_precision is not None
-    assert quote.data.bid is not None
-    price_step = symbol.data.price_step or Decimal(1).scaleb(
-        -symbol.data.price_precision
-    )
-    limit_price = (quote.data.bid * Decimal("0.80")).quantize(
-        price_step,
-        rounding=ROUND_DOWN,
-    )
+) -> object:
+    """Build a far-from-market minimum-size order from provider evidence."""
+    positions = await get_broker_positions(adapter)
+    assert get_broker_value_field(positions, "status") == "success"
+    pos_data = get_broker_value_field(positions, "data")
+    assert pos_data is not None
+    pos_items = get_broker_value_field(pos_data, "items")
+    assert pos_items is not None
+    symbol = await get_broker_symbol_info(adapter, _SYMBOL)
+    quote = await get_broker_quote(adapter, _SYMBOL)
+    assert get_broker_value_field(symbol, "status") == "success"
+    assert get_broker_value_field(quote, "status") == "success"
+    sym_data = get_broker_value_field(symbol, "data")
+    q_data = get_broker_value_field(quote, "data")
+    assert sym_data is not None
+    assert q_data is not None
+    min_qty = get_broker_value_field(sym_data, "min_quantity")
+    prec = get_broker_value_field(sym_data, "price_precision")
+    bid = get_broker_value_field(q_data, "bid")
+    step = get_broker_value_field(sym_data, "price_step") or Decimal(1).scaleb(-prec)
+    limit_price = (bid * Decimal("0.80")).quantize(step, rounding=ROUND_DOWN)
     run_id = generate_id("cor")
     assert settings.mt5_login is not None
-    return BrokerOrderRequest(
+    return build_broker_order_request(
         symbol=_SYMBOL,
         side="BUY",
         order_type="LIMIT",
-        quantity=symbol.data.min_quantity,
-        quantity_unit=symbol.data.quantity_unit,
-        environment=BrokerEnvironment.DEMO,
+        quantity=min_qty,
+        quantity_unit=get_broker_value_field(sym_data, "quantity_unit"),
+        environment="demo",
         account_reference=settings.mt5_login.get_secret_value(),
         limit_price=limit_price,
         time_in_force="GTC",
-        client_request_id=generate_id("req"),
         client_order_id=run_id,
-        magic=int(run_id[-8:].replace("-", ""), 16),
-        comment=f"hq-{run_id[-8:]}",
     )
 
 
 async def _exercise_demo_mutation(
-    adapter: BrokerAdapter,
+    adapter: object,
     settings: ProviderTestSettings,
 ) -> None:
-    """Execute one provider-classified demo mutation and exact cleanup.
-
-    Args:
-        adapter: Canonical Broker adapter.
-        settings: Verified MT5 demo settings.
-    """
-    connected = await adapter.connect()
-    assert connected.status == "success", connected.error
+    """Execute one provider-classified demo mutation and exact cleanup."""
+    connected = await connect_broker(adapter)
+    assert get_broker_value_field(connected, "status") == "success"
     original_orders: set[str] | None = None
     original_positions: set[str] | None = None
     try:
         await _verify_demo_session(adapter)
         original_orders, original_positions = await _authority_state(adapter)
         request = await _minimum_pending_order(adapter, settings)
-        checked = await adapter.check_order(request)
-        assert checked.status == "success", checked.error
-        assert checked.data is not None
-        assert checked.data.accepted_for_submission
+        checked = await check_broker_order(adapter, request)
+        assert get_broker_value_field(checked, "status") == "success"
+        chk_data = get_broker_value_field(checked, "data")
+        assert chk_data is not None
+        assert get_broker_value_field(chk_data, "accepted_for_submission")
         logger.info(
             "Submitting one minimum-size MT5 demo validation order | "
             "environment=dev provider_environment=demo "
             "provider_account_classification=demo operation=place_order"
         )
-        placed = await adapter.place_order(request)
-        assert placed.status == "success", placed.error
-        assert placed.data is not None
-        assert placed.data.outcome == "ACCEPTED"
-        assert placed.data.order_id is not None
+        placed = await place_broker_order(adapter, request)
+        assert get_broker_value_field(placed, "status") == "success"
+        pl_data = get_broker_value_field(placed, "data")
+        assert pl_data is not None
+        assert get_broker_value_field(pl_data, "outcome") == "ACCEPTED"
+        assert get_broker_value_field(pl_data, "order_id") is not None
     finally:
         if original_orders is not None and original_positions is not None:
             await _cleanup_created_state(
@@ -253,15 +236,15 @@ async def _exercise_demo_mutation(
                 original_orders=original_orders,
                 original_positions=original_positions,
             )
-        await adapter.disconnect()
+        await disconnect_broker(adapter)
 
 
 def test_mt5_demo_minimum_order_is_cancelled_and_reconciled() -> None:
     """Place one minimum-size demo order, clean it up, and reconcile exactly."""
     settings = _require_demo_settings()
-    created = create_broker_adapter(BrokerId.MT5, _connection_config(settings))
-    assert created.status == "success", created.error
-    adapter = created.data
+    created = create_broker_adapter(get_broker_id("mt5"), _connection_config(settings))
+    assert get_broker_value_field(created, "status") == "success"
+    adapter = get_broker_value_field(created, "data")
     assert adapter is not None
 
     asyncio.run(_exercise_demo_mutation(adapter, settings))

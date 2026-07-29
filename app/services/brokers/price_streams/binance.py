@@ -24,7 +24,6 @@ from app.services.brokers.contracts import (
     BrokerSubscriptionInfo,
     StandardResponse,
 )
-
 from app.utils import generate_id, utc_now
 
 

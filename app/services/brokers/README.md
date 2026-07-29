@@ -353,7 +353,7 @@ Registry imports provider factories lazily; provider modules never import Regist
 ### Structure rules
 
 - The package root contains only `README.md`, `__init__.py`, and approved feature folders.
-- Public consumers import from `app.services.brokers` or a documented capability contract, never provider implementation modules.
+- Public consumers import only from `app.services.brokers`; contracts, DTOs, enums, protocols, and provider implementation modules are internal.
 - `contracts` depends only on the standard library, Pydantic's `SecretStr`, and Utils-owned shared policies; it imports no provider SDK.
 - `runtime` contains only adapter-local transport mechanics and owns no provider, business, or persistent state.
 - Each provider exposes one adapter class and keeps transport/mapping helpers private.
@@ -374,7 +374,31 @@ Registry imports provider factories lazily; provider modules never import Regist
 
 ### Package root public API
 
-`app/services/brokers/__init__.py` contains explicit eager imports for contracts and registry functions, plus documented PEP 562 `__getattr__` lazy resolution for provider adapter types. Its `__all__` contains only:
+`app/services/brokers/__init__.py` is the sole cross-domain boundary and its `__all__` contains only standalone functions. Broker contracts, DTOs, enums, protocols, and provider classes remain internal.
+
+The historical export enumeration below is superseded by this function-only
+boundary. Cross-domain callers create opaque connection/adapter values through
+root builders and factories, invoke root operations, and read required facts via
+the documented connection, adapter, and feature-flag getter functions.
+
+`build_broker_value(value_type, **fields)` is the documented function-only
+constructor for the opaque contract values registered in
+`operations.py::_BROKER_VALUE_TYPES`; supported names are `account_info`,
+`account_transaction`, `balance`, `bar`, `connection_config`,
+`connection_status`, `deal`, `error`, `feature_flags`, `margin_request`,
+`market_status`, `order`, `order_book`, `order_check`, `order_filter`,
+`order_modification_request`, `order_request`, `order_result`, `page`,
+`permissions`, `platform_info`, `position`, `position_close_request`,
+`position_filter`, `position_modification_request`, `profit_request`, `quote`,
+`subscription_info`, `symbol_info`, `tick`, and `trading_session`.
+`get_broker_value_field(value, field_name)` is the sole documented way for an
+external caller to read a non-private fact from one of those opaque values.
+Constants are supplied as validated strings to the root builders and operations;
+Broker enums, protocols, classes, DTOs, and provider implementations are never
+public imports.
+Where an opaque canonical identifier is required, callers use
+`get_broker_id`, `get_broker_environment`, `get_broker_capability_id`, or
+`get_broker_error_code`; no enum constant is public.
 
 - FR-BRK-001–005 enums;
 - FR-BRK-006–042 canonical models/results;
@@ -384,7 +408,11 @@ Registry imports provider factories lazily; provider modules never import Regist
 
 The root file itself is assigned FR-BRK-135. Private helper/export requirements FR-BRK-110–111 and FR-BRK-113–134 do not add root exports unless explicitly stated above.
 
-`FakeBrokerAdapter` is imported from `app.services.brokers.testing` only. Provider classes are exposed for typing and provider-specific integration tests, but normal consumers obtain instances exclusively through `create_broker_adapter()`. `__getattr__` contains a fixed name-to-module table, imports only the requested provider module, caches only the resolved class object, and raises `AttributeError` for every other name. Root initialization performs no provider import until a lazy factory or approved adapter type is accessed, and performs no selection, connection, mapping, or business logic.
+`create_fake_broker_adapter()` is the only public deterministic-test entry point.
+Provider and fake-adapter classes are internal, including in Broker integration
+tests; callers receive opaque values from root factories and invoke root
+functions. Root initialization performs no provider import until a root factory
+is called, and performs no selection, connection, mapping, or business logic.
 
 ### Explicit exclusions
 

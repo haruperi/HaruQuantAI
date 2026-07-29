@@ -2,20 +2,18 @@
 
 import asyncio
 
-from app.services.brokers import create_broker_adapter
-from app.services.brokers.contracts import (
-    BrokerCapabilityId,
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerErrorCode,
-    BrokerId,
+from app.services.brokers import (
+    build_broker_connection_config,
+    cancel_broker_order,
+    create_configured_fake_broker_adapter,
+    get_broker_value_field,
 )
 
 
-def _config() -> BrokerConnectionConfig:
-    return BrokerConnectionConfig(
-        broker_id=BrokerId.DUKASCOPY,
-        environment=BrokerEnvironment.SANDBOX,
+def _config() -> object:
+    return build_broker_connection_config(
+        "dukascopy",
+        "sandbox",
         provider_enabled=True,
         connect_timeout_sec=1,
         request_timeout_sec=1,
@@ -29,35 +27,32 @@ def _config() -> BrokerConnectionConfig:
 
 def test_unsupported_operation_never_calls_provider() -> None:
     """An unreleased mutation returns a deterministic error from root API."""
-    created = create_broker_adapter(BrokerId.DUKASCOPY, _config())
-    assert created.status == "success"
-    adapter = created.data
-    assert adapter is not None
+    adapter = create_configured_fake_broker_adapter(_config())
 
     async def exercise() -> None:
-        result = await adapter.cancel_order("not-a-ticket")
-        assert result.status != "success"
-        assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
-        assert (
-            result.error.details["capability"] == BrokerCapabilityId.CANCEL_ORDER.value
-        )
+        result = await cancel_broker_order(adapter, "not-a-ticket")
+        assert get_broker_value_field(result, "status") != "success"
+        error = get_broker_value_field(result, "error")
+        assert error is not None
+        assert get_broker_value_field(error, "code") == "BROKER_CAPABILITY_UNSUPPORTED"
+        details = get_broker_value_field(error, "details")
+        assert isinstance(details, dict)
+        assert details.get("capability") == "cancel_order"
 
     asyncio.run(exercise())
 
 
 def test_unsupported_result_identifies_broker_and_environment() -> None:
     """The unsupported result carries broker/environment identity."""
-    created = create_broker_adapter(BrokerId.DUKASCOPY, _config())
-    assert created.status == "success"
-    adapter = created.data
-    assert adapter is not None
+    adapter = create_configured_fake_broker_adapter(_config())
 
     async def exercise() -> None:
-        result = await adapter.cancel_order("not-a-ticket")
-        assert result.metadata.extensions["broker"] == BrokerId.DUKASCOPY.value
-        assert (
-            result.metadata.extensions["environment"] == BrokerEnvironment.SANDBOX.value
-        )
+        result = await cancel_broker_order(adapter, "not-a-ticket")
+        metadata = get_broker_value_field(result, "metadata")
+        assert metadata is not None
+        extensions = get_broker_value_field(metadata, "extensions")
+        assert extensions is not None
+        assert extensions.get("broker") == "dukascopy"
+        assert extensions.get("environment") == "sandbox"
 
     asyncio.run(exercise())

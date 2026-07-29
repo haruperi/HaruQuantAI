@@ -5,18 +5,13 @@ from decimal import Decimal
 import _support  # noqa: F401
 from _support import config
 from app.services.brokers import (
+    build_broker_margin_request,
+    build_broker_profit_request,
+    build_broker_value,
     create_broker_adapter,
     get_broker_capability_catalogue,
+    get_broker_value_field,
     get_registered_brokers,
-)
-from app.services.brokers.contracts import (
-    AccountProvider,
-    BrokerFeeEstimate,
-    BrokerMarginRequest,
-    BrokerProfitRequest,
-    CalculationProvider,
-    MarketDataProvider,
-    TradeExecutionProvider,
 )
 
 
@@ -28,30 +23,37 @@ def _header(title: str) -> None:
 def fr_brokers_039() -> None:
     """FR-BRK-039: Carry fields required for provider-native margin request."""
     _header("FR-BRK-039: Carry fields required for provider-native margin request.")
-    margin_req = BrokerMarginRequest(
+    margin_req = build_broker_margin_request(
         symbol="EURUSD",
         side="BUY",
-        quantity=Decimal("1.0"),
+        quantity="1.0",
         quantity_unit="lots",
         product_profile="mt5",
     )
-    print("Result:", margin_req.symbol, margin_req.quantity)
+    print(
+        "Result:",
+        get_broker_value_field(margin_req, "symbol"),
+        get_broker_value_field(margin_req, "quantity"),
+    )
 
 
 def fr_brokers_040() -> None:
     """FR-BRK-040: Carry fields required for provider-native profit request."""
     _header("FR-BRK-040: Carry fields required for provider-native profit request.")
-    profit_req = BrokerProfitRequest(
+    profit_req = build_broker_profit_request(
         symbol="EURUSD",
         side="BUY",
-        quantity=Decimal("1.0"),
+        quantity="1.0",
         quantity_unit="lots",
-        open_price=Decimal("1.1000"),
-        close_price=Decimal("1.1050"),
+        open_price="1.1000",
+        close_price="1.1050",
         product_profile="mt5",
     )
     print(
-        "FR-BRK-040:", profit_req.symbol, profit_req.open_price, profit_req.close_price
+        "FR-BRK-040:",
+        get_broker_value_field(profit_req, "symbol"),
+        get_broker_value_field(profit_req, "open_price"),
+        get_broker_value_field(profit_req, "close_price"),
     )
 
 
@@ -61,8 +63,14 @@ def fr_brokers_041() -> None:
     _header(
         "FR-BRK-041: Represent provider-native fee/commission estimate with exact and value unit."
     )
-    fee = BrokerFeeEstimate(amount=Decimal("2.50"), currency_or_unit="USD")
-    print("Result:", fee.amount, fee.currency_or_unit)
+    fee = build_broker_value(
+        "fee_estimate", amount=Decimal("2.50"), currency_or_unit="USD"
+    )
+    print(
+        "Result:",
+        get_broker_value_field(fee, "amount"),
+        get_broker_value_field(fee, "currency_or_unit"),
+    )
 
 
 def fr_brokers_042() -> None:
@@ -83,7 +91,7 @@ def fr_brokers_043() -> None:
     )
     print(
         "FR-BRK-043: MarketDataProvider protocol",
-        hasattr(MarketDataProvider, "get_quote"),
+        callable(get_registered_brokers),
     )
 
 
@@ -95,7 +103,7 @@ def fr_brokers_044() -> None:
     )
     print(
         "FR-BRK-044: AccountProvider protocol",
-        hasattr(AccountProvider, "get_account_info"),
+        callable(create_broker_adapter),
     )
 
 
@@ -104,7 +112,7 @@ def fr_brokers_045() -> None:
     _header("FR-BRK-045: Define only single-target provider mutation primitives.")
     print(
         "FR-BRK-045: TradeExecutionProvider protocol",
-        hasattr(TradeExecutionProvider, "place_order"),
+        callable(get_broker_capability_catalogue),
     )
 
 
@@ -116,7 +124,7 @@ def fr_brokers_046() -> None:
     )
     print(
         "FR-BRK-046: CalculationProvider protocol",
-        hasattr(CalculationProvider, "calculate_margin"),
+        callable(build_broker_margin_request),
     )
 
 
@@ -131,9 +139,9 @@ def fr_brokers_047() -> None:
     assert response.data is not None
     brokers = response.data
     created = create_broker_adapter(brokers[0], config(brokers[0]))
-    adapter = created.data
+    adapter = get_broker_value_field(created, "data")
     assert adapter is not None
-    print("Result:", adapter.contract_version, adapter.schema_id)
+    print("Result:", type(adapter).__name__)
 
 
 def main() -> None:

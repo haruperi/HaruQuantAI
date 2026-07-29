@@ -2,12 +2,13 @@
 
 import asyncio
 
-from app.services.brokers import create_broker_adapter
-from app.services.brokers.contracts import (
-    BrokerConnectionConfig,
-    BrokerConnectionState,
-    BrokerEnvironment,
-    BrokerId,
+from app.services.brokers import (
+    build_broker_connection_config,
+    create_broker_adapter,
+    disconnect_broker,
+    get_broker_connection_status,
+    get_broker_id,
+    get_broker_value_field,
 )
 from pydantic import SecretStr
 
@@ -15,10 +16,10 @@ _LOGIN = "12345"
 _SERVER = "Demo-Server"
 
 
-def _config() -> BrokerConnectionConfig:
-    return BrokerConnectionConfig(
-        broker_id=BrokerId.MT5,
-        environment=BrokerEnvironment.DEMO,
+def _config() -> object:
+    return build_broker_connection_config(
+        get_broker_id("mt5"),
+        "demo",
         provider_enabled=True,
         connect_timeout_sec=1,
         request_timeout_sec=1,
@@ -38,36 +39,44 @@ def _config() -> BrokerConnectionConfig:
 
 def test_session_lifecycle_initialization_and_status() -> None:
     """Root-created adapter initializes disconnected and status reflects state."""
-    created = create_broker_adapter(BrokerId.MT5, _config())
-    assert created.status == "success"
-    adapter = created.data
+    created = create_broker_adapter(get_broker_id("mt5"), _config())
+    assert get_broker_value_field(created, "status") == "success"
+    adapter = get_broker_value_field(created, "data")
     assert adapter is not None
 
     async def exercise() -> None:
-        status = await adapter.get_connection_status()
-        assert status.status == "success"
-        assert status.data is not None
-        assert status.data.state == BrokerConnectionState.DISCONNECTED
+        status = await get_broker_connection_status(adapter)
+        assert get_broker_value_field(status, "status") == "success"
+        data = get_broker_value_field(status, "data")
+        assert data is not None
+        assert (
+            get_broker_value_field(get_broker_value_field(data, "state"), "value")
+            == "disconnected"
+        )
 
-        disconnected = await adapter.disconnect()
-        assert disconnected.status == "success"
+        disconnected = await disconnect_broker(adapter)
+        assert get_broker_value_field(disconnected, "status") == "success"
 
-        again = await adapter.disconnect()
-        assert again.status == "success"
+        again = await disconnect_broker(adapter)
+        assert get_broker_value_field(again, "status") == "success"
 
     asyncio.run(exercise())
 
 
 def test_connect_emits_lifecycle_events() -> None:
     """Connection status and event channels function cleanly."""
-    created = create_broker_adapter(BrokerId.MT5, _config())
-    assert created.status == "success"
-    adapter = created.data
+    created = create_broker_adapter(get_broker_id("mt5"), _config())
+    assert get_broker_value_field(created, "status") == "success"
+    adapter = get_broker_value_field(created, "data")
     assert adapter is not None
 
     async def exercise() -> None:
-        status = await adapter.get_connection_status()
-        assert status.data is not None
-        assert status.data.state == BrokerConnectionState.DISCONNECTED
+        status = await get_broker_connection_status(adapter)
+        data = get_broker_value_field(status, "data")
+        assert data is not None
+        assert (
+            get_broker_value_field(get_broker_value_field(data, "state"), "value")
+            == "disconnected"
+        )
 
     asyncio.run(exercise())

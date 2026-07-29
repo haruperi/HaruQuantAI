@@ -61,4 +61,4 @@ def test_broker_workflow_registry_has_one_complete_program_per_workflow() -> Non
     mutation_source = (WORKFLOW_DIR / EXPECTED["WF-BRK-TER"]).read_text(
         encoding="utf-8"
     )
-    assert "No broker mutation was transmitted" in mutation_source
+    assert "without provider transmission" in mutation_source

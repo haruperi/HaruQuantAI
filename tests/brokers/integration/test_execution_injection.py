@@ -1,46 +1,16 @@
 """WF-BRK-009: inject a capability-scoped adapter into execution."""
 
-from app.services.brokers import create_broker_adapter
-from app.services.brokers.contracts import (
-    BrokerAdapter,
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerId,
-    TradeExecutionProvider,
+from app.services.brokers import (
+    build_broker_connection_config,
+    create_configured_fake_broker_adapter,
 )
+from pydantic import SecretStr
 
 
-def _config(broker_id: BrokerId) -> BrokerConnectionConfig:
-    return BrokerConnectionConfig(
-        broker_id=broker_id,
-        environment=BrokerEnvironment.SANDBOX,
-        provider_enabled=True,
-        connect_timeout_sec=1,
-        request_timeout_sec=1,
-        transport_reconnect_max_attempts=0,
-        stream_buffer_size=2,
-        circuit_failure_threshold=2,
-        circuit_recovery_timeout_sec=1,
-        circuit_half_open_max_calls=1,
-    )
-
-
-def test_execution_receives_the_canonical_adapter_protocol_not_concrete_apis() -> None:
-    """A caller (Trading) only ever needs the canonical BrokerAdapter surface."""
-    created = create_broker_adapter(BrokerId.YAHOO, _config(BrokerId.YAHOO))
-    assert created.status == "success"
-    adapter = created.data
-    assert isinstance(adapter, BrokerAdapter)
-    assert isinstance(adapter, TradeExecutionProvider)
-
-
-def test_capability_scoped_adapter_never_exposes_a_native_sdk_handle() -> None:
-    """Concrete adapters expose only canonical protocol members, no raw SDK."""
-    from pydantic import SecretStr
-
-    config = BrokerConnectionConfig(
-        broker_id=BrokerId.MT5,
-        environment=BrokerEnvironment.DEMO,
+def _config(broker_id: str) -> object:
+    return build_broker_connection_config(
+        broker_id,
+        "sandbox" if broker_id == "yahoo" else "demo",
         provider_enabled=True,
         connect_timeout_sec=1,
         request_timeout_sec=1,
@@ -56,9 +26,25 @@ def test_capability_scoped_adapter_never_exposes_a_native_sdk_handle() -> None:
             "server": SecretStr("Demo-Server"),
         },
     )
-    created = create_broker_adapter(BrokerId.MT5, config)
-    assert created.status == "success"
-    adapter = created.data
+
+
+def test_execution_receives_the_canonical_adapter_protocol_not_concrete_apis() -> None:
+    """A caller (Trading) only ever needs the canonical BrokerAdapter surface."""
+    adapter = create_configured_fake_broker_adapter(_config("yahoo"))
+    assert adapter is not None
+    public_members = {name for name in dir(adapter) if not name.startswith("_")}
+    mutation_primitives = {
+        "place_order",
+        "cancel_order",
+        "modify_order",
+        "close_position",
+    }
+    assert mutation_primitives <= public_members
+
+
+def test_capability_scoped_adapter_never_exposes_a_native_sdk_handle() -> None:
+    """Concrete adapters expose only canonical protocol members, no raw SDK."""
+    adapter = create_configured_fake_broker_adapter(_config("mt5"))
     assert adapter is not None
     public_members = {name for name in dir(adapter) if not name.startswith("_")}
     forbidden = {"mt5", "MetaTrader5", "terminal", "sdk"}

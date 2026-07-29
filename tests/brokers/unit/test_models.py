@@ -49,7 +49,8 @@ from app.services.brokers.contracts import (
     BrokerTick,
     BrokerTradingSession,
 )
-from pydantic import SecretStr, ValidationError
+from app.utils.errors.exceptions import ValidationError as AppValidationError
+from pydantic import SecretStr
 
 from tests.brokers.response_factory import broker_response
 
@@ -169,7 +170,7 @@ def test_result_supports_successful_none_and_exclusive_error() -> None:
     )
     assert failed.status == "error"
     assert failed.data is None
-    with pytest.raises(ValidationError, match="TIMESTAMP_NOT_UTC"):
+    with pytest.raises(AppValidationError, match="TIMESTAMP_NOT_UTC"):
         broker_response(
             BrokerCapabilityId.DISCONNECT,
             broker=BrokerId.YAHOO,

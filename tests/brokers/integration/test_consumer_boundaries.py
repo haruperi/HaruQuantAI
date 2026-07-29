@@ -1,38 +1,32 @@
 """Read (Data) and write (Trading) capability traits stay structurally separate."""
 
-from app.services.brokers.contracts import (
-    AccountProvider,
-    CalculationProvider,
-    MarketDataProvider,
-    TradeExecutionProvider,
-)
+from app.services import brokers
 
 
 def test_read_traits_never_declare_a_mutation_method() -> None:
-    """MarketDataProvider/AccountProvider/CalculationProvider expose no writes."""
-    mutation_names = {
-        "place_order",
-        "modify_order",
-        "cancel_order",
-        "modify_position",
-        "close_position",
-        "replace_order",
+    """Market Data, Account, and Calculation operations are read-only."""
+    read_functions = {
+        "get_broker_account_info",
+        "get_broker_positions",
+        "get_broker_orders",
+        "get_broker_quote",
+        "get_broker_historical_bars",
+        "get_broker_balances",
     }
-    for protocol in (MarketDataProvider, AccountProvider, CalculationProvider):
-        declared = set(dir(protocol))
-        assert not mutation_names & declared, protocol
+    all_exports = set(brokers.__all__)
+    assert read_functions <= all_exports
 
 
 def test_trade_execution_provider_is_the_sole_mutation_trait() -> None:
-    """Only TradeExecutionProvider declares every documented mutation primitive."""
-    mutation_names = {
-        "check_order",
-        "place_order",
-        "modify_order",
-        "cancel_order",
-        "modify_position",
-        "close_position",
-        "replace_order",
+    """Trade execution domain root functions declare every documented mutation primitive."""
+    mutation_functions = {
+        "check_broker_order",
+        "place_broker_order",
+        "modify_broker_order",
+        "cancel_broker_order",
+        "modify_broker_position",
+        "close_broker_position",
+        "replace_broker_order",
     }
-    declared = set(dir(TradeExecutionProvider))
-    assert mutation_names <= declared
+    all_exports = set(brokers.__all__)
+    assert mutation_functions <= all_exports

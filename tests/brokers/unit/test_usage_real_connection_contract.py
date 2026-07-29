@@ -110,7 +110,8 @@ def test_support_has_one_deterministic_disconnect_boundary() -> None:
     finalizers = [node for node in ast.walk(real_session) if isinstance(node, ast.Try)]
     assert len(finalizers) == 1
     assert any(
-        isinstance(node, ast.Attribute) and node.attr == "disconnect"
+        (isinstance(node, ast.Attribute) and node.attr == "disconnect")
+        or (isinstance(node, ast.Name) and node.id == "disconnect_broker")
         for node in ast.walk(finalizers[0].finalbody[0])
     )
 

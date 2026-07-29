@@ -9,9 +9,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.brokers import (
     get_broker_capability_catalogue,
+    get_broker_id,
+    get_broker_value_field,
     get_registered_brokers,
 )
-from app.services.brokers.contracts import BrokerId
 
 WORKFLOW_ID = "WF-BRK-010"
 STAGES = (
@@ -47,27 +48,32 @@ def main() -> None:
     # Stage 1 — Enumerate the registered broker identifiers.
     _stage(1)
     registered_response = get_registered_brokers()
-    _report("registry", registered_response.status, None)
-    assert registered_response.status == "success"
-    assert registered_response.data is not None
-    registered = registered_response.data
-    print("Registered broker IDs :", tuple(item.value for item in registered))
+    status = get_broker_value_field(registered_response, "status")
+    _report("registry", status, None)
+    assert status == "success"
+    registered = get_broker_value_field(registered_response, "data")
+    assert registered is not None
+    print(
+        "Registered broker IDs :",
+        tuple(get_broker_value_field(item, "value") for item in registered),
+    )
     print("Registered count      :", len(registered))
-    assert BrokerId.MT5 in registered
+    mt5_id = get_broker_id("mt5")
+    assert mt5_id in registered
 
     # Stage 2 — Read the declared capability catalogue for each identifier.
     _stage(2)
     catalogue_response = get_broker_capability_catalogue()
-    _report("catalog ", catalogue_response.status, None)
-    assert catalogue_response.status == "success"
-    assert catalogue_response.data is not None
-    catalogue = catalogue_response.data
+    cat_status = get_broker_value_field(catalogue_response, "status")
+    _report("catalog ", cat_status, None)
+    assert cat_status == "success"
+    catalogue = get_broker_value_field(catalogue_response, "data")
+    assert catalogue is not None
     print("Catalogue entries     :", len(catalogue))
     for broker_id in registered:
         capabilities = catalogue.get(broker_id, ())
-        print(
-            f"  {broker_id.value:<12} {len(capabilities)} declared capability record(s)"
-        )
+        val = get_broker_value_field(broker_id, "value")
+        print(f"  {val:<12} {len(capabilities)} declared capability record(s)")
 
     # Stage 3 — Confirm discovery imports no provider package and opens no session.
     _stage(3)
@@ -80,7 +86,9 @@ def main() -> None:
     # Stage 4 — Show that an unregistered identifier is absent rather than empty.
     _stage(4)
     unknown_key = "not_a_registered_broker"
-    present = any(item.value == unknown_key for item in registered)
+    present = any(
+        get_broker_value_field(item, "value") == unknown_key for item in registered
+    )
     _report("unknown ", "success", f"present={present}")
     print("Unregistered identifier is absent, not an empty record:", present is False)
     print("A declared-but-unreleased write path still fails closed at execution: True")

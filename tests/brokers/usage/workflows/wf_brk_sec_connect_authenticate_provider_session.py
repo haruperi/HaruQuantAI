@@ -8,7 +8,18 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.brokers.contracts import BrokerId
+from app.services.brokers import (
+    connect_broker,
+    disconnect_broker,
+    get_broker_account_info,
+    get_broker_adapter_contract_version,
+    get_broker_adapter_schema_id,
+    get_broker_connection_status,
+    get_broker_feature_flags,
+    get_broker_permissions,
+    get_broker_value_field,
+    is_broker_connected,
+)
 from tests.brokers.usage._support import create_real_adapter, require_success
 
 WORKFLOW_ID = "WF-BRK-SEC"
@@ -25,44 +36,46 @@ async def run() -> None:
     """Execute the complete MT5 lifecycle."""
     print(f"{WORKFLOW_ID} — Connect and Authenticate Provider Session")
     print("INPUT BOUNDARY — caller-owned MT5 adapter with immutable demo config")
-    adapter = create_real_adapter(BrokerId.MT5)
+    adapter = create_real_adapter("mt5")
     try:
         # Stage 1 — Validate connection-only configuration.
         _stage(1)
-        assert adapter.contract_version == "v1"
-        assert adapter.schema_id == "brokers.adapter.v1"
+        assert get_broker_adapter_contract_version(adapter) == "v1"
+        assert get_broker_adapter_schema_id(adapter) == "brokers.adapter.v1"
 
         # Stage 2 — Establish transport and provider authentication.
         _stage(2)
-        require_success("MT5 connect", await adapter.connect())
+        require_success("MT5 connect", await connect_broker(adapter))
         connected = require_success(
-            "Verified connectivity", await adapter.is_connected()
+            "Verified connectivity", await is_broker_connected(adapter)
         )
-        print("Connection Test: ", connected.status)
-        assert connected.data is True
+        print("Connection Test: ", get_broker_value_field(connected, "status"))
+        assert get_broker_value_field(connected, "data") is True
 
         # Stage 3 — Verify account and environment identity.
         _stage(3)
         account_res = require_success(
-            "Account identity", await adapter.get_account_info()
+            "Account identity", await get_broker_account_info(adapter)
         )
-        if account_res.data is not None:
-            print("Account ID:", account_res.data.account_id)
-            print("Account Currency:", account_res.data.currency)
-        require_success("Permissions", await adapter.get_permissions())
+        data = get_broker_value_field(account_res, "data")
+        if data is not None:
+            print("Account ID:", get_broker_value_field(data, "account_id"))
+            print("Account Currency:", get_broker_value_field(data, "currency"))
+        require_success("Permissions", await get_broker_permissions(adapter))
 
         # Stage 4 — Refresh capability and lifecycle evidence.
         _stage(4)
-        require_success("Feature flags", await adapter.get_feature_flags())
+        require_success("Feature flags", await get_broker_feature_flags(adapter))
         status = require_success(
-            "Connection status", await adapter.get_connection_status()
+            "Connection status", await get_broker_connection_status(adapter)
         )
-        assert status.data is not None
-        assert status.data.transport_connected
+        status_data = get_broker_value_field(status, "data")
+        assert status_data is not None
+        assert get_broker_value_field(status_data, "transport_connected") is True
     finally:
         # Stage 5 — Disconnect and release every owned resource.
         _stage(5)
-        require_success("MT5 disconnect", await adapter.disconnect())
+        require_success("MT5 disconnect", await disconnect_broker(adapter))
     print("OUTPUT BOUNDARY — verified session evidence and deterministic disconnect")
 
 

@@ -3,12 +3,64 @@
 import importlib
 import inspect
 import sys
+from pathlib import Path
 
 
 def test_contract_exports_are_exact() -> None:
     """The contract package exposes only the documented public boundary."""
     contracts = importlib.import_module("app.services.brokers.contracts")
-    assert len(contracts.__all__) == 48
+    expected_exports = {
+        "BROKER_ERROR_CATALOG",
+        "AccountProvider",
+        "BrokerAccountInfo",
+        "BrokerAccountTransaction",
+        "BrokerAdapter",
+        "BrokerAssetInfo",
+        "BrokerBalance",
+        "BrokerBar",
+        "BrokerCapability",
+        "BrokerCapabilityId",
+        "BrokerConnectionConfig",
+        "BrokerConnectionEvent",
+        "BrokerConnectionState",
+        "BrokerConnectionStatus",
+        "BrokerDeal",
+        "BrokerEnvironment",
+        "BrokerError",
+        "BrokerErrorCode",
+        "BrokerFeatureFlags",
+        "BrokerFeeEstimate",
+        "BrokerId",
+        "BrokerMarginRequest",
+        "BrokerMarketStatus",
+        "BrokerOrder",
+        "BrokerOrderBook",
+        "BrokerOrderCheck",
+        "BrokerOrderFilter",
+        "BrokerOrderModificationRequest",
+        "BrokerOrderRequest",
+        "BrokerOrderResult",
+        "BrokerPage",
+        "BrokerPermissions",
+        "BrokerPlatformInfo",
+        "BrokerPosition",
+        "BrokerPositionCloseRequest",
+        "BrokerPositionFilter",
+        "BrokerPositionModificationRequest",
+        "BrokerProfitRequest",
+        "BrokerQuote",
+        "BrokerServerTime",
+        "BrokerSubscription",
+        "BrokerSubscriptionInfo",
+        "BrokerSymbolInfo",
+        "BrokerTick",
+        "BrokerTradingSession",
+        "CalculationProvider",
+        "MarketDataProvider",
+        "StandardResponse",
+        "TradeExecutionProvider",
+    }
+    assert set(contracts.__all__) == expected_exports
 
 
 def test_root_exports_are_function_only() -> None:
@@ -87,3 +139,20 @@ def test_registry_exports_are_exact() -> None:
         "get_registered_brokers",
         "get_broker_capability_catalogue",
     }
+
+
+def test_broker_owned_public_consumers_use_only_the_root_boundary() -> None:
+    """Usage, workflows, and integration evidence never deep-import Brokers."""
+    test_root = Path(__file__).resolve().parents[1]
+    consumer_paths = (
+        *sorted((test_root / "usage").glob("*.py")),
+        *sorted((test_root / "usage" / "workflows").glob("*.py")),
+        *sorted((test_root / "integration").glob("*.py")),
+        test_root / "wf_support.py",
+    )
+    violations = [
+        str(path.relative_to(test_root))
+        for path in consumer_paths
+        if "app.services.brokers." in path.read_text(encoding="utf-8")
+    ]
+    assert not violations, f"Broker deep imports are prohibited: {violations}"

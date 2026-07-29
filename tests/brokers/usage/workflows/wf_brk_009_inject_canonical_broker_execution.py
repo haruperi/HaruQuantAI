@@ -8,7 +8,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.brokers.contracts import BrokerAdapter, BrokerId
+from app.services.brokers import (
+    connect_broker,
+    disconnect_broker,
+    get_broker_adapter_schema_id,
+    get_broker_connection_status,
+    get_broker_quote,
+)
 from tests.brokers.usage._support import create_real_adapter, require_success
 
 WORKFLOW_ID = "WF-BRK-009"
@@ -20,10 +26,10 @@ STAGES = (
 )
 
 
-async def _execution_consumer(adapter: BrokerAdapter) -> None:
+async def _execution_consumer(adapter: object) -> None:
     """Represent a Trading consumer that knows only the canonical protocol."""
-    require_success("Injected status", await adapter.get_connection_status())
-    require_success("Injected quote", await adapter.get_quote("EURUSD"))
+    require_success("Injected status", await get_broker_connection_status(adapter))
+    require_success("Injected quote", await get_broker_quote(adapter, "EURUSD"))
 
 
 async def run() -> None:
@@ -33,14 +39,14 @@ async def run() -> None:
 
     # Stage 1 — Resolve a genuine MT5 adapter at the composition root.
     _stage(1)
-    adapter = create_real_adapter(BrokerId.MT5)
+    adapter = create_real_adapter("mt5")
     try:
-        require_success("MT5 connect", await adapter.connect())
+        require_success("MT5 connect", await connect_broker(adapter))
 
         # Stage 2 — Inject only the canonical BrokerAdapter capability.
         _stage(2)
-        injected: BrokerAdapter = adapter
-        assert injected.schema_id == "brokers.adapter.v1"
+        injected = adapter
+        assert get_broker_adapter_schema_id(injected) == "brokers.adapter.v1"
 
         # Stage 3 — Execute through the provider-neutral protocol.
         _stage(3)
@@ -48,7 +54,7 @@ async def run() -> None:
     finally:
         # Stage 4 — Return canonical evidence and release the adapter.
         _stage(4)
-        require_success("MT5 disconnect", await adapter.disconnect())
+        require_success("MT5 disconnect", await disconnect_broker(adapter))
     print("OUTPUT BOUNDARY — Trading consumed BrokerAdapter, not a native SDK")
 
 

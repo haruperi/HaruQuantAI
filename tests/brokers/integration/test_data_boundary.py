@@ -2,21 +2,20 @@
 
 import asyncio
 
-from app.services.brokers import create_broker_adapter
-from app.services.brokers.contracts import (
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerErrorCode,
-    BrokerId,
+from app.services.brokers import (
+    build_broker_connection_config,
+    create_configured_fake_broker_adapter,
+    get_broker_historical_bars,
+    get_broker_value_field,
 )
 
 _SYMBOL = "AAPL"
 
 
-def _config() -> BrokerConnectionConfig:
-    return BrokerConnectionConfig(
-        broker_id=BrokerId.YAHOO,
-        environment=BrokerEnvironment.SANDBOX,
+def _config() -> object:
+    return build_broker_connection_config(
+        "yahoo",
+        "sandbox",
         provider_enabled=True,
         connect_timeout_sec=1,
         request_timeout_sec=1,
@@ -31,16 +30,14 @@ def _config() -> BrokerConnectionConfig:
 
 def test_data_boundary_via_root() -> None:
     """Verify data boundary via root API and session gating."""
-    created = create_broker_adapter(BrokerId.YAHOO, _config())
-    assert created.status == "success"
-    adapter = created.data
-    assert adapter is not None
+    adapter = create_configured_fake_broker_adapter(_config())
 
     async def exercise() -> None:
         # Disconnected call returns BROKER_NOT_CONNECTED
-        result = await adapter.get_historical_bars(_SYMBOL, "1d", limit=1)
-        assert result.status != "success"
-        assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_NOT_CONNECTED.value
+        result = await get_broker_historical_bars(adapter, _SYMBOL, "1d", limit=1)
+        assert get_broker_value_field(result, "status") != "success"
+        error = get_broker_value_field(result, "error")
+        assert error is not None
+        assert get_broker_value_field(error, "code") == "BROKER_NOT_CONNECTED"
 
     asyncio.run(exercise())

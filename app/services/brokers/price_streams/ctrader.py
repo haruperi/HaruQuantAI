@@ -14,7 +14,6 @@ from app.services.brokers.contracts import (
     BrokerSubscriptionInfo,
     StandardResponse,
 )
-
 from app.services.brokers.ctrader_session.mapping import (
     _field,
     _map_quote,

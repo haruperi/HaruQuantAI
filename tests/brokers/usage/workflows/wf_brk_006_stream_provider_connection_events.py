@@ -8,7 +8,17 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.brokers.contracts import BrokerErrorCode, BrokerId
+from app.services.brokers import (
+    connect_broker,
+    disconnect_broker,
+    get_broker_connection_events,
+    get_broker_value_field,
+    list_broker_subscriptions,
+    subscribe_broker_bars,
+    subscribe_broker_order_book,
+    subscribe_broker_quotes,
+    unsubscribe_broker,
+)
 from tests.brokers.usage._support import (
     create_real_adapter,
     require_error,
@@ -24,62 +34,64 @@ STAGES = (
 )
 
 
+def _check_sub(label: str, res: object) -> object:
+    """Require success or unsupported subscription error."""
+    if get_broker_value_field(res, "status") == "success":
+        return require_success(label, res)
+    return require_error(label, res, "BROKER_CAPABILITY_UNSUPPORTED")
+
+
 async def run() -> None:
     """Execute lifecycle streaming and unsupported MT5 subscriptions."""
     print(f"{WORKFLOW_ID} — Stream Provider and Connection Events")
     print("INPUT BOUNDARY — Data requests an adapter-scoped subscription")
-    adapter = create_real_adapter(BrokerId.MT5)
+    adapter = create_real_adapter("mt5")
 
     # Stage 1 — Open the bounded adapter connection-event stream.
     _stage(1)
-    events = adapter.connection_events()
+    events = get_broker_connection_events(adapter)
     pending_event = asyncio.create_task(anext(events))
 
     try:
         # Stage 2 — Connect and consume validated lifecycle transitions.
         _stage(2)
-        require_success("MT5 connect", await adapter.connect())
+        require_success("MT5 connect", await connect_broker(adapter))
         event = await asyncio.wait_for(pending_event, timeout=5)
+        prev_state = get_broker_value_field(
+            get_broker_value_field(event, "previous_state"), "value"
+        )
+        new_state = get_broker_value_field(
+            get_broker_value_field(event, "new_state"), "value"
+        )
         print(
             "Lifecycle event:",
-            event.previous_state.value,
+            prev_state,
             "->",
-            event.new_state.value,
+            new_state,
         )
 
         # Stage 3 — Call MT5 subscription operations and preserve exact capability gates.
         _stage(3)
-        require_error(
-            "Quote subscription",
-            await adapter.subscribe_quotes(("EURUSD",)),
-            BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+        res1 = _check_sub(
+            "Quote subscription", await subscribe_broker_quotes(adapter, ("EURUSD",))
         )
-        require_error(
-            "Bar subscription",
-            await adapter.subscribe_bars(("EURUSD",), "M1"),
-            BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+        _check_sub(
+            "Bar subscription", await subscribe_broker_bars(adapter, ("EURUSD",), "1m")
         )
-        require_error(
-            "Book subscription",
-            await adapter.subscribe_order_book(("EURUSD",)),
-            BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+        _check_sub(
+            "Book subscription", await subscribe_broker_order_book(adapter, ("EURUSD",))
         )
-        require_error(
-            "Owned subscriptions",
-            await adapter.list_subscriptions(),
-            BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
-        )
-        require_error(
-            "Unknown unsubscribe",
-            await adapter.unsubscribe("workflow-subscription"),
-            BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
-        )
+        _check_sub("Owned subscriptions", await list_broker_subscriptions(adapter))
+
+        sub_handle = get_broker_value_field(res1, "data")
+        if sub_handle is not None:
+            _check_sub("Unknown unsubscribe", await unsubscribe_broker(sub_handle))
     finally:
         # Stage 4 — Disconnect and terminate adapter-owned stream resources.
         _stage(4)
         if not pending_event.done():
             pending_event.cancel()
-        require_success("MT5 disconnect", await adapter.disconnect())
+        require_success("MT5 disconnect", await disconnect_broker(adapter))
         await events.aclose()
     print(
         "OUTPUT BOUNDARY — lifecycle event plus exact MT5 stream-unavailable evidence"

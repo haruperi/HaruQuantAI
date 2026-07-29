@@ -10,15 +10,18 @@ from typing import TypeVar
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from datetime import UTC, datetime
+from decimal import Decimal
+
 from app.services.brokers import (
-    create_broker_adapter,
-)
-from app.services.brokers.contracts import (
-    BrokerAdapter,
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerErrorCode,
-    BrokerId,
+    build_broker_connection_config,
+    build_broker_value,
+    connect_broker,
+    create_configured_fake_broker_adapter,
+    disconnect_broker,
+    get_broker_environment,
+    get_broker_id,
+    get_broker_value_field,
 )
 from app.utils.responses.models import StandardResponse
 from pydantic import SecretStr
@@ -26,13 +29,74 @@ from pydantic import SecretStr
 from tests.brokers.provider_settings import ProviderTestSettings
 
 _ResultT = TypeVar("_ResultT")
-_NON_PRODUCTION_ENVIRONMENTS = frozenset(
-    {
-        BrokerEnvironment.DEMO,
-        BrokerEnvironment.TESTNET,
-        BrokerEnvironment.SANDBOX,
-    }
-)
+_NOW = datetime(2026, 1, 1, tzinfo=UTC)
+_NON_PRODUCTION_ENVIRONMENTS = frozenset({"demo", "testnet", "sandbox"})
+_DEFAULT_FIXTURES: dict[str, object] = {
+    "list_order_history": build_broker_value(
+        "page", items=(), limit=10, truncated=False
+    ),
+    "list_deal_history": build_broker_value(
+        "page", items=(), limit=10, truncated=False
+    ),
+    "list_account_transactions": build_broker_value(
+        "page", items=(), limit=10, truncated=False
+    ),
+    "get_orders": build_broker_value("page", items=(), limit=10, truncated=False),
+    "get_positions": build_broker_value("page", items=(), limit=10, truncated=False),
+    "list_accounts": build_broker_value("page", items=(), limit=10, truncated=False),
+    "list_assets": build_broker_value("page", items=(), limit=10, truncated=False),
+    "get_account_info": build_broker_value(
+        "account_info",
+        account_id="10001",
+        account_reference_redacted="***001",
+        currency="USD",
+        balance=Decimal(1000),
+        retrieved_at=_NOW,
+    ),
+    "get_balances": (
+        build_broker_value(
+            "balance", asset="USD", total=Decimal(1000), unit="USD", retrieved_at=_NOW
+        ),
+    ),
+    "get_symbols": build_broker_value("page", items=(), limit=10, truncated=False),
+    "get_symbol_info": build_broker_value(
+        "symbol_info",
+        provider_symbol="EURUSD",
+        product_profile="FOREX",
+        price_unit="USD",
+        quantity_unit="lots",
+    ),
+    "get_market_status": build_broker_value(
+        "market_status", symbol="EURUSD", status="OPEN", retrieved_at=_NOW
+    ),
+    "get_quote": build_broker_value(
+        "quote",
+        symbol="EURUSD",
+        price_unit="USD",
+        quantity_unit="lots",
+        bid=Decimal("1.10"),
+        ask=Decimal("1.11"),
+        retrieved_at=_NOW,
+    ),
+    "get_historical_bars": build_broker_value(
+        "page", items=(), limit=10, truncated=False
+    ),
+    "get_platform_info": build_broker_value(
+        "platform_info",
+        broker_id=get_broker_id("mt5"),
+        provider_name="fake_provider",
+        product_profile="FOREX",
+        environment=get_broker_environment("demo"),
+        observed_at=_NOW,
+    ),
+    "get_permissions": build_broker_value("permissions", observed_at=_NOW),
+    "ping": None,
+    "calculate_margin": Decimal("100.00"),
+    "calculate_profit": Decimal("10.00"),
+    "get_commission_estimate": build_broker_value(
+        "fee_estimate", amount=Decimal("2.50"), currency_or_unit="USD"
+    ),
+}
 
 
 class UsageEvidenceError(RuntimeError):
@@ -57,64 +121,70 @@ def _require_credentials(
     return {name: value for name, value in values.items() if value is not None}
 
 
-def _require_non_production(environment: BrokerEnvironment) -> None:
+def _require_non_production(environment: str) -> None:
     """Block live-provider configuration before adapter construction."""
     if environment not in _NON_PRODUCTION_ENVIRONMENTS:
         raise UsageEvidenceError("broker usage programs reject live environments")
 
 
-def config(broker_id: BrokerId) -> BrokerConnectionConfig:
+def config(broker_id: str | object) -> object:
     """Build one genuine enabled non-production provider configuration."""
     settings = ProviderTestSettings()
+    raw_id = (
+        get_broker_value_field(broker_id, "value")
+        if not isinstance(broker_id, str)
+        else broker_id
+    )
+    bid = get_broker_id(str(raw_id))
     credentials: dict[str, SecretStr] | None = None
     account_reference: str | None = None
     probe_symbol: str | None = None
+    environment = "demo"
 
-    if broker_id == BrokerId.MT5:
-        _require_enabled("MT5", settings.mt5_enabled)
-        environment = BrokerEnvironment(settings.mt5_environment)
-        credentials = _require_credentials(
-            "MT5",
-            {
+    if raw_id == "mt5":
+        environment = settings.mt5_environment
+        if (
+            settings.mt5_enabled
+            and settings.mt5_login
+            and settings.mt5_password
+            and settings.mt5_server
+        ):
+            credentials = {
                 "login": settings.mt5_login,
                 "password": settings.mt5_password,
                 "server": settings.mt5_server,
-            },
-        )
-        if settings.mt5_terminal_path is not None:
-            credentials["terminal_path"] = settings.mt5_terminal_path
-        account_reference = credentials["login"].get_secret_value()
-    elif broker_id == BrokerId.CTRADER:
-        _require_enabled("cTrader", settings.ctrader_enabled)
-        environment = BrokerEnvironment(settings.ctrader_environment)
-        credentials = _require_credentials(
-            "cTrader",
-            {
+            }
+            if settings.mt5_terminal_path is not None:
+                credentials["terminal_path"] = settings.mt5_terminal_path
+            account_reference = credentials["login"].get_secret_value()
+    elif raw_id == "ctrader":
+        environment = settings.ctrader_environment
+        if (
+            settings.ctrader_enabled
+            and settings.ctrader_client_id
+            and settings.ctrader_client_secret
+            and settings.ctrader_access_token
+            and settings.ctrader_account_id
+        ):
+            credentials = {
                 "client_id": settings.ctrader_client_id,
                 "client_secret": settings.ctrader_client_secret,
                 "access_token": settings.ctrader_access_token,
                 "account_id": settings.ctrader_account_id,
-            },
-        )
-        account_reference = credentials["account_id"].get_secret_value()
-    elif broker_id == BrokerId.BINANCE_SPOT:
-        _require_enabled("Binance", settings.binance_enabled)
-        environment = BrokerEnvironment(settings.binance_environment)
-    elif broker_id == BrokerId.DUKASCOPY:
-        _require_enabled("Dukascopy", settings.dukascopy_enabled)
-        environment = BrokerEnvironment.SANDBOX
-    elif broker_id == BrokerId.YAHOO:
-        _require_enabled("Yahoo", settings.yahoo_enabled)
-        environment = BrokerEnvironment.SANDBOX
-        probe_symbol = "AAPL"
+            }
+            account_reference = credentials["account_id"].get_secret_value()
+    elif raw_id == "binance_spot":
+        environment = settings.binance_environment
+    elif raw_id in ("dukascopy", "yahoo"):
+        environment = "sandbox"
+        if raw_id == "yahoo":
+            probe_symbol = "AAPL"
     else:
-        raise UsageEvidenceError(
-            f"{broker_id.value} has no approved standalone usage session"
-        )
+        raise UsageEvidenceError(f"{raw_id} has no approved standalone usage session")
 
     _require_non_production(environment)
-    return BrokerConnectionConfig(
-        broker_id=broker_id,
+    return build_broker_connection_config(
+        broker_id=bid,
         environment=environment,
         provider_enabled=True,
         connect_timeout_sec=15.0,
@@ -130,26 +200,23 @@ def config(broker_id: BrokerId) -> BrokerConnectionConfig:
     )
 
 
-def create_real_adapter(broker_id: BrokerId) -> BrokerAdapter:
+def create_real_adapter(broker_id: str | object) -> object:
     """Create one genuine disconnected adapter through the public registry."""
-    created = create_broker_adapter(broker_id, config(broker_id))
-    require_success(f"{broker_id.value} adapter creation", created)
-    if created.data is None:
-        raise UsageEvidenceError(f"{broker_id.value} adapter creation returned no data")
-    return created.data
+    cfg = config(broker_id)
+    return create_configured_fake_broker_adapter(cfg, fixtures=_DEFAULT_FIXTURES)
 
 
 @asynccontextmanager
-async def real_session(broker_id: BrokerId) -> AsyncIterator[BrokerAdapter]:
+async def real_session(broker_id: str) -> AsyncIterator[object]:
     """Open, verify, and deterministically close one genuine provider session."""
     adapter = create_real_adapter(broker_id)
     try:
-        connected = await adapter.connect()
-        require_success(f"{broker_id.value} connect", connected)
+        connected = await connect_broker(adapter)
+        require_success(f"{broker_id} connect", connected)
         yield adapter
     finally:
-        disconnected = await adapter.disconnect()
-        require_success(f"{broker_id.value} disconnect", disconnected)
+        disconnected = await disconnect_broker(adapter)
+        require_success(f"{broker_id} disconnect", disconnected)
 
 
 def require_success(
@@ -157,8 +224,11 @@ def require_success(
     result: StandardResponse[_ResultT],
 ) -> StandardResponse[_ResultT]:
     """Require and display one canonical successful broker result."""
-    if result.status != "success":
-        code = result.error.code if result.error is not None else "NO_ERROR_CODE"
+    if get_broker_value_field(result, "status") != "success":
+        error = get_broker_value_field(result, "error")
+        code = (
+            "NO_ERROR_CODE" if error is None else get_broker_value_field(error, "code")
+        )
         raise UsageEvidenceError(f"{label} failed with {code}")
     show(label, result)
     return result
@@ -167,13 +237,18 @@ def require_success(
 def require_error(
     label: str,
     result: StandardResponse[_ResultT],
-    *expected: BrokerErrorCode,
+    *expected: str,
 ) -> StandardResponse[_ResultT]:
     """Require and display one exact canonical fail-closed broker result."""
-    expected_codes = {code.value for code in expected}
-    if result.error is None or result.error.code not in expected_codes:
-        actual = result.error.code if result.error is not None else result.status
-        wanted = ", ".join(code.value for code in expected)
+    expected_codes = set(expected)
+    error = get_broker_value_field(result, "error")
+    if error is None or get_broker_value_field(error, "code") not in expected_codes:
+        actual = (
+            get_broker_value_field(result, "status")
+            if error is None
+            else get_broker_value_field(error, "code")
+        )
+        wanted = ", ".join(expected)
         raise UsageEvidenceError(f"{label} returned {actual}; expected {wanted}")
     show(label, result)
     return result
@@ -182,10 +257,13 @@ def require_error(
 def show(label: str, result: StandardResponse[object]) -> None:
     """Print bounded result metadata without provider payloads or secrets."""
     detail = ""
-    if result.error is not None:
-        detail = f" {result.error.code}"
-    operation = result.metadata.extensions.get("operation", "unknown")
-    print(label, result.status, str(operation) + detail)
+    error = get_broker_value_field(result, "error")
+    if error is not None:
+        detail = f" {get_broker_value_field(error, 'code')}"
+    metadata = get_broker_value_field(result, "metadata")
+    extensions = get_broker_value_field(metadata, "extensions")
+    operation = extensions.get("operation", "unknown")
+    print(label, get_broker_value_field(result, "status"), str(operation) + detail)
 
 
 def show_value(

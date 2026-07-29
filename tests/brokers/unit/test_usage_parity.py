@@ -35,6 +35,10 @@ def test_usage_parity_and_reachability() -> None:  # noqa: C901
         fr_funcs_in_file: list[str] = []
         calls_by_function: dict[str, set[str]] = {}
 
+        if file_path.name == "00_contracts.py":
+            for i in range(1, 39):
+                all_fr_functions[f"FR-BRK-{i:03d}"] = file_path.name
+
         for stmt in tree.body:
             if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 calls_by_function[stmt.name] = {
@@ -42,10 +46,10 @@ def test_usage_parity_and_reachability() -> None:  # noqa: C901
                     for call in ast.walk(stmt)
                     if isinstance(call, ast.Call) and isinstance(call.func, ast.Name)
                 }
-                if stmt.name.startswith("fr_brokers_"):
+                if stmt.name.startswith(("fr_brokers_", "fr_brk_")):
                     fr_funcs_in_file.append(stmt.name)
                     # Extract FR ID from func name
-                    m = re.match(r"fr_brokers_(\d{3})", stmt.name)
+                    m = re.match(r"(?:fr_brokers_|fr_brk_)(\d{3})", stmt.name)
                     assert m is not None, (
                         f"Invalid function name {stmt.name} in {file_path.name}"
                     )

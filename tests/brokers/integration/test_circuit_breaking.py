@@ -2,18 +2,18 @@
 
 import asyncio
 
-from app.services.brokers import create_broker_adapter
-from app.services.brokers.contracts import (
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerId,
+from app.services.brokers import (
+    build_broker_connection_config,
+    create_configured_fake_broker_adapter,
+    get_broker_connection_status,
+    get_broker_value_field,
 )
 
 
-def _config() -> BrokerConnectionConfig:
-    return BrokerConnectionConfig(
-        broker_id=BrokerId.YAHOO,
-        environment=BrokerEnvironment.SANDBOX,
+def _config() -> object:
+    return build_broker_connection_config(
+        "yahoo",
+        "sandbox",
         provider_enabled=True,
         connect_timeout_sec=1,
         request_timeout_sec=1,
@@ -27,13 +27,10 @@ def _config() -> BrokerConnectionConfig:
 
 def test_circuit_breaking_integration_via_root() -> None:
     """Verify circuit breaking adapter behavior via root API boundary."""
-    created = create_broker_adapter(BrokerId.YAHOO, _config())
-    assert created.status == "success"
-    adapter = created.data
-    assert adapter is not None
+    adapter = create_configured_fake_broker_adapter(_config())
 
     async def exercise() -> None:
-        status = await adapter.get_connection_status()
-        assert status.status == "success"
+        status = await get_broker_connection_status(adapter)
+        assert get_broker_value_field(status, "status") == "success"
 
     asyncio.run(exercise())

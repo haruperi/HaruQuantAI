@@ -2,12 +2,12 @@
 
 import asyncio
 
-from app.services.brokers import create_broker_adapter
-from app.services.brokers.contracts import (
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerErrorCode,
-    BrokerId,
+from app.services.brokers import (
+    build_broker_connection_config,
+    create_broker_adapter,
+    get_broker_id,
+    get_broker_value_field,
+    subscribe_broker_quotes,
 )
 from pydantic import SecretStr
 
@@ -15,10 +15,10 @@ _BUFFER_SIZE = 2
 _SYMBOL = "BTCUSDT"
 
 
-def _config() -> BrokerConnectionConfig:
-    return BrokerConnectionConfig(
-        broker_id=BrokerId.BINANCE_SPOT,
-        environment=BrokerEnvironment.TESTNET,
+def _config() -> object:
+    return build_broker_connection_config(
+        get_broker_id("binance_spot"),
+        "testnet",
         provider_enabled=True,
         connect_timeout_sec=1,
         request_timeout_sec=1,
@@ -36,16 +36,17 @@ def _config() -> BrokerConnectionConfig:
 
 def test_streaming_boundary_via_root() -> None:
     """Verify streaming boundary behavior via domain root API."""
-    created = create_broker_adapter(BrokerId.BINANCE_SPOT, _config())
-    assert created.status == "success"
-    adapter = created.data
+    created = create_broker_adapter(get_broker_id("binance_spot"), _config())
+    assert get_broker_value_field(created, "status") == "success"
+    adapter = get_broker_value_field(created, "data")
     assert adapter is not None
 
     async def exercise() -> None:
         # Unreleased subscribe_quotes returns BROKER_CAPABILITY_UNSUPPORTED
-        result = await adapter.subscribe_quotes((_SYMBOL,))
-        assert result.status != "success"
-        assert result.error is not None
-        assert result.error.code == BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED.value
+        result = await subscribe_broker_quotes(adapter, (_SYMBOL,))
+        assert get_broker_value_field(result, "status") != "success"
+        error = get_broker_value_field(result, "error")
+        assert error is not None
+        assert get_broker_value_field(error, "code") == "BROKER_CAPABILITY_UNSUPPORTED"
 
     asyncio.run(exercise())

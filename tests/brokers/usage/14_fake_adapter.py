@@ -5,33 +5,19 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import _support  # noqa: F401
-from _support import config, require_error, require_success
+from _support import require_error, require_success
 from app.services.brokers import (
-    create_broker_adapter,
-    create_fake_broker_adapter,
+    build_broker_connection_config,
+    build_broker_value,
+    connect_broker,
+    create_configured_fake_broker_adapter,
+    disconnect_broker,
+    get_broker_quote,
+    get_broker_value_field,
+    set_fake_broker_error,
 )
-from app.services.brokers.contracts import (
-    BrokerCapability,
-    BrokerCapabilityId,
-    BrokerError,
-    BrokerErrorCode,
-    BrokerId,
-    BrokerQuote,
-)
-from app.services.brokers.testing import FakeBrokerAdapter
 
 _NOW = datetime(2026, 1, 1, tzinfo=UTC)
-_MUTATIONS = frozenset(
-    {
-        BrokerCapabilityId.CHECK_ORDER,
-        BrokerCapabilityId.PLACE_ORDER,
-        BrokerCapabilityId.MODIFY_ORDER,
-        BrokerCapabilityId.CANCEL_ORDER,
-        BrokerCapabilityId.MODIFY_POSITION,
-        BrokerCapabilityId.CLOSE_POSITION,
-        BrokerCapabilityId.REPLACE_ORDER,
-    }
-)
 
 
 def _header(title: str) -> None:
@@ -39,25 +25,10 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _capabilities() -> dict[BrokerCapabilityId, BrokerCapability]:
-    """Declare the bounded non-production fake capability surface."""
-    return {
-        operation: BrokerCapability(
-            capability=operation,
-            implementation_status="IMPLEMENTED",
-            availability=("UNAVAILABLE" if operation in _MUTATIONS else "AVAILABLE"),
-            access_mode="WRITE" if operation in _MUTATIONS else "READ",
-            requirement="NONE",
-            verification_status="NOT_TESTED",
-            execution_model="TEST_DOUBLE",
-        )
-        for operation in BrokerCapabilityId
-    }
-
-
-def _quote() -> BrokerQuote:
+def _quote() -> object:
     """Return one valid deterministic quote fixture."""
-    return BrokerQuote(
+    return build_broker_value(
+        "quote",
         symbol="EURUSD",
         price_unit="USD",
         quantity_unit="units",
@@ -67,54 +38,60 @@ def _quote() -> BrokerQuote:
     )
 
 
-async def fr_brokers_133(adapter: FakeBrokerAdapter) -> None:
+async def fr_brokers_133(adapter: object) -> None:
     """FR-BRK-133: Inject and return one exact fake-adapter fixture."""
     _header("FR-BRK-133: Inject and return one exact fake-adapter fixture.")
-    result = await adapter.get_quote("EURUSD")
+    result = await get_broker_quote(adapter, "EURUSD")
     require_success("Result", result)
-    assert result.data == _quote()
+    assert get_broker_value_field(result, "data") == _quote()
 
 
-async def fr_brokers_134(adapter: FakeBrokerAdapter) -> None:
+async def fr_brokers_134(adapter: object) -> None:
     """FR-BRK-134: Inject and clear one exact fake-adapter error."""
     _header("FR-BRK-134: Inject and clear one exact fake-adapter error.")
-    adapter.inject_error(
-        BrokerCapabilityId.GET_QUOTE,
-        BrokerError(code=BrokerErrorCode.BROKER_TIMEOUT, message="bounded timeout"),
+    require_success(
+        "Injected fixture",
+        set_fake_broker_error(
+            adapter, "get_quote", "BROKER_TIMEOUT", "bounded timeout"
+        ),
     )
     require_error(
         "Injected result",
-        await adapter.get_quote("EURUSD"),
-        BrokerErrorCode.BROKER_TIMEOUT,
+        await get_broker_quote(adapter, "EURUSD"),
+        "BROKER_TIMEOUT",
     )
-    adapter.inject_error(BrokerCapabilityId.GET_QUOTE, None)
-    require_success("Cleared result", await adapter.get_quote("EURUSD"))
+    require_success("Cleared fixture", set_fake_broker_error(adapter, "get_quote"))
+    require_success("Cleared result", await get_broker_quote(adapter, "EURUSD"))
 
 
-async def fr_brokers_135(adapter: FakeBrokerAdapter) -> None:
+async def fr_brokers_135(adapter: object) -> None:
     """FR-BRK-135: Preserve the package-root API boundary export."""
     del adapter
     _header("FR-BRK-135: Preserve the package-root API boundary export.")
-    print("Result root export verified", callable(create_broker_adapter))
-    assert callable(create_broker_adapter)
-    assert callable(create_fake_broker_adapter)
+    print(
+        "Result root export verified", callable(create_configured_fake_broker_adapter)
+    )
+    assert callable(create_configured_fake_broker_adapter)
 
 
 async def _run() -> None:
     """Execute the feature whose explicit purpose is deterministic fake behavior."""
     quote = _quote()
-    adapter = create_fake_broker_adapter(
-        config(BrokerId.YAHOO),
-        _capabilities(),
-        fixtures={BrokerCapabilityId.GET_QUOTE: quote},
+    adapter = create_configured_fake_broker_adapter(
+        build_broker_connection_config(
+            broker_id="yahoo",
+            environment="sandbox",
+            provider_enabled=True,
+        ),
+        {"get_quote": quote},
     )
-    require_success("connect", await adapter.connect())
+    require_success("connect", await connect_broker(adapter))
     try:
         await fr_brokers_133(adapter)
         await fr_brokers_134(adapter)
         await fr_brokers_135(adapter)
     finally:
-        require_success("disconnect", await adapter.disconnect())
+        require_success("disconnect", await disconnect_broker(adapter))
 
 
 def main() -> None:

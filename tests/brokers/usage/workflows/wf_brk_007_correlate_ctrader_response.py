@@ -8,7 +8,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.brokers.contracts import BrokerId
+from app.services.brokers import (
+    connect_broker,
+    disconnect_broker,
+    get_broker_connection_status,
+    get_broker_value_field,
+)
 from tests.brokers.usage._support import create_real_adapter, require_success
 
 WORKFLOW_ID = "WF-BRK-007"
@@ -24,30 +29,38 @@ async def run() -> None:
     """Execute the public cTrader concurrency boundary."""
     print(f"{WORKFLOW_ID} — Correlate cTrader Response")
     print("INPUT BOUNDARY — cTrader requests in one adapter session generation")
-    adapter = create_real_adapter(BrokerId.CTRADER)
+    adapter = create_real_adapter("ctrader")
     try:
         # Stage 1 — Connect one genuine cTrader demo session generation.
         _stage(1)
-        require_success("cTrader connect", await adapter.connect())
+        require_success("cTrader connect", await connect_broker(adapter))
 
         # Stage 2 — Submit concurrent same-result-type status requests.
         _stage(2)
         first, second = await asyncio.gather(
-            adapter.get_connection_status(),
-            adapter.get_connection_status(),
+            get_broker_connection_status(adapter),
+            get_broker_connection_status(adapter),
         )
 
         # Stage 3 — Accept only each request's canonical correlated response.
         _stage(3)
         require_success("First correlated response", first)
         require_success("Second correlated response", second)
-        assert first.data is not None
-        assert second.data is not None
-        print("Correlated states:", first.data.state.value, second.data.state.value)
+        first_data = get_broker_value_field(first, "data")
+        second_data = get_broker_value_field(second, "data")
+        assert first_data is not None
+        assert second_data is not None
+        first_state = get_broker_value_field(
+            get_broker_value_field(first_data, "state"), "value"
+        )
+        second_state = get_broker_value_field(
+            get_broker_value_field(second_data, "state"), "value"
+        )
+        print("Correlated states:", first_state, second_state)
     finally:
         # Stage 4 — Disconnect without retaining stale-generation state.
         _stage(4)
-        require_success("cTrader disconnect", await adapter.disconnect())
+        require_success("cTrader disconnect", await disconnect_broker(adapter))
     print("OUTPUT BOUNDARY — two canonical same-type responses in one session")
 
 

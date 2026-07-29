@@ -9,18 +9,22 @@ from typing import Any
 from app.services.brokers.contracts.enums import (
     BrokerCapabilityId,
     BrokerEnvironment,
+    BrokerErrorCode,
     BrokerId,
 )
 from app.services.brokers.contracts.models import (
     BrokerAccountInfo,
     BrokerAccountTransaction,
+    BrokerAssetInfo,
     BrokerBalance,
     BrokerBar,
+    BrokerCapability,
     BrokerConnectionConfig,
     BrokerConnectionStatus,
     BrokerDeal,
     BrokerError,
     BrokerFeatureFlags,
+    BrokerFeeEstimate,
     BrokerMarginRequest,
     BrokerMarketStatus,
     BrokerOrder,
@@ -39,6 +43,7 @@ from app.services.brokers.contracts.models import (
     BrokerPositionModificationRequest,
     BrokerProfitRequest,
     BrokerQuote,
+    BrokerServerTime,
     BrokerSubscriptionInfo,
     BrokerSymbolInfo,
     BrokerTick,
@@ -50,7 +55,214 @@ from app.services.brokers.contracts.protocols import (
 )
 from app.utils.responses.models import StandardResponse
 
+_BROKER_VALUE_TYPES: Mapping[str, type[object]] = {
+    "account_info": BrokerAccountInfo,
+    "account_transaction": BrokerAccountTransaction,
+    "asset_info": BrokerAssetInfo,
+    "balance": BrokerBalance,
+    "bar": BrokerBar,
+    "connection_config": BrokerConnectionConfig,
+    "connection_status": BrokerConnectionStatus,
+    "deal": BrokerDeal,
+    "error": BrokerError,
+    "feature_flags": BrokerFeatureFlags,
+    "fee_estimate": BrokerFeeEstimate,
+    "margin_request": BrokerMarginRequest,
+    "market_status": BrokerMarketStatus,
+    "order": BrokerOrder,
+    "order_book": BrokerOrderBook,
+    "order_check": BrokerOrderCheck,
+    "order_filter": BrokerOrderFilter,
+    "order_modification_request": BrokerOrderModificationRequest,
+    "order_request": BrokerOrderRequest,
+    "order_result": BrokerOrderResult,
+    "page": BrokerPage,
+    "permissions": BrokerPermissions,
+    "platform_info": BrokerPlatformInfo,
+    "position": BrokerPosition,
+    "position_close_request": BrokerPositionCloseRequest,
+    "position_filter": BrokerPositionFilter,
+    "position_modification_request": BrokerPositionModificationRequest,
+    "profit_request": BrokerProfitRequest,
+    "quote": BrokerQuote,
+    "subscription_info": BrokerSubscriptionInfo,
+    "symbol_info": BrokerSymbolInfo,
+    "tick": BrokerTick,
+    "trading_session": BrokerTradingSession,
+}
+
 # --- DTO Builder Functions ---
+
+
+def build_broker_value(value_type: str, /, **fields: object) -> object:
+    """Build one documented opaque Broker contract value.
+
+    Args:
+        value_type: Registered lower-snake-case contract value name.
+        **fields: Exact constructor fields for that contract value.
+
+    Returns:
+        A Broker-owned opaque value.
+
+    Raises:
+        ValueError: If ``value_type`` is not a documented contract value.
+        TypeError: If the supplied fields do not satisfy its invariant.
+    """
+    target = _BROKER_VALUE_TYPES.get(value_type)
+    if target is None:
+        message = f"Unsupported Broker value type: {value_type}"
+        raise ValueError(message)
+    return target(**fields)
+
+
+def get_broker_value_field(value: object, field_name: str) -> object:
+    """Return one non-private field from an opaque Broker-owned value.
+
+    Args:
+        value: Value returned by a Broker root function.
+        field_name: Documented non-private field to read.
+
+    Returns:
+        The requested field value.
+
+    Raises:
+        ValueError: If a private field name is requested.
+        TypeError: If the value does not expose the requested field.
+    """
+    if field_name.startswith("_"):
+        raise ValueError("Broker value fields must be public")
+    try:
+        return getattr(value, field_name)
+    except AttributeError as error:
+        message = f"Broker value does not expose {field_name!r}"
+        raise TypeError(message) from error
+
+
+def set_fake_broker_error(
+    adapter: object,
+    capability_id: str,
+    error_code: str | None = None,
+    message: str = "bounded fake-adapter error",
+) -> StandardResponse[None]:
+    """Set or clear one deterministic fake-adapter error fixture.
+
+    Args:
+        adapter: Opaque fake adapter created through the package root.
+        capability_id: Capability identifier whose result is controlled.
+        error_code: Canonical error code, or ``None`` to clear the fixture.
+        message: Bounded non-sensitive error message.
+
+    Returns:
+        Canonical fixture-update result.
+
+    Raises:
+        TypeError: If ``adapter`` is not a package-root fake adapter value.
+    """
+    from app.services.brokers.testing.fake import FakeBrokerAdapter
+
+    if not isinstance(adapter, FakeBrokerAdapter):
+        raise TypeError("adapter must be a fake broker adapter")
+    error = (
+        None
+        if error_code is None
+        else BrokerError(code=BrokerErrorCode(error_code), message=message)
+    )
+    return adapter.inject_error(BrokerCapabilityId(capability_id), error)
+
+
+def create_configured_fake_broker_adapter(
+    config: object, fixtures: Mapping[str, object] | None = None
+) -> object:
+    """Create an opaque deterministic fake adapter from root-built values.
+
+    Args:
+        config: Opaque Broker connection configuration.
+        fixtures: Optional capability-ID to opaque fixture-value mapping.
+
+    Returns:
+        Opaque deterministic fake adapter.
+
+    Raises:
+        TypeError: If config is not a Broker connection configuration.
+    """
+    from app.services.brokers.testing.fake import FakeBrokerAdapter
+
+    if not isinstance(config, BrokerConnectionConfig):
+        raise TypeError("config must be a Broker connection configuration")
+    mutations = {
+        BrokerCapabilityId.CHECK_ORDER,
+        BrokerCapabilityId.PLACE_ORDER,
+        BrokerCapabilityId.MODIFY_ORDER,
+        BrokerCapabilityId.CANCEL_ORDER,
+        BrokerCapabilityId.MODIFY_POSITION,
+        BrokerCapabilityId.CLOSE_POSITION,
+        BrokerCapabilityId.REPLACE_ORDER,
+    }
+    capabilities = {
+        capability: BrokerCapability(
+            capability=capability,
+            implementation_status="IMPLEMENTED",
+            availability="UNAVAILABLE" if capability in mutations else "AVAILABLE",
+            access_mode="WRITE" if capability in mutations else "READ",
+            requirement="NONE",
+            verification_status="NOT_TESTED",
+            execution_model="TEST_DOUBLE",
+        )
+        for capability in BrokerCapabilityId
+    }
+    mapped_fixtures = {
+        BrokerCapabilityId(capability): fixture
+        for capability, fixture in (fixtures or {}).items()
+    }
+    return FakeBrokerAdapter(config, capabilities, fixtures=mapped_fixtures)
+
+
+def get_broker_id(value: str) -> object:
+    """Return one opaque validated Broker provider identifier.
+
+    Args:
+        value: Canonical provider identifier.
+
+    Returns:
+        Broker-owned validated provider identifier.
+    """
+    return BrokerId(value)
+
+
+def get_broker_environment(value: str) -> object:
+    """Return one opaque validated Broker environment identifier.
+
+    Args:
+        value: Canonical environment identifier.
+
+    Returns:
+        Broker-owned validated environment identifier.
+    """
+    return BrokerEnvironment(value)
+
+
+def get_broker_capability_id(value: str) -> object:
+    """Return one opaque validated Broker capability identifier.
+
+    Args:
+        value: Canonical capability identifier.
+
+    Returns:
+        Broker-owned validated capability identifier.
+    """
+    return BrokerCapabilityId(value)
+
+
+def get_broker_error_code(value: str) -> object:
+    """Return one opaque validated canonical Broker error code.
+
+    Args:
+        value: Canonical error-code identifier.
+
+    Returns:
+        Broker-owned validated error code.
+    """
+    return BrokerErrorCode(value)
 
 
 def build_broker_connection_config(
@@ -113,57 +325,67 @@ def build_broker_connection_config(
 
 
 def build_broker_order_request(
-    broker_id: BrokerId | str,
-    account_reference: str | None,
     symbol: str,
-    order_type: str,
     side: str,
+    order_type: str,
     quantity: Decimal | float | str,
-    price: Decimal | float | str | None = None,
+    quantity_unit: str,
+    environment: BrokerEnvironment | str,
+    account_reference: str | None = None,
+    limit_price: Decimal | float | str | None = None,
+    stop_price: Decimal | float | str | None = None,
     stop_loss: Decimal | float | str | None = None,
     take_profit: Decimal | float | str | None = None,
-    time_in_force: str = "gtc",
+    time_in_force: str | None = None,
+    expiration: datetime | None = None,
     client_order_id: str | None = None,
 ) -> BrokerOrderRequest:
     """Build a BrokerOrderRequest instance.
 
     Args:
-        broker_id: Broker identifier.
-        account_reference: Account reference string.
         symbol: Instrument symbol.
-        order_type: Order type (market, limit, stop).
         side: Order side (buy, sell).
+        order_type: Order type (market, limit, stop).
         quantity: Order quantity.
-        price: Optional limit price.
+        quantity_unit: Provider quantity unit.
+        environment: Target broker environment.
+        account_reference: Optional account reference.
+        limit_price: Optional limit price.
+        stop_price: Optional stop price.
         stop_loss: Optional stop loss price.
         take_profit: Optional take profit price.
         time_in_force: Time in force policy.
+        expiration: Optional GTD expiration.
         client_order_id: Optional client-side order identifier.
 
     Returns:
         Configured BrokerOrderRequest instance.
     """
-    bid = BrokerId(broker_id) if isinstance(broker_id, str) else broker_id
+    env = (
+        BrokerEnvironment(environment) if isinstance(environment, str) else environment
+    )
     return BrokerOrderRequest(
-        broker_id=bid,
-        account_reference=account_reference,
         symbol=symbol,
         order_type=order_type,
         side=side,
         quantity=Decimal(str(quantity)),
-        price=Decimal(str(price)) if price is not None else None,
+        quantity_unit=quantity_unit,
+        environment=env,
+        account_reference=account_reference,
+        limit_price=Decimal(str(limit_price)) if limit_price is not None else None,
+        stop_price=Decimal(str(stop_price)) if stop_price is not None else None,
         stop_loss=Decimal(str(stop_loss)) if stop_loss is not None else None,
         take_profit=Decimal(str(take_profit)) if take_profit is not None else None,
         time_in_force=time_in_force,
+        expiration=expiration,
         client_order_id=client_order_id,
     )
 
 
 def build_broker_order_modification_request(
-    broker_id: BrokerId | str,
     order_id: str,
-    symbol: str,
-    price: Decimal | float | str | None = None,
+    limit_price: Decimal | float | str | None = None,
+    stop_price: Decimal | float | str | None = None,
     stop_loss: Decimal | float | str | None = None,
     take_profit: Decimal | float | str | None = None,
     quantity: Decimal | float | str | None = None,
@@ -171,10 +393,9 @@ def build_broker_order_modification_request(
     """Build a BrokerOrderModificationRequest instance.
 
     Args:
-        broker_id: Broker identifier.
         order_id: Order identifier.
-        symbol: Instrument symbol.
-        price: Optional new price.
+        limit_price: Optional new limit price.
+        stop_price: Optional new stop price.
         stop_loss: Optional new stop loss.
         take_profit: Optional new take profit.
         quantity: Optional new quantity.
@@ -182,12 +403,10 @@ def build_broker_order_modification_request(
     Returns:
         Configured BrokerOrderModificationRequest instance.
     """
-    bid = BrokerId(broker_id) if isinstance(broker_id, str) else broker_id
     return BrokerOrderModificationRequest(
-        broker_id=bid,
         order_id=order_id,
-        symbol=symbol,
-        price=Decimal(str(price)) if price is not None else None,
+        limit_price=Decimal(str(limit_price)) if limit_price is not None else None,
+        stop_price=Decimal(str(stop_price)) if stop_price is not None else None,
         stop_loss=Decimal(str(stop_loss)) if stop_loss is not None else None,
         take_profit=Decimal(str(take_profit)) if take_profit is not None else None,
         quantity=Decimal(str(quantity)) if quantity is not None else None,
@@ -195,118 +414,111 @@ def build_broker_order_modification_request(
 
 
 def build_broker_position_close_request(
-    broker_id: BrokerId | str,
     position_id: str,
-    symbol: str,
-    quantity: Decimal | float | str | None = None,
+    quantity: Decimal | float | str,
+    quantity_unit: str,
 ) -> BrokerPositionCloseRequest:
     """Build a BrokerPositionCloseRequest instance.
 
     Args:
-        broker_id: Broker identifier.
         position_id: Position identifier.
-        symbol: Instrument symbol.
-        quantity: Optional partial close quantity.
+        quantity: Exact close quantity.
+        quantity_unit: Provider quantity unit.
 
     Returns:
         Configured BrokerPositionCloseRequest instance.
     """
-    bid = BrokerId(broker_id) if isinstance(broker_id, str) else broker_id
     return BrokerPositionCloseRequest(
-        broker_id=bid,
         position_id=position_id,
-        symbol=symbol,
-        quantity=Decimal(str(quantity)) if quantity is not None else None,
+        quantity=Decimal(str(quantity)),
+        quantity_unit=quantity_unit,
     )
 
 
 def build_broker_position_modification_request(
-    broker_id: BrokerId | str,
     position_id: str,
-    symbol: str,
     stop_loss: Decimal | float | str | None = None,
     take_profit: Decimal | float | str | None = None,
 ) -> BrokerPositionModificationRequest:
     """Build a BrokerPositionModificationRequest instance.
 
     Args:
-        broker_id: Broker identifier.
         position_id: Position identifier.
-        symbol: Instrument symbol.
         stop_loss: Optional stop loss price.
         take_profit: Optional take profit price.
 
     Returns:
         Configured BrokerPositionModificationRequest instance.
     """
-    bid = BrokerId(broker_id) if isinstance(broker_id, str) else broker_id
     return BrokerPositionModificationRequest(
-        broker_id=bid,
         position_id=position_id,
-        symbol=symbol,
         stop_loss=Decimal(str(stop_loss)) if stop_loss is not None else None,
         take_profit=Decimal(str(take_profit)) if take_profit is not None else None,
     )
 
 
 def build_broker_margin_request(
-    broker_id: BrokerId | str,
     symbol: str,
     side: str,
     quantity: Decimal | float | str,
+    quantity_unit: str,
+    product_profile: str,
     price: Decimal | float | str | None = None,
 ) -> BrokerMarginRequest:
     """Build a BrokerMarginRequest instance.
 
     Args:
-        broker_id: Broker identifier.
         symbol: Instrument symbol.
         side: Trade side.
         quantity: Order quantity.
+        quantity_unit: Provider quantity unit.
+        product_profile: Provider product profile.
         price: Optional reference price.
 
     Returns:
         Configured BrokerMarginRequest instance.
     """
-    bid = BrokerId(broker_id) if isinstance(broker_id, str) else broker_id
     return BrokerMarginRequest(
-        broker_id=bid,
         symbol=symbol,
         side=side,
         quantity=Decimal(str(quantity)),
+        quantity_unit=quantity_unit,
+        product_profile=product_profile,
         price=Decimal(str(price)) if price is not None else None,
     )
 
 
 def build_broker_profit_request(
-    broker_id: BrokerId | str,
     symbol: str,
     side: str,
     quantity: Decimal | float | str,
+    quantity_unit: str,
     open_price: Decimal | float | str,
     close_price: Decimal | float | str,
+    product_profile: str,
 ) -> BrokerProfitRequest:
     """Build a BrokerProfitRequest instance.
 
     Args:
-        broker_id: Broker identifier.
         symbol: Instrument symbol.
         side: Position side.
         quantity: Quantity.
+        quantity_unit: Provider quantity unit.
         open_price: Opening price.
         close_price: Closing price.
+        product_profile: Provider product profile.
 
     Returns:
         Configured BrokerProfitRequest instance.
     """
-    bid = BrokerId(broker_id) if isinstance(broker_id, str) else broker_id
     return BrokerProfitRequest(
-        broker_id=bid,
         symbol=symbol,
         side=side,
         quantity=Decimal(str(quantity)),
+        quantity_unit=quantity_unit,
         open_price=Decimal(str(open_price)),
         close_price=Decimal(str(close_price)),
+        product_profile=product_profile,
     )
 
 
@@ -330,8 +542,8 @@ def build_broker_order_filter(
     return BrokerOrderFilter(
         symbol=symbol,
         status=status,
-        start_time=start_time,
-        end_time=end_time,
+        start=start_time,
+        end=end_time,
     )
 
 
@@ -347,6 +559,148 @@ def build_broker_position_filter(
         Configured BrokerPositionFilter instance.
     """
     return BrokerPositionFilter(symbol=symbol)
+
+
+def get_broker_connection_id(connection: object) -> str:
+    """Return the configured provider identifier from opaque connection material.
+
+    Args:
+        connection: Broker-owned connection configuration.
+
+    Returns:
+        Canonical provider identifier.
+
+    Raises:
+        TypeError: If the supplied value is not Broker connection configuration.
+    """
+    if not isinstance(connection, BrokerConnectionConfig):
+        raise TypeError("connection must be BrokerConnectionConfig")
+    return connection.broker_id.value
+
+
+def get_broker_connection_environment(connection: object) -> str:
+    """Return the configured environment from opaque connection material.
+
+    Args:
+        connection: Broker-owned connection configuration.
+
+    Returns:
+        Canonical environment identifier.
+
+    Raises:
+        TypeError: If the supplied value is not Broker connection configuration.
+    """
+    if not isinstance(connection, BrokerConnectionConfig):
+        raise TypeError("connection must be BrokerConnectionConfig")
+    return connection.environment.value
+
+
+def get_broker_connection_account_reference(connection: object) -> str | None:
+    """Return the account reference from opaque connection material.
+
+    Args:
+        connection: Broker-owned connection configuration.
+
+    Returns:
+        The configured account reference, if present.
+
+    Raises:
+        TypeError: If the supplied value is not Broker connection configuration.
+    """
+    if not isinstance(connection, BrokerConnectionConfig):
+        raise TypeError("connection must be BrokerConnectionConfig")
+    return connection.account_reference
+
+
+def is_broker_connection_enabled(connection: object) -> bool:
+    """Return whether opaque connection material permits provider use.
+
+    Args:
+        connection: Broker-owned connection configuration.
+
+    Returns:
+        Whether the provider is explicitly enabled.
+
+    Raises:
+        TypeError: If the supplied value is not Broker connection configuration.
+    """
+    if not isinstance(connection, BrokerConnectionConfig):
+        raise TypeError("connection must be BrokerConnectionConfig")
+    return connection.provider_enabled
+
+
+def get_broker_adapter_contract_version(adapter: object) -> str:
+    """Return the protocol version from an opaque Broker adapter.
+
+    Args:
+        adapter: Broker-owned adapter implementation.
+
+    Returns:
+        Declared adapter contract version.
+
+    Raises:
+        TypeError: If the adapter does not satisfy the Broker protocol.
+    """
+    contract_version = getattr(adapter, "contract_version", None)
+    if not isinstance(contract_version, str):
+        raise TypeError("adapter must expose a string contract_version")
+    return contract_version
+
+
+def get_broker_adapter_schema_id(adapter: object) -> str:
+    """Return the schema identifier from an opaque Broker adapter.
+
+    Args:
+        adapter: Broker-owned adapter implementation.
+
+    Returns:
+        Declared adapter schema identifier.
+
+    Raises:
+        TypeError: If the adapter does not satisfy the Broker protocol.
+    """
+    schema_id = getattr(adapter, "schema_id", None)
+    if not isinstance(schema_id, str):
+        raise TypeError("adapter must expose a string schema_id")
+    return schema_id
+
+
+def get_broker_feature_flag_id(feature_flags: object) -> str:
+    """Return the provider identifier from opaque feature-flag evidence.
+
+    Args:
+        feature_flags: Broker-owned feature-flag evidence.
+
+    Returns:
+        Canonical provider identifier.
+
+    Raises:
+        TypeError: If the supplied value is not feature-flag evidence.
+    """
+    broker_id = getattr(feature_flags, "broker_id", None)
+    value = getattr(broker_id, "value", broker_id)
+    if not isinstance(value, str):
+        raise TypeError("feature_flags must expose a string broker_id")
+    return value
+
+
+def get_broker_feature_flag_environment(feature_flags: object) -> str:
+    """Return the environment from opaque feature-flag evidence.
+
+    Args:
+        feature_flags: Broker-owned feature-flag evidence.
+
+    Returns:
+        Canonical environment identifier.
+
+    Raises:
+        TypeError: If the supplied value is not feature-flag evidence.
+    """
+    environment = getattr(feature_flags, "environment", None)
+    value = getattr(environment, "value", environment)
+    if not isinstance(value, str):
+        raise TypeError("feature_flags must expose a string environment")
+    return value
 
 
 # --- Standalone Adapter Operation Delegate Functions ---
@@ -394,19 +748,19 @@ async def reconnect_broker(
     return await adapter.reconnect()
 
 
-def is_broker_connected(adapter: BrokerAdapter) -> bool:
+async def is_broker_connected(adapter: BrokerAdapter) -> StandardResponse[bool]:
     """Check if the broker adapter session is currently connected.
 
     Args:
         adapter: Targeted broker adapter.
 
     Returns:
-        True if connected, False otherwise.
+        Standard response containing the verified connectivity state.
     """
-    return adapter.is_connected()
+    return await adapter.is_connected()
 
 
-def get_broker_connection_status(
+async def get_broker_connection_status(
     adapter: BrokerAdapter,
 ) -> StandardResponse[BrokerConnectionStatus]:
     """Get connection status of the broker adapter.
@@ -417,7 +771,7 @@ def get_broker_connection_status(
     Returns:
         Standard response with detailed connection status.
     """
-    return adapter.get_connection_status()
+    return await adapter.get_connection_status()
 
 
 async def ping_broker(adapter: BrokerAdapter) -> StandardResponse[None]:
@@ -432,7 +786,7 @@ async def ping_broker(adapter: BrokerAdapter) -> StandardResponse[None]:
     return await adapter.ping()
 
 
-def get_broker_last_error(
+async def get_broker_last_error(
     adapter: BrokerAdapter,
 ) -> StandardResponse[BrokerError | None]:
     """Get last error reported by the broker adapter.
@@ -443,10 +797,10 @@ def get_broker_last_error(
     Returns:
         Standard response containing last BrokerError or None.
     """
-    return adapter.get_last_error()
+    return await adapter.get_last_error()
 
 
-def get_broker_feature_flags(
+async def get_broker_feature_flags(
     adapter: BrokerAdapter,
 ) -> StandardResponse[BrokerFeatureFlags]:
     """Get runtime feature flags for the broker adapter.
@@ -457,10 +811,10 @@ def get_broker_feature_flags(
     Returns:
         Standard response containing feature flags.
     """
-    return adapter.get_feature_flags()
+    return await adapter.get_feature_flags()
 
 
-def supports_broker_capability(
+async def supports_broker_capability(
     adapter: BrokerAdapter,
     capability_id: BrokerCapabilityId,
 ) -> bool:
@@ -473,7 +827,7 @@ def supports_broker_capability(
     Returns:
         True if supported and available, False otherwise.
     """
-    return adapter.supports(capability_id)
+    return await adapter.supports(capability_id)
 
 
 async def get_broker_platform_info(
@@ -805,17 +1159,19 @@ async def list_broker_subscriptions(
 async def get_broker_positions(
     adapter: BrokerAdapter,
     filter_spec: BrokerPositionFilter | None = None,
+    limit: int = 1000,
 ) -> StandardResponse[tuple[BrokerPosition, ...]]:
-    """Get active positions from the broker adapter.
+    """Get open positions from the broker adapter.
 
     Args:
         adapter: Targeted broker adapter.
         filter_spec: Optional position filter.
+        limit: Maximum items to return.
 
     Returns:
         Standard response containing positions tuple.
     """
-    return await adapter.get_positions(filter=filter_spec)
+    return await adapter.get_positions(filter=filter_spec, limit=limit)
 
 
 async def get_broker_position(
@@ -837,17 +1193,19 @@ async def get_broker_position(
 async def get_broker_orders(
     adapter: BrokerAdapter,
     filter_spec: BrokerOrderFilter | None = None,
+    limit: int = 1000,
 ) -> StandardResponse[tuple[BrokerOrder, ...]]:
     """Get active orders from the broker adapter.
 
     Args:
         adapter: Targeted broker adapter.
         filter_spec: Optional order filter.
+        limit: Maximum items to return.
 
     Returns:
         Standard response containing orders tuple.
     """
-    return await adapter.get_orders(filter=filter_spec)
+    return await adapter.get_orders(filter=filter_spec, limit=limit)
 
 
 async def get_broker_order(
@@ -1080,3 +1438,94 @@ async def calculate_broker_profit(
         Standard response containing calculated profit amount.
     """
     return await adapter.calculate_profit(request)
+
+
+async def refresh_broker_session(adapter: BrokerAdapter) -> StandardResponse[None]:
+    """Refresh one Broker session through its opaque adapter.
+
+    Returns:
+        The canonical refresh result.
+    """
+    return await adapter.refresh_session()
+
+
+async def get_broker_server_time(
+    adapter: BrokerAdapter,
+) -> StandardResponse[BrokerServerTime]:
+    """Get provider-reported server time through the root boundary.
+
+    Returns:
+        The canonical server-time result.
+    """
+    return await adapter.get_server_time()
+
+
+def get_broker_connection_events(adapter: BrokerAdapter) -> object:
+    """Return the opaque asynchronous connection-event stream."""
+    return adapter.connection_events()
+
+
+async def list_broker_accounts(
+    adapter: BrokerAdapter, cursor: str | None = None, limit: int | None = None
+) -> StandardResponse[BrokerPage[BrokerAccountInfo]]:
+    """List provider-visible accounts through the root boundary.
+
+    Returns:
+        The canonical bounded account page.
+    """
+    return await adapter.list_accounts(cursor=cursor, limit=limit)
+
+
+async def select_broker_account(
+    adapter: BrokerAdapter, account_id: str
+) -> StandardResponse[None]:
+    """Select one provider account through the root boundary.
+
+    Returns:
+        The canonical selection result.
+    """
+    return await adapter.select_account(account_id)
+
+
+async def list_broker_assets(
+    adapter: BrokerAdapter, cursor: str | None = None, limit: int | None = None
+) -> StandardResponse[BrokerPage[BrokerAssetInfo]]:
+    """List provider-visible assets through the root boundary.
+
+    Returns:
+        The canonical bounded asset page.
+    """
+    return await adapter.list_assets(cursor=cursor, limit=limit)
+
+
+async def get_broker_asset_info(
+    adapter: BrokerAdapter, asset: str
+) -> StandardResponse[BrokerAssetInfo]:
+    """Get one provider asset through the root boundary.
+
+    Returns:
+        The canonical asset result.
+    """
+    return await adapter.get_asset_info(asset)
+
+
+async def get_broker_commission_estimate(
+    adapter: BrokerAdapter, request: BrokerOrderRequest
+) -> StandardResponse[BrokerFeeEstimate]:
+    """Get one provider commission estimate through the root boundary.
+
+    Returns:
+        The canonical commission-estimate result.
+    """
+    return await adapter.get_commission_estimate(request)
+
+
+async def replace_broker_order(
+    adapter: BrokerAdapter, request: BrokerOrderModificationRequest
+) -> StandardResponse[BrokerOrderResult]:
+    """Replace one provider order through the root boundary.
+
+    Returns:
+        The canonical replacement result.
+    """
+    return await adapter.replace_order(request)

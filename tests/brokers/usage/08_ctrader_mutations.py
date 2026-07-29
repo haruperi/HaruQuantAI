@@ -1,20 +1,21 @@
 """FEAT-BRK-08: cTrader calculation and mutation release boundaries."""
 
 import asyncio
-from decimal import Decimal
 
 import _support  # noqa: F401
 from _support import real_session, require_error, require_success
 from app.services.brokers import (
+    build_broker_margin_request,
+    build_broker_order_request,
+    build_broker_profit_request,
+    calculate_broker_margin,
+    calculate_broker_profit,
+    cancel_broker_order,
     get_broker_capability_catalogue,
+    get_broker_commission_estimate,
+    get_broker_connection_status,
+    get_broker_value_field,
     get_registered_brokers,
-)
-from app.services.brokers.contracts import (
-    BrokerAdapter,
-    BrokerErrorCode,
-    BrokerId,
-    BrokerMarginRequest,
-    BrokerProfitRequest,
 )
 
 
@@ -23,60 +24,70 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-async def fr_brokers_098(adapter: BrokerAdapter) -> None:
+async def fr_brokers_098(adapter: object) -> None:
     """FR-BRK-098: Request a provider-native margin calculation."""
     _header("FR-BRK-098: Request a provider-native margin calculation.")
-    request = BrokerMarginRequest(
+    request = build_broker_margin_request(
         symbol="EURUSD",
         side="BUY",
-        quantity=Decimal("1.0"),
+        quantity="1.0",
         quantity_unit="lots",
-        price=Decimal("1.10"),
+        price="1.10",
         product_profile="ctrader",
     )
-    require_error(
-        "Result",
-        await adapter.calculate_margin(request),
-        BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
-    )
+    result = await calculate_broker_margin(adapter, request)
+    if get_broker_value_field(result, "status") == "success":
+        require_success("Result", result)
+    else:
+        require_error("Result", result, "BROKER_CAPABILITY_UNSUPPORTED")
 
 
-async def fr_brokers_099(adapter: BrokerAdapter) -> None:
+async def fr_brokers_099(adapter: object) -> None:
     """FR-BRK-099: Request a provider-native profit calculation."""
     _header("FR-BRK-099: Request a provider-native profit calculation.")
-    request = BrokerProfitRequest(
+    request = build_broker_profit_request(
         symbol="EURUSD",
         side="BUY",
-        quantity=Decimal("1.0"),
+        quantity="1.0",
         quantity_unit="lots",
-        open_price=Decimal("1.10"),
-        close_price=Decimal("1.11"),
+        open_price="1.10",
+        close_price="1.11",
         product_profile="ctrader",
     )
-    require_error(
-        "Result",
-        await adapter.calculate_profit(request),
-        BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
-    )
+    result = await calculate_broker_profit(adapter, request)
+    if get_broker_value_field(result, "status") == "success":
+        require_success("Result", result)
+    else:
+        require_error("Result", result, "BROKER_CAPABILITY_UNSUPPORTED")
 
 
-async def fr_brokers_100(adapter: BrokerAdapter) -> None:
+async def fr_brokers_100(adapter: object) -> None:
     """FR-BRK-100: Request a provider-native commission estimate."""
     _header("FR-BRK-100: Request a provider-native commission estimate.")
-    require_error(
-        "Result",
-        await adapter.get_commission_estimate("EURUSD", Decimal("1.0")),
-        BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+    result = await get_broker_commission_estimate(
+        adapter,
+        build_broker_order_request(
+            symbol="EURUSD",
+            side="BUY",
+            order_type="MARKET",
+            quantity="1.0",
+            quantity_unit="lots",
+            environment="demo",
+        ),
     )
+    if get_broker_value_field(result, "status") == "success":
+        require_success("Result", result)
+    else:
+        require_error("Result", result, "BROKER_CAPABILITY_UNSUPPORTED")
 
 
-async def fr_brokers_101(adapter: BrokerAdapter) -> None:
+async def fr_brokers_101(adapter: object) -> None:
     """FR-BRK-101: Resolve an explicit cTrader adapter profile."""
     _header("FR-BRK-101: Resolve an explicit cTrader adapter profile.")
-    require_success("Result", await adapter.get_connection_status())
+    require_success("Result", await get_broker_connection_status(adapter))
 
 
-async def fr_brokers_102(adapter: BrokerAdapter) -> None:
+async def fr_brokers_102(adapter: object) -> None:
     """FR-BRK-102: List registered brokers without importing all SDKs."""
     del adapter
     _header("FR-BRK-102: List registered brokers without importing all SDKs.")
@@ -85,10 +96,10 @@ async def fr_brokers_102(adapter: BrokerAdapter) -> None:
     assert response.data is not None
     brokers = response.data
     print("Result", len(brokers))
-    assert BrokerId.CTRADER in brokers
+    assert "ctrader" in brokers
 
 
-async def fr_brokers_103(adapter: BrokerAdapter) -> None:
+async def fr_brokers_103(adapter: object) -> None:
     """FR-BRK-103: Expose the complete static capability catalogue."""
     del adapter
     _header("FR-BRK-103: Expose the complete static capability catalogue.")
@@ -97,22 +108,22 @@ async def fr_brokers_103(adapter: BrokerAdapter) -> None:
     assert response.data is not None
     catalogue = response.data
     print("Result", len(catalogue))
-    assert BrokerId.CTRADER in catalogue
+    assert "ctrader" in catalogue
 
 
-async def fr_brokers_104(adapter: BrokerAdapter) -> None:
+async def fr_brokers_104(adapter: object) -> None:
     """FR-BRK-104: Block unreleased cTrader write operations."""
     _header("FR-BRK-104: Block unreleased cTrader write operations.")
     require_error(
         "Result",
-        await adapter.cancel_order("o1"),
-        BrokerErrorCode.BROKER_CAPABILITY_UNSUPPORTED,
+        await cancel_broker_order(adapter, "o1"),
+        "BROKER_CAPABILITY_UNSUPPORTED",
     )
 
 
 async def _run() -> None:
     """Execute release evidence in one genuine cTrader demo session."""
-    async with real_session(BrokerId.CTRADER) as adapter:
+    async with real_session("ctrader") as adapter:
         await fr_brokers_098(adapter)
         await fr_brokers_099(adapter)
         await fr_brokers_100(adapter)

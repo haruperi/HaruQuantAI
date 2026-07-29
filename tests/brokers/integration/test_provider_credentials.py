@@ -5,11 +5,13 @@ import sys
 from collections.abc import Iterator
 
 import pytest
-from app.services.brokers import create_broker_adapter
-from app.services.brokers.contracts import (
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerId,
+from app.services.brokers import (
+    build_broker_connection_config,
+    connect_broker,
+    create_broker_adapter,
+    disconnect_broker,
+    get_broker_id,
+    get_broker_value_field,
 )
 
 from tests.brokers.provider_settings import ProviderTestSettings
@@ -41,9 +43,9 @@ def test_mt5_demo_credential_gated_connection() -> None:
     }
     if settings.mt5_terminal_path is not None:
         credentials["terminal_path"] = settings.mt5_terminal_path
-    config = BrokerConnectionConfig(
-        broker_id=BrokerId.MT5,
-        environment=BrokerEnvironment.DEMO,
+    config = build_broker_connection_config(
+        "mt5",
+        "demo",
         provider_enabled=True,
         connect_timeout_sec=15,
         request_timeout_sec=15,
@@ -55,16 +57,16 @@ def test_mt5_demo_credential_gated_connection() -> None:
         account_reference=settings.mt5_login.get_secret_value(),
         credentials=credentials,
     )
-    created = create_broker_adapter(BrokerId.MT5, config)
-    assert created.status == "success"
-    adapter = created.data
+    created = create_broker_adapter(get_broker_id("mt5"), config)
+    assert get_broker_value_field(created, "status") == "success"
+    adapter = get_broker_value_field(created, "data")
     assert adapter is not None
 
     async def exercise() -> None:
         """Connect and disconnect one genuine MT5 session."""
-        result = await adapter.connect()
-        assert result.status == "success", result.error
-        await adapter.disconnect()
+        result = await connect_broker(adapter)
+        assert get_broker_value_field(result, "status") == "success"
+        await disconnect_broker(adapter)
 
     asyncio.run(exercise())
 
@@ -86,9 +88,9 @@ def test_ctrader_demo_credentials_validate_without_a_network_transport() -> None
         "access_token": settings.ctrader_access_token,
         "account_id": settings.ctrader_account_id,
     }
-    config = BrokerConnectionConfig(
-        broker_id=BrokerId.CTRADER,
-        environment=BrokerEnvironment.DEMO,
+    config = build_broker_connection_config(
+        "ctrader",
+        "demo",
         provider_enabled=True,
         connect_timeout_sec=15,
         request_timeout_sec=15,
@@ -100,7 +102,7 @@ def test_ctrader_demo_credentials_validate_without_a_network_transport() -> None
         account_reference=settings.ctrader_account_id.get_secret_value(),
         credentials=credentials,
     )
-    created = create_broker_adapter(BrokerId.CTRADER, config)
-    assert created.status == "success"
-    adapter = created.data
+    created = create_broker_adapter(get_broker_id("ctrader"), config)
+    assert get_broker_value_field(created, "status") == "success"
+    adapter = get_broker_value_field(created, "data")
     assert adapter is not None
