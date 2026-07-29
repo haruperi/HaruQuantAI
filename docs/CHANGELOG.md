@@ -2,18 +2,37 @@
 
 ## [Unreleased]
 
-### Consolidate broker-credential ownership in Brokers and utils.settings
+### Audit Utils, Brokers, and Data runtime truth and public boundaries
 
-Broker credentials are now owned by the Brokers domain through a public settings model and a route-only connection resolver, so the Data composition root and usage examples select a provider route only and never read credentials or open connections directly.
+The three audited domains now expose function-only package roots, focused tests exceed the per-file coverage floor, and usage evidence distinguishes genuine provider results from unavailable or test-only capabilities.
 
-#### Changed (2)
+#### Changed (4)
 
-- Promoted `BrokerProviderSettings` to the public `app.utils.settings` surface as the single source of truth for broker-provider credentials, read from the central `app/configs/env.json`, and added `resolve_provider_connection_config` and `create_connected_broker` to the Brokers public API so credential resolution, non-production enforcement, and connection are owned by Brokers.
+- Added the opaque `load_broker_provider_settings` function and Brokers-owned `resolve_provider_connection_config`/`create_connected_broker` operations so no settings class or connection DTO crosses a public package boundary.
 - Rewrote the Data composition root `_LazyBrokerSession` to resolve MT5, cTrader, and credential-free providers through the Brokers resolver and removed its private `_ProviderRuntimeSettings`, so Data no longer resolves credentials or builds connection configurations.
+- Migrated audited production, usage, workflow, and integration consumers to domain-root imports and added package-root function-only boundary checks.
+- Marked `FEAT-DATA-11` and `FR-DATA-095`–`099`/`123`–`129` Pending because the repository has no licensed real economic-calendar transport; the usage now reports `SOURCE_UNAVAILABLE` instead of using `DemonstrationTransport`.
 
-#### Fixed (1)
+#### Fixed (6)
 
 - Fixed the Data composition root silently ignoring `settings.mt5.*` in `app/configs/env.json` because `_ProviderRuntimeSettings` extended `BaseSettings` instead of `AppSettings` and therefore read only the process environment; real-MT5 retrieval through the Data path now honors the central settings file.
+- Fixed Brokers package-root history/time-range forwarding and canonical timeframe normalization, restoring genuine MT5 history and Dukascopy bar reads.
+- Fixed Data spread normalization so it rejects missing unit/scale evidence and record-shape mismatches instead of inventing `USD` or `scale=0`.
+- Fixed historical backfill so it establishes governed storage and source identity before retrieval, allowing scheduled jobs to persist genuine provider records and checkpoints.
+- Fixed Data source and real-time-feed usage evidence so it prints bounded provider-derived rows and ticks, while unavailable providers report explicit errors without injected fallbacks.
+- Fixed external spread imports so decimal scale is derived from observed provider values rather than assigned a fabricated default.
+
+### Add governed code generation with staged artefacts
+
+The Agentic firm can now turn an authenticated human specification into staged strategy or indicator source code that a person reviews before anything merges.
+
+#### Added (1)
+
+- `FEAT-AGT-16` Governed Code Generation and Sandbox: generation is gated on an authenticated human principal holding `agentic:author_code` and on a sandbox lease attesting separately to ephemerality, credential absence, blocked egress, and bounded resources, with any missing property refused before a model is called; artefacts carry files, per-file digests, dependency data, tests, model and prompt provenance, and complete search history, digested as one manifest; whether an indicator exists is read from the Indicators registry through the governed tool path, so a strategy requiring an unregistered primitive is either refused or staged as `blocked_on_indicator_merge` and structurally cannot claim readiness; and every staged path is validated on its raw text before parsing, then resolved and re-checked against the staging root, rejecting absolute paths, drive letters, traversal, symlink escapes, NTFS alternate data streams, and Windows reserved device names.
+
+#### Changed (1)
+
+- Added `tools.py` to the coder package beyond the canonical module specification, so the indicator-registry lookup traverses the same permission enforcement point as every other receiver call rather than importing Indicators directly.
 
 ### Add governed experiment design and Simulation coordination
 

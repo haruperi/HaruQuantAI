@@ -11,6 +11,12 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 from app.agentic import build_firm_mandate, build_role_manifest
+from app.agentic.agents.engineering.coder.agent import (
+    PROMPT_PATH as CODER_PROMPT_PATH,
+)
+from app.agentic.agents.engineering.coder.tools import (
+    get_registered_tool_names as get_coder_tool_names,
+)
 from app.agentic.agents.experimentation.experiment_designer.agent import (
     PROMPT_PATH as DESIGNER_PROMPT_PATH,
 )
@@ -502,6 +508,74 @@ def build_designer_mandate(**overrides: object) -> FirmMandate:
         "enabled_features": ("FEAT-AGT-14",),
         "enabled_roles": (DESIGNER_ROLE_ID,),
         "tool_scopes": dict.fromkeys(get_designer_tool_names(), "read_evidence"),
+    }
+    data.update(overrides)
+    return build_sandbox_mandate(**data)
+
+
+CODER_ROLE_ID = "coder"
+
+CODER_PROMPT_DIGEST = canonical_digest(
+    normalize_prompt_text(CODER_PROMPT_PATH.read_text(encoding="utf-8")),
+)
+
+
+def coder_role_manifest_fields(**overrides: object) -> dict[str, object]:
+    """Return complete Coder manifest fields.
+
+    The base prompt digest is derived from the real package artefact, so the
+    fixture exercises the same integrity chain production uses.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        Complete manifest constructor data.
+    """
+    data = manifest_fields(
+        role_id=CODER_ROLE_ID,
+        owning_feature="FEAT-AGT-16",
+        department="engineering",
+        agent_package="agents/engineering/coder",
+        description="Authors staged code artefacts under a human specification.",
+        objective="Implement the declared contract and the tests that refute it.",
+        expertise_boundary="Stages only; imports, executes, and deploys nothing.",
+        input_schema_id="agentic.code_specification.v1",
+        output_schema_id="agentic.code_artifact.v1",
+        base_prompt_hash=CODER_PROMPT_DIGEST,
+        evaluation_set_id="eval-coder-v1",
+        tools=get_coder_tool_names(),
+        permission_classes=("read_evidence",),
+    )
+    data.update(overrides)
+    return data
+
+
+def build_coder_role_manifest(**overrides: object) -> RoleManifest:
+    """Build the validated Coder role manifest.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        A validated manifest with derived integrity digests.
+    """
+    return build_role_manifest(coder_role_manifest_fields(**overrides))
+
+
+def build_coder_mandate(**overrides: object) -> FirmMandate:
+    """Build a sandbox mandate registering the coder tools.
+
+    Args:
+        **overrides: Optional field overrides for mandate variants.
+
+    Returns:
+        A validated firm mandate with a derived content digest.
+    """
+    data: dict[str, object] = {
+        "enabled_features": ("FEAT-AGT-16",),
+        "enabled_roles": (CODER_ROLE_ID,),
+        "tool_scopes": dict.fromkeys(get_coder_tool_names(), "read_evidence"),
     }
     data.update(overrides)
     return build_sandbox_mandate(**data)

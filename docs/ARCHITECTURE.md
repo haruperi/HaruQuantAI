@@ -111,8 +111,17 @@
   rather than reconciled, with the package importing neither Simulation
   contract so there is no site at which one could be authored; and holdout is
   claimed once per protocol, enforced in-process before the receiver is called
-  and durably by the ledger's primary key. `FEAT-AGT-09`, `10`, and `15`–`22`
-  remain `Missing`.
+  and durably by the ledger's primary key. `FEAT-AGT-16` is the first feature
+  that writes to a filesystem: an authenticated human specification and a lease
+  attesting to every isolation property gate generation before any model call;
+  the artefact manifest carries files, digests, dependencies, tests,
+  provenance, and complete search history, and is digested as a whole; and
+  every declared path is validated on its raw text before parsing, then
+  resolved and re-checked against the staging root so a symlink cannot carry a
+  write outside the tree. Isolation itself is delegated: Agentic declares the
+  sandbox port and refuses an under-attested lease, and binding a runtime that
+  actually isolates remains the composition root's obligation.
+  `FEAT-AGT-09`, `10`, `15`, and `17`–`22` remain `Missing`.
   Google ADK 2.x is adopted behind a scoped `requests` override, documented in
   `pyproject.toml` with the condition for its removal. Its hybrid layout keeps ten shared control-plane features as focused root packages and places twelve role-bearing features under registered `agents/<department>/<agent_name>/` leaf packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, feature schemas, and only specification-required optional files. Specialized leadership, market-intelligence, technical, quantitative, strategy/trader, experimentation, engineering, portfolio/risk-advisory, and operations roles may dynamically collaborate, simulate, optimize, code, and submit typed proposals. Google ADK 2.x is the selected runtime behind provider-neutral HaruQuantAI contracts. Agentic has no broker credential, direct broker route, risk approval, kill-switch authority, or execution authority; consequential proposals traverse the normal deterministic pipeline.
 * `app/utils/` is a partial implementation baseline for shared v1 contracts,
