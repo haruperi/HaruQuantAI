@@ -10,9 +10,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    DataQualityReport,
-    MarketDataset,
-    OHLCVRecord,
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
     detect_extreme_spread_widening,
     detect_flatline_periods,
     detect_price_jumps,
@@ -36,7 +36,7 @@ def _header(title: str) -> None:
 def _sample_dataset() -> MarketDataset:
     """Return a test MarketDataset fixture."""
     records = tuple(
-        OHLCVRecord(
+        build_ohlcv_record(
             timestamp=_START + timedelta(minutes=i),
             open=Decimal(100 + i),
             high=Decimal(101 + i),
@@ -51,7 +51,7 @@ def _sample_dataset() -> MarketDataset:
         )
         for i in range(5)
     )
-    report = DataQualityReport(
+    report = build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
         record_count=len(records),
@@ -61,7 +61,7 @@ def _sample_dataset() -> MarketDataset:
         schema_version="v1",
         generated_at=records[-1].available_at,
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="bars",
         symbol="EURUSD",
@@ -87,20 +87,27 @@ def example_25_quality_validation() -> None:
         "Validate OHLCV quality using inspect_data_quality and inspect_dataset_quality."
     )
     ds = _sample_dataset()
-    report = inspect_data_quality(ds)
-    print(f"Data Quality status: {report.quality_status} score={report.quality_score}")
-
-    full_report = inspect_dataset_quality(ds)
-    print(
-        f"Dataset Quality score: {full_report.quality_score} "
-        f"checked={full_report.checked_count}"
-    )
-
-    policy = get_quality_policy()
-    print(f"Quality policy: {policy.profile}")
-
-    remediation = summarize_quality_remediation(report)
-    print(f"Quality remediation summary: {remediation}")
+    res1 = inspect_data_quality(ds)
+    if res1.status == "success" and res1.data is not None:
+        report = res1.data
+        print(
+            f"Data Quality status: {report.quality_status} score={report.quality_score}"
+        )
+        res2 = inspect_dataset_quality(ds)
+        if res2.status == "success" and res2.data is not None:
+            full_report = res2.data
+            print(
+                f"Dataset Quality score: {full_report.quality_score} "
+                f"checked={full_report.checked_count}"
+            )
+        res3 = get_quality_policy()
+        if res3.status == "success" and res3.data is not None:
+            policy = res3.data
+            print(f"Quality policy: {policy.profile}")
+        res4 = summarize_quality_remediation(report)
+        if res4.status == "success" and res4.data is not None:
+            remediation = res4.data
+            print(f"Quality remediation summary: {remediation}")
 
 
 def example_anomaly_detectors() -> None:

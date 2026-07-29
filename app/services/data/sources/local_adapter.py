@@ -132,7 +132,9 @@ class LocalMarketDataSource(MarketDataSource):
                 safe_details={"field": "symbol"},
                 request_id=request.request_id,
             )
-        if dataset.data_kind != request.data_kind:
+        if dataset.data_kind != request.data_kind and not (
+            request.data_kind == "spreads" and dataset.data_kind == "ticks"
+        ):
             raise DataError(
                 "FILE_CORRUPTED",
                 safe_details={"field": "data_kind"},

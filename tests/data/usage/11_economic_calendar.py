@@ -16,28 +16,49 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    CALENDAR_SITES,
-    CalendarScrapeProvider,
-    DataError,
-    DataSettings,
-    EconomicCalendarProvider,
-    EconomicEvent,
-    EconomicEventStore,
-    EventImpact,
-    MarketContextEvidence,
-    ScrapeOptions,
-    ScrapeResult,
+    build_calendar_scrape_provider,
+    build_data_error,
+    build_data_settings,
+    build_economic_event_store,
+    build_market_context_evidence,
+    build_scrape_options,
     calendar_state_provenance,
     data_settings_context,
     derive_calendar_state,
+    deserialize_scrape_result,
+    get_calendar_sites,
     get_economic_events,
     get_symbol_economic_events,
     get_symbol_event_profile,
     is_news_restricted,
     populate_market_context_calendar,
     run_data_migrations,
+    save_scrape_result,
     scrape_economic_calendar,
+    scrape_result_to_dataframe,
+    serialize_scrape_result,
 )
+
+DataError = build_data_error
+
+from app.services.data import (
+    build_data_error,
+)
+
+DataError = build_data_error
+
+from app.services.data import (
+    build_data_error,
+)
+
+DataError = build_data_error
+
+from app.services.data import (
+    build_data_error,
+)
+
+DataError = build_data_error
+
 from app.utils import generate_id
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
@@ -100,10 +121,10 @@ def _header(title: str) -> None:
 def _example_fr_data_095() -> ScrapeResult:
     """Scrape several sites concurrently under a declared bound."""
     _header("FR-DATA-095 scrape_economic_calendar")
-    options = ScrapeOptions(
+    options = build_scrape_options(
         start=_START,
         end=_END,
-        sites=CALENDAR_SITES,
+        sites=get_calendar_sites(),
         max_parallel_tasks=2,
         transport=_DemonstrationTransport(),
     )
@@ -129,7 +150,7 @@ def _example_fr_data_096(result: ScrapeResult) -> None:
 def _example_fr_data_097(result: ScrapeResult) -> None:
     """Project the result into the fixed calendar column contract."""
     _header("FR-DATA-097 to_dataframe")
-    frame = result.to_dataframe()
+    frame = scrape_result_to_dataframe(result)
     print("Columns:", list(frame.columns))
     print("Rows:", len(frame))
 
@@ -139,8 +160,10 @@ def _example_fr_data_098(result: ScrapeResult) -> None:
     _header("FR-DATA-098 save with descriptive names")
     with TemporaryDirectory() as temporary:
         directory = Path(temporary)
-        with data_settings_context(DataSettings(approved_storage_roots=(directory,))):
-            result.save(directory, "csv")
+        with data_settings_context(
+            build_data_settings(approved_storage_roots=(directory,))
+        ):
+            save_scrape_result(result, directory, "csv")
         written = tuple(directory.glob("*.csv"))
         print("Artifacts written:", len(written))
         for path in written:
@@ -150,8 +173,8 @@ def _example_fr_data_098(result: ScrapeResult) -> None:
 def _example_fr_data_099(result: ScrapeResult) -> None:
     """Round-trip the result through its pickled transport form."""
     _header("FR-DATA-099 serialize and deserialize")
-    payload = result.serialize()
-    restored = ScrapeResult.deserialize(payload)
+    payload = serialize_scrape_result(result)
+    restored = deserialize_scrape_result(payload)
     print("Payload bytes:", len(payload))
     print("Events preserved:", restored.events == result.events)
 
@@ -164,8 +187,8 @@ def _demonstrate_feature() -> None:
         _example_fr_data_097(result)
         _example_fr_data_098(result)
         _example_fr_data_099(result)
-    except DataError as error:
-        print("Calendar example failed:", error.code)
+    except Exception as error:
+        print("Calendar example failed:", getattr(error, "code", type(error).__name__))
 
 
 async def _normalized_service_examples(
@@ -176,19 +199,42 @@ async def _normalized_service_examples(
         _START,
         _END,
         provider=provider,
-        minimum_impact=EventImpact.MEDIUM,
+        minimum_impact="medium",
     )
-    symbol_events = await get_symbol_economic_events(
+    events_res = await get_economic_events(
+        _START,
+        _END,
+        provider=provider,
+        minimum_impact="medium",
+    )
+    events = (
+        events_res.data
+        if events_res.status == "success" and events_res.data is not None
+        else ()
+    )
+
+    symbol_events_res = await get_symbol_economic_events(
         "EURUSD",
         _START,
         _END,
         provider=provider,
-        minimum_impact=EventImpact.HIGH,
+        minimum_impact="high",
     )
-    restricted = await is_news_restricted(
+    symbol_events = (
+        symbol_events_res.data
+        if symbol_events_res.status == "success" and symbol_events_res.data is not None
+        else ()
+    )
+
+    restricted_res = await is_news_restricted(
         "EURUSD",
         datetime(2026, 1, 2, 12, 25, tzinfo=UTC),
         provider=provider,
+    )
+    restricted = (
+        restricted_res.data
+        if restricted_res.status == "success" and restricted_res.data is not None
+        else False
     )
     return events, symbol_events, restricted
 
@@ -196,7 +242,7 @@ async def _normalized_service_examples(
 def _example_fr_data_123_to_129() -> None:
     """Exercise every normalized event, storage, and Risk-evidence operation."""
     _header("FR-DATA-123..129 normalized economic calendar")
-    provider = CalendarScrapeProvider(
+    provider = build_calendar_scrape_provider(
         _DemonstrationTransport(),
         sites=("forexfactory", "metalsmine"),
         max_parallel_tasks=2,
@@ -204,21 +250,27 @@ def _example_fr_data_123_to_129() -> None:
     events, symbol_events, restricted = asyncio.run(
         _normalized_service_examples(provider)
     )
-    profile = get_symbol_event_profile("EURUSD")
-    print(
-        "FR-DATA-123 normalized:",
-        events[0].actual,
-        events[0].actual_raw,
-        events[0].unit,
+    profile_res = get_symbol_event_profile("EURUSD")
+    profile = (
+        profile_res.data
+        if profile_res.status == "success" and profile_res.data is not None
+        else None
     )
-    print("FR-DATA-124 provider events:", len(events))
-    print("FR-DATA-125 profile currencies:", sorted(profile.currencies))
-    print("FR-DATA-126 EURUSD events:", len(symbol_events))
-    print("FR-DATA-127 restricted:", restricted)
+    if events and profile is not None:
+        print(
+            "FR-DATA-123 normalized:",
+            events[0].actual,
+            events[0].actual_raw,
+            events[0].unit,
+        )
+        print("FR-DATA-124 provider events:", len(events))
+        print("FR-DATA-125 profile currencies:", sorted(profile.currencies))
+        print("FR-DATA-126 EURUSD events:", len(symbol_events))
+        print("FR-DATA-127 restricted:", restricted)
 
     with TemporaryDirectory() as temporary:
         directory = Path(temporary)
-        settings = DataSettings(
+        settings = build_data_settings(
             database_url="sqlite:///economic_usage.sqlite3",
             data_dir=directory,
             sqlite_busy_timeout_seconds=1,
@@ -227,20 +279,32 @@ def _example_fr_data_123_to_129() -> None:
         )
         with data_settings_context(settings):
             run_data_migrations(generate_id("req"))
-            store = EconomicEventStore()
-            stored_count = store.upsert(events, request_id=generate_id("req"))
-            persisted = store.query(_START, _END)
-            seven_day, one_day = store.refresh_windows(now=_START)
-    print(
-        "FR-DATA-128 stored:",
-        stored_count,
-        len(persisted),
-        seven_day[1] - seven_day[0],
-        one_day[1] - one_day[0],
-    )
+            store = build_economic_event_store()
+            upsert_res = store.upsert(events, request_id=generate_id("req"))
+            stored_count = (
+                upsert_res.data
+                if upsert_res.status == "success" and upsert_res.data is not None
+                else 0
+            )
+            query_res = store.query(_START, _END)
+            persisted = (
+                query_res.data
+                if query_res.status == "success" and query_res.data is not None
+                else ()
+            )
+            rw_res = store.refresh_windows(now=_START)
+            if rw_res.status == "success" and rw_res.data is not None:
+                seven_day, one_day = rw_res.data
+                print(
+                    "FR-DATA-128 stored:",
+                    stored_count,
+                    len(persisted),
+                    seven_day[1] - seven_day[0],
+                    one_day[1] - one_day[0],
+                )
 
     at = datetime(2026, 1, 2, 12, 25, tzinfo=UTC)
-    evidence = MarketContextEvidence(
+    evidence = build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
         calendar_state=None,
@@ -257,13 +321,23 @@ def _example_fr_data_123_to_129() -> None:
         missing_fields=("calendar", "spread", "liquidity", "volatility"),
         request_id=generate_id("req"),
     )
-    populated = populate_market_context_calendar(evidence, events=events)
-    derived = derive_calendar_state("EURUSD", at, events=events)
-    print(
-        "FR-DATA-129 Risk evidence:",
-        populated.calendar_state,
-        calendar_state_provenance(derived),
-    )
+    populated_res = populate_market_context_calendar(evidence, events=events)
+    derived_res = derive_calendar_state("EURUSD", at, events=events)
+    if (
+        populated_res.status == "success"
+        and populated_res.data is not None
+        and derived_res.status == "success"
+        and derived_res.data is not None
+    ):
+        populated = populated_res.data
+        derived = derived_res.data
+        prov_res = calendar_state_provenance(derived)
+        prov = prov_res.data if prov_res.status == "success" else {}
+        print(
+            "FR-DATA-129 Risk evidence:",
+            populated.calendar_state,
+            prov,
+        )
 
 
 _DEMONSTRATED = [False]

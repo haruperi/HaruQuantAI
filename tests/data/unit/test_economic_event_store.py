@@ -81,9 +81,11 @@ def test_store_requires_migrated_table(monkeypatch, tmp_path: Path) -> None:
     _configure_db(monkeypatch, tmp_path)
     store = EconomicEventStore()
     with pytest.raises(DataError):
-        store.query(
-            datetime(2026, 1, 1, tzinfo=UTC),
-            datetime(2026, 2, 1, tzinfo=UTC),
+        _unwrap(
+            store.query(
+                datetime(2026, 1, 1, tzinfo=UTC),
+                datetime(2026, 2, 1, tzinfo=UTC),
+            )
         )
 
 
@@ -94,12 +96,14 @@ def test_upsert_inserts_and_returns_count(monkeypatch, tmp_path: Path) -> None:
     store = EconomicEventStore()
     events = [_event(delta=timedelta(minutes=5))]
 
-    count = store.upsert(events, request_id=generate_id("req"))
+    count = _unwrap(store.upsert(events, request_id=generate_id("req")))
 
     assert count == 1
-    stored = store.query(
-        datetime(2026, 7, 26, tzinfo=UTC),
-        datetime(2026, 7, 27, tzinfo=UTC),
+    stored = _unwrap(
+        store.query(
+            datetime(2026, 7, 26, tzinfo=UTC),
+            datetime(2026, 7, 27, tzinfo=UTC),
+        )
     )
     assert len(stored) == 1
     assert stored[0].id == events[0].id
@@ -115,16 +119,18 @@ def test_upsert_is_idempotent_on_composite_key(monkeypatch, tmp_path: Path) -> N
     store = EconomicEventStore()
     original = _event(delta=timedelta(minutes=5), forecast=Decimal("0.3"))
 
-    store.upsert([original], request_id=generate_id("req"))
+    _unwrap(store.upsert([original], request_id=generate_id("req")))
     revised = _event(
         delta=timedelta(minutes=5),
         forecast=Decimal("0.4"),
     )
-    store.upsert([revised], request_id=generate_id("req"))
+    _unwrap(store.upsert([revised], request_id=generate_id("req")))
 
-    stored = store.query(
-        datetime(2026, 7, 26, tzinfo=UTC),
-        datetime(2026, 7, 27, tzinfo=UTC),
+    stored = _unwrap(
+        store.query(
+            datetime(2026, 7, 26, tzinfo=UTC),
+            datetime(2026, 7, 27, tzinfo=UTC),
+        )
     )
     assert len(stored) == 1
     assert stored[0].forecast == Decimal("0.4")
@@ -141,8 +147,8 @@ def test_upsert_preserves_original_schedule_when_release_moves(
     original = _event(delta=timedelta(minutes=5))
     revised = _event(delta=timedelta(minutes=35))
 
-    store.upsert([original], request_id=generate_id("req"))
-    store.upsert([revised], request_id=generate_id("req"))
+    _unwrap(store.upsert([original], request_id=generate_id("req")))
+    _unwrap(store.upsert([revised], request_id=generate_id("req")))
 
     result = _unwrap(
         execute_transaction(
@@ -176,12 +182,14 @@ def test_query_filters_by_currency(monkeypatch, tmp_path: Path) -> None:
         country="DE",
         name="ECB",
     )
-    store.upsert([usd, eur], request_id=generate_id("req"))
+    _unwrap(store.upsert([usd, eur], request_id=generate_id("req")))
 
-    usd_only = store.query(
-        datetime(2026, 7, 26, tzinfo=UTC),
-        datetime(2026, 7, 27, tzinfo=UTC),
-        currencies=("USD",),
+    usd_only = _unwrap(
+        store.query(
+            datetime(2026, 7, 26, tzinfo=UTC),
+            datetime(2026, 7, 27, tzinfo=UTC),
+            currencies=("USD",),
+        )
     )
     assert len(usd_only) == 1
     assert usd_only[0].currency == "USD"
@@ -199,12 +207,14 @@ def test_query_filters_by_minimum_impact(monkeypatch, tmp_path: Path) -> None:
         name="Low",
         forecast=None,
     )
-    store.upsert([high, low], request_id=generate_id("req"))
+    _unwrap(store.upsert([high, low], request_id=generate_id("req")))
 
-    only_high = store.query(
-        datetime(2026, 7, 26, tzinfo=UTC),
-        datetime(2026, 7, 27, tzinfo=UTC),
-        minimum_impact=EventImpact.HIGH,
+    only_high = _unwrap(
+        store.query(
+            datetime(2026, 7, 26, tzinfo=UTC),
+            datetime(2026, 7, 27, tzinfo=UTC),
+            minimum_impact=EventImpact.HIGH,
+        )
     )
     assert len(only_high) == 1
     assert only_high[0].impact is EventImpact.HIGH
@@ -214,7 +224,7 @@ def test_refresh_windows_return_seven_days_and_one_day_bounds() -> None:
     """Refresh windows return the documented 7-day and 24-hour boundaries."""
     store = EconomicEventStore()
     now = datetime(2026, 7, 26, 12, tzinfo=UTC)
-    seven, twenty_four = store.refresh_windows(now=now)
+    seven, twenty_four = _unwrap(store.refresh_windows(now=now))
     assert seven[0] == now
     assert seven[1] - seven[0] == timedelta(days=7)
     assert twenty_four[0] == now
@@ -224,8 +234,10 @@ def test_refresh_windows_return_seven_days_and_one_day_bounds() -> None:
 def test_refresh_windows_reject_naive_now() -> None:
     """Refresh policy never silently interprets a naive observation time."""
     with pytest.raises(DataError):
-        EconomicEventStore().refresh_windows(
-            now=datetime(2026, 7, 26, 12, tzinfo=UTC).replace(tzinfo=None)
+        _unwrap(
+            EconomicEventStore().refresh_windows(
+                now=datetime(2026, 7, 26, 12, tzinfo=UTC).replace(tzinfo=None)
+            )
         )
 
 
@@ -234,7 +246,9 @@ def test_query_rejects_naive_window(monkeypatch, tmp_path: Path) -> None:
     _configure_db(monkeypatch, tmp_path)
     store = EconomicEventStore()
     with pytest.raises(DataError):
-        store.query(
-            datetime(2026, 7, 26, tzinfo=UTC).replace(tzinfo=None),
-            datetime(2026, 7, 27, tzinfo=UTC).replace(tzinfo=None),
+        _unwrap(
+            store.query(
+                datetime(2026, 7, 26, tzinfo=UTC).replace(tzinfo=None),
+                datetime(2026, 7, 27, tzinfo=UTC).replace(tzinfo=None),
+            )
         )

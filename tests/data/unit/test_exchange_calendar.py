@@ -2,8 +2,9 @@
 
 from datetime import UTC, date
 
-from app.services.data import ExchangeSessionRequest, get_exchange_sessions
+from app.services.data import get_exchange_sessions
 from app.services.data.contracts.responses import unwrap_data_response
+from app.services.data.time_sessions.contracts import ExchangeSessionRequest
 from app.utils import generate_id
 
 

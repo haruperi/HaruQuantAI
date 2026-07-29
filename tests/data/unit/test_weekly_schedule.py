@@ -2,12 +2,12 @@
 
 from datetime import UTC, date, datetime, time
 
-from app.services.data import (
+from app.services.data.contracts.responses import unwrap_data_response
+from app.services.data.time_sessions.contracts import (
     WeeklyHoliday,
     WeeklyScheduleDefinition,
-    WeeklyScheduleProvider,
 )
-from app.services.data.contracts.responses import unwrap_data_response
+from app.services.data.time_sessions.weekly_schedule import WeeklyScheduleProvider
 
 
 def _unwrap(response):

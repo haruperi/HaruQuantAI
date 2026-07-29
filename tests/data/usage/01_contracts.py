@@ -10,17 +10,20 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    DataError,
-    DataGap,
-    DataQualityReport,
-    DataRange,
-    ErrorDefinition,
-    MarketDataset,
-    OHLCVRecord,
-    QualityIssue,
-    SpreadRecord,
-    TickRecord,
+    build_data_error,
+    build_data_gap,
+    build_data_quality_report,
+    build_data_range,
+    build_error_definition,
+    build_market_dataset,
+    build_ohlcv_record,
+    build_quality_issue,
+    build_spread_record,
+    build_tick_record,
 )
+
+DataError = build_data_error
+
 
 _START = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
 _END = _START + timedelta(minutes=1)
@@ -34,7 +37,7 @@ def _header(title: str) -> None:
 
 def _demonstrate_feature() -> None:
     """Construct every public FEAT-DATA-01 contract type."""
-    bar = OHLCVRecord(
+    bar = build_ohlcv_record(
         timestamp=_START,
         source="usage",
         source_symbol="EURUSD",
@@ -49,7 +52,7 @@ def _demonstrate_feature() -> None:
         spread=Decimal("0.0002"),
         spread_unit="price",
     )
-    tick = TickRecord(
+    tick = build_tick_record(
         timestamp=_START,
         source="usage",
         source_symbol="EURUSD",
@@ -60,7 +63,7 @@ def _demonstrate_feature() -> None:
         price_unit="quote",
         volume_unit="ticks",
     )
-    spread = SpreadRecord(
+    spread = build_spread_record(
         timestamp=_START,
         source="usage",
         source_symbol="EURUSD",
@@ -69,7 +72,7 @@ def _demonstrate_feature() -> None:
         unit="points",
         scale=5,
     )
-    issue = QualityIssue(
+    issue = build_quality_issue(
         code="MISSING_BARS",
         severity="warning",
         message="One bounded example issue",
@@ -77,7 +80,7 @@ def _demonstrate_feature() -> None:
         samples=("2026-07-01T12:01:00Z",),
         blocking_workflows=(),
     )
-    report = DataQualityReport(
+    report = build_data_quality_report(
         quality_status="passed_with_warnings",
         quality_score=Decimal("0.99"),
         issues=(issue,),
@@ -89,7 +92,7 @@ def _demonstrate_feature() -> None:
         schema_version="v1",
         generated_at=_END,
     )
-    dataset = MarketDataset(
+    dataset = build_market_dataset(
         normalization_version="v1",
         data_kind="bars",
         symbol="EURUSD",
@@ -107,14 +110,15 @@ def _demonstrate_feature() -> None:
         precision_policy="decimal_string",
         request_id=_REQUEST_ID,
     )
-    data_range = DataRange(start=_START, end=_END)
-    gap = DataGap(start=_START, end=_END)
-    definition = ErrorDefinition(
+    data_range = build_data_range(start=_START, end=_END)
+    gap = build_data_gap(start=_START, end=_END)
+    definition = build_error_definition(
         code="EXAMPLE",
+        domain="data",
         category="usage",
         retryable=False,
         severity="info",
-        safe_message="Example",
+        description="Example",
         operator_action="None",
     )
     error = DataError(

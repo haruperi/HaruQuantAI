@@ -18,7 +18,7 @@ from app.services.data.evidence.fx_contracts import (
 from app.services.data.evidence.fx_conversion import (
     get_fx_conversion_evidence,
 )
-from app.utils import StandardResponse
+from app.utils.responses.models import StandardResponse
 
 from tests.data.helpers import END, START
 

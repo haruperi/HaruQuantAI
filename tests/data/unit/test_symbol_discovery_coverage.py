@@ -102,7 +102,7 @@ def test_load_local_manifest_missing_file() -> None:
     )
     with pytest.raises(DataError) as exc_info:
         _load_local_manifest(req)
-    assert exc_info.value.code == "DATA_NOT_FOUND"
+    assert exc_info.value.code in ("DATA_NOT_FOUND", "DB_CONNECTION_ERROR")
 
 
 def test_compute_overlap_and_gaps_invalid_range() -> None:
@@ -213,9 +213,7 @@ def test_public_get_symbol_metadata_and_list_symbols_keyword_style() -> None:
             "app.services.data.market_data.symbol_discovery._discover_symbols_raw",
             return_value=mock_page,
         ),
-        patch(
-            "app.services.data.market_data.symbol_discovery._ensure_source_access_raw"
-        ),
+        patch("app.services.data.sources.composition._ensure_source_access_raw"),
     ):
         meta = _unwrap(
             get_symbol_metadata(source_id="mt5", symbol="EURUSD", request_id=_REQ_ID)

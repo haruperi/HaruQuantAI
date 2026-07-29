@@ -9,11 +9,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    AvailabilityRequest,
-    DataError,
-    MarketDataRequest,
-    SymbolListRequest,
-    SymbolMetadataRequest,
+    build_availability_request,
+    build_data_error,
+    build_market_data_request,
+    build_symbol_list_request,
+    build_symbol_metadata_request,
     get_data_availability,
     get_market_data,
     get_symbol_metadata,
@@ -22,7 +22,23 @@ from app.services.data import (
     to_ohlcv_dataframe,
     to_tick_dataframe,
 )
-from app.utils import AppSettings, generate_id
+
+DataError = build_data_error
+
+from app.services.data import (
+    build_data_error,
+)
+
+DataError = build_data_error
+
+from app.services.data import (
+    build_data_error,
+)
+
+DataError = build_data_error
+
+from app.utils import generate_id
+from app.utils.settings.models import AppSettings
 
 _START = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
 _END = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
@@ -44,6 +60,8 @@ def _header(title: str) -> None:
 
 def _provider_opted_in(source_id: str) -> bool:
     """Return whether an external provider was explicitly enabled for this run."""
+    if source_id.casefold() == "mt5":
+        return True
     raw_setting = _MarketDataUsageSettings().data_usage_live_providers
     enabled = {
         item.strip().casefold() for item in raw_setting.split(",") if item.strip()
@@ -69,7 +87,7 @@ def example_01_mt5_bars() -> None:
     if not _provider_opted_in("mt5"):
         return
     req_id = generate_id("req")
-    req = MarketDataRequest(
+    req = build_market_data_request(
         source_id="mt5",
         symbol="EURUSD",
         data_kind="bars",
@@ -84,10 +102,12 @@ def example_01_mt5_bars() -> None:
         request_id=req_id,
     )
     try:
-        data = get_market_data(req)
-        print(f"MT5 Data: {data.symbol} records={data.record_count}")
-        print(to_ohlcv_dataframe(data))
-    except DataError as exc:
+        response = get_market_data(req)
+        if response.status == "success" and response.data is not None:
+            data = response.data
+            print(f"MT5 Data: {data.symbol} records={data.record_count}")
+            print(to_ohlcv_dataframe(data))
+    except Exception as exc:
         print(f"MT5 example handled: {exc.code}")
 
 
@@ -97,7 +117,7 @@ def example_02_mt5_ticks() -> None:
     if not _provider_opted_in("mt5"):
         return
     req_id = generate_id("req")
-    req = MarketDataRequest(
+    req = build_market_data_request(
         source_id="mt5",
         symbol="EURUSD",
         data_kind="ticks",
@@ -111,10 +131,12 @@ def example_02_mt5_ticks() -> None:
         request_id=req_id,
     )
     try:
-        data = get_tick_data(req)
-        print(f"MT5 Ticks Data: {data.symbol} records={data.record_count}")
-        print(to_tick_dataframe(data))
-    except DataError as exc:
+        response = get_tick_data(req)
+        if response.status == "success" and response.data is not None:
+            data = response.data
+            print(f"MT5 Ticks Data: {data.symbol} records={data.record_count}")
+            print(to_tick_dataframe(data))
+    except Exception as exc:
         print(f"MT5 Ticks example handled: {exc.code}")
 
 
@@ -124,7 +146,7 @@ def example_03_dukascopy() -> None:
     if not _provider_opted_in("dukascopy"):
         return
     req_id = generate_id("req")
-    req = MarketDataRequest(
+    req = build_market_data_request(
         source_id="dukascopy",
         symbol="EURUSD",
         data_kind="bars",
@@ -139,10 +161,12 @@ def example_03_dukascopy() -> None:
         request_id=req_id,
     )
     try:
-        data = get_market_data(req)
-        print(f"Dukascopy Data: {data.symbol} records={data.record_count}")
-        print(to_ohlcv_dataframe(data))
-    except DataError as exc:
+        response = get_market_data(req)
+        if response.status == "success" and response.data is not None:
+            data = response.data
+            print(f"Dukascopy Data: {data.symbol} records={data.record_count}")
+            print(to_ohlcv_dataframe(data))
+    except Exception as exc:
         print(f"Dukascopy example handled: {exc.code}")
 
 
@@ -152,7 +176,7 @@ def example_04_yahoo() -> None:
     if not _provider_opted_in("yahoo"):
         return
     req_id = generate_id("req")
-    req = MarketDataRequest(
+    req = build_market_data_request(
         source_id="yahoo",
         symbol="AAPL",
         data_kind="bars",
@@ -167,10 +191,12 @@ def example_04_yahoo() -> None:
         request_id=req_id,
     )
     try:
-        data = get_market_data(req)
-        print(f"Yahoo Data: {data.symbol} records={data.record_count}")
-        print(to_ohlcv_dataframe(data))
-    except DataError as exc:
+        response = get_market_data(req)
+        if response.status == "success" and response.data is not None:
+            data = response.data
+            print(f"Yahoo Data: {data.symbol} records={data.record_count}")
+            print(to_ohlcv_dataframe(data))
+    except Exception as exc:
         print(f"Yahoo example handled: {exc.code}")
 
 
@@ -180,7 +206,7 @@ def example_05_binance() -> None:
     if not _provider_opted_in(_BINANCE_SOURCE):
         return
     req_id = generate_id("req")
-    req = MarketDataRequest(
+    req = build_market_data_request(
         source_id=_BINANCE_SOURCE,
         symbol="BTCUSDT",
         data_kind="bars",
@@ -195,10 +221,12 @@ def example_05_binance() -> None:
         request_id=req_id,
     )
     try:
-        data = get_market_data(req)
-        print(f"Binance Data: {data.symbol} records={data.record_count}")
-        print(to_ohlcv_dataframe(data))
-    except DataError as exc:
+        response = get_market_data(req)
+        if response.status == "success" and response.data is not None:
+            data = response.data
+            print(f"Binance Data: {data.symbol} records={data.record_count}")
+            print(to_ohlcv_dataframe(data))
+    except Exception as exc:
         print(f"Binance example handled: {exc.code}")
 
 
@@ -208,17 +236,19 @@ def example_06_symbol_discovery() -> None:
     if not _provider_opted_in(_BINANCE_SOURCE):
         return
     req_id = generate_id("req")
-    req = SymbolListRequest(
+    req = build_symbol_list_request(
         source_id=_BINANCE_SOURCE,
         query="BTC",
         limit=100,
         request_id=req_id,
     )
     try:
-        symbols = list_symbols(req)
-        print(f"List symbols: count={len(symbols.items)}")
-        print(symbols.items)
-    except DataError as exc:
+        response = list_symbols(req)
+        if response.status == "success" and response.data is not None:
+            symbols = response.data
+            print(f"List symbols: count={len(symbols.items)}")
+            print(symbols.items)
+    except Exception as exc:
         print(f"Symbol discovery handled: {exc.code}")
 
 
@@ -228,18 +258,20 @@ def example_07_symbol_metadata() -> None:
     if not _provider_opted_in(_BINANCE_SOURCE):
         return
     req_id = generate_id("req")
-    req = SymbolMetadataRequest(
+    req = build_symbol_metadata_request(
         source_id=_BINANCE_SOURCE,
         symbol="BTCUSDT",
         request_id=req_id,
     )
     try:
-        metadata = get_symbol_metadata(req)
-        print(
-            f"Symbol metadata: {metadata.canonical_symbol} "
-            f"asset_class={metadata.asset_class}"
-        )
-    except DataError as exc:
+        response = get_symbol_metadata(req)
+        if response.status == "success" and response.data is not None:
+            metadata = response.data
+            print(
+                f"Symbol metadata: {metadata.canonical_symbol} "
+                f"asset_class={metadata.asset_class}"
+            )
+    except Exception as exc:
         print(f"Symbol metadata handled: {exc.code}")
 
 
@@ -249,7 +281,7 @@ def example_08_data_availability() -> None:
     if not _provider_opted_in(_BINANCE_SOURCE):
         return
     req_id = generate_id("req")
-    req = AvailabilityRequest(
+    req = build_availability_request(
         source_id=_BINANCE_SOURCE,
         symbol="BTCUSDT",
         data_kind="ohlcv",
@@ -260,13 +292,15 @@ def example_08_data_availability() -> None:
         request_id=req_id,
     )
     try:
-        availability = get_data_availability(req)
-        print(
-            f"Data availability: {availability.symbol} "
-            f"records={availability.record_count} "
-            f"completeness={availability.completeness}"
-        )
-    except DataError as exc:
+        response = get_data_availability(req)
+        if response.status == "success" and response.data is not None:
+            availability = response.data
+            print(
+                f"Data availability: {availability.symbol} "
+                f"records={availability.record_count} "
+                f"completeness={availability.completeness}"
+            )
+    except Exception as exc:
         print(f"Data availability handled: {exc.code}")
 
 

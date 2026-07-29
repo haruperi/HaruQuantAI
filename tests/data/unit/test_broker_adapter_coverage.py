@@ -111,8 +111,10 @@ async def test_fetch_async_bars_missing_volume() -> None:
     bar_res = MagicMock()
     bar_res.error = None
     bar_res.data = bar_page
-    bar_res.adapter_version = "v1"
-    bar_res.timestamp = _NOW
+    bar_res.metadata.extensions = {
+        "adapter_version": "v1",
+        "timestamp": "2026-07-01T12:00:00.000000Z",
+    }
 
     adapter.get_historical_bars = AsyncMock(return_value=bar_res)
     src = ExternalMarketDataSource("mt5", adapter)
@@ -142,8 +144,10 @@ async def test_fetch_async_empty_result() -> None:
     bar_res = MagicMock()
     bar_res.error = None
     bar_res.data = bar_page
-    bar_res.adapter_version = "v1"
-    bar_res.timestamp = _NOW
+    bar_res.metadata.extensions = {
+        "adapter_version": "v1",
+        "timestamp": "2026-07-01T12:00:00.000000Z",
+    }
 
     adapter.get_historical_bars = AsyncMock(return_value=bar_res)
     src = ExternalMarketDataSource("mt5", adapter)
@@ -173,8 +177,10 @@ async def test_fetch_async_spreads_missing_precision() -> None:
     spread_res = MagicMock()
     spread_res.error = None
     spread_res.data = Decimal("1.5")
-    spread_res.timestamp = _NOW
-    spread_res.adapter_version = "v1"
+    spread_res.metadata.extensions = {
+        "adapter_version": "v1",
+        "timestamp": "2026-07-01T12:00:00.000000Z",
+    }
     adapter.get_spread = AsyncMock(return_value=spread_res)
 
     meta = MagicMock()
@@ -220,10 +226,15 @@ async def test_get_symbol_metadata_async_invalid_timezone() -> None:
     adapter = MagicMock()
     info = MagicMock()
     info.provider_metadata = {"timezone": 12345}  # non-string timezone
+    info.provider_symbol = "EURUSD"
 
     info_res = MagicMock()
     info_res.error = None
     info_res.data = info
+    info_res.metadata.extensions = {
+        "adapter_version": "v1",
+        "timestamp": "2026-07-01T12:00:00.000000Z",
+    }
 
     adapter.get_symbol_info = AsyncMock(return_value=info_res)
     src = ExternalMarketDataSource("mt5", adapter)

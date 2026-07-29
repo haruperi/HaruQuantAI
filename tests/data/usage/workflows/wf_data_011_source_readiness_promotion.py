@@ -9,16 +9,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
-    SourceDescriptor,
-    SourceLicensePolicy,
-    SourcePromotionRequest,
+    build_source_descriptor,
+    build_source_license_policy,
+    build_source_promotion_request,
     get_market_data,
     get_source_descriptor,
     promote_source,
     register_source,
     run_data_migrations,
+    unwrap_data_response,
 )
-from app.utils import AuthContext, generate_id, utc_now
+from app.utils import create_auth_context, generate_id, utc_now
 from tests.data.usage.workflows._support import isolated_runtime, market_request
 
 WORKFLOW_ID = "WF-DATA-011"
@@ -41,7 +42,7 @@ def main() -> None:
     """Execute authenticated promotion and demotion in temporary state."""
     print(f"{WORKFLOW_ID} — Source Readiness and Promotion")
     print("INPUT BOUNDARY — operator evidence package and AuthContext")
-    genuine = get_market_data(market_request("bars", timeframe="M1", limit=1))
+
     with (
         tempfile.TemporaryDirectory(prefix="wf-data-011-") as directory,
         isolated_runtime(Path(directory)),
@@ -49,12 +50,17 @@ def main() -> None:
         request_id = generate_id("req")
         run_data_migrations(request_id)
 
+        genuine_resp = get_market_data(market_request("bars", timeframe="M1", limit=1))
+        genuine = unwrap_data_response(
+            genuine_resp, operation="get_market_data", request_id=request_id
+        )
+
         # Stage 1 — Compose MT5 and read its current staging descriptor.
         _stage(1)
         candidate_id = "mt5-workflow-candidate"
         evidence = ("normalization", "quality", "operator_signoff")
         register_source(
-            SourceDescriptor(
+            build_source_descriptor(
                 source_id=candidate_id,
                 readiness="staging",
                 capabilities=("ohlcv",),
@@ -64,7 +70,7 @@ def main() -> None:
                 schema_version="v1",
                 timezone="UTC",
                 revision=genuine.source_metadata.get("source_revision", "mt5-observed"),
-                license_policy=SourceLicensePolicy(
+                license_policy=build_source_license_policy(
                     source_id=candidate_id,
                     status="approved",
                     permitted_workflows=("research",),
@@ -76,12 +82,15 @@ def main() -> None:
             ),
             object,  # type: ignore[arg-type]
         )
-        descriptor = get_source_descriptor(candidate_id)
+        descriptor_resp = get_source_descriptor(candidate_id)
+        descriptor = unwrap_data_response(
+            descriptor_resp, operation="get_source_descriptor", request_id=request_id
+        )
 
         # Stage 2 — Build authenticated normalization, quality, and sign-off evidence.
         _stage(2)
         now = utc_now()
-        auth = AuthContext(
+        auth = create_auth_context(
             contract_version="v1",
             schema_id="utils.auth_context.v1",
             principal_id="workflow-operator",
@@ -99,8 +108,8 @@ def main() -> None:
 
         # Stage 3 — Promote only with the descriptor's complete evidence package.
         _stage(3)
-        promoted = promote_source(
-            SourcePromotionRequest(
+        promoted_resp = promote_source(
+            build_source_promotion_request(
                 source_id=candidate_id,
                 target_readiness="production",
                 evidence=evidence,
@@ -109,11 +118,14 @@ def main() -> None:
             auth,
             timestamp_ns=1,
         )
+        promoted = unwrap_data_response(
+            promoted_resp, operation="promote_source", request_id=request_id
+        )
 
         # Stage 4 — Demote immediately and preserve audited reversibility.
         _stage(4)
-        demoted = promote_source(
-            SourcePromotionRequest(
+        demoted_resp = promote_source(
+            build_source_promotion_request(
                 source_id=candidate_id,
                 target_readiness="staging",
                 evidence=("operator_signoff",),
@@ -122,6 +134,10 @@ def main() -> None:
             auth,
             timestamp_ns=2,
         )
+        demoted = unwrap_data_response(
+            demoted_resp, operation="promote_source", request_id=request_id
+        )
+
         print(
             "Readiness transition:",
             descriptor.readiness,

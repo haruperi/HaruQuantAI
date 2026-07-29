@@ -418,11 +418,37 @@ def scrape_economic_calendar(
     return result
 
 
+def scrape_result_to_dataframe(result: ScrapeResult) -> pd.DataFrame:
+    """Project a scrape result through the public function boundary."""
+    return result.to_dataframe()
+
+
+def save_scrape_result(
+    result: ScrapeResult, directory: Path, format: str = "csv"
+) -> None:
+    """Persist a scrape result through the public function boundary."""
+    result.save(directory, format)
+
+
+def serialize_scrape_result(result: ScrapeResult) -> bytes:
+    """Serialize a scrape result through the public function boundary."""
+    return result.serialize()
+
+
+def deserialize_scrape_result(payload: bytes) -> ScrapeResult:
+    """Deserialize a trusted scrape result through the public boundary."""
+    return ScrapeResult.deserialize(payload)
+
+
 __all__ = [
     "CALENDAR_SITES",
     "CalendarEvent",
     "CalendarTransport",
     "ScrapeOptions",
     "ScrapeResult",
+    "deserialize_scrape_result",
+    "save_scrape_result",
     "scrape_economic_calendar",
+    "scrape_result_to_dataframe",
+    "serialize_scrape_result",
 ]

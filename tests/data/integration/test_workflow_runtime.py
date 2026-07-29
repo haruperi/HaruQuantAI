@@ -9,30 +9,32 @@ from pathlib import Path
 
 import pytest
 from app.services.data import (
-    AvailabilityRequest,
-    DatasetSaveRequest,
-    DataSettings,
-    FeedConfig,
-    FeedStatusRequest,
-    FXConversionRequest,
-    FXRateLeg,
-    MarketContextEvidence,
-    MarketContextRequest,
-    MarketDataRequest,
-    MarketSchedule,
-    RawFeedEvent,
-    ReconnectPolicy,
-    ScheduleRequest,
-    SessionWindow,
-    SourceDescriptor,
-    SourceLicensePolicy,
-    SourcePromotionRequest,
-    SymbolListRequest,
-    SymbolMetadataRequest,
-    SyntheticRequest,
     aggregate_ticks_to_bars,
     align_multitimeframe_data,
+    build_availability_request,
+    build_data_response,
+    build_data_settings,
+    build_dataset_save_request,
+    build_feed_config,
+    build_feed_status_request,
+    build_fx_conversion_request,
+    build_fx_rate_leg,
+    build_market_context_evidence,
+    build_market_context_request,
+    build_market_data_request,
+    build_market_schedule,
+    build_raw_feed_event,
+    build_reconnect_policy,
+    build_schedule_request,
+    build_session_window,
+    build_source_descriptor,
+    build_source_license_policy,
+    build_source_promotion_request,
+    build_symbol_list_request,
+    build_symbol_metadata_request,
+    build_synthetic_request,
     data_settings_context,
+    data_start_time,
     ensure_source,
     generate_synthetic_bars,
     generate_tick_series,
@@ -52,9 +54,9 @@ from app.services.data import (
     save_dataset,
     start_internal_feed,
     to_ohlcv_dataframe,
+    unwrap_data_response,
 )
-from app.services.data.contracts.responses import unwrap_data_response
-from app.utils import AuthContext, generate_id
+from app.utils import create_auth_context, generate_id
 
 from tests.data.helpers import make_dataset, register_local_test_source
 
@@ -86,22 +88,27 @@ class _ContextProvider:
         request: MarketContextRequest,
     ) -> MarketContextEvidence:
         """Return fresh evidence for the requested symbol."""
-        return MarketContextEvidence(
-            symbol=request.symbol,
-            session_state="open",
-            calendar_state="clear",
-            spread=Decimal("0.0002"),
-            spread_unit="USD",
-            liquidity=Decimal(1000000),
-            volatility=Decimal("0.01"),
-            correlations={},
-            crisis_flags=(),
-            timezone=request.timezone,
-            as_of=request.as_of,
-            expires_at=request.as_of + timedelta(minutes=1),
-            provenance={"source": "integration-fixture"},
-            missing_fields=(),
+        return build_data_response(
+            operation="data.evidence.get_market_context_evidence",
             request_id=request.request_id,
+            start_time=data_start_time(),
+            data=build_market_context_evidence(
+                symbol=request.symbol,
+                session_state="open",
+                calendar_state="clear",
+                spread=Decimal("0.0002"),
+                spread_unit="USD",
+                liquidity=Decimal(1000000),
+                volatility=Decimal("0.01"),
+                correlations={},
+                crisis_flags=(),
+                timezone=request.timezone,
+                as_of=request.as_of,
+                expires_at=request.as_of + timedelta(minutes=1),
+                provenance={"source": "integration-fixture"},
+                missing_fields=(),
+                request_id=request.request_id,
+            ),
         )
 
 
@@ -117,15 +124,19 @@ class _FXProvider:
         request_id: str,
     ) -> FXRateLeg:
         """Return the requested direct conversion evidence."""
-        del request_id
-        return FXRateLeg(
-            source_currency=source_currency,
-            target_currency=target_currency,
-            rate=Decimal("1.10"),
-            source_id="integration-fixture",
-            provider_symbol=f"{source_currency}{target_currency}",
-            as_of=as_of - timedelta(seconds=1),
-            provenance={"quote": "declared-fixture"},
+        return build_data_response(
+            operation="data.evidence.get_fx_conversion_evidence",
+            request_id=request_id,
+            start_time=data_start_time(),
+            data=build_fx_rate_leg(
+                source_currency=source_currency,
+                target_currency=target_currency,
+                rate=Decimal("1.10"),
+                source_id="integration-fixture",
+                provider_symbol=f"{source_currency}{target_currency}",
+                as_of=as_of - timedelta(seconds=1),
+                provenance={"quote": "declared-fixture"},
+            ),
         )
 
 
@@ -142,12 +153,12 @@ class _Calendar:
         request_id: str,
     ) -> MarketSchedule:
         """Return one authoritative current session."""
-        window = SessionWindow(
+        window = build_session_window(
             label="open",
             opens_at=observed_at,
             closes_at=observed_at + timedelta(hours=1),
         )
-        return MarketSchedule(
+        return build_market_schedule(
             source_id=source_id,
             symbol=symbol,
             timezone=timezone,
@@ -172,16 +183,18 @@ def runtime(
         "app.services.data.realtime_feeds.state._ACTIVE_FEEDS",
     ):
         monkeypatch.setattr(target, {})
-    return DataSettings(
+    return build_data_settings(
         database_url="sqlite:///workflow-runtime.sqlite3",
         data_dir=tmp_path,
+        sqlite_busy_timeout_seconds=1.5,
+        write_lock_lease_seconds=30.0,
         approved_storage_roots=(Path("data/raw"),),
     )
 
 
 def _descriptor(source_id: str, *, readiness: str) -> SourceDescriptor:
     """Return one bounded source descriptor for runtime workflow tests."""
-    return SourceDescriptor(
+    return build_source_descriptor(
         source_id=source_id,
         readiness=readiness,
         capabilities=("ticks",),
@@ -191,7 +204,7 @@ def _descriptor(source_id: str, *, readiness: str) -> SourceDescriptor:
         schema_version="v1",
         timezone="UTC",
         revision="source-v1",
-        license_policy=SourceLicensePolicy(
+        license_policy=build_source_license_policy(
             source_id=source_id,
             status="approved",
             permitted_workflows=("validation",),
@@ -214,7 +227,7 @@ def test_wf_data_008_persists_ingests_and_reads_feed_status(
             _descriptor("fixture-feed", readiness="staging"),
             object,  # type: ignore[arg-type]
         )
-        config = FeedConfig(
+        config = build_feed_config(
             feed_id="wf-data-008",
             source_id="fixture-feed",
             symbol="EURUSD",
@@ -223,7 +236,7 @@ def test_wf_data_008_persists_ingests_and_reads_feed_status(
             buffer_capacity=2,
             overflow_policy="drop_and_reconcile",
             heartbeat_timeout_seconds=30,
-            reconnect_policy=ReconnectPolicy(
+            reconnect_policy=build_reconnect_policy(
                 max_retries=2,
                 initial_backoff_seconds=1,
                 max_backoff_seconds=4,
@@ -235,7 +248,7 @@ def test_wf_data_008_persists_ingests_and_reads_feed_status(
         started = start_internal_feed(config, clock=_FixedClock())
         accepted = ingest_feed_event(
             config.feed_id,
-            RawFeedEvent(
+            build_raw_feed_event(
                 feed_id=config.feed_id,
                 sequence=1,
                 event_timestamp=_NOW,
@@ -245,7 +258,7 @@ def test_wf_data_008_persists_ingests_and_reads_feed_status(
             ),
         )
         status = read_feed_status(
-            FeedStatusRequest(feed_id=config.feed_id, request_id=request_id),
+            build_feed_status_request(feed_id=config.feed_id, request_id=request_id),
             clock=_FixedClock(),
         )
 
@@ -261,7 +274,7 @@ def test_wf_data_011_persists_audited_reversible_promotion(
 ) -> None:
     """Promote and demote a source through authenticated durable transitions."""
     request_id = generate_id("req")
-    auth = AuthContext(
+    auth = create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="integration-operator",
@@ -282,25 +295,29 @@ def test_wf_data_011_persists_audited_reversible_promotion(
             _descriptor("fixture-promotion", readiness="staging"),
             object,  # type: ignore[arg-type]
         )
-        promoted = promote_source(
-            SourcePromotionRequest(
-                source_id="fixture-promotion",
-                target_readiness="production",
-                evidence=evidence,
-                request_id=request_id,
-            ),
-            auth,
-            timestamp_ns=1,
+        promoted = _unwrap(
+            promote_source(
+                build_source_promotion_request(
+                    source_id="fixture-promotion",
+                    target_readiness="production",
+                    evidence=evidence,
+                    request_id=request_id,
+                ),
+                auth,
+                timestamp_ns=1,
+            )
         )
-        demoted = promote_source(
-            SourcePromotionRequest(
-                source_id="fixture-promotion",
-                target_readiness="staging",
-                evidence=("operator_signoff",),
-                request_id=request_id,
-            ),
-            auth,
-            timestamp_ns=2,
+        demoted = _unwrap(
+            promote_source(
+                build_source_promotion_request(
+                    source_id="fixture-promotion",
+                    target_readiness="staging",
+                    evidence=("operator_signoff",),
+                    request_id=request_id,
+                ),
+                auth,
+                timestamp_ns=2,
+            )
         )
 
     assert promoted.readiness == "production"
@@ -309,7 +326,7 @@ def test_wf_data_011_persists_audited_reversible_promotion(
 
 def test_wf_data_014_and_015_return_fresh_provider_evidence() -> None:
     """Normalize market-context and deterministic FX evidence from read providers."""
-    context_request = MarketContextRequest(
+    context_request = build_market_context_request(
         symbol="EURUSD",
         as_of=_NOW,
         max_age_seconds=60,
@@ -317,8 +334,8 @@ def test_wf_data_014_and_015_return_fresh_provider_evidence() -> None:
         timezone="UTC",
         request_id=generate_id("req"),
     )
-    context = get_market_context_evidence(context_request, _ContextProvider())
-    fx_request = FXConversionRequest(
+    context = _unwrap(get_market_context_evidence(context_request, _ContextProvider()))
+    fx_request = build_fx_conversion_request(
         source_currency="EUR",
         target_currency="USD",
         as_of=_NOW,
@@ -329,7 +346,7 @@ def test_wf_data_014_and_015_return_fresh_provider_evidence() -> None:
         path_policy_version="v1",
         request_id=generate_id("req"),
     )
-    fx = get_fx_conversion_evidence(fx_request, _FXProvider())
+    fx = _unwrap(get_fx_conversion_evidence(fx_request, _FXProvider()))
 
     assert context.session_state == "open"
     assert context.missing_fields == ()
@@ -370,42 +387,50 @@ def test_wf_data_004_005_and_016_transform_generate_and_derive() -> None:
             "quality_report": quality,
         }
     )
-    resampled = resample_ohlcv(minute_dataset, "M5")
-    aligned = align_multitimeframe_data(
-        {"M1": minute_dataset, "M5": resampled},
-        target_timestamps=(minute_dataset.available_at,),
-    )
-    synthetic = generate_synthetic_bars(
-        SyntheticRequest(
-            symbol="EURUSD",
-            data_kind="bars",
-            timeframe="H1",
-            start=_NOW,
-            record_count=3,
-            method="gbm",
-            seed=42,
-            parameters={
-                "mu": Decimal("0.02"),
-                "sigma": Decimal("0.10"),
-                "start_val": Decimal("1.10"),
-            },
-            precision_policy="decimal_string",
-            request_id=generate_id("req"),
+    resampled = _unwrap(resample_ohlcv(minute_dataset, "M5"))
+    aligned = _unwrap(
+        align_multitimeframe_data(
+            {"M1": minute_dataset, "M5": resampled},
+            target_timestamps=(minute_dataset.available_at,),
         )
     )
-    derived = generate_tick_series(
-        synthetic,
-        model="trading_bar",
-        trading_timeframe="H1",
+    synthetic = _unwrap(
+        generate_synthetic_bars(
+            build_synthetic_request(
+                symbol="EURUSD",
+                data_kind="bars",
+                timeframe="H1",
+                start=_NOW,
+                record_count=3,
+                method="gbm",
+                seed=42,
+                parameters={
+                    "mu": Decimal("0.02"),
+                    "sigma": Decimal("0.10"),
+                    "start_val": Decimal("1.10"),
+                },
+                precision_policy="decimal_string",
+                request_id=generate_id("req"),
+            )
+        )
+    )
+    derived = _unwrap(
+        generate_tick_series(
+            synthetic,
+            model="trading_bar",
+            trading_timeframe="H1",
+        )
     )
     volume_ticks = tuple(
         tick.model_copy(update={"volume": Decimal(1), "volume_unit": "ticks"})
         for tick in derived.records
     )
-    aggregated = aggregate_ticks_to_bars(
-        derived.model_copy(update={"records": volume_ticks}),
-        "H1",
-        "last",
+    aggregated = _unwrap(
+        aggregate_ticks_to_bars(
+            derived.model_copy(update={"records": volume_ticks}),
+            "H1",
+            "last",
+        )
     )
 
     assert resampled.record_count == 2
@@ -446,7 +471,7 @@ def test_wf_data_009_discovers_metadata_and_measures_local_availability(
     with data_settings_context(runtime):
         run_data_migrations(request_id)
         save_dataset(
-            DatasetSaveRequest(
+            build_dataset_save_request(
                 dataset=dataset,
                 relative_path=Path("data/raw/ABC_M1.csv"),
                 format="csv",
@@ -455,48 +480,56 @@ def test_wf_data_009_discovers_metadata_and_measures_local_availability(
             )
         )
         register_local_test_source(raw_root, ("ABC",), source_id="local_csv")
-        symbols = list_symbols(
-            SymbolListRequest(
-                source_id="local_csv",
-                query="AB",
-                limit=10,
-                request_id=request_id,
+        symbols = _unwrap(
+            list_symbols(
+                build_symbol_list_request(
+                    source_id="local_csv",
+                    query="AB",
+                    limit=10,
+                    request_id=request_id,
+                )
             )
         )
-        metadata = get_symbol_metadata(
-            SymbolMetadataRequest(
-                source_id="local_csv",
-                symbol="ABC",
-                request_id=request_id,
+        metadata = _unwrap(
+            get_symbol_metadata(
+                build_symbol_metadata_request(
+                    source_id="local_csv",
+                    symbol="ABC",
+                    request_id=request_id,
+                )
             )
         )
-        history = get_market_data(
-            MarketDataRequest(
-                source_id="local_csv",
-                symbol="ABC",
-                data_kind="bars",
-                timeframe="M1",
-                start=dataset.start,
-                end=dataset.end + timedelta(minutes=1),
-                limit=10,
-                use_cache=False,
-                quality_failure_behavior="reject",
-                workflow_context="research",
-                precision_policy="decimal_string",
-                request_id=request_id,
+        history = _unwrap(
+            get_market_data(
+                build_market_data_request(
+                    source_id="local_csv",
+                    symbol="ABC",
+                    data_kind="bars",
+                    timeframe="M1",
+                    start=dataset.start,
+                    end=dataset.end + timedelta(minutes=1),
+                    limit=10,
+                    use_cache=False,
+                    quality_failure_behavior="reject",
+                    workflow_context="research",
+                    precision_policy="decimal_string",
+                    request_id=request_id,
+                )
             )
         )
-        analytical = to_ohlcv_dataframe(history)
-        availability = get_data_availability(
-            AvailabilityRequest(
-                source_id="local_csv",
-                symbol="ABC",
-                data_kind="ohlcv",
-                timeframe="M1",
-                start=dataset.start,
-                end=dataset.end + timedelta(minutes=1),
-                max_probe_records=10,
-                request_id=request_id,
+        analytical = _unwrap(to_ohlcv_dataframe(history))
+        availability = _unwrap(
+            get_data_availability(
+                build_availability_request(
+                    source_id="local_csv",
+                    symbol="ABC",
+                    data_kind="ohlcv",
+                    timeframe="M1",
+                    start=dataset.start,
+                    end=dataset.end + timedelta(minutes=1),
+                    max_probe_records=10,
+                    request_id=request_id,
+                )
             )
         )
 
@@ -541,7 +574,7 @@ def test_wf_data_010_returns_configured_utc_market_hours(
         ensure_source("csv", request_id)
         hours = _unwrap(
             get_market_hours(
-                ScheduleRequest(
+                build_schedule_request(
                     source_id="csv",
                     symbol="EURUSD",
                     view="hours",

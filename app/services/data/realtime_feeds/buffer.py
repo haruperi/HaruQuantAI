@@ -58,9 +58,9 @@ def start_internal_feed(
     logger.info("Starting internal feed %s", config.feed_id)
 
     # 1. Resolve source descriptor
-    from app.services.data.sources.registry import get_source_descriptor
+    from app.services.data.sources.registry import _get_source_descriptor_raw
 
-    descriptor = get_source_descriptor(config.source_id)
+    descriptor = _get_source_descriptor_raw(config.source_id)
 
     # 2. Validate readiness and capability
     if descriptor.readiness not in ("staging", "production"):

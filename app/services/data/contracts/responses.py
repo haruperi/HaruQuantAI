@@ -597,8 +597,6 @@ def run_data_operation[T](
             correlation_id=correlation_id,
             extensions=extensions,
         )
-    except _PROPAGATED_EXCEPTIONS:
-        raise
     except Exception as exception:  # noqa: BLE001 - safe normalization boundary.
         logger.warning("Data operation %s raised an unexpected exception", operation)
         return build_exception_response(

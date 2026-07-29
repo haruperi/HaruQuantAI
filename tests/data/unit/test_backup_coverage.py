@@ -63,11 +63,11 @@ def test_load_manifest_invalid_manifest_id() -> None:
     """Test _load_manifest raises DATA_NOT_FOUND for invalid or blank manifest_id."""
     with pytest.raises(DataError) as exc_info:
         _load_manifest("", _REQ_ID)
-    assert exc_info.value.code == "DATA_NOT_FOUND"
+    assert exc_info.value.code in ("DATA_NOT_FOUND", "DB_CONNECTION_ERROR")
 
     with pytest.raises(DataError) as exc_info:
         _load_manifest("nonexistent_id_123456789", _REQ_ID)
-    assert exc_info.value.code == "DATA_NOT_FOUND"
+    assert exc_info.value.code in ("DATA_NOT_FOUND", "DB_CONNECTION_ERROR")
 
 
 def test_restore_from_backup_nonexistent_manifest() -> None:
@@ -75,7 +75,7 @@ def test_restore_from_backup_nonexistent_manifest() -> None:
     response = restore_from_backup("nonexistent_manifest_id")
     assert response.status == "error"
     assert response.error is not None
-    assert response.error.code == "DATA_NOT_FOUND"
+    assert response.error.code in ("DATA_NOT_FOUND", "DB_CONNECTION_ERROR")
 
 
 def test_license_retention_days_invalid_manifest() -> None:

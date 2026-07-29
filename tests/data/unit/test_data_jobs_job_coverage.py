@@ -97,8 +97,36 @@ def test_handle_create_limits_exceeded() -> None:
     assert exc_info.value.code == "VALIDATION_FAILED"
 
 
-def test_handle_start_job_not_found() -> None:
+from pathlib import Path
+
+from app.services.data.contracts.responses import unwrap_data_response
+from app.services.data.persistence.migrations import run_data_migrations
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.data_jobs.test",
+        request_id=_REQ_ID,
+    )
+
+
+def _configure_db(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///jobs.sqlite3")
+    monkeypatch.setenv("DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("SQLITE_BUSY_TIMEOUT_SECONDS", "1")
+    monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "30")
+    return tmp_path / "jobs.sqlite3"
+
+
+def _apply_migrations(request_id: str) -> None:
+    _unwrap(run_data_migrations(request_id))
+
+
+def test_handle_start_job_not_found(monkeypatch, tmp_path: Path) -> None:
     """Test _handle_start raises JOB_NOT_FOUND for non-existent job."""
+    _configure_db(monkeypatch, tmp_path)
+    _apply_migrations(_REQ_ID)
     req = ScheduleJobRequest(
         action="start",
         job_id="nonexistent_job_123",
@@ -109,8 +137,10 @@ def test_handle_start_job_not_found() -> None:
     assert exc_info.value.code == "JOB_NOT_FOUND"
 
 
-def test_handle_stop_job_not_found() -> None:
+def test_handle_stop_job_not_found(monkeypatch, tmp_path: Path) -> None:
     """Test _handle_stop raises JOB_NOT_FOUND for non-existent job."""
+    _configure_db(monkeypatch, tmp_path)
+    _apply_migrations(_REQ_ID)
     req = ScheduleJobRequest(
         action="stop",
         job_id="nonexistent_job_123",
@@ -155,11 +185,13 @@ def test_acquire_job_run_lease_checks() -> None:
         assert exc_info.value.code == "CONCURRENT_WRITE_LOCKED"
 
 
-def test_read_update_job_status_nonexistent() -> None:
+def test_read_update_job_status_nonexistent(monkeypatch, tmp_path: Path) -> None:
     """Test read_update_job_status raises JOB_NOT_FOUND for non-existent job."""
+    _configure_db(monkeypatch, tmp_path)
+    _apply_migrations(_REQ_ID)
     req = JobStatusRequest(job_id="nonexistent_job_123", request_id=_REQ_ID)
     with pytest.raises(DataError) as exc_info:
-        read_update_job_status(req)
+        _unwrap(read_update_job_status(req))
     assert exc_info.value.code == "JOB_NOT_FOUND"
 
 
@@ -202,8 +234,10 @@ def test_schedule_update_job_actions() -> None:
         mock_r.assert_called_once()
 
 
-def test_run_data_update_job_once_nonexistent() -> None:
+def test_run_data_update_job_once_nonexistent(monkeypatch, tmp_path: Path) -> None:
     """Test run_data_update_job_once returns state='failed' for non-existent job."""
+    _configure_db(monkeypatch, tmp_path)
+    _apply_migrations(_REQ_ID)
     res = run_data_update_job_once("nonexistent_job_123", _REQ_ID)
     assert res.state == "failed"
     assert res.error_code == "JOB_NOT_FOUND"

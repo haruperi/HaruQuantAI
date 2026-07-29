@@ -35,7 +35,7 @@ from app.utils import get_logger, utc_now
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.brokers import (
+    from app.services.brokers.contracts import (
         BrokerAccountInfo,
         BrokerAdapter,
         BrokerBalance,

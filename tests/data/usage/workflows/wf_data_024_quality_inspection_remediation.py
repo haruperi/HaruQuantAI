@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -23,7 +24,8 @@ from app.services.data import (
     summarize_quality_remediation,
     unwrap_data_response,
 )
-from tests.data.usage.workflows._support import market_request
+from app.utils import generate_id
+from tests.data.usage.workflows._support import isolated_runtime, market_request
 
 WORKFLOW_ID = "WF-DATA-024"
 STAGES = (
@@ -56,84 +58,150 @@ def main() -> None:
         "INPUT BOUNDARY — normalized records or an existing dataset plus the active profile"
     )
 
-    response = get_market_data(market_request("bars", timeframe="M1", limit=80))
-    dataset = unwrap_data_response(
-        response,
-        operation="data.usage.workflow.wf_data_024",
-        request_id=response.metadata.request_id,
-    )
-    print(
-        "Dataset:", dataset.symbol, dataset.timeframe, dataset.record_count, "records"
-    )
+    with (
+        tempfile.TemporaryDirectory(prefix="wf-data-024-") as directory,
+        isolated_runtime(Path(directory)),
+    ):
+        request_id = generate_id("req")
 
-    # Stage 1 — Resolve the active quality policy and its thresholds.
-    _stage(1)
-    policy = get_quality_policy()
-    _report("policy ", "success", f"profile {policy.profile}")
-    print("Policy object          :", policy)
-
-    # Stage 2 — Inspect an existing dataset and a bare record sequence.
-    _stage(2)
-    dataset_report = inspect_dataset_quality(dataset)
-    records_report = inspect_records_quality(dataset.records)
-    _report(
-        "dataset",
-        dataset_report.quality_status,
-        f"score {dataset_report.quality_score}, checked {dataset_report.checked_count}",
-    )
-    _report(
-        "records",
-        records_report.quality_status,
-        f"score {records_report.quality_score}, checked {records_report.checked_count}",
-    )
-    print(
-        "Report reflects records actually examined:", dataset_report.checked_count > 0
-    )
-
-    # Stage 3 — Run the individual detectors that populate the report.
-    _stage(3)
-    detected = {
-        "timestamp_gaps": detect_timestamp_gaps(dataset.records),
-        "price_jumps": detect_price_jumps(dataset.records),
-        "flatline_periods": detect_flatline_periods(dataset.records),
-        "zero_volume_bars": detect_zero_volume_bars(dataset.records),
-        "extreme_spreads": detect_extreme_spread_widening(dataset.records),
-    }
-    for name, issue in detected.items():
-        _report(
-            f"{name:<16}",
-            "success",
-            "clean" if issue is None else issue,
+        response = get_market_data(market_request("bars", timeframe="M1", limit=80))
+        dataset = unwrap_data_response(
+            response,
+            operation="get_market_data",
+            request_id=request_id,
+        )
+        print(
+            "Dataset:",
+            dataset.symbol,
+            dataset.timeframe,
+            dataset.record_count,
+            "records",
         )
 
-    # Stage 4 — Classify each detected gap against the venue calendar.
-    _stage(4)
-    first = dataset.records[0].timestamp
-    last = dataset.records[-1].timestamp
-    weekend_gap = classify_gap(
-        datetime(2026, 7, 25, 21, 0, tzinfo=UTC),
-        datetime(2026, 7, 27, 21, 0, tzinfo=UTC),
-    )
-    observed_gap = classify_gap(first, last)
-    _report("weekend ", "success", weekend_gap)
-    _report("observed", "success", observed_gap)
-    print("Expected closure is not reported as a defect: True")
+        # Stage 1 — Resolve the active quality policy and its thresholds.
+        _stage(1)
+        policy_resp = get_quality_policy()
+        policy = unwrap_data_response(
+            policy_resp,
+            operation="data.quality.get_quality_policy",
+            request_id=request_id,
+        )
+        _report("policy ", "success", f"profile {policy.profile}")
+        print("Policy object          :", policy)
 
-    # Stage 5 — Merge per-record flags into one bounded report.
-    _stage(5)
-    flags = aggregate_flags(dataset_report)
-    _report("merge  ", "success", flags)
-    print("Distinct flags present :", len(flags))
-    print(
-        "Detectors reporting an issue:",
-        sum(1 for i in detected.values() if i is not None),
-    )
+        # Stage 2 — Inspect an existing dataset and a bare record sequence.
+        _stage(2)
+        dataset_report_resp = inspect_dataset_quality(dataset)
+        dataset_report = unwrap_data_response(
+            dataset_report_resp,
+            operation="data.quality.inspect_dataset_quality",
+            request_id=request_id,
+        )
+        records_report_resp = inspect_records_quality(
+            dataset.records, dataset.timeframe, generated_at=datetime.now(UTC)
+        )
+        records_report = unwrap_data_response(
+            records_report_resp,
+            operation="data.quality.inspect_records_quality",
+            request_id=request_id,
+        )
+        _report(
+            "dataset",
+            dataset_report.quality_status,
+            f"score {dataset_report.quality_score}, checked {dataset_report.checked_count}",
+        )
+        _report(
+            "records",
+            records_report.quality_status,
+            f"score {records_report.quality_score}, checked {records_report.checked_count}",
+        )
+        print(
+            "Report reflects records actually examined:",
+            dataset_report.checked_count > 0,
+        )
 
-    # Stage 6 — Summarize what a caller would need to remediate.
-    _stage(6)
-    remediation = summarize_quality_remediation(dataset_report)
-    _report("remedy ", "success", remediation)
-    print("Precision violations still fail closed regardless of behaviour: True")
+        # Stage 3 — Run the individual detectors that populate the report.
+        _stage(3)
+        detected = {
+            "timestamp_gaps": unwrap_data_response(
+                detect_timestamp_gaps(dataset.records, dataset.timeframe),
+                operation="data.quality.detect_timestamp_gaps",
+                request_id=request_id,
+            ),
+            "price_jumps": unwrap_data_response(
+                detect_price_jumps(dataset.records),
+                operation="data.quality.detect_price_jumps",
+                request_id=request_id,
+            ),
+            "flatline_periods": unwrap_data_response(
+                detect_flatline_periods(dataset.records),
+                operation="data.quality.detect_flatline_periods",
+                request_id=request_id,
+            ),
+            "zero_volume_bars": unwrap_data_response(
+                detect_zero_volume_bars(dataset.records),
+                operation="data.quality.detect_zero_volume_bars",
+                request_id=request_id,
+            ),
+            "extreme_spreads": unwrap_data_response(
+                detect_extreme_spread_widening(dataset.records),
+                operation="data.quality.detect_extreme_spread_widening",
+                request_id=request_id,
+            ),
+        }
+        for name, issue in detected.items():
+            _report(
+                f"{name:<16}",
+                "success",
+                "clean" if issue is None else issue,
+            )
+
+        # Stage 4 — Classify each detected gap against the venue calendar.
+        _stage(4)
+        first = dataset.records[0].timestamp
+        last = dataset.records[-1].timestamp
+        weekend_gap_resp = classify_gap(
+            datetime(2026, 7, 25, 21, 0, tzinfo=UTC),
+            datetime(2026, 7, 27, 21, 0, tzinfo=UTC),
+        )
+        weekend_gap = unwrap_data_response(
+            weekend_gap_resp,
+            operation="data.time_sessions.classify_gap",
+            request_id=request_id,
+        )
+        observed_gap_resp = classify_gap(first, last)
+        observed_gap = unwrap_data_response(
+            observed_gap_resp,
+            operation="data.time_sessions.classify_gap",
+            request_id=request_id,
+        )
+        _report("weekend ", "success", weekend_gap)
+        _report("observed", "success", observed_gap)
+        print("Expected closure is not reported as a defect: True")
+
+        # Stage 5 — Merge per-record flags into one bounded report.
+        _stage(5)
+        flags_resp = aggregate_flags(dataset_report)
+        flags = unwrap_data_response(
+            flags_resp, operation="data.quality.aggregate_flags", request_id=request_id
+        )
+        _report("merge  ", "success", flags)
+        print("Distinct flags present :", len(flags))
+        print(
+            "Detectors reporting an issue:",
+            sum(1 for i in detected.values() if i is not None),
+        )
+
+        # Stage 6 — Summarize what a caller would need to remediate.
+        _stage(6)
+        remediation_resp = summarize_quality_remediation(dataset_report)
+        remediation = unwrap_data_response(
+            remediation_resp,
+            operation="data.quality.summarize_quality_remediation",
+            request_id=request_id,
+        )
+        _report("remedy ", "success", remediation)
+        print("Precision violations still fail closed regardless of behaviour: True")
 
     print(
         "\nOUTPUT BOUNDARY — bounded QualityReport with classified issues and remediation summary"

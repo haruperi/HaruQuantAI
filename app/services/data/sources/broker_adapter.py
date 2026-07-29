@@ -31,7 +31,7 @@ logger = get_logger(__name__)
 if TYPE_CHECKING:
     from collections.abc import Coroutine
 
-    from app.services.brokers import BrokerAdapter
+    from app.services.brokers.contracts import BrokerAdapter
 
 
 class _AsyncRunner(Protocol):

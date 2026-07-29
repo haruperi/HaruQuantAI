@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 
-from app.services.data import MarketSchedule, SessionWindow
+from app.services.data.time_sessions.contracts import MarketSchedule, SessionWindow
 from app.services.data.time_sessions.market_hours import evaluate_market_hours
 from app.utils import generate_id
 

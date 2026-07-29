@@ -15,7 +15,8 @@ from app.services.data import (
     persist_audit_event,
     run_data_migrations,
 )
-from app.utils import AuditEvent, canonical_json, generate_id, redact_mapping_value
+from app.utils import canonical_json, generate_id, redact_mapping_value
+from app.utils.contracts.audit import AuditEvent
 
 
 def test_persists_utils_audit_event_envelope(
@@ -44,5 +45,7 @@ def test_persists_utils_audit_event_envelope(
     )
     assert "abc123" not in canonical_json(event.payload)
     result = persist_audit_event(event)
-    assert result.persisted
-    assert result.event_id == event.event_id
+    assert result.status == "success"
+    assert result.data is not None
+    assert result.data.persisted
+    assert result.data.event_id == event.event_id

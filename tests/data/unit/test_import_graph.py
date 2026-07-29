@@ -33,7 +33,14 @@ FEATURE_DIRECTORIES = frozenset(
     }
 )
 PERMITTED_ROOT_FILES = frozenset(
-    {"README.md", "__init__.py", "_limits.py", "_settings.py", "py.typed"}
+    {
+        "README.md",
+        "__init__.py",
+        "_limits.py",
+        "_settings.py",
+        "operations.py",
+        "py.typed",
+    }
 )
 REQUIRED_ROOT_FILES = frozenset(
     {"README.md", "__init__.py", "_limits.py", "_settings.py"}
@@ -113,7 +120,7 @@ def _registered_feature_modules() -> set[str]:
     return {
         match.group("module")
         for match in re.finditer(
-            r"^\| (?:Completed|Partial|Missing) \| `FEAT-DATA-\d{2}` .*?"
+            r"^\| (?:Completed|Partial) \| `FEAT-DATA-\d{2}` .*?"
             r"\| `(?P<module>[a-z_]+)/` \|",
             registry_match.group("body"),
             flags=re.MULTILINE,

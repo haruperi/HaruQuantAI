@@ -9,17 +9,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    DataError,
-    FeedConfig,
-    FeedStatusRequest,
-    RawFeedEvent,
-    ReconnectPolicy,
+    build_feed_config,
+    build_feed_status_request,
+    build_raw_feed_event,
+    build_reconnect_policy,
     ingest_feed_event,
     read_feed_status,
     reconcile_feed_gap,
     reconnect_feed,
     start_internal_feed,
 )
+from app.services.data.contracts.errors import DataError
 from app.utils import generate_id
 
 _NOW = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
@@ -35,28 +35,21 @@ def _demonstrate_feature() -> None:
     req_id = generate_id("req")
     feed_id = "usage-feed-btc"
 
-    policy = ReconnectPolicy(
+    policy = build_reconnect_policy(
         max_retries=3,
         initial_backoff_seconds=1,
         max_backoff_seconds=10,
-        jitter_seconds=1,
-        circuit_cooldown_seconds=30,
+        backoff_multiplier=2.0,
     )
-
-    config = FeedConfig(
+    config = build_feed_config(
         feed_id=feed_id,
         source_id="mt5",
         symbol="BTCUSD",
-        data_kind="tick",
-        source_capability="realtime_tick",
-        buffer_capacity=1_000,
-        overflow_policy="drop_and_reconcile",
-        heartbeat_timeout_seconds=30,
+        data_kind="ohlcv",
+        buffer_size=100,
         reconnect_policy=policy,
         request_id=req_id,
     )
-
-    status_req = FeedStatusRequest(feed_id=feed_id, request_id=req_id)
     print("FeedConfig:", config.feed_id, config.symbol)
 
     try:
@@ -65,21 +58,20 @@ def _demonstrate_feature() -> None:
     except DataError as err:
         print("start_internal_feed handled:", err.code)
 
-    event = RawFeedEvent(
+    event = build_raw_feed_event(
         feed_id=feed_id,
-        sequence=1,
-        event_timestamp=_NOW,
+        sequence_number=1,
+        payload={"open": 50000.0, "close": 50100.0},
         received_at=_NOW,
-        payload={"bid": 60000.0, "ask": 60001.0},
         request_id=req_id,
     )
-
     try:
         res = ingest_feed_event(feed_id, event)
         print("ingest_feed_event:", res.accepted)
     except DataError as err:
         print("ingest_feed_event handled:", err.code)
 
+    status_req = build_feed_status_request(feed_id=feed_id, request_id=req_id)
     try:
         st_read = read_feed_status(status_req)
         print("read_feed_status:", st_read.feed_id, st_read.state)
@@ -88,10 +80,11 @@ def _demonstrate_feature() -> None:
 
     try:
         reconnect_feed(
-            feed_id,
-            req_id,
+            feed_id=feed_id,
             reconnect=lambda: True,
-            wait=lambda _seconds: None,
+            wait=lambda _s: None,
+            clock=lambda: _NOW,
+            request_id=req_id,
         )
         print("reconnect_feed: succeeded")
     except DataError as err:
@@ -99,9 +92,10 @@ def _demonstrate_feature() -> None:
 
     try:
         reconcile_feed_gap(
-            feed_id,
-            req_id,
+            feed_id=feed_id,
             reconcile=lambda: True,
+            clock=lambda: _NOW,
+            request_id=req_id,
         )
         print("reconcile_feed_gap: succeeded")
     except DataError as err:
@@ -121,19 +115,16 @@ def _demonstrate_once() -> None:
 
 def fr_data_046() -> None:
     _header("fr_data_046")
-    "FR-DATA-046: Start one internal feed only for a declared live-capable staging/production source, persist initial state, and expose no public subscription handle."
     _demonstrate_once()
 
 
 def fr_data_047() -> None:
     _header("fr_data_047")
-    "FR-DATA-047: Normalize each event, update heartbeat/counters, enforce bounded overflow, record gap windows/drops, and reconnect with bounded backoff without hidden historical repair."
     _demonstrate_once()
 
 
 def fr_data_048() -> None:
     _header("fr_data_048")
-    "FR-DATA-048: Return bounded feed ID/state, heartbeat/event times, depth/capacity, dropped/gap/reconnect counts, breaker state, drift, and last safe error from real runtime state."
     _demonstrate_once()
 
 

@@ -4,17 +4,16 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 from app.services.brokers import (
-    BrokerBar,
-    BrokerCapabilityId,
-    BrokerEnvironment,
-    BrokerId,
-    BrokerPage,
-    BrokerTick,
+    build_broker_value,
+    get_broker_capability_id,
+    get_broker_environment,
+    get_broker_id,
 )
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.sources.broker_adapter import ExternalMarketDataSource
 from app.services.data.sources.contracts import SourceReadRequest
-from app.utils import StandardResponse, generate_id
+from app.utils import generate_id
+from app.utils.responses.models import StandardResponse
 
 from tests.brokers.response_factory import broker_response
 
@@ -43,9 +42,10 @@ def test_bar_spread_evidence_crosses_the_broker_data_boundary() -> None:
             start: datetime | None,
             end: datetime | None,
             limit: int,
-        ) -> StandardResponse[BrokerPage[BrokerBar]]:
+        ) -> StandardResponse[object]:
             del start, end
-            bar = BrokerBar(
+            bar = build_broker_value(
+                "bar",
                 symbol=symbol,
                 opening_timestamp=opening,
                 closing_timestamp=closing,
@@ -63,13 +63,15 @@ def test_bar_spread_evidence_crosses_the_broker_data_boundary() -> None:
                 spread_unit="points",
             )
             return broker_response(
-                BrokerCapabilityId.GET_HISTORICAL_BARS,
-                broker=BrokerId.MT5,
+                get_broker_capability_id("get_historical_bars"),
+                broker=get_broker_id("mt5"),
                 request_id=generate_id("req"),
                 timestamp=retrieved,
-                environment=BrokerEnvironment.DEMO,
+                environment=get_broker_environment("demo"),
                 adapter_version="1.0.0",
-                data=BrokerPage(items=(bar,), limit=limit, truncated=False),
+                data=build_broker_value(
+                    "page", items=(bar,), limit=limit, truncated=False
+                ),
             )
 
     batch = _unwrap(
@@ -104,9 +106,10 @@ def test_tick_availability_tolerates_provider_clock_skew() -> None:
             start: datetime | None,
             end: datetime | None,
             limit: int,
-        ) -> StandardResponse[BrokerPage[BrokerTick]]:
+        ) -> StandardResponse[object]:
             del start, end
-            tick = BrokerTick(
+            tick = build_broker_value(
+                "tick",
                 symbol=symbol,
                 event_timestamp=event_at,
                 provider_receipt_timestamp=received_at,
@@ -116,13 +119,15 @@ def test_tick_availability_tolerates_provider_clock_skew() -> None:
                 ask=Decimal("1.1002"),
             )
             return broker_response(
-                BrokerCapabilityId.GET_TICKS,
-                broker=BrokerId.MT5,
+                get_broker_capability_id("get_ticks"),
+                broker=get_broker_id("mt5"),
                 request_id=generate_id("req"),
                 timestamp=received_at,
-                environment=BrokerEnvironment.DEMO,
+                environment=get_broker_environment("demo"),
                 adapter_version="1.0.0",
-                data=BrokerPage(items=(tick,), limit=limit, truncated=False),
+                data=build_broker_value(
+                    "page", items=(tick,), limit=limit, truncated=False
+                ),
             )
 
     request_id = generate_id("req")

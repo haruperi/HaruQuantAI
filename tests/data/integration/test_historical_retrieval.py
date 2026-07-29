@@ -7,10 +7,10 @@ from pathlib import Path
 
 import pytest
 from app.services.data import (
-    DatasetSaveRequest,
-    DataSettings,
-    JobDefinition,
-    JobStatusRequest,
+    build_data_settings,
+    build_dataset_save_request,
+    build_job_definition,
+    build_job_status_request,
     create_data_update_job,
     data_settings_context,
     get_data_update_job_status,
@@ -37,19 +37,23 @@ def isolated_runtime(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_wf_data_007_commits_data_and_resumable_checkpoint(tmp_path: Path) -> None:
     """Run retrieval through a real local source into a durable job checkpoint."""
-    raw_root = tmp_path / "data" / "raw"
+    root = tmp_path.resolve()
+    raw_root = root / "data" / "raw"
     raw_root.mkdir(parents=True)
-    settings = DataSettings(
+    settings = build_data_settings(
         database_url="sqlite:///workflow.sqlite3",
-        data_dir=tmp_path,
+        data_dir=root,
+        sqlite_busy_timeout_seconds=1.5,
+        write_lock_lease_seconds=30.0,
         approved_storage_roots=(Path("data/raw"),),
     )
     request_id = generate_id("req")
 
     with data_settings_context(settings):
-        run_data_migrations(request_id)
-        save_dataset(
-            DatasetSaveRequest(
+        mig_res = run_data_migrations(request_id)
+        assert mig_res.status == "success"
+        save_res = save_dataset(
+            build_dataset_save_request(
                 dataset=make_dataset().model_copy(update={"request_id": request_id}),
                 relative_path=Path("data/raw/ABC_1m.csv"),
                 format="csv",
@@ -57,9 +61,10 @@ def test_wf_data_007_commits_data_and_resumable_checkpoint(tmp_path: Path) -> No
                 request_id=request_id,
             )
         )
+        assert save_res.status == "success", f"save_dataset failed: {save_res.error}"
         register_local_test_source(raw_root, ("ABC",), source_id="local_csv")
         created = create_data_update_job(
-            JobDefinition(
+            build_job_definition(
                 job_id="wf-data-007",
                 source_id="local_csv",
                 symbols=("ABC",),
@@ -76,7 +81,7 @@ def test_wf_data_007_commits_data_and_resumable_checkpoint(tmp_path: Path) -> No
         )
         result = run_data_update_job_once("wf-data-007", request_id=request_id)
         status = get_data_update_job_status(
-            JobStatusRequest(job_id="wf-data-007", request_id=request_id)
+            build_job_status_request(job_id="wf-data-007", request_id=request_id)
         )
 
     assert created.state == "created"

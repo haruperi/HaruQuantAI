@@ -13,13 +13,7 @@ from typing import TYPE_CHECKING, Any, Final, Literal, cast
 from pydantic import SecretStr, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from app.services.brokers import (
-    BrokerAdapter,
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerId,
-    create_broker_adapter,
-)
+from app.services.brokers import build_broker_connection_config, create_broker_adapter
 from app.services.data._settings import (
     LOCAL_SYMBOL_MANIFEST_NAME,
     get_data_settings,
@@ -94,20 +88,26 @@ class _ProviderRuntimeSettings(BaseSettings):
 
 # Provider read capabilities mirror the Brokers capability catalogue exactly; Data
 # never declares a capability the owning adapter does not implement.
+_MT5 = "mt5"
+_CTRADER = "ctrader"
+_BINANCE_SPOT = "binance_spot"
+_DUKASCOPY = "dukascopy"
+_YAHOO = "yahoo"
+
 _PROVIDER_CAPABILITIES: Final[Mapping[str, tuple[str, ...]]] = {
-    BrokerId.MT5.value: ("bars", "ticks", "spreads"),
-    BrokerId.CTRADER.value: ("bars", "ticks", "spreads", "sessions"),
-    BrokerId.BINANCE_SPOT.value: ("bars", "ticks", "spreads"),
-    BrokerId.DUKASCOPY.value: ("bars", "ticks"),
-    BrokerId.YAHOO.value: ("bars",),
+    _MT5: ("bars", "ticks", "spreads"),
+    _CTRADER: ("bars", "ticks", "spreads", "sessions"),
+    _BINANCE_SPOT: ("bars", "ticks", "spreads"),
+    _DUKASCOPY: ("bars", "ticks"),
+    _YAHOO: ("bars",),
 }
 
 # Providers whose public market data needs no credential material.
 _CREDENTIAL_FREE_PROVIDERS: Final[frozenset[str]] = frozenset(
     {
-        BrokerId.BINANCE_SPOT.value,
-        BrokerId.DUKASCOPY.value,
-        BrokerId.YAHOO.value,
+        _BINANCE_SPOT,
+        _DUKASCOPY,
+        _YAHOO,
     }
 )
 
@@ -115,23 +115,21 @@ _CREDENTIAL_FREE_PROVIDERS: Final[frozenset[str]] = frozenset(
 _PROVIDER_LICENSE_STATUS: Final[
     Mapping[str, Literal["approved", "restricted", "unknown"]]
 ] = {
-    BrokerId.MT5.value: "restricted",
-    BrokerId.CTRADER.value: "restricted",
-    BrokerId.BINANCE_SPOT.value: "restricted",
-    BrokerId.DUKASCOPY.value: "restricted",
-    BrokerId.YAHOO.value: "restricted",
+    _MT5: "restricted",
+    _CTRADER: "restricted",
+    _BINANCE_SPOT: "restricted",
+    _DUKASCOPY: "restricted",
+    _YAHOO: "restricted",
 }
 
 _PROVIDER_ENABLED_FIELDS: Final[Mapping[str, str]] = {
-    BrokerId.MT5.value: "mt5_enabled",
-    BrokerId.CTRADER.value: "ctrader_enabled",
-    BrokerId.BINANCE_SPOT.value: "binance_enabled",
-    BrokerId.DUKASCOPY.value: "dukascopy_enabled",
-    BrokerId.YAHOO.value: "yahoo_enabled",
+    _MT5: "mt5_enabled",
+    _CTRADER: "ctrader_enabled",
+    _BINANCE_SPOT: "binance_enabled",
+    _DUKASCOPY: "dukascopy_enabled",
+    _YAHOO: "yahoo_enabled",
 }
-_LOOP_BOUND_PROVIDERS: Final[frozenset[str]] = frozenset(
-    {BrokerId.BINANCE_SPOT.value, BrokerId.CTRADER.value}
-)
+_LOOP_BOUND_PROVIDERS: Final[frozenset[str]] = frozenset({_BINANCE_SPOT, _CTRADER})
 
 _YAHOO_PROBE_SYMBOL: Final = "AAPL"
 
@@ -188,10 +186,10 @@ class _LazyBrokerSession:
             source_id: Canonical provider source identifier.
         """
         self._source_id = source_id
-        self._adapter: BrokerAdapter | None = None
+        self._adapter: object | None = None
         self._lock = threading.RLock()
 
-    def adapter(self, request_id: str) -> BrokerAdapter:
+    def adapter(self, request_id: str) -> object:
         """Return the configured adapter for this source.
 
         Loop-bound providers remain disconnected until ``run`` so their clients are
@@ -225,9 +223,9 @@ class _LazyBrokerSession:
                     safe_details={"source_id": self._source_id},
                     request_id=request_id,
                 )
-            if self._source_id == BrokerId.CTRADER.value:
+            if self._source_id == _CTRADER:
                 return self._ctrader_adapter(settings, request_id)
-            if self._source_id != BrokerId.MT5.value:
+            if self._source_id != _MT5:
                 return self._credential_free_adapter(request_id)
             return self._mt5_adapter(settings, request_id)
 
@@ -235,7 +233,7 @@ class _LazyBrokerSession:
         self,
         settings: _ProviderRuntimeSettings,
         request_id: str,
-    ) -> BrokerAdapter:
+    ) -> object:
         """Build and connect the configured MT5 read adapter.
 
         Args:
@@ -261,9 +259,9 @@ class _LazyBrokerSession:
         if settings.mt5_terminal_path is not None:
             credentials["terminal_path"] = settings.mt5_terminal_path
         try:
-            config = BrokerConnectionConfig(
-                broker_id=BrokerId.MT5,
-                environment=BrokerEnvironment(settings.mt5_environment),
+            config = build_broker_connection_config(
+                broker_id=_MT5,
+                environment=settings.mt5_environment,
                 provider_enabled=True,
                 connect_timeout_sec=10.0,
                 request_timeout_sec=30.0,
@@ -282,7 +280,7 @@ class _LazyBrokerSession:
                 request_id=request_id,
             ) from error
         adapter = _require_broker_result(
-            create_broker_adapter(BrokerId.MT5, config),
+            create_broker_adapter(_MT5, config),
             operation="create_broker_adapter",
             request_id=request_id,
         )
@@ -300,7 +298,7 @@ class _LazyBrokerSession:
         self,
         settings: _ProviderRuntimeSettings,
         request_id: str,
-    ) -> BrokerAdapter:
+    ) -> object:
         """Build the configured cTrader read adapter.
 
         Args:
@@ -330,9 +328,9 @@ class _LazyBrokerSession:
         client_secret = cast("SecretStr", settings.ctrader_client_secret)
         access_token = cast("SecretStr", settings.ctrader_access_token)
         try:
-            config = BrokerConnectionConfig(
-                broker_id=BrokerId.CTRADER,
-                environment=BrokerEnvironment(settings.ctrader_environment),
+            config = build_broker_connection_config(
+                broker_id=_CTRADER,
+                environment=settings.ctrader_environment,
                 provider_enabled=True,
                 connect_timeout_sec=10.0,
                 request_timeout_sec=30.0,
@@ -356,7 +354,7 @@ class _LazyBrokerSession:
                 request_id=request_id,
             ) from error
         adapter = _require_broker_result(
-            create_broker_adapter(BrokerId.CTRADER, config),
+            create_broker_adapter(_CTRADER, config),
             operation="create_broker_adapter",
             request_id=request_id,
         )
@@ -409,7 +407,7 @@ class _LazyBrokerSession:
 
             return _run(execute(), request_id)
 
-    def _credential_free_adapter(self, request_id: str) -> BrokerAdapter:
+    def _credential_free_adapter(self, request_id: str) -> object:
         """Build one non-MT5 provider adapter and connect when loop-safe.
 
         Binance Spot, Dukascopy, and Yahoo serve public data and need no credential
@@ -429,13 +427,9 @@ class _LazyBrokerSession:
                 request_id=request_id,
             )
         try:
-            env = (
-                BrokerEnvironment.LIVE
-                if self._source_id == BrokerId.BINANCE_SPOT.value
-                else BrokerEnvironment.SANDBOX
-            )
-            config = BrokerConnectionConfig(
-                broker_id=BrokerId(self._source_id),
+            env = "live" if self._source_id == _BINANCE_SPOT else "sandbox"
+            config = build_broker_connection_config(
+                broker_id=self._source_id,
                 environment=env,
                 provider_enabled=True,
                 connect_timeout_sec=10.0,
@@ -446,9 +440,7 @@ class _LazyBrokerSession:
                 circuit_recovery_timeout_sec=30.0,
                 circuit_half_open_max_calls=1,
                 probe_symbol=(
-                    _YAHOO_PROBE_SYMBOL
-                    if self._source_id == BrokerId.YAHOO.value
-                    else None
+                    _YAHOO_PROBE_SYMBOL if self._source_id == _YAHOO else None
                 ),
             )
         except ValueError as error:
@@ -458,11 +450,11 @@ class _LazyBrokerSession:
                 request_id=request_id,
             ) from error
         adapter = _require_broker_result(
-            create_broker_adapter(BrokerId(self._source_id), config),
+            create_broker_adapter(self._source_id, config),
             operation="create_broker_adapter",
             request_id=request_id,
         )
-        if self._source_id == BrokerId.BINANCE_SPOT.value:
+        if self._source_id == _BINANCE_SPOT:
             self._adapter = adapter
             return adapter
         connect_result = _run(adapter.connect(), request_id)
@@ -592,7 +584,7 @@ def _provider_descriptor(source_id: str) -> SourceDescriptor:
 
 def _mt5_descriptor() -> SourceDescriptor:
     """Return the Data-owned policy declaration for the Brokers MT5 profile."""
-    source_id = BrokerId.MT5.value
+    source_id = _MT5
     return SourceDescriptor(
         source_id=source_id,
         readiness="staging",
@@ -867,9 +859,7 @@ def _ensure_source_raw(source_id: str, request_id: str) -> None:
             return
         session = _LazyBrokerSession(source_id)
         descriptor = (
-            _mt5_descriptor()
-            if source_id == BrokerId.MT5.value
-            else _provider_descriptor(source_id)
+            _mt5_descriptor() if source_id == _MT5 else _provider_descriptor(source_id)
         )
         identities = (
             (
@@ -883,7 +873,7 @@ def _ensure_source_raw(source_id: str, request_id: str) -> None:
                     request_id=request_id,
                 ),
             )
-            if source_id == BrokerId.YAHOO.value
+            if source_id == _YAHOO
             else ()
         )
         _register_source_raw(descriptor, session.source, identities)

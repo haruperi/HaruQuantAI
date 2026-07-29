@@ -9,24 +9,24 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    AuditEventQuery,
-    BackupTarget,
-    CacheReadRequest,
-    CacheWriteRequest,
-    ColumnMapping,
-    DataError,
-    DataQualityReport,
-    DatasetLoadRequest,
-    DatasetSaveRequest,
-    DataSettings,
-    ExternalImportRequest,
-    MarketDataset,
-    MigrationRequest,
-    MigrationStep,
-    OHLCVRecord,
-    StatementPlan,
-    TransactionRequest,
     acquire_write_lock,
+    build_audit_event_query,
+    build_backup_target,
+    build_cache_read_request,
+    build_cache_write_request,
+    build_column_mapping,
+    build_data_error,
+    build_data_quality_report,
+    build_data_settings,
+    build_dataset_load_request,
+    build_dataset_save_request,
+    build_external_import_request,
+    build_market_dataset,
+    build_migration_request,
+    build_migration_step,
+    build_ohlcv_record,
+    build_statement_plan,
+    build_transaction_request,
     clear_data_cache,
     create_backup,
     data_settings_context,
@@ -45,7 +45,36 @@ from app.services.data import (
     save_dataset,
     save_market_data,
 )
-from app.utils import AuditEvent, AuthContext, generate_id, logger
+
+DataError = build_data_error
+
+from app.services.data import (
+    build_data_error,
+)
+
+DataError = build_data_error
+
+from app.services.data import (
+    build_data_error,
+)
+
+DataError = build_data_error
+
+from app.services.data import (
+    build_data_error,
+)
+
+DataError = build_data_error
+
+from app.services.data import (
+    build_data_error,
+)
+
+DataError = build_data_error
+
+from app.utils import create_auth_context, generate_id
+from app.utils.contracts.audit import AuditEvent
+from loguru import logger
 
 _OBSERVED_AT = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
 
@@ -68,7 +97,7 @@ def _configure_environment(root: Path) -> None:
 def _quality() -> DataQualityReport:
     """Build clean quality evidence for one persisted dataset."""
     logger.info("Building storage example quality evidence")
-    return DataQualityReport(
+    return build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
         issues=(),
@@ -86,7 +115,7 @@ def _dataset() -> MarketDataset:
     """Build a small realistic dataset for persistence examples."""
     logger.info("Building storage example market dataset")
     records = tuple(
-        OHLCVRecord(
+        build_ohlcv_record(
             timestamp=_OBSERVED_AT + timedelta(minutes=index),
             open=Decimal(100) + index,
             high=Decimal(101) + index,
@@ -102,7 +131,7 @@ def _dataset() -> MarketDataset:
         )
         for index in range(2)
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="bars",
         symbol="AAPL",
@@ -125,16 +154,18 @@ def _dataset() -> MarketDataset:
 def _example_fr_data_014() -> None:
     """Run one raw transaction using the shared persistence connection."""
     _header("FR-DATA-014: executing one bounded SQLite transaction")
-    request = TransactionRequest(
-        plan=StatementPlan(
+    request = build_transaction_request(
+        plan=build_statement_plan(
             statements=("SELECT 1;",),
             parameter_sets=((),),
             max_rows=10,
         ),
         request_id=generate_id("req"),
     )
-    outcome = execute_transaction(request)
-    print(f"Transaction committed and returned {len(outcome.rows)} rows")
+    response = execute_transaction(request)
+    if response.status == "success" and response.data is not None:
+        outcome = response.data
+        print(f"Transaction committed and returned {len(outcome.rows)} rows")
 
 
 def _example_fr_data_015() -> None:
@@ -144,19 +175,21 @@ def _example_fr_data_015() -> None:
     statement = (
         "CREATE TABLE IF NOT EXISTS usage_notes (id TEXT PRIMARY KEY, content TEXT)"
     )
-    step = MigrationStep(
+    step = build_migration_step(
         domain="usage",
         migration_id="001_create_usage_notes",
         checksum="usage-notes-v1",
         statements=(statement,),
     )
-    request = MigrationRequest(
+    request = build_migration_request(
         domain="usage",
         steps=(step,),
         request_id=req_id,
     )
-    report = run_domain_migrations(request)
-    print(f"Applied migration IDs={report.applied_ids}")
+    response = run_domain_migrations(request)
+    if response.status == "success" and response.data is not None:
+        report = response.data
+        print(f"Applied migration IDs={report.applied_ids}")
 
 
 def _example_fr_data_016(root: Path) -> None:
@@ -164,8 +197,10 @@ def _example_fr_data_016(root: Path) -> None:
     _header("FR-DATA-016: acquiring a path-scoped write lease")
     req_id = generate_id("req")
     target_file = root / "data/processed/AAPL.parquet"
-    with acquire_write_lock(target_file, req_id) as lease:
-        print(f"Lease acquired for {lease.path} by {lease.request_id}")
+    response = acquire_write_lock(target_file, req_id)
+    if response.status == "success" and response.data is not None:
+        with response.data as lease:
+            print(f"Lease acquired for {lease.path} by {lease.request_id}")
 
 
 def _example_fr_data_017(root: Path) -> None:
@@ -173,7 +208,7 @@ def _example_fr_data_017(root: Path) -> None:
     _header("FR-DATA-017: loading a governed CSV artifact")
     ds = _dataset()
     save_dataset(
-        DatasetSaveRequest(
+        build_dataset_save_request(
             dataset=ds,
             relative_path=Path("data/raw/AAPL.csv"),
             format="csv",
@@ -181,14 +216,16 @@ def _example_fr_data_017(root: Path) -> None:
             request_id=ds.request_id,
         )
     )
-    request = DatasetLoadRequest(
+    request = build_dataset_load_request(
         relative_path=Path("data/raw/AAPL.csv"),
         format="csv",
         request_id=generate_id("req"),
     )
-    loaded = load_dataset(request)
-    checksum = loaded.source_metadata.get("sha256")
-    print(f"Verified {root / request.relative_path} with sha256={checksum}")
+    response = load_dataset(request)
+    if response.status == "success" and response.data is not None:
+        loaded = response.data
+        checksum = loaded.source_metadata.get("sha256")
+        print(f"Verified {root / request.relative_path} with sha256={checksum}")
 
 
 def _example_fr_data_018(root: Path) -> None:
@@ -196,7 +233,7 @@ def _example_fr_data_018(root: Path) -> None:
     _header("FR-DATA-018: saving a governed CSV artifact")
     ds = _dataset()
     save_dataset(
-        DatasetSaveRequest(
+        build_dataset_save_request(
             dataset=ds,
             relative_path=Path("data/raw/AAPL.csv"),
             format="csv",
@@ -204,15 +241,17 @@ def _example_fr_data_018(root: Path) -> None:
             request_id=ds.request_id,
         )
     )
-    loaded = load_dataset(
-        DatasetLoadRequest(
+    response = load_dataset(
+        build_dataset_load_request(
             relative_path=Path("data/raw/AAPL.csv"),
             format="csv",
             request_id=generate_id("req"),
         )
     )
-    checksum = loaded.source_metadata.get("sha256")
-    print(f"Verified {root / 'data/raw/AAPL.csv'} with sha256={checksum}")
+    if response.status == "success" and response.data is not None:
+        loaded = response.data
+        checksum = loaded.source_metadata.get("sha256")
+        print(f"Verified {root / 'data/raw/AAPL.csv'} with sha256={checksum}")
 
 
 def _example_fr_data_019() -> None:
@@ -221,7 +260,7 @@ def _example_fr_data_019() -> None:
     ds = _dataset()
     req_id = generate_id("req")
     put_cache_entry(
-        CacheWriteRequest(
+        build_cache_write_request(
             key="usage-aapl-m1-v1",
             dataset=ds,
             source_revision="rev-1",
@@ -230,22 +269,24 @@ def _example_fr_data_019() -> None:
             request_id=req_id,
         )
     )
-    entry = get_cache_entry(
-        CacheReadRequest(
+    response = get_cache_entry(
+        build_cache_read_request(
             key="usage-aapl-m1-v1",
             allow_stale=False,
             request_id=req_id,
         )
     )
-    print(f"Cache entry read: found={entry is not None}")
+    if response.status == "success":
+        entry = response.data
+        print(f"Cache entry read: found={entry is not None}")
 
 
 def _example_fr_data_020() -> None:
     """Write one dataset entry into the local SQLite cache."""
     _header("FR-DATA-020: writing a bounded cache entry")
     ds = _dataset()
-    outcome = put_cache_entry(
-        CacheWriteRequest(
+    response = put_cache_entry(
+        build_cache_write_request(
             key="usage-aapl-m1-v1",
             dataset=ds,
             source_revision="rev-1",
@@ -254,45 +295,55 @@ def _example_fr_data_020() -> None:
             request_id=generate_id("req"),
         )
     )
-    print(f"Cache write={outcome.written} key={outcome.key}")
+    if response.status == "success" and response.data is not None:
+        outcome = response.data
+        print(f"Cache write={outcome.written} key={outcome.key}")
 
 
 def example_13_csv_saver() -> None:
     """Save and reload CSV market-data artifacts via save_market_data."""
     _header("Save and reload CSV market-data artifacts via save_market_data.")
     ds = _dataset()
-    manifest = save_market_data(ds, destination_path=Path("data/raw/AAPL_saver.csv"))
-    print(
-        f"CSV save status: committed={manifest.committed} path={manifest.relative_path}"
-    )
+    response = save_market_data(ds, destination_path=Path("data/raw/AAPL_saver.csv"))
+    if response.status == "success" and response.data is not None:
+        manifest = response.data
+        print(
+            f"CSV save status: committed={manifest.committed} path={manifest.relative_path}"
+        )
 
 
 def example_14_parquet_saver() -> None:
     """Save and reload Parquet market-data artifacts via save_market_data."""
     _header("Save and reload Parquet market-data artifacts via save_market_data.")
     ds = _dataset()
-    manifest = save_market_data(
+    response = save_market_data(
         ds,
         destination_path=Path("data/processed/AAPL_saver.parquet"),
     )
-    print(
-        "Parquet save status: "
-        f"committed={manifest.committed} path={manifest.relative_path}"
-    )
+    if response.status == "success" and response.data is not None:
+        manifest = response.data
+        print(
+            "Parquet save status: "
+            f"committed={manifest.committed} path={manifest.relative_path}"
+        )
 
 
 def example_18_caching() -> None:
     """Demonstrate cache behavior and clearing via clear_data_cache."""
     _header("Demonstrate cache behavior and clearing via clear_data_cache.")
-    result = clear_data_cache(source_id="local_csv", symbol="AAPL", dry_run=False)
-    print(f"Cleared cache entries: deleted={result.deleted_count}")
+    response = clear_data_cache(source_id="local_csv", symbol="AAPL", dry_run=False)
+    if response.status == "success" and response.data is not None:
+        result = response.data
+        print(f"Cleared cache entries: deleted={result.deleted_count}")
 
 
 def example_35_cleanup() -> None:
     """Clear local data cache as cleanup."""
     _header("Clear local data cache as cleanup.")
-    result = clear_data_cache(dry_run=False)
-    print(f"Data cache cleanup result: deleted={result.deleted_count}")
+    response = clear_data_cache(dry_run=False)
+    if response.status == "success" and response.data is not None:
+        result = response.data
+        print(f"Data cache cleanup result: deleted={result.deleted_count}")
 
 
 def _example_fr_data_021() -> None:
@@ -312,21 +363,23 @@ def _example_fr_data_021() -> None:
         causation_id=generate_id("cau"),
         payload={"secret_key": "[REDACTED]", "status": "ok"},
     )
-    page = persist_audit_event(event)
-    print(f"Queried {len(page.events)} redacted audit events")
+    response = persist_audit_event(event)
+    if response.status == "success" and response.data is not None:
+        page = response.data
+        print(f"Queried {len(page.events)} redacted audit events")
 
 
 def _example_fr_data_077() -> None:
     """Query audit events with authorized AuthContext."""
     _header("FR-DATA-077: querying redacted audit evidence")
     req_id = generate_id("req")
-    query = AuditEventQuery(
+    query = build_audit_event_query(
         start=_OBSERVED_AT - timedelta(hours=1),
         end=_OBSERVED_AT + timedelta(hours=1),
         limit=10,
         request_id=req_id,
     )
-    auth = AuthContext(
+    auth = create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="user_admin",
@@ -340,15 +393,19 @@ def _example_fr_data_077() -> None:
         correlation_id=generate_id("cor"),
         issued_at=_OBSERVED_AT,
     )
-    page = query_audit_events(query, auth)
-    print(f"Queried {len(page.events)} redacted audit events")
+    response = query_audit_events(query, auth)
+    if response.status == "success" and response.data is not None:
+        page = response.data
+        print(f"Queried {len(page.events)} redacted audit events")
 
 
 def _example_fr_data_105() -> None:
     """Import an external raw CSV file using standard dialect."""
     _header("FR-DATA-106 describe_import_dialects")
-    for dialect_id, description in describe_import_dialects().items():
-        print(f" - {dialect_id}: {description}")
+    dialects_res = describe_import_dialects()
+    if dialects_res.status == "success" and dialects_res.data is not None:
+        for dialect_id, description in dialects_res.data.items():
+            print(f" - {dialect_id}: {description}")
 
     _header("FR-DATA-105 import_external_dataset")
     with TemporaryDirectory(prefix="haru-external-import-") as directory:
@@ -361,18 +418,18 @@ def _example_fr_data_105() -> None:
             "2026-07-01T12:01:00Z,1.1010,1.1025,1.1005,1.1015,1200\n",
             encoding="utf-8",
         )
-        settings = DataSettings(
+        settings = build_data_settings(
             database_url="sqlite:///storage.sqlite3",
             data_dir=root,
             sqlite_busy_timeout_seconds=1.5,
             write_lock_lease_seconds=30,
             approved_storage_roots=(root,),
         )
-        request = ExternalImportRequest(
+        request = build_external_import_request(
             relative_path=Path("data/raw/EURUSD.csv"),
             format="csv",
             dialect="standard",
-            mapping=ColumnMapping(
+            mapping=build_column_mapping(
                 timestamp="timestamp",
                 open="open",
                 high="high",
@@ -394,37 +451,44 @@ def _example_fr_data_105() -> None:
         try:
             with data_settings_context(settings):
                 run_data_migrations(generate_id("req"))
-                manifest = import_external_dataset(request)
-            print("Imported rows:", manifest.row_count)
-            print("Committed artifact:", manifest.relative_path)
-        except DataError as error:
+                response = import_external_dataset(request)
+                if response.status == "success" and response.data is not None:
+                    manifest = response.data
+                    print("Imported rows:", manifest.row_count)
+                    print("Committed artifact:", manifest.relative_path)
+        except Exception as error:
             print("External import error:", error.code)
 
 
 def _example_fr_data_108() -> None:
     """Create, restore, and inspect retention for one governed raw artifact."""
     _header("FR-DATA-108..110: backup, restore, and retention")
-    manifest = create_backup(
+    backup_res = create_backup(
         (
-            BackupTarget(
+            build_backup_target(
                 relative_path=Path("data/raw/AAPL.csv"),
                 schema_version="v1",
                 normalization_version="v1",
             ),
         )
     )
-    report = restore_from_backup(manifest.manifest_id)
-    retained = enforce_retention_policy("AAPL.csv", 365, dry_run=True)
-    print("Backup entries:", len(manifest.entries))
-    print("Restored entries:", report.restored_count)
-    print("Expired raw payloads:", retained)
+    if backup_res.status == "success" and backup_res.data is not None:
+        manifest = backup_res.data
+        restore_res = restore_from_backup(manifest.manifest_id)
+        ret_res = enforce_retention_policy("AAPL.csv", 365, dry_run=True)
+        if restore_res.status == "success" and restore_res.data is not None:
+            report = restore_res.data
+            retained = ret_res.data if ret_res.status == "success" else 0
+            print("Backup entries:", len(manifest.entries))
+            print("Restored entries:", report.restored_count)
+            print("Expired raw payloads:", retained)
 
 
 def _demonstrate_feature() -> None:
     """Call every storage operation in isolated state."""
     with TemporaryDirectory(prefix="haru-data-storage-") as directory:
         demo_root = Path(directory)
-        settings = DataSettings(
+        settings = build_data_settings(
             database_url="sqlite:///usage.sqlite3",
             data_dir=demo_root,
             sqlite_busy_timeout_seconds=1.5,

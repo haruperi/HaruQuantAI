@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Any, Final, Literal
+from typing import Final, Literal
 
 from pydantic import ConfigDict, field_validator, model_validator
 
 from app.services.data.contracts._base import DataContractModel, TracedOpenContract
 from app.services.data.contracts.validation import validate_request_id
 from app.utils import get_logger
+from app.utils.contracts.audit import AuditEvent
 
 logger = get_logger(__name__)
 
@@ -96,7 +97,7 @@ class AuditEventPage(DataContractModel):
 
     contract_version: Literal["v1"] = "v1"
     schema_id: Literal["data.audit_event_page.v1"] = "data.audit_event_page.v1"
-    events: tuple[Any, ...]
+    events: tuple[AuditEvent, ...]
     next_cursor: str | None = None
     request_id: str
 

@@ -10,14 +10,15 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
-    ColumnMapping,
-    DatasetLoadRequest,
-    ExternalImportRequest,
+    build_column_mapping,
+    build_dataset_load_request,
+    build_external_import_request,
     describe_import_dialects,
     get_market_data,
     import_external_dataset,
     load_dataset,
     run_data_migrations,
+    unwrap_data_response,
 )
 from app.utils import generate_id
 from tests.data.usage.workflows._support import isolated_runtime, market_request
@@ -44,11 +45,20 @@ def main() -> None:
     """Execute explicit external artifact admission."""
     print(f"{WORKFLOW_ID} — External Artifact Import")
     print("INPUT BOUNDARY — approved CSV path, dialect, and ColumnMapping")
-    bars = get_market_data(market_request("bars", timeframe="M1", limit=5))
-    with tempfile.TemporaryDirectory(prefix="wf-data-017-") as directory:
+
+    with (
+        tempfile.TemporaryDirectory(prefix="wf-data-017-") as directory,
+        isolated_runtime(Path(directory)),
+    ):
+        request_id = generate_id("req")
         root = Path(directory)
         raw = root / "raw"
-        raw.mkdir()
+        raw.mkdir(parents=True, exist_ok=True)
+
+        bars_resp = get_market_data(market_request("bars", timeframe="M1", limit=5))
+        bars = unwrap_data_response(
+            bars_resp, operation="get_market_data", request_id=request_id
+        )
 
         # Stage 1 — Resolve an approved external artifact path.
         _stage(1)
@@ -56,9 +66,12 @@ def main() -> None:
 
         # Stage 2 — Declare the CSV dialect and explicit column mapping.
         _stage(2)
-        dialects = describe_import_dialects()
+        dialects_resp = describe_import_dialects()
+        dialects = unwrap_data_response(
+            dialects_resp, operation="describe_import_dialects", request_id=request_id
+        )
         assert "standard" in dialects
-        mapping = ColumnMapping(
+        mapping = build_column_mapping(
             timestamp="timestamp",
             open="open",
             high="high",
@@ -84,46 +97,51 @@ def main() -> None:
                     )
                 )
 
-        with isolated_runtime(root):
-            run_data_migrations(generate_id("req"))
+        run_data_migrations(request_id)
 
-            # Stage 4 — Run canonical quality validation.
-            _stage(4)
-            request = ExternalImportRequest(
-                relative_path=Path("raw/provider_export.csv"),
+        # Stage 4 — Run canonical quality validation.
+        _stage(4)
+        request = build_external_import_request(
+            relative_path=Path("raw/provider_export.csv"),
+            format="csv",
+            dialect="standard",
+            mapping=mapping,
+            symbol="EURUSD",
+            data_kind="bars",
+            timeframe="M1",
+            source_id="mt5-export",
+            workflow_context="research",
+            precision_policy="decimal_string",
+            price_unit="USD",
+            volume_unit="lots",
+            destination_path=Path("raw/EURUSD_M1.csv"),
+            request_id=request_id,
+        )
+
+        # Stage 5 — Commit through manifest-backed storage.
+        _stage(5)
+        manifest_resp = import_external_dataset(request)
+        manifest = unwrap_data_response(
+            manifest_resp, operation="import_external_dataset", request_id=request_id
+        )
+
+        # Stage 6 — Persist external-origin audit evidence and reload the artifact.
+        _stage(6)
+        loaded_resp = load_dataset(
+            build_dataset_load_request(
+                relative_path=manifest.relative_path,
                 format="csv",
-                dialect="standard",
-                mapping=mapping,
-                symbol="EURUSD",
-                data_kind="bars",
-                timeframe="M1",
-                source_id="mt5-export",
-                workflow_context="research",
-                precision_policy="decimal_string",
-                price_unit="USD",
-                volume_unit="lots",
-                destination_path=Path("raw/EURUSD_M1.csv"),
-                request_id=generate_id("req"),
+                request_id=request_id,
             )
-
-            # Stage 5 — Commit through manifest-backed storage.
-            _stage(5)
-            manifest = import_external_dataset(request)
-
-            # Stage 6 — Persist external-origin audit evidence and reload the artifact.
-            _stage(6)
-            loaded = load_dataset(
-                DatasetLoadRequest(
-                    relative_path=manifest.relative_path,
-                    format="csv",
-                    request_id=generate_id("req"),
-                )
-            )
-            print(
-                "Imported records and origin:",
-                loaded.record_count,
-                loaded.source_metadata["origin"],
-            )
+        )
+        loaded = unwrap_data_response(
+            loaded_resp, operation="load_dataset", request_id=request_id
+        )
+        print(
+            "Imported records and origin:",
+            loaded.record_count,
+            loaded.source_metadata.get("origin"),
+        )
     print(
         "OUTPUT BOUNDARY — committed canonical artifact, manifest, and audit evidence"
     )

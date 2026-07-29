@@ -6,7 +6,6 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from app.services.data import (
-    MarketSchedule,
     get_data_availability,
     get_historical_volume,
     get_market_data,
@@ -20,6 +19,7 @@ from app.services.data import (
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.requests import MarketDataRequest
+from app.services.data.time_sessions.contracts import MarketSchedule
 
 
 def _unwrap(response):
@@ -51,11 +51,13 @@ def isolated_facade(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         symbol_discovery, "_fetch_historical_volume_raw", lambda request: request
     )
-    monkeypatch.setattr(
-        symbol_discovery, "_ensure_source_access_raw", lambda *_args: None
-    )
-    monkeypatch.setattr(schedule, "ensure_source", lambda *_args: None)
-    monkeypatch.setattr(schedule, "resolve_calendar", lambda *_args: object())
+    from app.services.data.sources import composition
+
+    monkeypatch.setattr(composition, "_ensure_source_access_raw", lambda *_args: None)
+    monkeypatch.setattr(composition, "ensure_identity", lambda *_args: None)
+    monkeypatch.setattr(composition, "ensure_storage", lambda *_args: None)
+    monkeypatch.setattr(composition, "ensure_source", lambda *_args: None)
+    monkeypatch.setattr(composition, "resolve_calendar", lambda *_args: object())
     monkeypatch.setattr(
         schedule,
         "_get_current_schedule_raw",

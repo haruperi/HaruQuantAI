@@ -6,8 +6,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from app.services.data import (
-    DataSettings,
-    ScrapeOptions,
+    build_data_settings,
+    build_scrape_options,
     data_settings_context,
     scrape_economic_calendar,
 )
@@ -38,7 +38,7 @@ def test_calendar_scrape_cleans_projects_and_saves(tmp_path: Path) -> None:
     """One public scrape produces a typed frame and descriptive artifact."""
     start = datetime(2026, 1, 1, tzinfo=UTC)
     result = scrape_economic_calendar(
-        ScrapeOptions(
+        build_scrape_options(
             start=start,
             end=start + timedelta(days=1),
             sites=("forexfactory",),
@@ -46,7 +46,7 @@ def test_calendar_scrape_cleans_projects_and_saves(tmp_path: Path) -> None:
         )
     )
 
-    with data_settings_context(DataSettings(approved_storage_roots=(tmp_path,))):
+    with data_settings_context(build_data_settings(approved_storage_roots=(tmp_path,))):
         result.save(tmp_path, "csv")
 
     assert len(result.events) == 1

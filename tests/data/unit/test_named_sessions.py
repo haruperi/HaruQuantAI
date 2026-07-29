@@ -2,12 +2,12 @@
 
 from datetime import UTC, datetime, time
 
-from app.services.data import (
+from app.services.data import get_active_market_sessions
+from app.services.data.contracts.responses import unwrap_data_response
+from app.services.data.time_sessions.contracts import (
     ActiveMarketSessionsRequest,
     NamedSessionDefinition,
-    get_active_market_sessions,
 )
-from app.services.data.contracts.responses import unwrap_data_response
 from app.utils import generate_id
 
 

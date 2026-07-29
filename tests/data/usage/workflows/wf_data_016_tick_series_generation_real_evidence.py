@@ -10,12 +10,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
-    DataSettings,
     generate_tick_series,
     generate_tick_series_to_parquet,
     get_market_data,
+    unwrap_data_response,
 )
-from tests.data.usage.workflows._support import market_request
+from app.utils import generate_id
+from tests.data.usage.workflows._support import isolated_runtime, market_request
 
 WORKFLOW_ID = "WF-DATA-016"
 STAGES = (
@@ -38,41 +39,53 @@ def main() -> None:
     print(f"{WORKFLOW_ID} — Tick-Series Generation from Real Evidence")
     print("INPUT BOUNDARY — genuine MT5 MarketDataset and approved models")
 
-    # Stage 1 — Retrieve bounded genuine MT5 bar evidence.
-    _stage(1)
-    bars = get_market_data(market_request("bars", timeframe="M1", limit=10))
+    with (
+        tempfile.TemporaryDirectory(prefix="wf-data-016-") as directory,
+        isolated_runtime(Path(directory)),
+    ):
+        request_id = generate_id("req")
 
-    # Stage 2 — Select one approved tick and spread model.
-    _stage(2)
-    arguments = {
-        "model": "trading_bar",
-        "trading_timeframe": "M1",
-        "spread_model": "fixed_spread",
-        "fixed_spread_points": Decimal(2),
-        "point_value": Decimal("0.00001"),
-    }
+        # Stage 1 — Retrieve bounded genuine MT5 bar evidence.
+        _stage(1)
+        bars_resp = get_market_data(market_request("bars", timeframe="M1", limit=10))
+        bars = unwrap_data_response(
+            bars_resp, operation="get_market_data", request_id=request_id
+        )
 
-    # Stage 3 — Generate canonical ordered ticks with intra-bar phase metadata.
-    _stage(3)
-    ticks = generate_tick_series(bars, **arguments)
-    assert all(record.source_bar_time is not None for record in ticks.records)
+        # Stage 2 — Select one approved tick and spread model.
+        _stage(2)
+        arguments = {
+            "model": "trading_bar",
+            "trading_timeframe": "M1",
+            "spread_model": "fixed_spread",
+            "fixed_spread_points": Decimal(2),
+            "point_value": Decimal("0.00001"),
+        }
 
-    # Stage 4 — Stream the bounded result to a temporary Parquet artifact.
-    _stage(4)
-    approved_root = DataSettings().approved_storage_roots[0]
-    approved_root.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(
-        prefix="wf-data-016-",
-        dir=approved_root,
-    ) as directory:
-        artifact = generate_tick_series_to_parquet(
+        # Stage 3 — Generate canonical ordered ticks with intra-bar phase metadata.
+        _stage(3)
+        ticks_resp = generate_tick_series(bars, **arguments)
+        ticks = unwrap_data_response(
+            ticks_resp, operation="generate_tick_series", request_id=request_id
+        )
+        assert all(record.source_bar_time is not None for record in ticks.records)
+
+        # Stage 4 — Stream the bounded result to a temporary Parquet artifact.
+        _stage(4)
+        out_path = Path("data/raw/ticks.parquet")
+        artifact_resp = generate_tick_series_to_parquet(
             bars,
-            path=Path(directory) / "ticks.parquet",
+            path=out_path,
             max_output_rows_per_chunk=1000,
             **arguments,
         )
-        assert Path(str(artifact["path"])).is_file()
-        print("Tick evidence:", ticks.record_count, artifact["rows"])
+        artifact = unwrap_data_response(
+            artifact_resp,
+            operation="generate_tick_series_to_parquet",
+            request_id=request_id,
+        )
+        assert Path(str(artifact.get("path"))).is_file()
+        print("Tick evidence:", ticks.record_count, artifact.get("rows"))
     print("OUTPUT BOUNDARY — canonical tick MarketDataset and bounded Parquet artifact")
 
 

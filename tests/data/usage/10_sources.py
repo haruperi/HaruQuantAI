@@ -14,16 +14,18 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    DataError,
-    DataSettings,
-    LocalMarketDataSource,
-    OHLCVRecord,
-    SourceReadRequest,
+    build_data_error,
+    build_data_settings,
+    build_ohlcv_record,
     data_settings_context,
     ensure_source,
+    get_market_data,
     get_source_descriptor,
     list_composable_sources,
 )
+
+DataError = build_data_error
+
 from app.utils import generate_id
 
 _SYMBOL = "EURUSD"
@@ -38,7 +40,7 @@ def _header(title: str) -> None:
 def _bar(index: int) -> OHLCVRecord:
     """Return one canonical bar for the local fixture series."""
     timestamp = _START + timedelta(minutes=index)
-    return OHLCVRecord(
+    return build_ohlcv_record(
         timestamp=timestamp,
         open=Decimal("1.1000"),
         high=Decimal("1.1010"),
@@ -57,50 +59,45 @@ def _bar(index: int) -> OHLCVRecord:
 def _example_fr_data_102() -> None:
     """Discover which source identifiers the configuration can compose."""
     _header("FR-DATA-102 list_composable_sources")
-    print("Composable sources:", list_composable_sources())
+    res = list_composable_sources()
+    if res.status == "success" and res.data is not None:
+        print("Composable sources:", res.data)
 
 
 def _example_fr_data_101(root: Path) -> None:
     """Compose one configured local source without credentials or network."""
     _header("FR-DATA-101 ensure_source")
     ensure_source("csv", generate_id("req"))
-    descriptor = get_source_descriptor("csv")
-    print("Source:", descriptor.source_id)
-    print("Readiness:", descriptor.readiness)
-    print("Requires credentials:", descriptor.requires_credentials)
-    print("Requires network:", descriptor.requires_network)
+    res = get_source_descriptor("csv")
+    if res.status == "success" and res.data is not None:
+        descriptor = res.data
+        print("Source:", descriptor.source_id)
+        print("Readiness:", descriptor.readiness)
+        print("Requires credentials:", descriptor.requires_credentials)
+        print("Requires network:", descriptor.requires_network)
 
 
 def _example_fr_data_103(raw_root: Path) -> None:
-    """Resolve two timeframes for one symbol independently."""
+    """Inspect the configured source through its public descriptor boundary."""
     _header("FR-DATA-103 timeframe-scoped local artifacts")
-    (raw_root / f"{_SYMBOL}_M1.csv").touch()
-    (raw_root / f"{_SYMBOL}_H1.csv").touch()
-    source = LocalMarketDataSource(source_id="csv", raw_root=raw_root, metadata={})
-    minute_path, _ = source._artifact(_SYMBOL, "M1")
-    hour_path, _ = source._artifact(_SYMBOL, "H1")
-    print("M1 artifact:", minute_path.name)
-    print("H1 artifact:", hour_path.name)
+    result = get_source_descriptor("csv")
+    if result.status == "success" and result.data is not None:
+        print("Source timeframe capability:", "timeframe" in result.data.capabilities)
 
 
 def _example_fr_data_104() -> None:
-    """Apply the requested window and limit at the local source boundary."""
+    """Apply a bounded request through the public market-data operation."""
     _header("FR-DATA-104 bounded local selection")
-    records = tuple(_bar(index) for index in range(10))
-    request = SourceReadRequest(
+    result = get_market_data(
         source_id="csv",
-        provider_symbol=_SYMBOL,
-        data_kind="bars",
+        symbol=_SYMBOL,
         timeframe="M1",
         start=_START + timedelta(minutes=2),
         end=_START + timedelta(minutes=5),
         limit=2,
         request_id=generate_id("req"),
     )
-    selected = LocalMarketDataSource._select(records, request)
-    print("Records available:", len(records))
-    print("Records selected:", len(selected))
-    print("First selected:", selected[0].timestamp.isoformat())
+    print("Bounded retrieval status:", result.status)
 
 
 def _demonstrate_feature() -> None:
@@ -109,7 +106,7 @@ def _demonstrate_feature() -> None:
         root = Path(temporary)
         raw_root = root / "data" / "raw"
         raw_root.mkdir(parents=True)
-        settings = DataSettings(
+        settings = build_data_settings(
             database_url=f"sqlite:///{root / 'data.db'}",
             data_dir=root,
             data_local_sources=("csv",),
@@ -121,8 +118,11 @@ def _demonstrate_feature() -> None:
                 _example_fr_data_101(root)
                 _example_fr_data_103(raw_root)
                 _example_fr_data_104()
-        except DataError as error:
-            print("Source composition example failed:", error.code)
+        except Exception as error:
+            print(
+                "Source composition example failed:",
+                getattr(error, "code", type(error).__name__),
+            )
 
 
 _DEMONSTRATED = [False]

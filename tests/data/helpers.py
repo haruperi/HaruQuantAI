@@ -4,23 +4,23 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
+from app.services.data import register_source, register_source_policy
 from app.services.data.contracts import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
+    TickRecord,
 )
-from app.services.data.market_data.symbol_metadata import (
-    SymbolMetadata,
-)
+from app.services.data.market_data.symbol_metadata import SymbolMetadata
 from app.services.data.sources.contracts import (
     SourceDescriptor,
     SourceIdentity,
     SourceLicensePolicy,
 )
 from app.services.data.sources.local_adapter import LocalMarketDataSource
-from app.services.data.sources.policy import SourcePolicyConfig, register_source_policy
-from app.services.data.sources.registry import register_source
+from app.services.data.sources.policy import SourcePolicyConfig
 from app.utils import create_audit_event, generate_id
+from app.utils.contracts.audit import AuditEvent
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 END = START + timedelta(minutes=1)
@@ -52,7 +52,24 @@ def make_bar(*, timestamp: datetime = START) -> OHLCVRecord:
         source="fixture",
         source_symbol="ABC",
         source_revision="rev-1",
-        available_at=AVAILABLE,
+        available_at=timestamp + timedelta(seconds=1),
+    )
+
+
+def make_tick(*, timestamp: datetime = START) -> TickRecord:
+    """Return one exact canonical tick record."""
+    return TickRecord(
+        timestamp=timestamp,
+        bid=Decimal("1.1000"),
+        ask=Decimal("1.1002"),
+        last=Decimal("1.1001"),
+        volume=Decimal(100),
+        price_unit="USD",
+        volume_unit="units",
+        source="fixture",
+        source_symbol="ABC",
+        source_revision="rev-1",
+        available_at=timestamp + timedelta(seconds=1),
     )
 
 
@@ -95,7 +112,30 @@ def make_dataset() -> MarketDataset:
     )
 
 
-def make_audit_event(*, timestamp: datetime = START):
+def make_tick_dataset() -> MarketDataset:
+    """Return one immutable provider-neutral tick dataset."""
+    tick = make_tick()
+    return MarketDataset(
+        normalization_version="v1",
+        data_kind="ticks",
+        symbol="ABC",
+        timeframe=None,
+        records=(tick,),
+        start=START,
+        end=START,
+        available_at=AVAILABLE,
+        record_count=1,
+        quality_report=make_quality(),
+        source_metadata={"source": "fixture"},
+        license_metadata={"status": "approved"},
+        cache_status="miss",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
+    )
+
+
+def make_audit_event(*, timestamp: datetime = START) -> AuditEvent:
     """Return one valid Utils-owned audit event."""
     return create_audit_event(
         contract_version="v1",

@@ -209,9 +209,16 @@ def test_ensure_source_and_access_dukascopy() -> None:
     mock_adapter = MagicMock()
     mock_adapter.connect.side_effect = _mock_connect
     mock_result = MagicMock(error=None, data=mock_adapter)
-    with patch(
-        "app.services.data.sources.composition.create_broker_adapter",
-        return_value=mock_result,
+    mock_provider_settings = _ProviderRuntimeSettings(dukascopy_enabled=True)
+    with (
+        patch(
+            "app.services.data.sources.composition.create_broker_adapter",
+            return_value=mock_result,
+        ),
+        patch(
+            "app.services.data.sources.composition._ProviderRuntimeSettings",
+            return_value=mock_provider_settings,
+        ),
     ):
         ensure_source("dukascopy", _REQ_ID)
         ensure_source_access("dukascopy", _REQ_ID)
@@ -241,13 +248,16 @@ def test_ensure_identity_dukascopy() -> None:
     """Test ensure_identity registers identity for dukascopy."""
     mock_meta = MagicMock()
     mock_meta.provider_symbol = "EURUSD"
-    # ``ensure_identity`` resolves the source through the migrated raw core
-    # ``_resolve_source_raw`` and then unwraps the nested ``get_symbol_metadata``
-    # StandardResponse, so both the patch target and the mock return shape must
-    # follow the migrated contract.
-    with patch(
-        "app.services.data.sources.composition._resolve_source_raw"
-    ) as mock_res_src:
+    # Patch both _ensure_source_access_raw (so the source check is bypassed)
+    # and _resolve_source_raw so the metadata fetch returns a controlled value.
+    with (
+        patch(
+            "app.services.data.sources.composition._ensure_source_access_raw",
+        ),
+        patch(
+            "app.services.data.sources.composition._resolve_source_raw"
+        ) as mock_res_src,
+    ):
         mock_src = MagicMock()
         metadata_response = MagicMock()
         metadata_response.status = "success"

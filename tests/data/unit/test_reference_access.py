@@ -24,9 +24,13 @@ from app.services.data.market_data.symbol_metadata import (
 )
 from app.services.data.persistence.contracts import DatasetSaveRequest
 from app.services.data.persistence.dataset_writer import save_dataset
-from app.services.data.sources.contracts import SourceDescriptor, SourceLicensePolicy
+from app.services.data.sources.contracts import (
+    SourceDescriptor,
+    SourceIdentity,
+    SourceLicensePolicy,
+)
 from app.services.data.sources.policy import _reset_policy_registry
-from app.services.data.sources.registry import _reset_registry
+from app.services.data.sources.registry import _reset_registry, register_source
 from app.utils import generate_id
 
 from tests.data.helpers import make_dataset, make_quality, register_local_test_source
@@ -234,27 +238,53 @@ def test_provider_availability_uses_bounded_observed_probe(
         }
     )
     captured: list[MarketDataRequest] = []
-    monkeypatch.setattr(
-        "app.services.data.market_data.symbol_discovery._get_source_descriptor_raw",
-        lambda _source_id: descriptor,
-    )
-    monkeypatch.setattr(
-        "app.services.data.market_data.symbol_discovery.ensure_storage",
-        lambda _request_id: None,
-    )
-    monkeypatch.setattr(
-        "app.services.data.market_data.symbol_discovery.ensure_identity",
-        lambda _source_id, _symbol, _request_id: None,
-    )
 
     def fetch(probe: MarketDataRequest) -> MarketDataset:
         captured.append(probe)
         return dataset
 
+    register_source(
+        descriptor,
+        factory=lambda *_args: SimpleNamespace(fetch_market_dataset=fetch),
+        identities=(
+            SourceIdentity(
+                source_id="binance_spot",
+                canonical_symbol="BTCUSDT",
+                friendly_name="BTCUSDT",
+                provider_symbol="BTCUSDT",
+                mapping_revision="provider-confirmed-v1",
+                provenance={"method": "unit_test"},
+                request_id=request_id,
+            ),
+        ),
+    )
+    from app.services.data.sources.policy import (
+        SourcePolicyConfig,
+        register_source_policy,
+    )
+
+    register_source_policy(
+        SourcePolicyConfig(
+            source_id="binance_spot",
+            rate_limit=10,
+            rate_window_seconds=1,
+            breaker_failure_threshold=5,
+            breaker_recovery_seconds=60,
+        )
+    )
     monkeypatch.setattr(
-        "app.services.data.market_data.symbol_discovery._fetch_market_dataset_raw",
+        "app.services.data.sources.composition.ensure_storage",
+        lambda _request_id: None,
+    )
+    monkeypatch.setattr(
+        "app.services.data.sources.composition.ensure_identity",
+        lambda _source_id, _symbol, _request_id: None,
+    )
+    monkeypatch.setattr(
+        "app.services.data.market_data.pipeline._fetch_market_dataset_raw",
         fetch,
     )
+
     request = AvailabilityRequest(
         source_id="binance_spot",
         symbol="BTCUSDT",

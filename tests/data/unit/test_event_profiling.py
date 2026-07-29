@@ -6,6 +6,7 @@ from types import MappingProxyType
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.economic_calendar.profiling import (
     SYMBOL_EVENT_PROFILES,
     SymbolEventProfile,
@@ -46,16 +47,26 @@ def test_canonical_profiles_are_registered(
     assert set(profile.countries) == countries
 
 
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.economic_calendar.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
+
+
 def test_get_symbol_event_profile_returns_registered_instance() -> None:
     """Lookup returns the same object referenced by the registry."""
-    profile = get_symbol_event_profile("EURUSD")
-    assert profile is SYMBOL_EVENT_PROFILES["EURUSD"]
+    profile = _unwrap(get_symbol_event_profile("EURUSD"))
+    assert profile == SYMBOL_EVENT_PROFILES["EURUSD"]
 
 
 def test_get_symbol_event_profile_rejects_unknown_symbol() -> None:
     """Unregistered symbols raise fail-closed VALIDATION_FAILED."""
     with pytest.raises(DataError) as error:
-        get_symbol_event_profile("NOTREAL")
+        _unwrap(get_symbol_event_profile("NOTREAL"))
     assert error.value.code == "VALIDATION_FAILED"
 
 

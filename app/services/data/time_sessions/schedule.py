@@ -34,7 +34,6 @@ from app.services.data.contracts.validation import (
 from app.services.data.contracts.validation import (
     resolve_request_id as _request_id,
 )
-from app.services.data.sources.composition import ensure_source, resolve_calendar
 from app.services.data.sources.registry import get_source_descriptor
 from app.services.data.time_sessions.contracts import (
     MarketHours,
@@ -111,6 +110,8 @@ def _get_current_schedule_raw(
             observed_at=observed_at,
             request_id=request.request_id,
         )
+        if hasattr(schedule, "data"):
+            schedule = schedule.data
     except DataError:
         raise
     except Exception as error:
@@ -253,6 +254,8 @@ def _get_market_hours_raw(
         timezone=timezone,
         request_id=request_id,
     )
+    from app.services.data.sources.composition import ensure_source, resolve_calendar
+
     selected_calendar = calendar or resolve_calendar(
         resolved.source_id,
         resolved.request_id,
@@ -328,6 +331,8 @@ def _get_trading_sessions_raw(
         timezone=timezone,
         request_id=request_id,
     )
+    from app.services.data.sources.composition import ensure_source, resolve_calendar
+
     selected_calendar = calendar or resolve_calendar(
         resolved.source_id,
         resolved.request_id,

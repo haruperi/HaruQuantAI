@@ -47,7 +47,11 @@ from app.services.data.economic_calendar.scraper import (
     CalendarTransport,
     ScrapeOptions,
     ScrapeResult,
+    deserialize_scrape_result,
+    save_scrape_result,
     scrape_economic_calendar,
+    scrape_result_to_dataframe,
+    serialize_scrape_result,
 )
 from app.services.data.economic_calendar.service import (
     get_economic_events,
@@ -88,6 +92,7 @@ __all__ = [
     "SymbolEventProfile",
     "calendar_state_provenance",
     "derive_calendar_state",
+    "deserialize_scrape_result",
     "evaluate_calendar_state",
     "from_row",
     "get_economic_events",
@@ -97,5 +102,8 @@ __all__ = [
     "is_news_restricted",
     "is_news_restricted_events",
     "populate_market_context_calendar",
+    "save_scrape_result",
     "scrape_economic_calendar",
+    "scrape_result_to_dataframe",
+    "serialize_scrape_result",
 ]

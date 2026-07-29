@@ -10,15 +10,16 @@ from tempfile import TemporaryDirectory
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
-    AuditEventQuery,
-    DataError,
-    DataSettings,
+    build_audit_event_query,
+    build_data_settings,
     data_settings_context,
     persist_audit_event,
     query_audit_events,
     resolve_operation_request_id,
     run_data_migrations,
+    unwrap_data_response,
 )
+from app.services.data.contracts.errors import DataError
 from app.utils import create_audit_event, create_auth_context, generate_id
 
 WORKFLOW_ID = "WF-DATA-022"
@@ -94,11 +95,11 @@ def main() -> None:
 
     with TemporaryDirectory() as temporary:
         directory = Path(temporary)
-        settings = DataSettings(
+        settings = build_data_settings(
             database_url="sqlite:///wf_data_022_audit.sqlite3",
             data_dir=directory,
-            sqlite_busy_timeout_seconds=1,
-            write_lock_lease_seconds=30,
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=30.0,
             approved_storage_roots=(directory,),
         )
         with data_settings_context(settings):
@@ -107,7 +108,10 @@ def main() -> None:
             run_data_migrations(generate_id("req"))
             print("Migrations applied   : True")
             try:
-                receipt = persist_audit_event(event)
+                receipt_resp = persist_audit_event(event)
+                receipt = unwrap_data_response(
+                    receipt_resp, operation="persist_audit_event", request_id=request_id
+                )
                 _report("persist", "success", receipt.persisted)
             except DataError as error:
                 _report("persist", "fail", error.code)
@@ -116,7 +120,12 @@ def main() -> None:
             # Stage 3 — The write commits transactionally with the action it records.
             _stage(3)
             try:
-                repeated = persist_audit_event(event)
+                repeated_resp = persist_audit_event(event)
+                repeated = unwrap_data_response(
+                    repeated_resp,
+                    operation="persist_audit_event",
+                    request_id=request_id,
+                )
                 _report("repeat ", "success", repeated.persisted)
                 print("Idempotent re-persist accepted: True")
             except DataError as error:
@@ -124,7 +133,7 @@ def main() -> None:
 
             # Stage 4 — Operators read bounded ordered pages of recorded events.
             _stage(4)
-            query = AuditEventQuery(
+            query = build_audit_event_query(
                 start=_START,
                 end=_END,
                 limit=10,
@@ -134,7 +143,10 @@ def main() -> None:
             print("Query window         :", query.start, "->", query.end)
             print("Query limit          :", query.limit)
             try:
-                page = query_audit_events(query, auth)
+                page_resp = query_audit_events(query, auth)
+                page = unwrap_data_response(
+                    page_resp, operation="query_audit_events", request_id=request_id
+                )
                 _report("query  ", "success", f"{len(page.events)} event(s)")
                 for recorded in page.events[:3]:
                     print("  -", recorded.event_id, recorded.action)
@@ -144,7 +156,7 @@ def main() -> None:
 
             # Stage 5 — Every read resolves its originating request identity for correlation.
             _stage(5)
-            resolved = resolve_operation_request_id(request_id)
+            resolved, _ = resolve_operation_request_id(request_id)
             _report("trace  ", "success", resolved)
             assert resolved
             print("Correlated to emitting request: True")

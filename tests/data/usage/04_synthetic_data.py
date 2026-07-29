@@ -10,7 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    SyntheticRequest,
+    build_synthetic_request,
     generate_synthetic_bars,
     generate_synthetic_ticks,
     to_ohlcv_dataframe,
@@ -30,7 +30,7 @@ def example_07_synthetic_bars() -> None:
     """Generate deterministic synthetic OHLCV bars."""
     _header("Generate deterministic synthetic OHLCV bars.")
     req_id = generate_id("req")
-    req = SyntheticRequest(
+    req = build_synthetic_request(
         symbol="GBPUSD",
         data_kind="bars",
         timeframe="H1",
@@ -48,16 +48,18 @@ def example_07_synthetic_bars() -> None:
         precision_policy="decimal_string",
         request_id=req_id,
     )
-    dataset = generate_synthetic_bars(req)
-    print(f"Synthetic bar rows: {dataset.record_count} symbol={dataset.symbol}")
-    print(to_ohlcv_dataframe(dataset))
+    response = generate_synthetic_bars(req)
+    if response.status == "success" and response.data is not None:
+        dataset = response.data
+        print(f"Synthetic bar rows: {dataset.record_count} symbol={dataset.symbol}")
+        print(to_ohlcv_dataframe(dataset))
 
 
 def example_synthetic_ticks() -> None:
     """Generate deterministic synthetic tick records."""
     _header("Generate deterministic synthetic tick records.")
     req_id = generate_id("req")
-    req = SyntheticRequest(
+    req = build_synthetic_request(
         symbol="GBPUSD",
         data_kind="ticks",
         start=_START,
@@ -72,9 +74,11 @@ def example_synthetic_ticks() -> None:
         precision_policy="decimal_string",
         request_id=req_id,
     )
-    dataset = generate_synthetic_ticks(req)
-    print(f"Synthetic tick rows: {dataset.record_count} symbol={dataset.symbol}")
-    print(to_tick_dataframe(dataset))
+    response = generate_synthetic_ticks(req)
+    if response.status == "success" and response.data is not None:
+        dataset = response.data
+        print(f"Synthetic tick rows: {dataset.record_count} symbol={dataset.symbol}")
+        print(to_tick_dataframe(dataset))
 
 
 def _demonstrate_feature() -> None:

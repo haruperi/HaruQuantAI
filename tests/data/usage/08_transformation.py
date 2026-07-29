@@ -10,12 +10,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    DataQualityReport,
-    MarketDataset,
-    OHLCVRecord,
-    TickRecord,
     aggregate_ticks_to_bars,
     align_multitimeframe_data,
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
+    build_tick_record,
     resample_ohlcv,
     to_ohlcv_dataframe,
 )
@@ -32,7 +32,7 @@ def _header(title: str) -> None:
 def _sample_m1_dataset() -> MarketDataset:
     """Return a sample M1 MarketDataset fixture."""
     records = tuple(
-        OHLCVRecord(
+        build_ohlcv_record(
             timestamp=_START + timedelta(minutes=i),
             open=Decimal(100 + i),
             high=Decimal(101 + i),
@@ -47,7 +47,7 @@ def _sample_m1_dataset() -> MarketDataset:
         )
         for i in range(10)
     )
-    report = DataQualityReport(
+    report = build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
         record_count=len(records),
@@ -57,7 +57,7 @@ def _sample_m1_dataset() -> MarketDataset:
         schema_version="v1",
         generated_at=records[-1].available_at,
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="bars",
         symbol="EURUSD",
@@ -81,30 +81,36 @@ def example_26_resampling() -> None:
     """Resample M1 bars to M5 using resample_ohlcv."""
     _header("Resample M1 bars to M5 using resample_ohlcv.")
     ds = _sample_m1_dataset()
-    resampled = resample_ohlcv(ds, target_timeframe="M5")
-    print(
-        f"Resampled OHLCV rows: {resampled.record_count} "
-        f"timeframe={resampled.timeframe}"
-    )
+    res1 = resample_ohlcv(ds, target_timeframe="M5")
+    if res1.status == "success" and res1.data is not None:
+        resampled = res1.data
+        print(
+            f"Resampled OHLCV rows: {resampled.record_count} "
+            f"timeframe={resampled.timeframe}"
+        )
 
 
 def example_27_multitimeframe_alignment() -> None:
     """Align M1 and M5 datasets using align_multitimeframe_data."""
     _header("Align M1 and M5 datasets using align_multitimeframe_data.")
     m1_ds = _sample_m1_dataset()
-    m5_ds = resample_ohlcv(m1_ds, target_timeframe="M5")
-    targets = [m1_ds.records[-1].available_at]
-    aligned = align_multitimeframe_data(
-        {"M1": m1_ds, "M5": m5_ds}, target_timestamps=targets
-    )
-    print(f"Aligned multitimeframe datasets: count={len(aligned)}")
+    m5_res = resample_ohlcv(m1_ds, target_timeframe="M5")
+    if m5_res.status == "success" and m5_res.data is not None:
+        m5_ds = m5_res.data
+        targets = [m1_ds.records[-1].available_at]
+        res2 = align_multitimeframe_data(
+            {"M1": m1_ds, "M5": m5_ds}, target_timestamps=targets
+        )
+        if res2.status == "success" and res2.data is not None:
+            aligned = res2.data
+            print(f"Aligned multitimeframe datasets: count={len(aligned)}")
 
 
 def example_28_tick_aggregation() -> None:
     """Aggregate ticks into M1 bars using aggregate_ticks_to_bars."""
     _header("Aggregate ticks into M1 bars using aggregate_ticks_to_bars.")
     ticks = tuple(
-        TickRecord(
+        build_tick_record(
             timestamp=_START + timedelta(seconds=i * 10),
             last=Decimal("1.1000") + Decimal(i) * Decimal("0.0001"),
             volume=Decimal(10),
@@ -130,8 +136,10 @@ def example_28_tick_aggregation() -> None:
             "record_count": len(ticks),
         }
     )
-    bars = aggregate_ticks_to_bars(tick_dataset, "M1", "last")
-    print(f"Aggregated ticks to bars: {bars.record_count} symbol={bars.symbol}")
+    res3 = aggregate_ticks_to_bars(tick_dataset, "M1", "last")
+    if res3.status == "success" and res3.data is not None:
+        bars = res3.data
+        print(f"Aggregated ticks to bars: {bars.record_count} symbol={bars.symbol}")
 
 
 def _demonstrate_feature() -> None:
@@ -141,8 +149,10 @@ def _demonstrate_feature() -> None:
     example_28_tick_aggregation()
 
     ds = _sample_m1_dataset()
-    df = to_ohlcv_dataframe(ds)
-    print(f"Converted dataset to DataFrame: shape={df.shape}")
+    df_res = to_ohlcv_dataframe(ds)
+    if df_res.status == "success" and df_res.data is not None:
+        df = df_res.data
+        print(f"Converted dataset to DataFrame: shape={df.shape}")
 
 
 _DEMONSTRATED = [False]

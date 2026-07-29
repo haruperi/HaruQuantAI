@@ -9,12 +9,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
-    DatasetLoadRequest,
-    DatasetSaveRequest,
+    build_dataset_load_request,
+    build_dataset_save_request,
     get_market_data,
     load_dataset,
     run_data_migrations,
     save_dataset,
+    unwrap_data_response,
 )
 from app.utils import generate_id
 from tests.data.usage.workflows._support import isolated_runtime, market_request
@@ -40,12 +41,18 @@ def main() -> None:
     """Execute local save and load with temporary durable state."""
     print(f"{WORKFLOW_ID} — Local Dataset Load and Save")
     print("INPUT BOUNDARY — approved path and normalized MT5 dataset")
-    dataset = get_market_data(market_request("bars", timeframe="M1"))
     with tempfile.TemporaryDirectory(prefix="wf-data-003-") as directory:
         root = Path(directory)
         with isolated_runtime(root):
             run_data_migrations(generate_id("req"))
-            (root / "raw").mkdir()
+            (root / "raw").mkdir(parents=True, exist_ok=True)
+
+            response = get_market_data(market_request("bars", timeframe="M1"))
+            dataset = unwrap_data_response(
+                response,
+                operation="get_market_data",
+                request_id=response.metadata.request_id,
+            )
 
             # Stage 1 — Resolve an approved relative storage path.
             _stage(1)
@@ -61,8 +68,8 @@ def main() -> None:
 
             # Stage 4 — Atomically write the artifact and versioned manifest.
             _stage(4)
-            manifest = save_dataset(
-                DatasetSaveRequest(
+            save_resp = save_dataset(
+                build_dataset_save_request(
                     dataset=dataset,
                     relative_path=relative_path,
                     format="parquet",
@@ -70,15 +77,21 @@ def main() -> None:
                     request_id=request_id,
                 )
             )
+            manifest = unwrap_data_response(
+                save_resp, operation="save_dataset", request_id=request_id
+            )
 
             # Stage 5 — Load and verify the artifact hash and schema.
             _stage(5)
-            loaded = load_dataset(
-                DatasetLoadRequest(
+            load_resp = load_dataset(
+                build_dataset_load_request(
                     relative_path=manifest.relative_path,
                     format="parquet",
                     request_id=generate_id("req"),
                 )
+            )
+            loaded = unwrap_data_response(
+                load_resp, operation="load_dataset", request_id=generate_id("req")
             )
             assert loaded.record_count == dataset.record_count
             print("Committed artifact:", manifest.relative_path)

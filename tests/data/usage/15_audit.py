@@ -9,12 +9,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    AuditEventQuery,
-    DataError,
+    build_audit_event_query,
     persist_audit_event,
     query_audit_events,
+    unwrap_data_response,
 )
-from app.utils import AuditEvent, AuthContext, generate_id
+from app.services.data.contracts.errors import DataError
+from app.utils import create_auth_context, generate_id
+from app.utils.contracts.audit import AuditEvent
 
 _START = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
 _END = _START + timedelta(hours=1)
@@ -46,17 +48,20 @@ def _demonstrate_feature() -> None:
 
     try:
         res = persist_audit_event(event)
-        print("persist_audit_event:", res.persisted)
+        res_data = unwrap_data_response(
+            res, operation="persist_audit_event", request_id=req_id
+        )
+        print("persist_audit_event:", res_data.persisted)
     except DataError as error:
         print("persist_audit_event handled:", error.code)
 
-    query = AuditEventQuery(
+    query = build_audit_event_query(
         start=_START,
         end=_END,
         limit=10,
         request_id=req_id,
     )
-    auth = AuthContext(
+    auth = create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="user_admin",
@@ -74,8 +79,11 @@ def _demonstrate_feature() -> None:
     print("AuthContext:", auth.principal_id)
 
     try:
-        page = query_audit_events(query, auth)
-        print("query_audit_events count:", len(page.events))
+        res_q = query_audit_events(query, auth)
+        res_q_data = unwrap_data_response(
+            res_q, operation="query_audit_events", request_id=req_id
+        )
+        print("query_audit_events count:", len(res_q_data.events))
     except DataError as error:
         print("query_audit_events handled:", error.code)
 
@@ -93,13 +101,11 @@ def _demonstrate_once() -> None:
 
 def fr_data_021() -> None:
     _header("fr_data_021")
-    "FR-DATA-021: Persist a redacted `AuditEvent v1` idempotently with trace identifiers and surface every persistence failure."
     _demonstrate_once()
 
 
 def fr_data_077() -> None:
     _header("fr_data_077")
-    "FR-DATA-077: Authorize and execute a bounded, deterministically ordered audit query without exposing storage handles or unredacted payloads."
     _demonstrate_once()
 
 

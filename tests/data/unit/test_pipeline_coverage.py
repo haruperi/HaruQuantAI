@@ -285,8 +285,8 @@ def test_public_facades_keyword_style() -> None:
             "app.services.data.market_data.pipeline._fetch_market_dataset_raw",
             return_value=mock_ds,
         ),
-        patch("app.services.data.market_data.pipeline.ensure_storage"),
-        patch("app.services.data.market_data.pipeline.ensure_identity"),
+        patch("app.services.data.sources.composition.ensure_storage"),
+        patch("app.services.data.sources.composition.ensure_identity"),
     ):
         res1 = _unwrap(
             get_market_data(

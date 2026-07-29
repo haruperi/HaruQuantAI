@@ -10,14 +10,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock
 
-from app.services.brokers import (
-    BrokerAccountInfo,
-    BrokerBalance,
-    BrokerOrder,
-    BrokerPage,
-    BrokerPermissions,
-    BrokerPosition,
-)
+from app.services.brokers import build_broker_value
 from app.services.data._limits import get_limit
 from app.services.data.evidence.account_contracts import (
     AccountSnapshotRequest,
@@ -54,7 +47,8 @@ def test_account_snapshot_success() -> None:  # noqa: PLR0915 - full evidence ma
     """Verify standard account state snapshot mapping from mock adapter."""
     # Mock Broker DTOs
     now = datetime.now(UTC)
-    mock_info = BrokerAccountInfo(
+    mock_info = build_broker_value(
+        "account_info",
         account_id="acc-1",
         retrieved_at=now,
         currency="USD",
@@ -64,7 +58,8 @@ def test_account_snapshot_success() -> None:  # noqa: PLR0915 - full evidence ma
         free_margin=Decimal(9500),
         status="ACTIVE",
     )
-    mock_balance = BrokerBalance(
+    mock_balance = build_broker_value(
+        "balance",
         asset="USD",
         unit="CURRENCY",
         retrieved_at=now,
@@ -72,7 +67,8 @@ def test_account_snapshot_success() -> None:  # noqa: PLR0915 - full evidence ma
         available=None,
         locked=Decimal(1000),
     )
-    mock_pos = BrokerPosition(
+    mock_pos = build_broker_value(
+        "position",
         position_id="pos-1",
         symbol="AAPL",
         side="LONG",
@@ -83,7 +79,8 @@ def test_account_snapshot_success() -> None:  # noqa: PLR0915 - full evidence ma
         open_price=Decimal(150),
         ownership_ref="mt5-magic:12345",
     )
-    mock_order = BrokerOrder(
+    mock_order = build_broker_value(
+        "order",
         order_id="ord-1",
         symbol="MSFT",
         side="BUY",
@@ -96,7 +93,8 @@ def test_account_snapshot_success() -> None:  # noqa: PLR0915 - full evidence ma
         retrieved_at=now,
         price=Decimal(250),
     )
-    mock_perms = BrokerPermissions(
+    mock_perms = build_broker_value(
+        "permissions",
         observed_at=now,
         trade_write=True,
         market_data_read=True,
@@ -121,10 +119,10 @@ def test_account_snapshot_success() -> None:  # noqa: PLR0915 - full evidence ma
     mock_adapter.get_account_info.return_value = mock_res(data=mock_info)
     mock_adapter.get_balances.return_value = mock_res(data=(mock_balance,))
     mock_adapter.get_positions.return_value = mock_res(
-        data=BrokerPage(items=(mock_pos,), limit=10)
+        data=build_broker_value("page", items=(mock_pos,), limit=10)
     )
     mock_adapter.get_orders.return_value = mock_res(
-        data=BrokerPage(items=(mock_order,), limit=10)
+        data=build_broker_value("page", items=(mock_order,), limit=10)
     )
     mock_adapter.get_permissions.return_value = mock_res(data=mock_perms)
     mock_adapter.is_connected.return_value = mock_res(data=True)
@@ -184,10 +182,14 @@ def test_account_snapshot_rejects_truncated_exposure_evidence() -> None:
     adapter.get_account_info = AsyncMock(return_value=result(object()))
     adapter.get_balances = AsyncMock(return_value=result(()))
     adapter.get_positions = AsyncMock(
-        return_value=result(BrokerPage(items=(), limit=1, truncated=True))
+        return_value=result(
+            build_broker_value("page", items=(), limit=1, truncated=True)
+        )
     )
     adapter.get_orders = AsyncMock(
-        return_value=result(BrokerPage(items=(), limit=1, truncated=False))
+        return_value=result(
+            build_broker_value("page", items=(), limit=1, truncated=False)
+        )
     )
     adapter.get_permissions = AsyncMock(return_value=result(object()))
     adapter.is_connected = AsyncMock(return_value=result(True))

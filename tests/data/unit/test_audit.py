@@ -20,6 +20,7 @@ from app.services.data.audit.contracts import (
 )
 from app.services.data.contracts.responses import unwrap_data_response
 from app.utils import create_auth_context
+from app.utils.contracts.auth import AuthContext
 
 from tests.data.helpers_models import END, START, make_audit_event
 

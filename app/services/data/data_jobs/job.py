@@ -636,8 +636,8 @@ def run_data_update_job_once(
             request_id=request_id,
         )
 
-    except Exception as error:  # noqa: BLE001
-        logger.error("Job run once failed for job %s", job_id)
+    except Exception as error:
+        logger.exception("Job run once failed for job %s: %s", job_id, error)
         finished_at = utc_now(clock)
         err_code = error.code if isinstance(error, DataError) else "SCHEDULER_ERROR"
 

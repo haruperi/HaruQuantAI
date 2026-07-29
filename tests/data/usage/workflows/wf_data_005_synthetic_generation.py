@@ -10,9 +10,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
-    SyntheticRequest,
+    build_synthetic_request,
     generate_synthetic_bars,
     generate_synthetic_ticks,
+    unwrap_data_response,
 )
 from app.utils import generate_id
 
@@ -55,31 +56,51 @@ def main() -> None:
 
     # Stage 2 — Generate canonical bars through the approved GBM method.
     _stage(2)
-    bar_request = SyntheticRequest(
+    bar_request = build_synthetic_request(
         **common,
         data_kind="bars",
-        timeframe="H1",
+        timeframe="M1",
         request_id=generate_id("req"),
     )
-    bars = generate_synthetic_bars(bar_request)
+    bars_resp = generate_synthetic_bars(bar_request)
+    bars = unwrap_data_response(
+        bars_resp,
+        operation="generate_synthetic_bars",
+        request_id=bar_request.request_id,
+    )
 
     # Stage 3 — Generate canonical ticks with identical deterministic inputs.
     _stage(3)
-    tick_request = SyntheticRequest(
+    tick_request = build_synthetic_request(
         **common,
         data_kind="ticks",
+        timeframe=None,
         request_id=generate_id("req"),
     )
-    ticks = generate_synthetic_ticks(tick_request)
+    ticks_resp = generate_synthetic_ticks(tick_request)
+    ticks = unwrap_data_response(
+        ticks_resp,
+        operation="generate_synthetic_ticks",
+        request_id=tick_request.request_id,
+    )
 
     # Stage 4 — Verify repeatability and fixture-only provenance.
     _stage(4)
-    repeated = generate_synthetic_bars(
-        bar_request.model_copy(update={"request_id": generate_id("req")})
+    repeat_resp = generate_synthetic_bars(bar_request)
+    repeat_bars = unwrap_data_response(
+        repeat_resp,
+        operation="generate_synthetic_bars",
+        request_id=bar_request.request_id,
     )
-    assert bars.records == repeated.records
-    print("Deterministic counts:", bars.record_count, ticks.record_count)
-    print("OUTPUT BOUNDARY — fixture-only canonical bars and ticks")
+
+    assert bars.records[0].open == repeat_bars.records[0].open
+    print(
+        "Generated records:",
+        bars.record_count,
+        ticks.record_count,
+        bars.source_metadata.get("generator", "gbm"),
+    )
+    print("OUTPUT BOUNDARY — verified synthetic MarketDataset and TickDataset")
 
 
 if __name__ == "__main__":

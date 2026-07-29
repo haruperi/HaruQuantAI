@@ -1,3 +1,5 @@
+from app.services.data import build_statement_plan, build_transaction_request
+
 """Integration tests for the short-lived Data SQLite boundary."""
 
 import importlib
@@ -6,11 +8,7 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
-from app.services.data import (
-    StatementPlan,
-    TransactionRequest,
-    execute_transaction,
-)
+from app.services.data import execute_transaction
 
 
 def test_database_connection_is_closed_after_committed_result(
@@ -22,8 +20,8 @@ def test_database_connection_is_closed_after_committed_result(
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("SQLITE_BUSY_TIMEOUT_SECONDS", "0.1")
     result = execute_transaction(
-        TransactionRequest(
-            plan=StatementPlan(
+        build_transaction_request(
+            plan=build_statement_plan(
                 statements=("CREATE TABLE evidence (id INTEGER PRIMARY KEY)",),
                 parameter_sets=((),),
                 max_rows=1,
@@ -38,8 +36,10 @@ def test_database_connection_is_closed_after_committed_result(
         connection.execute("INSERT INTO evidence (id) VALUES (?)", (1,))
         connection.commit()
 
-    assert result.committed
-    assert set(type(result).model_fields) == {
+    assert result.status == "success"
+    assert result.data is not None
+    assert result.data.committed
+    assert set(type(result.data).model_fields) == {
         "rows",
         "affected_rows",
         "committed",

@@ -10,8 +10,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
-    JobDefinition,
-    JobStatusRequest,
+    build_job_definition,
+    build_job_status_request,
     create_data_update_job,
     ensure_source,
     get_data_update_job_status,
@@ -19,6 +19,7 @@ from app.services.data import (
     recover_update_jobs,
     run_data_migrations,
     run_data_update_job_once,
+    unwrap_data_response,
 )
 from app.utils import generate_id
 from tests.data.usage.workflows._support import (
@@ -52,16 +53,18 @@ def main() -> None:
         with isolated_runtime(root):
             request_id = generate_id("req")
             run_data_migrations(request_id)
-            (root / "raw").mkdir()
-            (root / "processed").mkdir()
             end = datetime.now(UTC)
 
             # Stage 1 — Validate MT5 source, destination, and stable job identity.
             _stage(1)
             ensure_source("mt5", request_id)
-            seed = get_market_data(market_request("bars", timeframe="M1", limit=1))
-            assert seed.record_count == 1
-            definition = JobDefinition(
+            seed_resp = get_market_data(market_request("bars", timeframe="M1", limit=1))
+            seed = unwrap_data_response(
+                seed_resp, operation="get_market_data", request_id=request_id
+            )
+            assert seed.record_count >= 1
+
+            definition = build_job_definition(
                 job_id="wf-data-007-mt5",
                 source_id="mt5",
                 symbols=("EURUSD",),
@@ -87,22 +90,24 @@ def main() -> None:
             # Stage 4 — Read the persisted checkpoint and status.
             _stage(4)
             status = get_data_update_job_status(
-                JobStatusRequest(
+                build_job_status_request(
                     job_id=definition.job_id, request_id=generate_id("req")
                 )
             )
 
             # Stage 5 — Recover startup state without publishing partial work.
             _stage(5)
-            recovery = recover_update_jobs(generate_id("req"))
+            recovery_resp = recover_update_jobs(generate_id("req"))
+            recovery = unwrap_data_response(
+                recovery_resp, operation="recover_update_jobs", request_id=request_id
+            )
             print(
                 "Job evidence:",
                 created.state,
                 result.state,
                 status.last_checkpoint,
-                recovery.recovery_state
-                if hasattr(recovery, "recovery_state")
-                else "checked",
+                len(recovery),
+                "checked",
             )
     print("OUTPUT BOUNDARY — committed chunks and resumable checkpoint evidence")
 

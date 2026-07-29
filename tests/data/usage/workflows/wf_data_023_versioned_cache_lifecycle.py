@@ -3,19 +3,17 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
-    CacheClearRequest,
-    CacheReadRequest,
-    CacheWriteRequest,
-    DataSettings,
+    build_cache_clear_request,
+    build_cache_read_request,
+    build_cache_write_request,
     clear_cache_entry,
     clear_data_cache,
-    data_settings_context,
     get_cache_entry,
     get_market_data,
     get_source_descriptor,
@@ -24,7 +22,7 @@ from app.services.data import (
     unwrap_data_response,
 )
 from app.utils import generate_id
-from tests.data.usage.workflows._support import market_request
+from tests.data.usage.workflows._support import isolated_runtime, market_request
 
 WORKFLOW_ID = "WF-DATA-023"
 STAGES = (
@@ -56,111 +54,130 @@ def main() -> None:
         "INPUT BOUNDARY — cache identity derived from source revision, versions, and request"
     )
 
-    request = market_request("bars", timeframe="M1", limit=40)
-    response = get_market_data(request)
-    dataset = unwrap_data_response(
-        response,
-        operation="data.usage.workflow.wf_data_023",
-        request_id=response.metadata.request_id,
-    )
-    print(
-        "Dataset:", dataset.symbol, dataset.timeframe, dataset.record_count, "records"
-    )
+    with (
+        tempfile.TemporaryDirectory(prefix="wf-data-023-") as directory,
+        isolated_runtime(Path(directory)),
+    ):
+        request_id = generate_id("req")
 
-    with TemporaryDirectory(prefix="haru-wf-data-023-") as temporary:
-        root = Path(temporary)
-        for relative in ("data/raw", "data/processed", "data/cache", "artifacts/data"):
-            (root / relative).mkdir(parents=True, exist_ok=True)
-        settings = DataSettings(
-            database_url="sqlite:///wf_data_023_cache.sqlite3",
-            data_dir=root,
-            sqlite_busy_timeout_seconds=1,
-            write_lock_lease_seconds=30,
-            approved_storage_roots=(root,),
+        request = market_request("bars", timeframe="M1", limit=40)
+        response = get_market_data(request)
+        dataset = unwrap_data_response(
+            response,
+            operation="data.usage.workflow.wf_data_023",
+            request_id=request_id,
         )
-        with data_settings_context(settings):
-            run_data_migrations(generate_id("req"))
-            request_id = generate_id("req")
+        print(
+            "Dataset:",
+            dataset.symbol,
+            dataset.timeframe,
+            dataset.record_count,
+            "records",
+        )
 
-            # Stage 1 — Derive cache identity from the source descriptor and request dimensions.
-            _stage(1)
-            descriptor = get_source_descriptor(dataset.source_id)
-            _report("source ", "success", descriptor)
-            cache_key = f"{dataset.source_id}-{dataset.symbol}-{dataset.timeframe}-v1"
-            print("Cache key            :", cache_key)
-            print(
-                "Identity components  : source revision, schema version, request dimensions"
-            )
+        run_data_migrations(request_id)
 
-            # Stage 2 — Look up the versioned entry before any source read.
-            _stage(2)
-            miss = get_cache_entry(
-                CacheReadRequest(
-                    key=cache_key,
-                    allow_stale=False,
-                    request_id=request_id,
-                )
-            )
-            _report("lookup ", "success", f"found={miss is not None}")
-            print("Cold lookup is a miss:", miss is None)
+        # Stage 1 — Derive cache identity from the source descriptor and request dimensions.
+        _stage(1)
+        source_id = dataset.source_metadata.get("source_id", "mt5")
+        descriptor_resp = get_source_descriptor(source_id)
+        descriptor = unwrap_data_response(
+            descriptor_resp, operation="get_source_descriptor", request_id=request_id
+        )
+        _report("source ", "success", descriptor)
+        cache_key = f"{source_id}-{dataset.symbol}-{dataset.timeframe}-v1"
+        print("Cache key            :", cache_key)
+        print(
+            "Identity components  : source revision, schema version, request dimensions"
+        )
 
-            # Stage 3 — Store a normalized result after a successful retrieval.
-            _stage(3)
-            written = put_cache_entry(
-                CacheWriteRequest(
-                    key=cache_key,
-                    dataset=dataset,
-                    source_revision="rev-1",
-                    raw_data_hash="wf-data-023-hash",
-                    ttl_seconds=3600,
-                    request_id=request_id,
-                )
+        # Stage 2 — Look up the versioned entry before any source read.
+        _stage(2)
+        miss_resp = get_cache_entry(
+            build_cache_read_request(
+                key=cache_key,
+                allow_stale=False,
+                request_id=request_id,
             )
-            _report("write  ", "success", written)
-            hit = get_cache_entry(
-                CacheReadRequest(
-                    key=cache_key,
-                    allow_stale=False,
-                    request_id=request_id,
-                )
-            )
-            _report("hit    ", "success", f"found={hit is not None}")
+        )
+        miss = unwrap_data_response(
+            miss_resp, operation="get_cache_entry", request_id=request_id
+        )
+        _report("lookup ", "success", f"found={miss is not None}")
+        print("Cold lookup is a miss:", miss is None)
 
-            # Stage 4 — Invalidate one entry when its source revision changes.
-            _stage(4)
-            cleared = clear_cache_entry(
-                CacheClearRequest(
-                    namespace="market_data",
-                    source_id=dataset.source_id,
-                    symbol=dataset.symbol,
-                    dry_run=False,
-                    max_entries=10,
-                    request_id=request_id,
-                )
+        # Stage 3 — Store a normalized result after a successful retrieval.
+        _stage(3)
+        written_resp = put_cache_entry(
+            build_cache_write_request(
+                key=cache_key,
+                dataset=dataset,
+                source_revision="rev-1",
+                raw_data_hash="wf-data-023-hash",
+                ttl_seconds=3600,
+                request_id=request_id,
             )
-            _report("evict  ", "success", cleared)
-            after_evict = get_cache_entry(
-                CacheReadRequest(
-                    key=cache_key,
-                    allow_stale=False,
-                    request_id=request_id,
-                )
+        )
+        written = unwrap_data_response(
+            written_resp, operation="put_cache_entry", request_id=request_id
+        )
+        _report("write  ", "success", written)
+        hit_resp = get_cache_entry(
+            build_cache_read_request(
+                key=cache_key,
+                allow_stale=False,
+                request_id=request_id,
             )
-            _report("recheck", "success", f"found={after_evict is not None}")
-            print("Superseded revision is not served:", after_evict is None)
+        )
+        hit = unwrap_data_response(
+            hit_resp, operation="get_cache_entry", request_id=request_id
+        )
+        _report("hit    ", "success", f"found={hit is not None}")
 
-            # Stage 5 — Clear the whole cache during maintenance or schema migration.
-            _stage(5)
-            purged = clear_data_cache(
-                CacheClearRequest(
-                    namespace="market_data",
-                    dry_run=False,
-                    max_entries=100,
-                    request_id=request_id,
-                )
+        # Stage 4 — Invalidate one entry when its source revision changes.
+        _stage(4)
+        cleared_resp = clear_cache_entry(
+            build_cache_clear_request(
+                namespace="market_data",
+                source_id=source_id,
+                symbol=dataset.symbol,
+                dry_run=False,
+                max_entries=10,
+                request_id=request_id,
             )
-            _report("purge  ", "success", purged)
-            print("Cache-write failure never changes returned records: True")
+        )
+        cleared = unwrap_data_response(
+            cleared_resp, operation="clear_cache_entry", request_id=request_id
+        )
+        _report("evict  ", "success", cleared)
+        after_evict_resp = get_cache_entry(
+            build_cache_read_request(
+                key=cache_key,
+                allow_stale=False,
+                request_id=request_id,
+            )
+        )
+        after_evict = unwrap_data_response(
+            after_evict_resp, operation="get_cache_entry", request_id=request_id
+        )
+        _report("recheck", "success", f"found={after_evict is not None}")
+        print("Superseded revision is not served:", after_evict is None)
+
+        # Stage 5 — Clear the whole cache during maintenance or schema migration.
+        _stage(5)
+        purged_resp = clear_data_cache(
+            build_cache_clear_request(
+                namespace="market_data",
+                dry_run=False,
+                max_entries=100,
+                request_id=request_id,
+            )
+        )
+        purged = unwrap_data_response(
+            purged_resp, operation="clear_data_cache", request_id=request_id
+        )
+        _report("purge  ", "success", purged)
+        print("Cache-write failure never changes returned records: True")
 
     print(
         "\nOUTPUT BOUNDARY — cache hit, miss, or explicit invalidation with no stale record served"

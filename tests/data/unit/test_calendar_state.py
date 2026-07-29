@@ -72,42 +72,55 @@ def _event(symbol: str, *, delta: timedelta, impact: EventImpact) -> EconomicEve
     )
 
 
+from app.services.data.contracts.responses import unwrap_data_response
+
+
+def _unwrap(response):
+    return unwrap_data_response(
+        response,
+        operation="data.economic_calendar.test",
+        request_id="req-00000000-0000-4000-8000-000000000000",
+    )
+
+
 def test_derive_calendar_state_blackout_before_writes_provenance_keys() -> None:
     """Derivation returns the canonical state and the two provenance strings."""
     events = [_event("EURUSD", delta=timedelta(minutes=5), impact=EventImpact.HIGH)]
-    derived = derive_calendar_state(
-        "EURUSD", _NOW, events=events, before_minutes=10, after_minutes=10
+    derived = _unwrap(
+        derive_calendar_state(
+            "EURUSD", _NOW, events=events, before_minutes=10, after_minutes=10
+        )
     )
     assert derived.calendar_state == CALENDAR_STATE_BLACKOUT_BEFORE
     assert derived.event_count == 1
     assert derived.blackout_before_minutes == 10
     assert derived.blackout_after_minutes == 10
-    prov = calendar_state_provenance(derived)
+    prov = _unwrap(calendar_state_provenance(derived))
     assert prov == {"blackout_before_minutes": "10", "blackout_after_minutes": "10"}
 
 
 def test_derive_calendar_state_unknown_symbol_raises() -> None:
     """Unregistered symbols fail closed."""
     with pytest.raises(DataError):
-        derive_calendar_state("NOTREAL", _NOW, events=[])
+        _unwrap(derive_calendar_state("NOTREAL", _NOW, events=[]))
 
 
 def test_derive_calendar_state_empty_events_returns_open() -> None:
     """A successful empty event set proves that the calendar is open."""
-    derived = derive_calendar_state("EURUSD", _NOW, events=[])
+    derived = _unwrap(derive_calendar_state("EURUSD", _NOW, events=[]))
     assert derived.calendar_state == CALENDAR_STATE_OPEN
 
 
 def test_derive_calendar_state_missing_events_returns_unknown() -> None:
     """Absent acquisition evidence preserves Risk's missing-evidence policy."""
-    derived = derive_calendar_state("EURUSD", _NOW, events=None)
+    derived = _unwrap(derive_calendar_state("EURUSD", _NOW, events=None))
     assert derived.calendar_state == CALENDAR_STATE_UNKNOWN
 
 
 def test_default_minimum_impact_filters_low_events_by_default() -> None:
     """Default minimum impact is HIGH; a LOW event yields open."""
     events = [_event("EURUSD", delta=timedelta(minutes=5), impact=EventImpact.LOW)]
-    derived = derive_calendar_state("EURUSD", _NOW, events=events)
+    derived = _unwrap(derive_calendar_state("EURUSD", _NOW, events=events))
     assert derived.calendar_state == CALENDAR_STATE_OPEN
     assert DEFAULT_MINIMUM_IMPACT is EventImpact.HIGH
 
@@ -116,8 +129,10 @@ def test_populate_market_context_calendar_blocks_before_release() -> None:
     """Populating evidence carries the canonical state and merged provenance."""
     evidence = _evidence()
     events = [_event("EURUSD", delta=timedelta(minutes=5), impact=EventImpact.HIGH)]
-    new_evidence = populate_market_context_calendar(
-        evidence, events=events, before_minutes=10, after_minutes=10
+    new_evidence = _unwrap(
+        populate_market_context_calendar(
+            evidence, events=events, before_minutes=10, after_minutes=10
+        )
     )
     assert new_evidence.calendar_state == CALENDAR_STATE_BLACKOUT_BEFORE
     assert new_evidence.provenance["blackout_before_minutes"] == "10"
@@ -133,7 +148,7 @@ def test_populate_market_context_calendar_blocks_before_release() -> None:
 def test_populate_market_context_calendar_unknown_removes_no_missing_flag() -> None:
     """``unknown`` keeps calendar in Risk's explicit missing-field evidence."""
     evidence = _evidence()
-    new_evidence = populate_market_context_calendar(evidence, events=None)
+    new_evidence = _unwrap(populate_market_context_calendar(evidence, events=None))
     assert new_evidence.calendar_state == CALENDAR_STATE_UNKNOWN
     assert "calendar" in new_evidence.missing_fields
     assert new_evidence.provenance["blackout_before_minutes"] == "10"
@@ -163,7 +178,9 @@ def test_populate_market_context_events_irrelevant_to_symbol_do_not_block() -> N
         source_url=None,
         updated_at=None,
     )
-    new_evidence = populate_market_context_calendar(evidence, events=[gbp_event])
+    new_evidence = _unwrap(
+        populate_market_context_calendar(evidence, events=[gbp_event])
+    )
     assert new_evidence.calendar_state == CALENDAR_STATE_OPEN
 
 
@@ -171,5 +188,5 @@ def test_calendar_state_event_when_at_release_instant() -> None:
     """An event exactly at the release instant yields the event state."""
     evidence = _evidence(symbol="XAUUSD")
     events = [_event("XAUUSD", delta=timedelta(0), impact=EventImpact.HIGH)]
-    new_evidence = populate_market_context_calendar(evidence, events=events)
+    new_evidence = _unwrap(populate_market_context_calendar(evidence, events=events))
     assert new_evidence.calendar_state == CALENDAR_STATE_EVENT

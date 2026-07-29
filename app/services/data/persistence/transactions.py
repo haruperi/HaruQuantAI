@@ -91,7 +91,8 @@ def _load_database_config(settings: DataSettings, request_id: str) -> _DatabaseC
     logger.debug("Running DATA function: _load_database_config")
     try:
         return _parse_database_config(settings)
-    except OSError, ValueError:
+    except (OSError, ValueError) as exc:
+        logger.error("Database config parsing failed: %s", exc)
         raise _error("DB_CONNECTION_ERROR", request_id, "configuration") from None
 
 

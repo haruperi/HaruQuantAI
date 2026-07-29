@@ -28,9 +28,11 @@ def test_lock_release_persists_inactive_owner_evidence(
     database_path = _configure_locking(monkeypatch, tmp_path)
     target = tmp_path / "boundary.parquet"
 
-    with acquire_write_lock(
+    res = acquire_write_lock(
         target, "req-f345724aceae43e57c079d73e9f8e2f1352a047206a57df885838faef26d6bd9"
-    ) as lock:
+    )
+    assert res.status == "success" and res.data is not None
+    with res.data as lock:
         assert lock.expires_at_ns > 0
 
     with closing(sqlite3.connect(database_path, autocommit=True)) as connection:

@@ -197,6 +197,9 @@ def _fetch_backfill_data(request: BackfillChunkRequest) -> MarketDataset:
     try:
         return _fetch_market_dataset_raw(market_request)
     except DataError as error:
+        logger.error(
+            "Backfill fetch failed: code=%s details=%s", error.code, error.safe_details
+        )
         _execute_transaction_raw(
             TransactionRequest(
                 plan=StatementPlan(

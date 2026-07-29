@@ -12,10 +12,11 @@ from unittest.mock import MagicMock
 
 import pytest
 from app.services.brokers import (
-    BrokerCapabilityId,
-    BrokerEnvironment,
-    BrokerId,
-    BrokerTradingSession,
+    build_broker_value,
+    get_broker_capability_id,
+    get_broker_environment,
+    get_broker_id,
+    get_broker_value_field,
 )
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import unwrap_data_response
@@ -32,7 +33,8 @@ from app.services.data.sources.registry import (
     register_source,
     resolve_source_identity,
 )
-from app.utils import StandardResponse, generate_id
+from app.utils import generate_id
+from app.utils.responses.models import StandardResponse
 from pydantic import SecretStr
 
 from tests.brokers.response_factory import broker_response
@@ -88,13 +90,14 @@ def test_ensure_source_registers_mt5_without_connecting(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Source composition remains lazy until a provider read resolves it."""
+    monkeypatch.setenv("MT5_ENABLED", "true")
     monkeypatch.setattr(
         _runtime._LazyBrokerSession,
         "adapter",
         lambda *_args: pytest.fail("adapter connected during registration"),
     )
 
-    _runtime.ensure_source("mt5", generate_id("req"))
+    _unwrap(_runtime.ensure_source("mt5", generate_id("req")))
 
     descriptor = _unwrap(get_source_descriptor("mt5"))
     assert descriptor.readiness == "staging"
@@ -106,13 +109,14 @@ def test_ensure_source_registers_ctrader_session_capability_without_connecting(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """cTrader advertises the Brokers-owned read-only session capability."""
+    monkeypatch.setenv("CTRADER_ENABLED", "true")
     monkeypatch.setattr(
         _runtime._LazyBrokerSession,
         "adapter",
         lambda *_args: pytest.fail("adapter connected during registration"),
     )
 
-    _runtime.ensure_source("ctrader", generate_id("req"))
+    _unwrap(_runtime.ensure_source("ctrader", generate_id("req")))
 
     descriptor = _unwrap(get_source_descriptor("ctrader"))
     assert descriptor.capabilities == ("bars", "ticks", "spreads", "sessions")
@@ -161,6 +165,7 @@ def test_ensure_source_access_connects_with_the_call_request_id(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Provider connection errors retain the public caller's request identity."""
+    monkeypatch.setenv("MT5_ENABLED", "true")
     request_id = generate_id("req")
     captured: list[str] = []
 
@@ -170,7 +175,7 @@ def test_ensure_source_access_connects_with_the_call_request_id(
 
     monkeypatch.setattr(_runtime._LazyBrokerSession, "adapter", adapter)
 
-    _runtime.ensure_source_access("mt5", request_id)
+    _unwrap(_runtime.ensure_source_access("mt5", request_id))
 
     assert captured == [request_id]
 
@@ -200,7 +205,7 @@ def test_lazy_mt5_session_builds_connects_and_caches_adapter(
         ),
     )
 
-    def create(broker_id: BrokerId, config: object) -> SimpleNamespace:
+    def create(broker_id: object, config: object) -> SimpleNamespace:
         captured["broker_id"] = broker_id
         captured["config"] = config
         return SimpleNamespace(error=None, data=adapter)
@@ -210,8 +215,10 @@ def test_lazy_mt5_session_builds_connects_and_caches_adapter(
 
     assert session.adapter(request_id) is adapter
     assert session.adapter(request_id) is adapter
-    assert captured["broker_id"] == BrokerId.MT5
-    assert captured["config"].environment == BrokerEnvironment.DEMO
+    assert captured["broker_id"] == get_broker_id("mt5")
+    assert get_broker_value_field(
+        captured["config"], "environment"
+    ) == get_broker_environment("demo")
 
 
 def test_lazy_yahoo_session_uses_sandbox_and_explicit_probe(
@@ -227,7 +234,7 @@ def test_lazy_yahoo_session_uses_sandbox_and_explicit_probe(
     adapter = _Adapter()
     captured: dict[str, Any] = {}
 
-    def create(broker_id: BrokerId, config: object) -> SimpleNamespace:
+    def create(broker_id: object, config: object) -> SimpleNamespace:
         captured["broker_id"] = broker_id
         captured["config"] = config
         return SimpleNamespace(error=None, data=adapter)
@@ -236,9 +243,11 @@ def test_lazy_yahoo_session_uses_sandbox_and_explicit_probe(
     session = _runtime._LazyBrokerSession("yahoo")
 
     assert session._credential_free_adapter(request_id) is adapter
-    assert captured["broker_id"] == BrokerId.YAHOO
-    assert captured["config"].environment == BrokerEnvironment.SANDBOX
-    assert captured["config"].probe_symbol == "AAPL"
+    assert captured["broker_id"] == get_broker_id("yahoo")
+    assert get_broker_value_field(
+        captured["config"], "environment"
+    ) == get_broker_environment("sandbox")
+    assert get_broker_value_field(captured["config"], "probe_symbol") == "AAPL"
 
 
 def test_lazy_binance_session_uses_one_loop_and_anonymous_live_profile(
@@ -266,7 +275,7 @@ def test_lazy_binance_session_uses_one_loop_and_anonymous_live_profile(
     adapter = _Adapter()
     captured: dict[str, Any] = {}
 
-    def create(broker_id: BrokerId, config: object) -> SimpleNamespace:
+    def create(broker_id: object, config: object) -> SimpleNamespace:
         captured["broker_id"] = broker_id
         captured["config"] = config
         return SimpleNamespace(error=None, data=adapter)
@@ -275,9 +284,11 @@ def test_lazy_binance_session_uses_one_loop_and_anonymous_live_profile(
     session = _runtime._LazyBrokerSession("binance_spot")
 
     assert session._credential_free_adapter(request_id) is adapter
-    assert captured["broker_id"] == BrokerId.BINANCE_SPOT
-    assert captured["config"].environment == BrokerEnvironment.LIVE
-    assert captured["config"].credentials is None
+    assert captured["broker_id"] == get_broker_id("binance_spot")
+    assert get_broker_value_field(
+        captured["config"], "environment"
+    ) == get_broker_environment("live")
+    assert get_broker_value_field(captured["config"], "credentials") is None
     assert _runtime._provider_descriptor("binance_spot").requires_credentials is False
     assert adapter.events == []
 
@@ -425,7 +436,8 @@ def test_ensure_storage_runs_migrations_once_per_target(
 def test_broker_calendar_maps_authoritative_sessions() -> None:
     """Provider sessions become normalized Data schedule windows."""
     observed_at = datetime(2026, 7, 1, tzinfo=UTC)
-    provider_session = BrokerTradingSession(
+    provider_session = build_broker_value(
+        "trading_session",
         symbol="EURUSD",
         opens_at=observed_at,
         closes_at=observed_at + timedelta(hours=8),
@@ -438,14 +450,14 @@ def test_broker_calendar_maps_authoritative_sessions() -> None:
             symbol: str,
             start: datetime,
             end: datetime,
-        ) -> StandardResponse[tuple[BrokerTradingSession, ...]]:
+        ) -> StandardResponse[object]:
             del symbol, start, end
             return broker_response(
-                BrokerCapabilityId.GET_TRADING_SESSIONS,
-                broker=BrokerId.MT5,
+                get_broker_capability_id("get_trading_sessions"),
+                broker=get_broker_id("mt5"),
                 request_id=generate_id("req"),
                 timestamp=observed_at,
-                environment=BrokerEnvironment.DEMO,
+                environment=get_broker_environment("demo"),
                 adapter_version="1.0.0",
                 data=(provider_session,),
             )

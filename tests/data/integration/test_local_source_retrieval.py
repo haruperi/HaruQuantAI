@@ -15,12 +15,9 @@ from pathlib import Path
 
 import pytest
 from app.services.data import (
-    DataError,
-    DatasetLoadRequest,
-    DataSettings,
-    MarketDataset,
-    OHLCVRecord,
-    SourceReadRequest,
+    build_data_settings,
+    build_ohlcv_record,
+    build_source_read_request,
     data_settings_context,
     ensure_source,
     list_composable_sources,
@@ -50,7 +47,7 @@ def isolated_runtime(monkeypatch: pytest.MonkeyPatch) -> None:
 def _bar(index: int) -> OHLCVRecord:
     """Return one canonical bar offset by whole minutes from the window start."""
     timestamp = _START + timedelta(minutes=index)
-    return OHLCVRecord(
+    return build_ohlcv_record(
         timestamp=timestamp,
         open=Decimal("1.1000"),
         high=Decimal("1.1010"),
@@ -68,7 +65,7 @@ def _bar(index: int) -> OHLCVRecord:
 
 def _settings(tmp_path: Path) -> DataSettings:
     """Return settings rooting local composition at a temporary data directory."""
-    return DataSettings(
+    return build_data_settings(
         database_url=f"sqlite:///{tmp_path / 'data.db'}",
         data_dir=tmp_path,
         data_local_sources=("csv",),
@@ -110,11 +107,17 @@ def test_local_source_composes_without_credentials_or_network(
 ) -> None:
     """A configured local source is reachable with no provider dependency."""
     with data_settings_context(_settings(tmp_path)):
-        ensure_source("csv", generate_id("req"))
-        source = resolve_source("csv")
+        ensure_res = ensure_source("csv", generate_id("req"))
+        assert ensure_res.status == "success"
+        source_res = resolve_source("csv")
+        assert source_res.status == "success" and source_res.data is not None
+        source = source_res.data
+        sources_res = list_composable_sources()
+        assert sources_res.status == "success" and sources_res.data is not None
+        sources = sources_res.data
 
     assert source is not None
-    assert "csv" in list_composable_sources()
+    assert "csv" in sources
 
 
 def test_local_source_reads_only_the_requested_window(
@@ -139,8 +142,10 @@ def test_local_source_reads_only_the_requested_window(
     with data_settings_context(_settings(tmp_path)):
         request_id = generate_id("req")
         ensure_source("csv", request_id)
-        batch = resolve_source("csv").fetch(
-            SourceReadRequest(
+        source_res = resolve_source("csv")
+        assert source_res.status == "success" and source_res.data is not None
+        batch_res = source_res.data.fetch(
+            build_source_read_request(
                 source_id="csv",
                 provider_symbol=_SYMBOL,
                 data_kind="bars",
@@ -151,6 +156,8 @@ def test_local_source_reads_only_the_requested_window(
                 request_id=request_id,
             )
         )
+        assert batch_res.status == "success", f"fetch failed: {batch_res.error}"
+        batch = batch_res.data
 
     timestamps = [record["timestamp"] for record in batch.records]
     assert len(timestamps) == 3
@@ -183,10 +190,12 @@ def test_two_timeframes_for_one_symbol_are_independently_addressable(
 
     with data_settings_context(_settings(tmp_path)):
         ensure_source("csv", generate_id("req"))
-        source = resolve_source("csv")
+        source_res = resolve_source("csv")
+        assert source_res.status == "success" and source_res.data is not None
+        source = source_res.data
         for timeframe in ("1m", "1h"):
             source.fetch(
-                SourceReadRequest(
+                build_source_read_request(
                     source_id="csv",
                     provider_symbol=_SYMBOL,
                     data_kind="bars",
@@ -204,7 +213,8 @@ def test_two_timeframes_for_one_symbol_are_independently_addressable(
 
 def test_unsupported_source_identifier_fails_before_policy(tmp_path: Path) -> None:
     """An identifier outside the configured set never reaches source policy."""
-    with data_settings_context(_settings(tmp_path)), pytest.raises(DataError) as error:
-        ensure_source("not-configured-source", generate_id("req"))
+    with data_settings_context(_settings(tmp_path)):
+        res = ensure_source("not-configured-source", generate_id("req"))
 
-    assert error.value.code == "UNSUPPORTED_SOURCE"
+    assert res.status == "error" and res.error is not None
+    assert res.error.code == "UNSUPPORTED_SOURCE"

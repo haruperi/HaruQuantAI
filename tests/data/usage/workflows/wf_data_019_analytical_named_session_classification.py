@@ -3,17 +3,19 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
-    ActiveMarketSessionsRequest,
+    build_active_market_sessions_request,
     get_active_market_sessions,
     get_market_data,
+    unwrap_data_response,
 )
 from app.utils import generate_id
-from tests.data.usage.workflows._support import market_request
+from tests.data.usage.workflows._support import isolated_runtime, market_request
 
 WORKFLOW_ID = "WF-DATA-019"
 STAGES = (
@@ -36,26 +38,38 @@ def main() -> None:
     print(f"{WORKFLOW_ID} — Analytical Named-Session Classification")
     print("INPUT BOUNDARY — exact symbol and genuine aware UTC instant")
 
-    # Stage 1 — Retrieve a genuine MT5 observation timestamp.
-    _stage(1)
-    bars = get_market_data(market_request("bars", timeframe="M1", limit=1))
+    with (
+        tempfile.TemporaryDirectory(prefix="wf-data-019-") as directory,
+        isolated_runtime(Path(directory)),
+    ):
+        request_id = generate_id("req")
 
-    # Stage 2 — Submit the exact symbol and aware UTC instant.
-    _stage(2)
-    request = ActiveMarketSessionsRequest(
-        symbol=bars.symbol,
-        at=bars.records[-1].timestamp,
-        request_id=generate_id("req"),
-    )
+        # Stage 1 — Retrieve a genuine MT5 observation timestamp.
+        _stage(1)
+        bars_resp = get_market_data(market_request("bars", timeframe="M1", limit=1))
+        bars = unwrap_data_response(
+            bars_resp, operation="get_market_data", request_id=request_id
+        )
 
-    # Stage 3 — Classify regional sessions with DST-aware definitions.
-    _stage(3)
-    sessions = get_active_market_sessions(request)
+        # Stage 2 — Submit the exact symbol and aware UTC instant.
+        _stage(2)
+        request = build_active_market_sessions_request(
+            symbol=bars.symbol,
+            at=bars.records[-1].timestamp,
+            request_id=request_id,
+        )
 
-    # Stage 4 — Return labels structurally separated from tradability.
-    _stage(4)
-    assert not hasattr(sessions, "is_open")
-    print("Analytical labels:", sessions.sessions)
+        # Stage 3 — Classify regional sessions with DST-aware definitions.
+        _stage(3)
+        sessions_resp = get_active_market_sessions(request)
+        sessions = unwrap_data_response(
+            sessions_resp, operation="get_active_market_sessions", request_id=request_id
+        )
+
+        # Stage 4 — Return labels structurally separated from tradability.
+        _stage(4)
+        assert not hasattr(sessions, "is_open")
+        print("Analytical labels:", sessions.sessions)
     print("OUTPUT BOUNDARY — DST-aware liquidity labels with no trading authority")
 
 

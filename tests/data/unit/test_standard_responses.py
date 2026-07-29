@@ -26,10 +26,8 @@ from app.services.data.contracts.responses import (
     run_data_operation_async,
     unwrap_data_response,
 )
-from app.utils import (
-    StandardResponse,
-    generate_id,
-)
+from app.utils import generate_id
+from app.utils.responses.models import StandardResponse
 
 _OPERATION = "data.quality.get_quality_policy"
 _REQ = "req-11111111-1111-4111-8111-111111111111"
@@ -178,7 +176,9 @@ def test_static_traits_match_operation_registry() -> None:
         start_time=data_start_time(),
         data=None,
     ).metadata
-    assert meta.risk_level.value == traits.risk_level.value
+    assert meta.risk_level.value == getattr(
+        traits.risk_level, "value", str(traits.risk_level)
+    )
     assert meta.read_only is traits.read_only
     assert meta.writes_file is traits.writes_file
     assert meta.modifies_database is traits.modifies_database
@@ -240,7 +240,9 @@ def test_every_current_data_code_appears_exactly_once() -> None:
 
 def test_unapproved_code_is_rejected() -> None:
     """A code absent from the catalogue fails validation at the factory."""
-    from app.utils import ResponseMetadata, ValidationError, error_response
+    from app.utils.errors.exceptions import ValidationError
+    from app.utils.responses.factories import error_response
+    from app.utils.responses.models import ResponseMetadata
 
     metadata = ResponseMetadata(
         name=_OPERATION,
@@ -267,7 +269,9 @@ def test_unapproved_code_is_rejected() -> None:
 
 def test_manifest_uses_utils_owned_error_definition_with_data_domain() -> None:
     """The manifest uses the Utils-owned contract and stamps ``domain='data'``."""
-    from app.utils import ErrorDefinition as UtilsErrorDefinition
+    from app.services.data.contracts.errors import (
+        ErrorDefinition as UtilsErrorDefinition,
+    )
 
     for definition in DATA_ERROR_MANIFEST.values():
         assert isinstance(definition, UtilsErrorDefinition)

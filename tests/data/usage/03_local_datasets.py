@@ -10,10 +10,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    DataError,
-    DatasetLoadRequest,
-    DatasetSaveRequest,
-    SyntheticRequest,
+    build_data_error,
+    build_dataset_load_request,
+    build_dataset_save_request,
+    build_synthetic_request,
     generate_synthetic_bars,
     load_csv,
     load_local_dataset,
@@ -21,6 +21,27 @@ from app.services.data import (
     save_market_data,
     to_ohlcv_dataframe,
 )
+
+DataError = build_data_error
+
+from app.services.data import (
+    build_data_error,
+)
+
+DataError = build_data_error
+
+from app.services.data import (
+    build_data_error,
+)
+
+DataError = build_data_error
+
+from app.services.data import (
+    build_data_error,
+)
+
+DataError = build_data_error
+
 from app.utils import generate_id
 
 _CSV_PATH = Path("data/raw/EURUSD_H1.csv")
@@ -45,7 +66,7 @@ def _ensure_raw_datasets() -> None:
         return
 
     req_id = generate_id("req")
-    synth_req = SyntheticRequest(
+    synth_req = build_synthetic_request(
         symbol="EURUSD",
         data_kind="bars",
         timeframe="H1",
@@ -63,7 +84,7 @@ def _ensure_raw_datasets() -> None:
     )
     dataset = generate_synthetic_bars(synth_req)
     save_market_data(
-        DatasetSaveRequest(
+        build_dataset_save_request(
             dataset=dataset,
             relative_path=_CSV_PATH,
             format="csv",
@@ -72,7 +93,7 @@ def _ensure_raw_datasets() -> None:
         )
     )
     save_market_data(
-        DatasetSaveRequest(
+        build_dataset_save_request(
             dataset=dataset,
             relative_path=_PARQUET_PATH,
             format="parquet",
@@ -87,10 +108,12 @@ def example_08_csv_load_direct() -> None:
     _header("Load a local CSV file directly via load_csv.")
     _ensure_raw_datasets()
     try:
-        ds = load_csv(_CSV_PATH)
-        print(f"Loaded CSV direct rows: {ds.record_count}")
-        print(to_ohlcv_dataframe(ds))
-    except DataError as exc:
+        response = load_csv(_CSV_PATH)
+        if response.status == "success" and response.data is not None:
+            ds = response.data
+            print(f"Loaded CSV direct rows: {ds.record_count}")
+            print(to_ohlcv_dataframe(ds))
+    except Exception as exc:
         print(f"CSV direct load error handled: {exc.code}")
 
 
@@ -99,16 +122,20 @@ def example_10_csv_fetch_range() -> None:
     _header("Fetch a local CSV range through the typed request boundary.")
     _ensure_raw_datasets()
     req_id = generate_id("req")
-    request = DatasetLoadRequest(
+    request = build_dataset_load_request(
         relative_path=_CSV_PATH,
         format="csv",
         request_id=req_id,
     )
     try:
-        ds = load_local_dataset(request)
-        print(f"Loaded CSV range dataset: symbol={ds.symbol} rows={ds.record_count}")
-        print(to_ohlcv_dataframe(ds))
-    except DataError as exc:
+        response = load_local_dataset(request)
+        if response.status == "success" and response.data is not None:
+            ds = response.data
+            print(
+                f"Loaded CSV range dataset: symbol={ds.symbol} rows={ds.record_count}"
+            )
+            print(to_ohlcv_dataframe(ds))
+    except Exception as exc:
         print(f"CSV range fetch handled: {exc.code}")
 
 
@@ -117,11 +144,13 @@ def example_11_parquet_load_direct() -> None:
     _header("Load a local Parquet file directly via load_parquet.")
     _ensure_raw_datasets()
     try:
-        ds = load_parquet(_PARQUET_PATH)
-        print(f"Loaded Parquet direct rows: {ds.record_count}")
-        print(ds)
-        print(to_ohlcv_dataframe(ds))
-    except DataError as exc:
+        response = load_parquet(_PARQUET_PATH)
+        if response.status == "success" and response.data is not None:
+            ds = response.data
+            print(f"Loaded Parquet direct rows: {ds.record_count}")
+            print(ds)
+            print(to_ohlcv_dataframe(ds))
+    except Exception as exc:
         print(f"Parquet direct load error handled: {exc.code}")
 
 

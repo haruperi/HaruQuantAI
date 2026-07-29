@@ -1,3 +1,10 @@
+from app.services.data import (
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
+    build_source_license_policy,
+)
+
 """Contract builders bound to the new ``models`` package.
 
 ``CAP-DATA-026`` Phase 2 exposed a coexistence hazard that Phase 1 could not: while
@@ -13,15 +20,8 @@ helper in Phase 11, when the legacy package is deleted.
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data.contracts import (
-    DataQualityReport,
-    MarketDataset,
-    OHLCVRecord,
-)
-from app.services.data.sources.contracts import (
-    SourceLicensePolicy,
-)
 from app.utils import create_audit_event, generate_id
+from app.utils.contracts.audit import AuditEvent
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 END = START + timedelta(minutes=1)
@@ -30,7 +30,7 @@ AVAILABLE = END + timedelta(seconds=1)
 
 def make_license() -> SourceLicensePolicy:
     """Return an approved research license contract."""
-    return SourceLicensePolicy(
+    return build_source_license_policy(
         source_id="fixture",
         status="approved",
         permitted_workflows=("research",),
@@ -41,7 +41,7 @@ def make_license() -> SourceLicensePolicy:
 
 def make_bar(*, timestamp: datetime = START) -> OHLCVRecord:
     """Return one exact canonical OHLCV record."""
-    return OHLCVRecord(
+    return build_ohlcv_record(
         timestamp=timestamp,
         open=Decimal("10.0"),
         high=Decimal("11.0"),
@@ -59,7 +59,7 @@ def make_bar(*, timestamp: datetime = START) -> OHLCVRecord:
 
 def make_quality(*, count: int = 1) -> DataQualityReport:
     """Return passing bounded quality evidence."""
-    return DataQualityReport(
+    return build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
         issues=(),
@@ -76,7 +76,7 @@ def make_quality(*, count: int = 1) -> DataQualityReport:
 def make_dataset() -> MarketDataset:
     """Return one immutable provider-neutral market dataset."""
     bar = make_bar()
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="bars",
         symbol="ABC",
@@ -96,7 +96,7 @@ def make_dataset() -> MarketDataset:
     )
 
 
-def make_audit_event(*, timestamp: datetime = START):
+def make_audit_event(*, timestamp: datetime = START) -> AuditEvent:
     """Return one valid Utils-owned audit event."""
     return create_audit_event(
         contract_version="v1",

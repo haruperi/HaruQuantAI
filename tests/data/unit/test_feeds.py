@@ -18,7 +18,6 @@ from app.services.data.realtime_feeds.heartbeat import (
     touch_heartbeat,
 )
 from app.services.data.realtime_feeds.state import _ACTIVE_FEEDS, ActiveFeed
-from app.services.data.sources import registry
 from app.utils import generate_id
 
 _NOW = datetime(2026, 1, 1, 12, tzinfo=UTC)
@@ -80,8 +79,7 @@ def _isolated_feed_state(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(buffer, "_persist_feed_status", lambda *_args: None)
     monkeypatch.setattr(reconnection, "_persist_feed_status", lambda *_args: None)
     monkeypatch.setattr(
-        registry,
-        "get_source_descriptor",
+        "app.services.data.sources.registry._get_source_descriptor_raw",
         lambda _source_id: SimpleNamespace(
             readiness="production",
             capabilities=("ticks",),

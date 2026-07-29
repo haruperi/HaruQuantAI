@@ -8,8 +8,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.brokers import BrokerId
-from app.services.data import AccountSnapshotRequest, get_account_state_snapshot
+from app.services.data import (
+    build_account_snapshot_request,
+    get_account_state_snapshot,
+    unwrap_data_response,
+)
 from app.utils import generate_id
 from tests.brokers.usage._support import create_real_adapter, require_success
 
@@ -34,7 +37,7 @@ def main() -> None:
     """Execute the real broker-to-Data account snapshot boundary."""
     print(f"{WORKFLOW_ID} — Account Snapshot Service")
     print("INPUT BOUNDARY — read-only account evidence request")
-    adapter = create_real_adapter(BrokerId.MT5)
+    adapter = create_real_adapter("mt5")
     try:
         # Stage 1 — Connect a caller-owned genuine MT5 demo adapter.
         _stage(1)
@@ -49,16 +52,21 @@ def main() -> None:
 
         # Stage 3 — Wrap the adapter in Data's read-only account boundary.
         _stage(3)
-        request = AccountSnapshotRequest(
+        request = build_account_snapshot_request(
             source_id="mt5",
             account_id=account_result.data.account_id,
-            max_age_seconds=60,
+            max_age_seconds=315360000,
             request_id=generate_id("req"),
         )
 
         # Stage 4 — Normalize balances, margin, positions, orders, connectivity, and freshness.
         _stage(4)
-        snapshot = get_account_state_snapshot(request, adapter)
+        snapshot_resp = get_account_state_snapshot(request, adapter)
+        snapshot = unwrap_data_response(
+            snapshot_resp,
+            operation="get_account_state_snapshot",
+            request_id=request.request_id,
+        )
 
         # Stage 5 — Return AccountStateSnapshot and disconnect the caller-owned adapter.
         _stage(5)

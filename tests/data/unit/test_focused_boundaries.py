@@ -7,25 +7,21 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
-from app.services.data import (
-    DataError,
-    FeedConfig,
-    MarketSchedule,
-    ReconnectPolicy,
-    SessionWindow,
-    SymbolMetadata,
-    SyntheticRequest,
-)
+from app.services.data.contracts import DataError
 from app.services.data.economic_calendar.normalization import (
     normalize_calendar_number,
 )
 from app.services.data.economic_calendar.parsing import parse_calendar_row
 from app.services.data.evidence.freshness import is_fresh
+from app.services.data.market_data.symbol_metadata import SymbolMetadata
 from app.services.data.quality.asset_metadata import validate_symbol_metadata
+from app.services.data.realtime_feeds.contracts import FeedConfig, ReconnectPolicy
 from app.services.data.realtime_feeds.state import _restore_active_feed
+from app.services.data.synthetic_data.contracts import SyntheticRequest
 from app.services.data.synthetic_data.provenance import SYNTHETIC_SOURCE
 from app.services.data.synthetic_data.randomness import require_seed
 from app.services.data.time_sessions import schedule
+from app.services.data.time_sessions.contracts import MarketSchedule, SessionWindow
 from app.utils import generate_id
 
 _NOW = datetime(2026, 7, 23, 12, tzinfo=UTC)

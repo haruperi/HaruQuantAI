@@ -10,16 +10,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    AccountSnapshotRequest,
-    DataError,
-    FXConversionRequest,
-    FXRateLeg,
-    MarketContextEvidence,
-    MarketContextRequest,
+    build_account_snapshot_request,
+    build_fx_conversion_request,
+    build_fx_rate_leg,
+    build_market_context_evidence,
+    build_market_context_request,
     get_account_state_snapshot,
     get_fx_conversion_evidence,
     get_market_context_evidence,
+    unwrap_data_response,
 )
+from app.services.data.contracts.errors import DataError
 from app.utils import generate_id
 
 _AS_OF = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
@@ -30,11 +31,11 @@ class _ContextProvider:
 
     def get_market_context(
         self,
-        request: MarketContextRequest,
-    ) -> MarketContextEvidence:
+        request: object,
+    ) -> object:
         """Return complete fresh evidence for the exact request."""
-        return MarketContextEvidence(
-            symbol=request.symbol,
+        return build_market_context_evidence(
+            symbol=getattr(request, "symbol", "EURUSD"),
             session_state="open",
             calendar_state="clear",
             spread=Decimal("0.0002"),
@@ -43,12 +44,12 @@ class _ContextProvider:
             volatility=Decimal("0.01"),
             correlations={},
             crisis_flags=(),
-            timezone=request.timezone,
-            as_of=request.as_of,
-            expires_at=request.as_of + timedelta(minutes=5),
+            timezone=getattr(request, "timezone", "UTC"),
+            as_of=getattr(request, "as_of", _AS_OF),
+            expires_at=getattr(request, "as_of", _AS_OF) + timedelta(minutes=5),
             provenance={"source": "usage-fixture"},
             missing_fields=(),
-            request_id=request.request_id,
+            request_id=getattr(request, "request_id", generate_id("req")),
         )
 
 
@@ -62,17 +63,17 @@ class _FXProvider:
         target_currency: str,
         as_of: datetime,
         request_id: str,
-    ) -> FXRateLeg:
+    ) -> object:
         """Return one exact direct rate leg."""
         del request_id
-        return FXRateLeg(
+        return build_fx_rate_leg(
             source_currency=source_currency,
             target_currency=target_currency,
-            rate=Decimal("1.10"),
-            source_id="usage-fixture",
+            rate=Decimal("1.0850"),
+            source_id="usage-fx",
             provider_symbol=f"{source_currency}{target_currency}",
-            as_of=as_of - timedelta(seconds=1),
-            provenance={"quote": "declared-fixture"},
+            as_of=as_of,
+            provenance={"source": "usage-fixture"},
         )
 
 
@@ -82,42 +83,62 @@ def _header(title: str) -> None:
 
 
 def _demonstrate_feature() -> None:
-    """Call every FEAT-DATA-09 public evidence operation."""
-    context_request = MarketContextRequest(
-        symbol="EURUSD",
-        as_of=_AS_OF,
-        max_age_seconds=60,
-        requested_evidence=("session", "calendar", "spread", "liquidity"),
-        timezone="UTC",
-        request_id=generate_id("req"),
-    )
-    context = get_market_context_evidence(context_request, _ContextProvider())
-    print("get_market_context_evidence:", context.symbol, context.session_state)
+    """Exercise market context, FX conversion, and account state evidence."""
+    req_id = generate_id("req")
 
-    fx_request = FXConversionRequest(
+    ctx_req = build_market_context_request(
+        symbol="EURUSD",
+        max_age_seconds=60,
+        requested_evidence=("session", "calendar", "spread", "liquidity", "volatility"),
+        timezone="UTC",
+        as_of=_AS_OF,
+        request_id=req_id,
+    )
+    context_resp = get_market_context_evidence(ctx_req, _ContextProvider())
+    try:
+        context = unwrap_data_response(
+            context_resp,
+            operation="data.evidence.get_market_context_evidence",
+            request_id=req_id,
+        )
+        print("MarketContextEvidence:", context.symbol, context.session_state)
+    except DataError as error:
+        print("get_market_context_evidence handled:", error.code)
+
+    fx_req = build_fx_conversion_request(
         source_currency="EUR",
         target_currency="USD",
         as_of=_AS_OF,
-        max_age_seconds=60,
+        max_age_seconds=300,
         allowed_intermediates=("GBP",),
         max_legs=2,
-        path_policy_id="usage-direct-first",
+        path_policy_id="direct-first",
         path_policy_version="v1",
-        request_id=generate_id("req"),
+        request_id=req_id,
     )
-    fx = get_fx_conversion_evidence(fx_request, _FXProvider())
-    print("get_fx_conversion_evidence:", fx.composite_rate)
-
-    account_request = AccountSnapshotRequest(
-        source_id="usage-unavailable",
-        account_id="account-1",
-        max_age_seconds=60,
-        request_id=generate_id("req"),
-    )
+    fx_resp = get_fx_conversion_evidence(fx_req, _FXProvider())
     try:
-        get_account_state_snapshot(account_request, object())  # type: ignore[arg-type]
+        fx = unwrap_data_response(
+            fx_resp, operation="get_fx_conversion_evidence", request_id=req_id
+        )
+        print("FXConversionEvidence composite rate:", fx.composite_rate)
     except DataError as error:
-        print("get_account_state_snapshot: unavailable", error.code)
+        print("get_fx_conversion_evidence handled:", error.code)
+
+    account_request = build_account_snapshot_request(
+        account_id="acc-usage",
+        source_id="usage-unavailable",
+        max_age_seconds=60,
+        request_id=req_id,
+    )
+    account_resp = get_account_state_snapshot(account_request, object())
+    try:
+        account = unwrap_data_response(
+            account_resp, operation="get_account_state_snapshot", request_id=req_id
+        )
+        print("AccountStateSnapshot balance:", account.balance)
+    except DataError as error:
+        print("get_account_state_snapshot handled:", error.code)
 
 
 _DEMONSTRATED = [False]
@@ -133,37 +154,31 @@ def _demonstrate_once() -> None:
 
 def fr_data_008() -> None:
     _header("fr_data_008")
-    "FR-DATA-008: Expose immutable normalized account, balance, margin, position, order, connectivity, and staleness evidence with exact decimals and UTC snapshot time."
     _demonstrate_once()
 
 
 def fr_data_028() -> None:
     _header("fr_data_028")
-    "FR-DATA-028: Return a fresh normalized `AccountStateSnapshot v1` from read-only Brokers `BrokerAdapter` account reads without exposing credentials/provider objects."
     _demonstrate_once()
 
 
 def fr_data_075() -> None:
     _header("fr_data_075")
-    "FR-DATA-075: Validate a bounded request for session, calendar, spread, liquidity, volatility, correlation, and crisis evidence for one declared scope."
     _demonstrate_once()
 
 
 def fr_data_076() -> None:
     _header("fr_data_076")
-    "FR-DATA-076: Produce immutable `MarketContextEvidence v1` with separate contract version/schema ID, UTC freshness, provenance, and explicit missingness; never produce a Risk verdict."
     _demonstrate_once()
 
 
 def fr_data_078() -> None:
     _header("fr_data_078")
-    "FR-DATA-078: Validate source/target currencies, UTC `as_of`, explicit maximum age, and explicit allowed-path policy; reject same-leg cycles and unbounded discovery."
     _demonstrate_once()
 
 
 def fr_data_079() -> None:
     _header("fr_data_079")
-    "FR-DATA-079: Deterministically select an allowed acyclic direct/synthesized path and publish exact rates, UTC freshness, policy version, and source provenance as `FXConversionEvidence v1`; never fabricate a rate."
     _demonstrate_once()
 
 

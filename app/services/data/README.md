@@ -5,7 +5,7 @@
 > remains completed; `FEAT-DATA-16` point-in-time research-source evidence is
 > documented and `Missing`. The implemented baseline retains the owner-approved focused
 > architecture: one registered capability equals one module folder and one standalone
-> usage program. Behaviour, the 207 explicitly declared package-root public names,
+> usage program. Behaviour, the explicitly declared package-root public functions,
 > active requirement IDs,
 > contract versions, schema identifiers, and error codes remain compatible.
 > Provider facades compose on the Data side; their reads remain gated by Brokers
@@ -252,8 +252,54 @@ feature usages that consume them.
 
 The completed migration preserves contract versions, schema identifiers, error codes,
 validation behavior, and golden JSON schemas. The package root explicitly exports the
-207 approved names assigned across the fifteen registered features. Feature contracts
+The package-root function-only API is assigned across the fifteen registered features. Feature contracts
 live with their owners; no compatibility package recreates a removed path.
+
+#### Function-only construction boundary
+
+Data contract classes, enums, protocols, and constants are internal implementation
+details. Consumers construct a required Data value only through the corresponding
+package-root `build_...` function below; they must never import or alias an internal
+Data class. The remaining package-root exports are feature operations, predicates,
+getters, and response helpers documented by their owning feature rows above.
+
+```text
+build_account_order                 build_account_snapshot_request
+build_account_state_snapshot        build_active_market_sessions_request
+build_audit_event_page              build_audit_event_query
+build_availability_request          build_backup_target
+build_cache_read_request            build_cache_write_request
+build_calendar_scrape_provider      build_column_mapping
+build_data_gap                      build_data_quality_report
+build_data_range                    build_dataset_load_request
+build_dataset_save_request          build_data_settings
+build_economic_calendar_provider    build_economic_event
+build_economic_event_store          build_error_definition
+build_event_impact                  build_exchange_session_request
+build_external_import_request       build_feed_config
+build_feed_status_request           build_fx_conversion_evidence
+build_fx_conversion_request         build_fx_rate_leg
+build_job_definition                build_job_status_request
+build_local_market_data_source      build_market_context_evidence
+build_market_context_request        build_market_data_request
+build_market_dataset                build_market_hours_request
+build_market_schedule               build_migration_request
+build_migration_step                build_ohlcv_record
+build_quality_issue                 build_raw_feed_event
+build_read_only_broker_proxy        build_reconnect_policy
+build_schedule_request              build_scrape_options
+build_scrape_result                 build_session_window
+build_source_descriptor             build_source_identity
+build_source_license_policy         build_source_policy_config
+build_source_promotion_request      build_source_read_request
+build_spread_record                 build_statement_plan
+build_symbol_list_request           build_symbol_metadata_request
+build_synthetic_request             build_tick_record
+build_transaction_request           build_weekly_holiday
+build_weekly_schedule_definition    build_weekly_schedule_provider
+build_data_response                 build_data_error
+build_exception_response            build_symbol_metadata
+```
 
 ### Pre-migration capability map (historical evidence)
 
@@ -608,7 +654,7 @@ Section 2 owners remain, and no removed contract path is public or required.
 | Completed | 8 | Split `feeds/` and `scheduler/` **in place**, splitting `runtime.py` into buffer, reconnection, and heartbeat, and `backfill.py` into backfill and recovery. | `FR-DATA-041`–`048` | `test_feed_runtime.py`, `test_feed_status.py`, `test_backfill.py`, `test_scheduler.py` | 1, 2 |
 | Completed | 9 | Build `security/`: licensing enforcement, runtime read-only broker contract. Credentials pass-through withdrawn (`NFR-DATA-005`). | `FR-DATA-113`–`116`, `NFR-DATA-006` | `test_broker_contract.py`, `test_licensing.py`, `test_import_graph.py` | 1, 3 |
 | Completed | 10 | Build `persistence/backup.py` — snapshot, restore, and retention enforcement. Genuinely new capability. | `CAP-DATA-027`, `FR-DATA-108`–`110` | `test_backup.py`, `test_backfill.py`; restore round trip; atomic hash-mismatch rejection; dry-run/purge/licence retention cases | 2 |
-| Completed | 11 | Freeze the package-root `__init__.py` export list and migrate every cross-domain consumer import. | `NFR-DATA-001`, `NFR-DATA-011` | `test_api.py` asserts the explicit 207-name root surface. Data-owned usage and integration imports use the root boundary, and the repository production scan contains no prohibited `app.services.data.*` deep import outside Data. | 1–10 |
+| Completed | 11 | Freeze the package-root `__init__.py` export list and migrate every cross-domain consumer import. | `NFR-DATA-001`, `NFR-DATA-011` | `test_api.py` asserts the function-only root surface. Data-owned usage and integration imports use the root boundary, and the repository production scan contains no prohibited `app.services.data.*` deep import outside Data. | 1–10 |
 | Completed | 12 | Verification sweep: full suite, coverage ≥ 80%, `ruff`, `mypy`, and every usage program executed directly. | `NFR-DATA-012` | 436 Data tests pass with 81.65% branch-aware coverage; all fifteen usage programs exit zero; changed-file Ruff and full-repository Mypy pass. | 1–11 |
 
 **Consumer boundary.** Cross-domain consumers are required to use package-root
@@ -2491,8 +2537,8 @@ run the complete Data set at the feature/slice completion gate.
   contracts moved to their owners; current architecture guards inspect the actual
   feature folders.
 - [x] Every active requirement, workflow, and package-wide requirement is `Completed`.
-- [x] Package root explicitly imports and declares exactly the approved 207 public
-  names in `__all__`; the API golden/union test rejects missing or extra exposure.
+- [x] Package root explicitly imports and declares exactly the approved public
+  functions in `__all__`; the API golden/union test rejects missing or extra exposure.
 - [x] Contracts match `docs/PROJECT.md` name, version, owner, and consumers, and each
   owned contract is byte-identical to its pre-restructure golden snapshot.
 - [x] Data writes only Data-owned state; other domain migrations preserve ownership.
@@ -2513,7 +2559,7 @@ run the complete Data set at the feature/slice completion gate.
 Current implementation status: `Completed`. The package implements the approved
 fifteen focused feature folders and exactly fifteen numbered standalone usage
 programs. Removed horizontal packages have no compatibility shims, the explicit
-207-name package-root API is validated, and the complete focused validation gate
+Function-only package-root API is validated, and the complete focused validation gate
 passes with 81.65% branch-aware whole-domain coverage. All fifteen standalone usage
 programs pass, and the approved MT5 demo-provider read confirms genuine bounded
 provider evidence without a broker mutation.

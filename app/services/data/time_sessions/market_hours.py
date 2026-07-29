@@ -37,7 +37,7 @@ def evaluate_market_hours(
         None,
     )
     return MarketHours(
-        **schedule.model_dump(),
+        **dict(schedule),
         is_open=current is not None,
         checked_at=checked_at,
         current_session=current,
