@@ -30,7 +30,82 @@
 * The retired Live service has been folded into `app/services/trading/`; live execution remains a runtime route/mode, not a standalone service package.
 * `app/services/api/README.md` defines the approved gateway/UI boundary, state ownership, and synchronous initial Simulation/Optimization surface; no API runtime code or `ui/` application package has landed yet.
 * `app/services/portfolio/README.md` now defines the approved Portfolio target architecture; the package code is not yet implemented. Portfolio is the thirteenth domain and its status remains `Missing`.
-* `app/agentic/README.md` defines the complete Agentic Firm target; no package code has landed and every `FEAT-AGT-*` feature remains `Missing`. Its hybrid layout keeps ten shared control-plane features as focused root packages and places twelve role-bearing features under registered `agents/<department>/<agent_name>/` leaf packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, feature schemas, and only specification-required optional files. Specialized leadership, market-intelligence, technical, quantitative, strategy/trader, experimentation, engineering, portfolio/risk-advisory, and operations roles may dynamically collaborate, simulate, optimize, code, and submit typed proposals. Google ADK 2.x is the selected runtime behind provider-neutral HaruQuantAI contracts. Agentic has no broker credential, direct broker route, risk approval, kill-switch authority, or execution authority; consequential proposals traverse the normal deterministic pipeline.
+* `app/agentic/README.md` defines the complete Agentic Firm target. The package now
+  exists and Agentic status is `Partial`: `FEAT-AGT-01` implements the seven canonical
+  provider-neutral contracts (`AgentTask`, `AgentMessage`, `AgentArtifact`,
+  `AgentResult`, `AgentProvenance`, `BudgetUsage`, `WorkflowCheckpoint`) as immutable,
+  strictly validated, JSON-safe models carrying stable identity, aware-UTC time,
+  namespaced `agentic.*.v1` schema identity, trace lineage, and a canonical content
+  hash. `AgentResult` separates `ok`, `refused`, and `failed`, admits only enumerated
+  reason codes, and rejects deterministic execution fields. `FEAT-AGT-02` adds the immutable signed firm mandate, the evaluated role
+  manifest, and the validated `RoleRegistry`: mandate and manifest integrity digests
+  are recomputed rather than trusted, the composite instruction hash binds prompt and
+  manifest so a mutated prompt fails closed before agent construction, wildcard scopes
+  and the `controlled_mutation`/`critical` permission classes are unrepresentable, and
+  no title confers capability beyond its manifest. The package root is a function-only
+  public surface. `FEAT-AGT-03` implements provider-neutral `ModelProfile`
+  pinning that rejects floating aliases and credential material, a governed
+  `invoke_model` path that enforces profile bounds and refuses silent provider or
+  model substitution, and upgrade gating where missing evidence is a failure rather
+  than a default pass; `runtime/adk.py` is the sole construction site for a
+  Google ADK object: ADK is imported lazily so the Agentic public API loads no
+  provider module, the resolved credential reaches only the provider client and
+  never a contract, log, or audit record, and an observed cost is derived from
+  reported tokens rather than reported as a false zero that would defeat the
+  per-call ceiling. `FEAT-AGT-04` adds durable orchestration: idempotent submission that
+  persists its initial checkpoint before execution, expected-version guards,
+  bounded routing, and terminal states that never resume under the same task
+  identity. Following the Portfolio and Risk precedents, Agentic declares its
+  additive `agentic_` schema and an injected store port and implements no database
+  writer. `FEAT-AGT-05` enforces deny-by-default tool authorization across
+  registration, eligibility, permission class, environment, scope, budget, and
+  approval; it owns `ToolApprovalAttestation v1`, which adds the exact object hash,
+  single-use nonce, and signature that the Risk-owned `ApprovalAttestation v1` does
+  not carry, and it makes broker, order, kill-switch, override, and deployment
+  capabilities structurally unregistrable rather than merely refused. `FEAT-AGT-06`
+  assembles point-in-time context through ordered lookahead, trust, licensing,
+  freshness, deduplication, and injection filters, returning trusted context and
+  untrusted evidence in separate fields so retrieved text can never occupy an
+  instruction slot; its four separated stores redact before persistence, append
+  corrections rather than overwriting, and bound working memory by TTL and task.
+  `FEAT-AGT-07` runs bounded deliberation: independent briefs are
+  collected before any peer conclusion exists, so independence is structural rather
+  than procedural; participants, rounds, and fan-out come from the versioned limits
+  profile and are not raisable by a caller or a model; unresolved challenges are
+  preserved as dissent; and consensus cannot be claimed while material dissent
+  stands. A `DeliberationRecord` rejects authorization and position-size language
+  outright, so agreement can never be converted into a decision.
+  `FEAT-AGT-08` lands the first registered leaf agent package and
+  establishes the pattern the remaining eleven follow: `prompt.md` is versioned data
+  loaded and hash-verified against the enabled `RoleManifest` before construction,
+  with line endings normalized so the digest is portable; `agent.py` embeds no prompt
+  text, imports no ADK or provider object, and delegates to the injected runtime; and
+  the typed output carries no numeric field, so a recomputed upstream metric cannot
+  be expressed at all. `FEAT-AGT-11` adds the first governed tool adapters: every
+  evidence call is authorized by the permission enforcement point before the
+  receiver is reached, a denied call never falls through, and each result is
+  bounded as untrusted input. Its output pack takes instrument, venue, timeframe,
+  session, window, indicator versions, and quality status from the deterministic
+  receivers rather than from the model, so a model cannot misreport which
+  indicator definition was used; claims, confirmations, invalidations, and
+  leakage notes are keyed alike, making a claim without all three conditions
+  unrepresentable. `FEAT-AGT-12` applies the same separation to statistics: the
+  analyst names a metric and the Analytics catalog supplies its formula and its
+  minimum sample, so an estimator the catalog does not recognize — including a
+  formula a model writes out in place of a name — is refused rather than
+  accepted; findings, estimators, and uncertainty are keyed alike, so a point
+  estimate with no interval cannot be expressed; and non-finite, under-sampled,
+  hash-misaligned, or leakage-unsafe evidence is refused before the runtime is
+  invoked, so the model is never shown data it would have to repair.
+  `FEAT-AGT-13` turns specialist packs into falsifiable
+  hypotheses and non-executable theses: a hypothesis without a rejection criterion
+  cannot be constructed, a thesis rejects code, orders, prices, sizes, and
+  approvals, and both take their evidence references from the packs actually
+  supplied rather than from model output. Unresolved deliberation dissent forces a
+  `contested` stance regardless of what a model declares, so agreement alone never
+  promotes a proposal. `FEAT-AGT-09`, `10`, and `14`–`22` remain `Missing`.
+  Google ADK 2.x is adopted behind a scoped `requests` override, documented in
+  `pyproject.toml` with the condition for its removal. Its hybrid layout keeps ten shared control-plane features as focused root packages and places twelve role-bearing features under registered `agents/<department>/<agent_name>/` leaf packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, feature schemas, and only specification-required optional files. Specialized leadership, market-intelligence, technical, quantitative, strategy/trader, experimentation, engineering, portfolio/risk-advisory, and operations roles may dynamically collaborate, simulate, optimize, code, and submit typed proposals. Google ADK 2.x is the selected runtime behind provider-neutral HaruQuantAI contracts. Agentic has no broker credential, direct broker route, risk approval, kill-switch authority, or execution authority; consequential proposals traverse the normal deterministic pipeline.
 * `app/utils/` is a partial implementation baseline for shared v1 contracts,
   errors, identifiers, UTC, canonical serialization, redaction/security helpers,
   settings, and structured logging.
@@ -311,8 +386,11 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
   `data.market_dataset.v1`, `data.account_state_snapshot.v1`,
   `data.market_context_evidence.v1`, and `data.fx_conversion_evidence.v1`.
 - Canonical shared Data contracts live in `app.services.data.contracts`;
-  feature-specific contracts live in their registered feature folders. Public
-  consumers import both only through `app.services.data`.
+  feature-specific contracts live in their registered feature folders. Under the
+  Function-Only Public API Surface rule, `app.services.data` exposes standalone
+  operations only, so public consumers import operations from
+  `app.services.data` and contract types from `app.services.data.contracts` —
+  the same split the Brokers domain uses.
 - Data contract modules contain immutable schemas and deterministic validation only.
   They perform no source, broker, network, storage, cache, scheduling, or feed-runtime
   acquisition.

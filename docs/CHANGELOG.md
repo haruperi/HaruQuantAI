@@ -2,6 +2,58 @@
 
 ## [Unreleased]
 
+### Consolidate broker-credential ownership in Brokers and utils.settings
+
+Broker credentials are now owned by the Brokers domain through a public settings model and a route-only connection resolver, so the Data composition root and usage examples select a provider route only and never read credentials or open connections directly.
+
+#### Changed (2)
+
+- Promoted `BrokerProviderSettings` to the public `app.utils.settings` surface as the single source of truth for broker-provider credentials, read from the central `app/configs/env.json`, and added `resolve_provider_connection_config` and `create_connected_broker` to the Brokers public API so credential resolution, non-production enforcement, and connection are owned by Brokers.
+- Rewrote the Data composition root `_LazyBrokerSession` to resolve MT5, cTrader, and credential-free providers through the Brokers resolver and removed its private `_ProviderRuntimeSettings`, so Data no longer resolves credentials or builds connection configurations.
+
+#### Fixed (1)
+
+- Fixed the Data composition root silently ignoring `settings.mt5.*` in `app/configs/env.json` because `_ProviderRuntimeSettings` extended `BaseSettings` instead of `AppSettings` and therefore read only the process environment; real-MT5 retrieval through the Data path now honors the central settings file.
+
+### Begin Agentic Firm implementation
+
+The Agentic package now delivers its complete control-plane foundation — contracts, governance, runtime, orchestration, permissions, governed memory, and bounded deliberation — while every agent role and consequential capability remains unimplemented.
+
+#### Added (12)
+
+- `FEAT-AGT-01` Canonical Agentic Contracts and Provenance.
+- `FEAT-AGT-02` Firm Governance, Roster, and Authority.
+- `FEAT-AGT-03` Provider-neutral model profiles, governed invocation with silent-substitution detection, and evaluated upgrade gating, behind an agent-graph port whose Google ADK binding is not yet implemented.
+- `FEAT-AGT-04` Durable task and workflow orchestration with idempotent submission, checkpoint-before-execution, expected-version guards, and non-resumable terminal states.
+- `FEAT-AGT-05` Deny-by-default tool authorization with an Agentic-owned single-use `ToolApprovalAttestation v1`, and a registry in which broker, order, kill-switch, override, and deployment capabilities are structurally unregistrable.
+- `FEAT-AGT-06` Point-in-time context assembly with lookahead, trust, licensing, freshness, deduplication, and injection filters, plus four separated memory stores that redact before persistence and append corrections rather than overwriting.
+- `FEAT-AGT-07` Bounded deliberation that collects independent briefs before any peer exposure, caps participants and rounds from the versioned limits profile rather than from any caller or model, preserves unresolved dissent, and makes a record structurally incapable of carrying an approval or a position size.
+- `FEAT-AGT-08` The first registered leaf agent package, whose `prompt.md` is loaded as data and hash-verified against its role manifest before any model call, and whose output schema has no numeric field so a recomputed metric cannot be expressed.
+- `FEAT-AGT-11` The first agent package with governed tool adapters, where every evidence call is authorized before invocation and every output binding is taken from a deterministic receiver rather than from the model.
+- `FEAT-AGT-12` Quantitative research in which the analyst names a metric and the Analytics catalog supplies its formula and its minimum sample, so an unrecognized estimator is refused rather than authored; findings, estimators, and uncertainty are keyed alike so a point estimate with no interval is unrepresentable; and non-finite, under-sampled, hash-misaligned, or leakage-unsafe evidence is refused before the runtime is invoked.
+- `FEAT-AGT-13` Falsifiable hypotheses that cannot be built without a rejection criterion, and non-executable strategy theses that reject code, orders, prices, sizes, and approvals outright.
+- Package-wide Agentic settings and versioned limits profiles, disabled by default and fail-closed when incompletely configured.
+
+#### Changed (5)
+
+- Adopted `google-adk 2.5.0` as the Agentic runtime dependency behind the `AdkRuntime` port, resolved by a scoped `requests>=2.32.4` override that documents why `ctrader-open-api`'s exact pin does not apply to this project and when the override may be removed.
+- Implemented the Google ADK 2.x binding as the sole construction site for an ADK object, with lazy imports so the Agentic public API loads no provider module, a resolved credential that never enters a contract, and an observed cost derived from reported tokens rather than reported as a false zero.
+- Made `build_agent_result` generic so a role-bearing feature declares its own payload type without a cast at the call site.
+- Made the Agentic package root a function-only public surface, matching the Brokers and Strategy boundaries, with `build_*` constructors that derive canonical content digests.
+- Promoted the governed tool-call wrapper from the technical-analyst package into `FEAT-AGT-05` as `call_governed_tool`, with the audit sink injected as a callable so the permissions feature gains no dependency on governed memory.
+
+#### Fixed (1)
+
+- Fixed governed tool-call audit records colliding when a role called the same tool twice in the same instant: the record identity derives from redacted content, which was identical, so the second write was rejected. Audit entries now carry the call's ordinal within the task.
+
+### Refactor Strategy Domain to Function-Only Public Surface
+
+#### Changed (3)
+
+- Reduced the Strategy package-root API to standalone functions, with contract factories and enum getters replacing external class and constant imports.
+- Migrated Strategy consumers, workflows, usage evidence, and integration tests to import only from `app.services.strategy`.
+- Added Data-owned transaction and MarketDataset accessors required by Strategy without exposing Data implementation classes across the domain boundary.
+
 ### Refactor Brokers domain to Function-Only Public Surface
 
 The Brokers domain API was refactored to enforce Package-Root Export Gate, Domain-Root Imports Only, and Function-Only Public API Surface standards.
@@ -32,6 +84,11 @@ The fourteenth domain is specified as a full multi-agent research, engineering, 
 - Corrected the retained research-report provenance and recorded Google ADK 2.x as the selected runtime behind HaruQuantAI-owned provider-neutral contracts.
 - Reorganized the canonical Agentic README into the package README template, adding dependency-ordered module/file, workflow, configuration, persistence, testing, and change-process manifests without changing the approved twenty-two-feature end state.
 - Replaced the uniform Agentic capability layout with a hybrid architecture that retains ten shared infrastructure modules and gives twelve role-bearing features registered department/agent packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, focused schemas, and explicit optional files.
+
+#### Fixed (2)
+
+- Restored `app.services.research` importability by taking `DataError` and `MarketDataset` from `app.services.data.contracts` after the function-only refactor moved them off the package root.
+- Corrected Agentic memory-record identity to derive from the content digest, so distinct records written in the same instant for one task no longer collide.
 
 #### Removed (1)
 
@@ -105,7 +162,7 @@ The Research domain now exposes twelve focused advisory feature modules, while n
 
 The Portfolio domain now exposes eight focused feature modules with deterministic construction, governed activation, reduce-only rebalancing, cross-domain coordination, and standalone usage coverage.
 
-#### Added (8)
+#### Added (11)
 
 - `FEAT-PORT-01` Portfolio Boundary Contracts.
 - `FEAT-PORT-02` Evidence and Eligibility Validation.
@@ -132,7 +189,7 @@ The Portfolio domain now exposes eight focused feature modules with deterministi
 
 The Optimization domain now exposes nine focused feature modules with bounded reproducible parameter search, deterministic scoring, leakage-aware validation, robustness analysis, versioned advisory evidence, and standalone usage coverage.
 
-#### Added (9)
+#### Added (11)
 
 - `FEAT-OPT-01` Parameter Space and Provenance.
 - `FEAT-OPT-02` Objectives, Ranking, and Overfit Evidence.
@@ -152,7 +209,7 @@ The Optimization domain now exposes nine focused feature modules with bounded re
 
 The Simulation domain now exposes nine focused feature modules with deterministic execution, replay journals, fixed-precision account math, canonical artifacts, and standalone usage coverage.
 
-#### Added (9)
+#### Added (11)
 
 - `FEAT-SIM-01` Boundary and Quality Validation.
 - `FEAT-SIM-02` Simulation-Owned State.
@@ -188,7 +245,7 @@ The Analytics domain now exposes five focused feature modules with deterministic
 
 The Trading domain now exposes nine focused feature modules with deterministic authority, fail-closed execution, reconciliation, operational evidence, and standalone usage coverage.
 
-#### Added (9)
+#### Added (11)
 
 - `FEAT-TRD-01` Canonical Contracts and Registries.
 - `FEAT-TRD-02` State and Deterministic Projections.
@@ -234,7 +291,7 @@ The Risk domain now exposes fifteen focused feature modules with deterministic p
 
 The Strategy domain now exposes ten focused feature modules with deterministic contracts, governed workflows, immutable proposal boundaries, and standalone usage evidence.
 
-#### Added (10)
+#### Added (11)
 
 - `FEAT-STR-01` Versioned Strategy Contracts.
 - `FEAT-STR-02` Deterministic Safe Diagnostics.
@@ -314,7 +371,7 @@ July 23, 2026
 
 Consolidated current feature ownership into package READMEs while completing focused-domain, contract, and documentation corrections without changing runtime behavior.
 
-#### Added (8)
+#### Added (11)
 
 - Registered root runtime-profile and execution-route compatibility as `FEAT-APP-01` in `app/README.md`.
 - Recorded the 15 Brokers capability IDs and usage programs and exposed shared-provider-folder structural status.

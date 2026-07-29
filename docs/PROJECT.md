@@ -299,7 +299,21 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Owns**: Agentic contracts and provenance; firm mandate and role registry; Google ADK composition behind provider-neutral adapters; durable workflow state; dynamic bounded deliberation; Agentic tool permissions; evidence context and memory; specialized capabilities; sandboxed code generation; Agentic evaluation, promotion evidence, lifecycle, observability, incidents, replay, and public operations.
 * **Boundaries**: Agentic may submit an untrusted typed proposal into a receiver's normal public intake. It owns no source acquisition, canonical market fact, deterministic indicator or metric, strategy registration decision, portfolio activation, risk approval, order construction, trading state, execution, broker credential, broker mutation, kill-switch authority, or human authentication. Every consequential proposal passes through the complete deterministic Strategy, Portfolio, Risk, Trading, and Brokers pipeline applicable to that action.
 * **Key Limits**: Deny by default; no direct Brokers dependency; no self-approval or mandate override; no model-selected permission or limit; generated code is never hot-loaded; discussion is bounded and preserves dissent; data-dependent roles refuse without governed point-in-time evidence; disabling Agentic leaves deterministic safety and already-approved trading behaviour available.
-* **Status**: `Missing`. The complete target is documented before implementation begins.
+* **Status**: `Partial`. The complete twenty-two-feature target is documented and
+  implementation has begun in Feature Registry order. the complete control plane
+  is implemented: `FEAT-AGT-01` contracts, `FEAT-AGT-02` governance,
+  `FEAT-AGT-04` orchestration, `FEAT-AGT-05` permissions, `FEAT-AGT-06`
+  context and governed memory, `FEAT-AGT-07` bounded deliberation, `FEAT-AGT-08` the first registered
+  leaf agent package, `FEAT-AGT-11` the first agent package with governed
+  tool adapters, `FEAT-AGT-12` quantitative research grounded in the Analytics
+  metric catalog, and `FEAT-AGT-13` hypothesis and strategy-thesis development.
+  `FEAT-AGT-03` runtime is `Completed`: provider-neutral
+  model profiles, governed invocation, upgrade gating, and the Google ADK 2.x
+  binding all exist behind the agent-graph port. The binding is structurally
+  verified; no live provider call has been made. `FEAT-AGT-09`, `10`, `14`–`22`
+  remain `Missing`, so eight agent roles, lifecycle, operations, and the operator
+  API are unavailable and no Agentic system workflow is complete. `FEAT-AGT-09`
+  and `10` stay blocked on `FEAT-DATA-16` and `FEAT-RES-13`.
 * **Documentation**: `app/agentic/README.md`
 
 #### 2.1.14 UI/API
