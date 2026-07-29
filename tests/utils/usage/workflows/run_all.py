@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -26,7 +27,12 @@ def main() -> None:
         completed = subprocess.run(  # noqa: S603 - fixed local workflow scripts.
             [sys.executable, str(directory / filename)],
             check=False,
+            capture_output=True,
+            encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"},
         )
+        print(completed.stdout, end="")
+        print(completed.stderr, end="", file=sys.stderr)
         status = "PASS" if completed.returncode == 0 else "FAIL"
         print(f"{status} {filename}", flush=True)
         if completed.returncode:

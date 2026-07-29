@@ -341,6 +341,63 @@ def get_logger(name: str) -> BoundLogger:
     return BoundLogger(f"{_LOGGER_ROOT}.{name}")
 
 
+def get_logger_name(logger_handle: object) -> str:
+    """Return the name of an opaque Utils logger handle.
+
+    Args:
+        logger_handle: Handle returned by ``get_logger``.
+
+    Returns:
+        Fully qualified logger name.
+
+    Raises:
+        TypeError: If the handle was not created by Utils.
+    """
+    if not isinstance(logger_handle, BoundLogger):
+        raise TypeError("logger_handle must be a Utils logger handle")
+    return logger_handle._name  # noqa: SLF001
+
+
+def get_logger_handler_count(logger_handle: object) -> int:
+    """Return the handler count without exposing the underlying logger object.
+
+    Args:
+        logger_handle: Handle returned by ``get_logger``.
+
+    Returns:
+        Number of underlying standard-library handlers.
+
+    Raises:
+        TypeError: If the handle was not created by Utils.
+    """
+    if not isinstance(logger_handle, BoundLogger):
+        raise TypeError("logger_handle must be a Utils logger handle")
+    return len(logging.getLogger(logger_handle._name).handlers)  # noqa: SLF001
+
+
+def log_info(
+    logger_handle: object,
+    message: str,
+    *args: object,
+    context: Mapping[str, object] | None = None,
+) -> None:
+    """Emit an INFO record through an opaque Utils logger handle.
+
+    Args:
+        logger_handle: Handle returned by ``get_logger``.
+        message: Bounded log message.
+        args: Optional format arguments.
+        context: Optional structured context, redacted before output.
+
+    Raises:
+        TypeError: If the handle was not created by Utils.
+    """
+    if not isinstance(logger_handle, BoundLogger):
+        raise TypeError("logger_handle must be a Utils logger handle")
+    bound = logger_handle.bind(**dict(context or {}))
+    bound.info(message, *args)
+
+
 class BoundLogger:
     """Import-safe logger facade with lazy default configuration."""
 

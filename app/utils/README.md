@@ -541,6 +541,11 @@ repository `app/configs/env.json` loading base for typed domain settings.
 **Purpose:** Provide import-safe logger access, lazy approved defaults, and explicit
 redacted structured-handler overrides for specialized entry points.
 
+The package-root public logging boundary is function-only: callers obtain an
+opaque handle with `get_logger` and use `log_info` for structured emission;
+`get_logger_name` and `get_logger_handler_count` expose required facts without
+exporting the logger class.
+
 **Module flow:** `runtime bound-logger call → lazy default or explicit override → redact → structured record → configured sink`
 
 #### Files

@@ -11,7 +11,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from app.utils import configure_logging, flush_logging, get_logger, shutdown_logging
+from app.utils import (
+    configure_logging,
+    flush_logging,
+    get_logger,
+    get_logger_handler_count,
+    shutdown_logging,
+)
 from app.utils.errors.exceptions import ConfigurationError
 from app.utils.logging.logger import BoundLogger, RedactingFilter, StructuredFormatter
 from app.utils.logging.logger import logger as global_logger
@@ -27,7 +33,7 @@ def _reset_logging() -> Iterator[None]:
 
 def test_get_logger_configures_no_handlers() -> None:
     logger = get_logger("unit.no_handlers")
-    assert logger.handlers == []
+    assert get_logger_handler_count(logger) == 0
 
 
 def test_default_configuration_creates_all_sinks(

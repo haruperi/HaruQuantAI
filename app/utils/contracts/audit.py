@@ -412,7 +412,7 @@ def create_audit_event(
     action: str,
     request_id: str,
     correlation_id: str,
-    payload: Mapping[str, object],
+    payload: Mapping[str, JsonValue],
     principal_id: str | None = None,
     causation_id: str | None = None,
     contract_version: Literal["v1"] = "v1",

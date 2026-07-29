@@ -15,6 +15,9 @@ from app.utils.logging import (
     configure_logging,
     flush_logging,
     get_logger,
+    get_logger_handler_count,
+    get_logger_name,
+    log_info,
     shutdown_logging,
 )
 from app.utils.responses import (
@@ -59,9 +62,12 @@ __all__ = (
     "get_error_metadata",
     "get_execution_ms",
     "get_logger",
+    "get_logger_handler_count",
+    "get_logger_name",
     "is_fresh",
     "is_sensitive_key",
     "load_settings",
+    "log_info",
     "map_exception",
     "normalize_error_code",
     "parse_utc_timestamp",

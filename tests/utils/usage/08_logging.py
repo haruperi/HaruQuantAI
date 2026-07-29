@@ -11,6 +11,9 @@ from app.utils import (
     configure_logging,
     flush_logging,
     get_logger,
+    get_logger_name,
+    load_settings,
+    log_info,
     shutdown_logging,
 )
 
@@ -31,7 +34,7 @@ def fr_utils_032_import_safety() -> None:
 def fr_utils_026_logger_access() -> None:
     """FR-UTL-026: Access a stable named standard-library logger."""
     _header("Example 2: Logger Access")
-    print("Logger name:", get_logger("usage").name)
+    print("Logger name:", get_logger_name(get_logger("usage")))
 
 
 def fr_utils_027_standard_levels() -> None:
@@ -70,7 +73,7 @@ def fr_utils_039_exception_logging() -> None:
 def fr_utils_039_bound_context() -> None:
     """FR-UTL-039: Emit an immutable bound request context."""
     _header("Example 5: Bound Context")
-    logger.info("bound context", extra={"request_id": "req-example"})
+    log_info(logger, "bound context", context={"request_id": "req-example"})
 
 
 def fr_utils_040_specialized_routing(log_directory: Path) -> None:
@@ -80,12 +83,15 @@ def fr_utils_040_specialized_routing(log_directory: Path) -> None:
         log_directory: Configured temporary logging directory.
     """
     _header("Example 6: Specialized Routing")
-    logger.info("access example", extra={"log_type": "access"})
+    log_info(logger, "access example", context={"log_type": "access"})
     logger.debug("debug route example")
     logger.error("error route example")
     flush_logging()
-    names = sorted(path.name for path in log_directory.glob("*.log"))
-    print("Specialized routes:", names)
+    names = sorted(
+        path.name for path in log_directory.glob("*.log") if path.stat().st_size
+    )
+    assert {"access.log", "debug.log", "errors.log"} <= set(names)
+    print("Specialized non-empty routes:", names)
 
 
 def fr_utils_041_sink_failure(log_directory: Path) -> None:
@@ -96,7 +102,11 @@ def fr_utils_041_sink_failure(log_directory: Path) -> None:
     """
     _header("Example 7: Sink Failure")
     try:
-        configure_logging()
+        configure_logging(
+            load_settings().logging.model_copy(
+                update={"log_directory": log_directory, "level": "DEBUG"}
+            )
+        )
     except Exception:  # noqa: BLE001 - public logger intentionally hides error classes.
         print("Sink failure: safely surfaced")
 
@@ -107,7 +117,11 @@ def main() -> None:
     fr_utils_026_logger_access()
     with tempfile.TemporaryDirectory() as directory:
         log_directory = Path(directory)
-        configure_logging()
+        configure_logging(
+            load_settings().logging.model_copy(
+                update={"log_directory": log_directory, "level": "DEBUG"}
+            )
+        )
         fr_utils_027_standard_levels()
         fr_utils_028_logger_redaction()
         fr_utils_039_exception_logging()

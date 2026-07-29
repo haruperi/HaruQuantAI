@@ -14,7 +14,10 @@ from app.utils import (
     configure_logging,
     flush_logging,
     get_logger,
+    get_logger_handler_count,
+    get_logger_name,
     load_settings,
+    log_info,
     redact_mapping_value,
     shutdown_logging,
 )
@@ -47,8 +50,11 @@ def main() -> None:
     # Stage 1 — Import the global import-safe bound logger without side effects.
     _stage(1)
     named_logger = get_logger("workflow.utils")
-    assert named_logger.name.endswith("workflow.utils")
-    print("Utils-owned handlers before configuration:", len(named_logger.handlers))
+    assert get_logger_name(named_logger).endswith("workflow.utils")
+    print(
+        "Utils-owned handlers before configuration:",
+        get_logger_handler_count(named_logger),
+    )
 
     # Stage 2 — Supply structured, JSON-safe context.
     _stage(2)
@@ -76,11 +82,16 @@ def main() -> None:
                     update={"log_directory": log_directory, "render": "json"}
                 )
             )
-            logger.info(
+            log_info(
+                logger,
                 "workflow record token=synthetic-secret",
-                extra=dict(redacted.value),
+                context=dict(redacted.value),
             )
-            logger.info("access workflow record", extra={"log_type": "access"})
+            log_info(
+                logger,
+                "access workflow record",
+                context={"log_type": "access"},
+            )
             logger.debug("debug workflow record")
             logger.error("error workflow record")
             print("Structured records submitted to configured routes")

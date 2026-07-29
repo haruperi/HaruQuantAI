@@ -6,6 +6,7 @@ from app.utils import (
     configure_logging,
     flush_logging,
     get_logger,
+    log_info,
     shutdown_logging,
 )
 
@@ -23,11 +24,12 @@ def test_structured_logging_redacts_before_file_emission(
     monkeypatch.setenv("LOG_COLORIZE", "false")
     shutdown_logging()
     configure_logging()
-    logger.info(
+    log_info(
+        logger,
         "api_key=abc123",
-        extra={"request_id": "req-example", "password": "hidden"},
+        context={"request_id": "req-example", "password": "hidden"},
     )
-    logger.info("access", extra={"log_type": "access"})
+    log_info(logger, "access", context={"log_type": "access"})
     logger.debug("debug")
     logger.error("error")
     flush_logging()

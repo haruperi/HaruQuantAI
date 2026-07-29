@@ -10,14 +10,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
-    AuditEventQuery,
-    DataSettings,
+    build_audit_event_query,
+    build_data_settings,
     data_settings_context,
     persist_audit_event,
     query_audit_events,
     run_data_migrations,
+    unwrap_data_response,
 )
-from app.services.data.contracts.responses import unwrap_data_response
 from app.utils import (
     canonical_digest,
     canonical_json,
@@ -91,7 +91,7 @@ def main() -> None:
     # Stage 5 — Persist and read the event through Data's audit boundary.
     _stage(5)
     with tempfile.TemporaryDirectory(prefix="wf-utl-003-") as directory:
-        settings = DataSettings(
+        settings = build_data_settings(
             database_url="sqlite:///audit.sqlite3",
             data_dir=Path(directory),
             sqlite_busy_timeout_seconds=1.0,
@@ -116,7 +116,7 @@ def main() -> None:
                 operation="data.audit.persist_audit_event",
                 request_id=event.request_id,
             )
-            query = AuditEventQuery(
+            query = build_audit_event_query(
                 start=timestamp - timedelta(seconds=1),
                 end=timestamp + timedelta(seconds=1),
                 domain="utils",
