@@ -121,7 +121,16 @@
   write outside the tree. Isolation itself is delegated: Agentic declares the
   sandbox port and refuses an under-attested lease, and binding a runtime that
   actually isolates remains the composition root's obligation.
-  `FEAT-AGT-09`, `10`, `15`, and `17`–`22` remain `Missing`.
+  `FEAT-AGT-15` extends the same discipline to search: a plan is declared and
+  hashed before any trial runs, so a budget widened afterwards is a different
+  plan; the trial ledger requires attempted to equal completed plus failed with
+  a reason per failure, so a sweep cannot report its survivors while dropping
+  the trials that did not survive; robustness, stability, and overfit are read
+  from deterministic Optimization operations rather than asserted, so a verdict
+  cannot consist of a rank alone; and a sweep consuming holdout reserves it
+  from the same `FEAT-AGT-14` ledger an experiment would, closing the path by
+  which a thesis's single look could otherwise be spent twice.
+  `FEAT-AGT-09`, `10`, and `17`–`22` remain `Missing`.
   Google ADK 2.x is adopted behind a scoped `requests` override, documented in
   `pyproject.toml` with the condition for its removal. Its hybrid layout keeps ten shared control-plane features as focused root packages and places twelve role-bearing features under registered `agents/<department>/<agent_name>/` leaf packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, feature schemas, and only specification-required optional files. Specialized leadership, market-intelligence, technical, quantitative, strategy/trader, experimentation, engineering, portfolio/risk-advisory, and operations roles may dynamically collaborate, simulate, optimize, code, and submit typed proposals. Google ADK 2.x is the selected runtime behind provider-neutral HaruQuantAI contracts. Agentic has no broker credential, direct broker route, risk approval, kill-switch authority, or execution authority; consequential proposals traverse the normal deterministic pipeline.
 * `app/utils/` is a partial implementation baseline for shared v1 contracts,

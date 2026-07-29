@@ -22,6 +22,14 @@ The three audited domains now expose function-only package roots, focused tests 
 - Fixed Data source and real-time-feed usage evidence so it prints bounded provider-derived rows and ticks, while unavailable providers report explicit errors without injected fallbacks.
 - Fixed external spread imports so decimal scale is derived from observed provider values rather than assigned a fabricated default.
 
+### Add bounded optimization coordination
+
+The Agentic firm can now declare a bounded search before it runs and report what the whole search showed rather than what its best row showed.
+
+#### Added (1)
+
+- `FEAT-AGT-15` Optimization Coordination: sweep plans declare space, objective, method, trial budget, early-stop policy, seed, and holdout consumption before execution and carry a digest over the whole declaration, so a budget widened afterwards is a different plan; the trial ledger requires attempted to equal completed plus failed with a reason per failure and rejects a search that exceeded its budget, so survivorship bias is unrepresentable and an irreconcilable receiver report is refused before the verdict model is invoked; robustness, instability, and overfit evidence are assembled from deterministic Optimization operations rather than from the model or from rank, and a verdict consisting only of the winning parameters cannot be constructed; and a sweep consuming holdout reserves it from the same `FEAT-AGT-14` experiment ledger, so a thesis's single look cannot be spent once by an experiment and again by a sweep.
+
 ### Add governed code generation with staged artefacts
 
 The Agentic firm can now turn an authenticated human specification into staged strategy or indicator source code that a person reviews before anything merges.

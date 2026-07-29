@@ -23,6 +23,12 @@ from app.agentic.agents.experimentation.experiment_designer.agent import (
 from app.agentic.agents.experimentation.experiment_designer.tools import (
     get_registered_tool_names as get_designer_tool_names,
 )
+from app.agentic.agents.experimentation.optimization_coordinator.agent import (
+    PROMPT_PATH as SWEEP_PROMPT_PATH,
+)
+from app.agentic.agents.experimentation.optimization_coordinator.tools import (
+    get_registered_tool_names as get_sweep_tool_names,
+)
 from app.agentic.agents.experimentation.simulation_interpreter.agent import (
     PROMPT_PATH,
 )
@@ -576,6 +582,74 @@ def build_coder_mandate(**overrides: object) -> FirmMandate:
         "enabled_features": ("FEAT-AGT-16",),
         "enabled_roles": (CODER_ROLE_ID,),
         "tool_scopes": dict.fromkeys(get_coder_tool_names(), "read_evidence"),
+    }
+    data.update(overrides)
+    return build_sandbox_mandate(**data)
+
+
+SWEEP_ROLE_ID = "optimization_coordinator"
+
+SWEEP_PROMPT_DIGEST = canonical_digest(
+    normalize_prompt_text(SWEEP_PROMPT_PATH.read_text(encoding="utf-8")),
+)
+
+
+def sweep_role_manifest_fields(**overrides: object) -> dict[str, object]:
+    """Return complete Optimization Coordinator manifest fields.
+
+    The base prompt digest is derived from the real package artefact, so the
+    fixture exercises the same integrity chain production uses.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        Complete manifest constructor data.
+    """
+    data = manifest_fields(
+        role_id=SWEEP_ROLE_ID,
+        owning_feature="FEAT-AGT-15",
+        department="experimentation",
+        agent_package="agents/experimentation/optimization_coordinator",
+        description="Declares bounded searches and reads them for robustness.",
+        objective="Report what the whole search showed, not its best row.",
+        expertise_boundary="Runs no sweep and computes no robustness measure.",
+        input_schema_id="agentic.sweep_request.v1",
+        output_schema_id="agentic.sweep_verdict.v1",
+        base_prompt_hash=SWEEP_PROMPT_DIGEST,
+        evaluation_set_id="eval-optimization-coordinator-v1",
+        tools=get_sweep_tool_names(),
+        permission_classes=("read_evidence",),
+    )
+    data.update(overrides)
+    return data
+
+
+def build_sweep_role_manifest(**overrides: object) -> RoleManifest:
+    """Build the validated Optimization Coordinator role manifest.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        A validated manifest with derived integrity digests.
+    """
+    return build_role_manifest(sweep_role_manifest_fields(**overrides))
+
+
+def build_sweep_mandate(**overrides: object) -> FirmMandate:
+    """Build a sandbox mandate registering the optimization tools.
+
+    Args:
+        **overrides: Optional field overrides for mandate variants.
+
+    Returns:
+        A validated firm mandate with a derived content digest.
+    """
+    data: dict[str, object] = {
+        "enabled_features": ("FEAT-AGT-15",),
+        "enabled_roles": (SWEEP_ROLE_ID,),
+        "tool_scopes": dict.fromkeys(get_sweep_tool_names(), "read_evidence"),
     }
     data.update(overrides)
     return build_sandbox_mandate(**data)
