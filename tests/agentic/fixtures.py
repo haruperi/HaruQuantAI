@@ -62,6 +62,18 @@ from app.agentic.agents.market_analysis.technical_analyst.agent import (
 from app.agentic.agents.market_analysis.technical_analyst.tools import (
     get_registered_tool_names,
 )
+from app.agentic.agents.market_intelligence.fundamental_analyst.agent import (
+    PROMPT_PATH as FUNDAMENTAL_PROMPT_PATH,
+)
+from app.agentic.agents.market_intelligence.fundamental_analyst.tools import (
+    get_registered_tool_names as get_fundamental_tool_names,
+)
+from app.agentic.agents.market_intelligence.sentiment_analyst.agent import (
+    PROMPT_PATH as SENTIMENT_PROMPT_PATH,
+)
+from app.agentic.agents.market_intelligence.sentiment_analyst.tools import (
+    get_registered_tool_names as get_sentiment_tool_names,
+)
 from app.agentic.agents.operations.evaluation_manager.agent import (
     PROMPT_PATH as EVALUATION_PROMPT_PATH,
 )
@@ -1290,4 +1302,265 @@ def receiver_result(**overrides: object) -> dict[str, object]:
         "audit_event_ref": "strategy.audit:proposal-a",
     }
     data.update(overrides)
+    return data
+
+
+FUNDAMENTAL_ROLE_ID = "fundamental_analyst"
+SENTIMENT_ROLE_ID = "sentiment_analyst"
+
+FUNDAMENTAL_PROMPT_DIGEST = canonical_digest(
+    normalize_prompt_text(FUNDAMENTAL_PROMPT_PATH.read_text(encoding="utf-8")),
+)
+SENTIMENT_PROMPT_DIGEST = canonical_digest(
+    normalize_prompt_text(SENTIMENT_PROMPT_PATH.read_text(encoding="utf-8")),
+)
+
+INTELLIGENCE_TASK_ID = "task-intelligence-a"
+INTELLIGENCE_INSTRUMENT = "EURUSD"
+INTELLIGENCE_DECISION_TIME = "2026-07-29T11:00:00+00:00"
+
+
+def fundamental_role_manifest_fields(**overrides: object) -> dict[str, object]:
+    """Return complete Fundamental Analyst manifest fields.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        Complete manifest constructor data.
+    """
+    data = manifest_fields(
+        role_id=FUNDAMENTAL_ROLE_ID,
+        owning_feature="FEAT-AGT-09",
+        department="market_intelligence",
+        agent_package="agents/market_intelligence/fundamental_analyst",
+        description="Reads point-in-time filings, transcripts, and macro releases.",
+        objective="State what the evidence supports and what would falsify it.",
+        expertise_boundary="Fetches nothing, computes nothing, recommends nothing.",
+        input_schema_id="agentic.fundamental_request.v1",
+        output_schema_id="agentic.fundamental_evidence_pack.v1",
+        base_prompt_hash=FUNDAMENTAL_PROMPT_DIGEST,
+        evaluation_set_id="eval-fundamental-analyst-v1",
+        tools=get_fundamental_tool_names(),
+        permission_classes=("read_evidence",),
+    )
+    data.update(overrides)
+    return data
+
+
+def build_fundamental_role_manifest(**overrides: object) -> RoleManifest:
+    """Build the validated Fundamental Analyst role manifest.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        A validated manifest with derived integrity digests.
+    """
+    return build_role_manifest(fundamental_role_manifest_fields(**overrides))
+
+
+def build_fundamental_mandate(**overrides: object) -> FirmMandate:
+    """Build a sandbox mandate registering the fundamental tools.
+
+    Args:
+        **overrides: Optional field overrides for mandate variants.
+
+    Returns:
+        A validated firm mandate with a derived content digest.
+    """
+    data: dict[str, object] = {
+        "enabled_features": ("FEAT-AGT-09",),
+        "enabled_roles": (FUNDAMENTAL_ROLE_ID,),
+        "tool_scopes": dict.fromkeys(get_fundamental_tool_names(), "read_evidence"),
+    }
+    data.update(overrides)
+    return build_sandbox_mandate(**data)
+
+
+def sentiment_role_manifest_fields(**overrides: object) -> dict[str, object]:
+    """Return complete Sentiment Analyst manifest fields.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        Complete manifest constructor data.
+    """
+    data = manifest_fields(
+        role_id=SENTIMENT_ROLE_ID,
+        owning_feature="FEAT-AGT-10",
+        department="market_intelligence",
+        agent_package="agents/market_intelligence/sentiment_analyst",
+        description="Reads measured point-in-time news and social evidence.",
+        objective="Report what was measured, separately from what it might mean.",
+        expertise_boundary="Measures nothing, fetches nothing, recommends nothing.",
+        input_schema_id="agentic.sentiment_request.v1",
+        output_schema_id="agentic.sentiment_evidence_pack.v1",
+        base_prompt_hash=SENTIMENT_PROMPT_DIGEST,
+        evaluation_set_id="eval-sentiment-analyst-v1",
+        tools=get_sentiment_tool_names(),
+        permission_classes=("read_evidence",),
+    )
+    data.update(overrides)
+    return data
+
+
+def build_sentiment_role_manifest(**overrides: object) -> RoleManifest:
+    """Build the validated Sentiment Analyst role manifest.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        A validated manifest with derived integrity digests.
+    """
+    return build_role_manifest(sentiment_role_manifest_fields(**overrides))
+
+
+def build_sentiment_mandate(**overrides: object) -> FirmMandate:
+    """Build a sandbox mandate registering the sentiment tools.
+
+    Args:
+        **overrides: Optional field overrides for mandate variants.
+
+    Returns:
+        A validated firm mandate with a derived content digest.
+    """
+    data: dict[str, object] = {
+        "enabled_features": ("FEAT-AGT-10",),
+        "enabled_roles": (SENTIMENT_ROLE_ID,),
+        "tool_scopes": dict.fromkeys(get_sentiment_tool_names(), "read_evidence"),
+    }
+    data.update(overrides)
+    return build_sandbox_mandate(**data)
+
+
+def fundamental_projection(**overrides: object) -> dict[str, str]:
+    """Return a well-formed Research fundamental projection.
+
+    The shape mirrors `research.project_intelligence_evidence` for a
+    `FundamentalSourceEvidence`, flattened to bounded strings as the governed
+    tool boundary carries it.
+
+    Args:
+        **overrides: Optional field overrides for projection variants.
+
+    Returns:
+        Bounded projection fields.
+    """
+    data: dict[str, str] = {
+        "schema_id": "research.fundamental_source_evidence.v1",
+        "asset_scope": INTELLIGENCE_INSTRUMENT,
+        "document_references": (
+            "research.source:ecb-statement-2026-07-24,"
+            "research.source:fed-minutes-2026-07-18,"
+            "research.source:eurostat-hicp-2026-07-17"
+        ),
+        "source_kinds": "macro,statement",
+        "coverage": "macro=2,statement=1",
+        "observed_from": "2026-07-17T00:00:00+00:00",
+        "available_by": "2026-07-29T09:00:00+00:00",
+        "canonical_hash": "a" * 64,
+        "advisory_only": "True",
+    }
+    data.update({str(key): str(value) for key, value in overrides.items()})
+    return data
+
+
+def sentiment_projection(**overrides: object) -> dict[str, str]:
+    """Return a well-formed Research sentiment projection.
+
+    Args:
+        **overrides: Optional field overrides for projection variants.
+
+    Returns:
+        Bounded projection fields.
+    """
+    data: dict[str, str] = {
+        "schema_id": "research.sentiment_source_evidence.v1",
+        "asset_scope": INTELLIGENCE_INSTRUMENT,
+        "document_references": (
+            "research.source:wire-eur-2026-07-29a,"
+            "research.source:wire-eur-2026-07-29b,"
+            "research.source:social-eur-2026-07-29c"
+        ),
+        "polarity": (
+            "research.source:wire-eur-2026-07-29a=0.2,"
+            "research.source:wire-eur-2026-07-29b=-0.1,"
+            "research.source:social-eur-2026-07-29c=none"
+        ),
+        "source_coverage": "news=2,social=1",
+        "trust_evidence": (
+            "research.source:wire-eur-2026-07-29a=trusted,"
+            "research.source:social-eur-2026-07-29c=unverified"
+        ),
+        "manipulation_evidence": "research.source:social-eur-2026-07-29c=coordinated",
+        "missing_measurements": "research.source:social-eur-2026-07-29c",
+        "disagreement": "true",
+        "available_by": "2026-07-29T10:30:00+00:00",
+        "canonical_hash": "b" * 64,
+        "advisory_only": "True",
+    }
+    data.update({str(key): str(value) for key, value in overrides.items()})
+    return data
+
+
+def fundamental_model_output(**overrides: object) -> dict[str, str]:
+    """Return a well-formed fundamental model output.
+
+    Args:
+        **overrides: Optional field overrides for output variants.
+
+    Returns:
+        The model output a fundamental run would parse.
+    """
+    data: dict[str, str] = {
+        "claim:policy_divergence": (
+            "The supplied statements describe a widening policy-rate gap "
+            "between the two currency blocs over the observed window."
+        ),
+        "assumption:policy_divergence": (
+            "The statements are assumed to reflect the committees' settled "
+            "positions rather than provisional drafts."
+        ),
+        "horizon:policy_divergence": (
+            "Asserted over the six weeks to the next scheduled meeting of "
+            "either committee."
+        ),
+        "falsifier:policy_divergence": (
+            "Either committee publishes a statement reversing the direction "
+            "described, or an unscheduled decision moves rates the other way."
+        ),
+        "uncertainty": (
+            "The evidence covers three macro releases and no issuer filings, "
+            "and says nothing about how the gap transmits to spot pricing."
+        ),
+    }
+    data.update({str(key): str(value) for key, value in overrides.items()})
+    return data
+
+
+def sentiment_model_output(**overrides: object) -> dict[str, str]:
+    """Return a well-formed sentiment model output.
+
+    Args:
+        **overrides: Optional field overrides for output variants.
+
+    Returns:
+        The model output a sentiment run would parse.
+    """
+    data: dict[str, str] = {
+        "event:research.source:wire-eur-2026-07-29a": "policy_statement",
+        "event:research.source:wire-eur-2026-07-29b": "data_release",
+        "unsupported_narrative": (
+            "The two wire items frame the same release differently, which the "
+            "lexicon does not measure and which may be nothing."
+        ),
+        "uncertainty": (
+            "One of three documents could not be measured, and the two that "
+            "were disagree in sign."
+        ),
+    }
+    data.update({str(key): str(value) for key, value in overrides.items()})
     return data

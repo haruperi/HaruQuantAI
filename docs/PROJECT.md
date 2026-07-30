@@ -33,7 +33,7 @@ satisfied.
 
 - `app/utils/` implements the shared v1 contracts, errors, identifiers, UTC,
   canonical serialization, redaction/security helpers, settings, and logging.
-- `app/services/brokers/` is a partial implementation baseline. The canonical
+- `app/services/brokers/` is a completed implementation baseline. The canonical
   contracts, registry, runtime safety, provider adapters, and deterministic test
   adapter implement `FEAT-BRK-00`-`FEAT-BRK-15`. MT5/cTrader execution-state,
   calculation, and mutation bodies are present; cTrader/Binance streams and
@@ -183,12 +183,12 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Package**: `app/services/data`
 * **Responsibility**: Acquire, normalize, store, and serve trusted market data, read-only broker/account state, and governed point-in-time research-source documents. All broker/provider access is read-only and flows through the Brokers domain's canonical read capabilities.
 * **Inputs**: Package-root retrieval arguments or typed Data requests, Broker/provider reads, historical files, admitted CSV/Parquet artifacts, backfill commands, and licensed filing/transcript/macro/news/approved alternative source records.
-* **Outputs**: Normalized bars/ticks (`MarketDataset`), account/broker state snapshots (`AccountStateSnapshot`), storage state, detached analytical projections, and the future `ResearchSourceDocument`/query evidence family.
+* **Outputs**: Normalized bars/ticks (`MarketDataset`), account/broker state snapshots (`AccountStateSnapshot`), storage state, detached analytical projections, and opaque point-in-time research-source/query evidence values.
 * **Owns**: Historical market and account data storage/persistence, durable audit storage, shared database infrastructure, connections, locking, SQLite migration execution framework, real-time feed handling, data-source selection and cross-provider fallback policy, every provider/cross-provider alias mapping plus canonical and friendly market identity, conversion of those identities to exact provider-native symbols before a Brokers call, normalization of raw broker/provider reads into `MarketDataset` / `AccountStateSnapshot`, multi-timeframe alignment, deterministic series-level market-data quality inspection producing scored issue, severity, and remediation evidence, and deterministic tick-series derivation from real bar or tick evidence under approved tick and spread models (distinct from GBM synthetic generation, which is fixtures-only and never reaches an official simulation run).
 * **Boundaries**: Foundation layer with no trading decision logic. Brokers continues to own provider adapter implementations and connection/session mechanics. Data's package-root retrieval facade may privately and lazily compose a read-only adapter through the Brokers factory from Utils-loaded settings; manual adapter/source injection remains supported. Data does not expose that composition, invoke broker mutations, own strategy logic, backtest engines, sizing formulas, order dispatch, or other domains' tables, artifact schemas, and migration definitions (each domain owns its tables, artifact schemas, and migration definitions, utilizing the shared execution framework). Raw provider DataFrames, sockets, DB sessions, credentials, adapters, and provider SDK objects never cross its boundary. Data may explicitly project canonical bar or tick `MarketDataset` evidence into detached analytical DataFrames whose exact columns, missingness, units, and precision-loss boundaries are fixed in the Data README; the canonical dataset remains authoritative evidence.
 * **Key Limits**: Backfill chunks must be bounded and checkpointed; exclusive path-scoped write locks (`CONCURRENT_WRITE_LOCKED` on conflict); no-lookahead alignment by default; all broker/provider access is read-only and routed through Brokers. Quality evidence attached to a `MarketDataset` must be computed from the actual records; a constant or unexamined quality score is never emitted.
 * **Market-time authority**: Data owns broker-independent market-hour evaluation. Brokers supplies provider-authored symbol sessions (including cTrader weekly intervals and holidays); exchange-traded instruments require an explicit exchange calendar identifier; providers without a session API may use only an explicit revisioned weekly definition. Named Sydney/Tokyo/London/New York sessions are analytical liquidity labels and never establish tradability or order authority.
-* **Module structure**: The existing fifteen focused capabilities are complete. `FEAT-DATA-16` adds the documented but `Missing` `research_sources/` capability required for point-in-time fundamental and sentiment evidence. Each registered capability owns exactly one folder and one standalone usage program. Historical interpretation remains owned by Research/Agentic.
+* **Module structure**: All sixteen focused capabilities are complete, including `FEAT-DATA-16` `research_sources/` point-in-time evidence. Each registered capability owns exactly one folder and one standalone usage program. Historical interpretation remains owned by Research/Agentic.
 * **Documentation**: `app/services/data/README.md`
 
 #### 2.1.4 Indicators
@@ -286,7 +286,7 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Inputs**: Registered Strategy references, Analytics-owned `PortfolioAllocationEvidence`, Data-owned `AccountStateSnapshot` / `FXConversionEvidence`, Simulation-owned portfolio results, Risk-owned eligibility/allocation decisions, and explicit construction/rebalance configuration.
 * **Outputs**: `PortfolioConstructionResult`, `ActivePortfolioAllocation`, and `PortfolioRebalancePlan`; receiver-owned requests submitted to Risk, Simulation, and Trading.
 * **Owns**: Portfolio definitions/objectives, deterministic fixed/equal/inverse-volatility construction, target capital-weight metadata and proposed risk-budget weights, proposal/version identity, activation state, drift detection, reduce-only rebalance planning, rollback-as-new-version, and Portfolio-owned schemas/migrations/artifacts. Risk owns the authoritative risk-budget projection.
-* **Boundaries**: Never registers strategies, computes Analytics metrics, approves risk, determines final order size, directly mutates broker state, or imports provider SDKs. Portfolio submits Risk-owned review/budget requests and Trading-owned rebalance execution requests. It cannot activate an allocation without current Risk approval and required simulation evidence.
+* **Boundaries**: `app.services.portfolio` is the sole public import boundary and exports standalone functions only; values and services remain opaque. Portfolio never registers strategies, computes Analytics metrics, approves risk, determines final order size, directly mutates broker state, or imports provider SDKs. Portfolio submits Risk-owned review/budget requests and Trading-owned rebalance execution requests. It cannot activate an allocation without current Risk approval and required simulation evidence.
 * **Key Limits**: No hidden numeric defaults; portfolio size, weight caps, evidence freshness, drift thresholds, schedules, and decision expiry are required profile values. Missing/stale evidence fails closed. Live/paper activation requires authenticated human approval plus Risk authorization.
 * **Documentation**: `app/services/portfolio/README.md`
 
@@ -350,10 +350,12 @@ Domains are listed in dependency order, from lowest dependency to highest depend
   of twenty-two features are implemented, and the domain has never run for
   real:** no live provider call, no bound sandbox, no durable store anywhere,
   no role evaluated, no artefact promoted, no advisory reviewed, no proposal
-  evaluated, no incident outside tests. `FEAT-AGT-09` and
-  `10`
-  remain `Missing`, so two agent roles are unavailable and no Agentic system
-  workflow is complete; both stay blocked on `FEAT-DATA-16` and `FEAT-RES-13`.
+  evaluated, no incident outside tests. `FEAT-AGT-09` and `FEAT-AGT-10` landed
+  once `FEAT-DATA-16` and `FEAT-RES-13` unblocked them, and read a Research
+  projection through an injected port: no source has been fetched, no evidence
+  assembled, and no polarity measured outside tests. No Agentic system workflow
+  is complete — `WF-AGT-005` still has no isolation runtime to open, and every
+  cross-domain workflow needs a composition root that binds the ports.
 * **Documentation**: `app/agentic/README.md`
 
 #### 2.1.14 UI/API
@@ -1370,7 +1372,8 @@ The system is complete only when:
 - [ ] All tests and quality checks pass.
 
 Current status: `Missing` — the complete target system and system workflows are not
-implemented. Utils, Brokers, and Data are partial implementation baselines; Indicators and the
+implemented. Utils and Brokers are completed implementation baselines; Data is a
+partial implementation baseline. Indicators and the
 remaining domains are tracked independently, and current repository-wide
 documentation-quality cleanup does not erase completed functional domain evidence.
 

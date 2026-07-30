@@ -725,12 +725,10 @@ def test_the_root_exports_the_operator_surface() -> None:
 
 
 def test_the_root_exposes_no_unimplemented_capability() -> None:
-    # FEAT-AGT-09 and -10 are not implemented, and WF-AGT-005's planned
-    # sandbox exports have no runtime to open.
-    for absent in (
-        "analyze_fundamentals",
-        "analyze_sentiment",
-        "open_sandbox",
-        "stage_code_artifact",
-    ):
+    # WF-AGT-005's planned sandbox exports have no isolation runtime to open,
+    # so they stay absent. FEAT-AGT-09 and -10 have since landed and are
+    # exported; the assertion below reflects that.
+    for absent in ("open_sandbox", "stage_code_artifact"):
         assert absent not in agentic_root.__all__
+    for present in ("analyze_fundamentals", "analyze_sentiment"):
+        assert present in agentic_root.__all__

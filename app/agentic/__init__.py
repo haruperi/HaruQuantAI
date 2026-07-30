@@ -16,11 +16,10 @@ adds the authenticated operator surface — submit, inspect, cancel,
 approve-handoff, replay, quarantine, audit, and disablement — and the role
 operations of the implemented leaf agent packages.
 
-Two things are deliberately absent. `FEAT-AGT-09` and `FEAT-AGT-10` are not
-implemented, so no fundamental or sentiment operation appears here. And
-`open_sandbox` and `stage_code_artifact`, which `WF-AGT-005` names as planned
-root exports, are **not** exported: no isolation runtime exists to open, and a
-function that returned a lease nothing honours would be worse than the gap.
+All twenty-two registered features are implemented. `open_sandbox` and
+`stage_code_artifact`, which `WF-AGT-005` names as planned root exports, remain
+**absent**: no isolation runtime exists to open, and a function that returned a
+lease nothing honours would be worse than the gap.
 """
 
 from app.agentic.agents.engineering.coder.agent import author_code_artifact
@@ -40,6 +39,12 @@ from app.agentic.agents.market_analysis.quantitative_analyst.agent import (
 )
 from app.agentic.agents.market_analysis.technical_analyst.agent import (
     analyze_technical_context,
+)
+from app.agentic.agents.market_intelligence.fundamental_analyst.agent import (
+    analyze_fundamentals,
+)
+from app.agentic.agents.market_intelligence.sentiment_analyst.agent import (
+    analyze_sentiment,
 )
 from app.agentic.agents.operations.evaluation_manager.agent import (
     critique_candidate,
@@ -164,7 +169,9 @@ from app.agentic.runtime.upgrades import (
 
 __all__: tuple[str, ...] = (
     "advise_portfolio",
+    "analyze_fundamentals",
     "analyze_quantitative_evidence",
+    "analyze_sentiment",
     "analyze_technical_context",
     "approve_agentic_handoff",
     "assemble_context",

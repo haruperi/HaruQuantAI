@@ -2,6 +2,31 @@
 
 ## [Unreleased]
 
+### Complete point-in-time Research intelligence evidence
+
+Data and Research now provide the governed source-to-evidence path required for bounded fundamental and deterministic sentiment research.
+
+#### Added (2)
+
+- Added Data `FEAT-DATA-16` bounded HTTPS source ingestion, immutable revision persistence, decision-time eligibility queries, and detached evidence projection.
+- Added Research `FEAT-RES-13` fundamental/sentiment evidence plus completed `WF-RES-012` profile comparison with genuine usage evidence.
+
+#### Changed (1)
+
+- Refactored Research to a function-only package-root boundary and migrated its direct consumers, tests, workflows, and registry documentation.
+
+#### Fixed (1)
+
+- Fixed Research spread cleaning for empty prepared frames and made official-feed identity and publication time derive from retrieved RSS content rather than caller assertions.
+
+### Reconcile and complete the Brokers focused-domain baseline
+
+The Brokers package registry, structure, and evidence now match the implemented sixteen-feature one-folder-per-feature layout, and the domain completion gate passes green.
+
+#### Changed (1)
+
+- Reconciled the Brokers README with the implemented one-feature/one-folder structure, added the `WF-BRK-010` discovery integration test, rewrote usage parity to the file-level evidence convention, and marked the Brokers baseline `Completed` with 424 passing tests.
+
 ### Audit Utils, Brokers, and Data runtime truth and public boundaries
 
 The three audited domains now expose function-only package roots, focused tests exceed the per-file coverage floor, and usage evidence distinguishes genuine provider results from unavailable or test-only capabilities.
@@ -10,7 +35,7 @@ The three audited domains now expose function-only package roots, focused tests 
 
 - Completed Strategy `FEAT-STR-11` external proposal evaluation plus `WF-STR-011` approved Optimization-result adoption and `WF-STR-012` research-only signal evaluation, without importing or changing the upstream Optimization, Simulator, Analytics, or Research domains.
 
-#### Changed (7)
+#### Changed (10)
 
 - Added the opaque `load_broker_provider_settings` function and Brokers-owned `resolve_provider_connection_config`/`create_connected_broker` operations so no settings class or connection DTO crosses a public package boundary.
 - Rewrote the Data composition root `_LazyBrokerSession` to resolve MT5, cTrader, and credential-free providers through the Brokers resolver and removed its private `_ProviderRuntimeSettings`, so Data no longer resolves credentials or builds connection configurations.
@@ -19,8 +44,11 @@ The three audited domains now expose function-only package roots, focused tests 
 - Reworked every Indicators feature usage and the active workflow evidence to print bounded MT5-derived OHLCV and calculated DataFrames, and added direct subprocess coverage for `WF-INDI-006` through `WF-INDI-008`.
 - Refactored Risk to a 63-function package-root boundary, migrated direct consumers away from public classes/constants and deep imports, and completed all fifteen registered Risk workflows with substantive bounded evidence.
 - Refactored Trading to a function-only package-root boundary, migrated direct consumers, completed `WF-TRD-015` and `WF-TRD-016`, and raised every Trading production file above the 80% branch-aware coverage floor.
+- Refactored Simulator to a lazy, function-only package-root boundary with opaque value/handle operations, migrated its direct consumers, and completed standalone evidence for `WF-SIM-011` and `WF-SIM-012`.
+- Refactored Optimization to a function-only package-root boundary with opaque contract construction and inspection, replaced fake usage adapters with genuine MT5-derived Simulator/Analytics execution, and completed `WF-OPT-007` and `WF-OPT-008`.
+- Refactored Portfolio to a 21-function package-root boundary, migrated external consumers to opaque values/handles, and replaced canned workflow evidence with genuine MT5 and Simulator results plus transactional SQLite Portfolio state.
 
-#### Fixed (9)
+#### Fixed (10)
 
 - Fixed the Data composition root silently ignoring `settings.mt5.*` in `app/configs/env.json` because `_ProviderRuntimeSettings` extended `BaseSettings` instead of `AppSettings` and therefore read only the process environment; real-MT5 retrieval through the Data path now honors the central settings file.
 - Fixed Brokers package-root history/time-range forwarding and canonical timeframe normalization, restoring genuine MT5 history and Dukascopy bar reads.
@@ -31,6 +59,18 @@ The three audited domains now expose function-only package roots, focused tests 
 - Fixed Indicators response handling, private Data structural typing, workflow configuration construction, and validation/error branch coverage so the focused suite passes with every Indicators production file above the 80% floor.
 - Fixed Strategy response unwrapping, function-only contract/evaluator construction, deterministic checkpoint/configuration failures, and real MT5-backed usage evidence so all ten implemented workflows pass and every Strategy production file exceeds 80% branch coverage.
 - Fixed Risk YAML profile coercion for tuple, enum, loss-basis, hash-compatibility, and crisis-window fields; focused validation now passes 187 tests at 85.4% branch-aware coverage with every Risk production file above 80%.
+- Fixed Simulator timeline type validation, response trace fallback, typed idempotent replay, and terminal liquidation so real MT5-backed runs publish closed-trade evidence rather than empty or canned results.
+
+### Complete the Agentic firm with fundamental and sentiment research
+
+The last two registered Agentic roles land now that Data and Research provide the point-in-time source-to-evidence path they depend on.
+
+#### Added (2)
+
+- `FEAT-AGT-09` Fundamental Research: applicability is the receiver's answer, read before any model call, so a fundamental reading of an FX instrument under the issuer model is refused and never queried for data — Research's issuer model covers equity, corporate bonds, and funds, and FX has no issuer, which under an FX mandate makes that the ordinary path rather than an edge case; observation and availability instants, source kinds, coverage counts, document references, and the canonical digest are all copied from Research's projection, so a model output claiming a different availability instant or digest changes nothing; and claims, assumptions, horizons, and falsifiers are validated as parallel key sets, so a claim nobody can say how to falsify is a construction error rather than a review finding. Every projected reference passes `FEAT-AGT-06`'s injection classifier before the model is invoked, flagged references are excluded and recorded in the pack's uncertainty, and a projection consisting only of instructions is refused outright. The pack defines no numeric field at all.
+- `FEAT-AGT-10` News and Sentiment Research: source coverage, measured polarity, event classification, uncertainty, and unsupported narrative are five distinct fields, so a narrative the measurements do not support cannot be presented as one — and `unsupported_narrative` is kept rather than forbidden precisely so an analyst can say what the lexicon cannot measure, in the field labelled as not evidence. Trust, manipulation, revision, coverage, and availability metadata come from `SentimentSourceEvidence` unchanged; disagreement and unmeasurable documents are reported rather than averaged away; and the deterministic measurement version is checked against Research's closed set before any receiver round-trip. Instruction stripping runs **before** the model call, not after: flagged references are excluded from what the model sees, counted in the trusted context, recorded on the pack, and appended to its uncertainty.
+
+Neither package imports Research or Data. Both reach the receiver through an injected port, so the chain stays Agentic to Research to Data, and a test asserts it. All twenty-two Agentic features are now implemented; none of it has run for real — no live provider call, no bound sandbox runtime, no durable store, no evaluated role, no promoted artefact, no reviewed advisory, no evaluated proposal, and no source fetched.
 
 ### Add the public Agentic API and operator control
 

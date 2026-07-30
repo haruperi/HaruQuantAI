@@ -234,8 +234,8 @@ order below is the binding implementation order.
 | Completed | `FEAT-AGT-06` Evidence Context and Governed Memory              | `context_memory/`  | `EvidenceClaim`, `ContextBundle`, `MemoryRecord`, `AgenticMemoryStore`, `build_evidence_claim`, `build_memory_record`, `classify_injection`, `derive_content_hash`, `assemble_context`, `get_exclusion_reasons`, `build_in_memory_memory_store`, `store_memory`, `retrieve_memory`, `get_agentic_memory_migration_statements`, `build_agentic_memory_migration_request`               | `FR-AGENTIC-016`–`018` | `tests/agentic/usage/06_context_memory.py`  |
 | Completed | `FEAT-AGT-07` Dynamic Deliberation and Synthesis                | `deliberation/`    | `DeliberationPlan`, `Counterclaim`, `DissentRecord`, `DeliberationRecord`, `run_deliberation`, `reject_authorization_language`, `derive_record_hash`                           | `FR-AGENTIC-019`–`021` | `tests/agentic/usage/07_deliberation.py`    |
 | Completed | `FEAT-AGT-08` Analytics Interpretation                          | `agents/experimentation/simulation_interpreter/`       | `RunInterpretation`, `build_run_interpretation`, `interpret_analytics_evidence`                                                         | `FR-AGENTIC-022`–`024` | `tests/agentic/usage/08_interpretation.py`  |
-| Missing | `FEAT-AGT-09` Fundamental Research                              | `agents/market_intelligence/fundamental_analyst/`      | `FundamentalEvidencePack`, `analyze_fundamentals`                                                           | `FR-AGENTIC-025`–`027` | `tests/agentic/usage/09_fundamental.py`     |
-| Missing | `FEAT-AGT-10` News and Sentiment Research                       | `agents/market_intelligence/sentiment_analyst/`        | `SentimentEvidencePack`, `analyze_sentiment`                                                                | `FR-AGENTIC-028`–`030` | `tests/agentic/usage/10_sentiment.py`       |
+| Completed | `FEAT-AGT-09` Fundamental Research                              | `agents/market_intelligence/fundamental_analyst/`      | `FundamentalEvidencePack`, `analyze_fundamentals`                                                           | `FR-AGENTIC-025`–`027` | `tests/agentic/usage/09_fundamental.py`     |
+| Completed | `FEAT-AGT-10` News and Sentiment Research                       | `agents/market_intelligence/sentiment_analyst/`        | `SentimentEvidencePack`, `analyze_sentiment`                                                                | `FR-AGENTIC-028`–`030` | `tests/agentic/usage/10_sentiment.py`       |
 | Completed | `FEAT-AGT-11` Technical and Market-Structure Research           | `agents/market_analysis/technical_analyst/`            | `TechnicalEvidencePack`, `build_technical_evidence_pack`, `analyze_technical_context`                                                        | `FR-AGENTIC-031`–`033` | `tests/agentic/usage/11_technical.py`       |
 | Completed | `FEAT-AGT-12` Quantitative Research                             | `agents/market_analysis/quantitative_analyst/`         | `QuantitativeEvidencePack`, `analyze_quantitative_evidence`                                                 | `FR-AGENTIC-034`–`036` | `tests/agentic/usage/12_quantitative.py`    |
 | Completed | `FEAT-AGT-13` Hypothesis and Strategy Thesis Development        | `agents/strategy_desk/strategy_thesis_analyst/`        | `Hypothesis`, `StrategyThesis`, `build_hypothesis`, `build_strategy_thesis`, `develop_hypothesis`, `develop_strategy_thesis`                             | `FR-AGENTIC-037`–`039` | `tests/agentic/usage/13_thesis.py`          |
@@ -1080,35 +1080,62 @@ deadline, tool, token, or cost limits.
 
 | Status  | File            | Responsibility                                      | Key exports                 | Dependencies                                                                                                                     |
 | ------- | --------------- | --------------------------------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Missing | `agent.py`    | Define the provider-neutral analyst and analyze eligible point-in-time fundamental evidence | `analyze_fundamentals` | **Standard library:** `pathlib`; **Required third-party:** None; **Local:** governance, runtime, deliberation, Research public contracts |
-| Missing | `prompt.md`   | Define immutable fundamental-analysis, evidence, uncertainty, falsifier, and refusal instructions | Internal prompt artefact | **Standard library:** None; **Required third-party:** None; **Local:** None |
-| Missing | `schemas.py`  | Define bounded fundamental evidence output          | `FundamentalEvidencePack` | **Standard library:** None; **Required third-party:** `pydantic`; **Local:** contracts |
-| Missing | `tools.py`    | Bind only governed point-in-time fundamental evidence tools | Internal only; no public export | **Standard library:** None; **Required third-party:** None; **Local:** permissions, Research public contracts |
-| Missing | `README.md`   | Document the feature boundary, API, prompt, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
-| Missing | `__init__.py` | Expose the Feature Registry API                     | Feature Registry exports only | **Standard library:** None; **Required third-party:** None; **Local:** `agent.py`, `schemas.py` |
+| Completed | `agent.py`    | Define the provider-neutral analyst and analyze eligible point-in-time fundamental evidence | `analyze_fundamentals` | **Standard library:** `pathlib`, `decimal`; **Required third-party:** None; **Local:** governance, runtime, permissions, context memory, `schemas.py`, `tools.py` |
+| Completed | `prompt.md`   | Define immutable fundamental-analysis, evidence, uncertainty, falsifier, and refusal instructions | Internal prompt artefact | **Standard library:** None; **Required third-party:** None; **Local:** None |
+| Completed | `schemas.py`  | Define bounded fundamental evidence output          | `FundamentalEvidencePack` | **Standard library:** `types`; **Required third-party:** `pydantic`; **Local:** deliberation |
+| Completed | `tools.py`    | Bind only governed point-in-time fundamental evidence tools | Internal only; no public export | **Standard library:** None; **Required third-party:** None; **Local:** permissions, context memory, injected Research-evidence port |
+| Completed | `README.md`   | Document the feature boundary, API, prompt, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
+| Completed | `__init__.py` | Expose the Feature Registry API                     | Feature Registry exports only | **Standard library:** None; **Required third-party:** None; **Local:** `agent.py`, `schemas.py` |
 
 | Status  | Requirement ID     | Responsibility                                                                                                                                    | Side effects | Failure / Verification            |
 | ------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------------------------- |
-| Missing | `FR-AGENTIC-025` | Fundamental analysis shall use licensed point-in-time filings, transcripts, macro, and issuer evidence with publication and availability lineage. | Model call   | Point-in-time and licensing tests |
-| Missing | `FR-AGENTIC-026` | Fundamental outputs shall be asset-class aware and refuse when required issuer or macro evidence is unavailable or inapplicable.                  | None         | Applicability/refusal tests       |
-| Missing | `FR-AGENTIC-027` | Fundamental claims shall include evidence, assumptions, horizon, uncertainty, and falsifiers and shall remain advisory.                           | None         | Schema and authority tests        |
+| Completed | `FR-AGENTIC-025` | Fundamental analysis shall use licensed point-in-time filings, transcripts, macro, and issuer evidence with publication and availability lineage. | Read-only receiver calls; model call | Point-in-time and licensing tests |
+| Completed | `FR-AGENTIC-026` | Fundamental outputs shall be asset-class aware and refuse when required issuer or macro evidence is unavailable or inapplicable.                  | Read-only receiver call | Applicability/refusal tests       |
+| Completed | `FR-AGENTIC-027` | Fundamental claims shall include evidence, assumptions, horizon, uncertainty, and falsifiers and shall remain advisory.                           | None         | Schema and authority tests        |
+
+The canonical dependency column lists the Research public contracts as a local
+dependency. Nothing in the package imports them: building the evidence also
+requires a Data `ResearchSourceQuery`, so a concrete binding would pull two
+receiver domains into an agent package. An approved composition root binds the
+injected port instead, and a test asserts the package names neither
+`app.services.research` nor `app.services.data`. The chain stays
+Agentic → Research → Data.
+
+Applicability is the receiver's answer, read before the evidence call. Research
+covers issuer models for equity, corporate bonds, and funds only, so a
+fundamental reading of an FX instrument under the issuer model is refused and
+never reaches the model — the ordinary path under an FX mandate, not an edge
+case, and the integration test binds the real
+`research.assess_intelligence_applicability` to prove it.
 
 ### 4.10 `agents/market_intelligence/sentiment_analyst/` — News and Sentiment Research
 
 | Status  | File            | Responsibility                           | Key exports               | Dependencies                                                                                                                     |
 | ------- | --------------- | ---------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Missing | `agent.py`    | Define the provider-neutral analyst and analyze eligible governed text evidence | `analyze_sentiment` | **Standard library:** `pathlib`; **Required third-party:** None; **Local:** governance, runtime, deliberation, Research public contracts |
-| Missing | `prompt.md`   | Define immutable sentiment, manipulation, uncertainty, unsupported-narrative, and refusal instructions | Internal prompt artefact | **Standard library:** None; **Required third-party:** None; **Local:** None |
-| Missing | `schemas.py`  | Define bounded sentiment evidence output | `SentimentEvidencePack` | **Standard library:** None; **Required third-party:** `pydantic`; **Local:** contracts |
-| Missing | `tools.py`    | Bind only governed, injection-filtered text-evidence tools | Internal only; no public export | **Standard library:** None; **Required third-party:** None; **Local:** permissions, Research public contracts |
-| Missing | `README.md`   | Document the feature boundary, API, prompt, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
-| Missing | `__init__.py` | Expose the Feature Registry API          | Feature Registry exports only | **Standard library:** None; **Required third-party:** None; **Local:** `agent.py`, `schemas.py` |
+| Completed | `agent.py`    | Define the provider-neutral analyst and analyze eligible governed text evidence | `analyze_sentiment` | **Standard library:** `pathlib`, `decimal`; **Required third-party:** None; **Local:** governance, runtime, permissions, context memory, `schemas.py`, `tools.py` |
+| Completed | `prompt.md`   | Define immutable sentiment, manipulation, uncertainty, unsupported-narrative, and refusal instructions | Internal prompt artefact | **Standard library:** None; **Required third-party:** None; **Local:** None |
+| Completed | `schemas.py`  | Define bounded sentiment evidence output | `SentimentEvidencePack` | **Standard library:** `types`; **Required third-party:** `pydantic`; **Local:** deliberation |
+| Completed | `tools.py`    | Bind only governed, injection-filtered text-evidence tools | Internal only; no public export | **Standard library:** None; **Required third-party:** None; **Local:** permissions, context memory, injected Research-evidence port |
+| Completed | `README.md`   | Document the feature boundary, API, prompt, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
+| Completed | `__init__.py` | Expose the Feature Registry API          | Feature Registry exports only | **Standard library:** None; **Required third-party:** None; **Local:** `agent.py`, `schemas.py` |
 
 | Status  | Requirement ID     | Responsibility                                                                                                                                 | Side effects                | Failure / Verification         |
 | ------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | ------------------------------ |
-| Missing | `FR-AGENTIC-028` | Sentiment analysis shall use governed news/social sources with source trust, deduplication, revision, manipulation, and availability metadata. | Model call                  | Source-governance tests        |
-| Missing | `FR-AGENTIC-029` | Retrieved text shall pass instruction stripping and structured fact extraction before sentiment reasoning.                                     | Deterministic preprocessing | Injection and extraction tests |
-| Missing | `FR-AGENTIC-030` | Sentiment output shall separate source coverage, measured polarity, event classification, uncertainty, and unsupported narrative.              | None                        | Output separation tests        |
+| Completed | `FR-AGENTIC-028` | Sentiment analysis shall use governed news/social sources with source trust, deduplication, revision, manipulation, and availability metadata. | Read-only receiver calls; model call | Source-governance tests        |
+| Completed | `FR-AGENTIC-029` | Retrieved text shall pass instruction stripping and structured fact extraction before sentiment reasoning.                                     | Deterministic preprocessing | Injection and extraction tests |
+| Completed | `FR-AGENTIC-030` | Sentiment output shall separate source coverage, measured polarity, event classification, uncertainty, and unsupported narrative.              | None                        | Output separation tests        |
+
+The same dependency-column divergence recorded for §4.9 applies: the Research
+operations are reached through an injected port rather than imported, and a
+test asserts it.
+
+`FR-AGENTIC-029` runs `FEAT-AGT-06`'s `classify_injection` over every projected
+reference **before** the model is invoked. Flagged references are excluded from
+what the model sees, counted in the trusted context, recorded on the pack, and
+appended to its uncertainty; a projection consisting only of instructions is
+refused outright. The classifier is best-effort by its own documentation and is
+not the security boundary — the boundary is that retrieved text occupies an
+evidence slot and never an instruction slot.
 
 ### 4.11 `agents/market_analysis/technical_analyst/` — Technical and Market-Structure Research
 

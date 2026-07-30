@@ -29,7 +29,10 @@
 * Code present: `app/` package with implemented service modules under `app/services/`, including Trading as the surviving live-route runtime and broker-dispatch owner.
 * The retired Live service has been folded into `app/services/trading/`; live execution remains a runtime route/mode, not a standalone service package.
 * `app/services/api/README.md` defines the approved gateway/UI boundary, state ownership, and synchronous initial Simulation/Optimization surface; no API runtime code or `ui/` application package has landed yet.
-* `app/services/portfolio/README.md` now defines the approved Portfolio target architecture; the package code is not yet implemented. Portfolio is the thirteenth domain and its status remains `Missing`.
+* Portfolio is implemented and `Completed`: `app.services.portfolio` is its sole
+  public boundary, exposes standalone functions only, and coordinates genuine
+  Data/Simulation evidence while keeping Risk approval and Trading execution in
+  their owning domains.
 * `app/agentic/README.md` defines the complete Agentic Firm target. The package now
   exists and Agentic status is `Partial`: `FEAT-AGT-01` implements the seven canonical
   provider-neutral contracts (`AgentTask`, `AgentMessage`, `AgentArtifact`,
@@ -216,11 +219,21 @@
   disabling a package that never held safety authority cannot weaken safety.
   `WF-AGT-005`'s planned `open_sandbox` and `stage_code_artifact` are
   deliberately not exported, because no isolation runtime exists to open.
-  `FEAT-AGT-09` and `10` remain `Missing`, blocked on `FEAT-DATA-16` and
-  `FEAT-RES-13`. Twenty of the twenty-two features are implemented, and none of
-  it has run for real: no live provider call, no bound sandbox runtime, no
-  durable store, no evaluated role, no promoted artefact, no reviewed advisory,
-  no evaluated proposal.
+  `FEAT-AGT-09` and `FEAT-AGT-10` complete the twenty-two once `FEAT-DATA-16`
+  and `FEAT-RES-13` unblocked them. Both read a Research projection through an
+  injected port rather than importing a receiver, so the chain stays
+  Agentic to Research to Data. Applicability is the receiver's answer read
+  before any model call, which is why a fundamental reading of an FX instrument
+  under the issuer model is refused: Research's issuer model covers equity,
+  corporate bonds, and funds, and FX has no issuer. Claims, assumptions,
+  horizons, and falsifiers are parallel key sets, so a claim nobody can say how
+  to falsify is unrepresentable; and the sentiment analyst runs `FEAT-AGT-06`'s
+  injection classifier over every reference **before** the model is invoked,
+  excluding and counting what it flags, so retrieved text occupies an evidence
+  slot and never an instruction slot. All twenty-two features are implemented,
+  and none of it has run for real: no live provider call, no bound sandbox
+  runtime, no durable store, no evaluated role, no promoted artefact, no
+  reviewed advisory, no evaluated proposal, and no source fetched.
   Google ADK 2.x is adopted behind a scoped `requests` override, documented in
   `pyproject.toml` with the condition for its removal. Its hybrid layout keeps ten shared control-plane features as focused root packages and places twelve role-bearing features under registered `agents/<department>/<agent_name>/` leaf packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, feature schemas, and only specification-required optional files. Specialized leadership, market-intelligence, technical, quantitative, strategy/trader, experimentation, engineering, portfolio/risk-advisory, and operations roles may dynamically collaborate, simulate, optimize, code, and submit typed proposals. Google ADK 2.x is the selected runtime behind provider-neutral HaruQuantAI contracts. Agentic has no broker credential, direct broker route, risk approval, kill-switch authority, or execution authority; consequential proposals traverse the normal deterministic pipeline.
 * `app/utils/` is a partial implementation baseline for shared v1 contracts,
@@ -290,10 +303,10 @@
   `FR-SIM-033` fixture parity are verified without reverse imports. Analytics
   derives its equity curve deterministically from the closed-trade ledger and has
   no open decisions.
-* `app/services/research/` retains its completed twelve-feature deterministic
-  research baseline. Its status is now `Partial`: `FEAT-RES-13` documents the
-  `Missing` deterministic fundamental/sentiment source-evidence projection required
-  before those Agentic roles can activate.
+* `app/services/research/` provides a completed thirteen-feature deterministic
+  research baseline. `FEAT-RES-13` projects bounded fundamental and deterministic
+  sentiment evidence from eligible point-in-time Data records without exposing
+  unrestricted source content or granting strategy/execution authority.
 
 ---
 

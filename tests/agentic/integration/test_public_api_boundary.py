@@ -386,15 +386,13 @@ def test_the_root_surface_stays_function_only() -> None:
 
 @pytest.mark.parametrize(
     "planned",
-    [
-        "open_sandbox",
-        "stage_code_artifact",
-        "analyze_fundamentals",
-        "analyze_sentiment",
-    ],
+    ["open_sandbox", "stage_code_artifact"],
 )
 def test_the_root_exposes_nothing_that_does_not_exist(planned) -> None:
-    # WF-AGT-005 names two planned sandbox exports and FEAT-AGT-09/-10 name two
-    # roles. None is implemented, so none is exported: a function that could
-    # not do what its name promises is worse than the gap.
+    # WF-AGT-005 names two planned sandbox exports. Neither is implemented, so
+    # neither is exported: a function that could not do what its name promises
+    # is worse than the gap. FEAT-AGT-09 and -10 have since landed, and their
+    # operations are exported because they genuinely work.
     assert planned not in agentic_root.__all__
+    assert "analyze_fundamentals" in agentic_root.__all__
+    assert "analyze_sentiment" in agentic_root.__all__
