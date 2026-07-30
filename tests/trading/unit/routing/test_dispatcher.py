@@ -6,29 +6,22 @@ from collections.abc import Awaitable, Callable
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import cast
 
 import pytest
 from app.services.brokers import (
-    BrokerAdapter,
-    BrokerCapabilityId,
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerError,
-    BrokerErrorCode,
-    BrokerId,
-    BrokerOrderModificationRequest,
-    BrokerOrderRequest,
-    BrokerOrderResult,
-    BrokerPosition,
-    BrokerPositionCloseRequest,
-    BrokerPositionModificationRequest,
+    build_broker_connection_config,
+    build_broker_value,
+    get_broker_capability_id,
+    get_broker_environment,
+    get_broker_error_code,
+    get_broker_id,
+    get_broker_value_field,
 )
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent, TradingError
 from app.services.trading.routing.dispatcher import (
     dispatch_order_intent as _dispatch_order_intent,
 )
-from app.utils import StandardResponse
+from app.utils.responses.models import StandardResponse
 from tests.brokers.response_factory import broker_response
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
@@ -37,8 +30,8 @@ BROKER_REQUEST_ID = "req-dd37fc1c-2cd6-4d66-9f9a-7a7f9a2482ef"
 
 async def dispatch_order_intent(
     intent: OrderIntent,
-    connection: BrokerConnectionConfig | None,
-    broker_adapter: BrokerAdapter | None,
+    connection: object | None,
+    broker_adapter: object | None,
     simulation_dispatch: Callable[[OrderIntent], Awaitable[ExecutionReceipt]] | None,
 ) -> ExecutionReceipt:
     """Invoke the public dispatcher with explicit deterministic runtime policy."""
@@ -95,11 +88,11 @@ def _intent(*, route: str = "paper", action: str = "submit_order") -> OrderInten
     )
 
 
-def _connection() -> BrokerConnectionConfig:
+def _connection() -> object:
     """Build explicit demo Broker connection material."""
-    return BrokerConnectionConfig(
-        broker_id=BrokerId.MT5,
-        environment=BrokerEnvironment.DEMO,
+    return build_broker_connection_config(
+        broker_id="mt5",
+        environment="demo",
         provider_enabled=True,
         connect_timeout_sec=5,
         request_timeout_sec=10,
@@ -121,22 +114,23 @@ class _Adapter:
     def __init__(self) -> None:
         """Initialize observable mutation evidence."""
         self.calls = 0
-        self.request: BrokerOrderRequest | None = None
+        self.request: object | None = None
         self.mutations: list[object] = []
 
     def _order_result(
         self,
-        operation: BrokerCapabilityId,
-    ) -> StandardResponse[BrokerOrderResult]:
+        operation: object,
+    ) -> StandardResponse[object]:
         """Build one acknowledged Broker order result."""
         return broker_response(
             operation,
-            broker=BrokerId.MT5,
+            broker=get_broker_id("mt5"),
             request_id=BROKER_REQUEST_ID,
             timestamp=NOW,
-            environment=BrokerEnvironment.DEMO,
+            environment=get_broker_environment("demo"),
             adapter_version="test-v1",
-            data=BrokerOrderResult(
+            data=build_broker_value(
+                "order_result",
                 acknowledged=True,
                 outcome="ACCEPTED",
                 retrieved_at=NOW,
@@ -146,48 +140,49 @@ class _Adapter:
 
     async def place_order(
         self,
-        request: BrokerOrderRequest,
-    ) -> StandardResponse[BrokerOrderResult]:
+        request: object,
+    ) -> StandardResponse[object]:
         """Record and acknowledge one Broker placement."""
         self.calls += 1
         self.request = request
         self.mutations.append(request)
-        return self._order_result(BrokerCapabilityId.PLACE_ORDER)
+        return self._order_result(get_broker_capability_id("place_order"))
 
     async def modify_order(
         self,
-        request: BrokerOrderModificationRequest,
-    ) -> StandardResponse[BrokerOrderResult]:
+        request: object,
+    ) -> StandardResponse[object]:
         """Record and acknowledge one Broker order modification."""
         self.calls += 1
         self.mutations.append(request)
-        return self._order_result(BrokerCapabilityId.MODIFY_ORDER)
+        return self._order_result(get_broker_capability_id("modify_order"))
 
     async def cancel_order(
         self,
         order_id: str,
         client_request_id: str | None = None,
-    ) -> StandardResponse[BrokerOrderResult]:
+    ) -> StandardResponse[object]:
         """Record and acknowledge one Broker cancellation."""
         self.calls += 1
         self.mutations.append((order_id, client_request_id))
-        return self._order_result(BrokerCapabilityId.CANCEL_ORDER)
+        return self._order_result(get_broker_capability_id("cancel_order"))
 
     async def modify_position(
         self,
-        request: BrokerPositionModificationRequest,
-    ) -> StandardResponse[BrokerPosition]:
+        request: object,
+    ) -> StandardResponse[object]:
         """Record and acknowledge one Broker position modification."""
         self.calls += 1
         self.mutations.append(request)
         return broker_response(
-            BrokerCapabilityId.MODIFY_POSITION,
-            broker=BrokerId.MT5,
+            get_broker_capability_id("modify_position"),
+            broker=get_broker_id("mt5"),
             request_id=BROKER_REQUEST_ID,
             timestamp=NOW,
-            environment=BrokerEnvironment.DEMO,
+            environment=get_broker_environment("demo"),
             adapter_version="test-v1",
-            data=BrokerPosition(
+            data=build_broker_value(
+                "position",
                 position_id="broker-position-001",
                 symbol="EURUSD",
                 side="LONG",
@@ -199,37 +194,39 @@ class _Adapter:
 
     async def close_position(
         self,
-        request: BrokerPositionCloseRequest,
-    ) -> StandardResponse[BrokerOrderResult]:
+        request: object,
+    ) -> StandardResponse[object]:
         """Record and acknowledge one Broker position close."""
         self.calls += 1
         self.mutations.append(request)
-        return self._order_result(BrokerCapabilityId.CLOSE_POSITION)
+        return self._order_result(get_broker_capability_id("close_position"))
 
 
 class _ErrorAdapter(_Adapter):
     """Test adapter returning one canonical Broker failure."""
 
-    def __init__(self, code: BrokerErrorCode) -> None:
+    def __init__(self, code: object) -> None:
         """Initialize the selected Broker failure code."""
         super().__init__()
         self.code = code
 
     async def place_order(
         self,
-        request: BrokerOrderRequest,
-    ) -> StandardResponse[BrokerOrderResult]:
+        request: object,
+    ) -> StandardResponse[object]:
         """Return one explicit or ambiguous Broker failure."""
         self.calls += 1
         self.mutations.append(request)
         return broker_response(
-            BrokerCapabilityId.PLACE_ORDER,
-            broker=BrokerId.MT5,
+            get_broker_capability_id("place_order"),
+            broker=get_broker_id("mt5"),
             request_id=BROKER_REQUEST_ID,
             timestamp=NOW,
-            environment=BrokerEnvironment.DEMO,
+            environment=get_broker_environment("demo"),
             adapter_version="test-v1",
-            error=BrokerError(code=self.code, message="Redacted Broker failure"),
+            error=build_broker_value(
+                "error", code=self.code, message="Redacted Broker failure"
+            ),
         )
 
 
@@ -238,8 +235,8 @@ class _TimeoutAdapter(_Adapter):
 
     async def place_order(
         self,
-        request: BrokerOrderRequest,
-    ) -> StandardResponse[BrokerOrderResult]:
+        request: object,
+    ) -> StandardResponse[object]:
         """Remain pending until the dispatch boundary cancels the call."""
         await asyncio.sleep(1)
         return await super().place_order(request)
@@ -250,8 +247,8 @@ class _RaisingAdapter(_Adapter):
 
     async def place_order(
         self,
-        request: BrokerOrderRequest,
-    ) -> StandardResponse[BrokerOrderResult]:
+        request: object,
+    ) -> StandardResponse[object]:
         """Raise secret-bearing provider text at the external boundary."""
         self.calls += 1
         self.mutations.append(request)
@@ -265,14 +262,16 @@ def test_dispatch_has_single_mutation_boundary() -> None:
         dispatch_order_intent(
             _intent(),
             _connection(),
-            cast("BrokerAdapter", adapter),
+            adapter,
             None,
         )
     )
     assert adapter.calls == 1
     assert receipt.status == "accepted"
     assert adapter.request is not None
-    assert adapter.request.environment is BrokerEnvironment.DEMO
+    assert get_broker_value_field(
+        adapter.request, "environment"
+    ) == get_broker_environment("demo")
     assert adapter.request.account_reference == "broker-account-001"
     assert adapter.request.order_type == "MARKET"
     assert adapter.request.quantity_unit == "lots"
@@ -288,35 +287,44 @@ def test_dispatch_has_single_mutation_boundary() -> None:
             dispatch_order_intent(
                 _intent(action=action),
                 _connection(),
-                cast("BrokerAdapter", adapter),
+                adapter,
                 None,
             )
         )
-    assert isinstance(adapter.mutations[1], BrokerOrderModificationRequest)
+    assert (
+        get_broker_value_field(adapter.mutations[1], "order_id") == "broker-order-001"
+    )
     assert adapter.mutations[2] == ("broker-order-001", None)
-    assert isinstance(adapter.mutations[3], BrokerPositionModificationRequest)
-    assert isinstance(adapter.mutations[4], BrokerPositionCloseRequest)
-    assert isinstance(adapter.mutations[5], BrokerPositionCloseRequest)
-    close_request = cast("BrokerPositionCloseRequest", adapter.mutations[5])
-    assert close_request.position_id == "broker-position-001"
-    assert close_request.quantity_unit == "lots"
+    assert (
+        get_broker_value_field(adapter.mutations[3], "position_id")
+        == "broker-position-001"
+    )
+    assert (
+        get_broker_value_field(adapter.mutations[4], "position_id")
+        == "broker-position-001"
+    )
+    assert (
+        get_broker_value_field(adapter.mutations[5], "position_id")
+        == "broker-position-001"
+    )
+    assert get_broker_value_field(adapter.mutations[5], "quantity_unit") == "lots"
 
-    rejected_adapter = _ErrorAdapter(BrokerErrorCode.BROKER_REQUEST_REJECTED)
+    rejected_adapter = _ErrorAdapter(get_broker_error_code("BROKER_REQUEST_REJECTED"))
     rejected = asyncio.run(
         dispatch_order_intent(
             _intent(),
             _connection(),
-            cast("BrokerAdapter", rejected_adapter),
+            rejected_adapter,
             None,
         )
     )
     assert rejected.status == "rejected"
-    limited_adapter = _ErrorAdapter(BrokerErrorCode.BROKER_RATE_LIMITED)
+    limited_adapter = _ErrorAdapter(get_broker_error_code("BROKER_RATE_LIMITED"))
     limited_response = asyncio.run(
         _dispatch_order_intent(
             _intent(),
             _connection(),
-            cast("BrokerAdapter", limited_adapter),
+            limited_adapter,
             None,
             operation_timeout_seconds=Decimal(10),
             clock=lambda: NOW,
@@ -363,7 +371,7 @@ def test_dispatch_has_single_mutation_boundary() -> None:
 def test_dispatch_rejects_mismatched_authority_selection() -> None:
     """Absent, disabled, or cross-route authorities fail before mutation."""
     adapter = _Adapter()
-    broker = cast("BrokerAdapter", adapter)
+    broker = adapter
     with pytest.raises(TradingError):
         asyncio.run(dispatch_order_intent(_intent(route="sim"), None, None, None))
     with pytest.raises(TradingError):
@@ -404,7 +412,7 @@ def test_dispatch_rejects_mismatched_authority_selection() -> None:
         asyncio.run(
             dispatch_order_intent(
                 _intent(),
-                replace(_connection(), broker_id=BrokerId.CTRADER),
+                replace(_connection(), broker_id=get_broker_id("ctrader")),
                 broker,
                 None,
             )
@@ -422,7 +430,7 @@ def test_dispatch_rejects_mismatched_authority_selection() -> None:
         asyncio.run(
             dispatch_order_intent(
                 _intent(),
-                replace(_connection(), environment=BrokerEnvironment.LIVE),
+                replace(_connection(), environment=get_broker_environment("live")),
                 broker,
                 None,
             )
@@ -439,7 +447,7 @@ def test_timeout_replay_has_deterministic_receipt_identity() -> None:
         return await _dispatch_order_intent_value(
             _intent(),
             _connection(),
-            cast("BrokerAdapter", _TimeoutAdapter()),
+            _TimeoutAdapter(),
             None,
             operation_timeout_seconds=Decimal("0.001"),
             clock=lambda: NOW,
@@ -458,7 +466,7 @@ def test_provider_exception_becomes_redacted_unknown_receipt() -> None:
         _dispatch_order_intent(
             _intent(),
             _connection(),
-            cast("BrokerAdapter", _RaisingAdapter()),
+            _RaisingAdapter(),
             None,
             operation_timeout_seconds=Decimal(10),
             clock=lambda: NOW,

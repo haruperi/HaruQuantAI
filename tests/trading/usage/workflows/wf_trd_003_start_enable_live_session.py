@@ -7,15 +7,26 @@ import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.brokers import (
-    BrokerAdapter,
-    BrokerConnectionConfig,
-    BrokerId,
+    connect_broker,
     create_broker_adapter,
+    disconnect_broker,
+    get_broker_account_info,
+    get_broker_connection_environment,
+    get_broker_connection_id,
+    get_broker_connection_status,
+    get_broker_feature_flags,
+    get_broker_id,
 )
-from app.services.trading import LiveSession, ReadinessAssessment
+from app.services.trading import (
+    create_live_session,
+    create_readiness_assessment,
+    is_live_session_admission_enabled,
+    start_live_session,
+)
 from tests.brokers.usage._support import (
     config as broker_config,
 )
@@ -43,37 +54,41 @@ def _stage(number: int) -> None:
 
 @asynccontextmanager
 async def _mt5_session(
-    connection: BrokerConnectionConfig,
-) -> AsyncIterator[BrokerAdapter]:
+    connection: Any,
+) -> AsyncIterator[Any]:
     """Create, connect, and deterministically close the public MT5 adapter."""
     created = require_success(
         "MT5 adapter creation",
-        create_broker_adapter(BrokerId.MT5, connection),
+        create_broker_adapter(get_broker_id("mt5"), connection),
     )
     if created.data is None:
         raise RuntimeError("MT5 adapter creation returned no adapter")
     adapter = created.data
-    require_success("MT5 connect", await adapter.connect())
+    require_success("MT5 connect", await connect_broker(adapter))
     try:
         yield adapter
     finally:
-        require_success("MT5 disconnect", await adapter.disconnect())
+        require_success("MT5 disconnect", await disconnect_broker(adapter))
 
 
 async def run() -> None:
     """Run the genuine read-only lifecycle."""
     # Stage 1 — INPUT BOUNDARY: Approved demo MT5 configuration.
     _stage(1)
-    connection = broker_config(BrokerId.MT5)
+    connection = broker_config(get_broker_id("mt5"))
     async with _mt5_session(connection) as adapter:
-        print("Connected:", connection.broker_id.value, connection.environment.value)
+        print(
+            "Connected:",
+            get_broker_connection_id(connection),
+            get_broker_connection_environment(connection),
+        )
         # Stage 2: Read genuine capability and account evidence.
         _stage(2)
         flags_result = require_success(
-            "Feature flags", await adapter.get_feature_flags()
+            "Feature flags", await get_broker_feature_flags(adapter)
         )
-        require_success("Account", await adapter.get_account_info())
-        require_success("Connection", await adapter.get_connection_status())
+        require_success("Account", await get_broker_account_info(adapter))
+        require_success("Connection", await get_broker_connection_status(adapter))
         if flags_result.data is None:
             raise RuntimeError("MT5 returned no feature flags")
         # Stage 3: Compose the Trading lifecycle with the real adapter.
@@ -82,7 +97,7 @@ async def run() -> None:
         async def passed() -> bool:
             return True
 
-        session = LiveSession(
+        session = create_live_session(
             store=examples.MemoryStore(),
             connection=connection,
             broker_adapter=adapter,
@@ -90,7 +105,7 @@ async def run() -> None:
             risk_decision_source=lambda _request: None,
             action_policy_source=lambda _request: None,
             kill_switch_source=examples.inactive_kill_switch_hierarchy,
-            readiness_source=lambda request, _evidence: ReadinessAssessment(
+            readiness_source=lambda request, _evidence: create_readiness_assessment(
                 passed=True,
                 failed_check_codes=(),
                 evidence_refs={"mt5": "connected"},
@@ -117,8 +132,15 @@ async def run() -> None:
             "EXECUTION_ROUTE": "paper",
             "ALLOW_LIVE_MUTATIONS": False,
         }
-        outcome = await session.start(runtime, examples.live_evidence())
-        print("Startup:", outcome.status, "admission:", session.admission_enabled)
+        outcome = await start_live_session(session, runtime, examples.live_evidence())
+        print(
+            "Startup:",
+            outcome.status,
+            "admission:",
+            is_live_session_admission_enabled(session),
+            "evidence:",
+            outcome.data,
+        )
         # Stage 5 — OUTPUT BOUNDARY: Package-only status; context manager disconnects.
         _stage(5)
         print("Output:", outcome.status, "No broker mutation was transmitted")

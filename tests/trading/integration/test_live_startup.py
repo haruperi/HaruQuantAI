@@ -1,7 +1,11 @@
 """Workflow integration for fail-closed live startup."""
 
-# ruff: noqa: INP001
 import pytest
+from app.services.trading import (
+    is_live_session_admission_enabled,
+    start_live_session,
+)
+
 from tests.trading.conftest import live_config, live_evidence, live_session
 
 
@@ -14,7 +18,7 @@ async def test_live_startup_requires_reconciliation() -> None:
         return False
 
     session = live_session(startup_reconcile=incomplete)
-    result = await session.start(live_config(), live_evidence())
+    result = await start_live_session(session, live_config(), live_evidence())
     assert result.status == "success"
     assert result.metadata.extensions["legacy_status"] == "blocked"
-    assert not session.admission_enabled
+    assert not is_live_session_admission_enabled(session)

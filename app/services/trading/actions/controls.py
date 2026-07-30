@@ -253,7 +253,7 @@ def _kill_switch_command(request: TradingRequest, action: str) -> KillSwitchComm
     if request.scope_level is None or request.control_reason is None:
         raise TradingError("INVALID_REQUEST", "Switch scope and reason are required")
     return create_kill_switch_command(
-        action=action,  # type: ignore[arg-type]
+        action=action,
         scope_level=request.scope_level,
         portfolio_id=request.portfolio_id,
         strategy_id=request.strategy_id,

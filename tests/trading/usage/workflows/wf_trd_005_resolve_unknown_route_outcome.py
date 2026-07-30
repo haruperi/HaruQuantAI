@@ -50,22 +50,28 @@ def main() -> None:
         "received_at": examples.NOW.isoformat(),
         "timed_out": True,
     }
-    receipt = classify_authority_response(
+    receipt_response = classify_authority_response(
         raw_response,
         {
             "malformed_response_policy": "unknown_outcome",
             "mutation_retry_policy": "reconcile_before_retry",
         },
     )
+    assert receipt_response.status == "success"
+    assert receipt_response.data is not None
+    receipt = receipt_response.data
     print("Input:", receipt.response_classification, receipt.reconciliation_required)
     # Stage 2: Persist lock before authority comparison.
     _stage(2)
     store = examples.AuthorityStore(
         examples.authority_projection(orders={"order-internal": {"state": "pending"}})
     )
-    resolution = resolve_unknown_outcome(
+    resolution_response = resolve_unknown_outcome(
         receipt, store, lambda _route: examples.authority_snapshot()
     )
+    assert resolution_response.status == "success"
+    assert resolution_response.data is not None
+    resolution = resolution_response.data
     print("Transition:", resolution.transition)
     # Stage 3: Keep unresolved scope explicit.
     _stage(3)
@@ -77,15 +83,19 @@ def main() -> None:
     )
     # Stage 4: Build and emit the critical event after durable transition.
     _stage(4)
-    event = build_broker_state_unknown_event(
+    event_response = build_broker_state_unknown_event(
         receipt,
         incident_id=resolution.incident_reference,
         unresolved_scope=resolution.remaining_unresolved_scope,
         occurred_at=examples.authority_snapshot().observed_at,
         workflow_id=store.events[-1].workflow_id,
     )
+    assert event_response.status == "success"
+    assert event_response.data is not None
+    event = event_response.data
     published = []
-    emit_runtime_event(event, published.append)
+    emitted = emit_runtime_event(event, published.append)
+    assert emitted.status == "success"
     print("Event:", published[0].event_type, published[0].severity)
     # Stage 5 — OUTPUT BOUNDARY: Return locked resolution and incident evidence.
     _stage(5)

@@ -1,6 +1,6 @@
 """Workflow integration for kill switches and partial emergency results."""
 
-# ruff: noqa: ARG005, INP001
+# ruff: noqa: ARG005
 from dataclasses import replace
 from datetime import timedelta
 from types import SimpleNamespace
@@ -13,12 +13,14 @@ from app.services.risk import (
     create_risk_decision_package,
 )
 from app.services.trading import (
-    LiveSession,
-    ReadinessAssessment,
-    TradingProjection,
     cancel_all_orders,
+    create_live_session,
+    create_readiness_assessment,
+    create_trading_projection,
     resume_strategy,
+    start_live_session,
 )
+
 from tests.trading.conftest import (
     NOW,
     CountingAdapter,
@@ -123,7 +125,7 @@ def _paper_account() -> object:
 def _paper_emergency_dependencies(adapter: CountingAdapter):
     """Build paper bulk dependencies with per-child Option A Risk authority."""
     store = MemoryStore()
-    store.projection = TradingProjection(
+    store.projection = create_trading_projection(
         route="paper",
         tenant_id="account-001",
         authority_id="mt5",
@@ -142,7 +144,7 @@ def _paper_emergency_dependencies(adapter: CountingAdapter):
         updated_at=NOW,
     )
     connection = broker_connection()
-    session = LiveSession(
+    session = create_live_session(
         store=store,
         connection=connection,
         broker_adapter=cast("object", adapter),
@@ -150,7 +152,7 @@ def _paper_emergency_dependencies(adapter: CountingAdapter):
         risk_decision_source=_child_risk,
         action_policy_source=_emergency_policy,
         kill_switch_source=inactive_kill_switch_hierarchy,
-        readiness_source=lambda request, _evidence: ReadinessAssessment(
+        readiness_source=lambda request, _evidence: create_readiness_assessment(
             passed=True,
             failed_check_codes=(),
             evidence_refs={"data_authority_id": "data-authority-001"},
@@ -217,7 +219,7 @@ async def test_paper_bulk_cancel_binds_each_child_risk_authority() -> None:
         "EXECUTION_ROUTE": "paper",
         "ALLOW_LIVE_MUTATIONS": True,
     }
-    await session.start(config, live_evidence())
+    await start_live_session(session, config, live_evidence())
     item = trading_request(
         route="paper",
         provider_id="mt5",

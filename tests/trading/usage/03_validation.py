@@ -7,6 +7,7 @@ import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
@@ -18,11 +19,11 @@ from app.services.risk import (
     get_decision_state,
 )
 from app.services.trading import (
-    ReadinessAssessment,
-    RouteSnapshot,
-    TradingRequest,
     assess_execution_readiness,
     build_execution_plan,
+    create_readiness_assessment,
+    create_route_snapshot,
+    create_trading_request,
     get_route_snapshot,
     validate_order_request,
 )
@@ -30,6 +31,9 @@ from app.services.trading import (
 # Private type-only aliases; Risk exposes functions, not contract classes.
 KillSwitchState = object
 RiskDecisionPackage = object
+ReadinessAssessment = Any
+RouteSnapshot = Any
+TradingRequest = Any
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 
@@ -41,7 +45,7 @@ def _header(title: str) -> None:
 
 def _request() -> TradingRequest:
     """Build complete validated order material."""
-    return TradingRequest(
+    return create_trading_request(
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
@@ -98,7 +102,7 @@ def _symbol_capability() -> dict[str, object]:
 
 def _snapshot() -> RouteSnapshot:
     """Build current explicit route facts."""
-    return RouteSnapshot(
+    return create_route_snapshot(
         route="sim",
         provider_id=None,
         account_id="usage-account-001",
@@ -204,7 +208,7 @@ def example_validation() -> None:
     print(f"Execution readiness passed: {readiness_assessment.passed}")
 
     # 4. Build execution plan
-    readiness = ReadinessAssessment(
+    readiness = create_readiness_assessment(
         passed=True,
         failed_check_codes=(),
         evidence_refs={"risk_decision_id": "usage-risk-001"},

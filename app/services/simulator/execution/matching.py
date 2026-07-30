@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from decimal import Decimal
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -16,7 +16,8 @@ logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.timeline import Tick
-    from app.services.trading import OrderIntent
+
+    OrderIntent = Any
 
 SUPPORTED_FILL_POLICIES = ("FOK", "IOC")
 SAME_TICK_PRIORITY = ("STOP_LOSS", "TAKE_PROFIT", "PENDING_ACTIVATION")

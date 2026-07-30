@@ -461,7 +461,7 @@ async def _execute_request(
         gate = await evaluate_live_gate(request, evidence or {}, deps.live_session)
         intent = _intent_from_gate(request, gate)
         if intent is None:
-            return gate  # type: ignore[return-value]
+            return gate
     else:
         now = deps.clock()
         validate_action_policy(request, deps.action_policy_source(request), now)

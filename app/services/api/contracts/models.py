@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict, field_serializer, field_validator
 
-from app.services.data import MarketDataset  # noqa: TC001 - Pydantic runtime model
 from app.services.research import EdgeLabConfig  # noqa: TC001 - Pydantic runtime model
 from app.utils import get_logger
+
+MarketDataset = Any
 
 logger = get_logger(__name__)
 

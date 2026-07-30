@@ -7,7 +7,10 @@ from app.services.api import (
     build_unknown_broker_state_alert,
     deliver_critical_alert,
 )
-from app.services.trading import ExecutionReceipt, build_broker_state_unknown_event
+from app.services.trading import (
+    build_broker_state_unknown_event,
+    create_execution_receipt,
+)
 
 from tests.api.unit.test_alert_models import (
     CORRELATION_ID,
@@ -46,7 +49,7 @@ def test_delivery_failure_cannot_change_authoritative_state() -> None:
 
 def test_unknown_broker_alert_preserves_retry_lock_truth() -> None:
     """Verify Trading retry-lock truth survives API alert sink failure."""
-    receipt = ExecutionReceipt(
+    receipt = create_execution_receipt(
         receipt_id="receipt-unknown-001",
         intent_id="intent-001",
         client_order_id="client-order-001",
@@ -70,7 +73,9 @@ def test_unknown_broker_alert_preserves_retry_lock_truth() -> None:
         occurred_at=NOW,
         workflow_id=WORKFLOW_ID,
     )
-    alert = build_unknown_broker_state_alert(event)
+    assert event.status == "success"
+    assert event.data is not None
+    alert = build_unknown_broker_state_alert(event.data)
     attempts = 0
 
     def unavailable_sink(value: object, *, idempotency_key: str) -> None:
@@ -84,4 +89,4 @@ def test_unknown_broker_alert_preserves_retry_lock_truth() -> None:
 
     assert result.status == "failed"
     assert attempts == 1
-    assert event.facts["retry_locked"] is True
+    assert event.data.facts["retry_locked"] is True

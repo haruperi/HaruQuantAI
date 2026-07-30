@@ -7,10 +7,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.trading import (
-    BudgetGate,
-    OperationalEvent,
-    TradingError,
+    create_operational_event,
     emit_runtime_event,
+    validate_budget_authority,
 )
 from tests.trading.usage.workflows._support import examples
 
@@ -46,15 +45,14 @@ def main() -> None:
             "reasons": ("blocked",),
         }
     )
-    try:
-        BudgetGate.validate(
-            request, examples.monitoring_allocation(), denied, now=examples.NOW
-        )
-    except TradingError as error:
-        print("Budget:", error.code)
+    budget = validate_budget_authority(
+        request, examples.monitoring_allocation(), denied, now=examples.NOW
+    )
+    assert budget.error is not None
+    print("Budget:", budget.error.code, budget.error.details)
     # Stage 3: Build redacted operational event.
     _stage(3)
-    event = OperationalEvent(
+    event = create_operational_event(
         event_id="event-001",
         event_type="COST_OBSERVED",
         severity="warning",
@@ -74,10 +72,9 @@ def main() -> None:
         delivered.append(value)
         raise RuntimeError("sink unavailable")
 
-    try:
-        emit_runtime_event(event, sink)
-    except TradingError as delivery:
-        print("Delivery:", delivery.code)
+    delivery = emit_runtime_event(event, sink)
+    assert delivery.error is not None
+    print("Delivery:", delivery.error.code, delivery.error.details)
     # Stage 5 — OUTPUT BOUNDARY: Return attempted event plus incident evidence.
     _stage(5)
     print("Output events:", tuple(value.event_type for value in delivered))

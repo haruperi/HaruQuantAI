@@ -69,19 +69,96 @@ def _contract_entry(
     return MappingProxyType(entry)
 
 
-_ENVELOPE_STATUSES = [
-    "success",
-    "rejected",
-    "blocked",
-    "pending_approval",
-    "packaged",
-    "sent",
-    "partial",
-    "filled",
-    "cancelled",
-    "unknown_outcome",
-    "error",
-]
+_PUBLIC_FUNCTION_NAMES = (
+    "apply_execution_event",
+    "assess_execution_readiness",
+    "build_broker_state_unknown_event",
+    "build_execution_plan",
+    "build_trading_report",
+    "cancel_all_orders",
+    "cancel_order",
+    "classify_authority_response",
+    "clear_kill_switch",
+    "close_all_positions",
+    "close_position",
+    "compare_authority_state",
+    "create_authority_resolution",
+    "create_authority_snapshot",
+    "create_execution_evidence_report",
+    "create_execution_receipt",
+    "create_idempotency_reservation",
+    "create_live_session",
+    "create_operational_event",
+    "create_order_intent",
+    "create_portfolio_rebalance_execution_request",
+    "create_readiness_assessment",
+    "create_reconciliation_report",
+    "create_route_snapshot",
+    "create_trade_record",
+    "create_trading_action_draft",
+    "create_trading_dependencies",
+    "create_trading_error",
+    "create_trading_event",
+    "create_trading_projection",
+    "create_trading_request",
+    "dispatch_order_intent",
+    "emit_runtime_event",
+    "evaluate_live_gate",
+    "execute_portfolio_rebalance",
+    "get_live_session_status",
+    "get_public_contracts",
+    "get_route_snapshot",
+    "get_trading_contract_version",
+    "get_trading_migrations",
+    "get_trading_route",
+    "get_trading_schema_version",
+    "is_live_session_admission_enabled",
+    "is_live_session_reconciliation_ready",
+    "is_live_session_started",
+    "is_execution_receipt",
+    "is_trading_error",
+    "map_trading_error",
+    "modify_order",
+    "modify_position",
+    "pause_strategy",
+    "redact_trading_payload",
+    "reduce_exposure",
+    "reserve_idempotency",
+    "resolve_unknown_outcome",
+    "resume_strategy",
+    "run_live_evaluation_cycle",
+    "start_live_session",
+    "stop_live_session",
+    "submit_order",
+    "sync_positions",
+    "trigger_kill_switch",
+    "validate_adapter_capability",
+    "validate_budget_authority",
+    "validate_order_request",
+)
+
+_MUTATING_FUNCTIONS = frozenset(
+    {
+        "cancel_all_orders",
+        "cancel_order",
+        "clear_kill_switch",
+        "close_all_positions",
+        "close_position",
+        "dispatch_order_intent",
+        "execute_portfolio_rebalance",
+        "modify_order",
+        "modify_position",
+        "pause_strategy",
+        "reduce_exposure",
+        "resume_strategy",
+        "run_live_evaluation_cycle",
+        "start_live_session",
+        "stop_live_session",
+        "submit_order",
+        "sync_positions",
+        "trigger_kill_switch",
+    }
+)
 
 
 def _build_public_contracts() -> tuple[Mapping[str, JsonValue], ...]:
@@ -91,72 +168,18 @@ def _build_public_contracts() -> tuple[Mapping[str, JsonValue], ...]:
         Immutable ordered public-contract entries.
     """
     logger.debug("Building the Trading public-contract catalog")
-    return (
-        _contract_entry("TRADING_CONTRACT_VERSION", "constant", None),
-        _contract_entry("TradingRoute", "enum", None),
+    return tuple(
         _contract_entry(
-            "TradingRequest",
-            "model",
-            "trading.trading_request.v1",
-            approval_required=True,
-            idempotency="caller_key",
-        ),
-        _contract_entry(
-            "StandardResponse",
-            "response",
-            "utils.standard_response.v1",
-            statuses=["success", "error"],
-        ),
-        _contract_entry(
-            "OrderIntent",
-            "model",
-            "trading.order_intent.v1",
-            approval_required=True,
-            idempotency="canonical_hash",
-        ),
-        _contract_entry(
-            "ExecutionReceipt",
-            "model",
-            "trading.execution_receipt.v1",
-            statuses=[
-                "accepted",
-                "rejected",
-                "partial",
-                "filled",
-                "cancelled",
-                "unknown_outcome",
-            ],
-        ),
-        _contract_entry(
-            "TradeRecord",
-            "model",
-            "trading.trade_record.v1",
-        ),
-        _contract_entry(
-            "PortfolioRebalanceExecutionRequest",
-            "model",
-            "trading.portfolio_rebalance_execution_request.v1",
-            approval_required=True,
-            idempotency="canonical_hash",
-        ),
-        _contract_entry(
-            "ExecutionEvidenceReport",
-            "model",
-            "trading.execution_evidence_report.v1",
-        ),
-        _contract_entry("TradingError", "error", None),
-        _contract_entry("map_trading_error", "function", None),
-        _contract_entry("redact_trading_payload", "function", None),
-        _contract_entry("get_public_contracts", "function", None),
-        _contract_entry(
-            "create_trading_action_draft",
+            symbol,
             "function",
             None,
-            approval_required=True,
-            idempotency="caller_key",
-            statuses=["packaged"],
-            errors=["INVALID_DRAFT"],
-        ),
+            side_effects=["route_or_state_mutation"]
+            if symbol in _MUTATING_FUNCTIONS
+            else [],
+            approval_required=symbol in _MUTATING_FUNCTIONS,
+            idempotency="caller_key" if symbol in _MUTATING_FUNCTIONS else "none",
+        )
+        for symbol in _PUBLIC_FUNCTION_NAMES
     )
 
 

@@ -8,7 +8,7 @@ from dataclasses import replace
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from app.services.trading import BudgetGate, TradingError, execute_portfolio_rebalance
+from app.services.trading import execute_portfolio_rebalance, validate_budget_authority
 from tests.trading.usage.workflows._support import examples
 
 WORKFLOW_ID = "WF-TRD-013"
@@ -39,13 +39,13 @@ async def run() -> None:
     print("Canonical hash:", request.canonical_hash)
     # Stage 3: Validate matching current budget explicitly.
     _stage(3)
-    BudgetGate.validate(
+    budget = validate_budget_authority(
         request,
         examples.rebalance_allocation(),
         examples.rebalance_budget(request),
         now=examples.NOW,
     )
-    print("Budget valid")
+    print("Budget valid:", budget.status, budget.metadata.extensions)
     # Stage 4: Remove allocation authority and prove no dispatch.
     _stage(4)
     calls = 0
@@ -60,16 +60,17 @@ async def run() -> None:
         allocation_decision_source=lambda _item: None,
         simulation_dispatch=dispatch,
     )
-    try:
-        await execute_portfolio_rebalance(request, deps)
-    except TradingError as error:
-        blocked = error
-    else:
-        raise RuntimeError("Rebalance unexpectedly dispatched")
-    print("Blocked:", blocked.code, "dispatch calls:", calls)
+    blocked = await execute_portfolio_rebalance(request, deps)
+    assert blocked.error is not None
+    print("Blocked:", blocked.error.code, "dispatch calls:", calls)
     # Stage 5 — OUTPUT BOUNDARY: Return fail-closed result; no broker mutation.
     _stage(5)
-    print("Output:", type(blocked).__name__, "No broker mutation was transmitted")
+    print(
+        "Output:",
+        blocked.status,
+        blocked.error.details,
+        "No broker mutation was transmitted",
+    )
 
 
 def main() -> None:

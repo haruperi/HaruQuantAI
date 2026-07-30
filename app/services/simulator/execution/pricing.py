@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from decimal import ROUND_HALF_EVEN, Decimal
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -14,7 +14,8 @@ logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.timeline import Tick
-    from app.services.trading import OrderIntent
+
+    OrderIntent = Any
 
 
 class SessionInterval(BaseModel):

@@ -7,18 +7,24 @@ from collections.abc import Awaitable, Callable, Mapping
 from datetime import datetime
 from decimal import Decimal
 from hashlib import sha256
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from app.services.brokers import (
-    BrokerAdapter,
-    BrokerConnectionConfig,
-    BrokerErrorCode,
-    BrokerOrderModificationRequest,
-    BrokerOrderRequest,
-    BrokerOrderResult,
-    BrokerPosition,
-    BrokerPositionCloseRequest,
-    BrokerPositionModificationRequest,
+    build_broker_order_modification_request,
+    build_broker_order_request,
+    build_broker_position_close_request,
+    build_broker_position_modification_request,
+    cancel_broker_order,
+    close_broker_position,
+    get_broker_adapter_contract_version,
+    get_broker_adapter_schema_id,
+    get_broker_connection_account_reference,
+    get_broker_connection_environment,
+    get_broker_connection_id,
+    is_broker_connection_enabled,
+    modify_broker_order,
+    modify_broker_position,
+    place_broker_order,
 )
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent, TradingError
 from app.services.trading.contracts.responses import (
@@ -33,6 +39,8 @@ from app.utils import (
 )
 
 type StandardResponse[T] = Any
+type BrokerConnection = object
+type BrokerAdapter = object
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 logger = get_logger(__name__)
@@ -46,20 +54,20 @@ _CLASSIFICATION_POLICY: Mapping[str, JsonValue] = {
 }
 _EXPLICIT_REJECTIONS = frozenset(
     {
-        BrokerErrorCode.BROKER_AUTHENTICATION_FAILED,
-        BrokerErrorCode.BROKER_AUTHORIZATION_FAILED,
-        BrokerErrorCode.BROKER_SYMBOL_NOT_FOUND,
-        BrokerErrorCode.BROKER_ACCOUNT_NOT_FOUND,
-        BrokerErrorCode.BROKER_ORDER_NOT_FOUND,
-        BrokerErrorCode.BROKER_POSITION_NOT_FOUND,
-        BrokerErrorCode.BROKER_REQUEST_INVALID,
-        BrokerErrorCode.BROKER_REQUEST_REJECTED,
-        BrokerErrorCode.BROKER_MARKET_CLOSED,
-        BrokerErrorCode.BROKER_INSUFFICIENT_MARGIN,
-        BrokerErrorCode.BROKER_INSUFFICIENT_FUNDS,
+        "BROKER_AUTHENTICATION_FAILED",
+        "BROKER_AUTHORIZATION_FAILED",
+        "BROKER_SYMBOL_NOT_FOUND",
+        "BROKER_ACCOUNT_NOT_FOUND",
+        "BROKER_ORDER_NOT_FOUND",
+        "BROKER_POSITION_NOT_FOUND",
+        "BROKER_REQUEST_INVALID",
+        "BROKER_REQUEST_REJECTED",
+        "BROKER_MARKET_CLOSED",
+        "BROKER_INSUFFICIENT_MARGIN",
+        "BROKER_INSUFFICIENT_FUNDS",
     }
 )
-_EXPLICIT_REJECTION_CODES = frozenset(code.value for code in _EXPLICIT_REJECTIONS)
+_EXPLICIT_REJECTION_CODES = _EXPLICIT_REJECTIONS
 
 
 def _broker_evidence(
@@ -161,7 +169,7 @@ def _base_raw_response(
 
 def _order_result_fields(
     intent: OrderIntent,
-    result: BrokerOrderResult,
+    result: object,
 ) -> dict[str, JsonValue]:
     """Normalize one Broker order mutation result without upgrading evidence.
 
@@ -172,13 +180,15 @@ def _order_result_fields(
     Returns:
         JSON-safe result fields for conservative classification.
     """
-    logger.debug("Normalizing Broker order result %s", result.outcome)
-    filled = result.filled_quantity or Decimal(0)
-    if result.outcome == "UNKNOWN":
+    outcome = getattr(result, "outcome", None)
+    filled_quantity = getattr(result, "filled_quantity", None)
+    filled = filled_quantity if isinstance(filled_quantity, Decimal) else Decimal(0)
+    logger.debug("Normalizing Broker order result %s", outcome)
+    if outcome == "UNKNOWN":
         status = "unknown_outcome"
-    elif result.outcome == "REJECTED":
+    elif outcome == "REJECTED":
         status = "rejected"
-    elif result.outcome == "PARTIAL":
+    elif outcome == "PARTIAL":
         status = "partial"
     elif intent.action == "cancel_order":
         status = "cancelled"
@@ -186,20 +196,19 @@ def _order_result_fields(
         status = "filled"
     else:
         status = "accepted"
+    average_price = getattr(result, "average_price", None)
     return {
         "status": status,
-        "provider_order_id": result.order_id,
-        "provider_deal_ids": list(result.deal_ids),
+        "provider_order_id": getattr(result, "order_id", None),
+        "provider_deal_ids": list(getattr(result, "deal_ids", ())),
         "filled_quantity": str(filled),
-        "average_price": (
-            None if result.average_price is None else str(result.average_price)
-        ),
+        "average_price": None if average_price is None else str(average_price),
     }
 
 
 def _broker_raw_response(
     intent: OrderIntent,
-    result: StandardResponse[BrokerOrderResult] | StandardResponse[BrokerPosition],
+    result: StandardResponse[Any],
     received_at: datetime,
 ) -> dict[str, JsonValue]:
     """Normalize one canonical Broker result for receipt classification.
@@ -231,18 +240,17 @@ def _broker_raw_response(
                 "status": "rejected" if explicit_rejection else "unknown_outcome",
                 "filled_quantity": "0",
                 "rate_limited": (
-                    error is not None
-                    and error.code == BrokerErrorCode.BROKER_RATE_LIMITED.value
+                    error is not None and error.code == "BROKER_RATE_LIMITED"
                 ),
             }
         )
         return raw
-    if isinstance(result.data, BrokerOrderResult):
+    if hasattr(result.data, "outcome") and hasattr(result.data, "order_id"):
         raw.update(_order_result_fields(intent, result.data))
         authority_time = result.data.provider_timestamp or result.data.retrieved_at
         raw["authority_timestamp"] = authority_time.isoformat()
         return raw
-    if isinstance(result.data, BrokerPosition):
+    if hasattr(result.data, "position_id"):
         raw.update(
             {
                 "status": "accepted",
@@ -259,9 +267,9 @@ def _broker_raw_response(
 
 def _validate_broker_selection(
     intent: OrderIntent,
-    connection: BrokerConnectionConfig | None,
+    connection: BrokerConnection | None,
     broker_adapter: BrokerAdapter | None,
-) -> tuple[BrokerConnectionConfig, BrokerAdapter]:
+) -> tuple[BrokerConnection, BrokerAdapter]:
     """Validate explicit paper/live authority selection.
 
     Args:
@@ -278,26 +286,48 @@ def _validate_broker_selection(
     logger.debug("Validating injected Broker authority selection")
     if connection is None or broker_adapter is None:
         raise TradingError("SERVICE_UNAVAILABLE", "Broker authority is unavailable")
-    if not connection.provider_enabled:
+    if not is_broker_connection_enabled(connection):
         raise TradingError("GATE_BLOCKED", "Broker provider is disabled")
-    if intent.provider_id != connection.broker_id.value:
+    if intent.provider_id != get_broker_connection_id(connection):
         raise TradingError("SCOPE_MISMATCH", "Broker provider does not match intent")
-    if intent.route.value == "live" and connection.environment.value != "live":
+    if (
+        intent.route.value == "live"
+        and get_broker_connection_environment(connection) != "live"
+    ):
         raise TradingError("SCOPE_MISMATCH", "Live route requires live environment")
-    if intent.route.value == "paper" and connection.environment.value == "live":
+    if (
+        intent.route.value == "paper"
+        and get_broker_connection_environment(connection) == "live"
+    ):
         raise TradingError("SCOPE_MISMATCH", "Paper route cannot use live environment")
-    if broker_adapter.contract_version != "v1":
+    if get_broker_adapter_contract_version(broker_adapter) != "v1":
         raise TradingError("ADAPTER_INCOMPATIBLE", "Adapter contract is incompatible")
-    if broker_adapter.schema_id != "brokers.adapter.v1":
+    if get_broker_adapter_schema_id(broker_adapter) != "brokers.adapter.v1":
         raise TradingError("ADAPTER_INCOMPATIBLE", "Adapter schema is incompatible")
     return connection, broker_adapter
 
 
+def _validate_order_modification_fields(intent: OrderIntent) -> None:
+    """Reject fields absent from the verified Brokers modification contract.
+
+    Args:
+        intent: Trading-owned modification intent.
+
+    Raises:
+        TradingError: If time-in-force or expiration changes were requested.
+    """
+    if intent.time_in_force is not None or intent.expiration is not None:
+        raise TradingError(
+            "ADAPTER_INCOMPATIBLE",
+            "Broker modification contract cannot change time-in-force",
+        )
+
+
 async def _invoke_broker(
     intent: OrderIntent,
-    connection: BrokerConnectionConfig,
+    connection: BrokerConnection,
     broker_adapter: BrokerAdapter,
-) -> StandardResponse[BrokerOrderResult] | StandardResponse[BrokerPosition]:
+) -> StandardResponse[Any]:
     """Adapt and invoke exactly one receiver-owned Broker mutation.
 
     Args:
@@ -314,14 +344,14 @@ async def _invoke_broker(
     """
     logger.info("Invoking sole Broker mutation for action %s", intent.action)
     if intent.action == "submit_order":
-        request = BrokerOrderRequest(
+        request = build_broker_order_request(
             symbol=intent.symbol,
             side=intent.side,
             order_type=intent.order_type,
             quantity=intent.approved_volume,
             quantity_unit=intent.quantity_unit,
-            environment=connection.environment,
-            account_reference=connection.account_reference,
+            environment=get_broker_connection_environment(connection),
+            account_reference=get_broker_connection_account_reference(connection),
             limit_price=intent.price,
             stop_price=intent.stop_price,
             stop_loss=intent.stop_loss,
@@ -330,43 +360,46 @@ async def _invoke_broker(
             expiration=intent.expiration,
             client_order_id=intent.client_order_id,
         )
-        return await broker_adapter.place_order(request)
+        return await place_broker_order(cast("Any", broker_adapter), request)
     if intent.action == "modify_order":
         if intent.target_broker_order_id is None:
             raise TradingError("INVALID_REQUEST", "Broker order target is absent")
-        modification = BrokerOrderModificationRequest(
+        _validate_order_modification_fields(intent)
+        modification = build_broker_order_modification_request(
             order_id=intent.target_broker_order_id,
             quantity=intent.approved_volume,
             limit_price=intent.price,
             stop_price=intent.stop_price,
             stop_loss=intent.stop_loss,
             take_profit=intent.take_profit,
-            time_in_force=intent.time_in_force,
-            expiration=intent.expiration,
         )
-        return await broker_adapter.modify_order(modification)
+        return await modify_broker_order(cast("Any", broker_adapter), modification)
     if intent.action == "cancel_order":
         if intent.target_broker_order_id is None:
             raise TradingError("INVALID_REQUEST", "Broker order target is absent")
-        return await broker_adapter.cancel_order(intent.target_broker_order_id)
+        return await cancel_broker_order(
+            cast("Any", broker_adapter), intent.target_broker_order_id
+        )
     if intent.action == "modify_position":
         if intent.target_broker_position_id is None:
             raise TradingError("INVALID_REQUEST", "Broker position target is absent")
-        position_modification = BrokerPositionModificationRequest(
+        position_modification = build_broker_position_modification_request(
             position_id=intent.target_broker_position_id,
             stop_loss=intent.stop_loss,
             take_profit=intent.take_profit,
         )
-        return await broker_adapter.modify_position(position_modification)
+        return await modify_broker_position(
+            cast("Any", broker_adapter), position_modification
+        )
     if intent.action in {"close_position", "reduce_exposure"}:
         if intent.target_broker_position_id is None:
             raise TradingError("INVALID_REQUEST", "Broker position target is absent")
-        close_request = BrokerPositionCloseRequest(
+        close_request = build_broker_position_close_request(
             position_id=intent.target_broker_position_id,
             quantity=intent.approved_volume,
             quantity_unit=intent.quantity_unit,
         )
-        return await broker_adapter.close_position(close_request)
+        return await close_broker_position(cast("Any", broker_adapter), close_request)
     raise TradingError("INVALID_REQUEST", "Action has no Broker mutation mapping")
 
 
@@ -436,7 +469,7 @@ def _validate_dispatch_policy(operation_timeout_seconds: Decimal) -> None:
 
 async def _dispatch_order_intent_value(  # noqa: C901, PLR0912
     intent: OrderIntent,
-    connection: BrokerConnectionConfig | None,
+    connection: BrokerConnection | None,
     broker_adapter: BrokerAdapter | None,
     simulation_dispatch: Callable[
         [OrderIntent], Awaitable[StandardResponse[ExecutionReceipt] | ExecutionReceipt]
@@ -532,10 +565,9 @@ async def _dispatch_order_intent_value(  # noqa: C901, PLR0912
     except Exception:
         return _uncertain_failure_receipt(intent, clock())
     broker, _, environment, _ = _broker_evidence(result)
-    if (
-        broker != selected_connection.broker_id.value
-        or environment != selected_connection.environment.value
-    ):
+    if broker != get_broker_connection_id(
+        selected_connection
+    ) or environment != get_broker_connection_environment(selected_connection):
         raise TradingError("MALFORMED_RECEIPT", "Broker result scope mismatches")
     return _classify_authority_response_value(
         _broker_raw_response(intent, result, clock()),
@@ -545,7 +577,7 @@ async def _dispatch_order_intent_value(  # noqa: C901, PLR0912
 
 async def dispatch_order_intent(
     intent: OrderIntent,
-    connection: BrokerConnectionConfig | None,
+    connection: BrokerConnection | None,
     broker_adapter: BrokerAdapter | None,
     simulation_dispatch: Callable[
         [OrderIntent], Awaitable[StandardResponse[ExecutionReceipt] | ExecutionReceipt]

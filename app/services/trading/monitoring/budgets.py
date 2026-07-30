@@ -109,4 +109,25 @@ class BudgetGate:
         )
 
 
-__all__ = ["BudgetGate"]
+def validate_budget_authority(
+    request: PortfolioRebalanceExecutionRequest,
+    allocation: AllocationRiskDecision,
+    verdict: PortfolioBudgetExecutionVerdict,
+    *,
+    now: datetime,
+) -> StandardResponse[None]:
+    """Validate current Risk-owned budget authority.
+
+    Args:
+        request: Canonical rebalance execution request.
+        allocation: Current Risk allocation decision.
+        verdict: Current execution-time budget verdict.
+        now: Injected aware UTC evaluation time.
+
+    Returns:
+        Successful empty response or a canonical mapped Trading error.
+    """
+    return BudgetGate.validate(request, allocation, verdict, now=now)
+
+
+__all__ = ["validate_budget_authority"]

@@ -1,12 +1,14 @@
 """Workflow integration for uncertain authority outcomes."""
 
-# ruff: noqa: ARG005, INP001
+# ruff: noqa: ARG005
+from typing import Any
+
 from app.services.trading import (
-    OperationalEvent,
     build_broker_state_unknown_event,
     emit_runtime_event,
     resolve_unknown_outcome,
 )
+
 from tests.trading.conftest import (
     AuthorityStore,
     authority_projection,
@@ -50,7 +52,7 @@ def test_unknown_outcome_emits_critical_operational_event() -> None:
             "correlation_id": correlation_id,
         }
     )
-    published: list[OperationalEvent] = []
+    published: list[Any] = []
 
     resolution = resolve_unknown_outcome(
         receipt,
@@ -67,7 +69,7 @@ def test_unknown_outcome_emits_critical_operational_event() -> None:
         workflow_id=workflow_id,
     )
 
-    def sink(value: OperationalEvent) -> None:
+    def sink(value: Any) -> None:
         """Assert durable transition evidence exists before publication."""
         assert store.events[-1].event_type == "reconciliation_transitioned"
         published.append(value)

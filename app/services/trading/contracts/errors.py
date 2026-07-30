@@ -24,7 +24,6 @@ from app.utils import (
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
-RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 
 class HaruQuantError(Exception):
@@ -141,7 +140,7 @@ def redact_trading_payload(payload: JsonValue) -> StandardResponse[JsonValue]:
         safe,
         operation="trading.redact_trading_payload",
         message="Trading payload redacted",
-        risk_level=RiskLevel.LOW,
+        risk_level="low",
         read_only=True,
     )
 
@@ -276,7 +275,7 @@ def map_trading_error[T](
         details=details,
         operation=str(safe_context.get("operation", "trading.map_trading_error")),
         message=message,
-        risk_level=RiskLevel.HIGH,
+        risk_level="high",
         request_id=request_id if isinstance(request_id, str) else None,
         correlation_id=(correlation_id if isinstance(correlation_id, str) else None),
         read_only=True,

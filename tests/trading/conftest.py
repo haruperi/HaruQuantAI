@@ -1,8 +1,9 @@
 """Shared public builders for Trading unit and workflow-integration tests."""
 
+from typing import Any
+
 import pytest
 from app.services.risk import create_kill_switch_state
-from app.services.trading import TradingRequest
 from app.utils import create_auth_context
 
 from tests.trading.unit.actions.test_controls import switch as kill_switch
@@ -14,6 +15,9 @@ from tests.trading.unit.actions.test_dependencies import (
 )
 from tests.trading.unit.actions.test_dependencies import (
     dependencies as trading_dependencies,
+)
+from tests.trading.unit.actions.test_dependencies import (
+    execution_store as _execution_store,
 )
 from tests.trading.unit.actions.test_dependencies import (
     policy as action_policy,
@@ -86,6 +90,12 @@ from tests.trading.unit.validation.test_readiness import _switch as readiness_sw
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 KillSwitchState = object
+TradingRequest = Any
+
+
+def execution_store() -> MemoryStore:
+    """Build Trading state containing broker order and position targets."""
+    return _execution_store()
 
 
 def inactive_kill_switch() -> KillSwitchState:

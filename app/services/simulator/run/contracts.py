@@ -41,7 +41,8 @@ if TYPE_CHECKING:
     )
     from app.services.simulator.execution import ExecutionProfile
     from app.services.simulator.state import SimulationStateStore
-    from app.services.trading import OrderIntent
+
+    OrderIntent = Any
 
     AuditEvent = Any
 

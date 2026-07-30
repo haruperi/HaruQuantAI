@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-# ruff: noqa: INP001
 import asyncio
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.brokers import BrokerId, create_broker_adapter
-from app.services.trading import OrderIntent, dispatch_order_intent
-from app.utils import generate_id, logger
+from app.services.brokers import create_broker_adapter, get_broker_id
+from app.services.trading import create_order_intent, dispatch_order_intent
+from app.utils import generate_id, get_logger
+
 from tests.brokers.integration.test_mt5_demo_mutations import (
     _authority_state,
     _cleanup_created_state,
@@ -19,12 +19,14 @@ from tests.brokers.integration.test_mt5_demo_mutations import (
     _verify_demo_session,
 )
 
+logger = get_logger(__name__)
+
 
 async def _exercise_trading_demo_dispatch() -> None:
     """Dispatch one minimum-size MT5 demo order and reconcile exact cleanup."""
     settings = _require_demo_settings()
     connection = _connection_config(settings)
-    created = create_broker_adapter(BrokerId.MT5, connection)
+    created = create_broker_adapter(get_broker_id("mt5"), connection)
     assert created.status == "success", created.error
     adapter = created.data
     assert adapter is not None
@@ -40,7 +42,7 @@ async def _exercise_trading_demo_dispatch() -> None:
         now = datetime.now(UTC)
         request_id = minimum.client_request_id or generate_id("req")
         correlation_id = minimum.client_order_id or generate_id("cor")
-        intent = OrderIntent(
+        intent = create_order_intent(
             client_order_id=correlation_id,
             request_id=request_id,
             workflow_id=generate_id("wf"),

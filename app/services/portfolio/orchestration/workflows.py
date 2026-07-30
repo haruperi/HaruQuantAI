@@ -34,7 +34,10 @@ from app.services.risk import (
     get_decision_state,
 )
 from app.services.simulator import PortfolioBacktestRequestV1, PortfolioSimulationResult
-from app.services.trading import PortfolioRebalanceExecutionRequest, TradingRoute
+from app.services.trading import (
+    create_portfolio_rebalance_execution_request,
+    get_trading_route,
+)
 from app.utils import (
     canonical_json,
     create_audit_event,
@@ -53,6 +56,7 @@ AuditEvent = Any
 KillSwitchState = Any
 StandardTradingEnvelope = Any
 StrategyOperationalEligibilityDecision = Any
+PortfolioRebalanceExecutionRequest = Any
 type StandardResponse[T] = Any
 
 if TYPE_CHECKING:
@@ -775,14 +779,14 @@ class PortfolioWorkflowService:
                 }
                 for action in plan.actions
             ),
-            "route": TradingRoute(execution_route),
+            "route": get_trading_route(execution_route),
             "approval_token_ref": approval_token_ref,
             "canonical_material_version": "v1",
             "valid_from": now,
             "valid_until": valid_until,
         }
         data["canonical_hash"] = _digest(data)
-        return PortfolioRebalanceExecutionRequest.model_validate(data)
+        return create_portfolio_rebalance_execution_request(**data)
 
     def _transition_plan(
         self,
@@ -843,6 +847,15 @@ class PortfolioWorkflowService:
         """
         logger.debug("Projecting immutable redacted Trading execution facts")
         dumped = envelope.model_dump(mode="json")
+        if "error" in dumped and "metadata" in dumped:
+            error = dumped["error"]
+            return {
+                "status": dumped["status"],
+                "data": dumped["data"],
+                "errors": () if error is None else (error,),
+                "warnings": (),
+                "audit_metadata": dumped["metadata"],
+            }
         return {
             "status": dumped["status"],
             "data": dumped["data"],

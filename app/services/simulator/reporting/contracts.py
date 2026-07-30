@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from decimal import Decimal
 from pathlib import PurePosixPath
-from typing import Literal, override
+from typing import Any, Literal, override
 
 from pydantic import (
     BaseModel,
@@ -14,10 +14,11 @@ from pydantic import (
     model_validator,
 )
 
-from app.services.trading.contracts import ExecutionReceipt  # noqa: TC001
 from app.utils import get_logger
 
 logger = get_logger(__name__)
+
+ExecutionReceipt = Any
 
 CANONICAL_ARTIFACT_TYPES = ("journal.jsonl", "result.json", "report.md")
 REPORT_SCHEMA_VERSION = "v1"

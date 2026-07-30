@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
 from pathlib import Path
+from typing import Any
 
 import pytest
 from app.services.data.contracts import (
@@ -20,10 +21,12 @@ from app.services.simulator.accounting import ExecutionCostModel, SymbolSpecific
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.execution import ExecutionProfile, SessionInterval
 from app.services.simulator.run import SimulationBacktestRequestV1, run_backtest
-from app.services.trading import OrderIntent, TradingRoute
+from app.services.trading import create_order_intent
 from app.utils import AuditEvent, AuthContext, canonical_json
 
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
+
+OrderIntent = Any
 
 
 def _dataset(request_id: str) -> MarketDataset:
@@ -263,12 +266,12 @@ class FakeDependencies:
         del decisions
         created = request.start - timedelta(seconds=1)
         return (
-            OrderIntent(
+            create_order_intent(
                 client_order_id=f"order-{request.strategy_id}",
                 request_id=request.request_id,
                 workflow_id=request.workflow_id,
                 correlation_id=request.correlation_id,
-                route=TradingRoute.SIM,
+                route="sim",
                 provider_id=None,
                 account_id="account",
                 strategy_id=request.strategy_id,

@@ -6,6 +6,7 @@ import asyncio
 from dataclasses import replace
 from datetime import timedelta
 from decimal import ROUND_DOWN, Decimal
+from typing import Any
 
 from app.services.brokers import BrokerAdapter, BrokerId, create_broker_adapter
 from app.services.data import (
@@ -29,10 +30,12 @@ from app.services.strategy import (
     get_strategy_timing_policy,
 )
 from app.services.trading import (
-    LiveSession,
-    ReadinessAssessment,
-    TradingRequest,
-    TradingRoute,
+    create_live_session,
+    create_readiness_assessment,
+    create_trading_request,
+    is_live_session_started,
+    start_live_session,
+    stop_live_session,
     submit_order,
 )
 from app.utils import generate_id
@@ -50,6 +53,8 @@ from tests.trading.unit.actions.test_dependencies import (
     MemoryStore,
     dependencies,
 )
+
+LiveSession = Any
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 ProposedTrade = object
@@ -251,11 +256,11 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
             workflow_id=risk_decision.workflow_id,
             correlation_id=risk_decision.correlation_id,
         )
-        request = TradingRequest(
+        request = create_trading_request(
             request_id=risk_decision.request_id,
             workflow_id=risk_decision.workflow_id,
             correlation_id=risk_decision.correlation_id,
-            route=TradingRoute.PAPER,
+            route="paper",
             action="submit_order",
             provider_id="mt5",
             account_id=account.account_id,
@@ -323,7 +328,7 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
         flags_result = await adapter.get_feature_flags()
         assert flags_result.is_success, flags_result.error
         assert flags_result.data is not None
-        session = LiveSession(
+        session = create_live_session(
             store=store,
             connection=_connection_config(settings),
             broker_adapter=adapter,
@@ -331,7 +336,7 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
             risk_decision_source=lambda _: risk_decision,
             action_policy_source=lambda _: policy,
             kill_switch_source=lambda _: (risk_examples._inactive_state(),),
-            readiness_source=lambda item, _: ReadinessAssessment(
+            readiness_source=lambda item, _: create_readiness_assessment(
                 passed=True,
                 failed_check_codes=(),
                 evidence_refs={"data_authority_id": dataset.request_id},
@@ -346,7 +351,8 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
             shutdown_reconcile=_passed,
             clock=lambda: risk_examples.NOW,
         )
-        await session.start(
+        await start_live_session(
+            session,
             {
                 "RUNTIME_PROFILE": "paper",
                 "EXECUTION_ROUTE": "paper",
@@ -380,8 +386,8 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
             symbol_capability_source=lambda *_: (capability, symbol),
         )
         envelope = await submit_order(request, deps)
-        assert envelope.status == "sent"
-        assert envelope.audit_metadata["redaction_applied"] is True
+        assert envelope.status == "success"
+        assert envelope.metadata.extensions["redaction_applied"] is True
         assert store.projection is not None
         assert store.projection.receipts
         assert pre_audit
@@ -392,8 +398,8 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
                 original_orders=original_orders,
                 original_positions=original_positions,
             )
-        if session is not None and session.started:
-            stopped = await session.stop()
+        if session is not None and is_live_session_started(session):
+            stopped = await stop_live_session(session)
             assert stopped.status == "success"
         await adapter.disconnect()
 

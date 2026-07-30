@@ -9,23 +9,21 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
-from typing import cast
+from typing import Any
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.brokers import (
-    BrokerAdapter,
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerFeatureFlags,
-)
+from app.services.brokers import build_broker_connection_config
 from app.services.trading import (
-    LiveSession,
-    TradingRequest,
-    TradingRoute,
-    TradingStateStore,
+    create_live_session,
+    create_trading_request,
     evaluate_live_gate,
+    get_live_session_status,
+    get_trading_route,
+    is_live_session_started,
+    start_live_session,
+    stop_live_session,
 )
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
@@ -41,38 +39,29 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _session() -> LiveSession:
+def _session() -> Any:
     """Build a package-only usage session."""
-    connection = cast(
-        "BrokerConnectionConfig",
-        SimpleNamespace(
-            broker_id="test-broker",
-            environment=BrokerEnvironment.LIVE,
-            provider_enabled=True,
-        ),
+    connection = build_broker_connection_config(
+        broker_id="mt5",
+        environment="live",
+        provider_enabled=True,
     )
-    adapter = cast(
-        "BrokerAdapter",
-        SimpleNamespace(contract_version="v1", schema_id="brokers.adapter.v1"),
+    adapter = SimpleNamespace(contract_version="v1", schema_id="brokers.adapter.v1")
+    flags = SimpleNamespace(
+        broker_id="mt5",
+        environment="live",
     )
-    flags = cast(
-        "BrokerFeatureFlags",
-        SimpleNamespace(
-            broker_id="test-broker",
-            environment=BrokerEnvironment.LIVE,
-        ),
-    )
-    return LiveSession(
-        store=cast("TradingStateStore", object()),
+    return create_live_session(
+        store=object(),
         connection=connection,
         broker_adapter=adapter,
         feature_flags=flags,
         risk_decision_source=lambda _request: None,
         action_policy_source=lambda _request: None,
         kill_switch_source=lambda _request: (),
-        readiness_source=lambda _req, _ev: cast("object", None),
+        readiness_source=lambda _req, _ev: None,
         adapter_capability_source=lambda _request: {},
-        auth_context_source=lambda _request: cast("object", None),
+        auth_context_source=lambda _request: None,
         pre_audit_sink=lambda _ev: None,
         event_sink=lambda _evt: None,
         startup_reconcile=_passed,
@@ -114,24 +103,24 @@ def _evidence() -> dict[str, object]:
 async def _async_example() -> None:
     """Async portion of live session demonstration."""
     session = _session()
-    print(f"Initial LiveSession started state: {session.started}")
+    print(f"Initial session started state: {is_live_session_started(session)}")
 
     # Start session
-    start_res = await session.start(_config(), _evidence())
-    print(f"LiveSession start status: {start_res.status}")
+    start_res = await start_live_session(session, _config(), _evidence())
+    print(f"Session start status: {start_res.status}, evidence: {start_res.data}")
 
     # Session status
-    status_res = session.status()
+    status_res = get_live_session_status(session)
     status_data = status_res.data
     assert status_data is not None
     print(f"LiveSession status health: {status_data['health']}")
 
     # Evaluate live gate
-    request = TradingRequest(
+    request = create_trading_request(
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
-        route=TradingRoute.LIVE,
+        route=get_trading_route("live"),
         action="submit_order",
         provider_id="test-broker",
         account_id="account-001",
@@ -155,8 +144,8 @@ async def _async_example() -> None:
     print(f"Evaluated live gate result status: {gate_res.status}")
 
     # Stop session
-    stop_res = await session.stop()
-    print(f"LiveSession stop status: {stop_res.status}")
+    stop_res = await stop_live_session(session)
+    print(f"Session stop status: {stop_res.status}, evidence: {stop_res.data}")
 
 
 def example_live() -> None:

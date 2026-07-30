@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/trading`
 > **Status:** `Completed`
-> **Last updated:** `2026-07-24`
+> **Last updated:** `2026-07-30`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -86,19 +86,25 @@ only bounded redacted unresolved-scope evidence.
 | `PortfolioBudgetExecutionVerdict` | `v1` | Risk | Prove current execution-time budget authority for the exact allocation, plan, canonical plan hash, and budget unit; Trading never calculates consumption. |
 | Portfolio allocation/plan identifiers and hashes carried inside `PortfolioRebalanceExecutionRequest v1` | `v1` | Portfolio | Bind the Trading-owned execution request to one immutable target and plan without consuming or importing Portfolio contracts or internals. |
 
-Trading public operations return the shared Utils `StandardResponse[T]` through
-`app.services.trading`. Successful responses preserve the raw DTO directly in
-`data`; error responses set `data=None` and carry only the canonical symbolic
-`error.code` plus redacted `error.details`. Former business outcomes such as
+Trading exposes only standalone functions through `app.services.trading`; its
+package-root `__all__` contains no classes or constants. Public operation functions
+return the shared Utils `StandardResponse[T]`. Public `create_*` factories and
+`get_*` accessors return immutable internal DTOs or scalar configuration values
+without exposing their implementation classes for import. Successful responses
+preserve the raw DTO directly in `data`; error responses set `data=None` and carry
+only the canonical symbolic `error.code` plus redacted `error.details`. Former business outcomes such as
 `sent`, `partial`, `packaged`, and `unknown_outcome` are preserved in
 `metadata.extensions["legacy_status"]`. An unknown outcome is always
 `status="error"`, `code="UNKNOWN_OUTCOME"`, with the raw receipt in
 `error.details["receipt"]` and `legacy_status="unknown_outcome"`.
 
-**Consumed-symbol name reconciliation** (contract name → concrete public import, to avoid importing non-existent symbols):
+**Consumed-symbol name reconciliation** (contract name → package-root function,
+without importing dependency classes):
 
-- `IndicatorSeries v1` → class `IndicatorResult` (`from app.services.indicators import IndicatorResult`).
-- `RiskDecision v1` → class `RiskDecisionPackage` (`from app.services.risk import RiskDecisionPackage`); `ActionPolicyVerdict`, `KillSwitchState`, `StrategyOperationalEligibilityDecision`, and `AllocationRiskDecision` use their own names.
+- `IndicatorSeries v1` → values obtained through Indicators package-root functions
+  such as `get_indicator_result_values()`.
+- Risk-owned decision, policy, and kill-switch DTOs are created, queried, and
+  validated only through functions exported by `app.services.risk`.
 - The "Simulation" domain is the package `app.services.simulator`. Trading imports no Simulation internals; the `sim` route is dispatched through an injected async callback `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]`.
 
 ### Persisted state
@@ -169,14 +175,14 @@ Modules and files are ordered from lowest dependency to highest dependency.
 
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
-| Completed | `FEAT-TRD-01` Canonical Contracts and Registries | `contracts/` | `TRADING_CONTRACT_VERSION`, `TradingRoute`, `TradingRequest`, `StandardResponse`, `OrderIntent`, `ExecutionReceipt`, `TradeRecord`, `PortfolioRebalanceExecutionRequest`, `ExecutionEvidenceReport`, `TradingError`, `map_trading_error`, `redact_trading_payload`, `get_public_contracts`, `create_trading_action_draft`; exact declarations and fields: Section 4.1 | Section 4.1 functional requirements | `tests/trading/usage/01_contracts.py` |
-| Completed | `FEAT-TRD-02` State and Deterministic Projections | `state/` | `TRADING_SCHEMA_VERSION`, `IdempotencyReservation`, `TradingEvent`, `TradingProjection`, `TradingStateStore`, `apply_execution_event`, `get_trading_migrations`, `reserve_idempotency`; exact declarations: Section 4.2 | Section 4.2 functional requirements | `tests/trading/usage/02_state.py` |
-| Completed | `FEAT-TRD-03` Validation, Readiness, and Plans | `validation/` | `ReadinessAssessment`, `RouteSnapshot`, `assess_execution_readiness`, `build_execution_plan`, `get_route_snapshot`, `validate_order_request`; exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/trading/usage/03_validation.py` |
+| Completed | `FEAT-TRD-01` Canonical Contracts and Registries | `contracts/` | `get_trading_contract_version`, `get_trading_route`, `create_trading_request`, `create_order_intent`, `create_execution_receipt`, `create_trade_record`, `create_portfolio_rebalance_execution_request`, `create_execution_evidence_report`, `create_trading_error`, `is_trading_error`, `is_execution_receipt`, `map_trading_error`, `redact_trading_payload`, `get_public_contracts`, `create_trading_action_draft`; exact declarations and fields: Section 4.1 | Section 4.1 functional requirements | `tests/trading/usage/01_contracts.py` |
+| Completed | `FEAT-TRD-02` State and Deterministic Projections | `state/` | `get_trading_schema_version`, `create_idempotency_reservation`, `create_trading_event`, `create_trading_projection`, `apply_execution_event`, `get_trading_migrations`, `reserve_idempotency`; exact declarations: Section 4.2 | Section 4.2 functional requirements | `tests/trading/usage/02_state.py` |
+| Completed | `FEAT-TRD-03` Validation, Readiness, and Plans | `validation/` | `create_readiness_assessment`, `create_route_snapshot`, `assess_execution_readiness`, `build_execution_plan`, `get_route_snapshot`, `validate_order_request`; exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/trading/usage/03_validation.py` |
 | Completed | `FEAT-TRD-04` Authority Selection and Dispatch | `routing/` | `classify_authority_response`, `dispatch_order_intent`, `validate_adapter_capability`; exact declarations: Section 4.4 | Section 4.4 functional requirements | `tests/trading/usage/04_routing.py` |
-| Completed | `FEAT-TRD-05` Reconciliation and Retry Guard | `reconciliation/` | `AuthorityResolution`, `AuthoritySnapshot`, `ReconciliationReport`, `compare_authority_state`, `resolve_unknown_outcome`; exact declarations: Section 4.5 | Section 4.5 functional requirements | `tests/trading/usage/05_reconciliation.py` |
-| Completed | `FEAT-TRD-06` Operational and Budget Evidence | `monitoring/` | `BudgetGate`, `OperationalEvent`, `build_broker_state_unknown_event`, `emit_runtime_event`; exact declarations: Section 4.6 | Section 4.6 functional requirements | `tests/trading/usage/06_monitoring.py` |
-| Completed | `FEAT-TRD-07` Live and Paper Session Lifecycle | `live/` | `LiveSession`, `evaluate_live_gate`; exact declarations and configuration: Section 4.7 | Section 4.7 functional requirements | `tests/trading/usage/07_live.py` |
-| Completed | `FEAT-TRD-08` Route-Aware Public Actions | `actions/` | `TradingDependencies`, `submit_order`, `modify_order`, `cancel_order`, `close_position`, `modify_position`, `reduce_exposure`, `pause_strategy`, `resume_strategy`, `sync_positions`, `trigger_kill_switch`, `clear_kill_switch`, `cancel_all_orders`, `close_all_positions`, `execute_portfolio_rebalance`, `run_live_evaluation_cycle`; exact declarations: Section 4.8 | Section 4.8 functional requirements | `tests/trading/usage/08_actions.py` |
+| Completed | `FEAT-TRD-05` Reconciliation and Retry Guard | `reconciliation/` | `create_authority_resolution`, `create_authority_snapshot`, `create_reconciliation_report`, `compare_authority_state`, `resolve_unknown_outcome`; exact declarations: Section 4.5 | Section 4.5 functional requirements | `tests/trading/usage/05_reconciliation.py` |
+| Completed | `FEAT-TRD-06` Operational and Budget Evidence | `monitoring/` | `create_operational_event`, `validate_budget_authority`, `build_broker_state_unknown_event`, `emit_runtime_event`; exact declarations: Section 4.6 | Section 4.6 functional requirements | `tests/trading/usage/06_monitoring.py` |
+| Completed | `FEAT-TRD-07` Live and Paper Session Lifecycle | `live/` | `create_live_session`, `start_live_session`, `stop_live_session`, `get_live_session_status`, `is_live_session_started`, `is_live_session_reconciliation_ready`, `is_live_session_admission_enabled`, `evaluate_live_gate`; exact declarations and configuration: Section 4.7 | Section 4.7 functional requirements | `tests/trading/usage/07_live.py` |
+| Completed | `FEAT-TRD-08` Route-Aware Public Actions | `actions/` | `create_trading_dependencies`, `submit_order`, `modify_order`, `cancel_order`, `close_position`, `modify_position`, `reduce_exposure`, `pause_strategy`, `resume_strategy`, `sync_positions`, `trigger_kill_switch`, `clear_kill_switch`, `cancel_all_orders`, `close_all_positions`, `execute_portfolio_rebalance`, `run_live_evaluation_cycle`; exact declarations: Section 4.8 | Section 4.8 functional requirements | `tests/trading/usage/08_actions.py` |
 | Completed | `FEAT-TRD-09` Immutable Execution Evidence | `reporting/` | `build_trading_report` returning `ExecutionEvidenceReport`; exact declarations: Section 4.9 | Section 4.9 functional requirements | `tests/trading/usage/09_reporting.py` |
 
 ```text
@@ -322,11 +328,8 @@ never reused. New workflows continue from `WF-TRD-015`.
 | `WF-TRD-012` | `tests/trading/usage/workflows/wf_trd_012_accept_governed_upstream_request.py` |
 | `WF-TRD-013` | `tests/trading/usage/workflows/wf_trd_013_execute_authorized_portfolio_rebalance.py` |
 | `WF-TRD-014` | `tests/trading/usage/workflows/wf_trd_014_run_live_paper_evaluation_cycle.py` |
-| `WF-TRD-015` | `tests/trading/usage/workflows/wf_trd_015_pause_resume_strategy_route.py` *(pending)* |
-| `WF-TRD-016` | `tests/trading/usage/workflows/wf_trd_016_modify_working_order_or_position.py` *(pending)* |
-
-Entries marked *(pending)* are registered workflows whose standalone program is not
-yet written.
+| `WF-TRD-015` | `tests/trading/usage/workflows/wf_trd_015_pause_resume_strategy_route.py` |
+| `WF-TRD-016` | `tests/trading/usage/workflows/wf_trd_016_modify_working_order_or_open_position.py` |
 
 ### Status values
 
@@ -359,8 +362,8 @@ yet written.
 | Completed | Supporting | `WF-TRD-012` | Cross-domain | Accept governed upstream request | Approved `RiskDecision` and immutable lineage | Validated Trading request; no raw signal translation | `FR-TRD-003 → FR-TRD-024` |
 | Completed | Supporting | `WF-TRD-013` | Cross-domain | Execute authorized portfolio rebalance | `PortfolioRebalanceExecutionRequest v1` plus current Risk decisions | Idempotent order outcomes and reconciliation evidence | `FR-TRD-063 → FR-TRD-064 → FR-TRD-024 → FR-TRD-036 → FR-TRD-039` |
 | Completed | Supporting | `WF-TRD-014` | Cross-domain | Run a live/paper evaluation cycle | Live/paper market update or scheduled evaluation trigger | Neutral signal ends the cycle, or an approved `RiskDecision` enters the validate/gate/dispatch path | `FR-TRD-065 → FR-TRD-012 → FR-TRD-036` |
-| Completed | Supporting | `WF-TRD-015` | Cross-domain | Pause and resume a strategy route | Authorized operator or governance command naming an exact strategy scope | Durable paused/resumed route state; no position or order mutation | `Pending` |
-| Completed | Supporting | `WF-TRD-016` | Cross-domain | Modify a working order or open position | Approved modification request carrying current Risk authorization | One broker modification or cancellation, or an audited fail-closed outcome | `Pending` |
+| Completed | Supporting | `WF-TRD-015` | Cross-domain | Pause and resume a strategy route | Authorized operator or governance command naming an exact strategy scope | Durable paused/resumed route state; no position or order mutation | `FR-TRD-019 → FR-TRD-020` |
+| Completed | Supporting | `WF-TRD-016` | Cross-domain | Modify a working order or open position | Approved modification request carrying current Risk authorization | One broker modification or cancellation, or an audited fail-closed outcome | `FR-TRD-014 → FR-TRD-017` |
 
 ### `WF-TRD-SEC` — Validate and package a route-aware action
 
@@ -746,7 +749,7 @@ no working order is cancelled, and no broker mutation is issued.
 orders survive a pause untouched. Resume is refused while any applicable kill-switch
 scope is active, and an unresolved reconciliation keeps the route paused.
 
-**Integration test:** `Pending`
+**Integration test:** `tests/trading/integration/test_pause_resume.py::test_pause_resume_preserves_orders_and_positions`
 
 ### `WF-TRD-016` — Modify a working order or open position
 
@@ -774,6 +777,8 @@ fail-closed outcome.
 **Failure behavior:** a modification that increases risk without fresh Risk
 authorization is rejected. An ambiguous authority response enters `WF-TRD-005` rather
 than being retried.
+
+**Integration test:** `tests/trading/integration/test_modifications.py::test_modifications_use_current_state_and_fresh_authority`
 
 ---
 
@@ -967,7 +972,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Completed | `FR-TRD-030` | The system shall classify malformed success, timeout, and ambiguous/rate-limited mutation conservatively with retry delay/safety evidence. | `classify_authority_response(raw: JsonValue, capability: Mapping[str, JsonValue]) -> StandardResponse[ExecutionReceipt]` | None | `TradingError`: response cannot be safely represented | **Usage:** `tests/trading/usage/04_routing.py::fr_trd_030()`<br>**Unit:** `tests/trading/unit/routing/test_responses.py::test_malformed_success_is_unknown_outcome()` |
 | Completed | `FR-TRD-031` | The system shall dispatch exactly one approved intent to Simulation for sim or adapt it into the matching receiver-owned Brokers mutation DTO for paper/live. Broker environment/account reference come only from injected `BrokerConnectionConfig`; order type/unit/instructions come only from `OrderIntent`; target order/position identities come only from Trading state carried by the intent; timeout and receipt time come from validated injected policy/clock dependencies. | `async dispatch_order_intent(intent: OrderIntent, connection: BrokerConnectionConfig \| None, broker_adapter: BrokerAdapter \| None, simulation_dispatch: Callable[[OrderIntent], Awaitable[ExecutionReceipt]] \| None, *, operation_timeout_seconds: Decimal, clock: Callable[[], datetime]) -> StandardResponse[ExecutionReceipt]` | Broker mutation or external Simulation mutation | `TradingError`: authority unavailable, connection/target absent, gate absent, timeout, or unsafe response | **Usage:** `tests/trading/usage/04_routing.py::fr_trd_031()`<br>**Unit:** `tests/trading/unit/routing/test_dispatcher.py::test_dispatch_has_single_mutation_boundary()` |
 
-**Rules:** No provider SDK import; paper and live share this path and differ only by the environment/credentials carried in the injected `BrokerConnectionConfig` whose credential references were resolved by UI/API composition. The dispatch path is `async`: both the Brokers `BrokerAdapter` mutation operations and the injected simulation callback are awaited. No synchronous bridge (e.g., `asyncio.run`) is permitted inside a live event loop.
+**Rules:** No provider SDK or Broker class import; paper and live share this path and differ only by facts read through Broker root getter functions. The dispatch path is `async`: Broker root mutation functions and the injected simulation callback are awaited. No synchronous bridge (e.g., `asyncio.run`) is permitted inside a live event loop.
 **Implementation notes:** Implement a single broker mutation boundary and response classification; obtain the broker via the injected Brokers `BrokerAdapter` (mutation traits) — no broker resolver access — and provide Simulation dispatch through an injected callable.
 **Feature usage example:** `python tests/trading/usage/04_routing.py`
 

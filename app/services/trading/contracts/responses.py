@@ -8,7 +8,10 @@ from typing import Any, Literal, TypeVar, cast
 
 from app.utils import (
     build_response_metadata,
+    error_response,
     generate_id,
+    get_common_error_catalog,
+    get_standard_response_type,
     validate_id,
 )
 
@@ -17,8 +20,6 @@ RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 type JsonValue = Any
 type ResponseMetadata = Any
-type StandardResponse[T] = Any
-RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 T = TypeVar("T")
 
@@ -28,8 +29,8 @@ def _safe_trace_id(value: str | None, prefix: str) -> str:
     if value is not None:
         try:
             return validate_id(value, expected_prefix=prefix)
-        except Exception:
-            pass
+        except Exception:  # noqa: BLE001 - invalid trace input uses a safe fallback.
+            value = None
     return generate_id(prefix)
 
 
@@ -97,7 +98,8 @@ def success_trading_response(
     response_extensions = dict(extensions or {})
     if legacy_status is not None:
         response_extensions["legacy_status"] = legacy_status
-    return StandardResponse[T](
+    response_type: Any = get_standard_response_type()
+    return response_type(
         status="success",
         message=message,
         data=data,
@@ -140,31 +142,46 @@ def error_trading_response(
 
     Returns:
         Standard error response with ``data=None``.
+
+    Raises:
+        RuntimeError: If the Utils response invariant omits its error payload.
     """
     response_extensions = dict(extensions or {})
     if legacy_status is not None:
         response_extensions["legacy_status"] = legacy_status
-    return StandardResponse[T](
+    metadata = _metadata(
+        operation,
+        risk_level=risk_level,
+        request_id=request_id,
+        correlation_id=correlation_id,
+        started_at=started_at or perf_counter_ns(),
+        read_only=read_only,
+        writes_file=writes_file,
+        modifies_database=modifies_database,
+        places_trade=places_trade,
+        requires_network=requires_network,
+        extensions=response_extensions,
+    )
+    template: Any = error_response(
+        code="INTERNAL_ERROR",
+        details={},
+        message=message,
+        metadata=metadata,
+        catalog=get_common_error_catalog(),
+    )
+    if template.error is None:  # pragma: no cover - Utils invariant.
+        raise RuntimeError("Utils error response omitted StandardError")
+    standard_error_type = type(template.error)
+    response_type: Any = get_standard_response_type()
+    return response_type(
         status="error",
         message=message,
         data=None,
-        error=StandardError(
+        error=standard_error_type(
             code=code,
             details=cast("Mapping[str, JsonValue]", details),
         ),
-        metadata=_metadata(
-            operation,
-            risk_level=risk_level,
-            request_id=request_id,
-            correlation_id=correlation_id,
-            started_at=started_at or perf_counter_ns(),
-            read_only=read_only,
-            writes_file=writes_file,
-            modifies_database=modifies_database,
-            places_trade=places_trade,
-            requires_network=requires_network,
-            extensions=response_extensions,
-        ),
+        metadata=metadata,
     )
 
 

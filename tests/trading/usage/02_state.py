@@ -7,24 +7,28 @@ import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.trading import (
-    TRADING_SCHEMA_VERSION,
-    IdempotencyReservation,
-    TradingEvent,
-    TradingProjection,
-    TradingRequest,
-    TradingRoute,
     apply_execution_event,
+    create_idempotency_reservation,
+    create_trading_event,
+    create_trading_projection,
+    create_trading_request,
     get_trading_migrations,
+    get_trading_schema_version,
     reserve_idempotency,
 )
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
+IdempotencyReservation = Any
+TradingEvent = Any
+TradingProjection = Any
+TradingRequest = Any
+TradingRoute = Any
 type Scope = tuple[TradingRoute, str, str]
 
 
@@ -53,10 +57,10 @@ class _UsageStore:
                 if existing.material_hash == material_hash
                 else "conflict"
             )
-            return IdempotencyReservation.model_validate(
-                {**existing.model_dump(mode="python"), "status": status}
+            return create_idempotency_reservation(
+                **{**existing.model_dump(mode="python"), "status": status}
             )
-        reservation = IdempotencyReservation(
+        reservation = create_idempotency_reservation(
             key=key,
             material_hash=material_hash,
             material_version=material_version,
@@ -137,7 +141,7 @@ def _header(title: str) -> None:
 
 def _request() -> TradingRequest:
     """Build one governed request for idempotency usage."""
-    return TradingRequest(
+    return create_trading_request(
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
@@ -164,7 +168,7 @@ def _request() -> TradingRequest:
 
 def _event(event_id: str = "usage-event-001") -> TradingEvent:
     """Build one scoped usage event."""
-    return TradingEvent(
+    return create_trading_event(
         event_id=event_id,
         event_type="send_attempted",
         aggregate_version=0,
@@ -181,7 +185,7 @@ def _event(event_id: str = "usage-event-001") -> TradingEvent:
 
 def _projection(version: int = 1) -> TradingProjection:
     """Build one exact-scope projection."""
-    return TradingProjection(
+    return create_trading_projection(
         route="sim",
         tenant_id="usage-tenant-001",
         authority_id="simulator",
@@ -238,7 +242,7 @@ def example_state() -> None:
     print(f"Applied execution event updated projection version: {projection.version}")
 
     # 3. Schema versions and migrations
-    print(f"Trading schema version: {TRADING_SCHEMA_VERSION}")
+    print(f"Trading schema version: {get_trading_schema_version()}")
     migrations = get_trading_migrations()
     assert migrations.status == "success"
     migration_steps = migrations.data

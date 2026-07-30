@@ -7,8 +7,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from app.services.brokers import BrokerId
-from app.services.trading import TradingError, evaluate_live_gate
+from app.services.brokers import get_broker_id
+from app.services.trading import evaluate_live_gate, start_live_session
 from tests.brokers.usage._support import real_session, require_success
 from tests.trading.usage.workflows._support import examples
 
@@ -33,12 +33,13 @@ async def run() -> None:
     """Run the genuine connection plus fail-closed gate."""
     # Stage 1 — INPUT BOUNDARY: Genuine MT5 demo connection and canonical request.
     _stage(1)
-    async with real_session(BrokerId.MT5) as adapter:
+    async with real_session(get_broker_id("mt5")) as adapter:
         require_success("MT5 readiness", await adapter.get_connection_status())
         # Stage 2: Build a package-only session with deliberately absent Risk truth.
         _stage(2)
         session = examples.live_gate_session(risk_decision=None)
-        await session.start(
+        await start_live_session(
+            session,
             {**examples.live_config(), "ALLOW_LIVE_MUTATIONS": True},
             examples.live_evidence(),
         )
@@ -46,19 +47,15 @@ async def run() -> None:
         print("Input:", request.route, request.action)
         # Stage 3: Execute every mandatory public gate.
         _stage(3)
-        try:
-            await evaluate_live_gate(request, {}, session)
-        except TradingError as error:
-            blocked = error
-        else:
-            raise RuntimeError("Live gate unexpectedly admitted mutation")
-        print("Gate result:", blocked.code)
+        blocked = await evaluate_live_gate(request, {}, session)
+        assert blocked.error is not None
+        print("Gate result:", blocked.error.code, blocked.error.details)
         # Stage 4: No dispatch is attempted.
         _stage(4)
         print("Dispatch invoked:", False, "No broker mutation was transmitted")
         # Stage 5 — OUTPUT BOUNDARY: Structured fail-closed result; MT5 disconnect follows.
         _stage(5)
-        print("Output:", type(blocked).__name__, blocked.code)
+        print("Output:", blocked.status, blocked.error.code)
 
 
 def main() -> None:

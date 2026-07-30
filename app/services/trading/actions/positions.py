@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from app.services.trading.actions._shared import authority_id, require_action
 from app.services.trading.actions.orders import _execute_request
@@ -68,7 +68,7 @@ def _current_position_quantity(
         if position.position_id == target:
             if request.symbol is not None and position.symbol != request.symbol:
                 raise TradingError("SCOPE_MISMATCH", "Position symbol mismatches")
-            return position.quantity
+            return cast("Decimal", position.quantity)
     raise TradingError("RECONCILIATION_REQUIRED", "Position target is unavailable")
 
 

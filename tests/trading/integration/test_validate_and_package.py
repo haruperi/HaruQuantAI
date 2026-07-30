@@ -1,11 +1,11 @@
 """Workflow integration for validation and deterministic packaging."""
 
-# ruff: noqa: INP001
 from app.services.trading import (
-    ReadinessAssessment,
     build_execution_plan,
+    create_readiness_assessment,
     validate_order_request,
 )
+
 from tests.trading.conftest import (
     NOW,
     account_snapshot,
@@ -23,7 +23,7 @@ def test_validate_and_package_fails_closed() -> None:
     assert invalid.error is not None
     assert invalid.error.code == "VALIDATION_FAILED"
     valid = trading_request()
-    readiness = ReadinessAssessment(
+    readiness = create_readiness_assessment(
         passed=True,
         failed_check_codes=(),
         evidence_refs={"data": "snapshot"},

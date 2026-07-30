@@ -6,18 +6,49 @@ from types import SimpleNamespace
 from typing import cast
 
 import pytest
-from app.services.brokers import (
-    BrokerAdapter,
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerFeatureFlags,
-)
+from app.services.brokers import build_broker_connection_config
 from app.services.trading.live import LiveSession
+from app.services.trading.live.config import (
+    _positive_decimal,
+    _positive_int,
+    _staleness_bounds,
+    _validate_live_config,
+)
 from app.services.trading.monitoring import OperationalEvent
 from app.services.trading.state import TradingStateStore
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
+
+
+def test_runtime_config_rejects_inexact_and_incomplete_bounds() -> None:
+    """Runtime numeric and evidence policies accept no implicit coercion."""
+    with pytest.raises(TypeError, match="exact Decimal"):
+        _positive_decimal(1.5)
+    with pytest.raises(ValueError, match="finite and positive"):
+        _positive_decimal("0")
+    with pytest.raises(TypeError, match="exact int"):
+        _positive_int(True)
+    with pytest.raises(ValueError, match="positive"):
+        _positive_int(0)
+    with pytest.raises(TypeError, match="must be a mapping"):
+        _staleness_bounds(())
+    with pytest.raises(ValueError, match="exact evidence classes"):
+        _staleness_bounds({"route_snapshot": "1"})
+
+
+def test_runtime_config_requires_matching_profile_and_authority() -> None:
+    """Profile/route conflicts and blank authority identity fail closed."""
+    config = _config()
+    config["EXECUTION_ROUTE"] = "paper"
+    with pytest.raises(Exception, match="CONFIGURATION_INVALID"):
+        _validate_live_config(config)
+    config = _config()
+    config["DATA_AUTHORITY_ID"] = " "
+    with pytest.raises(Exception, match="CONFIGURATION_INVALID"):
+        _validate_live_config(config)
 
 
 @pytest.fixture
@@ -31,34 +62,27 @@ def anyio_backend() -> str:
     return "asyncio"
 
 
-def _authority() -> tuple[
-    BrokerConnectionConfig,
-    BrokerAdapter,
-    BrokerFeatureFlags,
-]:
+def _authority() -> tuple[object, object, object]:
     """Build minimal typed live authority test doubles.
 
     Returns:
         Connection, adapter, and feature-flag doubles.
     """
     logger.debug("Building LiveSession authority doubles")
-    connection = cast(
-        "BrokerConnectionConfig",
-        SimpleNamespace(
-            broker_id="test-broker",
-            environment=BrokerEnvironment.LIVE,
-            provider_enabled=True,
-        ),
+    connection = build_broker_connection_config(
+        broker_id="mt5",
+        environment="live",
+        provider_enabled=True,
     )
     adapter = cast(
-        "BrokerAdapter",
+        "object",
         SimpleNamespace(contract_version="v1", schema_id="brokers.adapter.v1"),
     )
     flags = cast(
-        "BrokerFeatureFlags",
+        "object",
         SimpleNamespace(
-            broker_id="test-broker",
-            environment=BrokerEnvironment.LIVE,
+            broker_id="mt5",
+            environment="live",
         ),
     )
     return connection, adapter, flags

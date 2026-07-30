@@ -6,7 +6,7 @@ from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Protocol
 
 from app.services.trading.contracts import (
     ExecutionReceipt,
@@ -43,7 +43,19 @@ if TYPE_CHECKING:
 
 type BrokerConnection = object
 type BrokerAdapter = object
-type SymbolCapability = tuple[Mapping[str, JsonValue], object]
+
+
+class _BrokerSymbolInfo(Protocol):
+    """Describe only normalized symbol fields consumed by Trading."""
+
+    quantity_unit: str
+    min_quantity: Decimal
+    max_quantity: Decimal
+    quantity_step: Decimal
+    price_step: Decimal
+
+
+type SymbolCapability = tuple[Mapping[str, JsonValue], _BrokerSymbolInfo]
 type SimulationDispatch = Callable[
     [OrderIntent], Awaitable[StandardResponse[ExecutionReceipt]]
 ]

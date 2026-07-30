@@ -7,20 +7,25 @@ import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.trading import (
-    AuthoritySnapshot,
-    ExecutionReceipt,
-    TradingEvent,
-    TradingProjection,
     compare_authority_state,
+    create_authority_snapshot,
+    create_execution_receipt,
+    create_trading_event,
+    create_trading_projection,
     resolve_unknown_outcome,
 )
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
+AuthoritySnapshot = Any
+ExecutionReceipt = Any
+TradingEvent = Any
+TradingProjection = Any
 
 
 def _header(title: str) -> None:
@@ -30,7 +35,7 @@ def _header(title: str) -> None:
 
 def _snapshot() -> AuthoritySnapshot:
     """Build normalized current Simulation authority facts."""
-    return AuthoritySnapshot(
+    return create_authority_snapshot(
         route="sim",
         authority_id="simulator",
         account_id="usage-account-001",
@@ -45,7 +50,7 @@ def _snapshot() -> AuthoritySnapshot:
 
 def _projection() -> TradingProjection:
     """Build the matching Trading projection."""
-    return TradingProjection(
+    return create_trading_projection(
         route="sim",
         tenant_id="usage-account-001",
         authority_id="simulator",
@@ -63,7 +68,7 @@ def _projection() -> TradingProjection:
 
 def _attempt() -> TradingEvent:
     """Build originating persisted send-attempt evidence."""
-    return TradingEvent(
+    return create_trading_event(
         event_id="usage-attempt-001",
         event_type="send_attempted",
         aggregate_version=0,
@@ -80,7 +85,7 @@ def _attempt() -> TradingEvent:
 
 def _receipt() -> ExecutionReceipt:
     """Build one unknown-outcome receipt requiring reconciliation."""
-    return ExecutionReceipt(
+    return create_execution_receipt(
         receipt_id="usage-receipt-001",
         intent_id="usage-intent-001",
         client_order_id="usage-client-order-001",

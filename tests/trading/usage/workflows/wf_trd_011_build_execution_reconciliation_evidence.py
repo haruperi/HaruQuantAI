@@ -38,17 +38,20 @@ def main() -> None:
     # Stage 2: Public report builder reads official evidence.
     _stage(2)
     outcome = build_trading_report(request, store)
+    assert outcome.status == "success"
+    assert outcome.data is not None
     # Stage 3: Inspect registered schema.
     _stage(3)
-    report = outcome.data["report"]
-    print("Schema:", report["schema_id"])
+    report = outcome.data
+    dumped = report.model_dump(mode="json")
+    print("Schema:", report.schema_id)
     # Stage 4: Preserve execution-only ownership.
     _stage(4)
     print(
         "Evidence keys:",
-        tuple(report["evidence"]),
+        tuple(dumped["evidence"]),
         "contains performance:",
-        "performance" in str(report).lower(),
+        "performance" in str(dumped).lower(),
     )
     # Stage 5 — OUTPUT BOUNDARY: Return StandardResponse with immutable report data.
     _stage(5)

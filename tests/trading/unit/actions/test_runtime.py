@@ -8,6 +8,7 @@ from typing import cast
 
 import app.services.trading.actions.runtime as runtime_module
 import pytest
+from app.services.brokers import build_broker_connection_config
 from app.services.risk import (
     create_risk_approval_token,
     create_risk_decision_package,
@@ -166,8 +167,18 @@ def evaluation_dependencies(intent):
     deps = replace(
         dependencies(),
         live_session=session,
-        connection=cast(
-            "object", SimpleNamespace(broker_id=SimpleNamespace(value="mt5"))
+        connection=build_broker_connection_config(
+            broker_id="mt5",
+            environment="demo",
+            provider_enabled=True,
+            connect_timeout_sec=5,
+            request_timeout_sec=10,
+            transport_reconnect_max_attempts=0,
+            stream_buffer_size=100,
+            circuit_failure_threshold=3,
+            circuit_recovery_timeout_sec=30,
+            circuit_half_open_max_calls=1,
+            account_reference="broker-account-001",
         ),
         market_data_source=market,
         evaluation_account_source=account,
@@ -323,3 +334,29 @@ def test_runtime_timeout_emits_operational_evidence() -> None:
     with pytest.raises(TradingError, match="WORKFLOW_TIMEOUT"):
         runtime_module._check_timeout(deps, NOW, evidence())
     assert events[0].event_type == "WORKFLOW_TIMEOUT"
+
+
+def test_runtime_helpers_fail_closed_on_missing_boundary_evidence() -> None:
+    """Missing route, connection, and lineage text fail before orchestration."""
+    deps = dependencies()
+    with pytest.raises(TradingError, match="INVALID_REQUEST"):
+        runtime_module._required_text({}, "action_policy_verdict_id")
+    with pytest.raises(TradingError, match="SERVICE_UNAVAILABLE"):
+        runtime_module._route(deps)
+    with pytest.raises(TradingError, match="SERVICE_UNAVAILABLE"):
+        runtime_module._provider_id(deps)
+    cancel = trade_intent().model_copy(update={"intent_type": "CANCEL"})
+    with pytest.raises(TradingError, match="RECONCILIATION_REQUIRED"):
+        runtime_module._state_target(
+            TradingRequest.model_validate(
+                {
+                    **dependencies_request_data(),
+                    "action": "cancel_order",
+                    "order_id": "placeholder",
+                    "target_broker_order_id": "placeholder",
+                    "expected_version": 1,
+                }
+            ),
+            deps,
+            cancel,
+        )

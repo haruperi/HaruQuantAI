@@ -92,3 +92,45 @@ def test_malformed_success_is_unknown_outcome() -> None:
         ).data.response_classification  # type: ignore[union-attr]
         == "ambiguous"
     )
+
+
+def test_unsafe_authority_fields_fail_closed() -> None:
+    """Malformed identities, quantities, timestamps, and policy never become receipts."""
+    cases = []
+    wrong_text = _raw()
+    wrong_text["provider_order_id"] = 42
+    cases.append(wrong_text)
+    missing_quantity = _raw()
+    missing_quantity.pop("requested_quantity")
+    cases.append(missing_quantity)
+    float_quantity = _raw()
+    float_quantity["requested_quantity"] = 1.0
+    cases.append(float_quantity)
+    invalid_quantity = _raw()
+    invalid_quantity["requested_quantity"] = "invalid"
+    cases.append(invalid_quantity)
+    negative_quantity = _raw()
+    negative_quantity["requested_quantity"] = "-1"
+    cases.append(negative_quantity)
+    naive_time = _raw()
+    naive_time["received_at"] = NOW.replace(tzinfo=None).isoformat()
+    cases.append(naive_time)
+    bad_deals = _raw()
+    bad_deals["provider_deal_ids"] = [1]
+    cases.append(bad_deals)
+
+    for raw in cases:
+        result = classify_authority_response(raw, POLICY)  # type: ignore[arg-type]
+        assert result.status == "error"
+        assert result.error is not None
+
+    for policy in (
+        {**POLICY, "malformed_response_policy": "accept"},
+        {**POLICY, "mutation_retry_policy": "blind_retry"},
+    ):
+        result = classify_authority_response(  # type: ignore[arg-type]
+            _raw(),
+            policy,
+        )
+        assert result.status == "error"
+        assert result.error is not None

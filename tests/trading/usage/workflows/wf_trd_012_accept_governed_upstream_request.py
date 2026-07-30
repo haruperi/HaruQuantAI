@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from app.services.trading import TradingError, TradingRequest, validate_order_request
+from app.services.trading import create_trading_request, validate_order_request
 from pydantic import ValidationError
 from tests.trading.usage.workflows._support import examples
 
@@ -38,7 +38,7 @@ def main() -> None:
     material = request.model_dump(mode="python")
     material["raw_signal"] = {"direction": "BUY"}
     try:
-        TradingRequest.model_validate(material)
+        create_trading_request(**material)
     except ValidationError:
         print("Raw signal rejected:", True)
     # Stage 3: Validate the canonical request through the public boundary.
@@ -46,12 +46,11 @@ def main() -> None:
     capability, _ = examples.symbol_capability(
         request.route, request.provider_id, request.symbol
     )
-    try:
-        validated = validate_order_request(
-            request, examples.account_snapshot(), capability
-        )
-    except TradingError as error:
-        raise RuntimeError(error) from error
+    validation = validate_order_request(
+        request, examples.account_snapshot(), capability
+    )
+    assert validation.data is not None
+    validated = validation.data
     print("Validated:", validated.request_id)
     # Stage 4: Preserve upstream identifiers/approved size.
     _stage(4)

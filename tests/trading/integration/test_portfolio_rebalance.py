@@ -1,18 +1,19 @@
 """Negative workflow integration for governed portfolio rebalance execution."""
 
-# ruff: noqa: INP001, PLR0915
+# ruff: noqa: PLR0915
 from dataclasses import replace
 from datetime import timedelta
 
 import pytest
 from app.services.risk import get_decision_state
 from app.services.trading import (
-    BudgetGate,
-    PortfolioRebalanceExecutionRequest,
+    create_portfolio_rebalance_execution_request,
     execute_portfolio_rebalance,
+    validate_budget_authority,
 )
 from app.utils import canonical_json
 from pydantic import ValidationError
+
 from tests.trading.conftest import (
     NOW,
     rebalance_allocation,
@@ -77,7 +78,7 @@ async def test_rebalance_cannot_bypass_risk_or_open_to_match_weight() -> None:
     budget_data = rebalance_budget(item).model_dump(mode="python")
     budget_data.update({"plan_id": "wrong-plan", "plan_hash": "b" * 64})
     mismatched_budget = type(rebalance_budget(item)).model_validate(budget_data)
-    budget_result = BudgetGate.validate(
+    budget_result = validate_budget_authority(
         item,
         rebalance_allocation(),
         mismatched_budget,
@@ -92,11 +93,11 @@ async def test_rebalance_cannot_bypass_risk_or_open_to_match_weight() -> None:
     open_action.update({"action": "submit_order", "reduce_only": False})
     open_data["actions"] = (open_action,)
     with pytest.raises(ValidationError, match="reduce-only"):
-        PortfolioRebalanceExecutionRequest.model_validate(open_data)
+        create_portfolio_rebalance_execution_request(**open_data)
     assert {action["action"] for action in item.actions} == {"reduce_exposure"}
 
     tampered = item.model_dump(mode="python")
     tampered["canonical_hash"] = "0" * 64
     with pytest.raises(ValidationError, match="canonical_hash"):
-        PortfolioRebalanceExecutionRequest.model_validate(tampered)
+        create_portfolio_rebalance_execution_request(**tampered)
     assert canonical_json(item.model_dump(mode="json"))

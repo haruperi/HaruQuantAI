@@ -9,8 +9,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from app.services import trading
-from app.services.trading import contracts
-from app.services.trading.contracts import (
+from app.services.trading import (
     create_trading_action_draft,
     get_public_contracts,
 )
@@ -46,19 +45,20 @@ def _draft_data() -> dict[str, object]:
 
 
 def test_public_catalog_matches_exports() -> None:
-    """Catalog symbols exactly match approved contracts package exports."""
+    """Catalog symbols exactly match the domain-root function exports."""
     catalog = get_public_contracts()
     assert catalog.status == "success"
     assert catalog.data is not None
     symbols = {str(entry["symbol"]) for entry in catalog.data}
-    assert symbols == set(contracts.__all__)
+    assert symbols == set(trading.__all__)
 
 
 def test_domain_root_exports_are_explicit_and_import_safe() -> None:
     """The package root exposes every feature through an explicit stable list."""
     assert "submit_order" in trading.__all__
     assert "build_trading_report" in trading.__all__
-    assert "LiveSession" in trading.__all__
+    assert "create_live_session" in trading.__all__
+    assert all(callable(getattr(trading, name)) for name in trading.__all__)
     assert not hasattr(trading, "__getattr__")
 
 
@@ -68,6 +68,7 @@ def test_domain_import_has_no_external_or_persistent_side_effect() -> None:
 import asyncio
 import builtins
 import os
+import platform
 import socket
 import sqlite3
 import subprocess
@@ -75,6 +76,7 @@ import threading
 
 environment = dict(os.environ)
 real_open = builtins.open
+platform.machine = lambda: "AMD64"
 
 def guarded_open(file, mode="r", *args, **kwargs):
     if any(flag in mode for flag in ("w", "a", "x", "+")):

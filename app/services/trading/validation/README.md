@@ -6,9 +6,10 @@ configuration, and requirement definitions are in
 
 `orders.py` validates requests, `snapshots.py` normalizes route evidence,
 `readiness.py` aggregates freshness and gate evidence, `plans.py` builds
-side-effect-free intents, and `authority.py` validates exact Risk policy,
-decision, and kill-switch authority. External consumers use documented exports
-through `app.services.trading`.
+side-effect-free intents, `authority.py` validates exact Risk policy, decision,
+and kill-switch authority, and `factories.py` constructs readiness/snapshot
+evidence without exporting their classes. External consumers use documented
+functions through `app.services.trading`.
 
 Validation is deterministic and fails closed before allocation, persistence,
 or external mutation.

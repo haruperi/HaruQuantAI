@@ -8,8 +8,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.trading import (
-    TradingEvent,
     apply_execution_event,
+    create_trading_event,
     get_trading_migrations,
     reserve_idempotency,
 )
@@ -37,7 +37,7 @@ def main() -> None:
     # Stage 1 — INPUT BOUNDARY: Versioned event enters injected Trading state port.
     _stage(1)
     store = examples.MemoryStore()
-    event = TradingEvent(
+    event = create_trading_event(
         event_id="attempt-001",
         event_type="send_attempted",
         aggregate_version=0,
@@ -53,21 +53,30 @@ def main() -> None:
     print("Input event:", event.event_type)
     # Stage 2: Read authoritative migrations.
     _stage(2)
-    print("Migrations:", len(get_trading_migrations()))
+    migrations = get_trading_migrations()
+    assert migrations.data is not None
+    print("Migrations:", len(migrations.data), migrations.data[0])
     # Stage 3: Reserve idempotency before send.
     _stage(3)
     request = examples.live_gate_request()
-    reservation = reserve_idempotency(
+    reservation_response = reserve_idempotency(
         request,
         store,
         reservation_time=event.occurred_at,
         retention_seconds=600,
         concurrency_lock_timeout_seconds=Decimal(30),
     )
-    print("Reservation:", reservation.status)
+    assert reservation_response.data is not None
+    print(
+        "Reservation:",
+        reservation_response.data.status,
+        reservation_response.data.material_hash,
+    )
     # Stage 4: Apply and reconstruct.
     _stage(4)
-    projection = apply_execution_event(event, store)
+    projection_response = apply_execution_event(event, store)
+    assert projection_response.data is not None
+    projection = projection_response.data
     print("Projection version:", projection.version)
     # Stage 5 — OUTPUT BOUNDARY: Return retry-locked recovered state.
     _stage(5)

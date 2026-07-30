@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from typing import Any
 
 from app.services.data import (
     EconomicEvent,
@@ -17,14 +18,16 @@ from app.services.risk import (
     get_limit_status,
 )
 from app.services.trading import (
-    RouteSnapshot,
-    TradingRequest,
     assess_execution_readiness,
+    create_route_snapshot,
+    create_trading_request,
 )
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 KillSwitchState = object
 RiskConfig = object
+RouteSnapshot = Any
+TradingRequest = Any
 
 _NOW = datetime(2026, 7, 26, 12, tzinfo=UTC)
 _REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
@@ -99,7 +102,7 @@ def _event() -> EconomicEvent:
 
 def _trading_request() -> TradingRequest:
     """Build a governed order request referencing the Risk decision."""
-    return TradingRequest(
+    return create_trading_request(
         request_id=_REQUEST_ID,
         workflow_id=_WORKFLOW_ID,
         correlation_id=_CORRELATION_ID,
@@ -126,7 +129,7 @@ def _trading_request() -> TradingRequest:
 
 def _route() -> RouteSnapshot:
     """Build fresh simulation route evidence."""
-    return RouteSnapshot(
+    return create_route_snapshot(
         route="sim",
         provider_id=None,
         account_id="account-001",

@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from typing import Any
 
 from app.services.simulator.execution import (
     ExecutionProfile,
@@ -9,18 +10,20 @@ from app.services.simulator.execution import (
     price_order,
 )
 from app.services.simulator.timeline import Tick
-from app.services.trading import OrderIntent, TradingRoute
+from app.services.trading import create_order_intent
+
+OrderIntent = Any
 
 
 def _intent(side: str = "BUY") -> OrderIntent:
     """Build one valid Trading-owned market intent."""
     instant = datetime(2025, 1, 1, tzinfo=UTC)
-    return OrderIntent(
+    return create_order_intent(
         client_order_id=f"order-{side.lower()}",
         request_id="req-123e4567-e89b-42d3-a456-426614174000",
         workflow_id="wf-123e4567-e89b-42d3-a456-426614174001",
         correlation_id="cor-123e4567-e89b-42d3-a456-426614174002",
-        route=TradingRoute.SIM,
+        route="sim",
         provider_id=None,
         account_id="account",
         strategy_id="strategy",

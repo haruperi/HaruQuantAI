@@ -16,7 +16,7 @@ RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.data import AccountStateSnapshot
+    AccountStateSnapshot = Any
     from app.services.trading.contracts.models import JsonValue
 
 _ORDER_ACTIONS = frozenset({"submit_order", "modify_order", "cancel_order"})

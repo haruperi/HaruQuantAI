@@ -8,32 +8,33 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
 from pathlib import Path
+from typing import Any
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.trading import (
-    TRADING_CONTRACT_VERSION,
-    ExecutionReceipt,
-    OrderIntent,
-    PortfolioRebalanceExecutionRequest,
-    TradeRecord,
-    TradingError,
-    TradingRequest,
-    TradingRoute,
+    create_execution_receipt,
+    create_order_intent,
+    create_portfolio_rebalance_execution_request,
+    create_trade_record,
     create_trading_action_draft,
+    create_trading_error,
+    create_trading_request,
     get_public_contracts,
+    get_trading_contract_version,
+    get_trading_route,
     map_trading_error,
     redact_trading_payload,
 )
 from app.utils import (
-    RiskLevel,
-    StandardResponse,
     build_response_metadata,
     canonical_json,
+    success_response,
 )
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
+ExecutionReceipt = Any
 
 
 def _header(title: str) -> None:
@@ -71,11 +72,11 @@ def _request_data() -> dict[str, object]:
 
 def _receipt() -> ExecutionReceipt:
     """Build a confirmed simulator receipt for usage examples."""
-    return ExecutionReceipt(
+    return create_execution_receipt(
         receipt_id="usage-receipt-001",
         intent_id="usage-intent-001",
         client_order_id="usage-order-001",
-        route=TradingRoute.SIM,
+        route=get_trading_route("sim"),
         authority="simulator",
         provider_order_id="sim-order-001",
         status="filled",
@@ -118,7 +119,7 @@ def _rebalance_data() -> dict[str, object]:
                 "reduction_amount": "0.25",
             },
         ),
-        "route": TradingRoute.SIM,
+        "route": get_trading_route("sim"),
         "approval_token_ref": "usage-approval-001",
         "canonical_material_version": "v1",
         "valid_from": NOW,
@@ -133,21 +134,19 @@ def example_contracts() -> None:
     _header("Demonstrate Trading contracts and helper models.")
     print("Trading Example 1: Boundary Contracts and Validation")
 
-    print(f"Trading contract version: {TRADING_CONTRACT_VERSION}")
-    print(f"Selected route: {TradingRoute('paper').value}")
+    print(f"Trading contract version: {get_trading_contract_version()}")
+    print(f"Selected route: {get_trading_route('paper').value}")
 
-    request = TradingRequest.model_validate(_request_data())
+    request = create_trading_request(**_request_data())
     print(f"Validated TradingRequest risk_decision_id: {request.risk_decision_id}")
 
-    envelope = StandardResponse(
-        status="success",
+    envelope = success_response(
+        {"route": "sim"},
         message="Trading contract validated",
-        data={"route": "sim"},
-        error=None,
         metadata=build_response_metadata(
             name="trading.usage_contract",
             domain="trading",
-            risk_level=RiskLevel.LOW,
+            risk_level="low",
             request_id="req-11111111-1111-4111-8111-111111111111",
             start_time=1,
             read_only=True,
@@ -159,12 +158,12 @@ def example_contracts() -> None:
     )
     print(f"StandardResponse status: {envelope.status}")
 
-    intent = OrderIntent(
+    intent = create_order_intent(
         client_order_id="usage-order-001",
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
-        route=TradingRoute.SIM,
+        route=get_trading_route("sim"),
         provider_id=None,
         account_id="usage-account-001",
         strategy_id="usage-strategy-001",
@@ -190,7 +189,7 @@ def example_contracts() -> None:
     receipt = _receipt()
     print(f"ExecutionReceipt status: {receipt.status}")
 
-    record = TradeRecord(
+    record = create_trade_record(
         record_id="usage-record-001",
         receipt=receipt,
         fill_ids=("usage-fill-001",),
@@ -203,10 +202,10 @@ def example_contracts() -> None:
     )
     print(f"TradeRecord reconciliation_state: {record.reconciliation_state}")
 
-    rebalance = PortfolioRebalanceExecutionRequest.model_validate(_rebalance_data())
+    rebalance = create_portfolio_rebalance_execution_request(**_rebalance_data())
     print(f"Rebalance request plan_id: {rebalance.plan_id}")
 
-    error = TradingError("INVALID_REQUEST", "Request evidence is invalid")
+    error = create_trading_error("INVALID_REQUEST", "Request evidence is invalid")
     print(f"TradingError code: {error.trading_code}")
 
     mapped = map_trading_error(

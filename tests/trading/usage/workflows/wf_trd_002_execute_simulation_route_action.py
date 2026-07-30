@@ -8,8 +8,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.trading import (
-    ReadinessAssessment,
     build_execution_plan,
+    create_readiness_assessment,
     dispatch_order_intent,
     validate_order_request,
 )
@@ -43,19 +43,24 @@ async def run() -> None:
     capability, _ = examples.symbol_capability(
         request.route, request.provider_id, request.symbol
     )
-    validate_order_request(request, examples.account_snapshot(), capability)
-    readiness = ReadinessAssessment(
+    validated_response = validate_order_request(
+        request, examples.account_snapshot(), capability
+    )
+    assert validated_response.data is not None
+    readiness = create_readiness_assessment(
         passed=True,
         failed_check_codes=(),
         evidence_refs={"simulation": "current"},
         assessed_at=examples.NOW,
     )
-    intent = build_execution_plan(request, readiness)
+    intent_response = build_execution_plan(validated_response.data, readiness)
+    assert intent_response.data is not None
+    intent = intent_response.data
     print("Validation passed; intent:", intent.client_order_id)
     # Stage 3: Dispatch selects Simulation authority.
     _stage(3)
     dependencies = examples.trading_dependencies()
-    receipt = await dispatch_order_intent(
+    receipt_response = await dispatch_order_intent(
         intent,
         dependencies.connection,
         dependencies.broker_adapter,
@@ -63,6 +68,8 @@ async def run() -> None:
         operation_timeout_seconds=dependencies.broker_operation_timeout_seconds,
         clock=dependencies.clock,
     )
+    assert receipt_response.data is not None
+    receipt = receipt_response.data
     print("Authority:", receipt.authority)
     # Stage 4: Read canonical simulated receipt truth.
     _stage(4)

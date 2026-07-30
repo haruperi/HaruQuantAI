@@ -17,8 +17,8 @@ from app.services.api import (
 )
 from app.services.risk import create_kill_switch_state
 from app.services.trading import (
-    ExecutionReceipt,
     build_broker_state_unknown_event,
+    create_execution_receipt,
 )
 from app.utils import AuthContext
 
@@ -106,7 +106,7 @@ def fr_api_066() -> CriticalOperationalAlert:
     Returns:
         Deterministic alert bound to Trading retry-lock evidence.
     """
-    receipt = ExecutionReceipt(
+    receipt = create_execution_receipt(
         receipt_id="receipt-unknown-example",
         intent_id="intent-example",
         client_order_id="client-order-example",
@@ -130,7 +130,9 @@ def fr_api_066() -> CriticalOperationalAlert:
         occurred_at=NOW,
         workflow_id=WORKFLOW_ID,
     )
-    alert = build_unknown_broker_state_alert(event)
+    assert event.status == "success"
+    assert event.data is not None
+    alert = build_unknown_broker_state_alert(event.data)
     assert alert.trigger is CriticalAlertTrigger.TRADING_BROKER_STATE_UNKNOWN
     return alert
 

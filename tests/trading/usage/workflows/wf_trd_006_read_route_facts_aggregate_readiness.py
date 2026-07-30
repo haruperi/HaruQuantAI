@@ -35,9 +35,12 @@ def main() -> None:
     print("Input:", request.route, request.account_id)
     # Stage 2: Read canonical route facts through public operation.
     _stage(2)
-    snapshot = get_route_snapshot(
+    snapshot_response = get_route_snapshot(
         request, lambda _route, _provider: examples.readiness_snapshot()
     )
+    assert snapshot_response.status == "success"
+    assert snapshot_response.data is not None
+    snapshot = snapshot_response.data
     print("Snapshot:", snapshot.available, snapshot.fresh)
     # Stage 3: Gather remaining authority evidence.
     _stage(3)
@@ -54,7 +57,7 @@ def main() -> None:
     }
     # Stage 4: Aggregate readiness.
     _stage(4)
-    result = assess_execution_readiness(
+    result_response = assess_execution_readiness(
         request,
         snapshot,
         examples.readiness_risk(),
@@ -62,10 +65,13 @@ def main() -> None:
         policy,
         bounds,
     )
+    assert result_response.status == "success"
+    assert result_response.data is not None
+    result = result_response.data
     print("Passed:", result.passed, "failures:", result.failed_check_codes)
     # Stage 5 — OUTPUT BOUNDARY: Return timestamped ReadinessAssessment.
     _stage(5)
-    print("Output:", type(result).__name__)
+    print("Output:", result.model_dump(mode="json"))
 
 
 if __name__ == "__main__":

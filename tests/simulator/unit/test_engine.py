@@ -3,6 +3,7 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 import pytest
 from app.services.simulator.accounting import (
@@ -18,9 +19,11 @@ from app.services.simulator.execution import (
 )
 from app.services.simulator.journal import JournalWriter
 from app.services.simulator.timeline import Tick
-from app.services.trading import OrderIntent, TradingRoute
+from app.services.trading import create_order_intent
 
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
+
+OrderIntent = Any
 
 
 def _value(response: object) -> object:
@@ -70,12 +73,12 @@ def _engine(tmp_path: Path, suffix: str) -> EventDrivenExecutionEngine:
 def _intent() -> OrderIntent:
     """Build one approved sim market intent."""
     instant = datetime(2025, 1, 1, tzinfo=UTC)
-    return OrderIntent(
+    return create_order_intent(
         client_order_id="order-engine",
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-11111111-1111-4111-8111-111111111111",
         correlation_id="cor-11111111-1111-4111-8111-111111111111",
-        route=TradingRoute.SIM,
+        route="sim",
         provider_id=None,
         account_id="account",
         strategy_id="strategy",

@@ -7,7 +7,7 @@ from datetime import datetime
 from decimal import Decimal
 from hashlib import sha256
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.simulator.accounting import AccountLedger, LedgerFill
 from app.services.simulator.errors import (
@@ -21,12 +21,15 @@ from app.services.simulator.execution.matching import (
 )
 from app.services.simulator.reporting.contracts import ClosedTradeRecord
 from app.services.simulator.timeline import Tick, validate_intent_timing
-from app.services.trading.contracts import ExecutionReceipt, OrderIntent
+from app.services.trading import create_execution_receipt
 from app.utils import canonical_json, get_logger
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 logger = get_logger(__name__)
+
+ExecutionReceipt = Any
+OrderIntent = Any
 
 if TYPE_CHECKING:
     from app.services.simulator.execution.matching import MatchResult
@@ -162,7 +165,7 @@ class EventDrivenExecutionEngine:
             if filled > 0
             else ()
         )
-        return ExecutionReceipt(
+        return create_execution_receipt(
             receipt_id=_receipt_id(intent, status, tick.sequence),
             intent_id=intent.source_intent_id,
             client_order_id=intent.client_order_id,
@@ -217,7 +220,7 @@ class EventDrivenExecutionEngine:
             intent.created_at if authority_tick is None else authority_tick.timestamp
         )
         authority_sequence = 0 if authority_tick is None else authority_tick.sequence
-        receipt = ExecutionReceipt(
+        receipt = create_execution_receipt(
             receipt_id=_receipt_id(intent, "accepted", authority_sequence),
             intent_id=intent.source_intent_id,
             client_order_id=intent.client_order_id,

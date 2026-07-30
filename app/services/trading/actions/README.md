@@ -11,5 +11,9 @@ reductions; `runtime.py` composes one evaluation cycle; and `_shared.py`
 contains private identity helpers. External consumers use documented exports
 through `app.services.trading`.
 
+The package-root surface is function-only: `create_trading_dependencies` builds
+the internal dependency container, while the action functions execute its
+documented operations. The internal `TradingDependencies` class is not public.
+
 Every mutation follows validation, exact Risk authority, kill-switch,
 idempotency, persisted-attempt, dispatch, receipt, and reconciliation rules.

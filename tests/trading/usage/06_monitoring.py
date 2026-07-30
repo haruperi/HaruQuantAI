@@ -7,22 +7,25 @@ import sys
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.trading import (
-    BudgetGate,
-    ExecutionReceipt,
-    OperationalEvent,
     build_broker_state_unknown_event,
+    create_execution_receipt,
+    create_operational_event,
     emit_runtime_event,
+    validate_budget_authority,
 )
+from tests.trading import conftest as examples
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
 WORKFLOW_ID = "wf-22222222-2222-4222-8222-222222222222"
 CORRELATION_ID = "cor-33333333-3333-4333-8333-333333333333"
+OperationalEvent = Any
 
 
 def _header(title: str) -> None:
@@ -36,7 +39,7 @@ def fr_trd_068() -> OperationalEvent:
     Returns:
         Critical unknown-broker-state operational evidence.
     """
-    receipt = ExecutionReceipt(
+    receipt = create_execution_receipt(
         receipt_id="usage-receipt-unknown",
         intent_id="usage-intent-unknown",
         client_order_id="usage-client-order-unknown",
@@ -76,7 +79,7 @@ def example_monitoring() -> None:
     print("Trading Example 6: Operational Events and Monitoring")
 
     # 1. Operational event construction
-    event = OperationalEvent(
+    event = create_operational_event(
         event_id="usage-event-001",
         event_type="LATENCY_OBSERVED",
         severity="info",
@@ -91,7 +94,7 @@ def example_monitoring() -> None:
 
     # 2. Emit runtime event
     published: list[OperationalEvent] = []
-    event2 = OperationalEvent(
+    event2 = create_operational_event(
         event_id="usage-event-002",
         event_type="HEALTH_CHANGED",
         severity="info",
@@ -105,8 +108,24 @@ def example_monitoring() -> None:
     assert emit_runtime_event(event2, published.append).status == "success"
     print(f"Published runtime events count: {len(published)}")
 
-    # 3. Budget gate
-    print(f"BudgetGate validate is callable: {callable(BudgetGate.validate)}")
+    # 3. Budget gate with exact Risk-owned plan bindings.
+    budget_request = examples.monitoring_request()
+    budget_result = validate_budget_authority(
+        budget_request,
+        examples.monitoring_allocation(),
+        examples.monitoring_verdict(budget_request),
+        now=NOW,
+    )
+    assert budget_result.status == "success"
+    print(
+        "Budget authority evidence:",
+        {
+            "status": budget_result.status,
+            "plan_id": budget_request.plan_id,
+            "allocation_version": budget_request.allocation_version,
+            "plan_hash": budget_request.canonical_hash,
+        },
+    )
 
     # 4. Critical unknown-broker-state evidence
     critical = fr_trd_068()

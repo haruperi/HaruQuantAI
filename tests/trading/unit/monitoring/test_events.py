@@ -11,7 +11,9 @@ from app.services.trading.monitoring import (
     build_broker_state_unknown_event,
     emit_runtime_event,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
@@ -34,7 +36,10 @@ def _event() -> OperationalEvent:
         request_id=REQUEST_ID,
         workflow_id=WORKFLOW_ID,
         correlation_id=CORRELATION_ID,
-        facts={"state": "degraded", "api_key": "secret-value"},
+        facts={  # pragma: allowlist secret
+            "state": "degraded",
+            "api_key": "secret-value",  # pragma: allowlist secret
+        },
         source_refs={"session": "session-001"},
     )
 
@@ -45,7 +50,7 @@ def test_event_has_trace_and_severity() -> None:
     event = _event()
     assert event.severity == "warning"
     assert event.workflow_id == WORKFLOW_ID
-    assert event.facts["api_key"] != "secret-value"
+    assert event.facts["api_key"] != "secret-value"  # pragma: allowlist secret
 
 
 def test_event_rejects_sensitive_source_reference() -> None:

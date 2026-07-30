@@ -1,14 +1,14 @@
 """Workflow integration for event persistence and state recovery."""
 
-# ruff: noqa: INP001
-from app.services.trading import TradingEvent, apply_execution_event
+from app.services.trading import apply_execution_event, create_trading_event
+
 from tests.trading.conftest import NOW, MemoryStore
 
 
 def test_recovery_preserves_unresolved_attempt() -> None:
     """A persisted send attempt reconstructs its unresolved retry lock."""
     store = MemoryStore()
-    event = TradingEvent(
+    event = create_trading_event(
         event_id="attempt-001",
         event_type="send_attempted",
         aggregate_version=0,

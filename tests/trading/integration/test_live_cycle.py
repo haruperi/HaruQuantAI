@@ -1,21 +1,19 @@
 """Workflow integration for the public-domain live evaluation cycle."""
 
-# ruff: noqa: ARG005, INP001
+# ruff: noqa: ARG005
 from dataclasses import replace
 from decimal import Decimal
 from types import SimpleNamespace
 from typing import cast
 
 import pytest
-from app.services.brokers import (
-    BrokerAdapter,
-    BrokerFeatureFlags,
-)
 from app.services.trading import (
-    LiveSession,
-    ReadinessAssessment,
+    create_live_session,
+    create_readiness_assessment,
     run_live_evaluation_cycle,
+    start_live_session,
 )
+
 from tests.trading.conftest import (
     NOW,
     CountingAdapter,
@@ -43,21 +41,15 @@ async def test_cycle_submits_intent_and_never_sizes() -> None:
         """Return successful lifecycle reconciliation evidence."""
         return True
 
-    session = LiveSession(
+    session = create_live_session(
         store=deps.store,
         connection=connection,
-        broker_adapter=cast("BrokerAdapter", adapter),
-        feature_flags=cast(
-            "BrokerFeatureFlags",
-            SimpleNamespace(
-                broker_id=connection.broker_id,
-                environment=connection.environment,
-            ),
-        ),
+        broker_adapter=cast("object", adapter),
+        feature_flags=SimpleNamespace(broker_id="mt5", environment="demo"),
         risk_decision_source=lambda request: evaluation_risk_decision(),
         action_policy_source=lambda request: action_policy(request.action),
         kill_switch_source=inactive_kill_switch_hierarchy,
-        readiness_source=lambda request, supplied_evidence: ReadinessAssessment(
+        readiness_source=lambda request, supplied_evidence: create_readiness_assessment(
             passed=True,
             failed_check_codes=(),
             evidence_refs={"data_authority_id": "data-001"},
@@ -77,7 +69,8 @@ async def test_cycle_submits_intent_and_never_sizes() -> None:
         shutdown_reconcile=passed,
         clock=lambda: NOW,
     )
-    await session.start(
+    await start_live_session(
+        session,
         {
             "RUNTIME_PROFILE": "paper",
             "EXECUTION_ROUTE": "paper",
@@ -102,7 +95,7 @@ async def test_cycle_submits_intent_and_never_sizes() -> None:
     deps = replace(
         deps,
         connection=connection,
-        broker_adapter=cast("BrokerAdapter", adapter),
+        broker_adapter=cast("object", adapter),
         simulation_dispatch=None,
         live_session=session,
     )

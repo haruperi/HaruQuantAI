@@ -1,7 +1,8 @@
 """Workflow integration for bounded live shutdown reporting."""
 
-# ruff: noqa: INP001
 import pytest
+from app.services.trading import start_live_session, stop_live_session
+
 from tests.trading.conftest import live_config, live_evidence, live_session
 
 
@@ -14,8 +15,8 @@ async def test_shutdown_reports_unresolved_work() -> None:
         return False
 
     session = live_session(flush_evidence=failed)
-    await session.start(live_config(), live_evidence())
-    outcome = await session.stop()
+    await start_live_session(session, live_config(), live_evidence())
+    outcome = await stop_live_session(session)
     assert outcome.status == "success"
     assert outcome.metadata.extensions["legacy_status"] == "partial"
     assert outcome.data is not None

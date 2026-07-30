@@ -22,13 +22,13 @@ from app.services.risk import (
     create_kill_switch_command,
     is_risk_domain_error,
 )
-from app.services.trading import OperationalEvent
 from app.utils import get_logger
 
 type AuthContext = Any
 ApprovalAttestation = Any
 KillSwitchCommand = Any
 KillSwitchState = Any
+OperationalEvent = Any
 
 logger = get_logger(__name__)
 

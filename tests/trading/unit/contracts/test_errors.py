@@ -17,7 +17,7 @@ def test_trading_error_rejects_unknown_code() -> None:
 
 def test_map_trading_error_redacts_provider_exception() -> None:
     """Raw provider exception content never enters the canonical envelope."""
-    raw_secret = "provider password=hunter2"
+    raw_secret = "provider password=hunter2"  # pragma: allowlist secret
     envelope = map_trading_error(
         ConnectionError(raw_secret),
         {
@@ -25,7 +25,7 @@ def test_map_trading_error_redacts_provider_exception() -> None:
             "provider_id": "paper-provider",
             "request_id": "req-001",
             "correlation_id": "corr-001",
-            "api_key": "top-secret",
+            "api_key": "top-secret",  # pragma: allowlist secret
         },
     )
     serialized = envelope.model_dump_json()
@@ -55,8 +55,10 @@ def test_redaction_is_recursive_and_case_insensitive() -> None:
     """Sensitive keys are redacted recursively without case dependence."""
     payload = {
         "outer": {
-            "Api_Key": "secret-one",
-            "items": [{"PASSWORD": "secret-two"}],
+            "Api_Key": "secret-one",  # pragma: allowlist secret
+            "items": [  # pragma: allowlist secret
+                {"PASSWORD": "secret-two"},  # pragma: allowlist secret
+            ],
         }
     }
     redacted = redact_trading_payload(payload)

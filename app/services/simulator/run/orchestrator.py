@@ -31,10 +31,12 @@ from app.services.simulator.validation import (
     validate_run_inputs,
 )
 from app.services.simulator.validation.contracts import MarketDataValidationContext
-from app.services.trading.contracts import ExecutionReceipt, OrderIntent
+from app.services.trading import is_execution_receipt
 from app.utils import canonical_digest, canonical_json, get_logger
 
 type AuthContext = Any
+ExecutionReceipt = Any
+OrderIntent = Any
 
 logger = get_logger(__name__)
 
@@ -146,9 +148,7 @@ def _completed_result(
         SimulationError: If the published accounting identity does not hold.
     """
     logger.info("Constructing completed SimulationResult for %s", run_id)
-    typed_receipts = tuple(
-        item for item in receipts if isinstance(item, ExecutionReceipt)
-    )
+    typed_receipts = tuple(item for item in receipts if is_execution_receipt(item))
     snapshot = unwrap_simulation_response(
         ledger.snapshot(), operation="simulation.run.ledger_snapshot"
     )

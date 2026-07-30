@@ -6,8 +6,10 @@ configuration, gate-order, and requirement definitions are in
 
 `config.py` validates mutation-safe runtime configuration, `session.py` owns
 admission/startup/recovery/shutdown state and typed authority ports, and
-`gates.py` executes the canonical mandatory gate order. External consumers use
-documented exports through `app.services.trading`.
+`gates.py` executes the canonical mandatory gate order. `facade.py` exposes
+function-only construction, lifecycle, status, and state inspection; the
+internal `LiveSession` class is not public. External consumers use documented
+functions through `app.services.trading`.
 
 The feature cannot create provider dependencies at import time and cannot
 enable mutation before startup reconciliation and pre-mutation audit succeed.

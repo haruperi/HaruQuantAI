@@ -8,7 +8,7 @@ from dataclasses import replace
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from app.services.trading import TradingError, cancel_all_orders, resume_strategy
+from app.services.trading import cancel_all_orders, resume_strategy
 from tests.trading.usage.workflows._support import examples
 
 WORKFLOW_ID = "WF-TRD-TER"
@@ -44,13 +44,9 @@ async def run() -> None:
     print("Input kill state:", states[0].state)
     # Stage 2: Active state blocks new admission.
     _stage(2)
-    try:
-        await resume_strategy(request, deps)
-    except TradingError as error:
-        blocked = error
-    else:
-        raise RuntimeError("Kill switch did not block resume")
-    print("Blocked:", blocked.code)
+    blocked = await resume_strategy(request, deps)
+    assert blocked.error is not None
+    print("Blocked:", blocked.error.code, blocked.error.details)
     # Stage 3: Emergency control uses governed Simulation authority.
     _stage(3)
     emergency = replace(

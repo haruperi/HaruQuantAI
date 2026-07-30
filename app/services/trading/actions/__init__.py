@@ -7,11 +7,14 @@ from app.services.trading.actions.controls import (
     sync_positions,
     trigger_kill_switch,
 )
-from app.services.trading.actions.dependencies import TradingDependencies
+from app.services.trading.actions.dependencies import (
+    TradingDependencies as TradingDependencies,
+)
 from app.services.trading.actions.emergency import (
     cancel_all_orders,
     close_all_positions,
 )
+from app.services.trading.actions.factories import create_trading_dependencies
 from app.services.trading.actions.orders import cancel_order, modify_order, submit_order
 from app.services.trading.actions.positions import (
     close_position,
@@ -22,12 +25,12 @@ from app.services.trading.actions.rebalance import execute_portfolio_rebalance
 from app.services.trading.actions.runtime import run_live_evaluation_cycle
 
 __all__ = [
-    "TradingDependencies",
     "cancel_all_orders",
     "cancel_order",
     "clear_kill_switch",
     "close_all_positions",
     "close_position",
+    "create_trading_dependencies",
     "execute_portfolio_rebalance",
     "modify_order",
     "modify_position",

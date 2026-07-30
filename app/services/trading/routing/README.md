@@ -7,7 +7,8 @@ adapter, timeout, and requirement definitions are in
 `capabilities.py` validates normalized provider declarations, `dispatcher.py`
 owns the single asynchronous Simulation or Brokers mutation boundary, and
 `responses.py` classifies authority results conservatively. External consumers
-use documented exports through `app.services.trading`.
+use only `validate_adapter_capability`, `dispatch_order_intent`, and
+`classify_authority_response` through `app.services.trading`.
 
 Unexpected provider exceptions, timeouts, and malformed successes become
 redacted reconciliation-required receipts; raw provider objects and exceptions

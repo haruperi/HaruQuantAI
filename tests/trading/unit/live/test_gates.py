@@ -286,6 +286,7 @@ def _session(
     *,
     risk_decision: RiskDecisionPackage | None = None,
     kill_switches: tuple[KillSwitchState, ...] = (),
+    readiness: ReadinessAssessment | None = None,
     pre_audit_sink: Callable[[object], None] | None = None,
 ) -> LiveSession:
     """Build a mutation-enabled session with injected Risk evidence.
@@ -293,6 +294,7 @@ def _session(
     Args:
         risk_decision: Optional typed Risk approval.
         kill_switches: Applicable Risk switch hierarchy.
+        readiness: Optional explicit route-readiness evidence.
         pre_audit_sink: Optional observable canonical audit sink.
 
     Returns:
@@ -323,11 +325,14 @@ def _session(
         risk_decision_source=lambda request: risk_decision,
         action_policy_source=lambda request: _policy(),
         kill_switch_source=lambda request: kill_switches,
-        readiness_source=lambda request, evidence: ReadinessAssessment(
-            passed=True,
-            failed_check_codes=(),
-            evidence_refs={"test": "ready"},
-            assessed_at=NOW,
+        readiness_source=lambda request, evidence: (
+            readiness
+            or ReadinessAssessment(
+                passed=True,
+                failed_check_codes=(),
+                evidence_refs={"test": "ready"},
+                assessed_at=NOW,
+            )
         ),
         adapter_capability_source=lambda request: _capability(),
         auth_context_source=lambda request: _auth_context(),
@@ -494,3 +499,97 @@ async def test_stale_kill_switch_evidence_blocks_dispatch() -> None:
     assert blocked.status == "error"
     assert blocked.error is not None
     assert blocked.error.code == "KILL_SWITCH_STALE"
+
+
+@pytest.mark.anyio
+async def test_gate_observes_session_enablement_and_reconciliation_state() -> None:
+    """Unstarted, package-only, and unreconciled sessions cannot dispatch."""
+    session = _session(
+        risk_decision=_risk_decision(),
+        kill_switches=_inactive_hierarchy(),
+    )
+    unstarted = await evaluate_live_gate(_request(), {}, session)
+    assert unstarted.status == "error"
+    assert unstarted.error is not None
+    assert unstarted.error.code == "GATE_BLOCKED"
+
+    await session.start(
+        {
+            "RUNTIME_PROFILE": "live",
+            "EXECUTION_ROUTE": "live",
+            "ALLOW_LIVE_MUTATIONS": False,
+            "LIVE_WORKFLOW_TIMEOUT_SECONDS": "30",
+            "SHUTDOWN_BUDGET_SECONDS": "5",
+            "IDEMPOTENCY_RETENTION_SECONDS": 600,
+            "CONCURRENCY_LOCK_TIMEOUT_SECONDS": "30",
+            "MAX_STALENESS_SECONDS": {
+                "route_snapshot": "30",
+                "risk_decision": "30",
+                "kill_switch": "30",
+            },
+            "DATA_AUTHORITY_ID": "data-authority-001",
+        },
+        {
+            "data_authority_id": "data-authority-001",
+            "adapter_security_profile": "approved",
+            "startup_evidence_fresh": True,
+        },
+    )
+    packaged = await evaluate_live_gate(_request(), {}, session)
+    assert packaged.status == "success"
+    assert packaged.data is not None
+    assert packaged.data["dispatch_allowed"] is False
+
+
+@pytest.mark.anyio
+async def test_gate_blocks_failed_readiness_and_audit_failure() -> None:
+    """Readiness and pre-mutation audit failures stop before dispatch."""
+    startup_config = {
+        "RUNTIME_PROFILE": "live",
+        "EXECUTION_ROUTE": "live",
+        "ALLOW_LIVE_MUTATIONS": True,
+        "LIVE_WORKFLOW_TIMEOUT_SECONDS": "30",
+        "SHUTDOWN_BUDGET_SECONDS": "5",
+        "IDEMPOTENCY_RETENTION_SECONDS": 600,
+        "CONCURRENCY_LOCK_TIMEOUT_SECONDS": "30",
+        "MAX_STALENESS_SECONDS": {
+            "route_snapshot": "30",
+            "risk_decision": "30",
+            "kill_switch": "30",
+        },
+        "DATA_AUTHORITY_ID": "data-authority-001",
+    }
+    startup_evidence = {
+        "data_authority_id": "data-authority-001",
+        "adapter_security_profile": "approved",
+        "startup_evidence_fresh": True,
+    }
+    failed_readiness = _session(
+        risk_decision=_risk_decision(),
+        kill_switches=_inactive_hierarchy(),
+        readiness=ReadinessAssessment(
+            passed=False,
+            failed_check_codes=("route_unavailable",),
+            evidence_refs={"test": "blocked"},
+            assessed_at=NOW,
+        ),
+    )
+    await failed_readiness.start(startup_config, startup_evidence)
+    blocked = await evaluate_live_gate(_request(), {}, failed_readiness)
+    assert blocked.status == "error"
+    assert blocked.error is not None
+    assert blocked.error.code == "GATE_BLOCKED"
+
+    def reject_audit(_event: object) -> None:
+        raise RuntimeError("audit unavailable")
+
+    audit_failure = _session(
+        risk_decision=_risk_decision(),
+        kill_switches=_inactive_hierarchy(),
+        pre_audit_sink=reject_audit,
+    )
+    await audit_failure.start(startup_config, startup_evidence)
+    blocked = await evaluate_live_gate(_request(), {}, audit_failure)
+    assert blocked.status == "error"
+    assert blocked.error is not None
+    assert blocked.error.code == "AUDIT_FAILED"

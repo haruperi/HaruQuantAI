@@ -10,9 +10,9 @@ from app.services.api import (
     build_unknown_broker_state_alert,
 )
 from app.services.trading import (
-    ExecutionReceipt,
-    OperationalEvent,
     build_broker_state_unknown_event,
+    create_execution_receipt,
+    create_operational_event,
 )
 
 from tests.api.unit.test_alert_models import (
@@ -51,7 +51,7 @@ def test_kill_switch_builder_rejects_non_active_state() -> None:
 
 def test_unknown_broker_builder_rejects_non_authoritative_event() -> None:
     """Verify current non-unknown Trading events cannot trigger the closed alert."""
-    event = OperationalEvent(
+    event = create_operational_event(
         event_id="event-1",
         event_type="INCIDENT_RECORDED",
         severity="critical",
@@ -69,7 +69,7 @@ def test_unknown_broker_builder_rejects_non_authoritative_event() -> None:
 
 def test_only_retry_locked_unknown_broker_event_builds_alert() -> None:
     """Verify exact Trading retry-lock evidence builds the closed API alert."""
-    receipt = ExecutionReceipt(
+    receipt = create_execution_receipt(
         receipt_id="receipt-unknown-001",
         intent_id="intent-001",
         client_order_id="client-order-001",
@@ -94,10 +94,12 @@ def test_only_retry_locked_unknown_broker_event_builds_alert() -> None:
         workflow_id=WORKFLOW_ID,
     )
 
-    alert = build_unknown_broker_state_alert(event)
+    assert event.status == "success"
+    assert event.data is not None
+    alert = build_unknown_broker_state_alert(event.data)
 
     assert alert.trigger is CriticalAlertTrigger.TRADING_BROKER_STATE_UNKNOWN
-    assert alert.source_id == event.event_id
+    assert alert.source_id == event.data.event_id
     assert alert.scope == {
         "retry_locked": "true",
         "unresolved_scope": "order:order-001",

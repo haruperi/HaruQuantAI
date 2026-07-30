@@ -3,9 +3,7 @@
 from hashlib import sha256
 from typing import Any, Literal
 
-from app.services.data import (
-    MigrationStep,
-)
+from app.services.data import build_migration_step
 from app.services.trading.contracts.responses import success_trading_response
 from app.utils import get_logger
 
@@ -63,7 +61,7 @@ def _migration_checksum(statements: tuple[str, ...]) -> str:
     return sha256(material).hexdigest()
 
 
-def _get_trading_migrations_value() -> tuple[MigrationStep, ...]:
+def _get_trading_migrations_value() -> tuple[Any, ...]:
     """Return additive Trading migration definitions without opening storage.
 
     Returns:
@@ -71,7 +69,7 @@ def _get_trading_migrations_value() -> tuple[MigrationStep, ...]:
     """
     logger.debug("Returning Trading-owned migration definitions")
     return (
-        MigrationStep(
+        build_migration_step(
             domain="trading",
             migration_id="001_initial_trading_schema",
             checksum=_migration_checksum(_TRADING_SCHEMA_STATEMENTS),
@@ -80,7 +78,7 @@ def _get_trading_migrations_value() -> tuple[MigrationStep, ...]:
     )
 
 
-def get_trading_migrations() -> StandardResponse[tuple[MigrationStep, ...]]:
+def get_trading_migrations() -> StandardResponse[tuple[Any, ...]]:
     """Return Trading migration definitions in a standard response.
 
     Returns:

@@ -190,6 +190,44 @@ def test_resolution_requires_approved_transition() -> None:
     assert approved.data is not None
     assert approved.data.transition == "approved_retry"
     assert approved.data.retry_allowed
+
+
+def test_authority_resolution_rejects_inconsistent_transition_evidence() -> None:
+    """Resolution identities, scopes, and retry transitions stay self-consistent."""
+    base = {
+        "resolution_id": "resolution-001",
+        "receipt_id": "receipt-001",
+        "incident_reference": "incident-001",
+        "transition": "resolved_no_retry",
+        "retry_allowed": False,
+        "approved_transition_reference": None,
+        "remaining_unresolved_scope": (),
+    }
+    with pytest.raises(ValueError, match="validation error"):
+        AuthorityResolution(**{**base, "resolution_id": " bad"})
+    with pytest.raises(ValueError, match="validation error"):
+        AuthorityResolution(
+            **{
+                **base,
+                "transition": "retry_locked",
+                "remaining_unresolved_scope": ("order:1", "order:1"),
+            }
+        )
+    with pytest.raises(ValueError, match="validation error"):
+        AuthorityResolution(
+            **{
+                **base,
+                "transition": "approved_retry",
+                "retry_allowed": True,
+            }
+        )
+    with pytest.raises(ValueError, match="validation error"):
+        AuthorityResolution(
+            **{
+                **base,
+                "remaining_unresolved_scope": ("order:1",),
+            }
+        )
     with pytest.raises(ValidationError):
         AuthorityResolution(
             resolution_id="resolution-invalid",

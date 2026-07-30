@@ -16,7 +16,7 @@ from app.services.trading.contracts import (
 )
 from app.services.trading.contracts.errors import _redacted_envelope_data
 from app.services.trading.contracts.responses import success_trading_response
-from app.services.trading.monitoring import BudgetGate
+from app.services.trading.monitoring.budgets import validate_budget_authority
 from app.services.trading.validation.authority import validate_kill_switch_hierarchy
 from app.utils import get_logger
 
@@ -123,7 +123,7 @@ async def _execute_portfolio_rebalance_value(
     budget = deps.budget_verdict_source(request)
     if allocation is None or budget is None:
         raise TradingError("PERMISSION_DENIED", "Rebalance budget authority is absent")
-    budget_response = BudgetGate.validate(request, allocation, budget, now=now)
+    budget_response = validate_budget_authority(request, allocation, budget, now=now)
     if budget_response.status == "error":
         raise TradingError("BUDGET_BLOCKED", "Rebalance budget authority is blocked")
     _validate_eligibility(request, deps, now)

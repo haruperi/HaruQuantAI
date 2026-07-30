@@ -7,8 +7,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.trading import (
-    ReadinessAssessment,
     build_execution_plan,
+    create_readiness_assessment,
     validate_order_request,
 )
 from tests.trading.usage.workflows._support import examples
@@ -41,11 +41,15 @@ def main() -> None:
     print("Input:", request.action, request.route, request.symbol)
     # Stage 2: Validate through the public boundary.
     _stage(2)
-    validated = validate_order_request(request, examples.account_snapshot(), capability)
+    validation = validate_order_request(
+        request, examples.account_snapshot(), capability
+    )
+    assert validation.data is not None
+    validated = validation.data
     print("Validated:", validated.request_id)
     # Stage 3: Supply explicit readiness evidence.
     _stage(3)
-    readiness = ReadinessAssessment(
+    readiness = create_readiness_assessment(
         passed=True,
         failed_check_codes=(),
         evidence_refs={"data": "snapshot"},
@@ -54,7 +58,9 @@ def main() -> None:
     print("Readiness:", readiness.passed)
     # Stage 4: Build deterministic package material.
     _stage(4)
-    plan = build_execution_plan(validated, readiness)
+    plan_response = build_execution_plan(validated, readiness)
+    assert plan_response.data is not None
+    plan = plan_response.data
     print("Packaged volume:", plan.approved_volume)
     # Stage 5 — OUTPUT BOUNDARY: Return package; no authority mutation occurs.
     _stage(5)

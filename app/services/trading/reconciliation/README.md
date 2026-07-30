@@ -6,8 +6,9 @@ comparison, transition, and requirement definitions are in
 
 `snapshots.py` defines normalized authority evidence, `compare.py` performs
 deterministic comparison, and `authority.py` persists retry-lock or approved
-resolution transitions. External consumers use documented exports through
-`app.services.trading`.
+resolution transitions. `factories.py` constructs normalized snapshots,
+reports, and resolutions without exporting their classes. External consumers
+use documented functions through `app.services.trading`.
 
 Unknown mutations remain retry-locked until persisted route-authority evidence
 proves an allowed transition.

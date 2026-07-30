@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     KillSwitchState = Any
-    from app.services.trading import OperationalEvent
+    OperationalEvent = Any
 
 
 def _alert_id(

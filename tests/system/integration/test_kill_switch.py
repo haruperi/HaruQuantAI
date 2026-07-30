@@ -3,8 +3,8 @@
 import asyncio
 from dataclasses import replace
 from datetime import timedelta
+from typing import Any
 
-import pytest
 from app.services.api.identity import require_auth_context
 from app.services.api.routes import operator
 from app.services.api.routes.operator import router
@@ -17,12 +17,7 @@ from app.services.risk import (
     create_risk_audit_chain,
     get_decision_state,
 )
-from app.services.trading import (
-    AuthoritySnapshot,
-    TradingError,
-    TradingRequest,
-    resume_strategy,
-)
+from app.services.trading import resume_strategy
 from app.utils import AuthContext, canonical_json
 from fastapi import FastAPI
 
@@ -38,8 +33,10 @@ from tests.trading.unit.actions.test_dependencies import (
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 ApprovalAttestation = object
+AuthoritySnapshot = Any
 KillSwitchCommand = object
 KillSwitchState = object
+TradingRequest = Any
 
 
 def _kill_switch_hierarchy(
@@ -171,8 +168,10 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
         clock=lambda: workflow_now,
     )
 
-    with pytest.raises(TradingError, match="KILL_SWITCH_ACTIVE"):
-        asyncio.run(resume_strategy(trading_request, active_dependencies))
+    blocked = asyncio.run(resume_strategy(trading_request, active_dependencies))
+    assert blocked.status == "error"
+    assert blocked.error is not None
+    assert blocked.error.code == "KILL_SWITCH_ACTIVE"
 
     attestation = create_approval_attestation(
         attestation_id="clearance-independent-1",

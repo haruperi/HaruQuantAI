@@ -33,11 +33,9 @@ from app.services.strategy import (
     get_strategy_timing_policy,
 )
 from app.services.trading import (
-    OrderIntent,
-    ReadinessAssessment,
-    TradingRequest,
-    TradingRoute,
     build_execution_plan,
+    create_readiness_assessment,
+    create_trading_request,
 )
 
 from tests.analytics import _support as analytics_examples
@@ -55,6 +53,8 @@ from tests.strategy.unit.test_models import (
     make_signal_config,
     make_signal_evidence,
 )
+
+OrderIntent = Any
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 ProposedTrade = object
@@ -333,11 +333,11 @@ class _SystemBacktestDependencies(FakeDependencies):
         assert intent is not None
         assert decision.approved_size is not None
         assert decision.token is not None
-        trading_request = TradingRequest(
+        trading_request = create_trading_request(
             request_id=decision.request_id,
             workflow_id=decision.workflow_id,
             correlation_id=decision.correlation_id,
-            route=TradingRoute.SIM,
+            route="sim",
             action="submit_order",
             account_id="account-1",
             strategy_id=intent.strategy_id,
@@ -362,7 +362,7 @@ class _SystemBacktestDependencies(FakeDependencies):
             instrument_quantity_step=Decimal("0.01"),
             instrument_price_tick=Decimal("0.00001"),
         )
-        readiness = ReadinessAssessment(
+        readiness = create_readiness_assessment(
             passed=True,
             failed_check_codes=(),
             evidence_refs={"risk": decision.decision_id},

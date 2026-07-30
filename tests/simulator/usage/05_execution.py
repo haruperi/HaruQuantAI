@@ -10,6 +10,7 @@ import tempfile
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
@@ -29,10 +30,11 @@ from app.services.simulator import (
     price_order,
     unwrap_simulation_response,
 )
-from app.services.trading import OrderIntent, TradingRoute
+from app.services.trading import create_order_intent
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 NOW = datetime(2025, 1, 1, tzinfo=UTC)
+OrderIntent = Any
 
 
 def _value(response: object) -> object:
@@ -47,12 +49,12 @@ def _header(title: str) -> None:
 
 def _intent() -> OrderIntent:
     """Build one approved sim market intent."""
-    return OrderIntent(
+    return create_order_intent(
         client_order_id="order-engine",
         request_id="req-123e4567-e89b-42d3-a456-426614174000",
         workflow_id="wf-123e4567-e89b-42d3-a456-426614174001",
         correlation_id="cor-123e4567-e89b-42d3-a456-426614174002",
-        route=TradingRoute.SIM,
+        route="sim",
         provider_id=None,
         account_id="account",
         strategy_id="strategy",

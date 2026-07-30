@@ -101,3 +101,26 @@ async def test_reduce_exposure_executes_exact_approved_quantity() -> None:
     result = await reduce_exposure(item, position_dependencies())
     assert result.status == "success"
     assert result.metadata.extensions["legacy_status"] == "sent"
+
+
+@pytest.mark.anyio
+async def test_position_target_and_symbol_must_match_projection() -> None:
+    """Unknown or mismatched position identity fails before dispatch."""
+    missing = await close_position(
+        request(action="close_position", quantity=Decimal(1)),
+        position_dependencies(),
+    )
+    assert missing.status == "error"
+    assert missing.error is not None
+    assert missing.error.code == "INVALID_REQUEST"
+    mismatched = await close_position(
+        position_request(
+            "close_position",
+            quantity=Decimal(1),
+            symbol="GBPUSD",
+        ),
+        position_dependencies(),
+    )
+    assert mismatched.status == "error"
+    assert mismatched.error is not None
+    assert mismatched.error.code == "SCOPE_MISMATCH"

@@ -144,3 +144,33 @@ def test_active_lock_exact_bound_passes_and_past_bound_fails() -> None:
     assert stale.status == "error"
     assert stale.error is not None
     assert stale.error.code == "TRADING_CONCURRENCY_CONFLICT"
+
+
+def test_invalid_timing_and_store_failure_are_mapped() -> None:
+    """Invalid bounds and unexpected persistence failure return finite errors."""
+    invalid = reserve_idempotency(
+        _request(),
+        _ReservationStore(),  # type: ignore[arg-type]
+        reservation_time=NOW.replace(tzinfo=None),
+        retention_seconds=0,
+        concurrency_lock_timeout_seconds=Decimal(0),
+    )
+    assert invalid.status == "error"
+    assert invalid.error is not None
+    assert invalid.error.code == "CONFIGURATION_INVALID"
+
+    class _FailingStore(_ReservationStore):
+        def reserve_idempotency(self, *args: object, **kwargs: object):
+            del args, kwargs
+            raise RuntimeError("storage unavailable")
+
+    failed = reserve_idempotency(
+        _request(),
+        _FailingStore(),  # type: ignore[arg-type]
+        reservation_time=NOW,
+        retention_seconds=300,
+        concurrency_lock_timeout_seconds=Decimal(30),
+    )
+    assert failed.status == "error"
+    assert failed.error is not None
+    assert failed.error.code == "PERSISTENCE_FAILED"

@@ -179,7 +179,7 @@ def _reserve_idempotency_value(
         logger.warning("Trading store rejected idempotency reservation")
         raise
     except Exception as error:
-        logger.error("Trading idempotency persistence failed")
+        logger.exception("Trading idempotency persistence failed")
         raise TradingError(
             "PERSISTENCE_FAILED",
             "Idempotency reservation persistence failed",

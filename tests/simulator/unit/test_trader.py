@@ -4,14 +4,17 @@ import asyncio
 from collections.abc import Awaitable, Callable
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 import pytest
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.execution import SimTrader
-from app.services.trading import ExecutionReceipt, OrderIntent, TradingRoute
 from app.utils import StandardResponse
 
 from tests.simulator.unit.test_engine import _engine, _intent, _tick
+
+ExecutionReceipt = Any
+OrderIntent = Any
 
 
 def test_submit_order_never_calls_live_adapter(tmp_path: Path) -> None:
@@ -62,7 +65,7 @@ def test_submit_order_rejects_non_sim_route_before_engine() -> None:
     """Reject a non-`sim` route at the facade, before the engine is reached."""
     spy = _SpyEngine()
     trader = SimTrader(spy)  # type: ignore[arg-type]
-    intent = _intent().model_copy(update={"route": TradingRoute.PAPER})
+    intent = _intent().model_copy(update={"route": "paper"})
     with pytest.raises(SimulationError) as captured:
         unwrap_simulation_response(
             asyncio.run(trader.submit_order(intent)),

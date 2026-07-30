@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import ValidationError as PydanticValidationError
 
+from app.services.brokers import get_broker_connection_id
 from app.services.risk import get_decision_state
 from app.services.trading.actions.orders import _execute_request
 from app.services.trading.contracts import (
@@ -97,7 +98,7 @@ def _provider_id(deps: TradingDependencies) -> str:
     logger.debug("Reading evaluation provider from Broker connection")
     if deps.connection is None:
         raise TradingError("SERVICE_UNAVAILABLE", "Broker connection is absent")
-    return deps.connection.broker_id.value
+    return get_broker_connection_id(deps.connection)
 
 
 def _state_target(

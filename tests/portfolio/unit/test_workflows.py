@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from decimal import Decimal
+from time import perf_counter_ns
+from typing import Any
 
 import pytest
 from app.services.analytics import (
@@ -25,11 +27,12 @@ from app.services.risk import (
     create_allocation_risk_decision,
     get_decision_state,
 )
-from app.services.trading import (
-    PortfolioRebalanceExecutionRequest,
-    StandardTradingEnvelope,
+from app.utils import (
+    AuditEvent,
+    build_response_metadata,
+    logger,
+    success_response,
 )
-from app.utils import AuditEvent, logger
 
 from tests.portfolio.unit.test_allocation import (
     _activator,
@@ -44,6 +47,8 @@ from tests.portfolio.unit.test_repository import FakePortfolioStore
 # Private type-only aliases; Risk exposes functions, not contract classes.
 AllocationReviewRequest = object
 AllocationRiskDecision = object
+PortfolioRebalanceExecutionRequest = Any
+StandardTradingEnvelope = Any
 
 
 class WorkflowRecorder:
@@ -121,24 +126,29 @@ class WorkflowRecorder:
         self.last_trading_request = request
         if self.fail_trading:
             raise RuntimeError("uncertain Trading receiver outcome")
-        envelope = StandardTradingEnvelope(
-            status="success",
-            message="Reconciled Portfolio reductions completed",
-            data={
+        envelope = success_response(
+            {
                 "plan_id": request.plan_id,
                 "outcomes": tuple(
                     {"action_id": row["action_id"], "status": "success", "data": {}}
                     for row in request.actions
                 ),
             },
-            errors=(),
-            warnings=(),
-            audit_metadata={
-                "operation": "execute_portfolio_rebalance",
-                "request_id": request.request_id,
-                "correlation_id": request.correlation_id,
-                "redaction_applied": True,
-            },
+            message="Reconciled Portfolio reductions completed",
+            metadata=build_response_metadata(
+                name="execute_portfolio_rebalance",
+                domain="trading",
+                risk_level="high",
+                request_id=request.request_id,
+                correlation_id=request.correlation_id,
+                start_time=perf_counter_ns(),
+                read_only=False,
+                writes_file=False,
+                modifies_database=True,
+                places_trade=True,
+                requires_network=False,
+                extensions={"redaction_applied": True},
+            ),
         )
         self.envelopes[f"trading-execution:{request.request_id}"] = envelope
         return envelope

@@ -1,24 +1,18 @@
 """Workflow integration for real Risk enforcement before live dispatch."""
 
-# ruff: noqa: INP001
 from dataclasses import replace
 from types import SimpleNamespace
-from typing import cast
+from typing import Any, cast
 
 import pytest
-from app.services.brokers import (
-    BrokerAdapter,
-    BrokerFeatureFlags,
-    BrokerOrderRequest,
-    BrokerOrderResult,
-)
 from app.services.trading import (
-    LiveSession,
-    ReadinessAssessment,
+    create_live_session,
+    create_readiness_assessment,
     evaluate_live_gate,
+    start_live_session,
     submit_order,
 )
-from app.utils import StandardResponse
+
 from tests.trading.conftest import (
     CountingAdapter,
     MemoryStore,
@@ -44,9 +38,7 @@ class _AuditedAdapter(CountingAdapter):
         super().__init__()
         self.order = order
 
-    async def place_order(
-        self, request: BrokerOrderRequest
-    ) -> StandardResponse[BrokerOrderResult]:
+    async def place_order(self, request: object) -> object:
         """Record adapter invocation and acknowledge the placement."""
         self.order.append("adapter")
         return await super().place_order(request)
@@ -63,20 +55,14 @@ def _paper_session(
     order: list[str],
     *,
     include_risk: bool = True,
-) -> LiveSession:
+) -> Any:
     """Build a paper session with every real mutation gate injected."""
     connection = broker_connection()
-    return LiveSession(
+    return create_live_session(
         store=store,
         connection=connection,
-        broker_adapter=cast("BrokerAdapter", adapter),
-        feature_flags=cast(
-            "BrokerFeatureFlags",
-            SimpleNamespace(
-                broker_id=connection.broker_id,
-                environment=connection.environment,
-            ),
-        ),
+        broker_adapter=cast("object", adapter),
+        feature_flags=SimpleNamespace(broker_id="mt5", environment="demo"),
         risk_decision_source=(
             (lambda _request: live_risk_decision())
             if include_risk
@@ -84,7 +70,7 @@ def _paper_session(
         ),
         action_policy_source=lambda _request: live_action_policy(),
         kill_switch_source=inactive_kill_switch_hierarchy,
-        readiness_source=lambda request, _evidence: ReadinessAssessment(
+        readiness_source=lambda request, _evidence: create_readiness_assessment(
             passed=True,
             failed_check_codes=(),
             evidence_refs={"data_authority_id": "data-authority-001"},
@@ -109,7 +95,7 @@ async def test_live_dispatch_requires_real_risk_decision() -> None:
     """No caller facts can substitute for the typed current Risk decision."""
     session = live_gate_session(risk_decision=None)
     config = {**live_config(), "ALLOW_LIVE_MUTATIONS": True}
-    await session.start(config, live_evidence())
+    await start_live_session(session, config, live_evidence())
     blocked_gate = await evaluate_live_gate(
         live_gate_request(), {"risk_approved": True}, session
     )
@@ -134,11 +120,11 @@ async def test_live_dispatch_completes_single_broker_mutation() -> None:
         "EXECUTION_ROUTE": "paper",
         "ALLOW_LIVE_MUTATIONS": True,
     }
-    await session.start(config, live_evidence())
+    await start_live_session(session, config, live_evidence())
     deps = replace(
         trading_dependencies(store=store),
         connection=broker_connection(),
-        broker_adapter=cast("BrokerAdapter", adapter),
+        broker_adapter=cast("object", adapter),
         simulation_dispatch=None,
         live_session=session,
     )
@@ -158,11 +144,11 @@ async def test_live_dispatch_completes_single_broker_mutation() -> None:
     blocked_session = _paper_session(
         blocked_adapter, MemoryStore(), [], include_risk=False
     )
-    await blocked_session.start(config, live_evidence())
+    await start_live_session(blocked_session, config, live_evidence())
     blocked_deps = replace(
         trading_dependencies(store=MemoryStore()),
         connection=broker_connection(),
-        broker_adapter=cast("BrokerAdapter", blocked_adapter),
+        broker_adapter=cast("object", blocked_adapter),
         simulation_dispatch=None,
         live_session=blocked_session,
     )

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from decimal import Decimal
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.simulator.errors import (
     SimulationError,
@@ -20,7 +20,9 @@ logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.execution.engine import EventDrivenExecutionEngine
-    from app.services.trading import ExecutionReceipt, OrderIntent
+
+    ExecutionReceipt = Any
+    OrderIntent = Any
 
 
 class SimTrader:

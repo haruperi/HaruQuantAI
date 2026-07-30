@@ -1,11 +1,11 @@
 """Workflow integration for budget and monitoring delivery failures."""
 
-# ruff: noqa: INP001
 from app.services.trading import (
-    BudgetGate,
-    OperationalEvent,
+    create_operational_event,
     emit_runtime_event,
+    validate_budget_authority,
 )
+
 from tests.trading.conftest import (
     NOW,
     monitoring_allocation,
@@ -17,7 +17,7 @@ from tests.trading.conftest import (
 def test_budget_and_event_delivery_failures_emit_incidents() -> None:
     """Budget mismatch blocks and event-delivery failure attempts an incident."""
     item = monitoring_request()
-    budget_result = BudgetGate.validate(
+    budget_result = validate_budget_authority(
         item,
         monitoring_allocation(),
         type(monitoring_verdict(item)).model_validate(
@@ -33,7 +33,7 @@ def test_budget_and_event_delivery_failures_emit_incidents() -> None:
     assert budget_result.error is not None
     assert budget_result.error.code == "BUDGET_BLOCKED"
     delivered = []
-    event = OperationalEvent(
+    event = create_operational_event(
         event_id="event-001",
         event_type="COST_OBSERVED",
         severity="warning",

@@ -8,21 +8,21 @@ import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.trading import (
-    ExecutionReceipt,
-    OrderIntent,
     classify_authority_response,
+    create_execution_receipt,
+    create_order_intent,
     dispatch_order_intent,
     validate_adapter_capability,
 )
-from app.services.trading.contracts.responses import success_trading_response
-from app.utils import RiskLevel
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
+OrderIntent = Any
 
 
 def _header(title: str) -> None:
@@ -32,7 +32,7 @@ def _header(title: str) -> None:
 
 def _intent() -> OrderIntent:
     """Build one complete simulation executable intent."""
-    return OrderIntent(
+    return create_order_intent(
         client_order_id="usage-client-order-001",
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
@@ -124,7 +124,7 @@ def example_routing() -> None:
 
     # 3. Dispatch order intent
     async def simulation_dispatch(intent: OrderIntent):
-        receipt = ExecutionReceipt(
+        return create_execution_receipt(
             receipt_id="usage-sim-receipt-001",
             intent_id=intent.source_intent_id,
             client_order_id=intent.client_order_id,
@@ -141,16 +141,6 @@ def example_routing() -> None:
             reconciliation_required=False,
             request_id=intent.request_id,
             correlation_id=intent.correlation_id,
-        )
-        return success_trading_response(
-            receipt,
-            operation="trading.usage_simulation_dispatch",
-            message="Usage simulation receipt",
-            risk_level=RiskLevel.HIGH,
-            request_id=receipt.request_id,
-            correlation_id=receipt.correlation_id,
-            read_only=False,
-            places_trade=True,
         )
 
     dispatched_receipt = asyncio.run(

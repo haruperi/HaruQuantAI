@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from typing import Any
 
 import app.services.simulator.execution.matching as matching_module
 import pytest
@@ -13,18 +14,20 @@ from app.services.simulator.execution import (
 )
 from app.services.simulator.execution.matching import evaluate_protective_exit
 from app.services.simulator.timeline import Tick
-from app.services.trading import OrderIntent, TradingRoute
+from app.services.trading import create_order_intent
+
+OrderIntent = Any
 
 
 def _intent() -> OrderIntent:
     """Build one IOC market intent."""
     instant = datetime(2025, 1, 1, tzinfo=UTC)
-    return OrderIntent(
+    return create_order_intent(
         client_order_id="order-ioc",
         request_id="req-123e4567-e89b-42d3-a456-426614174000",
         workflow_id="wf-123e4567-e89b-42d3-a456-426614174001",
         correlation_id="cor-123e4567-e89b-42d3-a456-426614174002",
-        route=TradingRoute.SIM,
+        route="sim",
         provider_id=None,
         account_id="account",
         strategy_id="strategy",

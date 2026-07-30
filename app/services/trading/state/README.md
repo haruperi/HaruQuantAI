@@ -8,7 +8,9 @@ persistence-port, and requirement definitions are in
 persistence port, `idempotency.py` owns canonical reservation policy,
 `projections.py` applies ordered optimistic events, and `migrations.py`
 declares additive Trading-owned schema metadata without opening a database.
-External consumers use documented exports through `app.services.trading`.
+`factories.py` exposes construction and schema-version functions; state classes
+and constants remain internal. External consumers use documented functions
+through `app.services.trading`.
 
 Data owns connection and migration execution infrastructure; this feature owns
 only Trading records and schema declarations.
