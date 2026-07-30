@@ -94,6 +94,13 @@ from app.agentic.agents.portfolio_risk_advisory.portfolio_risk_advisor.tools imp
 from app.agentic.agents.strategy_desk.strategy_thesis_analyst.agent import (
     PROMPT_PATH as THESIS_PROMPT_PATH,
 )
+from app.agentic.agents.strategy_desk.strategy_thesis_analyst.schemas import (
+    StrategyThesis,
+    build_strategy_thesis,
+)
+from app.agentic.agents.strategy_desk.trader.agent import (
+    PROMPT_PATH as TRADER_PROMPT_PATH,
+)
 from app.agentic.governance import FirmMandate, RoleManifest
 from app.agentic.governance.models import UNIVERSAL_PROHIBITIONS
 from app.agentic.governance.registry import normalize_prompt_text
@@ -1122,4 +1129,165 @@ def advisor_critique_output(**overrides: object) -> dict[str, str]:
         "The tail estimate rests on too few joint moves to be relied upon."
     )
     data.update({str(key): str(value) for key, value in overrides.items()})
+    return data
+
+
+TRADER_ROLE_ID = "trader"
+
+TRADER_PROMPT_DIGEST = canonical_digest(
+    normalize_prompt_text(TRADER_PROMPT_PATH.read_text(encoding="utf-8")),
+)
+
+PROPOSAL_TASK_ID = "task-trade-proposal-a"
+PROPOSAL_STRATEGY_ID = "strat-london-overlap"
+PROPOSAL_STRATEGY_VERSION = "1.4.0"
+PROPOSAL_INSTRUMENT = "EURUSD"
+PROPOSAL_EVIDENCE_REFS = (
+    "agentic.technical_evidence_pack:overlap-a",
+    "agentic.quantitative_evidence_pack:overlap-a",
+)
+
+
+def trader_role_manifest_fields(**overrides: object) -> dict[str, object]:
+    """Return complete Trader manifest fields.
+
+    The base prompt digest is derived from the real package artefact, so the
+    fixture exercises the same integrity chain production uses.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        Complete manifest constructor data.
+    """
+    data = manifest_fields(
+        role_id=TRADER_ROLE_ID,
+        owning_feature="FEAT-AGT-20",
+        department="strategy_desk",
+        agent_package="agents/strategy_desk/trader",
+        description="Turns a supported thesis into an evaluable proposal.",
+        objective="State the view, its horizon, and what would invalidate it.",
+        expertise_boundary="Sizes nothing, prices nothing, routes nothing.",
+        input_schema_id="agentic.trade_proposal_request.v1",
+        output_schema_id="agentic.trade_proposal.v1",
+        base_prompt_hash=TRADER_PROMPT_DIGEST,
+        evaluation_set_id="eval-trader-v1",
+        tools=(),
+        permission_classes=("read_evidence",),
+    )
+    data.update(overrides)
+    return data
+
+
+def build_trader_role_manifest(**overrides: object) -> RoleManifest:
+    """Build the validated Trader role manifest.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        A validated manifest with derived integrity digests.
+    """
+    return build_role_manifest(trader_role_manifest_fields(**overrides))
+
+
+def build_trader_mandate(**overrides: object) -> FirmMandate:
+    """Build a sandbox mandate enabling the trader.
+
+    The trader's manifest registers no tool: it composes from a thesis it was
+    handed and submits through the receiver's own intake, so there is nothing
+    for it to read through the governed tool path. The mandate keeps its
+    firm-wide tool scopes, which the trader is simply not eligible for.
+
+    Args:
+        **overrides: Optional field overrides for mandate variants.
+
+    Returns:
+        A validated firm mandate with a derived content digest.
+    """
+    data: dict[str, object] = {
+        "enabled_features": ("FEAT-AGT-20",),
+        "enabled_roles": (TRADER_ROLE_ID,),
+    }
+    data.update(overrides)
+    return build_sandbox_mandate(**data)
+
+
+def build_proposable_thesis(**overrides: object) -> StrategyThesis:
+    """Build a real `FEAT-AGT-13` thesis a proposal may rest on.
+
+    Args:
+        **overrides: Optional field overrides for thesis variants.
+
+    Returns:
+        A validated immutable strategy thesis.
+    """
+    data: dict[str, object] = {
+        "thesis_id": "thesis-london-overlap",
+        "task_id": PROPOSAL_TASK_ID,
+        "title": "Session-overlap momentum continuation",
+        "summary": "Momentum formed in London may continue into the overlap.",
+        "stance": "supported",
+        "hypothesis_ids": ("hypothesis-overlap-a",),
+        "signals": {"momentum": "Sign and magnitude of the London-session move."},
+        "intended_behaviour": {
+            "momentum": "Participate while the overlap trend persists.",
+        },
+        "supporting_evidence": PROPOSAL_EVIDENCE_REFS,
+        "retained_conflicts": (),
+        "assumptions": ("Session boundaries are stable.",),
+        "uncertainty": "One venue, one instrument, one year of observations.",
+        "next_test": "Evaluate the overlap relationship on a held-out year of data.",
+    }
+    data.update(overrides)
+    return build_strategy_thesis(data)
+
+
+def trader_model_output(**overrides: object) -> dict[str, str]:
+    """Return a well-formed trader model output.
+
+    Args:
+        **overrides: Optional field overrides for output variants.
+
+    Returns:
+        The model output a proposal run would parse.
+    """
+    data: dict[str, str] = {
+        "rationale": (
+            "The thesis holds that momentum formed in the London session "
+            "continues into the overlap, and the supplied evidence covers the "
+            "overlap window on this instrument."
+        ),
+        "invalidation": (
+            "The overlap move reverses the London-session direction on a "
+            "majority of sessions in the horizon.\n"
+            "The London-session move fails to exceed the noise band the "
+            "evidence established."
+        ),
+        "uncertainty": (
+            "The evidence covers one venue and one year and says nothing about "
+            "behaviour across a policy-driven regime change."
+        ),
+    }
+    data.update({str(key): str(value) for key, value in overrides.items()})
+    return data
+
+
+def receiver_result(**overrides: object) -> dict[str, object]:
+    """Return a well-formed Strategy proposal-evaluation result.
+
+    Args:
+        **overrides: Optional field overrides for result variants.
+
+    Returns:
+        The receiver fields a receipt would be built from.
+    """
+    data: dict[str, object] = {
+        "evaluation_request_id": "proposal-eval-" + ("a" * 64),
+        "status": "accepted_for_evaluation",
+        "reason_codes": (),
+        "signals_evaluated": 1,
+        "audit_event_ref": "strategy.audit:proposal-a",
+    }
+    data.update(overrides)
     return data

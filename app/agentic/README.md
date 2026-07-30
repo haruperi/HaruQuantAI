@@ -245,7 +245,7 @@ order below is the binding implementation order.
 | Completed | `FEAT-AGT-17` Evaluation, Critique, and Economic Acceptance     | `agents/operations/evaluation_manager/`                | `EvaluationPlan`, `CritiqueMemo`, `EconomicAcceptanceVerdict`, `evaluate_agent`, `critique_candidate`       | `FR-AGENTIC-049`–`051` | `tests/agentic/usage/17_evaluation.py`      |
 | Completed | `FEAT-AGT-18` Artefact Promotion and Lifecycle                  | `lifecycle/`       | `PromotionEvidencePacket`, `LifecycleRecord`, `assess_promotion`, `transition_artifact`                                   | `FR-AGENTIC-052`–`054` | `tests/agentic/usage/18_lifecycle.py`       |
 | Completed | `FEAT-AGT-19` Portfolio and Risk Advisory                       | `agents/portfolio_risk_advisory/portfolio_risk_advisor/` | `AllocationProposal`, `RiskAdvisory`, `advise_portfolio`, `critique_risk`                                   | `FR-AGENTIC-055`–`057` | `tests/agentic/usage/19_advisory.py`        |
-| Missing | `FEAT-AGT-20` Trade Proposal Handoff                            | `agents/strategy_desk/trader/`                           | `TradeProposal`, `TradeProposalReceipt`, `submit_trade_proposal`                                            | `FR-AGENTIC-058`–`060` | `tests/agentic/usage/20_trade_proposals.py` |
+| Completed | `FEAT-AGT-20` Trade Proposal Handoff                            | `agents/strategy_desk/trader/`                           | `TradeProposal`, `TradeProposalReceipt`, `submit_trade_proposal`                                            | `FR-AGENTIC-058`–`060` | `tests/agentic/usage/20_trade_proposals.py` |
 | Missing | `FEAT-AGT-21` Observability, Incidents, and Operational Control | `operations/`      | `AgenticTrace`, `IncidentRecord`, `ReplayRequest`, `get_run_trace`, `quarantine_agent`, `replay_run`                  | `FR-AGENTIC-061`–`063` | `tests/agentic/usage/21_operations.py`      |
 | Missing | `FEAT-AGT-22` Public Agentic API and Operator Control           | `public_api/`      | `AgenticDependencies`, `submit_firm_request`, `get_firm_run`, `approve_agentic_handoff`                                   | `FR-AGENTIC-064`–`066` | `tests/agentic/usage/22_public_api.py`      |
 
@@ -756,6 +756,18 @@ The workflow stays `Missing` until that submission exists.
    `trading.evaluate_live_gate()`, `trading.dispatch_order_intent()`.
 5. Agentic receives a proposal receipt, never order or fill truth —
    `agentic.record_proposal_receipt()` *(planned)*.
+
+**Status: `Partial`.** `FEAT-AGT-20` implements steps 1 and 5. Step 2's named
+operations cannot take an Agentic proposal — `strategy.build_trade_intent()`
+requires a `StrategyDecision` and a `StrategyExecutionContext`, which are
+deterministic evaluation state this domain does not have. Strategy's
+`FEAT-STR-11` `proposal_intake/` is the intake the handoff actually targets,
+through `create_strategy_proposal_evaluation_request`. Steps 3 and 4 are Risk's
+and Trading's and are not reachable from
+`agents/strategy_desk/trader/`. No signal has been evaluated and no intent
+constructed: `evaluate_strategy_proposal` needs a full Strategy composition
+that a composition root owns. The workflow stays `Missing` until that
+composition and the `FEAT-AGT-22` operator path exist.
 
 **Integration test:** `tests/agentic/integration/test_trade_proposal.py`
 
@@ -1285,18 +1297,34 @@ incompatible projections assembled in the tests, never in production.
 
 | Status  | File            | Responsibility                                                | Key exports                                 | Dependencies                                                                                                                                |
 | ------- | --------------- | ------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Missing | `agent.py`    | Define the provider-neutral trader and compose non-executable trade proposals | Internal only; no additional public export | **Standard library:** `pathlib`; **Required third-party:** None; **Local:** governance, runtime, deliberation, strategy-thesis analyst |
-| Missing | `prompt.md`   | Define immutable thesis, uncertainty, invalidation, non-execution, and refusal instructions | Internal prompt artefact | **Standard library:** None; **Required third-party:** None; **Local:** None |
-| Missing | `schemas.py`  | Define proposal and receipt contracts                         | `TradeProposal`, `TradeProposalReceipt` | **Standard library:** `datetime`; **Required third-party:** `pydantic`; **Local:** contracts, strategy-thesis analyst |
-| Missing | `handoff.py`  | Map and submit an untrusted proposal to receiver-owned intake | `submit_trade_proposal` | **Standard library:** None; **Required third-party:** None; **Local:** `schemas.py`, Strategy/Portfolio public contracts |
-| Missing | `README.md`   | Document the feature boundary, API, prompt, handoff, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
-| Missing | `__init__.py` | Expose the Feature Registry API                               | Feature Registry exports only | **Standard library:** None; **Required third-party:** None; **Local:** `agent.py`, `schemas.py`, `handoff.py` |
+| Completed | `agent.py`    | Define the provider-neutral trader and compose non-executable trade proposals | Internal only; no additional public export | **Standard library:** `pathlib`, `datetime`, `decimal`; **Required third-party:** None; **Local:** governance, runtime, strategy-thesis analyst, `schemas.py` |
+| Completed | `prompt.md`   | Define immutable thesis, uncertainty, invalidation, non-execution, and refusal instructions | Internal prompt artefact | **Standard library:** None; **Required third-party:** None; **Local:** None |
+| Completed | `schemas.py`  | Define proposal and receipt contracts                         | `TradeProposal`, `TradeProposalReceipt` | **Standard library:** `datetime`; **Required third-party:** `pydantic`; **Local:** deliberation |
+| Completed | `handoff.py`  | Map and submit an untrusted proposal to receiver-owned intake | `submit_trade_proposal` | **Standard library:** `datetime`; **Required third-party:** None; **Local:** `schemas.py`, Strategy `create_strategy_proposal_evaluation_request` |
+| Completed | `README.md`   | Document the feature boundary, API, prompt, handoff, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
+| Completed | `__init__.py` | Expose the Feature Registry API                               | Feature Registry exports only | **Standard library:** None; **Required third-party:** None; **Local:** `schemas.py`, `handoff.py` |
+
+The trader registers **no tool**. It composes from a thesis it was handed and
+submits through the receiver's own intake, so there is nothing for it to read
+through the governed tool path, and its manifest carries an empty tool tuple.
+
+`handoff.py` imports exactly one receiver operation —
+`strategy.create_strategy_proposal_evaluation_request` — and a test asserts the
+package's whole `app.services` import list is that single line. The canonical
+dependency column also lists the Portfolio public contracts; none is imported,
+because a proposal reaches Portfolio through Strategy's pipeline rather than
+directly.
 
 | Status  | Requirement ID     | Responsibility                                                                                                                                                          | Side effects                | Failure / Verification              |
 | ------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | ----------------------------------- |
-| Missing | `FR-AGENTIC-058` | A trade proposal shall carry thesis, instrument, direction, horizon, invalidation, evidence, uncertainty, evaluation request, and expiry, with no broker-native fields. | None                        | Contract and prohibited-field tests |
-| Missing | `FR-AGENTIC-059` | Trade proposals shall enter the normal deterministic Strategy/Portfolio/Risk/Trading pipeline and shall receive no privileged route or reduced validation.              | Receiver-owned request call | End-to-end boundary tests           |
-| Missing | `FR-AGENTIC-060` | Agentic shall treat receiver rejection, expiry, or acceptance as the outcome; it shall never represent a proposal receipt as an order or fill.                          | Receipt persistence         | Outcome-truth tests                 |
+| Completed | `FR-AGENTIC-058` | A trade proposal shall carry thesis, instrument, direction, horizon, invalidation, evidence, uncertainty, evaluation request, and expiry, with no broker-native fields. | None                        | Contract and prohibited-field tests |
+| Completed | `FR-AGENTIC-059` | Trade proposals shall enter the normal deterministic Strategy/Portfolio/Risk/Trading pipeline and shall receive no privileged route or reduced validation.              | Receiver-owned request call | End-to-end boundary tests           |
+| Completed | `FR-AGENTIC-060` | Agentic shall treat receiver rejection, expiry, or acceptance as the outcome; it shall never represent a proposal receipt as an order or fill.                          | None; the receipt is returned | Outcome-truth tests               |
+
+`FR-AGENTIC-060`'s side effect is narrower than the canonical row states. There
+is no receipt store in the §4.20 file list and no table for one;
+`submit_trade_proposal` returns the receipt and persisting it belongs to
+`FEAT-AGT-21` operations or `FEAT-AGT-22`.
 
 ### 4.21 `operations/` — Observability, Incidents, and Operational Control
 

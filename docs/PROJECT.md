@@ -312,8 +312,9 @@ Domains are listed in dependency order, from lowest dependency to highest depend
   accounting, `FEAT-AGT-16` staged code generation for strategy
   evaluators and candidate indicators, `FEAT-AGT-17` evaluation, critique,
   and economic acceptance, `FEAT-AGT-18` artefact promotion with an
-  append-only lifecycle ledger, and `FEAT-AGT-19` non-binding portfolio and
-  risk advisory. `FEAT-AGT-03` runtime is `Completed`:
+  append-only lifecycle ledger, `FEAT-AGT-19` non-binding portfolio and
+  risk advisory, and `FEAT-AGT-20` trade proposal handoff into Strategy's own
+  external-proposal intake. `FEAT-AGT-03` runtime is `Completed`:
   provider-neutral model profiles, governed invocation, upgrade gating, and the
   Google ADK 2.x binding all exist behind the agent-graph port. The binding is
   structurally verified; no live provider call has been made, no backtest has
@@ -330,9 +331,12 @@ Domains are listed in dependency order, from lowest dependency to highest depend
   yet bound, so the property holds within one process only. `FEAT-AGT-19`
   emits advice and nothing more: no evidence port is bound to a real receiver,
   no advice has reached Portfolio or Risk, and no receiver has reviewed
-  anything. `FEAT-AGT-09`,
-  `10`, `20`–`22`
-  remain `Missing`, so three agent roles, operations, and the operator
+  anything. `FEAT-AGT-20` composes and maps but does not evaluate: no signal
+  has been evaluated, no trade intent constructed, and no receipt persisted,
+  because evaluating a proposal needs a full Strategy composition a composition
+  root owns. `FEAT-AGT-09`,
+  `10`, `21`–`22`
+  remain `Missing`, so two agent roles, operations, and the operator
   API are unavailable and no Agentic system workflow is complete. `FEAT-AGT-09`
   and `10` stay blocked on `FEAT-DATA-16` and `FEAT-RES-13`.
 * **Documentation**: `app/agentic/README.md`
