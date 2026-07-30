@@ -25,6 +25,14 @@ The three audited domains now expose function-only package roots, focused tests 
 - Fixed Indicators response handling, private Data structural typing, workflow configuration construction, and validation/error branch coverage so the focused suite passes with every Indicators production file above the 80% floor.
 - Fixed Strategy response unwrapping, function-only contract/evaluator construction, deterministic checkpoint/configuration failures, and real MT5-backed usage evidence so all ten implemented workflows pass and every Strategy production file exceeds 80% branch coverage.
 
+### Add artefact promotion and lifecycle
+
+The Agentic firm can now decide whether a staged artefact has earned promotion, and record what happened to it in a history that cannot be rewritten.
+
+#### Added (1)
+
+- `FEAT-AGT-18` Artefact Promotion and Lifecycle: every evidence field on a promotion packet is required, so a packet assembled without the artefact, the experiment verdict, the sweep verdict, the critique, the simulation manifest, or an approving human is unconstructable rather than merely thin, and the packet digest covers the whole assembly so evidence appended after approval yields a different packet; five deterministic gates run in the order `FR-AGENTIC-053` names them — in-sample-only evidence, holdout consumed by both the experiment and the sweep, cumulative search beyond its declared ceiling, incomplete artefact provenance, and absent or unauthorised approval — each read from evidence the packet already carries, with every failure reported rather than only the first; transitions are append-only because the ledger accepts a position once, backed durably by a composite primary key on `(artifact_hash, sequence)`; they are keyed on the artefact digest rather than its identifier, so a materially changed artefact begins with an empty history and cannot inherit an approval granted to a different one; the current state is read from the ledger rather than supplied by the caller, so holding a valid packet does not permit skipping a step; demotion from `registered` requires neither packet nor approval; and `research_only` is terminal, so re-assembling a passing packet does not reopen a terminated artefact. The package registers no role, has no prompt, and invokes no model — promotion is a decision procedure, and a model here would be a place to argue past a gate. It records and does not register: nothing in it imports Strategy or the simulator, and reaching `strategy.register_strategy_version` is `FEAT-AGT-22`'s. No artefact has been promoted and the durable ledger is not yet bound, so append-only holds within one process only.
+
 ### Add evaluation, critique, and economic acceptance
 
 The Agentic firm can now decide whether one of its own roles has earned its place, on arithmetic no wording can move.

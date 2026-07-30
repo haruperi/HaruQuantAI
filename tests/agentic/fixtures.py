@@ -14,17 +14,32 @@ from app.agentic import build_firm_mandate, build_role_manifest
 from app.agentic.agents.engineering.coder.agent import (
     PROMPT_PATH as CODER_PROMPT_PATH,
 )
+from app.agentic.agents.engineering.coder.schemas import (
+    CodeArtifact,
+    build_code_artifact,
+    build_generated_file,
+    build_sandbox_result,
+)
 from app.agentic.agents.engineering.coder.tools import (
     get_registered_tool_names as get_coder_tool_names,
 )
 from app.agentic.agents.experimentation.experiment_designer.agent import (
     PROMPT_PATH as DESIGNER_PROMPT_PATH,
 )
+from app.agentic.agents.experimentation.experiment_designer.schemas import (
+    ExperimentVerdict,
+    build_experiment_verdict,
+)
 from app.agentic.agents.experimentation.experiment_designer.tools import (
     get_registered_tool_names as get_designer_tool_names,
 )
 from app.agentic.agents.experimentation.optimization_coordinator.agent import (
     PROMPT_PATH as SWEEP_PROMPT_PATH,
+)
+from app.agentic.agents.experimentation.optimization_coordinator.schemas import (
+    SweepVerdict,
+    build_sweep_verdict,
+    build_trial_ledger,
 )
 from app.agentic.agents.experimentation.optimization_coordinator.tools import (
     get_registered_tool_names as get_sweep_tool_names,
@@ -50,6 +65,13 @@ from app.agentic.agents.market_analysis.technical_analyst.tools import (
 from app.agentic.agents.operations.evaluation_manager.agent import (
     PROMPT_PATH as EVALUATION_PROMPT_PATH,
 )
+from app.agentic.agents.operations.evaluation_manager.evaluator import (
+    REQUIRED_CHALLENGE_KINDS,
+)
+from app.agentic.agents.operations.evaluation_manager.schemas import (
+    CritiqueMemo,
+    build_critique_memo,
+)
 from app.agentic.agents.operations.evaluation_manager.tools import (
     get_registered_tool_names as get_evaluation_tool_names,
 )
@@ -59,6 +81,7 @@ from app.agentic.agents.strategy_desk.strategy_thesis_analyst.agent import (
 from app.agentic.governance import FirmMandate, RoleManifest
 from app.agentic.governance.models import UNIVERSAL_PROHIBITIONS
 from app.agentic.governance.registry import normalize_prompt_text
+from app.agentic.lifecycle.models import PROMOTION_PERMISSION
 from app.utils import canonical_digest
 
 NOW = datetime(2026, 7, 29, 12, 0, tzinfo=UTC)
@@ -727,3 +750,178 @@ def build_evaluation_mandate(**overrides: object) -> FirmMandate:
     }
     data.update(overrides)
     return build_sandbox_mandate(**data)
+
+
+# --------------------------------------------------------------------------
+# FEAT-AGT-18 promotion evidence
+#
+# Lifecycle has no role and therefore no manifest. What it needs instead are
+# real instances of the four contracts a promotion packet carries, built
+# through the owning features' own constructors so the packet is assembled
+# from the same objects production would hand it.
+# --------------------------------------------------------------------------
+
+PROMOTION_TASK_ID = "task-promotion-a"
+PROMOTION_ENVIRONMENT = "sandbox"
+PROMOTION_APPROVER_ID = "user-reviewer-a"
+
+
+class ApprovingUser:
+    """A human principal shaped like a `utils.auth_context.v1`."""
+
+    def __init__(
+        self,
+        principal_id: str = PROMOTION_APPROVER_ID,
+        principal_type: str = "USER",
+        permissions: tuple[str, ...] = (PROMOTION_PERMISSION,),
+        tenant_or_environment: str = PROMOTION_ENVIRONMENT,
+    ) -> None:
+        """Initialize the approving principal.
+
+        Args:
+            principal_id: Authenticated identity.
+            principal_type: USER or SERVICE_ACCOUNT.
+            permissions: Fine-grained permissions held.
+            tenant_or_environment: Environment the context was issued for.
+        """
+        self.principal_id = principal_id
+        self.principal_type = principal_type
+        self.permissions = permissions
+        self.tenant_or_environment = tenant_or_environment
+
+
+def build_promotion_artifact(**overrides: object) -> CodeArtifact:
+    """Build a real `FEAT-AGT-16` staged artefact as promotion evidence.
+
+    Args:
+        **overrides: Optional field overrides for artefact variants.
+
+    Returns:
+        A validated immutable artefact carrying its manifest digest.
+    """
+    data: dict[str, object] = {
+        "artifact_id": "artifact-promotion-a",
+        "task_id": PROMOTION_TASK_ID,
+        "specification_id": "spec-promotion-a",
+        "kind": "strategy_evaluator",
+        "files": (
+            build_generated_file(
+                "momentum/evaluator.py",
+                "def evaluate_signals(bars):\n    return ()\n",
+            ),
+        ),
+        "dependencies": {"numpy": "2.4.6"},
+        "tests": ("test_evaluate_signals_returns_no_signal_on_empty_bars",),
+        "required_indicators": ("sma",),
+        "unregistered_indicators": (),
+        "model_profile_id": MODEL_PROFILE_ID,
+        "base_prompt_hash": CODER_PROMPT_DIGEST,
+        "composite_instruction_hash": canonical_digest("coder-composite-a"),
+        "tool_refs": ("indicators.list_indicators",),
+        "search_history": ("attempt 1: authored the evaluator",),
+        "sandbox_result": build_sandbox_result(
+            {
+                "result_id": "sandbox-promotion-a",
+                "lease_id": "lease-promotion-a",
+                "compiled": True,
+                "tests_run": 1,
+                "tests_passed": 1,
+                "duration_seconds": 3,
+            },
+        ),
+        "staging_path": "artifact-promotion-a",
+        "promotion_status": "ready",
+    }
+    data.update(overrides)
+    return build_code_artifact(data)
+
+
+def build_promotion_experiment_verdict(**overrides: object) -> ExperimentVerdict:
+    """Build a real `FEAT-AGT-14` experiment verdict as promotion evidence.
+
+    Args:
+        **overrides: Optional field overrides for verdict variants.
+
+    Returns:
+        A validated immutable experiment verdict.
+    """
+    data: dict[str, object] = {
+        "verdict_id": "verdict-experiment-promotion-a",
+        "task_id": PROMOTION_TASK_ID,
+        "spec_id": "spec-experiment-a",
+        "spec_hash": canonical_digest("experiment-spec-a"),
+        "conclusions": {"run-a": "The refuting outcome did not occur."},
+        "evidence_classes": {"run-a": "validation"},
+        "outcome": "not_refuted",
+        "holdout_consumed": False,
+        "limitations": ("One split cannot establish stability across regimes.",),
+    }
+    data.update(overrides)
+    return build_experiment_verdict(data)
+
+
+def build_promotion_sweep_verdict(**overrides: object) -> SweepVerdict:
+    """Build a real `FEAT-AGT-15` sweep verdict as promotion evidence.
+
+    Args:
+        **overrides: Optional field overrides for verdict variants.
+
+    Returns:
+        A validated immutable sweep verdict.
+    """
+    data: dict[str, object] = {
+        "verdict_id": "verdict-sweep-promotion-a",
+        "task_id": PROMOTION_TASK_ID,
+        "plan_id": "plan-sweep-a",
+        "plan_hash": canonical_digest("sweep-plan-a"),
+        "search_id": "search-promotion-a",
+        "reproducibility_hash": canonical_digest("sweep-evidence-a"),
+        "receiver_decision": "validation_needed",
+        "trials": build_trial_ledger(
+            {
+                "attempted": 24,
+                "completed": 24,
+                "failed": 0,
+                "failure_reasons": {},
+                "budget": 24,
+            },
+        ),
+        "selected_parameters": {"period": "20"},
+        "robustness_evidence": "robustness: score=62.5",
+        "instability_evidence": "stability: stability_percentage=41.7",
+        "overfit_evidence": "overfit: degradation=0.34",
+        "economic_effect": "The gain exceeds the modelled spread.",
+        "unresolved_risk": ("The optimum sits on a narrow ridge.",),
+        "holdout_consumed": False,
+        "lifetime_trials": 24,
+    }
+    data.update(overrides)
+    return build_sweep_verdict(data)
+
+
+def build_promotion_critique(**overrides: object) -> CritiqueMemo:
+    """Build a real `FEAT-AGT-17` critique memo as promotion evidence.
+
+    Args:
+        **overrides: Optional field overrides for memo variants.
+
+    Returns:
+        A validated immutable critique memo.
+    """
+    data: dict[str, object] = {
+        "memo_id": "memo-promotion-a",
+        "task_id": PROMOTION_TASK_ID,
+        "candidate_ref": "agentic.code_artifact:artifact-promotion-a",
+        "challenges": {
+            kind: (
+                f"The {kind} challenge was examined against the supplied "
+                "evidence and what it could not establish is stated."
+            )
+            for kind in sorted(REQUIRED_CHALLENGE_KINDS)
+        },
+        "unsubstantiated": (),
+        "blocking_concerns": (),
+        "evidence_refs": ("agentic.sweep_verdict:search-promotion-a",),
+    }
+    data.update(overrides)
+    return build_critique_memo(data)

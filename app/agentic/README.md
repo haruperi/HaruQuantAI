@@ -148,6 +148,7 @@ recovery rules. Other domains read through Agentic public contracts.
 | Missing | Evidence store: immutable claims, source references, availability times, hashes   | Agentic and bounded UI/API evidence views       | `context_memory/migrations.py`                          |
 | Partial | Experiment store: hypotheses, protocols, trials, holdout consumption, results     | Agentic lifecycle and bounded operator views    | `agents/experimentation/experiment_designer/migrations.py` |
 | Partial | Artefact store: generated files, SBOM, signatures, promotion packets              | Agentic lifecycle and approved receiver handoff | `agents/engineering/coder/artifact_store.py`; no direct table requirement |
+| Partial | Lifecycle ledger: append-only artefact transitions and assembled promotion packets | Agentic and bounded operator views              | `lifecycle/migrations.py`                                 |
 | Missing | Operational audit store: model/tool calls, policy decisions, approvals, incidents | Protected Agentic/UI/API audit operations       | `operations/migrations.py`                              |
 | Missing | Working-memory store: bounded task summaries and temporary coordination state     | Current task only                               | `context_memory/migrations.py`                          |
 
@@ -242,7 +243,7 @@ order below is the binding implementation order.
 | Completed | `FEAT-AGT-15` Optimization Coordination                         | `agents/experimentation/optimization_coordinator/`     | `SweepPlan`, `SweepVerdict`, `design_sweep`, `coordinate_optimization`                                      | `FR-AGENTIC-043`–`045` | `tests/agentic/usage/15_optimization.py`    |
 | Completed | `FEAT-AGT-16` Governed Code Generation and Sandbox              | `agents/engineering/coder/`                            | `CodeSpecification`, `CodeArtifact`, `SandboxResult`, `author_code_artifact`                                | `FR-AGENTIC-046`–`048` | `tests/agentic/usage/16_coding.py`          |
 | Completed | `FEAT-AGT-17` Evaluation, Critique, and Economic Acceptance     | `agents/operations/evaluation_manager/`                | `EvaluationPlan`, `CritiqueMemo`, `EconomicAcceptanceVerdict`, `evaluate_agent`, `critique_candidate`       | `FR-AGENTIC-049`–`051` | `tests/agentic/usage/17_evaluation.py`      |
-| Missing | `FEAT-AGT-18` Artefact Promotion and Lifecycle                  | `lifecycle/`       | `PromotionEvidencePacket`, `LifecycleRecord`, `assess_promotion`, `transition_artifact`                                   | `FR-AGENTIC-052`–`054` | `tests/agentic/usage/18_lifecycle.py`       |
+| Completed | `FEAT-AGT-18` Artefact Promotion and Lifecycle                  | `lifecycle/`       | `PromotionEvidencePacket`, `LifecycleRecord`, `assess_promotion`, `transition_artifact`                                   | `FR-AGENTIC-052`–`054` | `tests/agentic/usage/18_lifecycle.py`       |
 | Missing | `FEAT-AGT-19` Portfolio and Risk Advisory                       | `agents/portfolio_risk_advisory/portfolio_risk_advisor/` | `AllocationProposal`, `RiskAdvisory`, `advise_portfolio`, `critique_risk`                                   | `FR-AGENTIC-055`–`057` | `tests/agentic/usage/19_advisory.py`        |
 | Missing | `FEAT-AGT-20` Trade Proposal Handoff                            | `agents/strategy_desk/trader/`                           | `TradeProposal`, `TradeProposalReceipt`, `submit_trade_proposal`                                            | `FR-AGENTIC-058`–`060` | `tests/agentic/usage/20_trade_proposals.py` |
 | Missing | `FEAT-AGT-21` Observability, Incidents, and Operational Control | `operations/`      | `AgenticTrace`, `IncidentRecord`, `ReplayRequest`, `get_run_trace`, `quarantine_agent`, `replay_run`                  | `FR-AGENTIC-061`–`063` | `tests/agentic/usage/21_operations.py`      |
@@ -291,7 +292,10 @@ app/agentic/
 ├── lifecycle/
 │   ├── __init__.py
 │   ├── models.py
-│   └── service.py
+│   ├── service.py
+│   ├── migrations.py
+│   ├── repository.py
+│   └── README.md
 ├── operations/
 │   ├── __init__.py
 │   ├── models.py
@@ -699,6 +703,14 @@ Exhausted search budget or holdout misuse is terminal.
 Leakage, holdout reuse, exhausted search budget, missing evidence, or absent
 approval produces terminal `research_only`; receiver registration remains
 authoritative.
+
+**Status: `Partial`.** `FEAT-AGT-18` implements steps 5 and 6 and the terminal
+`research_only` outcome. Steps 1 through 4 are `FEAT-AGT-16` and `FEAT-AGT-17`
+under their own names — `agentic.evaluate_artifact()` and
+`agentic.run_critic_review()` were never authored as such, and
+`critique_candidate` is what step 4 became. Step 7 is the receiver's and is
+reached by `FEAT-AGT-22`; nothing in `lifecycle/` imports Strategy or the
+simulator. The workflow stays `Missing` until that handoff exists.
 
 **Integration test:** `tests/agentic/integration/test_artifact_promotion.py`
 
@@ -1193,15 +1205,35 @@ does not apply one. Changing a role's registered state belongs to
 
 | Status  | File            | Responsibility                                             | Key exports                                      | Dependencies                                                                                                                           |
 | ------- | --------------- | ---------------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Missing | `models.py`   | Define promotion packets and append-only lifecycle records | `PromotionEvidencePacket`, `LifecycleRecord` | **Standard library:** `datetime`; **Required third-party:** `pydantic`; **Local:** contracts, coder, evaluation manager |
-| Missing | `service.py`  | Assess promotion and perform governed transitions          | `assess_promotion`, `transition_artifact`    | **Standard library:** None; **Required third-party:** None; **Local:** `models.py`, experiment designer, evaluation manager |
-| Missing | `__init__.py` | Expose the lifecycle API                                   | All exports above                                | **Standard library:** None; **Required third-party:** None; **Local:** lifecycle files                               |
+| Completed | `models.py`   | Define promotion packets, append-only lifecycle records, and the transition machine | `PromotionEvidencePacket`, `LifecycleRecord`, `PromotionAssessment`, `validate_transition` | **Standard library:** `types`; **Required third-party:** `pydantic`; **Local:** coder, experiment designer, optimization coordinator, evaluation manager |
+| Completed | `service.py`  | Assess promotion and perform governed transitions          | `assess_promotion`, `transition_artifact`    | **Standard library:** None; **Required third-party:** None; **Local:** `models.py`, `repository.py` |
+| Completed | `migrations.py` | Define the immutable append-only lifecycle-ledger migrations executed by Data | `get_lifecycle_migration_statements`, `build_lifecycle_migration_request` | **Standard library:** `hashlib`; **Required third-party:** None; **Local:** Data migration protocol |
+| Completed | `repository.py` | Declare the injected ledger port and a deterministic non-durable reference store | `AgenticLifecycleStore`, `build_in_memory_lifecycle_store` | **Standard library:** None; **Required third-party:** None; **Local:** `models.py` |
+| Completed | `README.md`   | Document the feature boundary, API, gates, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
+| Completed | `__init__.py` | Expose the lifecycle API                                   | All exports above                                | **Standard library:** None; **Required third-party:** None; **Local:** lifecycle files                               |
+
+`migrations.py` and `repository.py` are additions to the canonical file list.
+`FR-AGENTIC-054` requires transitions be append-only, and an in-process check
+vanishes on restart; the composite primary key `(artifact_hash, sequence)` is
+what makes the property survive one. This follows the `FEAT-AGT-14` precedent,
+where durable enforcement of a scarcity rule earned its own table, and the
+domain rule that no package outside Data implements a database writer.
+
+This package registers no role. It has no `prompt.md`, no `agent.py`, and
+invokes no model: promotion is a decision procedure over evidence other
+features produced, and a model here would be a place to argue past a gate.
 
 | Status  | Requirement ID     | Responsibility                                                                                                                                    | Side effects                            | Failure / Verification |
 | ------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | ---------------------- |
-| Missing | `FR-AGENTIC-052` | Promotion shall require the complete ordered evidence packet, deterministic receiver gates, and authenticated human approval.                     | Lifecycle persistence; receiver handoff | Complete-packet tests  |
-| Missing | `FR-AGENTIC-053` | Leakage, holdout reuse, search-budget exhaustion, missing provenance, or absent approval shall terminate promotion as`research_only`.           | Lifecycle persistence                   | Terminal-gate tests    |
-| Missing | `FR-AGENTIC-054` | Artefact transitions shall be append-only, version-specific, non-skippable, automatically demotable, and never inherited across material changes. | Lifecycle persistence                   | Transition-state tests |
+| Completed | `FR-AGENTIC-052` | Promotion shall require the complete ordered evidence packet, deterministic receiver gates, and authenticated human approval.                     | Lifecycle persistence                   | Complete-packet tests  |
+| Completed | `FR-AGENTIC-053` | Leakage, holdout reuse, search-budget exhaustion, missing provenance, or absent approval shall terminate promotion as`research_only`.           | Lifecycle persistence                   | Terminal-gate tests    |
+| Completed | `FR-AGENTIC-054` | Artefact transitions shall be append-only, version-specific, non-skippable, automatically demotable, and never inherited across material changes. | Lifecycle persistence                   | Transition-state tests |
+
+`FR-AGENTIC-052`'s side effect is narrower than the canonical row states. This
+feature performs no receiver handoff: it assembles the packet, runs the gates,
+and records the outcome. Reaching `strategy.register_strategy_version` is
+`FEAT-AGT-22`'s, and recording `registered` means a receiver registered the
+version rather than that this feature caused it.
 
 ### 4.19 `agents/portfolio_risk_advisory/portfolio_risk_advisor/` — Portfolio and Risk Advisory
 
