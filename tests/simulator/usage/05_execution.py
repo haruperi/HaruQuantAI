@@ -16,16 +16,10 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.simulator import (
-    AccountLedger,
-    EventDrivenExecutionEngine,
-    ExecutionCostModel,
-    ExecutionProfile,
-    JournalWriter,
-    SessionInterval,
-    SimTrader,
-    SymbolSpecification,
-    Tick,
+    create_simulation_handle,
+    create_simulation_value,
     evaluate_protective_exit,
+    execute_simulation_handle_operation,
     match_order,
     price_order,
     unwrap_simulation_response,
@@ -78,10 +72,11 @@ def _intent() -> OrderIntent:
     )
 
 
-def _tick() -> Tick:
+def _tick() -> object:
     """Build the next tick."""
     instant = NOW + timedelta(seconds=1)
-    return Tick(
+    return create_simulation_value(
+        "Tick",
         symbol="EURUSD",
         timestamp=instant,
         bid=Decimal("1.10000"),
@@ -92,9 +87,10 @@ def _tick() -> Tick:
     )
 
 
-def _profile() -> ExecutionProfile:
+def _profile() -> object:
     """Build execution profile."""
-    return ExecutionProfile(
+    return create_simulation_value(
+        "ExecutionProfile",
         slippage_mode="none",
         fixed_slippage_points=Decimal(0),
         point_value=Decimal("0.00001"),
@@ -103,36 +99,49 @@ def _profile() -> ExecutionProfile:
         maximum_gap_points=Decimal(10),
         liquidity_mode="unbounded",
         participation_rate=Decimal(0),
-        sessions=(SessionInterval(start_week_second=0, end_week_second=604_800),),
+        sessions=(
+            create_simulation_value(
+                "SessionInterval", start_week_second=0, end_week_second=604_800
+            ),
+        ),
     )
 
 
-def _engine(tmp_path: Path, suffix: str) -> EventDrivenExecutionEngine:
+def _engine(tmp_path: Path, suffix: str) -> object:
     """Build execution engine."""
     store = SqliteSimulationStateStore(tmp_path / f"{suffix}.db", tmp_path / suffix)
-    writer = JournalWriter(store, f"run-{suffix}", "req-test", "cor-test")
-    writer.append(
+    writer = create_simulation_handle(
+        "JournalWriter", store, f"run-{suffix}", "req-test", "cor-test"
+    )
+    execute_simulation_handle_operation(
+        writer,
+        "append",
         "run_started",
         {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
         NOW,
     )
-    ledger = AccountLedger(
+    ledger = create_simulation_handle(
+        "AccountLedger",
         Decimal(10_000),
         "USD",
-        SymbolSpecification(
+        create_simulation_value(
+            "SymbolSpecification",
             minimum_volume=Decimal("0.01"),
             maximum_volume=Decimal(100),
             volume_step=Decimal("0.01"),
             contract_size=Decimal(100_000),
             leverage=Decimal(100),
         ),
-        ExecutionCostModel(
+        create_simulation_value(
+            "ExecutionCostModel",
             commission_per_lot_per_side=Decimal(0),
             long_swap_per_lot_rollover=Decimal(0),
             short_swap_per_lot_rollover=Decimal(0),
         ),
     )
-    return EventDrivenExecutionEngine(ledger, writer, _profile(), "v1")
+    return create_simulation_handle(
+        "EventDrivenExecutionEngine", ledger, writer, _profile(), "v1"
+    )
 
 
 def example_execution() -> None:
@@ -152,15 +161,26 @@ def example_execution() -> None:
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)
         engine = _engine(tmp_path, "usage-close")
-        trader = SimTrader(engine)
-        _value(asyncio.run(trader.submit_order(_intent())))
-        _value(engine.execute_tick(_tick()))
+        trader = create_simulation_handle("SimTrader", engine)
+        _value(
+            asyncio.run(
+                execute_simulation_handle_operation(  # type: ignore[arg-type]
+                    trader, "submit_order", _intent()
+                )
+            )
+        )
+        _value(execute_simulation_handle_operation(engine, "execute_tick", _tick()))
         close_res = _value(
-            trader.close_position("sim-position-order-engine", Decimal(1))
+            execute_simulation_handle_operation(
+                trader,
+                "close_position",
+                "sim-position-order-engine",
+                Decimal(1),
+            )
         )
         print(f"Closed position quantity: {close_res['quantity']}")
 
-        snapshot = _value(trader.snapshot())
+        snapshot = _value(execute_simulation_handle_operation(trader, "snapshot"))
         print(f"SimTrader snapshot engine version: {snapshot['engine_version']}")
 
     # 4. Protective exit
@@ -241,8 +261,11 @@ def fr_sim_020() -> None:
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
         engine = _engine(Path(tmp_dir), "usage-engine")
-        engine.submit_order(_intent())
-        print(f"Execution receipts: {len(_value(engine.execute_tick(_tick())))}")
+        _value(execute_simulation_handle_operation(engine, "submit_order", _intent()))
+        receipts = _value(
+            execute_simulation_handle_operation(engine, "execute_tick", _tick())
+        )
+        print("Execution receipts:", tuple(receipts))
 
 
 def fr_sim_021() -> None:
@@ -258,8 +281,16 @@ def fr_sim_021() -> None:
         "Demonstrate FR-SIM-021. Responsibility: The system shall accept only a Trading-owned `OrderIntent` for route `sim`, preserve its final approved volume, submit it to the active simulation engine without any broker call, and return a Trading-owned `ExecutionReceipt` constructed from the simulated outcome."
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
-        trader = SimTrader(_engine(Path(tmp_dir), "usage-submit"))
-        receipt = _value(asyncio.run(trader.submit_order(_intent())))
+        trader = create_simulation_handle(
+            "SimTrader", _engine(Path(tmp_dir), "usage-submit")
+        )
+        receipt = _value(
+            asyncio.run(
+                execute_simulation_handle_operation(  # type: ignore[arg-type]
+                    trader, "submit_order", _intent()
+                )
+            )
+        )
         print(f"Submission status: {receipt.status}")
 
 
@@ -276,8 +307,16 @@ def fr_sim_038() -> None:
         "Demonstrate FR-SIM-038. Responsibility: The system shall expose the bound asynchronous `SimTrader.submit_order` method whose signature is exactly the port Trading injects for the `sim` route, `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]`, delegating to its active engine and importing no Trading internals beyond public contracts."
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
-        trader = SimTrader(_engine(Path(tmp_dir), "usage-port"))
-        receipt = _value(asyncio.run(trader.submit_order(_intent())))
+        trader = create_simulation_handle(
+            "SimTrader", _engine(Path(tmp_dir), "usage-port")
+        )
+        receipt = _value(
+            asyncio.run(
+                execute_simulation_handle_operation(  # type: ignore[arg-type]
+                    trader, "submit_order", _intent()
+                )
+            )
+        )
         print(f"Async port status: {receipt.status}")
 
 
@@ -293,10 +332,25 @@ def fr_sim_022() -> None:
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
         engine = _engine(Path(tmp_dir), "usage-close-fr")
-        trader = SimTrader(engine)
-        _value(asyncio.run(trader.submit_order(_intent())))
-        _value(engine.execute_tick(_tick()))
-        print(_value(trader.close_position("sim-position-order-engine", Decimal(1))))
+        trader = create_simulation_handle("SimTrader", engine)
+        _value(
+            asyncio.run(
+                execute_simulation_handle_operation(  # type: ignore[arg-type]
+                    trader, "submit_order", _intent()
+                )
+            )
+        )
+        _value(execute_simulation_handle_operation(engine, "execute_tick", _tick()))
+        print(
+            _value(
+                execute_simulation_handle_operation(
+                    trader,
+                    "close_position",
+                    "sim-position-order-engine",
+                    Decimal(1),
+                )
+            )
+        )
 
 
 def fr_sim_023() -> None:
@@ -311,8 +365,11 @@ def fr_sim_023() -> None:
         "Demonstrate FR-SIM-023. Responsibility: The system shall expose immutable read-only orders, positions, pending orders, deals, and account state for the current run without leaking mutable engine objects."
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
-        trader = SimTrader(_engine(Path(tmp_dir), "usage-snapshot"))
-        print(f"Snapshot engine: {_value(trader.snapshot())['engine_version']}")
+        trader = create_simulation_handle(
+            "SimTrader", _engine(Path(tmp_dir), "usage-snapshot")
+        )
+        snapshot = _value(execute_simulation_handle_operation(trader, "snapshot"))
+        print("Simulation state snapshot:", dict(snapshot))
 
 
 def main() -> None:

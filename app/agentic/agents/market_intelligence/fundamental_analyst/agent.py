@@ -25,6 +25,7 @@ from app.agentic.agents.market_intelligence.fundamental_analyst.schemas import (
 )
 from app.agentic.agents.market_intelligence.fundamental_analyst.tools import (
     APPLICABILITY_TOOL,
+    DEFAULT_REQUIRED_KINDS,
     FUNDAMENTAL_EVIDENCE_TOOL,
     call_intelligence_tool,
     verify_projection,
@@ -407,6 +408,7 @@ def analyze_fundamentals(
             instrument,
             asset_class,
             model,
+            DEFAULT_REQUIRED_KINDS.get(model, ()),
             decision_time,
         ),
         now,

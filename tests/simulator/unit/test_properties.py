@@ -3,13 +3,9 @@
 from decimal import Decimal
 
 import pytest
-from app.services.simulator import (
-    SimulationError,
-    SymbolSpecification,
-    calculate_margin,
-    normalize_volume,
-)
-from app.services.simulator.errors import unwrap_simulation_response
+from app.services.simulator import calculate_margin, normalize_volume
+from app.services.simulator.accounting import SymbolSpecification
+from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 
 
 def _value(response: object) -> object:

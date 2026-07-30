@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import time
-from collections.abc import Callable, Mapping
-from typing import Any, TypeVar
+from collections.abc import Callable, Iterable, Mapping
+from decimal import Decimal
+from typing import Any, cast
 
 from app.services.analytics import (
-    AnalyticsRunConfig,
-    PerformanceReport,
     build_performance_report,
+    is_analytics_value,
 )
 from app.services.optimization.errors import OptimizationError
 from app.services.optimization.execution.contracts import (
@@ -18,39 +18,41 @@ from app.services.optimization.execution.contracts import (
     EngineOptimizationResult,
 )
 from app.services.simulator import (
-    SimulationBacktestRequestV1,
-    SimulationError,
-    SimulationResult,
-    SimulationRunDependencies,
+    calculate_simulation_backtest_config_hash,
+    create_simulation_value,
+    dump_simulation_value,
+    get_simulation_value_field,
+    is_simulation_value,
     run_backtest,
 )
-from app.utils import get_logger
+from app.utils import get_logger, get_standard_response_type
 
 type AuthContext = Any
 type StandardResponse[T] = Any
+AnalyticsRunConfig = Any
+PerformanceReport = Any
+SimulationRunDependencies = Any
 
 logger = get_logger(__name__)
 
-_T = TypeVar("_T")
-
 type SimulationRunner = Callable[
-    [SimulationBacktestRequestV1, AuthContext, SimulationRunDependencies],
-    SimulationResult | StandardResponse[SimulationResult],
+    [object, AuthContext, SimulationRunDependencies],
+    object,
 ]
 
 
 def _unwrap_upstream_response(
     value: object,
     *,
-    expected_type: type[_T],
+    predicate: Callable[[object], bool],
     operation: str,
     candidate_hash: str,
-) -> _T:
+) -> object:
     """Unwrap one upstream response while preserving safe failure evidence.
 
     Args:
         value: Raw or shared-response upstream value.
-        expected_type: Expected producer-owned payload type.
+        predicate: Public producer-owned payload predicate.
         operation: Qualified upstream operation name.
         candidate_hash: Optimization candidate identity.
 
@@ -61,22 +63,25 @@ def _unwrap_upstream_response(
         OptimizationError: If the upstream operation failed or returned an
             incompatible payload.
     """
-    if isinstance(value, StandardResponse):
-        if value.status != "success" or value.data is None:
+    if isinstance(value, get_standard_response_type()):
+        response = cast("Any", value)
+        if response.status != "success" or response.data is None:
             upstream_code = (
-                value.error.code if value.error is not None else "INVALID_RESPONSE"
+                response.error.code
+                if response.error is not None
+                else "INVALID_RESPONSE"
             )
             raise OptimizationError(
                 "OPT_EXECUTION_FAILED",
                 "UPSTREAM_OPERATION_FAILED",
                 safe_details={
                     "candidate_hash": candidate_hash,
-                    "upstream_domain": value.metadata.domain,
+                    "upstream_domain": response.metadata.domain,
                     "upstream_code": upstream_code,
                 },
             )
-        value = value.data
-    if not isinstance(value, expected_type):
+        value = response.data
+    if not predicate(value):
         raise OptimizationError(
             "OPT_EXECUTION_FAILED",
             "UPSTREAM_RESPONSE_INVALID",
@@ -90,7 +95,7 @@ def _unwrap_upstream_response(
 
 
 def _simulation_source(
-    result: SimulationResult, request: BacktestExecutionRequest
+    result: object, request: BacktestExecutionRequest
 ) -> Mapping[str, object]:
     """Project a completed Simulation result to Analytics ledger input.
 
@@ -104,9 +109,9 @@ def _simulation_source(
     logger.debug("Projecting Simulation result to Analytics source evidence")
     context = request.context
     return {
-        "contract_version": result.contract_version,
-        "schema_id": result.schema_id,
-        "source_id": result.run_id,
+        "contract_version": get_simulation_value_field(result, "contract_version"),
+        "schema_id": get_simulation_value_field(result, "schema_id"),
+        "source_id": get_simulation_value_field(result, "run_id"),
         "phase": "simulation",
         "window_start": context.start,
         "window_end": context.end,
@@ -115,11 +120,19 @@ def _simulation_source(
         "symbols": (context.symbol,),
         "timeframe": context.timeframe,
         "closed_trades": tuple(
-            row.model_dump(mode="python") for row in result.closed_trades
+            dump_simulation_value(row)
+            for row in cast(
+                "Iterable[object]",
+                get_simulation_value_field(result, "closed_trades"),
+            )
         ),
-        "quality_metadata": {"diagnostics": result.diagnostics},
+        "quality_metadata": {
+            "diagnostics": get_simulation_value_field(result, "diagnostics")
+        },
         "source_metadata": {
-            "simulation_request_hash": result.request_hash,
+            "simulation_request_hash": get_simulation_value_field(
+                result, "request_hash"
+            ),
             "candidate_hash": request.candidate_hash,
         },
     }
@@ -129,6 +142,7 @@ class SimulationAnalyticsBacktestAdapter:
     """Optimization-owned composition of public Simulation and Analytics APIs."""
 
     contract_version = "v1"
+    schema_id = "optimization.backtest_execution_adapter.v1"
     deterministic = True
 
     def __init__(
@@ -206,15 +220,19 @@ class SimulationAnalyticsBacktestAdapter:
             "execution_route": "sim",
             "canonical": context.canonical,
         }
-        payload["config_hash"] = _unwrap_upstream_response(
-            SimulationBacktestRequestV1.calculate_config_hash(payload),
-            expected_type=str,
-            operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
-            candidate_hash=request.candidate_hash,
+        payload["config_hash"] = str(
+            _unwrap_upstream_response(
+                calculate_simulation_backtest_config_hash(payload),
+                predicate=lambda value: isinstance(value, str),
+                operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
+                candidate_hash=request.candidate_hash,
+            )
         )
         started = time.monotonic()
         try:
-            simulation_request = SimulationBacktestRequestV1.model_validate(payload)
+            simulation_request = create_simulation_value(
+                "SimulationBacktestRequestV1", **payload
+            )
             candidate_auth = self._auth_context.model_copy(
                 update={
                     "request_id": request.request_id,
@@ -222,32 +240,41 @@ class SimulationAnalyticsBacktestAdapter:
                     "correlation_id": request.correlation_id,
                 }
             )
-            simulation_result = _unwrap_upstream_response(
+            simulation_result: object = _unwrap_upstream_response(
                 self._simulation_runner(
                     simulation_request,
                     candidate_auth,
                     self._simulation_dependencies,
                 ),
-                expected_type=SimulationResult,
+                predicate=lambda value: is_simulation_value(value, "SimulationResult"),
                 operation="simulation.run_backtest",
                 candidate_hash=request.candidate_hash,
             )
-            report = _unwrap_upstream_response(
+            report: PerformanceReport = _unwrap_upstream_response(
                 build_performance_report(
                     _simulation_source(simulation_result, request),
                     source_contract="simulation.result",
                     request_id=request.request_id,
                     correlation_id=request.correlation_id,
                     created_at=context.end,
-                    initial_balance=simulation_result.initial_balance,
-                    account_currency=simulation_result.account_currency,
+                    initial_balance=cast(
+                        "Decimal",
+                        get_simulation_value_field(
+                            simulation_result, "initial_balance"
+                        ),
+                    ),
+                    account_currency=str(
+                        get_simulation_value_field(
+                            simulation_result, "account_currency"
+                        )
+                    ),
                     config=self._analytics_config,
                 ),
-                expected_type=PerformanceReport,
+                predicate=lambda value: is_analytics_value(value, "PerformanceReport"),
                 operation="analytics.build_performance_report",
                 candidate_hash=request.candidate_hash,
             )
-        except (SimulationError, ValueError) as error:
+        except ValueError as error:
             raise OptimizationError(
                 "OPT_EXECUTION_FAILED",
                 "CANDIDATE_EXECUTION_REJECTED",
@@ -256,8 +283,12 @@ class SimulationAnalyticsBacktestAdapter:
         runtime_ms = (time.monotonic() - started) * 1000
         return EngineOptimizationResult(
             candidate_hash=request.candidate_hash,
-            simulation_run_id=simulation_result.run_id,
-            simulation_request_hash=simulation_result.request_hash,
+            simulation_run_id=str(
+                get_simulation_value_field(simulation_result, "run_id")
+            ),
+            simulation_request_hash=str(
+                get_simulation_value_field(simulation_result, "request_hash")
+            ),
             analytics_report=report,
             runtime_ms=runtime_ms,
             engine_type=self.engine_type,

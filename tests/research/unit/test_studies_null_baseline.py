@@ -4,27 +4,26 @@ from datetime import UTC, datetime
 
 import pandas as pd
 import pytest
-from app.services.research.contracts import (
-    EdgeResult,
-    StatisticalConfig,
-    StudyConfig,
-    TimeSplitResult,
-)
-from app.services.research.studies import (
+from app.services.research import (
     compare_to_null,
+    create_research_value,
     get_acceptance_criteria,
+    is_research_value,
     run_eds_null_baseline,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _HASH = "e" * 64
 
 
-def _split() -> TimeSplitResult:
+def _split() -> object:
     """Build a valid chronological split carrying a close column in test."""
     idx = pd.date_range("2026-01-01", periods=30, freq="h", tz="UTC")
     prices = pd.Series(range(1, 31), index=idx, dtype=float)
-    return TimeSplitResult(
+    return create_research_value(
+        "TimeSplitResult",
         train=pd.DataFrame({"close": prices.iloc[:10]}, index=idx[:10]),
         validation=pd.DataFrame({"close": prices.iloc[10:20]}, index=idx[10:20]),
         test=pd.DataFrame({"close": prices.iloc[20:]}, index=idx[20:]),
@@ -36,14 +35,16 @@ def _split() -> TimeSplitResult:
     )
 
 
-def _statistics() -> StatisticalConfig:
+def _statistics() -> object:
     """Build seeded statistical settings."""
-    return StatisticalConfig(7, 20, 20, 2, 20, "benjamini_hochberg")
+    return create_research_value(
+        "StatisticalConfig", 7, 20, 20, 2, 20, "benjamini_hochberg"
+    )
 
 
-def _study() -> StudyConfig:
+def _study() -> object:
     """Build a mean-reversion study policy with matched null settings."""
-    return StudyConfig({"side": "buy", "hold_bars": 2}, {}, {})
+    return create_research_value("StudyConfig", {"side": "buy", "hold_bars": 2}, {}, {})
 
 
 def test_baseline_records_seed_and_split() -> None:
@@ -55,7 +56,7 @@ def test_baseline_records_seed_and_split() -> None:
         statistics=_statistics(),
         study=_study(),
     )
-    assert isinstance(baseline, EdgeResult)
+    assert is_research_value(baseline, "EdgeResult")
     assert baseline.study == "null_baseline"
     assert baseline.seed == 7
     assert baseline.advisory_only is True
@@ -67,8 +68,8 @@ def test_baseline_records_seed_and_split() -> None:
 def test_baseline_rejects_missing_matched_policy() -> None:
     """FR-RES-062: fail closed when matched null policy is absent."""
     logger.debug("Testing Research null baseline policy rejection")
-    bad_study = StudyConfig({}, {}, {})
-    with pytest.raises(ValidationError, match="MATCHED_NULL_POLICY_REQUIRED"):
+    bad_study = create_research_value("StudyConfig", {}, {}, {})
+    with pytest.raises(ValueError, match="MATCHED_NULL_POLICY_REQUIRED"):
         run_eds_null_baseline(
             pd.DataFrame({"close": [1.0]}),
             split=_split(),
@@ -86,8 +87,8 @@ def test_compare_to_null_returns_percentile_and_pvalue() -> None:
         statistics=_statistics(),
         study=_study(),
     )
-    observed = EdgeResult(
-        "v1", "observed", {"mean": 0.0}, {}, "inconclusive", 7, (), True
+    observed = create_research_value(
+        "EdgeResult", "v1", "observed", {"mean": 0.0}, {}, "inconclusive", 7, (), True
     )
     comparison = compare_to_null(observed, baseline)
     assert "percentile" in comparison
@@ -105,8 +106,10 @@ def test_compare_rejects_mismatched_side() -> None:
         statistics=_statistics(),
         study=_study(),
     )
-    observed = EdgeResult("v1", "observed", {}, {}, "inconclusive", 7, (), True)
-    with pytest.raises(ValidationError, match="NULL_COMPARISON_EVIDENCE_MISSING"):
+    observed = create_research_value(
+        "EdgeResult", "v1", "observed", {}, {}, "inconclusive", 7, (), True
+    )
+    with pytest.raises(ValueError, match="NULL_COMPARISON_EVIDENCE_MISSING"):
         compare_to_null(observed, baseline)
 
 
@@ -128,6 +131,8 @@ def test_criteria_follow_confirmation_policy() -> None:
 def test_criteria_rejects_incompatible_baseline() -> None:
     """FR-RES-064: fail closed when baseline policy is incompatible."""
     logger.debug("Testing Research acceptance criteria rejection")
-    incompatible = EdgeResult("v1", "observed", {}, {}, "inconclusive", 7, (), True)
-    with pytest.raises(ValidationError, match="BASELINE_POLICY_NOT_V1"):
+    incompatible = create_research_value(
+        "EdgeResult", "v1", "observed", {}, {}, "inconclusive", 7, (), True
+    )
+    with pytest.raises(ValueError, match="BASELINE_POLICY_NOT_V1"):
         get_acceptance_criteria(incompatible)

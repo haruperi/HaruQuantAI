@@ -8,15 +8,12 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
-from app.services.portfolio.config import PortfolioSettings
-from app.services.portfolio.contracts import PortfolioConstructionRequest
-from app.services.portfolio.orchestration import (
-    ConstructionEvidenceInputs,
-    PortfolioWorkflowDependencies,
-    PortfolioWorkflowService,
+from app.services.portfolio import (
+    create_portfolio_handle,
+    create_portfolio_value,
+    execute_portfolio_handle_operation,
 )
-from app.services.portfolio.state import PortfolioRepository
-from app.utils import AuditEvent, logger
+from app.utils import get_logger
 from tests.portfolio.unit.test_allocation import _activator, _inactive_kill_switch
 from tests.portfolio.unit.test_evidence import (
     _owner_bundle,
@@ -25,6 +22,11 @@ from tests.portfolio.unit.test_evidence import (
 )
 from tests.portfolio.unit.test_repository import FakePortfolioStore
 from tests.portfolio.unit.test_workflows import _unused
+
+AuditEvent = Any
+PortfolioConstructionRequest = Any
+PortfolioSettings = Any
+logger = get_logger(__name__)
 
 
 def test_construction_workflow_validates_builds_persists_and_audits(
@@ -44,7 +46,7 @@ def test_construction_workflow_validates_builds_persists_and_audits(
             "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         }
     )
-    request = PortfolioConstructionRequest(**request_data)
+    request = create_portfolio_value("PortfolioConstructionRequest", **request_data)
     refs, decisions, account, market, analytics, fx = _owner_bundle(portfolio_now)
 
     def strategy_source(_request: PortfolioConstructionRequest):
@@ -81,7 +83,8 @@ def test_construction_workflow_validates_builds_persists_and_audits(
             Complete owner evidence input bundle.
         """
         logger.debug("Resolving integration construction evidence")
-        return ConstructionEvidenceInputs(
+        return create_portfolio_value(
+            "ConstructionEvidenceInputs",
             account_snapshot=account,
             market_dataset=market,
             analytics_evidence=analytics,
@@ -127,25 +130,33 @@ def test_construction_workflow_validates_builds_persists_and_audits(
         return portfolio_now
 
     store = FakePortfolioStore()
-    service = PortfolioWorkflowService(
-        portfolio_settings,
-        PortfolioRepository(store),
-        PortfolioWorkflowDependencies(
-            strategy_reference_source=strategy_source,
-            eligibility_decision_source=eligibility_source,
-            construction_evidence_source=evidence_source,
-            simulation_runner=_unused,
-            risk_reviewer=_unused,
-            risk_budget_activator=_activator,
-            kill_switch_source=kill_switch_source,
-            trading_executor=_unused,
-            trading_execution_source=_unused,
-            analytics_measurer=_unused,
-            audit_persister=audit_persist,
-            clock=clock,
-        ),
+    repository = create_portfolio_handle("PortfolioRepository", store)
+    dependencies = create_portfolio_handle(
+        "PortfolioWorkflowDependencies",
+        strategy_reference_source=strategy_source,
+        eligibility_decision_source=eligibility_source,
+        construction_evidence_source=evidence_source,
+        simulation_runner=_unused,
+        risk_reviewer=_unused,
+        risk_budget_activator=_activator,
+        kill_switch_source=kill_switch_source,
+        trading_executor=_unused,
+        trading_execution_source=_unused,
+        analytics_measurer=_unused,
+        audit_persister=audit_persist,
+        clock=clock,
     )
-    result, evidence = service.construct(request)
+    service = create_portfolio_handle(
+        "PortfolioWorkflowService",
+        portfolio_settings,
+        repository,
+        dependencies,
+    )
+    result, evidence = execute_portfolio_handle_operation(
+        service,
+        "construct",
+        request,
+    )
     assert store.constructions[result.result_id] is result
     assert evidence.request is request
     assert result.component_weights[0].capital_weight == Decimal("0.5")

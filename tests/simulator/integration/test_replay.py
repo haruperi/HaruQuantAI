@@ -4,12 +4,12 @@
 from pathlib import Path
 
 from app.services.simulator import (
-    JournalEvent,
+    get_simulation_value_field,
     replay_journal,
     run_backtest,
     unwrap_simulation_response,
 )
-from app.utils import logger
+from app.utils import get_logger
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
     _auth,
@@ -17,12 +17,19 @@ from tests.simulator.unit.test_orchestrator import (
     _request,
 )
 
+logger = get_logger(__name__)
 
-def _count_events(state: object, event: JournalEvent) -> dict[str, object]:
+
+def _count_events(state: object, event: object) -> dict[str, object]:
     """Reduce replay evidence to its deterministic event count."""
     logger.debug("Reducing one official journal event during replay")
     del state
-    return {"events": event.sequence + 1, "last_type": event.event_type}
+    sequence = get_simulation_value_field(event, "sequence")
+    assert isinstance(sequence, int)
+    return {
+        "events": sequence + 1,
+        "last_type": get_simulation_value_field(event, "event_type"),
+    }
 
 
 def test_completed_run_replays_to_terminal_state(tmp_path: Path) -> None:

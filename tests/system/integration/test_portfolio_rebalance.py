@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
 import pytest
-from app.services.portfolio.config import PortfolioSettings
-from app.services.portfolio.contracts import ActivePortfolioAllocation
-from app.utils import logger
+from app.utils import get_logger
 
 from tests.portfolio import conftest as portfolio_fixtures
 from tests.portfolio.integration import (
@@ -19,6 +18,9 @@ construction_result = portfolio_fixtures.construction_result
 portfolio_settings = portfolio_fixtures.portfolio_settings
 portfolio_now = portfolio_fixtures.portfolio_now
 run_rebalance_chain = rebalance_workflow.test_rebalance_chain_preserves_risk_trading_and_analytics_ownership
+ActivePortfolioAllocation = Any
+PortfolioSettings = Any
+logger = get_logger(__name__)
 
 
 @pytest.fixture

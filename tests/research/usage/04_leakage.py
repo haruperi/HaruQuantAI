@@ -12,7 +12,7 @@ import pandas as pd
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.research.leakage import (
+from app.services.research import (
     enforce_time_split,
     mask_research_artifact,
     validate_no_lookahead_features,

@@ -2,8 +2,10 @@
 
 # ruff: noqa: INP001
 from app.services.analytics import calculate_benchmark_evidence
-from app.utils import logger
-from tests.analytics._support import _configured_result, unwrap
+from app.utils import get_logger
+
+logger = get_logger(__name__)
+from tests.analytics._support import _configured_result, unwrap  # noqa: E402
 
 
 def test_benchmark_alignment_is_utc_and_window_bounded() -> None:

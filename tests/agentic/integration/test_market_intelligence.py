@@ -152,7 +152,15 @@ class _RealFundamentalPort:
             "reasons": ",".join(decision.reasons),
         }
 
-    def get_fundamental_projection(self, instrument, asset_class, model, decision_time):
+    def get_fundamental_projection(
+        self,
+        instrument,
+        asset_class,
+        model,
+        required_kinds,
+        decision_time,
+    ):
+        assert required_kinds
         self.calls.append(
             f"evidence:{instrument}:{asset_class}:{model}:{decision_time}"
         )

@@ -248,23 +248,27 @@
   and durable policy, historical/reference/context/FX access, deterministic
   transforms/alignment, synthetic generators, quality validation, recoverable
   scheduler jobs, internal feed status, immutable backup/restore manifests,
-  licence-aware retention enforcement, and 207 explicitly declared package-root
-  public names across fifteen focused features.
+  licence-aware retention enforcement, and a function-only package-root public
+  boundary across sixteen focused features.
   Retrieval and reference exports accept either their typed request or direct keyword
   arguments; standalone calls lazily compose MT5 read-only source, identity,
   migration, and calendar dependencies through the existing Brokers and Data
   boundaries. Explicit source/adapter injection remains supported.
   Its existing package-local architecture and repository-wide package-root consumer
-  boundary are implemented and verified. Data status is now `Partial`: the fifteen
-  current features remain completed, while `FEAT-DATA-16` point-in-time licensed
-  research-source evidence is documented and `Missing` for future Agentic
-  fundamental/sentiment activation.
+  boundary are implemented and verified. Data status is `Completed`, including
+  `FEAT-DATA-11` licensed bounded Firecrawl calendar acquisition verified against
+  all four declared portals, exact provider-value normalization, symbol-scoped
+  restriction evidence, and approved-root/SQLite persistence, plus
+  `FEAT-DATA-16` point-in-time licensed source documents, structured observations,
+  immutable revisions, verified-source manifests, and bounded projections for
+  Research consumption.
   `CAP-DATA-028` locates the behavior in
-  fifteen approved capabilities: `contracts/`, `market_data/`,
+  sixteen approved capabilities: `contracts/`, `market_data/`,
   `local_datasets/`, `synthetic_data/`, `tick_derivation/`, `persistence/`,
   `quality/`, `transformation/`, `time_sessions/`, `sources/`,
-  `economic_calendar/`, `realtime_feeds/`, `data_jobs/`, `evidence/`, and `audit/`.
-  Exactly fifteen numbered standalone usage programs cover those owners, and removed
+  `economic_calendar/`, `realtime_feeds/`, `data_jobs/`, `evidence/`, `audit/`, and
+  `research_sources/`. Exactly sixteen numbered standalone usage programs cover
+  those owners, and removed
   horizontal packages have no compatibility shims. The correction changes ownership
   and file focus only; active requirements, public behaviour, contract versions,
   schema identifiers, error codes, and the explicit package-root API remain

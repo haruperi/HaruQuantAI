@@ -59,7 +59,9 @@ def run_unsupervised_research(
     descriptive = insights.get("descriptive")
     pca = insights.get("pca")
     if not isinstance(descriptive, Mapping) or not isinstance(pca, Mapping):
-        raise ValueError("RES_INPUT_INVALID", "INVALID_INSIGHT_REPORT")
+        raise ValueError(  # noqa: TRY004 - Research validation taxonomy.
+            "RES_INPUT_INVALID", "INVALID_INSIGHT_REPORT"
+        )
     warnings: list[ResearchWarning] = []
     if not insights.get("pca"):
         warnings.append(

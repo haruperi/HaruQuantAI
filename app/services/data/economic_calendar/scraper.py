@@ -2,8 +2,10 @@
 
 Network access is supplied by an injected `CalendarTransport`, following the same
 injected-dependency pattern as `MarketContextProvider` and `FXRateProvider`. That
-keeps parsing, cleaning, validation, and persistence deterministically testable and
-keeps Data free of an embedded HTTP client.
+keeps parsing, cleaning, validation, and persistence deterministically testable.
+The package ships one licensed production transport in
+`economic_calendar/firecrawl_transport.py`; tests continue to inject deterministic
+transports, and without any declared transport the pipeline fails closed.
 """
 
 from __future__ import annotations
@@ -440,6 +442,24 @@ def deserialize_scrape_result(payload: bytes) -> ScrapeResult:
     return ScrapeResult.deserialize(payload)
 
 
+def get_calendar_value_field(value: object, field: str) -> object:
+    """Return one approved public field from an economic-calendar value.
+
+    Args:
+        value: Opaque calendar contract returned by the Data package root.
+        field: Non-private field name.
+
+    Returns:
+        Detached or immutable field value.
+
+    Raises:
+        ValueError: If the field is private or unavailable.
+    """
+    if not field or field.startswith("_") or not hasattr(value, field):
+        raise ValueError("Economic-calendar value does not expose the field")
+    return getattr(value, field)
+
+
 __all__ = [
     "CALENDAR_SITES",
     "CalendarEvent",
@@ -447,6 +467,7 @@ __all__ = [
     "ScrapeOptions",
     "ScrapeResult",
     "deserialize_scrape_result",
+    "get_calendar_value_field",
     "save_scrape_result",
     "scrape_economic_calendar",
     "scrape_result_to_dataframe",

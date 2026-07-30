@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.portfolio.config import PortfolioSettings
+from app.services.portfolio._settings import PortfolioSettings
 from app.services.portfolio.contracts import (
     ActivePortfolioAllocation,
     PortfolioRebalancePlan,
@@ -22,7 +22,9 @@ from app.services.risk import (
     create_strategy_operational_eligibility_decision,
     get_decision_state,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 AllocationRiskDecision = object
@@ -109,9 +111,17 @@ def _eligibility(now: datetime) -> dict[str, StrategyOperationalEligibilityDecis
     return {
         f"component-{suffix}": create_strategy_operational_eligibility_decision(
             decision_id=f"eligibility-{suffix}",
+            strategy_id=f"strategy-{suffix}",
+            strategy_version="1.0.0",
+            scope={"environment": "simulation"},
             state=get_decision_state("APPROVE"),
+            conditions=(),
+            policy_version="risk-policy-1",
+            evidence_refs={"strategy": suffix * 64},
+            issued_at=now,
             suspended=False,
             expires_at=now + timedelta(hours=1),
+            audit_ref=f"audit-{suffix}",
         )
         for suffix in ("a", "b")
     }

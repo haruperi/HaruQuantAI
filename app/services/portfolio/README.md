@@ -86,7 +86,7 @@ Risk separately persists the authoritative risk-budget projection. Portfolio sto
 | 1     | `contracts/`, `state/`        | Domain schemas, enums, repositories, migrations              |
 | 2     | `evidence/`, `construction/`  | Validate inputs and deterministically construct candidates   |
 | 3     | `allocation/`, `rebalancing/` | Govern activation, versions, drift, and rebalance plans      |
-| 4     | `orchestration/`, `api.py`    | Coordinate receiver-owned requests and expose the public API |
+| 4     | `orchestration/`, `api/`      | Coordinate receiver-owned requests behind the root function API |
 
 ### Package capability map
 
@@ -119,14 +119,22 @@ flowchart TD
 | Completed | `FEAT-PORT-07` Cross-Domain Workflow Coordination  | `orchestration/` | Exact declarations: Section 4.7                         | Section 4.7 functional requirements | `tests/portfolio/usage/08_orchestration.py` |
 | Completed | `FEAT-PORT-08` Public Portfolio API                | `api/`           | Exact declarations and package API: Section 4.8         | Section 4.8 functional requirements | `tests/portfolio/usage/04_lifecycle.py`     |
 
+The package root, `app.services.portfolio`, is the sole public import boundary.
+Its `__all__` contains standalone functions only. Contract values and stateful
+services are opaque: callers construct them with `create_portfolio_value()` or
+`create_portfolio_handle()`, inspect values with `get_portfolio_value_field()` or
+`dump_portfolio_value()`, and invoke an allow-listed handle operation with
+`execute_portfolio_handle_operation()`. Internal classes, constants, protocols,
+enums, settings models, error classes, and subpackage exports are not public.
+
 ```text
 app/services/portfolio/
 ├── __init__.py
 ├── README.md
-├── exceptions.py
-├── config.py
+├── _settings.py
 ├── contracts/
 │   ├── __init__.py
+│   ├── errors.py
 │   ├── requests.py
 │   ├── results.py
 │   └── allocations.py
@@ -152,6 +160,7 @@ app/services/portfolio/
 │   └── workflows.py
 └── api/
     ├── __init__.py
+    ├── factories.py
     └── service.py
 ```
 
@@ -159,7 +168,7 @@ app/services/portfolio/
 
 ```mermaid
 flowchart TD
-    API["api.py"] --> WF["orchestration/workflows.py"]
+    API["api/"] --> WF["orchestration/workflows.py"]
     WF --> EV["evidence/validator.py"]
     WF --> CS["construction/service.py"]
     WF --> AS["allocation/service.py"]
@@ -176,7 +185,8 @@ flowchart TD
 ### Structure rules
 
 - Dependencies point downward; contracts and state never import orchestration or API modules.
-- Cross-domain imports use documented public APIs or owner modules, never deep implementation paths.
+- Every external consumer imports only standalone functions from `app.services.portfolio`.
+- Cross-domain imports use each owner package root and never a deep implementation path.
 - No Risk, Simulation, Trading, Analytics, Data, or Strategy implementation object is stored in a Portfolio contract.
 - Every public function has explicit types and a Google-style docstring.
 - Portfolio calculations are deterministic for identical versioned inputs and explicit configuration.
@@ -186,9 +196,9 @@ flowchart TD
 
 Appendix P records the historical phase in which each stable seam was scheduled; it
 does not override dependency order. The complete domain is built exactly in this
-order: `exceptions.py` and `config.py`; `contracts/`; `evidence/`;
+order: `_settings.py` and `contracts/errors.py`; `contracts/`; `evidence/`;
 `construction/`; `state/`; `allocation/`; `rebalancing/`; `orchestration/`;
-`api.py`; package `__init__.py`. Exports are updated only after their implementation
+`api/`; package `__init__.py`. Exports are updated only after their implementation
 exists.
 
 ## 3. Workflows
@@ -456,8 +466,8 @@ sequenceDiagram
 
 | Status    | File             | Responsibility                                                                         | Key exports                                                        | Dependencies                                                                                                                               |
 | --------- | ---------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Completed | `exceptions.py`  | Define the immutable Portfolio error catalogue and Utils-based structured domain error. | `PORTFOLIO_ERROR_CATALOG`, `PortfolioError`, `PortfolioErrorPayload` | **Standard library:** `dataclasses`, `time`, `types`, `typing`; **Required third-party:** None; **Local:** `app.utils` |
-| Completed | `config.py`      | Define required Portfolio-owned settings and the deterministic UTC rebalance schedule. | `PortfolioSettings`, `RebalanceSchedule`                           | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** `app.utils.AppSettings`; `exceptions.py` |
+| Completed | `contracts/errors.py` | Define the internal immutable Portfolio error catalogue and structured domain error. | Internal error types; public access uses catalogue/payload functions | **Standard library:** `dataclasses`, `time`, `types`, `typing`; **Required third-party:** None; **Local:** `app.utils` |
+| Completed | `_settings.py`   | Define internal Portfolio settings and the deterministic UTC rebalance schedule. | Internal settings values; public construction uses `create_portfolio_value` | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** `app.utils.AppSettings`; `contracts/errors.py` |
 | Completed | `requests.py`    | Validate the Portfolio-owned construction command.                                     | `PortfolioConstructionRequest`                                     | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** None                                     |
 | Completed | `results.py`     | Define immutable construction output.                                                  | `PortfolioConstructionResult`                                      | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** `requests.py` → identifiers              |
 | Completed | `allocations.py` | Define active allocation and rebalance-plan contracts.                                 | `ActivePortfolioAllocation`, `PortfolioRebalancePlan`              | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** `results.py` → result references         |
@@ -469,9 +479,9 @@ All Portfolio models use `ConfigDict(extra="forbid", frozen=True, strict=True,
 allow_inf_nan=False)`. Every timestamp is timezone-aware UTC. Every digest is
 lowercase SHA-256 hexadecimal. Decimal values are accepted only as `Decimal`, are
 finite, and serialize into canonical hash material as strings. Supporting value rows
-are public only from `app.services.portfolio.contracts`; the package root exports the
-four registered contracts plus Portfolio error types. Public bounded operations
-use Utils `StandardResponse[T]`; Portfolio DTOs remain the direct response data.
+remain internal. External callers create and inspect registered opaque values through
+the package-root factory, getter, predicate, and dump functions. Governed application
+operations use Utils `StandardResponse[T]`; Portfolio DTOs remain direct response data.
 
 | Model                          | Exact fields                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -497,7 +507,8 @@ before hashing.
 No defaults. `PortfolioSettings` inherits `app.utils.AppSettings`; every field below
 is required and validated before a service is constructed. `PORTFOLIO_REBALANCE_SCHEDULE`
 is a `RebalanceSchedule(anchor_at: UTC datetime, interval_seconds: positive int)`.
-Schema versions and IDs are the only constants with defaults.
+Schema versions and IDs are the only constants with defaults. These values are
+internal and are created or inspected only through package-root functions.
 
 | ID          | Requirement                                                                                | Verification        |
 | ----------- | ------------------------------------------------------------------------------------------ | ------------------- |
@@ -647,8 +658,8 @@ a new approved Trading receiver contract.
 
 | Status    | File           | Responsibility                                 | Key exports                | Dependencies                                                                                                                                                                                                                                                |
 | --------- | -------------- | ---------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Completed | `workflows.py` | Implement `WF-PORT-001` through `WF-PORT-007`. | `PortfolioWorkflowService` | **Standard library:** `collections.abc`, `dataclasses`, `datetime`, `decimal`, `hashlib`, `typing`; **Required third-party:** None; **Local:** Portfolio feature APIs; Analytics, Data, Risk, Simulation, Strategy, Trading, and Utils public contracts |
-| Completed | `__init__.py`  | Expose workflow coordination API.              | `PortfolioWorkflowService` | **Standard library:** None; **Required third-party:** None; **Local:** `workflows.py`                                                                                                                                                                   |
+| Completed | `workflows.py` | Implement `WF-PORT-001` through `WF-PORT-007`. | Internal `PortfolioWorkflowService` | **Standard library:** `collections.abc`, `dataclasses`, `datetime`, `decimal`, `hashlib`, `typing`; **Required third-party:** None; **Local:** Portfolio feature APIs; Analytics, Data, Risk, Simulation, Strategy, Trading, and Utils package-root functions |
+| Completed | `__init__.py`  | Provide internal workflow composition exports. | Internal only | **Standard library:** None; **Required third-party:** None; **Local:** `workflows.py` |
 
 | ID          | Requirement                                                                                                                                                                                                              | Verification                   |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------ |
@@ -659,7 +670,9 @@ a new approved Trading receiver contract.
 | FR-PORT-029 | Never retry a potentially accepted mutation without receiver-provided idempotency semantics.                                                                                                                             | Failure tests                  |
 | FR-PORT-038 | After reconciled execution, request Analytics measurement from immutable Trading facts; preserve executed-but-unmeasured truth on Analytics failure and support deterministic recomputation without rewriting execution. | `SYS-WF-008` integration tests |
 
-`PortfolioWorkflowDependencies` is the only cross-domain composition bundle. It
+The internal `PortfolioWorkflowDependencies` value is the only cross-domain
+composition bundle. External composition creates it as an opaque handle through
+`create_portfolio_handle()`. It
 contains typed callables for Strategy reference resolution, Data evidence resolution,
 Simulation execution, Risk review and budget activation, Trading rebalance execution,
 Analytics measurement, audit persistence, and an injected UTC clock. Callables
@@ -674,8 +687,9 @@ never called again unless its owner contract explicitly declares idempotent repl
 
 | Status    | File           | Responsibility                                   | Key exports                             | Dependencies                                                                                                                                                                                             |
 | --------- | -------------- | ------------------------------------------------ | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Completed | `api/service.py` | Expose the typed Portfolio application boundary. | `PortfolioService`                      | **Standard library:** `collections.abc`, `datetime`, `decimal`, `typing`; **Required third-party:** None; **Local:** `orchestration.workflows`, Portfolio contracts, Risk and Utils public contracts |
-| Completed | `__init__.py`   | Expose supported package API only.               | `PortfolioService` and public contracts | **Standard library:** None; **Required third-party:** None; **Local:** `api/service.py`, `contracts`, `exceptions.py`                                                                                      |
+| Completed | `api/service.py` | Implement the typed application operations behind standalone wrappers. | Internal `PortfolioService` | **Standard library:** `collections.abc`, `datetime`, `decimal`, `typing`; **Required third-party:** None; **Local:** `orchestration.workflows`, Portfolio contracts, Risk and Utils package roots |
+| Completed | `api/factories.py` | Create/inspect opaque values and handles; expose catalogue/payload access. | Standalone factory/getter/predicate/dispatcher functions | **Standard library:** `collections.abc`, `dataclasses`, `inspect`, `types`, `typing`; **Required third-party:** `pydantic`; **Local:** Portfolio internals |
+| Completed | `__init__.py`   | Re-export the approved root function surface. | Standalone functions only | **Standard library:** None; **Required third-party:** None; **Local:** `api/service.py`, `api/factories.py` |
 
 | ID          | Requirement                                                                                 | Verification    |
 | ----------- | ------------------------------------------------------------------------------------------- | --------------- |
@@ -684,10 +698,12 @@ never called again unless its owner contract explicitly declares idempotent repl
 | FR-PORT-036 | Return Utils `StandardResponse[T]` envelopes; never `None` or raw exceptions cross the public boundary. | Contract tests |
 | FR-PORT-037 | Keep authentication and presentation logic outside Portfolio.                               | Import review   |
 
-`PortfolioService` exposes typed `construct`, `status`, `activate`, `assess_drift`,
-`submit_rebalance`, `recompute_measurement`, `rollback`, and `history` methods. Every
-governed method accepts `AuthContext` and `request_id: str | None = None`; a supplied
-request ID must equal any ID carried by the command. Every method returns
+The root functions `construct_portfolio`, `get_portfolio_status`,
+`activate_portfolio`, `assess_portfolio_drift`, `submit_portfolio_rebalance`,
+`recompute_portfolio_measurement`, `rollback_portfolio`, and
+`get_portfolio_history` delegate to an internal service handle. Every governed
+function accepts `AuthContext` and `request_id: str | None = None`; a supplied
+request ID must equal any ID carried by the command. Every function returns
 `StandardResponse[T]` with the raw Portfolio DTO directly in `data`, canonical
 trace identifiers in `metadata`, and known domain/dependency failures mapped to
 the immutable Portfolio error catalogue. `PortfolioError.to_payload` returns
@@ -705,17 +721,45 @@ the immutable Portfolio error catalogue. `PortfolioError.to_payload` returns
 | `history` | `StandardResponse[tuple[ActivePortfolioAllocation, ...]]` |
 | `PortfolioError.to_payload` | `StandardResponse[PortfolioErrorPayload]` |
 
+#### Exact package-root public API
+
+| Category | Standalone functions |
+| --- | --- |
+| Governed application operations | `construct_portfolio`, `get_portfolio_status`, `activate_portfolio`, `assess_portfolio_drift`, `submit_portfolio_rebalance`, `recompute_portfolio_measurement`, `rollback_portfolio`, `get_portfolio_history` |
+| Opaque values and handles | `create_portfolio_value`, `dump_portfolio_value`, `get_portfolio_value_field`, `is_portfolio_value`, `create_portfolio_handle`, `execute_portfolio_handle_operation`, `is_portfolio_handle` |
+| Evidence and deterministic reports | `validate_construction_evidence`, `assess_common_mode_exposure`, `measure_cross_account_correlation` |
+| Errors and migrations | `get_portfolio_error_catalog`, `to_portfolio_error_payload`, `get_portfolio_migrations` |
+
+Registered value names are `ActivePortfolioAllocation`,
+`CommonModeExposureReport`, `ConstructionEvidenceInputs`,
+`CrossAccountCorrelationReport`, `DriftObservation`, `EvidenceReferenceSet`,
+`FixedWeightInput`, `PortfolioComponentWeight`, `PortfolioConstructionRequest`,
+`PortfolioConstructionResult`, `PortfolioRebalanceAction`,
+`PortfolioRebalancePlan`, `PortfolioReviewResult`, `PortfolioSettings`,
+`RebalanceSchedule`, `StrategyAllocationRef`, and
+`ValidatedConstructionEvidence`. Registered handle names are
+`AllocationService`, `ConstructionService`, `PortfolioRepository`,
+`PortfolioService`, `PortfolioWorkflowDependencies`,
+`PortfolioWorkflowService`, and `RebalancingService`. Names register opaque
+construction only; none of the named classes is a public import.
+
 ### Feature usage examples
 
 ```python
-from app.services.portfolio import PortfolioService
-from app.services.portfolio.contracts import PortfolioConstructionRequest
+from app.services.portfolio import (
+    construct_portfolio,
+    create_portfolio_value,
+)
 
-request = PortfolioConstructionRequest(
-    contract_version="v1",
+request = create_portfolio_value(
+    "PortfolioConstructionRequest",
     # All strategy, eligibility, evidence, method, limit, and trace fields are explicit.
 )
-result = portfolio_service.construct(request=request, auth_context=auth_context)
+result = construct_portfolio(
+    portfolio_service,
+    request=request,
+    auth_context=auth_context,
+)
 ```
 
 The concrete constructor fields are intentionally not invented here; implementation must match the ratified `v1` schema in `docs/PROJECT.md` and this README.
@@ -822,7 +866,7 @@ uv run mypy app/services/portfolio
 - [x] Risk owns approval and authoritative budgets. `app/services/portfolio/orchestration/workflows.py:426`
 - [x] Trading remains the sole execution authority. `app/services/portfolio/orchestration/workflows.py:981`
 - [x] Activation, rollback, and rebalance semantics match Sections 3–5 and `docs/PROJECT.md`. `tests/system/integration/test_portfolio_activation.py:25`
-- [x] No hidden numeric defaults or live side effects exist. `app/services/portfolio/config.py:80`
+- [x] No hidden numeric defaults or live side effects exist. `app/services/portfolio/_settings.py:80`
 - [x] Targeted tests, Ruff, formatting, mypy, and 80% coverage pass. `tests/portfolio/unit/test_api_and_quality.py:188`
 - [x] Service status is updated from `Missing` only when evidence supports it. `app/services/portfolio/README.md:7`
 
@@ -846,7 +890,7 @@ These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`
 | -------------- | --------------------------------------- | ----------- | ------------------------------------------------------ |
 | `P-PORT-001`   | `app/services/portfolio/contracts/`     | 1           | `contracts` module + its `FR-PORT-*` behavior (§4)     |
 | `P-PORT-003`   | `app/services/portfolio/construction/`  | 1           | `construction` module + its `FR-PORT-*` behavior (§4)  |
-| `P-PORT-008`   | `app/services/portfolio/api.py`         | 1           | `api` module + its `FR-PORT-*` behavior (§4)           |
+| `P-PORT-008`   | `app/services/portfolio/api/`           | 1           | `api` module + its `FR-PORT-*` behavior (§4)           |
 | `P-PORT-002`   | `app/services/portfolio/evidence/`      | 9           | `evidence` module + its `FR-PORT-*` behavior (§4)      |
 | `P-PORT-004`   | `app/services/portfolio/state/`         | 9           | `state` module + its `FR-PORT-*` behavior (§4)         |
 | `P-PORT-005`   | `app/services/portfolio/allocation/`    | 9           | `allocation` module + its `FR-PORT-*` behavior (§4)    |

@@ -174,7 +174,7 @@ def _available_quantity(
     """
     logger.debug("Resolving Simulation tick liquidity")
     if profile.liquidity_mode == "unbounded":
-        return intent.approved_volume
+        return Decimal(intent.approved_volume)
     if tick.volume is None or tick.volume_unit != intent.quantity_unit:
         raise SimulationError(
             "SIM_LIQUIDITY_UNAVAILABLE", "Compatible tick liquidity is unavailable"

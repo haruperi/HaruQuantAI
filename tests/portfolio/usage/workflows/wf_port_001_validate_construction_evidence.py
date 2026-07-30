@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.portfolio import execute_portfolio_handle_operation
 from tests.portfolio.usage.workflows._support import construction_workflow
 
 WORKFLOW_ID = "WF-PORT-001"
@@ -50,7 +51,9 @@ def main() -> None:
 
     # Stage 4 — Run the public fail-closed evidence validator workflow.
     _stage(4)
-    evidence = service.validate_construction(request)
+    evidence = execute_portfolio_handle_operation(
+        service, "validate_construction", request
+    )
 
     # Stage 5 — Return typed immutable evidence without publishing candidate state.
     _stage(5)

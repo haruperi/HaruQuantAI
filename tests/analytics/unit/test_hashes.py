@@ -4,9 +4,11 @@ from decimal import Decimal
 
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.reports.hashes import compute_reproducibility_hashes
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics.unit.test_results_adapter import _config, _source
+logger = get_logger(__name__)
+
+from tests.analytics.unit.test_results_adapter import _config, _source  # noqa: E402
 
 
 def test_hashes_change_only_for_material_input() -> None:

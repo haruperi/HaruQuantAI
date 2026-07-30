@@ -7,18 +7,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.optimization.execution import execute_candidate
-from app.services.optimization.search import run_bounded_search
-from app.services.optimization.validation import (
+from app.services.optimization import (
     build_time_series_splits,
+    execute_candidate,
+    run_bounded_search,
     run_walk_forward_validation,
 )
-from tests.optimization.unit.test_adapter import FakeAdapter
-from tests.optimization.unit.test_execution_contracts import execution_request
-from tests.optimization.unit.test_validation_contracts import walk_forward_request
-from tests.optimization.usage.workflows._support import (
-    live_market_dataset,
-    live_search_request,
+from app.utils import flush_logging
+from tests.optimization.usage._support import (
+    genuine_execution_bundle,
+    walk_forward_request,
 )
 
 WORKFLOW_ID = "WF-OPT-SEC"
@@ -34,6 +32,8 @@ STAGES = (
 def _stage(number: int) -> None:
     """Print one README-aligned workflow stage."""
     print(f"\n{'=' * 88}\nStage {number}/{len(STAGES)} — {STAGES[number - 1]}\n{'=' * 88}")
+
+
 # fmt: on
 
 
@@ -44,10 +44,8 @@ def main() -> None:
 
     # Stage 1 — Receive approved WalkForwardRequest, Simulation adapter, and MT5 Data provenance.
     _stage(1)
-    adapter = FakeAdapter()
-    request = walk_forward_request().model_copy(
-        update={"search": live_search_request(live_market_dataset())}
-    )
+    dataset, candidate_request, adapter = genuine_execution_bundle()
+    request = walk_forward_request(dataset)
 
     # Stage 2 — Build rolling or expanding UTC folds with purge and effective embargo.
     _stage(2)
@@ -57,7 +55,7 @@ def main() -> None:
     _stage(3)
     search = run_bounded_search(request.search, adapter)
     candidate = execute_candidate(
-        execution_request(),
+        candidate_request,
         adapter,
         deterministic_only=True,
     )
@@ -71,3 +69,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+    flush_logging()

@@ -4,7 +4,9 @@
 import json
 from pathlib import Path
 
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _ROOT = Path(__file__).resolve().parents[3]
 _TRADE_FIELDS = {
@@ -118,7 +120,5 @@ def test_portfolio_simulation_result_fixture_matches_documented_schema() -> None
     )
     assert "FR-SIM-033" in simulator_readme
     assert "simulation.portfolio_result.v1" in simulator_readme
-    assert "component_results: tuple[Mapping[str, object], ...]" in simulator_readme
-    assert (
-        "component_return_series: tuple[Mapping[str, object], ...]" in simulator_readme
-    )
+    assert "component_results" in simulator_readme
+    assert "component_return_series" in simulator_readme

@@ -7,10 +7,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.research import MarketStructureConfig
-from app.services.research.market_structure import (
+from app.services.research import (
     build_market_structure_profile,
     build_strategy_fit,
+    create_research_value,
     evaluate_market_structure_quality,
 )
 from tests.research.usage.workflows._support import limits, prepared_dataset
@@ -31,9 +31,10 @@ def _stage(number: int) -> None:
 # fmt: on
 
 
-def _config() -> MarketStructureConfig:
+def _config() -> object:
     """Return bounded market-structure configuration."""
-    return MarketStructureConfig(
+    return create_research_value(
+        "MarketStructureConfig",
         {
             "swing_window": 3,
             "atr_period": 5,

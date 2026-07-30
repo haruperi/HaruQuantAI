@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, Protocol, cast
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -34,11 +34,19 @@ logger = get_logger(__name__)
 
 type _KillSwitchTransition = Callable[
     [KillSwitchCommand, AuthContext, ApprovalAttestation | None],
-    KillSwitchState,
+    object,
 ]
 type _ReadinessSource = Callable[[AuthContext], Mapping[str, str]]
 type _AuditSource = Callable[[AuthContext, int], Sequence[Any]]
 type _EventSource = Callable[[AuthContext], Sequence[OperationalEvent]]
+
+
+class _RiskResponseView(Protocol):
+    """Structural view of one Risk standard response."""
+
+    status: str
+    data: object | None
+
 
 router = APIRouter(prefix="/api/operator", tags=["operator"])
 
@@ -309,7 +317,7 @@ def _apply_kill_switch(
             workflow_id=auth.workflow_id,
             correlation_id=auth.correlation_id,
         )
-        state = transition(command, auth, attestation)
+        state_or_response = transition(command, auth, attestation)
     except Exception as error:
         if not is_risk_domain_error(error):
             raise
@@ -318,6 +326,16 @@ def _apply_kill_switch(
             status_code=status.HTTP_409_CONFLICT,
             detail=error.risk_code.value,  # type: ignore[attr-defined]
         ) from error
+    if hasattr(state_or_response, "status"):
+        risk_response = cast("_RiskResponseView", state_or_response)
+        if risk_response.status != "success" or risk_response.data is None:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="RISK_KILL_SWITCH_UNAVAILABLE",
+            )
+        state = cast("Any", risk_response.data)
+    else:
+        state = cast("Any", state_or_response)
     if state.state != "active":
         return _OperatorKillSwitchResponse(state=state, alert=None, delivery=None)
     alert = build_kill_switch_activation_alert(state, auth)

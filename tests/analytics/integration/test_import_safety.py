@@ -6,7 +6,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _ROOT = Path(__file__).resolve().parents[3]
 

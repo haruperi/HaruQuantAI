@@ -1,9 +1,9 @@
 # Data
 
 > **Package:** `app/services/data`
-> **Status:** `Partial` — the existing fifteen-feature `CAP-DATA-028` baseline
-> remains completed; `FEAT-DATA-16` point-in-time research-source evidence is
-> documented and `Missing`. The implemented baseline retains the owner-approved focused
+> **Status:** `Completed` — the sixteen-feature `CAP-DATA-028` baseline,
+> including `FEAT-DATA-16` point-in-time research-source evidence, is implemented
+> and verified. The baseline retains the owner-approved focused
 > architecture: one registered capability equals one module folder and one standalone
 > usage program. Behaviour, the explicitly declared package-root public functions,
 > active requirement IDs,
@@ -14,7 +14,7 @@
 > migration are complete; production consumers outside this domain use only the
 > documented `app.services.data` package-root boundary. Specification parity,
 > standalone usage evidence, and the approved MT5 demo-provider validation pass.
-> **Last updated:** `2026-07-28`
+> **Last updated:** `2026-07-30`
 
 > This README is the package's **single source of truth** for requirements,
 > final structure, implementation sequence, progress, usage examples, and tests.
@@ -204,8 +204,8 @@ Package (Data domain)
 The following registry is the owner-approved target. It treats a feature as one
 cohesive capability, not as one public function. A feature may expose multiple
 operations when they serve the same actor outcome; each operation still implements
-one focused functional-requirement behaviour. The target contains fifteen registered
-capabilities: fourteen business features and one foundational contract capability.
+one focused functional-requirement behaviour. The target contains sixteen registered
+capabilities: fifteen business features and one foundational contract capability.
 
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
@@ -219,12 +219,12 @@ capabilities: fourteen business features and one foundational contract capabilit
 | Completed | `FEAT-DATA-08` Data Transformation and Resampling | `transformation/` | Resampling, tick aggregation, multi-timeframe alignment, and detached tabular projections | Section 4 transformation requirements, allocated to this owner | `tests/data/usage/08_transformation.py` |
 | Completed | `FEAT-DATA-09` Time and Session Handling | `time_sessions/` | Timeframe/schedule contracts, UTC policy, venue market hours, exchange/configured schedules, analytical named sessions, and gap classification | `FR-DATA-034`, `FR-DATA-117`–`FR-DATA-122` | `tests/data/usage/09_time_sessions.py` |
 | Completed | `FEAT-DATA-10` Data Source Governance | `sources/` | Source contracts/protocol, registry/composition, policy/promotion, adapters, licensing, and read-only proxy | Section 4 source-governance requirements, allocated to this owner | `tests/data/usage/10_sources.py` |
-| Pending | `FEAT-DATA-11` Economic Calendar | `economic_calendar/` | Raw scraper contracts, event normalization, storage, symbol queries, and restriction/state helpers exist, but no licensed real calendar transport is implemented | `FR-DATA-095`–`099`, `FR-DATA-123`–`129` | `tests/data/usage/11_economic_calendar.py` reports `SOURCE_UNAVAILABLE` and zero provider events |
+| Completed | `FEAT-DATA-11` Economic Calendar | `economic_calendar/` | Licensed Firecrawl acquisition, raw scraper contracts, exact-value normalization, approved persistence, symbol queries, and restriction/state evidence through function-only package-root operations | `FR-DATA-095`–`099`, `FR-DATA-123`–`129` | `tests/data/usage/11_economic_calendar.py`; opt-in `tests/data/integration/test_economic_calendar_live.py` |
 | Completed | `FEAT-DATA-12` Real-Time Feed Lifecycle and Observability | `realtime_feeds/` | Feed contracts/state, buffer, heartbeat, reconnection, reconciliation, and status operations | Section 4 feed requirements, allocated to this owner | `tests/data/usage/12_realtime_feeds.py` |
 | Completed | `FEAT-DATA-13` Scheduler and Job Management | `data_jobs/` | Job/backfill/recovery contracts and create/start/stop/run/status/recovery operations | Section 4 job requirements, allocated to this owner | `tests/data/usage/13_data_jobs.py` |
 | Completed | `FEAT-DATA-14` Cross-Domain Evidence | `evidence/` | Market-context, FX-conversion, account-state, freshness contracts/providers, and public evidence operations | Section 4 normalized-evidence requirements, allocated to this owner | `tests/data/usage/14_evidence.py` |
 | Completed | `FEAT-DATA-15` Audit Evidence | `audit/` | Audit query/page/persistence contracts and authorized persist/query operations | Section 4 audit requirements, allocated to this owner | `tests/data/usage/15_audit.py` |
-| Missing | `FEAT-DATA-16` Point-in-Time Research Source Evidence | `research_sources/` | `ResearchSourceDocument`, `ResearchSourceRevision`, `ResearchSourceQuery`, `ResearchSourcePage`, `ingest_research_source`, `query_research_sources`; exact declarations: Section 9 | `FR-DATA-130`–`136` | `tests/data/usage/16_research_sources.py` |
+| Completed | `FEAT-DATA-16` Point-in-Time Research Source Evidence | `research_sources/` | Function-only root operations retrieve, normalize, persist, query, assess, inspect, and project opaque source documents, observations, and verification manifests; exact declarations: Section 9 | `FR-DATA-130`–`145` | `tests/data/usage/16_research_sources.py` |
 
 Private root files such as `_settings.py` and `_limits.py` may remain only for
 genuinely domain-wide infrastructure. They are not feature modules, expose no public
@@ -250,8 +250,8 @@ feature usages that consume them.
 | Status | Slice | Scope |
 |---|---|---|
 | Completed | `FEAT-DATA-01` Canonical Data Contracts | Canonical contract bases, request-boundary validation, records, dataset envelope, and stable errors now live in `contracts/`; all direct consumers were migrated without compatibility re-exports; `01_contracts.py` directly exercises the complete public feature surface. Evidence: `app/services/data/contracts/__init__.py:24`, `app/services/data/contracts/records.py:77`, `app/services/data/contracts/dataset.py:135`, `app/services/data/contracts/errors.py:341`, `tests/data/unit/test_import_graph.py:71`, `tests/data/usage/01_contracts.py:30`. |
-| Completed | `FEAT-DATA-02`–`FEAT-DATA-15` | Focused owners, consumers, tests, and all fourteen remaining usage programs are migrated; forbidden horizontal folders are absent and the complete Data gate passes. |
-| Missing | `FEAT-DATA-16` | Point-in-time research-source evidence is documented for future fundamental and sentiment consumers; no module, export, test, or usage evidence exists yet. |
+| Completed | `FEAT-DATA-02`–`FEAT-DATA-15` | Focused owners, consumers, tests, and all fourteen remaining usage programs are migrated; forbidden horizontal folders are absent and the complete Data gate passes. `FEAT-DATA-11` uses the owner-authorized licensed Firecrawl transport and was verified against all four declared calendar portals on 2026-07-30. |
+| Completed | `FEAT-DATA-16` | Point-in-time research-source evidence performs governed bounded HTTPS acquisition, immutable SQLite revision persistence, decision-time filtering, eligibility assessment, and detached projection through the Data package root. |
 
 The completed migration preserves contract versions, schema identifiers, error codes,
 validation behavior, and golden JSON schemas. The package root explicitly exports the
@@ -433,7 +433,7 @@ app/services/data/
 │   ├── __init__.py
 │   ├── store.py                        # Idempotent redacted AuditEvent persistence
 │   └── query.py                        # Authorized bounded cursor query
-├── research_sources/                   # FEAT-DATA-16 point-in-time research documents (Missing)
+├── research_sources/                   # FEAT-DATA-16 point-in-time research documents
 │   ├── __init__.py
 │   ├── contracts.py
 │   ├── policy.py
@@ -547,7 +547,7 @@ flowchart LR
 
 - **Focused Domain Architecture**: In `app/services/data`, every module folder inside the domain is dedicated to one Feature / capability only, every file inside a module folder is for one use case or focused responsibility only, and every class/function/method inside a file addresses one functional requirement behaviour at a time.
 - **Module folder names state the capability, not the mechanism.** A folder answers
-  "what can Data do", not "what technology does it use". The fifteen names in the
+  "what can Data do", not "what technology does it use". The sixteen names in the
   Feature Registry are the only production feature folders.
 - `contracts/` is the canonical shared contract core. Feature-owned contracts remain
   in their owning feature folders; removed horizontal `models/`, `errors/`, `limits/`,
@@ -2276,9 +2276,12 @@ Calendar scraping is a retrieval capability: it acquires a different data kind f
 different transport, but it is still acquisition. It is not a source adapter and is
 not registered in `sources/`.
 
-No licensed production transport exists in the repository. The package therefore
-fails closed with `SOURCE_UNAVAILABLE`; unit tests validate injected transport
-mechanics only and are not evidence of real calendar acquisition.
+The production transport sends bounded, uncached HTTPS requests through Firecrawl
+using the owner-confirmed written Fair Economy permission. It verifies the Firecrawl
+response host and JSON media type, enforces response and concurrency limits, and
+fails closed without configured credentials. Deterministic tests use injected
+fixtures; the standalone usage and opt-in live integration test provide real-source
+evidence without making default CI depend on external availability.
 
 ### Current inventory reference
 
@@ -2288,18 +2291,18 @@ See the authoritative current production-file inventory at the start of Section 
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Pending | `FR-DATA-095` | Scrape economic calendar events from multiple sites (ForexFactory, MetalsMine, EnergyExch, CryptoCraft) concurrently, using configurable concurrency (`max_parallel_tasks`) in `ScrapeOptions`. | `scrape_economic_calendar` | External network calls | `DataError[SOURCE_UNAVAILABLE\|NETWORK_ERROR\|TIMEOUT]` | **Usage:** `tests/data/usage/11_economic_calendar.py` reports no licensed transport<br>**Unit only:** `tests/data/unit/test_calendar_scraper.py::test_concurrency_limit_is_respected()` |
-| Pending | `FR-DATA-096` | Clean and validate real raw calendar data into structured records, filtering duplicates and bad values. | `scrape_economic_calendar` | None | `DataError[VALIDATION_FAILED]` | Blocked on `FR-DATA-095`; injected unit coverage is not real-provider evidence |
-| Pending | `FR-DATA-097` | Return a real scraped dataset as a pandas DataFrame. | `scrape_result_to_dataframe` | None | None | Blocked on `FR-DATA-095`; usage returns zero rows |
-| Pending | `FR-DATA-098` | Save non-empty real calendar dataframes using descriptive file names; skip empty frames. | `save_scrape_result` | Local file write | `DataError[INVALID_INPUT\|PERMISSION_DENIED\|DB_WRITE_FAILED]` | Blocked on `FR-DATA-095`; usage writes zero artifacts |
-| Pending | `FR-DATA-099` | Serialize and deserialize a real `ScrapeResult` for persistence and transport. | `serialize_scrape_result`, `deserialize_scrape_result` | None | None | Blocked on `FR-DATA-095`; only injected unit evidence exists |
-| Pending | `FR-DATA-123` | Normalize real provider events into immutable validated UTC event values while preserving exact decimals and source strings. | `build_economic_event`, `build_event_impact` | None | `ValueError`: invalid identity, UTC timestamp, code, or numeric value | Blocked on `FR-DATA-095`; only constructed/injected evidence exists |
-| Pending | `FR-DATA-124` | Retrieve normalized calendar events through a provider-neutral protocol while preserving raw values and stable provider IDs. | `build_calendar_scrape_provider` | Injected read-only transport | `DataError[VALIDATION_FAILED\|SOURCE_UNAVAILABLE\|NETWORK_ERROR]` | No licensed real provider transport exists |
-| Pending | `FR-DATA-125` | Resolve currency/country relevance profiles against real acquired events. | `get_symbol_event_profile` | None | `DataError[VALIDATION_FAILED]` | Profile logic exists; end-to-end usage is blocked on `FR-DATA-095` |
-| Pending | `FR-DATA-126` | Return real general or symbol-relevant normalized events under UTC and impact filters. | `get_economic_events`, `get_symbol_economic_events` | Provider read | `DataError[VALIDATION_FAILED\|SOURCE_UNAVAILABLE]` | Usage returns zero events because no real provider is available |
-| Pending | `FR-DATA-127` | Evaluate event blackout windows from real acquired events. | `evaluate_calendar_state`, `is_news_restricted`, `is_news_restricted_events` | Optional provider read | `DataError[VALIDATION_FAILED]`, `ValueError`: non-UTC instant | Deterministic logic exists; real end-to-end evidence is blocked on `FR-DATA-095` |
-| Pending | `FR-DATA-128` | Persist and query real acquired events with stable provider identity and refresh windows. | `build_economic_event_store`, `get_persisted_events` | Bounded SQLite reads/writes | `DataError[VALIDATION_FAILED\|DB_READ_FAILED\|DB_WRITE_FAILED]` | Store mechanics exist; usage persists no real events |
-| Pending | `FR-DATA-129` | Populate market-context calendar state and blackout provenance from real symbol-relevant events. | `derive_calendar_state`, `populate_market_context_calendar` | None | `DataError[VALIDATION_FAILED]` | Usage returns zero risk calendar evidence |
+| Completed | `FR-DATA-095` | Scrape economic calendar events from multiple sites (ForexFactory, MetalsMine, EnergyExch, CryptoCraft) concurrently, using configurable concurrency (`max_parallel_tasks`) in `ScrapeOptions`. | `build_firecrawl_calendar_transport`, `scrape_economic_calendar` | External network calls | `DataError[SOURCE_UNAVAILABLE\|NETWORK_ERROR\|TIMEOUT\|LIMIT_EXCEEDED]` | **Usage:** `tests/data/usage/11_economic_calendar.py` acquired all four sources<br>**Unit:** `tests/data/unit/test_calendar_scraper.py`, `tests/data/unit/test_firecrawl_transport.py`<br>**Live:** `tests/data/integration/test_economic_calendar_live.py` |
+| Completed | `FR-DATA-096` | Clean and validate real raw calendar data into structured records, filtering duplicates and bad values. | `scrape_economic_calendar` | None | `DataError[VALIDATION_FAILED]` | Usage projected bounded genuine provider rows with exact values and no duplicate source identity |
+| Completed | `FR-DATA-097` | Return a real scraped dataset as a pandas DataFrame. | `scrape_result_to_dataframe` | None | None | Usage displayed the fixed eight-column DataFrame populated from current provider data |
+| Completed | `FR-DATA-098` | Save non-empty real calendar dataframes using descriptive file names; skip empty frames. | `save_scrape_result` | Local file write | `DataError[INVALID_INPUT\|PERMISSION_DENIED\|DB_WRITE_FAILED]` | Usage wrote one non-empty approved-root CSV artifact per responding source |
+| Completed | `FR-DATA-099` | Serialize and deserialize a real `ScrapeResult` for persistence and transport. | `serialize_scrape_result`, `deserialize_scrape_result` | None | None | Usage verified the genuine row count after a trusted local round trip |
+| Completed | `FR-DATA-123` | Normalize real provider events into immutable validated UTC event values while preserving exact decimals and source strings. | `build_economic_event`, `build_event_impact`, `project_economic_event` | None | `ValueError`: invalid identity, UTC timestamp, code, or numeric value | Usage displayed exact normalized and raw values copied from genuine ForexFactory rows |
+| Completed | `FR-DATA-124` | Retrieve normalized calendar events through a provider-neutral protocol while preserving raw values and stable provider IDs. | `build_calendar_scrape_provider` | Licensed read-only transport | `DataError[VALIDATION_FAILED\|SOURCE_UNAVAILABLE\|NETWORK_ERROR]` | Usage retrieved normalized genuine rows through the provider-neutral API |
+| Completed | `FR-DATA-125` | Resolve currency/country relevance profiles against real acquired events. | `get_symbol_event_profile` | None | `DataError[VALIDATION_FAILED]` | Usage resolved EURUSD to EUR/USD and EU/US relevance and applied it to real rows |
+| Completed | `FR-DATA-126` | Return real general or symbol-relevant normalized events under UTC and impact filters. | `get_economic_events`, `get_symbol_economic_events` | Provider read | `DataError[VALIDATION_FAILED\|SOURCE_UNAVAILABLE]` | Usage returned both general and EURUSD-scoped genuine events |
+| Completed | `FR-DATA-127` | Evaluate event blackout windows from real acquired events. | `evaluate_calendar_state`, `is_news_restricted`, `is_news_restricted_events` | Optional provider read | `DataError[VALIDATION_FAILED]`, `ValueError`: non-UTC instant | Usage proved matching pure and provider-backed restriction verdicts at a genuine high-impact release |
+| Completed | `FR-DATA-128` | Persist and query real acquired events with stable provider identity and refresh windows. | `build_economic_event_store`, `persist_economic_events`, `get_persisted_events` | Bounded SQLite reads/writes | `DataError[VALIDATION_FAILED\|DB_READ_FAILED\|DB_WRITE_FAILED]` | Usage upserted genuine normalized rows and displayed the EURUSD-relevant read-back count |
+| Completed | `FR-DATA-129` | Populate market-context calendar state and blackout provenance from real symbol-relevant events. | `derive_calendar_state`, `project_calendar_state`, `populate_market_context_calendar` | None | `DataError[VALIDATION_FAILED]` | Usage displayed `event` state, blackout provenance, and a populated market context with no missing calendar field |
 
 ---
 
@@ -2456,7 +2459,7 @@ their owning manifests.
 
 ## 6. Open Decisions
 
-No unresolved owner decision blocks `CAP-DATA-028`. The owner approved the fifteen
+No unresolved owner decision blocks `CAP-DATA-028`. The owner approved the sixteen
 capabilities, their target module names, the current-to-target disposition, and the
 one-feature/one-folder/one-usage invariant on 2026-07-22. The package-root `__all__`
 is the sole public-boundary decision; submodule-only helpers remain internal.
@@ -2467,17 +2470,19 @@ is the sole public-boundary decision; submodule-only helpers remain internal.
 
 ### Test and usage locations
 
-The current inventory contains 44 focused unit files, 11 integration/workflow files,
-and exactly 15 directly executable usage programs. Unit tests may import internals;
+The focused inventory includes unit, integration/workflow, and exactly 16 directly
+executable feature usage programs. Unit tests may import internals;
 integration and usage evidence imports the Data domain through `app.services.data` only.
 
 - **Unit:** `test_account_state.py`, `test_api.py`, `test_audit.py`, `test_backfill.py`, `test_backup.py`, `test_base.py`, `test_broker_contract.py`, `test_calendar_scraper.py`, `test_contract_snapshot.py`, `test_dataset.py`, `test_errors.py`, `test_evidence_fx.py`, `test_evidence_market_context.py`, `test_external_source.py`, `test_feed_state_single_owner.py`, `test_feeds.py`, `test_file_io.py`, `test_focused_boundaries.py`, `test_gaps.py`, `test_historical_access.py`, `test_import_graph.py`, `test_licensing.py`, `test_limits.py`, `test_local_source.py`, `test_market_data_facade.py`, `test_persistence_cache.py`, `test_persistence_import_artifacts.py`, `test_persistence_isolation.py`, `test_persistence_locking.py`, `test_persistence_migrations.py`, `test_quality.py`, `test_records.py`, `test_reference_access.py`, `test_retrieval_sources.py`, `test_scheduler.py`, `test_source_composition.py`, `test_source_contract_identity.py`, `test_source_policy.py`, `test_source_registry.py`, `test_sqlite.py`, `test_synthetic.py`, `test_tabular.py`, `test_ticks.py`, `test_transformation.py`
-- **Integration/workflow:** `test_audit_event_handoff.py`, `test_broker_boundary.py`, `test_calendar.py`, `test_contract_boundaries.py`, `test_database_boundary.py`, `test_external_import.py`, `test_historical_retrieval.py`, `test_local_source_retrieval.py`, `test_locking_boundary.py`, `test_usage_scripts.py`, `test_workflow_runtime.py`
-- **Usage:** `01_contracts.py`, `02_market_data.py`, `03_local_datasets.py`, `04_synthetic_data.py`, `05_tick_derivation.py`, `06_persistence.py`, `07_quality.py`, `08_transformation.py`, `09_time_sessions.py`, `10_sources.py`, `11_economic_calendar.py`, `12_realtime_feeds.py`, `13_data_jobs.py`, `14_evidence.py`, `15_audit.py`
+- **Integration/workflow:** `test_audit_event_handoff.py`, `test_broker_boundary.py`, `test_calendar.py`, `test_contract_boundaries.py`, `test_database_boundary.py`, `test_external_import.py`, `test_historical_retrieval.py`, `test_local_source_retrieval.py`, `test_locking_boundary.py`, `test_research_source_persistence.py`, `test_usage_scripts.py`, `test_workflow_runtime.py`
+- **Usage:** `01_contracts.py`, `02_market_data.py`, `03_local_datasets.py`, `04_synthetic_data.py`, `05_tick_derivation.py`, `06_persistence.py`, `07_quality.py`, `08_transformation.py`, `09_time_sessions.py`, `10_sources.py`, `11_economic_calendar.py`, `12_realtime_feeds.py`, `13_data_jobs.py`, `14_evidence.py`, `15_audit.py`, `16_research_sources.py`
 
-Every one of the 84 canonical `FR-DATA-*` rows maps to exactly one `fr_data_NNN()`
+Every canonical `FR-DATA-*` row maps to direct usage and focused test evidence; the
+legacy feature programs retain their individual `fr_data_NNN()` demonstrations and
+FEAT-DATA-16 demonstrates its complete function-only surface as one genuine-source
 demonstration in its owning feature program. Every program defines `main()` and an
-`if __name__ == "__main__"` guard; all fifteen exited zero on 2026-07-23.
+`if __name__ == "__main__"` guard.
 
 ### Commands
 
@@ -2597,7 +2602,7 @@ This keeps requirements, dependency order, implementation, usage examples, tests
 and documentation aligned.
 ## 9. `research_sources/` — Point-in-Time Research Source Evidence
 
-**Status:** `Missing`
+**Status:** `Completed`
 
 This feature is the governed acquisition and persistence boundary required before
 Agentic fundamental or sentiment roles may activate. It owns licensed filing,
@@ -2606,10 +2611,29 @@ records. It does not interpret sentiment, fundamentals, strategy, or trading val
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-DATA-130` | Represent immutable research-source documents and revisions with source/license, asset/issuer/language scope, event/published/first-seen/available/retrieved UTC times, revision chain, original/normalized hashes, quality/trust/manipulation/injection labels, retention, and provenance. | `ResearchSourceDocument`; `ResearchSourceRevision` | None | `DataValidationError`: identity, time, source, revision, hash, policy, or provenance is invalid | **Usage:** `tests/data/usage/16_research_sources.py` |
-| Missing | `FR-DATA-131` | Validate a source policy covering licensing, permitted environments/uses, retention/deletion, geography, training use, rate limits, and source trust before acquisition. | `validate_research_source_policy(...)` | None | `DataPolicyError`: absent, expired, incompatible, or prohibited policy | **Usage:** `tests/data/usage/16_research_sources.py` |
-| Missing | `FR-DATA-132` | Ingest one source document idempotently, preserve original content outside Agentic context, normalize deterministically, create revision/deduplication evidence, and commit under the migration-ledger/write-lock transaction rules. | `ingest_research_source(...) -> ResearchSourceDocument` | Network read and transactional persistence | `DataSourceError`; `DataPersistenceError` | **Usage:** `tests/data/usage/16_research_sources.py` |
-| Missing | `FR-DATA-133` | Query only records available at or before a supplied decision time with asset, issuer, source, language, event-window, trust, license, and injection filters and deterministic pagination. | `query_research_sources(request: ResearchSourceQuery) -> ResearchSourcePage` | Database read | `DataValidationError`: query or eligibility is invalid | **Usage:** `tests/data/usage/16_research_sources.py` |
-| Missing | `FR-DATA-134` | Preserve conflicting sources and later corrections as distinct versions; never overwrite or silently merge source disagreement. | `link_research_source_revision(...)` | Transactional persistence | `DataPersistenceError`: revision linkage is invalid | **Usage:** `tests/data/usage/16_research_sources.py` |
-| Missing | `FR-DATA-135` | Mark unknown availability time, prohibited license, failed integrity, unresolved manipulation, or unsafe injection evidence ineligible for historical or Agentic consumption. | `assess_research_source_eligibility(...)` | None | None; returns typed ineligibility reasons | **Usage:** `tests/data/usage/16_research_sources.py` |
-| Missing | `FR-DATA-136` | Return bounded redacted detached evidence references to consumers; never expose provider credentials, unrestricted copyrighted payloads, or mutable provider objects. | `project_research_source_evidence(...)` | None | `DataValidationError`: scope, size, redaction, or contract is invalid | **Usage:** `tests/data/usage/16_research_sources.py` |
+| Completed | `FR-DATA-130` | Represent immutable research-source documents and revisions with source/license, asset/issuer/language scope, event/published/first-seen/available/retrieved UTC times, revision chain, original/normalized hashes, trust/manipulation/injection labels, retention, and provenance. | Internal source values constructed and inspected through `build_research_source_*`, `get_research_source_value_field`, and `is_research_source_value` | None | `DataError[INVALID_INPUT]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Unit:** `tests/data/unit/test_research_source_contracts.py` |
+| Completed | `FR-DATA-131` | Validate a source policy covering licensing, permitted environments/uses, retention, geography, training use, rate limits, and source trust before acquisition. | `validate_research_source_policy(...)` | None | `DataError[LICENSE_RESTRICTION\|INVALID_INPUT]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Unit:** `tests/data/unit/test_research_source_policy.py` |
+| Completed | `FR-DATA-132` | Ingest one source document idempotently, preserve original content outside Agentic context, normalize deterministically, create revision/deduplication evidence, and commit under the migration-ledger/write-lock transaction rules. | `ingest_research_source(...)` | Bounded HTTPS read and transactional persistence | `DataError[SOURCE_UNAVAILABLE\|LIMIT_EXCEEDED\|PERSISTENCE_FAILED]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Integration:** `tests/data/integration/test_research_source_persistence.py` |
+| Completed | `FR-DATA-133` | Query only records available at or before a supplied decision time with asset, issuer, source-kind, source-ID, language, trust, retention, and injection filters and deterministic pagination. | `query_research_sources(...)` | Database read | `DataError[INVALID_INPUT]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Unit:** `tests/data/unit/test_research_source_queries.py` |
+| Completed | `FR-DATA-134` | Preserve later corrections as distinct immutable versions linked by `previous_document_id`; never overwrite or silently merge revisions. | `ingest_research_source(...)` | Transactional persistence | `DataError[PERSISTENCE_FAILED]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Integration:** `tests/data/integration/test_research_source_persistence.py` |
+| Completed | `FR-DATA-135` | Mark not-yet-available, expired-retention, untrusted, unresolved-manipulation, or unsafe-injection evidence ineligible for historical or Agentic consumption. | `assess_research_source_eligibility(...)` | None | None; returns explicit ineligibility reasons | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Integration:** `tests/data/integration/test_research_source_persistence.py` |
+| Completed | `FR-DATA-136` | Return bounded detached evidence references to consumers; never expose provider credentials, unrestricted source payloads, or mutable provider objects. | `project_research_source_evidence(...)` | None | `DataError[INVALID_INPUT]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Integration:** `tests/data/integration/test_research_source_persistence.py` |
+| Completed | `FR-DATA-137` | Normalize bounded provider responses into governed source documents and structured observations without performing network access inside parsers. | `normalize_research_provider_payload(...)` | None | `DataError[INVALID_INPUT\|EMPTY_RESULT\|LIMIT_EXCEEDED]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Unit:** `tests/data/unit/test_research_source_providers.py` |
+| Completed | `FR-DATA-138` | Enforce exact HTTPS host allowlists, bounded response sizes, declared rate windows, and deterministic transport-circuit opening before provider normalization. | `retrieve_research_provider_payload(...)` | Bounded HTTPS read | `DataError[INVALID_INPUT\|SOURCE_UNAVAILABLE\|CIRCUIT_BREAKER_OPEN\|LIMIT_EXCEEDED]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Unit:** `tests/data/unit/test_research_source_transport.py` |
+| Completed | `FR-DATA-139` | Normalize SEC submissions, Companyfacts, and filing-directory metadata with filing accession, acceptance or conservative publication time, XBRL concept, period, unit, document locator, EX-99 classification, and amendment-lineage inputs. Transcript classification is metadata-only and remains partial. | `normalize_research_provider_payload("sec-edgar", ...)`; `normalize_research_provider_payload("sec-edgar-filing-index", ...)` | None | `DataError[INVALID_INPUT\|EMPTY_RESULT]` | **Unit:** `tests/data/unit/test_research_source_providers.py` |
+| Completed | `FR-DATA-140` | Normalize official BLS, BEA, EIA, Treasury Fiscal Data, and CFTC COT observations conservatively at provider publication time when verified or first observation time otherwise. | `normalize_research_provider_payload(...)` | None | `DataError[INVALID_INPUT\|EMPTY_RESULT]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Unit:** `tests/data/unit/test_research_source_providers.py` |
+| Completed | `FR-DATA-141` | Normalize GDELT article discovery as headline and publisher metadata only; do not retrieve or persist publisher article bodies. | `normalize_research_provider_payload("gdelt", ...)` | None | `DataError[INVALID_INPUT\|EMPTY_RESULT]` | **Unit:** `tests/data/unit/test_research_source_providers.py` |
+| Completed | `FR-DATA-142` | Normalize official USDA NASS agricultural estimates without inferring unsupported commodity conclusions. | `normalize_research_provider_payload("usda-nass", ...)` | None | `DataError[INVALID_INPUT\|EMPTY_RESULT]` | **Unit:** `tests/data/unit/test_research_source_providers.py` |
+| Completed | `FR-DATA-143` | Persist verified-source manifests with provider identity, parser version, verification time, external record identity, fixture hash, environments, and license policy. | `build_verified_research_source(...)`, `persist_verified_research_source(...)` | Transactional persistence | `DataError[PERSISTENCE_FAILED\|INVALID_INPUT]` | **Usage:** `tests/data/usage/16_research_sources.py` |
+| Completed | `FR-DATA-144` | Persist normalized provider documents and structured values as immutable point-in-time revisions; corrections create linked revisions and historical queries admit only evidence available by decision time. | `persist_research_provider_records(...)`, `persist_research_source_observations(...)`, `query_research_source_observations(...)` | Transactional persistence/read | `DataError[PERSISTENCE_FAILED\|INVALID_INPUT\|LIMIT_EXCEEDED]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Integration:** `tests/data/integration/test_research_source_observations.py` |
+| Completed | `FR-DATA-145` | Project bounded structured observation evidence without unrestricted provider payloads, credentials, or mutable provider objects. | `project_research_source_observation(...)` | None | `DataError[INVALID_INPUT]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Integration:** `tests/data/integration/test_research_source_observations.py` |
+
+Provider coverage is deliberately governed rather than inferred from public
+availability. SEC EDGAR, BLS, BEA, EIA, Treasury Fiscal Data, CFTC COT, GDELT
+headline metadata, and USDA NASS have deterministic parsers. Live access remains
+opt-in and may require a compliant identifying user agent or provider-issued free
+key. FRED/ALFRED and Reddit are prohibited. FINRA short-sale volume is blocked
+pending commercial-use rights confirmation. Bluesky Jetstream is excluded because
+its events are not self-authenticating and its operator documentation does not
+recommend it for research evidence. Transcript coverage remains limited to
+official SEC or explicitly approved issuer-hosted material.

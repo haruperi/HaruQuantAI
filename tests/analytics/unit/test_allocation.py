@@ -9,9 +9,11 @@ from app.services.analytics.reports.allocation import (
     build_portfolio_allocation_evidence,
     build_portfolio_rebalance_measurement,
 )
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics._support import (
+logger = get_logger(__name__)
+
+from tests.analytics._support import (  # noqa: E402
     _measurement_request,
     _portfolio_simulation_result,
     _report,

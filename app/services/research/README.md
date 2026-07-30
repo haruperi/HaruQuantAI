@@ -1,10 +1,10 @@
 # Research
 
 > **Package:** `app/services/research`
-> **Status:** `Partial` — the existing twelve features remain completed;
-> `FEAT-RES-13` fundamental and sentiment source evidence is documented and
-> `Missing`.
-> **Last updated:** `2026-07-28`
+> **Status:** `Completed` — all thirteen registered features, including
+> `FEAT-RES-13` fundamental and sentiment source evidence, are implemented and
+> verified.
+> **Last updated:** `2026-07-30`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -36,6 +36,8 @@ database infrastructure, and strategy registration remain outside this package.
 - Deterministic PCA/K-Means evidence and unsupervised insight generation.
 - Deterministic scorecards, profile snapshots, report rendering, and comparisons.
 - Research artifact schemas, migration definitions, and safe masked artifact persistence.
+- Bounded fundamental and deterministic sentiment evidence projected from eligible,
+  point-in-time Data source records, with explicit applicability and missingness.
 - `ResearchReport v1` and the explicit classified Research public API.
 
 ### Does not own
@@ -205,7 +207,7 @@ Folders and files are ordered from lowest dependency to highest dependency; this
 
 ### Feature Registry
 
-All twelve registered features are `Completed` with focused unit and integration
+All thirteen registered features are `Completed` with focused unit and integration
 tests, one standalone usage program per feature, repository-wide type checking,
 and at least 80% domain coverage. `run_edge_lab_profile` composes all ten
 configured in-memory stages in canonical dependency order while provider reads,
@@ -226,11 +228,11 @@ remain external.
 | Completed | `FEAT-RES-10` Deterministic Unsupervised Insights | `modeling/` | Implemented declarations: Section 4.10 | Section 4.10 functional requirements | `tests/research/usage/10_modeling.py` |
 | Completed | `FEAT-RES-11` Scorecards, Snapshots, and Edge Lab Profiles | `profiles/` | Implemented declarations: Section 4.11 | `FR-RES-089`–`096` | `tests/research/usage/11_profiles.py` |
 | Completed | `FEAT-RES-12` Safe Research Artifact Persistence | `artifacts/` | Implemented declarations: Section 4.12 | Section 4.12 functional requirements | `tests/research/usage/12_artifacts.py` |
-| Missing | `FEAT-RES-13` Fundamental and Sentiment Source Evidence | `intelligence/` | `FundamentalSourceEvidence`, `SentimentSourceEvidence`, `build_fundamental_source_evidence`, `build_sentiment_source_evidence` | `FR-RES-099`–`104` | `tests/research/usage/13_intelligence.py` |
+| Completed | `FEAT-RES-13` Fundamental and Sentiment Source Evidence | `intelligence/` | `assess_intelligence_applicability`, `build_fundamental_source_evidence`, `build_sentiment_source_evidence`, `project_intelligence_evidence`; internal evidence values remain opaque | `FR-RES-099`–`104` | `tests/research/usage/13_intelligence.py` |
 
 ```text
 research/
-├── __init__.py                         # Explicit classified lazy domain API only
+├── __init__.py                         # Explicit function-only domain API
 ├── README.md
 ├── contracts/                          # Versioned configurations and result contracts
 │   ├── __init__.py
@@ -290,7 +292,7 @@ research/
 ├── artifacts/                          # Safe masked artifact persistence
 │   ├── __init__.py
 │   └── persistence.py
-└── intelligence/                       # FEAT-RES-13 fundamental/sentiment evidence (Missing)
+└── intelligence/                       # FEAT-RES-13 fundamental/sentiment evidence
     ├── __init__.py
     ├── contracts.py
     └── evidence.py
@@ -379,7 +381,7 @@ flowchart LR
 - Files contain one focused responsibility and expose only symbols listed in Section 4.
 - Common Indicators and Analytics calculations are imported through documented owning-domain APIs; no compatibility re-exports exist.
 - Incremental feature computation, provider adapters, cluster signal adaptation, console printing, generic helpers/services/managers, and database orchestration are absent.
-- Module `__init__.py` files expose only their approved feature APIs; package `__init__.py` exposes only stable domain APIs and `PUBLIC_API_CLASSIFICATIONS`.
+- Module `__init__.py` files expose only their approved feature APIs; package `__init__.py` exposes only stable domain APIs and `get_public_api_classifications()`.
 - No module imports `profiles` or `artifacts` from a lower layer; circular imports are prohibited.
 
 ---
@@ -406,12 +408,11 @@ never reused. New workflows continue from `WF-RES-012`.
 
 ### Step annotation convention
 
-Research exposes exactly one package-root public function,
-`research.run_edge_lab_profile()`. Every stage operation named below is
-Research-internal and is reached only through that entry point; internal stages are
-annotated `research.<stage>()` *(internal)* so a reader can trace the stage without
-mistaking it for a public import. Cross-domain steps name the owning domain's
-public export.
+Research exposes standalone functions only from `app.services.research`; `__all__`
+is the complete public boundary. Public consumers never import Research classes,
+constants, or feature submodules. Internal immutable values are created, inspected,
+projected, or operated on through package-root factory and accessor functions.
+Cross-domain steps name the owning domain's public export.
 
 Evidence programs:
 
@@ -426,10 +427,7 @@ Evidence programs:
 - `WF-RES-008`: `tests/research/usage/workflows/wf_res_008_run_unsupervised_market_structure_research.py`
 - `WF-RES-009`: `tests/research/usage/workflows/wf_res_009_build_research_scorecard_profile_snapshot.py`
 - `WF-RES-010`: `tests/research/usage/workflows/wf_res_010_render_persist_research_artifact.py`
-- `WF-RES-012`: `tests/research/usage/workflows/wf_res_012_compare_research_profiles_across_periods.py` *(pending)*
-
-The entry marked *(pending)* is a registered workflow whose standalone program is not
-yet written.
+- `WF-RES-012`: `tests/research/usage/workflows/wf_res_012_compare_research_profiles_across_periods.py`
 
 ### Status values
 
@@ -459,7 +457,7 @@ yet written.
 | Completed | Supporting | `WF-RES-008` | Internal | Run Unsupervised Market-Structure Research | Leakage-safe feature frame + seed | `UnsupervisedResearchResult` | `FR-RES-081 → 088` |
 | Completed | Supporting | `WF-RES-009` | Internal | Build Research Scorecard and Profile Snapshot | Approved stage outputs | `ResearchScorecard` + `ResearchProfileSnapshot` | `FR-RES-089 → 092` |
 | Completed | Supporting | `WF-RES-010` | Internal | Render and Persist Research Artifact | Masked result + approved Research-owned output location | Research-internal `ArtifactReference` or typed failure; UI/API receives only `ResearchReport v1` | `FR-RES-093 → 095, 097` |
-| Completed | Supporting | `WF-RES-012` | Internal | Compare Research Profiles Across Periods | Two or more `ResearchProfileSnapshot` records over comparable symbol, timeframe, and config | Period-over-period profile deltas and stability caveats; advisory only | `Pending` |
+| Completed | Supporting | `WF-RES-012` | Internal | Compare Research Profiles Across Periods | Two or more opaque Research profile snapshots over comparable schema and configuration | Period-over-period score deltas, readiness stability, and explicit caveats; advisory only | `FR-RES-089`–`092` comparison projection |
 
 ### `WF-RES-SEC` — Prepare Research Dataset
 
@@ -692,20 +690,20 @@ comparable symbol, timeframe, and configuration over different periods.
 **Output boundary:** period-over-period profile deltas and stability caveats. The
 comparison is advisory and confers no readiness or registration authority.
 
-1. Confirm the snapshots share comparable symbol, timeframe, and config —
-   `utils.canonical_digest()`.
-2. Compare scorecard metrics across periods —
-   `research.compare_profile_snapshots()` *(internal)*.
-3. Report which structure and edge conclusions persisted and which did not —
-   `research.compare_profile_snapshots()` *(internal)*.
-4. Preserve statistical caveats about repeated comparison —
-   `analytics.run_statistical_validation()`.
+1. Confirm snapshots share a schema and configuration and carry distinct dataset
+   hashes in chronological order — `research.compare_research_profiles()`.
+2. Compare each adjacent period's scorecard rows and total —
+   `research.compare_research_profiles()`.
+3. Report readiness stability and changed conclusions without averaging periods —
+   `research.render_profile_comparison()`.
+4. Preserve explicit multiple-period and advisory-only caveats —
+   `research.render_profile_comparison()`.
 
 **Failure behaviour:** snapshots with incompatible symbol, timeframe, or config are
 refused rather than compared. A conclusion that holds in one period only is reported
 as unstable rather than averaged into an apparent edge.
 
-**Integration test:** `Pending`
+**Integration test:** `tests/research/integration/test_profile_comparison.py`
 
 #### End-to-end workflow diagram
 
@@ -740,15 +738,15 @@ This section is the implementation plan. Statuses reflect V1 audit evidence, not
 ### Owner-resolved implementation policy
 
 The following policy is authoritative for every Section 4 requirement. Public
-boundaries map third-party and Data failures to shared Utils errors with redacted
-symbolic details:
+boundaries map dependency failures to Research-owned errors with redacted symbolic
+details:
 
 | Error class | Approved Research codes |
 |---|---|
 | `ConfigurationError` | `RES_CONFIGURATION_INVALID`, `RES_STAGE_DEPENDENCY_INVALID`, `RES_STAGE_UNAVAILABLE` |
 | `ValidationError` | `RES_INPUT_INVALID`, `RES_INSUFFICIENT_DATA`, `RES_NONFINITE_DATA`, `RES_RESOURCE_LIMIT_EXCEEDED`, `RES_VERSION_INCOMPATIBLE`, `RES_MODEL_FIT_FAILED` |
 | `SecurityError` | `RES_PERMISSION_DENIED`, `RES_LEAKAGE_DETECTED`, `RES_ARTIFACT_PATH_REJECTED`, `RES_SENSITIVE_OUTPUT_REJECTED` |
-| `HaruQuantError` | `RES_ARTIFACT_CONFLICT`, `RES_ARTIFACT_TOO_LARGE`, `RES_ARTIFACT_ATOMICITY_UNAVAILABLE`, `RES_ARTIFACT_WRITE_FAILED`, `RES_AUDIT_PERSISTENCE_FAILED` |
+| `ResearchError` | `RES_ARTIFACT_CONFLICT`, `RES_ARTIFACT_TOO_LARGE`, `RES_ARTIFACT_ATOMICITY_UNAVAILABLE`, `RES_ARTIFACT_WRITE_FAILED`, `RES_AUDIT_PERSISTENCE_FAILED` |
 
 Exact hard bounds are 500,000 rows, 600 seconds per heavy operation, 50 MiB per
 serialized artifact, 1–10,000 resampling/null iterations, 1–128 calibration
@@ -1361,7 +1359,7 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 ### 4.13 `intelligence/` — Fundamental and Sentiment Source Evidence
 
-**Status:** `Missing`
+**Status:** `Completed`
 
 This deterministic feature converts eligible Data-owned point-in-time research
 documents into bounded evidence suitable for Agentic analysis. It performs
@@ -1370,12 +1368,20 @@ an LLM, express a market opinion, approve a strategy, or trade.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-RES-099` | Represent fundamental source evidence with issuer/asset scope, filing/statement/transcript/macro references, observation and availability windows, coverage, revisions, currency/unit lineage, quality, and canonical hash. | `FundamentalSourceEvidence` | None | `ResearchValidationError`: source, scope, time, coverage, unit, or lineage is invalid | **Usage:** `tests/research/usage/13_intelligence.py` |
-| Missing | `FR-RES-100` | Build fundamental source evidence only from eligible Data `ResearchSourceDocument` records available by the supplied decision time and refuse missing required coverage. | `build_fundamental_source_evidence(...)` | Data public API reads | `ResearchValidationError`: evidence is ineligible or insufficient | **Usage:** `tests/research/usage/13_intelligence.py` |
-| Missing | `FR-RES-101` | Represent sentiment source evidence with bounded document/event references, source coverage, deterministic polarity/event measurements where available, revision/trust/manipulation/injection evidence, and canonical hash. | `SentimentSourceEvidence` | None | `ResearchValidationError`: source, scope, measurement, or lineage is invalid | **Usage:** `tests/research/usage/13_intelligence.py` |
-| Missing | `FR-RES-102` | Build sentiment source evidence from eligible point-in-time documents using declared deterministic extraction/measurement versions and preserve disagreement and missingness. | `build_sentiment_source_evidence(...)` | Data public API reads | `ResearchValidationError`: evidence is ineligible, poisoned, or insufficient | **Usage:** `tests/research/usage/13_intelligence.py` |
-| Missing | `FR-RES-103` | Enforce asset-class applicability so issuer-specific evidence is not fabricated for instruments without an applicable issuer/fundamental model. | `assess_intelligence_applicability(...)` | None | None; returns typed applicability/refusal reasons | **Usage:** `tests/research/usage/13_intelligence.py` |
-| Missing | `FR-RES-104` | Return detached, bounded, non-binding evidence with no unrestricted source payload, model instruction, strategy recommendation, or execution field. | `project_intelligence_evidence(...)` | None | `ResearchValidationError`: size, redaction, or output contract is invalid | **Usage:** `tests/research/usage/13_intelligence.py` |
+| Completed | `FR-RES-099` | Represent fundamental source evidence with issuer/asset scope, filing/statement/transcript/macro references, coverage, revisions, currency/unit lineage, quality, and canonical hash. | Internal opaque evidence created by `build_fundamental_source_evidence(...)` and inspected/projected through root functions | None | `ValidationError[RES_INPUT_INVALID]` | **Usage:** `tests/research/usage/13_intelligence.py`<br>**Integration:** `tests/research/integration/test_intelligence.py` |
+| Completed | `FR-RES-100` | Build fundamental source evidence only from eligible Data source records available by the supplied decision time and refuse missing required coverage. | `build_fundamental_source_evidence(...)` | Data package-root query and projection reads | `ValidationError[RES_INSUFFICIENT_DATA\|RES_INPUT_INVALID]` | **Usage:** `tests/research/usage/13_intelligence.py`<br>**Integration:** `tests/research/integration/test_intelligence.py` |
+| Completed | `FR-RES-101` | Represent sentiment source evidence with bounded document references, source coverage, deterministic polarity measurements where available, revision/trust/manipulation/injection evidence, and canonical hash. | Internal opaque evidence created by `build_sentiment_source_evidence(...)` and inspected/projected through root functions | None | `ValidationError[RES_INPUT_INVALID]` | **Usage:** `tests/research/usage/13_intelligence.py`<br>**Integration:** `tests/research/integration/test_intelligence.py` |
+| Completed | `FR-RES-102` | Build sentiment source evidence from eligible point-in-time documents using the declared deterministic lexicon version and preserve disagreement and missingness. | `build_sentiment_source_evidence(...)` | Data package-root query and projection reads | `ValidationError[RES_INSUFFICIENT_DATA\|RES_INPUT_INVALID]` | **Usage:** `tests/research/usage/13_intelligence.py`<br>**Integration:** `tests/research/integration/test_intelligence.py` |
+| Completed | `FR-RES-103` | Enforce asset-class applicability so issuer-specific evidence is not fabricated for instruments without an applicable issuer/fundamental model. | `assess_intelligence_applicability(...)` | None | None; returns typed applicability/refusal reasons | **Usage:** `tests/research/usage/13_intelligence.py`<br>**Integration:** `tests/research/integration/test_intelligence.py` |
+| Completed | `FR-RES-104` | Return detached, bounded, non-binding evidence with no unrestricted source payload, model instruction, strategy recommendation, or execution field. | `project_intelligence_evidence(...)` | None | `ValidationError[RES_INPUT_INVALID]` | **Usage:** `tests/research/usage/13_intelligence.py`<br>**Integration:** `tests/research/integration/test_intelligence.py` |
+
+FEAT-RES-13 remains provider-agnostic and network-free. Network retrieval,
+provider parsing, licensing metadata, structured observations, immutable
+revisions, and point-in-time eligibility are owned by Data `FEAT-DATA-16`.
+Research consumes only bounded Data package-root queries and projections.
+Transcript evidence currently establishes official document existence and scope;
+sentiment remains deterministic title analysis and does not claim transcript-body
+language coverage.
 
 ## 5. Package-Wide Requirements and Shared Configuration
 

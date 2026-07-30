@@ -80,7 +80,7 @@ def _resolve_identifier(value: str | None, prefix: str) -> str:
         try:
             validate_id(value, expected_prefix=prefix)
             return value
-        except Exception:
+        except ValueError:
             logger.warning("Invalid Analytics response identifier was replaced")
     return generate_id(prefix)
 
@@ -169,7 +169,7 @@ def run_analytics_operation[TRaw, T](
             details={"reason": "VALIDATION_FAILED"},
             message="Analytics validation failed",
             metadata=metadata,
-            catalog=ANALYTICS_ERROR_CATALOG,
+            catalog=cast("Any", ANALYTICS_ERROR_CATALOG),
         )
     except AnalyticsError:
         logger.exception("Analytics operation execution failed")
@@ -186,7 +186,7 @@ def run_analytics_operation[TRaw, T](
             details={"reason": "EXECUTION_FAILED"},
             message="Analytics execution failed",
             metadata=metadata,
-            catalog=ANALYTICS_ERROR_CATALOG,
+            catalog=cast("Any", ANALYTICS_ERROR_CATALOG),
         )
     except Exception:
         logger.exception("Unexpected Analytics operation failure")
@@ -203,7 +203,7 @@ def run_analytics_operation[TRaw, T](
             details={"reason": "UNEXPECTED_EXCEPTION"},
             message="Analytics execution failed",
             metadata=metadata,
-            catalog=ANALYTICS_ERROR_CATALOG,
+            catalog=cast("Any", ANALYTICS_ERROR_CATALOG),
         )
 
     response_data: T = cast("T", result)

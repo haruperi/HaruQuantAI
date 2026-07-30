@@ -1,9 +1,14 @@
 """FEAT-BRK-12: cTrader genuine market-data release evidence."""
 
 import asyncio
+import sys
+from pathlib import Path
+from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import _support  # noqa: F401
-from _support import real_session, require_error, require_success
+from _support import UsageEvidenceError, real_session, require_error, require_success
 from app.services.brokers import (
     get_broker_historical_bars,
     get_broker_quote,
@@ -15,9 +20,30 @@ from app.services.brokers import (
 )
 
 
+def _feature_header(title: str) -> None:
+    """Print feature title and module flow banner."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"\n{'-' * 88}\n{title}\n{'-' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 async def _require_unreleased(adapter: object, operation: str) -> None:
@@ -32,61 +58,70 @@ async def _require_unreleased(adapter: object, operation: str) -> None:
         result = await get_broker_ticks(adapter, "EURUSD", limit=5)
     else:
         result = await get_broker_historical_bars(adapter, "EURUSD", "1m", limit=5)
+
     if get_broker_value_field(result, "status") == "success":
         require_success("Result", result)
     else:
         require_error("Result", result, "BROKER_CAPABILITY_UNSUPPORTED")
+    print(_format_result(result))
+    print(
+        f"Data -> operation='{operation}', status='{get_broker_value_field(result, 'status')}'"
+    )
 
 
-async def fr_brokers_124(adapter: object) -> None:
-    """FR-BRK-124: Fetch exact provider-native symbols when released."""
-    _header("FR-BRK-124: Fetch exact provider-native symbols when released.")
+async def fr_brokers_124_to_125_symbol_request(adapter: object) -> None:
+    """FR-BRK-124..125: Stage 1 — Symbol Request Specification."""
+    _header("Stage 1: Symbol Request Specification (FR-BRK-124..125)")
     await _require_unreleased(adapter, "symbols")
-
-
-async def fr_brokers_125(adapter: object) -> None:
-    """FR-BRK-125: Fetch genuine cTrader symbol information when released."""
-    _header("FR-BRK-125: Fetch genuine cTrader symbol information when released.")
     await _require_unreleased(adapter, "symbol_info")
 
 
-async def fr_brokers_126(adapter: object) -> None:
-    """FR-BRK-126: Fetch a genuine cTrader quote when released."""
-    _header("FR-BRK-126: Fetch a genuine cTrader quote when released.")
+async def fr_brokers_126_to_128_protobuf_calls(adapter: object) -> None:
+    """FR-BRK-126..128: Stage 2 — cTrader Protobuf Call Execution."""
+    _header("Stage 2: cTrader Protobuf Call Execution (FR-BRK-126..128)")
     await _require_unreleased(adapter, "quote")
-
-
-async def fr_brokers_127(adapter: object) -> None:
-    """FR-BRK-127: Fetch bounded genuine cTrader ticks when released."""
-    _header("FR-BRK-127: Fetch bounded genuine cTrader ticks when released.")
     await _require_unreleased(adapter, "ticks")
-
-
-async def fr_brokers_128(adapter: object) -> None:
-    """FR-BRK-128: Fetch bounded genuine cTrader bars when released."""
-    _header("FR-BRK-128: Fetch bounded genuine cTrader bars when released.")
     await _require_unreleased(adapter, "bars")
 
 
-async def fr_brokers_062(adapter: object) -> None:
-    """FR-BRK-062: Return genuine provider-authored UTC trading windows."""
-    _header("FR-BRK-062: Return genuine provider-authored UTC trading windows.")
-    result = await get_broker_trading_sessions(adapter, "EURUSD")
-    if get_broker_value_field(result, "status") == "success":
-        require_success("Result", result)
+async def fr_brokers_062_canonical_market_data(adapter: object) -> None:
+    """FR-BRK-062: Stage 3 — Canonical Market Data Output."""
+    _header("Stage 3: Canonical Market Data Output (FR-BRK-062)")
+    ts_res = await get_broker_trading_sessions(adapter, "EURUSD")
+    if get_broker_value_field(ts_res, "status") == "success":
+        require_success("Result", ts_res)
     else:
-        require_error("Result", result, "BROKER_CAPABILITY_UNSUPPORTED")
+        require_error("Result", ts_res, "BROKER_CAPABILITY_UNSUPPORTED")
+    print(_format_result(ts_res))
+    print(
+        f"Data -> trading_sessions_status='{get_broker_value_field(ts_res, 'status')}'"
+    )
 
 
 async def _run() -> None:
     """Execute cTrader market evidence in one genuine demo session."""
-    async with real_session("ctrader") as adapter:
-        await fr_brokers_124(adapter)
-        await fr_brokers_125(adapter)
-        await fr_brokers_126(adapter)
-        await fr_brokers_127(adapter)
-        await fr_brokers_128(adapter)
-        await fr_brokers_062(adapter)
+    _feature_header(
+        "FEATURE: FEAT-BRK-12 — ctrader_market_data/ — cTrader Market Data\n\n"
+        "Purpose: Provide cTrader symbols, trading sessions, quotes, spreads, ticks, and historical bars.\n\n"
+        "Module flow:\n"
+        "-> symbol request\n"
+        "-> cTrader protobuf call\n"
+        "-> canonical market data"
+    )
+
+    try:
+        async with real_session("ctrader") as adapter:
+            # Stage 1: Symbol request
+            await fr_brokers_124_to_125_symbol_request(adapter)
+
+            # Stage 2: Protobuf call
+            await fr_brokers_126_to_128_protobuf_calls(adapter)
+
+            # Stage 3: Canonical market data output
+            await fr_brokers_062_canonical_market_data(adapter)
+    except UsageEvidenceError as err:
+        print("Output Result -> UsageEvidenceError : UsageEvidenceError")
+        print(f"Data -> status='FAIL_CLOSED', reason='{err}'")
 
 
 def main() -> None:

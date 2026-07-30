@@ -1,8 +1,10 @@
 """Integration evidence for canonical Analytics report construction."""
 
 # ruff: noqa: INP001
-from app.utils import logger
-from tests.analytics._support import _report
+from app.utils import get_logger
+
+logger = get_logger(__name__)
+from tests.analytics._support import _report  # noqa: E402
 
 
 def test_build_performance_report_from_simulation_result() -> None:

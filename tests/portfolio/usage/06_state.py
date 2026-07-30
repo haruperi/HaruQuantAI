@@ -13,7 +13,7 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.portfolio import ActivePortfolioAllocation
+from app.services.portfolio import create_portfolio_value
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 
@@ -92,12 +92,17 @@ def fr_port_030() -> None:
     )
     print("FR-PORT-030: Prevent direct writes by other domains")
 
-    allocation = ActivePortfolioAllocation(**_allocation_data())
+    allocation = create_portfolio_value(
+        "ActivePortfolioAllocation", **_allocation_data()
+    )
     assert allocation.allocation_id
     print(f"Valid allocation created: {allocation.allocation_id}")
 
     try:
-        ActivePortfolioAllocation(**_allocation_data(canonical_hash="short"))
+        create_portfolio_value(
+            "ActivePortfolioAllocation",
+            **_allocation_data(canonical_hash="short"),
+        )
         msg = "ERROR: invalid hash accepted"
     except Exception:  # noqa: BLE001 - usage demonstrates rejection.
         msg = "Invalid canonical hash correctly rejected"
@@ -115,11 +120,14 @@ def fr_port_031() -> None:
     )
     print("FR-PORT-031: Preserve superseded and rolled-back versions")
 
-    allocation = ActivePortfolioAllocation(**_allocation_data())
+    allocation = create_portfolio_value(
+        "ActivePortfolioAllocation", **_allocation_data()
+    )
     assert allocation.allocation_version == "allocation-version-1"
     print(f"Immutable allocation_version: {allocation.allocation_version}")
 
-    rolled_back = ActivePortfolioAllocation(
+    rolled_back = create_portfolio_value(
+        "ActivePortfolioAllocation",
         **_allocation_data(
             allocation_id="allocation-2",
             allocation_version="allocation-version-2",
@@ -127,7 +135,7 @@ def fr_port_031() -> None:
             rollback_of_version="allocation-version-1",
             canonical_hash="d" * 64,
             idempotency_key="idem-2",
-        )
+        ),
     )
     assert rolled_back.rollback_of_version == "allocation-version-1"
     print(f"Rollback references version: {rolled_back.rollback_of_version}")
@@ -145,11 +153,15 @@ def fr_port_032() -> None:
     )
     print("FR-PORT-032: Use atomic activation and idempotency keys")
 
-    allocation = ActivePortfolioAllocation(**_allocation_data())
+    allocation = create_portfolio_value(
+        "ActivePortfolioAllocation", **_allocation_data()
+    )
     assert allocation.idempotency_key == "idem-1"
     print(f"Idempotency key: {allocation.idempotency_key}")
 
-    duplicate = ActivePortfolioAllocation(**_allocation_data())
+    duplicate = create_portfolio_value(
+        "ActivePortfolioAllocation", **_allocation_data()
+    )
     assert duplicate.idempotency_key == allocation.idempotency_key
     assert duplicate.canonical_hash == allocation.canonical_hash
     print("Same idempotency key + canonical hash = idempotent replay")
@@ -167,7 +179,9 @@ def fr_port_033() -> None:
     )
     print("FR-PORT-033: Store references, hashes, and decisions for lineage")
 
-    allocation = ActivePortfolioAllocation(**_allocation_data())
+    allocation = create_portfolio_value(
+        "ActivePortfolioAllocation", **_allocation_data()
+    )
     assert allocation.construction_result_id
     assert allocation.construction_result_hash
     assert allocation.simulation_result_id

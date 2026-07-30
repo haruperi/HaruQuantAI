@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from app.services.analytics.adapters import (
     adapt_trading_result as _adapt_trading_result,
@@ -63,6 +63,16 @@ from app.services.analytics.contracts import (
 from app.services.analytics.contracts import (
     validate_metric_catalog as _validate_metric_catalog,
 )
+from app.services.analytics.contracts.factories import (
+    create_analytics_run_config,
+    create_analytics_value,
+    create_closed_trade_ledger,
+    create_portfolio_rebalance_measurement_request,
+    create_risk_free_rate_evidence,
+    create_statistical_validation_config,
+    get_analytics_value_field,
+    is_analytics_value,
+)
 from app.services.analytics.contracts.responses import run_analytics_operation
 from app.services.analytics.dashboards import (
     build_dashboard_payload as _build_dashboard_payload,
@@ -110,8 +120,9 @@ from app.services.analytics.metrics import (
 )
 from app.services.analytics.reports import (
     WorstDayDistribution,
-    build_barrier_section,
-    build_worst_day_distribution,
+)
+from app.services.analytics.reports import (
+    build_barrier_section as _build_barrier_section,
 )
 from app.services.analytics.reports import (
     build_performance_report as _build_performance_report,
@@ -124,6 +135,9 @@ from app.services.analytics.reports import (
 )
 from app.services.analytics.reports import (
     build_portfolio_rebalance_measurement as _build_portfolio_rebalance_measurement,
+)
+from app.services.analytics.reports import (
+    build_worst_day_distribution as _build_worst_day_distribution,
 )
 from app.services.analytics.reports import (
     compare_performance_reports as _compare_performance_reports,
@@ -139,7 +153,42 @@ type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 if TYPE_CHECKING:
-    from app.services.data import MarketDataset
+    MarketDataset = Any
+
+
+def get_analytics_schema_version() -> str:
+    """Return the supported Analytics schema version."""
+    return ANALYTICS_SCHEMA_VERSION
+
+
+def get_annualization_policy() -> Mapping[str, object]:
+    """Return the immutable annualization policy."""
+    return ANNUALIZATION_POLICY
+
+
+def get_breakeven_epsilon() -> Decimal:
+    """Return the Analytics breakeven comparison epsilon."""
+    return BREAKEVEN_EPSILON
+
+
+def get_contract_compatibility_matrix() -> Mapping[str, object]:
+    """Return the supported cross-domain contract versions."""
+    return CONTRACT_COMPATIBILITY_MATRIX
+
+
+def get_evidence_catalog() -> Mapping[str, object]:
+    """Return the immutable evidence catalogue."""
+    return EVIDENCE_CATALOG
+
+
+def get_metric_definition_catalog() -> Mapping[str, object]:
+    """Return the immutable metric-definition catalogue."""
+    return METRIC_DEFINITION_CATALOG
+
+
+def get_min_metric_samples() -> Mapping[str, int]:
+    """Return the minimum sample count for Analytics metrics."""
+    return MIN_METRIC_SAMPLES
 
 
 def validate_contract_version(
@@ -778,6 +827,55 @@ def _truncate_transform(
     return points, {"truncation": metadata}
 
 
+def build_worst_day_distribution(
+    ledger: ClosedTradeLedger | TradingResult,
+    *,
+    percentiles: Sequence[Decimal],
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Build worst-day distribution evidence from an Analytics ledger.
+
+    Returns:
+        Standard response containing the calculated distribution.
+    """
+    return run_analytics_operation(
+        operation="analytics.reports.build_worst_day_distribution",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _build_worst_day_distribution(ledger, percentiles=percentiles),
+    )
+
+
+def build_barrier_section(
+    first_passage: object | None,
+    joint: object | None,
+    worst_day: WorstDayDistribution | None,
+    *,
+    mandate_version: str,
+    mode_sensitivity: Mapping[object, object] | None = None,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Build barrier evidence when verified first-passage inputs are supplied.
+
+    Returns:
+        Standard response containing the barrier report section.
+    """
+    return run_analytics_operation(
+        operation="analytics.reports.build_barrier_section",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _build_barrier_section(
+            cast("Any", first_passage),
+            cast("Any", joint),
+            worst_day,
+            mandate_version=mandate_version,
+            mode_sensitivity=cast("Any", mode_sensitivity),
+        ),
+    )
+
+
 def truncate_series(
     points: Sequence[Mapping[str, object]],
     *,
@@ -800,35 +898,13 @@ def truncate_series(
 
 
 __all__: tuple[str, ...] = (
-    "ANALYTICS_SCHEMA_VERSION",
-    "ANNUALIZATION_POLICY",
-    "BREAKEVEN_EPSILON",
-    "CONTRACT_COMPATIBILITY_MATRIX",
-    "EVIDENCE_CATALOG",
-    "METRIC_DEFINITION_CATALOG",
-    "MIN_METRIC_SAMPLES",
     "AnalyticsError",
-    "AnalyticsRunConfig",
     "AnalyticsValidationError",
-    "AnalyticsWarning",
-    "ClosedTrade",
-    "ClosedTradeLedger",
-    "DashboardPayload",
     "Lineage",
     "MetricEvidence",
-    "PerformanceReport",
-    "PortfolioAllocationEvidence",
-    "PortfolioPerformanceReport",
-    "PortfolioRebalanceMeasurementEvidence",
-    "PortfolioRebalanceMeasurementRequest",
-    "QualityFlag",
     "ReportSection",
-    "ReproducibilityHashes",
     "RiskFreeRateEvidence",
-    "SectionEvidence",
     "StatisticalValidationConfig",
-    "TradingResult",
-    "WorstDayDistribution",
     "adapt_trading_result",
     "align_benchmark_series",
     "build_barrier_section",
@@ -852,6 +928,21 @@ __all__: tuple[str, ...] = (
     "calculate_trade_evidence",
     "compare_performance_reports",
     "compute_reproducibility_hashes",
+    "create_analytics_run_config",
+    "create_analytics_value",
+    "create_closed_trade_ledger",
+    "create_portfolio_rebalance_measurement_request",
+    "create_risk_free_rate_evidence",
+    "create_statistical_validation_config",
+    "get_analytics_schema_version",
+    "get_analytics_value_field",
+    "get_annualization_policy",
+    "get_breakeven_epsilon",
+    "get_contract_compatibility_matrix",
+    "get_evidence_catalog",
+    "get_metric_definition_catalog",
+    "get_min_metric_samples",
+    "is_analytics_value",
     "run_statistical_validation",
     "serialize_report",
     "to_analytics_error_payload",

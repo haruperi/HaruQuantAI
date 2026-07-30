@@ -11,7 +11,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Sequence
 from datetime import datetime, timedelta
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from app.services.data.contracts import DataError
 from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
@@ -23,6 +23,9 @@ from app.services.data.economic_calendar.scraper import (
     ScrapeResult,
     scrape_economic_calendar,
 )
+
+if TYPE_CHECKING:
+    from app.services.data.contracts.responses import StandardResponse
 
 #: Map of ISO-3166-1 alpha-2 country code to the single dominant currency.
 #: Providers that already publish a currency are trusted verbatim; this table
@@ -70,7 +73,7 @@ class EconomicCalendarProvider(Protocol):
         currencies: Sequence[str] | None = None,
         countries: Sequence[str] | None = None,
         minimum_impact: EventImpact | None = None,
-    ) -> list[EconomicEvent]:
+    ) -> list[EconomicEvent] | StandardResponse[list[EconomicEvent]]:
         """Return normalized economic events for a UTC window.
 
         Args:

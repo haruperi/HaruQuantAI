@@ -589,7 +589,7 @@ def join_indicator_result(
     return result.join_to(data, mode=mode)
 
 
-def get_indicator_result_values(result: IndicatorResult) -> pd.DataFrame:
+def get_indicator_result_values(result: object) -> pd.DataFrame:
     """Return a copy-safe projection excluding original OHLCV columns.
 
     Args:
@@ -597,11 +597,16 @@ def get_indicator_result_values(result: IndicatorResult) -> pd.DataFrame:
 
     Returns:
         A deep copy of the generated indicator, availability, and quality columns.
+
+    Raises:
+        TypeError: If result is not an internal Indicator result.
     """
+    if not isinstance(result, IndicatorResult):
+        raise TypeError("Expected an Indicator result")
     return result.values_only
 
 
-def get_indicator_result_metadata(result: IndicatorResult) -> Mapping[str, object]:
+def get_indicator_result_metadata(result: object) -> Mapping[str, object]:
     """Return bounded metadata for an opaque IndicatorResult.
 
     Args:
@@ -610,7 +615,12 @@ def get_indicator_result_metadata(result: IndicatorResult) -> Mapping[str, objec
     Returns:
         Detached metadata required by cross-domain consumers. The nested
         manifest is represented as a JSON-compatible mapping.
+
+    Raises:
+        TypeError: If result is not an internal Indicator result.
     """
+    if not isinstance(result, IndicatorResult):
+        raise TypeError("Expected an Indicator result")
     manifest = result.manifest
     return {
         "contract_version": result.contract_version,

@@ -8,6 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.portfolio import execute_portfolio_handle_operation
 from tests.portfolio.usage.workflows._support import (
     NOW,
     construction_workflow,
@@ -34,9 +35,15 @@ def _stage(number: int) -> None:
 def main() -> None:
     """Run the complete README-defined allocation-activation workflow."""
     service, request, store, market = construction_workflow()
-    candidate, evidence = service.construct(request)
-    review = service.coordinate_review(
-        candidate, simulation_request(candidate), evidence
+    candidate, evidence = execute_portfolio_handle_operation(
+        service, "construct", request
+    )
+    review = execute_portfolio_handle_operation(
+        service,
+        "coordinate_review",
+        candidate,
+        simulation_request(candidate),
+        evidence,
     )
     print("INPUT BOUNDARY — all current activation gates:", candidate.result_id)
 
@@ -54,7 +61,9 @@ def main() -> None:
 
     # Stage 4 — Execute the atomic activation workflow.
     _stage(4)
-    active = service.activate(
+    active = execute_portfolio_handle_operation(
+        service,
+        "activate",
         candidate,
         evidence,
         review,

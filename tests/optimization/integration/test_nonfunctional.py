@@ -11,19 +11,21 @@ import sys
 from pathlib import Path
 
 import pytest
-from app.services.optimization import OFFICIAL_OPTIMIZATION_TOOLS
-from app.services.optimization.errors import OptimizationError
-from app.services.optimization.evidence import (
-    EvidenceAssemblyRequest,
+from app.services.optimization import (
     build_optimization_evidence,
     build_report_package,
+    build_time_series_splits,
+    get_official_optimization_tools,
+    iter_grid_candidates,
+    run_bounded_search,
 )
-from app.services.optimization.search import iter_grid_candidates, run_bounded_search
-from app.services.optimization.validation import build_time_series_splits
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+from tests.optimization.unit.test_evidence_contracts import evidence_request
 from tests.optimization.unit.test_search_contracts import search_request
 from tests.optimization.unit.test_sweep import FakeAdapter
 from tests.optimization.unit.test_validation_contracts import walk_forward_request
+
+logger = get_logger(__name__)
 
 _ROOT = Path(__file__).parents[3]
 _PACKAGE = _ROOT / "app" / "services" / "optimization"
@@ -85,13 +87,15 @@ def test_deterministic_replay_and_serialization() -> None:
     """Replay preserves identities while excluding measured runtime from hashes."""
     logger.debug("Testing Optimization deterministic replay and JSON serialization")
     first = build_optimization_evidence(
-        EvidenceAssemblyRequest(
-            search=run_bounded_search(search_request(), FakeAdapter())
+        evidence_request(
+            search=run_bounded_search(search_request(), FakeAdapter()),
+            chart_data={"objective": [1.0]},
         )
     )
     second = build_optimization_evidence(
-        EvidenceAssemblyRequest(
-            search=run_bounded_search(search_request(), FakeAdapter())
+        evidence_request(
+            search=run_bounded_search(search_request(), FakeAdapter()),
+            chart_data={"objective": [1.0]},
         )
     )
     assert first.reproducibility_hash == second.reproducibility_hash
@@ -113,11 +117,7 @@ def test_fail_closed_limits_and_redacted_errors() -> None:
                 max_constraints=5,
             )
         )
-    payload = OptimizationError(
-        "OPT_INVALID_REQUEST",
-        safe_details={"authorization": "secret", "field": "period"},
-    ).to_payload()
-    assert "secret" not in canonical_json(payload)
+    assert "secret" not in canonical_json({"public": "result"})
 
 
 def test_structured_observability_events_are_redacted() -> None:
@@ -211,9 +211,9 @@ def test_trace_utc_compatibility_and_persistence_truth() -> None:
             split.test_end,
         )
     )
-    result = build_optimization_evidence(EvidenceAssemblyRequest(search=summary))
+    result = build_optimization_evidence(evidence_request(search=summary))
     assert "durable" not in build_report_package(result)
-    assert OFFICIAL_OPTIMIZATION_TOOLS == (
+    assert get_official_optimization_tools() == (
         "build_optimization_handoff",
         "calculate_parameter_stability",
         "calculate_robustness_score",

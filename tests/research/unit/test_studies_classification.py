@@ -1,14 +1,17 @@
 """Unit tests for Research symbol classification (FR-RES-068)."""
 
 import pytest
-from app.services.research.contracts import EdgeResult
-from app.services.research.studies import classify_symbol
-from app.utils import ValidationError, logger
+from app.services.research import classify_symbol, create_research_value
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
-def _edge(classification: str, study: str = "mean_reversion") -> EdgeResult:
+def _edge(classification: str, study: str = "mean_reversion") -> object:
     """Build an advisory edge result for classification testing."""
-    return EdgeResult("v1", study, {}, {}, classification, 7, (), True)
+    return create_research_value(
+        "EdgeResult", "v1", study, {}, {}, classification, 7, (), True
+    )
 
 
 def test_classification_matches_report_policy() -> None:
@@ -49,7 +52,7 @@ def test_classification_is_inconclusive_without_confirmation() -> None:
 def test_classification_rejects_unsupported_policy() -> None:
     """FR-RES-068: fail closed for an unsupported confirmation policy."""
     logger.debug("Testing Research classification policy rejection")
-    with pytest.raises(ValidationError, match="CONFIRMATION_POLICY_NOT_V1"):
+    with pytest.raises(ValueError, match="CONFIRMATION_POLICY_NOT_V1"):
         classify_symbol(
             _edge("confirmed"),
             _edge("inconclusive", "trend_persistence"),

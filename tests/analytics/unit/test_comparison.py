@@ -3,9 +3,11 @@
 from decimal import Decimal
 
 from app.services.analytics.reports.comparison import compare_performance_reports
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics._support import _report
+logger = get_logger(__name__)
+
+from tests.analytics._support import _report  # noqa: E402
 
 
 def test_comparison_calculates_real_deltas() -> None:

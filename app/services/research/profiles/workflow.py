@@ -5,8 +5,9 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from time import perf_counter_ns
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
+from app.services.analytics import get_analytics_value_field
 from app.services.research.contracts import (
     EdgeLabConfig,
     EdgeResult,
@@ -16,7 +17,12 @@ from app.services.research.contracts import (
     ResearchWarning,
     UnsupervisedResearchResult,
 )
-from app.services.research.contracts.errors import RESEARCH_ERROR_CATALOG
+from app.services.research.contracts.errors import (
+    RESEARCH_ERROR_CATALOG,
+    ConfigurationError,
+    ResearchError,
+    ValidationError,
+)
 from app.services.research.data import prepare_research_dataset
 from app.services.research.features import build_research_feature_frame
 from app.services.research.leakage import (
@@ -47,6 +53,7 @@ from app.services.research.studies import (
 from app.utils import (
     build_response_metadata,
     canonical_digest,
+    error_response,
     exception_response,
     generate_id,
     get_execution_ms,
@@ -60,31 +67,12 @@ type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 
-class ConfigurationError(ValueError):
-    """Research-owned configuration failure."""
-
-    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
-        self.code = code
-        self.detail = detail
-        super().__init__(f"{code}:{detail}")
-
-
-class ValidationError(ValueError):
-    """Research-owned workflow validation failure."""
-
-    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
-        self.code = code
-        self.detail = detail
-        super().__init__(f"{code}:{detail}")
-
-
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     import pandas as pd
 
-    from app.services.analytics import PerformanceReport
-    from app.services.data import MarketDataset
+    MarketDataset = Any
     from app.services.research.contracts import (
         CoreMetricProfile,
         PreparedDataset,
@@ -358,7 +346,7 @@ class _RunState:
     """Mutable internal state for one bounded orchestration call."""
 
     config: EdgeLabConfig
-    performance: PerformanceReport | None
+    performance: object | None
     prepared: PreparedDataset
     warnings: list[ResearchWarning]
     stages: dict[str, Mapping[str, JSONValue]]
@@ -403,7 +391,7 @@ def _build_state(
     dataset: MarketDataset,
     *,
     config: EdgeLabConfig,
-    performance: PerformanceReport | None,
+    performance: object | None,
 ) -> _RunState:
     """Prepare immutable input evidence and initialize stage state.
 
@@ -644,19 +632,36 @@ def _validate_hypothesis(hypothesis: str) -> None:
         raise ValidationError("RES_INPUT_INVALID", "INVALID_HYPOTHESIS")
 
 
+def _validated_edge_lab_config(config: object) -> EdgeLabConfig:
+    """Return one validated internal Edge Lab configuration.
+
+    Args:
+        config: Opaque package-boundary value.
+
+    Returns:
+        Validated internal configuration.
+
+    Raises:
+        ValidationError: If the value is not a Research configuration.
+    """
+    if not isinstance(config, EdgeLabConfig):
+        raise ValidationError("RES_INPUT_INVALID", "INVALID_EDGE_LAB_CONFIG")
+    return config
+
+
 def run_edge_lab_profile(
     dataset: MarketDataset,
     *,
     hypothesis: str,
-    config: EdgeLabConfig,
-    performance: PerformanceReport | None = None,
+    config: object,
+    performance: object | None = None,
 ) -> StandardResponse[ResearchReport]:
     """Run selected deterministic stages and build an advisory report.
 
     Args:
         dataset: Canonical Data-owned market evidence.
         hypothesis: Explicit researcher-supplied hypothesis.
-        config: Complete bounded Research configuration.
+        config: Opaque complete bounded Research configuration.
         performance: Optional Analytics evidence supplied by the orchestrator.
 
     Returns:
@@ -697,6 +702,7 @@ def run_edge_lab_profile(
     try:
         logger.info("Running bounded Research Edge Lab profile")
         _validate_hypothesis(hypothesis)
+        config = _validated_edge_lab_config(config)
         extensions["selected_stages"] = tuple(config.selected_stages)
         _validate_selection(config)
         state = _build_state(
@@ -714,7 +720,9 @@ def run_edge_lab_profile(
         }
         evidence.update(state.stages)
         if performance is not None:
-            evidence["performance_report_ref"] = performance.report_id
+            evidence["performance_report_ref"] = str(
+                get_analytics_value_field(performance, "report_id")
+            )
 
         report_material = {
             "hypothesis": hypothesis,
@@ -750,12 +758,20 @@ def run_edge_lab_profile(
             message="Research Edge Lab profile completed",
             metadata=_metadata(),
         )
+    except ResearchError as error:
+        return error_response(
+            code=error.code,
+            details={"detail": error.detail},
+            message="Research Edge Lab profile failed",
+            metadata=_metadata(),
+            catalog=cast("Any", RESEARCH_ERROR_CATALOG),
+        )
     except Exception as error:  # noqa: BLE001 - public response boundary.
         return exception_response(
             error,
             message="Research Edge Lab profile failed",
             metadata=_metadata(),
-            catalog=RESEARCH_ERROR_CATALOG,
+            catalog=cast("Any", RESEARCH_ERROR_CATALOG),
         )
 
 

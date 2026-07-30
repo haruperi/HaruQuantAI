@@ -106,7 +106,7 @@ def _indicator_metadata(result: object) -> Mapping[str, object]:
     """
     try:
         return _get_indicator_metadata(result)
-    except AttributeError:
+    except TypeError:
         view = cast("_IndicatorResultView", result)
         return {
             "indicator_id": view.indicator_id,
@@ -129,7 +129,7 @@ def _indicator_frame(result: object) -> _IndicatorFrame:
         return cast("_IndicatorFrame", values)
     try:
         return _get_indicator_values(result)
-    except AttributeError:
+    except TypeError:
         return cast("_IndicatorResultView", result).values
 
 

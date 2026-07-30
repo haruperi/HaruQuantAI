@@ -2,8 +2,10 @@
 
 # ruff: noqa: INP001
 from app.services.analytics import serialize_report
-from app.utils import generate_id, logger
-from tests.analytics._support import _report, unwrap
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
+from tests.analytics._support import _report, unwrap  # noqa: E402
 
 
 def test_serialization_and_hashes_are_deterministic() -> None:

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.contracts.errors import AnalyticsValidationError
@@ -32,7 +32,7 @@ from app.utils import canonical_json, derive_stable_id, get_logger, validate_id
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.data import MarketDataset
+    MarketDataset = Any
 
 REQUIRED_REPORT_SECTIONS = ("trades", "pnl", "equity_returns", "drawdown")
 OPTIONAL_REPORT_SECTIONS = (

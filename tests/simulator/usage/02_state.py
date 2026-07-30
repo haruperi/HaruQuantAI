@@ -10,7 +10,7 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.simulator import SIMULATION_MIGRATIONS, SimulationStateStore
+from app.services.simulator import get_simulation_migrations
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 
@@ -35,13 +35,19 @@ def fr_sim_041() -> None:
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)
-        store: SimulationStateStore = SqliteSimulationStateStore(
+        store = SqliteSimulationStateStore(
             tmp_path / "simulation.db", tmp_path / "artifacts"
         )
         store.record_idempotency("req-usage", "a" * 64, "run-usage", "started")
         run_info = store.load_run("req-usage")
-        print(f"Recorded run info loaded: {run_info is not None}")
-        print(f"First simulation migration domain: {SIMULATION_MIGRATIONS[0].domain}")
+        print("Persisted idempotency row:", run_info)
+        migrations = get_simulation_migrations()
+        print(
+            "Simulation migration manifest:",
+            tuple(
+                step.model_dump(mode="python", warnings=False) for step in migrations
+            ),
+        )
 
 
 def main() -> None:

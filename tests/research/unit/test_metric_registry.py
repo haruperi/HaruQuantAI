@@ -4,13 +4,15 @@ from dataclasses import dataclass
 
 import pandas as pd
 import pytest
-from app.services.research.metrics import (
-    MetricCalculator,
-    MetricRegistry,
+from app.services.research import (
     build_default_registry,
+    create_research_metric_registry,
+    create_research_value,
+    is_research_metric_calculator,
 )
-from app.services.research.metrics.registry import MetricContext, MetricValue
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 @dataclass(frozen=True)
@@ -19,7 +21,7 @@ class _Calculator:
 
     family: str
 
-    def compute(self, context: MetricContext) -> tuple[MetricValue, ...]:
+    def compute(self, context: object) -> tuple[object, ...]:
         """Return one normalized test value.
 
         Args:
@@ -29,27 +31,33 @@ class _Calculator:
             One normalized value.
         """
         logger.debug("Computing test metric for %d rows", len(context.data))
-        return (MetricValue(self.family, 1.0, "ratio", len(context.data)),)
+        return (
+            create_research_value(
+                "MetricValue", self.family, 1.0, "ratio", len(context.data)
+            ),
+        )
 
 
 def test_calculator_protocol_contract() -> None:
     """Verify structural calculators satisfy the public protocol."""
     logger.debug("Testing Research calculator protocol")
-    assert isinstance(_Calculator("returns"), MetricCalculator)
+    assert is_research_metric_calculator(_Calculator("returns"))
 
 
 def test_calculator_returns_normalized_values() -> None:
     """Verify calculators return immutable normalized values."""
     logger.debug("Testing normalized Research metric values")
-    values = _Calculator("returns").compute(MetricContext(pd.DataFrame({"x": [1]})))
+    values = _Calculator("returns").compute(
+        create_research_value("MetricContext", pd.DataFrame({"x": [1]}))
+    )
     assert values[0].unit == "ratio"
 
 
 def test_registry_rejects_duplicate_family() -> None:
     """Verify duplicate families fail."""
     logger.debug("Testing duplicate Research metric family")
-    with pytest.raises(ValidationError):
-        MetricRegistry.from_calculators(
+    with pytest.raises(ValueError, match=r"."):
+        create_research_metric_registry(
             (_Calculator("returns"), _Calculator("returns"))
         )
 
@@ -58,7 +66,7 @@ def test_from_calculators_is_isolated() -> None:
     """Verify source iterable changes cannot mutate a registry."""
     logger.debug("Testing isolated Research metric registry")
     calculators = [_Calculator("returns")]
-    registry = MetricRegistry.from_calculators(calculators)
+    registry = create_research_metric_registry(calculators)
     calculators.append(_Calculator("roc"))
     assert len(registry.all()) == 1
 
@@ -66,7 +74,7 @@ def test_from_calculators_is_isolated() -> None:
 def test_resolve_missing_family() -> None:
     """Verify missing exact family resolution fails."""
     logger.debug("Testing missing Research metric family")
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValueError, match=r"."):
         build_default_registry().resolve("missing")
 
 

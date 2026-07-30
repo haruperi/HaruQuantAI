@@ -5,24 +5,26 @@ from decimal import Decimal
 from pathlib import Path
 
 from app.services.simulator import (
-    JournalEvent,
+    get_simulation_value_field,
     replay_journal,
     run_portfolio_backtest,
     unwrap_simulation_response,
 )
-from app.utils import logger
+from app.utils import get_logger
 from tests.simulator.unit.test_orchestrator import FakeDependencies, _dataset
 from tests.simulator.unit.test_portfolio_run import (
     _portfolio_auth,
     _portfolio_request,
 )
 
+logger = get_logger(__name__)
 
-def _last_event(state: object, event: JournalEvent) -> dict[str, object]:
+
+def _last_event(state: object, event: object) -> dict[str, object]:
     """Project the latest aggregate journal event."""
     logger.debug("Reducing one portfolio aggregate journal event")
     del state
-    return {"last_type": event.event_type}
+    return {"last_type": get_simulation_value_field(event, "event_type")}
 
 
 def test_portfolio_candidate_publishes_reconciled_aggregate(tmp_path: Path) -> None:

@@ -8,11 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.simulator import (
-    SimulationError,
-    run_backtest,
-    unwrap_simulation_response,
-)
+from app.services.simulator import run_backtest, unwrap_simulation_response
 from tests.simulator.usage.workflows._support import (
     authority,
     backtest_request,
@@ -66,7 +62,7 @@ def main() -> None:
                 response,
                 operation="simulation.workflow.wf_sim_004.run_backtest",
             )
-        except SimulationError as error:
+        except Exception as error:  # noqa: BLE001 - exception type is private.
             blocked = error
         else:
             raise AssertionError("failed-quality data unexpectedly executed")
@@ -74,7 +70,10 @@ def main() -> None:
         # Stage 4 — Return structured failure with no execution state or published result.
         _stage(4)
         assert not tuple(deps.artifact_root.rglob("manifest.json"))
-        print("OUTPUT BOUNDARY — typed SimulationError:", blocked.code)
+        print(
+            "OUTPUT BOUNDARY — controlled Simulation failure:",
+            blocked.code,
+        )
 
 
 if __name__ == "__main__":

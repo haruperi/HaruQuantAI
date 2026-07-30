@@ -206,3 +206,93 @@ def test_protective_exit_fails_closed_on_undeclared_precedence(
     with pytest.raises(SimulationError) as captured:
         evaluate_protective_exit(position, tick)
     assert captured.value.code == "SIM_EVENT_PRIORITY_AMBIGUOUS"
+
+
+def _unbounded_profile(
+    *, maximum_gap_points: Decimal = Decimal(10)
+) -> ExecutionProfile:
+    """Build one unbounded matching profile."""
+    return ExecutionProfile(
+        slippage_mode="none",
+        fixed_slippage_points=Decimal(0),
+        point_value=Decimal("0.0001"),
+        price_quantum=Decimal("0.0001"),
+        maximum_slippage_points=Decimal(0),
+        maximum_gap_points=maximum_gap_points,
+        liquidity_mode="unbounded",
+        participation_rate=Decimal(0),
+        sessions=(SessionInterval(start_week_second=0, end_week_second=604_800),),
+    )
+
+
+def test_match_order_rejects_unsupported_fill_policy() -> None:
+    """Reject a Trading intent whose fill policy is outside Simulation scope."""
+    intent = _intent().model_copy(update={"time_in_force": "GTC"})
+    with pytest.raises(SimulationError) as captured:
+        match_order(
+            intent, _exit_tick(Decimal("1.1"), Decimal("1.2")), _unbounded_profile()
+        )
+    assert captured.value.code == "SIM_UNSUPPORTED_FILL_POLICY"
+
+
+def test_limit_and_stop_orders_require_typed_trigger_prices() -> None:
+    """Reject missing price evidence and leave an untriggered limit pending."""
+    tick = _exit_tick(Decimal("1.1"), Decimal("1.2"))
+    profile = _unbounded_profile()
+    missing_limit = _intent().model_copy(update={"order_type": "LIMIT", "price": None})
+    with pytest.raises(SimulationError, match="missing"):
+        match_order(missing_limit, tick, profile)
+    pending = _intent().model_copy(
+        update={"order_type": "LIMIT", "price": Decimal("1.1")}
+    )
+    assert match_order(pending, tick, profile).status == "pending"
+    missing_stop = _intent().model_copy(
+        update={"order_type": "STOP", "stop_price": None}
+    )
+    with pytest.raises(SimulationError, match="missing"):
+        match_order(missing_stop, tick, profile)
+
+
+def test_match_order_rejects_gap_and_missing_liquidity() -> None:
+    """Reject excessive trigger gaps and absent bounded-volume evidence."""
+    tick = _exit_tick(Decimal("1.1"), Decimal("1.2"))
+    stop = _intent().model_copy(
+        update={"order_type": "STOP", "stop_price": Decimal("1.1")}
+    )
+    with pytest.raises(SimulationError) as captured:
+        match_order(stop, tick, _unbounded_profile(maximum_gap_points=Decimal(1)))
+    assert captured.value.code == "SIM_GAP_UNCROSSABLE"
+    bounded = _unbounded_profile().model_copy(
+        update={
+            "liquidity_mode": "tick_volume",
+            "participation_rate": Decimal("0.5"),
+        }
+    )
+    with pytest.raises(SimulationError) as captured:
+        match_order(_intent(), tick, bounded)
+    assert captured.value.code == "SIM_LIQUIDITY_UNAVAILABLE"
+
+
+def test_fok_cancels_when_tick_liquidity_is_insufficient() -> None:
+    """Cancel the full FOK quantity when measured volume cannot fill it."""
+    tick = Tick(
+        symbol="EURUSD",
+        timestamp=datetime(2025, 1, 1, tzinfo=UTC),
+        bid=Decimal("1.1"),
+        ask=Decimal("1.2"),
+        source_id="fixture",
+        sequence=1,
+        available_at=datetime(2025, 1, 1, tzinfo=UTC),
+        volume=Decimal(1),
+        volume_unit="lot",
+    )
+    profile = _unbounded_profile().model_copy(
+        update={
+            "liquidity_mode": "tick_volume",
+            "participation_rate": Decimal(1),
+        }
+    )
+    intent = _intent().model_copy(update={"time_in_force": "FOK"})
+    result = match_order(intent, tick, profile)
+    assert result.status == "cancelled"
+    assert result.cancelled_quantity == Decimal(2)

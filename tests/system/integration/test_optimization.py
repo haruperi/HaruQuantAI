@@ -1,31 +1,102 @@
 """SYS-WF-003 Optimization through approved Strategy adoption integration."""
 
 from contextlib import AbstractContextManager
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 
 from app.services.api.identity import require_auth_context
 from app.services.api.routes import strategies
 from app.services.api.routes.strategies import router as strategies_router
-from app.services.data import DataSettings, data_settings_context
-from app.services.optimization import run_parameter_sweep
-from app.services.optimization.execution import SimulationAnalyticsBacktestAdapter
-from app.services.strategy import (
-    StrategyConfig,
-    StrategyEnvironment,
-    StrategyParameterUpdateRequest,
-    StrategyRef,
+from app.services.data import (
+    build_data_quality_report,
+    build_data_settings,
+    build_market_dataset,
+    build_ohlcv_record,
+    data_settings_context,
 )
-from app.utils import logger
+from app.services.optimization import (
+    build_simulation_analytics_backtest_adapter,
+    run_parameter_sweep,
+)
+from app.services.strategy import (
+    create_strategy_config,
+    create_strategy_parameter_update_request,
+    create_strategy_ref,
+    get_strategy_environment,
+)
+from app.utils import get_logger
 from fastapi import FastAPI
 
 from tests.analytics._support import _report
 from tests.api._support import post_json
-from tests.data.helpers import make_dataset
 from tests.optimization.unit.test_adapter import _auth
 from tests.optimization.unit.test_search_contracts import search_request
 from tests.simulator.unit.test_reporting_contracts import _result
 from tests.strategy.unit.test_catalog import make_registration
 from tests.strategy.unit.test_models import make_auth, make_policy
+
+START = datetime(2026, 1, 1, tzinfo=UTC)
+END = START + timedelta(minutes=1)
+AVAILABLE = END + timedelta(seconds=1)
+logger = get_logger(__name__)
+
+
+def make_bar(timestamp=START):
+    """Return one exact canonical OHLCV record."""
+    return build_ohlcv_record(
+        timestamp=timestamp,
+        open=Decimal("10.0"),
+        high=Decimal("11.0"),
+        low=Decimal("9.0"),
+        close=Decimal("10.5"),
+        volume=Decimal(100),
+        price_unit="USD",
+        volume_unit="shares",
+        source="fixture",
+        source_symbol="ABC",
+        source_revision="rev-1",
+        available_at=timestamp + timedelta(seconds=1),
+    )
+
+
+def make_quality(count=1):
+    """Return passing bounded quality evidence."""
+    return build_data_quality_report(
+        quality_status="passed",
+        quality_score=Decimal(1),
+        issues=(),
+        warnings=(),
+        record_count=count,
+        checked_count=count,
+        truncated=False,
+        sample_limit=10,
+        schema_version="v1",
+        generated_at=AVAILABLE,
+    )
+
+
+def make_dataset():
+    """Return one immutable provider-neutral market dataset."""
+    bar = make_bar()
+    return build_market_dataset(
+        normalization_version="v1",
+        data_kind="bars",
+        symbol="ABC",
+        timeframe="1m",
+        records=(bar,),
+        start=START,
+        end=START,
+        available_at=AVAILABLE,
+        record_count=1,
+        quality_report=make_quality(),
+        source_metadata={"source": "fixture"},
+        license_metadata={"status": "approved"},
+        cache_status="miss",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
+    )
 
 
 def _storage(root: Path) -> AbstractContextManager[None]:
@@ -38,7 +109,7 @@ def _storage(root: Path) -> AbstractContextManager[None]:
         Data settings context.
     """
     return data_settings_context(
-        DataSettings(
+        build_data_settings(
             database_url="sqlite:///sys-wf-003.sqlite3",
             data_dir=root,
             sqlite_busy_timeout_seconds=1.5,
@@ -75,14 +146,14 @@ def test_sys_wf_003_approved_optimization_adoption(tmp_path: Path) -> None:
         return _result()
 
     _, analytics_config = _report()
-    adapter = SimulationAnalyticsBacktestAdapter(
+    adapter = build_simulation_analytics_backtest_adapter(
         auth_context=_auth(),
         simulation_dependencies=object(),
         analytics_config=analytics_config,
         engine_type="event_driven",
         engine_version="v1",
-        simulation_runner=runner,
     )
+    adapter._simulation_runner = runner
     response = run_parameter_sweep(search_request(), adapter)
     assert response.data is not None
     result = response.data
@@ -107,21 +178,21 @@ def test_sys_wf_003_approved_optimization_adoption(tmp_path: Path) -> None:
             "config_schema": strategy_manifest.config_schema,
         }
     )
-    strategy_config = StrategyConfig(
+    strategy_config = create_strategy_config(
         strategy_id="mean-reversion",
         strategy_version="1.0.0",
         config_schema_version="v1",
         parameters=parameters,
         request_id="req-system-optimization",
     )
-    strategy_ref = StrategyRef(
+    strategy_ref = create_strategy_ref(
         strategy_id=registration.strategy_id,
         exact_version=registration.strategy_version,
-        environment=StrategyEnvironment.RESEARCH,
+        environment=get_strategy_environment("RESEARCH"),
         request_id=registration.request_id,
         correlation_id=registration.correlation_id,
     )
-    update = StrategyParameterUpdateRequest(
+    update = create_strategy_parameter_update_request(
         command_id="command-approved-optimization-adoption",
         strategy_id=registration.strategy_id,
         strategy_version=registration.strategy_version,

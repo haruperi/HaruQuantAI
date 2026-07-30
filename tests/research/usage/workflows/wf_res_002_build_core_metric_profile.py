@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.research.metrics import build_core_metric_profile
+from app.services.research import build_core_metric_profile
 from tests.research.usage.workflows._support import limits, prepared_dataset
 
 WORKFLOW_ID = "WF-RES-002"
@@ -37,7 +37,7 @@ def main() -> None:
 
     # Stage 2 — Resolve the immutable default metric registry.
     _stage(2)
-    from app.services.research.metrics import build_default_registry
+    from app.services.research import build_default_registry
 
     registry = build_default_registry()
 

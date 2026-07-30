@@ -55,15 +55,23 @@ def test_cross_domain_imports_use_public_ports_and_remain_acyclic():
 def test_shared_contract_classes_keep_version_and_schema_identity_together():
     for path in sorted(_APP_ROOT.rglob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        for node in ast.walk(tree):
-            if not isinstance(node, ast.ClassDef):
-                continue
-            fields = {
+        class_fields = {
+            node.name: {
                 statement.target.id
                 for statement in node.body
                 if isinstance(statement, ast.AnnAssign)
                 and isinstance(statement.target, ast.Name)
             }
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ClassDef)
+        }
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.ClassDef) or node.name.startswith("_"):
+                continue
+            fields = set(class_fields[node.name])
+            for base in node.bases:
+                if isinstance(base, ast.Name):
+                    fields.update(class_fields.get(base.id, set()))
             identity_fields = fields & {"contract_version", "schema_id"}
             assert not identity_fields or identity_fields == {
                 "contract_version",

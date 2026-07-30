@@ -25,6 +25,7 @@ FEATURE_DIRECTORIES = frozenset(
         "persistence",
         "quality",
         "realtime_feeds",
+        "research_sources",
         "sources",
         "synthetic_data",
         "tick_derivation",

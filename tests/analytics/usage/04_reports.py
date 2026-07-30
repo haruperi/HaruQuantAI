@@ -7,6 +7,7 @@ import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
@@ -31,11 +32,8 @@ from app.services.analytics import (
     build_worst_day_distribution,
     compare_performance_reports,
     compute_reproducibility_hashes,
+    get_analytics_value_field,
     serialize_report,
-)
-from app.services.optimization.robustness import (
-    FirstPassageReport,
-    JointFirstPassageReport,
 )
 from app.services.risk import get_drawdown_mode
 from app.utils import generate_id
@@ -348,13 +346,17 @@ def fr_anlt_053() -> None:
         ),
         percentiles=(Decimal("0.5"), Decimal("0.95")),
     )
-    print(f"Worst-day percentiles: {dict(distribution.percentiles)}")
+    distribution = unwrap(distribution)
+    print(
+        "Worst-day percentiles:",
+        dict(get_analytics_value_field(distribution, "percentiles")),
+    )
 
 
 def fr_anlt_054() -> None:
     """FR-ANLT-054: Build a non-fabricating barrier report section."""
     _header("FR-ANLT-054: Barrier report section")
-    first = FirstPassageReport(
+    first = SimpleNamespace(
         mandate_version="v1",
         mode=get_drawdown_mode("STATIC"),
         paths=10,
@@ -365,7 +367,7 @@ def fr_anlt_054() -> None:
         probability_expired=Decimal("0.3"),
         median_termination_day=Decimal(3),
     )
-    joint = JointFirstPassageReport(
+    joint = SimpleNamespace(
         paths=10,
         seed=7,
         account_ids=("account-1", "account-2"),
@@ -377,18 +379,22 @@ def fr_anlt_054() -> None:
         probability_none_survive=Decimal("0.2"),
         measured_correlation={"account-1:account-2": Decimal("0.8")},
     )
-    worst = build_worst_day_distribution(
-        ClosedTradeLedger(daily_pnl=(Decimal(-100), Decimal(-10))),
-        percentiles=(Decimal("0.95"),),
+    worst = unwrap(
+        build_worst_day_distribution(
+            ClosedTradeLedger(daily_pnl=(Decimal(-100), Decimal(-10))),
+            percentiles=(Decimal("0.95"),),
+        )
     )
-    section = build_barrier_section(
-        first,
-        joint,
-        worst,
-        mandate_version="v1",
-        mode_sensitivity={get_drawdown_mode("STATIC"): first},
+    section = unwrap(
+        build_barrier_section(
+            first,
+            joint,
+            worst,
+            mandate_version="v1",
+            mode_sensitivity={get_drawdown_mode("STATIC"): first},
+        )
     )
-    print(f"Barrier section status: {section.status}")
+    print("Barrier section status:", get_analytics_value_field(section, "status"))
 
 
 def main() -> None:

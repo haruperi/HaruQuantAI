@@ -251,6 +251,8 @@ class BrokerProviderSettings(AppSettings):
         binance_environment: Binance Spot connection environment (testnet).
         dukascopy_enabled: Whether the Dukascopy provider connection is permitted.
         yahoo_enabled: Whether the Yahoo provider connection is permitted.
+        firecrawl_api_key: Licensed Firecrawl scraping-intermediary API key used
+            by the Data economic-calendar transport.
     """
 
     mt5_enabled: bool = False
@@ -269,3 +271,9 @@ class BrokerProviderSettings(AppSettings):
     binance_environment: Literal["testnet"] = "testnet"
     dukascopy_enabled: bool = False
     yahoo_enabled: bool = False
+    # Licensed Firecrawl scraping-intermediary API key used by the Data
+    # economic-calendar transport; the central file stores it as
+    # settings.firecrawl.firecrawl.
+    firecrawl_api_key: SecretStr | None = Field(
+        default=None, validation_alias="firecrawl_firecrawl"
+    )

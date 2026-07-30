@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, time
 from decimal import Decimal
-from typing import cast
+from typing import Any, cast
 
 from pydantic import ValidationError as PydanticValidationError
 
@@ -17,10 +17,13 @@ from app.services.analytics.contracts.models import (
     Lineage,
     TradingResult,
 )
-from app.services.data import MarketDataset, OHLCVRecord
+from app.services.data import is_ohlcv_record
 from app.utils import canonical_json, get_logger, redact_mapping_value
 
 logger = get_logger(__name__)
+
+MarketDataset = Any
+OHLCVRecord = Any
 
 _SOURCE_FIELDS = frozenset(
     {
@@ -213,7 +216,7 @@ def _adapt_benchmark(
         )
     if len(benchmark.records) - 1 > config.max_benchmark_points:
         raise AnalyticsValidationError("benchmark exceeds configured point bound")
-    if any(not isinstance(record, OHLCVRecord) for record in benchmark.records):
+    if any(not is_ohlcv_record(record) for record in benchmark.records):
         raise AnalyticsValidationError(
             "benchmark MarketDataset contains non-bar records"
         )

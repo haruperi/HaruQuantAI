@@ -6,7 +6,7 @@ from pathlib import Path
 from app.services.api.identity import require_auth_context
 from app.services.api.routes import strategies
 from app.services.api.routes.strategies import router
-from app.services.data import DataSettings, data_settings_context
+from app.services.data import build_data_settings, data_settings_context
 from fastapi import FastAPI
 
 from tests.api._support import post_json
@@ -24,7 +24,7 @@ def _storage(root: Path) -> AbstractContextManager[None]:
         Data settings context manager.
     """
     return data_settings_context(
-        DataSettings(
+        build_data_settings(
             database_url="sqlite:///api-strategy.sqlite3",
             data_dir=root,
             sqlite_busy_timeout_seconds=1.5,

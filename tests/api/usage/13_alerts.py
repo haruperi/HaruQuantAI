@@ -4,13 +4,14 @@ import sys
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.api import (
-    CriticalAlertDeliveryResult,
-    CriticalAlertTrigger,
-    CriticalOperationalAlert,
+    build_critical_alert_delivery_result,
+    build_critical_alert_trigger,
+    build_critical_operational_alert,
     build_kill_switch_activation_alert,
     build_unknown_broker_state_alert,
     deliver_critical_alert,
@@ -20,10 +21,11 @@ from app.services.trading import (
     build_broker_state_unknown_event,
     create_execution_receipt,
 )
-from app.utils import AuthContext
+from app.utils import create_auth_context
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 KillSwitchState = object
+AuthContext = Any
 
 NOW = datetime(2026, 7, 24, 9, tzinfo=UTC)
 REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
@@ -37,7 +39,7 @@ def _context() -> AuthContext:
     Returns:
         Valid shared authentication context.
     """
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="operator-example",
@@ -70,7 +72,7 @@ def _active_state() -> KillSwitchState:
     )
 
 
-def fr_api_064() -> CriticalOperationalAlert:
+def fr_api_064() -> object:
     """FR-API-064: Represent one of the two approved critical triggers, its
     deterministic authoritative-source binding, fixed-template bounded redacted
     content, and one delivery attempt/result without carrying secrets or provider
@@ -80,11 +82,11 @@ def fr_api_064() -> CriticalOperationalAlert:
         One bounded critical operational alert.
     """
     alert = build_kill_switch_activation_alert(_active_state(), _context())
-    assert alert.trigger is CriticalAlertTrigger.RISK_KILL_SWITCH_ACTIVATED
-    return CriticalOperationalAlert.model_validate(alert.model_dump())
+    assert alert.trigger is build_critical_alert_trigger("RISK_KILL_SWITCH_ACTIVATED")
+    return build_critical_operational_alert(**alert.model_dump())
 
 
-def fr_api_065() -> CriticalOperationalAlert:
+def fr_api_065() -> object:
     """FR-API-065: Accept only an active Risk KillSwitchState v1 plus
     authenticated trace context and derive risk.kill_switch_activated with identity
     bound to state ID/version; inactive or unknown state never creates an alert.
@@ -98,7 +100,7 @@ def fr_api_065() -> CriticalOperationalAlert:
     return first
 
 
-def fr_api_066() -> CriticalOperationalAlert:
+def fr_api_066() -> object:
     """FR-API-066: Accept only a critical Trading BROKER_STATE_UNKNOWN
     OperationalEvent v1 with retry_locked=true and receipt/incident references, and
     derive trading.broker_state_unknown with identity bound to the event ID.
@@ -133,11 +135,11 @@ def fr_api_066() -> CriticalOperationalAlert:
     assert event.status == "success"
     assert event.data is not None
     alert = build_unknown_broker_state_alert(event.data)
-    assert alert.trigger is CriticalAlertTrigger.TRADING_BROKER_STATE_UNKNOWN
-    return alert
+    assert alert.trigger is build_critical_alert_trigger("TRADING_BROKER_STATE_UNKNOWN")
+    return build_critical_operational_alert(**alert.model_dump())
 
 
-def fr_api_067() -> CriticalAlertDeliveryResult:
+def fr_api_067() -> object:
     """FR-API-067: Submit the alert exactly once to an injected sink using
     alert_id as the idempotency key and return a delivered/failed
     CriticalAlertDeliveryResult.
@@ -148,14 +150,14 @@ def fr_api_067() -> CriticalAlertDeliveryResult:
     alert = fr_api_065()
     attempts: list[str] = []
 
-    def sink(value: CriticalOperationalAlert, *, idempotency_key: str) -> None:
+    def sink(value: object, *, idempotency_key: str) -> None:
         """Record one secret-safe demonstration delivery."""
         assert value == alert
         attempts.append(idempotency_key)
 
     result = deliver_critical_alert(alert, sink)
     assert attempts == [alert.alert_id]
-    return CriticalAlertDeliveryResult.model_validate(result.model_dump())
+    return build_critical_alert_delivery_result(**result.model_dump())
 
 
 def main() -> None:

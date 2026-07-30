@@ -16,6 +16,7 @@ EXPECTED = {
     "WF-OPT-SEC": "wf_opt_sec_run_walk_forward_validation.py",
     "WF-OPT-005": "wf_opt_005_run_monte_carlo_robustness_analysis.py",
     "WF-OPT-006": "wf_opt_006_build_persist_versioned_evidence_handoffs.py",
+    "WF-OPT-007": "wf_opt_007_compare_runs_parameter_stability.py",
     "WF-OPT-008": "wf_opt_008_first_passage_drawdown_sensitivity.py",
 }
 

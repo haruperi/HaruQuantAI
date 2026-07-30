@@ -1,9 +1,14 @@
 """FEAT-BRK-03: cTrader provider lifecycle."""
 
 import asyncio
+import sys
+from pathlib import Path
+from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import _support  # noqa: F401
-from _support import real_session, require_error, require_success
+from _support import UsageEvidenceError, real_session, require_error, require_success
 from app.services.brokers import (
     get_broker_connection_events,
     get_broker_connection_status,
@@ -18,21 +23,43 @@ from app.services.brokers import (
 )
 
 
+def _feature_header(title: str) -> None:
+    """Print feature title and module flow banner."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"\n{'-' * 88}\n{title}\n{'-' * 88}")
 
 
-async def fr_brokers_057(adapter: object) -> None:
-    """FR-BRK-057: Yield one event per validated lifecycle transition."""
-    _header("FR-BRK-057: Yield one event per validated lifecycle transition.")
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
+
+
+async def fr_brokers_057_connection_events(adapter: object) -> None:
+    """FR-BRK-057: Stage 1 & 2 — cTrader Credentials and Connection Verification."""
+    _header("Stage 1 & 2: Credentials & Connection Verification (FR-BRK-057)")
     result = await get_broker_connection_status(adapter)
     require_success("Connection status", result)
     data = get_broker_value_field(result, "data")
     assert data is not None
     assert get_broker_value_field(data, "transport_connected")
+    print(_format_result(result))
     print(
-        "Lifecycle events available", get_broker_connection_events(adapter) is not None
+        f"Data -> transport_connected={get_broker_value_field(data, 'transport_connected')}, connection_events={get_broker_connection_events(adapter) is not None}"
     )
 
 
@@ -55,65 +82,53 @@ async def _require_unreleased(
         result = await get_broker_ticks(adapter, "EURUSD", limit=5)
     else:
         result = await get_broker_historical_bars(adapter, "EURUSD", "1m", limit=5)
+
     if get_broker_value_field(result, "status") == "success":
         require_success("Result", result)
     else:
         require_error("Result", result, "BROKER_CAPABILITY_UNSUPPORTED")
+    print(_format_result(result))
+    print(
+        f"Data -> operation='{operation}', status='{get_broker_value_field(result, 'status')}'"
+    )
 
 
-async def fr_brokers_058(adapter: object) -> None:
-    """FR-BRK-058: Return bounded exact provider-native symbols."""
-    _header("FR-BRK-058: Return bounded exact provider-native symbols.")
-    await _require_unreleased(adapter, "symbols")
-
-
-async def fr_brokers_059(adapter: object) -> None:
-    """FR-BRK-059: Return provider specifications and trading flags."""
-    _header("FR-BRK-059: Return provider specifications and trading flags.")
-    await _require_unreleased(adapter, "symbol_info")
-
-
-async def fr_brokers_060(adapter: object) -> None:
-    """FR-BRK-060: Perform watch-list selection or return unsupported."""
-    _header("FR-BRK-060: Perform watch-list selection or return unsupported.")
-    await _require_unreleased(adapter, "select_symbol")
-
-
-async def fr_brokers_061(adapter: object) -> None:
-    """FR-BRK-061: Return provider-reported market state without derivation."""
-    _header("FR-BRK-061: Return provider-reported market state without derivation.")
-    await _require_unreleased(adapter, "market_status")
-
-
-async def fr_brokers_063(adapter: object) -> None:
-    """FR-BRK-063: Return a genuine quote without fallback price."""
-    _header("FR-BRK-063: Return a genuine quote without fallback price.")
-    await _require_unreleased(adapter, "quote")
-
-
-async def fr_brokers_064(adapter: object) -> None:
-    """FR-BRK-064: Return bounded genuine provider ticks or unsupported."""
-    _header("FR-BRK-064: Return bounded genuine provider ticks or unsupported.")
-    await _require_unreleased(adapter, "ticks")
-
-
-async def fr_brokers_065(adapter: object) -> None:
-    """FR-BRK-065: Return bounded provider bars using timeframe translation."""
-    _header("FR-BRK-065: Return bounded provider bars using timeframe translation.")
-    await _require_unreleased(adapter, "bars")
+async def fr_brokers_058_to_065_authenticated_session_reads(adapter: object) -> None:
+    """FR-BRK-058..065: Stage 3 — Authenticated Session Read Surface Output."""
+    _header("Stage 3: Authenticated Session Reads Output (FR-BRK-058..065)")
+    for op in (
+        "symbols",
+        "symbol_info",
+        "select_symbol",
+        "market_status",
+        "quote",
+        "ticks",
+        "bars",
+    ):
+        await _require_unreleased(adapter, op)
 
 
 async def _run() -> None:
     """Execute lifecycle evidence in one genuine cTrader demo session."""
-    async with real_session("ctrader") as adapter:
-        await fr_brokers_057(adapter)
-        await fr_brokers_058(adapter)
-        await fr_brokers_059(adapter)
-        await fr_brokers_060(adapter)
-        await fr_brokers_061(adapter)
-        await fr_brokers_063(adapter)
-        await fr_brokers_064(adapter)
-        await fr_brokers_065(adapter)
+    _feature_header(
+        "FEATURE: FEAT-BRK-03 — ctrader_session/ — cTrader Account Lifecycle\n\n"
+        "Purpose: Provide cTrader session lifecycle, authentication, and platform info.\n\n"
+        "Module flow:\n"
+        "-> cTrader credentials\n"
+        "-> protobuf connection\n"
+        "-> authenticated session"
+    )
+
+    try:
+        async with real_session("ctrader") as adapter:
+            # Stage 1 & 2: Credentials and connection verification
+            await fr_brokers_057_connection_events(adapter)
+
+            # Stage 3: Authenticated session reads output
+            await fr_brokers_058_to_065_authenticated_session_reads(adapter)
+    except UsageEvidenceError as err:
+        print("Output Result -> UsageEvidenceError : UsageEvidenceError")
+        print(f"Data -> status='FAIL_CLOSED', reason='{err}'")
 
 
 def main() -> None:

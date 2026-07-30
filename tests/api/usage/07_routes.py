@@ -3,13 +3,14 @@
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.api.identity import require_auth_context
 from app.services.api.routes import operator, operator_router
 from app.services.risk import create_kill_switch_state
-from app.utils import AuthContext
+from app.utils import create_auth_context
 from fastapi import FastAPI
 from tests.api._support import post_json
 
@@ -17,6 +18,7 @@ from tests.api._support import post_json
 ApprovalAttestation = object
 KillSwitchCommand = object
 KillSwitchState = object
+AuthContext = Any
 
 NOW = datetime(2026, 7, 24, 9, tzinfo=UTC)
 REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
@@ -30,7 +32,7 @@ def _auth() -> AuthContext:
     Returns:
         Valid authenticated context.
     """
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="operator-example",

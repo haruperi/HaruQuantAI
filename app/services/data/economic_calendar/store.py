@@ -422,4 +422,26 @@ class EconomicEventStore:
         )
 
 
-__all__ = ["EconomicEventStore", "from_row"]
+def persist_economic_events(
+    events: Sequence[EconomicEvent],
+    *,
+    store: EconomicEventStore,
+    request_id: str,
+) -> StandardResponse[int]:
+    """Persist normalized economic events through the function-only boundary.
+
+    Args:
+        events: Normalized events acquired through the provider-neutral API.
+        store: Opaque Data-owned event-store handle.
+        request_id: Caller-supplied trace correlation ID.
+
+    Returns:
+        Standard response carrying the number of rows upserted.
+
+    Raises:
+        (in-band) ``DataError`` codes when the transactional write fails.
+    """
+    return store.upsert(events, request_id=request_id)
+
+
+__all__ = ["EconomicEventStore", "from_row", "persist_economic_events"]

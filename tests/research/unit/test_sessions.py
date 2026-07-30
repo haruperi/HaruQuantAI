@@ -4,19 +4,22 @@ from datetime import time
 
 import pandas as pd
 import pytest
-from app.services.research import SessionConfig
-from app.services.research.seasonality import (
+from app.services.research import (
     active_sessions_for_hour,
+    create_research_value,
     session_hours_payload,
     session_label_for_hour,
     tag_sessions,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
-def _config() -> SessionConfig:
+def _config() -> object:
     """Build a two-session policy with a documented overlap."""
-    return SessionConfig(
+    return create_research_value(
+        "SessionConfig",
         "UTC",
         {
             "london": (time(8), time(17)),
@@ -26,9 +29,10 @@ def _config() -> SessionConfig:
     )
 
 
-def _cross_midnight_config() -> SessionConfig:
+def _cross_midnight_config() -> object:
     """Build a session policy with a cross-midnight window."""
-    return SessionConfig(
+    return create_research_value(
+        "SessionConfig",
         "UTC",
         {
             "sydney": (time(22), time(7)),
@@ -73,7 +77,7 @@ def test_session_payload_is_versioned() -> None:
 
 def test_active_sessions_rejects_invalid_hour() -> None:
     """FR-RES-069: invalid hour fails closed."""
-    with pytest.raises(ValidationError, match="INVALID_HOUR_OF_DAY"):
+    with pytest.raises(ValueError, match="INVALID_HOUR_OF_DAY"):
         active_sessions_for_hour(24, config=_config())
 
 
@@ -93,5 +97,5 @@ def test_tag_sessions_rejects_naive_index() -> None:
     """FR-RES-072: naive timestamps fail closed."""
     idx = pd.date_range("2026-01-01", periods=5, freq="h")
     data = pd.DataFrame({"close": range(5)}, index=idx)
-    with pytest.raises(ValidationError, match="NAIVE_INDEX_REJECTED"):
+    with pytest.raises(ValueError, match="NAIVE_INDEX_REJECTED"):
         tag_sessions(data, config=_config())

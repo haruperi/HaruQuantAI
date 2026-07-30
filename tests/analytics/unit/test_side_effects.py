@@ -6,9 +6,11 @@ import socket
 import subprocess
 
 import pytest
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics._support import _report
+logger = get_logger(__name__)
+
+from tests.analytics._support import _report  # noqa: E402
 
 
 def _unexpected(*_args: object, **_kwargs: object) -> None:

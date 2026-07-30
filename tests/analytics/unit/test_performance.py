@@ -3,9 +3,11 @@
 import time
 import tracemalloc
 
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics._support import _report
+logger = get_logger(__name__)
+
+from tests.analytics._support import _report  # noqa: E402
 
 _MAX_REFERENCE_SECONDS = 5.0
 _MAX_REFERENCE_PEAK_BYTES = 64 * 1024 * 1024

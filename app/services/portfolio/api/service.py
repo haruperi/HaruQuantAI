@@ -7,9 +7,9 @@ from collections.abc import Mapping
 from datetime import datetime
 from decimal import Decimal
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
-from app.services.portfolio.exceptions import (
+from app.services.portfolio.contracts.errors import (
     PORTFOLIO_ERROR_CATALOG,
     PortfolioError,
 )
@@ -191,7 +191,7 @@ class PortfolioService:
             if isinstance(value, str):
                 try:
                     return validate_id(value, expected_prefix=prefix)
-                except TypeError, ValueError:
+                except Exception:  # noqa: BLE001 - malformed public input fails closed.
                     logger.debug("Replacing malformed Portfolio trace identifier")
             return generate_id(prefix)
 
@@ -790,4 +790,250 @@ class PortfolioService:
             )
 
 
-__all__: tuple[str, ...] = ("PortfolioService",)
+def _require_portfolio_service(service_handle: object) -> PortfolioService:
+    """Validate one opaque Portfolio public-service handle.
+
+    Args:
+        service_handle: Candidate handle created by the Portfolio factory.
+
+    Returns:
+        Validated internal Portfolio service.
+
+    Raises:
+        TypeError: If the object is not a Portfolio public-service handle.
+    """
+    if not isinstance(service_handle, PortfolioService):
+        raise TypeError("service_handle must be a PortfolioService handle")
+    return service_handle
+
+
+def construct_portfolio(
+    service_handle: object,
+    request: object,
+    auth_context: object,
+    request_id: str | None = None,
+) -> object:
+    """Run governed Portfolio construction.
+
+    Returns:
+        Structured Portfolio response envelope.
+    """
+    return _require_portfolio_service(service_handle).construct(
+        cast("PortfolioConstructionRequest", request),
+        cast("AuthContext", auth_context),
+        request_id,
+    )
+
+
+def get_portfolio_status(
+    service_handle: object,
+    portfolio_id: str,
+    scope: Mapping[str, str],
+    auth_context: object,
+    request_id: str | None = None,
+) -> object:
+    """Read the active Portfolio allocation.
+
+    Returns:
+        Structured Portfolio response envelope.
+    """
+    return _require_portfolio_service(service_handle).status(
+        portfolio_id,
+        scope,
+        cast("AuthContext", auth_context),
+        request_id,
+    )
+
+
+def activate_portfolio(
+    service_handle: object,
+    candidate: object,
+    evidence: object,
+    review: object,
+    *,
+    approval_attestation: object | None,
+    approval_validation: object | None,
+    expires_at: datetime,
+    idempotency_key: str,
+    expected_predecessor: str | None,
+    expected_revision: int,
+    auth_context: object,
+    request_id: str | None = None,
+) -> object:
+    """Run governed Portfolio activation.
+
+    Returns:
+        Structured Portfolio response envelope.
+    """
+    return _require_portfolio_service(service_handle).activate(
+        cast("PortfolioConstructionResult", candidate),
+        cast("ValidatedConstructionEvidence", evidence),
+        cast("PortfolioReviewResult", review),
+        approval_attestation=cast("ApprovalAttestation | None", approval_attestation),
+        approval_validation=cast(
+            "ApprovalValidationResult | None", approval_validation
+        ),
+        expires_at=expires_at,
+        idempotency_key=idempotency_key,
+        expected_predecessor=expected_predecessor,
+        expected_revision=expected_revision,
+        auth_context=cast("AuthContext", auth_context),
+        request_id=request_id,
+    )
+
+
+def assess_portfolio_drift(
+    service_handle: object,
+    allocation: object,
+    *,
+    actual_exposures: Mapping[str, Decimal],
+    evidence_as_of: datetime,
+    risk_decision: object,
+    eligibility_decisions: Mapping[str, object],
+    auth_context: object,
+    request_id: str | None = None,
+) -> object:
+    """Run Portfolio drift assessment.
+
+    Returns:
+        Structured Portfolio response envelope.
+    """
+    return _require_portfolio_service(service_handle).assess_drift(
+        cast("ActivePortfolioAllocation", allocation),
+        actual_exposures=actual_exposures,
+        evidence_as_of=evidence_as_of,
+        risk_decision=cast("AllocationRiskDecision", risk_decision),
+        eligibility_decisions=cast(
+            "Mapping[str, StrategyOperationalEligibilityDecision]",
+            eligibility_decisions,
+        ),
+        auth_context=cast("AuthContext", auth_context),
+        request_id=request_id,
+    )
+
+
+async def submit_portfolio_rebalance(
+    service_handle: object,
+    plan: object,
+    *,
+    account_evidence_ref: str,
+    market_evidence_ref: str,
+    fx_evidence_refs: tuple[str, ...],
+    runtime_profile: Literal["simulation", "paper", "live"],
+    execution_route: Literal["sim", "paper", "live"],
+    approval_refs: tuple[str, ...],
+    approval_token_ref: str,
+    trading_request_id: str,
+    valid_until: datetime,
+    auth_context: object,
+    request_id: str | None = None,
+) -> object:
+    """Submit one governed Portfolio rebalance.
+
+    Returns:
+        Structured Portfolio response envelope.
+    """
+    return await _require_portfolio_service(service_handle).submit_rebalance(
+        cast("PortfolioRebalancePlan", plan),
+        account_evidence_ref=account_evidence_ref,
+        market_evidence_ref=market_evidence_ref,
+        fx_evidence_refs=fx_evidence_refs,
+        runtime_profile=runtime_profile,
+        execution_route=execution_route,
+        approval_refs=approval_refs,
+        approval_token_ref=approval_token_ref,
+        trading_request_id=trading_request_id,
+        valid_until=valid_until,
+        auth_context=cast("AuthContext", auth_context),
+        request_id=request_id,
+    )
+
+
+def recompute_portfolio_measurement(
+    service_handle: object,
+    plan_id: str,
+    *,
+    trading_request_id: str,
+    auth_context: object,
+    request_id: str | None = None,
+) -> object:
+    """Recompute measurement from immutable Trading evidence.
+
+    Returns:
+        Structured Portfolio response envelope.
+    """
+    return _require_portfolio_service(service_handle).recompute_measurement(
+        plan_id,
+        trading_request_id=trading_request_id,
+        auth_context=cast("AuthContext", auth_context),
+        request_id=request_id,
+    )
+
+
+def rollback_portfolio(
+    service_handle: object,
+    candidate: object,
+    evidence: object,
+    review: object,
+    *,
+    rollback_of_version: str,
+    approval_attestation: object | None,
+    approval_validation: object | None,
+    expires_at: datetime,
+    idempotency_key: str,
+    expected_predecessor: str | None,
+    expected_revision: int,
+    auth_context: object,
+    request_id: str | None = None,
+) -> object:
+    """Create a new governed Portfolio rollback version.
+
+    Returns:
+        Structured Portfolio response envelope.
+    """
+    return _require_portfolio_service(service_handle).rollback(
+        cast("PortfolioConstructionResult", candidate),
+        cast("ValidatedConstructionEvidence", evidence),
+        cast("PortfolioReviewResult", review),
+        rollback_of_version=rollback_of_version,
+        approval_attestation=cast("ApprovalAttestation | None", approval_attestation),
+        approval_validation=cast(
+            "ApprovalValidationResult | None", approval_validation
+        ),
+        expires_at=expires_at,
+        idempotency_key=idempotency_key,
+        expected_predecessor=expected_predecessor,
+        expected_revision=expected_revision,
+        auth_context=cast("AuthContext", auth_context),
+        request_id=request_id,
+    )
+
+
+def get_portfolio_history(
+    service_handle: object,
+    portfolio_id: str,
+    auth_context: object,
+    request_id: str | None = None,
+) -> object:
+    """Read immutable Portfolio allocation history.
+
+    Returns:
+        Structured Portfolio response envelope.
+    """
+    return _require_portfolio_service(service_handle).history(
+        portfolio_id,
+        cast("AuthContext", auth_context),
+        request_id,
+    )
+
+
+__all__: tuple[str, ...] = (
+    "activate_portfolio",
+    "assess_portfolio_drift",
+    "construct_portfolio",
+    "get_portfolio_history",
+    "get_portfolio_status",
+    "recompute_portfolio_measurement",
+    "rollback_portfolio",
+    "submit_portfolio_rebalance",
+)

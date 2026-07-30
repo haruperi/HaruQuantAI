@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import hashlib
+from typing import Any
 
-from app.services.data import (
-    MigrationStep,
-)
+from app.services.data import build_migration_step
 from app.services.optimization.state.contracts import OPTIMIZATION_SCHEMA_VERSION
 from app.utils import get_logger
 
@@ -32,7 +31,7 @@ _STATEMENTS = (
 )
 
 
-def get_optimization_migrations() -> tuple[MigrationStep, ...]:
+def get_optimization_migrations() -> tuple[Any, ...]:
     """Return ordered additive Optimization schema definitions.
 
     Returns:
@@ -41,7 +40,7 @@ def get_optimization_migrations() -> tuple[MigrationStep, ...]:
     logger.info("Building Optimization-owned migration definitions")
     material = "\n-- statement --\n".join(_STATEMENTS).encode("utf-8")
     return (
-        MigrationStep(
+        build_migration_step(
             domain="optimization",
             migration_id="001_optimization_schema_v1",
             checksum=hashlib.sha256(material).hexdigest(),

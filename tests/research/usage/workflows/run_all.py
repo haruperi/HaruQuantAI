@@ -26,6 +26,7 @@ WORKFLOWS = (
     "wf_res_008_run_unsupervised_market_structure_research.py",
     "wf_res_009_build_research_scorecard_profile_snapshot.py",
     "wf_res_010_render_persist_research_artifact.py",
+    "wf_res_012_compare_research_profiles_across_periods.py",
     "wf_res_pri_run_complete_edge_lab_profile.py",
 )
 

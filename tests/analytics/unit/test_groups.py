@@ -12,9 +12,11 @@ from app.services.analytics.contracts import RiskFreeRateEvidence
 from app.services.analytics.contracts.catalogs import METRIC_DEFINITION_CATALOG
 from app.services.analytics.contracts.evidence import to_report_json_safe
 from app.services.analytics.metrics.groups import calculate_grouped_evidence
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics.unit.test_results_adapter import _config, _source
+logger = get_logger(__name__)
+
+from tests.analytics.unit.test_results_adapter import _config, _source  # noqa: E402
 
 _GOLDEN_DIRECTORY = Path("tests/analytics/fixtures/golden")
 

@@ -6,7 +6,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from types import MappingProxyType
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -88,10 +88,10 @@ def _target_amount(mandate: FirmMandate) -> Decimal:
     """
     target = mandate.profit_target
     if target.value_absolute is not None:
-        return target.value_absolute
+        return cast("Decimal", target.value_absolute)
     if target.value is None:
         raise OptimizationError("OPT_INVALID_REQUEST", "TARGET_MISSING")
-    return mandate.initial_balance * target.value
+    return cast("Decimal", mandate.initial_balance) * cast("Decimal", target.value)
 
 
 def _loss_limit(mandate: FirmMandate, equity: Decimal) -> Decimal:
@@ -109,7 +109,7 @@ def _loss_limit(mandate: FirmMandate, equity: Decimal) -> Decimal:
     """
     rule = mandate.daily_loss
     if rule.value_absolute is not None:
-        return rule.value_absolute
+        return cast("Decimal", rule.value_absolute)
     if rule.value is None:
         raise OptimizationError("OPT_INVALID_REQUEST", "DAILY_LIMIT_MISSING")
     basis = {
@@ -117,7 +117,7 @@ def _loss_limit(mandate: FirmMandate, equity: Decimal) -> Decimal:
         "current_balance": equity,
         "equity": equity,
     }[rule.basis]
-    return basis * rule.value
+    return cast("Decimal", basis) * cast("Decimal", rule.value)
 
 
 def _drawdown_floor(
@@ -146,14 +146,14 @@ def _drawdown_floor(
     if loss is None:
         if rule.value is None:
             raise OptimizationError("OPT_INVALID_REQUEST", "DRAWDOWN_LIMIT_MISSING")
-        loss = initial * rule.value
+        loss = initial * cast("Decimal", rule.value)
     reference = {
         get_drawdown_mode("STATIC"): initial,
         get_drawdown_mode("TRAILING_EOD"): peak_eod,
         get_drawdown_mode("TRAILING_INTRADAY"): peak_intraday,
     }[rule.mode]
-    floor = reference - loss
-    return min(floor, initial) if rule.trail_stops_at_initial else floor
+    floor = reference - cast("Decimal", loss)
+    return min(floor, initial) if bool(rule.trail_stops_at_initial) else floor
 
 
 def _evaluate_path(

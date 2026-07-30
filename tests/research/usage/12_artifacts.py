@@ -10,15 +10,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.research import (
-    ArtifactWriteConfig,
-    ResearchReport,
-    ResearchResourceLimits,
-)
-from app.services.research.artifacts import (
     build_research_migration_request,
+    create_research_value,
     write_research_artifact,
 )
-from app.utils import AuthContext
+from app.utils.contracts.auth import AuthContext
 
 _HASH = "e" * 64
 
@@ -28,9 +24,10 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _report() -> ResearchReport:
+def _report() -> object:
     """Build a canonical advisory report."""
-    return ResearchReport(
+    return create_research_value(
+        "ResearchReport",
         "v1",
         "research.report.v1",
         "research-report-test",
@@ -73,14 +70,16 @@ def fr_res_097() -> None:
     import tempfile
 
     root = Path(tempfile.mkdtemp()) / "artifacts"
-    config = ArtifactWriteConfig(root, "json")
+    config = create_research_value("ArtifactWriteConfig", root, "json")
     destination = root / "report.json"
     ref = write_research_artifact(
         _report(),
         destination,
         config=config,
         auth=_auth(),
-        limits=ResearchResourceLimits(500_000, 600.0, 52_428_800),
+        limits=create_research_value(
+            "ResearchResourceLimits", 500_000, 600.0, 52_428_800
+        ),
     )
     print(f"FR-RES-097 path={ref.relative_path} atomic={ref.atomic}")
 

@@ -7,9 +7,11 @@ from pathlib import Path
 import pytest
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.metrics.drawdowns import calculate_drawdown_evidence
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics.unit.test_results_adapter import _config, _source
+logger = get_logger(__name__)
+
+from tests.analytics.unit.test_results_adapter import _config, _source  # noqa: E402
 
 GOLDEN = Path("tests/analytics/fixtures/golden/max_drawdown.json")
 

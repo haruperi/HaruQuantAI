@@ -7,10 +7,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.research import StatisticalConfig, StudyConfig
-from app.services.research.leakage import enforce_time_split
-from app.services.research.studies import (
+from app.services.research import (
     compare_to_null,
+    create_research_value,
+    enforce_time_split,
     run_eds_mean_reversion,
     run_eds_null_baseline,
 )
@@ -44,8 +44,11 @@ def main() -> None:
         train_fraction=0.5,
         validation_fraction=0.2,
     )
-    statistics = StatisticalConfig(7, 20, 20, 2, 20, "benjamini_hochberg")
-    study = StudyConfig(
+    statistics = create_research_value(
+        "StatisticalConfig", 7, 20, 20, 2, 20, "benjamini_hochberg"
+    )
+    study = create_research_value(
+        "StudyConfig",
         {
             "lookback": 3,
             "entry_zscore": 0.5,

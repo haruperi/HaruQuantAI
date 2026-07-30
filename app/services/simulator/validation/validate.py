@@ -4,18 +4,19 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime
+from typing import Any
 
-from app.services.data import (
-    MarketDataset,
-    OHLCVRecord,
-    TickRecord,
-)
+from app.services.data import is_ohlcv_record, is_tick_record
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.validation.contracts import (
     MarketDataValidationContext,
     ValidatedMarketDataEvidence,
 )
 from app.utils import canonical_digest, canonical_json, get_logger
+
+MarketDataset = Any
+OHLCVRecord = Any
+TickRecord = Any
 
 logger = get_logger(__name__)
 
@@ -159,12 +160,12 @@ def _validate_records(dataset: MarketDataset) -> None:
     if len(set(timestamps)) != len(timestamps):
         _raise("SIM_DATA_DUPLICATE_TIMESTAMP", "Dataset timestamps are not unique")
     for record in dataset.records:
-        if isinstance(record, OHLCVRecord) and not (
+        if is_ohlcv_record(record) and not (
             record.low <= record.open <= record.high
             and record.low <= record.close <= record.high
         ):
             _raise("SIM_DATA_OHLC_INVALID", "OHLC relationships are invalid")
-        if isinstance(record, TickRecord) and (
+        if is_tick_record(record) and (
             record.bid is not None
             and record.ask is not None
             and record.ask < record.bid

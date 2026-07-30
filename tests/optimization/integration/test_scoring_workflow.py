@@ -1,16 +1,17 @@
 """WF-OPT-003 scoring, ranking, and overfit integration."""
 
 # ruff: noqa: INP001
-from app.services.optimization.scoring import (
-    ObjectiveName,
+from app.services.optimization import (
     assess_overfit_evidence,
     calculate_candidate_score,
     calculate_deflated_sharpe,
     count_nominal_trials,
     rank_candidates,
 )
-from app.utils import logger
+from app.utils import get_logger
 from tests.analytics._support import _report
+
+logger = get_logger(__name__)
 
 
 def test_scoring_workflow_preserves_metric_and_trial_evidence() -> None:
@@ -20,8 +21,8 @@ def test_scoring_workflow_preserves_metric_and_trial_evidence() -> None:
     first = calculate_candidate_score(
         report,
         candidate_hash="a" * 64,
-        objective=ObjectiveName.NET_PNL,
-        enabled_objectives=frozenset({ObjectiveName.NET_PNL}),
+        objective="net_pnl",
+        enabled_objectives=frozenset({"net_pnl"}),
     )
     second = first.model_copy(update={"candidate_hash": "b" * 64})
     trials = count_nominal_trials((first.candidate_hash, second.candidate_hash))

@@ -17,6 +17,15 @@ from app.services.analytics.contracts.evidence import (
     build_warning,
     to_report_json_safe,
 )
+from app.services.analytics.contracts.factories import (
+    create_analytics_run_config,
+    create_closed_trade_ledger,
+    create_portfolio_rebalance_measurement_request,
+    create_risk_free_rate_evidence,
+    create_statistical_validation_config,
+    get_analytics_value_field,
+    is_analytics_value,
+)
 from app.services.analytics.contracts.models import (
     ANALYTICS_SCHEMA_VERSION,
     AnalyticsRunConfig,
@@ -68,6 +77,13 @@ __all__ = (
     "TradingResult",
     "build_quality_flag",
     "build_warning",
+    "create_analytics_run_config",
+    "create_closed_trade_ledger",
+    "create_portfolio_rebalance_measurement_request",
+    "create_risk_free_rate_evidence",
+    "create_statistical_validation_config",
+    "get_analytics_value_field",
+    "is_analytics_value",
     "to_analytics_error_payload",
     "to_report_json_safe",
     "validate_contract_version",

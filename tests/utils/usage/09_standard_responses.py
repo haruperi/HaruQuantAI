@@ -5,10 +5,9 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from types import MappingProxyType
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-
-from typing import Any
 
 from app.utils import (
     build_response_metadata,
@@ -27,6 +26,32 @@ class ExampleResult:
     """Raw result used to demonstrate direct data preservation."""
 
     value: int
+
+
+def _feature_header(title: str) -> None:
+    """Print feature title and module flow banner."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'-' * 88}\n{title}\n{'-' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _metadata() -> Any:
@@ -50,7 +75,12 @@ def _metadata() -> Any:
 
 
 def fr_utils_042_through_047_standard_response() -> None:
-    """FR-UTL-042..047: Build success and error response branches."""
+    """FR-UTL-042..047: Stage 1 & 2 — Build success and error response branches."""
+    _header(
+        "Stage 1 & 2: Response Construction - Success & Error Envelopes (FR-UTL-042..047)"
+    )
+
+    # 1. Success response
     result = ExampleResult(value=42)
     success = success_response(
         result,
@@ -59,8 +89,11 @@ def fr_utils_042_through_047_standard_response() -> None:
     )
     assert success.data is result
     assert success.metadata.extensions["legacy_status"] == "completed"
-    print("Raw standard response data:", success.data)
+    assert isinstance(success, get_standard_response_type())
+    print(_format_result(success))
+    print(f"Data -> success_status='{success.status}', raw_data={success.data}")
 
+    # 2. Error response
     failure = error_response(
         code="VALIDATION_FAILED",
         details={"field": "value"},
@@ -70,8 +103,10 @@ def fr_utils_042_through_047_standard_response() -> None:
     )
     assert failure.data is None
     assert failure.error is not None
-    print("Approved standard error:", failure.error.code)
+    print(_format_result(failure))
+    print(f"Data -> error_status='{failure.status}', error_code='{failure.error.code}'")
 
+    # 3. Exception response
     unexpected = exception_response(
         RuntimeError("secret=must-not-escape"),
         message="Example failed safely",
@@ -81,13 +116,23 @@ def fr_utils_042_through_047_standard_response() -> None:
     assert unexpected.error is not None
     assert unexpected.error.code == "INTERNAL_ERROR"
     assert "must-not-escape" not in str(unexpected.model_dump(mode="json"))
+    print(_format_result(unexpected))
+    print(
+        f"Data -> exception_status='{unexpected.status}', code='{unexpected.error.code}'"
+    )
 
+    # 4. Timing metadata calculation
     elapsed_ms = get_execution_ms(1_000_000, clock=lambda: 2_234_567)
     assert elapsed_ms == 1.235
+    print(_format_result(elapsed_ms))
+    print(f"Data -> execution_duration_ms={elapsed_ms}")
 
 
 def fr_utils_050_immutable_mapping_data() -> None:
-    """FR-UTL-050: Preserve immutable mapping data through JSON serialization."""
+    """FR-UTL-050: Stage 3 — Preserve immutable mapping data through JSON serialization."""
+    _header(
+        "Stage 3: Validated Output Envelope - Immutable Mapping Proxy Response (FR-UTL-050)"
+    )
     immutable_data = MappingProxyType({"example": ExampleResult(value=42)})
     immutable_success = success_response(
         immutable_data,
@@ -95,18 +140,31 @@ def fr_utils_050_immutable_mapping_data() -> None:
         metadata=_metadata(),
     )
     assert immutable_success.data is immutable_data
-    assert immutable_success.model_dump(mode="json")["data"] == {
-        "example": {"value": 42}
-    }
-    print("Immutable mapping response data:", immutable_success.data)
+    dump = immutable_success.model_dump(mode="json")
+    assert dump["data"] == {"example": {"value": 42}}
+    print(_format_result(immutable_success))
+    print(
+        f"Data -> immutable_mapping_keys={list(immutable_success.data.keys())}, json_dump={dump['data']}"
+    )
 
 
 def main() -> None:
-    """Run the standard-response example."""
+    """Run all standard-response examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-UTIL-08 — responses/ — Standard Operation Responses\n\n"
+        "Purpose: Define the single business-neutral response contract used by every public operation.\n\n"
+        "Module flow:\n"
+        "-> raw operation result or caught failure + static operation facts + monotonic start\n"
+        "-> validation / factory handling\n"
+        "-> validated StandardResponse[T]"
+    )
+
+    # Stage 1 & 2: Raw result / failure + factory handling
     fr_utils_042_through_047_standard_response()
+
+    # Stage 3: Validated StandardResponse[T] output
     fr_utils_050_immutable_mapping_data()
 
 
 if __name__ == "__main__":
     main()
-    print("Canonical response runtime type:", get_standard_response_type().__name__)

@@ -1,9 +1,11 @@
 """Unit tests for Analytics dashboard payload projection."""
 
 from app.services.analytics.dashboards.payloads import build_dashboard_payload
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics._support import _report
+logger = get_logger(__name__)
+
+from tests.analytics._support import _report  # noqa: E402
 
 
 def test_dashboard_payload_does_not_recompute_metrics() -> None:

@@ -3,8 +3,10 @@
 # ruff: noqa: INP001
 from concurrent.futures import ThreadPoolExecutor
 
-from app.utils import generate_id, logger
-from tests.analytics._support import _report
+from app.utils import generate_id, get_logger
+
+logger = get_logger(__name__)
+from tests.analytics._support import _report  # noqa: E402
 
 
 def test_identical_reports_are_equal_in_parallel() -> None:

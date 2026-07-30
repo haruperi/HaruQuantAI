@@ -14,8 +14,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.portfolio import (
-    PortfolioRebalancePlan,
     assess_common_mode_exposure,
+    create_portfolio_value,
+    get_portfolio_value_field,
     measure_cross_account_correlation,
 )
 
@@ -120,7 +121,7 @@ def fr_port_020() -> None:
     )
     print("FR-PORT-020: Bind drift to active allocation version and fresh evidence")
 
-    plan = PortfolioRebalancePlan(**_base_plan_data())
+    plan = create_portfolio_value("PortfolioRebalancePlan", **_base_plan_data())
     assert plan.allocation_version == "allocation-version-1"
     assert plan.observed_at.tzinfo is not None
     print(f"Bound to allocation_version: {plan.allocation_version}")
@@ -139,7 +140,7 @@ def fr_port_021() -> None:
     )
     print("FR-PORT-021: Route every plan through Risk review")
 
-    plan = PortfolioRebalancePlan(**_base_plan_data())
+    plan = create_portfolio_value("PortfolioRebalancePlan", **_base_plan_data())
     assert plan.status == "review_required"
     print(f"Initial plan status: {plan.status}")
     print("Plan requires Risk review before Trading submission")
@@ -156,7 +157,7 @@ def fr_port_022() -> None:
     )
     print("FR-PORT-022: Make over-budget correction reduce-only")
 
-    plan = PortfolioRebalancePlan(**_base_plan_data())
+    plan = create_portfolio_value("PortfolioRebalancePlan", **_base_plan_data())
     for action in plan.actions:
         assert action.reduce_only is True
         assert action.action == "reduce_exposure"
@@ -174,7 +175,7 @@ def fr_port_023() -> None:
     )
     print("FR-PORT-023: Never open solely to match target weights")
 
-    plan = PortfolioRebalancePlan(**_base_plan_data())
+    plan = create_portfolio_value("PortfolioRebalancePlan", **_base_plan_data())
     action_ids = {a.component_id for a in plan.actions}
     for obs in plan.observations:
         if obs.drift < 0:
@@ -197,12 +198,13 @@ def fr_port_024() -> None:
     )
     print("FR-PORT-024: Block planning on kill switch or stale evidence")
 
-    plan = PortfolioRebalancePlan(
+    plan = create_portfolio_value(
+        "PortfolioRebalancePlan",
         **_base_plan_data(
             status="blocked",
             block_reasons=("KILL_SWITCH_ACTIVE",),
             actions=(),
-        )
+        ),
     )
     assert plan.status == "blocked"
     assert "KILL_SWITCH_ACTIVE" in plan.block_reasons
@@ -226,9 +228,15 @@ def fr_port_039() -> None:
         window=3,
         alert_threshold=Decimal("0.60"),
     )
-    print(f"Return correlation: {dict(report.return_correlation)}")
-    print(f"Decision correlation: {dict(report.decision_correlation)}")
-    print(f"Alert pairs: {report.alert_pairs}")
+    print(
+        "Return correlation:",
+        dict(get_portfolio_value_field(report, "return_correlation")),
+    )
+    print(
+        "Decision correlation:",
+        dict(get_portfolio_value_field(report, "decision_correlation")),
+    )
+    print("Alert pairs:", get_portfolio_value_field(report, "alert_pairs"))
 
 
 def fr_port_040() -> None:
@@ -248,11 +256,21 @@ def fr_port_040() -> None:
         signal_dependencies={"account-a": ("signal-x",), "account-b": ("signal-x",)},
     )
     print(
-        f"Aggregate loss-at-stop by factor: {dict(report.aggregate_loss_at_stop_by_factor)}"
+        "Aggregate loss-at-stop by factor:",
+        dict(get_portfolio_value_field(report, "aggregate_loss_at_stop_by_factor")),
     )
-    print(f"Breached accounts: {dict(report.breached_accounts)}")
-    print(f"Shared software: {dict(report.software_dependencies)}")
-    print(f"Shared signals: {dict(report.signal_dependencies)}")
+    print(
+        "Breached accounts:",
+        dict(get_portfolio_value_field(report, "breached_accounts")),
+    )
+    print(
+        "Shared software:",
+        dict(get_portfolio_value_field(report, "software_dependencies")),
+    )
+    print(
+        "Shared signals:",
+        dict(get_portfolio_value_field(report, "signal_dependencies")),
+    )
 
 
 def main() -> None:

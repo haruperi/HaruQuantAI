@@ -11,7 +11,7 @@ from app.services.portfolio.contracts import (
     PortfolioConstructionResult,
     PortfolioRebalancePlan,
 )
-from app.services.portfolio.exceptions import PortfolioError
+from app.services.portfolio.contracts.errors import PortfolioError
 from app.services.portfolio.state import (
     PORTFOLIO_MIGRATIONS,
     AuditOutboxRecord,
@@ -19,7 +19,9 @@ from app.services.portfolio.state import (
     scope_key,
 )
 from app.services.portfolio.state import repository as repository_module
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class FakePortfolioStore:

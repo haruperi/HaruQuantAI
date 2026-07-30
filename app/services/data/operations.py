@@ -45,6 +45,9 @@ from app.services.data.economic_calendar import (
     SymbolEventProfile,
 )
 from app.services.data.economic_calendar import events as _calendar_events
+from app.services.data.economic_calendar import (
+    firecrawl_transport as _calendar_firecrawl,
+)
 from app.services.data.economic_calendar import providers as _calendar_providers
 from app.services.data.economic_calendar import scraper as _calendar_scraper
 from app.services.data.economic_calendar import store as _calendar_store
@@ -73,6 +76,7 @@ from app.services.data.market_data.symbol_metadata import SymbolMetadata
 from app.services.data.persistence import DATA_MIGRATION_STEPS
 from app.services.data.persistence import contracts as _persistence_contracts
 from app.services.data.realtime_feeds import contracts as _feed_contracts
+from app.services.data.research_sources import contracts as _research_source_contracts
 from app.services.data.sources import contracts as _source_contracts
 from app.services.data.sources import read_only as _read_only
 from app.services.data.sources.contracts import (
@@ -135,6 +139,11 @@ def build_cache_write_request(*args: Any, **kwargs: Any) -> Any:
 def build_calendar_scrape_provider(*args: Any, **kwargs: Any) -> Any:
     """Build one CalendarScrapeProvider value through the Data public boundary."""
     return _calendar_providers.CalendarScrapeProvider(*args, **kwargs)
+
+
+def build_firecrawl_calendar_transport(*args: Any, **kwargs: Any) -> Any:
+    """Build the licensed Firecrawl transport through the Data public boundary."""
+    return _calendar_firecrawl.build_firecrawl_calendar_transport(*args, **kwargs)
 
 
 def build_column_mapping(*args: Any, **kwargs: Any) -> Any:
@@ -267,6 +276,43 @@ def build_read_only_broker_proxy(*args: Any, **kwargs: Any) -> Any:
 def build_reconnect_policy(*args: Any, **kwargs: Any) -> Any:
     """Build one ReconnectPolicy value through the Data public boundary."""
     return _feed_contracts.ReconnectPolicy(*args, **kwargs)
+
+
+def build_research_source_ingest_request(*args: Any, **kwargs: Any) -> Any:
+    """Build one opaque point-in-time source ingestion request."""
+    return _research_source_contracts.ResearchSourceIngestRequest(*args, **kwargs)
+
+
+def build_research_source_policy(*args: Any, **kwargs: Any) -> Any:
+    """Build one opaque governed research-source policy."""
+    return _research_source_contracts.ResearchSourcePolicy(*args, **kwargs)
+
+
+def build_research_source_query(*args: Any, **kwargs: Any) -> Any:
+    """Build one opaque point-in-time research-source query."""
+    return _research_source_contracts.ResearchSourceQuery(*args, **kwargs)
+
+
+def build_verified_research_source(*args: Any, **kwargs: Any) -> Any:
+    """Build one opaque verified-provider manifest."""
+    return _research_source_contracts.VerifiedResearchSource(*args, **kwargs)
+
+
+def get_research_source_value_field(value: object, field: str) -> object:
+    """Return one public field from a Data research-source value.
+
+    Raises:
+        ValueError: If the field is private or unavailable.
+    """
+    if not field or field.startswith("_") or not hasattr(value, field):
+        raise ValueError("Data research-source value does not expose the field")
+    return getattr(value, field)
+
+
+def is_research_source_value(value: object, value_type: str) -> bool:
+    """Return whether a value is one registered research-source contract."""
+    model = getattr(_research_source_contracts, value_type, None)
+    return isinstance(value, model) if isinstance(model, type) else False
 
 
 def build_schedule_request(*args: Any, **kwargs: Any) -> Any:

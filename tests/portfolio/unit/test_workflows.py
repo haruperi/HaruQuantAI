@@ -16,7 +16,7 @@ from app.services.portfolio.contracts import (
     ActivePortfolioAllocation,
     PortfolioRebalancePlan,
 )
-from app.services.portfolio.exceptions import PortfolioError
+from app.services.portfolio.contracts.errors import PortfolioError
 from app.services.portfolio.orchestration import (
     PortfolioWorkflowDependencies,
     PortfolioWorkflowService,
@@ -27,12 +27,7 @@ from app.services.risk import (
     create_allocation_risk_decision,
     get_decision_state,
 )
-from app.utils import (
-    AuditEvent,
-    build_response_metadata,
-    logger,
-    success_response,
-)
+from app.utils import build_response_metadata, get_logger, success_response
 
 from tests.portfolio.unit.test_allocation import (
     _activator,
@@ -48,6 +43,8 @@ from tests.portfolio.unit.test_repository import FakePortfolioStore
 AllocationReviewRequest = object
 AllocationRiskDecision = object
 PortfolioRebalanceExecutionRequest = Any
+AuditEvent = Any
+logger = get_logger(__name__)
 StandardTradingEnvelope = Any
 
 

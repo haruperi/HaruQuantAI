@@ -10,19 +10,18 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.optimization.evidence import build_optimization_evidence
-from app.services.optimization.state import (
-    OptimizationStateStore,
+from app.services.optimization import (
     build_optimization_artifact_path,
+    build_optimization_evidence,
     get_optimization_migrations,
     load_search_checkpoint,
     persist_optimization_result,
     save_search_checkpoint,
 )
-from tests.optimization.unit.test_evidence_contracts import evidence_request
-from tests.optimization.unit.test_state_contracts import (
-    MemoryOptimizationStore,
+from tests.optimization.usage._support import (
+    SqliteOptimizationStore,
     checkpoint,
+    evidence_request,
 )
 
 
@@ -36,11 +35,12 @@ def example_state() -> None:
     _header("Demonstrate optimization state persistence and checkpointing.")
     print("Optimization Example 6: Durable State and Checkpoints")
 
-    # 1. Memory state store initialization
-    store = MemoryOptimizationStore()
+    # 1. Durable SQLite state store initialization
+    store = SqliteOptimizationStore()
     print(
-        "Memory store satisfies OptimizationStateStore: "
-        f"{isinstance(store, OptimizationStateStore)}"
+        "SQLite store path and required operations: "
+        f"{store.path}, "
+        f"{tuple(method for method in ('save_checkpoint', 'load_checkpoint', 'save_result') if hasattr(store, method))}"
     )
 
     # 2. Checkpoint save and load
@@ -55,7 +55,10 @@ def example_state() -> None:
         reproducibility_hash=ckpt.reproducibility_hash,
         store=store,
     )
-    print(f"Loaded checkpoint search_id match: {loaded_ckpt == ckpt}")
+    print(
+        f"Loaded durable checkpoint: search_id={loaded_ckpt.search_id}, "
+        f"candidate_position={loaded_ckpt.completed_candidate_position}"
+    )
 
     # 3. Persist optimization result
     ev_req = evidence_request()

@@ -7,9 +7,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.research import CleaningConfig, EnrichmentConfig
-from app.services.research.data import (
+from app.services.research import (
     clean_dataset,
+    create_research_value,
     enrich_dataset,
     prepare_research_dataset,
     validate_dataset,
@@ -40,8 +40,12 @@ def main() -> None:
     print(f"{WORKFLOW_ID} — Prepare Research Dataset")
     print("INPUT BOUNDARY — genuine MT5 MarketDataset v1 from Data")
     dataset = live_market_dataset()
-    cleaning = CleaningConfig("UTC", "error", "none", "keep_warn", "error")
-    enrichment = EnrichmentConfig("EURUSD", True, True, False, True)
+    cleaning = create_research_value(
+        "CleaningConfig", "UTC", "error", "none", "keep_warn", "error"
+    )
+    enrichment = create_research_value(
+        "EnrichmentConfig", "EURUSD", True, True, False, True
+    )
 
     # Stage 1 — Validate the Data-owned MarketDataset and produce quality evidence.
     _stage(1)

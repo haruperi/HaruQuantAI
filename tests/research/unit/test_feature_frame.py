@@ -2,17 +2,15 @@
 
 import pandas as pd
 from app.services.indicators import sma
-from app.services.research.contracts import (
-    DataQualityReport,
-    FeatureConfig,
-    PreparedDataset,
-    ResearchResourceLimits,
+from app.services.research import (
+    build_research_feature_frame,
+    create_research_value,
 )
-from app.services.research.features import build_research_feature_frame
-from app.utils import logger
+from app.utils import get_logger
 
 from tests.indicators.helpers import build_dataset, unwrap_response
 
+logger = get_logger(__name__)
 _HASH = "c" * 64
 
 
@@ -37,10 +35,11 @@ def test_feature_frame_records_lineage_and_forward_columns() -> None:
         },
         index=index,
     )
-    prepared = PreparedDataset(
+    prepared = create_research_value(
+        "PreparedDataset",
         frame,
         "v1",
-        DataQualityReport((), (), ("schema",), ()),
+        create_research_value("DataQualityReport", (), (), ("schema",), ()),
         _HASH,
         _HASH,
         ("fixture",),
@@ -49,8 +48,10 @@ def test_feature_frame_records_lineage_and_forward_columns() -> None:
     features, metadata = build_research_feature_frame(
         prepared,
         indicator_results={"sma": unwrap_response(sma(dataset, period=5))},
-        config=FeatureConfig({"hurst": 20}, (2,), ("forward_return_2",), "preserve"),
-        limits=ResearchResourceLimits(100, 10.0, 1024),
+        config=create_research_value(
+            "FeatureConfig", {"hurst": 20}, (2,), ("forward_return_2",), "preserve"
+        ),
+        limits=create_research_value("ResearchResourceLimits", 100, 10.0, 1024),
     )
     assert "sma_5" in features
     assert "forward_return_2" not in metadata["training_feature_columns"]

@@ -4,8 +4,10 @@
 from app.services.analytics import (
     build_portfolio_performance_report,
 )
-from app.utils import logger
-from tests.analytics._support import _report
+from app.utils import get_logger
+
+logger = get_logger(__name__)
+from tests.analytics._support import _report  # noqa: E402
 
 
 def test_portfolio_report_fails_closed_without_fx() -> None:

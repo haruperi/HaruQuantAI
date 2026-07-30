@@ -1,3 +1,4 @@
+# ruff: noqa: BLE001
 """Run synthetic data generation examples (FEAT-DATA-04)."""
 
 from __future__ import annotations
@@ -6,6 +7,7 @@ import sys
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
@@ -26,10 +28,50 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def example_07_synthetic_bars() -> None:
-    """Generate deterministic synthetic OHLCV bars."""
-    _header("Generate deterministic synthetic OHLCV bars.")
-    req_id = generate_id("req")
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
+
+
+def fr_data_039_request() -> None:
+    """FR-DATA-039: Stage 1 — Construct SyntheticRequest parameters including explicit seed for deterministic replay."""
+    _header("Stage 1: Synthetic Request Construction - Synthetic Request (FR-DATA-039)")
+    req = build_synthetic_request(
+        symbol="GBPUSD",
+        data_kind="bars",
+        timeframe="H1",
+        start=_START,
+        record_count=24,
+        method="gbm",
+        seed=42,
+        parameters={
+            "mu": Decimal("0.02"),
+            "sigma": Decimal("0.10"),
+            "start_val": Decimal("1.2500"),
+        },
+        precision_policy="decimal_string",
+        request_id=generate_id("req"),
+    )
+    print(_format_result(req))
+    print(
+        f"Data -> SyntheticRequest(symbol={req.symbol}, kind={req.data_kind}, seed={req.seed})"
+    )
+
+
+def fr_data_039_bars() -> None:
+    """FR-DATA-039: Stage 2 — Generate deterministic synthetic OHLCV bars using GBM algorithm and seeded parameters."""
+    _header("Stage 2: Synthetic Bar Generation - Generate Synthetic Bars (FR-DATA-039)")
     req = build_synthetic_request(
         symbol="GBPUSD",
         data_kind="bars",
@@ -46,19 +88,29 @@ def example_07_synthetic_bars() -> None:
             "spread_max": Decimal(50),
         },
         precision_policy="decimal_string",
-        request_id=req_id,
+        request_id=generate_id("req"),
     )
-    response = generate_synthetic_bars(req)
-    if response.status == "success" and response.data is not None:
-        dataset = response.data
-        print(f"Synthetic bar rows: {dataset.record_count} symbol={dataset.symbol}")
-        print(to_ohlcv_dataframe(dataset))
+    try:
+        response = generate_synthetic_bars(req)
+        print(_format_result(response))
+        if response.status == "success" and response.data is not None:
+            dataset = response.data
+            print(
+                f"Data -> MarketDataset(symbol={dataset.symbol}, records={dataset.record_count})"
+            )
+            df_res = to_ohlcv_dataframe(dataset)
+            if df_res.data is not None:
+                print(f"Data -> DataFrame shape={df_res.data.shape}")
+    except Exception as exc:
+        print(f"Output Result -> {type(exc).__name__} : {type(exc).__name__}")
+        print(f"Data -> Exception({exc})")
 
 
-def example_synthetic_ticks() -> None:
-    """Generate deterministic synthetic tick records."""
-    _header("Generate deterministic synthetic tick records.")
-    req_id = generate_id("req")
+def fr_data_039_ticks() -> None:
+    """FR-DATA-039: Stage 3 — Generate deterministic synthetic tick records with intra-bar timing and spread dynamics."""
+    _header(
+        "Stage 3: Synthetic Tick Generation - Generate Synthetic Ticks (FR-DATA-039)"
+    )
     req = build_synthetic_request(
         symbol="GBPUSD",
         data_kind="ticks",
@@ -72,43 +124,39 @@ def example_synthetic_ticks() -> None:
             "start_val": Decimal("1.2500"),
         },
         precision_policy="decimal_string",
-        request_id=req_id,
+        request_id=generate_id("req"),
     )
-    response = generate_synthetic_ticks(req)
-    if response.status == "success" and response.data is not None:
-        dataset = response.data
-        print(f"Synthetic tick rows: {dataset.record_count} symbol={dataset.symbol}")
-        print(to_tick_dataframe(dataset))
-
-
-def _demonstrate_feature() -> None:
-    """Run all synthetic data generation examples."""
-    example_07_synthetic_bars()
-    example_synthetic_ticks()
-
-
-_DEMONSTRATED = [False]
-
-
-def _demonstrate_once() -> None:
-    """Run the feature demonstration once for all requirement entry points."""
-    if _DEMONSTRATED[0]:
-        return
-    _demonstrate_feature()
-    _DEMONSTRATED[0] = True
-
-
-def fr_data_039() -> None:
-    _header("fr_data_039")
-    "FR-DATA-039: Generate bounded canonical bars or ticks with GBM, exact parameters, and deterministic output when a seed is supplied; generation is not a source adapter."
-    _demonstrate_once()
+    try:
+        response = generate_synthetic_ticks(req)
+        print(_format_result(response))
+        if response.status == "success" and response.data is not None:
+            dataset = response.data
+            print(
+                f"Data -> MarketDataset(symbol={dataset.symbol}, records={dataset.record_count})"
+            )
+            df_res = to_tick_dataframe(dataset)
+            if df_res.data is not None:
+                print(f"Data -> DataFrame shape={df_res.data.shape}")
+    except Exception as exc:
+        print(f"Output Result -> {type(exc).__name__} : {type(exc).__name__}")
+        print(f"Data -> Exception({exc})")
 
 
 def main() -> None:
     """Execute every functional-requirement demonstration."""
-    demonstrations = (fr_data_039,)
-    for demonstration in demonstrations:
-        demonstration()
+    print("=" * 80)
+    print("FEATURE: FEAT-DATA-04 - Synthetic Data Generation")
+    print(
+        "PURPOSE: SyntheticRequest, seeded randomness, synthetic bar/tick generation, and provenance"
+    )
+    print(
+        "MODULE FLOW: Stage 1 (Synthetic Request Construction) -> Stage 2 (Synthetic Bar Generation) -> Stage 3 (Synthetic Tick Generation)"
+    )
+    print("=" * 80)
+
+    fr_data_039_request()
+    fr_data_039_bars()
+    fr_data_039_ticks()
 
 
 if __name__ == "__main__":

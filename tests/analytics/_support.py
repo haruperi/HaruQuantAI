@@ -16,13 +16,19 @@ from app.services.analytics import (
     adapt_trading_result,
     build_performance_report,
 )
-from app.services.data import DataQualityReport, MarketDataset, OHLCVRecord
-from app.utils import StandardResponse, canonical_json, generate_id, logger
+from app.services.data import (
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
+)
+from app.utils import canonical_json, generate_id, get_logger
+
+logger = get_logger(__name__)
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 
 
-def unwrap[T](response: StandardResponse[T]) -> T:
+def unwrap[T](response: object) -> T:
     """Return successful response data for test fixtures.
 
     Args:
@@ -34,8 +40,8 @@ def unwrap[T](response: StandardResponse[T]) -> T:
     Raises:
         AssertionError: If the operation returned an error response.
     """
-    if response.status != "success":
-        raise AssertionError(response.error)
+    if getattr(response, "status", None) != "success":
+        raise AssertionError(getattr(response, "error", None))
     return cast("T", response.data)
 
 
@@ -204,7 +210,7 @@ def _configured_result(
     benchmark_end = NOW.replace(hour=0, minute=0, second=0, microsecond=0)
     benchmark_available = NOW
     benchmark_records = (
-        OHLCVRecord(
+        build_ohlcv_record(
             timestamp=benchmark_start,
             source="analytics-test",
             source_symbol="BENCH",
@@ -217,7 +223,7 @@ def _configured_result(
             price_unit="index_points",
             volume_unit="contracts",
         ),
-        OHLCVRecord(
+        build_ohlcv_record(
             timestamp=benchmark_end,
             source="analytics-test",
             source_symbol="BENCH",
@@ -232,7 +238,7 @@ def _configured_result(
         ),
     )
     benchmark_evidence = (
-        MarketDataset(
+        build_market_dataset(
             normalization_version="v1",
             data_kind="bars",
             symbol="BENCH",
@@ -242,7 +248,7 @@ def _configured_result(
             end=benchmark_end,
             available_at=benchmark_available,
             record_count=2,
-            quality_report=DataQualityReport(
+            quality_report=build_data_quality_report(
                 quality_status="passed",
                 quality_score=Decimal(1),
                 record_count=2,

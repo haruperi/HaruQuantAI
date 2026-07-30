@@ -1,8 +1,10 @@
 """Unit tests for Research leakage evidence."""
 
 import pandas as pd
-from app.services.research.leakage import validate_no_lookahead_features
-from app.utils import logger
+from app.services.research import validate_no_lookahead_features
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def test_leakage_report_detects_forward_target() -> None:

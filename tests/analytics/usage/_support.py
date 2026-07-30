@@ -2,10 +2,8 @@
 
 from typing import cast
 
-from app.utils import StandardResponse
 
-
-def unwrap[T](response: StandardResponse[T]) -> T:
+def unwrap[T](response: object) -> T:
     """Return successful public-port data.
 
     Args:
@@ -17,6 +15,6 @@ def unwrap[T](response: StandardResponse[T]) -> T:
     Raises:
         AssertionError: If the public operation failed.
     """
-    if response.status != "success":
-        raise AssertionError(response.error)
+    if getattr(response, "status", None) != "success":
+        raise AssertionError(getattr(response, "error", None))
     return cast("T", response.data)

@@ -11,8 +11,10 @@ from app.services.analytics import (
     adapt_trading_result,
     build_closed_trade_equity_curve,
 )
-from app.utils import logger
-from tests.analytics._support import unwrap
+from app.utils import get_logger
+
+logger = get_logger(__name__)
+from tests.analytics._support import unwrap  # noqa: E402
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 

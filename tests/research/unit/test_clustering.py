@@ -1,17 +1,21 @@
 """Unit tests for Research K-Means clustering (FR-RES-082, 083)."""
 
 import pandas as pd
-from app.services.research import UnsupervisedResearchConfig
-from app.services.research.modeling import (
+from app.services.research import (
     attach_cluster_labels,
     cluster_feature_space,
+    create_research_value,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
-def _config() -> UnsupervisedResearchConfig:
+def _config() -> object:
     """Build a modeling configuration."""
-    return UnsupervisedResearchConfig(("a", "b"), True, 2, 2, 20, 7)
+    return create_research_value(
+        "UnsupervisedResearchConfig", ("a", "b"), True, 2, 2, 20, 7
+    )
 
 
 def _features(rows: int = 25) -> pd.DataFrame:

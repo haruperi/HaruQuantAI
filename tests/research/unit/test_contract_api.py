@@ -1,15 +1,18 @@
 """Unit tests for Research public API classifications."""
 
-from app.services.research.contracts import PUBLIC_API_CLASSIFICATIONS
-from app.utils import logger
+from app.services.research import get_public_api_classifications
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def test_public_api_is_unique_resolvable_and_side_effect_free() -> None:
     """Verify every implemented contract has one stable classification."""
     logger.debug("Testing Research contract API classifications")
-    assert PUBLIC_API_CLASSIFICATIONS
-    assert set(PUBLIC_API_CLASSIFICATIONS.values()) == {"stable"}
-    assert len(PUBLIC_API_CLASSIFICATIONS) == len(set(PUBLIC_API_CLASSIFICATIONS))
+    classifications = get_public_api_classifications()
+    assert classifications
+    assert set(classifications.values()) == {"stable"}
+    assert len(classifications) == len(set(classifications))
 
 
 def test_every_public_export_is_classified() -> None:
@@ -17,6 +20,6 @@ def test_every_public_export_is_classified() -> None:
     from app.services.research import __all__ as package_all
 
     logger.debug("Testing Research public export coverage")
-    classified = set(PUBLIC_API_CLASSIFICATIONS)
+    classified = set(get_public_api_classifications())
     unclassified = set(package_all) - classified
     assert not unclassified, f"Unclassified public exports: {sorted(unclassified)}"

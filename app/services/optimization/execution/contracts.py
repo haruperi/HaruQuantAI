@@ -10,7 +10,7 @@ from typing import Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from app.services.analytics import PerformanceReport  # noqa: TC001
+from app.services.analytics import is_analytics_value
 from app.services.optimization.parameters import ParameterValue  # noqa: TC001
 from app.utils import get_logger
 
@@ -167,7 +167,7 @@ class EngineOptimizationResult(BaseModel):
     candidate_hash: str
     simulation_run_id: str
     simulation_request_hash: str
-    analytics_report: PerformanceReport
+    analytics_report: object
     runtime_ms: float
     engine_type: str
     engine_version: str
@@ -196,6 +196,8 @@ class EngineOptimizationResult(BaseModel):
             raise ValueError("engine result identity is incomplete")
         if not math.isfinite(self.runtime_ms) or self.runtime_ms < 0:
             raise ValueError("engine result runtime must be finite and non-negative")
+        if not is_analytics_value(self.analytics_report, "PerformanceReport"):
+            raise ValueError("engine result Analytics evidence is incompatible")
         return self
 
 

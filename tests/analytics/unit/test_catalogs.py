@@ -11,7 +11,9 @@ from app.services.analytics.contracts import (
     validate_contract_version,
     validate_metric_catalog,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def test_every_contract_metric_is_cataloged() -> None:

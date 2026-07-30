@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import Protocol, cast
 
 import numpy as np
 import pandas as pd
 
 from app.services.data import (
-    DataError,
-    MarketDataset,
+    is_data_error,
+    is_market_dataset,
     to_ohlcv_dataframe,
     unwrap_data_response,
 )
@@ -23,6 +24,19 @@ from app.utils import get_logger
 logger = get_logger(__name__)
 
 _MIN_CONTINUITY_ROWS = 3
+
+
+class _MarketDataset(Protocol):
+    """Opaque subset of Data dataset evidence consumed by Research."""
+
+    record_count: int
+    data_kind: str
+    source_metadata: Mapping[str, str]
+    request_id: str
+
+    def model_dump(self, *, mode: str) -> Mapping[str, object]:
+        """Return the canonical serialized dataset payload."""
+        ...
 
 
 def _fatal(code: str, field: str) -> Mapping[str, str]:
@@ -106,7 +120,7 @@ def _continuity_warnings(frame: pd.DataFrame) -> tuple[ResearchWarning, ...]:
 
 
 def validate_dataset(
-    dataset: MarketDataset, *, limits: ResearchResourceLimits
+    dataset: object, *, limits: ResearchResourceLimits
 ) -> DataQualityReport:
     """Validate one canonical bar dataset without mutating it.
 
@@ -126,14 +140,16 @@ def validate_dataset(
         ValueError: If the input contract or resource bound is invalid.
     """
     logger.info("Validating canonical dataset for Research")
-    if not isinstance(dataset, MarketDataset):
+    if not is_market_dataset(dataset):
         raise ValueError("RES_INPUT_INVALID", "MARKET_DATASET_REQUIRED")
-    if dataset.record_count > limits.max_rows:
+    market_dataset = cast("_MarketDataset", dataset)
+    if market_dataset.record_count > limits.max_rows:
         raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
-    if dataset.data_kind != "bars" or dataset.record_count == 0:
+    if market_dataset.data_kind != "bars" or market_dataset.record_count == 0:
         raise ValueError("RES_INPUT_INVALID", "NONEMPTY_BAR_DATASET_REQUIRED")
     try:
-        frame_response = to_ohlcv_dataframe(dataset)
+        # Data contracts are intentionally opaque outside their package root.
+        frame_response = to_ohlcv_dataframe(dataset)  # type: ignore[arg-type]
         if isinstance(frame_response, pd.DataFrame):
             # Keep isolated legacy test doubles compatible while production
             # Data calls are consumed through the StandardResponse boundary.
@@ -144,11 +160,13 @@ def validate_dataset(
                 operation="research.data.validate_dataset",
                 request_id=frame_response.metadata.request_id,
             )
-    except DataError as error:
-        logger.error("Data projection failed during Research validation")
+    except Exception as error:
+        if not is_data_error(error):
+            raise
+        logger.exception("Data projection failed during Research validation")
         raise ValueError("RES_INPUT_INVALID", "DATA_PROJECTION_FAILED") from error
     fatal = _frame_findings(frame)
-    if not dataset.source_metadata:
+    if not market_dataset.source_metadata:
         fatal.append(_fatal("MISSING_SOURCE_METADATA", "source_metadata"))
     checks = (
         "contract",

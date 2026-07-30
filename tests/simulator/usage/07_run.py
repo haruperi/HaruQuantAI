@@ -13,21 +13,21 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.simulator import (
-    PortfolioBacktestRequestV1,
-    PortfolioComponentRequest,
-    SimulationBacktestRequestV1,
+    calculate_portfolio_backtest_config_hash,
+    calculate_simulation_backtest_config_hash,
+    create_simulation_value,
+    dump_simulation_value,
     run_backtest,
     run_fast_research,
     run_portfolio_backtest,
     unwrap_simulation_response,
 )
-from app.utils import AuthContext, canonical_digest, generate_id
-from tests.simulator.unit.test_orchestrator import (
-    FakeDependencies,
-    _auth,
-    _data_hash,
-    _dataset,
-    _fx_evidence,
+from app.utils import canonical_digest, create_auth_context, generate_id
+from tests.simulator.usage.workflows._support import (
+    authority,
+    dependencies,
+    fx_evidence,
+    live_tick_dataset,
 )
 
 
@@ -40,7 +40,7 @@ def _build_request(
     dataset: object,
     runtime_profile: str = "simulation",
     canonical: bool = True,
-) -> SimulationBacktestRequestV1:
+) -> object:
     """Build a valid backtest request with valid UUID trace IDs."""
     req_id = generate_id("req")
     wf_id = generate_id("wf")
@@ -58,7 +58,9 @@ def _build_request(
         "strategy_config_hash": "a" * 64,
         "data_ref": "dataset",
         "data_version": "v1",
-        "data_hash": _data_hash(dataset),  # type: ignore[arg-type]
+        "data_hash": canonical_digest(
+            dataset.model_dump(mode="python", warnings=False)
+        ),
         "tick_generation_ref": "tick-profile",
         "tick_generation_version": "v1",
         "tick_generation_hash": "b" * 64,
@@ -82,18 +84,19 @@ def _build_request(
         "canonical": canonical,
     }
     payload["config_hash"] = unwrap_simulation_response(
-        SimulationBacktestRequestV1.calculate_config_hash(payload),
+        calculate_simulation_backtest_config_hash(payload),
         operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
     )
-    return SimulationBacktestRequestV1.model_validate(payload)
+    return create_simulation_value("SimulationBacktestRequestV1", **payload)
 
 
 def _build_portfolio_request(
     dataset: object,
-) -> tuple[PortfolioBacktestRequestV1, AuthContext]:
+) -> tuple[object, object]:
     """Build a valid portfolio backtest request and authority with valid trace IDs."""
     child_req = _build_request(dataset)
-    component = PortfolioComponentRequest(
+    component = create_simulation_value(
+        "PortfolioComponentRequest",
         component_id="component-1",
         capital_weight=Decimal(1),
         risk_budget=Decimal(100),
@@ -105,7 +108,7 @@ def _build_portfolio_request(
     wf_id = generate_id("wf")
     cor_id = generate_id("cor")
     start = dataset.start
-    fx_evidence = _fx_evidence(dataset)  # type: ignore[arg-type]
+    conversion_evidence = fx_evidence(dataset)
 
     payload: dict[str, object] = {
         "request_id": req_id,
@@ -114,14 +117,16 @@ def _build_portfolio_request(
         "portfolio_id": "portfolio",
         "construction_result_id": "construction",
         "construction_version": "v1",
-        "components": (component.model_dump(mode="python", warnings=False),),
+        "components": (dump_simulation_value(component),),
         "measurement_start": start,
         "measurement_end": start + timedelta(days=30),
         "base_currency": "USD",
         "fx_evidence_ids": ("fx-1",),
-        "fx_evidence_versions": (fx_evidence.contract_version,),
+        "fx_evidence_versions": (conversion_evidence.contract_version,),
         "fx_evidence_hashes": (
-            canonical_digest(fx_evidence.model_dump(mode="python", warnings=False)),
+            canonical_digest(
+                conversion_evidence.model_dump(mode="python", warnings=False)
+            ),
         ),
         "execution_profile_version": "v1",
         "risk_policy_version": "v1",
@@ -131,12 +136,12 @@ def _build_portfolio_request(
         "execution_route": "sim",
     }
     payload["config_hash"] = unwrap_simulation_response(
-        PortfolioBacktestRequestV1.calculate_config_hash(payload),
+        calculate_portfolio_backtest_config_hash(payload),
         operation="simulation.run.portfolio_backtest_request_v1.calculate_config_hash",
     )
-    port_req = PortfolioBacktestRequestV1.model_validate(payload)
+    port_req = create_simulation_value("PortfolioBacktestRequestV1", **payload)
 
-    auth = AuthContext(
+    auth = create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="simulator-test",
@@ -158,8 +163,7 @@ def example_run() -> None:
     _header("Demonstrate backtest, fast research, and portfolio backtest execution.")
     print("Simulator Example 7: Backtest and Portfolio Orchestration")
 
-    req_id = generate_id("req")
-    dataset = _dataset(req_id)
+    dataset = live_tick_dataset()
     request = _build_request(dataset)
 
     print(f"Request type: {type(request).__name__}")
@@ -168,37 +172,36 @@ def example_run() -> None:
         tmp_path = Path(tmp_dir)
 
         # 1. Run canonical backtest
-        deps = FakeDependencies(tmp_path, dataset)  # type: ignore[arg-type]
+        deps = dependencies(tmp_path, dataset)
         result = unwrap_simulation_response(
-            run_backtest(request, _auth(request), deps), operation="usage.run_backtest"
+            run_backtest(request, authority(request), deps),
+            operation="usage.run_backtest",
         )
-        print(f"Canonical backtest status: {result.status}")
+        print("Canonical backtest result:", dump_simulation_value(result))
 
         # 2. Run fast research
-        fast_req_id = generate_id("req")
-        fast_dataset = _dataset(fast_req_id)
+        fast_dataset = live_tick_dataset()
         fast_request = _build_request(
             fast_dataset,
             runtime_profile="fast_research",
             canonical=False,
         )
-        fast_deps = FakeDependencies(tmp_path, fast_dataset)  # type: ignore[arg-type]
+        fast_deps = dependencies(tmp_path, fast_dataset)
         fast_result = unwrap_simulation_response(
-            run_fast_research(fast_request, _auth(fast_request), fast_deps),
+            run_fast_research(fast_request, authority(fast_request), fast_deps),
             operation="usage.run_fast_research",
         )
-        print(f"Fast research canonical status: {fast_result.canonical}")
+        print("Fast-research result:", dump_simulation_value(fast_result))
 
         # 3. Run portfolio backtest
-        port_req_id = generate_id("req")
-        port_dataset = _dataset(port_req_id)
+        port_dataset = live_tick_dataset()
         port_request, port_auth = _build_portfolio_request(port_dataset)
-        port_deps = FakeDependencies(tmp_path, port_dataset)  # type: ignore[arg-type]
+        port_deps = dependencies(tmp_path, port_dataset)
         port_result = unwrap_simulation_response(
             run_portfolio_backtest(port_request, port_auth, port_deps),
             operation="usage.run_portfolio_backtest",
         )
-        print(f"Portfolio backtest status: {port_result.status}")
+        print("Portfolio result:", dump_simulation_value(port_result))
 
 
 def fr_sim_029() -> None:
@@ -214,9 +217,8 @@ def fr_sim_029() -> None:
     _header(
         "Demonstrate FR-SIM-029. Responsibility: The system shall expose the exact `docs/PROJECT.md` §5 request for one synchronous bounded FX run, with separate contract version/schema ID, immutable Strategy/Data/Simulation/Risk references, JSON-safe parameters, symbol/timeframe/UTC range, positive initial balance, trace IDs, simulation profile/route, config hash, and no raw code/provider objects/inline data."
     )
-    request_id = generate_id("req")
-    request = _build_request(_dataset(request_id))
-    print(f"Backtest request: {request.schema_id}")
+    request = _build_request(live_tick_dataset())
+    print("Backtest request evidence:", dump_simulation_value(request))
 
 
 def fr_sim_032() -> None:
@@ -240,9 +242,8 @@ def fr_sim_032() -> None:
     _header(
         "Demonstrate FR-SIM-032. Responsibility: The system shall expose `PortfolioBacktestRequestV1` with `contract_version='v1'`, `schema_id='simulation.portfolio_backtest_request.v1'`, portfolio and construction-result identifiers and versions, ordered component allocations, exact Strategy/Data/FX/execution/Risk references and versions, bounded UTC range, explicit seed, positive initial balance, `runtime_profile='simulation'`, `execution_route='sim'`, and a SHA-256 config hash. Every FX evidence ID is positionally bound to an explicit `v1` compatibility version and lowercase canonical SHA-256 evidence hash. Each child request's initial balance equals the portfolio balance multiplied by its exact capital weight and its account currency equals the portfolio base currency. It carries scalar values, identifiers, references, and hashes only, never embeds a Portfolio-owned contract type, and carries no caller-supplied measurement series."
     )
-    request_id = generate_id("req")
-    request, _ = _build_portfolio_request(_dataset(request_id))
-    print(f"Portfolio request: {request.schema_id}")
+    request, _ = _build_portfolio_request(live_tick_dataset())
+    print("Portfolio request evidence:", dump_simulation_value(request))
 
 
 def fr_sim_030() -> None:
@@ -260,16 +261,15 @@ def fr_sim_030() -> None:
     _header(
         "Demonstrate FR-SIM-030. Responsibility: The system shall authenticate, deduplicate, validate, execute, journal, report, persist, and return one deterministic canonical FX run, never publishing a partial completed result. It persists bounded `simulation.run_started`, `simulation.run_completed`, `simulation.run_replayed`, or `simulation.run_failed` `AuditEvent v1` evidence through `SimulationRunDependencies.persist_audit_event`; unavailable audit persistence fails closed."
     )
-    request_id = generate_id("req")
-    dataset = _dataset(request_id)
+    dataset = live_tick_dataset()
     request = _build_request(dataset)
     with tempfile.TemporaryDirectory() as tmp_dir:
-        dependencies = FakeDependencies(Path(tmp_dir), dataset)
+        run_dependencies = dependencies(Path(tmp_dir), dataset)
         result = unwrap_simulation_response(
-            run_backtest(request, _auth(request), dependencies),
+            run_backtest(request, authority(request), run_dependencies),
             operation="usage.run_backtest",
         )
-        print(f"Canonical status: {result.status}")
+        print("Canonical result evidence:", dump_simulation_value(result))
 
 
 def fr_sim_034() -> None:
@@ -293,16 +293,15 @@ def fr_sim_034() -> None:
     _header(
         "Demonstrate FR-SIM-034. Responsibility: The system shall execute every component of an approved portfolio candidate through the ordinary deterministic simulation path, maintain one aggregate account ledger and the Risk-owned budget history, and publish `PortfolioSimulationResult v1` only when every component and the aggregate journal reconcile. Reconciliation is arithmetic and falsifiable: exact allocated opening capital equals portfolio opening capital, aggregate net profit equals the exact sum of component net profit, and aggregate component count equals the request. Component returns are sampled from each engine's actual end-of-tick mark-to-market equity observations on one shared 30-point UTC cadence; open-position price movement is included and closed-trade reconstruction is forbidden. Every resolved FX evidence object must match its request-bound version and canonical hash before freshness validation. The run persists bounded portfolio start/completion/failure audit evidence."
     )
-    request_id = generate_id("req")
-    dataset = _dataset(request_id)
+    dataset = live_tick_dataset()
     request, auth = _build_portfolio_request(dataset)
     with tempfile.TemporaryDirectory() as tmp_dir:
-        dependencies = FakeDependencies(Path(tmp_dir), dataset)
+        run_dependencies = dependencies(Path(tmp_dir), dataset)
         result = unwrap_simulation_response(
-            run_portfolio_backtest(request, auth, dependencies),
+            run_portfolio_backtest(request, auth, run_dependencies),
             operation="usage.run_portfolio_backtest",
         )
-        print(f"Portfolio status: {result.status}")
+        print("Portfolio result evidence:", dump_simulation_value(result))
 
 
 def fr_sim_031() -> None:
@@ -317,20 +316,19 @@ def fr_sim_031() -> None:
     _header(
         "Demonstrate FR-SIM-031. Responsibility: The system shall run an explicitly requested approximation only when enabled, mark every output `canonical=false`, disclose assumptions, prohibit canonical fills, promotion evidence, and reports, and persist bounded research start/completion/failure audit evidence."
     )
-    request_id = generate_id("req")
-    dataset = _dataset(request_id)
+    dataset = live_tick_dataset()
     request = _build_request(
         dataset,
         runtime_profile="fast_research",
         canonical=False,
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
-        dependencies = FakeDependencies(Path(tmp_dir), dataset)
+        run_dependencies = dependencies(Path(tmp_dir), dataset)
         result = unwrap_simulation_response(
-            run_fast_research(request, _auth(request), dependencies),
+            run_fast_research(request, authority(request), run_dependencies),
             operation="usage.run_fast_research",
         )
-        print(f"Fast research canonical: {result.canonical}")
+        print("Fast-research evidence:", dump_simulation_value(result))
 
 
 def main() -> None:

@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from app.services.api import ResearchRunRequest
+from app.services.api import build_research_run_request
 from app.services.api.identity import require_auth_context
 from app.services.api.routes.research import router
 from fastapi import FastAPI
@@ -33,7 +33,7 @@ def _app(*, authenticated: bool) -> FastAPI:
 
 def test_only_registered_report_crosses_boundary(tmp_path: Path) -> None:
     """Verify authenticated Research route returns a standard response."""
-    request = ResearchRunRequest(
+    request = build_research_run_request(
         hypothesis="Returns persist over one research bar.",
         dataset=make_dataset(),
         config=make_edge_lab_config(tmp_path),
@@ -57,7 +57,7 @@ def test_only_registered_report_crosses_boundary(tmp_path: Path) -> None:
 
 def test_research_route_fails_closed_without_authentication(tmp_path: Path) -> None:
     """Verify missing authentication prevents Research delegation."""
-    request = ResearchRunRequest(
+    request = build_research_run_request(
         hypothesis="Returns persist over one research bar.",
         dataset=make_dataset(),
         config=make_edge_lab_config(tmp_path),

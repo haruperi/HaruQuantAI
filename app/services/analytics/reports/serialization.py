@@ -59,14 +59,14 @@ def serialize_report(
         AnalyticsValidationError: If format, evidence, or size is invalid.
     """
     logger.info("Serializing Analytics performance report")
+    if format_name not in {"json", "text"}:
+        message = f"unsupported Analytics report format: {format_name}"
+        raise AnalyticsValidationError(message)
     try:
         if format_name == "json":
             rendered = canonical_json(to_report_json_safe(report))
-        elif format_name == "text":
-            rendered = _human_readable(report)
         else:
-            message = f"unsupported Analytics report format: {format_name}"
-            raise AnalyticsValidationError(message)
+            rendered = _human_readable(report)
     except Exception as error:
         raise AnalyticsValidationError("report serialization failed") from error
     if len(rendered.encode("utf-8")) > config.max_response_bytes:

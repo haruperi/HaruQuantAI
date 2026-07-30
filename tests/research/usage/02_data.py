@@ -11,18 +11,14 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import DataQualityReport as SourceQualityReport
 from app.services.data import (
-    MarketDataset,
-    OHLCVRecord,
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
 )
 from app.services.research import (
-    CleaningConfig,
-    EnrichmentConfig,
-    ResearchResourceLimits,
-)
-from app.services.research.data import (
     clean_dataset,
+    create_research_value,
     enrich_dataset,
     prepare_research_dataset,
     validate_dataset,
@@ -36,11 +32,11 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _dataset() -> MarketDataset:
+def _dataset():
     """Build the bounded usage market dataset."""
     start = datetime(2026, 1, 5, tzinfo=UTC)
     records = tuple(
-        OHLCVRecord(
+        build_ohlcv_record(
             timestamp=start + timedelta(minutes=index),
             open=Decimal(10),
             high=Decimal(11),
@@ -57,7 +53,7 @@ def _dataset() -> MarketDataset:
         )
         for index in range(5)
     )
-    quality = SourceQualityReport(
+    quality = build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
         record_count=5,
@@ -67,7 +63,7 @@ def _dataset() -> MarketDataset:
         schema_version="v1",
         generated_at=records[-1].available_at,
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="bars",
         symbol="TEST",
@@ -87,19 +83,21 @@ def _dataset() -> MarketDataset:
     )
 
 
-def _limits() -> ResearchResourceLimits:
+def _limits() -> object:
     """Build the bounded Research resource limits."""
-    return ResearchResourceLimits(100, 10.0, 1024)
+    return create_research_value("ResearchResourceLimits", 100, 10.0, 1024)
 
 
-def _cleaning_cfg() -> CleaningConfig:
+def _cleaning_cfg() -> object:
     """Build the explicit cleaning configuration."""
-    return CleaningConfig("UTC", "error", "none", "keep_warn", "error")
+    return create_research_value(
+        "CleaningConfig", "UTC", "error", "none", "keep_warn", "error"
+    )
 
 
-def _enrichment_cfg() -> EnrichmentConfig:
+def _enrichment_cfg() -> object:
     """Build the explicit enrichment configuration."""
-    return EnrichmentConfig("TEST", True, True, False, True)
+    return create_research_value("EnrichmentConfig", "TEST", True, True, False, True)
 
 
 def fr_res_027() -> None:

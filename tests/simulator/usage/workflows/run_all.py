@@ -25,6 +25,8 @@ WORKFLOWS = (
     "wf_sim_007_non_canonical_fast_research.py",
     "wf_sim_sec_portfolio_backtest.py",
     "wf_sim_010_tick_series_acquisition.py",
+    "wf_sim_011_reports_and_artifact_manifest.py",
+    "wf_sim_012_fx_margin_and_execution_costs.py",
 )
 
 

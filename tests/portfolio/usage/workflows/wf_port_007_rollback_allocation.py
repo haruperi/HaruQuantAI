@@ -8,6 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.portfolio import execute_portfolio_handle_operation
 from tests.portfolio.usage.workflows._support import (
     NOW,
     construction_workflow,
@@ -34,11 +35,19 @@ def _stage(number: int) -> None:
 def main() -> None:
     """Run the complete README-defined rollback workflow."""
     service, request, _store, market = construction_workflow()
-    candidate, evidence = service.construct(request)
-    review = service.coordinate_review(
-        candidate, simulation_request(candidate), evidence
+    candidate, evidence = execute_portfolio_handle_operation(
+        service, "construct", request
     )
-    historical = service.activate(
+    review = execute_portfolio_handle_operation(
+        service,
+        "coordinate_review",
+        candidate,
+        simulation_request(candidate),
+        evidence,
+    )
+    historical = execute_portfolio_handle_operation(
+        service,
+        "activate",
         candidate,
         evidence,
         review,
@@ -52,8 +61,12 @@ def main() -> None:
     rollback_request = request.model_copy(
         update={"portfolio_version": "version-rollback"}
     )
-    rollback_candidate, rollback_evidence = service.construct(rollback_request)
-    rollback_review = service.coordinate_review(
+    rollback_candidate, rollback_evidence = execute_portfolio_handle_operation(
+        service, "construct", rollback_request
+    )
+    rollback_review = execute_portfolio_handle_operation(
+        service,
+        "coordinate_review",
         rollback_candidate,
         simulation_request(rollback_candidate),
         rollback_evidence,
@@ -76,7 +89,9 @@ def main() -> None:
 
     # Stage 4 — Activate a new immutable rollback-linked version.
     _stage(4)
-    rolled_back = service.rollback(
+    rolled_back = execute_portfolio_handle_operation(
+        service,
+        "rollback",
         rollback_candidate,
         rollback_evidence,
         rollback_review,

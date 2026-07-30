@@ -5,24 +5,23 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from decimal import Decimal
-from types import SimpleNamespace
 from typing import Any
 
 import pytest
-from app.services.portfolio.config import PortfolioSettings
-from app.services.portfolio.contracts import (
-    PortfolioConstructionRequest,
-    PortfolioConstructionResult,
+from app.services.portfolio import (
+    create_portfolio_handle,
+    create_portfolio_value,
+    execute_portfolio_handle_operation,
+    validate_construction_evidence,
 )
-from app.services.portfolio.evidence import validate_construction_evidence
-from app.services.portfolio.orchestration import (
-    ConstructionEvidenceInputs,
-    PortfolioWorkflowDependencies,
-    PortfolioWorkflowService,
+from app.services.simulator import (
+    calculate_portfolio_backtest_config_hash,
+    calculate_simulation_backtest_config_hash,
+    create_simulation_value,
+    dump_simulation_value,
+    unwrap_simulation_response,
 )
-from app.services.portfolio.state import PortfolioRepository
-from app.services.simulator import PortfolioBacktestRequestV1
-from app.utils import AuditEvent, logger
+from app.utils import get_logger
 from tests.portfolio.unit.test_allocation import (
     _activator,
     _inactive_kill_switch,
@@ -36,6 +35,13 @@ from tests.portfolio.unit.test_evidence import (
 )
 from tests.portfolio.unit.test_repository import FakePortfolioStore
 from tests.portfolio.unit.test_workflows import _unused
+
+AuditEvent = Any
+PortfolioBacktestRequestV1 = Any
+PortfolioConstructionRequest = Any
+PortfolioConstructionResult = Any
+PortfolioSettings = Any
+logger = get_logger(__name__)
 
 
 def test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts(
@@ -56,14 +62,15 @@ def test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts(
             "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         }
     )
-    request = PortfolioConstructionRequest(**request_data)
-    candidate = PortfolioConstructionResult.model_validate(
-        {
+    request = create_portfolio_value("PortfolioConstructionRequest", **request_data)
+    candidate = create_portfolio_value(
+        "PortfolioConstructionResult",
+        **{
             **construction_result.model_dump(mode="python"),
             "request_id": request.request_id,
             "workflow_id": request.workflow_id,
             "correlation_id": request.correlation_id,
-        }
+        },
     )
     refs, decisions, account, market, analytics, fx = _owner_bundle(portfolio_now)
     evidence = validate_construction_evidence(
@@ -82,23 +89,98 @@ def test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts(
         now=portfolio_now,
         settings=portfolio_settings,
     )
-    simulation_request = PortfolioBacktestRequestV1.model_construct(
-        request_id=candidate.request_id,
-        workflow_id=candidate.workflow_id,
-        correlation_id=candidate.correlation_id,
-        portfolio_id=candidate.portfolio_id,
-        construction_result_id=candidate.result_id,
-        construction_version=candidate.portfolio_version,
-        components=tuple(
-            SimpleNamespace(
-                component_id=row.component_id,
-                capital_weight=row.capital_weight,
-                risk_budget=row.proposed_risk_budget_weight,
-            )
-            for row in candidate.component_weights
+    component_requests = []
+    for index, row in enumerate(candidate.component_weights, start=1):
+        request_fields = {
+            "request_id": f"req-11111111-1111-4111-8111-11111111111{index}",
+            "workflow_id": candidate.workflow_id,
+            "correlation_id": candidate.correlation_id,
+            "strategy_id": f"strategy-{row.component_id}",
+            "strategy_version": "1.0.0",
+            "strategy_config_ref": f"strategy-config-{row.component_id}",
+            "strategy_config_hash": "1" * 64,
+            "data_ref": "market-dataset-1",
+            "data_version": "v1",
+            "data_hash": "2" * 64,
+            "tick_generation_ref": "tick-generation-1",
+            "tick_generation_version": "v1",
+            "tick_generation_hash": "3" * 64,
+            "execution_profile_ref": "execution-profile-1",
+            "execution_profile_version": "v1",
+            "execution_profile_hash": "4" * 64,
+            "risk_policy_ref": "risk-policy-1",
+            "risk_policy_version": "v1",
+            "risk_policy_hash": "5" * 64,
+            "symbol": "EURUSD",
+            "timeframe": "M1",
+            "start": portfolio_now - timedelta(minutes=1),
+            "end": portfolio_now,
+            "parameters": {},
+            "initial_balance": Decimal(1000) * row.capital_weight,
+            "account_currency": "USD",
+            "asset_class": "FX",
+            "seed": index,
+            "runtime_profile": "simulation",
+            "execution_route": "sim",
+            "canonical": True,
+        }
+        request_fields["config_hash"] = unwrap_simulation_response(
+            calculate_simulation_backtest_config_hash(request_fields),
+            operation="calculate simulation backtest config hash",
+        )
+        component_requests.append(
+            {
+                "component_id": row.component_id,
+                "capital_weight": row.capital_weight,
+                "risk_budget": row.proposed_risk_budget_weight,
+                "risk_decision_id": f"eligibility-{row.component_id}",
+                "metrics_ref": f"analytics-{row.component_id}",
+                "backtest_request": create_simulation_value(
+                    "SimulationBacktestRequestV1",
+                    **request_fields,
+                ),
+            }
+        )
+    portfolio_request_fields = {
+        "request_id": candidate.request_id,
+        "workflow_id": candidate.workflow_id,
+        "correlation_id": candidate.correlation_id,
+        "portfolio_id": candidate.portfolio_id,
+        "construction_result_id": candidate.result_id,
+        "construction_version": candidate.portfolio_version,
+        "components": tuple(component_requests),
+        "measurement_start": portfolio_now - timedelta(minutes=1),
+        "measurement_end": portfolio_now,
+        "base_currency": "USD",
+        "fx_evidence_ids": ("req-11111111-1111-4111-8111-111111111114",),
+        "fx_evidence_versions": ("v1",),
+        "fx_evidence_hashes": ("d" * 64,),
+        "execution_profile_version": "v1",
+        "risk_policy_version": "risk-policy-1",
+        "seed": 7,
+        "initial_balance": Decimal(1000),
+        "runtime_profile": "simulation",
+        "execution_route": "sim",
+    }
+    hash_fields = {
+        **portfolio_request_fields,
+        "components": tuple(
+            {
+                **component,
+                "backtest_request": dump_simulation_value(
+                    component["backtest_request"]
+                ),
+            }
+            for component in component_requests
         ),
-        runtime_profile="simulation",
-        execution_route="sim",
+    }
+    portfolio_request_fields["config_hash"] = unwrap_simulation_response(
+        calculate_portfolio_backtest_config_hash(hash_fields),
+        operation="calculate portfolio backtest config hash",
+    )
+    simulation_request = create_simulation_value(
+        "PortfolioBacktestRequestV1",
+        **portfolio_request_fields,
     )
 
     def strategy_source(_request: PortfolioConstructionRequest):
@@ -114,7 +196,8 @@ def test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts(
     def evidence_source(_request: PortfolioConstructionRequest):
         """Return complete owner evidence when requested."""
         logger.debug("Resolving activation construction evidence")
-        return ConstructionEvidenceInputs(
+        return create_portfolio_value(
+            "ConstructionEvidenceInputs",
             account,
             market,
             analytics,
@@ -148,26 +231,38 @@ def test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts(
         logger.debug("Reading activation integration clock")
         return portfolio_now
 
-    service = PortfolioWorkflowService(
-        portfolio_settings,
-        PortfolioRepository(FakePortfolioStore()),
-        PortfolioWorkflowDependencies(
-            strategy_reference_source=strategy_source,
-            eligibility_decision_source=eligibility_source,
-            construction_evidence_source=evidence_source,
-            simulation_runner=simulation_runner,
-            risk_reviewer=risk_reviewer,
-            risk_budget_activator=_activator,
-            kill_switch_source=kill_switch_source,
-            trading_executor=_unused,
-            trading_execution_source=_unused,
-            analytics_measurer=_unused,
-            audit_persister=audit_persist,
-            clock=clock,
-        ),
+    repository = create_portfolio_handle("PortfolioRepository", FakePortfolioStore())
+    dependencies = create_portfolio_handle(
+        "PortfolioWorkflowDependencies",
+        strategy_reference_source=strategy_source,
+        eligibility_decision_source=eligibility_source,
+        construction_evidence_source=evidence_source,
+        simulation_runner=simulation_runner,
+        risk_reviewer=risk_reviewer,
+        risk_budget_activator=_activator,
+        kill_switch_source=kill_switch_source,
+        trading_executor=_unused,
+        trading_execution_source=_unused,
+        analytics_measurer=_unused,
+        audit_persister=audit_persist,
+        clock=clock,
     )
-    review = service.coordinate_review(candidate, simulation_request, evidence)
-    active = service.activate(
+    service = create_portfolio_handle(
+        "PortfolioWorkflowService",
+        portfolio_settings,
+        repository,
+        dependencies,
+    )
+    review = execute_portfolio_handle_operation(
+        service,
+        "coordinate_review",
+        candidate,
+        simulation_request,
+        evidence,
+    )
+    active = execute_portfolio_handle_operation(
+        service,
+        "activate",
         candidate,
         evidence,
         review,

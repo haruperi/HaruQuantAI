@@ -9,9 +9,11 @@ from typing import TypeVar
 import pytest
 from app.services.analytics.contracts import AnalyticsValidationError
 from app.services.analytics.reports.portfolio import build_portfolio_performance_report
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics._support import _report
+logger = get_logger(__name__)
+
+from tests.analytics._support import _report  # noqa: E402
 
 _T = TypeVar("_T")
 

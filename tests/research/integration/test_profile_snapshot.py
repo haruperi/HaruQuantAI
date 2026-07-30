@@ -1,17 +1,14 @@
 """Integration evidence for WF-RES-009: scorecard and snapshot determinism."""
 
 from app.services.research import (
-    CoreMetricProfile,
-    DataQualityReport,
-    EdgeResult,
-    MarketStructureProfile,
-    ResearchProfileSnapshot,
-)
-from app.services.research.profiles import (
     build_research_profile_snapshot,
     build_research_scorecard,
+    create_research_value,
+    is_research_value,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _HASH = "e" * 64
 
@@ -36,16 +33,20 @@ def test_scorecard_snapshot_is_deterministic() -> None:
             "activity",
         )
     }
-    metric_profile = CoreMetricProfile(
+    metric_profile = create_research_value(
+        "CoreMetricProfile",
         "v1",
         metrics,
-        DataQualityReport((), (), ("schema",), ()),
+        create_research_value("DataQualityReport", (), (), ("schema",), ()),
         _HASH,
         _HASH,
         (),
     )
-    edge = EdgeResult("v1", "mean_reversion", {}, {}, "confirmed", 7, (), True)
-    structure = MarketStructureProfile(
+    edge = create_research_value(
+        "EdgeResult", "v1", "mean_reversion", {}, {}, "confirmed", 7, (), True
+    )
+    structure = create_research_value(
+        "MarketStructureProfile",
         "v1",
         {"swing_window": 5},
         75.0,
@@ -66,6 +67,6 @@ def test_scorecard_snapshot_is_deterministic() -> None:
         dataset_hash=_HASH,
         configuration_hash=_HASH,
     )
-    assert isinstance(snapshot, ResearchProfileSnapshot)
+    assert is_research_value(snapshot, "ResearchProfileSnapshot")
     assert scorecard.advisory_only is True
     assert snapshot.advisory_only is True

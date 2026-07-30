@@ -7,19 +7,21 @@ from decimal import Decimal
 from pathlib import Path
 from time import perf_counter
 
-from app.services.data.contracts import (
-    DataQualityReport,
-    MarketDataset,
-    TickRecord,
+from app.services.data import (
+    build_data_quality_report,
+    build_market_dataset,
+    build_tick_record,
 )
 from app.services.simulator import run_backtest, unwrap_simulation_response
-from app.utils import logger
+from app.utils import get_logger
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
     _auth,
     _dataset,
     _request,
 )
+
+logger = get_logger(__name__)
 
 
 class TrackingDependencies(FakeDependencies):
@@ -83,7 +85,7 @@ class TrackingDependencies(FakeDependencies):
         return super().build_order_intents(decisions, request)  # type: ignore[arg-type]
 
 
-def _protective_dataset(request_id: str) -> MarketDataset:
+def _protective_dataset(request_id: str) -> object:
     """Build a falling three-tick dataset that crosses a protective stop.
 
     Args:
@@ -97,7 +99,7 @@ def _protective_dataset(request_id: str) -> MarketDataset:
     start = datetime(2025, 1, 6, 12, tzinfo=UTC)
     bids = (Decimal("1.10000"), Decimal("1.09000"), Decimal("1.08000"))
     records = tuple(
-        TickRecord(
+        build_tick_record(
             timestamp=start + timedelta(seconds=index),
             source="fixture",
             source_symbol="EURUSD",
@@ -111,7 +113,7 @@ def _protective_dataset(request_id: str) -> MarketDataset:
         )
         for index, bid in enumerate(bids)
     )
-    quality = DataQualityReport(
+    quality = build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
         record_count=len(records),
@@ -121,7 +123,7 @@ def _protective_dataset(request_id: str) -> MarketDataset:
         schema_version="v1",
         generated_at=records[-1].available_at,
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="ticks",
         symbol="EURUSD",

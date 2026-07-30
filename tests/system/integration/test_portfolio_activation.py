@@ -6,9 +6,7 @@ from datetime import datetime
 from typing import Any
 
 import pytest
-from app.services.portfolio.config import PortfolioSettings
-from app.services.portfolio.contracts import PortfolioConstructionResult
-from app.utils import logger
+from app.utils import get_logger
 
 from tests.portfolio import conftest as portfolio_fixtures
 from tests.portfolio.integration import (
@@ -20,6 +18,9 @@ construction_result = portfolio_fixtures.construction_result
 portfolio_settings = portfolio_fixtures.portfolio_settings
 portfolio_now = portfolio_fixtures.portfolio_now
 run_activation_chain = activation_workflow.test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts
+PortfolioConstructionResult = Any
+PortfolioSettings = Any
+logger = get_logger(__name__)
 
 
 def test_candidate_simulation_risk_review_and_activation_chain(

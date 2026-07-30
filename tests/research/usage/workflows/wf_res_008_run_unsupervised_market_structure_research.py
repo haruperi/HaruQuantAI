@@ -7,8 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.research import UnsupervisedResearchConfig
-from app.services.research.modeling import run_unsupervised_research
+from app.services.research import create_research_value, run_unsupervised_research
 from tests.research.usage.workflows._support import limits, prepared_dataset
 
 WORKFLOW_ID = "WF-RES-008"
@@ -35,7 +34,9 @@ def main() -> None:
     # Stage 1 — Receive the finite leakage-safe feature frame and explicit seed.
     _stage(1)
     frame = prepared_dataset().data
-    config = UnsupervisedResearchConfig(("close", "volume"), True, 2, 2, 20, 7)
+    config = create_research_value(
+        "UnsupervisedResearchConfig", ("close", "volume"), True, 2, 2, 20, 7
+    )
 
     # Stage 2 — Select and scale approved finite feature columns.
     _stage(2)

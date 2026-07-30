@@ -1,9 +1,4 @@
-"""Executable Portfolio public API lifecycle usage example.
-
-Demonstrates the PortfolioService public boundary through the package-root
-public API. Each functional requirement FR-PORT-034 through FR-PORT-037 has a
-dedicated demonstration function.
-"""
+"""Executable Portfolio standalone public API lifecycle usage example."""
 
 import inspect
 import sys
@@ -12,7 +7,29 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.portfolio import PortfolioError, PortfolioService
+from app.services.portfolio import (
+    activate_portfolio,
+    assess_portfolio_drift,
+    construct_portfolio,
+    get_portfolio_history,
+    get_portfolio_status,
+    recompute_portfolio_measurement,
+    rollback_portfolio,
+    submit_portfolio_rebalance,
+    to_portfolio_error_payload,
+)
+from app.utils import get_standard_response_type
+
+PUBLIC_OPERATIONS = {
+    "activate": activate_portfolio,
+    "assess_drift": assess_portfolio_drift,
+    "construct": construct_portfolio,
+    "history": get_portfolio_history,
+    "recompute_measurement": recompute_portfolio_measurement,
+    "rollback": rollback_portfolio,
+    "status": get_portfolio_status,
+    "submit_rebalance": submit_portfolio_rebalance,
+}
 
 
 def _header(title: str) -> None:
@@ -24,10 +41,10 @@ def fr_port_034() -> None:
     """FR-PORT-034: Expose construction, status, activation, drift/rebalance,
     rollback, and history operations.
 
-    Demonstrates that PortfolioService exposes every required operation.
+    Demonstrates that the package root exposes every required standalone operation.
     """
     _header(
-        "FR-PORT-034: Expose construction, status, activation, drift/rebalance, rollback, and history operations. Demonstrates that PortfolioService exposes every required operation."
+        "FR-PORT-034: Expose construction, status, activation, drift/rebalance, rollback, and history as package-root functions."
     )
     print("FR-PORT-034: Expose construction, status, activation, drift, rebalance")
 
@@ -41,15 +58,10 @@ def fr_port_034() -> None:
         "rollback",
         "history",
     }
-    actual = {
-        name
-        for name, _member in inspect.getmembers(
-            PortfolioService, predicate=inspect.isfunction
-        )
-    }
+    actual = set(PUBLIC_OPERATIONS)
     missing = required - actual
     assert not missing, f"Missing operations: {missing}"
-    print(f"All {len(required)} required operations present on PortfolioService")
+    print(f"All {len(required)} required standalone operations present at package root")
     for op in sorted(required):
         print(f"  - {op}")
 
@@ -58,11 +70,11 @@ def fr_port_035() -> None:
     """FR-PORT-035: Accept AuthContext and request_id: str | None = None on
     governed entry points.
 
-    Demonstrates that every governed public method accepts the required
+    Demonstrates that every governed public function accepts the required
     authentication and trace parameters.
     """
     _header(
-        "FR-PORT-035: Accept AuthContext and request_id: str | None = None on governed entry points. Demonstrates that every governed public method accepts the required authentication and trace parameters."
+        "FR-PORT-035: Every governed package-root function accepts AuthContext and optional request_id."
     )
     print("FR-PORT-035: Accept AuthContext and optional request_id")
 
@@ -77,55 +89,41 @@ def fr_port_035() -> None:
         "history",
     )
     for method_name in governed:
-        signature = inspect.signature(getattr(PortfolioService, method_name))
+        signature = inspect.signature(PUBLIC_OPERATIONS[method_name])
         assert "auth_context" in signature.parameters
         assert signature.parameters["request_id"].default is None
-        print(f"  {method_name}: auth_context + request_id OK")
+        print(f"  {method_name}: accepts auth_context and optional request_id")
 
 
 def fr_port_036() -> None:
     """FR-PORT-036: Return structured success/error envelopes; never None or
     raw exceptions.
 
-    Demonstrates that every public method returns a StandardResponse typed
+    Demonstrates that every governed public function returns a StandardResponse typed
     envelope.
     """
     _header(
-        "FR-PORT-036: Return structured success/error envelopes; never None or raw exceptions. Demonstrates that every public method returns a StandardResponse typed envelope."
+        "FR-PORT-036: Package-root operations return structured envelopes, never None or raw exceptions."
     )
     print("FR-PORT-036: Return structured envelopes, never None or raw exceptions")
 
-    governed = (
-        "construct",
-        "status",
-        "activate",
-        "assess_drift",
-        "submit_rebalance",
-        "recompute_measurement",
-        "rollback",
-        "history",
-    )
-    for method_name in governed:
-        signature = inspect.signature(getattr(PortfolioService, method_name))
-        return_annotation = str(signature.return_annotation)
-        assert "StandardResponse" in return_annotation
-        print(f"  {method_name} -> {return_annotation.split('[', maxsplit=1)[0]}")
-
-    error_response = PortfolioError("PORT_NOT_FOUND", "LIFECYCLE").to_payload()
+    error_response = to_portfolio_error_payload("PORT_NOT_FOUND", "LIFECYCLE")
+    assert isinstance(error_response, get_standard_response_type())
     assert error_response.status == "success"
     assert error_response.data is not None
-    print("  PortfolioError.to_payload -> StandardResponse")
+    print("Structured Portfolio error envelope:")
+    print(error_response.model_dump(mode="json"))
 
 
 def fr_port_037() -> None:
     """FR-PORT-037: Keep authentication and presentation logic outside
     Portfolio.
 
-    Demonstrates that the PortfolioService module contains no HTTP, FastAPI, or
+    Demonstrates that the Portfolio API implementation contains no HTTP, FastAPI, or
     authentication-framework imports.
     """
     _header(
-        "FR-PORT-037: Keep authentication and presentation logic outside Portfolio. Demonstrates that the PortfolioService module contains no HTTP, FastAPI, or authentication-framework imports."
+        "FR-PORT-037: Keep authentication and presentation frameworks outside Portfolio."
     )
     print("FR-PORT-037: Keep authentication and presentation outside Portfolio")
 

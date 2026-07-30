@@ -14,9 +14,11 @@ from app.services.analytics.contracts import (
 from app.services.analytics.metrics.distributions import (
     calculate_distribution_evidence,
 )
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics.unit.test_results_adapter import _config
+logger = get_logger(__name__)
+
+from tests.analytics.unit.test_results_adapter import _config  # noqa: E402
 
 
 def test_build_warning_bounds_detail() -> None:
@@ -96,7 +98,7 @@ def test_metric_modules_construct_no_warning_directly() -> None:
 def test_kernel_warning_detail_respects_configured_bound() -> None:
     """A kernel warning cannot exceed the configured detail bound."""
     logger.debug("Testing Analytics kernel warning detail bound")
-    with pytest.raises(AnalyticsValidationError, match="exceeds configured"):
+    with pytest.raises(AnalyticsValidationError, match="exceeds configured bound"):
         calculate_distribution_evidence(
             (1.0, 1.0, 1.0, 1.0), config=_config(max_warning_detail_bytes=1)
         )

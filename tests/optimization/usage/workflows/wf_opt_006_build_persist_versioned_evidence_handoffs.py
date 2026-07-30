@@ -7,14 +7,17 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.optimization.evidence import (
+from app.services.optimization import (
     build_optimization_evidence,
+    build_optimization_handoff,
     build_report_package,
+    persist_optimization_result,
 )
-from app.services.optimization.public_api import build_optimization_handoff
-from app.services.optimization.state import persist_optimization_result
-from tests.optimization.unit.test_evidence_contracts import evidence_request
-from tests.optimization.unit.test_state_contracts import MemoryOptimizationStore
+from app.utils import flush_logging
+from tests.optimization.usage._support import (
+    SqliteOptimizationStore,
+    evidence_request,
+)
 
 WORKFLOW_ID = "WF-OPT-006"
 STAGES = (
@@ -52,16 +55,18 @@ def main() -> None:
 
     # Stage 4 — Persist result and ranked evidence atomically through the injected store.
     _stage(4)
-    receipt = persist_optimization_result(result, MemoryOptimizationStore())
+    store = SqliteOptimizationStore()
+    receipt = persist_optimization_result(result, store)
 
     # Stage 5 — Build and return the advisory Optimization handoff.
     _stage(5)
     handoff_response = build_optimization_handoff(request)
     assert handoff_response.data is not None
     handoff = handoff_response.data
-    print("Report/durable:", report["schema_id"], receipt.durable)
+    print("Report/durable:", report["schema_id"], receipt.durable, store.path)
     print("OUTPUT BOUNDARY — typed OptimizationResult v1:", handoff.schema_id)
 
 
 if __name__ == "__main__":
     main()
+    flush_logging()

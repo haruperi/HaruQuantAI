@@ -13,7 +13,7 @@ from app.services.optimization.public_api.operations import (
     run_walk_forward_optimization,
 )
 
-OFFICIAL_OPTIMIZATION_TOOLS = (
+_OFFICIAL_OPTIMIZATION_TOOLS = (
     "build_optimization_handoff",
     "calculate_parameter_stability",
     "calculate_robustness_score",
@@ -26,13 +26,19 @@ OFFICIAL_OPTIMIZATION_TOOLS = (
     "run_walk_forward_optimization",
 )
 
+
+def get_official_optimization_tools() -> tuple[str, ...]:
+    """Return approved Optimization official operation names."""
+    return _OFFICIAL_OPTIMIZATION_TOOLS
+
+
 __all__ = (
-    "OFFICIAL_OPTIMIZATION_TOOLS",
     "build_optimization_handoff",
     "calculate_parameter_stability",
     "calculate_robustness_score",
     "compare_optimization_runs",
     "detect_overfit_parameters",
+    "get_official_optimization_tools",
     "rank_parameter_sets",
     "run_parameter_sweep",
     "run_robustness_analysis",

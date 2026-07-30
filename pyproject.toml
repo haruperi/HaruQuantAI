@@ -33,6 +33,10 @@ dependencies = [
     "uvicorn>=0.30.0",
     "yfinance>=1.4.1",
     "exchange-calendars==4.12",
+    # Agentic FEAT-AGT-03 runtime. Reachable only through the HaruQuantAI-owned
+    # `AdkRuntime` port in `app/agentic/runtime/adk.py`; no ADK object crosses
+    # the Agentic public boundary. Requires the `requests` override below.
+    "google-adk>=2.5.0",
 ]
 
 [tool.ruff]
@@ -298,3 +302,15 @@ ignore_missing_imports = true
 required-environments = [
     "sys_platform == 'win32' and platform_machine == 'AMD64'"
 ]
+
+# `ctrader-open-api==0.9.2` pins `requests==2.32.3` exactly, and `google-adk`
+# requires `requests>=2.32.4`; `ctrader-open-api==0.9.3` is yanked, so the two
+# are otherwise unsatisfiable together.
+#
+# The override is safe for this project specifically: the only `requests` usage
+# in `ctrader-open-api` is `Auth.getToken()` / `Auth.refreshToken()` in
+# `auth.py`, and the Brokers cTrader adapter never calls either — it
+# authenticates over protobuf/TCP with a caller-supplied `access_token`.
+#
+# Remove this override once `ctrader-open-api` relaxes its `requests` pin.
+override-dependencies = ["requests>=2.32.4"]

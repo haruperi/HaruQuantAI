@@ -63,6 +63,24 @@ _P = ParamSpec("_P")
 _R = TypeVar("_R")
 
 
+def _safe_validate_id(value: object, *, expected_prefix: str) -> str | None:
+    """Resolve a validated identifier value for trace propagation.
+
+    Args:
+        value: Candidate identifier value.
+        expected_prefix: Prefix rule for the identifier.
+
+    Returns:
+        Validated identifier or ``None`` when invalid.
+    """
+    if not isinstance(value, str):
+        return None
+    try:
+        return validate_id(value, expected_prefix=expected_prefix)
+    except ValueError:
+        return None
+
+
 def _canonical_trace_context(
     args: tuple[object, ...], kwargs: Mapping[str, object]
 ) -> tuple[str, str | None]:
@@ -82,19 +100,15 @@ def _canonical_trace_context(
         candidate = (
             value if isinstance(value, str) else getattr(value, "request_id", None)
         )
-        if request_id is None and isinstance(candidate, str):
-            try:
-                request_id = validate_id(candidate, expected_prefix="req")
-            except Exception:
-                continue
+        validated_request = _safe_validate_id(candidate, expected_prefix="req")
+        if request_id is None and validated_request is not None:
+            request_id = validated_request
         candidate_correlation = getattr(value, "correlation_id", None)
-        if correlation_id is None and isinstance(candidate_correlation, str):
-            try:
-                correlation_id = validate_id(
-                    candidate_correlation, expected_prefix="cor"
-                )
-            except Exception:
-                continue
+        validated_correlation = _safe_validate_id(
+            candidate_correlation, expected_prefix="cor"
+        )
+        if correlation_id is None and validated_correlation is not None:
+            correlation_id = validated_correlation
         if request_id is not None and correlation_id is not None:
             break
     return request_id or generate_id("req"), correlation_id
@@ -248,7 +262,7 @@ def _optimization_boundary(
                     details=details,
                     message=definition.description,
                     metadata=response_metadata(),
-                    catalog=OPTIMIZATION_ERROR_CATALOG,
+                    catalog=cast("Any", OPTIMIZATION_ERROR_CATALOG),
                 )
             except ValueError as error:
                 logger.info(
@@ -265,11 +279,11 @@ def _optimization_boundary(
                         "OPT_INVALID_REQUEST"
                     ].description,
                     metadata=response_metadata(),
-                    catalog=OPTIMIZATION_ERROR_CATALOG,
+                    catalog=cast("Any", OPTIMIZATION_ERROR_CATALOG),
                 )
-            except Exception as error:  # noqa: BLE001 - outer fail-closed boundary.
+            except Exception as error:
                 failure_type = type(error).__name__
-                logger.error(
+                logger.exception(
                     "Unexpected %s escaped Optimization operation %s",
                     failure_type,
                     function.__name__,
@@ -284,7 +298,7 @@ def _optimization_boundary(
                         "OPT_INTERNAL_ERROR"
                     ].description,
                     metadata=response_metadata(),
-                    catalog=OPTIMIZATION_ERROR_CATALOG,
+                    catalog=cast("Any", OPTIMIZATION_ERROR_CATALOG),
                 )
             return success_response(
                 raw_result,

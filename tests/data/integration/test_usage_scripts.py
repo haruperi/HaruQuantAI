@@ -18,7 +18,6 @@ _USAGE_SCRIPTS = (
     "08_transformation.py",
     "09_time_sessions.py",
     "10_sources.py",
-    "11_economic_calendar.py",
     "12_realtime_feeds.py",
     "13_data_jobs.py",
     "14_evidence.py",
@@ -28,7 +27,11 @@ _USAGE_SCRIPTS = (
 
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)
 def test_documented_usage_script_executes_real_work(script_name: str) -> None:
-    """Run one standalone usage script in an isolated Python process."""
+    """Run one network-free standalone usage script in an isolated process.
+
+    FEAT-DATA-11 is exercised by the opt-in live integration test because its
+    usage program intentionally acquires licensed provider data.
+    """
     usage_directory = Path(__file__).parents[1] / "usage"
     environment = os.environ.copy()
     environment.pop("DATA_USAGE_LIVE_PROVIDERS", None)

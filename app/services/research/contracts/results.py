@@ -13,22 +13,8 @@ from typing import Annotated, Literal
 import pandas as pd
 from pydantic import PlainSerializer
 
+from app.services.research.contracts.errors import SecurityError, ValidationError
 from app.utils import get_logger
-
-
-class ValidationError(ValueError):
-    """Research-owned result validation error."""
-
-    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
-        super().__init__(f"{code}:{detail}")
-
-
-class SecurityError(ValueError):
-    """Research-owned result security error."""
-
-    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
-        super().__init__(f"{code}:{detail}")
-
 
 logger = get_logger(__name__)
 

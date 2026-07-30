@@ -10,13 +10,9 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.optimization.errors import OptimizationError
-from app.services.optimization.execution import (
-    EngineOptimizationResult,
-    execute_candidate,
-)
-from tests.optimization.unit.test_adapter import FakeAdapter
-from tests.optimization.unit.test_execution_contracts import execution_request
+from app.services.analytics import get_analytics_value_field
+from app.services.optimization import execute_candidate, get_optimization_value_field
+from tests.optimization.usage._support import genuine_execution_bundle
 
 
 def _header(title: str) -> None:
@@ -29,27 +25,30 @@ def example_execution() -> None:
     _header("Demonstrate candidate execution engine integration.")
     print("Optimization Example 4: Candidate Execution")
 
-    req = execution_request()
+    dataset, req, adapter = genuine_execution_bundle()
     print(f"Execution request contract version: {req.contract_version}")
-
-    # Optimization Error construction
-    err = OptimizationError("OPT_EXECUTION_FAILED")
-    payload = err.to_payload()
-    print(f"OptimizationError payload code: {payload['code']}")
-
-    # Adapter verification
-    adapter = FakeAdapter()
-    print(f"Adapter is callable: {callable(getattr(adapter, 'execute', None))}")
-
-    # Execute candidate
-    res = adapter.execute(req)
     print(
-        "Adapter execution returned EngineOptimizationResult: "
-        f"{isinstance(res, EngineOptimizationResult)}"
+        f"Genuine input: {len(dataset.records)} MT5-derived {dataset.symbol} "
+        f"ticks; first={dataset.records[0]}"
     )
 
-    exec_res = execute_candidate(req, adapter, deterministic_only=True)
-    print(f"execute_candidate hash: {exec_res.candidate_hash[:8]}...")
+    # Execute candidate
+    res = execute_candidate(req, adapter, deterministic_only=True)
+    report = get_optimization_value_field(res, "analytics_report")
+    sections = get_analytics_value_field(report, "sections")
+    pnl_section = next(section for section in sections if section.section_key == "pnl")
+    print(
+        "Real adapter execution evidence:",
+        {
+            "candidate_hash": res.candidate_hash,
+            "simulation_run_id": res.simulation_run_id,
+            "simulation_request_hash": res.simulation_request_hash,
+            "analytics_report_id": get_analytics_value_field(report, "report_id"),
+            "pnl_metrics": tuple(
+                (metric.metric_key, metric.value) for metric in pnl_section.metrics
+            ),
+        },
+    )
 
 
 def main() -> None:

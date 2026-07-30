@@ -8,31 +8,53 @@ import sys
 import tempfile
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from functools import cache
 from pathlib import Path
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.simulator import (
-    ArtifactEntry,
-    ArtifactManifest,
-    ClosedTradeRecord,
-    ComponentReturnSeries,
-    PortfolioComponentResult,
-    PortfolioSimulationResult,
-    ReturnObservation,
-    RiskBudgetHistoryRow,
     build_artifact_manifest,
     build_json_report,
     build_markdown_report,
+    create_simulation_value,
+    dump_simulation_value,
+    get_simulation_value_field,
+    run_backtest,
     unwrap_simulation_response,
 )
-from tests.simulator.unit.test_reporting_contracts import _result
+from tests.simulator.usage.workflows._support import (
+    authority,
+    backtest_request,
+    dependencies,
+    live_tick_dataset,
+)
+
+
+@cache
+def _result() -> object:
+    """Execute one genuine bounded run for reporting evidence."""
+    dataset = live_tick_dataset()
+    request = backtest_request(dataset)
+    with tempfile.TemporaryDirectory(prefix="sim-reporting-") as directory:
+        return _value(
+            run_backtest(
+                request,
+                authority(request),
+                dependencies(Path(directory), dataset),
+            )
+        )
 
 
 def _value(response: object) -> object:
     """Unwrap one public Simulation response for display."""
     return unwrap_simulation_response(response, operation="usage.reporting")
+
+
+def _contract(name: str, **fields: object) -> object:
+    """Build one opaque Simulation reporting contract."""
+    return create_simulation_value(name, **fields)
 
 
 def _header(title: str) -> None:
@@ -50,7 +72,8 @@ def example_reporting() -> None:
 
     # 1. ClosedTradeRecord
     instant = datetime(2025, 1, 1, tzinfo=UTC)
-    trade = ClosedTradeRecord(
+    trade = _contract(
+        "ClosedTradeRecord",
         ticket="ticket",
         symbol="EURUSD",
         type="BUY",
@@ -69,11 +92,12 @@ def example_reporting() -> None:
         mae=Decimal(-1),
         mfe=Decimal(11),
     )
-    print(f"ClosedTradeRecord ticket: {trade.ticket}, profit: {trade.profit}")
+    print("Closed-trade ledger row:", dump_simulation_value(trade))
 
     # 2. ArtifactManifest
     entries = tuple(
-        ArtifactEntry(
+        _contract(
+            "ArtifactEntry",
             relative_path=name,
             media_type="application/octet-stream",
             size_bytes=1,
@@ -84,8 +108,8 @@ def example_reporting() -> None:
             "123", ("journal.jsonl", "result.json", "report.md"), strict=True
         )
     )
-    manifest = ArtifactManifest(artifacts=entries, created_at=instant)
-    print(f"ArtifactManifest entries count: {len(manifest.artifacts)}")
+    manifest = _contract("ArtifactManifest", artifacts=entries, created_at=instant)
+    print("Artifact manifest:", dump_simulation_value(manifest))
 
     # 3. Build artifact manifest on disk
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -98,7 +122,7 @@ def example_reporting() -> None:
         disk_manifest = _value(
             build_artifact_manifest(tmp_path, paths, created_at=instant)
         )
-        print(f"Disk manifest created with {len(disk_manifest.artifacts)} files")
+        print("Verified disk manifest:", dump_simulation_value(disk_manifest))
 
     # 4. JSON and Markdown report generation
     json_report = _value(build_json_report(result))
@@ -176,13 +200,15 @@ def fr_sim_033() -> None:
     start = datetime(2025, 1, 1, tzinfo=UTC)
     end = start + timedelta(days=30)
     observations = tuple(
-        ReturnObservation(
+        _contract(
+            "ReturnObservation",
             timestamp=start + timedelta(days=index + 1),
             return_value=Decimal("0.001"),
         )
         for index in range(30)
     )
-    result = PortfolioSimulationResult(
+    result = _contract(
+        "PortfolioSimulationResult",
         result_id="portfolio-result",
         run_id="portfolio-run",
         request_hash="a" * 64,
@@ -198,7 +224,8 @@ def fr_sim_033() -> None:
         measurement_end=end,
         base_currency="USD",
         component_results=(
-            PortfolioComponentResult(
+            _contract(
+                "PortfolioComponentResult",
                 component_id="component",
                 simulation_result_id="simulation-run",
                 journal_ref="component/journal.jsonl",
@@ -208,7 +235,8 @@ def fr_sim_033() -> None:
             ),
         ),
         component_return_series=(
-            ComponentReturnSeries(
+            _contract(
+                "ComponentReturnSeries",
                 component_id="component",
                 simulation_result_id="simulation-run",
                 observations=observations,
@@ -217,7 +245,8 @@ def fr_sim_033() -> None:
         aggregate_journal_ref="aggregate/journal.jsonl",
         aggregate_metrics_ref="aggregate/metrics.json",
         risk_budget_history=(
-            RiskBudgetHistoryRow(
+            _contract(
+                "RiskBudgetHistoryRow",
                 risk_decision_id="risk",
                 component_id="component",
                 effective_at=start,
@@ -229,7 +258,7 @@ def fr_sim_033() -> None:
         fx_evidence_ids=("fx-1",),
         artifact_manifest_ref="aggregate/manifest.json",
     )
-    print(f"Portfolio result status: {result.status}")
+    print("Portfolio result evidence:", dump_simulation_value(result))
 
 
 def fr_sim_025() -> None:
@@ -245,7 +274,8 @@ def fr_sim_025() -> None:
     )
     instant = datetime(2025, 1, 1, tzinfo=UTC)
     entries = tuple(
-        ArtifactEntry(
+        _contract(
+            "ArtifactEntry",
             relative_path=name,
             media_type="application/octet-stream",
             size_bytes=1,
@@ -258,8 +288,8 @@ def fr_sim_025() -> None:
             strict=True,
         )
     )
-    manifest = ArtifactManifest(artifacts=entries, created_at=instant)
-    print(f"Manifest schema: {manifest.schema_version}")
+    manifest = _contract("ArtifactManifest", artifacts=entries, created_at=instant)
+    print("Manifest schema:", get_simulation_value_field(manifest, "schema_version"))
 
 
 def fr_sim_026() -> None:
@@ -282,7 +312,7 @@ def fr_sim_026() -> None:
             path.write_text(name, encoding="utf-8")
             paths.append(path)
         manifest = _value(build_artifact_manifest(root, paths, created_at=instant))
-        print(f"Built artifacts: {len(manifest.artifacts)}")
+        print("Built artifact evidence:", dump_simulation_value(manifest))
 
 
 def fr_sim_027() -> None:

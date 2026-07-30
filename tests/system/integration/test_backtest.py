@@ -7,26 +7,22 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from app.services.analytics import PerformanceReport, build_performance_report
+from app.services.analytics import build_performance_report
 from app.services.data import (
-    DataQualityReport,
-    MarketDataset,
-    OHLCVRecord,
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
     generate_tick_series,
+    unwrap_data_response,
 )
 from app.services.indicators import get_indicator_result_metadata, sma
 from app.services.risk import get_decision_state
-from app.services.simulator import (
-    SimulationBacktestRequestV1,
-    SimulationResult,
-    run_backtest,
-)
+from app.services.simulator import run_backtest, unwrap_simulation_response
 from app.services.strategy import (
     build_trade_intent,
     create_strategy_decision,
     create_strategy_evaluator,
     create_strategy_execution_context,
-    create_trade_intent_value,
     create_validated_strategy_ref,
     evaluate_strategy_signals,
     get_strategy_environment,
@@ -55,6 +51,11 @@ from tests.strategy.unit.test_models import (
 )
 
 OrderIntent = Any
+MarketDataset = Any
+PerformanceReport = Any
+SimulationBacktestRequestV1 = Any
+SimulationResult = Any
+StrategyTradeIntent = Any
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 ProposedTrade = object
@@ -83,7 +84,7 @@ def _bar_dataset() -> MarketDataset:
         ),
     )
     records = tuple(
-        OHLCVRecord(
+        build_ohlcv_record(
             timestamp=start + timedelta(seconds=index * 10),
             source="system-workflow-fixture",
             source_symbol="EURUSD",
@@ -98,7 +99,7 @@ def _bar_dataset() -> MarketDataset:
         )
         for index, (open_price, high, low, close) in enumerate(prices)
     )
-    quality = DataQualityReport(
+    quality = build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
         record_count=len(records),
@@ -108,7 +109,7 @@ def _bar_dataset() -> MarketDataset:
         schema_version="v1",
         generated_at=records[-1].available_at,
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="bars",
         symbol="EURUSD",
@@ -137,15 +138,26 @@ def _ticks(dataset: MarketDataset) -> MarketDataset:
     Returns:
         Canonical Data-owned tick series.
     """
-    return generate_tick_series(
-        dataset,
-        model="trading_bar",
-        trading_timeframe="M1",
-        spread_model="fixed_spread",
-        fixed_spread_points=Decimal(2),
-        max_records=100,
+    return unwrap_data_response(
+        generate_tick_series(
+            dataset,
+            model="trading_bar",
+            trading_timeframe="M1",
+            spread_model="fixed_spread",
+            fixed_spread_points=Decimal(2),
+            max_records=100,
+            request_id=dataset.request_id,
+        ),
+        operation="generate_tick_series",
         request_id=dataset.request_id,
     )
+
+
+def _unwrap_response(response: Any) -> Any:
+    """Return data from one successful standard response."""
+    assert response.status == "success", response.error
+    assert response.data is not None
+    return response.data
 
 
 class _SystemBacktestDependencies(FakeDependencies):
@@ -168,7 +180,7 @@ class _SystemBacktestDependencies(FakeDependencies):
         self.bars = bars
         self.ticks = ticks
         self.calls: list[str] = []
-        self.trade_intent: create_trade_intent_value | None = None
+        self.trade_intent: StrategyTradeIntent | None = None
 
     def load_market_data(self, request: SimulationBacktestRequestV1) -> MarketDataset:
         """Load the referenced Data evidence."""
@@ -203,7 +215,7 @@ class _SystemBacktestDependencies(FakeDependencies):
         dataset: MarketDataset,
         indicators: tuple[Any, ...],
         request: SimulationBacktestRequestV1,
-    ) -> tuple[create_trade_intent_value, ...]:
+    ) -> tuple[StrategyTradeIntent, ...]:
         """Evaluate a registered Strategy and build its proposal intent."""
         self.calls.append("strategy")
         assert get_indicator_result_metadata(indicators[0])["indicator_id"] == "sma"
@@ -291,7 +303,7 @@ class _SystemBacktestDependencies(FakeDependencies):
 
     def review_risk(
         self,
-        intents: tuple[create_trade_intent_value, ...],
+        intents: tuple[StrategyTradeIntent, ...],
         request: SimulationBacktestRequestV1,
     ) -> tuple[RiskDecisionPackage, ...]:
         """Review the exact Strategy proposal through RiskGovernor."""
@@ -308,15 +320,18 @@ class _SystemBacktestDependencies(FakeDependencies):
         )
         assert proposal.schema_id == "risk.proposed_trade.v1"
         governor, _, _ = risk_examples._services(config)
-        decision = governor.review_trade_risk(
-            proposal,
-            risk_examples._snapshot_governor(config),
-            risk_examples._market(),
-            risk_examples._regime(),
-            (risk_examples._inactive_state(),),
-            risk_examples._auth(config),
-            attestation=risk_examples._attestation(config),
-            now=risk_examples.NOW,
+        decision = risk_examples.unwrap_risk_response(
+            governor.review_trade_risk(
+                proposal,
+                risk_examples._snapshot_governor(config),
+                risk_examples._market(),
+                risk_examples._regime(),
+                (risk_examples._inactive_state(),),
+                risk_examples._auth(config),
+                attestation=risk_examples._attestation(config),
+                now=risk_examples.NOW,
+            ),
+            operation="review_trade_risk",
         )
         assert decision.state is get_decision_state("APPROVE")
         return (decision,)
@@ -368,7 +383,7 @@ class _SystemBacktestDependencies(FakeDependencies):
             evidence_refs={"risk": decision.decision_id},
             assessed_at=request.start,
         )
-        return (build_execution_plan(trading_request, readiness),)
+        return (_unwrap_response(build_execution_plan(trading_request, readiness)),)
 
 
 def _analytics_report(
@@ -422,7 +437,10 @@ def test_sys_wf_001_backtest_reaches_performance_report(tmp_path: Path) -> None:
     request = _request(ticks, suffix="2")
     dependencies = _SystemBacktestDependencies(tmp_path, bars, ticks)
 
-    result = run_backtest(request, _auth(request), dependencies)
+    result = unwrap_simulation_response(
+        run_backtest(request, _auth(request), dependencies),
+        operation="run_backtest",
+    )
     report = _analytics_report(result, request)
 
     assert result.status == "completed"

@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from statistics import NormalDist
-from typing import TYPE_CHECKING
+from typing import cast
 
+from app.services.analytics import get_analytics_value_field
 from app.services.optimization.scoring.contracts import (
     OBJECTIVE_DIRECTIONS,
     CandidateScore,
@@ -16,9 +17,6 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
-if TYPE_CHECKING:
-    from app.services.analytics import PerformanceReport
-
 _MINIMUM_DSR_SAMPLE_COUNT = 3
 _SHA256_HEX_LENGTH = 64
 _SCALAR_METRIC_KEYS = frozenset(
@@ -26,7 +24,27 @@ _SCALAR_METRIC_KEYS = frozenset(
 )
 
 
-def _metric_values(report: PerformanceReport) -> dict[str, float | None]:
+def _normalize_objective(value: str | ObjectiveName) -> ObjectiveName:
+    """Normalize an objective input to a supported enum member.
+
+    Args:
+        value: Objective as enum member or canonical enum value.
+
+    Returns:
+        Canonical :class:`ObjectiveName`.
+
+    Raises:
+        ValueError: If the objective is unknown.
+        TypeError: If value is not a supported objective type.
+    """
+    if isinstance(value, ObjectiveName):
+        return value
+    if isinstance(value, str):
+        return ObjectiveName(value)
+    raise TypeError("optimization objective must be a known ObjectiveName or string")
+
+
+def _metric_values(report: object) -> dict[str, float | None]:
     """Project Analytics metric evidence by canonical key.
 
     Args:
@@ -41,33 +59,37 @@ def _metric_values(report: PerformanceReport) -> dict[str, float | None]:
     """
     logger.debug("Projecting Analytics metrics for Optimization")
     metrics: dict[str, float | None] = {}
-    for section in report.sections:
-        for metric in section.metrics:
-            if (
-                metric.metric_key not in _SCALAR_METRIC_KEYS
-                or metric.source_context != "all"
-            ):
+    for section in cast(
+        "Iterable[object]", get_analytics_value_field(report, "sections")
+    ):
+        for metric in cast(
+            "Iterable[object]", get_analytics_value_field(section, "metrics")
+        ):
+            metric_key = str(get_analytics_value_field(metric, "metric_key"))
+            source_context = str(get_analytics_value_field(metric, "source_context"))
+            if metric_key not in _SCALAR_METRIC_KEYS or source_context != "all":
                 continue
-            if metric.value is not None and not isinstance(metric.value, (int, float)):
+            metric_value = get_analytics_value_field(metric, "value")
+            if metric_value is not None and not isinstance(metric_value, (int, float)):
                 from decimal import Decimal
 
-                if not isinstance(metric.value, Decimal):
+                if not isinstance(metric_value, Decimal):
                     raise TypeError("Optimization objective metric must be numeric")
-            value = None if metric.value is None else float(metric.value)
-            if metric.metric_key in metrics and metrics[metric.metric_key] != value:
+            value = None if metric_value is None else float(metric_value)
+            if metric_key in metrics and metrics[metric_key] != value:
                 raise ValueError(
                     "Analytics report contains conflicting metric evidence"
                 )
-            metrics[metric.metric_key] = value
+            metrics[metric_key] = value
     return metrics
 
 
 def calculate_candidate_score(
-    report: PerformanceReport,
+    report: object,
     *,
     candidate_hash: str,
-    objective: ObjectiveName,
-    enabled_objectives: frozenset[ObjectiveName],
+    objective: ObjectiveName | str,
+    enabled_objectives: frozenset[ObjectiveName | str],
 ) -> CandidateScore:
     """Project one enabled objective from an Analytics report.
 
@@ -84,13 +106,21 @@ def calculate_candidate_score(
         ValueError: If the objective is disabled or report evidence conflicts.
     """
     logger.info("Calculating Optimization candidate score from Analytics evidence")
-    if objective not in enabled_objectives:
+    objective = _normalize_objective(objective)
+    normalized_enabled = {_normalize_objective(item) for item in enabled_objectives}
+    if objective not in normalized_enabled:
         raise ValueError("optimization objective is not enabled")
     metrics = _metric_values(report)
     value = metrics.get(objective.value)
     trade_count_value = metrics.get("trade_count")
     trade_count = None if trade_count_value is None else int(trade_count_value)
-    caveats = tuple(flag.code for flag in report.quality_flags)
+    caveats = tuple(
+        str(get_analytics_value_field(flag, "code"))
+        for flag in cast(
+            "Iterable[object]",
+            get_analytics_value_field(report, "quality_flags"),
+        )
+    )
     if value is None:
         caveats = (*caveats, "objective_unavailable")
     return CandidateScore(

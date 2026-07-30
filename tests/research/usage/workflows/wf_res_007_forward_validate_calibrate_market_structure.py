@@ -7,10 +7,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.research import MarketStructureConfig
-from app.services.research.market_structure import (
+from app.services.research import (
     build_validation_summary,
     calibrate_market_structure,
+    create_research_value,
     label_realized_market_behavior,
 )
 from tests.research.usage.workflows._support import limits, prepared_dataset
@@ -39,7 +39,8 @@ def main() -> None:
     # Stage 1 — Receive persisted prediction context and later approved MT5-derived data.
     _stage(1)
     prepared = prepared_dataset()
-    config = MarketStructureConfig(
+    config = create_research_value(
+        "MarketStructureConfig",
         {"calibration_grid": [{"trend_threshold": 0.4}]},
         False,
         (2,),

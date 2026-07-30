@@ -7,15 +7,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.optimization.scoring import (
-    ObjectiveName,
+from app.services.optimization import (
     assess_overfit_evidence,
     calculate_candidate_score,
     calculate_deflated_sharpe,
     count_nominal_trials,
     rank_candidates,
 )
-from tests.analytics._support import _report
+from app.utils import flush_logging
+from tests.optimization.usage._support import performance_report
 
 WORKFLOW_ID = "WF-OPT-TER"
 STAGES = (
@@ -41,15 +41,15 @@ def main() -> None:
 
     # Stage 1 — Receive Analytics-owned candidate and trade evidence.
     _stage(1)
-    report, _ = _report()
+    report = performance_report()
 
     # Stage 2 — Calculate the enabled objective score only.
     _stage(2)
     score = calculate_candidate_score(
         report,
         candidate_hash="a" * 64,
-        objective=ObjectiveName.NET_PNL,
-        enabled_objectives=frozenset({ObjectiveName.NET_PNL}),
+        objective="net_pnl",
+        enabled_objectives=frozenset({"net_pnl"}),
     )
 
     # Stage 3 — Calculate Deflated Sharpe and unique nominal-trial evidence.
@@ -87,3 +87,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+    flush_logging()

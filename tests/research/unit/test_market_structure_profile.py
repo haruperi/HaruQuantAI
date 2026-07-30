@@ -3,19 +3,18 @@
 import pandas as pd
 import pytest
 from app.services.research import (
-    DataQualityReport,
-    MarketStructureConfig,
-    MarketStructureProfile,
-    PreparedDataset,
-    ResearchResourceLimits,
+    build_market_structure_profile,
+    create_research_value,
+    is_research_value,
 )
-from app.services.research.market_structure import build_market_structure_profile
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _HASH = "e" * 64
 
 
-def _prepared(rows: int = 30) -> PreparedDataset:
+def _prepared(rows: int = 30) -> object:
     """Build a PreparedDataset with trending OHLCVS data."""
     idx = pd.date_range("2026-01-01", periods=rows, freq="h", tz="UTC")
     close = pd.Series(
@@ -32,19 +31,21 @@ def _prepared(rows: int = 30) -> PreparedDataset:
         },
         index=idx,
     )
-    return PreparedDataset(
+    return create_research_value(
+        "PreparedDataset",
         frame,
         "v1",
-        DataQualityReport((), (), ("schema",), ()),
+        create_research_value("DataQualityReport", (), (), ("schema",), ()),
         _HASH,
         _HASH,
         ("fixture",),
     )
 
 
-def _config() -> MarketStructureConfig:
+def _config() -> object:
     """Build a market-structure configuration."""
-    return MarketStructureConfig(
+    return create_research_value(
+        "MarketStructureConfig",
         {
             "swing_window": 5,
             "atr_period": 14,
@@ -58,9 +59,9 @@ def _config() -> MarketStructureConfig:
     )
 
 
-def _limits() -> ResearchResourceLimits:
+def _limits() -> object:
     """Build approved resource ceilings."""
-    return ResearchResourceLimits(500_000, 600.0, 52_428_800)
+    return create_research_value("ResearchResourceLimits", 500_000, 600.0, 52_428_800)
 
 
 def test_profile_reuses_canonical_score() -> None:
@@ -69,7 +70,7 @@ def test_profile_reuses_canonical_score() -> None:
     profile = build_market_structure_profile(
         _prepared(), config=_config(), limits=_limits()
     )
-    assert isinstance(profile, MarketStructureProfile)
+    assert is_research_value(profile, "MarketStructureProfile")
     assert profile.schema_version == "v1"
     assert 0.0 <= profile.score <= 100.0
     assert profile.verdict in ("trending", "ranging", "mixed")
@@ -78,9 +79,45 @@ def test_profile_reuses_canonical_score() -> None:
 
 def test_profile_rejects_oversized_input() -> None:
     """FR-RES-075: oversized input fails closed."""
-    with pytest.raises(ValidationError, match="ROW_LIMIT_EXCEEDED"):
+    with pytest.raises(ValueError, match="ROW_LIMIT_EXCEEDED"):
         build_market_structure_profile(
             _prepared(),
             config=_config(),
-            limits=ResearchResourceLimits(5, 10.0, 1024),
+            limits=create_research_value("ResearchResourceLimits", 5, 10.0, 1024),
+        )
+
+
+def test_profile_handles_insufficient_range_and_missing_ohlc() -> None:
+    """Cover bounded insufficiency, ranging evidence, and column refusal."""
+    insufficient = build_market_structure_profile(
+        _prepared(3),
+        config=_config(),
+        limits=_limits(),
+    )
+    assert insufficient.warnings[0].code == "INSUFFICIENT_SAMPLES"
+
+    prepared = _prepared()
+    prepared.data.loc[:, "close"] = 100.0
+    ranging = build_market_structure_profile(
+        prepared,
+        config=_config(),
+        limits=_limits(),
+    )
+    assert ranging.verdict == "ranging"
+    assert ranging.strategy_fit["primary_archetype"] == "mean_revert"
+
+    missing = create_research_value(
+        "PreparedDataset",
+        prepared.data.drop(columns=["close"]),
+        "v1",
+        create_research_value("DataQualityReport", (), (), ("schema",), ()),
+        _HASH,
+        _HASH,
+        ("fixture",),
+    )
+    with pytest.raises(ValueError, match="OHLC_COLUMNS_REQUIRED"):
+        build_market_structure_profile(
+            missing,
+            config=_config(),
+            limits=_limits(),
         )

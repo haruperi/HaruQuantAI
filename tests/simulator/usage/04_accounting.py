@@ -12,19 +12,14 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.evidence.fx_contracts import (
-    FXConversionEvidence,
-    FXRateLeg,
-)
+from app.services.data import build_fx_conversion_evidence, build_fx_rate_leg
 from app.services.simulator import (
-    AccountLedger,
-    ExecutionCostInput,
-    ExecutionCostModel,
-    LedgerFill,
-    SymbolSpecification,
     calculate_execution_costs,
     calculate_margin,
     convert_fx_amount,
+    create_simulation_handle,
+    create_simulation_value,
+    execute_simulation_handle_operation,
     normalize_volume,
     unwrap_simulation_response,
     validate_fx_evidence,
@@ -41,9 +36,10 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _specification() -> SymbolSpecification:
+def _specification() -> object:
     """Build symbol specification."""
-    return SymbolSpecification(
+    return create_simulation_value(
+        "SymbolSpecification",
         minimum_volume=Decimal("0.01"),
         maximum_volume=Decimal(100),
         volume_step=Decimal("0.01"),
@@ -52,24 +48,27 @@ def _specification() -> SymbolSpecification:
     )
 
 
-def _model() -> ExecutionCostModel:
+def _model() -> object:
     """Build execution cost model."""
-    return ExecutionCostModel(
+    return create_simulation_value(
+        "ExecutionCostModel",
         commission_per_lot_per_side=Decimal(1),
         long_swap_per_lot_rollover=Decimal(0),
         short_swap_per_lot_rollover=Decimal(0),
     )
 
 
-def _ledger() -> AccountLedger:
+def _ledger() -> object:
     """Build one isolated fixed-precision account ledger."""
-    return AccountLedger(Decimal(10_000), "USD", _specification(), _model())
+    return create_simulation_handle(
+        "AccountLedger", Decimal(10_000), "USD", _specification(), _model()
+    )
 
 
-def _evidence() -> FXConversionEvidence:
+def _evidence() -> object:
     """Build FX conversion evidence."""
     instant = datetime(2025, 1, 1, tzinfo=UTC)
-    leg = FXRateLeg(
+    leg = build_fx_rate_leg(
         source_currency="USD",
         target_currency="EUR",
         rate=Decimal("0.9"),
@@ -78,7 +77,7 @@ def _evidence() -> FXConversionEvidence:
         as_of=instant,
         provenance={"source": "fixture"},
     )
-    return FXConversionEvidence(
+    return build_fx_conversion_evidence(
         source_currency="USD",
         target_currency="EUR",
         legs=(leg,),
@@ -118,8 +117,11 @@ def fr_sim_008() -> None:
     _header(
         "Demonstrate FR-SIM-008. Responsibility: The system shall calculate configured Phase 1 commission and swap deterministically and return an itemized fixed-precision cost mapping."
     )
-    cost_input = ExecutionCostInput(
-        volume=Decimal(1), side="BUY", rollover_multiplier=Decimal(0)
+    cost_input = create_simulation_value(
+        "ExecutionCostInput",
+        volume=Decimal(1),
+        side="BUY",
+        rollover_multiplier=Decimal(0),
     )
     costs = _value(calculate_execution_costs(cost_input, _model()))
     print(f"Execution costs commission: {costs['commission']}")
@@ -189,14 +191,17 @@ def fr_sim_011() -> None:
         "Demonstrate FR-SIM-011. Responsibility: The system shall atomically apply a simulated fill, realized PnL, commission, swap, and margin effect while preserving balance/equity/free-margin invariants, accumulating commission, swap, and gross-profit totals, and returning the itemized costs charged by that fill so the caller can attribute them to the exact position. The engine journals the resulting evidence; the ledger itself publishes no event."
     )
     costs = _value(
-        _ledger().apply_fill(
-            LedgerFill(
+        execute_simulation_handle_operation(
+            _ledger(),
+            "apply_fill",
+            create_simulation_value(
+                "LedgerFill",
                 action="OPEN",
                 side="BUY",
                 volume=Decimal(1),
                 price=Decimal("1.1"),
-            )
-        )
+            ),
+        ),
     )
     print(f"Applied fill total costs: {costs['total']}")
 
@@ -215,8 +220,8 @@ def fr_sim_012() -> None:
     _header(
         "Demonstrate FR-SIM-012. Responsibility: The system shall return an immutable read-only fixed-precision account snapshot without exposing mutable engine state. The snapshot exposes `balance`, `equity`, `used_margin`, `free_margin`, `unrealized`, `commission`, `swap`, `gross_profit`, and `account_currency`. `equity` is `balance + unrealized` and `free_margin` is `equity - used_margin`, so open-position risk is reflected before the next fill is admitted."
     )
-    snapshot = _value(_ledger().snapshot())
-    print(f"Account equity: {snapshot['equity']}")
+    snapshot = _value(execute_simulation_handle_operation(_ledger(), "snapshot"))
+    print("Immutable account snapshot:", dict(snapshot))
 
 
 def fr_sim_042() -> None:
@@ -232,8 +237,9 @@ def fr_sim_042() -> None:
         "Demonstrate FR-SIM-042. Responsibility: The system shall accept the current aggregate unrealized profit and loss of all open positions, so that equity, free margin, and margin admission reflect open exposure at the current tick. The engine supplies it once per tick from observed excursions; Simulation computes no price of its own."
     )
     ledger = _ledger()
-    _value(ledger.mark_to_market(Decimal(-25)))
-    print(f"Marked equity: {_value(ledger.snapshot())['equity']}")
+    _value(execute_simulation_handle_operation(ledger, "mark_to_market", Decimal(-25)))
+    snapshot = _value(execute_simulation_handle_operation(ledger, "snapshot"))
+    print("Marked-to-market account snapshot:", dict(snapshot))
 
 
 def main() -> None:

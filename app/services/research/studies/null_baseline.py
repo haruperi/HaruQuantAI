@@ -97,7 +97,9 @@ def compare_to_null(
     value = observed.statistics.get("mean")
     distribution = baseline.null_evidence.get("distribution")
     if not isinstance(value, int | float) or not isinstance(distribution, list):
-        raise ValueError("RES_INPUT_INVALID", "NULL_COMPARISON_EVIDENCE_MISSING")
+        raise ValueError(  # noqa: TRY004 - Research validation taxonomy.
+            "RES_INPUT_INVALID", "NULL_COMPARISON_EVIDENCE_MISSING"
+        )
     values = np.asarray(distribution, dtype="float64")
     percentile = compute_null_percentile(float(value), values)
     return {

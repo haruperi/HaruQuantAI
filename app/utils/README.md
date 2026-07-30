@@ -133,8 +133,9 @@ Folders are ordered from lowest to highest dependency.
 This table is the sole current registry for Utils. Detailed signatures, contract
 fields, failure behavior, and evidence remain authoritative in the referenced
 Section 4 feature specifications and are not duplicated in the changelog.
-Runtime receiver-side schema validation accesses the internal audit-event class
-only through `get_audit_event_type`.
+Runtime receiver-side schema validation accesses the internal authentication and
+audit-event classes only through `get_auth_context_type` and
+`get_audit_event_type`.
 
 ```text
 utils/
@@ -384,15 +385,15 @@ functional behavior.
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `audit.py` | Define the redacted audit envelope and common strict contract-field validation. | `AuditEvent`, `create_audit_event`; module-level, not re-exported through `__init__.py`: `JsonValue`, `validate_non_empty`, `validate_utc`, `validate_trace_id` | **Standard library:** `collections.abc`, `datetime`, `json`, `math`, `re`, `types`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** None |
-| Completed | `auth.py` | Define immutable authenticated principal and trace context. | `AuthContext`, `create_auth_context` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `audit.py` → strict contract-field validation |
-| Completed | `__init__.py` | Expose the supported shared-contract API. | `create_auth_context`, `create_audit_event` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `audit.py`, `auth.py` → approved exports |
+| Completed | `auth.py` | Define immutable authenticated principal and trace context. | Internal `AuthContext`; public `create_auth_context`, `get_auth_context_type` | **Standard library:** `datetime`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** `audit.py` → strict contract-field validation |
+| Completed | `__init__.py` | Expose the supported shared-contract API. | `create_auth_context`, `get_auth_context_type`, `create_audit_event`, `get_audit_event_type` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `audit.py`, `auth.py` → approved exports |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-UTL-001` | Define immutable `AuthContext v1` with only `USER` and `SERVICE_ACCOUNT` principal types and complete trace context. | `AuthContext` | None | `ValidationError`: naive time, empty identity/trace field, or unsupported principal type | **Usage:** `tests/utils/usage/01_contracts.py::fr_utils_001_auth_context()`<br>**Unit:** `tests/utils/unit/test_auth.py::test_auth_context_rejects_naive_time()` |
-| Completed | `FR-UTL-002` | Define immutable redacted `AuditEvent v1` with bounded JSON-safe payload. | `AuditEvent` | None | `ValidationError`: naive timestamp, empty identity/trace field, or unsafe payload | **Usage:** `tests/utils/usage/01_contracts.py::fr_utils_002_audit_event()`<br>**Unit:** `tests/utils/unit/test_audit.py::test_audit_event_requires_json_safe_payload()` |
+| Completed | `FR-UTL-001` | Define immutable `AuthContext v1` with only `USER` and `SERVICE_ACCOUNT` principal types and complete trace context. The class remains internal; callers construct it with the factory and may resolve its runtime type only through the getter. | `create_auth_context`, `get_auth_context_type` | None | `ValidationError`: naive time, empty identity/trace field, or unsupported principal type | **Usage:** `tests/utils/usage/01_contracts.py::fr_utils_001_auth_context()`<br>**Unit:** `tests/utils/unit/test_auth.py::test_auth_context_rejects_naive_time()` |
+| Completed | `FR-UTL-002` | Define immutable redacted `AuditEvent v1` with bounded JSON-safe payload. The class remains internal; callers construct it with the factory and may resolve its runtime type only through the getter. | `create_audit_event`, `get_audit_event_type` | None | `ValidationError`: naive timestamp, empty identity/trace field, or unsafe payload | **Usage:** `tests/utils/usage/01_contracts.py::fr_utils_002_audit_event()`<br>**Unit:** `tests/utils/unit/test_audit.py::test_audit_event_requires_json_safe_payload()` |
 | Completed | `FR-UTL-003` | Reject naive timestamps, empty identity/trace fields, unsupported principal types, and malformed schema identity. | Strict contract-field validation used by `AuditEvent` and `AuthContext` | None | `ValidationError`: naive time, empty field, unsupported principal type, or malformed schema identity | **Usage:** `tests/utils/usage/01_contracts.py::fr_utils_003_contract_validation()`<br>**Unit:** `tests/utils/unit/test_audit.py::test_contract_field_validation_rejects_malformed_schema()` |
 
 ### 4.2 `errors/` — Shared Errors, Metadata, and Routing

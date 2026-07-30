@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/optimization`
 > **Status:** `Completed`
-> **Last updated:** `2026-07-13`
+> **Last updated:** `2026-07-30`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -275,7 +275,7 @@ Evidence programs:
 - `WF-OPT-001`: `tests/optimization/usage/workflows/wf_opt_001_package_optimization_robustness_request.py`
 - `WF-OPT-005`: `tests/optimization/usage/workflows/wf_opt_005_run_monte_carlo_robustness_analysis.py`
 - `WF-OPT-006`: `tests/optimization/usage/workflows/wf_opt_006_build_persist_versioned_evidence_handoffs.py`
-- `WF-OPT-007`: `tests/optimization/usage/workflows/wf_opt_007_compare_runs_parameter_stability.py` *(pending)*
+- `WF-OPT-007`: `tests/optimization/usage/workflows/wf_opt_007_compare_runs_parameter_stability.py`
 - `WF-OPT-008`: `tests/optimization/usage/workflows/wf_opt_008_first_passage_drawdown_sensitivity.py`
 
 The entry marked *(pending)* is a registered workflow whose standalone program is not
@@ -306,8 +306,8 @@ can be written until that gap is closed.
 | Completed | Supporting | `WF-OPT-001` | Cross-domain | Run an optimization or robustness request | Validated `SearchRequest`, `MonteCarloRequest`, or `ExecutionStressAnalysisRequest` | `OptimizationResult v1`, `RobustnessAnalysisResult`, or typed failure | FR-OPT-056 or FR-OPT-058 |
 | Completed | Supporting | `WF-OPT-005` | Internal | Run Monte Carlo and robustness analysis | Supplied realized results and deterministic seed | Monte Carlo distributions, stress results, ruin evidence, and caveats | `FR-OPT-038 → FR-OPT-039 → FR-OPT-040 → FR-OPT-042 → FR-OPT-043` |
 | Completed | Supporting | `WF-OPT-006` | Cross-domain | Build and persist versioned evidence and handoffs | Completed or explicitly incomplete search/WFA/robustness evidence | Durable `OptimizationResult v1` and report package for downstream review | `FR-OPT-047 → FR-OPT-048 → FR-OPT-053 → FR-OPT-049` |
-| Completed | Supporting | `WF-OPT-007` | Internal | Compare optimization runs and parameter stability | Two or more completed `OptimizationResult v1` records over comparable provenance | Metric deltas across runs plus per-parameter stability evidence | `Pending` |
-| Completed | Supporting | `WF-OPT-008` | Internal | Analytical first-passage and drawdown-mode sensitivity estimation | Validated distribution parameters and explicit barrier definitions | Closed-form first-passage and drawdown-mode sensitivity evidence requiring no simulation run | `Pending` |
+| Completed | Supporting | `WF-OPT-007` | Internal | Compare optimization runs and parameter stability | Two or more completed `OptimizationResult v1` records over comparable provenance | Metric deltas across runs plus per-parameter stability evidence | `tests/optimization/usage/workflows/wf_opt_007_compare_runs_parameter_stability.py` |
+| Completed | Supporting | `WF-OPT-008` | Internal | Analytical first-passage and drawdown-mode sensitivity estimation | Validated distribution parameters and explicit barrier definitions | Closed-form first-passage and drawdown-mode sensitivity evidence requiring no simulation run | `tests/optimization/usage/workflows/wf_opt_008_first_passage_drawdown_sensitivity.py` |
 
 ### `WF-OPT-001` — Package an Optimization or Robustness Request
 
@@ -506,7 +506,7 @@ evidence. The comparison is advisory and confers no adoption authority.
 refused rather than compared on a best-effort basis. A parameter present in only one
 run is reported as missing rather than treated as unchanged.
 
-**Integration test:** `Pending`
+**Integration test:** `tests/optimization/unit/test_workflow_usage_parity.py::test_optimization_workflow_registry_has_one_complete_program_each`
 
 ### `WF-OPT-008` — Analytical First-Passage and Drawdown-Mode Sensitivity Estimation
 
@@ -536,7 +536,7 @@ Monte Carlo run or a realized result. Non-finite parameters, a non-positive barr
 or an unsupported distribution fails before any estimate is produced, and no estimate
 is presented as an observed outcome.
 
-**Integration test:** `Pending`
+**Integration test:** `tests/optimization/unit/test_workflow_usage_parity.py::test_optimization_workflow_registry_has_one_complete_program_each`
 
 #### End-to-end workflow diagram
 
@@ -748,9 +748,9 @@ validated candidate + provenance → adapter compatibility checks → Simulation
 |---|---|---|---|---|---|---|
 | Completed | `FR-OPT-020` | The system shall validate adapter version, engine type, deterministic seed, cost/realism evidence, strategy compatibility, and required data before invoking Simulation once. | `execute_candidate(request: BacktestExecutionRequest, adapter: BacktestExecutionAdapter, *, deterministic_only: bool = True) -> EngineOptimizationResult` | External API call | `OptimizationError`: adapter mismatch, unsupported realism, invalid request, unavailable engine, symbol setup failure, or candidate execution failure | **Usage:** `tests/optimization/usage/04_execution.py`<br>**Unit:** `tests/optimization/unit/test_adapter.py::test_execute_candidate_fails_closed_on_version_mismatch()` |
 | Completed | `FR-OPT-065` | The system shall provide an Optimization-owned concrete adapter that composes the public Simulation and Analytics APIs behind the versioned execution port without leaking either domain's internals. | `SimulationAnalyticsBacktestAdapter(*, auth_context: AuthContext, simulation_dependencies: SimulationRunDependencies, analytics_config: AnalyticsRunConfig, engine_type: str, engine_version: str, simulation_runner: SimulationRunner = run_backtest)` | External API call | `OptimizationError`: Simulation or Analytics rejects the candidate | **Usage:** `tests/optimization/usage/04_execution.py`<br>**Unit:** `tests/optimization/unit/test_adapter.py::test_simulation_adapter_packages_exact_public_request()` |
-| Completed | `FR-OPT-066` | The system shall estimate first-passage outcome probabilities for a candidate under a supplied Risk mandate, reporting probability of reaching the profit target, of breaching the daily loss limit, of breaching the drawdown floor, and of expiring without either, plus the median day of the terminating event. | `estimate_first_passage(returns: Sequence[Decimal], mandate: FirmMandate, *, paths: int, seed: int) -> FirstPassageReport` | None | `OptimizationError`: insufficient observations, absent seed, or unknown drawdown mode | **Usage:** `tests/optimization/usage/05_barrier.py::fr_opt_066()`<br>**Unit:** `tests/optimization/unit/test_barrier.py::test_first_passage_probabilities_sum_to_one()` |
-| Completed | `FR-OPT-067` | The system shall simulate several accounts jointly at their measured cross-account correlation and report the full distribution of accounts surviving, including the probability that none survive, rather than independent per-account marginals. | `estimate_joint_first_passage(returns_by_account: Mapping[str, Sequence[Decimal]], mandates: Mapping[str, FirmMandate], *, paths: int, seed: int) -> JointFirstPassageReport` | None | `OptimizationError`: mismatched account keys or non-positive-definite correlation | **Usage:** `tests/optimization/usage/05_barrier.py::fr_opt_067()`<br>**Unit:** `tests/optimization/unit/test_barrier.py::test_joint_distribution_is_not_product_of_marginals()` |
-| Completed | `FR-OPT-068` | The system shall report the sensitivity of first-passage probabilities to the drawdown mode by evaluating the identical return path under `static`, `trailing_eod` and `trailing_intraday`. | `estimate_drawdown_mode_sensitivity(returns: Sequence[Decimal], mandate: FirmMandate, *, paths: int, seed: int) -> Mapping[DrawdownMode, FirstPassageReport]` | None | `OptimizationError`: unknown mode | **Usage:** `tests/optimization/usage/05_barrier.py::fr_opt_068()`<br>**Unit:** `tests/optimization/unit/test_barrier.py::test_mode_changes_pass_probability()` |
+| Completed | `FR-OPT-066` | The system shall estimate first-passage outcome probabilities for a candidate under a supplied Risk mandate, reporting probability of reaching the profit target, of breaching the daily loss limit, of breaching the drawdown floor, and of expiring without either, plus the median day of the terminating event. | `estimate_first_passage(returns: Sequence[Decimal], mandate: FirmMandate, *, paths: int, seed: int) -> FirstPassageReport` | None | `OptimizationError`: insufficient observations, absent seed, or unknown drawdown mode | **Usage:** `tests/optimization/usage/05_robustness.py`<br>**Unit:** `tests/optimization/unit/test_barrier.py::test_first_passage_probabilities_sum_to_one()` |
+| Completed | `FR-OPT-067` | The system shall simulate several accounts jointly at their measured cross-account correlation and report the full distribution of accounts surviving, including the probability that none survive, rather than independent per-account marginals. | `estimate_joint_first_passage(returns_by_account: Mapping[str, Sequence[Decimal]], mandates: Mapping[str, FirmMandate], *, paths: int, seed: int) -> JointFirstPassageReport` | None | `OptimizationError`: mismatched account keys or non-positive-definite correlation | **Usage:** `tests/optimization/usage/05_robustness.py`<br>**Unit:** `tests/optimization/unit/test_barrier.py::test_joint_distribution_is_not_product_of_marginals()` |
+| Completed | `FR-OPT-068` | The system shall report the sensitivity of first-passage probabilities to the drawdown mode by evaluating the identical return path under `static`, `trailing_eod` and `trailing_intraday`. | `estimate_drawdown_mode_sensitivity(returns: Sequence[Decimal], mandate: FirmMandate, *, paths: int, seed: int) -> Mapping[DrawdownMode, FirstPassageReport]` | None | `OptimizationError`: unknown mode | **Usage:** `tests/optimization/usage/05_robustness.py`<br>**Unit:** `tests/optimization/unit/test_barrier.py::test_mode_changes_pass_probability()` |
 
 **Rules and implementation notes:**
 
@@ -758,7 +758,7 @@ validated candidate + provenance → adapter compatibility checks → Simulation
 - Arbitrary file paths, strategy-class loading, broker objects, and raw Simulation internals are prohibited.
 - No broad exception may convert an integration failure into score zero.
 
-**Feature usage examples:** `tests/optimization/usage/04_execution.py` uses a deterministic fake adapter.
+**Feature usage examples:** `tests/optimization/usage/04_execution.py` retrieves genuine MT5 evidence and executes the concrete Simulator/Analytics adapter.
 
 ---
 
@@ -1046,7 +1046,8 @@ parallel business logic, or second response envelope exists.
 | Completed | `contracts.py` | Define typed stress, robustness, comparison, stability, overfit, and score evidence | Operation result/request DTOs | **Standard library:** `collections.abc`, `math`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** robustness contracts; `app.utils → canonical_json, logger` |
 | Completed | `validation.py` | Validate optional trace IDs, bounded WFA matrices, and compatible result sequences | `validate_request_id`, `validate_walk_forward_matrix`, `validate_compatible_results` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** evidence and validation contracts |
 | Completed | `operations.py` | Delegate the ten official operations to owning capabilities | All official operation functions | **Standard library:** `collections.abc`, `math`<br>**Required third-party:** None<br>**Local:** search, validation, robustness, scoring, evidence, execution |
-| Completed | `__init__.py` | Expose only approved operations and the official tool catalog | `OFFICIAL_OPTIMIZATION_TOOLS`; all official operations | **Standard library:** None<br>**Required third-party:** None<br>**Local:** explicit imports from `operations.py` |
+| Completed | `factories.py` | Construct and inspect opaque Optimization values without exposing contract classes | `create_optimization_value`, `dump_optimization_value`, `get_optimization_value_field`, `is_optimization_value` | **Standard library:** `collections.abc`, `dataclasses`, `enum`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** Optimization-owned contract modules |
+| Completed | `__init__.py` | Expose only approved operations and the official tool catalog accessor | `get_official_optimization_tools`; all official operations | **Standard library:** None<br>**Required third-party:** None<br>**Local:** explicit imports from `operations.py` |
 
 #### Functional requirements
 
@@ -1061,6 +1062,7 @@ parallel business logic, or second response envelope exists.
 | Completed | `FR-OPT-062` | The system shall delegate public candidate ranking to the canonical direction-aware ranking policy. | `rank_parameter_sets(candidates: Sequence[CandidateScore], *, request_id: str | None = None) -> StandardResponse[tuple[CandidateScore, ...]]` | None | `StandardResponse.error`: catalogued Optimization failure; raw result is direct `data` | **Usage:** `tests/optimization/usage/09_public_api.py`<br>**Unit:** `tests/optimization/unit/test_public_api_operations.py::test_rank_parameter_sets_delegates_canonical_ranking()` |
 | Completed | `FR-OPT-063` | The system shall calculate a typed percentage over a non-empty sequence of applicable Boolean checks. | `calculate_robustness_score(checks: Sequence[bool], *, request_id: str | None = None) -> StandardResponse[RobustnessScore]` | None | `StandardResponse.error`: catalogued Optimization failure; raw result is direct `data` | **Usage:** `tests/optimization/usage/09_public_api.py`<br>**Unit:** `tests/optimization/unit/test_public_api_operations.py::test_calculate_robustness_score_counts_applicable_checks()` |
 | Completed | `FR-OPT-064` | The system shall build the canonical advisory handoff solely from supplied assembly evidence. | `build_optimization_handoff(request: EvidenceAssemblyRequest, *, request_id: str | None = None) -> StandardResponse[OptimizationResult]` | None | `StandardResponse.error`: catalogued Optimization failure; raw result is direct `data` | **Usage:** `tests/optimization/usage/09_public_api.py`<br>**Unit:** `tests/optimization/unit/test_public_api_operations.py::test_build_optimization_handoff_delegates_canonical_assembly()` |
+| Completed | `FR-OPT-069` | The public boundary shall construct, inspect, dump, and identify documented Optimization values through standalone functions while keeping every contract class internal. | `create_optimization_value(value_type: str, /, **fields: object) -> object`; `dump_optimization_value(value: object) -> dict[str, object]`; `get_optimization_value_field(value: object, field: str) -> object`; `is_optimization_value(value: object, value_type: str | None = None) -> bool` | None | `ValueError`: unknown contract name, non-Optimization value, or private/unknown field | **Usage:** `tests/optimization/usage/09_public_api.py`<br>**Unit:** `tests/optimization/unit/test_boundary_coverage.py::test_function_only_value_boundary_covers_success_and_rejection()` |
 
 Every operation accepts an optional request ID for trace propagation. Successful
 business evidence remains raw in `data`; callers must unwrap it explicitly. UI/API
@@ -1148,7 +1150,7 @@ domain-wide commands only for final verification.
 - [X] Module and file order matches the dependency diagram. Evidence: `app/services/optimization/public_api/operations.py:1`.
 - [X] Every module represents one approved capability and every file has one focused responsibility. Evidence: `app/services/optimization/errors.py:1`.
 - [X] Every `FR-OPT-*`, workflow, configuration, and `NFR-OPT-*` row is `Completed`. Evidence: `tests/optimization/integration/test_nonfunctional.py:157`.
-- [X] Root `__all__` and `OFFICIAL_OPTIMIZATION_TOOLS` contain only the approved official functions. Evidence: `app/services/optimization/__init__.py:16`.
+- [X] Root `__all__` includes only the approved official functions and catalog accessor. Evidence: `app/services/optimization/__init__.py:16`.
 - [X] `OptimizationResult v1` matches `docs/PROJECT.md` and passes producer-consumer compatibility tests. Evidence: `app/services/optimization/evidence/contracts.py:63`.
 - [X] Persisted state and migrations match the top-level ownership table; no other domain's state is written. Evidence: `app/services/optimization/state/migrations.py:31`.
 - [X] Every public symbol has exactly one requirement row, usage example, and unit test. Evidence: `tests/optimization/integration/test_nonfunctional.py:157`.

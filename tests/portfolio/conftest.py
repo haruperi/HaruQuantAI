@@ -7,13 +7,16 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
-from app.services.portfolio.config import PortfolioSettings, RebalanceSchedule
-from app.services.portfolio.contracts import (
-    ActivePortfolioAllocation,
-    PortfolioComponentWeight,
-    PortfolioConstructionResult,
+from app.services.portfolio import (
+    create_portfolio_value,
+    get_portfolio_value_field,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+ActivePortfolioAllocation = Any
+PortfolioConstructionResult = Any
+PortfolioSettings = Any
+logger = get_logger(__name__)
 
 
 @pytest.fixture
@@ -38,7 +41,13 @@ def portfolio_settings(portfolio_now: datetime) -> PortfolioSettings:
         Validated Portfolio settings.
     """
     logger.debug("Creating explicit Portfolio test settings")
-    return PortfolioSettings(
+    schedule = create_portfolio_value(
+        "RebalanceSchedule",
+        anchor_at=portfolio_now,
+        interval_seconds=3600,
+    )
+    return create_portfolio_value(
+        "PortfolioSettings",
         portfolio_weight_sum_tolerance=Decimal("0.00000001"),
         portfolio_min_weight=Decimal(0),
         portfolio_max_weight=Decimal(1),
@@ -52,10 +61,7 @@ def portfolio_settings(portfolio_now: datetime) -> PortfolioSettings:
             "live": "explicit_human",
         },
         portfolio_rebalance_drift_threshold=Decimal("0.05"),
-        portfolio_rebalance_schedule=RebalanceSchedule(
-            anchor_at=portfolio_now,
-            interval_seconds=3600,
-        ),
+        portfolio_rebalance_schedule=schedule,
     )
 
 
@@ -133,7 +139,8 @@ def construction_result(portfolio_now: datetime) -> PortfolioConstructionResult:
     """
     logger.debug("Creating Portfolio construction result fixture")
     weights = tuple(
-        PortfolioComponentWeight(
+        create_portfolio_value(
+            "PortfolioComponentWeight",
             component_id=f"component-{suffix}",
             strategy_id=f"strategy-{suffix}",
             strategy_version="1.0.0",
@@ -142,7 +149,8 @@ def construction_result(portfolio_now: datetime) -> PortfolioConstructionResult:
         )
         for suffix in ("a", "b")
     )
-    return PortfolioConstructionResult(
+    return create_portfolio_value(
+        "PortfolioConstructionResult",
         result_id="portfolio-result-1",
         portfolio_id="portfolio-alpha",
         portfolio_version="version-1",
@@ -176,14 +184,21 @@ def active_allocation(
         Complete active allocation.
     """
     logger.debug("Creating active Portfolio allocation fixture")
-    return ActivePortfolioAllocation(
+    return create_portfolio_value(
+        "ActivePortfolioAllocation",
         allocation_id="allocation-1",
-        portfolio_id=construction_result.portfolio_id,
+        portfolio_id=get_portfolio_value_field(construction_result, "portfolio_id"),
         allocation_version="allocation-version-1",
-        scope=construction_result.scope,
-        construction_result_id=construction_result.result_id,
-        construction_result_hash=construction_result.canonical_hash,
-        component_weights=construction_result.component_weights,
+        scope=get_portfolio_value_field(construction_result, "scope"),
+        construction_result_id=get_portfolio_value_field(
+            construction_result, "result_id"
+        ),
+        construction_result_hash=get_portfolio_value_field(
+            construction_result, "canonical_hash"
+        ),
+        component_weights=get_portfolio_value_field(
+            construction_result, "component_weights"
+        ),
         simulation_result_id="simulation-result-1",
         simulation_result_hash="e" * 64,
         risk_decision_id="risk-decision-1",
@@ -192,8 +207,8 @@ def active_allocation(
         expires_at=portfolio_now + timedelta(days=1),
         idempotency_key="activation-idempotency-1",
         canonical_hash="f" * 64,
-        request_id=construction_result.request_id,
-        workflow_id=construction_result.workflow_id,
-        correlation_id=construction_result.correlation_id,
+        request_id=get_portfolio_value_field(construction_result, "request_id"),
+        workflow_id=get_portfolio_value_field(construction_result, "workflow_id"),
+        correlation_id=get_portfolio_value_field(construction_result, "correlation_id"),
         audit_ref="audit-1",
     )

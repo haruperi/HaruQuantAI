@@ -14,15 +14,9 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.research import (
-    EdgeResult,
-    ResearchResourceLimits,
-    StatisticalConfig,
-    StudyConfig,
-    TimeSplitResult,
-)
-from app.services.research.studies import (
     classify_symbol,
     compare_to_null,
+    create_research_value,
     get_acceptance_criteria,
     run_eds_mean_reversion,
     run_eds_null_baseline,
@@ -38,7 +32,7 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _edge_split() -> TimeSplitResult:
+def _edge_split() -> object:
     """Build a chronological split with an oscillating close in test."""
     idx = pd.date_range("2026-01-01", periods=50, freq="h", tz="UTC")
     close = pd.Series(
@@ -47,7 +41,8 @@ def _edge_split() -> TimeSplitResult:
         dtype="float64",
     )
     frame = pd.DataFrame({"close": close}, index=idx)
-    return TimeSplitResult(
+    return create_research_value(
+        "TimeSplitResult",
         train=frame.iloc[:20],
         validation=frame.iloc[20:30],
         test=frame.iloc[30:],
@@ -59,14 +54,17 @@ def _edge_split() -> TimeSplitResult:
     )
 
 
-def _statistics() -> StatisticalConfig:
+def _statistics() -> object:
     """Build seeded statistical settings."""
-    return StatisticalConfig(7, 20, 20, 2, 20, "benjamini_hochberg")
+    return create_research_value(
+        "StatisticalConfig", 7, 20, 20, 2, 20, "benjamini_hochberg"
+    )
 
 
-def _study() -> StudyConfig:
+def _study() -> object:
     """Build closed edge-study settings."""
-    return StudyConfig(
+    return create_research_value(
+        "StudyConfig",
         mean_reversion={
             "lookback": 5,
             "entry_zscore": 0.5,
@@ -94,9 +92,9 @@ def _study() -> StudyConfig:
     )
 
 
-def _limits() -> ResearchResourceLimits:
+def _limits() -> object:
     """Build approved resource ceilings."""
-    return ResearchResourceLimits(500_000, 600.0, 52_428_800)
+    return create_research_value("ResearchResourceLimits", 500_000, 600.0, 52_428_800)
 
 
 def fr_res_062() -> None:
@@ -107,7 +105,9 @@ def fr_res_062() -> None:
     )
     print("Research Example 7: Edge Studies and Confirmation")
     split = _edge_split()
-    study = StudyConfig({"side": "buy", "hold_bars": 2}, {}, {})
+    study = create_research_value(
+        "StudyConfig", {"side": "buy", "hold_bars": 2}, {}, {}
+    )
     baseline = run_eds_null_baseline(
         split.test, split=split, statistics=_statistics(), study=study
     )
@@ -121,12 +121,14 @@ def fr_res_063() -> None:
         "FR-RES-063: Compare observed evidence to the correctly matched null and return percentile, threshold, p-value, and warnings."
     )
     split = _edge_split()
-    study = StudyConfig({"side": "buy", "hold_bars": 2}, {}, {})
+    study = create_research_value(
+        "StudyConfig", {"side": "buy", "hold_bars": 2}, {}, {}
+    )
     baseline = run_eds_null_baseline(
         split.test, split=split, statistics=_statistics(), study=study
     )
-    observed = EdgeResult(
-        "v1", "observed", {"mean": 0.0}, {}, "inconclusive", 7, (), True
+    observed = create_research_value(
+        "EdgeResult", "v1", "observed", {"mean": 0.0}, {}, "inconclusive", 7, (), True
     )
     comparison = compare_to_null(observed, baseline)
     print(f"FR-RES-063 p_value={comparison['p_value']:.4f}")
@@ -139,7 +141,9 @@ def fr_res_064() -> None:
         "FR-RES-064: Extract versioned acceptance criteria from baseline evidence without hard-coded direction drift."
     )
     split = _edge_split()
-    study = StudyConfig({"side": "buy", "hold_bars": 2}, {}, {})
+    study = create_research_value(
+        "StudyConfig", {"side": "buy", "hold_bars": 2}, {}, {}
+    )
     baseline = run_eds_null_baseline(
         split.test, split=split, statistics=_statistics(), study=study
     )
@@ -207,8 +211,12 @@ def fr_res_068() -> None:
     _header(
         "FR-RES-068: Classify mean-reversion and trend evidence using one versioned confirmation policy and preserve uncertainty/advisory status."
     )
-    mr = EdgeResult("v1", "mean_reversion", {}, {}, "confirmed", 7, (), True)
-    tp = EdgeResult("v1", "trend_persistence", {}, {}, "inconclusive", 7, (), True)
+    mr = create_research_value(
+        "EdgeResult", "v1", "mean_reversion", {}, {}, "confirmed", 7, (), True
+    )
+    tp = create_research_value(
+        "EdgeResult", "v1", "trend_persistence", {}, {}, "inconclusive", 7, (), True
+    )
     classification = classify_symbol(mr, tp, policy_version="v1")
     print(f"FR-RES-068 classification={classification['classification']}")
 

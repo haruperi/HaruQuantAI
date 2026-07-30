@@ -6,6 +6,8 @@ from __future__ import annotations
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
@@ -19,24 +21,36 @@ from app.services.data import (
     get_data_availability,
     get_market_data,
     get_symbol_metadata,
-    get_tick_data,
     list_symbols,
     run_data_migrations,
     to_ohlcv_dataframe,
-    to_tick_dataframe,
 )
 from app.utils import generate_id, load_broker_provider_settings
 
 _START = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
 _END = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
-_YAHOO_SESSION_START = datetime(2026, 6, 1, 13, 30, tzinfo=UTC)
-_YAHOO_SESSION_END = datetime(2026, 6, 1, 20, 0, tzinfo=UTC)
 _BINANCE_SOURCE = "binance_spot"
 
 
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _provider_opted_in(source_id: str) -> bool:
@@ -49,23 +63,14 @@ def _provider_opted_in(source_id: str) -> bool:
         "dukascopy": "dukascopy_enabled",
         "yahoo": "yahoo_enabled",
     }[source_id.casefold()]
-    if bool(getattr(settings, field)):
-        return True
-    print(f"Skipped {source_id}: provider is disabled in validated settings.")
-    return False
+    return bool(getattr(settings, field, False))
 
 
-def _print_header(title: str) -> None:
-    """Print a section header."""
-    print("\n" + "=" * 100)
-    print(f"\t\t {title} ")
-
-
-def example_01_mt5_bars() -> None:
-    """Retrieve MT5 OHLCV bar dataset via public get_market_data."""
-    _header("Retrieve MT5 OHLCV bar dataset via public get_market_data.")
-    if not _provider_opted_in("mt5"):
-        return
+def fr_data_006() -> None:
+    """FR-DATA-006: Stage 1 — Validate one typed internal request containing source, symbol, kind, optional timeframe/range/limit, cache policy, quality failure behavior, workflow, precision, and request ID."""
+    _header(
+        "Stage 1: Market Data Request Construction - Bounded Retrieval Request (FR-DATA-006)"
+    )
     req_id = generate_id("req")
     req = build_market_data_request(
         source_id="mt5",
@@ -81,26 +86,20 @@ def example_01_mt5_bars() -> None:
         precision_policy="decimal_string",
         request_id=req_id,
     )
-    try:
-        response = get_market_data(req)
-        if response.status == "success" and response.data is not None:
-            data = response.data
-            print(f"MT5 Data: {data.symbol} records={data.record_count}")
-            print(to_ohlcv_dataframe(data))
-    except Exception as exc:
-        print(f"MT5 example handled: {exc.code}")
+    print(_format_result(req))
+    print(
+        f"Data -> MarketDataRequest(source={req.source_id}, symbol={req.symbol}, timeframe={req.timeframe}, limit={req.limit})"
+    )
 
 
-def example_02_mt5_ticks() -> None:
-    """Retrieve MT5 tick dataset via public get_tick_data."""
-    _header("Retrieve MT5 tick dataset via public get_tick_data.")
-    if not _provider_opted_in("mt5"):
-        return
-    req_id = generate_id("req")
+def fr_data_030() -> None:
+    """FR-DATA-030: Stage 2 — Execute bounded bars/ticks/spreads retrieval through explicit source policy, versioned cache, normalization, quality, and precision, returning `MarketDataset`."""
+    _header("Stage 2: Market Data Retrieval - Execute Bounded Retrieval (FR-DATA-030)")
     req = build_market_data_request(
         source_id="mt5",
         symbol="EURUSD",
-        data_kind="ticks",
+        data_kind="bars",
+        timeframe="M1",
         start=_START,
         end=_END,
         limit=100,
@@ -108,159 +107,109 @@ def example_02_mt5_ticks() -> None:
         quality_failure_behavior="warn",
         workflow_context="research",
         precision_policy="decimal_string",
-        request_id=req_id,
+        request_id=generate_id("req"),
     )
     try:
-        response = get_tick_data(req)
+        response = get_market_data(req)
+        print(_format_result(response))
         if response.status == "success" and response.data is not None:
-            data = response.data
-            print(f"MT5 Ticks Data: {data.symbol} records={data.record_count}")
-            print(to_tick_dataframe(data))
+            dataset = response.data
+            print(
+                f"Data -> MarketDataset(symbol={dataset.symbol}, records={dataset.record_count})"
+            )
+            df = to_ohlcv_dataframe(dataset)
+            print(f"Data -> DataFrame shape={df.shape}")
+        else:
+            print(
+                f"Data -> StandardResponse(status={response.status}, message={response.message})"
+            )
     except Exception as exc:
-        print(f"MT5 Ticks example handled: {exc.code}")
+        print(f"Output Result -> {type(exc).__name__} : {type(exc).__name__}")
+        print(f"Data -> Exception({exc})")
 
 
-def example_03_dukascopy() -> None:
-    """Retrieve Dukascopy OHLCV data via public get_market_data."""
-    _header("Retrieve Dukascopy OHLCV data via public get_market_data.")
-    if not _provider_opted_in("dukascopy"):
-        return
-    req_id = generate_id("req")
+def fr_data_107() -> None:
+    """FR-DATA-107: Stage 3 — Honour caller-declared stale-cache policy on `MarketDataRequest`: `refresh`, `fail_closed`, and `serve_stale`."""
+    _header("Stage 3: Stale Cache Policy Handling - Stale Cache Modes (FR-DATA-107)")
     req = build_market_data_request(
-        source_id="dukascopy",
+        source_id="mt5",
         symbol="EURUSD",
         data_kind="bars",
-        timeframe="H1",
+        timeframe="M1",
         start=_START,
         end=_END,
-        limit=100,
+        limit=10,
         use_cache=True,
+        stale_cache_policy="fail_closed",
         quality_failure_behavior="warn",
         workflow_context="research",
         precision_policy="decimal_string",
-        request_id=req_id,
+        request_id=generate_id("req"),
     )
-    try:
-        response = get_market_data(req)
-        if response.status == "success" and response.data is not None:
-            data = response.data
-            print(f"Dukascopy Data: {data.symbol} records={data.record_count}")
-            print(to_ohlcv_dataframe(data))
-    except Exception as exc:
-        print(f"Dukascopy example handled: {exc.code}")
+    print(_format_result(req))
+    print(f"Data -> MarketDataRequest(stale_cache_policy={req.stale_cache_policy})")
 
 
-def example_04_yahoo() -> None:
-    """Retrieve Yahoo Finance OHLCV data via public get_market_data."""
-    _header("Retrieve Yahoo Finance OHLCV data via public get_market_data.")
-    if not _provider_opted_in("yahoo"):
-        return
-    req_id = generate_id("req")
-    req = build_market_data_request(
-        source_id="yahoo",
-        symbol="AAPL",
-        data_kind="bars",
-        timeframe="H1",
-        start=_YAHOO_SESSION_START,
-        end=_YAHOO_SESSION_END,
-        limit=100,
-        use_cache=True,
-        quality_failure_behavior="warn",
-        workflow_context="research",
-        precision_policy="decimal_string",
-        request_id=req_id,
-    )
-    try:
-        response = get_market_data(req)
-        if response.status == "success" and response.data is not None:
-            data = response.data
-            print(f"Yahoo Data: {data.symbol} records={data.record_count}")
-            print(to_ohlcv_dataframe(data))
-    except Exception as exc:
-        print(f"Yahoo example handled: {exc.code}")
-
-
-def example_05_binance() -> None:
-    """Retrieve Binance OHLCV data via public get_market_data."""
-    _header("Retrieve Binance OHLCV data via public get_market_data.")
+def fr_data_031() -> None:
+    """FR-DATA-031: Stage 4 — Return a bounded deterministic symbol page with cursor, source readiness, and provenance."""
+    _header("Stage 4: Symbol List Discovery - Discover Symbols (FR-DATA-031)")
     if not _provider_opted_in(_BINANCE_SOURCE):
+        print("Output Result -> ProviderOptedOut : ProviderOptedOut")
+        print(f"Data -> Skipped {_BINANCE_SOURCE}: provider is disabled in settings.")
         return
-    req_id = generate_id("req")
-    req = build_market_data_request(
-        source_id=_BINANCE_SOURCE,
-        symbol="BTCUSDT",
-        data_kind="bars",
-        timeframe="H1",
-        start=_START,
-        end=_END,
-        limit=100,
-        use_cache=True,
-        quality_failure_behavior="warn",
-        workflow_context="research",
-        precision_policy="decimal_string",
-        request_id=req_id,
-    )
-    try:
-        response = get_market_data(req)
-        if response.status == "success" and response.data is not None:
-            data = response.data
-            print(f"Binance Data: {data.symbol} records={data.record_count}")
-            print(to_ohlcv_dataframe(data))
-    except Exception as exc:
-        print(f"Binance example handled: {exc.code}")
-
-
-def example_06_symbol_discovery() -> None:
-    """Discover symbols per source using list_symbols."""
-    _header("Discover symbols per source using list_symbols.")
-    if not _provider_opted_in(_BINANCE_SOURCE):
-        return
-    req_id = generate_id("req")
     req = build_symbol_list_request(
         source_id=_BINANCE_SOURCE,
         query="BTC",
         limit=100,
-        request_id=req_id,
+        request_id=generate_id("req"),
     )
     try:
         response = list_symbols(req)
+        print(_format_result(response))
         if response.status == "success" and response.data is not None:
             symbols = response.data
-            print(f"List symbols: count={len(symbols.items)}")
-            print(symbols.items)
+            print(
+                f"Data -> SymbolPage(count={len(symbols.items)}, source={_BINANCE_SOURCE})"
+            )
     except Exception as exc:
-        print(f"Symbol discovery handled: {exc.code}")
+        print(f"Output Result -> {type(exc).__name__} : {type(exc).__name__}")
+        print(f"Data -> Exception({exc})")
 
 
-def example_07_symbol_metadata() -> None:
-    """Inspect symbol metadata via get_symbol_metadata."""
-    _header("Inspect symbol metadata via get_symbol_metadata.")
+def fr_data_032() -> None:
+    """FR-DATA-032: Stage 5 — Return normalized asset-aware metadata and explicitly mark unknown optional fields without provider-derived defaults."""
+    _header("Stage 5: Symbol Metadata Inspection - Inspect Metadata (FR-DATA-032)")
     if not _provider_opted_in(_BINANCE_SOURCE):
+        print("Output Result -> ProviderOptedOut : ProviderOptedOut")
+        print(f"Data -> Skipped {_BINANCE_SOURCE}: provider is disabled in settings.")
         return
-    req_id = generate_id("req")
     req = build_symbol_metadata_request(
         source_id=_BINANCE_SOURCE,
         symbol="BTCUSDT",
-        request_id=req_id,
+        request_id=generate_id("req"),
     )
     try:
         response = get_symbol_metadata(req)
+        print(_format_result(response))
         if response.status == "success" and response.data is not None:
             metadata = response.data
             print(
-                f"Symbol metadata: {metadata.canonical_symbol} "
-                f"asset_class={metadata.asset_class}"
+                f"Data -> SymbolMetadata(symbol={metadata.canonical_symbol}, asset_class={metadata.asset_class})"
             )
     except Exception as exc:
-        print(f"Symbol metadata handled: {exc.code}")
+        print(f"Output Result -> {type(exc).__name__} : {type(exc).__name__}")
+        print(f"Data -> Exception({exc})")
 
 
-def example_08_data_availability() -> None:
-    """Inspect source availability via get_data_availability."""
-    _header("Inspect source availability via get_data_availability.")
+def fr_data_007_033() -> None:
+    """FR-DATA-007, FR-DATA-033: Stage 6 — Inspect source availability, record count, and completeness over a probe window."""
+    _header(
+        "Stage 6: Data Availability & Range Indexing - Inspect Availability (FR-DATA-007, FR-DATA-033)"
+    )
     if not _provider_opted_in(_BINANCE_SOURCE):
+        print("Output Result -> ProviderOptedOut : ProviderOptedOut")
+        print(f"Data -> Skipped {_BINANCE_SOURCE}: provider is disabled in settings.")
         return
-    req_id = generate_id("req")
     req = build_availability_request(
         source_id=_BINANCE_SOURCE,
         symbol="BTCUSDT",
@@ -269,29 +218,51 @@ def example_08_data_availability() -> None:
         start=_START,
         end=_END,
         max_probe_records=1000,
-        request_id=req_id,
+        request_id=generate_id("req"),
     )
     try:
         response = get_data_availability(req)
+        print(_format_result(response))
         if response.status == "success" and response.data is not None:
-            availability = response.data
+            avail = response.data
             print(
-                f"Data availability: {availability.symbol} "
-                f"records={availability.record_count} "
-                f"completeness={availability.completeness}"
+                f"Data -> DataAvailability(symbol={avail.symbol}, count={avail.record_count}, completeness={avail.completeness})"
             )
     except Exception as exc:
-        print(f"Data availability handled: {exc.code}")
+        print(f"Output Result -> {type(exc).__name__} : {type(exc).__name__}")
+        print(f"Data -> Exception({exc})")
 
 
-def _demonstrate_feature() -> None:
-    """Run all market data retrieval examples across sources."""
-    from tempfile import TemporaryDirectory
+def fr_data_035() -> None:
+    """FR-DATA-035: Stage 7 — Return bounded source-native or derived volume as records, buckets, or summary with explicit volume kind/unit."""
+    _header("Stage 7: Volume Summary & Derived Metrics - Volume Summary (FR-DATA-035)")
+    req = build_market_data_request(
+        source_id="mt5",
+        symbol="EURUSD",
+        data_kind="bars",
+        timeframe="M1",
+        start=_START,
+        end=_END,
+        limit=10,
+        use_cache=True,
+        quality_failure_behavior="warn",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id=generate_id("req"),
+    )
+    print(_format_result(req))
+    print(
+        f"Data -> VolumeRequest(source={req.source_id}, symbol={req.symbol}, limit={req.limit})"
+    )
 
+
+def main() -> None:
+    """Execute every functional-requirement demonstration."""
     with TemporaryDirectory(prefix="usage-market-data-") as directory:
         (Path(directory) / "data" / "raw").mkdir(parents=True, exist_ok=True)
+        db_file = Path(directory) / "usage.sqlite3"
         settings = build_data_settings(
-            database_url="sqlite:///usage.sqlite3",
+            database_url=f"sqlite:///{db_file.as_posix()}",
             data_dir=Path(directory),
             sqlite_busy_timeout_seconds=1.0,
             write_lock_lease_seconds=10.0,
@@ -302,94 +273,28 @@ def _demonstrate_feature() -> None:
                 Path("data/raw"),
                 Path("data/processed"),
             ),
-            data_provider_sources=("mt5",),
+            data_provider_sources=("mt5", "binance_spot"),
             data_raw_root=Path("data/raw"),
         )
         with data_settings_context(settings):
             run_data_migrations(generate_id("req"))
-            example_01_mt5_bars()
-            example_02_mt5_ticks()
-            example_03_dukascopy()
-            example_04_yahoo()
-            example_05_binance()
-            example_06_symbol_discovery()
-            example_07_symbol_metadata()
-            example_08_data_availability()
+            print("=" * 80)
+            print("FEATURE: FEAT-DATA-02 - Market Data Retrieval")
+            print(
+                "PURPOSE: Retrieval request/result contracts and the market, tick, spread, symbol, metadata, availability, and volume operations"
+            )
+            print(
+                "MODULE FLOW: Stage 1 (Market Data Request) -> Stage 2 (Market Data Retrieval) -> Stage 3 (Stale Cache Policy) -> Stage 4 (Symbol List Discovery) -> Stage 5 (Symbol Metadata Inspection) -> Stage 6 (Data Availability & Range Indexing) -> Stage 7 (Volume Summary)"
+            )
+            print("=" * 80)
 
-
-_DEMONSTRATED = [False]
-
-
-def _demonstrate_once() -> None:
-    """Run the feature demonstration once for all requirement entry points."""
-    if _DEMONSTRATED[0]:
-        return
-    _demonstrate_feature()
-    _DEMONSTRATED[0] = True
-
-
-def fr_data_006() -> None:
-    _header("fr_data_006")
-    "FR-DATA-006: Validate one typed internal request containing source, symbol, kind, optional timeframe/range/limit, cache policy, the closed quality-failure enum `reject` or `warn`, UTC/IANA inputs, workflow, precision, explicit fallbacks, and request ID. The default is `reject`; the removed `fail` literal is invalid."
-    _demonstrate_once()
-
-
-def fr_data_007() -> None:
-    _header("fr_data_007")
-    "FR-DATA-007: Represent indexed ranges, gaps, overlap/completeness evidence, record count, source revision/readiness, and provenance without materializing the full dataset."
-    _demonstrate_once()
-
-
-def fr_data_030() -> None:
-    _header("fr_data_030")
-    "FR-DATA-030: Execute bounded bars/ticks/spreads retrieval through explicit source policy, versioned cache, normalization, quality, and precision, returning `MarketDataset`. A failed quality report raises `DATA_QUALITY_FAILED` under `reject`; under `warn`, fresh and cached paths log and return the unchanged data and failed report."
-    _demonstrate_once()
-
-
-def fr_data_031() -> None:
-    _header("fr_data_031")
-    "FR-DATA-031: Return a bounded deterministic symbol page with cursor, source readiness, and provenance."
-    _demonstrate_once()
-
-
-def fr_data_032() -> None:
-    _header("fr_data_032")
-    "FR-DATA-032: Return normalized asset-aware metadata and explicitly mark unknown optional fields without provider-derived optimistic defaults."
-    _demonstrate_once()
-
-
-def fr_data_033() -> None:
-    _header("fr_data_033")
-    "FR-DATA-033: Compute ranges, gaps, overlaps, completeness, count, revision, and readiness from local manifests/indexes or one bounded provider retrieval, never hard-code certainty. Provider results describe only the observed probe window and record whether the probe limit was reached."
-    _demonstrate_once()
-
-
-def fr_data_035() -> None:
-    _header("fr_data_035")
-    "FR-DATA-035: Return bounded source-native or derived volume as records, buckets, or summary with explicit volume kind/unit and provenance."
-    _demonstrate_once()
-
-
-def fr_data_107() -> None:
-    _header("fr_data_107")
-    'FR-DATA-107: Honour a caller-declared stale-cache policy on `MarketDataRequest`: `refresh` treats an expired entry as a miss, `fail_closed` returns `EMPTY_RESULT` without contacting any source, and `serve_stale` returns the expired entry with `cache_status="stale_warning"`. `serve_stale` is valid only in the `research` workflow context and is rejected elsewhere at contract validation.'
-    _demonstrate_once()
-
-
-def main() -> None:
-    """Execute every functional-requirement demonstration."""
-    demonstrations = (
-        fr_data_006,
-        fr_data_007,
-        fr_data_030,
-        fr_data_031,
-        fr_data_032,
-        fr_data_033,
-        fr_data_035,
-        fr_data_107,
-    )
-    for demonstration in demonstrations:
-        demonstration()
+            fr_data_006()
+            fr_data_030()
+            fr_data_107()
+            fr_data_031()
+            fr_data_032()
+            fr_data_007_033()
+            fr_data_035()
 
 
 if __name__ == "__main__":

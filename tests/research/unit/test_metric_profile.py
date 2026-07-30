@@ -1,16 +1,14 @@
 """Unit tests for the Research core metric profile."""
 
 import pandas as pd
-from app.services.research.contracts import (
-    DataQualityReport,
-    PreparedDataset,
-    ResearchResourceLimits,
-)
-from app.services.research.metrics import (
+from app.services.research import (
     build_core_metric_profile,
     build_default_registry,
+    create_research_value,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _HASH = "e" * 64
 
@@ -29,10 +27,11 @@ def test_profile_preserves_undefined_reason_and_provenance() -> None:
         },
         index=pd.date_range("2026-01-01", periods=1, tz="UTC"),
     )
-    prepared = PreparedDataset(
+    prepared = create_research_value(
+        "PreparedDataset",
         frame,
         "v1",
-        DataQualityReport((), (), ("schema",), ()),
+        create_research_value("DataQualityReport", (), (), ("schema",), ()),
         _HASH,
         _HASH,
         ("fixture",),
@@ -40,7 +39,7 @@ def test_profile_preserves_undefined_reason_and_provenance() -> None:
     profile = build_core_metric_profile(
         prepared,
         registry=build_default_registry(),
-        limits=ResearchResourceLimits(10, 10.0, 1024),
+        limits=create_research_value("ResearchResourceLimits", 10, 10.0, 1024),
     )
     assert len(profile.metrics) == 7
     assert profile.dataset_hash == _HASH
@@ -61,16 +60,17 @@ def test_profile_defaults_to_default_registry() -> None:
         },
         index=pd.date_range("2026-01-01", periods=1, tz="UTC"),
     )
-    prepared = PreparedDataset(
+    prepared = create_research_value(
+        "PreparedDataset",
         frame,
         "v1",
-        DataQualityReport((), (), ("schema",), ()),
+        create_research_value("DataQualityReport", (), (), ("schema",), ()),
         _HASH,
         _HASH,
         ("fixture",),
     )
     profile = build_core_metric_profile(
         prepared,
-        limits=ResearchResourceLimits(10, 10.0, 1024),
+        limits=create_research_value("ResearchResourceLimits", 10, 10.0, 1024),
     )
     assert len(profile.metrics) == 7

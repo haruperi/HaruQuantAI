@@ -6,6 +6,7 @@ import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
@@ -18,6 +19,7 @@ from app.services.data import (
     build_tick_record,
     resample_ohlcv,
     to_ohlcv_dataframe,
+    to_tick_dataframe,
 )
 from app.utils import generate_id
 
@@ -29,7 +31,23 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _sample_m1_dataset() -> object:
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
+
+
+def _sample_m1_dataset() -> Any:
     """Return a sample M1 MarketDataset fixture."""
     records = tuple(
         build_ohlcv_record(
@@ -77,22 +95,24 @@ def _sample_m1_dataset() -> object:
     )
 
 
-def example_26_resampling() -> None:
-    """Resample M1 bars to M5 using resample_ohlcv."""
-    _header("Resample M1 bars to M5 using resample_ohlcv.")
+def fr_data_036() -> None:
+    """FR-DATA-036: Stage 1 — Resample ordered canonical OHLCV to a supported higher timeframe using deterministic aggregation."""
+    _header("Stage 1: OHLCV Resampling - Resample OHLCV (FR-DATA-036)")
     ds = _sample_m1_dataset()
     res1 = resample_ohlcv(ds, target_timeframe="M5")
+    print(_format_result(res1))
     if res1.status == "success" and res1.data is not None:
         resampled = res1.data
         print(
-            f"Resampled OHLCV rows: {resampled.record_count} "
-            f"timeframe={resampled.timeframe}"
+            f"Data -> MarketDataset(symbol={resampled.symbol}, timeframe={resampled.timeframe}, count={resampled.record_count})"
         )
 
 
-def example_27_multitimeframe_alignment() -> None:
-    """Align M1 and M5 datasets using align_multitimeframe_data."""
-    _header("Align M1 and M5 datasets using align_multitimeframe_data.")
+def fr_data_037_080() -> None:
+    """FR-DATA-037, FR-DATA-080: Stage 2 — Backward-align multiple datasets using only values available by each target timestamp without lookahead."""
+    _header(
+        "Stage 2: Multi-Timeframe Alignment - Align Multitimeframe Data (FR-DATA-037, FR-DATA-080)"
+    )
     m1_ds = _sample_m1_dataset()
     m5_res = resample_ohlcv(m1_ds, target_timeframe="M5")
     if m5_res.status == "success" and m5_res.data is not None:
@@ -101,14 +121,14 @@ def example_27_multitimeframe_alignment() -> None:
         res2 = align_multitimeframe_data(
             {"M1": m1_ds, "M5": m5_ds}, target_timestamps=targets
         )
+        print(_format_result(res2))
         if res2.status == "success" and res2.data is not None:
-            aligned = res2.data
-            print(f"Aligned multitimeframe datasets: count={len(aligned)}")
+            print(f"Data -> dict(keys={list(res2.data.keys())})")
 
 
-def example_28_tick_aggregation() -> None:
-    """Aggregate ticks into M1 bars using aggregate_ticks_to_bars."""
-    _header("Aggregate ticks into M1 bars using aggregate_ticks_to_bars.")
+def fr_data_038() -> None:
+    """FR-DATA-038: Stage 3 — Aggregate sorted canonical ticks into OHLCV bars with explicit timeframe and price-side policy."""
+    _header("Stage 3: Tick Aggregation to OHLCV Bars - Aggregate Ticks (FR-DATA-038)")
     ticks = tuple(
         build_tick_record(
             timestamp=_START + timedelta(seconds=i * 10),
@@ -137,104 +157,76 @@ def example_28_tick_aggregation() -> None:
         }
     )
     res3 = aggregate_ticks_to_bars(tick_dataset, "M1", "last")
+    print(_format_result(res3))
     if res3.status == "success" and res3.data is not None:
         bars = res3.data
-        print(f"Aggregated ticks to bars: {bars.record_count} symbol={bars.symbol}")
+        print(
+            f"Data -> MarketDataset(symbol={bars.symbol}, timeframe={bars.timeframe}, count={bars.record_count})"
+        )
 
 
-def _demonstrate_feature() -> None:
-    """Run all transformation examples."""
-    example_26_resampling()
-    example_27_multitimeframe_alignment()
-    example_28_tick_aggregation()
-
+def fr_data_081_082_083_085_086() -> None:
+    """FR-DATA-081, FR-DATA-082, FR-DATA-083, FR-DATA-085, FR-DATA-086: Stage 4 — Project bar/tick datasets to detached analytical DataFrames with UTC timestamp indices."""
+    _header(
+        "Stage 4: DataFrame Projection & Comparison - Analytical DataFrame (FR-DATA-081, FR-DATA-082, FR-DATA-083, FR-DATA-085, FR-DATA-086)"
+    )
     ds = _sample_m1_dataset()
     df_res = to_ohlcv_dataframe(ds)
+    print(_format_result(df_res))
     if df_res.status == "success" and df_res.data is not None:
         df = df_res.data
-        print(f"Converted dataset to DataFrame: shape={df.shape}")
+        print(f"Data -> DataFrame(shape={df.shape})")
 
-
-_DEMONSTRATED = [False]
-
-
-def _demonstrate_once() -> None:
-    """Run the feature demonstration once for all requirement entry points."""
-    if _DEMONSTRATED[0]:
-        return
-    _demonstrate_feature()
-    _DEMONSTRATED[0] = True
-
-
-def fr_data_036() -> None:
-    _header("fr_data_036")
-    "FR-DATA-036: Resample ordered canonical OHLCV only to a supported higher timeframe using deterministic OHLCV/spread aggregation and updated `available_at`."
-    _demonstrate_once()
-
-
-def fr_data_037() -> None:
-    _header("fr_data_037")
-    "FR-DATA-037: Backward-align multiple datasets using only values available by each target timestamp, preserving source availability metadata and failing atomically on lookahead."
-    _demonstrate_once()
-
-
-def fr_data_038() -> None:
-    _header("fr_data_038")
-    "FR-DATA-038: Aggregate sorted canonical ticks into OHLCV bars with explicit timeframe and price-side policy, preserving the closing tick's genuine bid/ask spread when both sides exist and rejecting disorder or ambiguous units."
-    _demonstrate_once()
-
-
-def fr_data_080() -> None:
-    _header("fr_data_080")
-    "FR-DATA-080: Align a private tabular market-data copy to an aware UTC datetime field/index without mutating caller input."
-    _demonstrate_once()
-
-
-def fr_data_081() -> None:
-    _header("fr_data_081")
-    "FR-DATA-081: Convert bar rows or private DataFrames to deterministic JSON-safe records with canonical UTC timestamps."
-    _demonstrate_once()
-
-
-def fr_data_082() -> None:
-    _header("fr_data_082")
-    "FR-DATA-082: Compare aligned private DataFrames using explicit finite tolerance and bounded diagnostics."
-    _demonstrate_once()
-
-
-def fr_data_083() -> None:
-    _header("fr_data_083")
-    "FR-DATA-083: Compare OHLC or OHLCV columns only after schema and alignment validation."
-    _demonstrate_once()
-
-
-def fr_data_085() -> None:
-    _header("fr_data_085")
-    'FR-DATA-085: Project one canonical bar `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly six float64 columns: finite `open`, `high`, `low`, `close`, and `volume`, plus provider-reported `spread`; preserve genuinely missing spread as `NaN`, expose the common supplied spread unit in `DataFrame.attrs["spread_unit"]` or `None` when absent, and fail on inconsistent supplied units or unsafe conversion.'
-    _demonstrate_once()
-
-
-def fr_data_086() -> None:
-    _header("fr_data_086")
-    "FR-DATA-086: Project one canonical tick `MarketDataset` to a detached analytical DataFrame with a UTC timestamp index and exactly four float64 columns: `bid`, `ask`, `last`, and `volume`; represent genuine missing optional values as `NaN`, expose common price/volume units in `DataFrame.attrs`, and fail on inconsistent units or unsafe float64 conversion."
-    _demonstrate_once()
+    ticks = tuple(
+        build_tick_record(
+            timestamp=_START + timedelta(seconds=i * 10),
+            last=Decimal("1.1000") + Decimal(i) * Decimal("0.0001"),
+            volume=Decimal(10),
+            bid=Decimal("1.0999") + Decimal(i) * Decimal("0.0001"),
+            ask=Decimal("1.1001") + Decimal(i) * Decimal("0.0001"),
+            price_unit="USD",
+            volume_unit="lots",
+            source="mt5",
+            source_symbol="EURUSD",
+            source_revision="usage-v1",
+            available_at=_START + timedelta(seconds=i * 10 + 1),
+        )
+        for i in range(5)
+    )
+    tick_ds = ds.model_copy(
+        update={
+            "data_kind": "ticks",
+            "timeframe": None,
+            "records": ticks,
+            "start": ticks[0].timestamp,
+            "end": ticks[-1].timestamp,
+            "available_at": ticks[-1].available_at,
+            "record_count": len(ticks),
+        }
+    )
+    tick_df_res = to_tick_dataframe(tick_ds)
+    print(_format_result(tick_df_res))
+    if tick_df_res.status == "success" and tick_df_res.data is not None:
+        tdf = tick_df_res.data
+        print(f"Data -> DataFrame(shape={tdf.shape})")
 
 
 def main() -> None:
     """Execute every functional-requirement demonstration."""
-    demonstrations = (
-        fr_data_036,
-        fr_data_037,
-        fr_data_038,
-        fr_data_080,
-        fr_data_081,
-        fr_data_082,
-        fr_data_083,
-        fr_data_085,
-        fr_data_086,
+    print("=" * 80)
+    print("FEATURE: FEAT-DATA-08 - Data Transformation and Resampling")
+    print(
+        "PURPOSE: Resample OHLCV, align multi-timeframe datasets, aggregate ticks to bars, and project to DataFrames"
     )
-    for demonstration in demonstrations:
-        demonstration()
+    print(
+        "MODULE FLOW: Stage 1 (OHLCV Resampling) -> Stage 2 (Multi-Timeframe Alignment) -> Stage 3 (Tick Aggregation) -> Stage 4 (DataFrame Projection & Comparison)"
+    )
+    print("=" * 80)
+
+    fr_data_036()
+    fr_data_037_080()
+    fr_data_038()
+    fr_data_081_082_083_085_086()
 
 
 if __name__ == "__main__":

@@ -8,17 +8,17 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from pydantic import BaseModel
 
-from app.services.analytics import PortfolioAllocationEvidence
+from app.services.analytics import get_analytics_value_field, is_analytics_value
 from app.services.data import (
     is_account_state_snapshot,
     is_fx_conversion_evidence,
     is_market_dataset,
 )
-from app.services.portfolio.exceptions import PortfolioError
+from app.services.portfolio.contracts.errors import PortfolioError
 from app.services.risk import get_decision_state
 from app.services.strategy import (
     create_validated_strategy_ref,
@@ -31,11 +31,12 @@ logger = get_logger(__name__)
 AccountStateSnapshot = Any
 FXConversionEvidence = Any
 MarketDataset = Any
+PortfolioAllocationEvidence = Any
 StrategyOperationalEligibilityDecision = Any
 ValidatedStrategyRef = Any
 
 if TYPE_CHECKING:
-    from app.services.portfolio.config import PortfolioSettings
+    from app.services.portfolio._settings import PortfolioSettings
     from app.services.portfolio.contracts import PortfolioConstructionRequest
 
 
@@ -243,7 +244,7 @@ def _validate_owner_evidence(
     if (
         not is_account_state_snapshot(account_snapshot)
         or not is_market_dataset(market_dataset)
-        or not isinstance(analytics_evidence, PortfolioAllocationEvidence)
+        or not is_analytics_value(analytics_evidence, "PortfolioAllocationEvidence")
         or any(not is_fx_conversion_evidence(item) for item in fx_evidence.values())
     ):
         raise PortfolioError("PORT_UNSAFE_OBJECT", "OWNER_EVIDENCE")
@@ -266,11 +267,11 @@ def _validate_owner_evidence(
             references.market_dataset_as_of,
         ),
         (
-            analytics_evidence.evidence_id,
+            get_analytics_value_field(analytics_evidence, "evidence_id"),
             references.analytics_evidence_id,
             _digest(analytics_evidence),
             references.analytics_evidence_hash,
-            analytics_evidence.measurement_end,
+            get_analytics_value_field(analytics_evidence, "measurement_end"),
             references.analytics_evidence_as_of,
         ),
     )
@@ -288,10 +289,18 @@ def _validate_owner_evidence(
             or actual_at != expected_at
         ):
             raise PortfolioError("PORT_REFERENCE_CHANGED", "OWNER_EVIDENCE")
-        _require_fresh(actual_at, now, settings.evidence_max_age(), "STALE")
+        _require_fresh(
+            cast("datetime", actual_at),
+            now,
+            settings.evidence_max_age(),
+            "STALE",
+        )
     if account_snapshot.expires_at <= now:
         raise PortfolioError("PORT_EVIDENCE_INVALID", "ACCOUNT_EXPIRED")
-    if analytics_evidence.base_currency != request.base_currency:
+    if (
+        get_analytics_value_field(analytics_evidence, "base_currency")
+        != request.base_currency
+    ):
         raise PortfolioError("PORT_EVIDENCE_INVALID", "CURRENCY_MISMATCH")
     if set(fx_evidence) != set(references.fx_evidence_ids):
         raise PortfolioError("PORT_FX_EVIDENCE_INVALID", "COVERAGE")

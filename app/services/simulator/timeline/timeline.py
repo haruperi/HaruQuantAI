@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
-from app.services.data import (
-    MarketDataset,
-    TickRecord,
-)
+from app.services.data import is_tick_record
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.timeline.contracts import Tick
 from app.utils import get_logger
+
+MarketDataset = Any
 
 logger = get_logger(__name__)
 
@@ -39,7 +39,7 @@ def build_tick_timeline(tick_dataset: MarketDataset) -> tuple[Tick, ...]:
         )
     timeline: list[Tick] = []
     for sequence, record in enumerate(tick_dataset.records):
-        if not isinstance(record, TickRecord):
+        if not is_tick_record(record):
             raise SimulationError(
                 "SIM_DATA_SCHEMA_INVALID",
                 "Tick dataset contains a non-tick record",

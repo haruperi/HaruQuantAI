@@ -4,9 +4,11 @@ from decimal import Decimal
 
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.metrics.trades import calculate_trade_evidence
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics.unit.test_results_adapter import _config, _source
+logger = get_logger(__name__)
+
+from tests.analytics.unit.test_results_adapter import _config, _source  # noqa: E402
 
 
 def test_trade_evidence_filters_open_and_placeholder_trades() -> None:

@@ -23,6 +23,10 @@ from app.services.data.persistence.contracts import (
 )
 from app.services.data.persistence.locking import _acquire_write_lock_raw
 from app.services.data.persistence.transactions import _execute_transaction_raw
+from app.services.data.research_sources.migrations import (
+    RESEARCH_PROVIDER_MIGRATION_STEP,
+    RESEARCH_SOURCE_MIGRATION_STEP,
+)
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -219,6 +223,8 @@ DATA_MIGRATION_STEPS = (
         checksum=_schema_checksum(_ECONOMIC_EVENTS_SCHEMA_STATEMENTS),
         statements=_ECONOMIC_EVENTS_SCHEMA_STATEMENTS,
     ),
+    RESEARCH_SOURCE_MIGRATION_STEP,
+    RESEARCH_PROVIDER_MIGRATION_STEP,
 )
 
 

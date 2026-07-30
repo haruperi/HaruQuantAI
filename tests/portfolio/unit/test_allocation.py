@@ -4,27 +4,30 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
+from app.services.portfolio._settings import PortfolioSettings
 from app.services.portfolio.allocation import AllocationService
-from app.services.portfolio.config import PortfolioSettings
 from app.services.portfolio.contracts import (
     ActivePortfolioAllocation,
     PortfolioConstructionResult,
 )
-from app.services.portfolio.exceptions import PortfolioError
+from app.services.portfolio.contracts.errors import PortfolioError
 from app.services.risk import (
     create_allocation_risk_decision,
     create_kill_switch_state,
     get_decision_state,
 )
-from app.services.simulator import PortfolioSimulationResult
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 AllocationBudgetActivationRequest = object
 AllocationRiskDecision = object
 KillSwitchState = object
+PortfolioSimulationResult = object
 
 
 class RecordingRepository:
@@ -74,7 +77,7 @@ def _simulation(
         Minimal public Simulation result instance.
     """
     logger.debug("Building Portfolio Simulation gate fixture")
-    return PortfolioSimulationResult.model_construct(
+    return SimpleNamespace(
         status="completed",
         portfolio_id=result.portfolio_id,
         construction_result_id=result.result_id,
@@ -250,6 +253,94 @@ def test_activation_blocks_kill_switch_and_missing_human_approval(
             runtime_profile="paper",
             **arguments,
         )
+
+
+def test_activation_rejects_each_invalid_external_gate(
+    construction_result: PortfolioConstructionResult,
+    portfolio_settings: PortfolioSettings,
+    portfolio_now: datetime,
+) -> None:
+    """Exercise fail-closed activation branches for malformed owner evidence."""
+    base = {
+        "simulation": _simulation(construction_result, portfolio_now),
+        "risk_decision": _risk_decision(construction_result, portfolio_now),
+        "kill_switches": (_inactive_kill_switch(portfolio_now),),
+        "approval_attestation": None,
+        "approval_validation": None,
+        "runtime_profile": "simulation",
+        "activated_at": portfolio_now,
+        "expires_at": portfolio_now + timedelta(days=1),
+        "idempotency_key": "activation-key-negative",
+        "expected_predecessor": None,
+        "expected_revision": 0,
+        "audit_ref": "portfolio-audit-negative",
+        "audit_record": {"event_type": "portfolio.activation"},
+    }
+    service = AllocationService(
+        portfolio_settings,
+        RecordingRepository(),  # type: ignore[arg-type]
+        _activator,
+    )
+
+    variants = (
+        (
+            {"activated_at": portfolio_now.replace(tzinfo=None)},
+            "ACTIVATED_AT_NOT_UTC",
+        ),
+        (
+            {
+                "simulation": SimpleNamespace(
+                    **{
+                        **vars(base["simulation"]),
+                        "construction_result_id": "different",
+                    }
+                )
+            },
+            "PORT_SIMULATION_INVALID",
+        ),
+        (
+            {
+                "risk_decision": base["risk_decision"].model_copy(
+                    update={"expires_at": portfolio_now}
+                )
+            },
+            "PORT_RISK_AUTHORIZATION_INVALID",
+        ),
+        ({"kill_switches": ()}, "PORT_KILL_SWITCH_ACTIVE"),
+        ({"expires_at": portfolio_now}, "ALLOCATION_EXPIRY"),
+    )
+    for overrides, expected in variants:
+        with pytest.raises(PortfolioError, match=expected):
+            service.activate(construction_result, **{**base, **overrides})
+
+    invalid_policy = portfolio_settings.model_copy(
+        update={
+            "portfolio_activation_approval_policy": {
+                **portfolio_settings.portfolio_activation_approval_policy,
+                "simulation": "explicit_human",
+            }
+        },
+    )
+    with pytest.raises(PortfolioError, match="SIMULATION_APPROVAL"):
+        AllocationService(
+            invalid_policy,
+            RecordingRepository(),  # type: ignore[arg-type]
+            _activator,
+        ).activate(construction_result, **base)
+
+    def failing_activator(
+        _request: object,
+        _decision: object,
+    ) -> object:
+        """Raise one receiver failure for dependency mapping coverage."""
+        raise RuntimeError("risk receiver unavailable")
+
+    with pytest.raises(PortfolioError, match="PORT_DEPENDENCY_FAILED"):
+        AllocationService(
+            portfolio_settings,
+            RecordingRepository(),  # type: ignore[arg-type]
+            failing_activator,  # type: ignore[arg-type]
+        ).activate(construction_result, **base)
 
 
 def test_rollback_is_recorded_only_as_new_governed_version(

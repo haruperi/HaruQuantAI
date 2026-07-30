@@ -1,17 +1,21 @@
 """Unit tests for Research validation and summaries (FR-RES-077, 078)."""
 
 import pandas as pd
-from app.services.research import MarketStructureConfig
-from app.services.research.market_structure import (
+import pytest
+from app.services.research import (
     build_validation_summary,
+    create_research_value,
     label_realized_market_behavior,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
-def _config() -> MarketStructureConfig:
+def _config() -> object:
     """Build a market-structure configuration."""
-    return MarketStructureConfig(
+    return create_research_value(
+        "MarketStructureConfig",
         {"swing_window": 5, "trend_threshold": 0.5, "range_threshold": 0.2},
         False,
         (10, 20),
@@ -55,3 +59,35 @@ def test_summary_preserves_sample_counts() -> None:
     assert result["total_rows"] == 2
     assert result["by_verdict"]["trend"] == 1
     assert result["by_symbol"]["A"] == 1
+
+
+def test_labeling_and_summary_fail_closed_and_preserve_missingness() -> None:
+    """Cover identity, schema, insufficiency, and summary fallback branches."""
+    with pytest.raises(ValueError, match="INVALID_IDENTITY"):
+        label_realized_market_behavior(
+            _data(),
+            symbol=" ",
+            timeframe="1h",
+            config=_config(),
+        )
+    with pytest.raises(ValueError, match="CLOSE_COLUMN_REQUIRED"):
+        label_realized_market_behavior(
+            _data().drop(columns=["close"]),
+            symbol="TEST",
+            timeframe="1h",
+            config=_config(),
+        )
+    insufficient = label_realized_market_behavior(
+        _data(2),
+        symbol="TEST",
+        timeframe="1h",
+        config=_config(),
+    )
+    assert insufficient["verdict"] == "insufficient"
+    with pytest.raises(ValueError, match="EMPTY_VALIDATION_ROWS"):
+        build_validation_summary([])
+    summary = build_validation_summary(
+        [{"verdict": "unknown", "symbol": "A", "confidence": True}]
+    )
+    assert summary["by_verdict"]["mixed"] == 1
+    assert summary["mean_confidence"] == 0.0

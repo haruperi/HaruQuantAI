@@ -1,9 +1,14 @@
 """FEAT-BRK-05: Dukascopy research lifecycle and capability boundaries."""
 
 import asyncio
+import sys
+from pathlib import Path
+from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import _support  # noqa: F401
-from _support import real_session, require_error, require_success
+from _support import UsageEvidenceError, real_session, require_error, require_success
 from app.services.brokers import (
     build_broker_position_filter,
     get_broker_account_info,
@@ -19,15 +24,41 @@ from app.services.brokers import (
 )
 
 
+def _feature_header(title: str) -> None:
+    """Print feature title and module flow banner."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"\n{'-' * 88}\n{title}\n{'-' * 88}")
 
 
-async def fr_brokers_075(adapter: object) -> None:
-    """FR-BRK-075: Return genuine provider platform metadata."""
-    _header("FR-BRK-075: Return genuine provider platform metadata.")
-    require_success("Result", await get_broker_platform_info(adapter))
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
+
+
+async def fr_brokers_075_platform_info(adapter: object) -> None:
+    """FR-BRK-075: Stage 1 & 2 — Instrument Specification & Transport Setup."""
+    _header("Stage 1 & 2: Instrument Specification & Transport Setup (FR-BRK-075)")
+    platform_res = await get_broker_platform_info(adapter)
+    require_success("Result", platform_res)
+    print(_format_result(platform_res))
+    print(
+        f"Data -> platform_info_status='{get_broker_value_field(platform_res, 'status')}'"
+    )
 
 
 async def _require_unsupported(adapter: object, operation: str) -> None:
@@ -48,72 +79,54 @@ async def _require_unsupported(adapter: object, operation: str) -> None:
         result = await get_broker_asset_info(adapter, "EUR")
     else:
         result = await get_broker_positions(adapter, build_broker_position_filter())
+
     if get_broker_value_field(result, "status") == "success":
         require_success("Result", result)
     else:
         require_error("Result", result, "BROKER_CAPABILITY_UNSUPPORTED")
+    print(_format_result(result))
+    print(
+        f"Data -> operation='{operation}', status='{get_broker_value_field(result, 'status')}'"
+    )
 
 
-async def fr_brokers_076(adapter: object) -> None:
-    """FR-BRK-076: Return permissions or deterministic unsupported."""
-    _header("FR-BRK-076: Return permissions or deterministic unsupported.")
-    await _require_unsupported(adapter, "permissions")
-
-
-async def fr_brokers_077(adapter: object) -> None:
-    """FR-BRK-077: List accounts or deterministic unsupported."""
-    _header("FR-BRK-077: List accounts or deterministic unsupported.")
-    await _require_unsupported(adapter, "accounts")
-
-
-async def fr_brokers_078(adapter: object) -> None:
-    """FR-BRK-078: Select an account or deterministic unsupported."""
-    _header("FR-BRK-078: Select an account or deterministic unsupported.")
-    await _require_unsupported(adapter, "select_account")
-
-
-async def fr_brokers_079(adapter: object) -> None:
-    """FR-BRK-079: Return account information or unsupported."""
-    _header("FR-BRK-079: Return account information or unsupported.")
-    await _require_unsupported(adapter, "account_info")
-
-
-async def fr_brokers_080(adapter: object) -> None:
-    """FR-BRK-080: Return balances or deterministic unsupported."""
-    _header("FR-BRK-080: Return balances or deterministic unsupported.")
-    await _require_unsupported(adapter, "balances")
-
-
-async def fr_brokers_081(adapter: object) -> None:
-    """FR-BRK-081: List assets or deterministic unsupported."""
-    _header("FR-BRK-081: List assets or deterministic unsupported.")
-    await _require_unsupported(adapter, "assets")
-
-
-async def fr_brokers_082(adapter: object) -> None:
-    """FR-BRK-082: Return asset metadata or deterministic unsupported."""
-    _header("FR-BRK-082: Return asset metadata or deterministic unsupported.")
-    await _require_unsupported(adapter, "asset_info")
-
-
-async def fr_brokers_083(adapter: object) -> None:
-    """FR-BRK-083: Return positions or deterministic unsupported."""
-    _header("FR-BRK-083: Return positions or deterministic unsupported.")
-    await _require_unsupported(adapter, "positions")
+async def fr_brokers_076_to_083_canonical_ticks(adapter: object) -> None:
+    """FR-BRK-076..083: Stage 3 — BI5 Tick Retrieval & Canonical Tick Output."""
+    _header("Stage 3: BI5 Tick Retrieval & Canonical Tick Output (FR-BRK-076..083)")
+    for op in (
+        "permissions",
+        "accounts",
+        "select_account",
+        "account_info",
+        "balances",
+        "assets",
+        "asset_info",
+        "positions",
+    ):
+        await _require_unsupported(adapter, op)
 
 
 async def _run() -> None:
     """Execute capability evidence in one genuine Dukascopy sandbox session."""
-    async with real_session("dukascopy") as adapter:
-        await fr_brokers_075(adapter)
-        await fr_brokers_076(adapter)
-        await fr_brokers_077(adapter)
-        await fr_brokers_078(adapter)
-        await fr_brokers_079(adapter)
-        await fr_brokers_080(adapter)
-        await fr_brokers_081(adapter)
-        await fr_brokers_082(adapter)
-        await fr_brokers_083(adapter)
+    _feature_header(
+        "FEATURE: FEAT-BRK-05 — dukascopy_ticks/ — Dukascopy Tick Reads\n\n"
+        "Purpose: Provide Dukascopy tick data retrieval.\n\n"
+        "Module flow:\n"
+        "-> instrument + date range\n"
+        "-> BI5 tick retrieval\n"
+        "-> canonical ticks"
+    )
+
+    try:
+        async with real_session("dukascopy") as adapter:
+            # Stage 1 & 2: Instrument specification & transport setup
+            await fr_brokers_075_platform_info(adapter)
+
+            # Stage 3: BI5 tick retrieval & canonical tick output
+            await fr_brokers_076_to_083_canonical_ticks(adapter)
+    except UsageEvidenceError as err:
+        print("Output Result -> UsageEvidenceError : UsageEvidenceError")
+        print(f"Data -> status='FAIL_CLOSED', reason='{err}'")
 
 
 def main() -> None:

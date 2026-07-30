@@ -7,9 +7,7 @@ journal sidecar is an explicit Phase 1 exclusion.
 
 from hashlib import sha256
 
-from app.services.data import (
-    MigrationStep,
-)
+from app.services.data import build_migration_step
 
 _STATEMENTS = (
     "CREATE TABLE IF NOT EXISTS simulation_runs ("
@@ -19,7 +17,7 @@ _STATEMENTS = (
 )
 
 SIMULATION_MIGRATIONS = (
-    MigrationStep(
+    build_migration_step(
         domain="simulation",
         migration_id="simulation-0001-state",
         checksum=f"sha256:{sha256('\n'.join(_STATEMENTS).encode('utf-8')).hexdigest()}",

@@ -15,11 +15,13 @@ from app.services.research.contracts import (
     ResearchProfileSnapshot,
     ResearchReport,
 )
+from app.services.research.contracts.errors import (
+    SecurityError,
+    ValidationError,
+)
 from app.services.research.leakage import mask_research_artifact
 from app.services.research.profiles import render_research_report
 from app.utils import (
-    SecurityError,
-    ValidationError,
     canonical_json,
     create_audit_event,
     generate_id,

@@ -162,6 +162,35 @@ def test_validate_phase_one_scope_rejects_unsupported_asset() -> None:
     assert captured.value.code == "SIM_UNSUPPORTED_ASSET_CLASS"
 
 
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {
+            "asset_class": "FX",
+            "runtime_profile": "live",
+            "execution_route": "sim",
+        },
+        {
+            "asset_class": "FX",
+            "runtime_profile": "simulation",
+            "execution_route": "live",
+        },
+        {
+            "asset_class": "FX",
+            "runtime_profile": "fast_research",
+            "execution_route": "sim",
+            "canonical": True,
+        },
+    ],
+)
+def test_validate_phase_one_scope_rejects_unsupported_modes(
+    payload: dict[str, object],
+) -> None:
+    """Reject unsupported profiles, routes, and canonical approximation claims."""
+    with pytest.raises(SimulationError):
+        validate_phase_one_scope(payload)
+
+
 def test_validate_run_inputs_accepts_reference_material() -> None:
     """Accept deterministic reference-only material."""
     validate_run_inputs(_valid_payload())

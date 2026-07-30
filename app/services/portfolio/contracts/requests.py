@@ -18,7 +18,7 @@ from pydantic import (
 )
 from pydantic import ValidationError as PydanticValidationError
 
-from app.services.portfolio.exceptions import PortfolioError
+from app.services.portfolio.contracts.errors import PortfolioError
 from app.utils import get_logger
 
 logger = get_logger(__name__)

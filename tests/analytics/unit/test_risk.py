@@ -1,9 +1,11 @@
 """Unit tests for Analytics risk evidence."""
 
 from app.services.analytics.metrics.risk import calculate_risk_evidence
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics.unit.test_results_adapter import _config
+logger = get_logger(__name__)
+
+from tests.analytics.unit.test_results_adapter import _config  # noqa: E402
 
 
 def test_risk_evidence_uses_cataloged_tail_convention() -> None:

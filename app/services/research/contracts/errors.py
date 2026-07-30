@@ -6,7 +6,27 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Literal
 
-from app.utils import validate_error_catalog
+
+class ResearchError(ValueError):
+    """Research-owned symbolic exception safe for public boundaries."""
+
+    def __init__(self, code: str, detail: str) -> None:
+        """Initialize symbolic Research failure evidence."""
+        self.code = code
+        self.detail = detail
+        super().__init__(f"{code}:{detail}")
+
+
+class ConfigurationError(ResearchError):
+    """Research configuration or stage dependency is invalid."""
+
+
+class ValidationError(ResearchError):
+    """Research input or evidence is invalid."""
+
+
+class SecurityError(ResearchError, PermissionError):
+    """Research publication or persistence violates a safety boundary."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -187,8 +207,14 @@ _DEFINITIONS = (
     ),
 )
 
-RESEARCH_ERROR_CATALOG = validate_error_catalog(
-    MappingProxyType({definition.code: definition for definition in _DEFINITIONS})
+RESEARCH_ERROR_CATALOG = MappingProxyType(
+    {definition.code: definition for definition in _DEFINITIONS}
 )
 
-__all__ = ["RESEARCH_ERROR_CATALOG"]
+__all__ = (
+    "RESEARCH_ERROR_CATALOG",
+    "ConfigurationError",
+    "ResearchError",
+    "SecurityError",
+    "ValidationError",
+)

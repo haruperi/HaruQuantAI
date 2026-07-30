@@ -1,48 +1,40 @@
-"""Shared, non-workflow infrastructure for Optimization workflow examples."""
+"""Shared genuine-evidence infrastructure for Optimization workflows."""
 
 from __future__ import annotations
 
+import json
 import os
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-
-from app.services.data import MarketDataset, get_market_data
-from app.services.optimization.search import SearchRequest
-from app.utils import canonical_digest
-from tests.data.usage.workflows._support import market_request
-from tests.optimization.unit.test_search_contracts import search_request
+from app.services.data import build_market_dataset
+from tests.optimization.usage._support import (
+    genuine_execution_bundle,
+    search_request,
+)
+from tests.simulator.usage.workflows._support import live_market_dataset
 
 _DATASET_ENV = "HARU_WORKFLOW_MARKET_DATASET"
 
 
-def live_market_dataset() -> MarketDataset:
-    """Return genuine bounded MT5 evidence, reusing runner-captured evidence."""
+def live_search_request(dataset: object) -> object:
+    """Bind one bounded search request to genuine Data provenance."""
+    return search_request(dataset)
+
+
+def captured_market_dataset() -> object:
+    """Load runner-captured market evidence or retrieve genuine MT5 data."""
     captured = os.environ.get(_DATASET_ENV)
     if captured:
-        return MarketDataset.model_validate_json(
-            Path(captured).read_text(encoding="utf-8")
+        return build_market_dataset(
+            **json.loads(Path(captured).read_text(encoding="utf-8"))
         )
-    return get_market_data(market_request("bars", timeframe="M1", limit=20))
+    return live_market_dataset()
 
 
-def live_search_request(dataset: MarketDataset) -> SearchRequest:
-    """Bind one bounded search request to genuine Data provenance."""
-    request = search_request()
-    context = request.execution_context.model_copy(
-        update={
-            "data_ref": f"mt5:{dataset.symbol}:{dataset.timeframe}",
-            "data_hash": canonical_digest(
-                dataset.model_dump(mode="python", warnings=False)
-            ),
-            "symbol": dataset.symbol,
-            "timeframe": dataset.timeframe,
-            "start": dataset.start,
-            "end": dataset.end,
-        }
-    )
-    return request.model_copy(update={"execution_context": context})
-
-
-__all__ = ["_DATASET_ENV", "live_market_dataset", "live_search_request"]
+__all__ = [
+    "_DATASET_ENV",
+    "captured_market_dataset",
+    "genuine_execution_bundle",
+    "live_market_dataset",
+    "live_search_request",
+]

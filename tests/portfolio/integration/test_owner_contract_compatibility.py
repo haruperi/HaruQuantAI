@@ -6,11 +6,14 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 
 import pytest
-from app.services.analytics import PortfolioRebalanceMeasurementRequest
-from app.services.portfolio.config import PortfolioSettings
-from app.services.portfolio.contracts import ActivePortfolioAllocation
-from app.utils import logger
+from app.services.analytics import is_analytics_value
+from app.services.portfolio import execute_portfolio_handle_operation
+from app.utils import get_logger
 from tests.portfolio.unit.test_workflows import _plan, _service
+
+ActivePortfolioAllocation = object
+PortfolioSettings = object
+logger = get_logger(__name__)
 
 
 @pytest.fixture
@@ -37,7 +40,9 @@ async def test_rebalance_uses_each_receivers_public_owned_contract(
         portfolio_now,
         portfolio_settings,
     )
-    await service.submit_rebalance(
+    operation = execute_portfolio_handle_operation(
+        service,
+        "submit_rebalance",
         _plan(active_allocation, portfolio_now, portfolio_settings),
         account_evidence_ref="account-1",
         market_evidence_ref="market-1",
@@ -49,6 +54,7 @@ async def test_rebalance_uses_each_receivers_public_owned_contract(
         trading_request_id="req-44444444-4444-4444-8444-444444444444",
         valid_until=portfolio_now + timedelta(minutes=5),
     )
+    await operation
     assert (
         getattr(recorder.last_risk_request, "schema_id", None)
         == "risk.allocation_review_request.v1"
@@ -57,9 +63,9 @@ async def test_rebalance_uses_each_receivers_public_owned_contract(
         getattr(recorder.last_trading_request, "schema_id", None)
         == "trading.portfolio_rebalance_execution_request.v1"
     )
-    assert isinstance(
+    assert is_analytics_value(
         recorder.last_analytics_request,
-        PortfolioRebalanceMeasurementRequest,
+        "PortfolioRebalanceMeasurementRequest",
     )
     assert recorder.last_trading_request is not None
     assert set(recorder.last_trading_request.actions[0]) == {

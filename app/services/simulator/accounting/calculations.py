@@ -4,15 +4,14 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from decimal import Decimal, DecimalException, InvalidOperation
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
-from app.services.data import (
-    FXConversionEvidence,  # noqa: TC001
-)
 from app.services.simulator.errors import SimulationError
 from app.utils import canonical_digest, get_logger
+
+FXConversionEvidence = Any
 
 logger = get_logger(__name__)
 
@@ -318,7 +317,7 @@ def convert_fx_amount(
     logger.info("Converting Simulation monetary amount with supplied FX evidence")
     if not amount.is_finite():
         raise SimulationError("SIM_INVALID_CONFIG", "FX amount must be finite")
-    return amount * evidence.evidence.composite_rate
+    return Decimal(amount * evidence.evidence.composite_rate)
 
 
 __all__ = [

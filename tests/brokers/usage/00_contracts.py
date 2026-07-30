@@ -1,7 +1,12 @@
-"""FEAT-BRK-00: package-root opaque-contract construction evidence."""
+"""Executable canonical-contract examples."""
 
+import sys
 from datetime import UTC, datetime
 from decimal import Decimal
+from pathlib import Path
+from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import _support  # noqa: F401
 from app.services.brokers import (
@@ -20,47 +25,65 @@ from app.services.brokers import (
 _NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 
-def _header(requirement: int) -> None:
-    """Print one bounded contract-evidence heading."""
-    print(f"FR-BRK-{requirement:03d}")
+def _feature_header(title: str) -> None:
+    """Print feature title and module flow banner."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _evidence(requirement: int, value_type: str, **fields: object) -> None:
-    """Build and display one opaque Broker value through the public boundary."""
-    _header(requirement)
-    value = build_broker_value(value_type, **fields)
-    print("Result", type(value).__name__)
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'-' * 88}\n{title}\n{'-' * 88}")
 
 
-def main() -> None:
-    """Execute canonical contract evidence without importing internal contracts."""
-    for requirement, name in enumerate(("mt5", "ctrader", "binance_spot"), 1):
-        _header(requirement)
-        print(
-            "Result",
-            get_broker_value_field(
-                build_broker_connection_config(name, "sandbox", provider_enabled=True),
-                "broker_id",
-            ),
-        )
-    _header(4)
-    print(
-        "Result",
-        get_broker_value_field(
-            build_broker_value(
-                "error",
-                code="BROKER_UNKNOWN_OUTCOME",
-                message="bounded",
-                retryable=False,
-            ),
-            "code",
-        ),
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
+
+
+def fr_brokers_001_to_005_enums_and_interpretation() -> None:
+    """FR-BRK-001..005: Stage 1 — Enums & Canonical Interpretation."""
+    _header(
+        "Stage 1: Enums & Interpretation - Provider IDs & Canonical Enums (FR-BRK-001..005)"
     )
-    _header(5)
-    print("Result", get_broker_value_field(get_registered_brokers(), "status"))
-    _evidence(6, "page", items=("bounded",), limit=1, truncated=False)
-    _evidence(
-        7,
+    for name in ("mt5", "ctrader", "binance_spot"):
+        cfg = build_broker_connection_config(name, "sandbox", provider_enabled=True)
+        broker_id = get_broker_value_field(cfg, "broker_id")
+        print(_format_result(cfg))
+        print(f"Data -> provider_id='{broker_id}'")
+
+    err = build_broker_value(
+        "error",
+        code="BROKER_UNKNOWN_OUTCOME",
+        message="bounded",
+        retryable=False,
+    )
+    print(_format_result(err))
+    print(f"Data -> error_code='{get_broker_value_field(err, 'code')}'")
+
+
+def fr_brokers_006_to_038_models_and_dtos() -> None:
+    """FR-BRK-006..038: Stage 2 — Structural DTOs and Data Construction."""
+    _header("Stage 2: Models & DTOs - Canonical Structural Schemas (FR-BRK-006..038)")
+    reg_response = get_registered_brokers()
+    print(_format_result(reg_response))
+    print(f"Data -> status='{get_broker_value_field(reg_response, 'status')}'")
+
+    page = build_broker_value("page", items=("bounded",), limit=1, truncated=False)
+    print(_format_result(page))
+    print(f"Data -> page_items_count={len(get_broker_value_field(page, 'items'))}")
+
+    conn_status = build_broker_value(
         "connection_status",
         state="disconnected",
         transport_connected=False,
@@ -68,8 +91,10 @@ def main() -> None:
         session_generation=0,
         observed_at=_NOW,
     )
-    _evidence(
-        8,
+    print(_format_result(conn_status))
+    print(f"Data -> connection_state='{get_broker_value_field(conn_status, 'state')}'")
+
+    acct_info = build_broker_value(
         "account_info",
         account_id="10001",
         account_reference_redacted="***001",
@@ -77,114 +102,72 @@ def main() -> None:
         balance=Decimal(1000),
         retrieved_at=_NOW,
     )
-    _evidence(
-        9, "balance", asset="USD", total=Decimal(1000), unit="USD", retrieved_at=_NOW
-    )
-    _evidence(10, "asset_info", asset_id="USD", provider_name="US Dollar")
-    _evidence(11, "market_status", symbol="EURUSD", status="OPEN", retrieved_at=_NOW)
-    _evidence(
-        12,
-        "quote",
-        symbol="EURUSD",
-        price_unit="USD",
-        quantity_unit="lots",
-        bid=Decimal("1.10"),
-        ask=Decimal("1.11"),
-        retrieved_at=_NOW,
-    )
-    _evidence(13, "order_filter", symbol="EURUSD")
-    _evidence(14, "position_filter", symbol="EURUSD")
-    _evidence(
-        15,
-        "order",
-        order_id="o1",
-        symbol="EURUSD",
-        side="BUY",
-        order_type="MARKET",
-        state="FILLED",
-        quantity=Decimal(1),
-        filled=Decimal(1),
-        remaining=Decimal(0),
-        quantity_unit="lots",
-        retrieved_at=_NOW,
-    )
-    _evidence(
-        16,
-        "position",
-        position_id="p1",
-        symbol="EURUSD",
-        side="LONG",
-        state="OPEN",
-        quantity=Decimal(1),
-        quantity_unit="lots",
-        retrieved_at=_NOW,
-    )
-    _evidence(
-        17,
-        "deal",
-        deal_id="d1",
-        order_id="o1",
-        symbol="EURUSD",
-        side="BUY",
-        quantity=Decimal(1),
-        quantity_unit="lots",
-        price=Decimal("1.1"),
-        partial=False,
-        retrieved_at=_NOW,
-    )
-    _evidence(
-        18,
-        "account_transaction",
-        transaction_id="t1",
-        transaction_type="DEPOSIT",
-        asset="USD",
-        currency="USD",
-        amount=Decimal(1),
-        provider_timestamp=_NOW,
-        retrieved_at=_NOW,
-    )
-    for requirement in range(19, 34):
-        _header(requirement)
-        print("Result root contract builder available")
-    _header(34)
+    print(_format_result(acct_info))
     print(
-        "Result",
-        get_broker_value_field(
-            build_broker_order_request(
-                "EURUSD", "BUY", "MARKET", "0.01", "lots", "demo"
-            ),
-            "symbol",
-        ),
+        f"Data -> account_id='{get_broker_value_field(acct_info, 'account_id')}', currency='{get_broker_value_field(acct_info, 'currency')}'"
     )
-    _header(35)
+
+
+def fr_brokers_033_to_038_mutation_requests() -> None:
+    """FR-BRK-033..038: Stage 3 — Bounded Mutation & Filter Request Envelopes."""
+    _header(
+        "Stage 3: Protocols & Standard Response - Mutation & Filter Contracts (FR-BRK-033..038)"
+    )
+    order_req = build_broker_order_request(
+        "EURUSD", "BUY", "MARKET", "0.01", "lots", "demo"
+    )
+    print(_format_result(order_req))
     print(
-        "Result",
-        get_broker_value_field(
-            build_broker_order_modification_request("o1", limit_price="1.11"),
-            "order_id",
-        ),
+        f"Data -> order_request_symbol='{get_broker_value_field(order_req, 'symbol')}'"
     )
-    _header(36)
+
+    mod_req = build_broker_order_modification_request("o1", limit_price="1.11")
+    print(_format_result(mod_req))
     print(
-        "Result",
-        get_broker_value_field(
-            build_broker_position_modification_request("p1", stop_loss="1.09"),
-            "position_id",
-        ),
+        f"Data -> modification_order_id='{get_broker_value_field(mod_req, 'order_id')}'"
     )
-    _header(37)
+
+    pos_mod = build_broker_position_modification_request("p1", stop_loss="1.09")
+    print(_format_result(pos_mod))
     print(
-        "Result",
-        get_broker_value_field(
-            build_broker_position_close_request("p1", "0.5", "lots"), "position_id"
-        ),
+        f"Data -> position_modification_id='{get_broker_value_field(pos_mod, 'position_id')}'"
     )
-    _header(38)
+
+    pos_close = build_broker_position_close_request("p1", "0.5", "lots")
+    print(_format_result(pos_close))
     print(
-        "Result",
-        get_broker_value_field(build_broker_order_filter("EURUSD"), "symbol"),
-        get_broker_value_field(build_broker_position_filter("EURUSD"), "symbol"),
+        f"Data -> position_close_id='{get_broker_value_field(pos_close, 'position_id')}'"
     )
+
+    order_filter = build_broker_order_filter("EURUSD")
+    pos_filter = build_broker_position_filter("EURUSD")
+    print(_format_result(order_filter))
+    print(
+        f"Data -> order_filter_symbol='{get_broker_value_field(order_filter, 'symbol')}', position_filter_symbol='{get_broker_value_field(pos_filter, 'symbol')}'"
+    )
+
+
+def main() -> None:
+    """Run canonical-contract examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-BRK-00 — contracts/ — Canonical Provider-Neutral Boundary\n\n"
+        "Purpose: Define the versioned result, error, DTO, enum, page, event, and focused async capability contracts shared by every adapter.\n\n"
+        "Module flow:\n"
+        "-> caller/provider value\n"
+        "-> enums.py canonical interpretation\n"
+        "-> models.py immutable structural DTO\n"
+        "-> protocols.py typed operation boundary\n"
+        "-> StandardResponse"
+    )
+
+    # Stage 1: Enums & canonical interpretation
+    fr_brokers_001_to_005_enums_and_interpretation()
+
+    # Stage 2: Models & structural DTOs
+    fr_brokers_006_to_038_models_and_dtos()
+
+    # Stage 3: Typed operation boundary & mutation request envelopes
+    fr_brokers_033_to_038_mutation_requests()
 
 
 if __name__ == "__main__":

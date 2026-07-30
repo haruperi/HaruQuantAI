@@ -6,10 +6,13 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 
 import pytest
-from app.services.portfolio.config import PortfolioSettings
-from app.services.portfolio.contracts import ActivePortfolioAllocation
-from app.utils import logger
+from app.services.portfolio import execute_portfolio_handle_operation
+from app.utils import get_logger
 from tests.portfolio.unit.test_workflows import _plan, _service
+
+ActivePortfolioAllocation = object
+PortfolioSettings = object
+logger = get_logger(__name__)
 
 
 @pytest.fixture
@@ -37,7 +40,9 @@ async def test_rebalance_chain_preserves_risk_trading_and_analytics_ownership(
         portfolio_settings,
     )
     original = _plan(active_allocation, portfolio_now, portfolio_settings)
-    measured = await service.submit_rebalance(
+    operation = execute_portfolio_handle_operation(
+        service,
+        "submit_rebalance",
         original,
         account_evidence_ref="account-1",
         market_evidence_ref="market-1",
@@ -49,6 +54,7 @@ async def test_rebalance_chain_preserves_risk_trading_and_analytics_ownership(
         trading_request_id="req-44444444-4444-4444-8444-444444444444",
         valid_until=portfolio_now + timedelta(minutes=5),
     )
+    measured = await operation
     versions = tuple(
         plan
         for (plan_id, _version), plan in store.plans.items()

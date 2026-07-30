@@ -2,13 +2,43 @@
 
 ## [Unreleased]
 
+### Close repository-wide validation regressions
+
+The combined domain migration now preserves function-only runtime validation,
+deterministic Strategy indicator evidence, and exact Analytics warning failures.
+
+#### Fixed (3)
+
+- Replaced the accidental public Utils `AuthContext` class export with documented factory and runtime-type getter functions and migrated API and Research usage consumers.
+- Restored Strategy evaluator support for focused indicator evidence while preserving package-root getters for genuine Indicators results.
+- Corrected Analytics warning-bound evidence to assert the exact configured-bound failure raised by production.
+
+### Complete licensed economic-calendar evidence
+
+Data now acquires, normalizes, persists, and evaluates real economic-calendar
+evidence through its function-only package boundary.
+
+#### Added (1)
+
+- Added a bounded licensed Firecrawl transport with host, media-type, response-size, concurrency, timeout, cache, and secret-handling safeguards for all four declared calendar portals.
+
+#### Changed (1)
+
+- Completed `FEAT-DATA-11` and `FR-DATA-095`–`099`/`123`–`129` with genuine multi-site usage evidence and opt-in live verification while keeping default CI network-free.
+
+#### Fixed (2)
+
+- Fixed provider-neutral calendar retrieval to accept the real scrape provider's normalized list instead of assuming an injected response envelope.
+- Added function-only event/state projection and persistence operations so consumers no longer need methods or fields from internal calendar classes.
+
 ### Complete point-in-time Research intelligence evidence
 
 Data and Research now provide the governed source-to-evidence path required for bounded fundamental and deterministic sentiment research.
 
-#### Added (2)
+#### Added (3)
 
 - Added Data `FEAT-DATA-16` bounded HTTPS source ingestion, immutable revision persistence, decision-time eligibility queries, and detached evidence projection.
+- Added governed SEC, official macro-agency, GDELT-headline, and USDA normalization with immutable point-in-time structured observations for Data-backed Research evidence.
 - Added Research `FEAT-RES-13` fundamental/sentiment evidence plus completed `WF-RES-012` profile comparison with genuine usage evidence.
 
 #### Changed (1)

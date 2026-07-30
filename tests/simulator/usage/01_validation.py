@@ -13,13 +13,14 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.contracts import (
-    DataQualityReport,
-    MarketDataset,
-    TickRecord,
+from app.services.data import (
+    build_data_quality_report,
+    build_market_dataset,
+    build_tick_record,
 )
 from app.services.simulator import (
-    MarketDataValidationContext,
+    create_simulation_value,
+    dump_simulation_value,
     unwrap_simulation_response,
     validate_market_data,
     validate_phase_one_scope,
@@ -38,10 +39,10 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _dataset() -> MarketDataset:
+def _dataset() -> object:
     """Build one valid Data-owned tick dataset."""
     instant = datetime(2025, 1, 2, 12, tzinfo=UTC)
-    record = TickRecord(
+    record = build_tick_record(
         timestamp=instant,
         source="fixture",
         source_symbol="EURUSD",
@@ -56,7 +57,7 @@ def _dataset() -> MarketDataset:
         tick_index_in_bar=0,
         bar_phase=1,
     )
-    quality = DataQualityReport(
+    quality = build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
         record_count=1,
@@ -66,7 +67,7 @@ def _dataset() -> MarketDataset:
         schema_version="v1",
         generated_at=instant,
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="ticks",
         symbol="EURUSD",
@@ -86,14 +87,15 @@ def _dataset() -> MarketDataset:
     )
 
 
-def _context(dataset: MarketDataset) -> MarketDataValidationContext:
+def _context(dataset: object) -> object:
     """Build matching validation context."""
     digest = sha256(
         canonical_json(dataset.model_dump(mode="python", warnings=False)).encode(
             "utf-8"
         )
     ).hexdigest()
-    return MarketDataValidationContext(
+    return create_simulation_value(
+        "MarketDataValidationContext",
         expected_data_hash=digest,
         requested_start=dataset.start,
         requested_end=dataset.end,
@@ -175,7 +177,7 @@ def fr_sim_002() -> None:
     )
     dataset = _dataset()
     evidence = _value(validate_market_data(dataset, _context(dataset)))
-    print(f"Validated market data records: {evidence.record_count}")
+    print("Validated market-data evidence:", dump_simulation_value(evidence))
 
 
 def main() -> None:

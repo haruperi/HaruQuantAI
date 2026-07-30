@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from app.services.research.features import (
+from app.services.research import (
     forward_max_adverse_excursion,
     forward_max_favorable_excursion,
     forward_returns,
@@ -12,7 +12,9 @@ from app.services.research.features import (
     rolling_hurst,
     simple_returns,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def _prices(count: int = 40) -> pd.Series:
@@ -61,7 +63,7 @@ def test_simple_returns_constant_series() -> None:
 def test_hurst_rejects_insufficient_sample() -> None:
     """Verify Hurst estimation rejects undersized samples."""
     logger.debug("Testing Research Hurst sample policy")
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValueError, match=r"."):
         hurst_exponent(_prices(10), minimum_samples=20)
 
 

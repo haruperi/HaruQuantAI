@@ -3,24 +3,21 @@
 from datetime import UTC, datetime
 
 import pandas as pd
-from app.services.research.contracts import (
-    EdgeResult,
-    ResearchResourceLimits,
-    StatisticalConfig,
-    StudyConfig,
-    TimeSplitResult,
-)
-from app.services.research.studies import (
+from app.services.research import (
+    create_research_value,
+    is_research_value,
     run_eds_mean_reversion,
     run_eds_session,
     run_eds_trend_persistence,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _HASH = "e" * 64
 
 
-def _edge_split() -> TimeSplitResult:
+def _edge_split() -> object:
     """Build a chronological split with an oscillating close in test."""
     idx = pd.date_range("2026-01-01", periods=50, freq="h", tz="UTC")
     close = pd.Series(
@@ -29,7 +26,8 @@ def _edge_split() -> TimeSplitResult:
         dtype="float64",
     )
     frame = pd.DataFrame({"close": close}, index=idx)
-    return TimeSplitResult(
+    return create_research_value(
+        "TimeSplitResult",
         train=frame.iloc[:20],
         validation=frame.iloc[20:30],
         test=frame.iloc[30:],
@@ -41,9 +39,10 @@ def _edge_split() -> TimeSplitResult:
     )
 
 
-def _study() -> StudyConfig:
+def _study() -> object:
     """Build closed edge-study settings."""
-    return StudyConfig(
+    return create_research_value(
+        "StudyConfig",
         mean_reversion={
             "lookback": 5,
             "entry_zscore": 0.5,
@@ -71,14 +70,16 @@ def _study() -> StudyConfig:
     )
 
 
-def _statistics() -> StatisticalConfig:
+def _statistics() -> object:
     """Build seeded statistical settings."""
-    return StatisticalConfig(7, 20, 20, 2, 20, "benjamini_hochberg")
+    return create_research_value(
+        "StatisticalConfig", 7, 20, 20, 2, 20, "benjamini_hochberg"
+    )
 
 
-def _limits() -> ResearchResourceLimits:
+def _limits() -> object:
     """Build approved resource ceilings."""
-    return ResearchResourceLimits(500_000, 600.0, 52_428_800)
+    return create_research_value("ResearchResourceLimits", 500_000, 600.0, 52_428_800)
 
 
 def test_mean_reversion_uses_matched_null() -> None:
@@ -91,7 +92,7 @@ def test_mean_reversion_uses_matched_null() -> None:
         statistics=_statistics(),
         limits=_limits(),
     )
-    assert isinstance(result, EdgeResult)
+    assert is_research_value(result, "EdgeResult")
     assert result.study == "mean_reversion"
     assert result.advisory_only is True
     assert result.seed == 7
@@ -111,7 +112,7 @@ def test_trend_study_records_rule_config() -> None:
         statistics=_statistics(),
         limits=_limits(),
     )
-    assert isinstance(result, EdgeResult)
+    assert is_research_value(result, "EdgeResult")
     assert result.study == "trend_persistence"
     assert result.statistics["lookback"] == 5
     assert result.statistics["minimum_move"] == 0.01
@@ -132,7 +133,7 @@ def test_session_study_applies_fdr() -> None:
         statistics=_statistics(),
         limits=_limits(),
     )
-    assert isinstance(result, EdgeResult)
+    assert is_research_value(result, "EdgeResult")
     assert result.study == "session"
     assert result.null_evidence["correction"] == "benjamini_hochberg"
     sessions = result.null_evidence["sessions"]

@@ -3,7 +3,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from app.services.portfolio.exceptions import PortfolioError
+from app.services.portfolio.contracts.errors import PortfolioError
 from app.services.portfolio.state.repository import (
     PortfolioRepository,
     PortfolioStateStore,

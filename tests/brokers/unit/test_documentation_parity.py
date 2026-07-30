@@ -4,12 +4,12 @@ import re
 from pathlib import Path
 
 
-def test_brokers_readme_has_one_reconciled_partial_registry() -> None:
+def test_brokers_readme_has_one_reconciled_completed_registry() -> None:
     """Require one feature, folder, and usage program for every registry row."""
     readme = Path("app/services/brokers/README.md").read_text(encoding="utf-8")
     assert readme.count("### Feature Registry") == 1
     rows = re.findall(
-        r"\| Partial \| `(?P<id>FEAT-BRK-\d{2})`[^|]*"
+        r"\| Completed \| `(?P<id>FEAT-BRK-\d{2})`[^|]*"
         r"\| `(?P<folder>[^`]+/)`[^|]*\|[^|]*\|[^|]*"
         r"\| `(?P<usage>tests/brokers/usage/\d{2}_[^`]+\.py)` \|",
         readme,
@@ -27,4 +27,4 @@ def test_brokers_readme_has_one_reconciled_partial_registry() -> None:
     assert "offline transport" not in readme
     assert "reject live environments" in readme
     assert re.search(r"never\s+transmit broker mutations", readme)
-    assert "- [x]" not in readme
+    assert "- [ ]" not in readme

@@ -5,7 +5,9 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from app.services.analytics.contracts import AnalyticsValidationError
 from app.services.analytics.dashboards.truncation import truncate_series
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def _points() -> tuple[dict[str, object], ...]:

@@ -11,8 +11,10 @@ from app.services.analytics import (
     build_portfolio_allocation_evidence,
     build_portfolio_rebalance_measurement,
 )
-from app.utils import logger
-from tests.analytics._support import _measurement_request, _report, unwrap
+from app.utils import get_logger
+
+logger = get_logger(__name__)
+from tests.analytics._support import _measurement_request, _report, unwrap  # noqa: E402
 
 
 def test_allocation_evidence_builder_is_package_root_public() -> None:

@@ -2,22 +2,19 @@
 
 import pandas as pd
 from app.services.research import (
-    DataQualityReport,
-    MarketStructureConfig,
-    MarketStructureProfile,
-    PreparedDataset,
-    ResearchResourceLimits,
-)
-from app.services.research.market_structure import (
     build_market_structure_profile,
     build_strategy_fit,
+    create_research_value,
+    is_research_value,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _HASH = "e" * 64
 
 
-def _prepared() -> PreparedDataset:
+def _prepared() -> object:
     """Build a PreparedDataset with trending OHLCVS data."""
     idx = pd.date_range("2026-01-05", periods=30, freq="h", tz="UTC")
     close = pd.Series([100.0 + i * 0.5 for i in range(30)], index=idx, dtype="float64")
@@ -32,19 +29,21 @@ def _prepared() -> PreparedDataset:
         },
         index=idx,
     )
-    return PreparedDataset(
+    return create_research_value(
+        "PreparedDataset",
         frame,
         "v1",
-        DataQualityReport((), (), ("schema",), ()),
+        create_research_value("DataQualityReport", (), (), ("schema",), ()),
         _HASH,
         _HASH,
         ("fixture",),
     )
 
 
-def _config() -> MarketStructureConfig:
+def _config() -> object:
     """Build market-structure settings."""
-    return MarketStructureConfig(
+    return create_research_value(
+        "MarketStructureConfig",
         {
             "swing_window": 5,
             "atr_period": 14,
@@ -64,10 +63,12 @@ def test_profile_and_fit_share_canonical_score() -> None:
     profile = build_market_structure_profile(
         _prepared(),
         config=_config(),
-        limits=ResearchResourceLimits(500_000, 600.0, 52_428_800),
+        limits=create_research_value(
+            "ResearchResourceLimits", 500_000, 600.0, 52_428_800
+        ),
     )
     fit = build_strategy_fit(profile)
-    assert isinstance(profile, MarketStructureProfile)
+    assert is_research_value(profile, "MarketStructureProfile")
     assert profile.strategy_fit["advisory_only"] is True
     assert fit["advisory_only"] is True
     assert fit["score"] == profile.score

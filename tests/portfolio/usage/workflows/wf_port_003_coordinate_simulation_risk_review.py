@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.portfolio import execute_portfolio_handle_operation
 from tests.portfolio.usage.workflows._support import (
     construction_workflow,
     simulation_request,
@@ -32,7 +33,9 @@ def _stage(number: int) -> None:
 def main() -> None:
     """Run the complete README-defined review-coordination workflow."""
     service, request, _store, market = construction_workflow()
-    candidate, evidence = service.construct(request)
+    candidate, evidence = execute_portfolio_handle_operation(
+        service, "construct", request
+    )
     receiver_request = simulation_request(candidate)
     print(
         "INPUT BOUNDARY — candidate/evidence/Simulation request:", candidate.result_id
@@ -52,7 +55,13 @@ def main() -> None:
 
     # Stage 4 — Submit the derived Risk-owned review request.
     _stage(4)
-    review = service.coordinate_review(candidate, receiver_request, evidence)
+    review = execute_portfolio_handle_operation(
+        service,
+        "coordinate_review",
+        candidate,
+        receiver_request,
+        evidence,
+    )
 
     # Stage 5 — Return current Simulation and Risk truth.
     _stage(5)

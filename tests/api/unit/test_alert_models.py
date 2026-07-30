@@ -4,9 +4,9 @@ from datetime import UTC, datetime
 
 import pytest
 from app.services.api import (
-    CriticalAlertDeliveryResult,
-    CriticalAlertTrigger,
-    CriticalOperationalAlert,
+    build_critical_alert_delivery_result,
+    build_critical_alert_trigger,
+    build_critical_operational_alert,
 )
 from pydantic import ValidationError
 
@@ -17,7 +17,7 @@ CORRELATION_ID = "cor-33333333-3333-4333-8333-333333333333"
 HASH = "a" * 64
 
 
-def _alert(**changes: object) -> CriticalOperationalAlert:
+def _alert(**changes: object) -> object:
     """Build one valid bounded alert.
 
     Args:
@@ -28,7 +28,7 @@ def _alert(**changes: object) -> CriticalOperationalAlert:
     """
     values: dict[str, object] = {
         "alert_id": HASH,
-        "trigger": CriticalAlertTrigger.RISK_KILL_SWITCH_ACTIVATED,
+        "trigger": build_critical_alert_trigger("RISK_KILL_SWITCH_ACTIVATED"),
         "title": "Risk kill switch activated",
         "summary": "Risk kill switch activated for global scope.",
         "scope": {"scope_level": "global"},
@@ -41,7 +41,7 @@ def _alert(**changes: object) -> CriticalOperationalAlert:
         "correlation_id": CORRELATION_ID,
     }
     values.update(changes)
-    return CriticalOperationalAlert.model_validate(values)
+    return build_critical_operational_alert(**values)
 
 
 def test_alert_contract_is_bounded_and_immutable() -> None:
@@ -62,7 +62,7 @@ def test_alert_contract_is_bounded_and_immutable() -> None:
 def test_delivery_result_requires_consistent_failure_evidence() -> None:
     """Verify delivery truth cannot claim failure without its stable code."""
     with pytest.raises(ValidationError):
-        CriticalAlertDeliveryResult(
+        build_critical_alert_delivery_result(
             delivery_id=HASH,
             alert_id=HASH,
             status="failed",

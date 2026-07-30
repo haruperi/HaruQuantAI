@@ -8,7 +8,7 @@ from app.services.api.contracts import (
     ResearchRunRequest,  # noqa: TC001 - FastAPI runtime request model
 )
 from app.services.api.identity import require_auth_context, require_human_permission
-from app.services.research import ResearchReport, run_edge_lab_profile
+from app.services.research import run_edge_lab_profile
 from app.utils import get_logger
 
 type AuthContext = Any
@@ -23,7 +23,7 @@ router = APIRouter(prefix="/api/research", tags=["research"])
 def _run_research(
     request: ResearchRunRequest,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
-) -> StandardResponse[ResearchReport]:
+) -> StandardResponse[object]:
     """Delegate one authenticated bounded run to Research.
 
     Args:

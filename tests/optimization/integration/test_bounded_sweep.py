@@ -1,7 +1,7 @@
 """Integration evidence for bounded Simulation-adapter search."""
 
 # ruff: noqa: INP001
-from app.services.optimization.search import run_bounded_search
+from app.services.optimization import run_bounded_search
 from tests.optimization.unit.test_adapter import FakeAdapter
 from tests.optimization.unit.test_search_contracts import search_request
 

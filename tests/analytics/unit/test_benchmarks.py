@@ -12,10 +12,16 @@ from app.services.analytics.metrics.benchmarks import (
     align_benchmark_series,
     calculate_benchmark_evidence,
 )
-from app.services.data import DataQualityReport, MarketDataset, OHLCVRecord
-from app.utils import generate_id, logger
+from app.services.data import (
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
+)
+from app.utils import generate_id, get_logger
 
-from tests.analytics.unit.test_results_adapter import _config, _source
+logger = get_logger(__name__)
+
+from tests.analytics.unit.test_results_adapter import _config, _source  # noqa: E402
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 _GOLDEN_DIRECTORY = Path("tests/analytics/fixtures/golden")
@@ -46,7 +52,7 @@ def test_benchmark_zero_variance_is_undefined() -> None:
     )
     start = NOW.replace(day=18)
     bars = (
-        OHLCVRecord(
+        build_ohlcv_record(
             timestamp=start,
             source="unit-test",
             source_symbol="BENCH",
@@ -59,7 +65,7 @@ def test_benchmark_zero_variance_is_undefined() -> None:
             price_unit="index_points",
             volume_unit="contracts",
         ),
-        OHLCVRecord(
+        build_ohlcv_record(
             timestamp=NOW,
             source="unit-test",
             source_symbol="BENCH",
@@ -73,7 +79,7 @@ def test_benchmark_zero_variance_is_undefined() -> None:
             volume_unit="contracts",
         ),
     )
-    benchmark = MarketDataset(
+    benchmark = build_market_dataset(
         normalization_version="v1",
         data_kind="bars",
         symbol="BENCH",
@@ -83,7 +89,7 @@ def test_benchmark_zero_variance_is_undefined() -> None:
         end=NOW,
         available_at=NOW,
         record_count=2,
-        quality_report=DataQualityReport(
+        quality_report=build_data_quality_report(
             quality_status="passed",
             quality_score=Decimal(1),
             record_count=2,

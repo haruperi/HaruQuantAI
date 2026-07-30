@@ -13,7 +13,7 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.portfolio import PortfolioConstructionResult
+from app.services.portfolio import create_portfolio_value, dump_portfolio_value
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 
@@ -34,7 +34,8 @@ def fr_port_010() -> None:
     )
     print("FR-PORT-010: Support fixed, equal, and inverse-volatility methods only")
 
-    result = PortfolioConstructionResult(
+    result = create_portfolio_value(
+        "PortfolioConstructionResult",
         result_id="result-1",
         portfolio_id="portfolio-alpha",
         portfolio_version="version-1",
@@ -70,8 +71,9 @@ def fr_port_010() -> None:
     print(f"Method 'equal' accepted: {result.method}")
 
     try:
-        PortfolioConstructionResult(
-            **{**result.model_dump(mode="python"), "method": "mean_variance"}
+        create_portfolio_value(
+            "PortfolioConstructionResult",
+            **{**dump_portfolio_value(result), "method": "mean_variance"},
         )
         msg = "ERROR: unsupported method accepted"
     except Exception:  # noqa: BLE001 - usage demonstrates rejection.
@@ -91,7 +93,8 @@ def fr_port_011() -> None:
     print("FR-PORT-011: Reject invalid weights and non-finite values")
 
     try:
-        PortfolioConstructionResult(
+        create_portfolio_value(
+            "PortfolioConstructionResult",
             result_id="result-bad",
             portfolio_id="portfolio-alpha",
             portfolio_version="version-1",
@@ -173,10 +176,10 @@ def fr_port_012() -> None:
         "workflow_id": "wf-1",
         "correlation_id": "corr-1",
     }
-    result_a = PortfolioConstructionResult(**data)
-    result_b = PortfolioConstructionResult(**data)
-    wire_a = result_a.model_dump(mode="json")
-    wire_b = result_b.model_dump(mode="json")
+    result_a = create_portfolio_value("PortfolioConstructionResult", **data)
+    result_b = create_portfolio_value("PortfolioConstructionResult", **data)
+    wire_a = dump_portfolio_value(result_a)
+    wire_b = dump_portfolio_value(result_b)
     assert wire_a == wire_b
     identical = result_a.canonical_hash == result_b.canonical_hash
     print(f"Identical canonical_hash: {identical}")
@@ -214,7 +217,8 @@ def fr_port_014() -> None:
     print("FR-PORT-014: Publish nothing on partial construction failure")
 
     try:
-        PortfolioConstructionResult(
+        create_portfolio_value(
+            "PortfolioConstructionResult",
             result_id="result-fail",
             portfolio_id="portfolio-alpha",
             portfolio_version="version-1",

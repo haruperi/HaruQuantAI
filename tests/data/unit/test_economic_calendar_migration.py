@@ -57,9 +57,12 @@ def _table_exists(name: str, request_id: str) -> bool:
 def test_economic_events_step_is_additive_and_second() -> None:
     """002_economic_events is the second ordered canonical migration step."""
     ids = tuple(step.migration_id for step in DATA_MIGRATION_STEPS)
-    assert ids[0] == "001_initial_data_schema"
-    assert ids[1] == "002_economic_events"
-    assert len(ids) == 2
+    assert ids == (
+        "001_initial_data_schema",
+        "002_economic_events",
+        "003_research_sources",
+        "004_research_source_providers",
+    )
 
 
 def test_run_data_migrations_creates_economic_events_table(
@@ -83,15 +86,15 @@ def test_run_data_migrations_is_idempotent_on_re_run(
     first = _unwrap(run_data_migrations(generate_id("req")))
     second = _unwrap(run_data_migrations(generate_id("req")))
 
-    assert tuple(first.applied_ids) == (
+    expected_ids = (
         "001_initial_data_schema",
         "002_economic_events",
+        "003_research_sources",
+        "004_research_source_providers",
     )
+    assert tuple(first.applied_ids) == expected_ids
     assert tuple(second.applied_ids) == ()
-    assert tuple(second.skipped_ids) == (
-        "001_initial_data_schema",
-        "002_economic_events",
-    )
+    assert tuple(second.skipped_ids) == expected_ids
 
 
 def test_running_only_step_one_before_step_two_can_be_repaired_by_running_first(

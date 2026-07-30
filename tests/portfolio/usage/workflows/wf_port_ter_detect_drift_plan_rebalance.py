@@ -8,13 +8,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from tests.portfolio.unit.test_rebalancing import _eligibility, _risk_decision
-from tests.portfolio.unit.test_workflows import _service
+from app.services.portfolio import execute_portfolio_handle_operation
 from tests.portfolio.usage.workflows._support import (
     NOW,
-    active_allocation,
-    live_market_dataset,
-    settings,
+    rebalance_workflow,
 )
 
 WORKFLOW_ID = "WF-PORT-TER"
@@ -39,11 +36,8 @@ def _stage(number: int) -> None:
 
 def main() -> None:
     """Run the complete README-defined drift-planning workflow."""
-    market = live_market_dataset()
-    active = active_allocation()
-    policy = settings()
-    service, _recorder, store = _service(active, NOW, policy)
-    exposures = {"component-a": Decimal("0.6"), "component-b": Decimal("0.4")}
+    service, active, risk, eligibility, store, market = rebalance_workflow()
+    exposures = {"component-a": Decimal("1.15")}
     print(
         "INPUT BOUNDARY — active allocation and genuine MT5 evidence:",
         market.request_id,
@@ -55,7 +49,7 @@ def main() -> None:
 
     # Stage 2 — Apply configured threshold and schedule.
     _stage(2)
-    print("Drift threshold:", policy.portfolio_rebalance_drift_threshold)
+    print("Target/actual risk:", risk.risk_budget_projection, exposures)
 
     # Stage 3 — Bind reductions to the active version.
     _stage(3)
@@ -71,12 +65,14 @@ def main() -> None:
 
     # Stage 6 — Execute the public drift-assessment workflow.
     _stage(6)
-    plan = service.assess_drift(
+    plan = execute_portfolio_handle_operation(
+        service,
+        "assess_drift",
         active,
         actual_exposures=exposures,
         evidence_as_of=NOW,
-        risk_decision=_risk_decision(active, NOW),
-        eligibility_decisions=_eligibility(NOW),
+        risk_decision=risk,
+        eligibility_decisions=eligibility,
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",

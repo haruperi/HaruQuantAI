@@ -10,13 +10,14 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.optimization.validation import (
-    SplitMode,
+from app.services.optimization import (
     build_time_series_splits,
     run_walk_forward_validation,
 )
-from tests.optimization.unit.test_adapter import FakeAdapter
-from tests.optimization.unit.test_validation_contracts import walk_forward_request
+from tests.optimization.usage._support import (
+    genuine_execution_bundle,
+    walk_forward_request,
+)
 
 
 def _header(title: str) -> None:
@@ -30,10 +31,9 @@ def example_validation() -> None:
     print("Optimization Example 8: Walk-Forward Validation and Time Series Folds")
 
     # 1. Split mode enum
-    print(f"Split Mode: {SplitMode.ROLLING.value}")
-
-    # 2. Walk forward request
-    req = walk_forward_request()
+    dataset, _, adapter = genuine_execution_bundle()
+    req = walk_forward_request(dataset)
+    print(f"Split mode from request: {req.mode}")
     print(f"Minimum fold count: {req.minimum_fold_count}")
 
     # 3. Build time series splits
@@ -42,11 +42,11 @@ def example_validation() -> None:
     print(f"Fold 0 leakage prevented: {splits[0].leakage_prevented}")
 
     # 4. Run walk-forward validation
-    adapter = FakeAdapter()
     wf_res = run_walk_forward_validation(req, adapter)
     print(
-        f"Walk-forward validation status: {wf_res.status}, "
-        f"pass rate: {wf_res.fold_pass_rate * 100:.1f}%"
+        f"Walk-forward validation on {len(dataset.records)} genuine MT5-derived ticks: "
+        f"status={wf_res.status}, pass rate={wf_res.fold_pass_rate * 100:.1f}%, "
+        f"fold evidence={wf_res.folds}"
     )
 
 

@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import IntEnum
+from typing import Any
 
 
 class EventImpact(IntEnum):
@@ -102,4 +103,40 @@ class EconomicEvent:
                 raise ValueError(detail)
 
 
-__all__ = ["EconomicEvent", "EventImpact"]
+def project_economic_event(event: EconomicEvent) -> dict[str, Any]:
+    """Return a detached, secret-safe projection of one normalized event.
+
+    Args:
+        event: Internal normalized economic event.
+
+    Returns:
+        Public scalar evidence preserving exact and raw provider values.
+    """
+    return {
+        "provider_event_id": event.id,
+        "provider": event.provider,
+        "name": event.name,
+        "category": event.category,
+        "country": event.country,
+        "currency": event.currency,
+        "scheduled_at": event.scheduled_at.isoformat(),
+        "impact": event.impact.name.lower(),
+        "actual": None if event.actual is None else str(event.actual),
+        "forecast": None if event.forecast is None else str(event.forecast),
+        "previous": None if event.previous is None else str(event.previous),
+        "revised_previous": (
+            None if event.revised_previous is None else str(event.revised_previous)
+        ),
+        "actual_raw": event.actual_raw,
+        "forecast_raw": event.forecast_raw,
+        "previous_raw": event.previous_raw,
+        "unit": event.unit,
+        "source": event.source,
+        "source_url": event.source_url,
+        "updated_at": (
+            None if event.updated_at is None else event.updated_at.isoformat()
+        ),
+    }
+
+
+__all__ = ["EconomicEvent", "EventImpact", "project_economic_event"]

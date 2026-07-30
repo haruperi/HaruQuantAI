@@ -1,4 +1,4 @@
-"""Integration evidence for WF-DATA-016 calendar acquisition and persistence."""
+"""Integration evidence for FEAT-DATA-11 calendar acquisition and persistence."""
 
 from __future__ import annotations
 
@@ -9,7 +9,9 @@ from app.services.data import (
     build_data_settings,
     build_scrape_options,
     data_settings_context,
+    save_scrape_result,
     scrape_economic_calendar,
+    scrape_result_to_dataframe,
 )
 
 
@@ -46,9 +48,9 @@ def test_calendar_scrape_cleans_projects_and_saves(tmp_path: Path) -> None:
         )
     )
 
+    frame = scrape_result_to_dataframe(result)
     with data_settings_context(build_data_settings(approved_storage_roots=(tmp_path,))):
-        result.save(tmp_path, "csv")
+        save_scrape_result(result, tmp_path, "csv")
 
-    assert len(result.events) == 1
-    assert len(result.to_dataframe()) == 1
+    assert len(frame) == 1
     assert len(tuple(tmp_path.glob("forexfactory_*.csv"))) == 1

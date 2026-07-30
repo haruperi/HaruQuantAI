@@ -1,6 +1,7 @@
 """Tests for all official Optimization public operations."""
 
 from decimal import Decimal
+from typing import Any
 
 from app.services.optimization.evidence import build_optimization_evidence
 from app.services.optimization.public_api import (
@@ -19,7 +20,6 @@ from app.services.optimization.public_api.contracts import (
     ExecutionStressAnalysisRequest,
 )
 from app.services.optimization.robustness import ExecutionStressRequest
-from app.utils import StandardResponse
 
 from tests.optimization.unit.test_evidence_contracts import evidence_request
 from tests.optimization.unit.test_ranking import _score
@@ -29,7 +29,7 @@ from tests.optimization.unit.test_sweep import FakeAdapter
 from tests.optimization.unit.test_validation_contracts import walk_forward_request
 
 
-def _data(response: StandardResponse[object]) -> object:
+def _data(response: Any) -> object:
     """Assert the exact success envelope and return its raw data."""
     assert set(response.model_dump()) == {
         "status",

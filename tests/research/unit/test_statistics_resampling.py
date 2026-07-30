@@ -2,23 +2,25 @@
 
 import numpy as np
 import pytest
-from app.services.research.contracts import StatisticalConfig
-from app.services.research.statistics import (
+from app.services.research import (
     block_bootstrap_ci,
     block_bootstrap_distribution,
+    create_research_value,
     permutation_test,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
-def _config() -> StatisticalConfig:
+def _config() -> object:
     """Build test statistical settings.
 
     Returns:
         Seeded bounded configuration.
     """
     logger.debug("Building Research resampling test config")
-    return StatisticalConfig(7, 100, 100, 2, 100, None)
+    return create_research_value("StatisticalConfig", 7, 100, 100, 2, 100, None)
 
 
 def test_distribution_is_seed_reproducible() -> None:
@@ -33,7 +35,7 @@ def test_distribution_is_seed_reproducible() -> None:
 def test_ci_rejects_non_finite_statistic() -> None:
     """Verify non-finite bootstrap statistics fail."""
     logger.debug("Testing Research bootstrap finite policy")
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValueError, match=r"."):
         block_bootstrap_ci(
             np.arange(5, dtype="float64"),
             statistic=lambda _: float("nan"),
@@ -45,5 +47,5 @@ def test_ci_rejects_non_finite_statistic() -> None:
 def test_permutation_rejects_empty_sample() -> None:
     """Verify permutation tests reject empty samples."""
     logger.debug("Testing Research permutation sample")
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValueError, match=r"."):
         permutation_test(0.0, np.asarray([]), alternative="two-sided", config=_config())

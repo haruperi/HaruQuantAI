@@ -1,14 +1,16 @@
 """WF-OPT-001 request packaging integration."""
 
 # ruff: noqa: INP001
-from app.services.optimization.public_api import (
+from app.services.optimization import (
     run_parameter_sweep,
     run_robustness_analysis,
 )
-from app.utils import logger
+from app.utils import get_logger
 from tests.optimization.unit.test_robustness_contracts import monte_carlo_request
 from tests.optimization.unit.test_search_contracts import search_request
 from tests.optimization.unit.test_sweep import FakeAdapter
+
+logger = get_logger(__name__)
 
 
 def test_optimization_and_robustness_requests_return_typed_evidence() -> None:

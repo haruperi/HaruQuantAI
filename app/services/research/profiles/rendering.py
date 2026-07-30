@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from itertools import pairwise
 from typing import TYPE_CHECKING
 
 from app.utils import get_logger
@@ -20,6 +21,7 @@ if TYPE_CHECKING:
 type JSONValue = (
     None | bool | int | float | str | list["JSONValue"] | Mapping[str, "JSONValue"]
 )
+_MIN_COMPARISON_PERIODS = 2
 
 
 def render_research_report(
@@ -103,6 +105,72 @@ def render_profile_comparison(
     return "\n".join(lines)
 
 
+def compare_research_profiles(
+    snapshots: tuple[ResearchProfileSnapshot, ...],
+) -> Mapping[str, JSONValue]:
+    """Compare compatible Research profiles across distinct periods.
+
+    Args:
+        snapshots: Two or more chronological profile snapshots.
+
+    Returns:
+        Detached period-over-period deltas and stability caveats.
+
+    Raises:
+        ValueError: If snapshots are insufficient, unordered, or incompatible.
+    """
+    logger.info("Comparing Research profiles across periods")
+    if len(snapshots) < _MIN_COMPARISON_PERIODS:
+        raise ValueError("RES_INPUT_INVALID", "PROFILE_COMPARISON_REQUIRES_TWO")
+    first = snapshots[0]
+    if any(item.schema_version != first.schema_version for item in snapshots[1:]):
+        raise ValueError("RES_INPUT_INVALID", "INCOMPATIBLE_SNAPSHOT_SCHEMA")
+    if any(
+        item.configuration_hash != first.configuration_hash for item in snapshots[1:]
+    ):
+        raise ValueError("RES_INPUT_INVALID", "INCOMPATIBLE_PROFILE_CONFIGURATION")
+    if len({item.dataset_hash for item in snapshots}) != len(snapshots):
+        raise ValueError("RES_INPUT_INVALID", "PROFILE_PERIODS_NOT_DISTINCT")
+    generated = tuple(item.generated_at for item in snapshots)
+    if generated != tuple(sorted(generated)):
+        raise ValueError("RES_INPUT_INVALID", "PROFILE_PERIODS_NOT_CHRONOLOGICAL")
+
+    comparisons: list[JSONValue] = []
+    readiness_changes = 0
+    for previous, current in pairwise(snapshots):
+        readiness_changed = previous.scorecard.readiness != current.scorecard.readiness
+        readiness_changes += int(readiness_changed)
+        comparisons.append(
+            {
+                "from_dataset_hash": previous.dataset_hash,
+                "to_dataset_hash": current.dataset_hash,
+                "from_generated_at": previous.generated_at.isoformat(),
+                "to_generated_at": current.generated_at.isoformat(),
+                "score_delta": round(
+                    current.scorecard.final_score - previous.scorecard.final_score,
+                    12,
+                ),
+                "readiness_changed": readiness_changed,
+                "warning_delta": len(current.warnings) - len(previous.warnings),
+            }
+        )
+    caveats: list[JSONValue] = [
+        "Comparisons are observational and advisory only.",
+        "Score changes do not establish causality or trading eligibility.",
+    ]
+    if readiness_changes:
+        caveats.append("Readiness changed across at least one adjacent period.")
+    return {
+        "schema_version": "v1",
+        "configuration_hash": first.configuration_hash,
+        "period_count": len(snapshots),
+        "comparisons": comparisons,
+        "readiness_stable": readiness_changes == 0,
+        "caveats": caveats,
+        "advisory_only": True,
+    }
+
+
 def generate_multi_symbol_report(
     reports: Mapping[str, ResearchReport],
     *,
@@ -158,6 +226,7 @@ def generate_multi_symbol_report(
 
 
 __all__ = (
+    "compare_research_profiles",
     "generate_multi_symbol_report",
     "render_profile_comparison",
     "render_research_report",

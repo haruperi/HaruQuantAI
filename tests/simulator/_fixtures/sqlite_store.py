@@ -25,7 +25,9 @@ from types import MappingProxyType
 
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.state import SIMULATION_MIGRATIONS, RunStatus
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+logger = get_logger(__name__)
 
 
 def _parse_canonical_event(canonical_event: str) -> tuple[dict[str, object], int]:

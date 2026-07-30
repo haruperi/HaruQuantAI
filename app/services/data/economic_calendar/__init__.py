@@ -21,8 +21,13 @@ from app.services.data.economic_calendar.calendar_state import (
     calendar_state_provenance,
     derive_calendar_state,
     populate_market_context_calendar,
+    project_calendar_state,
 )
-from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
+from app.services.data.economic_calendar.events import (
+    EconomicEvent,
+    EventImpact,
+    project_economic_event,
+)
 from app.services.data.economic_calendar.profiling import (
     SYMBOL_EVENT_PROFILES,
     SymbolEventProfile,
@@ -48,6 +53,7 @@ from app.services.data.economic_calendar.scraper import (
     ScrapeOptions,
     ScrapeResult,
     deserialize_scrape_result,
+    get_calendar_value_field,
     save_scrape_result,
     scrape_economic_calendar,
     scrape_result_to_dataframe,
@@ -62,6 +68,7 @@ from app.services.data.economic_calendar.service import (
 from app.services.data.economic_calendar.store import (
     EconomicEventStore,
     from_row,
+    persist_economic_events,
 )
 
 # Thin boundary helpers `normalize_calendar_number` and `parse_calendar_row`
@@ -95,13 +102,17 @@ __all__ = [
     "deserialize_scrape_result",
     "evaluate_calendar_state",
     "from_row",
+    "get_calendar_value_field",
     "get_economic_events",
     "get_persisted_events",
     "get_symbol_economic_events",
     "get_symbol_event_profile",
     "is_news_restricted",
     "is_news_restricted_events",
+    "persist_economic_events",
     "populate_market_context_calendar",
+    "project_calendar_state",
+    "project_economic_event",
     "save_scrape_result",
     "scrape_economic_calendar",
     "scrape_result_to_dataframe",

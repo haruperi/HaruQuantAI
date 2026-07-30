@@ -6,7 +6,9 @@ from app.services.analytics.contracts import (
     AnalyticsValidationError,
     to_analytics_error_payload,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def test_analytics_error_is_domain_base() -> None:

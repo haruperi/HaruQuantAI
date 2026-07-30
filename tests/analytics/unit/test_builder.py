@@ -5,9 +5,11 @@ from decimal import Decimal
 import pytest
 from app.services.analytics.contracts import AnalyticsValidationError, SectionEvidence
 from app.services.analytics.reports import builder
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
 
-from tests.analytics._support import NOW, _configured, _source_with_profit
+logger = get_logger(__name__)
+
+from tests.analytics._support import NOW, _configured, _source_with_profit  # noqa: E402
 
 
 def test_builder_fails_closed_on_required_section(

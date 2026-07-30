@@ -1,20 +1,25 @@
 """Unit tests for Research unsupervised insights (FR-RES-084 to 087)."""
 
 import pandas as pd
-from app.services.research import UnsupervisedResearchConfig
-from app.services.research.modeling import (
+import pytest
+from app.services.research import (
     analyze_cluster_outperformance,
     build_unsupervised_insight_report,
+    create_research_value,
     identify_pca_risk_factors,
     run_pca,
     summarize_investment_data,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
-def _config() -> UnsupervisedResearchConfig:
+def _config() -> object:
     """Build a modeling configuration."""
-    return UnsupervisedResearchConfig(("a", "b"), True, 2, 2, 20, 7)
+    return create_research_value(
+        "UnsupervisedResearchConfig", ("a", "b"), True, 2, 2, 20, 7
+    )
 
 
 def _features(rows: int = 25) -> pd.DataFrame:
@@ -64,3 +69,41 @@ def test_insight_report_has_no_signal_control() -> None:
     assert result["schema_version"] == "v1"
     assert result["signal_adaptation"] == "excluded"
     assert result["advisory_only"] is True
+
+
+def test_insight_helpers_reject_malformed_inputs_and_report_sparse_clusters() -> None:
+    """Cover descriptive, PCA-factor, label, horizon, and sparse branches."""
+    with pytest.raises(ValueError, match="EMPTY_INVESTMENT_DATA"):
+        summarize_investment_data(pd.DataFrame())
+    with pytest.raises(ValueError, match="INVALID_TOP_COUNT"):
+        identify_pca_risk_factors({}, top_count=0)
+    with pytest.raises(ValueError, match="MALFORMED_PCA_EVIDENCE"):
+        identify_pca_risk_factors({}, top_count=1)
+    factors = identify_pca_risk_factors(
+        {
+            "loadings": ["bad", [None, -0.5]],
+            "feature_columns": ["a", "b"],
+        },
+        top_count=2,
+    )
+    assert factors[0]["sign"] == "negative"
+    with pytest.raises(ValueError, match="CLOSE_COLUMN_REQUIRED"):
+        analyze_cluster_outperformance(
+            pd.DataFrame({"open": [1.0]}),
+            pd.Series([0]),
+            horizon=1,
+        )
+    with pytest.raises(ValueError, match="MISALIGNED_LABELS"):
+        analyze_cluster_outperformance(_ohlc(), pd.Series([0]), horizon=1)
+    with pytest.raises(ValueError, match="INVALID_HORIZON"):
+        analyze_cluster_outperformance(
+            _ohlc(),
+            pd.Series([0] * 25),
+            horizon=0,
+        )
+    sparse = analyze_cluster_outperformance(
+        _ohlc(),
+        pd.Series([0] * 23 + [1, 1]),
+        horizon=2,
+    )
+    assert sparse[1]["advisory"] == "sparse"

@@ -1,9 +1,9 @@
 """Integration test for the official Optimization boundary."""
 
 # ruff: noqa: INP001
-from app.services.optimization.public_api import (
-    OFFICIAL_OPTIMIZATION_TOOLS,
+from app.services.optimization import (
     compare_optimization_runs,
+    get_official_optimization_tools,
     run_parameter_sweep,
 )
 from tests.optimization.unit.test_search_contracts import search_request
@@ -20,4 +20,4 @@ def test_public_boundary_runs_and_compares_advisory_results() -> None:
     assert comparison_response.data is not None
     comparison = comparison_response.data
     assert comparison.search_ids == (first.search_id, second.search_id)
-    assert "run_parameter_sweep" in OFFICIAL_OPTIMIZATION_TOOLS
+    assert "run_parameter_sweep" in get_official_optimization_tools()

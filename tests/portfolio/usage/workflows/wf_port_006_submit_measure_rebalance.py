@@ -5,16 +5,15 @@ from __future__ import annotations
 import asyncio
 import sys
 from datetime import timedelta
+from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from tests.portfolio.unit.test_workflows import _plan, _service
+from app.services.portfolio import execute_portfolio_handle_operation
 from tests.portfolio.usage.workflows._support import (
     NOW,
-    active_allocation,
-    live_market_dataset,
-    settings,
+    rebalance_workflow,
 )
 
 WORKFLOW_ID = "WF-PORT-006"
@@ -37,11 +36,19 @@ def _stage(number: int) -> None:
 
 
 async def _run() -> None:
-    market = live_market_dataset()
-    active = active_allocation()
-    policy = settings()
-    service, recorder, _store = _service(active, NOW, policy)
-    plan = _plan(active, NOW, policy)
+    service, active, risk, eligibility, store, market = rebalance_workflow()
+    plan = execute_portfolio_handle_operation(
+        service,
+        "assess_drift",
+        active,
+        actual_exposures={"component-a": Decimal("1.15")},
+        evidence_as_of=NOW,
+        risk_decision=risk,
+        eligibility_decisions=eligibility,
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
+    )
     print(
         "INPUT BOUNDARY — current plan and MT5 evidence ref:",
         plan.plan_id,
@@ -66,7 +73,9 @@ async def _run() -> None:
 
     # Stage 5 — Measure immutable execution facts through Analytics.
     _stage(5)
-    result = await service.submit_rebalance(
+    result = await execute_portfolio_handle_operation(
+        service,
+        "submit_rebalance",
         plan,
         account_evidence_ref="account-1",
         market_evidence_ref=market.request_id,
@@ -85,7 +94,7 @@ async def _run() -> None:
 
     # Stage 7 — Demonstrate no second Trading submission was made.
     _stage(7)
-    assert recorder.trading_calls == 1
+    assert store.trading_calls == 1
     print("OUTPUT BOUNDARY — PortfolioRebalancePlan:", result.plan_version)
 
 

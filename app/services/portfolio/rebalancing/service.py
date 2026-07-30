@@ -13,7 +13,7 @@ from app.services.portfolio.contracts import (
     PortfolioRebalanceAction,
     PortfolioRebalancePlan,
 )
-from app.services.portfolio.exceptions import PortfolioError
+from app.services.portfolio.contracts.errors import PortfolioError
 from app.services.portfolio.rebalancing.cross_account import (
     CommonModeExposureReport,
     CrossAccountCorrelationReport,
@@ -29,7 +29,7 @@ AllocationRiskDecision = Any
 KillSwitchState = Any
 StrategyOperationalEligibilityDecision = Any
 if TYPE_CHECKING:
-    from app.services.portfolio.config import PortfolioSettings
+    from app.services.portfolio._settings import PortfolioSettings
     from app.services.portfolio.contracts import ActivePortfolioAllocation, PlanStatus
     from app.services.portfolio.state import AuditOutboxRecord, PortfolioRepository
 

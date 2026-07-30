@@ -76,7 +76,9 @@ def _float_setting(mapping: Mapping[str, JSONValue], key: str, detail: str) -> f
     """
     value = mapping.get(key)
     if isinstance(value, bool) or not isinstance(value, int | float):
-        raise ValueError("RES_INPUT_INVALID", detail)
+        raise ValueError(  # noqa: TRY004 - Research validation taxonomy.
+            "RES_INPUT_INVALID", detail
+        )
     output = float(value)
     if not np.isfinite(output):
         raise ValueError("RES_INPUT_INVALID", detail)

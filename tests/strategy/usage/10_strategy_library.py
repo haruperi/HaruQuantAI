@@ -707,11 +707,15 @@ def example_07_random_walk(market: object, point: Decimal) -> int:
     if snapshot is None:
         print("Fresh verified MT5 demo account evidence is unavailable.")
         return _UNAVAILABLE
-    tags = tuple(
+    observed_tags = tuple(
         f"{position.ownership_ref}:{'BUY' if position.side == 'LONG' else 'SELL'}"
         for position in snapshot.positions
         if position.ownership_ref is not None
     )
+    # Multiple broker positions may share one strategy ownership reference and
+    # side. Strategy evidence represents active ownership membership, so retain
+    # the first observed occurrence rather than inventing position identities.
+    tags = tuple(dict.fromkeys(observed_tags))
     context = _context("random-walk")
     parameters = {"buy_magic_number": 17001, "sell_magic_number": 17002}
     ref, config, evaluator = _binding(
@@ -733,7 +737,17 @@ def example_07_random_walk(market: object, point: Decimal) -> int:
     if outcome.data is None:
         print("RandomWalk evaluation failed:", outcome.error)
         return _UNAVAILABLE
-    print("Account snapshot:", snapshot.request_id, "positions:", len(tags))
+    print(
+        "Account snapshot:",
+        {
+            "request_id": snapshot.request_id,
+            "provider_positions": len(snapshot.positions),
+            "owned_position_tags": len(observed_tags),
+            "unique_position_tags": len(tags),
+            "duplicate_position_tags": len(observed_tags) - len(tags),
+            "active_tags": tags,
+        },
+    )
     for signal in outcome.data:
         print(signal.signal_name, "active=", signal.active)
     return 0

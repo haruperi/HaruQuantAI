@@ -24,8 +24,10 @@ from app.services.analytics.contracts import (
     build_quality_flag,
     build_warning,
 )
-from app.utils import logger
+from app.utils import get_logger
 from pydantic import ValidationError as PydanticValidationError
+
+logger = get_logger(__name__)
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 

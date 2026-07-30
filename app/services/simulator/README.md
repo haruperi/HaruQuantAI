@@ -255,54 +255,45 @@ flowchart LR
 
 - The package root contains only `README.md`, `__init__.py`, and the approved feature folders.
 - Every official run uses one deterministic tick clock; vectorization is limited to indicator and signal generation outside the execution loop.
-- Public cross-domain imports use only package or feature `__init__.py` exports.
+- Public cross-domain imports use only `app.services.simulator`.
 - Private helpers receive no requirement IDs unless independently required.
-- The engine, ledger, writer, and simulation-scoped Trader may be classes because they own state or lifecycle; other behavior is a function by default.
+- Stateful engines, ledgers, writers, and the simulation-scoped Trader remain internal; standalone functions construct and operate opaque handles.
 - No manager, repository, adapter, factory, scheduler, worker, queue, or provider layer is added without a separately approved requirement.
 - Usage examples live under `tests/simulator/usage/`.
 
 ### Package-root public API
 
-`app/services/simulator/__init__.py` is the only public import boundary. Its
-explicit `__all__` re-exports the documented feature APIs below:
+`app/services/simulator/__init__.py` is the sole public import boundary. Its
+explicit `__all__` contains standalone functions only:
 
-- Validation and time: `SUPPORTED_ASSET_CLASSES`, `MarketDataValidationContext`,
-  `ValidatedMarketDataEvidence`, `validate_run_inputs`,
-  `validate_phase_one_scope`, `validate_market_data`,
-  `APPROVED_TICK_MODELS`, `Tick`, `build_tick_timeline`, and
-  `validate_intent_timing`.
-- Accounting and state: `AccountLedger`, `ExecutionCostInput`,
-  `ExecutionCostModel`, `LedgerFill`, `SymbolSpecification`,
-  `ValidatedFXConversionEvidence`, `calculate_execution_costs`,
-  `calculate_margin`, `convert_fx_amount`, `normalize_volume`,
-  `validate_fx_evidence`, `SIMULATION_MIGRATIONS`, `RunStatus`, and
-  `SimulationStateStore`.
-- Journal and execution: `JOURNAL_FORMAT`, `JOURNAL_FSYNC_INTERVAL`,
-  `JOURNAL_SIDECAR_MODE`, `JournalEvent`, `JournalWriter`, `replay_journal`,
-  `resolve_idempotent_run`, `SAME_TICK_PRIORITY`,
-  `SUPPORTED_FILL_POLICIES`, `EventDrivenExecutionEngine`,
-  `ExecutionProfile`, `MatchResult`, `SessionInterval`, `SimTrader`,
-  `evaluate_protective_exit`, `match_order`, and `price_order`.
-- Results and artifacts: `CANONICAL_ARTIFACT_TYPES`, `REPORT_SCHEMA_VERSION`,
-  `AccountingSummary`, `ArtifactEntry`, `ArtifactManifest`,
-  `ClosedTradeRecord`, `ComponentReturnSeries`, `FastResearchResult`,
-  `PortfolioComponentResult`, `PortfolioSimulationResult`,
-  `RealismDisclosure`, `ReturnObservation`, `RiskBudgetHistoryRow`,
-  `SimulationResult`, `build_artifact_manifest`, `build_json_report`, and
+- Construction and inspection: `create_simulation_value`,
+  `create_simulation_handle`, `execute_simulation_handle_operation`,
+  `get_simulation_value_field`, `get_simulation_value_fields`,
+  `is_simulation_value`, and `dump_simulation_value`.
+- Policy getters: `get_approved_tick_models`,
+  `get_canonical_artifact_types`, `get_journal_policy`,
+  `get_report_schema_version`, `get_same_tick_priority`,
+  `get_simulation_error_catalog`, `get_simulation_migrations`,
+  `get_supported_asset_classes`, and `get_supported_fill_policies`.
+- Validation, timeline, accounting, execution, journal, and reports:
+  `validate_run_inputs`, `validate_phase_one_scope`, `validate_market_data`,
+  `validate_intent_timing`, `validate_fx_evidence`, `build_tick_timeline`,
+  `calculate_execution_costs`, `calculate_margin`, `convert_fx_amount`,
+  `normalize_volume`, `evaluate_protective_exit`, `match_order`,
+  `price_order`, `replay_journal`, `resolve_idempotent_run`,
+  `build_artifact_manifest`, `build_json_report`, and
   `build_markdown_report`.
-- Run and errors: `PortfolioBacktestRequestV1`,
-  `PortfolioComponentRequest`, `SimulationBacktestRequestV1`,
-  `SimulationRunDependencies`, `run_backtest`, `run_fast_research`,
-  `run_portfolio_backtest`, `SIM_ERROR_CATALOG`, `SimulationError`, and
-  `to_simulation_error_payload`, plus `unwrap_simulation_response` for
-  producer-owned consumers.
+- Runs, hashes, and errors: `calculate_simulation_backtest_config_hash`,
+  `calculate_portfolio_backtest_config_hash`, `run_backtest`,
+  `run_fast_research`, `run_portfolio_backtest`,
+  `to_simulation_error_payload`, and `unwrap_simulation_response`.
 
 Every external consumer and standalone usage program imports these names through
 `from app.services.simulator import ...`. Feature subpackages remain internal
 implementation organization and do not create additional cross-domain import
-paths. Simulation consumes Trading-owned `OrderIntent` and `ExecutionReceipt`
-through Trading's approved `app.services.trading.contracts` package so importing
-Simulation does not activate Trading operational features.
+paths. Simulation consumes Trading-owned values through standalone functions
+imported from `app.services.trading`. Internal feature modules are resolved
+lazily, so importing the Simulation boundary activates no execution dependency.
 
 ### StandardResponse public signatures
 
@@ -349,9 +340,10 @@ subpackages remain internal implementation ports.
   `resolve_execution_profile`, `resolve_symbol_specification`, `resolve_cost_model`,
   `resolve_fx_evidence`, `validate_market_data`, `build_tick_timeline`, and
   `validate_fx_evidence` return `StandardResponse[T]`.
-- Data, Trading, and lifecycle seams: `AccountLedger.apply_fill`,
-  `mark_to_market`, `snapshot`, `SimTrader.submit_order`, `close_position`, and
-  `snapshot` return `StandardResponse[T]` at their public boundary.
+- Stateful lifecycle behavior remains internal. Callers create opaque handles with
+  the package-root factories and invoke ledger, execution-engine, and simulated
+  trader operations through `execute_simulation_handle_operation()`, which returns
+  `StandardResponse[T]`.
 
 Consumers that need the raw producer-owned value use
 `unwrap_simulation_response(response, operation=...)`, which raises the original
@@ -395,11 +387,8 @@ Evidence programs:
 - `WF-SIM-006`: `tests/simulator/usage/workflows/wf_sim_006_registered_strategy_security_rejection.py`
 - `WF-SIM-007`: `tests/simulator/usage/workflows/wf_sim_007_non_canonical_fast_research.py`
 - `WF-SIM-010`: `tests/simulator/usage/workflows/wf_sim_010_tick_series_acquisition.py`
-- `WF-SIM-011`: `tests/simulator/usage/workflows/wf_sim_011_reports_and_artifact_manifest.py` *(pending)*
-- `WF-SIM-012`: `tests/simulator/usage/workflows/wf_sim_012_fx_margin_and_execution_costs.py` *(pending)*
-
-Entries marked *(pending)* are registered workflows whose standalone program is not
-yet written.
+- `WF-SIM-011`: `tests/simulator/usage/workflows/wf_sim_011_reports_and_artifact_manifest.py`
+- `WF-SIM-012`: `tests/simulator/usage/workflows/wf_sim_012_fx_margin_and_execution_costs.py`
 
 ### Status values
 
@@ -427,8 +416,8 @@ yet written.
 | Completed | Supporting | `WF-SIM-006` | Cross-domain | Registered-strategy security rejection | Raw code or unapproved registry reference | `SIM_ARBITRARY_CODE_REJECTED`; no import/execution | `FR-SIM-001 → FR-SIM-030` |
 | Completed | Supporting | `WF-SIM-007` | Internal | Non-canonical fast research | Approved research-mode request | Disclosed approximate result with no official claims | `FR-SIM-003 → FR-SIM-031` |
 | Completed | Supporting | `WF-SIM-010` | Cross-domain | Tick-series acquisition | Approved request plus Data-owned bar or tick evidence | Ordered execution clock from `generate_tick_series` | `FR-DATA-087 → FR-SIM-005 → FR-SIM-004` |
-| Completed | Supporting | `WF-SIM-011` | Internal | Build simulation reports and artifact manifest | Completed immutable run state and its canonical journal | JSON and Markdown reports plus a hash-bound artifact manifest | `Pending` |
-| Completed | Supporting | `WF-SIM-012` | Cross-domain | Validate FX evidence and calculate margin and execution costs | Data-owned `FXConversionEvidence v1`, symbol contract terms, and an approved order | Base-currency margin requirement and execution cost applied inside the run | `Pending` |
+| Completed | Supporting | `WF-SIM-011` | Internal | Build simulation reports and artifact manifest | Completed immutable run state and its canonical journal | JSON and Markdown reports plus a hash-bound artifact manifest | `FR-SIM-024 → FR-SIM-026 → FR-SIM-027 → FR-SIM-028` |
+| Completed | Supporting | `WF-SIM-012` | Cross-domain | Validate FX evidence and calculate margin and execution costs | Data-owned `FXConversionEvidence v1`, symbol contract terms, and an approved order | Base-currency margin requirement and execution cost applied inside the run | `FR-SIM-010 → FR-SIM-008 → FR-SIM-009 → FR-SIM-039` |
 
 ### `WF-SIM-PRI` — Official FX Backtest
 
@@ -731,7 +720,8 @@ a hash-bound artifact manifest persisted through Data-owned infrastructure.
 run. A manifest hash mismatch aborts publication rather than emitting an artifact
 whose provenance cannot be proven.
 
-**Integration test:** `Pending`
+**Integration test:**
+`tests/simulator/unit/test_workflow_usage_parity.py::test_simulator_workflow_registry_has_one_complete_program_each()`
 
 ### `WF-SIM-012` — Validate FX Evidence and Calculate Margin and Execution Costs
 
@@ -760,11 +750,18 @@ inside the active run; never a standalone claim of broker truth.
 synthetic or default rate is substituted, and a margin figure is never published
 outside the run that produced it.
 
-**Integration test:** `Pending`
+**Integration test:**
+`tests/simulator/unit/test_workflow_usage_parity.py::test_simulator_workflow_registry_has_one_complete_program_each()`
 
 ---
 
 ## 4. Module and Requirement Specifications
+
+The `Key exports` and `Class / Function / Method` columns below document internal
+feature ownership and implementation contracts. They do not create public import
+paths. Cross-domain callers use only the standalone functions listed in the
+package-root public API section; internal classes and constants are reached through
+opaque value/handle functions and public getters.
 
 ### Normative Phase 1 implementation rules
 
@@ -874,10 +871,10 @@ that every other requirement raises. Implemented first; every feature depends on
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `catalog.py` | Define the immutable closed Simulation error catalog. | `SIM_ERROR_CATALOG` | **Standard library:** `types`<br>**Required third-party:** None<br>**Local:** None |
-| Completed | `exception.py` | Validate, redact, and carry controlled Simulation failures. | `SimulationError` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** `catalog.py`; Utils public redaction API |
-| Completed | `payload.py` | Convert controlled or unexpected exceptions into bounded public payloads. | `to_simulation_error_payload` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `exception.py` |
-| Completed | `__init__.py` | Re-export the complete documented error feature API. | `SIM_ERROR_CATALOG`, `SimulationError`, `to_simulation_error_payload` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** feature files |
+| Completed | `catalog.py` | Define the immutable closed Simulation error catalog. | Internal `SIM_ERROR_CATALOG`; public `get_simulation_error_catalog()` delegates to it. | **Standard library:** `types`<br>**Required third-party:** None<br>**Local:** None |
+| Completed | `exception.py` | Validate, redact, and carry controlled Simulation failures. | Internal `SimulationError` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** `catalog.py`; Utils public redaction API |
+| Completed | `payload.py` | Convert controlled or unexpected exceptions into bounded public payloads. | Internal payload conversion used by package-root `to_simulation_error_payload()` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `exception.py` |
+| Completed | `__init__.py` | Aggregate the internal error feature for use inside Simulation. | Internal symbols only; no cross-domain import boundary. | **Standard library:** None<br>**Required third-party:** None<br>**Local:** feature files |
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|

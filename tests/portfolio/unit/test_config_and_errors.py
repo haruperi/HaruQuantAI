@@ -6,14 +6,17 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
-from app.services.portfolio.config import PortfolioSettings, RebalanceSchedule
-from app.services.portfolio.exceptions import (
+from app.services.portfolio._settings import PortfolioSettings, RebalanceSchedule
+from app.services.portfolio.contracts.errors import (
     PORTFOLIO_ERROR_CATALOG,
     PortfolioError,
     PortfolioErrorPayload,
 )
-from app.utils import HaruQuantError, logger
+from app.utils import get_logger
 from pydantic import ValidationError
+
+HaruQuantError = Exception
+logger = get_logger(__name__)
 
 
 def test_settings_have_no_business_defaults(monkeypatch: pytest.MonkeyPatch) -> None:

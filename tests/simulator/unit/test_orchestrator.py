@@ -8,32 +8,30 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from app.services.data.contracts import (
-    DataQualityReport,
-    MarketDataset,
-    TickRecord,
-)
-from app.services.data.evidence.fx_contracts import (
-    FXConversionEvidence,
-    FXRateLeg,
+from app.services.data import (
+    build_data_quality_report,
+    build_fx_conversion_evidence,
+    build_fx_rate_leg,
+    build_market_dataset,
+    build_tick_record,
 )
 from app.services.simulator.accounting import ExecutionCostModel, SymbolSpecification
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.execution import ExecutionProfile, SessionInterval
 from app.services.simulator.run import SimulationBacktestRequestV1, run_backtest
 from app.services.trading import create_order_intent
-from app.utils import AuditEvent, AuthContext, canonical_json
+from app.utils import canonical_json, create_auth_context
 
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 OrderIntent = Any
 
 
-def _dataset(request_id: str) -> MarketDataset:
+def _dataset(request_id: str) -> Any:
     """Build a two-tick official Data dataset."""
     start = datetime(2025, 1, 6, 12, tzinfo=UTC)
     records = tuple(
-        TickRecord(
+        build_tick_record(
             timestamp=start + timedelta(seconds=index),
             source="fixture",
             source_symbol="EURUSD",
@@ -47,7 +45,7 @@ def _dataset(request_id: str) -> MarketDataset:
         )
         for index in range(2)
     )
-    quality = DataQualityReport(
+    quality = build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
         record_count=2,
@@ -57,7 +55,7 @@ def _dataset(request_id: str) -> MarketDataset:
         schema_version="v1",
         generated_at=records[-1].available_at,
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="ticks",
         symbol="EURUSD",
@@ -77,7 +75,7 @@ def _dataset(request_id: str) -> MarketDataset:
     )
 
 
-def _fx_evidence(dataset: MarketDataset) -> FXConversionEvidence:
+def _fx_evidence(dataset: Any) -> Any:
     """Build one fresh Data-owned FX evidence fixture.
 
     Args:
@@ -87,7 +85,7 @@ def _fx_evidence(dataset: MarketDataset) -> FXConversionEvidence:
         Fresh direct EUR/USD conversion evidence.
     """
     instant = dataset.start
-    leg = FXRateLeg(
+    leg = build_fx_rate_leg(
         source_currency="EUR",
         target_currency="USD",
         rate=Decimal("1.10"),
@@ -96,7 +94,7 @@ def _fx_evidence(dataset: MarketDataset) -> FXConversionEvidence:
         as_of=instant,
         provenance={"provider": "fixture"},
     )
-    return FXConversionEvidence(
+    return build_fx_conversion_evidence(
         source_currency="EUR",
         target_currency="USD",
         legs=(leg,),
@@ -110,7 +108,7 @@ def _fx_evidence(dataset: MarketDataset) -> FXConversionEvidence:
     )
 
 
-def _data_hash(dataset: MarketDataset) -> str:
+def _data_hash(dataset: Any) -> str:
     """Hash a dataset with the official validation convention."""
     return sha256(
         canonical_json(dataset.model_dump(mode="python", warnings=False)).encode(
@@ -120,7 +118,7 @@ def _data_hash(dataset: MarketDataset) -> str:
 
 
 def _request(
-    dataset: MarketDataset,
+    dataset: Any,
     *,
     runtime_profile: str = "simulation",
     canonical: bool = True,
@@ -178,9 +176,9 @@ def _request(
     return SimulationBacktestRequestV1.model_validate(payload)
 
 
-def _auth(request: SimulationBacktestRequestV1) -> AuthContext:
+def _auth(request: SimulationBacktestRequestV1) -> Any:
     """Build matching authenticated run authority."""
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="simulator-test",
@@ -201,7 +199,7 @@ class FakeDependencies:
 
     fast_research_enabled = True
 
-    def __init__(self, tmp_path: Path, dataset: MarketDataset) -> None:
+    def __init__(self, tmp_path: Path, dataset: Any) -> None:
         """Initialize fixture state and evidence.
 
         Args:
@@ -213,9 +211,9 @@ class FakeDependencies:
             tmp_path / "state.db", self.artifact_root
         )
         self.dataset = dataset
-        self.audit_events: list[AuditEvent] = []
+        self.audit_events: list[Any] = []
 
-    def persist_audit_event(self, event: AuditEvent) -> None:
+    def persist_audit_event(self, event: Any) -> None:
         """Persist one audit event in the bounded fixture list.
 
         Args:
@@ -223,20 +221,20 @@ class FakeDependencies:
         """
         self.audit_events.append(event)
 
-    def load_market_data(self, request: SimulationBacktestRequestV1) -> MarketDataset:
+    def load_market_data(self, request: SimulationBacktestRequestV1) -> Any:
         """Return referenced market evidence."""
         del request
         return self.dataset
 
     def generate_tick_series(
-        self, dataset: MarketDataset, request: SimulationBacktestRequestV1
-    ) -> MarketDataset:
+        self, dataset: Any, request: SimulationBacktestRequestV1
+    ) -> Any:
         """Return Data's already-real tick evidence."""
         del request
         return dataset
 
     def calculate_indicators(
-        self, dataset: MarketDataset, request: SimulationBacktestRequestV1
+        self, dataset: Any, request: SimulationBacktestRequestV1
     ) -> tuple[object, ...]:
         """Record an empty valid Indicator set for this fixture."""
         del dataset, request
@@ -244,7 +242,7 @@ class FakeDependencies:
 
     def evaluate_strategy(
         self,
-        dataset: MarketDataset,
+        dataset: Any,
         indicators: tuple[object, ...],
         request: SimulationBacktestRequestV1,
     ) -> tuple[object, ...]:
@@ -336,9 +334,7 @@ class FakeDependencies:
             short_swap_per_lot_rollover=Decimal(0),
         )
 
-    def resolve_fx_evidence(
-        self, evidence_ids: tuple[str, ...]
-    ) -> Mapping[str, FXConversionEvidence]:
+    def resolve_fx_evidence(self, evidence_ids: tuple[str, ...]) -> Mapping[str, Any]:
         """Return one fresh Data-owned FX evidence record per identifier."""
         return {evidence_id: _fx_evidence(self.dataset) for evidence_id in evidence_ids}
 
@@ -371,7 +367,7 @@ def test_run_backtest_maps_internal_failure(tmp_path: Path) -> None:
     request = _request(dataset)
     dependencies = FakeDependencies(tmp_path, dataset)
 
-    def fail_load(request_value: SimulationBacktestRequestV1) -> MarketDataset:
+    def fail_load(request_value: SimulationBacktestRequestV1) -> Any:
         """Inject an unexpected read failure."""
         del request_value
         raise RuntimeError("provider secret")
@@ -389,6 +385,8 @@ def test_run_backtest_publishes_completed_result(tmp_path: Path) -> None:
     dependencies = FakeDependencies(tmp_path, dataset)
     result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
     assert result.status == "completed"
+    assert len(result.closed_trades) == 1
+    assert result.closed_trades[0].exit_time >= result.closed_trades[0].entry_time
     assert (dependencies.artifact_root / result.run_id / "manifest.json").is_file()
 
 
@@ -477,7 +475,7 @@ def test_run_backtest_persists_failed_audit_event(tmp_path: Path) -> None:
     request = _request(dataset, suffix="6")
     dependencies = FakeDependencies(tmp_path, dataset)
 
-    def fail_load(request_value: SimulationBacktestRequestV1) -> MarketDataset:
+    def fail_load(request_value: SimulationBacktestRequestV1) -> Any:
         del request_value
         raise RuntimeError("provider-secret")
 
@@ -500,7 +498,7 @@ def test_run_backtest_fails_closed_when_audit_persistence_fails(
     request = _request(dataset, suffix="3")
     dependencies = FakeDependencies(tmp_path, dataset)
 
-    def fail_audit(event: AuditEvent) -> None:
+    def fail_audit(event: Any) -> None:
         del event
         raise OSError("audit store unavailable")
 

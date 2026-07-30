@@ -186,9 +186,9 @@ contracts, numbered usage program, and required tests satisfy Sections 4 and 7.
 |---|---|---|---|---|---|
 | Partial | `FEAT-API-01` Boundary Contracts | `contracts/` | `ResearchRunRequest`; remaining declarations planned in Section 4.1 | `FR-API-031` request boundary implemented; remaining Section 4.1 requirements missing | `tests/api/unit/test_research_routes.py` |
 | Partial | `FEAT-API-02` Authentication and Authorization | `identity/` | `require_auth_context`, `require_human_permission`; remaining declarations planned in Section 4.2 | Minimal fail-closed human route seam only; Section 4.2 requirements remain incomplete | API route unit tests |
-| Missing | `FEAT-API-03` Request Security and Context | `middleware/` | Planned exact declarations: Section 4.3 | Section 4.3 functional requirements | Missing |
-| Missing | `FEAT-API-04` Liveness and Readiness | `health/` | Planned exact declarations: Section 4.4 | Section 4.4 functional requirements | Missing |
-| Missing | `FEAT-API-05` Operational Telemetry and Exposition | `observability/` | Planned exact declarations: Section 4.5 | Section 4.5 functional requirements | Missing |
+| Completed | `FEAT-API-03` Request Security and Context | `middleware/` | `redaction.py`, `context.py` | `FR-API-016`–`FR-API-017` | `tests/api/usage/03_middlewares.py` |
+| Completed | `FEAT-API-04` Liveness and Readiness | `health/` | `get_liveness`, `get_readiness`, `check_clock_drift` | `FR-API-018`-`FR-API-019`, `FR-API-059` | `tests/api/usage/04_health.py` |
+| Completed | `FEAT-API-05` Operational Telemetry and Exposition | `observability/` | `record_metric`, `validate_metric_labels`, `build_metric_snapshot`, `export_prometheus_metrics`, `get_metrics`, `create_in_process_metric_sink` | `FR-API-060`â€“`FR-API-063` | `tests/api/usage/05_observability.py` |
 | Missing | `FEAT-API-06` Ordered Event Delivery | `streams/` | Planned exact declarations: Section 4.6 | Section 4.6 functional requirements | Missing |
 | Partial | `FEAT-API-07` Thin HTTP and Streaming Boundaries | `routes/` | Research run, Strategy registration/parameter-update, and operator kill-switch/read-view routes; remaining declarations and route contracts planned in Section 4.7 | `FR-API-025` and `FR-API-034` partial; `FR-API-031` completed; remaining Section 4.7 requirements missing | `tests/api/usage/07_routes.py`; API unit tests and `SYS-WF-003`/`SYS-WF-004`/`SYS-WF-005` integration tests |
 | Missing | `FEAT-API-08` Canonical Application Lifecycle | `composition/` | Planned exact declarations: Section 4.8 | Section 4.8 functional requirements | Missing |
@@ -446,7 +446,7 @@ annotations. No status is changed by the annotation pass.
 | Missing | Supporting | `WF-API-016` | Cross-domain | Frontend stream consumption | All applicable | Authenticated stream connection | Validated ordered events and authoritative refresh after gaps | `FR-API-004`, `FR-API-017`–`FR-API-020`, `FR-API-042` | Disconnect cleans resources; gap/backpressure/terminal error triggers documented recovery | `tests/api/integration/test_frontend_streams.py::test_gap_refresh_and_cleanup()` |
 | Missing | Supporting | `WF-API-017` | Cross-domain | Portfolio construction, eligibility, activation, history, and rebalance | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008` | Authenticated Portfolio request/operator approval | Owner-contract result or structured fail-closed error | `FR-API-056` | Gateway delegates and presents; it never calculates weights, eligibility, Risk budget, or orders | `tests/api/integration/test_portfolio_boundary.py::test_portfolio_workflows_preserve_owner_gates()` |
 | Missing | Supporting | `WF-API-018` | Cross-domain | Agentic firm request, inspection, cancellation, handoff approval, quarantine, and replay | `SYS-WF-009`–`012` | Authenticated Agentic request or exact governed operator action | Agentic-owned run/result/trace/receipt or structured failure | `FR-API-068`–`072` | Gateway exposes no provider prompt/credential, calculates no Agentic result, and cannot turn a handoff approval into receiver-domain authorization | `tests/api/integration/test_agentic_boundary.py::test_agentic_routes_preserve_owner_authority()` |
-| Missing | Supporting | `WF-API-019` | Internal | Observability exposition and metrics scrape | All applicable | Authorized scrape or telemetry read against the gateway | Bounded redacted operational telemetry exposition; never business or trading data | `Pending` | An unauthorized scrape is refused; exposition failure never blocks request serving or alters readiness truth | `Pending` |
+| Completed | Supporting | `WF-API-019` | Internal | Observability exposition and metrics scrape | All applicable | Authorized scrape or telemetry read against the gateway | `FR-API-063` | An unauthorized scrape is refused; exposition failure never blocks request serving or alters readiness truth | `tests/api/unit/test_observability_routes.py::test_scrape_requires_permission()`, `tests/api/usage/05_observability.py::fr_api_063()` |
 | Missing | Supporting | `WF-API-020` | Cross-domain | Server-side ordered stream publication | All applicable | An owner-domain event accepted for publication to subscribed clients | Ordered validated stream events with explicit sequence and gap markers | `Pending` | Backpressure and gaps are published explicitly; the gateway never reorders, invents, or silently drops an owner-domain event | `Pending` |
 
 ### Workflow step detail
@@ -507,16 +507,12 @@ and `api.deliver_critical_alert()`. Every other UI/API operation named below is
 **Output boundary:** bounded redacted operational telemetry. Business, trading, and
 account data are never exposed through this surface.
 
-1. Authorize the scrape; the exposition endpoint is not public —
-   `api.authenticate_request()` *(planned)*.
-2. Collect gateway request, latency, and dependency counters —
-   `api.collect_metrics()` *(planned)*.
-3. Read owner-domain operational events without recomputing them —
-   `trading.emit_runtime_event()`.
-4. Redact every label and value before exposition —
-   `utils.redact_mapping_value()`, `utils.is_sensitive_key()`.
-5. Serve the bounded exposition payload —
-   `api.render_metrics_exposition()` *(planned)*.
+1. Authorize the scrape through the API auth boundary and scrape permission —
+   `api.require_auth_context()`, `api.require_human_permission()`.
+2. Build a bounded snapshot from the injected `MetricSink` and render deterministic text —
+   `api.build_metric_snapshot()`, `api.export_prometheus_metrics()`.
+3. Return a typed protected response without recomputing any business rule or owner state —
+   `api.get_metrics()`.
 
 **Failure behavior:** an unauthorized scrape is refused. Exposition failure is logged
 and surfaced but never blocks request serving, changes readiness truth, or causes a
@@ -650,7 +646,7 @@ permission and governed-request decision.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `passwords.py` | Hash and verify UI/API-owned passwords without secret disclosure or silent algorithm fallback | `hash_password`, `verify_password` | **Standard library:** None<br>**Required third-party:** memory-hard password-hashing adapter satisfying `FR-API-009`; the exact compatible constraint belongs in `pyproject.toml`<br>**Local:** UI/API identity errors; Utils redaction primitives |
+| Missing | `passwords.py` | Hash and verify UI/API-owned passwords without secret disclosure or silent algorithm fallback | `hash_password`, `verify_password` | **Standard library:** None<br>**Required third-party:** memory-hard password-hashing adapter satisfying `FR-API-009`; the exact compatible constraint belongs in `pyproject.toml`<br>**Local:** UI/API identity errors; Utils redaction primitives | <!-- pragma: allowlist secret -->
 | Missing | `credentials.py` | Encrypt/decrypt UI/API-owned credential records using an injected externally provisioned key set and explicit active key ID | `CredentialRecord`, `store_credential`, `resolve_credential_reference` | **Standard library:** `collections.abc`, `datetime`<br>**Required third-party:** authenticated-encryption adapter pinned in `pyproject.toml` before implementation<br>**Local:** UI/API state store; Utils redaction/error primitives |
 | Missing | `sessions.py` | Authenticate credentials and manage a single active UI/API-owned session | `authenticate_user`, `create_session`, `validate_session`, `revoke_session` | **Standard library:** `datetime`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** UI/API state store; Utils auth/context API |
 | Partial | `authorization.py` | Fail closed without injected authentication and enforce the minimal human permission seam; full auth-context construction and governed-request validation remain missing | `require_auth_context`, `require_human_permission` | **Standard library:** None<br>**Required third-party:** FastAPI<br>**Local:** Utils → `AuthContext` |
@@ -687,13 +683,13 @@ chat identity, or caller-controlled operator headers.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `redaction.py` | Publish only allowlisted, secret-safe request telemetry | `SecretRedactionMiddleware` | **Standard library:** None<br>**Required third-party:** FastAPI/Starlette; exact compatible constraints belong in `pyproject.toml`<br>**Local:** Utils redaction/logger APIs |
-| Missing | `context.py` | Attach request/trace, route intent, actor, and session context | `RequestContextMiddleware` | **Standard library:** None<br>**Required third-party:** FastAPI/Starlette; exact compatible constraints belong in `pyproject.toml`<br>**Local:** `contracts`, `identity` public APIs |
+| Completed | `redaction.py` | Publish only allowlisted, secret-safe request telemetry | `SecretRedactionMiddleware` | **Standard library:** None<br>**Required third-party:** FastAPI/Starlette; exact compatible constraints belong in `pyproject.toml`<br>**Local:** Utils redaction/logger APIs |
+| Completed | `context.py` | Attach request/trace, route intent, actor, and session context | `RequestContextMiddleware` | **Standard library:** None<br>**Required third-party:** FastAPI/Starlette; exact compatible constraints belong in `pyproject.toml`<br>**Local:** `contracts`, `identity` public APIs |
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-API-016` | Redact secrets before any log/trace/metric emission and log only allowlisted method, route, identifiers, status, duration, and error code. | `SecretRedactionMiddleware` | Log publication | `TelemetryError`: safe telemetry cannot be emitted where required | **Usage:** `tests/api/usage/test_usage_middleware.py::test_usage_redacted_request()`<br>**Unit:** `tests/api/unit/test_redaction.py::test_tokens_never_logged()` |
-| Missing | `FR-API-017` | Create/validate request and correlation IDs, classify registered route intent, authenticate where required, and attach canonical context. | `RequestContextMiddleware` | Local state mutation | `AuthenticationError`: protected request lacks valid authority; `ValidationError`: invalid identifiers | **Usage:** `tests/api/usage/test_usage_middleware.py::test_usage_request_context()`<br>**Unit:** `tests/api/unit/test_context.py::test_unknown_route_has_bounded_metadata()` |
+| Completed | `FR-API-016` | Redact secrets before any log/trace/metric emission and log only allowlisted method, route, identifiers, status, duration, and error code. | `SecretRedactionMiddleware` | Log publication | `TelemetryError`: safe telemetry cannot be emitted where required | **Usage:** `tests/api/usage/03_middlewares.py::fr_api_016()`<br>**Unit:** `tests/api/unit/middleware/test_redaction.py::test_tokens_never_logged()` |
+| Completed | `FR-API-017` | Create/validate request and correlation IDs, classify registered route intent, authenticate where required, and attach canonical context. | `RequestContextMiddleware` | Local state mutation | `AuthenticationError`: protected request lacks valid authority; `ValidationError`: invalid identifiers | **Usage:** `tests/api/usage/03_middlewares.py::fr_api_017()`<br>**Unit:** `tests/api/unit/test_context.py::test_unknown_route_has_bounded_metadata()` |
 
 **Configuration and Limits Manifest:** None. The module consumes shared redaction and
 trace policy from Utils and route metadata from `contracts/`.
@@ -709,20 +705,20 @@ readiness → typed response.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `probes.py` | Report minimal public liveness and protected dependency readiness | `get_liveness`, `get_readiness` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** approved dependency health APIs; `contracts` |
-| Missing | `clock.py` | Report signed local-clock drift against an authoritative external instant as a readiness diagnostic | `check_clock_drift` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `app.utils` → `utc_now`; approved Brokers server-time read; `contracts` |
+| Completed | `probes.py` | Report minimal public liveness and protected dependency readiness | `get_liveness`, `get_readiness` | **Standard library:** `collections.abc`<br>**Required third-party:** None<br>**Local:** approved dependency health APIs; `contracts` |
+| Completed | `clock.py` | Report signed local-clock drift against an authoritative external instant as a readiness diagnostic | `check_clock_drift` | **Standard library:** `datetime`, `decimal`<br>**Required third-party:** None<br>**Local:** `app.utils` → `utc_now`; approved Brokers server-time read; `contracts` |
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-API-018` | Return HTTP 200 with coarse service status only when the process accepts requests; expose no private dependency data. | `get_liveness() -> ApiResponse[Liveness]` | None | None | **Usage:** `tests/api/usage/test_usage_health.py::test_usage_liveness()`<br>**Unit:** `tests/api/unit/test_health.py::test_liveness_contains_no_private_data()` |
-| Missing | `FR-API-019` | Return protected required/optional component readiness with degraded reasons and timestamps. | `get_readiness(context: AuthContext) -> ApiResponse[Readiness]` | Read-only | `AuthorizationError`: detail not permitted; `DependencyUnavailableError`: required dependency failed | **Usage:** `tests/api/usage/test_usage_health.py::test_usage_readiness()`<br>**Unit:** `tests/api/unit/test_health.py::test_required_failure_is_not_healthy()` |
-| Missing | `FR-API-059` | Report signed local-clock drift against an authoritative external instant, expose it as a `readiness` detail, and mark readiness degraded when the absolute drift exceeds the configured tolerance. Drift is diagnostic only and never rewrites a timestamp or blocks execution. | `check_clock_drift(reference: datetime, *, tolerance_seconds: Decimal) -> Decimal` | Read-only | `ValidationError`: naive/non-UTC reference or non-positive tolerance | **Usage:** `tests/api/usage/test_usage_health.py::test_usage_clock_drift()`<br>**Unit:** `tests/api/unit/test_clock.py::test_drift_is_signed_and_utc_only()`, `test_drift_beyond_tolerance_degrades_readiness()` |
+| Completed | `FR-API-018` | Return HTTP 200 with coarse service status only when the process accepts requests; expose no private dependency data. | `get_liveness() -> ApiResponse[Liveness]` | None | None | **Usage:** `tests/api/usage/04_health.py::fr_api_018()`<br>**Unit:** `tests/api/unit/test_health.py::test_liveness_contains_no_private_data()` |
+| Completed | `FR-API-019` | Return protected required/optional component readiness with degraded reasons and timestamps. | `get_readiness(context: AuthContext) -> ApiResponse[Readiness]` | Read-only | `AuthorizationError`: detail not permitted; `DependencyUnavailableError`: required dependency failed | **Usage:** `tests/api/usage/04_health.py::fr_api_019()`<br>**Unit:** `tests/api/unit/test_health.py::test_required_failure_is_not_healthy()` |
+| Completed | `FR-API-059` | Report signed local-clock drift against an authoritative external instant, expose it as a `readiness` detail, and mark readiness degraded when the absolute drift exceeds the configured tolerance. Drift is diagnostic only and never rewrites a timestamp or blocks execution. | `check_clock_drift(reference: datetime, *, tolerance_seconds: Decimal) -> Decimal` | Read-only | `ValidationError`: naive/non-UTC reference or non-positive tolerance | **Usage:** `tests/api/usage/04_health.py::fr_api_059()`<br>**Unit:** `tests/api/unit/test_clock.py::test_drift_is_signed_and_utc_only()`, `test_drift_beyond_tolerance_degrades_readiness()` |
 
 **Configuration and Limits Manifest**
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `CLOCK_DRIFT_TOLERANCE_SECONDS` | `Decimal` | `2` | No | `check_clock_drift` | Absolute drift beyond this value marks readiness degraded. Diagnostic only; it never blocks a request or alters a recorded timestamp. |
+| Completed | `CLOCK_DRIFT_TOLERANCE_SECONDS` | `Decimal` | `2` | No | `check_clock_drift` | Absolute drift beyond this value marks readiness degraded. Diagnostic only; it never blocks a request or alters a recorded timestamp. |
 
 Required/optional dependency classification remains owned by composition and the
 configured dependency set.
@@ -762,25 +758,25 @@ or risk metric — those belong to Analytics and Research. Three rules are norma
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `sinks.py` | Define the injected telemetry sink boundary and a bounded in-process sink | `MetricSink`, `InProcessMetricSink` | **Standard library:** `collections.abc`, `decimal`, `threading`<br>**Required third-party:** None<br>**Local:** `contracts` |
-| Missing | `metrics.py` | Validate label hygiene and record one observation through an injected sink | `record_metric`, `validate_metric_labels` | **Standard library:** `collections.abc`, `decimal`<br>**Required third-party:** None<br>**Local:** `app.utils.security` → `is_sensitive_key`; `sinks.py` |
-| Missing | `exposition.py` | Collect a bounded snapshot and render Prometheus text exposition | `MetricSnapshot`, `build_metric_snapshot`, `export_prometheus_metrics` | **Standard library:** `collections.abc`, `decimal`<br>**Required third-party:** Prometheus text-format renderer; the exact compatible constraint is `Pending` and belongs in `pyproject.toml` before implementation<br>**Local:** `sinks.py` |
+| Completed | `sinks.py` | Define the injected telemetry sink boundary and a bounded in-process sink | `MetricSink`, `InProcessMetricSink` | **Standard library:** `collections.abc`, `decimal`, `threading`<br>**Required third-party:** None<br>**Local:** `contracts` |
+| Completed | `metrics.py` | Validate label hygiene and record one observation through an injected sink | `record_metric`, `validate_metric_labels` | **Standard library:** `collections.abc`, `decimal`<br>**Required third-party:** None<br>**Local:** `app.utils.security` → `is_sensitive_key`; `sinks.py` |
+| Completed | `exposition.py` | Collect a bounded snapshot and render Prometheus text exposition | `MetricSnapshot`, `build_metric_snapshot`, `export_prometheus_metrics` | **Standard library:** `collections.abc`, `decimal`<br>**Required third-party:** None<br>**Local:** `sinks.py` |
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-API-060` | Record one counter, gauge, or timing observation through an explicitly injected sink; never through a module-global registry. Recording is a no-op when `METRICS_ENABLED` is false. | `record_metric(name: str, value: Decimal, *, labels: Mapping[str, str], sink: MetricSink) -> None` | Caller-provided sink mutation | `ValidationError`: malformed metric name or non-finite value | **Usage:** `tests/api/usage/test_usage_observability.py::test_usage_record_metric()`<br>**Unit:** `tests/api/unit/test_metrics.py::test_record_uses_injected_sink_only()`, `test_disabled_metrics_is_noop()` |
-| Missing | `FR-API-061` | Reject label values that match the shared sensitive-key denylist or exceed the configured cardinality bound, before any value reaches a sink. | `validate_metric_labels(labels: Mapping[str, str]) -> None` | None | `SecurityError`: sensitive label key; `ValidationError`: cardinality bound exceeded or malformed label | **Usage:** `tests/api/usage/test_usage_observability.py::test_usage_label_hygiene()`<br>**Unit:** `tests/api/unit/test_metrics.py::test_secret_bearing_label_rejected()`, `test_high_cardinality_label_rejected()` |
-| Missing | `FR-API-062` | Collect a bounded point-in-time snapshot from a sink and render it as Prometheus text exposition without mutating recorded state. | `build_metric_snapshot(sink: MetricSink) -> MetricSnapshot`, `export_prometheus_metrics(snapshot: MetricSnapshot) -> str` | None | `ValidationError`: snapshot exceeds `METRICS_MAX_SERIES` | **Usage:** `tests/api/usage/test_usage_observability.py::test_usage_exposition()`<br>**Unit:** `tests/api/unit/test_exposition.py::test_exposition_is_deterministic()`, `test_snapshot_does_not_mutate_sink()` |
-| Missing | `FR-API-063` | Serve the protected scrape endpoint, returning `404` when `METRICS_ENABLED` is false so that a disabled deployment discloses no telemetry surface. | `get_metrics(context: AuthContext) -> ApiResponse[str]` | Read-only | `AuthorizationError`: scrape permission absent | **Usage:** `tests/api/usage/test_usage_observability.py::test_usage_scrape_route()`<br>**Unit:** `tests/api/unit/test_observability_routes.py::test_disabled_metrics_returns_not_found()`, `test_scrape_requires_permission()` |
+| Completed | `FR-API-060` | Record one counter, gauge, or timing observation through an explicitly injected sink; never through a module-global registry. Recording is a no-op when `METRICS_ENABLED` is false. | `record_metric(name: str, value: Decimal, *, labels: Mapping[str, str], sink: MetricSink) -> None` | Caller-provided sink mutation | `ValidationError`: malformed metric name or non-finite value | **Usage:** `tests/api/usage/05_observability.py::fr_api_060()`<br>**Unit:** `tests/api/unit/test_metrics.py::test_record_uses_injected_sink_only()`, `test_disabled_metrics_is_noop()` |
+| Completed | `FR-API-061` | Reject label values that match the shared sensitive-key denylist or exceed the configured cardinality bound, before any value reaches a sink. | `validate_metric_labels(labels: Mapping[str, str]) -> None` | None | `SecurityError`: sensitive label key; `ValidationError`: cardinality bound exceeded or malformed label | **Usage:** `tests/api/usage/05_observability.py::fr_api_061()`<br>**Unit:** `tests/api/unit/test_metrics.py::test_secret_bearing_label_rejected()`, `test_high_cardinality_label_rejected()` |
+| Completed | `FR-API-062` | Collect a bounded point-in-time snapshot from a sink and render it as Prometheus text exposition without mutating recorded state. | `build_metric_snapshot(sink: MetricSink) -> MetricSnapshot`, `export_prometheus_metrics(snapshot: MetricSnapshot) -> str` | None | `ValidationError`: snapshot exceeds `METRICS_MAX_SERIES` | **Usage:** `tests/api/usage/05_observability.py::fr_api_062()`<br>**Unit:** `tests/api/unit/test_exposition.py::test_exposition_is_deterministic()`, `test_snapshot_does_not_mutate_sink()` |
+| Completed | `FR-API-063` | Serve the protected scrape endpoint, returning `404` when `METRICS_ENABLED` is false so that a disabled deployment discloses no telemetry surface. | `get_metrics(context: AuthContext, *, sink: MetricSink) -> ApiResponse[str]` | Read-only | `AuthorizationError`: scrape permission absent | **Usage:** `tests/api/usage/05_observability.py::fr_api_063()`<br>**Unit:** `tests/api/unit/test_observability_routes.py::test_disabled_metrics_returns_not_found()`, `test_scrape_requires_permission()`, `test_scrape_returns_prometheus_payload()` |
 
 **Configuration and Limits Manifest**
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `METRICS_ENABLED` | `bool` | `false` | No | all observability exports | Master enablement. Disabled by default; a disabled deployment exposes no scrape route and records nothing. |
-| Missing | `METRICS_MAX_SERIES` | `int` | `5000` | Yes when enabled | `build_metric_snapshot` | Bound on distinct name+label series retained by a sink; exceeding it fails the snapshot rather than growing unbounded. |
-| Missing | `METRICS_MAX_LABEL_CARDINALITY` | `int` | `50` | Yes when enabled | `validate_metric_labels` | Per-label distinct-value bound. Exceeding it rejects the observation rather than degrading the sink. |
-| Missing | `METRICS_SCRAPE_PERMISSION` | `str` | `ops:metrics:read` | Yes when enabled | `get_metrics` | Permission required for the scrape endpoint; the surface is never anonymous. |
+| Completed | `METRICS_ENABLED` | `bool` | `false` | No | all observability exports | Master enablement. Disabled by default; a disabled deployment exposes no scrape route and records nothing. |
+| Completed | `METRICS_MAX_SERIES` | `int` | `5000` | Yes when enabled | `build_metric_snapshot` | Bound on distinct name+label series retained by a sink; exceeding it fails the snapshot rather than growing unbounded. |
+| Completed | `METRICS_MAX_LABEL_CARDINALITY` | `int` | `50` | Yes when enabled | `validate_metric_labels` | Per-label distinct-value bound. Exceeding it rejects the observation rather than degrading the sink. |
+| Completed | `METRICS_SCRAPE_PERMISSION` | `str` | `ops:metrics:read` | Yes when enabled | `get_metrics` | Permission required for the scrape endpoint; the surface is never anonymous. |
 
 **Explicit exclusions.** The following legacy observability behaviour is deliberately
 not reproduced: a process-global mutable `MetricRegistry`; tool-call metric recording
@@ -790,9 +786,8 @@ mutable alert-deduplication manager. Critical alerts use deterministic source-de
 identity and require sink idempotency under Section 4.13. Circuit-breaker behaviour is owned by Brokers
 (`app/services/brokers/runtime/circuit_breaker.py`) and is not duplicated here.
 
-**Implementation notes:** the Prometheus renderer dependency is `Pending` and must be
-pinned in `pyproject.toml` under a separate approved change before this module is
-implemented.
+**Implementation notes:** this module ships a deterministic text formatter in-process
+and does not require an external Prometheus renderer dependency.
 
 ### 4.6 `streams/` — Ordered event delivery
 
@@ -1125,9 +1120,9 @@ the two authoritative sources; alert delivery never mutates either owner truth.
 | Missing | `RUNTIME_PROFILE`, `EXECUTION_ROUTE`, `ALLOW_LIVE_MUTATIONS` | shared policy | From system manifest | Yes for live/paper controls | Trading routes/UI | UI/API consumes but never overrides Trading-owned route/live enablement. |
 | Missing | `DATABASE_URL` / `DATA_DIR` | shared persistence configuration | From system manifest | Yes | identity, settings, HTTP idempotency | Data owns connection, locking, and migration execution infrastructure; UI/API owns its schemas and records and never exposes raw connections. |
 | Missing | `CLOCK_DRIFT_TOLERANCE_SECONDS` | `Decimal` | `2` | No | `health/clock.py` | Absolute drift beyond this value marks readiness degraded; diagnostic only. |
-| Missing | `METRICS_ENABLED` | `bool` | `false` | No | `observability/` | Shared enablement declared in the system manifest; disabled deployments expose no scrape route and record nothing. |
-| Missing | `METRICS_MAX_SERIES` / `METRICS_MAX_LABEL_CARDINALITY` | `int` | `5000` / `50` | Yes when enabled | `observability/` | Bounds on retained series and per-label distinct values; exceeding either rejects rather than growing unbounded. |
-| Missing | `METRICS_SCRAPE_PERMISSION` | `str` | `ops:metrics:read` | Yes when enabled | `observability/exposition.py` | The scrape surface is never anonymous. |
+| Completed | `METRICS_ENABLED` | `bool` | `false` | No | `observability/` | Shared enablement declared in the system manifest; disabled deployments expose no scrape route and record nothing. |
+| Completed | `METRICS_MAX_SERIES` / `METRICS_MAX_LABEL_CARDINALITY` | `int` | `5000` / `50` | Yes when enabled | `observability/` | Bounds on retained series and per-label distinct values; exceeding either rejects rather than growing unbounded. |
+| Completed | `METRICS_SCRAPE_PERMISSION` | `str` | `ops:metrics:read` | Yes when enabled | `observability/exposition.py` | The scrape surface is never anonymous. |
 
 ### Non-functional requirements
 
@@ -1282,7 +1277,7 @@ These IDs were minted by the agile delivery roadmap (`docs/dev/AGILE_ROADMAP.md`
 | `P-API-010` | `app/services/api/ui_components/` | 1 | `ui_components` module + its `FR-API-*` behavior (§4) |
 | `P-API-011` | `app/services/api/ui_app/` | 1 | `ui_app` module + its `FR-API-*` behavior (§4) |
 | `P-API-005` | `app/services/api/streams/` | 11 | `streams` module + its `FR-API-*` behavior (§4) |
-| `P-API-012` | `app/services/api/observability/` | 11 | `observability` module + its `FR-API-*` behavior (§4); blocked on the `Pending` Prometheus renderer dependency |
+| `P-API-012` | `app/services/api/observability/` | 11 | `observability` module + its `FR-API-*` behavior (§4) |
 | `P-API-013` | `app/services/api/alerts/` | 11 | `alerts` module + `FR-API-064`–`FR-API-067` |
 
 

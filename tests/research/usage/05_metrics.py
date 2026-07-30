@@ -15,16 +15,11 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.research import (
-    DataQualityReport,
-    PreparedDataset,
-    ResearchResourceLimits,
-)
-from app.services.research.metrics import (
-    MetricRegistry,
     build_core_metric_profile,
     build_default_registry,
+    create_research_metric_registry,
+    create_research_value,
 )
-from app.services.research.metrics.registry import MetricContext, MetricValue
 
 
 @dataclass(frozen=True)
@@ -33,7 +28,7 @@ class _ExampleCalculator:
 
     family: str
 
-    def compute(self, context: MetricContext) -> tuple[MetricValue, ...]:
+    def compute(self, context: object) -> tuple[object, ...]:
         """Compute one example metric.
 
         Args:
@@ -42,7 +37,11 @@ class _ExampleCalculator:
         Returns:
             One normalized metric value.
         """
-        return (MetricValue(self.family, 1.0, "ratio", len(context.data)),)
+        return (
+            create_research_value(
+                "MetricValue", self.family, 1.0, "ratio", len(context.data)
+            ),
+        )
 
 
 def _header(title: str) -> None:
@@ -50,7 +49,7 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _prepared() -> PreparedDataset:
+def _prepared() -> object:
     """Build a small two-row prepared Research dataset.
 
     The frame includes the OHLCV columns plus the spread column required by
@@ -69,13 +68,15 @@ def _prepared() -> PreparedDataset:
             "spread": [0.1, 0.2],
         }
     )
-    quality = DataQualityReport(
+    quality = create_research_value(
+        "DataQualityReport",
         fatal_issues=(),
         warnings=(),
         checks=("schema",),
         cleaning_actions=(),
     )
-    return PreparedDataset(
+    return create_research_value(
+        "PreparedDataset",
         data=frame,
         schema_version="v1",
         quality=quality,
@@ -107,7 +108,9 @@ def fr_res_043() -> None:
         "FR-RES-043. Compute normalized values for one family from an immutable metric context."
     )
     calc = _ExampleCalculator("returns")
-    value = calc.compute(MetricContext(pd.DataFrame({"value": [1.0]})))[0]
+    value = calc.compute(
+        create_research_value("MetricContext", pd.DataFrame({"value": [1.0]}))
+    )[0]
     print(f"FR-RES-043 name={value.name} unit={value.unit}")
 
 
@@ -119,7 +122,7 @@ def fr_res_044() -> None:
     _header(
         "FR-RES-044. Own unique bounded calculator membership without global mutable defaults."
     )
-    registry = MetricRegistry.from_calculators((_ExampleCalculator("returns"),))
+    registry = create_research_metric_registry((_ExampleCalculator("returns"),))
     print(f"FR-RES-044 calculators={len(registry.all())}")
 
 
@@ -131,7 +134,7 @@ def fr_res_045() -> None:
     _header(
         "FR-RES-045. Construct an isolated registry from a bounded calculator iterable."
     )
-    registry = MetricRegistry.from_calculators((_ExampleCalculator("returns"),))
+    registry = create_research_metric_registry((_ExampleCalculator("returns"),))
     print(f"FR-RES-045 calculators={len(registry.all())}")
 
 
@@ -141,7 +144,7 @@ def fr_res_046() -> None:
     Resolve a calculator by exact family name.
     """
     _header("FR-RES-046. Resolve a calculator by exact family name.")
-    registry = MetricRegistry.from_calculators((_ExampleCalculator("returns"),))
+    registry = create_research_metric_registry((_ExampleCalculator("returns"),))
     resolved = registry.resolve("returns")
     print(f"FR-RES-046 resolved_family={resolved.family}")
 
@@ -155,7 +158,7 @@ def fr_res_047() -> None:
     _header(
         "FR-RES-047. Return calculators in deterministic registration order without exposing mutable storage."
     )
-    registry = MetricRegistry.from_calculators(
+    registry = create_research_metric_registry(
         (_ExampleCalculator("returns"), _ExampleCalculator("activity"))
     )
     calculators = registry.all()
@@ -186,7 +189,8 @@ def fr_res_049() -> None:
         "FR-RES-049. Build a deterministic profile with units, samples, undefined reasons, hashes, warnings, and duration from a prepared dataset."
     )
     profile = build_core_metric_profile(
-        _prepared(), limits=ResearchResourceLimits(10, 10.0, 1024)
+        _prepared(),
+        limits=create_research_value("ResearchResourceLimits", 10, 10.0, 1024),
     )
     print(f"FR-RES-049 metric_count={len(profile.metrics)}")
 

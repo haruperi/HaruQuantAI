@@ -5,21 +5,19 @@ executable parameter resolution, and hashing.
 """
 
 import sys
-from decimal import Decimal
 from pathlib import Path
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.optimization.parameters import (
-    ParameterRange,
-    ParameterSpace,
+from app.services.optimization import (
     candidate_hash,
     evaluate_constraints,
     get_executable_parameters,
     parameter_space_hash,
     validate_parameter_space,
 )
+from tests.optimization.usage._support import conditional_parameter_space
 
 
 def _header(title: str) -> None:
@@ -27,22 +25,9 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _usage_space() -> ParameterSpace:
+def _usage_space():
     """Construct a demonstration parameter space."""
-    return ParameterSpace(
-        parameters=(
-            ParameterRange(name="enabled", kind="boolean"),
-            ParameterRange(
-                name="period",
-                kind="integer",
-                minimum=Decimal(2),
-                maximum=Decimal(4),
-                step=Decimal(1),
-                active_when="enabled == True",
-            ),
-        ),
-        constraints=("period >= 2",),
-    )
+    return conditional_parameter_space()
 
 
 def example_parameters() -> None:

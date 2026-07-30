@@ -177,7 +177,7 @@ class JournalWriter:
             operation="simulation.journal.journal_writer.finalize",
         )
         self._finalized = True
-        return checksum
+        return str(checksum)
 
 
 __all__ = [

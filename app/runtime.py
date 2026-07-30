@@ -1,7 +1,7 @@
 """System-level runtime initialization validation."""
 
 import time
-from typing import Any, Final
+from typing import Final
 
 from app.utils import (
     build_response_metadata,
@@ -30,7 +30,7 @@ def validate_runtime_configuration(
     *,
     runtime_profile: str,
     execution_route: str,
-) -> Any:
+) -> object:
     """Validate the authoritative runtime profile and route pairing.
 
     Args:
@@ -62,14 +62,13 @@ def validate_runtime_configuration(
         requires_network=False,
     )
     if not is_compatible:
-        response = error_response(
+        return error_response(
             code=_ERROR_CODE,
             details={"detail": _ERROR_DETAIL},
             message=_ERROR_MESSAGE,
             metadata=metadata,
             catalog=get_common_error_catalog(),
         )
-        return response
     return success_response(
         None,
         message=_SUCCESS_MESSAGE,

@@ -4,25 +4,19 @@ from datetime import UTC, datetime, time, timedelta
 from decimal import Decimal
 from pathlib import Path
 
-from app.services.data import DataQualityReport, MarketDataset, OHLCVRecord
+from app.services.data import (
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
+)
 from app.services.research import (
-    ArtifactWriteConfig,
-    CleaningConfig,
-    EdgeLabConfig,
-    EnrichmentConfig,
-    FeatureConfig,
-    MarketStructureConfig,
-    ResearchResourceLimits,
-    SessionConfig,
-    StatisticalConfig,
-    StudyConfig,
-    UnsupervisedResearchConfig,
+    create_research_value,
 )
 
 _REQUEST_ID = "req-21234567-89ab-4def-8123-456789abcdef"
 
 
-def make_dataset() -> MarketDataset:
+def make_dataset() -> object:
     """Build bounded canonical Research input.
 
     Returns:
@@ -30,7 +24,7 @@ def make_dataset() -> MarketDataset:
     """
     start = datetime(2026, 1, 5, tzinfo=UTC)
     records = tuple(
-        OHLCVRecord(
+        build_ohlcv_record(
             timestamp=start + timedelta(minutes=index),
             source="research-fixture",
             source_symbol="TEST",
@@ -47,7 +41,7 @@ def make_dataset() -> MarketDataset:
         )
         for index in range(5)
     )
-    quality = DataQualityReport(
+    quality = build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
         record_count=len(records),
@@ -57,7 +51,7 @@ def make_dataset() -> MarketDataset:
         schema_version="v1",
         generated_at=records[-1].available_at,
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="bars",
         symbol="TEST",
@@ -81,7 +75,7 @@ def make_edge_lab_config(
     artifact_root: Path,
     *,
     selected_stages: tuple[str, ...] = ("data",),
-) -> EdgeLabConfig:
+) -> object:
     """Build complete explicit Edge Lab settings.
 
     Args:
@@ -91,19 +85,32 @@ def make_edge_lab_config(
     Returns:
         Validated Edge Lab configuration.
     """
-    return EdgeLabConfig(
-        cleaning=CleaningConfig("UTC", "error", "none", "keep_warn", "error"),
-        enrichment=EnrichmentConfig("TEST", True, True, False, True),
-        features=FeatureConfig({"sma": 2}, (1,), ("forward_return_1",), "preserve"),
-        statistics=StatisticalConfig(7, 20, 20, 2, 20, "benjamini_hochberg"),
-        studies=StudyConfig({}, {}, {}),
-        sessions=SessionConfig(
+    return create_research_value(
+        "EdgeLabConfig",
+        cleaning=create_research_value(
+            "CleaningConfig", "UTC", "error", "none", "keep_warn", "error"
+        ),
+        enrichment=create_research_value(
+            "EnrichmentConfig", "TEST", True, True, False, True
+        ),
+        features=create_research_value(
+            "FeatureConfig", {"sma": 2}, (1,), ("forward_return_1",), "preserve"
+        ),
+        statistics=create_research_value(
+            "StatisticalConfig", 7, 20, 20, 2, 20, "benjamini_hochberg"
+        ),
+        studies=create_research_value("StudyConfig", {}, {}, {}),
+        sessions=create_research_value(
+            "SessionConfig",
             "UTC",
             {"all": (time(0), time(23, 59))},
             ("all",),
         ),
-        market_structure=MarketStructureConfig({}, False, (2,), 1, 1),
-        modeling=UnsupervisedResearchConfig(
+        market_structure=create_research_value(
+            "MarketStructureConfig", {}, False, (2,), 1, 1
+        ),
+        modeling=create_research_value(
+            "UnsupervisedResearchConfig",
             ("close", "volume"),
             True,
             2,
@@ -111,7 +118,9 @@ def make_edge_lab_config(
             20,
             7,
         ),
-        artifacts=ArtifactWriteConfig(artifact_root.resolve(), "json"),
-        limits=ResearchResourceLimits(100, 10.0, 1024 * 1024),
+        artifacts=create_research_value(
+            "ArtifactWriteConfig", artifact_root.resolve(), "json"
+        ),
+        limits=create_research_value("ResearchResourceLimits", 100, 10.0, 1024 * 1024),
         selected_stages=selected_stages,
     )

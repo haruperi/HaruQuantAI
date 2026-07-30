@@ -2,9 +2,8 @@
 
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
-from typing import Literal
+from typing import Any, Literal
 
-from app.services.api import CriticalAlertSink
 from app.services.api.identity import require_auth_context
 from app.services.api.routes import operator
 from app.services.api.routes.operator import router
@@ -12,7 +11,7 @@ from app.services.risk import (
     create_approval_attestation,
     create_kill_switch_state,
 )
-from app.utils import AuthContext
+from app.utils import create_auth_context
 from fastapi import FastAPI
 
 from tests.api._support import get_json, post_json
@@ -21,6 +20,7 @@ from tests.api._support import get_json, post_json
 ApprovalAttestation = object
 KillSwitchCommand = object
 KillSwitchState = object
+AuthContext = Any
 
 NOW = datetime(2026, 7, 24, 9, tzinfo=UTC)
 REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
@@ -37,7 +37,7 @@ def _auth(*, principal_id: str = "operator-1") -> AuthContext:
     Returns:
         Valid shared authentication context.
     """
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id=principal_id,
@@ -87,7 +87,7 @@ def _app(
         KillSwitchState,
     ],
     *,
-    sink: CriticalAlertSink | None = None,
+    sink: Callable[[object], None] | None = None,
 ) -> FastAPI:
     """Build one fully composed operator test application.
 

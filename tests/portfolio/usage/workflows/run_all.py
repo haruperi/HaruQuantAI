@@ -2,18 +2,11 @@
 
 from __future__ import annotations
 
-import os
-import subprocess
+import runpy
 import sys
-import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-
-from tests.portfolio.usage.workflows._support import (
-    _DATASET_ENV,
-    live_market_dataset,
-)
 
 WORKFLOWS = (
     "wf_port_001_validate_construction_evidence.py",
@@ -28,18 +21,12 @@ WORKFLOWS = (
 
 
 def main() -> None:
-    """Capture MT5 evidence once and execute workflows in isolated processes."""
-    dataset = live_market_dataset()
-    with tempfile.TemporaryDirectory(prefix="wf-port-") as directory:
-        evidence = Path(directory) / "market-dataset.json"
-        evidence.write_text(dataset.model_dump_json(), encoding="utf-8")
-        environment = {**os.environ, _DATASET_ENV: str(evidence)}
-        for filename in WORKFLOWS:
-            subprocess.run(  # noqa: S603 - filenames are a fixed local tuple.
-                [sys.executable, str(Path(__file__).with_name(filename))],
-                check=True,
-                env=environment,
-            )
+    """Execute every workflow against its own genuine bounded evidence."""
+    for filename in WORKFLOWS:
+        runpy.run_path(
+            str(Path(__file__).with_name(filename)),
+            run_name="__main__",
+        )
     print(f"\nPortfolio workflows completed: {len(WORKFLOWS)}/{len(WORKFLOWS)}")
 
 

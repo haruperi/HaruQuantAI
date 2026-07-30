@@ -237,6 +237,25 @@ def calendar_state_provenance(
     )
 
 
+def project_calendar_state(result: CalendarStateResult) -> dict[str, object]:
+    """Return a detached projection of Risk-ready calendar-state evidence.
+
+    Args:
+        result: Internal calendar-state result.
+
+    Returns:
+        Public calendar state, windows, event count, and evidence reference.
+    """
+    return {
+        "symbol": result.symbol,
+        "calendar_state": result.calendar_state,
+        "blackout_before_minutes": result.blackout_before_minutes,
+        "blackout_after_minutes": result.blackout_after_minutes,
+        "event_count": result.event_count,
+        "evidence_ref": result.evidence_ref,
+    }
+
+
 def _populate_market_context_calendar_raw(
     evidence: MarketContextEvidence,
     *,
@@ -340,4 +359,5 @@ __all__ = [
     "calendar_state_provenance",
     "derive_calendar_state",
     "populate_market_context_calendar",
+    "project_calendar_state",
 ]

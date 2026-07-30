@@ -6,14 +6,18 @@ import sys
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.research import ArtifactWriteConfig, run_edge_lab_profile
-from app.services.research.artifacts import write_research_artifact
-from app.services.research.leakage import mask_research_artifact
-from app.services.research.profiles import render_research_report
-from app.utils import AuthContext
+from app.services.research import (
+    create_research_value,
+    mask_research_artifact,
+    render_research_report,
+    run_edge_lab_profile,
+    write_research_artifact,
+)
+from app.utils import create_auth_context
 from tests.research._support import make_edge_lab_config
 from tests.research.usage.workflows._support import limits, live_market_dataset
 
@@ -24,6 +28,7 @@ STAGES = (
     "Render the bounded report without performing I/O.",
     "Atomically persist the masked result and return ArtifactReference.",
 )
+type AuthContext = Any
 
 
 # fmt: off
@@ -35,7 +40,7 @@ def _stage(number: int) -> None:
 
 def _auth() -> AuthContext:
     """Return a dev-only Research write authority."""
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="research-workflow",
@@ -92,7 +97,7 @@ def main() -> None:
         reference = write_research_artifact(
             report,
             root / "report.json",
-            config=ArtifactWriteConfig(root, "json"),
+            config=create_research_value("ArtifactWriteConfig", root, "json"),
             auth=_auth(),
             limits=limits(),
         )

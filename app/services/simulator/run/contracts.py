@@ -390,33 +390,25 @@ class SimulationRunDependencies(Protocol):
         Raises:
             SimulationError: If durable persistence fails.
         """
-        logger.debug("Declaring Simulation audit persistence dependency")
-        del event
-        raise NotImplementedError
+        ...
 
     def load_market_data(
         self, request: SimulationBacktestRequestV1
     ) -> StandardResponse[MarketDataset]:
         """Load the immutable referenced Data dataset."""
-        logger.debug("Declaring Simulation load_market_data dependency")
-        del request
-        raise NotImplementedError
+        ...
 
     def generate_tick_series(
         self, dataset: MarketDataset, request: SimulationBacktestRequestV1
     ) -> StandardResponse[MarketDataset]:
         """Invoke Data's official real-evidence tick generator."""
-        logger.debug("Declaring Simulation generate_tick_series dependency")
-        del dataset, request
-        raise NotImplementedError
+        ...
 
     def calculate_indicators(
         self, dataset: MarketDataset, request: SimulationBacktestRequestV1
     ) -> StandardResponse[tuple[Any, ...]]:
         """Calculate point-in-time Indicator evidence."""
-        logger.debug("Declaring Simulation calculate_indicators dependency")
-        del dataset, request
-        raise NotImplementedError
+        ...
 
     def evaluate_strategy(
         self,
@@ -425,9 +417,7 @@ class SimulationRunDependencies(Protocol):
         request: SimulationBacktestRequestV1,
     ) -> StandardResponse[tuple[create_trade_intent_value, ...]]:
         """Evaluate a registered Strategy against supplied evidence."""
-        logger.debug("Declaring Simulation evaluate_strategy dependency")
-        del dataset, indicators, request
-        raise NotImplementedError
+        ...
 
     def review_risk(
         self,
@@ -435,9 +425,7 @@ class SimulationRunDependencies(Protocol):
         request: SimulationBacktestRequestV1,
     ) -> StandardResponse[tuple[RiskDecisionPackage, ...]]:
         """Review Strategy proposals under the referenced sim policy."""
-        logger.debug("Declaring Simulation review_risk dependency")
-        del intents, request
-        raise NotImplementedError
+        ...
 
     def build_order_intents(
         self,
@@ -445,33 +433,25 @@ class SimulationRunDependencies(Protocol):
         request: SimulationBacktestRequestV1,
     ) -> StandardResponse[tuple[OrderIntent, ...]]:
         """Pack approved Risk decisions through Trading's public boundary."""
-        logger.debug("Declaring Simulation build_order_intents dependency")
-        del decisions, request
-        raise NotImplementedError
+        ...
 
     def resolve_execution_profile(
         self, request: SimulationBacktestRequestV1
     ) -> StandardResponse[ExecutionProfile]:
         """Resolve the exact referenced execution profile."""
-        logger.debug("Declaring Simulation execution profile dependency")
-        del request
-        raise NotImplementedError
+        ...
 
     def resolve_symbol_specification(
         self, request: SimulationBacktestRequestV1
     ) -> StandardResponse[SymbolSpecification]:
         """Resolve approved symbol constraints."""
-        logger.debug("Declaring Simulation symbol specification dependency")
-        del request
-        raise NotImplementedError
+        ...
 
     def resolve_cost_model(
         self, request: SimulationBacktestRequestV1
     ) -> StandardResponse[ExecutionCostModel]:
         """Resolve the exact referenced cost model."""
-        logger.debug("Declaring Simulation cost-model dependency")
-        del request
-        raise NotImplementedError
+        ...
 
     def resolve_fx_evidence(
         self, evidence_ids: tuple[str, ...]
@@ -482,9 +462,7 @@ class SimulationRunDependencies(Protocol):
         never selects, refreshes, or synthesizes a rate. An identifier the
         caller cannot resolve fails the run closed.
         """
-        logger.debug("Declaring Simulation FX evidence dependency")
-        del evidence_ids
-        raise NotImplementedError
+        ...
 
 
 __all__ = [

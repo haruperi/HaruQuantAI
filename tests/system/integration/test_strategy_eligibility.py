@@ -7,10 +7,11 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
-from app.services.portfolio.config import PortfolioSettings
-from app.services.portfolio.contracts import PortfolioConstructionRequest
-from app.services.portfolio.evidence import validate_construction_evidence
-from app.utils import logger
+from app.services.portfolio import (
+    create_portfolio_value,
+    validate_construction_evidence,
+)
+from app.utils import get_logger
 
 from tests.portfolio import conftest as portfolio_fixtures
 from tests.portfolio.unit.test_evidence import (
@@ -22,6 +23,8 @@ from tests.portfolio.unit.test_evidence import (
 construction_request_data = portfolio_fixtures.construction_request_data
 portfolio_now = portfolio_fixtures.portfolio_now
 portfolio_settings = portfolio_fixtures.portfolio_settings
+PortfolioSettings = Any
+logger = get_logger(__name__)
 
 
 def test_strategy_eligibility_reaches_portfolio_without_contract_redefinition(
@@ -33,8 +36,9 @@ def test_strategy_eligibility_reaches_portfolio_without_contract_redefinition(
     """Strategy and Risk public contracts form valid construction evidence."""
     logger.info("Testing SYS-WF-006 Strategy eligibility into Portfolio")
     _patch_digest(monkeypatch)
-    request = PortfolioConstructionRequest(
-        **_request_data_with_fx(construction_request_data)
+    request = create_portfolio_value(
+        "PortfolioConstructionRequest",
+        **_request_data_with_fx(construction_request_data),
     )
     refs, decisions, account, market, analytics, fx = _owner_bundle(portfolio_now)
     evidence = validate_construction_evidence(

@@ -3,16 +3,15 @@
 from __future__ import annotations
 
 import hashlib
-from collections.abc import Awaitable, Callable, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from app.services.analytics import (
-    PortfolioAllocationEvidence,
-    PortfolioRebalanceMeasurementEvidence,
-    PortfolioRebalanceMeasurementRequest,
+    create_portfolio_rebalance_measurement_request,
+    get_analytics_value_field,
 )
 from app.services.portfolio.allocation import AllocationService, RiskBudgetActivator
 from app.services.portfolio.construction import ConstructionService
@@ -22,18 +21,18 @@ from app.services.portfolio.contracts import (
     PortfolioConstructionResult,
     PortfolioRebalancePlan,
 )
+from app.services.portfolio.contracts.errors import PortfolioError
 from app.services.portfolio.evidence import (
     ValidatedConstructionEvidence,
     revalidate_activation_evidence,
     validate_construction_evidence,
 )
-from app.services.portfolio.exceptions import PortfolioError
 from app.services.portfolio.rebalancing import RebalancingService
 from app.services.risk import (
     create_allocation_review_request,
     get_decision_state,
 )
-from app.services.simulator import PortfolioBacktestRequestV1, PortfolioSimulationResult
+from app.services.simulator import get_simulation_value_field
 from app.services.trading import (
     create_portfolio_rebalance_execution_request,
     get_trading_route,
@@ -57,13 +56,18 @@ KillSwitchState = Any
 StandardTradingEnvelope = Any
 StrategyOperationalEligibilityDecision = Any
 PortfolioRebalanceExecutionRequest = Any
+PortfolioBacktestRequestV1 = Any
+PortfolioSimulationResult = Any
+PortfolioAllocationEvidence = Any
+PortfolioRebalanceMeasurementEvidence = Any
+PortfolioRebalanceMeasurementRequest = Any
 type StandardResponse[T] = Any
 
 if TYPE_CHECKING:
     AccountStateSnapshot = Any
     FXConversionEvidence = Any
     MarketDataset = Any
-    from app.services.portfolio.config import PortfolioSettings
+    from app.services.portfolio._settings import PortfolioSettings
     from app.services.portfolio.state import AuditOutboxRecord, PortfolioRepository
 
 
@@ -429,9 +433,11 @@ class PortfolioWorkflowService:
             raise PortfolioError("PORT_DEPENDENCY_FAILED", "RISK_REVIEW") from error
         now = self._now()
         if (
-            simulation.status != "completed"
-            or simulation.portfolio_id != candidate.portfolio_id
-            or simulation.construction_result_id != candidate.result_id
+            get_simulation_value_field(simulation, "status") != "completed"
+            or get_simulation_value_field(simulation, "portfolio_id")
+            != candidate.portfolio_id
+            or get_simulation_value_field(simulation, "construction_result_id")
+            != candidate.result_id
             or decision.portfolio_id != candidate.portfolio_id
             or decision.reviewed_version != candidate.portfolio_version
             or decision.state is not get_decision_state("APPROVE")
@@ -470,19 +476,31 @@ class PortfolioWorkflowService:
             row.component_id: (row.capital_weight, row.proposed_risk_budget_weight)
             for row in candidate.component_weights
         }
+        components = cast(
+            "Iterable[object]",
+            get_simulation_value_field(request, "components"),
+        )
         observed_weights = {
-            row.component_id: (row.capital_weight, row.risk_budget)
-            for row in request.components
+            get_simulation_value_field(row, "component_id"): (
+                get_simulation_value_field(row, "capital_weight"),
+                get_simulation_value_field(row, "risk_budget"),
+            )
+            for row in components
         }
         if (
-            request.request_id != candidate.request_id
-            or request.workflow_id != candidate.workflow_id
-            or request.correlation_id != candidate.correlation_id
-            or request.portfolio_id != candidate.portfolio_id
-            or request.construction_result_id != candidate.result_id
-            or request.construction_version != candidate.portfolio_version
-            or request.runtime_profile != "simulation"
-            or request.execution_route != "sim"
+            get_simulation_value_field(request, "request_id") != candidate.request_id
+            or get_simulation_value_field(request, "workflow_id")
+            != candidate.workflow_id
+            or get_simulation_value_field(request, "correlation_id")
+            != candidate.correlation_id
+            or get_simulation_value_field(request, "portfolio_id")
+            != candidate.portfolio_id
+            or get_simulation_value_field(request, "construction_result_id")
+            != candidate.result_id
+            or get_simulation_value_field(request, "construction_version")
+            != candidate.portfolio_version
+            or get_simulation_value_field(request, "runtime_profile") != "simulation"
+            or get_simulation_value_field(request, "execution_route") != "sim"
             or observed_weights != expected_weights
         ):
             raise PortfolioError("PORT_SIMULATION_INVALID", "REQUEST_BINDING")
@@ -847,6 +865,32 @@ class PortfolioWorkflowService:
         """
         logger.debug("Projecting immutable redacted Trading execution facts")
         dumped = envelope.model_dump(mode="json")
+        raw_metadata = dumped.get("metadata", dumped.get("audit_metadata", {}))
+        extensions = (
+            raw_metadata.get("extensions", {})
+            if isinstance(raw_metadata, Mapping)
+            else {}
+        )
+        audit_metadata = {
+            "operation": (
+                raw_metadata.get("name") if isinstance(raw_metadata, Mapping) else None
+            ),
+            "request_id": (
+                raw_metadata.get("request_id")
+                if isinstance(raw_metadata, Mapping)
+                else None
+            ),
+            "correlation_id": (
+                raw_metadata.get("correlation_id")
+                if isinstance(raw_metadata, Mapping)
+                else None
+            ),
+            "redaction_applied": (
+                extensions.get("redaction_applied")
+                if isinstance(extensions, Mapping)
+                else None
+            ),
+        }
         if "error" in dumped and "metadata" in dumped:
             error = dumped["error"]
             return {
@@ -854,14 +898,14 @@ class PortfolioWorkflowService:
                 "data": dumped["data"],
                 "errors": () if error is None else (error,),
                 "warnings": (),
-                "audit_metadata": dumped["metadata"],
+                "audit_metadata": audit_metadata,
             }
         return {
             "status": dumped["status"],
             "data": dumped["data"],
             "errors": dumped["errors"],
             "warnings": dumped["warnings"],
-            "audit_metadata": dumped["audit_metadata"],
+            "audit_metadata": audit_metadata,
         }
 
     def _measurement_request(
@@ -888,7 +932,7 @@ class PortfolioWorkflowService:
         if plan.trading_execution_ref is None:
             raise PortfolioError("PORT_MEASUREMENT_FAILED", "EXECUTION_REFERENCE")
         facts = self._execution_facts(envelope)
-        return PortfolioRebalanceMeasurementRequest(
+        return create_portfolio_rebalance_measurement_request(
             contract_version="v1",
             schema_id="analytics.portfolio_rebalance_measurement_request.v1",
             request_id=f"{trading_request_id}:measurement",
@@ -1039,22 +1083,22 @@ class PortfolioWorkflowService:
             )
             return executed
         if isinstance(analytics_response, get_standard_response_type()):
-            if (
-                analytics_response.status != "success"
-                or analytics_response.data is None
-            ):
+            response = cast("Any", analytics_response)
+            if response.status != "success" or response.data is None:
                 logger.warning(
                     "Analytics returned no measurement; preserving executed "
                     "Portfolio truth"
                 )
                 return executed
-            evidence = analytics_response.data
+            evidence = response.data
         else:
             evidence = analytics_response
         if (
-            evidence.plan_id != executed.plan_id
-            or evidence.trading_execution_ref != executed.trading_execution_ref
-            or evidence.trading_execution_hash != request.trading_execution_hash
+            get_analytics_value_field(evidence, "plan_id") != executed.plan_id
+            or get_analytics_value_field(evidence, "trading_execution_ref")
+            != executed.trading_execution_ref
+            or get_analytics_value_field(evidence, "trading_execution_hash")
+            != get_analytics_value_field(request, "trading_execution_hash")
         ):
             logger.warning(
                 "Analytics measurement conflicted; preserving executed Portfolio truth"
@@ -1065,7 +1109,13 @@ class PortfolioWorkflowService:
             request_id=executed.request_id,
             correlation_id=executed.correlation_id,
             causation_id=None,
-            payload={"evidence_id": evidence.evidence_id, "plan_id": executed.plan_id},
+            payload={
+                "evidence_id": cast(
+                    "str",
+                    get_analytics_value_field(evidence, "evidence_id"),
+                ),
+                "plan_id": executed.plan_id,
+            },
         )
         measured = self._transition_plan(
             executed,

@@ -78,17 +78,17 @@ def _safe_detail(
         raise AnalyticsValidationError("max_detail_bytes must be positive")
     try:
         safe = _utils_to_json_safe(_normalize_analytical_value(detail))
-        if not isinstance(safe, dict):
-            raise AnalyticsValidationError("evidence detail must remain a mapping")
-        redacted = redact_mapping_value(safe)
-        if not isinstance(redacted.value, dict):
-            raise AnalyticsValidationError("redacted evidence detail is invalid")
-        result = dict(redacted.value)
-        if len(canonical_json(result).encode("utf-8")) > max_detail_bytes:
-            raise AnalyticsValidationError("evidence detail exceeds configured bound")
-        return result
     except Exception as error:
         raise AnalyticsValidationError("evidence detail is unsafe") from error
+    if not isinstance(safe, dict):
+        raise AnalyticsValidationError("evidence detail must remain a mapping")
+    redacted = redact_mapping_value(safe)
+    if not isinstance(redacted.value, dict):
+        raise AnalyticsValidationError("redacted evidence detail is invalid")
+    result = dict(redacted.value)
+    if len(canonical_json(result).encode("utf-8")) > max_detail_bytes:
+        raise AnalyticsValidationError("evidence detail exceeds configured bound")
+    return result
 
 
 def build_warning(

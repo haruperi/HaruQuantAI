@@ -22,6 +22,7 @@ WORKFLOWS = (
     "wf_opt_sec_run_walk_forward_validation.py",
     "wf_opt_005_run_monte_carlo_robustness_analysis.py",
     "wf_opt_006_build_persist_versioned_evidence_handoffs.py",
+    "wf_opt_007_compare_runs_parameter_stability.py",
     "wf_opt_008_first_passage_drawdown_sensitivity.py",
 )
 

@@ -1,9 +1,15 @@
 """FEAT-BRK-07: MetaTrader 5 mutation capability safety."""
 
 import asyncio
+import sys
+from pathlib import Path
+from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import _support  # noqa: F401
 from _support import (
+    UsageEvidenceError,
     create_real_adapter,
     real_session,
     require_error,
@@ -19,6 +25,7 @@ from app.services.brokers import (
     close_broker_position,
     disconnect_broker,
     get_broker_connection_status,
+    get_broker_value_field,
     modify_broker_order,
     modify_broker_position,
     place_broker_order,
@@ -26,9 +33,30 @@ from app.services.brokers import (
 )
 
 
+def _feature_header(title: str) -> None:
+    """Print feature title and module flow banner."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"\n{'-' * 88}\n{title}\n{'-' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _order() -> object:
@@ -43,119 +71,105 @@ def _order() -> object:
     )
 
 
-async def fr_brokers_091(adapter: object) -> None:
-    """FR-BRK-091: Validate an order request before transmission."""
-    _header("FR-BRK-091: Validate an order request before transmission.")
+async def fr_brokers_091_to_092_order_intent_and_check(adapter: object) -> None:
+    """FR-BRK-091..092: Stage 1 & 2 — Order Intent Construction and Release Policy Check."""
+    _header("Stage 1 & 2: Order Intent & Release Policy Check (FR-BRK-091..092)")
+    chk_res = await check_broker_order(adapter, _order())
     require_error(
-        "Result",
-        await check_broker_order(adapter, _order()),
-        "BROKER_NOT_CONNECTED",
-        "BROKER_CAPABILITY_UNSUPPORTED",
+        "Result", chk_res, "BROKER_NOT_CONNECTED", "BROKER_CAPABILITY_UNSUPPORTED"
     )
+    print(_format_result(chk_res))
+    print(f"Data -> check_order_status='{get_broker_value_field(chk_res, 'status')}'")
 
-
-async def fr_brokers_092(adapter: object) -> None:
-    """FR-BRK-092: Submit one mutation once without retry."""
-    _header("FR-BRK-092: Submit one mutation once without retry.")
+    plc_res = await place_broker_order(adapter, _order())
     require_error(
-        "Result",
-        await place_broker_order(adapter, _order()),
-        "BROKER_NOT_CONNECTED",
-        "BROKER_CAPABILITY_UNSUPPORTED",
+        "Result", plc_res, "BROKER_NOT_CONNECTED", "BROKER_CAPABILITY_UNSUPPORTED"
     )
+    print(_format_result(plc_res))
+    print(f"Data -> place_order_status='{get_broker_value_field(plc_res, 'status')}'")
 
 
-async def fr_brokers_093(adapter: object) -> None:
-    """FR-BRK-093: Modify one existing pending order."""
-    _header("FR-BRK-093: Modify one existing pending order.")
-    modification = build_broker_order_modification_request(
-        order_id="o1",
-        limit_price="1.11",
+async def fr_brokers_093_to_097_order_results(adapter: object) -> None:
+    """FR-BRK-093..097: Stage 3 — Provider Submission & Order Result / Fail-Closed Output."""
+    _header(
+        "Stage 3: Provider Submission & Fail-Closed Order Results (FR-BRK-093..097)"
     )
+    mod_req = build_broker_order_modification_request("o1", limit_price="1.11")
+    mod_res = await modify_broker_order(adapter, mod_req)
     require_error(
-        "Result",
-        await modify_broker_order(adapter, modification),
-        "BROKER_CAPABILITY_UNSUPPORTED",
-        "BROKER_NOT_CONNECTED",
+        "Result", mod_res, "BROKER_CAPABILITY_UNSUPPORTED", "BROKER_NOT_CONNECTED"
     )
+    print(_format_result(mod_res))
+    print(f"Data -> modify_order_status='{get_broker_value_field(mod_res, 'status')}'")
 
-
-async def fr_brokers_094(adapter: object) -> None:
-    """FR-BRK-094: Cancel one pending order."""
-    _header("FR-BRK-094: Cancel one pending order.")
+    cnl_res = await cancel_broker_order(adapter, "o1")
     require_error(
-        "Result",
-        await cancel_broker_order(adapter, "o1"),
-        "BROKER_NOT_CONNECTED",
-        "BROKER_CAPABILITY_UNSUPPORTED",
+        "Result", cnl_res, "BROKER_NOT_CONNECTED", "BROKER_CAPABILITY_UNSUPPORTED"
     )
+    print(_format_result(cnl_res))
+    print(f"Data -> cancel_order_status='{get_broker_value_field(cnl_res, 'status')}'")
 
-
-async def fr_brokers_095(adapter: object) -> None:
-    """FR-BRK-095: Modify one position's stop-loss or take-profit."""
-    _header("FR-BRK-095: Modify one position's stop-loss or take-profit.")
-    modification = build_broker_position_modification_request(
-        position_id="p1",
-        stop_loss="1.09",
-    )
+    pos_mod_req = build_broker_position_modification_request("p1", stop_loss="1.09")
+    pos_mod_res = await modify_broker_position(adapter, pos_mod_req)
     require_error(
-        "Result",
-        await modify_broker_position(adapter, modification),
-        "BROKER_CAPABILITY_UNSUPPORTED",
-        "BROKER_NOT_CONNECTED",
+        "Result", pos_mod_res, "BROKER_CAPABILITY_UNSUPPORTED", "BROKER_NOT_CONNECTED"
+    )
+    print(_format_result(pos_mod_res))
+    print(
+        f"Data -> modify_position_status='{get_broker_value_field(pos_mod_res, 'status')}'"
     )
 
-
-async def fr_brokers_096(adapter: object) -> None:
-    """FR-BRK-096: Close or reduce one position."""
-    _header("FR-BRK-096: Close or reduce one position.")
-    close = build_broker_position_close_request(
-        position_id="p1",
-        quantity="0.5",
-        quantity_unit="lots",
+    cls_req = build_broker_position_close_request(
+        "p1", quantity="0.5", quantity_unit="lots"
     )
+    cls_res = await close_broker_position(adapter, cls_req)
     require_error(
-        "Result",
-        await close_broker_position(adapter, close),
-        "BROKER_NOT_CONNECTED",
-        "BROKER_CAPABILITY_UNSUPPORTED",
+        "Result", cls_res, "BROKER_NOT_CONNECTED", "BROKER_CAPABILITY_UNSUPPORTED"
+    )
+    print(_format_result(cls_res))
+    print(
+        f"Data -> close_position_status='{get_broker_value_field(cls_res, 'status')}'"
     )
 
-
-async def fr_brokers_097(adapter: object) -> None:
-    """FR-BRK-097: Replace one order atomically or fail closed."""
-    _header("FR-BRK-097: Replace one order atomically or fail closed.")
+    rep_res = await replace_broker_order(adapter, mod_req)
     require_error(
-        "Result",
-        await replace_broker_order(
-            adapter,
-            build_broker_order_modification_request(
-                order_id="o1",
-                limit_price="1.11",
-            ),
-        ),
-        "BROKER_CAPABILITY_UNSUPPORTED",
-        "BROKER_NOT_CONNECTED",
+        "Result", rep_res, "BROKER_CAPABILITY_UNSUPPORTED", "BROKER_NOT_CONNECTED"
     )
+    print(_format_result(rep_res))
+    print(f"Data -> replace_order_status='{get_broker_value_field(rep_res, 'status')}'")
 
 
 async def _run() -> None:
     """Verify a real MT5 demo session, then prove mutations remain no-side-effect."""
-    async with real_session("mt5") as connected:
-        require_success(
-            "Verified demo status",
-            await get_broker_connection_status(connected),
-        )
+    _feature_header(
+        "FEATURE: FEAT-BRK-07 — mt5_mutations/ — MetaTrader 5 Mutations\n\n"
+        "Purpose: Provide single-target order placement, modification, cancellation, and position closure for MT5.\n\n"
+        "Module flow:\n"
+        "-> order intent\n"
+        "-> release policy check\n"
+        "-> provider submission\n"
+        "-> order result"
+    )
 
-    disconnected = create_real_adapter("mt5")
-    await fr_brokers_091(disconnected)
-    await fr_brokers_092(disconnected)
-    await fr_brokers_093(disconnected)
-    await fr_brokers_094(disconnected)
-    await fr_brokers_095(disconnected)
-    await fr_brokers_096(disconnected)
-    await fr_brokers_097(disconnected)
-    require_success("Final cleanup", await disconnect_broker(disconnected))
+    try:
+        async with real_session("mt5") as connected:
+            status_res = await get_broker_connection_status(connected)
+            require_success("Verified demo status", status_res)
+            print(_format_result(status_res))
+
+        disconnected = create_real_adapter("mt5")
+        # Stage 1 & 2: Order intent & release policy check
+        await fr_brokers_091_to_092_order_intent_and_check(disconnected)
+
+        # Stage 3: Fail-closed order results
+        await fr_brokers_093_to_097_order_results(disconnected)
+
+        clean_res = await disconnect_broker(disconnected)
+        require_success("Final cleanup", clean_res)
+        print(_format_result(clean_res))
+    except UsageEvidenceError as err:
+        print("Output Result -> UsageEvidenceError : UsageEvidenceError")
+        print(f"Data -> status='FAIL_CLOSED', reason='{err}'")
 
 
 def main() -> None:

@@ -12,7 +12,7 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.portfolio import PortfolioConstructionRequest
+from app.services.portfolio import create_portfolio_value
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 HASH_A = "a" * 64
@@ -110,7 +110,9 @@ def fr_port_006() -> None:
     )
     print("FR-PORT-006: Require eligibility decision for every strategy/version")
 
-    request = PortfolioConstructionRequest(**_base_request_data())
+    request = create_portfolio_value(
+        "PortfolioConstructionRequest", **_base_request_data()
+    )
     for component in request.components:
         assert component.eligibility_decision_id
         eligibility = component.eligibility_decision_id
@@ -129,7 +131,9 @@ def fr_port_007() -> None:
     )
     print("FR-PORT-007: Fail closed on invalid FX evidence")
 
-    request = PortfolioConstructionRequest(**_base_request_data())
+    request = create_portfolio_value(
+        "PortfolioConstructionRequest", **_base_request_data()
+    )
     assert len(request.evidence.fx_evidence_ids) == len(
         request.evidence.fx_evidence_hashes
     )
@@ -140,7 +144,10 @@ def fr_port_007() -> None:
             fx_evidence_ids=("fx-1", "fx-2"),
             fx_evidence_hashes=("a" * 64,),
         )
-        PortfolioConstructionRequest(**_base_request_data(evidence=bad_evidence))
+        create_portfolio_value(
+            "PortfolioConstructionRequest",
+            **_base_request_data(evidence=bad_evidence),
+        )
         msg = "ERROR: mismatched FX evidence accepted"
     except Exception:  # noqa: BLE001 - usage demonstrates rejection.
         msg = "Mismatched FX evidence correctly rejected"
@@ -159,7 +166,9 @@ def fr_port_008() -> None:
     )
     print("FR-PORT-008: Never synthesize rates, metrics, registrations, or approvals")
 
-    request = PortfolioConstructionRequest(**_base_request_data())
+    request = create_portfolio_value(
+        "PortfolioConstructionRequest", **_base_request_data()
+    )
     assert request.evidence.account_snapshot_id
     assert request.evidence.market_dataset_id
     assert request.evidence.analytics_evidence_id
@@ -183,7 +192,9 @@ def fr_port_009() -> None:
     )
     print("FR-PORT-009: Detect reference/version change via hashes")
 
-    request = PortfolioConstructionRequest(**_base_request_data())
+    request = create_portfolio_value(
+        "PortfolioConstructionRequest", **_base_request_data()
+    )
     assert len(request.evidence.account_snapshot_hash) == 64
     assert len(request.evidence.market_dataset_hash) == 64
     assert len(request.evidence.analytics_evidence_hash) == 64

@@ -7,8 +7,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.research.metrics import build_core_metric_profile
-from app.services.research.profiles import (
+from app.services.research import (
+    build_core_metric_profile,
     build_research_profile_snapshot,
     build_research_scorecard,
 )

@@ -14,32 +14,8 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.research import (
-    PUBLIC_API_CLASSIFICATIONS,
-    ArtifactReference,
-    ArtifactWriteConfig,
-    CleaningConfig,
-    CoreMetricProfile,
-    DataQualityReport,
-    EdgeLabConfig,
-    EdgeResult,
-    EnrichmentConfig,
-    FeatureConfig,
-    LeakageReport,
-    MarketStructureConfig,
-    MarketStructureProfile,
-    MarketStructureQualityReport,
-    PreparedDataset,
-    ResearchProfileSnapshot,
-    ResearchReport,
-    ResearchResourceLimits,
-    ResearchScorecard,
-    ResearchWarning,
-    SessionConfig,
-    StatisticalConfig,
-    StudyConfig,
-    TimeSplitResult,
-    UnsupervisedResearchConfig,
-    UnsupervisedResearchResult,
+    create_research_value,
+    get_public_api_classifications,
 )
 
 _HASH = "e" * 64
@@ -50,9 +26,9 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _quality() -> DataQualityReport:
+def _quality() -> object:
     """Build a minimal valid Research data-quality report."""
-    return DataQualityReport((), (), ("schema",), ())
+    return create_research_value("DataQualityReport", (), (), ("schema",), ())
 
 
 def fr_res_001() -> None:
@@ -65,7 +41,7 @@ def fr_res_001() -> None:
     _header(
         "FR-RES-001. The system shall define bounded row, duration, artifact-size, and advisory memory budgets without claiming unverified production performance."
     )
-    limits = ResearchResourceLimits(500_000, 600.0, 52_428_800)
+    limits = create_research_value("ResearchResourceLimits", 500_000, 600.0, 52_428_800)
     print(f"FR-RES-001 max_rows={limits.max_rows}")
 
 
@@ -79,7 +55,9 @@ def fr_res_002() -> None:
     _header(
         "FR-RES-002. The system shall require explicit timestamp, duplicate, missing-bar, non-trading-period, and spread-cleaning policies and shall never silently fill or drop data."
     )
-    cleaning = CleaningConfig("UTC", "error", "none", "keep_warn", "error")
+    cleaning = create_research_value(
+        "CleaningConfig", "UTC", "error", "none", "keep_warn", "error"
+    )
     print(f"FR-RES-002 timezone={cleaning.timezone}")
 
 
@@ -93,7 +71,9 @@ def fr_res_003() -> None:
     _header(
         "FR-RES-003. The system shall define explicit pip, geometry, return-label, and calendar enrichment selections; canonical session tagging remains owned by seasonality/."
     )
-    enrichment = EnrichmentConfig("EURUSD", True, True, False, True)
+    enrichment = create_research_value(
+        "EnrichmentConfig", "EURUSD", True, True, False, True
+    )
     print(f"FR-RES-003 symbol={enrichment.symbol}")
 
 
@@ -106,8 +86,8 @@ def fr_res_004() -> None:
     _header(
         "FR-RES-004. The system shall define feature windows, declared forward columns, warm-up/NaN policy, and non-mutation behavior."
     )
-    features = FeatureConfig(
-        {"sma": 20}, (1, 5), ("forward_1", "forward_5"), "preserve"
+    features = create_research_value(
+        "FeatureConfig", {"sma": 20}, (1, 5), ("forward_1", "forward_5"), "preserve"
     )
     print(f"FR-RES-004 windows={dict(features.windows)}")
 
@@ -122,7 +102,9 @@ def fr_res_005() -> None:
     _header(
         "FR-RES-005. The system shall define bootstrap, permutation, null, correction, effective-seed, and bounded-iteration settings in one statistical contract."
     )
-    statistics = StatisticalConfig(7, 20, 20, 2, 20, "benjamini_hochberg")
+    statistics = create_research_value(
+        "StatisticalConfig", 7, 20, 20, 2, 20, "benjamini_hochberg"
+    )
     print(f"FR-RES-005 seed={statistics.seed}")
 
 
@@ -135,7 +117,7 @@ def fr_res_006() -> None:
     _header(
         "FR-RES-006. The system shall define mean-reversion, trend-persistence, session-study, confirmation, and explicit isolated-failure policy."
     )
-    studies = StudyConfig({}, {}, {})
+    studies = create_research_value("StudyConfig", {}, {}, {})
     print(f"FR-RES-006 continue_on_study_error={studies.continue_on_study_error}")
 
 
@@ -148,7 +130,9 @@ def fr_res_007() -> None:
     _header(
         "FR-RES-007. The system shall define one timezone-aware set of named windows and deterministic overlap precedence for all session consumers."
     )
-    sessions = SessionConfig("UTC", {"london": (time(8), time(17))}, ("london",))
+    sessions = create_research_value(
+        "SessionConfig", "UTC", {"london": (time(8), time(17))}, ("london",)
+    )
     print(f"FR-RES-007 timezone={sessions.timezone}")
 
 
@@ -161,7 +145,7 @@ def fr_res_008() -> None:
     _header(
         "FR-RES-008. The system shall define bounded structure detection, canonical scoring, quality, validation, and calibration settings."
     )
-    structure = MarketStructureConfig({}, False, (20,), 5, 20)
+    structure = create_research_value("MarketStructureConfig", {}, False, (20,), 5, 20)
     print(f"FR-RES-008 quality_windows={structure.quality_windows}")
 
 
@@ -174,8 +158,14 @@ def fr_res_009() -> None:
     _header(
         "FR-RES-009. The system shall define feature columns, PCA components, cluster count, minimum samples, and seed for deterministic unsupervised research."
     )
-    modeling = UnsupervisedResearchConfig(
-        ("close", "high", "low", "volume"), True, 3, 5, 50, 7
+    modeling = create_research_value(
+        "UnsupervisedResearchConfig",
+        ("close", "high", "low", "volume"),
+        True,
+        3,
+        5,
+        50,
+        7,
     )
     print(f"FR-RES-009 pca_components={modeling.pca_components}")
 
@@ -189,7 +179,9 @@ def fr_res_010() -> None:
     _header(
         "FR-RES-010. The system shall define allowed root, format, overwrite, encoding, and atomic-replacement policy for safe artifact persistence."
     )
-    artifacts = ArtifactWriteConfig(Path("research").resolve(), "json")
+    artifacts = create_research_value(
+        "ArtifactWriteConfig", Path("research").resolve(), "json"
+    )
     print(f"FR-RES-010 format={artifacts.format}")
 
 
@@ -203,21 +195,42 @@ def fr_res_011() -> None:
     _header(
         "FR-RES-011. The system shall require complete explicit configuration for every selected stage, reject absent or incompatible dependencies, and never apply defaults for selected stages."
     )
-    config = EdgeLabConfig(
-        cleaning=CleaningConfig("UTC", "error", "none", "keep_warn", "error"),
-        enrichment=EnrichmentConfig("EURUSD", True, True, False, True),
-        features=FeatureConfig(
-            {"sma": 20}, (1, 5), ("forward_1", "forward_5"), "preserve"
+    config = create_research_value(
+        "EdgeLabConfig",
+        cleaning=create_research_value(
+            "CleaningConfig", "UTC", "error", "none", "keep_warn", "error"
         ),
-        statistics=StatisticalConfig(7, 20, 20, 2, 20, "benjamini_hochberg"),
-        studies=StudyConfig({}, {}, {}),
-        sessions=SessionConfig("UTC", {"london": (time(8), time(17))}, ("london",)),
-        market_structure=MarketStructureConfig({}, False, (20,), 5, 20),
-        modeling=UnsupervisedResearchConfig(
-            ("close", "high", "low", "volume"), True, 3, 5, 50, 7
+        enrichment=create_research_value(
+            "EnrichmentConfig", "EURUSD", True, True, False, True
         ),
-        artifacts=ArtifactWriteConfig(Path("research").resolve(), "json"),
-        limits=ResearchResourceLimits(500_000, 600.0, 52_428_800),
+        features=create_research_value(
+            "FeatureConfig", {"sma": 20}, (1, 5), ("forward_1", "forward_5"), "preserve"
+        ),
+        statistics=create_research_value(
+            "StatisticalConfig", 7, 20, 20, 2, 20, "benjamini_hochberg"
+        ),
+        studies=create_research_value("StudyConfig", {}, {}, {}),
+        sessions=create_research_value(
+            "SessionConfig", "UTC", {"london": (time(8), time(17))}, ("london",)
+        ),
+        market_structure=create_research_value(
+            "MarketStructureConfig", {}, False, (20,), 5, 20
+        ),
+        modeling=create_research_value(
+            "UnsupervisedResearchConfig",
+            ("close", "high", "low", "volume"),
+            True,
+            3,
+            5,
+            50,
+            7,
+        ),
+        artifacts=create_research_value(
+            "ArtifactWriteConfig", Path("research").resolve(), "json"
+        ),
+        limits=create_research_value(
+            "ResearchResourceLimits", 500_000, 600.0, 52_428_800
+        ),
         selected_stages=("data",),
     )
     print(f"FR-RES-011 selected_stages={len(config.selected_stages)}")
@@ -245,7 +258,9 @@ def fr_res_012() -> None:
         },
         index=index,
     )
-    prepared = PreparedDataset(frame, "v1", _quality(), _HASH, _HASH, ("fixture",))
+    prepared = create_research_value(
+        "PreparedDataset", frame, "v1", _quality(), _HASH, _HASH, ("fixture",)
+    )
     print(f"FR-RES-012 rows={len(prepared.data)}")
 
 
@@ -258,7 +273,7 @@ def fr_res_013() -> None:
     _header(
         "FR-RES-013. The system shall distinguish fatal issues, warnings, checks, and explicit cleaning actions with machine-readable codes."
     )
-    quality = DataQualityReport((), (), ("schema",), ())
+    quality = create_research_value("DataQualityReport", (), (), ("schema",), ())
     print(f"FR-RES-013 checks={len(quality.checks)}")
 
 
@@ -272,8 +287,15 @@ def fr_res_014() -> None:
     _header(
         "FR-RES-014. The system shall identify suspected lookahead columns, severity, evidence, recommendation, allowed forward columns, target, and source metadata."
     )
-    leakage = LeakageReport(
-        (), "none", {"checked": 1}, "No suspected lookahead", (), None, ("fixture",)
+    leakage = create_research_value(
+        "LeakageReport",
+        (),
+        "none",
+        {"checked": 1},
+        "No suspected lookahead",
+        (),
+        None,
+        ("fixture",),
     )
     print(f"FR-RES-014 severity={leakage.severity}")
 
@@ -303,7 +325,9 @@ def fr_res_015() -> None:
         "validation_start": datetime(2026, 1, 5, 9, tzinfo=UTC),
         "test_start": datetime(2026, 1, 5, 10, tzinfo=UTC),
     }
-    split = TimeSplitResult(train, validation, test, boundaries, _HASH)
+    split = create_research_value(
+        "TimeSplitResult", train, validation, test, boundaries, _HASH
+    )
     print(f"FR-RES-015 train_rows={len(split.train)}")
 
 
@@ -328,7 +352,9 @@ def fr_res_016() -> None:
             "activity",
         )
     }
-    profile = CoreMetricProfile("v1", metrics, _quality(), _HASH, _HASH, ())
+    profile = create_research_value(
+        "CoreMetricProfile", "v1", metrics, _quality(), _HASH, _HASH, ()
+    )
     print(f"FR-RES-016 schema_version={profile.schema_version}")
 
 
@@ -342,8 +368,16 @@ def fr_res_017() -> None:
     _header(
         "FR-RES-017. The system shall represent one advisory edge study with sample, rule/config, split identity, null evidence, uncertainty, confirmation, seed, warnings, and provenance."
     )
-    edge = EdgeResult(
-        "v1", "mean_reversion", {"mean": 0.5}, {}, "confirmed", 7, (), True
+    edge = create_research_value(
+        "EdgeResult",
+        "v1",
+        "mean_reversion",
+        {"mean": 0.5},
+        {},
+        "confirmed",
+        7,
+        (),
+        True,
     )
     print(f"FR-RES-017 classification={edge.classification}")
 
@@ -357,7 +391,9 @@ def fr_res_018() -> None:
     _header(
         "FR-RES-018. The system shall represent detected structure, regime, scoring, quality, and advisory fit."
     )
-    profile = MarketStructureProfile("v1", {}, 50.0, "mixed", {}, ())
+    profile = create_research_value(
+        "MarketStructureProfile", "v1", {}, 50.0, "mixed", {}, ()
+    )
     print(f"FR-RES-018 verdict={profile.verdict}")
 
 
@@ -370,7 +406,9 @@ def fr_res_019() -> None:
     _header(
         "FR-RES-019. The system shall represent stability windows, robustness, forward-validation outcome, and consolidated calibration evidence."
     )
-    quality = MarketStructureQualityReport("v1", {}, {}, {}, 1.0, ())
+    quality = create_research_value(
+        "MarketStructureQualityReport", "v1", {}, {}, {}, 1.0, ()
+    )
     print(f"FR-RES-019 schema_version={quality.schema_version}")
 
 
@@ -384,7 +422,9 @@ def fr_res_020() -> None:
     _header(
         "FR-RES-020. The system shall represent preprocessing, features, dropped columns, scaler, PCA, clusters, factor/cluster evidence, seed, parameters, diagnostics, and advisory status."
     )
-    result = UnsupervisedResearchResult("v1", {}, {}, {}, {}, 7, (), True)
+    result = create_research_value(
+        "UnsupervisedResearchResult", "v1", {}, {}, {}, {}, 7, (), True
+    )
     print(f"FR-RES-020 seed={result.seed}")
 
 
@@ -397,7 +437,8 @@ def fr_res_021() -> None:
     _header(
         "FR-RES-021. The system shall represent deterministic score rows, uncertainty, final score, readiness reasons, versions, and advisory status."
     )
-    scorecard = ResearchScorecard(
+    scorecard = create_research_value(
+        "ResearchScorecard",
         "v1",
         ({"criterion": "quality", "score": 20},),
         20.0,
@@ -418,7 +459,8 @@ def fr_res_022() -> None:
     _header(
         "FR-RES-022. The system shall normalize approved stage outputs into one versioned snapshot with hashes, versions, warnings, and advisory status."
     )
-    scorecard = ResearchScorecard(
+    scorecard = create_research_value(
+        "ResearchScorecard",
         "v1",
         (),
         0.0,
@@ -427,7 +469,8 @@ def fr_res_022() -> None:
         (),
         True,
     )
-    snapshot = ResearchProfileSnapshot(
+    snapshot = create_research_value(
+        "ResearchProfileSnapshot",
         "v1",
         {"data": {"schema_version": "v1"}},
         scorecard,
@@ -449,8 +492,13 @@ def fr_res_023() -> None:
     _header(
         "FR-RES-023. The system shall expose bounded structured warnings with code, message, severity, optional field path, and bounded details."
     )
-    warning = ResearchWarning(
-        "MISSING_DATA", "Some bars missing", "warning", "close", {"count": 1}
+    warning = create_research_value(
+        "ResearchWarning",
+        "MISSING_DATA",
+        "Some bars missing",
+        "warning",
+        "close",
+        {"count": 1},
     )
     print(f"FR-RES-023 code={warning.code}")
 
@@ -464,7 +512,8 @@ def fr_res_024() -> None:
     _header(
         "FR-RES-024. The system shall produce the fully defined ResearchReport v1 contract with advisory_only=True and complete reproducibility metadata."
     )
-    report = ResearchReport(
+    report = create_research_value(
+        "ResearchReport",
         contract_version="v1",
         schema_id="research.report.v1",
         report_id="research-report-test",
@@ -493,8 +542,15 @@ def fr_res_025() -> None:
     _header(
         "FR-RES-025. The system shall return a safe artifact reference containing relative location, format, byte size, content hash, atomicity, schema version, and audit identity."
     )
-    reference = ArtifactReference(
-        Path("report.json"), "json", 100, _HASH, True, "v1", "audit-001"
+    reference = create_research_value(
+        "ArtifactReference",
+        Path("report.json"),
+        "json",
+        100,
+        _HASH,
+        True,
+        "v1",
+        "audit-001",
     )
     print(f"FR-RES-025 format={reference.format}")
 
@@ -509,9 +565,10 @@ def fr_res_026() -> None:
     _header(
         "FR-RES-026. The system shall expose a unique immutable mapping for every __all__ name with stable classification and lazy import target, without recursive scanning or callable wrapping."
     )
-    stable = all(value == "stable" for value in PUBLIC_API_CLASSIFICATIONS.values())
+    public_api_classifications = get_public_api_classifications()
+    stable = all(value == "stable" for value in public_api_classifications.values())
     print(
-        f"FR-RES-026 classified_names={len(PUBLIC_API_CLASSIFICATIONS)} "
+        f"FR-RES-026 classified_names={len(public_api_classifications)} "
         f"all_stable={stable}"
     )
 

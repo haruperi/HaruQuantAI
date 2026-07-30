@@ -4,18 +4,11 @@ from __future__ import annotations
 
 import hashlib
 
-from app.services.data import MigrationRequest, MigrationStep
+from app.services.data import build_migration_request, build_migration_step
+from app.services.research.contracts.errors import (
+    ConfigurationError,
+)
 from app.utils import get_logger
-
-
-class ConfigurationError(ValueError):
-    """Research-owned configuration migration error."""
-
-    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
-        self.code = code
-        self.detail = detail
-        super().__init__(f"{code}:{detail}")
-
 
 logger = get_logger(__name__)
 
@@ -55,8 +48,8 @@ def _checksum(statements: tuple[str, ...]) -> str:
     return hashlib.sha256(material.encode("utf-8")).hexdigest()
 
 
-RESEARCH_MIGRATION_STEPS: tuple[MigrationStep, ...] = (
-    MigrationStep(
+RESEARCH_MIGRATION_STEPS: tuple[object, ...] = (
+    build_migration_step(
         domain=_DOMAIN,
         migration_id=_MIGRATION_ID,
         checksum=_checksum((_CREATE_STATEMENT, _INDEX_STATEMENT)),
@@ -65,7 +58,7 @@ RESEARCH_MIGRATION_STEPS: tuple[MigrationStep, ...] = (
 )
 
 
-def build_research_migration_request(request_id: str) -> MigrationRequest:
+def build_research_migration_request(request_id: str) -> object:
     """Return the deterministic Research-owned artifact metadata migration.
 
     Execution is delegated to Data's ``run_domain_migrations`` by callers.
@@ -82,7 +75,7 @@ def build_research_migration_request(request_id: str) -> MigrationRequest:
     logger.info("Building Research artifact migration request")
     if not request_id or request_id != request_id.strip():
         raise ConfigurationError("RES_CONFIGURATION_INVALID", "INVALID_REQUEST_ID")
-    return MigrationRequest(
+    return build_migration_request(
         domain=_DOMAIN,
         steps=RESEARCH_MIGRATION_STEPS,
         request_id=request_id,

@@ -18,7 +18,7 @@ from app.services.risk import (
     get_decision_state,
 )
 from app.services.trading import resume_strategy
-from app.utils import AuthContext, canonical_json
+from app.utils import canonical_json
 from fastapi import FastAPI
 
 from tests.api._support import post_json
@@ -37,6 +37,7 @@ AuthoritySnapshot = Any
 KillSwitchCommand = object
 KillSwitchState = object
 TradingRequest = Any
+AuthContext = Any
 
 
 def _kill_switch_hierarchy(
@@ -115,16 +116,19 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
         attestation: ApprovalAttestation | None,
     ) -> KillSwitchState:
         """Apply the command through real Risk authority and persistence."""
-        current[0] = apply_kill_switch_command(
-            command,
-            current[0],
-            auth,
-            approvals,
-            audit,
-            risk_store,
-            config,
-            attestation=attestation,
-            now=workflow_now,
+        current[0] = risk_support.unwrap_risk_response(
+            apply_kill_switch_command(
+                command,
+                current[0],
+                auth,
+                approvals,
+                audit,
+                risk_store,
+                config,
+                attestation=attestation,
+                now=workflow_now,
+            ),
+            operation="apply_kill_switch_command",
         )
         return current[0]
 
@@ -178,7 +182,10 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
         principal_id="operator-2",
         action="risk.kill.clear",
         scope={"global": "*"},
-        policy_ref=compute_config_hash(config),
+        policy_ref=risk_support.unwrap_risk_response(
+            compute_config_hash(config),
+            operation="compute_config_hash",
+        ),
         policy_version=config.policy_version,
         issued_at=workflow_now,
         expires_at=workflow_now + timedelta(minutes=1),
@@ -222,13 +229,16 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
         clock=lambda: workflow_now,
     )
     resumed = asyncio.run(resume_strategy(trading_request, recovered_dependencies))
-    risk_recovery = check_risk_kill_switch(
-        (current[0],),
-        {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
-        config,
-        risk_support._auth(config),
-        reconciled=True,
-        now=risk_support.NOW,
+    risk_recovery = risk_support.unwrap_risk_response(
+        check_risk_kill_switch(
+            (current[0],),
+            {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
+            config,
+            risk_support._auth(config),
+            reconciled=True,
+            now=risk_support.NOW,
+        ),
+        operation="check_risk_kill_switch",
     )
 
     assert active_status == 200, active_body

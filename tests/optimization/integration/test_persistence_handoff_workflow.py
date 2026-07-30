@@ -1,11 +1,15 @@
 """WF-OPT-006 evidence and persistence handoff integration."""
 
 # ruff: noqa: INP001
-from app.services.optimization.public_api import build_optimization_handoff
-from app.services.optimization.state import persist_optimization_result
-from app.utils import logger
+from app.services.optimization import (
+    build_optimization_handoff,
+    persist_optimization_result,
+)
+from app.utils import get_logger
 from tests.optimization.unit.test_evidence_contracts import evidence_request
 from tests.optimization.unit.test_state_contracts import MemoryOptimizationStore
+
+logger = get_logger(__name__)
 
 
 def test_evidence_handoff_is_durable_only_after_receipt() -> None:

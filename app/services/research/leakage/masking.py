@@ -4,15 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 
+from app.services.research.contracts.errors import (
+    SecurityError,
+)
 from app.utils import get_logger, is_sensitive_key
-
-
-class SecurityError(ValueError):
-    """Research-owned leakage security error."""
-
-    def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
-        super().__init__(f"{code}:{detail}")
-
 
 logger = get_logger(__name__)
 

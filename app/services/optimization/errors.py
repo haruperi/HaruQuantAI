@@ -10,7 +10,6 @@ from typing import Literal
 from app.utils import (
     get_logger,
     redact_mapping_value,
-    validate_error_catalog,
 )
 
 
@@ -131,10 +130,8 @@ _OPTIMIZATION_ERROR_DEFINITIONS = (
     ),
 )
 
-OPTIMIZATION_ERROR_CATALOG = validate_error_catalog(
-    MappingProxyType(
-        {definition.code: definition for definition in _OPTIMIZATION_ERROR_DEFINITIONS}
-    )
+OPTIMIZATION_ERROR_CATALOG = MappingProxyType(
+    {definition.code: definition for definition in _OPTIMIZATION_ERROR_DEFINITIONS}
 )
 
 

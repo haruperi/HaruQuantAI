@@ -13,7 +13,7 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.portfolio import ActivePortfolioAllocation
+from app.services.portfolio import create_portfolio_value
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 
@@ -93,7 +93,9 @@ def fr_port_015() -> None:
     )
     print("FR-PORT-015: Require Simulation and Risk authorization")
 
-    allocation = ActivePortfolioAllocation(**_allocation_data())
+    allocation = create_portfolio_value(
+        "ActivePortfolioAllocation", **_allocation_data()
+    )
     assert allocation.simulation_result_id
     assert allocation.simulation_result_hash
     assert allocation.risk_decision_id
@@ -114,7 +116,9 @@ def fr_port_016() -> None:
     )
     print("FR-PORT-016: Require human approval for paper/live profiles")
 
-    sim_allocation = ActivePortfolioAllocation(**_allocation_data())
+    sim_allocation = create_portfolio_value(
+        "ActivePortfolioAllocation", **_allocation_data()
+    )
     assert sim_allocation.scope.get("environment") == "simulation"
     print(f"Simulation scope: {sim_allocation.scope.get('environment')}")
     print("Simulation-profile activation is automatic within simulation policy")
@@ -133,7 +137,9 @@ def fr_port_017() -> None:
     )
     print("FR-PORT-017: Block activation while kill switch is active")
 
-    allocation = ActivePortfolioAllocation(**_allocation_data())
+    allocation = create_portfolio_value(
+        "ActivePortfolioAllocation", **_allocation_data()
+    )
     assert allocation.audit_ref
     print(f"Audit reference: {allocation.audit_ref}")
     print("Activation is auditable for kill-switch governance")
@@ -151,7 +157,9 @@ def fr_port_018() -> None:
     )
     print("FR-PORT-018: Use optimistic concurrency, one active version per scope")
 
-    allocation = ActivePortfolioAllocation(**_allocation_data())
+    allocation = create_portfolio_value(
+        "ActivePortfolioAllocation", **_allocation_data()
+    )
     assert allocation.allocation_version == "allocation-version-1"
     print(f"Allocation version: {allocation.allocation_version}")
     print(f"Scope: {dict(allocation.scope)}")
@@ -169,8 +177,9 @@ def fr_port_019() -> None:
     )
     print("FR-PORT-019: Implement rollback as a new governed version")
 
-    original = ActivePortfolioAllocation(**_allocation_data())
-    rollback = ActivePortfolioAllocation(
+    original = create_portfolio_value("ActivePortfolioAllocation", **_allocation_data())
+    rollback = create_portfolio_value(
+        "ActivePortfolioAllocation",
         **_allocation_data(
             allocation_id="allocation-2",
             allocation_version="allocation-version-2",
@@ -178,7 +187,7 @@ def fr_port_019() -> None:
             rollback_of_version=original.allocation_version,
             canonical_hash="d" * 64,
             idempotency_key="idem-2",
-        )
+        ),
     )
     assert rollback.rollback_of_version == original.allocation_version
     assert rollback.allocation_version != original.allocation_version

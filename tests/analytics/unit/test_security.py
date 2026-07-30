@@ -4,7 +4,9 @@ from app.services.analytics.contracts.errors import (
     AnalyticsValidationError,
     to_analytics_error_payload,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def test_error_payload_redacts_secret_material() -> None:

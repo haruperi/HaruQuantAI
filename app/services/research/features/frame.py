@@ -7,6 +7,10 @@ from typing import TYPE_CHECKING, cast
 
 import pandas as pd
 
+from app.services.indicators import (
+    get_indicator_result_metadata,
+    get_indicator_result_values,
+)
 from app.services.research.features.calculations import (
     forward_returns,
     log_returns,
@@ -18,7 +22,6 @@ from app.utils import get_logger
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.indicators import IndicatorResult
     from app.services.research.contracts import (
         FeatureConfig,
         PreparedDataset,
@@ -31,7 +34,7 @@ type JSONValue = (
 
 
 def _attach_indicator(
-    frame: pd.DataFrame, name: str, result: IndicatorResult
+    frame: pd.DataFrame, name: str, result: object
 ) -> tuple[pd.DataFrame, Mapping[str, JSONValue]]:
     """Attach one public IndicatorResult by timestamp.
 
@@ -47,15 +50,21 @@ def _attach_indicator(
         ValueError: If the contract, index, or columns are incompatible.
     """
     logger.debug("Attaching public IndicatorResult to Research frame")
+    metadata = get_indicator_result_metadata(result)
     if (
-        result.contract_version != "v1"
-        or result.schema_id != "indicators.indicator_series.v1"
+        metadata["contract_version"] != "v1"
+        or metadata["schema_id"] != "indicators.indicator_series.v1"
     ):
         raise ValueError("RES_VERSION_INCOMPATIBLE", "INDICATOR_VERSION_INVALID")
-    values = result.values_only
+    values = get_indicator_result_values(result)
     if not values.index.equals(frame.index):
         raise ValueError("RES_INPUT_INVALID", "INDICATOR_INDEX_MISMATCH")
-    columns = result.output_columns
+    columns_value = metadata["output_columns"]
+    if not isinstance(columns_value, tuple) or not all(
+        isinstance(column, str) for column in columns_value
+    ):
+        raise ValueError("RES_INPUT_INVALID", "INDICATOR_COLUMNS_INVALID")
+    columns = cast("tuple[str, ...]", columns_value)
     if set(columns) & set(frame.columns):
         raise ValueError("RES_INPUT_INVALID", "INDICATOR_COLUMN_COLLISION")
     output = frame.copy(deep=True)
@@ -63,9 +72,11 @@ def _attach_indicator(
         output[column] = values[column].to_numpy(copy=True)
     lineage: Mapping[str, JSONValue] = {
         "name": name,
-        "indicator_id": result.indicator_id,
-        "parameter_hash": result.parameter_hash,
-        "input_checksum": result.manifest.input_checksum,
+        "indicator_id": str(metadata["indicator_id"]),
+        "parameter_hash": str(metadata["parameter_hash"]),
+        "input_checksum": str(
+            cast("Mapping[str, object]", metadata["manifest"])["input_checksum"]
+        ),
         "output_columns": list(columns),
     }
     return output, lineage
@@ -74,7 +85,7 @@ def _attach_indicator(
 def build_research_feature_frame(
     prepared: PreparedDataset,
     *,
-    indicator_results: Mapping[str, IndicatorResult],
+    indicator_results: Mapping[str, object],
     config: FeatureConfig,
     limits: ResearchResourceLimits,
 ) -> tuple[pd.DataFrame, Mapping[str, JSONValue]]:

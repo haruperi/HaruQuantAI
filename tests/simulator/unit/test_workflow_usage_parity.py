@@ -19,6 +19,8 @@ EXPECTED = {
     "WF-SIM-007": "wf_sim_007_non_canonical_fast_research.py",
     "WF-SIM-SEC": "wf_sim_sec_portfolio_backtest.py",
     "WF-SIM-010": "wf_sim_010_tick_series_acquisition.py",
+    "WF-SIM-011": "wf_sim_011_reports_and_artifact_manifest.py",
+    "WF-SIM-012": "wf_sim_012_fx_margin_and_execution_costs.py",
 }
 
 

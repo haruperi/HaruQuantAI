@@ -86,7 +86,9 @@ def identify_pca_risk_factors(
     loadings = pca.get("loadings")
     feature_columns = pca.get("feature_columns")
     if not isinstance(loadings, list) or not isinstance(feature_columns, list):
-        raise ValueError("RES_INPUT_INVALID", "MALFORMED_PCA_EVIDENCE")
+        raise ValueError(  # noqa: TRY004 - Research validation taxonomy.
+            "RES_INPUT_INVALID", "MALFORMED_PCA_EVIDENCE"
+        )
     factors: list[Mapping[str, JSONValue]] = []
     for component_index, component in enumerate(loadings):
         if not isinstance(component, list):

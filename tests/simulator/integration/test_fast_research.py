@@ -4,13 +4,15 @@
 from pathlib import Path
 
 from app.services.simulator import run_fast_research, unwrap_simulation_response
-from app.utils import logger
+from app.utils import get_logger
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
     _auth,
     _dataset,
     _request,
 )
+
+logger = get_logger(__name__)
 
 
 def test_fast_research_cannot_produce_canonical_evidence(tmp_path: Path) -> None:

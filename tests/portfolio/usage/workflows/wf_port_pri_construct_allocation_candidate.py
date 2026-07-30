@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.portfolio import execute_portfolio_handle_operation
 from tests.portfolio.usage.workflows._support import construction_workflow
 
 WORKFLOW_ID = "WF-PORT-PRI"
@@ -54,7 +55,7 @@ def main() -> None:
 
     # Stage 6 — Execute the public workflow and persist immutable state.
     _stage(6)
-    result, evidence = service.construct(request)
+    result, evidence = execute_portfolio_handle_operation(service, "construct", request)
     assert store.constructions[result.result_id] is result
     print("Evidence lineage:", evidence.evidence_hash)
     print("OUTPUT BOUNDARY — PortfolioConstructionResult:", result.result_id)

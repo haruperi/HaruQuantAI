@@ -2,16 +2,19 @@
 
 import time
 from datetime import UTC, datetime
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from app.services.portfolio.api.service import PortfolioService
-from app.services.portfolio.exceptions import PortfolioError
-from app.utils import AuthContext, generate_id
+from app.services.portfolio.contracts.errors import PortfolioError
+from app.utils import create_auth_context, generate_id
+
+AuthContext = Any
 
 
 def _auth() -> AuthContext:
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="usr-1",

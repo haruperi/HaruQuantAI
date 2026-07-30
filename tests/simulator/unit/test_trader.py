@@ -9,12 +9,12 @@ from typing import Any
 import pytest
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.execution import SimTrader
-from app.utils import StandardResponse
 
 from tests.simulator.unit.test_engine import _engine, _intent, _tick
 
 ExecutionReceipt = Any
 OrderIntent = Any
+StandardResponse = Any
 
 
 def test_submit_order_never_calls_live_adapter(tmp_path: Path) -> None:

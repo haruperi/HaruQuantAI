@@ -1,7 +1,9 @@
 """Unit tests for recursive Research masking."""
 
-from app.services.research.leakage import mask_research_artifact
-from app.utils import logger
+from app.services.research import mask_research_artifact
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def test_masking_covers_nested_sensitive_fields() -> None:

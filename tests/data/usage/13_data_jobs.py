@@ -1,3 +1,4 @@
+# ruff: noqa: BLE001
 """Demonstrate FEAT-DATA-13 update-job scheduling and lifecycle operations."""
 
 from __future__ import annotations
@@ -6,6 +7,7 @@ import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
@@ -24,12 +26,6 @@ from app.services.data import (
 )
 from app.utils import generate_id
 
-
-def _error_code(error: BaseException) -> str:
-    """Return a safe public-boundary error identifier."""
-    return str(getattr(error, "code", type(error).__name__))
-
-
 _JOB_NAME = "usage_sync_eurusd"
 _START = datetime(2026, 6, 1, tzinfo=UTC)
 
@@ -39,8 +35,103 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _demonstrate_feature() -> None:
-    """Exercise job creation, status querying, execution, and state transitions."""
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
+
+
+def fr_data_041() -> None:
+    """FR-DATA-041: Stage 1 — Register job definition with source, symbol, timeframe, interval, and enabled status."""
+    _header("Stage 1: Job Registration & Definition - Job Definition (FR-DATA-041)")
+    req_id = generate_id("req")
+    job_def = build_job_definition(
+        job_id=_JOB_NAME,
+        source_id="mt5",
+        symbols=("EURUSD",),
+        timeframes=("M1",),
+        data_kinds=("ohlcv",),
+        start=_START,
+        end=_START + timedelta(days=1),
+        interval_seconds=3600,
+        enabled=True,
+        created_at=datetime.now(UTC),
+        request_id=req_id,
+    )
+    print(_format_result(job_def))
+    try:
+        job = create_data_update_job(job_def, request_id=req_id)
+        print(_format_result(job))
+        print(f"Data -> JobStatus(job_id={job.job_id}, state={job.state})")
+    except Exception as exc:
+        code = getattr(exc, "code", type(exc).__name__)
+        print(f"Data -> DataError({code})")
+
+
+def fr_data_042_043() -> None:
+    """FR-DATA-042, FR-DATA-043: Stage 2 — Start and stop data update jobs deterministically."""
+    _header(
+        "Stage 2: Job Lifecycle Control - Start & Stop Job (FR-DATA-042, FR-DATA-043)"
+    )
+    req_id = generate_id("req")
+    try:
+        job_st = start_data_update_job(job_id=_JOB_NAME, request_id=req_id)
+        print(_format_result(job_st))
+        print(f"Data -> JobStatus(job_id={job_st.job_id}, state={job_st.state})")
+    except Exception as exc:
+        code = getattr(exc, "code", type(exc).__name__)
+        print(f"Data -> DataError({code})")
+
+    try:
+        job_sp = stop_data_update_job(job_id=_JOB_NAME, request_id=req_id)
+        print(_format_result(job_sp))
+        print(f"Data -> JobStatus(job_id={job_sp.job_id}, state={job_sp.state})")
+    except Exception as exc:
+        code = getattr(exc, "code", type(exc).__name__)
+        print(f"Data -> DataError({code})")
+
+
+def fr_data_044_084() -> None:
+    """FR-DATA-044, FR-DATA-084: Stage 3 — Run update job once and advance checkpoint deterministically."""
+    _header(
+        "Stage 3: Single-Run Execution & Checkpointing - Run Job Once (FR-DATA-044, FR-DATA-084)"
+    )
+    req_id = generate_id("req")
+    try:
+        res = run_data_update_job_once(job_id=_JOB_NAME, request_id=req_id)
+        print(_format_result(res))
+        print(f"Data -> JobRunResult(job_id={res.job_id}, state={res.state})")
+    except Exception as exc:
+        code = getattr(exc, "code", type(exc).__name__)
+        print(f"Data -> DataError({code})")
+
+
+def fr_data_045() -> None:
+    """FR-DATA-045: Stage 4 — Query data update job status and recovery state."""
+    _header("Stage 4: Job Status & Recovery - Job Status Query (FR-DATA-045)")
+    req_id = generate_id("req")
+    status_req = build_job_status_request(job_id=_JOB_NAME, request_id=req_id)
+    try:
+        st = get_data_update_job_status(status_req)
+        print(_format_result(st))
+        print(f"Data -> JobStatus(job_id={st.job_id}, state={st.state})")
+    except Exception as exc:
+        code = getattr(exc, "code", type(exc).__name__)
+        print(f"Data -> DataError({code})")
+
+
+def main() -> None:
+    """Execute every functional-requirement demonstration."""
     with TemporaryDirectory(prefix="usage-data-jobs-") as directory:
         (Path(directory) / "data" / "raw").mkdir(parents=True, exist_ok=True)
         settings = build_data_settings(
@@ -60,118 +151,21 @@ def _demonstrate_feature() -> None:
         )
         with data_settings_context(settings):
             run_data_migrations(generate_id("req"))
-            _demonstrate_job_operations()
+            ensure_source("mt5", generate_id("req"))
+            print("=" * 80)
+            print("FEATURE: FEAT-DATA-13 - Data Jobs and Orchestration")
+            print(
+                "PURPOSE: Register, schedule, execute, checkpoint, and monitor automated data update jobs"
+            )
+            print(
+                "MODULE FLOW: Stage 1 (Registration & Definition) -> Stage 2 (Lifecycle Control) -> Stage 3 (Single-Run & Checkpoint) -> Stage 4 (Status & Recovery)"
+            )
+            print("=" * 80)
 
-
-def _demonstrate_job_operations() -> None:
-    """Run the update-job lifecycle operations inside an active context."""
-    req_id = generate_id("req")
-    ensure_source("mt5", req_id)
-
-    job_def = build_job_definition(
-        job_id=_JOB_NAME,
-        source_id="mt5",
-        symbols=("EURUSD",),
-        timeframes=("M1",),
-        data_kinds=("ohlcv",),
-        start=_START,
-        end=_START + timedelta(days=1),
-        interval_seconds=3600,
-        enabled=True,
-        created_at=datetime.now(UTC),
-        request_id=req_id,
-    )
-
-    try:
-        job = create_data_update_job(job_def, request_id=req_id)
-        print(f"Registered job: name={job.job_id} enabled={job.enabled}")
-    except Exception as exc:  # noqa: BLE001 - domain error classes stay internal.
-        print(f"create_data_update_job handled: {_error_code(exc)}")
-
-    status_req = build_job_status_request(job_id=_JOB_NAME, request_id=req_id)
-    try:
-        status = get_data_update_job_status(status_req)
-        print(f"Job status: state={status.state} enabled={status.enabled}")
-    except Exception as exc:  # noqa: BLE001 - domain error classes stay internal.
-        print(f"get_data_update_job_status handled: {_error_code(exc)}")
-
-    try:
-        job = start_data_update_job(job_id=_JOB_NAME, request_id=req_id)
-        print(f"Started job: state={job.state}")
-    except Exception as exc:  # noqa: BLE001 - domain error classes stay internal.
-        print(f"start_data_update_job handled: {_error_code(exc)}")
-
-    try:
-        result = run_data_update_job_once(job_id=_JOB_NAME, request_id=req_id)
-        print(
-            "Completed run:",
-            f"state={result.state}",
-            f"records={result.record_count}",
-            f"checkpoint={result.last_checkpoint}",
-        )
-    except Exception as exc:  # noqa: BLE001 - domain error classes stay internal.
-        print(f"run_data_update_job_once handled: {_error_code(exc)}")
-
-    try:
-        job = stop_data_update_job(job_id=_JOB_NAME, request_id=req_id)
-        print(f"Stopped job: state={job.state}")
-    except Exception as exc:  # noqa: BLE001 - domain error classes stay internal.
-        print(f"stop_data_update_job handled: {_error_code(exc)}")
-
-
-_DEMONSTRATED = [False]
-
-
-def _demonstrate_once() -> None:
-    """Run the feature demonstration once for all requirement entry points."""
-    if _DEMONSTRATED[0]:
-        return
-    _demonstrate_feature()
-    _DEMONSTRATED[0] = True
-
-
-def fr_data_041() -> None:
-    _header("fr_data_041")
-    _demonstrate_once()
-
-
-def fr_data_042() -> None:
-    _header("fr_data_042")
-    _demonstrate_once()
-
-
-def fr_data_043() -> None:
-    _header("fr_data_043")
-    _demonstrate_once()
-
-
-def fr_data_044() -> None:
-    _header("fr_data_044")
-    _demonstrate_once()
-
-
-def fr_data_045() -> None:
-    _header("fr_data_045")
-    _demonstrate_once()
-
-
-def fr_data_084() -> None:
-    _header("fr_data_084")
-    _demonstrate_once()
-
-
-def main() -> None:
-    """Execute every functional-requirement demonstration."""
-    demonstrations = (
-        fr_data_041,
-        fr_data_042,
-        fr_data_043,
-        fr_data_044,
-        fr_data_045,
-        fr_data_084,
-    )
-    for demonstration in demonstrations:
-        demonstration()
+            fr_data_041()
+            fr_data_042_043()
+            fr_data_044_084()
+            fr_data_045()
 
 
 if __name__ == "__main__":

@@ -12,14 +12,15 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.contracts import (
-    DataQualityReport,
-    MarketDataset,
-    TickRecord,
+from app.services.data import (
+    build_data_quality_report,
+    build_market_dataset,
+    build_tick_record,
 )
 from app.services.simulator import (
-    Tick,
     build_tick_timeline,
+    create_simulation_value,
+    dump_simulation_value,
     unwrap_simulation_response,
     validate_intent_timing,
 )
@@ -35,11 +36,11 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _dataset() -> MarketDataset:
+def _dataset() -> object:
     """Build tick dataset for timeline example."""
     start = datetime(2025, 1, 1, tzinfo=UTC)
     t2 = start + timedelta(seconds=1)
-    r1 = TickRecord(
+    r1 = build_tick_record(
         timestamp=start,
         source="fixture",
         source_symbol="EURUSD",
@@ -54,7 +55,7 @@ def _dataset() -> MarketDataset:
         tick_index_in_bar=0,
         bar_phase=1,
     )
-    r2 = TickRecord(
+    r2 = build_tick_record(
         timestamp=t2,
         source="fixture",
         source_symbol="EURUSD",
@@ -69,7 +70,7 @@ def _dataset() -> MarketDataset:
         tick_index_in_bar=1,
         bar_phase=1,
     )
-    quality = DataQualityReport(
+    quality = build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
         record_count=2,
@@ -79,7 +80,7 @@ def _dataset() -> MarketDataset:
         schema_version="v1",
         generated_at=t2,
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="ticks",
         symbol="EURUSD",
@@ -111,7 +112,8 @@ def fr_sim_004() -> None:
         "Demonstrate FR-SIM-004. Responsibility: The system shall expose an immutable UTC tick containing symbol, timestamp, bid, ask, source identity, sequence, and availability metadata with finite positive prices and `ask >= bid`."
     )
     instant = datetime(2025, 1, 1, tzinfo=UTC)
-    tick = Tick(
+    tick = create_simulation_value(
+        "Tick",
         symbol="EURUSD",
         timestamp=instant,
         bid=Decimal("1.10000"),
@@ -120,7 +122,7 @@ def fr_sim_004() -> None:
         sequence=0,
         available_at=instant,
     )
-    print(f"Tick spread: {tick.ask - tick.bid}")
+    print("Validated immutable tick:", dump_simulation_value(tick))
 
 
 def fr_sim_005() -> None:
@@ -137,8 +139,8 @@ def fr_sim_005() -> None:
         "Demonstrate FR-SIM-005. Responsibility: The system shall convert one Data-owned tick `MarketDataset` into a strictly ordered immutable `Tick` tuple, validating UTC monotonicity, positive finite prices, `ask >= bid`, and the presence of intra-bar phase evidence. Tick derivation itself belongs to Data (`FR-DATA-087`-`FR-DATA-090`); Simulation constructs no ticks, applies no spread model, and consumes no seed."
     )
     timeline = _value(build_tick_timeline(_dataset()))
-    sequences = tuple(t.sequence for t in timeline)
-    print(f"Timeline tick sequences: {sequences}")
+    rows = tuple(dump_simulation_value(tick) for tick in timeline)
+    print("Ordered execution timeline:", rows)
 
 
 def fr_sim_006() -> None:
@@ -153,7 +155,7 @@ def fr_sim_006() -> None:
     )
     instant = datetime(2025, 1, 1, tzinfo=UTC)
     _value(validate_intent_timing(instant, instant))
-    print("Intent timing validated successfully")
+    print("Intent timing decision:", {"visible_at": instant, "execution_at": instant})
 
 
 def main() -> None:

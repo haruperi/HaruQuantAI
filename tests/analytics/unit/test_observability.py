@@ -6,9 +6,11 @@ from decimal import Decimal
 import pytest
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.reports.builder import build_performance_report
-from app.utils import generate_id, logger
+from app.utils import generate_id, get_logger
 
-from tests.analytics._support import NOW, _configured, _source
+logger = get_logger(__name__)
+
+from tests.analytics._support import NOW, _configured, _source  # noqa: E402
 
 
 class _RecordCollector(logging.Handler):

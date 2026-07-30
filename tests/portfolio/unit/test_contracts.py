@@ -13,8 +13,10 @@ from app.services.portfolio.contracts import (
     PortfolioConstructionRequest,
     PortfolioConstructionResult,
 )
-from app.services.portfolio.exceptions import PortfolioError
-from app.utils import logger
+from app.services.portfolio.contracts.errors import PortfolioError
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def test_request_rejects_unknown_fields_and_unsafe_numbers(

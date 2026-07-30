@@ -10,22 +10,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.research import (
-    CoreMetricProfile,
-    DataQualityReport,
-    EdgeResult,
-    MarketStructureProfile,
-    ResearchReport,
-    ResearchScorecard,
-    run_edge_lab_profile,
-)
-from app.services.research.profiles import (
     build_dashboard_summary,
     build_profile_summary,
     build_research_profile_snapshot,
     build_research_scorecard,
+    create_research_value,
     generate_multi_symbol_report,
+    is_research_value,
     render_profile_comparison,
     render_research_report,
+    run_edge_lab_profile,
 )
 from tests.research._support import make_dataset, make_edge_lab_config
 
@@ -37,7 +31,7 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _metric_profile() -> CoreMetricProfile:
+def _metric_profile() -> object:
     """Build a seven-family metric profile with canonical families."""
     metrics = {
         f: {"value": 1.0, "unit": "ratio", "sample_size": 1}
@@ -51,24 +45,28 @@ def _metric_profile() -> CoreMetricProfile:
             "activity",
         )
     }
-    return CoreMetricProfile(
+    return create_research_value(
+        "CoreMetricProfile",
         "v1",
         metrics,
-        DataQualityReport((), (), ("schema",), ()),
+        create_research_value("DataQualityReport", (), (), ("schema",), ()),
         _HASH,
         _HASH,
         (),
     )
 
 
-def _edge() -> EdgeResult:
+def _edge() -> object:
     """Build a confirmed advisory edge."""
-    return EdgeResult("v1", "mean_reversion", {}, {}, "confirmed", 7, (), True)
+    return create_research_value(
+        "EdgeResult", "v1", "mean_reversion", {}, {}, "confirmed", 7, (), True
+    )
 
 
-def _structure() -> MarketStructureProfile:
+def _structure() -> object:
     """Build a trending profile."""
-    return MarketStructureProfile(
+    return create_research_value(
+        "MarketStructureProfile",
         "v1",
         {"swing_window": 5},
         75.0,
@@ -78,7 +76,7 @@ def _structure() -> MarketStructureProfile:
     )
 
 
-def _scorecard() -> ResearchScorecard:
+def _scorecard() -> object:
     """Build a canonical scorecard."""
     return build_research_scorecard(
         metric_profile=_metric_profile(),
@@ -89,9 +87,10 @@ def _scorecard() -> ResearchScorecard:
     )
 
 
-def _report() -> ResearchReport:
+def _report() -> object:
     """Build a canonical advisory report."""
-    return ResearchReport(
+    return create_research_value(
+        "ResearchReport",
         "v1",
         "research.report.v1",
         "research-report-test",
@@ -197,7 +196,7 @@ def fr_res_096() -> None:
     )
     assert response.status == "success"
     report = response.data
-    assert isinstance(report, ResearchReport)
+    assert is_research_value(report, "ResearchReport")
     print(
         "FR-RES-096 "
         f"stages={report.evidence['selected_stages']} "

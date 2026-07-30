@@ -1,6 +1,7 @@
 """Unit tests for Analytics barrier reports."""
 
 from decimal import Decimal
+from types import SimpleNamespace
 
 from app.services.analytics.contracts import ClosedTradeLedger
 from app.services.analytics.reports import (
@@ -8,16 +9,12 @@ from app.services.analytics.reports import (
     build_barrier_section,
     build_worst_day_distribution,
 )
-from app.services.optimization.robustness import (
-    FirstPassageReport,
-    JointFirstPassageReport,
-)
 from app.services.risk import get_drawdown_mode
 
 
-def _reports() -> tuple[FirstPassageReport, JointFirstPassageReport]:
+def _reports() -> tuple[object, object]:
     """Build bounded Optimization report fixtures."""
-    first = FirstPassageReport(
+    first = SimpleNamespace(
         mandate_version="v1",
         mode=get_drawdown_mode("STATIC"),
         paths=10,
@@ -28,7 +25,7 @@ def _reports() -> tuple[FirstPassageReport, JointFirstPassageReport]:
         probability_expired=Decimal("0.3"),
         median_termination_day=Decimal(3),
     )
-    joint = JointFirstPassageReport(
+    joint = SimpleNamespace(
         paths=10,
         seed=1,
         account_ids=("a", "b"),

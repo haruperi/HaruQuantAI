@@ -7,9 +7,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.research import FeatureConfig
-from app.services.research.features import build_research_feature_frame
-from app.services.research.leakage import (
+from app.services.research import (
+    build_research_feature_frame,
+    create_research_value,
     enforce_time_split,
     validate_no_lookahead_features,
 )
@@ -39,7 +39,9 @@ def main() -> None:
     # Stage 1 — Receive prepared genuine MT5 data and explicit feature configuration.
     _stage(1)
     prepared = prepared_dataset()
-    config = FeatureConfig({"sma": 2}, (1,), ("forward_return_1",), "preserve")
+    config = create_research_value(
+        "FeatureConfig", {"sma": 2}, (1,), ("forward_return_1",), "preserve"
+    )
 
     # Stage 2 — Build the Research feature frame and declared lineage.
     _stage(2)

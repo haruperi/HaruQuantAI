@@ -100,18 +100,27 @@ class DeterministicPort:
         decision = assess_intelligence_applicability(asset_class, model=model)
         return {"status": decision.status, "reasons": ",".join(decision.reasons)}
 
-    def get_fundamental_projection(self, instrument, asset_class, model, decision_time):
+    def get_fundamental_projection(
+        self,
+        instrument,
+        asset_class,
+        model,
+        required_kinds,
+        decision_time,
+    ):
         """Return the projected fundamental evidence.
 
         Args:
             instrument: Instrument under analysis.
             asset_class: Normalized instrument asset class.
             model: Requested fundamental model.
+            required_kinds: Source kinds required for this reading.
             decision_time: Point in time the evidence is available by.
 
         Returns:
             Bounded projection fields.
         """
+        assert required_kinds
         self.calls.append(
             f"evidence:{instrument}:{asset_class}:{model}:{decision_time}"
         )

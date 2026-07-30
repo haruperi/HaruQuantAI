@@ -1,37 +1,51 @@
-"""Public Portfolio domain port."""
+"""Approved function-only public boundary for Portfolio."""
 
-from app.services.portfolio.api import PortfolioService
-from app.services.portfolio.contracts import (
-    ActivePortfolioAllocation,
-    PortfolioConstructionRequest,
-    PortfolioConstructionResult,
-    PortfolioRebalancePlan,
+from app.services.portfolio.api import (
+    activate_portfolio,
+    assess_portfolio_drift,
+    construct_portfolio,
+    create_portfolio_handle,
+    create_portfolio_value,
+    dump_portfolio_value,
+    execute_portfolio_handle_operation,
+    get_portfolio_error_catalog,
+    get_portfolio_history,
+    get_portfolio_status,
+    get_portfolio_value_field,
+    is_portfolio_handle,
+    is_portfolio_value,
+    recompute_portfolio_measurement,
+    rollback_portfolio,
+    submit_portfolio_rebalance,
+    to_portfolio_error_payload,
 )
-from app.services.portfolio.exceptions import (
-    PORTFOLIO_ERROR_CATALOG,
-    PortfolioError,
-    PortfolioErrorPayload,
-)
-from app.services.portfolio.rebalancing import (
-    CommonModeExposureReport,
-    CrossAccountCorrelationReport,
-    RebalancingService,
+from app.services.portfolio.evidence import validate_construction_evidence
+from app.services.portfolio.rebalancing.cross_account import (
     assess_common_mode_exposure,
     measure_cross_account_correlation,
 )
+from app.services.portfolio.state.migrations import get_portfolio_migrations
 
-__all__: tuple[str, ...] = (
-    "PORTFOLIO_ERROR_CATALOG",
-    "ActivePortfolioAllocation",
-    "CommonModeExposureReport",
-    "CrossAccountCorrelationReport",
-    "PortfolioConstructionRequest",
-    "PortfolioConstructionResult",
-    "PortfolioError",
-    "PortfolioErrorPayload",
-    "PortfolioRebalancePlan",
-    "PortfolioService",
-    "RebalancingService",
+__all__ = (
+    "activate_portfolio",
     "assess_common_mode_exposure",
+    "assess_portfolio_drift",
+    "construct_portfolio",
+    "create_portfolio_handle",
+    "create_portfolio_value",
+    "dump_portfolio_value",
+    "execute_portfolio_handle_operation",
+    "get_portfolio_error_catalog",
+    "get_portfolio_history",
+    "get_portfolio_migrations",
+    "get_portfolio_status",
+    "get_portfolio_value_field",
+    "is_portfolio_handle",
+    "is_portfolio_value",
     "measure_cross_account_correlation",
+    "recompute_portfolio_measurement",
+    "rollback_portfolio",
+    "submit_portfolio_rebalance",
+    "to_portfolio_error_payload",
+    "validate_construction_evidence",
 )

@@ -8,12 +8,14 @@ from decimal import Decimal
 from typing import Any, cast
 
 import pytest
-from app.services.portfolio.config import PortfolioSettings
+from app.services.portfolio._settings import PortfolioSettings
 from app.services.portfolio.construction import ConstructionService
 from app.services.portfolio.contracts import PortfolioConstructionRequest
+from app.services.portfolio.contracts.errors import PortfolioError
 from app.services.portfolio.evidence import ValidatedConstructionEvidence
-from app.services.portfolio.exceptions import PortfolioError
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def _validated_evidence(

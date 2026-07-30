@@ -20,6 +20,9 @@ WORKFLOWS = (
     "wf_anlt_010_compare_performance_reports.py",
     "wf_anlt_013_build_portfolio_allocation_evidence.py",
     "wf_anlt_014_measure_reconciled_portfolio_rebalance.py",
+    "wf_anlt_015_equity_curve_worst_day_distribution.py",
+    "wf_anlt_016_validate_contract_and_metric_catalogue.py",
+    "wf_anlt_017_emit_error_payload_quality_flags.py",
 )
 
 

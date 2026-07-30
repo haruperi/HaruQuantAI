@@ -7,6 +7,7 @@ import time
 from collections.abc import Callable, Sequence
 from typing import TYPE_CHECKING
 
+from app.services.analytics import get_analytics_value_field
 from app.services.optimization.errors import OptimizationError
 from app.services.optimization.execution import (
     BacktestExecutionAdapter,
@@ -204,7 +205,9 @@ def run_bounded_search(
                 score=score,
                 evidence={
                     "simulation_run_id": measured.simulation_run_id,
-                    "analytics_report_id": measured.analytics_report.report_id,
+                    "analytics_report_id": get_analytics_value_field(
+                        measured.analytics_report, "report_id"
+                    ),
                 },
             )
         except OptimizationError as error:

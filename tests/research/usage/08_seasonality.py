@@ -14,14 +14,8 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.research import (
-    DataQualityReport,
-    PreparedDataset,
-    ResearchResourceLimits,
-    SessionConfig,
-)
-from app.services.research.seasonality import (
-    SeasonalityFilters,
     active_sessions_for_hour,
+    create_research_value,
     run_seasonality,
     session_hours_payload,
     session_label_for_hour,
@@ -36,9 +30,10 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _config() -> SessionConfig:
+def _config() -> object:
     """Build a two-session policy with a documented overlap."""
-    return SessionConfig(
+    return create_research_value(
+        "SessionConfig",
         "UTC",
         {
             "london": (time(8), time(17)),
@@ -48,15 +43,16 @@ def _config() -> SessionConfig:
     )
 
 
-def _prepared() -> PreparedDataset:
+def _prepared() -> object:
     """Build a PreparedDataset spanning multiple sessions."""
     idx = pd.date_range("2026-01-05", periods=48, freq="h", tz="UTC")
     close = pd.Series([100.0 + i * 0.3 for i in range(48)], index=idx, dtype="float64")
     frame = pd.DataFrame({"close": close}, index=idx)
-    return PreparedDataset(
+    return create_research_value(
+        "PreparedDataset",
         frame,
         "v1",
-        DataQualityReport((), (), ("schema",), ()),
+        create_research_value("DataQualityReport", (), (), ("schema",), ()),
         _HASH,
         _HASH,
         ("fixture",),
@@ -112,7 +108,9 @@ def fr_res_073() -> None:
     _header(
         "FR-RES-073: Define immutable optional calendar, session, symbol, and hour filters without embedding session definitions."
     )
-    filters = SeasonalityFilters(years=(2026,), months=(1,), hours=(8, 9, 14))
+    filters = create_research_value(
+        "SeasonalityFilters", years=(2026,), months=(1,), hours=(8, 9, 14)
+    )
     print(f"FR-RES-073 filter_hours={filters.hours}")
 
 
@@ -125,8 +123,10 @@ def fr_res_074() -> None:
     result = run_seasonality(
         _prepared(),
         sessions=_config(),
-        filters=SeasonalityFilters(),
-        limits=ResearchResourceLimits(500_000, 600.0, 52_428_800),
+        filters=create_research_value("SeasonalityFilters"),
+        limits=create_research_value(
+            "ResearchResourceLimits", 500_000, 600.0, 52_428_800
+        ),
     )
     print(f"FR-RES-074 row_count={result['row_count']}")
 

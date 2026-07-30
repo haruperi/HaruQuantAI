@@ -9,7 +9,7 @@ from app.services.optimization.execution import (
     SimulationAnalyticsBacktestAdapter,
     execute_candidate,
 )
-from app.utils import AuthContext
+from app.utils import create_auth_context
 
 from tests.analytics._support import _report
 from tests.optimization.unit.test_execution_contracts import execution_request
@@ -38,10 +38,10 @@ class FakeAdapter:
         )
 
 
-def _auth() -> AuthContext:
+def _auth() -> object:
     """Build matching test authority."""
     request = execution_request()
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="optimization-test",

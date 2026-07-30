@@ -12,7 +12,7 @@ from app.services.simulator.run import (
     PortfolioComponentRequest,
     run_portfolio_backtest,
 )
-from app.utils import AuthContext, canonical_digest
+from app.utils import canonical_digest
 
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
@@ -66,7 +66,7 @@ def _portfolio_request() -> PortfolioBacktestRequestV1:
     return PortfolioBacktestRequestV1.model_validate(payload)
 
 
-def _portfolio_auth(request: PortfolioBacktestRequestV1) -> AuthContext:
+def _portfolio_auth(request: PortfolioBacktestRequestV1) -> object:
     """Build matching portfolio authentication evidence."""
     child_auth = _auth(request.components[0].backtest_request)
     return child_auth.model_copy(

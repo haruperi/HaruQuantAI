@@ -13,12 +13,12 @@ import pandas as pd
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.research import StatisticalConfig
-from app.services.research.statistics import (
+from app.services.research import (
     benjamini_hochberg,
     block_bootstrap_ci,
     block_bootstrap_distribution,
     compute_null_percentile,
+    create_research_value,
     exceeds_null_threshold,
     holm_bonferroni,
     null_distribution_stats,
@@ -35,13 +35,15 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _config() -> StatisticalConfig:
+def _config() -> object:
     """Build seeded and bounded statistical settings.
 
     Returns:
         A validated statistical configuration instance.
     """
-    return StatisticalConfig(7, 20, 20, 2, 20, "benjamini_hochberg")
+    return create_research_value(
+        "StatisticalConfig", 7, 20, 20, 2, 20, "benjamini_hochberg"
+    )
 
 
 def fr_res_050() -> None:

@@ -2,8 +2,10 @@
 
 # ruff: noqa: INP001
 from app.services.analytics import build_dashboard_payload
-from app.utils import logger
-from tests.analytics._support import _report, unwrap
+from app.utils import get_logger
+
+logger = get_logger(__name__)
+from tests.analytics._support import _report, unwrap  # noqa: E402
 
 
 def test_dashboard_uses_report_sections_without_recomputation() -> None:

@@ -1,17 +1,21 @@
 """Unit tests for Research unsupervised workflow (FR-RES-088)."""
 
 import pandas as pd
+import pytest
 from app.services.research import (
-    ResearchResourceLimits,
-    UnsupervisedResearchConfig,
+    create_research_value,
+    run_unsupervised_research,
 )
-from app.services.research.modeling import run_unsupervised_research
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
-def _config() -> UnsupervisedResearchConfig:
+def _config() -> object:
     """Build a modeling configuration."""
-    return UnsupervisedResearchConfig(("a", "b"), True, 2, 2, 20, 7)
+    return create_research_value(
+        "UnsupervisedResearchConfig", ("a", "b"), True, 2, 2, 20, 7
+    )
 
 
 def _features(rows: int = 25) -> pd.DataFrame:
@@ -25,8 +29,58 @@ def test_workflow_is_stateless_seeded_and_advisory() -> None:
     result = run_unsupervised_research(
         _features(),
         config=_config(),
-        limits=ResearchResourceLimits(500_000, 600.0, 52_428_800),
+        limits=create_research_value(
+            "ResearchResourceLimits", 500_000, 600.0, 52_428_800
+        ),
     )
     assert result.schema_version == "v1"
     assert result.seed == 7
     assert result.advisory_only is True
+
+
+def test_workflow_resource_and_evidence_guards(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Cover row bounds, sample bounds, malformed insight, and empty PCA warning."""
+    with pytest.raises(ValueError, match="ROW_LIMIT_EXCEEDED"):
+        run_unsupervised_research(
+            _features(),
+            config=_config(),
+            limits=create_research_value("ResearchResourceLimits", 5, 10.0, 1_024),
+        )
+    with pytest.raises(ValueError, match="INSUFFICIENT_MODELING_SAMPLES"):
+        run_unsupervised_research(
+            _features(2),
+            config=_config(),
+            limits=create_research_value("ResearchResourceLimits", 100, 10.0, 1_024),
+        )
+    monkeypatch.setattr(
+        "app.services.research.modeling.workflow.cluster_feature_space",
+        lambda _features, *, config: {"labels": []},  # noqa: ARG005
+    )
+    monkeypatch.setattr(
+        "app.services.research.modeling.workflow.build_unsupervised_insight_report",
+        lambda _features, *, config: {  # noqa: ARG005
+            "descriptive": "bad",
+            "pca": {},
+        },
+    )
+    with pytest.raises(ValueError, match="INVALID_INSIGHT_REPORT"):
+        run_unsupervised_research(
+            _features(),
+            config=_config(),
+            limits=create_research_value("ResearchResourceLimits", 100, 10.0, 1_024),
+        )
+    monkeypatch.setattr(
+        "app.services.research.modeling.workflow.build_unsupervised_insight_report",
+        lambda _features, *, config: {  # noqa: ARG005
+            "descriptive": {"rows": 25},
+            "pca": {},
+        },
+    )
+    result = run_unsupervised_research(
+        _features(),
+        config=_config(),
+        limits=create_research_value("ResearchResourceLimits", 100, 10.0, 1_024),
+    )
+    assert result.warnings[0].code == "EMPTY_PCA"

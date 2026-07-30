@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from decimal import Decimal
 from types import MappingProxyType
-from typing import TYPE_CHECKING
 
 from app.services.analytics.contracts import (
     AnalyticsValidationError,
@@ -17,14 +16,25 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
-if TYPE_CHECKING:
-    from app.services.analytics.contracts import TradingResult
-    from app.services.optimization.robustness import (
-        FirstPassageReport,
-        JointFirstPassageReport,
-    )
-
 _MIN_DAILY_OBSERVATIONS = 2
+
+
+class _FirstPassageLike:
+    """Structural type for first-passage report fixtures and contracts."""
+
+    mandate_version: str
+    probability_target: Decimal
+    probability_daily_breach: Decimal
+    probability_drawdown_breach: Decimal
+    probability_expired: Decimal
+    median_termination_day: Decimal | None
+
+
+class _JointFirstPassageLike:
+    """Structural type for joint first-passage report fixtures and contracts."""
+
+    surviving_accounts_distribution: Mapping[int, Decimal]
+    probability_none_survive: Decimal
 
 
 def _quantile(values: Sequence[Decimal], probability: Decimal) -> Decimal:
@@ -46,7 +56,7 @@ def _quantile(values: Sequence[Decimal], probability: Decimal) -> Decimal:
     )
 
 
-def _daily_losses(ledger: ClosedTradeLedger | TradingResult) -> tuple[Decimal, ...]:
+def _daily_losses(ledger: object) -> tuple[Decimal, ...]:
     """Extract positive daily losses from either supported ledger shape.
 
     Args:
@@ -60,12 +70,18 @@ def _daily_losses(ledger: ClosedTradeLedger | TradingResult) -> tuple[Decimal, .
     """
     if isinstance(ledger, ClosedTradeLedger):
         return tuple(max(Decimal(0), -value) for value in ledger.daily_pnl)
-    daily = ledger.daily_equity_curve
+    daily = getattr(ledger, "daily_equity_curve", None)
+    previous = getattr(ledger, "initial_balance", None)
+    if not isinstance(daily, Sequence) or not isinstance(previous, Decimal):
+        raise AnalyticsValidationError(
+            "trading result ledger does not expose required fields"
+        )
     if len(daily) < _MIN_DAILY_OBSERVATIONS:
         raise AnalyticsValidationError("daily equity ledger needs two observations")
-    previous = ledger.initial_balance
     losses: list[Decimal] = []
     for point in daily:
+        if not isinstance(point, Mapping):
+            raise AnalyticsValidationError("equity points must be mapping records")
         value = point.get("equity")
         if not isinstance(value, Decimal) or not value.is_finite():
             raise AnalyticsValidationError(
@@ -77,7 +93,7 @@ def _daily_losses(ledger: ClosedTradeLedger | TradingResult) -> tuple[Decimal, .
 
 
 def build_worst_day_distribution(
-    ledger: ClosedTradeLedger | TradingResult,
+    ledger: object,
     *,
     percentiles: Sequence[Decimal],
 ) -> object:
@@ -182,12 +198,12 @@ def _probability_metrics(first_passage: object) -> tuple[MetricEvidence, ...]:
 
 
 def build_barrier_section(
-    first_passage: FirstPassageReport | None,
-    joint: JointFirstPassageReport | None,
+    first_passage: _FirstPassageLike | None,
+    joint: _JointFirstPassageLike | None,
     worst_day: WorstDayDistribution | None,
     *,
     mandate_version: str,
-    mode_sensitivity: Mapping[object, FirstPassageReport] | None = None,
+    mode_sensitivity: Mapping[object, _FirstPassageLike] | None = None,
 ) -> ReportSection:
     """Assemble barrier evidence or explicitly skip when evidence is absent.
 

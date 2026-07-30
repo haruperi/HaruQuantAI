@@ -21,6 +21,9 @@ EXPECTED = {
     "WF-ANLT-010": "wf_anlt_010_compare_performance_reports.py",
     "WF-ANLT-013": "wf_anlt_013_build_portfolio_allocation_evidence.py",
     "WF-ANLT-014": "wf_anlt_014_measure_reconciled_portfolio_rebalance.py",
+    "WF-ANLT-015": "wf_anlt_015_equity_curve_worst_day_distribution.py",
+    "WF-ANLT-016": "wf_anlt_016_validate_contract_and_metric_catalogue.py",
+    "WF-ANLT-017": "wf_anlt_017_emit_error_payload_quality_flags.py",
 }
 
 

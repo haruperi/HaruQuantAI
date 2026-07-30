@@ -11,14 +11,11 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.research import (
-    ResearchResourceLimits,
-    UnsupervisedResearchConfig,
-)
-from app.services.research.modeling import (
     analyze_cluster_outperformance,
     attach_cluster_labels,
     build_unsupervised_insight_report,
     cluster_feature_space,
+    create_research_value,
     identify_pca_risk_factors,
     run_pca,
     run_unsupervised_research,
@@ -31,9 +28,11 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _config() -> UnsupervisedResearchConfig:
+def _config() -> object:
     """Build a modeling configuration."""
-    return UnsupervisedResearchConfig(("a", "b"), True, 2, 2, 20, 7)
+    return create_research_value(
+        "UnsupervisedResearchConfig", ("a", "b"), True, 2, 2, 20, 7
+    )
 
 
 def _features(rows: int = 25) -> pd.DataFrame:
@@ -108,7 +107,9 @@ def fr_res_088() -> None:
     result = run_unsupervised_research(
         _features(),
         config=_config(),
-        limits=ResearchResourceLimits(500_000, 600.0, 52_428_800),
+        limits=create_research_value(
+            "ResearchResourceLimits", 500_000, 600.0, 52_428_800
+        ),
     )
     print(f"FR-RES-088 seed={result.seed} advisory={result.advisory_only}")
 

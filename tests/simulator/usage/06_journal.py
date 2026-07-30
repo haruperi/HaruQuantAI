@@ -12,7 +12,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.simulator import (
-    JournalWriter,
+    create_simulation_handle,
+    execute_simulation_handle_operation,
+    get_simulation_value_field,
     replay_journal,
     resolve_idempotent_run,
     unwrap_simulation_response,
@@ -49,13 +51,24 @@ def fr_sim_013() -> None:
             tmp_path / "state.db", tmp_path / "artifacts"
         )
         event = _value(
-            JournalWriter(store, "run-usage", "req-usage", "cor-usage").append(
+            execute_simulation_handle_operation(
+                create_simulation_handle(
+                    "JournalWriter", store, "run-usage", "req-usage", "cor-usage"
+                ),
+                "append",
                 "run_started",
                 {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
                 NOW,
             )
         )
-        print(f"JournalEvent sequence: {event.sequence}")
+        print(
+            "Journal event:",
+            {
+                "sequence": get_simulation_value_field(event, "sequence"),
+                "event_type": get_simulation_value_field(event, "event_type"),
+                "event_hash": get_simulation_value_field(event, "event_hash"),
+            },
+        )
 
 
 def fr_sim_014() -> None:
@@ -75,13 +88,20 @@ def fr_sim_014() -> None:
             tmp_path / "state.db", tmp_path / "artifacts"
         )
         event = _value(
-            JournalWriter(store, "run-usage", "req-usage", "cor-usage").append(
+            execute_simulation_handle_operation(
+                create_simulation_handle(
+                    "JournalWriter", store, "run-usage", "req-usage", "cor-usage"
+                ),
+                "append",
                 "run_started",
                 {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
                 NOW,
             )
         )
-        print(f"Appended event hash: {event.event_hash[:16]}...")
+        print(
+            "Appended hash-chain event:",
+            get_simulation_value_field(event, "event_hash"),
+        )
 
 
 def fr_sim_015() -> None:
@@ -99,13 +119,18 @@ def fr_sim_015() -> None:
         store = SqliteSimulationStateStore(
             tmp_path / "state.db", tmp_path / "artifacts"
         )
-        writer = JournalWriter(store, "run-usage", "req-usage", "cor-usage")
-        writer.append(
+        writer = create_simulation_handle(
+            "JournalWriter", store, "run-usage", "req-usage", "cor-usage"
+        )
+        execute_simulation_handle_operation(
+            writer,
+            "append",
             "run_started",
             {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
             NOW,
         )
-        print(f"Finalized checksum: {_value(writer.finalize())[:16]}...")
+        checksum = _value(execute_simulation_handle_operation(writer, "finalize"))
+        print("Finalized journal checksum:", checksum)
 
 
 def fr_sim_016() -> None:
@@ -124,16 +149,25 @@ def fr_sim_016() -> None:
         store = SqliteSimulationStateStore(
             tmp_path / "state.db", tmp_path / "artifacts"
         )
-        writer = JournalWriter(store, "run-usage", "req-usage", "cor-usage")
-        writer.append(
+        writer = create_simulation_handle(
+            "JournalWriter", store, "run-usage", "req-usage", "cor-usage"
+        )
+        execute_simulation_handle_operation(
+            writer,
+            "append",
             "run_started",
             {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
             NOW,
         )
-        _value(writer.finalize())
+        _value(execute_simulation_handle_operation(writer, "finalize"))
         path = tmp_path / "artifacts" / "run-usage" / "journal.jsonl"
         state = _value(
-            replay_journal(path, lambda _state, event: {"sequence": event.sequence})
+            replay_journal(
+                path,
+                lambda _state, event: {
+                    "sequence": get_simulation_value_field(event, "sequence")
+                },
+            )
         )
         print(f"Replayed sequence: {state['sequence']}")
 
@@ -172,29 +206,41 @@ def example_journal() -> None:
         store = SqliteSimulationStateStore(
             tmp_path / "state.db", tmp_path / "artifacts"
         )
-        writer = JournalWriter(store, "run-usage", "req-usage", "cor-usage")
+        writer = create_simulation_handle(
+            "JournalWriter", store, "run-usage", "req-usage", "cor-usage"
+        )
 
         # 1. Append journal event
         event = _value(
-            writer.append(
+            execute_simulation_handle_operation(
+                writer,
+                "append",
                 "run_started",
                 {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
                 NOW,
             )
         )
         print(
-            f"Appended JournalEvent type: {event.event_type}, "
-            f"sequence: {event.sequence}"
+            "Appended journal event:",
+            {
+                "event_type": get_simulation_value_field(event, "event_type"),
+                "sequence": get_simulation_value_field(event, "sequence"),
+            },
         )
 
         # 2. Finalize journal
-        digest = _value(writer.finalize())
+        digest = _value(execute_simulation_handle_operation(writer, "finalize"))
         print(f"Finalized journal digest SHA256: {digest[:16]}...")
 
         # 3. Replay journal
         path = tmp_path / "artifacts" / "run-usage" / "journal.jsonl"
         replayed = _value(
-            replay_journal(path, lambda _state, evt: {"sequence": evt.sequence})
+            replay_journal(
+                path,
+                lambda _state, evt: {
+                    "sequence": get_simulation_value_field(evt, "sequence")
+                },
+            )
         )
         print(f"Replayed journal state sequence: {replayed['sequence']}")
 

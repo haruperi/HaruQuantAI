@@ -14,13 +14,8 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.research import (
-    DataQualityReport,
-    FeatureConfig,
-    PreparedDataset,
-    ResearchResourceLimits,
-)
-from app.services.research.features import (
     build_research_feature_frame,
+    create_research_value,
     forward_max_adverse_excursion,
     forward_max_favorable_excursion,
     forward_returns,
@@ -171,8 +166,9 @@ def fr_res_038() -> None:
     _header(
         "FR-RES-038. Build a new feature frame with declared lineage, warm-up/NaN behavior, caller-supplied public IndicatorResult v1 inputs, research-only forward columns, and no input mutation."
     )
-    quality = DataQualityReport((), (), ("schema",), ())
-    prepared = PreparedDataset(
+    quality = create_research_value("DataQualityReport", (), (), ("schema",), ())
+    prepared = create_research_value(
+        "PreparedDataset",
         data=_frame(),
         schema_version="v1",
         quality=quality,
@@ -180,14 +176,15 @@ def fr_res_038() -> None:
         configuration_hash="e" * 64,
         source_references=("fixture",),
     )
-    features = FeatureConfig(
+    features = create_research_value(
+        "FeatureConfig",
         {"sma": 2},
         (1,),
         # Forward column must match the generated "forward_return_{horizon}".
         ("forward_return_1",),
         "preserve",
     )
-    limits = ResearchResourceLimits(100, 10.0, 1024)
+    limits = create_research_value("ResearchResourceLimits", 100, 10.0, 1024)
     frame, _metadata = build_research_feature_frame(
         prepared, indicator_results={}, config=features, limits=limits
     )

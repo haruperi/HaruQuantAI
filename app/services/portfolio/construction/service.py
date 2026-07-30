@@ -16,13 +16,13 @@ from app.services.portfolio.contracts import (
     PortfolioComponentWeight,
     PortfolioConstructionResult,
 )
-from app.services.portfolio.exceptions import PortfolioError
+from app.services.portfolio.contracts.errors import PortfolioError
 from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.portfolio.config import PortfolioSettings
+    from app.services.portfolio._settings import PortfolioSettings
     from app.services.portfolio.evidence import ValidatedConstructionEvidence
 
 

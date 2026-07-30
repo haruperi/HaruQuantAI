@@ -2,8 +2,10 @@
 
 # ruff: noqa: INP001
 from app.services.analytics import run_statistical_validation
-from app.utils import logger
-from tests.analytics._support import _configured_result, unwrap
+from app.utils import get_logger
+
+logger = get_logger(__name__)
+from tests.analytics._support import _configured_result, unwrap  # noqa: E402
 
 
 def test_seeded_validation_is_reproducible() -> None:

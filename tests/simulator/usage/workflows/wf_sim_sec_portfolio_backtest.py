@@ -8,7 +8,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.simulator import run_portfolio_backtest, unwrap_simulation_response
+from app.services.simulator import (
+    dump_simulation_value,
+    get_simulation_value_field,
+    run_portfolio_backtest,
+    unwrap_simulation_response,
+)
 from tests.simulator.usage.workflows._support import (
     dependencies,
     live_tick_dataset,
@@ -44,7 +49,14 @@ def main() -> None:
 
     # Stage 2 — Validate component allocations, versions, hashes, range, seed, and config hash.
     _stage(2)
-    assert sum(component.capital_weight for component in request.components) == 1
+    components = get_simulation_value_field(request, "components")
+    assert (
+        sum(
+            get_simulation_value_field(component, "capital_weight")
+            for component in components
+        )
+        == 1
+    )
 
     # Stage 3 — Execute every component through the ordinary deterministic Simulation path.
     _stage(3)
@@ -60,11 +72,15 @@ def main() -> None:
 
     # Stage 4 — Reconcile component and aggregate journals and account evidence.
     _stage(4)
-    assert len(result.component_results) == len(request.components)
+    assert len(get_simulation_value_field(result, "component_results")) == len(
+        components
+    )
 
     # Stage 5 — Return PortfolioSimulationResult v1 without approving or modifying allocation.
     _stage(5)
-    print("OUTPUT BOUNDARY — typed PortfolioSimulationResult v1:", result.status)
+    print(
+        "OUTPUT BOUNDARY — PortfolioSimulationResult v1:", dump_simulation_value(result)
+    )
 
 
 if __name__ == "__main__":

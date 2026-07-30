@@ -1,36 +1,35 @@
-# ruff: noqa: BLE001, E402
-"""Run source composition and local artifact access examples (FEAT-DATA-04).
+"""Run source composition and local artifact access examples (FEAT-DATA-10)."""
 
-Covers `FR-DATA-101` through `FR-DATA-104`: composing configured sources,
-discovering which identifiers are available, timeframe-scoped local artifact
-resolution, and bounded local reads.
-"""
+from __future__ import annotations
 
-import json
 import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    build_data_error,
     build_data_settings,
-    build_dataset_save_request,
+    build_market_data_request,
+    build_source_promotion_request,
+    build_symbol_list_request,
+    build_symbol_metadata_request,
     data_settings_context,
+    discover_symbols,
     ensure_source,
+    evaluate_source_policy,
+    fetch_symbol_metadata,
     get_market_data,
     get_source_descriptor,
-    get_symbol_metadata,
     list_composable_sources,
-    save_dataset,
-    unwrap_data_response,
+    list_registered_sources,
+    promote_source,
+    verify_read_only_call,
+    wrap_broker_client,
 )
-
-DataError = build_data_error
-
-from app.utils import generate_id
+from app.utils import create_auth_context, generate_id
 
 _SYMBOL = "EURUSD"
 _END = datetime.now(UTC)
@@ -42,122 +41,161 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _example_fr_data_102() -> None:
-    """Discover which source identifiers the configuration can compose."""
-    _header("FR-DATA-102 list_composable_sources")
-    res = list_composable_sources()
-    if res.status == "success" and res.data is not None:
-        print("Composable sources:", res.data)
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj.keys()))
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
-def _example_fr_data_101(root: Path) -> None:
-    """Compose one configured local source without credentials or network."""
-    _header("FR-DATA-101 ensure_source")
-    ensure_source("csv", generate_id("req"))
-    res = get_source_descriptor("csv")
-    if res.status == "success" and res.data is not None:
-        descriptor = res.data
-        print("Source:", descriptor.source_id)
-        print("Readiness:", descriptor.readiness)
-        print("Requires credentials:", descriptor.requires_credentials)
-        print("Requires network:", descriptor.requires_network)
+def fr_data_010_025_101_102() -> None:
+    """FR-DATA-010, FR-DATA-025, FR-DATA-101, FR-DATA-102: Stage 1 — Compose, list, and register configured sources at defined readiness without network/credential requirements."""
+    _header(
+        "Stage 1: Source Discovery & Registration - Source Governance (FR-DATA-010, FR-DATA-025, FR-DATA-101, FR-DATA-102)"
+    )
+    res_composable = list_composable_sources()
+    print(_format_result(res_composable))
+
+    res_registered = list_registered_sources()
+    print(_format_result(res_registered))
+
+    req_id = generate_id("req")
+    ensure_source("csv", req_id)
+    descriptor_res = get_source_descriptor("csv")
+    print(_format_result(descriptor_res))
+    if descriptor_res.status == "success" and descriptor_res.data is not None:
+        desc = descriptor_res.data
+        print(
+            f"Data -> SourceDescriptor(source_id={desc.source_id}, readiness={desc.readiness})"
+        )
 
 
-def _example_fr_data_103(raw_root: Path) -> None:
-    """Inspect the configured source through its public descriptor boundary."""
-    _header("FR-DATA-103 timeframe-scoped local artifacts")
-    result = get_source_descriptor("csv")
-    if result.status == "success" and result.data is not None:
-        print("Source capabilities:", result.data.capabilities)
+def fr_data_011_113_114() -> None:
+    """FR-DATA-011, FR-DATA-113, FR-DATA-114: Stage 2 — Enforce source license policy, workflow context, and attribution restrictions."""
+    _header(
+        "Stage 2: Source Descriptor & License Governance - Source License (FR-DATA-011, FR-DATA-113, FR-DATA-114)"
+    )
+    desc_res = get_source_descriptor("csv")
+    print(_format_result(desc_res))
+    if desc_res.status == "success" and desc_res.data is not None:
+        license_policy = desc_res.data.license_policy
+        print(
+            f"Data -> SourceLicensePolicy(status={license_policy.status}, export_allowed={license_policy.export_allowed})"
+        )
 
 
-def _example_fr_data_104(start: datetime, end: datetime) -> None:
-    """Apply a bounded request through the public market-data operation."""
-    _header("FR-DATA-104 bounded local selection")
-    result = get_market_data(
+def fr_data_022_023_024_103_104() -> None:
+    """FR-DATA-022, FR-DATA-023, FR-DATA-024, FR-DATA-103, FR-DATA-104: Stage 3 — Bounded adapter reads, symbol discovery, and timeframe-scoped local artifact resolution."""
+    _header(
+        "Stage 3: Bounded Adapter Read & Symbol Resolution - Local Artifact Read (FR-DATA-022, FR-DATA-023, FR-DATA-024, FR-DATA-103, FR-DATA-104)"
+    )
+    sym_req = build_symbol_list_request(
         source_id="csv",
-        symbol=_SYMBOL,
-        timeframe="M1",
-        start=start,
-        end=end,
-        limit=2,
+        limit=10,
         request_id=generate_id("req"),
     )
-    dataset = unwrap_data_response(
-        result,
-        operation="data.usage.get_local_market_data",
-        request_id=result.metadata.request_id,
-    )
-    print(
-        "Bounded local rows:",
-        [
-            (record.timestamp.isoformat(), str(record.open), str(record.close))
-            for record in dataset.records
-        ],
-    )
+    symbols_res = discover_symbols(sym_req)
+    print(_format_result(symbols_res))
 
+    meta_req = build_symbol_metadata_request(
+        source_id="csv",
+        symbol=_SYMBOL,
+        request_id=generate_id("req"),
+    )
+    meta_res = fetch_symbol_metadata(meta_req)
+    print(_format_result(meta_res))
 
-def _prepare_genuine_local_artifact(raw_root: Path) -> tuple[datetime, datetime]:
-    """Persist a genuine bounded MT5 dataset for the local-source read."""
-    response = get_market_data(
-        source_id="mt5",
+    market_res = get_market_data(
+        source_id="csv",
         symbol=_SYMBOL,
         timeframe="M1",
         start=_START,
         end=_END,
-        limit=10,
-        use_cache=False,
+        limit=2,
         request_id=generate_id("req"),
     )
-    dataset = unwrap_data_response(
-        response,
-        operation="data.usage.get_mt5_market_data",
-        request_id=response.metadata.request_id,
+    print(_format_result(market_res))
+    if market_res.status == "success" and market_res.data is not None:
+        ds = market_res.data
+        print(f"Data -> MarketDataset(symbol={ds.symbol}, count={ds.record_count})")
+
+
+def fr_data_026_027() -> None:
+    """FR-DATA-026, FR-DATA-027: Stage 4 — Evaluate fallback source order against capability, readiness, and authenticated promotion criteria."""
+    _header(
+        "Stage 4: Source Policy Resolution & Promotion Governance - Policy & Promotion (FR-DATA-026, FR-DATA-027)"
     )
-    save_response = save_dataset(
-        build_dataset_save_request(
-            dataset=dataset,
-            relative_path=Path("data/raw/EURUSD_M1.csv"),
-            format="csv",
-            overwrite=True,
-            request_id=dataset.request_id,
-        )
-    )
-    unwrap_data_response(
-        save_response,
-        operation="data.usage.save_local_market_data",
-        request_id=save_response.metadata.request_id,
-    )
-    metadata_response = get_symbol_metadata(
-        source_id="mt5",
+    m_req = build_market_data_request(
+        source_id="csv",
         symbol=_SYMBOL,
+        data_kind="bars",
+        timeframe="M1",
+        start=_START,
+        end=_END,
+        limit=2,
+        use_cache=False,
+        quality_failure_behavior="reject",
+        workflow_context="research",
+        precision_policy="decimal_string",
         request_id=generate_id("req"),
     )
-    metadata = unwrap_data_response(
-        metadata_response,
-        operation="data.usage.get_mt5_symbol_metadata",
-        request_id=metadata_response.metadata.request_id,
+    eval_res = evaluate_source_policy(m_req)
+    print(_format_result(eval_res))
+
+    auth = create_auth_context(
+        principal_id="operator",
+        principal_type="USER",
+        roles=("admin",),
+        permissions=("data:write",),
+        scopes=("system",),
+        tenant_or_environment="dev",
+        request_id=generate_id("req"),
+        workflow_id=generate_id("wf"),
+        correlation_id=generate_id("cor"),
+        issued_at=datetime.now(UTC),
     )
-    declared_metadata = metadata.model_dump(
-        mode="json",
-        exclude={"canonical_symbol", "provider_symbol", "source_id", "request_id"},
+    prom_req = build_source_promotion_request(
+        source_id="csv",
+        target_readiness="production",
+        evidence=("Verified local storage",),
+        request_id=generate_id("req"),
     )
-    (raw_root / "symbols.json").write_text(
-        json.dumps({_SYMBOL: declared_metadata}, indent=2),
-        encoding="utf-8",
-    )
-    print(
-        "Persisted genuine MT5 rows:",
-        [
-            (record.timestamp.isoformat(), str(record.open), str(record.close))
-            for record in dataset.records[:3]
-        ],
-    )
-    return dataset.records[2].timestamp, dataset.records[5].timestamp
+    prom_res = promote_source(prom_req, auth)
+    print(_format_result(prom_res))
 
 
-def _demonstrate_feature() -> None:
-    """Execute every source composition example against real runtime state."""
+def fr_data_115_116() -> None:
+    """FR-DATA-115, FR-DATA-116: Stage 5 — Wrap broker client proxy to enforce read-only contract on attribute access at runtime."""
+    _header(
+        "Stage 5: Read-Only Broker Surface Enforcement - Broker Proxy (FR-DATA-115, FR-DATA-116)"
+    )
+
+    class _DummyClient:
+        def get_account(self) -> dict[str, str]:
+            return {"account_id": "demo-1"}
+
+        def place_order(self) -> str:
+            return "order-placed"
+
+    client = _DummyClient()
+    proxy_res = wrap_broker_client(client)
+    print(_format_result(proxy_res))
+
+    read_check = verify_read_only_call("get_account")
+    print(_format_result(read_check))
+
+
+def main() -> None:
+    """Execute every functional-requirement demonstration."""
     with TemporaryDirectory() as temporary:
         root = Path(temporary)
         raw_root = root / "data" / "raw"
@@ -171,149 +209,22 @@ def _demonstrate_feature() -> None:
             data_provider_sources=("mt5",),
             data_raw_root=Path("data/raw"),
         )
-        try:
-            with data_settings_context(settings):
-                _example_fr_data_102()
-                start, end = _prepare_genuine_local_artifact(raw_root)
-                _example_fr_data_101(root)
-                _example_fr_data_103(raw_root)
-                _example_fr_data_104(start, end)
-        except Exception as error:
+        with data_settings_context(settings):
+            print("=" * 80)
+            print("FEATURE: FEAT-DATA-10 - Data Source Governance")
             print(
-                "Source composition example failed:",
-                getattr(error, "code", type(error).__name__),
+                "PURPOSE: Compose, govern, discover, and read data sources with strict license, readiness, and proxy enforcement"
             )
+            print(
+                "MODULE FLOW: Stage 1 (Discovery & Registration) -> Stage 2 (Descriptor & License) -> Stage 3 (Adapter Read & Symbol Resolution) -> Stage 4 (Policy & Promotion) -> Stage 5 (Read-Only Enforcement)"
+            )
+            print("=" * 80)
 
-
-_DEMONSTRATED = [False]
-
-
-def _demonstrate_once() -> None:
-    """Run the feature demonstration once for all requirement entry points."""
-    if _DEMONSTRATED[0]:
-        return
-    _demonstrate_feature()
-    _DEMONSTRATED[0] = True
-
-
-def fr_data_010() -> None:
-    _header("fr_data_010")
-    "FR-DATA-010: Declare source readiness, capabilities, credential/network/write requirements, schema/timezone/version metadata, promotion criteria, and sign-off evidence."
-    _demonstrate_once()
-
-
-def fr_data_011() -> None:
-    _header("fr_data_011")
-    "FR-DATA-011: Declare permitted workflow contexts, export/retention/attribution restrictions, enforcement behavior, and license status for each source."
-    _demonstrate_once()
-
-
-def fr_data_022() -> None:
-    _header("fr_data_022")
-    "FR-DATA-022: Require every adapter to perform one bounded read and return provider-neutral raw records plus source metadata without broker mutation."
-    _demonstrate_once()
-
-
-def fr_data_023() -> None:
-    _header("fr_data_023")
-    "FR-DATA-023: Require bounded, deterministically ordered symbol discovery with cursor pagination and declared discovery capability."
-    _demonstrate_once()
-
-
-def fr_data_024() -> None:
-    _header("fr_data_024")
-    "FR-DATA-024: Require normalized symbol metadata with provenance and explicit missing fields rather than optimistic defaults."
-    _demonstrate_once()
-
-
-def fr_data_025() -> None:
-    _header("fr_data_025")
-    "FR-DATA-025: Register a source descriptor and lazy factory atomically, reject duplicate/conflicting declarations, and perform no I/O during registration/import."
-    _demonstrate_once()
-
-
-def fr_data_026() -> None:
-    _header("fr_data_026")
-    "FR-DATA-026: Validate requested and explicit fallback sources in order against capability, readiness, license, context, timeout/rate, and breaker state and record every attempt."
-    _demonstrate_once()
-
-
-def fr_data_027() -> None:
-    _header("fr_data_027")
-    "FR-DATA-027: Change readiness only from a complete authenticated evidence package, record an audit event, and permit immediate reversible demotion."
-    _demonstrate_once()
-
-
-def fr_data_101() -> None:
-    _header("fr_data_101")
-    "FR-DATA-101: Compose and register the descriptor and lazy factory for every configured source — local artifact sources at `production` readiness and enabled provider facades at `staging` — dispatching on source kind rather than accepting a single hardcoded provider. Credential-free Binance Spot, Dukascopy, and Yahoo public reads compose without account secrets; an unconfigured identifier fails closed."
-    _demonstrate_once()
-
-
-def fr_data_102() -> None:
-    _header("fr_data_102")
-    "FR-DATA-102: Report which source identifiers the current configuration can compose so callers and operators discover valid `source_id` values without trial and error."
-    _demonstrate_once()
-
-
-def fr_data_103() -> None:
-    _header("fr_data_103")
-    "FR-DATA-103: Resolve local artifacts as `{symbol}_{timeframe}` first and fall back to `{symbol}` only for kinds without a timeframe, so multiple timeframes per symbol are individually addressable."
-    _demonstrate_once()
-
-
-def fr_data_104() -> None:
-    _header("fr_data_104")
-    "FR-DATA-104: Apply the requested UTC range and record limit at the local source boundary rather than returning the whole artifact, and fail closed when the window selects nothing."
-    _demonstrate_once()
-
-
-def fr_data_113() -> None:
-    _header("fr_data_113")
-    "FR-DATA-113: Block a retrieval, storage, or export workflow when the source `SourceLicensePolicy` does not permit it, failing closed when licence metadata is absent."
-    _demonstrate_once()
-
-
-def fr_data_114() -> None:
-    _header("fr_data_114")
-    "FR-DATA-114: Return the attribution text a source requires for publication, and fail rather than return an empty string when attribution is required but undeclared."
-    _demonstrate_once()
-
-
-def fr_data_115() -> None:
-    _header("fr_data_115")
-    "FR-DATA-115: Allow only the declared read method names and reject every mutation name deterministically, independent of the adapter's actual surface."
-    _demonstrate_once()
-
-
-def fr_data_116() -> None:
-    _header("fr_data_116")
-    "FR-DATA-116: Wrap a caller-owned broker client in a proxy that enforces the read-only contract on every attribute access at runtime, so a mutation call fails even when the underlying client exposes it."
-    _demonstrate_once()
-
-
-def main() -> None:
-    """Execute every functional-requirement demonstration."""
-    demonstrations = (
-        fr_data_010,
-        fr_data_011,
-        fr_data_022,
-        fr_data_023,
-        fr_data_024,
-        fr_data_025,
-        fr_data_026,
-        fr_data_027,
-        fr_data_101,
-        fr_data_102,
-        fr_data_103,
-        fr_data_104,
-        fr_data_113,
-        fr_data_114,
-        fr_data_115,
-        fr_data_116,
-    )
-    for demonstration in demonstrations:
-        demonstration()
+            fr_data_010_025_101_102()
+            fr_data_011_113_114()
+            fr_data_022_023_024_103_104()
+            fr_data_026_027()
+            fr_data_115_116()
 
 
 if __name__ == "__main__":

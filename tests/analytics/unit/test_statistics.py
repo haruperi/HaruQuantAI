@@ -6,9 +6,11 @@ from pathlib import Path
 
 import pytest
 from app.services.analytics.metrics.statistics import run_statistical_validation
-from app.utils import logger
+from app.utils import get_logger
 
-from tests.analytics.unit.test_results_adapter import _config
+logger = get_logger(__name__)
+
+from tests.analytics.unit.test_results_adapter import _config  # noqa: E402
 
 _GOLDEN_DIRECTORY = Path("tests/analytics/fixtures/golden")
 

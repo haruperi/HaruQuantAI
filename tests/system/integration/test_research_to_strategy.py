@@ -3,12 +3,12 @@
 from contextlib import AbstractContextManager
 from pathlib import Path
 
-from app.services.api import ResearchRunRequest
+from app.services.api import build_research_run_request
 from app.services.api.identity import require_auth_context
 from app.services.api.routes import strategies
 from app.services.api.routes.research import router as research_router
 from app.services.api.routes.strategies import router as strategies_router
-from app.services.data import DataSettings, data_settings_context
+from app.services.data import build_data_settings, data_settings_context
 from fastapi import FastAPI
 
 from tests.api._support import post_json
@@ -27,7 +27,7 @@ def _storage(root: Path) -> AbstractContextManager[None]:
         Data settings context.
     """
     return data_settings_context(
-        DataSettings(
+        build_data_settings(
             database_url="sqlite:///sys-wf-004.sqlite3",
             data_dir=root,
             sqlite_busy_timeout_seconds=1.5,
@@ -61,7 +61,7 @@ def _api() -> FastAPI:
 
 def test_sys_wf_004_research_to_reviewed_strategy_candidate(tmp_path: Path) -> None:
     """Verify advisory evidence requires explicit API approval to register."""
-    research_request = ResearchRunRequest(
+    research_request = build_research_run_request(
         hypothesis="Returns persist over one research bar.",
         dataset=make_dataset(),
         config=make_edge_lab_config(tmp_path),

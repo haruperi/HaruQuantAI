@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 from hashlib import sha256
+from typing import Any
 
-from app.services.data import (
-    MigrationStep,
-)
+from app.services.data import build_migration_step
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -102,8 +101,8 @@ def _migration_checksum(statements: tuple[str, ...]) -> str:
     return sha256(material).hexdigest()
 
 
-PORTFOLIO_MIGRATIONS: tuple[MigrationStep, ...] = (
-    MigrationStep(
+PORTFOLIO_MIGRATIONS: tuple[Any, ...] = (
+    build_migration_step(
         domain="portfolio",
         migration_id="001_initial_portfolio_schema",
         checksum=_migration_checksum(_PORTFOLIO_SCHEMA_STATEMENTS),
@@ -111,4 +110,14 @@ PORTFOLIO_MIGRATIONS: tuple[MigrationStep, ...] = (
     ),
 )
 
-__all__: tuple[str, ...] = ("PORTFOLIO_MIGRATIONS",)
+
+def get_portfolio_migrations() -> tuple[object, ...]:
+    """Return immutable Portfolio-owned migration steps.
+
+    Returns:
+        Portfolio migration steps in application order.
+    """
+    return PORTFOLIO_MIGRATIONS
+
+
+__all__: tuple[str, ...] = ("PORTFOLIO_MIGRATIONS", "get_portfolio_migrations")

@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import functools
 import time
+import uuid
 from collections.abc import Awaitable, Callable, Mapping
-from typing import Any, Literal, cast, overload
+from typing import Any, Literal, Protocol, cast, overload
 
 from app.services.simulator.errors.catalog import SIM_ERROR_CATALOG
 from app.services.simulator.errors.exception import SimulationError
@@ -21,10 +22,69 @@ from app.utils import (
 
 type JsonValue = Any
 type ResponseMetadata = Any
-type StandardResponse[T] = Any
+
+
+class _ErrorLike(Protocol):
+    """Structural error evidence used by the internal response unwrapping seam."""
+
+    @property
+    def code(self) -> str:
+        """Return the stable error code."""
+        ...
+
+    @property
+    def details(self) -> Mapping[str, object]:
+        """Return bounded error details."""
+        ...
+
+
+class _MetadataLike(Protocol):
+    """Structural trace metadata used by the response unwrapping seam."""
+
+    @property
+    def request_id(self) -> str:
+        """Return the request identifier."""
+        ...
+
+    @property
+    def correlation_id(self) -> str | None:
+        """Return the optional correlation identifier."""
+        ...
+
+
+class StandardResponse[T](Protocol):
+    """Structural subset of the Utils response contract consumed here."""
+
+    @property
+    def status(self) -> str:
+        """Return response status."""
+        ...
+
+    @property
+    def message(self) -> str:
+        """Return the bounded response message."""
+        ...
+
+    @property
+    def data(self) -> T | None:
+        """Return successful response data."""
+        ...
+
+    @property
+    def error(self) -> _ErrorLike | None:
+        """Return optional error evidence."""
+        ...
+
+    @property
+    def metadata(self) -> _MetadataLike:
+        """Return response metadata."""
+        ...
+
+
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 logger = get_logger(__name__)
+_UUID_VERSION = 4
 
 
 def _trace_context(
@@ -55,22 +115,26 @@ def _trace_context(
             correlation_id = getattr(value, "correlation_id", correlation_id)
         if request_id is not None:
             break
-    try:
-        request_id = validate_id(
-            request_id if isinstance(request_id, str) else "",
-            expected_prefix="req",
-        )
-    except Exception:
+    if not _is_trace_id(request_id, "req"):
         request_id = generate_id("req")
-    if correlation_id is not None:
-        try:
-            correlation_id = validate_id(
-                correlation_id if isinstance(correlation_id, str) else "",
-                expected_prefix="cor",
-            )
-        except Exception:
-            correlation_id = None
-    return request_id, correlation_id
+    else:
+        request_id = validate_id(cast("str", request_id), expected_prefix="req")
+    if correlation_id is not None and not _is_trace_id(correlation_id, "cor"):
+        correlation_id = None
+    return request_id, cast("str | None", correlation_id)
+
+
+def _is_trace_id(value: object, prefix: str) -> bool:
+    """Return whether a value is one canonical prefixed UUID4 identifier."""
+    if not isinstance(value, str) or not value.startswith(f"{prefix}-"):
+        return False
+    try:
+        parsed = uuid.UUID(value.removeprefix(f"{prefix}-"))
+    except ValueError:
+        return False
+    return parsed.version == _UUID_VERSION and str(parsed) == value.removeprefix(
+        f"{prefix}-"
+    )
 
 
 def _metadata(
@@ -167,10 +231,10 @@ def _response[T](
             details=_error_details(error),
             message=error.message,
             metadata=metadata(),
-            catalog=SIM_ERROR_CATALOG,
+            catalog=cast("Any", SIM_ERROR_CATALOG),
         )
-    except Exception as error:  # noqa: BLE001 - outer fail-closed boundary.
-        logger.error("Unexpected Simulation operation failure: %s", operation)
+    except Exception as error:
+        logger.exception("Unexpected Simulation operation failure: %s", operation)
         return error_response(
             code="SIM_INTERNAL_ERROR",
             details={
@@ -179,7 +243,7 @@ def _response[T](
             },
             message="simulation operation failed with an unexpected internal error",
             metadata=metadata(),
-            catalog=SIM_ERROR_CATALOG,
+            catalog=cast("Any", SIM_ERROR_CATALOG),
         )
     return success_response(
         value,
@@ -269,14 +333,14 @@ def guard_async_operation[**P, T](
                 details=_error_details(error),
                 message=error.message,
                 metadata=metadata(),
-                catalog=SIM_ERROR_CATALOG,
+                catalog=cast("Any", SIM_ERROR_CATALOG),
             )
         except Exception as error:  # noqa: BLE001 - outer fail-closed boundary.
             return exception_response(
                 SimulationError("SIM_INTERNAL_ERROR", "Simulation failed safely"),
                 message="simulation operation failed with an unexpected internal error",
                 metadata=metadata(),
-                catalog=SIM_ERROR_CATALOG,
+                catalog=cast("Any", SIM_ERROR_CATALOG),
                 extensions={"failure_type": type(error).__name__},
             )
         return success_response(
@@ -335,10 +399,10 @@ def unwrap_simulation_response[T](
 
 
 @overload
-def unwrap_simulation_response[T](response: T, *, operation: str) -> T: ...
+def unwrap_simulation_response(response: object, *, operation: str) -> object: ...
 
 
-def unwrap_simulation_response[T](response: T, *, operation: str) -> T:
+def unwrap_simulation_response(response: object, *, operation: str) -> object:
     """Unwrap one successful Simulation response without nesting it.
 
     Args:
@@ -353,18 +417,17 @@ def unwrap_simulation_response[T](response: T, *, operation: str) -> T:
             valid error evidence.
     """
     if not all(hasattr(response, field) for field in ("status", "metadata")):
-        # Transitional adapters are accepted while every concrete seam is
-        # migrated; public Simulation boundaries still always emit envelopes.
         return response
-    if response.status == "success":
-        return cast("T", response.data)
-    if response.error is not None:
+    envelope = cast("StandardResponse[object]", response)
+    if envelope.status == "success":
+        return envelope.data
+    if envelope.error is not None:
         raise SimulationError(
-            response.error.code,
-            response.message,
-            details=response.error.details,
-            request_id=response.metadata.request_id,
-            correlation_id=response.metadata.correlation_id,
+            envelope.error.code,
+            envelope.message,
+            details=envelope.error.details,
+            request_id=envelope.metadata.request_id,
+            correlation_id=envelope.metadata.correlation_id,
         )
     raise SimulationError(
         "SIM_INTERNAL_ERROR",

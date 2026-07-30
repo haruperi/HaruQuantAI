@@ -15,7 +15,6 @@ logger = get_logger(__name__)
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
-    from app.services.analytics import PerformanceReport
     from app.services.research.contracts import (
         CoreMetricProfile,
         EdgeResult,
@@ -44,7 +43,7 @@ def build_research_scorecard(
     edges: Sequence[EdgeResult],
     market_structure: MarketStructureProfile | None,
     modeling: UnsupervisedResearchResult | None,
-    performance: PerformanceReport | None = None,
+    performance: object | None = None,
 ) -> ResearchScorecard:
     """Build a deterministic advisory scorecard from approved evidence.
 

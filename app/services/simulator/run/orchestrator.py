@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Iterable, Mapping
 from datetime import datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from pydantic import ValidationError
 
@@ -31,7 +32,7 @@ from app.services.simulator.validation import (
     validate_run_inputs,
 )
 from app.services.simulator.validation.contracts import MarketDataValidationContext
-from app.services.trading import is_execution_receipt
+from app.services.trading import create_execution_receipt, is_execution_receipt
 from app.utils import canonical_digest, canonical_json, get_logger
 
 type AuthContext = Any
@@ -196,7 +197,7 @@ def _completed_result(
             session_model="explicit_utc_intervals",
             data_quality="passed",
             assumptions=("Trading-owned intents are the sole executable input.",),
-            limitations=("Open positions are not implicitly liquidated at range end.",),
+            limitations=("Terminal liquidation uses the final observed bid or ask.",),
         ),
     )
 
@@ -258,7 +259,7 @@ def _require_nonempty_timeline(timeline: tuple[Tick, ...]) -> None:
         )
 
 
-def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
+def _run_backtest_with_evidence(  # noqa: C901, PLR0915 - governed lifecycle.
     request: SimulationBacktestRequestV1,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
@@ -275,6 +276,7 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
 
     Raises:
         SimulationError: For any controlled or safely mapped run failure.
+        TypeError: If persisted replay material is structurally invalid.
     """
     logger.info("Starting official Simulation backtest %s", request.request_id)
     _validate_auth(request, auth_context)
@@ -309,8 +311,19 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
                 "SIM_CHECKPOINT_INCOMPATIBLE", "Stored result is unavailable"
             )
         try:
-            result = SimulationResult.model_validate(stored)
-        except ValidationError as error:
+            stored_result = dict(stored)
+            stored_fills = stored_result.get("fills")
+            if not isinstance(stored_fills, list):
+                raise TypeError("stored fills are invalid")  # noqa: TRY301
+            stored_result["fills"] = tuple(
+                create_execution_receipt(**item)
+                for item in stored_fills
+                if isinstance(item, dict)
+            )
+            if len(stored_result["fills"]) != len(stored_fills):
+                raise TypeError("stored fills are invalid")  # noqa: TRY301
+            result = SimulationResult.model_validate(stored_result)
+        except (TypeError, ValidationError) as error:
             raise SimulationError(
                 "SIM_CHECKPOINT_INCOMPATIBLE", "Stored result is invalid"
             ) from error
@@ -422,9 +435,12 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
             )
         for tick in timeline:
             receipts.extend(
-                unwrap_simulation_response(
-                    engine.execute_tick(tick),
-                    operation="simulation.run.engine_execute_tick",
+                cast(
+                    "Iterable[object]",
+                    unwrap_simulation_response(
+                        engine.execute_tick(tick),
+                        operation="simulation.run.engine_execute_tick",
+                    ),
                 )
             )
             while unsent and unsent[0].created_at <= tick.timestamp:
@@ -434,6 +450,18 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - explicit governed lifecycle.
                         operation="simulation.run.engine_submit_order",
                     )
                 )
+        terminal_state = unwrap_simulation_response(
+            engine.snapshot(),
+            operation="simulation.run.engine_snapshot",
+        )
+        positions = cast("Iterable[Mapping[str, object]]", terminal_state["positions"])
+        for position in positions:
+            unwrap_simulation_response(
+                engine.close_position(
+                    str(position["position_id"]), cast("Decimal", position["volume"])
+                ),
+                operation="simulation.run.engine_close_position",
+            )
         unwrap_simulation_response(
             writer.append(
                 "run_completed",

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Mapping
-from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
@@ -18,13 +17,10 @@ from app.services.research.contracts import (
     ResearchResourceLimits,
     ResearchWarning,
 )
-from app.services.research.data.validation import validate_dataset
+from app.services.research.data.validation import _MarketDataset, validate_dataset
 from app.utils import canonical_digest, canonical_json, get_logger
 
 logger = get_logger(__name__)
-
-if TYPE_CHECKING:
-    from app.services.data import MarketDataset
 
 type JSONValue = (
     None | bool | int | float | str | list["JSONValue"] | Mapping[str, "JSONValue"]
@@ -140,6 +136,8 @@ def _clean_spreads(
         ValueError: If invalid spreads exist under the error policy.
     """
     logger.debug("Applying Research spread cleaning policy")
+    if frame.empty:
+        return frame, (), ()
     invalid = ~np.isfinite(frame["spread"]) | (frame["spread"] < 0)
     if not bool(invalid.any()):
         return frame, (), ()
@@ -159,7 +157,7 @@ def _clean_spreads(
 
 
 def clean_dataset(
-    dataset: MarketDataset,
+    dataset: _MarketDataset,
     *,
     config: CleaningConfig,
     report: DataQualityReport,
@@ -184,7 +182,8 @@ def clean_dataset(
         raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
     if report.fatal_issues:
         raise ValueError("RES_INPUT_INVALID", "FATAL_QUALITY_ISSUES")
-    frame_response = to_ohlcv_dataframe(dataset)
+    # Data contracts are intentionally opaque outside their package root.
+    frame_response = to_ohlcv_dataframe(dataset)  # type: ignore[arg-type]
     if isinstance(frame_response, pd.DataFrame):
         # Keep isolated legacy test doubles compatible while production Data
         # calls are consumed through the StandardResponse boundary.
@@ -271,7 +270,7 @@ def enrich_dataset(
 
 
 def prepare_research_dataset(
-    dataset: MarketDataset,
+    dataset: _MarketDataset,
     *,
     cleaning: CleaningConfig,
     enrichment: EnrichmentConfig,

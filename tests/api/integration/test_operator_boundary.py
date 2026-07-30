@@ -1,6 +1,7 @@
 """Operator HTTP boundary integration with canonical Risk authority."""
 
 from datetime import timedelta
+from typing import Any
 
 from app.services.api.identity import require_auth_context
 from app.services.api.routes import operator
@@ -11,7 +12,7 @@ from app.services.risk import (
     create_approval_attestation,
     create_risk_audit_chain,
 )
-from app.utils import AuthContext, canonical_json
+from app.utils import canonical_json
 from fastapi import FastAPI
 
 from tests.api._support import post_json
@@ -21,6 +22,7 @@ from tests.risk import _support as risk_support
 ApprovalAttestation = object
 KillSwitchCommand = object
 KillSwitchState = object
+AuthContext = Any
 
 
 def test_operator_kill_switch() -> None:
@@ -40,7 +42,7 @@ def test_operator_kill_switch() -> None:
         attestation: ApprovalAttestation | None,
     ) -> KillSwitchState:
         """Apply one command through the canonical Risk transition."""
-        current[0] = apply_kill_switch_command(
+        result = apply_kill_switch_command(
             command,
             current[0],
             auth,
@@ -50,6 +52,10 @@ def test_operator_kill_switch() -> None:
             config,
             attestation=attestation,
             now=risk_support.NOW,
+        )
+        current[0] = risk_support._risk_value(
+            result,
+            operation="apply_kill_switch_command",
         )
         return current[0]
 
@@ -88,7 +94,10 @@ def test_operator_kill_switch() -> None:
         principal_id="operator-2",
         action="risk.kill.clear",
         scope={"global": "*"},
-        policy_ref=compute_config_hash(config),
+        policy_ref=risk_support._risk_value(
+            compute_config_hash(config),
+            "compute_config_hash",
+        ),
         policy_version=config.policy_version,
         issued_at=risk_support.NOW,
         expires_at=risk_support.NOW + timedelta(minutes=1),

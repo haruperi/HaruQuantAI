@@ -14,7 +14,9 @@ from app.services.analytics.contracts import (
     ClosedTrade,
     StatisticalValidationConfig,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 

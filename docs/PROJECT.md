@@ -24,7 +24,7 @@ HaruQuantAI is an algorithmic trading platform that turns market data into gover
 
 This document defines the target system and the contract-governed continuation of
 the existing implementation. Utils and Brokers are completed implementation
-baselines. Data's functional baseline and owner-approved fifteen-capability focused
+baselines. Data's functional baseline and owner-approved sixteen-capability focused
 architecture are implemented by `CAP-DATA-028`. Later agile phases run
 compatibility/regression gates and add only requirements that are not already
 satisfied.
@@ -52,19 +52,20 @@ satisfied.
   and the explicit 207-name package-root API. Architectural acceptance of
   `CAP-DATA-026` was withdrawn because fourteen horizontal module folders and ten
   usage programs do not satisfy one feature = one module folder = one usage program.
-  `CAP-DATA-028` implements the approved fifteen-capability corrective target.
+  `CAP-DATA-028` implements the approved sixteen-capability corrective target.
   Feature-owned contracts and behavior live in their focused owners, removed
-  horizontal paths have no compatibility shims, and exactly fifteen numbered usage
+  horizontal paths have no compatibility shims, and exactly sixteen numbered usage
   programs supply deterministic evidence. Data is `Completed`: package-local
   implementation, validation, the production-consumer package-root boundary,
   standalone usage evidence, and the approved MT5 demo-provider validation pass. The
   functional baseline includes series-level
   quality inspection (`CAP-DATA-023`), economic calendar scraping (`CAP-DATA-024`),
   and source composition, external artifact import, and stale-cache policy
-  (`CAP-DATA-025`) and backup/restore/retention. Two residual constraints are not Data
-  defects: non-MT5 provider reads stay `UNAVAILABLE` until the Brokers catalogue
-  records read-release evidence, and the calendar scraper's live network path has not
-  been executed against the four external sites.
+  (`CAP-DATA-025`) and backup/restore/retention. The owner-authorized licensed
+  economic-calendar path was verified on 2026-07-30 against ForexFactory,
+  MetalsMine, EnergyExch, and CryptoCraft through Firecrawl. Non-MT5 broker-provider
+  reads remain `UNAVAILABLE` until the Brokers catalogue records read-release
+  evidence; that is not a Data defect.
 - These domains are not rebuilt phase-by-phase. Current repository-wide
   semantic-docstring/format cleanup is tracked separately from functional domain
   completion.
@@ -272,8 +273,8 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 
 * **Package**: `app/services/research`
 * **Responsibility**: Provide a sandboxed, leakage-gated environment for data exploration and hypothesis evaluation, producing advisory reports and deterministic source-evidence projections only.
-* **Inputs**: Datasets and future point-in-time `ResearchSourceDocument` evidence from Data; Analytics public metric contracts.
-* **Outputs**: Advisory `ResearchReport`s, insights, feature definitions, hypothesis evaluations, and future `FundamentalSourceEvidence`/`SentimentSourceEvidence`.
+* **Inputs**: Datasets and eligible point-in-time `ResearchSourceDocument` and structured-observation evidence from Data; Analytics public metric contracts.
+* **Outputs**: Advisory `ResearchReport`s, insights, feature definitions, hypothesis evaluations, and bounded `FundamentalSourceEvidence`/`SentimentSourceEvidence`.
 * **Owns**: Research artifact persistence, its own tables/schemas/migrations, sandboxed analysis, feature engineering, deterministic historical labeling, leakage/bias validation, null models, edge discovery, statistical sign-off, and deterministic fundamental/sentiment source-evidence preparation.
 * **Boundaries**: Read-only toward live systems. Does not own live mutations, risk decisions, strategy promotion, or roadmap/code selection. Advisory only.
 * **Key Limits**: Non-deterministic routines require seed injection and output logs; persisted artifacts store SHA-256 config hashes; implicit/hidden data filling or dropping is forbidden (`CleaningConfig` explicit).
@@ -1008,8 +1009,8 @@ Document only contracts crossing domain or external-system boundaries.
 | Missing | `AllocationProposal` / `RiskAdvisory` | `v1` | `Agentic` | `Agentic` | `Portfolio, Risk, UI/API` | Non-binding portfolio recommendation and risk challenge | evidence refs, scope, proposed ranges, uncertainty, identified risks, constraints, dissent, expiry, `non_binding=true` | Missing/stale evidence or receiver rejection prevents adoption; no approval field exists |
 | Missing | `TradeProposal` | `v1` | `Agentic` | `Agentic` | `Strategy, Portfolio` | Submit a research thesis for normal deterministic evaluation | proposal/task IDs, instrument, direction, horizon, thesis, invalidation, evidence, uncertainty, requested evaluation scope, expiry; no broker fields | Expired, invalid, unauthorized, or rejected proposals stop; receipt is not order/fill evidence |
 | Completed | `StrategyProposalEvaluationRequest` / `StrategyProposalEvaluationResult` | `v1` | `Strategy` | `Agentic or other authenticated proposal source` | `Strategy; Agentic/UI/API receive result` | Receiver-owned boundary that converts an untrusted thesis into a deterministic Strategy evaluation | source proposal/hash, exact strategy/version, scope, expiry, evidence refs; result status/reasons, evaluated signal evidence, optional canonical `TradeIntent` | Proposal text/confidence/consensus cannot alter deterministic fields; absent matching current strategy signal emits no `TradeIntent` |
-| Missing | `ResearchSourceDocument` / `ResearchSourcePage` | `v1` | `Data` | `Data` | `Research; Agentic only through eligible bounded projections` | Point-in-time licensed filing, transcript, macro, news, or approved alternative-source evidence | source/license, asset/issuer/language scope, event/published/first-seen/available/retrieved times, revision, hashes, quality/trust/manipulation/injection, retention, provenance | Unknown availability, prohibited license, integrity, manipulation, injection, or scope makes evidence ineligible |
-| Missing | `FundamentalSourceEvidence` / `SentimentSourceEvidence` | `v1` | `Research` | `Research` | `Agentic, UI/API` | Deterministic bounded source selection, coverage, and measurement evidence for specialized agents | source-document references, decision time, asset applicability, coverage, revisions, deterministic measurements, trust/injection, limitations, hash | Ineligible, insufficient, inapplicable, poisoned, or conflicting evidence is preserved/refused; no model opinion or execution field |
+| Completed | `ResearchSourceDocument` / `ResearchSourcePage` / structured observations | `v1` | `Data` | `Data` | `Research; Agentic only through eligible bounded projections` | Point-in-time licensed filing, transcript, macro, news, or approved alternative-source evidence | source/license, asset/issuer/series scope, event/published/first-seen/available/retrieved times, immutable revisions, parser version, hashes, quality/trust/manipulation/injection, retention, provenance | Unknown availability, prohibited license, integrity, manipulation, injection, or scope makes evidence ineligible |
+| Completed | `FundamentalSourceEvidence` / `SentimentSourceEvidence` | `v1` | `Research` | `Research` | `Agentic, UI/API` | Deterministic bounded source selection, coverage, and measurement evidence for specialized agents | source-document references, decision time, asset applicability, coverage, revisions, deterministic measurements, trust/injection, limitations, hash | Ineligible, insufficient, inapplicable, poisoned, or conflicting evidence is preserved/refused; no model opinion or execution field |
 | Completed | `MarketDataset`                          | `v1`  | `Data`         | `Data`                                                                                 | `Indicators, Strategy, Trading, Simulation, Optimization, Research, Analytics, Portfolio, Agentic, UI/API` (Risk consumes `MarketContextEvidence` / `AccountStateSnapshot` instead) | Normalized bars/ticks with alignment metadata                                                                                                                                                                                                                         | symbol, timeframe, records,`available_at`, provenance                                                                                                                                                                                                                            | Structured data error; consumers must not accept raw provider objects                                                                                                                         |
 | Completed | `AccountStateSnapshot`                   | `v1`  | `Data`         | `Data`                                                                                 | `Strategy, Risk, Trading, Portfolio, Agentic`                                                                                                                                  | Read-only broker/account state for evaluation and validation                                                                                                                                                                                                          | account, balances, positions, margin, snapshot time (UTC)                                                                                                                                                                                                                          | Stale or unavailable snapshot causes dependent governed operations to fail closed                                                                                                             |
 | Completed | `FXConversionEvidence`                   | `v1`  | `Data`         | `Data`                                                                                 | `Risk, Simulation, Analytics, Portfolio`                                                                                                                                       | Fresh, provenance-bound direct or synthesized FX conversion path for one amount/currency scope                                                                                                                                                                        | source/target currencies, ordered rate legs, composite rate,`as_of`, freshness limit, path policy/version, provenance                                                                                                                                                            | Missing, stale, cyclic, disallowed, or unverifiable conversion path fails closed; consumers never synthesize rates                                                                            |

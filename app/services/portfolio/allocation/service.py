@@ -8,11 +8,12 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
 from app.services.portfolio.contracts import ActivePortfolioAllocation
-from app.services.portfolio.exceptions import PortfolioError
+from app.services.portfolio.contracts.errors import PortfolioError
 from app.services.risk import (
     create_allocation_budget_activation_request,
     get_decision_state,
 )
+from app.services.simulator import get_simulation_value_field
 from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
@@ -24,10 +25,11 @@ ApprovalValidationResult = Any
 KillSwitchState = Any
 
 if TYPE_CHECKING:
-    from app.services.portfolio.config import PortfolioSettings
+    from app.services.portfolio._settings import PortfolioSettings
     from app.services.portfolio.contracts import PortfolioConstructionResult
     from app.services.portfolio.state import AuditOutboxRecord, PortfolioRepository
-    from app.services.simulator import PortfolioSimulationResult
+
+    PortfolioSimulationResult = Any
 
 type RiskBudgetActivator = Callable[
     [AllocationBudgetActivationRequest, "AllocationRiskDecision"],
@@ -99,10 +101,13 @@ class AllocationService:
         if activated_at.tzinfo is None or activated_at.utcoffset() != timedelta(0):
             raise PortfolioError("PORT_INVALID_INPUT", "ACTIVATED_AT_NOT_UTC")
         if (
-            simulation.status != "completed"
-            or simulation.portfolio_id != candidate.portfolio_id
-            or simulation.construction_result_id != candidate.result_id
-            or simulation.construction_version != candidate.portfolio_version
+            get_simulation_value_field(simulation, "status") != "completed"
+            or get_simulation_value_field(simulation, "portfolio_id")
+            != candidate.portfolio_id
+            or get_simulation_value_field(simulation, "construction_result_id")
+            != candidate.result_id
+            or get_simulation_value_field(simulation, "construction_version")
+            != candidate.portfolio_version
         ):
             raise PortfolioError("PORT_SIMULATION_INVALID", "CANDIDATE_BINDING")
         if (

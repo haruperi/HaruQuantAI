@@ -2,7 +2,7 @@ from itertools import product
 
 import pytest
 from app.runtime import validate_runtime_configuration
-from app.utils import RiskLevel, validate_id
+from app.utils import validate_id
 
 _COMPATIBLE_PAIRS = (
     ("research", "none"),
@@ -37,7 +37,7 @@ def test_validate_runtime_configuration_accepts_compatible_pair(
     }
     assert response.metadata.name == "app.runtime.validate_runtime_configuration"
     assert response.metadata.domain == "app"
-    assert response.metadata.risk_level is RiskLevel.NONE
+    assert str(response.metadata.risk_level) == "none"
     assert validate_id(response.metadata.request_id, expected_prefix="req")
     assert response.metadata.correlation_id is None
     assert response.metadata.execution_ms >= 0

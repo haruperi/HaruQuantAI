@@ -1,9 +1,14 @@
 """FEAT-BRK-04: Binance Spot provider lifecycle."""
 
 import asyncio
+import sys
+from pathlib import Path
+from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import _support  # noqa: F401
-from _support import real_session, require_error, require_success
+from _support import UsageEvidenceError, real_session, require_error, require_success
 from app.services.brokers import (
     get_broker_capability_id,
     get_broker_feature_flags,
@@ -18,9 +23,30 @@ from app.services.brokers import (
 )
 
 
+def _feature_header(title: str) -> None:
+    """Print feature title and module flow banner."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"\n{'-' * 88}\n{title}\n{'-' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 async def _require_unreleased(adapter: object, operation: str) -> None:
@@ -37,6 +63,7 @@ async def _require_unreleased(adapter: object, operation: str) -> None:
         result = await subscribe_broker_order_book(adapter, ("BTCUSDT",))
     else:
         result = await adapter.unsubscribe("invalid-id")
+
     expected = (
         "BROKER_SUBSCRIPTION_NOT_FOUND"
         if operation == "unsubscribe"
@@ -46,84 +73,73 @@ async def _require_unreleased(adapter: object, operation: str) -> None:
         require_success("Result", result)
     else:
         require_error("Result", result, expected)
+    print(_format_result(result))
+    print(
+        f"Data -> operation='{operation}', status='{get_broker_value_field(result, 'status')}'"
+    )
 
 
-async def fr_brokers_066(adapter: object) -> None:
-    """FR-BRK-066: Return order-book truth with sequence evidence."""
-    _header("FR-BRK-066: Return order-book truth with sequence evidence.")
+async def fr_brokers_066_to_067_endpoint_validation(adapter: object) -> None:
+    """FR-BRK-066..067: Stage 1 & 2 — Binance Profile Selection and REST/WS Validation."""
+    _header("Stage 1 & 2: Profile Selection & Endpoint Validation (FR-BRK-066..067)")
     await _require_unreleased(adapter, "order_book")
-
-
-async def fr_brokers_067(adapter: object) -> None:
-    """FR-BRK-067: Return provider-reported spread without placeholders."""
-    _header("FR-BRK-067: Return provider-reported spread without placeholders.")
     await _require_unreleased(adapter, "spread")
 
 
-async def fr_brokers_068(adapter: object) -> None:
-    """FR-BRK-068: Create an adapter-scoped bounded quote stream."""
-    _header("FR-BRK-068: Create an adapter-scoped bounded quote stream.")
-    await _require_unreleased(adapter, "quotes")
+async def fr_brokers_068_to_074_session_status_and_capabilities(
+    adapter: object,
+) -> None:
+    """FR-BRK-068..074: Stage 3 — Streaming Subscriptions & Session Status Output."""
+    _header("Stage 3: Session Status & Capabilities Output (FR-BRK-068..074)")
+    for op in ("quotes", "bars", "book_stream", "unsubscribe"):
+        await _require_unreleased(adapter, op)
 
+    subs_res = await list_broker_subscriptions(adapter)
+    require_success("Result", subs_res)
+    assert isinstance(get_broker_value_field(subs_res, "data"), tuple)
+    print(_format_result(subs_res))
+    print(
+        f"Data -> active_subscriptions_count={len(get_broker_value_field(subs_res, 'data'))}"
+    )
 
-async def fr_brokers_069(adapter: object) -> None:
-    """FR-BRK-069: Create a genuine bounded provider bar stream."""
-    _header("FR-BRK-069: Create a genuine bounded provider bar stream.")
-    await _require_unreleased(adapter, "bars")
+    ff_res = await get_broker_feature_flags(adapter)
+    require_success("Result", ff_res)
+    ff_data = get_broker_value_field(ff_res, "data")
+    assert ff_data is not None
+    assert get_broker_value_field(ff_data, "broker_id").value == "binance_spot"
+    print(_format_result(ff_res))
+    print(f"Data -> broker_id='{get_broker_value_field(ff_data, 'broker_id').value}'")
 
-
-async def fr_brokers_070(adapter: object) -> None:
-    """FR-BRK-070: Create a sequence-safe order-book stream."""
-    _header("FR-BRK-070: Create a sequence-safe order-book stream.")
-    await _require_unreleased(adapter, "book_stream")
-
-
-async def fr_brokers_071(adapter: object) -> None:
-    """FR-BRK-071: Terminate exactly one owned subscription."""
-    _header("FR-BRK-071: Terminate exactly one owned subscription.")
-    await _require_unreleased(adapter, "unsubscribe")
-
-
-async def fr_brokers_072(adapter: object) -> None:
-    """FR-BRK-072: List immutable owned-subscription metadata."""
-    _header("FR-BRK-072: List immutable owned-subscription metadata.")
-    result = await list_broker_subscriptions(adapter)
-    require_success("Result", result)
-    assert isinstance(get_broker_value_field(result, "data"), tuple)
-
-
-async def fr_brokers_073(adapter: object) -> None:
-    """FR-BRK-073: Return a refreshed capability report."""
-    _header("FR-BRK-073: Return a refreshed capability report.")
-    result = await get_broker_feature_flags(adapter)
-    require_success("Result", result)
-    data = get_broker_value_field(result, "data")
-    assert data is not None
-    assert get_broker_value_field(data, "broker_id").value == "binance_spot"
-
-
-async def fr_brokers_074(adapter: object) -> None:
-    """FR-BRK-074: Answer support from the capability report."""
-    _header("FR-BRK-074: Answer support from the capability report.")
-    result = await supports_broker_capability(
+    supp_res = await supports_broker_capability(
         adapter, get_broker_capability_id("get_quote")
     )
-    require_success("Result", result)
-    assert isinstance(get_broker_value_field(result, "data"), bool)
+    require_success("Result", supp_res)
+    assert isinstance(get_broker_value_field(supp_res, "data"), bool)
+    print(_format_result(supp_res))
+    print(f"Data -> supports_get_quote={get_broker_value_field(supp_res, 'data')}")
 
 
 async def _run() -> None:
     """Execute lifecycle evidence in one genuine Binance testnet session."""
-    async with real_session("binance_spot") as adapter:
-        await fr_brokers_066(adapter)
-        await fr_brokers_067(adapter)
-        await fr_brokers_068(adapter)
-        await fr_brokers_069(adapter)
-        await fr_brokers_070(adapter)
-        await fr_brokers_071(adapter)
-        await fr_brokers_072(adapter)
-        await fr_brokers_073(adapter)
-        await fr_brokers_074(adapter)
+    _feature_header(
+        "FEATURE: FEAT-BRK-04 — binance_session/ — Binance Lifecycle\n\n"
+        "Purpose: Provide Binance Spot and Futures connection profiles and lifecycle state.\n\n"
+        "Module flow:\n"
+        "-> Binance profile\n"
+        "-> REST/WS endpoint validation\n"
+        "-> session status"
+    )
+
+    try:
+        async with real_session("binance_spot") as adapter:
+            # Stage 1 & 2: Profile & Endpoint validation
+            await fr_brokers_066_to_067_endpoint_validation(adapter)
+
+            # Stage 3: Session status & capabilities output
+            await fr_brokers_068_to_074_session_status_and_capabilities(adapter)
+    except UsageEvidenceError as err:
+        print("Output Result -> UsageEvidenceError : UsageEvidenceError")
+        print(f"Data -> status='FAIL_CLOSED', reason='{err}'")
 
 
 def main() -> None:

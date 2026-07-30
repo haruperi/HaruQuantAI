@@ -54,6 +54,14 @@ FUNDAMENTAL_EVIDENCE_TOOL = "research.build_fundamental_source_evidence"
 # exist; `macro` does not. The distinction is the receiver's, not ours.
 type FundamentalModel = str
 
+# What each fundamental model requires coverage of by default. An issuer model
+# needs an issuer document; a macro model needs a macro release. FX has no
+# issuer, so the macro default is the ordinary path under an FX mandate.
+DEFAULT_REQUIRED_KINDS: Mapping[str, tuple[str, ...]] = {
+    "issuer": ("filing",),
+    "macro": ("macro",),
+}
+
 # Fields a fundamental projection must carry for a pack to be built from it.
 REQUIRED_PROJECTION_FIELDS: tuple[str, ...] = (
     "asset_scope",
@@ -88,14 +96,21 @@ class FundamentalEvidencePort(Protocol):
         instrument: str,
         asset_class: str,
         model: str,
+        required_kinds: tuple[str, ...],
         decision_time: str,
     ) -> Mapping[str, str]:
         """Return the projected fundamental evidence for one instrument.
+
+        `required_kinds` reaches Research's own coverage rule: it refuses
+        `FUNDAMENTAL_COVERAGE_MISSING` when a declared kind has no eligible
+        document. Declaring it is how a reading says what it needs rather than
+        accepting whatever happens to exist.
 
         Args:
             instrument: Instrument under analysis.
             asset_class: Normalized instrument asset class.
             model: Requested fundamental model.
+            required_kinds: Source kinds the reading requires coverage of.
             decision_time: Point in time the evidence must be available by.
 
         Returns:
@@ -118,6 +133,53 @@ def verify_projection(projection: Mapping[str, str]) -> str | None:
     )
     if missing:
         return f"the fundamental projection omits: {', '.join(missing)}"
+    return None
+
+
+def parse_coverage(projection: Mapping[str, str]) -> dict[str, int]:
+    """Parse the receiver-reported coverage counts.
+
+    Args:
+        projection: Receiver-returned projection fields.
+
+    Returns:
+        Coverage kind to count; unreadable entries are omitted.
+    """
+    counts: dict[str, int] = {}
+    for item in str(projection.get("coverage", "")).split(","):
+        kind, _, count = item.partition("=")
+        if kind.strip() and count.strip().isdigit():
+            counts[kind.strip()] = int(count.strip())
+    return counts
+
+
+def verify_coverage(
+    projection: Mapping[str, str],
+    required_kinds: tuple[str, ...],
+) -> str | None:
+    """Report whether the projection covers every declared required kind.
+
+    Research refuses on its own coverage rule, but the analyst verifies the
+    answer rather than assuming the receiver applied the rule it was given: a
+    projection that came back without a required kind is not evidence for the
+    reading that was asked for.
+
+    Args:
+        projection: Receiver-returned projection fields.
+        required_kinds: Source kinds the reading requires coverage of.
+
+    Returns:
+        The failing condition, or None when every required kind is covered.
+    """
+    if not required_kinds:
+        return "a fundamental reading must declare the coverage it requires"
+    coverage = parse_coverage(projection)
+    missing = tuple(kind for kind in required_kinds if coverage.get(kind, 0) < 1)
+    if missing:
+        return (
+            "the projection covers no "
+            f"{', '.join(missing)} evidence, which this reading requires"
+        )
     return None
 
 
@@ -231,6 +293,7 @@ class _FundamentalEvidencePort:
         instrument: str,
         asset_class: str,
         model: str,
+        required_kinds: tuple[str, ...],
         decision_time: str,
     ) -> Mapping[str, str]:
         """Return the projected fundamental evidence for one instrument.
@@ -239,6 +302,7 @@ class _FundamentalEvidencePort:
             instrument: Instrument under analysis.
             asset_class: Normalized instrument asset class.
             model: Requested fundamental model.
+            required_kinds: Source kinds the reading requires coverage of.
             decision_time: Point in time the evidence must be available by.
 
         Returns:
@@ -248,6 +312,7 @@ class _FundamentalEvidencePort:
             instrument,
             asset_class,
             model,
+            required_kinds,
             decision_time,
         )
 

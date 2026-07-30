@@ -2,8 +2,11 @@
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from types import SimpleNamespace
 from typing import Any
 
+import pytest
+from app.services.simulator.errors import SimulationError
 from app.services.simulator.execution import (
     ExecutionProfile,
     SessionInterval,
@@ -80,3 +83,53 @@ def test_price_order_uses_side_correct_bid_ask() -> None:
     """Price BUY at ask and SELL at bid."""
     assert price_order(_intent("BUY"), _tick(), _profile()) == Decimal("1.10002")
     assert price_order(_intent("SELL"), _tick(), _profile()) == Decimal("1.10000")
+
+
+def test_execution_profile_rejects_invalid_policy_relationships() -> None:
+    """Reject invalid sessions, prices, slippage, liquidity, and empty calendars."""
+    with pytest.raises(ValueError, match=r".+"):
+        SessionInterval(start_week_second=1, end_week_second=1)
+    base = _profile().model_dump(mode="python")
+    for update in (
+        {"fixed_slippage_points": Decimal(-1)},
+        {"point_value": Decimal(0)},
+        {
+            "slippage_mode": "none",
+            "fixed_slippage_points": Decimal(1),
+            "maximum_slippage_points": Decimal(1),
+        },
+        {
+            "slippage_mode": "fixed_points",
+            "fixed_slippage_points": Decimal(2),
+            "maximum_slippage_points": Decimal(1),
+        },
+        {
+            "liquidity_mode": "tick_volume",
+            "participation_rate": Decimal(0),
+        },
+        {"liquidity_mode": "unbounded", "participation_rate": Decimal("0.5")},
+        {"sessions": ()},
+    ):
+        with pytest.raises(ValueError, match=r".+"):
+            ExecutionProfile(**(base | update))
+
+
+def test_price_order_rejects_invalid_price_and_slippage_outcomes() -> None:
+    """Reject invalid observed prices and adverse slippage below zero."""
+    invalid_tick = SimpleNamespace(bid=Decimal("NaN"), ask=Decimal("NaN"))
+    with pytest.raises(SimulationError, match="invalid"):
+        price_order(_intent(), invalid_tick, _profile())
+    slipped = ExecutionProfile(
+        slippage_mode="fixed_points",
+        fixed_slippage_points=Decimal(2),
+        point_value=Decimal("0.1"),
+        price_quantum=Decimal("0.1"),
+        maximum_slippage_points=Decimal(2),
+        maximum_gap_points=Decimal(10),
+        liquidity_mode="unbounded",
+        participation_rate=Decimal(0),
+        sessions=(SessionInterval(start_week_second=0, end_week_second=604_800),),
+    )
+    low_tick = SimpleNamespace(bid=Decimal("0.1"), ask=Decimal("0.2"))
+    with pytest.raises(SimulationError, match="invalid"):
+        price_order(_intent("SELL"), low_tick, slipped)

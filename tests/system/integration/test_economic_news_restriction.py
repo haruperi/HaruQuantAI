@@ -5,13 +5,16 @@ from decimal import Decimal
 from typing import Any
 
 from app.services.data import (
-    EconomicEvent,
-    EventImpact,
-    MarketContextEvidence,
+    build_economic_event,
+    build_event_impact,
+    build_market_context_evidence,
+    get_default_minimum_impact,
     populate_market_context_calendar,
+    unwrap_data_response,
 )
 from app.services.risk import (
     create_kill_switch_state,
+    create_risk_config,
     create_risk_decision_package,
     evaluate_market_context,
     get_decision_state,
@@ -25,7 +28,9 @@ from app.services.trading import (
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 KillSwitchState = object
-RiskConfig = object
+RiskConfig = Any
+EconomicEvent = Any
+MarketContextEvidence = Any
 RouteSnapshot = Any
 TradingRequest = Any
 
@@ -37,34 +42,32 @@ _CORRELATION_ID = "cor-33333333-3333-4333-8333-333333333333"
 
 def _risk_config() -> RiskConfig:
     """Build the deterministic simulation Risk policy."""
-    return RiskConfig.model_validate(
-        {
-            "profile": "simulation",
-            "execution_route": "sim",
-            "policy_version": "policy-1",
-            "base_currency": "USD",
-            "pending_order_exposure_policy": "include_full_remaining_exposure",
-            "evidence_max_age_seconds": {"portfolio": 60, "market": 30},
-            "clock_skew_tolerance_seconds": Decimal(0),
-            "var_min_observations": 3,
-            "var_lookback": 3,
-            "regime_assessment_enabled": False,
-            "approval_token_ttl_seconds": Decimal(60),
-            "approval_signing_key_ref": "secrets/risk-key",
-            "decision_ttl_seconds": Decimal(30),
-            "kill_switch_activation_permissions": ("risk.kill.activate",),
-            "kill_switch_clearance_permissions": ("risk.kill.clear",),
-            "report_timeout_seconds": Decimal(5),
-            "session_timezone": "UTC",
-            "missing_calendar_mode": "block",
-            "max_spread": {"EURUSD@points": Decimal(2)},
-        }
+    return create_risk_config(
+        profile="simulation",
+        execution_route="sim",
+        policy_version="policy-1",
+        base_currency="USD",
+        pending_order_exposure_policy="include_full_remaining_exposure",
+        evidence_max_age_seconds={"portfolio": 60, "market": 30},
+        clock_skew_tolerance_seconds=Decimal(0),
+        var_min_observations=3,
+        var_lookback=3,
+        regime_assessment_enabled=False,
+        approval_token_ttl_seconds=Decimal(60),
+        approval_signing_key_ref="secrets/risk-key",
+        decision_ttl_seconds=Decimal(30),
+        kill_switch_activation_permissions=("risk.kill.activate",),
+        kill_switch_clearance_permissions=("risk.kill.clear",),
+        report_timeout_seconds=Decimal(5),
+        session_timezone="UTC",
+        missing_calendar_mode="block",
+        max_spread={"EURUSD@points": Decimal(2)},
     )
 
 
 def _market() -> MarketContextEvidence:
     """Build complete market evidence with calendar acquisition pending."""
-    return MarketContextEvidence(
+    return build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
         calendar_state=None,
@@ -85,7 +88,7 @@ def _market() -> MarketContextEvidence:
 
 def _event() -> EconomicEvent:
     """Build one high-impact USD release five minutes ahead."""
-    return EconomicEvent(
+    return build_economic_event(
         id="provider-event-1",
         provider="demo",
         name="CPI",
@@ -93,7 +96,7 @@ def _event() -> EconomicEvent:
         country="US",
         currency="USD",
         scheduled_at=_NOW + timedelta(minutes=5),
-        impact=EventImpact.HIGH,
+        impact=build_event_impact(int(get_default_minimum_impact())),
         forecast=Decimal("3.2"),
         forecast_raw="3.2%",
         unit="%",
@@ -160,7 +163,11 @@ def _switch() -> KillSwitchState:
 
 def test_high_impact_event_blocks_risk_and_trading_readiness() -> None:
     """Risk consumes Data calendar evidence and Trading consumes only Risk."""
-    evidence = populate_market_context_calendar(_market(), events=[_event()])
+    evidence = unwrap_data_response(
+        populate_market_context_calendar(_market(), events=[_event()]),
+        operation="populate_market_context_calendar",
+        request_id=_REQUEST_ID,
+    )
     limit_response = evaluate_market_context(evidence, _risk_config(), now=_NOW)
     assert limit_response.status == "success"
     assert limit_response.data is not None
@@ -188,7 +195,7 @@ def test_high_impact_event_blocks_risk_and_trading_readiness() -> None:
         workflow_id=_WORKFLOW_ID,
         correlation_id=_CORRELATION_ID,
     )
-    assessment = assess_execution_readiness(
+    assessment_response = assess_execution_readiness(
         _trading_request(),
         _route(),
         decision,
@@ -205,6 +212,9 @@ def test_high_impact_event_blocks_risk_and_trading_readiness() -> None:
             "kill_switch": Decimal(30),
         },
     )
+    assert assessment_response.status == "success"
+    assert assessment_response.data is not None
+    assessment = assessment_response.data
 
     assert assessment.passed is False
     assert "RISK_NOT_APPROVED" in assessment.failed_check_codes

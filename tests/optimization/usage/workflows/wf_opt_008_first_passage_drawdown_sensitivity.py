@@ -15,6 +15,7 @@ from app.services.optimization import (
     estimate_joint_first_passage,
 )
 from app.services.risk import create_firm_mandate
+from app.utils import flush_logging
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 FirmMandate = object
@@ -115,7 +116,14 @@ def main() -> None:
     _stage(3)
     returns_by_account = {
         "account-1": _RETURNS,
-        "account-2": tuple(value * Decimal("0.9") for value in _RETURNS),
+        "account-2": (
+            Decimal("0.011"),
+            Decimal("-0.004"),
+            Decimal("0.018"),
+            Decimal("-0.009"),
+            Decimal("0.006"),
+            Decimal("-0.012"),
+        ),
     }
     joint = estimate_joint_first_passage(
         returns_by_account,
@@ -155,3 +163,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+    flush_logging()

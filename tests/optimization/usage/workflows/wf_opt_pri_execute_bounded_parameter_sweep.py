@@ -7,20 +7,17 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.optimization.execution import execute_candidate
-from app.services.optimization.parameters import (
+from app.services.optimization import (
     evaluate_constraints,
-    validate_parameter_space,
-)
-from app.services.optimization.search import (
+    execute_candidate,
     iter_grid_candidates,
     run_bounded_search,
     sample_random_candidates,
+    validate_parameter_space,
 )
-from tests.optimization.unit.test_adapter import FakeAdapter
-from tests.optimization.unit.test_execution_contracts import execution_request
+from app.utils import flush_logging
+from tests.optimization.usage._support import genuine_execution_bundle
 from tests.optimization.usage.workflows._support import (
-    live_market_dataset,
     live_search_request,
 )
 
@@ -58,8 +55,8 @@ def main() -> None:
     print(
         "INPUT BOUNDARY — SearchRequest, Strategy/Data provenance, Simulation adapter"
     )
-    request = live_search_request(live_market_dataset())
-    adapter = FakeAdapter()
+    dataset, candidate_request, adapter = genuine_execution_bundle()
+    request = live_search_request(dataset)
 
     # Stage 1 — Validate the bounded parameter space and genuine MT5 Data provenance.
     _stage(1)
@@ -98,7 +95,7 @@ def main() -> None:
     # Stage 4 — Execute one version-compatible candidate through the injected adapter.
     _stage(4)
     execution = execute_candidate(
-        execution_request(),
+        candidate_request,
         adapter,
         deterministic_only=True,
     )
@@ -107,9 +104,15 @@ def main() -> None:
     _stage(5)
     summary = run_bounded_search(request, adapter)
     print("Generated/accepted/random:", len(grid), len(accepted), len(random))
-    print("Execution candidate:", execution.candidate_hash)
+    print(
+        "Execution evidence:",
+        execution.candidate_hash,
+        execution.simulation_run_id,
+        f"MT5 rows={len(dataset.records)}",
+    )
     print("OUTPUT BOUNDARY — typed SearchSummary:", summary.search_id)
 
 
 if __name__ == "__main__":
     main()
+    flush_logging()

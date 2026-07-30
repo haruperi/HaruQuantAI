@@ -13,7 +13,7 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.portfolio import PortfolioRebalancePlan
+from app.services.portfolio import create_portfolio_value
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 
@@ -116,7 +116,7 @@ def fr_port_025() -> None:
     )
     print("FR-PORT-025: Submit only receiver-owned request contracts")
 
-    plan = PortfolioRebalancePlan(**_plan_data())
+    plan = create_portfolio_value("PortfolioRebalancePlan", **_plan_data())
     for action in plan.actions:
         assert action.action == "reduce_exposure"
         assert action.reduce_only is True
@@ -136,7 +136,7 @@ def fr_port_026() -> None:
     )
     print("FR-PORT-026: Revalidate gates before side effects")
 
-    plan = PortfolioRebalancePlan(**_plan_data())
+    plan = create_portfolio_value("PortfolioRebalancePlan", **_plan_data())
     assert plan.observed_at.tzinfo is not None
     assert plan.created_at.tzinfo is not None
     print(f"Observed at: {plan.observed_at}")
@@ -154,7 +154,7 @@ def fr_port_027() -> None:
     )
     print("FR-PORT-027: Propagate trace IDs end to end")
 
-    plan = PortfolioRebalancePlan(**_plan_data())
+    plan = create_portfolio_value("PortfolioRebalancePlan", **_plan_data())
     assert plan.request_id == "req-1"
     assert plan.workflow_id == "wf-1"
     assert plan.correlation_id == "corr-1"
@@ -176,7 +176,7 @@ def fr_port_028() -> None:
     )
     print("FR-PORT-028: Emit redacted audit events")
 
-    plan = PortfolioRebalancePlan(**_plan_data())
+    plan = create_portfolio_value("PortfolioRebalancePlan", **_plan_data())
     assert len(plan.canonical_hash) == 64
     assert len(plan.evidence_hash) == 64
     assert len(plan.config_hash) == 64
@@ -198,17 +198,18 @@ def fr_port_029() -> None:
     )
     print("FR-PORT-029: Never retry accepted mutation without idempotency")
 
-    plan = PortfolioRebalancePlan(**_plan_data())
+    plan = create_portfolio_value("PortfolioRebalancePlan", **_plan_data())
     assert plan.status == "review_required"
     print(f"Plan status before submission: {plan.status}")
 
-    executed = PortfolioRebalancePlan(
+    executed = create_portfolio_value(
+        "PortfolioRebalancePlan",
         **_plan_data(
             status="executed_unmeasured",
             risk_decision_id="risk-decision-1",
             trading_execution_ref="trading-execution-1",
             canonical_hash="d" * 64,
-        )
+        ),
     )
     assert executed.status == "executed_unmeasured"
     assert executed.trading_execution_ref
@@ -230,27 +231,29 @@ def fr_port_038() -> None:
     )
     print("FR-PORT-038: Request Analytics measurement, preserve execution truth")
 
-    executed = PortfolioRebalancePlan(
+    executed = create_portfolio_value(
+        "PortfolioRebalancePlan",
         **_plan_data(
             status="executed_unmeasured",
             risk_decision_id="risk-decision-1",
             trading_execution_ref="trading-execution-1",
             canonical_hash="d" * 64,
-        )
+        ),
     )
     assert executed.status == "executed_unmeasured"
     assert executed.trading_execution_ref is not None
     print(f"Executed-but-unmeasured: {executed.status}")
     print(f"Trading execution ref preserved: {executed.trading_execution_ref}")
 
-    measured = PortfolioRebalancePlan(
+    measured = create_portfolio_value(
+        "PortfolioRebalancePlan",
         **_plan_data(
             status="measured",
             risk_decision_id="risk-decision-1",
             trading_execution_ref="trading-execution-1",
             analytics_measurement_ref="analytics-evidence-1",
             canonical_hash="e" * 64,
-        )
+        ),
     )
     assert measured.status == "measured"
     assert measured.analytics_measurement_ref == "analytics-evidence-1"

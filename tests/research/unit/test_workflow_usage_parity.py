@@ -20,6 +20,7 @@ EXPECTED = {
     "WF-RES-008": "wf_res_008_run_unsupervised_market_structure_research.py",
     "WF-RES-009": "wf_res_009_build_research_scorecard_profile_snapshot.py",
     "WF-RES-010": "wf_res_010_render_persist_research_artifact.py",
+    "WF-RES-012": "wf_res_012_compare_research_profiles_across_periods.py",
     "WF-RES-PRI": "wf_res_pri_run_complete_edge_lab_profile.py",
 }
 

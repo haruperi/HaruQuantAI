@@ -10,7 +10,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.simulator import (
-    JournalWriter,
+    create_simulation_handle,
+    execute_simulation_handle_operation,
+    get_simulation_value_field,
     replay_journal,
     unwrap_simulation_response,
 )
@@ -42,9 +44,13 @@ def main() -> None:
         # Stage 1 — Receive a canonical journal with matching config, data, engine, and schema identities.
         _stage(1)
         store = SqliteSimulationStateStore(root / "state.db", root / "artifacts")
-        writer = JournalWriter(store, "run-replay", "req-replay", "cor-replay")
+        writer = create_simulation_handle(
+            "JournalWriter", store, "run-replay", "req-replay", "cor-replay"
+        )
         unwrap_simulation_response(
-            writer.append(
+            execute_simulation_handle_operation(
+                writer,
+                "append",
                 "run_started",
                 {"config_hash": "a", "data_hash": "b", "engine_version": "v1"},
                 datetime(2026, 1, 1, tzinfo=UTC),
@@ -52,7 +58,7 @@ def main() -> None:
             operation="simulation.workflow.wf_sim_005.journal_append",
         )
         unwrap_simulation_response(
-            writer.finalize(),
+            execute_simulation_handle_operation(writer, "finalize"),
             operation="simulation.workflow.wf_sim_005.journal_finalize",
         )
 
@@ -67,8 +73,8 @@ def main() -> None:
             replay_journal(
                 journal,
                 lambda _state, event: {
-                    "sequence": event.sequence,
-                    "hash": event.event_hash,
+                    "sequence": get_simulation_value_field(event, "sequence"),
+                    "hash": get_simulation_value_field(event, "event_hash"),
                 },
             ),
             operation="simulation.workflow.wf_sim_005.replay_journal",

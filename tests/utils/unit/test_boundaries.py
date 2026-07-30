@@ -22,6 +22,7 @@ _EXPECTED_EXPORTS = {
     "generate_id",
     "get_common_error_catalog",
     "get_audit_event_type",
+    "get_auth_context_type",
     "get_default_redaction_policy",
     "get_error_metadata",
     "get_execution_ms",
@@ -58,6 +59,7 @@ _EXPECTED_USAGE_CALLS = {
         "create_audit_event",
         "create_auth_context",
         "get_audit_event_type",
+        "get_auth_context_type",
     },
     "02_errors.py": {
         "get_common_error_catalog",

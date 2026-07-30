@@ -8,9 +8,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.research import SessionConfig
-from app.services.research.seasonality import (
-    SeasonalityFilters,
+from app.services.research import (
+    create_research_value,
     run_seasonality,
     tag_sessions,
 )
@@ -40,7 +39,8 @@ def main() -> None:
     # Stage 1 — Receive prepared genuine MT5 OHLCVS and an approved UTC session policy.
     _stage(1)
     prepared = prepared_dataset()
-    sessions = SessionConfig(
+    sessions = create_research_value(
+        "SessionConfig",
         "UTC",
         {
             "sydney": (time(21), time(6)),
@@ -60,7 +60,7 @@ def main() -> None:
     summary = run_seasonality(
         prepared,
         sessions=sessions,
-        filters=SeasonalityFilters(),
+        filters=create_research_value("SeasonalityFilters"),
         limits=limits(),
     )
 

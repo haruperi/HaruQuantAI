@@ -4,8 +4,10 @@
 from decimal import Decimal
 
 from app.services.analytics import compare_performance_reports
-from app.utils import logger
-from tests.analytics._support import _report, unwrap
+from app.utils import get_logger
+
+logger = get_logger(__name__)
+from tests.analytics._support import _report, unwrap  # noqa: E402
 
 
 def test_report_comparison_uses_actual_common_metrics() -> None:

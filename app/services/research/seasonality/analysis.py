@@ -175,7 +175,9 @@ def _row_number(row: Mapping[str, JSONValue], key: str) -> float:
     """
     value = row.get(key)
     if isinstance(value, bool) or not isinstance(value, int | float):
-        raise ValueError("RES_INPUT_INVALID", "INVALID_SEASONALITY_SUMMARY")
+        raise ValueError(  # noqa: TRY004 - Research validation taxonomy.
+            "RES_INPUT_INVALID", "INVALID_SEASONALITY_SUMMARY"
+        )
     return float(value)
 
 

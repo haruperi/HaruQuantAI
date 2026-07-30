@@ -97,19 +97,24 @@ async def _get_economic_events_raw(
         start.isoformat(),
         end.isoformat(),
     )
-    events = cast(
-        "list[EconomicEvent]",
-        unwrap_data_response(
-            await provider.get_events(
-                start,
-                end,
-                currencies=currencies,
-                countries=countries,
-                minimum_impact=minimum_impact,
+    provider_result = await provider.get_events(
+        start,
+        end,
+        currencies=currencies,
+        countries=countries,
+        minimum_impact=minimum_impact,
+    )
+    events = (
+        provider_result
+        if isinstance(provider_result, list)
+        else cast(
+            "list[EconomicEvent]",
+            unwrap_data_response(
+                provider_result,
+                operation="data.economic_calendar.get_economic_events",
+                request_id=request_id or generate_id("req"),
             ),
-            operation="data.economic_calendar.get_economic_events",
-            request_id=request_id or generate_id("req"),
-        ),
+        )
     )
     return [
         event

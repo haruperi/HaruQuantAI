@@ -3,23 +3,204 @@
 from __future__ import annotations
 
 import inspect
+from asyncio import run
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from app.services.portfolio.api import PortfolioService
-from app.services.portfolio.config import PortfolioSettings
+from app.services.portfolio import (
+    activate_portfolio,
+    assess_portfolio_drift,
+    construct_portfolio,
+    create_portfolio_handle,
+    create_portfolio_value,
+    dump_portfolio_value,
+    execute_portfolio_handle_operation,
+    get_portfolio_error_catalog,
+    get_portfolio_history,
+    get_portfolio_status,
+    get_portfolio_value_field,
+    is_portfolio_handle,
+    is_portfolio_value,
+    recompute_portfolio_measurement,
+    rollback_portfolio,
+    submit_portfolio_rebalance,
+    to_portfolio_error_payload,
+)
+from app.services.portfolio._settings import PortfolioSettings
+from app.services.portfolio.api.service import PortfolioService
 from app.services.portfolio.contracts import (
     ActivePortfolioAllocation,
     PortfolioConstructionRequest,
 )
 from app.services.portfolio.orchestration import PortfolioWorkflowService
 from app.services.portfolio.state import PortfolioRepository, scope_key
-from app.utils import AuthContext, StandardResponse, logger
+from app.utils import create_auth_context, get_logger, get_standard_response_type
 
 from tests.portfolio.unit.test_repository import FakePortfolioStore
 from tests.portfolio.unit.test_workflows import _plan, _service
+
+AuthContext = Any
+StandardResponse = get_standard_response_type()
+logger = get_logger(__name__)
+
+
+def test_function_only_factories_and_opaque_handles(
+    construction_result: object,
+    portfolio_settings: PortfolioSettings,
+) -> None:
+    """Exercise every function-only value and handle boundary."""
+    dumped = dump_portfolio_value(construction_result)
+    assert dumped["portfolio_id"] == "portfolio-alpha"
+    assert get_portfolio_value_field(construction_result, "portfolio_id") == (
+        "portfolio-alpha"
+    )
+    assert is_portfolio_value(construction_result)
+    assert is_portfolio_value(construction_result, "PortfolioConstructionResult")
+    assert not is_portfolio_value(construction_result, "Unknown")
+    with pytest.raises(ValueError, match="Unknown Portfolio value type"):
+        create_portfolio_value("Unknown")
+    with pytest.raises(ValueError, match="registered Portfolio value"):
+        dump_portfolio_value(object())
+    with pytest.raises(ValueError, match="registered Portfolio value"):
+        get_portfolio_value_field(object(), "field")
+    with pytest.raises(ValueError, match="Unknown Portfolio value field"):
+        get_portfolio_value_field(construction_result, "_private")
+
+    store = FakePortfolioStore()
+    repository = create_portfolio_handle("PortfolioRepository", store)
+    assert is_portfolio_handle(repository)
+    assert is_portfolio_handle(repository, "PortfolioRepository")
+    assert not is_portfolio_handle(repository, "Unknown")
+    assert (
+        execute_portfolio_handle_operation(
+            repository,
+            "history",
+            "portfolio-alpha",
+        )
+        == ()
+    )
+    with pytest.raises(ValueError, match="Unknown Portfolio handle type"):
+        create_portfolio_handle("Unknown")
+    with pytest.raises(ValueError, match="registered Portfolio handle"):
+        execute_portfolio_handle_operation(object(), "history")
+    with pytest.raises(ValueError, match="Unsupported Portfolio handle operation"):
+        execute_portfolio_handle_operation(repository, "activate_unknown")
+
+    schedule = create_portfolio_value(
+        "RebalanceSchedule",
+        anchor_at=datetime(
+            2026,
+            7,
+            19,
+            12,
+            0,
+            tzinfo=portfolio_settings.portfolio_rebalance_schedule.anchor_at.tzinfo,
+        ),
+        interval_seconds=3600,
+    )
+    schedule_dump = dump_portfolio_value(schedule)
+    assert schedule_dump["interval_seconds"] == 3600
+    assert get_portfolio_error_catalog()["PORT_NOT_FOUND"].code == "PORT_NOT_FOUND"
+    assert to_portfolio_error_payload("PORT_NOT_FOUND").data is not None
+
+
+def test_standalone_public_operations_delegate_to_internal_service(
+    portfolio_now: datetime,
+) -> None:
+    """Verify all standalone operations delegate without exporting a class."""
+    service = PortfolioService(MagicMock(), MagicMock())
+    marker = object()
+    service.construct = MagicMock(return_value=marker)
+    service.status = MagicMock(return_value=marker)
+    service.activate = MagicMock(return_value=marker)
+    service.assess_drift = MagicMock(return_value=marker)
+    service.submit_rebalance = AsyncMock(return_value=marker)
+    service.recompute_measurement = MagicMock(return_value=marker)
+    service.rollback = MagicMock(return_value=marker)
+    service.history = MagicMock(return_value=marker)
+    auth = _auth(portfolio_now)
+
+    assert construct_portfolio(service, marker, auth) is marker
+    assert get_portfolio_status(service, "portfolio-alpha", {}, auth) is marker
+    assert (
+        activate_portfolio(
+            service,
+            marker,
+            marker,
+            marker,
+            approval_attestation=None,
+            approval_validation=None,
+            expires_at=portfolio_now,
+            idempotency_key="key",
+            expected_predecessor=None,
+            expected_revision=0,
+            auth_context=auth,
+        )
+        is marker
+    )
+    assert (
+        assess_portfolio_drift(
+            service,
+            marker,
+            actual_exposures={},
+            evidence_as_of=portfolio_now,
+            risk_decision=marker,
+            eligibility_decisions={},
+            auth_context=auth,
+        )
+        is marker
+    )
+    assert (
+        run(
+            submit_portfolio_rebalance(
+                service,
+                marker,
+                account_evidence_ref="account",
+                market_evidence_ref="market",
+                fx_evidence_refs=(),
+                runtime_profile="simulation",
+                execution_route="sim",
+                approval_refs=(),
+                approval_token_ref="token",
+                trading_request_id="request",
+                valid_until=portfolio_now,
+                auth_context=auth,
+            )
+        )
+        is marker
+    )
+    assert (
+        recompute_portfolio_measurement(
+            service,
+            "plan",
+            trading_request_id="request",
+            auth_context=auth,
+        )
+        is marker
+    )
+    assert (
+        rollback_portfolio(
+            service,
+            marker,
+            marker,
+            marker,
+            rollback_of_version="v1",
+            approval_attestation=None,
+            approval_validation=None,
+            expires_at=portfolio_now,
+            idempotency_key="key",
+            expected_predecessor=None,
+            expected_revision=0,
+            auth_context=auth,
+        )
+        is marker
+    )
+    assert get_portfolio_history(service, "portfolio-alpha", auth) is marker
+    with pytest.raises(TypeError, match="PortfolioService handle"):
+        construct_portfolio(object(), marker, auth)
 
 
 def _auth(now: datetime) -> AuthContext:
@@ -32,7 +213,7 @@ def _auth(now: datetime) -> AuthContext:
         Valid immutable authentication context.
     """
     logger.debug("Building Portfolio API authentication context")
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="owner-1",

@@ -11,8 +11,10 @@ from app.services.portfolio.construction.methods import (
     inverse_volatility_weights,
 )
 from app.services.portfolio.contracts import FixedWeightInput
-from app.services.portfolio.exceptions import PortfolioError
-from app.utils import logger
+from app.services.portfolio.contracts.errors import PortfolioError
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def test_fixed_equal_and_inverse_volatility_are_deterministic() -> None:

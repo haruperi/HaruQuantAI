@@ -4,10 +4,10 @@ from decimal import Decimal
 
 import pytest
 from app.services.api import (
-    CriticalAlertError,
-    CriticalAlertTrigger,
+    build_critical_alert_trigger,
     build_kill_switch_activation_alert,
     build_unknown_broker_state_alert,
+    get_critical_alert_error_type,
 )
 from app.services.trading import (
     build_broker_state_unknown_event,
@@ -35,14 +35,14 @@ def test_kill_switch_builder_is_deterministic_and_source_bound() -> None:
     second = build_kill_switch_activation_alert(state, context)
 
     assert first == second
-    assert first.trigger is CriticalAlertTrigger.RISK_KILL_SWITCH_ACTIVATED
+    assert first.trigger is build_critical_alert_trigger("RISK_KILL_SWITCH_ACTIVATED")
     assert first.source_id == state.state_id
     assert first.scope == {"scope_level": "global"}
 
 
 def test_kill_switch_builder_rejects_non_active_state() -> None:
     """Verify inactive Risk state cannot fabricate an activation alert."""
-    with pytest.raises(CriticalAlertError, match="ALERT_SOURCE_INVALID"):
+    with pytest.raises(get_critical_alert_error_type(), match="ALERT_SOURCE_INVALID"):
         build_kill_switch_activation_alert(
             risk_support._inactive_state(),
             risk_support._auth(risk_support._config()),
@@ -63,7 +63,7 @@ def test_unknown_broker_builder_rejects_non_authoritative_event() -> None:
         source_refs={"receipt_id": "receipt-1", "incident_id": "incident-1"},
     )
 
-    with pytest.raises(CriticalAlertError, match="ALERT_SOURCE_INVALID"):
+    with pytest.raises(get_critical_alert_error_type(), match="ALERT_SOURCE_INVALID"):
         build_unknown_broker_state_alert(event)
 
 
@@ -98,7 +98,7 @@ def test_only_retry_locked_unknown_broker_event_builds_alert() -> None:
     assert event.data is not None
     alert = build_unknown_broker_state_alert(event.data)
 
-    assert alert.trigger is CriticalAlertTrigger.TRADING_BROKER_STATE_UNKNOWN
+    assert alert.trigger is build_critical_alert_trigger("TRADING_BROKER_STATE_UNKNOWN")
     assert alert.source_id == event.data.event_id
     assert alert.scope == {
         "retry_locked": "true",

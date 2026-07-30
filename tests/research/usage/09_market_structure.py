@@ -11,17 +11,11 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.research import (
-    DataQualityReport,
-    MarketStructureConfig,
-    MarketStructureProfile,
-    PreparedDataset,
-    ResearchResourceLimits,
-)
-from app.services.research.market_structure import (
     build_market_structure_profile,
     build_strategy_fit,
     build_validation_summary,
     calibrate_market_structure,
+    create_research_value,
     evaluate_market_structure_quality,
     label_realized_market_behavior,
 )
@@ -34,7 +28,7 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _prepared() -> PreparedDataset:
+def _prepared() -> object:
     """Build a PreparedDataset with trending OHLCVS data."""
     idx = pd.date_range("2026-01-05", periods=30, freq="h", tz="UTC")
     close = pd.Series([100.0 + i * 0.5 for i in range(30)], index=idx, dtype="float64")
@@ -49,19 +43,21 @@ def _prepared() -> PreparedDataset:
         },
         index=idx,
     )
-    return PreparedDataset(
+    return create_research_value(
+        "PreparedDataset",
         frame,
         "v1",
-        DataQualityReport((), (), ("schema",), ()),
+        create_research_value("DataQualityReport", (), (), ("schema",), ()),
         _HASH,
         _HASH,
         ("fixture",),
     )
 
 
-def _config() -> MarketStructureConfig:
+def _config() -> object:
     """Build market-structure settings."""
-    return MarketStructureConfig(
+    return create_research_value(
+        "MarketStructureConfig",
         {
             "swing_window": 5,
             "atr_period": 14,
@@ -76,9 +72,9 @@ def _config() -> MarketStructureConfig:
     )
 
 
-def _limits() -> ResearchResourceLimits:
+def _limits() -> object:
     """Build approved resource ceilings."""
-    return ResearchResourceLimits(500_000, 600.0, 52_428_800)
+    return create_research_value("ResearchResourceLimits", 500_000, 600.0, 52_428_800)
 
 
 def fr_res_075() -> None:
@@ -136,7 +132,8 @@ def fr_res_079() -> None:
 def fr_res_080() -> None:
     """FR-RES-080: Rank advisory strategy archetypes from profile evidence."""
     _header("FR-RES-080: Rank advisory strategy archetypes from profile evidence.")
-    profile = MarketStructureProfile(
+    profile = create_research_value(
+        "MarketStructureProfile",
         "v1",
         {"swing_window": 5},
         75.0,

@@ -1,11 +1,11 @@
-"""Structured Portfolio domain errors and boundary-safe payloads."""
+"""Internal Portfolio domain errors and boundary-safe payloads."""
 
 from __future__ import annotations
 
 import time
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Final, Literal
+from typing import Any, Final, Literal, cast
 
 from app.utils import (
     build_response_metadata,
@@ -263,8 +263,11 @@ _PORTFOLIO_ERROR_DEFINITIONS: tuple[ErrorDefinition, ...] = (
 )
 
 PORTFOLIO_ERROR_CATALOG: Final = validate_error_catalog(
-    MappingProxyType(
-        {definition.code: definition for definition in _PORTFOLIO_ERROR_DEFINITIONS}
+    cast(
+        "Any",
+        MappingProxyType(
+            {definition.code: definition for definition in _PORTFOLIO_ERROR_DEFINITIONS}
+        ),
     )
 )
 
@@ -321,7 +324,7 @@ class PortfolioError(HaruQuantError):
         metadata = build_response_metadata(
             name="portfolio.exceptions.portfolio_error.to_payload",
             domain="portfolio",
-            risk_level=RiskLevel.NONE,
+            risk_level="none",
             request_id=generate_id("req"),
             start_time=start_time,
             read_only=True,

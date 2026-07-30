@@ -4,6 +4,7 @@ from app.utils.contracts import (
     create_audit_event,
     create_auth_context,
     get_audit_event_type,
+    get_auth_context_type,
 )
 from app.utils.errors import (
     get_common_error_catalog,
@@ -63,6 +64,7 @@ __all__ = (
     "format_utc_timestamp",
     "generate_id",
     "get_audit_event_type",
+    "get_auth_context_type",
     "get_common_error_catalog",
     "get_default_redaction_policy",
     "get_error_metadata",

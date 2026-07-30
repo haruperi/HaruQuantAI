@@ -6,15 +6,15 @@ import pytest
 
 _USAGE_DIRECTORY = Path(__file__).parents[1] / "usage"
 _EXPECTED_OUTPUT = {
-    "01_contracts.py": "AuditEvent:",
-    "02_errors.py": "Routed error event:",
-    "03_identity.py": "Stable artifact ID:",
-    "04_time.py": "is_fresh': True",
-    "05_serialization.py": "Canonical JSON:",
-    "06_security.py": "Redaction policy: protected credential allowlist rejected",
-    "07_settings.py": "Active settings:",
-    "08_logging.py": "Logging verification:",
-    "09_standard_responses.py": "Raw standard response data:",
+    "01_contracts.py": "Data -> principal_id='service-demo'",
+    "02_errors.py": "Data -> routed_code='INTERNAL_ERROR'",
+    "03_identity.py": "Data -> validated_workflow_id=",
+    "04_time.py": "Data -> age_seconds=1, is_fresh=True",
+    "05_serialization.py": "Data -> canonical_digest=",
+    "06_security.py": "Data -> truncated=False, redacted_paths=",
+    "07_settings.py": "Data -> environment='test', runtime_profile='research'",
+    "08_logging.py": "Data -> non_empty_log_files=",
+    "09_standard_responses.py": "Data -> immutable_mapping_keys=",
 }
 
 

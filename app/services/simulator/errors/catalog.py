@@ -1,9 +1,9 @@
-from dataclasses import dataclass
-
 """Authoritative closed Simulation error catalog."""
 
 from collections.abc import Mapping
+from dataclasses import dataclass
 from types import MappingProxyType
+from typing import Literal
 
 from app.utils import get_logger
 
@@ -16,7 +16,7 @@ class ErrorDefinition:
     domain: str
     description: str
     category: str
-    severity: Literal[info, warning, error, critical]
+    severity: Literal["info", "warning", "error", "critical"]
     retryable: bool
     operator_action: str
 

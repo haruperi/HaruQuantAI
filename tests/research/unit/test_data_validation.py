@@ -1,23 +1,26 @@
 """Unit tests for Research dataset validation."""
 
+from __future__ import annotations
+
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pandas as pd
 import pytest
-from app.services.data.contracts import DataQualityReport as SourceQualityReport
-from app.services.data.contracts import (
-    MarketDataset,
-    OHLCVRecord,
+from app.services.data import (
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
 )
-from app.services.research.contracts import ResearchResourceLimits
-from app.services.research.data import validate_dataset
-from app.utils import logger
+from app.services.research import create_research_value, validate_dataset
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _REQUEST_ID = "req-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 
 
-def _dataset() -> MarketDataset:
+def _dataset():
     """Build a canonical bar dataset with spread evidence.
 
     Returns:
@@ -26,7 +29,7 @@ def _dataset() -> MarketDataset:
     logger.debug("Building Research validation test dataset")
     start = datetime(2026, 1, 5, tzinfo=UTC)
     records = tuple(
-        OHLCVRecord(
+        build_ohlcv_record(
             timestamp=start + timedelta(minutes=index),
             open=Decimal(10),
             high=Decimal(11),
@@ -43,7 +46,7 @@ def _dataset() -> MarketDataset:
         )
         for index in range(5)
     )
-    quality = SourceQualityReport(
+    quality = build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
         record_count=5,
@@ -53,7 +56,7 @@ def _dataset() -> MarketDataset:
         schema_version="v1",
         generated_at=records[-1].available_at,
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="bars",
         symbol="TEST",
@@ -98,6 +101,62 @@ def test_validate_dataset_reports_fatal_ohlc_issue(
         "app.services.research.data.validation.to_ohlcv_dataframe", lambda _: frame
     )
     report = validate_dataset(
-        _dataset(), limits=ResearchResourceLimits(100, 10.0, 1024)
+        _dataset(),
+        limits=create_research_value("ResearchResourceLimits", 100, 10.0, 1024),
     )
     assert any(issue["code"] == "INVALID_OHLC" for issue in report.fatal_issues)
+
+
+def test_validate_dataset_rejects_wrong_contract_limits_and_nonbars() -> None:
+    """Cover boundary, resource, and data-kind refusal paths."""
+    limits = create_research_value("ResearchResourceLimits", 100, 10.0, 1_024)
+    with pytest.raises(ValueError, match="MARKET_DATASET_REQUIRED"):
+        validate_dataset(object(), limits=limits)
+    with pytest.raises(ValueError, match="ROW_LIMIT_EXCEEDED"):
+        validate_dataset(
+            _dataset(),
+            limits=create_research_value("ResearchResourceLimits", 1, 10.0, 1_024),
+        )
+    nonbars = _dataset().model_copy(update={"data_kind": "ticks"})
+    with pytest.raises(ValueError, match="NONEMPTY_BAR_DATASET_REQUIRED"):
+        validate_dataset(nonbars, limits=limits)
+
+
+def test_validate_dataset_reports_nonfinite_irregular_and_missing_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Preserve multiple independent quality findings in one report."""
+    index = pd.to_datetime(
+        [
+            "2026-01-05T00:00:00Z",
+            "2026-01-05T00:01:00Z",
+            "2026-01-05T00:03:00Z",
+            "2026-01-05T00:04:00Z",
+            "2026-01-05T00:05:00Z",
+        ]
+    )
+    frame = pd.DataFrame(
+        {
+            "open": [10.0] * 5,
+            "high": [11.0] * 5,
+            "low": [9.0] * 5,
+            "close": [10.0, 10.1, float("nan"), 10.3, 10.4],
+            "volume": [100.0] * 5,
+            "spread": [0.1] * 5,
+        },
+        index=index,
+    )
+    monkeypatch.setattr(
+        "app.services.research.data.validation.to_ohlcv_dataframe",
+        lambda _dataset: frame,
+    )
+    dataset = _dataset().model_copy(update={"source_metadata": {}})
+    report = validate_dataset(
+        dataset,
+        limits=create_research_value("ResearchResourceLimits", 100, 10.0, 1_024),
+    )
+    assert {item["code"] for item in report.fatal_issues} >= {
+        "NONFINITE_VALUE",
+        "MISSING_SOURCE_METADATA",
+    }
+    assert any(warning.code == "IRREGULAR_INTERVALS" for warning in report.warnings)

@@ -2,22 +2,23 @@
 
 import pytest
 from app.services.research import (
-    ResearchProfileSnapshot,
-    ResearchScorecard,
-)
-from app.services.research.profiles import (
     build_dashboard_summary,
     build_profile_summary,
     build_research_profile_snapshot,
+    create_research_value,
+    is_research_value,
 )
-from app.utils import ValidationError, logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _HASH = "e" * 64
 
 
-def _scorecard() -> ResearchScorecard:
+def _scorecard() -> object:
     """Build a canonical advisory scorecard."""
-    return ResearchScorecard(
+    return create_research_value(
+        "ResearchScorecard",
         "v1",
         ({"criterion": "metrics", "score": 20.0},),
         75.0,
@@ -31,7 +32,7 @@ def _scorecard() -> ResearchScorecard:
 def test_snapshot_rejects_unversioned_stage() -> None:
     """FR-RES-090: unversioned stages are rejected."""
     logger.debug("Testing Research snapshot validation")
-    with pytest.raises(ValidationError, match="UNVERSIONED_SNAPSHOT_STAGE"):
+    with pytest.raises(ValueError, match="UNVERSIONED_SNAPSHOT_STAGE"):
         build_research_profile_snapshot(
             stages={"data": {"rows": 10}},
             scorecard=_scorecard(),
@@ -48,7 +49,7 @@ def test_snapshot_builds_versioned() -> None:
         dataset_hash=_HASH,
         configuration_hash=_HASH,
     )
-    assert isinstance(snapshot, ResearchProfileSnapshot)
+    assert is_research_value(snapshot, "ResearchProfileSnapshot")
     assert snapshot.schema_version == "v1"
 
 

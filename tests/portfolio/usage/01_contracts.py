@@ -12,7 +12,7 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.portfolio import PortfolioConstructionRequest
+from app.services.portfolio import create_portfolio_value, dump_portfolio_value
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 HASH_A = "a" * 64
@@ -95,12 +95,17 @@ def fr_port_001() -> None:
     )
     print("FR-PORT-001: Reject unknown fields and unsafe runtime objects")
 
-    request = PortfolioConstructionRequest(**_base_request_data())
-    wire_value = request.model_dump(mode="json")
+    request = create_portfolio_value(
+        "PortfolioConstructionRequest", **_base_request_data()
+    )
+    wire_value = dump_portfolio_value(request)
     print(f"Valid request created with {len(wire_value['components'])} components")
 
     try:
-        PortfolioConstructionRequest(**_base_request_data(unknown_field="bad"))
+        create_portfolio_value(
+            "PortfolioConstructionRequest",
+            **_base_request_data(unknown_field="bad"),
+        )
         msg = "ERROR: unknown field was accepted"
     except Exception:  # noqa: BLE001 - usage demonstrates rejection.
         msg = "Unknown field correctly rejected"
@@ -118,8 +123,10 @@ def fr_port_002() -> None:
     )
     print("FR-PORT-002: Separate contract_version from schema_id")
 
-    request = PortfolioConstructionRequest(**_base_request_data())
-    wire_value = request.model_dump(mode="json")
+    request = create_portfolio_value(
+        "PortfolioConstructionRequest", **_base_request_data()
+    )
+    wire_value = dump_portfolio_value(request)
     print(f"contract_version: {wire_value['contract_version']}")
     print(f"schema_id: {wire_value['schema_id']}")
     assert wire_value["contract_version"] != wire_value["schema_id"]
@@ -138,7 +145,9 @@ def fr_port_003() -> None:
     )
     print("FR-PORT-003: Require UTC timestamps, trace IDs, and finite numbers")
 
-    request = PortfolioConstructionRequest(**_base_request_data())
+    request = create_portfolio_value(
+        "PortfolioConstructionRequest", **_base_request_data()
+    )
     for field in ("measurement_start", "measurement_end", "requested_at"):
         ts = getattr(request, field)
         assert ts.tzinfo is not None
@@ -163,7 +172,9 @@ def fr_port_004() -> None:
     )
     print("FR-PORT-004: Separate capital weights from Risk budget references")
 
-    request = PortfolioConstructionRequest(**_base_request_data())
+    request = create_portfolio_value(
+        "PortfolioConstructionRequest", **_base_request_data()
+    )
     evidence_fields = list(type(request.evidence).model_fields)
     print(f"Evidence reference fields: {', '.join(evidence_fields[:3])}...")
     assert not hasattr(request, "risk_budget_projection")
@@ -182,7 +193,9 @@ def fr_port_005() -> None:
     )
     print("FR-PORT-005: Version breaking contract changes")
 
-    request = PortfolioConstructionRequest(**_base_request_data())
+    request = create_portfolio_value(
+        "PortfolioConstructionRequest", **_base_request_data()
+    )
     assert request.contract_version == "v1"
     assert request.schema_id == "portfolio.construction_request.v1"
     print(f"Fixed contract_version: {request.contract_version}")

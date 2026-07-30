@@ -171,7 +171,9 @@ def tag_sessions(
     """
     logger.info("Tagging Research sessions on frame")
     if not isinstance(data.index, pd.DatetimeIndex):
-        raise ValueError("RES_INPUT_INVALID", "DATETIME_INDEX_REQUIRED")
+        raise ValueError(  # noqa: TRY004 - Research validation taxonomy.
+            "RES_INPUT_INVALID", "DATETIME_INDEX_REQUIRED"
+        )
     if data.index.tz is None:
         raise ValueError("RES_INPUT_INVALID", "NAIVE_INDEX_REJECTED")
     labels: list[str] = []
