@@ -1,12 +1,32 @@
 """Unit tests for FEAT-DATA-01 canonical market records."""
 
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
 from app.services.data.contracts import OHLCVRecord, SpreadRecord, TickRecord
 from pydantic import ValidationError
 
-from tests.data.helpers import AVAILABLE, START, make_bar
+START = datetime(2026, 1, 1, tzinfo=UTC)
+AVAILABLE = START + timedelta(minutes=1, seconds=1)
+
+
+def make_bar() -> OHLCVRecord:
+    """Return one exact canonical OHLCV record for record validation."""
+    return OHLCVRecord(
+        timestamp=START,
+        open=Decimal("10.0"),
+        high=Decimal("11.0"),
+        low=Decimal("9.0"),
+        close=Decimal("10.5"),
+        volume=Decimal(100),
+        price_unit="USD",
+        volume_unit="shares",
+        source="fixture",
+        source_symbol="ABC",
+        source_revision="rev-1",
+        available_at=AVAILABLE,
+    )
 
 
 def test_ohlcv_record_rejects_invalid_range() -> None:

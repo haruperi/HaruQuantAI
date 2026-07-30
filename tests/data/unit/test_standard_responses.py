@@ -306,7 +306,10 @@ def test_raw_exception_text_and_secrets_are_absent() -> None:
     """Exception payloads and secret values never cross the boundary."""
     error = DataError(
         "INVALID_INPUT",
-        safe_details={"api_key": "supersecret", "note": "plain text"},
+        safe_details={
+            "api_key": "supersecret",  # pragma: allowlist secret
+            "note": "plain text",
+        },
     )
     response = build_data_response(
         operation=_OPERATION,

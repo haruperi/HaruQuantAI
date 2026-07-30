@@ -1,5 +1,6 @@
 """Integration tests for Data contract ownership boundaries."""
 
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 from app.services.data import (
@@ -9,9 +10,25 @@ from app.services.data import (
     build_account_state_snapshot,
     build_audit_event_page,
 )
-from app.utils.contracts.audit import AuditEvent
+from app.utils import create_audit_event, generate_id
 
-from tests.data.helpers import END, START, make_audit_event
+START = datetime(2026, 1, 1, tzinfo=UTC)
+END = START + timedelta(minutes=1)
+
+
+def make_audit_event(timestamp=START):
+    """Return one valid Utils-owned audit event."""
+    return create_audit_event(
+        contract_version="v1",
+        schema_id="utils.audit_event.v1",
+        event_id=generate_id("evt"),
+        timestamp=timestamp,
+        domain="data",
+        action="read",
+        request_id=generate_id("req"),
+        correlation_id=generate_id("cor"),
+        payload={"source": "fixture"},
+    )
 
 
 def test_data_contracts_exclude_provider_runtime_types() -> None:
@@ -47,4 +64,4 @@ def test_audit_page_uses_utils_owned_event_contract() -> None:
         events=(event,),
         request_id="req-b9079292e61f241af2fb05632499fcedb66c43bcadbe960298162cc15ce13532",
     )
-    assert isinstance(page.events[0], AuditEvent)
+    assert page.events[0].schema_id == "utils.audit_event.v1"

@@ -4,14 +4,13 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from types import MappingProxyType
-from typing import TYPE_CHECKING
+from types import MappingProxyType, SimpleNamespace
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import pytest
-from app.services.data import DataQualityReport, MarketDataset, OHLCVRecord
-from app.services.indicators import IndicatorManifest, IndicatorResult
-from app.services.strategy import (
+from app.services.data.contracts import DataQualityReport, MarketDataset, OHLCVRecord
+from app.services.strategy.contracts import (
     StrategyConfig,
     StrategyDecision,
     StrategyEnvironment,
@@ -28,8 +27,11 @@ from app.services.strategy import (
     ValidatedStrategyConfig,
     ValidatedStrategyRef,
 )
-from app.utils import AuthContext, logger
+from app.utils import get_logger
+from app.utils.contracts.auth import AuthContext
 from pydantic import ValidationError
+
+logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -113,7 +115,7 @@ def make_indicator(
     indicator_id: str,
     output_column: str,
     values: Sequence[float],
-) -> IndicatorResult:
+) -> Any:
     """Build public Indicators evidence without importing another test suite.
 
     Args:
@@ -144,7 +146,7 @@ def make_indicator(
         },
         index=index,
     )
-    manifest = IndicatorManifest(
+    manifest = SimpleNamespace(
         indicator_id=indicator_id,
         indicator_version="1.0.0",
         formula_version="1.0.0",
@@ -155,20 +157,16 @@ def make_indicator(
         row_count=market.record_count,
         symbol=market.symbol,
         source_timeframe=market.timeframe or "",
-        normalization_version=market.normalization_version,
-        source_metadata=market.source_metadata,
-        license_metadata=market.license_metadata,
-        quality_status=market.quality_report.quality_status,
-        quality_score=str(market.quality_report.quality_score),
-        quality_schema_version=market.quality_report.schema_version,
     )
-    return IndicatorResult(
+    return SimpleNamespace(
         indicator_id=indicator_id,
         indicator_version="1.0.0",
         formula_version="1.0.0",
         parameter_hash=HASH,
         values=frame,
         output_columns=(output_column,),
+        contract_version="v1",
+        schema_id="indicators.indicator_series.v1",
         manifest=manifest,
     )
 

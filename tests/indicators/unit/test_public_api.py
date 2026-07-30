@@ -4,38 +4,31 @@ import inspect
 import types
 
 import app.services.indicators as indicators_root
-import app.services.indicators.candles as indicators_candles
-import app.services.indicators.core as indicators_core
-import app.services.indicators.momentum as indicators_momentum
-import app.services.indicators.trend as indicators_trend
-import app.services.indicators.volatility as indicators_volatility
-import app.services.indicators.volume as indicators_volume
-from app.services.indicators import IndicatorErrorCode, get_indicator, sma
+from app.services.indicators import (
+    get_indicator,
+    sma,
+)
 
 from tests.indicators.helpers import build_dataset
 
 _EXPECTED_ROOT_ALL = (
-    "IndicatorConfig",
-    "IndicatorError",
-    "IndicatorErrorCode",
-    "IndicatorManifest",
-    "IndicatorProtocol",
-    "IndicatorResult",
-    "IndicatorSpec",
-    "WarmupRequirement",
     "adr",
     "adx",
     "atr",
     "bollinger_bands",
+    "build_indicator_config",
     "cmf",
     "doji",
     "ema",
     "engulfing",
     "get_capability_matrix",
     "get_indicator",
+    "get_indicator_result_metadata",
+    "get_indicator_result_values",
     "get_warmup_requirement",
     "hull_ma",
     "inside_bar",
+    "join_indicator_result",
     "list_indicators",
     "mfi",
     "obv",
@@ -50,51 +43,7 @@ _EXPECTED_ROOT_ALL = (
     "wma",
     "zigzag",
 )
-_EXPECTED_CORE_ALL = (
-    "IndicatorConfig",
-    "IndicatorError",
-    "IndicatorErrorCode",
-    "IndicatorManifest",
-    "IndicatorProtocol",
-    "IndicatorResult",
-    "IndicatorSpec",
-    "WarmupRequirement",
-    "get_capability_matrix",
-    "get_indicator",
-    "get_warmup_requirement",
-    "list_indicators",
-    "validate_indicator",
-)
-_EXPECTED_TREND_ALL = (
-    "adx",
-    "bollinger_bands",
-    "ema",
-    "hull_ma",
-    "sma",
-    "wma",
-    "zigzag",
-)
-_EXPECTED_VOLATILITY_ALL = (
-    "adr",
-    "atr",
-    "rolling_volatility",
-    "standard_deviation",
-)
-_EXPECTED_MOMENTUM_ALL = ("rsi", "williams_r")
-_EXPECTED_VOLUME_ALL = ("cmf", "mfi", "obv", "price_volume_distribution")
-_EXPECTED_CANDLES_ALL = ("doji", "engulfing", "inside_bar", "pinbar")
-
-_RETIRED_BUNDLED_MODULE_NAMES = ("moving_averages", "oscillators", "ranges", "rolling")
-
-_NAMESPACES = (
-    (indicators_root, _EXPECTED_ROOT_ALL),
-    (indicators_core, _EXPECTED_CORE_ALL),
-    (indicators_trend, _EXPECTED_TREND_ALL),
-    (indicators_volatility, _EXPECTED_VOLATILITY_ALL),
-    (indicators_momentum, _EXPECTED_MOMENTUM_ALL),
-    (indicators_volume, _EXPECTED_VOLUME_ALL),
-    (indicators_candles, _EXPECTED_CANDLES_ALL),
-)
+_NAMESPACES = ((indicators_root, _EXPECTED_ROOT_ALL),)
 
 
 def _public_non_module_attrs(module: types.ModuleType) -> set[str]:
@@ -128,8 +77,8 @@ def test_root_and_feature_exports_are_exact() -> None:
 
 def test_retired_bundled_modules_are_not_public_symbols() -> None:
     """Retired bundled implementation modules are absent from public exports."""
-    for _module, expected in _NAMESPACES:
-        assert not set(expected) & set(_RETIRED_BUNDLED_MODULE_NAMES)
+    retired = ("moving_averages", "oscillators", "ranges", "rolling")
+    assert not set(_EXPECTED_ROOT_ALL) & set(retired)
 
 
 def test_public_operations_return_the_exact_standard_response_shape() -> None:
@@ -160,5 +109,5 @@ def test_public_operations_return_the_exact_standard_response_shape() -> None:
     assert failure.status == "error"
     assert failure.data is None
     assert failure.error is not None
-    assert failure.error.code == IndicatorErrorCode.IND_INVALID_PARAMETER.value
+    assert failure.error.code == "IND_INVALID_PARAMETER"
     assert '"status":"error"' in failure.model_dump_json()

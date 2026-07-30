@@ -35,11 +35,15 @@ _CHECKSUM_CHUNK_RECORDS: Final[int] = 250
 if TYPE_CHECKING:
     import pandas as pd
 
-    from app.services.data import (
-        MarketDataset,
-        OHLCVRecord,
+    from app.services.indicators.core.contracts import (
+        IndicatorConfig,
     )
-    from app.services.indicators.core.contracts import IndicatorConfig
+    from app.services.indicators.core.contracts import (
+        _MarketDataset as MarketDataset,
+    )
+    from app.services.indicators.core.contracts import (
+        _OHLCVRecord as OHLCVRecord,
+    )
 else:
 
     class _LazyPandas:
@@ -257,7 +261,7 @@ def _input_checksum(data: MarketDataset) -> str:
         Lowercase 64-character SHA-256 hexadecimal digest.
     """
     payload = data.model_dump(mode="json")
-    records = payload.pop("records")
+    records = cast("list[object]", payload.pop("records"))
     digest = hashlib.sha256()
     digest.update(canonical_json(payload).encode("utf-8"))
     for start in range(0, len(records), _CHECKSUM_CHUNK_RECORDS):
@@ -569,4 +573,76 @@ def build_indicator_result(
     )
 
 
-__all__ = ["IndicatorManifest", "IndicatorResult"]
+def join_indicator_result(
+    result: IndicatorResult, data: MarketDataset, mode: Literal["copy"] = "copy"
+) -> pd.DataFrame:
+    """Join generated columns onto a copied projection of one dataset.
+
+    Args:
+        result: The IndicatorResult instance.
+        data: The MarketDataset v1 matching the result.
+        mode: Join mode; only "copy" is supported.
+
+    Returns:
+        A new DataFrame with generated indicator columns appended.
+    """
+    return result.join_to(data, mode=mode)
+
+
+def get_indicator_result_values(result: IndicatorResult) -> pd.DataFrame:
+    """Return a copy-safe projection excluding original OHLCV columns.
+
+    Args:
+        result: The IndicatorResult instance.
+
+    Returns:
+        A deep copy of the generated indicator, availability, and quality columns.
+    """
+    return result.values_only
+
+
+def get_indicator_result_metadata(result: IndicatorResult) -> Mapping[str, object]:
+    """Return bounded metadata for an opaque IndicatorResult.
+
+    Args:
+        result: Internal IndicatorResult returned by an official calculation.
+
+    Returns:
+        Detached metadata required by cross-domain consumers. The nested
+        manifest is represented as a JSON-compatible mapping.
+    """
+    manifest = result.manifest
+    return {
+        "contract_version": result.contract_version,
+        "schema_id": result.schema_id,
+        "indicator_id": result.indicator_id,
+        "indicator_version": result.indicator_version,
+        "formula_version": result.formula_version,
+        "parameter_hash": result.parameter_hash,
+        "output_columns": result.output_columns,
+        "manifest": {
+            "indicator_id": manifest.indicator_id,
+            "indicator_version": manifest.indicator_version,
+            "formula_version": manifest.formula_version,
+            "parameter_hash": manifest.parameter_hash,
+            "input_checksum": manifest.input_checksum,
+            "output_checksum": manifest.output_checksum,
+            "output_columns": manifest.output_columns,
+            "row_count": manifest.row_count,
+            "symbol": manifest.symbol,
+            "source_timeframe": manifest.source_timeframe,
+            "source_metadata": dict(manifest.source_metadata),
+            "license_metadata": dict(manifest.license_metadata),
+            "quality_status": manifest.quality_status,
+            "quality_score": manifest.quality_score,
+        },
+    }
+
+
+__all__ = [
+    "IndicatorManifest",
+    "IndicatorResult",
+    "get_indicator_result_metadata",
+    "get_indicator_result_values",
+    "join_indicator_result",
+]

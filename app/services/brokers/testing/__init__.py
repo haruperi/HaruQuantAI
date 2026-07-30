@@ -1,5 +1,8 @@
 """Testing utilities and fake adapter for the Brokers domain."""
 
+# This private testing shim preserves heterogeneous fake-adapter constructors.
+# ruff: noqa: ANN401
+
 from typing import Any
 
 from app.services.brokers.testing.fake import FakeBrokerAdapter

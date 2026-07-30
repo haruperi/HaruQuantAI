@@ -16,7 +16,6 @@ from app.services.indicators.core.error_catalog import INDICATOR_ERROR_CATALOG
 from app.utils import (
     build_response_metadata,
     error_response,
-    exception_response,
     generate_id,
     get_logger,
     redact_text_value,
@@ -27,15 +26,6 @@ type JsonValue = Any
 type StandardResponse[T] = Any
 type ResponseMetadata = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
-
-
-class HaruQuantError(Exception):
-    """Local safe error used for the Indicators response boundary."""
-
-    def __init__(self, code: str, detail: str) -> None:
-        self.code = code
-        self.detail = detail
-        super().__init__(f"{code}:{detail}")
 
 
 logger = get_logger(__name__)
@@ -285,22 +275,22 @@ def guard_public_boundary(
         # narrower clause would let an unanticipated type escape as a raw
         # traceback. BaseException is deliberately not caught, so KeyboardInterrupt
         # and SystemExit still propagate.
-        except Exception as error:  # noqa: BLE001
+        except Exception as error:
             failure_type = type(error).__name__
-            logger.error(
+            logger.exception(
                 "Unexpected %s escaped %s; returning IND_INTERNAL_ERROR",
                 failure_type,
                 function.__name__,
             )
-            return exception_response(
-                HaruQuantError("IND_INTERNAL_ERROR", "UNEXPECTED_EXCEPTION"),
-                message="indicator operation failed with an unexpected internal error",
-                metadata=metadata(),
-                catalog=INDICATOR_ERROR_CATALOG,
-                extensions={
+            return error_response(
+                code="IND_INTERNAL_ERROR",
+                details={
                     "operation": function.__name__,
                     "failure_type": failure_type,
                 },
+                message="indicator operation failed with an unexpected internal error",
+                metadata=metadata(),
+                catalog=INDICATOR_ERROR_CATALOG,
             )
 
         return success_response(
@@ -340,7 +330,7 @@ def _unwrap_indicator_response(response: StandardResponse[_R]) -> _R:
         IndicatorError: If the nested operation returned a known error.
     """
     if response.status == "success" and response.data is not None:
-        return response.data
+        return cast("_R", response.data)
     if response.error is not None:
         try:
             code = IndicatorErrorCode(response.error.code)

@@ -197,12 +197,12 @@
   participation in `SYS-WF-001` and the verified MT5 demo `SYS-WF-002` path pass.
   Retrospective SMC/FVG/swing/BOS/CHoCH labels remain excluded to preserve the
   non-repainting contract.
-* `app/services/strategy/` is implemented across contracts, diagnostics, registry,
-  intents, replay/checkpoints, vectorized evaluation, event hooks, and concrete
-  signal evaluators. Its status is now `Partial`: `FEAT-STR-11` documents the
-  `Missing` receiver-owned external-proposal evaluation that can emit a canonical
-  `TradeIntent` only when the registered deterministic strategy independently
-  supports the proposal.
+* `app/services/strategy/` is completed across contracts, diagnostics, registry,
+  intents, replay/checkpoints, vectorized evaluation, event hooks, concrete signal
+  evaluators, and receiver-owned external-proposal evaluation. It accepts approved
+  Optimization-result projections without importing Optimization and emits a
+  canonical `TradeIntent` only when the registered deterministic strategy
+  independently supports the proposal.
 * `app/services/risk/` is implemented across contracts, configuration, snapshots,
   sizing, audit chaining, policy gates, regimes, approvals, decisions, scenarios, and
   reporting. Its status is `Partial`: kill-switch clearance must require a distinct

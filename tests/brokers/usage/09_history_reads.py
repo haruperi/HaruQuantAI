@@ -28,10 +28,12 @@ def _range() -> tuple[datetime, datetime]:
 async def fr_brokers_105(adapter: object) -> None:
     """FR-BRK-105: Read a bounded genuine order-history page."""
     _header("FR-BRK-105: Read a bounded genuine order-history page.")
-    _start, _end = _range()
+    start, end = _range()
     require_success(
         "Result",
-        await list_broker_order_history(adapter, limit=5),
+        await list_broker_order_history(
+            adapter, start_time=start, end_time=end, limit=5
+        ),
     )
 
 
@@ -73,9 +75,12 @@ async def fr_brokers_108(adapter: object) -> None:
 async def fr_brokers_109(adapter: object) -> None:
     """FR-BRK-109: Require an active session for history reads."""
     _header("FR-BRK-109: Require an active session for history reads.")
+    start, end = _range()
     require_error(
         "Result",
-        await list_broker_order_history(adapter, limit=5),
+        await list_broker_order_history(
+            adapter, start_time=start, end_time=end, limit=5
+        ),
         "BROKER_NOT_CONNECTED",
     )
 

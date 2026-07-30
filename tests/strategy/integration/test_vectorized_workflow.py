@@ -4,10 +4,10 @@
 from datetime import timedelta
 
 from app.services.strategy import (
-    StrategyTimingPolicy,
+    get_strategy_timing_policy,
     run_vectorized_strategy_signals,
 )
-from app.utils import logger
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     make_config,
@@ -17,7 +17,9 @@ from tests.strategy.unit.test_models import (
 )
 from tests.strategy.unit.test_vectorized_runner import Evaluator, _dataset
 
-_TIMING = StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE
+logger = get_logger(__name__)
+
+_TIMING = get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE")
 _SHA256_LENGTH = 64
 
 

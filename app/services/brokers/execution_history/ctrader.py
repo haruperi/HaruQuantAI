@@ -1,11 +1,9 @@
-type StandardResponse[T] = (
-    Any  # mypy: disable-error-code="attr-defined,no-any-return,has-type"
-)
+# mypy: disable-error-code="attr-defined"
 """cTrader execution-history read operations."""
 
 # ruff: noqa: A002 - public protocol signatures are normative.
 from datetime import datetime
-from typing import Any, cast
+from typing import TYPE_CHECKING, cast
 
 from app.services.brokers.contracts import (
     BrokerCapabilityId,
@@ -23,6 +21,9 @@ from app.services.brokers.ctrader_session.mapping import (
     _map_position,
     _optional,
 )
+
+if TYPE_CHECKING:
+    from app.services.brokers.contracts.responses import StandardResponse
 
 
 class _CTraderExecutionHistoryMixin:

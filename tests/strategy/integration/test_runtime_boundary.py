@@ -2,16 +2,18 @@
 
 # ruff: noqa: PT018
 from app.services.strategy import (
-    StrategyTimingPolicy,
+    get_strategy_timing_policy,
     run_vectorized_strategy_signals,
 )
-from app.utils import logger
+from app.utils import get_logger
 
 from tests.strategy.integration.test_vectorized_workflow import _ProposingEvaluator
 from tests.strategy.unit.test_models import make_config, make_context, make_ref
 from tests.strategy.unit.test_vectorized_runner import Evaluator, _dataset
 
-_TIMING = StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE
+logger = get_logger(__name__)
+
+_TIMING = get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE")
 
 
 def test_runtime_boundary_emits_proposals_only() -> None:

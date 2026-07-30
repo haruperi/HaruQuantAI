@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.signals._mechanics import (
@@ -18,7 +18,6 @@ from app.utils import get_logger
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.indicators import IndicatorResult
     from app.services.strategy.contracts import (
         StrategyExecutionContext,
         StrategySignal,
@@ -35,7 +34,7 @@ class RandomWalkEvaluator(_SignalEvaluatorBase):
     def evaluate_signals(
         self,
         evidence: StrategySignalEvidence,
-        indicators: tuple[IndicatorResult, ...],
+        indicators: tuple[Any, ...],
         config: ValidatedStrategyConfig,
         context: StrategyExecutionContext,
     ) -> tuple[StrategySignal, ...]:

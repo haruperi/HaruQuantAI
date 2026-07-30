@@ -2,9 +2,11 @@
 
 # ruff: noqa: PT018
 from app.services.strategy import create_strategy_replay_manifest
-from app.utils import logger
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import HASH, make_config, make_context, make_ref
+
+logger = get_logger(__name__)
 
 
 def test_replay_manifest_is_deterministic() -> None:

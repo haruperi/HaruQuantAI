@@ -4,7 +4,7 @@
 from collections.abc import Mapping
 from datetime import datetime
 from decimal import Decimal
-from typing import Any
+from typing import Any, Literal
 
 from app.services.brokers.contracts.enums import (
     BrokerCapabilityId,
@@ -53,7 +53,7 @@ from app.services.brokers.contracts.protocols import (
     BrokerAdapter,
     BrokerSubscription,
 )
-from app.utils.responses.models import StandardResponse
+from app.services.brokers.contracts.responses import StandardResponse
 
 _BROKER_VALUE_TYPES: Mapping[str, type[object]] = {
     "account_info": BrokerAccountInfo,
@@ -326,8 +326,8 @@ def build_broker_connection_config(
 
 def build_broker_order_request(
     symbol: str,
-    side: str,
-    order_type: str,
+    side: Literal["BUY", "SELL"],
+    order_type: Literal["MARKET", "LIMIT", "STOP", "STOP_LIMIT"],
     quantity: Decimal | float | str,
     quantity_unit: str,
     environment: BrokerEnvironment | str,
@@ -336,7 +336,7 @@ def build_broker_order_request(
     stop_price: Decimal | float | str | None = None,
     stop_loss: Decimal | float | str | None = None,
     take_profit: Decimal | float | str | None = None,
-    time_in_force: str | None = None,
+    time_in_force: Literal["GTC", "IOC", "FOK", "GTD", "DAY"] | None = None,
     expiration: datetime | None = None,
     client_order_id: str | None = None,
 ) -> BrokerOrderRequest:
@@ -459,7 +459,7 @@ def build_broker_position_modification_request(
 
 def build_broker_margin_request(
     symbol: str,
-    side: str,
+    side: Literal["BUY", "SELL"],
     quantity: Decimal | float | str,
     quantity_unit: str,
     product_profile: str,
@@ -490,7 +490,7 @@ def build_broker_margin_request(
 
 def build_broker_profit_request(
     symbol: str,
-    side: str,
+    side: Literal["BUY", "SELL"],
     quantity: Decimal | float | str,
     quantity_unit: str,
     open_price: Decimal | float | str,
@@ -816,8 +816,8 @@ async def get_broker_feature_flags(
 
 async def supports_broker_capability(
     adapter: BrokerAdapter,
-    capability_id: BrokerCapabilityId,
-) -> bool:
+    capability_id: BrokerCapabilityId | str,
+) -> StandardResponse[bool]:
     """Check if the broker adapter supports a given capability.
 
     Args:
@@ -827,7 +827,12 @@ async def supports_broker_capability(
     Returns:
         True if supported and available, False otherwise.
     """
-    return await adapter.supports(capability_id)
+    capability = (
+        BrokerCapabilityId(capability_id)
+        if isinstance(capability_id, str)
+        else capability_id
+    )
+    return await adapter.supports(capability)
 
 
 async def get_broker_platform_info(
@@ -1010,7 +1015,7 @@ async def get_broker_ticks(
     start_time: datetime | None = None,
     end_time: datetime | None = None,
     limit: int | None = None,
-) -> StandardResponse[tuple[BrokerTick, ...]]:
+) -> StandardResponse[BrokerPage[BrokerTick]]:
     """Get historical ticks for a symbol from the broker adapter.
 
     Args:
@@ -1023,9 +1028,7 @@ async def get_broker_ticks(
     Returns:
         Standard response containing ticks tuple.
     """
-    return await adapter.get_ticks(
-        symbol, start_time=start_time, end_time=end_time, limit=limit
-    )
+    return await adapter.get_ticks(symbol, start=start_time, end=end_time, limit=limit)
 
 
 async def get_broker_historical_bars(
@@ -1035,7 +1038,7 @@ async def get_broker_historical_bars(
     start_time: datetime | None = None,
     end_time: datetime | None = None,
     limit: int | None = None,
-) -> StandardResponse[tuple[BrokerBar, ...]]:
+) -> StandardResponse[BrokerPage[BrokerBar]]:
     """Get historical bars for a symbol from the broker adapter.
 
     Args:
@@ -1052,8 +1055,8 @@ async def get_broker_historical_bars(
     return await adapter.get_historical_bars(
         symbol,
         timeframe,
-        start_time=start_time,
-        end_time=end_time,
+        start=start_time,
+        end=end_time,
         limit=limit,
     )
 
@@ -1078,7 +1081,7 @@ async def get_broker_order_book(
 
 async def subscribe_broker_quotes(
     adapter: BrokerAdapter,
-    symbol: str,
+    symbol: str | tuple[str, ...],
 ) -> StandardResponse[BrokerSubscription[BrokerQuote]]:
     """Subscribe to quote updates for a symbol.
 
@@ -1089,12 +1092,13 @@ async def subscribe_broker_quotes(
     Returns:
         Standard response containing subscription handle.
     """
-    return await adapter.subscribe_quotes(symbol)
+    symbols = (symbol,) if isinstance(symbol, str) else symbol
+    return await adapter.subscribe_quotes(symbols)
 
 
 async def subscribe_broker_bars(
     adapter: BrokerAdapter,
-    symbol: str,
+    symbol: str | tuple[str, ...],
     timeframe: str,
 ) -> StandardResponse[BrokerSubscription[BrokerBar]]:
     """Subscribe to bar updates for a symbol.
@@ -1107,12 +1111,13 @@ async def subscribe_broker_bars(
     Returns:
         Standard response containing subscription handle.
     """
-    return await adapter.subscribe_bars(symbol, timeframe)
+    symbols = (symbol,) if isinstance(symbol, str) else symbol
+    return await adapter.subscribe_bars(symbols, timeframe)
 
 
 async def subscribe_broker_order_book(
     adapter: BrokerAdapter,
-    symbol: str,
+    symbol: str | tuple[str, ...],
     depth: int | None = None,
 ) -> StandardResponse[BrokerSubscription[BrokerOrderBook]]:
     """Subscribe to order book updates for a symbol.
@@ -1125,7 +1130,8 @@ async def subscribe_broker_order_book(
     Returns:
         Standard response containing subscription handle.
     """
-    return await adapter.subscribe_order_book(symbol, depth=depth)
+    symbols = (symbol,) if isinstance(symbol, str) else symbol
+    return await adapter.subscribe_order_book(symbols, depth=depth)
 
 
 async def unsubscribe_broker(
@@ -1160,7 +1166,7 @@ async def get_broker_positions(
     adapter: BrokerAdapter,
     filter_spec: BrokerPositionFilter | None = None,
     limit: int = 1000,
-) -> StandardResponse[tuple[BrokerPosition, ...]]:
+) -> StandardResponse[BrokerPage[BrokerPosition]]:
     """Get open positions from the broker adapter.
 
     Args:
@@ -1194,7 +1200,7 @@ async def get_broker_orders(
     adapter: BrokerAdapter,
     filter_spec: BrokerOrderFilter | None = None,
     limit: int = 1000,
-) -> StandardResponse[tuple[BrokerOrder, ...]]:
+) -> StandardResponse[BrokerPage[BrokerOrder]]:
     """Get active orders from the broker adapter.
 
     Args:
@@ -1226,7 +1232,9 @@ async def get_broker_order(
 
 async def list_broker_order_history(
     adapter: BrokerAdapter,
-    filter_spec: BrokerOrderFilter | None = None,
+    start_time: datetime | None = None,
+    end_time: datetime | None = None,
+    symbol: str | None = None,
     cursor: str | None = None,
     limit: int | None = None,
 ) -> StandardResponse[BrokerPage[BrokerOrder]]:
@@ -1234,7 +1242,9 @@ async def list_broker_order_history(
 
     Args:
         adapter: Targeted broker adapter.
-        filter_spec: Optional order filter.
+        start_time: Inclusive history start timestamp.
+        end_time: Exclusive history end timestamp.
+        symbol: Optional exact provider symbol.
         cursor: Optional pagination cursor.
         limit: Optional page limit.
 
@@ -1242,7 +1252,11 @@ async def list_broker_order_history(
         Standard response containing page of orders.
     """
     return await adapter.list_order_history(
-        filter=filter_spec, cursor=cursor, limit=limit
+        start=start_time,
+        end=end_time,
+        symbol=symbol,
+        cursor=cursor,
+        limit=limit,
     )
 
 
@@ -1266,7 +1280,7 @@ async def list_broker_deal_history(
         Standard response containing page of deals.
     """
     return await adapter.list_deal_history(
-        start_time=start_time, end_time=end_time, cursor=cursor, limit=limit
+        start=start_time, end=end_time, cursor=cursor, limit=limit
     )
 
 
@@ -1306,7 +1320,7 @@ async def list_broker_account_transactions(
         Standard response containing page of transactions.
     """
     return await adapter.list_account_transactions(
-        start_time=start_time, end_time=end_time, cursor=cursor, limit=limit
+        start=start_time, end=end_time, cursor=cursor, limit=limit
     )
 
 
@@ -1361,19 +1375,19 @@ async def modify_broker_order(
 async def cancel_broker_order(
     adapter: BrokerAdapter,
     order_id: str,
-    symbol: str | None = None,
+    client_request_id: str | None = None,
 ) -> StandardResponse[BrokerOrderResult]:
     """Cancel open order on broker adapter.
 
     Args:
         adapter: Targeted broker adapter.
         order_id: Target order ID.
-        symbol: Optional instrument symbol.
+        client_request_id: Optional caller idempotency identifier.
 
     Returns:
         Standard response containing cancellation result.
     """
-    return await adapter.cancel_order(order_id, symbol=symbol)
+    return await adapter.cancel_order(order_id, client_request_id=client_request_id)
 
 
 async def modify_broker_position(

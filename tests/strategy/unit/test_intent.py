@@ -1,20 +1,22 @@
-"""Canonical TradeIntent contract tests."""
+"""Canonical create_trade_intent_value contract tests."""
 
 from decimal import Decimal
 
 import pytest
-from app.services.strategy import TradeIntent
-from app.utils import logger
+from app.services.strategy import create_trade_intent_value
+from app.utils import get_logger
 from pydantic import ValidationError
 
 from tests.strategy.unit.test_models import HASH, NOW
 
+logger = get_logger(__name__)
+
 
 def test_trade_intent_rejects_invalid_partial_fill_contract() -> None:
     """Verify minimum fills require an explicit partial-fill preference."""
-    logger.debug("Testing TradeIntent partial-fill invariant")
+    logger.debug("Testing create_trade_intent_value partial-fill invariant")
     with pytest.raises(ValidationError):
-        TradeIntent(
+        create_trade_intent_value(
             intent_id="intent-1",
             decision_id="decision-1",
             idempotency_key=HASH,

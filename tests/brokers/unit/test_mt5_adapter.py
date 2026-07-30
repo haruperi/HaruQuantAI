@@ -15,6 +15,7 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerId,
     BrokerMarginRequest,
+    BrokerOrderFilter,
     BrokerOrderModificationRequest,
     BrokerOrderRequest,
     BrokerPositionCloseRequest,
@@ -219,6 +220,16 @@ class _FakeTransport:
 
     async def close(self) -> None:
         self.closed = True
+
+
+class _EmptyCalculationTransport(_FakeTransport):
+    """Return no provider value for MT5 calculation calls."""
+
+    async def call(self, name: str, *args: object, **kwargs: object) -> object:
+        """Return no calculation evidence and delegate every other call."""
+        if name in {"order_calc_margin", "order_calc_profit"}:
+            return None
+        return await super().call(name, *args, **kwargs)
 
 
 def test_adapter_rejects_mismatched_account_reference() -> None:
@@ -482,6 +493,12 @@ def test_adapter_account_history_mutation_and_calculation_operations() -> None:
         assert (await adapter.get_last_error()).data is None
         assert (await adapter.get_position("1")).data is not None
         assert (await adapter.get_orders(limit=10)).data is not None
+        filtered_orders = await adapter.get_orders(
+            BrokerOrderFilter(symbol="EURUSD", side="BUY", status="ACCEPTED"),
+            limit=10,
+        )
+        assert filtered_orders.data is not None
+        assert (await adapter.get_position("not-a-ticket")).error is not None
         assert (await adapter.get_order("11")).data is not None
         assert (await adapter.list_order_history(start, end, limit=10)).data is not None
         deals = await adapter.list_deal_history(start, end, limit=10)
@@ -550,6 +567,38 @@ def test_adapter_account_history_mutation_and_calculation_operations() -> None:
             )
         )
         assert profit.data == Decimal(25)
+
+    asyncio.run(exercise())
+
+
+def test_adapter_calculations_fail_when_provider_returns_no_value() -> None:
+    """Absent provider calculation evidence maps to an explicit error."""
+    adapter = MT5BrokerAdapter(_config(), transport=_EmptyCalculationTransport())
+
+    async def exercise() -> None:
+        await adapter.connect()
+        margin = await adapter.calculate_margin(
+            BrokerMarginRequest(
+                symbol="EURUSD",
+                side="BUY",
+                quantity=Decimal(1),
+                quantity_unit="lots",
+                product_profile="mt5",
+            )
+        )
+        assert margin.error is not None
+        profit = await adapter.calculate_profit(
+            BrokerProfitRequest(
+                symbol="EURUSD",
+                side="BUY",
+                quantity=Decimal(1),
+                quantity_unit="lots",
+                open_price=Decimal("1.1"),
+                close_price=Decimal("1.2"),
+                product_profile="mt5",
+            )
+        )
+        assert profit.error is not None
 
     asyncio.run(exercise())
 

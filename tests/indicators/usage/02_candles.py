@@ -5,14 +5,24 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import DataError, MarketDataset, get_market_data
-from app.services.indicators import doji, engulfing, inside_bar, pinbar
+from typing import Any
+
+from app.services.data import get_market_data
+from app.services.indicators import (
+    doji,
+    engulfing,
+    inside_bar,
+    pinbar,
+)
 
 from tests.indicators.usage._support import (
+    print_indicator_evidence,
+    print_market_evidence,
     unwrap_indicator_response,
     unwrap_market_data_response,
 )
 
+MarketDataset = Any
 _CACHE: dict[str, MarketDataset] = {}
 
 
@@ -28,7 +38,7 @@ def _dataset() -> MarketDataset:
         A normalized real market dataset.
 
     Raises:
-        DataError: If the configured source is unavailable.
+        RuntimeError: If the configured source is unavailable.
     """
     if "dataset" not in _CACHE:
         _CACHE["dataset"] = unwrap_market_data_response(
@@ -48,7 +58,7 @@ def fr_indi_031() -> None:
         "FR-INDI-031: The system shall emit `1` when body/range is at most the explicit threshold and `0` otherwise; a zero-range candle is a Doji only when open equals close."
     )
     result = unwrap_indicator_response(doji(_dataset(), threshold=0.1))
-    print("Result:", result.values["doji"].tolist())
+    print_indicator_evidence(result, label="Doji calculations")
 
 
 def fr_indi_032() -> None:
@@ -57,7 +67,7 @@ def fr_indi_032() -> None:
         "FR-INDI-032: The system shall emit `1`, `-1`, or `0`; the first row is warmup and each later result depends only on the current and prior candle bodies."
     )
     result = unwrap_indicator_response(engulfing(_dataset()))
-    print("Result:", result.values["engulfing"].tolist())
+    print_indicator_evidence(result, label="Engulfing calculations")
 
 
 def fr_indi_033() -> None:
@@ -66,7 +76,7 @@ def fr_indi_033() -> None:
         "FR-INDI-033: The system shall emit `1`, `-1`, or `0` using fixed non-configurable shadow/body proportions, with bullish precedence for an otherwise ambiguous match."
     )
     result = unwrap_indicator_response(pinbar(_dataset()))
-    print("Result:", result.values["pinbar"].tolist())
+    print_indicator_evidence(result, label="Pinbar calculations")
 
 
 def fr_indi_034() -> None:
@@ -75,7 +85,7 @@ def fr_indi_034() -> None:
         "FR-INDI-034: The system shall emit `1` only when the current high/low is contained within the prior high/low; the first row is warmup."
     )
     result = unwrap_indicator_response(inside_bar(_dataset()))
-    print("Result:", result.values["inside_bar"].tolist())
+    print_indicator_evidence(result, label="Inside-bar calculations")
 
 
 def main() -> None:
@@ -86,9 +96,10 @@ def main() -> None:
     """
     try:
         _dataset()
-    except DataError as unavailable:
+    except RuntimeError as unavailable:
         print(f"Skipping candle examples: MT5 data unavailable ({unavailable.code})")
         raise SystemExit(3) from None
+    print_market_evidence(_dataset())
     fr_indi_031()
     fr_indi_032()
     fr_indi_033()

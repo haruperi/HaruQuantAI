@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from app.services.indicators import IndicatorError
+from app.services.indicators import get_indicator_result_values, join_indicator_result
 from app.services.strategy.contracts import StrategySignal
 from app.services.strategy.contracts.outcomes import failure, success
 from app.services.strategy.contracts.responses import (
@@ -12,21 +12,19 @@ from app.services.strategy.contracts.responses import (
     guard_strategy_boundary,
     unwrap_evaluator_result,
 )
-from app.services.strategy.diagnostics import StrategyErrorCode
+from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.signals._mechanics import (
     _bar_records,
     _SignalConfigError,
     _SignalDataError,
     _SignalIndicatorError,
 )
-from app.utils import get_logger
-
-type StandardResponse[T] = Any
+from app.utils import get_logger, get_standard_response_type
 
 logger = get_logger(__name__)
+_STANDARD_RESPONSE_TYPE = get_standard_response_type()
 
 if TYPE_CHECKING:
-    from app.services.indicators import IndicatorResult
     from app.services.strategy.contracts import (
         StrategyExecutionContext,
         StrategySignalEvidence,
@@ -95,7 +93,7 @@ def _validate_identity(
 
 def _validate_evidence(
     evidence: StrategySignalEvidence,
-    indicators: tuple[IndicatorResult, ...],
+    indicators: tuple[Any, ...],
     context: StrategyExecutionContext,
 ) -> None:
     """Validate point-in-time market, feature, and indicator evidence.
@@ -153,11 +151,15 @@ def _validate_evidence(
         )
     try:
         for indicator in indicators:
-            joined = indicator.join_to(evidence.primary_market)
-            if isinstance(joined, StandardResponse) and joined.status == "error":
+            joined = join_indicator_result(indicator, evidence.primary_market)
+            if (
+                isinstance(joined, _STANDARD_RESPONSE_TYPE)
+                and getattr(joined, "status", None) == "error"
+            ):
+                error = getattr(joined, "error", None)
                 upstream_code = (
-                    joined.error.code
-                    if joined.error is not None
+                    getattr(error, "code", "INVALID_RESPONSE")
+                    if error is not None
                     else "INVALID_RESPONSE"
                 )
                 failure(
@@ -167,7 +169,7 @@ def _validate_evidence(
                     request_id=context.request_id,
                     correlation_id=context.correlation_id,
                 )
-            available = indicator.values_only["available_at"]
+            available = get_indicator_result_values(indicator)["available_at"]
             if any(
                 item.to_pydatetime() > context.decision_timestamp for item in available
             ):
@@ -177,7 +179,7 @@ def _validate_evidence(
                     request_id=context.request_id,
                     correlation_id=context.correlation_id,
                 )
-    except IndicatorError:
+    except TypeError, ValueError, KeyError:
         failure(
             StrategyErrorCode.INDICATOR_MODULE_ERROR,
             "concrete signal indicator does not match primary market evidence",
@@ -239,7 +241,7 @@ def evaluate_strategy_signals(
     ref: ValidatedStrategyRef,
     config: ValidatedStrategyConfig,
     evidence: StrategySignalEvidence,
-    indicators: tuple[IndicatorResult, ...],
+    indicators: tuple[Any, ...],
     context: StrategyExecutionContext,
     evaluator: SignalEvaluator,
 ) -> tuple[StrategySignal, ...]:
@@ -290,8 +292,8 @@ def evaluate_strategy_signals(
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
-    except Exception as error:  # noqa: BLE001 - injected evaluator is untrusted.
-        logger.error("Concrete Strategy evaluator failed: %s", type(error).__name__)
+    except Exception as error:
+        logger.exception("Concrete Strategy evaluator failed: %s", type(error).__name__)
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,
             "concrete signal evaluator failed",

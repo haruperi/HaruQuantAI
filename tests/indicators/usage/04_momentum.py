@@ -5,14 +5,19 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import DataError, MarketDataset, get_market_data
+from typing import Any
+
+from app.services.data import get_market_data
 from app.services.indicators import rsi, williams_r
 
 from tests.indicators.usage._support import (
+    print_indicator_evidence,
+    print_market_evidence,
     unwrap_indicator_response,
     unwrap_market_data_response,
 )
 
+MarketDataset = Any
 _CACHE: dict[str, MarketDataset] = {}
 
 
@@ -28,7 +33,7 @@ def _dataset() -> MarketDataset:
         A normalized real market dataset.
 
     Raises:
-        DataError: If the configured source is unavailable.
+        RuntimeError: If the configured source is unavailable.
     """
     if "dataset" not in _CACHE:
         _CACHE["dataset"] = unwrap_market_data_response(
@@ -48,7 +53,7 @@ def fr_indi_021() -> None:
         "FR-INDI-021: The system shall calculate RSI for one validated `MarketDataset v1` using the approved gain/loss smoothing and seed contract, return the exact source-qualified output, keep values within approved bounds, handle flat/zero-gain/zero-loss windows deterministically, and expose causal metadata."
     )
     result = unwrap_indicator_response(rsi(_dataset(), period=2))
-    print("Result:", result.values["rsi_2"].tolist())
+    print_indicator_evidence(result, label="RSI calculations")
 
 
 def fr_indi_022() -> None:
@@ -57,7 +62,7 @@ def fr_indi_022() -> None:
         "FR-INDI-022: The system shall calculate Williams %R for one validated `MarketDataset v1` over the approved inclusive high/low window, enforce approved bounds and zero-range behavior, preserve warmup rows, and expose causal metadata."
     )
     result = unwrap_indicator_response(williams_r(_dataset(), period=2))
-    print("Result:", result.values["williams_r_2"].tolist())
+    print_indicator_evidence(result, label="Williams %R calculations")
 
 
 def main() -> None:
@@ -68,9 +73,10 @@ def main() -> None:
     """
     try:
         _dataset()
-    except DataError as unavailable:
+    except RuntimeError as unavailable:
         print(f"Skipping momentum examples: MT5 data unavailable ({unavailable.code})")
         raise SystemExit(3) from None
+    print_market_evidence(_dataset())
     fr_indi_021()
     fr_indi_022()
 

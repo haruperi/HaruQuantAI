@@ -13,7 +13,10 @@ from app.services.indicators import (
     list_indicators,
     validate_indicator,
 )
-from tests.indicators.usage._support import unwrap_indicator_response
+from tests.indicators.usage._support import (
+    print_market_evidence,
+    unwrap_indicator_response,
+)
 from tests.indicators.usage.workflows._support import indicator_config, live_bars
 
 WORKFLOW_ID = "WF-INDI-005"
@@ -53,10 +56,11 @@ def main() -> None:
     # Stage 4: Validate against real Data output.
     _stage(4)
     dataset = live_bars()
+    print_market_evidence(dataset)
     resolved = unwrap_indicator_response(
         validate_indicator("sma", dataset, indicator_config("sma", 5))
     )
-    print("Validated:", resolved.indicator_id, dataset.source_metadata.get("provider"))
+    print("Validated:", resolved.indicator_id, dataset.source_metadata.get("source_id"))
 
     # Stage 5 — OUTPUT BOUNDARY: Return immutable registry/validation evidence.
     _stage(5)

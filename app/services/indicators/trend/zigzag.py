@@ -21,7 +21,12 @@ from app.utils import get_logger
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.data import MarketDataset, OHLCVRecord
+    from app.services.indicators.core.contracts import (
+        _MarketDataset as MarketDataset,
+    )
+    from app.services.indicators.core.contracts import (
+        _OHLCVRecord as OHLCVRecord,
+    )
     from app.services.indicators.core.results import IndicatorResult
 
 _FORMULA_VERSION = "1.0.0"

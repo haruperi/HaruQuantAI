@@ -19,8 +19,13 @@ from app.services.data import (
     run_data_migrations,
     unwrap_data_response,
 )
-from app.services.data.contracts.errors import DataError
 from app.utils import create_audit_event, create_auth_context, generate_id
+
+
+def _error_code(error: BaseException) -> str:
+    """Return a safe public-boundary error identifier."""
+    return str(getattr(error, "code", type(error).__name__))
+
 
 WORKFLOW_ID = "WF-DATA-022"
 STAGES = (
@@ -113,8 +118,8 @@ def main() -> None:
                     receipt_resp, operation="persist_audit_event", request_id=request_id
                 )
                 _report("persist", "success", receipt.persisted)
-            except DataError as error:
-                _report("persist", "fail", error.code)
+            except Exception as error:
+                _report("persist", "fail", _error_code(error))
                 raise
 
             # Stage 3 — The write commits transactionally with the action it records.
@@ -128,8 +133,8 @@ def main() -> None:
                 )
                 _report("repeat ", "success", repeated.persisted)
                 print("Idempotent re-persist accepted: True")
-            except DataError as error:
-                _report("repeat ", "fail", error.code)
+            except Exception as error:  # noqa: BLE001
+                _report("repeat ", "fail", _error_code(error))
 
             # Stage 4 — Operators read bounded ordered pages of recorded events.
             _stage(4)
@@ -150,8 +155,8 @@ def main() -> None:
                 _report("query  ", "success", f"{len(page.events)} event(s)")
                 for recorded in page.events[:3]:
                     print("  -", recorded.event_id, recorded.action)
-            except DataError as error:
-                _report("query  ", "fail", error.code)
+            except Exception as error:
+                _report("query  ", "fail", _error_code(error))
                 raise
 
             # Stage 5 — Every read resolves its originating request identity for correlation.

@@ -1,3 +1,4 @@
+# ruff: noqa: ANN401
 """Bounded event buffering and gap reconciliation for internal feeds.
 
 Owns the ingestion path: normalize an event, update counters, enforce the configured
@@ -379,8 +380,8 @@ def reconcile_feed_gap(
         )
     try:
         reconciled = reconcile()
-    except Exception:  # noqa: BLE001 - injected provider boundary.
-        logger.error("Injected feed reconciliation failed")
+    except Exception:
+        logger.exception("Injected feed reconciliation failed")
         reconciled = False
     if not reconciled:
         raise DataError(

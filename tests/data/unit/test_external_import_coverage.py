@@ -3,6 +3,7 @@ Unit tests for app/services/data/persistence/external_import.py to reach >80% co
 """
 
 from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -15,6 +16,7 @@ from app.services.data.persistence.external_import import (
     _read_frame,
     _require_columns,
     _resolve_source_path,
+    _spread_record,
     describe_import_dialects,
 )
 
@@ -120,3 +122,22 @@ def test_decimal_invalid() -> None:
     with pytest.raises(DataError) as exc_info:
         _decimal("not_a_number", "field", _REQ_ID)
     assert exc_info.value.code == "DATA_QUALITY_FAILED"
+
+
+def test_spread_import_preserves_observed_decimal_scale() -> None:
+    """Imported spreads derive precision from the source observation."""
+    request = _make_import_req(
+        data_kind="spreads",
+        timeframe=None,
+        mapping=ColumnMapping(timestamp="time", spread="spread"),
+    )
+
+    record = _spread_record(
+        MagicMock(__getitem__=lambda _self, key: {"spread": "0.00012"}[key]),
+        _NOW,
+        request,
+        _NOW,
+    )
+
+    assert record.spread == Decimal("0.00012")
+    assert record.scale == 5

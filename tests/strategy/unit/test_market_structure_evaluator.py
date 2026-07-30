@@ -3,8 +3,9 @@
 from decimal import Decimal
 
 import pytest
-from app.services.strategy import MarketStructureEvaluator, StrategySignalEvidence
-from app.utils import logger
+from app.services.strategy.contracts import StrategySignalEvidence
+from app.services.strategy.evaluators.market_structure import MarketStructureEvaluator
+from app.utils import get_logger
 from pydantic import ValidationError
 
 from tests.strategy.unit.test_models import (
@@ -15,6 +16,8 @@ from tests.strategy.unit.test_models import (
     make_signal_config,
     make_signal_evidence,
 )
+
+logger = get_logger(__name__)
 
 
 def test_feature_evidence_must_be_provenance_complete() -> None:

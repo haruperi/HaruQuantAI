@@ -4,16 +4,18 @@ from pathlib import Path
 
 import pytest
 from app.services.strategy import (
-    StrategyRef,
     list_strategy_versions,
     register_strategy_version,
     validate_strategy_ref,
 )
+from app.services.strategy.contracts import StrategyRef
 from app.services.strategy.migrations.definitions import _strategy_migration_steps
-from app.utils import logger
+from app.utils import get_logger
 
 from tests.strategy.unit.test_catalog import make_registration, storage_context
 from tests.strategy.unit.test_models import make_auth, make_policy
+
+logger = get_logger(__name__)
 
 
 def test_strategy_migrations_are_ordered_and_owned() -> None:

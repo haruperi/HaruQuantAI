@@ -120,7 +120,7 @@ def _registered_feature_modules() -> set[str]:
     return {
         match.group("module")
         for match in re.finditer(
-            r"^\| (?:Completed|Partial) \| `FEAT-DATA-\d{2}` .*?"
+            r"^\| (?:Completed|Partial|Pending) \| `FEAT-DATA-\d{2}` .*?"
             r"\| `(?P<module>[a-z_]+)/` \|",
             registry_match.group("body"),
             flags=re.MULTILINE,
@@ -212,6 +212,30 @@ def test_package_root_has_no_runtime_side_effect_statements() -> None:
         if not isinstance(node, permitted)
     ]
     assert not unexpected, f"Unexpected package-root statements: {unexpected}"
+
+
+def test_public_evidence_uses_only_domain_root_imports() -> None:
+    """Keep Data usage and integration evidence on domain package roots."""
+    repository_root = DATA_ROOT.parents[2]
+    evidence_files = [
+        *(repository_root / "tests" / "data" / "usage").rglob("*.py"),
+        *(repository_root / "tests" / "data" / "integration").rglob("*.py"),
+    ]
+    violations: list[str] = []
+    for path in evidence_files:
+        relative = path.relative_to(repository_root).as_posix()
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if (
+                isinstance(node, ast.ImportFrom)
+                and node.module is not None
+                and (
+                    node.module.startswith("app.services.data.")
+                    or node.module.startswith("app.services.brokers.")
+                )
+            ):
+                violations.append(f"{relative}:{node.lineno}:{node.module}")
+    assert not violations, f"Domain deep imports are prohibited: {violations}"
 
 
 def test_domain_import_has_no_external_or_persistent_side_effect() -> None:

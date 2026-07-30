@@ -133,6 +133,8 @@ Folders are ordered from lowest to highest dependency.
 This table is the sole current registry for Utils. Detailed signatures, contract
 fields, failure behavior, and evidence remain authoritative in the referenced
 Section 4 feature specifications and are not duplicated in the changelog.
+Runtime receiver-side schema validation accesses the internal audit-event class
+only through `get_audit_event_type`.
 
 ```text
 utils/
@@ -525,15 +527,15 @@ repository `app/configs/env.json` loading base for typed domain settings.
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `models.py` | Define the immutable central `app/configs/env.json` settings base plus generic runtime/logging settings and strict validation. | `AppSettings`, `RuntimeSettings`, `LoggingSettings`; module-level, not re-exported through `__init__.py`: `LogLevel`, `LogRender`, `LogCompression`, `Environment`, `RuntimeProfile` | **Standard library:** `pathlib`, `typing`<br>**Required third-party:** `pydantic`, `pydantic-settings`<br>**Local:** `errors/exceptions.py` → `ConfigurationError` |
-| Completed | `loader.py` | Load supported runtime settings through `AppSettings` or an explicit mapping. | `load_settings` | **Standard library:** `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError` |
-| Completed | `__init__.py` | Expose the supported settings API. | `load_settings` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `models.py`, `loader.py` → approved exports |
+| Completed | `loader.py` | Load supported runtime settings through `AppSettings` or an explicit mapping, and expose broker-provider settings opaquely. | `load_broker_provider_settings`, `load_settings` | **Standard library:** `collections.abc`<br>**Required third-party:** `pydantic`<br>**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError` |
+| Completed | `__init__.py` | Expose the function-only supported settings API. | `load_broker_provider_settings`, `load_settings` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `loader.py` → approved exports |
 
 #### Functional requirements
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Completed | `FR-UTL-022` | Define the immutable central settings base and generic runtime/logging settings, including the approved human-readable default logging profile. | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | `app/configs/env.json`/environment read only when a settings instance is created | `ConfigurationError`: invalid generic setting value | **Usage:** `tests/utils/usage/07_settings.py::fr_utils_022_construct_configuration()`<br>**Unit:** `tests/utils/unit/test_models.py::test_default_logging_profile()` |
-| Completed | `FR-UTL-023` | Load explicit values and centralized `app/configs/env.json`/process settings in documented precedence order only when called. | `AppSettings`, `load_settings` | Settings read | `ConfigurationError`: unsupported or invalid runtime value | **Usage:** `tests/utils/usage/07_settings.py::fr_utils_023_load_active_configuration()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
+| Completed | `FR-UTL-023` | Load explicit values and centralized `app/configs/env.json`/process settings in documented precedence order only when called; expose broker-provider settings as an opaque value through the package root. | `load_broker_provider_settings`, `load_settings` | Settings read | `ConfigurationError`: unsupported or invalid runtime value | **Usage:** `tests/utils/usage/07_settings.py::fr_utils_023_load_active_configuration()`, `fr_utils_023_load_broker_provider_configuration()`<br>**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
 | Completed | `FR-UTL-024` | Reject unknown, incompatible, or unsafe deployment/runtime values without partial mutation. | Settings-model validation | None | `ConfigurationError`: unknown, incompatible, or unsafe value | **Usage:** `tests/utils/usage/07_settings.py::fr_utils_024_environment_constraints()`, `fr_utils_024_validate_settings()`<br>**Unit:** `tests/utils/unit/test_models.py::test_settings_reject_unknown_value_without_mutation()` |
 
 ### 4.8 `logging/` — Structured Logging
@@ -926,3 +928,5 @@ The first runtime log call activates the approved default profile. Import-time l
 attempts remain inert. Import
 `configure_logging`, `flush_logging`, or `shutdown_logging` only in specialized
 entry points that need a non-default profile or explicit lifecycle control.
+The runtime response class remains internal and is available for framework
+introspection only through `get_standard_response_type`.

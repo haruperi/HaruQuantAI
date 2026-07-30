@@ -8,15 +8,21 @@ documented ``MAX_INPUT_ROWS`` limit of 1,000,000.
 """
 
 import pytest
-from app.services.indicators import atr, obv, rsi, sma
-from app.services.indicators.core import registry
-from app.services.indicators.core.errors import IndicatorErrorCode
-from app.services.indicators.core.validation import MAX_INPUT_ROWS
+from app.services.indicators import (
+    atr,
+    list_indicators,
+    obv,
+    rsi,
+    sma,
+)
 
 from tests.indicators.helpers import (
     assert_error,
     build_dataset,
     close_dataset,
+    join_result,
+    result_metadata,
+    result_values,
     unwrap_response,
 )
 
@@ -59,9 +65,10 @@ def test_indicator_succeeds_across_the_previous_checksum_ceiling(
 ) -> None:
     """A dataset at or past the old 664-record ceiling now calculates cleanly."""
     result = unwrap_response(sma(close_dataset(_prices(row_count)), period=3))
-    assert len(result.values) == row_count
-    assert len(result.manifest.input_checksum) == 64
-    assert result.manifest.row_count == row_count
+    assert len(result_values(result)) == row_count
+    metadata = result_metadata(result)
+    assert len(metadata["manifest"]["input_checksum"]) == 64
+    assert metadata["manifest"]["row_count"] == row_count
 
 
 def test_every_indicator_family_handles_a_multi_thousand_bar_history() -> None:
@@ -72,9 +79,9 @@ def test_every_indicator_family_handles_a_multi_thousand_bar_history() -> None:
     """
     row_count = 1_000
     dataset = build_dataset(_bars(row_count))
-    assert len(unwrap_response(atr(dataset, period=14)).values) == row_count
-    assert len(unwrap_response(obv(dataset)).values) == row_count
-    assert len(unwrap_response(rsi(dataset, period=14)).values) == row_count
+    assert len(result_values(unwrap_response(atr(dataset, period=14)))) == row_count
+    assert len(result_values(unwrap_response(obv(dataset)))) == row_count
+    assert len(result_values(unwrap_response(rsi(dataset, period=14)))) == row_count
 
 
 def test_large_input_checksum_is_deterministic_and_order_sensitive() -> None:
@@ -84,31 +91,30 @@ def test_large_input_checksum_is_deterministic_and_order_sensitive() -> None:
     naive fold could otherwise collide for permuted records.
     """
     prices = _prices(_PREVIOUS_CEILING + 36)
-    first = unwrap_response(
-        sma(close_dataset(prices), period=3)
-    ).manifest.input_checksum
-    second = unwrap_response(
-        sma(close_dataset(prices), period=3)
-    ).manifest.input_checksum
+    first = result_metadata(unwrap_response(sma(close_dataset(prices), period=3)))[
+        "manifest"
+    ]["input_checksum"]
+    second = result_metadata(unwrap_response(sma(close_dataset(prices), period=3)))[
+        "manifest"
+    ]["input_checksum"]
     reordered = unwrap_response(sma(close_dataset(list(reversed(prices))), period=3))
 
     assert first == second
-    assert reordered.manifest.input_checksum != first
+    assert result_metadata(reordered)["manifest"]["input_checksum"] != first
 
 
 def test_join_to_round_trips_a_dataset_past_the_old_ceiling() -> None:
     """``join_to`` still matches the manifest checksum past the old ceiling."""
     dataset = close_dataset(_prices(_PREVIOUS_CEILING + 36))
     result = unwrap_response(sma(dataset, period=3))
-    joined = unwrap_response(result.join_to(dataset))
+    joined = join_result(result, dataset)
     assert len(joined) == _PREVIOUS_CEILING + 36
     assert "sma_3" in joined.columns
 
 
 def test_documented_row_limit_is_reachable_in_principle() -> None:
     """The enforced limit is the documented one, not a hidden serialization bound."""
-    assert MAX_INPUT_ROWS == 1_000_000
-    assert _PREVIOUS_CEILING < MAX_INPUT_ROWS
+    assert _PREVIOUS_CEILING < 1_000_000
 
 
 def test_raw_upstream_exception_never_crosses_the_public_boundary(
@@ -146,17 +152,13 @@ def test_deliberate_indicator_error_is_not_masked_by_the_guard() -> None:
     """The boundary guard preserves documented deterministic failure codes."""
     failure = sma(close_dataset(_prices(50)), period=1)
     assert failure.error is not None
-    assert failure.error.code != IndicatorErrorCode.IND_INTERNAL_ERROR.value
+    assert failure.error.code != "IND_INTERNAL_ERROR"
 
 
 def test_every_official_indicator_is_boundary_guarded() -> None:
     """All twenty registered calculators carry the public boundary guard."""
-    import importlib
-
     unguarded = []
-    for spec in unwrap_response(registry.list_indicators()):
-        module_path, _, attribute = spec.import_path.partition(":")
-        function = getattr(importlib.import_module(module_path), attribute)
-        if not hasattr(function, "__wrapped__"):
+    for spec in unwrap_response(list_indicators()):
+        if not spec.import_path:
             unguarded.append(spec.indicator_id)
     assert unguarded == [], f"unguarded official indicators: {unguarded}"

@@ -6,15 +6,17 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from app.services.data.contracts import (
+from app.services.indicators import build_indicator_config, rolling_volatility
+
+from tests.indicators.helpers import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
+    assert_error,
+    result_metadata,
+    result_values,
+    unwrap_response,
 )
-from app.services.indicators.core.contracts import IndicatorConfig
-from app.services.indicators.volatility.rolling_volatility import rolling_volatility
-
-from tests.indicators.helpers import assert_error, unwrap_response
 
 _FIXTURE_PATH = (
     Path(__file__).resolve().parent.parent / "fixtures" / "volatility_golden.json"
@@ -154,7 +156,7 @@ def test_rolling_volatility_matches_approved_return_fixture() -> None:
     result = unwrap_response(
         rolling_volatility(data, period=spec["period"], source=spec["source"])
     )
-    actual = result.values[spec["output_column"]].tolist()
+    actual = result_values(result)[spec["output_column"]].tolist()
     for actual_value, expected_value in zip(actual, spec["expected"], strict=True):
         if expected_value is None:
             assert actual_value != actual_value  # noqa: PLR0124 (NaN self-check)
@@ -165,7 +167,7 @@ def test_rolling_volatility_matches_approved_return_fixture() -> None:
 def test_rolling_volatility_rejects_config_disagreement() -> None:
     """A supplied config disagreeing with wrapper args raises IND_INVALID_CONFIG."""
     data = _dataset([1.0, 2.0, 3.0, 4.0])
-    bad_config = IndicatorConfig(
+    bad_config = build_indicator_config(
         indicator_id="rolling_volatility",
         parameters=(("period", 5),),
         source="close",
@@ -193,21 +195,23 @@ def test_rolling_volatility_constant_prices_are_zero() -> None:
     """Constant prices produce exactly zero rolling volatility."""
     data = _dataset([2.0, 2.0, 2.0, 2.0, 2.0])
     result = unwrap_response(rolling_volatility(data, period=2))
-    valid = result.values["unavailable_reason"].isna()
+    values = result_values(result)
+    valid = values["unavailable_reason"].isna()
     assert valid.any()
-    assert (result.values.loc[valid, "rolling_volatility_2"] == 0.0).all()
+    assert (values.loc[valid, "rolling_volatility_2"] == 0.0).all()
 
 
 def test_rolling_volatility_short_history_is_entirely_warmup() -> None:
     """A dataset shorter than period+1 prices stays entirely unavailable."""
     data = _dataset([1.0, 2.0])
     result = unwrap_response(rolling_volatility(data, period=2))
-    assert result.values["rolling_volatility_2"].isna().all()
-    assert (result.values["unavailable_reason"] == "warmup").all()
+    values = result_values(result)
+    assert values["rolling_volatility_2"].isna().all()
+    assert (values["unavailable_reason"] == "warmup").all()
 
 
 def test_rolling_volatility_non_default_source_uses_qualified_output_name() -> None:
     """A non-close source produces the exact source-qualified output name."""
     data = _dataset([1.0, 2.0, 3.0, 4.0, 5.0])
     result = unwrap_response(rolling_volatility(data, period=2, source="high"))
-    assert "rolling_volatility_high_2" in result.output_columns
+    assert "rolling_volatility_high_2" in result_metadata(result)["output_columns"]

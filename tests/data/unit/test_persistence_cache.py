@@ -8,9 +8,16 @@ until Phase 11 deletes it. Behaviour assertions are unchanged.
 from __future__ import annotations
 
 import time
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from app.services.data import (
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
+)
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence.cache import get_cache_entry, put_cache_entry
@@ -22,7 +29,66 @@ from app.services.data.persistence.contracts import (
     CacheWriteRequest,
 )
 
-from tests.data.helpers_models import make_dataset
+START = datetime(2026, 1, 1, tzinfo=UTC)
+END = START + timedelta(minutes=1)
+AVAILABLE = END + timedelta(seconds=1)
+
+
+def make_bar():
+    """Return one exact canonical OHLCV record."""
+    return build_ohlcv_record(
+        timestamp=START,
+        open=Decimal("10.0"),
+        high=Decimal("11.0"),
+        low=Decimal("9.0"),
+        close=Decimal("10.5"),
+        volume=Decimal(100),
+        price_unit="USD",
+        volume_unit="shares",
+        source="fixture",
+        source_symbol="ABC",
+        source_revision="rev-1",
+        available_at=AVAILABLE,
+    )
+
+
+def make_quality(count=1):
+    """Return passing bounded quality evidence."""
+    return build_data_quality_report(
+        quality_status="passed",
+        quality_score=Decimal(1),
+        issues=(),
+        warnings=(),
+        record_count=count,
+        checked_count=count,
+        truncated=False,
+        sample_limit=10,
+        schema_version="v1",
+        generated_at=AVAILABLE,
+    )
+
+
+def make_dataset():
+    """Return one immutable provider-neutral market dataset."""
+    bar = make_bar()
+    return build_market_dataset(
+        normalization_version="v1",
+        data_kind="bars",
+        symbol="ABC",
+        timeframe="1m",
+        records=(bar,),
+        start=START,
+        end=START,
+        available_at=AVAILABLE,
+        record_count=1,
+        quality_report=make_quality(),
+        source_metadata={"source": "fixture"},
+        license_metadata={"status": "approved"},
+        cache_status="miss",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
+    )
 
 
 def _unwrap(response):

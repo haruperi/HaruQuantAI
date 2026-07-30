@@ -15,7 +15,9 @@ from pathlib import Path
 
 import pytest
 from app.services.data import (
+    build_data_quality_report,
     build_data_settings,
+    build_market_dataset,
     build_ohlcv_record,
     build_source_read_request,
     data_settings_context,
@@ -27,6 +29,67 @@ from app.utils import generate_id
 
 _SYMBOL = "EURUSD"
 _START = datetime(2026, 1, 1, tzinfo=UTC)
+
+START = datetime(2026, 1, 1, tzinfo=UTC)
+END = START + timedelta(minutes=1)
+AVAILABLE = END + timedelta(seconds=1)
+
+
+def make_bar(timestamp=START):
+    """Return one exact canonical OHLCV record."""
+    return build_ohlcv_record(
+        timestamp=timestamp,
+        open=Decimal("10.0"),
+        high=Decimal("11.0"),
+        low=Decimal("9.0"),
+        close=Decimal("10.5"),
+        volume=Decimal(100),
+        price_unit="USD",
+        volume_unit="shares",
+        source="fixture",
+        source_symbol="ABC",
+        source_revision="rev-1",
+        available_at=timestamp + timedelta(seconds=1),
+    )
+
+
+def make_quality(count=1):
+    """Return passing bounded quality evidence."""
+    return build_data_quality_report(
+        quality_status="passed",
+        quality_score=Decimal(1),
+        issues=(),
+        warnings=(),
+        record_count=count,
+        checked_count=count,
+        truncated=False,
+        sample_limit=10,
+        schema_version="v1",
+        generated_at=AVAILABLE,
+    )
+
+
+def make_dataset():
+    """Return one immutable provider-neutral market dataset."""
+    bar = make_bar()
+    return build_market_dataset(
+        normalization_version="v1",
+        data_kind="bars",
+        symbol="ABC",
+        timeframe="1m",
+        records=(bar,),
+        start=START,
+        end=START,
+        available_at=AVAILABLE,
+        record_count=1,
+        quality_report=make_quality(),
+        source_metadata={"source": "fixture"},
+        license_metadata={"status": "approved"},
+        cache_status="miss",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -44,7 +107,7 @@ def isolated_runtime(monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(target, replacement)
 
 
-def _bar(index: int) -> OHLCVRecord:
+def _bar(index: int) -> object:
     """Return one canonical bar offset by whole minutes from the window start."""
     timestamp = _START + timedelta(minutes=index)
     return build_ohlcv_record(
@@ -63,7 +126,7 @@ def _bar(index: int) -> OHLCVRecord:
     )
 
 
-def _settings(tmp_path: Path) -> DataSettings:
+def _settings(tmp_path: Path) -> object:
     """Return settings rooting local composition at a temporary data directory."""
     return build_data_settings(
         database_url=f"sqlite:///{tmp_path / 'data.db'}",
@@ -110,10 +173,12 @@ def test_local_source_composes_without_credentials_or_network(
         ensure_res = ensure_source("csv", generate_id("req"))
         assert ensure_res.status == "success"
         source_res = resolve_source("csv")
-        assert source_res.status == "success" and source_res.data is not None
+        assert source_res.status == "success"
+        assert source_res.data is not None
         source = source_res.data
         sources_res = list_composable_sources()
-        assert sources_res.status == "success" and sources_res.data is not None
+        assert sources_res.status == "success"
+        assert sources_res.data is not None
         sources = sources_res.data
 
     assert source is not None
@@ -129,8 +194,6 @@ def test_local_source_reads_only_the_requested_window(
     (composed_root / f"{_SYMBOL}_1m.csv").touch()
     dataset_records = tuple(_bar(index) for index in range(10))
 
-    from tests.data.helpers import make_dataset
-
     stored = make_dataset().model_copy(
         update={"records": dataset_records, "symbol": _SYMBOL, "timeframe": "1m"}
     )
@@ -143,7 +206,8 @@ def test_local_source_reads_only_the_requested_window(
         request_id = generate_id("req")
         ensure_source("csv", request_id)
         source_res = resolve_source("csv")
-        assert source_res.status == "success" and source_res.data is not None
+        assert source_res.status == "success"
+        assert source_res.data is not None
         batch_res = source_res.data.fetch(
             build_source_read_request(
                 source_id="csv",
@@ -175,11 +239,9 @@ def test_two_timeframes_for_one_symbol_are_independently_addressable(
     (composed_root / f"{_SYMBOL}_1h.csv").touch()
     observed_paths: list[Path] = []
 
-    from tests.data.helpers import make_dataset
-
     stored = make_dataset().model_copy(update={"symbol": _SYMBOL, "timeframe": "1m"})
 
-    def load_requested_artifact(request: DatasetLoadRequest) -> MarketDataset:
+    def load_requested_artifact(request: object) -> object:
         observed_paths.append(request.relative_path)
         return stored
 
@@ -191,7 +253,8 @@ def test_two_timeframes_for_one_symbol_are_independently_addressable(
     with data_settings_context(_settings(tmp_path)):
         ensure_source("csv", generate_id("req"))
         source_res = resolve_source("csv")
-        assert source_res.status == "success" and source_res.data is not None
+        assert source_res.status == "success"
+        assert source_res.data is not None
         source = source_res.data
         for timeframe in ("1m", "1h"):
             source.fetch(
@@ -216,5 +279,6 @@ def test_unsupported_source_identifier_fails_before_policy(tmp_path: Path) -> No
     with data_settings_context(_settings(tmp_path)):
         res = ensure_source("not-configured-source", generate_id("req"))
 
-    assert res.status == "error" and res.error is not None
+    assert res.status == "error"
+    assert res.error is not None
     assert res.error.code == "UNSUPPORTED_SOURCE"

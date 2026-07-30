@@ -1,9 +1,9 @@
-﻿# Strategy
+# Strategy
 
 > **Package:** `app/services/strategy`
-> **Status:** `Partial` — the existing ten features remain completed;
-> `FEAT-STR-11` external research-proposal evaluation is documented and `Missing`.
-> **Last updated:** `2026-07-28`
+> **Status:** `Completed` — all eleven registered features, fifty-three
+> functional requirements, and twelve active workflows are implemented and verified.
+> **Last updated:** `2026-07-30`
 
 > This README is the package's **single source of truth** for final requirements, structure, implementation sequence, workflows, public contracts, configuration, limits, progress, usage examples, and tests.
 > Update this file before changing Strategy code.
@@ -50,6 +50,8 @@ Contract names, versions, and owners match `docs/PROJECT.md`. Commands and reque
 | Completed | `StrategyParameterUpdateRequest` | `v1`  | UI/API submits; Strategy receives                                        | Request validation and registration of an approved parameter set for a compatible strategy version.          |
 | Completed | `StrategyMutationResult`         | `v1`  | UI/API, Risk, Portfolio                                                  | Publish the deterministic accepted/idempotent/rejected result of a registration or parameter-version mutation. |
 | Completed | `TradeIntent`                    | `v1`  | Risk consumes; Trading and Simulation receive only after Risk governance | Represent a non-executable strategy proposal with deterministic identity, timing, sizing hints, and lineage. |
+| Completed | `StrategyProposalEvaluationRequest` | `v1` | Agentic or another authenticated source submits; Strategy receives | Bind an untrusted proposal to exact source, principal, trace, strategy, scope, evidence, and expiry fields. |
+| Completed | `StrategyProposalEvaluationResult` | `v1` | Agentic/UI/API consume; Strategy produces | Publish accepted, rejected, expired, or no-signal evidence with optional canonical `TradeIntent`. |
 
 **Internal composition-root input:** `StrategyValidationPolicy v1` is supplied
 by the runtime composition root to `validate_strategy_ref` and
@@ -193,6 +195,7 @@ flowchart TD
     STR --> EVT[[event: Stateful event decisions]]
     STR --> SIG[[signals: Concrete signal execution boundary]]
     STR --> EVAL[[evaluators: The strategy signal library]]
+    STR --> PROP[[proposal_intake: External proposal evaluation]]
     STR --> MIG[[migrations: Non-feature persistence support]]
 
     CON --> CONF[enums / policy / manifest / references / requests / execution / signals]
@@ -213,6 +216,9 @@ flowchart TD
     SIG --> SP[protocol.py: SignalEvaluator contract]
     SIG --> SB[boundary.py: Hash-bound atomic execution]
     EVAL --> CE[Strategy modules: One file per strategy]
+    PROP --> PR[requests.py / results.py: Receiver-owned contracts]
+    PROP --> PV[validation.py / evaluation.py: Fail-closed evaluation]
+    PROP --> PL[lineage.py: Lineage-only source binding]
     MIG --> MD[definitions.py: Strategy-owned schema definitions]
 ```
 
@@ -236,7 +242,7 @@ Folders and files are ordered from lowest dependency to highest dependency. This
 | Completed | `FEAT-STR-08` Stateful Event Evaluation | `event/` | Exact declarations: Section 4.8 | Section 4.8 functional requirements | `tests/strategy/usage/08_event.py` |
 | Completed | `FEAT-STR-09` Concrete Signal Execution Boundary | `signals/` | Exact declarations and signal contracts: Section 4.9 | Section 4.9 functional requirements | `tests/strategy/usage/09_signals.py` |
 | Completed | `FEAT-STR-10` Strategy Signal Library | `evaluators/` | Exact declarations: Section 4.10 | Section 4.10 functional requirements | `tests/strategy/usage/10_strategy_library.py` |
-| Missing | `FEAT-STR-11` External Research Proposal Evaluation | `proposal_intake/` | `StrategyProposalEvaluationRequest`, `StrategyProposalEvaluationResult`, `evaluate_strategy_proposal` | `FR-STR-049`–`053` | `tests/strategy/usage/11_proposal_intake.py` |
+| Completed | `FEAT-STR-11` External Research Proposal Evaluation | `proposal_intake/` | `create_strategy_proposal_evaluation_request`, `create_strategy_proposal_evaluation_result`, `validate_strategy_proposal`, `evaluate_strategy_proposal`, `bind_proposal_lineage` | `FR-STR-049`–`053` | `tests/strategy/usage/11_proposal_intake.py` |
 
 ```text
 app/services/strategy/
@@ -268,7 +274,8 @@ app/services/strategy/
 │   ├── configuration.py                # Validate declarative config and hash it
 │   ├── listing.py                      # Deterministic immutable listing
 │   ├── registration.py                 # Register one immutable version
-│   └── parameters.py                   # Record one immutable parameter version
+│   ├── parameters.py                   # Record one immutable parameter version
+│   └── optimization.py                 # Validate and adopt an approved handoff
 ├── intents/                            # Feature: canonical strategy proposals
 │   ├── __init__.py
 │   ├── README.md
@@ -308,10 +315,15 @@ app/services/strategy/
 │   ├── random_walk.py                  # Flat-state basket trigger signals
 │   ├── sqx_breakout_atr_trailing.py    # Channel breakout and ATR facts
 │   └── white_fairy.py                  # Recovered RSI crossing signals
-├── proposal_intake/                    # FEAT-STR-11 external proposal evaluation (Missing)
+├── proposal_intake/                    # FEAT-STR-11 external proposal evaluation
 │   ├── __init__.py
-│   ├── contracts.py
-│   └── evaluation.py
+│   ├── README.md
+│   ├── requests.py
+│   ├── results.py
+│   ├── factories.py
+│   ├── validation.py
+│   ├── evaluation.py
+│   └── lineage.py
 └── migrations/                         # Documented non-feature persistence support
     ├── __init__.py
     ├── README.md
@@ -419,11 +431,8 @@ never reused. New workflows continue from `WF-STR-011`.
 | `WF-STR-007` | `tests/strategy/usage/workflows/wf_str_007_supply_paper_live_decisions.py` |
 | `WF-STR-009` | `tests/strategy/usage/workflows/wf_str_009_reject_arbitrary_strategy_code.py` |
 | `WF-STR-010` | `tests/strategy/usage/workflows/wf_str_010_evaluate_recovered_concrete_signals.py` |
-| `WF-STR-011` | `tests/strategy/usage/workflows/wf_str_011_adopt_approved_optimization_parameters.py` *(pending)* |
-| `WF-STR-012` | `tests/strategy/usage/workflows/wf_str_012_evaluate_signals_for_research.py` *(pending)* |
-
-Entries marked *(pending)* are registered workflows whose standalone program is not
-yet written.
+| `WF-STR-011` | `tests/strategy/usage/workflows/wf_str_011_adopt_approved_optimization_parameters.py` |
+| `WF-STR-012` | `tests/strategy/usage/workflows/wf_str_012_evaluate_signals_for_research.py` |
 
 ### Status values
 
@@ -445,8 +454,8 @@ yet written.
 | Completed | Supporting | `WF-STR-007` | Cross-domain | Supply paper/live decisions           | Trading invokes Strategy with prepared inputs            | `TradeIntent` to Risk/Trading workflow                       | `FR-STR-023 → FR-STR-024 → FR-STR-032/033` |
 | Completed | Supporting | `WF-STR-009` | Cross-domain | Reject arbitrary strategy code        | Raw code/path/archive at command boundary                | Redacted`STRATEGY_ARBITRARY_CODE_REJECTED`; no import        | `FR-STR-018 → FR-STR-020/021/023/024`       |
 | Completed | Supporting | `WF-STR-010` | Cross-domain | Evaluate recovered concrete signals | Registry-bound evaluator + point-in-time Data/Indicators evidence | Atomic ordered immutable signal tuple or structured failure | `FR-STR-038 → FR-STR-039 → FR-STR-040/046 → FR-STR-047` |
-| Completed | Supporting | `WF-STR-011` | Cross-domain | Adopt approved optimization parameters | Explicitly approved `OptimizationResult` reference plus authenticated adoption command | New hash-addressed immutable configuration record; the approved record is never mutated | `Pending` |
-| Completed | Supporting | `WF-STR-012` | Cross-domain | Evaluate signals for research | Registered strategy version plus point-in-time Data and Indicators evidence | Ordered signal evidence for Research and Optimization; never a `TradeIntent` | `Pending` |
+| Completed | Supporting | `WF-STR-011` | Cross-domain | Adopt approved optimization parameters | Explicitly approved `OptimizationResult`-compatible reference plus authenticated adoption command | New hash-addressed immutable configuration record; the approved record is never mutated | `FR-STR-021` |
+| Completed | Supporting | `WF-STR-012` | Cross-domain | Evaluate signals for research | Registered strategy version plus point-in-time Data and Indicators evidence | Ordered signal evidence for Research and Optimization; never a `TradeIntent` | `FR-STR-047` |
 
 ### `WF-STR-001` — Validate Strategy Reference and Configuration
 
@@ -675,13 +684,14 @@ previously approved record is never mutated.
 
 1. UI/API supplies the authenticated adoption command and explicit user approval;
    Optimization cannot submit it — `utils.create_auth_context()`.
-2. Resolve the selected candidate and its evidence lineage from the optimization
-   handoff — `optimization.build_optimization_handoff()`.
+2. Accept the selected candidate through the published `OptimizationResult v1`
+   projection, without importing or executing Optimization —
+   `strategy.adopt_approved_optimization_parameters()`.
 3. Validate the proposed parameters against the registered version's declarative
    schema and bounds — `strategy.validate_strategy_ref()`,
    `strategy.validate_strategy_config()`.
-4. Write a new hash-addressed configuration record —
-   `strategy.update_strategy_parameters()`.
+4. Write a new hash-addressed configuration record through the existing immutable
+   update path — `strategy.adopt_approved_optimization_parameters()`.
 5. Record the adoption in the audit trail —
    `utils.create_audit_event()`, `data.persist_audit_event()`.
 
@@ -690,7 +700,7 @@ or an out-of-bounds parameter returns a structured Strategy error and writes not
 Adoption confers no operational eligibility; that remains the Risk-owned `SYS-WF-006`
 decision.
 
-**Integration test:** `Pending`
+**Integration test:** `tests/strategy/integration/test_optimization_adoption_workflow.py::test_compatible_handoff_creates_real_immutable_strategy_config`
 
 ### `WF-STR-012` — Evaluate Signals for Research
 
@@ -704,8 +714,8 @@ Indicators evidence supplied by Research or Optimization.
 
 1. Validate the registered reference and configuration —
    `strategy.validate_strategy_ref()`, `strategy.validate_strategy_config()`.
-2. Prepare the bounded research dataset and its indicator inputs —
-   `research.run_edge_lab_profile()`, `data.get_market_data()`.
+2. Accept the caller-prepared bounded research dataset and optional official
+   Indicator results — `data.get_market_data()`.
 3. Evaluate signals over the prepared evidence —
    `strategy.evaluate_strategy_signals()`.
 4. Export bounded redacted diagnostics alongside the signal evidence —
@@ -715,7 +725,7 @@ Indicators evidence supplied by Research or Optimization.
 convert its output into an executable action must re-enter `WF-STR-SEC` and the
 Risk-owned decision that follows it.
 
-**Integration test:** `Pending`
+**Executable evidence:** `tests/strategy/usage/workflows/wf_str_012_evaluate_signals_for_research.py`
 
 ---
 
@@ -822,9 +832,9 @@ covering the immutable contracts and structured outcomes in `FR-STR-001` through
 | Status  | File            | Responsibility                                                        | Key exports                                                                     | Dependencies                                                                                                                                                                                                                                                                                                                                        |
 | ------- | --------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Completed | `models.py`   | Define the bounded structured diagnostics schema.                     | `StrategyDiagnostics`                                                         | **Standard library:** `datetime`, `typing`**Required third-party:** `pydantic`**Local:** `contracts.models.py → StrategyExecutionContext`                                                                                                                                                                                |
-| Completed | `errors.py`   | Define only error codes reachable from approved initial capabilities and expose the immutable Strategy `ErrorDefinition` catalogue. | `StrategyErrorCode`, `STRATEGY_ERROR_CATALOG`                                                           | **Standard library:** `enum`, `types`**Required third-party:** None**Local:** `app.utils.ErrorDefinition`, `app.utils.validate_error_catalog`                                                                                                                                                                                                                 |
+| Completed | `errors.py`   | Define only error codes reachable from approved initial capabilities and expose the immutable Strategy `ErrorDefinition` catalogue. | `StrategyErrorCode`, `STRATEGY_ERROR_CATALOG`, `get_strategy_error_catalog`                            | **Standard library:** `enum`, `types`**Required third-party:** None**Local:** `app.utils.ErrorDefinition`, `app.utils.validate_error_catalog`                                                                                                                                                                                                                 |
 | Completed | `export.py`   | Normalize, redact, bound, and serialize Strategy diagnostics.         | `export_strategy_diagnostics`                                                 | **Standard library:** `collections.abc`**Required third-party:** None**Local:** `contracts.models.py → StrategyExecutionContext`; `models.py → StrategyDiagnostics`; `errors.py → StrategyErrorCode`; `app.utils → StandardResponse, redaction, and canonical serialization public APIs` |
-| Completed | `__init__.py` | Expose the supported diagnostics API.                                 | `StrategyDiagnostics`, `StrategyErrorCode`, `export_strategy_diagnostics` | **Standard library:** None**Required third-party:** None**Local:** Approved exports from `models.py`, `errors.py`, `export.py`                                                                                                                                                                                              |
+| Completed | `__init__.py` | Expose the supported diagnostics API.                                 | `StrategyDiagnostics`, `StrategyErrorCode`, `export_strategy_diagnostics`, `get_strategy_error_catalog` | **Standard library:** None**Required third-party:** None**Local:** Approved exports from `models.py`, `errors.py`, `export.py`                                                                                                                                                                                              |
 
 ### Configuration and Limits Manifest
 
@@ -911,9 +921,9 @@ The three conditional codes apply only when the selected manifest/lifecycle requ
 
 | Status  | Requirement ID | Responsibility                                                                                                                                                                  | Class / Function / Method                                                                                                              | Side Effects                                                       | Raises                                                                                             | Usage / Test                                                                                                                                                                                                              |
 | ------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Completed | `FR-STR-020` | The system shall register one unique immutable strategy version only after command, schema, module, hash, provenance, lifecycle-reference, and explicit validation-policy checks. | `register_strategy_version(request: StrategyRegistrationRequest, auth: AuthContext, policy: StrategyValidationPolicy) -> StandardResponse[StrategyMutationResult]` | Persistence write; event publication | None; returns deterministic mutation result or infrastructure error | **Usage:** `tests/strategy/usage/03_registry.py`**Unit:** `tests/strategy/unit/test_catalog.py::test_registration_is_immutable()` |
-| Completed | `FR-STR-021` | The system shall validate and record a parameter update as a new canonical configuration hash without mutating an approved prior record. | `update_strategy_parameters(request: StrategyParameterUpdateRequest, auth: AuthContext) -> StandardResponse[StrategyMutationResult]` | Persistence write; event publication | None; returns deterministic mutation result or infrastructure error | **Usage:** `tests/strategy/usage/03_registry.py`**Unit:** `tests/strategy/unit/test_catalog.py::test_parameter_update_preserves_prior_hash()` |
-| Completed | `FR-STR-022` | The system shall return immutable registry entries in deterministic strategy-id/version order without exposing persistence objects. | `list_strategy_versions(strategy_id: str | None = None) -> StandardResponse[tuple[ValidatedStrategyRef, ...]]` | Read-only | None; returns `STRATEGY_NOT_FOUND` only for an explicit missing id | **Usage:** `tests/strategy/usage/03_registry.py`**Unit:** `tests/strategy/unit/test_catalog.py::test_list_versions_is_deterministically_ordered()` |
+| Completed | `FR-STR-020` | The system shall register one unique immutable strategy version only after command, schema, module, hash, provenance, lifecycle-reference, and explicit validation-policy checks. | `register_strategy_version(request: StrategyRegistrationRequest, auth: AuthContext, policy: StrategyValidationPolicy) -> StandardResponse[StrategyMutationResult]` | Persistence write; event publication | None; returns deterministic mutation result or infrastructure error | **Usage:** `tests/strategy/usage/03_registry.py`**Integration:** `tests/strategy/integration/test_catalog_persistence.py::test_registration_is_immutable()` |
+| Completed | `FR-STR-021` | The system shall validate and record a parameter update as a new canonical configuration hash without mutating an approved prior record. | `update_strategy_parameters(request: StrategyParameterUpdateRequest, auth: AuthContext) -> StandardResponse[StrategyMutationResult]` | Persistence write; event publication | None; returns deterministic mutation result or infrastructure error | **Usage:** `tests/strategy/usage/03_registry.py`**Integration:** `tests/strategy/integration/test_catalog_persistence.py::test_parameter_update_preserves_prior_hash()` |
+| Completed | `FR-STR-022` | The system shall return immutable registry entries in deterministic strategy-id/version order without exposing persistence objects. | `list_strategy_versions(strategy_id: str | None = None) -> StandardResponse[tuple[ValidatedStrategyRef, ...]]` | Read-only | None; returns `STRATEGY_NOT_FOUND` only for an explicit missing id | **Usage:** `tests/strategy/usage/03_registry.py`**Integration:** `tests/strategy/integration/test_catalog_persistence.py::test_list_versions_is_deterministically_ordered()` |
 | Completed | `FR-STR-023` | The system shall resolve exactly one approved immutable version and fail before execution for invalid identity, lifecycle, environment, module, policy, or hashes. | `validate_strategy_ref(ref: StrategyRef, policy: StrategyValidationPolicy) -> StandardResponse[ValidatedStrategyRef]` | Read-only | None; returns registry/lifecycle/policy/hash error | **Usage:** `tests/strategy/usage/03_registry.py`**Unit:** `tests/strategy/unit/test_validation.py::test_version_constraint_resolves_exactly_one()` |
 | Completed | `FR-STR-024` | The system shall validate declarative configuration, explicit defaults, unknown fields, types, enums, bounds, and resource limits, producing a canonical hash before execution. | `validate_strategy_config(ref: ValidatedStrategyRef, config: StrategyConfig) -> StandardResponse[ValidatedStrategyConfig]`            | None                                                               | None; returns`STRATEGY_INVALID_CONFIG`, `STRATEGY_SCHEMA_VALIDATION_FAILED`, or resource error | **Usage:** `tests/strategy/usage/03_registry.py`**Unit:** `tests/strategy/unit/test_validation.py::test_config_rejects_executable_injection()`  |
 
@@ -1172,7 +1182,7 @@ No feature-specific numeric default is approved. Precision and UTC policies come
 
 ### 4.11 `proposal_intake/` — External Research Proposal Evaluation
 
-**Status:** `Missing`
+**Status:** `Completed`
 
 This receiver-owned boundary lets Agentic or another authorized external researcher
 submit a typed thesis for deterministic evaluation. It does not accept executable
@@ -1182,11 +1192,11 @@ deterministic signal evidence independently support it.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-STR-049` | Define the receiver-owned proposal-evaluation request with principal/trace identity, source proposal/task/hash, exact strategy/version, instrument, direction, horizon, thesis/invalidation evidence references, requested evaluation scope, expiry, and no broker-native or approval fields. | `StrategyProposalEvaluationRequest` | None | `ValidationError`: source, scope, strategy, evidence, time, or prohibited field is invalid | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
-| Missing | `FR-STR-050` | Define a result that records accepted-for-evaluation, rejected, expired, or no-signal status; deterministic reasons; source binding; evaluated strategy/signal evidence; and optional canonical `TradeIntent`. | `StrategyProposalEvaluationResult` | None | `ValidationError`: status, evidence, or intent binding is inconsistent | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
-| Missing | `FR-STR-051` | Validate authorization, idempotency, expiry, exact registered strategy identity/hashes, point-in-time Data/Indicators evidence, and evaluator compatibility before evaluation. | `validate_strategy_proposal(...)` | Read-only registry/evidence access | None; returns typed rejection | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
-| Missing | `FR-STR-052` | Evaluate the registered deterministic strategy normally and emit a `TradeIntent` only when its current canonical decision agrees with the requested instrument/direction and all Strategy invariants. | `evaluate_strategy_proposal(...) -> StandardResponse[StrategyProposalEvaluationResult]` | Audit event publication | None; returns deterministic rejection/failure | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
-| Missing | `FR-STR-053` | Preserve the Agentic proposal only as lineage and never let its confidence, consensus, rationale, size, approval language, or free text alter deterministic signals or `TradeIntent` fields. | `bind_proposal_lineage(...)` | None | `ValidationError`: proposal attempts deterministic-field influence | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
+| Completed | `FR-STR-049` | Define the receiver-owned proposal-evaluation request with principal/trace identity, source proposal/task/hash, exact strategy/version, instrument, direction, horizon, thesis/invalidation evidence references, requested evaluation scope, expiry, and no broker-native or approval fields. | `StrategyProposalEvaluationRequest` | None | `ValidationError`: source, scope, strategy, evidence, time, or prohibited field is invalid | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
+| Completed | `FR-STR-050` | Define a result that records accepted-for-evaluation, rejected, expired, or no-signal status; deterministic reasons; source binding; evaluated strategy/signal evidence; and optional canonical `TradeIntent`. | `StrategyProposalEvaluationResult` | None | `ValidationError`: status, evidence, or intent binding is inconsistent | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
+| Completed | `FR-STR-051` | Validate authorization, idempotency, expiry, exact registered strategy identity/hashes, point-in-time Data/Indicators evidence, and evaluator compatibility before evaluation. | `validate_strategy_proposal(...)` | Read-only registry/evidence access | None; returns typed rejection | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
+| Completed | `FR-STR-052` | Evaluate the registered deterministic strategy normally and emit a `TradeIntent` only when its current canonical decision agrees with the requested instrument/direction and all Strategy invariants. | `evaluate_strategy_proposal(...) -> StandardResponse[StrategyProposalEvaluationResult]` | Audit event publication | None; returns deterministic rejection/failure | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
+| Completed | `FR-STR-053` | Preserve the Agentic proposal only as lineage and never let its confidence, consensus, rationale, size, approval language, or free text alter deterministic signals or `TradeIntent` fields. | `bind_proposal_lineage(...)` | None | `ValidationError`: proposal attempts deterministic-field influence | **Usage:** `tests/strategy/usage/11_proposal_intake.py` |
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
@@ -1209,57 +1219,54 @@ deterministic signal evidence independently support it.
 | Completed | `NFR-STR-003` | Safety          | Strategy shall emit proposals only and shall never approve risk, create official orders/fills, mutate broker/account state, or bypass runtime gates.             | Boundary tests                   |
 | Completed | `NFR-STR-004` | Security        | Strategy imports and evaluation shall perform no direct network, broker, filesystem, subprocess, environment, secret, wall-clock, or unseeded-random decision access. Calls to the Utils-owned system logger are the sole infrastructure-observability exception and do not grant Strategy direct sink access. | Import/security tests |
 | Completed | `NFR-STR-005` | Reliability     | Validation, lookahead, clock-drift, hash, checkpoint, and safety failures shall fail closed before any intent or state commit.                                   | Failure-path tests               |
-| Completed | `NFR-STR-006` | Error handling  | Every expected failure shall return one accepted stable code and redacted structured details; raw exceptions shall not cross the public boundary. Reproducibility digests are chunked so large datasets and batches never raise a serialization error across the boundary. | Error catalogue tests; `tests/strategy/unit/test_large_input.py` |
+| Completed | `NFR-STR-006` | Error handling  | Every expected failure shall return one accepted stable code and redacted structured details; raw exceptions shall not cross the public boundary. Reproducibility digests are chunked so large datasets and batches never raise a serialization error across the boundary. | Error catalogue tests; `tests/strategy/integration/test_large_input.py` |
 | Completed | `NFR-STR-007` | Precision       | Price and quantity values shall use finite`Decimal`; tolerance rules shall be explicit; downstream domains own final execution quantization.                   | Contract/property tests          |
 | Completed | `NFR-STR-008` | Time            | All timestamps shall be aware UTC and point-in-time safe; previous-close is the default bar policy.                                                              | DST/session/lookahead tests      |
 | Completed | `NFR-STR-009` | Compatibility   | Public contracts shall remain backward compatible within a major version; breaking changes require version bumps, migration guidance, and compatibility tests.   | `tests/strategy/integration/test_contract_compatibility.py` |
 | Completed | `NFR-STR-010` | Maintainability | Public Python signatures shall be typed; modules/classes/functions shall have Google-style docstrings; private helpers shall begin with`_`.                    | Ruff/mypy/API review             |
-| Completed | `NFR-STR-011` | Testing         | Every public requirement shall have a unit test and usage example; collaborative workflows shall have integration tests; package coverage shall be at least 80%. Resource bounds are proven near their limit, not merely declared. | Traceability and coverage audit; `tests/strategy/unit/test_large_input.py` |
+| Completed | `NFR-STR-011` | Testing         | Every public requirement shall have a unit test and usage example; collaborative workflows shall have integration tests; package coverage shall be at least 80%. Resource bounds are proven near their limit, not merely declared. | Traceability and coverage audit; `tests/strategy/integration/test_large_input.py` |
 | Completed | `NFR-STR-012` | Performance     | Reference hardware, OS, Python/dependency versions, dataset, strategy type, method, and workload shall be recorded before numerical budgets become CI gates.     | `docs/benchmarks/strategy_baseline.md`; no numerical performance budget is a CI gate |
 
 ### Package public API
 
-`app.services.strategy.__init__` exposes only:
+`app.services.strategy.__init__` exposes only standalone functions:
 
 ```python
-StrategyConfig
-StrategyDecision
-StrategyDiagnostics
-StrategyEnvironment
-StrategyErrorCode
-StrategyEvent
-StrategyExecutionContext
-StrategyExecutionResult
-StrategyLifecycleStatus
-StrategyManifest
-StrategyMutationResult
-StrategyParameterUpdateRequest
-StrategyCheckpoint
-StrategyRef
-StrategyRegistrationRequest
-StrategyReplayManifest
-StrategySignal
-StrategySignalEvidence
-StrategyTimingPolicy
-StrategyValidationPolicy
-TradeIntent
-ValidatedStrategyConfig
-ValidatedStrategyRef
-EventStrategyEvaluator
-VectorizedStrategyEvaluator
-DecomposingTradeEvaluator
-HarrietHedgingEvaluator
-MarketStructureEvaluator
-NaiveMATrendEvaluator
-RandomWalkEvaluator
-SQXBreakoutAtrTrailingEvaluator
-SignalEvaluator
-WhiteFairyEvaluator
+adopt_approved_optimization_parameters
+bind_proposal_lineage
 build_trade_intent
 create_strategy_checkpoint
+create_strategy_checkpoint_value
+create_strategy_config
+create_strategy_decision
+create_strategy_diagnostics
+create_strategy_evaluator
+create_strategy_event
+create_strategy_execution_context
+create_strategy_execution_result
+create_strategy_manifest
+create_strategy_mutation_result
+create_strategy_parameter_update_request
+create_strategy_proposal_evaluation_request
+create_strategy_proposal_evaluation_result
+create_strategy_ref
+create_strategy_registration_request
 create_strategy_replay_manifest
+create_strategy_replay_manifest_value
+create_strategy_signal
+create_strategy_signal_evidence
+create_strategy_validation_policy
+create_trade_intent_value
+create_validated_strategy_config
+create_validated_strategy_ref
+evaluate_strategy_proposal
 evaluate_strategy_signals
 export_strategy_diagnostics
+get_strategy_environment
+get_strategy_error_catalog
+get_strategy_error_code
+get_strategy_lifecycle_status
+get_strategy_timing_policy
 list_strategy_versions
 register_strategy_version
 run_event_strategy_hook
@@ -1267,10 +1274,14 @@ run_vectorized_strategy_signals
 update_strategy_parameters
 validate_strategy_checkpoint
 validate_strategy_config
+validate_strategy_proposal
 validate_strategy_ref
 ```
 
-These are re-exports of the requirement-bearing symbols above, not additional public behavior.
+Contract classes, enums, evaluator classes, and raw constants are internal. The
+factory and getter functions above are the only supported way for external
+consumers, usage evidence, workflows, and integration tests to obtain Strategy
+values. Deep imports from Strategy feature packages are not supported.
 
 ### Initial limitations and deferrals
 
@@ -1328,7 +1339,7 @@ During iterative implementation, run only the test file associated with the chan
 - **Property/golden:** No-lookahead, deterministic identity, event ordering, canonical hashing, replay, checkpoint integrity, and decimal tolerance.
 - **Security:** Import side effects, raw-code rejection, config injection, secret redaction, oversized structures, and prohibited access.
 
-There are exactly ten numbered usage programs — one per feature. Each defines
+There are exactly eleven numbered usage programs — one per feature. Each defines
 `main()`, ends with an `if __name__ == "__main__"` guard, is excluded from pytest
 collection, and is verified by direct Python execution. Exit code `3` means the
 real connection or receiver-owned evidence is unavailable, never that synthetic
@@ -1336,7 +1347,7 @@ evidence was substituted.
 
 `10_strategy_library.py` is the single usage program for the whole strategy
 library; each strategy is one `example_NN_*` function inside it, not a separate
-program. Programs `07`, `08`, `09`, and `10` request real MT5 data through the Data
+program. Programs `07`, `08`, `09`, `10`, and `11` request real MT5 data through the Data
 package. `03_registry.py` and `06_checkpoints.py` additionally
 require `RUN_STRATEGY_STATEFUL_USAGE=1` because they open the configured
 Data-owned store; `05_replay.py` is pure and always runs.
@@ -1358,8 +1369,10 @@ dataset provenance and does not rewrite historical record availability.
 - [X] Module sections and files remain in dependency/implementation order. `app/services/strategy/contracts/execution.py:424`
 - [X] Every module folder represents one coherent approved capability. `tests/strategy/unit/test_usage_coverage.py:125`
 - [X] Every file has one focused responsibility. `tests/strategy/unit/test_usage_coverage.py:58`
-- [X] Every functional and non-functional requirement is `Completed` with evidence. `tests/strategy/usage/10_strategy_library.py:774`
-- [X] Every workflow is `Completed` with its integration test passing. `tests/system/integration/test_research_to_strategy.py:1`
+- [X] Every requirement owned by `FEAT-STR-01` through `FEAT-STR-11` is `Completed` with evidence. `tests/strategy/unit/test_usage_coverage.py:66`
+- [X] `FEAT-STR-11` and `FR-STR-049` through `FR-STR-053` have direct genuine-MT5 proposal-intake evidence. `tests/strategy/usage/11_proposal_intake.py:75`
+- [X] Every registered workflow has executable evidence and passing integration or parity coverage. `tests/strategy/unit/test_workflow_usage_parity.py:39`
+- [X] `WF-STR-011` and `WF-STR-012` execute without importing or modifying Optimization, Simulator, Analytics, or Research. `tests/strategy/usage/workflows/run_all.py:13`
 - [X] Every package and feature export matches the documented API exactly. `tests/strategy/unit/test_public_api.py:64`
 - [X] Owned and consumed contracts match `docs/PROJECT.md` names, versions, and owners. `tests/strategy/integration/test_contract_compatibility.py:75`
 - [X] Strategy-owned registry, configuration, checkpoint, and migration state follows the system data-ownership rule. `app/services/strategy/migrations/definitions.py:48`
@@ -1369,20 +1382,20 @@ dataset provenance and does not rewrite historical record availability.
 - [X] No raw provider object, DataFrame, DB session, socket, or exception crosses the public boundary. `tests/strategy/integration/test_registration_workflow.py:70`
 - [X] No arbitrary code, secret, network/filesystem/process access, broker mutation, or official state mutation is possible. `tests/strategy/unit/test_import_security.py:9`
 - [X] No removed, rejected, or excluded capability appears in the public API. `tests/strategy/unit/test_public_api.py:9`
-- [X] No hidden fallback or guessed default remains at a governed boundary. `tests/strategy/unit/test_catalog.py:100`
+- [X] No hidden fallback or guessed default remains at a governed boundary. `tests/strategy/integration/test_catalog_persistence.py:51`
 - [X] Every retained V1 behavior has a tested final destination or an explicit migration decision. `tests/strategy/integration/test_registration_workflow.py:17`
 - [X] No open decision remains in this specification.
 - [X] Ruff, format, prescribed mypy, targeted tests, usage tests, integration tests, and 80% coverage pass. `tests/strategy/integration/test_usage_scripts.py:27`
 
-Current evidence is `Completed`. The domain has ten registered features, ten
-feature module folders, and ten usage programs. The complete Strategy suite
-passes 113 cases with 82.04% branch-aware coverage; three isolated subprocess
-checks skip when their real provider prerequisites are unavailable, while direct
-development execution and the Strategy Signal Library's verified MT5 demo run
-pass all seven evaluators. Ruff lint, Ruff format verification, and prescribed
-mypy pass for the complete domain. The public causal ZigZag provider and the
-provider-derived Data-owned position ownership path pass deterministic and real
-non-production validation.
+Current implemented-baseline evidence and package status are `Completed`. The
+baseline has ten feature module folders and ten usage programs. The focused
+Strategy suite passes 164 cases with 91% branch-aware package coverage and every
+production file above 80% (minimum 81%). Direct development execution passes all
+eleven numbered usages and all twelve active workflows; the Strategy Signal
+Library evaluates all seven registered evaluators against bounded MT5 demo
+market evidence. Focused Ruff lint, Ruff format verification, and prescribed
+mypy pass. The public causal ZigZag provider and the provider-derived Data-owned
+position ownership path pass deterministic and real non-production validation.
 `NFR-STR-012` is completed by the non-gating baseline in
 `docs/benchmarks/strategy_baseline.md`.
 

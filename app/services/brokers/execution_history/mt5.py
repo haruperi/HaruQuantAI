@@ -1,11 +1,9 @@
-type StandardResponse[T] = (
-    Any  # mypy: disable-error-code="attr-defined,no-any-return,has-type"
-)
+# mypy: disable-error-code="attr-defined"
 """MT5 execution-history read operations."""
 
 # ruff: noqa: A002 - public protocol signatures are normative.
 from datetime import datetime
-from typing import Any, cast
+from typing import TYPE_CHECKING, cast
 
 from app.services.brokers.contracts import (
     BrokerAccountTransaction,
@@ -27,6 +25,9 @@ from app.services.brokers.mt5_account.mapping import (
     _map_position,
     _map_transaction,
 )
+
+if TYPE_CHECKING:
+    from app.services.brokers.contracts.responses import StandardResponse
 
 
 def _provider_ticket(value: str) -> int:

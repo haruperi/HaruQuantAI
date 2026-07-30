@@ -13,8 +13,7 @@ from app.services.brokers import (
     get_broker_id,
     get_broker_value_field,
 )
-
-from tests.brokers.provider_settings import ProviderTestSettings
+from app.utils import load_broker_provider_settings
 
 
 @pytest.fixture(autouse=True)
@@ -28,7 +27,7 @@ def _restore_sdk_import_isolation() -> Iterator[None]:
 
 def test_mt5_demo_credential_gated_connection() -> None:
     """A configured MT5 demo credential set verifies a genuine session."""
-    settings = ProviderTestSettings()
+    settings = load_broker_provider_settings()
     if (
         not settings.mt5_enabled
         or settings.mt5_login is None
@@ -73,7 +72,7 @@ def test_mt5_demo_credential_gated_connection() -> None:
 
 def test_ctrader_demo_credentials_validate_without_a_network_transport() -> None:
     """Configured cTrader credentials pass construction-time validation."""
-    settings = ProviderTestSettings()
+    settings = load_broker_provider_settings()
     if (
         not settings.ctrader_enabled
         or settings.ctrader_account_id is None

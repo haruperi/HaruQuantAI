@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from app.services.brokers import resolve_provider_connection_config
 from app.services.brokers.contracts import BrokerEnvironment, BrokerId
 from pydantic import SecretStr
 
@@ -65,7 +66,7 @@ def test_real_usage_configs_are_non_production(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Every provider usage profile resolves only to approved non-production."""
-    monkeypatch.setattr(_support, "ProviderTestSettings", _settings)
+    monkeypatch.setattr(_support, "load_broker_provider_settings", _settings)
     expected = {
         BrokerId.MT5: BrokerEnvironment.DEMO,
         BrokerId.CTRADER: BrokerEnvironment.DEMO,
@@ -83,11 +84,34 @@ def test_real_usage_rejects_live_before_adapter_creation(
     """A live setting cannot enter a standalone usage adapter."""
     monkeypatch.setattr(
         _support,
-        "ProviderTestSettings",
+        "load_broker_provider_settings",
         lambda: _settings(mt5_environment="live"),
     )
     with pytest.raises(_support.UsageEvidenceError, match="reject live"):
         _support.config(BrokerId.MT5)
+
+
+@pytest.mark.parametrize(
+    ("broker_id", "overrides", "message"),
+    [
+        ("mt5", {"mt5_password": None}, "credentials missing"),
+        ("ctrader", {"ctrader_enabled": False}, "provider enablement"),
+        ("binance_spot", {"binance_enabled": False}, "provider enablement"),
+        ("dukascopy", {"dukascopy_enabled": False}, "provider enablement"),
+        ("yahoo", {"yahoo_enabled": False}, "provider enablement"),
+    ],
+)
+def test_provider_resolution_fails_closed_for_incomplete_settings(
+    broker_id: str,
+    overrides: dict[str, object],
+    message: str,
+) -> None:
+    """Provider resolution rejects missing credentials and disabled routes."""
+    with pytest.raises(ValueError, match=message):
+        resolve_provider_connection_config(
+            broker_id,
+            settings=_settings(**overrides),
+        )
 
 
 def test_provider_usage_programs_use_real_session_helper() -> None:

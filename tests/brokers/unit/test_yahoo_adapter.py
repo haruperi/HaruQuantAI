@@ -5,8 +5,6 @@ from datetime import UTC, datetime
 
 import pytest
 from app.services.brokers.contracts import (
-    BrokerCapability,
-    BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerConnectionState,
     BrokerEnvironment,
@@ -31,21 +29,6 @@ def _config(**overrides: object) -> BrokerConnectionConfig:
     }
     values.update(overrides)
     return BrokerConnectionConfig(**values)  # type: ignore[arg-type]
-
-
-def _capabilities() -> dict[BrokerCapabilityId, BrokerCapability]:
-    return {
-        operation: BrokerCapability(
-            capability=operation,
-            implementation_status="IMPLEMENTED",
-            availability="AVAILABLE",
-            access_mode="READ",
-            requirement="NONE",
-            verification_status="NOT_TESTED",
-            execution_model="TEST_DOUBLE",
-        )
-        for operation in BrokerCapabilityId
-    }
 
 
 class _FakeTransport:
@@ -162,3 +145,18 @@ def test_adapter_maps_canonical_h1_to_yfinance_interval() -> None:
 
     asyncio.run(exercise())
     assert transport.requested_timeframes == ["1h"]
+
+
+def test_adapter_platform_info_is_explicitly_research_only() -> None:
+    """Platform metadata exposes the provider and research-only posture."""
+    adapter = YahooBrokerAdapter(_config(), transport=_FakeTransport())
+    adapter._ENFORCE_DECLARED_AVAILABILITY = False
+    adapter._state = BrokerConnectionState.READY
+
+    async def exercise() -> None:
+        result = await adapter.get_platform_info()
+        assert result.data is not None
+        assert result.data.provider_name == "Yahoo Finance"
+        assert result.data.endpoint_metadata["research_only"] is True
+
+    asyncio.run(exercise())

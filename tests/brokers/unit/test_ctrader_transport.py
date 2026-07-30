@@ -54,6 +54,18 @@ def test_transport_requires_connection_before_sending() -> None:
     asyncio.run(exercise())
 
 
+def test_transport_without_sender_fails_closed() -> None:
+    """A transport with no authenticated sender never reports connected."""
+    transport = _CTraderTransport(_config())
+
+    async def exercise() -> None:
+        assert not transport.connected
+        assert not await transport.connect()
+        assert not transport.connected
+
+    asyncio.run(exercise())
+
+
 def test_transport_rejects_unexpected_response_type() -> None:
     """A response of the wrong protobuf type is never accepted."""
 

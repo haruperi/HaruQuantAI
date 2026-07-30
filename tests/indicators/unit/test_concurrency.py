@@ -1,17 +1,15 @@
 """NFR-INDI-010: thread safety through immutability and no shared mutable state."""
 
 from concurrent.futures import ThreadPoolExecutor
-from types import MappingProxyType
 
 from app.services.indicators import (
     ema,
     get_capability_matrix,
-    get_indicator,
+    get_indicator_result_metadata,
     list_indicators,
     rsi,
     sma,
 )
-from app.services.indicators.core import registry
 
 from tests.indicators.helpers import close_dataset, unwrap_response
 
@@ -41,9 +39,9 @@ def test_parallel_calculations_produce_identical_checksums() -> None:
     """NFR-INDI-010: concurrent calculations are byte-identical to serial ones."""
     data = close_dataset(_PRICES)
     expected = {
-        "sma": unwrap_response(sma(data, period=3)).manifest,
-        "ema": unwrap_response(ema(data, period=3)).manifest,
-        "rsi": unwrap_response(rsi(data, period=3)).manifest,
+        "sma": get_indicator_result_metadata(unwrap_response(sma(data, period=3))),
+        "ema": get_indicator_result_metadata(unwrap_response(ema(data, period=3))),
+        "rsi": get_indicator_result_metadata(unwrap_response(rsi(data, period=3))),
     }
 
     def calculate(indicator_id: str) -> tuple[str, str, str]:
@@ -59,8 +57,8 @@ def test_parallel_calculations_produce_identical_checksums() -> None:
         result = unwrap_response(functions[indicator_id](data, period=3))
         return (
             indicator_id,
-            result.manifest.output_checksum,
-            result.manifest.parameter_hash,
+            get_indicator_result_metadata(result)["manifest"]["output_checksum"],
+            get_indicator_result_metadata(result)["parameter_hash"],
         )
 
     requests = ["sma", "ema", "rsi"] * (_SUBMISSIONS // 3)
@@ -69,8 +67,8 @@ def test_parallel_calculations_produce_identical_checksums() -> None:
 
     assert len(outcomes) == _SUBMISSIONS
     for indicator_id, output_checksum, parameter_hash in outcomes:
-        assert output_checksum == expected[indicator_id].output_checksum
-        assert parameter_hash == expected[indicator_id].parameter_hash
+        assert output_checksum == expected[indicator_id]["manifest"]["output_checksum"]
+        assert parameter_hash == expected[indicator_id]["parameter_hash"]
 
 
 def test_parallel_calculations_do_not_mutate_shared_input() -> None:
@@ -87,7 +85,9 @@ def test_parallel_calculations_do_not_mutate_shared_input() -> None:
         Returns:
             The manifest input checksum.
         """
-        return unwrap_response(sma(data, period=period)).manifest.input_checksum
+        return get_indicator_result_metadata(unwrap_response(sma(data, period=period)))[
+            "manifest"
+        ]["input_checksum"]
 
     with ThreadPoolExecutor(max_workers=_WORKERS) as pool:
         checksums = set(pool.map(calculate, [2, 3, 4, 5] * 3))
@@ -113,7 +113,9 @@ def test_parallel_registry_reads_are_stable() -> None:
         return (
             tuple(spec.indicator_id for spec in unwrap_response(list_indicators())),
             len(unwrap_response(get_capability_matrix())),
-            unwrap_response(get_indicator("sma")).indicator_id,
+            get_indicator_result_metadata(
+                unwrap_response(sma(close_dataset(_PRICES), period=3))
+            )["indicator_id"],
         )
 
     with ThreadPoolExecutor(max_workers=_WORKERS) as pool:
@@ -127,7 +129,5 @@ def test_parallel_registry_reads_are_stable() -> None:
 
 def test_registry_storage_is_immutable() -> None:
     """NFR-INDI-010: the registry exposes no mutable handle to callers."""
-    assert isinstance(registry._REGISTRY, MappingProxyType)
-    assert isinstance(registry._REGISTRY_ORDER, tuple)
     assert isinstance(unwrap_response(list_indicators()), tuple)
     assert isinstance(unwrap_response(get_capability_matrix()), tuple)

@@ -95,6 +95,35 @@ class StrategyRegistrationRequest(_Contract):
         logger.debug("Validating Strategy registration time")
         return _utc(value)
 
+    @field_validator("config_schema", mode="after")
+    @classmethod
+    def _freeze_registration_schema(
+        cls, value: Mapping[str, JsonValue]
+    ) -> Mapping[str, JsonValue]:
+        """Freeze the duplicated declarative registration schema.
+
+        Args:
+            value: Registration schema matching the immutable manifest.
+
+        Returns:
+            Detached immutable schema.
+        """
+        return cast("Mapping[str, JsonValue]", _freeze_json(value))
+
+    @field_serializer("config_schema", when_used="always")
+    def _serialize_registration_schema(
+        self, value: Mapping[str, JsonValue]
+    ) -> dict[str, object]:
+        """Serialize the immutable registration schema.
+
+        Args:
+            value: Frozen declarative schema.
+
+        Returns:
+            Detached ordinary mapping.
+        """
+        return cast("dict[str, object]", _thaw_json(value))
+
     @model_validator(mode="after")
     def _validate_registration_identity(self) -> StrategyRegistrationRequest:
         """Require request identity to match its immutable manifest.
@@ -201,7 +230,7 @@ class StrategyParameterUpdateRequest(_Contract):
             raise ValueError("parameter update cannot contain executable content")
         return frozen
 
-    @field_serializer("parameters", when_used="json")
+    @field_serializer("parameters", when_used="always")
     def _serialize_update_parameters(
         self, value: Mapping[str, JsonValue]
     ) -> dict[str, object]:

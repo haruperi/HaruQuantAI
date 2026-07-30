@@ -18,13 +18,26 @@ _USAGE_SCRIPTS = (
     "08_event.py",
     "09_signals.py",
     "10_strategy_library.py",
+    "11_proposal_intake.py",
 )
 _SIGNAL_SCRIPTS = {"10_strategy_library.py"}
-_UNAVAILABLE_EXIT = 3
+_EXPECTED_OUTPUT = {
+    "01_contracts.py": "STRATEGY CONTRACTS",
+    "02_diagnostics.py": "Public value-factory round trip: True",
+    "03_registry.py": "Publication pending: False",
+    "04_intents.py": "Complete proposal:",
+    "05_replay.py": "Complete replay manifest:",
+    "06_checkpoints.py": "Restored local state:",
+    "07_vectorized.py": "Atomic ordered intent batch",
+    "08_event.py": "Committed local state:",
+    "09_signals.py": "Official RSI evidence:",
+    "10_strategy_library.py": "Evaluated strategies with real evidence: 7/7",
+    "11_proposal_intake.py": "Evaluated proposal result:",
+}
 
 
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)
-def test_strategy_usage_script_executes_or_reports_unavailable(
+def test_strategy_usage_script_executes_with_genuine_evidence(
     script_name: str,
     tmp_path: Path,
 ) -> None:
@@ -43,8 +56,11 @@ def test_strategy_usage_script_executes_or_reports_unavailable(
     environment["ENVIRONMENT"] = "test"
     environment["DATA_DIR"] = str(state_root)
     environment["DATABASE_URL"] = "sqlite:///strategy_usage.sqlite3"
+    environment["SQLITE_BUSY_TIMEOUT_SECONDS"] = "1"
+    environment["WRITE_LOCK_LEASE_SECONDS"] = "30"
     environment["LOG_DIRECTORY"] = str(state_root / "logs")
     environment["LOG_FILE_PATH"] = str(state_root / "logs" / "strategy.log")
+    environment["STRATEGY_AUDIT_BARS"] = "1"
     completed = subprocess.run(  # noqa: S603 - fixed repository script list.
         [sys.executable, str(usage_directory / script_name)],
         check=False,
@@ -52,16 +68,15 @@ def test_strategy_usage_script_executes_or_reports_unavailable(
         text=True,
         cwd=Path(__file__).parents[3],
         env=environment,
-        timeout=120,
+        timeout=180,
     )
-    if completed.returncode == _UNAVAILABLE_EXIT:
-        pytest.skip(f"{script_name}: required real evidence is unavailable")
     assert completed.returncode == 0, (
         f"{script_name} failed\n"
         f"stdout:\n{completed.stdout}\n"
         f"stderr:\n{completed.stderr}"
     )
     assert completed.stdout.strip(), f"{script_name} produced no visible output"
+    assert _EXPECTED_OUTPUT[script_name] in completed.stdout
     if script_name in _SIGNAL_SCRIPTS:
         assert "active=" in completed.stdout
         assert "Evaluated" in completed.stdout

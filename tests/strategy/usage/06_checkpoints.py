@@ -7,19 +7,20 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from app.services.data import run_data_migrations
 from app.services.strategy import (
-    StrategyCheckpoint,
-    StrategyEnvironment,
-    StrategyLifecycleStatus,
-    StrategyManifest,
-    StrategyTimingPolicy,
-    StrategyValidationPolicy,
-    ValidatedStrategyConfig,
-    ValidatedStrategyRef,
     create_strategy_checkpoint,
+    create_strategy_checkpoint_value,
+    create_strategy_manifest,
+    create_strategy_validation_policy,
+    create_validated_strategy_config,
+    create_validated_strategy_ref,
+    get_strategy_environment,
+    get_strategy_lifecycle_status,
+    get_strategy_timing_policy,
     validate_strategy_checkpoint,
 )
-from app.utils import AuthContext
+from app.utils import create_auth_context
 
 _UNAVAILABLE = 3
 _HASH = "d" * 64
@@ -37,7 +38,7 @@ def _header(title: str) -> None:
 def fr_str_028() -> None:
     """Demonstrate the bounded checkpoint contract."""
     _header("Demonstrate the bounded checkpoint contract.")
-    assert StrategyCheckpoint.model_fields["state_checksum"]
+    assert callable(create_strategy_checkpoint_value)
 
 
 def fr_str_030() -> None:
@@ -52,13 +53,15 @@ def fr_str_031() -> None:
     assert callable(validate_strategy_checkpoint)
 
 
-def _binding() -> tuple[ValidatedStrategyRef, ValidatedStrategyConfig]:
+def _binding() -> tuple[
+    create_validated_strategy_ref, create_validated_strategy_config
+]:
     """Build the validated reference and configuration pair.
 
     Returns:
         The exact validated reference and configuration.
     """
-    policy = StrategyValidationPolicy(
+    policy = create_strategy_validation_policy(
         policy_version="usage-v1",
         approved_module_roots=("app.services.strategy.evaluators",),
         max_config_payload_bytes=4_096,
@@ -66,7 +69,7 @@ def _binding() -> tuple[ValidatedStrategyRef, ValidatedStrategyConfig]:
         max_config_string_length=128,
         max_config_collection_items=64,
     )
-    manifest = StrategyManifest(
+    manifest = create_strategy_manifest(
         strategy_id="usage-replay-strategy",
         strategy_version="1.0.0",
         module_path="app.services.strategy.evaluators.naive_ma_trend",
@@ -76,8 +79,8 @@ def _binding() -> tuple[ValidatedStrategyRef, ValidatedStrategyConfig]:
         config_schema={"type": "object"},
         required_data=("EURUSD:H1",),
         required_indicators=("sma",),
-        timing_policy=StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE,
-        permitted_environments=(StrategyEnvironment.RESEARCH,),
+        timing_policy=get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE"),
+        permitted_environments=(get_strategy_environment("RESEARCH"),),
         source_hash=_HASH,
         artifact_hash=_HASH,
         dependency_hash=_HASH,
@@ -90,17 +93,17 @@ def _binding() -> tuple[ValidatedStrategyRef, ValidatedStrategyConfig]:
         max_local_state_bytes=8_192,
         decision_timeout_seconds=5,
     )
-    ref = ValidatedStrategyRef(
+    ref = create_validated_strategy_ref(
         manifest=manifest,
-        lifecycle_status=StrategyLifecycleStatus.APPROVED,
-        environment=StrategyEnvironment.RESEARCH,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
+        environment=get_strategy_environment("RESEARCH"),
         policy_version=policy.policy_version,
         validation_policy=policy,
         registry_record_hash=_HASH,
         request_id=_REQUEST,
         correlation_id=_CORRELATION,
     )
-    config = ValidatedStrategyConfig(
+    config = create_validated_strategy_config(
         strategy_id=manifest.strategy_id,
         strategy_version=manifest.strategy_version,
         config_schema_version="v1",
@@ -119,7 +122,7 @@ def main() -> int:
         ``0`` on success, or ``3`` when the configured Strategy store is closed.
     """
     print("\nSTRATEGY LOCAL CHECKPOINTS")
-    print("Contract:", StrategyCheckpoint.__name__)
+    print("Contract:", create_strategy_checkpoint_value.__name__)
     fr_str_028()
     fr_str_030()
     fr_str_031()
@@ -130,8 +133,14 @@ def main() -> int:
         )
         return _UNAVAILABLE
 
+    migrated = run_data_migrations(_REQUEST)
+    if migrated.data is None:
+        print("Data migration prerequisite unavailable:", migrated.error)
+        return _UNAVAILABLE
+    print("Data migration prerequisite:", migrated.status, migrated.data)
+
     ref, config = _binding()
-    auth = AuthContext(
+    auth = create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="usage-principal",
@@ -152,9 +161,11 @@ def main() -> int:
         print("Checkpoint creation failed:", created.error)
         return _UNAVAILABLE
     checkpoint = created.data
+    reconstructed = create_strategy_checkpoint_value(**checkpoint.model_dump())
     print("Checkpoint ID:", checkpoint.checkpoint_id)
     print("State checksum:", checkpoint.state_checksum)
     print("Payload bytes:", checkpoint.payload_bytes)
+    print("Public value-factory round trip:", reconstructed == checkpoint)
 
     restored = validate_strategy_checkpoint(checkpoint, ref, config, auth)
     if restored.data is None:

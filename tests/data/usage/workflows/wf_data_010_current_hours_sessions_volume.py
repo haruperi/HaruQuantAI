@@ -10,16 +10,18 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
+    build_data_settings,
     build_market_hours_request,
     build_volume_request,
     build_weekly_schedule_definition,
     build_weekly_schedule_provider,
+    data_settings_context,
     get_historical_volume,
     get_market_hours,
+    run_data_migrations,
     unwrap_data_response,
 )
 from app.utils import generate_id
-from tests.data.usage.workflows._support import isolated_runtime
 
 WORKFLOW_ID = "WF-DATA-010"
 STAGES = (
@@ -44,7 +46,25 @@ def main() -> None:
 
     with tempfile.TemporaryDirectory(prefix="wf-data-010-") as directory:
         root = Path(directory)
-        with isolated_runtime(root):
+        (root / "data" / "raw").mkdir(parents=True, exist_ok=True)
+        settings = build_data_settings(
+            database_url="sqlite:///workflow.sqlite3",
+            data_dir=root,
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
+            approved_storage_roots=(
+                Path("raw"),
+                Path("processed"),
+                Path("data"),
+                Path("data/raw"),
+                Path("data/processed"),
+            ),
+            data_provider_sources=("mt5",),
+            data_raw_root=Path("data/raw"),
+        )
+        with data_settings_context(settings):
+            run_data_migrations(generate_id("req"))
+
             # Stage 1 — Declare an explicit revisioned EURUSD weekly schedule.
             _stage(1)
             provider = build_weekly_schedule_provider(

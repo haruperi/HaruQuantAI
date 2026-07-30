@@ -59,7 +59,10 @@ async def run() -> None:
         )
         data = get_broker_value_field(account_res, "data")
         if data is not None:
-            print("Account ID:", get_broker_value_field(data, "account_id"))
+            print(
+                "Account reference:",
+                get_broker_value_field(data, "account_reference_redacted"),
+            )
             print("Account Currency:", get_broker_value_field(data, "currency"))
         require_success("Permissions", await get_broker_permissions(adapter))
 

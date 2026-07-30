@@ -6,10 +6,10 @@ import hashlib
 from typing import Any
 
 from app.services.data import (
-    DataError,
-    StatementPlan,
-    TransactionRequest,
+    build_statement_plan,
+    build_transaction_request,
     execute_transaction,
+    is_data_error,
 )
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.outcomes import (
@@ -109,8 +109,8 @@ def register_strategy_version(
             return success(existing.model_copy(update={"status": "IDEMPOTENT"}))
         unwrap_data_response(
             execute_transaction(
-                TransactionRequest(
-                    plan=StatementPlan(
+                build_transaction_request(
+                    plan=build_statement_plan(
                         statements=(
                             "INSERT INTO strategy_versions (strategy_id, "
                             "strategy_version, manifest_json, lifecycle_status, "
@@ -140,14 +140,6 @@ def register_strategy_version(
             ),
             operation="data.execute_transaction.strategy_registry_mutation",
         )
-    except DataError as error:
-        logger.warning("Strategy registration persistence outcome: %s", error.code)
-        if error.code == "DB_WRITE_FAILED":
-            return success(
-                _rejected_registration(
-                    request, "IMMUTABLE_VERSION_EXISTS", auth.workflow_id
-                )
-            )
     except StrategyOperationError as error:
         logger.warning("Strategy registration response failure")
         if error.details.get("upstream_code") == "DB_WRITE_FAILED":
@@ -157,6 +149,17 @@ def register_strategy_version(
                 )
             )
         raise
+    except Exception as error:
+        if not is_data_error(error):
+            raise
+        error_code = getattr(error, "code", None)
+        logger.warning("Strategy registration persistence outcome: %s", error_code)
+        if error_code == "DB_WRITE_FAILED":
+            return success(
+                _rejected_registration(
+                    request, "IMMUTABLE_VERSION_EXISTS", auth.workflow_id
+                )
+            )
     return success(_publish_mutation(mutation, request.command_id, auth))
 
 

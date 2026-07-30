@@ -12,6 +12,7 @@ from app.services.data import (
     aggregate_ticks_to_bars,
     align_multitimeframe_data,
     build_availability_request,
+    build_data_quality_report,
     build_data_response,
     build_data_settings,
     build_dataset_save_request,
@@ -19,18 +20,24 @@ from app.services.data import (
     build_feed_status_request,
     build_fx_conversion_request,
     build_fx_rate_leg,
+    build_local_market_data_source,
     build_market_context_evidence,
     build_market_context_request,
     build_market_data_request,
+    build_market_dataset,
     build_market_schedule,
+    build_ohlcv_record,
     build_raw_feed_event,
     build_reconnect_policy,
     build_schedule_request,
     build_session_window,
     build_source_descriptor,
+    build_source_identity,
     build_source_license_policy,
+    build_source_policy_config,
     build_source_promotion_request,
     build_symbol_list_request,
+    build_symbol_metadata,
     build_symbol_metadata_request,
     build_synthetic_request,
     data_settings_context,
@@ -49,6 +56,7 @@ from app.services.data import (
     promote_source,
     read_feed_status,
     register_source,
+    register_source_policy,
     resample_ohlcv,
     run_data_migrations,
     save_dataset,
@@ -58,7 +66,134 @@ from app.services.data import (
 )
 from app.utils import create_auth_context, generate_id
 
-from tests.data.helpers import make_dataset, register_local_test_source
+START = datetime(2026, 1, 1, tzinfo=UTC)
+END = START + timedelta(minutes=1)
+AVAILABLE = END + timedelta(seconds=1)
+
+
+def make_bar(timestamp=START):
+    """Return one exact canonical OHLCV record."""
+    return build_ohlcv_record(
+        timestamp=timestamp,
+        open=Decimal("10.0"),
+        high=Decimal("11.0"),
+        low=Decimal("9.0"),
+        close=Decimal("10.5"),
+        volume=Decimal(100),
+        price_unit="USD",
+        volume_unit="shares",
+        source="fixture",
+        source_symbol="ABC",
+        source_revision="rev-1",
+        available_at=timestamp + timedelta(seconds=1),
+    )
+
+
+def make_quality(count=1):
+    """Return passing bounded quality evidence."""
+    return build_data_quality_report(
+        quality_status="passed",
+        quality_score=Decimal(1),
+        issues=(),
+        warnings=(),
+        record_count=count,
+        checked_count=count,
+        truncated=False,
+        sample_limit=10,
+        schema_version="v1",
+        generated_at=AVAILABLE,
+    )
+
+
+def make_dataset():
+    """Return one immutable provider-neutral market dataset."""
+    bar = make_bar()
+    return build_market_dataset(
+        normalization_version="v1",
+        data_kind="bars",
+        symbol="ABC",
+        timeframe="1m",
+        records=(bar,),
+        start=START,
+        end=START,
+        available_at=AVAILABLE,
+        record_count=1,
+        quality_report=make_quality(),
+        source_metadata={"source": "fixture"},
+        license_metadata={"status": "approved"},
+        cache_status="miss",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
+    )
+
+
+def register_local_test_source(raw_root, symbols, source_id="local_csv"):
+    """Register one explicitly rooted local source with complete test policy."""
+    request_id = generate_id("req")
+    metadata = {
+        symbol: build_symbol_metadata(
+            canonical_symbol=symbol,
+            provider_symbol=symbol,
+            asset_class="equity",
+            quote_currency="USD",
+            timezone="UTC",
+            source_id=source_id,
+            revision="metadata-v1",
+            retrieved_at=AVAILABLE,
+            missing_fields=("base_currency", "digits", "price_step", "quantity_step"),
+            request_id=request_id,
+        )
+        for symbol in symbols
+    }
+    identities = tuple(
+        build_source_identity(
+            source_id=source_id,
+            canonical_symbol=symbol,
+            friendly_name=symbol,
+            provider_symbol=symbol,
+            mapping_revision="mapping-v1",
+            provenance={"fixture": "explicit"},
+            request_id=request_id,
+        )
+        for symbol in symbols
+    )
+    descriptor = build_source_descriptor(
+        source_id=source_id,
+        readiness="production",
+        capabilities=("bars", "ticks", "spreads"),
+        requires_credentials=False,
+        requires_network=False,
+        supports_writes=False,
+        schema_version="v1",
+        timezone="UTC",
+        revision="source-v1",
+        license_policy=build_source_license_policy(
+            source_id=source_id,
+            status="approved",
+            permitted_workflows=("backtest", "research", "risk", "validation"),
+            export_allowed=True,
+            attribution_required=False,
+        ),
+        identity_mapping_revision="mapping-v1",
+        promotion_evidence=("fixture",),
+    )
+    register_source(
+        descriptor,
+        lambda: build_local_market_data_source(
+            source_id=source_id, raw_root=raw_root, metadata=metadata
+        ),
+        identities,
+    )
+    register_source_policy(
+        build_source_policy_config(
+            source_id=source_id,
+            rate_limit=1_000,
+            rate_window_seconds=60,
+            breaker_failure_threshold=3,
+            breaker_recovery_seconds=60,
+        )
+    )
 
 
 def _unwrap(response):
@@ -85,8 +220,8 @@ class _ContextProvider:
 
     def get_market_context(
         self,
-        request: MarketContextRequest,
-    ) -> MarketContextEvidence:
+        request: object,
+    ) -> object:
         """Return fresh evidence for the requested symbol."""
         return build_data_response(
             operation="data.evidence.get_market_context_evidence",
@@ -122,7 +257,7 @@ class _FXProvider:
         target_currency: str,
         as_of: datetime,
         request_id: str,
-    ) -> FXRateLeg:
+    ) -> object:
         """Return the requested direct conversion evidence."""
         return build_data_response(
             operation="data.evidence.get_fx_conversion_evidence",
@@ -151,7 +286,7 @@ class _Calendar:
         timezone: str,
         observed_at: datetime,
         request_id: str,
-    ) -> MarketSchedule:
+    ) -> object:
         """Return one authoritative current session."""
         window = build_session_window(
             label="open",
@@ -173,7 +308,7 @@ class _Calendar:
 def runtime(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
-) -> DataSettings:
+) -> object:
     """Return isolated migrated runtime settings and empty volatile registries."""
     for target in (
         "app.services.data.sources.registry._registry",
@@ -192,7 +327,7 @@ def runtime(
     )
 
 
-def _descriptor(source_id: str, *, readiness: str) -> SourceDescriptor:
+def _descriptor(source_id: str, *, readiness: str) -> object:
     """Return one bounded source descriptor for runtime workflow tests."""
     return build_source_descriptor(
         source_id=source_id,
@@ -217,7 +352,7 @@ def _descriptor(source_id: str, *, readiness: str) -> SourceDescriptor:
 
 
 def test_wf_data_008_persists_ingests_and_reads_feed_status(
-    runtime: DataSettings,
+    runtime: object,
 ) -> None:
     """Start a deterministic feed, ingest an event, and read persisted status."""
     request_id = generate_id("req")
@@ -270,7 +405,7 @@ def test_wf_data_008_persists_ingests_and_reads_feed_status(
 
 
 def test_wf_data_011_persists_audited_reversible_promotion(
-    runtime: DataSettings,
+    runtime: object,
 ) -> None:
     """Promote and demote a source through authenticated durable transitions."""
     request_id = generate_id("req")
@@ -441,7 +576,7 @@ def test_wf_data_004_005_and_016_transform_generate_and_derive() -> None:
 
 
 def test_wf_data_009_discovers_metadata_and_measures_local_availability(
-    runtime: DataSettings,
+    runtime: object,
 ) -> None:
     """Use one real local artifact for discovery, metadata, and availability."""
     request_id = generate_id("req")
@@ -543,7 +678,7 @@ def test_wf_data_009_discovers_metadata_and_measures_local_availability(
 
 
 def test_wf_data_010_returns_configured_utc_market_hours(
-    runtime: DataSettings,
+    runtime: object,
 ) -> None:
     """Compose a local source and return its normalized UTC hours."""
     assert runtime.data_dir is not None

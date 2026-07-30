@@ -2,19 +2,20 @@
 
 from __future__ import annotations
 
-from typing import TypeVar
+from typing import Any, TypeVar
 
-from app.services.data import MarketDataset, unwrap_data_response
-from app.utils import StandardResponse
+from app.services.data import to_ohlcv_dataframe, unwrap_data_response
+from app.services.indicators import get_indicator_result_values
 
 _ResponseT = TypeVar("_ResponseT")
+MarketDataset = Any
+StandardResponse = Any
 
 
 def unwrap_indicator_response(response: StandardResponse[_ResponseT]) -> _ResponseT:
     """Return successful Indicators data or fail with its safe error message."""
     if response.status != "success" or response.data is None:
-        error = response.error
-        detail = error.message if error is not None else "unknown indicator failure"
+        detail = response.message or "unknown indicator failure"
         raise RuntimeError(detail)
     return response.data
 
@@ -30,4 +31,39 @@ def unwrap_market_data_response(
     )
 
 
-__all__ = ["unwrap_indicator_response", "unwrap_market_data_response"]
+def print_market_evidence(dataset: MarketDataset, *, rows: int = 8) -> None:
+    """Print bounded genuine OHLCV rows and their source provenance."""
+    response = to_ohlcv_dataframe(dataset)
+    frame = unwrap_data_response(
+        response,
+        operation="indicators.usage.to_ohlcv_dataframe",
+        request_id=response.metadata.request_id,
+    )
+    provider = dataset.source_metadata.get(
+        "source_id",
+        dataset.source_metadata.get("provider", "unknown"),
+    )
+    print(
+        f"Genuine input ({provider}, {dataset.symbol} {dataset.timeframe}, "
+        f"{dataset.record_count} rows):"
+    )
+    print(frame.tail(rows).to_string())
+
+
+def print_indicator_evidence(
+    result: object,
+    *,
+    label: str = "Calculated indicator rows",
+    rows: int = 8,
+) -> None:
+    """Print bounded calculated values with availability and quality evidence."""
+    print(f"{label}:")
+    print(get_indicator_result_values(result).tail(rows).to_string())
+
+
+__all__ = [
+    "print_indicator_evidence",
+    "print_market_evidence",
+    "unwrap_indicator_response",
+    "unwrap_market_data_response",
+]

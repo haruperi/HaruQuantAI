@@ -5,7 +5,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import DataError, MarketDataset, get_market_data
+from typing import Any
+
+from app.services.data import get_market_data
 from app.services.indicators import (
     adr,
     atr,
@@ -14,10 +16,13 @@ from app.services.indicators import (
 )
 
 from tests.indicators.usage._support import (
+    print_indicator_evidence,
+    print_market_evidence,
     unwrap_indicator_response,
     unwrap_market_data_response,
 )
 
+MarketDataset = Any
 _CACHE: dict[str, MarketDataset] = {}
 
 
@@ -36,7 +41,7 @@ def _dataset(timeframe: str) -> MarketDataset:
         A normalized real market dataset.
 
     Raises:
-        DataError: If the configured source is unavailable.
+        RuntimeError: If the configured source is unavailable.
     """
     if timeframe not in _CACHE:
         _CACHE[timeframe] = unwrap_market_data_response(
@@ -56,7 +61,7 @@ def fr_indi_018() -> None:
         "FR-INDI-018: The system shall calculate non-negative ATR for one validated `MarketDataset v1` using the approved true-range/smoothing/seed contract, preserve gap and warmup semantics, and return causal metadata without input mutation."
     )
     result = unwrap_indicator_response(atr(_dataset("M5"), period=2))
-    print("Result:", result.values["atr_2"].tolist())
+    print_indicator_evidence(result, label="ATR calculations")
 
 
 def fr_indi_019() -> None:
@@ -65,7 +70,7 @@ def fr_indi_019() -> None:
         "FR-INDI-019: The system shall calculate ADR for one validated D1 `MarketDataset v1` as the inclusive rolling mean of `high-low`, perform no timeframe aggregation, preserve warmup rows, and return deterministic availability and manifest metadata."
     )
     result = unwrap_indicator_response(adr(_dataset("D1"), period=2))
-    print("Result:", result.values["adr_2"].tolist())
+    print_indicator_evidence(result, label="ADR calculations")
 
 
 def fr_indi_020() -> None:
@@ -74,7 +79,7 @@ def fr_indi_020() -> None:
         "FR-INDI-020: The system shall calculate rolling volatility for one validated `MarketDataset v1` from `period` log returns using `ddof=1` and annualization 252, return the exact source-qualified output, treat constant prices as zero volatility, and return causal metadata."
     )
     result = unwrap_indicator_response(rolling_volatility(_dataset("M5"), period=2))
-    print("Result:", result.values["rolling_volatility_2"].tolist())
+    print_indicator_evidence(result, label="Rolling-volatility calculations")
 
 
 def fr_indi_026() -> None:
@@ -83,7 +88,7 @@ def fr_indi_026() -> None:
         "FR-INDI-026: The system shall calculate rolling sample standard deviation (`ddof=1`) for one validated `MarketDataset v1` over the selected price, return the exact source-qualified output, treat constant prices as zero, and expose causal metadata."
     )
     result = unwrap_indicator_response(standard_deviation(_dataset("M5"), period=2))
-    print("Result:", result.values["standard_deviation_2"].tolist())
+    print_indicator_evidence(result, label="Standard-deviation calculations")
 
 
 def main() -> None:
@@ -95,11 +100,13 @@ def main() -> None:
     try:
         _dataset("M5")
         _dataset("D1")
-    except DataError as unavailable:
+    except RuntimeError as unavailable:
         print(
             f"Skipping volatility examples: MT5 data unavailable ({unavailable.code})"
         )
         raise SystemExit(3) from None
+    print_market_evidence(_dataset("M5"))
+    print_market_evidence(_dataset("D1"))
     fr_indi_018()
     fr_indi_019()
     fr_indi_020()

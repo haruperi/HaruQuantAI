@@ -63,7 +63,7 @@ from app.services.brokers.contracts.models import (
     BrokerTick,
     BrokerTradingSession,
 )
-from app.utils.responses.models import StandardResponse
+from app.services.brokers.contracts.responses import StandardResponse
 
 
 @runtime_checkable

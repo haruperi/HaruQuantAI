@@ -3,12 +3,10 @@
 # ruff: noqa: PT018
 from datetime import timedelta
 
-from app.services.strategy import (
-    StrategyTimingPolicy,
-    VectorizedStrategyEvaluator,
-    run_vectorized_strategy_signals,
-)
-from app.utils import logger
+from app.services.strategy import run_vectorized_strategy_signals
+from app.services.strategy.contracts import StrategyTimingPolicy
+from app.services.strategy.vectorized import VectorizedStrategyEvaluator
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,
@@ -18,6 +16,8 @@ from tests.strategy.unit.test_models import (
     make_market,
     make_ref,
 )
+
+logger = get_logger(__name__)
 
 _BARS = (
     ("1.1000", "1.1010", "1.0990", "1.1005"),

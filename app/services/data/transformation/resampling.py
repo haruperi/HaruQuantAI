@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Deterministic higher-timeframe aggregation of canonical bars.
 
 Resampling only ever coarsens: a target finer than the source is rejected rather than

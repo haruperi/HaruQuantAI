@@ -3,16 +3,17 @@
 from datetime import UTC, datetime
 
 import pytest
-from app.services.strategy import StrategyMutationResult
-from app.utils import (
+from app.services.strategy.contracts import StrategyMutationResult
+from app.utils import generate_id, get_logger
+from app.utils.responses.models import (
     ResponseMetadata,
     RiskLevel,
     StandardError,
     StandardResponse,
-    generate_id,
-    logger,
 )
 from pydantic import ValidationError
+
+logger = get_logger(__name__)
 
 
 def _metadata() -> ResponseMetadata:

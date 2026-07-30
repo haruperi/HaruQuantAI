@@ -50,7 +50,7 @@ def main() -> None:
         "symbol": "EURUSD",
         "observed_at": datetime(2026, 7, 28, 12, 0, 0, tzinfo=UTC),
         "close": Decimal("1.08422"),
-        "api_key": "must-not-escape",
+        "api_key": "must-not-escape",  # pragma: allowlist secret
         "records": 512,
     }
 

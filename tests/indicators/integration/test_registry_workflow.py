@@ -3,20 +3,21 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data import (
-    DataQualityReport,
-    MarketDataset,
-    OHLCVRecord,
-)
 from app.services.indicators import (
-    IndicatorConfig,
+    build_indicator_config,
     get_capability_matrix,
     get_indicator,
     list_indicators,
     validate_indicator,
 )
 
-from tests.indicators.helpers import assert_error, unwrap_response
+from tests.indicators.helpers import (
+    DataQualityReport,
+    MarketDataset,
+    OHLCVRecord,
+    assert_error,
+    unwrap_response,
+)
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 _OFFICIAL_INDICATOR_IDS = frozenset(
@@ -125,7 +126,7 @@ def test_registry_discovers_and_validates_only_official_batch_indicators() -> No
     assert_error(get_indicator("macd"), "IND_UNSUPPORTED_INDICATOR")
 
     data = _dataset()
-    config = IndicatorConfig(
+    config = build_indicator_config(
         indicator_id="sma",
         parameters=(("period", 2),),
         source="close",

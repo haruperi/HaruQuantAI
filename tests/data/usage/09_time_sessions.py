@@ -1,3 +1,4 @@
+# ruff: noqa: BLE001, E402
 """Demonstrate FEAT-DATA-09 time, schedule, and session operations."""
 
 from __future__ import annotations

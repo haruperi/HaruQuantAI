@@ -6,6 +6,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
 from app.services.data.economic_calendar.restriction import (
     CALENDAR_STATE_BLACKOUT_AFTER,
@@ -48,9 +49,6 @@ def _event(
         source_url=None,
         updated_at=None,
     )
-
-
-from app.services.data.contracts.responses import unwrap_data_response
 
 
 def _unwrap(response):

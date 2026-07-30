@@ -3,16 +3,18 @@
 from collections.abc import Mapping
 
 import pytest
-from app.services.strategy import (
+from app.services.strategy import run_vectorized_strategy_signals
+from app.services.strategy.contracts import (
     StrategyExecutionResult,
     StrategyTimingPolicy,
-    run_vectorized_strategy_signals,
 )
-from app.utils import logger
+from app.utils import get_logger
 from pydantic import ValidationError
 
 from tests.strategy.unit.test_models import make_config, make_context, make_ref
 from tests.strategy.unit.test_vectorized_runner import Evaluator, _dataset
+
+logger = get_logger(__name__)
 
 
 def _result() -> StrategyExecutionResult:

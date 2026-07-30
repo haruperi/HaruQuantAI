@@ -9,8 +9,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import align_multitimeframe_data, unwrap_data_response
-from app.services.indicators import sma
-from tests.indicators.usage._support import unwrap_indicator_response
+from app.services.indicators import (
+    get_indicator_result_metadata,
+    get_indicator_result_values,
+    sma,
+)
+from tests.indicators.usage._support import (
+    print_indicator_evidence,
+    print_market_evidence,
+    unwrap_indicator_response,
+)
 from tests.indicators.usage.workflows._support import live_bars
 
 WORKFLOW_ID = "WF-INDI-TER"
@@ -36,13 +44,8 @@ def main() -> None:
     _stage(1)
     primary = live_bars("M1", 80)
     higher = live_bars("M5", 40)
-    print(
-        "Inputs:",
-        primary.timeframe,
-        primary.record_count,
-        higher.timeframe,
-        higher.record_count,
-    )
+    print_market_evidence(primary)
+    print_market_evidence(higher)
 
     # Stage 2: Data aligns to explicit decision timestamps.
     _stage(2)
@@ -63,18 +66,20 @@ def main() -> None:
     _stage(3)
     primary_result = unwrap_indicator_response(sma(aligned["primary"], period=5))
     higher_result = unwrap_indicator_response(sma(aligned["higher"], period=5))
+    print_indicator_evidence(primary_result, label="Primary-timeframe SMA rows")
+    print_indicator_evidence(higher_result, label="Higher-timeframe SMA rows")
     print(
         "Calculated:",
-        primary_result.manifest.source_timeframe,
-        higher_result.manifest.source_timeframe,
+        get_indicator_result_metadata(primary_result)["manifest"]["source_timeframe"],
+        get_indicator_result_metadata(higher_result)["manifest"]["source_timeframe"],
     )
 
     # Stage 4: Caller applies availability-aware decision qualification.
     _stage(4)
-    decision_time = primary_result.values["available_at"].iloc[-1]
-    qualified_higher = higher_result.values.loc[
-        higher_result.values["available_at"] <= decision_time
-    ]
+    primary_values = get_indicator_result_values(primary_result)
+    higher_values = get_indicator_result_values(higher_result)
+    decision_time = primary_values["available_at"].iloc[-1]
+    qualified_higher = higher_values.loc[higher_values["available_at"] <= decision_time]
     print("Qualified higher-timeframe rows:", len(qualified_higher))
 
     # Stage 5 — OUTPUT BOUNDARY: Return independent typed IndicatorResult values.

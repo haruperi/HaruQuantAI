@@ -1,3 +1,4 @@
+# ruff: noqa: BLE001
 """Demonstrate FEAT-DATA-02 market-data retrieval surface across all sources."""
 
 from __future__ import annotations
@@ -10,47 +11,27 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
     build_availability_request,
-    build_data_error,
+    build_data_settings,
     build_market_data_request,
     build_symbol_list_request,
     build_symbol_metadata_request,
+    data_settings_context,
     get_data_availability,
     get_market_data,
     get_symbol_metadata,
     get_tick_data,
     list_symbols,
+    run_data_migrations,
     to_ohlcv_dataframe,
     to_tick_dataframe,
 )
-
-DataError = build_data_error
-
-from app.services.data import (
-    build_data_error,
-)
-
-DataError = build_data_error
-
-from app.services.data import (
-    build_data_error,
-)
-
-DataError = build_data_error
-
-from app.utils import generate_id
-from app.utils.settings.models import AppSettings
+from app.utils import generate_id, load_broker_provider_settings
 
 _START = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
 _END = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
 _YAHOO_SESSION_START = datetime(2026, 6, 1, 13, 30, tzinfo=UTC)
 _YAHOO_SESSION_END = datetime(2026, 6, 1, 20, 0, tzinfo=UTC)
 _BINANCE_SOURCE = "binance_spot"
-
-
-class _MarketDataUsageSettings(AppSettings):
-    """Usage settings inheriting AppSettings to load .env configuration."""
-
-    data_usage_live_providers: str = ""
 
 
 def _header(title: str) -> None:
@@ -60,18 +41,17 @@ def _header(title: str) -> None:
 
 def _provider_opted_in(source_id: str) -> bool:
     """Return whether an external provider was explicitly enabled for this run."""
-    if source_id.casefold() == "mt5":
+    settings = load_broker_provider_settings()
+    field = {
+        "mt5": "mt5_enabled",
+        "ctrader": "ctrader_enabled",
+        "binance_spot": "binance_enabled",
+        "dukascopy": "dukascopy_enabled",
+        "yahoo": "yahoo_enabled",
+    }[source_id.casefold()]
+    if bool(getattr(settings, field)):
         return True
-    raw_setting = _MarketDataUsageSettings().data_usage_live_providers
-    enabled = {
-        item.strip().casefold() for item in raw_setting.split(",") if item.strip()
-    }
-    if "all" in enabled or "*" in enabled or source_id.casefold() in enabled:
-        return True
-    print(
-        f"Skipped {source_id}: set DATA_USAGE_LIVE_PROVIDERS={source_id} "
-        "only after verifying the effective target and credential authority."
-    )
+    print(f"Skipped {source_id}: provider is disabled in validated settings.")
     return False
 
 
@@ -306,14 +286,35 @@ def example_08_data_availability() -> None:
 
 def _demonstrate_feature() -> None:
     """Run all market data retrieval examples across sources."""
-    example_01_mt5_bars()
-    example_02_mt5_ticks()
-    example_03_dukascopy()
-    example_04_yahoo()
-    example_05_binance()
-    example_06_symbol_discovery()
-    example_07_symbol_metadata()
-    example_08_data_availability()
+    from tempfile import TemporaryDirectory
+
+    with TemporaryDirectory(prefix="usage-market-data-") as directory:
+        (Path(directory) / "data" / "raw").mkdir(parents=True, exist_ok=True)
+        settings = build_data_settings(
+            database_url="sqlite:///usage.sqlite3",
+            data_dir=Path(directory),
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
+            approved_storage_roots=(
+                Path("raw"),
+                Path("processed"),
+                Path("data"),
+                Path("data/raw"),
+                Path("data/processed"),
+            ),
+            data_provider_sources=("mt5",),
+            data_raw_root=Path("data/raw"),
+        )
+        with data_settings_context(settings):
+            run_data_migrations(generate_id("req"))
+            example_01_mt5_bars()
+            example_02_mt5_ticks()
+            example_03_dukascopy()
+            example_04_yahoo()
+            example_05_binance()
+            example_06_symbol_discovery()
+            example_07_symbol_metadata()
+            example_08_data_availability()
 
 
 _DEMONSTRATED = [False]

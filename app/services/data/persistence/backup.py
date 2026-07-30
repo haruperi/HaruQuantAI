@@ -347,7 +347,7 @@ def _create_backup_raw(targets: Sequence[BackupTarget]) -> BackupManifest:
     except OSError as error:
         if staging_directory.exists():
             shutil.rmtree(staging_directory, ignore_errors=True)
-        logger.error("DATA backup creation failed")
+        logger.exception("DATA backup creation failed")
         raise _error("DB_WRITE_FAILED", request_id, "create_backup") from error
     return manifest
 
@@ -548,7 +548,7 @@ def _commit_restore(
                 if existed:
                     rollback.unlink()
     except Exception as error:
-        logger.error("DATA backup restore failed; rolling back target files")
+        logger.exception("DATA backup restore failed; rolling back target files")
         _rollback_restore(committed, prepared)
         if isinstance(error, DataError):
             raise
@@ -771,7 +771,7 @@ def _purge_expired(
             )
             shutil.rmtree(quarantine)
     except Exception as error:
-        logger.error("DATA retention purge failed; restoring quarantined files")
+        logger.exception("DATA retention purge failed; restoring quarantined files")
         _rollback_retention(moved, quarantine)
         if isinstance(error, DataError):
             raise

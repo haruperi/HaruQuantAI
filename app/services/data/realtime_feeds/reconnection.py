@@ -1,3 +1,4 @@
+# ruff: noqa: ANN401
 """Bounded reconnection with exponential backoff for internal feeds.
 
 Retry is bounded and deliberate: a delay derived from the attempt count, capped, and
@@ -104,8 +105,8 @@ def reconnect_feed(
         )
     try:
         connected = reconnect()
-    except Exception:  # noqa: BLE001 - injected provider boundary.
-        logger.error("Injected feed reconnect failed")
+    except Exception:
+        logger.exception("Injected feed reconnect failed")
         connected = False
     if not connected:
         active.state = "failed"

@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Runtime enforcement of Data's read-only broker contract.
 
 ``NFR-DATA-006`` states that all Data broker access is read-only and that Data never

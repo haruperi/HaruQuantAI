@@ -4,42 +4,53 @@ from __future__ import annotations
 
 import sys
 import time
+from collections.abc import Iterator
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any
+from typing import Any, Protocol
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
     build_data_settings,
     build_market_data_request,
+    data_settings_context,
     generate_tick_series,
     generate_tick_series_to_parquet,
     get_market_data,
     get_tick_data,
+    run_data_migrations,
     to_ohlcv_dataframe,
     to_tick_dataframe,
 )
-from app.services.data.contracts.errors import DataError
 from app.utils import generate_id
 
 _START = datetime(2026, 1, 1, 12, 0, tzinfo=UTC)
 _END = datetime(2026, 6, 30, 12, 0, tzinfo=UTC)
 
 
+class _StorageSettings(Protocol):
+    """Storage fields required by the temporary-directory helper."""
+
+    approved_storage_roots: tuple[Path, ...]
+
+
+@contextmanager
+def _approved_temporary_directory(settings: _StorageSettings) -> Iterator[str]:
+    """Create a temporary directory beneath the first approved storage root."""
+    if not settings.approved_storage_roots:
+        raise RuntimeError("No approved storage root is configured")
+    root = settings.approved_storage_roots[0].expanduser().resolve()
+    root.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(prefix="usage-tick-derivation-", dir=root) as directory:
+        yield directory
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
-
-
-def _approved_temporary_directory(
-    settings: Any | None = None,
-) -> TemporaryDirectory[str]:
-    """Create an automatically cleaned directory under an approved Data root."""
-    approved_root = (settings or build_data_settings()).approved_storage_roots[0]
-    approved_root.mkdir(parents=True, exist_ok=True)
-    return TemporaryDirectory(dir=approved_root)
 
 
 def _print_header(title: str) -> None:
@@ -75,8 +86,8 @@ def _sample_bars(
             _print_quality(f"MT5 {timeframe} bars", response.data)
             return response.data
         return None
-    except DataError as exc:
-        print(f"MT5 example handled: {exc.code}")
+    except Exception as exc:  # noqa: BLE001 - public error classes stay internal.
+        print(f"MT5 example handled: {getattr(exc, 'code', type(exc).__name__)}")
         return None
 
 
@@ -102,8 +113,8 @@ def _sample_ticks() -> Any | None:
             _print_quality("MT5 ticks", response.data)
             return response.data
         return None
-    except DataError as exc:
-        print(f"MT5 Ticks example handled: {exc.code}")
+    except Exception as exc:  # noqa: BLE001 - public error classes stay internal.
+        print(f"MT5 Ticks example handled: {getattr(exc, 'code', type(exc).__name__)}")
         return None
 
 
@@ -198,8 +209,11 @@ def example_03_tick_model_ohlc_m1() -> None:
             print(f"Generated Ticks: {ticks.symbol} records={ticks.record_count}")
             _print_quality("Generated ohlc_m1 ticks", ticks)
             print(to_tick_dataframe(ticks))
-    except DataError as exc:
-        print(f"ohlc_m1 tick model handled: {exc.code}")
+    except Exception as exc:  # noqa: BLE001 - public error classes stay internal.
+        print(
+            "ohlc_m1 tick model handled:",
+            getattr(exc, "code", type(exc).__name__),
+        )
 
 
 def example_04_tick_model_real() -> None:
@@ -231,43 +245,64 @@ def example_04_tick_model_real() -> None:
             print(f"Generated Ticks: {ticks.symbol} records={ticks.record_count}")
             _print_quality("Standardized real ticks", ticks)
             print(to_tick_dataframe(ticks))
-    except DataError as exc:
-        print(f"real tick model handled: {exc.code}")
+    except Exception as exc:  # noqa: BLE001 - public error classes stay internal.
+        print(f"real tick model handled: {getattr(exc, 'code', type(exc).__name__)}")
 
 
-def example_05_stream_tick_series_to_parquet() -> None:
+def example_05_stream_tick_series_to_parquet(destination: Path | None = None) -> None:
     """Write a bounded generated tick series through the public Parquet API."""
     _header("Write a bounded generated tick series through the public Parquet API.")
     bars = _sample_bars(limit=5)
     if bars is None:
         return
 
-    with _approved_temporary_directory() as temporary_directory:
-        start_time = time.perf_counter()
-        dest_path = Path("data/raw/ticks.parquet")
-        res = generate_tick_series_to_parquet(
-            bars,
-            path=dest_path,
-            model="trading_bar",
-            trading_timeframe="H1",
+    start_time = time.perf_counter()
+    dest_path = destination or Path("data/raw/ticks.parquet")
+    res = generate_tick_series_to_parquet(
+        bars,
+        path=dest_path,
+        model="trading_bar",
+        trading_timeframe="H1",
+    )
+    end_time = time.perf_counter()
+    if res.status == "success" and res.data is not None:
+        metadata = res.data
+        record_count = metadata.get("rows", 0)
+        _print_generation_rate(record_count, end_time - start_time)
+        print(
+            f"Wrote Parquet artifact: path={metadata.get('path')} "
+            f"records={record_count}"
         )
-        end_time = time.perf_counter()
-        if res.status == "success" and res.data is not None:
-            metadata = res.data
-            _print_generation_rate(metadata.record_count, end_time - start_time)
-            print(
-                f"Wrote Parquet artifact: path={metadata.path} "
-                f"records={metadata.record_count} bytes={metadata.byte_size}"
-            )
 
 
 def fr_data_005() -> None:
     _print_header("FEAT-DATA-05 Tick Derivation Surface")
-    example_01_tick_model_trading_bar()
-    example_02_tick_model_generated()
-    example_03_tick_model_ohlc_m1()
-    example_04_tick_model_real()
-    example_05_stream_tick_series_to_parquet()
+    with TemporaryDirectory(prefix="usage-tick-derivation-") as directory:
+        (Path(directory) / "data" / "raw").mkdir(parents=True, exist_ok=True)
+        settings = build_data_settings(
+            database_url="sqlite:///usage.sqlite3",
+            data_dir=Path(directory),
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
+            approved_storage_roots=(
+                Path("raw"),
+                Path("processed"),
+                Path("data"),
+                Path("data/raw"),
+                Path("data/processed"),
+            ),
+            data_provider_sources=("mt5",),
+            data_raw_root=Path("data/raw"),
+        )
+        with data_settings_context(settings):
+            run_data_migrations(generate_id("req"))
+            example_01_tick_model_trading_bar()
+            example_02_tick_model_generated()
+            example_03_tick_model_ohlc_m1()
+            example_04_tick_model_real()
+            example_05_stream_tick_series_to_parquet(
+                Path(directory) / "data" / "raw" / "ticks.parquet"
+            )
 
 
 def main() -> None:

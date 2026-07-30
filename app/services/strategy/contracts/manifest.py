@@ -139,7 +139,7 @@ class StrategyManifest(_Contract):
             raise ValueError("provenance_refs must not be empty")
         return self
 
-    @field_serializer("config_schema", when_used="json")
+    @field_serializer("config_schema", when_used="always")
     def _serialize_schema(self, value: Mapping[str, JsonValue]) -> dict[str, object]:
         """Serialize frozen config schema.
 

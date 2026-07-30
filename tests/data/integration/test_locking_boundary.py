@@ -31,7 +31,8 @@ def test_lock_release_persists_inactive_owner_evidence(
     res = acquire_write_lock(
         target, "req-f345724aceae43e57c079d73e9f8e2f1352a047206a57df885838faef26d6bd9"
     )
-    assert res.status == "success" and res.data is not None
+    assert res.status == "success"
+    assert res.data is not None
     with res.data as lock:
         assert lock.expires_at_ns > 0
 

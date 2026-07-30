@@ -19,7 +19,7 @@ from app.services.brokers.contracts.responses import (
 from app.utils import utc_now
 
 if TYPE_CHECKING:
-    from app.utils.responses.models import StandardResponse
+    from app.services.brokers.contracts.responses import StandardResponse
 
 
 def _unsupported_result[T](

@@ -8,7 +8,16 @@ import time
 import types
 from collections.abc import Mapping
 from datetime import UTC, datetime
-from typing import Any, Literal, cast, get_args, get_origin, get_type_hints, override
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Literal,
+    cast,
+    get_args,
+    get_origin,
+    get_type_hints,
+    override,
+)
 
 from app.services.brokers.adapter_runtime.subscription import _BrokerSubscription
 from app.services.brokers.contracts import (
@@ -31,7 +40,11 @@ from app.utils import (
     generate_id,
     success_response,
 )
-from app.utils.responses.models import ResponseMetadata, StandardResponse
+
+if TYPE_CHECKING:
+    from app.services.brokers.contracts.responses import StandardResponse
+
+type ResponseMetadata = Any
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
@@ -44,6 +57,7 @@ _SUBSCRIPTION_OPERATIONS = {
 
 class FakeBrokerAdapter(_UnsupportedAdapterBase):
     """Isolated fixture/result adapter with per-operation error injection.
+
     The fake honours its supplied capability declaration exactly as a real
     adapter does: a fixture or injected error registered against a capability
     declared `UNAVAILABLE` never bypasses the fail-closed gate. Subscription
@@ -147,7 +161,7 @@ class FakeBrokerAdapter(_UnsupportedAdapterBase):
                     name="brokers.testing.publish",
                     start_time=start_time,
                 ),
-                catalog=BROKER_ERROR_CATALOG,
+                catalog=cast("Any", BROKER_ERROR_CATALOG),
             )
         accepted = await subscription.publish(event)
         return success_response(

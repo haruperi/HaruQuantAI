@@ -1,3 +1,4 @@
+# ruff: noqa: BLE001
 """Run isolated SQLite, artifact, cache, lock, migration, and audit examples."""
 
 import sys
@@ -15,7 +16,6 @@ from app.services.data import (
     build_cache_read_request,
     build_cache_write_request,
     build_column_mapping,
-    build_data_error,
     build_data_quality_report,
     build_data_settings,
     build_dataset_load_request,
@@ -45,36 +45,7 @@ from app.services.data import (
     save_dataset,
     save_market_data,
 )
-
-DataError = build_data_error
-
-from app.services.data import (
-    build_data_error,
-)
-
-DataError = build_data_error
-
-from app.services.data import (
-    build_data_error,
-)
-
-DataError = build_data_error
-
-from app.services.data import (
-    build_data_error,
-)
-
-DataError = build_data_error
-
-from app.services.data import (
-    build_data_error,
-)
-
-DataError = build_data_error
-
-from app.utils import create_auth_context, generate_id
-from app.utils.contracts.audit import AuditEvent
-from loguru import logger
+from app.utils import create_audit_event, create_auth_context, generate_id
 
 _OBSERVED_AT = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
 
@@ -88,15 +59,13 @@ def _header(title: str) -> None:
 
 def _configure_environment(root: Path) -> None:
     """Configure an isolated DATA persistence profile for this script."""
-    logger.info("Configuring isolated DATA storage under %s", root)
     for relative in ("data/raw", "data/processed", "data/cache", "artifacts/data"):
         (root / relative).mkdir(parents=True, exist_ok=True)
     run_data_migrations(generate_id("req"))
 
 
-def _quality() -> DataQualityReport:
+def _quality():
     """Build clean quality evidence for one persisted dataset."""
-    logger.info("Building storage example quality evidence")
     return build_data_quality_report(
         quality_status="passed",
         quality_score=Decimal(1),
@@ -111,9 +80,8 @@ def _quality() -> DataQualityReport:
     )
 
 
-def _dataset() -> MarketDataset:
+def _dataset():
     """Build a small realistic dataset for persistence examples."""
-    logger.info("Building storage example market dataset")
     records = tuple(
         build_ohlcv_record(
             timestamp=_OBSERVED_AT + timedelta(minutes=index),
@@ -350,7 +318,7 @@ def _example_fr_data_021() -> None:
     """Persist one audit event to the durable SQLite store."""
     _header("FR-DATA-021: persisting redacted audit evidence")
     req_id = generate_id("req")
-    event = AuditEvent(
+    event = create_audit_event(
         contract_version="v1",
         schema_id="utils.audit_event.v1",
         event_id=generate_id("evt"),
@@ -423,7 +391,13 @@ def _example_fr_data_105() -> None:
             data_dir=root,
             sqlite_busy_timeout_seconds=1.5,
             write_lock_lease_seconds=30,
-            approved_storage_roots=(root,),
+            approved_storage_roots=(
+                Path("raw"),
+                Path("processed"),
+                Path("data"),
+                Path("data/raw"),
+                Path("data/processed"),
+            ),
         )
         request = build_external_import_request(
             relative_path=Path("data/raw/EURUSD.csv"),
@@ -493,6 +467,14 @@ def _demonstrate_feature() -> None:
             data_dir=demo_root,
             sqlite_busy_timeout_seconds=1.5,
             write_lock_lease_seconds=30,
+            approved_storage_roots=(
+                Path("raw"),
+                Path("processed"),
+                Path("data"),
+                Path("data/raw"),
+                Path("data/processed"),
+            ),
+            data_raw_root=Path("data/raw"),
         )
         with data_settings_context(settings):
             _configure_environment(demo_root)

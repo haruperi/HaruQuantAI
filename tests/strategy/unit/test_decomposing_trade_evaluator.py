@@ -1,7 +1,7 @@
 """Decomposing Trade concrete signal tests."""
 
-from app.services.strategy import DecomposingTradeEvaluator
-from app.utils import logger
+from app.services.strategy.evaluators.decomposing_trade import DecomposingTradeEvaluator
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,
@@ -11,6 +11,8 @@ from tests.strategy.unit.test_models import (
     make_signal_config,
     make_signal_evidence,
 )
+
+logger = get_logger(__name__)
 
 
 def test_decomposing_trade_preserves_four_rsi_crossings() -> None:

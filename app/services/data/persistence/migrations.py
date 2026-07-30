@@ -312,7 +312,7 @@ def _initialize_ledger(domain: str, request_id: str) -> None:
             )
         )
     except DataError as error:
-        logger.error("Failed to initialize migration ledger")
+        logger.exception("Failed to initialize migration ledger")
         if error.code == "CONCURRENT_WRITE_LOCKED":
             raise
         details = {"domain": domain, "stage": "ledger_initialization"}
@@ -353,7 +353,7 @@ def _fetch_applied_migrations(domain: str, request_id: str) -> dict[str, str]:
             )
         )
     except DataError as error:
-        logger.error("Failed to query migration ledger")
+        logger.exception("Failed to query migration ledger")
         if error.code == "CONCURRENT_WRITE_LOCKED":
             raise
         details = {"domain": domain, "stage": "ledger_query"}
@@ -406,7 +406,7 @@ def _apply_step(step: MigrationStep, request_id: str) -> None:
             )
         )
     except DataError as error:
-        logger.error("Failed to execute migration step %s", step.migration_id)
+        logger.exception("Failed to execute migration step %s", step.migration_id)
         if error.code == "CONCURRENT_WRITE_LOCKED":
             raise
         details = {
@@ -443,7 +443,7 @@ def _run_domain_migrations_raw(request: MigrationRequest) -> MigrationResult:
     try:
         database_path = _resolve_database_path(get_data_settings())
     except OSError, ValueError:
-        logger.error("Database path resolution failed")
+        logger.exception("Database path resolution failed")
         details = {"operation": "run_domain_migrations", "stage": "configuration"}
         raise DataError(
             "DB_CONNECTION_ERROR",
@@ -454,7 +454,7 @@ def _run_domain_migrations_raw(request: MigrationRequest) -> MigrationResult:
     try:
         lock = _acquire_write_lock_raw(database_path, request.request_id)
     except DataError:
-        logger.error("Failed to acquire database write lock")
+        logger.exception("Failed to acquire database write lock")
         raise
 
     applied_ids: list[str] = []

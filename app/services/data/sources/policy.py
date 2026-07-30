@@ -132,7 +132,7 @@ def record_source_attempt(
             )
         )
     except DataError as error:
-        logger.error("Durable source-attempt persistence failed")
+        logger.exception("Durable source-attempt persistence failed")
         raise DataError(
             "DB_WRITE_FAILED",
             safe_details={"operation": "source_attempt"},

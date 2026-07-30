@@ -1,10 +1,15 @@
 """Registered-only evaluator security integration."""
 
-from app.services.strategy import StrategyTimingPolicy, run_vectorized_strategy_signals
-from app.utils import logger
+from app.services.strategy import (
+    get_strategy_timing_policy,
+    run_vectorized_strategy_signals,
+)
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import make_config, make_context, make_ref
 from tests.strategy.unit.test_vectorized_runner import Evaluator, _dataset
+
+logger = get_logger(__name__)
 
 
 def test_unregistered_evaluator_hash_fails_closed() -> None:
@@ -12,7 +17,7 @@ def test_unregistered_evaluator_hash_fails_closed() -> None:
     logger.debug("Testing registered-only Strategy evaluator security")
     evaluator = Evaluator()
     evaluator.source_hash = "f" * 64
-    timing = StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE
+    timing = get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE")
     outcome = run_vectorized_strategy_signals(
         make_ref(timing=timing),
         make_config(),

@@ -33,7 +33,7 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _sample_dataset() -> MarketDataset:
+def _sample_dataset() -> object:
     """Return a test MarketDataset fixture."""
     records = tuple(
         build_ohlcv_record(

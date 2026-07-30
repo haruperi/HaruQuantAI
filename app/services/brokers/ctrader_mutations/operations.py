@@ -1,7 +1,7 @@
-type StandardResponse[T] = (
-    Any  # mypy: disable-error-code="attr-defined,no-any-return,has-type"
-)
+# mypy: disable-error-code="attr-defined"
 """cTrader mutation implementations behind unreleased public policy."""
+
+from typing import TYPE_CHECKING
 
 from app.services.brokers.contracts import (
     BrokerCapabilityId,
@@ -23,6 +23,9 @@ from app.services.brokers.ctrader_session.mapping import (
     _map_error_code,
     _map_order_result,
 )
+
+if TYPE_CHECKING:
+    from app.services.brokers.contracts.responses import StandardResponse
 
 
 class _CTraderMutationsMixin:
@@ -178,7 +181,7 @@ class _CTraderMutationsMixin:
         for order in _field(response, "order"):
             if str(_field(order, "orderId")) == order_id:
                 trade = _field(order, "tradeData")
-                return self._symbol_names[int(_field(trade, "symbolId"))]
+                return str(self._symbol_names[int(_field(trade, "symbolId"))])
         raise _RequestValidationError("cTrader active order is absent")
 
     async def _symbol_for_position(self, position_id: str) -> str:
@@ -196,7 +199,7 @@ class _CTraderMutationsMixin:
         for position in _field(response, "position"):
             if str(_field(position, "positionId")) == position_id:
                 trade = _field(position, "tradeData")
-                return self._symbol_names[int(_field(trade, "symbolId"))]
+                return str(self._symbol_names[int(_field(trade, "symbolId"))])
         raise _RequestValidationError("cTrader active position is absent")
 
     async def _execution(

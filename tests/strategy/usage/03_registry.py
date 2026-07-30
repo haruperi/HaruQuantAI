@@ -7,23 +7,24 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from app.services.data import run_data_migrations
 from app.services.strategy import (
-    StrategyConfig,
-    StrategyEnvironment,
-    StrategyLifecycleStatus,
-    StrategyManifest,
-    StrategyParameterUpdateRequest,
-    StrategyRef,
-    StrategyRegistrationRequest,
-    StrategyTimingPolicy,
-    StrategyValidationPolicy,
+    create_strategy_config,
+    create_strategy_manifest,
+    create_strategy_parameter_update_request,
+    create_strategy_ref,
+    create_strategy_registration_request,
+    create_strategy_validation_policy,
+    get_strategy_environment,
+    get_strategy_lifecycle_status,
+    get_strategy_timing_policy,
     list_strategy_versions,
     register_strategy_version,
     update_strategy_parameters,
     validate_strategy_config,
     validate_strategy_ref,
 )
-from app.utils import AuthContext
+from app.utils import create_auth_context
 
 _UNAVAILABLE = 3
 _HASH = "c" * 64
@@ -77,13 +78,13 @@ def _demonstrate_registry_requirements() -> None:
     fr_str_024()
 
 
-def _policy() -> StrategyValidationPolicy:
+def _policy() -> create_strategy_validation_policy:
     """Build the explicit host-owned validation policy.
 
     Returns:
         A complete immutable validation policy.
     """
-    return StrategyValidationPolicy(
+    return create_strategy_validation_policy(
         policy_version="usage-v1",
         approved_module_roots=("app.services.strategy.evaluators",),
         max_config_payload_bytes=4_096,
@@ -93,13 +94,13 @@ def _policy() -> StrategyValidationPolicy:
     )
 
 
-def _manifest() -> StrategyManifest:
+def _manifest() -> create_strategy_manifest:
     """Build the immutable registration manifest.
 
     Returns:
         A complete immutable strategy manifest.
     """
-    return StrategyManifest(
+    return create_strategy_manifest(
         strategy_id=_STRATEGY,
         strategy_version="1.0.0",
         module_path="app.services.strategy.evaluators.naive_ma_trend",
@@ -117,8 +118,8 @@ def _manifest() -> StrategyManifest:
         },
         required_data=("EURUSD:H1",),
         required_indicators=("sma",),
-        timing_policy=StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE,
-        permitted_environments=(StrategyEnvironment.RESEARCH,),
+        timing_policy=get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE"),
+        permitted_environments=(get_strategy_environment("RESEARCH"),),
         source_hash=_HASH,
         artifact_hash=_HASH,
         dependency_hash=_HASH,
@@ -133,7 +134,7 @@ def _manifest() -> StrategyManifest:
     )
 
 
-def main() -> int:  # noqa: PLR0911
+def main() -> int:  # noqa: C901, PLR0911, PLR0915
     """Register, resolve, validate, and re-version one immutable strategy.
 
     Returns:
@@ -148,10 +149,16 @@ def main() -> int:  # noqa: PLR0911
         )
         return _UNAVAILABLE
 
+    migrated = run_data_migrations(_REQUEST)
+    if migrated.data is None:
+        print("Data migration prerequisite unavailable:", migrated.error)
+        return _UNAVAILABLE
+    print("Data migration prerequisite:", migrated.status, migrated.data)
+
     now = datetime.now(UTC)
     policy = _policy()
     manifest = _manifest()
-    auth = AuthContext(
+    auth = create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="usage-principal",
@@ -165,7 +172,7 @@ def main() -> int:  # noqa: PLR0911
         correlation_id=_CORRELATION,
         issued_at=now,
     )
-    registration = StrategyRegistrationRequest(
+    registration = create_strategy_registration_request(
         command_id=f"usage-register-{now.isoformat()}",
         strategy_id=manifest.strategy_id,
         strategy_version=manifest.strategy_version,
@@ -178,7 +185,7 @@ def main() -> int:  # noqa: PLR0911
         provenance_refs=manifest.provenance_refs,
         principal_id=auth.principal_id,
         reason="usage example registration",
-        lifecycle_status=StrategyLifecycleStatus.APPROVED,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
         authorization_ref="usage-approval-1",
         requested_at=now,
         request_id=_REQUEST,
@@ -192,12 +199,17 @@ def main() -> int:  # noqa: PLR0911
         return _UNAVAILABLE
     print("Mutation status:", registered.data.status)
     print("Record ref:", registered.data.record_ref)
+    print("Audit event ref:", registered.data.audit_event_ref)
+    print("Publication pending:", registered.data.publication_pending)
+    if registered.data.publication_pending:
+        print("Registration audit publication is incomplete.")
+        return 1
 
     print("\n-- Resolve exactly one approved version (WF-STR-001) --")
-    reference = StrategyRef(
+    reference = create_strategy_ref(
         strategy_id=_STRATEGY,
         exact_version="1.0.0",
-        environment=StrategyEnvironment.RESEARCH,
+        environment=get_strategy_environment("RESEARCH"),
         request_id=_REQUEST,
         correlation_id=_CORRELATION,
     )
@@ -208,7 +220,7 @@ def main() -> int:  # noqa: PLR0911
     print("Resolved:", resolved.data.manifest.strategy_id, resolved.data.environment)
 
     print("\n-- Validate declarative configuration --")
-    config = StrategyConfig(
+    config = create_strategy_config(
         strategy_id=_STRATEGY,
         strategy_version="1.0.0",
         config_schema_version="v1",
@@ -222,7 +234,7 @@ def main() -> int:  # noqa: PLR0911
     print("Canonical config hash:", validated.data.config_hash)
 
     print("\n-- Record a new immutable parameter version --")
-    update = StrategyParameterUpdateRequest(
+    update = create_strategy_parameter_update_request(
         command_id=f"usage-config-{now.isoformat()}",
         strategy_id=_STRATEGY,
         strategy_version="1.0.0",
@@ -242,6 +254,11 @@ def main() -> int:  # noqa: PLR0911
         return _UNAVAILABLE
     print("Mutation status:", updated.data.status)
     print("New configuration hash:", updated.data.record_hash)
+    print("Audit event ref:", updated.data.audit_event_ref)
+    print("Publication pending:", updated.data.publication_pending)
+    if updated.data.publication_pending:
+        print("Parameter-update audit publication is incomplete.")
+        return 1
 
     print("\n-- Deterministic registry listing --")
     listed = list_strategy_versions()

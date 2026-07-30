@@ -200,7 +200,7 @@ class ScrapeResult:
                 else:
                     site_frame.to_parquet(path, index=False)
         except OSError as error:
-            logger.error("Calendar artifact write failed")
+            logger.exception("Calendar artifact write failed")
             raise DataError(
                 "DB_WRITE_FAILED",
                 safe_details={"operation": "save_calendar"},
@@ -424,10 +424,10 @@ def scrape_result_to_dataframe(result: ScrapeResult) -> pd.DataFrame:
 
 
 def save_scrape_result(
-    result: ScrapeResult, directory: Path, format: str = "csv"
+    result: ScrapeResult, directory: Path, file_format: str = "csv"
 ) -> None:
     """Persist a scrape result through the public function boundary."""
-    result.save(directory, format)
+    result.save(directory, file_format)
 
 
 def serialize_scrape_result(result: ScrapeResult) -> bytes:

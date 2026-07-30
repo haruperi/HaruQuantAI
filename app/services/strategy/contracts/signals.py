@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from datetime import datetime
 from decimal import Decimal
 from types import MappingProxyType
-from typing import Literal, cast
+from typing import Any, Literal, cast
 
 from pydantic import (
     field_serializer,
@@ -14,9 +14,6 @@ from pydantic import (
     model_validator,
 )
 
-from app.services.data import (
-    MarketDataset,  # noqa: TC001 - runtime annotation and model resolution
-)
 from app.services.strategy.contracts._base import (
     JsonValue,
     _Contract,
@@ -30,6 +27,8 @@ from app.services.strategy.contracts._base import (
 from app.utils import get_logger
 
 logger = get_logger(__name__)
+
+MarketDataset = Any
 
 
 class StrategySignal(_Contract):
@@ -122,7 +121,7 @@ class StrategySignal(_Contract):
         logger.debug("Freezing concrete Strategy signal facts")
         return cast("Mapping[str, JsonValue]", _freeze_json(value))
 
-    @field_serializer("lineage", when_used="json")
+    @field_serializer("lineage", when_used="always")
     def _serialize_signal_lineage(self, value: Mapping[str, str]) -> dict[str, str]:
         """Serialize immutable signal lineage.
 
@@ -135,7 +134,7 @@ class StrategySignal(_Contract):
         logger.debug("Serializing concrete Strategy signal lineage")
         return dict(value)
 
-    @field_serializer("facts", when_used="json")
+    @field_serializer("facts", when_used="always")
     def _serialize_signal_facts(
         self, value: Mapping[str, JsonValue]
     ) -> dict[str, object]:
@@ -157,8 +156,8 @@ class StrategySignalEvidence(_Contract):
     contract_version: Literal["v1"] = "v1"
     schema_id: Literal["strategy.signal_evidence.v1"] = "strategy.signal_evidence.v1"
     evidence_id: str
-    primary_market: MarketDataset
-    related_markets: Mapping[str, MarketDataset]
+    primary_market: Any
+    related_markets: Mapping[str, Any]
     point_size: Decimal
     feature_values: Mapping[str, tuple[Decimal, ...]]
     feature_available_at: Mapping[str, datetime]
@@ -201,9 +200,7 @@ class StrategySignalEvidence(_Contract):
 
     @field_validator("related_markets", mode="after")
     @classmethod
-    def _freeze_related_markets(
-        cls, value: Mapping[str, MarketDataset]
-    ) -> Mapping[str, MarketDataset]:
+    def _freeze_related_markets(cls, value: Mapping[str, Any]) -> Mapping[str, Any]:
         """Freeze named related market datasets.
 
         Args:
@@ -311,9 +308,9 @@ class StrategySignalEvidence(_Contract):
             raise ValueError("feature evidence values, times, and refs must align")
         return self
 
-    @field_serializer("related_markets", when_used="json")
+    @field_serializer("related_markets", when_used="always")
     def _serialize_related_markets(
-        self, value: Mapping[str, MarketDataset]
+        self, value: Mapping[str, Any]
     ) -> dict[str, MarketDataset]:
         """Serialize named related markets.
 
@@ -326,7 +323,7 @@ class StrategySignalEvidence(_Contract):
         logger.debug("Serializing related concrete Strategy market evidence")
         return dict(value)
 
-    @field_serializer("feature_values", when_used="json")
+    @field_serializer("feature_values", when_used="always")
     def _serialize_feature_values(
         self, value: Mapping[str, tuple[Decimal, ...]]
     ) -> dict[str, tuple[Decimal, ...]]:
@@ -341,7 +338,7 @@ class StrategySignalEvidence(_Contract):
         logger.debug("Serializing concrete Strategy feature values")
         return dict(value)
 
-    @field_serializer("feature_available_at", when_used="json")
+    @field_serializer("feature_available_at", when_used="always")
     def _serialize_feature_times(
         self, value: Mapping[str, datetime]
     ) -> dict[str, datetime]:
@@ -356,7 +353,7 @@ class StrategySignalEvidence(_Contract):
         logger.debug("Serializing concrete Strategy feature availability")
         return dict(value)
 
-    @field_serializer("feature_refs", when_used="json")
+    @field_serializer("feature_refs", when_used="always")
     def _serialize_feature_refs(self, value: Mapping[str, str]) -> dict[str, str]:
         """Serialize feature provenance references.
 

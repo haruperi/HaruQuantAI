@@ -15,9 +15,11 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerId,
     BrokerMarginRequest,
+    BrokerOrderFilter,
     BrokerOrderModificationRequest,
     BrokerOrderRequest,
     BrokerPositionCloseRequest,
+    BrokerPositionFilter,
     BrokerPositionModificationRequest,
     BrokerProfitRequest,
 )
@@ -304,11 +306,24 @@ def test_adapter_read_mutation_calculation_and_stream_operations() -> None:  # n
     start = datetime(2026, 1, 1, tzinfo=UTC)
     end = datetime(2026, 1, 2, tzinfo=UTC)
 
-    async def exercise() -> None:
+    async def exercise() -> None:  # noqa: PLR0915
         await adapter.connect()
         symbols = await adapter.get_symbols(limit=10)
         assert symbols.data is not None
         assert symbols.data.items[0].min_quantity == Decimal("0.01")
+        assert (await adapter.get_symbols(cursor="cursor", limit=1)).error is not None
+        assert (await adapter.get_symbols(limit=0)).error is not None
+        missing_symbol = await adapter.get_symbol_info("MISSING")
+        assert missing_symbol.error is not None
+        invalid_timeframe = await adapter.get_historical_bars(
+            "EURUSD", "INVALID", start, end, limit=10
+        )
+        assert invalid_timeframe.error is not None
+        assert (
+            await adapter.get_trading_sessions("EURUSD", start=start)
+        ).error is not None
+        sessions = await adapter.get_trading_sessions("EURUSD")
+        assert sessions.data is not None
         ticks = await adapter.get_ticks("EURUSD", start, end, limit=10)
         assert ticks.data is not None
         assert len(ticks.data.items) == 2
@@ -318,11 +333,23 @@ def test_adapter_read_mutation_calculation_and_stream_operations() -> None:  # n
         positions = await adapter.get_positions(limit=10)
         assert positions.data is not None
         assert positions.data.items[0].quantity == Decimal(1)
+        filtered_positions = await adapter.get_positions(
+            BrokerPositionFilter(symbol="EURUSD", side="LONG"),
+            limit=10,
+        )
+        assert filtered_positions.data is not None
         orders = await adapter.get_orders(limit=10)
         assert orders.data is not None
         assert orders.data.items[0].quantity == Decimal(1)
-        assert (await adapter.list_order_history(start, end, limit=10)).data is not None
-        deals = await adapter.list_deal_history(start, end, limit=10)
+        filtered_orders = await adapter.get_orders(
+            BrokerOrderFilter(symbol="EURUSD", side="BUY", status="ACCEPTED"),
+            limit=10,
+        )
+        assert filtered_orders.data is not None
+        assert (
+            await adapter.list_order_history(start, end, symbol="EURUSD", limit=10)
+        ).data is not None
+        deals = await adapter.list_deal_history(start, end, symbol="EURUSD", limit=10)
         assert deals.data is not None
         assert deals.data.items[0].quantity == Decimal(1)
 

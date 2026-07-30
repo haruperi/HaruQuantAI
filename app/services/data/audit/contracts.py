@@ -3,14 +3,23 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Final, Literal
+from typing import TYPE_CHECKING, Final, Literal, Protocol
 
 from pydantic import ConfigDict, field_validator, model_validator
 
 from app.services.data.contracts._base import DataContractModel, TracedOpenContract
 from app.services.data.contracts.validation import validate_request_id
-from app.utils import get_logger
-from app.utils.contracts.audit import AuditEvent
+from app.utils import get_audit_event_type, get_logger
+
+if TYPE_CHECKING:
+
+    class AuditEvent(Protocol):
+        """Typing-only view of the Utils-owned opaque audit event."""
+
+        timestamp: datetime
+        event_id: str
+else:
+    AuditEvent = get_audit_event_type()
 
 logger = get_logger(__name__)
 
@@ -121,7 +130,13 @@ class AuditEventPage(DataContractModel):
         """Require deterministic timestamp and event identity order."""
         logger.debug("Validating DATA audit page order")
         ordered = tuple(
-            sorted(self.events, key=lambda event: (event.timestamp, event.event_id))
+            sorted(
+                self.events,
+                key=lambda event: (
+                    event.timestamp,
+                    event.event_id,
+                ),
+            )
         )
         if self.events != ordered:
             raise ValueError("events must be ordered by timestamp and event_id")

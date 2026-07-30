@@ -8,14 +8,55 @@ cancellation, or orchestration context.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from datetime import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Literal, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
-    from app.services.data import MarketDataset
     from app.services.indicators.core.results import IndicatorResult
 type StandardResponse[T] = Any
+
+
+class _DataQualityReport(Protocol):
+    """Private structural view of Data-owned quality evidence."""
+
+    quality_status: Literal["passed", "passed_with_warnings", "failed", "not_checked"]
+    quality_score: Decimal
+    schema_version: str
+
+
+class _OHLCVRecord(Protocol):
+    """Private structural view of one Data-owned normalized OHLCV record."""
+
+    timestamp: datetime
+    available_at: datetime
+    open: Decimal
+    high: Decimal
+    low: Decimal
+    close: Decimal
+    volume: Decimal
+
+
+class _MarketDataset(Protocol):
+    """Private structural view of the Data-owned MarketDataset v1 boundary."""
+
+    contract_version: str
+    schema_id: str
+    normalization_version: str
+    data_kind: str
+    symbol: str
+    timeframe: str | None
+    records: Sequence[_OHLCVRecord]
+    record_count: int
+    quality_report: _DataQualityReport
+    source_metadata: Mapping[str, str]
+    license_metadata: Mapping[str, str]
+
+    def model_dump(self, *, mode: str = "python") -> dict[str, object]:
+        """Return the dataset's deterministic public serialization."""
+        ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -141,7 +182,7 @@ class IndicatorProtocol(Protocol):
     """
 
     def calculate(
-        self, data: MarketDataset, config: IndicatorConfig
+        self, data: _MarketDataset, config: IndicatorConfig
     ) -> StandardResponse[IndicatorResult]:
         """Calculate one official indicator for a normalized dataset.
 
@@ -157,9 +198,56 @@ class IndicatorProtocol(Protocol):
         ...
 
 
+def build_indicator_config(
+    indicator_id: str,
+    parameters: tuple[tuple[str, int | float | str], ...] = (),
+    source: str | None = "close",
+    formula_version: str = "v1",
+    output_mode: Literal["values"] = "values",
+    column_conflict_policy: Literal["error"] = "error",
+    precision_dtype: Literal["float64"] = "float64",
+    availability_policy: Literal["source_available_at"] = "source_available_at",
+    quality_policy: Literal["propagate_dataset"] = "propagate_dataset",
+    error_mode: Literal["raise"] = "raise",
+) -> IndicatorConfig:
+    """Construct a validated IndicatorConfig instance.
+
+    Args:
+        indicator_id: Exact lowercase official registry identifier.
+        parameters: Canonical key-sorted immutable parameter pairs.
+        source: Selected price source among open, high, low, or close.
+        formula_version: Version of the approved mathematical convention.
+        output_mode: Core output mode; only "values" is supported.
+        column_conflict_policy: Output-collision policy; only "error" is
+            supported.
+        precision_dtype: Numerical output dtype; only "float64" is supported.
+        availability_policy: Availability basis; only "source_available_at"
+            is supported.
+        quality_policy: Quality propagation policy; only "propagate_dataset"
+            is supported.
+        error_mode: Failure policy; only "raise" is supported.
+
+    Returns:
+        An immutable IndicatorConfig instance.
+    """
+    return IndicatorConfig(
+        indicator_id=indicator_id,
+        parameters=parameters,
+        source=source,
+        formula_version=formula_version,
+        output_mode=output_mode,
+        column_conflict_policy=column_conflict_policy,
+        precision_dtype=precision_dtype,
+        availability_policy=availability_policy,
+        quality_policy=quality_policy,
+        error_mode=error_mode,
+    )
+
+
 __all__ = [
     "IndicatorConfig",
     "IndicatorProtocol",
     "IndicatorSpec",
     "WarmupRequirement",
+    "build_indicator_config",
 ]

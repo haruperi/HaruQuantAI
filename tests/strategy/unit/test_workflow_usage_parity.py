@@ -20,6 +20,8 @@ EXPECTED = {
     "WF-STR-TER": "wf_str_ter_register_immutable_strategy_version.py",
     "WF-STR-009": "wf_str_009_reject_arbitrary_strategy_code.py",
     "WF-STR-010": "wf_str_010_evaluate_recovered_concrete_signals.py",
+    "WF-STR-011": "wf_str_011_adopt_approved_optimization_parameters.py",
+    "WF-STR-012": "wf_str_012_evaluate_signals_for_research.py",
 }
 
 

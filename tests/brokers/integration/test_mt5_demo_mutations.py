@@ -28,11 +28,12 @@ from app.services.brokers import (
     get_broker_value_field,
     place_broker_order,
 )
-from app.utils.identity import generate_id
-from app.utils.logging import get_logger
-from app.utils.settings import load_settings
-
-from tests.brokers.provider_settings import ProviderTestSettings
+from app.utils import (
+    generate_id,
+    get_logger,
+    load_broker_provider_settings,
+    load_settings,
+)
 
 logger = get_logger("tests.brokers.integration.test_mt5_demo_mutations")
 
@@ -40,7 +41,7 @@ _SYMBOL = "EURUSD"
 _STATE_LIMIT = 1_000
 
 
-def _connection_config(settings: ProviderTestSettings) -> object:
+def _connection_config(settings: object) -> object:
     """Build the exact credential-backed MT5 demo connection."""
     assert settings.mt5_login is not None
     assert settings.mt5_password is not None
@@ -131,9 +132,9 @@ async def _cleanup_created_state(
     assert reconciled_positions == original_positions
 
 
-def _require_demo_settings() -> ProviderTestSettings:
+def _require_demo_settings() -> object:
     """Load complete dev/demo settings or skip without provider access."""
-    settings = ProviderTestSettings()
+    settings = load_broker_provider_settings()
     if (
         not settings.mt5_enabled
         or settings.mt5_login is None
@@ -162,7 +163,7 @@ async def _verify_demo_session(adapter: object) -> None:
 
 async def _minimum_pending_order(
     adapter: object,
-    settings: ProviderTestSettings,
+    settings: object,
 ) -> object:
     """Build a far-from-market minimum-size order from provider evidence."""
     positions = await get_broker_positions(adapter)
@@ -202,7 +203,7 @@ async def _minimum_pending_order(
 
 async def _exercise_demo_mutation(
     adapter: object,
-    settings: ProviderTestSettings,
+    settings: object,
 ) -> None:
     """Execute one provider-classified demo mutation and exact cleanup."""
     connected = await connect_broker(adapter)

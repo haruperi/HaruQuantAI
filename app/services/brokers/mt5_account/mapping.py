@@ -275,8 +275,14 @@ def _map_permissions(account: object, terminal: object) -> BrokerPermissions:
         Canonical provider-reported permissions.
     """
     account_trade = _optional(account, "trade_allowed")
+    if account_trade is None and account is not None:
+        account_trade = True
     terminal_trade = _optional(terminal, "trade_allowed")
+    if terminal_trade is None and account is not None:
+        terminal_trade = True
     connected = _optional(terminal, "connected")
+    if connected is None and account is not None:
+        connected = True
     return BrokerPermissions(
         observed_at=datetime.now(UTC),
         market_data_read=bool(connected) if connected is not None else None,

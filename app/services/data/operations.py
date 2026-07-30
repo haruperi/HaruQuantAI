@@ -4,9 +4,13 @@ This module provides standalone getter functions for domain constants and
 builder helpers for canonical Data contract DTOs.
 """
 
+# These package-root builders intentionally forward heterogeneous private
+# constructor signatures while keeping every public export a function.
+# ruff: noqa: ANN401
+
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from app.services.data.audit.contracts import (
     AUDIT_QUERY_HARD_MAX_LIMIT,
@@ -68,7 +72,6 @@ from app.services.data.market_data.requests import MarketDataRequest
 from app.services.data.market_data.symbol_metadata import SymbolMetadata
 from app.services.data.persistence import DATA_MIGRATION_STEPS
 from app.services.data.persistence import contracts as _persistence_contracts
-from app.services.data.persistence.contracts import MigrationStep
 from app.services.data.realtime_feeds import contracts as _feed_contracts
 from app.services.data.sources import contracts as _source_contracts
 from app.services.data.sources import read_only as _read_only
@@ -89,6 +92,9 @@ from app.services.data.time_sessions import (
 )
 from app.services.data.time_sessions import contracts as _time_contracts
 from app.services.data.time_sessions import weekly_schedule as _weekly_schedule
+
+if TYPE_CHECKING:
+    from app.services.data.persistence.contracts import MigrationStep
 
 
 def build_account_order(*args: Any, **kwargs: Any) -> Any:
@@ -161,12 +167,6 @@ def build_data_error(*args: Any, **kwargs: Any) -> BaseException:
     from app.services.data.contracts.errors import DataError
 
     return DataError(*args, **kwargs)
-
-
-def build_economic_calendar_provider(*args: Any, **kwargs: Any) -> Any:
-    """Build one EconomicCalendarProvider value through the Data public boundary."""
-    del args, kwargs
-    return None
 
 
 def build_economic_event(*args: Any, **kwargs: Any) -> Any:

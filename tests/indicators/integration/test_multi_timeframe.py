@@ -3,15 +3,19 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data import (
+from app.services.data import align_multitimeframe_data
+from app.services.indicators import (
+    get_indicator_result_metadata,
+    get_indicator_result_values,
+    sma,
+)
+
+from tests.indicators.helpers import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
-    align_multitimeframe_data,
+    unwrap_response,
 )
-from app.services.indicators import sma
-
-from tests.indicators.helpers import unwrap_response
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -102,17 +106,20 @@ def test_separate_timeframe_results_preserve_source_availability() -> None:
     primary_result = unwrap_response(sma(aligned["primary"], period=2, source="close"))
     higher_result = unwrap_response(sma(aligned["higher"], period=2, source="close"))
 
-    assert primary_result.manifest.source_timeframe == "M5"
-    assert higher_result.manifest.source_timeframe == "H1"
-    assert primary_result.manifest.row_count == len(target)
-    assert higher_result.manifest.row_count == len(target)
+    primary_metadata = get_indicator_result_metadata(primary_result)
+    higher_metadata = get_indicator_result_metadata(higher_result)
+    assert primary_metadata["manifest"]["source_timeframe"] == "M5"
+    assert higher_metadata["manifest"]["source_timeframe"] == "H1"
+    assert primary_metadata["manifest"]["row_count"] == len(target)
+    assert higher_metadata["manifest"]["row_count"] == len(target)
     assert (
-        primary_result.manifest.input_checksum != higher_result.manifest.input_checksum
+        primary_metadata["manifest"]["input_checksum"]
+        != higher_metadata["manifest"]["input_checksum"]
     )
 
-    decision_time = primary_result.values["available_at"].iloc[2]
-    qualified_higher = higher_result.values.loc[
-        higher_result.values["available_at"] <= decision_time
-    ]
+    primary_values = get_indicator_result_values(primary_result)
+    higher_values = get_indicator_result_values(higher_result)
+    decision_time = primary_values["available_at"].iloc[2]
+    qualified_higher = higher_values.loc[higher_values["available_at"] <= decision_time]
     assert (qualified_higher["available_at"] <= decision_time).all()
-    assert len(qualified_higher) < len(higher_result.values)
+    assert len(qualified_higher) < len(higher_values)

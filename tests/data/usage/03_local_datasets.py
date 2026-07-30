@@ -1,3 +1,4 @@
+# ruff: noqa: BLE001, E402
 """Demonstrate FEAT-DATA-03 local CSV and Parquet dataset loading."""
 
 from __future__ import annotations

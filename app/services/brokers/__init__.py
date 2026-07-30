@@ -94,6 +94,10 @@ from app.services.brokers.registry.factory import (
     create_broker_adapter,
     get_registered_brokers,
 )
+from app.services.brokers.registry.provider_connections import (
+    create_connected_broker,
+    resolve_provider_connection_config,
+)
 from app.services.brokers.testing import (
     create_fake_broker_adapter,
 )
@@ -117,6 +121,7 @@ __all__ = (
     "connect_broker",
     "create_broker_adapter",
     "create_configured_fake_broker_adapter",
+    "create_connected_broker",
     "create_fake_broker_adapter",
     "disconnect_broker",
     "get_broker_account_info",
@@ -174,6 +179,7 @@ __all__ = (
     "reconnect_broker",
     "refresh_broker_session",
     "replace_broker_order",
+    "resolve_provider_connection_config",
     "select_broker_account",
     "select_broker_symbol",
     "set_fake_broker_error",

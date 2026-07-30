@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/indicators`
 > **Status:** `Completed`
-> **Last updated:** `2026-07-28`
+> **Last updated:** `2026-07-30`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -245,7 +245,7 @@ feature IDs, and each ordinal matches its usage-program number.
 
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
-| Completed | `FEAT-INDI-01` Indicator Contracts, Registry Discovery and Request Validation | `core/` | `IndicatorErrorCode`, `IndicatorError`, config/spec/warmup/protocol, result/manifest/projection, discovery, capability, `get_warmup_requirement`, and validation declarations | `FR-INDI-001`–`FR-INDI-014`; exact declarations in Section 4.1 | `tests/indicators/usage/01_core.py` |
+| Completed | `FEAT-INDI-01` Indicator Contracts, Registry Discovery and Request Validation | `core/` | `build_indicator_config`, `join_indicator_result`, `get_indicator_result_values`, discovery, capability, `get_warmup_requirement`, and validation declarations | `FR-INDI-001`–`FR-INDI-014`; exact declarations in Section 4.1 | `tests/indicators/usage/01_core.py` |
 | Completed | `FEAT-INDI-02` Candlestick Pattern Labelling | `candles/` | `doji`, `engulfing`, `pinbar`, `inside_bar` | `FR-INDI-031`–`FR-INDI-034`; exact declarations in Section 4.6 | `tests/indicators/usage/02_candles.py` |
 | Completed | `FEAT-INDI-03` Trend and Moving-Average Calculation | `trend/` | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag` | `FR-INDI-015`–`FR-INDI-017`, `FR-INDI-023`–`FR-INDI-025`, `FR-INDI-035`; exact declarations in Section 4.2 | `tests/indicators/usage/03_trend.py` |
 | Completed | `FEAT-INDI-04` Momentum Oscillator Calculation | `momentum/` | `rsi`, `williams_r` | `FR-INDI-021`, `FR-INDI-022`; exact declarations in Section 4.4 | `tests/indicators/usage/04_momentum.py` |
@@ -366,12 +366,17 @@ correct.
 
 ### Public import and API contract
 
-The package root `app.services.indicators` is the canonical public import surface. Its intended `__all__` is exactly:
+The package root `app.services.indicators` is the canonical public import surface. It is export-only: the module contains no public implementation functions. Its `__all__` is exactly:
+
+`IndicatorResult`, `IndicatorManifest`, `IndicatorConfig`, `IndicatorError`,
+`IndicatorErrorCode`, and `IndicatorProtocol` are internal implementation
+types and are never package-root exports. Cross-domain callers use
+`get_indicator_result_values`, `get_indicator_result_metadata`, and
+`join_indicator_result` for opaque calculation results.
 
 ```text
-IndicatorErrorCode, IndicatorError,
-IndicatorConfig, IndicatorSpec, WarmupRequirement, IndicatorProtocol,
-IndicatorManifest, IndicatorResult,
+build_indicator_config, join_indicator_result, get_indicator_result_values,
+get_indicator_result_metadata,
 get_indicator, list_indicators, get_capability_matrix, get_warmup_requirement,
 validate_indicator,
 ema, sma, wma, hull_ma, bollinger_bands, adx, zigzag,
@@ -383,9 +388,7 @@ doji, engulfing, pinbar, inside_bar
 
 | Public symbols | Classification | Official workflow eligibility | Cache behavior | Public side effects |
 |---|---|---|---|---|
-| `IndicatorErrorCode`, `IndicatorError` | Stable | `WF-INDI-001..005` | Not applicable | None |
-| `IndicatorConfig`, `IndicatorSpec`, `WarmupRequirement`, `IndicatorProtocol` | Stable | `WF-INDI-001..005` | Carries no cache configuration | None |
-| `IndicatorManifest`, `IndicatorResult`, `IndicatorResult.values_only`, `IndicatorResult.join_to` | Stable | `WF-INDI-001..004` | Exposes identity/checksum material only; no reads or writes | None |
+| `build_indicator_config`, `join_indicator_result`, `get_indicator_result_values`, `get_indicator_result_metadata` | Stable | `WF-INDI-001..005` | None | None |
 | `get_indicator`, `list_indicators`, `get_capability_matrix` | Stable | `WF-INDI-005` | None; immutable in-memory metadata | None |
 | `get_warmup_requirement` | Stable | `WF-INDI-003` | None; resolves immutable registry metadata without fetching data | None |
 | `validate_indicator` | Stable | `WF-INDI-001..005` | No cache access | None |
@@ -442,13 +445,13 @@ never reused. New workflows continue from `WF-INDI-006`.
 | Status | Rank | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
 |---|---|---|---|---|---|---|---|
 | Completed | Primary | `WF-INDI-PRI` | Internal | Core batch indicator calculation | One normalized `MarketDataset v1` plus approved config | Atomic `IndicatorResult` with values, availability, quality, and manifest | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-007..010` |
-| Completed | Secondary | `WF-INDI-SEC` | Cross-domain | Decision-time consumption | Trading or Simulation supplies Data-owned normalized input | `IndicatorSeries v1` returned for Strategy consumption | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-008` |
+| Completed | Secondary | `WF-INDI-SEC` | Cross-domain | Decision-time consumption | Trading or Simulation supplies Data-owned normalized input | Eighty genuine MT5 EURUSD M1 bars produce official availability-qualified RSI values and four concrete Strategy signals through the package-root boundaries | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-008` |
 | Completed | Tertiary | `WF-INDI-TER` | Cross-domain | Availability-aware multi-timeframe orchestration compatibility | Data supplies separately keyed aligned primary and higher-timeframe datasets; caller calculates each independently | Separately returned series preserve source availability and can be combined by the orchestrator without lookahead | `FR-INDI-014 → FR-INDI-015..035 → FR-INDI-007` |
 | Completed | Supporting | `WF-INDI-003` | Cross-domain | Warmup coordination | Caller queries an official `WarmupRequirement` and supplies sufficient history | Warmup rows retained and explicitly unavailable until safe | `FR-INDI-005 → FR-INDI-014 → FR-INDI-015..035` |
 | Completed | Supporting | `WF-INDI-005` | Internal | Static registry discovery and validation | Caller supplies official indicator ID/config | Validated spec/capability record or deterministic refusal | `FR-INDI-011..014` |
-| Completed | Supporting | `WF-INDI-006` | Internal | Candlestick pattern detection | One normalized `MarketDataset v1` and an official pattern ID | Boolean pattern series with the same availability and warmup semantics as any other indicator | `Pending` |
-| Completed | Supporting | `WF-INDI-007` | Internal | Volume-profile and volume-flow distribution | One normalized `MarketDataset v1` carrying volume plus bounded bucket configuration | Distribution or flow series with explicit unavailability where volume is absent | `Pending` |
-| Completed | Supporting | `WF-INDI-008` | Cross-domain | Capability-matrix introspection | Caller queries the static registry for capabilities and warmup cost | Capability matrix and per-indicator `WarmupRequirement` used to plan history before any calculation | `Pending` |
+| Completed | Supporting | `WF-INDI-006` | Internal | Candlestick pattern detection | One normalized `MarketDataset v1` and an official pattern ID | Boolean pattern series with the same availability and warmup semantics as any other indicator | `FR-INDI-003..005 → FR-INDI-014 → FR-INDI-031..034` |
+| Completed | Supporting | `WF-INDI-007` | Internal | Volume-profile and volume-flow distribution | One normalized `MarketDataset v1` carrying volume plus bounded bucket configuration | Distribution or flow series with explicit unavailability where volume is absent | `FR-INDI-003 → FR-INDI-014 → FR-INDI-027..030` |
+| Completed | Supporting | `WF-INDI-008` | Cross-domain | Capability-matrix introspection | Caller queries the static registry for capabilities and warmup cost | Capability matrix and per-indicator `WarmupRequirement` used to plan history before any calculation | `FR-INDI-004..005 → FR-INDI-011..013` |
 
 `WF-INDI-PRI`, `WF-INDI-SEC`, `WF-INDI-TER`, and `WF-INDI-003` are multi-feature
 completion gates covering Core, trend, volatility, momentum, volume, and candles.
@@ -519,7 +522,14 @@ Indicators calculates and describes availability only. Trading/Simulation owns o
 **Failure behavior:** invalid normalized input or unverifiable availability fails closed with no partial series; a downstream lookahead violation remains a downstream policy error, informed by `IND_LOOKAHEAD_RISK` metadata/error evidence.
 
 **Integration test:**
-`tests/indicators/integration/test_decision_time_consumption.py::test_strategy_receives_only_availability_qualified_series()`
+`tests/indicators/integration/test_decision_time_consumption.py::test_indicator_series_is_availability_qualified_at_decision_time()`
+
+**Known cross-domain blocker:** the standalone workflow calculates genuine MT5-backed
+RSI successfully, then Strategy returns `INDICATOR_MODULE_ERROR`. Strategy's
+`signals/boundary.py` checks the Indicators standard join response with an invalid
+runtime `isinstance(..., StandardResponse)` test where `StandardResponse` is a type
+alias. Repairing that Strategy-owned consumer is outside this Indicators-only
+production scope.
 
 ```mermaid
 sequenceDiagram
@@ -668,7 +678,8 @@ warmup, and provenance semantics as any other official indicator.
 **Failure behavior:** a pattern is never reported on a row whose required lookback
 is incomplete; a dataset missing OHLC fields fails validation before detection.
 
-**Integration test:** `Pending`
+**Integration test:**
+`tests/indicators/integration/test_workflow_scripts.py::test_repaired_indicator_workflow_executes[wf_indi_006_candlestick_pattern_detection.py]`
 
 ### `WF-INDI-007` — Volume-Profile and Volume-Flow Distribution
 
@@ -692,7 +703,8 @@ wherever volume evidence is absent.
 **Failure behavior:** a symbol whose venue reports no genuine volume fails closed
 rather than producing a distribution over synthetic tick counts.
 
-**Integration test:** `Pending`
+**Integration test:**
+`tests/indicators/integration/test_workflow_scripts.py::test_repaired_indicator_workflow_executes[wf_indi_007_volume_profile_distribution.py]`
 
 ### `WF-INDI-008` — Capability-Matrix Introspection
 
@@ -716,7 +728,8 @@ used to size history requests without running a calculation.
 data; an unsupported indicator ID returns `IND_UNSUPPORTED_INDICATOR` rather than an
 empty capability record.
 
-**Integration test:** `Pending`
+**Integration test:**
+`tests/indicators/integration/test_workflow_scripts.py::test_repaired_indicator_workflow_executes[wf_indi_008_capability_matrix_introspection.py]`
 
 ---
 

@@ -1,9 +1,8 @@
-type StandardResponse[T] = (
-    Any  # mypy: disable-error-code="attr-defined,no-any-return,has-type"
-)
+# mypy: disable-error-code="attr-defined"
 """MT5 mutation implementations behind unreleased public policy."""
 
 from collections.abc import Mapping
+from typing import TYPE_CHECKING
 
 from app.services.brokers.contracts import (
     BrokerCapabilityId,
@@ -28,6 +27,9 @@ from app.services.brokers.mt5_account.mapping import (
     _map_position,
     _optional,
 )
+
+if TYPE_CHECKING:
+    from app.services.brokers.contracts.responses import StandardResponse
 
 
 def _provider_ticket(value: str) -> int:

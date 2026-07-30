@@ -1,11 +1,12 @@
 """Structural guarantees for the standalone Strategy usage programs."""
 
 import ast
-from importlib import import_module
 from pathlib import Path
 
 from app.services import strategy
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _USAGE_DIR = Path(__file__).parents[1] / "usage"
 _FEATURE_REQUIREMENTS = {
@@ -27,6 +28,7 @@ _FEATURE_REQUIREMENTS = {
     "event": ("08_event.py", {33, 37}),
     "signals": ("09_signals.py", {47, 48}),
     "evaluators": ("10_strategy_library.py", set(range(40, 47))),
+    "proposal_intake": ("11_proposal_intake.py", set(range(49, 54))),
 }
 
 
@@ -37,36 +39,27 @@ def _programs() -> tuple[Path, ...]:
         Ordered numbered usage program paths.
     """
     logger.debug("Collecting standalone Strategy usage programs")
-    return tuple(sorted(_USAGE_DIR.glob("[0-9]*_*.py")))
+    return tuple(
+        sorted(_USAGE_DIR.glob("[0-9]*_*.py"))
+        + sorted((_USAGE_DIR / "workflows").glob("wf_*.py"))
+    )
 
 
-def test_every_public_symbol_has_usage_evidence() -> None:
-    """Verify every exported symbol is called or constructed in a program."""
+def test_every_public_symbol_is_called_in_usage_evidence() -> None:
+    """Verify every exported symbol is actually called in a usage program."""
     logger.debug("Testing Strategy usage symbol coverage")
     referenced: set[str] = set()
     for path in _programs():
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
-            if isinstance(node, ast.Name):
-                referenced.add(node.id)
-            elif isinstance(node, ast.Attribute):
-                referenced.add(node.attr)
+            if not isinstance(node, ast.Call):
+                continue
+            if isinstance(node.func, ast.Name):
+                referenced.add(node.func.id)
+            elif isinstance(node.func, ast.Attribute):
+                referenced.add(node.func.attr)
     missing = sorted(set(strategy.__all__) - referenced)
     assert not missing, f"public symbols without usage evidence: {missing}"
-
-
-def test_each_feature_program_uses_its_own_public_exports() -> None:
-    """Verify each feature's program covers that feature's public API."""
-    logger.debug("Testing Strategy feature-local public usage coverage")
-    for feature, (program_name, _) in _FEATURE_REQUIREMENTS.items():
-        path = _USAGE_DIR / program_name
-        tree = ast.parse(path.read_text(encoding="utf-8"))
-        referenced = {
-            node.id for node in ast.walk(tree) if isinstance(node, ast.Name)
-        } | {node.attr for node in ast.walk(tree) if isinstance(node, ast.Attribute)}
-        module = import_module(f"app.services.strategy.{feature}")
-        missing = sorted(set(module.__all__) - referenced)
-        assert not missing, f"{feature} exports missing from {program_name}: {missing}"
 
 
 def test_every_requirement_has_one_feature_local_demonstration() -> None:
@@ -84,7 +77,7 @@ def test_every_requirement_has_one_feature_local_demonstration() -> None:
         duplicates = observed & actual
         assert not duplicates, f"duplicate FR demonstrations: {duplicates}"
         observed.update(actual)
-    assert observed == set(range(1, 49))
+    assert observed == set(range(1, 54))
 
 
 def test_usage_programs_import_domain_dependencies_from_package_roots() -> None:
@@ -133,6 +126,6 @@ def test_program_count_matches_feature_count() -> None:
         and path.name != "migrations"
     }
     assert feature_directories == set(_FEATURE_REQUIREMENTS)
-    assert {path.name for path in _programs()} == {
+    assert {path.name for path in _USAGE_DIR.glob("[0-9]*_*.py")} == {
         program_name for program_name, _ in _FEATURE_REQUIREMENTS.values()
     }

@@ -11,15 +11,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
     build_availability_request,
+    build_data_settings,
     build_symbol_list_request,
     build_symbol_metadata_request,
+    data_settings_context,
     get_data_availability,
     get_symbol_metadata,
     list_symbols,
+    run_data_migrations,
     unwrap_data_response,
 )
 from app.utils import generate_id
-from tests.data.usage.workflows._support import isolated_runtime
 
 WORKFLOW_ID = "WF-DATA-009"
 STAGES = (
@@ -43,7 +45,25 @@ def main() -> None:
 
     with tempfile.TemporaryDirectory(prefix="wf-data-009-") as directory:
         root = Path(directory)
-        with isolated_runtime(root):
+        (root / "data" / "raw").mkdir(parents=True, exist_ok=True)
+        settings = build_data_settings(
+            database_url="sqlite:///workflow.sqlite3",
+            data_dir=root,
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
+            approved_storage_roots=(
+                Path("raw"),
+                Path("processed"),
+                Path("data"),
+                Path("data/raw"),
+                Path("data/processed"),
+            ),
+            data_provider_sources=("mt5",),
+            data_raw_root=Path("data/raw"),
+        )
+        with data_settings_context(settings):
+            run_data_migrations(generate_id("req"))
+
             # Stage 1 — Submit a bounded MT5 symbol-discovery query.
             _stage(1)
             req1 = build_symbol_list_request(

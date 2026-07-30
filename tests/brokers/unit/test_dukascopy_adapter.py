@@ -170,6 +170,33 @@ def test_adapter_get_ticks_requires_start_and_positive_limit() -> None:
     asyncio.run(exercise())
 
 
+def test_adapter_bars_reject_invalid_bounds_cursor_and_limit() -> None:
+    """Every caller-controlled bar bound fails before provider access."""
+    adapter = DukascopyBrokerAdapter(
+        _config(),
+        transport=_FakeTransport(),
+        candle_transport=_FakeCandleTransport(),
+    )
+
+    async def exercise() -> None:
+        await adapter.connect()
+        start = datetime(2026, 1, 1, tzinfo=UTC)
+        end = datetime(2026, 1, 1, 1, tzinfo=UTC)
+        assert (
+            await adapter.get_historical_bars("EURUSD", "H1", limit=1)
+        ).error is not None
+        assert (
+            await adapter.get_historical_bars(
+                "EURUSD", "H1", start, end, cursor="cursor", limit=1
+            )
+        ).error is not None
+        assert (
+            await adapter.get_historical_bars("EURUSD", "H1", start, end, limit=0)
+        ).error is not None
+
+    asyncio.run(exercise())
+
+
 def test_adapter_get_ticks_maps_bounded_genuine_ticks() -> None:
     """A bounded genuine tick page is mapped from the provider hour file."""
     adapter = DukascopyBrokerAdapter(_config(), transport=_FakeTransport())

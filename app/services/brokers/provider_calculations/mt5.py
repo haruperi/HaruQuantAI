@@ -1,3 +1,4 @@
+# mypy: disable-error-code="attr-defined"
 """MT5 provider-native calculation operations."""
 
 from __future__ import annotations
@@ -11,29 +12,6 @@ from app.services.brokers.contracts import (
     BrokerProfitRequest,
     StandardResponse,
 )
-from app.services.brokers.contracts.protocols import (
-    _RequestValidationError,
-)
-
-
-def _provider_ticket(value: str) -> int:
-    """Parse one caller-supplied MT5 ticket before any provider transmission.
-
-    Args:
-        value: Caller-supplied provider order or position identifier.
-
-    Returns:
-        The exact integral MT5 ticket.
-
-    Raises:
-        _RequestValidationError: If the identifier is not a valid MT5 ticket.
-            Raised before transmission so a malformed caller identifier is never
-            reported as an uncertain mutation outcome.
-    """
-    try:
-        return int(value)
-    except (TypeError, ValueError) as error:
-        raise _RequestValidationError("MT5 ticket must be an integer") from error
 
 
 class _MT5CalculationsMixin:

@@ -26,7 +26,7 @@ def build_response_metadata(
     *,
     name: str,
     domain: str,
-    risk_level: RiskLevel,
+    risk_level: str,
     request_id: str,
     start_time: int,
     read_only: bool,
@@ -64,7 +64,7 @@ def build_response_metadata(
     return ResponseMetadata(
         name=name,
         domain=domain,
-        risk_level=risk_level,
+        risk_level=RiskLevel(risk_level),
         request_id=request_id,
         correlation_id=correlation_id,
         execution_ms=get_execution_ms(start_time),

@@ -15,8 +15,12 @@ from app.services.data import (
     persist_audit_event,
     run_data_migrations,
 )
-from app.utils import canonical_json, generate_id, redact_mapping_value
-from app.utils.contracts.audit import AuditEvent
+from app.utils import (
+    canonical_json,
+    create_audit_event,
+    generate_id,
+    redact_mapping_value,
+)
 
 
 def test_persists_utils_audit_event_envelope(
@@ -32,7 +36,7 @@ def test_persists_utils_audit_event_envelope(
     run_data_migrations(generate_id("req"))
     safe_payload = redact_mapping_value({"account": "demo", "token": "abc123"}).value
     assert isinstance(safe_payload, dict)
-    event = AuditEvent(
+    event = create_audit_event(
         contract_version="v1",
         schema_id="utils.audit_event.v1",
         event_id=generate_id("evt"),

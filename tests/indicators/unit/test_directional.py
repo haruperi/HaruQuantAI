@@ -6,15 +6,17 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from app.services.data.contracts import (
+from app.services.indicators import adx, build_indicator_config
+
+from tests.indicators.helpers import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
+    assert_error,
+    result_metadata,
+    result_values,
+    unwrap_response,
 )
-from app.services.indicators.core.contracts import IndicatorConfig
-from app.services.indicators.trend.directional import adx
-
-from tests.indicators.helpers import assert_error, unwrap_response
 
 _FIXTURE_PATH = (
     Path(__file__).resolve().parent.parent / "fixtures" / "trend_golden.json"
@@ -160,7 +162,7 @@ def test_adx_matches_approved_golden_fixture() -> None:
         spec["expected_minus_di"],
     )
     for column, expected_values in zip(columns, expectations, strict=True):
-        actual = result.values[column].tolist()
+        actual = result_values(result)[column].tolist()
         for actual_value, expected_value in zip(actual, expected_values, strict=True):
             if expected_value is None:
                 assert actual_value != actual_value  # noqa: PLR0124 (NaN self-check)
@@ -172,7 +174,7 @@ def test_adx_rejects_config_disagreement() -> None:
     """A supplied config disagreeing with wrapper args raises IND_INVALID_CONFIG."""
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["adx_bars"])
-    bad_config = IndicatorConfig(
+    bad_config = build_indicator_config(
         indicator_id="adx",
         parameters=(("period", 5),),
         source=None,
@@ -192,21 +194,23 @@ def test_adx_short_history_is_entirely_warmup() -> None:
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["adx_bars"][:3])
     result = unwrap_response(adx(data, period=2))
-    assert result.values["adx_2"].isna().all()
-    assert result.values["plus_di_2"].isna().all()
-    assert result.values["minus_di_2"].isna().all()
-    assert (result.values["unavailable_reason"] == "warmup").all()
+    values = result_values(result)
+    assert values["adx_2"].isna().all()
+    assert values["plus_di_2"].isna().all()
+    assert values["minus_di_2"].isna().all()
+    assert (values["unavailable_reason"] == "warmup").all()
 
 
 def test_adx_zero_true_range_produces_zero_directional_values() -> None:
     """Zero true range across a flat dataset yields zero DI/DX/ADX."""
     data = _flat_dataset(8, 1.5)
     result = unwrap_response(adx(data, period=2))
-    valid = result.values["unavailable_reason"].isna()
+    values = result_values(result)
+    valid = values["unavailable_reason"].isna()
     assert valid.any()
-    assert (result.values.loc[valid, "adx_2"] == 0.0).all()
-    assert (result.values.loc[valid, "plus_di_2"] == 0.0).all()
-    assert (result.values.loc[valid, "minus_di_2"] == 0.0).all()
+    assert (values.loc[valid, "adx_2"] == 0.0).all()
+    assert (values.loc[valid, "plus_di_2"] == 0.0).all()
+    assert (values.loc[valid, "minus_di_2"] == 0.0).all()
 
 
 def test_adx_manifest_row_count_matches_input() -> None:
@@ -214,4 +218,4 @@ def test_adx_manifest_row_count_matches_input() -> None:
     fixture = _load_fixture()
     data = _dataset_from_bars(fixture["adx_bars"])
     result = unwrap_response(adx(data, period=2))
-    assert result.manifest.row_count == len(fixture["adx_bars"])
+    assert result_metadata(result)["manifest"]["row_count"] == len(fixture["adx_bars"])

@@ -6,15 +6,18 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from app.services.data.contracts import (
+from app.services.indicators import build_indicator_config, ema, sma
+
+from tests.indicators.helpers import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
+    assert_error,
+    join_result,
+    result_metadata,
+    result_values,
+    unwrap_response,
 )
-from app.services.indicators.core.contracts import IndicatorConfig
-from app.services.indicators.trend import ema, sma
-
-from tests.indicators.helpers import assert_error, unwrap_response
 
 _FIXTURE_PATH = (
     Path(__file__).resolve().parent.parent / "fixtures" / "trend_golden.json"
@@ -161,7 +164,7 @@ def test_sma_matches_approved_golden_fixture() -> None:
     data = _dataset_from_bars(fixture["bars"])
     spec = fixture["sma"]
     result = unwrap_response(sma(data, period=spec["period"], source=spec["source"]))
-    actual = result.values[spec["output_column"]].tolist()
+    actual = result_values(result)[spec["output_column"]].tolist()
     for actual_value, expected_value in zip(actual, spec["expected"], strict=True):
         if expected_value is None:
             assert actual_value != actual_value  # noqa: PLR0124 (NaN self-check)
@@ -175,7 +178,7 @@ def test_ema_matches_approved_golden_fixture() -> None:
     data = _dataset_from_bars(fixture["bars"])
     spec = fixture["ema"]
     result = unwrap_response(ema(data, period=spec["period"], source=spec["source"]))
-    actual = result.values[spec["output_column"]].tolist()
+    actual = result_values(result)[spec["output_column"]].tolist()
     for actual_value, expected_value in zip(actual, spec["expected"], strict=True):
         if expected_value is None:
             assert actual_value != actual_value  # noqa: PLR0124 (NaN self-check)
@@ -186,7 +189,7 @@ def test_ema_matches_approved_golden_fixture() -> None:
 def test_sma_rejects_config_disagreement() -> None:
     """A supplied config disagreeing with wrapper args raises IND_INVALID_CONFIG."""
     data = _dataset([1.0, 2.0, 3.0, 4.0])
-    bad_config = IndicatorConfig(
+    bad_config = build_indicator_config(
         indicator_id="sma",
         parameters=(("period", 5),),
         source="close",
@@ -207,7 +210,7 @@ def test_sma_rejects_config_disagreement() -> None:
 def test_ema_rejects_config_disagreement() -> None:
     """A supplied config disagreeing with wrapper args raises IND_INVALID_CONFIG."""
     data = _dataset([1.0, 2.0, 3.0, 4.0])
-    bad_config = IndicatorConfig(
+    bad_config = build_indicator_config(
         indicator_id="ema",
         parameters=(("period", 3),),
         source="high",
@@ -229,38 +232,40 @@ def test_sma_short_history_is_entirely_warmup() -> None:
     """A dataset shorter than the period stays entirely unavailable."""
     data = _dataset([1.0, 2.0])
     result = unwrap_response(sma(data, period=5))
-    assert result.values["sma_5"].isna().all()
-    assert (result.values["unavailable_reason"] == "warmup").all()
+    values = result_values(result)
+    assert values["sma_5"].isna().all()
+    assert (values["unavailable_reason"] == "warmup").all()
 
 
 def test_ema_short_history_is_entirely_warmup() -> None:
     """A dataset shorter than the period stays entirely unavailable."""
     data = _dataset([1.0, 2.0])
     result = unwrap_response(ema(data, period=5))
-    assert result.values["ema_5"].isna().all()
-    assert (result.values["unavailable_reason"] == "warmup").all()
+    values = result_values(result)
+    assert values["ema_5"].isna().all()
+    assert (values["unavailable_reason"] == "warmup").all()
 
 
 def test_sma_non_default_source_uses_qualified_output_name() -> None:
     """A non-close source produces the exact source-qualified output name."""
     data = _dataset([1.0, 2.0, 3.0, 4.0])
     result = unwrap_response(sma(data, period=2, source="high"))
-    assert "sma_high_2" in result.output_columns
-    assert result.values["sma_high_2"].notna().sum() == 3
+    assert "sma_high_2" in result_metadata(result)["output_columns"]
+    assert result_values(result)["sma_high_2"].notna().sum() == 3
 
 
 def test_ema_non_default_source_uses_qualified_output_name() -> None:
     """A non-close source produces the exact source-qualified output name."""
     data = _dataset([1.0, 2.0, 3.0, 4.0])
     result = unwrap_response(ema(data, period=2, source="low"))
-    assert "ema_low_2" in result.output_columns
-    assert result.values["ema_low_2"].notna().sum() == 3
+    assert "ema_low_2" in result_metadata(result)["output_columns"]
+    assert result_values(result)["ema_low_2"].notna().sum() == 3
 
 
 def test_sma_manifest_matches_join_to_input_checksum() -> None:
     """SMA's manifest input checksum agrees with join_to for the same dataset."""
     data = _dataset([1.0, 2.0, 3.0, 4.0, 5.0])
     result = unwrap_response(sma(data, period=3))
-    joined = unwrap_response(result.join_to(data))
+    joined = join_result(result, data)
     assert "sma_3" in joined.columns
-    assert result.manifest.row_count == 5
+    assert result_metadata(result)["manifest"]["row_count"] == 5

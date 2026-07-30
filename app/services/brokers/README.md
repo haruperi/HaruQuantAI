@@ -400,6 +400,17 @@ Where an opaque canonical identifier is required, callers use
 `get_broker_id`, `get_broker_environment`, `get_broker_capability_id`, or
 `get_broker_error_code`; no enum constant is public.
 
+Broker credential resolution and standalone connection are owned by Brokers.
+`resolve_provider_connection_config(broker_id, *, settings=None, ...)` resolves a
+governed non-production `BrokerConnectionConfig` from the public
+opaque settings value returned by `load_broker_provider_settings` (read from
+`app/configs/env.json` via the Utils settings layer); it rejects disabled
+providers, missing credentials, and any live environment before an adapter is
+built. `create_connected_broker(broker_id, *, settings=None, connect=True)` builds
+and (by default) connects that adapter, so cross-domain callers (the Data
+composition root and usage examples) select a provider route only and never read
+credentials or open connections directly.
+
 - FR-BRK-001–005 enums;
 - FR-BRK-006–042 canonical models/results;
 - FR-BRK-043–047 and FR-BRK-112 capability/subscription protocols;

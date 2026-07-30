@@ -8,13 +8,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.brokers import (
+    create_connected_broker,
+    disconnect_broker,
+)
 from app.services.data import (
     build_account_snapshot_request,
     get_account_state_snapshot,
     unwrap_data_response,
 )
 from app.utils import generate_id
-from tests.brokers.usage._support import create_real_adapter, require_success
 
 WORKFLOW_ID = "WF-DATA-013"
 STAGES = (
@@ -33,28 +36,37 @@ def _stage(number: int) -> None:
     )
 
 
+def _require_success(label: str, result: object) -> object:
+    """Require one canonical successful broker result and print its metadata."""
+    if result.status != "success":
+        code = "NO_ERROR_CODE" if result.error is None else result.error.code
+        raise RuntimeError(f"{label} failed with {code}")
+    print(label, result.status)
+    return result.data
+
+
 def main() -> None:
     """Execute the real broker-to-Data account snapshot boundary."""
     print(f"{WORKFLOW_ID} — Account Snapshot Service")
     print("INPUT BOUNDARY — read-only account evidence request")
-    adapter = create_real_adapter("mt5")
+    adapter = asyncio.run(create_connected_broker("mt5"))
     try:
         # Stage 1 — Connect a caller-owned genuine MT5 demo adapter.
         _stage(1)
-        require_success("MT5 connect", asyncio.run(adapter.connect()))
+        print("MT5 connect success")
 
         # Stage 2 — Read the exact provider account identity.
         _stage(2)
-        account_result = require_success(
+        account_data = _require_success(
             "MT5 account", asyncio.run(adapter.get_account_info())
         )
-        assert account_result.data is not None
+        assert account_data is not None
 
         # Stage 3 — Wrap the adapter in Data's read-only account boundary.
         _stage(3)
         request = build_account_snapshot_request(
             source_id="mt5",
-            account_id=account_result.data.account_id,
+            account_id=account_data.account_id,
             max_age_seconds=315360000,
             request_id=generate_id("req"),
         )
@@ -78,7 +90,7 @@ def main() -> None:
             snapshot.connected,
         )
     finally:
-        require_success("MT5 disconnect", asyncio.run(adapter.disconnect()))
+        _require_success("MT5 disconnect", asyncio.run(disconnect_broker(adapter)))
     print("OUTPUT BOUNDARY — immutable AccountStateSnapshot v1")
 
 

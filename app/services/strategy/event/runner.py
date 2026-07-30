@@ -26,10 +26,8 @@ from app.services.strategy.contracts.responses import (
     unwrap_evaluator_result,
     unwrap_strategy_response,
 )
-from app.services.strategy.diagnostics import (
-    StrategyErrorCode,
-    export_strategy_diagnostics,
-)
+from app.services.strategy.diagnostics import export_strategy_diagnostics
+from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.intents import TradeIntent, build_trade_intent
 from app.services.strategy.replay import create_strategy_replay_manifest
 from app.utils import canonical_digest, canonical_json, get_logger
@@ -39,7 +37,7 @@ type StandardResponse[T] = Any
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.data import AccountStateSnapshot
+    AccountStateSnapshot = Any
     from app.services.strategy.contracts._base import JsonValue
 
 
@@ -122,8 +120,8 @@ def run_event_strategy_hook(  # noqa: PLR0911
         )
     except StrategyOperationError:
         raise
-    except Exception as error:  # noqa: BLE001 - evaluator trust boundary.
-        logger.error("Event Strategy evaluator failed: %s", type(error).__name__)
+    except Exception as error:
+        logger.exception("Event Strategy evaluator failed: %s", type(error).__name__)
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,
             "strategy evaluator failed",
@@ -213,7 +211,7 @@ def run_event_strategy_hook(  # noqa: PLR0911
     try:
         result_hash = canonical_digest(material)
     except TypeError, ValueError:
-        logger.error("Event Strategy result digest failed")
+        logger.exception("Event Strategy result digest failed")
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,
             "strategy result digest failed",

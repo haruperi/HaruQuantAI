@@ -1,9 +1,9 @@
 """Unit tests for Bollinger Bands."""
 
 import pytest
-from app.services.indicators.trend import bollinger_bands
+from app.services.indicators import bollinger_bands
 
-from tests.indicators.helpers import close_dataset, unwrap_response
+from tests.indicators.helpers import close_dataset, result_values, unwrap_response
 
 
 def test_bollinger_bands_matches_sample_deviation_fixture() -> None:
@@ -11,7 +11,7 @@ def test_bollinger_bands_matches_sample_deviation_fixture() -> None:
     result = unwrap_response(
         bollinger_bands(close_dataset([1.0, 2.0, 3.0]), period=3, std_dev=2.0)
     )
-    row = result.values.iloc[-1]
+    row = result_values(result).iloc[-1]
     assert row["bollinger_bands_middle_3"] == pytest.approx(2.0)
     assert row["bollinger_bands_upper_3"] == pytest.approx(4.0)
     assert row["bollinger_bands_lower_3"] == pytest.approx(0.0)

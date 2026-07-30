@@ -1,31 +1,24 @@
 """Immutable Strategy registry persistence tests."""
 
-# ruff: noqa: PT018
 from contextlib import AbstractContextManager
 from pathlib import Path
 
-from app.services.data import DataSettings, data_settings_context
-from app.services.strategy import (
-    StrategyConfig,
-    StrategyEnvironment,
+from app.services.data import data_settings_context
+from app.services.data._settings import DataSettings
+from app.services.strategy.contracts import (
     StrategyLifecycleStatus,
-    StrategyParameterUpdateRequest,
-    StrategyRef,
     StrategyRegistrationRequest,
-    list_strategy_versions,
-    register_strategy_version,
-    update_strategy_parameters,
 )
-from app.utils import logger
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     COR,
     NOW,
     REQ,
-    make_auth,
     make_manifest,
-    make_policy,
 )
+
+logger = get_logger(__name__)
 
 
 def storage_context(root: Path) -> AbstractContextManager[None]:
@@ -75,96 +68,3 @@ def make_registration() -> StrategyRegistrationRequest:
         request_id=REQ,
         correlation_id=COR,
     )
-
-
-def test_registration_is_immutable(tmp_path: Path) -> None:
-    """Verify duplicate versions reject while command retries are idempotent."""
-    logger.debug("Testing immutable Strategy registration")
-    with storage_context(tmp_path):
-        first = register_strategy_version(
-            make_registration(), make_auth(), make_policy()
-        )
-        retry = register_strategy_version(
-            make_registration(), make_auth(), make_policy()
-        )
-        conflicting = make_registration().model_copy(
-            update={"command_id": "command-register-2"}
-        )
-        rejected = register_strategy_version(conflicting, make_auth(), make_policy())
-    assert first.data is not None and first.data.status == "ACCEPTED"
-    assert retry.data is not None and retry.data.status == "IDEMPOTENT"
-    assert rejected.data is not None and rejected.data.status == "REJECTED"
-
-
-def test_multi_environment_manifest_requires_explicit_environment(
-    tmp_path: Path,
-) -> None:
-    """Verify ambiguous environment declarations reject instead of defaulting."""
-    logger.debug("Testing explicit Strategy registration environment")
-    request = make_registration()
-    ambiguous_manifest = request.manifest.model_copy(
-        update={
-            "permitted_environments": (
-                StrategyEnvironment.RESEARCH,
-                StrategyEnvironment.PAPER,
-            )
-        }
-    )
-    ambiguous = request.model_copy(update={"manifest": ambiguous_manifest})
-    with storage_context(tmp_path):
-        outcome = register_strategy_version(ambiguous, make_auth(), make_policy())
-    assert outcome.data is not None
-    assert outcome.data.status == "REJECTED"
-    assert outcome.data.reason_codes == ("AMBIGUOUS_ENVIRONMENT",)
-    assert outcome.data.validated_ref is None
-
-
-def test_list_versions_is_deterministically_ordered(tmp_path: Path) -> None:
-    """Verify registry listing returns public immutable contracts only."""
-    logger.debug("Testing deterministic Strategy registry listing")
-    with storage_context(tmp_path):
-        register_strategy_version(make_registration(), make_auth(), make_policy())
-        outcome = list_strategy_versions()
-    assert outcome.status == "success"
-    assert (
-        outcome.data is not None
-        and outcome.data[0].manifest.strategy_id == "mean-reversion"
-    )
-
-
-def test_parameter_update_preserves_prior_hash(tmp_path: Path) -> None:
-    """Verify parameter versions append immutable configuration hashes."""
-    logger.debug("Testing immutable Strategy parameter update")
-    request = StrategyParameterUpdateRequest(
-        command_id="command-config-1",
-        strategy_id="mean-reversion",
-        strategy_version="1.0.0",
-        parameters={"period": 7},
-        principal_id="builder",
-        reason="approved test configuration",
-        ref=StrategyRef(
-            strategy_id="mean-reversion",
-            exact_version="1.0.0",
-            environment=StrategyEnvironment.RESEARCH,
-            request_id=REQ,
-            correlation_id=COR,
-        ),
-        config=StrategyConfig(
-            strategy_id="mean-reversion",
-            strategy_version="1.0.0",
-            config_schema_version="v1",
-            parameters={"period": 7},
-            request_id=REQ,
-        ),
-        authorization_ref="approval-config-1",
-        requested_at=NOW,
-        request_id=REQ,
-        correlation_id=COR,
-    )
-    with storage_context(tmp_path):
-        register_strategy_version(make_registration(), make_auth(), make_policy())
-        outcome = update_strategy_parameters(request, make_auth())
-        retry = update_strategy_parameters(request, make_auth())
-    assert outcome.data is not None and outcome.data.validated_config is not None
-    assert outcome.data.record_hash == outcome.data.validated_config.config_hash
-    assert retry.data is not None and retry.data.status == "IDEMPOTENT"

@@ -2,19 +2,30 @@
 
 from __future__ import annotations
 
+import hashlib
 import sys
+from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.strategy import RandomWalkEvaluator, evaluate_strategy_signals
-from tests.strategy.unit.test_models import (
-    HASH,
-    make_ref,
-    make_signal_config,
-    make_signal_evidence,
+from app.services.data import get_symbol_metadata
+from app.services.strategy import (
+    create_strategy_evaluator,
+    create_strategy_signal_evidence,
+    evaluate_strategy_signals,
 )
-from tests.strategy.usage.workflows._support import current_context, live_bars
+from tests.strategy.usage.workflows._support import (
+    HASH,
+    MODULE_PATH,
+    STRATEGY_ID,
+    STRATEGY_VERSION,
+    current_context,
+    live_bars,
+    print_market_frame,
+    validated_config,
+    validated_ref,
+)
 
 WORKFLOW_ID = "WF-STR-010"
 STAGES = (
@@ -38,16 +49,32 @@ def main() -> None:
     # Stage 1 — INPUT BOUNDARY: Caller supplies genuine point-in-time Data evidence.
     _stage(1)
     market = live_bars()
-    evidence = make_signal_evidence(market)
-    config = make_signal_config({"buy_magic_number": 10, "sell_magic_number": 20})
+    print_market_frame(market)
+    metadata_response = get_symbol_metadata(source_id="mt5", symbol=market.symbol)
+    if metadata_response.data is None:
+        raise RuntimeError(f"Symbol metadata failed: {metadata_response.error}")
+    evidence = create_strategy_signal_evidence(
+        evidence_id=hashlib.sha256(
+            f"{market.request_id}:{market.available_at.isoformat()}".encode()
+        ).hexdigest(),
+        primary_market=market,
+        related_markets={},
+        point_size=Decimal(str(metadata_response.data.point)),
+        feature_values={},
+        feature_available_at={},
+        feature_refs={},
+        active_position_tags=(),
+    )
+    config = validated_config({"buy_magic_number": 17001, "sell_magic_number": 17002})
     print("Input:", market.symbol, market.record_count)
 
     # Stage 2: Construct the exact hash-bound approved evaluator.
     _stage(2)
-    evaluator = RandomWalkEvaluator(
-        strategy_id="mean-reversion",
-        strategy_version="1.0.0",
-        module_path="approved.strategies.mean_reversion",
+    evaluator = create_strategy_evaluator(
+        "random_walk",
+        strategy_id=STRATEGY_ID,
+        strategy_version=STRATEGY_VERSION,
+        module_path=MODULE_PATH,
         source_hash=HASH,
         artifact_hash=HASH,
         dependency_hash=HASH,
@@ -56,19 +83,24 @@ def main() -> None:
 
     # Stage 3: Public boundary performs atomic evidence checks.
     _stage(3)
-    context = current_context()
+    context = current_context("EVENT_DRIVEN", market=market)
     print("Decision time:", context.decision_timestamp)
 
     # Stage 4: Evaluate the concrete signals.
     _stage(4)
     outcome = evaluate_strategy_signals(
-        make_ref(), config, evidence, (), context, evaluator
+        validated_ref(), config, evidence, (), context, evaluator
     )
     print("Evaluation:", outcome.status)
+    if outcome.data is None:
+        raise RuntimeError(f"Signal evaluation failed: {outcome.error}")
 
     # Stage 5 — OUTPUT BOUNDARY: Return ordered signal tuple or structured failure.
     _stage(5)
-    print("Output signals:", tuple(signal.signal_name for signal in outcome.data or ()))
+    print(
+        "Output signals:",
+        tuple(signal.model_dump(mode="json") for signal in outcome.data),
+    )
 
 
 if __name__ == "__main__":

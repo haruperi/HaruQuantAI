@@ -35,6 +35,7 @@ from app.services.data.sources.registry import (
 )
 from app.utils import generate_id
 from app.utils.responses.models import StandardResponse
+from app.utils.settings.models import BrokerProviderSettings
 from pydantic import SecretStr
 
 from tests.brokers.response_factory import broker_response
@@ -138,7 +139,7 @@ def test_lazy_mt5_session_maps_disabled_and_missing_credentials(
     session = _runtime._LazyBrokerSession("mt5")
     monkeypatch.setattr(
         _runtime,
-        "_ProviderRuntimeSettings",
+        "load_broker_provider_settings",
         lambda: SimpleNamespace(mt5_enabled=False),
     )
     with pytest.raises(DataError) as disabled:
@@ -147,7 +148,7 @@ def test_lazy_mt5_session_maps_disabled_and_missing_credentials(
 
     monkeypatch.setattr(
         _runtime,
-        "_ProviderRuntimeSettings",
+        "load_broker_provider_settings",
         lambda: SimpleNamespace(
             mt5_enabled=True,
             mt5_login=None,
@@ -194,7 +195,7 @@ def test_lazy_mt5_session_builds_connects_and_caches_adapter(
     captured: dict[str, Any] = {}
     monkeypatch.setattr(
         _runtime,
-        "_ProviderRuntimeSettings",
+        "load_broker_provider_settings",
         lambda: SimpleNamespace(
             mt5_enabled=True,
             mt5_environment="demo",
@@ -241,8 +242,9 @@ def test_lazy_yahoo_session_uses_sandbox_and_explicit_probe(
 
     monkeypatch.setattr(_runtime, "create_broker_adapter", create)
     session = _runtime._LazyBrokerSession("yahoo")
+    settings = BrokerProviderSettings(yahoo_enabled=True)
 
-    assert session._credential_free_adapter(request_id) is adapter
+    assert session._credential_free_adapter(settings, request_id) is adapter
     assert captured["broker_id"] == get_broker_id("yahoo")
     assert get_broker_value_field(
         captured["config"], "environment"
@@ -250,7 +252,7 @@ def test_lazy_yahoo_session_uses_sandbox_and_explicit_probe(
     assert get_broker_value_field(captured["config"], "probe_symbol") == "AAPL"
 
 
-def test_lazy_binance_session_uses_one_loop_and_anonymous_live_profile(
+def test_lazy_binance_session_uses_one_loop_and_anonymous_profile(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Standalone Binance connects, reads, and closes on one owned event loop."""
@@ -282,12 +284,13 @@ def test_lazy_binance_session_uses_one_loop_and_anonymous_live_profile(
 
     monkeypatch.setattr(_runtime, "create_broker_adapter", create)
     session = _runtime._LazyBrokerSession("binance_spot")
+    settings = BrokerProviderSettings(binance_enabled=True)
 
-    assert session._credential_free_adapter(request_id) is adapter
+    assert session._credential_free_adapter(settings, request_id) is adapter
     assert captured["broker_id"] == get_broker_id("binance_spot")
     assert get_broker_value_field(
         captured["config"], "environment"
-    ) == get_broker_environment("live")
+    ) == get_broker_environment("testnet")
     assert get_broker_value_field(captured["config"], "credentials") is None
     assert _runtime._provider_descriptor("binance_spot").requires_credentials is False
     assert adapter.events == []
@@ -349,7 +352,7 @@ def test_yahoo_source_registers_exact_standalone_identity(
     )
     monkeypatch.setattr(
         _runtime,
-        "_ProviderRuntimeSettings",
+        "load_broker_provider_settings",
         lambda: SimpleNamespace(yahoo_enabled=True),
     )
 

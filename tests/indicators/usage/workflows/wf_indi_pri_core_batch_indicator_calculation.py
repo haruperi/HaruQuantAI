@@ -7,8 +7,17 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.indicators import sma, validate_indicator
-from tests.indicators.usage._support import unwrap_indicator_response
+from app.services.indicators import (
+    get_indicator_result_metadata,
+    get_indicator_result_values,
+    sma,
+    validate_indicator,
+)
+from tests.indicators.usage._support import (
+    print_indicator_evidence,
+    print_market_evidence,
+    unwrap_indicator_response,
+)
 from tests.indicators.usage.workflows._support import indicator_config, live_bars
 
 WORKFLOW_ID = "WF-INDI-PRI"
@@ -34,7 +43,7 @@ def main() -> None:
     _stage(1)
     dataset = live_bars()
     config = indicator_config("sma", 5)
-    print("Input:", dataset.symbol, dataset.timeframe, dataset.record_count, "bars")
+    print_market_evidence(dataset)
 
     # Stage 2: Resolve and validate before calculation.
     _stage(2)
@@ -46,21 +55,22 @@ def main() -> None:
     result = unwrap_indicator_response(
         sma(dataset, period=5, source="close", config=config)
     )
-    print("Calculated rows:", result.manifest.row_count)
+    metadata = get_indicator_result_metadata(result)
+    print_indicator_evidence(result, label="Calculated SMA workflow rows")
 
     # Stage 4: Inspect propagated evidence.
     _stage(4)
     print(
         "Evidence:",
-        result.manifest.quality_status,
-        result.manifest.source_timeframe,
-        result.values["unavailable_reason"].notna().sum(),
+        metadata["manifest"].get("quality_status"),
+        metadata["manifest"]["source_timeframe"],
+        get_indicator_result_values(result)["unavailable_reason"].notna().sum(),
         "unavailable rows",
     )
 
     # Stage 5 — OUTPUT BOUNDARY: Return the typed IndicatorResult.
     _stage(5)
-    print("Output: IndicatorResult", result.manifest.output_checksum)
+    print("Output: IndicatorResult", metadata["manifest"]["output_checksum"])
 
 
 if __name__ == "__main__":

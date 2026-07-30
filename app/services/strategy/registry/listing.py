@@ -5,10 +5,10 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from app.services.data import (
-    DataError,
-    StatementPlan,
-    TransactionRequest,
+    build_statement_plan,
+    build_transaction_request,
     execute_transaction,
+    is_data_error,
 )
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.manifest import StrategyManifest
@@ -58,8 +58,8 @@ def list_strategy_versions(
             params = (strategy_id,)
         result = unwrap_data_response(
             execute_transaction(
-                TransactionRequest(
-                    plan=StatementPlan(
+                build_transaction_request(
+                    plan=build_statement_plan(
                         statements=(statement,),
                         parameter_sets=(params,),
                         max_rows=1_000,
@@ -69,7 +69,9 @@ def list_strategy_versions(
             ),
             operation="data.execute_transaction.strategy_registry",
         )
-    except DataError:
+    except Exception as error:
+        if not is_data_error(error):
+            raise
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,
             "strategy registry read failed",

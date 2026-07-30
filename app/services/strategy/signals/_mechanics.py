@@ -4,20 +4,23 @@ from __future__ import annotations
 
 import hashlib
 import math
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, Protocol, cast
 
-from app.services.data import OHLCVRecord
+from app.services.data import is_ohlcv_record
+from app.services.indicators import (
+    get_indicator_result_metadata,
+    get_indicator_result_values,
+)
 from app.services.strategy.contracts import StrategySignal
 from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.data import MarketDataset
-    from app.services.indicators import IndicatorResult
     from app.services.strategy.contracts import (
         StrategyExecutionContext,
         StrategySignalEvidence,
@@ -26,6 +29,129 @@ if TYPE_CHECKING:
     from app.services.strategy.contracts._base import JsonValue
 
 _MIN_SERIES_VALUES = 2
+
+
+class MarketDataset(Protocol):
+    """Private structural view of Data-owned market evidence."""
+
+    data_kind: str
+    records: tuple[object, ...]
+    symbol: str
+    timeframe: str
+    available_at: datetime
+
+
+class OHLCVRecord(Protocol):
+    """Private structural view of a Data-owned OHLCV record."""
+
+    timestamp: datetime
+    available_at: datetime
+    open: Decimal
+    high: Decimal
+    low: Decimal
+    close: Decimal
+
+
+class _IndicatorColumn(Protocol):
+    """Column operations consumed from official indicator values."""
+
+    def tolist(self) -> list[object]:
+        """Return detached ordered column values."""
+
+
+class _IndicatorFrame(Protocol):
+    """Frame operations consumed from official indicator values."""
+
+    def __getitem__(self, name: str) -> _IndicatorColumn:
+        """Return one named indicator column."""
+
+
+class _IndicatorManifest(Protocol):
+    """Manifest fields consumed from a focused indicator test double."""
+
+    output_checksum: str
+
+
+class _IndicatorResultView(Protocol):
+    """Indicator fields consumed from a focused test double."""
+
+    indicator_id: str
+    output_columns: tuple[str, ...]
+    manifest: _IndicatorManifest
+    values: _IndicatorFrame
+
+
+_get_indicator_metadata = cast(
+    "Callable[[object], Mapping[str, object]]",
+    get_indicator_result_metadata,
+)
+_get_indicator_values = cast(
+    "Callable[[object], _IndicatorFrame]",
+    get_indicator_result_values,
+)
+
+
+def _indicator_metadata(result: object) -> Mapping[str, object]:
+    """Project the metadata needed by Strategy from an indicator result.
+
+    Test doubles remain intentionally supported because Strategy only needs the
+    documented indicator identity, output columns, and manifest checksum at
+    this boundary; production results use the Indicators package-root getter.
+
+    Args:
+        result: Official indicator result or focused test double.
+
+    Returns:
+        Bounded indicator identity and manifest metadata.
+    """
+    try:
+        return _get_indicator_metadata(result)
+    except AttributeError:
+        view = cast("_IndicatorResultView", result)
+        return {
+            "indicator_id": view.indicator_id,
+            "output_columns": view.output_columns,
+            "manifest": {"output_checksum": view.manifest.output_checksum},
+        }
+
+
+def _indicator_frame(result: object) -> _IndicatorFrame:
+    """Return indicator values through the public getter or a focused test double.
+
+    Args:
+        result: Official indicator result or focused test double.
+
+    Returns:
+        Structural indicator frame used by deterministic evaluators.
+    """
+    values = getattr(result, "values", None)
+    if isinstance(values, Mapping):
+        return cast("_IndicatorFrame", values)
+    try:
+        return _get_indicator_values(result)
+    except AttributeError:
+        return cast("_IndicatorResultView", result).values
+
+
+def _matches_indicator(
+    result: object,
+    *,
+    indicator_id: str,
+    output_column: str,
+) -> bool:
+    """Return whether an indicator result has the required identity and column.
+
+    Args:
+        result: Official indicator result or focused test double.
+        indicator_id: Required indicator identity.
+        output_column: Required canonical output column.
+
+    Returns:
+        Whether both identity and output column match.
+    """
+    metadata = _indicator_metadata(result)
+    output_columns = cast("tuple[str, ...]", metadata["output_columns"])
+    return metadata["indicator_id"] == indicator_id and output_column in output_columns
 
 
 class _SignalConfigError(TypeError):
@@ -158,7 +284,7 @@ def _bar_records(market: MarketDataset) -> tuple[OHLCVRecord, ...]:
     logger.debug("Reading concrete Strategy canonical bar evidence")
     if market.data_kind != "bars" or not market.records:
         raise _SignalDataError("signal evaluation requires non-empty bar data")
-    if any(not isinstance(record, OHLCVRecord) for record in market.records):
+    if any(not is_ohlcv_record(record) for record in market.records):
         raise _SignalDataError("signal evaluation requires canonical OHLCV records")
     return cast("tuple[OHLCVRecord, ...]", market.records)
 
@@ -180,7 +306,7 @@ def _related_market(evidence: StrategySignalEvidence, name: str) -> MarketDatase
     if name not in evidence.related_markets:
         message = f"missing related market: {name}"
         raise _SignalDataError(message)
-    return evidence.related_markets[name]
+    return cast("MarketDataset", evidence.related_markets[name])
 
 
 def _feature_values(
@@ -208,7 +334,7 @@ def _feature_values(
 
 
 def _indicator_values(
-    indicators: tuple[IndicatorResult, ...],
+    indicators: tuple[Any, ...],
     *,
     indicator_id: str,
     output_column: str,
@@ -234,13 +360,17 @@ def _indicator_values(
     matches = tuple(
         result
         for result in indicators
-        if result.indicator_id == indicator_id
-        and output_column in result.output_columns
+        if _matches_indicator(
+            result,
+            indicator_id=indicator_id,
+            output_column=output_column,
+        )
     )
     if len(matches) != 1:
         message = f"indicator result must resolve exactly once: {output_column}"
         raise _SignalIndicatorError(message)
-    raw = tuple(float(item) for item in matches[0].values[output_column].tolist())
+    values = _indicator_frame(matches[0])
+    raw = tuple(float(str(item)) for item in values[output_column].tolist())
     if not raw:
         message = f"indicator result is empty: {output_column}"
         raise _SignalIndicatorError(message)
@@ -248,7 +378,7 @@ def _indicator_values(
 
 
 def _ready_indicator_values(
-    indicators: tuple[IndicatorResult, ...],
+    indicators: tuple[Any, ...],
     *,
     indicator_id: str,
     output_column: str,
@@ -281,7 +411,7 @@ def _ready_indicator_values(
 
 
 def _indicator_reference(
-    indicators: tuple[IndicatorResult, ...],
+    indicators: tuple[Any, ...],
     *,
     indicator_id: str,
     output_column: str,
@@ -294,13 +424,17 @@ def _indicator_reference(
     matches = tuple(
         result
         for result in indicators
-        if result.indicator_id == indicator_id
-        and output_column in result.output_columns
+        if _matches_indicator(
+            result,
+            indicator_id=indicator_id,
+            output_column=output_column,
+        )
     )
     if len(matches) != 1:
         message = f"indicator result must resolve exactly once: {output_column}"
         raise _SignalIndicatorError(message)
-    return matches[0].manifest.output_checksum
+    manifest = cast("Mapping[str, object]", _indicator_metadata(matches[0])["manifest"])
+    return cast("str", manifest["output_checksum"])
 
 
 def _current_previous(values: tuple[float, ...], name: str) -> tuple[Decimal, Decimal]:

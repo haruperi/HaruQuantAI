@@ -1,3 +1,4 @@
+# ruff: noqa: ANN401
 """Versioned, TTL-aware local SQLite caching."""
 
 from __future__ import annotations
@@ -113,14 +114,14 @@ def _get_cache_entry_raw(
         )
 
     except ValidationError as error:
-        logger.error("Cache entry schema validation failed")
+        logger.exception("Cache entry schema validation failed")
         raise DataError(
             "FILE_CORRUPTED",
             safe_details={"operation": "get_cache_entry"},
             request_id=request.request_id,
         ) from error
     except Exception as error:
-        logger.error("Cache entry query failed")
+        logger.exception("Cache entry query failed")
         if isinstance(error, DataError):
             raise
         raise DataError(
@@ -210,7 +211,7 @@ def _put_cache_entry_raw(
         )
 
     except Exception as error:
-        logger.error("Cache entry write failed")
+        logger.exception("Cache entry write failed")
         if isinstance(error, DataError):
             raise
         raise DataError(
@@ -343,7 +344,7 @@ def _clear_cache_entry_raw(request: CacheClearRequest) -> CacheClearResult:
         )
 
     except Exception as error:
-        logger.error("Cache clear failed")
+        logger.exception("Cache clear failed")
         if isinstance(error, DataError):
             raise
         raise DataError(

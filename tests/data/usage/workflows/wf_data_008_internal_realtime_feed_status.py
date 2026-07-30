@@ -4,15 +4,19 @@ from __future__ import annotations
 
 import sys
 import tempfile
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
+    build_data_settings,
     build_feed_config,
     build_feed_status_request,
+    build_market_data_request,
     build_raw_feed_event,
     build_reconnect_policy,
+    data_settings_context,
     get_tick_data,
     ingest_feed_event,
     read_feed_status,
@@ -21,8 +25,9 @@ from app.services.data import (
     unwrap_data_response,
 )
 from app.utils import generate_id
-from tests.data.usage.workflows._support import isolated_runtime, market_request
 
+_END = datetime.now(UTC)
+_START = _END - timedelta(days=5)
 WORKFLOW_ID = "WF-DATA-008"
 STAGES = (
     "Retrieve one genuine MT5 tick at the public read boundary.",
@@ -39,74 +44,111 @@ def _stage(number: int) -> None:
     )
 
 
+def _market_request(data_kind, *, timeframe, limit):
+    """Build one bounded genuine MT5 request inline."""
+    return build_market_data_request(
+        source_id="mt5",
+        symbol="EURUSD",
+        data_kind=data_kind,
+        timeframe=timeframe if data_kind == "bars" else None,
+        start=_START,
+        end=_END,
+        limit=limit,
+        use_cache=False,
+        quality_failure_behavior="warn",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        stale_cache_policy="refresh",
+        fallback_sources=(),
+        request_id=generate_id("req"),
+    )
+
+
 def main() -> None:
     """Execute the current feed harness with genuine provider evidence."""
     print(f"{WORKFLOW_ID} — Internal Real-Time Feed and Status")
     print("INPUT BOUNDARY — genuine MT5 tick enters the internal feed harness")
 
-    with (
-        tempfile.TemporaryDirectory(prefix="wf-data-008-") as directory,
-        isolated_runtime(Path(directory)),
-    ):
-        request_id = generate_id("req")
-        run_data_migrations(request_id)
-
-        # Stage 1 — Retrieve one genuine MT5 tick at the public read boundary.
-        _stage(1)
-        ticks_resp = get_tick_data(market_request("ticks", timeframe=None, limit=1))
-        ticks = unwrap_data_response(
-            ticks_resp, operation="get_tick_data", request_id=request_id
-        )
-        tick = ticks.records[-1]
-
-        # Stage 2 — Start the bounded internal feed runtime.
-        _stage(2)
-        config = build_feed_config(
-            feed_id="wf-data-008-mt5",
-            source_id="mt5",
-            symbol="EURUSD",
-            data_kind="tick",
-            source_capability="ticks",
-            buffer_capacity=8,
-            overflow_policy="drop_and_reconcile",
-            heartbeat_timeout_seconds=30,
-            reconnect_policy=build_reconnect_policy(
-                max_retries=2,
-                initial_backoff_seconds=1,
-                max_backoff_seconds=4,
-                jitter_seconds=1,
-                circuit_cooldown_seconds=30,
+    with tempfile.TemporaryDirectory(prefix="wf-data-008-") as directory:
+        root = Path(directory)
+        (root / "data" / "raw").mkdir(parents=True, exist_ok=True)
+        settings = build_data_settings(
+            database_url="sqlite:///workflow.sqlite3",
+            data_dir=root,
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
+            approved_storage_roots=(
+                Path("raw"),
+                Path("processed"),
+                Path("data"),
+                Path("data/raw"),
+                Path("data/processed"),
             ),
-            request_id=request_id,
+            data_provider_sources=("mt5",),
+            data_raw_root=Path("data/raw"),
         )
-        start_internal_feed(config)
+        with data_settings_context(settings):
+            request_id = generate_id("req")
+            run_data_migrations(request_id)
 
-        # Stage 3 — Normalize and ingest the provider-derived event.
-        _stage(3)
-        accepted = ingest_feed_event(
-            config.feed_id,
-            build_raw_feed_event(
-                feed_id=config.feed_id,
-                sequence=1,
-                event_timestamp=tick.timestamp,
-                received_at=tick.available_at,
-                payload={
-                    "bid": str(tick.bid) if tick.bid is not None else None,
-                    "ask": str(tick.ask) if tick.ask is not None else None,
-                },
-                request_id=request_id,
-            ),
-        )
-
-        # Stage 4 — Read persisted heartbeat, depth, gap, and breaker status.
-        _stage(4)
-        status = read_feed_status(
-            build_feed_status_request(
-                feed_id=config.feed_id, request_id=generate_id("req")
+            # Stage 1 — Retrieve one genuine MT5 tick at the public read boundary.
+            _stage(1)
+            ticks_resp = get_tick_data(
+                _market_request("ticks", timeframe=None, limit=1)
             )
-        )
-        assert accepted.accepted
-        print("Feed state:", status.state, status.buffer_depth, status.gap_count)
+            ticks = unwrap_data_response(
+                ticks_resp, operation="get_tick_data", request_id=request_id
+            )
+            tick = ticks.records[-1]
+
+            # Stage 2 — Start the bounded internal feed runtime.
+            _stage(2)
+            config = build_feed_config(
+                feed_id="wf-data-008-mt5",
+                source_id="mt5",
+                symbol="EURUSD",
+                data_kind="tick",
+                source_capability="ticks",
+                buffer_capacity=8,
+                overflow_policy="drop_and_reconcile",
+                heartbeat_timeout_seconds=30,
+                reconnect_policy=build_reconnect_policy(
+                    max_retries=2,
+                    initial_backoff_seconds=1,
+                    max_backoff_seconds=4,
+                    jitter_seconds=1,
+                    circuit_cooldown_seconds=30,
+                ),
+                request_id=request_id,
+            )
+            start_internal_feed(config)
+
+            # Stage 3 — Normalize and ingest the provider-derived event.
+            _stage(3)
+            accepted = ingest_feed_event(
+                config.feed_id,
+                build_raw_feed_event(
+                    feed_id=config.feed_id,
+                    sequence=1,
+                    event_timestamp=tick.timestamp,
+                    received_at=tick.available_at,
+                    payload={
+                        "bid": str(tick.bid) if tick.bid is not None else None,
+                        "ask": str(tick.ask) if tick.ask is not None else None,
+                    },
+                    request_id=request_id,
+                ),
+            )
+
+            # Stage 4 — Read persisted heartbeat, depth, gap, and breaker status.
+            _stage(4)
+            status = read_feed_status(
+                build_feed_status_request(
+                    feed_id=config.feed_id, request_id=generate_id("req")
+                )
+            )
+            assert accepted.accepted
+            print("Feed state:", status.state, status.buffer_depth, status.gap_count)
     print("OUTPUT BOUNDARY — bounded FeedStatus from real MT5-derived evidence")
 
 

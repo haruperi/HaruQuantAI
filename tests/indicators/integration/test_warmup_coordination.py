@@ -3,20 +3,22 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data import (
-    DataQualityReport,
-    MarketDataset,
-    OHLCVRecord,
-)
 from app.services.indicators import (
-    IndicatorConfig,
+    build_indicator_config,
     get_indicator,
+    get_indicator_result_values,
     get_warmup_requirement,
     sma,
     validate_indicator,
 )
 
-from tests.indicators.helpers import assert_error, unwrap_response
+from tests.indicators.helpers import (
+    DataQualityReport,
+    MarketDataset,
+    OHLCVRecord,
+    assert_error,
+    unwrap_response,
+)
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -101,7 +103,7 @@ def test_warmup_requirement_preserves_unavailable_rows() -> None:
     """
     spec = unwrap_response(get_indicator("sma"))
     period = 3
-    config = IndicatorConfig(
+    config = build_indicator_config(
         indicator_id="sma",
         parameters=(("period", period),),
         source="close",
@@ -118,13 +120,17 @@ def test_warmup_requirement_preserves_unavailable_rows() -> None:
 
     sufficient_data = _dataset(bar_count=4)
     result = unwrap_response(sma(sufficient_data, period=period, source="close"))
-    values = result.values
+    values = get_indicator_result_values(result)
     assert values["unavailable_reason"].iloc[: period - 1].eq("warmup").all()
     assert values["unavailable_reason"].iloc[period - 1 :].isna().all()
 
     short_data = _dataset(bar_count=2)
     short_result = unwrap_response(sma(short_data, period=period, source="close"))
-    assert short_result.values["unavailable_reason"].eq("warmup").all()
+    assert (
+        get_indicator_result_values(short_result)["unavailable_reason"]
+        .eq("warmup")
+        .all()
+    )
 
     empty_data = _dataset(bar_count=0)
     assert_error(validate_indicator("sma", empty_data, config), "IND_INSUFFICIENT_DATA")

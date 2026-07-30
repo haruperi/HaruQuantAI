@@ -7,12 +7,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.strategy import (
-    StrategyDiagnostics,
-    StrategyEnvironment,
-    StrategyErrorCode,
-    StrategyExecutionContext,
-    StrategyTimingPolicy,
+    create_strategy_diagnostics,
+    create_strategy_execution_context,
     export_strategy_diagnostics,
+    get_strategy_environment,
+    get_strategy_error_catalog,
+    get_strategy_error_code,
+    get_strategy_timing_policy,
 )
 
 
@@ -24,7 +25,10 @@ def _header(title: str) -> None:
 def fr_str_018() -> None:
     """Demonstrate the accepted Strategy error catalogue."""
     _header("Demonstrate the accepted Strategy error catalogue.")
-    assert StrategyErrorCode.INVALID_CONFIG.value == "STRATEGY_INVALID_CONFIG"
+    assert get_strategy_error_code("STRATEGY_INVALID_CONFIG").value == (
+        "STRATEGY_INVALID_CONFIG"
+    )
+    assert "STRATEGY_INVALID_CONFIG" in get_strategy_error_catalog()
 
 
 def fr_str_019() -> None:
@@ -36,7 +40,7 @@ def fr_str_019() -> None:
 def fr_str_034() -> None:
     """Demonstrate the immutable diagnostic contract."""
     _header("Demonstrate the immutable diagnostic contract.")
-    assert StrategyDiagnostics.model_fields["safe_details"]
+    assert callable(create_strategy_diagnostics)
 
 
 def main() -> int:
@@ -49,10 +53,10 @@ def main() -> int:
     fr_str_019()
     fr_str_034()
     print("\nSTRATEGY DIAGNOSTICS")
-    context = StrategyExecutionContext(
-        environment=StrategyEnvironment.RESEARCH,
+    context = create_strategy_execution_context(
+        environment=get_strategy_environment("RESEARCH"),
         decision_timestamp=datetime.now(UTC),
-        timing_policy=StrategyTimingPolicy.EVENT_DRIVEN,
+        timing_policy=get_strategy_timing_policy("EVENT_DRIVEN"),
         seed=11,
         interface_version="v1",
         request_id="req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
@@ -75,7 +79,8 @@ def main() -> int:
     if outcome.data is None:
         print("Error:", outcome.error)
         return 1
-    diagnostics: StrategyDiagnostics = outcome.data
+    diagnostics = outcome.data
+    reconstructed = create_strategy_diagnostics(**diagnostics.model_dump())
     print("Schema:", diagnostics.schema_id)
     print("Contract version:", diagnostics.contract_version)
     print("Status field:", diagnostics.status)
@@ -85,6 +90,7 @@ def main() -> int:
     print("Payload bytes:", diagnostics.payload_bytes)
     print("Redacted paths:", diagnostics.redacted_paths)
     print("Safe details:", dict(diagnostics.safe_details))
+    print("Public value-factory round trip:", reconstructed == diagnostics)
     print("Secret value never appears above.")
 
     print("\n-- Bound enforcement --")
@@ -95,12 +101,13 @@ def main() -> int:
         print("Error code:", bounded.error.code)
 
     print("\n-- Accepted error catalogue --")
-    print("Total accepted codes:", len(tuple(StrategyErrorCode)))
+    catalogue = get_strategy_error_catalog()
+    print("Total accepted codes:", len(catalogue))
     for code in (
-        StrategyErrorCode.INVALID_CONFIG,
-        StrategyErrorCode.LOOKAHEAD_DETECTED,
-        StrategyErrorCode.ARBITRARY_CODE_REJECTED,
-        StrategyErrorCode.RESOURCE_LIMIT_EXCEEDED,
+        get_strategy_error_code("STRATEGY_INVALID_CONFIG"),
+        get_strategy_error_code("STRATEGY_LOOKAHEAD_DETECTED"),
+        get_strategy_error_code("STRATEGY_ARBITRARY_CODE_REJECTED"),
+        get_strategy_error_code("STRATEGY_RESOURCE_LIMIT_EXCEEDED"),
     ):
         print(" ", code.value)
     return 0

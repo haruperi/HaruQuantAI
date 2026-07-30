@@ -2,28 +2,36 @@
 
 from __future__ import annotations
 
+import hashlib
 import sys
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.indicators import ema
+import pandas as pd
+from app.services.indicators import rsi
 from app.services.strategy import (
-    StrategyDecision,
-    StrategyExecutionContext,
-    StrategyTimingPolicy,
-    run_vectorized_strategy_signals,
+    create_strategy_evaluator,
+    create_strategy_execution_context,
+    create_strategy_manifest,
+    create_strategy_signal_evidence,
+    create_strategy_validation_policy,
+    create_validated_strategy_config,
+    create_validated_strategy_ref,
+    evaluate_strategy_signals,
+    get_strategy_environment,
+    get_strategy_lifecycle_status,
+    get_strategy_timing_policy,
 )
-from tests.indicators.usage._support import unwrap_indicator_response
+from app.utils import generate_id
+from tests.indicators.usage._support import (
+    print_indicator_evidence,
+    print_market_evidence,
+    unwrap_indicator_response,
+)
 from tests.indicators.usage.workflows._support import live_bars
-from tests.strategy.unit.test_models import (
-    HASH,
-    make_config,
-    make_context,
-    make_decision,
-    make_ref,
-)
 
 WORKFLOW_ID = "WF-INDI-SEC"
 STAGES = (
@@ -35,36 +43,6 @@ STAGES = (
 )
 
 
-class _CurrentNeutralEvaluator:
-    """Hash-bound evaluator returning a decision valid at the current clock."""
-
-    strategy_id = "mean-reversion"
-    strategy_version = "1.0.0"
-    module_path = "approved.strategies.mean_reversion"
-    source_hash = HASH
-    artifact_hash = HASH
-    dependency_hash = HASH
-
-    def evaluate_vectorized(
-        self,
-        market: object,
-        indicators: object,
-        config: object,
-        context: StrategyExecutionContext,
-        account_snapshot: object,
-    ) -> tuple[StrategyDecision, ...]:
-        """Return one neutral decision bound to the injected clock."""
-        del market, indicators, config, account_snapshot
-        return (
-            make_decision(action="NEUTRAL").model_copy(
-                update={
-                    "valid_from": context.decision_timestamp - timedelta(seconds=1),
-                    "expires_at": context.decision_timestamp + timedelta(seconds=1),
-                }
-            ),
-        )
-
-
 def _stage(number: int) -> None:
     """Print one README-aligned workflow stage."""
     print(
@@ -72,49 +50,177 @@ def _stage(number: int) -> None:
     )
 
 
+def _strategy_runtime(dataset: object, indicator: object) -> tuple[object, object]:
+    """Evaluate the concrete Decomposing Trade strategy against genuine RSI."""
+    repository_root = Path(__file__).parents[4]
+    module_path = "app.services.strategy.evaluators.decomposing_trade"
+    source_path = (
+        repository_root
+        / "app"
+        / "services"
+        / "strategy"
+        / "evaluators"
+        / "decomposing_trade.py"
+    )
+    source_hash = hashlib.sha256(source_path.read_bytes()).hexdigest()
+    dependency_hash = hashlib.sha256(b"indicators:rsi:1.0.0").hexdigest()
+    artifact_hash = hashlib.sha256(
+        f"{source_hash}:{dependency_hash}".encode()
+    ).hexdigest()
+    timing = get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE")
+    environment = get_strategy_environment("RESEARCH")
+    policy = create_strategy_validation_policy(
+        policy_version="policy-v1",
+        approved_module_roots=("app.services.strategy.evaluators",),
+        max_config_payload_bytes=4_096,
+        max_config_nesting_depth=8,
+        max_config_string_length=128,
+        max_config_collection_items=64,
+    )
+    manifest = create_strategy_manifest(
+        strategy_id="decomposing_trade",
+        strategy_version="1.0.0",
+        module_path=module_path,
+        owner_ref="strategy-domain",
+        interface_version="v1",
+        config_schema_version="v1",
+        config_schema={
+            "type": "object",
+            "properties": {
+                "rsi_period": {"type": "integer", "minimum": 2},
+                "oversold": {"type": "number"},
+                "overbought": {"type": "number"},
+            },
+            "required": ("rsi_period", "oversold", "overbought"),
+            "additionalProperties": False,
+        },
+        required_data=("bars",),
+        required_indicators=("rsi",),
+        timing_policy=timing,
+        permitted_environments=(environment,),
+        source_hash=source_hash,
+        artifact_hash=artifact_hash,
+        dependency_hash=dependency_hash,
+        provenance_refs=(str(source_path.relative_to(repository_root)),),
+        supported_hooks=("on_bar",),
+        requires_account_snapshot=False,
+        max_batch_records=100,
+        max_diagnostic_bytes=8_192,
+        max_checkpoint_bytes=8_192,
+        max_local_state_bytes=4_096,
+        decision_timeout_seconds=5,
+    )
+    request_id = generate_id("req")
+    correlation_id = generate_id("cor")
+    ref = create_validated_strategy_ref(
+        manifest=manifest,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
+        environment=environment,
+        policy_version=policy.policy_version,
+        validation_policy=policy,
+        registry_record_hash=artifact_hash,
+        request_id=request_id,
+        correlation_id=correlation_id,
+    )
+    config = create_validated_strategy_config(
+        strategy_id=manifest.strategy_id,
+        strategy_version=manifest.strategy_version,
+        config_schema_version=manifest.config_schema_version,
+        normalized_parameters={
+            "rsi_period": 2,
+            "oversold": 30,
+            "overbought": 70,
+        },
+        config_hash=hashlib.sha256(b"rsi=2;oversold=30;overbought=70").hexdigest(),
+        policy_version=policy.policy_version,
+        request_id=request_id,
+    )
+    context = create_strategy_execution_context(
+        environment=environment,
+        decision_timestamp=datetime.now(UTC),
+        timing_policy=timing,
+        seed=7,
+        interface_version="v1",
+        request_id=request_id,
+        workflow_id=generate_id("wf"),
+        correlation_id=correlation_id,
+        dependency_status={},
+        snapshot_refs=(dataset.request_id,),
+        max_diagnostic_bytes=8_192,
+    )
+    evidence = create_strategy_signal_evidence(
+        evidence_id=hashlib.sha256(
+            f"{dataset.request_id}:{dataset.available_at.isoformat()}".encode()
+        ).hexdigest(),
+        primary_market=dataset,
+        related_markets={},
+        point_size=Decimal("0.00001"),
+        feature_values={},
+        feature_available_at={},
+        feature_refs={},
+        active_position_tags=(),
+    )
+    evaluator = create_strategy_evaluator(
+        "decomposing_trade",
+        strategy_id=manifest.strategy_id,
+        strategy_version=manifest.strategy_version,
+        module_path=manifest.module_path,
+        source_hash=source_hash,
+        artifact_hash=artifact_hash,
+        dependency_hash=dependency_hash,
+    )
+    return (
+        evaluate_strategy_signals(
+            ref,
+            config,
+            evidence,
+            (indicator,),
+            context,
+            evaluator,
+        ),
+        timing,
+    )
+
+
 def main() -> None:
     """Run the documented input-to-output workflow."""
-    # Stage 1 — INPUT BOUNDARY: Data supplies a genuine MT5-backed MarketDataset.
+    print(f"{WORKFLOW_ID} — Decision-Time Consumption")
+    print("INPUT BOUNDARY — genuine MT5 bars and official RSI evidence")
+
+    # Stage 1 — accept genuine MT5-backed Data evidence.
     _stage(1)
     dataset = live_bars()
-    print("Input available_at:", dataset.available_at)
+    print_market_evidence(dataset)
 
-    # Stage 2: Calculate official EMA values.
+    # Stage 2 — calculate the official indicator values.
     _stage(2)
-    indicator = unwrap_indicator_response(ema(dataset, period=5))
-    print("Indicator rows:", indicator.manifest.row_count)
+    indicator = unwrap_indicator_response(rsi(dataset, period=2))
+    print_indicator_evidence(indicator, label="Decision-time RSI rows")
 
-    # Stage 3: Establish the documented decision-time policy.
+    # Stage 3 — establish and apply the decision-time policy.
     _stage(3)
-    timing = StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE
-    ref = make_ref(timing=timing)
-    ref = ref.model_copy(
-        update={
-            "manifest": ref.manifest.model_copy(
-                update={"required_indicators": ("ema",)}
-            )
-        }
-    )
+    outcome, timing = _strategy_runtime(dataset, indicator)
     print("Timing policy:", timing.value)
 
-    # Stage 4: Consume only availability-qualified typed evidence.
+    # Stage 4 — execute the concrete Strategy evaluator.
     _stage(4)
-    context = make_context(timing=timing).model_copy(
-        update={"decision_timestamp": datetime.now(UTC)}
+    signals = unwrap_indicator_response(outcome)
+    signal_frame = pd.DataFrame(
+        {
+            "signal_name": [signal.signal_name for signal in signals],
+            "side": [signal.side for signal in signals],
+            "active": [signal.active for signal in signals],
+            "timestamp": [signal.timestamp for signal in signals],
+            "facts": [dict(signal.facts) for signal in signals],
+        }
     )
-    outcome = run_vectorized_strategy_signals(
-        ref,
-        make_config(),
-        dataset,
-        (indicator,),
-        context,
-        _CurrentNeutralEvaluator(),
-    )
-    print("Strategy status:", outcome.status)
+    print("Concrete Decomposing Trade signal rows:")
+    print(signal_frame.to_string(index=False))
 
-    # Stage 5 — OUTPUT BOUNDARY: Return Strategy's canonical envelope.
+    # Stage 5 — expose Strategy's typed response and genuine signal rows.
     _stage(5)
-    print("Output:", type(outcome).__name__, outcome.status)
+    print("OUTPUT BOUNDARY — Strategy response carrying concrete signal rows")
+    print("Output:", outcome.status, len(signals), "genuine RSI-derived signals")
 
 
 if __name__ == "__main__":

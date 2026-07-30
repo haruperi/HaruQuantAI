@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict
-from typing import Any, Protocol, runtime_checkable
+from collections.abc import Callable
+from typing import Any, Protocol, cast, runtime_checkable
 
-from app.services.data import (
-    AccountStateSnapshot,  # noqa: TC001 - runtime annotation and model resolution
-    MarketDataset,  # noqa: TC001 - runtime annotation and model resolution
+from app.services.indicators import (
+    get_indicator_result_metadata,
+    get_indicator_result_values,
 )
-from app.services.indicators import IndicatorResult  # noqa: TC001
 from app.services.strategy.contracts.execution import (
     StrategyDecision,
     StrategyExecutionContext,
@@ -29,17 +28,22 @@ from app.services.strategy.contracts.responses import (
     unwrap_evaluator_result,
     unwrap_strategy_response,
 )
-from app.services.strategy.diagnostics import (
-    StrategyErrorCode,
-    export_strategy_diagnostics,
-)
+from app.services.strategy.diagnostics import export_strategy_diagnostics
+from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.intents import TradeIntent, build_trade_intent
 from app.services.strategy.replay import create_strategy_replay_manifest
 from app.utils import canonical_digest, get_logger
 
+AccountStateSnapshot = Any
+MarketDataset = Any
+
 type StandardResponse[T] = Any
 
 logger = get_logger(__name__)
+_get_indicator_values = cast(
+    "Callable[[object], Any]",
+    get_indicator_result_values,
+)
 
 
 @runtime_checkable
@@ -56,7 +60,7 @@ class VectorizedStrategyEvaluator(Protocol):
     def evaluate_vectorized(
         self,
         market: MarketDataset,
-        indicators: tuple[IndicatorResult, ...],
+        indicators: tuple[Any, ...],
         config: ValidatedStrategyConfig,
         context: StrategyExecutionContext,
         account_snapshot: AccountStateSnapshot | None,
@@ -83,7 +87,7 @@ def run_vectorized_strategy_signals(  # noqa: PLR0911
     ref: ValidatedStrategyRef,
     config: ValidatedStrategyConfig,
     market: MarketDataset,
-    indicators: tuple[IndicatorResult, ...],
+    indicators: tuple[Any, ...],
     context: StrategyExecutionContext,
     evaluator: VectorizedStrategyEvaluator,
     account_snapshot: AccountStateSnapshot | None = None,
@@ -120,8 +124,10 @@ def run_vectorized_strategy_signals(  # noqa: PLR0911
         )
     except StrategyOperationError:
         raise
-    except Exception as error:  # noqa: BLE001 - evaluator trust boundary.
-        logger.error("Vectorized Strategy evaluator failed: %s", type(error).__name__)
+    except Exception as error:
+        logger.exception(
+            "Vectorized Strategy evaluator failed: %s", type(error).__name__
+        )
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,
             "strategy evaluator failed",
@@ -157,10 +163,12 @@ def run_vectorized_strategy_signals(  # noqa: PLR0911
     try:
         data_checksum = canonical_digest(market.model_dump(mode="json"))
         indicator_hash = canonical_digest(
-            tuple(asdict(item.manifest) for item in indicators)
+            tuple(
+                get_indicator_result_metadata(item)["manifest"] for item in indicators
+            )
         )
     except TypeError, ValueError:
-        logger.error("Vectorized Strategy input digest failed")
+        logger.exception("Vectorized Strategy input digest failed")
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,
             "strategy input digest failed",
@@ -209,7 +217,7 @@ def run_vectorized_strategy_signals(  # noqa: PLR0911
     try:
         result_hash = canonical_digest(result_material)
     except TypeError, ValueError:
-        logger.error("Vectorized Strategy result digest failed")
+        logger.exception("Vectorized Strategy result digest failed")
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,
             "strategy result digest failed",
@@ -232,7 +240,7 @@ def _validate_readiness(  # noqa: PLR0911
     ref: ValidatedStrategyRef,
     config: ValidatedStrategyConfig,
     market: MarketDataset,
-    indicators: tuple[IndicatorResult, ...],
+    indicators: tuple[Any, ...],
     context: StrategyExecutionContext,
     evaluator: VectorizedStrategyEvaluator,
     account_snapshot: AccountStateSnapshot | None,
@@ -296,7 +304,9 @@ def _validate_readiness(  # noqa: PLR0911
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
-    actual_indicators = tuple(item.indicator_id for item in indicators)
+    actual_indicators = tuple(
+        get_indicator_result_metadata(item)["indicator_id"] for item in indicators
+    )
     if actual_indicators != ref.manifest.required_indicators:
         return failure(
             StrategyErrorCode.INDICATOR_NOT_READY,
@@ -356,9 +366,7 @@ def _identity_matches(
     )
 
 
-def _indicator_ready(
-    indicator: IndicatorResult, context: StrategyExecutionContext
-) -> bool:
+def _indicator_ready(indicator: object, context: StrategyExecutionContext) -> bool:
     """Return whether one indicator is causal at the decision clock.
 
     Args:
@@ -369,11 +377,12 @@ def _indicator_ready(
         Whether every availability timestamp is causal.
     """
     logger.debug("Checking Strategy indicator readiness")
-    if indicator.errors or "available_at" not in indicator.values.columns:
+    values = _get_indicator_values(indicator)
+    if "available_at" not in values.columns:
         return False
     return all(
         timestamp.to_pydatetime() <= context.decision_timestamp
-        for timestamp in indicator.values["available_at"].tolist()
+        for timestamp in values["available_at"].tolist()
     )
 
 

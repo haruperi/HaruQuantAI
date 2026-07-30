@@ -7,7 +7,12 @@ from collections.abc import Mapping
 from pydantic import ValidationError as PydanticValidationError
 
 from app.utils.errors.exceptions import ConfigurationError
-from app.utils.settings.models import AppSettings, LoggingSettings, RuntimeSettings
+from app.utils.settings.models import (
+    AppSettings,
+    BrokerProviderSettings,
+    LoggingSettings,
+    RuntimeSettings,
+)
 
 _SUPPORTED_KEYS = frozenset(
     {
@@ -239,3 +244,16 @@ def load_settings(
         return RuntimeSettings.model_validate(runtime_values)
     except PydanticValidationError:
         raise ConfigurationError("CONFIGURATION_INVALID") from None
+
+
+def load_broker_provider_settings() -> object:
+    """Load validated broker-provider settings as an opaque value.
+
+    The concrete settings model remains internal to Utils. Brokers receives the
+    validated object and owns all interpretation of provider credentials and
+    environments.
+
+    Returns:
+        An immutable, secret-redacting broker-provider settings value.
+    """
+    return BrokerProviderSettings()

@@ -1,3 +1,4 @@
+# ruff: noqa: ANN401
 """Explicit crash recovery for interrupted update jobs.
 
 Recovery is **never** triggered at import time. It runs only when a caller asks, because

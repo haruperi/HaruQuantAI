@@ -125,7 +125,7 @@ def _read_frame(path: Path, request: ExternalImportRequest) -> pd.DataFrame:
         separator = "\t" if request.dialect == "mt5_export" else ","
         return pd.read_csv(path, sep=separator)
     except (OSError, ValueError) as error:
-        logger.error("External artifact could not be decoded")
+        logger.exception("External artifact could not be decoded")
         raise DataError(
             "FILE_CORRUPTED",
             safe_details={"operation": "read_external_artifact"},
@@ -294,11 +294,14 @@ def _spread_record(
 ) -> SpreadRecord:
     """Build one canonical spread observation from a mapped source row."""
     mapping: ColumnMapping = request.mapping
+    spread = _decimal(row[mapping.spread], "spread", request.request_id)
     return SpreadRecord(
         timestamp=timestamp,
-        spread=_decimal(row[mapping.spread], "spread", request.request_id),
+        spread=spread,
         unit=request.price_unit,
-        scale=0,
+        # Preserve the observed decimal precision instead of inventing a
+        # constant scale that could misrepresent the imported source.
+        scale=max(0, -int(spread.as_tuple().exponent)),
         source=request.source_id,
         source_symbol=request.symbol,
         source_revision=IMPORT_NORMALIZATION_VERSION,
@@ -329,7 +332,7 @@ def _build_records(
             else:
                 records.append(_spread_record(row, timestamp, request, available_at))
     except ValidationError as error:
-        logger.error("External row violates the canonical record contract")
+        logger.exception("External row violates the canonical record contract")
         raise DataError(
             "DATA_QUALITY_FAILED",
             safe_details={"operation": "import_record_validation"},

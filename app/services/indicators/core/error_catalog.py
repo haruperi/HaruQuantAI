@@ -224,7 +224,15 @@ _DEFINITIONS = (
 )
 
 INDICATOR_ERROR_CATALOG = validate_error_catalog(
-    MappingProxyType({definition.code: definition for definition in _DEFINITIONS})
+    # Utils intentionally keeps ErrorDefinition internal to its function-only
+    # package boundary. These local immutable definitions satisfy the same
+    # runtime contract and are validated by the public function.
+    MappingProxyType(
+        {
+            definition.code: definition  # type: ignore[misc]
+            for definition in _DEFINITIONS
+        }
+    )
 )
 
 __all__ = ["INDICATOR_ERROR_CATALOG"]

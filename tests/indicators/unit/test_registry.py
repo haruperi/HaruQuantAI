@@ -1,6 +1,6 @@
 """Unit tests for the immutable official Indicators registry."""
 
-from app.services.indicators.core.registry import (
+from app.services.indicators import (
     get_capability_matrix,
     get_indicator,
     list_indicators,

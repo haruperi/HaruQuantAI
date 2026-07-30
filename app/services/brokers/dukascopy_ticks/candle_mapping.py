@@ -18,6 +18,24 @@ _TIMEFRAMES = {
 _CANDLE_FIELD_COUNT = 6
 
 
+def _normalize_timeframe(timeframe: str) -> str:
+    """Normalize documented duration notation to provider candle notation.
+
+    Args:
+        timeframe: Caller-supplied canonical duration or provider notation.
+
+    Returns:
+        Dukascopy mapping key.
+    """
+    return {
+        "1M": "M1",
+        "5M": "M5",
+        "15M": "M15",
+        "30M": "M30",
+        "1H": "H1",
+    }.get(timeframe.upper(), timeframe.upper())
+
+
 def _provider_interval(timeframe: str) -> str:
     """Return the exact Dukascopy web-chart interval for one timeframe.
 
@@ -31,7 +49,7 @@ def _provider_interval(timeframe: str) -> str:
         ValueError: If the timeframe is unsupported.
     """
     try:
-        return _TIMEFRAMES[timeframe.upper()][0]
+        return _TIMEFRAMES[_normalize_timeframe(timeframe)][0]
     except KeyError as error:
         raise ValueError("unsupported Dukascopy candle timeframe") from error
 
@@ -60,7 +78,7 @@ def _map_candles(
         ValueError: If the request timeframe or range is invalid.
         _ProviderResponseError: If a provider row is malformed or unordered.
     """
-    normalized = timeframe.upper()
+    normalized = _normalize_timeframe(timeframe)
     try:
         _, duration = _TIMEFRAMES[normalized]
     except KeyError as error:

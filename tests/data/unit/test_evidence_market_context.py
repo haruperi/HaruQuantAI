@@ -4,6 +4,7 @@
 package. The legacy copy still guards its original module until Phase 11.
 """
 
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from unittest.mock import MagicMock
 
@@ -16,7 +17,8 @@ from app.services.data.evidence.market_context_contracts import (
     MarketContextRequest,
 )
 
-from tests.data.helpers import END, START
+START = datetime(2026, 1, 1, tzinfo=UTC)
+END = START + timedelta(minutes=1)
 
 _MKT_OP = "data.evidence.market_context_provider.get_market_context"
 

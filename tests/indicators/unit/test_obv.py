@@ -1,8 +1,8 @@
 """Unit tests for On-Balance Volume."""
 
-from app.services.indicators.volume import obv
+from app.services.indicators import obv
 
-from tests.indicators.helpers import build_dataset, unwrap_response
+from tests.indicators.helpers import build_dataset, result_values, unwrap_response
 
 
 def test_obv_matches_directional_cumulative_fixture() -> None:
@@ -16,4 +16,4 @@ def test_obv_matches_directional_cumulative_fixture() -> None:
         ]
     )
     result = unwrap_response(obv(data))
-    assert result.values["obv"].tolist() == [0.0, 20.0, -10.0, -10.0]
+    assert result_values(result)["obv"].tolist() == [0.0, 20.0, -10.0, -10.0]

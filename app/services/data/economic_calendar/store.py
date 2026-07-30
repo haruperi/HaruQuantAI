@@ -198,7 +198,7 @@ def _from_row_raw(row: dict[str, object]) -> EconomicEvent:
             updated_at=_parse_dt(_opt_str(row, "updated_at")),
         )
     except (KeyError, ValueError, TypeError, ArithmeticError) as error:
-        logger.error("Failed to reconstruct an economic event row")
+        logger.exception("Failed to reconstruct an economic event row")
         raise DataError(
             "FILE_CORRUPTED",
             safe_details={"operation": "economic_event_from_row"},

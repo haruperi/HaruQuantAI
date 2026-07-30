@@ -1,3 +1,4 @@
+# ruff: noqa: ANN401
 """Recoverably atomic historical backfill orchestration."""
 
 from __future__ import annotations
@@ -176,6 +177,12 @@ def _acquire_lease(request: BackfillChunkRequest, now: datetime) -> None:
 def _fetch_backfill_data(request: BackfillChunkRequest) -> MarketDataset:
     """Fetch one bounded canonical dataset and persist only safe failure state."""
     logger.info("Fetching canonical backfill observations")
+    from app.services.data.sources.composition import ensure_identity, ensure_storage
+
+    # Scheduled jobs enter below the public market-data facade, so establish
+    # the same governed storage and provider-confirmed identity prerequisites.
+    ensure_storage(request.request_id)
+    ensure_identity(request.source_id, request.symbol, request.request_id)
     kind = cast(
         "Literal['bars', 'ticks', 'spreads']",
         {"ohlcv": "bars", "tick": "ticks", "spread": "spreads"}[request.data_kind],
@@ -197,7 +204,7 @@ def _fetch_backfill_data(request: BackfillChunkRequest) -> MarketDataset:
     try:
         return _fetch_market_dataset_raw(market_request)
     except DataError as error:
-        logger.error(
+        logger.exception(
             "Backfill fetch failed: code=%s details=%s", error.code, error.safe_details
         )
         _execute_transaction_raw(

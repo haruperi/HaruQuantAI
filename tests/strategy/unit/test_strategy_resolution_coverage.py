@@ -3,7 +3,8 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from app.services.data import DataError
+from app.services.data.contracts import DataError
+from app.services.strategy import validate_strategy_ref
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.references import StrategyRef
 from app.services.strategy.contracts.responses import StrategyOperationError
@@ -11,7 +12,6 @@ from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.registry.resolution import (
     _validate_record,
     _version_matches,
-    validate_strategy_ref,
 )
 from app.utils import generate_id
 

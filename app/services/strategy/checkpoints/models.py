@@ -50,7 +50,7 @@ class StrategyCheckpoint(BaseModel):
         logger.debug("Freezing Strategy checkpoint state")
         return MappingProxyType(dict(value))
 
-    @field_serializer("state", when_used="json")
+    @field_serializer("state", when_used="always")
     def _serialize_state(self, value: Mapping[str, JsonValue]) -> dict[str, JsonValue]:
         """Serialize checkpoint state.
 

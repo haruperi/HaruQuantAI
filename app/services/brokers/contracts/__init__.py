@@ -54,7 +54,7 @@ from app.services.brokers.contracts.protocols import (
     MarketDataProvider,
     TradeExecutionProvider,
 )
-from app.utils.responses.models import StandardResponse
+from app.services.brokers.contracts.responses import StandardResponse
 
 __all__: list[str] = [
     "BROKER_ERROR_CATALOG",

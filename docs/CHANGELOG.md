@@ -6,6 +6,10 @@
 
 The three audited domains now expose function-only package roots, focused tests exceed the per-file coverage floor, and usage evidence distinguishes genuine provider results from unavailable or test-only capabilities.
 
+#### Added (1)
+
+- Completed Strategy `FEAT-STR-11` external proposal evaluation plus `WF-STR-011` approved Optimization-result adoption and `WF-STR-012` research-only signal evaluation, without importing or changing the upstream Optimization, Simulator, Analytics, or Research domains.
+
 #### Changed (5)
 
 - Added the opaque `load_broker_provider_settings` function and Brokers-owned `resolve_provider_connection_config`/`create_connected_broker` operations so no settings class or connection DTO crosses a public package boundary.

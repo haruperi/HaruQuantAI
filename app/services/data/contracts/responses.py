@@ -22,7 +22,7 @@ import asyncio
 import time
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from app.services.data.contracts.errors import DATA_ERROR_MANIFEST, DataError
 from app.utils import (
@@ -430,7 +430,7 @@ def _data_error_details(error: DataError) -> Mapping[str, JsonValue]:
         details["request_id"] = error.request_id
     for key, value in error.safe_details.items():
         # safe_details values are already JSON scalars (validated by DataError).
-        details[str(key)] = value  # type: ignore[assignment]
+        details[str(key)] = value
     return details
 
 
@@ -477,7 +477,7 @@ def build_data_response[T](
         modifies_database=traits.modifies_database,
         places_trade=False,
         requires_network=traits.requires_network,
-        extensions=extensions or {},
+        extensions=cast("Any", extensions or {}),
     )
     if error is None:
         return success_response(
@@ -487,10 +487,10 @@ def build_data_response[T](
         )
     return error_response(
         code=error.code,
-        details=_data_error_details(error),
+        details=cast("Any", _data_error_details(error)),
         message=error.safe_message,
         metadata=metadata,
-        catalog=DATA_ERROR_MANIFEST,
+        catalog=cast("Any", DATA_ERROR_MANIFEST),
     )
 
 
@@ -545,8 +545,8 @@ def build_exception_response[T](
         exception,
         message=f"Data operation {operation} failed",
         metadata=metadata,
-        catalog=DATA_ERROR_MANIFEST,
-        extensions=extensions,
+        catalog=cast("Any", DATA_ERROR_MANIFEST),
+        extensions=cast("Any", extensions),
     )
 
 
@@ -724,7 +724,7 @@ def unwrap_data_response[T](
     # ``None`` is a legitimate raw success result for some Data operations
     # (for example ``validate_resample_target``). Callers requiring a non-null
     # business result must check ``data`` themselves.
-    return response.data
+    return cast("T", response.data)
 
 
 def resolve_operation_request_id(

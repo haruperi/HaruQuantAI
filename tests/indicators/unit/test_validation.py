@@ -3,15 +3,20 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data.contracts import (
+import pytest
+from app.services.indicators import (
+    build_indicator_config,
+    get_warmup_requirement,
+    validate_indicator,
+)
+
+from tests.indicators.helpers import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
+    assert_error,
+    unwrap_response,
 )
-from app.services.indicators.core.contracts import IndicatorConfig
-from app.services.indicators.core.validation import validate_indicator
-
-from tests.indicators.helpers import assert_error, unwrap_response
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -96,9 +101,9 @@ def _config(
     period: int = 14,
     source: str | None = "close",
     formula_version: str = "1.0.0",
-) -> IndicatorConfig:
+) -> object:
     """Build one canonical ``IndicatorConfig`` for validation tests."""
-    return IndicatorConfig(
+    return build_indicator_config(
         indicator_id=indicator_id,
         parameters=(("period", period),),
         source=source,
@@ -136,12 +141,12 @@ def test_validate_indicator_rejects_mismatched_config_identity() -> None:
 
 def test_validate_indicator_rejects_invalid_output_mode() -> None:
     """Precedence 3: a non-values output_mode is rejected."""
-    bad_config = IndicatorConfig(
+    bad_config = build_indicator_config(
         indicator_id="sma",
         parameters=(("period", 14),),
         source="close",
         formula_version="1.0.0",
-        output_mode="values_and_errors",  # type: ignore[arg-type]
+        output_mode="values_and_errors",
         column_conflict_policy="error",
         precision_dtype="float64",
         availability_policy="source_available_at",
@@ -155,14 +160,14 @@ def test_validate_indicator_rejects_invalid_output_mode() -> None:
 
 def test_validate_indicator_rejects_unsupported_dtype() -> None:
     """Precedence 4: a non-float64 precision_dtype is rejected."""
-    bad_config = IndicatorConfig(
+    bad_config = build_indicator_config(
         indicator_id="sma",
         parameters=(("period", 14),),
         source="close",
         formula_version="1.0.0",
         output_mode="values",
         column_conflict_policy="error",
-        precision_dtype="float32",  # type: ignore[arg-type]
+        precision_dtype="float32",
         availability_policy="source_available_at",
         quality_policy="propagate_dataset",
         error_mode="raise",
@@ -284,3 +289,140 @@ def test_validate_indicator_rejects_non_positive_rolling_volatility_source() -> 
         ),
         "IND_INVALID_OHLC",
     )
+
+
+def test_validate_indicator_rejects_non_approved_fixed_policy() -> None:
+    """A changed fixed policy is rejected before inspecting input data."""
+    config = build_indicator_config(
+        indicator_id="sma",
+        parameters=(("period", 2),),
+        source="close",
+        formula_version="1.0.0",
+        quality_policy="ignore",
+    )
+    assert_error(
+        validate_indicator("sma", _dataset(), config),
+        "IND_INVALID_CONFIG",
+    )
+
+
+@pytest.mark.parametrize(
+    ("parameters", "source"),
+    [
+        ((), "close"),
+        ((("period", True),), "close"),
+        ((("unknown", 2),), "close"),
+        ((("Period", 2),), "close"),
+        ((("period", 2),), None),
+    ],
+)
+def test_validate_indicator_rejects_invalid_parameter_shapes(
+    parameters: tuple[tuple[str, int], ...],
+    source: str | None,
+) -> None:
+    """Required, typed, declared, named, and source parameters fail closed."""
+    config = build_indicator_config(
+        indicator_id="sma",
+        parameters=parameters,
+        source=source,
+        formula_version="1.0.0",
+    )
+    assert_error(
+        validate_indicator("sma", _dataset(), config),
+        "IND_INVALID_PARAMETER",
+    )
+
+
+def test_validate_indicator_rejects_fixed_ohlc_indicator_source() -> None:
+    """A fixed-OHLC indicator cannot accept a selectable source."""
+    config = build_indicator_config(
+        indicator_id="obv",
+        parameters=(),
+        source="close",
+        formula_version="1.0.0",
+    )
+    assert_error(
+        validate_indicator("obv", _dataset(), config),
+        "IND_INVALID_PARAMETER",
+    )
+
+
+def test_validate_indicator_rejects_dataset_contract_identity() -> None:
+    """A non-v1 dataset identity fails before record inspection."""
+    dataset = _dataset().model_copy(update={"contract_version": "v2"})
+    assert_error(
+        validate_indicator("sma", dataset, _config()),
+        "IND_INVALID_INPUT_SCHEMA",
+    )
+
+
+def test_validate_indicator_rejects_non_bar_dataset() -> None:
+    """Indicators accept normalized bars only."""
+    dataset = _dataset().model_copy(update={"data_kind": "ticks"})
+    assert_error(
+        validate_indicator("sma", dataset, _config()),
+        "IND_INVALID_INPUT_SCHEMA",
+    )
+
+
+def test_validate_indicator_rejects_non_utc_timestamp() -> None:
+    """Naive timestamps fail the causal UTC contract."""
+    dataset = _dataset(bar_count=2)
+    first = dataset.records[0].model_copy(
+        update={"timestamp": dataset.records[0].timestamp.replace(tzinfo=None)}
+    )
+    dataset = dataset.model_copy(update={"records": (first, dataset.records[1])})
+    assert_error(
+        validate_indicator("sma", dataset, _config(period=2)),
+        "IND_INVALID_TIMEZONE",
+    )
+
+
+def test_validate_indicator_rejects_duplicate_timestamps() -> None:
+    """Duplicate row timestamps fail deterministically."""
+    dataset = _dataset(bar_count=2)
+    second = dataset.records[1].model_copy(
+        update={"timestamp": dataset.records[0].timestamp}
+    )
+    dataset = dataset.model_copy(update={"records": (dataset.records[0], second)})
+    assert_error(
+        validate_indicator("sma", dataset, _config(period=2)),
+        "IND_DUPLICATE_TIMESTAMP",
+    )
+
+
+def test_validate_indicator_rejects_non_monotonic_timestamps() -> None:
+    """Out-of-order rows fail before calculation."""
+    dataset = _dataset(bar_count=2)
+    dataset = dataset.model_copy(update={"records": tuple(reversed(dataset.records))})
+    assert_error(
+        validate_indicator("sma", dataset, _config(period=2)),
+        "IND_NON_MONOTONIC_TIME",
+    )
+
+
+@pytest.mark.parametrize(
+    ("indicator_id", "parameters", "source", "expected"),
+    [
+        ("obv", (), None, 1),
+        ("rsi", (("period", 2),), "close", 3),
+        ("adx", (("period", 2),), None, 4),
+        ("hull_ma", (("period", 4),), "close", 5),
+        ("engulfing", (), None, 2),
+    ],
+)
+def test_warmup_requirement_covers_every_policy(
+    indicator_id: str,
+    parameters: tuple[tuple[str, int], ...],
+    source: str | None,
+    expected: int,
+) -> None:
+    """Every declared warmup policy resolves to an exact observation count."""
+    config = build_indicator_config(
+        indicator_id=indicator_id,
+        parameters=parameters,
+        source=source,
+        formula_version="1.0.0",
+    )
+    requirement = unwrap_response(get_warmup_requirement(indicator_id, config))
+    assert requirement.minimum_observations == expected

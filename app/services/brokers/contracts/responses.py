@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 from collections.abc import Mapping
 from datetime import datetime
-from typing import Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from app.services.brokers.contracts.enums import (
     BrokerCapabilityId,
@@ -19,12 +19,16 @@ from app.utils import (
     error_response,
     format_utc_timestamp,
     get_execution_ms,
+    get_standard_response_type,
     success_response,
     to_json_safe,
 )
 
 type JsonValue = Any
-type StandardResponse[T] = Any
+if TYPE_CHECKING:
+    type StandardResponse[T] = Any
+else:
+    StandardResponse = get_standard_response_type()
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 _TRADE_OPERATIONS = frozenset(
@@ -210,7 +214,7 @@ def build_broker_response[T](
         details=_error_details(error),
         message=error.message,
         metadata=metadata,
-        catalog=BROKER_ERROR_CATALOG,
+        catalog=cast("Any", BROKER_ERROR_CATALOG),
     )
 
 

@@ -68,7 +68,7 @@ def _get_exchange_sessions_raw(
             for label, row in selected.iterrows()
         )
     except Exception as error:
-        logger.error("Exchange calendar query failed")
+        logger.exception("Exchange calendar query failed")
         raise DataError(
             "SOURCE_UNAVAILABLE",
             safe_details={"operation": "exchange_calendar"},

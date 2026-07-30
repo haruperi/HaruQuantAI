@@ -1,3 +1,4 @@
+# ruff: noqa: ANN401
 """Persisted update-job lifecycle: create, start, stop, run once, and report.
 
 Renamed from ``scheduler.py`` in ``CAP-DATA-026`` Phase 8, so the module no longer
@@ -637,7 +638,7 @@ def run_data_update_job_once(
         )
 
     except Exception as error:
-        logger.exception("Job run once failed for job %s: %s", job_id, error)
+        logger.exception("Job run once failed for job %s", job_id)
         finished_at = utc_now(clock)
         err_code = error.code if isinstance(error, DataError) else "SCHEDULER_ERROR"
 
@@ -708,8 +709,8 @@ def _start_background_loop(job_id: str, interval_seconds: int) -> None:
                         job_id,
                         generate_id("req"),
                     )
-                except Exception:  # noqa: BLE001
-                    logger.error("Background job execution failed for %s", job_id)
+                except Exception:
+                    logger.exception("Background job execution failed for %s", job_id)
 
         except asyncio.CancelledError:
             logger.info("Background loop for job %s was cancelled", job_id)

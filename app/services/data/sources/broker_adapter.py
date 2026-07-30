@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Mapping
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Protocol, override
+from typing import TYPE_CHECKING, Any, Protocol, cast, override
 
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -31,7 +31,7 @@ logger = get_logger(__name__)
 if TYPE_CHECKING:
     from collections.abc import Coroutine
 
-    from app.services.brokers.contracts import BrokerAdapter
+    type BrokerAdapter = Any
 
 
 class _AsyncRunner(Protocol):
@@ -61,7 +61,7 @@ def _run[T](operation: Coroutine[Any, Any, T], request_id: str) -> T:
     except DataError:
         raise
     except Exception as error:
-        logger.error("Injected broker read failed")
+        logger.exception("Injected broker read failed")
         raise DataError(
             "SOURCE_UNAVAILABLE",
             safe_details={"operation": "broker_read"},
@@ -89,7 +89,7 @@ def _require_result[T](
             safe_details={"operation": operation},
             request_id=request_id,
         )
-    return result.data
+    return cast("T", result.data)
 
 
 def _require_broker_extension[T](
@@ -199,7 +199,7 @@ class ExternalMarketDataSource(MarketDataSource):
                 end=request.end,
                 limit=request.limit,
             )
-            bar_page = _require_result(
+            bar_page: Any = _require_result(
                 bar_result, "historical_bars", request.request_id
             )
             bar_revision = _require_broker_extension(
@@ -257,7 +257,7 @@ class ExternalMarketDataSource(MarketDataSource):
                 end=request.end,
                 limit=request.limit,
             )
-            tick_page = _require_result(tick_result, "ticks", request.request_id)
+            tick_page: Any = _require_result(tick_result, "ticks", request.request_id)
             tick_revision = _require_broker_extension(
                 tick_result, "adapter_version", "ticks", request.request_id
             )
@@ -298,7 +298,7 @@ class ExternalMarketDataSource(MarketDataSource):
             spread_result = await self._adapter.get_spread(
                 symbol=request.provider_symbol
             )
-            spread = _require_result(spread_result, "spread", request.request_id)
+            spread: Any = _require_result(spread_result, "spread", request.request_id)
             spread_revision = _require_broker_extension(
                 spread_result, "adapter_version", "spread", request.request_id
             )
@@ -308,7 +308,7 @@ class ExternalMarketDataSource(MarketDataSource):
             metadata_result = await self._adapter.get_symbol_info(
                 symbol=request.provider_symbol
             )
-            metadata = _require_result(
+            metadata: Any = _require_result(
                 metadata_result,
                 "symbol_info",
                 request.request_id,
@@ -373,7 +373,7 @@ class ExternalMarketDataSource(MarketDataSource):
             cursor=request.cursor,
             limit=request.limit,
         )
-        page = _require_result(result, "symbols", request.request_id)
+        page: Any = _require_result(result, "symbols", request.request_id)
         revision = _require_broker_extension(
             result, "adapter_version", "symbols", request.request_id
         )
@@ -407,7 +407,7 @@ class ExternalMarketDataSource(MarketDataSource):
                 request_id=request.request_id,
             )
         result = await self._adapter.get_symbol_info(symbol=request.symbol)
-        info = _require_result(result, "symbol_info", request.request_id)
+        info: Any = _require_result(result, "symbol_info", request.request_id)
         revision = _require_broker_extension(
             result, "adapter_version", "symbol_info", request.request_id
         )

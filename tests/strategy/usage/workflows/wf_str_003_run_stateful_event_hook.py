@@ -8,12 +8,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.strategy import run_event_strategy_hook
-from tests.strategy.unit.test_event_runner import Evaluator
-from tests.strategy.unit.test_models import (
-    make_config,
-    make_context,
-    make_event,
-    make_ref,
+from tests.strategy.usage.workflows._support import (
+    MarketEventEvaluator,
+    current_context,
+    event_from_market,
+    live_bars,
+    print_market_frame,
+    validated_config,
+    validated_ref,
 )
 
 WORKFLOW_ID = "WF-STR-003"
@@ -37,22 +39,34 @@ def main() -> None:
     """Run the documented input-to-output workflow."""
     # Stage 1 — INPUT BOUNDARY: Runtime supplies a typed event and fixed evidence.
     _stage(1)
-    event, context = make_event(), make_context()
-    print("Input event:", event.event_type)
+    market = live_bars(limit=12)
+    print_market_frame(market)
+    context = current_context("EVENT_DRIVEN", market=market)
+    event = event_from_market(market, context)
+    print("Input event:", event.model_dump(mode="json"))
 
     # Stage 2: The manifest declares the allowed hook.
     _stage(2)
-    ref = make_ref()
+    ref = validated_ref()
     print("Declared hooks:", ref.manifest.supported_hooks)
 
     # Stage 3: Run exactly one approved hook.
     _stage(3)
-    outcome = run_event_strategy_hook(ref, make_config(), event, context, Evaluator())
+    outcome = run_event_strategy_hook(
+        ref,
+        validated_config(),
+        event,
+        context,
+        MarketEventEvaluator(),
+        {"bars_seen": 0},
+    )
     print("Hook status:", outcome.status)
+    if outcome.data is None:
+        raise RuntimeError(f"Event evaluation failed: {outcome.error}")
 
     # Stage 4: Inspect the fully validated candidate update.
     _stage(4)
-    update = outcome.data.local_state_update if outcome.data else None
+    update = outcome.data.local_state_update
     print("Candidate local state:", update)
 
     # Stage 5 — OUTPUT BOUNDARY: Return validated result or StandardResponse error.

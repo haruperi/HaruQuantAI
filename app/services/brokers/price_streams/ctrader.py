@@ -1,8 +1,8 @@
+"""cTrader price-stream operations."""
+
 from __future__ import annotations
 
 # mypy: disable-error-code="attr-defined,no-any-return,has-type"
-"""cTrader price-stream operations."""
-
 import asyncio
 
 from app.services.brokers.adapter_runtime.subscription import _BrokerSubscription

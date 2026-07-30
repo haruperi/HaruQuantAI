@@ -124,7 +124,7 @@ class StrategyConfig(_Contract):
             raise ValueError("configuration cannot contain executable content")
         return frozen
 
-    @field_serializer("parameters", when_used="json")
+    @field_serializer("parameters", when_used="always")
     def _serialize_parameters(
         self, value: Mapping[str, JsonValue]
     ) -> dict[str, object]:
@@ -246,7 +246,7 @@ class ValidatedStrategyConfig(_Contract):
         logger.debug("Freezing normalized Strategy parameters")
         return cast("Mapping[str, JsonValue]", _freeze_json(value))
 
-    @field_serializer("normalized_parameters", when_used="json")
+    @field_serializer("normalized_parameters", when_used="always")
     def _serialize_normalized(
         self, value: Mapping[str, JsonValue]
     ) -> dict[str, object]:

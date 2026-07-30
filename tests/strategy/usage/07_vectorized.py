@@ -4,21 +4,21 @@ import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import DataError, get_market_data
+from app.services.data import get_market_data, to_ohlcv_dataframe
 from app.services.strategy import (
-    StrategyDecision,
-    StrategyEnvironment,
-    StrategyExecutionContext,
-    StrategyLifecycleStatus,
-    StrategyManifest,
-    StrategyTimingPolicy,
-    StrategyValidationPolicy,
-    ValidatedStrategyConfig,
-    ValidatedStrategyRef,
-    VectorizedStrategyEvaluator,
+    create_strategy_decision,
+    create_strategy_execution_context,
+    create_strategy_manifest,
+    create_strategy_validation_policy,
+    create_validated_strategy_config,
+    create_validated_strategy_ref,
+    get_strategy_environment,
+    get_strategy_lifecycle_status,
+    get_strategy_timing_policy,
     run_vectorized_strategy_signals,
 )
 
@@ -45,7 +45,7 @@ def fr_str_032() -> None:
 def fr_str_036() -> None:
     """Demonstrate the hash-bound vectorized evaluator contract."""
     _header("Demonstrate the hash-bound vectorized evaluator contract.")
-    assert VectorizedStrategyEvaluator
+    assert callable(run_vectorized_strategy_signals)
 
 
 class LastBarProposalEvaluator:
@@ -76,7 +76,7 @@ class LastBarProposalEvaluator:
         del indicators, config, account_snapshot
         bar = market.records[-1]
         return (
-            StrategyDecision(
+            create_strategy_decision(
                 decision_id=f"usage-vectorized-{bar.timestamp.isoformat()}",
                 sequence=0,
                 action="PROPOSE",
@@ -110,26 +110,34 @@ def main() -> int:
     fr_str_036()
     print("\nVECTORIZED STRATEGY EVALUATION — REAL MT5 EURUSD M5")
     try:
+        request_end = datetime.now(UTC) - timedelta(hours=2)
         market_response = get_market_data(
             source_id="mt5",
             symbol="EURUSD",
             timeframe="M5",
+            start=request_end - timedelta(days=3),
+            end=request_end,
             limit=300,
             use_cache=False,
+            quality_failure_behavior="warn",
         )
-    except DataError as error:
-        print("Live MT5 data unavailable:", error.code)
+    except Exception as error:  # noqa: BLE001 - bounded standalone evidence path.
+        print("Live MT5 data unavailable:", type(error).__name__)
         return _UNAVAILABLE
     if market_response.status != "success" or market_response.data is None:
         print("Live MT5 data unavailable:", market_response.error)
         return _UNAVAILABLE
     market = market_response.data
 
-    print("Source: MT5")
-    print("Bars:", market.record_count)
-    print("Latest completed bar:", market.records[-1].timestamp)
+    frame_response = to_ohlcv_dataframe(market)
+    if frame_response.data is None:
+        print("MT5 frame projection failed:", frame_response.error)
+        return 1
+    print("Source: genuine MT5 EURUSD M5")
+    print(frame_response.data.tail(10).to_string())
+    print("Latest evidence availability:", market.available_at)
 
-    policy = StrategyValidationPolicy(
+    policy = create_strategy_validation_policy(
         policy_version="usage-v1",
         approved_module_roots=("app.services.strategy.evaluators",),
         max_config_payload_bytes=4_096,
@@ -137,10 +145,10 @@ def main() -> int:
         max_config_string_length=128,
         max_config_collection_items=64,
     )
-    timing = StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE
-    context = StrategyExecutionContext(
-        environment=StrategyEnvironment.RESEARCH,
-        decision_timestamp=datetime.now(UTC),
+    timing = get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE")
+    context = create_strategy_execution_context(
+        environment=get_strategy_environment("RESEARCH"),
+        decision_timestamp=market.available_at + timedelta(seconds=1),
         timing_policy=timing,
         seed=23,
         interface_version="v1",
@@ -151,7 +159,7 @@ def main() -> int:
         snapshot_refs=(market.request_id,),
         max_diagnostic_bytes=8_192,
     )
-    manifest = StrategyManifest(
+    manifest = create_strategy_manifest(
         strategy_id=_STRATEGY,
         strategy_version="1.0.0",
         module_path=_MODULE,
@@ -162,7 +170,7 @@ def main() -> int:
         required_data=("EURUSD:M5",),
         required_indicators=(),
         timing_policy=timing,
-        permitted_environments=(StrategyEnvironment.RESEARCH,),
+        permitted_environments=(get_strategy_environment("RESEARCH"),),
         source_hash=_HASH,
         artifact_hash=_HASH,
         dependency_hash=_HASH,
@@ -175,17 +183,17 @@ def main() -> int:
         max_local_state_bytes=8_192,
         decision_timeout_seconds=5,
     )
-    ref = ValidatedStrategyRef(
+    ref = create_validated_strategy_ref(
         manifest=manifest,
-        lifecycle_status=StrategyLifecycleStatus.APPROVED,
-        environment=StrategyEnvironment.RESEARCH,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
+        environment=get_strategy_environment("RESEARCH"),
         policy_version=policy.policy_version,
         validation_policy=policy,
         registry_record_hash=_HASH,
         request_id=_REQUEST,
         correlation_id=_CORRELATION,
     )
-    config = ValidatedStrategyConfig(
+    config = create_validated_strategy_config(
         strategy_id=_STRATEGY,
         strategy_version="1.0.0",
         config_schema_version="v1",
@@ -194,7 +202,7 @@ def main() -> int:
         policy_version=policy.policy_version,
         request_id=_REQUEST,
     )
-    evaluator: VectorizedStrategyEvaluator = LastBarProposalEvaluator()
+    evaluator: Any = LastBarProposalEvaluator()
 
     print("\n-- Atomic ordered intent batch --")
     outcome = run_vectorized_strategy_signals(
@@ -202,7 +210,7 @@ def main() -> int:
     )
     if outcome.data is None:
         print("Vectorized evaluation failed:", outcome.error)
-        return _UNAVAILABLE
+        return 1
     result = outcome.data
     print("Decisions:", len(result.decisions))
     print("Intents:", len(result.intents))
@@ -222,6 +230,12 @@ def main() -> int:
     print("Status:", rejected.status)
     if rejected.error is not None:
         print("Error code:", rejected.error.code)
+    if (
+        rejected.error is None
+        or rejected.error.code != "STRATEGY_ARTIFACT_HASH_MISMATCH"
+    ):
+        print("Hash-binding failure did not return the expected error.")
+        return 1
     print("\nIntents are proposals only; Risk has approved nothing.")
     return 0
 

@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from app.services.data import (
-    DataError,
-    StatementPlan,
-    TransactionRequest,
+    build_statement_plan,
+    build_transaction_request,
     execute_transaction,
+    is_data_error,
 )
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.manifest import StrategyManifest
@@ -46,8 +46,8 @@ def validate_strategy_ref(
     try:
         result = unwrap_data_response(
             execute_transaction(
-                TransactionRequest(
-                    plan=StatementPlan(
+                build_transaction_request(
+                    plan=build_statement_plan(
                         statements=(
                             "SELECT manifest_json, lifecycle_status, policy_json, "
                             "record_hash, request_id, correlation_id FROM "
@@ -62,8 +62,10 @@ def validate_strategy_ref(
             ),
             operation="data.execute_transaction.strategy_registry",
         )
-    except DataError:
-        logger.error("Strategy reference persistence read failed")
+    except Exception as error:
+        if not is_data_error(error):
+            raise
+        logger.exception("Strategy reference persistence read failed")
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,
             "strategy registry read failed",

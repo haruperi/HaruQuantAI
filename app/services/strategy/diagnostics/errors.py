@@ -1,12 +1,14 @@
-from dataclasses import dataclass
-
 """Accepted deterministic Strategy error catalogue."""
 
+from collections.abc import Mapping
+from dataclasses import dataclass
 from enum import StrEnum
 from types import MappingProxyType
-from typing import Literal, cast
+from typing import Literal, Protocol, cast
 
 from app.utils import validate_error_catalog
+
+type ErrorSeverity = Literal["info", "warning", "error", "critical"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -17,7 +19,7 @@ class ErrorDefinition:
     domain: str
     description: str
     category: str
-    severity: Literal["info", "warning", "error", "critical"]
+    severity: ErrorSeverity
     retryable: bool
     operator_action: str
 
@@ -116,9 +118,39 @@ def _definition(code: str) -> ErrorDefinition:
     )
 
 
-STRATEGY_ERROR_CATALOG = validate_error_catalog(
+class _CatalogValidator(Protocol):
+    """Structural adapter for the Utils-owned catalogue validator."""
+
+    def __call__(
+        self, catalog: Mapping[str, ErrorDefinition]
+    ) -> Mapping[str, ErrorDefinition]:
+        """Validate one structurally compatible error catalogue."""
+
+
+_validate_catalog = cast("_CatalogValidator", validate_error_catalog)
+
+STRATEGY_ERROR_CATALOG = _validate_catalog(
     MappingProxyType({code: _definition(code) for code in _APPROVED_CODES})
 )
 
 
-__all__ = ["STRATEGY_ERROR_CATALOG", "StrategyErrorCode"]
+def get_strategy_error_catalog() -> Mapping[str, ErrorDefinition]:
+    """Return the immutable Strategy error catalogue.
+
+    Returns:
+        Immutable mapping proxy of error codes to ErrorDefinition entries.
+    """
+    return STRATEGY_ERROR_CATALOG
+
+
+def get_strategy_error_code(value: str) -> StrategyErrorCode:
+    """Return one accepted Strategy error code by value."""
+    return StrategyErrorCode(value)
+
+
+__all__ = [
+    "STRATEGY_ERROR_CATALOG",
+    "StrategyErrorCode",
+    "get_strategy_error_catalog",
+    "get_strategy_error_code",
+]

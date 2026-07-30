@@ -1,145 +1,48 @@
-"""Unit tests for the Indicators Core MVP error catalogue and exception."""
+"""Public Indicators error-boundary tests."""
 
-import pytest
-from app.services.indicators.core.error_catalog import INDICATOR_ERROR_CATALOG
-from app.services.indicators.core.errors import (
-    IndicatorError,
-    IndicatorErrorCode,
-    guard_public_boundary,
-)
+from app.services.indicators import build_indicator_config, get_indicator, sma
 
-_EXPECTED_CODES = {
-    "IND_INVALID_CONFIG",
-    "IND_INVALID_PARAMETER",
-    "IND_UNSUPPORTED_INDICATOR",
-    "IND_UNSUPPORTED_TIMEFRAME",
-    "IND_UNSUPPORTED_DTYPE",
-    "IND_INVALID_INPUT_SCHEMA",
-    "IND_MISSING_REQUIRED_COLUMN",
-    "IND_INVALID_OUTPUT_COLUMN",
-    "IND_OUTPUT_COLUMN_CONFLICT",
-    "IND_INVALID_OUTPUT_MODE",
-    "IND_INPUT_MUTATION_DETECTED",
-    "IND_DUPLICATE_TIMESTAMP",
-    "IND_NON_MONOTONIC_TIME",
-    "IND_AMBIGUOUS_TIMESTAMP",
-    "IND_INVALID_TIMEZONE",
-    "IND_INVALID_OHLC",
-    "IND_INSUFFICIENT_DATA",
-    "IND_LOOKAHEAD_RISK",
-    "IND_FORMULA_VERSION_MISMATCH",
-    "IND_RESOURCE_LIMIT_EXCEEDED",
-    "IND_PARTIAL_RESULT",
-    "IND_INTERNAL_ERROR",
-}
+from tests.indicators.helpers import assert_error, build_dataset
 
 
-def test_error_code_catalog_contains_only_core_codes() -> None:
-    """FR-INDI-001: the catalogue contains exactly the 22 approved codes."""
-    codes = {member.value for member in IndicatorErrorCode}
-    assert codes == _EXPECTED_CODES
-    assert len(IndicatorErrorCode) == len(_EXPECTED_CODES)
-    assert set(INDICATOR_ERROR_CATALOG) == _EXPECTED_CODES
+def test_error_catalog_is_exposed_as_safe_response_codes() -> None:
+    """FR-INDI-001: unknown identifiers use the approved symbolic code."""
+    assert_error(get_indicator("macd"), "IND_UNSUPPORTED_INDICATOR")
 
 
-@guard_public_boundary
-def _unexpected_failure() -> None:
-    """Raise a caller-payload-like exception for boundary testing."""
-    raise RuntimeError("password=do-not-leak")
+def test_invalid_parameter_response_is_redacted() -> None:
+    """FR-INDI-002: public failures contain safe bounded details only."""
+    failure = sma(build_dataset([(1, 2, 0, 1, 10)]), period=1)
+    assert_error(failure, "IND_INVALID_PARAMETER")
+    assert failure.error is not None
+    assert len(failure.message) <= 256
+    assert "records" not in str(failure.error.details)
 
 
-def test_boundary_redacts_unexpected_exceptions_and_reports_metadata() -> None:
-    """Unexpected exceptions become safe internal-error responses."""
-    response = _unexpected_failure()
-
-    assert response.status == "error"
-    assert response.data is None
-    assert response.error is not None
-    assert response.error.code == "IND_INTERNAL_ERROR"
-    assert "do-not-leak" not in response.message
-    assert response.metadata.execution_ms >= 0
-    assert response.metadata.domain == "indicators"
-    assert response.metadata.read_only is True
-
-
-def test_indicator_error_serializes_redacted_details() -> None:
-    """FR-INDI-002: details are redacted, bounded, and immutable."""
-    error = IndicatorError(
-        IndicatorErrorCode.IND_INVALID_PARAMETER,
-        "period must be at least 2",
-        {"period": -1, "note": "password=abc123"},
+def test_invalid_configuration_fails_closed() -> None:
+    """Invalid configuration is reported through the StandardResponse envelope."""
+    config = build_indicator_config(
+        indicator_id="sma",
+        parameters=(("period", 1),),
+        source="close",
+        formula_version="1.0.0",
     )
-    assert error.code is IndicatorErrorCode.IND_INVALID_PARAMETER
-    assert error.message == "period must be at least 2"
-    assert error.details["period"] == -1
-    assert "abc123" not in error.details["note"]
-    with pytest.raises(TypeError):
-        error.details["period"] = 5  # type: ignore[index]
+    failure = sma(build_dataset([(1, 2, 0, 1, 10)]), period=1, config=config)
+    assert_error(failure, "IND_INVALID_PARAMETER")
 
 
-def test_indicator_error_rejects_empty_message() -> None:
-    """FR-INDI-002: a blank message is rejected."""
-    with pytest.raises(ValueError, match="non-empty"):
-        IndicatorError(IndicatorErrorCode.IND_INTERNAL_ERROR, "   ")
+def test_unexpected_public_failure_is_redacted_and_fails_closed() -> None:
+    """Unexpected exceptions become a bounded internal-error response."""
+    failure = get_indicator([])  # type: ignore[arg-type]
+    assert_error(failure, "IND_INTERNAL_ERROR")
+    assert failure.error is not None
+    assert failure.error.details["failure_type"] == "TypeError"
+    assert "[]" not in failure.message
 
 
-def test_indicator_error_rejects_oversized_message() -> None:
-    """FR-INDI-002: an over-length message is rejected."""
-    with pytest.raises(ValueError, match="maximum length"):
-        IndicatorError(IndicatorErrorCode.IND_INTERNAL_ERROR, "x" * 257)
-
-
-def test_indicator_error_rejects_oversized_details() -> None:
-    """FR-INDI-002: more than 16 detail keys is rejected."""
-    with pytest.raises(ValueError, match="maximum key count"):
-        IndicatorError(
-            IndicatorErrorCode.IND_INTERNAL_ERROR,
-            "too many details",
-            {f"key_{i}": i for i in range(17)},
-        )
-
-
-def test_indicator_error_rejects_non_snake_case_key() -> None:
-    """FR-INDI-002: a non-lowercase-snake-case key is rejected."""
-    with pytest.raises(ValueError, match="snake_case"):
-        IndicatorError(IndicatorErrorCode.IND_INTERNAL_ERROR, "bad key", {"BadKey": 1})
-
-
-def test_indicator_error_rejects_unsupported_value_type() -> None:
-    """FR-INDI-002: a nested mapping value is rejected as unsafe."""
-    with pytest.raises(TypeError):
-        IndicatorError(
-            IndicatorErrorCode.IND_INTERNAL_ERROR,
-            "bad value",
-            {"payload": {"nested": 1}},
-        )
-
-
-def test_indicator_error_rejects_non_finite_float() -> None:
-    """FR-INDI-002: a non-finite float detail value is rejected."""
-    with pytest.raises(ValueError, match="finite"):
-        IndicatorError(
-            IndicatorErrorCode.IND_INTERNAL_ERROR,
-            "bad float",
-            {"value": float("nan")},
-        )
-
-
-def test_indicator_error_accepts_bounded_scalar_tuple() -> None:
-    """FR-INDI-002: a tuple of scalars within bounds is accepted."""
-    error = IndicatorError(
-        IndicatorErrorCode.IND_INVALID_OUTPUT_COLUMN,
-        "unexpected columns",
-        {"columns": ("open", "high", "low")},
-    )
-    assert error.details["columns"] == ("open", "high", "low")
-
-
-def test_indicator_error_rejects_oversized_tuple() -> None:
-    """FR-INDI-002: a scalar tuple exceeding 20 items is rejected."""
-    with pytest.raises(ValueError, match="maximum item count"):
-        IndicatorError(
-            IndicatorErrorCode.IND_INTERNAL_ERROR,
-            "too many items",
-            {"columns": tuple(range(21))},
-        )
+def test_oversized_error_detail_fails_closed_without_echoing_input() -> None:
+    """Oversized diagnostic input is replaced by a safe internal error."""
+    oversized_identifier = "x" * 300
+    failure = get_indicator(oversized_identifier)
+    assert_error(failure, "IND_INTERNAL_ERROR")
+    assert oversized_identifier not in failure.message

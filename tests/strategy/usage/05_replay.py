@@ -7,16 +7,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.strategy import (
-    StrategyEnvironment,
-    StrategyExecutionContext,
-    StrategyLifecycleStatus,
-    StrategyManifest,
-    StrategyReplayManifest,
-    StrategyTimingPolicy,
-    StrategyValidationPolicy,
-    ValidatedStrategyConfig,
-    ValidatedStrategyRef,
+    create_strategy_execution_context,
+    create_strategy_manifest,
     create_strategy_replay_manifest,
+    create_strategy_replay_manifest_value,
+    create_strategy_validation_policy,
+    create_validated_strategy_config,
+    create_validated_strategy_ref,
+    get_strategy_environment,
+    get_strategy_lifecycle_status,
+    get_strategy_timing_policy,
 )
 
 _HASH = "d" * 64
@@ -33,7 +33,7 @@ def _header(title: str) -> None:
 def fr_str_027() -> None:
     """Demonstrate the replay-manifest contract."""
     _header("Demonstrate the replay-manifest contract.")
-    assert StrategyReplayManifest.model_fields["manifest_hash"]
+    assert callable(create_strategy_replay_manifest_value)
 
 
 def fr_str_029() -> None:
@@ -42,13 +42,15 @@ def fr_str_029() -> None:
     assert callable(create_strategy_replay_manifest)
 
 
-def _binding() -> tuple[ValidatedStrategyRef, ValidatedStrategyConfig]:
+def _binding() -> tuple[
+    create_validated_strategy_ref, create_validated_strategy_config
+]:
     """Build the validated reference and configuration pair.
 
     Returns:
         The exact validated reference and configuration.
     """
-    policy = StrategyValidationPolicy(
+    policy = create_strategy_validation_policy(
         policy_version="usage-v1",
         approved_module_roots=("app.services.strategy.evaluators",),
         max_config_payload_bytes=4_096,
@@ -56,7 +58,7 @@ def _binding() -> tuple[ValidatedStrategyRef, ValidatedStrategyConfig]:
         max_config_string_length=128,
         max_config_collection_items=64,
     )
-    manifest = StrategyManifest(
+    manifest = create_strategy_manifest(
         strategy_id="usage-replay-strategy",
         strategy_version="1.0.0",
         module_path="app.services.strategy.evaluators.naive_ma_trend",
@@ -66,8 +68,8 @@ def _binding() -> tuple[ValidatedStrategyRef, ValidatedStrategyConfig]:
         config_schema={"type": "object"},
         required_data=("EURUSD:H1",),
         required_indicators=("sma",),
-        timing_policy=StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE,
-        permitted_environments=(StrategyEnvironment.RESEARCH,),
+        timing_policy=get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE"),
+        permitted_environments=(get_strategy_environment("RESEARCH"),),
         source_hash=_HASH,
         artifact_hash=_HASH,
         dependency_hash=_HASH,
@@ -80,17 +82,17 @@ def _binding() -> tuple[ValidatedStrategyRef, ValidatedStrategyConfig]:
         max_local_state_bytes=8_192,
         decision_timeout_seconds=5,
     )
-    ref = ValidatedStrategyRef(
+    ref = create_validated_strategy_ref(
         manifest=manifest,
-        lifecycle_status=StrategyLifecycleStatus.APPROVED,
-        environment=StrategyEnvironment.RESEARCH,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
+        environment=get_strategy_environment("RESEARCH"),
         policy_version=policy.policy_version,
         validation_policy=policy,
         registry_record_hash=_HASH,
         request_id=_REQUEST,
         correlation_id=_CORRELATION,
     )
-    config = ValidatedStrategyConfig(
+    config = create_validated_strategy_config(
         strategy_id=manifest.strategy_id,
         strategy_version=manifest.strategy_version,
         config_schema_version="v1",
@@ -111,12 +113,12 @@ def main() -> int:
     fr_str_027()
     fr_str_029()
     print("\nSTRATEGY REPLAY MANIFEST")
-    print("Contract:", StrategyReplayManifest.__name__)
+    print("Contract:", create_strategy_replay_manifest_value.__name__)
     ref, config = _binding()
-    context = StrategyExecutionContext(
-        environment=StrategyEnvironment.RESEARCH,
+    context = create_strategy_execution_context(
+        environment=get_strategy_environment("RESEARCH"),
         decision_timestamp=datetime.now(UTC),
-        timing_policy=StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE,
+        timing_policy=get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE"),
         seed=13,
         interface_version="v1",
         request_id=_REQUEST,
@@ -133,10 +135,13 @@ def main() -> int:
         print("Replay manifest failed:", outcome.error)
         return 1
     replay = outcome.data
+    reconstructed = create_strategy_replay_manifest_value(**replay.model_dump())
     print("Schema:", replay.schema_id)
     print("Strategy:", replay.strategy_id, replay.strategy_version)
     print("Config hash:", replay.config_hash)
     print("Manifest hash:", replay.manifest_hash)
+    print("Complete replay manifest:", replay.model_dump(mode="json"))
+    print("Public value-factory round trip:", reconstructed == replay)
 
     repeat = create_strategy_replay_manifest(
         ref, config, context, data_checksum=_HASH, indicator_manifest_hash=_HASH

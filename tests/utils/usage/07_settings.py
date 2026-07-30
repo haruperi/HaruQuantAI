@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.utils import load_settings
+from app.utils import load_broker_provider_settings, load_settings
 
 
 def _header(title: str) -> None:
@@ -30,9 +30,25 @@ def fr_utils_023_load_active_configuration() -> None:
     print("Active settings:", settings.environment, settings.runtime_profile)
 
 
+def fr_utils_023_load_broker_provider_configuration() -> None:
+    """FR-UTL-023: Load secret-redacting broker settings through an opaque API."""
+    _header("Example 3: Load Broker Provider Configuration")
+    settings = load_broker_provider_settings()
+    print(
+        "Provider enablement:",
+        {
+            "mt5": settings.mt5_enabled,
+            "ctrader": settings.ctrader_enabled,
+            "binance": settings.binance_enabled,
+            "dukascopy": settings.dukascopy_enabled,
+            "yahoo": settings.yahoo_enabled,
+        },
+    )
+
+
 def fr_utils_024_environment_constraints() -> None:
     """FR-UTL-024: Demonstrate exact environment-value validation."""
-    _header("Example 3: Environment Constraints")
+    _header("Example 4: Environment Constraints")
     try:
         load_settings({"ENVIRONMENT": "invalid"}, {})
     except Exception:  # noqa: BLE001 - public loader intentionally hides error classes.
@@ -41,7 +57,7 @@ def fr_utils_024_environment_constraints() -> None:
 
 def fr_utils_024_validate_settings() -> None:
     """FR-UTL-024: Demonstrate unknown-key rejection without mutation."""
-    _header("Example 4: Validate Settings")
+    _header("Example 5: Validate Settings")
     source = {"UNKNOWN": "value"}
     try:
         load_settings(source, {})
@@ -53,6 +69,7 @@ def main() -> None:
     """Run all runtime-settings examples."""
     fr_utils_022_construct_configuration()
     fr_utils_023_load_active_configuration()
+    fr_utils_023_load_broker_provider_configuration()
     fr_utils_024_environment_constraints()
     fr_utils_024_validate_settings()
 

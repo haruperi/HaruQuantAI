@@ -3,18 +3,16 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from typing import TYPE_CHECKING, cast, override
+from typing import TYPE_CHECKING, Any, cast, override
 
-from app.services.strategy import RandomWalkEvaluator, evaluate_strategy_signals
-from app.utils import logger
+from app.services.strategy import create_strategy_evaluator, evaluate_strategy_signals
+from app.utils import get_logger
 
 if TYPE_CHECKING:
-    from app.services.indicators import IndicatorResult
     from app.services.strategy import (
-        StrategyExecutionContext,
-        StrategySignal,
-        StrategySignalEvidence,
-        ValidatedStrategyConfig,
+        create_strategy_execution_context,
+        create_strategy_signal_evidence,
+        create_validated_strategy_config,
     )
 
 from tests.strategy.unit.test_models import (
@@ -26,11 +24,14 @@ from tests.strategy.unit.test_models import (
     make_signal_evidence,
 )
 
+logger = get_logger(__name__)
 
-def _evaluator() -> RandomWalkEvaluator:
+
+def _evaluator() -> Any:
     """Build one exact registry-bound concrete evaluator."""
     logger.debug("Building concrete signal workflow evaluator")
-    return RandomWalkEvaluator(
+    return create_strategy_evaluator(
+        "random_walk",
         strategy_id="mean-reversion",
         strategy_version="1.0.0",
         module_path="approved.strategies.mean_reversion",
@@ -40,17 +41,22 @@ def _evaluator() -> RandomWalkEvaluator:
     )
 
 
-class _InvalidOutputEvaluator(RandomWalkEvaluator):
+class _InvalidOutputEvaluator:
     """Registry-bound evaluator returning a deliberately invalid runtime value."""
+
+    def __init__(self, **kwargs: Any) -> None:
+        """Bind the evaluator to one immutable registry identity."""
+        for name, value in kwargs.items():
+            setattr(self, name, value)
 
     @override
     def evaluate_signals(
         self,
-        evidence: StrategySignalEvidence,
-        indicators: tuple[IndicatorResult, ...],
-        config: ValidatedStrategyConfig,
-        context: StrategyExecutionContext,
-    ) -> tuple[StrategySignal, ...]:
+        evidence: create_strategy_signal_evidence,
+        indicators: tuple[Any, ...],
+        config: create_validated_strategy_config,
+        context: create_strategy_execution_context,
+    ) -> tuple[Any, ...]:
         """Return an invalid object under the declared signal type.
 
         Args:
@@ -64,7 +70,7 @@ class _InvalidOutputEvaluator(RandomWalkEvaluator):
         """
         logger.debug("Returning invalid concrete signal output for boundary testing")
         del evidence, indicators, config, context
-        return cast("tuple[StrategySignal, ...]", (object(),))
+        return cast("tuple[Any, ...]", (object(),))
 
 
 def test_concrete_signal_workflow() -> None:
@@ -92,7 +98,8 @@ def test_concrete_signal_workflow_fails_closed_on_hash_mismatch() -> None:
     logger.debug("Testing concrete signal hash failure")
     market = make_market((("1", "2", "0", "1"),))
     evaluator = _evaluator()
-    mismatched = RandomWalkEvaluator(
+    mismatched = create_strategy_evaluator(
+        "random_walk",
         strategy_id=evaluator.strategy_id,
         strategy_version=evaluator.strategy_version,
         module_path=evaluator.module_path,

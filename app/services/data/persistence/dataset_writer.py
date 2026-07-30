@@ -1,3 +1,4 @@
+# ruff: noqa: ANN401
 """Local dataset loading and atomic persistent storage."""
 
 from __future__ import annotations
@@ -361,7 +362,7 @@ def _save_dataset_raw(
                 df, request, absolute_path, manifest_path, clock
             )
         except Exception as error:
-            logger.error("Dataset save failed")
+            logger.exception("Dataset save failed")
             if isinstance(error, DataError):
                 raise
             raise DataError(
@@ -574,7 +575,7 @@ def _load_dataset_raw(request: DatasetLoadRequest) -> MarketDataset:
         )
 
     except Exception as error:
-        logger.error("Dataset load failed")
+        logger.exception("Dataset load failed")
         if isinstance(error, DataError):
             raise
         raise DataError(

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import sys
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
@@ -75,17 +76,34 @@ async def run() -> None:
 
         # Stage 3 — Read bounded order, deal, and transaction history.
         _stage(3)
+        end = datetime.now(UTC)
+        start = end - timedelta(days=7)
         require_success(
             "Order history",
-            await list_broker_order_history(adapter, limit=5),
+            await list_broker_order_history(
+                adapter,
+                start_time=start,
+                end_time=end,
+                limit=5,
+            ),
         )
         require_success(
             "Deal history",
-            await list_broker_deal_history(adapter, limit=5),
+            await list_broker_deal_history(
+                adapter,
+                start_time=start,
+                end_time=end,
+                limit=5,
+            ),
         )
         require_success(
             "Transactions",
-            await list_broker_account_transactions(adapter, limit=5),
+            await list_broker_account_transactions(
+                adapter,
+                start_time=start,
+                end_time=end,
+                limit=5,
+            ),
         )
 
         # Stage 4 — Return canonical provider truth with explicit missing-target evidence.

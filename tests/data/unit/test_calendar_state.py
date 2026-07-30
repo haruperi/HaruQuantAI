@@ -7,6 +7,7 @@ from decimal import Decimal
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.economic_calendar import (
     CALENDAR_STATE_BLACKOUT_BEFORE,
     CALENDAR_STATE_EVENT,
@@ -70,9 +71,6 @@ def _event(symbol: str, *, delta: timedelta, impact: EventImpact) -> EconomicEve
         source_url=None,
         updated_at=None,
     )
-
-
-from app.services.data.contracts.responses import unwrap_data_response
 
 
 def _unwrap(response):

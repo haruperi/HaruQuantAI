@@ -11,7 +11,6 @@ type StandardResponse[T] = Any
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.indicators import IndicatorResult
     from app.services.strategy.contracts import (
         StrategyExecutionContext,
         StrategySignal,
@@ -33,7 +32,7 @@ class SignalEvaluator(Protocol):
     def evaluate_signals(
         self,
         evidence: StrategySignalEvidence,
-        indicators: tuple[IndicatorResult, ...],
+        indicators: tuple[Any, ...],
         config: ValidatedStrategyConfig,
         context: StrategyExecutionContext,
     ) -> StandardResponse[tuple[StrategySignal, ...]]:

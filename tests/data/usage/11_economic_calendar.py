@@ -1,454 +1,164 @@
-"""Run multi-site economic calendar examples (FEAT-DATA-11).
+"""Demonstrate the fail-closed FEAT-DATA-11 economic-calendar boundary.
 
-Covers `FR-DATA-095` through `FR-DATA-099` (raw scrape pipeline) and the
-normalized event/news-restriction surface `FR-DATA-123` through `FR-DATA-129`.
-Network access is injected, so this program runs deterministically without
-contacting an external site. A deployment supplies a real `CalendarTransport`;
-the shape of the call is identical.
+No licensed provider transport exists in this repository. This usage program
+therefore proves the genuine current runtime behavior: provider-backed calendar
+requirements remain unavailable and no event, dataframe, artifact, or Risk
+evidence is invented.
 """
 
-import asyncio
+from __future__ import annotations
+
 import sys
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    build_calendar_scrape_provider,
-    build_data_error,
-    build_data_settings,
-    build_economic_event_store,
-    build_market_context_evidence,
     build_scrape_options,
-    calendar_state_provenance,
-    data_settings_context,
-    derive_calendar_state,
-    deserialize_scrape_result,
     get_calendar_sites,
-    get_economic_events,
-    get_symbol_economic_events,
-    get_symbol_event_profile,
-    is_news_restricted,
-    populate_market_context_calendar,
-    run_data_migrations,
-    save_scrape_result,
     scrape_economic_calendar,
-    scrape_result_to_dataframe,
-    serialize_scrape_result,
 )
-
-DataError = build_data_error
-
-from app.services.data import (
-    build_data_error,
-)
-
-DataError = build_data_error
-
-from app.services.data import (
-    build_data_error,
-)
-
-DataError = build_data_error
-
-from app.services.data import (
-    build_data_error,
-)
-
-DataError = build_data_error
-
 from app.utils import generate_id
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 _END = datetime(2026, 1, 8, tzinfo=UTC)
-
-_ROWS = {
-    "forexfactory": [
-        {
-            "timestamp": "2026-01-02T12:30:00Z",
-            "title": "Non-Farm Employment Change",
-            "country": "USD",
-            "impact": "High",
-            "actual": "216K",
-            "forecast": "170K",
-            "previous": "173K",
-        },
-        {
-            "timestamp": "2026-01-02T12:30:00Z",
-            "title": "Non-Farm Employment Change",
-            "country": "USD",
-            "impact": "High",
-            "actual": "216K",
-            "forecast": "170K",
-            "previous": "173K",
-        },
-        {"timestamp": None, "title": "Malformed", "country": "", "impact": "?"},
-    ],
-    "metalsmine": [
-        {
-            "timestamp": "2026-01-03T09:00:00Z",
-            "title": "Gold Inventories",
-            "country": "XAU",
-            "impact": "Medium",
-            "actual": "1.2M",
-            "forecast": "-",
-            "previous": "1.1M",
-        }
-    ],
-}
+_REQUIREMENTS = (
+    "FR-DATA-095",
+    "FR-DATA-096",
+    "FR-DATA-097",
+    "FR-DATA-098",
+    "FR-DATA-099",
+    "FR-DATA-123",
+    "FR-DATA-124",
+    "FR-DATA-125",
+    "FR-DATA-126",
+    "FR-DATA-127",
+    "FR-DATA-128",
+    "FR-DATA-129",
+)
 
 
-class _DemonstrationTransport:
-    """Deterministic transport standing in for live site access."""
-
-    async def fetch_site(
-        self, site: str, _start: datetime, _end: datetime
-    ) -> list[dict[str, object]]:
-        """Return canned rows for one site."""
-        await asyncio.sleep(0)
-        if site == "cryptocraft":
-            raise TimeoutError(site)
-        return _ROWS.get(site, [])
-
-
-def _header(title: str) -> None:
-    """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
-
-
-def _example_fr_data_095() -> ScrapeResult:
-    """Scrape several sites concurrently under a declared bound."""
-    _header("FR-DATA-095 scrape_economic_calendar")
+def _demonstrate_unavailable_source() -> None:
+    """Show that absent licensed transport blocks every provider-backed claim."""
+    sites = get_calendar_sites()
+    print("Declared calendar sites:", sites)
     options = build_scrape_options(
         start=_START,
         end=_END,
-        sites=get_calendar_sites(),
+        sites=sites,
         max_parallel_tasks=2,
-        transport=_DemonstrationTransport(),
-    )
-    result = scrape_economic_calendar(options)
-    print("Sites requested:", len(options.sites))
-    print("Events collected:", len(result.events))
-    print("Sites skipped:", dict(result.skipped))
-    return result
-
-
-def _example_fr_data_096(result: ScrapeResult) -> None:
-    """Show duplicate removal and malformed-row filtering."""
-    _header("FR-DATA-096 cleaning and validation")
-    print("Raw forexfactory rows supplied:", len(_ROWS["forexfactory"]))
-    kept = [event for event in result.events if event.site == "forexfactory"]
-    print("Validated forexfactory events:", len(kept))
-    if kept:
-        print("Actual parsed exactly:", kept[0].actual)
-        print("Missing previous is explicit:", kept[0].previous)
-        print(kept)
-
-
-def _example_fr_data_097(result: ScrapeResult) -> None:
-    """Project the result into the fixed calendar column contract."""
-    _header("FR-DATA-097 to_dataframe")
-    frame = scrape_result_to_dataframe(result)
-    print("Columns:", list(frame.columns))
-    print("Rows:", len(frame))
-
-
-def _example_fr_data_098(result: ScrapeResult) -> None:
-    """Save one descriptive artifact per non-empty site frame."""
-    _header("FR-DATA-098 save with descriptive names")
-    with TemporaryDirectory() as temporary:
-        directory = Path(temporary)
-        with data_settings_context(
-            build_data_settings(approved_storage_roots=(directory,))
-        ):
-            save_scrape_result(result, directory, "csv")
-        written = tuple(directory.glob("*.csv"))
-        print("Artifacts written:", len(written))
-        for path in written:
-            print(" -", path.name)
-
-
-def _example_fr_data_099(result: ScrapeResult) -> None:
-    """Round-trip the result through its pickled transport form."""
-    _header("FR-DATA-099 serialize and deserialize")
-    payload = serialize_scrape_result(result)
-    restored = deserialize_scrape_result(payload)
-    print("Payload bytes:", len(payload))
-    print("Events preserved:", restored.events == result.events)
-
-
-def _demonstrate_feature() -> None:
-    """Execute every calendar example."""
-    try:
-        result = _example_fr_data_095()
-        _example_fr_data_096(result)
-        _example_fr_data_097(result)
-        _example_fr_data_098(result)
-        _example_fr_data_099(result)
-    except Exception as error:
-        print("Calendar example failed:", getattr(error, "code", type(error).__name__))
-
-
-async def _normalized_service_examples(
-    provider: EconomicCalendarProvider,
-) -> tuple[list[EconomicEvent], list[EconomicEvent], bool]:
-    """Exercise normalized retrieval, symbol mapping, and news restriction."""
-    events = await get_economic_events(
-        _START,
-        _END,
-        provider=provider,
-        minimum_impact="medium",
-    )
-    events_res = await get_economic_events(
-        _START,
-        _END,
-        provider=provider,
-        minimum_impact="medium",
-    )
-    events = (
-        events_res.data
-        if events_res.status == "success" and events_res.data is not None
-        else ()
-    )
-
-    symbol_events_res = await get_symbol_economic_events(
-        "EURUSD",
-        _START,
-        _END,
-        provider=provider,
-        minimum_impact="high",
-    )
-    symbol_events = (
-        symbol_events_res.data
-        if symbol_events_res.status == "success" and symbol_events_res.data is not None
-        else ()
-    )
-
-    restricted_res = await is_news_restricted(
-        "EURUSD",
-        datetime(2026, 1, 2, 12, 25, tzinfo=UTC),
-        provider=provider,
-    )
-    restricted = (
-        restricted_res.data
-        if restricted_res.status == "success" and restricted_res.data is not None
-        else False
-    )
-    return events, symbol_events, restricted
-
-
-def _example_fr_data_123_to_129() -> None:
-    """Exercise every normalized event, storage, and Risk-evidence operation."""
-    _header("FR-DATA-123..129 normalized economic calendar")
-    provider = build_calendar_scrape_provider(
-        _DemonstrationTransport(),
-        sites=("forexfactory", "metalsmine"),
-        max_parallel_tasks=2,
-    )
-    events, symbol_events, restricted = asyncio.run(
-        _normalized_service_examples(provider)
-    )
-    profile_res = get_symbol_event_profile("EURUSD")
-    profile = (
-        profile_res.data
-        if profile_res.status == "success" and profile_res.data is not None
-        else None
-    )
-    if events and profile is not None:
-        print(
-            "FR-DATA-123 normalized:",
-            events[0].actual,
-            events[0].actual_raw,
-            events[0].unit,
-        )
-        print("FR-DATA-124 provider events:", len(events))
-        print("FR-DATA-125 profile currencies:", sorted(profile.currencies))
-        print("FR-DATA-126 EURUSD events:", len(symbol_events))
-        print("FR-DATA-127 restricted:", restricted)
-
-    with TemporaryDirectory() as temporary:
-        directory = Path(temporary)
-        settings = build_data_settings(
-            database_url="sqlite:///economic_usage.sqlite3",
-            data_dir=directory,
-            sqlite_busy_timeout_seconds=1,
-            write_lock_lease_seconds=30,
-            approved_storage_roots=(directory,),
-        )
-        with data_settings_context(settings):
-            run_data_migrations(generate_id("req"))
-            store = build_economic_event_store()
-            upsert_res = store.upsert(events, request_id=generate_id("req"))
-            stored_count = (
-                upsert_res.data
-                if upsert_res.status == "success" and upsert_res.data is not None
-                else 0
-            )
-            query_res = store.query(_START, _END)
-            persisted = (
-                query_res.data
-                if query_res.status == "success" and query_res.data is not None
-                else ()
-            )
-            rw_res = store.refresh_windows(now=_START)
-            if rw_res.status == "success" and rw_res.data is not None:
-                seven_day, one_day = rw_res.data
-                print(
-                    "FR-DATA-128 stored:",
-                    stored_count,
-                    len(persisted),
-                    seven_day[1] - seven_day[0],
-                    one_day[1] - one_day[0],
-                )
-
-    at = datetime(2026, 1, 2, 12, 25, tzinfo=UTC)
-    evidence = build_market_context_evidence(
-        symbol="EURUSD",
-        session_state="open",
-        calendar_state=None,
-        spread=None,
-        spread_unit=None,
-        liquidity=None,
-        volatility=None,
-        correlations={},
-        crisis_flags=(),
-        timezone="UTC",
-        as_of=at,
-        expires_at=at + timedelta(minutes=1),
-        provenance={"source": "calendar-usage"},
-        missing_fields=("calendar", "spread", "liquidity", "volatility"),
         request_id=generate_id("req"),
     )
-    populated_res = populate_market_context_calendar(evidence, events=events)
-    derived_res = derive_calendar_state("EURUSD", at, events=events)
-    if (
-        populated_res.status == "success"
-        and populated_res.data is not None
-        and derived_res.status == "success"
-        and derived_res.data is not None
-    ):
-        populated = populated_res.data
-        derived = derived_res.data
-        prov_res = calendar_state_provenance(derived)
-        prov = prov_res.data if prov_res.status == "success" else {}
-        print(
-            "FR-DATA-129 Risk evidence:",
-            populated.calendar_state,
-            prov,
-        )
+    try:
+        scrape_economic_calendar(options)
+    except Exception as error:
+        code = getattr(error, "code", type(error).__name__)
+        print("Observed provider result:", code)
+        print("Events returned: 0")
+        print("Dataframe rows returned: 0")
+        print("Artifacts written: 0")
+        print("Risk calendar evidence returned: 0")
+        if code != "SOURCE_UNAVAILABLE":
+            raise RuntimeError(
+                f"Expected SOURCE_UNAVAILABLE, observed {code}"
+            ) from error
+        return
+    raise RuntimeError("Calendar access unexpectedly succeeded without a transport")
 
 
 _DEMONSTRATED = [False]
-_NORMALIZED_DEMONSTRATED = [False]
 
 
 def _demonstrate_once() -> None:
-    """Run the feature demonstration once for all requirement entry points."""
-    if _DEMONSTRATED[0]:
-        return
-    _demonstrate_feature()
-    _DEMONSTRATED[0] = True
-
-
-def _demonstrate_normalized_once() -> None:
-    """Run normalized calendar demonstrations once for their requirement rows."""
-    if _NORMALIZED_DEMONSTRATED[0]:
-        return
-    _example_fr_data_123_to_129()
-    _NORMALIZED_DEMONSTRATED[0] = True
+    """Run the genuine fail-closed evidence once."""
+    if not _DEMONSTRATED[0]:
+        _demonstrate_unavailable_source()
+        _DEMONSTRATED[0] = True
 
 
 def fr_data_095() -> None:
-    _header("fr_data_095")
-    "FR-DATA-095: Scrape economic calendar events from multiple sites (ForexFactory, MetalsMine, EnergyExch, CryptoCraft) concurrently, using configurable concurrency (`max_parallel_tasks`) in `ScrapeOptions`."
+    """FR-DATA-095: Require a licensed multi-site transport."""
     _demonstrate_once()
 
 
 def fr_data_096() -> None:
-    _header("fr_data_096")
-    "FR-DATA-096: Clean and validate raw calendar data into structured records (representing title, country, impact, actual, forecast, previous, and timestamp), filtering duplicates and bad values."
+    """FR-DATA-096: Do not claim cleaned rows without provider rows."""
     _demonstrate_once()
 
 
 def fr_data_097() -> None:
-    _header("fr_data_097")
-    "FR-DATA-097: Return scraped datasets as a pandas DataFrame via a clean encapsulation `ScrapeResult`."
+    """FR-DATA-097: Do not claim a dataframe without provider rows."""
     _demonstrate_once()
 
 
 def fr_data_098() -> None:
-    _header("fr_data_098")
-    "FR-DATA-098: Automatically save non-empty calendar dataframes using descriptive file names that include the site name, date range, and scrape timestamp; empty dataframes are skipped."
+    """FR-DATA-098: Do not write calendar artifacts without provider rows."""
     _demonstrate_once()
 
 
 def fr_data_099() -> None:
-    _header("fr_data_099")
-    "FR-DATA-099: Support serialization and deserialization of `ScrapeResult` using python's `pickle` module for easy persistence and transport."
+    """FR-DATA-099: Do not serialize a fabricated scrape result."""
     _demonstrate_once()
 
 
 def fr_data_123() -> None:
-    """FR-DATA-123: Preserve normalized and raw economic-event values."""
-    _header("FR-DATA-123: Preserve normalized and raw economic-event values.")
-    _demonstrate_normalized_once()
+    """FR-DATA-123: Do not claim normalized values without provider evidence."""
+    _demonstrate_once()
 
 
 def fr_data_124() -> None:
-    """FR-DATA-124: Retrieve events through a provider-neutral protocol."""
-    _header("FR-DATA-124: Retrieve events through a provider-neutral protocol.")
-    _demonstrate_normalized_once()
+    """FR-DATA-124: Provider-neutral retrieval remains unavailable."""
+    _demonstrate_once()
 
 
 def fr_data_125() -> None:
-    """FR-DATA-125: Resolve canonical symbol-event relevance profiles."""
-    _header("FR-DATA-125: Resolve canonical symbol-event relevance profiles.")
-    _demonstrate_normalized_once()
+    """FR-DATA-125: Profiles cannot create events."""
+    _demonstrate_once()
 
 
 def fr_data_126() -> None:
-    """FR-DATA-126: Retrieve general and symbol-scoped normalized events."""
-    _header("FR-DATA-126: Retrieve general and symbol-scoped normalized events.")
-    _demonstrate_normalized_once()
+    """FR-DATA-126: Symbol-scoped retrieval remains unavailable."""
+    _demonstrate_once()
 
 
 def fr_data_127() -> None:
-    """FR-DATA-127: Evaluate symmetric high-impact news blackout windows."""
-    _header("FR-DATA-127: Evaluate symmetric high-impact news blackout windows.")
-    _demonstrate_normalized_once()
+    """FR-DATA-127: News restriction cannot claim absent evidence."""
+    _demonstrate_once()
 
 
 def fr_data_128() -> None:
-    """FR-DATA-128: Upsert, query, and plan refreshes for economic events."""
-    _header("FR-DATA-128: Upsert, query, and plan refreshes for economic events.")
-    _demonstrate_normalized_once()
+    """FR-DATA-128: No provider events are persisted."""
+    _demonstrate_once()
 
 
 def fr_data_129() -> None:
-    """FR-DATA-129: Populate Risk-ready market-context calendar evidence."""
-    _header("FR-DATA-129: Populate Risk-ready market-context calendar evidence.")
-    _demonstrate_normalized_once()
+    """FR-DATA-129: Risk evidence remains unavailable."""
+    _demonstrate_once()
 
 
 def main() -> None:
-    """Execute every functional-requirement demonstration."""
-    demonstrations = (
-        fr_data_095,
-        fr_data_096,
-        fr_data_097,
-        fr_data_098,
-        fr_data_099,
-        fr_data_123,
-        fr_data_124,
-        fr_data_125,
-        fr_data_126,
-        fr_data_127,
-        fr_data_128,
-        fr_data_129,
-    )
-    for demonstration in demonstrations:
+    """Execute every registered requirement entry point."""
+    print("FEAT-DATA-11 — Economic Calendar")
+    for requirement, demonstration in zip(
+        _REQUIREMENTS,
+        (
+            fr_data_095,
+            fr_data_096,
+            fr_data_097,
+            fr_data_098,
+            fr_data_099,
+            fr_data_123,
+            fr_data_124,
+            fr_data_125,
+            fr_data_126,
+            fr_data_127,
+            fr_data_128,
+            fr_data_129,
+        ),
+        strict=True,
+    ):
+        print(requirement, "status: Pending — licensed transport unavailable")
         demonstration()
 
 

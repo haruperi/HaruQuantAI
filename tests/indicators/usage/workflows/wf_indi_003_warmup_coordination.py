@@ -9,11 +9,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.indicators import (
     get_indicator,
+    get_indicator_result_metadata,
+    get_indicator_result_values,
     get_warmup_requirement,
     sma,
     validate_indicator,
 )
-from tests.indicators.usage._support import unwrap_indicator_response
+from tests.indicators.usage._support import (
+    print_indicator_evidence,
+    print_market_evidence,
+    unwrap_indicator_response,
+)
 from tests.indicators.usage.workflows._support import indicator_config, live_bars
 
 WORKFLOW_ID = "WF-INDI-003"
@@ -49,18 +55,26 @@ def main() -> None:
     # Stage 3: Data performs the genuine MT5 read.
     _stage(3)
     dataset = live_bars(limit=max(40, requirement.minimum_observations + 1))
-    print("Fetched:", dataset.record_count, "bars")
+    print_market_evidence(dataset)
 
     # Stage 4: Validate and calculate without silently dropping warmup.
     _stage(4)
     unwrap_indicator_response(validate_indicator("sma", dataset, config))
     result = unwrap_indicator_response(sma(dataset, period=10, config=config))
-    unavailable = int(result.values["unavailable_reason"].notna().sum())
+    unavailable = int(
+        get_indicator_result_values(result)["unavailable_reason"].notna().sum()
+    )
+    print_indicator_evidence(result, label="Warmup-preserving SMA rows")
     print("Retained warmup rows:", unavailable)
 
     # Stage 5 — OUTPUT BOUNDARY: Return the typed IndicatorResult.
     _stage(5)
-    print("Output:", type(result).__name__, result.manifest.row_count, "rows")
+    print(
+        "Output:",
+        type(result).__name__,
+        get_indicator_result_metadata(result)["manifest"]["row_count"],
+        "rows",
+    )
 
 
 if __name__ == "__main__":

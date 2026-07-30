@@ -3,26 +3,28 @@
 from pathlib import Path
 
 from app.services.strategy import (
-    StrategyConfig,
-    StrategyEnvironment,
-    StrategyRef,
+    create_strategy_config,
+    create_strategy_ref,
+    get_strategy_environment,
     register_strategy_version,
     validate_strategy_config,
     validate_strategy_ref,
 )
-from app.utils import logger
+from app.utils import get_logger
 
 from tests.strategy.unit.test_catalog import make_registration, storage_context
 from tests.strategy.unit.test_models import COR, REQ, make_auth, make_policy
+
+logger = get_logger(__name__)
 
 
 def test_registry_validation_workflow(tmp_path: Path) -> None:
     """Register, resolve, and validate one declarative configuration."""
     logger.debug("Testing WF-STR-001 registry validation")
-    ref = StrategyRef(
+    ref = create_strategy_ref(
         strategy_id="mean-reversion",
         exact_version="1.0.0",
-        environment=StrategyEnvironment.RESEARCH,
+        environment=get_strategy_environment("RESEARCH"),
         request_id=REQ,
         correlation_id=COR,
     )
@@ -35,7 +37,7 @@ def test_registry_validation_workflow(tmp_path: Path) -> None:
         )
         resolved = validate_strategy_ref(ref, make_policy())
     assert resolved.data is not None
-    config = StrategyConfig(
+    config = create_strategy_config(
         strategy_id="mean-reversion",
         strategy_version="1.0.0",
         config_schema_version="v1",

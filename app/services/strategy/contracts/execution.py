@@ -96,7 +96,7 @@ class StrategyExecutionContext(_Contract):
         logger.debug("Freezing Strategy dependency status")
         return cast("Mapping[str, JsonValue]", _freeze_json(value))
 
-    @field_serializer("dependency_status", when_used="json")
+    @field_serializer("dependency_status", when_used="always")
     def _serialize_dependency_status(
         self, value: Mapping[str, JsonValue]
     ) -> dict[str, object]:
@@ -201,7 +201,7 @@ class StrategyEvent(_Contract):
         logger.debug("Freezing Strategy event facts")
         return cast("Mapping[str, JsonValue]", _freeze_json(value))
 
-    @field_serializer("facts", when_used="json")
+    @field_serializer("facts", when_used="always")
     def _serialize_event_facts(
         self, value: Mapping[str, JsonValue]
     ) -> dict[str, object]:
@@ -393,7 +393,11 @@ class StrategyDecision(_Contract):
             raise ValueError("min_fill_size requires allowed partial fills")
         return self
 
-    @field_serializer("diagnostic_facts", "candidate_local_state", when_used="json")
+    @field_serializer(
+        "diagnostic_facts",
+        "candidate_local_state",
+        when_used="always",
+    )
     def _serialize_decision_json(
         self, value: Mapping[str, JsonValue] | None
     ) -> dict[str, object] | None:
@@ -410,7 +414,7 @@ class StrategyDecision(_Contract):
             return None
         return cast("dict[str, object]", _thaw_json(value))
 
-    @field_serializer("lineage", when_used="json")
+    @field_serializer("lineage", when_used="always")
     def _serialize_decision_lineage(self, value: Mapping[str, str]) -> dict[str, str]:
         """Serialize immutable decision lineage.
 
@@ -561,7 +565,7 @@ class StrategyExecutionResult(_Contract):
             raise ValueError("every proposal must produce exactly one intent")
         return self
 
-    @field_serializer("local_state_update", when_used="json")
+    @field_serializer("local_state_update", when_used="always")
     def _serialize_local_state_update(
         self, value: Mapping[str, JsonValue] | None
     ) -> dict[str, object] | None:

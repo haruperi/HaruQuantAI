@@ -3,11 +3,16 @@
 # ruff: noqa: PT018
 from pathlib import Path
 
-from app.services.strategy import StrategyLifecycleStatus, register_strategy_version
-from app.utils import logger
+from app.services.strategy import (
+    get_strategy_lifecycle_status,
+    register_strategy_version,
+)
+from app.utils import get_logger
 
 from tests.strategy.unit.test_catalog import make_registration, storage_context
 from tests.strategy.unit.test_models import make_auth, make_policy
+
+logger = get_logger(__name__)
 
 _SHA256_LENGTH = 64
 
@@ -52,7 +57,7 @@ def test_registration_workflow_rejects_unapproved_lifecycle(tmp_path: Path) -> N
     """Verify an unapproved lifecycle fails closed with no validated payload."""
     logger.debug("Testing WF-STR-008 fail-closed lifecycle rejection")
     request = make_registration().model_copy(
-        update={"lifecycle_status": StrategyLifecycleStatus.DRAFT}
+        update={"lifecycle_status": get_strategy_lifecycle_status("DRAFT")}
     )
     with storage_context(tmp_path):
         outcome = register_strategy_version(request, make_auth(), make_policy())

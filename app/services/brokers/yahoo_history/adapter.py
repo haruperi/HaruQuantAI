@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import override
+from typing import TYPE_CHECKING, override
 
 from app.services.brokers.contracts import (
     BrokerBar,
@@ -19,7 +19,9 @@ from app.services.brokers.contracts import (
 from app.services.brokers.contracts.protocols import _UnsupportedAdapterBase
 from app.services.brokers.yahoo_history.mapping import _map_history, _provider_interval
 from app.services.brokers.yahoo_history.transport import _YahooTransport
-from app.utils.responses.models import StandardResponse
+
+if TYPE_CHECKING:
+    from app.services.brokers.contracts.responses import StandardResponse
 
 
 class YahooBrokerAdapter(_UnsupportedAdapterBase):

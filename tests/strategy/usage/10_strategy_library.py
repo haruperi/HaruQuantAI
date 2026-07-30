@@ -9,85 +9,63 @@ evidence through the public ``evaluate_strategy_signals`` boundary.
 import asyncio
 import hashlib
 import inspect
+import os
 import sys
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import pandas as pd
 from app.services.brokers import (
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerId,
-    create_broker_adapter,
+    create_connected_broker,
+    disconnect_broker,
+    get_broker_connection_environment,
+    resolve_provider_connection_config,
 )
 from app.services.data import (
-    AccountSnapshotRequest,
-    AccountStateSnapshot,
-    DataError,
-    MarketDataset,
+    build_account_snapshot_request,
     get_account_state_snapshot,
     get_market_data,
     get_symbol_metadata,
+    to_ohlcv_dataframe,
+    unwrap_data_response,
 )
 from app.services.indicators import (
-    IndicatorError,
-    IndicatorErrorCode,
-    IndicatorResult,
     atr,
+    get_indicator_result_metadata,
+    get_indicator_result_values,
     rsi,
     sma,
     zigzag,
 )
 from app.services.strategy import (
-    DecomposingTradeEvaluator,
-    HarrietHedgingEvaluator,
-    MarketStructureEvaluator,
-    NaiveMATrendEvaluator,
-    RandomWalkEvaluator,
-    SignalEvaluator,
-    SQXBreakoutAtrTrailingEvaluator,
-    StrategyEnvironment,
-    StrategyExecutionContext,
-    StrategyLifecycleStatus,
-    StrategyManifest,
-    StrategySignalEvidence,
-    StrategyTimingPolicy,
-    StrategyValidationPolicy,
-    ValidatedStrategyConfig,
-    ValidatedStrategyRef,
-    WhiteFairyEvaluator,
+    create_strategy_evaluator,
+    create_strategy_execution_context,
+    create_strategy_manifest,
+    create_strategy_signal_evidence,
+    create_strategy_validation_policy,
+    create_validated_strategy_config,
+    create_validated_strategy_ref,
     evaluate_strategy_signals,
+    get_strategy_environment,
+    get_strategy_lifecycle_status,
+    get_strategy_timing_policy,
 )
-from app.utils import AppSettings, StandardResponse, canonical_json
-from pydantic import Field, SecretStr
-
-
-class _StrategyUsageSettings(AppSettings):
-    """Typed standalone composition settings for real Strategy evidence."""
-
-    environment: str = "dev"
-    strategy_audit_bars: int = Field(default=120, gt=0, le=240)
-    mt5_login: SecretStr | None = None
-    mt5_password: SecretStr | None = None
-    mt5_server: SecretStr | None = None
-    mt5_terminal_path: SecretStr | None = None
-
-
-_USAGE_SETTINGS = _StrategyUsageSettings()
+from app.utils import canonical_json
 
 _UNAVAILABLE = 3
 
 
-def _unwrap_indicator(response: StandardResponse[IndicatorResult]) -> IndicatorResult:
+def _unwrap_indicator(response: Any) -> Any:
     """Extract a successful indicator result for strategy evaluation."""
     if response.status != "success" or response.data is None:
         error = response.error
-        message = error.message if error is not None else "indicator calculation failed"
-        raise IndicatorError(IndicatorErrorCode.IND_INTERNAL_ERROR, message)
+        message = error.code if error is not None else "indicator calculation failed"
+        raise RuntimeError(message)
     return response.data
 
 
@@ -101,11 +79,26 @@ def _unwrap_indicator(response: StandardResponse[IndicatorResult]) -> IndicatorR
 # so indicators must be recomputed per window rather than sliced from a
 # full-history result. 260 bars is ample warmup for period-14 Wilder smoothing
 # to converge, keeping audited values equal to full-history values.
-_AUDIT_BARS = _USAGE_SETTINGS.strategy_audit_bars
+def _audit_bar_count() -> int:
+    """Return a bounded explicit audit-bar count.
+
+    Returns:
+        Integer in the inclusive range 1..120.
+
+    Raises:
+        ValueError: If ``STRATEGY_AUDIT_BARS`` is not an integer.
+    """
+    raw = os.environ.get("STRATEGY_AUDIT_BARS", "120")
+    count = int(raw)
+    if not 1 <= count <= 120:
+        raise ValueError("STRATEGY_AUDIT_BARS must be between 1 and 120")
+    return count
+
+
+_AUDIT_BARS = _audit_bar_count()
 _AUDIT_WINDOW = 260
-_AUDIT_DIR = Path(__file__).resolve().parent / "signal_audit"
 _MODULE_ROOT = "app.services.strategy.evaluators"
-_POLICY = StrategyValidationPolicy(
+_POLICY = create_strategy_validation_policy(
     policy_version="usage-v1",
     approved_module_roots=(_MODULE_ROOT,),
     max_config_payload_bytes=4_096,
@@ -120,7 +113,7 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _context(name: str) -> StrategyExecutionContext:
+def _context(name: str) -> create_strategy_execution_context:
     """Build one fixed deterministic evaluation context.
 
     Args:
@@ -129,10 +122,10 @@ def _context(name: str) -> StrategyExecutionContext:
     Returns:
         A complete immutable execution context.
     """
-    return StrategyExecutionContext(
-        environment=StrategyEnvironment.RESEARCH,
+    return create_strategy_execution_context(
+        environment=get_strategy_environment("RESEARCH"),
         decision_timestamp=datetime.now(UTC),
-        timing_policy=StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE,
+        timing_policy=get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE"),
         seed=1,
         interface_version="v1",
         request_id=f"strategy-usage-{name}",
@@ -145,17 +138,17 @@ def _context(name: str) -> StrategyExecutionContext:
 
 
 def _binding(
-    evaluator_type: type,
+    evaluator_name: str,
     strategy_id: str,
     parameters: dict[str, object],
-    context: StrategyExecutionContext,
+    context: create_strategy_execution_context,
     provenance_ref: str,
     required_indicators: tuple[str, ...],
-) -> tuple[ValidatedStrategyRef, ValidatedStrategyConfig, SignalEvaluator]:
+) -> tuple[create_validated_strategy_ref, create_validated_strategy_config, Any]:
     """Build the exact registry reference, configuration, and bound evaluator.
 
     Args:
-        evaluator_type: Concrete evaluator class from the library.
+        evaluator_name: Stable name in the public evaluator registry.
         strategy_id: Registered strategy identifier.
         parameters: Declarative normalized parameters.
         context: Fixed deterministic evaluation context.
@@ -166,10 +159,19 @@ def _binding(
         The validated reference, validated configuration, and hash-bound
         evaluator instance.
     """
-    source_hash = hashlib.sha256(inspect.getsource(evaluator_type).encode()).hexdigest()
+    module_path = f"{_MODULE_ROOT}.{evaluator_name}"
+    probe = create_strategy_evaluator(
+        evaluator_name,
+        strategy_id=strategy_id,
+        strategy_version="1.0.0",
+        module_path=module_path,
+        source_hash="0" * 64,
+        artifact_hash="0" * 64,
+        dependency_hash="0" * 64,
+    )
+    source_hash = hashlib.sha256(inspect.getsource(type(probe)).encode()).hexdigest()
     config_hash = hashlib.sha256(canonical_json(parameters).encode()).hexdigest()
-    module_path = f"{_MODULE_ROOT}.{evaluator_type.__module__.rsplit('.', 1)[-1]}"
-    manifest = StrategyManifest(
+    manifest = create_strategy_manifest(
         strategy_id=strategy_id,
         strategy_version="1.0.0",
         module_path=module_path,
@@ -193,9 +195,9 @@ def _binding(
         max_local_state_bytes=8_192,
         decision_timeout_seconds=5,
     )
-    ref = ValidatedStrategyRef(
+    ref = create_validated_strategy_ref(
         manifest=manifest,
-        lifecycle_status=StrategyLifecycleStatus.APPROVED,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
         environment=context.environment,
         policy_version=_POLICY.policy_version,
         validation_policy=_POLICY,
@@ -203,7 +205,7 @@ def _binding(
         request_id=context.request_id,
         correlation_id=context.correlation_id,
     )
-    config = ValidatedStrategyConfig(
+    config = create_validated_strategy_config(
         strategy_id=strategy_id,
         strategy_version="1.0.0",
         config_schema_version="v1",
@@ -212,7 +214,8 @@ def _binding(
         policy_version=_POLICY.policy_version,
         request_id=context.request_id,
     )
-    evaluator = evaluator_type(
+    evaluator = create_strategy_evaluator(
+        evaluator_name,
         strategy_id=strategy_id,
         strategy_version="1.0.0",
         module_path=module_path,
@@ -229,7 +232,7 @@ def _evidence(
     *,
     related: dict[str, object] | None = None,
     tags: tuple[str, ...] = (),
-) -> StrategySignalEvidence:
+) -> create_strategy_signal_evidence:
     """Build immutable point-in-time signal evidence.
 
     Args:
@@ -241,7 +244,7 @@ def _evidence(
     Returns:
         Complete immutable signal evidence.
     """
-    return StrategySignalEvidence(
+    return create_strategy_signal_evidence(
         evidence_id=hashlib.sha256(
             f"{market.request_id}:{market.available_at.isoformat()}".encode()
         ).hexdigest(),
@@ -288,8 +291,7 @@ def _slice(market: object, start: int, stop: int) -> object:
 
 def _audit(  # noqa: C901
     title: str,
-    slug: str,
-    evaluator_type: type,
+    evaluator_name: str,
     strategy_id: str,
     parameters: dict[str, object],
     indicator_factory: Callable[[object], Sequence[object]],
@@ -305,8 +307,7 @@ def _audit(  # noqa: C901
 
     Args:
         title: Human-readable strategy name.
-        slug: Filename-safe strategy identifier.
-        evaluator_type: Concrete evaluator class from the library.
+        evaluator_name: Stable public evaluator-registry name.
         strategy_id: Registered strategy identifier.
         parameters: Declarative normalized parameters.
         indicator_factory: Builds the ordered indicator tuple for one slice.
@@ -328,12 +329,12 @@ def _audit(  # noqa: C901
         window = _slice(market, index - _AUDIT_WINDOW + 1, index + 1)
         try:
             indicators = tuple(indicator_factory(window))
-        except IndicatorError as error:
+        except RuntimeError as error:
             failures[type(error).__name__] = failures.get(type(error).__name__, 0) + 1
             continue
-        context = _context(slug)
+        context = _context(evaluator_name)
         ref, config, evaluator = _binding(
-            evaluator_type,
+            evaluator_name,
             strategy_id,
             parameters,
             context,
@@ -357,7 +358,7 @@ def _audit(  # noqa: C901
         }
         for result in indicators:
             for column in result.output_columns:
-                series = result.values_only[column]
+                series = get_indicator_result_values(result)[column]
                 row[column] = series.iloc[-1]
                 # The evaluators compare the current value against the previous
                 # one, so both are needed to verify a crossing from one row.
@@ -376,9 +377,6 @@ def _audit(  # noqa: C901
         print("No bar produced signals. Failure codes:", failures or "none")
         return _UNAVAILABLE
     frame = pd.DataFrame(rows).set_index("timestamp")
-    _AUDIT_DIR.mkdir(exist_ok=True)
-    csv_path = _AUDIT_DIR / f"{slug}.csv"
-    frame.to_csv(csv_path)
     signal_columns = [
         column
         for column in frame.columns
@@ -395,7 +393,6 @@ def _audit(  # noqa: C901
         "display.max_columns", None, "display.width", 220, "display.max_rows", 20
     ):
         print(frame.tail(10).to_string())
-    print("Full frame written to:", csv_path)
     return 0
 
 
@@ -412,7 +409,6 @@ def example_01_naive_ma_trend(market: object, point: Decimal) -> int:
     return _audit(
         "01 NAIVE MA TREND",
         "naive_ma_trend",
-        NaiveMATrendEvaluator,
         "naive-ma-trend",
         {"fast_ma_period": 20, "slow_ma_period": 50, "filter_ma_period": 200},
         lambda slice_: (
@@ -439,7 +435,6 @@ def example_02_decomposing_trade(market: object, point: Decimal) -> int:
     return _audit(
         "02 DECOMPOSING TRADE",
         "decomposing_trade",
-        DecomposingTradeEvaluator,
         "decomposing-trade",
         {"rsi_period": 14, "overbought": "70", "oversold": "30"},
         lambda slice_: (_unwrap_indicator(rsi(slice_, period=14)),),
@@ -462,7 +457,6 @@ def example_03_white_fairy(market: object, point: Decimal) -> int:
     return _audit(
         "03 WHITE FAIRY",
         "white_fairy",
-        WhiteFairyEvaluator,
         "white-fairy",
         {"rsi_period": 14, "overbought": "70", "oversold": "30"},
         lambda slice_: (_unwrap_indicator(rsi(slice_, period=14)),),
@@ -485,7 +479,6 @@ def example_04_sqx_breakout_atr_trailing(market: object, point: Decimal) -> int:
     return _audit(
         "04 SQX BREAKOUT ATR TRAILING",
         "sqx_breakout_atr_trailing",
-        SQXBreakoutAtrTrailingEvaluator,
         "sqx-breakout-atr-trailing",
         {
             "breakout_lookback": 20,
@@ -504,7 +497,7 @@ def example_04_sqx_breakout_atr_trailing(market: object, point: Decimal) -> int:
 
 
 def example_05_harriet_hedging(  # noqa: C901
-    market: MarketDataset, point: Decimal
+    market: Any, point: Decimal
 ) -> int:
     """Audit Harriet Hedging multi-timeframe structure confirmations.
 
@@ -528,8 +521,8 @@ def example_05_harriet_hedging(  # noqa: C901
             use_cache=False,
             quality_failure_behavior="warn",
         )
-    except DataError as error:
-        print("Higher-timeframe evidence unavailable:", error.code)
+    except Exception as error:  # noqa: BLE001 - bounded standalone evidence path.
+        print("Higher-timeframe evidence unavailable:", type(error).__name__)
         return _UNAVAILABLE
     if higher_response.status != "success" or higher_response.data is None:
         print("Higher-timeframe evidence unavailable:", higher_response.error)
@@ -564,7 +557,7 @@ def example_05_harriet_hedging(  # noqa: C901
         higher_window = _slice(higher, max(0, closed[-1] - 59), closed[-1] + 1)
         context = _context("harriet-hedging")
         ref, config, evaluator = _binding(
-            HarrietHedgingEvaluator,
+            "harriet_hedging",
             "harriet-hedging",
             parameters,
             context,
@@ -599,9 +592,6 @@ def example_05_harriet_hedging(  # noqa: C901
         print("No bar produced signals. Failure codes:", failures or "none")
         return _UNAVAILABLE
     frame = pd.DataFrame(rows).set_index("timestamp")
-    _AUDIT_DIR.mkdir(exist_ok=True)
-    csv_path = _AUDIT_DIR / "harriet_hedging.csv"
-    frame.to_csv(csv_path)
     print(f"Audited bars: {len(frame)}  (window {_AUDIT_WINDOW}, no lookahead)")
     if failures:
         print("Skipped bars by reason:", failures)
@@ -609,7 +599,6 @@ def example_05_harriet_hedging(  # noqa: C901
         "display.max_columns", None, "display.width", 220, "display.max_rows", 20
     ):
         print(frame.tail(10).to_string())
-    print("Full frame written to:", csv_path)
     return 0
 
 
@@ -626,12 +615,12 @@ def example_06_market_structure(market: object, point: Decimal) -> int:
     print("\n06 MARKET STRUCTURE")
     print("-" * 88)
     result = _unwrap_indicator(zigzag(market, depth=2))
-    if result.values_only["zigzag_value_2"].count() < 8:
+    if get_indicator_result_values(result)["zigzag_value_2"].count() < 8:
         print("Fewer than eight causal confirmed ZigZag pivots are available.")
         return _UNAVAILABLE
     context = _context("market-structure")
     ref, config, evaluator = _binding(
-        MarketStructureEvaluator,
+        "market_structure",
         "market-structure",
         {},
         context,
@@ -650,78 +639,56 @@ def example_06_market_structure(market: object, point: Decimal) -> int:
     if outcome.data is None:
         print("Market Structure evaluation failed:", outcome.error)
         return _UNAVAILABLE
-    print("ZigZag manifest:", result.manifest.output_checksum)
+    print(
+        "ZigZag manifest:",
+        get_indicator_result_metadata(result)["manifest"]["output_checksum"],
+    )
     for signal in outcome.data:
         print(signal.signal_name, "active=", signal.active)
     return 0
 
 
-def _real_mt5_account_snapshot() -> AccountStateSnapshot | None:  # noqa: PLR0911
-    """Read a verified demo MT5 account snapshot through public contracts."""
-    login_secret = _USAGE_SETTINGS.mt5_login
-    password = _USAGE_SETTINGS.mt5_password
-    server_secret = _USAGE_SETTINGS.mt5_server
-    if (
-        _USAGE_SETTINGS.environment.casefold() not in {"dev", "test"}
-        or login_secret is None
-        or password is None
-        or server_secret is None
-    ):
+def _real_mt5_account_snapshot() -> Any | None:
+    """Read a verified demo MT5 account snapshot through public contracts.
+
+    Returns:
+        Fresh immutable account snapshot, or ``None`` when demo evidence is
+        unavailable.
+    """
+    if os.environ.get("ENVIRONMENT", "").lower() not in {"dev", "test"}:
+        print("Account evidence blocked outside dev/test.")
         return None
-    login = login_secret.get_secret_value()
-    server = server_secret.get_secret_value()
-    if "demo" not in server.casefold():
-        return None
-    credentials = {
-        "login": login_secret,
-        "password": password,
-        "server": server_secret,
-    }
-    terminal_path = _USAGE_SETTINGS.mt5_terminal_path
-    if terminal_path:
-        credentials["terminal_path"] = terminal_path
-    created = create_broker_adapter(
-        BrokerId.MT5,
-        BrokerConnectionConfig(
-            broker_id=BrokerId.MT5,
-            environment=BrokerEnvironment.DEMO,
-            provider_enabled=True,
-            connect_timeout_sec=10,
-            request_timeout_sec=15,
-            transport_reconnect_max_attempts=0,
-            stream_buffer_size=16,
-            circuit_failure_threshold=2,
-            circuit_recovery_timeout_sec=30,
-            circuit_half_open_max_calls=1,
-            account_reference=login,
-            credentials=credentials,
-            auto_connect=False,
-        ),
-    )
-    adapter = created.data
-    if adapter is None:
+    connection = resolve_provider_connection_config("mt5")
+    environment = get_broker_connection_environment(connection)
+    if environment != "demo":
+        print("Account evidence blocked for non-demo broker environment:", environment)
         return None
     try:
-        connected = asyncio.run(adapter.connect())
-        if connected.status != "success":
-            return None
-        snapshot_response = get_account_state_snapshot(
-            AccountSnapshotRequest(
-                source_id="mt5",
-                account_id=login,
-                max_age_seconds=30,
-                request_id="req-77777777-7777-4777-8777-777777777777",
-            ),
-            adapter,
-        )
-        if snapshot_response.status != "success":
-            return None
-        return snapshot_response.data
-    except DataError as error:
-        print("MT5 demo account snapshot failed:", error.code)
+        adapter = asyncio.run(create_connected_broker("mt5"))
+    except ValueError as error:
+        print("MT5 demo connection unavailable:", type(error).__name__)
         return None
+    try:
+        account_result = asyncio.run(adapter.get_account_info())
+        if account_result.data is None:
+            print("MT5 demo account identity unavailable:", account_result.error)
+            return None
+        request = build_account_snapshot_request(
+            source_id="mt5",
+            account_id=account_result.data.account_id,
+            max_age_seconds=300,
+            request_id=account_result.metadata.request_id,
+        )
+        response = get_account_state_snapshot(request, adapter)
+        return unwrap_data_response(
+            response,
+            operation="strategy.usage.get_account_state_snapshot",
+            request_id=response.metadata.request_id,
+        )
     finally:
-        asyncio.run(adapter.disconnect())
+        disconnected = asyncio.run(disconnect_broker(adapter))
+        if disconnected.status != "success":
+            print("MT5 demo disconnect warning:", disconnected.error)
 
 
 def example_07_random_walk(market: object, point: Decimal) -> int:
@@ -748,7 +715,7 @@ def example_07_random_walk(market: object, point: Decimal) -> int:
     context = _context("random-walk")
     parameters = {"buy_magic_number": 17001, "sell_magic_number": 17002}
     ref, config, evaluator = _binding(
-        RandomWalkEvaluator,
+        "random_walk",
         "random-walk",
         parameters,
         context,
@@ -833,8 +800,8 @@ def main() -> int:
             quality_failure_behavior="warn",
         )
         metadata_response = get_symbol_metadata(source_id="mt5", symbol="EURUSD")
-    except DataError as error:
-        print("Live MT5 evidence unavailable:", error.code)
+    except Exception as error:  # noqa: BLE001 - bounded standalone evidence path.
+        print("Live MT5 evidence unavailable:", type(error).__name__)
         return _UNAVAILABLE
     if market_response.status != "success" or market_response.data is None:
         print("Live MT5 evidence unavailable:", market_response.error)
@@ -848,6 +815,23 @@ def main() -> int:
         print("MT5 point-size evidence unavailable:", metadata.point)
         return _UNAVAILABLE
     point = Decimal(str(metadata.point))
+    frame_response = to_ohlcv_dataframe(market)
+    if frame_response.data is None:
+        print("Genuine MT5 frame projection failed:", frame_response.error)
+        return 1
+    print("\nGenuine MT5 input frame (latest 12 bounded rows):")
+    print(frame_response.data.tail(12).to_string())
+    print(
+        "Input evidence:",
+        {
+            "request_id": market.request_id,
+            "record_count": market.record_count,
+            "start": market.start,
+            "end": market.end,
+            "available_at": market.available_at,
+            "point_size": point,
+        },
+    )
     examples = (
         fr_str_040,
         fr_str_041,

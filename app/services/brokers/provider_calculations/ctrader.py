@@ -1,3 +1,4 @@
+# mypy: disable-error-code="attr-defined"
 """cTrader provider-native calculation operations."""
 
 from __future__ import annotations

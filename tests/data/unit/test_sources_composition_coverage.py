@@ -10,7 +10,6 @@ from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.sources.composition import (
     _BrokerMarketCalendar,
     _LazyBrokerSession,
-    _ProviderRuntimeSettings,
     _require_broker_result,
     _run,
     ensure_identity,
@@ -20,6 +19,7 @@ from app.services.data.sources.composition import (
     list_composable_sources,
     resolve_calendar,
 )
+from app.utils.settings.models import BrokerProviderSettings
 
 _REQ_ID = "req-11111111-1111-4111-8111-111111111111"
 _NOW = datetime.now(UTC)
@@ -83,10 +83,10 @@ def test_lazy_broker_session_disabled_provider() -> None:
     Test _LazyBrokerSession.adapter raises SOURCE_UNAVAILABLE when provider disabled.
     """
     session = _LazyBrokerSession("mt5")
-    mock_settings = _ProviderRuntimeSettings(mt5_enabled=False)
+    mock_settings = BrokerProviderSettings(mt5_enabled=False)
 
     with patch(
-        "app.services.data.sources.composition._ProviderRuntimeSettings",
+        "app.services.data.sources.composition.load_broker_provider_settings",
         return_value=mock_settings,
     ):
         with pytest.raises(DataError) as exc_info:
@@ -99,16 +99,19 @@ def test_lazy_broker_session_mt5_missing_credentials() -> None:
     Test _LazyBrokerSession._mt5_adapter raises CREDENTIALS_MISSING when secrets missing.
     """
     session = _LazyBrokerSession("mt5")
-    mock_settings = _ProviderRuntimeSettings(
+    mock_settings = BrokerProviderSettings(
         mt5_enabled=True,
         mt5_login=None,
         mt5_password=None,
         mt5_server=None,
     )
-
-    with pytest.raises(DataError) as exc_info:
-        session._mt5_adapter(mock_settings, _REQ_ID)
-    assert exc_info.value.code == "CREDENTIALS_MISSING"
+    with patch(
+        "app.services.data.sources.composition.load_broker_provider_settings",
+        return_value=mock_settings,
+    ):
+        with pytest.raises(DataError) as exc_info:
+            session.adapter(_REQ_ID)
+        assert exc_info.value.code == "CREDENTIALS_MISSING"
 
 
 def test_credential_free_adapters_and_sources() -> None:
@@ -126,13 +129,13 @@ def test_credential_free_adapters_and_sources() -> None:
     ):
         for source_id in ("yahoo", "binance_spot", "dukascopy"):
             session = _LazyBrokerSession(source_id)
-            mock_settings = _ProviderRuntimeSettings(
+            mock_settings = BrokerProviderSettings(
                 **{
                     f"{('binance' if source_id == 'binance_spot' else source_id)}_enabled": True
                 }
             )
             with patch(
-                "app.services.data.sources.composition._ProviderRuntimeSettings",
+                "app.services.data.sources.composition.load_broker_provider_settings",
                 return_value=mock_settings,
             ):
                 adapter = session.adapter(_REQ_ID)
@@ -209,14 +212,14 @@ def test_ensure_source_and_access_dukascopy() -> None:
     mock_adapter = MagicMock()
     mock_adapter.connect.side_effect = _mock_connect
     mock_result = MagicMock(error=None, data=mock_adapter)
-    mock_provider_settings = _ProviderRuntimeSettings(dukascopy_enabled=True)
+    mock_provider_settings = BrokerProviderSettings(dukascopy_enabled=True)
     with (
         patch(
             "app.services.data.sources.composition.create_broker_adapter",
             return_value=mock_result,
         ),
         patch(
-            "app.services.data.sources.composition._ProviderRuntimeSettings",
+            "app.services.data.sources.composition.load_broker_provider_settings",
             return_value=mock_provider_settings,
         ),
     ):

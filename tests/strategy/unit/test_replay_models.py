@@ -1,11 +1,14 @@
 """Strategy replay contract tests."""
 
 import pytest
-from app.services.strategy import StrategyCheckpoint, StrategyReplayManifest
-from app.utils import logger
+from app.services.strategy.checkpoints.models import StrategyCheckpoint
+from app.services.strategy.replay.models import StrategyReplayManifest
+from app.utils import get_logger
 from pydantic import ValidationError
 
 from tests.strategy.unit.test_models import COR, HASH, NOW, REQ, WF
+
+logger = get_logger(__name__)
 
 
 def test_manifest_requires_complete_lineage() -> None:

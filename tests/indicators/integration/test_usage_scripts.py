@@ -105,6 +105,8 @@ def test_indicators_usage_script_executes_successfully(script_name: str) -> None
                 "LOG_FILE_PATH": str(log_directory / "app.log"),
                 "PYTHONDONTWRITEBYTECODE": "1",
                 "RUNTIME_PROFILE": "research",
+                "SQLITE_BUSY_TIMEOUT_SECONDS": "1",
+                "WRITE_LOCK_LEASE_SECONDS": "30",
             }
         )
         completed = subprocess.run(  # noqa: S603 - fixed repository-controlled command

@@ -7,10 +7,10 @@ from collections.abc import Mapping
 from typing import Any
 
 from app.services.data import (
-    DataError,
-    StatementPlan,
-    TransactionRequest,
+    build_statement_plan,
+    build_transaction_request,
     execute_transaction,
+    is_data_error,
 )
 from app.services.strategy.checkpoints.models import StrategyCheckpoint
 from app.services.strategy.contracts._base import JsonValue  # noqa: TC001
@@ -20,6 +20,7 @@ from app.services.strategy.contracts.references import (  # noqa: TC001
     ValidatedStrategyRef,
 )
 from app.services.strategy.contracts.responses import (
+    StrategyOperationError,
     guard_strategy_boundary,
     unwrap_data_response,
 )
@@ -128,8 +129,8 @@ def create_strategy_checkpoint(  # noqa: PLR0911
         _ensure_strategy_storage(auth.request_id)
         unwrap_data_response(
             execute_transaction(
-                TransactionRequest(
-                    plan=StatementPlan(
+                build_transaction_request(
+                    plan=build_statement_plan(
                         statements=(
                             "INSERT OR IGNORE INTO strategy_checkpoints "
                             "(checkpoint_id, checkpoint_json, checksum, "
@@ -152,19 +153,21 @@ def create_strategy_checkpoint(  # noqa: PLR0911
             operation="data.execute_transaction.strategy_checkpoint_write",
         )
         return success(checkpoint)
-    except DataError:
-        logger.error("Strategy checkpoint persistence failed")
-        return failure(
-            StrategyErrorCode.INTERNAL_ERROR,
-            "checkpoint persistence failed",
-            request_id=auth.request_id,
-            correlation_id=auth.correlation_id,
-        )
     except ValueError:
         logger.warning("Strategy checkpoint serialization failed")
         return failure(
             StrategyErrorCode.CHECKPOINT_INVALID,
             "checkpoint state is invalid",
+            request_id=auth.request_id,
+            correlation_id=auth.correlation_id,
+        )
+    except Exception as error:
+        if not is_data_error(error):
+            raise
+        logger.exception("Strategy checkpoint persistence failed")
+        return failure(
+            StrategyErrorCode.INTERNAL_ERROR,
+            "checkpoint persistence failed",
             request_id=auth.request_id,
             correlation_id=auth.correlation_id,
         )
@@ -202,8 +205,8 @@ def validate_strategy_checkpoint(
     try:
         result = unwrap_data_response(
             execute_transaction(
-                TransactionRequest(
-                    plan=StatementPlan(
+                build_transaction_request(
+                    plan=build_statement_plan(
                         statements=(
                             "SELECT checkpoint_json FROM strategy_checkpoints "
                             "WHERE checkpoint_id = ?",
@@ -216,7 +219,18 @@ def validate_strategy_checkpoint(
             ),
             operation="data.execute_transaction.strategy_checkpoint_read",
         )
-    except DataError:
+    except StrategyOperationError:
+        logger.exception("Strategy checkpoint persistence read failed")
+        return failure(
+            StrategyErrorCode.INTERNAL_ERROR,
+            "checkpoint persistence read failed",
+            request_id=auth.request_id,
+            correlation_id=auth.correlation_id,
+        )
+    except Exception as error:
+        if not is_data_error(error):
+            raise
+        logger.exception("Strategy checkpoint persistence read failed")
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,
             "checkpoint persistence read failed",

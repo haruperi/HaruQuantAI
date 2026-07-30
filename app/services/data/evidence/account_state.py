@@ -1,3 +1,4 @@
+# ruff: noqa: ANN401
 """Read-only account state normalized from a caller-owned broker adapter.
 
 Produces ``AccountStateSnapshot`` from balance, position, and order reads. Data owns no
@@ -35,14 +36,12 @@ from app.utils import get_logger, utc_now
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.brokers.contracts import (
-        BrokerAccountInfo,
-        BrokerAdapter,
-        BrokerBalance,
-        BrokerOrder,
-        BrokerPermissions,
-        BrokerPosition,
-    )
+    type BrokerAccountInfo = Any
+    type BrokerAdapter = Any
+    type BrokerBalance = Any
+    type BrokerOrder = Any
+    type BrokerPermissions = Any
+    type BrokerPosition = Any
 
 
 def _failure(
@@ -250,7 +249,7 @@ def _get_account_state_snapshot_raw(
     except DataError:
         raise
     except Exception as error:
-        logger.error("Injected broker adapter account read failed")
+        logger.exception("Injected broker adapter account read failed")
         raise DataError(
             "SOURCE_UNAVAILABLE",
             safe_details={"operation": "account_snapshot"},

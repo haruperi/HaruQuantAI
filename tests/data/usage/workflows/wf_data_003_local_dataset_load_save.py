@@ -4,13 +4,17 @@ from __future__ import annotations
 
 import sys
 import tempfile
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
+    build_data_settings,
     build_dataset_load_request,
     build_dataset_save_request,
+    build_market_data_request,
+    data_settings_context,
     get_market_data,
     load_dataset,
     run_data_migrations,
@@ -18,8 +22,9 @@ from app.services.data import (
     unwrap_data_response,
 )
 from app.utils import generate_id
-from tests.data.usage.workflows._support import isolated_runtime, market_request
 
+_END = datetime.now(UTC)
+_START = _END - timedelta(days=5)
 WORKFLOW_ID = "WF-DATA-003"
 STAGES = (
     "Resolve an approved relative storage path.",
@@ -37,17 +42,55 @@ def _stage(number: int) -> None:
     )
 
 
+def _market_request(data_kind, *, timeframe, limit):
+    """Build one bounded genuine MT5 request inline."""
+    return build_market_data_request(
+        source_id="mt5",
+        symbol="EURUSD",
+        data_kind=data_kind,
+        timeframe=timeframe if data_kind == "bars" else None,
+        start=_START,
+        end=_END,
+        limit=limit,
+        use_cache=False,
+        quality_failure_behavior="warn",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        stale_cache_policy="refresh",
+        fallback_sources=(),
+        request_id=generate_id("req"),
+    )
+
+
 def main() -> None:
     """Execute local save and load with temporary durable state."""
     print(f"{WORKFLOW_ID} — Local Dataset Load and Save")
     print("INPUT BOUNDARY — approved path and normalized MT5 dataset")
     with tempfile.TemporaryDirectory(prefix="wf-data-003-") as directory:
         root = Path(directory)
-        with isolated_runtime(root):
+        (root / "data" / "raw").mkdir(parents=True, exist_ok=True)
+        settings = build_data_settings(
+            database_url="sqlite:///workflow.sqlite3",
+            data_dir=root,
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
+            approved_storage_roots=(
+                Path("raw"),
+                Path("processed"),
+                Path("data"),
+                Path("data/raw"),
+                Path("data/processed"),
+            ),
+            data_provider_sources=("mt5",),
+            data_raw_root=Path("data/raw"),
+        )
+        with data_settings_context(settings):
             run_data_migrations(generate_id("req"))
             (root / "raw").mkdir(parents=True, exist_ok=True)
 
-            response = get_market_data(market_request("bars", timeframe="M1"))
+            response = get_market_data(
+                _market_request("bars", timeframe="M1", limit=20)
+            )
             dataset = unwrap_data_response(
                 response,
                 operation="get_market_data",

@@ -101,7 +101,7 @@ class TradeIntent(BaseModel):
             raise ValueError("TradeIntent lineage must contain non-empty text")
         return MappingProxyType(dict(value))
 
-    @field_serializer("lineage", when_used="json")
+    @field_serializer("lineage", when_used="always")
     def _serialize_lineage(self, value: Mapping[str, str]) -> dict[str, str]:
         """Serialize immutable TradeIntent lineage.
 

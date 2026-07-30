@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from collections.abc import Coroutine, Sequence
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -97,16 +97,19 @@ async def _get_economic_events_raw(
         start.isoformat(),
         end.isoformat(),
     )
-    events = unwrap_data_response(
-        await provider.get_events(
-            start,
-            end,
-            currencies=currencies,
-            countries=countries,
-            minimum_impact=minimum_impact,
+    events = cast(
+        "list[EconomicEvent]",
+        unwrap_data_response(
+            await provider.get_events(
+                start,
+                end,
+                currencies=currencies,
+                countries=countries,
+                minimum_impact=minimum_impact,
+            ),
+            operation="data.economic_calendar.get_economic_events",
+            request_id=request_id or generate_id("req"),
         ),
-        operation="data.economic_calendar.get_economic_events",
-        request_id=request_id or generate_id("req"),
     )
     return [
         event

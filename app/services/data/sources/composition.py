@@ -10,10 +10,12 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
-from pydantic import SecretStr, ValidationError
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import ValidationError
 
-from app.services.brokers import build_broker_connection_config, create_broker_adapter
+from app.services.brokers import (
+    create_broker_adapter,
+    resolve_provider_connection_config,
+)
 from app.services.data._settings import (
     LOCAL_SYMBOL_MANIFEST_NAME,
     get_data_settings,
@@ -46,7 +48,7 @@ from app.services.data.sources.registry import (
     resolve_source_identity,
 )
 from app.services.data.time_sessions.contracts import MarketSchedule, SessionWindow
-from app.utils import generate_id, get_logger
+from app.utils import generate_id, get_logger, load_broker_provider_settings
 
 logger = get_logger(__name__)
 
@@ -57,33 +59,6 @@ _lock = threading.RLock()
 _calendars: dict[str, MarketCalendar] = {}
 _sessions: dict[str, _LazyBrokerSession] = {}
 _migrated_targets: set[tuple[str, str]] = set()
-
-
-class _ProviderRuntimeSettings(BaseSettings):
-    """Private provider settings used only by the standalone Data runtime."""
-
-    model_config = SettingsConfigDict(
-        env_ignore_empty=True,
-        case_sensitive=False,
-        extra="ignore",
-        frozen=True,
-    )
-
-    mt5_enabled: bool = False
-    mt5_environment: Literal["demo", "live"] = "demo"
-    mt5_login: SecretStr | None = None
-    mt5_password: SecretStr | None = None
-    mt5_server: SecretStr | None = None
-    mt5_terminal_path: SecretStr | None = None
-    ctrader_enabled: bool = False
-    ctrader_environment: Literal["demo", "live"] = "demo"
-    ctrader_account_id: SecretStr | None = None
-    ctrader_client_id: SecretStr | None = None
-    ctrader_client_secret: SecretStr | None = None
-    ctrader_access_token: SecretStr | None = None
-    binance_enabled: bool = False
-    dukascopy_enabled: bool = False
-    yahoo_enabled: bool = False
 
 
 # Provider read capabilities mirror the Brokers capability catalogue exactly; Data
@@ -148,7 +123,7 @@ def _run[T](operation: Coroutine[Any, Any, T], request_id: str) -> T:
     except DataError:
         raise
     except Exception as error:
-        logger.error("Standalone Data provider operation failed")
+        logger.exception("Standalone Data provider operation failed")
         raise DataError(
             "SOURCE_UNAVAILABLE",
             safe_details={"operation": "provider_runtime"},
@@ -173,7 +148,7 @@ def _require_broker_result[T](
             safe_details={"operation": operation},
             request_id=request_id,
         )
-    return result.data
+    return cast("T", result.data)
 
 
 class _LazyBrokerSession:
@@ -186,10 +161,10 @@ class _LazyBrokerSession:
             source_id: Canonical provider source identifier.
         """
         self._source_id = source_id
-        self._adapter: object | None = None
+        self._adapter: Any | None = None
         self._lock = threading.RLock()
 
-    def adapter(self, request_id: str) -> object:
+    def adapter(self, request_id: str) -> Any:  # noqa: ANN401
         """Return the configured adapter for this source.
 
         Loop-bound providers remain disconnected until ``run`` so their clients are
@@ -209,7 +184,7 @@ class _LazyBrokerSession:
                     request_id=request_id,
                 )
             try:
-                settings = _ProviderRuntimeSettings()
+                settings = load_broker_provider_settings()
             except ValueError as error:
                 raise DataError(
                     "INVALID_INPUT",
@@ -226,18 +201,57 @@ class _LazyBrokerSession:
             if self._source_id == _CTRADER:
                 return self._ctrader_adapter(settings, request_id)
             if self._source_id != _MT5:
-                return self._credential_free_adapter(request_id)
+                return self._credential_free_adapter(settings, request_id)
             return self._mt5_adapter(settings, request_id)
+
+    def _provider_config(
+        self,
+        settings: object,
+        request_id: str,
+    ) -> Any:  # noqa: ANN401
+        """Resolve one governed provider connection configuration via Brokers.
+
+        Credential resolution and environment enforcement are owned by the
+        Brokers domain; Data selects a route only.
+
+        Args:
+            settings: Effective broker provider settings.
+            request_id: Canonical request identity.
+
+        Returns:
+            Resolved broker connection configuration.
+
+        Raises:
+            DataError: If credentials are missing, the environment is live, or
+                the broker identifier is unsupported.
+        """
+        try:
+            return resolve_provider_connection_config(
+                self._source_id, settings=settings
+            )
+        except ValueError as error:
+            message = str(error)
+            if "credentials missing" in message:
+                raise DataError(
+                    "CREDENTIALS_MISSING",
+                    safe_details={"source_id": self._source_id},
+                    request_id=request_id,
+                ) from error
+            raise DataError(
+                "INVALID_INPUT",
+                safe_details={"field": "provider_settings"},
+                request_id=request_id,
+            ) from error
 
     def _mt5_adapter(
         self,
-        settings: _ProviderRuntimeSettings,
+        settings: object,
         request_id: str,
     ) -> object:
         """Build and connect the configured MT5 read adapter.
 
         Args:
-            settings: Effective application settings.
+            settings: Effective broker provider settings.
             request_id: Canonical request identity.
 
         Returns:
@@ -246,41 +260,9 @@ class _LazyBrokerSession:
         Raises:
             DataError: If credentials, configuration, or connection are invalid.
         """
-        login = settings.mt5_login
-        password = settings.mt5_password
-        server = settings.mt5_server
-        if login is None or password is None or server is None:
-            raise DataError(
-                "CREDENTIALS_MISSING",
-                safe_details={"source_id": self._source_id},
-                request_id=request_id,
-            )
-        credentials = {"login": login, "password": password, "server": server}
-        if settings.mt5_terminal_path is not None:
-            credentials["terminal_path"] = settings.mt5_terminal_path
-        try:
-            config = build_broker_connection_config(
-                broker_id=_MT5,
-                environment=settings.mt5_environment,
-                provider_enabled=True,
-                connect_timeout_sec=10.0,
-                request_timeout_sec=30.0,
-                transport_reconnect_max_attempts=3,
-                stream_buffer_size=1_000,
-                circuit_failure_threshold=5,
-                circuit_recovery_timeout_sec=30.0,
-                circuit_half_open_max_calls=1,
-                account_reference=login.get_secret_value(),
-                credentials=credentials,
-            )
-        except ValueError as error:
-            raise DataError(
-                "INVALID_INPUT",
-                safe_details={"field": "provider_settings"},
-                request_id=request_id,
-            ) from error
-        adapter = _require_broker_result(
-            create_broker_adapter(_MT5, config),
+        config = self._provider_config(settings, request_id)
+        adapter: Any = _require_broker_result(
+            create_broker_adapter(config.broker_id, config),
             operation="create_broker_adapter",
             request_id=request_id,
         )
@@ -296,13 +278,13 @@ class _LazyBrokerSession:
 
     def _ctrader_adapter(
         self,
-        settings: _ProviderRuntimeSettings,
+        settings: object,
         request_id: str,
     ) -> object:
         """Build the configured cTrader read adapter.
 
         Args:
-            settings: Effective application settings.
+            settings: Effective broker provider settings.
             request_id: Canonical request identity.
 
         Returns:
@@ -311,50 +293,9 @@ class _LazyBrokerSession:
         Raises:
             DataError: If credentials, configuration, or connection are invalid.
         """
-        credential_fields = (
-            settings.ctrader_account_id,
-            settings.ctrader_client_id,
-            settings.ctrader_client_secret,
-            settings.ctrader_access_token,
-        )
-        if any(value is None for value in credential_fields):
-            raise DataError(
-                "CREDENTIALS_MISSING",
-                safe_details={"source_id": self._source_id},
-                request_id=request_id,
-            )
-        account_id = cast("SecretStr", settings.ctrader_account_id)
-        client_id = cast("SecretStr", settings.ctrader_client_id)
-        client_secret = cast("SecretStr", settings.ctrader_client_secret)
-        access_token = cast("SecretStr", settings.ctrader_access_token)
-        try:
-            config = build_broker_connection_config(
-                broker_id=_CTRADER,
-                environment=settings.ctrader_environment,
-                provider_enabled=True,
-                connect_timeout_sec=10.0,
-                request_timeout_sec=30.0,
-                transport_reconnect_max_attempts=3,
-                stream_buffer_size=1_000,
-                circuit_failure_threshold=5,
-                circuit_recovery_timeout_sec=30.0,
-                circuit_half_open_max_calls=1,
-                account_reference=account_id.get_secret_value(),
-                credentials={
-                    "account_id": account_id,
-                    "client_id": client_id,
-                    "client_secret": client_secret,
-                    "access_token": access_token,
-                },
-            )
-        except ValueError as error:
-            raise DataError(
-                "INVALID_INPUT",
-                safe_details={"field": "provider_settings"},
-                request_id=request_id,
-            ) from error
-        adapter = _require_broker_result(
-            create_broker_adapter(_CTRADER, config),
+        config = self._provider_config(settings, request_id)
+        adapter: Any = _require_broker_result(
+            create_broker_adapter(config.broker_id, config),
             operation="create_broker_adapter",
             request_id=request_id,
         )
@@ -407,11 +348,20 @@ class _LazyBrokerSession:
 
             return _run(execute(), request_id)
 
-    def _credential_free_adapter(self, request_id: str) -> object:
+    def _credential_free_adapter(
+        self,
+        settings: object,
+        request_id: str,
+    ) -> object:
         """Build one non-MT5 provider adapter and connect when loop-safe.
 
         Binance Spot, Dukascopy, and Yahoo serve public data and need no credential
-        material.
+        material. Credential resolution still flows through the Brokers resolver so
+        the non-production environment guard is enforced uniformly.
+
+        Args:
+            settings: Effective broker provider settings.
+            request_id: Canonical request identity.
 
         Raises:
             DataError: If credentials are required, or construction or connection
@@ -426,31 +376,9 @@ class _LazyBrokerSession:
                 safe_details={"source_id": self._source_id},
                 request_id=request_id,
             )
-        try:
-            env = "live" if self._source_id == _BINANCE_SPOT else "sandbox"
-            config = build_broker_connection_config(
-                broker_id=self._source_id,
-                environment=env,
-                provider_enabled=True,
-                connect_timeout_sec=10.0,
-                request_timeout_sec=30.0,
-                transport_reconnect_max_attempts=3,
-                stream_buffer_size=1_000,
-                circuit_failure_threshold=5,
-                circuit_recovery_timeout_sec=30.0,
-                circuit_half_open_max_calls=1,
-                probe_symbol=(
-                    _YAHOO_PROBE_SYMBOL if self._source_id == _YAHOO else None
-                ),
-            )
-        except ValueError as error:
-            raise DataError(
-                "INVALID_INPUT",
-                safe_details={"field": "provider_settings"},
-                request_id=request_id,
-            ) from error
-        adapter = _require_broker_result(
-            create_broker_adapter(self._source_id, config),
+        config = self._provider_config(settings, request_id)
+        adapter: Any = _require_broker_result(
+            create_broker_adapter(config.broker_id, config),
             operation="create_broker_adapter",
             request_id=request_id,
         )
@@ -516,7 +444,7 @@ class _BrokerMarketCalendar:
             read_sessions(),
             request_id,
         )
-        sessions = _require_broker_result(
+        sessions: Any = _require_broker_result(
             result,
             operation="trading_sessions",
             request_id=request_id,
@@ -719,7 +647,7 @@ def _load_local_symbol_metadata(
             for symbol, entry in declared.items()
         }
     except (OSError, TypeError, ValueError, ValidationError) as error:
-        logger.error("Local symbol manifest for source %s is invalid", source_id)
+        logger.exception("Local symbol manifest for source %s is invalid", source_id)
         raise DataError(
             "FILE_CORRUPTED",
             safe_details={"field": LOCAL_SYMBOL_MANIFEST_NAME},
@@ -778,7 +706,7 @@ def _list_composable_sources_raw() -> tuple[str, ...]:
     """
     logger.debug("Listing composable DATA source identifiers")
     settings = get_data_settings()
-    provider_settings = _ProviderRuntimeSettings()
+    provider_settings = load_broker_provider_settings()
     enabled_providers = {
         broker_id
         for broker_id, field in _PROVIDER_ENABLED_FIELDS.items()
@@ -830,7 +758,7 @@ def _ensure_source_raw(source_id: str, request_id: str) -> None:
         if error.code != "SOURCE_UNAVAILABLE":
             raise
     settings = get_data_settings()
-    provider_settings = _ProviderRuntimeSettings()
+    provider_settings = load_broker_provider_settings()
     enabled_providers = {
         broker_id
         for broker_id, field in _PROVIDER_ENABLED_FIELDS.items()
@@ -958,7 +886,7 @@ def ensure_identity(source_id: str, symbol: str, request_id: str) -> None:
             request_id=request_id,
         )
     )
-    metadata = unwrap_data_response(
+    metadata: Any = unwrap_data_response(
         metadata_response,
         operation="data.sources.ensure_identity",
         request_id=request_id,

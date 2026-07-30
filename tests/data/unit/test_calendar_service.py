@@ -8,7 +8,11 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from app.services.data.contracts import DataError
-from app.services.data.contracts.responses import unwrap_data_response
+from app.services.data.contracts.responses import (
+    build_data_response,
+    data_start_time,
+    unwrap_data_response,
+)
 from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
 from app.services.data.economic_calendar.service import (
     get_economic_events,
@@ -46,12 +50,6 @@ def _event(
         impact=impact,
         updated_at=scheduled_at,
     )
-
-
-from app.services.data.contracts.responses import (
-    build_data_response,
-    data_start_time,
-)
 
 
 class _Provider:

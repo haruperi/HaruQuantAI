@@ -10,9 +10,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
+    build_data_settings,
     build_job_definition,
     build_job_status_request,
+    build_market_data_request,
     create_data_update_job,
+    data_settings_context,
     ensure_source,
     get_data_update_job_status,
     get_market_data,
@@ -22,10 +25,6 @@ from app.services.data import (
     unwrap_data_response,
 )
 from app.utils import generate_id
-from tests.data.usage.workflows._support import (
-    isolated_runtime,
-    market_request,
-)
 
 WORKFLOW_ID = "WF-DATA-TER"
 STAGES = (
@@ -35,6 +34,29 @@ STAGES = (
     "Read the persisted checkpoint and status.",
     "Recover startup state without publishing partial work.",
 )
+
+_END = datetime.now(UTC)
+_START = _END - timedelta(days=5)
+
+
+def _market_request(data_kind, *, timeframe, limit):
+    """Build one bounded genuine MT5 request inline."""
+    return build_market_data_request(
+        source_id="mt5",
+        symbol="EURUSD",
+        data_kind=data_kind,
+        timeframe=timeframe if data_kind == "bars" else None,
+        start=_START,
+        end=_END,
+        limit=limit,
+        use_cache=False,
+        quality_failure_behavior="warn",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        stale_cache_policy="refresh",
+        fallback_sources=(),
+        request_id=generate_id("req"),
+    )
 
 
 def _stage(number: int) -> None:
@@ -50,7 +72,23 @@ def main() -> None:
     print("INPUT BOUNDARY — bounded MT5 JobDefinition")
     with tempfile.TemporaryDirectory(prefix="wf-data-007-") as directory:
         root = Path(directory)
-        with isolated_runtime(root):
+        (root / "data" / "raw").mkdir(parents=True, exist_ok=True)
+        settings = build_data_settings(
+            database_url="sqlite:///workflow.sqlite3",
+            data_dir=root,
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
+            approved_storage_roots=(
+                Path("raw"),
+                Path("processed"),
+                Path("data"),
+                Path("data/raw"),
+                Path("data/processed"),
+            ),
+            data_provider_sources=("mt5",),
+            data_raw_root=Path("data/raw"),
+        )
+        with data_settings_context(settings):
             request_id = generate_id("req")
             run_data_migrations(request_id)
             end = datetime.now(UTC)
@@ -58,7 +96,9 @@ def main() -> None:
             # Stage 1 — Validate MT5 source, destination, and stable job identity.
             _stage(1)
             ensure_source("mt5", request_id)
-            seed_resp = get_market_data(market_request("bars", timeframe="M1", limit=1))
+            seed_resp = get_market_data(
+                _market_request("bars", timeframe="M1", limit=1)
+            )
             seed = unwrap_data_response(
                 seed_resp, operation="get_market_data", request_id=request_id
             )
@@ -97,16 +137,13 @@ def main() -> None:
 
             # Stage 5 — Recover startup state without publishing partial work.
             _stage(5)
-            recovery_resp = recover_update_jobs(generate_id("req"))
-            recovery = unwrap_data_response(
-                recovery_resp, operation="recover_update_jobs", request_id=request_id
-            )
+            recovery = recover_update_jobs(generate_id("req"))
             print(
                 "Job evidence:",
                 created.state,
                 result.state,
                 status.last_checkpoint,
-                len(recovery),
+                len(recovery.recovered_job_ids),
                 "checked",
             )
     print("OUTPUT BOUNDARY — committed chunks and resumable checkpoint evidence")

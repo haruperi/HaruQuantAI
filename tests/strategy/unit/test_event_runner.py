@@ -1,8 +1,9 @@
 """Atomic event-driven Strategy runner tests."""
 
 # ruff: noqa: PT018
-from app.services.strategy import EventStrategyEvaluator, run_event_strategy_hook
-from app.utils import logger
+from app.services.strategy import run_event_strategy_hook
+from app.services.strategy.event import EventStrategyEvaluator
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,
@@ -12,6 +13,8 @@ from tests.strategy.unit.test_models import (
     make_event,
     make_ref,
 )
+
+logger = get_logger(__name__)
 
 
 class Evaluator:

@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any, Literal, override
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
 from pydantic import ValidationError as PydanticValidationError
 from pydantic_settings import (
     BaseSettings,
@@ -222,3 +222,50 @@ class RuntimeSettings(_ConfigurationModel):
     environment: Environment = "dev"
     runtime_profile: RuntimeProfile = "research"
     logging: LoggingSettings = Field(default_factory=LoggingSettings)
+
+
+class BrokerProviderSettings(AppSettings):
+    """Immutable broker-provider credentials loaded from the central settings file.
+
+    This is the single source of truth for broker connection material. It extends
+    ``AppSettings`` so values are read from ``app/configs/env.json`` (under
+    ``settings.<provider>.*``) through the shared ``_CentralJsonSettingsSource``,
+    with process environment overrides taking precedence. Broker credential
+    resolution is owned by the Brokers domain; Data and usage examples select a
+    route only and never read these fields directly.
+
+    Attributes:
+        mt5_enabled: Whether the MT5 provider connection is permitted.
+        mt5_environment: MT5 connection environment, demo or live.
+        mt5_login: MT5 account login identifier.
+        mt5_password: MT5 account password.
+        mt5_server: MT5 broker server name.
+        mt5_terminal_path: Optional path to the MT5 terminal executable.
+        ctrader_enabled: Whether the cTrader provider connection is permitted.
+        ctrader_environment: cTrader connection environment, demo or live.
+        ctrader_account_id: cTrader trading account identifier.
+        ctrader_client_id: cTrader OAuth client identifier.
+        ctrader_client_secret: cTrader OAuth client secret.
+        ctrader_access_token: cTrader API access token.
+        binance_enabled: Whether the Binance Spot provider connection is permitted.
+        binance_environment: Binance Spot connection environment (testnet).
+        dukascopy_enabled: Whether the Dukascopy provider connection is permitted.
+        yahoo_enabled: Whether the Yahoo provider connection is permitted.
+    """
+
+    mt5_enabled: bool = False
+    mt5_environment: Literal["demo", "live"] = "demo"
+    mt5_login: SecretStr | None = None
+    mt5_password: SecretStr | None = None
+    mt5_server: SecretStr | None = None
+    mt5_terminal_path: SecretStr | None = None
+    ctrader_enabled: bool = False
+    ctrader_environment: Literal["demo", "live"] = "demo"
+    ctrader_account_id: SecretStr | None = None
+    ctrader_client_id: SecretStr | None = None
+    ctrader_client_secret: SecretStr | None = None
+    ctrader_access_token: SecretStr | None = None
+    binance_enabled: bool = False
+    binance_environment: Literal["testnet"] = "testnet"
+    dukascopy_enabled: bool = False
+    yahoo_enabled: bool = False

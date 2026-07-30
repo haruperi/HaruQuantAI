@@ -1,7 +1,7 @@
 """White Fairy concrete signal tests."""
 
-from app.services.strategy import WhiteFairyEvaluator
-from app.utils import logger
+from app.services.strategy.evaluators.white_fairy import WhiteFairyEvaluator
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,
@@ -11,6 +11,8 @@ from tests.strategy.unit.test_models import (
     make_signal_config,
     make_signal_evidence,
 )
+
+logger = get_logger(__name__)
 
 
 def test_white_fairy_preserves_entry_crossings_only() -> None:

@@ -12,7 +12,7 @@ credential.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Protocol, cast
 
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -60,10 +60,13 @@ def _get_market_context_evidence_raw(
         DataError: If the provider fails or mandatory evidence is stale or absent.
     """
     logger.info("Acquiring market context for request %s", request.request_id)
-    evidence = unwrap_data_response(
-        provider.get_market_context(request),
-        operation="data.evidence.get_market_context_evidence",
-        request_id=request.request_id,
+    evidence = cast(
+        "MarketContextEvidence",
+        unwrap_data_response(
+            provider.get_market_context(request),
+            operation="data.evidence.get_market_context_evidence",
+            request_id=request.request_id,
+        ),
     )
 
     if (

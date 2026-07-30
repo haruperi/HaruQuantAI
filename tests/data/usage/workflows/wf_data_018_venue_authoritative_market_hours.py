@@ -4,21 +4,24 @@ from __future__ import annotations
 
 import sys
 import tempfile
-from datetime import date, time
+from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
+    build_data_settings,
+    build_market_data_request,
     build_market_hours_request,
     build_weekly_schedule_definition,
     build_weekly_schedule_provider,
+    data_settings_context,
     get_market_data,
     get_market_hours,
+    run_data_migrations,
     unwrap_data_response,
 )
 from app.utils import generate_id
-from tests.data.usage.workflows._support import isolated_runtime, market_request
 
 WORKFLOW_ID = "WF-DATA-018"
 STAGES = (
@@ -27,6 +30,29 @@ STAGES = (
     "Expand authoritative configured windows with timezone and effective range.",
     "Derive deterministic current and next MarketHours state.",
 )
+
+_END = datetime.now(UTC)
+_START = _END - timedelta(days=5)
+
+
+def _market_request(data_kind, *, timeframe, limit):
+    """Build one bounded genuine MT5 request inline."""
+    return build_market_data_request(
+        source_id="mt5",
+        symbol="EURUSD",
+        data_kind=data_kind,
+        timeframe=timeframe if data_kind == "bars" else None,
+        start=_START,
+        end=_END,
+        limit=limit,
+        use_cache=False,
+        quality_failure_behavior="warn",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        stale_cache_policy="refresh",
+        fallback_sources=(),
+        request_id=generate_id("req"),
+    )
 
 
 def _stage(number: int) -> None:
@@ -41,54 +67,71 @@ def main() -> None:
     print(f"{WORKFLOW_ID} — Venue-Authoritative Market Hours")
     print("INPUT BOUNDARY — exact MT5 symbol and revisioned weekly definition")
 
-    with (
-        tempfile.TemporaryDirectory(prefix="wf-data-018-") as directory,
-        isolated_runtime(Path(directory)),
-    ):
-        request_id = generate_id("req")
-
-        # Stage 1 — Confirm the exact MT5 EURUSD symbol with genuine observations.
-        _stage(1)
-        evidence_resp = get_market_data(market_request("bars", timeframe="M1", limit=1))
-        evidence = unwrap_data_response(
-            evidence_resp, operation="get_market_data", request_id=request_id
-        )
-        assert evidence.symbol == "EURUSD"
-
-        # Stage 2 — Select an explicit revisioned weekly definition because MT5 exposes no sessions.
-        _stage(2)
-        definition = build_weekly_schedule_definition(
-            source_id="configured-mt5",
-            symbol="EURUSD",
-            timezone="UTC",
-            sessions={day: ((time(0), time(23, 59)),) for day in range(5)},
-            effective_from=date(2020, 1, 1),
-            revision="operator-v1",
-        )
-
-        # Stage 3 — Expand authoritative configured windows with timezone and effective range.
-        _stage(3)
-        provider = build_weekly_schedule_provider(definition)
-
-        # Stage 4 — Derive deterministic current and next MarketHours state.
-        _stage(4)
-        hours_resp = get_market_hours(
-            build_market_hours_request(
-                source_id=definition.source_id,
-                symbol=definition.symbol,
-                request_id=request_id,
+    with tempfile.TemporaryDirectory(prefix="wf-data-018-") as directory:
+        (Path(directory) / "data" / "raw").mkdir(parents=True, exist_ok=True)
+        settings = build_data_settings(
+            database_url="sqlite:///workflow.sqlite3",
+            data_dir=Path(directory),
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
+            approved_storage_roots=(
+                Path("raw"),
+                Path("processed"),
+                Path("data"),
+                Path("data/raw"),
+                Path("data/processed"),
             ),
-            provider,
+            data_provider_sources=("mt5",),
+            data_raw_root=Path("data/raw"),
         )
-        hours = unwrap_data_response(
-            hours_resp, operation="get_market_hours", request_id=request_id
-        )
-        print(
-            "Market-hours evidence:",
-            hours.is_open,
-            hours.current_session,
-            hours.next_session,
-        )
+        with data_settings_context(settings):
+            request_id = generate_id("req")
+            run_data_migrations(request_id)
+
+            # Stage 1 — Confirm the exact MT5 EURUSD symbol with genuine observations.
+            _stage(1)
+            evidence_resp = get_market_data(
+                _market_request("bars", timeframe="M1", limit=1)
+            )
+            evidence = unwrap_data_response(
+                evidence_resp, operation="get_market_data", request_id=request_id
+            )
+            assert evidence.symbol == "EURUSD"
+
+            # Stage 2 — Select an explicit revisioned weekly definition because MT5 exposes no sessions.
+            _stage(2)
+            definition = build_weekly_schedule_definition(
+                source_id="configured-mt5",
+                symbol="EURUSD",
+                timezone="UTC",
+                sessions={day: ((time(0), time(23, 59)),) for day in range(5)},
+                effective_from=date(2020, 1, 1),
+                revision="operator-v1",
+            )
+
+            # Stage 3 — Expand authoritative configured windows with timezone and effective range.
+            _stage(3)
+            provider = build_weekly_schedule_provider(definition)
+
+            # Stage 4 — Derive deterministic current and next MarketHours state.
+            _stage(4)
+            hours_resp = get_market_hours(
+                build_market_hours_request(
+                    source_id=definition.source_id,
+                    symbol=definition.symbol,
+                    request_id=request_id,
+                ),
+                provider,
+            )
+            hours = unwrap_data_response(
+                hours_resp, operation="get_market_hours", request_id=request_id
+            )
+            print(
+                "Market-hours evidence:",
+                hours.is_open,
+                hours.current_session,
+                hours.next_session,
+            )
     print("OUTPUT BOUNDARY — UTC sessions and deterministic MarketHours")
 
 

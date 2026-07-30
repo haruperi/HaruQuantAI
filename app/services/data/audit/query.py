@@ -6,6 +6,9 @@ and returns a cursor page. No storage handle or unredacted payload crosses the
 boundary.
 """
 
+# Auth context is an opaque cross-domain Utils value at this private boundary.
+# ruff: noqa: ANN401
+
 from __future__ import annotations
 
 import json
@@ -162,7 +165,7 @@ def _query_audit_events_raw(
         )
 
     except Exception as error:
-        logger.error("Audit query failed")
+        logger.exception("Audit query failed")
         if isinstance(error, DataError):
             raise
         raise DataError(

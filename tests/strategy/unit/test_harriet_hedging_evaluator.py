@@ -2,11 +2,9 @@
 
 from datetime import timedelta
 
-from app.services.strategy import (
-    HarrietHedgingEvaluator,
-    evaluate_strategy_signals,
-)
-from app.utils import logger
+from app.services.strategy import evaluate_strategy_signals
+from app.services.strategy.evaluators.harriet_hedging import HarrietHedgingEvaluator
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,
@@ -16,6 +14,8 @@ from tests.strategy.unit.test_models import (
     make_signal_config,
     make_signal_evidence,
 )
+
+logger = get_logger(__name__)
 
 
 def test_harriet_uses_only_available_higher_timeframe_bars() -> None:

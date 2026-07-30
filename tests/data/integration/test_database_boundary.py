@@ -1,5 +1,3 @@
-from app.services.data import build_statement_plan, build_transaction_request
-
 """Integration tests for the short-lived Data SQLite boundary."""
 
 import importlib
@@ -8,7 +6,11 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
-from app.services.data import execute_transaction
+from app.services.data import (
+    build_statement_plan,
+    build_transaction_request,
+    execute_transaction,
+)
 
 
 def test_database_connection_is_closed_after_committed_result(

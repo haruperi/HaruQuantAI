@@ -1,10 +1,12 @@
 """Unit tests for app/services/data/data_jobs/job.py to reach >80% coverage."""
 
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 from app.services.data.contracts import DataError
+from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.data_jobs.contracts import (
     JobDefinition,
     JobStatusRequest,
@@ -25,6 +27,7 @@ from app.services.data.data_jobs.job import (
     start_data_update_job,
     stop_data_update_job,
 )
+from app.services.data.persistence.migrations import run_data_migrations
 
 _REQ_ID = "req-11111111-1111-4111-8111-111111111111"
 _NOW = datetime.now(UTC)
@@ -95,12 +98,6 @@ def test_handle_create_limits_exceeded() -> None:
     with pytest.raises(DataError) as exc_info:
         _handle_create(req3)
     assert exc_info.value.code == "VALIDATION_FAILED"
-
-
-from pathlib import Path
-
-from app.services.data.contracts.responses import unwrap_data_response
-from app.services.data.persistence.migrations import run_data_migrations
 
 
 def _unwrap(response):

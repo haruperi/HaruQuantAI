@@ -6,10 +6,10 @@ import hashlib
 from typing import Any
 
 from app.services.data import (
-    DataError,
-    StatementPlan,
-    TransactionRequest,
+    build_statement_plan,
+    build_transaction_request,
     execute_transaction,
+    is_data_error,
     persist_audit_event,
 )
 from app.services.strategy.contracts.outcomes import (
@@ -47,8 +47,8 @@ def _load_mutation(command_id: str, request_id: str) -> StrategyMutationResult |
     logger.debug("Loading prior Strategy mutation")
     result = unwrap_data_response(
         execute_transaction(
-            TransactionRequest(
-                plan=StatementPlan(
+            build_transaction_request(
+                plan=build_statement_plan(
                     statements=(
                         "SELECT mutation_json FROM strategy_mutations "
                         "WHERE command_id = ?",
@@ -85,8 +85,8 @@ def _load_policy(ref: StrategyRef, request_id: str) -> StrategyValidationPolicy 
         return None
     result = unwrap_data_response(
         execute_transaction(
-            TransactionRequest(
-                plan=StatementPlan(
+            build_transaction_request(
+                plan=build_statement_plan(
                     statements=(
                         "SELECT policy_json FROM strategy_versions "
                         "WHERE strategy_id = ? "
@@ -152,8 +152,8 @@ def _publish_mutation(
         )
         unwrap_data_response(
             execute_transaction(
-                TransactionRequest(
-                    plan=StatementPlan(
+                build_transaction_request(
+                    plan=build_statement_plan(
                         statements=(
                             "UPDATE strategy_mutations SET mutation_json = ?, "
                             "publication_pending = 0 WHERE command_id = ?",
@@ -167,7 +167,9 @@ def _publish_mutation(
             operation="data.execute_transaction.strategy_mutation_publication",
         )
         return published
-    except DataError, StrategyOperationError:
+    except Exception as error:
+        if not (is_data_error(error) or isinstance(error, StrategyOperationError)):
+            raise
         logger.warning("Strategy mutation audit publication remains pending")
         return mutation
 

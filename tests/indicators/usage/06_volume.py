@@ -5,14 +5,24 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import DataError, MarketDataset, get_market_data
-from app.services.indicators import cmf, mfi, obv, price_volume_distribution
+from typing import Any
+
+from app.services.data import get_market_data
+from app.services.indicators import (
+    cmf,
+    mfi,
+    obv,
+    price_volume_distribution,
+)
 
 from tests.indicators.usage._support import (
+    print_indicator_evidence,
+    print_market_evidence,
     unwrap_indicator_response,
     unwrap_market_data_response,
 )
 
+MarketDataset = Any
 _CACHE: dict[str, MarketDataset] = {}
 
 
@@ -28,7 +38,7 @@ def _dataset() -> MarketDataset:
         A normalized real market dataset.
 
     Raises:
-        DataError: If the configured source is unavailable.
+        RuntimeError: If the configured source is unavailable.
     """
     if "dataset" not in _CACHE:
         _CACHE["dataset"] = unwrap_market_data_response(
@@ -48,7 +58,7 @@ def fr_indi_027() -> None:
         "FR-INDI-027: The system shall sum money-flow volume over an inclusive `period` window for one validated `MarketDataset v1`; zero-range bars contribute zero and a complete zero-volume window returns zero."
     )
     result = unwrap_indicator_response(cmf(_dataset(), period=2))
-    print("Result:", result.values["cmf_2"].tolist())
+    print_indicator_evidence(result, label="CMF calculations")
 
 
 def fr_indi_028() -> None:
@@ -57,7 +67,7 @@ def fr_indi_028() -> None:
         "FR-INDI-028: The system shall start at zero, add volume after a higher close, subtract it after a lower close, and carry forward after an unchanged close."
     )
     result = unwrap_indicator_response(obv(_dataset()))
-    print("Result:", result.values["obv"].tolist())
+    print_indicator_evidence(result, label="OBV calculations")
 
 
 def fr_indi_029() -> None:
@@ -66,7 +76,7 @@ def fr_indi_029() -> None:
         "FR-INDI-029: The system shall use typical price x volume over an inclusive `period` flow window; both flows zero returns 50, negative flow zero returns 100, and positive flow zero returns 0."
     )
     result = unwrap_indicator_response(mfi(_dataset(), period=2))
-    print("Result:", result.values["mfi_2"].tolist())
+    print_indicator_evidence(result, label="MFI calculations")
 
 
 def fr_indi_030() -> None:
@@ -77,10 +87,7 @@ def fr_indi_030() -> None:
     result = unwrap_indicator_response(
         price_volume_distribution(_dataset(), period=2, bins=2)
     )
-    print(
-        "FR-INDI-030",
-        result.values["price_volume_distribution_2_2"].tolist(),
-    )
+    print_indicator_evidence(result, label="Price-volume distribution calculations")
 
 
 def main() -> None:
@@ -91,9 +98,10 @@ def main() -> None:
     """
     try:
         _dataset()
-    except DataError as unavailable:
+    except RuntimeError as unavailable:
         print(f"Skipping volume examples: MT5 data unavailable ({unavailable.code})")
         raise SystemExit(3) from None
+    print_market_evidence(_dataset())
     fr_indi_027()
     fr_indi_028()
     fr_indi_029()

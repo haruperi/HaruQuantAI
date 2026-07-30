@@ -1,8 +1,8 @@
 """Naive MA Trend concrete signal tests."""
 
 import pytest
-from app.services.strategy import NaiveMATrendEvaluator
-from app.utils import logger
+from app.services.strategy.evaluators.naive_ma_trend import NaiveMATrendEvaluator
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,
@@ -12,6 +12,8 @@ from tests.strategy.unit.test_models import (
     make_signal_config,
     make_signal_evidence,
 )
+
+logger = get_logger(__name__)
 
 
 def _evaluator() -> NaiveMATrendEvaluator:

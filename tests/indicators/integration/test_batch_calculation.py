@@ -4,14 +4,16 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pandas as pd
-from app.services.data import (
+from app.services.indicators import build_indicator_config, sma, validate_indicator
+
+from tests.indicators.helpers import (
     DataQualityReport,
     MarketDataset,
     OHLCVRecord,
+    result_metadata,
+    result_values,
+    unwrap_response,
 )
-from app.services.indicators import IndicatorConfig, sma, validate_indicator
-
-from tests.indicators.helpers import unwrap_response
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -75,13 +77,13 @@ def _dataset(closes: list[float]) -> MarketDataset:
     )
 
 
-def _config() -> IndicatorConfig:
+def _config() -> object:
     """Build one canonical two-period close-source SMA config.
 
     Returns:
         The immutable calculation configuration.
     """
-    return IndicatorConfig(
+    return build_indicator_config(
         indicator_id="sma",
         parameters=(("period", 2),),
         source="close",
@@ -115,19 +117,27 @@ def test_batch_calculation_returns_atomic_available_result() -> None:
     result_second = unwrap_response(sma(data, period=2, source="close", config=config))
 
     assert (
-        result_first.manifest.output_checksum == result_second.manifest.output_checksum
+        result_metadata(result_first)["manifest"]["output_checksum"]
+        == result_metadata(result_second)["manifest"]["output_checksum"]
     )
-    assert result_first.manifest.input_checksum == result_second.manifest.input_checksum
-    assert result_first.manifest.parameter_hash == result_second.manifest.parameter_hash
+    assert (
+        result_metadata(result_first)["manifest"]["input_checksum"]
+        == result_metadata(result_second)["manifest"]["input_checksum"]
+    )
+    assert (
+        result_metadata(result_first)["manifest"]["parameter_hash"]
+        == result_metadata(result_second)["manifest"]["parameter_hash"]
+    )
 
-    result_values = result_first.values_only
-    assert len(result_values) == data.record_count
-    assert result_values["unavailable_reason"].iloc[0] == "warmup"
-    assert pd.isna(result_values["sma_2"].iloc[0])
-    assert not pd.isna(result_values["sma_2"].iloc[-1])
-    assert result_values["unavailable_reason"].iloc[1:].isna().all()
+    values = result_values(result_first)
+    assert len(values) == data.record_count
+    assert values["unavailable_reason"].iloc[0] == "warmup"
+    assert pd.isna(values["sma_2"].iloc[0])
+    assert not pd.isna(values["sma_2"].iloc[-1])
+    assert values["unavailable_reason"].iloc[1:].isna().all()
 
-    assert result_first.manifest.quality_status == data.quality_report.quality_status
-    assert result_first.manifest.source_metadata == dict(data.source_metadata)
-    assert len(result_first.manifest.output_checksum) == 64
-    assert result_first.output_columns == ("sma_2",)
+    metadata = result_metadata(result_first)
+    assert metadata["manifest"]["quality_status"] == data.quality_report.quality_status
+    assert metadata["manifest"].get("source_metadata") == dict(data.source_metadata)
+    assert len(metadata["manifest"]["output_checksum"]) == 64
+    assert metadata["output_columns"] == ("sma_2",)

@@ -62,7 +62,8 @@ def test_external_import_measures_commits_and_reloads(tmp_path: Path) -> None:
     with data_settings_context(settings):
         run_data_migrations(generate_id("req"))
         manifest_res = import_external_dataset(request)
-        assert manifest_res.status == "success" and manifest_res.data is not None
+        assert manifest_res.status == "success"
+        assert manifest_res.data is not None
         manifest = manifest_res.data
         loaded_res = load_dataset(
             build_dataset_load_request(
@@ -71,7 +72,8 @@ def test_external_import_measures_commits_and_reloads(tmp_path: Path) -> None:
                 request_id=generate_id("req"),
             )
         )
-        assert loaded_res.status == "success" and loaded_res.data is not None
+        assert loaded_res.status == "success"
+        assert loaded_res.data is not None
         loaded = loaded_res.data
 
     assert loaded.record_count == 2

@@ -1,7 +1,9 @@
 """SQX breakout and ATR concrete signal tests."""
 
-from app.services.strategy import SQXBreakoutAtrTrailingEvaluator
-from app.utils import logger
+from app.services.strategy.evaluators.sqx_breakout_atr_trailing import (
+    SQXBreakoutAtrTrailingEvaluator,
+)
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,
@@ -11,6 +13,8 @@ from tests.strategy.unit.test_models import (
     make_signal_config,
     make_signal_evidence,
 )
+
+logger = get_logger(__name__)
 
 
 def test_sqx_preserves_prior_channel_breakout_and_atr_facts() -> None:

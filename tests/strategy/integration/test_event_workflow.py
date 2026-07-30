@@ -2,7 +2,7 @@
 
 # ruff: noqa: PT018
 from app.services.strategy import run_event_strategy_hook
-from app.utils import logger
+from app.utils import get_logger
 
 from tests.strategy.unit.test_event_runner import Evaluator
 from tests.strategy.unit.test_models import (
@@ -11,6 +11,8 @@ from tests.strategy.unit.test_models import (
     make_event,
     make_ref,
 )
+
+logger = get_logger(__name__)
 
 
 def test_event_workflow() -> None:

@@ -1,3 +1,4 @@
+# ruff: noqa: ANN401
 """Read persisted/in-memory feed status information."""
 
 from __future__ import annotations

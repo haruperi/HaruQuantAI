@@ -1,3 +1,4 @@
+# ruff: noqa: BLE001, E402
 """Run source composition and local artifact access examples (FEAT-DATA-04).
 
 Covers `FR-DATA-101` through `FR-DATA-104`: composing configured sources,
@@ -5,9 +6,9 @@ discovering which identifiers are available, timeframe-scoped local artifact
 resolution, and bounded local reads.
 """
 
+import json
 import sys
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -16,12 +17,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from app.services.data import (
     build_data_error,
     build_data_settings,
-    build_ohlcv_record,
+    build_dataset_save_request,
     data_settings_context,
     ensure_source,
     get_market_data,
     get_source_descriptor,
+    get_symbol_metadata,
     list_composable_sources,
+    save_dataset,
+    unwrap_data_response,
 )
 
 DataError = build_data_error
@@ -29,31 +33,13 @@ DataError = build_data_error
 from app.utils import generate_id
 
 _SYMBOL = "EURUSD"
-_START = datetime(2026, 1, 1, tzinfo=UTC)
+_END = datetime.now(UTC)
+_START = _END - timedelta(days=5)
 
 
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
-
-
-def _bar(index: int) -> OHLCVRecord:
-    """Return one canonical bar for the local fixture series."""
-    timestamp = _START + timedelta(minutes=index)
-    return build_ohlcv_record(
-        timestamp=timestamp,
-        open=Decimal("1.1000"),
-        high=Decimal("1.1010"),
-        low=Decimal("1.0990"),
-        close=Decimal("1.1005"),
-        volume=Decimal(100),
-        price_unit="USD",
-        volume_unit="lots",
-        source="csv",
-        source_symbol=_SYMBOL,
-        source_revision="local-artifact-v1",
-        available_at=timestamp + timedelta(seconds=1),
-    )
 
 
 def _example_fr_data_102() -> None:
@@ -82,22 +68,92 @@ def _example_fr_data_103(raw_root: Path) -> None:
     _header("FR-DATA-103 timeframe-scoped local artifacts")
     result = get_source_descriptor("csv")
     if result.status == "success" and result.data is not None:
-        print("Source timeframe capability:", "timeframe" in result.data.capabilities)
+        print("Source capabilities:", result.data.capabilities)
 
 
-def _example_fr_data_104() -> None:
+def _example_fr_data_104(start: datetime, end: datetime) -> None:
     """Apply a bounded request through the public market-data operation."""
     _header("FR-DATA-104 bounded local selection")
     result = get_market_data(
         source_id="csv",
         symbol=_SYMBOL,
         timeframe="M1",
-        start=_START + timedelta(minutes=2),
-        end=_START + timedelta(minutes=5),
+        start=start,
+        end=end,
         limit=2,
         request_id=generate_id("req"),
     )
-    print("Bounded retrieval status:", result.status)
+    dataset = unwrap_data_response(
+        result,
+        operation="data.usage.get_local_market_data",
+        request_id=result.metadata.request_id,
+    )
+    print(
+        "Bounded local rows:",
+        [
+            (record.timestamp.isoformat(), str(record.open), str(record.close))
+            for record in dataset.records
+        ],
+    )
+
+
+def _prepare_genuine_local_artifact(raw_root: Path) -> tuple[datetime, datetime]:
+    """Persist a genuine bounded MT5 dataset for the local-source read."""
+    response = get_market_data(
+        source_id="mt5",
+        symbol=_SYMBOL,
+        timeframe="M1",
+        start=_START,
+        end=_END,
+        limit=10,
+        use_cache=False,
+        request_id=generate_id("req"),
+    )
+    dataset = unwrap_data_response(
+        response,
+        operation="data.usage.get_mt5_market_data",
+        request_id=response.metadata.request_id,
+    )
+    save_response = save_dataset(
+        build_dataset_save_request(
+            dataset=dataset,
+            relative_path=Path("data/raw/EURUSD_M1.csv"),
+            format="csv",
+            overwrite=True,
+            request_id=dataset.request_id,
+        )
+    )
+    unwrap_data_response(
+        save_response,
+        operation="data.usage.save_local_market_data",
+        request_id=save_response.metadata.request_id,
+    )
+    metadata_response = get_symbol_metadata(
+        source_id="mt5",
+        symbol=_SYMBOL,
+        request_id=generate_id("req"),
+    )
+    metadata = unwrap_data_response(
+        metadata_response,
+        operation="data.usage.get_mt5_symbol_metadata",
+        request_id=metadata_response.metadata.request_id,
+    )
+    declared_metadata = metadata.model_dump(
+        mode="json",
+        exclude={"canonical_symbol", "provider_symbol", "source_id", "request_id"},
+    )
+    (raw_root / "symbols.json").write_text(
+        json.dumps({_SYMBOL: declared_metadata}, indent=2),
+        encoding="utf-8",
+    )
+    print(
+        "Persisted genuine MT5 rows:",
+        [
+            (record.timestamp.isoformat(), str(record.open), str(record.close))
+            for record in dataset.records[:3]
+        ],
+    )
+    return dataset.records[2].timestamp, dataset.records[5].timestamp
 
 
 def _demonstrate_feature() -> None:
@@ -107,17 +163,21 @@ def _demonstrate_feature() -> None:
         raw_root = root / "data" / "raw"
         raw_root.mkdir(parents=True)
         settings = build_data_settings(
-            database_url=f"sqlite:///{root / 'data.db'}",
+            database_url="sqlite:///data.db",
             data_dir=root,
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
             data_local_sources=("csv",),
+            data_provider_sources=("mt5",),
             data_raw_root=Path("data/raw"),
         )
         try:
             with data_settings_context(settings):
                 _example_fr_data_102()
+                start, end = _prepare_genuine_local_artifact(raw_root)
                 _example_fr_data_101(root)
                 _example_fr_data_103(raw_root)
-                _example_fr_data_104()
+                _example_fr_data_104(start, end)
         except Exception as error:
             print(
                 "Source composition example failed:",

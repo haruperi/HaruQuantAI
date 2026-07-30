@@ -7,7 +7,7 @@ until Phase 11 deletes it. Behaviour assertions are unchanged.
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -19,10 +19,26 @@ from app.services.data.audit.contracts import (
     AuditEventQuery,
 )
 from app.services.data.contracts.responses import unwrap_data_response
-from app.utils import create_auth_context
+from app.utils import create_audit_event, create_auth_context, generate_id
 from app.utils.contracts.auth import AuthContext
 
-from tests.data.helpers_models import END, START, make_audit_event
+START = datetime(2026, 1, 1, tzinfo=UTC)
+END = START + timedelta(minutes=1)
+
+
+def make_audit_event(timestamp=START):
+    """Return one valid Utils-owned audit event."""
+    return create_audit_event(
+        contract_version="v1",
+        schema_id="utils.audit_event.v1",
+        event_id=generate_id("evt"),
+        timestamp=timestamp,
+        domain="data",
+        action="read",
+        request_id=generate_id("req"),
+        correlation_id=generate_id("cor"),
+        payload={"source": "fixture"},
+    )
 
 
 def _unwrap(response):

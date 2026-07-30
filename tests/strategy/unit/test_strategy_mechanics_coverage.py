@@ -166,7 +166,7 @@ def test_make_signal_construction() -> None:
     """Verify _make_signal builds active/inactive signals and validates side."""
     from datetime import UTC, datetime
 
-    from app.services.data import OHLCVRecord
+    from app.services.data import build_ohlcv_record
     from app.services.strategy.signals._mechanics import _make_signal
 
     evaluator = MagicMock(strategy_id="str-1", strategy_version="1.0.0")
@@ -174,7 +174,7 @@ def test_make_signal_construction() -> None:
     context = MagicMock(workflow_id="wf-1")
 
     now = datetime.now(UTC)
-    bar = OHLCVRecord(
+    bar = build_ohlcv_record(
         timestamp=now,
         source="test",
         source_symbol="EURUSD",

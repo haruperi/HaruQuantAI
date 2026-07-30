@@ -55,7 +55,12 @@ class StrategyDiagnostics(BaseModel):
         logger.debug("Freezing Strategy diagnostic mapping")
         return MappingProxyType(dict(value))
 
-    @field_serializer("safe_details", "dependency_health", "metrics", when_used="json")
+    @field_serializer(
+        "safe_details",
+        "dependency_health",
+        "metrics",
+        when_used="always",
+    )
     def _serialize_mappings(
         self, value: Mapping[str, JsonValue]
     ) -> dict[str, JsonValue]:

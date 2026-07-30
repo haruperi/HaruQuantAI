@@ -1,6 +1,10 @@
 """Business-neutral shared infrastructure for HaruQuantAI domains."""
 
-from app.utils.contracts import create_audit_event, create_auth_context
+from app.utils.contracts import (
+    create_audit_event,
+    create_auth_context,
+    get_audit_event_type,
+)
 from app.utils.errors import (
     get_common_error_catalog,
     get_error_metadata,
@@ -25,6 +29,7 @@ from app.utils.responses import (
     error_response,
     exception_response,
     get_execution_ms,
+    get_standard_response_type,
     success_response,
 )
 from app.utils.security import (
@@ -34,7 +39,7 @@ from app.utils.security import (
     redact_text_value,
 )
 from app.utils.serialization import canonical_digest, canonical_json, to_json_safe
-from app.utils.settings import load_settings
+from app.utils.settings import load_broker_provider_settings, load_settings
 from app.utils.time import (
     age_seconds,
     format_utc_timestamp,
@@ -57,6 +62,7 @@ __all__ = (
     "flush_logging",
     "format_utc_timestamp",
     "generate_id",
+    "get_audit_event_type",
     "get_common_error_catalog",
     "get_default_redaction_policy",
     "get_error_metadata",
@@ -64,8 +70,10 @@ __all__ = (
     "get_logger",
     "get_logger_handler_count",
     "get_logger_name",
+    "get_standard_response_type",
     "is_fresh",
     "is_sensitive_key",
+    "load_broker_provider_settings",
     "load_settings",
     "log_info",
     "map_exception",

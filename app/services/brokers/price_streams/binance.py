@@ -1,8 +1,8 @@
+"""Binance price-stream operations."""
+
 from __future__ import annotations
 
 # mypy: disable-error-code="attr-defined,no-any-return,has-type"
-"""Binance price-stream operations."""
-
 import asyncio
 from collections.abc import Callable, Mapping
 from typing import Any, cast

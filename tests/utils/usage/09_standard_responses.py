@@ -17,6 +17,7 @@ from app.utils import (
     generate_id,
     get_common_error_catalog,
     get_execution_ms,
+    get_standard_response_type,
     success_response,
 )
 
@@ -108,3 +109,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+    print("Canonical response runtime type:", get_standard_response_type().__name__)

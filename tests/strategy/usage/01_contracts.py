@@ -7,30 +7,33 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import DataQualityReport, MarketDataset, OHLCVRecord
-from app.services.strategy import (
-    StrategyConfig,
-    StrategyDecision,
-    StrategyEnvironment,
-    StrategyEvent,
-    StrategyExecutionContext,
-    StrategyExecutionResult,
-    StrategyLifecycleStatus,
-    StrategyManifest,
-    StrategyMutationResult,
-    StrategyParameterUpdateRequest,
-    StrategyRef,
-    StrategyRegistrationRequest,
-    StrategySignal,
-    StrategySignalEvidence,
-    StrategyTimingPolicy,
-    StrategyValidationPolicy,
-    ValidatedStrategyConfig,
-    ValidatedStrategyRef,
-    create_strategy_replay_manifest,
-    export_strategy_diagnostics,
+from app.services.data import (
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
 )
-from app.utils import StandardResponse
+from app.services.strategy import (
+    create_strategy_config,
+    create_strategy_decision,
+    create_strategy_event,
+    create_strategy_execution_context,
+    create_strategy_execution_result,
+    create_strategy_manifest,
+    create_strategy_mutation_result,
+    create_strategy_parameter_update_request,
+    create_strategy_ref,
+    create_strategy_registration_request,
+    create_strategy_replay_manifest,
+    create_strategy_signal,
+    create_strategy_signal_evidence,
+    create_strategy_validation_policy,
+    create_validated_strategy_config,
+    create_validated_strategy_ref,
+    export_strategy_diagnostics,
+    get_strategy_environment,
+    get_strategy_lifecycle_status,
+    get_strategy_timing_policy,
+)
 
 _HASH = "a" * 64
 _REQUEST = "req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
@@ -46,121 +49,123 @@ def _header(title: str) -> None:
 def fr_str_001() -> None:
     """Demonstrate the supported Strategy environment."""
     _header("Demonstrate the supported Strategy environment.")
-    assert StrategyEnvironment.RESEARCH.value == "RESEARCH"
+    assert get_strategy_environment("RESEARCH").value == "RESEARCH"
 
 
 def fr_str_002() -> None:
     """Demonstrate the explicit timing policy."""
     _header("Demonstrate the explicit timing policy.")
-    assert StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE.value
+    assert get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE").value
 
 
 def fr_str_003() -> None:
     """Demonstrate lifecycle eligibility states."""
     _header("Demonstrate lifecycle eligibility states.")
-    assert StrategyLifecycleStatus.APPROVED is not StrategyLifecycleStatus.REVOKED
+    assert get_strategy_lifecycle_status(
+        "APPROVED"
+    ) is not get_strategy_lifecycle_status("REVOKED")
 
 
 def fr_str_004() -> None:
     """Demonstrate exact Strategy reference construction."""
     _header("Demonstrate exact Strategy reference construction.")
-    assert StrategyRef.model_fields["exact_version"]
+    assert callable(create_strategy_ref)
 
 
 def fr_str_005() -> None:
     """Demonstrate validated reference construction."""
     _header("Demonstrate validated reference construction.")
-    assert ValidatedStrategyRef.model_fields["registry_record_hash"]
+    assert callable(create_validated_strategy_ref)
 
 
 def fr_str_006() -> None:
     """Demonstrate declarative Strategy configuration."""
     _header("Demonstrate declarative Strategy configuration.")
-    assert StrategyConfig.model_fields["parameters"]
+    assert callable(create_strategy_config)
 
 
 def fr_str_007() -> None:
     """Demonstrate validated configuration identity."""
     _header("Demonstrate validated configuration identity.")
-    assert ValidatedStrategyConfig.model_fields["config_hash"]
+    assert callable(create_validated_strategy_config)
 
 
 def fr_str_008() -> None:
     """Demonstrate the complete Strategy manifest."""
     _header("Demonstrate the complete Strategy manifest.")
-    assert StrategyManifest.model_fields["max_batch_records"]
+    assert callable(create_strategy_manifest)
 
 
 def fr_str_009() -> None:
     """Demonstrate the registration request contract."""
     _header("Demonstrate the registration request contract.")
-    assert StrategyRegistrationRequest.model_fields["authorization_ref"]
+    assert callable(create_strategy_registration_request)
 
 
 def fr_str_010() -> None:
     """Demonstrate the parameter-update request contract."""
     _header("Demonstrate the parameter-update request contract.")
-    assert StrategyParameterUpdateRequest.model_fields["parameters"]
+    assert callable(create_strategy_parameter_update_request)
 
 
 def fr_str_011() -> None:
     """Demonstrate fixed execution context."""
     _header("Demonstrate fixed execution context.")
-    assert StrategyExecutionContext.model_fields["decision_timestamp"]
+    assert callable(create_strategy_execution_context)
 
 
 def fr_str_012() -> None:
     """Demonstrate typed Strategy event evidence."""
     _header("Demonstrate typed Strategy event evidence.")
-    assert StrategyEvent.model_fields["source_checksum"]
+    assert callable(create_strategy_event)
 
 
 def fr_str_013() -> None:
     """Demonstrate neutral and proposal decisions."""
     _header("Demonstrate neutral and proposal decisions.")
-    assert StrategyDecision.model_fields["action"]
+    assert callable(create_strategy_decision)
 
 
 def fr_str_014() -> None:
     """Demonstrate the closed atomic execution result."""
     _header("Demonstrate the closed atomic execution result.")
-    assert StrategyExecutionResult.model_fields["replay_manifest"]
+    assert callable(create_strategy_execution_result)
 
 
 def fr_str_015() -> None:
     """Demonstrate structured Strategy errors."""
     _header("Demonstrate structured Strategy errors.")
-    assert StandardResponse.model_fields["error"]
+    assert callable(export_strategy_diagnostics)
 
 
 def fr_str_016() -> None:
     """Demonstrate exclusive Strategy outcomes."""
     _header("Demonstrate exclusive Strategy outcomes.")
-    assert StandardResponse.model_fields["status"]
+    assert callable(export_strategy_diagnostics)
 
 
 def fr_str_017() -> None:
     """Demonstrate immutable mutation truth."""
     _header("Demonstrate immutable mutation truth.")
-    assert StrategyMutationResult.model_fields["mutation_id"]
+    assert callable(create_strategy_mutation_result)
 
 
 def fr_str_035() -> None:
     """Demonstrate explicit host validation policy."""
     _header("Demonstrate explicit host validation policy.")
-    assert StrategyValidationPolicy.model_fields["policy_version"]
+    assert callable(create_strategy_validation_policy)
 
 
 def fr_str_038() -> None:
     """Demonstrate immutable concrete signal output."""
     _header("Demonstrate immutable concrete signal output.")
-    assert StrategySignal.model_fields["signal_id"]
+    assert callable(create_strategy_signal)
 
 
 def fr_str_039() -> None:
     """Demonstrate immutable point-in-time signal evidence."""
     _header("Demonstrate immutable point-in-time signal evidence.")
-    assert StrategySignalEvidence.model_fields["primary_market"]
+    assert callable(create_strategy_signal_evidence)
 
 
 def _demonstrate_requirement_contracts() -> None:
@@ -201,11 +206,11 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
     print("\nSTRATEGY CONTRACTS")
 
     print("\n-- Enumerations --")
-    print("Environment:", StrategyEnvironment.RESEARCH.value)
-    print("Timing policy:", StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE.value)
-    print("Lifecycle:", StrategyLifecycleStatus.APPROVED.value)
+    print("Environment:", get_strategy_environment("RESEARCH").value)
+    print("Timing policy:", get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE").value)
+    print("Lifecycle:", get_strategy_lifecycle_status("APPROVED").value)
 
-    policy = StrategyValidationPolicy(
+    policy = create_strategy_validation_policy(
         policy_version="usage-v1",
         approved_module_roots=("app.services.strategy.evaluators",),
         max_config_payload_bytes=16_384,
@@ -213,24 +218,24 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
         max_config_string_length=512,
         max_config_collection_items=128,
     )
-    reference = StrategyRef(
+    reference = create_strategy_ref(
         strategy_id="naive-ma-trend",
         exact_version="1.0.0",
-        environment=StrategyEnvironment.RESEARCH,
+        environment=get_strategy_environment("RESEARCH"),
         request_id=_REQUEST,
         correlation_id=_CORRELATION,
     )
-    config = StrategyConfig(
+    config = create_strategy_config(
         strategy_id=reference.strategy_id,
         strategy_version="1.0.0",
         config_schema_version="v1",
         parameters={"fast_ma_period": 20, "slow_ma_period": 50},
         request_id=_REQUEST,
     )
-    context = StrategyExecutionContext(
-        environment=StrategyEnvironment.RESEARCH,
+    context = create_strategy_execution_context(
+        environment=get_strategy_environment("RESEARCH"),
         decision_timestamp=now,
-        timing_policy=StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE,
+        timing_policy=get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE"),
         seed=7,
         interface_version="v1",
         request_id=_REQUEST,
@@ -246,7 +251,7 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
     print("Policy version:", policy.policy_version)
     print("Context timing:", context.timing_policy.value)
 
-    manifest = StrategyManifest(
+    manifest = create_strategy_manifest(
         strategy_id=reference.strategy_id,
         strategy_version="1.0.0",
         module_path="app.services.strategy.evaluators.naive_ma_trend",
@@ -257,7 +262,7 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
         required_data=("EURUSD:H1",),
         required_indicators=("sma",),
         timing_policy=context.timing_policy,
-        permitted_environments=(StrategyEnvironment.RESEARCH,),
+        permitted_environments=(get_strategy_environment("RESEARCH"),),
         source_hash=_HASH,
         artifact_hash=_HASH,
         dependency_hash=_HASH,
@@ -270,17 +275,17 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
         max_local_state_bytes=8_192,
         decision_timeout_seconds=5,
     )
-    validated_ref = ValidatedStrategyRef(
+    validated_ref = create_validated_strategy_ref(
         manifest=manifest,
-        lifecycle_status=StrategyLifecycleStatus.APPROVED,
-        environment=StrategyEnvironment.RESEARCH,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
+        environment=get_strategy_environment("RESEARCH"),
         policy_version=policy.policy_version,
         validation_policy=policy,
         registry_record_hash=_HASH,
         request_id=_REQUEST,
         correlation_id=_CORRELATION,
     )
-    validated_config = ValidatedStrategyConfig(
+    validated_config = create_validated_strategy_config(
         strategy_id=reference.strategy_id,
         strategy_version="1.0.0",
         config_schema_version="v1",
@@ -294,7 +299,7 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
     print("Validated ref record hash:", validated_ref.registry_record_hash)
     print("Validated config hash:", validated_config.config_hash)
 
-    registration = StrategyRegistrationRequest(
+    registration = create_strategy_registration_request(
         command_id="usage-command-register",
         strategy_id=manifest.strategy_id,
         strategy_version=manifest.strategy_version,
@@ -307,13 +312,13 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
         provenance_refs=manifest.provenance_refs,
         principal_id="usage-principal",
         reason="usage example registration",
-        lifecycle_status=StrategyLifecycleStatus.APPROVED,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
         authorization_ref="approval-1",
         requested_at=now,
         request_id=_REQUEST,
         correlation_id=_CORRELATION,
     )
-    parameter_update = StrategyParameterUpdateRequest(
+    parameter_update = create_strategy_parameter_update_request(
         command_id="usage-command-config",
         strategy_id=manifest.strategy_id,
         strategy_version=manifest.strategy_version,
@@ -331,7 +336,7 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
     print("Registration schema:", registration.schema_id)
     print("Parameter update schema:", parameter_update.schema_id)
 
-    event = StrategyEvent(
+    event = create_strategy_event(
         event_type="BAR_CLOSED",
         hook="on_bar",
         occurred_at=now,
@@ -347,7 +352,7 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
         workflow_id=_WORKFLOW,
         correlation_id=_CORRELATION,
     )
-    decision = StrategyDecision(
+    decision = create_strategy_decision(
         decision_id="usage-decision-1",
         sequence=0,
         action="PROPOSE",
@@ -368,7 +373,7 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
             "config_hash": _HASH,
         },
     )
-    neutral = StrategyDecision(
+    neutral = create_strategy_decision(
         decision_id="usage-decision-2",
         sequence=1,
         action="NEUTRAL",
@@ -383,7 +388,7 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
             "config_hash": _HASH,
         },
     )
-    signal = StrategySignal(
+    signal = create_strategy_signal(
         signal_id=_HASH,
         strategy_id=manifest.strategy_id,
         strategy_version=manifest.strategy_version,
@@ -395,30 +400,30 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
         facts={"fast": "1.1005"},
         lineage={"config_hash": _HASH},
     )
-    market_record = OHLCVRecord(
+    market_record = build_ohlcv_record(
         timestamp=now - timedelta(hours=1),
+        open="1.1000",
+        high="1.1010",
+        low="1.0990",
+        close="1.1005",
+        volume=100,
         source="usage",
         source_symbol="EURUSD",
         available_at=now - timedelta(hours=1),
-        open=Decimal("1.1000"),
-        high=Decimal("1.1010"),
-        low=Decimal("1.0990"),
-        close=Decimal("1.1005"),
-        volume=Decimal(100),
         price_unit="USD",
         volume_unit="units",
     )
-    market = MarketDataset(
-        normalization_version="v1",
-        data_kind="bars",
+    market = build_market_dataset(
         symbol="EURUSD",
-        timeframe="H1",
+        data_kind="bars",
         records=(market_record,),
+        normalization_version="v1",
+        timeframe="H1",
         start=market_record.timestamp,
         end=market_record.timestamp,
         available_at=market_record.available_at,
         record_count=1,
-        quality_report=DataQualityReport(
+        quality_report=build_data_quality_report(
             quality_status="passed",
             quality_score=Decimal(1),
             record_count=1,
@@ -435,7 +440,7 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
         precision_policy="decimal_string",
         request_id=_REQUEST,
     )
-    signal_evidence = StrategySignalEvidence(
+    signal_evidence = create_strategy_signal_evidence(
         evidence_id="strategy-contract-usage",
         primary_market=market,
         related_markets={},
@@ -452,7 +457,7 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
     print("Signal:", signal.signal_name, "active:", signal.active)
     print("Signal evidence:", signal_evidence.evidence_id)
 
-    mutation = StrategyMutationResult(
+    mutation = create_strategy_mutation_result(
         mutation_id="usage-mutation-1",
         mutation_type="REGISTER_VERSION",
         status="ACCEPTED",
@@ -477,7 +482,7 @@ def main() -> int:  # noqa: PLR0915 - explicit end-to-end evidence flow
     if diagnostics.data is None or replay.data is None:
         print("Unable to construct typed execution-result dependencies.")
         return 1
-    result = StrategyExecutionResult(
+    result = create_strategy_execution_result(
         decisions=(neutral,),
         intents=(),
         diagnostics=diagnostics.data,

@@ -6,28 +6,120 @@ import functools
 import inspect
 import time
 from collections.abc import Callable, Mapping
-from typing import Any, Literal, ParamSpec, TypeVar, cast, overload
+from typing import Any, Literal, ParamSpec, Protocol, TypeGuard, TypeVar, cast
 
 from app.utils import (
     build_response_metadata,
     error_response,
     generate_id,
     get_logger,
+    get_standard_response_type,
     success_response,
     validate_id,
 )
 
-type StandardResponse[T] = Any
-
 type JsonValue = Any
 type ResponseMetadata = Any
-type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 logger = get_logger(__name__)
 
 _P = ParamSpec("_P")
 _T = TypeVar("_T")
+_STANDARD_RESPONSE_TYPE = get_standard_response_type()
+
+
+class _ResponseError(Protocol):
+    """Structural view of one Utils-owned standard error."""
+
+    @property
+    def code(self) -> str:
+        """Return the stable error code."""
+
+    @property
+    def details(self) -> Mapping[str, JsonValue]:
+        """Return bounded structured error details."""
+
+
+class _ResponseMetadata(Protocol):
+    """Structural view of trace fields in Utils-owned response metadata."""
+
+    @property
+    def request_id(self) -> str:
+        """Return the canonical request identifier."""
+
+    @property
+    def correlation_id(self) -> str | None:
+        """Return the optional correlation identifier."""
+
+
+class StandardResponse[T](Protocol):
+    """Private structural view of the Utils-owned response contract."""
+
+    @property
+    def status(self) -> Literal["success", "error"]:
+        """Return the response status."""
+
+    @property
+    def message(self) -> str:
+        """Return the bounded response message."""
+
+    @property
+    def data(self) -> T | None:
+        """Return successful response data."""
+
+    @property
+    def error(self) -> _ResponseError | None:
+        """Return structured failure evidence."""
+
+    @property
+    def metadata(self) -> _ResponseMetadata:
+        """Return operation metadata."""
+
+
+def _is_standard_response(value: object) -> TypeGuard[StandardResponse[object]]:
+    """Return whether ``value`` is the Utils-owned runtime response type.
+
+    Args:
+        value: Candidate response value.
+
+    Returns:
+        Whether the value is a canonical Utils standard response.
+    """
+    return isinstance(value, _STANDARD_RESPONSE_TYPE)
+
+
+def _build_error_response[T](
+    *,
+    code: str,
+    details: Mapping[str, JsonValue],
+    message: str,
+    metadata: ResponseMetadata,
+    catalog: Mapping[str, object],
+) -> StandardResponse[T]:
+    """Build one Utils response through Strategy's structural adapter.
+
+    Args:
+        code: Approved Strategy error code.
+        details: Bounded structured error evidence.
+        message: Safe response message.
+        metadata: Utils-owned operation metadata.
+        catalog: Structurally compatible Strategy error catalogue.
+
+    Returns:
+        Canonical Utils response exposed through the private structural view.
+    """
+    build_error = cast("Callable[..., object]", error_response)
+    return cast(
+        "StandardResponse[T]",
+        build_error(
+            code=code,
+            details=details,
+            message=message,
+            metadata=metadata,
+            catalog=catalog,
+        ),
+    )
 
 
 class StrategyOperationError(Exception):
@@ -74,7 +166,9 @@ def _trace_context(
             correlation_id = getattr(value, "correlation_id", None)
             try:
                 canonical_request = validate_id(request_id, expected_prefix="req")
-            except Exception:
+            except Exception as error:
+                if not str(getattr(error, "code", "")).startswith("IDENTIFIER_"):
+                    raise
                 canonical_request = generate_id("req")
             canonical_correlation = None
             if isinstance(correlation_id, str):
@@ -82,7 +176,9 @@ def _trace_context(
                     canonical_correlation = validate_id(
                         correlation_id, expected_prefix="cor"
                     )
-                except Exception:
+                except Exception as error:
+                    if not str(getattr(error, "code", "")).startswith("IDENTIFIER_"):
+                        raise
                     canonical_correlation = generate_id("cor")
             return canonical_request, canonical_correlation
     return generate_id("req"), None
@@ -101,15 +197,27 @@ def _operation_metadata(
     """
     module = function.__module__
     operation = f"{module.removeprefix('app.services.')}.{function.__name__}"
-    is_mutation = module.endswith(("registry.registration", "registry.parameters"))
-    is_checkpoint_write = module.endswith(
-        "checkpoints.store"
-    ) and function.__name__ == ("create_strategy_checkpoint")
+    is_mutation = module.endswith(
+        ("registry.registration", "registry.parameters", "registry.optimization")
+    )
+    is_checkpoint_write = (
+        module.endswith("checkpoints.store")
+        and function.__name__ == "create_strategy_checkpoint"
+    )
+    is_audit_write = (
+        module.endswith("proposal_intake.evaluation")
+        and function.__name__ == "evaluate_strategy_proposal"
+    )
     if is_mutation:
         risk = "high"
-    elif module.endswith(("vectorized.runner", "event.runner", "signals.boundary")) or (
-        ".evaluators." in module
-    ):
+    elif module.endswith(
+        (
+            "vectorized.runner",
+            "event.runner",
+            "signals.boundary",
+            "proposal_intake.evaluation",
+        )
+    ) or (".evaluators." in module):
         risk = "medium"
     else:
         risk = "low"
@@ -121,9 +229,9 @@ def _operation_metadata(
         request_id=request_id,
         correlation_id=correlation_id,
         start_time=start_time,
-        read_only=not (is_mutation or is_checkpoint_write),
+        read_only=not (is_mutation or is_checkpoint_write or is_audit_write),
         writes_file=False,
-        modifies_database=is_mutation or is_checkpoint_write,
+        modifies_database=is_mutation or is_checkpoint_write or is_audit_write,
         places_trade=False,
         requires_network=False,
     )
@@ -164,23 +272,23 @@ def guard_strategy_boundary(
             from app.services.strategy.diagnostics.errors import STRATEGY_ERROR_CATALOG
 
             logger.info("Strategy operation returned %s", error.code)
-            return error_response(
+            return _build_error_response(
                 code=error.code,
                 details=error.details,
                 message=error.message,
                 metadata=metadata(),
                 catalog=STRATEGY_ERROR_CATALOG,
             )
-        except Exception as error:  # noqa: BLE001 - outer boundary is fail closed.
+        except Exception as error:
             from app.services.strategy.diagnostics.errors import STRATEGY_ERROR_CATALOG
 
             failure_type = type(error).__name__
-            logger.error(
+            logger.exception(
                 "Unexpected %s escaped Strategy operation %s",
                 failure_type,
                 function.__name__,
             )
-            return error_response(
+            return _build_error_response(
                 code="STRATEGY_INTERNAL_ERROR",
                 details={
                     "operation": function.__name__,
@@ -190,10 +298,13 @@ def guard_strategy_boundary(
                 metadata=metadata(),
                 catalog=STRATEGY_ERROR_CATALOG,
             )
-        return success_response(
-            raw_result,
-            message=f"{function.__name__} completed successfully",
-            metadata=metadata(),
+        return cast(
+            "StandardResponse[_T]",
+            success_response(
+                raw_result,
+                message=f"{function.__name__} completed successfully",
+                metadata=metadata(),
+            ),
         )
 
     signature = inspect.signature(function)
@@ -242,22 +353,6 @@ def unwrap_strategy_response(
     )
 
 
-@overload
-def unwrap_evaluator_result(
-    result: StandardResponse[_T],
-    *,
-    operation: str,
-) -> _T: ...
-
-
-@overload
-def unwrap_evaluator_result(
-    result: _T,
-    *,
-    operation: str,
-) -> _T: ...
-
-
 def unwrap_evaluator_result(
     result: StandardResponse[_T] | _T,
     *,
@@ -268,17 +363,10 @@ def unwrap_evaluator_result(
     Returns:
         The raw evaluator result.
     """
-    if all(hasattr(result, field) for field in ("status", "metadata")):
-        return cast("_T", unwrap_strategy_response(result, operation=operation))
-    return result
-
-
-@overload
-def unwrap_data_response(response: StandardResponse[_T], *, operation: str) -> _T: ...
-
-
-@overload
-def unwrap_data_response(response: _T, *, operation: str) -> _T: ...
+    if _is_standard_response(result):
+        typed = cast("StandardResponse[_T]", result)
+        return unwrap_strategy_response(typed, operation=operation)
+    return cast("_T", result)
 
 
 def unwrap_data_response(
@@ -294,13 +382,12 @@ def unwrap_data_response(
     Raises:
         StrategyOperationError: If Data returned an error response.
     """
-    if not all(hasattr(response, field) for field in ("status", "metadata")):
-        return response
-    if response.status == "success":
-        return cast("_T", response.data)
-    upstream_code = (
-        response.error.code if response.error is not None else "INVALID_RESPONSE"
-    )
+    if not _is_standard_response(response):
+        return cast("_T", response)
+    typed = cast("StandardResponse[_T]", response)
+    if typed.status == "success":
+        return cast("_T", typed.data)
+    upstream_code = typed.error.code if typed.error is not None else "INVALID_RESPONSE"
     raise StrategyOperationError(
         "STRATEGY_INTERNAL_ERROR",
         "strategy data dependency failed",

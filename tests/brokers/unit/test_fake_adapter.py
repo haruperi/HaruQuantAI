@@ -16,7 +16,7 @@ from app.services.brokers.contracts import (
     BrokerQuote,
 )
 from app.services.brokers.registry import get_broker_capability_catalogue
-from app.services.brokers.testing import FakeBrokerAdapter
+from app.services.brokers.testing import FakeBrokerAdapter, create_fake_broker_adapter
 
 _BUFFER_SIZE = 2
 _MUTATIONS = {
@@ -84,9 +84,37 @@ def _quote() -> BrokerQuote:
 
 def test_fake_adapter_implements_complete_protocol() -> None:
     """The fake structurally exposes every adapter operation."""
-    fake = _fake()
+    fake = create_fake_broker_adapter(_config(), _capabilities())
     assert isinstance(fake, BrokerAdapter)
     assert all(hasattr(fake, operation.value) for operation in BrokerCapabilityId)
+
+
+def test_fake_publish_reports_unknown_subscription() -> None:
+    """Publishing to an unowned subscription returns explicit failure evidence."""
+
+    async def exercise() -> None:
+        result = await _fake().publish("evt-missing", object())
+        assert result.error is not None
+        assert result.error.code == BrokerErrorCode.BROKER_SUBSCRIPTION_NOT_FOUND.value
+
+    asyncio.run(exercise())
+
+
+def test_fake_unsubscribe_honours_injected_error() -> None:
+    """An injected unsubscribe error is retained as canonical evidence."""
+
+    async def exercise() -> None:
+        fake = _fake()
+        await fake.connect()
+        fake.inject_error(
+            BrokerCapabilityId.UNSUBSCRIBE,
+            BrokerError(code=BrokerErrorCode.BROKER_TIMEOUT, message="timeout"),
+        )
+        result = await fake.unsubscribe("evt-missing")
+        assert result.error is not None
+        assert result.error.code == BrokerErrorCode.BROKER_TIMEOUT.value
+
+    asyncio.run(exercise())
 
 
 def test_fake_adapter_error_injection() -> None:

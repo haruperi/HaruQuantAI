@@ -4,6 +4,7 @@
 package. The legacy copy still guards its original module until Phase 11.
 """
 
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from unittest.mock import MagicMock
 
@@ -20,7 +21,8 @@ from app.services.data.evidence.fx_conversion import (
 )
 from app.utils.responses.models import StandardResponse
 
-from tests.data.helpers import END, START
+START = datetime(2026, 1, 1, tzinfo=UTC)
+END = START + timedelta(minutes=1)
 
 
 def _unwrap(response: StandardResponse) -> object:

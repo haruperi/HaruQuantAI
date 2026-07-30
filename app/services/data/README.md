@@ -69,11 +69,14 @@ execution decision.
 - Strategy evaluation, indicators, risk policy, position sizing, order formulation,
   broker dispatch decisions, reconciliation authority, or simulated fills/state.
 - Broker/provider adapter implementations, connection/session mechanics, or
-  credentials: Brokers owns adapters and lifecycle behavior; secrets are resolved
-  through the Utils settings layer. The Data package-root retrieval facade may
-  privately and lazily compose a read-only adapter through the Brokers factory for
-  standalone calls. Data never exposes the adapter or invokes `BrokerAdapter`
-  mutation operations.
+  credentials: Brokers owns adapters, credentials, and lifecycle behavior; secrets
+  are resolved through the opaque value returned by the Utils package-root
+  `load_broker_provider_settings` function. The Data composition root selects a
+  provider route only and resolves the connection configuration through the
+  Brokers public resolver
+  (`resolve_provider_connection_config`); it never reads credentials or builds
+  `BrokerConnectionConfig` itself. Data never exposes the adapter or invokes
+  `BrokerAdapter` mutation operations.
 - Another domain's tables, artifact schemas, or migration definitions.
 - Public streaming subscriptions, automatic feed-gap backfill, historical calendar
   reconstruction, TSDB selection, or unapproved external-source promotion.
@@ -216,7 +219,7 @@ capabilities: fourteen business features and one foundational contract capabilit
 | Completed | `FEAT-DATA-08` Data Transformation and Resampling | `transformation/` | Resampling, tick aggregation, multi-timeframe alignment, and detached tabular projections | Section 4 transformation requirements, allocated to this owner | `tests/data/usage/08_transformation.py` |
 | Completed | `FEAT-DATA-09` Time and Session Handling | `time_sessions/` | Timeframe/schedule contracts, UTC policy, venue market hours, exchange/configured schedules, analytical named sessions, and gap classification | `FR-DATA-034`, `FR-DATA-117`–`FR-DATA-122` | `tests/data/usage/09_time_sessions.py` |
 | Completed | `FEAT-DATA-10` Data Source Governance | `sources/` | Source contracts/protocol, registry/composition, policy/promotion, adapters, licensing, and read-only proxy | Section 4 source-governance requirements, allocated to this owner | `tests/data/usage/10_sources.py` |
-| Completed | `FEAT-DATA-11` Economic Calendar | `economic_calendar/` | Raw scraper contracts, `EconomicEvent`, `EconomicCalendarProvider`, `EconomicEventStore`, symbol queries, restriction/state helpers | `FR-DATA-095`–`099`, `FR-DATA-123`–`129` | `tests/data/usage/11_economic_calendar.py` |
+| Pending | `FEAT-DATA-11` Economic Calendar | `economic_calendar/` | Raw scraper contracts, event normalization, storage, symbol queries, and restriction/state helpers exist, but no licensed real calendar transport is implemented | `FR-DATA-095`–`099`, `FR-DATA-123`–`129` | `tests/data/usage/11_economic_calendar.py` reports `SOURCE_UNAVAILABLE` and zero provider events |
 | Completed | `FEAT-DATA-12` Real-Time Feed Lifecycle and Observability | `realtime_feeds/` | Feed contracts/state, buffer, heartbeat, reconnection, reconciliation, and status operations | Section 4 feed requirements, allocated to this owner | `tests/data/usage/12_realtime_feeds.py` |
 | Completed | `FEAT-DATA-13` Scheduler and Job Management | `data_jobs/` | Job/backfill/recovery contracts and create/start/stop/run/status/recovery operations | Section 4 job requirements, allocated to this owner | `tests/data/usage/13_data_jobs.py` |
 | Completed | `FEAT-DATA-14` Cross-Domain Evidence | `evidence/` | Market-context, FX-conversion, account-state, freshness contracts/providers, and public evidence operations | Section 4 normalized-evidence requirements, allocated to this owner | `tests/data/usage/14_evidence.py` |
@@ -273,17 +276,17 @@ build_calendar_scrape_provider      build_column_mapping
 build_data_gap                      build_data_quality_report
 build_data_range                    build_dataset_load_request
 build_dataset_save_request          build_data_settings
-build_economic_calendar_provider    build_economic_event
-build_economic_event_store          build_error_definition
-build_event_impact                  build_exchange_session_request
-build_external_import_request       build_feed_config
-build_feed_status_request           build_fx_conversion_evidence
-build_fx_conversion_request         build_fx_rate_leg
-build_job_definition                build_job_status_request
-build_local_market_data_source      build_market_context_evidence
-build_market_context_request        build_market_data_request
-build_market_dataset                build_market_hours_request
-build_market_schedule               build_migration_request
+build_economic_event               build_economic_event_store
+build_error_definition             build_event_impact
+build_exchange_session_request     build_external_import_request
+build_feed_config                  build_feed_status_request
+build_fx_conversion_evidence       build_fx_conversion_request
+build_fx_rate_leg                  build_job_definition
+build_job_status_request           build_local_market_data_source
+build_market_context_evidence      build_market_context_request
+build_market_data_request          build_market_dataset
+build_market_hours_request         build_market_schedule
+build_migration_request
 build_migration_step                build_ohlcv_record
 build_quality_issue                 build_raw_feed_event
 build_read_only_broker_proxy        build_reconnect_policy
@@ -2273,6 +2276,10 @@ Calendar scraping is a retrieval capability: it acquires a different data kind f
 different transport, but it is still acquisition. It is not a source adapter and is
 not registered in `sources/`.
 
+No licensed production transport exists in the repository. The package therefore
+fails closed with `SOURCE_UNAVAILABLE`; unit tests validate injected transport
+mechanics only and are not evidence of real calendar acquisition.
+
 ### Current inventory reference
 
 See the authoritative current production-file inventory at the start of Section 4.
@@ -2281,18 +2288,18 @@ See the authoritative current production-file inventory at the start of Section 
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-095` | Scrape economic calendar events from multiple sites (ForexFactory, MetalsMine, EnergyExch, CryptoCraft) concurrently, using configurable concurrency (`max_parallel_tasks`) in `ScrapeOptions`. | `scrape_economic_calendar(options: ScrapeOptions) -> ScrapeResult` | External network calls | `DataError[NETWORK_ERROR\|TIMEOUT]` | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_095()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_concurrency_limit_is_respected()` |
-| Completed | `FR-DATA-096` | Clean and validate raw calendar data into structured records (representing title, country, impact, actual, forecast, previous, and timestamp), filtering duplicates and bad values. | `scrape_economic_calendar` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_096()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_invalid_records_are_filtered()` |
-| Completed | `FR-DATA-097` | Return scraped datasets as a pandas DataFrame via a clean encapsulation `ScrapeResult`. | `ScrapeResult.to_dataframe() -> DataFrame` | None | None | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_097()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_to_dataframe_returns_valid_structure()` |
-| Completed | `FR-DATA-098` | Automatically save non-empty calendar dataframes using descriptive file names that include the site name, date range, and scrape timestamp; empty dataframes are skipped. | `ScrapeResult.save(directory: Path, format: str) -> None` | Local file write | `DataError[INVALID_INPUT\|PERMISSION_DENIED\|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_098()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_save_skips_empty_dataframes()` |
-| Completed | `FR-DATA-099` | Support serialization and deserialization of `ScrapeResult` using python's `pickle` module for easy persistence and transport. | `ScrapeResult.serialize() -> bytes` | None | None | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_099()`<br>**Unit:** `tests/data/unit/test_calendar_scraper.py::test_pickle_roundtrip()` |
-| Completed | `FR-DATA-123` | Normalize provider events into immutable validated UTC `EconomicEvent` values while preserving exact parsed decimals and original provider strings. | `EconomicEvent`, `EventImpact` | None | `ValueError`: invalid identity, UTC timestamp, code, or numeric value | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_123()`<br>**Unit:** `tests/data/unit/test_economic_events.py` |
-| Completed | `FR-DATA-124` | Retrieve normalized calendar events through an injected provider-neutral protocol; the scrape adapter preserves raw values and stable provider IDs. | `EconomicCalendarProvider`, `CalendarScrapeProvider` | Injected read-only transport | `DataError[VALIDATION_FAILED\|NETWORK_ERROR]` | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_124()`<br>**Unit:** `tests/data/unit/test_calendar_provider.py` |
-| Completed | `FR-DATA-125` | Resolve immutable currency/country relevance profiles for registered symbols. | `get_symbol_event_profile(symbol: str) -> SymbolEventProfile` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_125()`<br>**Unit:** `tests/data/unit/test_event_profiling.py` |
-| Completed | `FR-DATA-126` | Return general or symbol-relevant normalized events under UTC window, relevance-union, and impact filters. | `get_economic_events`, `get_symbol_economic_events` | Injected provider read | `DataError[VALIDATION_FAILED\|SOURCE_UNAVAILABLE]` | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_126()`<br>**Unit:** `tests/data/unit/test_calendar_service.py` |
-| Completed | `FR-DATA-127` | Evaluate inclusive pre/post event blackout windows without embedding the policy in Strategy or Trading. | `evaluate_calendar_state`, `is_news_restricted`, `is_news_restricted_events` | Optional injected provider read | `DataError[VALIDATION_FAILED]`, `ValueError`: non-UTC instant | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_127()`<br>**Unit:** `tests/data/unit/test_calendar_restriction.py` |
-| Completed | `FR-DATA-128` | Upsert by provider plus stable provider event ID, retain the original schedule, refresh mutable values, query bounded UTC windows, and expose 7-day/24-hour refresh windows. | `EconomicEventStore` | Bounded SQLite reads/writes | `DataError[VALIDATION_FAILED\|DB_READ_FAILED\|DB_WRITE_FAILED]` | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_128()`<br>**Unit:** `tests/data/unit/test_economic_event_store.py`, `tests/data/unit/test_economic_calendar_migration.py` |
-| Completed | `FR-DATA-129` | Populate `MarketContextEvidence.calendar_state` and exact blackout provenance from acquired symbol-relevant events; authoritative empty results are open and missing acquisition is unknown. | `derive_calendar_state`, `populate_market_context_calendar` | None | `DataError[VALIDATION_FAILED]` | **Usage:** `tests/data/usage/11_economic_calendar.py::fr_data_129()`<br>**Unit:** `tests/data/unit/test_calendar_state.py`<br>**System:** `tests/system/integration/test_economic_news_restriction.py` |
+| Pending | `FR-DATA-095` | Scrape economic calendar events from multiple sites (ForexFactory, MetalsMine, EnergyExch, CryptoCraft) concurrently, using configurable concurrency (`max_parallel_tasks`) in `ScrapeOptions`. | `scrape_economic_calendar` | External network calls | `DataError[SOURCE_UNAVAILABLE\|NETWORK_ERROR\|TIMEOUT]` | **Usage:** `tests/data/usage/11_economic_calendar.py` reports no licensed transport<br>**Unit only:** `tests/data/unit/test_calendar_scraper.py::test_concurrency_limit_is_respected()` |
+| Pending | `FR-DATA-096` | Clean and validate real raw calendar data into structured records, filtering duplicates and bad values. | `scrape_economic_calendar` | None | `DataError[VALIDATION_FAILED]` | Blocked on `FR-DATA-095`; injected unit coverage is not real-provider evidence |
+| Pending | `FR-DATA-097` | Return a real scraped dataset as a pandas DataFrame. | `scrape_result_to_dataframe` | None | None | Blocked on `FR-DATA-095`; usage returns zero rows |
+| Pending | `FR-DATA-098` | Save non-empty real calendar dataframes using descriptive file names; skip empty frames. | `save_scrape_result` | Local file write | `DataError[INVALID_INPUT\|PERMISSION_DENIED\|DB_WRITE_FAILED]` | Blocked on `FR-DATA-095`; usage writes zero artifacts |
+| Pending | `FR-DATA-099` | Serialize and deserialize a real `ScrapeResult` for persistence and transport. | `serialize_scrape_result`, `deserialize_scrape_result` | None | None | Blocked on `FR-DATA-095`; only injected unit evidence exists |
+| Pending | `FR-DATA-123` | Normalize real provider events into immutable validated UTC event values while preserving exact decimals and source strings. | `build_economic_event`, `build_event_impact` | None | `ValueError`: invalid identity, UTC timestamp, code, or numeric value | Blocked on `FR-DATA-095`; only constructed/injected evidence exists |
+| Pending | `FR-DATA-124` | Retrieve normalized calendar events through a provider-neutral protocol while preserving raw values and stable provider IDs. | `build_calendar_scrape_provider` | Injected read-only transport | `DataError[VALIDATION_FAILED\|SOURCE_UNAVAILABLE\|NETWORK_ERROR]` | No licensed real provider transport exists |
+| Pending | `FR-DATA-125` | Resolve currency/country relevance profiles against real acquired events. | `get_symbol_event_profile` | None | `DataError[VALIDATION_FAILED]` | Profile logic exists; end-to-end usage is blocked on `FR-DATA-095` |
+| Pending | `FR-DATA-126` | Return real general or symbol-relevant normalized events under UTC and impact filters. | `get_economic_events`, `get_symbol_economic_events` | Provider read | `DataError[VALIDATION_FAILED\|SOURCE_UNAVAILABLE]` | Usage returns zero events because no real provider is available |
+| Pending | `FR-DATA-127` | Evaluate event blackout windows from real acquired events. | `evaluate_calendar_state`, `is_news_restricted`, `is_news_restricted_events` | Optional provider read | `DataError[VALIDATION_FAILED]`, `ValueError`: non-UTC instant | Deterministic logic exists; real end-to-end evidence is blocked on `FR-DATA-095` |
+| Pending | `FR-DATA-128` | Persist and query real acquired events with stable provider identity and refresh windows. | `build_economic_event_store`, `get_persisted_events` | Bounded SQLite reads/writes | `DataError[VALIDATION_FAILED\|DB_READ_FAILED\|DB_WRITE_FAILED]` | Store mechanics exist; usage persists no real events |
+| Pending | `FR-DATA-129` | Populate market-context calendar state and blackout provenance from real symbol-relevant events. | `derive_calendar_state`, `populate_market_context_calendar` | None | `DataError[VALIDATION_FAILED]` | Usage returns zero risk calendar evidence |
 
 ---
 

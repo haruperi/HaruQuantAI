@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """FX conversion evidence over an injected rate provider.
 
 Selects a deterministic acyclic conversion path â€” direct or synthesized â€” and publishes
@@ -14,7 +15,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Protocol
+from typing import Protocol, cast
 
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -59,15 +60,18 @@ def _read_leg(
     """Read and validate one exact direct rate leg."""
     logger.debug("Reading explicit FX leg %s/%s", source_currency, target_currency)
     try:
-        leg = unwrap_data_response(
-            provider.get_rate_leg(
-                source_currency=source_currency,
-                target_currency=target_currency,
-                as_of=request.as_of,
+        leg = cast(
+            "FXRateLeg",
+            unwrap_data_response(
+                provider.get_rate_leg(
+                    source_currency=source_currency,
+                    target_currency=target_currency,
+                    as_of=request.as_of,
+                    request_id=request.request_id,
+                ),
+                operation="data.evidence.get_fx_conversion_evidence",
                 request_id=request.request_id,
             ),
-            operation="data.evidence.get_fx_conversion_evidence",
-            request_id=request.request_id,
         )
     except DataError as error:
         if error.code in {"DATA_NOT_FOUND", "SOURCE_UNAVAILABLE"}:

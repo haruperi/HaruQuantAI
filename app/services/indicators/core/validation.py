@@ -11,14 +11,11 @@ import math
 import re
 from collections.abc import Mapping
 from datetime import timedelta
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import pandas as pd
 
-from app.services.data import (
-    MarketDataset,
-    OHLCVRecord,
-)
+from app.services.data import is_ohlcv_record
 from app.services.indicators.core.contracts import (
     IndicatorConfig,
     IndicatorSpec,
@@ -32,6 +29,9 @@ from app.services.indicators.core.errors import (
 )
 from app.services.indicators.core.registry import get_indicator
 from app.utils import get_logger
+
+if TYPE_CHECKING:
+    from app.services.indicators.core.contracts import _MarketDataset as MarketDataset
 
 logger = get_logger(__name__)
 
@@ -278,7 +278,7 @@ def _validate_input_schema(data: MarketDataset) -> None:
             "dataset contract identity is not MarketDataset v1",
         )
     if data.data_kind != "bars" or any(
-        not isinstance(record, OHLCVRecord) for record in data.records
+        not is_ohlcv_record(record) for record in data.records
     ):
         raise IndicatorError(
             IndicatorErrorCode.IND_INVALID_INPUT_SCHEMA,
@@ -582,7 +582,7 @@ def get_warmup_requirement(
         IndicatorError: If the indicator or configuration is invalid.
     """
     logger.info("Resolving warmup requirement for %s", indicator_id)
-    spec = _unwrap_indicator_response(get_indicator(indicator_id))
+    spec: IndicatorSpec = _unwrap_indicator_response(get_indicator(indicator_id))
     _validate_config_identity(indicator_id, config)
     _validate_output_mode(config)
     _validate_precision_dtype(config)
@@ -659,7 +659,7 @@ def validate_indicator(
             the approved precedence order.
     """
     logger.info("Validating indicator request for %s", indicator_id)
-    spec = _unwrap_indicator_response(get_indicator(indicator_id))
+    spec: IndicatorSpec = _unwrap_indicator_response(get_indicator(indicator_id))
     _validate_config_identity(indicator_id, config)
     _validate_output_mode(config)
     _validate_precision_dtype(config)

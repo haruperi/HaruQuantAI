@@ -5,7 +5,12 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from app.services.data.contracts import DataError, OHLCVRecord
+from app.services.data.contracts import (
+    DataError,
+    DataQualityReport,
+    MarketDataset,
+    OHLCVRecord,
+)
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.sources.contracts import (
     SourceReadRequest,
@@ -13,7 +18,67 @@ from app.services.data.sources.contracts import (
 from app.services.data.sources.local_adapter import LocalMarketDataSource
 from app.utils import generate_id
 
-from tests.data.helpers import make_dataset
+START = datetime(2026, 1, 1, tzinfo=UTC)
+END = START + timedelta(minutes=1)
+AVAILABLE = END + timedelta(seconds=1)
+
+
+def make_bar(timestamp=START):
+    """Return one exact canonical OHLCV record."""
+    return OHLCVRecord(
+        timestamp=timestamp,
+        open=Decimal("10.0"),
+        high=Decimal("11.0"),
+        low=Decimal("9.0"),
+        close=Decimal("10.5"),
+        volume=Decimal(100),
+        price_unit="USD",
+        volume_unit="shares",
+        source="fixture",
+        source_symbol="ABC",
+        source_revision="rev-1",
+        available_at=timestamp + timedelta(seconds=1),
+    )
+
+
+def make_quality(count=1):
+    """Return passing bounded quality evidence."""
+    return DataQualityReport(
+        quality_status="passed",
+        quality_score=Decimal(1),
+        issues=(),
+        warnings=(),
+        record_count=count,
+        checked_count=count,
+        truncated=False,
+        sample_limit=10,
+        schema_version="v1",
+        generated_at=AVAILABLE,
+    )
+
+
+def make_dataset():
+    """Return one immutable provider-neutral market dataset."""
+    bar = make_bar()
+    return MarketDataset(
+        normalization_version="v1",
+        data_kind="bars",
+        symbol="ABC",
+        timeframe="1m",
+        records=(bar,),
+        start=START,
+        end=START,
+        available_at=AVAILABLE,
+        record_count=1,
+        quality_report=make_quality(),
+        source_metadata={"source": "fixture"},
+        license_metadata={"status": "approved"},
+        cache_status="miss",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id="req-491e2e64ca4b441c7f08620130e0e40d107775c753ca238bea74d87a1dd9f667",
+    )
+
 
 _SYMBOL = "ABC"
 _START = datetime(2026, 1, 1, tzinfo=UTC)

@@ -1,19 +1,19 @@
-"""Large-input behaviour for Strategy digest bounding (STR-B05).
+"""Large-input integration behaviour for Strategy digest bounding (STR-B05).
 
 These tests prove the runners digest realistic dataset and batch sizes rather
-than merely declaring a resource limit. Every prior fixture used <=20 bars, so
-the unbounded ``canonical_json`` path that failed above ~660 records was never
-exercised.
+than merely declaring a resource limit. Every prior fixture used at most 20
+bars, so the unbounded canonical JSON path that failed above about 660 records
+was never exercised.
 """
 
 # ruff: noqa: PT018
 from datetime import timedelta
 
 from app.services.strategy import (
-    StrategyTimingPolicy,
+    get_strategy_timing_policy,
     run_vectorized_strategy_signals,
 )
-from app.utils import canonical_digest, logger
+from app.utils import canonical_digest, get_logger
 
 from tests.strategy.unit.test_models import (
     NOW,
@@ -25,20 +25,20 @@ from tests.strategy.unit.test_models import (
 )
 from tests.strategy.unit.test_vectorized_runner import Evaluator
 
-_TIMING = StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE
+_TIMING = get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE")
 _SHA256_LENGTH = 64
 _BAR = ("1.1000", "1.1010", "1.0990", "1.1005")
+logger = get_logger(__name__)
 
 
 def _past_dataset(bar_count: int) -> object:
-    """Build a point-in-time-safe dataset of ``bar_count`` bars ending before NOW.
+    """Build a point-in-time-safe dataset ending before the decision clock.
 
     Args:
-        bar_count: Number of bars to synthesize.
+        bar_count: Number of bounded fixture bars to build.
 
     Returns:
-        An immutable dataset whose every record is available at or before the
-        fixture decision clock, so it never trips the lookahead guard.
+        An immutable dataset whose records are available before the decision.
     """
     logger.debug("Building %d-bar large-input dataset", bar_count)
     base = make_market(tuple(_BAR for _ in range(bar_count)))
@@ -83,7 +83,7 @@ def test_vectorized_runner_digests_thousand_bar_dataset() -> None:
 
 
 def test_vectorized_runner_digest_is_unchanged_across_bound() -> None:
-    """Verify datasets just below and above the old ~660-record ceiling both run."""
+    """Verify datasets below and above the former ceiling both run."""
     logger.debug("Testing vectorized digest across the former ceiling")
     for bar_count in (600, 700, 1_000):
         outcome = run_vectorized_strategy_signals(
@@ -107,6 +107,8 @@ def test_vectorized_runner_rejects_oversized_batch() -> None:
     )
 
     class _TwoDecisionEvaluator(Evaluator):
+        """Evaluator returning enough decisions to exceed the batch limit."""
+
         def evaluate_vectorized(
             self, market, indicators, config, context, account_snapshot
         ):

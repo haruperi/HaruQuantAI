@@ -7,7 +7,7 @@ from app.services.strategy import (
     create_strategy_replay_manifest,
     validate_strategy_checkpoint,
 )
-from app.utils import logger
+from app.utils import get_logger
 
 from tests.strategy.unit.test_catalog import storage_context
 from tests.strategy.unit.test_models import (
@@ -17,6 +17,8 @@ from tests.strategy.unit.test_models import (
     make_context,
     make_ref,
 )
+
+logger = get_logger(__name__)
 
 
 def test_replay_workflow(tmp_path: Path) -> None:

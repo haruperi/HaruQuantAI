@@ -2,9 +2,11 @@
 
 # ruff: noqa: PT018
 from app.services.strategy import export_strategy_diagnostics
-from app.utils import logger
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import make_context
+
+logger = get_logger(__name__)
 
 
 def test_diagnostics_workflow() -> None:

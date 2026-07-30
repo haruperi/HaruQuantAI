@@ -1,3 +1,4 @@
+# ruff: noqa: ANN401
 """Current configured market hours and normalized session windows.
 
 Moved from ``gateway/sessions.py`` by ``CAP-DATA-026``. The volume half of that module
@@ -17,7 +18,7 @@ runtime cycle.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Literal, Protocol
+from typing import Any, Literal, Protocol, cast
 
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -103,7 +104,7 @@ def _get_current_schedule_raw(
             )
     observed_at = utc_now(clock)
     try:
-        schedule = calendar.get_schedule(
+        schedule: Any = calendar.get_schedule(
             source_id=request.source_id,
             symbol=request.symbol,
             timezone=request.timezone,
@@ -115,7 +116,7 @@ def _get_current_schedule_raw(
     except DataError:
         raise
     except Exception as error:
-        logger.error("Authoritative market-calendar query failed")
+        logger.exception("Authoritative market-calendar query failed")
         raise DataError(
             "SOURCE_UNAVAILABLE",
             safe_details={"operation": "market_calendar"},
@@ -133,7 +134,7 @@ def _get_current_schedule_raw(
             safe_details={"operation": "market_calendar"},
             request_id=request.request_id,
         )
-    return schedule
+    return cast("MarketSchedule", schedule)
 
 
 def get_current_schedule(

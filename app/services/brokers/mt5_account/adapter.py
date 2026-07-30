@@ -334,7 +334,29 @@ class MT5BrokerAdapter(
             raise ValueError("positive bar limit is required")
         if (start is None) != (end is None):
             raise ValueError("bar start and end must be supplied together")
-        normalized_timeframe = timeframe.upper()
+        normalized_timeframe = {
+            "1M": "M1",
+            "2M": "M2",
+            "3M": "M3",
+            "4M": "M4",
+            "5M": "M5",
+            "6M": "M6",
+            "10M": "M10",
+            "12M": "M12",
+            "15M": "M15",
+            "20M": "M20",
+            "30M": "M30",
+            "1H": "H1",
+            "2H": "H2",
+            "3H": "H3",
+            "4H": "H4",
+            "6H": "H6",
+            "8H": "H8",
+            "12H": "H12",
+            "1D": "D1",
+            "1W": "W1",
+            "1MO": "MN1",
+        }.get(timeframe.upper(), timeframe.upper())
         constant_names = {
             "M1": "TIMEFRAME_M1",
             "M2": "TIMEFRAME_M2",

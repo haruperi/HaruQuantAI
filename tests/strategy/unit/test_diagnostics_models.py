@@ -1,9 +1,11 @@
 """Strategy diagnostics model tests."""
 
-from app.services.strategy.diagnostics import StrategyDiagnostics
-from app.utils import logger
+from app.services.strategy.diagnostics.models import StrategyDiagnostics
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import COR, HASH, NOW, REQ, WF
+
+logger = get_logger(__name__)
 
 
 def test_diagnostics_require_trace_and_redaction_status() -> None:

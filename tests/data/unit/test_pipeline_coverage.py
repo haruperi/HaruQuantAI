@@ -5,7 +5,7 @@ from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
 import pytest
-from app.services.data.contracts import DataError
+from app.services.data.contracts import DataError, SpreadRecord, TickRecord
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.pipeline import (
     _cached_dataset,
@@ -24,6 +24,7 @@ from app.services.data.market_data.pipeline import (
     volume_request,
 )
 from app.services.data.market_data.requests import MarketDataRequest
+from app.services.data.sources.contracts import RawSourceBatch
 
 _REQ_ID = "req-11111111-1111-4111-8111-111111111111"
 _NOW = datetime.now(UTC)
@@ -54,6 +55,22 @@ def _make_market_data_req(**kwargs) -> MarketDataRequest:
     }
     defaults.update(kwargs)
     return MarketDataRequest(**defaults)
+
+
+def _raw_batch(
+    records: tuple[dict[str, object], ...],
+    data_kind: str,
+) -> RawSourceBatch:
+    """Build exact provider-neutral source evidence for normalization tests."""
+    return RawSourceBatch(
+        source_id="mt5",
+        provider_symbol="EURUSD",
+        data_kind=data_kind,
+        records=records,
+        retrieved_at=_NOW,
+        revision="provider-v1",
+        request_id=_REQ_ID,
+    )
 
 
 def test_default_ttl() -> None:
@@ -117,6 +134,83 @@ def test_normalize_out_of_order_timestamps() -> None:
     req = _make_market_data_req()
     with pytest.raises(DataError) as exc_info:
         _normalize(raw_batch, req)
+    assert exc_info.value.code == "DATA_QUALITY_FAILED"
+
+
+def test_normalize_tick_and_spread_evidence() -> None:
+    """Canonical normalization preserves observed quote values and precision."""
+    common: dict[str, object] = {
+        "timestamp": _NOW,
+        "source": "mt5",
+        "source_symbol": "EURUSD",
+        "source_revision": "provider-v1",
+        "available_at": _NOW,
+        "bid": "1.08001",
+        "ask": "1.08003",
+        "price_unit": "USD",
+    }
+    tick_request = _make_market_data_req(data_kind="ticks", timeframe=None)
+    tick_records = _normalize(_raw_batch((common,), "ticks"), tick_request)
+    assert isinstance(tick_records[0], TickRecord)
+    assert tick_records[0].bid == Decimal("1.08001")
+    assert tick_records[0].ask == Decimal("1.08003")
+
+    spread_request = _make_market_data_req(data_kind="spreads", timeframe=None)
+    spread_records = _normalize(
+        _raw_batch(({**common, "scale": 5},), "spreads"),
+        spread_request,
+    )
+    assert isinstance(spread_records[0], SpreadRecord)
+    assert spread_records[0].spread == Decimal("0.00002")
+    assert spread_records[0].unit == "USD"
+    assert spread_records[0].scale == 5
+
+
+def test_normalize_spread_fails_closed_without_precision() -> None:
+    """Spread normalization never fabricates missing scale evidence."""
+    raw = _raw_batch(
+        (
+            {
+                "timestamp": _NOW,
+                "source": "mt5",
+                "source_symbol": "EURUSD",
+                "source_revision": "provider-v1",
+                "available_at": _NOW,
+                "spread": "0.00002",
+                "unit": "USD",
+            },
+        ),
+        "spreads",
+    )
+    request = _make_market_data_req(data_kind="spreads", timeframe=None)
+
+    with pytest.raises(DataError) as exc_info:
+        _normalize(raw, request)
+
+    assert exc_info.value.code == "DATA_QUALITY_FAILED"
+
+
+def test_normalize_rejects_record_shape_for_wrong_data_kind() -> None:
+    """A tick-shaped row cannot be accepted as a bar observation."""
+    raw = _raw_batch(
+        (
+            {
+                "timestamp": _NOW,
+                "source": "mt5",
+                "source_symbol": "EURUSD",
+                "source_revision": "provider-v1",
+                "available_at": _NOW,
+                "bid": "1.08001",
+                "ask": "1.08003",
+                "price_unit": "USD",
+            },
+        ),
+        "ticks",
+    )
+
+    with pytest.raises(DataError) as exc_info:
+        _normalize(raw, _make_market_data_req())
+
     assert exc_info.value.code == "DATA_QUALITY_FAILED"
 
 

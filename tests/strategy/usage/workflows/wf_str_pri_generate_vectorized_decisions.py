@@ -7,12 +7,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.strategy import StrategyTimingPolicy, run_vectorized_strategy_signals
-from tests.strategy.unit.test_models import make_config, make_ref
+from app.services.strategy import run_vectorized_strategy_signals
 from tests.strategy.usage.workflows._support import (
-    CurrentNeutralEvaluator,
+    MarketProposalEvaluator,
     current_context,
     live_bars,
+    print_market_frame,
+    validated_config,
+    validated_ref,
 )
 
 WORKFLOW_ID = "WF-STR-PRI"
@@ -21,7 +23,7 @@ STAGES = (
     "Fix the decision clock and immutable Strategy identity/configuration.",
     "Validate readiness, identity, ordering, and no-lookahead atomically.",
     "Run the approved hash-bound vectorized evaluator.",
-    "Return deterministic TradeIntent batch, replay evidence, and diagnostics.",
+    "Return deterministic create_trade_intent_value batch, replay evidence, and diagnostics.",
 )
 
 
@@ -37,36 +39,44 @@ def main() -> None:
     # Stage 1 — INPUT BOUNDARY: Data supplies a genuine MT5-backed MarketDataset.
     _stage(1)
     market = live_bars()
+    print_market_frame(market)
     print("Input:", market.symbol, market.timeframe, market.record_count)
 
     # Stage 2: Freeze identity, config, and decision time.
     _stage(2)
-    timing = StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE
-    ref, config, context = (
-        make_ref(timing=timing),
-        make_config(),
-        current_context(timing),
-    )
+    ref = validated_ref(timing_name="BAR_OPEN_PREVIOUS_CLOSE", supported_hooks=())
+    config = validated_config()
+    context = current_context("BAR_OPEN_PREVIOUS_CLOSE", market=market)
     print("Decision time:", context.decision_timestamp)
 
     # Stage 3: Public runner performs atomic boundary validation.
     _stage(3)
-    print("Evaluator identity:", CurrentNeutralEvaluator.source_hash)
+    print("Evaluator identity:", MarketProposalEvaluator.source_hash)
 
     # Stage 4: Run the approved evaluator.
     _stage(4)
     outcome = run_vectorized_strategy_signals(
-        ref, config, market, (), context, CurrentNeutralEvaluator()
+        ref, config, market, (), context, MarketProposalEvaluator()
     )
     print("Evaluation:", outcome.status)
+    if outcome.data is None:
+        raise RuntimeError(f"Vectorized evaluation failed: {outcome.error}")
 
     # Stage 5 — OUTPUT BOUNDARY: Return atomic result or StandardResponse error.
     _stage(5)
     print(
         "Output:",
         type(outcome).__name__,
-        len(outcome.data.intents) if outcome.data else 0,
-        "intents",
+        tuple(
+            {
+                "intent_id": intent.intent_id,
+                "symbol": intent.symbol,
+                "side": intent.side,
+                "quantity_hint": intent.quantity_hint,
+                "lineage": dict(intent.lineage),
+            }
+            for intent in outcome.data.intents
+        ),
     )
 
 

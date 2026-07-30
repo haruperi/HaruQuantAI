@@ -5,49 +5,12 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from pydantic import SecretStr
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from app.services.brokers import (
-    BrokerConnectionConfig,
-    BrokerConnectionStatus,
-    BrokerEnvironment,
-    BrokerId,
+    build_broker_connection_config,
+    get_broker_value_field,
 )
-from app.utils.responses.models import StandardResponse
-from app.utils.settings.models import AppSettings
-
-
-class _WorkflowSettings(AppSettings):
-    """Local runtime settings for workflow examples with MT5 credentials."""
-
-    mt5_environment: str = "demo"
-    mt5_login: SecretStr | None = None
-    mt5_password: SecretStr | None = None
-    mt5_server: SecretStr | None = None
-    mt5_terminal_path: SecretStr | None = None
-
-
-def _workflow_settings() -> _WorkflowSettings:
-    """Load runtime settings from `.env` and the current process.
-
-    Returns:
-        Validated workflow settings.
-    """
-    return _WorkflowSettings()
-
-
-def _environment_from_settings(value: str) -> BrokerEnvironment:
-    """Map workflow environment value to a broker environment enum.
-
-    Returns:
-        Parsed environment, defaulting safely to demo.
-    """
-    normalized = value.strip().lower()
-    try:
-        return BrokerEnvironment(normalized)
-    except ValueError:
-        return BrokerEnvironment.DEMO
+from app.utils import load_broker_provider_settings
 
 
 def build_mt5_connection_config(
@@ -55,42 +18,35 @@ def build_mt5_connection_config(
     connect_timeout_sec: float = 1.0,
     request_timeout_sec: float = 1.0,
     stream_buffer_size: int = 8,
-) -> BrokerConnectionConfig:
+) -> object:
     """Build a bounded MT5 connection config from environment-provided settings.
-
-    Env variables are sourced through ``from app.utils import settings``.
-
-    Falls back to offline placeholder credentials when broker credentials are not
-    present so script execution remains deterministic in offline environments.
 
     Returns:
         Bounded non-production MT5 connection configuration.
+
+    Raises:
+        RuntimeError: If verified MT5 demo credentials are unavailable.
     """
-    configured = _workflow_settings()
+    configured = load_broker_provider_settings()
     if (
-        configured.mt5_login is not None
-        and configured.mt5_password is not None
-        and configured.mt5_server is not None
+        not configured.mt5_enabled
+        or configured.mt5_environment != "demo"
+        or configured.mt5_login is None
+        or configured.mt5_password is None
+        or configured.mt5_server is None
     ):
-        credentials: dict[str, SecretStr] = {
-            "login": configured.mt5_login,
-            "password": configured.mt5_password,
-            "server": configured.mt5_server,
-        }
-        account_reference = configured.mt5_login.get_secret_value()
-    else:
-        account_reference = "100001"
-        credentials = {
-            "login": SecretStr(account_reference),
-            "password": SecretStr("offline-placeholder"),
-            "server": SecretStr("Offline-Demo"),
-        }
+        raise RuntimeError("Verified MT5 demo credentials are unavailable")
+    credentials = {
+        "login": configured.mt5_login,
+        "password": configured.mt5_password,
+        "server": configured.mt5_server,
+    }
     if configured.mt5_terminal_path is not None:
         credentials["terminal_path"] = configured.mt5_terminal_path
 
-    return BrokerConnectionConfig(
-        broker_id=BrokerId.MT5,
-        environment=_environment_from_settings(configured.mt5_environment),
+    return build_broker_connection_config(
+        broker_id="mt5",
+        environment="demo",
         provider_enabled=True,
         connect_timeout_sec=connect_timeout_sec,
         request_timeout_sec=request_timeout_sec,
@@ -99,31 +55,45 @@ def build_mt5_connection_config(
         circuit_failure_threshold=2,
         circuit_recovery_timeout_sec=1.0,
         circuit_half_open_max_calls=1,
-        account_reference=account_reference,
+        account_reference=configured.mt5_login.get_secret_value(),
         credentials=credentials,
     )
 
 
-def print_result(label: str, result: StandardResponse[object]) -> None:
-    """Print a bounded result summary for workflow verification."""
-    operation = result.metadata.extensions.get("operation", "unknown")
-    if result.error is not None:
-        print(f"{label}: {operation} -> {result.status} {result.error.code}")
+def print_result(label: str, result: object) -> None:
+    """Print a bounded result summary and substantive payload."""
+    metadata = get_broker_value_field(result, "metadata")
+    operation = get_broker_value_field(metadata, "extensions").get(
+        "operation", "unknown"
+    )
+    error = get_broker_value_field(result, "error")
+    status = get_broker_value_field(result, "status")
+    if error is not None:
+        print(
+            f"{label}: {operation} -> {status} {get_broker_value_field(error, 'code')}"
+        )
     else:
-        print(f"{label}: {operation} -> {result.status}")
+        print(
+            f"{label}: {operation} -> {status} "
+            f"data={get_broker_value_field(result, 'data')!r}"
+        )
 
 
 def print_connection_status(
     label: str,
-    result: StandardResponse[BrokerConnectionStatus],
+    result: object,
 ) -> None:
     """Print one canonical connection status result."""
-    if result.data is None:
-        operation = result.metadata.extensions.get("operation", "unknown")
+    data = get_broker_value_field(result, "data")
+    metadata = get_broker_value_field(result, "metadata")
+    operation = get_broker_value_field(metadata, "extensions").get(
+        "operation", "unknown"
+    )
+    if data is None:
         print(f"{label}: no status payload ({operation})")
         return
-    operation = result.metadata.extensions.get("operation", "unknown")
     print(
-        f"{label}: {operation} -> {result.status} "
-        f"{result.data.state} transport={result.data.transport_connected}"
+        f"{label}: {operation} -> {get_broker_value_field(result, 'status')} "
+        f"{get_broker_value_field(data, 'state')} "
+        f"transport={get_broker_value_field(data, 'transport_connected')}"
     )

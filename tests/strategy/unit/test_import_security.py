@@ -3,7 +3,9 @@
 import ast
 from pathlib import Path
 
-from app.utils import logger
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def test_strategy_has_no_prohibited_direct_imports() -> None:

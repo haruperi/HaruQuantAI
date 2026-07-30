@@ -10,6 +10,7 @@ from app.utils import (
     create_audit_event,
     create_auth_context,
     generate_id,
+    get_audit_event_type,
     redact_mapping_value,
 )
 from pydantic import ValidationError as PydanticValidationError
@@ -83,6 +84,7 @@ def fr_utils_003_contract_validation() -> None:
 
 def main() -> None:
     """Run all shared-contract examples."""
+    print("Audit event runtime type:", get_audit_event_type().__name__)
     fr_utils_001_auth_context()
     fr_utils_002_audit_event()
     fr_utils_003_contract_validation()

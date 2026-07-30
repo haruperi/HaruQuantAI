@@ -1,10 +1,11 @@
 """Strategy-owned persistence migration definitions."""
 
 import hashlib
+from typing import Any
 
 from app.services.data import (
-    MigrationRequest,
-    MigrationStep,
+    build_migration_request,
+    build_migration_step,
     run_domain_migrations,
 )
 from app.services.strategy.contracts.responses import unwrap_data_response
@@ -48,7 +49,7 @@ _STATEMENTS = (
 )
 
 
-def _strategy_migration_steps() -> tuple[MigrationStep, ...]:
+def _strategy_migration_steps() -> tuple[Any, ...]:
     """Return ordered immutable Strategy migration definitions.
 
     Returns:
@@ -57,7 +58,7 @@ def _strategy_migration_steps() -> tuple[MigrationStep, ...]:
     logger.debug("Building Strategy migration definitions")
     material = "\n".join(_STATEMENTS).encode("utf-8")
     return (
-        MigrationStep(
+        build_migration_step(
             domain="strategy",
             migration_id="0001_strategy_domain",
             checksum=hashlib.sha256(material).hexdigest(),
@@ -75,7 +76,7 @@ def _ensure_strategy_storage(request_id: str) -> None:
     logger.info("Ensuring Strategy-owned persistence schema")
     unwrap_data_response(
         run_domain_migrations(
-            MigrationRequest(
+            build_migration_request(
                 domain="strategy",
                 steps=_strategy_migration_steps(),
                 request_id=request_id,

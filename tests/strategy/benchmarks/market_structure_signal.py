@@ -14,7 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.strategy import MarketStructureEvaluator
+from app.services.strategy.evaluators.market_structure import MarketStructureEvaluator
 
 from tests.strategy.unit.test_models import (
     HASH,

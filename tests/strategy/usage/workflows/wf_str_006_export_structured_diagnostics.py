@@ -8,7 +8,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.strategy import export_strategy_diagnostics
-from tests.strategy.unit.test_models import make_context
+from tests.strategy.usage.workflows._support import (
+    current_context,
+    live_bars,
+    print_market_frame,
+)
 
 WORKFLOW_ID = "WF-STR-006"
 STAGES = (
@@ -31,14 +35,22 @@ def main() -> None:
     """Run the documented input-to-output workflow."""
     # Stage 1 — INPUT BOUNDARY: Caller supplies safe facts at the Strategy boundary.
     _stage(1)
-    context = make_context()
-    facts = {"strategy_id": "mean-reversion", "password": "never-print-this"}
+    market = live_bars(limit=12)
+    print_market_frame(market)
+    context = current_context("EVENT_DRIVEN", market=market)
+    facts = {
+        "strategy_id": "mean-reversion",
+        "observed_close": str(market.records[-1].close),
+        "password": "never-print-this",  # pragma: allowlist secret
+    }
     print("Input keys:", tuple(facts))
 
     # Stage 2: Public exporter recursively redacts.
     _stage(2)
     outcome = export_strategy_diagnostics(context, facts)
     print("Export:", outcome.status)
+    if outcome.data is None:
+        raise RuntimeError(f"Diagnostics export failed: {outcome.error}")
 
     # Stage 3: Payload bound is enforced by the fixed context.
     _stage(3)
@@ -46,8 +58,9 @@ def main() -> None:
 
     # Stage 4: Inspect canonical safe evidence.
     _stage(4)
-    safe = outcome.data.safe_details if outcome.data else {}
+    safe = outcome.data.safe_details
     print("Redacted password:", safe.get("password"))
+    print("Safe diagnostics:", outcome.data.model_dump(mode="json"))
 
     # Stage 5 — OUTPUT BOUNDARY: Return typed diagnostics or StandardResponse error.
     _stage(5)

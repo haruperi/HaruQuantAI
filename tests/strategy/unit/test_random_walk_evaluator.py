@@ -1,7 +1,7 @@
 """RandomWalk concrete trigger tests."""
 
-from app.services.strategy import RandomWalkEvaluator
-from app.utils import logger
+from app.services.strategy.evaluators.random_walk import RandomWalkEvaluator
+from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,
@@ -10,6 +10,8 @@ from tests.strategy.unit.test_models import (
     make_signal_config,
     make_signal_evidence,
 )
+
+logger = get_logger(__name__)
 
 
 def test_random_walk_emits_non_random_flat_state_triggers() -> None:

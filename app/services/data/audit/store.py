@@ -10,6 +10,9 @@ This module holds the write half. The authorized read half is ``audit/query.py``
 it does not import this module, so the two halves stay independently testable.
 """
 
+# Audit events are opaque cross-domain Utils values at this private boundary.
+# ruff: noqa: ANN401
+
 from __future__ import annotations
 
 import json
@@ -110,7 +113,7 @@ def _persist_audit_event_raw(event: Any) -> AuditPersistenceResult:
         )
 
     except Exception as error:
-        logger.error("Audit event persistence failed")
+        logger.exception("Audit event persistence failed")
         if isinstance(error, DataError):
             raise
         raise DataError(

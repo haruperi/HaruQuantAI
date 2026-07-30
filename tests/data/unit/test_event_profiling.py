@@ -47,8 +47,6 @@ def test_canonical_profiles_are_registered(
     assert set(profile.countries) == countries
 
 
-
-
 def _unwrap(response):
     return unwrap_data_response(
         response,

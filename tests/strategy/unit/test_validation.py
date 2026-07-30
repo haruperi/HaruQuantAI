@@ -5,18 +5,22 @@ from pathlib import Path
 
 import pytest
 from app.services.strategy import (
-    StrategyConfig,
-    StrategyEnvironment,
-    StrategyRef,
     register_strategy_version,
     validate_strategy_config,
     validate_strategy_ref,
 )
-from app.utils import logger
+from app.services.strategy.contracts import (
+    StrategyConfig,
+    StrategyEnvironment,
+    StrategyRef,
+)
+from app.utils import get_logger
 from pydantic import ValidationError
 
 from tests.strategy.unit.test_catalog import make_registration, storage_context
 from tests.strategy.unit.test_models import COR, REQ, make_auth, make_policy, make_ref
+
+logger = get_logger(__name__)
 
 
 def test_version_constraint_resolves_exactly_one(tmp_path: Path) -> None:

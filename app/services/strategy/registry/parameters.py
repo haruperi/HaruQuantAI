@@ -5,10 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 from app.services.data import (
-    DataError,
-    StatementPlan,
-    TransactionRequest,
+    build_statement_plan,
+    build_transaction_request,
     execute_transaction,
+    is_data_error,
 )
 from app.services.strategy.contracts.outcomes import (
     StrategyMutationResult,
@@ -107,8 +107,8 @@ def update_strategy_parameters(  # noqa: PLR0911
             return success(existing.model_copy(update={"status": "IDEMPOTENT"}))
         unwrap_data_response(
             execute_transaction(
-                TransactionRequest(
-                    plan=StatementPlan(
+                build_transaction_request(
+                    plan=build_statement_plan(
                         statements=(
                             "INSERT OR IGNORE INTO strategy_configs (strategy_id, "
                             "strategy_version, config_hash, config_json, "
@@ -136,8 +136,10 @@ def update_strategy_parameters(  # noqa: PLR0911
             ),
             operation="data.execute_transaction.strategy_parameter_mutation",
         )
-    except DataError:
-        logger.error("Strategy parameter persistence failed")
+    except Exception as error:
+        if not is_data_error(error):
+            raise
+        logger.exception("Strategy parameter persistence failed")
         return failure(
             StrategyErrorCode.INTERNAL_ERROR,
             "strategy parameter persistence failed",

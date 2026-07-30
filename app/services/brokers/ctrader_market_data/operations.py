@@ -1,12 +1,10 @@
-type StandardResponse[T] = (
-    Any  # mypy: disable-error-code="attr-defined,no-any-return,has-type"
-)
+# mypy: disable-error-code="attr-defined"
 """cTrader market-data operations."""
 
 import asyncio
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Any, cast
+from typing import TYPE_CHECKING, cast
 
 from app.services.brokers.contracts import (
     BrokerBar,
@@ -30,6 +28,9 @@ from app.services.brokers.ctrader_session.mapping import (
     _map_ticks,
     _optional,
 )
+
+if TYPE_CHECKING:
+    from app.services.brokers.contracts.responses import StandardResponse
 
 
 class _CTraderMarketDataMixin:

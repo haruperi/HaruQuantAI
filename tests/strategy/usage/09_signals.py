@@ -1,42 +1,45 @@
-"""Executable example of the concrete signal evaluation boundary.
+"""Execute the concrete Strategy signal boundary with genuine MT5 and RSI evidence."""
 
-This program demonstrates the *mechanism* that runs catalogue content: the
-``SignalEvaluator`` structural contract and the hash-bound
-``evaluate_strategy_signals`` boundary, including its fail-closed paths.
-"""
+from __future__ import annotations
 
 import hashlib
 import inspect
 import sys
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import DataError, get_market_data, get_symbol_metadata
+from app.services.data import get_market_data, get_symbol_metadata, to_ohlcv_dataframe
+from app.services.indicators import get_indicator_result_values, rsi
 from app.services.strategy import (
-    SignalEvaluator,
-    StrategyEnvironment,
-    StrategyExecutionContext,
-    StrategyLifecycleStatus,
-    StrategyManifest,
-    StrategySignal,
-    StrategySignalEvidence,
-    StrategyTimingPolicy,
-    StrategyValidationPolicy,
-    ValidatedStrategyConfig,
-    ValidatedStrategyRef,
+    create_strategy_evaluator,
+    create_strategy_execution_context,
+    create_strategy_manifest,
+    create_strategy_signal_evidence,
+    create_strategy_validation_policy,
+    create_validated_strategy_config,
+    create_validated_strategy_ref,
     evaluate_strategy_signals,
+    get_strategy_environment,
+    get_strategy_lifecycle_status,
+    get_strategy_timing_policy,
 )
+from app.utils import canonical_digest
 
 _UNAVAILABLE = 3
-_MODULE = "app.services.strategy.evaluators.naive_ma_trend"
+_EVALUATOR_NAME = "decomposing_trade"
+_MODULE = "app.services.strategy.evaluators.decomposing_trade"
 _STRATEGY = "usage-signal-boundary"
 
 
 def _header(title: str) -> None:
-    """Print one example heading."""
+    """Print one example heading.
+
+    Args:
+        title: Reader-facing heading.
+    """
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
@@ -49,97 +52,88 @@ def fr_str_047() -> None:
 def fr_str_048() -> None:
     """Demonstrate the structural signal evaluator contract."""
     _header("Demonstrate the structural signal evaluator contract.")
-    assert SignalEvaluator
+    assert callable(create_strategy_evaluator)
 
 
-class ConstantSignalEvaluator:
-    """Minimal evaluator satisfying the SignalEvaluator structural contract."""
-
-    def __init__(self, source_hash: str) -> None:
-        """Bind the evaluator to its immutable registry identity.
-
-        Args:
-            source_hash: Approved source, artifact, and dependency hash.
-        """
-        self.strategy_id = _STRATEGY
-        self.strategy_version = "1.0.0"
-        self.module_path = _MODULE
-        self.source_hash = source_hash
-        self.artifact_hash = source_hash
-        self.dependency_hash = source_hash
-
-    def evaluate_signals(self, evidence, indicators, config, context):
-        """Return one explicit inactive signal for the evaluated bar.
-
-        Args:
-            evidence: Point-in-time signal evidence.
-            indicators: Ordered precomputed indicator results.
-            config: Validated immutable configuration.
-            context: Fixed deterministic evaluation context.
-
-        Returns:
-            One deterministic inactive signal.
-        """
-        del indicators, context
-        bar = evidence.primary_market.records[-1]
-        identity = hashlib.sha256(
-            f"{config.config_hash}:{bar.timestamp.isoformat()}:BOUNDARY_DEMO".encode()
-        ).hexdigest()
-        return (
-            StrategySignal(
-                signal_id=identity,
-                strategy_id=self.strategy_id,
-                strategy_version=self.strategy_version,
-                symbol=evidence.primary_market.symbol,
-                timestamp=bar.timestamp,
-                signal_name="BOUNDARY_DEMO",
-                side=None,
-                active=False,
-                facts={"close": str(bar.close)},
-                lineage={"config_hash": config.config_hash},
-            ),
-        )
-
-
-def main() -> int:
-    """Run one evaluator through the boundary and show its fail-closed path.
+def _source_hash() -> str:
+    """Hash the concrete evaluator source selected through the public factory.
 
     Returns:
-        ``0`` on success, or ``3`` when real MT5 evidence is unavailable.
+        SHA-256 hash of the actual registered evaluator source.
+    """
+    probe = create_strategy_evaluator(
+        _EVALUATOR_NAME,
+        strategy_id=_STRATEGY,
+        strategy_version="1.0.0",
+        module_path=_MODULE,
+        source_hash="0" * 64,
+        artifact_hash="0" * 64,
+        dependency_hash="0" * 64,
+    )
+    return hashlib.sha256(inspect.getsource(type(probe)).encode()).hexdigest()
+
+
+def main() -> int:  # noqa: PLR0911
+    """Evaluate real RSI evidence and show the hash-binding failure path.
+
+    Returns:
+        ``0`` on success, ``3`` when genuine provider evidence is unavailable,
+        otherwise ``1`` for a Strategy functional failure.
     """
     fr_str_047()
     fr_str_048()
-    print("\nCONCRETE SIGNAL EVALUATION BOUNDARY")
+    print("\nCONCRETE SIGNAL EVALUATION — GENUINE MT5 EURUSD H1 + RSI")
+    request_end = datetime.now(UTC) - timedelta(hours=2)
     try:
         market_response = get_market_data(
             source_id="mt5",
             symbol="EURUSD",
             timeframe="H1",
-            limit=100,
+            start=request_end - timedelta(days=30),
+            end=request_end,
+            limit=300,
             use_cache=False,
             quality_failure_behavior="warn",
         )
         metadata_response = get_symbol_metadata(source_id="mt5", symbol="EURUSD")
-    except DataError as error:
-        print("Live MT5 evidence unavailable:", error.code)
+    except (OSError, RuntimeError, ValueError) as error:
+        print("Genuine MT5 evidence unavailable:", type(error).__name__)
         return _UNAVAILABLE
-    if market_response.status != "success" or market_response.data is None:
-        print("Live MT5 data unavailable:", market_response.error)
-        return _UNAVAILABLE
-    if metadata_response.status != "success" or metadata_response.data is None:
-        print("MT5 metadata unavailable:", metadata_response.error)
+    if market_response.data is None or metadata_response.data is None:
+        print(
+            "Genuine MT5 evidence unavailable:",
+            market_response.error or metadata_response.error,
+        )
         return _UNAVAILABLE
     market = market_response.data
     metadata = metadata_response.data
-    if not isinstance(metadata.point, int | float):
-        print("MT5 point-size evidence unavailable:", metadata.point)
-        return _UNAVAILABLE
+    frame_response = to_ohlcv_dataframe(market)
+    if frame_response.data is None:
+        print("MT5 frame projection failed:", frame_response.error)
+        return 1
+    print("\nGenuine input bars:")
+    print(frame_response.data.tail(10).to_string())
 
-    source_hash = hashlib.sha256(
-        inspect.getsource(ConstantSignalEvaluator).encode()
-    ).hexdigest()
-    evaluator: SignalEvaluator = ConstantSignalEvaluator(source_hash)
-    policy = StrategyValidationPolicy(
+    indicator_response = rsi(market, period=14)
+    if indicator_response.data is None:
+        print("Official RSI calculation failed:", indicator_response.error)
+        return 1
+    indicator = indicator_response.data
+    print("\nOfficial RSI evidence:")
+    print(
+        get_indicator_result_values(indicator)[["rsi_14", "available_at"]]
+        .tail(10)
+        .to_string()
+    )
+
+    source_hash = _source_hash()
+    config_parameters = {
+        "rsi_period": 14,
+        "overbought": "70",
+        "oversold": "30",
+    }
+    config_hash = canonical_digest(config_parameters)
+    policy = create_strategy_validation_policy(
         policy_version="usage-v1",
         approved_module_roots=("app.services.strategy.evaluators",),
         max_config_payload_bytes=4_096,
@@ -147,10 +141,10 @@ def main() -> int:
         max_config_string_length=128,
         max_config_collection_items=64,
     )
-    context = StrategyExecutionContext(
-        environment=StrategyEnvironment.RESEARCH,
-        decision_timestamp=datetime.now(UTC),
-        timing_policy=StrategyTimingPolicy.BAR_OPEN_PREVIOUS_CLOSE,
+    context = create_strategy_execution_context(
+        environment=get_strategy_environment("RESEARCH"),
+        decision_timestamp=market.available_at + timedelta(seconds=1),
+        timing_policy=get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE"),
         seed=29,
         interface_version="v1",
         request_id="strategy-usage-signals",
@@ -160,7 +154,7 @@ def main() -> int:
         snapshot_refs=(market.request_id,),
         max_diagnostic_bytes=8_192,
     )
-    manifest = StrategyManifest(
+    manifest = create_strategy_manifest(
         strategy_id=_STRATEGY,
         strategy_version="1.0.0",
         module_path=_MODULE,
@@ -169,7 +163,7 @@ def main() -> int:
         config_schema_version="v1",
         config_schema={"type": "object"},
         required_data=("EURUSD:H1",),
-        required_indicators=(),
+        required_indicators=("rsi",),
         timing_policy=context.timing_policy,
         permitted_environments=(context.environment,),
         source_hash=source_hash,
@@ -184,9 +178,9 @@ def main() -> int:
         max_local_state_bytes=8_192,
         decision_timeout_seconds=5,
     )
-    ref = ValidatedStrategyRef(
+    ref = create_validated_strategy_ref(
         manifest=manifest,
-        lifecycle_status=StrategyLifecycleStatus.APPROVED,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
         environment=context.environment,
         policy_version=policy.policy_version,
         validation_policy=policy,
@@ -194,16 +188,16 @@ def main() -> int:
         request_id=context.request_id,
         correlation_id=context.correlation_id,
     )
-    config = ValidatedStrategyConfig(
+    config = create_validated_strategy_config(
         strategy_id=_STRATEGY,
         strategy_version="1.0.0",
         config_schema_version="v1",
-        normalized_parameters={"demo": True},
-        config_hash=source_hash,
+        normalized_parameters=config_parameters,
+        config_hash=config_hash,
         policy_version=policy.policy_version,
         request_id=context.request_id,
     )
-    evidence = StrategySignalEvidence(
+    evidence = create_strategy_signal_evidence(
         evidence_id=hashlib.sha256(
             f"{market.request_id}:{market.available_at.isoformat()}".encode()
         ).hexdigest(),
@@ -215,25 +209,59 @@ def main() -> int:
         feature_refs={},
         active_position_tags=(),
     )
+    evaluator = create_strategy_evaluator(
+        _EVALUATOR_NAME,
+        strategy_id=_STRATEGY,
+        strategy_version="1.0.0",
+        module_path=_MODULE,
+        source_hash=source_hash,
+        artifact_hash=source_hash,
+        dependency_hash=source_hash,
+    )
 
-    print("\n-- Registry-bound execution --")
-    outcome = evaluate_strategy_signals(ref, config, evidence, (), context, evaluator)
+    print("\n-- Registry-bound concrete execution --")
+    outcome = evaluate_strategy_signals(
+        ref,
+        config,
+        evidence,
+        (indicator,),
+        context,
+        evaluator,
+    )
     if outcome.data is None:
-        print("Boundary rejected the evaluation:", outcome.error)
-        return _UNAVAILABLE
+        print("Boundary rejected genuine evidence:", outcome.error)
+        return 1
     for signal in outcome.data:
-        print(
-            f"  {signal.signal_name}: active={signal.active} "
-            f"side={signal.side} id={signal.signal_id[:16]}"
-        )
-    print("Evaluated bar:", market.records[-1].timestamp)
+        print(signal.model_dump(mode="json"))
 
     print("\n-- Hash binding fails closed --")
-    unbound = ConstantSignalEvaluator("0" * 64)
-    rejected = evaluate_strategy_signals(ref, config, evidence, (), context, unbound)
-    print("Status:", rejected.status)
-    if rejected.error is not None:
-        print("Error code:", rejected.error.code)
+    unbound = create_strategy_evaluator(
+        _EVALUATOR_NAME,
+        strategy_id=_STRATEGY,
+        strategy_version="1.0.0",
+        module_path=_MODULE,
+        source_hash="0" * 64,
+        artifact_hash="0" * 64,
+        dependency_hash="0" * 64,
+    )
+    rejected = evaluate_strategy_signals(
+        ref,
+        config,
+        evidence,
+        (indicator,),
+        context,
+        unbound,
+    )
+    print(
+        "Rejected:",
+        rejected.status,
+        rejected.error.code if rejected.error else None,
+    )
+    if (
+        rejected.error is None
+        or rejected.error.code != "STRATEGY_ARTIFACT_HASH_MISMATCH"
+    ):
+        return 1
     print("\nSignals are evidence only; they authorize no execution.")
     return 0
 
