@@ -199,8 +199,28 @@
   every reference is a content digest re-verified against the store, and an
   outcome reporting any attempted side effect is rejected. Quarantine records a
   decision; changing a role's registered state remains a governance manifest
-  re-issue.
-  `FEAT-AGT-09`, `10`, and `22`–`22` remain `Missing`.
+  re-issue. `FEAT-AGT-22` closes the boundary with eight authenticated operator
+  operations over a frozen dependency record in which every port is a required
+  field, so a partially wired firm cannot be invoked at all. Every answer is a
+  mapping of bounded strings rather than a domain object, which is what makes
+  "no prompts, credentials, or provider internals" structural: there is no
+  nested value a `ModelProfile` or an `AgentProvenance` could travel inside,
+  and a forbidden-key rule closes the text route. Failures are mapped rather
+  than raised, so no provider or receiver exception crosses the boundary.
+  Disablement is checked before authentication for anything that creates or
+  changes work, drains or cancels active runs by policy, writes over nothing,
+  and leaves reads available so an operator can still learn why the firm
+  stopped. Its safety-equivalence clause holds structurally: a test over every
+  file in `app/agentic` asserts the domain names no kill-switch operation, no
+  risk approval, no live gate, no order dispatch, and no broker SDK, so
+  disabling a package that never held safety authority cannot weaken safety.
+  `WF-AGT-005`'s planned `open_sandbox` and `stage_code_artifact` are
+  deliberately not exported, because no isolation runtime exists to open.
+  `FEAT-AGT-09` and `10` remain `Missing`, blocked on `FEAT-DATA-16` and
+  `FEAT-RES-13`. Twenty of the twenty-two features are implemented, and none of
+  it has run for real: no live provider call, no bound sandbox runtime, no
+  durable store, no evaluated role, no promoted artefact, no reviewed advisory,
+  no evaluated proposal.
   Google ADK 2.x is adopted behind a scoped `requests` override, documented in
   `pyproject.toml` with the condition for its removal. Its hybrid layout keeps ten shared control-plane features as focused root packages and places twelve role-bearing features under registered `agents/<department>/<agent_name>/` leaf packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, feature schemas, and only specification-required optional files. Specialized leadership, market-intelligence, technical, quantitative, strategy/trader, experimentation, engineering, portfolio/risk-advisory, and operations roles may dynamically collaborate, simulate, optimize, code, and submit typed proposals. Google ADK 2.x is the selected runtime behind provider-neutral HaruQuantAI contracts. Agentic has no broker credential, direct broker route, risk approval, kill-switch authority, or execution authority; consequential proposals traverse the normal deterministic pipeline.
 * `app/utils/` is a partial implementation baseline for shared v1 contracts,

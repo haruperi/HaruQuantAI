@@ -314,8 +314,9 @@ Domains are listed in dependency order, from lowest dependency to highest depend
   and economic acceptance, `FEAT-AGT-18` artefact promotion with an
   append-only lifecycle ledger, `FEAT-AGT-19` non-binding portfolio and
   risk advisory, `FEAT-AGT-20` trade proposal handoff into Strategy's own
-  external-proposal intake, and `FEAT-AGT-21` correlated traces with
-  deterministic incident containment. `FEAT-AGT-03` runtime is `Completed`:
+  external-proposal intake, `FEAT-AGT-21` correlated traces with
+  deterministic incident containment, and `FEAT-AGT-22` the authenticated
+  operator boundary. `FEAT-AGT-03` runtime is `Completed`:
   provider-neutral model profiles, governed invocation, upgrade gating, and the
   Google ADK 2.x binding all exist behind the agent-graph port. The binding is
   structurally verified; no live provider call has been made, no backtest has
@@ -340,11 +341,19 @@ Domains are listed in dependency order, from lowest dependency to highest depend
   than a misleadingly complete one, but nothing there can make a call site emit
   its span. Its quarantine records a decision rather than mutating a role, its
   replay is validated and never executed, and no incident has occurred outside
-  tests. `FEAT-AGT-09`,
-  `10`, and `22`
-  remain `Missing`, so two agent roles and the operator
-  API are unavailable and no Agentic system workflow is complete. `FEAT-AGT-09`
-  and `10` stay blocked on `FEAT-DATA-16` and `FEAT-RES-13`.
+  tests. `FEAT-AGT-22` closes the boundary — eight authenticated operator
+  operations over an explicit dependency record, every answer a mapping of
+  bounded strings so no prompt, credential, or provider name has anywhere to
+  travel, and disablement that rejects new work while leaving reads available —
+  but it deliberately exports neither `open_sandbox` nor
+  `stage_code_artifact`, because no isolation runtime exists to open. **Twenty
+  of twenty-two features are implemented, and the domain has never run for
+  real:** no live provider call, no bound sandbox, no durable store anywhere,
+  no role evaluated, no artefact promoted, no advisory reviewed, no proposal
+  evaluated, no incident outside tests. `FEAT-AGT-09` and
+  `10`
+  remain `Missing`, so two agent roles are unavailable and no Agentic system
+  workflow is complete; both stay blocked on `FEAT-DATA-16` and `FEAT-RES-13`.
 * **Documentation**: `app/agentic/README.md`
 
 #### 2.1.14 UI/API

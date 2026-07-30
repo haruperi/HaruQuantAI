@@ -247,7 +247,7 @@ order below is the binding implementation order.
 | Completed | `FEAT-AGT-19` Portfolio and Risk Advisory                       | `agents/portfolio_risk_advisory/portfolio_risk_advisor/` | `AllocationProposal`, `RiskAdvisory`, `advise_portfolio`, `critique_risk`                                   | `FR-AGENTIC-055`–`057` | `tests/agentic/usage/19_advisory.py`        |
 | Completed | `FEAT-AGT-20` Trade Proposal Handoff                            | `agents/strategy_desk/trader/`                           | `TradeProposal`, `TradeProposalReceipt`, `submit_trade_proposal`                                            | `FR-AGENTIC-058`–`060` | `tests/agentic/usage/20_trade_proposals.py` |
 | Completed | `FEAT-AGT-21` Observability, Incidents, and Operational Control | `operations/`      | `AgenticTrace`, `IncidentRecord`, `ReplayRequest`, `get_run_trace`, `quarantine_agent`, `replay_run`                  | `FR-AGENTIC-061`–`063` | `tests/agentic/usage/21_operations.py`      |
-| Missing | `FEAT-AGT-22` Public Agentic API and Operator Control           | `public_api/`      | `AgenticDependencies`, `submit_firm_request`, `get_firm_run`, `approve_agentic_handoff`                                   | `FR-AGENTIC-064`–`066` | `tests/agentic/usage/22_public_api.py`      |
+| Completed | `FEAT-AGT-22` Public Agentic API and Operator Control           | `public_api/`      | `AgenticDependencies`, `submit_firm_request`, `get_firm_run`, `approve_agentic_handoff`                                   | `FR-AGENTIC-064`–`066` | `tests/agentic/usage/22_public_api.py`      |
 
 ```text
 app/agentic/
@@ -680,6 +680,15 @@ Exhausted search budget or holdout misuse is terminal.
    `utils.canonical_digest()`.
 5. Stage the artefact; no code is hot-loaded —
    `agentic.stage_code_artifact()` *(planned)*.
+
+**Status: `Missing`.** `FEAT-AGT-16` implements steps 1, 3, 4, and 5 inside
+`author_code_artifact`, which stages every file itself. Step 2 has no
+implementation and `FEAT-AGT-22` did not add one: `open_sandbox` and
+`stage_code_artifact` are not exported at the package root, because no
+isolation runtime exists to open and a function that could not do what its name
+promises would be worse than the gap. The workflow completes when a composition
+root binds a runtime that is genuinely ephemeral, credential-free, and
+network-denied.
 
 **Integration test:** `tests/agentic/integration/test_code_artifact.py`
 
@@ -1377,15 +1386,35 @@ make it otherwise.
 
 | Status  | File                | Responsibility                                            | Key exports                                                            | Dependencies                                                                                                                                                                                         |
 | ------- | ------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Missing | `dependencies.py` | Define explicit typed composition dependencies            | `AgenticDependencies`                                                | **Standard library:** `collections.abc`; **Required third-party:** None; **Local:** all Agentic public feature APIs                                                              |
-| Missing | `service.py`      | Expose authenticated typed Agentic application operations | `submit_firm_request`, `get_firm_run`, `approve_agentic_handoff` | **Standard library:** None; **Required third-party:** None; **Local:** dependencies, orchestration, permissions, operations, lifecycle, portfolio-risk advisor, trader, Utils contracts |
-| Missing | `__init__.py`     | Expose the supported package API only                     | Registered Agentic public API                                          | **Standard library:** None; **Required third-party:** None; **Local:** `service.py`, public contracts                                                                            |
+| Completed | `dependencies.py` | Define explicit typed composition dependencies            | `AgenticDependencies`, `AuthenticatedPrincipal`, `build_agentic_dependencies` | **Standard library:** `dataclasses`; **Required third-party:** None; **Local:** the store ports and policy contracts of every implemented feature |
+| Completed | `service.py`      | Expose authenticated typed Agentic application operations | `submit_firm_request`, `get_firm_run`, `cancel_firm_run`, `approve_agentic_handoff`, `replay_firm_run`, `quarantine_firm_agent`, `get_firm_audit`, `disable_agentic` | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** dependencies, contracts, orchestration, lifecycle, operations, Utils |
+| Completed | `README.md`       | Document the boundary, the operator surface, and what is deliberately absent | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
+| Completed | `__init__.py`     | Expose the supported package API only                     | Registered Agentic public API                                          | **Standard library:** None; **Required third-party:** None; **Local:** `dependencies.py`, `service.py`                                                                            |
+
+`FR-AGENTIC-065` names seven operator operations; the key-exports column above
+names three. The column is a subset of the requirement, not a cap on it, so all
+seven are implemented alongside `disable_agentic` for `FR-AGENTIC-066`.
+
+**Two planned root exports are deliberately absent.** `WF-AGT-005` names
+`agentic.open_sandbox()` and `agentic.stage_code_artifact()`; neither is
+exported, because no isolation runtime exists to open and a function that could
+not do what its name promises would be worse than the gap. `FEAT-AGT-09` and
+`FEAT-AGT-10` are unimplemented, so no fundamental or sentiment operation
+appears on the root either. A test asserts all four names are absent.
 
 | Status  | Requirement ID     | Responsibility                                                                                                                                                              | Side effects                       | Failure / Verification                   |
 | ------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ---------------------------------------- |
-| Missing | `FR-AGENTIC-064` | Public operations shall require`AuthContext`, explicit dependencies, request/correlation IDs, bounded inputs, and stable mapped failures.                                 | Depends on operation               | Signature and envelope tests             |
-| Missing | `FR-AGENTIC-065` | Operator APIs shall expose submit, inspect, cancel, approve-handoff, replay, quarantine, and audit operations without exposing prompts, credentials, or provider internals. | Governed state change/read         | Public API and redaction tests           |
-| Missing | `FR-AGENTIC-066` | Package disablement shall reject new work, cancel or safely drain active work by policy, preserve audit evidence, and leave deterministic safety controls available.        | Cancellation/drain and persistence | Disablement and safety-equivalence tests |
+| Completed | `FR-AGENTIC-064` | Public operations shall require`AuthContext`, explicit dependencies, request/correlation IDs, bounded inputs, and stable mapped failures.                                 | Depends on operation               | Signature and envelope tests             |
+| Completed | `FR-AGENTIC-065` | Operator APIs shall expose submit, inspect, cancel, approve-handoff, replay, quarantine, and audit operations without exposing prompts, credentials, or provider internals. | Governed state change/read         | Public API and redaction tests           |
+| Completed | `FR-AGENTIC-066` | Package disablement shall reject new work, cancel or safely drain active work by policy, preserve audit evidence, and leave deterministic safety controls available.        | Cancellation/drain; no persistence write | Disablement and safety-equivalence tests |
+
+`FR-AGENTIC-066`'s safety-equivalence clause holds for a structural reason:
+Agentic never held a deterministic safety control to surrender. An integration
+test asserts over every `.py` file in `app/agentic` that the domain names no
+kill-switch operation, no risk approval, no live gate, no order dispatch, and
+no broker SDK. Disablement itself writes nothing — the audit and operations
+stores are untouched, and a test asserts the record count is identical before
+and after.
 
 ### Feature usage examples
 
