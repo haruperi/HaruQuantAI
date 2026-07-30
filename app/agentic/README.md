@@ -149,7 +149,7 @@ recovery rules. Other domains read through Agentic public contracts.
 | Partial | Experiment store: hypotheses, protocols, trials, holdout consumption, results     | Agentic lifecycle and bounded operator views    | `agents/experimentation/experiment_designer/migrations.py` |
 | Partial | Artefact store: generated files, SBOM, signatures, promotion packets              | Agentic lifecycle and approved receiver handoff | `agents/engineering/coder/artifact_store.py`; no direct table requirement |
 | Partial | Lifecycle ledger: append-only artefact transitions and assembled promotion packets | Agentic and bounded operator views              | `lifecycle/migrations.py`                                 |
-| Missing | Operational audit store: model/tool calls, policy decisions, approvals, incidents | Protected Agentic/UI/API audit operations       | `operations/migrations.py`                              |
+| Partial | Operational audit store: model/tool calls, policy decisions, approvals, incidents | Protected Agentic/UI/API audit operations       | `operations/migrations.py`; call and approval records are written by `context_memory/migrations.py` |
 | Missing | Working-memory store: bounded task summaries and temporary coordination state     | Current task only                               | `context_memory/migrations.py`                          |
 
 Evidence, experiment, and audit facts are append-only. Corrections create new
@@ -246,7 +246,7 @@ order below is the binding implementation order.
 | Completed | `FEAT-AGT-18` Artefact Promotion and Lifecycle                  | `lifecycle/`       | `PromotionEvidencePacket`, `LifecycleRecord`, `assess_promotion`, `transition_artifact`                                   | `FR-AGENTIC-052`–`054` | `tests/agentic/usage/18_lifecycle.py`       |
 | Completed | `FEAT-AGT-19` Portfolio and Risk Advisory                       | `agents/portfolio_risk_advisory/portfolio_risk_advisor/` | `AllocationProposal`, `RiskAdvisory`, `advise_portfolio`, `critique_risk`                                   | `FR-AGENTIC-055`–`057` | `tests/agentic/usage/19_advisory.py`        |
 | Completed | `FEAT-AGT-20` Trade Proposal Handoff                            | `agents/strategy_desk/trader/`                           | `TradeProposal`, `TradeProposalReceipt`, `submit_trade_proposal`                                            | `FR-AGENTIC-058`–`060` | `tests/agentic/usage/20_trade_proposals.py` |
-| Missing | `FEAT-AGT-21` Observability, Incidents, and Operational Control | `operations/`      | `AgenticTrace`, `IncidentRecord`, `ReplayRequest`, `get_run_trace`, `quarantine_agent`, `replay_run`                  | `FR-AGENTIC-061`–`063` | `tests/agentic/usage/21_operations.py`      |
+| Completed | `FEAT-AGT-21` Observability, Incidents, and Operational Control | `operations/`      | `AgenticTrace`, `IncidentRecord`, `ReplayRequest`, `get_run_trace`, `quarantine_agent`, `replay_run`                  | `FR-AGENTIC-061`–`063` | `tests/agentic/usage/21_operations.py`      |
 | Missing | `FEAT-AGT-22` Public Agentic API and Operator Control           | `public_api/`      | `AgenticDependencies`, `submit_firm_request`, `get_firm_run`, `approve_agentic_handoff`                                   | `FR-AGENTIC-064`–`066` | `tests/agentic/usage/22_public_api.py`      |
 
 ```text
@@ -804,6 +804,17 @@ Failed compatibility or silent/floating substitution is refused.
 
 Terminal work cannot resume under the same task identity.
 
+**Status: `Partial`.** `FEAT-AGT-21` implements steps 1 through 4 under its own
+names: `classify_incident` and `quarantine_task` became the single governed
+`quarantine_agent`, which derives containment from the kind, cancels through
+the normal `FEAT-AGT-04` path, and records the incident with its checkpoint and
+evidence preserved. Step 5 is **validated, not executed**: `replay_run` proves
+every reference still carries its recorded digest and returns an outcome
+reporting nothing ran, because re-executing a workflow needs the orchestration
+executor and a bound runtime a composition root owns. The workflow row also
+names `FR-AGENTIC-066`, which is `FEAT-AGT-22`'s, so the workflow stays
+`Missing`.
+
 **Integration test:** `tests/agentic/integration/test_incident_recovery.py`
 
 ### `WF-AGT-011` — Governed Memory Write and Retrieval
@@ -1330,17 +1341,37 @@ is no receipt store in the §4.20 file list and no table for one;
 
 | Status  | File              | Responsibility                                            | Key exports                                             | Dependencies                                                                                                                             |
 | ------- | ----------------- | --------------------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Missing | `models.py`     | Define traces, incidents, and replay requests             | `AgenticTrace`, `IncidentRecord`, `ReplayRequest` | **Standard library:** `datetime`; **Required third-party:** `pydantic`; **Local:** contracts                       |
-| Missing | `migrations.py` | Define operations/audit-store migrations                  | Internal only; no public export                         | **Standard library:** None; **Required third-party:** None; **Local:** Data migration protocol                         |
-| Missing | `repository.py` | Persist redacted operational and incident evidence        | Internal only; no public export                         | **Standard library:** `collections.abc`; **Required third-party:** None; **Local:** `models.py`, `migrations.py` |
-| Missing | `service.py`    | Inspect traces, quarantine roles, and run isolated replay | `get_run_trace`, `quarantine_agent`, `replay_run` | **Standard library:** None; **Required third-party:** None; **Local:** orchestration, repository, governance           |
-| Missing | `__init__.py`   | Expose the operations API                                 | Registered exports above                                | **Standard library:** None; **Required third-party:** None; **Local:** operations files                                |
+| Completed | `models.py`     | Define traces, incidents, replay requests, and the containment table | `AgenticTrace`, `IncidentRecord`, `ReplayRequest`, `ReplayOutcome`, `required_containment` | **Standard library:** `decimal`, `types`; **Required third-party:** `pydantic`; **Local:** utils |
+| Completed | `migrations.py` | Define operations/audit-store migrations                  | `get_operations_migration_statements`, `build_operations_migration_request` | **Standard library:** `hashlib`; **Required third-party:** None; **Local:** Data migration protocol                         |
+| Completed | `repository.py` | Persist redacted operational and incident evidence        | `AgenticOperationsStore`, `build_in_memory_operations_store` | **Standard library:** None; **Required third-party:** None; **Local:** `models.py` |
+| Completed | `service.py`    | Inspect traces, quarantine roles, and run isolated replay | `get_run_trace`, `quarantine_agent`, `replay_run` | **Standard library:** `decimal`; **Required third-party:** None; **Local:** orchestration, context memory, `models.py`, `repository.py` |
+| Completed | `README.md`     | Document the feature boundary, API, containment, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
+| Completed | `__init__.py`   | Expose the operations API                                 | Registered exports above                                | **Standard library:** None; **Required third-party:** None; **Local:** operations files                                |
+
+This package registers no role. It has no `prompt.md`, no `agent.py`, and
+invokes no model: classifying an incident and containing it must be
+deterministic, and a model here would be a place to argue that an incident was
+not one.
+
+It also defines no redactor. `FEAT-AGT-06` redacts at the memory boundary, and
+a trace inherits both the redacted content and the paths that were removed; a
+test asserts this package names `redact_mapping_value`, `redact_text_value`,
+and `RedactionPolicy` nowhere.
 
 | Status  | Requirement ID     | Responsibility                                                                                                                                                             | Side effects                               | Failure / Verification                 |
 | ------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | -------------------------------------- |
-| Missing | `FR-AGENTIC-061` | Every workflow, agent, model, tool, handoff, guardrail, approval, state transition, cost, and failure shall emit correlated redacted telemetry.                            | Audit/telemetry publication                | Trace-completeness and redaction tests |
-| Missing | `FR-AGENTIC-062` | Injection, privilege, data-poisoning, schema, drift, cost, runaway-loop, provider, or sandbox incidents shall trigger deterministic containment and evidence preservation. | Cancellation/quarantine; persistence write | Incident-containment tests             |
-| Missing | `FR-AGENTIC-063` | Replay shall use immutable references and an isolated environment and shall never repeat external side effects.                                                            | Isolated replay task                       | Side-effect and reference tests        |
+| Completed | `FR-AGENTIC-061` | Every workflow, agent, model, tool, handoff, guardrail, approval, state transition, cost, and failure shall emit correlated redacted telemetry.                            | Persistence read; optional trace write     | Trace-completeness and redaction tests |
+| Completed | `FR-AGENTIC-062` | Injection, privilege, data-poisoning, schema, drift, cost, runaway-loop, provider, or sandbox incidents shall trigger deterministic containment and evidence preservation. | Cancellation; persistence write            | Incident-containment tests             |
+| Completed | `FR-AGENTIC-063` | Replay shall use immutable references and an isolated environment and shall never repeat external side effects.                                                            | Persistence write; no execution            | Side-effect and reference tests        |
+
+Two side-effect columns are narrower than the canonical rows state.
+`FR-AGENTIC-061` publishes no telemetry: it reads the audit store the firm
+already writes to and returns a typed trace, optionally saving it. And
+`FR-AGENTIC-062`'s quarantine records a decision rather than mutating a role —
+governance exposes no role-state mutation path, the same wall `FEAT-AGT-17`
+documented for `disable` and `retire`. `FR-AGENTIC-063` validates a replay and
+executes nothing; `ReplayOutcome.executed` is `False` because no path here can
+make it otherwise.
 
 ### 4.22 `public_api/` — Public Agentic API and Operator Control
 

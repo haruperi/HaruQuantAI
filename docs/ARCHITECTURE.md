@@ -182,7 +182,25 @@
   "no privileged route" structural. A receipt carries Strategy's own status
   enumeration verbatim — the most favourable being `accepted_for_evaluation` —
   and records a produced intent by identity alone, never by content.
-  `FEAT-AGT-09`, `10`, and `21`–`22` remain `Missing`.
+  `FEAT-AGT-21` makes observability and containment deterministic rather than
+  best-effort: a trace covers all ten required span kinds by set equality or
+  does not exist, so a run whose emitters stayed silent produces a refusal
+  instead of a partial view that reads as complete, and an unlabelled or
+  invented span never widens the contract. Redaction is inherited from the
+  `FEAT-AGT-06` memory boundary and defined nowhere in the package, so the firm
+  keeps one answer to what counts as a secret. Containment is a property of the
+  incident kind through a fixed table rather than a judgement at the call site,
+  applied through the normal cancellation path; a record whose action disagrees
+  with its kind, a quarantine naming no role, a cancel naming one, or any
+  containment without preserved evidence and a checkpoint are all
+  unrepresentable, and one classified incident per kind per correlated run is
+  enforced in the double and by a unique constraint in the durable table.
+  Replay is isolated by the type — the environment is a literal `sandbox`,
+  every reference is a content digest re-verified against the store, and an
+  outcome reporting any attempted side effect is rejected. Quarantine records a
+  decision; changing a role's registered state remains a governance manifest
+  re-issue.
+  `FEAT-AGT-09`, `10`, and `22`–`22` remain `Missing`.
   Google ADK 2.x is adopted behind a scoped `requests` override, documented in
   `pyproject.toml` with the condition for its removal. Its hybrid layout keeps ten shared control-plane features as focused root packages and places twelve role-bearing features under registered `agents/<department>/<agent_name>/` leaf packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, feature schemas, and only specification-required optional files. Specialized leadership, market-intelligence, technical, quantitative, strategy/trader, experimentation, engineering, portfolio/risk-advisory, and operations roles may dynamically collaborate, simulate, optimize, code, and submit typed proposals. Google ADK 2.x is the selected runtime behind provider-neutral HaruQuantAI contracts. Agentic has no broker credential, direct broker route, risk approval, kill-switch authority, or execution authority; consequential proposals traverse the normal deterministic pipeline.
 * `app/utils/` is a partial implementation baseline for shared v1 contracts,
@@ -236,9 +254,9 @@
   reporting. Its status is `Partial`: kill-switch clearance must require a distinct
   authorized attestation principal, while the current implementation still requires
   the same principal.
-* `app/services/trading/` is a partial implementation baseline across all 64
+* `app/services/trading/` is a completed implementation baseline across all 64
   functional and eight non-functional requirements, nine capability modules, and all
-  fourteen documented workflows. It owns `OrderIntent v1`, `ExecutionReceipt v1`,
+  sixteen documented workflows. It owns `OrderIntent v1`, `ExecutionReceipt v1`,
   `TradeRecord v1`, and `OperationalEvent v1`. Production live mutation remains
   disabled by default.
 * Later agile phases reuse these completed domains and run compatibility/regression

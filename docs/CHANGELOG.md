@@ -10,7 +10,7 @@ The three audited domains now expose function-only package roots, focused tests 
 
 - Completed Strategy `FEAT-STR-11` external proposal evaluation plus `WF-STR-011` approved Optimization-result adoption and `WF-STR-012` research-only signal evaluation, without importing or changing the upstream Optimization, Simulator, Analytics, or Research domains.
 
-#### Changed (6)
+#### Changed (7)
 
 - Added the opaque `load_broker_provider_settings` function and Brokers-owned `resolve_provider_connection_config`/`create_connected_broker` operations so no settings class or connection DTO crosses a public package boundary.
 - Rewrote the Data composition root `_LazyBrokerSession` to resolve MT5, cTrader, and credential-free providers through the Brokers resolver and removed its private `_ProviderRuntimeSettings`, so Data no longer resolves credentials or builds connection configurations.
@@ -18,6 +18,7 @@ The three audited domains now expose function-only package roots, focused tests 
 - Marked `FEAT-DATA-11` and `FR-DATA-095`–`099`/`123`–`129` Pending because the repository has no licensed real economic-calendar transport; the usage now reports `SOURCE_UNAVAILABLE` instead of using `DemonstrationTransport`.
 - Reworked every Indicators feature usage and the active workflow evidence to print bounded MT5-derived OHLCV and calculated DataFrames, and added direct subprocess coverage for `WF-INDI-006` through `WF-INDI-008`.
 - Refactored Risk to a 63-function package-root boundary, migrated direct consumers away from public classes/constants and deep imports, and completed all fifteen registered Risk workflows with substantive bounded evidence.
+- Refactored Trading to a function-only package-root boundary, migrated direct consumers, completed `WF-TRD-015` and `WF-TRD-016`, and raised every Trading production file above the 80% branch-aware coverage floor.
 
 #### Fixed (9)
 
@@ -30,6 +31,14 @@ The three audited domains now expose function-only package roots, focused tests 
 - Fixed Indicators response handling, private Data structural typing, workflow configuration construction, and validation/error branch coverage so the focused suite passes with every Indicators production file above the 80% floor.
 - Fixed Strategy response unwrapping, function-only contract/evaluator construction, deterministic checkpoint/configuration failures, and real MT5-backed usage evidence so all ten implemented workflows pass and every Strategy production file exceeds 80% branch coverage.
 - Fixed Risk YAML profile coercion for tuple, enum, loss-basis, hash-compatibility, and crisis-window fields; focused validation now passes 187 tests at 85.4% branch-aware coverage with every Risk production file above 80%.
+
+### Add observability, incidents, and operational control
+
+The Agentic firm can now show what a run did, stop what has gone wrong the same way whoever noticed, and re-examine a run without letting it act again.
+
+#### Added (1)
+
+- `FEAT-AGT-21` Observability, Incidents, and Operational Control: a trace covers all ten required span kinds validated by set equality or does not exist, so a run whose emitters stayed silent produces a refusal naming the missing spans rather than a partial view that reads as complete, an unlabelled record is counted but covers nothing, and a span nobody agreed to does not widen the contract; redaction is inherited from the `FEAT-AGT-06` memory boundary and the package defines no redactor of its own, with the trace carrying the union of the paths that were removed so an operator can see redaction happened without the trace ever holding the material, and an unreadable cost is skipped with a warning rather than silently read as zero. Containment is a property of the incident kind through a fixed table rather than a judgement at the call site — injection, privilege, data-poisoning, and sandbox incidents quarantine and cancel, drift quarantines without cancelling, and cost, provider, runaway-loop, and schema incidents cancel — applied through the normal `FEAT-AGT-04` cancellation path, with an already-terminal run recorded against its real state rather than re-cancelled; a record whose action disagrees with its kind, a quarantine naming no role, a cancel naming one, or any containment without preserved evidence and a checkpoint are all unrepresentable, and one classified incident per kind per correlated run is enforced in the reference store and by a `UNIQUE (run_id, correlation_id, kind)` constraint in the durable table so a second report cannot replace the first and its evidence. Replay is isolated by the type: the environment is a literal `sandbox` so a production replay is unconstructable, every reference is a content digest re-verified against what the store actually holds, and an outcome reporting any attempted side effect is rejected. The package registers no role, has no prompt, and invokes no model — classifying an incident must be deterministic, and a model would be a place to argue that an incident was not one. Quarantine records a decision rather than mutating a role, replay is validated rather than executed, trace completeness is enforced on assembly rather than on emission, and no incident has occurred outside tests.
 
 ### Add trade proposal handoff
 

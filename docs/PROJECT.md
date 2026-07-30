@@ -229,7 +229,7 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Package**: `app/services/trading`
 * **Responsibility**: Orchestrate live and paper evaluation workflows, convert approved risk decisions into deterministic order intents, and execute them on the selected route (`sim`, `paper`, `live`) with reconciliation, monitoring, and emergency controls.
 * **Inputs**: Live/paper evaluation triggers, strategy references, route/profile configuration, runtime gate configuration, approved `RiskDecision`s with approval tokens, Risk-owned `ActionPolicyVerdict`s, and `KillSwitchState`.
-* **Outputs**: `OrderIntent`s, execution receipts / `TradeRecord`s, reconciliation results, and `OperationalEvent` monitoring/incident evidence.
+* **Outputs**: Function-built `OrderIntent`s, execution receipts / `TradeRecord`s, reconciliation results, and `OperationalEvent` monitoring/incident evidence. The package root exports standalone functions only; DTO classes, enum classes, and constants remain Trading-internal.
 * **Owns**: Live/paper runtime orchestration, orders, fills, execution-state persistence, its own tables, schemas, and migration definitions, order intent formulation, client order IDs and idempotency, route-aware request packing, runtime gates, execution-broker/account/environment selection, broker dispatch after Risk clearance, reconciliation authority, execution monitoring, and emergency stop of in-flight execution.
 * **Boundaries**: Trading may coordinate Data, Indicators, Strategy, and Risk during a live/paper evaluation, but it does not own their decisions or business logic. Its execution phase begins only after receiving an approved `RiskDecision` and compatible `ActionPolicyVerdict`; it executes exactly the approved size. It enforces Risk's active kill-switch hierarchy by blocking new dispatches and attempting only truthful cancellation of pending/cancellable work. It resumes only after authorized clearance and reconciliation. It does not own signal creation, risk/action policy, approval reservations, backtest orchestration, broker connections/adapters, or secret storage (Brokers owns connections and adapters; credentials are resolved by the UI/API composition root and injected via `BrokerConnectionConfig`). Only Trading may invoke `BrokerAdapter` mutation operations, and only for approved broker mutations; it may also use adapter reads needed for execution and reconciliation. Paper and live share the same execution path and differ only by the environment/credentials carried in the injected `BrokerConnectionConfig`. Trading cannot approve its own risk decisions.
 * **Key Limits**: Live actions require valid approval tokens and volume constraints; `ALLOW_LIVE_MUTATIONS=false` blocks all live mutation by default; Decimal precision ≥ 28 digits with 8-decimal quantization; idempotency via SHA-256 over canonical JSON; broker operation timeout and check frequency limits; blind retries banned — unknown broker state freezes execution.
@@ -313,8 +313,9 @@ Domains are listed in dependency order, from lowest dependency to highest depend
   evaluators and candidate indicators, `FEAT-AGT-17` evaluation, critique,
   and economic acceptance, `FEAT-AGT-18` artefact promotion with an
   append-only lifecycle ledger, `FEAT-AGT-19` non-binding portfolio and
-  risk advisory, and `FEAT-AGT-20` trade proposal handoff into Strategy's own
-  external-proposal intake. `FEAT-AGT-03` runtime is `Completed`:
+  risk advisory, `FEAT-AGT-20` trade proposal handoff into Strategy's own
+  external-proposal intake, and `FEAT-AGT-21` correlated traces with
+  deterministic incident containment. `FEAT-AGT-03` runtime is `Completed`:
   provider-neutral model profiles, governed invocation, upgrade gating, and the
   Google ADK 2.x binding all exist behind the agent-graph port. The binding is
   structurally verified; no live provider call has been made, no backtest has
@@ -334,9 +335,14 @@ Domains are listed in dependency order, from lowest dependency to highest depend
   anything. `FEAT-AGT-20` composes and maps but does not evaluate: no signal
   has been evaluated, no trade intent constructed, and no receipt persisted,
   because evaluating a proposal needs a full Strategy composition a composition
-  root owns. `FEAT-AGT-09`,
-  `10`, `21`–`22`
-  remain `Missing`, so two agent roles, operations, and the operator
+  root owns. `FEAT-AGT-21` enforces trace completeness on assembly rather than
+  on emission: a run whose emitters stay silent gets no trace at all rather
+  than a misleadingly complete one, but nothing there can make a call site emit
+  its span. Its quarantine records a decision rather than mutating a role, its
+  replay is validated and never executed, and no incident has occurred outside
+  tests. `FEAT-AGT-09`,
+  `10`, and `22`
+  remain `Missing`, so two agent roles and the operator
   API are unavailable and no Agentic system workflow is complete. `FEAT-AGT-09`
   and `10` stay blocked on `FEAT-DATA-16` and `FEAT-RES-13`.
 * **Documentation**: `app/agentic/README.md`
