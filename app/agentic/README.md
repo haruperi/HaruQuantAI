@@ -241,7 +241,7 @@ order below is the binding implementation order.
 | Completed | `FEAT-AGT-14` Experiment and Simulation Coordination            | `agents/experimentation/experiment_designer/`          | `ExperimentSpec`, `ExperimentVerdict`, `design_experiment`, `coordinate_simulation`                         | `FR-AGENTIC-040`–`042` | `tests/agentic/usage/14_experiments.py`     |
 | Completed | `FEAT-AGT-15` Optimization Coordination                         | `agents/experimentation/optimization_coordinator/`     | `SweepPlan`, `SweepVerdict`, `design_sweep`, `coordinate_optimization`                                      | `FR-AGENTIC-043`–`045` | `tests/agentic/usage/15_optimization.py`    |
 | Completed | `FEAT-AGT-16` Governed Code Generation and Sandbox              | `agents/engineering/coder/`                            | `CodeSpecification`, `CodeArtifact`, `SandboxResult`, `author_code_artifact`                                | `FR-AGENTIC-046`–`048` | `tests/agentic/usage/16_coding.py`          |
-| Missing | `FEAT-AGT-17` Evaluation, Critique, and Economic Acceptance     | `agents/operations/evaluation_manager/`                | `EvaluationPlan`, `CritiqueMemo`, `EconomicAcceptanceVerdict`, `evaluate_agent`, `critique_candidate`       | `FR-AGENTIC-049`–`051` | `tests/agentic/usage/17_evaluation.py`      |
+| Completed | `FEAT-AGT-17` Evaluation, Critique, and Economic Acceptance     | `agents/operations/evaluation_manager/`                | `EvaluationPlan`, `CritiqueMemo`, `EconomicAcceptanceVerdict`, `evaluate_agent`, `critique_candidate`       | `FR-AGENTIC-049`–`051` | `tests/agentic/usage/17_evaluation.py`      |
 | Missing | `FEAT-AGT-18` Artefact Promotion and Lifecycle                  | `lifecycle/`       | `PromotionEvidencePacket`, `LifecycleRecord`, `assess_promotion`, `transition_artifact`                                   | `FR-AGENTIC-052`–`054` | `tests/agentic/usage/18_lifecycle.py`       |
 | Missing | `FEAT-AGT-19` Portfolio and Risk Advisory                       | `agents/portfolio_risk_advisory/portfolio_risk_advisor/` | `AllocationProposal`, `RiskAdvisory`, `advise_portfolio`, `critique_risk`                                   | `FR-AGENTIC-055`–`057` | `tests/agentic/usage/19_advisory.py`        |
 | Missing | `FEAT-AGT-20` Trade Proposal Handoff                            | `agents/strategy_desk/trader/`                           | `TradeProposal`, `TradeProposalReceipt`, `submit_trade_proposal`                                            | `FR-AGENTIC-058`–`060` | `tests/agentic/usage/20_trade_proposals.py` |
@@ -1165,19 +1165,29 @@ deadline, tool, token, or cost limits.
 
 | Status  | File            | Responsibility                                              | Key exports                                                         | Dependencies                                                                                                               |
 | ------- | --------------- | ----------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Missing | `agent.py`    | Define the provider-neutral manager, evaluate roles, and critique candidate artefacts | `evaluate_agent`, `critique_candidate` | **Standard library:** `pathlib`; **Required third-party:** None; **Local:** governance, runtime, deliberation, experiment designer, optimization coordinator, coder |
-| Missing | `prompt.md`   | Define immutable adversarial-critique, baseline, uncertainty, economic-acceptance, and refusal instructions | Internal prompt artefact | **Standard library:** None; **Required third-party:** None; **Local:** None |
-| Missing | `schemas.py`  | Define evaluation plans, critiques, and acceptance verdicts | `EvaluationPlan`, `CritiqueMemo`, `EconomicAcceptanceVerdict` | **Standard library:** None; **Required third-party:** `pydantic`; **Local:** contracts |
-| Missing | `tools.py`    | Bind governed evidence, test, and grader operations | Internal only; no public export | **Standard library:** None; **Required third-party:** None; **Local:** permissions, owner-public evaluation evidence |
-| Missing | `evaluator.py` | Apply feature-specific evaluation-set and calibrated-grader definitions | Internal only; no public export | **Standard library:** None; **Required third-party:** None; **Local:** `schemas.py`, shared evaluation contracts |
-| Missing | `README.md`   | Document the feature boundary, API, prompt, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
-| Missing | `__init__.py` | Expose the Feature Registry API                             | Feature Registry exports only | **Standard library:** None; **Required third-party:** None; **Local:** `agent.py`, `schemas.py` |
+| Completed | `agent.py`    | Define the provider-neutral manager, evaluate roles, and critique candidate artefacts | `evaluate_agent`, `critique_candidate` | **Standard library:** `pathlib`, `decimal`; **Required third-party:** None; **Local:** governance, runtime, permissions, experiment designer, optimization coordinator, coder |
+| Completed | `prompt.md`   | Define immutable adversarial-critique, baseline, uncertainty, economic-acceptance, and refusal instructions | Internal prompt artefact | **Standard library:** None; **Required third-party:** None; **Local:** None |
+| Completed | `schemas.py`  | Define evaluation plans, critiques, and acceptance verdicts | `EvaluationPlan`, `CritiqueMemo`, `EconomicAcceptanceVerdict` | **Standard library:** `decimal`; **Required third-party:** `pydantic`; **Local:** contracts, `evaluator.py` |
+| Completed | `tools.py`    | Bind governed evidence, test, and grader operations | Internal only; no public export | **Standard library:** None; **Required third-party:** None; **Local:** permissions, context memory, owner-public evaluation evidence |
+| Completed | `evaluator.py` | Apply feature-specific evaluation-set and calibrated-grader definitions and the acceptance arithmetic | Internal only; no public export | **Standard library:** `decimal`; **Required third-party:** None; **Local:** utils |
+| Completed | `README.md`   | Document the feature boundary, API, prompt, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
+| Completed | `__init__.py` | Expose the Feature Registry API                             | Feature Registry exports only | **Standard library:** None; **Required third-party:** None; **Local:** `agent.py`, `schemas.py` |
+
+`evaluator.py` also owns the economic-acceptance arithmetic, which the canonical
+file list assigned only to the grader definitions. Keeping the thresholds and
+the comparison in one module means `schemas.py` and `agent.py` validate against
+the same constants rather than each restating them.
 
 | Status  | Requirement ID     | Responsibility                                                                                                                               | Side effects                     | Failure / Verification         |
 | ------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ------------------------------ |
-| Missing | `FR-AGENTIC-049` | Agent evaluation shall use versioned gold, adversarial, poisoning, refusal, regression, and economic-ablation sets with calibrated graders.  | Model/tool calls; evidence write | Evaluation-suite tests         |
-| Missing | `FR-AGENTIC-050` | Candidate critique shall include leakage, causality, robustness, cost, operational, security, and counterfactual challenges.                 | Model/tool calls                 | Critique-coverage tests        |
-| Missing | `FR-AGENTIC-051` | A role shall be disabled or retired when it fails safety/reliability gates or does not beat its simpler baseline after uncertainty and cost. | Governed role-state change       | Baseline and disablement tests |
+| Completed | `FR-AGENTIC-049` | Agent evaluation shall use versioned gold, adversarial, poisoning, refusal, regression, and economic-ablation sets with calibrated graders.  | Model/tool calls; evidence write | Evaluation-suite tests         |
+| Completed | `FR-AGENTIC-050` | Candidate critique shall include leakage, causality, robustness, cost, operational, security, and counterfactual challenges.                 | Model/tool calls                 | Critique-coverage tests        |
+| Completed | `FR-AGENTIC-051` | A role shall be disabled or retired when it fails safety/reliability gates or does not beat its simpler baseline after uncertainty and cost. | Verdict only; no state change    | Baseline and disablement tests |
+
+`FR-AGENTIC-051`'s side effect is narrower than the canonical row states. This
+feature computes the required action and records it in a binding verdict; it
+does not apply one. Changing a role's registered state belongs to
+`FEAT-AGT-18` lifecycle or a governance manifest re-issue.
 
 ### 4.18 `lifecycle/` — Artefact Promotion and Lifecycle
 

@@ -47,6 +47,12 @@ from app.agentic.agents.market_analysis.technical_analyst.agent import (
 from app.agentic.agents.market_analysis.technical_analyst.tools import (
     get_registered_tool_names,
 )
+from app.agentic.agents.operations.evaluation_manager.agent import (
+    PROMPT_PATH as EVALUATION_PROMPT_PATH,
+)
+from app.agentic.agents.operations.evaluation_manager.tools import (
+    get_registered_tool_names as get_evaluation_tool_names,
+)
 from app.agentic.agents.strategy_desk.strategy_thesis_analyst.agent import (
     PROMPT_PATH as THESIS_PROMPT_PATH,
 )
@@ -650,6 +656,74 @@ def build_sweep_mandate(**overrides: object) -> FirmMandate:
         "enabled_features": ("FEAT-AGT-15",),
         "enabled_roles": (SWEEP_ROLE_ID,),
         "tool_scopes": dict.fromkeys(get_sweep_tool_names(), "read_evidence"),
+    }
+    data.update(overrides)
+    return build_sandbox_mandate(**data)
+
+
+EVALUATION_ROLE_ID = "evaluation_manager"
+
+EVALUATION_PROMPT_DIGEST = canonical_digest(
+    normalize_prompt_text(EVALUATION_PROMPT_PATH.read_text(encoding="utf-8")),
+)
+
+
+def evaluation_role_manifest_fields(**overrides: object) -> dict[str, object]:
+    """Return complete Evaluation Manager manifest fields.
+
+    The base prompt digest is derived from the real package artefact, so the
+    fixture exercises the same integrity chain production uses.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        Complete manifest constructor data.
+    """
+    data = manifest_fields(
+        role_id=EVALUATION_ROLE_ID,
+        owning_feature="FEAT-AGT-17",
+        department="operations",
+        agent_package="agents/operations/evaluation_manager",
+        description="Evaluates roles and critiques candidates adversarially.",
+        objective="Find the reason a candidate should not proceed.",
+        expertise_boundary="Grades nothing, computes nothing, mutates nothing.",
+        input_schema_id="agentic.evaluation_request.v1",
+        output_schema_id="agentic.economic_acceptance_verdict.v1",
+        base_prompt_hash=EVALUATION_PROMPT_DIGEST,
+        evaluation_set_id="eval-evaluation-manager-v1",
+        tools=get_evaluation_tool_names(),
+        permission_classes=("read_evidence",),
+    )
+    data.update(overrides)
+    return data
+
+
+def build_evaluation_role_manifest(**overrides: object) -> RoleManifest:
+    """Build the validated Evaluation Manager role manifest.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        A validated manifest with derived integrity digests.
+    """
+    return build_role_manifest(evaluation_role_manifest_fields(**overrides))
+
+
+def build_evaluation_mandate(**overrides: object) -> FirmMandate:
+    """Build a sandbox mandate registering the evaluation tools.
+
+    Args:
+        **overrides: Optional field overrides for mandate variants.
+
+    Returns:
+        A validated firm mandate with a derived content digest.
+    """
+    data: dict[str, object] = {
+        "enabled_features": ("FEAT-AGT-17",),
+        "enabled_roles": (EVALUATION_ROLE_ID,),
+        "tool_scopes": dict.fromkeys(get_evaluation_tool_names(), "read_evidence"),
     }
     data.update(overrides)
     return build_sandbox_mandate(**data)

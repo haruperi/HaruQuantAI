@@ -179,7 +179,9 @@ uv run python tests/agentic/usage/12_quantitative.py
   doubles.
 - Interpretation *quality* is not verified here. Grounding, disclosure
   calibration, and refusal correctness under adversarial evidence are measured
-  by `FEAT-AGT-17` evaluation against versioned sets, which is `Missing`.
+  by `FEAT-AGT-17` evaluation against versioned sets. That mechanism now
+  exists, but no versioned set has been authored for this role and no grader
+  has been calibrated against it, so this role has not in fact been evaluated.
 - `analytics.validate_contract_version` is registered as an eligible tool but
   is not yet called by `agent.py`; evidence contract compatibility is checked
   by the caller.

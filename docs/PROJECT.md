@@ -309,16 +309,22 @@ Domains are listed in dependency order, from lowest dependency to highest depend
   metric catalog, `FEAT-AGT-13` hypothesis and strategy-thesis development, and
   `FEAT-AGT-14` pre-registered experiment protocols with governed Simulation
   coordination, `FEAT-AGT-15` bounded optimization with reconciled trial
-  accounting, and `FEAT-AGT-16` staged code generation for strategy
-  evaluators and candidate indicators. `FEAT-AGT-03` runtime is `Completed`:
+  accounting, `FEAT-AGT-16` staged code generation for strategy
+  evaluators and candidate indicators, and `FEAT-AGT-17` evaluation, critique,
+  and economic acceptance. `FEAT-AGT-03` runtime is `Completed`:
   provider-neutral model profiles, governed invocation, upgrade gating, and the
   Google ADK 2.x binding all exist behind the agent-graph port. The binding is
   structurally verified; no live provider call has been made, no backtest has
   been executed through the Simulation port, and no sandbox runtime is bound —
   `FEAT-AGT-16` proves that an under-attested lease is refused, not that any
-  isolation exists, and no parameter sweep has been executed. `FEAT-AGT-09`,
-  `10`, `17`–`22`
-  remain `Missing`, so five agent roles, lifecycle, operations, and the operator
+  isolation exists, and no parameter sweep has been executed. `FEAT-AGT-17` is
+  likewise the mechanism and not the result: no versioned gold, adversarial,
+  poisoning, refusal, regression, or economic-ablation set has been authored
+  for any registered role and no grader has been calibrated, so no role in the
+  firm has in fact been evaluated, and every leaf package that defers its
+  quality claim to evaluation still defers it. `FEAT-AGT-09`,
+  `10`, `18`–`22`
+  remain `Missing`, so four agent roles, lifecycle, operations, and the operator
   API are unavailable and no Agentic system workflow is complete. `FEAT-AGT-09`
   and `10` stay blocked on `FEAT-DATA-16` and `FEAT-RES-13`.
 * **Documentation**: `app/agentic/README.md`

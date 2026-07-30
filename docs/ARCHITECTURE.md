@@ -130,7 +130,19 @@
   cannot consist of a rank alone; and a sweep consuming holdout reserves it
   from the same `FEAT-AGT-14` ledger an experiment would, closing the path by
   which a thesis's single look could otherwise be spent twice.
-  `FEAT-AGT-09`, `10`, and `17`–`22` remain `Missing`.
+  `FEAT-AGT-17` closes the loop by making acceptance arithmetic rather than
+  judgement: the six evaluation-set kinds and the seven critique challenges are
+  validated by set equality, so a missing poisoning set or an unaddressed
+  leakage challenge is unrepresentable rather than merely weaker; the required
+  action is computed from the gate outcomes and the margin before the model is
+  invoked, and the verdict recomputes it and rejects disagreement, so a model
+  cannot write `continue` over a failed gate; and a candidate beats its simpler
+  baseline only when its margin strictly exceeds the measurement uncertainty
+  plus its extra cost, with an exact tie going to the baseline. The feature
+  decides and does not mutate: applying a disable or a retire is `FEAT-AGT-18`'s
+  or a mandate re-issue's, and no versioned set or calibrated grader yet exists
+  for any role, so the mechanism is verified and no role has been evaluated.
+  `FEAT-AGT-09`, `10`, and `18`–`22` remain `Missing`.
   Google ADK 2.x is adopted behind a scoped `requests` override, documented in
   `pyproject.toml` with the condition for its removal. Its hybrid layout keeps ten shared control-plane features as focused root packages and places twelve role-bearing features under registered `agents/<department>/<agent_name>/` leaf packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, feature schemas, and only specification-required optional files. Specialized leadership, market-intelligence, technical, quantitative, strategy/trader, experimentation, engineering, portfolio/risk-advisory, and operations roles may dynamically collaborate, simulate, optimize, code, and submit typed proposals. Google ADK 2.x is the selected runtime behind provider-neutral HaruQuantAI contracts. Agentic has no broker credential, direct broker route, risk approval, kill-switch authority, or execution authority; consequential proposals traverse the normal deterministic pipeline.
 * `app/utils/` is a partial implementation baseline for shared v1 contracts,

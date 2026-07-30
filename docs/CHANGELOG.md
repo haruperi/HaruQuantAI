@@ -6,14 +6,15 @@
 
 The three audited domains now expose function-only package roots, focused tests exceed the per-file coverage floor, and usage evidence distinguishes genuine provider results from unavailable or test-only capabilities.
 
-#### Changed (4)
+#### Changed (5)
 
 - Added the opaque `load_broker_provider_settings` function and Brokers-owned `resolve_provider_connection_config`/`create_connected_broker` operations so no settings class or connection DTO crosses a public package boundary.
 - Rewrote the Data composition root `_LazyBrokerSession` to resolve MT5, cTrader, and credential-free providers through the Brokers resolver and removed its private `_ProviderRuntimeSettings`, so Data no longer resolves credentials or builds connection configurations.
 - Migrated audited production, usage, workflow, and integration consumers to domain-root imports and added package-root function-only boundary checks.
 - Marked `FEAT-DATA-11` and `FR-DATA-095`–`099`/`123`–`129` Pending because the repository has no licensed real economic-calendar transport; the usage now reports `SOURCE_UNAVAILABLE` instead of using `DemonstrationTransport`.
+- Reworked every Indicators feature usage and the active workflow evidence to print bounded MT5-derived OHLCV and calculated DataFrames, and added direct subprocess coverage for `WF-INDI-006` through `WF-INDI-008`.
 
-#### Fixed (6)
+#### Fixed (8)
 
 - Fixed the Data composition root silently ignoring `settings.mt5.*` in `app/configs/env.json` because `_ProviderRuntimeSettings` extended `BaseSettings` instead of `AppSettings` and therefore read only the process environment; real-MT5 retrieval through the Data path now honors the central settings file.
 - Fixed Brokers package-root history/time-range forwarding and canonical timeframe normalization, restoring genuine MT5 history and Dukascopy bar reads.
@@ -21,6 +22,16 @@ The three audited domains now expose function-only package roots, focused tests 
 - Fixed historical backfill so it establishes governed storage and source identity before retrieval, allowing scheduled jobs to persist genuine provider records and checkpoints.
 - Fixed Data source and real-time-feed usage evidence so it prints bounded provider-derived rows and ticks, while unavailable providers report explicit errors without injected fallbacks.
 - Fixed external spread imports so decimal scale is derived from observed provider values rather than assigned a fabricated default.
+- Fixed Indicators response handling, private Data structural typing, workflow configuration construction, and validation/error branch coverage so the focused suite passes with every Indicators production file above the 80% floor.
+- Fixed Strategy response unwrapping, function-only contract/evaluator construction, deterministic checkpoint/configuration failures, and real MT5-backed usage evidence so all ten implemented workflows pass and every Strategy production file exceeds 80% branch coverage.
+
+### Add evaluation, critique, and economic acceptance
+
+The Agentic firm can now decide whether one of its own roles has earned its place, on arithmetic no wording can move.
+
+#### Added (1)
+
+- `FEAT-AGT-17` Evaluation, Critique, and Economic Acceptance: an evaluation plan validates its six versioned set kinds and seven critique challenge kinds by set equality rather than by sufficiency, so an evaluation missing its poisoning set or a critique that never addresses leakage is unrepresentable rather than merely weaker, and each set requires its own calibrated grader; which sets exist at which version and whether a grader was calibrated are read through the governed tool path and audited, never asserted by the model, and coverage is checked before any model call; a candidate beats its simpler baseline only when its margin strictly exceeds the measurement uncertainty plus its extra cost, with an exact tie going to the baseline because complexity has to earn its place; the required continue, disable, or retire action is computed from the gate outcomes and that margin before the model is invoked, and the verdict recomputes it and refuses to be built when the recorded action disagrees, so a model cannot write `continue` over a failed adversarial, poisoning, or refusal gate; and challenges the candidate evidence already supports are derived from the `CodeArtifact`, `SweepVerdict`, and `ExperimentVerdict` and merged over the model's text rather than under it. The feature decides and does not mutate: applying a disable or a retire belongs to `FEAT-AGT-18` lifecycle or a governance manifest re-issue. No versioned set has been authored and no grader calibrated for any registered role, so the mechanism is verified and no role has yet been evaluated.
 
 ### Add bounded optimization coordination
 

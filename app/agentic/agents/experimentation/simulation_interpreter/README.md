@@ -150,7 +150,10 @@ uv run python tests/agentic/usage/08_interpretation.py
   Google ADK binding is not implemented (`FEAT-AGT-03` is `Partial`).
 - Interpretation *quality* is not verified here. Grounding, citation
   correctness, and refusal calibration are measured by `FEAT-AGT-17`
-  evaluation against versioned sets, which is `Missing`.
+  evaluation against versioned sets. That mechanism now exists, but no gold,
+  adversarial, poisoning, refusal, regression, or economic-ablation set has
+  been authored for this role and no grader has been calibrated against it, so
+  this role has not in fact been evaluated.
 
 ---
 

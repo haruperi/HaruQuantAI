@@ -224,8 +224,10 @@ uv run python tests/agentic/usage/14_experiments.py
 - `WF-AGT-003` remains `Missing`. This feature implements steps 3 through 5;
   steps 1 and 2 need `FEAT-AGT-09`, blocked on `FEAT-DATA-16`.
 - Design *quality* is not verified here. Whether a protocol is well-posed is
-  measured by `FEAT-AGT-17` evaluation against versioned sets, which is
-  `Missing`.
+  measured by `FEAT-AGT-17` evaluation against versioned sets. That mechanism
+  now exists, but no versioned set has been authored for this role and no
+  grader has been calibrated against it, so this role has not in fact been
+  evaluated.
 
 ---
 
