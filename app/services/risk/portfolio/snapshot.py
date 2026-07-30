@@ -511,10 +511,10 @@ def build_portfolio_risk_snapshot(
     try:
         return _build_snapshot(state, config, checked_now)
     except RiskDomainError:
-        logger.error("Portfolio snapshot build failed with a coded Risk error")
+        logger.exception("Portfolio snapshot build failed with a coded Risk error")
         raise
     except (ArithmeticError, KeyError, ValueError) as error:
-        logger.error("Portfolio snapshot calculation failed closed")
+        logger.exception("Portfolio snapshot calculation failed closed")
         raise RiskDomainError(
             RiskErrorCode.SNAPSHOT_BUILD_FAILED,
             "portfolio snapshot calculation failed",

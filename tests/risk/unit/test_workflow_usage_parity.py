@@ -23,6 +23,8 @@ EXPECTED = {
     "WF-RISK-011": "wf_risk_011_generate_risk_decision_summary.py",
     "WF-RISK-012": "wf_risk_012_persist_risk_audit_token_state.py",
     "WF-RISK-014": "wf_risk_014_revalidate_decision_evidence_before_reuse.py",
+    "WF-RISK-015": "wf_risk_015_firm_mandate_single_day_profit_share.py",
+    "WF-RISK-016": "wf_risk_016_compute_pin_risk_config_hash.py",
 }
 
 

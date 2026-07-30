@@ -5,26 +5,28 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Callable, Sequence
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.portfolio.contracts import ActivePortfolioAllocation
 from app.services.portfolio.exceptions import PortfolioError
 from app.services.risk import (
-    AllocationBudgetActivationRequest,
-    ApprovalAttestation,
-    ApprovalValidationResult,
-    DecisionState,
-    KillSwitchState,
+    create_allocation_budget_activation_request,
+    get_decision_state,
 )
 from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 
+AllocationBudgetActivationRequest = Any
+AllocationRiskDecision = Any
+ApprovalAttestation = Any
+ApprovalValidationResult = Any
+KillSwitchState = Any
+
 if TYPE_CHECKING:
     from app.services.portfolio.config import PortfolioSettings
     from app.services.portfolio.contracts import PortfolioConstructionResult
     from app.services.portfolio.state import AuditOutboxRecord, PortfolioRepository
-    from app.services.risk import AllocationRiskDecision
     from app.services.simulator import PortfolioSimulationResult
 
 type RiskBudgetActivator = Callable[
@@ -106,7 +108,7 @@ class AllocationService:
         if (
             risk_decision.portfolio_id != candidate.portfolio_id
             or risk_decision.reviewed_version != candidate.portfolio_version
-            or risk_decision.state is not DecisionState.APPROVE
+            or risk_decision.state is not get_decision_state("APPROVE")
             or risk_decision.active
             or risk_decision.issued_at > activated_at
             or risk_decision.expires_at <= activated_at
@@ -198,7 +200,7 @@ class AllocationService:
         )
         if expires_at <= activated_at:
             raise PortfolioError("PORT_INVALID_INPUT", "ALLOCATION_EXPIRY")
-        activation_request = AllocationBudgetActivationRequest(
+        activation_request = create_allocation_budget_activation_request(
             portfolio_id=candidate.portfolio_id,
             allocation_version=candidate.portfolio_version,
             decision_id=risk_decision.decision_id,
@@ -223,7 +225,7 @@ class AllocationService:
             ) from error
         if (
             not activated_risk.active
-            or activated_risk.state is not DecisionState.APPROVE
+            or activated_risk.state is not get_decision_state("APPROVE")
             or activated_risk.decision_id != risk_decision.decision_id
         ):
             raise PortfolioError("PORT_RISK_AUTHORIZATION_INVALID", "ACTIVATION")

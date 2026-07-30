@@ -37,7 +37,7 @@ from app.services.optimization.robustness import (
     FirstPassageReport,
     JointFirstPassageReport,
 )
-from app.services.risk import DrawdownMode
+from app.services.risk import get_drawdown_mode
 from app.utils import generate_id
 from tests.analytics._support import (
     _measurement_request,
@@ -356,7 +356,7 @@ def fr_anlt_054() -> None:
     _header("FR-ANLT-054: Barrier report section")
     first = FirstPassageReport(
         mandate_version="v1",
-        mode=DrawdownMode.STATIC,
+        mode=get_drawdown_mode("STATIC"),
         paths=10,
         seed=7,
         probability_target=Decimal("0.5"),
@@ -386,7 +386,7 @@ def fr_anlt_054() -> None:
         joint,
         worst,
         mandate_version="v1",
-        mode_sensitivity={DrawdownMode.STATIC: first},
+        mode_sensitivity={get_drawdown_mode("STATIC"): first},
     )
     print(f"Barrier section status: {section.status}")
 

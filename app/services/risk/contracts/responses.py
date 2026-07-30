@@ -7,7 +7,7 @@ import inspect
 import time
 from collections.abc import Callable, Mapping
 from contextlib import suppress
-from typing import Any, Literal, ParamSpec, TypeVar, cast
+from typing import Any, Literal, ParamSpec, Protocol, TypeVar, cast
 
 from pydantic import ValidationError as PydanticValidationError
 
@@ -27,7 +27,41 @@ from app.utils import (
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 type ResponseMetadata = Any
-type StandardResponse[T] = Any
+
+
+class _ResponseErrorView(Protocol):
+    """Structural view of one standard response error."""
+
+    @property
+    def code(self) -> str:
+        """Return the stable error code."""
+        ...
+
+
+class StandardResponse[T](Protocol):
+    """Structural view of the Utils-owned standard response."""
+
+    @property
+    def status(self) -> str:
+        """Return the standard response status."""
+        ...
+
+    @property
+    def data(self) -> T | None:
+        """Return successful response data, when present."""
+        ...
+
+    @property
+    def error(self) -> _ResponseErrorView | None:
+        """Return structured error data, when present."""
+        ...
+
+    @property
+    def metadata(self) -> object:
+        """Return immutable operation metadata."""
+        ...
+
+
 logger = get_logger(__name__)
 
 _P = ParamSpec("_P")
@@ -173,7 +207,9 @@ def guard_risk_boundary(
                     details={"diagnostic": error.details},
                     message=RISK_ERROR_CATALOG[error.risk_code.value].description,
                     metadata=metadata(),
-                    catalog=RISK_ERROR_CATALOG,
+                    # Utils hides its concrete catalogue class; the Risk
+                    # definition is the documented structural equivalent.
+                    catalog=cast("Any", RISK_ERROR_CATALOG),
                 )
             except (PydanticValidationError, TypeError, ValueError) as error:
                 logger.info("Risk operation failed validation")
@@ -184,10 +220,10 @@ def guard_risk_boundary(
                         RiskErrorCode.VALIDATION_FAILED.value
                     ].description,
                     metadata=metadata(),
-                    catalog=RISK_ERROR_CATALOG,
+                    catalog=cast("Any", RISK_ERROR_CATALOG),
                 )
-            except Exception as error:  # noqa: BLE001 - outer fail-closed boundary.
-                logger.error(
+            except Exception as error:
+                logger.exception(
                     "Unexpected %s escaped Risk operation %s",
                     type(error).__name__,
                     function.__name__,
@@ -201,7 +237,7 @@ def guard_risk_boundary(
                         RiskErrorCode.UNKNOWN_ERROR.value
                     ].description,
                     metadata=metadata(),
-                    catalog=RISK_ERROR_CATALOG,
+                    catalog=cast("Any", RISK_ERROR_CATALOG),
                     extensions={
                         "operation": function.__name__,
                         "failure_type": type(error).__name__,

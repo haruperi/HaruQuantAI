@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from app.services.risk import DecisionState
+from app.services.risk import get_decision_state, review_trade_risk
 from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-PRI"
@@ -14,7 +14,7 @@ STAGES = (
     "Accept exact TradeIntent lineage, current evidence, auth, config, and full kill-switch hierarchy.",
     "Validate identity/config, kill switch, freshness, and required evidence in fixed precedence.",
     "Evaluate ordered hard limits, policy restrictions, concurrency, and approval eligibility.",
-    "Build and durably audit the complete RiskDecisionPackage.",
+    "Build and durably audit the complete create_risk_decision_package.",
     "Return RiskDecision v1 to Trading or Simulation without execution side effects.",
 )
 
@@ -42,7 +42,8 @@ def main() -> None:
     # Stage 3: Governor evaluates every applicable limit.
     _stage(3)
     decision = unwrap_risk_response(
-        governor.review_trade_risk(
+        review_trade_risk(
+            governor,
             examples._proposal(config),
             examples._snapshot(config),
             examples._market(),
@@ -63,9 +64,13 @@ def main() -> None:
         "audit:",
         audit.records[-1].event_type,
     )
-    # Stage 5 — OUTPUT BOUNDARY: Return RiskDecisionPackage only.
+    # Stage 5 — OUTPUT BOUNDARY: Return create_risk_decision_package only.
     _stage(5)
-    print("Output:", type(decision).__name__, decision.state is DecisionState.BLOCK)
+    print(
+        "Output:",
+        type(decision).__name__,
+        decision.state is get_decision_state("BLOCK"),
+    )
 
 
 if __name__ == "__main__":

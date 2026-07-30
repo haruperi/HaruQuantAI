@@ -22,6 +22,8 @@ WORKFLOWS = (
     "wf_risk_011_generate_risk_decision_summary.py",
     "wf_risk_012_persist_risk_audit_token_state.py",
     "wf_risk_014_revalidate_decision_evidence_before_reuse.py",
+    "wf_risk_015_firm_mandate_single_day_profit_share.py",
+    "wf_risk_016_compute_pin_risk_config_hash.py",
 )
 
 

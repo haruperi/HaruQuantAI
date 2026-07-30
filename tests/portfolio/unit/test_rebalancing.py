@@ -17,12 +17,17 @@ from app.services.portfolio.rebalancing import (
     measure_cross_account_correlation,
 )
 from app.services.risk import (
-    AllocationRiskDecision,
-    DecisionState,
-    KillSwitchState,
-    StrategyOperationalEligibilityDecision,
+    create_allocation_risk_decision,
+    create_kill_switch_state,
+    create_strategy_operational_eligibility_decision,
+    get_decision_state,
 )
 from app.utils import logger
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+AllocationRiskDecision = object
+KillSwitchState = object
+StrategyOperationalEligibilityDecision = object
 
 
 class RecordingPlanRepository:
@@ -67,11 +72,11 @@ def _risk_decision(
         Active authoritative Risk decision.
     """
     logger.debug("Building active Risk budget decision for Portfolio drift")
-    return AllocationRiskDecision(
+    return create_allocation_risk_decision(
         decision_id=allocation.risk_decision_id,
         portfolio_id=allocation.portfolio_id,
         reviewed_version=allocation.allocation_version,
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         capped_weights={
             "component-a": Decimal("0.5"),
             "component-b": Decimal("0.5"),
@@ -102,9 +107,9 @@ def _eligibility(now: datetime) -> dict[str, StrategyOperationalEligibilityDecis
     """
     logger.debug("Building current Portfolio rebalance eligibility")
     return {
-        f"component-{suffix}": StrategyOperationalEligibilityDecision.model_construct(
+        f"component-{suffix}": create_strategy_operational_eligibility_decision(
             decision_id=f"eligibility-{suffix}",
-            state=DecisionState.APPROVE,
+            state=get_decision_state("APPROVE"),
             suspended=False,
             expires_at=now + timedelta(hours=1),
         )
@@ -123,7 +128,7 @@ def _kill_switch(now: datetime, state: str = "inactive") -> KillSwitchState:
         Canonical kill-switch evidence.
     """
     logger.debug("Building Portfolio rebalance kill-switch evidence")
-    return KillSwitchState.model_construct(
+    return create_kill_switch_state(
         state_id="kill-switch-1",
         scope_level="global",
         scope={},

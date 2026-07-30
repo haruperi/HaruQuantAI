@@ -8,11 +8,7 @@ from typing import Any, Literal, Self, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from app.services.risk import (
-    DecisionState,
-    KillSwitchState,
-    RiskDecisionPackage,
-)
+from app.services.risk import get_decision_state
 from app.services.trading.contracts import TradingError, TradingRequest
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
@@ -24,6 +20,8 @@ from app.services.trading.validation.snapshots import (
 from app.utils import get_logger, to_json_safe
 
 type StandardResponse[T] = Any
+KillSwitchState = Any
+RiskDecisionPackage = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 logger = get_logger(__name__)
@@ -172,7 +170,7 @@ def _append_risk_failures(
     logger.debug("Checking Trading Risk readiness evidence")
     if risk_decision.decision_id != request.risk_decision_id:
         failed.append("RISK_DECISION_MISMATCH")
-    if risk_decision.state is not DecisionState.APPROVE:
+    if risk_decision.state is not get_decision_state("APPROVE"):
         failed.append("RISK_NOT_APPROVED")
     age = Decimal(str((request.system_time - risk_decision.issued_at).total_seconds()))
     if risk_decision.expires_at <= request.system_time or age > max_staleness_seconds:

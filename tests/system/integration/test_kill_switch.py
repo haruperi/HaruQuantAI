@@ -9,14 +9,13 @@ from app.services.api.identity import require_auth_context
 from app.services.api.routes import operator
 from app.services.api.routes.operator import router
 from app.services.risk import (
-    ApprovalAttestation,
-    DecisionState,
-    KillSwitchCommand,
-    KillSwitchState,
-    RiskAuditChain,
     apply_kill_switch_command,
     check_risk_kill_switch,
     compute_config_hash,
+    create_approval_attestation,
+    create_kill_switch_state,
+    create_risk_audit_chain,
+    get_decision_state,
 )
 from app.services.trading import (
     AuthoritySnapshot,
@@ -37,6 +36,11 @@ from tests.trading.unit.actions.test_dependencies import (
     request,
 )
 
+# Private type-only aliases; Risk exposes functions, not contract classes.
+ApprovalAttestation = object
+KillSwitchCommand = object
+KillSwitchState = object
+
 
 def _kill_switch_hierarchy(
     request_value: TradingRequest,
@@ -45,7 +49,7 @@ def _kill_switch_hierarchy(
     """Build the exact applicable hierarchy around the real global state."""
     states = [
         global_state,
-        KillSwitchState(
+        create_kill_switch_state(
             state_id="strategy-state-1",
             scope_level="strategy",
             scope={"strategy_id": request_value.strategy_id},
@@ -57,7 +61,7 @@ def _kill_switch_hierarchy(
     ]
     if request_value.portfolio_id is not None:
         states.append(
-            KillSwitchState(
+            create_kill_switch_state(
                 state_id="portfolio-state-1",
                 scope_level="portfolio",
                 scope={"portfolio_id": request_value.portfolio_id},
@@ -69,7 +73,7 @@ def _kill_switch_hierarchy(
         )
     if request_value.symbol is not None:
         states.append(
-            KillSwitchState(
+            create_kill_switch_state(
                 state_id="symbol-state-1",
                 scope_level="symbol",
                 scope={"symbol": request_value.symbol},
@@ -99,7 +103,7 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
     config = risk_support._config()
     _, approvals, _ = risk_support._services(config)
     risk_store = risk_support._KillStore()
-    audit = RiskAuditChain(
+    audit = create_risk_audit_chain(
         config,
         risk_store,
         lambda: risk_support.NOW,
@@ -170,7 +174,7 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
     with pytest.raises(TradingError, match="KILL_SWITCH_ACTIVE"):
         asyncio.run(resume_strategy(trading_request, active_dependencies))
 
-    attestation = ApprovalAttestation(
+    attestation = create_approval_attestation(
         attestation_id="clearance-independent-1",
         principal_id="operator-2",
         action="risk.kill.clear",
@@ -234,5 +238,5 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
     assert clear_status == 200, clear_body
     assert clear_body["state"]["state"] == "inactive"
     assert resumed.status == "success"
-    assert risk_recovery.state is DecisionState.APPROVE
+    assert risk_recovery.state is get_decision_state("APPROVE")
     assert len(risk_store.records) == 2

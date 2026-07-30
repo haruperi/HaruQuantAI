@@ -9,28 +9,28 @@ import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import MarketContextEvidence
+from app.services.data import build_market_context_evidence
 from app.services.risk import (
-    ApprovalAttestation,
-    ApprovalTokenService,
-    KillSwitchState,
-    PortfolioRiskSnapshot,
-    ProposedTrade,
-    RegimeAssessment,
-    RiskApprovalToken,
-    RiskAuditChain,
-    RiskAuditRecord,
-    RiskConfig,
-    RiskGovernor,
     compute_config_hash,
+    create_approval_attestation,
+    create_approval_token_service,
+    create_kill_switch_state,
+    create_portfolio_risk_snapshot,
+    create_proposed_trade,
+    create_regime_assessment,
+    create_risk_audit_chain,
+    create_risk_config,
+    create_risk_governor,
+    review_trade_risk,
+    run_portfolio_risk_governor,
 )
-from app.services.strategy import TradeIntent
-from app.utils import AuthContext, canonical_json
+from app.services.strategy import create_trade_intent_value
+from app.utils import canonical_json, create_auth_context
 
 from tests.risk._support import unwrap_risk_response
 
@@ -45,15 +45,15 @@ class _ExampleAuditStore:
     """Minimal append-only audit store for this example."""
 
     def __init__(self) -> None:
-        self.records: list[RiskAuditRecord] = []
+        self.records: list[Any] = []
 
-    def read_head(self, *, timeout_seconds: Decimal | None) -> RiskAuditRecord | None:
+    def read_head(self, *, timeout_seconds: Decimal | None) -> Any | None:
         del timeout_seconds
         return self.records[-1] if self.records else None
 
     def append_atomic(
         self,
-        record: RiskAuditRecord,
+        record: Any,
         *,
         expected_sequence: int,
         expected_previous_hash: str,
@@ -63,9 +63,7 @@ class _ExampleAuditStore:
         self.records.append(record)
         return "appended"
 
-    def read_all(
-        self, *, timeout_seconds: Decimal | None
-    ) -> tuple[RiskAuditRecord, ...]:
+    def read_all(self, *, timeout_seconds: Decimal | None) -> tuple[Any, ...]:
         del timeout_seconds
         return tuple(self.records)
 
@@ -74,11 +72,11 @@ class _ExampleTokenStore:
     """Minimal single-process durable token store for this example."""
 
     def __init__(self) -> None:
-        self.tokens: dict[str, RiskApprovalToken] = {}
+        self.tokens: dict[str, Any] = {}
         self.consumed: set[str] = set()
 
     def save_issued(
-        self, token: RiskApprovalToken, *, timeout_seconds: Decimal | None
+        self, token: Any, *, timeout_seconds: Decimal | None
     ) -> Literal["saved", "already_saved", "conflict"]:
         del timeout_seconds
         current = self.tokens.get(token.token_id)
@@ -130,9 +128,9 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _config() -> RiskConfig:
+def _config() -> create_risk_config:
     """Build a complete simulation-profile Risk configuration."""
-    return RiskConfig(
+    return create_risk_config(
         profile="simulation",
         execution_route="sim",
         policy_version="policy-1",
@@ -152,9 +150,9 @@ def _config() -> RiskConfig:
     )
 
 
-def _market() -> MarketContextEvidence:
+def _market() -> build_market_context_evidence:
     """Build fresh complete Data-owned market-context evidence."""
-    return MarketContextEvidence(
+    return build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
         calendar_state="clear",
@@ -173,9 +171,9 @@ def _market() -> MarketContextEvidence:
     )
 
 
-def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
+def _snapshot(config: create_risk_config) -> create_portfolio_risk_snapshot:
     """Build a healthy snapshot carrying exact governor trace identifiers."""
-    return PortfolioRiskSnapshot(
+    return create_portfolio_risk_snapshot(
         snapshot_id="snapshot-1",
         account_id="account-1",
         base_currency="USD",
@@ -208,9 +206,9 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
     )
 
 
-def _intent() -> TradeIntent:
+def _intent() -> create_trade_intent_value:
     """Build one immutable Strategy risk-increase trade intent."""
-    return TradeIntent(
+    return create_trade_intent_value(
         intent_id="intent-1",
         decision_id="strategy-decision-1",
         idempotency_key="intent-key-1",
@@ -240,9 +238,9 @@ def _intent() -> TradeIntent:
     )
 
 
-def _proposal(config: RiskConfig) -> ProposedTrade:
+def _proposal(config: create_risk_config) -> create_proposed_trade:
     """Build a Risk-owned proposal bound exactly to the embedded intent."""
-    return ProposedTrade(
+    return create_proposed_trade(
         intent=_intent(),
         account_id="account-1",
         portfolio_id="portfolio-1",
@@ -260,7 +258,7 @@ def _proposal(config: RiskConfig) -> ProposedTrade:
     )
 
 
-def _regime() -> RegimeAssessment:
+def _regime() -> create_regime_assessment:
     """Build one fully known normal regime assessment."""
     states = dict.fromkeys(
         (
@@ -274,7 +272,7 @@ def _regime() -> RegimeAssessment:
         ),
         "normal",
     )
-    return RegimeAssessment(
+    return create_regime_assessment(
         assessment_id="regime-1",
         states=states,
         previous_states=states,
@@ -286,9 +284,9 @@ def _regime() -> RegimeAssessment:
     )
 
 
-def _inactive_kill_switch() -> KillSwitchState:
+def _inactive_kill_switch() -> create_kill_switch_state:
     """Build one inactive applicable canonical kill-switch state."""
-    return KillSwitchState(
+    return create_kill_switch_state(
         state_id="global-state-1",
         scope_level="global",
         scope={},
@@ -299,9 +297,9 @@ def _inactive_kill_switch() -> KillSwitchState:
     )
 
 
-def _auth(config: RiskConfig) -> AuthContext:
+def _auth(config: create_risk_config) -> create_auth_context:
     """Build an authenticated context with exact governor trace identity."""
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="operator-1",
@@ -317,9 +315,9 @@ def _auth(config: RiskConfig) -> AuthContext:
     )
 
 
-def _attestation(config: RiskConfig) -> ApprovalAttestation:
+def _attestation(config: create_risk_config) -> create_approval_attestation:
     """Build authorized human approval evidence bound to this decision."""
-    return ApprovalAttestation(
+    return create_approval_attestation(
         attestation_id="attestation-1",
         principal_id="operator-1",
         action="submit_order",
@@ -336,10 +334,12 @@ def _attestation(config: RiskConfig) -> ApprovalAttestation:
     )
 
 
-def _governor(config: RiskConfig) -> RiskGovernor:
+def _governor(config: Any) -> Any:
     """Construct the governor with fully injected Risk dependencies."""
-    audit = RiskAuditChain(config, _ExampleAuditStore(), lambda: NOW, canonical_json)
-    approvals = ApprovalTokenService(
+    audit = create_risk_audit_chain(
+        config, _ExampleAuditStore(), lambda: NOW, canonical_json
+    )
+    approvals = create_approval_token_service(
         config,
         _ExampleTokenStore(),
         audit,
@@ -347,7 +347,7 @@ def _governor(config: RiskConfig) -> RiskGovernor:
         lambda _: b"example-risk-signing-key-material-32-bytes",
         lambda evidence: evidence.principal_id == "operator-1",
     )
-    return RiskGovernor(config, approvals, audit, lambda: NOW)
+    return create_risk_governor(config, approvals, audit, lambda: NOW)
 
 
 def example_governor() -> None:
@@ -360,7 +360,8 @@ def example_governor() -> None:
     snapshot = _snapshot(config)
 
     decision = unwrap_risk_response(
-        governor.review_trade_risk(
+        review_trade_risk(
+            governor,
             _proposal(config),
             snapshot,
             _market(),
@@ -379,7 +380,8 @@ def example_governor() -> None:
     )
 
     current = unwrap_risk_response(
-        governor.run_portfolio_risk_governor(
+        run_portfolio_risk_governor(
+            governor,
             snapshot,
             _market(),
             _regime(),

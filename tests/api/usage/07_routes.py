@@ -8,14 +8,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.api.identity import require_auth_context
 from app.services.api.routes import operator, operator_router
-from app.services.risk import (
-    ApprovalAttestation,
-    KillSwitchCommand,
-    KillSwitchState,
-)
+from app.services.risk import create_kill_switch_state
 from app.utils import AuthContext
 from fastapi import FastAPI
 from tests.api._support import post_json
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+ApprovalAttestation = object
+KillSwitchCommand = object
+KillSwitchState = object
 
 NOW = datetime(2026, 7, 24, 9, tzinfo=UTC)
 REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
@@ -70,7 +71,7 @@ def fr_api_034() -> dict[str, object]:
         assert auth.principal_id == "operator-example"
         assert attestation is None
         commands.append(command)
-        return KillSwitchState(
+        return create_kill_switch_state(
             state_id="global-active-example",
             scope_level="global",
             scope={},

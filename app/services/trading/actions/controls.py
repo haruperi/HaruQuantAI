@@ -7,7 +7,7 @@ from __future__ import annotations
 from hashlib import sha256
 from typing import TYPE_CHECKING, Any, Literal
 
-from app.services.risk import ActionPolicyVerdict, KillSwitchCommand
+from app.services.risk import create_kill_switch_command
 from app.services.trading.actions._shared import authority_id, require_action
 from app.services.trading.contracts import (
     TradingError,
@@ -28,6 +28,8 @@ from app.services.trading.validation.authority import (
 from app.utils import canonical_json, get_logger
 
 type StandardResponse[T] = Any
+ActionPolicyVerdict = Any
+KillSwitchCommand = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 logger = get_logger(__name__)
@@ -250,7 +252,7 @@ def _kill_switch_command(request: TradingRequest, action: str) -> KillSwitchComm
     logger.debug("Building typed Risk kill-switch command")
     if request.scope_level is None or request.control_reason is None:
         raise TradingError("INVALID_REQUEST", "Switch scope and reason are required")
-    return KillSwitchCommand(
+    return create_kill_switch_command(
         action=action,  # type: ignore[arg-type]
         scope_level=request.scope_level,
         portfolio_id=request.portfolio_id,

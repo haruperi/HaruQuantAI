@@ -8,10 +8,10 @@ from hashlib import sha256
 
 import pytest
 from app.services.risk import (
-    AllocationRiskDecision,
-    DecisionState,
-    PortfolioBudgetExecutionVerdict,
-    StrategyOperationalEligibilityDecision,
+    create_allocation_risk_decision,
+    create_portfolio_budget_execution_verdict,
+    create_strategy_operational_eligibility_decision,
+    get_decision_state,
 )
 from app.services.trading.actions import execute_portfolio_rebalance
 from app.services.trading.contracts import (
@@ -27,6 +27,11 @@ from tests.trading.unit.actions.test_dependencies import (
     MemoryStore,
     dependencies,
 )
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+AllocationRiskDecision = object
+PortfolioBudgetExecutionVerdict = object
+StrategyOperationalEligibilityDecision = object
 
 
 @pytest.fixture
@@ -78,11 +83,11 @@ def rebalance_request() -> PortfolioRebalanceExecutionRequest:
 
 def allocation() -> AllocationRiskDecision:
     """Build current active Risk allocation authority."""
-    return AllocationRiskDecision(
+    return create_allocation_risk_decision(
         decision_id="allocation-001",
         portfolio_id="portfolio-001",
         reviewed_version="allocation-v1",
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         capped_weights={"strategy-001": Decimal("0.5")},
         risk_budget_projection={"strategy-001": Decimal(5000)},
         conditions=(),
@@ -98,7 +103,7 @@ def allocation() -> AllocationRiskDecision:
 
 def budget(item: PortfolioRebalanceExecutionRequest) -> PortfolioBudgetExecutionVerdict:
     """Build exact plan-bound Risk execution budget authority."""
-    return PortfolioBudgetExecutionVerdict(
+    return create_portfolio_budget_execution_verdict(
         verdict_id="budget-001",
         allocation_decision_id=item.allocation_decision_id,
         portfolio_id=item.portfolio_id,
@@ -118,12 +123,12 @@ def budget(item: PortfolioRebalanceExecutionRequest) -> PortfolioBudgetExecution
 
 def eligibility() -> StrategyOperationalEligibilityDecision:
     """Build current approved strategy eligibility authority."""
-    return StrategyOperationalEligibilityDecision(
+    return create_strategy_operational_eligibility_decision(
         decision_id="eligibility-001",
         strategy_id="strategy-001",
         strategy_version="v1",
         scope={"portfolio_id": "portfolio-001"},
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         conditions=(),
         policy_version="policy-v1",
         evidence_refs={"review": "review-001"},

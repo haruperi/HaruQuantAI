@@ -34,11 +34,9 @@ RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.data import (
-        MarketContextEvidence,
-    )
     from app.services.risk.audit import RiskAuditChain
     from app.services.risk.audit.storage import _AllocationDecisionStore
+    from app.services.risk.contracts.evidence import _MarketContextEvidenceView
 
 _ALLOCATION_KINDS = frozenset({"portfolio", "strategy", "symbol", "cluster"})
 
@@ -253,7 +251,7 @@ def _audit_record(
 def review_allocation_proposal(
     request: AllocationReviewRequest,
     snapshot: PortfolioRiskSnapshot,
-    market: MarketContextEvidence,
+    market: _MarketContextEvidenceView,
     config: RiskConfig,
     store: _AllocationDecisionStore,
     audit: RiskAuditChain,
@@ -354,7 +352,7 @@ def review_allocation_proposal(
     try:
         saved = store.save_review_if_absent(decision, timeout_seconds=timeout)
     except Exception as error:
-        logger.error("Allocation review persistence failed")
+        logger.exception("Allocation review persistence failed")
         raise RiskDomainError(
             RiskErrorCode.STORAGE_ERROR,
             "allocation review persistence unavailable",
@@ -502,7 +500,7 @@ def activate_allocation_budget(
             timeout_seconds=timeout,
         )
     except Exception as error:
-        logger.error("Reading active allocation Risk budget failed")
+        logger.exception("Reading active allocation Risk budget failed")
         raise RiskDomainError(
             RiskErrorCode.STORAGE_ERROR,
             "active allocation budget unavailable",
@@ -515,7 +513,7 @@ def activate_allocation_budget(
         current,
         checked_now,
     )
-    values = decision.model_dump(mode="python")
+    values = decision.model_dump(warnings=False, mode="python")
     values["active"] = True
     active = AllocationRiskDecision.model_validate(values)
     try:
@@ -525,7 +523,7 @@ def activate_allocation_budget(
             timeout_seconds=timeout,
         )
     except Exception as error:
-        logger.error("Allocation Risk budget compare-and-swap failed")
+        logger.exception("Allocation Risk budget compare-and-swap failed")
         raise RiskDomainError(
             RiskErrorCode.STORAGE_ERROR,
             "allocation budget activation unavailable",

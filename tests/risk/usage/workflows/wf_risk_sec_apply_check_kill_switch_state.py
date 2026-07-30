@@ -7,21 +7,21 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.risk import (
-    KillSwitchCommand,
-    RiskAuditChain,
     apply_kill_switch_command,
     check_risk_kill_switch,
+    create_kill_switch_command,
+    create_risk_audit_chain,
 )
 from app.utils import canonical_json
 from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-SEC"
 STAGES = (
-    "Accept explicit scoped KillSwitchCommand plus separate AuthContext.",
+    "Accept explicit scoped create_kill_switch_command plus separate create_auth_context.",
     "Validate precedence, authorization, and transition requirements.",
     "Persist canonical state, revoke affected approvals, and seal audit evidence.",
     "Check the complete hierarchy for deterministic block/recovery truth.",
-    "Return KillSwitchState and Risk decision without mutating execution controls.",
+    "Return create_kill_switch_state and Risk decision without mutating execution controls.",
 )
 
 
@@ -39,8 +39,8 @@ def main() -> None:
     config = examples._config()
     _, approvals, _ = examples._services(config)
     store = examples._KillStore()
-    audit = RiskAuditChain(config, store, lambda: examples.NOW, canonical_json)
-    command = KillSwitchCommand(
+    audit = create_risk_audit_chain(config, store, lambda: examples.NOW, canonical_json)
+    command = create_kill_switch_command(
         action="activate",
         scope_level="global",
         portfolio_id=None,

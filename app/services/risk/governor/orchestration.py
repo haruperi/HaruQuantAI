@@ -39,11 +39,9 @@ RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.data import (
-        MarketContextEvidence,
-    )
     from app.services.risk.approvals import ApprovalTokenService
     from app.services.risk.audit import RiskAuditChain
+    from app.services.risk.contracts.evidence import _MarketContextEvidenceView
 
 
 class _CapacityGuard(Protocol):  # pragma: no cover
@@ -513,7 +511,7 @@ class RiskGovernor:
         self,
         proposal: ProposedTrade,
         snapshot: PortfolioRiskSnapshot,
-        market: MarketContextEvidence,
+        market: _MarketContextEvidenceView,
         auth: AuthContext,
         now: datetime,
     ) -> None:
@@ -565,7 +563,7 @@ class RiskGovernor:
     def _base_checks(
         self,
         snapshot: PortfolioRiskSnapshot,
-        market: MarketContextEvidence,
+        market: _MarketContextEvidenceView,
         regime: RegimeAssessment,
         kill_switch_states: Sequence[KillSwitchState],
         now: datetime,
@@ -612,7 +610,7 @@ class RiskGovernor:
         self,
         proposal: ProposedTrade,
         snapshot: PortfolioRiskSnapshot,
-        market: MarketContextEvidence,
+        market: _MarketContextEvidenceView,
         regime: RegimeAssessment,
         kill_switch_states: Sequence[KillSwitchState],
         auth: AuthContext,
@@ -773,7 +771,7 @@ class RiskGovernor:
     def run_portfolio_risk_governor(
         self,
         snapshot: PortfolioRiskSnapshot,
-        market: MarketContextEvidence,
+        market: _MarketContextEvidenceView,
         regime: RegimeAssessment,
         kill_switch_states: Sequence[KillSwitchState],
         auth: AuthContext,
@@ -874,4 +872,115 @@ class RiskGovernor:
             ) from error
 
 
-__all__ = ["RiskGovernor"]
+def create_risk_governor(
+    config: RiskConfig,
+    approvals: ApprovalTokenService,
+    audit: RiskAuditChain,
+    clock: Callable[[], datetime],
+    capacity_guard: _CapacityGuard | None = None,
+) -> RiskGovernor:
+    """Create an opaque fixed-precedence Risk governor.
+
+    Args:
+        config: Validated Risk configuration.
+        approvals: Opaque approval-token coordinator.
+        audit: Opaque Risk audit coordinator.
+        clock: Injected aware-UTC clock.
+        capacity_guard: Optional atomic in-flight capacity owner.
+
+    Returns:
+        Opaque internal Risk governor.
+    """
+    return RiskGovernor(config, approvals, audit, clock, capacity_guard)
+
+
+def review_trade_risk(
+    governor: RiskGovernor,
+    proposal: ProposedTrade,
+    snapshot: PortfolioRiskSnapshot,
+    market: _MarketContextEvidenceView,
+    regime: RegimeAssessment,
+    kill_switch_states: Sequence[KillSwitchState],
+    auth: object,
+    *,
+    attestation: ApprovalAttestation | None = None,
+    now: datetime,
+) -> object:
+    """Review one proposed trade through an opaque Risk governor.
+
+    Args:
+        governor: Opaque governor returned by :func:`create_risk_governor`.
+        proposal: Risk-owned non-executable proposal.
+        snapshot: Current immutable portfolio evidence.
+        market: Current normalized market-context evidence.
+        regime: Current deterministic regime assessment.
+        kill_switch_states: Complete applicable kill-switch hierarchy.
+        auth: Authenticated caller and trace context.
+        attestation: Optional current human approval evidence.
+        now: Explicit aware-UTC decision time.
+
+    Returns:
+        Standard response carrying the canonical Risk decision.
+
+    Raises:
+        TypeError: If ``governor`` is not a Risk governor.
+    """
+    if not isinstance(governor, RiskGovernor):
+        raise TypeError("governor must be created by create_risk_governor")
+    return governor.review_trade_risk(
+        proposal,
+        snapshot,
+        market,
+        regime,
+        kill_switch_states,
+        auth,
+        attestation=attestation,
+        now=now,
+    )
+
+
+def run_portfolio_risk_governor(
+    governor: RiskGovernor,
+    snapshot: PortfolioRiskSnapshot,
+    market: _MarketContextEvidenceView,
+    regime: RegimeAssessment,
+    kill_switch_states: Sequence[KillSwitchState],
+    auth: object,
+    *,
+    now: datetime,
+) -> object:
+    """Evaluate current portfolio compliance through an opaque governor.
+
+    Args:
+        governor: Opaque governor returned by :func:`create_risk_governor`.
+        snapshot: Current immutable portfolio evidence.
+        market: Current normalized market-context evidence.
+        regime: Current deterministic regime assessment.
+        kill_switch_states: Complete applicable kill-switch hierarchy.
+        auth: Authenticated caller and trace context.
+        now: Explicit aware-UTC decision time.
+
+    Returns:
+        Standard response carrying the canonical current-state decision.
+
+    Raises:
+        TypeError: If ``governor`` is not a Risk governor.
+    """
+    if not isinstance(governor, RiskGovernor):
+        raise TypeError("governor must be created by create_risk_governor")
+    return governor.run_portfolio_risk_governor(
+        snapshot,
+        market,
+        regime,
+        kill_switch_states,
+        auth,
+        now=now,
+    )
+
+
+__all__ = [
+    "RiskGovernor",
+    "create_risk_governor",
+    "review_trade_risk",
+    "run_portfolio_risk_governor",
+]

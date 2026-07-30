@@ -25,9 +25,18 @@ from app.services.portfolio.evidence import (
     validator,
 )
 from app.services.portfolio.exceptions import PortfolioError
-from app.services.risk import DecisionState, StrategyOperationalEligibilityDecision
-from app.services.strategy import StrategyLifecycleStatus, ValidatedStrategyRef
+from app.services.risk import (
+    create_strategy_operational_eligibility_decision,
+    get_decision_state,
+)
+from app.services.strategy import (
+    create_validated_strategy_ref,
+    get_strategy_lifecycle_status,
+)
 from app.utils import logger
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+StrategyOperationalEligibilityDecision = object
 
 
 def _analytics_evidence(now: datetime) -> PortfolioAllocationEvidence:
@@ -50,7 +59,7 @@ def _analytics_evidence(now: datetime) -> PortfolioAllocationEvidence:
 def _owner_bundle(
     now: datetime,
 ) -> tuple[
-    dict[str, ValidatedStrategyRef],
+    dict[str, create_validated_strategy_ref],
     dict[str, StrategyOperationalEligibilityDecision],
     AccountStateSnapshot,
     MarketDataset,
@@ -66,23 +75,23 @@ def _owner_bundle(
         Strategy, Risk, Data, Analytics, and FX owner-contract bundle.
     """
     logger.debug("Building Portfolio owner evidence test bundle")
-    refs: dict[str, ValidatedStrategyRef] = {}
+    refs: dict[str, create_validated_strategy_ref] = {}
     decisions: dict[str, StrategyOperationalEligibilityDecision] = {}
     for suffix in ("a", "b"):
-        ref = ValidatedStrategyRef.model_construct(
+        ref = create_validated_strategy_ref.model_construct(
             manifest=SimpleNamespace(
                 strategy_id=f"strategy-{suffix}",
                 strategy_version="1.0.0",
             ),
-            lifecycle_status=StrategyLifecycleStatus.APPROVED,
+            lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
             registry_record_hash=suffix * 64,
         )
-        decision = StrategyOperationalEligibilityDecision.model_construct(
+        decision = create_strategy_operational_eligibility_decision(
             decision_id=f"eligibility-{suffix}",
             strategy_id=f"strategy-{suffix}",
             strategy_version="1.0.0",
             scope={"environment": "simulation", "tenant": "owner"},
-            state=DecisionState.APPROVE,
+            state=get_decision_state("APPROVE"),
             suspended=False,
             issued_at=now - timedelta(minutes=1),
             expires_at=now + timedelta(minutes=10),
@@ -280,12 +289,12 @@ def test_evidence_rejects_changed_strategy_and_unsafe_objects(
     )
     refs, decisions, account, market, analytics, fx = _owner_bundle(portfolio_now)
     changed = dict(refs)
-    changed["component-a"] = ValidatedStrategyRef.model_construct(
+    changed["component-a"] = create_validated_strategy_ref.model_construct(
         manifest=SimpleNamespace(
             strategy_id="strategy-a",
             strategy_version="2.0.0",
         ),
-        lifecycle_status=StrategyLifecycleStatus.APPROVED,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
         registry_record_hash="a" * 64,
     )
     common = {

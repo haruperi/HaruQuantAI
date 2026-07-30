@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+from app.services.risk import issue_risk_approval_token, validate_risk_approval_token
 from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-008"
@@ -31,10 +32,15 @@ def main() -> None:
     _stage(1)
     service, store, decision, attestation = examples._values(live=True)
     print("Input decision:", decision.decision_id)
-    # Stage 2: Issue through ApprovalTokenService.
+    # Stage 2: Issue through create_approval_token_service.
     _stage(2)
     token = unwrap_risk_response(
-        service.issue(decision, attestation, now=examples.NOW),
+        issue_risk_approval_token(
+            service,
+            decision,
+            attestation,
+            now=examples.NOW,
+        ),
         operation="approval_tokens.issue",
     )
     print("Issued:", token.token_id)
@@ -45,8 +51,12 @@ def main() -> None:
     # Stage 4: Validate, reserve, consume, and audit atomically.
     _stage(4)
     result = unwrap_risk_response(
-        service.validate_reserve_and_consume(
-            token, attestation, expected, now=examples.NOW
+        validate_risk_approval_token(
+            service,
+            token,
+            attestation,
+            expected,
+            now=examples.NOW,
         ),
         operation="approval_tokens.validate_reserve_and_consume",
     )

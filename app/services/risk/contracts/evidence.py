@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from datetime import datetime, timedelta
 from decimal import Decimal
 from types import MappingProxyType
-from typing import Literal
+from typing import Literal, Protocol, runtime_checkable
 
 from pydantic import (
     BaseModel,
@@ -18,9 +18,9 @@ from pydantic import (
 )
 
 from app.services.data import (
-    AccountStateSnapshot,  # noqa: TC001
-    FXConversionEvidence,  # noqa: TC001
-    MarketContextEvidence,  # noqa: TC001
+    build_account_state_snapshot,
+    build_fx_conversion_evidence,
+    build_market_context_evidence,
 )
 from app.services.risk.contracts.enums import LimitStatus, RiskErrorCode
 from app.services.risk.contracts.errors import RiskDomainError
@@ -33,6 +33,92 @@ logger = get_logger(__name__)
 
 _CURRENCY_CODE_LENGTH = 3
 _CORRELATION_PAIR_SIZE = 2
+
+
+@runtime_checkable
+class _AccountItemView(Protocol):
+    """Structural view of one Data-owned account position or order."""
+
+    symbol: str
+    side: str
+    quantity: Decimal
+
+
+@runtime_checkable
+class _AccountStateSnapshotView(Protocol):
+    """Structural view of the Data-owned account snapshot."""
+
+    contract_version: str
+    account_id: str
+    currency: str
+    equity: Decimal
+    margin_used: Decimal | None
+    positions: tuple[_AccountItemView, ...]
+    orders: tuple[_AccountItemView, ...]
+    snapshot_at: datetime
+    expires_at: datetime
+    request_id: str
+
+    def model_dump(
+        self,
+        *,
+        mode: str = "python",
+        warnings: bool = True,
+    ) -> dict[str, object]:
+        """Return the complete account snapshot payload."""
+        ...
+
+
+@runtime_checkable
+class _FXConversionEvidenceView(Protocol):
+    """Structural view of Data-owned FX conversion evidence."""
+
+    contract_version: str
+    source_currency: str
+    target_currency: str
+    composite_rate: Decimal
+    as_of: datetime
+    expires_at: datetime
+    request_id: str
+
+    def model_dump(
+        self,
+        *,
+        mode: str = "python",
+        warnings: bool = True,
+    ) -> dict[str, object]:
+        """Return the complete FX conversion payload."""
+        ...
+
+
+@runtime_checkable
+class _MarketContextEvidenceView(Protocol):
+    """Structural view of Data-owned market-context evidence."""
+
+    contract_version: str
+    symbol: str
+    spread: Decimal | None
+    spread_unit: str | None
+    liquidity: Decimal | None
+    volatility: Decimal | None
+    correlations: Mapping[str, Decimal]
+    crisis_flags: tuple[str, ...]
+    session_state: str | None
+    calendar_state: str | None
+    timezone: str
+    provenance: Mapping[str, str]
+    as_of: datetime
+    expires_at: datetime
+    request_id: str
+
+    def model_dump(
+        self,
+        *,
+        mode: str = "python",
+        warnings: bool = True,
+    ) -> dict[str, object]:
+        """Return the complete market-context payload."""
+        ...
 
 
 def _utc(value: datetime) -> datetime:
@@ -156,14 +242,14 @@ class PortfolioState(_EvidenceModel):
 
     contract_version: Literal["v1"] = "v1"
     schema_id: Literal["risk.portfolio_state.v1"] = "risk.portfolio_state.v1"
-    account_snapshot: AccountStateSnapshot
+    account_snapshot: _AccountStateSnapshotView
     peak_equity: Decimal
     day_start_equity: Decimal
     inception_equity: Decimal
     symbol_prices: Mapping[str, Decimal]
     symbol_contract_sizes: Mapping[str, Decimal]
     symbol_quote_currencies: Mapping[str, str]
-    fx_conversions: tuple[FXConversionEvidence, ...]
+    fx_conversions: tuple[_FXConversionEvidenceView, ...]
     return_timestamps: tuple[datetime, ...]
     return_history: Mapping[str, tuple[Decimal, ...]]
     correlations: Mapping[str, Decimal]
@@ -174,6 +260,59 @@ class PortfolioState(_EvidenceModel):
     missing_fields: tuple[str, ...]
     request_id: str
     workflow_id: str
+
+    @field_validator("account_snapshot", mode="before")
+    @classmethod
+    def _validate_account_snapshot(cls, value: object) -> object:
+        """Require an exact Data-owned account snapshot.
+
+        Args:
+            value: Candidate Data account snapshot.
+
+        Returns:
+            Exact validated Data account snapshot.
+
+        Raises:
+            TypeError: If the value does not implement Data's account contract.
+            ValueError: If the value was not produced by Data's public API.
+        """
+        if not isinstance(value, _AccountStateSnapshotView):
+            raise TypeError("account snapshot is incompatible")
+        validated = build_account_state_snapshot(
+            **value.model_dump(warnings=False, mode="python")
+        )
+        if type(value) is not type(validated):
+            raise ValueError("account snapshot must be produced by Data")
+        return validated
+
+    @field_validator("fx_conversions", mode="before")
+    @classmethod
+    def _validate_fx_conversions(cls, value: object) -> object:
+        """Require exact Data-owned FX conversion evidence.
+
+        Args:
+            value: Candidate conversion tuple.
+
+        Returns:
+            Exact validated conversion tuple.
+
+        Raises:
+            TypeError: If any value does not implement Data's FX contract.
+            ValueError: If any value was not produced by Data's public API.
+        """
+        if not isinstance(value, tuple):
+            raise TypeError("FX conversions must be a tuple")
+        validated_items = []
+        for item in value:
+            if not isinstance(item, _FXConversionEvidenceView):
+                raise TypeError("FX conversion evidence is incompatible")
+            validated = build_fx_conversion_evidence(
+                **item.model_dump(warnings=False, mode="python")
+            )
+            if type(item) is not type(validated):
+                raise ValueError("FX conversion evidence must be produced by Data")
+            validated_items.append(validated)
+        return tuple(validated_items)
 
     @field_validator("request_id", "workflow_id")
     @classmethod
@@ -429,7 +568,7 @@ class PortfolioState(_EvidenceModel):
         """
         logger.debug("Validating PortfolioState FX conversion evidence")
         base_currency = self.account_snapshot.currency
-        conversions: dict[str, FXConversionEvidence] = {}
+        conversions: dict[str, _FXConversionEvidenceView] = {}
         for evidence in self.fx_conversions:
             if (
                 evidence.contract_version != "v1"
@@ -682,7 +821,7 @@ class PortfolioRiskSnapshot(_EvidenceModel):
 
 @guard_risk_boundary(risk_level="medium", read_only=True)
 def validate_market_context_evidence(
-    evidence: MarketContextEvidence, *, now: datetime
+    evidence: _MarketContextEvidenceView, *, now: datetime
 ) -> None:
     """Validate Data-owned market context for Risk use.
 
@@ -694,6 +833,20 @@ def validate_market_context_evidence(
         RiskDomainError: If evidence is incompatible, stale, or malformed.
     """
     logger.info("Validating Data-owned market-context evidence for Risk")
+    if not isinstance(evidence, _MarketContextEvidenceView):
+        raise RiskDomainError(
+            RiskErrorCode.VALIDATION_FAILED,
+            "market-context evidence is incompatible",
+        )
+    payload = evidence.model_dump(warnings=False, mode="python")
+    payload["correlations"] = dict(evidence.correlations)
+    payload["provenance"] = dict(evidence.provenance)
+    validated = build_market_context_evidence(**payload)
+    if type(evidence) is not type(validated):
+        raise RiskDomainError(
+            RiskErrorCode.VALIDATION_FAILED,
+            "market-context evidence must be produced by Data",
+        )
     try:
         checked_now = _utc(now)
     except ValueError as error:

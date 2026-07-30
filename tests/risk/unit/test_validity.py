@@ -75,3 +75,37 @@ def test_config_change_and_expiry_invalidate() -> None:
     assert expired.status == "error"
     assert expired.error is not None
     assert expired.error.code == RiskErrorCode.STALE_EVIDENCE.value
+
+
+def test_unchanged_fresh_decision_is_reusable_but_not_authorizing() -> None:
+    """Return complete reuse evidence without granting execution authority."""
+    config = examples._config()
+    governor, _, _ = examples._services(config)
+    proposal = examples._proposal(config)
+    snapshot = examples._snapshot(config)
+    decision = unwrap_risk_response(
+        governor.review_trade_risk(
+            proposal,
+            snapshot,
+            policy_examples._market(),
+            examples._regime(),
+            (examples._inactive_state(),),
+            examples._auth(config),
+            attestation=examples._attestation(config),
+            now=examples.NOW,
+        ),
+        operation="risk_governor.review_trade_risk",
+    )
+    result = unwrap_risk_response(
+        revalidate_risk_decision(
+            decision,
+            proposal,
+            snapshot,
+            config,
+            now=examples.NOW,
+        ),
+        operation="revalidate_risk_decision",
+    )
+    assert result.reusable is True
+    assert result.refresh_required is False
+    assert result.evidence_refs["decision"] == decision.decision_id

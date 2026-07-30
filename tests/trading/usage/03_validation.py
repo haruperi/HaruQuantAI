@@ -11,10 +11,12 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data.evidence.account_contracts import (
-    AccountStateSnapshot,
+from app.services.data import build_account_state_snapshot
+from app.services.risk import (
+    create_kill_switch_state,
+    create_risk_decision_package,
+    get_decision_state,
 )
-from app.services.risk import DecisionState, KillSwitchState, RiskDecisionPackage
 from app.services.trading import (
     ReadinessAssessment,
     RouteSnapshot,
@@ -24,6 +26,10 @@ from app.services.trading import (
     get_route_snapshot,
     validate_order_request,
 )
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+KillSwitchState = object
+RiskDecisionPackage = object
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 
@@ -63,9 +69,9 @@ def _request() -> TradingRequest:
     )
 
 
-def _account() -> AccountStateSnapshot:
+def _account() -> object:
     """Build current Data-owned account evidence."""
-    return AccountStateSnapshot(
+    return build_account_state_snapshot(
         account_id="usage-account-001",
         currency="USD",
         balances=(),
@@ -110,10 +116,10 @@ def _snapshot() -> RouteSnapshot:
 
 def _risk() -> RiskDecisionPackage:
     """Build a real approving Risk decision package."""
-    return RiskDecisionPackage(
+    return create_risk_decision_package(
         decision_id="usage-risk-001",
         intent_id="usage-intent-001",
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         requested_size=Decimal("1.00"),
         approved_size=Decimal("1.00"),
         ordered_checks=(),
@@ -134,7 +140,7 @@ def _risk() -> RiskDecisionPackage:
 
 def _switch() -> KillSwitchState:
     """Build inactive real Risk kill-switch state."""
-    return KillSwitchState(
+    return create_kill_switch_state(
         state_id="usage-switch-001",
         scope_level="global",
         scope={},

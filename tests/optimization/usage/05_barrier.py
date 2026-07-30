@@ -11,12 +11,15 @@ from app.services.optimization import (
     estimate_first_passage,
     estimate_joint_first_passage,
 )
-from app.services.risk import FirmMandate
+from app.services.risk import create_firm_mandate
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+FirmMandate = object
 
 
 def _mandate(account_id: str = "account-1") -> FirmMandate:
     """Build a bounded mandate for the examples."""
-    return FirmMandate(
+    return create_firm_mandate(
         account_id=account_id,
         mandate_version="2026.07.28-01",
         firm="Example Firm",

@@ -14,13 +14,17 @@ from app.services.portfolio.contracts import (
 )
 from app.services.portfolio.exceptions import PortfolioError
 from app.services.risk import (
-    AllocationBudgetActivationRequest,
-    AllocationRiskDecision,
-    DecisionState,
-    KillSwitchState,
+    create_allocation_risk_decision,
+    create_kill_switch_state,
+    get_decision_state,
 )
 from app.services.simulator import PortfolioSimulationResult
 from app.utils import logger
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+AllocationBudgetActivationRequest = object
+AllocationRiskDecision = object
+KillSwitchState = object
 
 
 class RecordingRepository:
@@ -95,11 +99,11 @@ def _risk_decision(
         Current inactive Risk decision.
     """
     logger.debug("Building Portfolio Risk decision gate fixture")
-    return AllocationRiskDecision(
+    return create_allocation_risk_decision(
         decision_id="risk-decision-1",
         portfolio_id=result.portfolio_id,
         reviewed_version=result.portfolio_version,
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         capped_weights={
             item.component_id: item.capital_weight for item in result.component_weights
         },
@@ -127,7 +131,7 @@ def _inactive_kill_switch(now: datetime) -> KillSwitchState:
         Inactive global kill-switch state.
     """
     logger.debug("Building inactive Portfolio kill-switch fixture")
-    return KillSwitchState(
+    return create_kill_switch_state(
         state_id="kill-switch-1",
         scope_level="global",
         scope={},

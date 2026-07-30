@@ -11,14 +11,13 @@ from hashlib import sha256
 from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.brokers import (
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerFeatureFlags,
-)
-from app.services.risk import (
-    ActionPolicyVerdict,
-    KillSwitchState,
-    RiskDecisionPackage,
+    get_broker_adapter_contract_version,
+    get_broker_adapter_schema_id,
+    get_broker_connection_environment,
+    get_broker_connection_id,
+    get_broker_feature_flag_environment,
+    get_broker_feature_flag_id,
+    is_broker_connection_enabled,
 )
 from app.services.trading.contracts import TradingError
 from app.services.trading.contracts.errors import _redacted_envelope_data
@@ -41,6 +40,9 @@ from app.utils import (
 )
 
 type StandardResponse[T] = Any
+ActionPolicyVerdict = Any
+KillSwitchState = Any
+RiskDecisionPackage = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 type AuthContext = Any
@@ -48,10 +50,12 @@ type AuthContext = Any
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.brokers import BrokerAdapter
     from app.services.trading.state import TradingStateStore
 
 type _LifecycleStep = Callable[[], Awaitable[bool]]
+type BrokerConnection = object
+type BrokerAdapter = object
+type BrokerFeatureFlags = object
 type _RiskDecisionSource = Callable[[TradingRequest], RiskDecisionPackage | None]
 type _ActionPolicySource = Callable[[TradingRequest], ActionPolicyVerdict | None]
 type _KillSwitchSource = Callable[[TradingRequest], Sequence[KillSwitchState]]
@@ -60,7 +64,7 @@ type _ReadinessSource = Callable[
 ]
 type _AdapterCapabilitySource = Callable[[TradingRequest], Mapping[str, JsonValue]]
 type _AuthContextSource = Callable[[TradingRequest], AuthContext]
-type _AuditSink = Callable[[AuditEvent], None]
+type _AuditSink = Callable[[object], None]
 type _EventSink = Callable[[OperationalEvent], None]
 
 
@@ -71,7 +75,7 @@ class LiveSession:
         self,
         *,
         store: TradingStateStore,
-        connection: BrokerConnectionConfig | None,
+        connection: BrokerConnection | None,
         broker_adapter: BrokerAdapter | None,
         feature_flags: BrokerFeatureFlags | None,
         risk_decision_source: _RiskDecisionSource,
@@ -473,15 +477,16 @@ class LiveSession:
             raise TradingError(
                 "SERVICE_UNAVAILABLE", "Live session authority is absent"
             )
-        live_environment = connection.environment is BrokerEnvironment.LIVE
+        live_environment = get_broker_connection_environment(connection) == "live"
         if (config.execution_route == "live") != live_environment:
             raise TradingError("CONFIGURATION_INVALID", "Broker environment is unsafe")
         if (
-            not connection.provider_enabled
-            or flags.broker_id != connection.broker_id
-            or flags.environment is not connection.environment
-            or adapter.contract_version != "v1"
-            or adapter.schema_id != "brokers.adapter.v1"
+            not is_broker_connection_enabled(connection)
+            or get_broker_feature_flag_id(flags) != get_broker_connection_id(connection)
+            or get_broker_feature_flag_environment(flags)
+            != get_broker_connection_environment(connection)
+            or get_broker_adapter_contract_version(adapter) != "v1"
+            or get_broker_adapter_schema_id(adapter) != "brokers.adapter.v1"
         ):
             raise TradingError(
                 "ADAPTER_INCOMPATIBLE", "Broker authority is incompatible"

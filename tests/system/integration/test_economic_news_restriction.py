@@ -10,18 +10,21 @@ from app.services.data import (
     populate_market_context_calendar,
 )
 from app.services.risk import (
-    DecisionState,
-    KillSwitchState,
-    LimitStatus,
-    RiskConfig,
-    RiskDecisionPackage,
+    create_kill_switch_state,
+    create_risk_decision_package,
     evaluate_market_context,
+    get_decision_state,
+    get_limit_status,
 )
 from app.services.trading import (
     RouteSnapshot,
     TradingRequest,
     assess_execution_readiness,
 )
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+KillSwitchState = object
+RiskConfig = object
 
 _NOW = datetime(2026, 7, 26, 12, tzinfo=UTC)
 _REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
@@ -141,7 +144,7 @@ def _route() -> RouteSnapshot:
 
 def _switch() -> KillSwitchState:
     """Build fresh inactive Risk kill-switch evidence."""
-    return KillSwitchState(
+    return create_kill_switch_state(
         state_id="switch-001",
         scope_level="global",
         scope={},
@@ -160,12 +163,12 @@ def test_high_impact_event_blocks_risk_and_trading_readiness() -> None:
     assert limit_response.data is not None
     limit_results = limit_response.data
     calendar = next(result for result in limit_results if result.limit_id == "calendar")
-    assert calendar.status is LimitStatus.BLOCKED
+    assert calendar.status is get_limit_status("BLOCKED")
 
-    decision = RiskDecisionPackage(
+    decision = create_risk_decision_package(
         decision_id="risk-calendar-block",
         intent_id="intent-001",
-        state=DecisionState.REJECT,
+        state=get_decision_state("REJECT"),
         requested_size=Decimal("1.00"),
         approved_size=None,
         ordered_checks=limit_results,

@@ -9,7 +9,6 @@ import pytest
 from app.services.analytics import PortfolioRebalanceMeasurementRequest
 from app.services.portfolio.config import PortfolioSettings
 from app.services.portfolio.contracts import ActivePortfolioAllocation
-from app.services.risk import AllocationReviewRequest
 from app.services.trading import PortfolioRebalanceExecutionRequest
 from app.utils import logger
 from tests.portfolio.unit.test_workflows import _plan, _service
@@ -51,7 +50,10 @@ async def test_rebalance_uses_each_receivers_public_owned_contract(
         trading_request_id="req-44444444-4444-4444-8444-444444444444",
         valid_until=portfolio_now + timedelta(minutes=5),
     )
-    assert isinstance(recorder.last_risk_request, AllocationReviewRequest)
+    assert (
+        getattr(recorder.last_risk_request, "schema_id", None)
+        == "risk.allocation_review_request.v1"
+    )
     assert isinstance(
         recorder.last_trading_request,
         PortfolioRebalanceExecutionRequest,

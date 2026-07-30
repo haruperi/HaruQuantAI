@@ -3,18 +3,16 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data import (
-    MarketContextEvidence,
-)
-from app.services.risk import ProposedTrade, validate_market_context_evidence
-from app.services.strategy import TradeIntent
+from app.services.data import build_market_context_evidence
+from app.services.risk import create_proposed_trade, validate_market_context_evidence
+from app.services.strategy import create_trade_intent_value
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
 def test_risk_embeds_the_exact_strategy_intent() -> None:
     """Preserve the complete Strategy object at the Risk boundary."""
-    intent = TradeIntent(
+    intent = create_trade_intent_value(
         intent_id="intent-1",
         decision_id="strategy-decision-1",
         idempotency_key="intent-key-1",
@@ -42,7 +40,7 @@ def test_risk_embeds_the_exact_strategy_intent() -> None:
         rationale_ref=None,
         lineage={"config_hash": "a" * 64},
     )
-    proposal = ProposedTrade(
+    proposal = create_proposed_trade(
         intent=intent,
         account_id="account-1",
         portfolio_id=None,
@@ -63,7 +61,7 @@ def test_risk_embeds_the_exact_strategy_intent() -> None:
 
 def test_risk_consumes_the_data_market_contract() -> None:
     """Validate Data evidence directly without a Risk duplicate model."""
-    evidence = MarketContextEvidence(
+    evidence = build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
         calendar_state="clear",

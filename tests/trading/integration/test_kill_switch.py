@@ -7,15 +7,11 @@ from types import SimpleNamespace
 from typing import cast
 
 import pytest
-from app.services.brokers import (
-    BrokerAdapter,
-    BrokerFeatureFlags,
+from app.services.data import build_account_order, build_account_state_snapshot
+from app.services.risk import (
+    create_action_policy_verdict,
+    create_risk_decision_package,
 )
-from app.services.data.evidence.account_contracts import (
-    AccountOrder,
-    AccountStateSnapshot,
-)
-from app.services.risk import ActionPolicyVerdict, RiskDecisionPackage
 from app.services.trading import (
     LiveSession,
     ReadinessAssessment,
@@ -41,6 +37,10 @@ from tests.trading.conftest import (
     trading_request,
     unknown_dispatch,
 )
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+ActionPolicyVerdict = object
+RiskDecisionPackage = object
 
 
 async def _passed() -> bool:
@@ -81,7 +81,7 @@ def _child_risk(request) -> RiskDecisionPackage:
             "expires_at": NOW + timedelta(minutes=5),
         }
     )
-    return RiskDecisionPackage.model_validate(data)
+    return create_risk_decision_package(**data)
 
 
 def _emergency_policy(request) -> ActionPolicyVerdict:
@@ -101,15 +101,15 @@ def _emergency_policy(request) -> ActionPolicyVerdict:
             "correlation_id": request.correlation_id,
         }
     )
-    return ActionPolicyVerdict.model_validate(data)
+    return create_action_policy_verdict(**data)
 
 
-def _paper_account() -> AccountStateSnapshot:
+def _paper_account() -> object:
     """Build account evidence with eligible, skipped, and state-missing orders."""
     data = account_snapshot().model_dump(mode="python")
     data["orders"] = (
         *data["orders"],
-        AccountOrder(
+        build_account_order(
             order_id="order-missing",
             symbol="EURUSD",
             side="BUY",
@@ -117,7 +117,7 @@ def _paper_account() -> AccountStateSnapshot:
             quantity=1,
         ),
     )
-    return AccountStateSnapshot.model_validate(data)
+    return build_account_state_snapshot(**data)
 
 
 def _paper_emergency_dependencies(adapter: CountingAdapter):
@@ -145,14 +145,8 @@ def _paper_emergency_dependencies(adapter: CountingAdapter):
     session = LiveSession(
         store=store,
         connection=connection,
-        broker_adapter=cast("BrokerAdapter", adapter),
-        feature_flags=cast(
-            "BrokerFeatureFlags",
-            SimpleNamespace(
-                broker_id=connection.broker_id,
-                environment=connection.environment,
-            ),
-        ),
+        broker_adapter=cast("object", adapter),
+        feature_flags=SimpleNamespace(broker_id="mt5", environment="demo"),
         risk_decision_source=_child_risk,
         action_policy_source=_emergency_policy,
         kill_switch_source=inactive_kill_switch_hierarchy,
@@ -177,7 +171,7 @@ def _paper_emergency_dependencies(adapter: CountingAdapter):
     deps = replace(
         trading_dependencies(store=store),
         connection=connection,
-        broker_adapter=cast("BrokerAdapter", adapter),
+        broker_adapter=cast("object", adapter),
         simulation_dispatch=None,
         live_session=session,
         account_state_source=lambda _request: _paper_account(),

@@ -67,7 +67,7 @@ def test_portfolio_governor_no_execution_mutation() -> None:
     config = examples._config()
     governor, _, _ = examples._services(config)
     snapshot = examples._snapshot(config)
-    before = snapshot.model_dump(mode="python")
+    before = snapshot.model_dump(warnings=False, mode="python")
     decision = unwrap_risk_response(
         governor.run_portfolio_risk_governor(
             snapshot,
@@ -80,7 +80,7 @@ def test_portfolio_governor_no_execution_mutation() -> None:
         operation="risk_governor.run_portfolio_risk_governor",
     )
     assert decision.state is DecisionState.APPROVE
-    assert snapshot.model_dump(mode="python") == before
+    assert snapshot.model_dump(warnings=False, mode="python") == before
     assert decision.recommendations == ("no_remediation_required",)
 
 

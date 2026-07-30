@@ -10,15 +10,16 @@ The three audited domains now expose function-only package roots, focused tests 
 
 - Completed Strategy `FEAT-STR-11` external proposal evaluation plus `WF-STR-011` approved Optimization-result adoption and `WF-STR-012` research-only signal evaluation, without importing or changing the upstream Optimization, Simulator, Analytics, or Research domains.
 
-#### Changed (5)
+#### Changed (6)
 
 - Added the opaque `load_broker_provider_settings` function and Brokers-owned `resolve_provider_connection_config`/`create_connected_broker` operations so no settings class or connection DTO crosses a public package boundary.
 - Rewrote the Data composition root `_LazyBrokerSession` to resolve MT5, cTrader, and credential-free providers through the Brokers resolver and removed its private `_ProviderRuntimeSettings`, so Data no longer resolves credentials or builds connection configurations.
 - Migrated audited production, usage, workflow, and integration consumers to domain-root imports and added package-root function-only boundary checks.
 - Marked `FEAT-DATA-11` and `FR-DATA-095`–`099`/`123`–`129` Pending because the repository has no licensed real economic-calendar transport; the usage now reports `SOURCE_UNAVAILABLE` instead of using `DemonstrationTransport`.
 - Reworked every Indicators feature usage and the active workflow evidence to print bounded MT5-derived OHLCV and calculated DataFrames, and added direct subprocess coverage for `WF-INDI-006` through `WF-INDI-008`.
+- Refactored Risk to a 63-function package-root boundary, migrated direct consumers away from public classes/constants and deep imports, and completed all fifteen registered Risk workflows with substantive bounded evidence.
 
-#### Fixed (8)
+#### Fixed (9)
 
 - Fixed the Data composition root silently ignoring `settings.mt5.*` in `app/configs/env.json` because `_ProviderRuntimeSettings` extended `BaseSettings` instead of `AppSettings` and therefore read only the process environment; real-MT5 retrieval through the Data path now honors the central settings file.
 - Fixed Brokers package-root history/time-range forwarding and canonical timeframe normalization, restoring genuine MT5 history and Dukascopy bar reads.
@@ -28,6 +29,7 @@ The three audited domains now expose function-only package roots, focused tests 
 - Fixed external spread imports so decimal scale is derived from observed provider values rather than assigned a fabricated default.
 - Fixed Indicators response handling, private Data structural typing, workflow configuration construction, and validation/error branch coverage so the focused suite passes with every Indicators production file above the 80% floor.
 - Fixed Strategy response unwrapping, function-only contract/evaluator construction, deterministic checkpoint/configuration failures, and real MT5-backed usage evidence so all ten implemented workflows pass and every Strategy production file exceeds 80% branch coverage.
+- Fixed Risk YAML profile coercion for tuple, enum, loss-basis, hash-compatibility, and crisis-window fields; focused validation now passes 187 tests at 85.4% branch-aware coverage with every Risk production file above 80%.
 
 ### Add portfolio and risk advisory
 

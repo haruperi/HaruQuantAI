@@ -3,9 +3,8 @@ from decimal import Decimal
 
 import pytest
 from app.services.data import (
-    AccountBalance,
-    AccountStateSnapshot,
-    MarketContextEvidence,
+    build_account_state_snapshot,
+    build_market_context_evidence,
 )
 from app.services.risk.contracts import (
     PortfolioRiskSnapshot,
@@ -22,13 +21,15 @@ REQUEST_ID = "req-12345678-1234-4234-8234-123456789abc"
 def _state() -> PortfolioState:
     """Build representative immutable portfolio evidence."""
     return PortfolioState(
-        account_snapshot=AccountStateSnapshot(
+        account_snapshot=build_account_state_snapshot(
             account_id="account-1",
             currency="USD",
             balances=(
-                AccountBalance(
-                    asset="USD", total=Decimal(10000), available=Decimal(9500)
-                ),
+                {
+                    "asset": "USD",
+                    "total": Decimal(10000),
+                    "available": Decimal(9500),
+                },
             ),
             equity=Decimal(9500),
             margin_used=Decimal(500),
@@ -101,12 +102,12 @@ def test_snapshot_serializes_decimal_exactly() -> None:
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
-    assert snapshot.model_dump(mode="json")["equity"] == "9500.10"
+    assert snapshot.model_dump(warnings=False, mode="json")["equity"] == "9500.10"
 
 
 def test_market_context_uses_data_owned_contract() -> None:
     """Consume and freshness-check the Data-owned contract."""
-    evidence = MarketContextEvidence(
+    evidence = build_market_context_evidence(
         symbol="EURUSD",
         spread=Decimal("0.0001"),
         spread_unit="price",

@@ -1,6 +1,6 @@
 """Executable Risk config usage example.
 
-Demonstrates RiskConfig validation, file loading, and canonical config hash calculation.
+Demonstrates create_risk_config validation, file loading, and canonical config hash calculation.
 """
 
 import hashlib
@@ -15,11 +15,12 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.risk import (
-    DrawdownMode,
-    FirmMandate,
-    RiskConfig,
     compute_config_hash,
+    create_firm_mandate,
+    create_risk_config,
+    get_drawdown_mode,
     load_firm_mandate,
+    load_risk_config,
 )
 
 from tests.risk._support import unwrap_risk_response
@@ -50,21 +51,21 @@ def _values() -> dict[str, object]:
 
 
 def example_config() -> None:
-    """Demonstrate RiskConfig validation and hashing."""
-    _header("Demonstrate RiskConfig validation and hashing.")
+    """Demonstrate create_risk_config validation and hashing."""
+    _header("Demonstrate create_risk_config validation and hashing.")
     print("Risk Example 2: Configuration Validation and Hashing")
 
     # 1. Validate config
-    config = RiskConfig.model_validate(_values())
+    config = create_risk_config(**_values())
     print(
-        f"RiskConfig profile: {config.profile}, policy version: {config.policy_version}"
+        f"create_risk_config profile: {config.profile}, policy version: {config.policy_version}"
     )
 
     # 2. Compute config hash
     digest = unwrap_risk_response(
         compute_config_hash(config), operation="compute_config_hash"
     )
-    print(f"Computed RiskConfig SHA256 digest: {digest}")
+    print(f"Computed create_risk_config SHA256 digest: {digest}")
 
 
 _DEMONSTRATED = False
@@ -94,7 +95,20 @@ def fr_risk_023() -> None:
     _header(
         "FR-RISK-023: Load only the selected YAML profile from the bounded root and fail closed on missing/invalid live configuration."
     )
-    _demonstrate_once()
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        (root / "research.yaml").write_text(
+            yaml.safe_dump(
+                create_risk_config(**_values()).model_dump(warnings=False, mode="json"),
+            ),
+            encoding="utf-8",
+        )
+        loaded = unwrap_risk_response(
+            load_risk_config("research", root),
+            operation="load_risk_config",
+        )
+        print("Loaded bounded profile:")
+        print(loaded.model_dump(warnings=False, mode="json"))
 
 
 def fr_risk_024() -> None:
@@ -106,9 +120,9 @@ def fr_risk_024() -> None:
     _demonstrate_once()
 
 
-def _mandate(*, verified: bool = True, digest: str = "a" * 64) -> FirmMandate:
+def _mandate(*, verified: bool = True, digest: str = "a" * 64) -> object:
     """Build a bounded mandate usage fixture."""
-    return FirmMandate(
+    return create_firm_mandate(
         account_id="usage-account",
         mandate_version="2026.07.28-01",
         firm="Example Firm",
@@ -139,7 +153,9 @@ def _mandate(*, verified: bool = True, digest: str = "a" * 64) -> FirmMandate:
 
 
 def fr_risk_063() -> None:
-    """FR-RISK-063: Demonstrate an immutable mandate record."""
+    """FR-RISK-063: Define an immutable per-account firm mandate record carrying
+    firm identity, product model, phase, initial balance, the archived terms
+    URL, access date and terms content hash, and an explicit `verified` flag."""
     _header("FR-RISK-063: Immutable per-account firm mandate record")
     mandate = _mandate()
     print(f"Mandate account/version: {mandate.account_id}/{mandate.mandate_version}")
@@ -147,7 +163,9 @@ def fr_risk_063() -> None:
 
 
 def fr_risk_064() -> None:
-    """FR-RISK-064: Demonstrate archived terms verification and fail-closed load."""
+    """FR-RISK-064: Refuse every limit evaluation for an account whose mandate
+    is unverified or whose archived terms hash no longer matches, failing
+    closed rather than falling back to a profile default."""
     _header("FR-RISK-064: Verified mandate loading")
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
@@ -155,7 +173,9 @@ def fr_risk_064() -> None:
         digest = hashlib.sha256(terms).hexdigest()
         (root / "usage-account.terms").write_bytes(terms)
         (root / "usage-account.yaml").write_text(
-            yaml.safe_dump(_mandate(digest=digest).model_dump(mode="json")),
+            yaml.safe_dump(
+                _mandate(digest=digest).model_dump(warnings=False, mode="json")
+            ),
             encoding="utf-8",
         )
         loaded = unwrap_risk_response(
@@ -165,15 +185,15 @@ def fr_risk_064() -> None:
 
 
 def fr_risk_065() -> None:
-    """FR-RISK-065: Demonstrate explicit drawdown mode configuration."""
+    """FR-RISK-065: Expose the drawdown mode, its reference basis, whether it
+    trails unrealised equity, whether a ratchet ceiling applies, and any
+    end-of-day snapshot time and timezone as required configuration."""
     _header("FR-RISK-065: Explicit drawdown mode configuration")
-    config = RiskConfig.model_validate(
-        {
-            **_values(),
-            "drawdown_mode": DrawdownMode.TRAILING_EOD,
-            "drawdown_eod_snapshot_time": "23:59",
-            "drawdown_eod_snapshot_timezone": "UTC",
-        }
+    config = create_risk_config(
+        **_values(),
+        drawdown_mode=get_drawdown_mode("TRAILING_EOD"),
+        drawdown_eod_snapshot_time="23:59",
+        drawdown_eod_snapshot_timezone="UTC",
     )
     print(
         f"Drawdown mode: {config.drawdown_mode}; snapshot: "

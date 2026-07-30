@@ -8,24 +8,26 @@ from types import SimpleNamespace
 from typing import cast
 
 import pytest
-from app.services.brokers import (
-    BrokerAdapter,
-    BrokerConnectionConfig,
-    BrokerEnvironment,
-    BrokerFeatureFlags,
-)
+from app.services.brokers import build_broker_connection_config
 from app.services.risk import (
-    ActionPolicyVerdict,
-    DecisionState,
-    KillSwitchState,
-    RiskApprovalToken,
-    RiskDecisionPackage,
+    create_action_policy_verdict,
+    create_kill_switch_state,
+    create_risk_approval_token,
+    create_risk_decision_package,
+    get_decision_state,
 )
 from app.services.trading.contracts import TradingRequest, TradingRoute
 from app.services.trading.live import LiveSession, evaluate_live_gate
 from app.services.trading.state import IdempotencyReservation, TradingStateStore
 from app.services.trading.validation import ReadinessAssessment
-from app.utils import AuditEvent, AuthContext, logger
+from app.utils import create_auth_context, get_logger
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+ActionPolicyVerdict = object
+KillSwitchState = object
+RiskDecisionPackage = object
+
+logger = get_logger(__name__)
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -132,7 +134,7 @@ def _policy() -> ActionPolicyVerdict:
         Allowed Risk-owned action policy.
     """
     logger.debug("Building live-gate action policy")
-    return ActionPolicyVerdict(
+    return create_action_policy_verdict(
         verdict_id="policy-verdict-001",
         action="submit_order",
         scope={"account_id": "account-001"},
@@ -157,7 +159,7 @@ def _risk_decision() -> RiskDecisionPackage:
         Approved Risk decision package.
     """
     logger.debug("Building live-gate Risk decision")
-    token = RiskApprovalToken(
+    token = create_risk_approval_token(
         token_id="token-001",
         decision_id="risk-decision-001",
         config_hash="a" * 64,
@@ -172,10 +174,10 @@ def _risk_decision() -> RiskDecisionPackage:
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
-    return RiskDecisionPackage(
+    return create_risk_decision_package(
         decision_id="risk-decision-001",
         intent_id="intent-001",
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         requested_size=Decimal(1),
         approved_size=Decimal(1),
         ordered_checks=(),
@@ -201,7 +203,7 @@ def _inactive_switch() -> KillSwitchState:
         Inactive Risk switch state.
     """
     logger.debug("Building inactive live-gate kill switch")
-    return KillSwitchState(
+    return create_kill_switch_state(
         state_id="switch-001",
         scope_level="global",
         scope={},
@@ -218,7 +220,7 @@ def _inactive_hierarchy(
     """Build all exact applicable inactive switch scopes."""
     return (
         global_state or _inactive_switch(),
-        KillSwitchState(
+        create_kill_switch_state(
             state_id="switch-strategy",
             scope_level="strategy",
             scope={"strategy_id": "strategy-001"},
@@ -227,7 +229,7 @@ def _inactive_hierarchy(
             version=1,
             updated_at=NOW,
         ),
-        KillSwitchState(
+        create_kill_switch_state(
             state_id="switch-symbol",
             scope_level="symbol",
             scope={"symbol": "EURUSD"},
@@ -239,9 +241,9 @@ def _inactive_hierarchy(
     )
 
 
-def _auth_context() -> AuthContext:
+def _auth_context() -> object:
     """Build exact authenticated context for pre-mutation audit."""
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="trading-test",
@@ -284,7 +286,7 @@ def _session(
     *,
     risk_decision: RiskDecisionPackage | None = None,
     kill_switches: tuple[KillSwitchState, ...] = (),
-    pre_audit_sink: Callable[[AuditEvent], None] | None = None,
+    pre_audit_sink: Callable[[object], None] | None = None,
 ) -> LiveSession:
     """Build a mutation-enabled session with injected Risk evidence.
 
@@ -297,23 +299,20 @@ def _session(
         Started-capable LiveSession fixture.
     """
     logger.debug("Building live-gate session fixture")
-    connection = cast(
-        "BrokerConnectionConfig",
-        SimpleNamespace(
-            broker_id="test-broker",
-            environment=BrokerEnvironment.LIVE,
-            provider_enabled=True,
-        ),
+    connection = build_broker_connection_config(
+        broker_id="mt5",
+        environment="live",
+        provider_enabled=True,
     )
     adapter = cast(
-        "BrokerAdapter",
+        "object",
         SimpleNamespace(contract_version="v1", schema_id="brokers.adapter.v1"),
     )
     flags = cast(
-        "BrokerFeatureFlags",
+        "object",
         SimpleNamespace(
-            broker_id="test-broker",
-            environment=BrokerEnvironment.LIVE,
+            broker_id="mt5",
+            environment="live",
         ),
     )
     return LiveSession(
@@ -418,7 +417,7 @@ async def test_gate_passes_every_typed_authority_in_order() -> None:
 @pytest.mark.anyio
 async def test_gate_emits_exact_utils_audit_event() -> None:
     """The live pre-mutation boundary emits the shared typed AuditEvent."""
-    audits: list[AuditEvent] = []
+    audits: list[object] = []
     session = _session(
         risk_decision=_risk_decision(),
         kill_switches=_inactive_hierarchy(),
@@ -450,9 +449,11 @@ async def test_gate_emits_exact_utils_audit_event() -> None:
     await evaluate_live_gate(_request(), {"route": "fresh"}, session)
 
     assert len(audits) == 1
-    assert isinstance(audits[0], AuditEvent)
-    assert audits[0].principal_id == _auth_context().principal_id
-    assert audits[0].request_id == _auth_context().request_id
+    assert hasattr(audits[0], "principal_id")
+    audit_fields = vars(audits[0])
+    auth_fields = vars(_auth_context())
+    assert audit_fields["principal_id"] == auth_fields["principal_id"]
+    assert audit_fields["request_id"] == auth_fields["request_id"]
 
 
 @pytest.mark.anyio

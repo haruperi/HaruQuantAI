@@ -3,9 +3,7 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data import (
-    MarketContextEvidence,
-)
+from app.services.data import build_market_context_evidence
 from app.services.risk.admission import review_strategy_admission
 from app.services.risk.config import RiskConfig
 from app.services.risk.contracts import (
@@ -16,12 +14,12 @@ from app.services.risk.contracts import (
 )
 from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.strategy import (
-    StrategyEnvironment,
-    StrategyLifecycleStatus,
-    StrategyManifest,
-    StrategyTimingPolicy,
-    StrategyValidationPolicy,
-    ValidatedStrategyRef,
+    create_strategy_manifest,
+    create_strategy_validation_policy,
+    create_validated_strategy_ref,
+    get_strategy_environment,
+    get_strategy_lifecycle_status,
+    get_strategy_timing_policy,
 )
 
 from tests.risk._support import _risk_success
@@ -103,9 +101,9 @@ def _config() -> RiskConfig:
     )
 
 
-def _registration() -> ValidatedStrategyRef:
+def _registration() -> create_validated_strategy_ref:
     """Build one exact approved public Strategy reference."""
-    validation = StrategyValidationPolicy(
+    validation = create_strategy_validation_policy(
         policy_version="strategy-policy-1",
         approved_module_roots=("approved.strategies",),
         max_config_payload_bytes=4096,
@@ -113,7 +111,7 @@ def _registration() -> ValidatedStrategyRef:
         max_config_string_length=256,
         max_config_collection_items=128,
     )
-    manifest = StrategyManifest(
+    manifest = create_strategy_manifest(
         strategy_id="mean-reversion",
         strategy_version="1.0.0",
         module_path="approved.strategies.mean_reversion",
@@ -123,8 +121,8 @@ def _registration() -> ValidatedStrategyRef:
         config_schema={"type": "object"},
         required_data=("bars",),
         required_indicators=(),
-        timing_policy=StrategyTimingPolicy.EVENT_DRIVEN,
-        permitted_environments=(StrategyEnvironment.SIMULATION,),
+        timing_policy=get_strategy_timing_policy("EVENT_DRIVEN"),
+        permitted_environments=(get_strategy_environment("SIMULATION"),),
         source_hash=HASH_A,
         artifact_hash=HASH_A,
         dependency_hash=HASH_A,
@@ -137,10 +135,10 @@ def _registration() -> ValidatedStrategyRef:
         max_local_state_bytes=4096,
         decision_timeout_seconds=5,
     )
-    return ValidatedStrategyRef(
+    return create_validated_strategy_ref(
         manifest=manifest,
-        lifecycle_status=StrategyLifecycleStatus.APPROVED,
-        environment=StrategyEnvironment.SIMULATION,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
+        environment=get_strategy_environment("SIMULATION"),
         policy_version=validation.policy_version,
         validation_policy=validation,
         registry_record_hash=HASH_B,
@@ -149,9 +147,9 @@ def _registration() -> ValidatedStrategyRef:
     )
 
 
-def _market() -> MarketContextEvidence:
+def _market() -> object:
     """Build complete fresh Data-owned market evidence."""
-    return MarketContextEvidence(
+    return build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
         calendar_state="clear",
@@ -192,7 +190,7 @@ def _request() -> StrategyOperationalEligibilityRequest:
 def test_admission_never_mutates_strategy_state() -> None:
     """Persist and audit eligibility without changing the Strategy reference."""
     registration = _registration()
-    before = registration.model_dump(mode="json")
+    before = registration.model_dump(warnings=False, mode="json")
     store = _EligibilityStore()
     audit = _Audit()
     decision = unwrap_risk_response(
@@ -211,7 +209,7 @@ def test_admission_never_mutates_strategy_state() -> None:
     assert decision.suspended is False
     assert store.decision == decision
     assert len(audit.records) == 1
-    assert registration.model_dump(mode="json") == before
+    assert registration.model_dump(warnings=False, mode="json") == before
 
 
 def test_admission_fails_closed_on_evidence_or_identity_conflict() -> None:

@@ -345,10 +345,10 @@ def calculate_position_size(
             correlation_adjustment=correlation_adjustment,
         )
     except RiskDomainError:
-        logger.error("Position sizing failed with a coded Risk error")
+        logger.exception("Position sizing failed with a coded Risk error")
         raise
     except (ArithmeticError, ValueError) as error:
-        logger.error("Position sizing calculation failed closed")
+        logger.exception("Position sizing calculation failed closed")
         raise RiskDomainError(
             RiskErrorCode.CALCULATION_FAILED, "position sizing failed"
         ) from error

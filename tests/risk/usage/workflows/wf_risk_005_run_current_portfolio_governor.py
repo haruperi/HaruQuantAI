@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from app.services.risk import DecisionState
+from app.services.risk import get_decision_state, run_portfolio_risk_governor
 from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-005"
@@ -15,7 +15,7 @@ STAGES = (
     "Validate current evidence and evaluate portfolio-wide limits.",
     "Recommend approve, block, reduction, or review without mutating execution.",
     "Persist the material decision to the Risk audit chain.",
-    "Return current-state RiskDecisionPackage to Trading/UI/API.",
+    "Return current-state create_risk_decision_package to Trading/UI/API.",
 )
 
 
@@ -33,12 +33,13 @@ def main() -> None:
     config = examples._config()
     governor, _, audit = examples._services(config)
     snapshot = examples._snapshot(config)
-    before = snapshot.model_dump(mode="python")
+    before = snapshot.model_dump(warnings=False, mode="python")
     print("Input snapshot:", snapshot.snapshot_id)
     # Stage 2: Execute portfolio compliance validation.
     _stage(2)
     decision = unwrap_risk_response(
-        governor.run_portfolio_risk_governor(
+        run_portfolio_risk_governor(
+            governor,
             snapshot,
             examples._market(),
             examples._regime(),
@@ -51,13 +52,19 @@ def main() -> None:
     print("Decision:", decision.state)
     # Stage 3: Verify no execution or snapshot mutation.
     _stage(3)
-    print("Input unchanged:", before == snapshot.model_dump(mode="python"))
+    print(
+        "Input unchanged:", before == snapshot.model_dump(warnings=False, mode="python")
+    )
     # Stage 4: Verify durable audit evidence.
     _stage(4)
     print("Audit decision:", audit.records[-1].decision_id)
     # Stage 5 — OUTPUT BOUNDARY: Return advisory current-state decision.
     _stage(5)
-    print("Output:", type(decision).__name__, decision.state is DecisionState.APPROVE)
+    print(
+        "Output:",
+        type(decision).__name__,
+        decision.state is get_decision_state("APPROVE"),
+    )
 
 
 if __name__ == "__main__":

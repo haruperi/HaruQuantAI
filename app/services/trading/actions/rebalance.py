@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-from app.services.risk import DecisionState
+from app.services.risk import get_decision_state
 from app.services.trading.actions._shared import response_data_json
 from app.services.trading.actions.positions import reduce_exposure
 from app.services.trading.contracts import (
@@ -53,7 +53,7 @@ def _validate_eligibility(
     if set(by_id) != set(request.eligibility_decision_ids):
         raise TradingError("PERMISSION_DENIED", "Eligibility references mismatch")
     if any(
-        decision.state is not DecisionState.APPROVE
+        decision.state is not get_decision_state("APPROVE")
         or decision.suspended
         or decision.expires_at <= now
         for decision in decisions

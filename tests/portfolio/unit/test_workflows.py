@@ -22,9 +22,8 @@ from app.services.portfolio.orchestration import (
 from app.services.portfolio.rebalancing import RebalancingService
 from app.services.portfolio.state import PortfolioRepository, scope_key
 from app.services.risk import (
-    AllocationReviewRequest,
-    AllocationRiskDecision,
-    DecisionState,
+    create_allocation_risk_decision,
+    get_decision_state,
 )
 from app.services.trading import (
     PortfolioRebalanceExecutionRequest,
@@ -41,6 +40,10 @@ from tests.portfolio.unit.test_rebalancing import (
     _assess,
 )
 from tests.portfolio.unit.test_repository import FakePortfolioStore
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+AllocationReviewRequest = object
+AllocationRiskDecision = object
 
 
 class WorkflowRecorder:
@@ -78,11 +81,11 @@ class WorkflowRecorder:
         logger.info("Recording Portfolio workflow Risk review")
         self.risk_calls += 1
         self.last_risk_request = request
-        return AllocationRiskDecision(
+        return create_allocation_risk_decision(
             decision_id="risk-rebalance-1",
             portfolio_id=request.portfolio_id,
             reviewed_version=request.portfolio_version,
-            state=DecisionState.APPROVE,
+            state=get_decision_state("APPROVE"),
             capped_weights={
                 row.component_id: row.capital_weight
                 for row in self.allocation.component_weights

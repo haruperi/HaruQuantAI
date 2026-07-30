@@ -189,13 +189,34 @@ def _coerce_yaml_values(payload: Mapping[str, object]) -> dict[str, object]:
         normalized[field_name] = {
             str(key): _coerce_decimal(item) for key, item in value.items()
         }
+    return _coerce_yaml_collections(normalized)
+
+
+def _coerce_yaml_collections(normalized: dict[str, object]) -> dict[str, object]:
+    """Normalize schema-declared YAML collections and enumerations.
+
+    Args:
+        normalized: Payload whose Decimal fields have already been normalized.
+
+    Returns:
+        Fully normalized Risk configuration payload.
+    """
     for field_name in (
+        "allowed_session_states",
+        "blocked_calendar_states",
         "kill_switch_activation_permissions",
         "kill_switch_clearance_permissions",
     ):
         value = normalized.get(field_name)
         if isinstance(value, list):
             normalized[field_name] = tuple(value)
+    drawdown_mode = normalized.get("drawdown_mode")
+    if isinstance(drawdown_mode, str):
+        normalized["drawdown_mode"] = DrawdownMode(drawdown_mode)
+    for field_name in ("daily_loss_basis", "total_loss_basis"):
+        value = normalized.get(field_name)
+        if isinstance(value, str):
+            normalized[field_name] = LossReferenceBasis(value)
     for field_name in ("compatible_config_hashes", "crisis_windows_utc"):
         value = normalized.get(field_name)
         if isinstance(value, Mapping):
@@ -833,7 +854,10 @@ def load_risk_config(profile: str, config_root: Path) -> RiskConfig:
     try:
         return _load_risk_config(profile, config_root)
     except (OSError, TypeError, ValueError, ValidationError, yaml.YAMLError) as error:
-        logger.error("Risk configuration load failed closed: %s", type(error).__name__)
+        logger.exception(
+            "Risk configuration load failed closed: %s",
+            type(error).__name__,
+        )
         raise RiskDomainError(
             RiskErrorCode.INVALID_RISK_CONFIG,
             "profile load or validation failed",
@@ -855,7 +879,7 @@ def compute_config_hash(config: RiskConfig) -> str:
     """
     logger.info("Computing canonical Risk configuration hash")
     try:
-        payload = config.model_dump(mode="json")
+        payload = config.model_dump(warnings=False, mode="json")
         canonical = json.dumps(
             payload,
             sort_keys=True,
@@ -865,7 +889,7 @@ def compute_config_hash(config: RiskConfig) -> str:
         )
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     except (TypeError, ValueError) as error:
-        logger.error("Risk configuration canonicalization failed")
+        logger.exception("Risk configuration canonicalization failed")
         raise RiskDomainError(
             RiskErrorCode.INVALID_RISK_CONFIG,
             "canonical configuration serialization failed",

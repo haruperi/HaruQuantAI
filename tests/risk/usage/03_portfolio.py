@@ -11,11 +11,12 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import (
-    AccountBalance,
-    AccountStateSnapshot,
+from app.services.data import build_account_state_snapshot
+from app.services.risk import (
+    build_portfolio_risk_snapshot,
+    create_portfolio_state,
+    create_risk_config,
 )
-from app.services.risk import PortfolioState, RiskConfig, build_portfolio_risk_snapshot
 
 from tests.risk._support import unwrap_risk_response
 
@@ -38,11 +39,15 @@ def fr_risk_025() -> None:
     )
     print("Risk Example 7: Portfolio Risk Snapshot Construction")
 
-    account = AccountStateSnapshot(
+    account = build_account_state_snapshot(
         account_id="account-1",
         currency="USD",
         balances=(
-            AccountBalance(asset="USD", total=Decimal(10000), available=Decimal(10000)),
+            {
+                "asset": "USD",
+                "total": Decimal(10000),
+                "available": Decimal(10000),
+            },
         ),
         equity=Decimal(10000),
         margin_used=Decimal(0),
@@ -56,7 +61,7 @@ def fr_risk_025() -> None:
         expires_at=NOW + timedelta(minutes=1),
         request_id="req-12345678-1234-4234-8234-123456789abc",
     )
-    state = PortfolioState(
+    state = create_portfolio_state(
         account_snapshot=account,
         peak_equity=Decimal(10000),
         day_start_equity=Decimal(10000),
@@ -76,7 +81,7 @@ def fr_risk_025() -> None:
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
-    config = RiskConfig(
+    config = create_risk_config(
         profile="research",
         execution_route="none",
         policy_version="policy-1",
@@ -99,10 +104,8 @@ def fr_risk_025() -> None:
         build_portfolio_risk_snapshot(state, config, now=NOW),
         operation="build_portfolio_risk_snapshot",
     )
-    print(
-        f"Snapshot account ID: {snapshot.account_id}, "
-        f"gross exposure: {snapshot.gross_exposure}"
-    )
+    print("Complete calculated portfolio-risk snapshot:")
+    print(snapshot.model_dump(warnings=False, mode="json"))
 
 
 def main() -> None:

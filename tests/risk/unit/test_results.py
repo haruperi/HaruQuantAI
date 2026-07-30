@@ -337,7 +337,7 @@ def test_decision_reuse_result_never_grants_action_authority() -> None:
     )
     assert result.reusable is True
     assert not hasattr(result, "action_policy_verdict")
-    invalid = result.model_dump(mode="python")
+    invalid = result.model_dump(warnings=False, mode="python")
     invalid["refresh_required"] = True
     with pytest.raises(ValidationError):
         DecisionReuseValidationResult.model_validate(invalid)

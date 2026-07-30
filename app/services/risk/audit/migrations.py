@@ -2,9 +2,7 @@
 
 import hashlib
 
-from app.services.data import (
-    MigrationStep,
-)
+from app.services.data import build_migration_step
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -98,7 +96,7 @@ def _checksum(statements: tuple[str, ...]) -> str:
 
 
 _RISK_MIGRATION_STEPS = (
-    MigrationStep(
+    build_migration_step(
         domain="risk",
         migration_id="risk-0001-initial-state",
         checksum=_checksum(_STATEMENTS),

@@ -12,10 +12,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.risk import (
-    PortfolioRiskSnapshot,
-    PositionSizingRequest,
-    RiskConfig,
     calculate_position_size,
+    create_portfolio_risk_snapshot,
+    create_position_sizing_request,
+    create_risk_config,
 )
 
 from tests.risk._support import unwrap_risk_response
@@ -28,9 +28,9 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _snapshot() -> PortfolioRiskSnapshot:
+def _snapshot() -> create_portfolio_risk_snapshot:
     """Build immutable snapshot input."""
-    return PortfolioRiskSnapshot(
+    return create_portfolio_risk_snapshot(
         snapshot_id="snapshot-1",
         account_id="account-1",
         base_currency="USD",
@@ -61,9 +61,9 @@ def _snapshot() -> PortfolioRiskSnapshot:
     )
 
 
-def _config() -> RiskConfig:
+def _config() -> create_risk_config:
     """Build risk policy config."""
-    return RiskConfig(
+    return create_risk_config(
         profile="research",
         execution_route="none",
         policy_version="policy-1",
@@ -92,7 +92,7 @@ def fr_risk_026() -> None:
     print("Risk Example 8: Position Sizing Calculation")
 
     snapshot = _snapshot()
-    request = PositionSizingRequest(
+    request = create_position_sizing_request(
         method="fixed_risk",
         requested_size=None,
         fixed_lot=None,
@@ -116,10 +116,8 @@ def fr_risk_026() -> None:
         calculate_position_size(request, snapshot, _config()),
         operation="calculate_position_size",
     )
-    print(
-        f"Calculated normalized size: {result.normalized_size}, "
-        f"approved: {result.approved}"
-    )
+    print("Complete position-sizing result:")
+    print(result.model_dump(warnings=False, mode="json"))
 
 
 def main() -> None:

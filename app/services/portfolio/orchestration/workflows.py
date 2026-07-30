@@ -7,7 +7,7 @@ from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.analytics import (
     PortfolioAllocationEvidence,
@@ -30,37 +30,35 @@ from app.services.portfolio.evidence import (
 from app.services.portfolio.exceptions import PortfolioError
 from app.services.portfolio.rebalancing import RebalancingService
 from app.services.risk import (
-    AllocationReviewRequest,
-    AllocationRiskDecision,
-    ApprovalAttestation,
-    ApprovalValidationResult,
-    DecisionState,
-    KillSwitchState,
-    StrategyOperationalEligibilityDecision,
+    create_allocation_review_request,
+    get_decision_state,
 )
 from app.services.simulator import PortfolioBacktestRequestV1, PortfolioSimulationResult
-from app.services.strategy import ValidatedStrategyRef
-from app.services.trading import (
-    PortfolioRebalanceExecutionRequest,
-    StandardTradingEnvelope,
-    TradingRoute,
-)
+from app.services.trading import PortfolioRebalanceExecutionRequest, TradingRoute
 from app.utils import (
-    StandardResponse,
     canonical_json,
     create_audit_event,
     generate_id,
     get_logger,
+    get_standard_response_type,
 )
 
 logger = get_logger(__name__)
 
+AllocationReviewRequest = Any
+AllocationRiskDecision = Any
+ApprovalAttestation = Any
+ApprovalValidationResult = Any
+AuditEvent = Any
+KillSwitchState = Any
+StandardTradingEnvelope = Any
+StrategyOperationalEligibilityDecision = Any
+type StandardResponse[T] = Any
+
 if TYPE_CHECKING:
-    from app.services.data import (
-        AccountStateSnapshot,
-        FXConversionEvidence,
-        MarketDataset,
-    )
+    AccountStateSnapshot = Any
+    FXConversionEvidence = Any
+    MarketDataset = Any
     from app.services.portfolio.config import PortfolioSettings
     from app.services.portfolio.state import AuditOutboxRecord, PortfolioRepository
 
@@ -108,7 +106,7 @@ class PortfolioReviewResult:
 
 
 type StrategyReferenceSource = Callable[
-    [PortfolioConstructionRequest], Mapping[str, ValidatedStrategyRef]
+    [PortfolioConstructionRequest], Mapping[str, Any]
 ]
 type EligibilityDecisionSource = Callable[
     [PortfolioConstructionRequest],
@@ -432,7 +430,7 @@ class PortfolioWorkflowService:
             or simulation.construction_result_id != candidate.result_id
             or decision.portfolio_id != candidate.portfolio_id
             or decision.reviewed_version != candidate.portfolio_version
-            or decision.state is not DecisionState.APPROVE
+            or decision.state is not get_decision_state("APPROVE")
             or decision.issued_at > now
             or decision.expires_at <= now
         ):
@@ -504,7 +502,7 @@ class PortfolioWorkflowService:
         """
         logger.debug("Building Risk-owned Portfolio construction review request")
         request = evidence.request
-        return AllocationReviewRequest(
+        return create_allocation_review_request(
             projection_kind="construction",
             portfolio_id=candidate.portfolio_id,
             portfolio_version=candidate.portfolio_version,
@@ -689,7 +687,7 @@ class PortfolioWorkflowService:
             Receiver-owned self-contained Risk request.
         """
         logger.debug("Building Risk-owned Portfolio rebalance review request")
-        return AllocationReviewRequest(
+        return create_allocation_review_request(
             projection_kind="rebalance",
             portfolio_id=plan.portfolio_id,
             portfolio_version=plan.allocation_version,
@@ -955,7 +953,7 @@ class PortfolioWorkflowService:
             raise PortfolioError("PORT_DEPENDENCY_FAILED", "RISK_REVIEW") from error
         now = self._now()
         if (
-            decision.state is not DecisionState.APPROVE
+            decision.state is not get_decision_state("APPROVE")
             or decision.portfolio_id != plan.portfolio_id
             or decision.reviewed_version != plan.allocation_version
             or decision.expires_at <= now
@@ -1027,7 +1025,7 @@ class PortfolioWorkflowService:
                 "Analytics measurement failed; preserving executed Portfolio truth"
             )
             return executed
-        if isinstance(analytics_response, StandardResponse):
+        if isinstance(analytics_response, get_standard_response_type()):
             if (
                 analytics_response.status != "success"
                 or analytics_response.data is None

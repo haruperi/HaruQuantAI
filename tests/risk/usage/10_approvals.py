@@ -8,21 +8,21 @@ from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.risk import (
-    ApprovalAttestation,
-    ApprovalTokenService,
-    DecisionState,
-    RiskApprovalToken,
-    RiskAuditChain,
-    RiskAuditRecord,
-    RiskConfig,
-    RiskDecisionPackage,
     compute_config_hash,
+    create_approval_attestation,
+    create_approval_token_service,
+    create_risk_audit_chain,
+    create_risk_config,
+    create_risk_decision_package,
+    get_decision_state,
+    issue_risk_approval_token,
+    validate_risk_approval_token,
 )
 from app.utils import canonical_json
 
@@ -35,15 +35,15 @@ class _AuditStore:
     """Minimal durable audit adapter."""
 
     def __init__(self) -> None:
-        self.records: list[RiskAuditRecord] = []
+        self.records: list[Any] = []
 
-    def read_head(self, *, timeout_seconds: Decimal | None) -> RiskAuditRecord | None:
+    def read_head(self, *, timeout_seconds: Decimal | None) -> Any | None:
         del timeout_seconds
         return self.records[-1] if self.records else None
 
     def append_atomic(
         self,
-        record: RiskAuditRecord,
+        record: Any,
         *,
         expected_sequence: int,
         expected_previous_hash: str,
@@ -53,9 +53,7 @@ class _AuditStore:
         self.records.append(record)
         return "appended"
 
-    def read_all(
-        self, *, timeout_seconds: Decimal | None
-    ) -> tuple[RiskAuditRecord, ...]:
+    def read_all(self, *, timeout_seconds: Decimal | None) -> tuple[Any, ...]:
         del timeout_seconds
         return tuple(self.records)
 
@@ -64,13 +62,13 @@ class _TokenStore:
     """Single-process durable token adapter."""
 
     def __init__(self) -> None:
-        self.tokens: dict[str, RiskApprovalToken] = {}
+        self.tokens: dict[str, Any] = {}
         self.consumed: set[str] = set()
         self.revoked: set[str] = set()
 
     def save_issued(
         self,
-        token: RiskApprovalToken,
+        token: Any,
         *,
         timeout_seconds: Decimal | None,
     ) -> Literal["saved", "already_saved", "conflict"]:
@@ -145,7 +143,7 @@ def example_approvals() -> None:
     _header("Demonstrate Risk approval token lifecycle.")
     print("Risk Example 5: Approval Token Service")
 
-    config = RiskConfig(
+    config = create_risk_config(
         profile="research",
         execution_route="none",
         policy_version="policy-1",
@@ -162,8 +160,8 @@ def example_approvals() -> None:
         report_timeout_seconds=Decimal(5),
     )
     token_store = _TokenStore()
-    audit = RiskAuditChain(config, _AuditStore(), lambda: NOW, canonical_json)
-    service = ApprovalTokenService(
+    audit = create_risk_audit_chain(config, _AuditStore(), lambda: NOW, canonical_json)
+    service = create_approval_token_service(
         config,
         token_store,
         audit,
@@ -174,10 +172,10 @@ def example_approvals() -> None:
     config_hash = unwrap_risk_response(
         compute_config_hash(config), operation="compute_config_hash"
     )
-    decision = RiskDecisionPackage(
+    decision = create_risk_decision_package(
         decision_id="decision-1",
         intent_id="intent-1",
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         requested_size=Decimal(10),
         approved_size=Decimal(8),
         ordered_checks=(),
@@ -194,7 +192,7 @@ def example_approvals() -> None:
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
-    attestation = ApprovalAttestation(
+    attestation = create_approval_attestation(
         attestation_id="attestation-1",
         principal_id="approver-1",
         action="submit_order",
@@ -210,7 +208,7 @@ def example_approvals() -> None:
 
     # 1. Issue token
     token = unwrap_risk_response(
-        service.issue(decision, attestation, now=NOW),
+        issue_risk_approval_token(service, decision, attestation, now=NOW),
         operation="approval_tokens.issue",
     )
     print(f"Issued Approval Token ID: {token.token_id}, action: {token.action}")
@@ -226,7 +224,13 @@ def example_approvals() -> None:
         **dict(token.scope),
     }
     result = unwrap_risk_response(
-        service.validate_reserve_and_consume(token, attestation, expected, now=NOW),
+        validate_risk_approval_token(
+            service,
+            token,
+            attestation,
+            expected,
+            now=NOW,
+        ),
         operation="approval_tokens.validate_reserve_and_consume",
     )
     print(f"Validation result valid: {result.valid}")
@@ -254,11 +258,11 @@ def fr_risk_035() -> None:
 
 def fr_risk_036() -> None:
     """FR-RISK-036: Validate Risk-owned, UI/API-produced
-    `ApprovalAttestation v1`, then issue a tamper-evident token only for an
+    `create_approval_attestation v1`, then issue a tamper-evident token only for an
     eligible decision, binding request/workflow/action/account/strategy/symbol/
     config/decision/approver/expiry/nonce and writing audit/state durably."""
     _header(
-        "FR-RISK-036: Validate Risk-owned, UI/API-produced `ApprovalAttestation v1`, then issue a tamper-evident token only for an eligible decision, binding request/workflow/action/account/strategy/symbol/ config/decision/approver/expiry/nonce and writing audit/state durably."
+        "FR-RISK-036: Validate Risk-owned, UI/API-produced `create_approval_attestation v1`, then issue a tamper-evident token only for an eligible decision, binding request/workflow/action/account/strategy/symbol/ config/decision/approver/expiry/nonce and writing audit/state durably."
     )
     _demonstrate_once()
 

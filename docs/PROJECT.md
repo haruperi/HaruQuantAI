@@ -218,7 +218,7 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Package**: `app/services/risk`
 * **Responsibility**: Intercept every trading proposal and approve or reject it against safety limits, exposure, and governance policy — the master gate.
 * **Inputs**: `TradeIntent` proposals from Strategy, account/broker state and `MarketContextEvidence` from Data, Risk-owned `ApprovalAttestation`, risk policies, and thresholds.
-* **Outputs**: `RiskDecision` (approved intent with approval token, or structured rejection), `ActionPolicyVerdict`, `KillSwitchState`, and advisory `ScenarioResult` values. Position-sizing, regime, and report types remain Risk-internal.
+* **Outputs**: Function-built `RiskDecision` (approved intent with approval token, or structured rejection), `ActionPolicyVerdict`, `KillSwitchState`, and advisory `ScenarioResult` values. The package root exports standalone functions only; contract classes, enum classes, and constants remain Risk-internal.
 * **Owns**: Proposal interception, final approved/capped position size, safety limits, portfolio exposure and drawdown tracking, action-policy verdicts, approval-token issuance/validation and atomic pending-approval reservation, kill-switch policy/hierarchy/active state/clearance, lifecycle gates (research → full-live), and cryptographic audit chaining of decisions.
 * **Boundaries**: Does not own data ingestion, strategy code, broker submission, or account state truth. Cannot execute anything itself.
 * **Key Limits**: Missing thresholds or unverifiable broker state fail closed; live approval requires active broker state validation; strict payload size and structure limits; strict `Decimal` handling (`allow_inf_nan=False`, `ROUND_HALF_EVEN`).

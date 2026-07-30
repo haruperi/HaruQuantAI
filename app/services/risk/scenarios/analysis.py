@@ -212,7 +212,7 @@ def run_risk_scenario_analysis(
             )
         return tuple(results)
     except RiskDomainError:
-        logger.error("Risk scenario workload failed closed")
+        logger.exception("Risk scenario workload failed closed")
         raise
     except (ArithmeticError, KeyError, TypeError, ValueError) as error:
         raise RiskDomainError(

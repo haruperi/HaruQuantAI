@@ -8,22 +8,31 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
 from types import MappingProxyType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
 from app.services.analytics import PortfolioAllocationEvidence
 from app.services.data import (
-    AccountStateSnapshot,
-    FXConversionEvidence,
-    MarketDataset,
+    is_account_state_snapshot,
+    is_fx_conversion_evidence,
+    is_market_dataset,
 )
 from app.services.portfolio.exceptions import PortfolioError
-from app.services.risk import DecisionState, StrategyOperationalEligibilityDecision
-from app.services.strategy import StrategyLifecycleStatus, ValidatedStrategyRef
+from app.services.risk import get_decision_state
+from app.services.strategy import (
+    create_validated_strategy_ref,
+    get_strategy_lifecycle_status,
+)
 from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
+
+AccountStateSnapshot = Any
+FXConversionEvidence = Any
+MarketDataset = Any
+StrategyOperationalEligibilityDecision = Any
+ValidatedStrategyRef = Any
 
 if TYPE_CHECKING:
     from app.services.portfolio.config import PortfolioSettings
@@ -145,12 +154,29 @@ def _validate_strategy_and_eligibility(
         PortfolioError: If any reference or approval is missing or incompatible.
     """
     logger.info("Validating Portfolio Strategy and Risk eligibility evidence")
+    for item in strategy_refs.values():
+        model_dump = getattr(item, "model_dump", None)
+        if not callable(model_dump):
+            raise PortfolioError("PORT_UNSAFE_OBJECT", "STRATEGY_REFERENCE")
+        try:
+            validated = create_validated_strategy_ref(
+                **model_dump(warnings=False, mode="python")
+            )
+        except (TypeError, ValueError) as error:
+            raise PortfolioError("PORT_UNSAFE_OBJECT", "STRATEGY_REFERENCE") from error
+        if (
+            item.__class__.__module__,
+            item.__class__.__qualname__,
+        ) != (
+            validated.__class__.__module__,
+            validated.__class__.__qualname__,
+        ):
+            raise PortfolioError("PORT_UNSAFE_OBJECT", "STRATEGY_REFERENCE")
     if any(
-        not isinstance(item, ValidatedStrategyRef) for item in strategy_refs.values()
-    ):
-        raise PortfolioError("PORT_UNSAFE_OBJECT", "STRATEGY_REFERENCE")
-    if any(
-        not isinstance(item, StrategyOperationalEligibilityDecision)
+        not all(
+            hasattr(item, field)
+            for field in ("strategy_id", "strategy_version", "state", "expires_at")
+        )
         for item in eligibility_decisions.values()
     ):
         raise PortfolioError("PORT_UNSAFE_OBJECT", "ELIGIBILITY_DECISION")
@@ -166,7 +192,8 @@ def _validate_strategy_and_eligibility(
             strategy_ref.manifest.strategy_id != component.strategy_id
             or strategy_ref.manifest.strategy_version != component.strategy_version
             or strategy_ref.registry_record_hash != component.registry_record_hash
-            or strategy_ref.lifecycle_status is not StrategyLifecycleStatus.APPROVED
+            or strategy_ref.lifecycle_status
+            is not get_strategy_lifecycle_status("APPROVED")
         ):
             raise PortfolioError("PORT_REFERENCE_CHANGED", "STRATEGY_REFERENCE")
         if (
@@ -175,7 +202,7 @@ def _validate_strategy_and_eligibility(
             or decision.strategy_id != component.strategy_id
             or decision.strategy_version != component.strategy_version
             or dict(decision.scope) != dict(request.scope)
-            or decision.state is not DecisionState.APPROVE
+            or decision.state is not get_decision_state("APPROVE")
             or decision.suspended
             or decision.issued_at > now
             or decision.expires_at <= now
@@ -214,12 +241,10 @@ def _validate_owner_evidence(
     """
     logger.info("Validating Portfolio Data and Analytics owner evidence")
     if (
-        not isinstance(account_snapshot, AccountStateSnapshot)
-        or not isinstance(market_dataset, MarketDataset)
+        not is_account_state_snapshot(account_snapshot)
+        or not is_market_dataset(market_dataset)
         or not isinstance(analytics_evidence, PortfolioAllocationEvidence)
-        or any(
-            not isinstance(item, FXConversionEvidence) for item in fx_evidence.values()
-        )
+        or any(not is_fx_conversion_evidence(item) for item in fx_evidence.values())
     ):
         raise PortfolioError("PORT_UNSAFE_OBJECT", "OWNER_EVIDENCE")
     references = request.evidence

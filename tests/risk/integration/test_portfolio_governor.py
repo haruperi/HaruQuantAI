@@ -1,6 +1,6 @@
 """Workflow integration test for current-state portfolio Risk governor."""
 
-from app.services.risk import DecisionState
+from app.services.risk import get_decision_state, run_portfolio_risk_governor
 
 from tests.risk import _support as examples
 from tests.risk import _support as policy_examples
@@ -11,10 +11,11 @@ def test_portfolio_governor_has_no_execution_side_effect() -> None:
     config = examples._config()
     governor, _, audit = examples._services(config)
     snapshot = examples._snapshot(config)
-    before = snapshot.model_dump(mode="python")
+    before = snapshot.model_dump(warnings=False, mode="python")
     execution_state = {"orders_cancelled": False, "positions_closed": False}
     decision = examples.unwrap_risk_response(
-        governor.run_portfolio_risk_governor(
+        run_portfolio_risk_governor(
+            governor,
             snapshot,
             policy_examples._market(),
             examples._regime(),
@@ -24,7 +25,7 @@ def test_portfolio_governor_has_no_execution_side_effect() -> None:
         ),
         operation="risk_governor.run_portfolio_risk_governor",
     )
-    assert decision.state is DecisionState.APPROVE
-    assert snapshot.model_dump(mode="python") == before
+    assert decision.state is get_decision_state("APPROVE")
+    assert snapshot.model_dump(warnings=False, mode="python") == before
     assert execution_state == {"orders_cancelled": False, "positions_closed": False}
     assert audit.records[-1].decision_id == decision.decision_id

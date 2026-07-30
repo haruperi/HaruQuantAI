@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import ValidationError as PydanticValidationError
 
-from app.services.risk import DecisionState
+from app.services.risk import get_decision_state
 from app.services.trading.actions.orders import _execute_request
 from app.services.trading.contracts import (
     TradingError,
@@ -29,8 +29,8 @@ RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.risk import RiskDecisionPackage
-    from app.services.strategy import TradeIntent
+    RiskDecisionPackage = Any
+    create_trade_intent_value = Any
     from app.services.trading.actions.dependencies import TradingDependencies
     from app.services.trading.contracts.models import JsonValue
 
@@ -103,7 +103,7 @@ def _provider_id(deps: TradingDependencies) -> str:
 def _state_target(
     request: TradingRequest,
     deps: TradingDependencies,
-    intent: TradeIntent,
+    intent: create_trade_intent_value,
 ) -> tuple[str | None, str | None, int | None]:
     """Read modify/cancel/close target identifiers from Trading state.
 
@@ -162,7 +162,7 @@ def _state_target(
 
 
 def _approved_request(
-    intent: TradeIntent,
+    intent: create_trade_intent_value,
     decision: RiskDecisionPackage,
     deps: TradingDependencies,
     evidence: Mapping[str, JsonValue],
@@ -184,13 +184,15 @@ def _approved_request(
     logger.debug("Building canonical request from Strategy/Risk lineage")
     now = deps.clock()
     if (
-        decision.state is not DecisionState.APPROVE
+        decision.state is not get_decision_state("APPROVE")
         or decision.intent_id != intent.intent_id
         or decision.approved_size is None
         or decision.token is None
         or decision.expires_at <= now
     ):
-        raise TradingError("PERMISSION_DENIED", "Risk did not approve TradeIntent")
+        raise TradingError(
+            "PERMISSION_DENIED", "Risk did not approve create_trade_intent_value"
+        )
     route = _route(deps)
     provider_id = _provider_id(deps)
     _, symbol_info = deps.symbol_capability_source(route, provider_id, intent.symbol)

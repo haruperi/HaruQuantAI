@@ -11,11 +11,11 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import MarketContextEvidence
+from app.services.data import build_market_context_evidence
 from app.services.risk import (
-    FirmMandate,
-    PortfolioRiskSnapshot,
-    RiskConfig,
+    create_firm_mandate,
+    create_portfolio_risk_snapshot,
+    create_risk_config,
     evaluate_market_context,
     evaluate_portfolio_limits,
     evaluate_single_day_profit_share,
@@ -32,9 +32,9 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _snapshot() -> PortfolioRiskSnapshot:
+def _snapshot() -> create_portfolio_risk_snapshot:
     """Build immutable portfolio risk snapshot."""
-    return PortfolioRiskSnapshot(
+    return create_portfolio_risk_snapshot(
         snapshot_id="snapshot-1",
         account_id="account-1",
         base_currency="USD",
@@ -71,9 +71,9 @@ def _snapshot() -> PortfolioRiskSnapshot:
     )
 
 
-def _config() -> RiskConfig:
+def _config() -> create_risk_config:
     """Build risk policy config."""
-    return RiskConfig(
+    return create_risk_config(
         profile="research",
         execution_route="none",
         policy_version="policy-1",
@@ -90,9 +90,9 @@ def _config() -> RiskConfig:
     )
 
 
-def _market() -> MarketContextEvidence:
+def _market() -> build_market_context_evidence:
     """Build fresh complete Data-owned market-context evidence."""
-    return MarketContextEvidence(
+    return build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
         calendar_state="clear",
@@ -160,10 +160,10 @@ def fr_risk_028() -> None:
     """FR-RISK-028: Evaluate supplied spread, liquidity availability, session,
     and normalized calendar state without external fetches, hidden unit
     conversion, or naive/aware datetime comparison. Slippage is excluded because
-    `MarketContextEvidence v1` does not carry it and execution slippage is
+    `build_market_context_evidence v1` does not carry it and execution slippage is
     receiver-owned post-trade evidence."""
     _header(
-        "FR-RISK-028: Evaluate supplied spread, liquidity availability, session, and normalized calendar state without external fetches, hidden unit conversion, or naive/aware datetime comparison. Slippage is excluded because `MarketContextEvidence v1` does not carry it and execution slippage is receiver-owned post-trade evidence."
+        "FR-RISK-028: Evaluate supplied spread, liquidity availability, session, and normalized calendar state without external fetches, hidden unit conversion, or naive/aware datetime comparison. Slippage is excluded because `build_market_context_evidence v1` does not carry it and execution slippage is receiver-owned post-trade evidence."
     )
     _demonstrate_once()
 
@@ -179,9 +179,9 @@ def fr_risk_062() -> None:
     _demonstrate_once()
 
 
-def _mandate() -> FirmMandate:
+def _mandate() -> create_firm_mandate:
     """Build a verified mandate for the forward checks."""
-    return FirmMandate(
+    return create_firm_mandate(
         account_id="account-1",
         mandate_version="2026.07.28-01",
         firm="Example Firm",
@@ -218,7 +218,12 @@ def _mandate() -> FirmMandate:
 
 
 def fr_risk_066() -> None:
-    """FR-RISK-066: Report absolute drawdown headroom under a mandate."""
+    """FR-RISK-066: Evaluate the drawdown floor under the configured mode:
+    `static` from a fixed reference, `trailing_eod` from the highest end-of-day
+    balance with an optional ratchet ceiling at the initial balance, or
+    `trailing_intraday` from peak equity including unrealised gains. Report
+    remaining headroom as an absolute amount in account currency, not only as
+    a ratio of peak."""
     _header("FR-RISK-066: Absolute drawdown headroom")
     mandate = _mandate()
     results = unwrap_risk_response(
@@ -230,7 +235,10 @@ def fr_risk_066() -> None:
 
 
 def fr_risk_067() -> None:
-    """FR-RISK-067: Record the fixed initial-balance loss basis."""
+    """FR-RISK-067: Evaluate daily and total loss against a configurable
+    reference basis, supporting a fixed initial balance in addition to the
+    existing day-start and inception equity bases, and record which basis was
+    applied."""
     _header("FR-RISK-067: Initial-balance loss basis")
     mandate = _mandate()
     results = unwrap_risk_response(
@@ -243,7 +251,11 @@ def fr_risk_067() -> None:
 
 
 def fr_risk_068() -> None:
-    """FR-RISK-068: Project a single-day profit share before settlement."""
+    """FR-RISK-068: Project the share of cumulative profit a single trading day
+    would represent if the account were settled now, and fail or constrain
+    when a proposal's best case would exceed the configured maximum single-day
+    share. This is a forward projection, distinct from the existing
+    snapshot-integrity consistency check."""
     _header("FR-RISK-068: Forward single-day profit-share projection")
     result = unwrap_risk_response(
         evaluate_single_day_profit_share(_snapshot(), _mandate(), now=NOW),

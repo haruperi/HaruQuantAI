@@ -6,15 +6,18 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from types import MappingProxyType
+from typing import Any
 
 import numpy as np
 
 from app.services.optimization.errors import OptimizationError
-from app.services.risk import DrawdownMode, FirmMandate
+from app.services.risk import get_drawdown_mode
 from app.utils import get_logger
 
 logger = get_logger(__name__)
 
+DrawdownMode = Any
+FirmMandate = Any
 _MIN_OBSERVATIONS = 2
 _PSD_EIGENVALUE_TOLERANCE = -1e-10
 
@@ -145,9 +148,9 @@ def _drawdown_floor(
             raise OptimizationError("OPT_INVALID_REQUEST", "DRAWDOWN_LIMIT_MISSING")
         loss = initial * rule.value
     reference = {
-        DrawdownMode.STATIC: initial,
-        DrawdownMode.TRAILING_EOD: peak_eod,
-        DrawdownMode.TRAILING_INTRADAY: peak_intraday,
+        get_drawdown_mode("STATIC"): initial,
+        get_drawdown_mode("TRAILING_EOD"): peak_eod,
+        get_drawdown_mode("TRAILING_INTRADAY"): peak_intraday,
     }[rule.mode]
     floor = reference - loss
     return min(floor, initial) if rule.trail_stops_at_initial else floor
@@ -411,11 +414,17 @@ def estimate_drawdown_mode_sensitivity(
     """
     logger.info("Estimating Optimization drawdown-mode sensitivity")
     reports: dict[DrawdownMode, FirstPassageReport] = {}
-    for mode in DrawdownMode:
+    for mode in (
+        get_drawdown_mode("STATIC"),
+        get_drawdown_mode("TRAILING_EOD"),
+        get_drawdown_mode("TRAILING_INTRADAY"),
+    ):
         rule_data = mandate.max_drawdown.model_dump()
         rule_data["mode"] = mode
-        rule_data["trails_on_unrealised"] = mode is DrawdownMode.TRAILING_INTRADAY
-        if mode is DrawdownMode.TRAILING_EOD:
+        rule_data["trails_on_unrealised"] = mode is get_drawdown_mode(
+            "TRAILING_INTRADAY"
+        )
+        if mode is get_drawdown_mode("TRAILING_EOD"):
             rule_data["eod_snapshot_time"] = rule_data["eod_snapshot_time"] or "23:59"
             rule_data["eod_snapshot_tz"] = rule_data["eod_snapshot_tz"] or "UTC"
         else:

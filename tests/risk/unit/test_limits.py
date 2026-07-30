@@ -4,9 +4,9 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 from app.services.data import (
-    EconomicEvent,
-    EventImpact,
-    MarketContextEvidence,
+    build_economic_event,
+    build_event_impact,
+    build_market_context_evidence,
     populate_market_context_calendar,
 )
 from app.services.risk.config import (
@@ -106,7 +106,7 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
     )
 
 
-def _market(*, timezone: str = "UTC") -> MarketContextEvidence:
+def _market(*, timezone: str = "UTC") -> object:
     """Build complete normalized market-context evidence.
 
     Args:
@@ -115,7 +115,7 @@ def _market(*, timezone: str = "UTC") -> MarketContextEvidence:
     Returns:
         Immutable Data-owned market context.
     """
-    return MarketContextEvidence(
+    return build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
         calendar_state="clear",
@@ -190,6 +190,7 @@ def test_market_context_applies_missing_modes_units_and_availability() -> None:
             "calendar_state": "unknown",
             "spread": Decimal(3),
             "liquidity": None,
+            "missing_fields": ("session", "calendar", "liquidity"),
         }
     )
     results = unwrap_risk_response(
@@ -214,7 +215,7 @@ def test_market_context_applies_missing_modes_units_and_availability() -> None:
 
 def test_calendar_limit_consumes_data_derived_event_and_open_evidence() -> None:
     """Risk blocks a Data-derived window and passes an authoritative empty query."""
-    event = EconomicEvent(
+    event = build_economic_event(
         id="provider-event-1",
         provider="demo",
         name="CPI",
@@ -222,7 +223,7 @@ def test_calendar_limit_consumes_data_derived_event_and_open_evidence() -> None:
         country="US",
         currency="USD",
         scheduled_at=NOW + timedelta(minutes=5),
-        impact=EventImpact.HIGH,
+        impact=build_event_impact(3),
     )
     blocked_evidence = unwrap_risk_response(
         populate_market_context_calendar(_market(), events=[event]),

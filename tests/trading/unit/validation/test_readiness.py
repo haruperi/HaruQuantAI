@@ -5,7 +5,11 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.risk import DecisionState, KillSwitchState, RiskDecisionPackage
+from app.services.risk import (
+    create_kill_switch_state,
+    create_risk_decision_package,
+    get_decision_state,
+)
 from app.services.trading.contracts import TradingError, TradingRequest
 from app.services.trading.validation import (
     ReadinessAssessment,
@@ -13,6 +17,10 @@ from app.services.trading.validation import (
     assess_execution_readiness,
 )
 from pydantic import ValidationError
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+KillSwitchState = object
+RiskDecisionPackage = object
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 BOUNDS = {
@@ -78,10 +86,10 @@ def _snapshot() -> RouteSnapshot:
 
 def _risk() -> RiskDecisionPackage:
     """Build a real approving Risk decision package."""
-    return RiskDecisionPackage(
+    return create_risk_decision_package(
         decision_id="risk-001",
         intent_id="intent-001",
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         requested_size=Decimal("1.00"),
         approved_size=Decimal("1.00"),
         ordered_checks=(),
@@ -102,7 +110,7 @@ def _risk() -> RiskDecisionPackage:
 
 def _switch(state: str = "inactive") -> KillSwitchState:
     """Build a real Risk kill-switch state."""
-    return KillSwitchState(
+    return create_kill_switch_state(
         state_id="switch-001",
         scope_level="global",
         scope={},
@@ -144,7 +152,7 @@ def test_readiness_fails_on_any_missing_evidence() -> None:
         _risk().model_copy(
             update={
                 "decision_id": "other-risk",
-                "state": DecisionState.REJECT,
+                "state": get_decision_state("REJECT"),
                 "expires_at": NOW,
                 "approved_size": Decimal("2.00"),
                 "intent_id": "other-intent",

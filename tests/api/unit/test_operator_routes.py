@@ -8,11 +8,19 @@ from app.services.api import CriticalAlertSink
 from app.services.api.identity import require_auth_context
 from app.services.api.routes import operator
 from app.services.api.routes.operator import router
-from app.services.risk import ApprovalAttestation, KillSwitchCommand, KillSwitchState
+from app.services.risk import (
+    create_approval_attestation,
+    create_kill_switch_state,
+)
 from app.utils import AuthContext
 from fastapi import FastAPI
 
 from tests.api._support import get_json, post_json
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+ApprovalAttestation = object
+KillSwitchCommand = object
+KillSwitchState = object
 
 NOW = datetime(2026, 7, 24, 9, tzinfo=UTC)
 REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
@@ -62,7 +70,7 @@ def _state(
     Returns:
         Canonical Risk state.
     """
-    return KillSwitchState(
+    return create_kill_switch_state(
         state_id=f"global-{state}-2",
         scope_level="global",
         scope={},
@@ -180,7 +188,7 @@ def test_kill_switch_clearance_requires_distinct_principals() -> None:
         calls.append(command)
         return _state("inactive")
 
-    attestation = ApprovalAttestation(
+    attestation = create_approval_attestation(
         attestation_id="attestation-clear-1",
         principal_id="operator-1",
         action="risk.kill.clear",

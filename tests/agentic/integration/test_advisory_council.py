@@ -48,7 +48,7 @@ from app.agentic.agents.portfolio_risk_advisory.portfolio_risk_advisor.tools imp
     get_registered_tool_names,
 )
 from app.agentic.runtime import ModelOutcome
-from app.services.risk import AllocationReviewRequest
+from app.services.risk import create_allocation_review_request
 from app.utils import derive_stable_id, generate_id
 from pydantic import ValidationError
 
@@ -370,30 +370,30 @@ def _projection(**overrides: object) -> dict[str, object]:
 
 
 def test_the_receiver_accepts_a_self_contained_projection() -> None:
-    request = AllocationReviewRequest.model_validate(_projection())
+    request = create_allocation_review_request(**_projection())
     assert request.portfolio_id == ADVISORY_PORTFOLIO_ID
 
 
 def test_the_receiver_rejects_a_projection_without_evidence() -> None:
     with pytest.raises(ValidationError, match="not self-contained"):
-        AllocationReviewRequest.model_validate(_projection(evidence_hashes={}))
+        create_allocation_review_request(**_projection(evidence_hashes={}))
 
 
 def test_the_receiver_rejects_a_projection_with_no_components() -> None:
     with pytest.raises(ValidationError, match="not self-contained"):
-        AllocationReviewRequest.model_validate(_projection(ordered_components=()))
+        create_allocation_review_request(**_projection(ordered_components=()))
 
 
 def test_the_receiver_rejects_an_incompatible_route() -> None:
     with pytest.raises(ValidationError, match="profile and route are incompatible"):
-        AllocationReviewRequest.model_validate(
-            _projection(runtime_profile="simulation", execution_route="live"),
+        create_allocation_review_request(
+            **_projection(runtime_profile="simulation", execution_route="live"),
         )
 
 
 def test_the_receiver_rejects_a_rebalance_without_its_plan() -> None:
     with pytest.raises(ValidationError, match="rebalance requires plan_id"):
-        AllocationReviewRequest.model_validate(_projection(plan_id=None))
+        create_allocation_review_request(**_projection(plan_id=None))
 
 
 def test_agentic_never_constructs_a_receiver_request() -> None:

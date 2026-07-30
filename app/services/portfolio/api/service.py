@@ -43,12 +43,11 @@ if TYPE_CHECKING:
         PortfolioWorkflowService,
     )
     from app.services.portfolio.state import PortfolioRepository
-    from app.services.risk import (
-        AllocationRiskDecision,
-        ApprovalAttestation,
-        ApprovalValidationResult,
-        StrategyOperationalEligibilityDecision,
-    )
+
+    AllocationRiskDecision = Any
+    ApprovalAttestation = Any
+    ApprovalValidationResult = Any
+    StrategyOperationalEligibilityDecision = Any
 
 
 _OPERATION_FACTS = MappingProxyType(
@@ -192,8 +191,8 @@ class PortfolioService:
             if isinstance(value, str):
                 try:
                     return validate_id(value, expected_prefix=prefix)
-                except Exception:
-                    pass
+                except TypeError, ValueError:
+                    logger.debug("Replacing malformed Portfolio trace identifier")
             return generate_id(prefix)
 
         return (

@@ -2,7 +2,7 @@
 
 from datetime import timedelta
 
-from app.services.risk import RiskAuditChain
+from app.services.risk import create_risk_audit_chain
 from app.services.risk.config import compute_config_hash
 from app.services.risk.contracts import (
     ApprovalAttestation,
@@ -77,7 +77,12 @@ def test_clearance_requires_matching_current_attestation() -> None:
     config = examples._config()
     _, approvals, _ = examples._services(config)
     store = examples._KillStore()
-    audit = RiskAuditChain(config, store, lambda: examples.NOW, canonical_json)
+    audit = create_risk_audit_chain(
+        config,
+        store,
+        lambda: examples.NOW,
+        canonical_json,
+    )
     current = examples._inactive_state().model_copy(
         update={"state": "active", "reason": "operator safety stop"}
     )
@@ -145,7 +150,12 @@ def test_clearance_requires_distinct_principal() -> None:
     config = examples._config()
     _, approvals, _ = examples._services(config)
     store = examples._KillStore()
-    audit = RiskAuditChain(config, store, lambda: examples.NOW, canonical_json)
+    audit = create_risk_audit_chain(
+        config,
+        store,
+        lambda: examples.NOW,
+        canonical_json,
+    )
     current = examples._inactive_state().model_copy(
         update={"state": "active", "reason": "operator safety stop"}
     )

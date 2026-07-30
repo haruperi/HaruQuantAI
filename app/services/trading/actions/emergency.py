@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import ValidationError as PydanticValidationError
 
-from app.services.risk import DecisionState
+from app.services.risk import get_decision_state
 from app.services.trading.actions._shared import (
     authority_id,
     require_action,
@@ -88,7 +88,7 @@ def _bind_child_authority(
     token = None if decision is None else decision.token
     if (
         decision is None
-        or decision.state is not DecisionState.APPROVE
+        or decision.state is not get_decision_state("APPROVE")
         or decision.intent_id is None
         or decision.approved_size != child.quantity
         or decision.expires_at <= now

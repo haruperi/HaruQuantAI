@@ -498,7 +498,7 @@ class ApprovalTokenService:
             Mutable canonical signing-value mapping.
         """
         logger.debug("Extracting exact signed Risk approval-token fields")
-        values = token.model_dump(mode="python")
+        values = token.model_dump(warnings=False, mode="python")
         values.pop("signature")
         return values
 
@@ -845,4 +845,126 @@ class ApprovalTokenService:
         return count
 
 
-__all__ = ["ApprovalTokenService"]
+def create_approval_token_service(
+    config: RiskConfig,
+    state: _TokenStateStore,
+    audit: RiskAuditChain,
+    clock: Callable[[], datetime],
+    secret_resolver: Callable[[str], bytes],
+    authorization_verifier: Callable[[ApprovalAttestation], bool],
+) -> ApprovalTokenService:
+    """Create an opaque durable approval-token coordinator.
+
+    Args:
+        config: Validated Risk configuration.
+        state: Injected durable token-state adapter.
+        audit: Opaque Risk audit coordinator.
+        clock: Injected aware-UTC clock.
+        secret_resolver: Injected signing-key resolver.
+        authorization_verifier: Injected attestation authorization verifier.
+
+    Returns:
+        Opaque internal approval-token coordinator.
+    """
+    return ApprovalTokenService(
+        config,
+        state,
+        audit,
+        clock,
+        secret_resolver,
+        authorization_verifier,
+    )
+
+
+def issue_risk_approval_token(
+    service: ApprovalTokenService,
+    decision: RiskDecisionPackage,
+    attestation: ApprovalAttestation,
+    *,
+    now: datetime,
+) -> object:
+    """Issue one scoped Risk approval token.
+
+    Args:
+        service: Opaque approval-token coordinator.
+        decision: Eligible Risk decision.
+        attestation: Current authorized approval attestation.
+        now: Explicit aware-UTC issue time.
+
+    Returns:
+        Standard response carrying the durable token.
+
+    Raises:
+        TypeError: If ``service`` is not a Risk approval coordinator.
+    """
+    if not isinstance(service, ApprovalTokenService):
+        raise TypeError("service must be created by create_approval_token_service")
+    return service.issue(decision, attestation, now=now)
+
+
+def validate_risk_approval_token(
+    service: ApprovalTokenService,
+    token: RiskApprovalToken,
+    attestation: ApprovalAttestation,
+    expected: Mapping[str, str],
+    *,
+    now: datetime,
+) -> object:
+    """Validate, reserve, and consume one Risk approval token.
+
+    Args:
+        service: Opaque approval-token coordinator.
+        token: Submitted Risk approval token.
+        attestation: Submitted approval attestation.
+        expected: Exact action and scope bindings.
+        now: Explicit aware-UTC validation time.
+
+    Returns:
+        Standard response carrying the validation result.
+
+    Raises:
+        TypeError: If ``service`` is not a Risk approval coordinator.
+    """
+    if not isinstance(service, ApprovalTokenService):
+        raise TypeError("service must be created by create_approval_token_service")
+    return service.validate_reserve_and_consume(
+        token,
+        attestation,
+        expected,
+        now=now,
+    )
+
+
+def revoke_risk_approval_scope(
+    service: ApprovalTokenService,
+    scope: Mapping[str, str],
+    reason: str,
+    *,
+    now: datetime,
+) -> object:
+    """Revoke outstanding Risk tokens intersecting a scope.
+
+    Args:
+        service: Opaque approval-token coordinator.
+        scope: Global or exact subordinate scope.
+        reason: Material revocation reason.
+        now: Explicit aware-UTC revocation time.
+
+    Returns:
+        Standard response carrying the number of revoked tokens.
+
+    Raises:
+        TypeError: If ``service`` is not a Risk approval coordinator.
+    """
+    if not isinstance(service, ApprovalTokenService):
+        raise TypeError("service must be created by create_approval_token_service")
+    return service.revoke_scope(scope, reason, now=now)
+
+
+__all__ = [
+    "ApprovalTokenService",
+    "create_approval_token_service",
+    "issue_risk_approval_token",
+    "revoke_risk_approval_scope",
+    "validate_risk_approval_token",
+]

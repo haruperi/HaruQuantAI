@@ -1,18 +1,23 @@
 """Executable Risk audit usage example.
 
-Demonstrates creating and appending records to RiskAuditChain.
+Demonstrates creating and appending records to create_risk_audit_chain.
 """
 
 import sys
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.risk import RiskAuditChain, RiskAuditRecord, RiskConfig
+from app.services.risk import (
+    append_risk_audit_record,
+    create_risk_audit_chain,
+    create_risk_audit_record,
+    create_risk_config,
+)
 from app.utils import canonical_json
 
 from tests.risk._support import unwrap_risk_response
@@ -24,15 +29,15 @@ class _ExampleStore:
     """Minimal store for example."""
 
     def __init__(self) -> None:
-        self.records: list[RiskAuditRecord] = []
+        self.records: list[Any] = []
 
-    def read_head(self, *, timeout_seconds: Decimal | None) -> RiskAuditRecord | None:
+    def read_head(self, *, timeout_seconds: Decimal | None) -> Any | None:
         del timeout_seconds
         return self.records[-1] if self.records else None
 
     def append_atomic(
         self,
-        record: RiskAuditRecord,
+        record: Any,
         *,
         expected_sequence: int,
         expected_previous_hash: str,
@@ -42,9 +47,7 @@ class _ExampleStore:
         self.records.append(record)
         return "appended"
 
-    def read_all(
-        self, *, timeout_seconds: Decimal | None
-    ) -> tuple[RiskAuditRecord, ...]:
+    def read_all(self, *, timeout_seconds: Decimal | None) -> tuple[Any, ...]:
         del timeout_seconds
         return tuple(self.records)
 
@@ -59,7 +62,7 @@ def example_audit() -> None:
     _header("Demonstrate Risk audit chain hashing and appending.")
     print("Risk Example 6: Tamper-Evident Audit Chain")
 
-    config = RiskConfig(
+    config = create_risk_config(
         profile="research",
         execution_route="none",
         policy_version="policy-1",
@@ -79,9 +82,9 @@ def example_audit() -> None:
     )
 
     store = _ExampleStore()
-    chain = RiskAuditChain(config, store, lambda: NOW, canonical_json)
+    chain = create_risk_audit_chain(config, store, lambda: NOW, canonical_json)
 
-    record = RiskAuditRecord(
+    record = create_risk_audit_record(
         record_id="audit-example-1",
         event_type="risk.example",
         payload={"outcome": "blocked"},
@@ -97,10 +100,12 @@ def example_audit() -> None:
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
 
-    sealed = unwrap_risk_response(chain.append(record), operation="risk_audit.append")
-    print(
-        f"Sealed Audit Record sequence: {sealed.sequence}, hash: {sealed.record_hash}"
+    sealed = unwrap_risk_response(
+        append_risk_audit_record(chain, record),
+        operation="append_risk_audit_record",
     )
+    print("Complete sealed and redacted audit record:")
+    print(sealed.model_dump(warnings=False, mode="json"))
 
 
 _DEMONSTRATED = False

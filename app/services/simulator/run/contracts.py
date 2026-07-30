@@ -31,16 +31,16 @@ RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.data import FXConversionEvidence, MarketDataset
-    from app.services.indicators import IndicatorResult
-    from app.services.risk import RiskDecisionPackage
+    FXConversionEvidence = Any
+    MarketDataset = Any
+    RiskDecisionPackage = Any
+    create_trade_intent_value = Any
     from app.services.simulator.accounting import (
         ExecutionCostModel,
         SymbolSpecification,
     )
     from app.services.simulator.execution import ExecutionProfile
     from app.services.simulator.state import SimulationStateStore
-    from app.services.strategy import TradeIntent
     from app.services.trading import OrderIntent
 
     AuditEvent = Any
@@ -411,7 +411,7 @@ class SimulationRunDependencies(Protocol):
 
     def calculate_indicators(
         self, dataset: MarketDataset, request: SimulationBacktestRequestV1
-    ) -> StandardResponse[tuple[IndicatorResult, ...]]:
+    ) -> StandardResponse[tuple[Any, ...]]:
         """Calculate point-in-time Indicator evidence."""
         logger.debug("Declaring Simulation calculate_indicators dependency")
         del dataset, request
@@ -420,9 +420,9 @@ class SimulationRunDependencies(Protocol):
     def evaluate_strategy(
         self,
         dataset: MarketDataset,
-        indicators: tuple[IndicatorResult, ...],
+        indicators: tuple[Any, ...],
         request: SimulationBacktestRequestV1,
-    ) -> StandardResponse[tuple[TradeIntent, ...]]:
+    ) -> StandardResponse[tuple[create_trade_intent_value, ...]]:
         """Evaluate a registered Strategy against supplied evidence."""
         logger.debug("Declaring Simulation evaluate_strategy dependency")
         del dataset, indicators, request
@@ -430,7 +430,7 @@ class SimulationRunDependencies(Protocol):
 
     def review_risk(
         self,
-        intents: tuple[TradeIntent, ...],
+        intents: tuple[create_trade_intent_value, ...],
         request: SimulationBacktestRequestV1,
     ) -> StandardResponse[tuple[RiskDecisionPackage, ...]]:
         """Review Strategy proposals under the referenced sim policy."""

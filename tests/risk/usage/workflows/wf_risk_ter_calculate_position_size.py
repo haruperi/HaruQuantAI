@@ -8,13 +8,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from decimal import Decimal
 
-from app.services.risk import PositionSizingRequest, calculate_position_size
+from app.services.risk import calculate_position_size, create_position_sizing_request
 from tests.risk._support import unwrap_risk_response
 from tests.risk.usage.workflows._support import examples
 
 WORKFLOW_ID = "WF-RISK-TER"
 STAGES = (
-    "Accept PositionSizingRequest and current portfolio, stop, broker, and model evidence.",
+    "Accept create_position_sizing_request and current portfolio, stop, broker, and model evidence.",
     "Validate required method-specific evidence and deterministic fallback policy.",
     "Calculate raw size using the selected supported method.",
     "Clamp or reject against supplied constraints without a synthetic lot fallback.",
@@ -35,7 +35,7 @@ def main() -> None:
     _stage(1)
     config = examples._config()
     snapshot = examples._snapshot(config)
-    request = PositionSizingRequest(
+    request = create_position_sizing_request(
         method="fixed_risk",
         requested_size=None,
         fixed_lot=None,

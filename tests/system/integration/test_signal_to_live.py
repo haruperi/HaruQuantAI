@@ -18,16 +18,15 @@ from app.services.data import (
 )
 from app.services.indicators import sma
 from app.services.risk import (
-    ActionPolicyVerdict,
-    DecisionState,
-    ProposedTrade,
+    create_action_policy_verdict,
+    get_decision_state,
 )
 from app.services.strategy import (
-    StrategyDecision,
-    StrategyEnvironment,
-    StrategyExecutionContext,
-    StrategyTimingPolicy,
     build_trade_intent,
+    create_strategy_decision,
+    create_strategy_execution_context,
+    get_strategy_environment,
+    get_strategy_timing_policy,
 )
 from app.services.trading import (
     LiveSession,
@@ -51,6 +50,9 @@ from tests.trading.unit.actions.test_dependencies import (
     MemoryStore,
     dependencies,
 )
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+ProposedTrade = object
 
 _SYMBOL = "EURUSD"
 
@@ -143,7 +145,7 @@ def _risk_decision(intent, quantity: Decimal, price: Decimal):
             "stop_distance": max(price * Decimal("0.01"), Decimal("0.00001")),
         }
     )
-    assert isinstance(proposal, ProposedTrade)
+    assert proposal.schema_id == "risk.proposed_trade.v1"
     governor, _, _ = risk_examples._services(config)
     decision = governor.review_trade_risk(
         proposal,
@@ -155,7 +157,7 @@ def _risk_decision(intent, quantity: Decimal, price: Decimal):
         attestation=risk_examples._attestation(config),
         now=risk_examples.NOW,
     )
-    assert decision.state is DecisionState.APPROVE
+    assert decision.state is get_decision_state("APPROVE")
     return decision
 
 
@@ -191,7 +193,7 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
         limit_price = (quote.bid * Decimal("0.80")).quantize(
             price_step, rounding=ROUND_DOWN
         )
-        decision = StrategyDecision(
+        decision = create_strategy_decision(
             decision_id=generate_id("req"),
             sequence=0,
             action="PROPOSE",
@@ -214,10 +216,10 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
                 "config_hash": "a" * 64,
             },
         )
-        context = StrategyExecutionContext(
-            environment=StrategyEnvironment.PAPER,
+        context = create_strategy_execution_context(
+            environment=get_strategy_environment("PAPER"),
             decision_timestamp=risk_examples.NOW,
-            timing_policy=StrategyTimingPolicy.EVENT_DRIVEN,
+            timing_policy=get_strategy_timing_policy("EVENT_DRIVEN"),
             seed=0,
             interface_version="v1",
             request_id=risk_examples.REQUEST_ID,
@@ -233,7 +235,7 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
         intent = intent_result.data
         risk_decision = _risk_decision(intent, symbol.min_quantity, limit_price)
         assert risk_decision.token is not None
-        policy = ActionPolicyVerdict(
+        policy = create_action_policy_verdict(
             verdict_id=generate_id("req"),
             action="submit_order",
             scope={"account_id": account.account_id},

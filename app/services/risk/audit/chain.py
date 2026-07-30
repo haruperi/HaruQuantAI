@@ -166,7 +166,7 @@ class RiskAuditChain:
             payload=payload,
         )
         record_hash = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
-        values = record.model_dump(mode="python")
+        values = record.model_dump(warnings=False, mode="python")
         values.update(
             payload=payload,
             sequence=sequence,
@@ -275,10 +275,10 @@ class RiskAuditChain:
                             return current
                         break
             except RiskDomainError:
-                logger.error("Risk kill-switch atomic transition failed closed")
+                logger.exception("Risk kill-switch atomic transition failed closed")
                 raise
             except Exception as error:
-                logger.error("Risk kill-switch transactional store access failed")
+                logger.exception("Risk kill-switch transactional store access failed")
                 raise RiskDomainError(
                     RiskErrorCode.STORAGE_ERROR,
                     "kill-switch atomic persistence unavailable",
@@ -304,10 +304,10 @@ class RiskAuditChain:
         try:
             return self._append_to_store(record)
         except RiskDomainError:
-            logger.error("Risk audit append failed closed")
+            logger.exception("Risk audit append failed closed")
             raise
         except Exception as error:
-            logger.error("Risk audit store access failed")
+            logger.exception("Risk audit store access failed")
             raise RiskDomainError(
                 RiskErrorCode.STORAGE_ERROR, "audit persistence unavailable"
             ) from error
@@ -389,7 +389,7 @@ class RiskAuditChain:
         try:
             return self._verify_records(records)
         except (TypeError, ValueError) as error:
-            logger.error("Risk audit-chain tamper detected")
+            logger.exception("Risk audit-chain tamper detected")
             raise RiskDomainError(
                 RiskErrorCode.AUDIT_CHAIN_TAMPER_DETECTED,
                 "audit chain verification failed",
@@ -430,4 +430,101 @@ class RiskAuditChain:
         return True
 
 
-__all__ = ["RiskAuditChain"]
+def create_risk_audit_chain(
+    config: RiskConfig,
+    store: _RiskAuditStore,
+    clock: Callable[[], datetime],
+    serializer: Callable[[object], str],
+) -> RiskAuditChain:
+    """Create an opaque tamper-evident Risk audit coordinator.
+
+    Args:
+        config: Validated Risk configuration.
+        store: Injected atomic Risk audit store.
+        clock: Injected aware-UTC clock.
+        serializer: Injected canonical serializer.
+
+    Returns:
+        Opaque internal audit coordinator.
+    """
+    return RiskAuditChain(config, store, clock, serializer)
+
+
+def append_risk_audit_record(audit: RiskAuditChain, record: RiskAuditRecord) -> object:
+    """Append one Risk audit record through an opaque coordinator.
+
+    Args:
+        audit: Opaque coordinator returned by :func:`create_risk_audit_chain`.
+        record: Unsealed Risk audit record.
+
+    Returns:
+        Standard response carrying the sealed record.
+
+    Raises:
+        TypeError: If ``audit`` is not a Risk audit coordinator.
+    """
+    if not isinstance(audit, RiskAuditChain):
+        raise TypeError("audit must be created by create_risk_audit_chain")
+    return audit.append(record)
+
+
+def append_risk_kill_switch_transition(
+    audit: RiskAuditChain,
+    record: RiskAuditRecord,
+    state: KillSwitchState,
+    store: _KillSwitchStateStore,
+    *,
+    expected_version: int,
+) -> object:
+    """Atomically append one kill-switch transition and audit record.
+
+    Args:
+        audit: Opaque coordinator returned by :func:`create_risk_audit_chain`.
+        record: Unsealed Risk audit record.
+        state: Resulting canonical kill-switch state.
+        store: Combined state and audit persistence adapter.
+        expected_version: Required predecessor state version.
+
+    Returns:
+        Standard response carrying the sealed record.
+
+    Raises:
+        TypeError: If ``audit`` is not a Risk audit coordinator.
+    """
+    if not isinstance(audit, RiskAuditChain):
+        raise TypeError("audit must be created by create_risk_audit_chain")
+    return audit.append_kill_switch_transition(
+        record,
+        state,
+        store,
+        expected_version=expected_version,
+    )
+
+
+def verify_risk_audit_chain(
+    audit: RiskAuditChain, records: Sequence[RiskAuditRecord]
+) -> object:
+    """Verify a complete Risk audit chain through an opaque coordinator.
+
+    Args:
+        audit: Opaque coordinator returned by :func:`create_risk_audit_chain`.
+        records: Ordered sealed Risk audit records.
+
+    Returns:
+        Standard response carrying the verification result.
+
+    Raises:
+        TypeError: If ``audit`` is not a Risk audit coordinator.
+    """
+    if not isinstance(audit, RiskAuditChain):
+        raise TypeError("audit must be created by create_risk_audit_chain")
+    return audit.verify(records)
+
+
+__all__ = [
+    "RiskAuditChain",
+    "append_risk_audit_record",
+    "append_risk_kill_switch_transition",
+    "create_risk_audit_chain",
+    "verify_risk_audit_chain",
+]

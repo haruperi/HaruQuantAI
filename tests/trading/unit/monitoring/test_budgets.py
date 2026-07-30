@@ -6,16 +6,22 @@ from decimal import Decimal
 from hashlib import sha256
 
 from app.services.risk import (
-    AllocationRiskDecision,
-    DecisionState,
-    PortfolioBudgetExecutionVerdict,
+    create_allocation_risk_decision,
+    create_portfolio_budget_execution_verdict,
+    get_decision_state,
 )
 from app.services.trading.contracts import (
     PortfolioRebalanceExecutionRequest,
     TradingRoute,
 )
 from app.services.trading.monitoring import BudgetGate
-from app.utils import canonical_json, logger
+from app.utils import canonical_json, get_logger
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+AllocationRiskDecision = object
+PortfolioBudgetExecutionVerdict = object
+
+logger = get_logger(__name__)
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
@@ -68,11 +74,11 @@ def _allocation() -> AllocationRiskDecision:
         Active Risk allocation decision.
     """
     logger.debug("Building budget-gate allocation decision")
-    return AllocationRiskDecision(
+    return create_allocation_risk_decision(
         decision_id="allocation-decision-001",
         portfolio_id="portfolio-001",
         reviewed_version="allocation-v1",
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         capped_weights={"strategy-001": Decimal("0.5")},
         risk_budget_projection={"strategy-001": Decimal(5000)},
         conditions=(),
@@ -98,7 +104,7 @@ def _verdict(
         Allowed plan-bound budget verdict.
     """
     logger.debug("Building budget-gate execution verdict")
-    return PortfolioBudgetExecutionVerdict(
+    return create_portfolio_budget_execution_verdict(
         verdict_id="budget-verdict-001",
         allocation_decision_id="allocation-decision-001",
         portfolio_id=request.portfolio_id,

@@ -2,7 +2,7 @@
 
 from decimal import Decimal
 
-from app.services.risk import ScenarioDefinition, run_risk_scenario_analysis
+from app.services.risk import create_scenario_definition, run_risk_scenario_analysis
 
 from tests.risk import _support as examples
 
@@ -11,8 +11,8 @@ def test_scenario_analysis_is_deterministic_and_advisory() -> None:
     """Produce reproducible differences without approval or input mutation."""
     config = examples._config()
     snapshot = examples._snapshot(config)
-    before = snapshot.model_dump(mode="python")
-    scenario = ScenarioDefinition(
+    before = snapshot.model_dump(warnings=False, mode="python")
+    scenario = create_scenario_definition(
         scenario_id="combined-stress",
         shocks={
             "equity": Decimal("-0.15"),
@@ -33,4 +33,4 @@ def test_scenario_analysis_is_deterministic_and_advisory() -> None:
     assert first == second
     assert first[0].advisory_only is True
     assert first[0].approved is False
-    assert snapshot.model_dump(mode="python") == before
+    assert snapshot.model_dump(warnings=False, mode="python") == before

@@ -1,19 +1,21 @@
 """Shared exact-authority validation for governed Trading mutations."""
 
+from __future__ import annotations
+
 from collections.abc import Sequence
 from datetime import datetime
 from decimal import Decimal
+from typing import Any
 
-from app.services.risk import (
-    ActionPolicyVerdict,
-    DecisionState,
-    KillSwitchState,
-    RiskDecisionPackage,
-)
+from app.services.risk import get_decision_state
 from app.services.trading.contracts import TradingError, TradingRequest
 from app.utils import get_logger
 
 logger = get_logger(__name__)
+
+ActionPolicyVerdict = Any
+KillSwitchState = Any
+RiskDecisionPackage = Any
 
 
 def validate_action_policy(
@@ -86,7 +88,7 @@ def validate_risk_authority(
     valid = (
         decision.decision_id == request.risk_decision_id
         and decision.intent_id == request.intent_id
-        and decision.state is DecisionState.APPROVE
+        and decision.state is get_decision_state("APPROVE")
         and decision.approved_size == request.quantity
         and decision.request_id == request.request_id
         and decision.workflow_id == request.workflow_id

@@ -1,5 +1,10 @@
-"""Public Risk configuration exports."""
+"""Internal Risk configuration exports."""
 
+from app.services.risk.config.factories import (
+    create_firm_mandate,
+    create_risk_config,
+    get_drawdown_mode,
+)
 from app.services.risk.config.mandates import (
     ConsistencyRule,
     DailyLossRule,
@@ -26,6 +31,9 @@ __all__ = [
     "ProfitTarget",
     "RiskConfig",
     "compute_config_hash",
+    "create_firm_mandate",
+    "create_risk_config",
+    "get_drawdown_mode",
     "load_firm_mandate",
     "load_risk_config",
 ]

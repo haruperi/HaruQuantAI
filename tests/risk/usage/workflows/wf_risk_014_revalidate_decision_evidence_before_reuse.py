@@ -7,7 +7,7 @@ from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from app.services.risk import revalidate_risk_decision
+from app.services.risk import revalidate_risk_decision, review_trade_risk
 from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-014"
@@ -35,7 +35,8 @@ def main() -> None:
     governor, _, _ = examples._services(config)
     proposal, snapshot = examples._proposal(config), examples._snapshot(config)
     decision = unwrap_risk_response(
-        governor.review_trade_risk(
+        review_trade_risk(
+            governor,
             proposal,
             snapshot,
             examples._market(),

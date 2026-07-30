@@ -375,7 +375,7 @@ def apply_kill_switch_command(
         ).info("Completed canonical Risk kill-switch state decision")
         return new_state
     except RiskDomainError:
-        logger.error("Risk kill-switch command failed closed")
+        logger.exception("Risk kill-switch command failed closed")
         raise
     except Exception as error:
         raise RiskDomainError(
@@ -512,7 +512,7 @@ def check_risk_kill_switch(
         ).info("Completed hierarchical Risk kill-switch decision")
         return decision
     except RiskDomainError:
-        logger.error("Risk kill-switch check failed closed")
+        logger.exception("Risk kill-switch check failed closed")
         raise
     except (KeyError, TypeError, ValueError) as error:
         raise RiskDomainError(

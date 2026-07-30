@@ -2,14 +2,13 @@
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from typing import Any
 
 from app.services.data import (
-    AccountBalance,
-    AccountOrder,
-    AccountPosition,
-    AccountStateSnapshot,
-    FXConversionEvidence,
-    FXRateLeg,
+    build_account_order,
+    build_account_state_snapshot,
+    build_fx_conversion_evidence,
+    build_fx_rate_leg,
 )
 from app.services.risk.config import RiskConfig
 from app.services.risk.contracts import PortfolioState
@@ -42,9 +41,9 @@ def _config() -> RiskConfig:
     )
 
 
-def _fx_evidence() -> FXConversionEvidence:
+def _fx_evidence() -> Any:
     """Build exact JPY-to-USD conversion evidence."""
-    leg = FXRateLeg(
+    leg = build_fx_rate_leg(
         source_currency="JPY",
         target_currency="USD",
         rate=Decimal("0.01"),
@@ -53,7 +52,7 @@ def _fx_evidence() -> FXConversionEvidence:
         as_of=NOW,
         provenance={"source": "data"},
     )
-    return FXConversionEvidence(
+    return build_fx_conversion_evidence(
         source_currency="JPY",
         target_currency="USD",
         legs=(leg,),
@@ -69,30 +68,30 @@ def _fx_evidence() -> FXConversionEvidence:
 
 def _state() -> PortfolioState:
     """Build complete position, pending-order, return, and FX evidence."""
-    account = AccountStateSnapshot(
+    account = build_account_state_snapshot(
         account_id="account-1",
         currency="USD",
         balances=(
-            AccountBalance(
-                asset="USD",
-                total=Decimal(10000),
-                available=Decimal(9000),
-            ),
+            {
+                "asset": "USD",
+                "total": Decimal(10000),
+                "available": Decimal(9000),
+            },
         ),
         equity=Decimal(10000),
         margin_used=Decimal(1000),
         margin_available=Decimal(9000),
         positions=(
-            AccountPosition(
-                position_id="position-1",
-                symbol="EURUSD",
-                side="LONG",
-                quantity=Decimal(1),
-                entry_price=Decimal("1.09"),
-            ),
+            {
+                "position_id": "position-1",
+                "symbol": "EURUSD",
+                "side": "LONG",
+                "quantity": Decimal(1),
+                "entry_price": Decimal("1.09"),
+            },
         ),
         orders=(
-            AccountOrder(
+            build_account_order(
                 order_id="order-1",
                 symbol="USDJPY",
                 side="SELL",

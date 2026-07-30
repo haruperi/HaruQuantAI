@@ -12,15 +12,15 @@ from app.services.risk.contracts import (
     ScenarioDefinition,
     StrategyOperationalEligibilityRequest,
 )
-from app.services.strategy import TradeIntent
+from app.services.strategy import create_trade_intent_value
 from pydantic import ValidationError
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
-def _intent() -> TradeIntent:
+def _intent() -> create_trade_intent_value:
     """Build one exact immutable Strategy intent."""
-    return TradeIntent(
+    return create_trade_intent_value(
         intent_id="intent-1",
         decision_id="strategy-decision-1",
         idempotency_key="intent-key-1",
@@ -226,7 +226,7 @@ def test_trace_ids_require_exact_prefixed_uuid4(field: str, invalid: str) -> Non
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
-    values = command.model_dump(mode="python")
+    values = command.model_dump(warnings=False, mode="python")
     values[field] = invalid
 
     with pytest.raises(ValidationError):

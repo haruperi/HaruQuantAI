@@ -1,14 +1,14 @@
 """Integration test for Strategy-to-Risk operational eligibility review."""
 
 from decimal import Decimal
-from typing import Literal
+from typing import Any, Literal
 
 from app.services.risk import (
-    DecisionState,
-    RiskAuditChain,
-    RiskAuditRecord,
-    StrategyOperationalEligibilityRequest,
+    create_risk_audit_chain,
+    create_strategy_operational_eligibility_request,
+    get_decision_state,
     review_strategy_admission,
+    verify_risk_audit_chain,
 )
 from app.utils import canonical_json
 
@@ -20,9 +20,9 @@ class _AuditStore:
 
     def __init__(self) -> None:
         """Initialize an empty chain."""
-        self.records: list[RiskAuditRecord] = []
+        self.records: list[Any] = []
 
-    def read_head(self, *, timeout_seconds: Decimal | None) -> RiskAuditRecord | None:
+    def read_head(self, *, timeout_seconds: Decimal | None) -> Any | None:
         """Return the current chain head.
 
         Args:
@@ -36,7 +36,7 @@ class _AuditStore:
 
     def append_atomic(
         self,
-        record: RiskAuditRecord,
+        record: Any,
         *,
         expected_sequence: int,
         expected_previous_hash: str,
@@ -57,9 +57,7 @@ class _AuditStore:
         self.records.append(record)
         return "appended"
 
-    def read_all(
-        self, *, timeout_seconds: Decimal | None
-    ) -> tuple[RiskAuditRecord, ...]:
+    def read_all(self, *, timeout_seconds: Decimal | None) -> tuple[Any, ...]:
         """Return all integration audit records.
 
         Args:
@@ -76,11 +74,16 @@ def test_strategy_operational_eligibility_end_to_end() -> None:
     """Persist an exact Strategy decision and a verifiable sealed audit event."""
     config = examples._config()
     audit_store = _AuditStore()
-    audit = RiskAuditChain(config, audit_store, lambda: examples.NOW, canonical_json)
+    audit = create_risk_audit_chain(
+        config,
+        audit_store,
+        lambda: examples.NOW,
+        canonical_json,
+    )
     eligibility_store = examples._EligibilityStore()
     decision = examples.unwrap_risk_response(
         review_strategy_admission(
-            StrategyOperationalEligibilityRequest(
+            create_strategy_operational_eligibility_request(
                 strategy_id="mean-reversion",
                 strategy_version="1.0.0",
                 runtime_profile="simulation",
@@ -104,11 +107,11 @@ def test_strategy_operational_eligibility_end_to_end() -> None:
         ),
         operation="review_strategy_admission",
     )
-    assert decision.state is DecisionState.APPROVE
+    assert decision.state is get_decision_state("APPROVE")
     assert eligibility_store.decision == decision
     assert (
         examples.unwrap_risk_response(
-            audit.verify(tuple(audit_store.records)),
+            verify_risk_audit_chain(audit, tuple(audit_store.records)),
             operation="risk_audit_chain.verify",
         )
         is True

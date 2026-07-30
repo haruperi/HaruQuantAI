@@ -7,11 +7,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.risk import (
-    AllocationBudgetActivationRequest,
-    KillSwitchState,
-    RiskAuditChain,
     activate_allocation_budget,
+    create_allocation_budget_activation_request,
+    create_kill_switch_state,
+    create_risk_audit_chain,
     review_allocation_proposal,
+    verify_risk_audit_chain,
 )
 from app.utils import canonical_json
 from tests.risk.integration.test_strategy_admission import _AuditStore
@@ -40,7 +41,9 @@ def main() -> None:
     _stage(1)
     config = examples._config()
     audit_store = _AuditStore()
-    audit = RiskAuditChain(config, audit_store, lambda: examples.NOW, canonical_json)
+    audit = create_risk_audit_chain(
+        config, audit_store, lambda: examples.NOW, canonical_json
+    )
     store = examples._AllocationStore()
     request = examples._allocation_request(config)
     print("Input:", request.portfolio_id, request.portfolio_version)
@@ -61,7 +64,7 @@ def main() -> None:
     print("Review:", decision.state)
     # Stage 3: Bind activation to exact decision.
     _stage(3)
-    activation = AllocationBudgetActivationRequest(
+    activation = create_allocation_budget_activation_request(
         portfolio_id="portfolio-1",
         allocation_version="allocation-v1",
         decision_id=decision.decision_id,
@@ -73,7 +76,7 @@ def main() -> None:
         correlation_id=examples.CORRELATION_ID,
     )
     states = (
-        KillSwitchState(
+        create_kill_switch_state(
             state_id="kill-global",
             scope_level="global",
             scope={},
@@ -95,7 +98,8 @@ def main() -> None:
         "Active/audit:",
         active.active,
         unwrap_risk_response(
-            audit.verify(tuple(audit_store.records)), operation="risk_audit.verify"
+            verify_risk_audit_chain(audit, tuple(audit_store.records)),
+            operation="verify_risk_audit_chain",
         ),
     )
     # Stage 5 — OUTPUT BOUNDARY: Return authoritative Risk budget projection.

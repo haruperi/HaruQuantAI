@@ -34,9 +34,7 @@ RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.data import (
-        MarketContextEvidence,
-    )
+    from app.services.risk.contracts.evidence import _MarketContextEvidenceView
 
 
 def _utc(value: datetime) -> datetime:
@@ -604,7 +602,7 @@ def evaluate_portfolio_limits(
         )
         return tuple(results)
     except RiskDomainError:
-        logger.error("Portfolio Policy limit evaluation failed closed")
+        logger.exception("Portfolio Policy limit evaluation failed closed")
         raise
 
 
@@ -737,7 +735,7 @@ def _calendar_missing_result(
 
 
 def _session_result(
-    evidence: MarketContextEvidence,
+    evidence: _MarketContextEvidenceView,
     config: RiskConfig,
     evidence_refs: tuple[str, ...],
 ) -> RiskLimitResult:
@@ -792,7 +790,7 @@ def _session_result(
 
 
 def _calendar_result(
-    evidence: MarketContextEvidence,
+    evidence: _MarketContextEvidenceView,
     config: RiskConfig,
     evidence_refs: tuple[str, ...],
 ) -> RiskLimitResult:
@@ -834,7 +832,7 @@ def _calendar_result(
 
 
 def _spread_result(
-    evidence: MarketContextEvidence,
+    evidence: _MarketContextEvidenceView,
     caps: Mapping[str, Decimal],
     evidence_refs: tuple[str, ...],
 ) -> RiskLimitResult:
@@ -860,7 +858,7 @@ def _spread_result(
 
 @guard_risk_boundary(risk_level="medium", read_only=True)
 def evaluate_market_context(
-    evidence: MarketContextEvidence,
+    evidence: _MarketContextEvidenceView,
     config: RiskConfig,
     *,
     now: datetime,
@@ -912,7 +910,7 @@ def evaluate_market_context(
             ),
         )
     except (KeyError, TypeError, ValueError) as error:
-        logger.error("Market-context Policy configuration is incomplete")
+        logger.exception("Market-context Policy configuration is incomplete")
         raise RiskDomainError(
             RiskErrorCode.INVALID_RISK_CONFIG,
             "market-context policy configuration invalid",

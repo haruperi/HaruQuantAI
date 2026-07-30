@@ -1,11 +1,11 @@
 """Workflow integration test for canonical Risk kill-switch control."""
 
 from app.services.risk import (
-    DecisionState,
-    KillSwitchCommand,
-    RiskAuditChain,
     apply_kill_switch_command,
     check_risk_kill_switch,
+    create_kill_switch_command,
+    create_risk_audit_chain,
+    get_decision_state,
 )
 from app.utils import canonical_json
 
@@ -17,9 +17,14 @@ def test_kill_switch_command_blocks_trading_without_execution_mutation() -> None
     config = examples._config()
     _, approvals, _ = examples._services(config)
     store = examples._KillStore()
-    audit = RiskAuditChain(config, store, lambda: examples.NOW, canonical_json)
+    audit = create_risk_audit_chain(
+        config,
+        store,
+        lambda: examples.NOW,
+        canonical_json,
+    )
     execution_state = {"enabled": True}
-    command = KillSwitchCommand(
+    command = create_kill_switch_command(
         action="activate",
         scope_level="global",
         portfolio_id=None,
@@ -56,5 +61,5 @@ def test_kill_switch_command_blocks_trading_without_execution_mutation() -> None
         operation="check_risk_kill_switch",
     )
     assert active.state == "active"
-    assert decision.state is DecisionState.BLOCK
+    assert decision.state is get_decision_state("BLOCK")
     assert execution_state == {"enabled": True}

@@ -7,25 +7,23 @@ import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.risk import (
-    ApprovalAttestation,
-    ApprovalTokenService,
-    KillSwitchCommand,
-    KillSwitchState,
-    RiskApprovalToken,
-    RiskAuditChain,
-    RiskAuditRecord,
-    RiskConfig,
     apply_kill_switch_command,
     check_risk_kill_switch,
     compute_config_hash,
+    create_approval_attestation,
+    create_approval_token_service,
+    create_kill_switch_command,
+    create_kill_switch_state,
+    create_risk_audit_chain,
+    create_risk_config,
 )
-from app.utils import AuthContext, canonical_json, generate_id
+from app.utils import canonical_json, create_auth_context, generate_id
 
 from tests.risk._support import unwrap_risk_response
 
@@ -39,15 +37,15 @@ class _AuditStore:
     """Minimal durable audit adapter."""
 
     def __init__(self) -> None:
-        self.records: list[RiskAuditRecord] = []
+        self.records: list[Any] = []
 
-    def read_head(self, *, timeout_seconds: Decimal | None) -> RiskAuditRecord | None:
+    def read_head(self, *, timeout_seconds: Decimal | None) -> Any | None:
         del timeout_seconds
         return self.records[-1] if self.records else None
 
     def append_atomic(
         self,
-        record: RiskAuditRecord,
+        record: Any,
         *,
         expected_sequence: int,
         expected_previous_hash: str,
@@ -57,9 +55,7 @@ class _AuditStore:
         self.records.append(record)
         return "appended"
 
-    def read_all(
-        self, *, timeout_seconds: Decimal | None
-    ) -> tuple[RiskAuditRecord, ...]:
+    def read_all(self, *, timeout_seconds: Decimal | None) -> tuple[Any, ...]:
         del timeout_seconds
         return tuple(self.records)
 
@@ -68,13 +64,11 @@ class _TokenStore:
     """Single-process token store."""
 
     def __init__(self) -> None:
-        self.tokens: dict[str, RiskApprovalToken] = {}
+        self.tokens: dict[str, Any] = {}
         self.consumed: set[str] = set()
         self.revoked: set[str] = set()
 
-    def save_issued(
-        self, token: RiskApprovalToken, *, timeout_seconds: Decimal | None
-    ) -> str:
+    def save_issued(self, token: Any, *, timeout_seconds: Decimal | None) -> str:
         del timeout_seconds
         self.tokens[token.token_id] = token
         return "saved"
@@ -96,12 +90,12 @@ class _KillStore(_AuditStore):
 
     def __init__(self) -> None:
         super().__init__()
-        self.state: KillSwitchState | None = None
+        self.state: create_kill_switch_state | None = None
 
     def compare_and_swap_with_audit(
         self,
-        state: KillSwitchState,
-        record: RiskAuditRecord,
+        state: create_kill_switch_state,
+        record: Any,
         *,
         expected_version: int,
         expected_sequence: int,
@@ -136,7 +130,7 @@ def example_kill_switch() -> None:
     _header("Demonstrate kill-switch state transitions and checks.")
     print("Risk Example 4: Kill Switch State Transitions")
 
-    config = RiskConfig(
+    config = create_risk_config(
         profile="research",
         execution_route="none",
         policy_version="policy-1",
@@ -152,7 +146,7 @@ def example_kill_switch() -> None:
         report_timeout_seconds=Decimal(5),
     )
 
-    auth = AuthContext(
+    auth = create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="operator-1",
@@ -168,9 +162,9 @@ def example_kill_switch() -> None:
     )
 
     kill_store = _KillStore()
-    audit = RiskAuditChain(config, kill_store, lambda: NOW, canonical_json)
+    audit = create_risk_audit_chain(config, kill_store, lambda: NOW, canonical_json)
     token_store = _TokenStore()
-    approvals = ApprovalTokenService(
+    approvals = create_approval_token_service(
         config,
         token_store,
         audit,
@@ -178,7 +172,7 @@ def example_kill_switch() -> None:
         lambda _: b"example-risk-signing-key-material-32-bytes",
         lambda evidence: evidence.principal_id == "operator-1",
     )
-    inactive_state = KillSwitchState(
+    inactive_state = create_kill_switch_state(
         state_id="global-state-1",
         scope_level="global",
         scope={},
@@ -189,7 +183,7 @@ def example_kill_switch() -> None:
     )
 
     # 1. Activate kill switch
-    command = KillSwitchCommand(
+    command = create_kill_switch_command(
         action="activate",
         scope_level="global",
         portfolio_id=None,
@@ -230,7 +224,7 @@ def example_kill_switch() -> None:
             "correlation_id": clear_correlation_id,
         }
     )
-    clear_command = KillSwitchCommand(
+    clear_command = create_kill_switch_command(
         action="clear",
         scope_level="global",
         portfolio_id=None,
@@ -242,7 +236,7 @@ def example_kill_switch() -> None:
         workflow_id=clear_workflow_id,
         correlation_id=clear_correlation_id,
     )
-    attestation = ApprovalAttestation(
+    attestation = create_approval_attestation(
         attestation_id="clearance-attestation-1",
         principal_id="operator-2",
         action="risk.kill.clear",
@@ -304,14 +298,14 @@ def fr_risk_043() -> None:
     under `global > portfolio > strategy > symbol` precedence, atomically
     compare-and-swap canonical state with its Risk audit record in the injected
     store, revoke affected approvals on activation, and never mutate execution
-    controls. Activation requires one authorized `AuthContext` and remains
+    controls. Activation requires one authorized `create_auth_context` and remains
     immediate and unilateral. Clearance additionally requires a matching current
-    `ApprovalAttestation v1` from a different authorized principal; same-principal
+    `create_approval_attestation v1` from a different authorized principal; same-principal
     clearance leaves the active state unchanged and fails deterministically.
     Active config is explicit so permission, timeout, policy reference, and audit
     hashing never use implicit state."""
     _header(
-        "FR-RISK-043: Apply an authorized, version-checked activation/clearance under `global > portfolio > strategy > symbol` precedence, atomically compare-and-swap canonical state with its Risk audit record in the injected store, revoke affected approvals on activation, and never mutate execution controls. Activation requires one authorized `AuthContext` and remains immediate and unilateral. Clearance additionally requires a matching current `ApprovalAttestation v1` from a different authorized principal; same-principal clearance leaves the active state unchanged and fails deterministically. Active config is explicit so permission, timeout, policy reference, and audit hashing never use implicit state."
+        "FR-RISK-043: Apply an authorized, version-checked activation/clearance under `global > portfolio > strategy > symbol` precedence, atomically compare-and-swap canonical state with its Risk audit record in the injected store, revoke affected approvals on activation, and never mutate execution controls. Activation requires one authorized `create_auth_context` and remains immediate and unilateral. Clearance additionally requires a matching current `create_approval_attestation v1` from a different authorized principal; same-principal clearance leaves the active state unchanged and fails deterministically. Active config is explicit so permission, timeout, policy reference, and audit hashing never use implicit state."
     )
     _demonstrate_once()
 

@@ -2,23 +2,19 @@
 
 from datetime import timedelta
 from decimal import Decimal
-from typing import Literal
+from typing import Any, Literal
 
-import pytest
 from app.services.risk import (
-    ApprovalAttestation,
-    ApprovalTokenService,
-    DecisionState,
-    KillSwitchCommand,
-    KillSwitchState,
-    RiskApprovalToken,
-    RiskAuditChain,
-    RiskAuditRecord,
-    RiskDecisionPackage,
-    RiskDomainError,
-    RiskErrorCode,
     apply_kill_switch_command,
     compute_config_hash,
+    create_approval_attestation,
+    create_approval_token_service,
+    create_kill_switch_command,
+    create_risk_audit_chain,
+    create_risk_decision_package,
+    get_decision_state,
+    issue_risk_approval_token,
+    review_trade_risk,
 )
 from app.utils import canonical_json
 
@@ -30,7 +26,7 @@ from tests.risk import _support as policy_examples
 class _UnavailableAuditStore:
     """Receiver adapter whose durable audit backend is unavailable."""
 
-    def read_head(self, *, timeout_seconds: Decimal | None) -> RiskAuditRecord | None:
+    def read_head(self, *, timeout_seconds: Decimal | None) -> Any | None:
         """Fail the first mandatory audit read.
 
         Args:
@@ -44,7 +40,7 @@ class _UnavailableAuditStore:
 
     def append_atomic(
         self,
-        record: RiskAuditRecord,
+        record: Any,
         *,
         expected_sequence: int,
         expected_previous_hash: str,
@@ -54,9 +50,7 @@ class _UnavailableAuditStore:
         del record, expected_sequence, expected_previous_hash, timeout_seconds
         raise OSError("audit unavailable")
 
-    def read_all(
-        self, *, timeout_seconds: Decimal | None
-    ) -> tuple[RiskAuditRecord, ...]:
+    def read_all(self, *, timeout_seconds: Decimal | None) -> tuple[Any, ...]:
         """Reject unreachable full-chain read."""
         del timeout_seconds
         raise OSError("audit unavailable")
@@ -67,8 +61,8 @@ class _UnavailableKillSwitchStore(approval_examples._KillStore):
 
     def compare_and_swap_with_audit(
         self,
-        state: KillSwitchState,
-        record: RiskAuditRecord,
+        state: Any,
+        record: Any,
         *,
         expected_version: int,
         expected_sequence: int,
@@ -87,7 +81,7 @@ class _UnavailableKillSwitchStore(approval_examples._KillStore):
         raise OSError("transaction unavailable")
 
 
-def _eligible_decision(config_hash: str) -> RiskDecisionPackage:
+def _eligible_decision(config_hash: str) -> Any:
     """Build one exact eligible decision for persistence failure workflow.
 
     Args:
@@ -99,7 +93,8 @@ def _eligible_decision(config_hash: str) -> RiskDecisionPackage:
     config = decision_examples._config()
     governor, _, _ = decision_examples._services(config)
     pending = decision_examples.unwrap_risk_response(
-        governor.review_trade_risk(
+        review_trade_risk(
+            governor,
             decision_examples._proposal(config),
             decision_examples._snapshot(config),
             policy_examples._market(),
@@ -110,9 +105,9 @@ def _eligible_decision(config_hash: str) -> RiskDecisionPackage:
         ),
         operation="risk_governor.review_trade_risk",
     )
-    values = pending.model_dump(mode="python")
+    values = pending.model_dump(warnings=False, mode="python")
     values.update(
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         approved_size=pending.requested_size,
         primary_failure_limit=None,
         composite_breach_flags=(),
@@ -120,17 +115,17 @@ def _eligible_decision(config_hash: str) -> RiskDecisionPackage:
         config_hash=config_hash,
         evidence_refs={**pending.evidence_refs, "config": config_hash},
     )
-    return RiskDecisionPackage.model_validate(values)
+    return create_risk_decision_package(**values)
 
 
 def test_audit_and_token_state_fail_closed_atomically() -> None:
     """Expose no successful issue when mandatory audit persistence fails."""
     config = decision_examples._config()
     token_store = approval_examples._TokenStore()
-    audit = RiskAuditChain(
+    audit = create_risk_audit_chain(
         config, _UnavailableAuditStore(), lambda: decision_examples.NOW, canonical_json
     )
-    service = ApprovalTokenService(
+    service = create_approval_token_service(
         config,
         token_store,
         audit,
@@ -138,25 +133,21 @@ def test_audit_and_token_state_fail_closed_atomically() -> None:
         lambda _: b"example-risk-signing-key-material-32-bytes",
         lambda evidence: evidence.principal_id == "operator-1",
     )
-    with pytest.raises(RiskDomainError) as captured:
-        decision_examples.unwrap_risk_response(
-            service.issue(
-                _eligible_decision(
-                    decision_examples.unwrap_risk_response(
-                        policy_examples.compute_config_hash(config),
-                        operation="compute_config_hash",
-                    )
-                ),
-                decision_examples._attestation(config),
-                now=decision_examples.NOW,
-            ),
-            operation="approval_token_service.issue",
-        )
-    assert captured.value.risk_code is RiskErrorCode.STORAGE_ERROR
-    assert len(token_store.tokens) == 1
-    assert all(
-        isinstance(token, RiskApprovalToken) for token in token_store.tokens.values()
+    response = issue_risk_approval_token(
+        service,
+        _eligible_decision(
+            decision_examples.unwrap_risk_response(
+                policy_examples.compute_config_hash(config),
+                operation="compute_config_hash",
+            )
+        ),
+        decision_examples._attestation(config),
+        now=decision_examples.NOW,
     )
+    assert response.status == "error"
+    assert response.error.code == "STORAGE_ERROR"
+    assert len(token_store.tokens) == 1
+    assert all(token.token_id for token in token_store.tokens.values())
 
 
 def test_kill_switch_clearance_audit_failure_leaves_state_unchanged() -> None:
@@ -164,11 +155,16 @@ def test_kill_switch_clearance_audit_failure_leaves_state_unchanged() -> None:
     config = decision_examples._config()
     _, approvals, _ = decision_examples._services(config)
     store = _UnavailableKillSwitchStore()
-    audit = RiskAuditChain(config, store, lambda: decision_examples.NOW, canonical_json)
+    audit = create_risk_audit_chain(
+        config,
+        store,
+        lambda: decision_examples.NOW,
+        canonical_json,
+    )
     current = decision_examples._inactive_state().model_copy(
         update={"state": "active", "reason": "operator safety stop"}
     )
-    command = KillSwitchCommand(
+    command = create_kill_switch_command(
         action="clear",
         scope_level="global",
         portfolio_id=None,
@@ -180,7 +176,7 @@ def test_kill_switch_clearance_audit_failure_leaves_state_unchanged() -> None:
         workflow_id=decision_examples.WORKFLOW_ID,
         correlation_id=decision_examples.CORRELATION_ID,
     )
-    attestation = ApprovalAttestation(
+    attestation = create_approval_attestation(
         attestation_id="clearance-independent-1",
         principal_id="operator-2",
         action="risk.kill.clear",
@@ -196,22 +192,18 @@ def test_kill_switch_clearance_audit_failure_leaves_state_unchanged() -> None:
         correlation_id=decision_examples.CORRELATION_ID,
     )
 
-    with pytest.raises(RiskDomainError) as captured:
-        decision_examples.unwrap_risk_response(
-            apply_kill_switch_command(
-                command,
-                current,
-                decision_examples._auth(config, clearance=True),
-                approvals,
-                audit,
-                store,
-                config,
-                attestation=attestation,
-                now=decision_examples.NOW,
-            ),
-            operation="apply_kill_switch_command",
-        )
-
-    assert captured.value.risk_code is RiskErrorCode.STORAGE_ERROR
+    response = apply_kill_switch_command(
+        command,
+        current,
+        decision_examples._auth(config, clearance=True),
+        approvals,
+        audit,
+        store,
+        config,
+        attestation=attestation,
+        now=decision_examples.NOW,
+    )
+    assert response.status == "error"
+    assert response.error.code == "STORAGE_ERROR"
     assert store.state is None
     assert store.records == []

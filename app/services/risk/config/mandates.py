@@ -293,7 +293,10 @@ def load_firm_mandate(account_id: str, config_root: Path) -> FirmMandate:
     try:
         return _load_firm_mandate(account_id, config_root)
     except (OSError, TypeError, ValueError, yaml.YAMLError) as error:
-        logger.error("Firm mandate load failed closed: %s", type(error).__name__)
+        logger.exception(
+            "Firm mandate load failed closed: %s",
+            type(error).__name__,
+        )
         raise RiskDomainError(
             RiskErrorCode.INVALID_RISK_CONFIG,
             "firm mandate load or verification failed",

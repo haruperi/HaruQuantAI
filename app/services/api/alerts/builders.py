@@ -18,7 +18,7 @@ type AuthContext = Any
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.risk import KillSwitchState
+    KillSwitchState = Any
     from app.services.trading import OperationalEvent
 
 

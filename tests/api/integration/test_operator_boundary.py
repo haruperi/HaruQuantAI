@@ -6,12 +6,10 @@ from app.services.api.identity import require_auth_context
 from app.services.api.routes import operator
 from app.services.api.routes.operator import router
 from app.services.risk import (
-    ApprovalAttestation,
-    KillSwitchCommand,
-    KillSwitchState,
-    RiskAuditChain,
     apply_kill_switch_command,
     compute_config_hash,
+    create_approval_attestation,
+    create_risk_audit_chain,
 )
 from app.utils import AuthContext, canonical_json
 from fastapi import FastAPI
@@ -19,13 +17,20 @@ from fastapi import FastAPI
 from tests.api._support import post_json
 from tests.risk import _support as risk_support
 
+# Private type-only aliases; Risk exposes functions, not contract classes.
+ApprovalAttestation = object
+KillSwitchCommand = object
+KillSwitchState = object
+
 
 def test_operator_kill_switch() -> None:
     """Verify activation and distinct-principal clearance delegate to real Risk."""
     config = risk_support._config()
     _, approvals, _ = risk_support._services(config)
     store = risk_support._KillStore()
-    audit = RiskAuditChain(config, store, lambda: risk_support.NOW, canonical_json)
+    audit = create_risk_audit_chain(
+        config, store, lambda: risk_support.NOW, canonical_json
+    )
     current = [risk_support._inactive_state()]
     alerts: list[str] = []
 
@@ -78,7 +83,7 @@ def test_operator_kill_switch() -> None:
         activation,
     )
 
-    attestation = ApprovalAttestation(
+    attestation = create_approval_attestation(
         attestation_id="clearance-independent-1",
         principal_id="operator-2",
         action="risk.kill.clear",

@@ -5,7 +5,7 @@ from dataclasses import replace
 from datetime import timedelta
 
 import pytest
-from app.services.risk import KillSwitchState
+from app.services.risk import create_kill_switch_state
 from app.services.trading.actions import (
     clear_kill_switch,
     pause_strategy,
@@ -24,6 +24,9 @@ from tests.trading.unit.actions.test_dependencies import (
     policy,
     request,
 )
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+KillSwitchState = object
 
 
 @pytest.fixture
@@ -66,7 +69,7 @@ def authority() -> AuthoritySnapshot:
 def switch(level: str, state: str = "inactive") -> KillSwitchState:
     """Build one canonical Risk kill-switch state."""
     scope = {} if level == "global" else {"id": "scope-001"}
-    return KillSwitchState(
+    return create_kill_switch_state(
         state_id=f"switch-{level}",
         scope_level=level,
         scope=scope,

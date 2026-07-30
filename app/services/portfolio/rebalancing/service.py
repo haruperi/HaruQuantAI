@@ -6,7 +6,7 @@ import hashlib
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from app.services.portfolio.contracts import (
     DriftObservation,
@@ -20,16 +20,14 @@ from app.services.portfolio.rebalancing.cross_account import (
     assess_common_mode_exposure,
     measure_cross_account_correlation,
 )
-from app.services.risk import (
-    AllocationRiskDecision,
-    DecisionState,
-    KillSwitchState,
-    StrategyOperationalEligibilityDecision,
-)
+from app.services.risk import get_decision_state
 from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 
+AllocationRiskDecision = Any
+KillSwitchState = Any
+StrategyOperationalEligibilityDecision = Any
 if TYPE_CHECKING:
     from app.services.portfolio.config import PortfolioSettings
     from app.services.portfolio.contracts import ActivePortfolioAllocation, PlanStatus
@@ -157,7 +155,7 @@ class RebalancingService:
             reasons.add("KILL_SWITCH")
         if (
             not risk_decision.active
-            or risk_decision.state is not DecisionState.APPROVE
+            or risk_decision.state is not get_decision_state("APPROVE")
             or risk_decision.decision_id != allocation.risk_decision_id
             or risk_decision.reviewed_version != allocation.allocation_version
             or risk_decision.expires_at <= now
@@ -251,7 +249,7 @@ class RebalancingService:
             )
             eligibility = eligibility_decisions[component_id]
             if (
-                eligibility.state is not DecisionState.APPROVE
+                eligibility.state is not get_decision_state("APPROVE")
                 or eligibility.suspended
                 or eligibility.expires_at <= now
             ):

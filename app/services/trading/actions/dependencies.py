@@ -8,27 +8,6 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
-from app.services.brokers import (
-    BrokerAdapter,
-    BrokerConnectionConfig,
-    BrokerSymbolInfo,
-)
-from app.services.data import (
-    AccountStateSnapshot,
-    MarketContextEvidence,
-    MarketDataset,
-)
-from app.services.indicators import IndicatorResult
-from app.services.risk import (
-    ActionPolicyVerdict,
-    AllocationRiskDecision,
-    KillSwitchCommand,
-    KillSwitchState,
-    PortfolioBudgetExecutionVerdict,
-    RiskDecisionPackage,
-    StrategyOperationalEligibilityDecision,
-)
-from app.services.strategy import TradeIntent
 from app.services.trading.contracts import (
     ExecutionReceipt,
     OrderIntent,
@@ -41,6 +20,18 @@ from app.services.trading.contracts.models import JsonValue
 from app.services.trading.reconciliation import AuthoritySnapshot
 from app.utils import get_logger
 
+AccountStateSnapshot = Any
+ActionPolicyVerdict = Any
+AllocationRiskDecision = Any
+KillSwitchCommand = Any
+KillSwitchState = Any
+MarketContextEvidence = Any
+MarketDataset = Any
+PortfolioBudgetExecutionVerdict = Any
+RiskDecisionPackage = Any
+StrategyOperationalEligibilityDecision = Any
+TradeIntent = Any
+
 type StandardResponse[T] = Any
 
 logger = get_logger(__name__)
@@ -50,7 +41,9 @@ if TYPE_CHECKING:
     from app.services.trading.monitoring import OperationalEvent
     from app.services.trading.state import TradingStateStore
 
-type SymbolCapability = tuple[Mapping[str, JsonValue], BrokerSymbolInfo]
+type BrokerConnection = object
+type BrokerAdapter = object
+type SymbolCapability = tuple[Mapping[str, JsonValue], object]
 type SimulationDispatch = Callable[
     [OrderIntent], Awaitable[StandardResponse[ExecutionReceipt]]
 ]
@@ -86,10 +79,10 @@ type MarketContextSource = Callable[
     [MarketDataset, Mapping[str, JsonValue]], Awaitable[MarketContextEvidence]
 ]
 type IndicatorSource = Callable[
-    [MarketDataset, Mapping[str, JsonValue]], Awaitable[IndicatorResult]
+    [MarketDataset, Mapping[str, JsonValue]], Awaitable[Any]
 ]
 type StrategySource = Callable[
-    [MarketDataset, AccountStateSnapshot, IndicatorResult, Mapping[str, JsonValue]],
+    [MarketDataset, AccountStateSnapshot, Any, Mapping[str, JsonValue]],
     Awaitable[TradeIntent | None],
 ]
 type RiskSource = Callable[
@@ -137,14 +130,14 @@ class TradingDependencies:
         evaluation_account_source: Data account-snapshot evaluation port.
         market_context_source: Data-owned normalized market-context evidence port.
         indicator_source: Indicators evaluation port.
-        strategy_source: Strategy TradeIntent evaluation port.
+        strategy_source: Strategy create_trade_intent_value evaluation port.
         risk_source: Risk decision evaluation port.
         child_risk_decision_source: Exact per-child emergency Risk authority.
         execution_risk_decision_source: Exact per-request Simulation Risk authority.
     """
 
     store: TradingStateStore
-    connection: BrokerConnectionConfig | None
+    connection: BrokerConnection | None
     broker_adapter: BrokerAdapter | None
     simulation_dispatch: SimulationDispatch | None
     live_session: LiveSession | None

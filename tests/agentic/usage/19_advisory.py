@@ -49,7 +49,7 @@ from app.agentic.agents.portfolio_risk_advisory.portfolio_risk_advisor.tools imp
     get_registered_tool_names,
 )
 from app.agentic.runtime import ModelOutcome
-from app.services.risk import AllocationReviewRequest
+from app.services.risk import create_allocation_review_request
 from app.utils import derive_stable_id, generate_id
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
@@ -527,7 +527,7 @@ def fr_agentic_057() -> None:
     )
     for label, override in projections:
         try:
-            AllocationReviewRequest.model_validate({**base, **override})
+            create_allocation_review_request(**{**base, **override})
             verdict = "accepted by Risk"
         except Exception as error:  # noqa: BLE001 - usage demonstrates rejection.
             detail = next(

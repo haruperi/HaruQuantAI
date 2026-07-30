@@ -8,27 +8,26 @@ import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import MarketContextEvidence
+from app.services.data import build_market_context_evidence
 from app.services.risk import (
-    RiskAuditChain,
-    RiskAuditRecord,
-    RiskConfig,
-    StrategyOperationalEligibilityDecision,
-    StrategyOperationalEligibilityRequest,
+    create_risk_audit_chain,
+    create_risk_audit_record,
+    create_risk_config,
+    create_strategy_operational_eligibility_request,
     review_strategy_admission,
 )
 from app.services.strategy import (
-    StrategyEnvironment,
-    StrategyLifecycleStatus,
-    StrategyManifest,
-    StrategyTimingPolicy,
-    StrategyValidationPolicy,
-    ValidatedStrategyRef,
+    create_strategy_manifest,
+    create_strategy_validation_policy,
+    create_validated_strategy_ref,
+    get_strategy_environment,
+    get_strategy_lifecycle_status,
+    get_strategy_timing_policy,
 )
 from app.utils import canonical_json
 
@@ -44,15 +43,15 @@ class _ExampleAuditStore:
     """Minimal append-only audit store for this example."""
 
     def __init__(self) -> None:
-        self.records: list[RiskAuditRecord] = []
+        self.records: list[create_risk_audit_record] = []
 
-    def read_head(self, *, timeout_seconds: Decimal | None) -> RiskAuditRecord | None:
+    def read_head(self, *, timeout_seconds: Decimal | None) -> Any | None:
         del timeout_seconds
         return self.records[-1] if self.records else None
 
     def append_atomic(
         self,
-        record: RiskAuditRecord,
+        record: Any,
         *,
         expected_sequence: int,
         expected_previous_hash: str,
@@ -62,9 +61,7 @@ class _ExampleAuditStore:
         self.records.append(record)
         return "appended"
 
-    def read_all(
-        self, *, timeout_seconds: Decimal | None
-    ) -> tuple[RiskAuditRecord, ...]:
+    def read_all(self, *, timeout_seconds: Decimal | None) -> tuple[Any, ...]:
         del timeout_seconds
         return tuple(self.records)
 
@@ -73,11 +70,11 @@ class _ExampleEligibilityStore:
     """Minimal idempotent eligibility decision store for this example."""
 
     def __init__(self) -> None:
-        self.decision: StrategyOperationalEligibilityDecision | None = None
+        self.decision: Any | None = None
 
     def save_if_absent(
         self,
-        decision: StrategyOperationalEligibilityDecision,
+        decision: Any,
         *,
         timeout_seconds: Decimal | None,
     ) -> bool:
@@ -93,9 +90,9 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _config() -> RiskConfig:
+def _config() -> create_risk_config:
     """Build a complete simulation-profile Risk configuration."""
-    return RiskConfig(
+    return create_risk_config(
         profile="simulation",
         execution_route="sim",
         policy_version="policy-1",
@@ -115,9 +112,9 @@ def _config() -> RiskConfig:
     )
 
 
-def _market() -> MarketContextEvidence:
+def _market() -> build_market_context_evidence:
     """Build fresh complete Data-owned market-context evidence."""
-    return MarketContextEvidence(
+    return build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
         calendar_state="clear",
@@ -136,9 +133,9 @@ def _market() -> MarketContextEvidence:
     )
 
 
-def _registration() -> ValidatedStrategyRef:
+def _registration() -> create_validated_strategy_ref:
     """Build an approved simulation Strategy registration reference."""
-    validation = StrategyValidationPolicy(
+    validation = create_strategy_validation_policy(
         policy_version="strategy-policy-1",
         approved_module_roots=("approved.strategies",),
         max_config_payload_bytes=4096,
@@ -146,7 +143,7 @@ def _registration() -> ValidatedStrategyRef:
         max_config_string_length=256,
         max_config_collection_items=128,
     )
-    manifest = StrategyManifest(
+    manifest = create_strategy_manifest(
         strategy_id="mean-reversion",
         strategy_version="1.0.0",
         module_path="approved.strategies.mean_reversion",
@@ -156,8 +153,8 @@ def _registration() -> ValidatedStrategyRef:
         config_schema={"type": "object"},
         required_data=("bars",),
         required_indicators=(),
-        timing_policy=StrategyTimingPolicy.EVENT_DRIVEN,
-        permitted_environments=(StrategyEnvironment.SIMULATION,),
+        timing_policy=get_strategy_timing_policy("EVENT_DRIVEN"),
+        permitted_environments=(get_strategy_environment("SIMULATION"),),
         source_hash=HASH_A,
         artifact_hash=HASH_A,
         dependency_hash=HASH_A,
@@ -170,10 +167,10 @@ def _registration() -> ValidatedStrategyRef:
         max_local_state_bytes=4096,
         decision_timeout_seconds=5,
     )
-    return ValidatedStrategyRef(
+    return create_validated_strategy_ref(
         manifest=manifest,
-        lifecycle_status=StrategyLifecycleStatus.APPROVED,
-        environment=StrategyEnvironment.SIMULATION,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
+        environment=get_strategy_environment("SIMULATION"),
         policy_version=validation.policy_version,
         validation_policy=validation,
         registry_record_hash=HASH_B,
@@ -182,9 +179,9 @@ def _registration() -> ValidatedStrategyRef:
     )
 
 
-def _request() -> StrategyOperationalEligibilityRequest:
+def _request() -> create_strategy_operational_eligibility_request:
     """Build an eligibility request bound to one exact registered version."""
-    return StrategyOperationalEligibilityRequest(
+    return create_strategy_operational_eligibility_request(
         strategy_id="mean-reversion",
         strategy_version="1.0.0",
         runtime_profile="simulation",
@@ -202,19 +199,21 @@ def _request() -> StrategyOperationalEligibilityRequest:
 
 
 def fr_risk_029() -> None:
-    """FR-RISK-029: Validate a public Strategy `ValidatedStrategyRef` against the
+    """FR-RISK-029: Validate a public Strategy `create_validated_strategy_ref` against the
     exact request, produce and atomically persist
     `StrategyOperationalEligibilityDecision v1` with scope, conditions,
     evidence/policy lineage, issue/expiry, and suspension semantics, then append
     its Risk audit record; never mutate Strategy state."""
     _header(
-        "FR-RISK-029: Validate a public Strategy `ValidatedStrategyRef` against the exact request, produce and atomically persist `StrategyOperationalEligibilityDecision v1` with scope, conditions, evidence/policy lineage, issue/expiry, and suspension semantics, then append its Risk audit record; never mutate Strategy state."
+        "FR-RISK-029: Validate a public Strategy `create_validated_strategy_ref` against the exact request, produce and atomically persist `StrategyOperationalEligibilityDecision v1` with scope, conditions, evidence/policy lineage, issue/expiry, and suspension semantics, then append its Risk audit record; never mutate Strategy state."
     )
     print("Risk Example 8: Strategy Operational Eligibility")
 
     config = _config()
     store = _ExampleEligibilityStore()
-    audit = RiskAuditChain(config, _ExampleAuditStore(), lambda: NOW, canonical_json)
+    audit = create_risk_audit_chain(
+        config, _ExampleAuditStore(), lambda: NOW, canonical_json
+    )
 
     decision = unwrap_risk_response(
         review_strategy_admission(

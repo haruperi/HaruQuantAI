@@ -11,7 +11,11 @@ from pathlib import Path
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.risk import PortfolioRiskSnapshot, RiskConfig, generate_risk_report
+from app.services.risk import (
+    create_portfolio_risk_snapshot,
+    create_risk_config,
+    generate_risk_report,
+)
 
 from tests.risk._support import unwrap_risk_response
 
@@ -23,9 +27,9 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _snapshot() -> PortfolioRiskSnapshot:
+def _snapshot() -> create_portfolio_risk_snapshot:
     """Build immutable snapshot input."""
-    return PortfolioRiskSnapshot(
+    return create_portfolio_risk_snapshot(
         snapshot_id="snapshot-1",
         account_id="account-1",
         base_currency="USD",
@@ -67,7 +71,7 @@ def fr_risk_046() -> None:
     )
     print("Risk Example 11: Risk Reporting")
 
-    config = RiskConfig(
+    config = create_risk_config(
         profile="research",
         execution_route="none",
         policy_version="policy-1",
@@ -88,9 +92,11 @@ def fr_risk_046() -> None:
         operation="generate_risk_report",
     )
     print(
-        f"Generated report format: {report.format}, "
+        f"Generated report format: {report.format}; "
         f"approval_claimed: {report.approval_claimed}"
     )
+    print("Rendered risk report content:")
+    print(report.content)
 
 
 def main() -> None:

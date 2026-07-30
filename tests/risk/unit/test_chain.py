@@ -177,3 +177,78 @@ def test_verify_detects_tamper() -> None:
     assert response.status == "error"
     assert response.error is not None
     assert response.error.code == RiskErrorCode.AUDIT_CHAIN_TAMPER_DETECTED.value
+
+
+def test_chain_rejects_invalid_inputs_and_conflicting_identity() -> None:
+    """Reject invalid time, serialization, sealed input, and reused identity."""
+    with pytest.raises(RiskDomainError):
+        RiskAuditChain(
+            _config(),
+            _MemoryAuditStore(),
+            lambda: NOW.replace(tzinfo=None),
+            canonical_json,
+        )
+    unsupported = _config().model_construct(audit_hash_algorithm="sha512")
+    with pytest.raises(RiskDomainError):
+        RiskAuditChain(unsupported, _MemoryAuditStore(), lambda: NOW, canonical_json)
+
+    bad_serializer = RiskAuditChain(
+        _config(),
+        _MemoryAuditStore(),
+        lambda: NOW,
+        lambda _: 1,  # type: ignore[arg-type,return-value]
+    )
+    assert bad_serializer.append(_record()).status == "error"
+
+    chain = RiskAuditChain(_config(), _MemoryAuditStore(), lambda: NOW, canonical_json)
+    assert chain.append(_record().model_copy(update={"sealed": True})).status == "error"
+    future = _record().model_copy(
+        update={"record_id": "audit-future", "occurred_at": NOW.replace(year=2027)}
+    )
+    assert chain.append(future).status == "error"
+
+    store = _MemoryAuditStore()
+    chain = RiskAuditChain(_config(), store, lambda: NOW, canonical_json)
+    assert chain.append(_record()).status == "success"
+    conflicting = _record().model_copy(update={"payload": {"status": "approved"}})
+    assert chain.append(conflicting).status == "error"
+
+
+def test_chain_handles_atomic_outcomes_and_continuity_failure() -> None:
+    """Accept idempotent atomic evidence and reject conflicts or discontinuity."""
+
+    class _OutcomeStore(_MemoryAuditStore):
+        """Return one configured atomic outcome."""
+
+        def __init__(self, outcome: str) -> None:
+            super().__init__()
+            self.outcome = outcome
+
+        def append_atomic(
+            self,
+            record: RiskAuditRecord,
+            *,
+            expected_sequence: int,
+            expected_previous_hash: str,
+            timeout_seconds: Decimal | None,
+        ) -> Literal["appended", "already_appended", "conflict"]:
+            del expected_sequence, expected_previous_hash, timeout_seconds
+            if self.outcome == "already_appended":
+                self.records.append(record)
+                return "already_appended"
+            return "conflict"
+
+    idempotent = RiskAuditChain(
+        _config(), _OutcomeStore("already_appended"), lambda: NOW, canonical_json
+    )
+    assert idempotent.append(_record()).status == "success"
+    conflicting = RiskAuditChain(
+        _config(), _OutcomeStore("conflict"), lambda: NOW, canonical_json
+    )
+    assert conflicting.append(_record()).status == "error"
+
+    store = _MemoryAuditStore()
+    chain = RiskAuditChain(_config(), store, lambda: NOW, canonical_json)
+    sealed = unwrap_risk_response(chain.append(_record()), operation="append")
+    discontinuous = sealed.model_copy(update={"sequence": 1})
+    assert chain.verify((discontinuous,)).status == "error"

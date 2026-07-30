@@ -18,15 +18,17 @@ from app.services.api.alerts import (
 )
 from app.services.api.identity import require_auth_context, require_human_permission
 from app.services.risk import (
-    ApprovalAttestation,
-    KillSwitchCommand,
-    KillSwitchState,
-    RiskDomainError,
+    create_approval_attestation,
+    create_kill_switch_command,
+    is_risk_domain_error,
 )
 from app.services.trading import OperationalEvent
 from app.utils import get_logger
 
 type AuthContext = Any
+ApprovalAttestation = Any
+KillSwitchCommand = Any
+KillSwitchState = Any
 
 logger = get_logger(__name__)
 
@@ -108,7 +110,7 @@ class _OperatorApprovalAttestation(BaseModel):
         Raises:
             ValueError: If Risk rejects the decoded evidence.
         """
-        ApprovalAttestation.model_validate(self.model_dump())
+        create_approval_attestation(**self.model_dump())
         return self
 
     def to_contract(self) -> ApprovalAttestation:
@@ -117,7 +119,7 @@ class _OperatorApprovalAttestation(BaseModel):
         Returns:
             Validated Risk approval attestation.
         """
-        return ApprovalAttestation.model_validate(self.model_dump())
+        return create_approval_attestation(**self.model_dump())
 
 
 class _OperatorKillSwitchResponse(BaseModel):
@@ -295,7 +297,7 @@ def _apply_kill_switch(
     )
     _validate_clearance(request, auth, attestation)
     try:
-        command = KillSwitchCommand(
+        command = create_kill_switch_command(
             action=request.action,
             scope_level=request.scope_level,
             portfolio_id=request.portfolio_id,
@@ -308,11 +310,13 @@ def _apply_kill_switch(
             correlation_id=auth.correlation_id,
         )
         state = transition(command, auth, attestation)
-    except RiskDomainError as error:
+    except Exception as error:
+        if not is_risk_domain_error(error):
+            raise
         logger.warning("Risk rejected operator kill-switch command")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=error.risk_code.value,
+            detail=error.risk_code.value,  # type: ignore[attr-defined]
         ) from error
     if state.state != "active":
         return _OperatorKillSwitchResponse(state=state, alert=None, delivery=None)
@@ -348,7 +352,7 @@ def _get_audit_events(
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_AuditSource, Depends(_audit_source)],
     limit: Annotated[int, Query(ge=1, le=200)] = 50,
-) -> Any:
+) -> Sequence[Any]:
     """Return a protected bounded Data-owned audit page.
 
     Args:

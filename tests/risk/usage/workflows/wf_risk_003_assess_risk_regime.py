@@ -16,7 +16,7 @@ STAGES = (
     "Validate required point-in-time evidence without fetching or extrapolating.",
     "Classify configured regime dimensions deterministically.",
     "Apply tightening modifiers and record transition evidence.",
-    "Return RegimeAssessment or fail closed on required unknown evidence.",
+    "Return create_regime_assessment or fail closed on required unknown evidence.",
 )
 
 
@@ -50,7 +50,7 @@ def main() -> None:
     print(
         "Modifiers:", dict(assessment.modifiers), "transitions:", assessment.transitions
     )
-    # Stage 5 — OUTPUT BOUNDARY: Return typed RegimeAssessment.
+    # Stage 5 — OUTPUT BOUNDARY: Return typed create_regime_assessment.
     _stage(5)
     print("Output:", type(assessment).__name__)
 

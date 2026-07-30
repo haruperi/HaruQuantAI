@@ -27,7 +27,7 @@ def test_analysis_is_immutable_and_deterministic() -> None:
     """Preserve input and return identical exact advisory projections."""
     config = examples._config()
     snapshot = examples._snapshot(config)
-    before = snapshot.model_dump(mode="python")
+    before = snapshot.model_dump(warnings=False, mode="python")
     first = unwrap_risk_response(
         run_risk_scenario_analysis(snapshot, (_scenario(),), config, now=examples.NOW),
         operation="run_risk_scenario_analysis",
@@ -40,7 +40,7 @@ def test_analysis_is_immutable_and_deterministic() -> None:
     assert first[0].projected["equity"] == Decimal(9000)
     assert first[0].projected["drawdown"] == Decimal("0.07")
     assert first[0].advisory_only is True
-    assert snapshot.model_dump(mode="python") == before
+    assert snapshot.model_dump(warnings=False, mode="python") == before
 
 
 def test_analysis_enforces_configured_payload_bound() -> None:

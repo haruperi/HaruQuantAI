@@ -1,13 +1,11 @@
 """Fail-closed validation of Risk-owned rebalance budget authority."""
 
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Any, Literal
 
-from app.services.risk import (
-    AllocationRiskDecision,
-    DecisionState,
-    PortfolioBudgetExecutionVerdict,
-)
+from app.services.risk import get_decision_state
 from app.services.trading.contracts import (
     PortfolioRebalanceExecutionRequest,
     TradingError,
@@ -16,6 +14,8 @@ from app.services.trading.contracts.responses import success_trading_response
 from app.utils import get_logger
 
 type StandardResponse[T] = Any
+AllocationRiskDecision = Any
+PortfolioBudgetExecutionVerdict = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 logger = get_logger(__name__)
@@ -48,7 +48,7 @@ class BudgetGate:
             allocation.decision_id == request.allocation_decision_id
             and allocation.portfolio_id == request.portfolio_id
             and allocation.reviewed_version == request.allocation_version
-            and allocation.state is DecisionState.APPROVE
+            and allocation.state is get_decision_state("APPROVE")
             and allocation.active
             and bool(allocation.risk_budget_projection)
             and allocation.issued_at <= now < allocation.expires_at

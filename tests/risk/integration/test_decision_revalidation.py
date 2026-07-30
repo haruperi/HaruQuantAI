@@ -2,11 +2,9 @@
 
 from decimal import Decimal
 
-import pytest
 from app.services.risk import (
-    RiskDomainError,
-    RiskErrorCode,
     revalidate_risk_decision,
+    review_trade_risk,
 )
 
 from tests.risk import _support as examples
@@ -20,7 +18,8 @@ def test_material_change_requires_new_decision() -> None:
     proposal = examples._proposal(config)
     snapshot = examples._snapshot(config)
     decision = examples.unwrap_risk_response(
-        governor.review_trade_risk(
+        review_trade_risk(
+            governor,
             proposal,
             snapshot,
             policy_examples._market(),
@@ -33,11 +32,12 @@ def test_material_change_requires_new_decision() -> None:
         operation="risk_governor.review_trade_risk",
     )
     changed = proposal.model_copy(update={"requested_size": Decimal(2)})
-    with pytest.raises(RiskDomainError) as captured:
-        examples.unwrap_risk_response(
-            revalidate_risk_decision(
-                decision, changed, snapshot, config, now=examples.NOW
-            ),
-            operation="revalidate_risk_decision",
-        )
-    assert captured.value.risk_code is RiskErrorCode.STALE_EVIDENCE
+    response = revalidate_risk_decision(
+        decision,
+        changed,
+        snapshot,
+        config,
+        now=examples.NOW,
+    )
+    assert response.status == "error"
+    assert response.error.code == "STALE_EVIDENCE"

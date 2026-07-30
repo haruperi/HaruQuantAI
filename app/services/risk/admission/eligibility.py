@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 from datetime import datetime, timedelta
 from time import monotonic
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, Protocol, cast, runtime_checkable
 
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
@@ -23,9 +23,9 @@ from app.services.risk.contracts.responses import (
 )
 from app.services.risk.limits import evaluate_market_context
 from app.services.strategy import (
-    StrategyEnvironment,
-    StrategyLifecycleStatus,
-    ValidatedStrategyRef,
+    create_validated_strategy_ref,
+    get_strategy_environment,
+    get_strategy_lifecycle_status,
 )
 from app.utils import canonical_json, get_logger
 
@@ -34,11 +34,37 @@ RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.data import (
-        MarketContextEvidence,
-    )
     from app.services.risk.audit import RiskAuditChain
     from app.services.risk.audit.storage import _EligibilityDecisionStore
+    from app.services.risk.contracts.evidence import _MarketContextEvidenceView
+
+
+@runtime_checkable
+class _StrategyManifestView(Protocol):
+    """Structural view of a Strategy registration manifest."""
+
+    strategy_id: str
+    strategy_version: str
+    permitted_environments: tuple[object, ...]
+
+
+@runtime_checkable
+class _ValidatedStrategyRefView(Protocol):
+    """Structural view of a validated Strategy registration."""
+
+    manifest: _StrategyManifestView
+    registry_record_hash: str
+    lifecycle_status: object
+    environment: object
+
+    def model_dump(
+        self,
+        *,
+        mode: str = "python",
+        warnings: bool = True,
+    ) -> dict[str, object]:
+        """Return the complete validated Strategy reference payload."""
+        ...
 
 
 def _utc(value: datetime) -> datetime:
@@ -61,10 +87,10 @@ def _utc(value: datetime) -> datetime:
 
 def _validate_registration(
     request: StrategyOperationalEligibilityRequest,
-    registration: ValidatedStrategyRef,
+    registration: _ValidatedStrategyRefView,
     config: RiskConfig,
     now: datetime,
-) -> None:
+) -> _ValidatedStrategyRefView:
     """Validate exact Strategy, policy, environment, and request bindings.
 
     Args:
@@ -73,14 +99,23 @@ def _validate_registration(
         config: Active Risk policy.
         now: Checked evaluation time.
 
+    Returns:
+        Exact Strategy-produced validated registration.
+
     Raises:
         RiskDomainError: If any exact binding is incompatible.
     """
     logger.debug("Validating exact Strategy registration for admission")
+    registration = cast(
+        "_ValidatedStrategyRefView",
+        create_validated_strategy_ref(
+            **registration.model_dump(warnings=False, mode="python")
+        ),
+    )
     environment = {
-        "simulation": StrategyEnvironment.SIMULATION,
-        "paper": StrategyEnvironment.PAPER,
-        "live": StrategyEnvironment.LIVE,
+        "simulation": get_strategy_environment("SIMULATION"),
+        "paper": get_strategy_environment("PAPER"),
+        "live": get_strategy_environment("LIVE"),
     }[request.runtime_profile]
     valid = (
         request.requested_at <= now
@@ -88,7 +123,7 @@ def _validate_registration(
         and request.strategy_version == registration.manifest.strategy_version
         and request.registration_ref == registration.registry_record_hash
         and request.policy_version == config.policy_version
-        and registration.lifecycle_status is StrategyLifecycleStatus.APPROVED
+        and registration.lifecycle_status is get_strategy_lifecycle_status("APPROVED")
         and registration.environment is environment
         and environment in registration.manifest.permitted_environments
         and request.runtime_profile == config.profile
@@ -99,6 +134,7 @@ def _validate_registration(
             RiskErrorCode.POLICY_BLOCKED,
             "strategy registration or runtime binding is incompatible",
         )
+    return registration
 
 
 def _decision_state(
@@ -128,7 +164,7 @@ def _decision_state(
 
 def _identity(
     request: StrategyOperationalEligibilityRequest,
-    registration: ValidatedStrategyRef,
+    registration: _ValidatedStrategyRefView,
     config_hash: str,
 ) -> str:
     """Derive a stable idempotent decision identity.
@@ -198,8 +234,8 @@ def _audit_record(
 )
 def review_strategy_admission(
     request: StrategyOperationalEligibilityRequest,
-    registration: ValidatedStrategyRef,
-    market: MarketContextEvidence,
+    registration: _ValidatedStrategyRefView,
+    market: _MarketContextEvidenceView,
     config: RiskConfig,
     store: _EligibilityDecisionStore,
     audit: RiskAuditChain,
@@ -226,7 +262,12 @@ def review_strategy_admission(
     logger.info("Reviewing Strategy operational eligibility")
     started_at = monotonic()
     checked_now = _utc(now)
-    _validate_registration(request, registration, config, checked_now)
+    registration = _validate_registration(
+        request,
+        registration,
+        config,
+        checked_now,
+    )
     if market.request_id not in request.evidence_refs.values():
         raise RiskDomainError(
             RiskErrorCode.MISSING_EVIDENCE,
@@ -267,7 +308,7 @@ def review_strategy_admission(
     try:
         saved = store.save_if_absent(decision, timeout_seconds=timeout)
     except Exception as error:
-        logger.error("Strategy eligibility persistence failed")
+        logger.exception("Strategy eligibility persistence failed")
         raise RiskDomainError(
             RiskErrorCode.STORAGE_ERROR,
             "strategy eligibility persistence unavailable",

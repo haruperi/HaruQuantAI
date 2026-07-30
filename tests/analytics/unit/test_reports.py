@@ -12,14 +12,14 @@ from app.services.optimization.robustness import (
     FirstPassageReport,
     JointFirstPassageReport,
 )
-from app.services.risk import DrawdownMode
+from app.services.risk import get_drawdown_mode
 
 
 def _reports() -> tuple[FirstPassageReport, JointFirstPassageReport]:
     """Build bounded Optimization report fixtures."""
     first = FirstPassageReport(
         mandate_version="v1",
-        mode=DrawdownMode.STATIC,
+        mode=get_drawdown_mode("STATIC"),
         paths=10,
         seed=1,
         probability_target=Decimal("0.4"),
@@ -75,7 +75,7 @@ def test_barrier_section_contains_mode_sensitivity() -> None:
         joint,
         worst,
         mandate_version="v1",
-        mode_sensitivity={DrawdownMode.STATIC: first},
+        mode_sensitivity={get_drawdown_mode("STATIC"): first},
     )
     assert section.status == "completed"
     assert any(

@@ -7,9 +7,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.risk import (
-    RiskAuditChain,
-    StrategyOperationalEligibilityRequest,
+    create_risk_audit_chain,
+    create_strategy_operational_eligibility_request,
     review_strategy_admission,
+    verify_risk_audit_chain,
 )
 from app.utils import canonical_json
 from tests.risk.integration.test_strategy_admission import _AuditStore
@@ -37,7 +38,7 @@ def main() -> None:
     # Stage 1 — INPUT BOUNDARY: Registered Strategy asks Risk for operational eligibility.
     _stage(1)
     config = examples._config()
-    request = StrategyOperationalEligibilityRequest(
+    request = create_strategy_operational_eligibility_request(
         strategy_id="mean-reversion",
         strategy_version="1.0.0",
         runtime_profile="simulation",
@@ -56,7 +57,9 @@ def main() -> None:
     # Stage 2: Prepare current immutable evidence.
     _stage(2)
     audit_store = _AuditStore()
-    audit = RiskAuditChain(config, audit_store, lambda: examples.NOW, canonical_json)
+    audit = create_risk_audit_chain(
+        config, audit_store, lambda: examples.NOW, canonical_json
+    )
     eligibility_store = examples._EligibilityStore()
     # Stage 3: Execute the public admission review.
     _stage(3)
@@ -78,7 +81,8 @@ def main() -> None:
     print(
         "Audit valid:",
         unwrap_risk_response(
-            audit.verify(tuple(audit_store.records)), operation="risk_audit.verify"
+            verify_risk_audit_chain(audit, tuple(audit_store.records)),
+            operation="verify_risk_audit_chain",
         ),
     )
     # Stage 5 — OUTPUT BOUNDARY: Return typed eligibility decision.

@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from app.services.risk import generate_risk_report
+from app.services.risk import generate_risk_report, review_trade_risk
 from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-011"
@@ -36,7 +36,8 @@ def main() -> None:
         update={"state": "active", "reason": "operator safety stop"}
     )
     decision = unwrap_risk_response(
-        governor.review_trade_risk(
+        review_trade_risk(
+            governor,
             examples._proposal(config),
             examples._snapshot(config),
             examples._market(),

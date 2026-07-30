@@ -3,12 +3,17 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data import (
-    MarketContextEvidence,
-)
+import pytest
+from app.services.data import build_market_context_evidence
 from app.services.risk.allocation import (
     activate_allocation_budget,
     review_allocation_proposal,
+)
+from app.services.risk.allocation.budget import (
+    _cap_for,
+    _parse_component,
+    _parse_components,
+    _review_state,
 )
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
@@ -17,8 +22,10 @@ from app.services.risk.contracts import (
     AllocationRiskDecision,
     DecisionState,
     KillSwitchState,
+    LimitStatus,
     PortfolioRiskSnapshot,
     RiskAuditRecord,
+    RiskDomainError,
 )
 from app.services.risk.contracts.responses import unwrap_risk_response
 
@@ -178,9 +185,9 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
     )
 
 
-def _market() -> MarketContextEvidence:
+def _market() -> object:
     """Build complete fresh market evidence."""
-    return MarketContextEvidence(
+    return build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
         calendar_state="clear",
@@ -277,6 +284,69 @@ def test_allocation_rejects_malformed_component_schema() -> None:
     assert response.error.code == "INVALID_INPUT"
 
 
+def test_allocation_helpers_cover_exact_policy_branches() -> None:
+    """Exercise invalid components, default caps, and ordered review precedence."""
+    config = _config()
+    with pytest.raises(RiskDomainError, match="ALLOCATION_COMPONENT_WEIGHT_INVALID"):
+        _parse_component(
+            {
+                "component_id": "bad",
+                "dimension": "symbol:EURUSD",
+                "weight": "not-decimal",
+            }
+        )
+    with pytest.raises(RiskDomainError, match="ALLOCATION_COMPONENT_VALUE_INVALID"):
+        _parse_component(
+            {
+                "component_id": "bad",
+                "dimension": "unknown:EURUSD",
+                "weight": "0.1",
+            }
+        )
+    component = {
+        "component_id": "same",
+        "dimension": "symbol:EURUSD",
+        "weight": "0.1",
+    }
+    with pytest.raises(RiskDomainError, match="ALLOCATION_COMPONENTS_MUST_BE_UNIQUE"):
+        _parse_components((component, component))
+    assert _cap_for("portfolio:main", config) == Decimal(1)
+    assert _cap_for("symbol:EURUSD", config) == config.max_symbol_concentration
+    assert _cap_for("strategy:alpha", config) == config.max_dimension_concentration
+    assert (
+        _review_state((), cap_breached=False, total_invalid=True)[0]
+        is DecisionState.REJECT
+    )
+    assert (
+        _review_state((), cap_breached=True, total_invalid=False)[0]
+        is DecisionState.REJECT
+    )
+    assert (
+        _review_state(
+            (LimitStatus.BLOCKED,),
+            cap_breached=False,
+            total_invalid=False,
+        )[0]
+        is DecisionState.BLOCK
+    )
+    assert (
+        _review_state(
+            (LimitStatus.NEEDS_MORE_EVIDENCE,),
+            cap_breached=False,
+            total_invalid=False,
+        )[0]
+        is DecisionState.NEEDS_MORE_EVIDENCE
+    )
+    assert (
+        _review_state(
+            (LimitStatus.WARN,),
+            cap_breached=False,
+            total_invalid=False,
+        )[0]
+        is DecisionState.WARN
+    )
+
+
 def test_budget_activation_is_version_exact_and_atomic() -> None:
     """Reject a version mismatch before CAS and atomically activate an exact review."""
     config = _config()
@@ -294,7 +364,7 @@ def test_budget_activation_is_version_exact_and_atomic() -> None:
         ),
         operation="review_allocation_proposal",
     )
-    values = reviewed.model_dump(mode="python")
+    values = reviewed.model_dump(warnings=False, mode="python")
     values.update(state=DecisionState.APPROVE, conditions=())
     approved = AllocationRiskDecision.model_validate(values)
     base = {

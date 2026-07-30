@@ -1,6 +1,6 @@
 """Executable Risk contracts usage example.
 
-Demonstrates creating and inspecting TradeIntent, PortfolioState, and Risk
+Demonstrates creating and inspecting create_trade_intent_value, create_portfolio_state, and Risk
 contract instances.
 """
 
@@ -13,15 +13,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    AccountBalance,
-    AccountStateSnapshot,
-    MarketContextEvidence,
+    build_account_state_snapshot,
+    build_market_context_evidence,
 )
 from app.services.risk import (
-    PortfolioState,
+    create_portfolio_state,
     validate_market_context_evidence,
 )
-from app.services.strategy import TradeIntent
+from app.services.strategy import create_trade_intent_value
 
 from tests.risk._support import unwrap_risk_response
 
@@ -39,8 +38,8 @@ def example_contracts() -> None:
     _header("Demonstrate Risk contract models.")
     print("Risk Example 1: Boundary Contracts and Evidence")
 
-    # 1. TradeIntent
-    intent = TradeIntent(
+    # 1. create_trade_intent_value
+    intent = create_trade_intent_value(
         intent_id="intent-1",
         decision_id="strategy-decision-1",
         idempotency_key="intent-key-1",
@@ -69,16 +68,20 @@ def example_contracts() -> None:
         lineage={"config_hash": "a" * 64},
     )
     print(
-        f"TradeIntent ID: {intent.intent_id}, symbol: {intent.symbol}, "
+        f"create_trade_intent_value ID: {intent.intent_id}, symbol: {intent.symbol}, "
         f"side: {intent.side}"
     )
 
-    # 2. PortfolioState
-    account = AccountStateSnapshot(
+    # 2. create_portfolio_state
+    account = build_account_state_snapshot(
         account_id="account-1",
         currency="USD",
         balances=(
-            AccountBalance(asset="USD", total=Decimal(10000), available=Decimal(9500)),
+            {
+                "asset": "USD",
+                "total": Decimal(10000),
+                "available": Decimal(9500),
+            },
         ),
         equity=Decimal(10000),
         margin_used=Decimal(500),
@@ -92,7 +95,7 @@ def example_contracts() -> None:
         expires_at=NOW + timedelta(minutes=1),
         request_id="req-12345678-1234-4234-8234-123456789abc",
     )
-    portfolio = PortfolioState(
+    portfolio = create_portfolio_state(
         account_snapshot=account,
         peak_equity=Decimal(10000),
         day_start_equity=Decimal(10000),
@@ -113,11 +116,11 @@ def example_contracts() -> None:
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
     )
     print(
-        f"PortfolioState account ID: {portfolio.account_snapshot.account_id}, "
+        f"create_portfolio_state account ID: {portfolio.account_snapshot.account_id}, "
         f"equity: {portfolio.account_snapshot.equity}"
     )
 
-    market = MarketContextEvidence(
+    market = build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
         calendar_state="clear",
@@ -192,15 +195,15 @@ def fr_risk_003() -> None:
 
 
 def fr_risk_004() -> None:
-    """FR-RISK-004: Carry exact immutable Data-owned `AccountStateSnapshot v1`
-    and `FXConversionEvidence v1` values plus peak/day-start/inception equity,
+    """FR-RISK-004: Carry exact immutable Data-owned `build_account_state_snapshot v1`
+    and `build_fx_conversion_evidence v1` values plus peak/day-start/inception equity,
     symbol mark prices, contract sizes, quote currencies, exposure dimensions,
     aligned timestamped per-symbol return histories, explicit pair
     correlations, UTC `as_of`, provenance, missingness, and schema version.
-    Open `AccountOrder.quantity` is the full remaining pending quantity for Risk
+    Open `build_account_order.quantity` is the full remaining pending quantity for Risk
     exposure."""
     _header(
-        "FR-RISK-004: Carry exact immutable Data-owned `AccountStateSnapshot v1` and `FXConversionEvidence v1` values plus peak/day-start/inception equity, symbol mark prices, contract sizes, quote currencies, exposure dimensions, aligned timestamped per-symbol return histories, explicit pair correlations, UTC `as_of`, provenance, missingness, and schema version. Open `AccountOrder.quantity` is the full remaining pending quantity for Risk exposure."
+        "FR-RISK-004: Carry exact immutable Data-owned `build_account_state_snapshot v1` and `build_fx_conversion_evidence v1` values plus peak/day-start/inception equity, symbol mark prices, contract sizes, quote currencies, exposure dimensions, aligned timestamped per-symbol return histories, explicit pair correlations, UTC `as_of`, provenance, missingness, and schema version. Open `build_account_order.quantity` is the full remaining pending quantity for Risk exposure."
     )
     _demonstrate_once()
 
@@ -219,13 +222,13 @@ def fr_risk_005() -> None:
 def fr_risk_006() -> None:
     """FR-RISK-006: Define the Risk-owned receiver contract for one
     non-executable review. It embeds the complete immutable Strategy
-    `TradeIntent v1` unchanged and adds current valuation, stop-distance,
+    `create_trade_intent_value v1` unchanged and adds current valuation, stop-distance,
     account/portfolio scope, evidence timestamps, provenance references/hashes,
     and requested Risk profile. Risk rejects an incompatible intent version,
     conflicting duplicated fact, invalid scope/size, or absent required stop
     evidence."""
     _header(
-        "FR-RISK-006: Define the Risk-owned receiver contract for one non-executable review. It embeds the complete immutable Strategy `TradeIntent v1` unchanged and adds current valuation, stop-distance, account/portfolio scope, evidence timestamps, provenance references/hashes, and requested Risk profile. Risk rejects an incompatible intent version, conflicting duplicated fact, invalid scope/size, or absent required stop evidence."
+        "FR-RISK-006: Define the Risk-owned receiver contract for one non-executable review. It embeds the complete immutable Strategy `create_trade_intent_value v1` unchanged and adds current valuation, stop-distance, account/portfolio scope, evidence timestamps, provenance references/hashes, and requested Risk profile. Risk rejects an incompatible intent version, conflicting duplicated fact, invalid scope/size, or absent required stop evidence."
     )
     _demonstrate_once()
 
@@ -249,24 +252,24 @@ def fr_risk_008() -> None:
 
 
 def fr_risk_009() -> None:
-    """FR-RISK-009: Define `AllocationReviewRequest v1` carrying a
+    """FR-RISK-009: Define `create_allocation_review_request v1` carrying a
     self-contained Risk-owned projection (projection kind,
     portfolio/result/plan IDs and versions, ordered weights or actions,
     eligibility decisions, account/market/FX evidence references and hashes,
     runtime scope, approval references); it never embeds or imports a
     Portfolio-owned contract."""
     _header(
-        "FR-RISK-009: Define `AllocationReviewRequest v1` carrying a self-contained Risk-owned projection (projection kind, portfolio/result/plan IDs and versions, ordered weights or actions, eligibility decisions, account/market/FX evidence references and hashes, runtime scope, approval references); it never embeds or imports a Portfolio-owned contract."
+        "FR-RISK-009: Define `create_allocation_review_request v1` carrying a self-contained Risk-owned projection (projection kind, portfolio/result/plan IDs and versions, ordered weights or actions, eligibility decisions, account/market/FX evidence references and hashes, runtime scope, approval references); it never embeds or imports a Portfolio-owned contract."
     )
     _demonstrate_once()
 
 
 def fr_risk_010() -> None:
-    """FR-RISK-010: Define `StrategyOperationalEligibilityRequest v1` for an
+    """FR-RISK-010: Define `create_strategy_operational_eligibility_request v1` for an
     exact registered strategy/version and scope (strategy/version, runtime
     profile, route, policy/evidence/approval references, requested scope)."""
     _header(
-        "FR-RISK-010: Define `StrategyOperationalEligibilityRequest v1` for an exact registered strategy/version and scope (strategy/version, runtime profile, route, policy/evidence/approval references, requested scope)."
+        "FR-RISK-010: Define `create_strategy_operational_eligibility_request v1` for an exact registered strategy/version and scope (strategy/version, runtime profile, route, policy/evidence/approval references, requested scope)."
     )
     _demonstrate_once()
 
@@ -320,22 +323,22 @@ def fr_risk_015() -> None:
 
 
 def fr_risk_016() -> None:
-    """FR-RISK-016: Implement `KillSwitchCommand v1` with action, explicit scope
+    """FR-RISK-016: Implement `create_kill_switch_command v1` with action, explicit scope
     level, applicable portfolio/strategy/symbol identifiers, reason, UTC
     timestamp, request/workflow/correlation IDs, and schema identity. Principal
-    authorization remains in the separate `AuthContext`; clearance requires a
-    separate matching current `ApprovalAttestation`."""
+    authorization remains in the separate `create_auth_context`; clearance requires a
+    separate matching current `create_approval_attestation`."""
     _header(
-        "FR-RISK-016: Implement `KillSwitchCommand v1` with action, explicit scope level, applicable portfolio/strategy/symbol identifiers, reason, UTC timestamp, request/workflow/correlation IDs, and schema identity. Principal authorization remains in the separate `AuthContext`; clearance requires a separate matching current `ApprovalAttestation`."
+        "FR-RISK-016: Implement `create_kill_switch_command v1` with action, explicit scope level, applicable portfolio/strategy/symbol identifiers, reason, UTC timestamp, request/workflow/correlation IDs, and schema identity. Principal authorization remains in the separate `create_auth_context`; clearance requires a separate matching current `create_approval_attestation`."
     )
     _demonstrate_once()
 
 
 def fr_risk_017() -> None:
-    """FR-RISK-017: Implement `KillSwitchState` v1 with scope, active/unknown
+    """FR-RISK-017: Implement `create_kill_switch_state` v1 with scope, active/unknown
     state, reason, version, and UTC update time."""
     _header(
-        "FR-RISK-017: Implement `KillSwitchState` v1 with scope, active/unknown state, reason, version, and UTC update time."
+        "FR-RISK-017: Implement `create_kill_switch_state` v1 with scope, active/unknown state, reason, version, and UTC update time."
     )
     _demonstrate_once()
 
@@ -382,23 +385,23 @@ def fr_risk_021() -> None:
 
 
 def fr_risk_047() -> None:
-    """FR-RISK-047: Define `ApprovalAttestation v1` authenticated human approval
+    """FR-RISK-047: Define `create_approval_attestation v1` authenticated human approval
     evidence (principal, action, scope, policy reference/version, issue/expiry
     times, trace IDs); it carries no secret and is never execution authority by
     itself."""
     _header(
-        "FR-RISK-047: Define `ApprovalAttestation v1` authenticated human approval evidence (principal, action, scope, policy reference/version, issue/expiry times, trace IDs); it carries no secret and is never execution authority by itself."
+        "FR-RISK-047: Define `create_approval_attestation v1` authenticated human approval evidence (principal, action, scope, policy reference/version, issue/expiry times, trace IDs); it carries no secret and is never execution authority by itself."
     )
     _demonstrate_once()
 
 
 def fr_risk_048() -> None:
-    """FR-RISK-048: Define `AllocationBudgetActivationRequest v1` (allocation and
+    """FR-RISK-048: Define `create_allocation_budget_activation_request v1` (allocation and
     decision references, scope, effective time, predecessor, trace IDs) to
     activate the Risk-owned budget projection for one approved allocation
     version."""
     _header(
-        "FR-RISK-048: Define `AllocationBudgetActivationRequest v1` (allocation and decision references, scope, effective time, predecessor, trace IDs) to activate the Risk-owned budget projection for one approved allocation version."
+        "FR-RISK-048: Define `create_allocation_budget_activation_request v1` (allocation and decision references, scope, effective time, predecessor, trace IDs) to activate the Risk-owned budget projection for one approved allocation version."
     )
     _demonstrate_once()
 
@@ -425,11 +428,11 @@ def fr_risk_050() -> None:
 
 
 def fr_risk_058() -> None:
-    """FR-RISK-058: Validate the consumed Data-owned `MarketContextEvidence v1`
+    """FR-RISK-058: Validate the consumed Data-owned `build_market_context_evidence v1`
     version, UTC freshness, provenance, bounded values, and explicit missingness
     without redefining or fetching it."""
     _header(
-        "FR-RISK-058: Validate the consumed Data-owned `MarketContextEvidence v1` version, UTC freshness, provenance, bounded values, and explicit missingness without redefining or fetching it."
+        "FR-RISK-058: Validate the consumed Data-owned `build_market_context_evidence v1` version, UTC freshness, provenance, bounded values, and explicit missingness without redefining or fetching it."
     )
     _demonstrate_once()
 

@@ -3,15 +3,11 @@
 from datetime import timedelta
 from decimal import Decimal
 
-from app.services.data import (
-    AccountBalance,
-    AccountPosition,
-    AccountStateSnapshot,
-)
+from app.services.data import build_account_state_snapshot
 from app.services.risk import (
-    PortfolioState,
-    ScenarioDefinition,
     build_portfolio_risk_snapshot,
+    create_portfolio_state,
+    create_scenario_definition,
     run_risk_scenario_analysis,
 )
 
@@ -22,27 +18,27 @@ def test_supported_scenario_and_position_workload_completes() -> None:
     """Exercise 500 positions, 100 strategies, 5,000 returns, and 100 scenarios."""
     config = examples._config()
     symbols = tuple(f"S{index:03d}" for index in range(500))
-    account = AccountStateSnapshot(
+    account = build_account_state_snapshot(
         account_id="account-performance",
         currency="USD",
         balances=(
-            AccountBalance(
-                asset="USD",
-                total=Decimal(1_000_000),
-                available=Decimal(1_000_000),
-            ),
+            {
+                "asset": "USD",
+                "total": Decimal(1_000_000),
+                "available": Decimal(1_000_000),
+            },
         ),
         equity=Decimal(1_000_000),
         margin_used=Decimal(0),
         margin_available=Decimal(1_000_000),
         positions=tuple(
-            AccountPosition(
-                position_id=f"position-{index:03d}",
-                symbol=symbol,
-                side="LONG",
-                quantity=Decimal(1),
-                entry_price=Decimal(1),
-            )
+            {
+                "position_id": f"position-{index:03d}",
+                "symbol": symbol,
+                "side": "LONG",
+                "quantity": Decimal(1),
+                "entry_price": Decimal(1),
+            }
             for index, symbol in enumerate(symbols)
         ),
         orders=(),
@@ -56,7 +52,7 @@ def test_supported_scenario_and_position_workload_completes() -> None:
     return_timestamps = tuple(
         examples.NOW - timedelta(seconds=5_000 - index) for index in range(5_000)
     )
-    state = PortfolioState(
+    state = create_portfolio_state(
         account_snapshot=account,
         peak_equity=Decimal(1_000_000),
         day_start_equity=Decimal(1_000_000),
@@ -84,7 +80,7 @@ def test_supported_scenario_and_position_workload_completes() -> None:
         operation="build_portfolio_risk_snapshot",
     )
     scenarios = tuple(
-        ScenarioDefinition(
+        create_scenario_definition(
             scenario_id=f"scenario-{index:03d}",
             shocks={"drawdown": Decimal("0.001")},
             randomized=False,

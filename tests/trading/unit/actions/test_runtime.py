@@ -9,11 +9,11 @@ from typing import cast
 import app.services.trading.actions.runtime as runtime_module
 import pytest
 from app.services.risk import (
-    DecisionState,
-    RiskApprovalToken,
-    RiskDecisionPackage,
+    create_risk_approval_token,
+    create_risk_decision_package,
+    get_decision_state,
 )
-from app.services.strategy import TradeIntent
+from app.services.strategy import create_trade_intent_value
 from app.services.trading.actions import run_live_evaluation_cycle
 from app.services.trading.contracts import (
     TradingError,
@@ -21,13 +21,15 @@ from app.services.trading.contracts import (
 )
 from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.state import TradingProjection
-from app.utils import RiskLevel
 
 from tests.trading.unit.actions.test_dependencies import (
     NOW,
     account_snapshot,
     dependencies,
 )
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+RiskDecisionPackage = object
 
 
 @pytest.fixture
@@ -48,9 +50,9 @@ def evidence() -> dict[str, object]:
     }
 
 
-def trade_intent() -> TradeIntent:
+def trade_intent() -> create_trade_intent_value:
     """Build one immutable Strategy proposal without executable sizing."""
-    return TradeIntent(
+    return create_trade_intent_value(
         intent_id="intent-001",
         decision_id="strategy-decision-001",
         idempotency_key="idempotency-001",
@@ -82,7 +84,7 @@ def trade_intent() -> TradeIntent:
 
 def risk_decision() -> RiskDecisionPackage:
     """Build one exact Risk approval carrying the only executable size."""
-    token = RiskApprovalToken(
+    token = create_risk_approval_token(
         token_id="token-001",
         decision_id="risk-001",
         config_hash="a" * 64,
@@ -97,10 +99,10 @@ def risk_decision() -> RiskDecisionPackage:
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
     )
-    return RiskDecisionPackage(
+    return create_risk_decision_package(
         decision_id="risk-001",
         intent_id="intent-001",
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         requested_size=Decimal("0.50"),
         approved_size=Decimal("0.50"),
         ordered_checks=(),
@@ -190,7 +192,7 @@ async def test_cycle_never_generates_or_sizes_signals(monkeypatch) -> None:
             {"request_id": item.request_id},
             message="captured",
             operation="trading.test",
-            risk_level=RiskLevel.HIGH,
+            risk_level="high",
             request_id=item.request_id,
             correlation_id=item.correlation_id,
             read_only=False,

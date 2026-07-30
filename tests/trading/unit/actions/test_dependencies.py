@@ -9,7 +9,7 @@ from decimal import Decimal
 from typing import Literal, cast
 
 import pytest
-from app.services.brokers import BrokerSymbolInfo
+from app.services.brokers import build_broker_value
 from app.services.data.evidence.account_contracts import (
     AccountBalance,
     AccountOrder,
@@ -17,11 +17,11 @@ from app.services.data.evidence.account_contracts import (
     AccountStateSnapshot,
 )
 from app.services.risk import (
-    ActionPolicyVerdict,
-    DecisionState,
-    KillSwitchState,
-    RiskApprovalToken,
-    RiskDecisionPackage,
+    create_action_policy_verdict,
+    create_kill_switch_state,
+    create_risk_approval_token,
+    create_risk_decision_package,
+    get_decision_state,
 )
 from app.services.trading.actions import TradingDependencies
 from app.services.trading.contracts import (
@@ -37,7 +37,14 @@ from app.services.trading.state import (
     TradingEvent,
     TradingProjection,
 )
-from app.utils import logger
+from app.utils import get_logger
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+ActionPolicyVerdict = object
+KillSwitchState = object
+RiskDecisionPackage = object
+
+logger = get_logger(__name__)
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 DATA_REQUEST_ID = "req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
@@ -223,7 +230,7 @@ def account_snapshot() -> AccountStateSnapshot:
 
 def policy(action: str = "submit_order", **scope: str) -> ActionPolicyVerdict:
     """Build one current allowed Risk action-policy verdict."""
-    return ActionPolicyVerdict(
+    return create_action_policy_verdict(
         verdict_id="policy-001",
         action=action,
         scope={"account_id": "account-001", **scope},
@@ -243,7 +250,7 @@ def policy(action: str = "submit_order", **scope: str) -> ActionPolicyVerdict:
 
 def risk_decision(item: TradingRequest) -> RiskDecisionPackage:
     """Build an exact current Risk approval for one governed request."""
-    token = RiskApprovalToken(
+    token = create_risk_approval_token(
         token_id=item.approval_token_ref,
         decision_id=item.risk_decision_id,
         config_hash="config-hash",
@@ -258,10 +265,10 @@ def risk_decision(item: TradingRequest) -> RiskDecisionPackage:
         workflow_id=item.workflow_id,
         correlation_id=item.correlation_id,
     )
-    return RiskDecisionPackage(
+    return create_risk_decision_package(
         decision_id=item.risk_decision_id,
         intent_id=item.intent_id,
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         requested_size=item.quantity,
         approved_size=item.quantity,
         ordered_checks=(),
@@ -291,7 +298,7 @@ def kill_switch_states(item: TradingRequest) -> tuple[KillSwitchState, ...]:
     if item.symbol is not None:
         scopes.append(("symbol", {"symbol": item.symbol}))
     return tuple(
-        KillSwitchState(
+        create_kill_switch_state(
             state_id=f"switch-{level}",
             scope_level=level,
             scope=scope,
@@ -328,7 +335,8 @@ def symbol_capability(route, provider_id, symbol):
         "mutation_retry_policy": "reconcile_before_retry",
         "redaction_applied": True,
     }
-    info = BrokerSymbolInfo(
+    info = build_broker_value(
+        "symbol_info",
         provider_symbol=symbol,
         product_profile="fx",
         price_unit="quote",

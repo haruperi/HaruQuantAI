@@ -16,7 +16,7 @@ STAGES = (
     "Validate versions, UTC timestamps, finite numerics, profile, and config hash.",
     "Normalize without inventing missing values or mutating source evidence.",
     "Calculate exposure, drawdown, leverage, distribution, and contribution evidence.",
-    "Return immutable PortfolioRiskSnapshot with coverage and missing-evidence markers.",
+    "Return immutable create_portfolio_risk_snapshot with coverage and missing-evidence markers.",
 )
 
 
@@ -38,7 +38,7 @@ def main() -> None:
     print("Config:", config.profile, config.policy_version)
     # Stage 3: Preserve the immutable caller input.
     _stage(3)
-    before = state.model_dump(mode="python")
+    before = state.model_dump(warnings=False, mode="python")
     # Stage 4: Build all supported portfolio calculations.
     _stage(4)
     snapshot = unwrap_risk_response(
@@ -53,7 +53,7 @@ def main() -> None:
         type(snapshot).__name__,
         snapshot.snapshot_id,
         "input unchanged:",
-        before == state.model_dump(mode="python"),
+        before == state.model_dump(warnings=False, mode="python"),
     )
 
 

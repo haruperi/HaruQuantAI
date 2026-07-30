@@ -1,6 +1,6 @@
 """Workflow integration test for fixed-precedence proposed-trade review."""
 
-from app.services.risk import DecisionState
+from app.services.risk import get_decision_state, review_trade_risk
 
 from tests.risk import _support as examples
 from tests.risk import _support as policy_examples
@@ -14,7 +14,8 @@ def test_trade_review_uses_fixed_precedence_and_fails_closed() -> None:
         update={"state": "active", "reason": "global safety stop"}
     )
     decision = examples.unwrap_risk_response(
-        governor.review_trade_risk(
+        review_trade_risk(
+            governor,
             examples._proposal(config),
             examples._snapshot(config),
             policy_examples._market(),
@@ -26,7 +27,7 @@ def test_trade_review_uses_fixed_precedence_and_fails_closed() -> None:
         ),
         operation="risk_governor.review_trade_risk",
     )
-    assert decision.state is DecisionState.BLOCK
+    assert decision.state is get_decision_state("BLOCK")
     assert decision.primary_failure_limit == "kill_switch"
     assert decision.token is None
     assert audit.records[-1].event_type == "risk.governor.decision"

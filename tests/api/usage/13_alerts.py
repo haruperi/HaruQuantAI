@@ -15,12 +15,15 @@ from app.services.api import (
     build_unknown_broker_state_alert,
     deliver_critical_alert,
 )
-from app.services.risk import KillSwitchState
+from app.services.risk import create_kill_switch_state
 from app.services.trading import (
     ExecutionReceipt,
     build_broker_state_unknown_event,
 )
 from app.utils import AuthContext
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+KillSwitchState = object
 
 NOW = datetime(2026, 7, 24, 9, tzinfo=UTC)
 REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
@@ -56,7 +59,7 @@ def _active_state() -> KillSwitchState:
     Returns:
         Canonical active global state.
     """
-    return KillSwitchState(
+    return create_kill_switch_state(
         state_id="global-state-example",
         scope_level="global",
         scope={},

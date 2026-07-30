@@ -5,7 +5,7 @@ from dataclasses import replace
 from datetime import timedelta
 
 import pytest
-from app.services.risk import DecisionState
+from app.services.risk import get_decision_state
 from app.services.trading import (
     BudgetGate,
     PortfolioRebalanceExecutionRequest,
@@ -59,7 +59,7 @@ async def test_rebalance_cannot_bypass_risk_or_open_to_match_weight() -> None:
     assert expired_result.error.code == "BUDGET_BLOCKED"
 
     rejected_data = rebalance_allocation().model_dump(mode="python")
-    rejected_data["state"] = DecisionState.REJECT
+    rejected_data["state"] = get_decision_state("REJECT")
     rejected_data["active"] = False
     rejected = type(rebalance_allocation()).model_validate(rejected_data)
     rejected_deps = replace(

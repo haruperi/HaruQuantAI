@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 from app.services.analytics import PerformanceReport, build_performance_report
 from app.services.data import (
@@ -13,23 +14,23 @@ from app.services.data import (
     OHLCVRecord,
     generate_tick_series,
 )
-from app.services.indicators import IndicatorResult, sma
-from app.services.risk import DecisionState, ProposedTrade, RiskDecisionPackage
+from app.services.indicators import get_indicator_result_metadata, sma
+from app.services.risk import get_decision_state
 from app.services.simulator import (
     SimulationBacktestRequestV1,
     SimulationResult,
     run_backtest,
 )
 from app.services.strategy import (
-    RandomWalkEvaluator,
-    StrategyDecision,
-    StrategyEnvironment,
-    StrategyExecutionContext,
-    StrategyTimingPolicy,
-    TradeIntent,
-    ValidatedStrategyRef,
     build_trade_intent,
+    create_strategy_decision,
+    create_strategy_evaluator,
+    create_strategy_execution_context,
+    create_trade_intent_value,
+    create_validated_strategy_ref,
     evaluate_strategy_signals,
+    get_strategy_environment,
+    get_strategy_timing_policy,
 )
 from app.services.trading import (
     OrderIntent,
@@ -54,6 +55,10 @@ from tests.strategy.unit.test_models import (
     make_signal_config,
     make_signal_evidence,
 )
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+ProposedTrade = object
+RiskDecisionPackage = object
 
 
 def _bar_dataset() -> MarketDataset:
@@ -163,7 +168,7 @@ class _SystemBacktestDependencies(FakeDependencies):
         self.bars = bars
         self.ticks = ticks
         self.calls: list[str] = []
-        self.trade_intent: TradeIntent | None = None
+        self.trade_intent: create_trade_intent_value | None = None
 
     def load_market_data(self, request: SimulationBacktestRequestV1) -> MarketDataset:
         """Load the referenced Data evidence."""
@@ -187,7 +192,7 @@ class _SystemBacktestDependencies(FakeDependencies):
         self,
         dataset: MarketDataset,
         request: SimulationBacktestRequestV1,
-    ) -> tuple[IndicatorResult, ...]:
+    ) -> tuple[Any, ...]:
         """Invoke the Indicators package-root SMA operation."""
         del request
         self.calls.append("indicators")
@@ -196,20 +201,20 @@ class _SystemBacktestDependencies(FakeDependencies):
     def evaluate_strategy(
         self,
         dataset: MarketDataset,
-        indicators: tuple[IndicatorResult, ...],
+        indicators: tuple[Any, ...],
         request: SimulationBacktestRequestV1,
-    ) -> tuple[TradeIntent, ...]:
+    ) -> tuple[create_trade_intent_value, ...]:
         """Evaluate a registered Strategy and build its proposal intent."""
         self.calls.append("strategy")
-        assert indicators[0].indicator_id == "sma"
+        assert get_indicator_result_metadata(indicators[0])["indicator_id"] == "sma"
         base_ref = make_ref()
         manifest = base_ref.manifest.model_copy(
-            update={"permitted_environments": (StrategyEnvironment.SIMULATION,)}
+            update={"permitted_environments": (get_strategy_environment("SIMULATION"),)}
         )
-        ref = ValidatedStrategyRef(
+        ref = create_validated_strategy_ref(
             manifest=manifest,
             lifecycle_status=base_ref.lifecycle_status,
-            environment=StrategyEnvironment.SIMULATION,
+            environment=get_strategy_environment("SIMULATION"),
             policy_version=base_ref.policy_version,
             validation_policy=base_ref.validation_policy,
             registry_record_hash=base_ref.registry_record_hash,
@@ -217,10 +222,10 @@ class _SystemBacktestDependencies(FakeDependencies):
             correlation_id=base_ref.correlation_id,
         )
         config = make_signal_config({"buy_magic_number": 10, "sell_magic_number": 20})
-        context = StrategyExecutionContext(
-            environment=StrategyEnvironment.SIMULATION,
+        context = create_strategy_execution_context(
+            environment=get_strategy_environment("SIMULATION"),
             decision_timestamp=dataset.available_at,
-            timing_policy=StrategyTimingPolicy.EVENT_DRIVEN,
+            timing_policy=get_strategy_timing_policy("EVENT_DRIVEN"),
             seed=request.seed,
             interface_version="v1",
             request_id=risk_examples.REQUEST_ID,
@@ -230,7 +235,8 @@ class _SystemBacktestDependencies(FakeDependencies):
             snapshot_refs=(request.data_ref,),
             max_diagnostic_bytes=8_192,
         )
-        evaluator = RandomWalkEvaluator(
+        evaluator = create_strategy_evaluator(
+            "random_walk",
             strategy_id=manifest.strategy_id,
             strategy_version=manifest.strategy_version,
             module_path=manifest.module_path,
@@ -251,7 +257,7 @@ class _SystemBacktestDependencies(FakeDependencies):
         signal = next(
             item for item in signal_outcome.data if item.active and item.side == "BUY"
         )
-        decision = StrategyDecision(
+        decision = create_strategy_decision(
             decision_id="sys-wf-001-decision",
             sequence=0,
             action="PROPOSE",
@@ -285,7 +291,7 @@ class _SystemBacktestDependencies(FakeDependencies):
 
     def review_risk(
         self,
-        intents: tuple[TradeIntent, ...],
+        intents: tuple[create_trade_intent_value, ...],
         request: SimulationBacktestRequestV1,
     ) -> tuple[RiskDecisionPackage, ...]:
         """Review the exact Strategy proposal through RiskGovernor."""
@@ -300,7 +306,7 @@ class _SystemBacktestDependencies(FakeDependencies):
                 "stop_distance": Decimal("0.0050"),
             }
         )
-        assert isinstance(proposal, ProposedTrade)
+        assert proposal.schema_id == "risk.proposed_trade.v1"
         governor, _, _ = risk_examples._services(config)
         decision = governor.review_trade_risk(
             proposal,
@@ -312,7 +318,7 @@ class _SystemBacktestDependencies(FakeDependencies):
             attestation=risk_examples._attestation(config),
             now=risk_examples.NOW,
         )
-        assert decision.state is DecisionState.APPROVE
+        assert decision.state is get_decision_state("APPROVE")
         return (decision,)
 
     def build_order_intents(

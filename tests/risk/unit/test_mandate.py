@@ -3,27 +3,28 @@
 import hashlib
 from datetime import UTC, datetime
 from decimal import Decimal
+from typing import Any
 
 import pytest
 import yaml
 from app.services.risk import (
-    FirmMandate,
-    PortfolioRiskSnapshot,
-    RiskConfig,
-    RiskErrorCode,
+    compute_config_hash,
+    create_firm_mandate,
+    create_portfolio_risk_snapshot,
+    create_risk_config,
     evaluate_portfolio_limits,
     load_firm_mandate,
 )
-from app.services.risk.config import compute_config_hash
-from app.services.risk.contracts.responses import unwrap_risk_response
 from pydantic import ValidationError
+
+from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 28, tzinfo=UTC)
 
 
-def _mandate(*, verified: bool = True, terms_hash: str = "a" * 64) -> FirmMandate:
+def _mandate(*, verified: bool = True, terms_hash: str = "a" * 64) -> Any:
     """Build a small valid mandate fixture."""
-    return FirmMandate(
+    return create_firm_mandate(
         account_id="account-1",
         mandate_version="2026.07.28-01",
         firm="Example Firm",
@@ -59,9 +60,9 @@ def _mandate(*, verified: bool = True, terms_hash: str = "a" * 64) -> FirmMandat
     )
 
 
-def _config() -> RiskConfig:
+def _config() -> Any:
     """Build a valid simulation configuration."""
-    return RiskConfig(
+    return create_risk_config(
         profile="simulation",
         execution_route="sim",
         policy_version="policy-1",
@@ -78,9 +79,9 @@ def _config() -> RiskConfig:
     )
 
 
-def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
+def _snapshot(config: Any) -> Any:
     """Build a complete account snapshot for mandate gating."""
-    return PortfolioRiskSnapshot(
+    return create_portfolio_risk_snapshot(
         snapshot_id="snapshot-1",
         account_id="account-1",
         base_currency="USD",
@@ -121,7 +122,7 @@ def test_mandate_requires_terms_hash() -> None:
     values = _mandate().model_dump()
     values.pop("terms_source_hash")
     with pytest.raises(ValidationError):
-        FirmMandate.model_validate(values)
+        create_firm_mandate(**values)
 
 
 def test_unverified_mandate_blocks_evaluation(tmp_path) -> None:
@@ -133,14 +134,71 @@ def test_unverified_mandate_blocks_evaluation(tmp_path) -> None:
         operation="evaluate_portfolio_limits",
     )
     assert results[0].limit_id == "mandate"
-    assert results[0].reason_code is RiskErrorCode.INVALID_RISK_CONFIG
+    assert results[0].reason_code.value == "INVALID_RISK_CONFIG"
 
     terms = b"archived terms"
     digest = hashlib.sha256(terms).hexdigest()
     loaded = mandate.model_copy(update={"terms_source_hash": digest})
     (tmp_path / "account-1.terms").write_bytes(terms)
     (tmp_path / "account-1.yaml").write_text(
-        yaml.safe_dump(loaded.model_dump(mode="json")), encoding="utf-8"
+        yaml.safe_dump(loaded.model_dump(warnings=False, mode="json")), encoding="utf-8"
     )
     response = load_firm_mandate("account-1", tmp_path)
     assert response.status == "error"
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("account_id", ""),
+        ("mandate_version", ""),
+        ("firm", ""),
+        ("currency", "usd"),
+        ("terms_url", ""),
+        ("initial_balance", Decimal(0)),
+        ("terms_source_hash", "invalid"),
+    ],
+)
+def test_mandate_rejects_invalid_identity(
+    field: str,
+    value: object,
+) -> None:
+    """Reject invalid mandate identity and provenance values."""
+    values = _mandate().model_dump(warnings=False, mode="python")
+    values[field] = value
+    with pytest.raises(ValidationError):
+        create_firm_mandate(**values)
+
+
+@pytest.mark.parametrize(
+    ("rule", "updates"),
+    [
+        ("profit_target", {"value": None, "value_absolute": None}),
+        ("profit_target", {"value": Decimal("0.1"), "value_absolute": Decimal(10)}),
+        ("daily_loss", {"value": None, "value_absolute": None}),
+        ("daily_loss", {"reset_time": ""}),
+        ("daily_loss", {"reset_tz": "Mars/Nowhere"}),
+        ("max_drawdown", {"value": None, "value_absolute": None}),
+        (
+            "max_drawdown",
+            {
+                "mode": "trailing_eod",
+                "eod_snapshot_time": None,
+                "eod_snapshot_tz": None,
+            },
+        ),
+        (
+            "max_drawdown",
+            {"mode": "static", "eod_snapshot_time": "23:59", "eod_snapshot_tz": "UTC"},
+        ),
+    ],
+)
+def test_mandate_rejects_invalid_nested_rules(
+    rule: str,
+    updates: dict[str, object],
+) -> None:
+    """Reject ambiguous or incompatible firm-rule representations."""
+    values = _mandate().model_dump(warnings=False, mode="python")
+    values[rule] = {**values[rule], **updates}
+    with pytest.raises(ValidationError):
+        create_firm_mandate(**values)

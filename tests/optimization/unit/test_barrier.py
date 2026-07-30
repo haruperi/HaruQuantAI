@@ -7,12 +7,18 @@ from app.services.optimization.robustness import (
     estimate_first_passage,
     estimate_joint_first_passage,
 )
-from app.services.risk import DrawdownMode, FirmMandate
+from app.services.risk import (
+    create_firm_mandate,
+    get_drawdown_mode,
+)
+
+# Private type-only aliases; Risk exposes functions, not contract classes.
+FirmMandate = object
 
 
 def _mandate() -> FirmMandate:
     """Build a deterministic evaluation mandate."""
-    return FirmMandate(
+    return create_firm_mandate(
         account_id="account-1",
         mandate_version="v1",
         firm="Example Firm",
@@ -97,8 +103,8 @@ def test_mode_changes_pass_probability() -> None:
         seed=13,
     )
     assert set(reports) == {
-        DrawdownMode.STATIC,
-        DrawdownMode.TRAILING_EOD,
-        DrawdownMode.TRAILING_INTRADAY,
+        get_drawdown_mode("STATIC"),
+        get_drawdown_mode("TRAILING_EOD"),
+        get_drawdown_mode("TRAILING_INTRADAY"),
     }
     assert {report.mode for report in reports.values()} == set(reports)

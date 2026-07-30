@@ -1,59 +1,73 @@
 """Shared test support helpers and fixtures for Risk tests."""
 
+from __future__ import annotations
+
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from time import perf_counter_ns
 from typing import Literal, TypeVar, cast
 
-from app.services.data import MarketContextEvidence
+from app.services.data import build_market_context_evidence
 from app.services.risk import (
-    AllocationReviewRequest,
-    AllocationRiskDecision,
-    ApprovalAttestation,
-    ApprovalTokenService,
-    DecisionState,
-    KillSwitchState,
-    PortfolioRiskSnapshot,
-    PositionSizingRequest,
-    ProposedTrade,
-    RegimeAssessment,
-    RiskApprovalToken,
-    RiskAuditChain,
-    RiskAuditRecord,
-    RiskConfig,
-    RiskDecisionPackage,
-    RiskDomainError,
-    RiskErrorCode,
-    RiskGovernor,
-    StrategyOperationalEligibilityDecision,
     calculate_position_size,
     compute_config_hash,
+    create_allocation_review_request,
+    create_approval_attestation,
+    create_approval_token_service,
+    create_kill_switch_state,
+    create_portfolio_risk_snapshot,
+    create_position_sizing_request,
+    create_proposed_trade,
+    create_regime_assessment,
+    create_risk_audit_chain,
+    create_risk_config,
+    create_risk_decision_package,
+    create_risk_domain_error,
+    create_risk_governor,
+    get_decision_state,
+    get_risk_error_code,
 )
 from app.services.strategy import (
-    StrategyEnvironment,
-    StrategyLifecycleStatus,
-    StrategyManifest,
-    StrategyTimingPolicy,
-    StrategyValidationPolicy,
-    TradeIntent,
-    ValidatedStrategyRef,
+    create_strategy_manifest,
+    create_strategy_validation_policy,
+    create_trade_intent_value,
+    create_validated_strategy_ref,
+    get_strategy_environment,
+    get_strategy_lifecycle_status,
+    get_strategy_timing_policy,
 )
 from app.utils import (
-    AuthContext,
-    RiskLevel,
-    StandardResponse,
     build_response_metadata,
     canonical_json,
+    create_auth_context,
+    get_standard_response_type,
     success_response,
 )
 
 _ResponseValue = TypeVar("_ResponseValue")
+type StandardResponse[T] = object
+type AllocationReviewRequest = object
+type AllocationRiskDecision = object
+type ApprovalAttestation = object
+type ApprovalTokenService = object
+type AuthContext = object
+type KillSwitchState = object
+type MarketContextEvidence = object
+type PortfolioRiskSnapshot = object
+type PositionSizingRequest = object
+type ProposedTrade = object
+type RegimeAssessment = object
+type RiskApprovalToken = object
+type RiskAuditChain = object
+type RiskAuditRecord = object
+type RiskConfig = object
+type RiskDecisionPackage = object
+type RiskGovernor = object
+type StrategyOperationalEligibilityDecision = object
 
 
-def unwrap_risk_response(
-    response: StandardResponse[_ResponseValue], *, operation: str
-) -> _ResponseValue:
+def unwrap_risk_response(response: object, *, operation: str) -> _ResponseValue:
     """Unwrap a successful public Risk response in test support code.
 
     Args:
@@ -64,16 +78,16 @@ def unwrap_risk_response(
         Raw Risk result stored in ``data``.
 
     Raises:
-        RiskDomainError: If the response carries a coded Risk failure.
+        create_risk_domain_error: If the response carries a coded Risk failure.
         TypeError: If the response is not a StandardResponse.
     """
-    if not isinstance(response, StandardResponse):
+    if not isinstance(response, get_standard_response_type()):
         message = f"{operation} returned a non-standard response"
         raise TypeError(message)
     if response.status != "success" or response.error is not None:
         code = response.error.code if response.error is not None else "UNKNOWN_ERROR"
         message = f"{operation} failed"
-        raise RiskDomainError(RiskErrorCode(code), message)
+        raise create_risk_domain_error(get_risk_error_code(code), message)
     return cast("_ResponseValue", response.data)
 
 
@@ -99,7 +113,7 @@ def _risk_value(response: object, operation: str) -> object:
     return unwrap_risk_response(response, operation=operation)  # type: ignore[arg-type]
 
 
-def _risk_success[T](data: T) -> StandardResponse[T]:
+def _risk_success[T](data: T) -> object:
     """Build a valid successful response for a test double boundary.
 
     Returns:
@@ -108,7 +122,7 @@ def _risk_success[T](data: T) -> StandardResponse[T]:
     metadata = build_response_metadata(
         name="tests.risk.audit.append",
         domain="risk",
-        risk_level=RiskLevel.CRITICAL,
+        risk_level="critical",
         request_id=REQUEST_ID,
         correlation_id=CORRELATION_ID,
         start_time=perf_counter_ns(),
@@ -421,7 +435,7 @@ def _config() -> RiskConfig:
     Returns:
         Complete simulation-profile Risk configuration.
     """
-    return RiskConfig(
+    return create_risk_config(
         profile="simulation",
         execution_route="sim",
         policy_version="policy-1",
@@ -447,7 +461,7 @@ def _market() -> MarketContextEvidence:
     Returns:
         Fresh complete market-context evidence.
     """
-    return MarketContextEvidence(
+    return build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
         calendar_state="clear",
@@ -472,7 +486,7 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
     Returns:
         Healthy example portfolio risk snapshot.
     """
-    return PortfolioRiskSnapshot(
+    return create_portfolio_risk_snapshot(
         snapshot_id="snapshot-1",
         account_id="account-1",
         base_currency="USD",
@@ -503,13 +517,13 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
     )
 
 
-def _registration() -> ValidatedStrategyRef:
+def _registration() -> create_validated_strategy_ref:
     """Build an approved simulation Strategy reference.
 
     Returns:
         Approved simulation Strategy registration reference.
     """
-    validation = StrategyValidationPolicy(
+    validation = create_strategy_validation_policy(
         policy_version="strategy-policy-1",
         approved_module_roots=("approved.strategies",),
         max_config_payload_bytes=4096,
@@ -517,7 +531,7 @@ def _registration() -> ValidatedStrategyRef:
         max_config_string_length=256,
         max_config_collection_items=128,
     )
-    manifest = StrategyManifest(
+    manifest = create_strategy_manifest(
         strategy_id="mean-reversion",
         strategy_version="1.0.0",
         module_path="approved.strategies.mean_reversion",
@@ -527,8 +541,8 @@ def _registration() -> ValidatedStrategyRef:
         config_schema={"type": "object"},
         required_data=("bars",),
         required_indicators=(),
-        timing_policy=StrategyTimingPolicy.EVENT_DRIVEN,
-        permitted_environments=(StrategyEnvironment.SIMULATION,),
+        timing_policy=get_strategy_timing_policy("EVENT_DRIVEN"),
+        permitted_environments=(get_strategy_environment("SIMULATION"),),
         source_hash=HASH_A,
         artifact_hash=HASH_A,
         dependency_hash=HASH_A,
@@ -541,10 +555,10 @@ def _registration() -> ValidatedStrategyRef:
         max_local_state_bytes=4096,
         decision_timeout_seconds=5,
     )
-    return ValidatedStrategyRef(
+    return create_validated_strategy_ref(
         manifest=manifest,
-        lifecycle_status=StrategyLifecycleStatus.APPROVED,
-        environment=StrategyEnvironment.SIMULATION,
+        lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
+        environment=get_strategy_environment("SIMULATION"),
         policy_version=validation.policy_version,
         validation_policy=validation,
         registry_record_hash=HASH_B,
@@ -559,7 +573,7 @@ def _allocation_request(config: RiskConfig) -> AllocationReviewRequest:
     Returns:
         Self-contained allocation review request within the configured caps.
     """
-    return AllocationReviewRequest(
+    return create_allocation_review_request(
         projection_kind="construction",
         portfolio_id="portfolio-1",
         portfolio_version="allocation-v1",
@@ -600,7 +614,7 @@ def _auth(config: RiskConfig, *, clearance: bool = False) -> AuthContext:
     permissions = ["risk.kill.activate"]
     if clearance:
         permissions.append("risk.kill.clear")
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="operator-1",
@@ -616,13 +630,13 @@ def _auth(config: RiskConfig, *, clearance: bool = False) -> AuthContext:
     )
 
 
-def _intent() -> TradeIntent:
+def _intent() -> create_trade_intent_value:
     """Build one immutable Strategy risk-increase intent.
 
     Returns:
         Immutable Strategy risk-increase trade intent.
     """
-    return TradeIntent(
+    return create_trade_intent_value(
         intent_id="intent-1",
         decision_id="strategy-decision-1",
         idempotency_key="intent-key-1",
@@ -658,7 +672,7 @@ def _proposal(config: RiskConfig) -> ProposedTrade:
     Returns:
         Risk-owned proposal bound exactly to the embedded trade intent.
     """
-    return ProposedTrade(
+    return create_proposed_trade(
         intent=_intent(),
         account_id="account-1",
         portfolio_id="portfolio-1",
@@ -710,7 +724,7 @@ def _regime() -> RegimeAssessment:
         ),
         "normal",
     )
-    return RegimeAssessment(
+    return create_regime_assessment(
         assessment_id="regime-1",
         states=states,
         previous_states=states,
@@ -736,7 +750,7 @@ def _inactive_state(
         "strategy": {"strategy_id": "strategy-1"},
         "symbol": {"symbol": "EURUSD"},
     }
-    return KillSwitchState(
+    return create_kill_switch_state(
         state_id=f"{level}-state-1",
         scope_level=level,
         scope=scopes[level],
@@ -757,7 +771,7 @@ def _services(
     """
     audit = _Audit()
     token_store = _TokenStore()
-    approvals = ApprovalTokenService(
+    approvals = create_approval_token_service(
         config,
         token_store,
         cast("RiskAuditChain", audit),
@@ -765,7 +779,7 @@ def _services(
         lambda _: b"example-risk-signing-key-material-32-bytes",
         lambda evidence: evidence.principal_id == "operator-1",
     )
-    governor = RiskGovernor(
+    governor = create_risk_governor(
         config,
         approvals,
         cast("RiskAuditChain", audit),
@@ -780,7 +794,7 @@ def _attestation(config: RiskConfig) -> ApprovalAttestation:
     Returns:
         Authorized trade approval evidence bound to the decision.
     """
-    return ApprovalAttestation(
+    return create_approval_attestation(
         attestation_id="attestation-1",
         principal_id="operator-1",
         action="submit_order",
@@ -808,7 +822,7 @@ def _values(
     Returns:
         Token service, token store, decision, and attestation for one run.
     """
-    config = RiskConfig(
+    config = create_risk_config(
         profile="live" if live else "research",
         execution_route="live" if live else "none",
         policy_version="policy-1",
@@ -831,8 +845,8 @@ def _values(
         double_spend_owner="risk_store" if live else None,
     )
     token_store = _TokenStore()
-    audit = RiskAuditChain(config, _AuditStore(), lambda: NOW, canonical_json)
-    service = ApprovalTokenService(
+    audit = create_risk_audit_chain(config, _AuditStore(), lambda: NOW, canonical_json)
+    service = create_approval_token_service(
         config,
         token_store,
         audit,
@@ -841,10 +855,10 @@ def _values(
         lambda evidence: evidence.principal_id == "approver-1",
     )
     config_hash = _risk_value(compute_config_hash(config), "compute_config_hash")
-    decision = RiskDecisionPackage(
+    decision = create_risk_decision_package(
         decision_id="decision-1",
         intent_id="intent-1",
-        state=DecisionState.APPROVE,
+        state=get_decision_state("APPROVE"),
         requested_size=Decimal(10),
         approved_size=Decimal(8),
         ordered_checks=(),
@@ -861,7 +875,7 @@ def _values(
         workflow_id=WORKFLOW_ID,
         correlation_id=CORRELATION_ID,
     )
-    attestation = ApprovalAttestation(
+    attestation = create_approval_attestation(
         attestation_id="attestation-1",
         principal_id="approver-1",
         action="submit_order",
@@ -902,7 +916,7 @@ def run_position_size_test() -> None:
             approval.
     """
     snapshot = _snapshot(_config())
-    request = PositionSizingRequest(
+    request = create_position_sizing_request(
         method="fixed_risk",
         requested_size=None,
         fixed_lot=None,

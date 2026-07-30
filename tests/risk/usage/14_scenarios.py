@@ -12,9 +12,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.risk import (
-    PortfolioRiskSnapshot,
-    RiskConfig,
-    ScenarioDefinition,
+    create_portfolio_risk_snapshot,
+    create_risk_config,
+    create_scenario_definition,
     run_risk_scenario_analysis,
 )
 
@@ -28,9 +28,9 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _snapshot() -> PortfolioRiskSnapshot:
+def _snapshot() -> create_portfolio_risk_snapshot:
     """Build immutable snapshot input."""
-    return PortfolioRiskSnapshot(
+    return create_portfolio_risk_snapshot(
         snapshot_id="snapshot-1",
         account_id="account-1",
         base_currency="USD",
@@ -70,7 +70,7 @@ def fr_risk_045() -> None:
     )
     print("Risk Example 10: Scenario Stress Testing")
 
-    config = RiskConfig(
+    config = create_risk_config(
         profile="research",
         execution_route="none",
         policy_version="policy-1",
@@ -87,7 +87,7 @@ def fr_risk_045() -> None:
     )
 
     scenarios = (
-        ScenarioDefinition(
+        create_scenario_definition(
             scenario_id="equity-stress",
             shocks={"equity": Decimal("-0.10")},
             randomized=True,
@@ -100,10 +100,9 @@ def fr_risk_045() -> None:
         run_risk_scenario_analysis(_snapshot(), scenarios, config, now=NOW),
         operation="run_risk_scenario_analysis",
     )
-    print(
-        f"Scenario result count: {len(results)}, seed: {results[0].seed}, "
-        f"approved: {results[0].approved}"
-    )
+    print("Complete bounded advisory scenario results:")
+    for result in results:
+        print(result.model_dump(warnings=False, mode="json"))
 
 
 def main() -> None:

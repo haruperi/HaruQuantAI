@@ -12,9 +12,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.data import (
-    MarketContextEvidence,
+    build_market_context_evidence,
 )
-from app.services.risk import PortfolioRiskSnapshot, RiskConfig, assess_risk_regime
+from app.services.risk import (
+    assess_risk_regime,
+    create_portfolio_risk_snapshot,
+    create_risk_config,
+)
 
 from tests.risk._support import unwrap_risk_response
 
@@ -26,9 +30,9 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _snapshot() -> PortfolioRiskSnapshot:
+def _snapshot() -> create_portfolio_risk_snapshot:
     """Build immutable snapshot input."""
-    return PortfolioRiskSnapshot(
+    return create_portfolio_risk_snapshot(
         snapshot_id="snapshot-1",
         account_id="account-1",
         base_currency="USD",
@@ -59,9 +63,9 @@ def _snapshot() -> PortfolioRiskSnapshot:
     )
 
 
-def _market() -> MarketContextEvidence:
+def _market() -> build_market_context_evidence:
     """Build market context evidence."""
-    return MarketContextEvidence(
+    return build_market_context_evidence(
         symbol="EURUSD",
         session_state="active",
         calendar_state="trading_hours",
@@ -90,7 +94,7 @@ def fr_risk_031() -> None:
     )
     print("Risk Example 9: Regime Assessment")
 
-    config = RiskConfig(
+    config = create_risk_config(
         profile="research",
         execution_route="none",
         policy_version="policy-1",
@@ -110,10 +114,8 @@ def fr_risk_031() -> None:
         assess_risk_regime(_snapshot(), _market(), config, now=NOW),
         operation="assess_risk_regime",
     )
-    print(
-        f"Assessed volatility state: {assessment.states.get('volatility')}, "
-        f"modifiers: {assessment.modifiers}"
-    )
+    print("Complete deterministic regime assessment:")
+    print(assessment.model_dump(warnings=False, mode="json"))
 
 
 def main() -> None:

@@ -1,9 +1,9 @@
 """Shared public builders for Trading unit and workflow-integration tests."""
 
 import pytest
-from app.services.risk import KillSwitchState
+from app.services.risk import create_kill_switch_state
 from app.services.trading import TradingRequest
-from app.utils import AuthContext
+from app.utils import create_auth_context
 
 from tests.trading.unit.actions.test_controls import switch as kill_switch
 from tests.trading.unit.actions.test_dependencies import (
@@ -84,6 +84,9 @@ from tests.trading.unit.validation.test_readiness import _risk as readiness_risk
 from tests.trading.unit.validation.test_readiness import _snapshot as readiness_snapshot
 from tests.trading.unit.validation.test_readiness import _switch as readiness_switch
 
+# Private type-only aliases; Risk exposes functions, not contract classes.
+KillSwitchState = object
+
 
 def inactive_kill_switch() -> KillSwitchState:
     """Build inactive kill-switch evidence observed at the shared clock.
@@ -101,7 +104,7 @@ def inactive_kill_switch_hierarchy(
     """Build every exact applicable inactive Risk switch scope."""
     states = [
         inactive_kill_switch().model_copy(update={"updated_at": request.system_time}),
-        KillSwitchState(
+        create_kill_switch_state(
             state_id="switch-strategy",
             scope_level="strategy",
             scope={"strategy_id": request.strategy_id},
@@ -113,7 +116,7 @@ def inactive_kill_switch_hierarchy(
     ]
     if request.portfolio_id is not None:
         states.append(
-            KillSwitchState(
+            create_kill_switch_state(
                 state_id="switch-portfolio",
                 scope_level="portfolio",
                 scope={"portfolio_id": request.portfolio_id},
@@ -125,7 +128,7 @@ def inactive_kill_switch_hierarchy(
         )
     if request.symbol is not None:
         states.append(
-            KillSwitchState(
+            create_kill_switch_state(
                 state_id="switch-symbol",
                 scope_level="symbol",
                 scope={"symbol": request.symbol},
@@ -138,9 +141,9 @@ def inactive_kill_switch_hierarchy(
     return tuple(states)
 
 
-def auth_context(request: TradingRequest) -> AuthContext:
+def auth_context(request: TradingRequest) -> object:
     """Build exact authenticated trace context for a governed request."""
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="trading-test",

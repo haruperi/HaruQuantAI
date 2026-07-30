@@ -26,9 +26,7 @@ RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.data import (
-        MarketContextEvidence,
-    )
+    from app.services.risk.contracts.evidence import _MarketContextEvidenceView
 
 _State = Literal["normal", "elevated", "high", "unknown"]
 _DIMENSIONS = (
@@ -96,7 +94,7 @@ def _maximum(values: tuple[Decimal | None, ...]) -> Decimal | None:
 
 
 def _crisis_state(
-    evidence: MarketContextEvidence, config: RiskConfig, now: datetime
+    evidence: _MarketContextEvidenceView, config: RiskConfig, now: datetime
 ) -> _State:
     """Classify supplied flags and configured current crisis windows.
 
@@ -116,7 +114,7 @@ def _crisis_state(
 
 
 def _context_states(
-    evidence: MarketContextEvidence, config: RiskConfig, now: datetime
+    evidence: _MarketContextEvidenceView, config: RiskConfig, now: datetime
 ) -> dict[str, _State]:
     """Classify liquidity, crisis, news, and session context.
 
@@ -160,7 +158,7 @@ def _context_states(
 
 def _enabled_states(
     snapshot: PortfolioRiskSnapshot,
-    evidence: MarketContextEvidence,
+    evidence: _MarketContextEvidenceView,
     config: RiskConfig,
     now: datetime,
 ) -> dict[str, _State]:
@@ -205,7 +203,7 @@ def _enabled_states(
 
 def _assessment_id(
     snapshot: PortfolioRiskSnapshot,
-    evidence: MarketContextEvidence,
+    evidence: _MarketContextEvidenceView,
     config_hash: str,
     states: dict[str, _State],
     now: datetime,
@@ -283,7 +281,7 @@ def _require_live_evidence(config: RiskConfig, missing: tuple[str, ...]) -> None
 @guard_risk_boundary(risk_level="medium", read_only=True)
 def assess_risk_regime(
     snapshot: PortfolioRiskSnapshot,
-    evidence: MarketContextEvidence,
+    evidence: _MarketContextEvidenceView,
     config: RiskConfig,
     *,
     now: datetime,
@@ -351,10 +349,10 @@ def assess_risk_regime(
             assessed_at=checked_now,
         )
     except RiskDomainError:
-        logger.error("Risk regime assessment failed closed")
+        logger.exception("Risk regime assessment failed closed")
         raise
     except (ArithmeticError, KeyError, TypeError, ValueError) as error:
-        logger.error("Risk regime classification failed")
+        logger.exception("Risk regime classification failed")
         raise RiskDomainError(
             RiskErrorCode.CALCULATION_FAILED,
             "regime assessment calculation failed",

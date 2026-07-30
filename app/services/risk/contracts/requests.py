@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Literal
+from typing import Literal, Protocol, runtime_checkable
 
 from pydantic import (
     BaseModel,
@@ -15,7 +15,7 @@ from pydantic import (
     model_validator,
 )
 
-from app.services.strategy import TradeIntent  # noqa: TC001
+from app.services.strategy import create_trade_intent_value
 from app.utils import get_logger, validate_id
 
 logger = get_logger(__name__)
@@ -65,6 +65,7 @@ class _RequestModel(BaseModel):
         extra="forbid",
         frozen=True,
         allow_inf_nan=False,
+        arbitrary_types_allowed=True,
     )
 
     @field_validator(
@@ -102,12 +103,32 @@ class _RequestModel(BaseModel):
             raise ValueError(message) from error
 
 
+@runtime_checkable
+class _TradeIntentView(Protocol):
+    """Structural view of the Strategy-owned immutable trade intent."""
+
+    intent_id: str
+    strategy_id: str
+    symbol: str
+    intent_type: str
+    quantity_hint: Decimal | None
+
+    def model_dump(
+        self,
+        *,
+        mode: str = "python",
+        warnings: bool = True,
+    ) -> dict[str, object]:
+        """Return the complete immutable Strategy intent payload."""
+        ...
+
+
 class ProposedTrade(_RequestModel):
     """Risk-owned receiver request embedding one exact Strategy intent."""
 
     contract_version: Literal["v1"] = "v1"
     schema_id: Literal["risk.proposed_trade.v1"] = "risk.proposed_trade.v1"
-    intent: TradeIntent
+    intent: _TradeIntentView
     account_id: str
     portfolio_id: str | None
     requested_size: Decimal
@@ -121,6 +142,36 @@ class ProposedTrade(_RequestModel):
     request_id: str
     workflow_id: str
     correlation_id: str
+
+    @field_validator("intent", mode="before")
+    @classmethod
+    def _validate_strategy_intent(cls, value: object) -> object:
+        """Require the exact Strategy-owned immutable intent implementation.
+
+        Args:
+            value: Candidate Strategy intent.
+
+        Returns:
+            Exact validated Strategy intent.
+
+        Raises:
+            TypeError: If the value does not implement Strategy's intent contract.
+            ValueError: If the value was not produced by Strategy's public API.
+        """
+        if not isinstance(value, _TradeIntentView):
+            raise TypeError("intent must implement the Strategy intent contract")
+        validated = create_trade_intent_value(
+            **value.model_dump(warnings=False, mode="python")
+        )
+        if (
+            value.__class__.__module__,
+            value.__class__.__qualname__,
+        ) != (
+            validated.__class__.__module__,
+            validated.__class__.__qualname__,
+        ):
+            raise ValueError("intent must be produced by Strategy's public API")
+        return value
 
     @field_validator("account_id", "request_id", "workflow_id", "correlation_id")
     @classmethod

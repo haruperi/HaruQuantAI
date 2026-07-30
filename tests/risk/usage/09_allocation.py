@@ -8,23 +8,22 @@ import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.data import MarketContextEvidence
+from app.services.data import build_market_context_evidence
 from app.services.risk import (
-    AllocationBudgetActivationRequest,
-    AllocationReviewRequest,
-    AllocationRiskDecision,
-    KillSwitchState,
-    PortfolioRiskSnapshot,
-    RiskAuditChain,
-    RiskAuditRecord,
-    RiskConfig,
     activate_allocation_budget,
     compute_config_hash,
+    create_allocation_budget_activation_request,
+    create_allocation_review_request,
+    create_kill_switch_state,
+    create_portfolio_risk_snapshot,
+    create_risk_audit_chain,
+    create_risk_audit_record,
+    create_risk_config,
     review_allocation_proposal,
 )
 from app.utils import canonical_json
@@ -39,15 +38,15 @@ class _ExampleAuditStore:
     """Minimal append-only audit store for this example."""
 
     def __init__(self) -> None:
-        self.records: list[RiskAuditRecord] = []
+        self.records: list[create_risk_audit_record] = []
 
-    def read_head(self, *, timeout_seconds: Decimal | None) -> RiskAuditRecord | None:
+    def read_head(self, *, timeout_seconds: Decimal | None) -> Any | None:
         del timeout_seconds
         return self.records[-1] if self.records else None
 
     def append_atomic(
         self,
-        record: RiskAuditRecord,
+        record: Any,
         *,
         expected_sequence: int,
         expected_previous_hash: str,
@@ -57,9 +56,7 @@ class _ExampleAuditStore:
         self.records.append(record)
         return "appended"
 
-    def read_all(
-        self, *, timeout_seconds: Decimal | None
-    ) -> tuple[RiskAuditRecord, ...]:
+    def read_all(self, *, timeout_seconds: Decimal | None) -> tuple[Any, ...]:
         del timeout_seconds
         return tuple(self.records)
 
@@ -68,12 +65,12 @@ class _ExampleAllocationStore:
     """Minimal version-exact allocation review and budget store."""
 
     def __init__(self) -> None:
-        self.review: AllocationRiskDecision | None = None
-        self.active: AllocationRiskDecision | None = None
+        self.review: Any | None = None
+        self.active: Any | None = None
 
     def save_review_if_absent(
         self,
-        decision: AllocationRiskDecision,
+        decision: Any,
         *,
         timeout_seconds: Decimal | None,
     ) -> bool:
@@ -85,7 +82,7 @@ class _ExampleAllocationStore:
 
     def get_active(
         self, portfolio_id: str, *, timeout_seconds: Decimal | None
-    ) -> AllocationRiskDecision | None:
+    ) -> Any | None:
         del timeout_seconds
         if self.active is not None and self.active.portfolio_id == portfolio_id:
             return self.active
@@ -93,7 +90,7 @@ class _ExampleAllocationStore:
 
     def activate_compare_and_swap(
         self,
-        decision: AllocationRiskDecision,
+        decision: Any,
         *,
         expected_predecessor_version: str | None,
         timeout_seconds: Decimal | None,
@@ -111,9 +108,9 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def _config() -> RiskConfig:
+def _config() -> create_risk_config:
     """Build a complete simulation-profile Risk configuration."""
-    return RiskConfig(
+    return create_risk_config(
         profile="simulation",
         execution_route="sim",
         policy_version="policy-1",
@@ -133,9 +130,9 @@ def _config() -> RiskConfig:
     )
 
 
-def _market() -> MarketContextEvidence:
+def _market() -> build_market_context_evidence:
     """Build fresh complete Data-owned market-context evidence."""
-    return MarketContextEvidence(
+    return build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
         calendar_state="clear",
@@ -154,9 +151,9 @@ def _market() -> MarketContextEvidence:
     )
 
 
-def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
+def _snapshot(config: create_risk_config) -> create_portfolio_risk_snapshot:
     """Build a healthy immutable portfolio risk snapshot."""
-    return PortfolioRiskSnapshot(
+    return create_portfolio_risk_snapshot(
         snapshot_id="snapshot-1",
         account_id="account-1",
         base_currency="USD",
@@ -189,9 +186,9 @@ def _snapshot(config: RiskConfig) -> PortfolioRiskSnapshot:
     )
 
 
-def _review_request(config: RiskConfig) -> AllocationReviewRequest:
+def _review_request(config: create_risk_config) -> create_allocation_review_request:
     """Build a self-contained within-cap allocation review request."""
-    return AllocationReviewRequest(
+    return create_allocation_review_request(
         projection_kind="construction",
         portfolio_id="portfolio-1",
         portfolio_version="allocation-v1",
@@ -223,9 +220,9 @@ def _review_request(config: RiskConfig) -> AllocationReviewRequest:
     )
 
 
-def _inactive_kill_switch() -> KillSwitchState:
+def _inactive_kill_switch() -> create_kill_switch_state:
     """Build one inactive applicable canonical kill-switch state."""
-    return KillSwitchState(
+    return create_kill_switch_state(
         state_id="global-state-1",
         scope_level="global",
         scope={},
@@ -243,7 +240,9 @@ def example_allocation() -> None:
 
     config = _config()
     store = _ExampleAllocationStore()
-    audit = RiskAuditChain(config, _ExampleAuditStore(), lambda: NOW, canonical_json)
+    audit = create_risk_audit_chain(
+        config, _ExampleAuditStore(), lambda: NOW, canonical_json
+    )
 
     decision = unwrap_risk_response(
         review_allocation_proposal(
@@ -263,7 +262,7 @@ def example_allocation() -> None:
         f"reviewed version: {decision.reviewed_version}"
     )
 
-    activation = AllocationBudgetActivationRequest(
+    activation = create_allocation_budget_activation_request(
         portfolio_id="portfolio-1",
         allocation_version="allocation-v1",
         decision_id=decision.decision_id,

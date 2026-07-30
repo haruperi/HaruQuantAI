@@ -7,7 +7,7 @@ from types import MappingProxyType
 from typing import Literal
 
 from app.services.risk.contracts.enums import RiskErrorCode
-from app.utils import validate_error_catalog
+from app.utils import normalize_error_code
 
 type ErrorSeverity = Literal["info", "warning", "error", "critical"]
 
@@ -324,8 +324,30 @@ _DEFINITIONS = (
     ),
 )
 
-RISK_ERROR_CATALOG = validate_error_catalog(
-    MappingProxyType({definition.code: definition for definition in _DEFINITIONS})
-)
+
+def _validate_catalog(
+    definitions: tuple[ErrorDefinition, ...],
+) -> MappingProxyType[str, ErrorDefinition]:
+    """Validate and freeze Risk-owned error definitions.
+
+    Args:
+        definitions: Ordered Risk error definitions.
+
+    Returns:
+        Immutable code-keyed Risk error catalogue.
+
+    Raises:
+        ValueError: If a code is malformed, duplicated, or mismatched.
+    """
+    validated: dict[str, ErrorDefinition] = {}
+    for definition in definitions:
+        code = normalize_error_code(definition.code)
+        if code != definition.code or code in validated:
+            raise ValueError("Risk error catalogue is inconsistent")
+        validated[code] = definition
+    return MappingProxyType(validated)
+
+
+RISK_ERROR_CATALOG = _validate_catalog(_DEFINITIONS)
 
 __all__ = ["RISK_ERROR_CATALOG"]
