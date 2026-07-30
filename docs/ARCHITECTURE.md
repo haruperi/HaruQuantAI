@@ -154,7 +154,20 @@
   does not let anyone skip a step, and demotion from `registered` needs neither
   packet nor approval. The feature records and does not register: nothing in it
   imports Strategy or the simulator, and reaching a receiver is `FEAT-AGT-22`'s.
-  `FEAT-AGT-09`, `10`, and `19`–`22` remain `Missing`.
+  `FEAT-AGT-19` makes non-binding a property of the type rather than a claim in
+  the prose: an allocation proposal defines no lot size, notional, quantity, or
+  price field, so nothing in it could reach an execution path even if the object
+  were mishandled; approval language is refused through `FEAT-AGT-07`'s single
+  definition, extended only by the level-and-price vocabulary specific to an
+  advisor; and every proposal expires, strictly, with an already-expired one
+  unconstructable and an expired one never critiqued. Mandate scope is copied
+  from what Risk returned rather than from the model, so a proposal cannot widen
+  its own asset class; every evidence read must carry an observation instant,
+  and an unreadable one counts as stale. The risk critique covers all eight
+  kinds by set equality and emits no approval by absence — the advisory has no
+  verdict, severity, or boolean a caller could read as consent. All five
+  receiver operations are reached through an injected port, never by import.
+  `FEAT-AGT-09`, `10`, and `20`–`22` remain `Missing`.
   Google ADK 2.x is adopted behind a scoped `requests` override, documented in
   `pyproject.toml` with the condition for its removal. Its hybrid layout keeps ten shared control-plane features as focused root packages and places twelve role-bearing features under registered `agents/<department>/<agent_name>/` leaf packages with provider-neutral `agent.py`, integrity-checked `prompt.md`, feature schemas, and only specification-required optional files. Specialized leadership, market-intelligence, technical, quantitative, strategy/trader, experimentation, engineering, portfolio/risk-advisory, and operations roles may dynamically collaborate, simulate, optimize, code, and submit typed proposals. Google ADK 2.x is the selected runtime behind provider-neutral HaruQuantAI contracts. Agentic has no broker credential, direct broker route, risk approval, kill-switch authority, or execution authority; consequential proposals traverse the normal deterministic pipeline.
 * `app/utils/` is a partial implementation baseline for shared v1 contracts,

@@ -75,6 +75,22 @@ from app.agentic.agents.operations.evaluation_manager.schemas import (
 from app.agentic.agents.operations.evaluation_manager.tools import (
     get_registered_tool_names as get_evaluation_tool_names,
 )
+from app.agentic.agents.portfolio_risk_advisory.portfolio_risk_advisor.agent import (
+    PROMPT_PATH as ADVISOR_PROMPT_PATH,
+)
+from app.agentic.agents.portfolio_risk_advisory.portfolio_risk_advisor.schemas import (
+    REQUIRED_RISK_KINDS,
+)
+from app.agentic.agents.portfolio_risk_advisory.portfolio_risk_advisor.tools import (
+    ACCOUNT_STATE_TOOL,
+    ALLOCATION_EVIDENCE_TOOL,
+    COMMON_MODE_TOOL,
+    CORRELATION_TOOL,
+    FIRM_MANDATE_TOOL,
+)
+from app.agentic.agents.portfolio_risk_advisory.portfolio_risk_advisor.tools import (
+    get_registered_tool_names as get_advisor_tool_names,
+)
 from app.agentic.agents.strategy_desk.strategy_thesis_analyst.agent import (
     PROMPT_PATH as THESIS_PROMPT_PATH,
 )
@@ -925,3 +941,185 @@ def build_promotion_critique(**overrides: object) -> CritiqueMemo:
     }
     data.update(overrides)
     return build_critique_memo(data)
+
+
+ADVISOR_ROLE_ID = "portfolio_risk_advisor"
+
+ADVISOR_PROMPT_DIGEST = canonical_digest(
+    normalize_prompt_text(ADVISOR_PROMPT_PATH.read_text(encoding="utf-8")),
+)
+
+
+def advisor_role_manifest_fields(**overrides: object) -> dict[str, object]:
+    """Return complete Portfolio and Risk Advisor manifest fields.
+
+    The base prompt digest is derived from the real package artefact, so the
+    fixture exercises the same integrity chain production uses.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        Complete manifest constructor data.
+    """
+    data = manifest_fields(
+        role_id=ADVISOR_ROLE_ID,
+        owning_feature="FEAT-AGT-19",
+        department="portfolio_risk_advisory",
+        agent_package="agents/portfolio_risk_advisory/portfolio_risk_advisor",
+        description="Describes exposure and critiques what could go wrong.",
+        objective="State where emphasis sits and what the evidence cannot show.",
+        expertise_boundary="Approves nothing, sizes nothing, computes nothing.",
+        input_schema_id="agentic.advisory_request.v1",
+        output_schema_id="agentic.allocation_proposal.v1",
+        base_prompt_hash=ADVISOR_PROMPT_DIGEST,
+        evaluation_set_id="eval-portfolio-risk-advisor-v1",
+        tools=get_advisor_tool_names(),
+        permission_classes=("read_evidence",),
+    )
+    data.update(overrides)
+    return data
+
+
+def build_advisor_role_manifest(**overrides: object) -> RoleManifest:
+    """Build the validated Portfolio and Risk Advisor role manifest.
+
+    Args:
+        **overrides: Optional field overrides for manifest variants.
+
+    Returns:
+        A validated manifest with derived integrity digests.
+    """
+    return build_role_manifest(advisor_role_manifest_fields(**overrides))
+
+
+def build_advisor_mandate(**overrides: object) -> FirmMandate:
+    """Build a sandbox mandate registering the advisory tools.
+
+    Args:
+        **overrides: Optional field overrides for mandate variants.
+
+    Returns:
+        A validated firm mandate with a derived content digest.
+    """
+    data: dict[str, object] = {
+        "enabled_features": ("FEAT-AGT-19",),
+        "enabled_roles": (ADVISOR_ROLE_ID,),
+        "tool_scopes": dict.fromkeys(get_advisor_tool_names(), "read_evidence"),
+    }
+    data.update(overrides)
+    return build_sandbox_mandate(**data)
+
+
+ADVISORY_PORTFOLIO_ID = "portfolio-fx-core"
+ADVISORY_MANDATE_ID = "mandate-sandbox"
+
+
+def advisory_evidence(
+    observed_at: str, **overrides: object
+) -> dict[
+    str,
+    dict[str, str],
+]:
+    """Return the five receiver readings an advisory rests on.
+
+    Every reading carries its own observation instant, because freshness is
+    established from what the receiver reported rather than from the model.
+
+    Args:
+        observed_at: ISO-8601 observation instant for every reading.
+        **overrides: Optional per-tool reading overrides.
+
+    Returns:
+        Tool identity to bounded receiver evidence.
+    """
+    data: dict[str, dict[str, str]] = {
+        ALLOCATION_EVIDENCE_TOOL: {
+            "observed_at": observed_at,
+            "evidence_ref": "analytics.portfolio_allocation_evidence:v3",
+            "base_currency": "USD",
+            "candidates": "momentum_fx,carry_fx",
+        },
+        COMMON_MODE_TOOL: {
+            "observed_at": observed_at,
+            "report_ref": "portfolio.common_mode_exposure:2026-07-29",
+            "shared_software_dependencies": "mt5_bridge",
+            "breached_accounts": "none",
+        },
+        CORRELATION_TOOL: {
+            "observed_at": observed_at,
+            "report_ref": "portfolio.cross_account_correlation:2026-07-29",
+            "highest_pair": "momentum_fx/carry_fx",
+            "highest_value": "0.62",
+        },
+        ACCOUNT_STATE_TOOL: {
+            "observed_at": observed_at,
+            "snapshot_ref": "data.account_state_snapshot:2026-07-29T11:58Z",
+            "currency": "USD",
+            "headroom_state": "within_limits",
+        },
+        FIRM_MANDATE_TOOL: {
+            "observed_at": observed_at,
+            "mandate_id": ADVISORY_MANDATE_ID,
+            "mandate_version": "1.0.0",
+            "asset_class": "fx",
+            "base_currency": "USD",
+        },
+    }
+    for key, value in overrides.items():
+        if isinstance(value, dict):
+            data[key] = {str(k): str(v) for k, v in value.items()}
+    return data
+
+
+def advisor_model_output(**overrides: object) -> dict[str, str]:
+    """Return a well-formed advisory model output.
+
+    Args:
+        **overrides: Optional field overrides for output variants.
+
+    Returns:
+        The model output an advisory run would parse.
+    """
+    data: dict[str, str] = {
+        "weight:momentum_fx": "greater emphasis than the carry candidate",
+        "weight:carry_fx": "reduced emphasis while correlation stays elevated",
+        "rationale": (
+            "Cross-account correlation between the two candidates is elevated, "
+            "so emphasis is shifted toward the candidate whose drawdown is "
+            "less dependent on the shared bridge."
+        ),
+        "constraints_respected": (
+            "The view stays inside the fx asset scope.\n"
+            "The view stays inside the USD base currency."
+        ),
+        "limitations": (
+            "One correlation reading cannot establish stability under stress.\n"
+            "Account headroom was read once and may move within the session."
+        ),
+    }
+    data.update({str(key): str(value) for key, value in overrides.items()})
+    return data
+
+
+def advisor_critique_output(**overrides: object) -> dict[str, str]:
+    """Return a well-formed risk-critique model output.
+
+    Args:
+        **overrides: Optional field overrides for output variants.
+
+    Returns:
+        The model output a critique run would parse.
+    """
+    data: dict[str, str] = {
+        f"risk:{kind}": (
+            f"The {kind} risk was examined against the supplied evidence and "
+            "what it could not establish is stated."
+        )
+        for kind in sorted(REQUIRED_RISK_KINDS)
+    }
+    data["unresolved_risks"] = (
+        "The tail estimate rests on too few joint moves to be relied upon."
+    )
+    data.update({str(key): str(value) for key, value in overrides.items()})
+    return data

@@ -244,7 +244,7 @@ order below is the binding implementation order.
 | Completed | `FEAT-AGT-16` Governed Code Generation and Sandbox              | `agents/engineering/coder/`                            | `CodeSpecification`, `CodeArtifact`, `SandboxResult`, `author_code_artifact`                                | `FR-AGENTIC-046`–`048` | `tests/agentic/usage/16_coding.py`          |
 | Completed | `FEAT-AGT-17` Evaluation, Critique, and Economic Acceptance     | `agents/operations/evaluation_manager/`                | `EvaluationPlan`, `CritiqueMemo`, `EconomicAcceptanceVerdict`, `evaluate_agent`, `critique_candidate`       | `FR-AGENTIC-049`–`051` | `tests/agentic/usage/17_evaluation.py`      |
 | Completed | `FEAT-AGT-18` Artefact Promotion and Lifecycle                  | `lifecycle/`       | `PromotionEvidencePacket`, `LifecycleRecord`, `assess_promotion`, `transition_artifact`                                   | `FR-AGENTIC-052`–`054` | `tests/agentic/usage/18_lifecycle.py`       |
-| Missing | `FEAT-AGT-19` Portfolio and Risk Advisory                       | `agents/portfolio_risk_advisory/portfolio_risk_advisor/` | `AllocationProposal`, `RiskAdvisory`, `advise_portfolio`, `critique_risk`                                   | `FR-AGENTIC-055`–`057` | `tests/agentic/usage/19_advisory.py`        |
+| Completed | `FEAT-AGT-19` Portfolio and Risk Advisory                       | `agents/portfolio_risk_advisory/portfolio_risk_advisor/` | `AllocationProposal`, `RiskAdvisory`, `advise_portfolio`, `critique_risk`                                   | `FR-AGENTIC-055`–`057` | `tests/agentic/usage/19_advisory.py`        |
 | Missing | `FEAT-AGT-20` Trade Proposal Handoff                            | `agents/strategy_desk/trader/`                           | `TradeProposal`, `TradeProposalReceipt`, `submit_trade_proposal`                                            | `FR-AGENTIC-058`–`060` | `tests/agentic/usage/20_trade_proposals.py` |
 | Missing | `FEAT-AGT-21` Observability, Incidents, and Operational Control | `operations/`      | `AgenticTrace`, `IncidentRecord`, `ReplayRequest`, `get_run_trace`, `quarantine_agent`, `replay_run`                  | `FR-AGENTIC-061`–`063` | `tests/agentic/usage/21_operations.py`      |
 | Missing | `FEAT-AGT-22` Public Agentic API and Operator Control           | `public_api/`      | `AgenticDependencies`, `submit_firm_request`, `get_firm_run`, `approve_agentic_handoff`                                   | `FR-AGENTIC-064`–`066` | `tests/agentic/usage/22_public_api.py`      |
@@ -731,6 +731,15 @@ simulator. The workflow stays `Missing` until that handoff exists.
 5. Portfolio and Risk apply their complete normal controls to any submitted
    receiver-owned request — `risk.review_allocation_proposal()`,
    `portfolio.PortfolioService.coordinate_review()`.
+
+**Status: `Partial`.** `FEAT-AGT-19` implements steps 1 and 4. Steps 2 and 3
+are `FEAT-AGT-07` under their own names — `agentic.collect_briefs()` and
+`agentic.synthesize_deliberation()` were never authored as such, and
+`run_deliberation` is what both became; the advisor consumes its preserved
+dissent rather than re-implementing it. Step 5 is the receiver's and needs the
+`FEAT-AGT-22` submission path; nothing in
+`agents/portfolio_risk_advisory/` imports Portfolio, Risk, Analytics, or Data.
+The workflow stays `Missing` until that submission exists.
 
 **Integration test:** `tests/agentic/integration/test_advisory_council.py`
 
@@ -1239,18 +1248,38 @@ version rather than that this feature caused it.
 
 | Status  | File            | Responsibility                                         | Key exports                              | Dependencies                                                                                                                                     |
 | ------- | --------------- | ------------------------------------------------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Missing | `agent.py`    | Define the provider-neutral advisor, produce portfolio advice, and run independent risk critique | `advise_portfolio`, `critique_risk` | **Standard library:** `pathlib`; **Required third-party:** None; **Local:** governance, runtime, deliberation, Analytics/Portfolio/Risk public contracts |
-| Missing | `prompt.md`   | Define immutable non-binding portfolio, independent-risk, dissent, expiry, and refusal instructions | Internal prompt artefact | **Standard library:** None; **Required third-party:** None; **Local:** None |
-| Missing | `schemas.py`  | Define non-binding allocation and risk advice          | `AllocationProposal`, `RiskAdvisory` | **Standard library:** `datetime`; **Required third-party:** `pydantic`; **Local:** contracts |
-| Missing | `tools.py`    | Bind read-only Analytics, Portfolio, Risk, and account-evidence operations | Internal only; no public export | **Standard library:** None; **Required third-party:** None; **Local:** permissions, Analytics/Portfolio/Risk public contracts |
+| Completed | `agent.py`    | Define the provider-neutral advisor, produce portfolio advice, and run independent risk critique | `advise_portfolio`, `critique_risk` | **Standard library:** `pathlib`, `datetime`, `decimal`; **Required third-party:** None; **Local:** governance, runtime, permissions, deliberation, `schemas.py`, `tools.py` |
+| Completed | `prompt.md`   | Define immutable non-binding portfolio, independent-risk, dissent, expiry, and refusal instructions | Internal prompt artefact | **Standard library:** None; **Required third-party:** None; **Local:** None |
+| Completed | `schemas.py`  | Define non-binding allocation and risk advice          | `AllocationProposal`, `RiskAdvisory` | **Standard library:** `datetime`, `types`; **Required third-party:** `pydantic`; **Local:** deliberation |
+| Completed | `tools.py`    | Bind read-only Analytics, Portfolio, Risk, and account-evidence operations | Internal only; no public export | **Standard library:** None; **Required third-party:** None; **Local:** permissions, context memory, injected receiver-evidence port |
 | Completed | `README.md`   | Document the feature boundary, API, prompt, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
 | Completed | `__init__.py` | Expose the Feature Registry API                        | Feature Registry exports only | **Standard library:** None; **Required third-party:** None; **Local:** `agent.py`, `schemas.py` |
 
+The canonical dependency column lists the Analytics, Portfolio, and Risk public
+contracts as local dependencies of `agent.py` and `tools.py`. No module in this
+package imports them. Their real signatures want `Decimal` maps of loss-at-stop
+by account, a connected broker adapter, and an analytics run configuration, so
+constructing one here would be Agentic authoring receiver inputs; the five
+operations are reached through an injected port instead, bound by an approved
+composition root. A test asserts the package names no service domain at all.
+
+`schemas.py` reuses `FEAT-AGT-07`'s `reject_authorization_language` rather than
+restating what reads as an authorization, and adds only the level-and-price
+vocabulary specific to an advisor.
+
 | Status  | Requirement ID     | Responsibility                                                                                                                                      | Side effects                          | Failure / Verification            |
 | ------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | --------------------------------- |
-| Missing | `FR-AGENTIC-055` | Portfolio advice shall use current Analytics, Portfolio, Risk, and account-scope evidence and return non-binding proposals with expiry.             | Read-only owner API calls; model call | Freshness and non-binding tests   |
-| Missing | `FR-AGENTIC-056` | Risk critics shall identify mandate, barrier, tail, concentration, liquidity, correlation, operational, and model risks but shall emit no approval. | Model call                            | Risk-coverage and authority tests |
-| Missing | `FR-AGENTIC-057` | Portfolio or risk advice shall be rejected by the receiver when evidence, identity, scope, authorization, or freshness is invalid.                  | Receiver-owned request call           | Receiver-rejection tests          |
+| Completed | `FR-AGENTIC-055` | Portfolio advice shall use current Analytics, Portfolio, Risk, and account-scope evidence and return non-binding proposals with expiry.             | Read-only owner API calls; model call | Freshness and non-binding tests   |
+| Completed | `FR-AGENTIC-056` | Risk critics shall identify mandate, barrier, tail, concentration, liquidity, correlation, operational, and model risks but shall emit no approval. | Model call                            | Risk-coverage and authority tests |
+| Completed | `FR-AGENTIC-057` | Portfolio or risk advice shall be rejected by the receiver when evidence, identity, scope, authorization, or freshness is invalid.                  | None; the receiver owns the call      | Receiver-rejection tests          |
+
+`FR-AGENTIC-057`'s side effect is narrower than the canonical row states. This
+feature makes no receiver-owned request call: it emits advice carrying the
+identity, scope, evidence, and freshness a receiver rejects on, and refuses to
+emit advice whose evidence is stale or whose mandate scope is unavailable.
+Submitting a receiver-owned request belongs to `FEAT-AGT-22`. The requirement
+is verified with Risk's own `AllocationReviewRequest` rejecting incomplete and
+incompatible projections assembled in the tests, never in production.
 
 ### 4.20 `agents/strategy_desk/trader/` — Trade Proposal Handoff
 
