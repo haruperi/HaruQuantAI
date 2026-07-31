@@ -6,8 +6,9 @@ Demonstrates safe artifact persistence and migration definition.
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.research import (
     build_research_migration_request,
@@ -19,9 +20,30 @@ from app.utils.contracts.auth import AuthContext
 _HASH = "e" * 64
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _report() -> object:
@@ -95,6 +117,13 @@ def fr_res_098() -> None:
 
 def main() -> None:
     """Run Research artifacts usage example."""
+    _feature_header(
+        "FEATURE: FEAT-RES-12 — artifacts/ — Safe Research Artifact Persistence\n\n"
+        "Purpose: Govern research artifact persistence, schema migrations, and masked JSON/Markdown storage.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Artifact metadata envelope construction\n-> Stage 2: Masked JSON/Markdown serialization\n-> Stage 3: Database ledger migration and artifact persistence"
+    )
+
     fr_res_097()
     fr_res_098()
 

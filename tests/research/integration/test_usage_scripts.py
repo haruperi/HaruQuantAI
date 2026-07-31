@@ -19,13 +19,15 @@ _USAGE_SCRIPTS = (
     "10_modeling.py",
     "11_profiles.py",
     "12_artifacts.py",
+    "13_intelligence.py",
+    "features.py",
 )
 
 
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)
 def test_research_usage_script_executes(script_name: str) -> None:
     """Run one standalone Research usage script in an isolated Python process."""
-    usage_directory = Path(__file__).parents[1] / "usage"
+    usage_directory = Path(__file__).parents[1] / "usage" / "features"
     completed = subprocess.run(  # noqa: S603 - fixed repository-controlled command
         [sys.executable, str(usage_directory / script_name)],
         check=False,

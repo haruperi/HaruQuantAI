@@ -7,11 +7,12 @@ scorecards, reports, artifact references, and public API classifications.
 import sys
 from datetime import UTC, datetime, time
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
 # Add repository root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.research import (
     create_research_value,
@@ -21,9 +22,30 @@ from app.services.research import (
 _HASH = "e" * 64
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _quality() -> object:
@@ -575,6 +597,13 @@ def fr_res_026() -> None:
 
 def main() -> None:
     """Run every Research contract requirement demonstration in order."""
+    _feature_header(
+        "FEATURE: FEAT-RES-01 — contracts/ — Versioned Contracts and Configuration\n\n"
+        "Purpose: Define research resource limits, configuration envelopes, warnings, and ResearchReport v1 schemas.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Contract schema definition & resource limits mapping\n-> Stage 2: Fail-closed strict validation of research configurations and options\n-> Stage 3: Immutable ResearchReport v1 envelope construction"
+    )
+
     print("Research Example 1: Contracts and Results")
     fr_res_001()
     fr_res_002()

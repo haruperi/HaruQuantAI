@@ -216,19 +216,19 @@ remain external.
 
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
-| Completed | `FEAT-RES-01` Versioned Contracts and Configuration | `contracts/` | Implemented package-root contracts include `ResearchReport v1` and `EdgeLabConfig`; exact declarations: Section 4.1 | Section 4.1 functional requirements | `tests/research/usage/01_contracts.py` |
-| Completed | `FEAT-RES-02` Deterministic Dataset Preparation | `data/` | Implemented declarations: Section 4.2 | Section 4.2 functional requirements | `tests/research/usage/02_data.py` |
-| Completed | `FEAT-RES-03` Research-Specific Features | `features/` | Implemented declarations: Section 4.3 | Section 4.3 functional requirements | `tests/research/usage/03_features.py` |
-| Completed | `FEAT-RES-04` Leakage Evidence, Splits, and Masking | `leakage/` | Implemented declarations: Section 4.4 | Section 4.4 functional requirements | `tests/research/usage/04_leakage.py` |
-| Completed | `FEAT-RES-05` Core Metric Profile | `metrics/` | Implemented declarations: Section 4.5 | Section 4.5 functional requirements | `tests/research/usage/05_metrics.py` |
-| Completed | `FEAT-RES-06` Seeded Statistical Validation | `statistics/` | Implemented declarations: Section 4.6 | Section 4.6 functional requirements | `tests/research/usage/06_statistics.py` |
-| Completed | `FEAT-RES-07` Edge Discovery and Confirmation | `studies/` | Implemented declarations: Section 4.7 | Section 4.7 functional requirements | `tests/research/usage/07_studies.py` |
-| Completed | `FEAT-RES-08` Sessions and Seasonality | `seasonality/` | Implemented declarations: Section 4.8 | Section 4.8 functional requirements | `tests/research/usage/08_seasonality.py` |
-| Completed | `FEAT-RES-09` Market Structure Analysis | `market_structure/` | Implemented declarations: Section 4.9 | Section 4.9 functional requirements | `tests/research/usage/09_market_structure.py` |
-| Completed | `FEAT-RES-10` Deterministic Unsupervised Insights | `modeling/` | Implemented declarations: Section 4.10 | Section 4.10 functional requirements | `tests/research/usage/10_modeling.py` |
-| Completed | `FEAT-RES-11` Scorecards, Snapshots, and Edge Lab Profiles | `profiles/` | Implemented declarations: Section 4.11 | `FR-RES-089`–`096` | `tests/research/usage/11_profiles.py` |
-| Completed | `FEAT-RES-12` Safe Research Artifact Persistence | `artifacts/` | Implemented declarations: Section 4.12 | Section 4.12 functional requirements | `tests/research/usage/12_artifacts.py` |
-| Completed | `FEAT-RES-13` Fundamental and Sentiment Source Evidence | `intelligence/` | `assess_intelligence_applicability`, `build_fundamental_source_evidence`, `build_sentiment_source_evidence`, `project_intelligence_evidence`; internal evidence values remain opaque | `FR-RES-099`–`104` | `tests/research/usage/13_intelligence.py` |
+| Completed | `FEAT-RES-01` Versioned Contracts and Configuration | `contracts/` | Implemented package-root contracts include `ResearchReport v1` and `EdgeLabConfig`; exact declarations: Section 4.1 | Section 4.1 functional requirements | `tests/research/usage/features/01_contracts.py` |
+| Completed | `FEAT-RES-02` Deterministic Dataset Preparation | `data/` | Implemented declarations: Section 4.2 | Section 4.2 functional requirements | `tests/research/usage/features/02_data.py` |
+| Completed | `FEAT-RES-03` Research-Specific Features | `features/` | Implemented declarations: Section 4.3 | Section 4.3 functional requirements | `tests/research/usage/features/03_features.py` |
+| Completed | `FEAT-RES-04` Leakage Evidence, Splits, and Masking | `leakage/` | Implemented declarations: Section 4.4 | Section 4.4 functional requirements | `tests/research/usage/features/04_leakage.py` |
+| Completed | `FEAT-RES-05` Core Metric Profile | `metrics/` | Implemented declarations: Section 4.5 | Section 4.5 functional requirements | `tests/research/usage/features/05_metrics.py` |
+| Completed | `FEAT-RES-06` Seeded Statistical Validation | `statistics/` | Implemented declarations: Section 4.6 | Section 4.6 functional requirements | `tests/research/usage/features/06_statistics.py` |
+| Completed | `FEAT-RES-07` Edge Discovery and Confirmation | `studies/` | Implemented declarations: Section 4.7 | Section 4.7 functional requirements | `tests/research/usage/features/07_studies.py` |
+| Completed | `FEAT-RES-08` Sessions and Seasonality | `seasonality/` | Implemented declarations: Section 4.8 | Section 4.8 functional requirements | `tests/research/usage/features/08_seasonality.py` |
+| Completed | `FEAT-RES-09` Market Structure Analysis | `market_structure/` | Implemented declarations: Section 4.9 | Section 4.9 functional requirements | `tests/research/usage/features/09_market_structure.py` |
+| Completed | `FEAT-RES-10` Deterministic Unsupervised Insights | `modeling/` | Implemented declarations: Section 4.10 | Section 4.10 functional requirements | `tests/research/usage/features/10_modeling.py` |
+| Completed | `FEAT-RES-11` Scorecards, Snapshots, and Edge Lab Profiles | `profiles/` | Implemented declarations: Section 4.11 | `FR-RES-089`–`096` | `tests/research/usage/features/11_profiles.py` |
+| Completed | `FEAT-RES-12` Safe Research Artifact Persistence | `artifacts/` | Implemented declarations: Section 4.12 | Section 4.12 functional requirements | `tests/research/usage/features/12_artifacts.py` |
+| Completed | `FEAT-RES-13` Fundamental and Sentiment Source Evidence | `intelligence/` | `assess_intelligence_applicability`, `build_fundamental_source_evidence`, `build_sentiment_source_evidence`, `project_intelligence_evidence`; internal evidence values remain opaque | `FR-RES-099`–`104` | `tests/research/usage/features/13_intelligence.py` |
 
 ```text
 research/

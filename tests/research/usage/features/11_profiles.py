@@ -6,8 +6,9 @@ Demonstrates scorecard, snapshot, summaries, and rendering.
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.research import (
     build_dashboard_summary,
@@ -26,9 +27,30 @@ from tests.research._support import make_dataset, make_edge_lab_config
 _HASH = "e" * 64
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _metric_profile() -> object:
@@ -206,6 +228,13 @@ def fr_res_096() -> None:
 
 def main() -> None:
     """Run Research profiles usage example."""
+    _feature_header(
+        "FEATURE: FEAT-RES-11 — profiles/ — Scorecards, Snapshots, and Edge Lab Profiles\n\n"
+        "Purpose: Build research scorecards, capture versioned profile snapshots, and run the full Edge Lab profile pipeline.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Metric scorecard building\n-> Stage 2: Versioned profile snapshot capture\n-> Stage 3: Full Edge Lab profile execution"
+    )
+
     fr_res_089()
     fr_res_090()
     fr_res_091()

@@ -5,10 +5,11 @@ Demonstrates profile, quality, validation, calibration, and strategy fit.
 
 import sys
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.research import (
     build_market_structure_profile,
@@ -23,9 +24,30 @@ from app.services.research import (
 _HASH = "e" * 64
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _prepared() -> object:
@@ -147,6 +169,13 @@ def fr_res_080() -> None:
 
 def main() -> None:
     """Run Research market-structure usage example."""
+    _feature_header(
+        "FEATURE: FEAT-RES-09 — market_structure/ — Market Structure Analysis\n\n"
+        "Purpose: Profile volatility regimes, regime stability, calibration quality, and strategy fit.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Volatility regime tagging and profile extraction\n-> Stage 2: Regime transition stability and forward robustness testing\n-> Stage 3: Strategy fit recommendation rendering"
+    )
+
     fr_res_075()
     fr_res_076()
     fr_res_077()

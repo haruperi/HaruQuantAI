@@ -7,7 +7,7 @@ import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
     build_data_settings,
@@ -29,8 +29,20 @@ from app.services.research import (
 from app.utils import generate_id
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def main() -> None:
     """Pass genuine Treasury data through provider-neutral Research evidence."""
+    _feature_header(
+        "FEATURE: FEAT-RES-13 — intelligence/ — Fundamental and Sentiment Source Evidence\n\n"
+        "Purpose: Assess applicability and project point-in-time fundamental and sentiment source evidence.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Source record applicability assessment\n-> Stage 2: Point-in-time fundamental and sentiment evidence extraction\n-> Stage 3: Consolidated intelligence evidence projection"
+    )
+
     now = datetime.now(UTC)
     policy = build_research_source_policy(
         "treasury-fiscal-data-v1",

@@ -5,10 +5,11 @@ Demonstrates PCA, K-Means clustering, insights, and the workflow.
 
 import sys
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.research import (
     analyze_cluster_outperformance,
@@ -23,9 +24,30 @@ from app.services.research import (
 )
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _config() -> object:
@@ -116,6 +138,13 @@ def fr_res_088() -> None:
 
 def main() -> None:
     """Run Research modeling usage example."""
+    _feature_header(
+        "FEATURE: FEAT-RES-10 — modeling/ — Deterministic Unsupervised Insights\n\n"
+        "Purpose: Extract principal components, cluster market states with K-Means, and generate unsupervised insights.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Feature matrix normalization and PCA decomposition\n-> Stage 2: Deterministic K-Means market state clustering\n-> Stage 3: Unsupervised insight report generation"
+    )
+
     fr_res_081()
     fr_res_082()
     fr_res_083()

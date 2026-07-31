@@ -6,12 +6,13 @@ excursions, and canonical feature-frame assembly.
 
 import sys
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
 
 # Add repository root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.research import (
     build_research_feature_frame,
@@ -26,9 +27,30 @@ from app.services.research import (
 )
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _prices() -> pd.Series:
@@ -193,6 +215,13 @@ def fr_res_038() -> None:
 
 def main() -> None:
     """Run every Research feature requirement demonstration in order."""
+    _feature_header(
+        "FEATURE: FEAT-RES-03 — features/ — Research-Specific Features\n\n"
+        "Purpose: Compute research-specific return series, Hurst exponent, forward outcomes, and feature frames.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Input price series loading and return transformation\n-> Stage 2: Hurst exponent estimation and historical forward outcome labeling\n-> Stage 3: Assembled feature-frame construction"
+    )
+
     print("Research Example 3: Feature Calculations and Excursions")
     fr_res_031()
     fr_res_032()
