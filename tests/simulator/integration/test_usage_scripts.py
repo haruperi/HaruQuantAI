@@ -19,6 +19,7 @@ _USAGE_SCRIPTS = (
     "07_run.py",
     "08_errors.py",
     "09_reporting.py",
+    "features.py",
 )
 
 _USAGE_REQUIREMENTS = {
@@ -31,6 +32,7 @@ _USAGE_REQUIREMENTS = {
     "07_run.py": {29, 30, 31, 32, 34},
     "08_errors.py": {35, 36, 37},
     "09_reporting.py": {24, 25, 26, 27, 28, 33, 40},
+    "features.py": set(),
 }
 
 _README_REQUIREMENTS = {
@@ -53,7 +55,7 @@ def _normalized_text(value: str) -> str:
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)
 def test_simulator_usage_script_executes(script_name: str) -> None:
     """Run one standalone Simulator usage script in an isolated Python process."""
-    usage_directory = Path(__file__).parents[1] / "usage"
+    usage_directory = Path(__file__).parents[1] / "usage" / "features"
     completed = subprocess.run(  # noqa: S603 - fixed repository-controlled command
         [sys.executable, str(usage_directory / script_name)],
         check=False,
@@ -73,8 +75,16 @@ def test_simulator_usage_script_executes(script_name: str) -> None:
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)
 def test_usage_script_maps_requirements_and_uses_root_api(script_name: str) -> None:
     """Require one callable demonstration per mapped FR and no deep public import."""
-    usage_path = Path(__file__).parents[1] / "usage" / script_name
+    usage_path = Path(__file__).parents[1] / "usage" / "features" / script_name
     module = ast.parse(usage_path.read_text(encoding="utf-8"))
+    if script_name == "features.py":
+        assert not any(
+            isinstance(node, ast.ImportFrom)
+            and node.module is not None
+            and node.module.startswith("app.services.simulator.")
+            for node in ast.walk(module)
+        )
+        return
     functions = {
         node.name: node
         for node in module.body
