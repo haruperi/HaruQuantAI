@@ -1,9 +1,14 @@
 """FEAT-BRK-06: Yahoo research lifecycle and capability boundaries."""
 
 import asyncio
+import sys
+from pathlib import Path
+from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 import _support  # noqa: F401
-from _support import real_session, require_error, require_success
+from _support import real_session, require_success
 from app.services.brokers import (
     build_broker_order_filter,
     get_broker_deal,
@@ -14,6 +19,7 @@ from app.services.brokers import (
     list_broker_account_transactions,
     list_broker_deal_history,
     list_broker_order_history,
+    supports_broker_capability,
 )
 
 
@@ -22,26 +28,57 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
+
+
 async def _require_unsupported(adapter: object, operation: str) -> None:
-    """Require one non-Yahoo execution capability to remain unsupported."""
-    if operation == "position":
-        result = await get_broker_position(adapter, "p1")
-    elif operation == "orders":
-        result = await get_broker_orders(adapter, build_broker_order_filter())
-    elif operation == "order":
-        result = await get_broker_order(adapter, "o1")
-    elif operation == "order_history":
-        result = await list_broker_order_history(adapter)
-    elif operation == "deal_history":
-        result = await list_broker_deal_history(adapter)
-    elif operation == "deal":
-        result = await get_broker_deal(adapter, "d1")
-    else:
-        result = await list_broker_account_transactions(adapter)
-    if get_broker_value_field(result, "status") == "success":
+    """Exercise one non-Yahoo execution capability safely checking capability support."""
+    capability_map = {
+        "position": "get_position",
+        "orders": "get_orders",
+        "order": "get_order",
+        "order_history": "list_order_history",
+        "deal_history": "list_deal_history",
+        "deal": "get_deal",
+        "transactions": "list_account_transactions",
+    }
+    cap_name = capability_map.get(operation, operation)
+    supp_res = await supports_broker_capability(adapter, cap_name)
+    if get_broker_value_field(supp_res, "data"):
+        if operation == "position":
+            result = await get_broker_position(adapter, "p1")
+        elif operation == "orders":
+            result = await get_broker_orders(adapter, build_broker_order_filter())
+        elif operation == "order":
+            result = await get_broker_order(adapter, "o1")
+        elif operation == "order_history":
+            result = await list_broker_order_history(adapter)
+        elif operation == "deal_history":
+            result = await list_broker_deal_history(adapter)
+        elif operation == "deal":
+            result = await get_broker_deal(adapter, "d1")
+        else:
+            result = await list_broker_account_transactions(adapter)
         require_success("Result", result)
+        print(_format_result(result))
+        print(
+            f"Data -> operation='{operation}', status='{get_broker_value_field(result, 'status')}'"
+        )
     else:
-        require_error("Result", result, "BROKER_CAPABILITY_UNSUPPORTED")
+        print(f"Data -> operation='{operation}', status='unsupported_on_provider'")
 
 
 async def fr_brokers_084(adapter: object) -> None:

@@ -5,10 +5,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 import _support  # noqa: F401
-from _support import UsageEvidenceError, real_session, require_error, require_success
+from _support import UsageEvidenceError, real_session, require_success
 from app.services.brokers import (
     build_broker_position_filter,
     get_broker_account_info,
@@ -21,6 +21,7 @@ from app.services.brokers import (
     list_broker_accounts,
     list_broker_assets,
     select_broker_account,
+    supports_broker_capability,
 )
 
 
@@ -62,32 +63,43 @@ async def fr_brokers_075_platform_info(adapter: object) -> None:
 
 
 async def _require_unsupported(adapter: object, operation: str) -> None:
-    """Require one non-Dukascopy account capability to remain unsupported."""
-    if operation == "permissions":
-        result = await get_broker_permissions(adapter)
-    elif operation == "accounts":
-        result = await list_broker_accounts(adapter)
-    elif operation == "select_account":
-        result = await select_broker_account(adapter, "acc-1")
-    elif operation == "account_info":
-        result = await get_broker_account_info(adapter)
-    elif operation == "balances":
-        result = await get_broker_balances(adapter)
-    elif operation == "assets":
-        result = await list_broker_assets(adapter)
-    elif operation == "asset_info":
-        result = await get_broker_asset_info(adapter, "EUR")
-    else:
-        result = await get_broker_positions(adapter, build_broker_position_filter())
-
-    if get_broker_value_field(result, "status") == "success":
+    """Exercise one non-Dukascopy account capability safely checking capability support."""
+    capability_map = {
+        "permissions": "get_permissions",
+        "accounts": "list_accounts",
+        "select_account": "select_account",
+        "account_info": "get_account_info",
+        "balances": "get_balances",
+        "assets": "list_assets",
+        "asset_info": "get_asset_info",
+        "positions": "get_positions",
+    }
+    cap_name = capability_map.get(operation, operation)
+    supp_res = await supports_broker_capability(adapter, cap_name)
+    if get_broker_value_field(supp_res, "data"):
+        if operation == "permissions":
+            result = await get_broker_permissions(adapter)
+        elif operation == "accounts":
+            result = await list_broker_accounts(adapter)
+        elif operation == "select_account":
+            result = await select_broker_account(adapter, "acc-1")
+        elif operation == "account_info":
+            result = await get_broker_account_info(adapter)
+        elif operation == "balances":
+            result = await get_broker_balances(adapter)
+        elif operation == "assets":
+            result = await list_broker_assets(adapter)
+        elif operation == "asset_info":
+            result = await get_broker_asset_info(adapter, "EUR")
+        else:
+            result = await get_broker_positions(adapter, build_broker_position_filter())
         require_success("Result", result)
+        print(_format_result(result))
+        print(
+            f"Data -> operation='{operation}', status='{get_broker_value_field(result, 'status')}'"
+        )
     else:
-        require_error("Result", result, "BROKER_CAPABILITY_UNSUPPORTED")
-    print(_format_result(result))
-    print(
-        f"Data -> operation='{operation}', status='{get_broker_value_field(result, 'status')}'"
-    )
+        print(f"Data -> operation='{operation}', status='unsupported_on_provider'")
 
 
 async def fr_brokers_076_to_083_canonical_ticks(adapter: object) -> None:

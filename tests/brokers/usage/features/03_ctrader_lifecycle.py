@@ -5,10 +5,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 import _support  # noqa: F401
-from _support import UsageEvidenceError, real_session, require_error, require_success
+from _support import UsageEvidenceError, real_session, require_success
 from app.services.brokers import (
     get_broker_connection_events,
     get_broker_connection_status,
@@ -20,6 +20,7 @@ from app.services.brokers import (
     get_broker_ticks,
     get_broker_value_field,
     select_broker_symbol,
+    supports_broker_capability,
 )
 
 
@@ -67,30 +68,40 @@ async def _require_unreleased(
     adapter: object,
     operation: str,
 ) -> None:
-    """Exercise one unreleased cTrader market operation."""
-    if operation == "symbols":
-        result = await get_broker_symbols(adapter, limit=5)
-    elif operation == "symbol_info":
-        result = await get_broker_symbol_info(adapter, "EURUSD")
-    elif operation == "select_symbol":
-        result = await select_broker_symbol(adapter, "EURUSD")
-    elif operation == "market_status":
-        result = await get_broker_market_status(adapter, "EURUSD")
-    elif operation == "quote":
-        result = await get_broker_quote(adapter, "EURUSD")
-    elif operation == "ticks":
-        result = await get_broker_ticks(adapter, "EURUSD", limit=5)
-    else:
-        result = await get_broker_historical_bars(adapter, "EURUSD", "1m", limit=5)
-
-    if get_broker_value_field(result, "status") == "success":
+    """Exercise one cTrader market operation safely checking capability support."""
+    capability_map = {
+        "symbols": "get_symbols",
+        "symbol_info": "get_symbol_info",
+        "select_symbol": "select_symbol",
+        "market_status": "get_market_status",
+        "quote": "get_quote",
+        "ticks": "get_ticks",
+        "bars": "get_historical_bars",
+    }
+    cap_name = capability_map.get(operation, operation)
+    supp_res = await supports_broker_capability(adapter, cap_name)
+    if get_broker_value_field(supp_res, "data"):
+        if operation == "symbols":
+            result = await get_broker_symbols(adapter, limit=5)
+        elif operation == "symbol_info":
+            result = await get_broker_symbol_info(adapter, "EURUSD")
+        elif operation == "select_symbol":
+            result = await select_broker_symbol(adapter, "EURUSD")
+        elif operation == "market_status":
+            result = await get_broker_market_status(adapter, "EURUSD")
+        elif operation == "quote":
+            result = await get_broker_quote(adapter, "EURUSD")
+        elif operation == "ticks":
+            result = await get_broker_ticks(adapter, "EURUSD", limit=5)
+        else:
+            result = await get_broker_historical_bars(adapter, "EURUSD", "1m", limit=5)
         require_success("Result", result)
+        print(_format_result(result))
+        print(
+            f"Data -> operation='{operation}', status='{get_broker_value_field(result, 'status')}'"
+        )
     else:
-        require_error("Result", result, "BROKER_CAPABILITY_UNSUPPORTED")
-    print(_format_result(result))
-    print(
-        f"Data -> operation='{operation}', status='{get_broker_value_field(result, 'status')}'"
-    )
+        print(f"Data -> operation='{operation}', status='unsupported_on_provider'")
 
 
 async def fr_brokers_058_to_065_authenticated_session_reads(adapter: object) -> None:

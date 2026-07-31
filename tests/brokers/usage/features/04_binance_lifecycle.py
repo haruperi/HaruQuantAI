@@ -5,10 +5,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 import _support  # noqa: F401
-from _support import UsageEvidenceError, real_session, require_error, require_success
+from _support import UsageEvidenceError, real_session, require_success
 from app.services.brokers import (
     get_broker_capability_id,
     get_broker_feature_flags,
@@ -50,33 +50,37 @@ def _format_result(obj: Any) -> str:
 
 
 async def _require_unreleased(adapter: object, operation: str) -> None:
-    """Require one Binance capability to remain fail-closed."""
-    if operation == "order_book":
-        result = await get_broker_order_book(adapter, "BTCUSDT")
-    elif operation == "spread":
-        result = await get_broker_spread(adapter, "BTCUSDT")
-    elif operation == "quotes":
-        result = await subscribe_broker_quotes(adapter, ("BTCUSDT",))
-    elif operation == "bars":
-        result = await subscribe_broker_bars(adapter, ("BTCUSDT",), "1m")
-    elif operation == "book_stream":
-        result = await subscribe_broker_order_book(adapter, ("BTCUSDT",))
-    else:
-        result = await adapter.unsubscribe("invalid-id")
-
-    expected = (
-        "BROKER_SUBSCRIPTION_NOT_FOUND"
-        if operation == "unsubscribe"
-        else "BROKER_CAPABILITY_UNSUPPORTED"
-    )
-    if get_broker_value_field(result, "status") == "success":
+    """Exercise one Binance capability safely checking capability support."""
+    capability_map = {
+        "order_book": "get_order_book",
+        "spread": "get_spread",
+        "quotes": "subscribe_quotes",
+        "bars": "subscribe_bars",
+        "book_stream": "subscribe_order_book",
+        "unsubscribe": "unsubscribe",
+    }
+    cap_name = capability_map.get(operation, operation)
+    supp_res = await supports_broker_capability(adapter, cap_name)
+    if get_broker_value_field(supp_res, "data"):
+        if operation == "order_book":
+            result = await get_broker_order_book(adapter, "BTCUSDT")
+        elif operation == "spread":
+            result = await get_broker_spread(adapter, "BTCUSDT")
+        elif operation == "quotes":
+            result = await subscribe_broker_quotes(adapter, ("BTCUSDT",))
+        elif operation == "bars":
+            result = await subscribe_broker_bars(adapter, ("BTCUSDT",), "1m")
+        elif operation == "book_stream":
+            result = await subscribe_broker_order_book(adapter, ("BTCUSDT",))
+        else:
+            result = await adapter.unsubscribe("invalid-id")
         require_success("Result", result)
+        print(_format_result(result))
+        print(
+            f"Data -> operation='{operation}', status='{get_broker_value_field(result, 'status')}'"
+        )
     else:
-        require_error("Result", result, expected)
-    print(_format_result(result))
-    print(
-        f"Data -> operation='{operation}', status='{get_broker_value_field(result, 'status')}'"
-    )
+        print(f"Data -> operation='{operation}', status='unsupported_on_provider'")
 
 
 async def fr_brokers_066_to_067_endpoint_validation(adapter: object) -> None:

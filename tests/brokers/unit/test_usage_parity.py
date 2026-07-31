@@ -3,7 +3,7 @@
 import ast
 import pathlib
 
-USAGE_DIR = pathlib.Path("tests/brokers/usage")
+USAGE_DIR = pathlib.Path("tests/brokers/usage/features")
 
 
 def test_usage_parity_and_reachability() -> None:  # noqa: C901

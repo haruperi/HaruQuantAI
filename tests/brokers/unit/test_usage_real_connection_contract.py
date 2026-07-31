@@ -9,9 +9,9 @@ from app.services.brokers import resolve_provider_connection_config
 from app.services.brokers.contracts import BrokerEnvironment, BrokerId
 from pydantic import SecretStr
 
-from tests.brokers.usage import _support
+from tests.brokers.usage.features import _support
 
-_USAGE_DIR = Path("tests/brokers/usage")
+_USAGE_DIR = Path("tests/brokers/usage/features")
 _PROVIDER_PROGRAMS = (
     "02_mt5_account.py",
     "03_ctrader_lifecycle.py",

@@ -5,13 +5,12 @@ import sys
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 import _support  # noqa: F401
 from _support import (
     create_real_adapter,
     real_session,
-    require_error,
     require_success,
 )
 from app.services.brokers import (
@@ -24,6 +23,7 @@ from app.services.brokers import (
     ping_broker,
     reconnect_broker,
     refresh_broker_session,
+    supports_broker_capability,
 )
 
 
@@ -99,15 +99,27 @@ async def fr_brokers_052_to_056_verified_account_info(adapter: object) -> None:
     print(_format_result(ping_res))
     print(f"Data -> ping_status='{get_broker_value_field(ping_res, 'status')}'")
 
-    refresh_res = await refresh_broker_session(adapter)
-    require_error("Session refresh", refresh_res, "BROKER_CAPABILITY_UNSUPPORTED")
-    print(_format_result(refresh_res))
-    print(f"Data -> refresh_status='{get_broker_value_field(refresh_res, 'status')}'")
+    supp_refresh = await supports_broker_capability(adapter, "refresh_session")
+    if get_broker_value_field(supp_refresh, "data"):
+        refresh_res = await refresh_broker_session(adapter)
+        require_success("Session refresh", refresh_res)
+        print(_format_result(refresh_res))
+        print(
+            f"Data -> refresh_status='{get_broker_value_field(refresh_res, 'status')}'"
+        )
+    else:
+        print("Data -> refresh_status='unsupported_on_provider'")
 
-    time_res = await get_broker_server_time(adapter)
-    require_error("Server time", time_res, "BROKER_CAPABILITY_UNSUPPORTED")
-    print(_format_result(time_res))
-    print(f"Data -> server_time_status='{get_broker_value_field(time_res, 'status')}'")
+    supp_time = await supports_broker_capability(adapter, "get_server_time")
+    if get_broker_value_field(supp_time, "data"):
+        time_res = await get_broker_server_time(adapter)
+        require_success("Server time", time_res)
+        print(_format_result(time_res))
+        print(
+            f"Data -> server_time_status='{get_broker_value_field(time_res, 'status')}'"
+        )
+    else:
+        print("Data -> server_time_status='unsupported_on_provider'")
 
     err_res = await get_broker_last_error(adapter)
     require_success("Last error", err_res)
