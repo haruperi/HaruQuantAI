@@ -1,15 +1,18 @@
 """Executable Risk sizing usage example.
 
-Demonstrates calculating position sizing based on fixed monetary risk.
+Demonstrates FEAT-RISK-04 calculating position sizing based on fixed monetary risk.
 """
+
+from __future__ import annotations
 
 import sys
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 # Add repository root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.risk import (
     calculate_position_size,
@@ -17,15 +20,35 @@ from app.services.risk import (
     create_position_sizing_request,
     create_risk_config,
 )
-
 from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _snapshot() -> create_portfolio_risk_snapshot:
@@ -81,15 +104,10 @@ def _config() -> create_risk_config:
 
 
 def fr_risk_026() -> None:
-    """FR-RISK-026: Calculate fixed-lot, fixed-risk, milestone,
-    fractional-Kelly, volatility, or fixed-fractional size using the retained
-    migration-evidenced formulas; enforce stop/equity/evidence rules; disclose
-    fallback/correlation adjustment; normalize against explicit broker and risk
-    constraints; return no non-zero failure fallback and no approval."""
+    """FR-RISK-026: Stage 3 — Calculate fixed-lot, fixed-risk, milestone, fractional-Kelly, volatility, or fixed-fractional size using the retained migration-evidenced formulas; enforce stop/equity/evidence rules; disclose fallback/correlation adjustment; normalize against explicit broker and risk constraints; return no non-zero failure fallback and no approval."""
     _header(
-        "FR-RISK-026: Calculate fixed-lot, fixed-risk, milestone, fractional-Kelly, volatility, or fixed-fractional size using the retained migration-evidenced formulas; enforce stop/equity/evidence rules; disclose fallback/correlation adjustment; normalize against explicit broker and risk constraints; return no non-zero failure fallback and no approval."
+        "Stage 3: Position Sizing Calculation - Calculate Position Size (FR-RISK-026)"
     )
-    print("Risk Example 8: Position Sizing Calculation")
 
     snapshot = _snapshot()
     request = create_position_sizing_request(
@@ -116,12 +134,22 @@ def fr_risk_026() -> None:
         calculate_position_size(request, snapshot, _config()),
         operation="calculate_position_size",
     )
-    print("Complete position-sizing result:")
-    print(result.model_dump(warnings=False, mode="json"))
+    print(_format_result(result))
+    print(
+        f"Data -> normalized_size={result.normalized_size}, approved={result.approved}"
+    )
 
 
 def main() -> None:
-    """Run the FR-RISK-026 sizing demonstration."""
+    """Run all feature examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-RISK-04 — sizing/ — Position Sizing Calculation\n\n"
+        "Purpose: Calculate position sizing based on fixed lot, fixed risk, milestone, fractional Kelly, volatility, or fixed fractional methods.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Build untrusted sizing request and portfolio snapshot\n"
+        "-> Stage 2: Validate sizing inputs and constraints\n"
+        "-> Stage 3: Return normalized PositionSizingResult without granting approval"
+    )
     fr_risk_026()
 
 

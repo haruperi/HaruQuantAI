@@ -1,8 +1,9 @@
 """Executable Risk allocation review and budget-activation usage example.
 
-Demonstrates independent review of a self-contained Portfolio projection and
-compare-and-swap activation of the authoritative Risk budget projection.
+Demonstrates FEAT-RISK-09 independent review of a self-contained Portfolio projection and compare-and-swap activation of the authoritative Risk budget projection.
 """
+
+from __future__ import annotations
 
 import sys
 from datetime import UTC, datetime, timedelta
@@ -11,7 +12,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 # Add repository root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import build_market_context_evidence
 from app.services.risk import (
@@ -27,11 +28,36 @@ from app.services.risk import (
     review_allocation_proposal,
 )
 from app.utils import canonical_json
-
 from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
+
+
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 class _ExampleAuditStore:
@@ -101,11 +127,6 @@ class _ExampleAllocationStore:
             return False
         self.active = decision
         return True
-
-
-def _header(title: str) -> None:
-    """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _config() -> create_risk_config:
@@ -233,11 +254,9 @@ def _inactive_kill_switch() -> create_kill_switch_state:
     )
 
 
-def example_allocation() -> None:
-    """Demonstrate allocation review followed by budget activation."""
-    _header("Demonstrate allocation review followed by budget activation.")
-    print("Risk Example 9: Allocation Review and Budget Activation")
-
+def fr_risk_030() -> None:
+    """FR-RISK-030: Stage 3 — Produce and atomically persist `AllocationRiskDecision v1`, enforce caps for the exact reviewed Portfolio version, and append its Risk audit record without constructing or applying a Portfolio allocation."""
+    _header("Stage 3: Allocation Review - Review Allocation Proposal (FR-RISK-030)")
     config = _config()
     store = _ExampleAllocationStore()
     audit = create_risk_audit_chain(
@@ -256,10 +275,30 @@ def example_allocation() -> None:
         ),
         operation="review_allocation_proposal",
     )
-    print(f"Allocation verdict: {decision.state}")
-    print(
-        f"Decision ID: {decision.decision_id}, "
-        f"reviewed version: {decision.reviewed_version}"
+    print(_format_result(decision))
+    print(f"Data -> decision_id='{decision.decision_id}', state='{decision.state}'")
+
+
+def fr_risk_051() -> None:
+    """FR-RISK-051: Stage 3 — Atomically compare-and-swap the authoritative risk-budget projection only for the exact approved allocation version and predecessor; version, expiry, active/unknown kill-switch, or concurrency conflict blocks activation, and success is audit-chained."""
+    _header("Stage 3: Budget Activation - Activate Allocation Budget (FR-RISK-051)")
+    config = _config()
+    store = _ExampleAllocationStore()
+    audit = create_risk_audit_chain(
+        config, _ExampleAuditStore(), lambda: NOW, canonical_json
+    )
+
+    decision = unwrap_risk_response(
+        review_allocation_proposal(
+            _review_request(config),
+            _snapshot(config),
+            _market(),
+            config,
+            store,
+            audit,
+            now=NOW,
+        ),
+        operation="review_allocation_proposal",
     )
 
     activation = create_allocation_budget_activation_request(
@@ -285,46 +324,24 @@ def example_allocation() -> None:
         ),
         operation="activate_allocation_budget",
     )
-    print(f"Activated version: {active.reviewed_version}")
-    print(f"Durably active: {store.active is not None}")
-
-
-_DEMONSTRATED = False
-
-
-def _demonstrate_once() -> None:
-    """Run the bounded allocation demonstration once."""
-    global _DEMONSTRATED  # noqa: PLW0603
-    if not _DEMONSTRATED:
-        example_allocation()
-        _DEMONSTRATED = True
-
-
-def fr_risk_030() -> None:
-    """FR-RISK-030: Produce and atomically persist `AllocationRiskDecision v1`,
-    enforce caps for the exact reviewed Portfolio version, and append its Risk
-    audit record without constructing or applying a Portfolio allocation."""
-    _header(
-        "FR-RISK-030: Produce and atomically persist `AllocationRiskDecision v1`, enforce caps for the exact reviewed Portfolio version, and append its Risk audit record without constructing or applying a Portfolio allocation."
+    print(_format_result(active))
+    print(
+        f"Data -> decision_id='{active.decision_id}', reviewed_version='{active.reviewed_version}', active={active.active}"
     )
-    _demonstrate_once()
-
-
-def fr_risk_051() -> None:
-    """FR-RISK-051: Atomically compare-and-swap the authoritative risk-budget
-    projection only for the exact approved allocation version and predecessor;
-    version, expiry, active/unknown kill-switch, or concurrency conflict blocks
-    activation, and success is audit-chained."""
-    _header(
-        "FR-RISK-051: Atomically compare-and-swap the authoritative risk-budget projection only for the exact approved allocation version and predecessor; version, expiry, active/unknown kill-switch, or concurrency conflict blocks activation, and success is audit-chained."
-    )
-    _demonstrate_once()
 
 
 def main() -> None:
-    """Run every functional-requirement demonstration for Risk allocation."""
-    for demonstrate in (fr_risk_030, fr_risk_051):
-        demonstrate()
+    """Run all feature examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-RISK-09 — allocation/ — Allocation Proposal Review and Budget Activation\n\n"
+        "Purpose: Review a self-contained Portfolio projection and atomically compare-and-swap the authoritative Risk budget projection.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Build untrusted allocation review request and portfolio snapshot\n"
+        "-> Stage 2: Validate allocation caps, evidence, and policy\n"
+        "-> Stage 3: Return AllocationRiskDecision and activate allocation budget"
+    )
+    fr_risk_030()
+    fr_risk_051()
 
 
 if __name__ == "__main__":

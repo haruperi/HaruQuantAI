@@ -1,8 +1,9 @@
-"""Executable Risk decision-reuse revalidation usage example.
+"""Executable canonical Risk governor usage example.
 
-Demonstrates confirming that a prior canonical decision is still reusable, and
-that a material change to the reviewed proposal deterministically invalidates it.
+Demonstrates FEAT-RISK-12 constructing the governor with injected dependencies, reviewing one proposed trade in fixed precedence, and running the current-state portfolio governor without any execution side effect.
 """
+
+from __future__ import annotations
 
 import sys
 from datetime import UTC, datetime, timedelta
@@ -11,7 +12,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 # Add repository root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import build_market_context_evidence
 from app.services.risk import (
@@ -25,12 +26,11 @@ from app.services.risk import (
     create_risk_audit_chain,
     create_risk_config,
     create_risk_governor,
-    revalidate_risk_decision,
     review_trade_risk,
+    run_portfolio_risk_governor,
 )
 from app.services.strategy import create_trade_intent_value
 from app.utils import canonical_json, create_auth_context
-
 from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
@@ -38,6 +38,32 @@ MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
 REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
 WORKFLOW_ID = "wf-22222222-2222-4222-8222-222222222222"
 CORRELATION_ID = "cor-33333333-3333-4333-8333-333333333333"
+
+
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 class _ExampleAuditStore:
@@ -72,13 +98,17 @@ class _ExampleTokenStore:
 
     def __init__(self) -> None:
         self.tokens: dict[str, Any] = {}
+        self.consumed: set[str] = set()
 
     def save_issued(
         self, token: Any, *, timeout_seconds: Decimal | None
     ) -> Literal["saved", "already_saved", "conflict"]:
         del timeout_seconds
-        self.tokens[token.token_id] = token
-        return "saved"
+        current = self.tokens.get(token.token_id)
+        if current is None:
+            self.tokens[token.token_id] = token
+            return "saved"
+        return "already_saved" if current == token else "conflict"
 
     def consume_if_active(
         self,
@@ -95,8 +125,16 @@ class _ExampleTokenStore:
         "consumed", "missing", "expired", "revoked", "already_consumed", "conflict"
     ]:
         del expected_signature, reservation_id, workflow_id, action, scope
-        del now, timeout_seconds
-        return "consumed" if token_id in self.tokens else "missing"
+        del timeout_seconds
+        token = self.tokens.get(token_id)
+        if token is None:
+            return "missing"
+        if token_id in self.consumed:
+            return "already_consumed"
+        if now >= token.expires_at:
+            return "expired"
+        self.consumed.add(token_id)
+        return "consumed"
 
     def revoke_intersecting(
         self,
@@ -108,11 +146,6 @@ class _ExampleTokenStore:
     ) -> int:
         del scope, reason, revoked_at, timeout_seconds
         return 0
-
-
-def _header(title: str) -> None:
-    """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _config() -> create_risk_config:
@@ -193,9 +226,9 @@ def _snapshot(config: create_risk_config) -> create_portfolio_risk_snapshot:
     )
 
 
-def _proposal(config: create_risk_config) -> create_proposed_trade:
-    """Build a Risk-owned proposal bound exactly to the embedded intent."""
-    intent = create_trade_intent_value(
+def _intent() -> create_trade_intent_value:
+    """Build one immutable Strategy risk-increase trade intent."""
+    return create_trade_intent_value(
         intent_id="intent-1",
         decision_id="strategy-decision-1",
         idempotency_key="intent-key-1",
@@ -223,8 +256,12 @@ def _proposal(config: create_risk_config) -> create_proposed_trade:
         rationale_ref=None,
         lineage={"strategy_config": "a" * 64},
     )
+
+
+def _proposal(config: create_risk_config) -> create_proposed_trade:
+    """Build a Risk-owned proposal bound exactly to the embedded intent."""
     return create_proposed_trade(
-        intent=intent,
+        intent=_intent(),
         account_id="account-1",
         portfolio_id="portfolio-1",
         requested_size=Decimal(1),
@@ -317,16 +354,8 @@ def _attestation(config: create_risk_config) -> create_approval_attestation:
     )
 
 
-def fr_risk_042() -> None:
-    """FR-RISK-042: Compare proposal/evidence/config/time with a prior decision
-    and invalidate material changes, expiry, skew, stale state, config mismatch,
-    or reconciliation expiry without granting action authority."""
-    _header(
-        "FR-RISK-042: Compare proposal/evidence/config/time with a prior decision and invalidate material changes, expiry, skew, stale state, config mismatch, or reconciliation expiry without granting action authority."
-    )
-    print("Risk Example 11: Decision Reuse Revalidation")
-
-    config = _config()
+def _governor(config: Any) -> Any:
+    """Construct the governor with fully injected Risk dependencies."""
     audit = create_risk_audit_chain(
         config, _ExampleAuditStore(), lambda: NOW, canonical_json
     )
@@ -338,14 +367,33 @@ def fr_risk_042() -> None:
         lambda _: b"example-risk-signing-key-material-32-bytes",
         lambda evidence: evidence.principal_id == "operator-1",
     )
-    governor = create_risk_governor(config, approvals, audit, lambda: NOW)
+    return create_risk_governor(config, approvals, audit, lambda: NOW)
 
-    proposal = _proposal(config)
+
+def fr_risk_039() -> None:
+    """FR-RISK-039: Stage 1 — Own immutable config plus injected token, audit, clock, and optional configured concurrency protection dependencies."""
+    _header(
+        "Stage 1: Risk Governor Construction - Construct Risk Governor (FR-RISK-039)"
+    )
+    config = _config()
+    governor = _governor(config)
+    print(_format_result(governor))
+    print(
+        "Data -> Risk governor initialized with injected token service and audit chain"
+    )
+
+
+def fr_risk_040() -> None:
+    """FR-RISK-040: Stage 3 — Validate and review one proposed trade in fixed precedence, include regime/projected risks/final capped size/concurrency disclosure, attach a token only when eligible and a valid optional attestation is supplied, and audit the decision. Missing attestation yields `needs_approval`, never synthetic approval."""
+    _header("Stage 3: Pre-Trade Risk Review - Review Proposed Trade (FR-RISK-040)")
+    config = _config()
+    governor = _governor(config)
     snapshot = _snapshot(config)
+
     decision = unwrap_risk_response(
         review_trade_risk(
             governor,
-            proposal,
+            _proposal(config),
             snapshot,
             _market(),
             _regime(),
@@ -354,27 +402,54 @@ def fr_risk_042() -> None:
             attestation=_attestation(config),
             now=NOW,
         ),
-        operation="risk_governor.review_trade_risk",
+        operation="review_trade_risk",
     )
-
-    reuse = unwrap_risk_response(
-        revalidate_risk_decision(decision, proposal, snapshot, config, now=NOW),
-        operation="revalidate_risk_decision",
-    )
+    print(_format_result(decision))
     print(
-        f"Unchanged proposal reusable: {reuse.reusable}, "
-        f"refresh required: {reuse.refresh_required}"
+        f"Data -> decision_id='{decision.decision_id}', state='{decision.state}', approved_size={decision.approved_size}"
     )
 
-    changed = proposal.model_copy(update={"requested_size": Decimal(2)})
-    response = revalidate_risk_decision(decision, changed, snapshot, config, now=NOW)
-    if response.status == "error" and response.error is not None:
-        print(f"Material size change blocked reuse with code: {response.error.code}")
+
+def fr_risk_041() -> None:
+    """FR-RISK-041: Stage 3 — Evaluate current portfolio compliance and return a remediation recommendation without changing execution state."""
+    _header(
+        "Stage 3: Current Portfolio Governance - Run Portfolio Risk Governor (FR-RISK-041)"
+    )
+    config = _config()
+    governor = _governor(config)
+    snapshot = _snapshot(config)
+
+    current = unwrap_risk_response(
+        run_portfolio_risk_governor(
+            governor,
+            snapshot,
+            _market(),
+            _regime(),
+            (_inactive_kill_switch(),),
+            _auth(config),
+            now=NOW,
+        ),
+        operation="run_portfolio_risk_governor",
+    )
+    print(_format_result(current))
+    print(
+        f"Data -> decision_id='{current.decision_id}', state='{current.state}', approved_size={current.approved_size}"
+    )
 
 
 def main() -> None:
-    """Run the FR-RISK-042 decision-reuse demonstration."""
-    fr_risk_042()
+    """Run all feature examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-RISK-12 — governor/ — Canonical Risk Governor Orchestration\n\n"
+        "Purpose: Review proposed trades and evaluate current portfolio compliance in fixed precedence without execution side effects.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Construct risk governor with injected approval, audit, and clock dependencies\n"
+        "-> Stage 2: Evaluate fixed precedence limits (kill-switch, evidence freshness, limits, sizing, regime)\n"
+        "-> Stage 3: Return RiskDecisionPackage for trade review or portfolio compliance"
+    )
+    fr_risk_039()
+    fr_risk_040()
+    fr_risk_041()
 
 
 if __name__ == "__main__":

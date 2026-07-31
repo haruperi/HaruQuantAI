@@ -1,8 +1,9 @@
 """Executable Risk strategy operational-eligibility usage example.
 
-Demonstrates reviewing an exact registered Strategy version for operational use
-without mutating Strategy registration state.
+Demonstrates FEAT-RISK-08 reviewing an exact registered Strategy version for operational use without mutating Strategy registration state.
 """
+
+from __future__ import annotations
 
 import sys
 from datetime import UTC, datetime, timedelta
@@ -11,7 +12,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 # Add repository root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import build_market_context_evidence
 from app.services.risk import (
@@ -30,13 +31,38 @@ from app.services.strategy import (
     get_strategy_timing_policy,
 )
 from app.utils import canonical_json
-
 from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 MARKET_REQUEST_ID = "req-cccccccc-cccc-4ccc-8ccc-cccccccccccc"
 HASH_A = "a" * 64
 HASH_B = "b" * 64
+
+
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 class _ExampleAuditStore:
@@ -83,11 +109,6 @@ class _ExampleEligibilityStore:
             return False
         self.decision = decision
         return True
-
-
-def _header(title: str) -> None:
-    """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _config() -> create_risk_config:
@@ -199,15 +220,10 @@ def _request() -> create_strategy_operational_eligibility_request:
 
 
 def fr_risk_029() -> None:
-    """FR-RISK-029: Validate a public Strategy `create_validated_strategy_ref` against the
-    exact request, produce and atomically persist
-    `StrategyOperationalEligibilityDecision v1` with scope, conditions,
-    evidence/policy lineage, issue/expiry, and suspension semantics, then append
-    its Risk audit record; never mutate Strategy state."""
+    """FR-RISK-029: Stage 3 — Validate a public Strategy `create_validated_strategy_ref` against the exact request, produce and atomically persist `StrategyOperationalEligibilityDecision v1` with scope, conditions, evidence/policy lineage, issue/expiry, and suspension semantics, then append its Risk audit record; never mutate Strategy state."""
     _header(
-        "FR-RISK-029: Validate a public Strategy `create_validated_strategy_ref` against the exact request, produce and atomically persist `StrategyOperationalEligibilityDecision v1` with scope, conditions, evidence/policy lineage, issue/expiry, and suspension semantics, then append its Risk audit record; never mutate Strategy state."
+        "Stage 3: Strategy Admission Review - Review Strategy Admission (FR-RISK-029)"
     )
-    print("Risk Example 8: Strategy Operational Eligibility")
 
     config = _config()
     store = _ExampleEligibilityStore()
@@ -227,16 +243,22 @@ def fr_risk_029() -> None:
         ),
         operation="review_strategy_admission",
     )
-    print(f"Eligibility verdict: {decision.state}, suspended: {decision.suspended}")
+    print(_format_result(decision))
     print(
-        f"Decision ID: {decision.decision_id}, "
-        f"strategy: {decision.strategy_id}@{decision.strategy_version}"
+        f"Data -> decision_id='{decision.decision_id}', state='{decision.state}', suspended={decision.suspended}"
     )
-    print(f"Durably persisted: {store.decision is not None}")
 
 
 def main() -> None:
-    """Run the FR-RISK-029 admission demonstration."""
+    """Run all feature examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-RISK-08 — admission/ — Strategy Operational Eligibility Review\n\n"
+        "Purpose: Review an exact registered Strategy version for operational use without mutating Strategy registration state.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Build untrusted eligibility request, strategy registration ref, and market evidence\n"
+        "-> Stage 2: Validate strategy registration match, policy, and market context\n"
+        "-> Stage 3: Return StrategyOperationalEligibilityDecision and persist sealed audit record"
+    )
     fr_risk_029()
 
 

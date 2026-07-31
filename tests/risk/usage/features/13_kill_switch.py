@@ -1,22 +1,22 @@
 """Executable Risk kill-switch usage example.
 
-Demonstrates authorized kill-switch activation and canonical block-state checking.
+Demonstrates FEAT-RISK-13 authorized kill-switch activation and canonical block-state checking.
 """
 
+from __future__ import annotations
+
 import sys
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, Literal
 
 # Add repository root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.risk import (
     apply_kill_switch_command,
     check_risk_kill_switch,
-    compute_config_hash,
-    create_approval_attestation,
     create_approval_token_service,
     create_kill_switch_command,
     create_kill_switch_state,
@@ -24,13 +24,38 @@ from app.services.risk import (
     create_risk_config,
 )
 from app.utils import canonical_json, create_auth_context, generate_id
-
 from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 REQUEST_ID = generate_id("req")
 WORKFLOW_ID = generate_id("wf")
 CORRELATION_ID = generate_id("cor")
+
+
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _header(title: str) -> None:
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 class _AuditStore:
@@ -120,16 +145,7 @@ class _KillStore(_AuditStore):
         return "committed"
 
 
-def _header(title: str) -> None:
-    """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
-
-
-def example_kill_switch() -> None:
-    """Demonstrate kill-switch state transitions and checks."""
-    _header("Demonstrate kill-switch state transitions and checks.")
-    print("Risk Example 4: Kill Switch State Transitions")
-
+def _setup():
     config = create_risk_config(
         profile="research",
         execution_route="none",
@@ -181,8 +197,14 @@ def example_kill_switch() -> None:
         version=1,
         updated_at=NOW,
     )
+    return config, auth, kill_store, audit, approvals, inactive_state
 
-    # 1. Activate kill switch
+
+def fr_risk_043() -> None:
+    """FR-RISK-043: Stage 3 — Apply an authorized, version-checked activation/clearance under `global > portfolio > strategy > symbol` precedence, atomically compare-and-swap canonical state with its Risk audit record in the injected store, revoke affected approvals on activation, and never mutate execution controls. Activation requires one authorized `create_auth_context` and remains immediate and unilateral. Clearance additionally requires a matching current `create_approval_attestation v1` from a different authorized principal; same-principal clearance leaves the active state unchanged and fails deterministically. Active config is explicit so permission, timeout, policy reference, and audit hashing never use implicit state."""
+    _header("Stage 3: Kill Switch Transition - Apply Kill Switch Command (FR-RISK-043)")
+    config, auth, kill_store, audit, approvals, inactive_state = _setup()
+
     command = create_kill_switch_command(
         action="activate",
         scope_level="global",
@@ -208,69 +230,20 @@ def example_kill_switch() -> None:
         ),
         operation="apply_kill_switch_command",
     )
+    print(_format_result(result_state))
     print(
-        f"Activated kill switch state: {result_state.state}, "
-        f"reason: {result_state.reason}"
+        f"Data -> state_id='{result_state.state_id}', state='{result_state.state}', version={result_state.version}"
     )
 
-    # 2. Clear only with a distinct-principal attestation.
-    clear_request_id = generate_id("req")
-    clear_workflow_id = generate_id("wf")
-    clear_correlation_id = generate_id("cor")
-    clear_auth = auth.model_copy(
-        update={
-            "request_id": clear_request_id,
-            "workflow_id": clear_workflow_id,
-            "correlation_id": clear_correlation_id,
-        }
-    )
-    clear_command = create_kill_switch_command(
-        action="clear",
-        scope_level="global",
-        portfolio_id=None,
-        strategy_id=None,
-        symbol=None,
-        reason="reconciled and independently approved",
-        requested_at=NOW,
-        request_id=clear_request_id,
-        workflow_id=clear_workflow_id,
-        correlation_id=clear_correlation_id,
-    )
-    attestation = create_approval_attestation(
-        attestation_id="clearance-attestation-1",
-        principal_id="operator-2",
-        action="risk.kill.clear",
-        scope={"global": "*"},
-        policy_ref=unwrap_risk_response(
-            compute_config_hash(config), operation="compute_config_hash"
-        ),
-        policy_version=config.policy_version,
-        issued_at=NOW,
-        expires_at=NOW + timedelta(minutes=1),
-        request_id=clear_request_id,
-        workflow_id=clear_workflow_id,
-        correlation_id=clear_correlation_id,
-    )
-    cleared_state = unwrap_risk_response(
-        apply_kill_switch_command(
-            clear_command,
-            result_state,
-            clear_auth,
-            approvals,
-            audit,
-            kill_store,
-            config,
-            attestation=attestation,
-            now=NOW,
-        ),
-        operation="apply_kill_switch_command",
-    )
-    print(f"Distinct-principal clearance state: {cleared_state.state}")
 
-    # 3. Check kill switch status
+def fr_risk_044() -> None:
+    """FR-RISK-044: Stage 3 — Return deterministic block/recovery eligibility; active or unknown applicable state blocks live risk increase, and recovery requires all applicable scopes inactive plus Trading reconciliation. Config and authenticated trace context are required so the returned canonical decision contains no invented policy or trace identity."""
+    _header("Stage 3: Kill Switch Check - Check Risk Kill Switch (FR-RISK-044)")
+    config, auth, _, _, _, inactive_state = _setup()
+
     decision_package = unwrap_risk_response(
         check_risk_kill_switch(
-            (cleared_state,),
+            (inactive_state,),
             {"portfolio_id": "portfolio-1", "symbol": "EURUSD"},
             config,
             auth,
@@ -279,53 +252,24 @@ def example_kill_switch() -> None:
         ),
         operation="check_risk_kill_switch",
     )
-    print(f"Checked kill switch decision state: {decision_package.state.value}")
-
-
-_DEMONSTRATED = False
-
-
-def _demonstrate_once() -> None:
-    """Run the bounded kill-switch demonstration once."""
-    global _DEMONSTRATED  # noqa: PLW0603
-    if not _DEMONSTRATED:
-        example_kill_switch()
-        _DEMONSTRATED = True
-
-
-def fr_risk_043() -> None:
-    """FR-RISK-043: Apply an authorized, version-checked activation/clearance
-    under `global > portfolio > strategy > symbol` precedence, atomically
-    compare-and-swap canonical state with its Risk audit record in the injected
-    store, revoke affected approvals on activation, and never mutate execution
-    controls. Activation requires one authorized `create_auth_context` and remains
-    immediate and unilateral. Clearance additionally requires a matching current
-    `create_approval_attestation v1` from a different authorized principal; same-principal
-    clearance leaves the active state unchanged and fails deterministically.
-    Active config is explicit so permission, timeout, policy reference, and audit
-    hashing never use implicit state."""
-    _header(
-        "FR-RISK-043: Apply an authorized, version-checked activation/clearance under `global > portfolio > strategy > symbol` precedence, atomically compare-and-swap canonical state with its Risk audit record in the injected store, revoke affected approvals on activation, and never mutate execution controls. Activation requires one authorized `create_auth_context` and remains immediate and unilateral. Clearance additionally requires a matching current `create_approval_attestation v1` from a different authorized principal; same-principal clearance leaves the active state unchanged and fails deterministically. Active config is explicit so permission, timeout, policy reference, and audit hashing never use implicit state."
+    print(_format_result(decision_package))
+    print(
+        f"Data -> decision_id='{decision_package.decision_id}', state='{decision_package.state.value}'"
     )
-    _demonstrate_once()
-
-
-def fr_risk_044() -> None:
-    """FR-RISK-044: Return deterministic block/recovery eligibility; active or
-    unknown applicable state blocks live risk increase, and recovery requires
-    all applicable scopes inactive plus Trading reconciliation. Config and
-    authenticated trace context are required so the returned canonical decision
-    contains no invented policy or trace identity."""
-    _header(
-        "FR-RISK-044: Return deterministic block/recovery eligibility; active or unknown applicable state blocks live risk increase, and recovery requires all applicable scopes inactive plus Trading reconciliation. Config and authenticated trace context are required so the returned canonical decision contains no invented policy or trace identity."
-    )
-    _demonstrate_once()
 
 
 def main() -> None:
-    """Run every functional-requirement demonstration for the kill switch."""
-    for demonstrate in (fr_risk_043, fr_risk_044):
-        demonstrate()
+    """Run all feature examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-RISK-13 — kill_switch/ — Risk Kill-Switch State Governance\n\n"
+        "Purpose: Authorize kill-switch activation/clearance and evaluate block/recovery eligibility under strict precedence.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Build untrusted kill-switch command, current state, auth context, and clearance attestation\n"
+        "-> Stage 2: Validate permissions, distinct dual-principal clearance, and scope precedence\n"
+        "-> Stage 3: Return updated KillSwitchState or RiskDecisionPackage block check"
+    )
+    fr_risk_043()
+    fr_risk_044()
 
 
 if __name__ == "__main__":

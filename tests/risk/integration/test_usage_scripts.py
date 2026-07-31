@@ -24,6 +24,7 @@ _USAGE_SCRIPTS = (
     "13_kill_switch.py",
     "14_scenarios.py",
     "15_reporting.py",
+    "features.py",
 )
 
 
@@ -40,7 +41,7 @@ def _documented_usage_requirements() -> dict[str, dict[str, str]]:
     )
     section_four = readme.split("## 4.", maxsplit=1)[1].split("## 5.", maxsplit=1)[0]
     feature_number: int | None = None
-    expected = {name: {} for name in _USAGE_SCRIPTS}
+    expected = {name: {} for name in _USAGE_SCRIPTS if name != "features.py"}
     for line in section_four.splitlines():
         heading = re.match(r"### 4\.(\d+) ", line)
         if heading is not None:
@@ -57,7 +58,7 @@ def _documented_usage_requirements() -> dict[str, dict[str, str]]:
 
 def test_usage_functions_reconcile_exactly_with_section_four() -> None:
     """Require one exact, documented, main-reachable function per Risk FR."""
-    usage_directory = Path(__file__).parents[1] / "usage"
+    usage_directory = Path(__file__).parents[1] / "usage" / "features"
     documented = _documented_usage_requirements()
     observed: set[str] = set()
     for script_name, requirements in documented.items():
@@ -94,7 +95,7 @@ def test_usage_functions_reconcile_exactly_with_section_four() -> None:
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)
 def test_risk_usage_script_executes(script_name: str) -> None:
     """Run one standalone Risk usage script in an isolated Python process."""
-    usage_directory = Path(__file__).parents[1] / "usage"
+    usage_directory = Path(__file__).parents[1] / "usage" / "features"
     # Argument vector is the running interpreter plus a path built from a
     # hard-coded literal name joined to this file's own directory. No external
     # or caller-supplied input reaches the process boundary.

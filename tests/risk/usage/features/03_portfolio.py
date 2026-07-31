@@ -1,15 +1,18 @@
 """Executable Risk portfolio usage example.
 
-Demonstrates building a portfolio risk snapshot from account state evidence.
+Demonstrates FEAT-RISK-03 building a portfolio risk snapshot from account state evidence.
 """
+
+from __future__ import annotations
 
 import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 # Add repository root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import build_account_state_snapshot
 from app.services.risk import (
@@ -17,10 +20,14 @@ from app.services.risk import (
     create_portfolio_state,
     create_risk_config,
 )
-
 from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
+
+
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _header(title: str) -> None:
@@ -28,16 +35,27 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
+
+
 def fr_risk_025() -> None:
-    """FR-RISK-025: Build an immutable snapshot containing pending-order-aware
-    gross/net exposure by dimension, account-currency conversions,
-    drawdown/loss state, margin/leverage, volatility, historical VaR/CVaR,
-    pair/portfolio correlation, incremental contribution, assumptions,
-    coverage, and explicit gaps."""
+    """FR-RISK-025: Stage 3 — Build an immutable snapshot containing pending-order-aware gross/net exposure by dimension, account-currency conversions, drawdown/loss state, margin/leverage, volatility, historical VaR/CVaR, pair/portfolio correlation, incremental contribution, assumptions, coverage, and explicit gaps."""
     _header(
-        "FR-RISK-025: Build an immutable snapshot containing pending-order-aware gross/net exposure by dimension, account-currency conversions, drawdown/loss state, margin/leverage, volatility, historical VaR/CVaR, pair/portfolio correlation, incremental contribution, assumptions, coverage, and explicit gaps."
+        "Stage 3: Portfolio Risk Calculation - Build Portfolio Risk Snapshot (FR-RISK-025)"
     )
-    print("Risk Example 7: Portfolio Risk Snapshot Construction")
 
     account = build_account_state_snapshot(
         account_id="account-1",
@@ -104,12 +122,20 @@ def fr_risk_025() -> None:
         build_portfolio_risk_snapshot(state, config, now=NOW),
         operation="build_portfolio_risk_snapshot",
     )
-    print("Complete calculated portfolio-risk snapshot:")
-    print(snapshot.model_dump(warnings=False, mode="json"))
+    print(_format_result(snapshot))
+    print(f"Data -> equity={snapshot.equity}, gross_exposure={snapshot.gross_exposure}")
 
 
 def main() -> None:
-    """Run the FR-RISK-025 portfolio demonstration."""
+    """Run all feature examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-RISK-03 — portfolio/ — Portfolio State Construction and Risk Snapshot Computation\n\n"
+        "Purpose: Construct immutable portfolio state from Data-owned account state evidence and compute reproducible portfolio risk snapshots.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Build untrusted portfolio state inputs\n"
+        "-> Stage 2: Validate state and config policy\n"
+        "-> Stage 3: Compute reproducible PortfolioRiskSnapshot"
+    )
     fr_risk_025()
 
 
