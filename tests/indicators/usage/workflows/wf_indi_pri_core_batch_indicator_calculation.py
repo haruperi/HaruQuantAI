@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.indicators import (
+    get_indicator,
     get_indicator_result_metadata,
     get_indicator_result_values,
     sma,
@@ -22,12 +24,33 @@ from tests.indicators.usage.workflows._support import indicator_config, live_bar
 
 WORKFLOW_ID = "WF-INDI-PRI"
 STAGES = (
-    "Accept a normalized MarketDataset and immutable IndicatorConfig.",
     "Resolve and validate the official indicator request.",
+    "Resolve and validate the request before calculation.",
     "Run the official vectorized formula in canonical row order.",
     "Preserve warmup availability, provenance, and quality evidence.",
-    "Return one atomic IndicatorResult or IndicatorError.",
+    "Return one atomic IndicatorResult.",
 )
+
+
+def _feature_header(title: str) -> None:
+    """Print the feature banner and module flow."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _stage(number: int) -> None:
@@ -39,38 +62,70 @@ def _stage(number: int) -> None:
 
 def main() -> None:
     """Run the documented input-to-output workflow."""
-    # Stage 1 — INPUT BOUNDARY: Data supplies a genuine MT5-backed MarketDataset.
+    _feature_header(
+        "WF-INDI-PRI: Core Batch Indicator Calculation\n\n"
+        "Purpose: Execute the canonical batch pipeline from normalized input through "
+        "official validation and indicator calculation, returning one atomic IndicatorResult.\n\n"
+        "Module flow:\n"
+        "-> dataset + config\n"
+        "-> resolve and validate indicator request\n"
+        "-> execute official formula and return IndicatorResult"
+    )
+    print("INPUT BOUNDARY — dataset + config")
+    # Stage 1
     _stage(1)
     dataset = live_bars()
+    spec = unwrap_indicator_response(get_indicator("sma"))
     config = indicator_config("sma", 5)
-    print_market_evidence(dataset)
-
-    # Stage 2: Resolve and validate before calculation.
-    _stage(2)
-    spec = unwrap_indicator_response(validate_indicator("sma", dataset, config))
-    print("Validated:", spec.indicator_id, spec.formula_version)
-
-    # Stage 3: Execute the official formula.
-    _stage(3)
-    result = unwrap_indicator_response(
-        sma(dataset, period=5, source="close", config=config)
+    print(_format_result(spec))
+    print(
+        f"Data -> indicator={spec.indicator_id}, formula={spec.formula_version}, "
+        f"cache_limit={len(dataset)}"
     )
-    metadata = get_indicator_result_metadata(result)
+    print_market_evidence(dataset)
+    # Stage 2
+    _stage(2)
+    resolved_spec = unwrap_indicator_response(
+        validate_indicator("sma", dataset, config)
+    )
+    print(_format_result(resolved_spec))
+    print(f"Data -> validated_indicator={resolved_spec.indicator_id}")
+    # Stage 3
+    _stage(3)
+    result = unwrap_indicator_response(sma(dataset, period=5, config=config))
+    result_values = get_indicator_result_values(result)
+    unavailable_rows = int(result_values["unavailable_reason"].notna().sum())
+    print(_format_result(result))
+    print(f"Data -> rows={len(result_values)}, unavailable_rows={unavailable_rows}")
     print_indicator_evidence(result, label="Calculated SMA workflow rows")
-
-    # Stage 4: Inspect propagated evidence.
+    # Stage 4
     _stage(4)
+    metadata = get_indicator_result_metadata(result)
+    manifest = metadata["manifest"]
+    print(_format_result(manifest))
+    print(
+        "Data -> manifest_quality=",
+        manifest["quality_status"],
+        ", source_timeframe=",
+        manifest["source_timeframe"],
+    )
     print(
         "Evidence:",
-        metadata["manifest"].get("quality_status"),
-        metadata["manifest"]["source_timeframe"],
-        get_indicator_result_values(result)["unavailable_reason"].notna().sum(),
+        manifest["quality_status"],
+        manifest["source_timeframe"],
+        result_values["unavailable_reason"].notna().sum(),
         "unavailable rows",
     )
-
-    # Stage 5 — OUTPUT BOUNDARY: Return the typed IndicatorResult.
+    # Stage 5
     _stage(5)
-    print("Output: IndicatorResult", metadata["manifest"]["output_checksum"])
+    print("OUTPUT BOUNDARY — atomic IndicatorResult")
+    print(_format_result(result))
+    print(
+        "Output: ",
+        type(result).__name__,
+        manifest["output_checksum"],
+    )
+    print(f"Data -> unavailable_rows={unavailable_rows}")
 
 
 if __name__ == "__main__":

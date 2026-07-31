@@ -23,6 +23,7 @@ _USAGE_SCRIPTS = (
     "14_evidence.py",
     "15_audit.py",
     "16_research_sources.py",
+    "features.py",
 )
 
 

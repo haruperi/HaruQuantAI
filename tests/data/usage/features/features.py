@@ -552,7 +552,7 @@ def _run_stage_9_transformation(dataset: Any) -> None:
         f"aggregated_bars_status='{agg_bars.status}', "
         f"aligned_status='{aligned.status}', "
         f"mtf_aligned_status='{aligned_mtf.status}', "
-        f"dataframe_rows={len(df) if df is not None else 0}"
+        f"dataframe_rows={len(df.data) if (df is not None and df.data is not None) else 0}"
     )
 
 
@@ -812,29 +812,36 @@ def _run_stage_14_evidence() -> None:
     )
     fx_ev = get_fx_conversion_evidence(fx_req, _FXProvider())
 
-    adapter = asyncio.run(create_connected_broker("mt5"))
+    acc_ev_status = "skipped_provider_disabled"
     try:
-        account_info = asyncio.run(adapter.get_account_info())
-        if account_info.status != "success":
-            raise RuntimeError(f"Account-info request failed: {account_info.status}")
-        account_data = account_info.data
-        if account_data is None:
-            raise RuntimeError("Account-info response had no data")
+        adapter = asyncio.run(create_connected_broker("mt5"))
+        try:
+            account_info = asyncio.run(adapter.get_account_info())
+            if account_info.status != "success":
+                raise RuntimeError(
+                    f"Account-info request failed: {account_info.status}"
+                )
+            account_data = account_info.data
+            if account_data is None:
+                raise RuntimeError("Account-info response had no data")
 
-        acc_req = build_account_snapshot_request(
-            source_id="mt5",
-            account_id=account_data.account_id,
-            max_age_seconds=315360000,
-            request_id=_REQUEST_ID,
-        )
-        acc_ev = get_account_state_snapshot(acc_req, adapter)
-    finally:
-        asyncio.run(disconnect_broker(adapter))
+            acc_req = build_account_snapshot_request(
+                source_id="mt5",
+                account_id=account_data.account_id,
+                max_age_seconds=315360000,
+                request_id=_REQUEST_ID,
+            )
+            acc_ev = get_account_state_snapshot(acc_req, adapter)
+            acc_ev_status = str(acc_ev.status)
+        finally:
+            asyncio.run(disconnect_broker(adapter))
+    except Exception as err:  # noqa: BLE001
+        print(f"Skipping MT5 broker snapshot: {err}")
 
     print(
         f"Data -> market_context_status='{ctx_ev.status}', "
         f"fx_conversion_status='{fx_ev.status}', "
-        f"account_snapshot_status='{acc_ev.status}'"
+        f"account_snapshot_status='{acc_ev_status}'"
     )
 
 

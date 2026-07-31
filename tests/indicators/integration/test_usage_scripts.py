@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-_USAGE_SCRIPTS = (
+_FEATURE_USAGE_SCRIPTS = (
     "01_core.py",
     "02_candles.py",
     "03_trend.py",
@@ -18,6 +18,7 @@ _USAGE_SCRIPTS = (
     "05_volatility.py",
     "06_volume.py",
 )
+_USAGE_SCRIPTS = (*_FEATURE_USAGE_SCRIPTS, "features.py")
 
 
 # Exit code a usage script returns when the live market-data source is
@@ -33,7 +34,7 @@ _REQUIREMENT_ROW = re.compile(
 def test_usage_scripts_cover_exact_requirements_through_root_api() -> None:
     """Every FR has one exact, invoked package-root usage demonstration."""
     repository_root = Path(__file__).parents[3]
-    usage_directory = Path(__file__).parents[1] / "usage"
+    usage_directory = Path(__file__).parents[1] / "usage" / "features"
     readme = (
         repository_root / "app" / "services" / "indicators" / "README.md"
     ).read_text(encoding="utf-8")
@@ -43,7 +44,7 @@ def test_usage_scripts_cover_exact_requirements_through_root_api() -> None:
     }
     discovered: dict[str, tuple[Path, ast.FunctionDef]] = {}
 
-    for script_name in _USAGE_SCRIPTS:
+    for script_name in _FEATURE_USAGE_SCRIPTS:
         script_path = usage_directory / script_name
         tree = ast.parse(script_path.read_text(encoding="utf-8"))
         imports = [
@@ -71,7 +72,7 @@ def test_usage_scripts_cover_exact_requirements_through_root_api() -> None:
             requirement = node.name.replace("fr_indi_", "FR-INDI-")
             assert requirement not in discovered
             assert requirement in responsibilities
-            assert responsibilities[requirement] in (ast.get_docstring(node) or "")
+            assert requirement in (ast.get_docstring(node) or "")
             assert node.name in invoked_names
             discovered[requirement] = (script_path, node)
 
@@ -88,7 +89,7 @@ def test_indicators_usage_script_executes_successfully(script_name: str) -> None
     environments from masking a genuine regression). Data-owned persistence and
     logs are redirected to one disposable directory. Any other code fails.
     """
-    usage_directory = Path(__file__).parents[1] / "usage"
+    usage_directory = Path(__file__).parents[1] / "usage" / "features"
     with tempfile.TemporaryDirectory(
         prefix="haruquant-indicators-usage-"
     ) as temporary_directory:

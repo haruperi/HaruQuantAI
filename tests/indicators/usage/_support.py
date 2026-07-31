@@ -1,8 +1,20 @@
+# ruff: noqa: E402
 """Shared response helpers for Indicators usage evidence."""
 
 from __future__ import annotations
 
+import os
+import pathlib
+import tempfile
 from typing import Any, TypeVar
+
+_data_dir = str(pathlib.Path(tempfile.gettempdir()) / "haruquant-data")
+pathlib.Path(_data_dir).mkdir(exist_ok=True, parents=True)
+os.environ.setdefault("DATA_DIR", _data_dir)
+os.environ.setdefault("DATABASE_URL", "sqlite:///usage.db")
+os.environ.setdefault("ENVIRONMENT", "dev")
+os.environ.setdefault("WRITE_LOCK_LEASE_SECONDS", "30")
+os.environ.setdefault("SQLITE_BUSY_TIMEOUT_SECONDS", "1")
 
 from app.services.data import to_ohlcv_dataframe, unwrap_data_response
 from app.services.indicators import get_indicator_result_values

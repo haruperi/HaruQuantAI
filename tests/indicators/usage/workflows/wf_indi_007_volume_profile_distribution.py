@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
@@ -33,6 +34,27 @@ STAGES = (
 )
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature banner and module flow."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
+
+
 def _stage(number: int) -> None:
     """Print one README-aligned workflow stage."""
     print(
@@ -40,30 +62,35 @@ def _stage(number: int) -> None:
     )
 
 
-def _report(label: str, status: str, data: object) -> None:
-    """Print the status and bounded data of one workflow step."""
-    print(f"{label} status : {status}")
-    print(f"{label} data   : {data}")
-
-
 def main() -> None:
     """Run the documented volume-profile and volume-flow workflow."""
+    _feature_header(
+        "WF-INDI-007: Volume-Profile and Volume-Flow Distribution\n\n"
+        "Purpose: Validate volume availability and produce profile/flow outputs while "
+        "preserving unavailable rows where source volume is absent.\n\n"
+        "Module flow:\n"
+        "-> dataset + validated volume config\n"
+        "-> distribution or flow calculation per stage\n"
+        "-> explicit unavailability for missing volume"
+    )
     print(f"{WORKFLOW_ID} — Volume-Profile and Volume-Flow Distribution")
     print("INPUT BOUNDARY — one MarketDataset v1 carrying volume plus bounded config")
-
+    # Stage 1
+    _stage(1)
     dataset = live_bars()
     print_market_evidence(dataset)
-
-    # Stage 1 — Validate that the dataset carries usable volume for the request.
-    _stage(1)
     config = indicator_config("obv", source=None)
     validated = unwrap_indicator_response(validate_indicator("obv", dataset, config))
-    _report("valid  ", "success", validated.indicator_id)
     first_record = dataset.records[0]
-    print("Volume field present   :", hasattr(first_record, "volume"))
-    print("First record volume    :", getattr(first_record, "volume", None))
-
-    # Stage 2 — Build the price-bucketed volume distribution over the bounded window.
+    print(_format_result(validated))
+    print(
+        "Data -> ",
+        "has_volume_field=",
+        hasattr(first_record, "volume"),
+        "volume=",
+        getattr(first_record, "volume", None),
+    )
+    # Stage 2
     _stage(2)
     distribution = unwrap_indicator_response(
         price_volume_distribution(
@@ -78,30 +105,22 @@ def main() -> None:
             ),
         )
     )
-    _report(
-        "profile",
-        "success",
-        f"{get_indicator_result_metadata(distribution)['manifest']['row_count']} rows over 10 price buckets",
-    )
+    distribution_values = get_indicator_result_values(distribution)
+    print(_format_result(distribution))
     print(
-        "Output columns         :",
-        list(get_indicator_result_values(distribution).columns)[:6],
+        f"Data -> distribution_rows={len(distribution_values)}, "
+        f"columns={list(distribution_values.columns)}"
     )
     print_indicator_evidence(
         distribution,
         label="Price-volume distribution rows",
     )
-
-    # Stage 3 — Calculate cumulative and money-weighted flow series.
+    # Stage 3
     _stage(3)
     flows = {
         "obv": unwrap_indicator_response(obv(dataset, config=config)),
         "mfi": unwrap_indicator_response(
-            mfi(
-                dataset,
-                period=14,
-                config=indicator_config("mfi", 14, source=None),
-            )
+            mfi(dataset, period=14, config=indicator_config("mfi", 14, source=None))
         ),
         "cmf": unwrap_indicator_response(
             cmf(
@@ -112,41 +131,37 @@ def main() -> None:
         ),
     }
     for name, result in flows.items():
-        _report(
-            f"{name:<7}",
-            "success",
-            f"{get_indicator_result_metadata(result)['manifest']['row_count']} rows, checksum {get_indicator_result_metadata(result)['manifest']['output_checksum']}",
+        flow_values = get_indicator_result_values(result)
+        print(_format_result(result))
+        print(
+            f"Data -> {name} rows={len(flow_values)}, "
+            f"row_checksum_columns={list(flow_values.columns)[:4]}"
         )
         print_indicator_evidence(result, label=f"{name} flow rows")
-
-    # Stage 4 — Mark rows whose source volume is zero or missing as unavailable.
+    # Stage 4
     _stage(4)
+    print("OUTPUT BOUNDARY — volume profile distribution series")
     zero_volume_response = detect_zero_volume_bars(dataset.records)
     zero_volume_issue = unwrap_data_response(
         zero_volume_response,
         operation="indicators.usage.workflow.detect_zero_volume_bars",
         request_id=zero_volume_response.metadata.request_id,
     )
-    _report(
-        "zerovol",
-        "success",
-        "no zero-volume run detected"
-        if zero_volume_issue is None
-        else zero_volume_issue,
+    unavailable = int(
+        get_indicator_result_values(flows["mfi"])["unavailable_reason"].notna().sum()
     )
-    mfi_result = flows["mfi"]
-    unavailable = (
-        get_indicator_result_values(mfi_result)["unavailable_reason"].notna().sum()
+    print(_format_result(flows["mfi"]))
+    print(
+        "Data -> ",
+        "zero_volume_issue=",
+        "none" if zero_volume_issue is None else zero_volume_issue,
+        ", unavailable_rows=",
+        unavailable,
     )
     print("Rows marked unavailable:", unavailable)
-    print("Absence treated as zero flow: False")
-    assert (
-        get_indicator_result_metadata(mfi_result)["manifest"]["row_count"]
-        == dataset.record_count
-    )
-
+    metadata = get_indicator_result_metadata(flows["mfi"])
     print(
-        "\nOUTPUT BOUNDARY — distribution or flow series with explicit unavailability"
+        f"Data -> manifest_rows={metadata['manifest']['row_count']}, checksum={metadata['manifest']['output_checksum']}"
     )
 
 

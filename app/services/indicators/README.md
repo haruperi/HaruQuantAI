@@ -245,12 +245,12 @@ feature IDs, and each ordinal matches its usage-program number.
 
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
-| Completed | `FEAT-INDI-01` Indicator Contracts, Registry Discovery and Request Validation | `core/` | `build_indicator_config`, `join_indicator_result`, `get_indicator_result_values`, discovery, capability, `get_warmup_requirement`, and validation declarations | `FR-INDI-001`–`FR-INDI-014`; exact declarations in Section 4.1 | `tests/indicators/usage/01_core.py` |
-| Completed | `FEAT-INDI-02` Candlestick Pattern Labelling | `candles/` | `doji`, `engulfing`, `pinbar`, `inside_bar` | `FR-INDI-031`–`FR-INDI-034`; exact declarations in Section 4.6 | `tests/indicators/usage/02_candles.py` |
-| Completed | `FEAT-INDI-03` Trend and Moving-Average Calculation | `trend/` | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag` | `FR-INDI-015`–`FR-INDI-017`, `FR-INDI-023`–`FR-INDI-025`, `FR-INDI-035`; exact declarations in Section 4.2 | `tests/indicators/usage/03_trend.py` |
-| Completed | `FEAT-INDI-04` Momentum Oscillator Calculation | `momentum/` | `rsi`, `williams_r` | `FR-INDI-021`, `FR-INDI-022`; exact declarations in Section 4.4 | `tests/indicators/usage/04_momentum.py` |
-| Completed | `FEAT-INDI-05` Volatility and Range Calculation | `volatility/` | `atr`, `adr`, `rolling_volatility`, `standard_deviation` | `FR-INDI-018`–`FR-INDI-020`, `FR-INDI-026`; exact declarations in Section 4.3 | `tests/indicators/usage/05_volatility.py` |
-| Completed | `FEAT-INDI-06` Volume-Flow and Price-Volume Calculation | `volume/` | `cmf`, `obv`, `mfi`, `price_volume_distribution` | `FR-INDI-027`–`FR-INDI-030`; exact declarations in Section 4.5 | `tests/indicators/usage/06_volume.py` |
+| Completed | `FEAT-INDI-01` Indicator Contracts, Registry Discovery and Request Validation | `core/` | `build_indicator_config`, `join_indicator_result`, `get_indicator_result_values`, discovery, capability, `get_warmup_requirement`, and validation declarations | `FR-INDI-001`–`FR-INDI-014`; exact declarations in Section 4.1 | `tests/indicators/usage/features/01_core.py` |
+| Completed | `FEAT-INDI-02` Candlestick Pattern Labelling | `candles/` | `doji`, `engulfing`, `pinbar`, `inside_bar` | `FR-INDI-031`–`FR-INDI-034`; exact declarations in Section 4.6 | `tests/indicators/usage/features/02_candles.py` |
+| Completed | `FEAT-INDI-03` Trend and Moving-Average Calculation | `trend/` | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag` | `FR-INDI-015`–`FR-INDI-017`, `FR-INDI-023`–`FR-INDI-025`, `FR-INDI-035`; exact declarations in Section 4.2 | `tests/indicators/usage/features/03_trend.py` |
+| Completed | `FEAT-INDI-04` Momentum Oscillator Calculation | `momentum/` | `rsi`, `williams_r` | `FR-INDI-021`, `FR-INDI-022`; exact declarations in Section 4.4 | `tests/indicators/usage/features/04_momentum.py` |
+| Completed | `FEAT-INDI-05` Volatility and Range Calculation | `volatility/` | `atr`, `adr`, `rolling_volatility`, `standard_deviation` | `FR-INDI-018`–`FR-INDI-020`, `FR-INDI-026`; exact declarations in Section 4.3 | `tests/indicators/usage/features/05_volatility.py` |
+| Completed | `FEAT-INDI-06` Volume-Flow and Price-Volume Calculation | `volume/` | `cmf`, `obv`, `mfi`, `price_volume_distribution` | `FR-INDI-027`–`FR-INDI-030`; exact declarations in Section 4.5 | `tests/indicators/usage/features/06_volume.py` |
 
 Module folders are named for the analytical family they calculate. Within each
 folder every file implements exactly one official indicator, and every public
@@ -1563,21 +1563,23 @@ tests/indicators/
 │   ├── test_warmup_coordination.py
 │   ├── test_multi_timeframe.py
 │   ├── test_registry_workflow.py
-│   └── test_usage_scripts.py           # Executes each usage/NN_*.py program
+│   └── test_usage_scripts.py           # Executes each usage/features/*.py program
 └── usage/                              # Runnable real-data example scripts (not pytest)
-    ├── conftest.py                      # Excludes NN_*.py scripts from pytest collection
-    ├── 01_core.py
-    ├── 02_candles.py
-    ├── 03_trend.py
-    ├── 04_momentum.py
-    ├── 05_volatility.py
-    └── 06_volume.py
+    └── features/                       # Standalone per-feature and full-domain programs
+        ├── conftest.py                  # Excludes *.py scripts from pytest collection
+        ├── 01_core.py
+        ├── 02_candles.py
+        ├── 03_trend.py
+        ├── 04_momentum.py
+        ├── 05_volatility.py
+        ├── 06_volume.py
+        └── features.py                 # Full-domain pipeline program
 ```
 
-The `usage/NN_*.py` files are standalone, runnable example scripts that
+The `usage/features/*.py` files are standalone, runnable example scripts that
 exercise the public API against real market data and real connections; they are
 deliberately not `test_`-prefixed and are excluded from pytest collection by
-`usage/conftest.py`. Their successful execution (or explicit skip when live data
+`usage/features/conftest.py`. Their successful execution (or explicit skip when live data
 is unavailable) is verified by
 `tests/indicators/integration/test_usage_scripts.py`.
 
@@ -1594,7 +1596,7 @@ uv run pytest tests/indicators/integration
 # Usage examples are runnable scripts, verified (executed / skipped) by the
 # integration runner below, and may also be run directly against live data:
 uv run pytest tests/indicators/integration/test_usage_scripts.py
-# e.g. uv run python tests/indicators/usage/01_core.py
+# e.g. uv run python tests/indicators/usage/features/features.py
 
 uv run pytest -o addopts='' tests/indicators --cov=app.services.indicators --cov-branch --cov-fail-under=80
 ```

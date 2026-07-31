@@ -218,9 +218,13 @@ class _CTraderNetworkClient:
             for handler in tuple(self._event_handlers):
                 if loop.is_closed():
                     return
+
+                def _call(h: Any = handler) -> Any:
+                    return h(extracted)
+
                 self._post_to_asyncio_loop(
                     loop,
-                    lambda handler=handler: handler(extracted),
+                    _call,
                     callback_id="message",
                 )
 

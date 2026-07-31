@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
@@ -25,6 +26,27 @@ STAGES = (
 )
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature banner and module flow."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
+
+
 def _stage(number: int) -> None:
     """Print one README-aligned workflow stage."""
     print(
@@ -32,35 +54,30 @@ def _stage(number: int) -> None:
     )
 
 
-def _report(label: str, status: str, data: object) -> None:
-    """Print the status and bounded data of one workflow step."""
-    print(f"{label} status : {status}")
-    print(f"{label} data   : {data}")
-
-
 def main() -> None:
     """Run the documented capability-matrix introspection workflow."""
-    print(f"{WORKFLOW_ID} — Capability-Matrix Introspection")
-    print(
-        "INPUT BOUNDARY — planning caller queries the registry before requesting history"
+    _feature_header(
+        "WF-INDI-008: Capability-Matrix Introspection\n\n"
+        "Purpose: Read immutable capability metadata and resolve per-indicator warmup "
+        "requirements to size upstream history before calculation.\n\n"
+        "Module flow:\n"
+        "-> register and capability discovery\n"
+        "-> resolve indicator warmup requirements\n"
+        "-> derive upstream history requirement"
     )
-
-    # Stage 1 — Enumerate the official indicator set.
+    print(f"{WORKFLOW_ID} — Capability-Matrix Introspection")
+    print("INPUT BOUNDARY — capability and warmup query")
+    # Stage 1
     _stage(1)
     specs = unwrap_indicator_response(list_indicators())
-    _report("registry", "success", f"{len(specs)} official indicators")
-    print("First identifiers      :", [spec.indicator_id for spec in specs[:6]])
-
-    # Stage 2 — Read declared capabilities and required input fields.
+    print(_format_result(specs))
+    print("Data -> registered=", len(specs))
+    # Stage 2
     _stage(2)
     matrix = unwrap_indicator_response(get_capability_matrix())
-    _report("matrix  ", "success", f"{len(matrix)} capability records")
-    sample = matrix[0]
-    print("Record keys            :", list(sample.keys()))
-    print("Sample record          :", dict(sample))
-    assert len(matrix) == len(specs)
-
-    # Stage 3 — Resolve the exact warmup cost for each planned indicator and config.
+    print(_format_result(matrix))
+    print("Data -> capability_records=", len(matrix))
+    # Stage 3
     _stage(3)
     planned = (("sma", 5), ("rsi", 14), ("cmf", 20))
     warmups: dict[str, object] = {}
@@ -75,29 +92,31 @@ def main() -> None:
             get_warmup_requirement(indicator_id, config)
         )
         warmups[indicator_id] = requirement
-        _report(
-            f"{indicator_id:<8}",
-            "success",
-            f"period {period}, spec v{spec.formula_version}, warmup {requirement}",
+        print(_format_result(requirement))
+        print(
+            "Data ->",
+            indicator_id,
+            "minimum=",
+            requirement.minimum_observations,
+            "formula=",
+            spec.formula_version,
         )
-
-    # Stage 4 — Size the upstream history request from the largest resolved warmup.
+    # Stage 4
     _stage(4)
+    print("OUTPUT BOUNDARY — capability matrix and warmup requirements")
     minimum_bars = [
         getattr(requirement, "minimum_observations", None)
         for requirement in warmups.values()
     ]
     resolved = [value for value in minimum_bars if isinstance(value, int)]
+    print(_format_result(warmups))
     if resolved:
         required = max(resolved)
-        print("Per-indicator minimums :", resolved)
-        print("History rows to request:", required)
+        print("Data -> per-indicator minimums:", resolved)
+        print("Data -> requested_rows=", required)
     else:
-        print("Per-indicator warmups  :", list(warmups.values()))
-        print("History sizing uses the largest declared warmup requirement.")
-    print("No calculation performed and no data fetched: True")
-
-    print("\nOUTPUT BOUNDARY — capability matrix plus per-indicator WarmupRequirement")
+        print("Data -> per-indicator_warmups=", list(warmups.values()))
+        print("Data -> upstream rows derived from largest resolved warmup requirement")
 
 
 if __name__ == "__main__":

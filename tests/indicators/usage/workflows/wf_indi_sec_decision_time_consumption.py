@@ -7,6 +7,7 @@ import sys
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
@@ -39,8 +40,29 @@ STAGES = (
     "Calculate the requested official indicator.",
     "Qualify values by source availability at decision time.",
     "Pass the typed IndicatorResult through Strategy's public boundary.",
-    "Return the Strategy envelope or a documented domain error.",
+    "Return the Strategy's typed response and concrete signal rows.",
 )
+
+
+def _feature_header(title: str) -> None:
+    """Print the feature banner and module flow."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _stage(number: int) -> None:
@@ -126,11 +148,7 @@ def _strategy_runtime(dataset: object, indicator: object) -> tuple[object, objec
         strategy_id=manifest.strategy_id,
         strategy_version=manifest.strategy_version,
         config_schema_version=manifest.config_schema_version,
-        normalized_parameters={
-            "rsi_period": 2,
-            "oversold": 30,
-            "overbought": 70,
-        },
+        normalized_parameters={"rsi_period": 2, "oversold": 30, "overbought": 70},
         config_hash=hashlib.sha256(b"rsi=2;oversold=30;overbought=70").hexdigest(),
         policy_version=policy.policy_version,
         request_id=request_id,
@@ -165,9 +183,9 @@ def _strategy_runtime(dataset: object, indicator: object) -> tuple[object, objec
         strategy_id=manifest.strategy_id,
         strategy_version=manifest.strategy_version,
         module_path=manifest.module_path,
-        source_hash=source_hash,
-        artifact_hash=artifact_hash,
-        dependency_hash=dependency_hash,
+        source_hash=manifest.source_hash,
+        artifact_hash=manifest.artifact_hash,
+        dependency_hash=manifest.dependency_hash,
     )
     return (
         evaluate_strategy_signals(
@@ -184,27 +202,38 @@ def _strategy_runtime(dataset: object, indicator: object) -> tuple[object, objec
 
 def main() -> None:
     """Run the documented input-to-output workflow."""
+    _feature_header(
+        "WF-INDI-SEC: Decision-Time Consumption\n\n"
+        "Purpose: Consume Indicators output at decision time through Strategy, "
+        "preserving availability boundaries and returning typed strategy signals.\n\n"
+        "Module flow:\n"
+        "-> dataset + indicator request\n"
+        "-> indicator availability-aware calculation\n"
+        "-> strategy signal envelope"
+    )
     print(f"{WORKFLOW_ID} — Decision-Time Consumption")
     print("INPUT BOUNDARY — genuine MT5 bars and official RSI evidence")
-
-    # Stage 1 — accept genuine MT5-backed Data evidence.
+    # Stage 1
     _stage(1)
     dataset = live_bars()
     print_market_evidence(dataset)
-
-    # Stage 2 — calculate the official indicator values.
+    # Stage 2
     _stage(2)
     indicator = unwrap_indicator_response(rsi(dataset, period=2))
+    print(_format_result(indicator))
+    print(
+        f"Data -> indicator_rows={indicator.record_count}, available_at={dataset.available_at}"
+    )
     print_indicator_evidence(indicator, label="Decision-time RSI rows")
-
-    # Stage 3 — establish and apply the decision-time policy.
+    # Stage 3
     _stage(3)
     outcome, timing = _strategy_runtime(dataset, indicator)
-    print("Timing policy:", timing.value)
-
-    # Stage 4 — execute the concrete Strategy evaluator.
+    print(_format_result(outcome))
+    print(f"Data -> timing_policy={timing.value}")
+    # Stage 4
     _stage(4)
     signals = unwrap_indicator_response(outcome)
+    print(_format_result(signals))
     signal_frame = pd.DataFrame(
         {
             "signal_name": [signal.signal_name for signal in signals],
@@ -214,13 +243,15 @@ def main() -> None:
             "facts": [dict(signal.facts) for signal in signals],
         }
     )
-    print("Concrete Decomposing Trade signal rows:")
+    print(
+        f"Data -> signal_rows={len(signal_frame)}, active_signals={signal_frame['active'].sum()}"
+    )
     print(signal_frame.to_string(index=False))
-
-    # Stage 5 — expose Strategy's typed response and genuine signal rows.
+    # Stage 5
     _stage(5)
     print("OUTPUT BOUNDARY — Strategy response carrying concrete signal rows")
-    print("Output:", outcome.status, len(signals), "genuine RSI-derived signals")
+    print(_format_result(outcome))
+    print(f"Data -> output_rows={len(signal_frame)}")
 
 
 if __name__ == "__main__":
