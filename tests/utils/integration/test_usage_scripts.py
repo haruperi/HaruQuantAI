@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-_USAGE_DIRECTORY = Path(__file__).parents[1] / "usage"
+_USAGE_DIRECTORY = Path(__file__).parents[1] / "usage" / "features"
 _EXPECTED_OUTPUT = {
     "01_contracts.py": "Data -> principal_id='service-demo'",
     "02_errors.py": "Data -> routed_code='INTERNAL_ERROR'",
@@ -15,6 +15,7 @@ _EXPECTED_OUTPUT = {
     "07_settings.py": "Data -> environment='test', runtime_profile='research'",
     "08_logging.py": "Data -> non_empty_log_files=",
     "09_standard_responses.py": "Data -> immutable_mapping_keys=",
+    "features.py": "Data -> full_domain_pipeline_status='completed'",
 }
 
 

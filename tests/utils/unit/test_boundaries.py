@@ -271,7 +271,7 @@ def test_features_register_contains_every_public_function() -> None:
 def test_each_feature_has_one_standalone_usage_program_covering_public_calls() -> None:
     """Require one non-pytest program that calls every operation in each feature."""
     source_root = Path(app.utils.__file__).parent
-    usage_root = source_root.parents[1] / "tests" / "utils" / "usage"
+    usage_root = source_root.parents[1] / "tests" / "utils" / "usage" / "features"
     usage_files = {
         path.name: path for path in usage_root.glob("[0-9][0-9]_*.py") if path.is_file()
     }
