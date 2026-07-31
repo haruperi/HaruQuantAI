@@ -13,13 +13,14 @@ _USAGE_SCRIPTS = (
     "03_metrics.py",
     "04_reports.py",
     "05_dashboards.py",
+    "features.py",
 )
 
 
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)
 def test_analytics_usage_script_executes(script_name: str) -> None:
     """Run one standalone Analytics usage script in an isolated Python process."""
-    usage_directory = Path(__file__).parents[1] / "usage"
+    usage_directory = Path(__file__).parents[1] / "usage" / "features"
     completed = subprocess.run(  # noqa: S603 - fixed repository-controlled command
         [sys.executable, str(usage_directory / script_name)],
         check=False,

@@ -1,15 +1,18 @@
 """Executable Analytics dashboards usage example.
 
-Demonstrates building bounded DashboardPayload presentation projections.
+Demonstrates FEAT-ANLT-05 building bounded DashboardPayload presentation projections and series truncation.
 """
+
+from __future__ import annotations
 
 import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 # Add repository root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.analytics import (
     AnalyticsRunConfig,
@@ -27,9 +30,30 @@ from tests.analytics.usage._support import unwrap
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _config() -> AnalyticsRunConfig:
@@ -83,12 +107,9 @@ def _trade() -> ClosedTrade:
     )
 
 
-def example_dashboards() -> None:
-    """Demonstrate Analytics dashboard projections."""
-    _header("Demonstrate Analytics dashboard projections.")
-    print("Analytics Example 5: Dashboard Payloads and Series Truncation")
-
-    # 1. Truncate series
+def fr_anlt_045() -> None:
+    """FR-ANLT-045: Stage 3 — Truncate series while preserving key extrema and endpoints."""
+    _header("Stage 3: Series Truncation - Truncate Series (FR-ANLT-045)")
     points = tuple(
         {"timestamp": NOW + timedelta(minutes=i), "value": float(i % 5)}
         for i in range(20)
@@ -96,12 +117,15 @@ def example_dashboards() -> None:
     truncation_response = truncate_series(points, max_points=6)
     selected = unwrap(truncation_response)
     metadata = truncation_response.metadata.extensions["truncation"]
+    print(_format_result(truncation_response))
     print(
-        f"Original points: {len(points)}, Truncated points: {len(selected)}, "
-        f"Truncated flag: {metadata['truncated']}"
+        f"Data -> original_points={len(points)}, truncated_points={len(selected)}, is_truncated={metadata['truncated']}"
     )
 
-    # 2. Build dashboard payload from performance report
+
+def fr_anlt_046() -> None:
+    """FR-ANLT-046: Stage 3 — Project PerformanceReport into bounded DashboardPayload v1."""
+    _header("Stage 3: Dashboard Projection - Build Dashboard Payload (FR-ANLT-046)")
     config = _config()
     trade = _trade()
     source = {
@@ -131,43 +155,27 @@ def example_dashboards() -> None:
             config=config,
         )
     )
-
-    payload = unwrap(build_dashboard_payload(report))
-    payload = DashboardPayload(**dict(payload.__dict__))
-    print(f"Dashboard Payload schema: {payload.schema_id}")
-    print(f"Non-binding: {payload.non_binding}")
-
-
-def fr_anlt_045() -> None:
-    """FR-ANLT-045.
-
-    The system shall deterministically bound a series without exceeding the
-    approved limit, preserving endpoints and approved extrema/trough/high/warning
-    points by defined priority and returning original/returned counts, method,
-    reason, and truncation status.
-    """
-    _header(
-        "FR-ANLT-045. The system shall deterministically bound a series without exceeding the approved limit, preserving endpoints and approved extrema/trough/high/warning points by defined priority and returning original/returned counts, method, reason, and truncation status."
-    )
-    example_dashboards()
-
-
-def fr_anlt_046() -> None:
-    """FR-ANLT-046.
-
-    The system shall project only approved `PerformanceReport` sections into
-    finite versioned summary, equity, drawdown, warning, and quality-flag payloads
-    with units/status metadata and no metric recomputation.
-    """
-    _header(
-        "FR-ANLT-046. The system shall project only approved `PerformanceReport` sections into finite versioned summary, equity, drawdown, warning, and quality-flag payloads with units/status metadata and no metric recomputation."
-    )
-    example_dashboards()
+    payload_resp = build_dashboard_payload(report)
+    payload_dto = unwrap(payload_resp)
+    payload = DashboardPayload(**dict(payload_dto.__dict__))
+    print(_format_result(payload_resp))
+    print(f"Data -> schema_id='{payload.schema_id}', non_binding={payload.non_binding}")
 
 
 def main() -> None:
-    """Run the bounded demonstration shared by every dashboard requirement."""
-    example_dashboards()
+    """Run all feature examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-ANLT-05 — dashboards/ — Bounded Report Projection\n\n"
+        "Purpose: Project validated PerformanceReport evidence into bounded DashboardPayload payloads and perform deterministic series truncation.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: PerformanceReport input mapping and truncation parameter binding\n"
+        "-> Stage 2: Endpoint/extrema preservation and bounding validation\n"
+        "-> Stage 3: DashboardPayload v1 projection construction and truncation metadata generation"
+    )
+
+    # Stage 3: Series truncation & Dashboard payload projection
+    fr_anlt_045()
+    fr_anlt_046()
 
 
 if __name__ == "__main__":
