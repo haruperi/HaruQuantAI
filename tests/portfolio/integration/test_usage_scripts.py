@@ -7,19 +7,20 @@ from pathlib import Path
 
 _USAGE_SCRIPTS = (
     "01_contracts.py",
-    "02_construction.py",
-    "03_rebalancing.py",
-    "04_lifecycle.py",
-    "05_evidence.py",
-    "06_state.py",
-    "07_allocation.py",
-    "08_orchestration.py",
+    "02_evidence.py",
+    "03_construction.py",
+    "04_state.py",
+    "05_allocation.py",
+    "06_rebalancing.py",
+    "07_orchestration.py",
+    "08_public_api.py",
+    "features.py",
 )
 
 
 def test_portfolio_usage_scripts_execute() -> None:
     """Run all standalone Portfolio usage programs serially and visibly."""
-    usage_directory = Path(__file__).parents[1] / "usage"
+    usage_directory = Path(__file__).parents[1] / "usage" / "features"
     for script_name in _USAGE_SCRIPTS:
         completed = subprocess.run(  # noqa: S603 - fixed local command.
             [sys.executable, str(usage_directory / script_name)],

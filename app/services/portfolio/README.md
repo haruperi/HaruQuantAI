@@ -108,16 +108,16 @@ flowchart TD
 
 ### Feature Registry
 
-| Status    | Feature                                            | Owning module    | Public API and contracts                                | Requirements                        | Usage evidence                              |
-| --------- | -------------------------------------------------- | ---------------- | ------------------------------------------------------- | ----------------------------------- | ------------------------------------------- |
-| Completed | `FEAT-PORT-01` Portfolio Boundary Contracts        | `contracts/`     | Exact declarations and contract fields: Section 4.1     | Section 4.1 functional requirements | `tests/portfolio/usage/01_contracts.py`     |
-| Completed | `FEAT-PORT-02` Evidence and Eligibility Validation | `evidence/`      | Exact declarations: Section 4.2                         | Section 4.2 functional requirements | `tests/portfolio/usage/05_evidence.py`      |
-| Completed | `FEAT-PORT-03` Deterministic Construction          | `construction/`  | Exact declarations: Section 4.3                         | Section 4.3 functional requirements | `tests/portfolio/usage/02_construction.py`  |
-| Completed | `FEAT-PORT-04` Portfolio Persistence               | `state/`         | Exact declarations and state contracts: Section 4.4     | Section 4.4 functional requirements | `tests/portfolio/usage/06_state.py`         |
-| Completed | `FEAT-PORT-05` Version and Activation Governance   | `allocation/`    | Exact declarations: Section 4.5                         | Section 4.5 functional requirements | `tests/portfolio/usage/07_allocation.py`    |
-| Completed | `FEAT-PORT-06` Drift and Rebalance Planning        | `rebalancing/`   | Exact declarations and rebalance contracts: Section 4.6 | Section 4.6 functional requirements | `tests/portfolio/usage/03_rebalancing.py`   |
-| Completed | `FEAT-PORT-07` Cross-Domain Workflow Coordination  | `orchestration/` | Exact declarations: Section 4.7                         | Section 4.7 functional requirements | `tests/portfolio/usage/08_orchestration.py` |
-| Completed | `FEAT-PORT-08` Public Portfolio API                | `api/`           | Exact declarations and package API: Section 4.8         | Section 4.8 functional requirements | `tests/portfolio/usage/04_lifecycle.py`     |
+| Status    | Feature                                            | Owning module    | Public API and contracts                                | Requirements                        | Usage evidence                                       |
+| --------- | -------------------------------------------------- | ---------------- | ------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------- |
+| Completed | `FEAT-PORT-01` Portfolio Boundary Contracts        | `contracts/`     | Exact declarations and contract fields: Section 4.1     | Section 4.1 functional requirements | `tests/portfolio/usage/features/01_contracts.py`     |
+| Completed | `FEAT-PORT-02` Evidence and Eligibility Validation | `evidence/`      | Exact declarations: Section 4.2                         | Section 4.2 functional requirements | `tests/portfolio/usage/features/02_evidence.py`      |
+| Completed | `FEAT-PORT-03` Deterministic Construction          | `construction/`  | Exact declarations: Section 4.3                         | Section 4.3 functional requirements | `tests/portfolio/usage/features/03_construction.py`  |
+| Completed | `FEAT-PORT-04` Portfolio Persistence               | `state/`         | Exact declarations and state contracts: Section 4.4     | Section 4.4 functional requirements | `tests/portfolio/usage/features/04_state.py`         |
+| Completed | `FEAT-PORT-05` Version and Activation Governance   | `allocation/`    | Exact declarations: Section 4.5                         | Section 4.5 functional requirements | `tests/portfolio/usage/features/05_allocation.py`    |
+| Completed | `FEAT-PORT-06` Drift and Rebalance Planning        | `rebalancing/`   | Exact declarations and rebalance contracts: Section 4.6 | Section 4.6 functional requirements | `tests/portfolio/usage/features/06_rebalancing.py`   |
+| Completed | `FEAT-PORT-07` Cross-Domain Workflow Coordination  | `orchestration/` | Exact declarations: Section 4.7                         | Section 4.7 functional requirements | `tests/portfolio/usage/features/07_orchestration.py` |
+| Completed | `FEAT-PORT-08` Public Portfolio API                | `api/`           | Exact declarations and package API: Section 4.8         | Section 4.8 functional requirements | `tests/portfolio/usage/features/08_public_api.py`    |
 
 The package root, `app.services.portfolio`, is the sole public import boundary.
 Its `__all__` contains standalone functions only. Contract values and stateful
@@ -818,14 +818,15 @@ tests/portfolio/integration/test_construction_workflow.py
 tests/portfolio/integration/test_activation_workflow.py
 tests/portfolio/integration/test_rebalance_workflow.py
 tests/portfolio/integration/test_owner_contract_compatibility.py
-tests/portfolio/usage/01_contracts.py
-tests/portfolio/usage/02_construction.py
-tests/portfolio/usage/03_rebalancing.py
-tests/portfolio/usage/04_lifecycle.py
-tests/portfolio/usage/05_evidence.py
-tests/portfolio/usage/06_state.py
-tests/portfolio/usage/07_allocation.py
-tests/portfolio/usage/08_orchestration.py
+tests/portfolio/usage/features/01_contracts.py
+tests/portfolio/usage/features/02_evidence.py
+tests/portfolio/usage/features/03_construction.py
+tests/portfolio/usage/features/04_state.py
+tests/portfolio/usage/features/05_allocation.py
+tests/portfolio/usage/features/06_rebalancing.py
+tests/portfolio/usage/features/07_orchestration.py
+tests/portfolio/usage/features/08_public_api.py
+tests/portfolio/usage/features/features.py
 tests/portfolio/integration/test_usage_scripts.py
 tests/system/integration/test_strategy_eligibility.py
 tests/system/integration/test_portfolio_activation.py
