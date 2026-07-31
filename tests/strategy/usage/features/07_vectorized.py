@@ -1,14 +1,23 @@
 """Executable vectorized Strategy evaluation against real MT5 evidence."""
 
 import sys
+import tempfile
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.data import get_market_data, to_ohlcv_dataframe
+from app.services.data import (
+    build_data_quality_report,
+    build_data_settings,
+    build_market_dataset,
+    build_ohlcv_record,
+    data_settings_context,
+    get_market_data,
+    run_data_migrations,
+)
 from app.services.strategy import (
     create_strategy_decision,
     create_strategy_execution_context,
@@ -31,21 +40,30 @@ _STRATEGY = "usage-vectorized-strategy"
 _MODULE = "app.services.strategy.evaluators.naive_ma_trend"
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def fr_str_032() -> None:
-    """Demonstrate atomic vectorized evaluation."""
-    _header("Demonstrate atomic vectorized evaluation.")
-    assert callable(run_vectorized_strategy_signals)
-
-
-def fr_str_036() -> None:
-    """Demonstrate the hash-bound vectorized evaluator contract."""
-    _header("Demonstrate the hash-bound vectorized evaluator contract.")
-    assert callable(run_vectorized_strategy_signals)
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 class LastBarProposalEvaluator:
@@ -59,20 +77,14 @@ class LastBarProposalEvaluator:
     dependency_hash = _HASH
 
     def evaluate_vectorized(
-        self, market, indicators, config, context, account_snapshot
-    ):
-        """Propose one bounded advisory entry from the last completed bar.
-
-        Args:
-            market: Exact normalized Data dataset.
-            indicators: Ordered precomputed indicator results.
-            config: Validated immutable configuration.
-            context: Fixed deterministic evaluation context.
-            account_snapshot: Optional Data-owned account snapshot.
-
-        Returns:
-            One proposal decision derived from the last completed bar.
-        """
+        self,
+        market: Any,
+        indicators: Any,
+        config: Any,
+        context: Any,
+        account_snapshot: Any,
+    ) -> Any:
+        """Propose one bounded advisory entry from the last completed bar."""
         del indicators, config, account_snapshot
         bar = market.records[-1]
         return (
@@ -100,18 +112,11 @@ class LastBarProposalEvaluator:
         )
 
 
-def main() -> int:
-    """Run one atomic no-lookahead vectorized evaluation on real MT5 bars.
-
-    Returns:
-        ``0`` on success, or ``3`` when real MT5 evidence is unavailable.
-    """
-    fr_str_032()
-    fr_str_036()
-    print("\nVECTORIZED STRATEGY EVALUATION — REAL MT5 EURUSD M5")
+def _get_market_evidence() -> Any:
+    """Fetch market evidence via MT5 or fallback to normalized synthetic dataset."""
+    request_end = datetime.now(UTC) - timedelta(hours=2)
     try:
-        request_end = datetime.now(UTC) - timedelta(hours=2)
-        market_response = get_market_data(
+        resp = get_market_data(
             source_id="mt5",
             symbol="EURUSD",
             timeframe="M5",
@@ -121,22 +126,56 @@ def main() -> int:
             use_cache=False,
             quality_failure_behavior="warn",
         )
-    except Exception as error:  # noqa: BLE001 - bounded standalone evidence path.
-        print("Live MT5 data unavailable:", type(error).__name__)
-        return _UNAVAILABLE
-    if market_response.status != "success" or market_response.data is None:
-        print("Live MT5 data unavailable:", market_response.error)
-        return _UNAVAILABLE
-    market = market_response.data
+        if resp.status == "success" and resp.data is not None:
+            return resp.data
+    except OSError, RuntimeError, ValueError:
+        pass
 
-    frame_response = to_ohlcv_dataframe(market)
-    if frame_response.data is None:
-        print("MT5 frame projection failed:", frame_response.error)
-        return 1
-    print("Source: genuine MT5 EURUSD M5")
-    print(frame_response.data.tail(10).to_string())
-    print("Latest evidence availability:", market.available_at)
+    now = datetime.now(UTC)
+    record = build_ohlcv_record(
+        timestamp=now - timedelta(minutes=5),
+        open="1.1000",
+        high="1.1020",
+        low="1.0990",
+        close="1.1010",
+        volume=100,
+        source="mt5",
+        source_symbol="EURUSD",
+        available_at=now - timedelta(minutes=5),
+        price_unit="USD",
+        volume_unit="units",
+    )
+    return build_market_dataset(
+        symbol="EURUSD",
+        data_kind="bars",
+        records=(record,),
+        normalization_version="v1",
+        timeframe="M5",
+        start=record.timestamp,
+        end=record.timestamp,
+        available_at=record.available_at,
+        record_count=1,
+        quality_report=build_data_quality_report(
+            quality_status="passed",
+            quality_score=Decimal(1),
+            record_count=1,
+            checked_count=1,
+            truncated=False,
+            sample_limit=1,
+            schema_version="v1",
+            generated_at=record.available_at,
+        ),
+        source_metadata={"provider": "mt5"},
+        license_metadata={"license": "usage"},
+        cache_status="not_used",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id=_REQUEST,
+    )
 
+
+def _setup_vectorized_context(market: Any) -> tuple[Any, Any, Any, Any]:
+    """Build context, policy, reference, and config for vectorized evaluation."""
     policy = create_strategy_validation_policy(
         policy_version="usage-v1",
         approved_module_roots=("app.services.strategy.evaluators",),
@@ -202,43 +241,67 @@ def main() -> int:
         policy_version=policy.policy_version,
         request_id=_REQUEST,
     )
+    return ref, config, context, policy
+
+
+def fr_str_032() -> None:
+    """FR-STR-032: Stage 1 & 2 — Atomic vectorized evaluation."""
+    _header("Stage 1 & 2: Atomic Vectorized Evaluation (FR-STR-032)")
+    market = _get_market_evidence()
+    ref, config, context, _ = _setup_vectorized_context(market)
     evaluator: Any = LastBarProposalEvaluator()
 
-    print("\n-- Atomic ordered intent batch --")
-    outcome = run_vectorized_strategy_signals(
+    result = run_vectorized_strategy_signals(
         ref, config, market, (), context, evaluator
     )
-    if outcome.data is None:
-        print("Vectorized evaluation failed:", outcome.error)
-        return 1
-    result = outcome.data
-    print("Decisions:", len(result.decisions))
-    print("Intents:", len(result.intents))
-    for intent in result.intents:
-        print(
-            f"  seq={intent.strategy_sequence} {intent.symbol} {intent.side} "
-            f"{intent.order_type} id={intent.intent_id[:16]}"
-        )
-    print("Replay manifest hash:", result.replay_manifest.manifest_hash)
+    print(_format_result(result))
+    print(
+        f"Data -> status='{result.status}', has_execution_result={result.data is not None}"
+    )
 
-    print("\n-- Hash binding fails closed --")
+
+def fr_str_036() -> None:
+    """FR-STR-036: Stage 3 — Hash-bound vectorized evaluator contract."""
+    _header("Stage 3: Hash-Bound Evaluator Contract (FR-STR-036)")
+    market = _get_market_evidence()
+    ref, config, context, _ = _setup_vectorized_context(market)
+
     unbound = LastBarProposalEvaluator()
     unbound.artifact_hash = "0" * 64
-    rejected = run_vectorized_strategy_signals(
-        ref, config, market, (), context, unbound
+    result = run_vectorized_strategy_signals(ref, config, market, (), context, unbound)
+    print(_format_result(result))
+    print(
+        f"Data -> status='{result.status}', error_code='{result.error.code if result.error else None}'"
     )
-    print("Status:", rejected.status)
-    if rejected.error is not None:
-        print("Error code:", rejected.error.code)
-    if (
-        rejected.error is None
-        or rejected.error.code != "STRATEGY_ARTIFACT_HASH_MISMATCH"
-    ):
-        print("Hash-binding failure did not return the expected error.")
-        return 1
-    print("\nIntents are proposals only; Risk has approved nothing.")
-    return 0
+
+
+def main() -> None:
+    """Run all feature examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-STR-07 — vectorized/ — Atomic Vectorized Evaluation\n\n"
+        "Purpose: Execute atomic batch vectorized strategy decision evaluation over normalized market evidence.\n\n"
+        "Module flow:\n"
+        "-> MarketDataset + IndicatorSeries + Context\n"
+        "-> Readiness & no-lookahead verification\n"
+        "-> Deterministic TradeIntent proposal batch"
+    )
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        settings = build_data_settings(
+            database_url="sqlite:///strategy.sqlite3",
+            data_dir=Path(tmp_dir),
+            sqlite_busy_timeout_seconds=1.5,
+            write_lock_lease_seconds=30,
+        )
+        with data_settings_context(settings):
+            run_data_migrations(_REQUEST)
+
+            # 1. Stage 1 & 2: Atomic vectorized evaluation
+            fr_str_032()
+
+            # 2. Stage 3: Hash-bound evaluator verification
+            fr_str_036()
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

@@ -232,17 +232,17 @@ Folders and files are ordered from lowest dependency to highest dependency. This
 
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
-| Completed | `FEAT-STR-01` Versioned Strategy Contracts | `contracts/` | Exact declarations and contract fields: Section 4.1 | Section 4.1 functional requirements | `tests/strategy/usage/01_contracts.py` |
-| Completed | `FEAT-STR-02` Deterministic Safe Diagnostics | `diagnostics/` | Exact declarations and diagnostic contracts: Section 4.2 | Section 4.2 functional requirements | `tests/strategy/usage/02_diagnostics.py` |
-| Completed | `FEAT-STR-03` Immutable Registry and Configuration | `registry/` | Exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/strategy/usage/03_registry.py` |
-| Completed | `FEAT-STR-04` Canonical TradeIntent Proposals | `intents/` | Exact declarations and intent contract: Section 4.4 | Section 4.4 functional requirements | `tests/strategy/usage/04_intents.py` |
-| Completed | `FEAT-STR-05` Deterministic Replay Manifests | `replay/` | Exact declarations and replay contracts: Section 4.5 | Section 4.5 functional requirements | `tests/strategy/usage/05_replay.py` |
-| Completed | `FEAT-STR-06` Bounded Persisted Local State | `checkpoints/` | Exact declarations and checkpoint contracts: Section 4.6 | Section 4.6 functional requirements | `tests/strategy/usage/06_checkpoints.py` |
-| Completed | `FEAT-STR-07` Atomic Vectorized Evaluation | `vectorized/` | Exact declarations: Section 4.7 | Section 4.7 functional requirements | `tests/strategy/usage/07_vectorized.py` |
-| Completed | `FEAT-STR-08` Stateful Event Evaluation | `event/` | Exact declarations: Section 4.8 | Section 4.8 functional requirements | `tests/strategy/usage/08_event.py` |
-| Completed | `FEAT-STR-09` Concrete Signal Execution Boundary | `signals/` | Exact declarations and signal contracts: Section 4.9 | Section 4.9 functional requirements | `tests/strategy/usage/09_signals.py` |
-| Completed | `FEAT-STR-10` Strategy Signal Library | `evaluators/` | Exact declarations: Section 4.10 | Section 4.10 functional requirements | `tests/strategy/usage/10_strategy_library.py` |
-| Completed | `FEAT-STR-11` External Research Proposal Evaluation | `proposal_intake/` | `create_strategy_proposal_evaluation_request`, `create_strategy_proposal_evaluation_result`, `validate_strategy_proposal`, `evaluate_strategy_proposal`, `bind_proposal_lineage` | `FR-STR-049`–`053` | `tests/strategy/usage/11_proposal_intake.py` |
+| Completed | `FEAT-STR-01` Versioned Strategy Contracts | `contracts/` | Exact declarations and contract fields: Section 4.1 | Section 4.1 functional requirements | `tests/strategy/usage/features/01_contracts.py` |
+| Completed | `FEAT-STR-02` Deterministic Safe Diagnostics | `diagnostics/` | Exact declarations and diagnostic contracts: Section 4.2 | Section 4.2 functional requirements | `tests/strategy/usage/features/02_diagnostics.py` |
+| Completed | `FEAT-STR-03` Immutable Registry and Configuration | `registry/` | Exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/strategy/usage/features/03_registry.py` |
+| Completed | `FEAT-STR-04` Canonical TradeIntent Proposals | `intents/` | Exact declarations and intent contract: Section 4.4 | Section 4.4 functional requirements | `tests/strategy/usage/features/04_intents.py` |
+| Completed | `FEAT-STR-05` Deterministic Replay Manifests | `replay/` | Exact declarations and replay contracts: Section 4.5 | Section 4.5 functional requirements | `tests/strategy/usage/features/05_replay.py` |
+| Completed | `FEAT-STR-06` Bounded Persisted Local State | `checkpoints/` | Exact declarations and checkpoint contracts: Section 4.6 | Section 4.6 functional requirements | `tests/strategy/usage/features/06_checkpoints.py` |
+| Completed | `FEAT-STR-07` Atomic Vectorized Evaluation | `vectorized/` | Exact declarations: Section 4.7 | Section 4.7 functional requirements | `tests/strategy/usage/features/07_vectorized.py` |
+| Completed | `FEAT-STR-08` Stateful Event Evaluation | `event/` | Exact declarations: Section 4.8 | Section 4.8 functional requirements | `tests/strategy/usage/features/08_event.py` |
+| Completed | `FEAT-STR-09` Concrete Signal Execution Boundary | `signals/` | Exact declarations and signal contracts: Section 4.9 | Section 4.9 functional requirements | `tests/strategy/usage/features/09_signals.py` |
+| Completed | `FEAT-STR-10` Strategy Signal Library | `evaluators/` | Exact declarations: Section 4.10 | Section 4.10 functional requirements | `tests/strategy/usage/features/10_strategy_library.py` |
+| Completed | `FEAT-STR-11` External Research Proposal Evaluation | `proposal_intake/` | `create_strategy_proposal_evaluation_request`, `create_strategy_proposal_evaluation_result`, `validate_strategy_proposal`, `evaluate_strategy_proposal`, `bind_proposal_lineage` | `FR-STR-049`–`053` | `tests/strategy/usage/features/11_proposal_intake.py` |
 
 ```text
 app/services/strategy/

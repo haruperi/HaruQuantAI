@@ -8,7 +8,7 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
-_USAGE_DIR = Path(__file__).parents[1] / "usage"
+_USAGE_DIR = Path(__file__).parents[1] / "usage" / "features"
 _FEATURE_REQUIREMENTS = {
     "contracts": (
         "01_contracts.py",
@@ -41,7 +41,7 @@ def _programs() -> tuple[Path, ...]:
     logger.debug("Collecting standalone Strategy usage programs")
     return tuple(
         sorted(_USAGE_DIR.glob("[0-9]*_*.py"))
-        + sorted((_USAGE_DIR / "workflows").glob("wf_*.py"))
+        + sorted((_USAGE_DIR.parent / "workflows").glob("wf_*.py"))
     )
 
 

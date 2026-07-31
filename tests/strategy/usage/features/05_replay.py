@@ -3,8 +3,9 @@
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.strategy import (
     create_strategy_execution_context,
@@ -25,31 +26,34 @@ _WORKFLOW = "wf-88888888-8888-4888-8888-888888888888"
 _CORRELATION = "cor-99999999-9999-4999-8999-999999999999"
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
-def fr_str_027() -> None:
-    """Demonstrate the replay-manifest contract."""
-    _header("Demonstrate the replay-manifest contract.")
-    assert callable(create_strategy_replay_manifest_value)
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
-def fr_str_029() -> None:
-    """Demonstrate deterministic replay-manifest creation."""
-    _header("Demonstrate deterministic replay-manifest creation.")
-    assert callable(create_strategy_replay_manifest)
-
-
-def _binding() -> tuple[
-    create_validated_strategy_ref, create_validated_strategy_config
-]:
-    """Build the validated reference and configuration pair.
-
-    Returns:
-        The exact validated reference and configuration.
-    """
+def _binding() -> tuple[Any, Any]:
+    """Build the validated reference and configuration pair."""
     policy = create_strategy_validation_policy(
         policy_version="usage-v1",
         approved_module_roots=("app.services.strategy.evaluators",),
@@ -104,16 +108,9 @@ def _binding() -> tuple[
     return ref, config
 
 
-def main() -> int:
-    """Create a deterministic replay manifest from exact validated identities.
-
-    Returns:
-        ``0`` once manifest creation and hash stability are demonstrated.
-    """
-    fr_str_027()
-    fr_str_029()
-    print("\nSTRATEGY REPLAY MANIFEST")
-    print("Contract:", create_strategy_replay_manifest_value.__name__)
+def fr_str_027() -> None:
+    """FR-STR-027: Stage 1 — Replay manifest contract creation."""
+    _header("Stage 1: Replay Manifest Contract Creation (FR-STR-027)")
     ref, config = _binding()
     context = create_strategy_execution_context(
         environment=get_strategy_environment("RESEARCH"),
@@ -128,37 +125,61 @@ def main() -> int:
         snapshot_refs=("live-market-read",),
         max_diagnostic_bytes=8_192,
     )
-    outcome = create_strategy_replay_manifest(
+    res = create_strategy_replay_manifest(ref, config, context, _HASH, _HASH)
+    if res.data is None:
+        raise RuntimeError("Replay manifest creation failed")
+    result = create_strategy_replay_manifest_value(**res.data.model_dump())
+    print(_format_result(result))
+    print(
+        f"Data -> strategy_id='{result.strategy_id}', manifest_hash='{result.manifest_hash[:16]}...'"
+    )
+
+
+def fr_str_029() -> None:
+    """FR-STR-029: Stage 2 & 3 — Deterministic replay manifest creation."""
+    _header("Stage 2 & 3: Deterministic Replay Manifest Creation (FR-STR-029)")
+    ref, config = _binding()
+    context = create_strategy_execution_context(
+        environment=get_strategy_environment("RESEARCH"),
+        decision_timestamp=datetime.now(UTC),
+        timing_policy=get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE"),
+        seed=13,
+        interface_version="v1",
+        request_id=_REQUEST,
+        workflow_id=_WORKFLOW,
+        correlation_id=_CORRELATION,
+        dependency_status={"data": "ready", "indicators": "ready"},
+        snapshot_refs=("live-market-read",),
+        max_diagnostic_bytes=8_192,
+    )
+    result = create_strategy_replay_manifest(
         ref, config, context, data_checksum=_HASH, indicator_manifest_hash=_HASH
     )
-    if outcome.data is None:
-        print("Replay manifest failed:", outcome.error)
-        return 1
-    replay = outcome.data
-    reconstructed = create_strategy_replay_manifest_value(**replay.model_dump())
-    print("Schema:", replay.schema_id)
-    print("Strategy:", replay.strategy_id, replay.strategy_version)
-    print("Config hash:", replay.config_hash)
-    print("Manifest hash:", replay.manifest_hash)
-    print("Complete replay manifest:", replay.model_dump(mode="json"))
-    print("Public value-factory round trip:", reconstructed == replay)
+    print(_format_result(result))
+    if result.data is None:
+        raise RuntimeError("Replay manifest generation failed")
+    print(
+        f"Data -> status='{result.status}', manifest_hash='{result.data.manifest_hash[:16]}...'"
+    )
 
-    repeat = create_strategy_replay_manifest(
-        ref, config, context, data_checksum=_HASH, indicator_manifest_hash=_HASH
-    )
-    same = repeat.data is not None and repeat.data.manifest_hash == replay.manifest_hash
-    print("Identical inputs reproduce the identical hash:", same)
 
-    drifted = create_strategy_replay_manifest(
-        ref, config, context, data_checksum="a" * 64, indicator_manifest_hash=_HASH
+def main() -> None:
+    """Run all feature examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-STR-05 — replay/ — Deterministic Replay Manifests\n\n"
+        "Purpose: Create immutable replay manifests for exact deterministic evaluation replay.\n\n"
+        "Module flow:\n"
+        "-> Validated reference & config + context\n"
+        "-> Input hash binding & manifest construction\n"
+        "-> StrategyReplayManifest"
     )
-    changed = (
-        drifted.data is not None and drifted.data.manifest_hash != replay.manifest_hash
-    )
-    print("Changed data checksum changes the manifest hash:", changed)
-    print("\nReplay-manifest construction is pure and persists nothing.")
-    return 0
+
+    # 1. Stage 1: Replay manifest contract creation
+    fr_str_027()
+
+    # 2. Stage 2 & 3: Deterministic replay manifest creation
+    fr_str_029()
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
