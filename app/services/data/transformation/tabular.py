@@ -19,12 +19,7 @@ from typing import TYPE_CHECKING, Any
 
 from app.services.data.contracts import DataError
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
-from app.services.data.contracts.responses import (
-    StandardResponse,
-    data_start_time,
-    run_data_operation,
-)
-from app.utils import generate_id, get_logger
+from app.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -151,7 +146,7 @@ def bars_to_records(records: Sequence[OHLCVRecord]) -> list[dict[str, Any]]:
         ) from error
 
 
-def _to_ohlcv_dataframe_raw(dataset: MarketDataset) -> pd.DataFrame:
+def to_ohlcv_dataframe(dataset: MarketDataset) -> pd.DataFrame:
     """Project one canonical bar dataset to an analytical OHLCV/spread DataFrame.
 
     The returned frame is a new mutable analytical copy. The source
@@ -240,34 +235,7 @@ def _to_ohlcv_dataframe_raw(dataset: MarketDataset) -> pd.DataFrame:
     return frame
 
 
-def to_ohlcv_dataframe(
-    dataset: MarketDataset,
-) -> StandardResponse[pd.DataFrame]:
-    """Project one canonical bar dataset to an analytical OHLCV/spread DataFrame.
-
-    The returned frame is a new mutable analytical copy. The source
-    ``MarketDataset`` remains the authoritative precision, quality, provenance,
-    and availability evidence.
-
-    Args:
-        dataset: Canonical Data-owned market dataset containing OHLCV bars.
-
-    Returns:
-        Standard response carrying a DataFrame with a UTC ``timestamp`` index and
-        float64 ``open``, ``high``, ``low``, ``close``, ``volume``, and
-        ``spread`` columns. The provider-reported spread unit is stored in
-        ``frame.attrs["spread_unit"]``. Genuine missing spread values are
-        represented as ``NaN``.
-    """
-    return run_data_operation(
-        operation="data.transformation.to_ohlcv_dataframe",
-        request_id=generate_id("req"),
-        start_time=data_start_time(),
-        raw=lambda: _to_ohlcv_dataframe_raw(dataset),
-    )
-
-
-def _to_tick_dataframe_raw(dataset: MarketDataset) -> pd.DataFrame:
+def to_tick_dataframe(dataset: MarketDataset) -> pd.DataFrame:
     """Project one canonical tick dataset to an analytical DataFrame.
 
     Genuine missing optional tick values become ``NaN``. The returned frame is a
@@ -357,32 +325,6 @@ def _to_tick_dataframe_raw(dataset: MarketDataset) -> pd.DataFrame:
     frame.attrs["price_unit"] = next(iter(price_units), None)
     frame.attrs["volume_unit"] = next(iter(volume_units), None)
     return frame
-
-
-def to_tick_dataframe(
-    dataset: MarketDataset,
-) -> StandardResponse[pd.DataFrame]:
-    """Project one canonical tick dataset to an analytical DataFrame.
-
-    Genuine missing optional tick values become ``NaN``. The returned frame is a
-    new mutable analytical copy; the canonical ``MarketDataset`` remains the
-    authoritative precision, quality, provenance, and availability evidence.
-
-    Args:
-        dataset: Canonical Data-owned market dataset containing ticks.
-
-    Returns:
-        Standard response carrying a DataFrame with a UTC ``timestamp`` index and
-        float64 ``bid``, ``ask``, ``last``, and ``volume`` columns. Common units
-        are stored in ``frame.attrs["price_unit"]`` and
-        ``frame.attrs["volume_unit"]``.
-    """
-    return run_data_operation(
-        operation="data.transformation.to_tick_dataframe",
-        request_id=generate_id("req"),
-        start_time=data_start_time(),
-        raw=lambda: _to_tick_dataframe_raw(dataset),
-    )
 
 
 def _serialize_value(val: object) -> object:

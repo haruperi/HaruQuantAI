@@ -35,7 +35,7 @@ from app.services.data.contracts.validation import (
 from app.services.data.contracts.validation import (
     resolve_request_id as _request_id,
 )
-from app.services.data.sources.registry import get_source_descriptor
+from app.services.data.sources.registry import _get_source_descriptor_raw
 from app.services.data.time_sessions.contracts import (
     MarketHours,
     MarketHoursRequest,
@@ -95,13 +95,8 @@ def _get_current_schedule_raw(
     )
 
     if validate_source:
-        desc_res = get_source_descriptor(request.source_id)
-        desc = (
-            desc_res.data
-            if hasattr(desc_res, "data") and desc_res.data is not None
-            else desc_res
-        )
-        if getattr(desc, "readiness", None) == "disabled":
+        desc = _get_source_descriptor_raw(request.source_id)
+        if desc.readiness == "disabled":
             raise DataError(
                 "SOURCE_UNAVAILABLE",
                 safe_details={"source_id": request.source_id},
