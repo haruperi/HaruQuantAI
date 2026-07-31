@@ -35,7 +35,7 @@ def _unwrap(response):
 
 def test_usage_parquet_directory_is_beneath_approved_root(tmp_path: Path) -> None:
     """The standalone Parquet demonstration writes only under an approved root."""
-    usage = importlib.import_module("tests.data.usage.05_tick_derivation")
+    usage = importlib.import_module("tests.data.usage.features.05_tick_derivation")
 
     settings = DataSettings(approved_storage_roots=(tmp_path,))
     with usage._approved_temporary_directory(settings) as temporary_directory:

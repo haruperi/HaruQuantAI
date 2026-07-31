@@ -258,10 +258,6 @@ def to_ohlcv_dataframe(
         ``spread`` columns. The provider-reported spread unit is stored in
         ``frame.attrs["spread_unit"]``. Genuine missing spread values are
         represented as ``NaN``.
-
-    Raises:
-        (in-band) ``VALIDATION_FAILED``, ``DATA_QUALITY_FAILED``, or
-          ``PRECISION_MISMATCH`` on failure.
     """
     return run_data_operation(
         operation="data.transformation.to_ohlcv_dataframe",
@@ -380,10 +376,6 @@ def to_tick_dataframe(
         float64 ``bid``, ``ask``, ``last``, and ``volume`` columns. Common units
         are stored in ``frame.attrs["price_unit"]`` and
         ``frame.attrs["volume_unit"]``.
-
-    Raises:
-        (in-band) ``VALIDATION_FAILED``, ``DATA_QUALITY_FAILED``, or
-          ``PRECISION_MISMATCH`` on failure.
     """
     return run_data_operation(
         operation="data.transformation.to_tick_dataframe",

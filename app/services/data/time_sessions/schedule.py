@@ -95,8 +95,13 @@ def _get_current_schedule_raw(
     )
 
     if validate_source:
-        desc = get_source_descriptor(request.source_id)
-        if desc.readiness == "disabled":
+        desc_res = get_source_descriptor(request.source_id)
+        desc = (
+            desc_res.data
+            if hasattr(desc_res, "data") and desc_res.data is not None
+            else desc_res
+        )
+        if getattr(desc, "readiness", None) == "disabled":
             raise DataError(
                 "SOURCE_UNAVAILABLE",
                 safe_details={"source_id": request.source_id},

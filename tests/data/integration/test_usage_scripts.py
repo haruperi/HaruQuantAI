@@ -22,6 +22,7 @@ _USAGE_SCRIPTS = (
     "13_data_jobs.py",
     "14_evidence.py",
     "15_audit.py",
+    "16_research_sources.py",
 )
 
 
@@ -32,7 +33,7 @@ def test_documented_usage_script_executes_real_work(script_name: str) -> None:
     FEAT-DATA-11 is exercised by the opt-in live integration test because its
     usage program intentionally acquires licensed provider data.
     """
-    usage_directory = Path(__file__).parents[1] / "usage"
+    usage_directory = Path(__file__).parents[1] / "usage" / "features"
     environment = os.environ.copy()
     environment.pop("DATA_USAGE_LIVE_PROVIDERS", None)
     for setting_name in (

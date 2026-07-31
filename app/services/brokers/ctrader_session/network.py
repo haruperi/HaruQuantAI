@@ -216,7 +216,13 @@ class _CTraderNetworkClient:
             if loop is None:
                 return
             for handler in tuple(self._event_handlers):
-                loop.call_soon_threadsafe(handler, extracted)
+                if loop.is_closed():
+                    return
+                self._post_to_asyncio_loop(
+                    loop,
+                    lambda handler=handler: handler(extracted),
+                    callback_id="message",
+                )
 
         client = Client(host, EndPoints.PROTOBUF_PORT, TcpProtocol)
         client.setConnectedCallback(_on_connected)
@@ -354,14 +360,16 @@ class _CTraderNetworkClient:
     async def close(self) -> None:  # pragma: no cover - requires Twisted + network
         """Release only this client's session; the shared reactor keeps running."""
         self._connected = False
+        self._loop = None
+        self._event_handlers.clear()
         client = self._client
         if client is not None:
+            self._client = None
             from twisted.internet import (
                 reactor,  # type: ignore[import-untyped, unused-ignore]
             )
 
             reactor.callFromThread(client.stopService)  # type: ignore[attr-defined]
-            self._client = None
             logger.bind(
                 broker=self._config.broker_id.value,
                 environment=self._config.environment.value,
@@ -383,6 +391,8 @@ class _CTraderNetworkClient:
         loop = self._loop
         if loop is None:
             raise ConnectionError("cTrader event loop is not bound")
+        if loop.is_closed():
+            raise ConnectionError("cTrader event loop is closed")
         future: asyncio.Future[Any] = loop.create_future()
 
         def _on_ok(response: Any) -> None:
@@ -422,7 +432,7 @@ class _CTraderNetworkClient:
             if not future.done():
                 future.set_result(value)
 
-        loop.call_soon_threadsafe(_set)
+        self._post_to_asyncio_loop(loop, _set, callback_id="resolve")
 
     def _reject(  # pragma: no cover - live only
         self, future: asyncio.Future[Any], error: Exception
@@ -437,4 +447,33 @@ class _CTraderNetworkClient:
             if not future.done():
                 future.set_exception(error)
 
-        loop.call_soon_threadsafe(_set)
+        self._post_to_asyncio_loop(loop, _set, callback_id="reject")
+
+    def _post_to_asyncio_loop(
+        self,
+        loop: asyncio.AbstractEventLoop,
+        callback: Callable[[], None],
+        *,
+        callback_id: str,
+    ) -> None:
+        """Post a callback only when the loop is still usable.
+
+        Args:
+            loop: Target event loop.
+            callback: Callback to execute in loop context.
+            callback_id: Internal trace tag for debug logs.
+
+        Raises:
+            RuntimeError: If the event loop error is not a loop-closed condition.
+        """
+        if loop.is_closed():
+            return
+        try:
+            loop.call_soon_threadsafe(callback)
+        except RuntimeError as error:
+            if "Event loop is closed" in str(error):
+                logger.debug(
+                    "Ignoring cTrader callback after loop close: %s", callback_id
+                )
+                return
+            raise

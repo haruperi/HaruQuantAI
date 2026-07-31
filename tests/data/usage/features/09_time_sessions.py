@@ -7,7 +7,7 @@ from datetime import UTC, date, datetime, time
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
     build_active_market_sessions_request,
