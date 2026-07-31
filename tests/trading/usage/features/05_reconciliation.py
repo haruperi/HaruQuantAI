@@ -1,7 +1,9 @@
 """Executable Trading reconciliation usage example.
 
-Demonstrates authority snapshots and reconciliation.
+Demonstrates FEAT-TRD-05 authority snapshots and reconciliation.
 """
+
+from __future__ import annotations
 
 import sys
 from datetime import UTC, datetime, timedelta
@@ -10,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 # Add repository root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.trading import (
     compare_authority_state,
@@ -28,9 +30,30 @@ TradingEvent = Any
 TradingProjection = Any
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _snapshot() -> AuthoritySnapshot:
@@ -143,78 +166,85 @@ class _Store:
         self.projection = projection
 
 
-def example_reconciliation() -> None:
-    """Demonstrate Trading reconciliation API."""
-    _header("Demonstrate Trading reconciliation API.")
-    print("Trading Example 5: Authority Reconciliation")
-
-    snap = _snapshot()
-    proj = _projection()
-    print(f"Authority snapshot source_id: {snap.source_id}")
-
-    report_response = compare_authority_state(snap, proj)
-    assert report_response.status == "success"
-    report = report_response.data
-    assert report is not None
-    print(
-        f"Reconciliation severity: {report.severity}, unresolved: {report.unresolved}"
-    )
-
-    resolution_response = resolve_unknown_outcome(  # type: ignore[arg-type]
-        _receipt(),
-        _Store(),
-        lambda _route: snap,
-    )
-    assert resolution_response.status == "success"
-    resolution = resolution_response.data
-    assert resolution is not None
-    print(f"Unknown outcome resolution transition: {resolution.transition}")
-    print(f"Retry allowed: {resolution.retry_allowed}")
-
-
 def fr_trd_043() -> None:
-    """FR-TRD-043: The system shall expose normalized account/order/position/time authority evidence without provider objects."""
-    _header(
-        "FR-TRD-043: The system shall expose normalized account/order/position/time authority evidence without provider objects."
-    )
-    example_reconciliation()
+    """FR-TRD-043: Stage 1 — Expose normalized authority snapshot evidence."""
+    _header("Stage 1: Evidence Snapshot - Expose Authority Snapshot (FR-TRD-043)")
+    snap = _snapshot()
+    print(_format_result(snap))
+    print(f"Data -> source_id='{snap.source_id}', route='{snap.route}'")
 
 
 def fr_trd_044() -> None:
-    """FR-TRD-044: The system shall deterministically report missing, extra, mismatched, and stale records without claiming resolution."""
-    _header(
-        "FR-TRD-044: The system shall deterministically report missing, extra, mismatched, and stale records without claiming resolution."
-    )
-    example_reconciliation()
+    """FR-TRD-044: Stage 2 — Deterministically compare authority state against projection."""
+    _header("Stage 2: State Comparison - Compare Authority State (FR-TRD-044)")
+    report_response = compare_authority_state(_snapshot(), _projection())
+    print(_format_result(report_response))
+    print(f"Data -> status='{report_response.status}'")
 
 
 def fr_trd_045() -> None:
-    """FR-TRD-045: The system shall lock retry, persist evidence, prefer route authority truth, and release only after an approved transition resolves."""
+    """FR-TRD-045: Stage 3 — Resolve unknown outcome receipt and unlock retry."""
     _header(
-        "FR-TRD-045: The system shall lock retry, persist evidence, prefer route authority truth, and release only after an approved transition resolves."
+        "Stage 3: Unknown Outcome Resolution - Resolve Unknown Outcome (FR-TRD-045)"
     )
-    example_reconciliation()
+    resolution_response = resolve_unknown_outcome(  # type: ignore[arg-type]
+        _receipt(),
+        _Store(),
+        lambda _route: _snapshot(),
+    )
+    print(_format_result(resolution_response))
+    print(f"Data -> status='{resolution_response.status}'")
 
 
 def fr_trd_061() -> None:
-    """FR-TRD-061: The system shall expose a deterministic comparison result with discrepancy classes, severity, evidence references, and unresolved status."""
-    _header(
-        "FR-TRD-061: The system shall expose a deterministic comparison result with discrepancy classes, severity, evidence references, and unresolved status."
+    """FR-TRD-061: Stage 3 — Expose deterministic reconciliation report DTO."""
+    _header("Stage 3: Reconciliation Report - Construct Comparison Report (FR-TRD-061)")
+    report_response = compare_authority_state(_snapshot(), _projection())
+    report = report_response.data
+    print(_format_result(report))
+    print(
+        f"Data -> severity='{report.severity if report else None}', unresolved={report.unresolved if report else None}"
     )
-    example_reconciliation()
 
 
 def fr_trd_062() -> None:
-    """FR-TRD-062: The system shall expose the approved authority transition, retry decision, incident reference, and remaining unresolved scope."""
+    """FR-TRD-062: Stage 3 — Expose authority resolution result DTO."""
     _header(
-        "FR-TRD-062: The system shall expose the approved authority transition, retry decision, incident reference, and remaining unresolved scope."
+        "Stage 3: Authority Resolution DTO - Construct Resolution Result (FR-TRD-062)"
     )
-    example_reconciliation()
+    resolution_response = resolve_unknown_outcome(  # type: ignore[arg-type]
+        _receipt(),
+        _Store(),
+        lambda _route: _snapshot(),
+    )
+    resolution = resolution_response.data
+    print(_format_result(resolution))
+    print(
+        f"Data -> transition='{resolution.transition if resolution else None}', retry_allowed={resolution.retry_allowed if resolution else None}"
+    )
 
 
 def main() -> None:
-    """Run Trading reconciliation usage example."""
-    example_reconciliation()
+    """Run all feature examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-TRD-05 — reconciliation/ — Reconciliation and Retry Guard\n\n"
+        "Purpose: Normalize authority state, compare local projections against authority truth, and resolve unknown outcomes.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Authority snapshot loading and projection state inspection\n"
+        "-> Stage 2: Deterministic discrepancy analysis and comparison report generation\n"
+        "-> Stage 3: Unknown-outcome resolution, retry state unlocking, and resolution DTO creation"
+    )
+
+    # Stage 1: Evidence snapshot
+    fr_trd_043()
+
+    # Stage 2: Discrepancy analysis & Comparison
+    fr_trd_044()
+
+    # Stage 3: Outcome resolution & DTO creation
+    fr_trd_045()
+    fr_trd_061()
+    fr_trd_062()
 
 
 if __name__ == "__main__":

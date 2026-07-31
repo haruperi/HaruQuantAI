@@ -16,13 +16,14 @@ _USAGE_SCRIPTS = (
     "07_live.py",
     "08_actions.py",
     "09_reporting.py",
+    "features.py",
 )
 
 
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)
 def test_trading_usage_script_executes(script_name: str) -> None:
     """Run one standalone Trading usage script in an isolated Python process."""
-    usage_directory = Path(__file__).parents[1] / "usage"
+    usage_directory = Path(__file__).parents[1] / "usage" / "features"
     completed = subprocess.run(  # noqa: S603 - fixed repository-controlled command
         [sys.executable, str(usage_directory / script_name)],
         check=False,

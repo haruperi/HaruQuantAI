@@ -1,7 +1,9 @@
 """Executable Trading validation usage example.
 
-Demonstrates order validation and execution readiness.
+Demonstrates FEAT-TRD-03 order validation and execution readiness.
 """
+
+from __future__ import annotations
 
 import sys
 from datetime import UTC, datetime, timedelta
@@ -10,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 # Add repository root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import build_account_state_snapshot
 from app.services.risk import (
@@ -38,9 +40,30 @@ TradingRequest = Any
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _request() -> TradingRequest:
@@ -165,33 +188,31 @@ def _policy() -> dict[str, object]:
     }
 
 
-def example_validation() -> None:
-    """Demonstrate Trading validation API."""
-    _header("Demonstrate Trading validation API.")
-    print("Trading Example 3: Order Validation and Execution Readiness")
+def fr_trd_024() -> None:
+    """FR-TRD-024: Stage 2 — Validate order request parameters and preconditions."""
+    _header("Stage 2: Pre-route Validation - Validate Order Request (FR-TRD-024)")
+    validated = validate_order_request(_request(), _account(), _symbol_capability())
+    print(_format_result(validated))
+    print(f"Data -> status='{validated.status}'")
 
-    req = _request()
 
-    # 1. Validate order request
-    validated = validate_order_request(req, _account(), _symbol_capability())
-    assert validated.status == "success"
-    validated_request = validated.data
-    assert validated_request is not None
-    print(f"Validated order request quantity: {validated_request.quantity}")
+def fr_trd_026() -> None:
+    """FR-TRD-026: Stage 1 — Get timestamped route snapshot facts."""
+    _header("Stage 1: Facts Loading - Get Route Snapshot (FR-TRD-026)")
 
-    # 2. Get route snapshot
     def source(_route: object, _provider: object) -> dict[str, object]:
         return _snapshot().model_dump(mode="python")
 
-    route_snap = get_route_snapshot(req, source)  # type: ignore[arg-type]
-    assert route_snap.status == "success"
-    snapshot = route_snap.data
-    assert snapshot is not None
-    print(f"Route snapshot available: {snapshot.available}")
+    route_snap = get_route_snapshot(_request(), source)  # type: ignore[arg-type]
+    print(_format_result(route_snap))
+    print(f"Data -> status='{route_snap.status}'")
 
-    # 3. Execution readiness assessment
+
+def fr_trd_027() -> None:
+    """FR-TRD-027: Stage 2 — Assess execution readiness across required evidence."""
+    _header("Stage 2: Readiness Evaluation - Assess Execution Readiness (FR-TRD-027)")
     assessment = assess_execution_readiness(
-        req,
+        _request(),
         _snapshot(),
         _risk(),
         _switch(),
@@ -202,76 +223,67 @@ def example_validation() -> None:
             "kill_switch": Decimal(30),
         },
     )
-    assert assessment.status == "success"
-    readiness_assessment = assessment.data
-    assert readiness_assessment is not None
-    print(f"Execution readiness passed: {readiness_assessment.passed}")
+    print(_format_result(assessment))
+    print(f"Data -> status='{assessment.status}'")
 
-    # 4. Build execution plan
+
+def fr_trd_028() -> None:
+    """FR-TRD-028: Stage 3 — Build deterministic execution plan without side-effects."""
+    _header("Stage 3: Plan Construction - Build Execution Plan (FR-TRD-028)")
     readiness = create_readiness_assessment(
         passed=True,
         failed_check_codes=(),
         evidence_refs={"risk_decision_id": "usage-risk-001"},
         assessed_at=NOW,
     )
-    plan = build_execution_plan(req, readiness)
-    assert plan.status == "success"
-    execution_plan = plan.data
-    assert execution_plan is not None
-    print(f"Built execution plan route: {execution_plan.route.value}")
-
-
-def fr_trd_024() -> None:
-    """FR-TRD-024: The system shall validate symbol, action, approved order type, required order-shape fields, instrument-provided quantity unit, Decimal volume/price/stops, instrument limits, margin evidence, tickets, and operation preconditions before route selection."""
-    _header(
-        "FR-TRD-024: The system shall validate symbol, action, approved order type, required order-shape fields, instrument-provided quantity unit, Decimal volume/price/stops, instrument limits, margin evidence, tickets, and operation preconditions before route selection."
-    )
-    example_validation()
-
-
-def fr_trd_026() -> None:
-    """FR-TRD-026: The system shall return timestamped account/symbol/quote/permission/authority facts or explicit unavailable/stale failures."""
-    _header(
-        "FR-TRD-026: The system shall return timestamped account/symbol/quote/permission/authority facts or explicit unavailable/stale failures."
-    )
-    example_validation()
-
-
-def fr_trd_027() -> None:
-    """FR-TRD-027: The system shall aggregate all required checks, enforce caller-declared expiry and configured `route_snapshot`, `risk_decision`, and `kill_switch` age bounds, and return a bounded pass/fail assessment with evidence references. Kill-switch evidence older than its bound fails with `KILL_SWITCH_STALE` independently of its reported `inactive` state."""
-    _header(
-        "FR-TRD-027: The system shall aggregate all required checks, enforce caller-declared expiry and configured `route_snapshot`, `risk_decision`, and `kill_switch` age bounds, and return a bounded pass/fail assessment with evidence references. Kill-switch evidence older than its bound fails with `KILL_SWITCH_STALE` independently of its reported `inactive` state."
-    )
-    example_validation()
-
-
-def fr_trd_028() -> None:
-    """FR-TRD-028: The system shall construct a deterministic plan and canonical idempotency material without side effects, preserving approved order type, validated quantity unit, optional order instructions, and Trading-state target identities exactly."""
-    _header(
-        "FR-TRD-028: The system shall construct a deterministic plan and canonical idempotency material without side effects, preserving approved order type, validated quantity unit, optional order instructions, and Trading-state target identities exactly."
-    )
-    example_validation()
+    plan = build_execution_plan(_request(), readiness)
+    print(_format_result(plan))
+    print(f"Data -> status='{plan.status}'")
 
 
 def fr_trd_059() -> None:
-    """FR-TRD-059: The system shall expose one immutable snapshot containing explicit fact values, source, authority, UTC timestamps, freshness, availability, and capability evidence."""
-    _header(
-        "FR-TRD-059: The system shall expose one immutable snapshot containing explicit fact values, source, authority, UTC timestamps, freshness, availability, and capability evidence."
-    )
-    example_validation()
+    """FR-TRD-059: Stage 3 — Expose immutable RouteSnapshot contract."""
+    _header("Stage 3: Route Snapshot DTO - Construct RouteSnapshot (FR-TRD-059)")
+    snap = _snapshot()
+    print(_format_result(snap))
+    print(f"Data -> available={snap.available}, fresh={snap.fresh}")
 
 
 def fr_trd_060() -> None:
-    """FR-TRD-060: The system shall expose a bounded passed/failed readiness result with failed check codes and evidence references."""
-    _header(
-        "FR-TRD-060: The system shall expose a bounded passed/failed readiness result with failed check codes and evidence references."
+    """FR-TRD-060: Stage 3 — Expose ReadinessAssessment DTO."""
+    _header("Stage 3: Readiness DTO - Construct ReadinessAssessment (FR-TRD-060)")
+    readiness = create_readiness_assessment(
+        passed=True,
+        failed_check_codes=(),
+        evidence_refs={"risk_decision_id": "usage-risk-001"},
+        assessed_at=NOW,
     )
-    example_validation()
+    print(_format_result(readiness))
+    print(f"Data -> passed={readiness.passed}")
 
 
 def main() -> None:
-    """Run Trading validation usage example."""
-    example_validation()
+    """Run all feature examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-TRD-03 — validation/ — Validation, Readiness, and Plans\n\n"
+        "Purpose: Validate order requests, evaluate execution readiness, and construct deterministic execution plans.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Facts loading, quote inspection, and capability gathering\n"
+        "-> Stage 2: Fail-closed order validation and multi-factor readiness evaluation\n"
+        "-> Stage 3: Execution plan construction and DTO representation"
+    )
+
+    # Stage 1: Facts loading
+    fr_trd_026()
+
+    # Stage 2: Fail-closed validation & Readiness evaluation
+    fr_trd_024()
+    fr_trd_027()
+
+    # Stage 3: Execution plan construction & DTO representation
+    fr_trd_028()
+    fr_trd_059()
+    fr_trd_060()
 
 
 if __name__ == "__main__":

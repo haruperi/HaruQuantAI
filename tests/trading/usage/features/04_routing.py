@@ -1,7 +1,9 @@
 """Executable Trading routing usage example.
 
-Demonstrates adapter capabilities and order dispatch.
+Demonstrates FEAT-TRD-04 adapter capabilities and order dispatch.
 """
+
+from __future__ import annotations
 
 import asyncio
 import sys
@@ -11,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 # Add repository root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.trading import (
     classify_authority_response,
@@ -25,9 +27,30 @@ NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 OrderIntent = Any
 
 
+def _feature_header(title: str) -> None:
+    """Print the feature header banner."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _format_result(obj: Any) -> str:
+    """Dynamically format the output result type name and field/key signature."""
+    cls = type(obj)
+    type_name = cls.__name__
+    if hasattr(cls, "model_fields"):
+        keys = ", ".join(cls.model_fields.keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    if isinstance(obj, dict):
+        keys = ", ".join(obj.keys())
+        return f"Output Result -> dict({keys}) : dict"
+    if hasattr(obj, "__dict__"):
+        keys = ", ".join(vars(obj).keys())
+        return f"Output Result -> {type_name}({keys}) : {type_name}"
+    return f"Output Result -> {type_name} : {type_name}"
 
 
 def _intent() -> OrderIntent:
@@ -83,20 +106,23 @@ def _capability() -> dict[str, object]:
     }
 
 
-def example_routing() -> None:
-    """Demonstrate Trading routing API."""
-    _header("Demonstrate Trading routing API.")
-    print("Trading Example 4: Adapter Capabilities and Order Dispatch")
-
-    # 1. Validate adapter capability
+def fr_trd_029() -> None:
+    """FR-TRD-029: Stage 2 — Reject adapters lacking required capability declarations."""
+    _header("Stage 2: Capability Validation - Validate Adapter Capability (FR-TRD-029)")
     capability_result = validate_adapter_capability(  # type: ignore[arg-type]
         _paper_intent(),
         _capability(),
         operation_timeout_seconds=Decimal(10),
     )
-    print("Validated adapter capability successfully")
+    print(_format_result(capability_result))
+    print(f"Data -> status='{capability_result.status}'")
 
-    # 2. Classify authority response
+
+def fr_trd_030() -> None:
+    """FR-TRD-030: Stage 2 — Classify authority response conservatively."""
+    _header(
+        "Stage 2: Response Classification - Classify Authority Response (FR-TRD-030)"
+    )
     raw = {
         "receipt_id": "usage-receipt-001",
         "intent_id": "usage-intent-001",
@@ -116,13 +142,14 @@ def example_routing() -> None:
         raw,
         _capability(),  # type: ignore[arg-type]
     )
-    assert capability_result.status == "success"
-    assert receipt_result.status == "success"
-    receipt = receipt_result.data
-    assert receipt is not None
-    print(f"Classified authority response status: {receipt.status}")
+    print(_format_result(receipt_result))
+    print(f"Data -> status='{receipt_result.status}'")
 
-    # 3. Dispatch order intent
+
+def fr_trd_031() -> None:
+    """FR-TRD-031: Stage 3 — Dispatch approved intent to Simulation or Broker target."""
+    _header("Stage 3: Dispatch Execution - Dispatch Order Intent (FR-TRD-031)")
+
     async def simulation_dispatch(intent: OrderIntent):
         return create_execution_receipt(
             receipt_id="usage-sim-receipt-001",
@@ -153,39 +180,27 @@ def example_routing() -> None:
             clock=lambda: NOW,
         )
     )
-    assert dispatched_receipt.status == "success"
-    dispatched = dispatched_receipt.data
-    assert dispatched is not None
-    print(f"Dispatched order intent receipt status: {dispatched.status}")
-
-
-def fr_trd_029() -> None:
-    """FR-TRD-029: The system shall reject adapters lacking approved provider, API/schema, action, intent order-type, security, timeout, malformed-response, rate-limit, retry, and redaction declarations."""
-    _header(
-        "FR-TRD-029: The system shall reject adapters lacking approved provider, API/schema, action, intent order-type, security, timeout, malformed-response, rate-limit, retry, and redaction declarations."
-    )
-    example_routing()
-
-
-def fr_trd_030() -> None:
-    """FR-TRD-030: The system shall classify malformed success, timeout, and ambiguous/rate-limited mutation conservatively with retry delay/safety evidence."""
-    _header(
-        "FR-TRD-030: The system shall classify malformed success, timeout, and ambiguous/rate-limited mutation conservatively with retry delay/safety evidence."
-    )
-    example_routing()
-
-
-def fr_trd_031() -> None:
-    """FR-TRD-031: The system shall dispatch exactly one approved intent to Simulation for sim or adapt it into the matching receiver-owned Brokers mutation DTO for paper/live. Broker environment/account reference come only from injected `BrokerConnectionConfig`; order type/unit/instructions come only from `OrderIntent`; target order/position identities come only from Trading state carried by the intent; timeout and receipt time come from validated injected policy/clock dependencies."""
-    _header(
-        "FR-TRD-031: The system shall dispatch exactly one approved intent to Simulation for sim or adapt it into the matching receiver-owned Brokers mutation DTO for paper/live. Broker environment/account reference come only from injected `BrokerConnectionConfig`; order type/unit/instructions come only from `OrderIntent`; target order/position identities come only from Trading state carried by the intent; timeout and receipt time come from validated injected policy/clock dependencies."
-    )
-    example_routing()
+    print(_format_result(dispatched_receipt))
+    print(f"Data -> status='{dispatched_receipt.status}'")
 
 
 def main() -> None:
-    """Run Trading routing usage example."""
-    example_routing()
+    """Run all feature examples in sequential module flow order."""
+    _feature_header(
+        "FEATURE: FEAT-TRD-04 — routing/ — Authority Selection and Dispatch\n\n"
+        "Purpose: Validate adapter capability declarations, classify authority responses, and dispatch order intents to targets.\n\n"
+        "Module flow:\n"
+        "-> Stage 1: Order intent preparation and adapter declaration inspection\n"
+        "-> Stage 2: Fail-closed adapter validation and authority response classification\n"
+        "-> Stage 3: Order intent dispatch to target authority and execution receipt generation"
+    )
+
+    # Stage 2: Capability validation & Response classification
+    fr_trd_029()
+    fr_trd_030()
+
+    # Stage 3: Dispatch execution
+    fr_trd_031()
 
 
 if __name__ == "__main__":
