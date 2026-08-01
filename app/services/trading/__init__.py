@@ -51,6 +51,7 @@ from app.services.trading.monitoring import (
     emit_runtime_event,
     validate_budget_authority,
 )
+from app.services.trading.monitoring.runtime import get_trading_operational_events
 from app.services.trading.reconciliation import (
     compare_authority_state,
     create_authority_resolution,
@@ -66,9 +67,11 @@ from app.services.trading.routing import (
 )
 from app.services.trading.state import (
     apply_execution_event,
+    build_trading_state_store,
     create_idempotency_reservation,
     create_trading_event,
     create_trading_projection,
+    execute_trading_state_store_operation,
     get_trading_migrations,
     get_trading_schema_version,
     reserve_idempotency,
@@ -88,6 +91,7 @@ __all__: tuple[str, ...] = (
     "build_broker_state_unknown_event",
     "build_execution_plan",
     "build_trading_report",
+    "build_trading_state_store",
     "cancel_all_orders",
     "cancel_order",
     "classify_authority_response",
@@ -118,11 +122,13 @@ __all__: tuple[str, ...] = (
     "emit_runtime_event",
     "evaluate_live_gate",
     "execute_portfolio_rebalance",
+    "execute_trading_state_store_operation",
     "get_live_session_status",
     "get_public_contracts",
     "get_route_snapshot",
     "get_trading_contract_version",
     "get_trading_migrations",
+    "get_trading_operational_events",
     "get_trading_route",
     "get_trading_schema_version",
     "is_execution_receipt",

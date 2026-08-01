@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import sys
 from datetime import UTC, datetime
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.services.api import (
     build_api_error,
@@ -51,7 +55,7 @@ def fr_api_003() -> dict[str, object]:
     """FR-API-003: build success and error response envelopes."""
     metadata = fr_api_001()
     success = build_api_response(
-        status="SUCCESS",
+        status="success",
         message="ok",
         data={"ready": True},
         metadata=metadata,
@@ -59,7 +63,7 @@ def fr_api_003() -> dict[str, object]:
     return {
         "success": success,
         "error": build_api_response(
-            status="ERROR",
+            status="error",
             message="failed",
             error=fr_api_002(),
             metadata=metadata,
@@ -96,6 +100,7 @@ def fr_api_005() -> object:
         owner="api",
         response_contract="ApiResponse.v1",
         auth_required=True,
+        permission="contracts:read",
         governance_scope="none",
     )
 

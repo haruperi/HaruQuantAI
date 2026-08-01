@@ -190,6 +190,65 @@ def create_simulation_value(value_type: str, /, **fields: object) -> object:
     return model(**fields)
 
 
+def build_simulation_run_dependencies(**values: object) -> object:
+    """Build one explicit canonical Simulation runtime dependency bundle.
+
+    Args:
+        **values: Exact state, artifact, policy, and public owner ports.
+
+    Returns:
+        Opaque dependency bundle accepted by ``run_backtest``.
+    """
+    builder = _operation(
+        "app.services.simulator.run.dependencies",
+        "build_simulation_run_dependencies",
+    )
+    return builder(**cast("Any", values))
+
+
+def build_simulation_state_store(**values: object) -> object:
+    """Build the durable Simulation state adapter.
+
+    Returns:
+        Opaque state-store implementation.
+    """
+    from app.services.simulator.state import build_simulation_state_store as builder
+
+    return builder(**cast("Any", values))
+
+
+def execute_simulation_state_store_operation(
+    store: object,
+    operation: str,
+    /,
+    *args: object,
+    **kwargs: object,
+) -> object:
+    """Execute one allowlisted operation on a Simulation state adapter.
+
+    Returns:
+        Exact state operation response.
+
+    Raises:
+        TypeError: If the handle does not satisfy the Simulation state protocol.
+        ValueError: If the operation is not part of the state boundary.
+    """
+    from app.services.simulator.state import SimulationStateStore
+
+    allowed = {
+        "append_journal",
+        "finalize_journal",
+        "flush_journal",
+        "load_run",
+        "record_idempotency",
+    }
+    if not isinstance(store, SimulationStateStore):
+        raise TypeError("store must implement SimulationStateStore")
+    if operation not in allowed:
+        raise ValueError("unsupported Simulation state-store operation")
+    return getattr(store, operation)(*args, **kwargs)
+
+
 def create_simulation_handle(
     handle_type: str, /, *args: object, **kwargs: object
 ) -> object:
@@ -617,6 +676,8 @@ __all__ = (
     "build_artifact_manifest",
     "build_json_report",
     "build_markdown_report",
+    "build_simulation_run_dependencies",
+    "build_simulation_state_store",
     "build_tick_timeline",
     "calculate_execution_costs",
     "calculate_margin",
@@ -628,6 +689,7 @@ __all__ = (
     "dump_simulation_value",
     "evaluate_protective_exit",
     "execute_simulation_handle_operation",
+    "execute_simulation_state_store_operation",
     "get_approved_tick_models",
     "get_canonical_artifact_types",
     "get_journal_policy",

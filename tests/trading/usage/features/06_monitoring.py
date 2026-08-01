@@ -6,6 +6,7 @@ Demonstrates FEAT-TRD-06 operational events, runtime event emission, and budget 
 from __future__ import annotations
 
 import sys
+import tempfile
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -14,11 +15,17 @@ from typing import Any
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.data import (
+    build_data_settings,
+    data_settings_context,
+    run_runtime_store_migrations,
+)
 from app.services.trading import (
     build_broker_state_unknown_event,
     create_execution_receipt,
     create_operational_event,
     emit_runtime_event,
+    get_trading_operational_events,
     validate_budget_authority,
 )
 from tests.trading import conftest as examples
@@ -156,6 +163,16 @@ def main() -> None:
         "-> Stage 2: Fail-closed budget authority verdict validation\n"
         "-> Stage 3: Operational event construction, critical incident creation, and runtime event emission"
     )
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        settings = build_data_settings(
+            database_url="sqlite:///trading-monitoring.sqlite3",
+            data_dir=Path(tmp_dir),
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
+        )
+        with data_settings_context(settings):
+            run_runtime_store_migrations(REQUEST_ID)
+            assert get_trading_operational_events() == ()
 
     # Stage 2: Fail-closed budget validation
     fr_trd_047()

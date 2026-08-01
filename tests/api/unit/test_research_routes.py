@@ -41,7 +41,7 @@ def test_only_registered_report_crosses_boundary(tmp_path: Path) -> None:
 
     status_code, body = post_json(
         _app(authenticated=True),
-        "/api/research/run",
+        "/api/v1/research/run",
         request.model_dump(mode="json"),
     )
 
@@ -65,7 +65,7 @@ def test_research_route_fails_closed_without_authentication(tmp_path: Path) -> N
 
     status_code, body = post_json(
         _app(authenticated=False),
-        "/api/research/run",
+        "/api/v1/research/run",
         request.model_dump(mode="json"),
     )
 

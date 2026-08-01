@@ -163,14 +163,15 @@ def _setup():
     )
 
     auth = create_auth_context(
-        contract_version="v1",
-        schema_id="utils.auth_context.v1",
+        contract_version="v2",
+        schema_id="utils.auth_context.v2",
         principal_id="operator-1",
         principal_type="USER",
         roles=("risk_operator",),
         permissions=("risk.kill.activate", "risk.kill.clear"),
         scopes=("risk",),
-        tenant_or_environment=config.profile,
+        tenant_or_environment="development",
+        runtime_profile=config.profile,
         request_id=REQUEST_ID,
         workflow_id=WORKFLOW_ID,
         correlation_id=CORRELATION_ID,

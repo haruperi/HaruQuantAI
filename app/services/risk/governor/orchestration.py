@@ -432,7 +432,7 @@ class RiskGovernor:
             raise ValueError("governor clock skew exceeded")
         if snapshot.config_hash != self._config_hash():
             raise ValueError("snapshot configuration binding conflicts")
-        if auth.tenant_or_environment != self._config.profile:
+        if auth.runtime_profile != self._config.profile:
             raise ValueError("authenticated environment conflicts with Risk profile")
 
     def _capacity_result(

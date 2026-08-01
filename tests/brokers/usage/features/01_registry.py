@@ -15,6 +15,7 @@ from app.services.brokers import (
     build_broker_value,
     create_broker_adapter,
     get_broker_capability_catalogue,
+    get_broker_dashboard_snapshot,
     get_broker_value_field,
     get_registered_brokers,
 )
@@ -126,6 +127,7 @@ def main() -> None:
         "-> explicit lazy creation\n"
         "-> connected adapter"
     )
+    assert get_broker_dashboard_snapshot()["status"] == "unavailable"
 
     # Stage 1: Broker ID & config / calculation requests
     fr_brokers_039_to_041_calculation_requests()

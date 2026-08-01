@@ -18,6 +18,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.risk import (
+    build_development_risk_config,
     compute_config_hash,
     create_firm_mandate,
     create_risk_config,
@@ -214,6 +215,7 @@ def main() -> None:
         "-> Stage 2: Strict RiskConfig and firm mandate validation\n"
         "-> Stage 3: Canonical JSON & config SHA-256 hash"
     )
+    assert build_development_risk_config().profile == "research"
 
     # 1. Stage 1: YAML & Mandate inputs
     fr_risk_023()

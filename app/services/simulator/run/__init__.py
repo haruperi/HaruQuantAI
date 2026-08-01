@@ -6,6 +6,7 @@ from app.services.simulator.run.contracts import (
     SimulationBacktestRequestV1,
     SimulationRunDependencies,
 )
+from app.services.simulator.run.dependencies import build_simulation_run_dependencies
 from app.services.simulator.run.orchestrator import run_backtest
 from app.services.simulator.run.portfolio import run_portfolio_backtest
 from app.services.simulator.run.research import run_fast_research
@@ -15,6 +16,7 @@ __all__ = [
     "PortfolioComponentRequest",
     "SimulationBacktestRequestV1",
     "SimulationRunDependencies",
+    "build_simulation_run_dependencies",
     "run_backtest",
     "run_fast_research",
     "run_portfolio_backtest",

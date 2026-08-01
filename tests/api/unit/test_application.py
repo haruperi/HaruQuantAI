@@ -1,0 +1,209 @@
+"""Tests for canonical application composition and lifecycle."""
+
+from types import SimpleNamespace
+
+import pytest
+from app.services.api import (
+    build_api_settings,
+    build_in_process_api_graph,
+    create_api_app,
+    get_required_in_process_provider_names,
+)
+from app.services.api.composition import application, lifecycle
+from app.services.api.composition.owner_sources import (
+    read_audit_events,
+    read_dashboard_snapshot,
+    read_trading_events,
+)
+from app.services.api.routes.dashboards import _dashboard_source
+from app.services.api.routes.operator import _audit_source, _event_source
+
+from tests.api._support import get_json, post_json
+
+
+def _in_process_providers() -> dict[str, object]:
+    """Build complete inert provider values for lifecycle tests."""
+    return {
+        name: lambda *args, **kwargs: (args, kwargs)
+        for name in get_required_in_process_provider_names()
+    }
+
+
+def test_canonical_app_has_exact_cors_and_route_catalog() -> None:
+    """One app exposes every registered route under `/api/v1`."""
+    config = build_api_settings(ui_origins=("https://ui.example.test",))
+    app = create_api_app(config)
+    paths = app.openapi()["paths"]
+    assert "/api/v1/auth/login" in paths
+    assert len(paths) == 20
+    assert "/api/v1/operator/approvals" in paths
+    assert "/api/v1/operator/kill-switch" not in paths
+    assert "/api/v1/backtest/run" not in paths
+    assert all(path.startswith("/api/v1/") for path in paths)
+    cors = next(
+        middleware
+        for middleware in app.user_middleware
+        if middleware.cls.__name__ == "CORSMiddleware"
+    )
+    assert cors.kwargs["allow_origins"] == ["https://ui.example.test"]
+    assert application.app is not None
+
+
+def test_canonical_app_binds_exact_owner_sources() -> None:
+    """The default ASGI application uses the concrete reduced owner graph."""
+    app = create_api_app(build_api_settings())
+    assert app.dependency_overrides[_dashboard_source]() is read_dashboard_snapshot
+    assert app.dependency_overrides[_audit_source]() is read_audit_events
+    assert app.dependency_overrides[_event_source]() is read_trading_events
+
+
+def test_runtime_profile_and_execution_route_fail_closed() -> None:
+    """Reject mismatched routes and live execution without explicit enablement."""
+    with pytest.raises(ValueError, match="runtime profile"):
+        build_api_settings(runtime_profile="simulation", execution_route="paper")
+    with pytest.raises(ValueError, match="live execution"):
+        build_api_settings(runtime_profile="live", execution_route="live")
+    settings = build_api_settings(
+        runtime_profile="live",
+        execution_route="live",
+        allow_live_mutations=True,
+    )
+    assert settings.allow_live_mutations is True
+
+
+def test_canonical_app_fails_closed_before_owner_delegation() -> None:
+    """Protected and idempotent routes reject incomplete boundary evidence."""
+    app = create_api_app(build_api_settings())
+    auth_status, auth_body = get_json(app, "/api/v1/health/readiness")
+    assert auth_status == 401
+    assert auth_body["status"] == "error"
+    assert auth_body["error"]["code"] == "AUTHENTICATION_REQUIRED"
+    assert auth_body["metadata"]["route"] == "/api/v1/health/readiness"
+    excluded_status, excluded_body = post_json(
+        app,
+        "/api/v1/portfolio/activations",
+        {},
+    )
+    assert excluded_status == 404
+    assert excluded_body["status"] == "error"
+
+
+def test_canonical_app_wraps_successful_json_responses() -> None:
+    """Every non-stream JSON success uses the canonical five-field envelope."""
+    app = create_api_app(build_api_settings())
+    response_status, response_body = get_json(app, "/api/v1/health/liveness")
+    assert response_status == 200
+    assert set(response_body) == {"status", "message", "data", "error", "metadata"}
+    assert response_body["status"] == "success"
+    assert response_body["error"] is None
+    assert response_body["metadata"]["operation"] == "api.get_liveness"
+
+
+def test_required_startup_failure_propagates(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Required storage failure blocks startup truthfully."""
+    monkeypatch.setattr(
+        lifecycle,
+        "run_api_migrations",
+        lambda _: SimpleNamespace(status="error", data=None),
+    )
+    app = create_api_app(build_api_settings())
+
+    async def enter_lifespan() -> None:
+        async with lifecycle.lifespan(app):
+            raise AssertionError("startup failure must prevent serving")
+
+    import asyncio
+
+    with pytest.raises(lifecycle.StartupError):
+        asyncio.run(enter_lifespan())
+
+
+def test_optional_startup_failure_is_visible_degradation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Explicit optional failures degrade but do not block serving."""
+    monkeypatch.setattr(
+        lifecycle,
+        "run_api_migrations",
+        lambda _: SimpleNamespace(status="success", data=object()),
+    )
+    app = application.create_app(
+        build_api_settings(),
+        optional_startup_probes={
+            "optional": lambda: (_ for _ in ()).throw(RuntimeError())
+        },
+    )
+
+    async def enter_lifespan() -> None:
+        async with lifecycle.lifespan(app):
+            assert app.state.api_ready is True
+            assert app.state.api_optional_degraded == {
+                "optional": "DEPENDENCY_UNAVAILABLE"
+            }
+        assert app.state.api_ready is False
+
+    import asyncio
+
+    asyncio.run(enter_lifespan())
+
+
+def test_required_provider_failure_blocks_readiness(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A failed required in-process probe prevents application readiness."""
+    monkeypatch.setattr(
+        lifecycle,
+        "run_api_migrations",
+        lambda _: SimpleNamespace(status="success", data=object()),
+    )
+    app = create_api_app(build_api_settings())
+
+    def unavailable() -> object:
+        """Represent one unavailable required provider."""
+        raise RuntimeError
+
+    app.state.api_required_startup_probes = {"required": unavailable}
+
+    async def enter_lifespan() -> None:
+        async with lifecycle.lifespan(app):
+            raise AssertionError("required provider failure must prevent serving")
+
+    import asyncio
+
+    with pytest.raises(
+        lifecycle.StartupError,
+        match="API_REQUIRED_DEPENDENCY_UNAVAILABLE:required",
+    ):
+        asyncio.run(enter_lifespan())
+    assert app.state.api_ready is False
+
+
+def test_in_process_owned_resources_close_in_reverse_order(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Close only graph-owned resources in reverse acquisition order."""
+    monkeypatch.setattr(
+        lifecycle,
+        "run_api_migrations",
+        lambda _: SimpleNamespace(status="success", data=object()),
+    )
+    closed: list[str] = []
+    graph = build_in_process_api_graph(
+        _in_process_providers(),
+        owned_resource_closers=(
+            lambda: closed.append("first"),
+            lambda: closed.append("second"),
+        ),
+    )
+    app = create_api_app(build_api_settings(), in_process_graph=graph)
+
+    async def enter_lifespan() -> None:
+        async with lifecycle.lifespan(app):
+            assert app.state.api_ready is True
+
+    import asyncio
+
+    asyncio.run(enter_lifespan())
+    assert closed == ["second", "first"]

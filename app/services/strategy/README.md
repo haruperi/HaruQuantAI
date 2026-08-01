@@ -234,7 +234,7 @@ Folders and files are ordered from lowest dependency to highest dependency. This
 |---|---|---|---|---|---|
 | Completed | `FEAT-STR-01` Versioned Strategy Contracts | `contracts/` | Exact declarations and contract fields: Section 4.1 | Section 4.1 functional requirements | `tests/strategy/usage/features/01_contracts.py` |
 | Completed | `FEAT-STR-02` Deterministic Safe Diagnostics | `diagnostics/` | Exact declarations and diagnostic contracts: Section 4.2 | Section 4.2 functional requirements | `tests/strategy/usage/features/02_diagnostics.py` |
-| Completed | `FEAT-STR-03` Immutable Registry and Configuration | `registry/` | Exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/strategy/usage/features/03_registry.py` |
+| Completed | `FEAT-STR-03` Immutable Registry and Configuration | `registry/` | Exact declarations: Section 4.3; secret-free `build_development_strategy_validation_policy` composition manifest | Section 4.3 functional requirements | `tests/strategy/usage/features/03_registry.py` |
 | Completed | `FEAT-STR-04` Canonical TradeIntent Proposals | `intents/` | Exact declarations and intent contract: Section 4.4 | Section 4.4 functional requirements | `tests/strategy/usage/features/04_intents.py` |
 | Completed | `FEAT-STR-05` Deterministic Replay Manifests | `replay/` | Exact declarations and replay contracts: Section 4.5 | Section 4.5 functional requirements | `tests/strategy/usage/features/05_replay.py` |
 | Completed | `FEAT-STR-06` Bounded Persisted Local State | `checkpoints/` | Exact declarations and checkpoint contracts: Section 4.6 | Section 4.6 functional requirements | `tests/strategy/usage/features/06_checkpoints.py` |

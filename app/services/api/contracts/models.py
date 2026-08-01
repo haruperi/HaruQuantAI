@@ -22,12 +22,14 @@ from pydantic import (
     model_validator,
 )
 
+from app.services.api._limits import MAX_ERROR_DETAILS, MAX_ERROR_TEXT_LENGTH
 from app.services.data import build_market_dataset, is_market_dataset
 from app.services.research import create_research_value, is_research_value
-from app.utils import get_logger, utc_now
+from app.utils import get_logger, is_sensitive_key, utc_now
 
-_MAX_DETAILS = 16
 _MAX_VISIBLE_IDS = 200
+_HTTP_SUCCESS_MIN = 200
+_HTTP_ERROR_MIN = 400
 
 logger = get_logger(__name__)
 
@@ -159,6 +161,9 @@ class ApiMetadata(_BaseApiContract):
     timestamp: datetime = Field(default_factory=utc_now)
     stale: bool = False
     stale_reason: str | None = None
+    next_cursor: str | None = None
+    page_size: int | None = Field(default=None, ge=0, le=200)
+    idempotency_replayed: bool = False
 
     @field_validator("request_id", "operation")
     @classmethod
@@ -239,18 +244,16 @@ class ApiError(_BaseApiContract):
         """
         if not isinstance(value, Mapping):
             raise TypeError("details must be a mapping")
-        if len(value) > _MAX_DETAILS:
+        if len(value) > MAX_ERROR_DETAILS:
             raise ValueError("details must be at most 16 entries")
-        for key in value:
+        for key, item in value.items():
             if not isinstance(key, str):
                 raise TypeError("detail keys must be strings")
             _validate_non_empty(key, "detail key")
-            if key.lower().replace("-", "").replace("_", "") in {
-                "apikey",
-                "password",
-                "secret",
-            }:
+            if is_sensitive_key(key):
                 raise ValueError("reserved key is not allowed")
+            if isinstance(item, str) and len(item) > MAX_ERROR_TEXT_LENGTH:
+                raise ValueError("detail text exceeds maximum length")
         return value
 
 
@@ -298,6 +301,7 @@ class StreamEvent(_BaseApiContract):
 
     sequence: int
     request_id: str
+    trace_id: str | None = None
     route: str
     event_type: StreamEventType
     timestamp: datetime = Field(default_factory=utc_now)
@@ -364,6 +368,10 @@ class StreamEvent(_BaseApiContract):
             raise ValueError("heartbeat events cannot include payload")
         if self.event_type == StreamEventType.ERROR and self.error is None:
             raise ValueError("error events require error")
+        if self.event_type != StreamEventType.ERROR and self.error is not None:
+            raise ValueError("only error events may include error")
+        if self.event_type == StreamEventType.PAYLOAD and self.payload is None:
+            raise ValueError("payload events require payload")
         return self
 
 
@@ -538,6 +546,9 @@ class RouteContract(_BaseApiContract):
     idempotency_policy: Literal["none", "required", "optional"] | None = None
     rate_limit: str | None = None
     audit_events: bool = False
+    success_statuses: tuple[int, ...] = (200,)
+    error_statuses: tuple[int, ...] = (422, 500)
+    observability: bool = True
 
     @field_validator("route_id", "owner")
     @classmethod
@@ -586,6 +597,27 @@ class RouteContract(_BaseApiContract):
             and self.governance_scope != "required"
         ):
             raise ValueError("governed_write routes must require governance")
+        if self.auth_required and not self.permission:
+            raise ValueError("authenticated routes require a permission")
+        if self.side_effect in {RouteSideEffect.WRITE, RouteSideEffect.GOVERNED_WRITE}:
+            if self.idempotency_policy is None:
+                raise ValueError("write routes require an explicit retry policy")
+            if not self.audit_events:
+                raise ValueError("write routes require audit events")
+        if (
+            self.side_effect == RouteSideEffect.GOVERNED_WRITE
+            and self.idempotency_policy != "required"
+        ):
+            raise ValueError("governed_write routes require idempotency")
+        if not self.success_statuses or any(
+            status < _HTTP_SUCCESS_MIN or status >= _HTTP_ERROR_MIN
+            for status in self.success_statuses
+        ):
+            raise ValueError("success_statuses must contain successful HTTP statuses")
+        if not self.error_statuses or any(
+            status < _HTTP_ERROR_MIN for status in self.error_statuses
+        ):
+            raise ValueError("error_statuses must contain error HTTP statuses")
         return self
 
 

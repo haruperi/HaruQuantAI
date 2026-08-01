@@ -1,201 +1,43 @@
-"""Authenticated operator kill-switch and protected evidence boundary."""
+"""Authenticated operator evidence and approval boundary."""
 
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
-from datetime import datetime
-from typing import Annotated, Any, Literal, Protocol, cast
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 
-from app.services.api.alerts import (
-    CriticalAlertDeliveryResult,
-    CriticalAlertSink,
-    CriticalOperationalAlert,
-    build_kill_switch_activation_alert,
-    deliver_critical_alert,
+from app.services.api.identity import (
+    create_approval,
+    require_auth_context,
+    require_human_permission,
 )
-from app.services.api.identity import require_auth_context, require_human_permission
-from app.services.risk import (
-    create_approval_attestation,
-    create_kill_switch_command,
-    is_risk_domain_error,
-)
-from app.utils import get_logger
 
 type AuthContext = Any
-ApprovalAttestation = Any
-KillSwitchCommand = Any
-KillSwitchState = Any
-OperationalEvent = Any
-
-logger = get_logger(__name__)
-
-type _KillSwitchTransition = Callable[
-    [KillSwitchCommand, AuthContext, ApprovalAttestation | None],
-    object,
-]
-type _ReadinessSource = Callable[[AuthContext], Mapping[str, str]]
+type OperationalEvent = Any
 type _AuditSource = Callable[[AuthContext, int], Sequence[Any]]
 type _EventSource = Callable[[AuthContext], Sequence[OperationalEvent]]
 
-
-class _RiskResponseView(Protocol):
-    """Structural view of one Risk standard response."""
-
-    status: str
-    data: object | None
+router = APIRouter(prefix="/api/v1/operator", tags=["operator"])
 
 
-router = APIRouter(prefix="/api/operator", tags=["operator"])
-
-
-class _OperatorKillSwitchRequest(BaseModel):
-    """Receiver-owned operator input for one scoped Risk transition."""
+class _ApprovalRequest(BaseModel):
+    """Scoped UI/API-owned human approval request."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    action: Literal["activate", "clear"]
-    scope_level: Literal["global", "portfolio", "strategy", "symbol"]
-    portfolio_id: str | None = None
-    strategy_id: str | None = None
-    symbol: str | None = None
-    reason: str
-    requested_at: datetime
-    attestation: _OperatorApprovalAttestation | None = None
-
-    @model_validator(mode="after")
-    def _validate_closed_values(self) -> _OperatorKillSwitchRequest:
-        """Validate the closed command and scope values.
-
-        Returns:
-            Validated request.
-
-        Raises:
-            ValueError: If action or scope is unsupported.
-        """
-        if self.action not in {"activate", "clear"}:
-            raise ValueError("action must be activate or clear")
-        if self.scope_level not in {"global", "portfolio", "strategy", "symbol"}:
-            raise ValueError("scope_level is invalid")
-        required_scope = {
-            "portfolio": self.portfolio_id,
-            "strategy": self.strategy_id,
-            "symbol": self.symbol,
-        }.get(self.scope_level)
-        if self.scope_level != "global" and required_scope is None:
-            raise ValueError("scoped commands require their matching identifier")
-        return self
-
-
-class _OperatorApprovalAttestation(BaseModel):
-    """JSON-facing exact representation of Risk approval evidence."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    contract_version: Literal["v1"] = "v1"
-    schema_id: Literal["risk.approval_attestation.v1"] = "risk.approval_attestation.v1"
-    attestation_id: str
-    principal_id: str
-    action: str
-    scope: Mapping[str, str]
-    policy_ref: str
-    policy_version: str
-    issued_at: datetime
-    expires_at: datetime
-    request_id: str
-    workflow_id: str
-    correlation_id: str
-
-    @model_validator(mode="after")
-    def _validate_owner_contract(self) -> _OperatorApprovalAttestation:
-        """Validate the decoded JSON against the Risk-owned contract.
-
-        Returns:
-            Validated JSON-facing attestation.
-
-        Raises:
-            ValueError: If Risk rejects the decoded evidence.
-        """
-        create_approval_attestation(**self.model_dump())
-        return self
-
-    def to_contract(self) -> ApprovalAttestation:
-        """Return the canonical Risk-owned approval contract.
-
-        Returns:
-            Validated Risk approval attestation.
-        """
-        return create_approval_attestation(**self.model_dump())
-
-
-class _OperatorKillSwitchResponse(BaseModel):
-    """Operator-visible canonical state and optional alert-delivery evidence."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    state: KillSwitchState
-    alert: CriticalOperationalAlert | None
-    delivery: CriticalAlertDeliveryResult | None
-
-
-def _kill_switch_transition() -> _KillSwitchTransition:
-    """Fail closed until composition injects the Risk transition.
-
-    Raises:
-        HTTPException: Always when no transition boundary is configured.
-    """
-    raise HTTPException(
-        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        detail="RISK_KILL_SWITCH_UNAVAILABLE",
-    )
-
-
-def _unavailable_alert_sink(
-    alert: CriticalOperationalAlert,
-    *,
-    idempotency_key: str,
-) -> None:
-    """Represent unavailable alert delivery without blocking Risk activation.
-
-    Args:
-        alert: Validated critical alert.
-        idempotency_key: Deterministic alert identity.
-
-    Raises:
-        RuntimeError: Always so delivery returns structured failure evidence.
-    """
-    del alert, idempotency_key
-    raise RuntimeError("critical alert sink unavailable")
-
-
-def _critical_alert_sink() -> CriticalAlertSink:
-    """Return the default fail-visible alert sink.
-
-    Returns:
-        Sink that reports unavailability through delivery evidence.
-    """
-    return _unavailable_alert_sink
-
-
-def _readiness_source() -> _ReadinessSource:
-    """Fail closed until composition injects protected readiness.
-
-    Raises:
-        HTTPException: Always when readiness is unavailable.
-    """
-    raise HTTPException(
-        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        detail="READINESS_UNAVAILABLE",
-    )
+    subject_id: str = Field(min_length=1, max_length=200)
+    scope: str = Field(min_length=1, max_length=200)
+    evidence: Mapping[str, object]
+    ttl_seconds: int = Field(ge=1, le=86_400)
 
 
 def _audit_source() -> _AuditSource:
-    """Fail closed until composition injects the Data-owned audit query.
+    """Fail closed until composition injects the Data audit query.
 
     Raises:
-        HTTPException: Always when audit query is unavailable.
+        HTTPException: Always when the audit query is unavailable.
     """
     raise HTTPException(
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -207,162 +49,12 @@ def _event_source() -> _EventSource:
     """Fail closed until composition injects the Trading event view.
 
     Raises:
-        HTTPException: Always when events are unavailable.
+        HTTPException: Always when the event view is unavailable.
     """
     raise HTTPException(
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         detail="OPERATIONAL_EVENTS_UNAVAILABLE",
     )
-
-
-def _scope(request: _OperatorKillSwitchRequest) -> dict[str, str]:
-    """Derive the exact Risk scope mapping.
-
-    Args:
-        request: Validated operator request.
-
-    Returns:
-        Canonical Risk scope mapping.
-    """
-    values = {
-        "portfolio": request.portfolio_id,
-        "strategy": request.strategy_id,
-        "symbol": request.symbol,
-    }
-    value = values.get(request.scope_level)
-    return {} if request.scope_level == "global" else {request.scope_level: str(value)}
-
-
-def _validate_clearance(
-    request: _OperatorKillSwitchRequest,
-    auth: AuthContext,
-    attestation: ApprovalAttestation | None,
-) -> None:
-    """Reject incomplete or same-principal clearance before Risk delegation.
-
-    Args:
-        request: Validated operator request.
-        auth: Authenticated command principal.
-        attestation: Canonical optional Risk clearance evidence.
-
-    Raises:
-        HTTPException: If clearance evidence is absent or incompatible.
-    """
-    if request.action != "clear":
-        return
-    if attestation is None:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="CLEARANCE_ATTESTATION_REQUIRED",
-        )
-    expected_scope = _scope(request) or {"global": "*"}
-    if attestation.principal_id == auth.principal_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="DISTINCT_PRINCIPAL_REQUIRED",
-        )
-    if (
-        attestation.action != "risk.kill.clear"
-        or dict(attestation.scope) != expected_scope
-        or attestation.request_id != auth.request_id
-        or attestation.workflow_id != auth.workflow_id
-        or attestation.correlation_id != auth.correlation_id
-        or not (attestation.issued_at <= request.requested_at < attestation.expires_at)
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="CLEARANCE_ATTESTATION_MISMATCH",
-        )
-
-
-@router.post("/kill-switch", response_model=_OperatorKillSwitchResponse)
-def _apply_kill_switch(
-    request: _OperatorKillSwitchRequest,
-    auth: Annotated[AuthContext, Depends(require_auth_context)],
-    transition: Annotated[_KillSwitchTransition, Depends(_kill_switch_transition)],
-    alert_sink: Annotated[CriticalAlertSink, Depends(_critical_alert_sink)],
-) -> _OperatorKillSwitchResponse:
-    """Delegate one authorized scoped command to canonical Risk authority.
-
-    Args:
-        request: Receiver-owned operator input.
-        auth: Authenticated command principal and trace.
-        transition: Injected Risk-owned transition boundary.
-        alert_sink: Injected channel-neutral alert sink.
-
-    Returns:
-        Canonical state plus visible activation alert-delivery evidence.
-
-    Raises:
-        HTTPException: If authorization, clearance, or Risk delegation fails.
-    """
-    permission = (
-        "risk.kill.activate" if request.action == "activate" else "risk.kill.clear"
-    )
-    require_human_permission(auth, permission)
-    attestation = (
-        None if request.attestation is None else request.attestation.to_contract()
-    )
-    _validate_clearance(request, auth, attestation)
-    try:
-        command = create_kill_switch_command(
-            action=request.action,
-            scope_level=request.scope_level,
-            portfolio_id=request.portfolio_id,
-            strategy_id=request.strategy_id,
-            symbol=request.symbol,
-            reason=request.reason,
-            requested_at=request.requested_at,
-            request_id=auth.request_id,
-            workflow_id=auth.workflow_id,
-            correlation_id=auth.correlation_id,
-        )
-        state_or_response = transition(command, auth, attestation)
-    except Exception as error:
-        if not is_risk_domain_error(error):
-            raise
-        logger.warning("Risk rejected operator kill-switch command")
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=error.risk_code.value,  # type: ignore[attr-defined]
-        ) from error
-    if hasattr(state_or_response, "status"):
-        risk_response = cast("_RiskResponseView", state_or_response)
-        if risk_response.status != "success" or risk_response.data is None:
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="RISK_KILL_SWITCH_UNAVAILABLE",
-            )
-        state = cast("Any", risk_response.data)
-    else:
-        state = cast("Any", state_or_response)
-    if state.state != "active":
-        return _OperatorKillSwitchResponse(state=state, alert=None, delivery=None)
-    alert = build_kill_switch_activation_alert(state, auth)
-    delivery = deliver_critical_alert(alert, alert_sink)
-    return _OperatorKillSwitchResponse(
-        state=state,
-        alert=alert,
-        delivery=delivery,
-    )
-
-
-@router.get("/readiness", response_model=dict[str, str])
-def _get_readiness(
-    auth: Annotated[AuthContext, Depends(require_auth_context)],
-    source: Annotated[_ReadinessSource, Depends(_readiness_source)],
-) -> dict[str, str]:
-    """Return protected bounded readiness evidence.
-
-    Args:
-        auth: Authenticated operator.
-        source: Injected readiness source.
-
-    Returns:
-        Bounded readiness mapping.
-    """
-    require_human_permission(auth, "ops:read")
-    return dict(source(auth))
 
 
 @router.get("/audit-events", response_model=None)
@@ -401,6 +93,31 @@ def _get_events(
     """
     require_human_permission(auth, "ops:events:read")
     return tuple(source(auth))
+
+
+@router.post("/approvals", response_model=None)
+def _create_approval(
+    request: _ApprovalRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+) -> object:
+    """Persist one distinct-principal scoped operator approval.
+
+    Args:
+        request: Exact subject, scope, evidence, and expiry.
+        auth: Authenticated human approver.
+
+    Returns:
+        Secret-free UI/API approval record.
+    """
+    require_human_permission(auth, "ops:approve")
+    return create_approval(
+        issuer_id=auth.principal_id,
+        subject_id=request.subject_id,
+        scope=request.scope,
+        evidence=request.evidence,
+        ttl_seconds=request.ttl_seconds,
+        request_id=auth.request_id,
+    )
 
 
 __all__ = ("router",)

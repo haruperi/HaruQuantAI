@@ -3,6 +3,13 @@
 > **Package:** `app/agentic`
 > **Domain ID:** `AGENTIC`
 > **Status:** `Partial`
+
+> **API-BE-003 runtime seam:** production public operations require durable
+> workflow, memory, operations, and lifecycle stores. In-memory reference stores
+> remain test-only; UI/API receives one owner-built `AgenticDependencies` bundle
+> through `build_durable_agentic_dependencies` and gains no Agentic or
+> receiver-domain authority. Restart durability is verified in
+> `tests/agentic/integration/test_durable_runtime.py`.
 > **Last updated:** `2026-07-29`
 > **System workflows:** `SYS-WF-009`, `SYS-WF-010`, `SYS-WF-011`, `SYS-WF-012`
 

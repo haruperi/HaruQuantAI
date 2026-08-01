@@ -2,6 +2,11 @@
 
 > **Package:** `app/services/risk`
 > **Status:** `Completed`
+
+> **API-BE-003 runtime seam:** Allocation and governor composition bind their
+> durable state, approval-token state, and audit ports for `FR-RISK-030` and
+> `FR-RISK-041`;
+> UI/API receives operation callables and never owns Risk decisions or state.
 > **Last updated:** `2026-07-28`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -162,10 +167,10 @@ Modules and files are ordered from lowest dependency to highest dependency. Priv
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
 | Completed | `FEAT-RISK-01` Versioned Contracts and Deterministic Errors | `contracts/` | Exact declarations and contract fields: Section 4.1 | Section 4.1 functional requirements | `tests/risk/usage/features/01_contracts.py` |
-| Completed | `FEAT-RISK-02` Risk Profiles and Stable Configuration | `config/` | Exact declarations: Section 4.2 | Section 4.2 functional requirements | `tests/risk/usage/features/02_config.py` |
+| Completed | `FEAT-RISK-02` Risk Profiles and Stable Configuration | `config/` | Exact declarations: Section 4.2; secret-free `build_development_risk_config` research manifest with external signing-key reference | Section 4.2 functional requirements | `tests/risk/usage/features/02_config.py` |
 | Completed | `FEAT-RISK-03` Portfolio Risk Snapshot | `portfolio/` | Exact declarations and snapshot contracts: Section 4.3 | Section 4.3 functional requirements | `tests/risk/usage/features/03_portfolio.py` |
 | Completed | `FEAT-RISK-04` Position Sizing Recommendations | `sizing/` | Exact declarations: Section 4.4 | Section 4.4 functional requirements | `tests/risk/usage/features/04_sizing.py` |
-| Completed | `FEAT-RISK-05` Tamper-Evident Risk Audit | `audit/` | Exact declarations and audit contracts: Section 4.5 | Section 4.5 functional requirements | `tests/risk/usage/features/05_audit.py` |
+| Completed | `FEAT-RISK-05` Tamper-Evident Risk Audit | `audit/` | Exact declarations and audit contracts: Section 4.5; durable stable-scope kill-switch CAS/read adapter | Section 4.5 functional requirements | `tests/risk/usage/features/05_audit.py` |
 | Completed | `FEAT-RISK-06` Portfolio and Market-Context Limits | `limits/` | Exact declarations: Section 4.6 | Section 4.6 functional requirements | `tests/risk/usage/features/06_limits.py` |
 | Completed | `FEAT-RISK-07` Regime Assessment and Limit Tightening | `regimes/` | Exact declarations: Section 4.7 | Section 4.7 functional requirements | `tests/risk/usage/features/07_regimes.py` |
 | Completed | `FEAT-RISK-08` Strategy Operational Eligibility | `admission/` | Exact declarations: Section 4.8 | Section 4.8 functional requirements | `tests/risk/usage/features/08_admission.py` |

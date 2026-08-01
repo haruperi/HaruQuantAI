@@ -2,6 +2,12 @@
 
 > **Package:** `app/services/trading`
 > **Status:** `Completed`
+
+> **API-BE-003 runtime seam:** `actions/` constructs the existing
+> `TradingDependencies` only from explicit public owner ports. Broker access is
+> lazy, live mutations remain disabled unless existing Trading gates authorize
+> them, and UI/API never supplies substitute authority. `state/runtime.py`
+> supplies the Data-backed idempotency, event, projection, and evidence store.
 > **Last updated:** `2026-07-30`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -180,7 +186,7 @@ Modules and files are ordered from lowest dependency to highest dependency.
 | Completed | `FEAT-TRD-03` Validation, Readiness, and Plans | `validation/` | `create_readiness_assessment`, `create_route_snapshot`, `assess_execution_readiness`, `build_execution_plan`, `get_route_snapshot`, `validate_order_request`; exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/trading/usage/features/03_validation.py` |
 | Completed | `FEAT-TRD-04` Authority Selection and Dispatch | `routing/` | `classify_authority_response`, `dispatch_order_intent`, `validate_adapter_capability`; exact declarations: Section 4.4 | Section 4.4 functional requirements | `tests/trading/usage/features/04_routing.py` |
 | Completed | `FEAT-TRD-05` Reconciliation and Retry Guard | `reconciliation/` | `create_authority_resolution`, `create_authority_snapshot`, `create_reconciliation_report`, `compare_authority_state`, `resolve_unknown_outcome`; exact declarations: Section 4.5 | Section 4.5 functional requirements | `tests/trading/usage/features/05_reconciliation.py` |
-| Completed | `FEAT-TRD-06` Operational and Budget Evidence | `monitoring/` | `create_operational_event`, `validate_budget_authority`, `build_broker_state_unknown_event`, `emit_runtime_event`; exact declarations: Section 4.6 | Section 4.6 functional requirements | `tests/trading/usage/features/06_monitoring.py` |
+| Completed | `FEAT-TRD-06` Operational and Budget Evidence | `monitoring/` | `create_operational_event`, `validate_budget_authority`, `build_broker_state_unknown_event`, `emit_runtime_event`, `get_trading_operational_events`; exact declarations: Section 4.6 | Section 4.6 functional requirements | `tests/trading/usage/features/06_monitoring.py` |
 | Completed | `FEAT-TRD-07` Live and Paper Session Lifecycle | `live/` | `create_live_session`, `start_live_session`, `stop_live_session`, `get_live_session_status`, `is_live_session_started`, `is_live_session_reconciliation_ready`, `is_live_session_admission_enabled`, `evaluate_live_gate`; exact declarations and configuration: Section 4.7 | Section 4.7 functional requirements | `tests/trading/usage/features/07_live.py` |
 | Completed | `FEAT-TRD-08` Route-Aware Public Actions | `actions/` | `create_trading_dependencies`, `submit_order`, `modify_order`, `cancel_order`, `close_position`, `modify_position`, `reduce_exposure`, `pause_strategy`, `resume_strategy`, `sync_positions`, `trigger_kill_switch`, `clear_kill_switch`, `cancel_all_orders`, `close_all_positions`, `execute_portfolio_rebalance`, `run_live_evaluation_cycle`; exact declarations: Section 4.8 | Section 4.8 functional requirements | `tests/trading/usage/features/08_actions.py` |
 | Completed | `FEAT-TRD-09` Immutable Execution Evidence | `reporting/` | `build_trading_report` returning `ExecutionEvidenceReport`; exact declarations: Section 4.9 | Section 4.9 functional requirements | `tests/trading/usage/features/09_reporting.py` |

@@ -2,6 +2,24 @@
 
 ## [Unreleased]
 
+### Implement the API backend foundation
+
+The API service now provides the canonical contract, identity, governance,
+routing, streaming, and application-composition foundation while owner-domain
+with a truthful reduced owner-backed HTTP surface ready for frontend client work.
+
+#### Added (3)
+
+- Completed `FEAT-API-01` through `FEAT-API-08`, added canonical non-stream envelopes and the validated three-source in-process provider graph with required readiness probes and reverse shutdown.
+- Added Data-owned durable runtime records and owner adapters for Simulation, Risk, Trading, Portfolio, and Agentic state while retaining the unresolved canonical provider-configuration gate.
+- Added an exact 21-operation backend-v1 route/OpenAPI inventory and explicit absence evidence for uncomposed Simulation, Risk, Trading, Optimization, Portfolio, and Agentic HTTP families.
+
+#### Changed (3)
+
+- Reconciled the API feature registry and Sections 4.1 through 4.8 with executable tests, numbered usage evidence, and the reduced frontend-v1 capability map.
+- Added fail-closed API runtime-profile validation, route-class rate limits, request deadlines, bounded pagination, import-boundary enforcement, and a deterministic 21-operation OpenAPI contract digest.
+- Added Utils `AuthContext v2` and API account migration `api-0003`, preserving deployment tenancy separately from the bounded runtime profile so Risk consumes execution authority while Agentic retains deployment-environment binding.
+
 ### Close repository-wide validation regressions
 
 The combined domain migration now preserves function-only runtime validation,

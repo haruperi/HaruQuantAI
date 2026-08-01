@@ -90,6 +90,7 @@ from app.services.brokers.operations import (
 from app.services.brokers.registry.catalogue import (
     get_broker_capability_catalogue,
 )
+from app.services.brokers.registry.dashboard import get_broker_dashboard_snapshot
 from app.services.brokers.registry.factory import (
     create_broker_adapter,
     get_registered_brokers,
@@ -137,6 +138,7 @@ __all__ = (
     "get_broker_connection_events",
     "get_broker_connection_id",
     "get_broker_connection_status",
+    "get_broker_dashboard_snapshot",
     "get_broker_deal",
     "get_broker_environment",
     "get_broker_error_catalog",

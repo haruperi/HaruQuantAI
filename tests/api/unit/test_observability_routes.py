@@ -45,7 +45,7 @@ def test_disabled_metrics_returns_not_found(monkeypatch: pytest.MonkeyPatch) -> 
     sink = create_in_process_metric_sink()
     sink.record("api_metric_total", Decimal(1), labels={"service": "api"})
 
-    status_code, body = get_json(_app(sink=sink), "/api/metrics")
+    status_code, body = get_json(_app(sink=sink), "/api/v1/metrics")
 
     assert status_code == 404
     assert body["detail"] == "METRICS_DISABLED"
@@ -59,7 +59,7 @@ def test_scrape_requires_permission(monkeypatch: pytest.MonkeyPatch) -> None:
 
     status_code, body = get_json(
         _app(sink=sink, permissions=("ops:read",)),
-        "/api/metrics",
+        "/api/v1/metrics",
     )
 
     assert status_code == 403
@@ -72,9 +72,9 @@ def test_scrape_returns_prometheus_payload(monkeypatch: pytest.MonkeyPatch) -> N
     sink = create_in_process_metric_sink()
     sink.record("api_metric_total", Decimal(1), labels={"service": "api"})
 
-    status_code, body = get_json(_app(sink=sink), "/api/metrics")
+    status_code, body = get_json(_app(sink=sink), "/api/v1/metrics")
 
     assert status_code == 200
     assert body["status"] == "success"
     assert "api_metric_total" in body["data"]
-    assert body["metadata"]["route"] == "/api/metrics"
+    assert body["metadata"]["route"] == "/api/v1/metrics"

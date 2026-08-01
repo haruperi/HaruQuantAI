@@ -204,8 +204,8 @@ Package (Data domain)
 The following registry is the owner-approved target. It treats a feature as one
 cohesive capability, not as one public function. A feature may expose multiple
 operations when they serve the same actor outcome; each operation still implements
-one focused functional-requirement behaviour. The target contains sixteen registered
-capabilities: fifteen business features and one foundational contract capability.
+one focused functional-requirement behaviour. The target contains seventeen registered
+capabilities: sixteen business features and one foundational contract capability.
 
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
@@ -217,14 +217,15 @@ capabilities: fifteen business features and one foundational contract capability
 | Completed | `FEAT-DATA-06` Data Persistence and Storage | `persistence/` | Transaction, migration, locking, dataset, cache, import, backup, restore, retention, and path contracts/operations | Section 4 persistence requirements, allocated to this owner | `tests/data/usage/features/06_persistence.py` |
 | Completed | `FEAT-DATA-07` Data Quality and Validation | `quality/` | Quality contracts, series/anomaly inspection, symbol metadata validation, policy, scoring, and remediation | Section 4 quality requirements, allocated to this owner | `tests/data/usage/features/07_quality.py` |
 | Completed | `FEAT-DATA-08` Data Transformation and Resampling | `transformation/` | Resampling, tick aggregation, multi-timeframe alignment, and detached tabular projections | Section 4 transformation requirements, allocated to this owner | `tests/data/usage/features/08_transformation.py` |
-| Completed | `FEAT-DATA-09` Time and Session Handling | `time_sessions/` | Timeframe/schedule contracts, UTC policy, venue market hours, exchange/configured schedules, analytical named sessions, and gap classification | `FR-DATA-034`, `FR-DATA-117`–`FR-DATA-122` | `tests/data/usage/features/09_time_sessions.py` |
+| Completed | `FEAT-DATA-09` Time and Session Handling | `time_sessions/` | Timeframe/schedule contracts, UTC policy, venue market hours, exchange/configured schedules, analytical named sessions, gap classification, and explicit context-required dashboard snapshot | `FR-DATA-034`, `FR-DATA-117`–`FR-DATA-122` | `tests/data/usage/features/09_time_sessions.py` |
 | Completed | `FEAT-DATA-10` Data Source Governance | `sources/` | Source contracts/protocol, registry/composition, policy/promotion, adapters, licensing, and read-only proxy | Section 4 source-governance requirements, allocated to this owner | `tests/data/usage/features/10_sources.py` |
-| Completed | `FEAT-DATA-11` Economic Calendar | `economic_calendar/` | Licensed Firecrawl acquisition, raw scraper contracts, exact-value normalization, approved persistence, symbol queries, and restriction/state evidence through function-only package-root operations | `FR-DATA-095`–`099`, `FR-DATA-123`–`129` | `tests/data/usage/features/11_economic_calendar.py`; opt-in `tests/data/integration/test_economic_calendar_live.py` |
+| Completed | `FEAT-DATA-11` Economic Calendar | `economic_calendar/` | Licensed Firecrawl acquisition, raw scraper contracts, exact-value normalization, approved persistence, symbol queries, restriction/state evidence, and explicit context-required dashboard snapshot through function-only package-root operations | `FR-DATA-095`–`099`, `FR-DATA-123`–`129` | `tests/data/usage/features/11_economic_calendar.py`; opt-in `tests/data/integration/test_economic_calendar_live.py` |
 | Completed | `FEAT-DATA-12` Real-Time Feed Lifecycle and Observability | `realtime_feeds/` | Feed contracts/state, buffer, heartbeat, reconnection, reconciliation, and status operations | Section 4 feed requirements, allocated to this owner | `tests/data/usage/features/12_realtime_feeds.py` |
 | Completed | `FEAT-DATA-13` Scheduler and Job Management | `data_jobs/` | Job/backfill/recovery contracts and create/start/stop/run/status/recovery operations | Section 4 job requirements, allocated to this owner | `tests/data/usage/features/13_data_jobs.py` |
 | Completed | `FEAT-DATA-14` Cross-Domain Evidence | `evidence/` | Market-context, FX-conversion, account-state, freshness contracts/providers, and public evidence operations | Section 4 normalized-evidence requirements, allocated to this owner | `tests/data/usage/features/14_evidence.py` |
 | Completed | `FEAT-DATA-15` Audit Evidence | `audit/` | Audit query/page/persistence contracts and authorized persist/query operations | Section 4 audit requirements, allocated to this owner | `tests/data/usage/features/15_audit.py` |
 | Completed | `FEAT-DATA-16` Point-in-Time Research Source Evidence | `research_sources/` | Function-only root operations retrieve, normalize, persist, query, assess, inspect, and project opaque source documents, observations, and verification manifests; exact declarations: Section 9 | `FR-DATA-130`–`145` | `tests/data/usage/features/16_research_sources.py` |
+| Completed | `FEAT-DATA-17` Cross-Domain Runtime Persistence Adapters | `runtime_stores/` | Opaque namespaced durable-state handles, allowlisted codecs, atomic record/transition operations, deterministic bounded cross-partition reads, and owner-specific construction functions | `FR-DATA-146`–`150` | `tests/data/usage/features/17_runtime_stores.py`; `tests/data/unit/test_runtime_store_codecs.py`; `tests/data/integration/test_runtime_store_persistence.py` |
 
 Private root files such as `_settings.py` and `_limits.py` may remain only for
 genuinely domain-wide infrastructure. They are not feature modules, expose no public
@@ -2627,6 +2628,22 @@ records. It does not interpret sentiment, fundamentals, strategy, or trading val
 | Completed | `FR-DATA-143` | Persist verified-source manifests with provider identity, parser version, verification time, external record identity, fixture hash, environments, and license policy. | `build_verified_research_source(...)`, `persist_verified_research_source(...)` | Transactional persistence | `DataError[PERSISTENCE_FAILED\|INVALID_INPUT]` | **Usage:** `tests/data/usage/16_research_sources.py` |
 | Completed | `FR-DATA-144` | Persist normalized provider documents and structured values as immutable point-in-time revisions; corrections create linked revisions and historical queries admit only evidence available by decision time. | `persist_research_provider_records(...)`, `persist_research_source_observations(...)`, `query_research_source_observations(...)` | Transactional persistence/read | `DataError[PERSISTENCE_FAILED\|INVALID_INPUT\|LIMIT_EXCEEDED]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Integration:** `tests/data/integration/test_research_source_observations.py` |
 | Completed | `FR-DATA-145` | Project bounded structured observation evidence without unrestricted provider payloads, credentials, or mutable provider objects. | `project_research_source_observation(...)` | None | `DataError[INVALID_INPUT]` | **Usage:** `tests/data/usage/16_research_sources.py`<br>**Integration:** `tests/data/integration/test_research_source_observations.py` |
+
+### 10. `runtime_stores/` — Cross-domain runtime persistence adapters
+
+This Data-owned feature provides opaque namespaced durable record handles to runtime
+composition. It owns SQL, connection use, migration execution, transaction bounds,
+and storage failure mapping. Consuming domains retain their schemas and semantics and
+adapt these primitive operations behind their existing narrow state protocols. Codec
+registration is explicit and allowlisted; arbitrary imports and pickle are prohibited.
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Completed | `FR-DATA-146` | Construct opaque durable runtime-store handles for Simulation, Risk, Trading, Portfolio, and Agentic namespaces without exposing a connection or session. | `build_*_runtime_store(...) -> object` | None | `ValueError`: invalid namespace or codecs | `tests/data/usage/features/17_runtime_stores.py` |
+| Completed | `FR-DATA-147` | Provide atomic put-once, upsert, compare-and-swap, append, get, ordered-list, and guarded state-plus-event transition operations through Data transactions. | `execute_runtime_store_operation(...) -> object`; `execute_runtime_store_transition(...) -> bool` | Transactional read/write | `DataError`: storage or concurrency failure | `tests/data/integration/test_runtime_store_persistence.py` |
+| Completed | `FR-DATA-148` | Encode and decode only explicitly registered runtime value kinds; prohibit pickle, arbitrary imports, and silent type substitution. | codec registry validation | None | `TypeError`, `ValueError`: unsafe or unknown codec/value | `tests/data/unit/test_runtime_store_codecs.py` |
+| Completed | `FR-DATA-149` | Bound namespaces, keys, collections, list sizes, and serialized payloads while preventing secret-bearing field names from persistence or errors. | runtime-store validation | None | `ValueError`: unsafe or unbounded input | `tests/data/unit/test_runtime_store_codecs.py` |
+| Completed | `FR-DATA-150` | Apply the immutable runtime-store schema through Data's migration ledger, checksum verification, write lock, and transaction rules. | `run_runtime_store_migrations(request_id: str) -> object` | Schema migration | `DataError`: migration failure | `tests/data/integration/test_runtime_store_persistence.py` |
 
 Provider coverage is deliberately governed rather than inferred from public
 availability. SEC EDGAR, BLS, BEA, EIA, Treasury Fiscal Data, CFTC COT, GDELT

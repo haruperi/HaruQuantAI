@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from app.utils.contracts.audit import (
     validate_non_empty,
@@ -15,17 +15,18 @@ from app.utils.contracts.audit import (
 
 
 class AuthContext(BaseModel):
-    """Immutable authenticated principal and trace context version 1.
+    """Immutable authenticated principal and trace context.
 
     Attributes:
-        contract_version: The version string, fixed at 'v1'.
-        schema_id: The schema identifier, fixed at 'utils.auth_context.v1'.
+        contract_version: The version string, either 'v1' or 'v2'.
+        schema_id: The matching versioned schema identifier.
         principal_id: Unique identity of the authenticated user or service.
         principal_type: Categorization as USER or SERVICE_ACCOUNT.
         roles: Bounded unique roles assigned to the principal.
         permissions: Bounded unique fine-grained permissions.
         scopes: Bounded unique scopes requested/granted.
         tenant_or_environment: Namespace of the tenant or environment.
+        runtime_profile: Separate execution-safety profile in version 2.
         request_id: Trace identifier of the outer request.
         workflow_id: Trace identifier tracking the orchestrating workflow.
         correlation_id: Trace identifier tracking the entire flow.
@@ -34,18 +35,40 @@ class AuthContext(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    contract_version: Literal["v1"]
-    schema_id: Literal["utils.auth_context.v1"]
+    contract_version: Literal["v1", "v2"]
+    schema_id: Literal["utils.auth_context.v1", "utils.auth_context.v2"]
     principal_id: str
     principal_type: Literal["USER", "SERVICE_ACCOUNT"]
     roles: tuple[str, ...]
     permissions: tuple[str, ...]
     scopes: tuple[str, ...]
     tenant_or_environment: str
+    runtime_profile: Literal["research", "simulation", "paper", "live"] | None = None
     request_id: str
     workflow_id: str
     correlation_id: str
     issued_at: datetime
+
+    @model_validator(mode="after")
+    def _validate_contract_version(self) -> AuthContext:
+        """Require exact schema and runtime-profile semantics for each version.
+
+        Returns:
+            Validated authentication context.
+
+        Raises:
+            ValueError: If version, schema, and runtime profile do not agree.
+        """
+        if self.contract_version == "v1":
+            if self.schema_id != "utils.auth_context.v1":
+                raise ValueError("AuthContext v1 requires its v1 schema")
+            if self.runtime_profile is not None:
+                raise ValueError("AuthContext v1 cannot carry runtime_profile")
+            return self
+        if self.schema_id != "utils.auth_context.v2" or self.runtime_profile is None:
+            message = "AuthContext v2 requires its v2 schema and runtime_profile"
+            raise ValueError(message)
+        return self
 
     @field_validator("principal_id", "tenant_or_environment")
     @classmethod
@@ -148,12 +171,15 @@ def create_auth_context(
     permissions: tuple[str, ...],
     scopes: tuple[str, ...],
     tenant_or_environment: str,
+    runtime_profile: Literal["research", "simulation", "paper", "live"] | None = None,
     request_id: str,
     workflow_id: str,
     correlation_id: str,
     issued_at: datetime,
-    contract_version: Literal["v1"] = "v1",
-    schema_id: Literal["utils.auth_context.v1"] = "utils.auth_context.v1",
+    contract_version: Literal["v1", "v2"] = "v1",
+    schema_id: Literal[
+        "utils.auth_context.v1", "utils.auth_context.v2"
+    ] = "utils.auth_context.v1",
 ) -> AuthContext:
     """Construct an immutable AuthContext instance.
 
@@ -164,12 +190,13 @@ def create_auth_context(
         permissions: Bounded unique fine-grained permissions.
         scopes: Bounded unique scopes requested/granted.
         tenant_or_environment: Namespace of the tenant or environment.
+        runtime_profile: Separate execution-safety profile required by version 2.
         request_id: Trace identifier of the outer request.
         workflow_id: Trace identifier tracking the orchestrating workflow.
         correlation_id: Trace identifier tracking the entire flow.
         issued_at: Aware UTC datetime representing token issuance.
-        contract_version: Version string fixed at 'v1'.
-        schema_id: Schema identifier fixed at 'utils.auth_context.v1'.
+        contract_version: Version string, either 'v1' or 'v2'.
+        schema_id: Matching versioned schema identifier.
 
     Returns:
         Validated immutable AuthContext instance.
@@ -183,6 +210,7 @@ def create_auth_context(
         permissions=permissions,
         scopes=scopes,
         tenant_or_environment=tenant_or_environment,
+        runtime_profile=runtime_profile,
         request_id=request_id,
         workflow_id=workflow_id,
         correlation_id=correlation_id,

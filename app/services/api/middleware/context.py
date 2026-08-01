@@ -7,7 +7,6 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Final, cast, override
-from uuid import uuid4
 
 from fastapi import HTTPException, status
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
@@ -19,7 +18,7 @@ from app.services.api.contracts.catalog import (
     ROUTE_CONTRACT_REGISTRY,
     RouteContractRegistry,
 )
-from app.utils import get_auth_context_type, utc_now
+from app.utils import generate_id, get_auth_context_type, utc_now
 
 if TYPE_CHECKING:
     from app.services.api.contracts.models import RouteContract
@@ -33,6 +32,7 @@ _MAX_PATH_LENGTH: Final = 2048
 _ID_PATTERN: Final = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$")
 _VALIDATION_ERROR_CODE: Final = "VALIDATION_ERROR"
 _AUTHENTICATION_REQUIRED_CODE: Final = "AUTHENTICATION_REQUIRED"
+_IDEMPOTENCY_KEY_REQUIRED_CODE: Final = "IDEMPOTENCY_KEY_REQUIRED"
 type AuthContext = Any
 
 
@@ -82,7 +82,7 @@ def _build_request_id(value: str | None = None) -> str:
         The validated, bounded result.
     """
     if value is None:
-        return uuid4().hex
+        return generate_id("req")
     return _normalize_identifier(value)
 
 
@@ -93,7 +93,7 @@ def _build_correlation_id(value: str | None = None) -> str:
         The validated, bounded result.
     """
     if value is None:
-        return uuid4().hex
+        return generate_id("cor")
     return _normalize_identifier(value)
 
 
@@ -192,6 +192,31 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
             method,
             path,
         )
+        preliminary_context = _CanonicalRequestContext(
+            request_id=request_id,
+            correlation_id=correlation_id,
+            method=method,
+            path=path,
+            route_id=route_contract.route_id if route_contract else None,
+            route_intent=_classify_route_intent(route_contract),
+            auth_required=route_contract.auth_required if route_contract else False,
+            permission=route_contract.permission if route_contract else None,
+            governance_scope=(
+                route_contract.governance_scope if route_contract else "none"
+            ),
+            actor_id=None,
+            tenant=None,
+        )
+        setattr(request.state, CANONICAL_CONTEXT_STATE_KEY, preliminary_context)
+        if (
+            route_contract is not None
+            and route_contract.idempotency_policy == "required"
+            and not request.headers.get("idempotency-key")
+        ):
+            return JSONResponse(
+                content={"detail": _IDEMPOTENCY_KEY_REQUIRED_CODE},
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            )
         if route_contract is not None and route_contract.auth_required:
             try:
                 auth_context = self._auth_context_provider(request)

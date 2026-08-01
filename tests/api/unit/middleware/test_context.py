@@ -151,8 +151,8 @@ def test_missing_request_ids_are_generated_for_untrusted_clients() -> None:
     )
     status_code, body = _send_get(app, "/api/middleware/anonymous")
     assert status_code == 200
-    assert len(body["request_id"]) == 32
-    assert len(body["correlation_id"]) == 32
+    assert body["request_id"].startswith("req-")
+    assert body["correlation_id"].startswith("cor-")
 
 
 def test_request_context_calls_auth_provider_for_protected_route() -> None:
@@ -182,6 +182,7 @@ def test_request_context_calls_auth_provider_for_protected_route() -> None:
         path="/api/middleware/admin",
         owner="api",
         auth_required=True,
+        permission="ops:read",
     )
     app = build_request_context_middleware(
         app,
@@ -212,6 +213,7 @@ def test_request_context_rejects_auth_required_route_without_provider() -> None:
         path="/api/middleware/locked",
         owner="api",
         auth_required=True,
+        permission="ops:read",
     )
     app = build_request_context_middleware(
         app,

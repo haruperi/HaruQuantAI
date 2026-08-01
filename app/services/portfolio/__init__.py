@@ -25,16 +25,22 @@ from app.services.portfolio.rebalancing.cross_account import (
     measure_cross_account_correlation,
 )
 from app.services.portfolio.state.migrations import get_portfolio_migrations
+from app.services.portfolio.state.runtime import (
+    build_portfolio_state_store,
+    execute_portfolio_state_store_operation,
+)
 
 __all__ = (
     "activate_portfolio",
     "assess_common_mode_exposure",
     "assess_portfolio_drift",
+    "build_portfolio_state_store",
     "construct_portfolio",
     "create_portfolio_handle",
     "create_portfolio_value",
     "dump_portfolio_value",
     "execute_portfolio_handle_operation",
+    "execute_portfolio_state_store_operation",
     "get_portfolio_error_catalog",
     "get_portfolio_history",
     "get_portfolio_migrations",

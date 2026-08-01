@@ -2,6 +2,12 @@
 
 > **Package:** `app/services/simulator`
 > **Status:** `Completed` — implementation, documentation, behavioral
+
+> **API-BE-003 runtime seam:** `run/` owns construction of the explicit
+> `SimulationRunDependencies` bundle consumed by `FR-SIM-029`/`FR-SIM-030`;
+> composition supplies only documented package-root owner operations and durable
+> state ports, never test fixtures or implicit globals. `state/runtime.py`
+> supplies durable journal, artifact-finalization, and run-idempotency behavior.
 > validation, standalone usage, and coverage gates are current and green.
 > **Last updated:** `2026-07-24`
 

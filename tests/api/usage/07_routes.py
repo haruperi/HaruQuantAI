@@ -1,130 +1,35 @@
-"""Standalone UI/API operator-route usage."""
+"""Standalone canonical HTTP route inventory usage."""
+
+from __future__ import annotations
 
 import sys
-from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.api.identity import require_auth_context
-from app.services.api.routes import operator, operator_router
-from app.services.risk import create_kill_switch_state
-from app.utils import create_auth_context
-from fastapi import FastAPI
-from tests.api._support import post_json
-
-# Private type-only aliases; Risk exposes functions, not contract classes.
-ApprovalAttestation = object
-KillSwitchCommand = object
-KillSwitchState = object
-AuthContext = Any
-
-NOW = datetime(2026, 7, 24, 9, tzinfo=UTC)
-REQUEST_ID = "req-11111111-1111-4111-8111-111111111111"
-WORKFLOW_ID = "wf-22222222-2222-4222-8222-222222222222"
-CORRELATION_ID = "cor-33333333-3333-4333-8333-333333333333"
-
-
-def _auth() -> AuthContext:
-    """Build one authorized human operator.
-
-    Returns:
-        Valid authenticated context.
-    """
-    return create_auth_context(
-        contract_version="v1",
-        schema_id="utils.auth_context.v1",
-        principal_id="operator-example",
-        principal_type="USER",
-        roles=("risk_operator",),
-        permissions=("risk.kill.activate",),
-        scopes=("risk",),
-        tenant_or_environment="simulation",
-        request_id=REQUEST_ID,
-        workflow_id=WORKFLOW_ID,
-        correlation_id=CORRELATION_ID,
-        issued_at=NOW,
-    )
-
-
-def fr_api_034() -> dict[str, object]:
-    """FR-API-034: Authenticate/authorize a human operator; construct
-    KillSwitchCommand v1 with explicit global/portfolio/strategy/symbol scope and
-    applicable identifiers; submit activation immediately with the commanding
-    principal's separate AuthContext; for clearance require and submit a matching
-    current ApprovalAttestation v1 issued by a different authorized principal;
-    reject same-principal clearance before delegation while Risk remains
-    authoritative; and expose protected readiness/OperationalEvent v1 views plus
-    bounded Data-owned audit pages without issuing Risk tokens, policy verdicts,
-    or direct store access.
-
-    Returns:
-        JSON activation response from the complete HTTP boundary.
-    """
-    commands: list[KillSwitchCommand] = []
-
-    def transition(
-        command: KillSwitchCommand,
-        auth: AuthContext,
-        attestation: ApprovalAttestation | None,
-    ) -> KillSwitchState:
-        """Demonstrate delegation to an injected Risk-owned boundary."""
-        assert auth.principal_id == "operator-example"
-        assert attestation is None
-        commands.append(command)
-        return create_kill_switch_state(
-            state_id="global-active-example",
-            scope_level="global",
-            scope={},
-            state="active",
-            reason=command.reason,
-            version=2,
-            updated_at=NOW,
-        )
-
-    def sink(value: object, *, idempotency_key: str) -> None:
-        """Accept one bounded channel-neutral example alert."""
-        del value
-        assert len(idempotency_key) == 64
-
-    app = FastAPI()
-    app.include_router(operator_router)
-    app.dependency_overrides[require_auth_context] = _auth
-    app.dependency_overrides[operator._kill_switch_transition] = lambda: transition
-    app.dependency_overrides[operator._critical_alert_sink] = lambda: sink
-    status_code, body = post_json(
-        app,
-        "/api/operator/kill-switch",
-        {
-            "action": "activate",
-            "scope_level": "global",
-            "portfolio_id": None,
-            "strategy_id": None,
-            "symbol": None,
-            "reason": "operator safety stop",
-            "requested_at": NOW.isoformat(),
-            "attestation": None,
-        },
-    )
-    assert status_code == 200
-    assert len(commands) == 1
-    return body
+from app.services.api import create_api_app, get_canonical_route_contract_registry
 
 
 def main() -> None:
-    """Run the operator-route requirement demonstration."""
-    result = fr_api_034()
-    state = result["state"]
-    delivery = result["delivery"]
-    assert isinstance(state, dict)
-    assert isinstance(delivery, dict)
-    print(
-        {
-            "state": state["state"],
-            "delivery": delivery["status"],
-        }
-    )
+    """Verify every canonical HTTP operation has one declared contract."""
+    application = create_api_app()
+    operations = {
+        (method.upper(), path)
+        for path, path_item in application.openapi()["paths"].items()
+        for method in path_item
+    }
+    contracts = get_canonical_route_contract_registry()
+    declarations = {(item.method, item.path) for item in contracts.all()}
+    assert operations == declarations
+    assert len(operations) == 21
+    assert not any("/simulation/sessions" in path for _, path in operations)
+    assert not any("/backtest/" in path for _, path in operations)
+    assert not any("/risk/" in path for _, path in operations)
+    assert not any("/live/" in path for _, path in operations)
+    assert not any("/optimization/" in path for _, path in operations)
+    assert not any("/portfolio/" in path for _, path in operations)
+    assert not any("/agentic/" in path for _, path in operations)
+    print({"operations": len(operations), "prefix": "/api/v1"})
 
 
 if __name__ == "__main__":

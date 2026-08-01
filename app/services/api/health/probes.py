@@ -176,7 +176,7 @@ def get_liveness() -> ApiResponse[Liveness]:
     payload = _build_liveness(now)
     metadata = ApiMetadata(
         request_id=generate_id("req"),
-        route="/api/health/liveness",
+        route="/api/v1/health/liveness",
         operation="api.get_liveness",
         trace_id=None,
     )
@@ -225,7 +225,7 @@ def get_readiness(context: AuthContext) -> ApiResponse[Readiness]:
         clock_drift_seconds=clock_drift,
     )
     metadata = _response_metadata(
-        route="/api/health/readiness",
+        route="/api/v1/health/readiness",
         operation="api.get_readiness",
         request_id=context.request_id,
         trace_id=context.correlation_id,

@@ -14,6 +14,7 @@ from app.services.data import (
     run_data_migrations,
 )
 from app.services.strategy import (
+    build_development_strategy_validation_policy,
     create_strategy_config,
     create_strategy_manifest,
     create_strategy_parameter_update_request,
@@ -276,6 +277,10 @@ def main() -> None:
         "-> Registration/Parameter update command\n"
         "-> Fail-closed validation & schema check\n"
         "-> Immutable registry record & canonical hash"
+    )
+    assert (
+        build_development_strategy_validation_policy().policy_version
+        == "strategy-development-v1"
     )
 
     with tempfile.TemporaryDirectory() as tmp_dir:

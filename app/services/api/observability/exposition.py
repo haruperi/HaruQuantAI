@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 type AuthContext = Any
 
 _MAX_SERIES_DEFAULT: Final = 5000
-_SNAPSHOT_ROUTE: Final = "/api/metrics"
+_SNAPSHOT_ROUTE: Final = "/api/v1/metrics"
 _SNAPSHOT_OPERATION: Final = "api.get_metrics"
 _METRIC_NAME_PATTERN = re.compile(r"^[a-zA-Z_:][a-zA-Z0-9_:]*$")
 _LABEL_NAME_PATTERN = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")

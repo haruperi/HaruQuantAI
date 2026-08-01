@@ -141,6 +141,7 @@ from app.agentic.permissions.registry import (
     validate_policy_registry,
 )
 from app.agentic.public_api.dependencies import build_agentic_dependencies
+from app.agentic.public_api.runtime import build_durable_agentic_dependencies
 from app.agentic.public_api.service import (
     approve_agentic_handoff,
     cancel_firm_run,
@@ -190,6 +191,7 @@ __all__: tuple[str, ...] = (
     "build_budget_usage",
     "build_deterministic_adk_runtime",
     "build_deterministic_model_gateway",
+    "build_durable_agentic_dependencies",
     "build_evidence_claim",
     "build_firm_mandate",
     "build_in_memory_memory_store",

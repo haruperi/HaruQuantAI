@@ -243,6 +243,13 @@ def build_auth_context(*, principal: AuthSource, trace: AuthSource) -> AuthConte
         _get_field(principal, "tenant_or_environment"),
         "tenant_or_environment",
     )
+    runtime_profile = _coerce_non_empty_text(
+        _get_field(principal, "runtime_profile"),
+        "runtime_profile",
+    )
+    if runtime_profile not in {"research", "simulation", "paper", "live"}:
+        logger.debug("Unsupported runtime_profile claim")
+        _raise_authentication_required()
     issued_at = _coerce_utc_datetime(_get_field(trace, "issued_at"), "issued_at")
     request_id = _coerce_non_empty_text(_get_field(trace, "request_id"), "request_id")
     workflow_id = _coerce_non_empty_text(
@@ -254,14 +261,18 @@ def build_auth_context(*, principal: AuthSource, trace: AuthSource) -> AuthConte
         "correlation_id",
     )
     return create_auth_context(
-        contract_version="v1",
-        schema_id="utils.auth_context.v1",
+        contract_version="v2",
+        schema_id="utils.auth_context.v2",
         principal_id=principal_id,
         principal_type=cast("Literal['USER', 'SERVICE_ACCOUNT']", principal_type),
         roles=roles,
         permissions=permissions,
         scopes=scopes,
         tenant_or_environment=tenant,
+        runtime_profile=cast(
+            "Literal['research', 'simulation', 'paper', 'live']",
+            runtime_profile,
+        ),
         request_id=request_id,
         workflow_id=workflow_id,
         correlation_id=correlation_id,

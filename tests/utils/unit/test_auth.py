@@ -60,3 +60,32 @@ def test_auth_context_is_immutable_and_complete() -> None:
     )
     with pytest.raises(ValidationError):
         context.principal_id = "changed"
+
+
+def test_auth_context_v2_requires_separate_runtime_profile() -> None:
+    """Keep deployment tenancy distinct from execution-safety profile."""
+    context = AuthContext(
+        contract_version="v2",
+        schema_id="utils.auth_context.v2",
+        principal_id="service-1",
+        principal_type="SERVICE_ACCOUNT",
+        roles=(),
+        permissions=("read",),
+        scopes=("demo",),
+        tenant_or_environment="development",
+        runtime_profile="simulation",
+        request_id=generate_id("req"),
+        workflow_id=generate_id("wf"),
+        correlation_id=generate_id("cor"),
+        issued_at=datetime.now(UTC),
+    )
+    assert context.tenant_or_environment == "development"
+    assert context.runtime_profile == "simulation"
+
+    with pytest.raises(ValidationError):
+        AuthContext(
+            **{
+                **context.model_dump(),
+                "runtime_profile": None,
+            }
+        )

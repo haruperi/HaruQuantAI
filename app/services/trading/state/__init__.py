@@ -25,13 +25,19 @@ from app.services.trading.state.projections import (
 from app.services.trading.state.projections import (
     apply_execution_event,
 )
+from app.services.trading.state.runtime import (
+    build_trading_state_store,
+    execute_trading_state_store_operation,
+)
 from app.services.trading.state.stores import TradingStateStore as TradingStateStore
 
 __all__ = [
     "apply_execution_event",
+    "build_trading_state_store",
     "create_idempotency_reservation",
     "create_trading_event",
     "create_trading_projection",
+    "execute_trading_state_store_operation",
     "get_trading_migrations",
     "get_trading_schema_version",
     "reserve_idempotency",

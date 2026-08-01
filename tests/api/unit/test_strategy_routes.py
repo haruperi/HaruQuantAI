@@ -1,78 +1,58 @@
-"""Authenticated Strategy route tests."""
+"""Authenticated Strategy catalogue route tests."""
 
-from contextlib import AbstractContextManager
-from pathlib import Path
+from typing import Any
 
+import pytest
 from app.services.api.identity import require_auth_context
 from app.services.api.routes import strategies
 from app.services.api.routes.strategies import router
-from app.services.data import build_data_settings, data_settings_context
+from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI
 
-from tests.api._support import post_json
-from tests.strategy.unit.test_catalog import make_registration
-from tests.strategy.unit.test_models import make_auth, make_policy
+from tests.api._support import get_json
 
 
-def _storage(root: Path) -> AbstractContextManager[None]:
-    """Build isolated Strategy persistence settings.
-
-    Args:
-        root: Temporary Data root.
-
-    Returns:
-        Data settings context manager.
-    """
-    return data_settings_context(
-        build_data_settings(
-            database_url="sqlite:///api-strategy.sqlite3",
-            data_dir=root,
-            sqlite_busy_timeout_seconds=1.5,
-            write_lock_lease_seconds=30,
-        )
+def _auth() -> object:
+    """Build one authorized Strategy reader."""
+    return create_auth_context(
+        contract_version="v2",
+        schema_id="utils.auth_context.v2",
+        principal_id="strategy-reader",
+        principal_type="USER",
+        roles=("researcher",),
+        permissions=("strategy:read",),
+        scopes=("strategy",),
+        tenant_or_environment="development",
+        runtime_profile="research",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
+        issued_at=utc_now(),
     )
 
 
 def _app() -> FastAPI:
-    """Build an authenticated Strategy API application.
-
-    Returns:
-        Configured FastAPI application.
-    """
+    """Build one authenticated Strategy read application."""
     app = FastAPI()
     app.include_router(router)
-    auth = make_auth()
-    app.dependency_overrides[require_auth_context] = lambda: auth
-    app.dependency_overrides[strategies._strategy_validation_policy] = make_policy
+    app.dependency_overrides[require_auth_context] = _auth
     return app
 
 
-def test_strategy_registration_delegates_to_owner(tmp_path: Path) -> None:
-    """Verify authenticated route returns Strategy mutation truth."""
-    request = make_registration()
+def test_strategy_catalogue_reads_delegate_to_owner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Catalogue and filtered version reads preserve owner delegation."""
+    calls: list[str | None] = []
 
-    with _storage(tmp_path):
-        status_code, body = post_json(
-            _app(),
-            "/api/strategies/registrations",
-            request.model_dump(mode="json"),
-        )
+    def versions(strategy_id: str | None = None) -> tuple[dict[str, Any], ...]:
+        calls.append(strategy_id)
+        return ({"strategy_id": strategy_id or "all"},)
 
-    assert status_code == 200, body
-    assert body["status"] == "ACCEPTED"
-    assert body["strategy_id"] == request.strategy_id
+    monkeypatch.setattr(strategies, "list_strategy_versions", versions)
+    catalogue_status, catalogue = get_json(_app(), "/api/v1/strategies")
+    version_status, version = get_json(_app(), "/api/v1/strategies/alpha/versions")
 
-
-def test_strategy_registration_rejects_principal_mismatch(tmp_path: Path) -> None:
-    """Verify API cannot submit a command for another principal."""
-    request = make_registration().model_copy(update={"principal_id": "other"})
-
-    with _storage(tmp_path):
-        status_code, body = post_json(
-            _app(),
-            "/api/strategies/registrations",
-            request.model_dump(mode="json"),
-        )
-
-    assert status_code == 403
-    assert body["detail"] == "PRINCIPAL_MISMATCH"
+    assert (catalogue_status, catalogue) == (200, [{"strategy_id": "all"}])
+    assert (version_status, version) == (200, [{"strategy_id": "alpha"}])
+    assert calls == [None, "alpha"]

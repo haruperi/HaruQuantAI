@@ -1,0 +1,265 @@
+"""Canonical FastAPI application construction."""
+
+from collections.abc import Callable, Mapping
+from typing import Any, cast
+
+from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.services.api._settings import ApiSettings, get_api_settings
+from app.services.api.composition.in_process import (
+    build_in_process_graph,
+    get_graph_closers,
+    get_graph_overrides,
+    get_graph_probes,
+)
+from app.services.api.composition.lifecycle import lifespan
+from app.services.api.composition.owner_sources import (
+    read_audit_events,
+    read_dashboard_snapshot,
+    read_trading_events,
+)
+from app.services.api.contracts.catalog import create_canonical_route_contract_registry
+from app.services.api.identity import (
+    IdentityError,
+    build_auth_context,
+    require_auth_context,
+    validate_csrf,
+    validate_session,
+)
+from app.services.api.middleware.context import (
+    CANONICAL_CONTEXT_STATE_KEY,
+    RequestContextMiddleware,
+)
+from app.services.api.middleware.deadlines import DeadlineMiddleware
+from app.services.api.middleware.envelope import get_canonical_envelope_middleware
+from app.services.api.middleware.rate_limits import RateLimitMiddleware
+from app.services.api.middleware.redaction import SecretRedactionMiddleware
+from app.services.api.routes import (
+    auth_router,
+    dashboards_router,
+    data_router,
+    health_router,
+    observability_router,
+    operator_router,
+    research_router,
+    settings_router,
+    strategies_router,
+)
+from app.utils import generate_id, utc_now
+
+_SESSION_COOKIE = "hq_session"
+_ROUTERS = (
+    auth_router,
+    health_router,
+    settings_router,
+    data_router,
+    strategies_router,
+    research_router,
+    dashboards_router,
+    operator_router,
+    observability_router,
+)
+
+
+def _build_canonical_graph() -> object:
+    """Build the exact owner-backed graph for the reduced backend v1.
+
+    Returns:
+        Validated in-process graph containing all retained owner sources.
+    """
+    return build_in_process_graph(
+        {
+            "dashboard.source": read_dashboard_snapshot,
+            "operator.audit_source": read_audit_events,
+            "operator.event_source": read_trading_events,
+        }
+    )
+
+
+def _bearer_or_cookie(request: Request) -> str:
+    """Extract one opaque supported authentication credential.
+
+    Returns:
+        Opaque session credential.
+
+    Raises:
+        HTTPException: If no supported credential is present.
+    """
+    token = request.cookies.get(_SESSION_COOKIE)
+    authorization = request.headers.get("authorization", "")
+    if token is None and authorization.startswith("Bearer "):
+        token = authorization.removeprefix("Bearer ").strip()
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="AUTHENTICATION_REQUIRED",
+        )
+    return token
+
+
+def _resolve_auth_context(request: Request) -> object:
+    """Build authority only from a persisted validated session.
+
+    Returns:
+        Utils-owned immutable authentication context.
+
+    Raises:
+        HTTPException: If session validation fails.
+    """
+    context = getattr(request.state, CANONICAL_CONTEXT_STATE_KEY, None)
+    request_id = str(getattr(context, "request_id", ""))
+    correlation_id = str(getattr(context, "correlation_id", ""))
+    token = _bearer_or_cookie(request)
+    try:
+        user = validate_session(
+            token,
+            request_id=request_id,
+        )
+        if request.cookies.get(_SESSION_COOKIE) is not None and request.method not in {
+            "GET",
+            "HEAD",
+            "OPTIONS",
+        }:
+            csrf_token = request.headers.get("x-csrf-token", "")
+            validate_csrf(token, csrf_token, request_id=request_id)
+    except IdentityError as error:
+        code = (
+            "CSRF_INVALID"
+            if str(error) == "CSRF_INVALID"
+            else "AUTHENTICATION_REQUIRED"
+        )
+        raise HTTPException(
+            status_code=(
+                status.HTTP_403_FORBIDDEN
+                if code == "CSRF_INVALID"
+                else status.HTTP_401_UNAUTHORIZED
+            ),
+            detail=code,
+        ) from error
+    return build_auth_context(
+        principal={
+            "principal_id": user.user_id,
+            "principal_type": "USER",
+            "roles": user.roles,
+            "permissions": user.permissions,
+            "scopes": user.scopes,
+            "tenant_or_environment": user.tenant_or_environment,
+            "runtime_profile": user.runtime_profile,
+        },
+        trace={
+            "issued_at": utc_now(),
+            "request_id": request_id,
+            "workflow_id": generate_id("wf"),
+            "correlation_id": correlation_id,
+        },
+    )
+
+
+def _request_auth_context(request: Request) -> object:
+    """Return middleware-validated authentication state.
+
+    Returns:
+        Validated authentication context.
+
+    Raises:
+        HTTPException: If middleware did not authenticate the request.
+    """
+    context = getattr(request.state, "api_auth_context", None)
+    if context is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="AUTHENTICATION_REQUIRED",
+        )
+    return context
+
+
+def create_app(
+    config: ApiSettings | None = None,
+    *,
+    in_process_graph: object | None = None,
+    dependency_overrides: Mapping[Callable[..., object], Callable[..., object]]
+    | None = None,
+    optional_startup_probes: Mapping[str, Callable[[], object]] | None = None,
+    owned_resource_closers: tuple[Callable[[], object], ...] = (),
+) -> FastAPI:
+    """Construct the single canonical UI/API application.
+
+    Args:
+        config: Validated runtime settings.
+        in_process_graph: Opaque validated in-process owner dependency graph.
+        dependency_overrides: Explicit owner-domain adapter dependencies.
+        optional_startup_probes: Named dependencies allowed to degrade.
+        owned_resource_closers: Gateway-owned resource shutdown hooks.
+
+    Returns:
+        Fully composed FastAPI application.
+
+    Raises:
+        ValueError: If legacy and canonical dependency bindings are mixed.
+    """
+    settings = config or get_api_settings()
+    route_contracts = create_canonical_route_contract_registry()
+    application = FastAPI(
+        title="HaruQuantAI API",
+        version=settings.api_version,
+        lifespan=lifespan,
+    )
+    application.state.api_settings = settings
+    application.state.api_route_contract_registry = route_contracts
+    if in_process_graph is not None and dependency_overrides:
+        raise ValueError(
+            "in_process_graph and dependency_overrides cannot be supplied together"
+        )
+    graph = in_process_graph or _build_canonical_graph()
+    graph_overrides = dict(get_graph_overrides(graph))
+    graph_overrides.update(dependency_overrides or {})
+    application.state.api_required_startup_probes = dict(get_graph_probes(graph))
+    application.state.api_optional_startup_probes = dict(optional_startup_probes or {})
+    graph_closers = get_graph_closers(graph)
+    application.state.api_owned_resource_closers = (
+        *graph_closers,
+        *owned_resource_closers,
+    )
+    for router in _ROUTERS:
+        application.include_router(router)
+    application.dependency_overrides[require_auth_context] = _request_auth_context
+    for dependency, override in (
+        graph_overrides or dict(dependency_overrides or {})
+    ).items():
+        application.dependency_overrides[dependency] = override
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=list(settings.ui_origins),
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=[
+            "Authorization",
+            "Content-Type",
+            "Idempotency-Key",
+            "X-CSRF-Token",
+            "X-Request-ID",
+            "X-Correlation-ID",
+        ],
+    )
+    application.add_middleware(SecretRedactionMiddleware)
+    application.add_middleware(
+        RateLimitMiddleware,
+        limits=settings.rate_limits_by_class,
+    )
+    application.add_middleware(
+        DeadlineMiddleware,
+        timeout_seconds=settings.api_endpoint_timeout_seconds,
+    )
+    application.add_middleware(
+        RequestContextMiddleware,
+        auth_context_provider=cast("Any", _resolve_auth_context),
+        route_contract_registry=route_contracts,
+    )
+    application.add_middleware(get_canonical_envelope_middleware())
+    return application
+
+
+app = create_app()
+
+__all__ = ("app", "create_app")

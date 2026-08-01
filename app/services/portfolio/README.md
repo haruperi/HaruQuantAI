@@ -1,5 +1,10 @@
 # Portfolio
 
+> **API-BE-003 runtime seam:** `api/factories.py` constructs the opaque
+> Portfolio application handle from owner workflow and repository handles; UI/API
+> may invoke only allow-listed package-root operations. `state/runtime.py`
+> supplies the Data-backed atomic Portfolio state port.
+
 | Field                | Value                                                                                                      |
 | -------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **Package path**     | `app/services/portfolio`                                                                                   |

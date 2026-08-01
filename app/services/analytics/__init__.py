@@ -80,6 +80,9 @@ from app.services.analytics.dashboards import (
 from app.services.analytics.dashboards import (
     truncate_series as _truncate_series,
 )
+from app.services.analytics.dashboards.snapshots import (
+    get_analytics_dashboard_snapshot,
+)
 from app.services.analytics.metrics import (
     ANNUALIZATION_POLICY,
     BREAKEVEN_EPSILON,
@@ -934,6 +937,7 @@ __all__: tuple[str, ...] = (
     "create_portfolio_rebalance_measurement_request",
     "create_risk_free_rate_evidence",
     "create_statistical_validation_config",
+    "get_analytics_dashboard_snapshot",
     "get_analytics_schema_version",
     "get_analytics_value_field",
     "get_annualization_policy",

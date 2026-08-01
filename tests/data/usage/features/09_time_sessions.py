@@ -21,6 +21,7 @@ from app.services.data import (
     get_active_market_sessions,
     get_exchange_sessions,
     get_market_hours,
+    get_market_hours_dashboard_snapshot,
     get_timeframe_spec,
     get_trading_sessions,
     require_utc,
@@ -182,6 +183,7 @@ def fr_data_121_122() -> None:
 def main() -> None:
     """Execute every functional-requirement demonstration."""
     print("=" * 80)
+    assert get_market_hours_dashboard_snapshot()["status"] == "unavailable"
     print("FEATURE: FEAT-DATA-09 - Time and Session Handling")
     print(
         "PURPOSE: Market hours, venue trading sessions, schedule providers, and analytical session classification"

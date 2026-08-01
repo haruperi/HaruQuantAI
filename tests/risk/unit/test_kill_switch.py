@@ -72,6 +72,23 @@ def test_recovery_requires_clear_hierarchy_and_reconciliation() -> None:
     assert recovered.state is DecisionState.APPROVE
 
 
+def test_runtime_profile_mismatch_fails_closed_independent_of_tenancy() -> None:
+    """Reject Risk reads when execution profile differs from active policy."""
+    config = examples._config()
+    auth = examples._auth(config).model_copy(update={"runtime_profile": "paper"})
+    response = check_risk_kill_switch(
+        (examples._inactive_state(),),
+        {"portfolio_id": "portfolio-1"},
+        config,
+        auth,
+        reconciled=True,
+        now=examples.NOW,
+    )
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == RiskErrorCode.POLICY_BLOCKED.value
+
+
 def test_clearance_requires_matching_current_attestation() -> None:
     """Deny unapproved clearance and apply exact authorized evidence."""
     config = examples._config()

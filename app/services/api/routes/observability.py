@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 type AuthContext = Any
 
-router = APIRouter(prefix="/api", tags=["observability"])
+router = APIRouter(prefix="/api/v1", tags=["observability"])
 
 
 def _metrics_sink() -> object:

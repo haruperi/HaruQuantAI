@@ -29,6 +29,7 @@ def _principal() -> dict[str, object]:
         ),
         "scopes": ("risk", "strategy"),
         "tenant_or_environment": "simulation",
+        "runtime_profile": "simulation",
     }
 
 
@@ -97,6 +98,20 @@ def test_missing_permission_rejected() -> None:
         require_permission(context, "portfolio:delete")
     assert exc_info.value.status_code == 403
     assert exc_info.value.detail == "AUTHORIZATION_DENIED"
+
+
+def test_runtime_profile_claim_is_required_and_bounded() -> None:
+    """Reject missing or caller-tampered runtime authority claims."""
+    missing = dict(_principal())
+    missing.pop("runtime_profile")
+    with pytest.raises(HTTPException) as missing_error:
+        build_auth_context(principal=missing, trace=_trace())
+    assert missing_error.value.status_code == 401
+
+    invalid = {**_principal(), "runtime_profile": "development"}
+    with pytest.raises(HTTPException) as invalid_error:
+        build_auth_context(principal=invalid, trace=_trace())
+    assert invalid_error.value.status_code == 401
 
 
 def test_require_human_permission_rejects_service_account() -> None:

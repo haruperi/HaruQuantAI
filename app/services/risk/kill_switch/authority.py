@@ -137,7 +137,7 @@ def _authorized(
         auth.request_id == command.request_id
         and auth.workflow_id == command.workflow_id
         and auth.correlation_id == command.correlation_id
-        and auth.tenant_or_environment == config.profile
+        and auth.runtime_profile == config.profile
         and command.requested_at <= now
     )
     permissions = (
@@ -269,7 +269,7 @@ def _validate_check_request(
         RiskDomainError: If scope or environment is invalid.
     """
     logger.debug("Validating Risk kill-switch read-side request")
-    if not scope or auth.tenant_or_environment != config.profile:
+    if not scope or auth.runtime_profile != config.profile:
         raise RiskDomainError(
             RiskErrorCode.POLICY_BLOCKED, "kill-switch check scope invalid"
         )

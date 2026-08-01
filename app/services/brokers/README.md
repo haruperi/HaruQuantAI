@@ -229,7 +229,7 @@ The tree below defines the final layout. The following table is the sole normati
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
 | Completed | `FEAT-BRK-00` Canonical Provider-Neutral Contracts | `contracts/` | Section 4.1 | Section 4.1 requirements | `tests/brokers/usage/features/00_contracts.py` |
-| Completed | `FEAT-BRK-01` Adapter Registry and Capability Discovery | `registry/` | Section 4.8 | Section 4.8 requirements | `tests/brokers/usage/features/01_registry.py` |
+| Completed | `FEAT-BRK-01` Adapter Registry and Capability Discovery | `registry/` | Section 4.8; socket-free `get_broker_dashboard_snapshot` context requirement | Section 4.8 requirements | `tests/brokers/usage/features/01_registry.py` |
 | Completed | `FEAT-BRK-02` MetaTrader 5 Account Lifecycle | `mt5_account/` | Section 4.3 | Section 4.3 requirements | `tests/brokers/usage/features/02_mt5_account.py` |
 | Completed | `FEAT-BRK-03` cTrader Account Lifecycle | `ctrader_session/` | Section 4.4 | Section 4.4 requirements | `tests/brokers/usage/features/03_ctrader_lifecycle.py` |
 | Completed | `FEAT-BRK-04` Binance Lifecycle | `binance_session/` | Section 4.5 | Section 4.5 requirements | `tests/brokers/usage/features/04_binance_lifecycle.py` |

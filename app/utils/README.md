@@ -22,7 +22,7 @@ It makes no trading or domain decision.
 
 ### Owns
 
-- `AuthContext v1` and `AuditEvent v1`.
+- `AuthContext v1`/`v2` and `AuditEvent v1`.
 - Shared base errors, error metadata, boundary-safe mapping, and injected event routing.
 - `StandardResponse v1`, structured response errors, required operation metadata,
   immutable error-definition catalogues, and monotonic execution timing.
@@ -40,7 +40,7 @@ It makes no trading or domain decision.
   validation, or business limits.
 - Authentication, identity verification, permission enforcement, session state,
   or credential persistence; UI/API owns these capabilities and produces
-  `AuthContext v1`.
+  `AuthContext v2` for current API sessions while preserving v1 compatibility.
 - DataFrame, OHLC, OHLCV, market-data quality, conversion, comparison, chunking,
   repair, resampling, persistence, or cache behavior; Data owns these capabilities.
 - Password hashing, credential encryption, key generation/storage/rotation,
@@ -58,14 +58,17 @@ It makes no trading or domain decision.
 
 | Status | Contract | Version | Producer | Consumers | Purpose |
 |---|---|---|---|---|---|
-| Completed | `AuthContext` | `v1` | UI/API | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio | Immutable authenticated principal and trace context. `principal_type` is exactly `USER` or `SERVICE_ACCOUNT`. |
+| Completed | `AuthContext` | `v1`, `v2` | UI/API | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, Agentic | Immutable authenticated principal and trace context. Version 2 separates deployment tenancy from the bounded execution-safety runtime profile. |
 | Completed | `AuditEvent` | `v1` | Every emitting domain | Data (direct persistence consumer); Risk and UI/API query persisted events only through Data-owned query contracts | Redacted, versioned trace record persisted by Data; each producer owns its payload meaning. |
 | Completed | `StandardResponse[T]` | `v1` | Every bounded public operation | Every internal or external caller of that operation | Immutable five-field function-level response preserving the raw result directly in `data` and prior envelope evidence in `metadata.extensions`. |
 
 `AuthContext v1` contains `contract_version`, `schema_id`, `principal_id`,
 `principal_type`, roles, permissions, scopes, tenant/environment, request ID,
 workflow ID, correlation ID, and UTC issue time. Missing or invalid context fails
-closed at the receiving domain.
+closed at the receiving domain. `AuthContext v2` adds the required independent
+`runtime_profile` claim (`research`, `simulation`, `paper`, or `live`); Risk and
+Trading consume that claim while deployment-tenancy consumers continue to use
+`tenant_or_environment`.
 
 `AuditEvent v1` contains `contract_version`, `schema_id`, event ID, UTC timestamp,
 domain, action, optional principal ID, request ID, correlation ID, optional causation
@@ -391,7 +394,7 @@ functional behavior.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-UTL-001` | Define immutable `AuthContext v1` with only `USER` and `SERVICE_ACCOUNT` principal types and complete trace context. The class remains internal; callers construct it with the factory and may resolve its runtime type only through the getter. | `create_auth_context`, `get_auth_context_type` | None | `ValidationError`: naive time, empty identity/trace field, or unsupported principal type | **Usage:** `tests/utils/usage/features/01_contracts.py::fr_utils_001_auth_context()`<br>**Unit:** `tests/utils/unit/test_auth.py::test_auth_context_rejects_naive_time()` |
+| Completed | `FR-UTL-001` | Define immutable backward-compatible `AuthContext v1` and current `AuthContext v2`; v2 requires a bounded runtime profile separate from deployment tenancy. Only `USER` and `SERVICE_ACCOUNT` principal types are valid. | `create_auth_context`, `get_auth_context_type` | None | `ValidationError`: version/schema mismatch, missing or invalid v2 runtime profile, naive time, empty identity/trace field, or unsupported principal type | **Usage:** `tests/utils/usage/features/01_contracts.py::fr_utils_001_auth_context()`<br>**Unit:** `tests/utils/unit/test_auth.py::test_auth_context_v2_requires_separate_runtime_profile()` |
 | Completed | `FR-UTL-002` | Define immutable redacted `AuditEvent v1` with bounded JSON-safe payload. The class remains internal; callers construct it with the factory and may resolve its runtime type only through the getter. | `create_audit_event`, `get_audit_event_type` | None | `ValidationError`: naive timestamp, empty identity/trace field, or unsafe payload | **Usage:** `tests/utils/usage/features/01_contracts.py::fr_utils_002_audit_event()`<br>**Unit:** `tests/utils/unit/test_audit.py::test_audit_event_requires_json_safe_payload()` |
 | Completed | `FR-UTL-003` | Reject naive timestamps, empty identity/trace fields, unsupported principal types, and malformed schema identity. | Strict contract-field validation used by `AuditEvent` and `AuthContext` | None | `ValidationError`: naive time, empty field, unsupported principal type, or malformed schema identity | **Usage:** `tests/utils/usage/features/01_contracts.py::fr_utils_003_contract_validation()`<br>**Unit:** `tests/utils/unit/test_audit.py::test_contract_field_validation_rejects_malformed_schema()` |
 

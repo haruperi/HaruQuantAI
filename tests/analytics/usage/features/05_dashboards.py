@@ -22,6 +22,7 @@ from app.services.analytics import (
     StatisticalValidationConfig,
     build_dashboard_payload,
     build_performance_report,
+    get_analytics_dashboard_snapshot,
     truncate_series,
 )
 from app.utils import generate_id
@@ -172,6 +173,7 @@ def main() -> None:
         "-> Stage 2: Endpoint/extrema preservation and bounding validation\n"
         "-> Stage 3: DashboardPayload v1 projection construction and truncation metadata generation"
     )
+    assert get_analytics_dashboard_snapshot("summary")["status"] == "unavailable"
 
     # Stage 3: Series truncation & Dashboard payload projection
     fr_anlt_045()

@@ -16,7 +16,7 @@ type StandardResponse[T] = Any
 
 logger = get_logger(__name__)
 
-router = APIRouter(prefix="/api/research", tags=["research"])
+router = APIRouter(prefix="/api/v1/research", tags=["research"])
 
 
 @router.post("/run", response_model=None)

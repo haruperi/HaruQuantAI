@@ -8,9 +8,11 @@ internal implementation details.
 from app.services.risk.admission import review_strategy_admission
 from app.services.risk.allocation import (
     activate_allocation_budget,
+    build_allocation_runtime_operation,
     review_allocation_proposal,
 )
 from app.services.risk.approvals import (
+    build_risk_approval_state_store,
     create_approval_token_service,
     issue_risk_approval_token,
     revoke_risk_approval_scope,
@@ -19,7 +21,9 @@ from app.services.risk.approvals import (
 from app.services.risk.audit import (
     append_risk_audit_record,
     append_risk_kill_switch_transition,
+    build_risk_state_store,
     create_risk_audit_chain,
+    execute_risk_state_store_operation,
     verify_risk_audit_chain,
 )
 from app.services.risk.config import (
@@ -30,6 +34,7 @@ from app.services.risk.config import (
     load_firm_mandate,
     load_risk_config,
 )
+from app.services.risk.config.development import build_development_risk_config
 from app.services.risk.contracts import (
     create_action_policy_verdict,
     create_allocation_budget_activation_request,
@@ -65,6 +70,7 @@ from app.services.risk.contracts import (
     validate_market_context_evidence,
 )
 from app.services.risk.governor import (
+    build_governance_runtime_operation,
     create_risk_governor,
     review_trade_risk,
     run_portfolio_risk_governor,
@@ -91,7 +97,12 @@ __all__ = (
     "append_risk_kill_switch_transition",
     "apply_kill_switch_command",
     "assess_risk_regime",
+    "build_allocation_runtime_operation",
+    "build_development_risk_config",
+    "build_governance_runtime_operation",
     "build_portfolio_risk_snapshot",
+    "build_risk_approval_state_store",
+    "build_risk_state_store",
     "calculate_position_size",
     "check_risk_kill_switch",
     "compute_config_hash",
@@ -129,6 +140,7 @@ __all__ = (
     "evaluate_market_context",
     "evaluate_portfolio_limits",
     "evaluate_single_day_profit_share",
+    "execute_risk_state_store_operation",
     "generate_risk_report",
     "get_decision_state",
     "get_drawdown_mode",

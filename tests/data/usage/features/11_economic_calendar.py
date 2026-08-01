@@ -27,6 +27,7 @@ from app.services.data import (
     deserialize_scrape_result,
     evaluate_calendar_state,
     from_row,
+    get_calendar_dashboard_snapshot,
     get_calendar_sites,
     get_calendar_value_field,
     get_default_minimum_impact,
@@ -370,6 +371,7 @@ def _show_persistence(
 
 def main() -> None:
     """Run genuine acquisition, normalization, storage, and Risk handoff."""
+    assert get_calendar_dashboard_snapshot()["status"] == "unavailable"
     start, end = _current_provider_week(datetime.now(UTC))
     transport = build_firecrawl_calendar_transport(max_parallel_requests=2)
     result = _acquire_real_calendar(transport, start, end)

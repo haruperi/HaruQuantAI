@@ -176,7 +176,7 @@ The order is the implementation sequence.
 | Completed | `FEAT-ANLT-02` Approved Upstream Result Mapping | `adapters/` | Exact declarations: Section 4.2 | Section 4.2 functional requirements | `tests/analytics/usage/features/02_adapters.py` |
 | Completed | `FEAT-ANLT-03` Internal Pure Analytical Evidence | `metrics/` | Exact declarations: Section 4.3 | Section 4.3 functional requirements | `tests/analytics/usage/features/03_metrics.py` |
 | Completed | `FEAT-ANLT-04` Canonical Reporting | `reports/` | Exact declarations and report contracts: Section 4.4 | Section 4.4 functional requirements | `tests/analytics/usage/features/04_reports.py` |
-| Completed | `FEAT-ANLT-05` Bounded Report Projection | `dashboards/` | Exact declarations and `DashboardPayload` contract: Section 4.6 | Section 4.6 functional requirements | `tests/analytics/usage/features/05_dashboards.py` |
+| Completed | `FEAT-ANLT-05` Bounded Report Projection | `dashboards/` | Exact declarations, `DashboardPayload`, and explicit context-required `get_analytics_dashboard_snapshot`: Section 4.6 | Section 4.6 functional requirements | `tests/analytics/usage/features/05_dashboards.py` |
 
 Excluded work has no `FEAT-*` registration and does not consume a feature ordinal.
 The registry therefore maps the five active feature IDs one-to-one to the five
