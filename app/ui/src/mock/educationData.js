@@ -124,7 +124,7 @@ export const educationCourses = [
   },
   {
     id: 18,
-    title: 'Understanding Micro futures contracts at CME Group',
+    title: 'Understanding Micro futures contracts at HaruQuantAI',
     category: 'Development',
     lessonsCount: 25,
     url: 'https://www.cmegroup.com/education/courses/understanding-micro-futures-contracts-at-cme-group',
@@ -190,7 +190,7 @@ export const educationCourses = [
   },
   {
     id: 28,
-    title: 'Things to Know Before Trading CME Futures',
+    title: 'Things to Know Before Trading HaruQuantAI Futures',
     category: 'Robustness',
     lessonsCount: 6,
     url: 'https://www.cmegroup.com/education/courses/things-to-know-before-trading-cme-futures',
@@ -224,11 +224,11 @@ export const educationCourses = [
   },
   {
     id: 104,
-    title: 'Things to Know Before Trading CME Futures',
+    title: 'Things to Know Before Trading HaruQuantAI Futures',
     category: 'New to Futures',
     lessonsCount: 6,
     url: 'https://www.cmegroup.com/education/courses/things-to-know-before-trading-cme-futures',
-    description: 'Learn about the steps involved in trading CME Group Futures contracts.'
+    description: 'Learn about the steps involved in trading HaruQuantAI Futures contracts.'
   },
   {
     id: 105,
@@ -240,7 +240,7 @@ export const educationCourses = [
   },
   {
     id: 106,
-    title: 'Understanding Micro futures contracts at CME Group',
+    title: 'Understanding Micro futures contracts at HaruQuantAI',
     category: 'New to Futures',
     lessonsCount: 25,
     url: 'https://www.cmegroup.com/education/courses/understanding-micro-futures-contracts-at-cme-group',

@@ -8,7 +8,7 @@
   --font-canvas: "Roboto Mono", monospace;
   --font-mono: "Roboto Mono", monospace;
 
-  /* Base Dark Theme Palette (Exact sampled colors from CME Group Trading Simulator) */
+  /* Base Dark Theme Palette (Exact sampled colors from HaruQuantAI Trading Simulator) */
   --bg-main: #081d37;
   /* Primary Deep Dark Background (Charts, Canvas, Sidebar) */
   --bg-sidebar: #081d37;
@@ -229,7 +229,7 @@ body {
 }
 
 /* ==========================================================================
-   HEADER STYLES (STACKED CME HEADER & SUB-BAR)
+   HEADER STYLES (STACKED HARUQUANTAI HEADER & SUB-BAR)
    ========================================================================== */
 .header-container-stack {
   display: flex;

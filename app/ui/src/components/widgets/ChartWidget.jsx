@@ -2438,7 +2438,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
         {/* Top-Left Overlay Legend */}
         <div className="tv-overlay-legend">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', fontWeight: 600 }}>
-            <span style={{ color: 'var(--text-white)', fontWeight: 700 }}>{symbol} • {timeframe.replace('m', '')} • CME</span>
+            <span style={{ color: 'var(--text-white)', fontWeight: 700 }}>{symbol} • {timeframe.replace('m', '')} • HaruQuantAI</span>
             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00C853' }} />
 
             <span style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: '#00C853', fontWeight: 600 }}>

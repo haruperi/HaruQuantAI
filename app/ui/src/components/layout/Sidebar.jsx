@@ -125,7 +125,7 @@ export const Sidebar = () => {
           {!isCollapsed && <span>Trade Log</span>}
         </div>
 
-        <div className="sidebar-menu-item" onClick={() => alert('CME Group Simulator Help')}>
+        <div className="sidebar-menu-item" onClick={() => alert('HaruQuantAI Simulator Help')}>
           <HelpCircle size={15} />
           {!isCollapsed && <span>Help</span>}
         </div>
@@ -135,7 +135,7 @@ export const Sidebar = () => {
           {!isCollapsed && <span>Feedback</span>}
         </div>
 
-        <div className="sidebar-menu-item" onClick={() => alert('About CME Trading Simulator')}>
+        <div className="sidebar-menu-item" onClick={() => alert('About HaruQuantAI Trading Simulator')}>
           <Info size={15} />
           {!isCollapsed && <span>About</span>}
         </div>

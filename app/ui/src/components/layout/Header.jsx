@@ -108,12 +108,12 @@ export const Header = () => {
     <div className="header-container-stack">
       {/* 1. TOP HEADER BAR matching reference image */}
       <header className="cme-header-top">
-        {/* Brand CME Group Logo */}
+        {/* Brand HaruQuantAI Logo */}
         <div className="cme-logo-area">
           <div className="cme-brand-badge">
-            <span style={{ color: '#fff', fontWeight: 900, fontSize: '13px', letterSpacing: '-0.5px' }}>CME</span>
+            <span style={{ color: '#fff', fontWeight: 900, fontSize: '13px', letterSpacing: '-0.5px' }}>HQ</span>
           </div>
-          <span className="cme-brand-title">CME Group</span>
+          <span className="cme-brand-title">HaruQuantAI</span>
         </div>
 
         {/* Financial Metrics Status Bar */}
