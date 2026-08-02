@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import { MarketsWidget } from '../widgets/MarketsWidget';

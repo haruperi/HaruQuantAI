@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { educationCourses } from '../../mock/educationData';
 import { docsData } from '../../mock/docsData';

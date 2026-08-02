@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import { Target, X, Plus, Minus } from 'lucide-react';

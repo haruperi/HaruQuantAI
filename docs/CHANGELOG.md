@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Upgrade app/ui to React 19 and Next.js
+
+The `app/ui` frontend package has been upgraded from Vite to Next.js (App Router) and React 19, enabling server-side rendering, optimized page routing, metadata management, and Zustand 5 state integration.
+
+#### Changed (2)
+
+- Upgraded `app/ui` framework dependencies from Vite + React 18 to Next.js 15.5+ with React 19.2 and Zustand 5.0.
+- Migrated `app/ui` architecture to Next.js App Router (`src/app/layout.jsx`, `src/app/page.jsx`, `src/app/globals.css`), converting interactive layouts and widgets into Client Components.
+
 ### Implement the API backend foundation
 
 The API service now provides the canonical contract, identity, governance,

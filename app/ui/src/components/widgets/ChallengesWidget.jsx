@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import { Trophy, Users, Shield, ArrowRight } from 'lucide-react';

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import { Download, Edit3, MessageSquare } from 'lucide-react';
