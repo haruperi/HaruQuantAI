@@ -23,7 +23,11 @@ import {
   ThumbsUp,
   Info,
   ShieldAlert,
-  Cookie
+  Cookie,
+  LayoutDashboard,
+  FlaskConical,
+  TrendingUp,
+  AlertTriangle
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -94,6 +98,36 @@ export const Sidebar: React.FC = () => {
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('commentary', 'News')}>
           <Newspaper size={15} />
           {!isCollapsed && <span>News</span>}
+        </div>
+
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('dashboard', 'Dashboard')}>
+          <LayoutDashboard size={15} />
+          {!isCollapsed && <span>Dashboard</span>}
+        </div>
+
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('strategies', 'Strategies')}>
+          <FileSpreadsheet size={15} />
+          {!isCollapsed && <span>Strategies</span>}
+        </div>
+
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('research', 'Edge Lab')}>
+          <FlaskConical size={15} />
+          {!isCollapsed && <span>Edge Lab</span>}
+        </div>
+
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('simulation', 'Backtest')}>
+          <History size={15} />
+          {!isCollapsed && <span>Backtest</span>}
+        </div>
+
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('risk', 'Risk')}>
+          <AlertTriangle size={15} />
+          {!isCollapsed && <span>Risk</span>}
+        </div>
+
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('trading', 'Trading')}>
+          <TrendingUp size={15} />
+          {!isCollapsed && <span>Trading</span>}
         </div>
       </div>
 

@@ -80,12 +80,21 @@ const EXPECTED: ReadonlyArray<{
     path: "/api/v1/operator/approvals",
     permission: "ops:approve",
   },
+  { id: "api.simulation.run", method: "POST", path: "/api/v1/simulation/run", permission: "simulation:run" },
+  { id: "api.simulation.portfolio_run", method: "POST", path: "/api/v1/simulation/portfolio-run", permission: "simulation:run" },
+  { id: "api.simulation.result", method: "GET", path: "/api/v1/simulation/results/{run_id}", permission: "simulation:read" },
+  { id: "api.risk.kill_switch", method: "GET", path: "/api/v1/risk/kill-switch", permission: "risk:read" },
+  { id: "api.risk.decisions", method: "GET", path: "/api/v1/risk/decisions", permission: "risk:read" },
+  { id: "api.trading.session", method: "GET", path: "/api/v1/trading/session", permission: "trading:read" },
+  { id: "api.trading.submit_order", method: "POST", path: "/api/v1/trading/orders", permission: "trading:write" },
+  { id: "api.trading.cancel_order", method: "DELETE", path: "/api/v1/trading/orders/{order_id}", permission: "trading:write" },
+  { id: "api.trading.close_position", method: "POST", path: "/api/v1/trading/positions/{position_id}/close", permission: "trading:write" },
 ];
 
 describe("clients match the backend route catalog", () => {
-  it("has exactly the approved 23 operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(23);
-    expect(ROUTE_CONTRACTS).toHaveLength(23);
+  it("has exactly the approved 32 operations", () => {
+    expect(ROUTE_CONTRACT_COUNT).toBe(32);
+    expect(ROUTE_CONTRACTS).toHaveLength(32);
   });
 
   it("matches every expected id, method, path, and permission", () => {
@@ -138,5 +147,26 @@ describe("clients match the backend route catalog", () => {
     expect(stream?.stream).toBe(true);
     expect(stream?.sideEffect).toBe("stream");
     expect(stream?.permission).toBe("data:read");
+  });
+
+  it("marks the three trading mutation routes as governed + idempotent", () => {
+    for (const id of [
+      "api.trading.submit_order",
+      "api.trading.cancel_order",
+      "api.trading.close_position",
+    ]) {
+      const contract = ROUTE_CONTRACTS_BY_ID[id];
+      expect(contract?.governed, `${id} should be governed`).toBe(true);
+      expect(contract?.idempotencyRequired, `${id} should require idempotency`).toBe(true);
+      expect(contract?.sideEffect, `${id} should be governed_write`).toBe("governed_write");
+    }
+  });
+
+  it("marks the simulation run routes as idempotency-required writes", () => {
+    for (const id of ["api.simulation.run", "api.simulation.portfolio_run"]) {
+      const contract = ROUTE_CONTRACTS_BY_ID[id];
+      expect(contract?.idempotencyRequired, `${id} should require idempotency`).toBe(true);
+      expect(contract?.sideEffect, `${id} should be write`).toBe("write");
+    }
   });
 });

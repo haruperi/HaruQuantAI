@@ -269,8 +269,90 @@ export const metricsRoutes = {
   }),
 } as const;
 
+// --- Simulation (3) ------------------------------------------------------
+
+export const simulationRoutes = {
+  run: route({
+    id: "api.simulation.run",
+    method: "POST",
+    path: "/api/v1/simulation/run",
+    permission: "simulation:run",
+    sideEffect: "write",
+    idempotencyRequired: true,
+  }),
+  portfolioRun: route({
+    id: "api.simulation.portfolio_run",
+    method: "POST",
+    path: "/api/v1/simulation/portfolio-run",
+    permission: "simulation:run",
+    sideEffect: "write",
+    idempotencyRequired: true,
+  }),
+  result: route({
+    id: "api.simulation.result",
+    method: "GET",
+    path: "/api/v1/simulation/results/{run_id}",
+    permission: "simulation:read",
+  }),
+} as const;
+
+// --- Risk (2) ------------------------------------------------------------
+
+export const riskRoutes = {
+  killSwitch: route({
+    id: "api.risk.kill_switch",
+    method: "GET",
+    path: "/api/v1/risk/kill-switch",
+    permission: "risk:read",
+  }),
+  decisions: route({
+    id: "api.risk.decisions",
+    method: "GET",
+    path: "/api/v1/risk/decisions",
+    permission: "risk:read",
+  }),
+} as const;
+
+// --- Trading session (4) -------------------------------------------------
+
+export const tradingRoutes = {
+  session: route({
+    id: "api.trading.session",
+    method: "GET",
+    path: "/api/v1/trading/session",
+    permission: "trading:read",
+  }),
+  submitOrder: route({
+    id: "api.trading.submit_order",
+    method: "POST",
+    path: "/api/v1/trading/orders",
+    permission: "trading:write",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  cancelOrder: route({
+    id: "api.trading.cancel_order",
+    method: "DELETE",
+    path: "/api/v1/trading/orders/{order_id}",
+    permission: "trading:write",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  closePosition: route({
+    id: "api.trading.close_position",
+    method: "POST",
+    path: "/api/v1/trading/positions/{position_id}/close",
+    permission: "trading:write",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+} as const;
+
 /**
- * Frozen registry of all 23 route contracts.
+ * Frozen registry of all 32 route contracts.
  *
  * The count is exported for the drift test so a structural mismatch fails CI.
  */
@@ -298,10 +380,19 @@ export const ROUTE_CONTRACTS = [
   operatorRoutes.events,
   operatorRoutes.approvals,
   metricsRoutes.scrape,
+  simulationRoutes.run,
+  simulationRoutes.portfolioRun,
+  simulationRoutes.result,
+  riskRoutes.killSwitch,
+  riskRoutes.decisions,
+  tradingRoutes.session,
+  tradingRoutes.submitOrder,
+  tradingRoutes.cancelOrder,
+  tradingRoutes.closePosition,
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 23;
+export const ROUTE_CONTRACT_COUNT = 32;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

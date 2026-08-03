@@ -8,7 +8,13 @@ export type WidgetType =
   | "tradeLog"
   | "tradePlan"
   | "education"
-  | "challenges";
+  | "challenges"
+  | "dashboard"
+  | "strategies"
+  | "research"
+  | "simulation"
+  | "risk"
+  | "trading";
 
 export interface Widget {
   id: string;

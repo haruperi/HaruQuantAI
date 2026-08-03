@@ -2,6 +2,36 @@
 
 ## [Unreleased]
 
+### Add workflow presentation components and grow the frontend route catalog to 32 (FEAT-API-11)
+
+The third frontend feature delivers the auth-aware shell and the freshness-aware dashboard, read-only strategies, backtest simulation, risk state, trading session, and Edge Lab research views — the first components to render real backend data through the typed clients and auth context. The frontend route catalog grows from 23 to 32 to match the backend bridge entry below, completing Section 4.11 with no Excluded requirements remaining.
+
+#### Added (3)
+
+- Added `app/ui/src/components/workflow/` with `AppShell` (first `useAuth` consumer, error boundary), `DashboardView` (six parallel snapshots, stale warnings), `StrategyWorkspace` (read-only catalogue), `SimulationView` (run + lookup), `RiskView` (kill-switch + decisions), `TradingView` (session + governed actions disabled until preflight), and `ResearchWorkspace` (advisory report).
+- Added the `simulation`, `risk`, and `trading` typed clients and wired the nine new routes into the frontend catalog, the drift test, the Sidebar ADD-WIDGETS catalog, and the WorkspaceGrid render switch.
+- Added seven Vitest component tests and the numbered usage program `tests/api/usage/16_frontend_components.tsx`.
+
+#### Changed (1)
+
+- Marked `FEAT-API-11` and Section 4.11 functional requirements `FR-API-046`–`FR-API-051` `Completed` in the API README; no Section 4.11 requirement remains Excluded or Pending.
+
+### Add Simulation, Risk, and governed Trading backend bridges
+
+Backend v1 now exposes the owner-domain prerequisites for the deferred Simulation and Risk/Trading frontend work while keeping UI/API limited to transport and composition.
+
+#### Added (4)
+
+- Added synchronous canonical and portfolio Simulation run routes plus durable result retrieval, backed by explicitly composed Simulator ports and atomic lifecycle/result persistence.
+- Added exact-scope Risk kill-switch reads and bounded newest-first immutable Risk decision reads through Risk-owned persistence.
+- Added exact-scope Trading session reads and governed submit, cancel, and close routes through Trading public operations.
+- Added route, composition, persistence-boundary, OpenAPI, and production-exclusion tests for the new operations.
+
+#### Changed (2)
+
+- Increased the backend-v1 route registry from 23 to 32 operations while leaving the frontend's existing 23-operation transport catalog for its separate follow-up.
+- Excluded production-capital execution at the API boundary; only explicitly configured paper dependencies may execute mutations, and missing owner references fail closed.
+
 ### Adopt /auth/me identity recovery and add the SSE stream consumer (FEAT-API-10 closeout)
 
 The frontend context layer now uses the server-authoritative identity route and ships the previously-deferred stream consumer, completing FR-API-045 and closing the two informational blockers that depended on backend routes added in the streaming-bridges entry below.
@@ -65,6 +95,27 @@ The first frontend feature delivers the single typed client transport layer that
 #### Changed (1)
 
 - Corrected the planned `ui/` package tree in the API README to the actual single-page widget-workspace architecture and marked `FEAT-API-09` and the Section 4.9 functional requirements `Completed`.
+
+### Add Indicators, Analytics, and Brokers persistence
+
+Three domains that previously owned no tables gain schema and private CRUD, following the artifact-catalogue pattern.
+
+#### Added (4)
+
+- Added indicator definition, parameter-set, and materialisation-reference tables, with generated columns exposing the frequently filtered parameter keys, plus create, read, update, and delete operations.
+- Added the analytics derived store: metric definitions and values, closed round-trip analysis, profit attribution, equity-curve summaries, and generated reports, with create, read, and update operations.
+- Added bitemporal provider-to-canonical symbol mapping for brokers, with forward, reverse, and point-in-time resolution.
+- Added thirteen requirements across the three domains covering migration location, causality declaration, staleness invalidation, sample-size honesty, excursion recording, and mapping uniqueness.
+
+#### Changed (3)
+
+- Recorded indicator and analytics persisted state as delivered in the system data-ownership register, and named symbol mapping as the sole broker persisted state.
+- Extended the model-versus-code comparison to the four new migration modules.
+- Recorded that analytics and brokers delete nothing while indicators may purge materialisations, since a materialisation is recomputable and a mapping or measurement is evidence.
+
+#### Fixed (1)
+
+- Fixed column parsing in schema tooling that split definitions by line, so a wrapped constraint or generated-column expression was read as two entries and produced fragments as column names; inline comments are now stripped before splitting.
 
 ### Add the artifact catalog
 

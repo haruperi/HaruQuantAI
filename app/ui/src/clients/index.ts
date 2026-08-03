@@ -7,7 +7,7 @@
  *   import { apiClients, unwrapData, ApiClientError } from "@/clients";
  *   const { data } = await apiClients.health.liveness();
  *
- * The catalog exposes typed clients only for the 21 registered backend-v1
+ * The catalog exposes typed clients only for the 32 registered backend-v1
  * operations. No parallel generic helper exists; every call delegates through
  * the single `request` transport. The drift test asserts this catalog matches
  * the backend route inventory exactly.
@@ -50,6 +50,22 @@ export type {
   AuditEventsPage,
   OperationalEvent,
 } from "./operator";
+export type {
+  PortfolioSimulationResult,
+  SimulationResult,
+  SimulationRunInput,
+} from "./simulation";
+export type {
+  KillSwitchQuery,
+  KillSwitchState,
+  RiskDecision,
+  RiskDecisionsQuery,
+} from "./risk";
+export type {
+  ExecutionReceipt,
+  SubmitOrderInput,
+  TradingProjection,
+} from "./trading";
 
 // Value re-exports (used both as stand-alone exports and inside apiClients).
 export { isApiSuccessResponse } from "./contracts";
@@ -74,8 +90,24 @@ import { research } from "./research";
 import { dashboards } from "./dashboards";
 import { operator } from "./operator";
 import { metrics } from "./metrics";
+import { simulation } from "./simulation";
+import { risk } from "./risk";
+import { trading } from "./trading";
 
-export { auth, health, settings, data, strategies, research, dashboards, operator, metrics };
+export {
+  auth,
+  health,
+  settings,
+  data,
+  strategies,
+  research,
+  dashboards,
+  operator,
+  metrics,
+  simulation,
+  risk,
+  trading,
+};
 
 /**
  * The single typed client catalog.
@@ -94,6 +126,9 @@ export const apiClients = {
   dashboards,
   operator,
   metrics,
+  simulation,
+  risk,
+  trading,
 } as const;
 
 /** Aggregate type of the catalog, for callers that want to depend on the shape. */

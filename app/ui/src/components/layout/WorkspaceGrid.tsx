@@ -13,6 +13,12 @@ import { TradeLogWidget } from '../widgets/TradeLogWidget';
 import { TradePlanWidget } from '../widgets/TradePlanWidget';
 import { EducationWidget } from '../widgets/EducationWidget';
 import { ChallengesWidget } from '../widgets/ChallengesWidget';
+import { DashboardView } from '../workflow/dashboard';
+import { StrategyWorkspace } from '../workflow/strategies';
+import { ResearchWorkspace } from '../workflow/research';
+import { SimulationView } from '../workflow/simulation';
+import { RiskView } from '../workflow/risk';
+import { TradingView } from '../workflow/trading';
 import { X, Maximize2, Minimize2, GripHorizontal, Layers, ArrowRightLeft } from 'lucide-react';
 
 import {
@@ -220,6 +226,18 @@ export const WorkspaceGrid: React.FC = () => {
         return <EducationWidget />;
       case 'challenges':
         return <ChallengesWidget />;
+      case 'dashboard':
+        return <DashboardView />;
+      case 'strategies':
+        return <StrategyWorkspace />;
+      case 'research':
+        return <ResearchWorkspace />;
+      case 'simulation':
+        return <SimulationView />;
+      case 'risk':
+        return <RiskView />;
+      case 'trading':
+        return <TradingView />;
       default:
         return <MarketsWidget />;
     }
