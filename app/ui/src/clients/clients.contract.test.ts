@@ -25,12 +25,14 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.auth.register", method: "POST", path: "/api/v1/auth/register", permission: null },
   { id: "api.auth.login", method: "POST", path: "/api/v1/auth/login", permission: null },
   { id: "api.auth.logout", method: "POST", path: "/api/v1/auth/logout", permission: null },
+  { id: "api.auth.me", method: "GET", path: "/api/v1/auth/me", permission: null },
   { id: "api.health.liveness", method: "GET", path: "/api/v1/health/liveness", permission: null },
   { id: "api.health.readiness", method: "GET", path: "/api/v1/health/readiness", permission: "ops:read" },
   { id: "api.metrics", method: "GET", path: "/api/v1/metrics", permission: "ops:metrics:read" },
   { id: "api.settings.read", method: "GET", path: "/api/v1/settings", permission: "settings:read" },
   { id: "api.settings.update", method: "PUT", path: "/api/v1/settings", permission: "settings:write" },
   { id: "api.data.symbols", method: "GET", path: "/api/v1/data/symbols", permission: "data:read" },
+  { id: "api.data.stream", method: "GET", path: "/api/v1/data/stream", permission: "data:read" },
   { id: "api.strategies.catalogue", method: "GET", path: "/api/v1/strategies", permission: "strategy:read" },
   {
     id: "api.strategies.versions",
@@ -81,9 +83,9 @@ const EXPECTED: ReadonlyArray<{
 ];
 
 describe("clients match the backend route catalog", () => {
-  it("has exactly the approved 21 operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(21);
-    expect(ROUTE_CONTRACTS).toHaveLength(21);
+  it("has exactly the approved 23 operations", () => {
+    expect(ROUTE_CONTRACT_COUNT).toBe(23);
+    expect(ROUTE_CONTRACTS).toHaveLength(23);
   });
 
   it("matches every expected id, method, path, and permission", () => {
@@ -123,5 +125,18 @@ describe("clients match the backend route catalog", () => {
   it("marks the symbols route as paginated", () => {
     const symbols = ROUTE_CONTRACTS_BY_ID["api.data.symbols"];
     expect(symbols?.paginated).toBe(true);
+  });
+
+  it("marks auth.me as auth-required with no permission string", () => {
+    const me = ROUTE_CONTRACTS_BY_ID["api.auth.me"];
+    expect(me?.authRequired).toBe(true);
+    expect(me?.permission).toBeNull();
+  });
+
+  it("marks data.stream as an SSE stream route", () => {
+    const stream = ROUTE_CONTRACTS_BY_ID["api.data.stream"];
+    expect(stream?.stream).toBe(true);
+    expect(stream?.sideEffect).toBe("stream");
+    expect(stream?.permission).toBe("data:read");
   });
 });

@@ -2,6 +2,56 @@
 
 ## [Unreleased]
 
+### Adopt /auth/me identity recovery and add the SSE stream consumer (FEAT-API-10 closeout)
+
+The frontend context layer now uses the server-authoritative identity route and ships the previously-deferred stream consumer, completing FR-API-045 and closing the two informational blockers that depended on backend routes added in the streaming-bridges entry below.
+
+#### Added (4)
+
+- Added `app/ui/src/context/streams.ts` (`consumeStream`, `StreamGapError`) with monotonic-sequence validation, heartbeat filtering, terminal-error surfacing, bounded reconnection after transient gaps, and an `onGap` hook for authoritative refresh over `GET /api/v1/data/stream`.
+- Added the low-level SSE transport `app/ui/src/clients/stream.ts` (`openStream`) that opens an authenticated `fetch` streaming connection, parses `text/event-stream` frames, and yields Zod-validated `StreamEvent` objects.
+- Added `StreamEvent`/`StreamEventType` schemas to `clients/contracts.ts`, plus `auth.me()` and `data.stream()` typed client wrappers and the `StreamTransportOptions` surface.
+- Added unit tests for the stream consumer and the `auth.me` recovery path, and a `testUsageConsumeStream` case in the numbered usage program 15.
+
+#### Changed (2)
+
+- Refactored `AuthProvider` to recover identity server-authoritatively via `GET /api/v1/auth/me` (replacing the readiness-probe workaround); `sessionStorage` now mirrors identity only as a display fallback, and the session token never leaves the HttpOnly cookie.
+- Grew the frontend route catalog from 21 to 23 operations by adding `api.auth.me` (auth-required, no permission) and `api.data.stream` (SSE, `StreamEvent.v1`); the drift test now asserts the 23-operation inventory and the new `authRequired`/`stream` route flags.
+
+### Add Data-owned MT5 streaming and backend recovery bridges
+
+The backend now resolves both prerequisites previously deferred by the frontend while preserving the gateway as orchestration only: Data owns genuine MT5 tick/bar acquisition and UI/API owns authenticated transport.
+
+#### Added (4)
+
+- Added Data-owned `ticks` mode, which delivers every MT5 tick independently of the selected display timeframe through bounded overlapping reads with multiplicity-preserving deduplication and explicit saturated-batch gaps.
+- Added Data-owned `bars` mode, which emits genuine closed MT5 bars at canonical timeframe boundaries such as M1, M5, and H1 without publishing partial or fabricated bars.
+- Added shared bounded Data stream fan-out with monotonic cursors, heartbeats, retained resume, explicit slow-consumer termination, and last-subscriber provider cleanup.
+- Added authenticated `GET /api/v1/auth/me` identity recovery and `GET /api/v1/data/stream` SSE transport, increasing the backend-v1 registry from 21 to 23 operations.
+
+#### Changed (2)
+
+- Assigned MT5 market-stream business behavior to `app.services.data.realtime_feeds`; UI/API performs permission/quota checks, event translation, SSE framing, and resource cleanup only.
+- Reclassified the frontend stream-consumer blocker: its backend SSE prerequisite now exists, while implementing `FR-API-045` and adopting `/me` in `AuthProvider` remain separate frontend work.
+
+### Add frontend session and page context (FEAT-API-10)
+
+The second frontend feature delivers the React context layer that recovers the authenticated browser session, registers bounded redacted page context, and preflights governed writes — the bridge between the typed clients (FEAT-API-09) and the widget workspace.
+
+#### Added (3)
+
+- Added the frontend context package `app/ui/src/context/` with `AuthProvider` (readiness-probe session recovery + non-secret identity in sessionStorage), `PageContextProvider` (≤200 visible ids, dedup, sensitive-key rejection), and `buildGovernedOptions` (30s preflight, auto idempotency key, advisory client check).
+- Added Vitest unit tests (jsdom + Testing Library) and the standalone numbered usage program `tests/api/usage/15_frontend_context.tsx`, plus the `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`, and `@vitejs/plugin-react` dev dependencies.
+- Added the `tsconfig.usage.json` automatic-JSX-runtime config and mounted `<AuthProvider>` in the root App Router layout so session recovery covers every route.
+
+#### Changed (1)
+
+- Marked `FEAT-API-10` and Section 4.10 functional requirements `FR-API-042`–`FR-API-044` `Completed` and `FR-API-045` `Pending` (no backend stream route exists today) in the API README.
+
+#### Deprecated (1)
+
+- Deprecated the stream consumer `FR-API-045` from the Section 4.10 scope: it is deferred pending a backend stream route, so no `streams.ts` ships in this feature.
+
 ### Add typed frontend transport (FEAT-API-09)
 
 The first frontend feature delivers the single typed client transport layer that maps the 21 frozen backend-v1 operations to typed TypeScript calls, so the CME-style widget workspace can reach real backend data through one contract-validated entry point instead of parallel ad-hoc fetch helpers.
@@ -15,6 +65,71 @@ The first frontend feature delivers the single typed client transport layer that
 #### Changed (1)
 
 - Corrected the planned `ui/` package tree in the API README to the actual single-page widget-workspace architecture and marked `FEAT-API-09` and the Section 4.9 functional requirements `Completed`.
+
+### Add the artifact catalog
+
+The storage model chosen earlier — broker as runtime source, files as the pinned store — had no index. Seven tables now catalogue what has been written, so a pinned read selects the artifacts it needs by recorded time range instead of walking the artifact tree.
+
+#### Added (4)
+
+- Added seven catalogue tables covering instrument, provider, and session reference data, a logical dataset registry, a per-artifact index, a fetch log, and a quality-event log, as one additive migration step.
+- Added create and read operations for the catalogue to the data persistence layer, including artifact selection by overlapping time range, the integrity gate, and coverage reporting.
+- Added seven requirements covering manifest-derived rebuildability, the overlap predicate, the fail-closed integrity gate, write ordering, fetch-source recording, timestamp semantics, and quality-event attribution.
+- Added usage evidence exercising every catalogue operation, including a demonstration that the naive range predicate silently drops an artifact that begins before the requested window.
+
+#### Changed (3)
+
+- Rewrote the artifact-layout and read-path sections to describe what the artifact writer actually does: one content-addressed file plus a sidecar manifest, written atomically, with no directory partitioning.
+- Withdrew directory partitioning from the storage model. An index that prunes by recorded time range is more precise than one that prunes by directory name and needs no filesystem access, so partitioning by path became redundant once a catalogue existed.
+- Recorded storing prices as decimal strings rather than a decimal logical type as an open improvement: the current form is precision-safe but forgoes numeric predicate pushdown.
+
+### Record every shipped table in the schema model
+
+Thirteen tables that ship today were absent from the model, which asserted authority over the target schema while omitting parts of the current one. The model now records all of them.
+
+#### Added (2)
+
+- Added eight operational and reference tables from the data domain, four from the interface domain, and one strategy mutation-command table to the schema model, generated from their conformed definitions so model and code cannot drift.
+- Added a reconciliation section recording that model completeness is closed, that nine applied tables track time through purpose-specific columns rather than a creation timestamp, and that four applied strategy tables predate the strict-typing convention.
+
+#### Changed (2)
+
+- Extended the audit-column exemption in schema verification from two tables to nine, each annotated with the timestamp column it uses instead, and added an exemption for one applied table that tracks progress without a modification timestamp.
+- Relaxed the namespace-coverage check to accept a ratified but deliberately unused namespace, now that the utility framework owns no tables.
+
+### Separate Data schema definitions from the migration runner
+
+Data's schema definitions move to the domain migration package while the shared migration runner stays in the persistence layer, completing the canonical migration layout across every domain.
+
+#### Changed (2)
+
+- Moved Data's own table definitions into the domain migration package, leaving ledger initialisation, checksum comparison, write-lock acquisition, and step application in the persistence layer under the shared-infrastructure exemption. The two applied statement sets were moved unchanged, so their recorded checksums still match.
+- Documented that the definitions package must not re-export the runtime-store runner, since doing so makes importing the runner initialise a package that imports the runner back.
+
+#### Fixed (1)
+
+- Fixed a circular import introduced when the research-source definitions were relocated: importing the migration runner initialised the definitions package, which imported the runtime-store module, which imported the half-initialised runner.
+
+### Conform Agentic and Data schema definitions
+
+The final two definition owners move to canonical per-domain migration packages, completing the relocation across every domain that owns schema. The model absorbs seventeen shipped tables it had not recorded.
+
+#### Added (3)
+
+- Added the thirteen shipped Agentic tables and four shipped Data research-source and runtime tables to the schema model, recorded from the conformed definitions so model and code cannot drift apart.
+- Added strict typing, creation timestamps, and request and correlation identifiers across all seventeen tables.
+- Added five requirements covering migration location, strict typing and traceability, sequence uniqueness, the runner-versus-definition split, and research-source traceability.
+
+#### Changed (4)
+
+- Relocated five Agentic migration definitions into one package with a submodule per feature area, and two Data definitions into a Data migration package, leaving the shared migration runner in place under its infrastructure exemption.
+- Renumbered the Agentic experimentation migration from sequence two to sequence five; two migrations previously claimed the same sequence, leaving apply order ambiguous.
+- Renamed the runtime-record table into the ratified data namespace and corrected its ledger domain, which previously matched no folder, prefix, or ownership entry.
+- Corrected the simulator ledger domain to match its owning package and dropped its non-standard checksum prefix so every domain stores a bare digest.
+
+#### Fixed (1)
+
+- Fixed the audit-column check in schema verification to exempt append-only tables, where a modification timestamp would wrongly imply a row can be revised.
 
 ### Conform Portfolio, Optimization, Research, and Simulator schema definitions
 

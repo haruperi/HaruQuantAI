@@ -92,6 +92,14 @@ describe("auth client", () => {
     expect(res.status).toBe("success");
     expect(res.data).toBeNull();
   });
+
+  it("me recovers the server-authoritative identity", async () => {
+    fakeFetch(() =>
+      success({ user_id: "u1", username: "alice", expires_at: "2026-08-04T00:00:00Z" })
+    );
+    const res = await apiClients.auth.me();
+    expect(unwrapData(res).username).toBe("alice");
+  });
 });
 
 describe("health client", () => {

@@ -8,9 +8,10 @@
 
 import { z } from "zod";
 
-import type { ApiResponse } from "./contracts";
+import type { ApiResponse, StreamEvent } from "./contracts";
 import { dataRoutes } from "./routes";
 import { request, type RequestOptions, type QueryValue } from "./request";
+import { openStream, type StreamTransportOptions } from "./stream";
 
 /** One symbol row. Data-owned; field set may grow, so rows are open records. */
 export const symbolRowSchema = z.record(z.string(), z.unknown());
@@ -49,5 +50,32 @@ export function symbols(
   });
 }
 
+/** Query parameters for the SSE market stream. */
+export interface StreamQuery {
+  symbol: string;
+  mode: "bars" | "ticks";
+  timeframe: string;
+  source_id?: "mt5";
+}
+
+/**
+ * Open the authenticated SSE market stream and yield validated events.
+ *
+ * Delegates to the low-level SSE transport. Higher-level gap/reconnect
+ * handling is provided by `context/streams.ts::consumeStream`.
+ */
+export function stream(
+  params: StreamQuery,
+  options?: Omit<StreamTransportOptions, "query">
+): AsyncIterable<StreamEvent> {
+  const query: Record<string, QueryValue> = {
+    symbol: params.symbol,
+    mode: params.mode,
+    timeframe: params.timeframe,
+  };
+  if (params.source_id !== undefined) query.source_id = params.source_id;
+  return openStream(dataRoutes.stream, { query, ...options });
+}
+
 /** Aggregated data client. */
-export const data = { symbols };
+export const data = { symbols, stream };

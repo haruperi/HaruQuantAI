@@ -1,5 +1,5 @@
 /**
- * Frozen typed route contracts for the 21 registered backend-v1 operations.
+ * Frozen typed route contracts for the 23 registered backend-v1 operations.
  *
  * Source of truth: `app/services/api/contracts/catalog.py` (`_KNOWN_ROUTE_CONTRACTS`).
  * The drift test in `clients.contract.test.ts` asserts that this module
@@ -15,9 +15,12 @@ export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 /**
  * One typed frontend route contract.
  *
- * The optional `returnsText` flag marks routes that bypass the JSON envelope
- * and return a raw text body (only `/api/v1/metrics` today, which serves
- * Prometheus exposition format).
+ * - `returnsText` marks routes that bypass the JSON envelope and return a raw
+ *   text body (only `/api/v1/metrics` today, Prometheus exposition format).
+ * - `authRequired` marks routes that require an authenticated session even
+ *   when no specific permission string is attached (e.g. `/api/v1/auth/me`).
+ * - `stream` marks SSE routes whose response contract is `StreamEvent.v1`
+ *   (only `/api/v1/data/stream` today).
  */
 export interface RouteContract<
   TMethod extends HttpMethod = HttpMethod,
@@ -27,6 +30,7 @@ export interface RouteContract<
   readonly method: TMethod;
   readonly path: TPath;
   readonly permission: string | null;
+  readonly authRequired: boolean;
   readonly sideEffect: RouteSideEffect;
   /** True for governed writes (require idempotency + governance + CSRF). */
   readonly governed: boolean;
@@ -34,6 +38,8 @@ export interface RouteContract<
   readonly idempotencyRequired: boolean;
   /** True for cursor-paginated list routes. */
   readonly paginated: boolean;
+  /** True for SSE stream routes (response_contract = StreamEvent.v1). */
+  readonly stream: boolean;
   /** True when the route returns raw text instead of the JSON envelope. */
   readonly returnsText: boolean;
 }
@@ -44,10 +50,12 @@ function route<TMethod extends HttpMethod, TPath extends string>(config: {
   method: TMethod;
   path: TPath;
   permission?: string;
+  authRequired?: boolean;
   sideEffect?: RouteSideEffect;
   governed?: boolean;
   idempotencyRequired?: boolean;
   paginated?: boolean;
+  stream?: boolean;
   returnsText?: boolean;
 }): RouteContract<TMethod, TPath> {
   return {
@@ -55,15 +63,17 @@ function route<TMethod extends HttpMethod, TPath extends string>(config: {
     method: config.method,
     path: config.path,
     permission: config.permission ?? null,
+    authRequired: config.authRequired ?? (config.permission !== undefined),
     sideEffect: config.sideEffect ?? "read",
     governed: config.governed ?? false,
     idempotencyRequired: config.idempotencyRequired ?? false,
     paginated: config.paginated ?? false,
+    stream: config.stream ?? false,
     returnsText: config.returnsText ?? false,
   };
 }
 
-// --- Authentication (3) --------------------------------------------------
+// --- Authentication (4) --------------------------------------------------
 
 export const authRoutes = {
   register: route({
@@ -83,6 +93,13 @@ export const authRoutes = {
     method: "POST",
     path: "/api/v1/auth/logout",
     sideEffect: "write",
+  }),
+  me: route({
+    id: "api.auth.me",
+    method: "GET",
+    path: "/api/v1/auth/me",
+    // Requires an authenticated session but carries no permission string.
+    authRequired: true,
   }),
 } as const;
 
@@ -123,7 +140,7 @@ export const settingsRoutes = {
   }),
 } as const;
 
-// --- Data / symbol discovery (1) ----------------------------------------
+// --- Data / symbol discovery + market stream (2) -------------------------
 
 export const dataRoutes = {
   symbols: route({
@@ -132,6 +149,14 @@ export const dataRoutes = {
     path: "/api/v1/data/symbols",
     permission: "data:read",
     paginated: true,
+  }),
+  stream: route({
+    id: "api.data.stream",
+    method: "GET",
+    path: "/api/v1/data/stream",
+    permission: "data:read",
+    sideEffect: "stream",
+    stream: true,
   }),
 } as const;
 
@@ -245,7 +270,7 @@ export const metricsRoutes = {
 } as const;
 
 /**
- * Frozen registry of all 21 route contracts.
+ * Frozen registry of all 23 route contracts.
  *
  * The count is exported for the drift test so a structural mismatch fails CI.
  */
@@ -253,11 +278,13 @@ export const ROUTE_CONTRACTS = [
   authRoutes.register,
   authRoutes.login,
   authRoutes.logout,
+  authRoutes.me,
   healthRoutes.liveness,
   healthRoutes.readiness,
   settingsRoutes.read,
   settingsRoutes.update,
   dataRoutes.symbols,
+  dataRoutes.stream,
   strategiesRoutes.catalogue,
   strategiesRoutes.versions,
   researchRoutes.run,
@@ -274,7 +301,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 21;
+export const ROUTE_CONTRACT_COUNT = 23;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

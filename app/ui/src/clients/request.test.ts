@@ -14,7 +14,7 @@ import {
   request,
   unwrapData,
 } from "./request";
-import { dataRoutes, healthRoutes, metricsRoutes, operatorRoutes } from "./routes";
+import { dataRoutes, healthRoutes, metricsRoutes, operatorRoutes, authRoutes } from "./routes";
 import type { ApiResponse } from "./contracts";
 
 /** Build a successful JSON envelope response. */
@@ -106,17 +106,7 @@ describe("request — FR-API-038 typed transport", () => {
     const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(noContentResponse());
     globalThis.fetch = fetchMock as unknown as typeof globalThis.fetch;
 
-    const result = await request<null>({
-      method: "POST",
-      path: "/api/v1/auth/logout",
-      id: "api.auth.logout",
-      permission: null,
-      sideEffect: "write",
-      governed: false,
-      idempotencyRequired: false,
-      paginated: false,
-      returnsText: false,
-    });
+    const result = await request<null>(authRoutes.logout);
 
     expect(result.status).toBe("success");
     expect(result.data).toBeNull();

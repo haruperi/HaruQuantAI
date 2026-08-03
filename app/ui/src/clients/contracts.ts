@@ -178,3 +178,28 @@ export function isApiSuccessResponse<T>(
 
 /** Permissive payload schema used when a route returns opaque owner JSON. */
 export const opaquePayloadSchema = z.unknown();
+
+/** Stream event type discriminator. Source: `StreamEventType`. */
+export const streamEventType = z.enum(["heartbeat", "payload", "error"]);
+export type StreamEventType = z.infer<typeof streamEventType>;
+
+/**
+ * Streaming event envelope.
+ *
+ * Mirrors `StreamEvent.v1` as served by the SSE bridge
+ * (`app/services/api/routes/data_stream.py`). Each SSE frame carries `id`
+ * (sequence), `event` (event_type), and `data` (this JSON envelope).
+ */
+export const streamEventSchema = z.object({
+  sequence: z.number().int().min(0),
+  request_id: z.string().min(1),
+  trace_id: z.string().nullable().nullish(),
+  route: z.string().min(1).startsWith("/"),
+  event_type: streamEventType,
+  timestamp: z.string().min(1),
+  payload: z.record(z.string(), z.unknown()).nullable().nullish(),
+  error: z.string().nullable().nullish(),
+  cursor: z.string().nullable().nullish(),
+});
+
+export type StreamEvent = z.infer<typeof streamEventSchema>;

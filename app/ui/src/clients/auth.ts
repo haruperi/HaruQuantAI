@@ -26,6 +26,10 @@ export const sessionSchema = z.object({
 });
 export type Session = z.infer<typeof sessionSchema>;
 
+/** Identity recovered from the server-side session via `GET /api/v1/auth/me`. */
+export const identitySchema = sessionSchema;
+export type Identity = z.infer<typeof identitySchema>;
+
 /** Build common options for an auth write. */
 function authOptions(
   body: unknown,
@@ -55,5 +59,19 @@ export function logout(options?: RequestOptions): Promise<ApiResponse<null>> {
   return request<null>(authRoutes.logout, options);
 }
 
+/**
+ * Recover the caller's non-secret identity from the server-side session.
+ *
+ * Hits `GET /api/v1/auth/me`: returns `{user_id, username, expires_at}` when
+ * the cookie session is valid, 401 when missing/expired. This is the
+ * server-authoritative identity source for `AuthProvider` recovery.
+ */
+export function me(options?: RequestOptions): Promise<ApiResponse<Identity>> {
+  return request<Identity>(authRoutes.me, {
+    schema: identitySchema,
+    ...options,
+  });
+}
+
 /** Aggregated auth client. */
-export const auth = { register, login, logout };
+export const auth = { register, login, logout, me };

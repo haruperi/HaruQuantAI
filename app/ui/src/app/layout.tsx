@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { AuthProvider } from '@/context';
 
 export const metadata: Metadata = {
   title: 'HaruQuantAI | Trading Simulator',
@@ -25,7 +26,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <div id="root">{children}</div>
+        <div id="root">
+          <AuthProvider>{children}</AuthProvider>
+        </div>
       </body>
     </html>
   );

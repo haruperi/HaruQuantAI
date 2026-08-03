@@ -23,19 +23,23 @@ export type {
   ApiStatus,
   ApiSuccessResponse,
   RouteSideEffect,
+  StreamEvent,
+  StreamEventType,
 } from "./contracts";
 export type { HttpMethod, RouteContract } from "./routes";
 
 export type { QueryValue, RequestOptions } from "./request";
 
-export type { Credentials, Session } from "./auth";
+export type { Credentials, Identity, Session } from "./auth";
 export type {
   HealthDependencyCheck,
   Liveness,
   Readiness,
 } from "./health";
 export type { SettingsUpdate, UserSettings } from "./settings";
-export type { SymbolPage, SymbolRow, SymbolsQuery } from "./data";
+export type { StreamQuery, SymbolPage, SymbolRow, SymbolsQuery } from "./data";
+export { openStream } from "./stream";
+export type { StreamTransportOptions } from "./stream";
 export type { StrategyCatalogue, StrategyVersion } from "./strategies";
 export type { ResearchReport, ResearchRunInput } from "./research";
 export type { DashboardSnapshot } from "./dashboards";
