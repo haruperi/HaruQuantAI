@@ -24,6 +24,11 @@ def test_provider_manifest_is_exact_and_deterministic() -> None:
         "dashboard.source",
         "operator.audit_source",
         "operator.event_source",
+        "risk.source",
+        "simulation.result_source",
+        "simulation.run_source",
+        "trading.mutation_source",
+        "trading.session_source",
     )
     assert len(set(names)) == len(names)
     assert names == tuple(sorted(names))

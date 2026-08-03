@@ -1,0 +1,90 @@
+"""Structural guarantees for API-owned CRUD persistence."""
+
+import ast
+import inspect
+import re
+from pathlib import Path
+
+from app.services.api import persistence
+from app.utils import get_logger
+
+logger = get_logger(__name__)
+
+_API_ROOT = Path(__file__).parents[3] / "app" / "services" / "api"
+_PERSISTENCE_ROOT = _API_ROOT / "persistence"
+_EXPECTED_FILES = {"__init__.py", "create.py", "read.py", "update.py", "delete.py"}
+_EXPECTED_EXPORTS = {
+    "consume_approval_record",
+    "create_account_record",
+    "create_approval_record",
+    "create_idempotency_record",
+    "create_user_settings_record",
+    "delete_auth_failure_record",
+    "delete_idempotency_record",
+    "finalize_idempotency_record",
+    "read_account_record",
+    "read_approval_record",
+    "read_auth_failure_record",
+    "read_auth_lock_record",
+    "read_credential_record",
+    "read_csrf_record",
+    "read_idempotency_record",
+    "read_session_record",
+    "read_user_settings_record",
+    "replace_active_session_record",
+    "revoke_session_record",
+    "update_account_last_login",
+    "update_auth_failure_record",
+    "update_credential_record",
+    "update_user_settings_record",
+}
+_SQL_PATTERNS = (
+    re.compile(r"^SELECT\s+.+\s+FROM\s+"),
+    re.compile(r"^INSERT\s+(?:OR\s+\w+\s+)?INTO\s+"),
+    re.compile(r"^UPDATE\s+.+\s+SET\s+"),
+    re.compile(r"^DELETE\s+FROM\s+"),
+)
+
+
+def test_persistence_package_has_exact_crud_layout() -> None:
+    """Verify the private package has only its boundary and four CRUD modules."""
+    logger.debug("Checking exact API persistence package layout")
+    assert {path.name for path in _PERSISTENCE_ROOT.glob("*.py")} == _EXPECTED_FILES
+
+
+def test_persistence_boundary_exports_only_crud_functions() -> None:
+    """Verify the internal boundary exports the intended standalone functions."""
+    logger.debug("Checking API persistence function exports")
+    assert set(persistence.__all__) == _EXPECTED_EXPORTS
+    assert all(
+        inspect.isfunction(getattr(persistence, name)) for name in persistence.__all__
+    )
+
+
+def test_api_sql_is_confined_to_persistence_and_migrations() -> None:
+    """Verify API business modules contain no CRUD SQL or transaction calls."""
+    logger.debug("Checking API SQL ownership boundary")
+    violations: list[str] = []
+    migrations_root = _API_ROOT / "migrations"
+    for path in _API_ROOT.rglob("*.py"):
+        if (
+            _PERSISTENCE_ROOT in path.parents
+            or migrations_root in path.parents
+            or path.name == "migrations.py"
+        ):
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                name = getattr(node.func, "id", None) or getattr(
+                    node.func,
+                    "attr",
+                    None,
+                )
+                if name == "execute_transaction":
+                    violations.append(f"{path}: execute_transaction")
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                normalized = " ".join(node.value.upper().split())
+                if any(pattern.search(normalized) for pattern in _SQL_PATTERNS):
+                    violations.append(f"{path}: SQL literal")
+    assert not violations, violations
