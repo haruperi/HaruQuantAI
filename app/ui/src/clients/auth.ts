@@ -1,0 +1,59 @@
+/**
+ * Authentication client for the 3 auth operations.
+ *
+ * Each call delegates through the single `request` transport. Credentials are
+ * sent only as request bodies; the opaque session is established via the
+ * `hq_session` / `hq_csrf` cookies set by the backend response.
+ */
+
+import { z } from "zod";
+
+import type { ApiResponse } from "./contracts";
+import { authRoutes } from "./routes";
+import { request, type RequestOptions } from "./request";
+
+/** Request body for register/login (backend `_Credentials`). */
+export interface Credentials {
+  username: string;
+  password: string;
+}
+
+/** Response data for register/login (backend returns this dict literal). */
+export const sessionSchema = z.object({
+  user_id: z.string().min(1),
+  username: z.string().min(1),
+  expires_at: z.string().min(1),
+});
+export type Session = z.infer<typeof sessionSchema>;
+
+/** Build common options for an auth write. */
+function authOptions(
+  body: unknown,
+  overrides?: RequestOptions
+): RequestOptions {
+  return { schema: sessionSchema, body, ...overrides };
+}
+
+/** Register a new account and establish a session (HTTP 201). */
+export function register(
+  credentials: Credentials,
+  options?: RequestOptions
+): Promise<ApiResponse<Session>> {
+  return request<Session>(authRoutes.register, authOptions(credentials, options));
+}
+
+/** Authenticate an existing account and establish a session (HTTP 200). */
+export function login(
+  credentials: Credentials,
+  options?: RequestOptions
+): Promise<ApiResponse<Session>> {
+  return request<Session>(authRoutes.login, authOptions(credentials, options));
+}
+
+/** Revoke the caller's session (HTTP 204, bodyless success). */
+export function logout(options?: RequestOptions): Promise<ApiResponse<null>> {
+  return request<null>(authRoutes.logout, options);
+}
+
+/** Aggregated auth client. */
+export const auth = { register, login, logout };

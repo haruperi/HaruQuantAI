@@ -2,6 +2,163 @@
 
 ## [Unreleased]
 
+### Add typed frontend transport (FEAT-API-09)
+
+The first frontend feature delivers the single typed client transport layer that maps the 21 frozen backend-v1 operations to typed TypeScript calls, so the CME-style widget workspace can reach real backend data through one contract-validated entry point instead of parallel ad-hoc fetch helpers.
+
+#### Added (3)
+
+- Added the typed frontend transport package `app/ui/src/clients/` with a Zod-validated `ApiResponse` envelope mirror, frozen `RouteContract` definitions for the 21 registered operations, the single `request`/`unwrapData`/`ApiClientError` primitive, and nine focused domain clients aggregated into one `apiClients` catalog.
+- Added Vitest unit and drift tests plus the standalone numbered usage program `tests/api/usage/14_frontend_clients.ts`, and a `next.config.mjs` same-origin rewrite proxy so session and CSRF cookies stay first-party in development.
+- Added the `zod`, `vitest`, `tsx`, and `@vitest/coverage-v8` frontend dependencies and the `vitest.config.ts` runner configuration.
+
+#### Changed (1)
+
+- Corrected the planned `ui/` package tree in the API README to the actual single-page widget-workspace architecture and marked `FEAT-API-09` and the Section 4.9 functional requirements `Completed`.
+
+### Conform Portfolio, Optimization, Research, and Simulator schema definitions
+
+Four further domains move to the canonical per-domain migration package. In each case the schema model adopts the shipped design rather than the reverse, because the shipped design already satisfied the conventions the model was reaching for.
+
+#### Added (2)
+
+- Added request, correlation, and audit-timestamp columns across all eleven tables in the four domains, plus publication tracking on the portfolio audit outbox and covering indexes for scope, reproducibility, and audit lookups.
+- Added a model-versus-code comparison script that reports column divergence per table and exits non-zero on mismatch.
+
+#### Changed (4)
+
+- Adopted the shipped Portfolio design into the schema model: composite-key immutable definition and plan history, a separate current-version pointer under a compare-and-swap guard, and no foreign keys, since version rows must survive independently.
+- Adopted the shipped Optimization and Research designs into the schema model: a search identified by its own key with ranked candidates as a payload, and an artifact table that is a file manifest rather than a general catalog.
+- Renamed the simulator run-identity table into the ratified abbreviated namespace and recorded that the canonical journal remains append-only newline-delimited JSON with no backing table.
+- Relocated four domains' migration definitions into per-domain migration packages and repointed their public re-exports, requirement records, and test fixtures.
+
+#### Removed (1)
+
+- Withdrew the proposed separate portfolio definition-version table and three other unbuilt tables from the active model, demoting them and eleven others to an explicitly labelled target-only section.
+
+#### Fixed (1)
+
+- Fixed a constraint matcher in schema tooling that matched clause keywords as line prefixes and therefore silently discarded any column whose name began with one of them, hiding eight columns from every model-versus-code comparison.
+
+### Conform Trading and Risk schema definitions to the authoritative model
+
+Trading and Risk migration definitions move to the canonical per-domain migration package and adopt the model's audit, traceability, and strictness conventions. Neither step had been applied to a database, so both definitions are edited in place rather than extended.
+
+#### Added (3)
+
+- Added monotonic sequence, unique event identity, aggregate-version uniqueness, correlation and causation identifiers, and audit timestamps to the trading event log, so two concurrent writers computing the same next version collide at insert instead of double-appending.
+- Added the consumed event-log position to trading projections, giving rebuilds a resume point and readers a staleness check.
+- Added eight requirements covering migration location, strict typing, audit and traceability columns, and additive-only evolution across the two domains.
+
+#### Changed (3)
+
+- Declared every Risk table strict and gave each one creation, request, and correlation columns, with modification timestamps on the mutable ones.
+- Adopted the shipped Risk table names and the eligibility versus allocation split into the schema model, rather than renaming the domain to match an independent design; the two decisions are made by different authorities on different cadences.
+- Relocated Trading and Risk migration definitions into per-domain migration packages and repointed the state re-exports, requirement records, and unit tests.
+
+### Close every open schema decision
+
+All seven remaining schema decisions are resolved and written into the authoritative specifications; the system open-decisions section is now empty.
+
+#### Added (1)
+
+- Added an append-only portfolio definition version table so configuration history is immutable while child foreign keys continue to resolve against a single-column parent key, satisfying the portfolio data-ownership requirement.
+
+#### Changed (5)
+
+- Ratified the four undocumented table namespaces as singular full words matching the existing convention, renaming the system and indicator namespaces throughout the schema model.
+- Ratified the abbreviated simulator namespace as canonical and recorded that the longer form in code was never applied to a database.
+- Recorded the runtime database engine version as confirmed by evidence from the applied development database rather than assumed.
+- Established the sidecar artifact manifest as authoritative and the database catalog as a rebuildable index over it, with a documented rebuild procedure.
+- Set the adoption scope to rewriting the seven never-applied divergent definitions before first apply, leaving the six applied ones documented as divergent.
+
+#### Removed (1)
+
+- Removed the database schema open-decisions block from the system specification; no schema decisions remain unresolved.
+
+### Correct two schema-model claims and close a dissolved decision
+
+Investigation of the migration runner and the runtime-store layer showed that two recorded hazards do not exist, and the requirement-identifier convention is already established rather than absent.
+
+#### Changed (2)
+
+- Corrected the migration-relocation guidance: a step checksum covers its ordered SQL statements only and the ledger keys on domain and migration identifier, so relocating a definition is an import-path refactor rather than a checksum risk; the preserved invariants are now stated precisely.
+- Recorded the requirement and feature identifier allocation convention alongside the additive-migration tier, including the next free identifier per domain, so later phases allocate in sequence instead of inventing.
+
+#### Removed (1)
+
+- Removed the open decision questioning whether the uniform persistence layout was overridden by the shared runtime-store layer; domain create, read, update, and delete operations already live in each domain's private persistence package and reach shared infrastructure only through the Data public API.
+
+### Adopt a hybrid normalisation convention in the schema model
+
+The schema model absorbs forty columns from twelve live tables that carry integrity, traceability, or state the model could not express, while rejecting twenty-six that duplicate existing columns or hold payloads the model normalises.
+
+#### Added (4)
+
+- Added integrity hashes, policy references, and traceability identifiers to the Strategy configuration, version, and checkpoint tables.
+- Added canonical hashes, scope keys, activation timestamps, and plan versioning to the Portfolio definition, allocation, and rebalance tables, and reproducibility fields to optimization checkpoints.
+- Added retention class, sensitivity, injection status, redaction paths, evidence references, and authoring role to agentic memory records, and workflow name, version, node, and payload hashes to workflow checkpoints, correcting a resume ambiguity across workflow versions.
+- Added primary-key presence, rename-collision, and stated-count verification to the schema verification script.
+
+#### Changed (3)
+
+- Established the hybrid normalisation convention: a field becomes a typed column only when filtered, constraint-enforceable, or part of a unique key, and otherwise stays in a validated payload with generated columns for hot keys.
+- Established one migration package per domain as the canonical location for immutable schema definitions, and recorded that relocating existing sites must preserve their migration checksums.
+- Extended workflow-checkpoint uniqueness to include workflow version so two versions of one workflow may each hold the same sequence number.
+
+### Correct the schema model against shipped architecture
+
+Six defects in the target schema model are corrected against live code and the system data-ownership record, reducing the model from 90 to 86 tables.
+
+#### Added (2)
+
+- Added the write-lock lease table to the schema model, transcribed from the live locking implementation, closing a gap against the mandatory write-lock policy.
+- Added request and correlation identifiers to twenty-one tables whose rows record a decision, a side-effecting mutation, an external interaction, or an audit event; reference, configuration, and derived-output tables are deliberately excluded.
+
+#### Changed (4)
+
+- Corrected the migration-ledger definition in the schema model to match the live implementation exactly, replacing an invented key and timestamp scheme.
+- Aligned the Parquet partition-file catalog with the live storage-manifest contract by adopting artifact format, normalization version, source revision, provenance, and request identifier, while rejecting three fields already represented.
+- Recorded the Analytics derived metric store as an owned, recomputable state in the data-ownership record, resolving its conflict with the schema model.
+- Reordered the schema-model adoption priorities to reflect that Brokers is deliberately stateless and Analytics owns derived state.
+
+#### Removed (2)
+
+- Withdrew the simulation timeline-event table from the schema model; the canonical journal remains append-only JSONL, and the model now defers to that documented exclusion.
+- Withdrew the broker provider, connection, account, and connection-event tables from the schema model, retaining only symbol mapping; the withdrawal of the production-connection safety constraint is recorded explicitly.
+
+### Promote the cross-domain database schema model to authoritative
+
+The target database schema model moves from the non-authoritative working area to `docs/schema/` and becomes canonical for cross-domain schema structure, while current-state registries and executable migrations keep their existing owners.
+
+#### Added (3)
+
+- Added `docs/schema/` as the authoritative cross-domain schema model covering 90 target tables across all 14 domains, with storage tiers, prefix ownership, column conventions, and indexing policy.
+- Added a reconciliation record comparing the target model against the 59 live tables, classifying every overlap into an adoption tier.
+- Added `docs/schema/verify_schema.py`, which executes the model against SQLite and asserts foreign-key resolution, index targets, audit columns, `STRICT` mode, prefix uniqueness, and absence of `REAL` monetary columns.
+
+#### Changed (3)
+
+- Routed target schema, prefix ownership, column conventions, indexing policy, and target-versus-live reconciliation to `docs/schema/` in the documentation update rules.
+- Recorded the schema model, target-versus-current divergence handling, and its boundary against feature-registry and migration authority in the architecture reference.
+- Recorded eleven unresolved schema decisions in the system open-decisions section, including two conflicts between the model and the existing data-ownership record.
+
+### Standardize domain persistence layout
+
+Strategy, API, Portfolio, Risk, Trading, Simulator, Agentic, and Data persistence now use the uniform private CRUD package while
+preserving domain ownership, immutable records, public APIs, and Data-owned transaction mechanics.
+
+#### Changed (8)
+
+- Moved Strategy registry, configuration, mutation, and checkpoint CRUD statements into the private `strategy/persistence` create/read/update/delete layout without changing schemas or public behavior.
+- Moved API account, session, credential, approval, idempotency, authentication-failure, and settings CRUD statements into the private `api/persistence` create/read/update/delete layout without changing schemas or public behavior.
+- Moved Portfolio runtime-record reads and atomic construction, plan, and allocation transitions into the private `portfolio/persistence` create/read/update/delete layout without splitting compare-and-swap transactions.
+- Moved Risk approval-token, audit-chain, eligibility, allocation-budget, and kill-switch CRUD calls into the private `risk/persistence` create/read/update/delete layout while preserving revision guards and compound atomic transitions.
+- Moved Trading idempotency, append-only event, projection, reconciliation-evidence, and unresolved-attempt CRUD calls into the private `trading/persistence` create/read/update/delete layout while preserving scope isolation and optimistic concurrency guards.
+- Moved Simulator journal staging and run-idempotency lifecycle CRUD calls into the private `simulator/persistence` create/read/update/delete layout while preserving append ordering, monotonic lifecycle validation, CAS updates, and canonical JSONL publication.
+- Moved Agentic memory, lifecycle, operations, and orchestration runtime-record CRUD calls into the private `agentic/persistence` create/read/update/delete layout while preserving incident and workflow atomic transitions, append ordering, and workflow compare-and-swap updates.
+- Consolidated Data-owned audit, cache, calendar, feed, source-policy, job, research-source, and runtime-store CRUD in `data/persistence` create/read/update/delete modules while retaining transaction, locking, migration, backup, and recovery infrastructure and preserving compound atomic transitions.
+
 ### Upgrade app/ui to React 19 and Next.js
 
 The `app/ui` frontend package has been upgraded from Vite to Next.js (App Router) and React 19, enabling server-side rendering, optimized page routing, metadata management, and Zustand 5 state integration.

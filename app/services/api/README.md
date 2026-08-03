@@ -2,8 +2,8 @@
 
 > **Specification location:** `app/services/api/README.md`
 > **Logical runtime packages:** FastAPI gateway at `app/services/api` plus Next.js frontend at `ui/` (per the `docs/PROJECT.md` registry), with canonical ASGI target `app.services.api.composition.application:app`; Next.js frontend at `ui/`
-> **Status:** `Reduced owner-backed backend v1 completed through Section 4.8; ready to begin Section 4.9 typed frontend transport`
-> **Last updated:** `2026-07-24`
+> **Status:** `Backend v1 complete (Sections 4.1–4.8, 4.13); Section 4.9 typed frontend transport complete; ready to begin Section 4.10`
+> **Last updated:** `2026-08-03`
 
 > This README is the UI/API domain's **single source of truth** for final requirements,
 > structure, implementation sequence, workflows, public symbols, boundary contracts,
@@ -126,8 +126,8 @@ connection, locking, and migration execution only.
 
 | Status | State / Store | Read access (via contract) | Migration definitions |
 |---|---|---|---|
-| Completed | User, session, authentication-failure, settings, approval, and encrypted credential-reference state | UI/API package-root identity/settings/credential functions | `app/services/api/identity/migrations.py` |
-| Completed | HTTP-idempotency reservations and terminal replay records | UI/API package-root replay/conflict functions | `app/services/api/identity/migrations.py` |
+| Completed | User, session, authentication-failure, settings, approval, and encrypted credential-reference state | UI/API package-root identity/settings/credential functions | `app/services/api/identity/migrations.py`; `app/services/api/persistence/` |
+| Completed | HTTP-idempotency reservations and terminal replay records | UI/API package-root replay/conflict functions | `app/services/api/identity/migrations.py`; `app/services/api/persistence/` |
 
 Browser sessions use opaque server-side identifiers in secure HttpOnly SameSite
 cookies outside local development and require CSRF validation for state changes.
@@ -192,7 +192,7 @@ contracts, numbered usage program, and required tests satisfy Sections 4 and 7.
 | Completed | `FEAT-API-06` Ordered Event Delivery | `streams/` | `normalize_stream_event`, `create_stream_manager` through the package root | `FR-API-020`–`FR-API-021` | `tests/api/usage/06_streams.py`; `tests/api/unit/test_streams.py` |
 | Completed | `FEAT-API-07` Thin HTTP Boundaries | `routes/` | Exactly 21 backend-v1 operations; unsupported owner workflows are excluded and absent from OpenAPI | `FR-API-022`–`FR-API-025`, `FR-API-031`, `FR-API-032`, `FR-API-034`; `FR-API-026`–`FR-API-030`, `FR-API-056`, `FR-API-068`–`FR-API-072` excluded | `tests/api/usage/07_routes.py`; `tests/api/unit/test_route_catalog.py:21`; `tests/api/contracts/test_openapi_contract.py:12`; `tests/api/unit/test_application.py:52` |
 | Completed | `FEAT-API-08` Canonical Application Lifecycle | `composition/` | `create_api_app`, `build_api_settings`, `build_in_process_api_graph`, `get_required_in_process_provider_names`, canonical three-source `app.services.api.composition.application:app` | `FR-API-035`–`FR-API-037`, `FR-API-058` | `tests/api/usage/08_composition.py`; `tests/api/unit/test_application.py`; `tests/api/unit/test_in_process_composition.py`; `tests/api/integration/test_in_process_boundary.py` |
-| Missing | `FEAT-API-09` Typed Frontend Transport | `ui/clients/` | Planned exact declarations: Section 4.9 | Section 4.9 functional requirements | Missing |
+| Completed | `FEAT-API-09` Typed Frontend Transport | `ui/clients/` | `request`, `unwrapData`, `ApiClientError`, `apiClients` (9 focused clients for 21 operations) | `FR-API-038`–`FR-API-041` | `tests/api/usage/14_frontend_clients.ts`; `app/ui/src/clients/request.test.ts`; `app/ui/src/clients/clients.test.ts`; `app/ui/src/clients/clients.contract.test.ts` |
 | Missing | `FEAT-API-10` Frontend Session and Page Context | `ui/context/` | Planned exact declarations: Section 4.10 | Section 4.10 functional requirements | Missing |
 | Missing | `FEAT-API-11` Workflow Presentation Components | `ui/components/` | Planned exact declarations: Section 4.11 | Section 4.11 functional requirements | Missing |
 | Missing | `FEAT-API-12` Protected Workflow Pages | `ui/app/` | Planned exact declarations: Section 4.12 | Section 4.12 functional requirements | Missing |
@@ -255,7 +255,7 @@ preserved. Evidence: `app/services/api/middleware/envelope.py`,
 `tests/api/unit/test_application.py::test_canonical_app_wraps_successful_json_responses`.
 
 1. Boundary contracts are immutable, bounded, secret-safe, and registered deterministically. Evidence: `app/services/api/contracts/models.py:148`, `app/services/api/contracts/catalog.py:31`.
-2. API-owned accounts, opaque sessions, encrypted credential references, approvals, idempotency, settings, and immutable migrations are implemented behind Data's public persistence boundary. Evidence: `app/services/api/identity/migrations.py:136`, `app/services/api/identity/credentials.py:49`.
+2. API-owned accounts, opaque sessions, encrypted credential references, approvals, idempotency, and settings delegate all CRUD through the private uniform persistence package, while immutable migrations remain separate behind Data's public migration boundary. Evidence: `app/services/api/persistence/__init__.py`, `app/services/api/identity/migrations.py:136`.
 3. Canonical request identity, templated-route intent, authentication, required idempotency, and redacted telemetry are enforced before delegation. Evidence: `app/services/api/middleware/context.py:151`.
 4. Public liveness and protected dependency readiness remain versioned and secret-safe. Evidence: `app/services/api/health/probes.py:173`.
 5. Injected, non-authoritative metrics and protected exposition remain complete. Evidence: `app/services/api/observability/metrics.py:116`.
@@ -272,6 +272,7 @@ app/services/api/
 │   └── catalog.py                # Route/stream classification and contract registry
 ├── identity/
 │   ├── __init__.py
+│   ├── errors.py                 # Stable bounded identity failure contract
 │   ├── passwords.py              # UI/API-owned password hashing and verification
 │   ├── accounts.py               # Accounts, authentication, and failure limiting
 │   ├── credentials.py            # Encrypted credential records and active-key selection
@@ -281,6 +282,12 @@ app/services/api/
 │   ├── settings.py               # Versioned user settings
 │   ├── migrations.py             # Immutable API-owned schema manifest
 │   └── authorization.py          # AuthContext, permission, and governed-write checks
+├── persistence/                   # Private API-owned CRUD support package
+│   ├── __init__.py                # Private function-only persistence boundary
+│   ├── create.py                  # Account, session, approval, idempotency, settings creates
+│   ├── read.py                    # API-owned identity and governance reads
+│   ├── update.py                  # API-owned state updates and upserts
+│   └── delete.py                  # Failure-window and expired-reservation deletes
 ├── middleware/
 │   ├── __init__.py
 │   ├── context.py                # Request, trace, actor, session, and route intent
@@ -318,44 +325,55 @@ app/services/api/
     ├── broker_config.py          # Resolve references and build BrokerConnectionConfig
     └── application.py            # Canonical app and route registration
 
-ui/
-├── app/
-│   ├── auth-page.tsx
-│   ├── workflow-page.tsx
-│   ├── (auth)/login/page.tsx
-│   ├── (auth)/register/page.tsx
-│   └── (protected)/
-│       ├── layout.tsx
-│       ├── page.tsx
-│       ├── settings/page.tsx
-│       ├── strategies/page.tsx
-│       ├── strategies/[id]/page.tsx
-│       └── edge-lab/page.tsx
-├── clients/
-│   ├── request.ts
-│   ├── index.ts
-│   ├── auth.ts
-│   ├── settings.ts
-│   ├── data.ts
-│   ├── strategies.ts
-│   ├── research.ts
-│   ├── dashboards.ts
-│   └── operator.ts
-├── context/
-│   ├── auth.tsx
-│   ├── page.tsx
-│   ├── governed.ts
-│   └── streams.ts
-└── components/
-    ├── shell.tsx
-    ├── dashboard.tsx
-    ├── strategies.tsx
-    ├── simulation.tsx
-    ├── trading.tsx
-    └── research.tsx
+ui/                                   # Next.js 15 (App Router) + React 19 + TypeScript frontend
+├── app/                              # Single-page widget workspace (not a route-page app, by owner decision)
+│   ├── layout.tsx                    # Root layout: metadata, fonts, theme container
+│   └── page.tsx                      # Single route entry; renders <App/>
+├── App.tsx                           # Workspace root: header + sidebar + workspace grid + order-ticket modal
+├── clients/                          # FEAT-API-09: typed frontend transport (Section 4.9)
+│   ├── contracts.ts                  # Zod schemas mirroring ApiResponse/ApiError/ApiMetadata (contracts/models.py)
+│   ├── routes.ts                     # Frozen typed RouteContract definitions for the 21 backend-v1 operations
+│   ├── request.ts                    # request, unwrapData, ApiClientError (single transport primitive)
+│   ├── auth.ts                       # auth.register/login/logout
+│   ├── health.ts                     # health.liveness/readiness
+│   ├── settings.ts                   # settings.read/update
+│   ├── data.ts                       # data.symbols (cursor-paginated)
+│   ├── strategies.ts                 # strategies.catalogue/versions
+│   ├── research.ts                   # research.run
+│   ├── dashboards.ts                 # dashboards.{broker,equityCurve,summary,systemResources,marketHours,forexCalendar}
+│   ├── operator.ts                   # operator.{auditEvents,events,approvals}
+│   ├── metrics.ts                    # metrics.scrape (Prometheus text; bypasses JSON envelope)
+│   └── index.ts                      # apiClients catalog + public re-exports
+├── components/
+│   ├── layout/
+│   │   ├── Header.tsx                # Top bar + workspace tabs
+│   │   ├── Sidebar.tsx               # Collapsible widget-add navigation
+│   │   └── WorkspaceGrid.tsx         # 12-column explicit grid: drag, resize, expand
+│   └── widgets/                      # CME-style trading-simulator widgets (mock-data fed today)
+│       ├── MarketsWidget.tsx
+│       ├── WatchlistWidget.tsx
+│       ├── ChartWidget.tsx           # Canvas candlestick charting engine
+│       ├── PriceLadderWidget.tsx
+│       ├── OptionsGridWidget.tsx
+│       ├── PositionsWidget.tsx
+│       ├── TradeLogWidget.tsx
+│       ├── TradePlanWidget.tsx
+│       ├── EducationWidget.tsx
+│       ├── ChallengesWidget.tsx
+│       └── OrderTicketModal.tsx
+├── store/
+│   └── useTradingStore.ts            # Zustand store: workspaces, widgets, products, orders, positions
+├── types/                            # Shared TypeScript domain types (market, widget, store, education)
+├── mock/                             # Static mock data (products, options, education, docs)
+└── utils/
+    └── gridLayout.ts                 # Explicit-grid placement helpers
 ```
 
-### Module dependency diagram
+> **Widget architecture (owner decision):** the frontend is a single-page
+> widget workspace, not a Next.js route-page application. Sections 4.10–4.12
+> therefore compose workflow context, presentation, and layout around the
+> widget grid, not around route segments. This decision is reflected in the
+> tree above and in the frontend build artefacts.
 
 ```mermaid
 flowchart LR
@@ -688,6 +706,11 @@ enforce sessions and permissions, and construct the Utils-owned `AuthContext`.
 UI/API owns durable credential state and browser/service authentication transport but
 does not generate, store, or rotate encryption keys.
 
+All API-owned CRUD statement construction and execution resides in the private
+`app/services/api/persistence/` support package. Identity files retain validation,
+cryptography, authorization, expiry, optimistic-concurrency, and orchestration policy;
+`identity/migrations.py` remains the separate immutable schema manifest.
+
 **Module flow:** credentials/session → validated principal → Utils `AuthContext` →
 permission and governed-request decision.
 
@@ -702,6 +725,7 @@ permission and governed-request decision.
 | Completed | `idempotency.py` | Reserve scoped request keys and retain terminal replay evidence for at least 24 hours | `reserve_idempotency_key`, `finalize_idempotency_key` | **Standard library:** `hashlib`, `datetime`<br>**Local:** Data public transactions |
 | Completed | `settings.py` | Persist versioned user settings with optimistic concurrency | `get_user_settings`, `update_user_settings` | **Standard library:** `json`<br>**Local:** Data public transactions |
 | Completed | `migrations.py` | Declare immutable API-owned schema steps and apply them through Data's migration manifest boundary | `get_api_migration_steps`, `run_api_migrations` | **Local:** Data public migration functions |
+| Completed | `../persistence/` | Execute API-owned CRUD through the exact private `create.py`, `read.py`, `update.py`, and `delete.py` layout | Private standalone CRUD functions | **Local:** Data public transaction functions |
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
@@ -989,24 +1013,29 @@ feature folders. Required imports and required storage initialization never fail
 
 | Status | File group | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `request.ts` | One transport primitive, typed errors, safe retry, stale metadata, governed options | `request`, `unwrapData`, `ApiClientError` | **Standard library:** browser `fetch` API<br>**Required third-party:** TypeScript/runtime validator; exact compatible constraints belong in the frontend manifest<br>**Local:** generated/maintained boundary DTOs |
-| Missing | Focused domain client files plus `index.ts` | Map approved route groups to typed operations while exporting one catalog | `apiClients` | **Standard library:** None<br>**Required third-party:** approved runtime validator<br>**Local:** `request.ts`; route DTOs |
+| Completed | `contracts.ts` | Zod schemas + inferred types mirroring `ApiResponse/ApiError/ApiMetadata` and the 21 stable error codes | `apiResponseSchema`, `apiMetadataSchema`, `apiErrorSchema`, `apiErrorCode`, `isApiSuccessResponse` | **Standard library:** None<br>**Required third-party:** `zod@^3.23.8`<br>**Local:** None |
+| Completed | `routes.ts` | Frozen typed `RouteContract` definitions for the 21 registered operations, plus the drift-test count | `ROUTE_CONTRACTS`, `ROUTE_CONTRACT_COUNT`, `ROUTE_CONTRACTS_BY_ID`, per-family route groups | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `contracts.ts` |
+| Completed | `request.ts` | One transport primitive, typed errors, safe retry, stale metadata, governed options | `request`, `unwrapData`, `ApiClientError`, `resolveBaseUrl` | **Standard library:** browser `fetch` API, `crypto`, `URLSearchParams`<br>**Required third-party:** `zod@^3.23.8`<br>**Local:** `contracts.ts`, `routes.ts` |
+| Completed | Focused domain client files (`auth`, `health`, `settings`, `data`, `strategies`, `research`, `dashboards`, `operator`, `metrics`) plus `index.ts` | Map approved route groups to typed operations while exporting one catalog | `apiClients` | **Standard library:** None<br>**Required third-party:** `zod@^3.23.8`<br>**Local:** `request.ts`, `routes.ts` |
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-API-038` | Send typed requests with configured base URL, approved auth transport, request/trace IDs, safe JSON/204 parsing, contract validation, one opt-in transient GET retry, and stale metadata. | `request<T>(contract: RouteContract, options: RequestOptions) => Promise<ApiResponse<T>>` | External API call; telemetry | `ApiClientError`: typed HTTP/contract/transport failure | **Usage:** `tests/api/usage/test_usage_frontend_clients.ts::testUsageRequest()`<br>**Unit:** `ui/clients/request.test.ts::parses204AndErrors()` |
-| Missing | `FR-API-039` | Expose only `data` from a successful envelope without creating another transport stack. | `unwrapData<T>(response: ApiResponse<T>) => T` | None | `ApiClientError`: response is not successful | **Usage:** `tests/api/usage/test_usage_frontend_clients.ts::testUsageUnwrapData()`<br>**Unit:** `ui/clients/request.test.ts::rejectsErrorEnvelope()` |
-| Missing | `FR-API-040` | Carry status, code, request/trace IDs, retryability, and bounded details for frontend failures. | `ApiClientError extends Error` | None | None | **Usage:** `tests/api/usage/test_usage_frontend_clients.ts::testUsageApiClientError()`<br>**Unit:** `ui/clients/request.test.ts::errorIsTraceable()` |
-| Missing | `FR-API-041` | Provide one catalog containing typed clients only for the 21 registered auth, health, settings, symbol, Strategy-read, Research, dashboard, operator-evidence/approval, and metrics operations. | `apiClients: ApiClients` | External API call | `ApiClientError`: route contract fails | **Usage:** `tests/api/usage/test_usage_frontend_clients.ts::testUsageFocusedClients()`<br>**Unit:** `ui/clients/clients.contract.test.ts::clientsMatchRouteCatalog()` |
+| Completed | `FR-API-038` | Send typed requests with configured base URL, approved auth transport, request/trace IDs, safe JSON/204 parsing, contract validation, one opt-in transient GET retry, and stale metadata. | `request<T>(contract: RouteContract, options: RequestOptions) => Promise<ApiResponse<T>>` | External API call; telemetry | `ApiClientError`: typed HTTP/contract/transport failure | **Usage:** `tests/api/usage/14_frontend_clients.ts::testUsageRequest()`<br>**Unit:** `app/ui/src/clients/request.test.ts` |
+| Completed | `FR-API-039` | Expose only `data` from a successful envelope without creating another transport stack. | `unwrapData<T>(response: ApiResponse<T>) => T` | None | `ApiClientError`: response is not successful | **Usage:** `tests/api/usage/14_frontend_clients.ts::testUsageUnwrapData()`<br>**Unit:** `app/ui/src/clients/request.test.ts` |
+| Completed | `FR-API-040` | Carry status, code, request/trace IDs, retryability, and bounded details for frontend failures. | `ApiClientError extends Error` | None | None | **Usage:** `tests/api/usage/14_frontend_clients.ts::testUsageApiClientError()`<br>**Unit:** `app/ui/src/clients/request.test.ts` |
+| Completed | `FR-API-041` | Provide one catalog containing typed clients only for the 21 registered auth, health, settings, symbol, Strategy-read, Research, dashboard, operator-evidence/approval, and metrics operations. | `apiClients: ApiClients` | External API call | `ApiClientError`: route contract fails | **Usage:** `tests/api/usage/14_frontend_clients.ts::testUsageFocusedClients()`<br>**Unit:** `app/ui/src/clients/clients.contract.test.ts`; `app/ui/src/clients/clients.test.ts` |
 
 **Configuration and Limits Manifest**
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `NEXT_PUBLIC_API_URL` | `str` | localhost in development only | Yes in production | `request` | Missing production URL fails build/startup. |
+| Completed | `NEXT_PUBLIC_API_URL` | `str` | empty (same-origin via the `next.config.mjs` rewrite proxy) in development | Yes in production | `resolveBaseUrl` | Missing production URL falls back to same-origin; set it to the canonical gateway origin in production deployments. |
+| Completed | `BACKEND_URL` | `str` | `http://127.0.0.1:8000` | Development only | `next.config.mjs rewrites()` | Origin the dev rewrite proxy forwards `/api/*` to. |
 
 **Implementation notes:** one transport stack only; no parallel generic helpers.
 Authentication attaches only through the opaque-cookie or bearer-service-account transport specified in Section 1.
+The `/api/v1/metrics` route is the one documented deviation from the JSON-envelope rule: it serves Prometheus text exposition, which the transport detects via `contract.returnsText` and wraps in a synthetic success envelope so callers see a uniform type.
+Cookie authentication uses `credentials: "include"` so the opaque `hq_session` (HttpOnly) cookie is sent and `Set-Cookie` honoured; for non-safe methods the JS-readable `hq_csrf` cookie is mirrored as the `X-CSRF-Token` header (double-submit CSRF).
 
 ### 4.10 `ui/context/` — Session, governed, page, and stream context
 
@@ -1168,10 +1197,10 @@ the two authoritative sources; alert delivery never mutates either owner truth.
 
 | Status | Requirement ID | Type | Responsibility | Verification |
 |---|---|---|---|---|
-| Completed | `NFR-API-001` | Architecture | UI/API shall import only documented public domain APIs and contain no domain calculations or direct persistence/broker access. | Package-root import test and canonical three-source owner graph pass. |
+| Completed | `NFR-API-001` | Architecture | UI/API shall import only documented public cross-domain APIs, contain no domain calculations or broker access, and confine API-owned direct CRUD persistence to its private `persistence/` support package. | Package-root import test, persistence-layout test, and canonical three-source owner graph pass. |
 | Missing | `NFR-API-002` | Security | Protected endpoints require validated user/service context; governed writes require permission, audit, idempotency, fresh evidence, and approval when applicable. | Security integration tests |
 | Missing | `NFR-API-003` | Safety | Live/paper mutations cannot bypass Trading/Risk live flags, broker readiness, reconciliation, idempotency, audit, or kill-switch gates. | Live safety tests |
-| Partial | `NFR-API-004` | Contracts | Non-stream responses use `ApiResponse`; streams use `StreamEvent`; API/UI drift fails CI. | Backend OpenAPI digest and operation inventory are frozen; frontend drift remains Section 4.9 work. |
+| Partial | `NFR-API-004` | Contracts | Non-stream responses use `ApiResponse`; streams use `StreamEvent`; API/UI drift fails CI. | Backend OpenAPI digest and operation inventory are frozen; frontend drift test passes (`app/ui/src/clients/clients.contract.test.ts`); remaining drift coverage grows with Sections 4.10–4.12. |
 | Missing | `NFR-API-005` | Security | Logs, errors, traces, telemetry, examples, and screenshots contain no tokens, credentials, passwords, CSRF values, raw secrets, or private broker data. | Redaction tests |
 | Missing | `NFR-API-006` | Reliability | Required-route/dependency failures block startup/readiness; only explicitly optional routes degrade with a visible reason. | Startup failure tests |
 | Missing | `NFR-API-007` | Streaming | Disconnect stops delivery, releases resources, preserves authoritative owner state, and emits no later client events. | Stream lifecycle tests |
