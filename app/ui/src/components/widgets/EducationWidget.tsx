@@ -3,11 +3,12 @@
 import React, { useState } from 'react';
 import { educationCourses } from '../../mock/educationData';
 import { docsData } from '../../mock/docsData';
-import { ArrowUpRight, BookOpen, X, FileText, ChevronRight } from 'lucide-react';
+import type { Doc, EducationCourse } from '../../types/education';
+import { ArrowUpRight, FileText, ChevronRight } from 'lucide-react';
 
-export const EducationWidget = () => {
-  const [selectedCat, setSelectedCat] = useState('Fundamentals');
-  const [selectedDoc, setSelectedDoc] = useState(null);
+export const EducationWidget: React.FC = () => {
+  const [selectedCat, setSelectedCat] = useState<string>('Fundamentals');
+  const [selectedDoc, setSelectedDoc] = useState<Doc | null>(null);
 
   const categories = [
     'Fundamentals',
@@ -27,15 +28,15 @@ export const EducationWidget = () => {
   const filteredDocs = docsData.filter((d) => d.category === selectedCat);
   const filteredCourses = educationCourses.filter((c) => c.category === selectedCat);
 
-  const handleCardClick = (item) => {
+  const handleCardClick = (item: Doc | EducationCourse) => {
     if (isDocCategory) {
-      setSelectedDoc(item);
-    } else if (item.url) {
+      setSelectedDoc(item as Doc);
+    } else if ('url' in item && item.url) {
       window.open(item.url, '_blank', 'noopener,noreferrer');
     }
   };
 
-  const renderFormattedMarkdown = (text) => {
+  const renderFormattedMarkdown = (text: string) => {
     if (!text) return null;
     const lines = text.split('\n');
     return lines.map((line, idx) => {
@@ -86,7 +87,7 @@ export const EducationWidget = () => {
     });
   };
 
-  const formatBoldText = (str) => {
+  const formatBoldText = (str: string) => {
     if (!str) return str;
     const parts = str.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, i) => {
@@ -164,7 +165,7 @@ export const EducationWidget = () => {
                   padding: '18px 20px',
                   display: 'flex',
                   flexDirection: 'column',
-                  justify: 'space-between',
+                  justifyContent: 'space-between',
                   cursor: 'pointer',
                   minHeight: '160px',
                   transition: 'all 0.2s ease',
@@ -213,7 +214,7 @@ export const EducationWidget = () => {
                   padding: '18px 20px',
                   display: 'flex',
                   flexDirection: 'column',
-                  justify: 'space-between',
+                  justifyContent: 'space-between',
                   cursor: 'pointer',
                   minHeight: '160px',
                   transition: 'all 0.2s ease',

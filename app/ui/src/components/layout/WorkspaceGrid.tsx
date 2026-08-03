@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
+import type { Widget } from '../../types/widget';
 import { MarketsWidget } from '../widgets/MarketsWidget';
 import { WatchlistWidget } from '../widgets/WatchlistWidget';
 import { ChartWidget } from '../widgets/ChartWidget';
@@ -24,7 +25,7 @@ import {
   usedRowCount
 } from '../../utils/gridLayout';
 
-export const WorkspaceGrid = () => {
+export const WorkspaceGrid: React.FC = () => {
   const {
     workspaces,
     activeWorkspaceId,
@@ -37,21 +38,22 @@ export const WorkspaceGrid = () => {
     resizeWidget
   } = useTradingStore();
 
-  const [draggedWidgetId, setDraggedWidgetId] = useState(null);
-  const [dropTargetId, setDropTargetId] = useState(null);
-  const [resizingWidgetId, setResizingWidgetId] = useState(null);
+  const [draggedWidgetId, setDraggedWidgetId] = useState<string | number | null>(null);
+  const [dropTargetId, setDropTargetId] = useState<string | number | null>(null);
+  const [resizingWidgetId, setResizingWidgetId] = useState<string | number | null>(null);
   // Cell under the cursor while dragging over blank canvas, for the drop ghost.
-  const [ghostCell, setGhostCell] = useState(null);
+  const [ghostCell, setGhostCell] = useState<{ col: number; row: number } | null>(null);
 
   // Authoritative copy of the dragged id. `dataTransfer.getData()` is blocked
   // during dragover for security, and React state is stale inside native
   // handlers, so the ref is what the drop handlers actually read.
-  const draggedIdRef = useRef(null);
-  const containerRef = useRef(null);
+  const draggedIdRef = useRef<string | null>(null);
+  const containerRef = useRef<HTMLElement | null>(null);
   // Guards the flicker: dragenter/dragleave also fire when the cursor crosses
   // into a *child* of the card, so we only clear on a real boundary exit.
-  const dragDepthRef = useRef(new Map());
+  const dragDepthRef = useRef<Map<string | number, number>>(new Map());
 
+  // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
   const currentWorkspace = workspaces.find((w) => w.id == activeWorkspaceId) || workspaces[0];
   const expandedWidgetId = currentWorkspace.expandedWidgetId;
   const isExpanded = Boolean(expandedWidgetId);
@@ -67,20 +69,20 @@ export const WorkspaceGrid = () => {
   // Esc cancels an in-flight drag without moving anything.
   useEffect(() => {
     if (!draggedWidgetId) return undefined;
-    const onKeyDown = (e) => {
+    const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') endDrag();
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [draggedWidgetId, endDrag]);
 
-  const handleDragStart = (e, widgetId) => {
+  const handleDragStart = (e: React.DragEvent, widgetId: string | number) => {
     e.dataTransfer.setData('text/plain', String(widgetId));
     e.dataTransfer.effectAllowed = 'move';
 
     // Drag the whole card as the ghost, not just the little title tab, so the
     // cursor carries a recognisable picture of the widget being moved.
-    const card = e.currentTarget.closest('.widget-card');
+    const card = (e.currentTarget as HTMLElement).closest('.widget-card');
     if (card && typeof e.dataTransfer.setDragImage === 'function') {
       const rect = card.getBoundingClientRect();
       e.dataTransfer.setDragImage(card, e.clientX - rect.left, e.clientY - rect.top);
@@ -92,7 +94,7 @@ export const WorkspaceGrid = () => {
 
   const handleDragEnd = endDrag;
 
-  const handleDragEnter = (e, targetWidgetId) => {
+  const handleDragEnter = (_e: React.DragEvent, targetWidgetId: string | number) => {
     const depth = (dragDepthRef.current.get(targetWidgetId) || 0) + 1;
     dragDepthRef.current.set(targetWidgetId, depth);
     // Never highlight the card being dragged - dropping on yourself is a no-op.
@@ -101,7 +103,7 @@ export const WorkspaceGrid = () => {
     }
   };
 
-  const handleDragOver = (e, targetWidgetId) => {
+  const handleDragOver = (e: React.DragEvent, targetWidgetId: string | number) => {
     e.preventDefault();
     // Cards stopPropagation, and they cover the whole viewport when the grid
     // overflows - so edge auto-scroll has to be driven from here too, or it can
@@ -114,7 +116,7 @@ export const WorkspaceGrid = () => {
     }
   };
 
-  const handleDragLeave = (e, targetWidgetId) => {
+  const handleDragLeave = (_e: React.DragEvent, targetWidgetId: string | number) => {
     const depth = (dragDepthRef.current.get(targetWidgetId) || 1) - 1;
     dragDepthRef.current.set(targetWidgetId, depth);
     if (depth <= 0) {
@@ -123,11 +125,11 @@ export const WorkspaceGrid = () => {
     }
   };
 
-  const handleDrop = (e, targetWidgetId) => {
+  const handleDrop = (e: React.DragEvent, targetWidgetId: string | number) => {
     e.preventDefault();
     const sourceId = e.dataTransfer.getData('text/plain') || draggedIdRef.current;
     if (sourceId && targetWidgetId && String(sourceId) !== String(targetWidgetId)) {
-      reorderWidgets(sourceId, targetWidgetId);
+      reorderWidgets(String(sourceId), String(targetWidgetId));
     }
     endDrag();
   };
@@ -138,14 +140,14 @@ export const WorkspaceGrid = () => {
    * the wrong gesture. Pixel deltas are converted to grid spans live, so the
    * widget snaps cell by cell as you pull the corner.
    */
-  const startResize = (e, widget) => {
+  const startResize = (e: React.PointerEvent<HTMLDivElement>, widget: Widget) => {
     // Left button only, and never let this bubble into a drag or a header click.
     if (e.button !== 0) return;
     e.preventDefault();
     e.stopPropagation();
 
     const container = containerRef.current;
-    const card = e.currentTarget.closest('.widget-card');
+    const card = (e.currentTarget as HTMLElement).closest('.widget-card');
     if (!container || !card) return;
 
     const rowUnit = GRID_ROW_HEIGHT + GRID_GAP;
@@ -160,8 +162,8 @@ export const WorkspaceGrid = () => {
     e.currentTarget.setPointerCapture?.(e.pointerId);
     setResizingWidgetId(widget.id);
 
-    let frame = null;
-    const onMove = (ev) => {
+    let frame: number | null = null;
+    const onMove = (ev: PointerEvent) => {
       if (frame) return; // coalesce to one update per animation frame
       frame = requestAnimationFrame(() => {
         frame = null;
@@ -186,7 +188,7 @@ export const WorkspaceGrid = () => {
 
   // Auto-scroll the workspace when the cursor nears its top/bottom edge, so a
   // widget can be dragged to a slot that is currently off-screen.
-  const autoScroll = (e) => {
+  const autoScroll = (e: React.DragEvent | DragEvent) => {
     const el = containerRef.current;
     if (!el || el.scrollHeight <= el.clientHeight) return;
     const rect = el.getBoundingClientRect();
@@ -196,7 +198,7 @@ export const WorkspaceGrid = () => {
     else if (rect.bottom - e.clientY < ZONE) el.scrollTop += SPEED;
   };
 
-  const renderWidgetContent = (widget) => {
+  const renderWidgetContent = (widget: Widget): React.JSX.Element => {
     switch (widget.type) {
       case 'markets':
         return <MarketsWidget />;
@@ -225,6 +227,7 @@ export const WorkspaceGrid = () => {
 
   // Render Fullscreen Expanded Widget with Sub-Tabs Bar
   if (isExpanded) {
+    // eslint-disable-next-line eqeqeq -- widget id may match string or number
     const activeWidget = currentWorkspace.widgets.find((w) => w.id == expandedWidgetId) || currentWorkspace.widgets[0];
 
     return (
@@ -236,6 +239,7 @@ export const WorkspaceGrid = () => {
           </div>
 
           {currentWorkspace.widgets.map((w) => {
+            // eslint-disable-next-line eqeqeq -- widget id comparison
             const isActive = w.id == expandedWidgetId;
             return (
               <div
@@ -270,10 +274,10 @@ export const WorkspaceGrid = () => {
 
             <div className="widget-controls">
               {/* Contract Icon to return to shared screen view */}
-              <span className="widget-btn" onClick={(e) => { e.stopPropagation(); contractWidget(); }} title="Contract Window (Share Workspace Screen)">
+              <span className="widget-btn" onClick={(e: React.MouseEvent) => { e.stopPropagation(); contractWidget(); }} title="Contract Window (Share Workspace Screen)">
                 <Minimize2 size={14} color="var(--cme-blue-cyan)" />
               </span>
-              <span className="widget-btn" onClick={(e) => { e.stopPropagation(); contractWidget(); removeWidget(activeWidget.id); }} title="Close Widget">
+              <span className="widget-btn" onClick={(e: React.MouseEvent) => { e.stopPropagation(); contractWidget(); removeWidget(activeWidget.id); }} title="Close Widget">
                 <X size={14} />
               </span>
             </div>
@@ -308,7 +312,7 @@ export const WorkspaceGrid = () => {
       ? isAreaFree(
           currentWorkspace.widgets,
           { col: ghostColumn, row: ghostCell.row, colSpan: draggedRect.colSpan, rowSpan: draggedRect.rowSpan },
-          draggedWidgetId
+          String(draggedWidgetId)
         )
       : false;
 
@@ -323,7 +327,7 @@ export const WorkspaceGrid = () => {
       style={{ gridTemplateRows: `repeat(${gridMinRows}, ${GRID_ROW_HEIGHT}px)` }}
       // Only reached when the cursor is over blank canvas: the cards
       // stopPropagation on their own drag events.
-      onDragOver={(e) => {
+      onDragOver={(e: React.DragEvent<HTMLElement>) => {
         if (!draggedIdRef.current) return;
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
@@ -332,11 +336,11 @@ export const WorkspaceGrid = () => {
         // Track the cell under the cursor so the ghost previews the landing spot.
         setGhostCell(cellFromPoint(e.currentTarget, e.clientX, e.clientY));
       }}
-      onDragLeave={(e) => {
-        if (e.currentTarget.contains(e.relatedTarget)) return;
+      onDragLeave={(e: React.DragEvent<HTMLElement>) => {
+        if (e.currentTarget.contains(e.relatedTarget as Node)) return;
         setGhostCell(null);
       }}
-      onDrop={(e) => {
+      onDrop={(e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
         const sourceId = e.dataTransfer.getData('text/plain') || draggedIdRef.current;
         if (sourceId) {
@@ -361,19 +365,19 @@ export const WorkspaceGrid = () => {
               gridColumn: `${rect.col} / span ${rect.colSpan}`,
               gridRow: `${rect.row} / span ${rect.rowSpan}`
             }}
-            onDragEnter={(e) => {
+            onDragEnter={(e: React.DragEvent) => {
               e.stopPropagation();
               handleDragEnter(e, w.id);
             }}
-            onDragOver={(e) => {
+            onDragOver={(e: React.DragEvent) => {
               e.stopPropagation();
               handleDragOver(e, w.id);
             }}
-            onDragLeave={(e) => {
+            onDragLeave={(e: React.DragEvent) => {
               e.stopPropagation();
               handleDragLeave(e, w.id);
             }}
-            onDrop={(e) => {
+            onDrop={(e: React.DragEvent) => {
               e.stopPropagation();
               handleDrop(e, w.id);
             }}
@@ -394,7 +398,7 @@ export const WorkspaceGrid = () => {
               <div
                 className="widget-product-code-tab"
                 draggable
-                onDragStart={(e) => handleDragStart(e, w.id)}
+                onDragStart={(e: React.DragEvent) => handleDragStart(e, w.id)}
                 onDragEnd={handleDragEnd}
                 role="button"
                 aria-grabbed={isBeingDragged}
@@ -407,10 +411,10 @@ export const WorkspaceGrid = () => {
 
               <div className="widget-controls">
                 {/* Expand Icon to fill workspace & create sub-tabs */}
-                <span className="widget-btn" onClick={(e) => { e.stopPropagation(); expandWidget(w.id); }} title="Expand Window (Fill Workspace)">
+                <span className="widget-btn" onClick={(e: React.MouseEvent) => { e.stopPropagation(); expandWidget(w.id); }} title="Expand Window (Fill Workspace)">
                   <Maximize2 size={14} />
                 </span>
-                <span className="widget-btn" onClick={(e) => { e.stopPropagation(); removeWidget(w.id); }} title="Close Widget">
+                <span className="widget-btn" onClick={(e: React.MouseEvent) => { e.stopPropagation(); removeWidget(w.id); }} title="Close Widget">
                   <X size={14} />
                 </span>
               </div>
@@ -424,7 +428,7 @@ export const WorkspaceGrid = () => {
             {/* Bottom-right corner grip: drag to resize across grid cells */}
             <div
               className="widget-resize-handle"
-              onPointerDown={(e) => startResize(e, w)}
+              onPointerDown={(e: React.PointerEvent<HTMLDivElement>) => startResize(e, w)}
               role="separator"
               aria-label={`Resize ${w.title}. Currently ${w.colSpan || 6} of ${GRID_COLUMNS} columns wide.`}
               title="Drag to resize this widget"
@@ -439,18 +443,6 @@ export const WorkspaceGrid = () => {
         );
       })}
 
-      {/*
-        Free-space drop targets, drawn only while a drag is in flight. They are
-        appended after every widget, so grid auto-placement puts them in the
-        leftover space - existing cards never shift when a drag starts.
-        The whole blank canvas is also a drop zone (see the <main> handlers);
-        these just make the target visible.
-      */}
-      {/*
-        Live preview of where the widget will land. Rendered as a real grid item
-        at the hovered coordinates, so what you see is exactly what you get.
-        Turns red when the area is occupied - that drop is rejected.
-      */}
       {ghostCell && draggedRect && (
         <div
           className={`drop-ghost ${ghostFits ? '' : 'drop-ghost-blocked'}`}

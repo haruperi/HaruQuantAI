@@ -1,3 +1,5 @@
+import type { EducationCourse } from "../types/education";
+
 export const educationCourses = [
   // ==================== FUNDAMENTALS ====================
   {
@@ -592,4 +594,4 @@ export const educationCourses = [
     url: 'https://www.cmegroup.com/education/courses/introduction-to-base-metals',
     description: 'Gain greater understanding of the base metals futures and options markets. Learn about non-ferrous industrial metals including copper, aluminum, lead, nickel, tin and zinc. See who uses...'
   }
-];
+] satisfies EducationCourse[];

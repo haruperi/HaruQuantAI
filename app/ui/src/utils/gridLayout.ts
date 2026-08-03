@@ -7,6 +7,8 @@
  * back against the preceding widgets, so empty space can never be occupied.
  */
 
+import type { GridRect, Widget } from "../types/widget";
+
 export const GRID_COLUMNS = 12;
 export const GRID_GAP = 8;
 export const GRID_ROW_HEIGHT = 250;
@@ -16,10 +18,11 @@ export const MAX_COL_SPAN = GRID_COLUMNS;
 export const MIN_ROW_SPAN = 1;
 export const MAX_ROW_SPAN = 6;
 
-const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const clamp = (value: number, min: number, max: number): number =>
+  Math.min(Math.max(value, min), max);
 
 /** Normalises a widget to a rectangle, tolerating legacy records with no col/row. */
-export const rectOf = (widget) => {
+export const rectOf = (widget: Widget): GridRect => {
   const colSpan = clamp(widget.colSpan || 6, MIN_COL_SPAN, MAX_COL_SPAN);
   const rowSpan = clamp(widget.rowSpan || 2, MIN_ROW_SPAN, MAX_ROW_SPAN);
   return {
@@ -30,14 +33,18 @@ export const rectOf = (widget) => {
   };
 };
 
-const overlaps = (a, b) =>
+const overlaps = (a: GridRect, b: GridRect): boolean =>
   a.col < b.col + b.colSpan &&
   b.col < a.col + a.colSpan &&
   a.row < b.row + b.rowSpan &&
   b.row < a.row + a.rowSpan;
 
 /** True when `rect` can sit at its coordinates without touching any other widget. */
-export const isAreaFree = (widgets, rect, ignoreId) =>
+export const isAreaFree = (
+  widgets: Widget[],
+  rect: GridRect,
+  ignoreId?: string
+): boolean =>
   rect.col >= 1 &&
   rect.col + rect.colSpan - 1 <= GRID_COLUMNS &&
   rect.row >= 1 &&
@@ -47,10 +54,10 @@ export const isAreaFree = (widgets, rect, ignoreId) =>
  * Assigns coordinates to any widget that lacks them by replaying auto-packing
  * once. Lets existing saved workspaces upgrade to explicit placement in place.
  */
-export const ensureCoordinates = (widgets) => {
+export const ensureCoordinates = (widgets: Widget[]): Widget[] => {
   if (widgets.every((w) => w.col && w.row)) return widgets;
 
-  const placed = [];
+  const placed: Widget[] = [];
   for (const widget of widgets) {
     if (widget.col && widget.row) {
       placed.push(widget);
@@ -63,7 +70,11 @@ export const ensureCoordinates = (widgets) => {
 };
 
 /** Scans top-left to bottom-right for the first gap that fits the given size. */
-export const findFreeCell = (widgets, colSpan, rowSpan) => {
+export const findFreeCell = (
+  widgets: Widget[],
+  colSpan: number,
+  rowSpan: number
+): { col: number; row: number } => {
   for (let row = 1; row < 200; row++) {
     for (let col = 1; col <= GRID_COLUMNS - colSpan + 1; col++) {
       if (isAreaFree(widgets, { col, row, colSpan, rowSpan })) return { col, row };
@@ -73,7 +84,11 @@ export const findFreeCell = (widgets, colSpan, rowSpan) => {
 };
 
 /** Converts a pointer position inside the grid to 1-based grid coordinates. */
-export const cellFromPoint = (container, clientX, clientY) => {
+export const cellFromPoint = (
+  container: HTMLElement,
+  clientX: number,
+  clientY: number
+): { col: number; row: number } => {
   const rect = container.getBoundingClientRect();
   const styles = window.getComputedStyle(container);
   const padLeft = parseFloat(styles.paddingLeft) || 0;
@@ -93,7 +108,7 @@ export const cellFromPoint = (container, clientX, clientY) => {
 };
 
 /** Total rows occupied, so the grid can reserve a spare row of drop space. */
-export const usedRowCount = (widgets) =>
+export const usedRowCount = (widgets: Widget[]): number =>
   widgets.reduce((max, w) => {
     const r = rectOf(w);
     return Math.max(max, r.row + r.rowSpan - 1);

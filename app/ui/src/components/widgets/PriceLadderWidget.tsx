@@ -2,9 +2,14 @@
 
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
+import type { OrderSide } from '../../types/market';
 import { Target, X, Plus, Minus } from 'lucide-react';
 
-export const PriceLadderWidget = ({ symbol = 'ESU5' }) => {
+interface Props {
+  symbol?: string;
+}
+
+export const PriceLadderWidget: React.FC<Props> = ({ symbol = 'ESU5' }) => {
   const {
     products,
     oneClickTrading,
@@ -39,7 +44,7 @@ export const PriceLadderWidget = ({ symbol = 'ESU5' }) => {
     ticks.push({ price: px, isLast, isBidSide, bidVol, askVol });
   }
 
-  const handleCellClick = (side, price) => {
+  const handleCellClick = (side: OrderSide, price: number) => {
     if (oneClickTrading) {
       submitOrder({
         symbol: targetProduct.symbol,
@@ -59,7 +64,7 @@ export const PriceLadderWidget = ({ symbol = 'ESU5' }) => {
     }
   };
 
-  const handleMarketOrder = (side) => {
+  const handleMarketOrder = (side: OrderSide) => {
     if (oneClickTrading) {
       submitOrder({
         symbol: targetProduct.symbol,

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
+import type { OrderSide } from '../../types/market';
 import {
-  Plus,
   PlusCircle,
   Slash,
   Minus,
@@ -41,7 +41,6 @@ import {
   MousePointer,
   Eraser,
   ZoomIn,
-  ZoomOut,
   Link,
   Paintbrush,
   Layers,
@@ -51,7 +50,7 @@ import {
   MoreHorizontal
 } from 'lucide-react';
 
-const renderChartIcon = (type) => {
+const renderChartIcon = (type: string) => {
   if (['Bars', 'HLC bars'].includes(type)) return <BarChart2 size={14} />;
   if (['Line', 'Line with markers', 'Step line', 'Kagi'].includes(type)) return <LineChartIcon size={14} />;
   if (['Area', 'HLC area', 'Baseline'].includes(type)) return <Activity size={14} />;
@@ -71,7 +70,7 @@ const TEXT_TOOLS = new Set([
   'signpost', 'flagmark'
 ]);
 
-const drawArrowHead = (ctx, fromX, fromY, toX, toY, color, size = 9) => {
+const drawArrowHead = (ctx: CanvasRenderingContext2D, fromX: number, fromY: number, toX: number, toY: number, color: string, size = 9) => {
   const angle = Math.atan2(toY - fromY, toX - fromX);
   ctx.fillStyle = color;
   ctx.beginPath();
@@ -82,7 +81,7 @@ const drawArrowHead = (ctx, fromX, fromY, toX, toY, color, size = 9) => {
   ctx.fill();
 };
 
-const drawPolyline = (ctx, points = []) => {
+const drawPolyline = (ctx: CanvasRenderingContext2D, points: { x: number; y: number }[] = []) => {
   if (points.length < 2) return;
   ctx.beginPath();
   ctx.moveTo(points[0].x, points[0].y);
@@ -90,7 +89,7 @@ const drawPolyline = (ctx, points = []) => {
   ctx.stroke();
 };
 
-const renderDrawingShape = (ctx, shape, chartWidth, chartHeight, priceMin, priceRange, priceMax) => {
+const renderDrawingShape = (ctx: CanvasRenderingContext2D, shape: any, chartWidth: number, chartHeight: number, _priceMin: number, priceRange: number, priceMax: number) => {
   if (!shape) return;
   const { tool, startX, startY, endX, endY, text, emoji, points = [] } = shape;
   const color = shape.color || '#3cc8ff';
@@ -416,12 +415,12 @@ const renderDrawingShape = (ctx, shape, chartWidth, chartHeight, priceMin, price
       threedrives: [[0, .75], [.16, .2], [.32, .72], [.5, .08], [.66, .65], [.84, 0], [1, .55]],
       default: [[0, .72], [.2, .12], [.4, .62], [.62, .25], [.8, .8], [1, .18]]
     };
-    const normalized = definitions[tool] || definitions.default;
-    const patternPoints = normalized.map(([x, y]) => ({ x: startX + width * x, y: startY + height * y }));
+    const normalized = (definitions as Record<string, number[][]>)[tool] || definitions.default;
+    const patternPoints = normalized.map(([x, y]: number[]) => ({ x: startX + width * x, y: startY + height * y }));
     drawPolyline(ctx, patternPoints);
     ctx.fillStyle = color;
     ctx.font = '600 10px "Roboto Mono", monospace';
-    patternPoints.forEach((point, index) => {
+    patternPoints.forEach((point: { x: number; y: number }, index: number) => {
       ctx.beginPath();
       ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
       ctx.fill();
@@ -499,7 +498,7 @@ const renderDrawingShape = (ctx, shape, chartWidth, chartHeight, priceMin, price
       callout: 'Callout', comment: 'Comment', pricelabel: 'Price Label',
       signpost: 'Signpost', flagmark: 'Flag'
     };
-    const label = text || labels[tool] || 'Text';
+    const label = text || (labels as Record<string, string>)[tool] || 'Text';
     const labelWidth = Math.max(72, ctx.measureText(label).width + 18);
     ctx.fillStyle = '#112b4a';
     ctx.fillRect(startX - 5, startY - 14, labelWidth, 24);
@@ -554,14 +553,19 @@ const renderDrawingShape = (ctx, shape, chartWidth, chartHeight, priceMin, price
   ctx.restore();
 };
 
-export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
+interface Props {
+  symbol?: string;
+  widgetId?: string;
+}
+
+export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
   const { products, openOrderTicket, submitOrder, oneClickTrading, toggleExpandWidget, theme } = useTradingStore();
   const targetProduct = products.find((p) => p.symbol === symbol) || products[0];
 
   // State Management for TradingView Toolbar Controls & Dropdowns
   const [timeframe, setTimeframe] = useState('5m');
   const [chartType, setChartType] = useState('Candles');
-  const [activeDropdown, setActiveDropdown] = useState(null); // 'timeframe' | 'chartStyle' | 'indicators' | 'layoutGrid' | null
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null); // 'timeframe' | 'chartStyle' | 'indicators' | 'layoutGrid' | null
   const [activeTool, setActiveTool] = useState('crosshair');
   const [isAveragePriceOn, setIsAveragePriceOn] = useState(true);
   const [selectedIndicators, setSelectedIndicators] = useState(['EMA', 'Volume']);
@@ -578,7 +582,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
   const [syncDateRange, setSyncDateRange] = useState(false);
 
   // Drawing Tools & Submenus State matching Screenshots
-  const [activeSubmenu, setActiveSubmenu] = useState(null); // 'cursor' | 'lines' | 'fib' | 'patterns' | 'prediction' | 'brush' | 'text' | 'emojis' | 'trash' | null
+  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null); // 'cursor' | 'lines' | 'fib' | 'patterns' | 'prediction' | 'brush' | 'text' | 'emojis' | 'trash' | null
   const [submenuPosition, setSubmenuPosition] = useState({ top: 0, left: 0 });
   const [cursorMode, setCursorMode] = useState('cross'); // 'cross' | 'dot' | 'arrow' | 'demonstration' | 'eraser'
   const [isStayInDrawingMode, setIsStayInDrawingMode] = useState(false);
@@ -593,18 +597,18 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
   const [isIndicatorsHidden, setIsIndicatorsHidden] = useState(false);
   const [arePositionsHidden, setArePositionsHidden] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const [drawings, setDrawings] = useState([]);
+  const [drawings, setDrawings] = useState<any[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [currentLine, setCurrentLine] = useState(null);
+  const [currentLine, setCurrentLine] = useState<any | null>(null);
 
   // Quantity Stepper for Buy/Sell Overlay
   const [orderQty, setOrderQty] = useState('1');
 
   // Mouse Crosshair Position State
-  const [crosshairPos, setCrosshairPos] = useState({ x: -1, y: -1, price: null, time: null });
+  const [crosshairPos, setCrosshairPos] = useState<{ x: number; y: number; price: number | null; time: string | null }>({ x: -1, y: -1, price: null, time: null });
 
   // Floating Tool Property Editor Toolbar State (matching User's Screenshot)
-  const [selectedDrawingId, setSelectedDrawingId] = useState(null);
+  const [selectedDrawingId, setSelectedDrawingId] = useState<string | number | null>(null);
   const [toolEditorPos, setToolEditorPos] = useState({ x: 300, y: 50 });
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showWidthPicker, setShowWidthPicker] = useState(false);
@@ -615,7 +619,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
 
   const selectedDrawing = drawings.find((d) => String(d.id) === String(selectedDrawingId)) || (drawings.length > 0 ? drawings[drawings.length - 1] : null);
 
-  const updateSelectedDrawing = (updates) => {
+  const updateSelectedDrawing = (updates: any) => {
     if (!selectedDrawing) return;
     const targetId = selectedDrawing.id;
     setDrawings(drawings.map((d) => (d.id === targetId ? { ...d, ...updates } : d)));
@@ -657,7 +661,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
     setShowMoreMenu(false);
   };
 
-  const handleEditorGripMouseDown = (e) => {
+  const handleEditorGripMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDraggingEditor(true);
     setDragOffset({
@@ -667,7 +671,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
   };
 
   useEffect(() => {
-    const handleGlobalMouseMove = (e) => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
       if (isDraggingEditor) {
         setToolEditorPos({
           x: e.clientX - dragOffset.x,
@@ -686,13 +690,13 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
     };
   }, [isDraggingEditor, dragOffset]);
 
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const toggleDropdown = (name) => {
+  const toggleDropdown = (name: string) => {
     setActiveDropdown(activeDropdown === name ? null : name);
   };
 
-  const toggleDrawingSubmenu = (name, event) => {
+  const toggleDrawingSubmenu = (name: string, event: React.MouseEvent<HTMLElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     setSubmenuPosition({
       top: Math.max(4, Math.min(rect.top, window.innerHeight - 430)),
@@ -701,7 +705,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
     setActiveSubmenu(activeSubmenu === name ? null : name);
   };
 
-  const toggleStar = (item, e) => {
+  const toggleStar = (item: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (starredItems.includes(item)) {
       setStarredItems(starredItems.filter((i) => i !== item));
@@ -752,7 +756,9 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     const container = canvas.parentElement;
+    if (!container) return;
     const width = canvas.width = container.clientWidth || 700;
     const height = canvas.height = container.clientHeight || 400;
 
@@ -956,7 +962,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
         ctx.fillRect(x - barW / 2, yHigh, barW, Math.max(2, yLow - yHigh));
       });
     } else if (chartType === 'Heikin Ashi') {
-      const haData = [];
+      const haData: { haOpen: number; haHigh: number; haLow: number; haClose: number }[] = [];
       candles.forEach((c, idx) => {
         const haClose = (c.open + c.high + c.low + c.close) / 4;
         const haOpen = idx === 0 ? (c.open + c.close) / 2 : (haData[idx - 1].haOpen + haData[idx - 1].haClose) / 2;
@@ -988,7 +994,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
       });
     } else if (chartType === 'Renko') {
       const brickSize = Math.max(0.5, (priceMax - priceMin) / 20);
-      const bricks = [];
+      const bricks: { open: number; close: number; isUp: boolean }[] = [];
       let currentPrice = candles[0].close;
 
       candles.forEach((c) => {
@@ -1019,7 +1025,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
         ctx.strokeRect(x - brickW * 0.4, top, brickW * 0.8, height);
       });
     } else if (chartType === 'Line break') {
-      const linesData = [];
+      const linesData: { open: number; close: number; isUp: boolean }[] = [];
       candles.forEach((c, idx) => {
         if (idx === 0) {
           linesData.push({ open: c.open, close: c.close, isUp: c.close >= c.open });
@@ -1106,8 +1112,8 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
       }
     } else if (chartType === 'Point & figure') {
       const boxSize = Math.max(0.4, (priceMax - priceMin) / 15);
-      const cols = [];
-      let curCol = { isX: true, boxes: [] };
+      const cols: { isX: boolean; boxes: number[] }[] = [];
+      let curCol: { isX: boolean; boxes: number[] } = { isX: true, boxes: [] };
       let lastPrice = candles[0].close;
 
       candles.forEach((c) => {
@@ -1363,7 +1369,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
     }
   }, [candles, chartType, selectedIndicators, targetProduct.lastPrice, drawings, currentLine, crosshairPos, isDrawingsHidden, isIndicatorsHidden, theme, cursorMode, panOffset, zoomLevel]);
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -1391,7 +1397,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
       }
     }
 
-    setCrosshairPos({ x, y });
+    setCrosshairPos((prev) => ({ ...prev, x, y }));
     if (isDrawing && currentLine) {
       setCurrentLine({
         ...currentLine,
@@ -1404,7 +1410,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
     }
   };
 
-  const handleMouseDown = (e) => {
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -1419,8 +1425,8 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
         const shapePoints = shape.points?.length ? shape.points : [
           { x: shape.startX, y: shape.startY }, { x: shape.endX, y: shape.endY }
         ];
-        const xs = shapePoints.map((point) => point.x);
-        const ys = shapePoints.map((point) => point.y);
+        const xs = shapePoints.map((point: any) => point.x);
+        const ys = shapePoints.map((point: any) => point.y);
         return chartX >= Math.min(...xs) - margin && chartX <= Math.max(...xs) + margin
           && y >= Math.min(...ys) - margin && y <= Math.max(...ys) + margin;
       });
@@ -1539,7 +1545,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
     return () => window.removeEventListener('mouseup', stopPanning);
   }, []);
 
-  const handleQuickTrade = (side) => {
+  const handleQuickTrade = (side: OrderSide) => {
     if (oneClickTrading) {
       submitOrder({ symbol: targetProduct.symbol, side, qty: Number(orderQty) || 1, orderType: 'Market' });
     } else {
@@ -1820,7 +1826,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
             <Settings size={15} color="#ffffff" />
           </button>
 
-          <button className="tv-btn-clean" onClick={() => toggleExpandWidget(widgetId)} title="Fullscreen / Expand Window">
+          <button className="tv-btn-clean" onClick={() => toggleExpandWidget(widgetId ?? null)} title="Fullscreen / Expand Window">
             <Maximize2 size={15} color="#ffffff" />
           </button>
         </div>
@@ -1829,7 +1835,7 @@ export const ChartWidget = ({ symbol = 'ESU6', widgetId }) => {
       {/* 2. MAIN CANVAS AREA & LEFT SIDEBAR */}
       <div style={{ flex: 1, display: 'flex', position: 'relative', overflow: 'hidden' }}>
         {/* Left Drawing Sidebar Column matching Screenshots 1, 2, 3, 4 */}
-        <div className="tv-sidebar" style={{ '--submenu-top': `${submenuPosition.top}px`, '--submenu-left': `${submenuPosition.left}px` }} onClick={(e) => e.stopPropagation()}>
+        <div className="tv-sidebar" style={{ '--submenu-top': `${submenuPosition.top}px`, '--submenu-left': `${submenuPosition.left}px` } as React.CSSProperties} onClick={(e) => e.stopPropagation()}>
           {/* Top Badge: (+) Plus Circle */}
           <div className="tv-sidebar-btn" onClick={() => toggleDropdown('indicators')} title="Add Symbol / Indicator">
             <PlusCircle size={17} color="#ffffff" />

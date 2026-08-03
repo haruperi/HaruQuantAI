@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
+import type { Workspace } from '../../types/widget';
 import {
   ChevronLeft,
   Plus,
@@ -15,7 +16,7 @@ import {
   FileJson
 } from 'lucide-react';
 
-export const Header = () => {
+export const Header: React.FC = () => {
   const {
     practiceBalance,
     challengeBalance,
@@ -37,8 +38,8 @@ export const Header = () => {
   } = useTradingStore();
 
   const [currentTime, setCurrentTime] = useState('');
-  const [workspaceMenuId, setWorkspaceMenuId] = useState(null);
-  const [renameWorkspaceId, setRenameWorkspaceId] = useState(null);
+  const [workspaceMenuId, setWorkspaceMenuId] = useState<number | null>(null);
+  const [renameWorkspaceId, setRenameWorkspaceId] = useState<number | null>(null);
   const [renameDraft, setRenameDraft] = useState('');
   const [workspaceToast, setWorkspaceToast] = useState('');
 
@@ -56,24 +57,24 @@ export const Header = () => {
   const isChallenge = mode === 'challenge';
   const displayFunds = isChallenge ? challengeBalance : practiceBalance;
 
-  const showWorkspaceToast = (message) => {
+  const showWorkspaceToast = (message: string) => {
     setWorkspaceToast(message);
     window.setTimeout(() => setWorkspaceToast(''), 1800);
   };
 
-  const openRename = (workspace) => {
+  const openRename = (workspace: Workspace) => {
     setRenameWorkspaceId(workspace.id);
     setRenameDraft(workspace.name);
     setWorkspaceMenuId(null);
   };
 
-  const commitRename = (workspaceId) => {
+  const commitRename = (workspaceId: number) => {
     renameWorkspace(workspaceId, renameDraft);
     setRenameWorkspaceId(null);
     showWorkspaceToast('Workspace renamed');
   };
 
-  const copyWorkspaceJson = async (workspace) => {
+  const copyWorkspaceJson = async (workspace: Workspace) => {
     const payload = JSON.stringify(workspace, null, 2);
     try {
       await navigator.clipboard.writeText(payload);
@@ -93,7 +94,7 @@ export const Header = () => {
     showWorkspaceToast('New Workspace created');
   };
 
-  const handleDuplicateWorkspace = (wsId) => {
+  const handleDuplicateWorkspace = (wsId: number) => {
     if (workspaces.length >= 10) {
       showWorkspaceToast('Maximum 10 workspaces allowed');
       setWorkspaceMenuId(null);
@@ -191,24 +192,28 @@ export const Header = () => {
           {workspaces.map((ws) => (
             <div
               key={ws.id}
+              // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
               className={`workspace-sub-tab ${ws.id == activeWorkspaceId ? 'active' : ''} ${workspaceMenuId === ws.id ? 'menu-open' : ''}`}
               onClick={() => setActiveWorkspace(ws.id)}
             >
+              {/* eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string */}
               <Star size={12} fill={ws.id == activeWorkspaceId ? "#0088cc" : "transparent"} color={ws.id == activeWorkspaceId ? "#0088cc" : "#6b7c93"} />
               <span>{ws.name}</span>
-              <MoreVertical
-                size={13}
-                className="tab-menu-icon"
-                title={`Workspace menu: ${ws.name}`}
-                onClick={(event) => { event.stopPropagation(); setWorkspaceMenuId(workspaceMenuId === ws.id ? null : ws.id); setRenameWorkspaceId(null); }}
-              />
+              <span title={`Workspace menu: ${ws.name}`} style={{ display: 'inline-flex' }}>
+                <MoreVertical
+                  size={13}
+                  className="tab-menu-icon"
+                  onClick={(event: React.MouseEvent) => { event.stopPropagation(); setWorkspaceMenuId(workspaceMenuId === ws.id ? null : ws.id); setRenameWorkspaceId(null); }}
+                />
+              </span>
 
               {workspaceMenuId === ws.id && (
-                <div className="workspace-action-menu" onClick={(event) => event.stopPropagation()}>
+                <div className="workspace-action-menu" onClick={(event: React.MouseEvent) => event.stopPropagation()}>
                   <button onClick={() => handleDuplicateWorkspace(ws.id)}>
                     <Copy size={15} /><span>Duplicate</span>
                   </button>
                   <button onClick={() => { setDefaultWorkspace(ws.id); setWorkspaceMenuId(null); showWorkspaceToast('Default workspace updated'); }}>
+                    {/* eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string */}
                     {defaultWorkspaceId == ws.id ? <Check size={15} color="#3cc8ff" /> : <Star size={15} />}<span>Set as Default</span>
                   </button>
                   <button onClick={() => openRename(ws)}>
@@ -225,13 +230,13 @@ export const Header = () => {
               )}
 
               {renameWorkspaceId === ws.id && (
-                <div className="workspace-rename-popover" onClick={(event) => event.stopPropagation()}>
+                <div className="workspace-rename-popover" onClick={(event: React.MouseEvent) => event.stopPropagation()}>
                   <label htmlFor={`workspace-name-${ws.id}`}>Rename Workspace</label>
                   <input
                     id={`workspace-name-${ws.id}`}
                     value={renameDraft}
-                    onChange={(event) => setRenameDraft(event.target.value)}
-                    onKeyDown={(event) => { if (event.key === 'Enter') commitRename(ws.id); if (event.key === 'Escape') setRenameWorkspaceId(null); }}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => setRenameDraft(event.target.value)}
+                    onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => { if (event.key === 'Enter') commitRename(ws.id); if (event.key === 'Escape') setRenameWorkspaceId(null); }}
                     autoFocus
                   />
                   <div className="workspace-rename-actions">

@@ -2,20 +2,21 @@
 
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
-import { Download, Edit3, MessageSquare } from 'lucide-react';
+import type { TradeLogEntry } from '../../types/market';
+import { Download, Edit3 } from 'lucide-react';
 
-export const TradeLogWidget = () => {
+export const TradeLogWidget: React.FC = () => {
   const { tradeLog } = useTradingStore();
-  const [selectedProduct, setSelectedProduct] = useState('All Products');
-  const [editingNoteId, setEditingNoteId] = useState(null);
-  const [noteText, setNoteText] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<string>('All Products');
+  const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
+  const [noteText, setNoteText] = useState<string>('');
 
-  const handleEditNote = (trade) => {
+  const handleEditNote = (trade: TradeLogEntry) => {
     setEditingNoteId(trade.id);
     setNoteText(trade.notes || '');
   };
 
-  const handleSaveNote = (tradeId) => {
+  const handleSaveNote = (tradeId: number) => {
     // Save note in local store state
     const trade = tradeLog.find((t) => t.id === tradeId);
     if (trade) trade.notes = noteText;

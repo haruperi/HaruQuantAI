@@ -1,17 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import { generateOptionsGrid } from '../../mock/optionsData';
-import { Plus } from 'lucide-react';
+import type { OrderSide } from '../../types/market';
 
-export const OptionsGridWidget = ({ symbol = 'ESU5' }) => {
+interface Props {
+  symbol?: string;
+}
+
+export const OptionsGridWidget: React.FC<Props> = ({ symbol = 'ESU5' }) => {
   const { products, openOrderTicket, submitOrder, oneClickTrading } = useTradingStore();
   const targetProduct = products.find((p) => p.symbol === symbol) || products[0];
 
   const gridData = generateOptionsGrid(targetProduct.lastPrice);
 
-  const handleCellClick = (strike, cp, side, price) => {
+  const handleCellClick = (strike: number, cp: string, side: OrderSide, price: number) => {
     if (oneClickTrading) {
       submitOrder({
         symbol: targetProduct.symbol,
@@ -61,9 +65,9 @@ export const OptionsGridWidget = ({ symbol = 'ESU5' }) => {
         <table className="cme-table" style={{ fontSize: '11px', textAlign: 'center' }}>
           <thead>
             <tr>
-              <th colSpan="8" style={{ background: '#0f2647', color: 'var(--cme-blue-bright)', textAlign: 'center', borderRight: '1px solid var(--cme-navy-border)' }}>CALLS</th>
+              <th colSpan={8} style={{ background: '#0f2647', color: 'var(--cme-blue-bright)', textAlign: 'center', borderRight: '1px solid var(--cme-navy-border)' }}>CALLS</th>
               <th style={{ background: 'var(--cme-navy-header)', textAlign: 'center' }}>STRIKE</th>
-              <th colSpan="8" style={{ background: '#0f2647', color: 'var(--cme-blue-bright)', textAlign: 'center', borderLeft: '1px solid var(--cme-navy-border)' }}>PUTS</th>
+              <th colSpan={8} style={{ background: '#0f2647', color: 'var(--cme-blue-bright)', textAlign: 'center', borderLeft: '1px solid var(--cme-navy-border)' }}>PUTS</th>
             </tr>
             <tr>
               <th>LOW</th>

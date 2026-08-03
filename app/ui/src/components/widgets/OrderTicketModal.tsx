@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
+import type { OrderSide, TicketOrderType } from '../../types/market';
 import { X, Plus, Minus } from 'lucide-react';
 
-export const OrderTicketModal = () => {
+export const OrderTicketModal: React.FC = () => {
   const {
     isOrderTicketOpen,
     closeOrderTicket,
@@ -13,17 +14,17 @@ export const OrderTicketModal = () => {
     submitOrder
   } = useTradingStore();
 
-  const [activeTab, setActiveTab] = useState('futures');
-  const [side, setSide] = useState('BUY');
-  const [orderType, setOrderType] = useState('Market');
-  const [quantity, setQuantity] = useState(1);
-  const [tif, setTif] = useState('DAY');
-  const [limitPrice, setLimitPrice] = useState('');
-  const [stopPrice, setStopPrice] = useState('');
+  const [activeTab, setActiveTab] = useState<'futures' | 'options'>('futures');
+  const [side, setSide] = useState<OrderSide>('BUY');
+  const [orderType, setOrderType] = useState<TicketOrderType | string>('Market');
+  const [quantity, setQuantity] = useState<number>(1);
+  const [tif, setTif] = useState<string>('DAY');
+  const [limitPrice, setLimitPrice] = useState<number | string>('');
+  const [stopPrice, setStopPrice] = useState<number | string>('');
 
   // Options fields
-  const [optionType, setOptionType] = useState('CALL');
-  const [strikePrice, setStrikePrice] = useState('61000');
+  const [optionType, setOptionType] = useState<string>('CALL');
+  const [strikePrice, setStrikePrice] = useState<string | number>('61000');
 
   const initialSymbol = orderTicketProps?.symbol || 'ESU5';
   const targetProduct = products.find((p) => p.symbol === initialSymbol) || products[0] || { symbol: 'ESU5', lastPrice: 6244.00, bid: 6243.75, ask: 6244.25, volume: 1000, change: 0 };
@@ -45,13 +46,13 @@ export const OrderTicketModal = () => {
 
   const isBuy = side === 'BUY';
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     submitOrder({
       symbol: targetProduct.symbol,
       side,
       qty: quantity,
-      orderType,
+      orderType: orderType as TicketOrderType,
       limitPrice: Number(limitPrice),
       stopPrice: Number(stopPrice),
       tif,
@@ -62,7 +63,7 @@ export const OrderTicketModal = () => {
 
   return (
     <div className="modal-overlay" onClick={closeOrderTicket}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         {/* Modal Header */}
         <div className="modal-header">
           <span>Trade - {targetProduct.symbol}</span>

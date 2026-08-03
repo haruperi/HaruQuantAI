@@ -7,7 +7,7 @@ import { WorkspaceGrid } from './components/layout/WorkspaceGrid';
 import { OrderTicketModal } from './components/widgets/OrderTicketModal';
 import { useTradingStore } from './store/useTradingStore';
 
-export function App() {
+export function App(): React.JSX.Element {
   const { updateQuotes, theme } = useTradingStore();
 
   // Run real-time price quote tick updates every 1.2 seconds

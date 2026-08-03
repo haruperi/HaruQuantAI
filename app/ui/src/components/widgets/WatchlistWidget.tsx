@@ -2,22 +2,14 @@
 
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
-import { Plus, GripVertical, Check } from 'lucide-react';
+import { Plus, GripVertical } from 'lucide-react';
 
-export const WatchlistWidget = () => {
+export const WatchlistWidget: React.FC = () => {
   const { products, openOrderTicket, submitOrder, oneClickTrading } = useTradingStore();
-  const [selectedList, setSelectedList] = useState('Featured Watchlists');
-  const [selectedProducts, setSelectedProducts] = useState([
+  const [selectedList, setSelectedList] = useState<string>('Featured Watchlists');
+  const [selectedProducts] = useState<string[]>([
     'ESU5', 'MESU5', 'NQU5', 'MNQU5', 'CLQ5', 'GCQ5', '6EU5', 'ZCZ5'
   ]);
-
-  const toggleProduct = (symbol) => {
-    if (selectedProducts.includes(symbol)) {
-      setSelectedProducts(selectedProducts.filter((s) => s !== symbol));
-    } else {
-      setSelectedProducts([...selectedProducts, symbol]);
-    }
-  };
 
   const watchlistItems = products.filter((p) => selectedProducts.includes(p.symbol));
 

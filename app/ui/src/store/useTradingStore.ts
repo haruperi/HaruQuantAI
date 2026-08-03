@@ -1,5 +1,8 @@
 import { create } from 'zustand';
 import { initialProducts } from '../mock/productsData';
+import type { TradingStoreState } from '../types/store';
+import type { Position, TradeLogEntry, Order } from '../types/market';
+import type { Widget, Workspace } from '../types/widget';
 import {
   GRID_COLUMNS,
   MIN_COL_SPAN,
@@ -11,7 +14,7 @@ import {
   findFreeCell
 } from '../utils/gridLayout';
 
-export const useTradingStore = create((set, get) => ({
+export const useTradingStore = create<TradingStoreState>((set) => ({
   // Account Financial State
   practiceBalance: 100000.00,
   challengeBalance: 100218.75,
@@ -229,7 +232,7 @@ export const useTradingStore = create((set, get) => ({
   setMode: (mode) => set({ mode }),
   toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
   toggleOneClickTrading: () => set((state) => ({ oneClickTrading: !state.oneClickTrading })),
-  resetBalance: () => set((state) => ({
+  resetBalance: () => set(() => ({
     practiceBalance: 100000.00,
     netPL: 0.00,
     margin: 0.00,
@@ -242,14 +245,16 @@ export const useTradingStore = create((set, get) => ({
   setDefaultWorkspace: (id) => set({ defaultWorkspaceId: id }),
 
   renameWorkspace: (id, name) => set((state) => ({
+    // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
     workspaces: state.workspaces.map((ws) => ws.id == id ? { ...ws, name: name.trim() || ws.name } : ws)
   })),
 
   duplicateWorkspace: (id) => set((state) => {
+    // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
     const source = state.workspaces.find((ws) => ws.id == id);
     if (!source || state.workspaces.length >= 10) return state;
     const newId = Math.max(...state.workspaces.map((ws) => Number(ws.id) || 0)) + 1;
-    const copy = {
+    const copy: Workspace = {
       ...source,
       id: newId,
       name: `${source.name} Copy`,
@@ -261,17 +266,22 @@ export const useTradingStore = create((set, get) => ({
 
   deleteWorkspace: (id) => set((state) => {
     if (state.workspaces.length <= 1) return state;
+    // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
     const remaining = state.workspaces.filter((ws) => ws.id != id);
+    // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
     const nextActive = state.activeWorkspaceId == id ? remaining[0].id : state.activeWorkspaceId;
+    // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
     const nextDefault = state.defaultWorkspaceId == id ? remaining[0].id : state.defaultWorkspaceId;
     return { workspaces: remaining, activeWorkspaceId: nextActive, defaultWorkspaceId: nextDefault };
   }),
 
   expandWidget: (widgetId) => set((state) => {
+    // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
     const activeWs = state.workspaces.find((ws) => ws.id == state.activeWorkspaceId) || state.workspaces[0];
     const targetId = widgetId || (activeWs?.widgets[0]?.id);
     return {
       workspaces: state.workspaces.map((ws) =>
+        // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
         ws.id == state.activeWorkspaceId ? { ...ws, expandedWidgetId: targetId } : ws
       )
     };
@@ -279,16 +289,19 @@ export const useTradingStore = create((set, get) => ({
 
   contractWidget: () => set((state) => ({
     workspaces: state.workspaces.map((ws) =>
+      // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
       ws.id == state.activeWorkspaceId ? { ...ws, expandedWidgetId: null } : ws
     )
   })),
 
   toggleExpandWidget: (widgetId) => set((state) => {
+    // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
     const activeWs = state.workspaces.find((ws) => ws.id == state.activeWorkspaceId) || state.workspaces[0];
     const isCurrentlyExpanded = Boolean(activeWs?.expandedWidgetId);
     const targetId = widgetId || (activeWs?.widgets[0]?.id);
     return {
       workspaces: state.workspaces.map((ws) =>
+        // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
         ws.id == state.activeWorkspaceId ? { ...ws, expandedWidgetId: isCurrentlyExpanded ? null : targetId } : ws
       )
     };
@@ -296,6 +309,7 @@ export const useTradingStore = create((set, get) => ({
 
   switchExpandedWidget: (widgetId) => set((state) => ({
     workspaces: state.workspaces.map((ws) =>
+      // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
       ws.id == state.activeWorkspaceId ? { ...ws, expandedWidgetId: widgetId } : ws
     )
   })),
@@ -314,7 +328,7 @@ export const useTradingStore = create((set, get) => ({
     });
     const nextNum = maxNum + 1;
     const newId = Date.now();
-    const newWs = {
+    const newWs: Workspace = {
       id: newId,
       name: `New Workspace-${nextNum}`,
       widgets: [
@@ -335,6 +349,7 @@ export const useTradingStore = create((set, get) => ({
    * Positions slot grows to fill it. Nothing else in the grid moves.
    */
   reorderWidgets: (sourceWidgetId, targetWidgetId) => set((state) => {
+    // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
     const activeWs = state.workspaces.find((ws) => ws.id == state.activeWorkspaceId);
     if (!activeWs || !targetWidgetId || targetWidgetId === 'END') return state;
 
@@ -366,6 +381,7 @@ export const useTradingStore = create((set, get) => ({
    * no-op rather than an overlap.
    */
   moveWidgetToCell: (widgetId, col, row) => set((state) => {
+    // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
     const activeWs = state.workspaces.find((ws) => ws.id == state.activeWorkspaceId);
     if (!activeWs) return state;
 
@@ -384,6 +400,7 @@ export const useTradingStore = create((set, get) => ({
 
     return {
       workspaces: state.workspaces.map((ws) =>
+        // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
         ws.id == state.activeWorkspaceId
           ? {
               ...ws,
@@ -401,6 +418,7 @@ export const useTradingStore = create((set, get) => ({
    * MIN_COL_SPAN keeps a widget wide enough for its header controls to fit.
    */
   resizeWidget: (widgetId, colSpan, rowSpan) => set((state) => {
+    // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
     const activeWs = state.workspaces.find((ws) => ws.id == state.activeWorkspaceId);
     if (!activeWs) return state;
 
@@ -427,6 +445,7 @@ export const useTradingStore = create((set, get) => ({
 
     return {
       workspaces: state.workspaces.map((ws) =>
+        // eslint-disable-next-line eqeqeq -- workspace id is number; caller may pass string
         ws.id == state.activeWorkspaceId
           ? {
               ...ws,
@@ -448,11 +467,12 @@ export const useTradingStore = create((set, get) => ({
         // Drop new widgets into the first gap that fits, so they never land on
         // top of an existing one now that placement is explicit.
         const cell = findFreeCell(ws.widgets, 6, 2);
+        const newWidget: Widget = { id: newWidgetId, type: widgetType, title: customTitle || widgetType, symbol, ...cell, colSpan: 6, rowSpan: 2 };
         return {
           ...ws,
           widgets: [
             ...ws.widgets,
-            { id: newWidgetId, type: widgetType, title: customTitle || widgetType, symbol, ...cell, colSpan: 6, rowSpan: 2 }
+            newWidget
           ]
         };
       }
@@ -486,7 +506,7 @@ export const useTradingStore = create((set, get) => ({
     const targetProduct = state.products.find((p) => p.symbol === symbol) || state.products[0];
     const fillPrice = orderType === 'Market' ? (side === 'BUY' ? targetProduct.ask : targetProduct.bid) : (limitPrice || targetProduct.lastPrice);
 
-    const newOrder = {
+    const newOrder: Order = {
       id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
       side,
       symbol,
@@ -503,9 +523,8 @@ export const useTradingStore = create((set, get) => ({
       timestamp: new Date().toLocaleTimeString('en-US', { hour12: false })
     };
 
-    let updatedPositions = [...state.positions];
-    let updatedLog = [...state.tradeLog];
-    let netPLChange = 0;
+    const updatedPositions: Position[] = [...state.positions];
+    const updatedLog: TradeLogEntry[] = [...state.tradeLog];
 
     if (orderType === 'Market') {
       const existingPosIndex = updatedPositions.findIndex((p) => p.symbol === symbol);
@@ -582,7 +601,7 @@ export const useTradingStore = create((set, get) => ({
 
   flattenPositions: () => set((state) => {
     // Flatten all active positions instantly
-    const newLogEntries = state.positions.map((pos) => ({
+    const newLogEntries: TradeLogEntry[] = state.positions.map((pos) => ({
       id: Date.now() + Math.random(),
       symbol: pos.symbol,
       transactionDate: `${new Date().toLocaleDateString()} | ${new Date().toLocaleTimeString()}`,
@@ -607,11 +626,11 @@ export const useTradingStore = create((set, get) => ({
   }),
 
   cancelAllOrders: () => set((state) => ({
-    orders: state.orders.map((o) => o.status === 'Working' ? { ...o, status: 'Cancelled', leaves: 0 } : o)
+    orders: state.orders.map((o) => o.status === 'Working' ? { ...o, status: 'Cancelled' as const, leaves: 0 } : o)
   })),
 
   cancelOrder: (orderId) => set((state) => ({
-    orders: state.orders.map((o) => o.id === orderId ? { ...o, status: 'Cancelled', leaves: 0 } : o)
+    orders: state.orders.map((o) => o.id === orderId ? { ...o, status: 'Cancelled' as const, leaves: 0 } : o)
   })),
 
   // Real-Time Ticker Simulator Loop

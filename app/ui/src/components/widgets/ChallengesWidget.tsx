@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import { Trophy, Users, Shield, ArrowRight } from 'lucide-react';
 
-export const ChallengesWidget = () => {
+export const ChallengesWidget: React.FC = () => {
   const { setMode } = useTradingStore();
-  const [promoCode, setPromoCode] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [agreed, setAgreed] = useState(false);
+  const [promoCode, setPromoCode] = useState<string>('');
+  const [displayName, setDisplayName] = useState<string>('');
+  const [agreed, setAgreed] = useState<boolean>(false);
 
   const handleJoinChallenge = () => {
     setMode('challenge');

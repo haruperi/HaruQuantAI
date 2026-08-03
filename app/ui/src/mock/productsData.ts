@@ -1,3 +1,5 @@
+import type { Product } from "../types/market";
+
 export const initialProducts = [
   {
     symbol: 'MNQU5',
@@ -208,7 +210,7 @@ export const initialProducts = [
     bid: 5.0820,
     ask: 5.0830
   }
-];
+] satisfies Product[];
 
 export const assetClasses = [
   'Equity Index',

@@ -1,6 +1,7 @@
+import type { Metadata } from 'next';
 import './globals.css';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'HaruQuantAI | Trading Simulator',
   description: 'Real-time HaruQuantAI & algorithmic trading simulation, analytics, and strategy governance platform.',
   icons: {
@@ -8,7 +9,11 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <head>

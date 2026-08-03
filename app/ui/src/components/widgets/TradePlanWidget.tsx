@@ -3,13 +3,13 @@
 import React, { useState } from 'react';
 import { Save } from 'lucide-react';
 
-export const TradePlanWidget = () => {
-  const [dollarsToRisk, setDollarsToRisk] = useState('10000.0');
-  const [percentToRisk, setPercentToRisk] = useState('3.0');
-  const [buyingPower, setBuyingPower] = useState('3.0');
-  const [decisionInput, setDecisionInput] = useState('Technical');
-  const [marketTrend, setMarketTrend] = useState('Momentum');
-  const [riskReward, setRiskReward] = useState('3:1');
+export const TradePlanWidget: React.FC = () => {
+  const [dollarsToRisk, setDollarsToRisk] = useState<string>('10000.0');
+  const [percentToRisk, setPercentToRisk] = useState<string>('3.0');
+  const [buyingPower, setBuyingPower] = useState<string>('3.0');
+  const [decisionInput, setDecisionInput] = useState<string>('Technical');
+  const [marketTrend, setMarketTrend] = useState<string>('Momentum');
+  const [riskReward, setRiskReward] = useState<string>('3:1');
 
   const handleSave = () => {
     alert('Your Trade Plan parameters have been saved successfully.');

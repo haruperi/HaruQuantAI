@@ -3,12 +3,20 @@
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import { assetClasses } from '../../mock/productsData';
+import type { Product } from '../../types/market';
 import { MoreVertical, LineChart, AlignJustify, Layers } from 'lucide-react';
 
-export const MarketsWidget = () => {
-  const [selectedCategory, setSelectedCategory] = useState('Equity Index');
-  const [sortBy, setSortBy] = useState('Volume');
-  const [activeMenuSymbol, setActiveMenuSymbol] = useState(null);
+interface DerivedProduct extends Product {
+  range: number;
+  adr: number;
+  volatility: number;
+  rangePct: number;
+}
+
+export const MarketsWidget: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState<string>('Equity Index');
+  const [sortBy, setSortBy] = useState<string>('Volume');
+  const [activeMenuSymbol, setActiveMenuSymbol] = useState<string | null>(null);
 
   const { products, openOrderTicket, submitOrder, oneClickTrading, addWidgetToWorkspace } = useTradingStore();
 
@@ -22,7 +30,7 @@ export const MarketsWidget = () => {
    *  rangePct   - how much of the average day is already used. Above 100% means
    *               the contract has exceeded its normal range and may be extended.
    */
-  const withMetrics = filteredProducts.map((p) => {
+  const withMetrics: DerivedProduct[] = filteredProducts.map((p) => {
     const range = p.high - p.low;
     const adr = p.adr10 || 0;
     return {
@@ -46,7 +54,7 @@ export const MarketsWidget = () => {
     return a.name.localeCompare(b.name);
   });
 
-  const fmt = (value, p) => value.toFixed(p.decimals ?? 2);
+  const fmt = (value: number, p: Product) => value.toFixed(p.decimals ?? 2);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>

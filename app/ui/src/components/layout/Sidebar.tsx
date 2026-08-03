@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
+import type { WidgetType } from '../../types/widget';
 import {
   ChevronLeft,
   ChevronRight,
@@ -25,12 +26,12 @@ import {
   Cookie
 } from 'lucide-react';
 
-export const Sidebar = () => {
+export const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { addWidgetToWorkspace } = useTradingStore();
 
-  const handleAddWidget = (type, title) => {
-    addWidgetToWorkspace(type, title);
+  const handleAddWidget = (type: string, title: string) => {
+    addWidgetToWorkspace(type as WidgetType, title);
   };
 
   return (

@@ -1,6 +1,8 @@
-export const generateOptionsGrid = (underlyingPrice = 6243.75) => {
+import type { OptionsGridRow } from "../types/market";
+
+export const generateOptionsGrid = (underlyingPrice = 6243.75): OptionsGridRow[] => {
   const baseStrike = Math.round(underlyingPrice / 25) * 25;
-  const strikes = [];
+  const strikes: OptionsGridRow[] = [];
 
   for (let i = -10; i <= 10; i++) {
     const strike = baseStrike + i * 25;

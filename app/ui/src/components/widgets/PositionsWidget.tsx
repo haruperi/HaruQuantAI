@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 
-export const PositionsWidget = () => {
-  const [activeTab, setActiveTab] = useState('positions');
-  const [posFilter, setPosFilter] = useState('All');
-  const [ordFilter, setOrdFilter] = useState('All');
+export const PositionsWidget: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'positions' | 'orders'>('positions');
+  const [posFilter, setPosFilter] = useState<string>('All');
+  const [ordFilter, setOrdFilter] = useState<string>('All');
 
   const {
     positions,
@@ -90,7 +90,7 @@ export const PositionsWidget = () => {
               <tbody>
                 {positions.length === 0 ? (
                   <tr>
-                    <td colSpan="12" style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>
+                    <td colSpan={12} style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>
                       No open positions to display
                     </td>
                   </tr>
