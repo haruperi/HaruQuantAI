@@ -2,7 +2,7 @@
 
 > **Specification location:** `app/services/api/README.md`
 > **Logical runtime packages:** FastAPI gateway at `app/services/api` plus Next.js frontend at `ui/` (per the `docs/PROJECT.md` registry), with canonical ASGI target `app.services.api.composition.application:app`; Next.js frontend at `ui/`
-> **Status:** `Backend v1 exposes 32 operations; frontend typed transport and workflow presentation components complete (Sections 4.9–4.11); ready to begin Section 4.12`
+> **Status:** `Backend v1 exposes 32 operations; frontend Sections 4.9–4.12 complete (typed transport, session/page/governed/stream context, workflow components, protected pages); frontend build complete`
 > **Last updated:** `2026-08-03`
 
 > This README is the UI/API domain's **single source of truth** for final requirements,
@@ -195,7 +195,7 @@ contracts, numbered usage program, and required tests satisfy Sections 4 and 7.
 | Completed | `FEAT-API-09` Typed Frontend Transport | `ui/clients/` | `request`, `unwrapData`, `ApiClientError`, `openStream`, `apiClients` (9 focused clients for 23 operations incl. auth.me + data.stream) | `FR-API-038`–`FR-API-041` | `tests/api/usage/14_frontend_clients.ts`; `app/ui/src/clients/request.test.ts`; `app/ui/src/clients/clients.test.ts`; `app/ui/src/clients/clients.contract.test.ts` |
 | Completed | `FEAT-API-10` Frontend Session and Page Context | `ui/context/` | `AuthProvider`, `useAuth`, `PageContextProvider`, `usePageContext`, `buildGovernedOptions`, `isGovernedFresh`, `consumeStream`, `StreamGapError`, `PageContextError`, `GovernedPreflightError` | `FR-API-042`–`FR-API-045` | `tests/api/usage/15_frontend_context.tsx`; `app/ui/src/context/{auth,page,governed,streams}.test.ts(x)` |
 | Completed | `FEAT-API-11` Workflow Presentation Components | `ui/components/workflow/` | `AppShell`, `DashboardView`, `StrategyWorkspace`, `SimulationView`, `RiskView`, `TradingView`, `ResearchWorkspace` | `FR-API-046`–`FR-API-051` | `tests/api/usage/16_frontend_components.tsx`; `app/ui/src/components/workflow/*.test.tsx` |
-| Missing | `FEAT-API-12` Protected Workflow Pages | `ui/app/` | Planned exact declarations: Section 4.12 | Section 4.12 functional requirements | Missing |
+| Completed | `FEAT-API-12` Protected Workflow Pages | `ui/app/` | `AuthenticationPage` (at `/login`), `ProtectedLayout`, `WorkflowPage` | `FR-API-053`–`FR-API-055` | `tests/api/usage/17_frontend_pages.tsx`; `app/ui/src/app/{authentication-page,protected-layout,pages.contract}.test.tsx` |
 | Completed | `FEAT-API-13` Critical Operational Alert Delivery | `alerts/` | `CriticalAlertTrigger`, `CriticalOperationalAlert`, `CriticalAlertDeliveryResult`, `CriticalAlertError`, `CriticalAlertSink`, `build_kill_switch_activation_alert`, `build_unknown_broker_state_alert`, `deliver_critical_alert` | `FR-API-064`–`FR-API-067` | `tests/api/usage/13_alerts.py` |
 
 #### Backend foundation evidence and remaining gate (`API-BE-001`)
@@ -1117,28 +1117,36 @@ specified component surface.
 
 ### 4.12 `ui/app/` — Protected workflow pages
 
-**Module flow:** Next.js route → protected layout → approved workflow component → typed
-client/context.
+**Module flow:** access route (`/login`) → `AuthenticationPage`; root route (`/`) →
+`WorkflowPage` → `ProtectedLayout` → `AppShell` → widget workspace.
 
-| Status | File group | Responsibility | Key exports | Dependencies |
+**Two-tier model (owner decision):** the login/register access page is a dedicated
+Next.js route segment (`/login`), separate from the single-page widget workspace
+at `/` which is gated on the authenticated session. Unauthenticated visitors to `/`
+are redirected to `/login`.
+
+| Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `auth-page.tsx` | Render the approved login/register page behavior | `AuthenticationPage` | **Standard library:** None<br>**Required third-party:** React/Next versions pinned in the frontend manifest before implementation<br>**Local:** auth client/context |
-| Missing | `workflow-page.tsx` | Compose the approved protected workflow selected by the framework page wrapper | `WorkflowPage` | **Standard library:** None<br>**Required third-party:** React/Next versions pinned in the frontend manifest before implementation<br>**Local:** approved workflow components |
-| Missing | `(protected)/layout.tsx` | Enforce authenticated layout and compose the shell | `ProtectedLayout` | **Standard library:** None<br>**Required third-party:** React/Next versions pinned in the frontend manifest before implementation<br>**Local:** `context/auth.tsx`; `components/shell.tsx` |
-| Missing | Auth/protected `page.tsx` files | Framework entry points for approved route manifests | None at domain package boundary | **Standard library:** None<br>**Required third-party:** React/Next versions pinned in the frontend manifest before implementation<br>**Local:** approved workflow components |
+| Completed | `login/page.tsx` | `/login` route segment; framework entry for the access gate | default export | **Standard library:** None<br>**Required third-party:** Next 15 App Router<br>**Local:** `./authentication-page` |
+| Completed | `authentication-page.tsx` | Login/register access form with session recovery | `AuthenticationPage` | **Standard library:** None<br>**Required third-party:** React 19; `next/navigation` `useRouter`<br>**Local:** `clients` `ApiClientError`; `context` `useAuth` |
+| Completed | `protected-layout.tsx` | Gate the workspace on the authenticated session | `ProtectedLayout` | **Standard library:** None<br>**Required third-party:** React 19; `next/navigation` `useRouter`<br>**Local:** `context` `useAuth`; `components/workflow` `AppShell` |
+| Completed | `workflow-page.tsx` | Compose the protected widget workspace from the public surface | `WorkflowPage` | **Standard library:** None<br>**Required third-party:** React 19<br>**Local:** `App`; `./protected-layout` |
+| Completed | `page.tsx` | Root route (`/`) framework entry; delegates to `WorkflowPage` | default export | **Standard library:** None<br>**Local:** `./workflow-page` |
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `FR-API-053` | Render login/register routes and recover cleanly from invalid or expired sessions. | `AuthenticationPage(props: AuthenticationPageProps) => JSX.Element` | External API call; local state mutation | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_pages.tsx::testUsageAuthenticationPages()`<br>**Unit:** `ui/app/auth.e2e.test.ts::loginLogoutRecovery()` |
-| Missing | `FR-API-054` | Protect dashboard, settings, Strategy catalogue, operator evidence, and Edge Lab routes. | `ProtectedLayout(props: PropsWithChildren) => JSX.Element` | External API call; local state mutation | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_pages.tsx::testUsageProtectedLayout()`<br>**Unit:** `ui/app/protected.e2e.test.ts::unauthenticatedAccessRedirects()` |
-| Missing | `FR-API-055` | Compose an approved workflow route exclusively from public clients, context, and workflow components. | `WorkflowPage(props: WorkflowPageProps) => JSX.Element` | External API call through clients | `ApiClientError` | **Usage:** `tests/api/usage/test_usage_frontend_pages.tsx::testUsageApprovedPages()`<br>**Unit:** `ui/app/pages.contract.test.ts::everyPageHasClientContract()` |
+| Completed | `FR-API-053` | Render login/register routes and recover cleanly from invalid or expired sessions. | `AuthenticationPage(props: AuthenticationPageProps) => JSX.Element` | External API call; local state mutation | `ApiClientError` | **Usage:** `tests/api/usage/17_frontend_pages.tsx::testUsageLoginRoute()`<br>**Unit:** `app/ui/src/app/authentication-page.test.tsx` |
+| Completed | `FR-API-054` | Protect the widget workspace; redirect unauthenticated visitors to the access gate. | `ProtectedLayout(props: PropsWithChildren) => JSX.Element` | Local state mutation; navigation | `ApiClientError` | **Usage:** `tests/api/usage/17_frontend_pages.tsx`<br>**Unit:** `app/ui/src/app/protected-layout.test.tsx` |
+| Completed | `FR-API-055` | Compose an approved workflow route exclusively from public clients, context, and workflow components. | `WorkflowPage(props: WorkflowPageProps) => JSX.Element` | External API call through clients | `ApiClientError` | **Usage:** `tests/api/usage/17_frontend_pages.tsx::testUsageApprovedPages()`<br>**Unit:** `app/ui/src/app/pages.contract.test.ts` |
 
 **Configuration and Limits Manifest:** None. Routing consumes the approved auth and
 client configuration.
 
 **Implementation notes:** Next.js page default exports are framework entry points, not
 additional domain-level public exports; they delegate only to `AuthenticationPage`,
-`ProtectedLayout`, or `WorkflowPage`.
+`ProtectedLayout`, or `WorkflowPage`. The access tier (`/login`) is a separate route
+because login/register is an access page, not an internal workspace view; the workspace
+tier (`/`) remains a single-page widget workspace per the owner decision.
 
 ### 4.13 `alerts/` — Critical operational alert delivery
 

@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+### Add protected workflow pages — frontend build complete (FEAT-API-12, Section 4.12)
+
+The fourth and final frontend feature delivers the access gate (`/login`) and the protected workspace composition point. The frontend build is now complete: Sections 4.9–4.12 (typed transport, session/page/governed/stream context, workflow components, protected pages) are all implemented.
+
+#### Added (3)
+
+- Added `app/ui/src/app/authentication-page.tsx` (`AuthenticationPage`), a dedicated `/login` route segment (`app/ui/src/app/login/page.tsx`) for the access gate with login/register toggle and clean session-recovery handling.
+- Added `app/ui/src/app/protected-layout.tsx` (`ProtectedLayout`) which gates the widget workspace on the authenticated session and redirects unauthenticated visitors to `/login`, plus `workflow-page.tsx` (`WorkflowPage`) composing the protected workspace from the public surface.
+- Added three unit test files and the numbered usage program `tests/api/usage/17_frontend_pages.tsx`.
+
+#### Changed (1)
+
+- Rewired the root route `app/ui/src/app/page.tsx` to delegate to `WorkflowPage` (was `<App/>`); marked `FEAT-API-12` and Section 4.12 functional requirements `FR-API-053`–`FR-API-055` `Completed` in the API README.
+
 ### Add workflow presentation components and grow the frontend route catalog to 32 (FEAT-API-11)
 
 The third frontend feature delivers the auth-aware shell and the freshness-aware dashboard, read-only strategies, backtest simulation, risk state, trading session, and Edge Lab research views — the first components to render real backend data through the typed clients and auth context. The frontend route catalog grows from 23 to 32 to match the backend bridge entry below, completing Section 4.11 with no Excluded requirements remaining.
