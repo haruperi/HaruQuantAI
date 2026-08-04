@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING
 
 from pydantic import ValidationError
 
-from app.services.data.audit.store import _persist_audit_event_raw
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -247,6 +246,9 @@ def _audit(
     Raises:
         DataError: If durable audit persistence fails.
     """
+    # Import at the side-effect boundary because audit delegates its CRUD back here.
+    from app.services.data.audit.store import _persist_audit_event_raw
+
     logger.info("Persisting %s audit evidence", action)
     _persist_audit_event_raw(
         create_audit_event(
@@ -287,30 +289,35 @@ def _create_backup_raw(targets: Sequence[BackupTarget]) -> BackupManifest:
         f"{request_id}:{created_at.isoformat()}",
     )
     backup_root = resolve_approved_storage_path(_BACKUP_ROOT, request_id)
+    backup_root.mkdir(parents=True, exist_ok=True)
     final_directory = backup_root / manifest_id
     staging_directory = backup_root / f"{manifest_id}.tmp"
-    entries = tuple(
-        BackupEntry(
-            relative_path=file_path.relative_to(data_root),
-            content_hash=compute_file_hash(file_path),
-            byte_count=file_path.stat().st_size,
-            schema_version=target.schema_version,
-            normalization_version=target.normalization_version,
-        )
-        for file_path, target in files
-    )
-    manifest = BackupManifest(
-        manifest_id=manifest_id,
-        entries=entries,
-        manifest_hash=_manifest_hash(manifest_id, entries, created_at, request_id),
-        created_at=created_at,
-        request_id=request_id,
-    )
-
     try:
         with _acquire_write_lock_raw(final_directory, request_id):
             if final_directory.exists() or staging_directory.exists():
                 raise _error("DB_WRITE_FAILED", request_id, "create_backup")
+            # The lease is itself persisted in SQLite. Compute hashes only after
+            # acquiring it so a database target cannot change between hashing and
+            # copying because of this operation's own lock write.
+            entries = tuple(
+                BackupEntry(
+                    relative_path=file_path.relative_to(data_root),
+                    content_hash=compute_file_hash(file_path),
+                    byte_count=file_path.stat().st_size,
+                    schema_version=target.schema_version,
+                    normalization_version=target.normalization_version,
+                )
+                for file_path, target in files
+            )
+            manifest = BackupManifest(
+                manifest_id=manifest_id,
+                entries=entries,
+                manifest_hash=_manifest_hash(
+                    manifest_id, entries, created_at, request_id
+                ),
+                created_at=created_at,
+                request_id=request_id,
+            )
             staging_directory.mkdir(parents=True)
             expected_hashes = {
                 entry.relative_path: entry.content_hash for entry in entries

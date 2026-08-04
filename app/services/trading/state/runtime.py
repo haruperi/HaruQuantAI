@@ -8,11 +8,22 @@ from typing import Literal, cast
 
 from pydantic import BaseModel
 
-from app.services.data import (
-    build_trading_runtime_store,
-    execute_runtime_store_operation,
-)
 from app.services.trading.contracts.models import JsonValue, TradingRoute
+from app.services.trading.persistence import (
+    create_event_record,
+    create_idempotency_record,
+    create_projection_record,
+    create_trading_runtime_store,
+    read_all_event_records,
+    read_event_records,
+    read_idempotency_record,
+    read_idempotency_record_with_revision,
+    read_projection_record,
+    read_projection_record_with_revision,
+    update_event_projection_records,
+    update_idempotency_record,
+    update_projection_record,
+)
 from app.services.trading.state.events import TradingEvent
 from app.services.trading.state.idempotency import IdempotencyReservation
 from app.services.trading.state.projections import TradingProjection
@@ -50,7 +61,7 @@ class _DurableTradingStateStore:
 
     def __init__(self) -> None:
         """Construct the adapter without opening a connection."""
-        self._store = build_trading_runtime_store(
+        self._store = create_trading_runtime_store(
             {
                 "event": (_encode, TradingEvent.model_validate_json),
                 "projection": (_encode, TradingProjection.model_validate_json),
@@ -73,9 +84,7 @@ class _DurableTradingStateStore:
         """
         existing = cast(
             "IdempotencyReservation | None",
-            execute_runtime_store_operation(
-                self._store, "get", collection="idempotency", key=key
-            ),
+            read_idempotency_record(self._store, key),
         )
         if existing is not None:
             matching = (
@@ -94,14 +103,7 @@ class _DurableTradingStateStore:
             expires_at=expires_at,
         )
         try:
-            execute_runtime_store_operation(
-                self._store,
-                "put_once",
-                collection="idempotency",
-                key=key,
-                kind="reservation",
-                value=reservation,
-            )
+            create_idempotency_record(self._store, key, reservation)
         except ValueError:
             return self.reserve_idempotency(
                 key, material_hash, material_version, reserved_at, expires_at
@@ -123,13 +125,8 @@ class _DurableTradingStateStore:
             ValueError: If the reservation is missing or mismatched.
         """
         stored = cast(
-            "tuple[IdempotencyReservation, int] | None",
-            execute_runtime_store_operation(
-                self._store,
-                "get_with_revision",
-                collection="idempotency",
-                key=key,
-            ),
+            "tuple[IdempotencyReservation, str] | None",
+            read_idempotency_record_with_revision(self._store, key),
         )
         if stored is None or stored[0].material_hash != material_hash:
             raise ValueError("idempotency completion does not match a reservation")
@@ -145,12 +142,9 @@ class _DurableTradingStateStore:
                 "reserved_at": completed_at,
             }
         )
-        execute_runtime_store_operation(
+        update_idempotency_record(
             self._store,
-            "compare_and_swap",
-            collection="idempotency",
             key=key,
-            kind="reservation",
             value=updated,
             expected_revision=revision,
         )
@@ -158,15 +152,34 @@ class _DurableTradingStateStore:
     def append_event(self, event: TradingEvent) -> None:
         """Append one immutable versioned Trading event."""
         scope = (event.route, event.tenant_id, event.authority_id)
-        execute_runtime_store_operation(
+        create_event_record(
             self._store,
-            "append",
-            collection="events",
             key=event.event_id,
             partition=_scope_key(scope),
             sequence=event.aggregate_version + 1,
-            kind="event",
             value=event,
+        )
+
+    def apply_event(
+        self,
+        event: TradingEvent,
+        projection: TradingProjection,
+        expected_version: int,
+    ) -> None:
+        """Atomically persist an event and every derived projection.
+
+        Args:
+            event: Authoritative event to append.
+            projection: Deterministic state after the event.
+            expected_version: Optimistic version observed before projection.
+        """
+        scope = (event.route, event.tenant_id, event.authority_id)
+        update_event_projection_records(
+            self._store,
+            event=event,
+            projection=projection,
+            scope_key=_scope_key(scope),
+            expected_version=expected_version,
         )
 
     def load_projection(self, scope: TradingScope) -> TradingProjection | None:
@@ -177,12 +190,7 @@ class _DurableTradingStateStore:
         """
         return cast(
             "TradingProjection | None",
-            execute_runtime_store_operation(
-                self._store,
-                "get",
-                collection="projections",
-                key=_scope_key(scope),
-            ),
+            read_projection_record(self._store, _scope_key(scope)),
         )
 
     def save_projection(
@@ -197,24 +205,19 @@ class _DurableTradingStateStore:
         key = _scope_key(scope)
         stored = cast(
             "tuple[TradingProjection, int] | None",
-            execute_runtime_store_operation(
-                self._store,
-                "get_with_revision",
-                collection="projections",
-                key=key,
-            ),
+            read_projection_record_with_revision(self._store, key),
         )
         current_version = 0 if stored is None else stored[0].version
         if current_version != expected_version:
             raise ValueError("Trading projection version conflict")
-        execute_runtime_store_operation(
+        if stored is None:
+            create_projection_record(self._store, key, projection)
+            return
+        update_projection_record(
             self._store,
-            "put_once" if stored is None else "compare_and_swap",
-            collection="projections",
             key=key,
-            kind="projection",
             value=projection,
-            expected_revision=None if stored is None else stored[1],
+            expected_revision=stored[1],
         )
 
     def load_unresolved_attempts(self, scope: TradingScope) -> tuple[TradingEvent, ...]:
@@ -225,13 +228,7 @@ class _DurableTradingStateStore:
         """
         events = cast(
             "tuple[TradingEvent, ...]",
-            execute_runtime_store_operation(
-                self._store,
-                "list",
-                collection="events",
-                partition=_scope_key(scope),
-                limit=1_000,
-            ),
+            read_event_records(self._store, _scope_key(scope)),
         )
         projection = self.load_projection(scope)
         unresolved = (
@@ -254,12 +251,7 @@ class _DurableTradingStateStore:
         """
         events = cast(
             "tuple[TradingEvent, ...]",
-            execute_runtime_store_operation(
-                self._store,
-                "list_all_partitions",
-                collection="events",
-                limit=limit,
-            ),
+            read_all_event_records(self._store, limit),
         )
         return tuple(event for event in events if event.event_type == "send_attempted")
 
@@ -302,6 +294,7 @@ def execute_trading_state_store_operation(
         ValueError: If the operation is unsupported.
     """
     allowed = {
+        "apply_event",
         "append_event",
         "complete_idempotency",
         "load_projection",
@@ -318,4 +311,33 @@ def execute_trading_state_store_operation(
     return getattr(store, operation)(*args, **kwargs)
 
 
-__all__ = ("build_trading_state_store", "execute_trading_state_store_operation")
+def get_trading_projection(
+    route: str,
+    tenant_id: str,
+    authority_id: str,
+) -> object | None:
+    """Read one exact-scope aggregate Trading projection.
+
+    Args:
+        route: Canonical ``sim``, ``paper``, or ``live`` route.
+        tenant_id: Authenticated tenant or environment identifier.
+        authority_id: Exact account/session authority identifier.
+
+    Returns:
+        Canonical Trading projection or ``None`` when no event exists.
+
+    Raises:
+        ValueError: If the exact scope is incomplete.
+    """
+    if not tenant_id or not authority_id:
+        raise ValueError("Trading projection scope is incomplete")
+    store = build_trading_state_store()
+    scope: TradingScope = (TradingRoute(route), tenant_id, authority_id)
+    return execute_trading_state_store_operation(store, "load_projection", scope)
+
+
+__all__ = (
+    "build_trading_state_store",
+    "execute_trading_state_store_operation",
+    "get_trading_projection",
+)

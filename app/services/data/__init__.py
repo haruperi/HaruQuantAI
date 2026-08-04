@@ -219,11 +219,13 @@ from app.services.data.quality import (
     validate_symbol_metadata,
 )
 from app.services.data.realtime_feeds import (
+    build_market_stream_request,
     ingest_feed_event,
     read_feed_status,
     reconcile_feed_gap,
     reconnect_feed,
     start_internal_feed,
+    stream_market_data,
 )
 from app.services.data.realtime_feeds.status import get_feed_status
 from app.services.data.research_sources import (
@@ -353,6 +355,7 @@ __all__ = (
     "build_market_dataset",
     "build_market_hours_request",
     "build_market_schedule",
+    "build_market_stream_request",
     "build_migration_request",
     "build_migration_step",
     "build_ohlcv_record",
@@ -544,6 +547,7 @@ __all__ = (
     "start_data_update_job",
     "start_internal_feed",
     "stop_data_update_job",
+    "stream_market_data",
     "summarize_quality_remediation",
     "to_ohlcv_dataframe",
     "to_tick_dataframe",

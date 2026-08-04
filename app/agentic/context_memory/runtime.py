@@ -1,4 +1,4 @@
-"""Durable Agentic memory store over Data-owned runtime records."""
+"""Durable Agentic memory store over Agentic-owned relational records."""
 
 from __future__ import annotations
 
@@ -7,11 +7,11 @@ from typing import cast
 from pydantic import BaseModel
 
 from app.agentic.context_memory.models import MemoryRecord
-from app.services.data import (
-    build_agentic_runtime_store,
-    execute_runtime_store_operation,
+from app.agentic.persistence import (
+    create_agentic_persistence_store,
+    create_memory_record,
+    read_memory_records,
 )
-from app.utils import canonical_digest
 
 
 def _encode(value: object) -> str:
@@ -28,21 +28,12 @@ def _encode(value: object) -> str:
     return value.model_dump_json()
 
 
-def _key(*values: str) -> str:
-    """Derive one storage-safe identifier.
-
-    Returns:
-        Bounded key.
-    """
-    return f"record-{canonical_digest(values)}"
-
-
 class DurableMemoryStore:
     """Data-backed implementation of the Agentic memory-store port."""
 
     def __init__(self) -> None:
-        """Build the lazy Data runtime handle."""
-        self._store = build_agentic_runtime_store(
+        """Build the relational persistence handle."""
+        self._store = create_agentic_persistence_store(
             {"memory": (_encode, MemoryRecord.model_validate_json)}
         )
 
@@ -53,14 +44,11 @@ class DurableMemoryStore:
             Appended record.
         """
         records = self.list_records(record.store_class, record.task_id)
-        execute_runtime_store_operation(
+        create_memory_record(
             self._store,
-            "append",
-            collection="memory-records",
-            key=_key(record.record_id),
-            partition=_key(record.store_class, record.task_id),
+            key=record.record_id,
+            partition=record.task_id,
             sequence=len(records) + 1,
-            kind="memory",
             value=record,
         )
         return record
@@ -73,12 +61,11 @@ class DurableMemoryStore:
         """
         return cast(
             "tuple[MemoryRecord, ...]",
-            execute_runtime_store_operation(
+            read_memory_records(
                 self._store,
-                "list",
-                collection="memory-records",
-                partition=_key(store_class, task_id),
-                limit=1_000,
+                store_class,
+                task_id,
+                1_000,
             ),
         )
 

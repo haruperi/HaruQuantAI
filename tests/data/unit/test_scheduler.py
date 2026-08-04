@@ -110,17 +110,31 @@ def test_lease_state_and_job_contract_invariants() -> None:
 
 def test_create_start_stop_handlers(monkeypatch: pytest.MonkeyPatch) -> None:
     """Persist valid lifecycle changes and invoke bounded loop controls."""
-    results = iter(
+    identities = iter(
         (
             SimpleNamespace(rows=()),
-            SimpleNamespace(rows=()),
-            SimpleNamespace(rows=(_row(),)),
-            SimpleNamespace(rows=()),
             SimpleNamespace(rows=({"job_id": "job-fixture"},)),
-            SimpleNamespace(rows=()),
         )
     )
-    monkeypatch.setattr(job, "_execute_transaction_raw", lambda _request: next(results))
+    monkeypatch.setattr(
+        job, "read_update_job_identity", lambda *_args, **_kwargs: next(identities)
+    )
+    monkeypatch.setattr(
+        job,
+        "create_update_job_record",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=()),
+    )
+    monkeypatch.setattr(
+        job,
+        "read_update_job_start_state",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=(_row(),)),
+    )
+    monkeypatch.setattr(
+        job, "update_job_start", lambda *_args, **_kwargs: SimpleNamespace(rows=())
+    )
+    monkeypatch.setattr(
+        job, "update_job_stop", lambda *_args, **_kwargs: SimpleNamespace(rows=())
+    )
     monkeypatch.setattr(job, "_evaluate_source_policy_raw", lambda _request: None)
     started: list[tuple[str, int]] = []
     stopped: list[str] = []
@@ -148,19 +162,26 @@ def test_handlers_reject_missing_duplicate_and_held_jobs(
     monkeypatch.setattr(job, "_evaluate_source_policy_raw", lambda _request: None)
     monkeypatch.setattr(
         job,
-        "_execute_transaction_raw",
-        lambda _request: SimpleNamespace(rows=({"job_id": definition.job_id},)),
+        "read_update_job_identity",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            rows=({"job_id": definition.job_id},)
+        ),
     )
     with pytest.raises(DataError):
         job._handle_create(_request("create", definition))
 
     monkeypatch.setattr(
         job,
-        "_execute_transaction_raw",
-        lambda _request: SimpleNamespace(rows=()),
+        "read_update_job_start_state",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=()),
     )
     with pytest.raises(DataError):
         job._handle_start(_request("start"), _SequenceClock())
+    monkeypatch.setattr(
+        job,
+        "read_update_job_identity",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=()),
+    )
     with pytest.raises(DataError):
         job._handle_stop(_request("stop"))
 
@@ -170,8 +191,8 @@ def test_handlers_reject_missing_duplicate_and_held_jobs(
     )
     monkeypatch.setattr(
         job,
-        "_execute_transaction_raw",
-        lambda _request: SimpleNamespace(rows=(held,)),
+        "read_update_job_start_state",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=(held,)),
     )
     with pytest.raises(DataError):
         job._handle_start(_request("start"), _SequenceClock())
@@ -193,8 +214,8 @@ def test_read_status_maps_persisted_evidence(monkeypatch: pytest.MonkeyPatch) ->
     }
     monkeypatch.setattr(
         job,
-        "_execute_transaction_raw",
-        lambda _request: SimpleNamespace(rows=(row,)),
+        "read_update_job_status_record",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=(row,)),
     )
     result = job.read_update_job_status(
         JobStatusRequest(job_id="job-fixture", request_id=generate_id("req")),
@@ -204,8 +225,8 @@ def test_read_status_maps_persisted_evidence(monkeypatch: pytest.MonkeyPatch) ->
 
     monkeypatch.setattr(
         job,
-        "_execute_transaction_raw",
-        lambda _request: SimpleNamespace(rows=()),
+        "read_update_job_status_record",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=()),
     )
     with pytest.raises(DataError):
         job.read_update_job_status(
@@ -218,8 +239,8 @@ def test_run_range_and_chunk_execution(monkeypatch: pytest.MonkeyPatch) -> None:
     checkpoint_end = _NOW + timedelta(minutes=10)
     monkeypatch.setattr(
         job,
-        "_execute_transaction_raw",
-        lambda _request: SimpleNamespace(
+        "read_latest_backfill_end",
+        lambda *_args, **_kwargs: SimpleNamespace(
             rows=({"max_end": checkpoint_end.isoformat()},)
         ),
     )
@@ -280,8 +301,8 @@ def test_run_once_success_and_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     monkeypatch.setattr(
         job,
-        "_execute_transaction_raw",
-        lambda _request: SimpleNamespace(rows=()),
+        "update_job_run_success",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=()),
     )
     success = job.run_data_update_job_once(
         "job-fixture",
@@ -294,6 +315,11 @@ def test_run_once_success_and_failure(monkeypatch: pytest.MonkeyPatch) -> None:
         raise DataError("JOB_NOT_FOUND")
 
     monkeypatch.setattr(job, "_acquire_job_run_lease", _fail)
+    monkeypatch.setattr(
+        job,
+        "update_job_run_failure",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=()),
+    )
     failure = job.run_data_update_job_once(
         "job-fixture",
         generate_id("req"),

@@ -24,11 +24,10 @@ from app.services.data.data_jobs.backfill import (
 from app.services.data.data_jobs.contracts import (
     RecoveryReport,
 )
-from app.services.data.persistence.contracts import (
-    StatementPlan,
-    TransactionRequest,
+from app.services.data.persistence import (
+    read_prepared_backfill_records,
+    update_job_recovery_blocked,
 )
-from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.utils import generate_id, get_logger, utc_now
 
 logger = get_logger(__name__)
@@ -46,24 +45,7 @@ def recover_update_jobs(
     """Finish prepared publications and classify unrecoverable checkpoints."""
     rid = request_id or generate_id("req")
     logger.info("Recovering prepared DATA backfill publications")
-    prepared = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    """
-                    SELECT idempotency_key, job_id, content_hash,
-                           artifact_temp, artifact_final
-                    FROM data_backfill_checkpoints
-                    WHERE publication_state = 'prepared'
-                    ORDER BY created_at, idempotency_key
-                    """.strip(),
-                ),
-                parameter_sets=((),),
-                max_rows=1_000,
-            ),
-            request_id=rid,
-        )
-    )
+    prepared = read_prepared_backfill_records(request_id=rid, limit=1_000)
     recovered: list[str] = []
     blocked: list[str] = []
     for row in prepared.rows:
@@ -82,24 +64,7 @@ def recover_update_jobs(
                 str(row["artifact_final"]),
             )
         except DataError:
-            _execute_transaction_raw(
-                TransactionRequest(
-                    plan=StatementPlan(
-                        statements=(
-                            """
-                            UPDATE data_update_jobs
-                            SET state = 'blocked', recovery_state = 'blocked',
-                                last_error = 'CHECKPOINT_CORRUPTED',
-                                lease_owner = NULL, lease_expires_at = NULL
-                            WHERE job_id = ?
-                            """.strip(),
-                        ),
-                        parameter_sets=((job_id,),),
-                        max_rows=1,
-                    ),
-                    request_id=rid,
-                )
-            )
+            update_job_recovery_blocked(job_id, request_id=rid)
             blocked.append(job_id)
         else:
             recovered.append(job_id)

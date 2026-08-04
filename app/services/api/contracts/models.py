@@ -80,6 +80,7 @@ class RouteSideEffect(StrEnum):
 
     NONE = "none"
     READ = "read"
+    STREAM = "stream"
     WRITE = "write"
     GOVERNED_WRITE = "governed_write"
 
@@ -597,8 +598,6 @@ class RouteContract(_BaseApiContract):
             and self.governance_scope != "required"
         ):
             raise ValueError("governed_write routes must require governance")
-        if self.auth_required and not self.permission:
-            raise ValueError("authenticated routes require a permission")
         if self.side_effect in {RouteSideEffect.WRITE, RouteSideEffect.GOVERNED_WRITE}:
             if self.idempotency_policy is None:
                 raise ValueError("write routes require an explicit retry policy")
@@ -676,6 +675,139 @@ class GovernedRequestContext(_BaseApiContract):
         """Return whether this context is stale."""
         now = now or utc_now()
         return (now - self.generated_at).total_seconds() > self.stale_after_seconds
+
+
+class SimulationRunRequest(_BaseApiContract):
+    """Exact API projection of ``SimulationBacktestRequestV1``."""
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["simulation.backtest_request.v1"] = (
+        "simulation.backtest_request.v1"
+    )
+    request_id: str
+    workflow_id: str
+    correlation_id: str
+    strategy_id: str
+    strategy_version: str
+    strategy_config_ref: str
+    strategy_config_hash: str
+    data_ref: str
+    data_version: str
+    data_hash: str
+    tick_generation_ref: str
+    tick_generation_version: str
+    tick_generation_hash: str
+    execution_profile_ref: str
+    execution_profile_version: str
+    execution_profile_hash: str
+    risk_policy_ref: str
+    risk_policy_version: str
+    risk_policy_hash: str
+    symbol: str
+    timeframe: str
+    start: datetime
+    end: datetime
+    parameters: Mapping[str, object]
+    initial_balance: Decimal
+    account_currency: str
+    asset_class: Literal["FX"]
+    seed: int
+    runtime_profile: Literal["simulation", "fast_research"]
+    execution_route: Literal["sim"]
+    canonical: bool
+    config_hash: str
+
+
+class PortfolioComponentRunRequest(_BaseApiContract):
+    """One exact portfolio component and its canonical backtest request."""
+
+    component_id: str
+    capital_weight: Decimal
+    risk_budget: Decimal
+    risk_decision_id: str
+    metrics_ref: str
+    backtest_request: SimulationRunRequest
+
+
+class PortfolioSimulationRunRequest(_BaseApiContract):
+    """Exact API projection of ``PortfolioBacktestRequestV1``."""
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["simulation.portfolio_backtest_request.v1"] = (
+        "simulation.portfolio_backtest_request.v1"
+    )
+    request_id: str
+    workflow_id: str
+    correlation_id: str
+    portfolio_id: str
+    construction_result_id: str
+    construction_version: str
+    components: tuple[PortfolioComponentRunRequest, ...]
+    measurement_start: datetime
+    measurement_end: datetime
+    base_currency: str
+    fx_evidence_ids: tuple[str, ...]
+    fx_evidence_versions: tuple[str, ...]
+    fx_evidence_hashes: tuple[str, ...]
+    execution_profile_version: str
+    risk_policy_version: str
+    seed: int
+    initial_balance: Decimal
+    runtime_profile: Literal["simulation"]
+    execution_route: Literal["sim"]
+    config_hash: str
+
+
+class TradingMutationRequest(_BaseApiContract):
+    """Exact API projection of one governed Trading request."""
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["trading.trading_request.v1"] = "trading.trading_request.v1"
+    request_id: str
+    workflow_id: str
+    correlation_id: str
+    causation_id: str | None = None
+    route: Literal["paper", "live"]
+    action: str
+    provider_id: str | None = None
+    account_id: str
+    portfolio_id: str | None = None
+    strategy_id: str
+    strategy_version: str
+    intent_id: str
+    symbol: str | None = None
+    side: Literal["BUY", "SELL"] | None = None
+    order_type: Literal["MARKET", "LIMIT", "STOP", "STOP_LIMIT"]
+    quantity_unit: str
+    quantity: Decimal | None = None
+    price: Decimal | None = None
+    stop_price: Decimal | None = None
+    stop_loss: Decimal | None = None
+    take_profit: Decimal | None = None
+    time_in_force: Literal["GTC", "IOC", "FOK", "GTD", "DAY"] | None = None
+    expiration: datetime | None = None
+    target_broker_order_id: str | None = None
+    target_broker_position_id: str | None = None
+    order_id: str | None = None
+    position_id: str | None = None
+    expected_version: int | None = None
+    risk_decision_id: str
+    action_policy_verdict_id: str
+    approval_token_ref: str
+    eligibility_decision_id: str | None = None
+    allocation_decision_id: str | None = None
+    scope_level: Literal["global", "portfolio", "strategy", "symbol"] | None = None
+    control_reason: str | None = None
+    idempotency_key: str
+    canonical_material_version: str
+    system_time: datetime
+    broker_time: datetime | None = None
+    valid_until: datetime
+    instrument_min_quantity: Decimal | None = None
+    instrument_max_quantity: Decimal | None = None
+    instrument_quantity_step: Decimal | None = None
+    instrument_price_tick: Decimal | None = None
+    redaction_applied: Literal[True] = True
 
 
 class PageContext(_BaseApiContract):
@@ -919,11 +1051,15 @@ __all__ = (
     "HealthDependencyCheck",
     "Liveness",
     "PageContext",
+    "PortfolioComponentRunRequest",
+    "PortfolioSimulationRunRequest",
     "Readiness",
     "ResearchRunRequest",
     "RouteContract",
     "RouteSideEffect",
     "RouteStability",
+    "SimulationRunRequest",
     "StreamEvent",
     "StreamEventType",
+    "TradingMutationRequest",
 )

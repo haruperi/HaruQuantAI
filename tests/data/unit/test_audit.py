@@ -249,7 +249,7 @@ def test_persist_audit_uncommitted_transaction_error(
             request_id="req-4248ec040f25c337464d601a23be28bee0a2a9c01d8ff18ccdbc5913176bd0ff",
         )
 
-    monkeypatch.setattr(audit_mod, "_execute_transaction_raw", mock_execute)
+    monkeypatch.setattr(audit_mod, "create_audit_event_record", mock_execute)
 
     event = make_audit_event()
     response = persist_audit_event(event)
@@ -269,7 +269,7 @@ def test_persist_audit_exception_mapping(
     def mock_execute(*args, **kwargs):
         raise ValueError("Mock write database error")
 
-    monkeypatch.setattr(audit_mod, "_execute_transaction_raw", mock_execute)
+    monkeypatch.setattr(audit_mod, "create_audit_event_record", mock_execute)
 
     event = make_audit_event()
     response = persist_audit_event(event)
@@ -289,7 +289,7 @@ def test_query_audit_exception_mapping(
     def mock_execute(*args, **kwargs):
         raise ValueError("Mock query database error")
 
-    monkeypatch.setattr(audit_mod, "_execute_transaction_raw", mock_execute)
+    monkeypatch.setattr(audit_mod, "read_audit_event_records", mock_execute)
 
     auth = make_auth(admin=True)
     query = AuditEventQuery(

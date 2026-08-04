@@ -403,7 +403,9 @@ No experimental, optional, or future callable is exported in the initial package
 > **Workflow usage evidence:** Each completed workflow has one standalone
 > input-to-output program with README-aligned stages. Market-dependent programs read
 > genuine MT5 demo evidence through Data. Run all programs with
-> `python tests/indicators/usage/workflows/run_all.py`. This satisfies
+> `python tests/indicators/usage/workflows/run_all.py`. The pytest execution evidence
+> is deliberately opt-in with `INDICATORS_USAGE_LIVE_MT5=1`; ordinary CI never opens
+> a broker connection. This satisfies
 > `NFR-INDI-011` and complements feature-level usage evidence.
 
 ### Workflow rank values

@@ -2,7 +2,7 @@
 
 from typing import TYPE_CHECKING, Annotated, NoReturn
 
-from fastapi import APIRouter, Cookie, Header, HTTPException, Response, status
+from fastapi import APIRouter, Cookie, Header, HTTPException, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.services.api._settings import get_api_settings
@@ -10,6 +10,7 @@ from app.services.api.identity import (
     IdentityError,
     authenticate_user,
     create_session,
+    recover_session_identity,
     register_user,
     revoke_session,
     validate_csrf,
@@ -155,6 +156,33 @@ def _login(
         "username": user.username,
         "expires_at": session.expires_at,
     }
+
+
+@router.get("/me")
+def _me(request: Request) -> dict[str, object]:
+    """Recover the caller's non-secret identity from server-side session state.
+
+    Returns:
+        Current user identity and exact session expiry.
+
+    Raises:
+        HTTPException: If the session is missing, expired, revoked, or inactive.
+    """
+    request_id = generate_id("req")
+    token = request.cookies.get(_SESSION_COOKIE)
+    authorization = request.headers.get("authorization", "")
+    if token is None and authorization.startswith("Bearer "):
+        token = authorization.removeprefix("Bearer ").strip()
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="AUTHENTICATION_REQUIRED",
+        )
+    try:
+        identity = recover_session_identity(token, request_id=request_id)
+    except IdentityError as error:
+        _raise_identity_http_error(error)
+    return identity.model_dump(mode="json")
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)

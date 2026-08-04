@@ -13,8 +13,10 @@ from urllib.request import Request, urlopen
 from xml.etree import ElementTree as ET
 
 from app.services.data.contracts.errors import DataError
-from app.services.data.persistence.contracts import StatementPlan, TransactionRequest
-from app.services.data.persistence.transactions import _execute_transaction_raw
+from app.services.data.persistence import (
+    create_research_source_record,
+    read_latest_research_source_record,
+)
 from app.services.data.research_sources.contracts import (
     ResearchSourceDocument,
     ResearchSourceIngestRequest,
@@ -26,15 +28,6 @@ from app.utils import canonical_digest, get_logger, utc_now
 logger = get_logger(__name__)
 _TAG = re.compile(r"<[^>]+>")
 _WHITESPACE = re.compile(r"\s+")
-_SELECT_COLUMNS = """
-document_id, source_id, source_kind, document_kind, external_id, title,
-source_url, asset_scope_json, issuer_scope_json, macro_series_scope_json,
-language, event_at, published_at,
-first_seen_at, available_at, retrieved_at, revision, previous_document_id,
-original_hash, normalized_hash, license_id, retention_until, trust_status,
-manipulation_status, injection_status, currency, unit, parser_version,
-record_status, provenance_json
-""".strip()
 
 
 def _normalize(payload: bytes) -> str:
@@ -214,21 +207,10 @@ def ingest_research_source(
     external_id, title, published_at = _source_metadata(payload, request)
     original_hash = hashlib.sha256(payload).hexdigest()
     normalized_hash = hashlib.sha256(normalized.encode()).hexdigest()
-    existing = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    f"""
-                    SELECT {_SELECT_COLUMNS} FROM data_research_sources
-                    WHERE source_id = ? AND external_id = ?
-                    ORDER BY revision DESC LIMIT 1
-                    """.strip(),  # noqa: S608 - columns are a module constant.
-                ),
-                parameter_sets=((request.source_id, external_id),),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
+    existing = read_latest_research_source_record(
+        request.source_id,
+        external_id,
+        request_id=request.request_id,
     )
     if existing.rows and str(existing.rows[0]["normalized_hash"]) == normalized_hash:
         return _row_to_document(dict(existing.rows[0]))
@@ -285,30 +267,9 @@ def ingest_research_source(
         "generic-v1",
         "active",
     )
-    _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    """
-                    INSERT INTO data_research_sources (
-                        document_id, source_id, source_kind, external_id, title,
-                        source_url, asset_scope_json, issuer_scope_json, language,
-                        event_at, published_at, first_seen_at, available_at,
-                        retrieved_at, revision, previous_document_id, original_hash,
-                        normalized_hash, original_content, normalized_text, license_id,
-                        retention_until, trust_status, manipulation_status,
-                        injection_status, currency, unit, provenance_json,
-                        document_kind, macro_series_scope_json, parser_version,
-                        record_status
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                              ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """.strip(),
-                ),
-                parameter_sets=(values,),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
+    create_research_source_record(
+        values,
+        request_id=request.request_id,
     )
     return ResearchSourceDocument(
         document_id=document_id,

@@ -291,7 +291,7 @@ class SqliteSimulationStateStore:
             with closing(self._connect()) as connection, connection:
                 row = connection.execute(
                     "SELECT request_hash, run_id, status, result_payload "
-                    "FROM simulation_runs WHERE request_id = ?",
+                    "FROM sim_runs WHERE request_id = ?",
                     (request_id,),
                 ).fetchone()
             if row is None:
@@ -338,7 +338,7 @@ class SqliteSimulationStateStore:
         try:
             with closing(self._connect()) as connection, connection:
                 existing = connection.execute(
-                    "SELECT request_hash, run_id, status FROM simulation_runs "
+                    "SELECT request_hash, run_id, status FROM sim_runs "
                     "WHERE request_id = ?",
                     (request_id,),
                 ).fetchone()
@@ -348,14 +348,14 @@ class SqliteSimulationStateStore:
                     conflict = True
                 elif existing is None:
                     connection.execute(
-                        "INSERT INTO simulation_runs"
+                        "INSERT INTO sim_runs"
                         "(request_id, request_hash, run_id, status, result_payload) "
                         "VALUES (?, ?, ?, ?, ?)",
                         (request_id, request_hash, run_id, status, serialized),
                     )
                 else:
                     connection.execute(
-                        "UPDATE simulation_runs SET status = ?, result_payload = ? "
+                        "UPDATE sim_runs SET status = ?, result_payload = ? "
                         "WHERE request_id = ?",
                         (status, serialized, request_id),
                     )

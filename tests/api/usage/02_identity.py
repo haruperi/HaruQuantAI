@@ -18,7 +18,9 @@ from app.services.api import (
     create_api_approval,
     create_api_session,
     finalize_api_idempotency_key,
+    get_system_settings,
     get_user_settings,
+    recover_api_session_identity,
     register_api_user,
     require_api_permission,
     reserve_api_idempotency_key,
@@ -26,6 +28,7 @@ from app.services.api import (
     revoke_api_session,
     run_api_migrations,
     store_api_credential,
+    update_system_settings,
     update_user_settings,
     validate_api_csrf,
     validate_api_session,
@@ -51,7 +54,7 @@ def main() -> None:
             user = register_api_user(
                 username="api-usage-user",
                 password="bounded usage password",  # pragma: allowlist secret
-                permissions=("settings:read", "settings:write"),
+                permissions=("settings:admin", "settings:read", "settings:write"),
                 request_id=generate_id("req"),
             )
             user = authenticate_api_user(
@@ -71,6 +74,11 @@ def main() -> None:
                 ).user_id
                 == user.user_id
             )
+            identity = recover_api_session_identity(
+                session.session_token,
+                request_id=generate_id("req"),
+            )
+            assert identity.username == user.username
             validate_api_csrf(
                 session.session_token,
                 session.csrf_token,
@@ -84,6 +92,7 @@ def main() -> None:
                     "permissions": user.permissions,
                     "scopes": user.scopes,
                     "tenant_or_environment": user.tenant_or_environment,
+                    "runtime_profile": user.runtime_profile,
                 },
                 trace={
                     "issued_at": datetime.now(UTC),
@@ -147,6 +156,13 @@ def main() -> None:
                 expected_version=current.version,
                 request_id=generate_id("req"),
             )
+            system_current = get_system_settings(request_id=generate_id("req"))
+            system_updated = update_system_settings(
+                {"theme": "light"},
+                actor_id=user.user_id,
+                expected_version=system_current.version,
+                request_id=generate_id("req"),
+            )
             key = b"u" * 32
             credential = store_api_credential(
                 owner_id=user.user_id,
@@ -175,7 +191,13 @@ def main() -> None:
             )
             assert broker_config.broker_id == "mt5"
             revoke_api_session(session.session_token, request_id=generate_id("req"))
-            print({"user_id": user.user_id, "settings_version": updated.version})
+            print(
+                {
+                    "user_id": user.user_id,
+                    "settings_version": updated.version,
+                    "system_settings_version": system_updated.version,
+                }
+            )
 
 
 if __name__ == "__main__":

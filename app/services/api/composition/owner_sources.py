@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Mapping
 from datetime import timedelta
+from pathlib import Path
 from typing import Any, Protocol, cast
 
 from app.services.analytics import get_analytics_dashboard_snapshot
@@ -15,7 +17,9 @@ from app.services.data import (
     query_audit_events,
     unwrap_data_response,
 )
-from app.services.trading import get_trading_operational_events
+from app.services.risk import get_kill_switch_state, list_risk_decisions
+from app.services.simulator import get_simulation_result
+from app.services.trading import get_trading_operational_events, get_trading_projection
 from app.utils import generate_id, utc_now
 
 type AuthContext = Any
@@ -99,8 +103,73 @@ def read_trading_events(_auth: AuthContext) -> tuple[object, ...]:
     return tuple(get_trading_operational_events())
 
 
+def read_risk_state(
+    operation: str,
+    parameters: Mapping[str, object],
+    _auth: AuthContext,
+) -> object:
+    """Read canonical Risk state through package-root owner functions.
+
+    Returns:
+        Risk-owned state or decision records.
+
+    Raises:
+        ValueError: If the operation is unsupported.
+    """
+    if operation == "kill-switch":
+        return get_kill_switch_state(
+            str(parameters["scope_level"]),
+            parameters["scope"],
+        )
+    if operation == "decisions":
+        limit = parameters["limit"]
+        if not isinstance(limit, int) or isinstance(limit, bool):
+            raise ValueError("Risk decision limit must be an integer")
+        return list_risk_decisions(limit)
+    raise ValueError("unsupported Risk read operation")
+
+
+def read_simulation_result(
+    run_id: str,
+    _auth: AuthContext,
+    *,
+    artifact_root: Path,
+) -> object | None:
+    """Read one completed Simulator-owned result by run ID.
+
+    Args:
+        run_id: Canonical Simulation run identifier.
+        _auth: Validated caller context; authorization occurs in the route.
+        artifact_root: Configured Simulator artifact directory.
+
+    Returns:
+        Canonical completed result or ``None``.
+    """
+    return get_simulation_result(
+        run_id,
+        artifact_root=artifact_root,
+    )
+
+
+def read_trading_session(
+    route: str,
+    tenant_id: str,
+    authority_id: str,
+    _auth: AuthContext,
+) -> object | None:
+    """Read one exact-scope Trading aggregate projection.
+
+    Returns:
+        Trading-owned projection or ``None``.
+    """
+    return get_trading_projection(route, tenant_id, authority_id)
+
+
 __all__ = (
     "read_audit_events",
     "read_dashboard_snapshot",
+    "read_risk_state",
+    "read_simulation_result",
     "read_trading_events",
+    "read_trading_session",
 )

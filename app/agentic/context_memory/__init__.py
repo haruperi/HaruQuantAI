@@ -1,10 +1,6 @@
 """Public `FEAT-AGT-06` evidence context and governed memory API."""
 
 from app.agentic.context_memory.context import assemble_context, get_exclusion_reasons
-from app.agentic.context_memory.migrations import (
-    build_agentic_memory_migration_request,
-    get_agentic_memory_migration_statements,
-)
 from app.agentic.context_memory.models import (
     ContextBundle,
     EvidenceClaim,
@@ -19,6 +15,10 @@ from app.agentic.context_memory.repository import (
     build_in_memory_memory_store,
     retrieve_memory,
     store_memory,
+)
+from app.agentic.migrations.memory import (
+    build_agentic_memory_migration_request,
+    get_agentic_memory_migration_statements,
 )
 
 __all__: tuple[str, ...] = (

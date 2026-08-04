@@ -321,15 +321,19 @@ def fr_data_020_021() -> None:
         "Stage 7: Backup, Restore & Retention - Persistence Backup & Retention (FR-DATA-020, FR-DATA-021)"
     )
     backup_target = build_backup_target(
-        relative_path=Path("data/cache/persistence.sqlite3"),
+        relative_path=Path("data/raw/AAPL_M1.csv"),
         schema_version="v1",
         normalization_version="v1",
     )
-    backup_res = create_backup(backup_target)
+    backup_res = create_backup((backup_target,))
     print(_format_result(backup_res))
+    if backup_res.status != "success" or backup_res.data is None:
+        raise RuntimeError("backup usage did not produce a manifest")
 
-    restore_res = restore_from_backup(backup_target)
+    restore_res = restore_from_backup(backup_res.data.manifest_id)
     print(_format_result(restore_res))
+    if restore_res.status != "success":
+        raise RuntimeError("restore usage did not complete")
 
     retention_res = enforce_retention_policy(
         "AAPL_M1.csv", max_age_days=30, dry_run=True

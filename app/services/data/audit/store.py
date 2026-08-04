@@ -16,7 +16,7 @@ it does not import this module, so the two halves stay independently testable.
 from __future__ import annotations
 
 import json
-from typing import Any, Final
+from typing import Any
 
 from app.services.data.audit.contracts import (
     AuditPersistenceResult,
@@ -27,21 +27,10 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
-from app.services.data.persistence.contracts import (
-    StatementPlan,
-    TransactionRequest,
-)
-from app.services.data.persistence.transactions import _execute_transaction_raw
+from app.services.data.persistence import create_audit_event_record
 from app.utils import get_logger
 
 logger = get_logger(__name__)
-
-_INSERT_AUDIT_EVENT: Final = """
-INSERT OR IGNORE INTO data_audit_events (
-    event_id, timestamp, domain, action, principal_id,
-    request_id, correlation_id, causation_id, payload_json
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-""".strip()
 
 
 def _raise_write_failed(event_id: str, request_id: str) -> None:
@@ -83,16 +72,7 @@ def _persist_audit_event_raw(event: Any) -> AuditPersistenceResult:
             payload_json,
         )
 
-        tx_request = TransactionRequest(
-            plan=StatementPlan(
-                statements=(_INSERT_AUDIT_EVENT,),
-                parameter_sets=(params,),
-                max_rows=1,
-            ),
-            request_id=event.request_id,
-        )
-
-        result = _execute_transaction_raw(tx_request)
+        result = create_audit_event_record(params, request_id=event.request_id)
         if not result.committed:
             _raise_write_failed(event.event_id, event.request_id)
 

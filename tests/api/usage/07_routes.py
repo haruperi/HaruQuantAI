@@ -21,10 +21,12 @@ def main() -> None:
     contracts = get_canonical_route_contract_registry()
     declarations = {(item.method, item.path) for item in contracts.all()}
     assert operations == declarations
-    assert len(operations) == 21
+    assert len(operations) == 32
+    assert ("POST", "/api/v1/simulation/run") in operations
+    assert ("GET", "/api/v1/risk/kill-switch") in operations
+    assert ("GET", "/api/v1/trading/session") in operations
     assert not any("/simulation/sessions" in path for _, path in operations)
     assert not any("/backtest/" in path for _, path in operations)
-    assert not any("/risk/" in path for _, path in operations)
     assert not any("/live/" in path for _, path in operations)
     assert not any("/optimization/" in path for _, path in operations)
     assert not any("/portfolio/" in path for _, path in operations)

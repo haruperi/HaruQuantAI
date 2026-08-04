@@ -1,7 +1,7 @@
 """Authenticated versioned user-settings HTTP routes."""
 
 from collections.abc import Mapping
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from pydantic import BaseModel, ConfigDict, Field
@@ -9,10 +9,12 @@ from pydantic import BaseModel, ConfigDict, Field
 from app.services.api.identity import (
     IdentityError,
     finalize_idempotency_key,
+    get_system_settings,
     get_user_settings,
     require_auth_context,
     require_permission,
     reserve_idempotency_key,
+    update_system_settings,
     update_user_settings,
 )
 from app.utils import canonical_json, generate_id
@@ -29,13 +31,15 @@ class _SettingsUpdate(BaseModel):
 
     settings: Mapping[str, str]
     expected_version: int = Field(ge=0)
+    scope: Literal["system", "user"] = "user"
 
 
 @router.get("")
 def _get_settings(
     context: Annotated[AuthContext, Depends(require_auth_context)],
+    scope: Literal["system", "user"] = "user",
 ) -> object:
-    """Read the authenticated user's settings.
+    """Read authenticated user or authorized global system settings.
 
     Returns:
         Current versioned settings record.
@@ -43,6 +47,9 @@ def _get_settings(
     Raises:
         IdentityError: If the caller lacks settings read permission.
     """
+    if scope == "system":
+        require_permission(context, "settings:admin")
+        return get_system_settings(request_id=generate_id("req"))
     require_permission(context, "settings:read")
     return get_user_settings(context.principal_id, request_id=generate_id("req"))
 
@@ -61,7 +68,8 @@ def _put_settings(
     Raises:
         HTTPException: If idempotency or optimistic version validation fails.
     """
-    require_permission(context, "settings:write")
+    permission = "settings:admin" if body.scope == "system" else "settings:write"
+    require_permission(context, permission)
     if idempotency_key is None:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
@@ -78,13 +86,23 @@ def _put_settings(
             request_id=request_id,
         )
         if decision.state == "replay":
+            if body.scope == "system":
+                return get_system_settings(request_id=request_id)
             return get_user_settings(context.principal_id, request_id=request_id)
-        updated = update_user_settings(
-            context.principal_id,
-            body.settings,
-            expected_version=body.expected_version,
-            request_id=request_id,
-        )
+        if body.scope == "system":
+            updated = update_system_settings(
+                body.settings,
+                actor_id=context.principal_id,
+                expected_version=body.expected_version,
+                request_id=request_id,
+            )
+        else:
+            updated = update_user_settings(
+                context.principal_id,
+                body.settings,
+                expected_version=body.expected_version,
+                request_id=request_id,
+            )
         finalize_idempotency_key(
             principal_id=context.principal_id,
             method="PUT",

@@ -1,8 +1,13 @@
 """Standalone usage evidence for FEAT-DATA-17 runtime persistence."""
 
+from __future__ import annotations
+
 import json
+import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
     build_agentic_runtime_store,

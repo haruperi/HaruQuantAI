@@ -239,6 +239,7 @@ def execute_simulation_state_store_operation(
         "append_journal",
         "finalize_journal",
         "flush_journal",
+        "load_result",
         "load_run",
         "record_idempotency",
     }
@@ -247,6 +248,20 @@ def execute_simulation_state_store_operation(
     if operation not in allowed:
         raise ValueError("unsupported Simulation state-store operation")
     return getattr(store, operation)(*args, **kwargs)
+
+
+def get_simulation_result(run_id: str, **values: object) -> object | None:
+    """Read one validated completed Simulation result by run ID.
+
+    Args:
+        run_id: Canonical Simulation run identifier.
+        **values: State-store construction values, including ``artifact_root``.
+
+    Returns:
+        Canonical result or ``None`` when the run is unknown or incomplete.
+    """
+    store = build_simulation_state_store(**values)
+    return execute_simulation_state_store_operation(store, "load_result", run_id)
 
 
 def create_simulation_handle(
@@ -697,6 +712,7 @@ __all__ = (
     "get_same_tick_priority",
     "get_simulation_error_catalog",
     "get_simulation_migrations",
+    "get_simulation_result",
     "get_simulation_value_field",
     "get_simulation_value_fields",
     "get_supported_asset_classes",

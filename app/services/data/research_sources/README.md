@@ -5,6 +5,10 @@ responses, normalizes provider-specific metadata and structured values, persists
 immutable document and observation revisions, applies source-use policy, and
 returns point-in-time bounded projections.
 
+All document, observation, verified-manifest, and point-in-time query CRUD delegates
+to `app.services.data.persistence`; this module retains policy, normalization,
+eligibility, and evidence construction.
+
 The Data package root is the only public boundary. Files in this folder and their
 classes, constants, and parser functions are internal. Cross-domain consumers use
 the standalone functions exported by `app.services.data`.

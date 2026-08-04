@@ -13,11 +13,20 @@ from typing import Any
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.data import (
+    build_data_settings,
+    build_migration_request,
+    data_settings_context,
+    run_domain_migrations,
+    unwrap_data_response,
+)
 from app.services.simulator import (
+    build_simulation_state_store,
+    execute_simulation_state_store_operation,
     get_simulation_migrations,
     unwrap_simulation_response,
 )
-from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
+from app.utils import canonical_json, generate_id
 
 
 def _feature_header(title: str) -> None:
@@ -46,6 +55,41 @@ def _format_result(obj: Any) -> str:
     return f"Output Result -> {type_name} : {type_name}"
 
 
+def _settings(data_dir: Path) -> object:
+    """Build isolated Data settings for this executable example."""
+    return build_data_settings(
+        database_url="sqlite:///simulator-usage.db",
+        data_dir=data_dir,
+        sqlite_busy_timeout_seconds=1.0,
+        write_lock_lease_seconds=10.0,
+        approved_storage_roots=(Path(),),
+    )
+
+
+def _run_migrations() -> None:
+    """Apply Simulator's immutable manifest through Data's public boundary."""
+    request_id = generate_id("req")
+    unwrap_data_response(
+        run_domain_migrations(
+            build_migration_request(
+                domain="simulator",
+                steps=get_simulation_migrations(),
+                request_id=request_id,
+            )
+        ),
+        operation="simulator.usage.migrations",
+        request_id=request_id,
+    )
+
+
+def _execute(store: object, operation: str, *args: object) -> object:
+    """Execute and unwrap one public Simulator state operation."""
+    return unwrap_simulation_response(
+        execute_simulation_state_store_operation(store, operation, *args),
+        operation=f"simulator.usage.{operation}",
+    )
+
+
 def fr_sim_041() -> None:
     """
     FR-SIM-041: Stage 3 — Depend on state persistence protocol and expose domain migrations.
@@ -57,24 +101,98 @@ def fr_sim_041() -> None:
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)
-        store = SqliteSimulationStateStore(
-            tmp_path / "simulation.db", tmp_path / "artifacts"
-        )
-        store.record_idempotency("req-usage", "a" * 64, "run-usage", "started")
-        run_info = store.load_run("req-usage")
-        print(_format_result(run_info))
-        print(
-            f"Data -> run_id='{run_info.get('run_id') if isinstance(run_info, dict) else None}'"
-        )
+        with data_settings_context(_settings(tmp_path)):
+            _run_migrations()
+            request_id = generate_id("req")
+            store = build_simulation_state_store(artifact_root=tmp_path / "artifacts")
+            _execute(
+                store,
+                "record_idempotency",
+                request_id,
+                "a" * 64,
+                "run-usage",
+                "started",
+            )
+            run_info = _execute(store, "load_run", request_id)
+            print(_format_result(run_info))
+            print(f"Data -> run_id='{run_info['run_id']}'")
 
-    resp = get_simulation_migrations()
-    migrations = unwrap_simulation_response(
-        resp, operation="usage.state.get_simulation_migrations"
-    )
-    print(_format_result(resp))
-    print(
-        f"Data -> migration_step_count={len(migrations if isinstance(migrations, tuple) else ())}"
-    )
+    migrations = get_simulation_migrations()
+    print(_format_result(migrations))
+    print(f"Data -> migration_step_count={len(migrations)}")
+
+
+def fr_sim_094() -> None:
+    """FR-SIM-094: Persist lifecycle state directly in `sim_runs`."""
+    _header("Direct Relational Run Persistence (FR-SIM-094)")
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_path = Path(tmp_dir)
+        with data_settings_context(_settings(tmp_path)):
+            _run_migrations()
+            request_id = generate_id("req")
+            store = build_simulation_state_store(artifact_root=tmp_path / "artifacts")
+            _execute(
+                store,
+                "record_idempotency",
+                request_id,
+                "b" * 64,
+                "run-relational",
+                "started",
+            )
+            reconstructed = build_simulation_state_store(
+                artifact_root=tmp_path / "artifacts"
+            )
+            row = _execute(reconstructed, "load_run", request_id)
+            print(_format_result(row))
+            print("Data -> persisted_table='sim_runs'")
+
+
+def fr_sim_095() -> None:
+    """FR-SIM-095: Enforce identity-bound lifecycle transitions."""
+    _header("Idempotent Lifecycle Compare-and-Swap (FR-SIM-095)")
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_path = Path(tmp_dir)
+        with data_settings_context(_settings(tmp_path)):
+            _run_migrations()
+            request_id = generate_id("req")
+            store = build_simulation_state_store(artifact_root=tmp_path / "artifacts")
+            arguments = (request_id, "c" * 64, "run-cas", "started")
+            _execute(store, "record_idempotency", *arguments)
+            _execute(store, "record_idempotency", *arguments)
+            _execute(
+                store,
+                "record_idempotency",
+                request_id,
+                "c" * 64,
+                "run-cas",
+                "failed",
+            )
+            row = _execute(store, "load_run", request_id)
+            print(_format_result(row))
+            print(f"Data -> replayed=True, terminal_status='{row['status']}'")
+
+
+def fr_sim_096() -> None:
+    """FR-SIM-096: Publish durable journals as canonical JSONL."""
+    _header("Partial JSONL Group Commit and Atomic Publication (FR-SIM-096)")
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        artifact_root = Path(tmp_dir) / "artifacts"
+        store = build_simulation_state_store(artifact_root=artifact_root)
+        first = canonical_json({"sequence": 0, "event_hash": "d" * 64})
+        second = canonical_json({"sequence": 1, "event_hash": "e" * 64})
+        _execute(store, "append_journal", "run-jsonl", first)
+        reconstructed = build_simulation_state_store(artifact_root=artifact_root)
+        _execute(reconstructed, "append_journal", "run-jsonl", second)
+        _execute(reconstructed, "flush_journal", "run-jsonl")
+        checksum = _execute(
+            reconstructed,
+            "finalize_journal",
+            "run-jsonl",
+            2,
+            "e" * 64,
+        )
+        print(_format_result(checksum))
+        print("Data -> artifact='journal.jsonl', partial_exists=False")
 
 
 def main() -> None:
@@ -90,6 +208,15 @@ def main() -> None:
 
     # Stage 3: State protocol & Migrations
     fr_sim_041()
+
+    # Stage 4: Direct relational persistence
+    fr_sim_094()
+
+    # Stage 5: Identity-bound lifecycle CAS
+    fr_sim_095()
+
+    # Stage 6: Durable JSONL journal publication
+    fr_sim_096()
 
 
 if __name__ == "__main__":

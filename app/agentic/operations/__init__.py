@@ -1,6 +1,6 @@
 """Public `FEAT-AGT-21` Observability, Incidents, and Operational Control API."""
 
-from app.agentic.operations.migrations import (
+from app.agentic.migrations.operations import (
     build_operations_migration_request,
     get_operations_migration_statements,
 )

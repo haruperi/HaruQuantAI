@@ -35,11 +35,20 @@ from app.services.data.data_jobs.contracts import (
     JobStatusRequest,
     ScheduleJobRequest,
 )
-from app.services.data.persistence.contracts import (
-    StatementPlan,
-    TransactionRequest,
+from app.services.data.persistence import (
+    create_update_job_record,
+    read_latest_backfill_end,
+    read_update_job_definition_record,
+    read_update_job_enabled,
+    read_update_job_identity,
+    read_update_job_start_state,
+    read_update_job_status_record,
+    update_job_run_failure,
+    update_job_run_lease,
+    update_job_run_success,
+    update_job_start,
+    update_job_stop,
 )
-from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.services.data.sources.policy import _evaluate_source_policy_raw
 from app.utils import generate_id, get_logger, utc_now
 
@@ -131,16 +140,9 @@ def _handle_create(request: ScheduleJobRequest) -> None:
     _evaluate_source_policy_raw(dummy_req)
 
     # 3. Check if job already exists
-    check_sql = "SELECT job_id FROM data_update_jobs WHERE job_id = ?"
-    exists_res = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(check_sql,),
-                parameter_sets=((request.job_id,),),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
+    exists_res = read_update_job_identity(
+        request.job_id,
+        request_id=request.request_id,
     )
     if exists_res.rows:
         raise DataError(
@@ -150,13 +152,6 @@ def _handle_create(request: ScheduleJobRequest) -> None:
         )
 
     # 4. Insert definition into SQLite
-    insert_sql = (
-        "INSERT INTO data_update_jobs ("
-        "    job_id, source_id, symbols_json, timeframes_json, data_kinds_json, "
-        "    start, end, interval_seconds, enabled, created_at, request_id, "
-        "    state, recovery_state"
-        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'created', 'clean')"
-    )
     start_str = definition.start.astimezone(UTC).isoformat().replace("+00:00", "Z")
     end_str = (
         definition.end.astimezone(UTC).isoformat().replace("+00:00", "Z")
@@ -167,29 +162,21 @@ def _handle_create(request: ScheduleJobRequest) -> None:
         definition.created_at.astimezone(UTC).isoformat().replace("+00:00", "Z")
     )
 
-    _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(insert_sql,),
-                parameter_sets=(
-                    (
-                        request.job_id,
-                        definition.source_id,
-                        json.dumps(definition.symbols),
-                        json.dumps(definition.timeframes),
-                        json.dumps(definition.data_kinds),
-                        start_str,
-                        end_str,
-                        definition.interval_seconds,
-                        1 if definition.enabled else 0,
-                        created_str,
-                        request.request_id,
-                    ),
-                ),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
+    create_update_job_record(
+        (
+            request.job_id,
+            definition.source_id,
+            json.dumps(definition.symbols),
+            json.dumps(definition.timeframes),
+            json.dumps(definition.data_kinds),
+            start_str,
+            end_str,
+            definition.interval_seconds,
+            1 if definition.enabled else 0,
+            created_str,
+            request.request_id,
+        ),
+        request_id=request.request_id,
     )
 
     # Start background loop if enabled
@@ -200,19 +187,9 @@ def _handle_create(request: ScheduleJobRequest) -> None:
 def _handle_start(request: ScheduleJobRequest, clock: Any | None = None) -> None:
     """Handle starting an update job."""
     logger.debug("Running DATA function: _handle_start")
-    query_sql = (
-        "SELECT job_id, interval_seconds, state, lease_owner, lease_expires_at "
-        "FROM data_update_jobs WHERE job_id = ?"
-    )
-    job_res = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(query_sql,),
-                parameter_sets=((request.job_id,),),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
+    job_res = read_update_job_start_state(
+        request.job_id,
+        request_id=request.request_id,
     )
     if not job_res.rows:
         raise DataError(
@@ -237,19 +214,7 @@ def _handle_start(request: ScheduleJobRequest, clock: Any | None = None) -> None
         )
 
     # Update enabled state
-    update_sql = (
-        "UPDATE data_update_jobs SET enabled = 1, state = 'created' WHERE job_id = ?"
-    )
-    _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(update_sql,),
-                parameter_sets=((request.job_id,),),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
-    )
+    update_job_start(request.job_id, request_id=request.request_id)
 
     # Start loop
     interval = row["interval_seconds"]
@@ -260,16 +225,9 @@ def _handle_start(request: ScheduleJobRequest, clock: Any | None = None) -> None
 def _handle_stop(request: ScheduleJobRequest) -> None:
     """Handle stopping an update job."""
     logger.debug("Running DATA function: _handle_stop")
-    query_sql = "SELECT job_id FROM data_update_jobs WHERE job_id = ?"
-    job_res = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(query_sql,),
-                parameter_sets=((request.job_id,),),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
+    job_res = read_update_job_identity(
+        request.job_id,
+        request_id=request.request_id,
     )
     if not job_res.rows:
         raise DataError(
@@ -282,24 +240,7 @@ def _handle_stop(request: ScheduleJobRequest) -> None:
     _stop_background_loop(request.job_id)
 
     # Update to stopped
-    update_sql = (
-        "UPDATE data_update_jobs "
-        "SET enabled = 0, "
-        "    state = 'stopped', "
-        "    lease_owner = NULL, "
-        "    lease_expires_at = NULL "
-        "WHERE job_id = ?"
-    )
-    _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(update_sql,),
-                parameter_sets=((request.job_id,),),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
-    )
+    update_job_stop(request.job_id, request_id=request.request_id)
 
 
 def schedule_update_job(
@@ -357,20 +298,9 @@ def read_update_job_status(
     """
     logger.info("Reading status for update job %s", request.job_id)
 
-    query_sql = (
-        "SELECT job_id, state, enabled, last_run_status, last_checkpoint, "
-        "last_error, next_run_at, lease_owner, lease_expires_at, recovery_state "
-        "FROM data_update_jobs WHERE job_id = ?"
-    )
-    res = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(query_sql,),
-                parameter_sets=((request.job_id,),),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
+    res = read_update_job_status_record(
+        request.job_id,
+        request_id=request.request_id,
     )
 
     if not res.rows:
@@ -411,21 +341,7 @@ def _acquire_job_run_lease(
 ) -> dict[str, object]:
     """Verify job execution permissions and acquire the lease in SQLite."""
     logger.debug("Running DATA function: _acquire_job_run_lease")
-    query_sql = (
-        "SELECT job_id, source_id, symbols_json, timeframes_json, data_kinds_json, "
-        "start, end, interval_seconds, enabled, state, lease_owner, lease_expires_at "
-        "FROM data_update_jobs WHERE job_id = ?"
-    )
-    res = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(query_sql,),
-                parameter_sets=((job_id,),),
-                max_rows=1,
-            ),
-            request_id=request_id,
-        )
-    )
+    res = read_update_job_definition_record(job_id, request_id=request_id)
     if not res.rows:
         raise DataError(
             "JOB_NOT_FOUND",
@@ -458,20 +374,9 @@ def _acquire_job_run_lease(
     # Acquire/update lease
     lease_expires = started_at + timedelta(seconds=JOB_LEASE_TIMEOUT_SECONDS)
     lease_expires_str = lease_expires.isoformat().replace("+00:00", "Z")
-    update_lease_sql = (
-        "UPDATE data_update_jobs "
-        "SET state = 'running', lease_owner = ?, lease_expires_at = ? "
-        "WHERE job_id = ?"
-    )
-    _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(update_lease_sql,),
-                parameter_sets=((request_id, lease_expires_str, job_id),),
-                max_rows=1,
-            ),
-            request_id=request_id,
-        )
+    update_job_run_lease(
+        (request_id, lease_expires_str, job_id),
+        request_id=request_id,
     )
     return dict(row)
 
@@ -488,20 +393,7 @@ def _determine_run_range(
     job_end = datetime.fromisoformat(str(row["end"])) if row["end"] else None
 
     # Determine start timestamp from last committed checkpoint
-    query_max_committed = (
-        "SELECT MAX(committed_end) as max_end "
-        "FROM data_backfill_checkpoints WHERE job_id = ?"
-    )
-    chk_res = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(query_max_committed,),
-                parameter_sets=((job_id,),),
-                max_rows=1,
-            ),
-            request_id=request_id,
-        )
-    )
+    chk_res = read_latest_backfill_end(job_id, request_id=request_id)
     start_time = job_start
     if chk_res.rows and chk_res.rows[0]["max_end"]:
         max_end_str = str(chk_res.rows[0]["max_end"])
@@ -603,26 +495,11 @@ def run_data_update_job_once(
             next_run = finished_at + timedelta(seconds=int(str(interval_val)))
             next_run_str = next_run.isoformat().replace("+00:00", "Z")
 
-        update_success_sql = (
-            "UPDATE data_update_jobs "
-            "SET state = 'stopped', "
-            "    last_run_status = 'succeeded', "
-            "    last_checkpoint = ?, "
-            "    last_error = NULL, "
-            "    next_run_at = ?, "
-            "    lease_owner = NULL, "
-            "    lease_expires_at = NULL "
-            "WHERE job_id = ?"
-        )
-        _execute_transaction_raw(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(update_success_sql,),
-                    parameter_sets=((last_chk, next_run_str, job_id),),
-                    max_rows=1,
-                ),
-                request_id=request_id,
-            )
+        update_job_run_success(
+            last_chk,
+            next_run_str,
+            job_id,
+            request_id=request_id,
         )
 
         return JobRunResult(
@@ -642,24 +519,10 @@ def run_data_update_job_once(
         finished_at = utc_now(clock)
         err_code = error.code if isinstance(error, DataError) else "SCHEDULER_ERROR"
 
-        update_fail_sql = (
-            "UPDATE data_update_jobs "
-            "SET state = 'failed', "
-            "    last_run_status = 'failed', "
-            "    last_error = ?, "
-            "    lease_owner = NULL, "
-            "    lease_expires_at = NULL "
-            "WHERE job_id = ?"
-        )
-        _execute_transaction_raw(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(update_fail_sql,),
-                    parameter_sets=((err_code, job_id),),
-                    max_rows=1,
-                ),
-                request_id=request_id,
-            )
+        update_job_run_failure(
+            err_code,
+            job_id,
+            request_id=request_id,
         )
 
         return JobRunResult(
@@ -689,16 +552,9 @@ def _start_background_loop(job_id: str, interval_seconds: int) -> None:
             while True:
                 await asyncio.sleep(interval_seconds)
                 # Check if job is still enabled
-                query_sql = "SELECT enabled FROM data_update_jobs WHERE job_id = ?"
-                chk = _execute_transaction_raw(
-                    TransactionRequest(
-                        plan=StatementPlan(
-                            statements=(query_sql,),
-                            parameter_sets=((job_id,),),
-                            max_rows=1,
-                        ),
-                        request_id=generate_id("req"),
-                    )
+                chk = read_update_job_enabled(
+                    job_id,
+                    request_id=generate_id("req"),
                 )
                 if not chk.rows or not bool(chk.rows[0]["enabled"]):
                     logger.info("Job %s disabled, exiting background loop", job_id)

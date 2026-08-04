@@ -28,7 +28,7 @@
 * Tooling configured: `ruff` (full rule set), `mypy`, `pytest`, `pre-commit` (hygiene checks, ruff, ruff-format, detect-secrets, mypy).
 * Code present: `app/` package with implemented service modules under `app/services/`, including Trading as the surviving live-route runtime and broker-dispatch owner.
 * The retired Live service has been folded into `app/services/trading/`; live execution remains a runtime route/mode, not a standalone service package.
-* `app/services/api/README.md` defines the approved gateway/UI boundary and state ownership. Backend v1 has 21 registered owner-backed operations, a deterministic OpenAPI digest, and a validated three-source in-process composition graph. Unsupported Simulation, Risk, Trading mutation, Optimization, Portfolio, and Agentic HTTP families are explicitly absent, and no `ui/` application package has landed yet.
+* `app/services/api/README.md` defines the approved gateway/UI boundary and state ownership. Backend v1 has 23 registered owner-backed operations, including server-side session identity recovery and an authenticated SSE bridge over Data-owned MT5 streams, plus a deterministic OpenAPI digest and validated in-process composition graph. Unsupported Simulation, Risk, Trading mutation, Optimization, Portfolio, and Agentic HTTP families are explicitly absent.
 * Portfolio is implemented and `Completed`: `app.services.portfolio` is its sole
   public boundary, exposes standalone functions only, and coordinates genuine
   Data/Simulation evidence while keeping Risk approval and Trading execution in
@@ -266,8 +266,9 @@
   sixteen approved capabilities: `contracts/`, `market_data/`,
   `local_datasets/`, `synthetic_data/`, `tick_derivation/`, `persistence/`,
   `quality/`, `transformation/`, `time_sessions/`, `sources/`,
-  `economic_calendar/`, `realtime_feeds/`, `data_jobs/`, `evidence/`, `audit/`, and
-  `research_sources/`. Exactly sixteen numbered standalone usage programs cover
+  `economic_calendar/`, `realtime_feeds/`, `data_jobs/`, `evidence/`, `audit/`,
+  `research_sources/`, and the private `runtime_stores/` support directory. Exactly
+  seventeen numbered standalone usage programs cover
   those owners, and removed
   horizontal packages have no compatibility shims. The correction changes ownership
   and file focus only; active requirements, public behaviour, contract versions,
@@ -318,7 +319,7 @@
 
 ### Workspace Directory Layout (Target)
 
-* `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, API composition, and channel-neutral critical operational alert delivery. Backend v1 exposes exactly 21 owner-backed operations and composes dashboard, audit-event, and Trading operational-event sources in-process. Simulation, Risk, Trading mutation, Optimization, Portfolio, and Agentic HTTP families remain excluded until exact public owner/runtime contracts exist. UI/API owns user/session/settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration.
+* `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, API composition, and channel-neutral critical operational alert delivery. Backend v1 exposes exactly 23 owner-backed operations and composes dashboard, audit-event, Trading operational-event, and Data market-stream sources in-process. The stream route owns authentication, quota admission, SSE framing, and cleanup only; Data owns stream acquisition and cadence. Simulation, Risk, Trading mutation, Optimization, Portfolio, and Agentic HTTP families remain excluded until exact public owner/runtime contracts exist. UI/API owns user/session/unified user-and-system settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration.
 * `app/agentic/`: Approved top-level orchestration domain with one focused owning module per registered feature. Ten shared infrastructure features remain root packages for portable contracts/governance, Google ADK adaptation, durable orchestration, permissions, context/memory, bounded deliberation, lifecycle, operations, and public API. Twelve role-bearing feature modules are leaf packages under the namespace-only `agents/<department>/<agent_name>/` hierarchy; each owns `agent.py`, `prompt.md`, schemas, README, and only its declared optional files. Agentic submits untrusted typed requests only and has no direct execution path.
 * `app/`: Core domain modules (utils, brokers, data, indicators, strategy, risk, trading, simulator, analytics, optimization, research, portfolio, agentic, and API). Live-route execution is owned by Trading.
 * `data/`: SQLite databases, migration tracking, cache/log dumps, market/research assets.
@@ -418,6 +419,27 @@ checksum, lock, transaction, retention, and recovery rules.
 3. **Function-Only Public Surface**: Public APIs expose only standalone functions (`def func(...)`). Classes and constants remain internal:
    - Constants are accessed via public getter functions (`get_...()`).
    - Classes are encapsulated internally; public functions delegate to internal class methods (`_func()`).
+
+### Domain Persistence Layout
+
+Data owns shared database connection, bounded transaction, locking, migration-ledger,
+backup, and recovery infrastructure. Each persistent domain owns the meaning of its
+records and keeps CRUD statement construction in one private
+`app/services/[DOMAIN]/persistence/` support package containing exactly
+`__init__.py`, `create.py`, `read.py`, `update.py`, and `delete.py`. Atomic
+multi-statement operations are classified by domain effect and remain in one CRUD
+module. Unsupported verbs retain an empty module, while immutable schema definitions
+remain in the domain's separate `migrations/` support package. Domain feature modules
+retain authorization, validation, policy, orchestration, domain-model construction,
+and public response behavior and call persistence only through the private package
+boundary. Cross-domain persistence infrastructure is consumed only through
+`app.services.data`; no domain opens SQLite connections or imports Data internals.
+The infrastructure-owning `app/services/data/persistence/` package keeps the same
+`create.py`, `read.py`, `update.py`, and `delete.py` CRUD naming convention, but is
+exempt from the five-file limit because it also owns transactions, locks, migrations,
+backups, recovery, approved paths, datasets, and cache orchestration. Data feature
+modules construct domain intent only; all SQL record operations terminate at this
+private persistence boundary.
 
 ---
 
@@ -533,6 +555,12 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
   `app.services.data.evidence`; canonical/friendly identity, provider-symbol mapping,
   and source readiness/licence/promotion policy belong in
   `app.services.data.sources`.
+- Real-time market acquisition and subscription semantics belong in
+  `app.services.data.realtime_feeds`. MT5 tick mode polls the verified Brokers
+  tick-copy read without timeframe throttling; bar mode emits genuine closed bars at
+  the selected canonical UTC boundary. Shared sequencing, heartbeat, bounded replay,
+  explicit gap/backpressure failure, and producer cleanup remain Data behavior. The
+  UI/API route is only an authenticated SSE transport bridge.
 - `MarketDataRequest.limit` is required to be positive, but OHLCV retrieval has no
   app-wide record-count ceiling. Tick and spread retrieval retain their governed
   limits; multi-million-record OHLCV ingestion remains the responsibility of the
@@ -629,8 +657,12 @@ Portfolio collaboration is contract-governed:
 
 * **Data Layout Conventions**: Core cross-module database tracking identifiers must use `TEXT` format. SQLite boolean fields enforce strict `0` or `1` constraints. JSON text structures map to an explicit `*_json` suffix name.
 * **Precision Standard**: Structural or broker-critical price, size, volume, and balance mathematics must bypass standard floating-point operations. Requires `decimal.Decimal` parsing to ensure transaction immutability.
-* **Table Namespace Prefixes**: Each persistent domain uses an owner-specific namespace (for example `data_`, `api_`, `strategy_`, `risk_`, `trading_`, `sim_`, `optimization_`, `research_`, `portfolio_`, and `audit_`). Exact table names belong only in the owning domain README/migrations.
+* **Authoritative Schema Model**: [`docs/schema/`](schema/README.md) is the authoritative cross-domain database schema model. It is canonical for storage tiers, the target table and column model across all 14 domains, prefix ownership, universal column conventions, indexing and Parquet policy, and the reconciliation record between target and live schema. It is not canonical for current-state feature registries (owning package `README.md`) or executable schema (owning domain migration definitions), and it authorises no migration.
+* **Table Namespace Prefixes**: Each persistent domain uses an owner-specific singular-full-word namespace: `util_`, `broker_`, `data_`, `indicator_`, `strategy_`, `risk_`, `trading_`, `sim_`, `analytics_`, `optimization_`, `research_`, `portfolio_`, `agentic_`, and `api_`. `sim_` is canonical for Simulator; the `simulation_` form in code predates this rule and is unapplied. The target namespace set is defined in `docs/schema/`; exact current table names belong only in the owning domain README/migrations.
+* **Target vs Current Divergence**: A new table must conform to the schema model. An existing table that diverges is a documented state recorded in `docs/schema/05_reconciliation.md` with an adoption tier, not a defect to be silently migrated away. Closing a divergence requires an additive migration or an explicit baseline reset approval.
 * **Migration Invariance**: Database tracking updates via additive structure migrations. Modifying applied structural migrations is prohibited without an explicit baseline reset approval.
+* **Migration Definition Location**: Immutable schema definitions live in `app/services/<domain>/migrations/` — one migration package per domain, aggregating that domain's schema. Migrations are schema evolution, not CRUD, and remain outside the domain `persistence/` package. Sites that predate this rule are non-conformant. Relocation is an import-path refactor, not a ledger risk: a step checksum is computed over its ordered SQL statements only, and the ledger keys on `(domain, migration_id)`, so neither module path nor file name is an input. The invariants a move must preserve are the statement tuple byte-for-byte, including whitespace, and the literal `domain` and `migration_id` values.
+* **Normalise vs Payload**: A field becomes a typed column only when it is filtered or joined on, enforceable by a `CHECK` constraint, or part of a unique key. Everything else is carried in a single `*_json` payload validated by `json_valid`, with frequently queried inner keys exposed as indexed generated columns rather than promoted to real columns. This keeps constraint enforcement where it earns its cost while allowing payload evolution without an additive migration.
 
 ---
 
@@ -711,7 +743,7 @@ domain and not an execution-control authority:
 | **System Persistence** | `DATABASE_URL`, `DATA_DIR`, `ARTIFACT_DIR`, `DATA_CACHE_PATH` |
 | **Operational Protection** | `ALLOW_LIVE_MUTATIONS` (defaults to `false`), `RUNTIME_PROFILE`, `EXECUTION_ROUTE` |
 | **Structured Logging** | `LOG_LEVEL`, `LOG_RENDER` |
-| **Settings Loading** | Repository `app/configs/env.json` and process overrides are read only by typed classes inheriting `app.utils.AppSettings`; ordinary modules consume settings objects. |
+| **Settings Loading** | Repository `app/configs/env.json` and process overrides bootstrap typed settings through `app.utils.AppSettings`, including values required before SQLite can open. After connection, UI/API's `api_settings` stores one secret-safe versioned document shape for user and global-system scopes; it never stores bootstrap paths or secrets. |
 | **Broker Integration** | Provider-neutral adapter selection/readiness plus adapter-specific settings; UI/API composition resolves credential references and injects Brokers-owned `BrokerConnectionConfig` instances. |
 
 ---

@@ -123,7 +123,7 @@ def test_program_count_matches_feature_count() -> None:
         for path in (Path(__file__).parents[3] / "app/services/strategy").iterdir()
         if path.is_dir()
         and (path / "__init__.py").exists()
-        and path.name != "migrations"
+        and path.name not in {"migrations", "persistence"}
     }
     assert feature_directories == set(_FEATURE_REQUIREMENTS)
     assert {path.name for path in _USAGE_DIR.glob("[0-9]*_*.py")} == {

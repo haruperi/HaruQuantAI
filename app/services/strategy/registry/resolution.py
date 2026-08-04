@@ -2,12 +2,7 @@
 
 from __future__ import annotations
 
-from app.services.data import (
-    build_statement_plan,
-    build_transaction_request,
-    execute_transaction,
-    is_data_error,
-)
+from app.services.data import is_data_error
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.manifest import StrategyManifest
 from app.services.strategy.contracts.outcomes import failure, success
@@ -18,11 +13,9 @@ from app.services.strategy.contracts.references import (
     StrategyRef,
     ValidatedStrategyRef,
 )
-from app.services.strategy.contracts.responses import (
-    guard_strategy_boundary,
-    unwrap_data_response,
-)
+from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
+from app.services.strategy.persistence import read_strategy_version_records
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -44,23 +37,10 @@ def validate_strategy_ref(
     """
     logger.info("Validating Strategy reference for %s", ref.strategy_id)
     try:
-        result = unwrap_data_response(
-            execute_transaction(
-                build_transaction_request(
-                    plan=build_statement_plan(
-                        statements=(
-                            "SELECT manifest_json, lifecycle_status, policy_json, "
-                            "record_hash, request_id, correlation_id FROM "
-                            "strategy_versions WHERE strategy_id = ? ORDER BY "
-                            "strategy_version",
-                        ),
-                        parameter_sets=((ref.strategy_id,),),
-                        max_rows=1_000,
-                    ),
-                    request_id=ref.request_id,
-                )
-            ),
-            operation="data.execute_transaction.strategy_registry",
+        rows = read_strategy_version_records(
+            ref.strategy_id,
+            ref.request_id,
+            include_trace_ids=True,
         )
     except Exception as error:
         if not is_data_error(error):
@@ -73,7 +53,7 @@ def validate_strategy_ref(
             correlation_id=ref.correlation_id,
         )
     matches: list[ValidatedStrategyRef] = []
-    for row in result.rows:
+    for row in rows:
         manifest = StrategyManifest.model_validate_json(str(row["manifest_json"]))
         if not _version_matches(manifest.strategy_version, ref):
             continue
@@ -88,7 +68,7 @@ def validate_strategy_ref(
     if len(matches) != 1:
         code = (
             StrategyErrorCode.NOT_FOUND
-            if not result.rows
+            if not rows
             else StrategyErrorCode.VERSION_CONSTRAINT_UNSATISFIABLE
         )
         return failure(

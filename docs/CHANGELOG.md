@@ -2,6 +2,110 @@
 
 ## [Unreleased]
 
+### Unify user and system settings persistence
+
+UI/API now owns one scoped settings store while central typed configuration remains
+the bootstrap authority required to open the database.
+
+#### Added (2)
+
+- Added immutable migration `api-0006`, which copies legacy user documents into scoped `api_settings`, verifies exact row preservation, and removes the superseded table.
+- Added admin-authorized global system settings reads and updates through the existing canonical settings route and API public boundary.
+
+#### Changed (2)
+
+- Changed user and system settings to share one versioned, bounded, secret-safe document contract keyed by derived scope and subject.
+- Changed `DataSettings` to consume the central `app/configs/env.json` and process-override source order already used by other typed domain settings.
+
+### Complete schema and persistence programme
+
+The final API normalization, ledger repair, and schema-tooling decisions close the
+schema programme without deleting development identity state or inventing absent
+business producers.
+
+#### Added (2)
+
+- Added normalized API roles, permissions, role-permission grants, and scoped account bindings through immutable migration `api-0005`.
+- Added complete-manifest migration validation that rejects applied ledger IDs absent from the owning code manifest.
+
+#### Changed (5)
+
+- Changed API account and session authority reads to normalized RBAC tables while retaining immutable-baseline JSON columns as dormant compatibility fields.
+- Retained decimal-string Parquet values as the canonical precision-safe policy until bounded native-decimal scale metadata exists.
+- Recorded genuine Brokers usage programs as manual, credential-gated non-production evidence rather than ordinary CI execution.
+- Made licensed calendar, live research-provider, and genuine MT5 workflow verification explicit opt-ins so ordinary CI opens no provider connection.
+- Reconciled system workflow evidence with owner-domain mutation APIs while retaining the backend-v1 exclusion of Strategy and operator kill-switch mutation routes.
+
+#### Fixed (5)
+
+- Repaired the development-only orphan `api-0004` ledger row after an immutable backup while preserving the existing account and sessions.
+- Made the twelve-check schema verifier typed, formatted, resource-safe, and Ruff-clean.
+- Synchronized migration-manifest, public-export, Trading catalogue, AuthContext compatibility, and relational usage evidence with the completed schema programme.
+- Preserved function-only public ports while distinguishing mandatory Data persistence delegation from business-domain dependency cycles.
+- Included the registered runtime-record step in Data's complete ordered migration manifest so a fresh database cannot create a future ledger orphan.
+
+### Complete Agentic relational persistence
+
+Agentic workflow, memory-record, lifecycle, and operations state now uses eight
+Agentic-owned relational tables instead of the generic Data runtime-record store.
+
+#### Changed (3)
+
+- Changed active Agentic durable stores to construct direct relational operations through Data's public statement-plan and transaction boundary.
+- Made workflow idempotency and revision guards, incident uniqueness, lifecycle sequencing, and immutable packet, trace, and replay writes survive process reconstruction.
+- Expanded the unapplied Agentic baseline columns so checkpoints, lifecycle concerns, promotion evidence, trace spans, incident evidence, and replay outcomes round-trip without invented or discarded fields.
+
+### Complete Simulator relational persistence
+
+Simulator lifecycle and completed-result state now uses `sim_runs` directly, while
+its canonical journal remains an append-only JSONL artifact rather than database
+state.
+
+#### Changed (3)
+
+- Changed Simulator run identity, lifecycle, idempotency, and completed-result persistence to construct direct `sim_runs` operations through Data's public statement-plan and transaction boundary.
+- Replaced generic runtime-record journal staging with partial canonical JSONL, reconstruction-safe sequence validation, group-commit `fsync`, and atomic final publication.
+- Made lifecycle transitions compare request hash, run identity, prior status, and prior result material so identical replay is idempotent and stale or terminal mutation fails closed.
+
+### Complete Portfolio relational persistence
+
+Portfolio durable state now uses its owned relational tables instead of the generic
+Data runtime-record store while preserving Portfolio's opaque public state boundary.
+
+#### Changed (3)
+
+- Changed construction results, allocation versions, active scope pointers, idempotency bindings, rebalance plans, and audit-outbox persistence to construct direct relational operations through Data's public statement-plan and transaction boundary.
+- Made construction-plus-outbox, plan-plus-outbox, and allocation-plus-idempotency-plus-active-scope-plus-outbox writes atomic and fail closed on identity conflicts, stale revisions, or mismatched predecessors.
+- Left `portfolio_definitions` without a runtime producer because no registered Portfolio command currently creates definitions; no speculative business record is synthesized to populate the table.
+
+### Complete Risk relational persistence
+
+Risk durable state now uses its owned relational tables instead of the generic Data
+runtime-record store while preserving Risk's existing public contracts and Data's
+connection and transaction ownership.
+
+#### Changed (4)
+
+- Changed Risk approval, audit, eligibility, allocation, kill-switch, and canonical decision persistence to construct direct relational operations through Data's public statement-plan and transaction boundary.
+- Made approval consumption, allocation activation, and kill-switch-plus-audit updates atomic and fail closed on stale revisions, predecessors, chain heads, or identity conflicts.
+- Exposed `run_risk_migrations` through the Risk package root so application composition and integration evidence can apply the immutable Risk manifest without importing private migration definitions.
+- Removed the obsolete generic-store sequence allocator from canonical decision persistence, allowing every decision identity accepted by `RiskDecisionPackage v1` to round-trip through `risk_decision_snapshots`.
+
+### Complete Trading relational persistence and Phase 4D materialization
+
+Trading durable state now uses its owned event, idempotency, projection, order, fill,
+position, and transition tables instead of the generic Data runtime-record store.
+
+#### Added (2)
+
+- Added `trading_orders`, `trading_fills`, `trading_positions`, and `trading_order_transitions` to the unapplied Trading baseline with the model's indexes and fail-closed constraints.
+- Added atomic event-to-table normalization and integration evidence covering a nullable TIF, authority-time fills, current positions, and order transitions.
+
+#### Changed (2)
+
+- Changed Trading persistence to construct direct relational operations while delegating connections, locking, bounded execution, and transactions to Data's public boundary.
+- Made `trading_orders.time_in_force` nullable so persistence preserves an omitted governed instruction rather than inventing a broker default.
+
 ### Add protected workflow pages — frontend build complete (FEAT-API-12, Section 4.12)
 
 The fourth and final frontend feature delivers the access gate (`/login`) and the protected workspace composition point. The frontend build is now complete: Sections 4.9–4.12 (typed transport, session/page/governed/stream context, workflow components, protected pages) are all implemented.
@@ -109,6 +213,28 @@ The first frontend feature delivers the single typed client transport layer that
 #### Changed (1)
 
 - Corrected the planned `ui/` package tree in the API README to the actual single-page widget-workspace architecture and marked `FEAT-API-09` and the Section 4.9 functional requirements `Completed`.
+
+### Withdraw feature status from the four persistence packages
+
+Schema and CRUD are internal support, not capabilities. Registering them as features implied a public API that no domain exported, and produced registry rows whose stated evidence could not satisfy the usage-program contract. The registrations are withdrawn; the evidence they were meant to carry is kept as unit tests instead.
+
+#### Changed (2)
+
+- Withdrew `FEAT-DATA-18`, `FEAT-INDI-07`, `FEAT-ANLT-06` and `FEAT-BRK-16` along with their `FR-DATA-154`–`160`, `FR-INDI-036`–`040`, `FR-ANLT-055`–`059` and `FR-BRK-136`–`138` rows, and deleted the four numbered usage programs. The tables, migrations and private CRUD modules are unchanged and still applied; only their status as registered features is.
+- Recorded `migrations/` as a support directory in the Data import-graph test, on the same reasoning: it holds schema definitions applied by the runner in `persistence/` and carries no feature identity.
+
+#### Added (2)
+
+- Added `tests/data/unit/test_catalog_schema.py`, `tests/indicators/unit/test_persistence_schema.py`, `tests/analytics/unit/test_persistence_schema.py` and `tests/brokers/unit/test_symbol_map_schema.py` — twenty-two tests asserting the invariants the withdrawn requirements described, against the shipped schema statements: the overlap predicate that `BETWEEN` gets wrong, the fail-closed integrity gate, duplicate formula versions, null measurements without a declared insufficient sample, and duplicate active symbol mappings.
+- Added `docs/schema/verify_persistence_sql.py`, which asserts that every table named in a persistence SQL literal has a creating statement. Nothing else connected those strings to the migrations.
+
+#### Fixed (5)
+
+- Fixed ten statements still reading `hq_runtime_records` after the table was renamed to `data_runtime_records`. The migration had been updated and the statements that read it had not, so every one would have failed on first apply for trading, risk, portfolio, simulation, and agentic persistence alike.
+- Fixed an identifier collision in which `FR-DATA-154` through `FR-DATA-157` named both the MT5 streaming requirements and the artifact-catalog requirements. Withdrawing the catalog rows leaves the streaming allocation intact.
+- Fixed the reconciliation record, which listed Trading materialisation as delivered. `trading_orders`, `trading_fills`, `trading_positions` and `trading_order_transitions` exist in the model and in no migration; the comparison script now lists the twenty-six model tables no module creates, rather than reporting no drift for tables it never compared.
+- Fixed the model's `data_migration_ledger.applied_at_ns` column, transcribed as `INTEGER` when the shipped column is `TEXT` with a nineteen-digit `GLOB` check that rejects a truncated or second-resolution stamp at write time.
+- Fixed index-name extraction in the schema harness, which consumed `IF NOT EXISTS` as the name and reported two partial unique indexes as `IF`.
 
 ### Add Indicators, Analytics, and Brokers persistence
 

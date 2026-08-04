@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from app.services.data.contracts import DataError
-from app.services.data.persistence.transactions import _execute_transaction_raw
+from app.services.data.persistence import update_feed_record
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -126,28 +126,6 @@ def _clear_active_feeds() -> None:
 def _persist_feed_status(active: ActiveFeed, request_id: str) -> None:
     """Save/update current feed status to the SQLite database."""
     logger.debug("Running DATA function: _persist_feed_status")
-    from app.services.data.persistence.contracts import (
-        StatementPlan,
-        TransactionRequest,
-    )
-
-    update_sql = (
-        "UPDATE data_feeds SET "
-        "  state = ?, "
-        "  heartbeat_at = ?, "
-        "  last_event_at = ?, "
-        "  buffer_depth = ?, "
-        "  dropped_count = ?, "
-        "  gap_count = ?, "
-        "  reconnect_count = ?, "
-        "  breaker_state = ?, "
-        "  breaker_opened_at = ?, "
-        "  drift_ms = ?, "
-        "  last_error = ?, "
-        "  updated_at = ? "
-        "WHERE feed_id = ?"
-    )
-
     hb_str = (
         active.heartbeat_at.isoformat().replace("+00:00", "Z")
         if active.heartbeat_at
@@ -165,31 +143,23 @@ def _persist_feed_status(active: ActiveFeed, request_id: str) -> None:
         else None
     )
 
-    _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(update_sql,),
-                parameter_sets=(
-                    (
-                        active.state,
-                        hb_str,
-                        evt_str,
-                        len(active.buffer),
-                        active.dropped_count,
-                        active.gap_count,
-                        active.reconnect_count,
-                        active.breaker_state,
-                        breaker_opened_str,
-                        active.drift_ms,
-                        active.last_error,
-                        upd_str,
-                        active.config.feed_id,
-                    ),
-                ),
-                max_rows=1,
-            ),
-            request_id=request_id,
-        )
+    update_feed_record(
+        (
+            active.state,
+            hb_str,
+            evt_str,
+            len(active.buffer),
+            active.dropped_count,
+            active.gap_count,
+            active.reconnect_count,
+            active.breaker_state,
+            breaker_opened_str,
+            active.drift_ms,
+            active.last_error,
+            upd_str,
+            active.config.feed_id,
+        ),
+        request_id=request_id,
     )
 
 

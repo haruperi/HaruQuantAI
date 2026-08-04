@@ -237,7 +237,7 @@ def test_cache_write_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> N
     def mock_execute(*args, **kwargs):
         raise ValueError("Mock DB write error")
 
-    monkeypatch.setattr(cache_mod, "_execute_transaction_raw", mock_execute)
+    monkeypatch.setattr(cache_mod, "update_cache_record", mock_execute)
 
     dataset = make_dataset()
     write_req = CacheWriteRequest(
@@ -264,7 +264,7 @@ def test_cache_read_error(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> No
     def mock_execute(*args, **kwargs):
         raise ValueError("Mock DB read error")
 
-    monkeypatch.setattr(cache_mod, "_execute_transaction_raw", mock_execute)
+    monkeypatch.setattr(cache_mod, "read_cache_record", mock_execute)
 
     read_req = CacheReadRequest(
         key="error-key",

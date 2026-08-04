@@ -66,6 +66,7 @@ def test_in_process_route_authorizes_and_delegates_once(
         unauthorized = register_api_user(
             username="in-process-reader-without-permission",
             password="bounded unauthorized password",  # pragma: allowlist secret
+            roles=("dashboard_reader_without_permission",),
             request_id=generate_id("req"),
         )
         unauthorized_session = create_api_session(

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import inspect
 from asyncio import run
 from datetime import datetime, timedelta
@@ -24,6 +25,7 @@ from app.services.portfolio import (
     get_portfolio_value_field,
     is_portfolio_handle,
     is_portfolio_value,
+    persistence,
     recompute_portfolio_measurement,
     rollback_portfolio,
     submit_portfolio_rebalance,
@@ -36,6 +38,7 @@ from app.services.portfolio.contracts import (
     PortfolioConstructionRequest,
 )
 from app.services.portfolio.orchestration import PortfolioWorkflowService
+from app.services.portfolio.persistence import delete
 from app.services.portfolio.state import PortfolioRepository, scope_key
 from app.utils import create_auth_context, get_logger, get_standard_response_type
 
@@ -45,6 +48,87 @@ from tests.portfolio.unit.test_workflows import _plan, _service
 AuthContext = Any
 StandardResponse = get_standard_response_type()
 logger = get_logger(__name__)
+
+_PORTFOLIO_ROOT = Path(__file__).parents[3] / "app" / "services" / "portfolio"
+_PERSISTENCE_ROOT = _PORTFOLIO_ROOT / "persistence"
+_EXPECTED_PERSISTENCE_FILES = {
+    "__init__.py",
+    "create.py",
+    "read.py",
+    "update.py",
+    "delete.py",
+}
+_EXPECTED_PERSISTENCE_EXPORTS = {
+    "create_construction_record",
+    "create_plan_record",
+    "create_portfolio_runtime_store",
+    "read_active_allocation_record",
+    "read_allocation_history_records",
+    "read_allocation_record",
+    "read_construction_record",
+    "read_idempotency_record",
+    "read_plan_record",
+    "read_plan_version_records",
+    "update_active_allocation_record",
+}
+_DATA_RUNTIME_CALLS = {
+    "build_portfolio_runtime_store",
+    "execute_runtime_store_operation",
+    "execute_runtime_store_transition",
+}
+
+
+def test_private_persistence_package_has_exact_crud_layout() -> None:
+    """Enforce the documented private Portfolio persistence boundary."""
+    logger.info("Testing Portfolio persistence package structure")
+    assert {path.name for path in _PERSISTENCE_ROOT.glob("*.py")} == (
+        _EXPECTED_PERSISTENCE_FILES
+    )
+    assert set(persistence.__all__) == _EXPECTED_PERSISTENCE_EXPORTS
+    assert all(
+        inspect.isfunction(getattr(persistence, name)) for name in persistence.__all__
+    )
+    assert delete.__all__ == []
+
+
+def test_active_allocation_update_retains_one_atomic_transition() -> None:
+    """Keep active-state CAS and immutable history in one Data transaction."""
+    logger.info("Testing Portfolio atomic allocation persistence transition")
+    source = inspect.getsource(persistence.update_active_allocation_record)
+    assert source.count("_execute(") == 1
+    assert "portfolio_allocation_versions" in source
+    assert "portfolio_active_scopes" in source
+    assert "portfolio_idempotency" in source
+    assert "portfolio_audit_outbox" in source
+
+
+def test_data_runtime_calls_are_confined_to_portfolio_persistence() -> None:
+    """Prevent direct Data runtime-store access from Portfolio feature modules."""
+    logger.info("Testing Portfolio runtime-store call ownership")
+    violations: list[str] = []
+    for path in _PORTFOLIO_ROOT.rglob("*.py"):
+        if _PERSISTENCE_ROOT in path.parents:
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            name = getattr(node.func, "id", None) or getattr(node.func, "attr", None)
+            if name in _DATA_RUNTIME_CALLS:
+                violations.append(f"{path}: {name}")
+    assert not violations, violations
+
+
+def test_portfolio_persistence_no_longer_uses_generic_runtime_records() -> None:
+    """Require direct relational statements through Data transactions only."""
+    source = "\n".join(
+        path.read_text(encoding="utf-8") for path in _PERSISTENCE_ROOT.glob("*.py")
+    )
+    assert "data_runtime_records" not in source
+    assert "build_portfolio_runtime_store" not in source
+    assert "execute_runtime_store_operation" not in source
+    assert "execute_runtime_store_transition" not in source
+    assert "execute_transaction" in source
 
 
 def test_function_only_factories_and_opaque_handles(

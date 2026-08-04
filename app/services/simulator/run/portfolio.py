@@ -490,6 +490,13 @@ def run_portfolio_backtest(
     )
     try:
         result = _run_portfolio_backtest(request, auth_context, dependencies)
+        dependencies.state_store.record_idempotency(
+            request.request_id,
+            result.request_hash,
+            result.run_id,
+            "completed",
+            result.model_dump(mode="json", warnings=False),
+        )
     except Exception:
         emit_simulation_audit(
             dependencies,

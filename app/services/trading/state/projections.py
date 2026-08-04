@@ -328,8 +328,13 @@ def _apply_execution_event_value(
         )
     projected = _project_event(current, event)
     try:
-        store.append_event(event)
-        store.save_projection(projected, current.version)
+        atomic_apply = getattr(store, "apply_event", None)
+        if callable(atomic_apply):
+            atomic_apply(event, projected, current.version)
+        else:
+            # Injected in-memory teaching/test stores have no transaction boundary.
+            store.append_event(event)
+            store.save_projection(projected, current.version)
     except Exception as error:
         raise TradingError(
             "PERSISTENCE_FAILED",

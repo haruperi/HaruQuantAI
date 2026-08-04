@@ -13,4 +13,8 @@ and constants remain internal. External consumers use documented functions
 through `app.services.trading`.
 
 Data owns connection and migration execution infrastructure; this feature owns
-only Trading records and schema declarations.
+only Trading records and schema declarations. `runtime.py` coordinates the
+durable state port while every runtime-record create, read, and update operation
+is implemented behind the private `app/services/trading/persistence` boundary.
+Idempotency and projection updates remain compare-and-swap guarded, and events
+remain append-only. Trading currently owns no runtime-record delete operation.

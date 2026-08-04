@@ -24,6 +24,9 @@ from app.services.risk.audit import (
     build_risk_state_store,
     create_risk_audit_chain,
     execute_risk_state_store_operation,
+    get_kill_switch_state,
+    list_risk_decisions,
+    persist_risk_decision,
     verify_risk_audit_chain,
 )
 from app.services.risk.config import (
@@ -84,6 +87,7 @@ from app.services.risk.limits import (
     evaluate_portfolio_limits,
     evaluate_single_day_profit_share,
 )
+from app.services.risk.migrations.definitions import run_risk_migrations
 from app.services.risk.portfolio import build_portfolio_risk_snapshot
 from app.services.risk.regimes import assess_risk_regime
 from app.services.risk.reporting import generate_risk_report
@@ -144,19 +148,23 @@ __all__ = (
     "generate_risk_report",
     "get_decision_state",
     "get_drawdown_mode",
+    "get_kill_switch_state",
     "get_limit_status",
     "get_risk_error_catalog",
     "get_risk_error_code",
     "is_risk_domain_error",
     "issue_risk_approval_token",
+    "list_risk_decisions",
     "load_firm_mandate",
     "load_risk_config",
+    "persist_risk_decision",
     "revalidate_risk_decision",
     "review_allocation_proposal",
     "review_strategy_admission",
     "review_trade_risk",
     "revoke_risk_approval_scope",
     "run_portfolio_risk_governor",
+    "run_risk_migrations",
     "run_risk_scenario_analysis",
     "validate_market_context_evidence",
     "validate_risk_approval_token",

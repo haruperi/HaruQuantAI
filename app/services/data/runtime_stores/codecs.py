@@ -6,15 +6,18 @@ import json
 import re
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
-from typing import Any, Literal, cast
+from typing import Literal, cast
 
-from app.services.data.contracts.responses import unwrap_data_response
-from app.services.data.persistence.contracts import (
-    StatementPlan,
-    TransactionRequest,
-    TransactionResult,
+from app.services.data.persistence import (
+    create_runtime_append_record,
+    create_runtime_put_once_record,
+    read_runtime_collection_records,
+    read_runtime_partition_records,
+    read_runtime_record,
+    update_runtime_compare_and_swap_record,
+    update_runtime_transition_records,
+    update_runtime_upsert_record,
 )
-from app.services.data.persistence.transactions import execute_transaction
 from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
@@ -160,33 +163,6 @@ def _require_store(value: object) -> _RuntimeStore:
     return value
 
 
-def _transaction(
-    statements: tuple[str, ...],
-    parameter_sets: tuple[tuple[object, ...], ...],
-    *,
-    max_rows: int = 1,
-) -> TransactionResult:
-    """Execute one bounded Data-owned runtime transaction.
-
-    Returns:
-        Data transaction result.
-    """
-    request_id = generate_id("req")
-    request = TransactionRequest(
-        plan=StatementPlan(
-            statements=statements,
-            parameter_sets=cast("Any", parameter_sets),
-            max_rows=max_rows,
-        ),
-        request_id=request_id,
-    )
-    return unwrap_data_response(
-        execute_transaction(request),
-        operation="data.runtime_stores.transaction",
-        request_id=request_id,
-    )
-
-
 def _encode(store: _RuntimeStore, kind: str, value: object) -> str:
     """Encode one allowlisted owner value.
 
@@ -234,31 +210,33 @@ def _read_rows(
     Returns:
         Detached normalized row mappings.
     """
+    request_id = generate_id("req")
     if key is not None:
-        sql = (
-            "SELECT codec_kind, payload_json, revision FROM hq_runtime_records "
-            "WHERE namespace = ? AND collection_name = ? AND record_key = ?"
+        result = read_runtime_record(
+            store.namespace,
+            collection,
+            key,
+            request_id=request_id,
         )
-        params: tuple[object, ...] = (store.namespace, collection, key)
     elif all_partitions:
-        sql = (
-            "SELECT codec_kind, payload_json, revision FROM hq_runtime_records "
-            "WHERE namespace = ? AND collection_name = ? "
-            "ORDER BY sequence_number ASC, partition_key ASC LIMIT ?"
+        result = read_runtime_collection_records(
+            store.namespace,
+            collection,
+            limit,
+            request_id=request_id,
         )
-        params = (store.namespace, collection, limit)
     else:
-        sql = (
-            "SELECT codec_kind, payload_json, revision FROM hq_runtime_records "
-            "WHERE namespace = ? AND collection_name = ? AND partition_key = ? "
-            "ORDER BY sequence_number ASC LIMIT ?"
+        result = read_runtime_partition_records(
+            store.namespace,
+            collection,
+            partition or "",
+            limit,
+            request_id=request_id,
         )
-        params = (store.namespace, collection, partition or "", limit)
-    result = _transaction((sql,), (params,), max_rows=limit)
     return cast("tuple[Mapping[str, object], ...]", result.rows)
 
 
-def execute_runtime_store_operation(  # noqa: C901, PLR0911, PLR0912, PLR0915
+def execute_runtime_store_operation(  # noqa: C901, PLR0911, PLR0912
     handle: object,
     operation: _Operation,
     *,
@@ -315,35 +293,23 @@ def execute_runtime_store_operation(  # noqa: C901, PLR0911, PLR0912, PLR0915
     if operation == "append":
         if isinstance(sequence, bool) or sequence <= 0:
             raise ValueError("append sequence must be positive")
-        sql = (
-            "INSERT INTO hq_runtime_records "
-            "(namespace, collection_name, record_key, partition_key, sequence_number, "
-            "codec_kind, payload_json, revision) VALUES (?, ?, ?, ?, ?, ?, ?, 1)"
-        )
-        _transaction(
-            (sql,),
+        create_runtime_append_record(
             (
-                (
-                    store.namespace,
-                    safe_collection,
-                    safe_key,
-                    safe_partition,
-                    sequence,
-                    safe_kind,
-                    payload,
-                ),
+                store.namespace,
+                safe_collection,
+                safe_key,
+                safe_partition,
+                sequence,
+                safe_kind,
+                payload,
             ),
+            request_id=generate_id("req"),
         )
         return 1
     if operation == "put_once":
-        sql = (
-            "INSERT OR IGNORE INTO hq_runtime_records "
-            "(namespace, collection_name, record_key, partition_key, sequence_number, "
-            "codec_kind, payload_json, revision) VALUES (?, ?, ?, '', 0, ?, ?, 1)"
-        )
-        _transaction(
-            (sql,),
-            ((store.namespace, safe_collection, safe_key, safe_kind, payload),),
+        create_runtime_put_once_record(
+            (store.namespace, safe_collection, safe_key, safe_kind, payload),
+            request_id=generate_id("req"),
         )
         rows = _read_rows(store, safe_collection, key=safe_key)
         if (
@@ -357,17 +323,9 @@ def execute_runtime_store_operation(  # noqa: C901, PLR0911, PLR0912, PLR0915
             raise TypeError("stored runtime revision is not an integer")
         return revision
     if operation == "upsert":
-        sql = (
-            "INSERT INTO hq_runtime_records "
-            "(namespace, collection_name, record_key, partition_key, sequence_number, "
-            "codec_kind, payload_json, revision) VALUES (?, ?, ?, '', 0, ?, ?, 1) "
-            "ON CONFLICT(namespace, collection_name, record_key) DO UPDATE SET "
-            "codec_kind = excluded.codec_kind, payload_json = excluded.payload_json, "
-            "revision = hq_runtime_records.revision + 1"
-        )
-        _transaction(
-            (sql,),
-            ((store.namespace, safe_collection, safe_key, safe_kind, payload),),
+        update_runtime_upsert_record(
+            (store.namespace, safe_collection, safe_key, safe_kind, payload),
+            request_id=generate_id("req"),
         )
         rows = _read_rows(store, safe_collection, key=safe_key)
         revision = rows[0]["revision"]
@@ -378,23 +336,16 @@ def execute_runtime_store_operation(  # noqa: C901, PLR0911, PLR0912, PLR0915
         raise ValueError("unsupported runtime-store operation or missing revision")
     if isinstance(expected_revision, bool) or expected_revision < 1:
         raise ValueError("expected revision must be positive")
-    sql = (
-        "UPDATE hq_runtime_records SET codec_kind = ?, payload_json = ?, "
-        "revision = revision + 1 WHERE namespace = ? AND collection_name = ? "
-        "AND record_key = ? AND revision = ?"
-    )
-    result = _transaction(
-        (sql,),
+    result = update_runtime_compare_and_swap_record(
         (
-            (
-                safe_kind,
-                payload,
-                store.namespace,
-                safe_collection,
-                safe_key,
-                expected_revision,
-            ),
+            safe_kind,
+            payload,
+            store.namespace,
+            safe_collection,
+            safe_key,
+            expected_revision,
         ),
+        request_id=generate_id("req"),
     )
     if result.affected_rows != 1:
         raise ValueError("runtime compare-and-swap revision conflict")
@@ -437,11 +388,6 @@ def execute_runtime_store_transition(
     state_payload = _encode(store, state_kind, state_value)
     event_payload = _encode(store, event_kind, event_value)
     if expected_revision == 0:
-        state_sql = (
-            "INSERT OR IGNORE INTO hq_runtime_records "
-            "(namespace, collection_name, record_key, partition_key, sequence_number, "
-            "codec_kind, payload_json, revision) VALUES (?, ?, ?, '', 0, ?, ?, 1)"
-        )
         state_params: tuple[object, ...] = (
             store.namespace,
             state_collection,
@@ -450,11 +396,6 @@ def execute_runtime_store_transition(
             state_payload,
         )
     else:
-        state_sql = (
-            "UPDATE hq_runtime_records SET codec_kind = ?, payload_json = ?, "
-            "revision = revision + 1 WHERE namespace = ? AND collection_name = ? "
-            "AND record_key = ? AND revision = ?"
-        )
         state_params = (
             state_kind,
             state_payload,
@@ -463,26 +404,19 @@ def execute_runtime_store_transition(
             state_key,
             expected_revision,
         )
-    event_sql = (
-        "INSERT INTO hq_runtime_records "
-        "(namespace, collection_name, record_key, partition_key, sequence_number, "
-        "codec_kind, payload_json, revision) "
-        "SELECT ?, ?, ?, ?, ?, ?, ?, 1 WHERE changes() = 1"
-    )
-    result = _transaction(
-        (state_sql, event_sql),
+    result = update_runtime_transition_records(
+        state_params,
         (
-            state_params,
-            (
-                store.namespace,
-                event_collection,
-                event_key,
-                event_partition,
-                event_sequence,
-                event_kind,
-                event_payload,
-            ),
+            store.namespace,
+            event_collection,
+            event_key,
+            event_partition,
+            event_sequence,
+            event_kind,
+            event_payload,
         ),
+        create_state=expected_revision == 0,
+        request_id=generate_id("req"),
     )
     return result.affected_rows == _ATOMIC_TRANSITION_WRITE_COUNT
 

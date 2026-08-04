@@ -10,7 +10,7 @@
 > through `build_durable_agentic_dependencies` and gains no Agentic or
 > receiver-domain authority. Restart durability is verified in
 > `tests/agentic/integration/test_durable_runtime.py`.
-> **Last updated:** `2026-07-29`
+> **Last updated:** `2026-08-04`
 > **System workflows:** `SYS-WF-009`, `SYS-WF-010`, `SYS-WF-011`, `SYS-WF-012`
 
 > This README is the package's single source of truth for the Agentic domain's
@@ -151,13 +151,13 @@ recovery rules. Other domains read through Agentic public contracts.
 
 | Status  | State / Store                                                                     | Read access                                     | Migration definitions                                     |
 | ------- | --------------------------------------------------------------------------------- | ----------------------------------------------- | --------------------------------------------------------- |
-| Missing | Workflow store: task state, checkpoints, leases, idempotency, retry/cancel state  | Agentic and UI/API through task/run operations  | `orchestration/migrations.py`                           |
-| Missing | Evidence store: immutable claims, source references, availability times, hashes   | Agentic and bounded UI/API evidence views       | `context_memory/migrations.py`                          |
+| Completed | Workflow store: task state, checkpoints, idempotency, retry/cancel state       | Agentic and UI/API through task/run operations  | `migrations/workflow.py`                                |
+| Missing | Evidence store: immutable claims, source references, availability times, hashes   | Agentic and bounded UI/API evidence views       | `migrations/memory.py`                                  |
 | Partial | Experiment store: hypotheses, protocols, trials, holdout consumption, results     | Agentic lifecycle and bounded operator views    | `agents/experimentation/experiment_designer/migrations.py` |
 | Partial | Artefact store: generated files, SBOM, signatures, promotion packets              | Agentic lifecycle and approved receiver handoff | `agents/engineering/coder/artifact_store.py`; no direct table requirement |
-| Partial | Lifecycle ledger: append-only artefact transitions and assembled promotion packets | Agentic and bounded operator views              | `lifecycle/migrations.py`                                 |
-| Partial | Operational audit store: model/tool calls, policy decisions, approvals, incidents | Protected Agentic/UI/API audit operations       | `operations/migrations.py`; call and approval records are written by `context_memory/migrations.py` |
-| Missing | Working-memory store: bounded task summaries and temporary coordination state     | Current task only                               | `context_memory/migrations.py`                          |
+| Completed | Lifecycle ledger: append-only artefact transitions and assembled promotion packets | Agentic and bounded operator views            | `migrations/lifecycle.py`                               |
+| Partial | Operational audit store: model/tool calls, policy decisions, approvals, incidents | Protected Agentic/UI/API audit operations       | `migrations/operations.py`; audit memory uses `migrations/memory.py` |
+| Completed | Working-memory store: bounded task summaries and temporary coordination state   | Current task only                               | `migrations/memory.py`                                  |
 
 Evidence, experiment, and audit facts are append-only. Corrections create new
 versions. Artefacts are content-addressed and immutable. Working memory is
@@ -254,7 +254,17 @@ order below is the binding implementation order.
 | Completed | `FEAT-AGT-19` Portfolio and Risk Advisory                       | `agents/portfolio_risk_advisory/portfolio_risk_advisor/` | `AllocationProposal`, `RiskAdvisory`, `advise_portfolio`, `critique_risk`                                   | `FR-AGENTIC-055`–`057` | `tests/agentic/usage/19_advisory.py`        |
 | Completed | `FEAT-AGT-20` Trade Proposal Handoff                            | `agents/strategy_desk/trader/`                           | `TradeProposal`, `TradeProposalReceipt`, `submit_trade_proposal`                                            | `FR-AGENTIC-058`–`060` | `tests/agentic/usage/20_trade_proposals.py` |
 | Completed | `FEAT-AGT-21` Observability, Incidents, and Operational Control | `operations/`      | `AgenticTrace`, `IncidentRecord`, `ReplayRequest`, `get_run_trace`, `quarantine_agent`, `replay_run`                  | `FR-AGENTIC-061`–`063` | `tests/agentic/usage/21_operations.py`      |
-| Completed | `FEAT-AGT-22` Public Agentic API and Operator Control           | `public_api/`      | `AgenticDependencies`, `submit_firm_request`, `get_firm_run`, `approve_agentic_handoff`                                   | `FR-AGENTIC-064`–`066` | `tests/agentic/usage/22_public_api.py`      |
+| Completed | `FEAT-AGT-22` Public Agentic API and Operator Control           | `public_api/`      | `AgenticDependencies`, `submit_firm_request`, `get_firm_run`, `approve_agentic_handoff`                                   | `FR-AGENTIC-064`–`072` | `tests/agentic/usage/22_public_api.py`      |
+
+`persistence/` is private non-feature support infrastructure. It owns the
+function-only create/read/update/delete boundary used by durable Agentic runtime
+adapters; registered features retain validation, codecs, sequencing, state
+derivation, and their public contracts.
+
+The durable adapters write the eight relational tables that have active runtime
+producers. They do not use `data_runtime_records`. `agentic_evidence_claims` and
+the four `agentic_experiment_*` tables remain outside this completed persistence
+slice because no production durable store currently produces those records.
 
 ```text
 app/agentic/
@@ -262,6 +272,12 @@ app/agentic/
 ├── __init__.py
 ├── _settings.py
 ├── _limits.py
+├── persistence/              # Private non-feature CRUD support
+│   ├── __init__.py
+│   ├── create.py
+│   ├── read.py
+│   ├── update.py
+│   └── delete.py
 ├── contracts/
 │   ├── __init__.py
 │   └── models.py
@@ -280,6 +296,8 @@ app/agentic/
 │   ├── models.py
 │   ├── repository.py
 │   ├── migrations.py
+│   ├── runtime.py
+│   ├── README.md
 │   └── service.py
 ├── permissions/
 │   ├── __init__.py
@@ -291,7 +309,9 @@ app/agentic/
 │   ├── models.py
 │   ├── context.py
 │   ├── repository.py
-│   └── migrations.py
+│   ├── migrations.py
+│   ├── runtime.py
+│   └── README.md
 ├── deliberation/
 │   ├── __init__.py
 │   ├── models.py
@@ -302,13 +322,16 @@ app/agentic/
 │   ├── service.py
 │   ├── migrations.py
 │   ├── repository.py
+│   ├── runtime.py
 │   └── README.md
 ├── operations/
 │   ├── __init__.py
 │   ├── models.py
 │   ├── repository.py
 │   ├── migrations.py
-│   └── service.py
+│   ├── runtime.py
+│   ├── service.py
+│   └── README.md
 ├── public_api/
 │   ├── __init__.py
 │   ├── dependencies.py
@@ -1003,6 +1026,7 @@ for promotion, portfolio, risk-advisory, and trade-proposal workflows.
 | Completed | `models.py`     | Define workflow declarations, run states, and the transition machine | `WorkflowDefinition`, `WorkflowRun`, `build_workflow_definition`, `is_terminal_state`, `validate_transition` | **Standard library:** `datetime`; **Required third-party:** `pydantic`; **Local:** `contracts`                                              |
 | Completed | `migrations.py` | Define immutable Agentic workflow-store migrations executed by Data | `get_agentic_migration_statements`, `build_agentic_migration_request` | **Standard library:** None; **Required third-party:** None; **Local:** Data migration protocol                                                    |
 | Completed | `repository.py` | Declare the injected store port and a deterministic non-durable reference store | `AgenticWorkflowStore`, `build_in_memory_workflow_store` | **Standard library:** `collections.abc`; **Required third-party:** None; **Local:** `models.py`, `migrations.py`                            |
+| Completed | `runtime.py`    | Adapt workflow runs and checkpoints to the private Agentic persistence boundary | Internal only | **Standard library:** None; **Required third-party:** `pydantic`; **Local:** `models.py`, `contracts`, `persistence/` |
 | Completed | `service.py`    | Submit, resume, cancel, and expire workflows behind injected policy/context ports | `submit_task`, `resume_task`, `cancel_task`, `expire_task`, `PolicyPort`, `ContextPort` | **Standard library:** `datetime`; **Required third-party:** None; **Local:** governance, runtime, repository, injected permission/context ports |
 | Completed | `__init__.py`   | Expose the orchestration API                        | Feature Registry exports only                                      | **Standard library:** None; **Required third-party:** None; **Local:** orchestration files                                                        |
 
@@ -1039,6 +1063,7 @@ for promotion, portfolio, risk-advisory, and trade-proposal workflows.
 | Completed | `context.py`    | Assemble bounded eligible model context            | `assemble_context`, `get_exclusion_reasons` | **Standard library:** None; **Required third-party:** None; **Local:** `models.py`, owner-public evidence contracts  |
 | Completed | `migrations.py` | Define evidence and memory-store migrations executed by Data | `get_agentic_memory_migration_statements`, `build_agentic_memory_migration_request` | **Standard library:** None; **Required third-party:** None; **Local:** Data migration protocol                         |
 | Completed | `repository.py` | Declare the injected store port and a deterministic non-durable reference store | `AgenticMemoryStore`, `build_in_memory_memory_store`, `store_memory`, `retrieve_memory` | **Standard library:** `collections.abc`; **Required third-party:** None; **Local:** `models.py`, `migrations.py` |
+| Completed | `runtime.py`    | Adapt governed memory records to the private Agentic persistence boundary | Internal only | **Standard library:** None; **Required third-party:** `pydantic`; **Local:** `models.py`, `persistence/` |
 | Completed | `__init__.py`   | Expose the context/memory API                      | Feature Registry exports only                          | **Standard library:** None; **Required third-party:** None; **Local:** context-memory files                            |
 
 | Status  | Requirement ID     | Responsibility                                                                                                                                                             | Side effects              | Failure / Verification               |
@@ -1284,6 +1309,7 @@ does not apply one. Changing a role's registered state belongs to
 | Completed | `service.py`  | Assess promotion and perform governed transitions          | `assess_promotion`, `transition_artifact`    | **Standard library:** None; **Required third-party:** None; **Local:** `models.py`, `repository.py` |
 | Completed | `migrations.py` | Define the immutable append-only lifecycle-ledger migrations executed by Data | `get_lifecycle_migration_statements`, `build_lifecycle_migration_request` | **Standard library:** `hashlib`; **Required third-party:** None; **Local:** Data migration protocol |
 | Completed | `repository.py` | Declare the injected ledger port and a deterministic non-durable reference store | `AgenticLifecycleStore`, `build_in_memory_lifecycle_store` | **Standard library:** None; **Required third-party:** None; **Local:** `models.py` |
+| Completed | `runtime.py` | Adapt lifecycle records and packets to the private Agentic persistence boundary | Internal only | **Standard library:** None; **Required third-party:** `pydantic`; **Local:** `models.py`, `persistence/` |
 | Completed | `README.md`   | Document the feature boundary, API, gates, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
 | Completed | `__init__.py` | Expose the lifecycle API                                   | All exports above                                | **Standard library:** None; **Required third-party:** None; **Local:** lifecycle files                               |
 
@@ -1387,6 +1413,7 @@ is no receipt store in the §4.20 file list and no table for one;
 | Completed | `models.py`     | Define traces, incidents, replay requests, and the containment table | `AgenticTrace`, `IncidentRecord`, `ReplayRequest`, `ReplayOutcome`, `required_containment` | **Standard library:** `decimal`, `types`; **Required third-party:** `pydantic`; **Local:** utils |
 | Completed | `migrations.py` | Define operations/audit-store migrations                  | `get_operations_migration_statements`, `build_operations_migration_request` | **Standard library:** `hashlib`; **Required third-party:** None; **Local:** Data migration protocol                         |
 | Completed | `repository.py` | Persist redacted operational and incident evidence        | `AgenticOperationsStore`, `build_in_memory_operations_store` | **Standard library:** None; **Required third-party:** None; **Local:** `models.py` |
+| Completed | `runtime.py`    | Adapt traces, incidents, and replays to the private Agentic persistence boundary | Internal only | **Standard library:** None; **Required third-party:** `pydantic`; **Local:** `models.py`, `persistence/` |
 | Completed | `service.py`    | Inspect traces, quarantine roles, and run isolated replay | `get_run_trace`, `quarantine_agent`, `replay_run` | **Standard library:** `decimal`; **Required third-party:** None; **Local:** orchestration, context memory, `models.py`, `repository.py` |
 | Completed | `README.md`     | Document the feature boundary, API, containment, dependencies, and evidence | None | **Standard library:** None; **Required third-party:** None; **Local:** package README template |
 | Completed | `__init__.py`   | Expose the operations API                                 | Registered exports above                                | **Standard library:** None; **Required third-party:** None; **Local:** operations files                                |
@@ -1441,6 +1468,12 @@ appears on the root either. A test asserts all four names are absent.
 | Completed | `FR-AGENTIC-064` | Public operations shall require`AuthContext`, explicit dependencies, request/correlation IDs, bounded inputs, and stable mapped failures.                                 | Depends on operation               | Signature and envelope tests             |
 | Completed | `FR-AGENTIC-065` | Operator APIs shall expose submit, inspect, cancel, approve-handoff, replay, quarantine, and audit operations without exposing prompts, credentials, or provider internals. | Governed state change/read         | Public API and redaction tests           |
 | Completed | `FR-AGENTIC-066` | Package disablement shall reject new work, cancel or safely drain active work by policy, preserve audit evidence, and leave deterministic safety controls available.        | Cancellation/drain; no persistence write | Disablement and safety-equivalence tests |
+| Completed | `FR-AGENTIC-067` | Agentic migration definitions shall reside in `app/agentic/migrations/`, one submodule per feature area, keeping schema evolution outside the private CRUD package. Sequence numbers shall be unique across the domain. | `build_agentic_migration_request`, `build_agentic_memory_migration_request`, `build_lifecycle_migration_request`, `build_operations_migration_request`, `build_experiment_migration_request` | None | None | `tests/agentic/unit/test_orchestration.py` |
+| Completed | `FR-AGENTIC-068` | Every Agentic table shall be declared `STRICT` and carry `created_at`; every table recording a decision, mutation, or external interaction shall additionally carry `request_id` and `correlation_id`. Append-only tables shall omit `updated_at`, so the absence of the column states that a row is written once. | Schema definition only | None | `DataError`: type violation on write | `tests/agentic/unit/test_lifecycle.py` |
+| Completed | `FR-AGENTIC-069` | The experimentation migration shall carry sequence `005`, not `002`. Two Agentic migrations previously claimed sequence `002`, leaving the intended apply order between context memory and experimentation ambiguous. | Schema definition only | None | None | `tests/agentic/integration/test_experiment_coordination.py` |
+| Completed | `FR-AGENTIC-070` | Existing durable workflow, memory, lifecycle, and operations state shall persist directly in the eight Agentic-owned relational tables and shall never read or write `data_runtime_records`. | Agentic relational persistence through Data transactions | None | `DataError`: persistence failure | `tests/agentic/integration/test_durable_runtime.py` |
+| Completed | `FR-AGENTIC-071` | Workflow idempotency and revision compare-and-swap, incident uniqueness, immutable traces/replays/packets, and append-only lifecycle sequencing shall be enforced by guarded statements and relational constraints. | Transactional relational writes | None | `ValueError`: identity, uniqueness, or revision conflict | `tests/agentic/unit/test_relational_persistence_branches.py` |
+| Completed | `FR-AGENTIC-072` | Relational reads shall reconstruct the complete validated Agentic models without invented fields, preserve deterministic bounded ordering, and delegate database execution through Data's public transaction boundary. | Bounded relational reads | None | `ValueError`: persistence or bound failure | `tests/agentic/integration/test_durable_runtime.py` |
 
 `FR-AGENTIC-066`'s safety-equivalence clause holds for a structural reason:
 Agentic never held a deterministic safety control to surrender. An integration

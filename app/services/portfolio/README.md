@@ -3,14 +3,14 @@
 > **API-BE-003 runtime seam:** `api/factories.py` constructs the opaque
 > Portfolio application handle from owner workflow and repository handles; UI/API
 > may invoke only allow-listed package-root operations. `state/runtime.py`
-> supplies the Data-backed atomic Portfolio state port.
+> supplies the Data-backed direct-relational Portfolio state port.
 
 | Field                | Value                                                                                                      |
 | -------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **Package path**     | `app/services/portfolio`                                                                                   |
 | **Domain ID**        | `PORT`                                                                                                     |
 | **Status**           | Completed — all eight feature owners have dedicated module folders, usage programs, and passing validation |
-| **Last updated**     | 2026-07-26                                                                                                 |
+| **Last updated**     | 2026-08-04                                                                                                 |
 | **System workflows** | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008`                                                                   |
 
 ## 1. Purpose and Boundary
@@ -153,7 +153,14 @@ app/services/portfolio/
 ├── state/
 │   ├── __init__.py
 │   ├── repository.py
+│   ├── runtime.py
 │   └── migrations.py
+├── persistence/
+│   ├── __init__.py
+│   ├── create.py
+│   ├── read.py
+│   ├── update.py
+│   └── delete.py
 ├── allocation/
 │   ├── __init__.py
 │   └── service.py
@@ -190,6 +197,7 @@ flowchart TD
 ### Structure rules
 
 - Dependencies point downward; contracts and state never import orchestration or API modules.
+- The documented non-feature `persistence/` package constructs Portfolio-owned relational statements and delegates their execution to Data's public transaction functions; atomic state-plus-event transitions stay in one CRUD function.
 - Every external consumer imports only standalone functions from `app.services.portfolio`.
 - Cross-domain imports use each owner package root and never a deep implementation path.
 - No Risk, Simulation, Trading, Analytics, Data, or Strategy implementation object is stored in a Portfolio contract.
@@ -579,6 +587,8 @@ internal and are created or inspected only through package-root functions.
 | --------- | --------------- | ------------------------------------------------------------------ | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Completed | `migrations.py` | Define Portfolio-owned migrations executed by Data infrastructure. | `PORTFOLIO_MIGRATIONS`                        | **Standard library:** None; **Required third-party:** None; **Local:** Data migration protocol                   |
 | Completed | `repository.py` | Atomic repositories, version checks, and read models.              | `PortfolioRepository`                         | **Standard library:** `collections.abc`; **Required third-party:** None; **Local:** `contracts`, `migrations.py` |
+| Completed | `runtime.py` | Retain Portfolio codecs, validation, conflict policy, and opaque state-store dispatch while delegating CRUD. | `build_portfolio_state_store`, `execute_portfolio_state_store_operation` | **Standard library:** `json`, `typing`; **Required third-party:** Pydantic; **Local:** `contracts`, private `persistence/` |
+| Completed | `../persistence/` | Build construction/plan creates, active-allocation CAS updates, idempotency bindings, audit-outbox writes, and bounded reads against Portfolio-owned relational tables. | Private standalone CRUD functions | **Local:** Data package-root statement-plan and transaction functions |
 | Completed | `__init__.py`   | Expose state interfaces.                                           | `PortfolioRepository`, `PORTFOLIO_MIGRATIONS` | **Standard library:** None; **Required third-party:** None; **Local:** state files above                         |
 
 `PortfolioRepository` coordinates an injected `PortfolioStateStore` port. Portfolio
@@ -588,7 +598,17 @@ and audit-outbox tables plus a mutable active-scope pointer. Activation is one
 compare-and-swap transaction over the caller-supplied expected predecessor and
 revision. Reusing an idempotency key with identical canonical material returns the
 stored result; different material raises `PORT_IDEMPOTENCY_CONFLICT`. State and its
-redacted audit-outbox record commit atomically.
+redacted audit-outbox record commit atomically. The private persistence package
+classifies construction and plan transitions as creates and allocation activation as
+an update; each state-plus-event transition remains one Data transaction and is never
+split across CRUD files.
+
+The runtime writes `portfolio_construction_results`,
+`portfolio_allocation_versions`, `portfolio_active_scopes`,
+`portfolio_idempotency`, `portfolio_rebalance_plans`, and
+`portfolio_audit_outbox` directly. `portfolio_definitions` remains schema-owned but
+has no current producer; Portfolio does not invent definition records merely to
+populate the table.
 
 | ID          | Requirement                                                          | Verification      |
 | ----------- | -------------------------------------------------------------------- | ----------------- |
@@ -596,6 +616,8 @@ redacted audit-outbox record commit atomically.
 | FR-PORT-031 | Preserve every superseded and rolled-back version.                   | History tests     |
 | FR-PORT-032 | Use atomic activation and deterministic idempotency keys.            | Transaction tests |
 | FR-PORT-033 | Store references, hashes, and decisions needed to reproduce lineage. | Persistence tests |
+| FR-PORT-044 | Persist runtime state directly in Portfolio-owned relational tables while Data retains connection, locking, and transaction execution ownership. | Relational integration and boundary tests |
+| FR-PORT-045 | Commit construction-plus-outbox, plan-plus-outbox, and allocation-plus-idempotency-plus-active-scope-plus-outbox transitions atomically; conflicts and stale revisions fail closed without partial rows. | Atomicity, conflict, and rollback tests |
 
 ### 4.5 `allocation/` — Version and Activation Governance
 
@@ -648,6 +670,9 @@ redacted audit-outbox record commit atomically.
 | Completed | FR-PORT-024 | Block planning/submission on kill switch, expiry, stale evidence, or target-version change. | Fail-closed tests |
 | Completed | FR-PORT-039 | Compute rolling cross-account return correlation and cross-account decision correlation over a configured window, across accounts held at different counterparties, and raise a deterministic alert above the configured threshold. | Correlation tests |
 | Completed | FR-PORT-040 | Report aggregate exposure across all accounts in loss-at-stop amounts mapped to risk factors rather than nominal size, identify which accounts would breach under a shared adverse scenario, and record shared software and signal dependencies. | Common-mode tests |
+| Completed | FR-PORT-041 | Portfolio migration definitions shall reside in `app/services/portfolio/migrations/`, keeping schema evolution outside the private CRUD package. Portfolio owns exactly one checksummed step covering all seven durable tables. | Schema definition only |
+| Completed | FR-PORT-042 | `portfolio_definitions` and `portfolio_rebalance_plans` shall key on a composite `(id, version)` primary key so history is immutable: a change appends a version and never rewrites a prior row. `portfolio_active_scopes` shall carry the current-version pointer under a `revision` compare-and-swap guard, keeping at most one active allocation per scope. | Schema definition only |
+| Completed | FR-PORT-043 | Every Portfolio table shall carry `created_at`, `request_id`, and `correlation_id`, and the audit outbox shall additionally track `publication_state`, `attempts`, and `published_at` so an undelivered notification is visible rather than lost. | Schema definition only |
 
 V1 execution submission is reduce-only because Trading's registered receiver
 contract accepts only `action="reduce_exposure"` and `reduce_only=True`. Negative

@@ -17,14 +17,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
     build_data_settings,
+    build_migration_request,
     data_settings_context,
-    run_runtime_store_migrations,
+    run_domain_migrations,
+    unwrap_data_response,
 )
 from app.services.trading import (
     build_broker_state_unknown_event,
     create_execution_receipt,
     create_operational_event,
     emit_runtime_event,
+    get_trading_migrations,
     get_trading_operational_events,
     validate_budget_authority,
 )
@@ -171,7 +174,19 @@ def main() -> None:
             write_lock_lease_seconds=10.0,
         )
         with data_settings_context(settings):
-            run_runtime_store_migrations(REQUEST_ID)
+            migration_response = get_trading_migrations()
+            assert migration_response.data is not None
+            unwrap_data_response(
+                run_domain_migrations(
+                    build_migration_request(
+                        domain="trading",
+                        steps=migration_response.data,
+                        request_id=REQUEST_ID,
+                    )
+                ),
+                operation="trading.usage.monitoring.migrations",
+                request_id=REQUEST_ID,
+            )
             assert get_trading_operational_events() == ()
 
     # Stage 2: Fail-closed budget validation

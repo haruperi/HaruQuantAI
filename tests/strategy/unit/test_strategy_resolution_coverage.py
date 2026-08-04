@@ -34,7 +34,7 @@ def test_validate_strategy_ref_handles_data_error() -> None:
     policy = MagicMock()
 
     with patch(
-        "app.services.strategy.registry.resolution.execute_transaction",
+        "app.services.strategy.registry.resolution.read_strategy_version_records",
         side_effect=DataError("DB failure"),
     ):
         res = validate_strategy_ref(ref, policy)
@@ -99,10 +99,9 @@ def test_validate_strategy_ref_search_results() -> None:
     policy = MagicMock(approved_module_roots=("app.strategies",))
 
     # Empty rows -> NOT_FOUND
-    mock_empty_res = MagicMock(rows=[])
     with patch(
-        "app.services.strategy.registry.resolution.execute_transaction",
-        return_value=mock_empty_res,
+        "app.services.strategy.registry.resolution.read_strategy_version_records",
+        return_value=(),
     ):
         res_empty = validate_strategy_ref(ref, policy)
         assert res_empty.status == "error"
@@ -113,12 +112,11 @@ def test_validate_strategy_ref_search_results() -> None:
     mock_manifest = MagicMock()
     mock_manifest.strategy_version = "2.0.0"
     mock_row = {"manifest_json": '{"strategy_version": "2.0.0"}'}
-    mock_mismatch_res = MagicMock(rows=[mock_row])
     err_code = StrategyErrorCode.VERSION_CONSTRAINT_UNSATISFIABLE.value
     with (
         patch(
-            "app.services.strategy.registry.resolution.execute_transaction",
-            return_value=mock_mismatch_res,
+            "app.services.strategy.registry.resolution.read_strategy_version_records",
+            return_value=(mock_row,),
         ),
         patch(
             "app.services.strategy.contracts.manifest.StrategyManifest.model_validate_json",

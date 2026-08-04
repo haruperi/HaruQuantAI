@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import Any
 
 from app.services.data.contracts import DataError
+from app.services.data.persistence import read_feed_record
 from app.services.data.realtime_feeds.contracts import (
     FeedStatus,
     FeedStatusRequest,
@@ -88,29 +89,7 @@ def read_feed_status(
         )
 
     # Check database
-    from app.services.data.persistence.contracts import (
-        StatementPlan,
-        TransactionRequest,
-    )
-    from app.services.data.persistence.transactions import _execute_transaction_raw
-
-    query_sql = (
-        "SELECT feed_id, source_id, symbol, data_kind, state, heartbeat_at, "
-        "  last_event_at, buffer_depth, buffer_capacity, dropped_count, "
-        "  gap_count, reconnect_count, breaker_state, drift_ms, last_error, "
-        "  heartbeat_timeout_seconds "
-        "FROM data_feeds WHERE feed_id = ?"
-    )
-    res = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(query_sql,),
-                parameter_sets=((request.feed_id,),),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
-    )
+    res = read_feed_record(request.feed_id, request_id=request.request_id)
     if not res.rows:
         raise DataError(
             "DATA_NOT_FOUND",

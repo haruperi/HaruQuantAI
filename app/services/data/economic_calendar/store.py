@@ -24,56 +24,16 @@ from app.services.data.contracts.responses import (
     run_data_operation,
 )
 from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
-from app.services.data.persistence.contracts import (
-    StatementPlan,
-    TransactionRequest,
+from app.services.data.persistence import (
+    read_economic_event_records,
+    update_economic_event_records,
 )
-from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 
 _REFRESH_NEXT_7_DAYS: Final[int] = 7
 _REFRESH_NEXT_24_HOURS: Final[int] = 24
-
-_UPSERT_SQL = """
-INSERT INTO data_economic_events (
-    provider, provider_event_id, name, category, country, currency,
-    scheduled_at, original_scheduled_at, actual, forecast, previous,
-    revised_previous, actual_raw, forecast_raw, previous_raw, unit, source,
-    source_url, impact, updated_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-ON CONFLICT (provider, provider_event_id) DO UPDATE SET
-    name = excluded.name,
-    category = excluded.category,
-    country = excluded.country,
-    currency = excluded.currency,
-    scheduled_at = excluded.scheduled_at,
-    original_scheduled_at = data_economic_events.original_scheduled_at,
-    actual = excluded.actual,
-    forecast = excluded.forecast,
-    previous = excluded.previous,
-    revised_previous = excluded.revised_previous,
-    actual_raw = excluded.actual_raw,
-    forecast_raw = excluded.forecast_raw,
-    previous_raw = excluded.previous_raw,
-    unit = excluded.unit,
-    source = excluded.source,
-    source_url = excluded.source_url,
-    impact = excluded.impact,
-    updated_at = excluded.updated_at
-""".strip()
-
-# Query rows in scheduled_at order. The optional currency/country/impact
-# clauses are appended deterministically below.
-_QUERY_SQL_BASE = (
-    "SELECT provider, provider_event_id, name, category, country, currency, "
-    "scheduled_at, original_scheduled_at, actual, forecast, previous, "
-    "revised_previous, actual_raw, forecast_raw, previous_raw, unit, source, "
-    "source_url, impact, updated_at "
-    "FROM data_economic_events "
-    "WHERE scheduled_at >= ? AND scheduled_at < ?"
-)
 
 
 def _iso(value: datetime | None) -> str | None:
@@ -237,17 +197,10 @@ class EconomicEventStore:
         if not events:
             return 0
         parameter_sets = tuple(_to_row(event) for event in events)
-        statements = tuple(_UPSERT_SQL for _ in events)
         logger.info("Upserting %d economic events", len(events))
-        _execute_transaction_raw(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=statements,
-                    parameter_sets=parameter_sets,
-                    max_rows=max(1, len(events)),
-                ),
-                request_id=request_id,
-            )
+        update_economic_event_records(
+            parameter_sets,
+            request_id=request_id,
         )
         return len(events)
 
@@ -296,37 +249,17 @@ class EconomicEventStore:
         if start >= end:
             raise DataError("VALIDATION_FAILED", safe_details={"field": "window"})
 
-        clauses: list[str] = []
-        params: list[int | float | str | bytes | None] = [_iso(start), _iso(end)]
-        if currencies:
-            placeholders = ", ".join("?" for _ in currencies)
-            clauses.append(f"currency IN ({placeholders})")
-            params.extend(currencies)
-        if countries:
-            placeholders = ", ".join("?" for _ in countries)
-            clauses.append(f"country IN ({placeholders})")
-            params.extend(countries)
-        if minimum_impact is not None:
-            clauses.append("impact >= ?")
-            params.append(int(minimum_impact))
-        if provider is not None:
-            clauses.append("provider = ?")
-            params.append(provider)
-        sql = _QUERY_SQL_BASE
-        if clauses:
-            sql = f"{sql} AND {' AND '.join(clauses)}"
-        sql = f"{sql} ORDER BY scheduled_at ASC"
-
         logger.debug("Querying stored economic events")
-        result = _execute_transaction_raw(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(sql,),
-                    parameter_sets=(tuple(params),),
-                    max_rows=100_000,
-                ),
-                request_id=request_id or generate_id("req"),
-            )
+        result = read_economic_event_records(
+            start=str(_iso(start)),
+            end=str(_iso(end)),
+            currencies=currencies,
+            countries=countries,
+            minimum_impact=(
+                int(minimum_impact) if minimum_impact is not None else None
+            ),
+            provider=provider,
+            request_id=request_id or generate_id("req"),
         )
         return [_from_row_raw(dict(row)) for row in result.rows]
 

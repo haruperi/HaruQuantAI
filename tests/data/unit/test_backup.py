@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import sqlite3
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -57,7 +58,7 @@ def data_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     ):
         (tmp_path / relative).mkdir(parents=True)
     monkeypatch.setattr(
-        "app.services.data.persistence.backup._persist_audit_event_raw",
+        "app.services.data.audit.store._persist_audit_event_raw",
         lambda _event: None,
     )
     return tmp_path
@@ -86,6 +87,22 @@ def test_manifest_records_hash_per_target(data_root: Path) -> None:
     assert entry.content_hash == hashlib.sha256(payload.read_bytes()).hexdigest()
     committed = data_root / "artifacts/data/backups" / manifest.manifest_id
     assert (committed / "manifest.json").is_file()
+
+
+def test_database_backup_hashes_after_persisted_lease(data_root: Path) -> None:
+    """Snapshot a database after the lease write so copied hashes remain stable."""
+    database = data_root / "data/cache/data.db"
+    with sqlite3.connect(database) as connection:
+        connection.execute("CREATE TABLE evidence (id INTEGER PRIMARY KEY)")
+
+    with data_settings_context(_settings(data_root)):
+        manifest = _unwrap(create_backup((_target("data/cache/data.db"),)))
+
+    entry = manifest.entries[0]
+    committed = data_root / "artifacts/data/backups" / manifest.manifest_id
+    copied = committed / "payload/data/cache/data.db"
+    assert copied.is_file()
+    assert entry.content_hash == hashlib.sha256(copied.read_bytes()).hexdigest()
 
 
 def test_restore_round_trip(data_root: Path) -> None:

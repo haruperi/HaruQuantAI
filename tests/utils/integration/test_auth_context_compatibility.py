@@ -27,6 +27,7 @@ _REQUIRED_FIELDS = frozenset(
         "scopes",
         "tenant_or_environment",
         "request_id",
+        "runtime_profile",
         "workflow_id",
         "correlation_id",
         "issued_at",
@@ -60,8 +61,9 @@ def test_auth_context_exposes_exactly_the_required_consumer_fields() -> None:
     """Prove the consumed field set is complete and carries no extra field."""
     context = _canonical_context()
     assert set(type(context).model_fields) == _REQUIRED_FIELDS
-    for field in _REQUIRED_FIELDS:
+    for field in _REQUIRED_FIELDS - {"runtime_profile"}:
         assert getattr(context, field) is not None
+    assert context.runtime_profile is None
 
 
 def test_auth_context_round_trips_without_loss() -> None:

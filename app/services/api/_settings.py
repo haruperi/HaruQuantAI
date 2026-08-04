@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from functools import lru_cache
-from typing import Literal
+from pathlib import Path
+from typing import Literal, override
 
 from pydantic import Field, field_validator, model_validator
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
 from app.services.api._limits import (
     API_DEFAULT_PAGE_SIZE,
@@ -16,11 +18,16 @@ from app.services.api._limits import (
     PREFLIGHT_WARNING_TTL_SECONDS,
     get_default_rate_limits,
 )
-from app.utils.settings.models import AppSettings
+from app.utils.settings import (
+    get_app_settings_model_config,
+    get_app_settings_sources,
+)
 
 
-class ApiSettings(AppSettings):
+class ApiSettings(BaseSettings):
     """Immutable configuration for the canonical API application."""
+
+    model_config = get_app_settings_model_config()
 
     environment: Literal["dev", "test", "staging", "production"] = "dev"
     api_host: str = "127.0.0.1"
@@ -28,6 +35,7 @@ class ApiSettings(AppSettings):
     api_version: Literal["v1"] = "v1"
     runtime_profile: Literal["research", "simulation", "paper", "live"] = "research"
     execution_route: Literal["none", "sim", "paper", "live"] = "none"
+    simulation_artifact_root: Path = Path("artifacts/simulation")
     allow_live_mutations: bool = False
     ui_origins: tuple[str, ...] = ("http://localhost:3000",)
     session_ttl_seconds: int = Field(default=3600, ge=60, le=2_592_000)
@@ -58,6 +66,29 @@ class ApiSettings(AppSettings):
     rate_limits_by_class: Mapping[str, tuple[int, float]] = Field(
         default_factory=lambda: dict(get_default_rate_limits())
     )
+
+    @override
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        """Load explicit and process values before the central JSON source.
+
+        Returns:
+            Canonical settings sources in descending precedence order.
+        """
+        return get_app_settings_sources(
+            settings_cls,
+            init_settings,
+            env_settings,
+            dotenv_settings,
+            file_secret_settings,
+        )
 
     @field_validator("api_host")
     @classmethod

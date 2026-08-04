@@ -5,8 +5,6 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
-from app.services.api.identity import require_auth_context
-from app.services.api.routes import strategies
 from app.services.api.routes.strategies import router as strategies_router
 from app.services.data import (
     build_data_quality_report,
@@ -24,12 +22,12 @@ from app.services.strategy import (
     create_strategy_parameter_update_request,
     create_strategy_ref,
     get_strategy_environment,
+    register_strategy_version,
+    update_strategy_parameters,
 )
 from app.utils import get_logger
-from fastapi import FastAPI
 
 from tests.analytics._support import _report
-from tests.api._support import post_json
 from tests.optimization.unit.test_adapter import _auth
 from tests.optimization.unit.test_search_contracts import search_request
 from tests.simulator.unit.test_reporting_contracts import _result
@@ -118,21 +116,8 @@ def _storage(root: Path) -> AbstractContextManager[None]:
     )
 
 
-def _api() -> FastAPI:
-    """Build the authenticated API composition for SYS-WF-003.
-
-    Returns:
-        Configured FastAPI application.
-    """
-    app = FastAPI()
-    app.include_router(strategies_router)
-    app.dependency_overrides[require_auth_context] = make_auth
-    app.dependency_overrides[strategies._strategy_validation_policy] = make_policy
-    return app
-
-
 def test_sys_wf_003_approved_optimization_adoption(tmp_path: Path) -> None:
-    """Verify advisory Optimization requires API approval before adoption."""
+    """Verify approved Optimization evidence enters Strategy through its owner API."""
     logger.debug("Testing SYS-WF-003 deterministic advisory core")
     dataset = make_dataset()
     captured: dict[str, object] = {}
@@ -208,26 +193,25 @@ def test_sys_wf_003_approved_optimization_adoption(tmp_path: Path) -> None:
         correlation_id=registration.correlation_id,
     )
 
-    app = _api()
     with _storage(tmp_path):
-        registration_status, registration_body = post_json(
-            app,
-            "/api/strategies/registrations",
-            registration.model_dump(mode="json"),
+        registration_response = register_strategy_version(
+            registration,
+            make_auth(),
+            make_policy(),
         )
-        adoption_status, adoption_body = post_json(
-            app,
-            "/api/strategies/parameter-updates",
-            update.model_dump(mode="json"),
-        )
+        adoption_response = update_strategy_parameters(update, make_auth())
 
     simulation_request = captured["request"]
     assert dataset.schema_id == "data.market_dataset.v1"
     assert simulation_request.schema_id == "simulation.backtest_request.v1"
     assert result.ranked_candidates
     assert result.diagnostics["search"]
-    assert registration_status == 200
-    assert registration_body["status"] == "ACCEPTED"
-    assert adoption_status == 200
-    assert adoption_body["status"] == "ACCEPTED"
-    assert adoption_body["validated_config"]["normalized_parameters"] == parameters
+    route_paths = {route.path for route in strategies_router.routes}
+    assert "/api/v1/strategies/registrations" not in route_paths
+    assert "/api/v1/strategies/parameter-updates" not in route_paths
+    assert registration_response.data is not None
+    assert registration_response.data.status == "ACCEPTED"
+    assert adoption_response.data is not None
+    assert adoption_response.data.status == "ACCEPTED"
+    assert adoption_response.data.validated_config is not None
+    assert adoption_response.data.validated_config.normalized_parameters == parameters

@@ -4,12 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from app.services.data import (
-    build_statement_plan,
-    build_transaction_request,
-    execute_transaction,
-    is_data_error,
-)
+from app.services.data import is_data_error
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.manifest import StrategyManifest
 from app.services.strategy.contracts.outcomes import failure, success
@@ -17,11 +12,9 @@ from app.services.strategy.contracts.policy import StrategyValidationPolicy
 from app.services.strategy.contracts.references import (
     ValidatedStrategyRef,
 )
-from app.services.strategy.contracts.responses import (
-    guard_strategy_boundary,
-    unwrap_data_response,
-)
+from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
+from app.services.strategy.persistence import read_strategy_version_records
 from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
@@ -43,32 +36,7 @@ def list_strategy_versions(
     request_id = generate_id("req")
     correlation_id = generate_id("cor")
     try:
-        if strategy_id is None:
-            statement = (
-                "SELECT manifest_json, lifecycle_status, policy_json, record_hash "
-                "FROM strategy_versions ORDER BY strategy_id, strategy_version"
-            )
-            params: tuple[str, ...] = ()
-        else:
-            statement = (
-                "SELECT manifest_json, lifecycle_status, policy_json, record_hash "
-                "FROM strategy_versions WHERE strategy_id = ? ORDER BY strategy_id, "
-                "strategy_version"
-            )
-            params = (strategy_id,)
-        result = unwrap_data_response(
-            execute_transaction(
-                build_transaction_request(
-                    plan=build_statement_plan(
-                        statements=(statement,),
-                        parameter_sets=(params,),
-                        max_rows=1_000,
-                    ),
-                    request_id=request_id,
-                )
-            ),
-            operation="data.execute_transaction.strategy_registry",
-        )
+        rows = read_strategy_version_records(strategy_id, request_id)
     except Exception as error:
         if not is_data_error(error):
             raise
@@ -78,14 +46,14 @@ def list_strategy_versions(
             request_id=request_id,
             correlation_id=correlation_id,
         )
-    if strategy_id is not None and not result.rows:
+    if strategy_id is not None and not rows:
         return failure(
             StrategyErrorCode.NOT_FOUND,
             "strategy was not found",
             request_id=request_id,
             correlation_id=correlation_id,
         )
-    refs = tuple(_row_to_ref(row, request_id, correlation_id) for row in result.rows)
+    refs = tuple(_row_to_ref(row, request_id, correlation_id) for row in rows)
     return success(refs)
 
 

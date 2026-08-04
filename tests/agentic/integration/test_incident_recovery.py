@@ -274,8 +274,11 @@ def test_operations_reaches_no_receiver_and_executes_no_replay() -> None:
 
     # Data's migration builders are the one permitted service import.
     importers = {
-        path.name
-        for path in Path("app/agentic/operations").glob("*.py")
+        str(path.as_posix())
+        for path in (
+            *Path("app/agentic/operations").glob("*.py"),
+            Path("app/agentic/migrations/operations.py"),
+        )
         if "app.services" in path.read_text(encoding="utf-8")
     }
-    assert importers == {"migrations.py"}
+    assert importers == {"app/agentic/migrations/operations.py"}

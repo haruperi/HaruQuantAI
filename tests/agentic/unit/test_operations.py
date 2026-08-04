@@ -720,7 +720,7 @@ def test_the_migration_request_is_declared_not_executed() -> None:
     from pathlib import Path
 
     assert build_operations_migration_request(generate_id("req")) is not None
-    source = Path("app/agentic/operations/migrations.py").read_text(encoding="utf-8")
+    source = Path("app/agentic/migrations/operations.py").read_text(encoding="utf-8")
     for forbidden in ("connect(", "execute(", "cursor"):
         assert forbidden not in source
 

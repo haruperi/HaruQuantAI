@@ -5,8 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from app.services.data.contracts.errors import DataError
-from app.services.data.persistence.contracts import StatementPlan, TransactionRequest
-from app.services.data.persistence.transactions import _execute_transaction_raw
+from app.services.data.persistence import read_research_source_records
 from app.services.data.research_sources.contracts import (
     JSONScalar,
     ResearchSourceDocument,
@@ -15,7 +14,6 @@ from app.services.data.research_sources.contracts import (
     query_digest,
 )
 from app.services.data.research_sources.ingestion import (
-    _SELECT_COLUMNS,
     _row_to_document,
 )
 from app.services.data.research_sources.policy import (
@@ -26,24 +24,11 @@ from app.services.data.research_sources.policy import (
 def query_research_sources(query: ResearchSourceQuery) -> ResearchSourcePage:
     """Return eligible records known by the supplied decision time."""
     offset = 0 if query.cursor is None else int(query.cursor)
-    result = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    f"""
-                    SELECT {_SELECT_COLUMNS} FROM data_research_sources
-                    WHERE available_at <= ?
-                    ORDER BY available_at, source_id, external_id, revision
-                    LIMIT ? OFFSET ?
-                    """.strip(),  # noqa: S608 - columns are a module constant.
-                ),
-                parameter_sets=(
-                    (query.decision_time.isoformat(), query.limit + 1, offset),
-                ),
-                max_rows=query.limit + 1,
-            ),
-            request_id=query.request_id,
-        )
+    result = read_research_source_records(
+        query.decision_time.isoformat(),
+        query.limit + 1,
+        offset,
+        request_id=query.request_id,
     )
     eligible: list[ResearchSourceDocument] = []
     for raw in result.rows:

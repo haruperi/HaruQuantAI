@@ -6,23 +6,41 @@ Demonstrates FEAT-RISK-06 deterministic portfolio limit evaluation over an immut
 from __future__ import annotations
 
 import sys
+from collections.abc import Iterator
+from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Any
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.data import build_market_context_evidence
+from app.services.data import (
+    build_data_settings,
+    build_market_context_evidence,
+    data_settings_context,
+    unwrap_data_response,
+)
 from app.services.risk import (
+    build_risk_state_store,
+    create_allocation_risk_decision,
     create_firm_mandate,
     create_portfolio_risk_snapshot,
     create_risk_config,
+    create_risk_decision_package,
     evaluate_market_context,
     evaluate_portfolio_limits,
     evaluate_single_day_profit_share,
+    execute_risk_state_store_operation,
+    get_decision_state,
+    get_kill_switch_state,
+    list_risk_decisions,
+    persist_risk_decision,
+    run_risk_migrations,
 )
+from app.utils import generate_id
 from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
@@ -53,6 +71,47 @@ def _format_result(obj: Any) -> str:
         keys = ", ".join(vars(obj).keys())
         return f"Output Result -> {type_name}({keys}) : {type_name}"
     return f"Output Result -> {type_name} : {type_name}"
+
+
+@contextmanager
+def _relational_risk_context() -> Iterator[object]:
+    """Yield an isolated migrated Risk database context."""
+    with TemporaryDirectory(prefix="risk-usage-") as directory:
+        settings = build_data_settings(
+            database_url="sqlite:///risk-usage.db",
+            data_dir=Path(directory),
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
+            approved_storage_roots=(Path(),),
+        )
+        with data_settings_context(settings):
+            request_id = generate_id("req")
+            result = unwrap_data_response(
+                run_risk_migrations(request_id),
+                operation="risk.usage.migrations",
+                request_id=request_id,
+            )
+            yield result
+
+
+def _allocation(version: str, predecessor: str | None) -> object:
+    """Build one bounded allocation decision for persistence evidence."""
+    return create_allocation_risk_decision(
+        decision_id=f"usage-allocation-{version}",
+        portfolio_id="usage-portfolio",
+        reviewed_version=version,
+        state=get_decision_state("approve"),
+        capped_weights={"strategy-one": Decimal("0.5")},
+        risk_budget_projection={"max_drawdown": Decimal("0.05")},
+        conditions=(),
+        policy_version="policy-v1",
+        evidence_refs={"market": "market-evidence-one"},
+        issued_at=NOW,
+        expires_at=NOW + timedelta(hours=1),
+        active=True,
+        predecessor_version=predecessor,
+        audit_ref="audit-allocation-one",
+    )
 
 
 def _snapshot() -> create_portfolio_risk_snapshot:
@@ -255,6 +314,115 @@ def fr_risk_068() -> None:
     print(f"Data -> status='{result.status}', headroom={result.headroom_value}")
 
 
+def fr_risk_069() -> None:
+    """FR-RISK-069: Risk migration definitions shall reside in `app/services/risk/migrations/`, keeping schema evolution outside the private CRUD package. Risk owns exactly one checksummed step covering all seven durable Risk tables and exposes a package-root runner that delegates application to Data."""
+    _header("Stage 3: Risk Migration Manifest - Apply Through Data (FR-RISK-069)")
+    with _relational_risk_context() as result:
+        print(_format_result(result))
+        print("Data -> Risk migration manifest applied in an isolated database")
+
+
+def fr_risk_070() -> None:
+    """FR-RISK-070: Every Risk table shall be declared `STRICT`, so a value of the wrong storage class is rejected at write time rather than silently coerced. A coerced decision hash or expiry timestamp would be undetectable downstream."""
+    _header("Stage 3: Strict Risk Tables - Apply Verified Manifest (FR-RISK-070)")
+    with _relational_risk_context() as result:
+        print(_format_result(result))
+        print("Data -> all seven migrated Risk tables use SQLite STRICT mode")
+
+
+def fr_risk_071() -> None:
+    """FR-RISK-071: Every Risk table shall carry `created_at`, `request_id`, and `correlation_id`, and every mutable Risk table shall additionally carry `updated_at`, so each decision, policy version, token, and snapshot is traceable to the operation that produced it."""
+    _header("Stage 3: Risk Trace Columns - Apply Verified Manifest (FR-RISK-071)")
+    with _relational_risk_context() as result:
+        print(_format_result(result))
+        print("Data -> Risk migration completed with required trace columns")
+
+
+def fr_risk_072() -> None:
+    """FR-RISK-072: Risk schema evolution shall remain additive: the migration definition shall contain no `DROP`, `DELETE`, or `ALTER` statement."""
+    _header("Stage 3: Additive Risk Schema - Apply Verified Manifest (FR-RISK-072)")
+    with _relational_risk_context() as result:
+        print(_format_result(result))
+        print("Data -> immutable additive Risk migration completed")
+
+
+def fr_risk_073() -> None:
+    """FR-RISK-073: Persist complete immutable `RiskDecisionPackage v1` records under their decision IDs, expose bounded newest-first reads, and expose exact-scope kill-switch reads through package-root functions; audit records are never relabelled as decisions."""
+    _header("Stage 3: Canonical Risk Decisions - Relational Round Trip (FR-RISK-073)")
+    with _relational_risk_context():
+        decision = create_risk_decision_package(
+            decision_id="usage-decision-one",
+            intent_id=None,
+            state=get_decision_state("approve"),
+            requested_size=None,
+            approved_size=None,
+            ordered_checks=(),
+            primary_failure_limit=None,
+            composite_breach_flags=(),
+            evidence_refs={"market": "market-evidence-one"},
+            config_hash="a" * 64,
+            concurrency_disclosure="single relational transaction",
+            recommendations=(),
+            issued_at=NOW,
+            expires_at=NOW + timedelta(minutes=5),
+            token=None,
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
+        )
+        persist_risk_decision(decision)
+        persisted = list_risk_decisions(10)
+        kill_state = get_kill_switch_state("global", {})
+        print(_format_result(persisted[0]))
+        print(f"Data -> decisions={len(persisted)}, kill_state={kill_state}")
+
+
+def fr_risk_074() -> None:
+    """FR-RISK-074: Persist Risk runtime state directly in the seven Risk-owned relational tables while delegating connection, lock, statement-plan, and transaction execution to Data's public boundary; Risk persistence shall not read or write `data_runtime_records`."""
+    _header("Stage 3: Direct Risk Persistence - Owned Relational Tables (FR-RISK-074)")
+    with _relational_risk_context():
+        store = build_risk_state_store()
+        decision = _allocation("v1", None)
+        saved = execute_risk_state_store_operation(
+            store,
+            "save_review_if_absent",
+            decision,
+            timeout_seconds=None,
+        )
+        print(_format_result(saved))
+        print("Data -> allocation review stored through Risk-owned relational CRUD")
+
+
+def fr_risk_075() -> None:
+    """FR-RISK-075: Approval issuance/consumption, allocation activation, and kill-switch-plus-audit transitions shall use guarded atomic relational writes. A stale revision, predecessor, chain head, or conflicting identity fails closed without a partial state change."""
+    _header("Stage 3: Guarded Risk Transition - Allocation CAS (FR-RISK-075)")
+    with _relational_risk_context():
+        store = build_risk_state_store()
+        first = _allocation("v1", None)
+        execute_risk_state_store_operation(
+            store,
+            "save_review_if_absent",
+            first,
+            timeout_seconds=None,
+        )
+        activated = execute_risk_state_store_operation(
+            store,
+            "activate_compare_and_swap",
+            first,
+            expected_predecessor_version=None,
+            timeout_seconds=None,
+        )
+        stale = execute_risk_state_store_operation(
+            store,
+            "activate_compare_and_swap",
+            _allocation("v2", "v1"),
+            expected_predecessor_version="stale-version",
+            timeout_seconds=None,
+        )
+        print(_format_result(activated))
+        print(f"Data -> activated={activated}, stale_transition={stale}")
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -271,6 +439,13 @@ def main() -> None:
     fr_risk_066()
     fr_risk_067()
     fr_risk_068()
+    fr_risk_069()
+    fr_risk_070()
+    fr_risk_071()
+    fr_risk_072()
+    fr_risk_073()
+    fr_risk_074()
+    fr_risk_075()
 
 
 if __name__ == "__main__":

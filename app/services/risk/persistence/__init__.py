@@ -1,0 +1,51 @@
+"""Private Risk-owned CRUD persistence boundary."""
+
+from app.services.risk.persistence.create import (
+    create_active_allocation_record,
+    create_allocation_review_record,
+    create_approval_state_record,
+    create_audit_record,
+    create_decision_record,
+    create_eligibility_record,
+    create_risk_runtime_store,
+)
+from app.services.risk.persistence.read import (
+    read_active_allocation_record,
+    read_active_allocation_record_with_revision,
+    read_approval_index_records,
+    read_approval_state_record,
+    read_approval_state_record_with_revision,
+    read_audit_record,
+    read_audit_records,
+    read_decision_record,
+    read_decision_records,
+    read_kill_switch_record,
+)
+from app.services.risk.persistence.update import (
+    update_active_allocation_record,
+    update_approval_state_record,
+    update_kill_switch_with_audit,
+)
+
+__all__ = [
+    "create_active_allocation_record",
+    "create_allocation_review_record",
+    "create_approval_state_record",
+    "create_audit_record",
+    "create_decision_record",
+    "create_eligibility_record",
+    "create_risk_runtime_store",
+    "read_active_allocation_record",
+    "read_active_allocation_record_with_revision",
+    "read_approval_index_records",
+    "read_approval_state_record",
+    "read_approval_state_record_with_revision",
+    "read_audit_record",
+    "read_audit_records",
+    "read_decision_record",
+    "read_decision_records",
+    "read_kill_switch_record",
+    "update_active_allocation_record",
+    "update_approval_state_record",
+    "update_kill_switch_with_audit",
+]

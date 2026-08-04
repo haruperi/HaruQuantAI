@@ -1,4 +1,4 @@
-"""Durable Agentic operations store over Data-owned runtime records."""
+"""Durable Agentic operations store over Agentic-owned relational records."""
 
 from __future__ import annotations
 
@@ -12,12 +12,14 @@ from app.agentic.operations.models import (
     ReplayOutcome,
     ReplayRequest,
 )
-from app.services.data import (
-    build_agentic_runtime_store,
-    execute_runtime_store_operation,
-    execute_runtime_store_transition,
+from app.agentic.persistence import (
+    create_agentic_persistence_store,
+    create_incident_record,
+    create_operation_trace_record,
+    create_replay_record,
+    read_incident_records,
+    read_operation_trace_record,
 )
-from app.utils import canonical_digest
 
 
 def _encode(value: object) -> str:
@@ -34,24 +36,16 @@ def _encode(value: object) -> str:
     return value.model_dump_json()
 
 
-def _key(*values: str) -> str:
-    """Derive one storage-safe identifier.
-
-    Returns:
-        Bounded key.
-    """
-    return f"record-{canonical_digest(values)}"
-
-
 class DurableOperationsStore:
     """Data-backed implementation of the Agentic operations-store port."""
 
     def __init__(self) -> None:
-        """Build the lazy Data runtime handle."""
-        self._store = build_agentic_runtime_store(
+        """Build the relational persistence handle."""
+        self._store = create_agentic_persistence_store(
             {
                 "incident": (_encode, IncidentRecord.model_validate_json),
                 "replay": (_encode, ReplayOutcome.model_validate_json),
+                "replay-request": (_encode, ReplayRequest.model_validate_json),
                 "trace": (_encode, AgenticTrace.model_validate_json),
             }
         )
@@ -62,13 +56,10 @@ class DurableOperationsStore:
         Returns:
             Persisted trace.
         """
-        execute_runtime_store_operation(
+        create_operation_trace_record(
             self._store,
-            "put_once",
-            collection="operation-traces",
-            key=_key(trace.trace_hash),
-            kind="trace",
-            value=trace,
+            trace.trace_hash,
+            trace,
         )
         return trace
 
@@ -80,11 +71,9 @@ class DurableOperationsStore:
         """
         return cast(
             "AgenticTrace | None",
-            execute_runtime_store_operation(
+            read_operation_trace_record(
                 self._store,
-                "get",
-                collection="operation-traces",
-                key=_key(trace_hash),
+                trace_hash,
             ),
         )
 
@@ -98,19 +87,12 @@ class DurableOperationsStore:
             ValueError: If the incident classification is already recorded.
         """
         incidents = self._all_incidents()
-        committed = execute_runtime_store_transition(
+        committed = create_incident_record(
             self._store,
-            state_collection="incident-guards",
-            state_key=_key(incident.run_id, incident.correlation_id, incident.kind),
-            state_kind="incident",
-            state_value=incident,
-            expected_revision=0,
-            event_collection="operation-incidents",
-            event_key=_key(incident.incident_id),
-            event_partition="incidents",
-            event_sequence=len(incidents) + 1,
-            event_kind="incident",
-            event_value=incident,
+            guard_key=f"{incident.run_id}:{incident.correlation_id}:{incident.kind}",
+            incident_key=incident.incident_id,
+            sequence=len(incidents) + 1,
+            value=incident,
         )
         if not committed:
             raise ValueError("Agentic incident classification is already recorded")
@@ -124,12 +106,10 @@ class DurableOperationsStore:
         """
         return cast(
             "tuple[IncidentRecord, ...]",
-            execute_runtime_store_operation(
+            read_incident_records(
                 self._store,
-                "list",
-                collection="operation-incidents",
-                partition="incidents",
-                limit=1_000,
+                "incidents",
+                1_000,
             ),
         )
 
@@ -170,13 +150,11 @@ class DurableOperationsStore:
         """
         if request.replay_id != outcome.replay_id:
             raise ValueError("Agentic replay request and outcome conflict")
-        execute_runtime_store_operation(
+        create_replay_record(
             self._store,
-            "put_once",
-            collection="operation-replays",
-            key=_key(request.replay_id),
-            kind="replay",
-            value=outcome,
+            request.replay_id,
+            request,
+            outcome,
         )
         return outcome
 

@@ -20,11 +20,11 @@ from app.services.portfolio.api import (
     to_portfolio_error_payload,
 )
 from app.services.portfolio.evidence import validate_construction_evidence
+from app.services.portfolio.migrations import get_portfolio_migrations
 from app.services.portfolio.rebalancing.cross_account import (
     assess_common_mode_exposure,
     measure_cross_account_correlation,
 )
-from app.services.portfolio.state.migrations import get_portfolio_migrations
 from app.services.portfolio.state.runtime import (
     build_portfolio_state_store,
     execute_portfolio_state_store_operation,

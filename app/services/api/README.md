@@ -126,8 +126,8 @@ connection, locking, and migration execution only.
 
 | Status | State / Store | Read access (via contract) | Migration definitions |
 |---|---|---|---|
-| Completed | User, session, authentication-failure, settings, approval, and encrypted credential-reference state | UI/API package-root identity/settings/credential functions | `app/services/api/identity/migrations.py`; `app/services/api/persistence/` |
-| Completed | HTTP-idempotency reservations and terminal replay records | UI/API package-root replay/conflict functions | `app/services/api/identity/migrations.py`; `app/services/api/persistence/` |
+| Completed | User, normalized role/permission/binding authority, session, authentication-failure, settings, approval, and encrypted credential-reference state | UI/API package-root identity/settings/credential functions | `app/services/api/migrations/`; `app/services/api/persistence/` |
+| Completed | HTTP-idempotency reservations and terminal replay records | UI/API package-root replay/conflict functions | `app/services/api/migrations/`; `app/services/api/persistence/` |
 
 Browser sessions use opaque server-side identifiers in secure HttpOnly SameSite
 cookies outside local development and require CSRF validation for state changes.
@@ -185,7 +185,7 @@ contracts, numbered usage program, and required tests satisfy Sections 4 and 7.
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
 | Completed | `FEAT-API-01` Boundary Contracts | `contracts/` | Package-root contract builders, canonical route registry, `ApiMetadata`, `ApiError`, `ApiResponse`, `StreamEvent`, `RouteContract`, `GovernedRequestContext`, `PageContext` | `FR-API-001`–`FR-API-008` | `tests/api/usage/01_contracts.py`; `tests/api/contracts/` |
-| Completed | `FEAT-API-02` Authentication and Authorization | `identity/` | Package-root account/session/permission/governance/credential/settings/approval/idempotency functions | `FR-API-009`–`FR-API-015`, `FR-API-057`–`FR-API-058` | `tests/api/usage/02_identity.py`; `tests/api/integration/test_auth_settings.py`; `tests/api/integration/test_governance_state.py` |
+| Completed | `FEAT-API-02` Authentication and Authorization | `identity/` | Package-root account/session/permission/governance/credential/scoped-settings/approval/idempotency functions plus normalized RBAC persistence | `FR-API-009`–`FR-API-015`, `FR-API-057`–`FR-API-058`, `FR-API-073`–`FR-API-077` | `tests/api/usage/02_identity.py`; `tests/api/integration/test_auth_settings.py`; `tests/api/integration/test_settings_migration.py`; `tests/api/integration/test_governance_state.py` |
 | Completed | `FEAT-API-03` Request Security and Context | `middleware/` | `redaction.py`, `context.py` | `FR-API-016`–`FR-API-017` | `tests/api/usage/03_middlewares.py` |
 | Completed | `FEAT-API-04` Liveness and Readiness | `health/` | `get_liveness`, `get_readiness`, `check_clock_drift` | `FR-API-018`-`FR-API-019`, `FR-API-059` | `tests/api/usage/04_health.py` |
 | Completed | `FEAT-API-05` Operational Telemetry and Exposition | `observability/` | `record_metric`, `validate_metric_labels`, `build_metric_snapshot`, `export_prometheus_metrics`, `get_metrics`, `create_in_process_metric_sink` | `FR-API-060`â€“`FR-API-063` | `tests/api/usage/05_observability.py` |
@@ -256,7 +256,7 @@ preserved. Evidence: `app/services/api/middleware/envelope.py`,
 `tests/api/unit/test_application.py::test_canonical_app_wraps_successful_json_responses`.
 
 1. Boundary contracts are immutable, bounded, secret-safe, and registered deterministically. Evidence: `app/services/api/contracts/models.py:148`, `app/services/api/contracts/catalog.py:31`.
-2. API-owned accounts, opaque sessions, encrypted credential references, approvals, idempotency, and settings delegate all CRUD through the private uniform persistence package, while immutable migrations remain separate behind Data's public migration boundary. Evidence: `app/services/api/persistence/__init__.py`, `app/services/api/identity/migrations.py:136`.
+2. API-owned accounts, normalized authority, opaque sessions, encrypted credential references, approvals, idempotency, and settings delegate all CRUD through the private uniform persistence package, while immutable migrations remain separate behind Data's public migration boundary. Evidence: `app/services/api/persistence/__init__.py`, `app/services/api/migrations/definitions.py`.
 3. Canonical request identity, templated-route intent, authentication, required idempotency, and redacted telemetry are enforced before delegation. Evidence: `app/services/api/middleware/context.py:151`.
 4. Public liveness and protected dependency readiness remain versioned and secret-safe. Evidence: `app/services/api/health/probes.py:173`.
 5. Injected, non-authoritative metrics and protected exposition remain complete. Evidence: `app/services/api/observability/metrics.py:116`.
@@ -280,8 +280,8 @@ app/services/api/
 │   ├── sessions.py               # Authentication and session lifecycle boundary
 │   ├── approvals.py              # Scoped distinct-principal approval state
 │   ├── idempotency.py            # Durable HTTP reservation and replay state
-│   ├── settings.py               # Versioned user settings
-│   ├── migrations.py             # Immutable API-owned schema manifest
+│   ├── settings.py               # Versioned user/system settings
+│   ├── migrations/               # Immutable API-owned schema manifest
 │   └── authorization.py          # AuthContext, permission, and governed-write checks
 ├── persistence/                   # Private API-owned CRUD support package
 │   ├── __init__.py                # Private function-only persistence boundary
@@ -314,7 +314,7 @@ app/services/api/
 ├── routes/
 │   ├── __init__.py
 │   ├── auth.py                   # Registration, login, logout
-│   ├── settings.py               # User settings read/update
+│   ├── settings.py               # Scoped user/system settings read/update
 │   ├── data.py                   # Symbol discovery
 │   ├── strategies.py             # Strategy catalogue/version reads
 │   ├── research.py               # Initial core Edge Lab boundary
@@ -710,7 +710,9 @@ does not generate, store, or rotate encryption keys.
 All API-owned CRUD statement construction and execution resides in the private
 `app/services/api/persistence/` support package. Identity files retain validation,
 cryptography, authorization, expiry, optimistic-concurrency, and orchestration policy;
-`identity/migrations.py` remains the separate immutable schema manifest.
+`migrations/` remains the separate immutable schema manifest. Applied account JSON
+claim columns are compatibility-only after `api-0005`; authorization reads use the
+normalized role, permission, role-permission, and scoped binding tables.
 
 **Module flow:** credentials/session → validated principal → Utils `AuthContext` →
 permission and governed-request decision.
@@ -724,8 +726,8 @@ permission and governed-request decision.
 | Completed | `accounts.py` | Persist accounts, authenticate active verified users, update last-login evidence, and rate-limit invalid attempts | `register_user`, `authenticate_user` | **Standard library:** `hashlib`, `datetime`<br>**Local:** `passwords.py`; Data public transactions |
 | Completed | `approvals.py` | Persist and atomically consume scoped distinct-principal approvals | `create_approval`, `consume_approval` | **Standard library:** `hashlib`, `datetime`<br>**Local:** Data public transactions |
 | Completed | `idempotency.py` | Reserve scoped request keys and retain terminal replay evidence for at least 24 hours | `reserve_idempotency_key`, `finalize_idempotency_key` | **Standard library:** `hashlib`, `datetime`<br>**Local:** Data public transactions |
-| Completed | `settings.py` | Persist versioned user settings with optimistic concurrency | `get_user_settings`, `update_user_settings` | **Standard library:** `json`<br>**Local:** Data public transactions |
-| Completed | `migrations.py` | Declare immutable API-owned schema steps and apply them through Data's migration manifest boundary | `get_api_migration_steps`, `run_api_migrations` | **Local:** Data public migration functions |
+| Completed | `settings.py` | Persist versioned, secret-safe user and global system settings with optimistic concurrency | `get_user_settings`, `get_system_settings`, `update_user_settings`, `update_system_settings` | **Standard library:** `json`<br>**Local:** Data public transactions |
+| Completed | `../migrations/definitions.py` | Declare immutable API-owned schema steps and apply the complete manifest through Data's migration boundary | `get_api_migration_steps`, `run_api_migrations` | **Local:** Data public migration functions |
 | Completed | `../persistence/` | Execute API-owned CRUD through the exact private `create.py`, `read.py`, `update.py`, and `delete.py` layout | Private standalone CRUD functions | **Local:** Data public transaction functions |
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
@@ -739,6 +741,11 @@ permission and governed-request decision.
 | Completed | `FR-API-015` | Validate governed context, cookie CSRF, approval scope, idempotency dependency, stale evidence, and audit intent before delegation. | `validate_governed_request`, `validate_csrf`, `create_approval`, `consume_approval`, `reserve_idempotency_key`, `finalize_idempotency_key` | Read-only; API-owned persistence | `HTTPException`, `IdentityError`: governed evidence is incomplete, stale, mismatched, or unavailable | **Usage:** `tests/api/usage/02_identity.py`<br>**Integration:** `tests/api/integration/test_governance_state.py` |
 | Completed | `FR-API-057` | Encrypt credential material before persistence with authenticated encryption, store key ID/version and integrity metadata but never the key, select exactly the configured active key from an injected externally provisioned key set, and decrypt only for an authorized composition request. | `store_credential`, `resolve_credential_reference` | Persistence write/read | `IdentityError`: missing key, tamper, unknown reference, unauthorized access, or storage failure | **Usage:** `tests/api/usage/02_identity.py`<br>**Integration:** `tests/api/integration/test_auth_settings.py` |
 | Completed | `FR-API-058` | Resolve an opaque `secret://` reference only at composition, build one immutable Brokers-owned `BrokerConnectionConfig v1` with `SecretStr` values, and discard plaintext after construction without logging, caching, or returning it through UI/API contracts. | `build_broker_connection_config` | Credential-store read | `IdentityError`, `ValueError`: unsafe reference, unavailable key, or invalid Brokers config | **Usage:** `tests/api/usage/02_identity.py`; `tests/api/usage/08_composition.py`<br>**Integration:** `tests/api/integration/test_auth_settings.py` |
+| Completed | `FR-API-073` | Keep immutable API schema definitions in `app/services/api/migrations/` while Data owns migration execution, ledger verification, locking, and transactions. | `get_api_migration_steps`, `run_api_migrations` | Schema migration | Data migration failure | **Integration:** `tests/api/integration/test_auth_settings.py` |
+| Completed | `FR-API-074` | Persist account authority through normalized roles, permissions, role-permission grants, and scoped bindings; backfill exact legacy claims, reject conflicting role definitions, and treat account JSON claim columns as compatibility-only. | `register_user`, `authenticate_user`, `validate_session` | Transactional persistence read/write | `IdentityError`: conflicting authority or unavailable store | **Usage:** `tests/api/usage/02_identity.py`<br>**Integration:** `tests/api/integration/test_auth_settings.py::test_login_settings_credentials_logout()` |
+| Completed | `FR-API-075` | Persist user preferences and the global non-secret system document in one `api_settings` table keyed by derived scope and subject, while Utils remains stateless. | `get_user_settings`, `get_system_settings`, `update_user_settings`, `update_system_settings` | Transactional persistence read/write | `IdentityError`: unavailable store | **Usage:** `tests/api/usage/02_identity.py`<br>**Integration:** `tests/api/integration/test_auth_settings.py::test_login_settings_credentials_logout()` |
+| Completed | `FR-API-076` | Migrate every legacy `api_user_settings` document into user scope with exact JSON, version, and timestamp preservation before dropping the legacy table; preserve immutable historical checksums. | `api-0006`, `run_api_migrations` | Schema migration | `DataError[SCHEMA_MIGRATION_FAILED]` | **Integration:** `tests/api/integration/test_settings_migration.py` |
+| Completed | `FR-API-077` | Default the canonical settings route to the authenticated user's derived subject and require `settings:admin` before any global-system read or update; reject secret-like or oversized keys and enforce optimistic versions in both scopes. | `settings.router`, scoped settings operations | Read-only; persistence write | Bounded 401/403/409/422/503 failures | **Integration:** `tests/api/integration/test_auth_settings.py::test_system_settings_route_requires_admin_permission()` |
 
 **Configuration and Limits Manifest**
 
@@ -923,7 +930,7 @@ stream subscription → standard envelope/event.
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Completed | `FR-API-022` | Expose typed registration, login, logout, and authenticated server-side `/me` identity recovery without fallback identities or credential disclosure. | `auth.router: APIRouter` | Persistence read/write | Bounded 400/401/403/422/429/503 failures | **Usage:** `tests/api/usage/02_identity.py`; `tests/api/usage/07_routes.py`<br>**Integration:** `tests/api/integration/test_auth_settings.py` |
-| Completed | `FR-API-023` | Expose authenticated settings read/update through one canonical path. | `settings.router: APIRouter` | Read-only; persistence write | Bounded 401/403/409/422/503 failures | **Usage:** `tests/api/usage/02_identity.py`; `tests/api/usage/07_routes.py`<br>**Integration:** `tests/api/integration/test_auth_settings.py` |
+| Completed | `FR-API-023` | Expose authenticated user and admin-authorized system settings read/update through one canonical path and derive the stored subject from authority rather than request input. | `settings.router: APIRouter` | Read-only; persistence write | Bounded 401/403/409/422/503 failures | **Usage:** `tests/api/usage/02_identity.py`; `tests/api/usage/07_routes.py`<br>**Integration:** `tests/api/integration/test_auth_settings.py` |
 | Completed | `FR-API-024` | Expose authenticated bounded symbol discovery through Data. Dataset preparation is excluded from backend v1. | `data.router: APIRouter` | Read-only | Bounded 401/403/422/502/503 failures | **Usage:** `tests/api/usage/07_routes.py`<br>**Contract:** `tests/api/contracts/test_pagination_contract.py` |
 | Completed | `FR-API-025` | Expose Strategy catalogue and version reads. Registration, parameter updates, raw import/export, SQX, executable content, and artifact lifecycle are excluded from backend v1. | `strategies.router: APIRouter` | Read-only | Bounded 401/403/422/503 failures | **Usage:** `tests/api/usage/07_routes.py`<br>**Unit:** `tests/api/unit/test_strategy_routes.py` |
 | Completed | `FR-API-026` | Expose synchronous canonical and portfolio Simulation runs plus durable result retrieval through an explicitly composed owner dependency bundle; missing references fail closed. | Simulation route handlers | Simulation persistence/audit writes | Typed validation, owner, or dependency error | Route/composition tests |
@@ -1242,7 +1249,7 @@ the two authoritative sources; alert delivery never mutates either owner truth.
 | Completed | `NFR-API-013` | Resilience | Only opt-in idempotent reads retry once for classified transient failures; governed writes and unknown broker outcomes never retry blindly. | `tests/api/nfr/test_nfr_013_resilience.py` |
 | Excluded | `NFR-API-014` | Imports | Import routes are outside the approved initial build and remain absent. | Route-absence contract test |
 | Excluded | `NFR-API-015` | Documentation | Documentation file I/O is outside the approved initial build and remain absent. | Route-absence contract test |
-| Completed | `NFR-API-016` | Testing | Every public symbol has one usage example and unit test; every collaborative workflow has an integration test; coverage is at least 80%. | API-domain coverage is 84.04% (`--cov=app/services/api --cov-fail-under=80` passes); 17 numbered usage programs, 8 NFR suites, unit/integration/contract tests across `tests/api/`. |
+| Completed | `NFR-API-016` | Testing | Every public symbol has one usage example and unit test; every collaborative workflow has an integration test; coverage is at least 80%. | API-domain coverage is 84.36% (`pytest -o addopts='' tests/api --cov=app/services/api --cov-branch --cov-fail-under=80` passes with 127 tests); 17 numbered usage programs, 8 NFR suites, unit/integration/contract tests across `tests/api/`. |
 | Completed | `NFR-API-017` | Quality | Backend and frontend build, lint, format, type, contract, security, and targeted tests are runnable in CI. | `.github/workflows/ci.yml` runs `scripts/ci_check.py` (ruff format, ruff check, mypy, pytest) on every push/PR; frontend runs `tsc`, `vitest`, `next lint`, `next build`. |
 | Completed | `NFR-API-018` | Determinism | Contract registration, route ordering, cursor ordering, and idempotency conflict behavior are deterministic. | `tests/api/nfr/test_nfr_018_determinism.py` (registry order, size, OpenAPI paths + operation inventory deterministic across builds) |
 

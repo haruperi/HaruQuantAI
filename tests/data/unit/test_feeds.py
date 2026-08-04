@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 from app.services.data.contracts import DataError
-from app.services.data.realtime_feeds import buffer, reconnection, status
+from app.services.data.realtime_feeds import buffer, reconnection, state, status
 from app.services.data.realtime_feeds.contracts import (
     FeedConfig,
     FeedStatusRequest,
@@ -75,7 +75,10 @@ def _isolated_feed_state(monkeypatch: pytest.MonkeyPatch) -> None:
     """Isolate runtime state and replace persistence with deterministic evidence."""
     _ACTIVE_FEEDS.clear()
     result = SimpleNamespace(rows=(), affected_rows=1, committed=True)
-    monkeypatch.setattr(buffer, "_execute_transaction_raw", lambda _request: result)
+    monkeypatch.setattr(buffer, "create_feed_record", lambda *_args, **_kwargs: result)
+    monkeypatch.setattr(buffer, "read_feed_record", lambda *_args, **_kwargs: result)
+    monkeypatch.setattr(state, "update_feed_record", lambda *_args, **_kwargs: result)
+    monkeypatch.setattr(status, "read_feed_record", lambda *_args, **_kwargs: result)
     monkeypatch.setattr(buffer, "_persist_feed_status", lambda *_args: None)
     monkeypatch.setattr(reconnection, "_persist_feed_status", lambda *_args: None)
     monkeypatch.setattr(
@@ -237,8 +240,9 @@ def test_status_database_result_and_missing(monkeypatch: pytest.MonkeyPatch) -> 
         "heartbeat_timeout_seconds": 10,
     }
     monkeypatch.setattr(
-        "app.services.data.persistence.transactions._execute_transaction_raw",
-        lambda _transaction: SimpleNamespace(rows=(row,)),
+        status,
+        "read_feed_record",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=(row,)),
     )
     current = status.read_feed_status(
         request,
@@ -248,8 +252,9 @@ def test_status_database_result_and_missing(monkeypatch: pytest.MonkeyPatch) -> 
     assert current.last_error == "FEED_HEARTBEAT_TIMEOUT"
 
     monkeypatch.setattr(
-        "app.services.data.persistence.transactions._execute_transaction_raw",
-        lambda _transaction: SimpleNamespace(rows=()),
+        status,
+        "read_feed_record",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=()),
     )
     with pytest.raises(DataError):
         status.read_feed_status(request)

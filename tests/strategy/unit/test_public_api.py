@@ -14,6 +14,7 @@ def test_root_and_feature_exports_are_exact() -> None:
     expected_functions = {
         "adopt_approved_optimization_parameters",
         "bind_proposal_lineage",
+        "build_development_strategy_validation_policy",
         "build_trade_intent",
         "create_strategy_checkpoint",
         "create_strategy_checkpoint_value",

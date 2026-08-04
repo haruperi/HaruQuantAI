@@ -10,10 +10,6 @@ version-specific, non-skippable, demotable, and never inherited
 from __future__ import annotations
 
 import pytest
-from app.agentic.lifecycle.migrations import (
-    build_lifecycle_migration_request,
-    get_lifecycle_migration_statements,
-)
 from app.agentic.lifecycle.models import (
     PROMOTION_PERMISSION,
     REQUIRED_PROVENANCE,
@@ -37,6 +33,10 @@ from app.agentic.lifecycle.service import (
     get_artifact_state,
     is_settled,
     transition_artifact,
+)
+from app.agentic.migrations.lifecycle import (
+    build_lifecycle_migration_request,
+    get_lifecycle_migration_statements,
 )
 from app.utils import generate_id
 from pydantic import ValidationError
@@ -160,13 +160,16 @@ def test_only_migrations_reaches_a_service_domain() -> None:
     from pathlib import Path
 
     importers = {
-        path.name
-        for path in Path("app/agentic/lifecycle").glob("*.py")
+        str(path.as_posix())
+        for path in (
+            *Path("app/agentic/lifecycle").glob("*.py"),
+            Path("app/agentic/migrations/lifecycle.py"),
+        )
         if "app.services" in path.read_text(encoding="utf-8")
     }
     # Data owns migration execution, so declaring a schema is the one legitimate
     # service import. Anything else would be this package reaching a receiver.
-    assert importers == {"migrations.py"}
+    assert importers == {"app/agentic/migrations/lifecycle.py"}
 
 
 # --------------------------------------------------------------------------
@@ -702,6 +705,6 @@ def test_the_migration_request_is_declared_not_executed() -> None:
     assert request is not None
     from pathlib import Path
 
-    source = Path("app/agentic/lifecycle/migrations.py").read_text(encoding="utf-8")
+    source = Path("app/agentic/migrations/lifecycle.py").read_text(encoding="utf-8")
     for forbidden in ("connect(", "execute(", "cursor"):
         assert forbidden not in source

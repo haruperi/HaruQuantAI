@@ -52,6 +52,8 @@ __all__ = (
     "build_api_metadata",
     "build_api_response",
     "build_api_settings",
+    "build_api_simulation_dependencies",
+    "build_api_trading_dependencies",
     "build_authoritative_auth_context",
     "build_broker_connection_config",
     "build_critical_alert_delivery_result",
@@ -88,10 +90,12 @@ __all__ = (
     "get_readiness",
     "get_required_in_process_provider_names",
     "get_route_contract_registry",
+    "get_system_settings",
     "get_user_settings",
     "hash_api_password",
     "normalize_stream_event",
     "record_metric",
+    "recover_api_session_identity",
     "register_api_user",
     "register_route_contract",
     "require_api_permission",
@@ -100,6 +104,7 @@ __all__ = (
     "revoke_api_session",
     "run_api_migrations",
     "store_api_credential",
+    "update_system_settings",
     "update_user_settings",
     "validate_api_csrf",
     "validate_api_session",
@@ -488,6 +493,8 @@ def create_api_app(
     in_process_graph: object | None = None,
     dependency_overrides: Mapping[Callable[..., object], Callable[..., object]]
     | None = None,
+    simulation_dependencies: object | None = None,
+    trading_dependencies: object | None = None,
 ) -> object:
     """Construct the canonical application through the package boundary.
 
@@ -502,7 +509,31 @@ def create_api_app(
         typed_config,
         in_process_graph=in_process_graph,
         dependency_overrides=dependency_overrides,
+        simulation_dependencies=simulation_dependencies,
+        trading_dependencies=trading_dependencies,
     )
+
+
+def build_api_simulation_dependencies(**values: object) -> object:
+    """Compose the complete Simulator receiver-owned dependency bundle.
+
+    Returns:
+        Opaque Simulator dependency bundle.
+    """
+    from app.services.api.composition import build_api_simulation_dependencies as build
+
+    return build(**cast("Any", values))
+
+
+def build_api_trading_dependencies(**values: object) -> object:
+    """Compose the complete Trading-owned dependency container.
+
+    Returns:
+        Opaque Trading dependency container.
+    """
+    from app.services.api.composition import build_api_trading_dependencies as build
+
+    return build(**cast("Any", values))
 
 
 def build_in_process_api_graph(
@@ -600,6 +631,17 @@ def validate_api_session(session_token: str, **values: object) -> object:
     return validate_session(session_token, **cast("Any", values))
 
 
+def recover_api_session_identity(session_token: str, **values: object) -> object:
+    """Recover non-secret display identity from one opaque API session.
+
+    Returns:
+        Current user identity and exact session expiry.
+    """
+    from app.services.api.identity import recover_session_identity
+
+    return recover_session_identity(session_token, **cast("Any", values))
+
+
 def revoke_api_session(session_token: str, **values: object) -> None:
     """Idempotently revoke one opaque API session."""
     from app.services.api.identity import revoke_session
@@ -656,6 +698,17 @@ def get_user_settings(user_id: str, **values: object) -> object:
     return _get_user_settings(user_id, **cast("Any", values))
 
 
+def get_system_settings(**values: object) -> object:
+    """Read the global versioned non-secret system settings.
+
+    Returns:
+        Current global settings record.
+    """
+    from app.services.api.identity import get_system_settings as _get_system_settings
+
+    return _get_system_settings(**cast("Any", values))
+
+
 def update_user_settings(
     user_id: str,
     settings: Mapping[str, str],
@@ -670,6 +723,25 @@ def update_user_settings(
 
     return _update_settings(
         user_id,
+        settings,
+        **cast("Any", values),
+    )
+
+
+def update_system_settings(
+    settings: Mapping[str, str],
+    **values: object,
+) -> object:
+    """Optimistically replace global non-secret system settings.
+
+    Returns:
+        Updated global settings record.
+    """
+    from app.services.api.identity import (
+        update_system_settings as _update_system_settings,
+    )
+
+    return _update_system_settings(
         settings,
         **cast("Any", values),
     )

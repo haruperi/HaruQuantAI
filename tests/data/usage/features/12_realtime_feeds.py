@@ -3,11 +3,13 @@
 
 from __future__ import annotations
 
+import asyncio
 import sys
+from collections.abc import AsyncGenerator
 from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any
+from typing import Any, cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
@@ -15,6 +17,7 @@ from app.services.data import (
     build_data_settings,
     build_feed_config,
     build_feed_status_request,
+    build_market_stream_request,
     build_raw_feed_event,
     build_reconnect_policy,
     data_settings_context,
@@ -22,6 +25,7 @@ from app.services.data import (
     read_feed_status,
     run_data_migrations,
     start_internal_feed,
+    stream_market_data,
 )
 from app.utils import generate_id
 
@@ -136,6 +140,28 @@ def fr_data_048() -> None:
         print(f"Data -> FeedStatus(error={code})")
 
 
+def fr_data_154_157() -> None:
+    """FR-DATA-154..157: Build both MT5 stream modes through Data's API."""
+    _header("Stage 4: Data-Owned MT5 Tick and Closed-Bar Streams")
+
+    async def demonstrate() -> None:
+        """Construct both streams without opening a live provider in usage CI."""
+        for mode, timeframe in (("ticks", "M1"), ("bars", "H1")):
+            request = build_market_stream_request(
+                source_id="mt5",
+                symbol="EURUSD",
+                mode=mode,
+                timeframe=timeframe,
+                request_id=generate_id("req"),
+            )
+            print(_format_result(request))
+            stream = stream_market_data(request)
+            await cast("AsyncGenerator[object]", stream).aclose()
+            print(f"Data -> MarketStream(mode={mode}, timeframe={timeframe})")
+
+    asyncio.run(demonstrate())
+
+
 def main() -> None:
     """Execute every functional-requirement demonstration."""
     with TemporaryDirectory(prefix="usage-feeds-") as directory:
@@ -170,6 +196,7 @@ def main() -> None:
             fr_data_046()
             fr_data_047()
             fr_data_048()
+            fr_data_154_157()
 
 
 if __name__ == "__main__":

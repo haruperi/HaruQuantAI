@@ -36,7 +36,7 @@ def test_simulation_imports_no_data_storage_module() -> None:
     assert not any(
         name.startswith("app.services.data.persistence") for name in _imported_modules()
     )
-    assert SIMULATION_MIGRATIONS[0].domain == "simulation"
+    assert SIMULATION_MIGRATIONS[0].domain == "simulator"
 
 
 def test_simulation_imports_no_sqlite_module() -> None:

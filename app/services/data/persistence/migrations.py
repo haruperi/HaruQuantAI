@@ -1,8 +1,13 @@
-"""Module for executing domain migrations and maintaining migration ledger."""
+"""Execute domain migrations and maintain the immutable migration ledger.
+
+This module owns migration *execution* only: ledger initialisation, checksum
+comparison, write-lock acquisition, and step application on behalf of every
+domain. Data's own schema definitions live in
+``app/services/data/migrations/core.py``.
+"""
 
 from __future__ import annotations
 
-import hashlib
 import time
 from pathlib import Path
 
@@ -13,6 +18,7 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
+from app.services.data.migrations.core import DATA_MIGRATION_STEPS
 from app.services.data.persistence.contracts import (
     MigrationRequest,
     MigrationResult,
@@ -23,209 +29,11 @@ from app.services.data.persistence.contracts import (
 )
 from app.services.data.persistence.locking import _acquire_write_lock_raw
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.services.data.research_sources.migrations import (
-    RESEARCH_PROVIDER_MIGRATION_STEP,
-    RESEARCH_SOURCE_MIGRATION_STEP,
-)
 from app.utils import get_logger
 
 logger = get_logger(__name__)
 
 _SQLITE_URL_PREFIX = "sqlite:///"
-
-_DATA_SCHEMA_STATEMENTS = (
-    """
-    CREATE TABLE data_cache (
-        key TEXT PRIMARY KEY,
-        dataset_json TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        expires_at TEXT,
-        source_revision TEXT NOT NULL,
-        raw_data_hash TEXT NOT NULL,
-        schema_version TEXT NOT NULL,
-        normalization_version TEXT NOT NULL,
-        request_id TEXT NOT NULL
-    ) STRICT
-    """.strip(),
-    """
-    CREATE TABLE data_audit_events (
-        event_id TEXT PRIMARY KEY,
-        timestamp TEXT NOT NULL,
-        domain TEXT NOT NULL,
-        action TEXT NOT NULL,
-        principal_id TEXT,
-        request_id TEXT NOT NULL,
-        correlation_id TEXT NOT NULL,
-        causation_id TEXT,
-        payload_json TEXT NOT NULL
-    ) STRICT
-    """.strip(),
-    """
-    CREATE TABLE data_source_attempts (
-        source_id TEXT NOT NULL,
-        timestamp_ns TEXT NOT NULL CHECK (
-            length(timestamp_ns) = 19
-            AND timestamp_ns NOT GLOB '*[^0-9]*'
-        ),
-        request_id TEXT NOT NULL,
-        status TEXT NOT NULL CHECK (status IN ('SUCCESS', 'FAILURE', 'BLOCKED')),
-        error_code TEXT,
-        PRIMARY KEY (source_id, timestamp_ns)
-    ) STRICT
-    """.strip(),
-    """
-    CREATE TABLE data_source_state (
-        source_id TEXT PRIMARY KEY,
-        readiness TEXT NOT NULL CHECK (
-            readiness IN ('disabled', 'staging', 'production')
-        ),
-        descriptor_revision TEXT NOT NULL,
-        updated_at_ns TEXT NOT NULL CHECK (
-            length(updated_at_ns) = 19
-            AND updated_at_ns NOT GLOB '*[^0-9]*'
-        ),
-        request_id TEXT NOT NULL
-    ) STRICT
-    """.strip(),
-    """
-    CREATE TABLE data_update_jobs (
-        job_id TEXT PRIMARY KEY,
-        source_id TEXT NOT NULL,
-        symbols_json TEXT NOT NULL,
-        timeframes_json TEXT NOT NULL,
-        data_kinds_json TEXT NOT NULL,
-        start TEXT NOT NULL,
-        end TEXT,
-        interval_seconds INTEGER,
-        enabled INTEGER NOT NULL CHECK (enabled IN (0, 1)),
-        created_at TEXT NOT NULL,
-        request_id TEXT NOT NULL,
-        state TEXT NOT NULL CHECK (
-            state IN ('created', 'running', 'stopped', 'failed', 'blocked')
-        ),
-        last_run_status TEXT CHECK (
-            last_run_status IN ('succeeded', 'failed', 'blocked')
-        ),
-        last_checkpoint TEXT,
-        last_error TEXT,
-        next_run_at TEXT,
-        lease_owner TEXT,
-        lease_expires_at TEXT,
-        recovery_state TEXT NOT NULL CHECK (
-            recovery_state IN ('clean', 'required', 'recovered', 'blocked')
-        )
-    ) STRICT
-    """.strip(),
-    """
-    CREATE TABLE data_backfill_checkpoints (
-        idempotency_key TEXT PRIMARY KEY,
-        job_id TEXT NOT NULL,
-        chunk_id TEXT NOT NULL,
-        committed_start TEXT NOT NULL,
-        committed_end TEXT NOT NULL,
-        record_count INTEGER NOT NULL,
-        content_hash TEXT NOT NULL,
-        checkpoint TEXT NOT NULL,
-        artifact_temp TEXT NOT NULL,
-        artifact_final TEXT NOT NULL,
-        publication_state TEXT NOT NULL CHECK (
-            publication_state IN ('prepared', 'committed')
-        ),
-        request_id TEXT NOT NULL,
-        created_at TEXT NOT NULL
-    ) STRICT
-    """.strip(),
-    "CREATE INDEX idx_checkpoints_job ON data_backfill_checkpoints (job_id)",
-    """
-    CREATE TABLE data_feeds (
-        feed_id TEXT PRIMARY KEY,
-        source_id TEXT NOT NULL,
-        symbol TEXT NOT NULL,
-        data_kind TEXT NOT NULL CHECK (data_kind IN ('ohlcv', 'tick', 'spread')),
-        timeframe TEXT,
-        source_capability TEXT NOT NULL,
-        buffer_capacity INTEGER NOT NULL,
-        overflow_policy TEXT NOT NULL CHECK (
-            overflow_policy IN ('halt', 'drop_and_reconcile', 'backpressure')
-        ),
-        heartbeat_timeout_seconds INTEGER NOT NULL,
-        reconnect_policy_json TEXT NOT NULL,
-        state TEXT NOT NULL CHECK (
-            state IN ('starting', 'running', 'stopped', 'failed', 'blocked')
-        ),
-        heartbeat_at TEXT,
-        last_event_at TEXT,
-        buffer_depth INTEGER NOT NULL,
-        dropped_count INTEGER NOT NULL,
-        gap_count INTEGER NOT NULL,
-        reconnect_count INTEGER NOT NULL,
-        breaker_state TEXT NOT NULL CHECK (
-            breaker_state IN ('closed', 'open', 'half_open')
-        ),
-        breaker_opened_at TEXT,
-        drift_ms INTEGER,
-        last_error TEXT,
-        request_id TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-    ) STRICT
-    """.strip(),
-)
-
-
-_ECONOMIC_EVENTS_SCHEMA_STATEMENTS = (
-    """
-    CREATE TABLE data_economic_events (
-        provider TEXT NOT NULL,
-        provider_event_id TEXT NOT NULL,
-        name TEXT NOT NULL,
-        category TEXT,
-        country TEXT,
-        currency TEXT,
-        scheduled_at TEXT NOT NULL,
-        original_scheduled_at TEXT,
-        actual TEXT,
-        forecast TEXT,
-        previous TEXT,
-        revised_previous TEXT,
-        actual_raw TEXT,
-        forecast_raw TEXT,
-        previous_raw TEXT,
-        unit TEXT,
-        source TEXT,
-        source_url TEXT,
-        impact INTEGER NOT NULL CHECK (impact BETWEEN 1 AND 4),
-        updated_at TEXT,
-        PRIMARY KEY (provider, provider_event_id)
-    ) STRICT
-    """.strip(),
-    "CREATE INDEX idx_economic_events_scheduled ON data_economic_events (scheduled_at)",
-)
-
-
-def _schema_checksum(statements: tuple[str, ...]) -> str:
-    """Return the stable checksum for one ordered migration statement set."""
-    logger.debug("Calculating DATA schema migration checksum")
-    material = "\n-- statement --\n".join(statements).encode("utf-8")
-    return hashlib.sha256(material).hexdigest()
-
-
-DATA_MIGRATION_STEPS = (
-    MigrationStep(
-        domain="data",
-        migration_id="001_initial_data_schema",
-        checksum=_schema_checksum(_DATA_SCHEMA_STATEMENTS),
-        statements=_DATA_SCHEMA_STATEMENTS,
-    ),
-    MigrationStep(
-        domain="data",
-        migration_id="002_economic_events",
-        checksum=_schema_checksum(_ECONOMIC_EVENTS_SCHEMA_STATEMENTS),
-        statements=_ECONOMIC_EVENTS_SCHEMA_STATEMENTS,
-    ),
-    RESEARCH_SOURCE_MIGRATION_STEP,
-    RESEARCH_PROVIDER_MIGRATION_STEP,
-)
 
 
 def _resolve_database_path(settings: DataSettings) -> Path:
@@ -476,6 +284,23 @@ def _run_domain_migrations_raw(request: MigrationRequest) -> MigrationResult:
         applied_migrations = _fetch_applied_migrations(
             request.domain, request.request_id
         )
+        if request.complete_manifest:
+            declared_ids = {step.migration_id for step in request.steps}
+            orphaned_ids = sorted(set(applied_migrations) - declared_ids)
+            if orphaned_ids:
+                logger.error(
+                    "Applied migrations are absent from the complete manifest: %s",
+                    ", ".join(orphaned_ids),
+                )
+                raise DataError(
+                    "SCHEMA_MIGRATION_FAILED",
+                    safe_details={
+                        "domain": request.domain,
+                        "migration_id": orphaned_ids[0],
+                        "stage": "manifest_validation",
+                    },
+                    request_id=request.request_id,
+                )
         max_applied_id = max(applied_migrations.keys()) if applied_migrations else None
 
         # 3. Validate and apply/skip steps
@@ -570,11 +395,25 @@ def _run_data_migrations_raw(request_id: str) -> MigrationResult:
         Applied and skipped DATA migration identifiers.
     """
     logger.info("Running the authoritative DATA schema migration manifest")
+    # Runtime records remain a registered Data feature and therefore belong to the
+    # complete manifest. Its module stays out of migrations/__init__ to avoid the
+    # documented import cycle, so resolve its definitions only when the runner fires.
+    from app.services.data.migrations.runtime_stores import (
+        get_runtime_store_migration_steps,
+    )
+
+    complete_steps = tuple(
+        sorted(
+            (*DATA_MIGRATION_STEPS, *get_runtime_store_migration_steps()),
+            key=lambda step: step.migration_id,
+        )
+    )
     return _run_domain_migrations_raw(
         MigrationRequest(
             domain="data",
-            steps=DATA_MIGRATION_STEPS,
+            steps=complete_steps,
             request_id=request_id,
+            complete_manifest=True,
         )
     )
 

@@ -178,7 +178,7 @@ def test_parameter_update_rejections_and_storage_failure() -> None:
             return_value=None,
         ),
         patch(
-            "app.services.strategy.registry.parameters.execute_transaction",
+            "app.services.strategy.registry.parameters.update_strategy_configuration_record",
             side_effect=RuntimeError("database"),
         ),
         patch(

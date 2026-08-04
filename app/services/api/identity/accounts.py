@@ -6,15 +6,20 @@ import hashlib
 import json
 from collections.abc import Mapping
 from datetime import datetime, timedelta
-from typing import Literal, Protocol, Self, cast
+from typing import Literal, Self, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
+from app.services.api.identity.errors import IdentityError
 from app.services.api.identity.passwords import hash_password, verify_password
-from app.services.data import (
-    build_statement_plan,
-    build_transaction_request,
-    execute_transaction,
+from app.services.api.persistence import (
+    create_account_record,
+    delete_auth_failure_record,
+    read_account_record,
+    read_auth_failure_record,
+    read_auth_lock_record,
+    update_account_last_login,
+    update_auth_failure_record,
 )
 from app.utils import derive_stable_id, get_logger, utc_now
 
@@ -23,17 +28,6 @@ logger = get_logger(__name__)
 _AUTH_FAILURE_LIMIT = 5
 _AUTH_FAILURE_WINDOW_SECONDS = 300
 _AUTH_LOCK_SECONDS = 300
-
-
-class IdentityError(RuntimeError):
-    """Bounded UI/API identity failure."""
-
-
-class _TransactionResult(Protocol):
-    """Fields consumed from Data's normalized transaction result."""
-
-    rows: tuple[Mapping[str, object], ...]
-    affected_rows: int
 
 
 class AuthenticatedUser(BaseModel):
@@ -104,18 +98,48 @@ def _username_hash(username: str) -> str:
     return hashlib.sha256(username.casefold().encode("utf-8")).hexdigest()
 
 
+def _validate_authority_claims(
+    roles: tuple[str, ...],
+    permissions: tuple[str, ...],
+    scopes: tuple[str, ...],
+) -> None:
+    """Validate normalized server-owned authority before persistence.
+
+    Args:
+        roles: Role names to bind to the account.
+        permissions: Permission keys granted by every named role.
+        scopes: Optional binding scope keys.
+
+    Raises:
+        ValueError: If authority values are empty, padded, duplicated, or wildcarded.
+    """
+    if not roles:
+        raise ValueError("at least one account role is required")
+    for field, values in (
+        ("roles", roles),
+        ("permissions", permissions),
+        ("scopes", scopes),
+    ):
+        if any(not value or value != value.strip() for value in values):
+            message = f"{field} must contain trimmed non-empty values"
+            raise ValueError(message)
+        if len(set(values)) != len(values):
+            message = f"{field} must not contain duplicates"
+            raise ValueError(message)
+    if any("*" in permission for permission in permissions):
+        raise ValueError("wildcard permissions are prohibited")
+
+
 def _check_auth_rate_limit(username: str, request_id: str, now: datetime) -> None:
     """Fail closed while a login-attempt key is locked.
 
     Raises:
         IdentityError: If the login-attempt key is currently rate limited.
     """
-    result = _execute(
-        ("SELECT locked_until FROM api_auth_failures WHERE username_hash = ?",),
-        ((_username_hash(username),),),
+    rows = read_auth_lock_record(
+        _username_hash(username),
         request_id=request_id,
     )
-    rows = tuple(result.rows)
     if (
         rows
         and rows[0]["locked_until"] is not None
@@ -127,15 +151,7 @@ def _check_auth_rate_limit(username: str, request_id: str, now: datetime) -> Non
 def _record_auth_failure(username: str, request_id: str, now: datetime) -> None:
     """Persist one bounded authentication failure window."""
     key = _username_hash(username)
-    result = _execute(
-        (
-            "SELECT failure_count, window_started_at FROM api_auth_failures "
-            "WHERE username_hash = ?",
-        ),
-        ((key,),),
-        request_id=request_id,
-    )
-    rows = tuple(result.rows)
+    rows = read_auth_failure_record(key, request_id=request_id)
     window_started = now
     count = 1
     if rows:
@@ -148,63 +164,21 @@ def _record_auth_failure(username: str, request_id: str, now: datetime) -> None:
         if count >= _AUTH_FAILURE_LIMIT
         else None
     )
-    _execute(
-        (
-            "INSERT INTO api_auth_failures "
-            "(username_hash, failure_count, window_started_at, locked_until) "
-            "VALUES (?, ?, ?, ?) ON CONFLICT(username_hash) DO UPDATE SET "
-            "failure_count=excluded.failure_count, "
-            "window_started_at=excluded.window_started_at, "
-            "locked_until=excluded.locked_until",
-        ),
-        (
-            (
-                key,
-                count,
-                window_started.isoformat(),
-                locked_until.isoformat() if locked_until else None,
-            ),
-        ),
+    update_auth_failure_record(
+        username_hash=key,
+        failure_count=count,
+        window_started_at=window_started.isoformat(),
+        locked_until=locked_until.isoformat() if locked_until else None,
         request_id=request_id,
     )
 
 
 def _clear_auth_failures(username: str, request_id: str) -> None:
     """Clear a login-attempt window after successful authentication."""
-    _execute(
-        ("DELETE FROM api_auth_failures WHERE username_hash = ?",),
-        ((_username_hash(username),),),
+    delete_auth_failure_record(
+        _username_hash(username),
         request_id=request_id,
     )
-
-
-def _execute(
-    statements: tuple[str, ...],
-    parameter_sets: tuple[tuple[object, ...], ...],
-    *,
-    request_id: str,
-    max_rows: int = 1,
-) -> _TransactionResult:
-    """Execute one bounded account-owned statement plan through Data.
-
-    Returns:
-        Data-owned transaction result.
-
-    Raises:
-        IdentityError: If Data cannot confirm a committed transaction.
-    """
-    request = build_transaction_request(
-        plan=build_statement_plan(
-            statements=statements,
-            parameter_sets=parameter_sets,
-            max_rows=max_rows,
-        ),
-        request_id=request_id,
-    )
-    response = execute_transaction(request)
-    if response.status != "success" or response.data is None:
-        raise IdentityError("IDENTITY_STORE_UNAVAILABLE")
-    return cast("_TransactionResult", response.data)
 
 
 def register_user(
@@ -241,31 +215,20 @@ def register_user(
     normalized_username = username.strip()
     if not normalized_username or normalized_username != username:
         raise ValueError("username must be non-empty and trimmed")
+    _validate_authority_claims(roles, permissions, scopes)
     user_id = derive_stable_id("id", f"api-user:{normalized_username.casefold()}")
     created_at = utc_now()
     try:
-        _execute(
-            (
-                "INSERT INTO api_accounts "
-                "(user_id, username, password_hash, roles_json, permissions_json, "
-                "scopes_json, environment, runtime_profile, active, verified, "
-                "created_at, "
-                "last_login_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 1, ?, NULL)",
-            ),
-            (
-                (
-                    user_id,
-                    normalized_username,
-                    hash_password(password),
-                    json.dumps(roles, separators=(",", ":")),
-                    json.dumps(permissions, separators=(",", ":")),
-                    json.dumps(scopes, separators=(",", ":")),
-                    tenant_or_environment,
-                    runtime_profile,
-                    created_at.isoformat(),
-                ),
-            ),
+        create_account_record(
+            user_id=user_id,
+            username=normalized_username,
+            password_hash=hash_password(password),
+            roles=roles,
+            permissions=permissions,
+            scopes=scopes,
+            environment=tenant_or_environment,
+            runtime_profile=runtime_profile,
+            created_at=created_at.isoformat(),
             request_id=request_id,
         )
     except IdentityError as error:
@@ -300,17 +263,7 @@ def authenticate_user(
     logger.info("Authenticating one UI/API account")
     login_at = utc_now()
     _check_auth_rate_limit(username, request_id, login_at)
-    result = _execute(
-        (
-            "SELECT user_id, username, password_hash, roles_json, permissions_json, "
-            "scopes_json, environment, runtime_profile, active, verified, "
-            "last_login_at "
-            "FROM api_accounts WHERE username = ?",
-        ),
-        ((username,),),
-        request_id=request_id,
-    )
-    rows = tuple(result.rows)
+    rows = read_account_record(username, request_id=request_id)
     if len(rows) != 1:
         _record_auth_failure(username, request_id, login_at)
         raise IdentityError("AUTHENTICATION_REQUIRED")
@@ -325,9 +278,9 @@ def authenticate_user(
         _record_auth_failure(username, request_id, login_at)
         raise IdentityError("AUTHENTICATION_REQUIRED")
     _clear_auth_failures(username, request_id)
-    _execute(
-        ("UPDATE api_accounts SET last_login_at = ? WHERE user_id = ?",),
-        ((login_at.isoformat(), str(row["user_id"])),),
+    update_account_last_login(
+        user_id=str(row["user_id"]),
+        last_login_at=login_at.isoformat(),
         request_id=request_id,
     )
     row["last_login_at"] = login_at.isoformat()

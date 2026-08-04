@@ -8,6 +8,11 @@ from pathlib import Path
 
 import pytest
 
+pytestmark = pytest.mark.skipif(
+    os.environ.get("INDICATORS_USAGE_LIVE_MT5") != "1",
+    reason="genuine MT5 workflow evidence requires explicit live-provider opt-in",
+)
+
 _WORKFLOW_SCRIPTS = (
     "wf_indi_006_candlestick_pattern_detection.py",
     "wf_indi_007_volume_profile_distribution.py",

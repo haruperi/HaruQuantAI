@@ -9,7 +9,13 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict
 
 from app.services.api._limits import HTTP_IDEMPOTENCY_RETENTION_SECONDS
-from app.services.api.identity.accounts import IdentityError, _execute
+from app.services.api.identity.errors import IdentityError
+from app.services.api.persistence import (
+    create_idempotency_record,
+    delete_idempotency_record,
+    finalize_idempotency_record,
+    read_idempotency_record,
+)
 from app.utils import canonical_json, get_logger, utc_now
 
 logger = get_logger(__name__)
@@ -79,23 +85,11 @@ def reserve_idempotency_key(
     request_hash = hashlib.sha256(
         canonical_json(request_material).encode("utf-8")
     ).hexdigest()
-    existing = _execute(
-        (
-            "SELECT request_hash, response_json, status_code, expires_at "
-            "FROM api_idempotency WHERE scope_key = ?",
-        ),
-        ((scope_key,),),
-        request_id=request_id,
-    )
-    rows = tuple(existing.rows)
+    rows = read_idempotency_record(scope_key, request_id=request_id)
     if rows:
         row = rows[0]
         if datetime.fromisoformat(str(row["expires_at"])) <= current:
-            _execute(
-                ("DELETE FROM api_idempotency WHERE scope_key = ?",),
-                ((scope_key,),),
-                request_id=request_id,
-            )
+            delete_idempotency_record(scope_key, request_id=request_id)
         elif str(row["request_hash"]) != request_hash:
             raise IdentityError("IDEMPOTENCY_CONFLICT")
         elif row["response_json"] is not None and row["status_code"] is not None:
@@ -107,14 +101,11 @@ def reserve_idempotency_key(
         else:
             raise IdentityError("DUPLICATE_IDEMPOTENCY_KEY")
     expires_at = current + timedelta(seconds=HTTP_IDEMPOTENCY_RETENTION_SECONDS)
-    _execute(
-        (
-            "INSERT INTO api_idempotency "
-            "(scope_key, request_hash, response_json, status_code, created_at, "
-            "expires_at) "
-            "VALUES (?, ?, NULL, NULL, ?, ?)",
-        ),
-        ((scope_key, request_hash, current.isoformat(), expires_at.isoformat()),),
+    create_idempotency_record(
+        scope_key=scope_key,
+        request_hash=request_hash,
+        created_at=current.isoformat(),
+        expires_at=expires_at.isoformat(),
         request_id=request_id,
     )
     return IdempotencyDecision(state="reserved")
@@ -146,15 +137,13 @@ def finalize_idempotency_key(
     """
     if len(response_json.encode("utf-8")) > _MAX_TERMINAL_RESPONSE_BYTES:
         raise IdentityError("IDEMPOTENCY_RESPONSE_TOO_LARGE")
-    result = _execute(
-        (
-            "UPDATE api_idempotency SET response_json = ?, status_code = ? "
-            "WHERE scope_key = ? AND response_json IS NULL",
-        ),
-        ((response_json, status_code, _scope_key(principal_id, method, route, key)),),
+    affected_rows = finalize_idempotency_record(
+        scope_key=_scope_key(principal_id, method, route, key),
+        response_json=response_json,
+        status_code=status_code,
         request_id=request_id,
     )
-    if int(result.affected_rows) != 1:
+    if affected_rows != 1:
         raise IdentityError("IDEMPOTENCY_RESERVATION_MISSING")
 
 

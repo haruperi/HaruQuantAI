@@ -7,7 +7,7 @@
 > durable state, approval-token state, and audit ports for `FR-RISK-030` and
 > `FR-RISK-041`;
 > UI/API receives operation callables and never owns Risk decisions or state.
-> **Last updated:** `2026-07-28`
+> **Last updated:** `2026-08-03`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -92,15 +92,27 @@ No raw DataFrame, provider object, socket, database session, or broker client ma
 
 Data owns database connections, locking, and migration execution. Risk owns the following schemas and is their only semantic writer; concrete persistence occurs through injected narrow interfaces.
 
+All Risk relational CRUD is centralized in the private support package
+`app/services/risk/persistence/`, whose sole boundary is `persistence/__init__.py`.
+Its implementation is divided consistently into `create.py`, `read.py`,
+`update.py`, and `delete.py`; feature runtime adapters contain policy and
+coordination only. Risk records are stored in the seven Risk-owned tables rather
+than Data's generic `data_runtime_records`; Data remains responsible for connection,
+locking, and transaction execution. This support directory is not a separately
+registered feature.
+
+Application composition initializes those tables through `run_risk_migrations`, which
+submits Risk's immutable manifest to Data's public migration executor.
+
 | Status | State / Store | Read access (via contract) | Migration definitions |
 |---|---|---|---|
-| Completed | Risk policy versions and configuration hashes | Risk; UI/API through approved policy views | `app/services/risk/audit/migrations.py` |
-| Completed | Canonical kill-switch state | Trading and UI/API through `create_kill_switch_state` v1 | `app/services/risk/audit/migrations.py` |
-| Completed | Approval-token issuance, revocation, nonce, and atomic reservation/consumption state | Risk validation only; validation result returned to caller | `app/services/risk/audit/migrations.py` |
-| Completed | Decision audit chain, including `previous_hash` and `record_hash` | Trading/UI/API through `RiskDecision` and audit views through `AuditEvent` | `app/services/risk/audit/migrations.py` |
-| Completed | Operational-eligibility decisions and suspension/expiry history | Portfolio, Trading, UI/API through `StrategyOperationalEligibilityDecision` | `app/services/risk/audit/migrations.py` |
-| Completed | Allocation decisions and active authoritative risk-budget projections | Portfolio, Trading, UI/API through `AllocationRiskDecision` and approved Risk views | `app/services/risk/audit/migrations.py` |
-| Completed | Optional decision/snapshot records enabled by an approved profile | Callers through Risk-owned result contracts only | `app/services/risk/audit/migrations.py` |
+| Completed | Risk policy versions and configuration hashes | Risk; UI/API through approved policy views | `app/services/risk/migrations/definitions.py` |
+| Completed | Canonical kill-switch state | Trading and UI/API through `create_kill_switch_state` v1 | `app/services/risk/migrations/definitions.py` |
+| Completed | Approval-token issuance, revocation, nonce, and atomic reservation/consumption state | Risk validation only; validation result returned to caller | `app/services/risk/migrations/definitions.py` |
+| Completed | Decision audit chain, including `previous_hash` and `record_hash` | Trading/UI/API through `RiskDecision` and audit views through `AuditEvent` | `app/services/risk/migrations/definitions.py` |
+| Completed | Operational-eligibility decisions and suspension/expiry history | Portfolio, Trading, UI/API through `StrategyOperationalEligibilityDecision` | `app/services/risk/migrations/definitions.py` |
+| Completed | Allocation decisions and active authoritative risk-budget projections | Portfolio, Trading, UI/API through `AllocationRiskDecision` and approved Risk views | `app/services/risk/migrations/definitions.py` |
+| Completed | Optional decision/snapshot records enabled by an approved profile | Callers through Risk-owned result contracts only | `app/services/risk/migrations/definitions.py` |
 
 ### Four-level structure
 
@@ -209,7 +221,8 @@ risk/
 │   ├── __init__.py
 │   ├── chain.py
 │   ├── storage.py
-│   └── migrations.py
+│   ├── migrations.py
+│   └── runtime.py
 ├── limits/                             # Portfolio and market-context limit evaluation
 │   ├── __init__.py
 │   └── evaluation.py
@@ -225,7 +238,14 @@ risk/
 ├── approvals/                          # Approval-token lifecycle
 │   ├── __init__.py
 │   ├── state.py
-│   └── tokens.py
+│   ├── tokens.py
+│   └── runtime.py
+├── persistence/                        # Private shared Risk CRUD support
+│   ├── __init__.py
+│   ├── create.py
+│   ├── read.py
+│   ├── update.py
+│   └── delete.py
 ├── validity/                           # Decision reuse revalidation
 │   ├── __init__.py
 │   └── revalidation.py
@@ -1107,6 +1127,7 @@ aliases are not retained.
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `storage.py` | Private injected Risk persistence Protocols for audit, eligibility, allocation-budget, and kill-switch state; no public export | None | **Standard library:** decimal, typing<br>**Required third-party:** None<br>**Local:** `contracts`; `app.utils → logger` |
+| Completed | `runtime.py` | Private audit, eligibility, allocation-budget, and kill-switch adapter delegating record CRUD to `risk/persistence` | None | **Standard library:** decimal, typing<br>**Required third-party:** pydantic<br>**Local:** `contracts`, `risk.persistence`, `app.utils` |
 | Completed | `chain.py` | Stateful audit-chain coordination, including atomic kill-switch state/audit transitions | `RiskAuditChain`, `RiskAuditChain.append`, `RiskAuditChain.append_kill_switch_transition`, `RiskAuditChain.verify` | **Standard library:** collections.abc, datetime, decimal, hashlib, threading<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, private storage port; `app.utils → redaction` |
 | Completed | `migrations.py` | Risk-owned table/index migration definitions for execution by Data infrastructure | None | **Standard library:** hashlib<br>**Required third-party:** None<br>**Local:** `app.services.data → MigrationStep`; `app.utils → logger` |
 | Completed | `__init__.py` | Expose audit coordinator only | `RiskAuditChain` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `chain.py` |
@@ -1127,6 +1148,11 @@ aliases are not retained.
 | Completed | `FR-RISK-034` | Verify genesis, sequence, previous hash, and record hash; identify tamper deterministically. | `RiskAuditChain.verify(records: Sequence[RiskAuditRecord]) -> bool` | Read-only | `RiskDomainError(AUDIT_CHAIN_TAMPER_DETECTED, STORAGE_ERROR)` | **Usage:** `tests/risk/usage/features/05_audit.py::fr_risk_034()`<br>**Unit:** `test_chain.py::test_verify_detects_tamper()` |
 
 **Implementation notes:** Implement focused audit/signature behavior from this specification (no V1 artifact exists in the repository); include no generic repository hierarchy and no broad audit/report ownership.
+
+The private runtime adapter delegates record CRUD to `risk/persistence`. Audit
+appends remain immutable, allocation activation remains revision-guarded, and a
+kill-switch state change plus its audit record remains one indivisible Data-owned
+transaction.
 
 The private persistence ports are exact and synchronous. `timeout_seconds` is the
 configured positive `Decimal` or `None` only where the selected non-live profile
@@ -1208,6 +1234,13 @@ and maps to `RiskDomainError(STORAGE_ERROR)`; callers never infer success.
 | Completed | `FR-RISK-066` | Evaluate the drawdown floor under the configured mode: `static` from a fixed reference, `trailing_eod` from the highest end-of-day balance with an optional ratchet ceiling at the initial balance, or `trailing_intraday` from peak equity including unrealised gains. Report remaining headroom as an absolute amount in account currency, not only as a ratio of peak. | `evaluate_portfolio_limits` | None | `RiskDomainError(INVALID_RISK_CONFIG, MISSING_EVIDENCE)`: unknown mode or absent reference equity | **Usage:** `tests/risk/usage/features/06_limits.py::fr_risk_066()`<br>**Unit:** `tests/risk/unit/test_limits.py::test_each_drawdown_mode_produces_distinct_floor()` |
 | Completed | `FR-RISK-067` | Evaluate daily and total loss against a configurable reference basis, supporting a fixed initial balance in addition to the existing day-start and inception equity bases, and record which basis was applied. | `evaluate_portfolio_limits` | None | `RiskDomainError(INVALID_RISK_CONFIG)`: unknown loss basis | **Usage:** `tests/risk/usage/features/06_limits.py::fr_risk_067()`<br>**Unit:** `tests/risk/unit/test_limits.py::test_initial_balance_basis_differs_from_day_start()` |
 | Completed | `FR-RISK-068` | Project the share of cumulative profit a single trading day would represent if the account were settled now, and fail or constrain when a proposal's best case would exceed the configured maximum single-day share. This is a forward projection, distinct from the existing snapshot-integrity consistency check. | `evaluate_single_day_profit_share(snapshot: PortfolioRiskSnapshot, mandate: create_firm_mandate, *, now: datetime) -> RiskLimitResult` | None | `RiskDomainError(MISSING_EVIDENCE)`: cumulative profit history absent | **Usage:** `tests/risk/usage/features/06_limits.py::fr_risk_068()`<br>**Unit:** `tests/risk/unit/test_limits.py::test_projected_day_share_constrains_before_settlement()` |
+| Completed | `FR-RISK-069` | Risk migration definitions shall reside in `app/services/risk/migrations/`, keeping schema evolution outside the private CRUD package. Risk owns exactly one checksummed step covering all seven durable Risk tables and exposes a package-root runner that delegates application to Data. | `run_risk_migrations` | Schema migration | `DataError`: ledger, lock, checksum, or statement failure | **Usage:** `tests/risk/usage/features/06_limits.py::fr_risk_069()`<br>**Unit:** `tests/risk/unit/test_migrations.py::test_migration_definition_is_stable_and_complete()` |
+| Completed | `FR-RISK-070` | Every Risk table shall be declared `STRICT`, so a value of the wrong storage class is rejected at write time rather than silently coerced. A coerced decision hash or expiry timestamp would be undetectable downstream. | Schema definition only | None | `DataError`: type violation on write | **Usage:** `tests/risk/usage/features/06_limits.py::fr_risk_070()`<br>**Unit:** `tests/risk/unit/test_migrations.py::test_every_risk_table_is_strict_and_audited()` |
+| Completed | `FR-RISK-071` | Every Risk table shall carry `created_at`, `request_id`, and `correlation_id`, and every mutable Risk table shall additionally carry `updated_at`, so each decision, policy version, token, and snapshot is traceable to the operation that produced it. | Schema definition only | None | None | **Usage:** `tests/risk/usage/features/06_limits.py::fr_risk_071()`<br>**Unit:** `tests/risk/unit/test_migrations.py::test_every_risk_table_is_strict_and_audited()` |
+| Completed | `FR-RISK-072` | Risk schema evolution shall remain additive: the migration definition shall contain no `DROP`, `DELETE`, or `ALTER` statement. | Schema definition only | None | None | **Usage:** `tests/risk/usage/features/06_limits.py::fr_risk_072()`<br>**Unit:** `tests/risk/unit/test_migrations.py::test_migration_defines_no_destructive_statement()` |
+| Completed | `FR-RISK-073` | Persist complete immutable `RiskDecisionPackage v1` records under their decision IDs, expose bounded newest-first reads, and expose exact-scope kill-switch reads through package-root functions; audit records are never relabelled as decisions. | `persist_risk_decision`, `list_risk_decisions`, `get_kill_switch_state` | Persistence read/write | `ValueError`: invalid bound or identity conflict | **Usage:** `tests/risk/usage/features/06_limits.py::fr_risk_073()`<br>**Unit:** `tests/risk/unit/test_runtime_decisions.py` |
+| Completed | `FR-RISK-074` | Persist Risk runtime state directly in the seven Risk-owned relational tables while delegating connection, lock, statement-plan, and transaction execution to Data's public boundary; Risk persistence shall not read or write `data_runtime_records`. | Private `app.services.risk.persistence` functions | Persistence read/write | `DataError`: relational constraint, migration, or transaction failure | **Usage:** `tests/risk/usage/features/06_limits.py::fr_risk_074()`<br>**Integration:** `tests/risk/integration/test_runtime_state.py`<br>**Unit:** `tests/risk/unit/test_public_api.py::test_risk_persistence_no_longer_uses_generic_runtime_records()` |
+| Completed | `FR-RISK-075` | Approval issuance/consumption, allocation activation, and kill-switch-plus-audit transitions shall use guarded atomic relational writes. A stale revision, predecessor, chain head, or conflicting identity fails closed without a partial state change. | Private Risk state adapters | Persistence read/write | Conflict result or `ValueError`: stale or conflicting transition | **Usage:** `tests/risk/usage/features/06_limits.py::fr_risk_075()`<br>**Integration:** `tests/risk/integration/test_runtime_state.py`<br>**Unit:** `tests/risk/unit/test_public_api.py::test_compound_persistence_writes_remain_single_transitions()` |
 
 **Implementation notes:** Implement limit calculations from this specification; introduce no root check wrappers, forced decisions, or policy-manager layers.
 
@@ -1369,6 +1402,7 @@ authority; an audit append follows successful persistence and any failure is sur
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `state.py` | Private durable token-state Protocol; no public export | None | **Standard library:** typing<br>**Required third-party:** None<br>**Local:** `contracts` |
+| Completed | `runtime.py` | Private durable token-state adapter delegating record CRUD to `risk/persistence` | None | **Standard library:** datetime, decimal, typing<br>**Required third-party:** None<br>**Local:** `contracts`, `risk.persistence`, `app.utils` |
 | Completed | `tokens.py` | Coordinated signing and durable lifecycle | `ApprovalTokenService` and its public methods | **Standard library:** collections.abc, datetime, hashlib, hmac, secrets, time<br>**Required third-party:** None<br>**Local:** `contracts`, `config`, `audit`, private state port |
 | Completed | `__init__.py` | Expose token coordinator | `ApprovalTokenService` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `tokens.py` |
 
@@ -1393,6 +1427,8 @@ authority; an audit append follows successful persistence and any failure is sur
 specification; use no hard-coded identity or process-global replay sets. UI/API owns approval attestation;
 Risk owns validation, token issuance, reservation, consumption, and action-policy
 verdicts under the registered market-context, approval-attestation, reservation, and execution-governance contracts.
+Approval issuance persists state and its enumerable index in one transaction;
+consumption and revocation retain revision-based compare-and-swap authority.
 The exact signed material is the canonical JSON representation of every token
 field except `signature`, plus `attestation_id` and `policy_ref`. The attestation
 must match the decision request/workflow/correlation IDs, current policy version,

@@ -7,10 +7,18 @@ from app.services.api.composition.in_process import (
     get_required_provider_names,
 )
 from app.services.api.composition.lifecycle import StartupError, lifespan
+from app.services.api.composition.simulation_dependencies import (
+    build_api_simulation_dependencies,
+)
+from app.services.api.composition.trading_dependencies import (
+    build_api_trading_dependencies,
+)
 
 __all__ = (
     "StartupError",
     "app",
+    "build_api_simulation_dependencies",
+    "build_api_trading_dependencies",
     "build_broker_connection_config",
     "build_in_process_graph",
     "create_app",

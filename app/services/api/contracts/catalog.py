@@ -122,16 +122,20 @@ def _contract(
     idempotency_policy: str | None = None,
     governance_scope: str = "none",
     success_statuses: tuple[int, ...] = (200,),
+    auth_required: bool | None = None,
+    response_contract: str = "ApiResponse.v1",
 ) -> RouteContract:
     """Build one complete internal route declaration.
 
     Returns:
         Validated route contract.
     """
-    authenticated = permission is not None
+    authenticated = permission is not None if auth_required is None else auth_required
     writes = side_effect in {RouteSideEffect.WRITE, RouteSideEffect.GOVERNED_WRITE}
     if path.startswith("/api/v1/auth/"):
         rate_limit = "authentication"
+    elif side_effect == RouteSideEffect.STREAM:
+        rate_limit = "stream"
     elif side_effect == RouteSideEffect.GOVERNED_WRITE:
         rate_limit = "governed_write"
     elif owner in {"optimization", "simulation", "research"} and method != "GET":
@@ -151,7 +155,7 @@ def _contract(
         idempotency_policy=idempotency_policy,  # type: ignore[arg-type]
         rate_limit=rate_limit,
         audit_events=writes,
-        response_contract="ApiResponse.v1",
+        response_contract=response_contract,
         request_contract="BoundaryRequest.v1" if method != "GET" else None,
         success_statuses=success_statuses,
         error_statuses=(400, 401, 403, 409, 422, 429, 500, 503),
@@ -184,6 +188,13 @@ _KNOWN_ROUTE_CONTRACTS: tuple[RouteContract, ...] = (
         side_effect=RouteSideEffect.WRITE,
         idempotency_policy="optional",
         success_statuses=(204,),
+    ),
+    _contract(
+        "api.auth.me",
+        "GET",
+        "/api/v1/auth/me",
+        "api",
+        auth_required=True,
     ),
     _contract(
         "api.health.liveness",
@@ -220,6 +231,15 @@ _KNOWN_ROUTE_CONTRACTS: tuple[RouteContract, ...] = (
     ),
     _contract("api.data.symbols", "GET", "/api/v1/data/symbols", "data", "data:read"),
     _contract(
+        "api.data.stream",
+        "GET",
+        "/api/v1/data/stream",
+        "data",
+        "data:read",
+        side_effect=RouteSideEffect.STREAM,
+        response_contract="StreamEvent.v1",
+    ),
+    _contract(
         "api.strategies.catalogue",
         "GET",
         "/api/v1/strategies",
@@ -235,6 +255,91 @@ _KNOWN_ROUTE_CONTRACTS: tuple[RouteContract, ...] = (
     ),
     _contract(
         "api.research.run", "POST", "/api/v1/research/run", "research", "research:run"
+    ),
+    _contract(
+        "api.simulation.run",
+        "POST",
+        "/api/v1/simulation/run",
+        "simulator",
+        "simulation:run",
+        side_effect=RouteSideEffect.WRITE,
+        idempotency_policy="required",
+        response_contract="SimulationResult.v1",
+    ),
+    _contract(
+        "api.simulation.portfolio_run",
+        "POST",
+        "/api/v1/simulation/portfolio-run",
+        "simulator",
+        "simulation:run",
+        side_effect=RouteSideEffect.WRITE,
+        idempotency_policy="required",
+        response_contract="PortfolioSimulationResult.v1",
+    ),
+    _contract(
+        "api.simulation.result",
+        "GET",
+        "/api/v1/simulation/results/{run_id}",
+        "simulator",
+        "simulation:read",
+        response_contract="SimulationResult.v1",
+    ),
+    _contract(
+        "api.risk.kill_switch",
+        "GET",
+        "/api/v1/risk/kill-switch",
+        "risk",
+        "risk:read",
+        response_contract="KillSwitchState.v1",
+    ),
+    _contract(
+        "api.risk.decisions",
+        "GET",
+        "/api/v1/risk/decisions",
+        "risk",
+        "risk:read",
+        response_contract="RiskDecisionPackage.v1",
+    ),
+    _contract(
+        "api.trading.session",
+        "GET",
+        "/api/v1/trading/session",
+        "trading",
+        "trading:read",
+        response_contract="TradingProjection.v1",
+    ),
+    _contract(
+        "api.trading.submit_order",
+        "POST",
+        "/api/v1/trading/orders",
+        "trading",
+        "trading:write",
+        side_effect=RouteSideEffect.GOVERNED_WRITE,
+        idempotency_policy="required",
+        governance_scope="required",
+        response_contract="ExecutionReceipt.v1",
+    ),
+    _contract(
+        "api.trading.cancel_order",
+        "DELETE",
+        "/api/v1/trading/orders/{order_id}",
+        "trading",
+        "trading:write",
+        side_effect=RouteSideEffect.GOVERNED_WRITE,
+        idempotency_policy="required",
+        governance_scope="required",
+        response_contract="ExecutionReceipt.v1",
+    ),
+    _contract(
+        "api.trading.close_position",
+        "POST",
+        "/api/v1/trading/positions/{position_id}/close",
+        "trading",
+        "trading:write",
+        side_effect=RouteSideEffect.GOVERNED_WRITE,
+        idempotency_policy="required",
+        governance_scope="required",
+        response_contract="ExecutionReceipt.v1",
     ),
     *(
         _contract(

@@ -123,6 +123,55 @@ def test_run_domain_migrations_rejects_modified_applied_step(
     assert response.error.details["migration_id"] == "001_create_test"
 
 
+def test_complete_manifest_rejects_orphaned_applied_step(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Reject an applied ledger row absent from a declared complete manifest."""
+    _configure_migrations(monkeypatch, tmp_path)
+    declared = MigrationStep(
+        domain="api",
+        migration_id="api-0001",
+        checksum="declared-hash",
+        statements=("CREATE TABLE declared_table (id INTEGER PRIMARY KEY)",),
+    )
+    orphan = MigrationStep(
+        domain="api",
+        migration_id="api-0004",
+        checksum="orphan-hash",
+        statements=("CREATE TABLE orphan_table (id INTEGER PRIMARY KEY)",),
+    )
+    _unwrap(
+        run_domain_migrations(
+            MigrationRequest(
+                domain="api",
+                steps=(declared, orphan),
+                request_id=(
+                    "req-6e5905ea8766457d82bb0ca0bcffef24167bd9a222ce7857b83b"
+                    "9b46b8e3ce14"  # pragma: allowlist secret
+                ),
+            )
+        )
+    )
+
+    response = run_domain_migrations(
+        MigrationRequest(
+            domain="api",
+            steps=(declared,),
+            request_id=(
+                "req-9cf4090d46df41a2994d5078675d3f6a35d1170420cb5a794213c93f30b20e7d"
+            ),
+            complete_manifest=True,
+        )
+    )
+
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == "SCHEMA_MIGRATION_FAILED"
+    assert response.error.details["domain"] == "api"
+    assert response.error.details["migration_id"] == "api-0004"
+    assert response.error.details["stage"] == "manifest_validation"
+
+
 def test_run_domain_migrations_rejects_out_of_order_step(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:

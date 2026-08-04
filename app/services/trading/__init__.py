@@ -73,6 +73,7 @@ from app.services.trading.state import (
     create_trading_projection,
     execute_trading_state_store_operation,
     get_trading_migrations,
+    get_trading_projection,
     get_trading_schema_version,
     reserve_idempotency,
 )
@@ -129,6 +130,7 @@ __all__: tuple[str, ...] = (
     "get_trading_contract_version",
     "get_trading_migrations",
     "get_trading_operational_events",
+    "get_trading_projection",
     "get_trading_route",
     "get_trading_schema_version",
     "is_execution_receipt",

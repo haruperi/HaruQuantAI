@@ -99,7 +99,7 @@ def test_get_cache_entry_handles_stale_and_expiration() -> None:
     mock_res.rows = (mock_row,)
 
     with patch(
-        "app.services.data.persistence.cache._execute_transaction_raw",
+        "app.services.data.persistence.cache.read_cache_record",
         return_value=mock_res,
     ):
         # Allow stale False -> returns None
@@ -131,7 +131,7 @@ def test_get_cache_entry_error_handling() -> None:
     mock_res.rows = (mock_row,)
 
     with patch(
-        "app.services.data.persistence.cache._execute_transaction_raw",
+        "app.services.data.persistence.cache.read_cache_record",
         return_value=mock_res,
     ):
         response = get_cache_entry(read_req)
@@ -141,7 +141,7 @@ def test_get_cache_entry_error_handling() -> None:
 
     # Database exception
     with patch(
-        "app.services.data.persistence.cache._execute_transaction_raw",
+        "app.services.data.persistence.cache.read_cache_record",
         side_effect=RuntimeError("DB query failed"),
     ):
         response = get_cache_entry(read_req)
@@ -167,7 +167,7 @@ def test_put_cache_entry_uncommitted_row() -> None:
     mock_res.affected_rows = 0
 
     with patch(
-        "app.services.data.persistence.cache._execute_transaction_raw",
+        "app.services.data.persistence.cache.update_cache_record",
         return_value=mock_res,
     ):
         response = put_cache_entry(write_req)
@@ -224,9 +224,15 @@ def test_clear_cache_entry_filters_and_dry_run() -> None:
         request_id=_REQ_ID,
     )
 
-    with patch(
-        "app.services.data.persistence.cache._execute_transaction_raw",
-        side_effect=[mock_select_res, mock_delete_res],
+    with (
+        patch(
+            "app.services.data.persistence.cache.read_cache_records",
+            return_value=mock_select_res,
+        ),
+        patch(
+            "app.services.data.persistence.cache.delete_cache_records",
+            return_value=mock_delete_res,
+        ),
     ):
         res_del = _unwrap(clear_cache_entry(req_delete))
         assert res_del.matched_count == 1

@@ -316,11 +316,148 @@ class FeedStatus(_Contract):
         return self
 
 
+class MarketStreamRequest(_Contract):
+    """Bounded request for one Data-owned real-time market stream."""
+
+    source_id: str
+    symbol: str
+    mode: Literal["bars", "ticks"]
+    timeframe: str
+    request_id: str
+    resume_after: int | None = None
+
+    @field_validator("source_id", "symbol", "timeframe", "request_id")
+    @classmethod
+    def _validate_text(cls, value: str) -> str:
+        """Validate one required stream identifier.
+
+        Returns:
+            Non-empty trimmed identifier.
+        """
+        return _text(value)
+
+    @field_validator("resume_after")
+    @classmethod
+    def _validate_resume_after(cls, value: int | None) -> int | None:
+        """Validate an optional last-observed sequence.
+
+        Returns:
+            Non-negative sequence or ``None``.
+
+        Raises:
+            ValueError: If the sequence is negative.
+        """
+        if value is not None and value < 0:
+            raise ValueError("resume_after must be non-negative")
+        return value
+
+    @model_validator(mode="after")
+    def _validate_mt5_request(self) -> MarketStreamRequest:
+        """Restrict the first released stream source to MT5.
+
+        Returns:
+            Validated MT5 request.
+
+        Raises:
+            ValueError: If another source is requested.
+        """
+        if self.source_id != "mt5":
+            raise ValueError("the initial market stream source must be mt5")
+        return self
+
+
+class MarketStreamEvent(_Contract):
+    """Ordered canonical event emitted by a Data-owned market stream."""
+
+    feed_id: str
+    sequence: int
+    event_type: Literal["tick", "bar", "heartbeat", "gap", "error"]
+    mode: Literal["bars", "ticks"]
+    source_id: str
+    symbol: str
+    timeframe: str
+    occurred_at: datetime
+    payload: object | None = None
+    cursor: str
+    error: str | None = None
+    terminal: bool = False
+    request_id: str
+
+    @field_validator(
+        "feed_id",
+        "source_id",
+        "symbol",
+        "timeframe",
+        "cursor",
+        "request_id",
+    )
+    @classmethod
+    def _validate_text(cls, value: str) -> str:
+        """Validate one required event identifier.
+
+        Returns:
+            Non-empty trimmed identifier.
+        """
+        return _text(value)
+
+    @field_validator("sequence")
+    @classmethod
+    def _validate_sequence(cls, value: int) -> int:
+        """Validate one non-negative stream sequence.
+
+        Returns:
+            Validated sequence.
+
+        Raises:
+            ValueError: If the sequence is negative.
+        """
+        if value < 0:
+            raise ValueError("stream sequence must be non-negative")
+        return value
+
+    @field_validator("occurred_at")
+    @classmethod
+    def _validate_occurred_at(cls, value: datetime) -> datetime:
+        """Validate the event time as aware UTC.
+
+        Returns:
+            Validated timestamp.
+        """
+        return _utc(value)
+
+    @model_validator(mode="after")
+    def _validate_event_shape(self) -> MarketStreamEvent:
+        """Validate payload and terminal-error invariants.
+
+        Returns:
+            Validated event.
+
+        Raises:
+            ValueError: If the event family has an inconsistent shape.
+        """
+        if self.event_type in {"tick", "bar"} and self.payload is None:
+            raise ValueError("market payload events require payload")
+        if (
+            self.event_type in {"heartbeat", "gap", "error"}
+            and self.payload is not None
+        ):
+            raise ValueError("control stream events cannot include payload")
+        if self.event_type in {"gap", "error"} and self.error is None:
+            raise ValueError("gap and error events require an error code")
+        if self.event_type not in {"gap", "error"} and self.error is not None:
+            raise ValueError("only gap and error events may include an error code")
+        if self.terminal and self.event_type not in {"gap", "error"}:
+            raise ValueError("only gap and error events may be terminal")
+        return self
+
+
 __all__ = [
     "FeedConfig",
     "FeedEventResult",
     "FeedStatus",
     "FeedStatusRequest",
+    "MarketStreamEvent",
+    "MarketStreamRequest",
     "RawFeedEvent",
     "ReconnectPolicy",
 ]

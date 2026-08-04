@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from app.services.trading.migrations import TRADING_SCHEMA_VERSION
 from app.services.trading.state.events import TradingEvent
 from app.services.trading.state.idempotency import IdempotencyReservation
-from app.services.trading.state.migrations import TRADING_SCHEMA_VERSION
 from app.services.trading.state.projections import TradingProjection
 
 

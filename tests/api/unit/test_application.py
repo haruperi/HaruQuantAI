@@ -35,7 +35,9 @@ def test_canonical_app_has_exact_cors_and_route_catalog() -> None:
     app = create_api_app(config)
     paths = app.openapi()["paths"]
     assert "/api/v1/auth/login" in paths
-    assert len(paths) == 20
+    assert "/api/v1/auth/me" in paths
+    assert "/api/v1/data/stream" in paths
+    assert len(paths) == 31
     assert "/api/v1/operator/approvals" in paths
     assert "/api/v1/operator/kill-switch" not in paths
     assert "/api/v1/backtest/run" not in paths

@@ -1,5 +1,9 @@
 """FEAT-DATA-16 point-in-time research-source evidence."""
 
+from app.services.data.migrations.research_sources import (
+    RESEARCH_PROVIDER_MIGRATION_STEP,
+    RESEARCH_SOURCE_MIGRATION_STEP,
+)
 from app.services.data.research_sources.contracts import (
     ResearchSourceDocument,
     ResearchSourceEligibility,
@@ -10,10 +14,6 @@ from app.services.data.research_sources.contracts import (
     VerifiedResearchSource,
 )
 from app.services.data.research_sources.ingestion import ingest_research_source
-from app.services.data.research_sources.migrations import (
-    RESEARCH_PROVIDER_MIGRATION_STEP,
-    RESEARCH_SOURCE_MIGRATION_STEP,
-)
 from app.services.data.research_sources.normalization import (
     normalize_research_provider_payload,
 )

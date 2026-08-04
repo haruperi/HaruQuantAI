@@ -1,6 +1,7 @@
 """Canonical FastAPI application construction."""
 
 from collections.abc import Callable, Mapping
+from functools import partial
 from typing import Any, cast
 
 from fastapi import FastAPI, HTTPException, Request, status
@@ -17,7 +18,16 @@ from app.services.api.composition.lifecycle import lifespan
 from app.services.api.composition.owner_sources import (
     read_audit_events,
     read_dashboard_snapshot,
+    read_risk_state,
+    read_simulation_result,
     read_trading_events,
+    read_trading_session,
+)
+from app.services.api.composition.simulation_dependencies import (
+    build_simulation_run_source,
+)
+from app.services.api.composition.trading_dependencies import (
+    build_trading_mutation_source,
 )
 from app.services.api.contracts.catalog import create_canonical_route_contract_registry
 from app.services.api.identity import (
@@ -39,13 +49,18 @@ from app.services.api.routes import (
     auth_router,
     dashboards_router,
     data_router,
+    data_stream_router,
     health_router,
     observability_router,
     operator_router,
     research_router,
+    risk_router,
     settings_router,
+    simulation_router,
     strategies_router,
+    trading_router,
 )
+from app.services.api.streams import create_stream_connection_manager
 from app.utils import generate_id, utc_now
 
 _SESSION_COOKIE = "hq_session"
@@ -54,15 +69,24 @@ _ROUTERS = (
     health_router,
     settings_router,
     data_router,
+    data_stream_router,
     strategies_router,
     research_router,
+    simulation_router,
+    risk_router,
+    trading_router,
     dashboards_router,
     operator_router,
     observability_router,
 )
 
 
-def _build_canonical_graph() -> object:
+def _build_canonical_graph(
+    *,
+    settings: ApiSettings,
+    simulation_dependencies: object | None = None,
+    trading_dependencies: object | None = None,
+) -> object:
     """Build the exact owner-backed graph for the reduced backend v1.
 
     Returns:
@@ -73,6 +97,18 @@ def _build_canonical_graph() -> object:
             "dashboard.source": read_dashboard_snapshot,
             "operator.audit_source": read_audit_events,
             "operator.event_source": read_trading_events,
+            "risk.source": read_risk_state,
+            "simulation.result_source": partial(
+                read_simulation_result,
+                artifact_root=settings.simulation_artifact_root,
+            ),
+            "simulation.run_source": build_simulation_run_source(
+                simulation_dependencies
+            ),
+            "trading.mutation_source": build_trading_mutation_source(
+                trading_dependencies
+            ),
+            "trading.session_source": read_trading_session,
         }
     )
 
@@ -182,6 +218,8 @@ def create_app(
     | None = None,
     optional_startup_probes: Mapping[str, Callable[[], object]] | None = None,
     owned_resource_closers: tuple[Callable[[], object], ...] = (),
+    simulation_dependencies: object | None = None,
+    trading_dependencies: object | None = None,
 ) -> FastAPI:
     """Construct the single canonical UI/API application.
 
@@ -191,6 +229,8 @@ def create_app(
         dependency_overrides: Explicit owner-domain adapter dependencies.
         optional_startup_probes: Named dependencies allowed to degrade.
         owned_resource_closers: Gateway-owned resource shutdown hooks.
+        simulation_dependencies: Complete Simulator receiver-owned port bundle.
+        trading_dependencies: Complete Trading receiver-owned dependency bundle.
 
     Returns:
         Fully composed FastAPI application.
@@ -207,11 +247,20 @@ def create_app(
     )
     application.state.api_settings = settings
     application.state.api_route_contract_registry = route_contracts
+    application.state.api_stream_connection_manager = create_stream_connection_manager(
+        max_connections_per_actor=settings.stream_max_connections_per_actor,
+        max_connections_process=settings.stream_max_connections_process,
+        resume_window=settings.stream_resume_window,
+    )
     if in_process_graph is not None and dependency_overrides:
         raise ValueError(
             "in_process_graph and dependency_overrides cannot be supplied together"
         )
-    graph = in_process_graph or _build_canonical_graph()
+    graph = in_process_graph or _build_canonical_graph(
+        settings=settings,
+        simulation_dependencies=simulation_dependencies,
+        trading_dependencies=trading_dependencies,
+    )
     graph_overrides = dict(get_graph_overrides(graph))
     graph_overrides.update(dependency_overrides or {})
     application.state.api_required_startup_probes = dict(get_graph_probes(graph))

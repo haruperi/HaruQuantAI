@@ -5,23 +5,20 @@ from dataclasses import replace
 from datetime import timedelta
 from typing import Any
 
-from app.services.api.identity import require_auth_context
-from app.services.api.routes import operator
 from app.services.api.routes.operator import router
 from app.services.risk import (
     apply_kill_switch_command,
     check_risk_kill_switch,
     compute_config_hash,
     create_approval_attestation,
+    create_kill_switch_command,
     create_kill_switch_state,
     create_risk_audit_chain,
     get_decision_state,
 )
 from app.services.trading import resume_strategy
 from app.utils import canonical_json
-from fastapi import FastAPI
 
-from tests.api._support import post_json
 from tests.risk import _support as risk_support
 from tests.trading.unit.actions.test_controls import authority, projection
 from tests.trading.unit.actions.test_dependencies import (
@@ -137,30 +134,22 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
         del value
         alert_attempts.append(idempotency_key)
 
-    app = FastAPI()
-    app.include_router(router)
-    app.dependency_overrides[require_auth_context] = lambda: risk_support._auth(
-        config,
-        clearance=True,
+    assert "/api/v1/operator/kill-switch" not in {route.path for route in router.routes}
+    auth = risk_support._auth(config, clearance=True)
+    active_command = create_kill_switch_command(
+        action="activate",
+        scope_level="global",
+        portfolio_id=None,
+        strategy_id=None,
+        symbol=None,
+        reason="operator safety stop",
+        requested_at=workflow_now,
+        request_id=risk_support.REQUEST_ID,
+        workflow_id=risk_support.WORKFLOW_ID,
+        correlation_id=risk_support.CORRELATION_ID,
     )
-    app.dependency_overrides[operator._kill_switch_transition] = lambda: transition
-    app.dependency_overrides[operator._critical_alert_sink] = lambda: sink
-    payload = {
-        "action": "activate",
-        "scope_level": "global",
-        "portfolio_id": None,
-        "strategy_id": None,
-        "symbol": None,
-        "reason": "operator safety stop",
-        "requested_at": workflow_now.isoformat(),
-        "attestation": None,
-    }
-
-    active_status, active_body = post_json(
-        app,
-        "/api/operator/kill-switch",
-        payload,
-    )
+    active_state = transition(active_command, auth, None)
+    sink(active_state, idempotency_key=f"kill-switch:{active_state.state_id}:active")
 
     def current_states(value: TradingRequest) -> tuple[KillSwitchState, ...]:
         """Return the current canonical Risk state hierarchy."""
@@ -193,17 +182,19 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
         workflow_id=risk_support.WORKFLOW_ID,
         correlation_id=risk_support.CORRELATION_ID,
     )
-    clearance = {
-        **payload,
-        "action": "clear",
-        "reason": "reconciled and independently approved",
-        "attestation": attestation.model_dump(mode="json"),
-    }
-    clear_status, clear_body = post_json(
-        app,
-        "/api/operator/kill-switch",
-        clearance,
+    clear_command = create_kill_switch_command(
+        action="clear",
+        scope_level="global",
+        portfolio_id=None,
+        strategy_id=None,
+        symbol=None,
+        reason="reconciled and independently approved",
+        requested_at=workflow_now,
+        request_id=risk_support.REQUEST_ID,
+        workflow_id=risk_support.WORKFLOW_ID,
+        correlation_id=risk_support.CORRELATION_ID,
     )
+    clear_state = transition(clear_command, auth, attestation)
     trading_store = MemoryStore()
     trading_store.projection = projection().model_copy(
         update={"updated_at": workflow_now}
@@ -241,11 +232,9 @@ def test_operator_activation_halts_and_clearance_requires_reconciliation() -> No
         operation="check_risk_kill_switch",
     )
 
-    assert active_status == 200, active_body
-    assert active_body["state"]["state"] == "active"
+    assert active_state.state == "active"
     assert len(alert_attempts) == 1
-    assert clear_status == 200, clear_body
-    assert clear_body["state"]["state"] == "inactive"
+    assert clear_state.state == "inactive"
     assert resumed.status == "success"
     assert risk_recovery.state is get_decision_state("APPROVE")
     assert len(risk_store.records) == 2

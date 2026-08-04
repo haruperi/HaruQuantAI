@@ -3,7 +3,7 @@
 > **Package:** `app/agentic/lifecycle`
 > **Feature:** `FEAT-AGT-18` Artefact Promotion and Lifecycle
 > **Status:** `Completed`
-> **Last updated:** `2026-07-30`
+> **Last updated:** `2026-08-03`
 
 > This README documents one registered root infrastructure package. It is
 > **subordinate to the canonical Agentic Feature Registry** in
@@ -76,8 +76,13 @@ lifecycle/
 ├── service.py       # assess_promotion and transition_artifact
 ├── migrations.py    # Append-only ledger schema executed by Data
 ├── repository.py    # Ledger port and its deterministic in-memory double
+├── runtime.py       # Durable adapter through Agentic persistence
 └── README.md        # This file
 ```
+
+Durable CRUD is centralized in the private `app/agentic/persistence/` support
+package. This feature retains lifecycle validation, sequencing, codec handling,
+and state derivation; it does not call Data runtime-store operations directly.
 
 **`migrations.py` and `repository.py` are additions to the canonical §4.18 file
 list.** `FR-AGENTIC-054` requires transitions be append-only. An in-process
@@ -229,6 +234,6 @@ from the act is what makes the record trustworthy.
    non-inheritance, and changing it would let a modified artefact inherit an
    approval granted to a different one.
 5. Never relax the append-only check to an upsert.
-6. Update `models.py`, `service.py`, `repository.py`, `migrations.py`, tests,
+6. Update `models.py`, `service.py`, `repository.py`, `runtime.py`, `migrations.py`, tests,
    and the usage program.
 7. Change status only after every gate passes.

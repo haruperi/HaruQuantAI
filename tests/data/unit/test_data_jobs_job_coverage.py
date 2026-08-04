@@ -155,7 +155,7 @@ def test_acquire_job_run_lease_checks() -> None:
     res_disabled.rows = [{"enabled": 0}]
 
     with patch(
-        "app.services.data.data_jobs.job._execute_transaction_raw",
+        "app.services.data.data_jobs.job.read_update_job_definition_record",
         return_value=res_disabled,
     ):
         with pytest.raises(DataError) as exc_info:
@@ -174,7 +174,7 @@ def test_acquire_job_run_lease_checks() -> None:
     ]
 
     with patch(
-        "app.services.data.data_jobs.job._execute_transaction_raw",
+        "app.services.data.data_jobs.job.read_update_job_definition_record",
         return_value=res_running,
     ):
         with pytest.raises(DataError) as exc_info:

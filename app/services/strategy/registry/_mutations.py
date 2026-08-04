@@ -5,13 +5,7 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
-from app.services.data import (
-    build_statement_plan,
-    build_transaction_request,
-    execute_transaction,
-    is_data_error,
-    persist_audit_event,
-)
+from app.services.data import is_data_error, persist_audit_event
 from app.services.strategy.contracts.outcomes import (
     StrategyMutationResult,
 )
@@ -24,6 +18,11 @@ from app.services.strategy.contracts.responses import (
     unwrap_data_response,
 )
 from app.services.strategy.migrations.definitions import _ensure_strategy_storage
+from app.services.strategy.persistence import (
+    read_strategy_mutation_record,
+    read_strategy_policy_record,
+    update_strategy_mutation_publication,
+)
 from app.utils import create_audit_event, generate_id, get_logger
 
 type AuthContext = Any
@@ -45,27 +44,10 @@ def _load_mutation(command_id: str, request_id: str) -> StrategyMutationResult |
         Prior mutation result or ``None``.
     """
     logger.debug("Loading prior Strategy mutation")
-    result = unwrap_data_response(
-        execute_transaction(
-            build_transaction_request(
-                plan=build_statement_plan(
-                    statements=(
-                        "SELECT mutation_json FROM strategy_mutations "
-                        "WHERE command_id = ?",
-                    ),
-                    parameter_sets=((command_id,),),
-                    max_rows=1,
-                ),
-                request_id=request_id,
-            )
-        ),
-        operation="data.execute_transaction.strategy_mutation_lookup",
-    )
-    if not result.rows:
+    rows = read_strategy_mutation_record(command_id, request_id)
+    if not rows:
         return None
-    return StrategyMutationResult.model_validate_json(
-        str(result.rows[0]["mutation_json"])
-    )
+    return StrategyMutationResult.model_validate_json(str(rows[0]["mutation_json"]))
 
 
 def _load_policy(ref: StrategyRef, request_id: str) -> StrategyValidationPolicy | None:
@@ -83,28 +65,10 @@ def _load_policy(ref: StrategyRef, request_id: str) -> StrategyValidationPolicy 
     version = ref.exact_version
     if version is None:
         return None
-    result = unwrap_data_response(
-        execute_transaction(
-            build_transaction_request(
-                plan=build_statement_plan(
-                    statements=(
-                        "SELECT policy_json FROM strategy_versions "
-                        "WHERE strategy_id = ? "
-                        "AND strategy_version = ?",
-                    ),
-                    parameter_sets=((ref.strategy_id, version),),
-                    max_rows=1,
-                ),
-                request_id=request_id,
-            )
-        ),
-        operation="data.execute_transaction.strategy_policy_lookup",
-    )
-    if not result.rows:
+    rows = read_strategy_policy_record(ref.strategy_id, version, request_id)
+    if not rows:
         return None
-    return StrategyValidationPolicy.model_validate_json(
-        str(result.rows[0]["policy_json"])
-    )
+    return StrategyValidationPolicy.model_validate_json(str(rows[0]["policy_json"]))
 
 
 def _publish_mutation(
@@ -150,22 +114,7 @@ def _publish_mutation(
         published = mutation.model_copy(
             update={"audit_event_ref": event_id, "publication_pending": False}
         )
-        unwrap_data_response(
-            execute_transaction(
-                build_transaction_request(
-                    plan=build_statement_plan(
-                        statements=(
-                            "UPDATE strategy_mutations SET mutation_json = ?, "
-                            "publication_pending = 0 WHERE command_id = ?",
-                        ),
-                        parameter_sets=((published.model_dump_json(), command_id),),
-                        max_rows=1,
-                    ),
-                    request_id=mutation.request_id,
-                )
-            ),
-            operation="data.execute_transaction.strategy_mutation_publication",
-        )
+        update_strategy_mutation_publication(published, command_id)
         return published
     except Exception as error:
         if not (is_data_error(error) or isinstance(error, StrategyOperationError)):

@@ -312,8 +312,8 @@ def test_checkpoint_and_listing_fail_closed_branches() -> None:
     assert denied_restore.error.code == "STRATEGY_CHECKPOINT_INVALID"
 
     with patch(
-        "app.services.strategy.checkpoints.store.execute_transaction",
-        return_value=SimpleNamespace(rows=()),
+        "app.services.strategy.checkpoints.store.read_strategy_checkpoint_record",
+        return_value=(),
     ):
         unknown = validate_strategy_checkpoint(
             checkpoint,
@@ -326,7 +326,7 @@ def test_checkpoint_and_listing_fail_closed_branches() -> None:
 
     with (
         patch(
-            "app.services.strategy.registry.listing.execute_transaction",
+            "app.services.strategy.registry.listing.read_strategy_version_records",
             side_effect=RuntimeError("database"),
         ),
         patch(
@@ -339,8 +339,8 @@ def test_checkpoint_and_listing_fail_closed_branches() -> None:
     assert failed_listing.error.code == "STRATEGY_INTERNAL_ERROR"
 
     with patch(
-        "app.services.strategy.registry.listing.execute_transaction",
-        return_value=SimpleNamespace(rows=()),
+        "app.services.strategy.registry.listing.read_strategy_version_records",
+        return_value=(),
     ):
         missing = list_strategy_versions("missing")
     assert missing.error is not None

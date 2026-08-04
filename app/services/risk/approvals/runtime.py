@@ -1,4 +1,4 @@
-"""Durable Risk approval-token state over Data-owned runtime records."""
+"""Durable Risk approval-token state over Risk-owned relational records."""
 
 from __future__ import annotations
 
@@ -8,13 +8,16 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Literal, cast
 
-from app.services.data import (
-    build_risk_runtime_store,
-    execute_runtime_store_operation,
-    execute_runtime_store_transition,
-)
 from app.services.risk.contracts import RiskApprovalToken
-from app.utils import canonical_digest, canonical_json, get_logger
+from app.services.risk.persistence import (
+    create_approval_state_record,
+    create_risk_runtime_store,
+    read_approval_index_records,
+    read_approval_state_record,
+    read_approval_state_record_with_revision,
+    update_approval_state_record,
+)
+from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 type _State = dict[str, object]
@@ -34,15 +37,6 @@ def _encode(value: object) -> str:
     return canonical_json(dict(value), max_items=None)
 
 
-def _key(*values: str) -> str:
-    """Derive a storage-safe state key.
-
-    Returns:
-        Bounded key.
-    """
-    return f"record-{canonical_digest(values)}"
-
-
 def _state(token: RiskApprovalToken) -> _State:
     """Create the durable issued state without storing signing secrets.
 
@@ -52,6 +46,7 @@ def _state(token: RiskApprovalToken) -> _State:
     return {
         "approval_json": token.model_dump_json(),
         "consumed": False,
+        "consumed_at": None,
         "reservation_id": None,
         "revocation_reason": None,
         "revoked_at": None,
@@ -89,7 +84,7 @@ class _DurableTokenStateStore:
 
     def __init__(self) -> None:
         """Build the lazy Data runtime handle."""
-        self._store = build_risk_runtime_store(
+        self._store = create_risk_runtime_store(
             {"approval-state": (_encode, json.loads)}
         )
 
@@ -106,37 +101,17 @@ class _DurableTokenStateStore:
         """
         del timeout_seconds
         value = _state(token)
-        existing = execute_runtime_store_operation(
-            self._store,
-            "get",
-            collection="approval-states",
-            key=_key(token.token_id),
-        )
+        existing = read_approval_state_record(self._store, token.token_id)
         if existing is not None:
             return "already_saved" if existing == value else "conflict"
-        index = cast(
-            "tuple[object, ...]",
-            execute_runtime_store_operation(
-                self._store,
-                "list",
-                collection="approval-index",
-                partition="approvals",
-                limit=1_000,
-            ),
-        )
-        committed = execute_runtime_store_transition(
+        index = read_approval_index_records(self._store)
+        committed = create_approval_state_record(
             self._store,
-            state_collection="approval-states",
-            state_key=_key(token.token_id),
-            state_kind="approval-state",
+            state_key=token.token_id,
             state_value=value,
-            expected_revision=0,
-            event_collection="approval-index",
-            event_key=_key("index", token.token_id),
-            event_partition="approvals",
-            event_sequence=len(index) + 1,
-            event_kind="approval-state",
-            event_value={"approval_id": token.token_id},
+            index_key=token.token_id,
+            index_sequence=len(index) + 1,
+            index_value={"approval_id": token.token_id},
         )
         return "saved" if committed else "conflict"
 
@@ -166,13 +141,8 @@ class _DurableTokenStateStore:
         """
         del timeout_seconds
         stored = cast(
-            "tuple[_State, int] | None",
-            execute_runtime_store_operation(
-                self._store,
-                "get_with_revision",
-                collection="approval-states",
-                key=_key(token_id),
-            ),
+            "tuple[_State, str] | None",
+            read_approval_state_record_with_revision(self._store, token_id),
         )
         if stored is None:
             return "missing"
@@ -194,15 +164,13 @@ class _DurableTokenStateStore:
         updated = {
             **value,
             "consumed": True,
+            "consumed_at": now.isoformat(),
             "reservation_id": reservation_id,
         }
         try:
-            execute_runtime_store_operation(
+            update_approval_state_record(
                 self._store,
-                "compare_and_swap",
-                collection="approval-states",
-                key=_key(token_id),
-                kind="approval-state",
+                key=token_id,
                 value=updated,
                 expected_revision=revision,
             )
@@ -224,16 +192,7 @@ class _DurableTokenStateStore:
             Number of newly revoked approvals.
         """
         del timeout_seconds
-        index = cast(
-            "tuple[Mapping[str, object], ...]",
-            execute_runtime_store_operation(
-                self._store,
-                "list",
-                collection="approval-index",
-                partition="approvals",
-                limit=1_000,
-            ),
-        )
+        index = read_approval_index_records(self._store)
         revoked = 0
         for item in index:
             approval_id = item.get("approval_id")
@@ -256,13 +215,8 @@ class _DurableTokenStateStore:
             True only when this call committed a new revocation.
         """
         stored = cast(
-            "tuple[_State, int] | None",
-            execute_runtime_store_operation(
-                self._store,
-                "get_with_revision",
-                collection="approval-states",
-                key=_key(approval_id),
-            ),
+            "tuple[_State, str] | None",
+            read_approval_state_record_with_revision(self._store, approval_id),
         )
         if stored is None:
             return False
@@ -280,12 +234,9 @@ class _DurableTokenStateStore:
             "revoked_at": revoked_at.isoformat(),
         }
         try:
-            execute_runtime_store_operation(
+            update_approval_state_record(
                 self._store,
-                "compare_and_swap",
-                collection="approval-states",
-                key=_key(approval_id),
-                kind="approval-state",
+                key=approval_id,
                 value=updated,
                 expected_revision=revision,
             )

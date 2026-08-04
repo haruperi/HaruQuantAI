@@ -860,6 +860,38 @@ def ensure_source_access(source_id: str, request_id: str) -> StandardResponse[No
     )
 
 
+def _resolve_realtime_session_raw(
+    source_id: str,
+    request_id: str,
+) -> _LazyBrokerSession:
+    """Return Data's private lazy provider session for real-time reads.
+
+    The session never crosses the Data package boundary. Real-time feature code uses
+    it only to execute Brokers-owned read operations through the same credential,
+    environment, circuit, and lifecycle controls as historical retrieval.
+
+    Args:
+        source_id: Configured provider source identifier.
+        request_id: Canonical request identifier.
+
+    Returns:
+        Existing or newly composed private provider session.
+
+    Raises:
+        DataError: If the source cannot be composed or is not provider-backed.
+    """
+    _ensure_source_raw(source_id, request_id)
+    with _lock:
+        session = _sessions.get(source_id)
+    if session is None:
+        raise DataError(
+            "UNSUPPORTED_SOURCE",
+            safe_details={"source_id": source_id},
+            request_id=request_id,
+        )
+    return session
+
+
 def ensure_identity(source_id: str, symbol: str, request_id: str) -> None:
     """Resolve or register one provider-confirmed identity mapping.
 

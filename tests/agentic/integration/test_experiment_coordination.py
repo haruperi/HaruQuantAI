@@ -35,10 +35,6 @@ from app.agentic.agents.experimentation.experiment_designer import (
     coordinate_simulation,
     design_experiment,
 )
-from app.agentic.agents.experimentation.experiment_designer.migrations import (
-    build_experiment_migration_request,
-    get_experiment_migration_statements,
-)
 from app.agentic.agents.experimentation.experiment_designer.repository import (
     build_in_memory_experiment_store,
 )
@@ -49,6 +45,10 @@ from app.agentic.agents.experimentation.experiment_designer.tools import (
 from app.agentic.agents.strategy_desk.strategy_thesis_analyst import (
     build_hypothesis,
     build_strategy_thesis,
+)
+from app.agentic.migrations.experiment import (
+    build_experiment_migration_request,
+    get_experiment_migration_statements,
 )
 from app.agentic.runtime import ModelOutcome
 from app.utils import derive_stable_id, generate_id

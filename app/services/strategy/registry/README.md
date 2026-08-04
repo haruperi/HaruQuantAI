@@ -3,7 +3,10 @@
 This feature owns immutable strategy registration, parameter-version recording,
 deterministic listing, exact reference resolution, and declarative configuration
 validation. Mutations initialize Strategy storage through the private migration
-support package; read-only operations never execute migrations.
+support package; read-only operations never execute migrations. The feature retains
+authorization, validation, hashing, immutable model construction, and public response
+behavior while delegating all registry CRUD statements to the private
+`app/services/strategy/persistence/` support package.
 
 `adopt_approved_optimization_parameters` is the Strategy-owned receiver for
 `OptimizationResult v1` projections. It requires authenticated owner approval,

@@ -11,7 +11,11 @@ from datetime import datetime
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from pydantic import BaseModel, ConfigDict, SecretStr
 
-from app.services.api.identity.accounts import IdentityError, _execute
+from app.services.api.identity.errors import IdentityError
+from app.services.api.persistence import (
+    read_credential_record,
+    update_credential_record,
+)
 from app.utils import canonical_json, derive_stable_id, get_logger, utc_now
 
 logger = get_logger(__name__)
@@ -88,26 +92,13 @@ def store_credential(
     plaintext = canonical_json(plaintext_values).encode("utf-8")
     ciphertext = AESGCM(key).encrypt(nonce, plaintext, associated_data)
     created_at = utc_now()
-    _execute(
-        (
-            "INSERT INTO api_credentials "
-            "(reference, owner_id, key_id, nonce_b64, ciphertext_b64, "
-            "created_at, version) "
-            "VALUES (?, ?, ?, ?, ?, ?, 1) "
-            "ON CONFLICT(reference) DO UPDATE SET key_id=excluded.key_id, "
-            "nonce_b64=excluded.nonce_b64, ciphertext_b64=excluded.ciphertext_b64, "
-            "created_at=excluded.created_at, version=excluded.version",
-        ),
-        (
-            (
-                reference,
-                owner_id,
-                key_id,
-                base64.urlsafe_b64encode(nonce).decode("ascii"),
-                base64.urlsafe_b64encode(ciphertext).decode("ascii"),
-                created_at.isoformat(),
-            ),
-        ),
+    update_credential_record(
+        reference=reference,
+        owner_id=owner_id,
+        key_id=key_id,
+        nonce_b64=base64.urlsafe_b64encode(nonce).decode("ascii"),
+        ciphertext_b64=base64.urlsafe_b64encode(ciphertext).decode("ascii"),
+        created_at=created_at.isoformat(),
         request_id=request_id,
     )
     return CredentialRecord(
@@ -142,15 +133,7 @@ def resolve_credential_reference(
     logger.info("Resolving one authorized UI/API credential reference")
     if not reference.startswith("secret://"):
         raise IdentityError("CREDENTIAL_REFERENCE_INVALID")
-    result = _execute(
-        (
-            "SELECT owner_id, key_id, nonce_b64, ciphertext_b64, version "
-            "FROM api_credentials WHERE reference = ?",
-        ),
-        ((reference,),),
-        request_id=request_id,
-    )
-    rows = tuple(result.rows)
+    rows = read_credential_record(reference, request_id=request_id)
     if len(rows) != 1:
         raise IdentityError("CREDENTIAL_REFERENCE_UNKNOWN")
     row = rows[0]

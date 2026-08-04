@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from app.services.optimization.evidence.assemble import build_optimization_evidence
 from app.services.optimization.evidence.handoff import build_report_package
 from app.services.optimization.execution.adapter import execute_candidate
+from app.services.optimization.migrations import get_optimization_migrations
 from app.services.optimization.parameters import (
     evaluate_constraints,
     get_executable_parameters,
@@ -68,7 +69,6 @@ from app.services.optimization.search.sweep import (
     select_top_candidates,
 )
 from app.services.optimization.state.artifacts import build_optimization_artifact_path
-from app.services.optimization.state.migrations import get_optimization_migrations
 from app.services.optimization.state.persistence import persist_optimization_result
 from app.services.optimization.state.stores import (
     load_search_checkpoint,

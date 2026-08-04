@@ -19,13 +19,18 @@ from app.services.data.market_data.pipeline import _fetch_market_dataset_raw
 from app.services.data.market_data.requests import (
     MarketDataRequest,
 )
+from app.services.data.persistence import (
+    create_backfill_checkpoint_record,
+    read_committed_backfill_record,
+    read_update_job_identity,
+    update_backfill_failure,
+    update_backfill_finalization,
+    update_backfill_lease,
+)
 from app.services.data.persistence.contracts import (
     DatasetSaveRequest,
-    StatementPlan,
-    TransactionRequest,
 )
 from app.services.data.persistence.dataset_writer import _save_dataset_raw
-from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.utils import get_logger, utc_now
 
 logger = get_logger(__name__)
@@ -102,23 +107,9 @@ def _committed_result(
 ) -> BackfillChunkResult | None:
     """Return an existing committed idempotency result."""
     logger.debug("Checking committed backfill idempotency state")
-    result = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    """
-                    SELECT job_id, chunk_id, idempotency_key, committed_start,
-                           committed_end, record_count, content_hash,
-                           artifact_final
-                    FROM data_backfill_checkpoints
-                    WHERE idempotency_key = ? AND publication_state = 'committed'
-                    """.strip(),
-                ),
-                parameter_sets=((key,),),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
+    result = read_committed_backfill_record(
+        key,
+        request_id=request.request_id,
     )
     return _result_from_row(request, result.rows[0]) if result.rows else None
 
@@ -127,46 +118,21 @@ def _acquire_lease(request: BackfillChunkRequest, now: datetime) -> None:
     """Atomically acquire or renew the job lease with one conditional mutation."""
     logger.info("Acquiring atomic backfill lease for job %s", request.job_id)
     expires_at = now + timedelta(seconds=JOB_LEASE_TIMEOUT_SECONDS)
-    result = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    """
-                    UPDATE data_update_jobs
-                    SET state = 'running', lease_owner = ?, lease_expires_at = ?
-                    WHERE job_id = ? AND (
-                        state != 'running'
-                        OR lease_owner = ?
-                        OR lease_expires_at IS NULL
-                        OR lease_expires_at <= ?
-                    )
-                    """.strip(),
-                ),
-                parameter_sets=(
-                    (
-                        request.request_id,
-                        expires_at.isoformat(),
-                        request.job_id,
-                        request.request_id,
-                        now.isoformat(),
-                    ),
-                ),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
+    result = update_backfill_lease(
+        (
+            request.request_id,
+            expires_at.isoformat(),
+            request.job_id,
+            request.request_id,
+            now.isoformat(),
+        ),
+        request_id=request.request_id,
     )
     if result.affected_rows > 0:
         return
-    existing = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=("SELECT job_id FROM data_update_jobs WHERE job_id = ?",),
-                parameter_sets=((request.job_id,),),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
+    existing = read_update_job_identity(
+        request.job_id,
+        request_id=request.request_id,
     )
     code = "CONCURRENT_WRITE_LOCKED" if existing.rows else "JOB_NOT_FOUND"
     raise DataError(
@@ -207,22 +173,10 @@ def _fetch_backfill_data(request: BackfillChunkRequest) -> MarketDataset:
         logger.exception(
             "Backfill fetch failed: code=%s details=%s", error.code, error.safe_details
         )
-        _execute_transaction_raw(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        """
-                        UPDATE data_update_jobs
-                        SET last_run_status = 'failed', last_error = ?,
-                            recovery_state = 'required'
-                        WHERE job_id = ?
-                        """.strip(),
-                    ),
-                    parameter_sets=((error.code, request.job_id),),
-                    max_rows=1,
-                ),
-                request_id=request.request_id,
-            )
+        update_backfill_failure(
+            error.code,
+            request.job_id,
+            request_id=request.request_id,
         )
         raise
 
@@ -297,39 +251,22 @@ def _prepare_artifact(
         )
     )
     chunk_id = f"chunk-{key}"
-    _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    """
-                    INSERT INTO data_backfill_checkpoints (
-                        idempotency_key, job_id, chunk_id, committed_start,
-                        committed_end, record_count, content_hash, checkpoint,
-                        artifact_temp, artifact_final, publication_state,
-                        request_id, created_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'prepared', ?, ?)
-                    """.strip(),
-                ),
-                parameter_sets=(
-                    (
-                        key,
-                        request.job_id,
-                        chunk_id,
-                        request.start.isoformat(),
-                        request.end.isoformat(),
-                        dataset.record_count,
-                        manifest.content_hash,
-                        str(pending_relative),
-                        str(pending_relative),
-                        str(final_relative),
-                        request.request_id,
-                        now.isoformat(),
-                    ),
-                ),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
+    create_backfill_checkpoint_record(
+        (
+            key,
+            request.job_id,
+            chunk_id,
+            request.start.isoformat(),
+            request.end.isoformat(),
+            dataset.record_count,
+            manifest.content_hash,
+            str(pending_relative),
+            str(pending_relative),
+            str(final_relative),
+            request.request_id,
+            now.isoformat(),
+        ),
+        request_id=request.request_id,
     )
     return chunk_id, manifest.content_hash, str(pending_relative), str(final_relative)
 
@@ -389,31 +326,11 @@ def _finalize_checkpoint(
 ) -> None:
     """Atomically finalize checkpoint and job evidence after publication."""
     logger.info("Finalizing committed backfill checkpoint")
-    result = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    """
-                    UPDATE data_backfill_checkpoints
-                    SET checkpoint = ?, publication_state = 'committed'
-                    WHERE idempotency_key = ? AND publication_state = 'prepared'
-                    """.strip(),
-                    """
-                    UPDATE data_update_jobs
-                    SET last_run_status = 'succeeded', last_checkpoint = ?,
-                        last_error = NULL, recovery_state = 'clean',
-                        lease_owner = NULL, lease_expires_at = NULL
-                    WHERE job_id = ?
-                    """.strip(),
-                ),
-                parameter_sets=(
-                    (final_relative, key),
-                    (final_relative, job_id),
-                ),
-                max_rows=1,
-            ),
-            request_id=request_id,
-        )
+    result = update_backfill_finalization(
+        final_relative,
+        key,
+        job_id,
+        request_id=request_id,
     )
     if not result.committed:
         raise DataError(

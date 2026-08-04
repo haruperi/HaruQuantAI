@@ -1,4 +1,4 @@
-"""Durable Agentic lifecycle store over Data-owned runtime records."""
+"""Durable Agentic lifecycle store over Agentic-owned relational records."""
 
 from __future__ import annotations
 
@@ -11,11 +11,13 @@ from app.agentic.lifecycle.models import (
     LifecycleRecord,
     PromotionEvidencePacket,
 )
-from app.services.data import (
-    build_agentic_runtime_store,
-    execute_runtime_store_operation,
+from app.agentic.persistence import (
+    create_agentic_persistence_store,
+    create_lifecycle_packet_record,
+    create_lifecycle_record,
+    read_lifecycle_packet_record,
+    read_lifecycle_records,
 )
-from app.utils import canonical_digest
 
 
 def _encode(value: object) -> str:
@@ -32,21 +34,12 @@ def _encode(value: object) -> str:
     return value.model_dump_json()
 
 
-def _key(value: str) -> str:
-    """Derive one storage-safe identifier.
-
-    Returns:
-        Bounded key.
-    """
-    return f"record-{canonical_digest(value)}"
-
-
 class DurableLifecycleStore:
     """Data-backed implementation of the Agentic lifecycle-store port."""
 
     def __init__(self) -> None:
-        """Build the lazy Data runtime handle."""
-        self._store = build_agentic_runtime_store(
+        """Build the relational persistence handle."""
+        self._store = create_agentic_persistence_store(
             {
                 "lifecycle": (_encode, LifecycleRecord.model_validate_json),
                 "packet": (_encode, PromotionEvidencePacket.model_validate_json),
@@ -64,14 +57,11 @@ class DurableLifecycleStore:
         """
         if record.sequence != self.next_sequence(record.artifact_hash):
             raise ValueError("Agentic lifecycle sequence is not appendable")
-        execute_runtime_store_operation(
+        create_lifecycle_record(
             self._store,
-            "append",
-            collection="lifecycle-records",
-            key=_key(record.record_id),
-            partition=_key(record.artifact_hash),
+            key=record.record_id,
+            partition=record.artifact_hash,
             sequence=record.sequence,
-            kind="lifecycle",
             value=record,
         )
         return record
@@ -84,12 +74,10 @@ class DurableLifecycleStore:
         """
         return cast(
             "tuple[LifecycleRecord, ...]",
-            execute_runtime_store_operation(
+            read_lifecycle_records(
                 self._store,
-                "list",
-                collection="lifecycle-records",
-                partition=_key(artifact_hash),
-                limit=1_000,
+                artifact_hash,
+                1_000,
             ),
         )
 
@@ -116,13 +104,10 @@ class DurableLifecycleStore:
         Returns:
             Persisted packet.
         """
-        execute_runtime_store_operation(
+        create_lifecycle_packet_record(
             self._store,
-            "put_once",
-            collection="lifecycle-packets",
-            key=_key(packet.packet_hash),
-            kind="packet",
-            value=packet,
+            packet.packet_hash,
+            packet,
         )
         return packet
 
@@ -134,11 +119,9 @@ class DurableLifecycleStore:
         """
         return cast(
             "PromotionEvidencePacket | None",
-            execute_runtime_store_operation(
+            read_lifecycle_packet_record(
                 self._store,
-                "get",
-                collection="lifecycle-packets",
-                key=_key(packet_hash),
+                packet_hash,
             ),
         )
 

@@ -1,5 +1,6 @@
 """Supported Optimization state API."""
 
+from app.services.optimization.migrations import get_optimization_migrations
 from app.services.optimization.state.artifacts import (
     build_optimization_artifact_path,
 )
@@ -9,7 +10,6 @@ from app.services.optimization.state.contracts import (
     OptimizationPersistenceReceipt,
     OptimizationStateStore,
 )
-from app.services.optimization.state.migrations import get_optimization_migrations
 from app.services.optimization.state.persistence import persist_optimization_result
 from app.services.optimization.state.stores import (
     load_search_checkpoint,

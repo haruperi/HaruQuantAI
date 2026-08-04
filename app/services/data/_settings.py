@@ -10,12 +10,16 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from pathlib import Path
-from typing import Annotated, Final, Literal
+from typing import Annotated, Final, Literal, override
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, PydanticBaseSettingsSource
 
 from app.utils import get_logger
+from app.utils.settings import (
+    get_app_settings_model_config,
+    get_app_settings_sources,
+)
 
 logger = get_logger(__name__)
 
@@ -34,12 +38,7 @@ LOCAL_SYMBOL_MANIFEST_NAME: Final = "symbols.json"
 class DataSettings(BaseSettings):
     """Immutable DATA-owned settings resolved from explicit or process values."""
 
-    model_config = SettingsConfigDict(
-        env_ignore_empty=True,
-        case_sensitive=False,
-        extra="ignore",
-        frozen=True,
-    )
+    model_config = get_app_settings_model_config()
 
     database_url: str | None = None
     data_dir: Path | None = None
@@ -54,6 +53,36 @@ class DataSettings(BaseSettings):
     data_provider_sources: Annotated[tuple[str, ...], NoDecode] = ()
     data_raw_root: Path = DEFAULT_RAW_ROOT
     quality_profile: Literal["strict", "standard", "lenient"] = "standard"
+
+    @override
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        """Load explicit and process values before the central JSON source.
+
+        Args:
+            settings_cls: Concrete Data settings model.
+            init_settings: Explicit constructor values source.
+            env_settings: Process-environment source.
+            dotenv_settings: Optional dotenv source.
+            file_secret_settings: File-backed secret source.
+
+        Returns:
+            Canonical settings sources in descending precedence order.
+        """
+        return get_app_settings_sources(
+            settings_cls,
+            init_settings,
+            env_settings,
+            dotenv_settings,
+            file_secret_settings,
+        )
 
     @field_validator("database_url", mode="before")
     @classmethod

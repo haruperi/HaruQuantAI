@@ -1,4 +1,4 @@
-"""Portfolio state protocol over Data-owned durable runtime records."""
+"""Portfolio state protocol over Portfolio-owned relational records."""
 
 from __future__ import annotations
 
@@ -11,15 +11,23 @@ from typing import Any, cast, get_args, get_origin
 
 from pydantic import BaseModel
 
-from app.services.data import (
-    build_portfolio_runtime_store,
-    execute_runtime_store_operation,
-    execute_runtime_store_transition,
-)
 from app.services.portfolio.contracts import (
     ActivePortfolioAllocation,
     PortfolioConstructionResult,
     PortfolioRebalancePlan,
+)
+from app.services.portfolio.persistence import (
+    create_construction_record,
+    create_plan_record,
+    create_portfolio_runtime_store,
+    read_active_allocation_record,
+    read_allocation_history_records,
+    read_allocation_record,
+    read_construction_record,
+    read_idempotency_record,
+    read_plan_record,
+    read_plan_version_records,
+    update_active_allocation_record,
 )
 from app.utils import canonical_digest, canonical_json, get_logger
 
@@ -209,11 +217,11 @@ def _sequence(value: Mapping[str, object]) -> int:
 
 
 class _DurablePortfolioStateStore:
-    """Concrete Portfolio adapter over Data runtime records."""
+    """Concrete Portfolio adapter over owned relational records."""
 
     def __init__(self) -> None:
         """Construct the adapter without opening a connection."""
-        self._store = build_portfolio_runtime_store(
+        self._store = create_portfolio_runtime_store(
             {
                 "allocation": (
                     _encode_model,
@@ -231,43 +239,38 @@ class _DurablePortfolioStateStore:
             }
         )
 
-    def _commit_immutable(
+    def _commit_construction(
         self,
         *,
-        collection: str,
         key: str,
-        kind: str,
         value: object,
         audit_record: AuditOutboxRecord,
     ) -> None:
-        """Atomically persist immutable state and its outbox evidence.
+        """Atomically persist immutable construction and outbox evidence.
 
         Raises:
             ValueError: If stored material conflicts with the immutable value.
         """
         outbox = {
             "audit": dict(audit_record),
-            "collection": collection,
+            "collection": "constructions",
             "record_key": key,
         }
-        committed = execute_runtime_store_transition(
+        existing = read_construction_record(self._store, key)
+        if existing is not None:
+            if existing == value:
+                return
+            raise ValueError("Portfolio immutable state conflicts")
+        committed = create_construction_record(
             self._store,
-            state_collection=collection,
             state_key=key,
-            state_kind=kind,
             state_value=value,
-            expected_revision=0,
-            event_collection="outbox",
-            event_key=_key("outbox", collection, key),
-            event_partition="events",
+            event_key=_key("outbox", "constructions", key),
             event_sequence=_sequence(outbox),
-            event_kind="outbox",
             event_value=outbox,
         )
         if not committed:
-            existing = execute_runtime_store_operation(
-                self._store, "get", collection=collection, key=key
-            )
+            existing = read_construction_record(self._store, key)
             if existing != value:
                 raise ValueError("Portfolio immutable state conflicts")
 
@@ -281,10 +284,8 @@ class _DurablePortfolioStateStore:
         Returns:
             Persisted construction result.
         """
-        self._commit_immutable(
-            collection="constructions",
+        self._commit_construction(
             key=result.canonical_hash,
-            kind="construction",
             value=result,
             audit_record=audit_record,
         )
@@ -308,17 +309,28 @@ class _DurablePortfolioStateStore:
         """
         if material_hash != allocation.canonical_hash:
             raise ValueError("Portfolio allocation material hash conflicts")
-        active_key = _key(
+        existing_allocation = read_allocation_record(
+            self._store,
             allocation.portfolio_id,
-            canonical_json(dict(allocation.scope), max_items=None),
+            allocation.allocation_version,
         )
+        if existing_allocation is not None:
+            if existing_allocation == allocation:
+                return allocation
+            raise ValueError("Portfolio immutable allocation conflicts")
+        idempotency = read_idempotency_record(
+            self._store,
+            allocation.idempotency_key,
+        )
+        if idempotency is not None:
+            raise ValueError("Portfolio allocation idempotency conflicts")
+        scope_key = canonical_json(dict(allocation.scope), max_items=None)
         stored = cast(
             "tuple[ActivePortfolioAllocation, int] | None",
-            execute_runtime_store_operation(
+            read_active_allocation_record(
                 self._store,
-                "get_with_revision",
-                collection="active",
-                key=active_key,
+                allocation.portfolio_id,
+                scope_key,
             ),
         )
         if stored is None:
@@ -335,26 +347,14 @@ class _DurablePortfolioStateStore:
         }
         existing_history = cast(
             "tuple[object, ...]",
-            execute_runtime_store_operation(
-                self._store,
-                "list",
-                collection="allocation-history",
-                partition=_key("history", allocation.portfolio_id),
-                limit=1_000,
-            ),
+            read_allocation_history_records(self._store, allocation.portfolio_id),
         )
-        committed = execute_runtime_store_transition(
+        committed = update_active_allocation_record(
             self._store,
-            state_collection="active",
-            state_key=active_key,
-            state_kind="allocation",
             state_value=allocation,
             expected_revision=expected_revision,
-            event_collection="allocation-history",
             event_key=_key(allocation.portfolio_id, allocation.allocation_version),
-            event_partition=_key("history", allocation.portfolio_id),
             event_sequence=len(existing_history) + 1,
-            event_kind="outbox",
             event_value=history,
         )
         if not committed:
@@ -374,39 +374,25 @@ class _DurablePortfolioStateStore:
         Raises:
             ValueError: If stored material conflicts with the immutable plan.
         """
-        plan_key = _key(plan.plan_id, plan.plan_version)
-        versions = cast(
-            "tuple[Mapping[str, object], ...]",
-            execute_runtime_store_operation(
-                self._store,
-                "list",
-                collection="plan-versions",
-                partition=_key("plans", plan.plan_id),
-                limit=1_000,
-            ),
-        )
+        existing = read_plan_record(self._store, plan.plan_id, plan.plan_version)
+        if existing is not None:
+            if existing == plan:
+                return plan
+            raise ValueError("Portfolio immutable plan conflicts")
+        versions = read_plan_version_records(self._store, plan.plan_id)
         history = {
             "audit": dict(audit_record),
             "plan": json.loads(plan.model_dump_json()),
         }
-        committed = execute_runtime_store_transition(
+        committed = create_plan_record(
             self._store,
-            state_collection="plans",
-            state_key=plan_key,
-            state_kind="plan",
             state_value=plan,
-            expected_revision=0,
-            event_collection="plan-versions",
-            event_key=plan_key,
-            event_partition=_key("plans", plan.plan_id),
+            event_key=_key("outbox", "plans", plan.plan_id, plan.plan_version),
             event_sequence=len(versions) + 1,
-            event_kind="outbox",
             event_value=history,
         )
         if not committed:
-            existing = execute_runtime_store_operation(
-                self._store, "get", collection="plans", key=plan_key
-            )
+            existing = read_plan_record(self._store, plan.plan_id, plan.plan_version)
             if existing != plan:
                 raise ValueError("Portfolio immutable plan conflicts")
         return plan
@@ -421,12 +407,7 @@ class _DurablePortfolioStateStore:
         """
         return cast(
             "tuple[ActivePortfolioAllocation, int] | None",
-            execute_runtime_store_operation(
-                self._store,
-                "get_with_revision",
-                collection="active",
-                key=_key(portfolio_id, scope_key),
-            ),
+            read_active_allocation_record(self._store, portfolio_id, scope_key),
         )
 
     def load_allocation(
@@ -437,13 +418,9 @@ class _DurablePortfolioStateStore:
         Returns:
             Allocation or ``None``.
         """
-        return next(
-            (
-                allocation
-                for allocation in self.load_history(portfolio_id)
-                if allocation.allocation_version == allocation_version
-            ),
-            None,
+        return cast(
+            "ActivePortfolioAllocation | None",
+            read_allocation_record(self._store, portfolio_id, allocation_version),
         )
 
     def load_history(self, portfolio_id: str) -> tuple[ActivePortfolioAllocation, ...]:
@@ -452,15 +429,9 @@ class _DurablePortfolioStateStore:
         Returns:
             Ordered allocation versions.
         """
-        rows = cast(
-            "tuple[Mapping[str, object], ...]",
-            execute_runtime_store_operation(
-                self._store,
-                "list",
-                collection="allocation-history",
-                partition=_key("history", portfolio_id),
-                limit=1_000,
-            ),
+        rows = read_allocation_history_records(
+            self._store,
+            portfolio_id,
         )
         return tuple(
             cast(
@@ -484,23 +455,9 @@ class _DurablePortfolioStateStore:
         if plan_version is not None:
             return cast(
                 "PortfolioRebalancePlan | None",
-                execute_runtime_store_operation(
-                    self._store,
-                    "get",
-                    collection="plans",
-                    key=_key(plan_id, plan_version),
-                ),
+                read_plan_record(self._store, plan_id, plan_version),
             )
-        versions = cast(
-            "tuple[Mapping[str, object], ...]",
-            execute_runtime_store_operation(
-                self._store,
-                "list",
-                collection="plan-versions",
-                partition=_key("plans", plan_id),
-                limit=1_000,
-            ),
-        )
+        versions = read_plan_version_records(self._store, plan_id)
         if not versions:
             return None
         return cast(

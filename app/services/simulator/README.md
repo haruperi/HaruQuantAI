@@ -7,9 +7,10 @@
 > `SimulationRunDependencies` bundle consumed by `FR-SIM-029`/`FR-SIM-030`;
 > composition supplies only documented package-root owner operations and durable
 > state ports, never test fixtures or implicit globals. `state/runtime.py`
-> supplies durable journal, artifact-finalization, and run-idempotency behavior.
+> coordinates durable JSONL journal publication and run-idempotency behavior;
+> private direct-relational `sim_runs` CRUD is owned by `simulator/persistence`.
 > validation, standalone usage, and coverage gates are current and green.
-> **Last updated:** `2026-07-24`
+> **Last updated:** `2026-08-04`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -96,10 +97,17 @@ mutate them. Compatibility is checked from `contract_version`, never by parsing
 
 Data owns the shared connection, locking, and migration execution infrastructure. Simulation owns only the following schemas, artifacts, and migration definitions, and only Simulation may write them.
 
+All Simulator relational CRUD is centralized in the private support package
+`app/services/simulator/persistence/`, whose sole boundary is
+`persistence/__init__.py`. Its implementation uses the standard `create.py`,
+`read.py`, `update.py`, and `delete.py` layout. The state adapter retains
+lifecycle policy, journal validation, error translation, and filesystem artifact
+publication. This support directory is not a separately registered feature.
+
 | Status | State / Store | Read access (via contract) | Migration definitions |
 |---|---|---|---|
-| Completed | Completed simulation result records | Analytics, Optimization, UI/API via `SimulationResult`; Portfolio, Analytics, UI/API via `PortfolioSimulationResult` | `app/services/simulator/state/migrations.py` |
-| Completed | Append-only versioned JSONL journal and replay metadata | Simulation replay; consumers through `SimulationResult` references | Artifact schema under `journal/`; canonical JSONL-only durability |
+| Completed | Run identity, lifecycle, and completed simulation result records in `sim_runs` | Analytics, Optimization, UI/API via `SimulationResult`; Portfolio, Analytics, UI/API via `PortfolioSimulationResult` | `app/services/simulator/migrations/definitions.py` |
+| Completed | Append-only versioned JSONL journal and replay metadata | Simulation replay; consumers through `SimulationResult` references | Partial JSONL staging, group-commit `fsync`, and atomic publication under the approved artifact root; no database journal records or table |
 | Completed | Canonical JSON and Markdown execution reports | Analytics, Optimization, Portfolio, UI/API through applicable `SimulationResult` / `PortfolioSimulationResult` artifact references | Artifact schema under `reporting/` |
 | Completed | Artifact manifest and checksums | Analytics, Optimization, Portfolio, UI/API through the applicable `SimulationResult` / `PortfolioSimulationResult` | Artifact schema under `reporting/` |
 
@@ -145,7 +153,8 @@ flowchart TD
     REP --> REPF[contracts.py; artifacts.py; reports.py]
     RUN --> RUNF[contracts.py; aggregate.py; audit.py; orchestrator.py; portfolio.py; research.py]
     ERR --> ERRF[catalog.py; exception.py; payload.py]
-    STA --> STAF[store.py; migrations.py]
+    STA --> STAF[store.py; runtime.py]
+    STA --> MIG[migrations/definitions.py]
 ```
 
 ---
@@ -207,10 +216,19 @@ simulator/
 │   ├── contracts.py                    # Result and artifact manifest contracts
 │   ├── artifacts.py                    # Checksummed artifact manifest assembly
 │   └── reports.py                      # Canonical JSON and Markdown reports
-├── state/                              # Simulation-owned schemas and migrations
+├── migrations/                         # Simulation-owned immutable schema definitions
+│   ├── __init__.py
+│   └── definitions.py
+├── state/                              # Simulation persistence protocol and runtime
 │   ├── __init__.py
 │   ├── store.py                        # SimulationStateStore port
-│   └── migrations.py                   # Simulation-owned migration definitions
+│   └── runtime.py                      # Durable state and artifact coordination
+├── persistence/                        # Private shared Simulator CRUD support
+│   ├── __init__.py
+│   ├── create.py
+│   ├── read.py
+│   ├── update.py
+│   └── delete.py
 └── run/                                # Typed public contracts and orchestration
     ├── __init__.py
     ├── contracts.py                    # Versioned request contracts
@@ -1067,7 +1085,7 @@ masks a cataloged condition.
 |---|---|---|---|---|---|---|
 | Completed | `JOURNAL_FORMAT` | `str` | `jsonl-v1` | Yes | `JournalWriter` | Only versioned append-only canonical JSONL is accepted. The store appends to `journal.jsonl.partial` and atomically renames to `journal.jsonl` at finalization. |
 | Completed | `JOURNAL_FSYNC_INTERVAL` | `int` | `100` events; flush again at run completion | Yes | `JournalWriter.append()` | Group commit: `append()` counts unflushed events and calls the port's `flush_journal()` every `JOURNAL_FSYNC_INTERVAL` events and once more before finalization, bounding loss to at most one batch while keeping one synchronous write per batch rather than per event. Persistence failure aborts the run. |
-| Completed | `JOURNAL_SIDECAR_MODE` | `str` | `disabled` | Yes | `JournalWriter` | No SQLite table backs the journal. `SIMULATION_MIGRATIONS` declares only the run-identity table; a journal sidecar remains an explicit Phase 1 exclusion. |
+| Completed | `JOURNAL_SIDECAR_MODE` | `str` | `disabled` | Yes | `JournalWriter` | No dedicated Simulation-owned SQLite journal table is migrated. Data's generic runtime-record table transactionally stages events before canonical JSONL publication; a separate journal sidecar remains excluded. |
 
 #### `contracts.py` — Journal Event Contract
 
@@ -1091,7 +1109,10 @@ masks a cataloged condition.
 
 **Rules:** Risk rejections, IOC remainder cancellation, lifecycle transitions, validation failures, and all state mutations are typed journal events. No separate compliance-record subsystem is created.
 
-**Implementation notes:** JSONL is canonical. SQLite indexing is outside the initial implementation and may be proposed later only with profiling evidence.
+**Implementation notes:** JSONL is canonical. Data's generic runtime-record
+infrastructure stages append-only events for transactional reconstruction before
+finalization; Simulation owns no dedicated journal table or SQLite sidecar.
+Domain-specific SQLite journal indexing remains outside the initial implementation.
 
 ### Feature usage examples
 
@@ -1107,17 +1128,25 @@ definitions, so no Simulation module imports Data storage internals.
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `store.py` | Define the persistence port Simulation depends on as a `Protocol`; the caller supplies the implementation. Contains no connection, schema execution, filesystem write, or SQL. | `SimulationStateStore` | **Standard library:** `collections.abc`, `typing`<br>**Required third-party:** None<br>**Local:** None |
-| Completed | `migrations.py` | Declare Simulation-owned schema migrations using the Data-owned step contract. | `SIMULATION_MIGRATIONS` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.services.data.contracts` → `MigrationStep` |
+| Completed | `../migrations/definitions.py` | Declare Simulation-owned schema migrations using Data's public migration-step constructor. | Private manifest consumed by package-root `get_simulation_migrations` | **Standard library:** hashlib<br>**Required third-party:** None<br>**Local:** `app.services.data` package root |
+| Completed | `runtime.py` | Coordinate partial-JSONL staging, group-commit durability, atomic journal publication, and monotonic run-idempotency lifecycle while delegating direct `sim_runs` CRUD to `simulator/persistence`. | `build_simulation_state_store` | **Standard library:** hashlib, json, os, pathlib, typing<br>**Required third-party:** None<br>**Local:** errors, `simulator.persistence`, Utils |
 | Completed | `__init__.py` | Expose the supported state API. | `SimulationStateStore`, `SIMULATION_MIGRATIONS` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** feature files → exports |
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Completed | `FR-SIM-041` | The system shall depend on persistence only through an injected runtime-checkable `Protocol` exposing `append_journal`, `flush_journal`, `finalize_journal`, `load_run`, and `record_idempotency`, and shall declare its own migrations using the Data-owned `MigrationStep` contract. Simulation imports no Data storage, connection, or locking module, no `sqlite3`, and executes no schema statement of its own. | `SimulationStateStore` (Protocol), `SIMULATION_MIGRATIONS` | None | `SimulationError`: `SIM_PERSISTENCE_FAILED` raised by the caller's implementation | **Usage:** `tests/simulator/usage/features/02_state.py::fr_sim_041()`<br>**Unit:** `tests/simulator/unit/test_state.py::test_simulation_imports_no_data_storage_module()`, `::test_simulation_imports_no_sqlite_module()` |
+| Completed | `FR-SIM-094` | Simulator shall persist run identity, lifecycle state, and validated completed single-run or portfolio-result payloads directly in `sim_runs` through Data's public statement-plan and transaction boundary. Unknown and incomplete runs return no result and never synthesize one. | `build_simulation_state_store`, `get_simulation_result` | Relational read/write | `SimulationError`: `SIM_PERSISTENCE_FAILED` for malformed or unavailable state | **Usage:** `tests/simulator/usage/features/02_state.py::fr_sim_094()`<br>**Integration:** `tests/simulator/integration/test_runtime_state.py` |
+| Completed | `FR-SIM-095` | Lifecycle changes shall compare the persisted request hash, run identity, prior status, and prior result material. Identical replays are idempotent; identity conflicts, stale changes, backward transitions, and terminal-result mutation fail closed without a partial update. | `record_idempotency` | Atomic relational update | `SimulationError`: `SIM_RUN_ID_CONFLICT` or `SIM_PERSISTENCE_FAILED` | **Usage:** `tests/simulator/usage/features/02_state.py::fr_sim_095()`<br>**Unit:** `tests/simulator/unit/test_relational_persistence_branches.py` |
+| Completed | `FR-SIM-096` | Journal events shall stage in a partial canonical JSONL artifact, recover contiguous sequence state after adapter reconstruction, become durable through group-commit `fsync`, and publish by atomic rename only after exact event-count and tail-hash validation. No database journal staging or journal table is permitted. | `append_journal`, `flush_journal`, `finalize_journal` | Filesystem write | `SimulationError`: `SIM_PERSISTENCE_FAILED` | **Usage:** `tests/simulator/usage/features/02_state.py::fr_sim_096()`<br>**Integration:** `tests/simulator/integration/test_runtime_state.py` |
 
 **Rules:** Data owns the shared connection, locking, and migration execution
 framework; Simulation owns only its records, artifacts, and migration definitions.
 The permitted Data imports are `app.services.data.contracts` and public Data
 package-root operations. `app.services.data.storage.*` is never imported.
+Database record creation, reads, and prior-state-guarded updates are implemented only
+behind `simulator/persistence`. Existing run lifecycle replacement remains a
+compare-and-swap operation. JSONL validation and atomic filesystem publication
+remain responsibilities of the state runtime adapter.
 
 ### Feature usage examples
 
@@ -1299,6 +1328,9 @@ activation; Simulation only measures the candidate it was given.
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Completed | `FR-SIM-031` | The system shall run an explicitly requested approximation only when enabled, mark every output `canonical=false`, disclose assumptions, prohibit canonical fills, promotion evidence, and reports, and persist bounded research start/completion/failure audit evidence. | `run_fast_research(request: SimulationBacktestRequestV1, auth_context: AuthContext, dependencies: SimulationRunDependencies) -> FastResearchResult` | Audit event publication | `SimulationError`: controlled validation, audit, or research failure | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_031()`<br>**Unit:** `tests/simulator/unit/test_research.py::test_fast_research_cannot_claim_canonical()` |
+| Completed | `FR-SIM-091` | Simulator migration definitions shall reside in `app/services/simulator/migrations/`, keeping schema evolution outside the private persistence layer. Simulator persists run identity only; the canonical journal remains append-only JSONL with no backing table. | `SIMULATION_MIGRATIONS` | None | None | **Unit:** `tests/simulator/unit/test_state.py` |
+| Completed | `FR-SIM-092` | The run-identity table shall be named `sim_runs` under the ratified `sim_` namespace, be declared `STRICT`, and carry `correlation_id`, `created_at`, and `updated_at`. `request_id` remains the primary key and `run_id` separately unique, so a replayed request returns the original run rather than starting a second. | `SIMULATION_MIGRATIONS` | None | None | **Unit:** `tests/simulator/unit/test_state.py` |
+| Completed | `FR-SIM-093` | Persist every completed single or portfolio result as its validated owner contract under the canonical `run_id`, retain request-ID idempotency independently, and expose bounded result retrieval through `get_simulation_result`; unknown or incomplete runs return no result and never synthesize one. | `get_simulation_result` | Persistence read/write | `SimulationError`: malformed or conflicting result state | **Unit:** `tests/simulator/unit/test_runtime_state.py` |
 
 **Rules:** `run_backtest`, `run_portfolio_backtest`, and `run_fast_research` are
 the only public operations owned by the run feature; internal run helpers are not
@@ -1406,7 +1438,7 @@ During iterative implementation, run only the specific files associated with the
 - [X] Every requirement and workflow has status `Completed` with mapped verification. Evidence: `tests/simulator/integration/test_official_backtest.py:78`.
 - [X] Every functional public export is documented under `Key exports` and traced to its implementing requirement. Evidence: `app/services/simulator/__init__.py:16`.
 - [X] Owned and consumed contracts match `docs/PROJECT.md` name, version, owner, and failure behavior. Evidence: `app/services/simulator/run/contracts.py:63`.
-- [X] Simulation writes only its owned result, journal, and artifact state through the explicit Simulation state-store boundary, which is a `Protocol` the caller implements. Evidence: `app/services/simulator/state/store.py:18`; `tests/simulator/unit/test_state.py::test_simulation_imports_no_sqlite_module`.
+- [X] Simulation writes run lifecycle and completed-result state directly to `sim_runs` through Data's public transaction boundary, keeps journals as canonical JSONL artifacts, and isolates database CRUD behind private persistence functions. Evidence: `app/services/simulator/state/runtime.py:209`; `app/services/simulator/persistence/create.py:131`; `tests/simulator/integration/test_runtime_state.py:28`.
 - [X] Official execution is tick-based, deterministic, no-lookahead, fixed-precision, and fail-closed. Evidence: `app/services/simulator/run/orchestrator.py:232`.
 - [X] No raw code, live adapter, broker SDK, credential resolution, network call, or live mutation is reachable. Evidence: `tests/simulator/integration/test_strategy_security.py:10`.
 - [X] Every `FR-SIM-*` has one usage example and at least one unit test; every workflow has an integration test. Evidence: `tests/simulator/integration/test_official_backtest.py:78`.
@@ -1425,7 +1457,7 @@ During iterative implementation, run only the specific files associated with the
 - [X] Idempotency on the governed path is resolved through `resolve_idempotent_run`, with no second implementation. Evidence: `app/services/simulator/run/orchestrator.py`; `tests/simulator/unit/test_orchestrator.py::test_repeat_request_with_different_hash_conflicts`.
 - [X] Every feature `__init__.py` exposes exactly its documented public symbols. Evidence: `tests/simulator/unit/test_public_api.py::test_feature_exports_match_documentation`.
 - [X] Rejected behavior is absent from the architecture and active package surface. Evidence: `app/services/simulator/validation/validate.py:77`.
-- [X] The package contains only `README.md`, `__init__.py`, and the approved feature folders; no migration or compatibility shim exists. Evidence: `app/services/simulator/__init__.py:1`.
+- [X] The package contains only `README.md`, `__init__.py`, the approved feature folders, and the documented private `persistence/` support directory; no compatibility shim exists. Evidence: `app/services/simulator/__init__.py:1`; `app/services/simulator/persistence/__init__.py:1`.
 
 Current checklist status: `Completed`. All implementation, contract, boundary,
 documentation, behavioral, standalone usage, typing, formatting, and coverage

@@ -26,6 +26,7 @@ FEATURE_DIRECTORIES = frozenset(
         "quality",
         "realtime_feeds",
         "research_sources",
+        "runtime_stores",
         "sources",
         "synthetic_data",
         "tick_derivation",
@@ -33,6 +34,11 @@ FEATURE_DIRECTORIES = frozenset(
         "transformation",
     }
 )
+# Directories that hold internal support rather than a registered feature, and so
+# carry no `FEAT-DATA-NN` row. `migrations/` holds schema definitions applied by
+# the runner in `persistence/`; it is deliberately not a feature, per the decision
+# that persistence and schema packages are private support packages.
+SUPPORT_DIRECTORIES = frozenset({"migrations"})
 PERMITTED_ROOT_FILES = frozenset(
     {
         "README.md",
@@ -135,7 +141,7 @@ def test_registered_feature_directories_match_the_current_package() -> None:
         path.name
         for path in DATA_ROOT.iterdir()
         if path.is_dir() and path.name != "__pycache__"
-    }
+    } - SUPPORT_DIRECTORIES
     assert actual == FEATURE_DIRECTORIES
     assert _registered_feature_modules() == FEATURE_DIRECTORIES
 

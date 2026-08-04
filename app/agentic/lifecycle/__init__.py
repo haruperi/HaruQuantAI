@@ -1,9 +1,5 @@
 """Public `FEAT-AGT-18` Artefact Promotion and Lifecycle API."""
 
-from app.agentic.lifecycle.migrations import (
-    build_lifecycle_migration_request,
-    get_lifecycle_migration_statements,
-)
 from app.agentic.lifecycle.models import (
     LifecycleRecord,
     PromotionAssessment,
@@ -23,6 +19,10 @@ from app.agentic.lifecycle.service import (
     get_artifact_state,
     is_settled,
     transition_artifact,
+)
+from app.agentic.migrations.lifecycle import (
+    build_lifecycle_migration_request,
+    get_lifecycle_migration_statements,
 )
 
 __all__: tuple[str, ...] = (

@@ -198,7 +198,7 @@ def test_import_admits_a_standard_csv(
         lambda request: captured.setdefault("dataset", request.dataset),
     )
     monkeypatch.setattr(
-        "app.services.data.persistence.external_import._persist_audit_event_raw",
+        "app.services.data.audit.store._persist_audit_event_raw",
         lambda event: captured.setdefault("event", event),
     )
 
@@ -223,7 +223,7 @@ def test_import_admits_an_mt5_export(
         lambda request: captured.setdefault("dataset", request.dataset),
     )
     monkeypatch.setattr(
-        "app.services.data.persistence.external_import._persist_audit_event_raw",
+        "app.services.data.audit.store._persist_audit_event_raw",
         lambda _event: None,
     )
     mapping = ColumnMapping(
@@ -258,7 +258,7 @@ def test_import_records_external_origin_in_audit(
         lambda _request: None,
     )
     monkeypatch.setattr(
-        "app.services.data.persistence.external_import._persist_audit_event_raw",
+        "app.services.data.audit.store._persist_audit_event_raw",
         events.append,
     )
 
@@ -284,7 +284,7 @@ def test_import_rejects_blocking_measured_quality(
         lambda _request: pytest.fail("failed-quality import reached persistence"),
     )
     monkeypatch.setattr(
-        "app.services.data.persistence.external_import._persist_audit_event_raw",
+        "app.services.data.audit.store._persist_audit_event_raw",
         lambda _event: pytest.fail("failed-quality import reached audit"),
     )
 

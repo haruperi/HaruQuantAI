@@ -7,8 +7,9 @@
 > `TradingDependencies` only from explicit public owner ports. Broker access is
 > lazy, live mutations remain disabled unless existing Trading gates authorize
 > them, and UI/API never supplies substitute authority. `state/runtime.py`
-> supplies the Data-backed idempotency, event, projection, and evidence store.
-> **Last updated:** `2026-07-30`
+> coordinates the Data-backed state adapter while private record CRUD is owned by
+> `trading/persistence`.
+> **Last updated:** `2026-08-03`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -117,6 +118,13 @@ without importing dependency classes):
 
 Trading owns logical schemas and migration definitions; Data owns connection, locking, and migration execution infrastructure. Concrete stores are injected. Trading does not implement a custom JSONL persistence architecture in the final design.
 
+All Trading runtime-record CRUD is centralized in the private support package
+`app/services/trading/persistence/`, whose sole boundary is
+`persistence/__init__.py`. Its implementation uses the standard `create.py`,
+`read.py`, `update.py`, and `delete.py` layout. State adapters retain Trading
+policy, scope derivation, reconciliation interpretation, and unresolved-attempt
+filtering. This support directory is not a separately registered feature.
+
 | Status | State / Store | Read access (via contract) | Migration definitions |
 |---|---|---|---|
 | Completed | Orders, fills, receipts, and execution projections | Analytics, Portfolio, and UI/API via `TradeRecord` / `ExecutionReceipt` | `state/migrations.py` |
@@ -208,7 +216,16 @@ trading/
 │   ├── stores.py                       # Minimal injected store protocols
 │   ├── idempotency.py                  # Caller-key reservation and conflict checks
 │   ├── projections.py                  # Receipt/fill/order/position projections
-│   └── migrations.py                   # Trading-owned migration definitions
+│   ├── materializations.py             # Event-to-relational projection normalization
+│   ├── factories.py                    # Function-only contract construction
+│   ├── migrations.py                   # Trading-owned migration definitions
+│   └── runtime.py                      # Durable state coordination adapter
+├── persistence/                        # Private shared Trading CRUD support
+│   ├── __init__.py
+│   ├── create.py
+│   ├── read.py
+│   ├── update.py
+│   └── delete.py
 ├── validation/                         # Validation, snapshots, readiness, plans
 │   ├── __init__.py
 │   ├── README.md
@@ -872,6 +889,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Completed | `stores.py` | Define minimal injected state operations | `TradingStateStore` and its seven public operations, including terminal idempotency completion and exact report-evidence reads | **Standard library:** `collections.abc`, `datetime`, `typing`<br>**Required third-party:** None<br>**Local:** `events.py`; `contracts.models` |
 | Completed | `idempotency.py` | Reserve caller keys and detect material conflicts | `IdempotencyReservation`, `reserve_idempotency` | **Standard library:** `datetime`, `decimal`, `hashlib`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** contracts, `stores.py`; Utils canonical JSON/logger APIs |
 | Completed | `projections.py` | Apply ordered events with optimistic versions | `TradingProjection`, `apply_execution_event` | **Standard library:** `collections.abc`, `datetime`, `types`, `typing`<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** contracts, `events.py`, `stores.py`; Utils serialization/logger APIs |
+| Completed | `runtime.py` | Coordinate durable idempotency, append-only events, projections, reconciliation evidence, and unresolved-attempt views while delegating all record CRUD to `trading/persistence` | `build_trading_state_store`, `execute_trading_state_store_operation` | **Standard library:** collections.abc, datetime, typing<br>**Required third-party:** `pydantic>=2.13.4`<br>**Local:** contracts, state models, `trading.persistence`, Utils logger |
 | Completed | `migrations.py` | Declare Trading-owned schema version and migrations | `TRADING_SCHEMA_VERSION`, `get_trading_migrations` | **Standard library:** `hashlib`<br>**Required third-party:** None<br>**Local:** Data `MigrationStep`; Utils logger |
 | Completed | `__init__.py` | Expose state API | All exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** files above |
 
@@ -900,9 +918,23 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Completed | `FR-TRD-067` | The store shall return exact stored JSON-safe report evidence for one route/tenant/authority scope without computing or enriching it. | `TradingStateStore.load_report_evidence(scope: tuple[TradingRoute, str, str]) -> Mapping[str, JsonValue]` | Read-only | `TradingError`: read or schema failure | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_067()`<br>**Unit:** `tests/trading/unit/state/test_stores.py::test_report_evidence_is_scope_isolated()` |
 | Completed | `FR-TRD-057` | The system shall expose an immutable reservation result distinguishing new, duplicate-completed, duplicate-active, conflict, and reconciliation-required states. | `IdempotencyReservation` | None | `TradingError`: invalid reservation state | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_057()`<br>**Unit:** `tests/trading/unit/state/test_idempotency.py::test_reservation_states_are_finite()` |
 | Completed | `FR-TRD-058` | The system shall expose a route/tenant-scoped order, position, fill, receipt, and authority projection with optimistic version. | `TradingProjection` | None | `TradingError`: invalid projection/version | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_058()`<br>**Unit:** `tests/trading/unit/state/test_projections.py::test_projection_requires_scope_and_version()` |
+| Completed | `FR-TRD-070` | Trading migration definitions shall reside in `app/services/trading/migrations/` and be re-exported through `state/`, keeping schema evolution outside the private CRUD package. | `get_trading_migrations`, `TRADING_SCHEMA_VERSION` | None | None | **Unit:** `tests/trading/unit/state/test_migrations.py::test_migrations_are_additive_and_ordered()` |
+| Completed | `FR-TRD-071` | The `trading_events` table shall carry a monotonic `event_seq`, a unique `event_id`, and a `UNIQUE (scope_key, aggregate_version)` constraint so that two concurrent writers computing the same next aggregate version collide at insert rather than double-appending. | Schema definition only | None | `DataError`: constraint violation on concurrent append | **Unit:** `tests/trading/unit/state/test_migrations.py::test_migrations_are_additive_and_ordered()` |
+| Completed | `FR-TRD-072` | Every Trading table shall carry `created_at`, and every mutable Trading table shall additionally carry `updated_at`; `trading_events` and `trading_idempotency` shall carry `correlation_id` so that an appended event or reservation is traceable to the operation that produced it. | Schema definition only | None | None | **Unit:** `tests/trading/unit/state/test_migrations.py::test_migrations_are_additive_and_ordered()` |
+| Completed | `FR-TRD-073` | The `trading_projections` table shall record `last_event_seq`, the position to which the projection has consumed the event log, so a rebuild has a resume point and a reader can detect staleness. | `TradingProjection` | None | `TradingError`: invalid projection/version | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_058()` |
+| Completed | `FR-TRD-074` | Expose one exact-scope aggregate projection read keyed by route, tenant, and authority through `get_trading_projection`; absent state remains absent and no account, position, or order fact is invented. | `get_trading_projection` | Persistence read | `ValueError`: incomplete or invalid scope | **Unit:** `tests/trading/unit/state/test_runtime_projection_read.py` |
+| Completed | `FR-TRD-075` | Trading durable state shall persist directly to Trading-owned tables through Data's public transaction executor and shall not write Trading state to `data_runtime_records`. | `build_trading_state_store`, `apply_execution_event` | Atomic persistence write | `TradingError`: mapping, constraint, or transaction failure | **Integration:** `tests/trading/integration/test_runtime_state.py::test_atomic_event_application_materializes_trading_tables()`<br>**Unit:** `tests/trading/unit/state/test_persistence_layout.py::test_trading_persistence_no_longer_uses_generic_runtime_records()` |
+| Completed | `FR-TRD-076` | Event append, optimistic aggregate projection replacement, and applicable order, fill, position, and transition materialization shall commit atomically; `trading_events` remains authoritative and materialized rows remain rebuildable without invented order defaults or authority timestamps. | `apply_execution_event` | Atomic persistence write | `TradingError`: incomplete canonical evidence or stale version | **Integration:** `tests/trading/integration/test_runtime_state.py::test_atomic_event_application_materializes_trading_tables()` |
 
 **Rules:** A required persistence failure blocks broker mutation; import creates no store.
 **Implementation notes:** Depend on injected store ports and Data-executed Trading migrations; do not build a custom JSONL persistence engine. Implement deterministic hashing, deduplication, optimistic versioning, and projection math.
+The private runtime adapter delegates every database operation to
+`trading/persistence`. Idempotency completion and existing projection replacement
+remain revision-based compare-and-swap operations; events remain append-only.
+Reconciliation and unresolved-attempt durability continue to use the same scoped
+event and projection records. Order, fill, position, and transition tables are atomic
+read projections of that event stream, not a second write model. A missing TIF remains
+SQL `NULL`; fill execution time comes from authority evidence rather than receipt time.
 **Feature usage example:** `python tests/trading/usage/features/02_state.py`
 
 ---
@@ -1293,7 +1325,7 @@ uv run pytest tests/trading -o addopts="" --import-mode=importlib \
 - [X] Every requirement and workflow is `Completed` with its mapped test passing. `tests/trading/integration/test_live_cycle.py:30`
 - [X] The typed public API catalog is exact and import-side-effect free. `tests/trading/unit/contracts/test_registry.py:47`
 - [X] Owned/consumed contracts match `docs/PROJECT.md` and compatibility tests pass. `tests/trading/integration/test_upstream_request.py:11`
-- [X] Trading-owned schemas/migrations use Data's infrastructure and no foreign state is written. `app/services/trading/state/stores.py:20`
+- [X] Trading-owned schemas/migrations use Data's infrastructure and no foreign state is written. `app/services/trading/persistence/create.py:17`
 - [X] Every dependency is documented and no provider SDK crosses the package boundary. `app/services/trading/actions/dependencies.py:86`
 - [X] Every public symbol has exactly one functional requirement, usage example, and unit test. `app/services/trading/contracts/registry.py:81`
 - [X] Every collaborative workflow has an integration test. `tests/trading/integration/test_portfolio_rebalance.py:29`

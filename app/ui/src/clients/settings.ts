@@ -8,7 +8,7 @@ import type { ApiResponse } from "./contracts";
 import { settingsRoutes } from "./routes";
 import { request, type RequestOptions } from "./request";
 
-/** Versioned user settings record (backend `UserSettingsRecord`). */
+/** Versioned user settings projection from the unified backend settings record. */
 export const userSettingsSchema = z.object({
   user_id: z.string().min(1),
   settings: z.record(z.string(), z.string()),

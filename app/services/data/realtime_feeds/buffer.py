@@ -20,7 +20,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from app.services.data.contracts import DataError
-from app.services.data.persistence.transactions import _execute_transaction_raw
+from app.services.data.persistence import create_feed_record, read_feed_record
 from app.services.data.realtime_feeds.contracts import (
     FeedEventResult,
     FeedStatus,
@@ -89,29 +89,7 @@ def start_internal_feed(
         )
 
     # Check database for existing feed
-    from app.services.data.persistence.contracts import (
-        StatementPlan,
-        TransactionRequest,
-    )
-
-    query_sql = (
-        "SELECT feed_id, source_id, symbol, data_kind, timeframe, "
-        "source_capability, buffer_capacity, overflow_policy, "
-        "heartbeat_timeout_seconds, state, heartbeat_at, last_event_at, "
-        "buffer_depth, dropped_count, gap_count, reconnect_count, "
-        "breaker_state, breaker_opened_at, drift_ms, last_error "
-        "FROM data_feeds WHERE feed_id = ?"
-    )
-    res = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(query_sql,),
-                parameter_sets=((config.feed_id,),),
-                max_rows=1,
-            ),
-            request_id=config.request_id,
-        )
-    )
+    res = read_feed_record(config.feed_id, request_id=config.request_id)
     if res.rows:
         active = _restore_active_feed(config, res.rows[0], utc_now(clock))
         _ACTIVE_FEEDS[config.feed_id] = active
@@ -151,46 +129,24 @@ def start_internal_feed(
         }
     )
 
-    # Persist initial state
-    insert_sql = (
-        "INSERT INTO data_feeds ("
-        "  feed_id, source_id, symbol, data_kind, timeframe, source_capability, "
-        "  buffer_capacity, overflow_policy, heartbeat_timeout_seconds, "
-        "  reconnect_policy_json, state, heartbeat_at, last_event_at, "
-        "  buffer_depth, dropped_count, gap_count, reconnect_count, "
-        "  breaker_state, drift_ms, last_error, request_id, created_at, "
-        "  updated_at"
-        ") VALUES ("
-        "  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, 0, 0, 0, 0, 'closed', "
-        "  NULL, NULL, ?, ?, ?"
-        ")"
-    )
-    _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(insert_sql,),
-                parameter_sets=(
-                    (
-                        config.feed_id,
-                        config.source_id,
-                        config.symbol,
-                        config.data_kind,
-                        config.timeframe,
-                        config.source_capability,
-                        config.buffer_capacity,
-                        config.overflow_policy,
-                        config.heartbeat_timeout_seconds,
-                        reconnect_json,
-                        "starting",
-                        config.request_id,
-                        now_str,
-                        now_str,
-                    ),
-                ),
-                max_rows=1,
-            ),
-            request_id=config.request_id,
-        )
+    create_feed_record(
+        (
+            config.feed_id,
+            config.source_id,
+            config.symbol,
+            config.data_kind,
+            config.timeframe,
+            config.source_capability,
+            config.buffer_capacity,
+            config.overflow_policy,
+            config.heartbeat_timeout_seconds,
+            reconnect_json,
+            "starting",
+            config.request_id,
+            now_str,
+            now_str,
+        ),
+        request_id=config.request_id,
     )
 
     # Register in-memory

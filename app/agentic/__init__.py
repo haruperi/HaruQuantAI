@@ -60,10 +60,6 @@ from app.agentic.agents.strategy_desk.strategy_thesis_analyst.agent import (
 )
 from app.agentic.agents.strategy_desk.trader.handoff import submit_trade_proposal
 from app.agentic.context_memory.context import assemble_context, get_exclusion_reasons
-from app.agentic.context_memory.migrations import (
-    build_agentic_memory_migration_request,
-    get_agentic_memory_migration_statements,
-)
 from app.agentic.context_memory.models import (
     build_evidence_claim,
     build_memory_record,
@@ -104,15 +100,19 @@ from app.agentic.lifecycle.service import (
     get_artifact_state,
     transition_artifact,
 )
+from app.agentic.migrations.memory import (
+    build_agentic_memory_migration_request,
+    get_agentic_memory_migration_statements,
+)
+from app.agentic.migrations.workflow import (
+    build_agentic_migration_request,
+    get_agentic_migration_statements,
+)
 from app.agentic.operations.service import (
     get_run_incidents,
     get_run_trace,
     quarantine_agent,
     replay_run,
-)
-from app.agentic.orchestration.migrations import (
-    build_agentic_migration_request,
-    get_agentic_migration_statements,
 )
 from app.agentic.orchestration.models import (
     build_workflow_definition,

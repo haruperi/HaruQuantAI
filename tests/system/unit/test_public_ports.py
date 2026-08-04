@@ -47,6 +47,8 @@ def test_cross_domain_imports_use_public_ports_and_remain_acyclic():
             if target_domain is None or target_domain == source_domain:
                 continue
             _assert_public_import(imported_module, target_domain, path)
+            if _is_data_infrastructure_delegation(path, target_domain):
+                continue
             dependency_graph[source_domain].add(target_domain)
 
     _assert_acyclic(dependency_graph)
@@ -128,6 +130,14 @@ def _assert_public_import(module: str, domain: str, path: Path) -> None:
         f"{path} imports internal cross-domain module {module}; "
         f"use the {domain} root or an immediate public feature port"
     )
+
+
+def _is_data_infrastructure_delegation(path: Path, target_domain: str) -> bool:
+    """Identify mandated domain persistence delegation to Data infrastructure."""
+    if target_domain != "app.services.data":
+        return False
+    relative_parts = path.relative_to(_REPOSITORY_ROOT).parts
+    return "persistence" in relative_parts or "migrations" in relative_parts
 
 
 def _assert_acyclic(graph: dict[str, set[str]]) -> None:

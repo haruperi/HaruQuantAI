@@ -162,28 +162,29 @@ def test_committed_lookup_and_lease_outcomes(monkeypatch: pytest.MonkeyPatch) ->
     }
     monkeypatch.setattr(
         backfill,
-        "_execute_transaction_raw",
-        lambda _transaction: SimpleNamespace(rows=(row,)),
+        "read_committed_backfill_record",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=(row,)),
     )
     assert backfill._committed_result(request, result.idempotency_key)
 
     monkeypatch.setattr(
         backfill,
-        "_execute_transaction_raw",
-        lambda _transaction: SimpleNamespace(rows=(), affected_rows=1),
+        "update_backfill_lease",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=(), affected_rows=1),
     )
     backfill._acquire_lease(request, _NOW)
 
-    responses = iter(
-        (
-            SimpleNamespace(rows=(), affected_rows=0),
-            SimpleNamespace(rows=({"job_id": request.job_id},), affected_rows=0),
-        )
+    monkeypatch.setattr(
+        backfill,
+        "update_backfill_lease",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=(), affected_rows=0),
     )
     monkeypatch.setattr(
         backfill,
-        "_execute_transaction_raw",
-        lambda _transaction: next(responses),
+        "read_update_job_identity",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            rows=({"job_id": request.job_id},), affected_rows=0
+        ),
     )
     with pytest.raises(DataError) as exc_info:
         backfill._acquire_lease(request, _NOW)
@@ -209,8 +210,8 @@ def test_fetch_and_configured_storage_fail_closed(
     persisted: list[object] = []
     monkeypatch.setattr(
         backfill,
-        "_execute_transaction_raw",
-        persisted.append,
+        "update_backfill_failure",
+        lambda *args, **kwargs: persisted.append((args, kwargs)),
     )
 
     def _fail(_request: object) -> object:
@@ -255,8 +256,8 @@ def test_publication_and_finalize_reject_incomplete_evidence(
 
     monkeypatch.setattr(
         backfill,
-        "_execute_transaction_raw",
-        lambda _transaction: SimpleNamespace(committed=False),
+        "update_backfill_finalization",
+        lambda *_args, **_kwargs: SimpleNamespace(committed=False),
     )
     with pytest.raises(DataError):
         backfill._finalize_checkpoint(
@@ -336,8 +337,8 @@ def test_prepare_finalize_and_execute_protocol(monkeypatch: pytest.MonkeyPatch) 
     )
     monkeypatch.setattr(
         backfill,
-        "_execute_transaction_raw",
-        lambda _transaction: SimpleNamespace(committed=True),
+        "create_backfill_checkpoint_record",
+        lambda *_args, **_kwargs: SimpleNamespace(committed=True),
     )
     prepared = backfill._prepare_artifact(
         request,
@@ -346,6 +347,11 @@ def test_prepare_finalize_and_execute_protocol(monkeypatch: pytest.MonkeyPatch) 
         _NOW,
     )
     assert prepared[0] == "chunk-key-fixture"
+    monkeypatch.setattr(
+        backfill,
+        "update_backfill_finalization",
+        lambda *_args, **_kwargs: SimpleNamespace(committed=True),
+    )
     backfill._finalize_checkpoint(
         request.request_id,
         request.job_id,
@@ -394,8 +400,8 @@ def test_recovery_classifies_recovered_and_blocked(
     )
     monkeypatch.setattr(
         recovery,
-        "_execute_transaction_raw",
-        lambda _transaction: SimpleNamespace(rows=rows),
+        "read_prepared_backfill_records",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=rows),
     )
 
     def _publish(
@@ -410,6 +416,9 @@ def test_recovery_classifies_recovered_and_blocked(
 
     monkeypatch.setattr(recovery, "_publish_artifact", _publish)
     monkeypatch.setattr(recovery, "_finalize_checkpoint", lambda *_args: None)
+    monkeypatch.setattr(
+        recovery, "update_job_recovery_blocked", lambda *_args, **_kwargs: None
+    )
     report = recovery.recover_update_jobs(
         request_id=generate_id("req"),
         clock=SimpleNamespace(now=lambda: _NOW),

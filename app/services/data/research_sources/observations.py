@@ -7,17 +7,14 @@ from collections.abc import Mapping, Sequence
 from datetime import datetime
 
 from app.services.data.contracts.errors import DataError
-from app.services.data.persistence.contracts import StatementPlan, TransactionRequest
-from app.services.data.persistence.transactions import _execute_transaction_raw
+from app.services.data.persistence import (
+    create_research_observation_record,
+    read_latest_research_observation_record,
+    read_research_observation_records,
+)
 from app.services.data.research_sources.contracts import ResearchSourceObservation
 from app.utils import canonical_digest
 
-_COLUMNS = """
-observation_id, document_id, source_id, series_id, observation_period,
-value_json, unit, published_at, available_at, retrieved_at, revision,
-previous_observation_id, content_hash, parser_version, trust_status,
-provenance_json
-""".strip()
 _MAX_OBSERVATIONS = 200
 
 
@@ -93,22 +90,11 @@ def persist_research_source_observations(
                 "unit": raw.get("unit"),
             }
         )
-        existing = _execute_transaction_raw(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        f"""
-                        SELECT {_COLUMNS} FROM data_research_observations
-                        WHERE source_id = ? AND series_id = ?
-                          AND observation_period = ?
-                        ORDER BY revision DESC LIMIT 1
-                        """.strip(),  # noqa: S608
-                    ),
-                    parameter_sets=((source_id, series_id, period),),
-                    max_rows=1,
-                ),
-                request_id=request_id,
-            )
+        existing = read_latest_research_observation_record(
+            source_id,
+            series_id,
+            period,
+            request_id=request_id,
         )
         if existing.rows and str(existing.rows[0]["content_hash"]) == content_hash:
             persisted.append(_row(existing.rows[0]))
@@ -147,25 +133,9 @@ def persist_research_source_observations(
             "trusted",
             json.dumps(provenance, sort_keys=True),
         )
-        _execute_transaction_raw(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        """
-                        INSERT INTO data_research_observations (
-                            observation_id, document_id, source_id, series_id,
-                            observation_period, value_json, unit, published_at,
-                            available_at, retrieved_at, revision,
-                            previous_observation_id, content_hash, parser_version,
-                            trust_status, provenance_json
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        """.strip(),
-                    ),
-                    parameter_sets=(values,),
-                    max_rows=1,
-                ),
-                request_id=request_id,
-            )
+        create_research_observation_record(
+            values,
+            request_id=request_id,
         )
         persisted.append(
             ResearchSourceObservation(
@@ -201,33 +171,12 @@ def query_research_source_observations(
     """Read bounded observations available by a historical decision time."""
     if not 0 < limit <= _MAX_OBSERVATIONS:
         raise DataError("LIMIT_EXCEEDED", request_id=request_id)
-    result = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    f"""
-                    SELECT {_COLUMNS} FROM data_research_observations
-                    WHERE available_at <= ?
-                      AND (? IS NULL OR source_id = ?)
-                      AND (? IS NULL OR series_id = ?)
-                    ORDER BY available_at, source_id, series_id, revision
-                    LIMIT ?
-                    """.strip(),  # noqa: S608
-                ),
-                parameter_sets=(
-                    (
-                        decision_time.isoformat(),
-                        source_id,
-                        source_id,
-                        series_id,
-                        series_id,
-                        limit,
-                    ),
-                ),
-                max_rows=limit,
-            ),
-            request_id=request_id,
-        )
+    result = read_research_observation_records(
+        decision_time.isoformat(),
+        source_id,
+        series_id,
+        limit,
+        request_id=request_id,
     )
     return tuple(_row(row) for row in result.rows)
 

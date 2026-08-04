@@ -7,12 +7,26 @@ from types import MappingProxyType
 
 from app.services.api.routes.dashboards import _dashboard_source
 from app.services.api.routes.operator import _audit_source, _event_source
+from app.services.api.routes.risk import _risk_source
+from app.services.api.routes.simulation import (
+    _simulation_result_source,
+    _simulation_run_source,
+)
+from app.services.api.routes.trading import (
+    _trading_mutation_source,
+    _trading_session_source,
+)
 
 _ROUTE_DEPENDENCIES: Mapping[str, Callable[..., object]] = MappingProxyType(
     {
         "dashboard.source": _dashboard_source,
         "operator.audit_source": _audit_source,
         "operator.event_source": _event_source,
+        "risk.source": _risk_source,
+        "simulation.result_source": _simulation_result_source,
+        "simulation.run_source": _simulation_run_source,
+        "trading.mutation_source": _trading_mutation_source,
+        "trading.session_source": _trading_session_source,
     }
 )
 

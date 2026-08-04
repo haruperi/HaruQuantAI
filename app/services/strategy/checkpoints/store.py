@@ -6,12 +6,7 @@ import hashlib
 from collections.abc import Mapping
 from typing import Any
 
-from app.services.data import (
-    build_statement_plan,
-    build_transaction_request,
-    execute_transaction,
-    is_data_error,
-)
+from app.services.data import is_data_error
 from app.services.strategy.checkpoints.models import StrategyCheckpoint
 from app.services.strategy.contracts._base import JsonValue  # noqa: TC001
 from app.services.strategy.contracts.outcomes import failure, success
@@ -22,10 +17,13 @@ from app.services.strategy.contracts.references import (  # noqa: TC001
 from app.services.strategy.contracts.responses import (
     StrategyOperationError,
     guard_strategy_boundary,
-    unwrap_data_response,
 )
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.migrations.definitions import _ensure_strategy_storage
+from app.services.strategy.persistence import (
+    create_strategy_checkpoint_record,
+    read_strategy_checkpoint_record,
+)
 from app.utils import (
     canonical_json,
     get_logger,
@@ -127,31 +125,7 @@ def create_strategy_checkpoint(  # noqa: PLR0911
             redacted_paths=redacted.redacted_paths,
         )
         _ensure_strategy_storage(auth.request_id)
-        unwrap_data_response(
-            execute_transaction(
-                build_transaction_request(
-                    plan=build_statement_plan(
-                        statements=(
-                            "INSERT OR IGNORE INTO strategy_checkpoints "
-                            "(checkpoint_id, checkpoint_json, checksum, "
-                            "authorization_ref, request_id) VALUES (?, ?, ?, ?, ?)",
-                        ),
-                        parameter_sets=(
-                            (
-                                checkpoint.checkpoint_id,
-                                checkpoint.model_dump_json(),
-                                checkpoint.state_checksum,
-                                checkpoint.authorization_ref,
-                                checkpoint.request_id,
-                            ),
-                        ),
-                        max_rows=1,
-                    ),
-                    request_id=auth.request_id,
-                )
-            ),
-            operation="data.execute_transaction.strategy_checkpoint_write",
-        )
+        create_strategy_checkpoint_record(checkpoint)
         return success(checkpoint)
     except ValueError:
         logger.warning("Strategy checkpoint serialization failed")
@@ -203,21 +177,9 @@ def validate_strategy_checkpoint(
             correlation_id=auth.correlation_id,
         )
     try:
-        result = unwrap_data_response(
-            execute_transaction(
-                build_transaction_request(
-                    plan=build_statement_plan(
-                        statements=(
-                            "SELECT checkpoint_json FROM strategy_checkpoints "
-                            "WHERE checkpoint_id = ?",
-                        ),
-                        parameter_sets=((checkpoint.checkpoint_id,),),
-                        max_rows=1,
-                    ),
-                    request_id=auth.request_id,
-                )
-            ),
-            operation="data.execute_transaction.strategy_checkpoint_read",
+        rows = read_strategy_checkpoint_record(
+            checkpoint.checkpoint_id,
+            auth.request_id,
         )
     except StrategyOperationError:
         logger.exception("Strategy checkpoint persistence read failed")
@@ -237,16 +199,14 @@ def validate_strategy_checkpoint(
             request_id=auth.request_id,
             correlation_id=auth.correlation_id,
         )
-    if not result.rows:
+    if not rows:
         return failure(
             StrategyErrorCode.CHECKPOINT_INVALID,
             "checkpoint is unknown",
             request_id=auth.request_id,
             correlation_id=auth.correlation_id,
         )
-    stored = StrategyCheckpoint.model_validate_json(
-        str(result.rows[0]["checkpoint_json"])
-    )
+    stored = StrategyCheckpoint.model_validate_json(str(rows[0]["checkpoint_json"]))
     state_json = canonical_json(stored.state)
     checksum = hashlib.sha256(state_json.encode("utf-8")).hexdigest()
     compatible = (

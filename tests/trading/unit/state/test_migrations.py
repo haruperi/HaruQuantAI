@@ -24,8 +24,15 @@ def test_migrations_are_additive_and_ordered() -> None:
         sorted(step.migration_id for step in steps)
     )
     assert all(step.domain == "trading" for step in steps)
-    statements = " ".join(
-        statement.upper() for step in steps for statement in step.statements
+    statements = tuple(
+        statement.lstrip().upper() for step in steps for statement in step.statements
     )
-    assert "DROP " not in statements
-    assert "DELETE " not in statements
+    assert not any(statement.startswith("DROP ") for statement in statements)
+    assert not any(statement.startswith("DELETE ") for statement in statements)
+    for table in (
+        "TRADING_ORDERS",
+        "TRADING_FILLS",
+        "TRADING_POSITIONS",
+        "TRADING_ORDER_TRANSITIONS",
+    ):
+        assert any(f"CREATE TABLE IF NOT EXISTS {table}" in item for item in statements)

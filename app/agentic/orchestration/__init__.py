@@ -1,6 +1,6 @@
 """Public `FEAT-AGT-04` durable task and workflow orchestration API."""
 
-from app.agentic.orchestration.migrations import (
+from app.agentic.migrations.workflow import (
     build_agentic_migration_request,
     get_agentic_migration_statements,
 )

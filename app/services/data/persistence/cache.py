@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime, timedelta
-from typing import Any, Final, Literal
+from typing import Any, Literal
 
 from pydantic import ValidationError
 
@@ -22,26 +22,13 @@ from app.services.data.persistence.contracts import (
     CacheReadRequest,
     CacheWriteRequest,
     CacheWriteResult,
-    StatementPlan,
-    TransactionRequest,
 )
-from app.services.data.persistence.transactions import _execute_transaction_raw
+from app.services.data.persistence.delete import delete_cache_records
+from app.services.data.persistence.read import read_cache_record, read_cache_records
+from app.services.data.persistence.update import update_cache_record
 from app.utils import get_logger, utc_now
 
 logger = get_logger(__name__)
-
-_GET_CACHE_ENTRY: Final = (
-    "SELECT dataset_json, created_at, expires_at, source_revision, "
-    "raw_data_hash, schema_version, normalization_version, request_id "
-    "FROM data_cache WHERE key = ?"
-).strip()
-
-_PUT_CACHE_ENTRY: Final = """
-INSERT OR REPLACE INTO data_cache (
-    key, dataset_json, created_at, expires_at, source_revision,
-    raw_data_hash, schema_version, normalization_version, request_id
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-""".strip()
 
 
 def _get_cache_entry_raw(
@@ -62,16 +49,7 @@ def _get_cache_entry_raw(
         DataError: For database connection or query failures.
     """
     try:
-        tx_request = TransactionRequest(
-            plan=StatementPlan(
-                statements=(_GET_CACHE_ENTRY,),
-                parameter_sets=((request.key,),),
-                max_rows=1,
-            ),
-            request_id=request.request_id,
-        )
-
-        result = _execute_transaction_raw(tx_request)
+        result = read_cache_record(request.key, request_id=request.request_id)
         if not result.rows:
             return None
 
@@ -192,14 +170,7 @@ def _put_cache_entry_raw(
             request.request_id,
         )
 
-        tx_request = TransactionRequest(
-            plan=StatementPlan(
-                statements=(_PUT_CACHE_ENTRY,), parameter_sets=(params,), max_rows=1
-            ),
-            request_id=request.request_id,
-        )
-
-        result = _execute_transaction_raw(tx_request)
+        result = update_cache_record(params, request_id=request.request_id)
         written = result.committed and result.affected_rows > 0
         if not written:
             _raise_cache_write_failed(request.request_id)
@@ -306,33 +277,17 @@ def _clear_cache_entry_raw(request: CacheClearRequest) -> CacheClearResult:
                 request_id=request.request_id,
             )
 
-        # Fetch all keys and dataset_json from cache
-        select_req = TransactionRequest(
-            plan=StatementPlan(
-                statements=("SELECT key, dataset_json FROM data_cache",),
-                parameter_sets=((),),
-                max_rows=10000,
-            ),
-            request_id=request.request_id,
-        )
-        result = _execute_transaction_raw(select_req)
+        result = read_cache_records(request_id=request.request_id, limit=10_000)
 
         matched_keys = _filter_cached_keys(result.rows, request)
         matched_count = len(matched_keys)
         deleted_count = 0
 
         if matched_count > 0 and not request.dry_run:
-            placeholders = ",".join("?" for _ in matched_keys)
-            delete_stmt = f"DELETE FROM data_cache WHERE key IN ({placeholders})"  # noqa: S608
-            delete_req = TransactionRequest(
-                plan=StatementPlan(
-                    statements=(delete_stmt,),
-                    parameter_sets=(tuple(matched_keys),),
-                    max_rows=1,
-                ),
+            del_res = delete_cache_records(
+                tuple(matched_keys),
                 request_id=request.request_id,
             )
-            del_res = _execute_transaction_raw(delete_req)
             if del_res.committed:
                 deleted_count = del_res.affected_rows
 

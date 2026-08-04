@@ -15,10 +15,14 @@ from app.services.api.contracts.models import (
     HealthDependencyCheck,
     Liveness,
     PageContext,
+    PortfolioComponentRunRequest,
+    PortfolioSimulationRunRequest,
     Readiness,
     ResearchRunRequest,
     RouteContract,
+    SimulationRunRequest,
     StreamEvent,
+    TradingMutationRequest,
 )
 
 __all__ = (
@@ -32,10 +36,14 @@ __all__ = (
     "HealthDependencyCheck",
     "Liveness",
     "PageContext",
+    "PortfolioComponentRunRequest",
+    "PortfolioSimulationRunRequest",
     "Readiness",
     "ResearchRunRequest",
     "RouteContract",
     "RouteContractRegistry",
+    "SimulationRunRequest",
     "StreamEvent",
+    "TradingMutationRequest",
     "register_route_contract",
 )

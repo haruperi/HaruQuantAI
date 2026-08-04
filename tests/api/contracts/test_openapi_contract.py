@@ -27,8 +27,8 @@ def test_openapi_v1_contains_no_excluded_routes() -> None:
     assert not any("/docs/" in path for path in paths)
     assert not any("/simulation/sessions" in path for path in paths)
     assert not any("/backtest/" in path for path in paths)
-    assert not any("/risk/" in path for path in paths)
-    assert not any("/live/" in path for path in paths)
+    assert "/api/v1/risk/kill-switch" in paths
+    assert "/api/v1/trading/session" in paths
     assert not any("/optimization/" in path for path in paths)
     assert not any("/portfolio/" in path for path in paths)
     assert not any("/agentic/" in path for path in paths)

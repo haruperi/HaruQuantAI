@@ -26,58 +26,28 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
-from app.services.data.persistence.contracts import (
-    StatementPlan,
-    TransactionRequest,
-)
-from app.services.data.persistence.transactions import _execute_transaction_raw
+from app.services.data.persistence import read_audit_event_records
 from app.utils import create_audit_event, get_logger
 
 type AuthContext = Any
 
 logger = get_logger(__name__)
 
+_AUDIT_CURSOR_PART_COUNT = 2
 
-def _build_audit_query(request: AuditEventQuery) -> tuple[str, list[Any]]:
-    """Build the SQL query and query parameters dynamically."""
-    logger.debug("Building a bounded audit query")
-    sql_parts = [
-        "SELECT event_id, timestamp, domain, action, principal_id, request_id, "
-        "correlation_id, causation_id, payload_json FROM data_audit_events "
-        "WHERE timestamp >= ? AND timestamp <= ?"
-    ]
-    params: list[Any] = [request.start.isoformat(), request.end.isoformat()]
 
-    if request.domain is not None:
-        sql_parts.append("AND domain = ?")
-        params.append(request.domain)
-    if request.action is not None:
-        sql_parts.append("AND action = ?")
-        params.append(request.action)
-    if request.principal_id is not None:
-        sql_parts.append("AND principal_id = ?")
-        params.append(request.principal_id)
-    if request.correlation_id is not None:
-        sql_parts.append("AND correlation_id = ?")
-        params.append(request.correlation_id)
-
-    # Keyset pagination cursor
-    if request.cursor is not None:
-        try:
-            cursor_ts, cursor_evt = request.cursor.split("||", 1)
-            sql_parts.append("AND (timestamp > ? OR (timestamp = ? AND event_id > ?))")
-            params.extend([cursor_ts, cursor_ts, cursor_evt])
-        except ValueError as ve:
-            raise DataError(
-                "INVALID_INPUT",
-                safe_details={"reason": "Malformed query pagination cursor"},
-                request_id=request.request_id,
-            ) from ve
-
-    sql_parts.append("ORDER BY timestamp ASC, event_id ASC LIMIT ?")
-    params.append(request.limit)
-
-    return " ".join(sql_parts).strip(), params
+def _parse_audit_cursor(request: AuditEventQuery) -> tuple[str | None, str | None]:
+    """Parse one keyset-pagination cursor into its storage identities."""
+    if request.cursor is None:
+        return None, None
+    parts = request.cursor.split("||", 1)
+    if len(parts) != _AUDIT_CURSOR_PART_COUNT:
+        raise DataError(
+            "INVALID_INPUT",
+            safe_details={"reason": "Malformed query pagination cursor"},
+            request_id=request.request_id,
+        )
+    return parts[0], parts[1]
 
 
 def _parse_audit_events(rows: tuple[Mapping[str, Any], ...]) -> list[Any]:
@@ -139,18 +109,19 @@ def _query_audit_events_raw(
         )
 
     try:
-        query_sql, params = _build_audit_query(request)
-
-        tx_request = TransactionRequest(
-            plan=StatementPlan(
-                statements=(query_sql,),
-                parameter_sets=(tuple(params),),
-                max_rows=request.limit,
-            ),
+        cursor_timestamp, cursor_event_id = _parse_audit_cursor(request)
+        result = read_audit_event_records(
+            start=request.start.isoformat(),
+            end=request.end.isoformat(),
+            domain=request.domain,
+            action=request.action,
+            principal_id=request.principal_id,
+            correlation_id=request.correlation_id,
+            cursor_timestamp=cursor_timestamp,
+            cursor_event_id=cursor_event_id,
+            limit=request.limit,
             request_id=request.request_id,
         )
-
-        result = _execute_transaction_raw(tx_request)
         events = _parse_audit_events(result.rows)
 
         # Determine if a next page cursor should be generated

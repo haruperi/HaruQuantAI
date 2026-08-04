@@ -3,7 +3,7 @@
 > **Package:** `app/agentic/operations`
 > **Feature:** `FEAT-AGT-21` Observability, Incidents, and Operational Control
 > **Status:** `Completed`
-> **Last updated:** `2026-07-30`
+> **Last updated:** `2026-08-03`
 
 > This README documents one registered root infrastructure package. It is
 > **subordinate to the canonical Agentic Feature Registry** in
@@ -73,12 +73,17 @@ operations/
 ├── models.py       # Trace, incident, replay contracts and the containment table
 ├── migrations.py   # Operations-ledger schema executed by Data
 ├── repository.py   # Ledger port and its deterministic in-memory double
+├── runtime.py      # Durable adapter through Agentic persistence
 ├── service.py      # get_run_trace, quarantine_agent, replay_run
 └── README.md       # This file
 ```
 
 The canonical §4.21 file list plus `README.md`, which every other package
 carries.
+
+Durable CRUD is centralized in the private `app/agentic/persistence/` support
+package. Incident classification uniqueness and ledger append remain one atomic
+transition; this feature retains filtering, containment, and replay validation.
 
 ### Public API
 
@@ -229,6 +234,6 @@ records are really redacted, and a terminal run really refuses to resume.
    `side_effects_attempted` accept a non-zero value.
 6. Adding a span or incident kind invalidates every existing trace or record by
    design — add the test that shows the old shape is now refused.
-7. Update `models.py`, `service.py`, `repository.py`, `migrations.py`, tests,
+7. Update `models.py`, `service.py`, `repository.py`, `runtime.py`, `migrations.py`, tests,
    and the usage program.
 8. Change status only after every gate passes.

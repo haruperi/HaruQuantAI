@@ -5,12 +5,7 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
-from app.services.data import (
-    build_statement_plan,
-    build_transaction_request,
-    execute_transaction,
-    is_data_error,
-)
+from app.services.data import is_data_error
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.outcomes import (
     StrategyMutationResult,
@@ -28,9 +23,9 @@ from app.services.strategy.contracts.requests import (  # noqa: TC001
 from app.services.strategy.contracts.responses import (
     StrategyOperationError,
     guard_strategy_boundary,
-    unwrap_data_response,
 )
 from app.services.strategy.migrations.definitions import _ensure_strategy_storage
+from app.services.strategy.persistence import create_strategy_version_record
 from app.services.strategy.registry._mutations import (
     _REGISTER_PERMISSION,
     _load_mutation,
@@ -107,39 +102,7 @@ def register_strategy_version(
         existing = _load_mutation(request.command_id, request.request_id)
         if existing is not None:
             return success(existing.model_copy(update={"status": "IDEMPOTENT"}))
-        unwrap_data_response(
-            execute_transaction(
-                build_transaction_request(
-                    plan=build_statement_plan(
-                        statements=(
-                            "INSERT INTO strategy_versions (strategy_id, "
-                            "strategy_version, manifest_json, lifecycle_status, "
-                            "policy_json, record_hash, request_id, correlation_id) "
-                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                            "INSERT INTO strategy_mutations (command_id, "
-                            "mutation_json, "
-                            "publication_pending) VALUES (?, ?, 1)",
-                        ),
-                        parameter_sets=(
-                            (
-                                request.manifest.strategy_id,
-                                request.manifest.strategy_version,
-                                request.manifest.model_dump_json(),
-                                request.lifecycle_status.value,
-                                policy.model_dump_json(),
-                                record_hash,
-                                request.request_id,
-                                request.correlation_id,
-                            ),
-                            (request.command_id, mutation.model_dump_json()),
-                        ),
-                        max_rows=2,
-                    ),
-                    request_id=request.request_id,
-                )
-            ),
-            operation="data.execute_transaction.strategy_registry_mutation",
-        )
+        create_strategy_version_record(request, policy, record_hash, mutation)
     except StrategyOperationError as error:
         logger.warning("Strategy registration response failure")
         if error.details.get("upstream_code") == "DB_WRITE_FAILED":

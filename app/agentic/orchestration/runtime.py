@@ -1,4 +1,4 @@
-"""Durable Agentic workflow store over Data-owned runtime records."""
+"""Durable Agentic workflow store over Agentic-owned relational records."""
 
 from __future__ import annotations
 
@@ -8,12 +8,15 @@ from pydantic import BaseModel
 
 from app.agentic.contracts import WorkflowCheckpoint
 from app.agentic.orchestration.models import WorkflowRun
-from app.services.data import (
-    build_agentic_runtime_store,
-    execute_runtime_store_operation,
-    execute_runtime_store_transition,
+from app.agentic.persistence import (
+    create_agentic_persistence_store,
+    create_workflow_checkpoint_record,
+    create_workflow_run_reservation,
+    read_workflow_checkpoint_records,
+    read_workflow_idempotency_record,
+    read_workflow_run_record,
+    update_workflow_run_record,
 )
-from app.utils import canonical_digest
 
 
 def _encode(value: object) -> str:
@@ -30,21 +33,12 @@ def _encode(value: object) -> str:
     return value.model_dump_json()
 
 
-def _key(value: str) -> str:
-    """Derive one storage-safe identifier.
-
-    Returns:
-        Bounded key.
-    """
-    return f"record-{canonical_digest(value)}"
-
-
 class DurableWorkflowStore:
     """Data-backed implementation of the Agentic workflow-store port."""
 
     def __init__(self) -> None:
-        """Build the lazy Data runtime handle."""
-        self._store = build_agentic_runtime_store(
+        """Build the relational persistence handle."""
+        self._store = create_agentic_persistence_store(
             {
                 "checkpoint": (_encode, WorkflowCheckpoint.model_validate_json),
                 "workflow-run": (_encode, WorkflowRun.model_validate_json),
@@ -56,43 +50,35 @@ class DurableWorkflowStore:
 
         Returns:
             Newly reserved or previously stored run.
+
+        Raises:
+            ValueError: If the run identity conflicts with stored state.
         """
         existing = cast(
             "WorkflowRun | None",
-            execute_runtime_store_operation(
+            read_workflow_idempotency_record(
                 self._store,
-                "get",
-                collection="workflow-idempotency",
-                key=_key(run.idempotency_key),
+                run.idempotency_key,
             ),
         )
         if existing is not None:
             return existing
-        committed = execute_runtime_store_transition(
+        committed = create_workflow_run_reservation(
             self._store,
-            state_collection="workflow-idempotency",
-            state_key=_key(run.idempotency_key),
-            state_kind="workflow-run",
-            state_value=run,
-            expected_revision=0,
-            event_collection="workflow-runs",
-            event_key=_key(run.run_id),
-            event_partition="runs",
-            event_sequence=int(canonical_digest(run.run_id)[:15], 16) + 1,
-            event_kind="workflow-run",
-            event_value=run,
+            idempotency_key=run.idempotency_key,
+            run_key=run.run_id,
+            sequence=run.sequence + 1,
+            value=run,
         )
         if committed:
             return run
-        return cast(
-            "WorkflowRun",
-            execute_runtime_store_operation(
-                self._store,
-                "get",
-                collection="workflow-idempotency",
-                key=_key(run.idempotency_key),
-            ),
+        existing = cast(
+            "WorkflowRun | None",
+            read_workflow_idempotency_record(self._store, run.idempotency_key),
         )
+        if existing is None:
+            raise ValueError("Agentic workflow identity conflicts with stored state")
+        return existing
 
     def load_run(self, run_id: str) -> WorkflowRun | None:
         """Load one run by identity.
@@ -102,11 +88,9 @@ class DurableWorkflowStore:
         """
         return cast(
             "WorkflowRun | None",
-            execute_runtime_store_operation(
+            read_workflow_run_record(
                 self._store,
-                "get",
-                collection="workflow-runs",
-                key=_key(run_id),
+                run_id,
             ),
         )
 
@@ -120,27 +104,21 @@ class DurableWorkflowStore:
             ValueError: If the stored revision conflicts.
         """
         committed = run.model_copy(update={"revision": expected_revision + 1})
-        execute_runtime_store_operation(
+        update_workflow_run_record(
             self._store,
-            "compare_and_swap",
-            collection="workflow-runs",
-            key=_key(run.run_id),
-            kind="workflow-run",
+            key=run.run_id,
             value=committed,
-            expected_revision=expected_revision + 1,
+            expected_revision=expected_revision,
         )
         return committed
 
     def append_checkpoint(self, checkpoint: WorkflowCheckpoint) -> None:
         """Append one immutable checkpoint."""
-        execute_runtime_store_operation(
+        create_workflow_checkpoint_record(
             self._store,
-            "append",
-            collection="workflow-checkpoints",
-            key=_key(checkpoint.checkpoint_id),
-            partition=_key(checkpoint.task_id),
+            key=checkpoint.checkpoint_id,
+            partition=checkpoint.task_id,
             sequence=checkpoint.sequence + 1,
-            kind="checkpoint",
             value=checkpoint,
         )
 
@@ -152,12 +130,10 @@ class DurableWorkflowStore:
         """
         return cast(
             "tuple[WorkflowCheckpoint, ...]",
-            execute_runtime_store_operation(
+            read_workflow_checkpoint_records(
                 self._store,
-                "list",
-                collection="workflow-checkpoints",
-                partition=_key(task_id),
-                limit=1_000,
+                task_id,
+                1_000,
             ),
         )
 

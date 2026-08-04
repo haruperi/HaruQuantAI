@@ -17,7 +17,6 @@ from typing import TYPE_CHECKING, Any
 from pydantic import ValidationError
 
 from app.services.data._settings import get_data_settings
-from app.services.data.audit.store import _persist_audit_event_raw
 from app.services.data.contracts import (
     DataError,
     DataQualityReport,
@@ -401,6 +400,9 @@ def _require_acceptable_quality(
 
 def _audit_import(request: ExternalImportRequest, record_count: int) -> None:
     """Record the external origin of an admitted artifact."""
+    # Import at the side-effect boundary because audit delegates its CRUD back here.
+    from app.services.data.audit.store import _persist_audit_event_raw
+
     logger.info("Recording external import provenance for %s", request.symbol)
     _persist_audit_event_raw(
         create_audit_event(

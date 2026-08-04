@@ -324,7 +324,13 @@ app/services/strategy/
 │   ├── validation.py
 │   ├── evaluation.py
 │   └── lineage.py
-└── migrations/                         # Documented non-feature persistence support
+├── persistence/                        # Private non-feature CRUD support
+│   ├── __init__.py                     # Internal CRUD export boundary
+│   ├── create.py                       # Version and checkpoint inserts
+│   ├── read.py                         # Registry, mutation, policy, checkpoint reads
+│   ├── update.py                       # Configuration and publication updates
+│   └── delete.py                       # Explicitly empty; records are immutable
+└── migrations/                         # Documented non-feature schema support
     ├── __init__.py
     ├── README.md
     └── definitions.py                  # Strategy-owned schema definitions
@@ -929,11 +935,24 @@ The three conditional codes apply only when the selected manifest/lifecycle requ
 
 **Implementation notes:** Reuse current JSON configuration validation and bundled-strategy discovery only as migration input. Replace mutable/bundled class lookup with versioned immutable entries; remove physical deletion, archive import, arbitrary path loading, and in-place approval mutation.
 
-The documented non-feature support directory
-`app/services/strategy/migrations/` owns Strategy's private migration
-definitions. Mutating registry and checkpoint entry points initialize the
-schema through Data's public migration runner; registry and checkpoint reads
-never invoke migration execution.
+The documented non-feature support directories split responsibilities cleanly.
+`app/services/strategy/persistence/` owns only Strategy CRUD statement construction,
+Data transaction delegation, and normalized row handoff. Registry and checkpoint
+features retain authorization, validation, hashing, model construction, audit
+publication, and public response behavior. `app/services/strategy/migrations/` owns
+Strategy's private immutable migration definitions. Mutating registry and checkpoint
+entry points initialize the schema through Data's public migration runner; registry
+and checkpoint reads never invoke migration execution.
+
+#### `persistence/` — Non-feature CRUD support
+
+| Status | File | Responsibility | Key exports | Dependencies |
+| --- | --- | --- | --- | --- |
+| Completed | `create.py` | Execute atomic creation of immutable version/mutation pairs and checkpoint records. | `create_strategy_version_record`, `create_strategy_checkpoint_record` | **Standard library:** None **Required third-party:** None **Local:** Data public transaction builders/executor; Strategy record contracts |
+| Completed | `read.py` | Execute bounded registry, mutation, policy, and checkpoint reads and return normalized rows. | `read_strategy_version_records`, `read_strategy_mutation_record`, `read_strategy_policy_record`, `read_strategy_checkpoint_record` | **Standard library:** `collections.abc` **Required third-party:** None **Local:** Data public transaction builders/executor |
+| Completed | `update.py` | Execute the atomic immutable configuration transition and mutation-publication update. | `update_strategy_configuration_record`, `update_strategy_mutation_publication` | **Standard library:** `typing` **Required third-party:** None **Local:** Data public transaction builders/executor; Strategy record contracts |
+| Completed | `delete.py` | Declare that Strategy persistence exposes no delete operation because owned records are immutable. | None | None |
+| Completed | `__init__.py` | Provide the private Strategy-internal CRUD function boundary. | The eight standalone CRUD functions above | **Local:** CRUD modules |
 
 #### `migrations/` — Non-feature persistence support
 
@@ -1376,6 +1395,8 @@ dataset provenance and does not rewrite historical record availability.
 - [X] Every package and feature export matches the documented API exactly. `tests/strategy/unit/test_public_api.py:64`
 - [X] Owned and consumed contracts match `docs/PROJECT.md` names, versions, and owners. `tests/strategy/integration/test_contract_compatibility.py:75`
 - [X] Strategy-owned registry, configuration, checkpoint, and migration state follows the system data-ownership rule. `app/services/strategy/migrations/definitions.py:48`
+- [X] Strategy's private persistence support package has the exact `__init__.py` plus create/read/update/delete layout and standalone-function boundary. `tests/strategy/unit/test_persistence_layout.py:29`
+- [X] Strategy CRUD SQL and Data transaction execution are confined to the private persistence package while schema evolution remains in migrations. `tests/strategy/unit/test_persistence_layout.py:45`
 - [X] Every dependency is documented in standard-library, third-party, local order. `tests/strategy/unit/test_import_security.py:9`
 - [X] Every public symbol has exactly one functional requirement, usage example, and unit test. `tests/strategy/unit/test_usage_coverage.py:43`
 - [X] Every usage program is a standalone `main()` program behind a `__main__` guard, one per feature. `tests/strategy/unit/test_usage_coverage.py:105`

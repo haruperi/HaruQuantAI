@@ -5,10 +5,10 @@ from pathlib import Path
 
 from app.services.api import build_research_run_request
 from app.services.api.identity import require_auth_context
-from app.services.api.routes import strategies
 from app.services.api.routes.research import router as research_router
 from app.services.api.routes.strategies import router as strategies_router
 from app.services.data import build_data_settings, data_settings_context
+from app.services.strategy import register_strategy_version
 from fastapi import FastAPI
 
 from tests.api._support import post_json
@@ -44,7 +44,6 @@ def _api() -> FastAPI:
     """
     app = FastAPI()
     app.include_router(research_router)
-    app.include_router(strategies_router)
     auth = make_auth().model_copy(
         update={
             "permissions": (
@@ -55,12 +54,11 @@ def _api() -> FastAPI:
         }
     )
     app.dependency_overrides[require_auth_context] = lambda: auth
-    app.dependency_overrides[strategies._strategy_validation_policy] = make_policy
     return app
 
 
 def test_sys_wf_004_research_to_reviewed_strategy_candidate(tmp_path: Path) -> None:
-    """Verify advisory evidence requires explicit API approval to register."""
+    """Verify reviewed Research evidence enters Strategy through its owner API."""
     research_request = build_research_run_request(
         hypothesis="Returns persist over one research bar.",
         dataset=make_dataset(),
@@ -70,7 +68,7 @@ def test_sys_wf_004_research_to_reviewed_strategy_candidate(tmp_path: Path) -> N
 
     report_status, report = post_json(
         app,
-        "/api/research/run",
+        "/api/v1/research/run",
         research_request.model_dump(mode="json"),
     )
     assert report_status == 200
@@ -95,14 +93,18 @@ def test_sys_wf_004_research_to_reviewed_strategy_candidate(tmp_path: Path) -> N
     )
 
     with _storage(tmp_path):
-        mutation_status, mutation = post_json(
-            app,
-            "/api/strategies/registrations",
-            registration.model_dump(mode="json"),
+        mutation_response = register_strategy_version(
+            registration,
+            make_auth(),
+            make_policy(),
         )
 
-    assert mutation_status == 200
-    assert mutation["status"] == "ACCEPTED"
-    assert mutation["validated_ref"]["manifest"]["provenance_refs"] == [
-        research_report["report_id"]
-    ]
+    assert "/api/v1/strategies/registrations" not in {
+        route.path for route in strategies_router.routes
+    }
+    assert mutation_response.data is not None
+    assert mutation_response.data.status == "ACCEPTED"
+    assert mutation_response.data.validated_ref is not None
+    assert mutation_response.data.validated_ref.manifest.provenance_refs == (
+        research_report["report_id"],
+    )

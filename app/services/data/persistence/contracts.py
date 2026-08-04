@@ -187,6 +187,7 @@ class MigrationRequest(_Contract):
     domain: str
     steps: tuple[MigrationStep, ...]
     request_id: str
+    complete_manifest: bool = False
 
     @field_validator("domain", "request_id")
     @classmethod

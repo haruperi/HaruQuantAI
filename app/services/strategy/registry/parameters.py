@@ -4,12 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.services.data import (
-    build_statement_plan,
-    build_transaction_request,
-    execute_transaction,
-    is_data_error,
-)
+from app.services.data import is_data_error
 from app.services.strategy.contracts.outcomes import (
     StrategyMutationResult,
     failure,
@@ -21,11 +16,11 @@ from app.services.strategy.contracts.requests import (  # noqa: TC001
 from app.services.strategy.contracts.responses import (
     StrategyOperationError,
     guard_strategy_boundary,
-    unwrap_data_response,
     unwrap_strategy_response,
 )
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.migrations.definitions import _ensure_strategy_storage
+from app.services.strategy.persistence import update_strategy_configuration_record
 from app.services.strategy.registry._mutations import (
     _UPDATE_PERMISSION,
     _load_mutation,
@@ -105,36 +100,11 @@ def update_strategy_parameters(  # noqa: PLR0911
         existing = _load_mutation(request.command_id, request.request_id)
         if existing is not None:
             return success(existing.model_copy(update={"status": "IDEMPOTENT"}))
-        unwrap_data_response(
-            execute_transaction(
-                build_transaction_request(
-                    plan=build_statement_plan(
-                        statements=(
-                            "INSERT OR IGNORE INTO strategy_configs (strategy_id, "
-                            "strategy_version, config_hash, config_json, "
-                            "policy_version, "
-                            "request_id) VALUES (?, ?, ?, ?, ?, ?)",
-                            "INSERT INTO strategy_mutations (command_id, "
-                            "mutation_json, "
-                            "publication_pending) VALUES (?, ?, 1)",
-                        ),
-                        parameter_sets=(
-                            (
-                                config.strategy_id,
-                                config.strategy_version,
-                                config.config_hash,
-                                config.model_dump_json(),
-                                config.policy_version,
-                                request.request_id,
-                            ),
-                            (request.command_id, mutation.model_dump_json()),
-                        ),
-                        max_rows=2,
-                    ),
-                    request_id=request.request_id,
-                )
-            ),
-            operation="data.execute_transaction.strategy_parameter_mutation",
+        update_strategy_configuration_record(
+            config,
+            mutation,
+            request.command_id,
+            request.request_id,
         )
     except Exception as error:
         if not is_data_error(error):

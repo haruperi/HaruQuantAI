@@ -7,7 +7,12 @@ from datetime import datetime, timedelta
 
 from pydantic import BaseModel, ConfigDict
 
-from app.services.api.identity.accounts import IdentityError, _execute
+from app.services.api.identity.errors import IdentityError
+from app.services.api.persistence import (
+    consume_approval_record,
+    create_approval_record,
+    read_approval_record,
+)
 from app.utils import canonical_json, derive_stable_id, get_logger, utc_now
 
 logger = get_logger(__name__)
@@ -72,23 +77,14 @@ def create_approval(
         f"api-approval:{issuer_id}:{subject_id}:{scope}:{evidence_hash}",
     )
     expires_at = created_at + timedelta(seconds=ttl_seconds)
-    _execute(
-        (
-            "INSERT INTO api_approvals "
-            "(approval_id, issuer_id, subject_id, scope, evidence_hash, "
-            "created_at, expires_at, consumed_at) VALUES (?, ?, ?, ?, ?, ?, ?, NULL)",
-        ),
-        (
-            (
-                approval_id,
-                issuer_id,
-                subject_id,
-                scope,
-                evidence_hash,
-                created_at.isoformat(),
-                expires_at.isoformat(),
-            ),
-        ),
+    create_approval_record(
+        approval_id=approval_id,
+        issuer_id=issuer_id,
+        subject_id=subject_id,
+        scope=scope,
+        evidence_hash=evidence_hash,
+        created_at=created_at.isoformat(),
+        expires_at=expires_at.isoformat(),
         request_id=request_id,
     )
     return ApprovalRecord(
@@ -130,15 +126,7 @@ def consume_approval(
     logger.info("Consuming one scoped UI/API approval")
     current = now or utc_now()
     expected_hash = hashlib.sha256(canonical_json(evidence).encode("utf-8")).hexdigest()
-    result = _execute(
-        (
-            "SELECT issuer_id, subject_id, scope, evidence_hash, created_at, "
-            "expires_at, consumed_at FROM api_approvals WHERE approval_id = ?",
-        ),
-        ((approval_id,),),
-        request_id=request_id,
-    )
-    rows = tuple(result.rows)
+    rows = read_approval_record(approval_id, request_id=request_id)
     if len(rows) != 1:
         raise IdentityError("APPROVAL_REQUIRED")
     row = rows[0]
@@ -150,15 +138,12 @@ def consume_approval(
         or datetime.fromisoformat(str(row["expires_at"])) <= current
     ):
         raise IdentityError("APPROVAL_INVALID")
-    update = _execute(
-        (
-            "UPDATE api_approvals SET consumed_at = ? "
-            "WHERE approval_id = ? AND consumed_at IS NULL",
-        ),
-        ((current.isoformat(), approval_id),),
+    affected_rows = consume_approval_record(
+        approval_id=approval_id,
+        consumed_at=current.isoformat(),
         request_id=request_id,
     )
-    if int(update.affected_rows) != 1:
+    if affected_rows != 1:
         raise IdentityError("APPROVAL_ALREADY_CONSUMED")
     return ApprovalRecord(
         approval_id=approval_id,

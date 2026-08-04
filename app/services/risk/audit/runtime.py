@@ -1,4 +1,4 @@
-"""Risk persistence protocols over Data-owned durable runtime records."""
+"""Risk persistence protocols over Risk-owned relational records."""
 
 from __future__ import annotations
 
@@ -7,20 +7,34 @@ from typing import Literal, cast
 
 from pydantic import BaseModel
 
-from app.services.data import (
-    build_risk_runtime_store,
-    execute_runtime_store_operation,
-    execute_runtime_store_transition,
-)
 from app.services.risk.contracts import (
     AllocationRiskDecision,
     KillSwitchState,
     RiskAuditRecord,
+    RiskDecisionPackage,
     StrategyOperationalEligibilityDecision,
+)
+from app.services.risk.persistence import (
+    create_active_allocation_record,
+    create_allocation_review_record,
+    create_audit_record,
+    create_decision_record,
+    create_eligibility_record,
+    create_risk_runtime_store,
+    read_active_allocation_record,
+    read_active_allocation_record_with_revision,
+    read_audit_record,
+    read_audit_records,
+    read_decision_record,
+    read_decision_records,
+    read_kill_switch_record,
+    update_active_allocation_record,
+    update_kill_switch_with_audit,
 )
 from app.utils import canonical_digest, get_logger
 
 logger = get_logger(__name__)
+_MAX_DECISION_PAGE = 200
 
 
 def _kill_switch_key(scope_level: str, scope: object) -> str:
@@ -51,10 +65,11 @@ class _DurableRiskStore:
 
     def __init__(self) -> None:
         """Construct the adapter without opening a database connection."""
-        self._store = build_risk_runtime_store(
+        self._store = create_risk_runtime_store(
             {
                 "allocation": (_encode, AllocationRiskDecision.model_validate_json),
                 "audit": (_encode, RiskAuditRecord.model_validate_json),
+                "decision": (_encode, RiskDecisionPackage.model_validate_json),
                 "eligibility": (
                     _encode,
                     StrategyOperationalEligibilityDecision.model_validate_json,
@@ -85,9 +100,7 @@ class _DurableRiskStore:
         Returns:
             Exact append outcome.
         """
-        existing = execute_runtime_store_operation(
-            self._store, "get", collection="audit", key=record.record_id
-        )
+        existing = read_audit_record(self._store, record.record_id)
         if existing is not None:
             return "already_appended" if existing == record else "conflict"
         head = self.read_head(timeout_seconds=timeout_seconds)
@@ -99,14 +112,10 @@ class _DurableRiskStore:
         ):
             return "conflict"
         try:
-            execute_runtime_store_operation(
+            create_audit_record(
                 self._store,
-                "append",
-                collection="audit",
-                key=record.record_id,
-                partition="chain",
+                record_id=record.record_id,
                 sequence=expected_sequence + 1,
-                kind="audit",
                 value=record,
             )
         except ValueError:
@@ -122,16 +131,46 @@ class _DurableRiskStore:
             Ordered sealed audit records.
         """
         del timeout_seconds
-        return cast(
-            "tuple[RiskAuditRecord, ...]",
-            execute_runtime_store_operation(
+        return cast("tuple[RiskAuditRecord, ...]", read_audit_records(self._store))
+
+    def save_decision(self, decision: RiskDecisionPackage) -> None:
+        """Persist one immutable canonical Risk decision.
+
+        Raises:
+            ValueError: If the decision identity conflicts.
+        """
+        existing = read_decision_record(self._store, decision.decision_id)
+        if existing is not None:
+            if existing == decision:
+                return
+            raise ValueError("Risk decision identity conflict")
+        try:
+            create_decision_record(
                 self._store,
-                "list",
-                collection="audit",
-                partition="chain",
-                limit=1_000,
-            ),
+                decision_id=decision.decision_id,
+                value=decision,
+            )
+        except ValueError:
+            stored = read_decision_record(self._store, decision.decision_id)
+            if stored is not None:
+                if stored == decision:
+                    return
+                raise ValueError("Risk decision identity conflict") from None
+            raise
+
+    def list_decisions(self, limit: int) -> tuple[RiskDecisionPackage, ...]:
+        """Return a bounded newest-first Risk decision page.
+
+        Raises:
+            ValueError: If the requested page bound is invalid.
+        """
+        if isinstance(limit, bool) or limit <= 0 or limit > _MAX_DECISION_PAGE:
+            raise ValueError("Risk decision limit must be between 1 and 200")
+        records = cast(
+            "tuple[RiskDecisionPackage, ...]",
+            read_decision_records(self._store, limit),
         )
+        return records
 
     def save_if_absent(
         self,
@@ -145,9 +184,11 @@ class _DurableRiskStore:
             True for an exact first or idempotent write.
         """
         del timeout_seconds
-        return self._put_once(
-            "eligibility", decision.decision_id, "eligibility", decision
-        )
+        try:
+            create_eligibility_record(self._store, decision.decision_id, decision)
+        except ValueError:
+            return False
+        return True
 
     def save_review_if_absent(
         self,
@@ -161,25 +202,8 @@ class _DurableRiskStore:
             True for an exact first or idempotent write.
         """
         del timeout_seconds
-        return self._put_once(
-            "allocation-reviews", decision.decision_id, "allocation", decision
-        )
-
-    def _put_once(self, collection: str, key: str, kind: str, value: object) -> bool:
-        """Persist one exact immutable Risk value.
-
-        Returns:
-            Whether the write was first or idempotent.
-        """
         try:
-            execute_runtime_store_operation(
-                self._store,
-                "put_once",
-                collection=collection,
-                key=key,
-                kind=kind,
-                value=value,
-            )
+            create_allocation_review_record(self._store, decision.decision_id, decision)
         except ValueError:
             return False
         return True
@@ -198,12 +222,7 @@ class _DurableRiskStore:
         del timeout_seconds
         return cast(
             "AllocationRiskDecision | None",
-            execute_runtime_store_operation(
-                self._store,
-                "get",
-                collection="allocation-active",
-                key=portfolio_id,
-            ),
+            read_active_allocation_record(self._store, portfolio_id),
         )
 
     def activate_compare_and_swap(
@@ -220,33 +239,30 @@ class _DurableRiskStore:
         """
         del timeout_seconds
         stored = cast(
-            "tuple[AllocationRiskDecision, int] | None",
-            execute_runtime_store_operation(
-                self._store,
-                "get_with_revision",
-                collection="allocation-active",
-                key=decision.portfolio_id,
+            "tuple[AllocationRiskDecision, str] | None",
+            read_active_allocation_record_with_revision(
+                self._store, decision.portfolio_id
             ),
         )
         if stored is None:
             if expected_predecessor_version is not None:
                 return False
-            operation: Literal["compare_and_swap", "put_once"] = "put_once"
-            revision = 0
-        else:
-            current, revision = stored
-            if current.reviewed_version != expected_predecessor_version:
+            try:
+                create_active_allocation_record(
+                    self._store, decision.portfolio_id, decision
+                )
+            except ValueError:
                 return False
-            operation = "compare_and_swap"
+            return True
+        current, revision = stored
+        if current.reviewed_version != expected_predecessor_version:
+            return False
         try:
-            execute_runtime_store_operation(
+            update_active_allocation_record(
                 self._store,
-                operation,
-                collection="allocation-active",
                 key=decision.portfolio_id,
-                kind="allocation",
                 value=decision,
-                expected_revision=revision or None,
+                expected_revision=revision,
             )
         except ValueError:
             return False
@@ -267,9 +283,7 @@ class _DurableRiskStore:
         Returns:
             Exact atomic transition outcome.
         """
-        existing = execute_runtime_store_operation(
-            self._store, "get", collection="audit", key=record.record_id
-        )
+        existing = read_audit_record(self._store, record.record_id)
         if existing is not None:
             return "already_committed" if existing == record else "conflict"
         head = self.read_head(timeout_seconds=timeout_seconds)
@@ -280,19 +294,14 @@ class _DurableRiskStore:
             or actual_previous != expected_previous_hash
         ):
             return "conflict"
-        committed = execute_runtime_store_transition(
+        committed = update_kill_switch_with_audit(
             self._store,
-            state_collection="kill-switch",
             state_key=_kill_switch_key(state.scope_level, state.scope),
-            state_kind="kill-switch",
             state_value=state,
             expected_revision=expected_version,
-            event_collection="audit",
-            event_key=record.record_id,
-            event_partition="chain",
-            event_sequence=expected_sequence + 1,
-            event_kind="audit",
-            event_value=record,
+            audit_key=record.record_id,
+            audit_sequence=expected_sequence + 1,
+            audit_value=record,
         )
         return "committed" if committed else "conflict"
 
@@ -306,12 +315,7 @@ class _DurableRiskStore:
         """
         return cast(
             "KillSwitchState | None",
-            execute_runtime_store_operation(
-                self._store,
-                "get",
-                collection="kill-switch",
-                key=_kill_switch_key(scope_level, scope),
-            ),
+            read_kill_switch_record(self._store, _kill_switch_key(scope_level, scope)),
         )
 
 
@@ -347,9 +351,11 @@ def execute_risk_state_store_operation(
         "compare_and_swap_with_audit",
         "get_active",
         "load_kill_switch",
+        "list_decisions",
         "read_all",
         "read_head",
         "save_if_absent",
+        "save_decision",
         "save_review_if_absent",
     }
     if not isinstance(store, _DurableRiskStore):
@@ -359,4 +365,42 @@ def execute_risk_state_store_operation(
     return getattr(store, operation)(*args, **kwargs)
 
 
-__all__ = ("build_risk_state_store", "execute_risk_state_store_operation")
+def get_kill_switch_state(scope_level: str, scope: object) -> object | None:
+    """Return current canonical kill-switch state for one exact scope."""
+    store = build_risk_state_store()
+    return execute_risk_state_store_operation(
+        store,
+        "load_kill_switch",
+        scope_level,
+        scope,
+    )
+
+
+def persist_risk_decision(decision: object) -> None:
+    """Persist one immutable ``RiskDecisionPackage v1``.
+
+    Raises:
+        TypeError: If the value is not a canonical Risk decision.
+    """
+    if not isinstance(decision, RiskDecisionPackage):
+        raise TypeError("decision must be RiskDecisionPackage v1")
+    store = build_risk_state_store()
+    execute_risk_state_store_operation(store, "save_decision", decision)
+
+
+def list_risk_decisions(limit: int = 50) -> tuple[object, ...]:
+    """Return a bounded newest-first page of canonical Risk decisions."""
+    store = build_risk_state_store()
+    return cast(
+        "tuple[object, ...]",
+        execute_risk_state_store_operation(store, "list_decisions", limit),
+    )
+
+
+__all__ = (
+    "build_risk_state_store",
+    "execute_risk_state_store_operation",
+    "get_kill_switch_state",
+    "list_risk_decisions",
+    "persist_risk_decision",
+)

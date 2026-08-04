@@ -1,6 +1,6 @@
 """Public Portfolio persistence interfaces and migrations."""
 
-from app.services.portfolio.state.migrations import PORTFOLIO_MIGRATIONS
+from app.services.portfolio.migrations import PORTFOLIO_MIGRATIONS
 from app.services.portfolio.state.repository import (
     AuditOutboxRecord,
     PortfolioRepository,

@@ -10,6 +10,9 @@ from app.services.risk.audit.chain import (
 from app.services.risk.audit.runtime import (
     build_risk_state_store,
     execute_risk_state_store_operation,
+    get_kill_switch_state,
+    list_risk_decisions,
+    persist_risk_decision,
 )
 
 __all__ = [
@@ -19,5 +22,8 @@ __all__ = [
     "build_risk_state_store",
     "create_risk_audit_chain",
     "execute_risk_state_store_operation",
+    "get_kill_switch_state",
+    "list_risk_decisions",
+    "persist_risk_decision",
     "verify_risk_audit_chain",
 ]

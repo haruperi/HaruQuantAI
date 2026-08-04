@@ -61,7 +61,7 @@ def test_storage_package_import_has_no_configuration_or_filesystem_side_effect(
     persistence = importlib.import_module("app.services.data.persistence")
     reloaded = importlib.reload(persistence)
 
-    expected = [
+    expected = {
         "DATA_MIGRATION_STEPS",
         "WriteLock",
         "acquire_write_lock",
@@ -81,6 +81,11 @@ def test_storage_package_import_has_no_configuration_or_filesystem_side_effect(
         "run_domain_migrations",
         "save_dataset",
         "save_market_data",
-    ]
-    assert sorted(reloaded.__all__) == expected
+    }
+    for module_name in ("create", "read", "update", "delete"):
+        crud_module = importlib.import_module(
+            f"app.services.data.persistence.{module_name}"
+        )
+        expected.update(crud_module.__all__)
+    assert set(reloaded.__all__) == expected
     assert tuple(tmp_path.iterdir()) == ()

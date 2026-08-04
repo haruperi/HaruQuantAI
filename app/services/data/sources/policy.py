@@ -13,11 +13,13 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
-from app.services.data.persistence.contracts import (
-    StatementPlan,
-    TransactionRequest,
+from app.services.data.persistence import (
+    create_source_attempt_record,
+    read_recent_source_attempt_records,
+    read_source_attempt_count,
+    read_source_state_record,
+    update_source_state_with_audit,
 )
-from app.services.data.persistence.transactions import _execute_transaction_raw
 from app.services.data.sources.contracts import (
     SourceDescriptor,
     SourcePlan,
@@ -107,29 +109,15 @@ def record_source_attempt(
     if observed_ns < 0:
         raise ValueError("timestamp_ns must be non-negative")
     try:
-        _execute_transaction_raw(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        """
-                        INSERT INTO data_source_attempts (
-                            source_id, timestamp_ns, request_id, status, error_code
-                        ) VALUES (?, ?, ?, ?, ?)
-                        """.strip(),
-                    ),
-                    parameter_sets=(
-                        (
-                            source_id,
-                            f"{observed_ns:019d}",
-                            request_id,
-                            status,
-                            error_code,
-                        ),
-                    ),
-                    max_rows=1,
-                ),
-                request_id=request_id,
-            )
+        create_source_attempt_record(
+            (
+                source_id,
+                f"{observed_ns:019d}",
+                request_id,
+                status,
+                error_code,
+            ),
+            request_id=request_id,
         )
     except DataError as error:
         logger.exception("Durable source-attempt persistence failed")
@@ -148,22 +136,10 @@ def _recent_attempts(
     """Read durable recent source attempts or fail closed."""
     logger.debug("Reading durable source attempts for %s", source_id)
     try:
-        result = _execute_transaction_raw(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        """
-                        SELECT status, timestamp_ns FROM data_source_attempts
-                        WHERE source_id = ?
-                        ORDER BY timestamp_ns DESC
-                        LIMIT ?
-                        """.strip(),
-                    ),
-                    parameter_sets=((source_id, limit),),
-                    max_rows=limit,
-                ),
-                request_id=request_id,
-            )
+        result = read_recent_source_attempt_records(
+            source_id,
+            limit,
+            request_id=request_id,
         )
     except DataError as error:
         raise DataError(
@@ -185,22 +161,10 @@ def _rate_limit_exceeded(
     logger.debug("Checking source rate limit for %s", config.source_id)
     window_ns = config.rate_window_seconds * 1_000_000_000
     try:
-        result = _execute_transaction_raw(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=(
-                        """
-                        SELECT COUNT(*) AS count_val FROM data_source_attempts
-                        WHERE source_id = ? AND timestamp_ns >= ?
-                        """.strip(),
-                    ),
-                    parameter_sets=(
-                        (config.source_id, f"{max(0, now_ns - window_ns):019d}"),
-                    ),
-                    max_rows=1,
-                ),
-                request_id=request_id,
-            )
+        result = read_source_attempt_count(
+            config.source_id,
+            f"{max(0, now_ns - window_ns):019d}",
+            request_id=request_id,
         )
     except DataError as error:
         raise DataError(
@@ -266,18 +230,9 @@ def _persisted_descriptor(
 ) -> SourceDescriptor:
     """Overlay a durable readiness transition on the configured descriptor."""
     logger.debug("Resolving durable readiness for %s", descriptor.source_id)
-    result = _execute_transaction_raw(
-        TransactionRequest(
-            plan=StatementPlan(
-                statements=(
-                    "SELECT readiness, descriptor_revision "
-                    "FROM data_source_state WHERE source_id = ?",
-                ),
-                parameter_sets=((descriptor.source_id,),),
-                max_rows=1,
-            ),
-            request_id=request_id,
-        )
+    result = read_source_state_record(
+        descriptor.source_id,
+        request_id=request_id,
     )
     if not result.rows:
         return descriptor
@@ -400,53 +355,27 @@ def _promote_source_raw(
         separators=(",", ":"),
         sort_keys=True,
     )
-    statements = (
-        """
-        INSERT INTO data_source_state (
-            source_id, readiness, descriptor_revision, updated_at_ns, request_id
-        ) VALUES (?, ?, ?, ?, ?)
-        ON CONFLICT(source_id) DO UPDATE SET
-            readiness = excluded.readiness,
-            descriptor_revision = excluded.descriptor_revision,
-            updated_at_ns = excluded.updated_at_ns,
-            request_id = excluded.request_id
-        """.strip(),
-        """
-        INSERT INTO data_audit_events (
-            event_id, timestamp, domain, action, principal_id,
-            request_id, correlation_id, causation_id, payload_json
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.strip(),
-    )
     try:
-        _execute_transaction_raw(
-            TransactionRequest(
-                plan=StatementPlan(
-                    statements=statements,
-                    parameter_sets=(
-                        (
-                            request.source_id,
-                            request.target_readiness,
-                            descriptor.revision,
-                            f"{observed_ns:019d}",
-                            request.request_id,
-                        ),
-                        (
-                            event_id,
-                            auth.issued_at.isoformat(),
-                            "data",
-                            "promote_source",
-                            auth.principal_id,
-                            request.request_id,
-                            auth.correlation_id,
-                            None,
-                            payload,
-                        ),
-                    ),
-                    max_rows=1,
-                ),
-                request_id=request.request_id,
-            )
+        update_source_state_with_audit(
+            (
+                request.source_id,
+                request.target_readiness,
+                descriptor.revision,
+                f"{observed_ns:019d}",
+                request.request_id,
+            ),
+            (
+                event_id,
+                auth.issued_at.isoformat(),
+                "data",
+                "promote_source",
+                auth.principal_id,
+                request.request_id,
+                auth.correlation_id,
+                None,
+                payload,
+            ),
+            request_id=request.request_id,
         )
     except DataError as error:
         raise DataError(

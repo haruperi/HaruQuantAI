@@ -45,8 +45,10 @@ execution decision.
   records examined.
 - Historical market/account data tables, local CSV/Parquet datasets, cache state,
   source policy, job/checkpoint state, feed status, and durable audit storage.
-- Shared SQLite connections, path-scoped write locking, and migration execution;
-  each persistent domain still owns its own tables and migration definitions.
+- Shared SQLite connections, path-scoped write locking, and migration execution.
+  Data-owned record SQL is centralized in `persistence/create.py`, `read.py`,
+  `update.py`, and `delete.py`; each other persistent domain still owns its tables,
+  CRUD package, and migration definitions.
 - Normalization of raw broker/provider reads (obtained through Brokers' `BrokerAdapter`
   read traits) into `MarketDataset`, `AccountStateSnapshot`,
   `MarketContextEvidence`, and `FXConversionEvidence`.
@@ -220,7 +222,7 @@ capabilities: sixteen business features and one foundational contract capability
 | Completed | `FEAT-DATA-09` Time and Session Handling | `time_sessions/` | Timeframe/schedule contracts, UTC policy, venue market hours, exchange/configured schedules, analytical named sessions, gap classification, and explicit context-required dashboard snapshot | `FR-DATA-034`, `FR-DATA-117`–`FR-DATA-122` | `tests/data/usage/features/09_time_sessions.py` |
 | Completed | `FEAT-DATA-10` Data Source Governance | `sources/` | Source contracts/protocol, registry/composition, policy/promotion, adapters, licensing, and read-only proxy | Section 4 source-governance requirements, allocated to this owner | `tests/data/usage/features/10_sources.py` |
 | Completed | `FEAT-DATA-11` Economic Calendar | `economic_calendar/` | Licensed Firecrawl acquisition, raw scraper contracts, exact-value normalization, approved persistence, symbol queries, restriction/state evidence, and explicit context-required dashboard snapshot through function-only package-root operations | `FR-DATA-095`–`099`, `FR-DATA-123`–`129` | `tests/data/usage/features/11_economic_calendar.py`; opt-in `tests/data/integration/test_economic_calendar_live.py` |
-| Completed | `FEAT-DATA-12` Real-Time Feed Lifecycle and Observability | `realtime_feeds/` | Feed contracts/state, buffer, heartbeat, reconnection, reconciliation, and status operations | Section 4 feed requirements, allocated to this owner | `tests/data/usage/features/12_realtime_feeds.py` |
+| Completed | `FEAT-DATA-12` Real-Time Feed Lifecycle and Market Streaming | `realtime_feeds/` | Feed lifecycle/status plus `build_market_stream_request` and `stream_market_data` for genuine MT5 tick and closed-bar streams | `FR-DATA-046`–`FR-DATA-048`, `FR-DATA-154`–`FR-DATA-157` | `tests/data/usage/features/12_realtime_feeds.py`; `tests/data/unit/test_market_streaming.py` |
 | Completed | `FEAT-DATA-13` Scheduler and Job Management | `data_jobs/` | Job/backfill/recovery contracts and create/start/stop/run/status/recovery operations | Section 4 job requirements, allocated to this owner | `tests/data/usage/features/13_data_jobs.py` |
 | Completed | `FEAT-DATA-14` Cross-Domain Evidence | `evidence/` | Market-context, FX-conversion, account-state, freshness contracts/providers, and public evidence operations | Section 4 normalized-evidence requirements, allocated to this owner | `tests/data/usage/features/14_evidence.py` |
 | Completed | `FEAT-DATA-15` Audit Evidence | `audit/` | Audit query/page/persistence contracts and authorized persist/query operations | Section 4 audit requirements, allocated to this owner | `tests/data/usage/features/15_audit.py` |
@@ -286,6 +288,7 @@ build_fx_rate_leg                  build_job_definition
 build_job_status_request           build_local_market_data_source
 build_market_context_evidence      build_market_context_request
 build_market_data_request          build_market_dataset
+build_market_stream_request
 build_market_hours_request         build_market_schedule
 build_migration_request
 build_migration_step                build_ohlcv_record
@@ -1515,9 +1518,13 @@ For `FEAT-DATA-09`, the package-root row is supplemented by the registered expor
 | `market_data/results.py` | Temporary market-data result contracts pending FEAT-DATA-02 migration. | `DataAvailability` | stdlib: __future__, collections, decimal, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.services.data.contracts.dataset`, `app.utils` |
 | `market_data/symbol_discovery.py` | Reference data and availability orchestration. | `VOLUME_RESPONSE_MODES`, `discover_symbols`, `fetch_historical_volume`, `fetch_symbol_metadata`, `get_data_availability`, `get_historical_volume`, `get_symbol_metadata`, `inspect_availability`, `list_symbols`, `symbol_list_request`, `symbol_metadata_request` | stdlib: __future__, datetime, decimal, json, typing<br>local: `app.services.data._settings`, `app.services.data.contracts`, `app.services.data.contracts.records`, `app.services.data.market_data.pipeline`, `app.services.data.market_data.requests`, `app.services.data.market_data.results`, `app.services.data.market_data.symbol_metadata`, `app.services.data.persistence.contracts`, `app.services.data.sources.composition`, `app.services.data.sources.contracts`, `app.services.data.sources.registry`, `app.utils` |
 | `market_data/symbol_metadata.py` | Symbol, schedule, session, and volume descriptor contracts. | `SymbolListRequest`, `SymbolMetadata`, `SymbolMetadataRequest`, `SymbolPage`, `VolumeRecord`, `VolumeResult`, `VolumeSummary` | stdlib: __future__, collections, datetime, decimal, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.utils` |
-| `persistence/__init__.py` | Shared DATA persistence infrastructure: SQLite, locks, migrations, files, cache. | `DATA_MIGRATION_STEPS`, `WriteLock`, `acquire_write_lock`, `clear_cache_entry`, `clear_data_cache`, `create_backup`, `describe_import_dialects`, `enforce_retention_policy`, `execute_transaction`, `get_cache_entry`, `import_external_dataset`, `load_dataset`, `load_local_dataset`, `put_cache_entry`, `restore_from_backup`, `run_data_migrations`, `run_domain_migrations`, `save_dataset`, `save_market_data` | local: `app.services.data.persistence.backup`, `app.services.data.persistence.cache`, `app.services.data.persistence.dataset_writer`, `app.services.data.persistence.external_import`, `app.services.data.persistence.locking`, `app.services.data.persistence.migrations`, `app.services.data.persistence.transactions` |
+| `persistence/__init__.py` | Private boundary for Data CRUD and shared SQLite, lock, migration, file, cache, and recovery infrastructure. | CRUD manager functions plus the established persistence operations | local: all `app.services.data.persistence` owner modules |
 | `persistence/backup.py` | Immutable approved-root backups, atomic restore, and raw-data retention. | `create_backup`, `enforce_retention_policy`, `restore_from_backup` | stdlib: __future__, collections, contextlib, datetime, hashlib, json, pathlib, shutil, time, typing<br>third-party: pydantic<br>local: `app.services.data.audit.store`, `app.services.data.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.dataset_writer`, `app.services.data.persistence.locking`, `app.utils` |
 | `persistence/cache.py` | Versioned, TTL-aware local SQLite caching. | `clear_cache_entry`, `clear_data_cache`, `get_cache_entry`, `put_cache_entry` | stdlib: __future__, collections, datetime, json, typing<br>third-party: pydantic<br>local: `app.services.data.contracts`, `app.services.data.contracts.validation`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.utils` |
+| `persistence/create.py` | Data-owned insert and append operations. | `create_*_record` managers for audit, feeds, source attempts, jobs, backfill, research sources/observations, and runtime stores | local: `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.utils` |
+| `persistence/read.py` | Data-owned bounded record queries. | `read_*_record(s)` managers for cache, audit, calendar, feeds, source policy, jobs, research sources/observations, and runtime stores | local: `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.utils` |
+| `persistence/update.py` | Data-owned updates and compound atomic transitions. | `update_*` managers for cache, calendar, feeds, source promotion/audit, jobs/backfills, research verification, and runtime-store CAS/transitions | local: `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.utils` |
+| `persistence/delete.py` | Data-owned delete operations. | `delete_cache_records` | local: `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.utils` |
 | `persistence/contracts.py` | Typed storage, transaction, migration, cache, and manifest contracts. | `CACHE_CLEAR_MAX_ENTRIES`, `CACHE_TTL_MAX_SECONDS`, `IMPORT_DIALECTS`, `_OHLC_COLUMN_COUNT`, `BackupManifest`, `BackupTarget`, `CacheClearRequest`, `CacheClearResult`, `CacheEntry`, `CacheReadRequest`, `CacheWriteRequest`, `CacheWriteResult`, `ColumnMapping`, `DatasetSaveRequest`, `ExternalImportRequest`, `MigrationRequest`, `MigrationResult`, `MigrationStep`, `RestoreReport`, `StatementPlan`, `StorageManifest`, `TransactionRequest`, `TransactionResult` | stdlib: __future__, collections, datetime, pathlib, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.services.data.contracts.dataset`, `app.utils` |
 | `persistence/dataset_writer.py` | Local dataset loading and atomic persistent storage. | `compute_file_hash`, `load_dataset`, `load_local_dataset`, `resolve_approved_storage_path`, `resolve_data_root`, `save_dataset`, `save_market_data` | stdlib: __future__, datetime, decimal, hashlib, json, math, pathlib, typing<br>third-party: pandas, pydantic<br>local: `app.services.data._settings`, `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.local_datasets.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.locking`, `app.utils` |
 | `persistence/external_import.py` | Explicit audited admission of externally produced market-data artifacts. | `describe_import_dialects`, `import_external_dataset` | stdlib: __future__, collections, datetime, decimal, pathlib, typing<br>third-party: pandas, pydantic<br>local: `app.services.data._settings`, `app.services.data.audit.store`, `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.persistence.contracts`, `app.services.data.persistence.dataset_writer`, `app.services.data.quality`, `app.utils` |
@@ -1532,9 +1539,12 @@ For `FEAT-DATA-09`, the package-root row is supplemented by the registered expor
 | `quality/policy.py` | Quality profiles, thresholds, and deterministic remediation mapping. | `QUALITY_BLOCKING_ISSUES`, `QUALITY_MIN_SCORE`, `QUALITY_PROFILE_THRESHOLDS`, `QUALITY_REMEDIATION`, `QUALITY_SEVERITY_WEIGHTS`, `QualityPolicy`, `get_quality_policy`, `summarize_quality_remediation` | stdlib: __future__, collections, decimal, typing<br>local: `app.services.data._settings`, `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.utils` |
 | `quality/scoring.py` | Private helpers shared by the quality detectors. | Internal only | stdlib: __future__, collections, typing<br>local: `app.services.data.contracts.dataset` |
 | `quality/series.py` | Series-level quality inspection, scoring, and status derivation. | `detect_timestamp_gaps`, `inspect_dataset_quality`, `inspect_records_quality`, `validate_tick_order` | stdlib: __future__, collections, datetime, decimal, itertools, typing<br>local: `app.services.data.contracts`, `app.services.data.contracts.dataset`, `app.services.data.contracts.records`, `app.services.data.quality.anomalies`, `app.services.data.quality.policy`, `app.services.data.quality.scoring`, `app.services.data.time_sessions.contracts`, `app.services.data.time_sessions.timeframes`, `app.utils` |
-| `realtime_feeds/__init__.py` | Internal feed runtime lifecycle and status API. | `ingest_feed_event`, `read_feed_status`, `reconcile_feed_gap`, `reconnect_feed`, `start_internal_feed` | stdlib: __future__<br>local: `app.services.data.realtime_feeds.buffer`, `app.services.data.realtime_feeds.reconnection`, `app.services.data.realtime_feeds.status` |
+| `realtime_feeds/__init__.py` | Feed lifecycle/status and Data-owned market-stream API. | `build_market_stream_request`, `ingest_feed_event`, `read_feed_status`, `reconcile_feed_gap`, `reconnect_feed`, `start_internal_feed`, `stream_market_data` | local: focused realtime-feed owner modules |
 | `realtime_feeds/buffer.py` | Bounded event buffering and gap reconciliation for internal feeds. | `ingest_feed_event`, `reconcile_feed_gap`, `start_internal_feed` | stdlib: __future__, collections, datetime, json, typing<br>local: `app.services.data.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.services.data.realtime_feeds.contracts`, `app.services.data.realtime_feeds.state`, `app.services.data.sources.registry`, `app.utils` |
-| `realtime_feeds/contracts.py` | Public bounded live-feed configuration, event, and status contracts. | `FeedConfig`, `FeedEventResult`, `FeedStatus`, `FeedStatusRequest`, `RawFeedEvent`, `ReconnectPolicy` | stdlib: __future__, collections, datetime, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.utils` |
+| `realtime_feeds/contracts.py` | Public bounded live-feed configuration, event, status, and market-stream contracts. | Internal contracts constructed/consumed through package-root functions | stdlib: __future__, collections, datetime, types, typing<br>third-party: pydantic<br>local: `app.services.data.contracts._base`, `app.utils` |
+| `realtime_feeds/mt5_ticks.py` | Poll genuine MT5 tick history with overlap deduplication and explicit saturated-batch gaps. | Internal only | Brokers package-root reads; Data source composition and tick contracts |
+| `realtime_feeds/mt5_bars.py` | Emit genuine newly closed MT5 bars at canonical UTC timeframe boundaries. | Internal only | Brokers package-root reads; Data timeframes and OHLCV contracts |
+| `realtime_feeds/subscriptions.py` | Validate requests and own shared sequencing, fan-out, heartbeat, resume, backpressure, and cleanup. | `build_market_stream_request`, `stream_market_data` | stdlib asyncio; Data stream contracts and MT5 producers |
 | `realtime_feeds/heartbeat.py` | Heartbeat observation for internal feeds. | Internal only | stdlib: __future__, datetime, typing<br>local: `app.services.data.realtime_feeds.state`, `app.utils` |
 | `realtime_feeds/reconnection.py` | Bounded reconnection with exponential backoff for internal feeds. | `reconnect_feed` | stdlib: __future__, collections, datetime, hashlib<br>local: `app.services.data.contracts`, `app.services.data.realtime_feeds.state`, `app.utils` |
 | `realtime_feeds/state.py` | The single registry of live internal feed state. | `ActiveFeed` | stdlib: __future__, collections, datetime, typing<br>local: `app.services.data.contracts`, `app.services.data.persistence.contracts`, `app.services.data.persistence.transactions`, `app.services.data.realtime_feeds.contracts`, `app.utils` |
@@ -1747,9 +1757,10 @@ usage programs.
 
 ### 4.2 `persistence/` and `audit/` — Durable State, Artifacts, and Audit Evidence
 
-**Purpose:** Provide the single safe SQLite, file, cache, lock, migration, import,
-and backup infrastructure while preserving each domain's schema ownership, and hold
-durable governed audit evidence behind an authorized bounded query.
+**Purpose:** Provide the single safe Data-owned CRUD boundary plus SQLite, file,
+cache, lock, migration, import, and backup infrastructure while preserving each
+domain's schema ownership, and hold durable governed audit evidence behind an
+authorized bounded query.
 
 `audit/` is a separate folder rather than a `persistence/` file because it owns a
 cross-domain contract (`AuditEventQuery` / `AuditEventPage`) with its own
@@ -2221,10 +2232,11 @@ through `FR-DATA-045`.
 
 ---
 
-### 4.7 `realtime_feeds/` — Internal Real-Time Feed Lifecycle
+### 4.7 `realtime_feeds/` — Real-Time Feed Lifecycle and Market Streaming
 
 **Purpose:** Normalize internal live events through bounded buffers and expose honest
-heartbeat, overflow, gap, reconnect, and breaker status without public streaming.
+status, while owning the canonical MT5 tick and closed-bar stream consumed by thin
+transport bridges.
 
 **Module flow:**
 
@@ -2233,6 +2245,11 @@ staging/production source event
   → normalize and buffer
   → heartbeat/gap/reconnect state
   → internal consumer and read-only status
+
+MT5 Brokers read capability
+  → Data canonical tick or closed OHLCV record
+  → shared bounded sequence/replay stream
+  → package-root async iterator
 ```
 
 ### Current inventory reference
@@ -2247,23 +2264,30 @@ See the authoritative current production-file inventory at the start of Section 
 | Completed | `FEED_OVERFLOW_POLICIES` | `tuple[str, ...]` | `halt, drop_and_reconcile, backpressure` | Yes | runtime | `drop_and_reconcile` records a gap only; no automatic backfill capability exists. |
 | Completed | `FEED_HEARTBEAT_TIMEOUT_SECONDS` | `int` | No shared default | Yes | runtime/status | Each feed supplies its positive timeout; status derives expiry without mutating state. |
 | Completed | `FEED_RECONNECT_POLICY` | `ReconnectPolicy` | No shared default | Yes | runtime | Each feed supplies bounded retry/backoff/cooldown values; exhaustion opens the circuit. |
+| Completed | `MARKET_STREAM_HUB_LIMIT` / `MARKET_STREAM_RESUME_WINDOW` / `MARKET_STREAM_QUEUE_SIZE` | `int` | `128` / `256` / `256` | Yes | market streaming | Bound retained stream keys, per-key replay history, and each subscriber queue. Inactive least-recently-used hubs are evicted before new admission. |
 
 #### Public feed runtime API
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-DATA-046` | Start one internal feed only for a declared live-capable staging/production source, persist initial state, and expose no public subscription handle. | `start_internal_feed(config: FeedConfig) -> FeedStatus` | Local state mutation; persistence write; External API call | `DataError[SOURCE_UNAVAILABLE|POLICY_BLOCKED|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/12_realtime_feeds.py::fr_data_046()`<br>**Unit:** `tests/data/unit/test_feeds.py` |
-| Completed | `FR-DATA-047` | Normalize each event, update heartbeat/counters, enforce bounded overflow, record gap windows/drops, and reconnect with bounded backoff without hidden historical repair. | `ingest_feed_event(feed_id: str, event: RawFeedEvent) -> FeedEventResult` | Local state mutation; persistence write | `DataError[BUFFER_OVERFLOW|DATA_DROPPED|FEED_HEARTBEAT_TIMEOUT]` | **Usage:** `tests/data/usage/12_realtime_feeds.py::fr_data_047()`<br>**Unit:** `tests/data/unit/test_feeds.py` |
-| Completed | `FR-DATA-048` | Return bounded feed ID/state, heartbeat/event times, depth/capacity, dropped/gap/reconnect counts, breaker state, drift, and last safe error from real runtime state. | `read_feed_status(request: FeedStatusRequest) -> FeedStatus` | Read-only | `DataError[DATA_NOT_FOUND|DATABASE_ERROR]` | **Usage:** `tests/data/usage/12_realtime_feeds.py::fr_data_048()`<br>**Unit:** `tests/data/unit/test_feeds.py` |
+| Completed | `FR-DATA-046` | Start one internal feed only for a declared live-capable staging/production source, persist initial state, and expose no public subscription handle. | `start_internal_feed(config: FeedConfig) -> FeedStatus` | Local state mutation; persistence write; External API call | `DataError[SOURCE_UNAVAILABLE|POLICY_BLOCKED|VALIDATION_FAILED]` | **Usage:** `tests/data/usage/features/12_realtime_feeds.py::fr_data_046()`<br>**Unit:** `tests/data/unit/test_feeds.py` |
+| Completed | `FR-DATA-047` | Normalize each event, update heartbeat/counters, enforce bounded overflow, record gap windows/drops, and reconnect with bounded backoff without hidden historical repair. | `ingest_feed_event(feed_id: str, event: RawFeedEvent) -> FeedEventResult` | Local state mutation; persistence write | `DataError[BUFFER_OVERFLOW|DATA_DROPPED|FEED_HEARTBEAT_TIMEOUT]` | **Usage:** `tests/data/usage/features/12_realtime_feeds.py::fr_data_047()`<br>**Unit:** `tests/data/unit/test_feeds.py` |
+| Completed | `FR-DATA-048` | Return bounded feed ID/state, heartbeat/event times, depth/capacity, dropped/gap/reconnect counts, breaker state, drift, and last safe error from real runtime state. | `read_feed_status(request: FeedStatusRequest) -> FeedStatus` | Read-only | `DataError[DATA_NOT_FOUND|DATABASE_ERROR]` | **Usage:** `tests/data/usage/features/12_realtime_feeds.py::fr_data_048()`<br>**Unit:** `tests/data/unit/test_feeds.py` |
+| Completed | `FR-DATA-154` | Validate an MT5 stream request with exact provider symbol, `bars` or `ticks` mode, canonical timeframe, request identity, and optional non-negative resume sequence. The timeframe is presentation context in tick mode and never throttles delivery. | `build_market_stream_request(**values) -> object` | None | `DataError[UNSUPPORTED_TIMEFRAME]`; validation error | **Usage:** `tests/data/usage/features/12_realtime_feeds.py::fr_data_154_157()`<br>**Unit:** `tests/data/unit/test_market_streaming.py` |
+| Completed | `FR-DATA-155` | In tick mode, emit every tick returned by MT5 independent of timeframe using bounded 50 ms polling of the verified Brokers tick-read contract; remove read-window overlap without collapsing genuine identical same-timestamp ticks, and terminate with `DATA_DROPPED` when a saturated batch makes completeness unprovable. | `stream_market_data(request: object) -> AsyncIterator[object]` | External read; bounded async state | `DataError[SOURCE_UNAVAILABLE|DATA_DROPPED]` | **Usage:** `tests/data/usage/features/12_realtime_feeds.py::fr_data_154_157()`<br>**Unit:** `tests/data/unit/test_market_streaming.py` |
+| Completed | `FR-DATA-156` | In bars mode, emit the latest genuine closed MT5 bar and then one newly closed bar at each selected UTC timeframe boundary (for example M1, M5, and H1), never a partial or fabricated bar. | `stream_market_data(request: object) -> AsyncIterator[object]` | External read; bounded async state | `DataError[SOURCE_UNAVAILABLE|DATA_QUALITY_FAILED]` | **Usage:** `tests/data/usage/features/12_realtime_feeds.py::fr_data_154_157()`<br>**Unit:** `tests/data/unit/test_market_streaming.py` |
+| Completed | `FR-DATA-157` | Share one provider producer per exact stream key, assign monotonic sequence/cursor values, emit 15-second heartbeats, retain 256 events for resume, terminate slow consumers with an explicit gap, cancel provider work when the final subscriber disconnects, and bound retained hubs to 128 with inactive least-recently-used eviction. | `stream_market_data(request: object) -> AsyncIterator[object]` | Bounded in-memory state; external read | `DataError[STATE_RECOVERY_FAILED|DATA_DROPPED|SOURCE_UNAVAILABLE|LIMIT_EXCEEDED]` | **Usage:** `tests/data/usage/features/12_realtime_feeds.py::fr_data_154_157()`<br>**Unit:** `tests/data/unit/test_market_streaming.py` |
 
-**Implementation notes:** Replace V1 mock registration/counters. Do not add a
-composite health score or public subscription surface. Minimum source/consumer and numeric
-buffer, heartbeat, and reconnect values are informational baselines until measured evidence supports binding gates.
+**Implementation notes:** MT5's verified Python integration is pull-based: it exposes
+tick-copy and bar-copy reads, not a provider callback/WebSocket. Data therefore polls
+through the Brokers public read boundary and never invents a WebSocket transport. Do
+not add a composite health score. Numeric buffer, heartbeat, and reconnect values are
+bounded implementation policy.
 
 ### Feature usage examples
 
-`tests/data/usage/12_realtime_feeds.py` contains one demonstration for each `FR-DATA-046`
-through `FR-DATA-048`.
+`tests/data/usage/features/12_realtime_feeds.py` demonstrates `FR-DATA-046` through
+`FR-DATA-048` and `FR-DATA-154` through `FR-DATA-157`.
 
 ---
 
@@ -2416,8 +2440,9 @@ the focused unit and integration suites.
 
 ### Shared Configuration and Limits Manifest
 
-`app/services/data/_settings.py` owns immutable `DataSettings`, loads it only
-through `app.utils.AppSettings`, and provides a context-local explicit profile for
+`app/services/data/_settings.py` owns immutable `DataSettings`, loads central
+`app/configs/env.json` and process overrides only through `app.utils.AppSettings`,
+and provides a context-local explicit profile for
 isolated tests and usage scripts. DATA production modules never parse `.env` files or
 read `os.environ` directly. Missing or invalid required settings are translated to the
 documented fail-closed `DataError` at the feature boundary.
@@ -2434,7 +2459,7 @@ their owning manifests.
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Completed | `DATABASE_URL` / `DATA_DIR` | `str` / `Path` | None | Yes | persistence, sources, retrieval, scheduler, feeds | Shared connection/artifact-root configuration owned by `DataSettings`, loaded through Utils, and validated by Data. |
+| Completed | `DATABASE_URL` / `DATA_DIR` | `str` / `Path` | None | Yes | persistence, sources, retrieval, scheduler, feeds | Bootstrap connection/artifact-root configuration owned by `DataSettings`, loaded from central JSON/process sources through Utils before any database settings row can be reached, and validated by Data. Evidence: `tests/data/unit/test_settings.py`. |
 | Completed | `NORMALIZATION_VERSION` | `str` | `v1` | Yes | all data-producing modules | Change invalidates cache and incompatible persisted artifacts. |
 | Completed | Feature-owned bounds | typed constants/request fields | Values in Section 4 manifests | Yes | access, processing, jobs, feeds, API | Bounds are validated by their owning feature before allocation, provider access, or mutation. |
 | Completed | Precision policy | contract metadata plus exact `Decimal` | `decimal_string` at governed boundaries | Yes | contracts, access, processing, storage, API | Non-finite and unsafe values fail; deterministic synthetic quantization uses `ROUND_HALF_EVEN`. |
@@ -2475,7 +2500,7 @@ The focused inventory includes unit, integration/workflow, and exactly 16 direct
 executable feature usage programs. Unit tests may import internals;
 integration and usage evidence imports the Data domain through `app.services.data` only.
 
-- **Unit:** `test_account_state.py`, `test_api.py`, `test_audit.py`, `test_backfill.py`, `test_backup.py`, `test_base.py`, `test_broker_contract.py`, `test_calendar_scraper.py`, `test_contract_snapshot.py`, `test_dataset.py`, `test_errors.py`, `test_evidence_fx.py`, `test_evidence_market_context.py`, `test_external_source.py`, `test_feed_state_single_owner.py`, `test_feeds.py`, `test_file_io.py`, `test_focused_boundaries.py`, `test_gaps.py`, `test_historical_access.py`, `test_import_graph.py`, `test_licensing.py`, `test_limits.py`, `test_local_source.py`, `test_market_data_facade.py`, `test_persistence_cache.py`, `test_persistence_import_artifacts.py`, `test_persistence_isolation.py`, `test_persistence_locking.py`, `test_persistence_migrations.py`, `test_quality.py`, `test_records.py`, `test_reference_access.py`, `test_retrieval_sources.py`, `test_scheduler.py`, `test_source_composition.py`, `test_source_contract_identity.py`, `test_source_policy.py`, `test_source_registry.py`, `test_sqlite.py`, `test_synthetic.py`, `test_tabular.py`, `test_ticks.py`, `test_transformation.py`
+- **Unit:** `test_account_state.py`, `test_api.py`, `test_audit.py`, `test_backfill.py`, `test_backup.py`, `test_base.py`, `test_broker_contract.py`, `test_calendar_scraper.py`, `test_contract_snapshot.py`, `test_dataset.py`, `test_errors.py`, `test_evidence_fx.py`, `test_evidence_market_context.py`, `test_external_source.py`, `test_feed_state_single_owner.py`, `test_feeds.py`, `test_file_io.py`, `test_focused_boundaries.py`, `test_gaps.py`, `test_historical_access.py`, `test_import_graph.py`, `test_licensing.py`, `test_limits.py`, `test_local_source.py`, `test_market_data_facade.py`, `test_persistence_cache.py`, `test_persistence_crud_layout.py`, `test_persistence_import_artifacts.py`, `test_persistence_isolation.py`, `test_persistence_locking.py`, `test_persistence_migrations.py`, `test_quality.py`, `test_records.py`, `test_reference_access.py`, `test_retrieval_sources.py`, `test_scheduler.py`, `test_source_composition.py`, `test_source_contract_identity.py`, `test_source_policy.py`, `test_source_registry.py`, `test_sqlite.py`, `test_synthetic.py`, `test_tabular.py`, `test_ticks.py`, `test_transformation.py`
 - **Integration/workflow:** `test_audit_event_handoff.py`, `test_broker_boundary.py`, `test_calendar.py`, `test_contract_boundaries.py`, `test_database_boundary.py`, `test_external_import.py`, `test_historical_retrieval.py`, `test_local_source_retrieval.py`, `test_locking_boundary.py`, `test_research_source_persistence.py`, `test_usage_scripts.py`, `test_workflow_runtime.py`
 - **Usage:** `01_contracts.py`, `02_market_data.py`, `03_local_datasets.py`, `04_synthetic_data.py`, `05_tick_derivation.py`, `06_persistence.py`, `07_quality.py`, `08_transformation.py`, `09_time_sessions.py`, `10_sources.py`, `11_economic_calendar.py`, `12_realtime_feeds.py`, `13_data_jobs.py`, `14_evidence.py`, `15_audit.py`, `16_research_sources.py`
 
@@ -2644,6 +2669,10 @@ registration is explicit and allowlisted; arbitrary imports and pickle are prohi
 | Completed | `FR-DATA-148` | Encode and decode only explicitly registered runtime value kinds; prohibit pickle, arbitrary imports, and silent type substitution. | codec registry validation | None | `TypeError`, `ValueError`: unsafe or unknown codec/value | `tests/data/unit/test_runtime_store_codecs.py` |
 | Completed | `FR-DATA-149` | Bound namespaces, keys, collections, list sizes, and serialized payloads while preventing secret-bearing field names from persistence or errors. | runtime-store validation | None | `ValueError`: unsafe or unbounded input | `tests/data/unit/test_runtime_store_codecs.py` |
 | Completed | `FR-DATA-150` | Apply the immutable runtime-store schema through Data's migration ledger, checksum verification, write lock, and transaction rules. | `run_runtime_store_migrations(request_id: str) -> object` | Schema migration | `DataError`: migration failure | `tests/data/integration/test_runtime_store_persistence.py` |
+| Completed | `FR-DATA-151` | Data-owned schema definitions shall reside in `app/services/data/migrations/`; the migration runner, ledger, checksum comparison, and write-lock acquisition remain in `app/services/data/persistence/` under the shared-infrastructure exemption. The runtime-record table shall be named `data_runtime_records` under the ratified `data_` namespace and registered under the `data` ledger domain. | `run_runtime_store_migrations(request_id: str) -> object` | Schema migration | `DataError`: migration failure | `tests/data/integration/test_runtime_store_persistence.py` |
+| Completed | `FR-DATA-152` | Every Data research-source and runtime table shall carry `created_at`, `request_id`, and `correlation_id`, so an externally sourced document or runtime record is traceable to the operation that admitted it. | Schema definition only | None | None | `tests/data/integration/test_database_boundary.py` |
+| Completed | `FR-DATA-153` | Data schema definitions and the migration runner shall be separated: `app/services/data/migrations/` owns Data's own table definitions, while ledger initialisation, checksum comparison, write-lock acquisition, and step application remain in `app/services/data/persistence/` under the shared-infrastructure exemption. The definitions package shall not re-export the runtime-store runner, so importing the runner cannot initialise a package that imports the runner back. | `DATA_MIGRATION_STEPS`, `run_domain_migrations`, `run_data_migrations` | Schema migration | `DataError`: migration failure | `tests/data/integration/test_database_boundary.py` |
+| Completed | `FR-DATA-158` | A migration request declared as a complete domain manifest shall fail closed when the ledger contains an applied migration ID absent from that manifest; partial manifests remain supported for explicitly incremental callers. Data's complete runner includes every registered Data step in canonical order, including `005-runtime-records`, so its separately callable feature runner cannot become an orphan. | `MigrationRequest.complete_manifest`, `run_domain_migrations` | Ledger read; no schema mutation on mismatch | `DataError[SCHEMA_MIGRATION_FAILED]` | `tests/data/unit/test_persistence_migrations.py::test_complete_manifest_rejects_orphaned_applied_step()`; `tests/data/unit/test_economic_calendar_migration.py::test_run_data_migrations_is_idempotent_on_re_run()` |
 
 Provider coverage is deliberately governed rather than inferred from public
 availability. SEC EDGAR, BLS, BEA, EIA, Treasury Fiscal Data, CFTC COT, GDELT
