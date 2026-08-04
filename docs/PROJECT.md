@@ -1281,6 +1281,142 @@ Rules:
 - Environment-specific configuration differences belong in Section 6 or the owning domain README.
 - If the topology diverges (e.g., the Trading runtime is split into its own process), update this section and re-verify Section 6 profile/route gating.
 
+### 9.1 Domain Status
+
+The audit matrix is the system-level record of per-domain conformance. It is
+organised in two tiers. Tier 1 dimensions are mechanically decidable and are
+swept by `scripts/audit_check.py`. Tier 2 dimensions require owner judgement and
+are assessed by review. Rows are audit objects, not only packages: rows `0`,
+`15`, `16`, and `17` cover the system, configuration, frontend, and schema-model
+surfaces that no domain row would otherwise carry.
+
+#### Audit rows
+
+| Row | Audit object | Location |
+| --- | --- | --- |
+| 0. System | Cross-domain workflows `SYS-WF-001`–`012` | `tests/system/` |
+| 1. Utils | Domain package | `app/utils` |
+| 2. Brokers | Domain package | `app/services/brokers` |
+| 3. Data | Domain package | `app/services/data` |
+| 4. Indicators | Domain package | `app/services/indicators` |
+| 5. Strategy | Domain package | `app/services/strategy` |
+| 6. Risk | Domain package | `app/services/risk` |
+| 7. Trading | Domain package | `app/services/trading` |
+| 8. Simulator | Domain package | `app/services/simulator` |
+| 9. Analytics | Domain package | `app/services/analytics` |
+| 10. Optimization | Domain package | `app/services/optimization` |
+| 11. Research | Domain package | `app/services/research` |
+| 12. Portfolio | Domain package | `app/services/portfolio` |
+| 13. Agentic | Orchestration domain package | `app/agentic` |
+| 14. UI-API | Domain package | `app/services/api` |
+| 15. Configs | Shared configuration and limits manifest (Section 6) | `app/configs` |
+| 16. UI | Frontend application | `app/ui` |
+| 17. Schema Model | Target schema and reconciliation | `docs/schema/` |
+
+#### Status legend
+
+| Symbol | Meaning |
+| :-: | --- |
+| `[ ]` | Not yet assessed |
+| `OK` | Conformant; evidence recorded |
+| `~` | Partially conformant; deviation is documented and bounded |
+| `X` | Non-conformant; remediation required |
+| `?` | Static analysis inconclusive; requires manual resolution |
+| `-` | Not applicable to this row |
+
+#### Tier 1 — mechanical conformance
+
+Swept by `uv run python scripts/audit_check.py`. Advisory: the sweep never
+fails a build, and its output is not itself evidence until recorded here.
+
+| Row | REG | GATE | FUNC | DEEP | ROOT | USE | WFE | UT | IT | COV | HYG | Evidence |
+| --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | --- |
+| 0. System | - | - | - | - | - | [ ] | [ ] | [ ] | [ ] | - | - | |
+| 1. Utils | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 2. Brokers | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 3. Data | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 4. Indicators | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 5. Strategy | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 6. Risk | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 7. Trading | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 8. Simulator | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 9. Analytics | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 10. Optimization | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 11. Research | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 12. Portfolio | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 13. Agentic | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 14. UI-API | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 15. Configs | - | - | - | - | - | - | - | - | - | - | [ ] | |
+| 16. UI | - | - | - | - | - | - | - | [ ] | [ ] | [ ] | - | |
+| 17. Schema Model | - | - | - | - | - | - | - | - | - | - | - | |
+
+Tier 1 dimension definitions:
+
+| Code | Dimension | Rule source |
+| --- | --- | --- |
+| `REG` | Feature Registry reconciliation: README-registered `FEAT-[DOM]-NN` IDs equal production feature module folders, applying the documented Reconciliation Exclusions | `AGENTS.md` §1 |
+| `GATE` | Package-Root Export Gate: `app/services/[DOMAIN]/__init__.py` declares a literal `__all__` and is the sole public boundary | `AGENTS.md` §1 |
+| `FUNC` | Function-Only Public API Surface: every `__all__` entry resolves to a standalone function, not a class or constant | `AGENTS.md` §1 |
+| `DEEP` | No Deep Cross-Domain Imports by production services, usage examples, workflow scripts, and integration tests | `AGENTS.md` §1 |
+| `ROOT` | Root-file Rule: package root holds only `__init__.py`, `_settings.py`, `_limits.py`, `py.typed` | `AGENTS.md` §1 |
+| `USE` | One numbered usage program per registered feature | `AGENTS.md` §2, Section 11 |
+| `WFE` | One stage-labelled program per active `WF-[DOM]-NNN`, plus `run_all.py` | Section 11 |
+| `UT` | Unit tests present in the owning domain | Section 11 |
+| `IT` | Integration tests present | Section 11 |
+| `COV` | Coverage at or above the 80% floor | `AGENTS.md` §2 |
+| `HYG` | No bare `except`, no `print` in application code, no literal credential patterns | `AGENTS.md` §2, §3 |
+
+#### Tier 2 — reviewed conformance
+
+Assessed by owner review. No mechanical proxy exists for these dimensions; a
+cell may only be set from a recorded review with `path:line` evidence.
+
+| Row | DB | SCHEMA | CONTRACT | LOG | SAFE | QUANT | NFR | DOCS | UI | Evidence |
+| --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | --- |
+| 0. System | - | - | [ ] | - | [ ] | [ ] | [ ] | [ ] | - | |
+| 1. Utils | - | - | [ ] | [ ] | [ ] | - | [ ] | [ ] | [ ] | |
+| 2. Brokers | - | - | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 3. Data | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 4. Indicators | - | - | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 5. Strategy | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 6. Risk | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 7. Trading | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 8. Simulator | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 9. Analytics | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 10. Optimization | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 11. Research | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 12. Portfolio | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 13. Agentic | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 14. UI-API | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 15. Configs | - | - | [ ] | - | [ ] | - | - | [ ] | [ ] | |
+| 16. UI | - | - | [ ] | [ ] | [ ] | - | [ ] | [ ] | [ ] | |
+| 17. Schema Model | [ ] | [ ] | - | - | - | - | [ ] | [ ] | - | |
+
+Tier 2 dimension definitions:
+
+| Code | Dimension | Rule source |
+| --- | --- | --- |
+| `DB` | Migrations run through the authoritative manifest with ledger verification, write locks, checksum validation, and transactional execution | `AGENTS.md` §5 |
+| `SCHEMA` | Target-vs-live reconciliation is current; divergences between `docs/schema/` and applied migrations are stated | `AGENTS.md` §4 |
+| `CONTRACT` | Shared contracts are documented, owned, versioned, and covered by producer–consumer compatibility tests | Section 5 |
+| `LOG` | `logger` used at workflow boundaries, public entry points, external interactions, state transitions, side effects, decisions, retries, and failures, with no secret exposure | `AGENTS.md` §2 |
+| `SAFE` | Fail-closed under uncertainty, non-bypassable kill switch, no live action by default, environment boundaries enforced, credential hygiene | `AGENTS.md` §3 |
+| `QUANT` | No lookahead bias, deterministic and seeded stochastic paths, reproducible backtests, no invented results, fills, or performance | `AGENTS.md` §3 |
+| `NFR` | Declared performance and latency budgets met; unit tests within the 100 ms ceiling | `AGENTS.md` §1 |
+| `DOCS` | Owning README, `docs/ARCHITECTURE.md`, and `docs/CHANGELOG.md` current; no resolved rows retained in `Open Decisions` | `AGENTS.md` §4 |
+| `UI` | Domain capability reachable through the UI-API boundary and surfaced in the frontend | Section 5 |
+
+#### Recording rules
+
+- A cell moves off `[ ]` only when supported by evidence recorded in the row's
+  `Evidence` column as `path:line`, per `AGENTS.md` §4 Checklist Evidence.
+- `scripts/audit_check.py` output is advisory input, not evidence. A sweep run
+  under an interpreter that failed to parse any source file is void.
+- Tier 1 `-` cells are fixed by row kind. Tier 2 `-` cells record that the
+  dimension does not apply to that audit object and require no evidence.
+- This matrix records conformance. It does not restate feature status, which
+  remains owned by the `### Feature Registry` of each package README.
+
 ---
 
 ## 10. System Usage
@@ -1316,6 +1452,8 @@ uv run python tests/[domain]/usage/NN_[feature].py
 uv run ruff check app
 uv run ruff format --check app
 uv run mypy app
+
+uv run python scripts/audit_check.py
 ```
 
 ### Verification rules
@@ -1334,6 +1472,8 @@ uv run mypy app
   active workflow inventory directly.
 - System integration tests verify collaboration across domains; every `SYS-WF-*` workflow must have at least one.
 - Shared contracts must have producer–consumer compatibility tests when needed.
+- `scripts/audit_check.py` sweeps the Tier 1 architecture conformance dimensions
+  recorded in Section 9.1. It is advisory and always exits 0; it never gates CI.
 
 Detailed verification content: `Missing` (implementation has not begun).
 

@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+### Establish two-tier system audit matrix
+
+Domain status becomes an evidence-backed conformance record spanning architecture,
+safety, and quant-correctness dimensions, with an advisory sweep for the
+mechanically decidable subset.
+
+#### Added (2)
+
+- Added `scripts/audit_check.py`, an advisory Tier 1 sweep reporting registry, boundary, import, structure, evidence, test, coverage, and hygiene conformance per domain.
+- Added an eighteen-row two-tier audit matrix that covers the system, configuration, frontend, and schema-model surfaces alongside the fourteen domains.
+
+#### Changed (1)
+
+- Changed Section 9.1 domain status from six existence checkboxes to twenty conformance dimensions requiring recorded `path:line` evidence.
+
 ### Unify user and system settings persistence
 
 UI/API now owns one scoped settings store while central typed configuration remains
