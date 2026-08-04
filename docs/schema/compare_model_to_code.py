@@ -45,6 +45,7 @@ _CODE_MODULES = (
 _CONCAT_MODULES = (
     ("app/services/research/migrations/definitions.py", "research_artifacts"),
     ("app/services/simulator/migrations/definitions.py", "sim_runs"),
+    ("app/services/simulator/migrations/definitions.py", "sim_sessions"),
 )
 
 # Existence is a broader question than column-level conformance. The modules
@@ -150,14 +151,14 @@ def _code_tables() -> dict[str, set[str]]:
     for relative, table in _CONCAT_MODULES:
         source = (_ROOT / relative).read_text(encoding="utf-8")
         joined = "".join(re.findall(r'"([^"]*)"', source))
-        match = re.search(
+        table_match = re.search(
             rf"CREATE TABLE IF NOT EXISTS {table} \((.*?)\) STRICT", joined, re.DOTALL
         )
-        if match is None:
+        if table_match is None:
             continue
         tables[table] = {
             entry.split()[0]
-            for entry in _split_top_level(match.group(1))
+            for entry in _split_top_level(table_match.group(1))
             if not _CONSTRAINT.match(entry) and entry.split()[0].isidentifier()
         }
     return tables

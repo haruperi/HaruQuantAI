@@ -70,6 +70,7 @@ from app.services.optimization.search.sweep import (
 )
 from app.services.optimization.state.artifacts import build_optimization_artifact_path
 from app.services.optimization.state.persistence import persist_optimization_result
+from app.services.optimization.state.read import load_optimization_result
 from app.services.optimization.state.stores import (
     load_search_checkpoint,
     save_search_checkpoint,
@@ -162,6 +163,7 @@ __all__ = (
     "get_optimization_value_field",
     "is_optimization_value",
     "iter_grid_candidates",
+    "load_optimization_result",
     "load_search_checkpoint",
     "parameter_space_hash",
     "persist_optimization_result",

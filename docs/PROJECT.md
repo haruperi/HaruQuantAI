@@ -362,11 +362,11 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 #### 2.1.14 UI/API
 
 * **Package**: `app/services/api` (FastAPI gateway) + `ui/` (Next.js frontend) — one logical domain implemented by two deployable packages.
-* **Responsibility**: Expose the system to users and clients through authenticated HTTP interfaces and frontend views. Backend v1 delegates exactly 32 operations covering auth/session identity, health, settings, symbols, Data-owned market streaming, Strategy reads, synchronous Simulation, Risk reads, non-production Trading, Research, dashboards, operator evidence/approvals, and metrics.
+* **Responsibility**: Expose the system to users and clients through authenticated HTTP interfaces and frontend views. Backend v1 delegates exactly 55 operations, including completed-run Simulation journal playback sessions, through composed owner-domain boundaries.
 * **Inputs**: HTTP and SSE connections, client payloads, authenticated principals.
 * **Outputs**: HTTP responses, SSE events, views/DTOs, `AuthContext` propagated to downstream domains.
 * **Owns**: Routes, HTTP wrappers, frontend views and client stores, auth/authz enforcement, password hashing, credential encryption/persistence, active-key selection, composition-root credential-reference resolution, DTO translation, operational telemetry recording through explicitly injected sinks, metric-label hygiene, the Prometheus exposition surface, and clock-drift readiness diagnostics.
-* **Boundaries**: Pure presentation/delegation layer with zero inline trading, risk, strategy, analytics, research, or market-stream acquisition logic. The canonical backend-v1 graph binds owner-authored dashboard/audit/event/market-stream reads, synchronous Simulator operations, Risk state reads, and Trading projections/mutations. Dataset preparation, Strategy mutations, interactive Simulation, production-capital execution, Optimization, Portfolio, Agentic, operator kill-switch, and duplicate operator-readiness HTTP routes remain excluded until exact owner contracts and runtime composition exist. Operational telemetry and SSE handling are transport only. Encryption keys are supplied by deployment configuration; UI/API does not generate, persist, or rotate them.
+* **Boundaries**: Pure presentation/delegation layer with zero inline trading, risk, strategy, analytics, research, or market-stream acquisition logic. The canonical backend-v1 graph binds owner-authored reads, synchronous Simulator operations, completed-run journal playback sessions, and the registered Risk, Trading, Optimization, Portfolio, and Agentic bridges. Dataset preparation, Strategy mutations, live Simulation mutation/what-if, production-capital execution, operator kill-switch, and duplicate operator-readiness HTTP routes remain excluded. Portfolio activation, rollback, drift, rebalance, and measurement operations remain pending because their intermediate evidence and review objects are not yet HTTP-producible through the Portfolio public boundary. Operational telemetry and SSE handling are transport only. Encryption keys are supplied by deployment configuration; UI/API does not generate, persist, or rotate them.
 * **Key Limits**: List endpoints paginated; endpoint timeouts; preflight warnings expire.
 * **Documentation**: `app/services/api/README.md`
 
@@ -1283,12 +1283,7 @@ Rules:
 
 ### 9.1 Domain Status
 
-The audit matrix is the system-level record of per-domain conformance. It is
-organised in two tiers. Tier 1 dimensions are mechanically decidable and are
-swept by `scripts/audit_check.py`. Tier 2 dimensions require owner judgement and
-are assessed by review. Rows are audit objects, not only packages: rows `0`,
-`15`, `16`, and `17` cover the system, configuration, frontend, and schema-model
-surfaces that no domain row would otherwise carry.
+The audit matrix is the system-level record of per-domain conformance.
 
 #### Audit rows
 
@@ -1326,27 +1321,25 @@ surfaces that no domain row would otherwise carry.
 
 #### Tier 1 — mechanical conformance
 
-Swept by `uv run python scripts/audit_check.py`. Advisory: the sweep never
-fails a build, and its output is not itself evidence until recorded here.
 
-| Row | REG | GATE | FUNC | DEEP | ROOT | USE | WFE | UT | IT | COV | HYG | Evidence |
-| --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | --- |
-| 0. System | - | - | - | - | - | [ ] | [ ] | [ ] | [ ] | - | - | |
-| 1. Utils | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 2. Brokers | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 3. Data | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 4. Indicators | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 5. Strategy | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 6. Risk | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 7. Trading | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 8. Simulator | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 9. Analytics | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 10. Optimization | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 11. Research | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 12. Portfolio | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 13. Agentic | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 14. UI-API | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 15. Configs | - | - | - | - | - | - | - | - | - | - | [ ] | |
+| Row | REG | TASK | GATE | FUNC | DEEP | ROOT | USE | WFE | UT | IT | COV | HYG | Evidence |
+| --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | --- |
+| 0. System | - | [ ] | - | - | - | - | [ ] | [ ] | [ ] | [ ] | - | - | |
+| 1. Utils | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | REG `app/utils/README.md:122`; TASK `app/utils/README.md:880`; GATE `app/utils/__init__.py:57`; FUNC `app/utils/__init__.py:57`; DEEP `app/services/data/_settings.py:18`; ROOT `app/utils/__init__.py:1`; USE `tests/utils/integration/test_usage_scripts.py:7`; WFE `tests/utils/usage/workflows/run_all.py:10`; UT `tests/utils/unit/test_logger.py:1`; IT `tests/utils/integration/test_import_safety.py:14`; COV `app/utils/README.md:872`; HYG `tests/utils/unit/test_boundaries.py:171` |
+| 2. Brokers | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 3. Data | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 4. Indicators | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 5. Strategy | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 6. Risk | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 7. Trading | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 8. Simulator | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 9. Analytics | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 10. Optimization | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 11. Research | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 12. Portfolio | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 13. Agentic | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 14. UI-API | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 15. Configs | - | [ ] | - | - | - | - | - | - | - | - | [ ] | [ ] |
 | 16. UI | - | - | - | - | - | - | - | [ ] | [ ] | [ ] | - | |
 | 17. Schema Model | - | - | - | - | - | - | - | - | - | - | - | |
 
@@ -1368,13 +1361,10 @@ Tier 1 dimension definitions:
 
 #### Tier 2 — reviewed conformance
 
-Assessed by owner review. No mechanical proxy exists for these dimensions; a
-cell may only be set from a recorded review with `path:line` evidence.
-
 | Row | DB | SCHEMA | CONTRACT | LOG | SAFE | QUANT | NFR | DOCS | UI | Evidence |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | --- |
 | 0. System | - | - | [ ] | - | [ ] | [ ] | [ ] | [ ] | - | |
-| 1. Utils | - | - | [ ] | [ ] | [ ] | - | [ ] | [ ] | [ ] | |
+| 1. Utils | - | - | OK | OK | OK | OK | OK | OK | - | CONTRACT `tests/utils/integration/test_auth_context_compatibility.py:1`; LOG `tests/utils/integration/test_structured_logging.py:12`; SAFE `app/utils/settings/models.py:258`; QUANT `app/utils/README.md:754`; NFR `app/utils/README.md:882`; DOCS `docs/CHANGELOG.md:5` |
 | 2. Brokers | - | - | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 3. Data | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 4. Indicators | - | - | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |

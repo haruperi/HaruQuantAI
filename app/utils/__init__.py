@@ -40,7 +40,12 @@ from app.utils.security import (
     redact_text_value,
 )
 from app.utils.serialization import canonical_digest, canonical_json, to_json_safe
-from app.utils.settings import load_broker_provider_settings, load_settings
+from app.utils.settings import (
+    get_app_settings_model_config,
+    get_app_settings_sources,
+    load_broker_provider_settings,
+    load_settings,
+)
 from app.utils.time import (
     age_seconds,
     format_utc_timestamp,
@@ -63,6 +68,8 @@ __all__ = (
     "flush_logging",
     "format_utc_timestamp",
     "generate_id",
+    "get_app_settings_model_config",
+    "get_app_settings_sources",
     "get_audit_event_type",
     "get_auth_context_type",
     "get_common_error_catalog",

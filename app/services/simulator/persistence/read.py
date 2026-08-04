@@ -79,4 +79,57 @@ def read_result_record(store: object, run_id: str) -> object | None:
     return _require_store(store).result_decoder(str(row["result_payload"]))
 
 
-__all__ = ["read_result_record", "read_run_record"]
+def read_completed_run_record(store: object, run_id: str) -> bool:
+    """Return whether a completed canonical run exists.
+
+    Args:
+        store: Opaque Simulator persistence handle.
+        run_id: Canonical run identity.
+
+    Returns:
+        Whether the run exists in completed state.
+    """
+    _require_store(store)
+    return (
+        _one_row(
+            "SELECT run_id FROM sim_runs WHERE run_id=? AND status='completed'",
+            (run_id,),
+        )
+        is not None
+    )
+
+
+def read_session_record(store: object, session_id: str) -> Mapping[str, object] | None:
+    """Read one Simulator playback session.
+
+    Args:
+        store: Opaque Simulator persistence handle.
+        session_id: Stable playback-session identity.
+
+    Returns:
+        Normalized session row or ``None``.
+    """
+    _require_store(store)
+    row = _one_row(
+        "SELECT session_id, run_id, status, cursor, created_at, expires_at "
+        "FROM sim_sessions WHERE session_id=?",
+        (session_id,),
+    )
+    if row is None:
+        return None
+    return {
+        "session_id": str(row["session_id"]),
+        "run_id": str(row["run_id"]),
+        "status": str(row["status"]),
+        "cursor": int(str(row["cursor"])),
+        "created_at": str(row["created_at"]),
+        "expires_at": str(row["expires_at"]),
+    }
+
+
+__all__ = [
+    "read_completed_run_record",
+    "read_result_record",
+    "read_run_record",
+    "read_session_record",
+]

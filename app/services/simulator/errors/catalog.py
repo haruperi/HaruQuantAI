@@ -71,6 +71,9 @@ _GROUPS: dict[str, tuple[str, ...]] = {
         "SIM_PERSISTENCE_FAILED",
         "SIM_CHECKPOINT_INCOMPATIBLE",
         "SIM_RUN_ID_CONFLICT",
+        "SIM_SESSION_NOT_FOUND",
+        "SIM_SESSION_EXPIRED",
+        "SIM_PLAYBACK_CURSOR_INVALID",
     ),
     "portfolio": (
         "SIM_COMPONENT_INCOMPLETE",

@@ -2,6 +2,65 @@
 
 ## [Unreleased]
 
+### Align architecture documentation with the completed Utils boundary
+
+Stale status and settings references in `docs/ARCHITECTURE.md` are corrected to
+the completed, function-only Utils package boundary.
+
+#### Fixed (1)
+
+- Fixed `docs/ARCHITECTURE.md`: Utils is a completed (not partial) implementation baseline, and settings bootstrap references the public `app.utils` settings boundary instead of the internal `AppSettings` symbol path.
+
+### Add completed-run journal playback sessions
+
+Simulation journals can now be traversed frame by frame over a resumable,
+quota-governed SSE boundary without retaining a live engine.
+
+#### Added (3)
+
+- Added durable one-hour `sim_sessions` rows with completed-run validation and monotonic sequence cursors.
+- Added two-pass, constant-memory hash-chain validation and raw journal-event playback from finalized JSONL artifacts.
+- Added idempotent session creation and resumable SSE frame delivery at two new `/api/v1/simulation/sessions` operations.
+
+#### Changed (1)
+
+- Changed `FR-API-027` and `WF-API-007` to completed for the journal-playback tier while retaining `WF-API-008` live mutation/what-if as excluded.
+
+### Bridge Optimization public operations behind the API gateway
+
+The UI/API gateway now composes the Optimization domain's typed public API and
+exposes its ten run/read operations plus one durable result read as governed
+HTTP routes, mirroring the existing Simulation and Portfolio bridges.
+
+#### Added (4)
+
+- Added eleven `/api/v1/optimization` HTTP routes (`FEAT-API-07` / `FR-API-030`) covering the four governed runs, six read-only analyses, and one result read behind an explicitly composed Simulation/Analytics adapter.
+- Added `app/services/api/composition/optimization_dependencies.py` composing the Optimization receiver-owned dependency bundle and `optimization.source` to the in-process provider graph with fail-closed default composition.
+- Added the `load_result` operation to the `OptimizationStateStore` protocol and the public `load_optimization_result` read function backing the durable result route.
+- Added `tests/api/unit/test_optimization_routes.py` covering dispatcher conversion, fail-closed behaviour, the discriminated robustness variant, and the read permission and 404 paths.
+
+#### Changed (1)
+
+- Changed the canonical route catalog and OpenAPI snapshot to fifty-four operations and removed the Optimization route-absence contract assertions.
+
+### Close Utils public-boundary deep imports
+
+Shared settings-integration helpers join the Utils public boundary, and every
+in-scope consumer imports strictly through package roots.
+
+#### Added (1)
+
+- Added `get_app_settings_model_config` and `get_app_settings_sources` to the `app.utils` public boundary for typed domain settings infrastructure.
+
+#### Changed (1)
+
+- Moved three process/IO-bound Utils boundary proofs from unit to integration scope to restore the 100 ms unit-test ceiling.
+
+#### Fixed (2)
+
+- Fixed eight deep `app.utils.*` import sites in API/Data settings infrastructure and Research/Broker test consumers to use the documented public boundary.
+- Fixed the malformed `FR-UTL-029` requirement row and restored per-file coverage evidence for the settings feature boundary.
+
 ### Establish two-tier system audit matrix
 
 Domain status becomes an evidence-backed conformance record spanning architecture,
@@ -790,6 +849,25 @@ Central environment configuration is grouped into logical sections, while provid
 - Migrated the qualifying Simulation validation, timeline, accounting, execution, journal, reporting, run, ledger, and Trading-simulation seams to `StandardResponse[T]`, preserving raw results in `data` and updating callers and usage evidence.
 - Migrated qualifying Trading public operations to Utils `StandardResponse[T]`, preserving raw DTOs, fail-closed unknown-outcome receipt evidence, and canonical symbolic error details.
 - Migrated qualifying Risk public operations to Utils `StandardResponse[T]`, preserved decision states inside raw response data, and added the immutable Risk error catalogue and boundary usage evidence.
+
+### Bridge Portfolio construction and reads through the API gateway
+
+The API gateway composes the Portfolio receiver-owned dependency bundle behind a fail-closed source and exposes the three HTTP-reducible Portfolio operations as thin delegations through the function-only public boundary.
+
+#### Added (4)
+
+- Added `app/services/api/composition/portfolio_dependencies.py` composing the twelve-callback `PortfolioWorkflowDependencies`, `PortfolioWorkflowService`, and opaque `PortfolioService` handle through Portfolio package-root factories and exposing a fail-closed route dispatcher.
+- Added `app/services/api/routes/portfolio.py` with governed `POST /api/v1/portfolio/construct` and read-only `GET /api/v1/portfolio/{portfolio_id}/status` and `GET /api/v1/portfolio/{portfolio_id}/history` endpoints.
+- Added `PortfolioConstructRequest`, `PortfolioStrategyAllocationRef`, `PortfolioFixedWeightInput`, and `PortfolioEvidenceReferenceSet` API boundary projections and registered three route contracts in the canonical catalogue.
+- Added `tests/api/unit/test_portfolio_routes.py` covering DTO-to-strict-contract conversion, list-to-tuple normalization, fail-closed behaviour, read delegation, idempotency enforcement, and permission rejection.
+
+#### Changed (5)
+
+- Changed the canonical in-process graph from an exact eight-provider to an exact nine-provider manifest by binding the new `portfolio.source` provider.
+- Changed the backend-v1 public surface from 32 to 35 HTTP operations and regenerated the frozen OpenAPI digest and operation inventory.
+- Flipped `FR-API-056` from `Excluded` to `Partial` and `WF-API-017` from `Excluded` to `Partial` with the pending subset and its infeasibility reason documented.
+- Updated `tests/api/unit/test_route_catalog.py`, `tests/api/unit/test_application.py`, `tests/api/unit/test_in_process_composition.py`, and `tests/api/contracts/test_openapi_contract.py` to the new operation count and provider manifest and removed the Portfolio route-absence assertions.
+- Updated `app/services/api/README.md` and `docs/PROJECT.md` operation counts, structure tree, route table, and Portfolio boundary narrative.
 
 ## 2.2.11
 

@@ -72,15 +72,31 @@ class MemoryOptimizationStore:
             reproducibility_hash=result.reproducibility_hash,
         )
 
+    def load_result(self, search_id: str) -> OptimizationResult | None:
+        """Load one persisted result for tests.
+
+        Args:
+            search_id: Canonical search identity.
+
+        Returns:
+            Stored result or ``None`` when absent.
+        """
+        return self.results.get(search_id)
+
 
 def test_store_port_exposes_only_owned_state() -> None:
-    """The injected protocol has only three Optimization-owned operations."""
+    """The injected protocol has only four Optimization-owned operations."""
     methods = {
         name
         for name, value in OptimizationStateStore.__dict__.items()
         if callable(value) and not name.startswith("_")
     }
-    assert methods == {"save_checkpoint", "load_checkpoint", "save_result"}
+    assert methods == {
+        "load_checkpoint",
+        "load_result",
+        "save_checkpoint",
+        "save_result",
+    }
 
 
 def test_checkpoint_requires_reproducibility_identity() -> None:

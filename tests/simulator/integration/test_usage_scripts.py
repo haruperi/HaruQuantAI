@@ -1,4 +1,3 @@
-# ruff: noqa: INP001 - standalone test namespace by repository policy.
 """Integration evidence that every documented Simulator usage script is runnable."""
 
 import ast

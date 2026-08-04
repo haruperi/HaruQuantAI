@@ -2,22 +2,27 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+from collections.abc import AsyncIterator, Callable, Mapping
 from pathlib import Path
 from typing import Any, Literal, cast
 
 from app.services.simulator import (
     build_simulation_run_dependencies,
     build_simulation_state_store,
+    create_simulation_session,
     create_simulation_value,
     run_backtest,
     run_portfolio_backtest,
+    stream_simulation_session_frames,
+    to_simulation_error_payload,
+    unwrap_simulation_response,
 )
 
 type AuthContext = Any
 type _RunOperation = Callable[
     [Literal["run", "portfolio-run"], object, AuthContext], object
 ]
+type _SessionOperation = Callable[..., object]
 
 
 def build_api_simulation_dependencies(
@@ -82,4 +87,89 @@ def build_simulation_run_source(dependencies: object | None) -> _RunOperation:
     return _run
 
 
-__all__ = ("build_api_simulation_dependencies", "build_simulation_run_source")
+def _runtime_code(error: Exception) -> str:
+    """Map one Simulator failure to its bounded public code.
+
+    Returns:
+        Stable Simulator error code.
+    """
+    payload = to_simulation_error_payload(error)
+    return str(payload["code"])
+
+
+def build_simulation_session_source(  # noqa: C901 - two bounded operations.
+    dependencies: object | None,
+) -> _SessionOperation:
+    """Build completed-run session creation and frame delivery operations.
+
+    Args:
+        dependencies: Complete receiver-owned Simulation dependency bundle.
+
+    Returns:
+        Operation dispatcher bound to the approved Simulation artifact root.
+    """
+
+    async def _frames(
+        session_id: str, resume_after: int | None
+    ) -> AsyncIterator[object]:
+        """Yield owner journal events and expose only bounded failures.
+
+        Yields:
+            Ordered Simulator-owned journal events.
+
+        Raises:
+            RuntimeError: If playback is unavailable or fails validation.
+        """
+        if dependencies is None:
+            raise RuntimeError("SIMULATION_PLAYBACK_UNAVAILABLE")
+        try:
+            iterator = cast(
+                "AsyncIterator[object]",
+                stream_simulation_session_frames(
+                    session_id,
+                    resume_after=resume_after,
+                    dependencies=dependencies,
+                ),
+            )
+            async for event in iterator:
+                yield event
+        except RuntimeError:
+            raise
+        except Exception as error:
+            raise RuntimeError(_runtime_code(error)) from error
+
+    def _session(operation: str, *args: object, **kwargs: object) -> object:
+        """Dispatch one session operation through Simulator package-root APIs.
+
+        Returns:
+            Created session projection or frame iterator.
+
+        Raises:
+            RuntimeError: If playback is unavailable or Simulator fails.
+            ValueError: If the requested operation is unsupported.
+        """
+        if dependencies is None:
+            raise RuntimeError("SIMULATION_PLAYBACK_UNAVAILABLE")
+        if operation == "create":
+            try:
+                response = create_simulation_session(
+                    str(args[0]), request_id=str(kwargs["request_id"])
+                )
+                return unwrap_simulation_response(
+                    response,
+                    operation="api.simulation.create_session",
+                )
+            except Exception as error:
+                raise RuntimeError(_runtime_code(error)) from error
+        if operation == "frames":
+            return _frames(str(args[0]), cast("int | None", kwargs["resume_after"]))
+        raise ValueError("unsupported Simulation session operation")
+
+    return _session
+
+
+__all__ = (
+    "build_api_simulation_dependencies",
+    "build_simulation_run_source",
+    "build_simulation_session_source",
+)

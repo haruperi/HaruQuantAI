@@ -2,8 +2,8 @@
 
 > **Specification location:** `app/services/api/README.md`
 > **Logical runtime packages:** FastAPI gateway at `app/services/api` plus Next.js frontend at `ui/` (per the `docs/PROJECT.md` registry), with canonical ASGI target `app.services.api.composition.application:app`; Next.js frontend at `ui/`
-> **Status:** `Backend v1 exposes 32 operations; frontend Sections 4.9–4.12 complete (typed transport, session/page/governed/stream context, workflow components, protected pages); frontend build complete`
-> **Last updated:** `2026-08-03`
+> **Status:** `Backend v1 exposes 55 operations, including completed-run Simulation journal playback sessions; live interactive what-if remains excluded; frontend Sections 4.9–4.12 complete`
+> **Last updated:** `2026-08-04`
 
 > This README is the UI/API domain's **single source of truth** for final requirements,
 > structure, implementation sequence, workflows, public symbols, boundary contracts,
@@ -182,6 +182,12 @@ The UI/API domain is `Partial`. These are the approved current feature
 targets; no feature may be marked `Completed` until its owning module, exact public
 contracts, numbered usage program, and required tests satisfy Sections 4 and 7.
 
+> **In progress (`API-CLOSE-001`).** The Agentic rows below were corrected from a stale
+> `Excluded` status to match already-merged code. The remaining open rows —
+> `FR-API-056` Portfolio lifecycle, the reintroduced Strategy/Data/Risk families, the §5
+> shared-configuration rows, and frontend parity — are specified but **not yet
+> implemented**. No status may flip to `Completed` until its tests run and pass.
+
 | Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|
 | Completed | `FEAT-API-01` Boundary Contracts | `contracts/` | Package-root contract builders, canonical route registry, `ApiMetadata`, `ApiError`, `ApiResponse`, `StreamEvent`, `RouteContract`, `GovernedRequestContext`, `PageContext` | `FR-API-001`–`FR-API-008` | `tests/api/usage/01_contracts.py`; `tests/api/contracts/` |
@@ -190,8 +196,8 @@ contracts, numbered usage program, and required tests satisfy Sections 4 and 7.
 | Completed | `FEAT-API-04` Liveness and Readiness | `health/` | `get_liveness`, `get_readiness`, `check_clock_drift` | `FR-API-018`-`FR-API-019`, `FR-API-059` | `tests/api/usage/04_health.py` |
 | Completed | `FEAT-API-05` Operational Telemetry and Exposition | `observability/` | `record_metric`, `validate_metric_labels`, `build_metric_snapshot`, `export_prometheus_metrics`, `get_metrics`, `create_in_process_metric_sink` | `FR-API-060`â€“`FR-API-063` | `tests/api/usage/05_observability.py` |
 | Completed | `FEAT-API-06` Ordered Event Delivery | `streams/` | `normalize_stream_event`, `create_stream_manager` through the package root | `FR-API-020`–`FR-API-021` | `tests/api/usage/06_streams.py`; `tests/api/unit/test_streams.py` |
-| Completed | `FEAT-API-07` Thin HTTP Boundaries | `routes/` | Exactly 32 backend-v1 operations, including Simulation run/results, Risk reads, and non-production Trading session/mutations | `FR-API-022`–`FR-API-026`, `FR-API-028`–`FR-API-029`, `FR-API-031`–`FR-API-034`; remaining exclusions unchanged | `tests/api/usage/07_routes.py`; `tests/api/unit/test_route_catalog.py`; `tests/api/contracts/test_openapi_contract.py` |
-| Completed | `FEAT-API-08` Canonical Application Lifecycle | `composition/` | `create_api_app`, dependency-bundle builders, exact eight-provider graph, and canonical `app.services.api.composition.application:app` | `FR-API-035`–`FR-API-037`, `FR-API-058` | `tests/api/usage/08_composition.py`; `tests/api/unit/test_application.py`; `tests/api/unit/test_in_process_composition.py` |
+| Completed | `FEAT-API-07` Thin HTTP Boundaries | `routes/` | Exactly 55 backend-v1 operations, including completed-run Simulation journal playback sessions | `FR-API-022`–`FR-API-034`, `FR-API-056` (partial); live what-if exclusion unchanged | `tests/api/usage/07_routes.py`; `tests/api/unit/test_route_catalog.py`; `tests/api/contracts/test_openapi_contract.py`; `tests/api/unit/test_simulation_sessions_route.py` |
+| Completed | `FEAT-API-08` Canonical Application Lifecycle | `composition/` | `create_api_app`, dependency-bundle builders, exact twelve-provider graph, and canonical `app.services.api.composition.application:app` | `FR-API-035`–`FR-API-037`, `FR-API-058` | `tests/api/usage/08_composition.py`; `tests/api/unit/test_application.py`; `tests/api/unit/test_in_process_composition.py` |
 | Completed | `FEAT-API-09` Typed Frontend Transport | `ui/clients/` | `request`, `unwrapData`, `ApiClientError`, `openStream`, `apiClients` (9 focused clients for 23 operations incl. auth.me + data.stream) | `FR-API-038`–`FR-API-041` | `tests/api/usage/14_frontend_clients.ts`; `app/ui/src/clients/request.test.ts`; `app/ui/src/clients/clients.test.ts`; `app/ui/src/clients/clients.contract.test.ts` |
 | Completed | `FEAT-API-10` Frontend Session and Page Context | `ui/context/` | `AuthProvider`, `useAuth`, `PageContextProvider`, `usePageContext`, `buildGovernedOptions`, `isGovernedFresh`, `consumeStream`, `StreamGapError`, `PageContextError`, `GovernedPreflightError` | `FR-API-042`–`FR-API-045` | `tests/api/usage/15_frontend_context.tsx`; `app/ui/src/context/{auth,page,governed,streams}.test.ts(x)` |
 | Completed | `FEAT-API-11` Workflow Presentation Components | `ui/components/workflow/` | `AppShell`, `DashboardView`, `StrategyWorkspace`, `SimulationView`, `RiskView`, `TradingView`, `ResearchWorkspace` | `FR-API-046`–`FR-API-051` | `tests/api/usage/16_frontend_components.tsx`; `app/ui/src/components/workflow/*.test.tsx` |
@@ -206,22 +212,25 @@ contracts, numbered usage program, and required tests satisfy Sections 4 and 7.
 
 The owner selected Path 1: backend v1 exposes only capabilities that the canonical
 in-process application can compose and execute from existing package-root owner APIs.
-The public surface is exactly 32 HTTP operations: the prior 23 operations plus three Simulation, two Risk, and four Trading operations.
-settings (2), symbol discovery and market streaming (2), Strategy catalogue/version reads (2), Research
-(1), dashboard snapshots (6), operator audit/event/approval operations (3), and
-protected metrics (1). Dataset preparation, Strategy mutations, Simulation, Risk,
-Trading, Optimization, Portfolio, Agentic, operator kill-switch, and duplicate
-operator-readiness routes are excluded from backend v1 until their exact request and
-runtime contracts exist. Their owner-domain implementations remain available for
-future composition.
+The public surface is exactly 55 HTTP operations. Simulation contributes its existing
+synchronous run/result routes plus two completed-run journal playback operations;
+Optimization, Portfolio, and Agentic operations are composed where their current
+route contracts declare them. Dataset preparation, Strategy mutations, live
+Simulation mutation/what-if, production-capital execution, operator kill-switch, and
+duplicate operator-readiness routes remain excluded from backend v1. Portfolio activation, rollback,
+drift assessment, rebalance submission, and measurement recomputation are bridged
+only through construction and read operations because their intermediate evidence
+and review objects are not yet HTTP-producible through the Portfolio public boundary;
+their owner-domain implementations remain available for future composition.
 
-The canonical application owns one exact eight-provider in-process graph covering
-dashboard/operator reads plus Simulation, Risk, and Trading boundaries. It binds
-read sources from public owner APIs and accepts explicit opaque Simulator/Trading
-dependency bundles during application construction. Development
-credential rotation remains deferred until production transition; no credential value
-is tracked, logged, tested, or used for an external connection by this correction.
-Section 4.9 remains outside `API-BE-003-D6`; no frontend file is created or modified.
+The canonical application owns one exact twelve-provider in-process graph covering
+dashboard/operator reads plus Simulation, Risk, Trading, and Portfolio boundaries. It
+binds read sources from public owner APIs and accepts explicit opaque
+Simulator/Trading/Portfolio dependency bundles during application construction.
+Development credential rotation remains deferred until production transition; no
+credential value is tracked, logged, tested, or used for an external connection by this
+correction. Section 4.9 remains outside `API-BE-003-D6`; no frontend file is created
+or modified.
 
 The approved development composition uses the safe defaults
 `runtime_profile=research`, `execution_route=none`, and
@@ -239,7 +248,7 @@ Items 1–8 below verify the implemented backend foundation. `FEAT-API-07` is co
 for the reduced backend-v1 boundary; frontend Sections 4.9–4.12 remain missing.
 
 The owner selected an in-process modular-monolith composition. `INPROC-001` now
-provides one exact eight-name provider manifest, rejects missing/unknown/invalid provider
+provides one exact nine-name provider manifest, rejects missing/unknown/invalid provider
 graphs before application construction, binds the graph internally without exposing
 private route dependencies, probes required graph values before readiness, and closes
 graph-owned resources in reverse acquisition order. Evidence:
@@ -261,12 +270,17 @@ preserved. Evidence: `app/services/api/middleware/envelope.py`,
 4. Public liveness and protected dependency readiness remain versioned and secret-safe. Evidence: `app/services/api/health/probes.py:173`.
 5. Injected, non-authoritative metrics and protected exposition remain complete. Evidence: `app/services/api/observability/metrics.py:116`.
 6. Owner events are normalized into ordered secret-safe events with quotas, resume windows, gap detection, terminal backpressure errors, and disconnect cleanup. Evidence: `app/services/api/streams/events.py:59`, `app/services/api/streams/lifecycle.py:35`.
-7. The canonical OpenAPI surface and fresh route registry contain the same 21 `/api/v1` operations; excluded workflow families are absent. Evidence: `app/services/api/composition/application.py:177`, `app/services/api/contracts/catalog.py:161`, `tests/api/unit/test_route_catalog.py:21`.
+7. The canonical OpenAPI surface and fresh route registry contain the same 35 `/api/v1` operations; excluded workflow families are absent. Evidence: `app/services/api/composition/application.py:177`, `app/services/api/contracts/catalog.py:161`, `tests/api/unit/test_route_catalog.py:17`.
 8. One exact-origin FastAPI composition runs required API migrations, reports optional degradation, closes only owned resources, and exposes the ASGI app at `app.services.api.composition.application:app`. Evidence: `app/services/api/composition/lifecycle.py:28`, `app/services/api/composition/application.py:155`.
 ```text
 app/services/api/
 ├── __init__.py
 ├── README.md
+├── _settings.py                   # Typed UI/API runtime settings via the shared boundary
+├── _limits.py                     # Validated package-wide UI/API limits
+├── migrations/
+│   ├── __init__.py
+│   └── definitions.py             # Canonical UI/API-owned persistence migration manifest
 ├── contracts/
 │   ├── __init__.py
 │   ├── models.py                 # Boundary envelopes and governed/page context
@@ -281,7 +295,6 @@ app/services/api/
 │   ├── approvals.py              # Scoped distinct-principal approval state
 │   ├── idempotency.py            # Durable HTTP reservation and replay state
 │   ├── settings.py               # Versioned user/system settings
-│   ├── migrations/               # Immutable API-owned schema manifest
 │   └── authorization.py          # AuthContext, permission, and governed-write checks
 ├── persistence/                   # Private API-owned CRUD support package
 │   ├── __init__.py                # Private function-only persistence boundary
@@ -313,39 +326,73 @@ app/services/api/
 │   └── lifecycle.py              # Connection, resume, backpressure, and cleanup
 ├── routes/
 │   ├── __init__.py
-│   ├── auth.py                   # Registration, login, logout
+│   ├── auth.py                   # Registration, login, logout, /me identity recovery
+│   ├── health.py                 # Public liveness and protected readiness
+│   ├── observability.py          # Protected Prometheus exposition boundary
 │   ├── settings.py               # Scoped user/system settings read/update
-│   ├── data.py                   # Symbol discovery
-│   ├── strategies.py             # Strategy catalogue/version reads
+│   ├── data.py                   # Symbol discovery and governed dataset preparation
+│   ├── data_stream.py            # Authenticated SSE bridge over Data-owned market streams
+│   ├── strategies.py             # Strategy catalogue/version reads and governed mutations
 │   ├── research.py               # Initial core Edge Lab boundary
+│   ├── simulation.py             # Synchronous canonical/portfolio runs and result reads
+│   ├── simulation_sessions.py    # Completed-run journal playback sessions and SSE frames
+│   ├── risk.py                   # Kill-switch read/command and immutable decision reads
+│   ├── trading.py                # Exact-scope session reads and governed paper mutations
+│   ├── portfolio.py              # Portfolio construct, status, history, and governed lifecycle
+│   ├── optimization.py           # Optimization runs, analyses, and result read bridges
+│   ├── agentic.py                # Agentic submit/inspect/audit/governance operator tier
 │   ├── dashboards.py             # Read-only operational and analytics snapshots
 │   └── operator.py               # Approvals, audit, and operator events
 └── composition/
     ├── __init__.py
     ├── lifecycle.py              # Required/optional dependency lifecycle
+    ├── adapters.py               # Stable provider names bound to private route dependency keys
+    ├── in_process.py             # Exact provider-graph validation and opaque overrides
+    ├── owner_sources.py          # Concrete read-only sources built from owner package-root APIs
     ├── broker_config.py          # Resolve references and build BrokerConnectionConfig
+    ├── broker_session.py         # Non-production broker adapter lifecycle composition
+    ├── simulation_dependencies.py   # Compose synchronous Simulator execution behind the boundary
+    ├── trading_dependencies.py      # Compose governed Trading mutations behind the boundary
+    ├── portfolio_dependencies.py    # Compose governed Portfolio lifecycle behind the boundary
+    ├── optimization_dependencies.py # Compose Optimization runs behind a Simulation/Analytics adapter
+    ├── agentic_dependencies.py      # Compose the Agentic operator surface behind the boundary
     └── application.py            # Canonical app and route registration
 
-ui/                                   # Next.js 15 (App Router) + React 19 + TypeScript frontend
-├── app/                              # Single-page widget workspace (not a route-page app, by owner decision)
+app/ui/                               # Next.js 15 (App Router) + React 19 + TypeScript frontend
+└── src/
+├── app/                              # Two-tier routing: /login access gate + / widget workspace
 │   ├── layout.tsx                    # Root layout: metadata, fonts, theme container
-│   └── page.tsx                      # Single route entry; renders <App/>
+│   ├── login/page.tsx                # /login route segment
+│   ├── authentication-page.tsx       # Login/register access form
+│   ├── protected-layout.tsx          # Session gate for the workspace
+│   ├── workflow-page.tsx             # Protected widget workspace composition
+│   └── page.tsx                      # Root route entry; renders <WorkflowPage/>
 ├── App.tsx                           # Workspace root: header + sidebar + workspace grid + order-ticket modal
 ├── clients/                          # FEAT-API-09: typed frontend transport (Section 4.9)
 │   ├── contracts.ts                  # Zod schemas mirroring ApiResponse/ApiError/ApiMetadata (contracts/models.py)
-│   ├── routes.ts                     # Frozen typed RouteContract definitions for the 21 backend-v1 operations
+│   ├── routes.ts                     # Frozen typed RouteContract definitions for every backend-v1 operation
 │   ├── request.ts                    # request, unwrapData, ApiClientError (single transport primitive)
-│   ├── auth.ts                       # auth.register/login/logout
+│   ├── stream.ts                     # openStream low-level SSE transport
+│   ├── auth.ts                       # auth.register/login/logout/me
 │   ├── health.ts                     # health.liveness/readiness
 │   ├── settings.ts                   # settings.read/update
-│   ├── data.ts                       # data.symbols (cursor-paginated)
-│   ├── strategies.ts                 # strategies.catalogue/versions
+│   ├── data.ts                       # data.symbols (cursor-paginated), data.prepareDataset
+│   ├── strategies.ts                 # strategies.catalogue/versions/register/updateParameters
 │   ├── research.ts                   # research.run
+│   ├── simulation.ts                 # simulation.run/portfolioRun/result
+│   ├── simulationSessions.ts         # simulation.createSession/frames (journal playback)
+│   ├── risk.ts                       # risk.killSwitch/decisions/activateKillSwitch
+│   ├── trading.ts                     # trading.session/orders/cancel/closePosition
+│   ├── portfolio.ts                  # portfolio.construct/status/history/activate/rollback/drift/rebalance/recompute
+│   ├── optimization.ts               # optimization.{parameterSweep,walkForward,…,handoff,result}
+│   ├── agentic.ts                    # agentic.{submit,run,cancel,audit,approveHandoff,quarantine,disable}
 │   ├── dashboards.ts                 # dashboards.{broker,equityCurve,summary,systemResources,marketHours,forexCalendar}
 │   ├── operator.ts                   # operator.{auditEvents,events,approvals}
 │   ├── metrics.ts                    # metrics.scrape (Prometheus text; bypasses JSON envelope)
 │   └── index.ts                      # apiClients catalog + public re-exports
+├── context/                          # FEAT-API-10: auth, page, governed, and stream context
 ├── components/
+│   ├── workflow/                     # FEAT-API-11: approved workflow presentation components
 │   ├── layout/
 │   │   ├── Header.tsx                # Top bar + workspace tabs
 │   │   ├── Sidebar.tsx               # Collapsible widget-add navigation
@@ -431,13 +478,13 @@ higher-authority exclusion.
 | `CAP-UI-009` symbol discovery | `routes/data.py`; `FR-API-024`; dataset preparation excluded from backend v1 |
 | `CAP-UI-010` strategy catalogue/version reads | `routes/strategies.py`; `FR-API-025`; mutations/raw import/export/SQX excluded |
 | `CAP-UI-011` synchronous backtest result | `routes/simulation.py`; `FR-API-026`; configured owner references fail closed when absent |
-| `CAP-UI-012` interactive simulator | Excluded from the initial synchronous lifecycle; no initial route or component |
+| `CAP-UI-012` interactive simulator | Backend completed-run journal playback is available; a frontend playback component and live what-if remain excluded |
 | `CAP-UI-013` risk decision support | `routes/risk.py`; `FR-API-028`; Risk owns state and decisions |
 | `CAP-UI-014` paper monitoring/mutations | `routes/trading.py`; `FR-API-029`; production-capital execution excluded |
-| `CAP-UI-015` optimization/scenarios | Excluded from backend v1 pending Simulation composition and exact supported operations |
+| `CAP-UI-015` optimization/scenarios | `routes/optimization.py`; `FR-API-030`; ten Optimization operations plus durable result read behind a composed Simulation/Analytics adapter |
 | `CAP-UI-016` initial Edge Lab | `routes/research.py`; `FR-API-031`; advanced surface excluded |
 | `CAP-UI-018` dashboard reads | `routes/dashboards.py`; `FR-API-032`; currency strength excluded |
-| `CAP-UI-019` documentation | Excluded from the initial build; no route, state, client, or component |
+| `CAP-UI-019` documentation | **Authoritative exclusion — owner scope.** No route, state, client, or component. Enforced by `tests/api/contracts/test_route_absence.py` |
 | `CAP-UI-020` shared streaming | `streams/`; `FR-API-004`, `FR-API-020`, `FR-API-021` |
 | `CAP-UI-021` typed frontend clients | `ui/clients/`; `FR-API-038`–`FR-API-041` |
 | `CAP-UI-022` frontend auth/shell | `ui/context/`, `ui/app/`; `FR-API-042`, `FR-API-046`, `FR-API-053`, `FR-API-054` |
@@ -462,11 +509,11 @@ public symbols below. Unsupported ranges are absent from the target structure.
 | `UIAPI-FR-061`–`070` | `FR-API-019`, `FR-API-021`, `FR-API-034` |
 | `UIAPI-FR-071`–`076` | `FR-API-022`, `FR-API-023`; duplicate settings path rejected |
 | `UIAPI-FR-101`–`114` | Strategy catalogue/version reads map to `FR-API-025`; mutations and raw import/export/SQX requirements are excluded |
-| `UIAPI-FR-115`–`123` | Synchronous run/result subset implemented by `FR-API-026`; interactive lifecycle remains `FR-API-027` |
-| `UIAPI-FR-124`–`146` | `FR-API-027` |
+| `UIAPI-FR-115`–`123` | Synchronous run/result subset implemented by `FR-API-026`; completed-run playback lifecycle implemented by `FR-API-027` |
+| `UIAPI-FR-124`–`146` | `FR-API-027` journal playback tier; live mutation/what-if deferred |
 | `UIAPI-FR-147`–`150` | Exact-scope read subset implemented by `FR-API-028` |
 | `UIAPI-FR-151`–`176` | Session and governed paper-mutation subset implemented by `FR-API-029`; production capital excluded |
-| `UIAPI-FR-177`–`193` | Excluded from backend v1 with `FR-API-030` |
+| `UIAPI-FR-177`–`193` | `FR-API-030`; the ten Optimization run/read operations plus durable result read are implemented behind a composed Simulation/Analytics adapter |
 | `UIAPI-FR-194`–`199`, `201` | `FR-API-032` |
 | `UIAPI-FR-202`–`207` | Data reads map to `FR-API-024`; documentation-file capabilities are excluded |
 | `UIAPI-FR-208`–`226`, `238`–`241` | `FR-API-031` |
@@ -508,9 +555,9 @@ annotations. No status is changed by the annotation pass.
 | Completed | Supporting | `WF-API-004` | Cross-domain | Symbol discovery | `SYS-WF-001` | Authenticated bounded symbol query | Data-owned symbol page or provider error | `FR-API-024` | No provider or user fallback | `tests/api/contracts/test_pagination_contract.py::test_symbol_list_has_bounded_page_size()` |
 | Completed | Supporting | `WF-API-005` | Cross-domain | Strategy catalogue and version reads | `SYS-WF-003`, `SYS-WF-004` | Authenticated optional strategy identifier | Strategy-owned version catalogue | `FR-API-025` | Gateway does not mutate Strategy state | `tests/api/unit/test_strategy_routes.py::test_strategy_catalogue_reads_delegate_to_owner()` |
 | Completed | Supporting | `WF-API-006` | Cross-domain | Synchronous backtest run and result review | Configured Simulator owner graph | Versioned request | Validated result | `FR-API-026` | Missing references or composition fail closed | Simulation boundary tests |
-| Excluded | Supporting | `WF-API-007` | Cross-domain | Interactive Simulation session lifecycle | Outside initial scope | — | — | `FR-API-027` | No initial session, frame, replay, or queued state | Excluded |
-| Excluded | Supporting | `WF-API-008` | Cross-domain | Governed interactive Simulation mutation/what-if | Outside initial scope | — | — | `FR-API-027` | Excluded with the interactive session lifecycle | Excluded |
-| Excluded | Supporting | `WF-API-009` | Cross-domain | Synchronous Optimization and scenario run | Outside backend v1 | — | — | `FR-API-030` | Exact supported operations and Simulation composition are unavailable | Route-absence contract test |
+| Completed | Supporting | `WF-API-007` | Cross-domain | Completed-run Simulation playback sessions | Finalized hash-chained Simulation journal | Completed run ID and optional `Last-Event-ID` | Ordered raw journal frames over SSE | `FR-API-027` (journal playback tier) | Invalid run/session/cursor/hash chain fails closed; disconnect releases quota | `tests/api/unit/test_simulation_sessions_route.py`; `tests/simulator/integration/test_playback_sessions.py` |
+| Excluded | Supporting | `WF-API-008` | Cross-domain | Governed live Simulation mutation/what-if | Requires a stateful live engine | — | — | `FR-API-027` (deferred tier) | No live engine registry or mid-playback mutation is implemented | Excluded |
+| Completed | Supporting | `WF-API-009` | Cross-domain | Synchronous Optimization and scenario run | Authenticated Optimization caller; composed Simulation/Analytics adapter | Typed Optimization result envelope | `FR-API-030` | Missing composition or references fail closed | Optimization route tests |
 | Completed | Supporting | `WF-API-010` | Cross-domain | Risk decision support | Authenticated Risk read | Exact scope or bound | Owner state/decisions | `FR-API-028` | Missing state is explicit | Risk route tests |
 | Completed | Supporting | `WF-API-011` | Cross-domain | Core Edge Lab research | `SYS-WF-004` | Bounded dataset/config request with explicit hypothesis | Registered `ResearchReport v1` or structured error | `FR-API-031` | Leakage/provider failures block publication; internal profiles, snapshots, and unsupported endpoints are absent | `tests/api/unit/test_research_routes.py`; `tests/system/integration/test_research_to_strategy.py` |
 | Completed | Supporting | `WF-API-012` | Cross-domain | Paper/demo session and governed broker action | Authenticated scoped request | Trading projection or receipt | `FR-API-029` | Production capital and incomplete authority fail closed | Trading governance tests |
@@ -518,8 +565,8 @@ annotations. No status is changed by the annotation pass.
 | Completed | Supporting | `WF-API-014` | Cross-domain | Critical operational alert delivery | `SYS-WF-002`, `SYS-WF-005` | Active Risk `KillSwitchState` plus authenticated trace context, or critical Trading `BROKER_STATE_UNKNOWN` `OperationalEvent` | Deterministic `CriticalOperationalAlert` plus one `CriticalAlertDeliveryResult` | `FR-API-064`–`FR-API-067` | Invalid source is rejected; sink failure is structured and logged but never alters source truth, safety state, or retry locks | `tests/api/integration/test_critical_alerts.py::test_delivery_failure_cannot_change_authoritative_state()` |
 | Completed | Supporting | `WF-API-015` | Cross-domain | Frontend governed request | All applicable | User action | Typed result, warning, or client preflight block | `FR-API-035`–`FR-API-041` | Preflight never substitutes for backend authorization; stale data blocks governed use | `app/ui/src/context/governed.test.ts`; `tests/api/usage/15_frontend_context.tsx::testUsageGovernedOptions()` |
 | Completed | Supporting | `WF-API-016` | Cross-domain | Frontend stream consumption | All applicable | Authenticated stream connection | Validated ordered events and authoritative refresh after gaps | `FR-API-004`, `FR-API-017`–`FR-API-020`, `FR-API-042` | Disconnect cleans resources; gap/backpressure/terminal error triggers documented recovery | `app/ui/src/context/streams.test.ts`; `tests/api/usage/15_frontend_context.tsx::testUsageConsumeStream()` |
-| Excluded | Supporting | `WF-API-017` | Cross-domain | Portfolio workflows | Outside backend v1 | — | — | `FR-API-056` | Exact eligibility operation and composed workflow ports are unavailable | Route-absence contract test |
-| Excluded | Supporting | `WF-API-018` | Cross-domain | Agentic workflows | Outside backend v1 | — | — | `FR-API-068`–`072` | Promised result views and canonical development runtime are unavailable | Route-absence contract test |
+| Partial | Supporting | `WF-API-017` | Cross-domain | Portfolio workflows | Authenticated scoped Portfolio request | Portfolio construct, active-status, or allocation-history result | `FR-API-056` (partial) | Construction, status, and history bridge the Portfolio public API; activation, rollback, drift, rebalance, and measurement remain pending because their intermediate evidence and review objects are not yet HTTP-producible | `tests/api/unit/test_portfolio_routes.py`; `tests/api/unit/test_route_catalog.py` |
+| Completed | Supporting | `WF-API-018` | Cross-domain | Agentic operator workflows | Authenticated human operator with an exact Agentic permission | Reserved run identity, bounded run/audit evidence, or a containment state transition | `FR-API-068`–`072` | Submission reserves and never executes; an uncomposed runtime fails closed with `AGENTIC_RUNTIME_UNAVAILABLE`; reads stay available while the firm is disabled | `tests/api/unit/test_agentic_routes.py` |
 | Completed | Supporting | `WF-API-019` | Internal | Observability exposition and metrics scrape | All applicable | Authorized scrape or telemetry read against the gateway | `FR-API-063` | An unauthorized scrape is refused; exposition failure never blocks request serving or alters readiness truth | `tests/api/unit/test_observability_routes.py::test_scrape_requires_permission()`, `tests/api/usage/05_observability.py::fr_api_063()` |
 | Completed | Supporting | `WF-API-020` | Cross-domain | Server-side ordered stream publication | All applicable | An owner-domain event accepted for publication to subscribed clients | Ordered validated stream events with explicit sequence and gap markers | `FR-API-004`, `FR-API-020` | Backpressure and gaps are published explicitly; the gateway never reorders, invents, or silently drops an owner-domain event | `app/services/api/routes/data_stream.py`; `app/services/api/streams/lifecycle.py`; backend stream tests |
 
@@ -911,18 +958,22 @@ stream subscription → standard envelope/event.
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `auth.py` | Authentication HTTP boundary | `router` | **Required third-party:** FastAPI/Pydantic<br>**Local:** `identity`, `contracts` |
+| Completed | `health.py` | Public liveness and protected readiness HTTP boundary | `router` | **Required third-party:** FastAPI<br>**Local:** `health`, `identity` |
+| Completed | `observability.py` | Protected Prometheus exposition boundary | `router` | **Required third-party:** FastAPI<br>**Local:** `observability`, `identity` |
 | Completed | `settings.py` | Versioned optimistic settings boundary with terminal HTTP idempotency | `router` | **Required third-party:** FastAPI/Pydantic<br>**Local:** `identity`, `contracts` |
 | Completed | `data.py` | Bounded symbol discovery | `router` | **Required third-party:** FastAPI<br>**Local:** `identity`, Data package-root API |
 | Completed | `data_stream.py` | Authenticated SSE bridge over Data-owned MT5 market streams | `router` | **Required third-party:** FastAPI<br>**Local:** `identity`, `streams`, Data package-root API |
 | Completed | `strategies.py` | Registered Strategy catalogue/version reads | `router` | **Required third-party:** FastAPI<br>**Local:** `identity`; Strategy package-root API |
 | Completed | `simulation.py` | Synchronous canonical/portfolio runs and durable result reads | `router` | Simulator package-root APIs and explicitly composed receiver-owned ports |
+| Completed | `simulation_sessions.py` | Completed-run journal playback session creation and SSE frame delivery | `router` | Simulator package-root APIs; shared stream lifecycle and event envelope |
 | Completed | `risk.py` | Exact-scope kill-switch and immutable decision reads | `router` | Risk package-root APIs |
 | Completed | `trading.py` | Exact-scope session reads and governed non-production mutations | `router` | Trading package-root APIs and explicitly composed receiver-owned ports |
-| Excluded | Optimization routes | Not registered in backend v1 | None | Exact supported owner operations remain unavailable |
+| Completed | `optimization.py` | Ten Optimization operations plus durable result read behind a composed Simulation/Analytics adapter | `router` | Optimization package-root APIs and explicitly composed receiver-owned ports |
 | Completed | `research.py` | Initial core Edge Lab research | `router` | **Standard library:** None<br>**Required third-party:** FastAPI and the manifest-declared Pydantic constraint; exact compatible FastAPI constraint belongs in `pyproject.toml`<br>**Local:** `identity`, `contracts`; Research public API |
 | Completed | `dashboards.py` | Read-only operational/analytics snapshots | `router` | **Required third-party:** FastAPI<br>**Local:** `identity`; explicitly injected owner snapshot adapter |
 | Completed | `operator.py` | Protected owner events, bounded audit views, and API-owned approvals | `router` | Trading and Data package-root APIs; `identity.approvals` |
-| Excluded | Portfolio and Agentic routes | Not registered in backend v1 | None | Exact public owner operations/runtime manifests remain unavailable |
+| Completed | `portfolio.py` | Portfolio construction, reads, and governed allocation lifecycle | `router` | Portfolio package-root APIs and explicitly composed receiver-owned ports |
+| Completed | `agentic.py` | Agentic submit/inspect/audit/governance operator tier | `router` | Agentic package-root APIs and an explicitly composed dependency bundle |
 | Completed | `__init__.py` | Expose approved routers to composition only | named routers | **Local:** route files → `router` aliases |
 
 #### Route-family functional requirements
@@ -934,16 +985,20 @@ stream subscription → standard envelope/event.
 | Completed | `FR-API-024` | Expose authenticated bounded symbol discovery through Data. Dataset preparation is excluded from backend v1. | `data.router: APIRouter` | Read-only | Bounded 401/403/422/502/503 failures | **Usage:** `tests/api/usage/07_routes.py`<br>**Contract:** `tests/api/contracts/test_pagination_contract.py` |
 | Completed | `FR-API-025` | Expose Strategy catalogue and version reads. Registration, parameter updates, raw import/export, SQX, executable content, and artifact lifecycle are excluded from backend v1. | `strategies.router: APIRouter` | Read-only | Bounded 401/403/422/503 failures | **Usage:** `tests/api/usage/07_routes.py`<br>**Unit:** `tests/api/unit/test_strategy_routes.py` |
 | Completed | `FR-API-026` | Expose synchronous canonical and portfolio Simulation runs plus durable result retrieval through an explicitly composed owner dependency bundle; missing references fail closed. | Simulation route handlers | Simulation persistence/audit writes | Typed validation, owner, or dependency error | Route/composition tests |
-| Excluded | `FR-API-027` | Interactive Simulation sessions, frames, replay, positions/orders, mutations, and what-if routes are outside the initial synchronous build. | None | None | None | Route-absence test `tests/api/unit/test_route_catalog.py::test_interactive_simulation_routes_absent()` |
+| Completed | `FR-API-027` | Provide the journal-playback tier for completed Simulation runs: durably create idempotent sessions and stream validated raw journal events over SSE with cursor resume and shared connection quotas. Equity reconstruction and live engine mutation/what-if remain deferred. | `POST /api/v1/simulation/sessions`; `GET /api/v1/simulation/sessions/{session_id}/frames` | Session persistence; finalized journal read; bounded connection state | Bounded 400/401/403/404/409/422/429/503 failures and terminal stream errors | `tests/api/unit/test_simulation_sessions_route.py`; `tests/simulator/unit/test_playback.py`; `tests/simulator/integration/test_playback_sessions.py` |
 | Completed | `FR-API-028` | Expose exact-scope kill-switch state and bounded newest-first immutable RiskDecisionPackage reads through Risk public functions. | Risk route handlers | None | Invalid scope, missing state, or dependency error | Risk route tests |
 | Completed | `FR-API-029` | Expose exact-scope Trading projections and governed submit/cancel/close operations only through Trading public functions; production-capital execution is excluded and incomplete authority fails closed. | Trading route handlers | Governed Trading mutation | Permission, idempotency, policy, evidence, kill-switch, reconciliation, or dependency error | Trading governance tests |
-| Excluded | `FR-API-030` | Optimization HTTP routes are outside backend v1 pending exact supported operations and Simulation composition. | None | None | None | Route-absence contract test |
+| Completed | `FR-API-030` | Expose the ten Optimization public operations (parameter sweep, walk-forward, walk-forward matrix, robustness, compare, stability, overfit, rank, robustness score, evidence handoff) plus one durable result read through an explicitly composed Simulation/Analytics adapter; missing composition fails closed. | Optimization route handlers | Governed run side effects; durable result read | Typed validation, owner, or dependency error | `tests/api/unit/test_optimization_routes.py` |
 | Completed | `FR-API-031` | Submit one bounded initial Research request with an explicit hypothesis and return only registered `ResearchReport v1` advisory evidence inside `StandardResponse.data`; Research-internal datasets, stage profiles, scorecards, snapshots, and artifact types never cross the API boundary directly. | `POST /api/research/run`; `ResearchRunRequest` | Read-only external-domain call | Standard 401/403/422/503 envelopes | **Unit:** `tests/api/unit/test_research_routes.py`<br>**System:** `tests/system/integration/test_research_to_strategy.py` |
 | Completed | `FR-API-032` | Expose broker/equity/summary/resource/market-hours/calendar owner snapshots with freshness evidence; merge system status into readiness. | `dashboards.router: APIRouter` | Read-only; external owner call | Bounded 401/403/404/422/502/503 failures | **Usage:** `tests/api/usage/07_routes.py`<br>**Contract:** `tests/api/unit/test_route_catalog.py` |
 | Completed | `FR-API-033` | Authenticate and authorize `data:read`, enforce per-actor/process stream quotas, and bridge Data-owned ordered MT5 tick or closed-bar events to `/api/v1/data/stream` as SSE with `Last-Event-ID`, heartbeats, explicit terminal errors, and disconnect cleanup. The route performs transport orchestration only. | `GET /api/v1/data/stream` | External Data stream; bounded connection state | Bounded 400/401/403/429/503 failures and terminal stream errors | **Usage:** `tests/api/usage/07_routes.py`<br>**Unit:** `tests/api/unit/test_data_stream_route.py` |
 | Completed | `FR-API-034` | Authenticate/authorize a human operator; expose owner events, bounded Data audit pages, and API-owned scoped approvals without issuing Risk verdicts. Kill-switch and duplicate readiness routes are excluded from backend v1. | `operator.router: APIRouter` | Data/Trading read; API approval persistence | Bounded 401/403/404/409/422/503 failures | **Usage:** `tests/api/usage/07_routes.py`<br>**Unit:** `tests/api/unit/test_operator_routes.py`<br>**Integration:** `tests/api/integration/test_governance_state.py` |
-| Excluded | `FR-API-056` | Portfolio HTTP workflows are outside backend v1 pending exact owner operations and composed ports. | None | None | None | Route-absence contract test |
-| Excluded | `FR-API-068`–`FR-API-072` | Agentic HTTP workflows are outside backend v1 pending exact owner views and a canonical development runtime. | None | None | None | Route-absence contract test |
+| Partial | `FR-API-056` | Bridge the Portfolio public API for construction, active-status, and allocation-history operations through an explicitly composed Portfolio dependency bundle. Activation, rollback, drift assessment, rebalance submission, and measurement recomputation remain pending: their intermediate `ValidatedConstructionEvidence`, `PortfolioReviewResult`, `AllocationRiskDecision`, and eligibility inputs are not yet HTTP-producible through the Portfolio public boundary (`coordinate_review` is not exported and `construct_portfolio` discards the evidence it produces). Missing references fail closed. | `POST /api/v1/portfolio/construct`; `GET /api/v1/portfolio/{portfolio_id}/status`; `GET /api/v1/portfolio/{portfolio_id}/history` | Governed Portfolio construction write; read-only owner calls | Permission, idempotency, validation, or dependency error | **Unit:** `tests/api/unit/test_portfolio_routes.py`<br>**Contract:** `tests/api/unit/test_route_catalog.py` |
+| Completed | `FR-API-068` | Reserve exactly one Agentic run identifier through the composed operator surface without executing any agent; require `agentic:submit`, a bounded HTTP idempotency key, and an authenticated human principal. Submission reserves, it never runs. | `POST /api/v1/agentic/runs`; `AgenticRunSubmitRequest` | Agentic run reservation; audit | Bounded 401/403/422/503 failures; `AGENTIC_RUNTIME_UNAVAILABLE` when no bundle is composed | **Unit:** `tests/api/unit/test_agentic_routes.py` |
+| Completed | `FR-API-069` | Expose bounded Agentic run inspection and immutable run-audit reads that remain available while the firm is disabled, so an operator can determine why it stopped. | `GET /api/v1/agentic/runs/{run_id}`; `GET /api/v1/agentic/runs/{run_id}/audit` | Read-only | Bounded 401/403/404/422/503 failures | **Unit:** `tests/api/unit/test_agentic_routes.py` |
+| Completed | `FR-API-070` | Cancel one reserved Agentic run under `agentic:cancel_run` with the deterministic `OPERATOR_CANCELLED` reason; cancellation never fabricates a terminal result. | `DELETE /api/v1/agentic/runs/{run_id}` | Agentic state transition; audit | Bounded 401/403/404/409/503 failures | **Unit:** `tests/api/unit/test_agentic_routes.py` |
+| Completed | `FR-API-071` | Record one authenticated human handoff approval under `agentic:approve_promotion`; the gateway records attestation and never itself authorizes a promotion. | `POST /api/v1/agentic/handoffs/approve`; `AgenticHandoffApprovalRequest` | Agentic approval persistence; audit | Bounded 401/403/409/422/503 failures | **Unit:** `tests/api/unit/test_agentic_routes.py` |
+| Completed | `FR-API-072` | Expose the two Agentic containment operations — agent quarantine and the firm-wide disable kill switch — under `agentic:operate`; Agentic remains the sole authority over its own runtime state. | `POST /api/v1/agentic/incidents/quarantine`; `POST /api/v1/agentic/disable`; `AgenticQuarantineRequest`, `AgenticDisableRequest` | Agentic containment state transition; audit | Bounded 401/403/422/503 failures | **Unit:** `tests/api/unit/test_agentic_routes.py` |
 
 #### Approved route contract inventory
 
@@ -964,7 +1019,10 @@ CSRF for cookie-authenticated browser requests.
 | `dashboards.py` | Six versioned broker/equity/summary/resource/market-hours/calendar reads | Authenticated; injected owner adapter | Read-only with snapshot/freshness; provider failure never silently substituted |
 | `operator.py` | `GET /api/v1/operator/audit-events`; `GET /api/v1/operator/events`; `POST /api/v1/operator/approvals` | Validated human operator; Data owns audit, Trading owns events, UI/API owns approvals | Bounded reads and API approval persistence; no Risk verdict or direct owner storage access |
 | `simulation.py` | `POST /api/v1/simulation/run`; `POST /api/v1/simulation/portfolio-run`; `GET /api/v1/simulation/results/{run_id}` | Authenticated Simulation caller; Simulator owns execution/results | Required idempotency key; explicit dependency composition; durable owner result read |
+| `simulation_sessions.py` | `POST /api/v1/simulation/sessions`; `GET /api/v1/simulation/sessions/{session_id}/frames` | Authenticated `simulation:read`; Simulator owns session and journal truth | Governed durable idempotency on create; SSE quota, raw journal frames, `Last-Event-ID`, and disconnect cleanup |
+| `portfolio.py` | `POST /api/v1/portfolio/construct`; `GET /api/v1/portfolio/{portfolio_id}/status`; `GET /api/v1/portfolio/{portfolio_id}/history` | Authenticated Portfolio caller; Portfolio owns construction/state | Governed construction write with required idempotency and explicit dependency composition; read-only status/history delegation |
 | `risk.py` | `GET /api/v1/risk/kill-switch`; `GET /api/v1/risk/decisions` | Authenticated Risk reader; Risk owns state | Exact-scope and bounded read-only delegation |
+| `optimization.py` | `POST /api/v1/optimization/parameter-sweep`; `POST /api/v1/optimization/walk-forward`; `POST /api/v1/optimization/walk-forward-matrix`; `POST /api/v1/optimization/robustness`; `GET /api/v1/optimization/results/{search_id}`; `POST /api/v1/optimization/compare`; `POST /api/v1/optimization/stability`; `POST /api/v1/optimization/overfit`; `POST /api/v1/optimization/rank`; `POST /api/v1/optimization/robustness-score`; `POST /api/v1/optimization/handoff` | Authenticated Optimization caller; Optimization owns execution/analysis/results | Governed run idempotency required; read-only analyses delegate once; durable result read against the composed state port |
 | `trading.py` | `GET /api/v1/trading/session`; `POST /api/v1/trading/orders`; `DELETE /api/v1/trading/orders/{order_id}`; `POST /api/v1/trading/positions/{position_id}/close` | Authenticated Trading caller; Trading owns state/mutations | Paper-only mutation bridge with exact idempotency, authority, and owner governance |
 
 **Configuration and Limits Manifest**
@@ -972,8 +1030,9 @@ CSRF for cookie-authenticated browser requests.
 No route-local import or documentation-file limits exist because both capabilities are
 outside the initial build.
 
-**Implementation notes:** backend v1 registers exactly 32 operations. Excluded
-workflow families require a new approved contract/composition plan before registration.
+**Implementation notes:** backend v1 registers exactly 55 operations. Playback uses
+raw causative journal events (Option A); per-event equity reconstruction and live
+what-if require a separately approved enhancement.
 
 **Route rules:** endpoint timeout is 30 seconds unless a documented async/stream contract
 applies; raw exceptions never cross the boundary; 204 never has a body; partial mutation
@@ -1237,7 +1296,7 @@ the two authoritative sources; alert delivery never mutates either owner truth.
 | Completed | `NFR-API-001` | Architecture | UI/API shall import only documented public cross-domain APIs, contain no domain calculations, and confine broker access to credential-safe composition. | Package-root import, persistence-layout, and exact-provider graph tests. |
 | Completed | `NFR-API-002` | Security | Protected endpoints require validated user/service context; governed writes require permission, audit, idempotency, fresh evidence, and approval when applicable. | `tests/api/nfr/test_nfr_002_security.py` |
 | Completed | `NFR-API-003` | Safety | Live/paper mutations cannot bypass Trading/Risk live flags, broker readiness, reconciliation, idempotency, audit, or kill-switch gates. | `tests/api/nfr/test_nfr_003_safety.py` |
-| Completed | `NFR-API-004` | Contracts | Non-stream responses use `ApiResponse`; streams use `StreamEvent`; API/UI drift fails CI. | Backend OpenAPI digest and operation inventory are frozen at 32 operations; frontend drift test passes (`app/ui/src/clients/clients.contract.test.ts`); Sections 4.9–4.12 are complete. |
+| Completed | `NFR-API-004` | Contracts | Non-stream responses use `ApiResponse`; streams use `StreamEvent`; API/UI drift fails CI. | Backend OpenAPI digest and operation inventory are frozen at 55 operations; frontend drift test passes (`app/ui/src/clients/clients.contract.test.ts`); Sections 4.9–4.12 are complete. |
 | Completed | `NFR-API-005` | Security | Logs, errors, traces, telemetry, examples, and screenshots contain no tokens, credentials, passwords, CSRF values, raw secrets, or private broker data. | `tests/api/nfr/test_nfr_005_redaction.py` |
 | Completed | `NFR-API-006` | Reliability | Required-route/dependency failures block startup/readiness; only explicitly optional routes degrade with a visible reason. | `tests/api/nfr/test_nfr_006_startup.py` |
 | Completed | `NFR-API-007` | Streaming | Disconnect stops delivery, releases resources, preserves authoritative owner state, and emits no later client events. | `tests/api/nfr/test_nfr_007_streaming.py` |

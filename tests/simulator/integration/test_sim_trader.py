@@ -1,5 +1,4 @@
 """Workflow integration test for Trading's injected Simulation port."""
-# ruff: noqa: INP001
 
 import asyncio
 from pathlib import Path
@@ -10,6 +9,7 @@ from app.services.simulator import (
     unwrap_simulation_response,
 )
 from app.utils import get_logger
+
 from tests.simulator.unit.test_engine import _engine, _intent, _tick
 
 logger = get_logger(__name__)

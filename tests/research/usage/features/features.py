@@ -307,12 +307,12 @@ def main() -> None:
     _stage_header(12, "FEAT-RES-12", "Safe Research Artifact Persistence")
     import tempfile
 
-    from app.utils.contracts.auth import AuthContext
+    from app.utils import create_auth_context
 
     art_root = Path(tempfile.mkdtemp()) / "artifacts"
     art_config = create_research_value("ArtifactWriteConfig", art_root, "json")
     art_dest = art_root / "report.json"
-    auth_ctx = AuthContext(
+    auth_ctx = create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="researcher-001",

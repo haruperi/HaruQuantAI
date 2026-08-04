@@ -37,6 +37,23 @@ def test_simulation_imports_no_data_storage_module() -> None:
         name.startswith("app.services.data.persistence") for name in _imported_modules()
     )
     assert SIMULATION_MIGRATIONS[0].domain == "simulator"
+    assert [step.migration_id for step in SIMULATION_MIGRATIONS] == [
+        "001_simulator_state_v1",
+        "002_simulator_playback_sessions_v1",
+    ]
+    session_ddl = SIMULATION_MIGRATIONS[1].statements[0]
+    assert "CREATE TABLE IF NOT EXISTS sim_sessions" in session_ddl
+    assert all(
+        column in session_ddl
+        for column in (
+            "session_id",
+            "run_id",
+            "status",
+            "cursor",
+            "created_at",
+            "expires_at",
+        )
+    )
 
 
 def test_simulation_imports_no_sqlite_module() -> None:

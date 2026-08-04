@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.services.api._settings import ApiSettings, get_api_settings
+from app.services.api.composition.agentic_dependencies import build_agentic_source
 from app.services.api.composition.in_process import (
     build_in_process_graph,
     get_graph_closers,
@@ -15,6 +16,9 @@ from app.services.api.composition.in_process import (
     get_graph_probes,
 )
 from app.services.api.composition.lifecycle import lifespan
+from app.services.api.composition.optimization_dependencies import (
+    build_optimization_source,
+)
 from app.services.api.composition.owner_sources import (
     read_audit_events,
     read_dashboard_snapshot,
@@ -23,8 +27,12 @@ from app.services.api.composition.owner_sources import (
     read_trading_events,
     read_trading_session,
 )
+from app.services.api.composition.portfolio_dependencies import (
+    build_portfolio_source,
+)
 from app.services.api.composition.simulation_dependencies import (
     build_simulation_run_source,
+    build_simulation_session_source,
 )
 from app.services.api.composition.trading_dependencies import (
     build_trading_mutation_source,
@@ -46,6 +54,7 @@ from app.services.api.middleware.envelope import get_canonical_envelope_middlewa
 from app.services.api.middleware.rate_limits import RateLimitMiddleware
 from app.services.api.middleware.redaction import SecretRedactionMiddleware
 from app.services.api.routes import (
+    agentic_router,
     auth_router,
     dashboards_router,
     data_router,
@@ -53,10 +62,13 @@ from app.services.api.routes import (
     health_router,
     observability_router,
     operator_router,
+    optimization_router,
+    portfolio_router,
     research_router,
     risk_router,
     settings_router,
     simulation_router,
+    simulation_sessions_router,
     strategies_router,
     trading_router,
 )
@@ -73,11 +85,15 @@ _ROUTERS = (
     strategies_router,
     research_router,
     simulation_router,
+    simulation_sessions_router,
+    portfolio_router,
     risk_router,
     trading_router,
+    optimization_router,
     dashboards_router,
     operator_router,
     observability_router,
+    agentic_router,
 )
 
 
@@ -86,6 +102,9 @@ def _build_canonical_graph(
     settings: ApiSettings,
     simulation_dependencies: object | None = None,
     trading_dependencies: object | None = None,
+    portfolio_dependencies: object | None = None,
+    optimization_dependencies: object | None = None,
+    agentic_dependencies: object | None = None,
 ) -> object:
     """Build the exact owner-backed graph for the reduced backend v1.
 
@@ -94,15 +113,21 @@ def _build_canonical_graph(
     """
     return build_in_process_graph(
         {
+            "agentic.source": build_agentic_source(agentic_dependencies),
             "dashboard.source": read_dashboard_snapshot,
             "operator.audit_source": read_audit_events,
             "operator.event_source": read_trading_events,
+            "optimization.source": build_optimization_source(optimization_dependencies),
+            "portfolio.source": build_portfolio_source(portfolio_dependencies),
             "risk.source": read_risk_state,
             "simulation.result_source": partial(
                 read_simulation_result,
                 artifact_root=settings.simulation_artifact_root,
             ),
             "simulation.run_source": build_simulation_run_source(
+                simulation_dependencies
+            ),
+            "simulation.session_source": build_simulation_session_source(
                 simulation_dependencies
             ),
             "trading.mutation_source": build_trading_mutation_source(
@@ -220,6 +245,9 @@ def create_app(
     owned_resource_closers: tuple[Callable[[], object], ...] = (),
     simulation_dependencies: object | None = None,
     trading_dependencies: object | None = None,
+    portfolio_dependencies: object | None = None,
+    optimization_dependencies: object | None = None,
+    agentic_dependencies: object | None = None,
 ) -> FastAPI:
     """Construct the single canonical UI/API application.
 
@@ -231,6 +259,13 @@ def create_app(
         owned_resource_closers: Gateway-owned resource shutdown hooks.
         simulation_dependencies: Complete Simulator receiver-owned port bundle.
         trading_dependencies: Complete Trading receiver-owned dependency bundle.
+        portfolio_dependencies: Complete Portfolio receiver-owned dependency
+            bundle (opaque ``PortfolioService`` handle).
+        optimization_dependencies: Complete Optimization receiver-owned
+            dependency bundle, or ``None`` to fail every Optimization route
+            closed with HTTP 503.
+        agentic_dependencies: Complete Agentic ``AgenticDependencies`` bundle,
+            or ``None`` to fail every Agentic route closed with HTTP 503.
 
     Returns:
         Fully composed FastAPI application.
@@ -260,6 +295,9 @@ def create_app(
         settings=settings,
         simulation_dependencies=simulation_dependencies,
         trading_dependencies=trading_dependencies,
+        portfolio_dependencies=portfolio_dependencies,
+        optimization_dependencies=optimization_dependencies,
+        agentic_dependencies=agentic_dependencies,
     )
     graph_overrides = dict(get_graph_overrides(graph))
     graph_overrides.update(dependency_overrides or {})

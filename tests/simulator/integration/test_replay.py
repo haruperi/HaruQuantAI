@@ -1,5 +1,4 @@
 """Workflow integration test for deterministic official-journal replay."""
-# ruff: noqa: INP001
 
 from pathlib import Path
 
@@ -10,6 +9,7 @@ from app.services.simulator import (
     unwrap_simulation_response,
 )
 from app.utils import get_logger
+
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
     _auth,

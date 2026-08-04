@@ -1,8 +1,6 @@
 import json
 import logging
 import os
-import subprocess
-import sys
 import time
 import zipfile
 from collections.abc import Iterator
@@ -221,48 +219,6 @@ def test_configure_logging_is_idempotent(
         if handler.__class__.__module__ == "app.utils.logging.logger"
     ]
     assert len(owned) == 1
-
-
-def test_import_registers_no_handlers() -> None:
-    command = (
-        "import logging; import app.utils; "
-        "print(len(logging.getLogger('haruquant').handlers))"
-    )
-    completed = subprocess.run(  # noqa: S603 - fixed interpreter and source.
-        [sys.executable, "-c", command],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    assert completed.stdout.strip() == "0"
-
-
-def test_import_time_bound_log_does_not_activate_defaults(tmp_path: Path) -> None:
-    probe = tmp_path / "lazy_logging_probe.py"
-    probe.write_text(
-        "from app.utils import get_logger\nget_logger('haruquant').info('import-time record')\n",
-        encoding="utf-8",
-    )
-    environment = os.environ.copy()
-    environment["PYTHONPATH"] = os.pathsep.join(
-        filter(None, (str(tmp_path), environment.get("PYTHONPATH", "")))
-    )
-    command = (
-        "import logging; import lazy_logging_probe; "
-        "print(len(logging.getLogger('haruquant').handlers))"
-    )
-
-    completed = subprocess.run(  # noqa: S603 - fixed interpreter and source.
-        [sys.executable, "-c", command],
-        check=True,
-        capture_output=True,
-        text=True,
-        cwd=Path(__file__).parents[3],
-        env=environment,
-    )
-
-    assert completed.stdout.strip() == "0"
-    assert not (tmp_path / "data" / "logs").exists()
 
 
 def test_configure_logging_applies_log_level() -> None:

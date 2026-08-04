@@ -18,7 +18,7 @@ from app.services.api._limits import (
     PREFLIGHT_WARNING_TTL_SECONDS,
     get_default_rate_limits,
 )
-from app.utils.settings import (
+from app.utils import (
     get_app_settings_model_config,
     get_app_settings_sources,
 )

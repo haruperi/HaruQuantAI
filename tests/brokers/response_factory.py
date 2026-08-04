@@ -13,9 +13,9 @@ from app.services.brokers.contracts import (
     BrokerId,
 )
 from app.services.brokers.contracts.responses import build_broker_response
-from app.utils.identity import generate_id
-from app.utils.responses.models import StandardResponse
-from app.utils.time import utc_now
+from app.utils import generate_id, get_standard_response_type, utc_now
+
+StandardResponse: Any = get_standard_response_type()
 
 
 def broker_response(

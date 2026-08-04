@@ -13,10 +13,14 @@ _PERSISTENCE_ROOT = _SIMULATOR_ROOT / "persistence"
 _PERSISTENCE_EXPORTS = {
     "complete_run_record",
     "create_run_record",
+    "create_session_record",
     "create_simulator_persistence_store",
+    "read_completed_run_record",
     "read_result_record",
     "read_run_record",
+    "read_session_record",
     "update_run_record",
+    "update_session_record",
 }
 _DATA_RUNTIME_OPERATIONS = {
     "build_simulator_runtime_store",

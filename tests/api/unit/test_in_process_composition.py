@@ -21,12 +21,16 @@ def test_provider_manifest_is_exact_and_deterministic() -> None:
     """Expose one stable provider manifest without duplicate route bindings."""
     names = get_required_in_process_provider_names()
     assert names == (
+        "agentic.source",
         "dashboard.source",
         "operator.audit_source",
         "operator.event_source",
+        "optimization.source",
+        "portfolio.source",
         "risk.source",
         "simulation.result_source",
         "simulation.run_source",
+        "simulation.session_source",
         "trading.mutation_source",
         "trading.session_source",
     )

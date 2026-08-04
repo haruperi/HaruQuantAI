@@ -15,7 +15,9 @@ from app.services.research import (
     create_research_value,
     write_research_artifact,
 )
-from app.utils.contracts.auth import AuthContext
+from app.utils import create_auth_context
+
+type AuthContext = Any
 
 _HASH = "e" * 64
 
@@ -69,7 +71,7 @@ def _report() -> object:
 
 def _auth() -> AuthContext:
     """Build a valid AuthContext."""
-    return AuthContext(
+    return create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="researcher-001",

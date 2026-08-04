@@ -326,6 +326,7 @@ the rows anyone actually queries.
 | `idx_indicator_cache_stale` | `state IN ('stale','invalidated')` | Cache rebuild queue |
 | `idx_opt_trials_pending` | `state='pending'` | Trial dispatch |
 | `idx_sim_runs_active` | `state IN ('queued','running')` | Run scheduler |
+| `idx_sim_sessions_expiry` | `status IN ('active','expired')` | Playback-session expiry and cleanup |
 
 Six of these are **unique partial indexes enforcing a business invariant**. That is
 their primary job; query acceleration is secondary.

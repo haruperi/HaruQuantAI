@@ -1,5 +1,4 @@
 """Workflow integration test for the registered-strategy security boundary."""
-# ruff: noqa: INP001
 
 import pytest
 from app.services.simulator import (
@@ -7,6 +6,7 @@ from app.services.simulator import (
     validate_run_inputs,
 )
 from app.utils import get_logger
+
 from tests.simulator.unit.test_validate import _valid_payload
 
 logger = get_logger(__name__)

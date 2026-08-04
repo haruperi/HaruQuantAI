@@ -1,6 +1,5 @@
 """Integration tests for complete Portfolio construction coordination."""
 
-# ruff: noqa: INP001
 from __future__ import annotations
 
 from datetime import datetime
@@ -14,6 +13,7 @@ from app.services.portfolio import (
     execute_portfolio_handle_operation,
 )
 from app.utils import get_logger
+
 from tests.portfolio.unit.test_allocation import _activator, _inactive_kill_switch
 from tests.portfolio.unit.test_evidence import (
     _owner_bundle,

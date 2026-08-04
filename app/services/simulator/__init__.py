@@ -264,6 +264,46 @@ def get_simulation_result(run_id: str, **values: object) -> object | None:
     return execute_simulation_state_store_operation(store, "load_result", run_id)
 
 
+def create_simulation_session(
+    run_id: str, *, request_id: str
+) -> StandardResponse[object]:
+    """Create one journal playback session for a completed run."""
+    return _guarded(
+        _operation("app.services.simulator.state", "create_simulation_session"),
+        operation="simulation.state.create_simulation_session",
+        risk_level="low",
+        read_only=False,
+        modifies_database=True,
+    )(run_id, request_id=request_id)
+
+
+def read_simulation_session(session_id: str) -> StandardResponse[object]:
+    """Read one journal playback session projection."""
+    return _guarded(
+        _operation("app.services.simulator.state", "read_simulation_session"),
+        operation="simulation.state.read_simulation_session",
+        risk_level="low",
+        read_only=True,
+    )(session_id)
+
+
+def stream_simulation_session_frames(
+    session_id: str,
+    *,
+    resume_after: int | None,
+    dependencies: object,
+) -> object:
+    """Return an async iterator over one playback session's journal frames."""
+    operation = _operation(
+        "app.services.simulator.state", "stream_simulation_session_frames"
+    )
+    return operation(
+        session_id,
+        resume_after=resume_after,
+        dependencies=dependencies,
+    )
+
+
 def create_simulation_handle(
     handle_type: str, /, *args: object, **kwargs: object
 ) -> object:
@@ -700,6 +740,7 @@ __all__ = (
     "calculate_simulation_backtest_config_hash",
     "convert_fx_amount",
     "create_simulation_handle",
+    "create_simulation_session",
     "create_simulation_value",
     "dump_simulation_value",
     "evaluate_protective_exit",
@@ -721,11 +762,13 @@ __all__ = (
     "match_order",
     "normalize_volume",
     "price_order",
+    "read_simulation_session",
     "replay_journal",
     "resolve_idempotent_run",
     "run_backtest",
     "run_fast_research",
     "run_portfolio_backtest",
+    "stream_simulation_session_frames",
     "to_simulation_error_payload",
     "unwrap_simulation_response",
     "validate_fx_evidence",

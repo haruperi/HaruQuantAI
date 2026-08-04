@@ -28,6 +28,10 @@ from app.services.research import create_research_value, is_research_value
 from app.utils import get_logger, is_sensitive_key, utc_now
 
 _MAX_VISIBLE_IDS = 200
+_MAX_REFERENCE_LENGTH = 200
+_MAX_TEXT_LENGTH = 2_000
+_MAX_SEQUENCE_ITEMS = 64
+_HASH_HEX_LENGTH = 64
 _HTTP_SUCCESS_MIN = 200
 _HTTP_ERROR_MIN = 400
 
@@ -677,6 +681,22 @@ class GovernedRequestContext(_BaseApiContract):
         return (now - self.generated_at).total_seconds() > self.stale_after_seconds
 
 
+class SimulationSessionCreateRequest(_BaseApiContract):
+    """Request to open playback over one completed Simulation run."""
+
+    run_id: str = Field(min_length=1, max_length=200)
+
+    @field_validator("run_id")
+    @classmethod
+    def _validate_run_id(cls, value: str) -> str:
+        """Validate one trimmed completed-run identity.
+
+        Returns:
+            Validated run identity.
+        """
+        return _validate_non_empty(value, "run_id")
+
+
 class SimulationRunRequest(_BaseApiContract):
     """Exact API projection of ``SimulationBacktestRequestV1``."""
 
@@ -808,6 +828,99 @@ class TradingMutationRequest(_BaseApiContract):
     instrument_quantity_step: Decimal | None = None
     instrument_price_tick: Decimal | None = None
     redaction_applied: Literal[True] = True
+
+
+class PortfolioStrategyAllocationRef(_BaseApiContract):
+    """Exact API projection of one Portfolio component reference.
+
+    Attributes:
+        component_id: Portfolio-local stable component identity.
+        strategy_id: Strategy-owned immutable identity.
+        strategy_version: Exact Strategy version.
+        registry_record_hash: Strategy registry record digest.
+        eligibility_decision_id: Risk eligibility decision reference.
+    """
+
+    component_id: str
+    strategy_id: str
+    strategy_version: str
+    registry_record_hash: str
+    eligibility_decision_id: str
+
+
+class PortfolioFixedWeightInput(_BaseApiContract):
+    """Exact API projection of one fixed-weight component.
+
+    Attributes:
+        component_id: Referenced component identity.
+        capital_weight: Target capital metadata weight.
+        proposed_risk_budget_weight: Non-authoritative proposed Risk budget.
+    """
+
+    component_id: str
+    capital_weight: Decimal
+    proposed_risk_budget_weight: Decimal
+
+
+class PortfolioEvidenceReferenceSet(_BaseApiContract):
+    """Exact API projection of one Portfolio construction evidence lineage.
+
+    Attributes:
+        account_snapshot_id: Data account snapshot reference.
+        account_snapshot_hash: Account snapshot digest.
+        account_snapshot_as_of: Account snapshot observation time.
+        market_dataset_id: Data market dataset reference.
+        market_dataset_hash: Market dataset digest.
+        market_dataset_as_of: Market evidence observation time.
+        analytics_evidence_id: Analytics evidence reference.
+        analytics_evidence_hash: Analytics evidence digest.
+        analytics_evidence_as_of: Analytics evidence observation time.
+        fx_evidence_ids: Ordered Data FX evidence references.
+        fx_evidence_hashes: Ordered digests aligned to each FX reference.
+    """
+
+    account_snapshot_id: str
+    account_snapshot_hash: str
+    account_snapshot_as_of: datetime
+    market_dataset_id: str
+    market_dataset_hash: str
+    market_dataset_as_of: datetime
+    analytics_evidence_id: str
+    analytics_evidence_hash: str
+    analytics_evidence_as_of: datetime
+    fx_evidence_ids: tuple[str, ...]
+    fx_evidence_hashes: tuple[str, ...]
+
+
+class PortfolioConstructRequest(_BaseApiContract):
+    """Exact API projection of ``PortfolioConstructionRequest``.
+
+    The bridge converts this boundary model into the strict Portfolio-owned
+    construction request through Portfolio's package-root value factory.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["portfolio.construction_request.v1"] = (
+        "portfolio.construction_request.v1"
+    )
+    request_id: str
+    workflow_id: str
+    correlation_id: str
+    causation_id: str | None = None
+    portfolio_id: str
+    portfolio_version: str
+    scope: Mapping[str, str]
+    components: tuple[PortfolioStrategyAllocationRef, ...]
+    method: Literal["fixed", "equal", "inverse_volatility"]
+    fixed_weights: tuple[PortfolioFixedWeightInput, ...]
+    evidence: PortfolioEvidenceReferenceSet
+    measurement_start: datetime
+    measurement_end: datetime
+    base_currency: str
+    runtime_profile: Literal["simulation", "paper", "live"]
+    execution_route: Literal["sim", "paper", "live"]
+    simulation_policy_version: str
+    requested_at: datetime
 
 
 class PageContext(_BaseApiContract):
@@ -1010,6 +1123,256 @@ class ResearchRunRequest(BaseModel):
         return cast("dict[str, object]", _serialize_mappingproxy(value))
 
 
+class AgenticRunSubmitRequest(_BaseApiContract):
+    """Bounded authenticated request to reserve one Agentic run.
+
+    Submitting reserves a run identifier; it does **not** execute agents. The
+    bridge forwards these fields to the Agentic operator surface, which refuses
+    an unregistered workflow deterministically.
+    """
+
+    workflow_name: str
+    objective: str
+    input_refs: tuple[str, ...] = ()
+    deadline_seconds: int = Field(default=1_800, gt=0, le=86_400)
+    cost_budget: str | None = Field(default=None, max_length=64)
+
+    @field_validator("workflow_name", "objective")
+    @classmethod
+    def _validate_text(cls, value: str) -> str:
+        """Validate non-empty trimmed bounded text.
+
+        Args:
+            value: Candidate text.
+
+        Returns:
+            The validated, trimmed text.
+
+        Raises:
+            ValueError: If the text is empty, untrimmed, or oversized.
+        """
+        if not value or value != value.strip():
+            msg = "field must be non-empty trimmed text"
+            raise ValueError(msg)
+        if len(value) > _MAX_TEXT_LENGTH:
+            msg = "field must not exceed 2000 characters"
+            raise ValueError(msg)
+        return value
+
+    @field_validator("input_refs", mode="before")
+    @classmethod
+    def _coerce_input_refs(cls, value: object) -> tuple[str, ...]:
+        """Normalize one JSON-style evidence-reference sequence.
+
+        Args:
+            value: Candidate sequence.
+
+        Returns:
+            Tuple of trimmed non-empty references.
+
+        Raises:
+            ValueError: If any reference is blank or the tuple is oversized.
+        """
+        if isinstance(value, str):
+            items: tuple[str, ...] = (value,)
+        elif isinstance(value, tuple | list):
+            items = tuple(str(item) for item in value)
+        else:
+            items = ()
+        normalized = tuple(item for item in items if item)
+        if len(normalized) != len(items):
+            msg = "input_refs must not contain blank entries"
+            raise ValueError(msg)
+        if len(normalized) > _MAX_SEQUENCE_ITEMS:
+            msg = "input_refs must not exceed 64 entries"
+            raise ValueError(msg)
+        return normalized
+
+
+class AgenticHandoffApprovalRequest(_BaseApiContract):
+    """Bounded authenticated human approval of one staged Agentic artefact."""
+
+    artifact_hash: str
+    artifact_id: str
+    rationale: str
+
+    @field_validator("artifact_hash")
+    @classmethod
+    def _validate_hash(cls, value: str) -> str:
+        """Validate one lowercase SHA-256 artefact digest.
+
+        Args:
+            value: Candidate digest.
+
+        Returns:
+            The validated digest.
+
+        Raises:
+            ValueError: If the digest is not 64 lowercase hex characters.
+        """
+        if len(value) != _HASH_HEX_LENGTH or any(
+            ch not in "0123456789abcdef" for ch in value
+        ):
+            msg = "artifact_hash must be 64 lowercase hex characters"
+            raise ValueError(msg)
+        return value
+
+    @field_validator("artifact_id", "rationale")
+    @classmethod
+    def _validate_text(cls, value: str) -> str:
+        """Validate non-empty trimmed bounded text.
+
+        Args:
+            value: Candidate text.
+
+        Returns:
+            The validated, trimmed text.
+
+        Raises:
+            ValueError: If the text is empty, untrimmed, or oversized.
+        """
+        if not value or value != value.strip():
+            msg = "field must be non-empty trimmed text"
+            raise ValueError(msg)
+        if len(value) > _MAX_TEXT_LENGTH:
+            msg = "field must not exceed 2000 characters"
+            raise ValueError(msg)
+        return value
+
+
+class AgenticQuarantineRequest(_BaseApiContract):
+    """Bounded authenticated request to classify, contain, and record one incident."""
+
+    run_id: str
+    kind: Literal[
+        "cost",
+        "data_poisoning",
+        "drift",
+        "injection",
+        "privilege",
+        "provider",
+        "runaway_loop",
+        "sandbox",
+        "schema",
+    ]
+    trigger: str
+    role_id: str
+    preserved_evidence_refs: tuple[str, ...]
+    checkpoint_ref: str
+
+    @field_validator("run_id", "role_id", "checkpoint_ref")
+    @classmethod
+    def _validate_reference(cls, value: str) -> str:
+        """Validate one short non-empty trimmed reference.
+
+        Args:
+            value: Candidate reference.
+
+        Returns:
+            The validated, trimmed reference.
+
+        Raises:
+            ValueError: If the reference is empty, untrimmed, or oversized.
+        """
+        if not value or value != value.strip():
+            msg = "reference must be non-empty trimmed text"
+            raise ValueError(msg)
+        if len(value) > _MAX_REFERENCE_LENGTH:
+            msg = "reference must not exceed 200 characters"
+            raise ValueError(msg)
+        return value
+
+    @field_validator("trigger")
+    @classmethod
+    def _validate_trigger(cls, value: str) -> str:
+        """Validate the bounded incident trigger description.
+
+        Args:
+            value: Candidate trigger text.
+
+        Returns:
+            The validated, trimmed trigger text.
+
+        Raises:
+            ValueError: If the trigger is empty, untrimmed, or oversized.
+        """
+        if not value or value != value.strip():
+            msg = "trigger must be non-empty trimmed text"
+            raise ValueError(msg)
+        if len(value) > _MAX_TEXT_LENGTH:
+            msg = "trigger must not exceed 2000 characters"
+            raise ValueError(msg)
+        return value
+
+    @field_validator("preserved_evidence_refs", mode="before")
+    @classmethod
+    def _coerce_evidence(cls, value: object) -> tuple[str, ...]:
+        """Normalize one non-empty JSON-style evidence-reference sequence.
+
+        Args:
+            value: Candidate sequence.
+
+        Returns:
+            Tuple of trimmed non-empty references.
+
+        Raises:
+            ValueError: If the sequence is empty, blank, or oversized.
+        """
+        if isinstance(value, str):
+            items: tuple[str, ...] = (value,)
+        elif isinstance(value, tuple | list):
+            items = tuple(str(item) for item in value)
+        else:
+            items = ()
+        normalized = tuple(item.strip() for item in items if item.strip())
+        if not normalized:
+            msg = "preserved_evidence_refs must name at least one reference"
+            raise ValueError(msg)
+        if len(normalized) != len(items):
+            msg = "preserved_evidence_refs must not contain blank entries"
+            raise ValueError(msg)
+        if len(normalized) > _MAX_SEQUENCE_ITEMS:
+            msg = "preserved_evidence_refs must not exceed 64 entries"
+            raise ValueError(msg)
+        return normalized
+
+
+class AgenticDisableRequest(_BaseApiContract):
+    """Bounded authenticated request to stop the Agentic firm and settle runs."""
+
+    run_ids: tuple[str, ...] = ()
+    policy: Literal["cancel", "drain"] = "drain"
+
+    @field_validator("run_ids", mode="before")
+    @classmethod
+    def _coerce_run_ids(cls, value: object) -> tuple[str, ...]:
+        """Normalize one optional JSON-style run-identifier sequence.
+
+        Args:
+            value: Candidate sequence.
+
+        Returns:
+            Tuple of trimmed non-empty run identifiers.
+
+        Raises:
+            ValueError: If any identifier is blank or the tuple is oversized.
+        """
+        if isinstance(value, str):
+            items: tuple[str, ...] = (value,)
+        elif isinstance(value, tuple | list):
+            items = tuple(str(item) for item in value)
+        else:
+            items = ()
+        normalized = tuple(item.strip() for item in items if item.strip())
+        if len(normalized) != len(items):
+            msg = "run_ids must not contain blank entries"
+            raise ValueError(msg)
+        if len(normalized) > _MAX_SEQUENCE_ITEMS:
+            msg = "run_ids must not exceed 64 entries"
+            raise ValueError(msg)
+        return normalized
+
+
 def _serialize_mappingproxy(value: object) -> object:
     """Recursively convert mapping proxies, tuples, and dataclasses to JSON-safe values.
 
@@ -1041,7 +1404,96 @@ def _coerce_time(value: str | time) -> time:
     return time.fromisoformat(value)
 
 
+class OptimizationParameterSweepRequest(_BaseApiContract):
+    """Serialized API projection of one Optimization ``SearchRequest``.
+
+    The bridge reconstructs the strict Optimization-owned request through the
+    Optimization package-root value factory; the serialized payload is
+    validated only for non-emptiness and bounded size at the API boundary.
+    """
+
+    request_id: str
+    payload: Mapping[str, object]
+
+
+class OptimizationWalkForwardRequest(_BaseApiContract):
+    """Serialized API projection of one Optimization ``WalkForwardRequest``."""
+
+    request_id: str
+    payload: Mapping[str, object]
+
+
+class OptimizationWalkForwardMatrixRequest(_BaseApiContract):
+    """Serialized API projection of a bounded walk-forward matrix request."""
+
+    request_id: str
+    requests: tuple[Mapping[str, object], ...]
+    max_requests: int = Field(ge=1, le=20)
+
+
+class OptimizationRobustnessRequest(_BaseApiContract):
+    """Serialized API projection of one Optimization robustness request.
+
+    The Optimization robustness contract is a discriminated union of
+    ``MonteCarloRequest`` and ``ExecutionStressAnalysisRequest``. The presence
+    of the ``stress`` field in ``payload`` selects the stress variant; the
+    bridge reconstructs the correct owner value.
+    """
+
+    request_id: str
+    payload: Mapping[str, object]
+    max_simulations: int = Field(default=2000, ge=1, le=10_000)
+
+
+class OptimizationCompareRequest(_BaseApiContract):
+    """Serialized API projection of one Optimization comparison request."""
+
+    request_id: str
+    results: tuple[Mapping[str, object], ...]
+
+
+class OptimizationStabilityRequest(_BaseApiContract):
+    """Serialized API projection of one parameter-stability request."""
+
+    request_id: str
+    ranked_candidates: tuple[Mapping[str, object], ...]
+
+
+class OptimizationOverfitRequest(_BaseApiContract):
+    """Serialized API projection of one overfit-parameter evidence request."""
+
+    request_id: str
+    in_sample: Mapping[str, float]
+    out_of_sample: Mapping[str, float]
+    threshold: float
+
+
+class OptimizationRankRequest(_BaseApiContract):
+    """Serialized API projection of one parameter-set ranking request."""
+
+    request_id: str
+    candidates: tuple[Mapping[str, object], ...]
+
+
+class OptimizationRobustnessScoreRequest(_BaseApiContract):
+    """Serialized API projection of one robustness-score request."""
+
+    request_id: str
+    checks: tuple[bool, ...]
+
+
+class OptimizationHandoffRequest(_BaseApiContract):
+    """Serialized API projection of one Optimization evidence handoff request."""
+
+    request_id: str
+    payload: Mapping[str, object]
+
+
 __all__ = (
+    "AgenticDisableRequest",
+    "AgenticHandoffApprovalRequest",
+    "AgenticQuarantineRequest",
+    "AgenticRunSubmitRequest",
     "ApiError",
     "ApiErrorCode",
     "ApiMetadata",
@@ -1050,9 +1502,23 @@ __all__ = (
     "GovernedRequestContext",
     "HealthDependencyCheck",
     "Liveness",
+    "OptimizationCompareRequest",
+    "OptimizationHandoffRequest",
+    "OptimizationOverfitRequest",
+    "OptimizationParameterSweepRequest",
+    "OptimizationRankRequest",
+    "OptimizationRobustnessRequest",
+    "OptimizationRobustnessScoreRequest",
+    "OptimizationStabilityRequest",
+    "OptimizationWalkForwardMatrixRequest",
+    "OptimizationWalkForwardRequest",
     "PageContext",
     "PortfolioComponentRunRequest",
+    "PortfolioConstructRequest",
+    "PortfolioEvidenceReferenceSet",
+    "PortfolioFixedWeightInput",
     "PortfolioSimulationRunRequest",
+    "PortfolioStrategyAllocationRef",
     "Readiness",
     "ResearchRunRequest",
     "RouteContract",

@@ -1,6 +1,7 @@
 """Supported Simulation journal API."""
 
 from app.services.simulator.journal.contracts import JournalEvent
+from app.services.simulator.journal.playback import stream_journal_events
 from app.services.simulator.journal.replay import (
     replay_journal,
     resolve_idempotent_run,
@@ -20,4 +21,5 @@ __all__ = [
     "JournalWriter",
     "replay_journal",
     "resolve_idempotent_run",
+    "stream_journal_events",
 ]

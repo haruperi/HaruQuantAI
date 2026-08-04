@@ -1,5 +1,4 @@
 """Workflow integration test for all-or-nothing portfolio simulation."""
-# ruff: noqa: INP001
 
 from decimal import Decimal
 from pathlib import Path
@@ -11,6 +10,7 @@ from app.services.simulator import (
     unwrap_simulation_response,
 )
 from app.utils import get_logger
+
 from tests.simulator.unit.test_orchestrator import FakeDependencies, _dataset
 from tests.simulator.unit.test_portfolio_run import (
     _portfolio_auth,

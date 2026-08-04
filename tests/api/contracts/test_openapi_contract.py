@@ -25,10 +25,10 @@ def test_openapi_v1_contains_no_excluded_routes() -> None:
     paths = tuple(create_api_app().openapi()["paths"])
     assert not any("/imports" in path for path in paths)
     assert not any("/docs/" in path for path in paths)
-    assert not any("/simulation/sessions" in path for path in paths)
+    assert "/api/v1/simulation/sessions" in paths
     assert not any("/backtest/" in path for path in paths)
     assert "/api/v1/risk/kill-switch" in paths
     assert "/api/v1/trading/session" in paths
-    assert not any("/optimization/" in path for path in paths)
-    assert not any("/portfolio/" in path for path in paths)
-    assert not any("/agentic/" in path for path in paths)
+    assert "/api/v1/optimization/parameter-sweep" in paths
+    assert "/api/v1/portfolio/construct" in paths
+    assert any("/agentic/" in path for path in paths)

@@ -1,10 +1,10 @@
 """Workflow integration test for isolated non-canonical fast research."""
-# ruff: noqa: INP001
 
 from pathlib import Path
 
 from app.services.simulator import run_fast_research, unwrap_simulation_response
 from app.utils import get_logger
+
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
     _auth,

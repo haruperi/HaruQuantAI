@@ -1,5 +1,4 @@
 """Workflow integration tests for the official governed backtest path."""
-# ruff: noqa: INP001
 
 import tracemalloc
 from datetime import UTC, datetime, timedelta
@@ -14,6 +13,7 @@ from app.services.data import (
 )
 from app.services.simulator import run_backtest, unwrap_simulation_response
 from app.utils import get_logger
+
 from tests.simulator.unit.test_orchestrator import (
     FakeDependencies,
     _auth,

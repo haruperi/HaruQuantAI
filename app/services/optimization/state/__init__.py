@@ -11,6 +11,7 @@ from app.services.optimization.state.contracts import (
     OptimizationStateStore,
 )
 from app.services.optimization.state.persistence import persist_optimization_result
+from app.services.optimization.state.read import load_optimization_result
 from app.services.optimization.state.stores import (
     load_search_checkpoint,
     save_search_checkpoint,
@@ -23,6 +24,7 @@ __all__ = [
     "OptimizationStateStore",
     "build_optimization_artifact_path",
     "get_optimization_migrations",
+    "load_optimization_result",
     "load_search_checkpoint",
     "persist_optimization_result",
     "save_search_checkpoint",

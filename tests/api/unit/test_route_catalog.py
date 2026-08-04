@@ -14,19 +14,27 @@ def test_every_openapi_operation_has_exactly_one_contract() -> None:
     }
     declarations = {(item.method, item.path) for item in registry.all()}
     assert operations == declarations
-    assert registry.size == 32
+    assert registry.size == 55
     assert registry.get("GET", "/api/v1/auth/me") is not None
     assert registry.get("GET", "/api/v1/data/stream") is not None
-    assert registry.get("GET", "/api/v1/agentic/runs/concrete-id") is None
+    assert registry.get("POST", "/api/v1/portfolio/construct") is not None
+    assert registry.get("GET", "/api/v1/agentic/runs/concrete-id") is not None
+    assert registry.get("POST", "/api/v1/optimization/parameter-sweep") is not None
+    assert registry.get("GET", "/api/v1/optimization/results/concrete-id") is not None
+    assert registry.get("POST", "/api/v1/simulation/sessions") is not None
+    assert (
+        registry.get("GET", "/api/v1/simulation/sessions/{session_id}/frames")
+        is not None
+    )
 
 
 def test_excluded_workflow_routes_are_absent() -> None:
     """Uncomposed owner workflow families stay outside backend v1."""
     paths = create_api_app().openapi()["paths"]
-    assert not any("/simulation/sessions" in path for path in paths)
+    assert "/api/v1/simulation/sessions" in paths
     assert not any("/backtest/" in path for path in paths)
     assert "/api/v1/risk/kill-switch" in paths
     assert "/api/v1/trading/session" in paths
-    assert not any("/optimization/" in path for path in paths)
-    assert not any("/portfolio/" in path for path in paths)
-    assert not any("/agentic/" in path for path in paths)
+    assert "/api/v1/optimization/parameter-sweep" in paths
+    assert "/api/v1/portfolio/construct" in paths
+    assert "/api/v1/agentic/runs" in paths

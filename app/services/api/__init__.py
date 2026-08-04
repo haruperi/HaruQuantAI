@@ -48,8 +48,11 @@ type AuthContext = Any
 
 __all__ = (
     "authenticate_api_user",
+    "build_api_agentic_dependencies",
     "build_api_error",
     "build_api_metadata",
+    "build_api_optimization_dependencies",
+    "build_api_portfolio_dependencies",
     "build_api_response",
     "build_api_settings",
     "build_api_simulation_dependencies",
@@ -495,6 +498,9 @@ def create_api_app(
     | None = None,
     simulation_dependencies: object | None = None,
     trading_dependencies: object | None = None,
+    portfolio_dependencies: object | None = None,
+    optimization_dependencies: object | None = None,
+    agentic_dependencies: object | None = None,
 ) -> object:
     """Construct the canonical application through the package boundary.
 
@@ -511,7 +517,49 @@ def create_api_app(
         dependency_overrides=dependency_overrides,
         simulation_dependencies=simulation_dependencies,
         trading_dependencies=trading_dependencies,
+        portfolio_dependencies=portfolio_dependencies,
+        optimization_dependencies=optimization_dependencies,
+        agentic_dependencies=agentic_dependencies,
     )
+
+
+def build_api_portfolio_dependencies(**values: object) -> object:
+    """Compose the complete Portfolio receiver-owned dependency bundle.
+
+    Returns:
+        Opaque Portfolio dependency bundle.
+    """
+    from app.services.api.composition import (
+        build_api_portfolio_dependencies as build,
+    )
+
+    return build(**cast("Any", values))
+
+
+def build_api_agentic_dependencies(**values: object) -> object:
+    """Compose the complete Agentic ``AgenticDependencies`` bundle.
+
+    Returns:
+        Opaque Agentic dependency bundle.
+    """
+    from app.services.api.composition import (
+        build_api_agentic_dependencies as build,
+    )
+
+    return build(**cast("Any", values))
+
+
+def build_api_optimization_dependencies(**values: object) -> object:
+    """Compose the complete Optimization receiver-owned dependency bundle.
+
+    Returns:
+        Opaque Optimization dependency bundle.
+    """
+    from app.services.api.composition import (
+        build_api_optimization_dependencies as build,
+    )
+
+    return build(**cast("Any", values))
 
 
 def build_api_simulation_dependencies(**values: object) -> object:

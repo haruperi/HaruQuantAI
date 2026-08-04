@@ -15,10 +15,10 @@ from typing import Annotated, Final, Literal, override
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, PydanticBaseSettingsSource
 
-from app.utils import get_logger
-from app.utils.settings import (
+from app.utils import (
     get_app_settings_model_config,
     get_app_settings_sources,
+    get_logger,
 )
 
 logger = get_logger(__name__)

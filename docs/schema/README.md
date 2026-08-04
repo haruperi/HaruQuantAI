@@ -61,7 +61,7 @@ actually contains and this model states what it should become.
 | **Engine strategy** | SQLite-native equivalents for JSONB/hypertables (owner-selected) |
 | **Authored** | 2026-08-03 |
 | **Approval** | Dry-Run Plan 1 (authored), Dry-Run Plan 2 Phase 0 (promoted) |
-| **Entities** | 102 tables across 14 domains |
+| **Entities** | 103 tables across 14 domains |
 | **Storage model** | MT5 broker is the runtime source; Parquet is the pinned store; SQLite holds system state + a Parquet catalog. **No bulk series in the database.** |
 | **Verified** | All DDL executed against a live SQLite engine; FK targets, index targets, audit columns, prefix ownership, `STRICT` mode, and absence of `REAL` monetary columns all checked programmatically |
 
@@ -73,7 +73,7 @@ actually contains and this model states what it should become.
 |---|---|
 | [00_domain_relationship_map.md](00_domain_relationship_map.md) | Ownership model, dependency DAG, cross-domain FK policy, universal conventions |
 | [01_entity_specs_core.md](01_entity_specs_core.md) | Utils, Brokers, Data, Indicators — 25 tables |
-| [02_entity_specs_execution.md](02_entity_specs_execution.md) | Strategy, Risk, Trading, Simulator — 25 tables |
+| [02_entity_specs_execution.md](02_entity_specs_execution.md) | Strategy, Risk, Trading, Simulator — 26 tables |
 | [03_entity_specs_intelligence.md](03_entity_specs_intelligence.md) | Analytics, Optimization, Research, Portfolio, Agentic, UI-API — 52 tables |
 | [04_indexing_and_performance.md](04_indexing_and_performance.md) | PRAGMAs, Parquet layout, catalog-then-file read paths, index catalogue, throughput |
 | [05_reconciliation.md](05_reconciliation.md) | **Live vs. proposal diff, adoption tiers, resolution of D4** |

@@ -5,7 +5,6 @@
 These tests prove the published shapes match what the registered consumers read,
 rather than asserting parity in a comment.
 """
-# ruff: noqa: INP001
 
 from decimal import Decimal
 
@@ -15,6 +14,7 @@ from app.services.simulator import (
     get_simulation_value_fields,
 )
 from app.utils import get_logger
+
 from tests.simulator.unit.test_orchestrator import _dataset, _request
 from tests.simulator.unit.test_portfolio_run import _portfolio_request
 from tests.simulator.unit.test_reporting_contracts import _result

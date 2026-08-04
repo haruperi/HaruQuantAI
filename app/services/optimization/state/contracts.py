@@ -133,6 +133,11 @@ class OptimizationStateStore(Protocol):
         )
         raise NotImplementedError
 
+    def load_result(self, search_id: str) -> OptimizationResult | None:
+        """Load one persisted Optimization result by search identity."""
+        logger.debug("Declaring Optimization result load operation for %s", search_id)
+        raise NotImplementedError
+
 
 __all__ = [
     "OPTIMIZATION_SCHEMA_VERSION",

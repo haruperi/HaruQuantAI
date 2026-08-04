@@ -1,6 +1,5 @@
 """Producer-consumer compatibility tests for Portfolio owner requests."""
 
-# ruff: noqa: INP001
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -9,6 +8,7 @@ import pytest
 from app.services.analytics import is_analytics_value
 from app.services.portfolio import execute_portfolio_handle_operation
 from app.utils import get_logger
+
 from tests.portfolio.unit.test_workflows import _plan, _service
 
 ActivePortfolioAllocation = object

@@ -2,11 +2,17 @@
 
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.utils import load_broker_provider_settings, load_settings
+from app.utils import (
+    get_app_settings_model_config,
+    get_app_settings_sources,
+    load_broker_provider_settings,
+    load_settings,
+)
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
 
 def _feature_header(title: str) -> None:
@@ -33,6 +39,53 @@ def _format_result(obj: Any) -> str:
         keys = ", ".join(vars(obj).keys())
         return f"Output Result -> {type_name}({keys}) : {type_name}"
     return f"Output Result -> {type_name} : {type_name}"
+
+
+class _DemoDomainSettings(BaseSettings):
+    """Minimal typed domain settings wired through the shared settings boundary.
+
+    Mirrors approved domain ``_settings.py`` infrastructure: configuration and
+    source precedence come exclusively from the Utils public getters.
+
+    Attributes:
+        environment: Standard environment classification name.
+        runtime_profile: Standard runtime profile categorization name.
+    """
+
+    model_config = get_app_settings_model_config()
+
+    environment: str | None = None
+    runtime_profile: str | None = None
+
+    @override
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        """Delegate source precedence to the canonical shared sources.
+
+        Args:
+            settings_cls: Concrete application settings model.
+            init_settings: Explicit constructor-value source.
+            env_settings: Process-environment source.
+            dotenv_settings: Optional dotenv source.
+            file_secret_settings: File-backed secret source.
+
+        Returns:
+            Settings sources in descending precedence order.
+        """
+        return get_app_settings_sources(
+            settings_cls,
+            init_settings,
+            env_settings,
+            dotenv_settings,
+            file_secret_settings,
+        )
 
 
 def fr_utils_023_load_active_configuration() -> None:
@@ -104,6 +157,19 @@ def fr_utils_022_construct_configuration() -> None:
     )
 
 
+def fr_utils_022_app_settings_integration() -> None:
+    """FR-UTL-022: Stage 3 — Wire typed domain settings through the shared boundary getters."""
+    _header(
+        "Stage 3: Domain Settings Integration - Shared Config + Sources (FR-UTL-022)"
+    )
+    settings = _DemoDomainSettings()
+    print(_format_result(settings))
+    print(
+        f"Data -> environment='{settings.environment}', "
+        f"runtime_profile='{settings.runtime_profile}'"
+    )
+
+
 def main() -> None:
     """Run all runtime-settings examples in sequential module flow order."""
     _feature_header(
@@ -126,6 +192,7 @@ def main() -> None:
 
     # Stage 3: Immutable settings output construction
     fr_utils_022_construct_configuration()
+    fr_utils_022_app_settings_integration()
 
 
 if __name__ == "__main__":

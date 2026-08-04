@@ -17,7 +17,7 @@ def test_error_rejects_uncataloged_code() -> None:
 
 def test_catalog_matches_documented_requirements() -> None:
     """Verify the closed catalog has only prefixed fail-closed codes."""
-    assert len(SIM_ERROR_CATALOG) == 43
+    assert len(SIM_ERROR_CATALOG) == 46
     assert all(code.startswith("SIM_") for code in SIM_ERROR_CATALOG)
     assert all(
         row.severity in {"error", "critical"} for row in SIM_ERROR_CATALOG.values()

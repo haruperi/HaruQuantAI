@@ -700,7 +700,7 @@ resume point for rebuilds and the staleness check for readers.
 ## Domain 8 — Simulator (`sim_`)
 
 > **This domain follows the live implementation.** Simulator persists **run identity
-> only**. Its canonical journal is append-only JSONL and its results are published as
+> and completed-run playback session cursors**. Its canonical journal is append-only JSONL and its results are published as
 > file artifacts; neither is backed by a table. The mirrored `sim_orders` /
 > `sim_fills` / `sim_positions` design an earlier draft proposed is target-only and is
 > not implied by this schema.
@@ -733,6 +733,27 @@ reusing the prior run.
 `result_payload` is nullable — an incomplete run has no result, and per
 `AGENTS.md` §3 "No Invented Data" an absent result must read as absent rather than as
 an empty one.
+
+### `sim_sessions`
+
+```sql
+CREATE TABLE sim_sessions (
+    session_id TEXT    PRIMARY KEY,
+    run_id     TEXT    NOT NULL,
+    status     TEXT    NOT NULL CHECK(status IN ('active', 'completed', 'expired')),
+    cursor     INTEGER NOT NULL CHECK(cursor >= -1),
+    created_at TEXT    NOT NULL,
+    expires_at TEXT    NOT NULL,
+    FOREIGN KEY(run_id) REFERENCES sim_runs(run_id)
+) STRICT;
+
+CREATE INDEX idx_sim_sessions_run ON sim_sessions(run_id);
+CREATE INDEX idx_sim_sessions_expiry ON sim_sessions(status, expires_at);
+```
+
+The row is a one-hour, stateless cursor over an already-finalized journal. Cursor
+updates are monotonic, `-1` means no frame has been delivered, and no engine state,
+positions, orders, or equity snapshots are stored in this table.
 
 ### Why there is no journal table
 
@@ -770,7 +791,7 @@ Their column definitions are omitted here rather than carried as unbuilt DDL; th
 | Strategy | 7 |
 | Risk | 10 |
 | Trading | 7 |
-| Simulator | 1 |
-| **Total** | **25** |
+| Simulator | 2 |
+| **Total** | **26** |
 
 Next: [03_entity_specs_intelligence.md](03_entity_specs_intelligence.md)

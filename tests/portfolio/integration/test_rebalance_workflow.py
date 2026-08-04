@@ -1,6 +1,5 @@
 """Integration test for Risk-reviewed Trading/Analytics Portfolio rebalance."""
 
-# ruff: noqa: INP001
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -8,6 +7,7 @@ from datetime import datetime, timedelta
 import pytest
 from app.services.portfolio import execute_portfolio_handle_operation
 from app.utils import get_logger
+
 from tests.portfolio.unit.test_workflows import _plan, _service
 
 ActivePortfolioAllocation = object

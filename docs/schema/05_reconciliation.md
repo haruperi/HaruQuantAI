@@ -36,7 +36,7 @@ tables that already existed.
 | Phase 3c | 13 Agentic + 4 Data research-source/runtime |
 | Dry-Run Plan 9 | 8 Data operational + 4 API + `strategy_mutations` |
 
-Model size: **102 tables**. Of these, 59 have a code definition and the remainder are
+Model size: **103 tables**. Of these, 60 have a code definition and the remainder are
 explicitly labelled target-only in their domain sections.
 
 Two categories are recorded rather than corrected, because the tables are applied and
@@ -362,7 +362,7 @@ Model size after Phase 1: **86 tables** (was 90).
 
 ### Phase 4 — status
 
-The model stands at **102 tables**. All five sub-phases shipped.
+The model stands at **103 tables**. All five sub-phases shipped.
 
 | Sub-phase | Status | Delivered |
 |---|---|---|

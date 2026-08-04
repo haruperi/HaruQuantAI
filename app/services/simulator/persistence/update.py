@@ -103,4 +103,38 @@ def complete_run_record(
         raise ValueError("Simulator run completion state conflict")
 
 
-__all__ = ["complete_run_record", "update_run_record"]
+def update_session_record(
+    store: object,
+    *,
+    session_id: str,
+    status: str,
+    cursor: int,
+    request_id: str,
+) -> bool:
+    """Advance one playback session without regressing its cursor.
+
+    Args:
+        store: Opaque Simulator persistence handle.
+        session_id: Stable playback-session identity.
+        status: Replacement lifecycle status.
+        cursor: Greatest journal sequence delivered so far.
+        request_id: Trace identifier for the delegated transaction.
+
+    Returns:
+        Whether one session row was updated.
+
+    Raises:
+        ValueError: If the status or cursor is invalid.
+    """
+    _require_store(store)
+    if status not in {"active", "completed", "expired"} or cursor < -1:
+        raise ValueError("Simulator playback session update is invalid")
+    result = _execute(
+        ("UPDATE sim_sessions SET status=?, cursor=MAX(cursor, ?) WHERE session_id=?",),
+        ((status, cursor, session_id),),
+        request_id=request_id,
+    )
+    return result.affected_rows == 1
+
+
+__all__ = ["complete_run_record", "update_run_record", "update_session_record"]

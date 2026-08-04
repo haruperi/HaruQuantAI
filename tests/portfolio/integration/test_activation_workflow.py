@@ -1,6 +1,5 @@
 """Integration test for Simulation/Risk-reviewed Portfolio activation."""
 
-# ruff: noqa: INP001
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -22,6 +21,7 @@ from app.services.simulator import (
     unwrap_simulation_response,
 )
 from app.utils import get_logger
+
 from tests.portfolio.unit.test_allocation import (
     _activator,
     _inactive_kill_switch,

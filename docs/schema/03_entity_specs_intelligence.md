@@ -1418,11 +1418,11 @@ because they are required before it can be reached.
 | File | Tables |
 |---|---|
 | [01](01_entity_specs_core.md) — Core | 25 |
-| [02](02_entity_specs_execution.md) — Execution | 25 |
+| [02](02_entity_specs_execution.md) — Execution | 26 |
 | 03 — Intelligence & Perimeter | 40 |
-| **All 14 domains** | **102** |
+| **All 14 domains** | **103** |
 
-All 102 `CREATE TABLE` and 148 `CREATE INDEX` statements in this model have been
+All 103 `CREATE TABLE` statements in this model have been
 executed against a live SQLite engine to confirm they parse, that every declared
 foreign key resolves, and that every index target exists.
 

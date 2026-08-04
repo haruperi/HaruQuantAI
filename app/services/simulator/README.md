@@ -98,7 +98,8 @@ publication. This support directory is not a separately registered feature.
 
 | Status    | State / Store                                                                   | Read access (via contract)                                                                                                            | Migration definitions                                                                                                                       |
 | --------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Completed | Run identity, lifecycle, and completed simulation result records in`sim_runs` | Analytics, Optimization, UI/API via`SimulationResult`; Portfolio, Analytics, UI/API via `PortfolioSimulationResult`               | `app/services/simulator/migrations/definitions.py`                                                                                        |
+| Completed | Run identity, lifecycle, and completed simulation result records in `sim_runs` | Analytics, Optimization, UI/API via `SimulationResult`; Portfolio, Analytics, UI/API via `PortfolioSimulationResult` | `app/services/simulator/migrations/definitions.py` |
+| Completed | Completed-run playback session lifecycle and monotonic cursor in `sim_sessions` | UI/API through package-root session create/read/frame functions | `app/services/simulator/migrations/definitions.py` |
 | Completed | Append-only versioned JSONL journal and replay metadata                         | Simulation replay; consumers through`SimulationResult` references                                                                   | Partial JSONL staging, group-commit`fsync`, and atomic publication under the approved artifact root; no database journal records or table |
 | Completed | Canonical JSON and Markdown execution reports                                   | Analytics, Optimization, Portfolio, UI/API through applicable`SimulationResult` / `PortfolioSimulationResult` artifact references | Artifact schema under`reporting/`                                                                                                         |
 | Completed | Artifact manifest and checksums                                                 | Analytics, Optimization, Portfolio, UI/API through the applicable`SimulationResult` / `PortfolioSimulationResult`                 | Artifact schema under`reporting/`                                                                                                         |
@@ -140,12 +141,12 @@ flowchart TD
     VAL --> VALF[contracts.py; validate.py]
     TIME --> TIMEF[contracts.py; timeline.py]
     ACC --> ACCF[calculations.py; ledger.py]
-    JRN --> JRNF[contracts.py; writer.py; replay.py]
+    JRN --> JRNF[contracts.py; writer.py; replay.py; playback.py]
     EXE --> EXEF[pricing.py; matching.py; engine.py; trader.py]
     REP --> REPF[contracts.py; artifacts.py; reports.py]
     RUN --> RUNF[contracts.py; aggregate.py; audit.py; orchestrator.py; portfolio.py; research.py]
     ERR --> ERRF[catalog.py; exception.py; payload.py]
-    STA --> STAF[store.py; runtime.py]
+    STA --> STAF[store.py; runtime.py; sessions.py]
     STA --> MIG[migrations/definitions.py]
 ```
 
@@ -196,7 +197,8 @@ simulator/
 │   ├── __init__.py
 │   ├── contracts.py                    # Versioned journal event contract
 │   ├── writer.py                       # Streaming hash-chained persistence
-│   └── replay.py                       # Validation, reconstruction, and request-id resolution
+│   ├── replay.py                       # Validation, reconstruction, and request-id resolution
+│   └── playback.py                     # Two-pass validated frame production
 ├── execution/                          # Matching, order lifecycle, engine state, simulated Trader
 │   ├── __init__.py
 │   ├── pricing.py                      # Bid/ask price and configured realism models
@@ -214,7 +216,8 @@ simulator/
 ├── state/                              # Simulation persistence protocol and runtime
 │   ├── __init__.py
 │   ├── store.py                        # SimulationStateStore port
-│   └── runtime.py                      # Durable state and artifact coordination
+│   ├── runtime.py                      # Durable state and artifact coordination
+│   └── sessions.py                     # Completed-run playback session lifecycle
 ├── persistence/                        # Private shared Simulator CRUD support
 │   ├── __init__.py
 │   ├── create.py
@@ -303,6 +306,8 @@ explicit `__all__` contains standalone functions only:
   `calculate_portfolio_backtest_config_hash`, `run_backtest`,
   `run_fast_research`, `run_portfolio_backtest`,
   `to_simulation_error_payload`, and `unwrap_simulation_response`.
+- Completed-run playback: `create_simulation_session`,
+  `read_simulation_session`, and `stream_simulation_session_frames`.
 
 Every external consumer and standalone usage program imports these names through
 `from app.services.simulator import ...`. Feature subpackages remain internal
@@ -901,7 +906,7 @@ the `SIM_` prefix:
 | Request and scope        | `SIM_INVALID_CONFIG`, `SIM_INVALID_DATE_RANGE`, `SIM_MISSING_SYMBOL`, `SIM_ARBITRARY_CODE_REJECTED`, `SIM_UNSUPPORTED_OPERATION`, `SIM_UNSUPPORTED_ASSET_CLASS`, `SIM_UNSUPPORTED_FEATURE`                                                                                                                                                                                                                                                                                                                                  |
 | Data and timing          | `SIM_DATA_CHECKSUM_MISMATCH`, `SIM_DATA_SCHEMA_INVALID`, `SIM_DATA_NON_MONOTONIC`, `SIM_DATA_DUPLICATE_TIMESTAMP`, `SIM_DATA_OHLC_INVALID`, `SIM_DATA_SPREAD_NEGATIVE`, `SIM_DATA_STALE`, `SIM_DATA_COVERAGE_INSUFFICIENT`, `SIM_LOOKAHEAD_DETECTED`, `SIM_FEATURE_LOOKAHEAD_DETECTED`, `SIM_UNSUPPORTED_TICK_MODEL`, `SIM_SPREAD_MISSING`                                                                                                                                                                        |
 | Execution and accounting | `SIM_INVALID_PRICE`, `SIM_INVALID_VOLUME`, `SIM_VOLUME_BELOW_MIN`, `SIM_VOLUME_ABOVE_MAX`, `SIM_VOLUME_STEP_MISMATCH`, `SIM_SLIPPAGE_EXCEEDED`, `SIM_LIQUIDITY_UNAVAILABLE`, `SIM_GAP_UNCROSSABLE`, `SIM_MARKET_CLOSED`, `SIM_UNSUPPORTED_FILL_POLICY`, `SIM_INSUFFICIENT_MARGIN`, `SIM_COMMISSION_CALCULATION_FAILED`, `SIM_SWAP_CALCULATION_FAILED`, `SIM_FX_EVIDENCE_UNAVAILABLE`, `SIM_POSITION_NOT_FOUND`, `SIM_ORDER_NOT_FOUND`, `SIM_EVENT_PRIORITY_AMBIGUOUS`, `SIM_ACCOUNT_INVARIANT_BROKEN` |
-| Persistence and replay   | `SIM_PERSISTENCE_FAILED`, `SIM_CHECKPOINT_INCOMPATIBLE`, `SIM_RUN_ID_CONFLICT`                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Persistence and replay   | `SIM_PERSISTENCE_FAILED`, `SIM_CHECKPOINT_INCOMPATIBLE`, `SIM_RUN_ID_CONFLICT`, `SIM_SESSION_NOT_FOUND`, `SIM_SESSION_EXPIRED`, `SIM_PLAYBACK_CURSOR_INVALID` |
 | Portfolio                | `SIM_COMPONENT_INCOMPLETE`, `SIM_AGGREGATE_UNRECONCILED`                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Safe fallback            | `SIM_INTERNAL_ERROR`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
@@ -1064,6 +1069,7 @@ masks a cataloged condition.
 | Completed | `contracts.py` | Define the versioned immutable journal event.                                                                                  | `JournalEvent`                                                                                                       | **Standard library:** `datetime`, `typing`**Required third-party:** `pydantic>=2.13.4`**Local:** Utils public API → canonical JSON, IDs, redaction                                                     |
 | Completed | `writer.py`    | Stream events to append-only JSONL with sequence, hash continuity, and group-commit durability through an injected store port. | `JournalWriter` (`append`, `finalize`), `JOURNAL_FORMAT`, `JOURNAL_FSYNC_INTERVAL`, `JOURNAL_SIDECAR_MODE` | **Standard library:** `collections.abc`, `datetime`, `hashlib`**Required third-party:** None**Local:** `contracts.py` → `JournalEvent`; injected `SimulationStateStore`; Utils → canonical JSON |
 | Completed | `replay.py`    | Validate and replay journals and resolve request-id reuse.                                                                     | `replay_journal`, `resolve_idempotent_run`                                                                         | **Standard library:** `collections.abc`, `pathlib`**Required third-party:** None**Local:** `contracts.py` → `JournalEvent`; Utils canonical JSON                                                     |
+| Completed | `playback.py` | Validate a finalized journal completely, then stream events after a sequence cursor without materializing the file. | `stream_journal_events` | **Standard library:** `collections.abc`, `pathlib`**Required third-party:** None**Local:** `contracts.py`, `replay.py` validation primitives |
 | Completed | `__init__.py`  | Expose the supported journal API.                                                                                              | All public symbols above                                                                                               | **Standard library:** None**Required third-party:** None**Local:** feature files → exports                                                                                                                   |
 
 ### Configuration and Limits Manifest
@@ -1099,7 +1105,11 @@ masks a cataloged condition.
 **Implementation notes:** JSONL is canonical. Data's generic runtime-record
 infrastructure stages append-only events for transactional reconstruction before
 finalization; Simulation owns no dedicated journal table or SQLite sidecar.
-Domain-specific SQLite journal indexing remains outside the initial implementation.
+Playback performs two sequential O(1)-memory passes: the first validates the complete
+hash chain before any frame is exposed, and the second yields events after the resume
+cursor. Frames contain raw journal events (equity-gap Option A); account/equity
+reconstruction is a future enhancement. Domain-specific SQLite journal indexing
+remains outside the initial implementation.
 
 ### Feature usage examples
 
@@ -1117,6 +1127,7 @@ definitions, so no Simulation module imports Data storage internals.
 | Completed | `store.py`                     | Define the persistence port Simulation depends on as a`Protocol`; the caller supplies the implementation. Contains no connection, schema execution, filesystem write, or SQL.                       | `SimulationStateStore`                                               | **Standard library:** `collections.abc`, `typing`**Required third-party:** None**Local:** None                                        |
 | Completed | `../migrations/definitions.py` | Declare Simulation-owned schema migrations using Data's public migration-step constructor.                                                                                                            | Private manifest consumed by package-root`get_simulation_migrations` | **Standard library:** hashlib**Required third-party:** None**Local:** `app.services.data` package root                                  |
 | Completed | `runtime.py`                   | Coordinate partial-JSONL staging, group-commit durability, atomic journal publication, and monotonic run-idempotency lifecycle while delegating direct`sim_runs` CRUD to `simulator/persistence`. | `build_simulation_state_store`                                       | **Standard library:** hashlib, json, os, pathlib, typing**Required third-party:** None**Local:** errors, `simulator.persistence`, Utils |
+| Completed | `sessions.py` | Create/read one-hour completed-run playback sessions and advance a monotonic journal cursor while streaming validated frames. | `create_simulation_session`, `read_simulation_session`, `stream_simulation_session_frames` | **Standard library:** datetime, pathlib**Required third-party:** None**Local:** journal playback, persistence, Utils |
 | Completed | `__init__.py`                  | Expose the supported state API.                                                                                                                                                                       | `SimulationStateStore`, `SIMULATION_MIGRATIONS`                    | **Standard library:** None**Required third-party:** None**Local:** feature files → exports                                               |
 
 | Status    | Requirement ID | Responsibility                                                                                                                                                                                                                                                                                                                                                                                                                      | Class / Function / Method                                      | Side Effects             | Raises                                                                                | Usage / Test                                                                                                                                                                                                                            |

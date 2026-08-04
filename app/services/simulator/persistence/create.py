@@ -165,4 +165,47 @@ def create_run_record(store: object, key: str, value: object) -> None:
     )
 
 
-__all__ = ["create_run_record", "create_simulator_persistence_store"]
+def create_session_record(
+    store: object,
+    value: Mapping[str, object],
+    *,
+    request_id: str,
+) -> None:
+    """Create one immutable-identity playback session row.
+
+    Args:
+        store: Opaque Simulator persistence handle.
+        value: Validated session fields.
+        request_id: Trace identifier for the delegated transaction.
+
+    Raises:
+        ValueError: If the session cannot be inserted exactly once.
+    """
+    _require_store(store)
+    result = _execute(
+        (
+            "INSERT INTO sim_sessions "
+            "(session_id, run_id, status, cursor, created_at, expires_at) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+        ),
+        (
+            (
+                _text_field(value, "session_id"),
+                _text_field(value, "run_id"),
+                _text_field(value, "status"),
+                value["cursor"],
+                _text_field(value, "created_at"),
+                _text_field(value, "expires_at"),
+            ),
+        ),
+        request_id=request_id,
+    )
+    if result.affected_rows != 1:
+        raise ValueError("Simulator playback session was not created")
+
+
+__all__ = [
+    "create_run_record",
+    "create_session_record",
+    "create_simulator_persistence_store",
+]

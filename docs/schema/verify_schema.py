@@ -117,11 +117,11 @@ for f, s in perf_idx:
     try:
         con.execute(s)
         made_i.append(name_of(s, "INDEX"))
-    except sqlite3.Error as e:
-        if "already exists" in str(e):
+    except sqlite3.Error as error:
+        if "already exists" in str(error):
             dup_i.append(name_of(s, "INDEX"))
         else:
-            errors.append((f, name_of(s, "INDEX"), str(e)))
+            errors.append((f, name_of(s, "INDEX"), str(error)))
 
 print("\n=== 1: DDL executes ===")
 print(
@@ -129,8 +129,8 @@ print(
 )
 if errors:
     print(f"FAILURES {len(errors)}:")
-    for e in errors:
-        print("   ", e)
+    for failure in errors:
+        print("   ", failure)
 else:
     print("PASS")
 
@@ -191,10 +191,14 @@ PREFIXES = [
     "agentic_",
     "api_",
 ]
-counts, unpre = collections.Counter(), []
+counts: collections.Counter[str] = collections.Counter()
+unpre: list[str] = []
 for t in made_t:
-    m = [p for p in PREFIXES if t.startswith(p)]
-    counts[max(m, key=len)] += 1 if m else unpre.append(t)
+    matching_prefixes = [p for p in PREFIXES if t.startswith(p)]
+    if matching_prefixes:
+        counts[max(matching_prefixes, key=len)] += 1
+    else:
+        unpre.append(t)
 print("\n=== 6: prefix ownership ===")
 print("  " + " | ".join(f"{p.rstrip('_')}={counts[p]}" for p in PREFIXES))
 print(f"  TOTAL {sum(counts.values())}")
