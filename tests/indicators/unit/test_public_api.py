@@ -36,6 +36,7 @@ _EXPECTED_ROOT_ALL = (
     "price_volume_distribution",
     "rolling_volatility",
     "rsi",
+    "run_indicators_migrations",
     "sma",
     "standard_deviation",
     "validate_indicator",

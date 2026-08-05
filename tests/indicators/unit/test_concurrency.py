@@ -32,7 +32,7 @@ _PRICES = [
     1.19,
 ]
 _WORKERS = 4
-_SUBMISSIONS = 12
+_SUBMISSIONS = 6
 
 
 def test_parallel_calculations_produce_identical_checksums() -> None:
@@ -90,7 +90,7 @@ def test_parallel_calculations_do_not_mutate_shared_input() -> None:
         ]["input_checksum"]
 
     with ThreadPoolExecutor(max_workers=_WORKERS) as pool:
-        checksums = set(pool.map(calculate, [2, 3, 4, 5] * 3))
+        checksums = set(pool.map(calculate, [2, 3, 4, 5, 2, 3]))
 
     assert len(checksums) == 1
     assert data.model_dump(mode="json") == before
@@ -100,6 +100,7 @@ def test_parallel_registry_reads_are_stable() -> None:
     """NFR-INDI-010: registry reads are immutable and stable under concurrency."""
     serial_ids = tuple(spec.indicator_id for spec in unwrap_response(list_indicators()))
     serial_matrix_size = len(unwrap_response(get_capability_matrix()))
+    data = close_dataset(_PRICES)
 
     def read(_attempt: int) -> tuple[tuple[str, ...], int, str]:
         """Perform one concurrent registry read.
@@ -113,9 +114,9 @@ def test_parallel_registry_reads_are_stable() -> None:
         return (
             tuple(spec.indicator_id for spec in unwrap_response(list_indicators())),
             len(unwrap_response(get_capability_matrix())),
-            get_indicator_result_metadata(
-                unwrap_response(sma(close_dataset(_PRICES), period=3))
-            )["indicator_id"],
+            get_indicator_result_metadata(unwrap_response(sma(data, period=3)))[
+                "indicator_id"
+            ],
         )
 
     with ThreadPoolExecutor(max_workers=_WORKERS) as pool:

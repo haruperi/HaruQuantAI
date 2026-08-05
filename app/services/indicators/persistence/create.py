@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.services.data import build_transaction_request, execute_transaction
+from app.services.data import (
+    build_statement_plan,
+    build_transaction_request,
+    execute_transaction,
+)
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -47,9 +51,11 @@ def _execute(statement: str, parameters: tuple[Any, ...], *, request_id: str) ->
     """
     return execute_transaction(
         build_transaction_request(
-            statements=(statement,),
-            parameter_sets=(parameters,),
-            max_rows=1,
+            plan=build_statement_plan(
+                statements=(statement,),
+                parameter_sets=(parameters,),
+                max_rows=1,
+            ),
             request_id=request_id,
         )
     )

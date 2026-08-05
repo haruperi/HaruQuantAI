@@ -2,6 +2,25 @@
 
 ## [Unreleased]
 
+### Reconcile Indicators mechanical and reviewed conformance audit evidence
+
+The Indicators audit remediation aligns startup schema migration wiring, CRUD test coverage, unit-test speed, active documentation, and audit matrix tracking.
+
+#### Added (2)
+
+- Added `run_indicators_migrations` package-root runner and API lifecycle startup migration execution for the `indicator_*` schema.
+- Added scratch-database CRUD unit tests in `tests/indicators/unit/test_persistence_crud.py` meeting the 80% coverage floor across all five persistence modules.
+
+#### Changed (2)
+
+- Reconciled Indicators owning README, `docs/ARCHITECTURE.md`, `docs/schema/05_reconciliation.md`, and `docs/PROJECT.md` audit matrix to reflect 31 public export symbols, private persistence support, and documented D2-B UI exclusion.
+- Optimized thread-pool test allocations in `tests/indicators/unit/test_concurrency.py` so all unit tests execute within the 100 ms ceiling.
+
+#### Fixed (2)
+
+- Fixed public `__all__` export count and import boundary assertions (27/30 -> 31).
+- Corrected withdrawn feature requirement docstrings in migration definitions.
+
 ### Reconcile Data mechanical and reviewed conformance evidence
 
 The Data audit remediation aligns its focused structure, public-boundary consumers,

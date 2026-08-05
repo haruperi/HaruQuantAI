@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/indicators`
 > **Status:** `Completed`
-> **Last updated:** `2026-07-30`
+> **Last updated:** `2026-08-05`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -30,7 +30,7 @@ Indicators converts normalized market datasets into deterministic, vectorized de
 - Data acquisition, provider adapters, source readiness, provider normalization, symbol mapping, calendar/session normalization, quote-quality policy, or multi-timeframe orchestration; Data owns these.
 - Signal interpretation, crossover decisions, trade proposals, strategy lifecycle, or final position sizing.
 - Risk approval, orders, fills, journals, broker/account state, execution, or broker mutation.
-- Persistence, cache storage, audit sinks, telemetry export, tracing backends, SLO enforcement, or alert routing.
+- Persistence execution and orchestration, cache storage, audit sinks, telemetry export, tracing backends, SLO enforcement, or alert routing. Indicators declares its own support schema and private CRUD statements, but Data executes them.
 - Runtime custom registration, incremental/streaming state, chunking, out-of-core execution, acceleration, composition graphs, proprietary controls, or release engineering.
 - Retrospective SMC/FVG/swing/BOS/CHoCH labels in the production indicator surface.
 
@@ -120,7 +120,17 @@ datasets; no official v1 calculation accepts more than one symbol.
 
 ### Persisted state
 
-Indicators persists no tables, artifacts, cache entries, registry mutations, or incremental state. All public calculations have side effect `None`.
+Indicators owns three support tables — `indicator_definitions`,
+`indicator_param_sets`, and `indicator_materializations` — declared in
+`migrations/definitions.py` and applied through Data's authoritative migration
+executor by `run_indicators_migrations`, which the UI/API startup lifecycle
+invokes. The private CRUD modules in `persistence/` construct statements only
+and delegate execution to `app.services.data`. This is internal support, not a
+registered feature: no public Indicators calculation persists anything, and no
+production caller consumes these tables yet; computed series are recomputed on
+demand, and materialisation rows will record only artifact references once a
+future materialisation capability is registered. All public calculations have
+side effect `None`.
 Indicators is not an `AuditEvent` producer: its API is pure and deterministic, so
 the governed caller audits any surrounding action.
 
@@ -226,13 +236,22 @@ indicators/
 │   ├── obv.py                          # On-Balance Volume
 │   ├── mfi.py                          # Money Flow Index
 │   └── price_volume_distribution.py    # Rolling volume-by-price point of control
-└── candles/                            # Feature: single/two-bar candlestick patterns
+├── candles/                            # Feature: single/two-bar candlestick patterns
+│   ├── __init__.py
+│   ├── README.md
+│   ├── doji.py                         # Doji pattern
+│   ├── engulfing.py                    # Engulfing pattern
+│   ├── pinbar.py                       # Pinbar pattern
+│   └── inside_bar.py                   # Inside bar pattern
+├── migrations/                         # Non-feature support: Indicators-owned schema
+│   ├── __init__.py
+│   └── definitions.py                  # Additive schema steps and startup runner
+└── persistence/                        # Non-feature support: private CRUD, no public API
     ├── __init__.py
-    ├── README.md
-    ├── doji.py                         # Doji pattern
-    ├── engulfing.py                    # Engulfing pattern
-    ├── pinbar.py                       # Pinbar pattern
-    └── inside_bar.py                   # Inside bar pattern
+    ├── create.py                       # Definition, parameter-set, materialisation inserts
+    ├── read.py                         # Definition, materialisation, stale-list reads
+    ├── update.py                       # State advancement and source invalidation
+    └── delete.py                       # Recomputable-series purges
 ```
 
 Excluded from the structure: `base.py`, `batch/`, `incremental/`, `adapters/`, `custom/`, caching, composition, audit/telemetry, acceleration, and proprietary-access modules. MACD, crossover helpers, pip conversion, balance-scaled volume, and generic averaging/base-class abstractions have no final destination in this package. Retrospective SMC/FVG/swing/BOS/CHoCH labels remain excluded from the production indicator surface (see Section 1) because swing/BOS/CHoCH structure-break tracking is inherently retroactive (a later bar can rewrite an earlier bar's already-published signal), which is fundamentally incompatible with this package's immutable, non-repainting batch output guarantee; this exclusion is revisited only as a separately scoped decision, not silently reduced to a partial port.
@@ -281,7 +300,7 @@ flowchart LR
 
 ### Structure rules
 
-- The root contains only `README.md`, `__init__.py`, and the six approved module folders.
+- The root contains only `README.md`, `__init__.py`, the six approved module folders, and the two documented non-feature support directories `migrations/` and `persistence/`.
 - Built-ins are stateless functions. Classes are limited to immutable data contracts, the structural protocol, and the domain exception.
 - Each trend/volatility/momentum/volume/candles file implements exactly one official indicator; a file is never shared by two indicators. Private vectorization helpers may be duplicated per file rather than factored into a shared base class.
 - Public callers import only from `app.services.indicators`; feature and leaf modules are not stable API.
@@ -379,7 +398,7 @@ types and are never package-root exports. Cross-domain callers use
 build_indicator_config, join_indicator_result, get_indicator_result_values,
 get_indicator_result_metadata,
 get_indicator, list_indicators, get_capability_matrix, get_warmup_requirement,
-validate_indicator,
+validate_indicator, run_indicators_migrations,
 ema, sma, wma, hull_ma, bollinger_bands, adx, zigzag,
 atr, adr, rolling_volatility, standard_deviation,
 rsi, williams_r,
@@ -393,6 +412,7 @@ doji, engulfing, pinbar, inside_bar
 | `get_indicator`, `list_indicators`, `get_capability_matrix` | Stable | `WF-INDI-005` | None; immutable in-memory metadata | None |
 | `get_warmup_requirement` | Stable | `WF-INDI-003` | None; resolves immutable registry metadata without fetching data | None |
 | `validate_indicator` | Stable | `WF-INDI-001..005` | No cache access | None |
+| `run_indicators_migrations` | Stable | None (startup support) | No cache access | Applies the Indicators support schema through Data's migration executor |
 | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag`, `atr`, `adr`, `rolling_volatility`, `standard_deviation`, `rsi`, `williams_r`, `cmf`, `obv`, `mfi`, `price_volume_distribution`, `doji`, `engulfing`, `pinbar`, `inside_bar` | Stable | `WF-INDI-001..004`; official in `SYS-WF-001` and `SYS-WF-002` | No cache access; returns canonical checksum material | None |
 
 No experimental, optional, or future callable is exported in the initial package. Excluded capabilities appear only in the capability matrix as unsupported modes, not as callable stubs.
@@ -1503,8 +1523,8 @@ this immutable, non-repainting production surface.
 | Completed | `NFR-INDI-006` | Numeric policy | Indicator values shall use float64 and approved absolute/relative tolerances; NaN, infinity, overflow, underflow, negative zero, null, and degenerate windows shall follow each approved formula table. | Golden/property/edge tests |
 | Completed | `NFR-INDI-007` | No-lookahead | Every row shall expose earliest-safe UTC `available_at` and source-window bounds; current/future data cannot be represented as already available. | Causality tests |
 | Completed | `NFR-INDI-008` | Data boundary | The package shall consume and propagate Data-owned provenance/quality/alignment evidence without implementing provider normalization, calendar, symbol-mapping, or quote-quality policy. | Producer-consumer contract tests |
-| Completed | `NFR-INDI-009` | Reliability | Validation, resource-limit, and calculation failures shall be atomic, deterministic, and fail closed; no partial official result is published. No raw upstream exception crosses the public port. External deadlines and cancellation remain orchestrator-owned. | Failure-injection tests; `tests/indicators/unit/test_large_input.py` (boundary guard coverage) and `tests/indicators/unit/test_zigzag.py` |
-| Completed | `NFR-INDI-010` | Concurrency | Public calculations and registry reads shall be thread-safe through immutability and absence of shared mutable state. | `tests/indicators/unit/test_concurrency.py` (parallel checksum equality, shared-input immutability, parallel registry reads, immutable registry storage) |
+| Completed | `NFR-INDI-009` | Reliability | Validation, resource-limit, and calculation failures shall be atomic, deterministic, and fail closed; no partial official result is published. No raw upstream exception crosses the public port. External deadlines and cancellation remain orchestrator-owned. | Failure-injection tests; `tests/indicators/structural/test_large_input.py` (boundary guard coverage) and `tests/indicators/unit/test_zigzag.py` |
+| Completed | `NFR-INDI-010` | Concurrency | Public calculations and registry reads shall be thread-safe through immutability and absence of shared mutable state. | `tests/indicators/structural/test_concurrency.py` (parallel checksum equality, shared-input immutability, parallel registry reads, immutable registry storage) |
 | Completed | `NFR-INDI-011` | Testing | Every `FR-INDI-*` shall have usage and unit coverage; formulas require approved hand-calculated golden fixtures and invariants/property tests. No absent historical implementation or third-party indicator library is normative. | Traceability and coverage audit |
 | Completed | `NFR-INDI-012` | Coverage | The package shall maintain at least 80% statement and branch coverage, with all documented error paths exercised. | `pytest --cov`; 2026-07-24 measured branch-enabled coverage 91.71% over 1770 statements / 342 branches (151 passed) |
 | Completed | `NFR-INDI-013` | Dependencies | Runtime dependencies shall be direct project dependencies and locked at the approved baseline declared in `pyproject.toml`: Python `>=3.14`, pandas `==3.0.3`, and NumPy `==2.4.6`. No patch-level Python pin is declared, so any 3.14.x interpreter satisfies the baseline. | `pyproject.toml`, `uv.lock`, and dependency-version audit |
@@ -1520,7 +1540,7 @@ No open decisions.
 
 ---
 
-## 7. Tests and Definition of Done
+### 7. Tests and Definition of Done
 
 ### Test and usage locations
 
@@ -1536,8 +1556,7 @@ tests/indicators/
 │   ├── __init__.py
 │   ├── test_public_api.py
 │   ├── test_import_boundaries.py
-│   ├── test_concurrency.py
-│   ├── test_large_input.py
+│   ├── test_persistence_crud.py
 │   ├── test_errors.py
 │   ├── test_contracts.py
 │   ├── test_results.py
@@ -1559,7 +1578,9 @@ tests/indicators/
 │   ├── test_doji.py
 │   ├── test_engulfing.py
 │   ├── test_pinbar.py
-│   └── test_inside_bar.py
+│   ├── test_inside_bar.py
+│   ├── test_concurrency.py
+│   └── test_large_input.py
 ├── integration/
 │   ├── __init__.py
 │   ├── test_batch_calculation.py
@@ -1635,8 +1656,8 @@ embedded in the fixture.
 - [X] The root registry and public package port expose exactly 21 approved indicators. Evidence: `app/services/indicators/core/registry.py`.
 - [X] Each feature is one module folder with one runnable usage program, registered with a matching `FEAT-INDI-NN` in this README's Section 2 Feature Registry.
 - [X] `NFR-INDI-001` purity and dependency boundaries are proven by test, not by inspection. Evidence: `tests/indicators/unit/test_import_boundaries.py:90`.
-- [X] `NFR-INDI-010` thread safety is proven by test, not by inspection. Evidence: `tests/indicators/unit/test_concurrency.py:40`.
-- [X] Every public export documented in Sections 2 and 4 matches the implemented signature, verified against `inspect.signature` for all 27 public callables.
+- [X] `NFR-INDI-010` thread safety is proven by test, not by inspection. Evidence: `tests/indicators/unit/test_concurrency.py:38`.
+- [X] Every public export documented in Sections 2 and 4 matches the implemented signature, verified against `inspect.signature` for all 31 public callables.
 - [X] Usage programs define `main()` and an `if __name__ == "__main__"` guard per `AGENTS.md` §4. Evidence: `tests/indicators/usage/01_core.py:205`.
 - [X] Datasets far beyond the former 664-record serialization ceiling calculate correctly; `MAX_INPUT_ROWS` is the only input-size limit. Evidence: `app/services/indicators/core/results.py:219`, `tests/indicators/unit/test_large_input.py:53`.
 - [X] No raw upstream exception crosses the public port; all twenty-one calculators are boundary-guarded. Evidence: `app/services/indicators/core/errors.py`, `tests/indicators/unit/test_zigzag.py`.

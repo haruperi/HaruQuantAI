@@ -6,7 +6,11 @@ it opens no connection and executes nothing.
 
 Computed indicator series are **not** stored here. They are recomputed on demand
 or materialised to an artifact, and ``indicator_materializations`` records only
-the reference; see ``FR-INDI-036`` through ``FR-INDI-040``.
+the reference. The requirement rows that once registered this support surface
+(`FR-INDI-036`-`040`) were withdrawn together with `FEAT-INDI-07`; the tables,
+migrations, and private CRUD modules are unchanged and the evidence is kept as
+unit tests (see `docs/CHANGELOG.md`, "Withdraw feature status from the four
+persistence packages").
 """
 
 from __future__ import annotations
@@ -14,7 +18,11 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
-from app.services.data import build_migration_step
+from app.services.data import (
+    build_migration_request,
+    build_migration_step,
+    run_domain_migrations,
+)
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -139,8 +147,28 @@ def get_indicator_migrations() -> tuple[object, ...]:
     return INDICATOR_MIGRATIONS
 
 
+def run_indicators_migrations(request_id: str) -> object:
+    """Apply the immutable Indicators migration manifest through Data.
+
+    Args:
+        request_id: Canonical startup request identifier.
+
+    Returns:
+        Data-owned standard migration response.
+    """
+    logger.info("Running Indicators-owned schema migrations")
+    request = build_migration_request(
+        domain="indicators",
+        steps=get_indicator_migrations(),
+        request_id=request_id,
+        complete_manifest=True,
+    )
+    return run_domain_migrations(request)
+
+
 __all__ = [
     "INDICATOR_MIGRATIONS",
     "INDICATOR_SCHEMA_VERSION",
     "get_indicator_migrations",
+    "run_indicators_migrations",
 ]

@@ -13,10 +13,12 @@ from app.services.indicators.migrations.definitions import (
 )
 from app.services.indicators.migrations.definitions import (
     get_indicator_migrations,
+    run_indicators_migrations,
 )
 
 __all__ = [
     "INDICATOR_MIGRATIONS",
     "INDICATOR_SCHEMA_VERSION",
     "get_indicator_migrations",
+    "run_indicators_migrations",
 ]

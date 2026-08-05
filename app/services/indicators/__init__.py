@@ -19,6 +19,7 @@ from app.services.indicators.core.validation import (
     get_warmup_requirement,
     validate_indicator,
 )
+from app.services.indicators.migrations.definitions import run_indicators_migrations
 from app.services.indicators.momentum.rsi import rsi
 from app.services.indicators.momentum.williams_r import williams_r
 from app.services.indicators.trend.bollinger_bands import bollinger_bands
@@ -64,6 +65,7 @@ __all__ = (
     "price_volume_distribution",
     "rolling_volatility",
     "rsi",
+    "run_indicators_migrations",
     "sma",
     "standard_deviation",
     "validate_indicator",

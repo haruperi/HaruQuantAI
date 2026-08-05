@@ -279,8 +279,12 @@
   schema identifiers, error codes, and the explicit package-root API remain
   compatible.
 * `app/services/indicators/` is a completed implementation containing the
-  immutable Core calculation boundary and 20 approved one-indicator-per-file
+  immutable Core calculation boundary and 21 approved one-indicator-per-file
   implementations across trend, volatility, momentum, volume, and candles.
+  Its private `migrations/` and `persistence/` support directories carry the
+  ledger-ready `indicator_*` schema and CRUD statements applied through Data's
+  executor; feature registrations for that support surface were withdrawn (see
+  the changelog).
   Its package-root API, standalone usage programs, domain workflows, and its
   participation in `SYS-WF-001` and the verified MT5 demo `SYS-WF-002` path pass.
   Retrospective SMC/FVG/swing/BOS/CHoCH labels remain excluded to preserve the

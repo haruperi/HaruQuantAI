@@ -8,6 +8,7 @@ from fastapi import FastAPI
 
 from app.services.api.identity import run_api_migrations
 from app.services.data import build_data_settings, data_settings_context
+from app.services.indicators import run_indicators_migrations
 from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
@@ -47,6 +48,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         if result.status != "success" or result.data is None:
             app.state.api_ready = False
             raise StartupError("API_STORAGE_INITIALIZATION_FAILED")
+        indicators_result = cast(
+            "_MigrationResponse",
+            run_indicators_migrations(generate_id("req")),
+        )
+        if indicators_result.status != "success" or indicators_result.data is None:
+            app.state.api_ready = False
+            raise StartupError("INDICATORS_STORAGE_INITIALIZATION_FAILED")
         required_probes: Mapping[str, Callable[[], object]] = getattr(
             app.state,
             "api_required_startup_probes",

@@ -325,7 +325,7 @@ all 71.** Sequence by whether the owning domain has a real gap:
 | Priority | Tables | Status | Why |
 |---|---|---|---|
 | — | ~~`util_*` (7)~~ | Withdrawn | Utils is the shared framework and owns no state |
-| 2 | `indicator_*` (3) | **Built (Phase 4B)** | No live Indicators persistence |
+| 2 | `indicator_*` (3) | **Built (Phase 4B)** | Applied at UI/API startup through `run_indicators_migrations`; the private CRUD statements have no production caller yet (registrations withdrawn), so this stays support-only |
 | 3 | `analytics_*` (6) | **Built (Phase 4C)** | Derived store only. `analytics_trade_analysis` holds MAE/MFE per round-trip, which nothing else stores — Trading owns fills, no domain owns round-trip analysis. Requires the §5 amendment made under D10 |
 | 4 | `trading_orders`, `trading_fills`, `trading_positions`, `trading_order_transitions` | **Built (Phase 4D)** | Trading now writes authoritative events and rebuildable relational projections in one Data-owned transaction; no Trading state uses the generic runtime-record table |
 | 5 | `broker_symbol_map` (1) | **Built (Phase 4E)** | Bitemporal reference data. The other four `broker_*` tables are **withdrawn** — Brokers stays a stateless passthrough. The step is ledger-ready (stable checksum, execution delegated to `run_domain_migrations`) but currently has no runtime composition wiring: nothing invokes `get_broker_migrations`, and the CRUD statements have no caller |
@@ -372,7 +372,7 @@ The model stands at **103 tables**. All five sub-phases shipped.
 | Sub-phase | Status | Delivered |
 |---|---|---|
 | 4A | Shipped schema; application integration reactivated | Artifact catalogue (7 tables); the withdrawn conflicting `FR-DATA-154`–`160` allocation remains historical, while current `FEAT-DATA-18` uses `FR-DATA-161`–`167` |
-| 4B | Shipped | `indicator_*` (3), `FEAT-INDI-07`, `FR-INDI-036`–`040` |
+| 4B | Shipped schema; registrations withdrawn | `indicator_*` (3) applied as schema; `FEAT-INDI-07` and `FR-INDI-036`–`040` withdrawn 2026-08-03 (private persistence support) |
 | 4C | Shipped | `analytics_*` (6), `FEAT-ANLT-06`, `FR-ANLT-055`–`059` |
 | 4D | Shipped | Trading materialisation (`trading_orders`, `trading_fills`, `trading_positions`, `trading_order_transitions`) and direct Trading-owned persistence |
 | 4E | Schema shipped; registrations withdrawn | `broker_symbol_map` (1) applied as schema; `FEAT-BRK-16` and `FR-BRK-136`–`138` withdrawn 2026-08-03 (private persistence support) |
