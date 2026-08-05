@@ -69,8 +69,9 @@ def _sample_dataset() -> Any:
         for i in range(5)
     )
     report = build_data_quality_report(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=len(records),
         checked_count=len(records),
         truncated=False,
@@ -127,7 +128,7 @@ def fr_data_092() -> None:
 
 
 def fr_data_093() -> None:
-    """FR-DATA-093: Stage 3 — Compute quality score clamped to [0, 1] in Decimal and resolve quality status."""
+    """FR-DATA-093: Stage 3 — Compute a percentage grade and operational decision."""
     _header(
         "Stage 3: Quality Scoring & Status Resolution - Score & Status (FR-DATA-093)"
     )
@@ -141,7 +142,9 @@ def fr_data_093() -> None:
     if res1.status == "success" and res1.data is not None:
         report = res1.data
         print(
-            f"Data -> DataQualityReport(status={report.quality_status}, score={report.quality_score})"
+            "Data -> DataQualityReport("
+            f"status={report.quality_status}, decision={report.quality_decision}, "
+            f"score={report.quality_score})"
         )
 
 
@@ -175,6 +178,7 @@ def main() -> None:
     fr_data_092()
     fr_data_093()
     fr_data_094()
+    print("SUCCESS: FEAT-DATA-07 completed")
 
 
 if __name__ == "__main__":

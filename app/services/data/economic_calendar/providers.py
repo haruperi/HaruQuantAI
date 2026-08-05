@@ -146,7 +146,7 @@ def _unit(*values: str | None) -> str | None:
 
 def _normalize(site: str, event: CalendarEvent) -> EconomicEvent:
     """Map one scraped `CalendarEvent` to a normalized `EconomicEvent`."""
-    raw_country = event.country or None
+    raw_country = event.country.strip().upper() if event.country else None
     # Some portals put the currency code (USD, EUR) in the country slot. We
     # detect that and split it back out: a real currency code populates
     # `currency` but leaves `country=None` (we don't invent an ISO country).

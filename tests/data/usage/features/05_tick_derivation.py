@@ -245,6 +245,7 @@ def main() -> None:
             fr_data_089()
             fr_data_090()
             fr_data_087_090_parquet(base_dir)
+            print("SUCCESS: FEAT-DATA-05 completed")
 
 
 if __name__ == "__main__":

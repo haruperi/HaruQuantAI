@@ -100,11 +100,7 @@ def main() -> None:
             bars_request = _market_request("bars", timeframe="M1", limit=20)
             ticks_request = _market_request("ticks", timeframe=None, limit=20)
             spreads_request = _market_request("spreads", timeframe=None, limit=20)
-            print(
-                "Validated request IDs:",
-                bars_request.request_id,  # type: ignore[attr-defined]
-                ticks_request.request_id,  # type: ignore[attr-defined]
-            )
+            print("Validated request IDs:", bars_request.request_id)  # type: ignore[attr-defined]
 
             # Stage 2 — Compose MT5 and enforce readiness, capability, license, rate, timeout, and breaker policy.
             _stage(2)
@@ -184,9 +180,12 @@ def main() -> None:
                 )
                 for report in reports
             )
-            print("Quality states:", tuple(report.quality_status for report in reports))
-            print("Remediation summaries:", remediation)
-    print("OUTPUT BOUNDARY — three typed MarketDataset values")
+            print("\nQuality Scores:", [report.quality_score for report in reports])
+            print(
+                "\nQuality Status:", tuple(report.quality_status for report in reports)
+            )
+            print("\nRemediation Summaries:", remediation)
+    print("\nOUTPUT BOUNDARY — three typed MarketDataset values")
 
 
 if __name__ == "__main__":

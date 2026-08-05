@@ -28,6 +28,12 @@ from app.services.data.economic_calendar.events import (
     EventImpact,
     project_economic_event,
 )
+from app.services.data.economic_calendar.ingestion import (
+    backfill_forexfactory_history,
+    crawl_forexfactory_event_definitions,
+    import_economic_calendar_csv,
+    sync_current_week_economic_calendar,
+)
 from app.services.data.economic_calendar.profiling import (
     SYMBOL_EVENT_PROFILES,
     SymbolEventProfile,
@@ -97,7 +103,9 @@ __all__ = [
     "ScrapeOptions",
     "ScrapeResult",
     "SymbolEventProfile",
+    "backfill_forexfactory_history",
     "calendar_state_provenance",
+    "crawl_forexfactory_event_definitions",
     "derive_calendar_state",
     "deserialize_scrape_result",
     "evaluate_calendar_state",
@@ -107,6 +115,7 @@ __all__ = [
     "get_persisted_events",
     "get_symbol_economic_events",
     "get_symbol_event_profile",
+    "import_economic_calendar_csv",
     "is_news_restricted",
     "is_news_restricted_events",
     "persist_economic_events",
@@ -117,4 +126,5 @@ __all__ = [
     "scrape_economic_calendar",
     "scrape_result_to_dataframe",
     "serialize_scrape_result",
+    "sync_current_week_economic_calendar",
 ]

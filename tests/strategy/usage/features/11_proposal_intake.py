@@ -108,8 +108,9 @@ def _get_market_evidence() -> tuple[Any, Any]:
         available_at=record.available_at,
         record_count=1,
         quality_report=build_data_quality_report(
-            quality_status="passed",
-            quality_score=Decimal(1),
+            quality_status="perfect",
+            quality_decision="accepted",
+            quality_score=Decimal(100),
             record_count=1,
             checked_count=1,
             truncated=False,

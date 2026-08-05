@@ -19,12 +19,16 @@ from tests.simulator.unit.test_orchestrator import (
 logger = get_logger(__name__)
 
 
-def test_failed_data_quality_prevents_result_publication(tmp_path: Path) -> None:
-    """Stop before engine output when Data quality status is failed."""
+def test_rejected_data_quality_prevents_result_publication(tmp_path: Path) -> None:
+    """Stop before engine output when Data quality is rejected."""
     logger.info("Testing WF-SIM-004 market-data quality gate")
     original = _dataset("req-eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee")
     failed_quality = original.quality_report.model_copy(
-        update={"quality_status": "failed"}
+        update={
+            "quality_status": "critical",
+            "quality_decision": "rejected",
+            "quality_score": 0,
+        }
     )
     dataset = original.model_copy(update={"quality_report": failed_quality})
     request = _request(dataset, suffix="e")

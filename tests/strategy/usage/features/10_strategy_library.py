@@ -291,8 +291,9 @@ def _get_library_evidence() -> tuple[Any, Decimal]:
         available_at=records[-1].available_at,
         record_count=len(records),
         quality_report=build_data_quality_report(
-            quality_status="passed",
-            quality_score=Decimal(1),
+            quality_status="perfect",
+            quality_decision="accepted",
+            quality_score=Decimal(100),
             record_count=len(records),
             checked_count=len(records),
             truncated=False,

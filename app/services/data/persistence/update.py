@@ -23,30 +23,105 @@ INSERT OR REPLACE INTO data_cache (
 
 _UPSERT_ECONOMIC_EVENT = """
 INSERT INTO data_economic_events (
-    provider, provider_event_id, name, category, country, currency,
-    scheduled_at, original_scheduled_at, actual, forecast, previous,
-    revised_previous, actual_raw, forecast_raw, previous_raw, unit, source,
-    source_url, impact, updated_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-ON CONFLICT (provider, provider_event_id) DO UPDATE SET
-    name = excluded.name,
-    category = excluded.category,
+    event_id, title, country, scheduled_at, original_scheduled_at, impact,
+    actual, forecast, previous, revised_previous, provider, source_url,
+    first_seen_at, updated_at, request_id, provider_definition_id
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT (event_id) DO UPDATE SET
+    title = excluded.title,
     country = excluded.country,
-    currency = excluded.currency,
     scheduled_at = excluded.scheduled_at,
     original_scheduled_at = data_economic_events.original_scheduled_at,
-    actual = excluded.actual,
-    forecast = excluded.forecast,
-    previous = excluded.previous,
-    revised_previous = excluded.revised_previous,
-    actual_raw = excluded.actual_raw,
-    forecast_raw = excluded.forecast_raw,
-    previous_raw = excluded.previous_raw,
-    unit = excluded.unit,
-    source = excluded.source,
+    actual = COALESCE(excluded.actual, data_economic_events.actual),
+    forecast = COALESCE(excluded.forecast, data_economic_events.forecast),
+    previous = COALESCE(excluded.previous, data_economic_events.previous),
+    revised_previous = COALESCE(
+        excluded.revised_previous, data_economic_events.revised_previous
+    ),
+    provider = excluded.provider,
     source_url = excluded.source_url,
+    provider_definition_id = COALESCE(
+        excluded.provider_definition_id,
+        data_economic_events.provider_definition_id
+    ),
     impact = excluded.impact,
-    updated_at = excluded.updated_at
+    updated_at = excluded.updated_at,
+    request_id = excluded.request_id
+""".strip()
+
+_UPSERT_ECONOMIC_COVERAGE = """
+INSERT INTO data_economic_calendar_coverage (
+    provider, range_start, range_end, status, source_revision,
+    synchronized_at, request_id
+) VALUES (?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT (provider, range_start, range_end) DO UPDATE SET
+    status = excluded.status,
+    source_revision = excluded.source_revision,
+    synchronized_at = excluded.synchronized_at,
+    request_id = excluded.request_id
+""".strip()
+_UPSERT_ECONOMIC_EVENT_DEFINITION = """
+INSERT INTO data_economic_event_definitions (
+    provider, provider_definition_id, country, title, source_url,
+    source_original, source_latest, measures, effect, frequency, also_called,
+    event_type, first_seen_at, created_at, last_verified_at, request_id
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT (provider, provider_definition_id) DO UPDATE SET
+    country = excluded.country,
+    title = excluded.title,
+    source_url = CASE
+        WHEN length(excluded.source_url) > length(
+            data_economic_event_definitions.source_url
+        ) THEN excluded.source_url
+        ELSE data_economic_event_definitions.source_url
+    END,
+    source_original = COALESCE(
+        excluded.source_original,
+        data_economic_event_definitions.source_original
+    ),
+    source_latest = COALESCE(
+        excluded.source_latest,
+        data_economic_event_definitions.source_latest
+    ),
+    measures = COALESCE(excluded.measures, data_economic_event_definitions.measures),
+    effect = COALESCE(excluded.effect, data_economic_event_definitions.effect),
+    frequency = COALESCE(
+        excluded.frequency,
+        data_economic_event_definitions.frequency
+    ),
+    also_called = COALESCE(
+        excluded.also_called,
+        data_economic_event_definitions.also_called
+    ),
+    event_type = COALESCE(
+        excluded.event_type,
+        data_economic_event_definitions.event_type
+    ),
+    last_verified_at = excluded.last_verified_at,
+    request_id = excluded.request_id
+""".strip()
+_RECONCILE_ECONOMIC_EVENT_DEFINITIONS = """
+UPDATE data_economic_events
+SET provider_definition_id = (
+        SELECT MIN(d.provider_definition_id)
+        FROM data_economic_event_definitions d
+        WHERE d.provider = 'forexfactory'
+          AND d.country = data_economic_events.country
+          AND d.title = data_economic_events.title
+    ),
+    source_url = (
+        SELECT MIN(d.source_url)
+        FROM data_economic_event_definitions d
+        WHERE d.provider = 'forexfactory'
+          AND d.country = data_economic_events.country
+          AND d.title = data_economic_events.title
+    )
+WHERE (
+      SELECT COUNT(*) FROM data_economic_event_definitions d
+      WHERE d.provider = 'forexfactory'
+        AND d.country = data_economic_events.country
+        AND d.title = data_economic_events.title
+  ) = 1
 """.strip()
 _UPDATE_FEED = """
 UPDATE data_feeds SET
@@ -216,6 +291,39 @@ def update_economic_event_records(
     )
 
 
+def update_economic_calendar_coverage_record(
+    parameters: tuple[Any, ...], *, request_id: str
+) -> TransactionResult:
+    """Upsert one explicit Economic Calendar coverage interval."""
+    logger.debug("Updating Data economic-calendar coverage")
+    return _execute_update(
+        (_UPSERT_ECONOMIC_COVERAGE,), (parameters,), request_id=request_id
+    )
+
+
+def update_economic_event_definition_record(
+    parameters: tuple[Any, ...], *, request_id: str
+) -> TransactionResult:
+    """Upsert one verified Economic Calendar event definition."""
+    logger.debug("Updating one Economic Calendar event definition")
+    return _execute_update(
+        (_UPSERT_ECONOMIC_EVENT_DEFINITION,), (parameters,), request_id=request_id
+    )
+
+
+def reconcile_economic_event_definition_records(
+    *, request_id: str
+) -> TransactionResult:
+    """Link exact unambiguous occurrence rows to verified definitions."""
+    logger.info("Reconciling Economic Calendar event definitions")
+    return _execute_update(
+        (_RECONCILE_ECONOMIC_EVENT_DEFINITIONS,),
+        ((),),
+        request_id=request_id,
+        max_rows=100_000,
+    )
+
+
 def update_feed_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
@@ -382,10 +490,13 @@ def update_runtime_transition_records(
 
 
 __all__ = [
+    "reconcile_economic_event_definition_records",
     "update_backfill_failure",
     "update_backfill_finalization",
     "update_backfill_lease",
     "update_cache_record",
+    "update_economic_calendar_coverage_record",
+    "update_economic_event_definition_record",
     "update_economic_event_records",
     "update_feed_record",
     "update_job_recovery_blocked",

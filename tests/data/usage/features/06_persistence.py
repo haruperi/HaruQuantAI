@@ -73,8 +73,9 @@ def _format_result(obj: Any) -> str:
 def _quality():
     """Build clean quality evidence for one persisted dataset."""
     return build_data_quality_report(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         issues=(),
         warnings=(),
         record_count=2,
@@ -381,6 +382,7 @@ def main() -> None:
             fr_data_019()
             fr_data_105_106()
             fr_data_020_021()
+            print("SUCCESS: FEAT-DATA-06 completed")
 
 
 if __name__ == "__main__":

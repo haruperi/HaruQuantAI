@@ -3,7 +3,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from app.services.data.contracts import DataError
+from app.services.data import build_data_error
 from app.services.strategy import validate_strategy_ref
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.references import StrategyRef
@@ -35,7 +35,7 @@ def test_validate_strategy_ref_handles_data_error() -> None:
 
     with patch(
         "app.services.strategy.registry.resolution.read_strategy_version_records",
-        side_effect=DataError("DB failure"),
+        side_effect=build_data_error("DB_READ_FAILED"),
     ):
         res = validate_strategy_ref(ref, policy)
         assert res.status == "error"

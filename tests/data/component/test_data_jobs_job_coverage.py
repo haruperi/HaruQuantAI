@@ -1,4 +1,4 @@
-"""Unit tests for app/services/data/data_jobs/job.py to reach >80% coverage."""
+"""Component tests for Data job-store edge cases and coverage."""
 
 from datetime import UTC, datetime, timedelta
 from pathlib import Path

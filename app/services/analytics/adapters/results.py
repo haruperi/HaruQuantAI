@@ -206,7 +206,7 @@ def _adapt_benchmark(
         )
     if benchmark.data_kind != "bars":
         raise AnalyticsValidationError("benchmark MarketDataset must contain bars")
-    if benchmark.quality_report.quality_status in {"failed", "not_checked"}:
+    if benchmark.quality_report.quality_decision in {"rejected", "not_evaluated"}:
         raise AnalyticsValidationError(
             "benchmark MarketDataset quality is insufficient"
         )

@@ -27,6 +27,7 @@ from app.services.data import (
 from app.utils import generate_id
 
 _JOB_NAME = "usage_sync_eurusd"
+_CALENDAR_JOB_NAME = "usage_sync_economic_calendar"
 _START = datetime(2026, 6, 1, tzinfo=UTC)
 
 
@@ -130,6 +131,47 @@ def fr_data_045() -> None:
         print(f"Data -> DataError({code})")
 
 
+def fr_data_174() -> None:
+    """FR-DATA-174: Schedule and dispatch the safe weekly calendar refresh."""
+    _header("Stage 5: Weekly Economic Calendar Dispatch (FR-DATA-174)")
+    req_id = generate_id("req")
+    definition = build_job_definition(
+        job_id=_CALENDAR_JOB_NAME,
+        source_id="forexfactory",
+        symbols=(),
+        timeframes=(),
+        data_kinds=("economic_calendar",),
+        start=datetime(2026, 8, 2, tzinfo=UTC),
+        end=None,
+        interval_seconds=604800,
+        enabled=True,
+        environment="dev",
+        created_at=datetime.now(UTC),
+        request_id=req_id,
+    )
+    created = create_data_update_job(definition, request_id=req_id)
+    result = run_data_update_job_once(
+        _CALENDAR_JOB_NAME,
+        req_id,
+        calendar_rows=(
+            {
+                "title": "Final Manufacturing PMI",
+                "country": "JPY",
+                "date": "2026-08-02T20:30:00-04:00",
+                "impact": "Low",
+                "forecast": "54.7",
+                "previous": "54.7",
+            },
+        ),
+    )
+    print(_format_result(result))
+    print(
+        "Data -> "
+        f"JobStatus(job_id={created.job_id}); "
+        f"JobRunResult(state={result.state}, records={result.record_count})"
+    )
+
+
 def main() -> None:
     """Execute every functional-requirement demonstration."""
     with TemporaryDirectory(prefix="usage-data-jobs-") as directory:
@@ -166,6 +208,8 @@ def main() -> None:
             fr_data_042_043()
             fr_data_044_084()
             fr_data_045()
+            fr_data_174()
+            print("SUCCESS: FEAT-DATA-13 completed")
 
 
 if __name__ == "__main__":

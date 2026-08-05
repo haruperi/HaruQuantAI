@@ -17,7 +17,7 @@ Two things I asserted in Dry-Run Plan 1 were wrong. Both are corrected here.
 
 | Claimed | Actual | Why it matters |
 |---|---|---|
-| "~48 tables live across 10 domains" | **59 tables across 11 prefixes** | My first grep matched only `CREATE TABLE IF NOT EXISTS`; 11 tables use bare `CREATE TABLE`. The Data domain is the bulk of the miss — 13 live tables, not 2. |
+| "~48 tables live across 10 domains" | **69 tables across 11 prefixes** | The current manifest includes 23 Data tables after catalog activation, explicit Economic Calendar coverage, and normalized event definitions; the original grep also missed tables declared with bare `CREATE TABLE`. |
 | Proposal is a clean greenfield target | **The live system already stores bulk data outside SQLite** | Simulator journals to append-only JSONL; Data writes CSV/Parquet artifacts with sidecar JSON manifests. The Parquet decision is not new architecture — it is *already the live pattern*, and the proposal partly reinvented it. |
 
 The second point reframes the whole reconciliation. See §4.
@@ -134,17 +134,22 @@ was a mistake.
 
 ---
 
-## 3. Proposal gaps — 40 live tables with no equivalent
+## 3. Proposal gaps — 49 live tables with no equivalent
 
 These are **not** candidates for deletion. They are things the proposal failed to
 account for, and each would have to be preserved or explicitly retired.
 
-### Data (13 live, proposal has 0 of them)
+### Data (23 live, proposal has 0 of them)
 
 `data_feeds` · `data_update_jobs` · `data_backfill_checkpoints` · `data_cache` ·
 `data_source_state` · `data_source_attempts` · `data_audit_events` ·
-`data_economic_events` · `data_research_sources` · `data_research_observations` ·
-`data_verified_research_sources` · `data_write_locks` · `data_migration_ledger`
+`data_economic_events` · `data_economic_calendar_coverage` ·
+`data_economic_event_definitions` · `data_research_sources` ·
+`data_research_observations` · `data_verified_research_sources` ·
+`data_runtime_records` · `data_symbols` · `data_providers` ·
+`data_market_sessions` · `data_datasets` · `data_partition_files` ·
+`data_fetch_log` · `data_quality_events` · `data_write_locks` ·
+`data_migration_ledger`
 
 This is the proposal's largest failure. It designed a Data domain around storing bars
 — a thing the live system deliberately does not do — and consequently missed the
@@ -366,7 +371,7 @@ The model stands at **103 tables**. All five sub-phases shipped.
 
 | Sub-phase | Status | Delivered |
 |---|---|---|
-| 4A | Shipped | Artifact catalogue (7 tables), `FEAT-DATA-18`, `FR-DATA-154`–`160` |
+| 4A | Shipped schema; application integration reactivated | Artifact catalogue (7 tables); the withdrawn conflicting `FR-DATA-154`–`160` allocation remains historical, while current `FEAT-DATA-18` uses `FR-DATA-161`–`167` |
 | 4B | Shipped | `indicator_*` (3), `FEAT-INDI-07`, `FR-INDI-036`–`040` |
 | 4C | Shipped | `analytics_*` (6), `FEAT-ANLT-06`, `FR-ANLT-055`–`059` |
 | 4D | Shipped | Trading materialisation (`trading_orders`, `trading_fills`, `trading_positions`, `trading_order_transitions`) and direct Trading-owned persistence |

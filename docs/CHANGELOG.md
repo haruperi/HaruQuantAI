@@ -2,6 +2,37 @@
 
 ## [Unreleased]
 
+### Reconcile Data mechanical and reviewed conformance evidence
+
+The Data audit remediation aligns its focused structure, public-boundary consumers,
+standalone workflows, coverage evidence, resource lifecycle, and active documentation.
+
+#### Added (4)
+
+- Added stage-labelled `WF-DATA-020` economic-calendar restriction evidence with honest provider status and deterministic normalized fallback evidence.
+- Added stage-labelled `WF-DATA-021` migration, immutable-ledger rerun, backup, restore, and dry-run retention evidence against a disposable approved store.
+- Added `FEAT-DATA-18` application-triggered artifact/reference catalog operations, reconstruction evidence, and lifecycle reachability guards for all 23 Data tables.
+- Added normalized Forex Factory event definitions, permanent URLs, verified specification metadata, and exact historical occurrence reconciliation through immutable migration `009_economic_event_definitions`.
+
+#### Changed (9)
+
+- Moved Data's function-only construction, getter, and predicate adapters from the package root into documented reconciliation-excluded `_shared/` support while preserving all 253 public functions.
+- Migrated external Strategy, Trading, Simulator, and Research tests from private Data modules to the package-root function boundary.
+- Reconciled Data's registry, active workflow count, requirement mappings, usage-program count, and completed system-domain status.
+- Classified repository-scale and real local-infrastructure checks as structural or component tests so the Data unit suite enforces its 100 ms ceiling without weakening coverage.
+- Activated the seven shipped catalog tables behind explicit transactions and made persisted verified-research-source manifests readable instead of write-only.
+- Made Economic Calendar reads database-first, added explicit interval coverage, preserved rescheduling evidence, and added bounded CSV, historical Forex Factory, and current-week CSV synchronization through immutable migration `007_economic_calendar_database_first`.
+- Added explicit non-production weekly Economic Calendar job scheduling and dispatch through additive migration `008_data_jobs_environment` while preserving existing market-job behavior.
+- Replaced credit-dependent historical Forex Factory backfill with bounded credential-free Jina Reader acquisition, coverage-ledger resume, timezone-aware parsing, and retryable interval execution.
+- Versioned Data quality evidence to percentage scoring with descriptive grades, explicit operational decisions, and decision-based downstream gates.
+
+#### Fixed (4)
+
+- Fixed Data Feature Registry parsing so all seventeen padded Markdown rows reconcile with their production folders.
+- Fixed Data per-file coverage gaps in runtime codecs, cache deletion, and dashboard evidence.
+- Replaced a real-time cache-expiration sleep with the supported injected clock and added explicit resource-warning verification.
+- Removed the stale feature usage aggregator from canonical execution parity and included all seventeen numbered programs.
+
 ### Reconcile Brokers mechanical-conformance audit evidence
 
 The Brokers Tier-1 audit found broken workflow usage imports, a padding-brittle

@@ -6,15 +6,13 @@ from __future__ import annotations
 from dataclasses import FrozenInstanceError
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Literal, cast
+from typing import Any, Literal, cast
 
 import pytest
 from app.services.brokers import build_broker_value
-from app.services.data.evidence.account_contracts import (
-    AccountBalance,
-    AccountOrder,
-    AccountPosition,
-    AccountStateSnapshot,
+from app.services.data import (
+    build_account_order,
+    build_account_state_snapshot,
 )
 from app.services.risk import (
     create_action_policy_verdict,
@@ -184,34 +182,34 @@ def request(**updates: object) -> TradingRequest:
     return TradingRequest.model_validate(base)
 
 
-def account_snapshot() -> AccountStateSnapshot:
+def account_snapshot() -> Any:
     """Build current account, order, and position evidence."""
-    return AccountStateSnapshot(
+    return build_account_state_snapshot(
         account_id="account-001",
         currency="USD",
         balances=(
-            AccountBalance(asset="USD", total=Decimal(10000), available=Decimal(9000)),
+            {"asset": "USD", "total": Decimal(10000), "available": Decimal(9000)},
         ),
         equity=Decimal(10000),
         margin_available=Decimal(9000),
         positions=(
-            AccountPosition(
-                position_id="position-001",
-                symbol="EURUSD",
-                side="LONG",
-                quantity=Decimal(2),
-                entry_price=Decimal("1.1000"),
-            ),
+            {
+                "position_id": "position-001",
+                "symbol": "EURUSD",
+                "side": "LONG",
+                "quantity": Decimal(2),
+                "entry_price": Decimal("1.1000"),
+            },
         ),
         orders=(
-            AccountOrder(
+            build_account_order(
                 order_id="order-001",
                 symbol="EURUSD",
                 side="BUY",
                 state="PENDING",
                 quantity=Decimal(1),
             ),
-            AccountOrder(
+            build_account_order(
                 order_id="order-filled",
                 symbol="EURUSD",
                 side="BUY",

@@ -137,7 +137,23 @@ class QualityIssue(_Contract):
 class DataQualityReport(_Contract):
     """Bounded quality evidence for one normalized dataset."""
 
-    quality_status: Literal["passed", "passed_with_warnings", "failed", "not_checked"]
+    contract_version: Literal["v2"] = "v2"
+    quality_status: Literal[
+        "perfect",
+        "excellent",
+        "good",
+        "degraded",
+        "poor",
+        "critical",
+        "not_checked",
+    ]
+    quality_decision: Literal[
+        "accepted",
+        "accepted_with_warnings",
+        "review_required",
+        "rejected",
+        "not_evaluated",
+    ]
     quality_score: Decimal
     issues: tuple[QualityIssue, ...] = ()
     warnings: tuple[str, ...] = ()
@@ -153,9 +169,9 @@ class DataQualityReport(_Contract):
     def _validate_score(cls, value: Decimal) -> Decimal:
         """Validate one DATA value or contract invariant."""
         logger.debug("Running DATA function: _validate_score")
-        if not value.is_finite() or not Decimal(0) <= value <= Decimal(1):
-            raise ValueError("quality_score must be finite and between zero and one")
-        return value
+        if not value.is_finite() or not Decimal(0) <= value <= Decimal(100):
+            raise ValueError("quality_score must be finite and between zero and 100")
+        return value.quantize(Decimal("0.01"))
 
     @field_validator("record_count", "checked_count", "sample_limit")
     @classmethod
@@ -197,8 +213,20 @@ class DataQualityReport(_Contract):
             raise ValueError("checked_count must not exceed record_count")
         if sum(len(issue.samples) for issue in self.issues) > self.sample_limit:
             raise ValueError("quality issue samples exceed sample_limit")
-        if self.quality_status == "failed" and not self.issues:
-            raise ValueError("failed quality status requires an issue")
+        if self.checked_count == 0:
+            if (
+                self.quality_score != Decimal(0)
+                or self.quality_status != "not_checked"
+                or self.quality_decision != "not_evaluated"
+            ):
+                raise ValueError("unchecked quality evidence must fail closed")
+            return self
+        expected_status = _quality_status_for_score(self.quality_score)
+        if self.quality_status != expected_status:
+            raise ValueError("quality_status does not match quality_score")
+        expected_decision = _quality_decision_for_report(self)
+        if self.quality_decision != expected_decision:
+            raise ValueError("quality_decision does not match quality evidence")
         return self
 
     @field_serializer("quality_score", when_used="json")
@@ -206,6 +234,34 @@ class DataQualityReport(_Contract):
         """Serialize one DATA contract value deterministically."""
         logger.debug("Running DATA function: _serialize_score")
         return str(value)
+
+
+def _quality_status_for_score(score: Decimal) -> str:
+    """Return the deterministic percentage grade for an examined score."""
+    if score == Decimal(100):
+        return "perfect"
+    if score >= Decimal(95):
+        return "excellent"
+    if score >= Decimal(90):
+        return "good"
+    if score >= Decimal(80):
+        return "degraded"
+    if score >= Decimal(60):
+        return "poor"
+    return "critical"
+
+
+def _quality_decision_for_report(report: DataQualityReport) -> str:
+    """Return the fail-closed operational decision for one graded report."""
+    if any(issue.code in {"MISSING_BARS", "DUPLICATE_BARS"} for issue in report.issues):
+        return "rejected"
+    if report.quality_status in {"poor", "critical"}:
+        return "rejected"
+    if report.quality_status == "degraded":
+        return "review_required"
+    if report.issues or report.warnings:
+        return "accepted_with_warnings"
+    return "accepted"
 
 
 class MarketDataset(_Contract):

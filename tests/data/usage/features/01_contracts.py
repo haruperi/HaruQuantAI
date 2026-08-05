@@ -130,8 +130,9 @@ def fr_data_004() -> None:
         blocking_workflows=(),
     )
     report = build_data_quality_report(
-        quality_status="passed_with_warnings",
-        quality_score=Decimal("0.99"),
+        quality_status="excellent",
+        quality_decision="rejected",
+        quality_score=Decimal("99.00"),
         issues=(issue,),
         warnings=(),
         record_count=1,
@@ -174,8 +175,9 @@ def fr_data_005() -> None:
         blocking_workflows=(),
     )
     report = build_data_quality_report(
-        quality_status="passed_with_warnings",
-        quality_score=Decimal("0.99"),
+        quality_status="excellent",
+        quality_decision="rejected",
+        quality_score=Decimal("99.00"),
         issues=(issue,),
         warnings=(),
         record_count=1,
@@ -264,6 +266,7 @@ def main() -> None:
     fr_data_005()
     fr_data_012()
     fr_data_013()
+    print("SUCCESS: FEAT-DATA-01 completed")
 
 
 if __name__ == "__main__":

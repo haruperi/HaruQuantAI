@@ -153,7 +153,7 @@ def test_fetch_market_dataset_rejects_blocking_quality(
 def test_fetch_market_dataset_warns_and_returns_blocking_quality(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Warn behavior returns records with failed quality evidence intact."""
+    """Warn behavior returns records with rejected quality evidence intact."""
     _install_runtime(
         monkeypatch,
         (_bar(0, 0), _bar(1, 1), _bar(2, 30)),
@@ -165,7 +165,7 @@ def test_fetch_market_dataset_warns_and_returns_blocking_quality(
     dataset = _unwrap(fetch_market_dataset(request))
 
     assert dataset.record_count == 3
-    assert dataset.quality_report.quality_status == "failed"
+    assert dataset.quality_report.quality_decision == "rejected"
     assert {issue.code for issue in dataset.quality_report.issues} == {"MISSING_BARS"}
 
 
@@ -210,4 +210,4 @@ def test_fetch_market_dataset_returns_nonblocking_quality(
     dataset = _unwrap(fetch_market_dataset(_request()))
 
     assert dataset.record_count == 8
-    assert dataset.quality_report.quality_status != "failed"
+    assert dataset.quality_report.quality_decision != "rejected"

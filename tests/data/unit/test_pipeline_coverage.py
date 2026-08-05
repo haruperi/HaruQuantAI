@@ -219,11 +219,12 @@ def test_require_acceptable_quality_reject() -> None:
     Test _require_acceptable_quality raises DATA_QUALITY_FAILED when behavior is 'reject'.
     """
     ds = MagicMock()
-    ds.quality_report.quality_status = "failed"
+    ds.quality_report.quality_status = "critical"
+    ds.quality_report.quality_decision = "rejected"
     issue = MagicMock()
     issue.code = "DUPLICATE_BARS"
     ds.quality_report.issues = [issue]
-    ds.quality_report.quality_score = Decimal("0.0")
+    ds.quality_report.quality_score = Decimal("0.00")
     ds.symbol = "EURUSD"
     ds.request_id = _REQ_ID
 

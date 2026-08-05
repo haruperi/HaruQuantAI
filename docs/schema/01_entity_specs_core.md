@@ -485,11 +485,12 @@ CREATE TABLE data_update_jobs (
     next_run_at TEXT,
     lease_owner TEXT,
     lease_expires_at TEXT,
-    recovery_state TEXT NOT NULL CHECK ( recovery_state IN ('clean', 'required', 'recovered', 'blocked') )
+    recovery_state TEXT NOT NULL CHECK ( recovery_state IN ('clean', 'required', 'recovered', 'blocked') ),
+    environment TEXT
 ) STRICT;
 ```
 
-Scheduled ingestion with leases. `lease_owner` and `lease_expires_at` prevent two workers claiming one job; `recovery_state` and `last_checkpoint` make an interrupted job resumable.
+Scheduled ingestion with leases. `lease_owner` and `lease_expires_at` prevent two workers claiming one job; `recovery_state` and `last_checkpoint` make an interrupted job resumable. Migration `008_data_jobs_environment` adds nullable `environment`; it is required and constrained by the application contract for exclusive weekly `economic_calendar` jobs and remains null for market-data jobs.
 
 #### `data_backfill_checkpoints`
 
@@ -550,31 +551,79 @@ Streaming feed lifecycle. `dropped_count` and `gap_count` are separate from `rec
 
 ```sql
 CREATE TABLE data_economic_events (
-    provider TEXT NOT NULL,
-    provider_event_id TEXT NOT NULL,
-    name TEXT NOT NULL,
-    category TEXT,
-    country TEXT,
-    currency TEXT,
+    event_id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    country TEXT NOT NULL,
     scheduled_at TEXT NOT NULL,
-    original_scheduled_at TEXT,
+    original_scheduled_at TEXT NOT NULL,
+    impact INTEGER NOT NULL CHECK (impact BETWEEN 1 AND 3),
     actual TEXT,
     forecast TEXT,
     previous TEXT,
     revised_previous TEXT,
-    actual_raw TEXT,
-    forecast_raw TEXT,
-    previous_raw TEXT,
-    unit TEXT,
-    source TEXT,
+    provider TEXT NOT NULL,
     source_url TEXT,
-    impact INTEGER NOT NULL CHECK (impact BETWEEN 1 AND 4),
-    updated_at TEXT,
-    PRIMARY KEY (provider, provider_event_id)
+    first_seen_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    provider_definition_id TEXT
 ) STRICT;
 ```
 
-Calendar events keyed `(provider, provider_event_id)`, so the same event from two providers does not collide.
+Calendar events use a provider-qualified deterministic `event_id`. Exact provider
+values remain strings in `actual`, `forecast`, and `previous`; this preserves suffixes
+without parallel raw/normalized columns. `original_scheduled_at` is immutable when a
+provider reschedules an event.
+
+#### `data_economic_event_definitions`
+
+```sql
+CREATE TABLE data_economic_event_definitions (
+    provider TEXT NOT NULL,
+    provider_definition_id TEXT NOT NULL,
+    country TEXT NOT NULL,
+    title TEXT NOT NULL,
+    source_url TEXT NOT NULL,
+    source_original TEXT,
+    source_latest TEXT,
+    measures TEXT,
+    effect TEXT,
+    frequency TEXT,
+    also_called TEXT,
+    event_type TEXT,
+    first_seen_at TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    last_verified_at TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    PRIMARY KEY (provider, provider_definition_id),
+    UNIQUE (provider, source_url)
+) STRICT;
+```
+
+Definition-level specifications are normalized away from scheduled occurrences.
+Only verified provider text is stored; unavailable values remain null. Occurrences
+join through `provider_definition_id`, and reconciliation requires one exact
+title/country match.
+
+#### `data_economic_calendar_coverage`
+
+```sql
+CREATE TABLE data_economic_calendar_coverage (
+    provider TEXT NOT NULL,
+    range_start TEXT NOT NULL,
+    range_end TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('complete', 'partial')),
+    source_revision TEXT NOT NULL,
+    synchronized_at TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    PRIMARY KEY (provider, range_start, range_end),
+    CHECK (range_start < range_end)
+) STRICT;
+```
+
+Coverage is explicit because an empty event query does not prove missing data. Public
+calendar retrieval checks these intervals before any provider request and acquires
+only uncovered ranges.
 
 #### `data_research_sources`
 

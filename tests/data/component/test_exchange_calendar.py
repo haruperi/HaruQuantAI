@@ -1,4 +1,4 @@
-"""Tests for explicit exchange-calendar session retrieval."""
+"""Component tests for explicit exchange-calendar session retrieval."""
 
 from datetime import UTC, date
 

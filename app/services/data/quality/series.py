@@ -148,30 +148,52 @@ def _detect_gaps(
 def _score(issues: Sequence[QualityIssue], checked: int) -> Decimal:
     """Compute the deterministic quality score from detected issues."""
     if checked <= 0:
-        return Decimal(1)
+        return Decimal(0)
     penalty = Decimal(0)
     for issue in issues:
         weight = QUALITY_SEVERITY_WEIGHTS[issue.severity]
         affected = Decimal(issue.affected_count or 0)
         penalty += weight * affected / Decimal(checked)
-    score = Decimal(1) - penalty
-    return max(Decimal(0), min(Decimal(1), score))
+    score = Decimal(100) * (Decimal(1) - penalty)
+    bounded = max(Decimal(0), min(Decimal(100), score))
+    return bounded.quantize(Decimal("0.01"))
 
 
-def _status(
+def _status(score: Decimal, checked: int) -> str:
+    """Derive the deterministic percentage grade."""
+    if checked == 0:
+        return "not_checked"
+    if score == Decimal(100):
+        return "perfect"
+    boundaries = (
+        (Decimal(95), "excellent"),
+        (QUALITY_MIN_SCORE, "good"),
+        (Decimal(80), "degraded"),
+        (Decimal(60), "poor"),
+    )
+    for minimum, status in boundaries:
+        if score >= minimum:
+            return status
+    return "critical"
+
+
+def _decision(
     issues: Sequence[QualityIssue],
-    score: Decimal,
-    policy: QualityPolicy,
+    status: str,
     warnings: Sequence[str],
 ) -> str:
-    """Derive the deterministic quality status."""
+    """Derive the fail-closed operational quality decision."""
+    if status == "not_checked":
+        return "not_evaluated"
     if any(issue.code in QUALITY_BLOCKING_ISSUES for issue in issues):
-        return "failed"
-    if policy.profile == "strict" and score < QUALITY_MIN_SCORE:
-        return "failed"
+        return "rejected"
+    if status in {"poor", "critical"}:
+        return "rejected"
+    if status == "degraded":
+        return "review_required"
     if issues or warnings:
-        return "passed_with_warnings"
-    return "passed"
+        return "accepted_with_warnings"
+    return "accepted"
 
 
 def inspect_dataset_quality(
@@ -275,14 +297,16 @@ def _inspect_records_quality_raw(
         warnings.append("spread_unit_unverified")
 
     score = _score(issues, checked)
-    if not score.is_finite() or not Decimal(0) <= score <= Decimal(1):
+    if not score.is_finite() or not Decimal(0) <= score <= Decimal(100):
         raise DataError(
             "VALIDATION_FAILED",
             safe_details={"field": "quality_score"},
             request_id=request_id,
         )
+    status = _status(score, checked)
     return DataQualityReport(
-        quality_status=_status(issues, score, active, warnings),  # type: ignore[arg-type]
+        quality_status=status,  # type: ignore[arg-type]
+        quality_decision=_decision(issues, status, warnings),  # type: ignore[arg-type]
         quality_score=score,
         issues=issues,
         warnings=tuple(warnings),
@@ -290,7 +314,7 @@ def _inspect_records_quality_raw(
         checked_count=checked,
         truncated=truncated,
         sample_limit=limit,
-        schema_version="v1",
+        schema_version="v2",
         generated_at=generated_at,
     )
 

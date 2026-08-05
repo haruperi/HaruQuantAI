@@ -49,7 +49,7 @@ QUALITY_BLOCKING_ISSUES: Final[frozenset[str]] = frozenset(
     {"MISSING_BARS", "DUPLICATE_BARS"}
 )
 
-QUALITY_MIN_SCORE: Final[Decimal] = Decimal("0.90")
+QUALITY_MIN_SCORE: Final[Decimal] = Decimal("90.00")
 
 QUALITY_SEVERITY_WEIGHTS: Final[Mapping[str, Decimal]] = {
     "info": Decimal(0),

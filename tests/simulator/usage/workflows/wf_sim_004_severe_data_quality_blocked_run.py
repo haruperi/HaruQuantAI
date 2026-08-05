@@ -46,7 +46,11 @@ def main() -> None:
     failed = original.model_copy(
         update={
             "quality_report": original.quality_report.model_copy(
-                update={"quality_status": "failed"}
+                update={
+                    "quality_status": "critical",
+                    "quality_decision": "rejected",
+                    "quality_score": 0,
+                }
             )
         }
     )

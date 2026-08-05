@@ -42,8 +42,9 @@ def make_dataset() -> object:
         for index in range(5)
     )
     quality = build_data_quality_report(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=len(records),
         checked_count=len(records),
         truncated=False,

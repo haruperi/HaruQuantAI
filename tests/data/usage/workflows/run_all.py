@@ -25,6 +25,8 @@ WORKFLOWS = (
     "wf_data_017_external_artifact_import.py",
     "wf_data_018_venue_authoritative_market_hours.py",
     "wf_data_019_analytical_named_session_classification.py",
+    "wf_data_020_economic_calendar_news_restriction.py",
+    "wf_data_021_persistence_lifecycle.py",
     "wf_data_022_data_audit_trail.py",
     "wf_data_023_versioned_cache_lifecycle.py",
     "wf_data_024_quality_inspection_remediation.py",

@@ -90,6 +90,7 @@ Rows preserve the input record order. The index is a UTC `DatetimeIndex` named
 | `computed_from_end` | `datetime64[ns, UTC]` | Inclusive last contributing timestamp; `NaT` while the complete formula window is unavailable. |
 | `source_timeframe` | pandas string | Exact non-empty input timeframe. |
 | `data_quality_status` | pandas string | Exact `MarketDataset.quality_report.quality_status`. |
+| `data_quality_decision` | pandas string | Exact `MarketDataset.quality_report.quality_decision`; operational gates use this field. |
 | `data_quality_score` | `float64` | Exact finite decimal score converted to float64 for display; the manifest retains canonical decimal-string evidence. |
 | `unavailable_reason` | pandas string | `"warmup"` before the first valid value and `NA` afterward. No other v1 reason is emitted for a successful result. |
 
@@ -878,8 +879,9 @@ Every official `period` is an integer satisfying
 | `normalization_version` | exact non-empty Data-owned `str` |
 | `source_metadata` | immutable `Mapping[str, str]`, copied from Data |
 | `license_metadata` | immutable `Mapping[str, str]`, copied from Data |
-| `quality_status` | `Literal["passed", "passed_with_warnings", "not_checked"]` |
-| `quality_score` | canonical finite decimal `str`, copied from Data |
+| `quality_status` | Data-owned percentage grade: `perfect`, `excellent`, `good`, `degraded`, `poor`, `critical`, or `not_checked` |
+| `quality_decision` | Data-owned operational decision: `accepted`, `accepted_with_warnings`, `review_required`, `rejected`, or `not_evaluated` |
+| `quality_score` | canonical `0.00` through `100.00` decimal `str`, copied from Data |
 | `quality_schema_version` | exact non-empty Data-owned `str` |
 
 Volatile host, process, thread, duration, and wall-clock calculation fields are
@@ -1035,9 +1037,9 @@ each leaf file's actual imports.
 **Rules:** Validation is whole-request and precedes private projection/formula work.
 The public Data contract already supplies immutable ordered records and UTC/exact
 numeric validation; Indicators verifies the conditions its formula requires without
-redefining Data policy. A failed Data quality report fails
-`IND_INVALID_INPUT_SCHEMA`; `passed`, `passed_with_warnings`, and `not_checked`
-statuses are propagated. Provider-specific
+redefining Data policy. A `rejected` or `not_evaluated` Data quality decision fails
+`IND_INVALID_INPUT_SCHEMA`; accepted and review-required evidence propagates its
+percentage grade, decision, and score. Provider-specific
 adjustment, symbol mapping, calendar, stub-quote, inverted-market, and spread rules
 are never duplicated here.
 

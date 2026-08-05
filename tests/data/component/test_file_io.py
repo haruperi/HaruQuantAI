@@ -1,4 +1,4 @@
-"""Unit tests for datasets local persistence.
+"""Component tests for datasets local persistence.
 
 [CAP-DATA-026 Phase 2] Copy of the legacy storage test, re-pointed at the
 new `persistence`/`audit` modules. The legacy copy still guards `storage/`
@@ -53,8 +53,9 @@ def make_bar():
 def make_quality(count=1):
     """Return passing bounded quality evidence."""
     return build_data_quality_report(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         issues=(),
         warnings=(),
         record_count=count,
@@ -233,8 +234,9 @@ def test_save_quality_failed_dataset(
         message="Mock quality failure",
     )
     failed_quality = DataQualityReport(
-        quality_status="failed",
-        quality_score=Decimal("0.5"),
+        quality_status="critical",
+        quality_decision="rejected",
+        quality_score=Decimal("50.00"),
         issues=(issue,),
         warnings=(),
         record_count=1,

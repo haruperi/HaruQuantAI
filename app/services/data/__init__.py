@@ -9,81 +9,7 @@ implementation details and are never exported through a public Data boundary.
 # Import order is dependency order, not lexical order.
 
 from app.services.data._settings import data_settings_context
-from app.services.data.audit import persist_audit_event, query_audit_events
-from app.services.data.contracts.responses import (
-    build_data_response,
-    build_exception_response,
-    data_start_time,
-    resolve_operation_request_id,
-    run_data_operation,
-    run_data_operation_async,
-    unwrap_data_response,
-)
-from app.services.data.data_jobs import (
-    derive_backfill_key,
-    execute_backfill_chunk,
-    read_update_job_status,
-    recover_update_jobs,
-    schedule_update_job,
-)
-from app.services.data.data_jobs.job import (
-    create_data_update_job,
-    get_data_update_job_status,
-    run_data_update_job_once,
-    start_data_update_job,
-    stop_data_update_job,
-)
-from app.services.data.economic_calendar import (
-    calendar_state_provenance,
-    derive_calendar_state,
-    deserialize_scrape_result,
-    evaluate_calendar_state,
-    from_row,
-    get_calendar_value_field,
-    get_economic_events,
-    get_persisted_events,
-    get_symbol_economic_events,
-    get_symbol_event_profile,
-    is_news_restricted,
-    is_news_restricted_events,
-    persist_economic_events,
-    populate_market_context_calendar,
-    project_calendar_state,
-    project_economic_event,
-    save_scrape_result,
-    scrape_economic_calendar,
-    scrape_result_to_dataframe,
-    serialize_scrape_result,
-)
-from app.services.data.economic_calendar.dashboard import (
-    get_calendar_dashboard_snapshot,
-)
-from app.services.data.evidence import (
-    get_account_state_snapshot,
-    get_fx_conversion_evidence,
-    get_market_context_evidence,
-)
-from app.services.data.local_datasets import (
-    load_csv,
-    load_dataset,
-    load_local_dataset,
-    load_parquet,
-)
-from app.services.data.market_data import (
-    discover_symbols,
-    fetch_historical_volume,
-    fetch_market_dataset,
-    fetch_symbol_metadata,
-    get_data_availability,
-    get_historical_volume,
-    get_market_data,
-    get_spread_data,
-    get_symbol_metadata,
-    get_tick_data,
-    inspect_availability,
-    list_symbols,
-)
-from app.services.data.operations import (
+from app.services.data._shared.operations import (
     build_account_order,
     build_account_snapshot_request,
     build_account_state_snapshot,
@@ -131,6 +57,7 @@ from app.services.data.operations import (
     build_quality_issue,
     build_raw_feed_event,
     build_read_only_broker_proxy,
+    build_reader_calendar_transport,
     build_reconnect_policy,
     build_research_source_ingest_request,
     build_research_source_policy,
@@ -186,6 +113,94 @@ from app.services.data.operations import (
     is_read_only_broker_proxy,
     is_research_source_value,
     is_tick_record,
+)
+from app.services.data.artifact_catalog import (
+    get_catalog_evidence,
+    get_catalog_table_lifecycles,
+    get_verified_research_source,
+    reconcile_data_catalog,
+    record_catalog_fetch,
+    record_catalog_quality_event,
+    register_catalog_artifact,
+    sync_catalog_reference,
+)
+from app.services.data.audit import persist_audit_event, query_audit_events
+from app.services.data.contracts.responses import (
+    build_data_response,
+    build_exception_response,
+    data_start_time,
+    resolve_operation_request_id,
+    run_data_operation,
+    run_data_operation_async,
+    unwrap_data_response,
+)
+from app.services.data.data_jobs import (
+    derive_backfill_key,
+    execute_backfill_chunk,
+    read_update_job_status,
+    recover_update_jobs,
+    schedule_update_job,
+)
+from app.services.data.data_jobs.job import (
+    create_data_update_job,
+    get_data_update_job_status,
+    run_data_update_job_once,
+    start_data_update_job,
+    stop_data_update_job,
+)
+from app.services.data.economic_calendar import (
+    backfill_forexfactory_history,
+    calendar_state_provenance,
+    crawl_forexfactory_event_definitions,
+    derive_calendar_state,
+    deserialize_scrape_result,
+    evaluate_calendar_state,
+    from_row,
+    get_calendar_value_field,
+    get_economic_events,
+    get_persisted_events,
+    get_symbol_economic_events,
+    get_symbol_event_profile,
+    import_economic_calendar_csv,
+    is_news_restricted,
+    is_news_restricted_events,
+    persist_economic_events,
+    populate_market_context_calendar,
+    project_calendar_state,
+    project_economic_event,
+    save_scrape_result,
+    scrape_economic_calendar,
+    scrape_result_to_dataframe,
+    serialize_scrape_result,
+    sync_current_week_economic_calendar,
+)
+from app.services.data.economic_calendar.dashboard import (
+    get_calendar_dashboard_snapshot,
+)
+from app.services.data.evidence import (
+    get_account_state_snapshot,
+    get_fx_conversion_evidence,
+    get_market_context_evidence,
+)
+from app.services.data.local_datasets import (
+    load_csv,
+    load_dataset,
+    load_local_dataset,
+    load_parquet,
+)
+from app.services.data.market_data import (
+    discover_symbols,
+    fetch_historical_volume,
+    fetch_market_dataset,
+    fetch_symbol_metadata,
+    get_data_availability,
+    get_historical_volume,
+    get_market_data,
+    get_spread_data,
+    get_symbol_metadata,
+    get_tick_data,
+    inspect_availability,
+    list_symbols,
 )
 from app.services.data.persistence import (
     acquire_write_lock,
@@ -311,6 +326,7 @@ __all__ = (
     "align_datasets",
     "align_multitimeframe_data",
     "assess_research_source_eligibility",
+    "backfill_forexfactory_history",
     "build_account_order",
     "build_account_snapshot_request",
     "build_account_state_snapshot",
@@ -363,6 +379,7 @@ __all__ = (
     "build_quality_issue",
     "build_raw_feed_event",
     "build_read_only_broker_proxy",
+    "build_reader_calendar_transport",
     "build_reconnect_policy",
     "build_research_source_ingest_request",
     "build_research_source_policy",
@@ -397,6 +414,7 @@ __all__ = (
     "classify_gap",
     "clear_cache_entry",
     "clear_data_cache",
+    "crawl_forexfactory_event_definitions",
     "create_backup",
     "create_data_update_job",
     "data_settings_context",
@@ -437,6 +455,8 @@ __all__ = (
     "get_calendar_dashboard_snapshot",
     "get_calendar_sites",
     "get_calendar_value_field",
+    "get_catalog_evidence",
+    "get_catalog_table_lifecycles",
     "get_current_schedule",
     "get_data_availability",
     "get_data_error_manifest",
@@ -475,7 +495,9 @@ __all__ = (
     "get_timeframe_manifest",
     "get_timeframe_spec",
     "get_trading_sessions",
+    "get_verified_research_source",
     "get_workflow_contexts",
+    "import_economic_calendar_csv",
     "import_external_dataset",
     "ingest_feed_event",
     "ingest_research_source",
@@ -519,9 +541,13 @@ __all__ = (
     "query_research_sources",
     "read_feed_status",
     "read_update_job_status",
+    "reconcile_data_catalog",
     "reconcile_feed_gap",
     "reconnect_feed",
+    "record_catalog_fetch",
+    "record_catalog_quality_event",
     "recover_update_jobs",
+    "register_catalog_artifact",
     "register_source",
     "register_source_policy",
     "require_utc",
@@ -549,6 +575,8 @@ __all__ = (
     "stop_data_update_job",
     "stream_market_data",
     "summarize_quality_remediation",
+    "sync_catalog_reference",
+    "sync_current_week_economic_calendar",
     "to_ohlcv_dataframe",
     "to_tick_dataframe",
     "unwrap_data_response",

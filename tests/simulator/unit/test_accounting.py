@@ -2,11 +2,12 @@
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from typing import Any
 
 import pytest
-from app.services.data.evidence.fx_contracts import (
-    FXConversionEvidence,
-    FXRateLeg,
+from app.services.data import (
+    build_fx_conversion_evidence,
+    build_fx_rate_leg,
 )
 from app.services.simulator.accounting import (
     ExecutionCostInput,
@@ -32,10 +33,10 @@ def _specification() -> SymbolSpecification:
     )
 
 
-def _fx_evidence() -> FXConversionEvidence:
+def _fx_evidence() -> Any:
     """Build fresh Data-owned FX evidence."""
     instant = datetime(2025, 1, 1, tzinfo=UTC)
-    leg = FXRateLeg(
+    leg = build_fx_rate_leg(
         source_currency="USD",
         target_currency="EUR",
         rate=Decimal("0.9"),
@@ -44,7 +45,7 @@ def _fx_evidence() -> FXConversionEvidence:
         as_of=instant,
         provenance={"provider": "fixture"},
     )
-    return FXConversionEvidence(
+    return build_fx_conversion_evidence(
         source_currency="USD",
         target_currency="EUR",
         legs=(leg,),

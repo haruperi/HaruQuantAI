@@ -197,6 +197,7 @@ def main() -> None:
             fr_data_047()
             fr_data_048()
             fr_data_154_157()
+            print("SUCCESS: FEAT-DATA-12 completed")
 
 
 if __name__ == "__main__":

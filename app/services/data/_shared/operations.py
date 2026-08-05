@@ -1,7 +1,8 @@
-"""Approved Data domain operations, getters, and DTO builders.
+"""Private package-root construction, getter, and predicate adapters.
 
-This module provides standalone getter functions for domain constants and
-builder helpers for canonical Data contract DTOs.
+This reconciliation-excluded support module contains no feature behavior. It
+adapts private feature-owned contract types and constants to the function-only
+package-root boundary without making those private values public.
 """
 
 # These package-root builders intentionally forward heterogeneous private
@@ -49,6 +50,7 @@ from app.services.data.economic_calendar import (
     firecrawl_transport as _calendar_firecrawl,
 )
 from app.services.data.economic_calendar import providers as _calendar_providers
+from app.services.data.economic_calendar import reader_transport as _calendar_reader
 from app.services.data.economic_calendar import scraper as _calendar_scraper
 from app.services.data.economic_calendar import store as _calendar_store
 from app.services.data.economic_calendar.scraper import CALENDAR_SITES
@@ -144,6 +146,11 @@ def build_calendar_scrape_provider(*args: Any, **kwargs: Any) -> Any:
 def build_firecrawl_calendar_transport(*args: Any, **kwargs: Any) -> Any:
     """Build the licensed Firecrawl transport through the Data public boundary."""
     return _calendar_firecrawl.build_firecrawl_calendar_transport(*args, **kwargs)
+
+
+def build_reader_calendar_transport(*args: Any, **kwargs: Any) -> Any:
+    """Build the bounded Reader transport through the Data public boundary."""
+    return _calendar_reader.build_reader_calendar_transport(*args, **kwargs)
 
 
 def build_column_mapping(*args: Any, **kwargs: Any) -> Any:

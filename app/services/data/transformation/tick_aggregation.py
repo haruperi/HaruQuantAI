@@ -193,8 +193,9 @@ def _aggregate_ticks_raw(
         )
 
     quality_report = DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         issues=(),
         warnings=(),
         record_count=len(bars),

@@ -77,5 +77,5 @@ def test_external_import_measures_commits_and_reloads(tmp_path: Path) -> None:
         loaded = loaded_res.data
 
     assert loaded.record_count == 2
-    assert loaded.quality_report.quality_status != "failed"
+    assert loaded.quality_report.quality_decision != "rejected"
     assert loaded.source_metadata["origin"] == "external_import"

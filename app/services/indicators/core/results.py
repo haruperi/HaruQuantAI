@@ -91,8 +91,8 @@ class IndicatorManifest:
         normalization_version: Data-owned normalization version.
         source_metadata: Immutable Data-owned source provenance.
         license_metadata: Immutable Data-owned license provenance.
-        quality_status: Data-owned dataset quality status, excluding
-            ``"failed"``.
+        quality_status: Data-owned dataset percentage grade.
+        quality_decision: Data-owned operational quality decision.
         quality_score: Canonical finite decimal quality score string.
         quality_schema_version: Data-owned quality schema version.
     """
@@ -110,7 +110,10 @@ class IndicatorManifest:
     normalization_version: str
     source_metadata: Mapping[str, str]
     license_metadata: Mapping[str, str]
-    quality_status: Literal["passed", "passed_with_warnings", "not_checked"]
+    quality_status: Literal[
+        "perfect", "excellent", "good", "degraded", "poor", "critical"
+    ]
+    quality_decision: Literal["accepted", "accepted_with_warnings", "review_required"]
     quality_score: str
     quality_schema_version: str
     manifest_version: Literal["v1"] = "v1"
@@ -531,6 +534,7 @@ def build_indicator_result(
     frame["computed_from_end"] = pd.Series(computed_from_end).to_numpy(copy=True)
     frame["source_timeframe"] = source_timeframe
     frame["data_quality_status"] = data.quality_report.quality_status
+    frame["data_quality_decision"] = data.quality_report.quality_decision
     frame["data_quality_score"] = float(data.quality_report.quality_score)
     frame["unavailable_reason"] = pd.Series(unavailable_reason).to_numpy(copy=True)
 
@@ -558,6 +562,7 @@ def build_indicator_result(
         source_metadata=dict(data.source_metadata),
         license_metadata=dict(data.license_metadata),
         quality_status=data.quality_report.quality_status,  # type: ignore[arg-type]
+        quality_decision=data.quality_report.quality_decision,  # type: ignore[arg-type]
         quality_score=str(data.quality_report.quality_score),
         quality_schema_version=data.quality_report.schema_version,
     )
@@ -644,6 +649,7 @@ def get_indicator_result_metadata(result: object) -> Mapping[str, object]:
             "source_metadata": dict(manifest.source_metadata),
             "license_metadata": dict(manifest.license_metadata),
             "quality_status": manifest.quality_status,
+            "quality_decision": manifest.quality_decision,
             "quality_score": manifest.quality_score,
         },
     }

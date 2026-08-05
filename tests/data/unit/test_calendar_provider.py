@@ -75,6 +75,16 @@ def test_get_events_normalizes_calendar_events() -> None:
     assert event.unit == "K"
 
 
+def test_get_events_normalizes_provider_country_case() -> None:
+    """Normalize provider labels before enforcing the uppercase contract."""
+    transport = _FakeTransport({"forexfactory": [_row(country="All")]})
+    provider = CalendarScrapeProvider(transport, sites=("forexfactory",))
+
+    events = asyncio.run(provider.get_events(_START, _END))
+
+    assert events[0].country == "ALL"
+
+
 def test_get_events_filters_by_currency() -> None:
     """Currency filter excludes non-matching rows post-normalization."""
     transport = _FakeTransport(

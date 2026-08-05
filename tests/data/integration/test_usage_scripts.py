@@ -18,13 +18,14 @@ _USAGE_SCRIPTS = (
     "08_transformation.py",
     "09_time_sessions.py",
     "10_sources.py",
+    "11_economic_calendar.py",
     "12_realtime_feeds.py",
     "13_data_jobs.py",
     "14_evidence.py",
     "15_audit.py",
     "16_research_sources.py",
     "17_runtime_stores.py",
-    "features.py",
+    "18_artifact_catalog.py",
 )
 
 
@@ -32,8 +33,8 @@ _USAGE_SCRIPTS = (
 def test_documented_usage_script_executes_real_work(script_name: str) -> None:
     """Run one network-free standalone usage script in an isolated process.
 
-    FEAT-DATA-11 is exercised by the opt-in live integration test because its
-    usage program intentionally acquires licensed provider data.
+    Provider-dependent programs must report honest unavailability and still
+    execute their deterministic contract evidence without inventing live data.
     """
     usage_directory = Path(__file__).parents[1] / "usage" / "features"
     environment = os.environ.copy()
@@ -60,3 +61,7 @@ def test_documented_usage_script_executes_real_work(script_name: str) -> None:
         f"stdout:\n{completed.stdout}\n"
         f"stderr:\n{completed.stderr}"
     )
+    assert completed.stdout.strip(), f"{script_name} produced no actual evidence"
+    normalized_output = completed.stdout.lower()
+    assert "data" in normalized_output, f"{script_name} omitted actual data evidence"
+    assert "success" in normalized_output, f"{script_name} omitted success evidence"

@@ -13,6 +13,8 @@ even when synchronously testable transports are used.
 
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Coroutine, Sequence
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any, cast
@@ -42,6 +44,13 @@ if TYPE_CHECKING:
     from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
     from app.services.data.economic_calendar.providers import EconomicCalendarProvider
     from app.services.data.economic_calendar.store import EconomicEventStore
+
+
+def _default_store() -> EconomicEventStore:
+    """Construct the internal database-backed event store lazily."""
+    from app.services.data.economic_calendar.store import EconomicEventStore
+
+    return EconomicEventStore()
 
 
 def _require_aware(name: str, value: datetime) -> datetime:
@@ -78,6 +87,7 @@ async def _get_economic_events_raw(
     end: datetime,
     *,
     provider: EconomicCalendarProvider,
+    store: EconomicEventStore | None = None,
     currencies: Sequence[str] | None = None,
     countries: Sequence[str] | None = None,
     minimum_impact: EventImpact | None = None,
@@ -93,36 +103,75 @@ async def _get_economic_events_raw(
     if start >= end:
         raise DataError("VALIDATION_FAILED", safe_details={"field": "window"})
     logger.info(
-        "Retrieving economic events for window [%s, %s)",
+        "Querying economic-event database for window [%s, %s)",
         start.isoformat(),
         end.isoformat(),
     )
-    provider_result = await provider.get_events(
-        start,
-        end,
-        currencies=currencies,
-        countries=countries,
-        minimum_impact=minimum_impact,
-    )
-    events = (
-        provider_result
-        if isinstance(provider_result, list)
-        else cast(
-            "list[EconomicEvent]",
-            unwrap_data_response(
-                provider_result,
-                operation="data.economic_calendar.get_economic_events",
-                request_id=request_id or generate_id("req"),
-            ),
+    active_request_id = request_id or generate_id("req")
+    active_store = store or _default_store()
+    for gap_start, gap_end in active_store.missing_intervals(
+        start, end, request_id=active_request_id
+    ):
+        logger.info(
+            "Acquiring missing economic-event interval [%s, %s)",
+            gap_start.isoformat(),
+            gap_end.isoformat(),
         )
+        provider_result = await provider.get_events(
+            gap_start,
+            gap_end,
+            currencies=currencies,
+            countries=countries,
+            minimum_impact=minimum_impact,
+        )
+        acquired = (
+            provider_result
+            if isinstance(provider_result, list)
+            else cast(
+                "list[EconomicEvent]",
+                unwrap_data_response(
+                    provider_result,
+                    operation="data.economic_calendar.get_economic_events",
+                    request_id=active_request_id,
+                ),
+            )
+        )
+        accepted = [
+            event
+            for event in acquired
+            if gap_start <= event.scheduled_at < gap_end
+            and _matches_scope(event, currencies, countries)
+            and (minimum_impact is None or event.impact >= minimum_impact)
+        ]
+        unwrap_data_response(
+            active_store.upsert(accepted, request_id=active_request_id),
+            operation="data.economic_calendar.persist_gap",
+            request_id=active_request_id,
+        )
+        revision = hashlib.sha256(
+            json.dumps(sorted((event.provider, event.id) for event in accepted)).encode(
+                "utf-8"
+            )
+        ).hexdigest()
+        active_store.record_coverage(
+            gap_start,
+            gap_end,
+            provider="economic-calendar-provider",
+            source_revision=revision,
+            request_id=active_request_id,
+        )
+    return unwrap_data_response(
+        active_store.query(
+            start,
+            end,
+            currencies=currencies,
+            countries=countries,
+            minimum_impact=minimum_impact,
+            request_id=active_request_id,
+        ),
+        operation="data.economic_calendar.query_persisted",
+        request_id=active_request_id,
     )
-    return [
-        event
-        for event in events
-        if start <= event.scheduled_at < end
-        and _matches_scope(event, currencies, countries)
-        and (minimum_impact is None or event.impact >= minimum_impact)
-    ]
 
 
 async def get_economic_events(
@@ -130,6 +179,7 @@ async def get_economic_events(
     end: datetime,
     *,
     provider: EconomicCalendarProvider,
+    store: EconomicEventStore | None = None,
     currencies: Sequence[str] | None = None,
     countries: Sequence[str] | None = None,
     minimum_impact: EventImpact | None = None,
@@ -140,6 +190,7 @@ async def get_economic_events(
         start: Inclusive timezone-aware UTC window start.
         end: Exclusive timezone-aware UTC window end.
         provider: Injected economic-calendar provider.
+        store: Optional injected database store; defaults to the Data store.
         currencies: Optional currency filter.
         countries: Optional country filter.
         minimum_impact: Optional minimum-impact filter.
@@ -161,6 +212,7 @@ async def get_economic_events(
             start,
             end,
             provider=provider,
+            store=store,
             currencies=currencies,
             countries=countries,
             minimum_impact=minimum_impact,
@@ -175,6 +227,7 @@ async def _get_symbol_economic_events_raw(
     end: datetime,
     *,
     provider: EconomicCalendarProvider,
+    store: EconomicEventStore | None = None,
     minimum_impact: EventImpact | None = None,
     request_id: str | None = None,
 ) -> list[EconomicEvent]:
@@ -198,6 +251,7 @@ async def _get_symbol_economic_events_raw(
         start,
         end,
         provider=provider,
+        store=store,
         currencies=tuple(sorted(profile.currencies)),
         countries=tuple(sorted(profile.countries)),
         minimum_impact=minimum_impact,
@@ -211,6 +265,7 @@ async def get_symbol_economic_events(
     end: datetime,
     *,
     provider: EconomicCalendarProvider,
+    store: EconomicEventStore | None = None,
     minimum_impact: EventImpact | None = None,
 ) -> StandardResponse[list[EconomicEvent]]:
     """Retrieve economic events relevant to one tradable symbol.
@@ -220,6 +275,7 @@ async def get_symbol_economic_events(
         start: Inclusive timezone-aware UTC window start.
         end: Exclusive timezone-aware UTC window end.
         provider: Injected economic-calendar provider.
+        store: Optional injected database store; defaults to the Data store.
         minimum_impact: Optional minimum-impact filter.
 
     Returns:
@@ -240,6 +296,7 @@ async def get_symbol_economic_events(
             start,
             end,
             provider=provider,
+            store=store,
             minimum_impact=minimum_impact,
             request_id=request_id,
         ),
@@ -251,6 +308,7 @@ async def _is_news_restricted_raw(
     at: datetime,
     *,
     provider: EconomicCalendarProvider,
+    store: EconomicEventStore | None = None,
     minutes_before: int = 10,
     minutes_after: int = 10,
     minimum_impact: EventImpact = DEFAULT_MINIMUM_IMPACT,
@@ -276,6 +334,7 @@ async def _is_news_restricted_raw(
         window_start,
         window_end,
         provider=provider,
+        store=store,
         minimum_impact=minimum_impact,
         request_id=request_id,
     )
@@ -293,6 +352,7 @@ async def is_news_restricted(
     at: datetime,
     *,
     provider: EconomicCalendarProvider,
+    store: EconomicEventStore | None = None,
     minutes_before: int = 10,
     minutes_after: int = 10,
     minimum_impact: EventImpact = DEFAULT_MINIMUM_IMPACT,
@@ -308,6 +368,7 @@ async def is_news_restricted(
         symbol: Canonical tradable symbol (must have a registered profile).
         at: Timezone-aware UTC instant.
         provider: Injected economic-calendar provider.
+        store: Optional injected database store; defaults to the Data store.
         minutes_before: Blackout minutes before each release.
         minutes_after: Blackout minutes after each release.
         minimum_impact: Minimum impact to consider. Defaults to HIGH.
@@ -329,6 +390,7 @@ async def is_news_restricted(
                     symbol,
                     at,
                     provider=provider,
+                    store=store,
                     minutes_before=minutes_before,
                     minutes_after=minutes_after,
                     minimum_impact=minimum_impact,

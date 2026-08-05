@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import os
 import sqlite3
+from contextlib import closing
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -92,8 +93,9 @@ def test_manifest_records_hash_per_target(data_root: Path) -> None:
 def test_database_backup_hashes_after_persisted_lease(data_root: Path) -> None:
     """Snapshot a database after the lease write so copied hashes remain stable."""
     database = data_root / "data/cache/data.db"
-    with sqlite3.connect(database) as connection:
+    with closing(sqlite3.connect(database)) as connection:
         connection.execute("CREATE TABLE evidence (id INTEGER PRIMARY KEY)")
+        connection.commit()
 
     with data_settings_context(_settings(data_root)):
         manifest = _unwrap(create_backup((_target("data/cache/data.db"),)))

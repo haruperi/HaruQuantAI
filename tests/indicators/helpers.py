@@ -166,8 +166,9 @@ def build_dataset(
         for position, (open_price, high, low, close, volume) in enumerate(bars)
     )
     quality = _FixtureModel(
-        quality_status="passed",
-        quality_score=Decimal("1.0"),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=len(records),
         checked_count=len(records),
         truncated=False,
@@ -243,6 +244,7 @@ def build_indicator_evidence(
             "computed_from_end": [record.timestamp for record in market.records],
             "source_timeframe": market.timeframe,
             "data_quality_status": market.quality_report.quality_status,
+            "data_quality_decision": market.quality_report.quality_decision,
             "data_quality_score": float(market.quality_report.quality_score),
             "unavailable_reason": [pd.NA] * len(index),
         },

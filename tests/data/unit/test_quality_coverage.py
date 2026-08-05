@@ -43,8 +43,9 @@ def test_aggregate_flags_success_and_unknown_flag() -> None:
         samples=("2026-01-01T01:00:00Z",),
     )
     report = DataQualityReport(
-        quality_status="passed_with_warnings",
-        quality_score=Decimal("0.9"),
+        quality_status="good",
+        quality_decision="rejected",
+        quality_score=Decimal("90.00"),
         issues=(issue_spike, issue_missing),
         warnings=(),
         record_count=10,
@@ -66,8 +67,9 @@ def test_aggregate_flags_success_and_unknown_flag() -> None:
         samples=(),
     )
     report_unknown = DataQualityReport(
-        quality_status="failed",
-        quality_score=Decimal("0.0"),
+        quality_status="critical",
+        quality_decision="rejected",
+        quality_score=Decimal("0.00"),
         issues=(unknown_issue,),
         warnings=(),
         record_count=10,
@@ -125,13 +127,15 @@ def test_detect_gaps_edge_cases() -> None:
     assert _detect_gaps((fri, mon), timeframe="D1", policy=policy, limit=10) is None
 
 
-def test_status_strict_policy_score_failure() -> None:
-    """Test _status fails when strict policy score is below minimum."""
-    policy = MagicMock()
-    policy.profile = "strict"
-    # Low score < QUALITY_MIN_SCORE (0.8)
-    status = _status(issues=(), score=Decimal("0.5"), policy=policy, warnings=())
-    assert status == "failed"
+def test_status_percentage_grade_boundaries() -> None:
+    """Test deterministic percentage grades at representative boundaries."""
+    assert _status(Decimal("100.00"), 1) == "perfect"
+    assert _status(Decimal("95.00"), 1) == "excellent"
+    assert _status(Decimal("90.00"), 1) == "good"
+    assert _status(Decimal("80.00"), 1) == "degraded"
+    assert _status(Decimal("60.00"), 1) == "poor"
+    assert _status(Decimal("59.99"), 1) == "critical"
+    assert _status(Decimal("100.00"), 0) == "not_checked"
 
 
 def test_validate_tick_order() -> None:

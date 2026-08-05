@@ -12,6 +12,8 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
+_WEEKLY_INTERVAL_SECONDS = 7 * 24 * 60 * 60
+
 
 def _text(value: str) -> str:
     """Execute one private DATA operation."""
@@ -201,11 +203,12 @@ class JobDefinition(_Contract):
     source_id: str
     symbols: tuple[str, ...]
     timeframes: tuple[str, ...]
-    data_kinds: tuple[Literal["ohlcv", "tick", "spread"], ...]
+    data_kinds: tuple[Literal["ohlcv", "tick", "spread", "economic_calendar"], ...]
     start: datetime
     end: datetime | None = None
     interval_seconds: int | None = None
     enabled: bool
+    environment: Literal["dev", "demo", "paper", "sandbox", "testnet"] | None = None
     created_at: datetime
     request_id: str
 
@@ -222,15 +225,16 @@ class JobDefinition(_Contract):
         """Validate one DATA value or contract invariant."""
         logger.debug("Running DATA function: _validate_text_tuple")
         validated = tuple(_text(item) for item in value)
-        if not validated or len(set(validated)) != len(validated):
-            raise ValueError("values must be non-empty and unique")
+        if len(set(validated)) != len(validated):
+            raise ValueError("values must be unique")
         return validated
 
     @field_validator("data_kinds")
     @classmethod
     def _validate_kinds(
-        cls, value: tuple[Literal["ohlcv", "tick", "spread"], ...]
-    ) -> tuple[Literal["ohlcv", "tick", "spread"], ...]:
+        cls,
+        value: tuple[Literal["ohlcv", "tick", "spread", "economic_calendar"], ...],
+    ) -> tuple[Literal["ohlcv", "tick", "spread", "economic_calendar"], ...]:
         """Validate one DATA value or contract invariant."""
         logger.debug("Running DATA function: _validate_kinds")
         if not value or len(set(value)) != len(value):
@@ -256,7 +260,26 @@ class JobDefinition(_Contract):
             raise ValueError("open-ended jobs require interval_seconds")
         if "ohlcv" in self.data_kinds and not self.timeframes:
             raise ValueError("OHLCV jobs require timeframes")
+        if "economic_calendar" in self.data_kinds:
+            self._validate_calendar_job()
+        elif not self.symbols:
+            raise ValueError("market-data jobs require symbols")
+        elif self.environment is not None:
+            raise ValueError("environment is reserved for economic_calendar jobs")
         return self
+
+    def _validate_calendar_job(self) -> None:
+        """Validate the exclusive, non-production weekly calendar job shape."""
+        if self.data_kinds != ("economic_calendar",):
+            raise ValueError("economic_calendar cannot be mixed with market data")
+        if self.symbols or self.timeframes:
+            raise ValueError("economic_calendar jobs do not accept market dimensions")
+        if self.environment is None:
+            raise ValueError(
+                "economic_calendar jobs require a non-production environment"
+            )
+        if self.interval_seconds != _WEEKLY_INTERVAL_SECONDS:
+            raise ValueError("economic_calendar jobs require a weekly interval")
 
 
 class ScheduleJobRequest(_Contract):

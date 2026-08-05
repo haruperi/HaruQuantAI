@@ -166,6 +166,7 @@ but retain schema ownership.
 | Completed | Source readiness, capabilities, license policy, rate limits, and breaker state       | Data source policy APIs                                              | `app/services/data/persistence/migrations.py` |
 | Completed | Update jobs, leases, idempotency keys, checkpoints, and recovery state               | Data job APIs                                                        | `app/services/data/persistence/migrations.py` |
 | Completed | Internal feed heartbeat, gap, buffer, reconnect, and circuit state                   | `get_feed_status`                                                  | `app/services/data/persistence/migrations.py` |
+| Completed | Economic events, original schedules, exact provider values, and explicit synchronized-range coverage | Database-first calendar queries and Risk restriction evidence | `app/services/data/migrations/economic_calendar.py` |
 | Completed | Shared migration ledger and path-scoped lock records                                 | Persistent domains through migration results; no direct table access | `app/services/data/persistence/migrations.py` |
 
 ### Four-level structure
@@ -195,8 +196,9 @@ Package (Data domain)
 The following registry is the owner-approved target. It treats a feature as one
 cohesive capability, not as one public function. A feature may expose multiple
 operations when they serve the same actor outcome; each operation still implements
-one focused functional-requirement behaviour. The target contains seventeen registered
-capabilities: sixteen business features and one foundational contract capability.
+one focused functional-requirement behaviour. The target contains eighteen registered
+capabilities: sixteen business features and one foundational contract capability,
+for eighteen registered features in total.
 
 | Status    | Feature                                                        | Owning module          | Public API and contracts                                                                                                                                                                                                                           | Requirements                                                         | Usage evidence                                                                                                                                                     |
 | --------- | -------------------------------------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -210,18 +212,25 @@ capabilities: sixteen business features and one foundational contract capability
 | Completed | `FEAT-DATA-08` Data Transformation and Resampling            | `transformation/`    | Resampling, tick aggregation, multi-timeframe alignment, and detached tabular projections                                                                                                                                                          | Section 4 transformation requirements, allocated to this owner       | `tests/data/usage/features/08_transformation.py`                                                                                                                 |
 | Completed | `FEAT-DATA-09` Time and Session Handling                     | `time_sessions/`     | Timeframe/schedule contracts, UTC policy, venue market hours, exchange/configured schedules, analytical named sessions, gap classification, and explicit context-required dashboard snapshot                                                       | `FR-DATA-034`, `FR-DATA-117`–`FR-DATA-122`                    | `tests/data/usage/features/09_time_sessions.py`                                                                                                                  |
 | Completed | `FEAT-DATA-10` Data Source Governance                        | `sources/`           | Source contracts/protocol, registry/composition, policy/promotion, adapters, licensing, and read-only proxy                                                                                                                                        | Section 4 source-governance requirements, allocated to this owner    | `tests/data/usage/features/10_sources.py`                                                                                                                        |
-| Completed | `FEAT-DATA-11` Economic Calendar                             | `economic_calendar/` | Licensed Firecrawl acquisition, raw scraper contracts, exact-value normalization, approved persistence, symbol queries, restriction/state evidence, and explicit context-required dashboard snapshot through function-only package-root operations | `FR-DATA-095`–`099`, `FR-DATA-123`–`129`                   | `tests/data/usage/features/11_economic_calendar.py`; opt-in `tests/data/integration/test_economic_calendar_live.py`                                            |
+| Completed | `FEAT-DATA-11` Economic Calendar                             | `economic_calendar/` | Database-first queries, CSV bootstrap, bounded resumable historical Forex Factory acquisition through Jina Reader, current-week CSV synchronization, permanent event-definition URLs/specifications, exact-value normalization, explicit coverage, approved persistence, symbol queries, and restriction/state evidence | `FR-DATA-095`–`099`, `FR-DATA-123`–`129`, `FR-DATA-168`–`180` | `tests/data/usage/features/11_economic_calendar.py`; `tests/data/component/test_economic_calendar_ingestion.py`; `tests/data/component/test_economic_event_url_reconciliation.py`; `tests/data/unit/test_economic_event_urls.py`; opt-in `tests/data/integration/test_economic_calendar_live.py` |
 | Completed | `FEAT-DATA-12` Real-Time Feed Lifecycle and Market Streaming | `realtime_feeds/`    | Feed lifecycle/status plus`build_market_stream_request` and `stream_market_data` for genuine MT5 tick and closed-bar streams                                                                                                                   | `FR-DATA-046`–`FR-DATA-048`, `FR-DATA-154`–`FR-DATA-157`   | `tests/data/usage/features/12_realtime_feeds.py`; `tests/data/unit/test_market_streaming.py`                                                                   |
-| Completed | `FEAT-DATA-13` Scheduler and Job Management                  | `data_jobs/`         | Job/backfill/recovery contracts and create/start/stop/run/status/recovery operations                                                                                                                                                               | Section 4 job requirements, allocated to this owner                  | `tests/data/usage/features/13_data_jobs.py`                                                                                                                      |
+| Completed | `FEAT-DATA-13` Scheduler and Job Management                  | `data_jobs/`         | Job/backfill/recovery contracts, create/start/stop/run/status/recovery operations, and explicit non-production weekly Economic Calendar dispatch                                                                                                    | Section 4 job requirements, including `FR-DATA-174`                  | `tests/data/usage/features/13_data_jobs.py`                                                                                                                      |
 | Completed | `FEAT-DATA-14` Cross-Domain Evidence                         | `evidence/`          | Market-context, FX-conversion, account-state, freshness contracts/providers, and public evidence operations                                                                                                                                        | Section 4 normalized-evidence requirements, allocated to this owner  | `tests/data/usage/features/14_evidence.py`                                                                                                                       |
 | Completed | `FEAT-DATA-15` Audit Evidence                                | `audit/`             | Audit query/page/persistence contracts and authorized persist/query operations                                                                                                                                                                     | Section 4 audit requirements, allocated to this owner                | `tests/data/usage/features/15_audit.py`                                                                                                                          |
 | Completed | `FEAT-DATA-16` Point-in-Time Research Source Evidence        | `research_sources/`  | Function-only root operations retrieve, normalize, persist, query, assess, inspect, and project opaque source documents, observations, and verification manifests; exact declarations: Section 9                                                   | `FR-DATA-130`–`145`                                             | `tests/data/usage/features/16_research_sources.py`                                                                                                               |
 | Completed | `FEAT-DATA-17` Cross-Domain Runtime Persistence Adapters     | `runtime_stores/`    | Opaque namespaced durable-state handles, allowlisted codecs, atomic record/transition operations, deterministic bounded cross-partition reads, and owner-specific construction functions                                                           | `FR-DATA-146`–`150`                                             | `tests/data/usage/features/17_runtime_stores.py`; `tests/data/unit/test_runtime_store_codecs.py`; `tests/data/integration/test_runtime_store_persistence.py` |
+| Completed | `FEAT-DATA-18` Artifact and Reference Catalog                | `artifact_catalog/`  | Application-triggered reference synchronization, atomic artifact indexing, bounded fetch/quality evidence, sidecar reconstruction, table lifecycle evidence, and verified-source retrieval                                                        | `FR-DATA-161`–`167`; amended `FR-DATA-143`                       | `tests/data/usage/features/18_artifact_catalog.py`; `tests/data/component/test_artifact_catalog_persistence.py`; `tests/data/structural/test_catalog_table_reachability.py` |
 
 Private root files such as `_settings.py` and `_limits.py` may remain only for
 genuinely domain-wide infrastructure. They are not feature modules, expose no public
 feature API, and receive direct unit coverage plus indirect coverage through the
 feature usages that consume them.
+
+`_shared/` is a documented reconciliation-excluded support directory. It owns only
+the private function-only construction, defensive getter, and predicate adapters
+used by `app.services.data.__init__`; it owns no retrieval, policy, persistence,
+network, orchestration, or other feature behavior and is not a second public boundary.
+`migrations/` remains the separate schema-definition support directory.
 
 #### Current-to-target module disposition
 
@@ -247,7 +256,7 @@ feature usages that consume them.
 
 The completed migration preserves contract versions, schema identifiers, error codes,
 validation behavior, and golden JSON schemas. The package root explicitly exports the
-The package-root function-only API is assigned across the fifteen registered features. Feature contracts
+The package-root function-only API is assigned across the eighteen registered features. Feature contracts
 live with their owners; no compatibility package recreates a removed path.
 
 #### Function-only construction boundary
@@ -367,7 +376,9 @@ app/services/data/
 └── audit/
 ```
 
-The current files are ordered from lowest dependency to highest dependency:
+The following retained inventory is the historical pre-`CAP-DATA-028` disposition
+map, not the current package tree. Current feature/module ownership is defined only
+by the Feature Registry above and verified by `test_import_graph.py`:
 
 ```text
 app/services/data/
@@ -540,7 +551,7 @@ flowchart LR
 
 - **Focused Domain Architecture**: In `app/services/data`, every module folder inside the domain is dedicated to one Feature / capability only, every file inside a module folder is for one use case or focused responsibility only, and every class/function/method inside a file addresses one functional requirement behaviour at a time.
 - **Module folder names state the capability, not the mechanism.** A folder answers
-  "what can Data do", not "what technology does it use". The sixteen names in the
+  "what can Data do", not "what technology does it use". The eighteen names in the
   Feature Registry are the only production feature folders.
 - `contracts/` is the canonical shared contract core. Feature-owned contracts remain
   in their owning feature folders; removed horizontal `models/`, `errors/`, `limits/`,
@@ -651,7 +662,7 @@ Section 2 owners remain, and no removed contract path is public or required.
 | Completed | 9     | Build`security/`: licensing enforcement, runtime read-only broker contract. Credentials pass-through withdrawn (`NFR-DATA-005`).                                                                                                  | `FR-DATA-113`–`116`, `NFR-DATA-006`                                                       | `test_broker_contract.py`, `test_licensing.py`, `test_import_graph.py`                                                                                                                                                                                                                             | 1, 3       |
 | Completed | 10    | Build`persistence/backup.py` — snapshot, restore, and retention enforcement. Genuinely new capability.                                                                                                                             | `CAP-DATA-027`, `FR-DATA-108`–`110`                                                       | `test_backup.py`, `test_backfill.py`; restore round trip; atomic hash-mismatch rejection; dry-run/purge/licence retention cases                                                                                                                                                                      | 2          |
 | Completed | 11    | Freeze the package-root`__init__.py` export list and migrate every cross-domain consumer import.                                                                                                                                    | `NFR-DATA-001`, `NFR-DATA-011`                                                               | `test_api.py` asserts the function-only root surface. Data-owned usage and integration imports use the root boundary, and the repository production scan contains no prohibited `app.services.data.*` deep import outside Data.                                                                      | 1–10      |
-| Completed | 12    | Verification sweep: full suite, coverage ≥ 80%,`ruff`, `mypy`, and every usage program executed directly.                                                                                                                        | `NFR-DATA-012`                                                                                 | 436 Data tests pass with 81.65% branch-aware coverage; all fifteen usage programs exit zero; changed-file Ruff and full-repository Mypy pass.                                                                                                                                                            | 1–11      |
+| Completed | 12    | Verification sweep: full suite, per-file coverage ≥ 80%,`ruff`, `mypy`, and every usage program executed directly.                                                                                                               | `NFR-DATA-012`                                                                                 | Current executable evidence is owned by `tests/data/`; exact pass and coverage measurements are recorded by the validation run rather than frozen here.                                                                                                                                                  | 1–11      |
 
 **Consumer boundary.** Cross-domain consumers are required to use package-root
 exports. Data-owned usage and integration evidence complies, and repository-wide
@@ -710,15 +721,14 @@ never reused. `WF-DATA-006` remains retired to Research. New workflows continue 
 | `WF-DATA-017` | `tests/data/usage/workflows/wf_data_017_external_artifact_import.py`                         |
 | `WF-DATA-018` | `tests/data/usage/workflows/wf_data_018_venue_authoritative_market_hours.py`                 |
 | `WF-DATA-019` | `tests/data/usage/workflows/wf_data_019_analytical_named_session_classification.py`          |
-| `WF-DATA-020` | `tests/data/usage/workflows/wf_data_020_economic_calendar_news_restriction.py` *(pending)* |
-| `WF-DATA-021` | `tests/data/usage/workflows/wf_data_021_persistence_lifecycle.py` *(pending)*              |
+| `WF-DATA-020` | `tests/data/usage/workflows/wf_data_020_economic_calendar_news_restriction.py`             |
+| `WF-DATA-021` | `tests/data/usage/workflows/wf_data_021_persistence_lifecycle.py`                          |
 | `WF-DATA-022` | `tests/data/usage/workflows/wf_data_022_data_audit_trail.py`                                 |
 | `WF-DATA-023` | `tests/data/usage/workflows/wf_data_023_versioned_cache_lifecycle.py`                        |
 | `WF-DATA-024` | `tests/data/usage/workflows/wf_data_024_quality_inspection_remediation.py`                   |
 
 `WF-DATA-006` is retired to Research and therefore intentionally has no Data
-workflow program. Entries marked *(pending)* are registered workflows whose
-standalone program is not yet written.
+workflow program. Every active row below has one stage-labelled standalone program.
 
 ### Status values
 
@@ -756,11 +766,11 @@ standalone program is not yet written.
 | Completed | Supporting | `WF-DATA-017` | Internal     | External artifact import                                     | Operator supplies an approved path, declared dialect, and explicit column mapping       | Committed canonical artifact, manifest, and audit event                                      | `FR-DATA-105 → FR-DATA-106 → FR-DATA-018`                |
 | Completed | Supporting | `WF-DATA-018` | Cross-domain | Venue-authoritative market hours                             | Explicit broker source or exchange calendar code and exact symbol                       | UTC sessions plus deterministic open/current/next state                                      | `FR-DATA-117 → FR-DATA-118 → FR-DATA-119/120`            |
 | Completed | Supporting | `WF-DATA-019` | Cross-domain | Analytical named-session classification                      | Exact symbol, aware UTC instant, and configured regional definitions                    | DST-aware liquidity labels that confer no trading authority                                  | `FR-DATA-121 → FR-DATA-122`                               |
-| Completed | Supporting | `WF-DATA-020` | Internal     | Economic calendar and news-restriction evidence              | Bounded symbol/date-range calendar query                                                | Provenanced economic events, symbol event profile, and restriction verdict                   | `Pending`                                                  |
-| Completed | Supporting | `WF-DATA-021` | Internal     | Persistence lifecycle: migration, backup, restore, retention | Operator maintenance command against the Data-owned store                               | Verified schema ledger, committed backup, restored store, or enforced retention result       | `Pending`                                                  |
-| Completed | Supporting | `WF-DATA-022` | Cross-domain | Data audit trail                                             | Domain-supplied redacted`AuditEvent v1` or bounded audit query                        | Durably persisted event or bounded ordered audit page                                        | `Pending`                                                  |
-| Completed | Supporting | `WF-DATA-023` | Internal     | Versioned cache lifecycle                                    | Cache identity derived from source revision, schema version, and request dimensions     | Cache hit, miss, or explicit invalidation with no stale record served outside policy         | `Pending`                                                  |
-| Completed | Supporting | `WF-DATA-024` | Internal     | Standalone quality inspection and remediation                | Normalized records or an existing dataset plus the active quality profile               | Bounded`QualityReport` with classified issues and a remediation summary                    | `Pending`                                                  |
+| Completed | Supporting | `WF-DATA-020` | Internal     | Economic calendar and news-restriction evidence              | Bounded symbol/date-range calendar query                                                | Provenanced economic events, symbol event profile, and restriction verdict                   | `FR-DATA-095–099 → FR-DATA-123–129`                     |
+| Completed | Supporting | `WF-DATA-021` | Internal     | Persistence lifecycle: migration, backup, restore, retention | Operator maintenance command against the Data-owned store                               | Verified schema ledger, committed backup, restored store, or enforced retention result       | `FR-DATA-015/016 → FR-DATA-108 → 109 → 110`             |
+| Completed | Supporting | `WF-DATA-022` | Cross-domain | Data audit trail                                             | Domain-supplied redacted`AuditEvent v1` or bounded audit query                        | Durably persisted event or bounded ordered audit page                                        | `FR-DATA-021 → FR-DATA-077`                              |
+| Completed | Supporting | `WF-DATA-023` | Internal     | Versioned cache lifecycle                                    | Cache identity derived from source revision, schema version, and request dimensions     | Cache hit, miss, or explicit invalidation with no stale record served outside policy         | `FR-DATA-019 → FR-DATA-020`                              |
+| Completed | Supporting | `WF-DATA-024` | Internal     | Standalone quality inspection and remediation                | Normalized records or an existing dataset plus the active quality profile               | Bounded`QualityReport` with classified issues and a remediation summary                    | `FR-DATA-091 → 092 → 093 → 094`                         |
 
 ### `WF-DATA-PRI` — Historical Bars, Ticks, and Spreads
 
@@ -790,9 +800,9 @@ standalone program is not yet written.
    `QUALITY_PROFILE`. The report always reflects the actual records examined; a
    constant or unexamined score is never emitted — `data.fetch_market_dataset()`,
    `data.inspect_dataset_quality()`, `data.get_quality_policy()`.
-5. Apply `quality_failure_behavior` to failed reports identically for fresh and
+5. Apply `quality_failure_behavior` to rejected reports identically for fresh and
    cached data: `reject` raises `DATA_QUALITY_FAILED`, while `warn` emits a bounded
-   warning and returns the unchanged typed dataset with its failed report intact.
+   warning and returns the unchanged typed dataset with its rejected report intact.
    Precision violations still fail closed. Advisory issues reduce `quality_score`
    and populate `issues`/`warnings` without blocking — `data.build_data_response()`,
    `data.unwrap_data_response()`.
@@ -1316,7 +1326,7 @@ explicit restriction verdict; never a trading authorization.
 unknown symbol fails closed. A restriction verdict is evidence only; Risk and Trading
 remain the sole authorities on whether an action may proceed.
 
-**Integration test:** `Pending`
+**Integration test:** `Completed` — `tests/data/usage/workflows/wf_data_020_economic_calendar_news_restriction.py:1` and `tests/data/integration/test_calendar.py:1`.
 
 ---
 
@@ -1344,7 +1354,7 @@ or an enforced retention result.
 being repaired in place; applied migration steps are immutable; a failed restore
 never leaves a partially overwritten store.
 
-**Integration test:** `Pending`
+**Integration test:** `Completed` — `tests/data/usage/workflows/wf_data_021_persistence_lifecycle.py:1` and `tests/data/integration/test_database_boundary.py:1`.
 
 ---
 
@@ -1371,7 +1381,7 @@ a bounded audit query.
 authors audit content on another domain's behalf, and a failed persist surfaces
 rather than silently dropping the event.
 
-**Integration test:** `Pending`
+**Integration test:** `Completed` — `tests/data/integration/test_audit_event_handoff.py:1`.
 
 ---
 
@@ -1398,7 +1408,7 @@ record is served outside declared policy.
 changes returned records; an entry whose identity components disagree is treated as a
 miss rather than served.
 
-**Integration test:** `Pending`
+**Integration test:** `Completed` — `tests/data/integration/test_workflow_runtime.py:1`.
 
 ---
 
@@ -1430,7 +1440,7 @@ remediation summary.
 constant or unexamined score is never emitted, and a precision violation fails closed
 regardless of the configured failure behaviour.
 
-**Integration test:** `Pending`
+**Integration test:** `Completed` — `tests/data/integration/test_workflow_runtime.py:1`.
 
 ---
 
@@ -2009,8 +2019,8 @@ See the authoritative current production-file inventory at the start of Section 
 | Completed | `TICK_PARQUET_MAX_OUTPUT_ROWS_PER_CHUNK` | `int`                         | `2000000`                                                   | Yes      | `generate_tick_series_to_parquet()`                                | Output-aware chunking ceiling; input slices are sized from estimated output rows, not input rows.                                                                                                                          |
 | Completed | `QUALITY_PROFILE`                        | `str`                         | `standard`                                                  | Yes      | `inspect_dataset_quality()`                                        | Exactly`strict`, `standard`, or `lenient`. Selects one frozen `QualityPolicy` threshold set; individual thresholds are not separately tunable configuration. An unrecognized value fails rather than falling back. |
 | Completed | `QUALITY_PROFILE_THRESHOLDS`             | `Mapping[str, QualityPolicy]` | Frozen built-in set                                           | Yes      | `inspect_dataset_quality()`                                        | Immutable module-level mapping defining spike sigma, flat-line run length, zero-volume run length, spread ceiling, and gap tolerance per profile. Not environment-configurable.                                            |
-| Completed | `QUALITY_BLOCKING_ISSUES`                | `frozenset[str]`              | `{"MISSING_BARS", "DUPLICATE_BARS"}`                        | Yes      | `inspect_dataset_quality()`                                        | Closed set of issue codes that set`quality_status="failed"`. Every other detected issue is advisory: it reduces `quality_score` and appears in `issues` without blocking.                                            |
-| Completed | `QUALITY_MIN_SCORE`                      | `Decimal`                     | `0.90`                                                      | Yes      | `WF-DATA-001`                                                      | Score below this value sets`quality_status="failed"` under the `strict` profile only; `standard` and `lenient` treat it as advisory.                                                                               |
+| Completed | `QUALITY_BLOCKING_ISSUES`                | `frozenset[str]`              | `{"MISSING_BARS", "DUPLICATE_BARS"}`                        | Yes      | `inspect_dataset_quality()`                                        | Closed set of issue codes that sets `quality_decision="rejected"` independently of the descriptive percentage grade. Every other detected issue reduces `quality_score` and remains visible in `issues`.                                            |
+| Completed | `QUALITY_MIN_SCORE`                      | `Decimal`                     | `90.00`                                                     | Yes      | `WF-DATA-001`                                                      | Minimum percentage for the `good` grade. Lower examined scores grade `degraded`, `poor`, or `critical`, with the separate decision field governing operational acceptance.                                                                               |
 | Completed | `QUALITY_SEVERITY_WEIGHTS`               | `Mapping[str, Decimal]`       | `info=0`, `warning=0.25`, `error=0.5`, `critical=1.0` | Yes      | `inspect_dataset_quality()`                                        | Deterministic weights used by the score formula in`FR-DATA-093`.                                                                                                                                                         |
 
 #### Tabular market-data implementation
@@ -2070,7 +2080,7 @@ session-agnostic and reports gaps solely against timeframe frequency.
 | --------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Completed | `FR-DATA-091` | Detect missing bars against expected timeframe frequency, discounting exact weekend closures and supplied`SessionWindow` closures. Emit critical `MISSING_BARS` only for unexplained gaps beyond tolerance, with affected count and bounded samples; add `calendar_unverified` when no sessions were supplied.                                                                                                                               | `inspect_dataset_quality(dataset: MarketDataset, *, policy: QualityPolicy \| None = None, sessions: Sequence[SessionWindow] \| None = None, generated_at: datetime) -> DataQualityReport` | None         | `DataError[VALIDATION_FAILED\|UNSUPPORTED_TIMEFRAME]`: malformed policy or unsupported timeframe | **Usage:** `tests/data/usage/07_quality.py::fr_data_091()`**Unit:** `tests/data/unit/test_quality.py::test_gap_detection_discounts_weekend_closure()`, `test_declared_session_break_is_not_reported_as_missing()`                         |
 | Completed | `FR-DATA-092` | Detect price spikes beyond the profile sigma bound, flat-line runs, zero-volume runs, duplicate OHLCV bar timestamps, and comparable price-unit spread-threshold breaches. Tick timestamps may repeat; provider-point spreads are disclosed as`spread_unit_unverified` instead of being compared to a price-unit ceiling. Each issue carries bounded evidence.                                                                                   | `inspect_dataset_quality`                                                                                                                                                               | None         | `DataError[VALIDATION_FAILED]`: malformed policy                                                | **Usage:** `tests/data/usage/07_quality.py::fr_data_092()`**Unit:** `tests/data/unit/test_quality.py::test_duplicate_tick_timestamps_are_not_duplicate_bars()`, `test_incomparable_spread_units_are_not_threshold_breaches()`             |
-| Completed | `FR-DATA-093` | Compute`quality_score` as `1 − Σ(severity_weight × affected_count / checked_count)` clamped to `[0, 1]` in `Decimal`, and derive `quality_status`: `failed` when any `QUALITY_BLOCKING_ISSUES` code is present (or, under `strict`, when the score is below `QUALITY_MIN_SCORE`), otherwise `passed_with_warnings` when any issue or warning exists, otherwise `passed`. A constant or unexamined score is never emitted. | `inspect_dataset_quality`                                                                                                                                                               | None         | `DataError[VALIDATION_FAILED]`: non-finite or out-of-range computed score                       | **Usage:** `tests/data/usage/07_quality.py::fr_data_093()`**Unit:** `tests/data/unit/test_quality.py::test_score_reflects_issue_severity()`, `test_clean_series_scores_one()`, `test_score_is_never_constant_across_differing_inputs()` |
+| Completed | `FR-DATA-093` | Emit `DataQualityReport v2`: compute `quality_score` as `100 × clamp(1 − Σ(severity_weight × affected_count / checked_count), 0, 1)` in `Decimal`, quantized to `0.01`; grade examined evidence as `perfect` (100), `excellent` (95–99.99), `good` (90–94.99), `degraded` (80–89.99), `poor` (60–79.99), or `critical` (below 60), and emit `not_checked`/`0.00` when nothing was examined. Derive the independent operational `quality_decision`: blocking issue, `poor`, or `critical` = `rejected`; `degraded` = `review_required`; otherwise evidence with issues/warnings = `accepted_with_warnings`, clean evidence = `accepted`, and unchecked evidence = `not_evaluated`. Operational gates consume the decision, never infer permission from the grade. A constant or unexamined passing score is prohibited. | `inspect_dataset_quality` | None | `DataError[VALIDATION_FAILED]`: non-finite, out-of-range, or inconsistent score/grade/decision | **Usage:** `tests/data/usage/07_quality.py::fr_data_093()` **Unit:** `tests/data/unit/test_quality.py::test_score_reflects_issue_severity()`, `test_clean_series_scores_one_hundred_percent()`, `tests/data/unit/test_quality_coverage.py::test_status_percentage_grade_boundaries()` |
 | Completed | `FR-DATA-094` | Map each detected issue code to one deterministic recommended remediation action without mutating the dataset or performing the remediation.                                                                                                                                                                                                                                                                                                       | `summarize_quality_remediation(report: DataQualityReport) -> Mapping[str, str]`                                                                                                         | None         | `DataError[VALIDATION_FAILED]`: unknown issue code                                              | **Usage:** `tests/data/usage/07_quality.py::fr_data_094()`**Unit:** `tests/data/unit/test_quality.py::test_remediation_is_deterministic()`, `test_remediation_does_not_mutate_report()`                                                   |
 
 **Quality evidence propagation.** Only `retrieval/sources.py` computes a fresh report,
@@ -2209,6 +2219,7 @@ See the authoritative current production-file inventory at the start of Section 
 | Completed | `FR-DATA-043` | Validate interrupted job leases/checkpoints at startup and resume only after the last committed chunk without publishing partial work.                                                                                                                            | `recover_update_jobs(request_id: str                                             | None = None) -> RecoveryReport`         | Persistence write                  | `DataError[CHECKPOINT_CORRUPTED                                                                                                                                |
 | Completed | `FR-DATA-044` | Start or stop a persisted job only after state-transition, lease, source-policy, and schedule validation; recurring execution uses the single-node in-process asyncio loop, while`run_data_update_job_once` remains independently invokable by an OS scheduler. | `schedule_update_job(request: ScheduleJobRequest) -> JobStatus`                | Local state mutation; persistence write | `DataError[JOB_NOT_FOUND           | SCHEDULER_ERROR                                                                                                                                                |
 | Completed | `FR-DATA-045` | Return persisted job definition/state, enabled flag, run/checkpoint/error/next-run evidence, lease and recovery state, and request ID without mutation.                                                                                                           | `read_update_job_status(request: JobStatusRequest) -> JobStatus`               | Read-only                               | `DataError[JOB_NOT_FOUND           | DATABASE_ERROR]`                                                                                                                                               |
+| Completed | `FR-DATA-174` | Persist and dispatch an exclusive weekly `economic_calendar` job only with an explicit approved non-production environment; route it solely to the official current-week synchronization operation. | `run_data_update_job_once(job_id, request_id, *, calendar_rows=None)` | Official HTTPS read and transactional persistence write | `DataError[POLICY_BLOCKED\|SOURCE_UNAVAILABLE\|DATABASE_ERROR]` | `tests/data/unit/test_scheduler.py::test_calendar_job_requires_safe_weekly_shape_and_dispatches`; `tests/data/usage/features/13_data_jobs.py::fr_data_174()` |
 
 **Implementation notes:** Retain V1 job-definition/status persistence concepts but
 replace the status-only execution loop. Never mark a run successful merely because a
@@ -2282,20 +2293,25 @@ bounded implementation policy.
 
 ### 4.8 `economic_calendar/` — Multi-Site Economic Calendar Scraping
 
-**Purpose:** Acquire economic calendar events, preserve provider text beside exact
-numeric values, expose provider-neutral and symbol-scoped queries, persist stable
-event identities across schedule changes, and populate Risk-ready calendar evidence.
+**Purpose:** Query persisted economic calendar evidence before acquisition, fill only
+explicit coverage gaps, preserve exact provider values and first-observed schedules,
+maintain stable event identities, and populate Risk-ready calendar evidence.
 
 Calendar scraping is a retrieval capability: it acquires a different data kind from a
 different transport, but it is still acquisition. It is not a source adapter and is
 not registered in `sources/`.
 
-The production transport sends bounded, uncached HTTPS requests through Firecrawl
+The multi-site live transport sends bounded, uncached HTTPS requests through Firecrawl
 using the owner-confirmed written Fair Economy permission. It verifies the Firecrawl
 response host and JSON media type, enforces response and concurrency limits, and
 fails closed without configured credentials. Deterministic tests use injected
 fixtures; the standalone usage and opt-in live integration test provide real-source
 evidence without making default CI depend on external availability.
+Historical Forex Factory population uses `build_reader_calendar_transport`, which
+restricts requests to Jina Reader and Forex Factory, parses bounded weekly Markdown,
+converts the page's America/Chicago clock with timezone rules, and resumes only
+coverage-ledger gaps. The credential-free transport fetches sequentially within
+Jina Reader's documented unauthenticated rate limit.
 
 ### Current inventory reference
 
@@ -2313,10 +2329,22 @@ See the authoritative current production-file inventory at the start of Section 
 | Completed | `FR-DATA-123` | Normalize real provider events into immutable validated UTC event values while preserving exact decimals and source strings.                                                                        | `build_economic_event`, `build_event_impact`, `project_economic_event`                | None                         | `ValueError`: invalid identity, UTC timestamp, code, or numeric value | Usage displayed exact normalized and raw values copied from genuine ForexFactory rows                                                                                                                                                                                         |
 | Completed | `FR-DATA-124` | Retrieve normalized calendar events through a provider-neutral protocol while preserving raw values and stable provider IDs.                                                                        | `build_calendar_scrape_provider`                                                          | Licensed read-only transport | `DataError[VALIDATION_FAILED\|SOURCE_UNAVAILABLE\|NETWORK_ERROR]`       | Usage retrieved normalized genuine rows through the provider-neutral API                                                                                                                                                                                                      |
 | Completed | `FR-DATA-125` | Resolve currency/country relevance profiles against real acquired events.                                                                                                                           | `get_symbol_event_profile`                                                                | None                         | `DataError[VALIDATION_FAILED]`                                        | Usage resolved EURUSD to EUR/USD and EU/US relevance and applied it to real rows                                                                                                                                                                                              |
-| Completed | `FR-DATA-126` | Return real general or symbol-relevant normalized events under UTC and impact filters.                                                                                                              | `get_economic_events`, `get_symbol_economic_events`                                     | Provider read                | `DataError[VALIDATION_FAILED\|SOURCE_UNAVAILABLE]`                     | Usage returned both general and EURUSD-scoped genuine events                                                                                                                                                                                                                  |
+| Completed | `FR-DATA-126` | Return real general or symbol-relevant normalized events under UTC and impact filters, querying persisted coverage and events before any provider call. | `get_economic_events`, `get_symbol_economic_events` | Database read; provider read and transactional write only for uncovered intervals | `DataError[VALIDATION_FAILED\|SOURCE_UNAVAILABLE\|DATABASE_ERROR]` | `tests/data/unit/test_calendar_service.py::test_complete_database_coverage_prevents_provider_call()` |
 | Completed | `FR-DATA-127` | Evaluate event blackout windows from real acquired events.                                                                                                                                          | `evaluate_calendar_state`, `is_news_restricted`, `is_news_restricted_events`          | Optional provider read       | `DataError[VALIDATION_FAILED]`, `ValueError`: non-UTC instant       | Usage proved matching pure and provider-backed restriction verdicts at a genuine high-impact release                                                                                                                                                                          |
-| Completed | `FR-DATA-128` | Persist and query real acquired events with stable provider identity and refresh windows.                                                                                                           | `build_economic_event_store`, `persist_economic_events`, `get_persisted_events`       | Bounded SQLite reads/writes  | `DataError[VALIDATION_FAILED\|DB_READ_FAILED\|DB_WRITE_FAILED]`         | Usage upserted genuine normalized rows and displayed the EURUSD-relevant read-back count                                                                                                                                                                                      |
+| Completed | `FR-DATA-128` | Persist and query real acquired events with deterministic provider-qualified identity, exact provider strings, immutable original schedule, and explicit coverage intervals. | `build_economic_event_store`, `persist_economic_events`, `get_persisted_events` | Bounded SQLite reads/writes | `DataError[VALIDATION_FAILED\|DB_READ_FAILED\|DB_WRITE_FAILED]` | `tests/data/component/test_economic_event_store.py`; `tests/data/component/test_economic_calendar_ingestion.py` |
 | Completed | `FR-DATA-129` | Populate market-context calendar state and blackout provenance from real symbol-relevant events.                                                                                                    | `derive_calendar_state`, `project_calendar_state`, `populate_market_context_calendar` | None                         | `DataError[VALIDATION_FAILED]`                                        | Usage displayed`event` state, blackout provenance, and a populated market context with no missing calendar field                                                                                                                                                            |
+| Completed | `FR-DATA-168` | Stream `data/scrape.csv` into bounded transactions for `2007-01-01` through `2024-07-31`, recording its content hash and rejecting rows outside the approved interval. | `import_economic_calendar_csv` | File read and transactional database write | `DataError[FILE_NOT_FOUND\|VALIDATION_FAILED\|DATABASE_ERROR]` | `tests/data/component/test_economic_calendar_ingestion.py` |
+| Completed | `FR-DATA-169` | Acquire Forex Factory historical pages from `2024-08-01` to the current-week boundary in bounded resumable intervals. | `build_reader_calendar_transport`, `backfill_forexfactory_history` | Credential-free bounded Jina Reader HTTPS reads and transactional database writes | `DataError[SOURCE_UNAVAILABLE\|NETWORK_ERROR\|VALIDATION_FAILED\|DATABASE_ERROR]` | `tests/data/unit/test_reader_calendar_transport.py`; injected-provider tests and bounded live verification |
+| Completed | `FR-DATA-170` | Validate and synchronize the official current-week CSV using exactly `Title`, `Country`, `Date`, `Time`, `Impact`, `Forecast`, `Previous`, and `URL`, retaining the permanent event URL. | `sync_current_week_economic_calendar` | Bounded HTTPS read and transactional database write | `DataError[SOURCE_UNAVAILABLE\|LIMIT_EXCEEDED\|VALIDATION_FAILED]` | `tests/data/component/test_economic_calendar_ingestion.py`; `tests/data/component/test_economic_event_url_reconciliation.py` |
+| Completed | `FR-DATA-171` | Record complete coverage only after successful event persistence; empty event results do not imply missing or complete coverage. | database-first retrieval and coverage store | Transactional database read/write | `DataError[DATABASE_ERROR]` | `tests/data/unit/test_calendar_service.py`; `tests/data/component/test_economic_calendar_ingestion.py` |
+| Completed | `FR-DATA-172` | Preserve `original_scheduled_at` across provider rescheduling while updating the current `scheduled_at`. | economic event upsert | Transactional database write | `DataError[DATABASE_ERROR]` | `tests/data/component/test_economic_event_store.py::test_upsert_preserves_original_schedule_when_release_moves()` |
+| Completed | `FR-DATA-173` | Apply the reduced event schema and coverage table through immutable migration `007_economic_calendar_database_first` without modifying historical step `002_economic_events`. | `run_data_migrations` | Governed schema migration | `DataError[SCHEMA_MIGRATION_FAILED]` | `tests/data/component/test_economic_calendar_migration.py`; `tests/data/component/test_economic_calendar_ingestion.py` |
+| Completed | `FR-DATA-175` | Discover permanent Forex Factory event-definition pages through a bounded numeric-ID interval using the fixed-host Reader transport and declared rate limit. | `crawl_forexfactory_event_definitions` | Bounded HTTPS reads and incremental transactional writes | `DataError[PERMISSION_DENIED\|NETWORK_ERROR\|VALIDATION_FAILED]` | `tests/data/unit/test_economic_event_urls.py` |
+| Completed | `FR-DATA-176` | Persist verified event definitions and canonical permanent URLs through immutable migration `009_economic_event_definitions`. | `run_data_migrations`, `crawl_forexfactory_event_definitions` | Governed schema migration and transactional database writes | `DataError[SCHEMA_MIGRATION_FAILED\|DATABASE_ERROR]` | `tests/data/component/test_economic_calendar_migration.py`; `tests/data/component/test_economic_event_url_reconciliation.py` |
+| Completed | `FR-DATA-177` | Synchronize official current-week CSV definitions and permanent URLs without deriving URL slugs. | `sync_current_week_economic_calendar` | Bounded HTTPS read and transactional database write | `DataError[SOURCE_UNAVAILABLE\|VALIDATION_FAILED\|DATABASE_ERROR]` | `tests/data/component/test_economic_event_url_reconciliation.py::test_weekly_csv_persists_definition_and_permanent_url` |
+| Completed | `FR-DATA-178` | Reconcile historical occurrences only through an exact, unique title/country definition match; unmatched or ambiguous rows remain unlinked. | `crawl_forexfactory_event_definitions` | Transactional database update | `DataError[DATABASE_ERROR]` | `tests/data/component/test_economic_event_url_reconciliation.py::test_exact_unique_definition_reconciles_historical_occurrence` |
+| Completed | `FR-DATA-179` | Preserve verified Source, latest release, Measures, Usual Effect, Frequency, Also Called, and Event Type values; absent page values remain null. | `crawl_forexfactory_event_definitions` | Reader HTTPS read and transactional definition upsert | `DataError[NETWORK_ERROR\|VALIDATION_FAILED\|DATABASE_ERROR]` | `tests/data/unit/test_economic_event_urls.py::test_parse_event_definition_preserves_verified_specs` |
+| Completed | `FR-DATA-180` | Join stored occurrences to their event definition so database-first queries return permanent URLs and specifications while preserving immutable `original_scheduled_at`. | `get_economic_events`, `get_symbol_economic_events`, `get_persisted_events` | Bounded joined database read | `DataError[DATABASE_ERROR\|FILE_CORRUPTED]` | `tests/data/component/test_economic_event_url_reconciliation.py`; `tests/data/component/test_economic_event_store.py` |
 
 ---
 
@@ -2425,7 +2453,7 @@ the focused unit and integration suites.
 | Completed | `NFR-DATA-009` | Performance     | Official responses obey applicable hard inline/allocation limits and reject excess work before expensive operations where a governed bound exists. Direct OHLCV retrieval has no app-wide record-count ceiling; backfill chunks, payloads, diagnostics, and non-OHLCV retrieval remain bounded. | Direct limit and pre-side-effect tests                                                                          |
 | Completed | `NFR-DATA-010` | Compatibility   | Schema changes shall be additive within v1 or use a new major identifier; incompatible persisted data is explicitly migrated offline or invalidated/re-ingested.                                                                                                                                | Contract/migration tests                                                                                        |
 | Completed | `NFR-DATA-011` | Maintainability | Every file shall retain one focused responsibility, imports shall be absolute, and package/submodule`__all__` values shall list only approved public symbols.                                                                                                                                 | Structure/import review                                                                                         |
-| Completed | `NFR-DATA-012` | Testing         | Every`FR-DATA-*` shall have one runnable usage example and at least one unit test; every active Data workflow shall have one directly executable, stage-labelled workflow program; every collaborative workflow shall have an integration test; coverage shall be at least 80%.               | Traceability and coverage audit; eighteen active workflow programs and`tests/data/usage/workflows/run_all.py` |
+| Completed | `NFR-DATA-012` | Testing         | Every`FR-DATA-*` shall have one runnable usage example and at least one unit test; every active Data workflow shall have one directly executable, stage-labelled workflow program; every collaborative workflow shall have an integration test; every production file and the aggregate domain shall have at least 80% coverage. | Traceability, per-file coverage audit, twenty-three active workflow programs, and`tests/data/usage/workflows/run_all.py` |
 
 ### Shared Configuration and Limits Manifest
 
@@ -2474,10 +2502,7 @@ their owning manifests.
 
 ## 6. Open Decisions
 
-No unresolved owner decision blocks `CAP-DATA-028`. The owner approved the sixteen
-capabilities, their target module names, the current-to-target disposition, and the
-one-feature/one-folder/one-usage invariant on 2026-07-22. The package-root `__all__`
-is the sole public-boundary decision; submodule-only helpers remain internal.
+No open decisions.
 
 ---
 
@@ -2485,18 +2510,21 @@ is the sole public-boundary decision; submodule-only helpers remain internal.
 
 ### Test and usage locations
 
-The focused inventory includes unit, integration/workflow, and exactly 16 directly
-executable feature usage programs. Unit tests may import internals;
-integration and usage evidence imports the Data domain through `app.services.data` only.
+The focused inventory includes unit, component, structural, integration/workflow,
+and exactly 18 directly executable feature usage programs. Unit and component tests
+may import internals; integration and usage evidence import Data through
+`app.services.data` only.
 
-- **Unit:** `test_account_state.py`, `test_api.py`, `test_audit.py`, `test_backfill.py`, `test_backup.py`, `test_base.py`, `test_broker_contract.py`, `test_calendar_scraper.py`, `test_contract_snapshot.py`, `test_dataset.py`, `test_errors.py`, `test_evidence_fx.py`, `test_evidence_market_context.py`, `test_external_source.py`, `test_feed_state_single_owner.py`, `test_feeds.py`, `test_file_io.py`, `test_focused_boundaries.py`, `test_gaps.py`, `test_historical_access.py`, `test_import_graph.py`, `test_licensing.py`, `test_limits.py`, `test_local_source.py`, `test_market_data_facade.py`, `test_persistence_cache.py`, `test_persistence_crud_layout.py`, `test_persistence_import_artifacts.py`, `test_persistence_isolation.py`, `test_persistence_locking.py`, `test_persistence_migrations.py`, `test_quality.py`, `test_records.py`, `test_reference_access.py`, `test_retrieval_sources.py`, `test_scheduler.py`, `test_source_composition.py`, `test_source_contract_identity.py`, `test_source_policy.py`, `test_source_registry.py`, `test_sqlite.py`, `test_synthetic.py`, `test_tabular.py`, `test_ticks.py`, `test_transformation.py`
+- **Unit:** pure deterministic behavior with mocked external I/O in `tests/data/unit/`; every reported pytest phase must remain at or below 100 ms.
+- **Component:** real local SQLite, filesystem, Parquet, durable-policy, job-store, or third-party calendar behavior in `tests/data/component/`.
+- **Structural:** repository/package AST scans and fresh-interpreter import checks in `tests/data/structural/`.
 - **Integration/workflow:** `test_audit_event_handoff.py`, `test_broker_boundary.py`, `test_calendar.py`, `test_contract_boundaries.py`, `test_database_boundary.py`, `test_external_import.py`, `test_historical_retrieval.py`, `test_local_source_retrieval.py`, `test_locking_boundary.py`, `test_research_source_persistence.py`, `test_usage_scripts.py`, `test_workflow_runtime.py`
-- **Usage:** `01_contracts.py`, `02_market_data.py`, `03_local_datasets.py`, `04_synthetic_data.py`, `05_tick_derivation.py`, `06_persistence.py`, `07_quality.py`, `08_transformation.py`, `09_time_sessions.py`, `10_sources.py`, `11_economic_calendar.py`, `12_realtime_feeds.py`, `13_data_jobs.py`, `14_evidence.py`, `15_audit.py`, `16_research_sources.py`
+- **Usage:** `01_contracts.py`, `02_market_data.py`, `03_local_datasets.py`, `04_synthetic_data.py`, `05_tick_derivation.py`, `06_persistence.py`, `07_quality.py`, `08_transformation.py`, `09_time_sessions.py`, `10_sources.py`, `11_economic_calendar.py`, `12_realtime_feeds.py`, `13_data_jobs.py`, `14_evidence.py`, `15_audit.py`, `16_research_sources.py`, `17_runtime_stores.py`
 
 Every canonical `FR-DATA-*` row maps to direct usage and focused test evidence; the
 legacy feature programs retain their individual `fr_data_NNN()` demonstrations and
-FEAT-DATA-16 demonstrates its complete function-only surface as one genuine-source
-demonstration in its owning feature program. Every program defines `main()` and an
+FEAT-DATA-16 demonstrates its genuine-source surface and FEAT-DATA-17 demonstrates
+the runtime-store surface in their owning programs. Every program defines `main()` and an
 `if __name__ == "__main__"` guard.
 
 ### Commands
@@ -2507,13 +2535,15 @@ uv run ruff format --check app/services/data tests/data
 uv run mypy app/services/data tests/data
 
 uv run pytest tests/data/unit
+uv run pytest tests/data/component
+uv run pytest tests/data/structural
 uv run pytest tests/data/integration
-for script in tests/data/usage/[0-9][0-9]_*.py; do uv run python "$script"; done
+for script in tests/data/usage/features/[0-9][0-9]_*.py; do uv run python "$script"; done
 
 uv run coverage erase
 uv run coverage run --parallel-mode --branch --source=app.services.data \
   -m pytest tests/data --no-cov -q
-for script in tests/data/usage/[0-9][0-9]_*.py; do
+for script in tests/data/usage/features/[0-9][0-9]_*.py; do
   uv run coverage run --parallel-mode --branch --source=app.services.data "$script"
 done
 uv run coverage combine
@@ -2530,7 +2560,11 @@ run the complete Data set at the feature/slice completion gate.
   `BrokerAdapter` read traits, Utils-owned `StandardResponse[T]`, and
   Brokers-owned response extensions/error codes.
 - **Unit:** success, validation, exact errors, side effects, bounds, retained V1
-  behavior, and modified/new behavior for every `FR-DATA-*`.
+  behavior, and modified/new behavior for every `FR-DATA-*`; each pytest-reported
+  setup, call, and teardown phase stays within 100 ms.
+- **Component:** real local infrastructure and third-party library behavior without
+  production credentials or network mutation.
+- **Structural:** repository-scale ownership, import, registry, and side-effect guards.
 - **Integration:** every `WF-DATA-*`, including fake source/broker contracts,
   transaction/lock/recovery faults, and no-lookahead/source-policy boundaries.
 - **Usage:** every documented `example_*` function runs through the supported public
@@ -2539,16 +2573,16 @@ run the complete Data set at the feature/slice completion gate.
   unavailable.
 - **Security:** secret/redaction, path escape, read-only broker-access enforcement,
   provider-object leakage, and dependency-boundary tests.
-- **Performance:** direct limit and pre-side-effect tests are binding; local/synthetic
-  benchmarks and feed soak measurements remain informational until recorded evidence
-  supports a new explicit gate.
+- **Performance:** the 100 ms unit-test ceiling, direct limits, and pre-side-effect
+  tests are binding; component/structural duration and feed soak measurements remain
+  informational unless a dedicated budget is declared.
 
 ### README specification checklist
 
 - [X] Domain boundary matches `docs/PROJECT.md` and resolved ADRs.
 - [X] Every approved reconciliation capability has a destination.
 - [X] Removed or rejected behavior is absent from the architecture.
-- [X] All 18 active workflows, plus retired `WF-DATA-006`, including the required broker boundary, are represented.
+- [X] All 23 active workflows, plus retired `WF-DATA-006`, including the required broker boundary, are represented. Evidence: `tests/data/unit/test_workflow_usage_parity.py:1`.
 - [X] Every intended public symbol maps to an owning functional requirement row.
 - [X] Every requirement has a typed signature, side-effect classification, errors,
   usage example location, and unit-test location.
@@ -2584,10 +2618,10 @@ run the complete Data set at the feature/slice completion gate.
 - [X] Every emitted `DataQualityReport` is computed from the records examined.
 
 Current implementation status: `Completed`. The package implements the approved
-fifteen focused feature folders and exactly fifteen numbered standalone usage
+eighteen focused feature folders and exactly eighteen numbered standalone usage
 programs. Removed horizontal packages have no compatibility shims, the explicit
 Function-only package-root API is validated, and the complete focused validation gate
-passes with 81.65% branch-aware whole-domain coverage. All fifteen standalone usage
+passes the branch-aware aggregate and per-file 80% coverage floors. All eighteen standalone usage
 programs pass, and the approved MT5 demo-provider read confirms genuine bounded
 provider evidence without a broker mutation.
 
@@ -2640,7 +2674,7 @@ records. It does not interpret sentiment, fundamentals, strategy, or trading val
 | Completed | `FR-DATA-140` | Normalize official BLS, BEA, EIA, Treasury Fiscal Data, and CFTC COT observations conservatively at provider publication time when verified or first observation time otherwise.                                                                                                                             | `normalize_research_provider_payload(...)`                                                                                                               | None                                             | `DataError[INVALID_INPUT\|EMPTY_RESULT]`                                           | **Usage:** `tests/data/usage/16_research_sources.py`**Unit:** `tests/data/unit/test_research_source_providers.py`                  |
 | Completed | `FR-DATA-141` | Normalize GDELT article discovery as headline and publisher metadata only; do not retrieve or persist publisher article bodies.                                                                                                                                                                              | `normalize_research_provider_payload("gdelt", ...)`                                                                                                      | None                                             | `DataError[INVALID_INPUT\|EMPTY_RESULT]`                                           | **Unit:** `tests/data/unit/test_research_source_providers.py`                                                                              |
 | Completed | `FR-DATA-142` | Normalize official USDA NASS agricultural estimates without inferring unsupported commodity conclusions.                                                                                                                                                                                                     | `normalize_research_provider_payload("usda-nass", ...)`                                                                                                  | None                                             | `DataError[INVALID_INPUT\|EMPTY_RESULT]`                                           | **Unit:** `tests/data/unit/test_research_source_providers.py`                                                                              |
-| Completed | `FR-DATA-143` | Persist verified-source manifests with provider identity, parser version, verification time, external record identity, fixture hash, environments, and license policy.                                                                                                                                       | `build_verified_research_source(...)`, `persist_verified_research_source(...)`                                                                         | Transactional persistence                        | `DataError[PERSISTENCE_FAILED\|INVALID_INPUT]`                                     | **Usage:** `tests/data/usage/16_research_sources.py`                                                                                       |
+| Completed | `FR-DATA-143` | Persist and retrieve verified-source manifests with provider identity, parser version, verification time, external record identity, fixture hash, environments, and license policy.                                                                                                                          | `build_verified_research_source(...)`, `persist_verified_research_source(...)`, `get_verified_research_source(...)`                                    | Transactional persistence/read                   | `DataError[PERSISTENCE_FAILED\|INVALID_INPUT]`                                     | **Usage:** `tests/data/usage/features/16_research_sources.py`; **Component:** `tests/data/component/test_artifact_catalog_persistence.py` |
 | Completed | `FR-DATA-144` | Persist normalized provider documents and structured values as immutable point-in-time revisions; corrections create linked revisions and historical queries admit only evidence available by decision time.                                                                                                 | `persist_research_provider_records(...)`, `persist_research_source_observations(...)`, `query_research_source_observations(...)`                     | Transactional persistence/read                   | `DataError[PERSISTENCE_FAILED\|INVALID_INPUT\|LIMIT_EXCEEDED]`                      | **Usage:** `tests/data/usage/16_research_sources.py`**Integration:** `tests/data/integration/test_research_source_observations.py` |
 | Completed | `FR-DATA-145` | Project bounded structured observation evidence without unrestricted provider payloads, credentials, or mutable provider objects.                                                                                                                                                                            | `project_research_source_observation(...)`                                                                                                               | None                                             | `DataError[INVALID_INPUT]`                                                        | **Usage:** `tests/data/usage/16_research_sources.py`**Integration:** `tests/data/integration/test_research_source_observations.py` |
 
@@ -2663,6 +2697,13 @@ registration is explicit and allowlisted; arbitrary imports and pickle are prohi
 | Completed | `FR-DATA-152` | Every Data research-source and runtime table shall carry`created_at`, `request_id`, and `correlation_id`, so an externally sourced document or runtime record is traceable to the operation that admitted it.                                                                                                                                                                                                                                                                     | Schema definition only                                                                                | None                                        | None                                                         | `tests/data/integration/test_database_boundary.py`                                                                                                                                                                    |
 | Completed | `FR-DATA-153` | Data schema definitions and the migration runner shall be separated:`app/services/data/migrations/` owns Data's own table definitions, while ledger initialisation, checksum comparison, write-lock acquisition, and step application remain in `app/services/data/persistence/` under the shared-infrastructure exemption. The definitions package shall not re-export the runtime-store runner, so importing the runner cannot initialise a package that imports the runner back. | `DATA_MIGRATION_STEPS`, `run_domain_migrations`, `run_data_migrations`                          | Schema migration                            | `DataError`: migration failure                             | `tests/data/integration/test_database_boundary.py`                                                                                                                                                                    |
 | Completed | `FR-DATA-158` | A migration request declared as a complete domain manifest shall fail closed when the ledger contains an applied migration ID absent from that manifest; partial manifests remain supported for explicitly incremental callers. Data's complete runner includes every registered Data step in canonical order, including`005-runtime-records`, so its separately callable feature runner cannot become an orphan.                                                                     | `MigrationRequest.complete_manifest`, `run_domain_migrations`                                     | Ledger read; no schema mutation on mismatch | `DataError[SCHEMA_MIGRATION_FAILED]`                       | `tests/data/unit/test_persistence_migrations.py::test_complete_manifest_rejects_orphaned_applied_step()`; `tests/data/unit/test_economic_calendar_migration.py::test_run_data_migrations_is_idempotent_on_re_run()` |
+| Completed | `FR-DATA-161` | Synchronize validated provider and canonical-symbol evidence without inventing missing metadata or granting trading authority. | `sync_catalog_reference(...)` | Transactional persistence | `DataError[INVALID_INPUT\|DATABASE_ERROR]` | `tests/data/component/test_artifact_catalog_persistence.py` |
+| Completed | `FR-DATA-162` | Persist explicit revisioned provider/exchange session evidence with symbol identity; catalog sessions never establish order authority. | `sync_catalog_reference(...)` | Transactional persistence | `DataError[INVALID_INPUT\|DATABASE_ERROR]` | `tests/data/component/test_artifact_catalog_persistence.py` |
+| Completed | `FR-DATA-163` | Register each committed sidecar-authoritative dataset and partition artifact in one transaction after filesystem hash verification. | `register_catalog_artifact(...)`, `save_dataset(...)` | File and database write | `DataError[FILE_CORRUPTED\|DATABASE_ERROR]` | `tests/data/component/test_file_io.py` |
+| Completed | `FR-DATA-164` | Read bounded overlapping artifact, integrity, coverage, reference, fetch, and quality evidence without scanning record payloads. | `get_catalog_evidence(...)` | Database read | `DataError[LIMIT_EXCEEDED\|DATABASE_ERROR]` | `tests/data/structural/test_catalog_table_reachability.py` |
+| Completed | `FR-DATA-165` | Append bounded classified fetch outcomes including actual source, materialization state, timing, and safe failure code. | `record_catalog_fetch(...)` | Transactional persistence | `DataError[DATABASE_ERROR]` | `tests/data/component/test_artifact_catalog_persistence.py` |
+| Completed | `FR-DATA-166` | Append only quality findings computed from examined records and never invent a quality result. | `record_catalog_quality_event(...)` | Transactional persistence | `DataError[DATABASE_ERROR]` | `tests/data/component/test_artifact_catalog_persistence.py` |
+| Completed | `FR-DATA-167` | Rebuild the bounded artifact index from approved-root sidecars after verifying each referenced artifact hash, and expose all 23 table lifecycle triggers. | `reconcile_data_catalog(...)`, `get_catalog_table_lifecycles()` | Bounded filesystem read and database write | `DataError[LIMIT_EXCEEDED\|FILE_CORRUPTED]` | `tests/data/structural/test_catalog_table_reachability.py`; `tests/data/usage/features/18_artifact_catalog.py` |
 
 Provider coverage is deliberately governed rather than inferred from public
 availability. SEC EDGAR, BLS, BEA, EIA, Treasury Fiscal Data, CFTC COT, GDELT

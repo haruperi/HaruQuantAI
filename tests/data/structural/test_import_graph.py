@@ -1,4 +1,4 @@
-"""Structural guards for the current focused DATA domain architecture."""
+"""Repository-scale structural guards for the focused DATA architecture."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ DOMAIN_PREFIX = "app.services.data"
 FEATURE_DIRECTORIES = frozenset(
     {
         "audit",
+        "artifact_catalog",
         "contracts",
         "data_jobs",
         "economic_calendar",
@@ -38,14 +39,13 @@ FEATURE_DIRECTORIES = frozenset(
 # carry no `FEAT-DATA-NN` row. `migrations/` holds schema definitions applied by
 # the runner in `persistence/`; it is deliberately not a feature, per the decision
 # that persistence and schema packages are private support packages.
-SUPPORT_DIRECTORIES = frozenset({"migrations"})
+SUPPORT_DIRECTORIES = frozenset({"_shared", "migrations"})
 PERMITTED_ROOT_FILES = frozenset(
     {
         "README.md",
         "__init__.py",
         "_limits.py",
         "_settings.py",
-        "operations.py",
         "py.typed",
     }
 )
@@ -127,8 +127,9 @@ def _registered_feature_modules() -> set[str]:
     return {
         match.group("module")
         for match in re.finditer(
-            r"^\| (?:Completed|Partial|Pending) \| `FEAT-DATA-\d{2}` .*?"
-            r"\| `(?P<module>[a-z_]+)/` \|",
+            r"^\|\s*(?:Completed|Partial|Pending)\s*\|\s*"
+            r"`FEAT-DATA-\d{2}`[^|]*\|\s*"
+            r"`(?P<module>[a-z_]+)/`\s*\|",
             registry_match.group("body"),
             flags=re.MULTILINE,
         )
@@ -152,6 +153,40 @@ def test_only_permitted_infrastructure_files_exist_at_package_root() -> None:
     assert REQUIRED_ROOT_FILES <= actual <= PERMITTED_ROOT_FILES
 
 
+def test_shared_operations_is_private_boundary_support_only() -> None:
+    """Keep the reconciliation-excluded adapter narrow and package-root owned."""
+    support_file = DATA_ROOT / "_shared" / "operations.py"
+    source = support_file.read_text(encoding="utf-8")
+    tree = ast.parse(source, filename=str(support_file))
+    prohibited_calls = {
+        "open",
+        "urlopen",
+        "execute_transaction",
+        "run_data_migrations",
+        "run_domain_migrations",
+    }
+    called_names = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert not prohibited_calls & called_names
+    assert "logger." not in source
+
+    repository_root = DATA_ROOT.parents[2]
+    importers: set[str] = set()
+    consumer_roots = (
+        repository_root / "app" / "services",
+        repository_root / "app" / "agentic",
+    )
+    for path in (path for root in consumer_roots for path in _python_files(root)):
+        if path == support_file:
+            continue
+        if "app.services.data._shared" in path.read_text(encoding="utf-8"):
+            importers.add(path.relative_to(repository_root).as_posix())
+    assert importers == {"app/services/data/__init__.py"}
+
+
 def test_every_feature_has_module_documentation() -> None:
     """Assert each focused feature folder owns one module README."""
     missing = [
@@ -160,6 +195,31 @@ def test_every_feature_has_module_documentation() -> None:
         if not (DATA_ROOT / feature / "README.md").is_file()
     ]
     assert not missing, f"Focused feature README files are missing: {missing}"
+
+
+def test_registered_features_have_exactly_one_numbered_usage_program() -> None:
+    """Reconcile registry IDs, documented evidence, and numbered programs."""
+    readme = DOMAIN_README.read_text(encoding="utf-8")
+    registry = re.search(
+        r"^### Feature Registry\s*$\n(?P<body>.*?)(?=^### |\Z)",
+        readme,
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    assert registry is not None
+    registered = {
+        int(match.group("number")): match.group("path")
+        for match in re.finditer(
+            r"`FEAT-DATA-(?P<number>\d{2})`[^\n]*?"
+            r"`(?P<path>tests/data/usage/features/\d{2}_[a-z_]+\.py)`",
+            registry.group("body"),
+        )
+    }
+    usage_root = DATA_ROOT.parents[2] / "tests" / "data" / "usage" / "features"
+    actual = {
+        int(path.name[:2]): path.relative_to(DATA_ROOT.parents[2]).as_posix()
+        for path in usage_root.glob("[0-9][0-9]_*.py")
+    }
+    assert registered == actual
 
 
 def test_removed_legacy_packages_are_absent_and_unreferenced() -> None:
@@ -243,6 +303,28 @@ def test_public_evidence_uses_only_domain_root_imports() -> None:
             ):
                 violations.append(f"{relative}:{node.lineno}:{node.module}")
     assert not violations, f"Domain deep imports are prohibited: {violations}"
+
+
+def test_cross_domain_consumers_use_only_the_data_package_root() -> None:
+    """Reject static deep Data imports in the governed consumer categories."""
+    repository_root = DATA_ROOT.parents[2]
+    candidate_files = [
+        *(
+            path
+            for path in (repository_root / "app" / "services").rglob("*.py")
+            if DATA_ROOT not in path.parents
+        ),
+        *(repository_root / "app" / "agentic").rglob("*.py"),
+        *(repository_root / "tests").glob("*/usage/**/*.py"),
+        *(repository_root / "tests").glob("*/integration/**/*.py"),
+    ]
+    violations: list[str] = []
+    for path in candidate_files:
+        for module in sorted(_domain_imports(path, module_level_only=False)):
+            if module != DOMAIN_PREFIX:
+                relative = path.relative_to(repository_root).as_posix()
+                violations.append(f"{relative}:{module}")
+    assert not violations, f"Cross-domain consumers deep-import Data: {violations}"
 
 
 def test_domain_import_has_no_external_or_persistent_side_effect() -> None:

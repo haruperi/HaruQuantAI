@@ -78,8 +78,8 @@ def _inspect(records: tuple[OHLCVRecord, ...], *, policy=_STANDARD):
     )
 
 
-def test_clean_series_scores_one() -> None:
-    """A series with no detected issue scores exactly one."""
+def test_clean_series_scores_one_hundred_percent() -> None:
+    """A series with no detected issue scores exactly 100 percent."""
     records = tuple(
         _bar(index, close=str(10 + index), volume=str(100 + index))
         for index in range(8)
@@ -87,7 +87,8 @@ def test_clean_series_scores_one() -> None:
 
     report = _inspect(records)
 
-    assert report.quality_score == Decimal(1)
+    assert report.quality_score == Decimal("100.00")
+    assert report.quality_status == "perfect"
     assert not any(issue.code == "MISSING_BARS" for issue in report.issues)
 
 
@@ -103,7 +104,7 @@ def test_gap_detection_reports_missing_bars() -> None:
 
     codes = {issue.code for issue in report.issues}
     assert "MISSING_BARS" in codes
-    assert report.quality_status == "failed"
+    assert report.quality_decision == "rejected"
 
 
 def test_gap_detection_discounts_weekend_closure() -> None:
@@ -183,7 +184,7 @@ def test_duplicate_timestamps_are_blocking() -> None:
 
     codes = {issue.code for issue in report.issues}
     assert "DUPLICATE_BARS" in codes
-    assert report.quality_status == "failed"
+    assert report.quality_decision == "rejected"
 
 
 def test_duplicate_tick_timestamps_are_not_duplicate_bars() -> None:
@@ -222,7 +223,8 @@ def test_flatline_run_is_reported() -> None:
 
     codes = {issue.code for issue in report.issues}
     assert "FLAT_LINE" in codes
-    assert report.quality_status == "passed_with_warnings"
+    assert report.quality_status == "excellent"
+    assert report.quality_decision == "accepted_with_warnings"
 
 
 def test_zero_volume_run_is_reported() -> None:
@@ -312,7 +314,8 @@ def test_strict_profile_fails_below_minimum_score() -> None:
 
     report = _inspect(records, policy=_STRICT)
 
-    assert report.quality_status == "failed"
+    assert report.quality_status in {"poor", "critical"}
+    assert report.quality_decision == "rejected"
 
 
 def test_remediation_is_deterministic() -> None:
@@ -350,8 +353,9 @@ def test_unknown_issue_code_is_rejected() -> None:
     )
 
     report = DataQualityReport(
-        quality_status="passed_with_warnings",
-        quality_score=Decimal("0.5"),
+        quality_status="critical",
+        quality_decision="rejected",
+        quality_score=Decimal("50.00"),
         issues=(
             QualityIssue(
                 code="UNMAPPED_CODE",

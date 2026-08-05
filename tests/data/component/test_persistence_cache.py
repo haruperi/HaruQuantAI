@@ -1,4 +1,4 @@
-"""Unit tests for cache persistence operations.
+"""Component tests for cache persistence operations.
 
 [CAP-DATA-026 Phase 2] Copy of the legacy storage test, re-pointed at the
 new `persistence`/`audit` modules. The legacy copy still guards `storage/`
@@ -7,10 +7,10 @@ until Phase 11 deletes it. Behaviour assertions are unchanged.
 
 from __future__ import annotations
 
-import time
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from app.services.data import (
@@ -55,8 +55,9 @@ def make_bar():
 def make_quality(count=1):
     """Return passing bounded quality evidence."""
     return build_data_quality_report(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         issues=(),
         warnings=(),
         record_count=count,
@@ -203,10 +204,11 @@ def test_cache_expiration_policy(
         raw_data_hash="hash-1",
         request_id="req-d28c2b51880bae5db4771a0284035b4dafaace830c3ddc87098e3f98636d3444",
     )
-    _unwrap(put_cache_entry(write_req))
-
-    # Wait for entry to expire
-    time.sleep(1.1)
+    written_at = datetime(2026, 1, 1, tzinfo=UTC)
+    write_clock = SimpleNamespace(now=lambda: written_at)
+    read_clock = SimpleNamespace(now=lambda: expired_at)
+    _unwrap(put_cache_entry(write_req, clock=write_clock))
+    expired_at = written_at + timedelta(seconds=2)
 
     # 1. Reading with allow_stale=False -> Miss
     read_req_miss = CacheReadRequest(
@@ -214,7 +216,7 @@ def test_cache_expiration_policy(
         allow_stale=False,
         request_id="req-b0d723e3ba8d92fec6d6cdb73d9b86e95b5be57a8e04efe5524a241b6c7d5d03",
     )
-    entry_miss = _unwrap(get_cache_entry(read_req_miss))
+    entry_miss = _unwrap(get_cache_entry(read_req_miss, clock=read_clock))
     assert entry_miss is None
 
     # 2. Reading with allow_stale=True -> Hit with warning status
@@ -223,7 +225,7 @@ def test_cache_expiration_policy(
         allow_stale=True,
         request_id="req-137083e33c90538abb67fc8925817bf77ede5ab669e2ea39bfc4987e28ebcdae",
     )
-    entry_stale = _unwrap(get_cache_entry(read_req_stale))
+    entry_stale = _unwrap(get_cache_entry(read_req_stale, clock=read_clock))
     assert entry_stale is not None
     assert entry_stale.dataset.cache_status == "stale_warning"
 

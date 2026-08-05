@@ -384,15 +384,16 @@ def _require_acceptable_quality(
         request: Import declaration supplying trace and symbol context.
 
     Raises:
-        DataError: If the report has a failed status.
+        DataError: If the report has a rejected or unevaluated decision.
     """
-    if report.quality_status == "failed":
+    if report.quality_decision in {"rejected", "not_evaluated"}:
         logger.warning("Rejecting external artifact with blocking quality evidence")
         raise DataError(
             "DATA_QUALITY_FAILED",
             safe_details={
                 "symbol": request.symbol,
                 "quality_status": report.quality_status,
+                "quality_decision": report.quality_decision,
             },
             request_id=request.request_id,
         )

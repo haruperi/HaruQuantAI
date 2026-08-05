@@ -249,26 +249,30 @@
   transforms/alignment, synthetic generators, quality validation, recoverable
   scheduler jobs, internal feed status, immutable backup/restore manifests,
   licence-aware retention enforcement, and a function-only package-root public
-  boundary across sixteen focused features.
+  boundary across eighteen focused features.
   Retrieval and reference exports accept either their typed request or direct keyword
   arguments; standalone calls lazily compose MT5 read-only source, identity,
   migration, and calendar dependencies through the existing Brokers and Data
   boundaries. Explicit source/adapter injection remains supported.
   Its existing package-local architecture and repository-wide package-root consumer
   boundary are implemented and verified. Data status is `Completed`, including
-  `FEAT-DATA-11` licensed bounded Firecrawl calendar acquisition verified against
-  all four declared portals, exact provider-value normalization, symbol-scoped
-  restriction evidence, and approved-root/SQLite persistence, plus
+  `FEAT-DATA-11` database-first calendar retrieval, bounded resumable historical
+  Forex Factory acquisition through credential-free Jina Reader, current-week CSV
+  synchronization, normalized permanent event definitions and specifications,
+  exact provider-value
+  normalization, symbol-scoped restriction evidence, and governed SQLite coverage,
+  plus
   `FEAT-DATA-16` point-in-time licensed source documents, structured observations,
   immutable revisions, verified-source manifests, and bounded projections for
   Research consumption.
   `CAP-DATA-028` locates the behavior in
-  sixteen approved capabilities: `contracts/`, `market_data/`,
+  eighteen approved capabilities: `contracts/`, `market_data/`,
   `local_datasets/`, `synthetic_data/`, `tick_derivation/`, `persistence/`,
   `quality/`, `transformation/`, `time_sessions/`, `sources/`,
   `economic_calendar/`, `realtime_feeds/`, `data_jobs/`, `evidence/`, `audit/`,
-  `research_sources/`, and the private `runtime_stores/` support directory. Exactly
-  seventeen numbered standalone usage programs cover
+  `research_sources/`, and `runtime_stores/`. Private `_shared/` construction
+  adapters and `migrations/` definitions are documented support directories. Exactly
+  eighteen numbered standalone usage programs cover
   those owners, and removed
   horizontal packages have no compatibility shims. The correction changes ownership
   and file focus only; active requirements, public behaviour, contract versions,
@@ -634,7 +638,13 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
 - Retrieval quality-failure behavior is a closed `reject | warn` contract, applied
   identically to fresh and cached datasets. `reject` is the default and raises
   `DATA_QUALITY_FAILED`; `warn` logs bounded evidence and returns the unchanged
-  dataset with `quality_status="failed"` and its issues intact.
+  dataset with `quality_decision="rejected"` and its issues intact.
+- Data quality evidence contract v2 reports a two-decimal percentage score from
+  `0.00` through `100.00`, a descriptive grade (`perfect`, `excellent`, `good`,
+  `degraded`, `poor`, `critical`, or `not_checked`), and a separate operational
+  decision (`accepted`, `accepted_with_warnings`, `review_required`, `rejected`,
+  or `not_evaluated`). Consumers gate on the decision and fail closed for
+  `rejected` or `not_evaluated`; a grade alone never authorizes an operation.
 - High-level bar quality inspection discounts exact weekend closures and injected
   `SessionWindow` non-trading intervals. Unexplained weekday gaps remain critical;
   absent session evidence is explicitly disclosed as `calendar_unverified`.

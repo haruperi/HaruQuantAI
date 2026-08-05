@@ -1,4 +1,4 @@
-"""Unit tests for source evaluation policy and promotion transitions."""
+"""Component tests for durable source policy and promotion transitions."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from unittest.mock import MagicMock
 import pytest
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.requests import MarketDataRequest
+from app.services.data.persistence.contracts import TransactionResult
 from app.services.data.sources.contracts import (
     SourceDescriptor,
     SourceLicensePolicy,
@@ -20,7 +21,6 @@ from app.services.data.sources.policy import (
     _reset_policy_registry,
     evaluate_source_policy,
     promote_source,
-    record_source_attempt,
     register_source_policy,
 )
 from app.services.data.sources.protocol import MarketDataSource
@@ -266,9 +266,16 @@ def test_evaluate_source_policy_rate_limits(monkeypatch: pytest.MonkeyPatch) -> 
     desc = _make_descriptor("src-1")
     _register_descriptor(desc)
 
-    # Trigger rate limit (simulate 100 recent attempts)
-    for _ in range(100):
-        record_source_attempt("src-1", generate_id("req"), "SUCCESS")
+    monkeypatch.setitem(
+        evaluate_source_policy.__globals__,
+        "read_source_attempt_count",
+        lambda *_args, **_kwargs: TransactionResult(
+            rows=({"count_val": 100},),
+            affected_rows=0,
+            committed=True,
+            request_id=_REQ_ID,
+        ),
+    )
 
     req = MarketDataRequest(
         source_id="src-1",

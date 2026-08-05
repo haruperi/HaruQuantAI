@@ -45,8 +45,9 @@ def test_usage_parquet_directory_is_beneath_approved_root(tmp_path: Path) -> Non
 
 def _quality(count: int) -> DataQualityReport:
     return DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal("1.0"),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=count,
         checked_count=count,
         truncated=False,

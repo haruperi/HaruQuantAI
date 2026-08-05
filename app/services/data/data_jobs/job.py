@@ -18,10 +18,11 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from typing import Any, Final, Literal
 
-from app.services.data.contracts import DataError
+from app.services.data.contracts import DataError, unwrap_data_response
 from app.services.data.data_jobs.backfill import (
     BACKFILL_MAX_RECORDS_PER_CHUNK,
     JOB_LEASE_TIMEOUT_SECONDS,
@@ -34,6 +35,9 @@ from app.services.data.data_jobs.contracts import (
     JobStatus,
     JobStatusRequest,
     ScheduleJobRequest,
+)
+from app.services.data.economic_calendar.ingestion import (
+    sync_current_week_economic_calendar,
 )
 from app.services.data.persistence import (
     create_update_job_record,
@@ -117,27 +121,29 @@ def _handle_create(request: ScheduleJobRequest) -> None:
             request_id=request.request_id,
         )
 
-    # 2. Evaluate source policies
-    from app.services.data.market_data.requests import MarketDataRequest
+    # 2. Evaluate source policies for market jobs. Economic Calendar jobs use
+    # their fixed official source and explicit non-production environment guard.
+    if definition.data_kinds != ("economic_calendar",):
+        from app.services.data.market_data.requests import MarketDataRequest
 
-    dkind: Literal["bars", "ticks", "spreads"] = (
-        "bars" if "ohlcv" in definition.data_kinds else "ticks"
-    )
-    dummy_req = MarketDataRequest(
-        source_id=definition.source_id,
-        symbol=definition.symbols[0],
-        data_kind=dkind,
-        timeframe=definition.timeframes[0] if definition.timeframes else None,
-        start=definition.start,
-        end=definition.end or (definition.start + timedelta(hours=1)),
-        limit=10,
-        use_cache=False,
-        quality_failure_behavior="reject",
-        workflow_context="validation",
-        precision_policy="decimal_string",
-        request_id=request.request_id,
-    )
-    _evaluate_source_policy_raw(dummy_req)
+        dkind: Literal["bars", "ticks", "spreads"] = (
+            "bars" if "ohlcv" in definition.data_kinds else "ticks"
+        )
+        dummy_req = MarketDataRequest(
+            source_id=definition.source_id,
+            symbol=definition.symbols[0],
+            data_kind=dkind,
+            timeframe=definition.timeframes[0] if definition.timeframes else None,
+            start=definition.start,
+            end=definition.end or (definition.start + timedelta(hours=1)),
+            limit=10,
+            use_cache=False,
+            quality_failure_behavior="reject",
+            workflow_context="validation",
+            precision_policy="decimal_string",
+            request_id=request.request_id,
+        )
+        _evaluate_source_policy_raw(dummy_req)
 
     # 3. Check if job already exists
     exists_res = read_update_job_identity(
@@ -175,6 +181,7 @@ def _handle_create(request: ScheduleJobRequest) -> None:
             1 if definition.enabled else 0,
             created_str,
             request.request_id,
+            definition.environment,
         ),
         request_id=request.request_id,
     )
@@ -459,11 +466,37 @@ def _execute_run_chunks(
     return committed_chunks, record_count, last_chk
 
 
+def _execute_calendar_sync(
+    row: dict[str, object],
+    request_id: str,
+    rows: Sequence[Mapping[str, object]] | None = None,
+) -> tuple[int, int, str]:
+    """Synchronize the official current week for one calendar job."""
+    environment = row.get("environment")
+    if not isinstance(environment, str):
+        raise DataError(
+            "POLICY_BLOCKED",
+            safe_details={"message": "Calendar job environment is missing"},
+            request_id=request_id,
+        )
+    result: dict[str, int] = unwrap_data_response(
+        sync_current_week_economic_calendar(environment=environment, rows=rows),
+        operation="data.economic_calendar.sync_current_week",
+        request_id=request_id,
+    )
+    imported = result["imported"]
+    if imported <= 0:
+        raise DataError("SOURCE_UNAVAILABLE", request_id=request_id)
+    checkpoint = f"economic-calendar:{datetime.now(UTC).date().isoformat()}"
+    return 1, imported, checkpoint
+
+
 def run_data_update_job_once(
     job_id: str,
     request_id: str,
     *,
     clock: Any | None = None,
+    calendar_rows: Sequence[Mapping[str, object]] | None = None,
 ) -> JobRunResult:
     """Execute a data update job synchronously once.
 
@@ -471,6 +504,7 @@ def run_data_update_job_once(
         job_id: The job identifier.
         request_id: The request identifier.
         clock: Optional injected UTC clock.
+        calendar_rows: Optional bounded current-week rows for deterministic execution.
 
     Returns:
         The JobRunResult details.
@@ -482,10 +516,19 @@ def run_data_update_job_once(
 
     try:
         row = _acquire_job_run_lease(job_id, started_at, request_id)
-        start_time, end_time = _determine_run_range(row, job_id, request_id, started_at)
-        committed_chunks, record_count, last_chk = _execute_run_chunks(
-            row, start_time, end_time, request_id, clock
-        )
+        data_kinds = json.loads(str(row["data_kinds_json"]))
+        last_chk: str | None
+        if data_kinds == ["economic_calendar"]:
+            committed_chunks, record_count, last_chk = _execute_calendar_sync(
+                row, request_id, calendar_rows
+            )
+        else:
+            start_time, end_time = _determine_run_range(
+                row, job_id, request_id, started_at
+            )
+            committed_chunks, record_count, last_chk = _execute_run_chunks(
+                row, start_time, end_time, request_id, clock
+            )
 
         # Update database with success
         finished_at = utc_now(clock)

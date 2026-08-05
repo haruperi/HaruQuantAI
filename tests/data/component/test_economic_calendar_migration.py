@@ -1,4 +1,4 @@
-"""Unit tests for the 002_economic_events additive migration step (FR-DATA-128)."""
+"""Component tests for the 002 economic-events migration (FR-DATA-128)."""
 
 from __future__ import annotations
 
@@ -63,6 +63,9 @@ def test_economic_events_step_is_additive_and_second() -> None:
         "003_research_sources",
         "004_research_source_providers",
         "006_data_catalog_v1",
+        "007_economic_calendar_database_first",
+        "008_data_jobs_environment",
+        "009_economic_event_definitions",
     )
 
 
@@ -94,6 +97,9 @@ def test_run_data_migrations_is_idempotent_on_re_run(
         "004_research_source_providers",
         "005-runtime-records",
         "006_data_catalog_v1",
+        "007_economic_calendar_database_first",
+        "008_data_jobs_environment",
+        "009_economic_event_definitions",
     )
     assert tuple(first.applied_ids) == expected_ids
     assert tuple(second.applied_ids) == ()

@@ -32,6 +32,7 @@ NO_CREATED_AT_ALLOWED = {
     "data_source_attempts",  # timestamp_ns
     "data_audit_events",  # timestamp
     "data_economic_events",  # scheduled_at / updated_at
+    "data_economic_calendar_coverage",  # synchronized_at
     "api_auth_failures",  # window_started_at
     "strategy_mutations",  # command-scoped; no time column by design
 }

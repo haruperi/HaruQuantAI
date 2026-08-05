@@ -543,14 +543,14 @@ def test_resolve_request_id_rejects_invalid_explicit() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Registry completeness sanity (the full 130-candidate coverage gate lives in
+# Registry completeness sanity (the full 134-candidate coverage gate lives in
 # the boundary test added with the final slice).
 # ---------------------------------------------------------------------------
 
 
-def test_operation_registry_covers_130_candidates() -> None:
-    """The static registry carries the 130 qualifying Data operations."""
-    assert len(OPERATION_TRAITS) == 130
+def test_operation_registry_covers_134_candidates() -> None:
+    """The static registry carries the 134 qualifying Data operations."""
+    assert len(OPERATION_TRAITS) == 134
 
 
 def test_every_trait_is_immutable_instance() -> None:

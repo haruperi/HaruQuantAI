@@ -39,8 +39,9 @@ def make_bar(timestamp=START):
 def make_quality(count=1):
     """Return passing bounded quality evidence."""
     return DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         issues=(),
         warnings=(),
         record_count=count,
@@ -86,8 +87,9 @@ def test_quality_report_bounds_samples() -> None:
     )
     with pytest.raises(DataError):
         DataQualityReport(
-            quality_status="passed_with_warnings",
-            quality_score=Decimal("0.5"),
+            quality_status="critical",
+            quality_decision="rejected",
+            quality_score=Decimal("50.00"),
             issues=(issue,),
             warnings=(),
             record_count=2,

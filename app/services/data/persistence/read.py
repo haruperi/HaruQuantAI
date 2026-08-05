@@ -20,10 +20,12 @@ _CACHE_COLUMNS = (
     "schema_version, normalization_version, request_id"
 )
 _ECONOMIC_EVENT_COLUMNS = (
-    "provider, provider_event_id, name, category, country, currency, "
-    "scheduled_at, original_scheduled_at, actual, forecast, previous, "
-    "revised_previous, actual_raw, forecast_raw, previous_raw, unit, source, "
-    "source_url, impact, updated_at"
+    "e.event_id, e.title, e.country, e.scheduled_at, "
+    "e.original_scheduled_at, e.impact, e.actual, e.forecast, e.previous, "
+    "e.revised_previous, e.provider, COALESCE(d.source_url, e.source_url) "
+    "AS source_url, e.first_seen_at, e.updated_at, e.request_id, "
+    "e.provider_definition_id, d.source_original, d.source_latest, d.measures, "
+    "d.effect, d.frequency, d.also_called, d.event_type"
 )
 _FEED_COLUMNS = (
     "feed_id, source_id, symbol, data_kind, timeframe, source_capability, "
@@ -145,29 +147,47 @@ def read_economic_event_records(
 ) -> TransactionResult:
     """Read bounded stored economic events under optional filters."""
     sql = (
-        f"SELECT {_ECONOMIC_EVENT_COLUMNS} FROM data_economic_events "  # noqa: S608
-        "WHERE scheduled_at >= ? AND scheduled_at < ?"
+        f"SELECT {_ECONOMIC_EVENT_COLUMNS} FROM data_economic_events e "  # noqa: S608
+        "LEFT JOIN data_economic_event_definitions d "
+        "ON d.provider = 'forexfactory' "
+        "AND d.provider_definition_id = e.provider_definition_id "
+        "WHERE e.scheduled_at >= ? AND e.scheduled_at < ?"
     )
     clauses: list[str] = []
     parameters: list[Any] = [start, end]
     if currencies:
-        clauses.append(f"currency IN ({', '.join('?' for _ in currencies)})")
+        clauses.append(f"e.country IN ({', '.join('?' for _ in currencies)})")
         parameters.extend(currencies)
     if countries:
-        clauses.append(f"country IN ({', '.join('?' for _ in countries)})")
+        clauses.append(f"e.country IN ({', '.join('?' for _ in countries)})")
         parameters.extend(countries)
     if minimum_impact is not None:
-        clauses.append("impact >= ?")
+        clauses.append("e.impact >= ?")
         parameters.append(minimum_impact)
     if provider is not None:
-        clauses.append("provider = ?")
+        clauses.append("e.provider = ?")
         parameters.append(provider)
     if clauses:
         sql = f"{sql} AND {' AND '.join(clauses)}"
     logger.debug("Reading Data economic-event persistence records")
     return _execute_read(
-        f"{sql} ORDER BY scheduled_at ASC",
+        f"{sql} ORDER BY e.scheduled_at ASC",
         tuple(parameters),
+        request_id=request_id,
+        max_rows=limit,
+    )
+
+
+def read_economic_calendar_coverage_records(
+    *, start: str, end: str, request_id: str, limit: int = 1000
+) -> TransactionResult:
+    """Read complete coverage intervals overlapping one requested window."""
+    return _execute_read(
+        "SELECT provider, range_start, range_end, status, source_revision, "
+        "synchronized_at FROM data_economic_calendar_coverage "
+        "WHERE range_end > ? AND range_start < ? "
+        "ORDER BY range_start ASC LIMIT ?",
+        (start, end, limit),
         request_id=request_id,
         max_rows=limit,
     )
@@ -263,7 +283,8 @@ def read_update_job_definition_record(
     """Read the persisted definition and lease state for one update job."""
     return _execute_read(
         "SELECT job_id, source_id, symbols_json, timeframes_json, data_kinds_json, "
-        "start, end, interval_seconds, enabled, state, lease_owner, lease_expires_at "
+        "start, end, interval_seconds, enabled, state, lease_owner, lease_expires_at, "
+        "environment "
         "FROM data_update_jobs WHERE job_id = ?",
         (job_id,),
         request_id=request_id,
@@ -448,7 +469,13 @@ __all__ = [
     "read_audit_event_records",
     "read_cache_record",
     "read_cache_records",
+    "read_catalog_coverage",
+    "read_catalog_event_records",
+    "read_catalog_files_for_range",
+    "read_catalog_reference_records",
+    "read_catalog_unverified_count",
     "read_committed_backfill_record",
+    "read_economic_calendar_coverage_records",
     "read_economic_event_records",
     "read_feed_record",
     "read_latest_backfill_end",
@@ -468,6 +495,7 @@ __all__ = [
     "read_update_job_identity",
     "read_update_job_start_state",
     "read_update_job_status_record",
+    "read_verified_research_source_record",
 ]
 
 
@@ -604,4 +632,66 @@ def read_catalog_coverage(dataset_id: str, *, request_id: str) -> TransactionRes
     logger.debug("Reading Data catalog coverage")
     return _execute_read(
         _SELECT_CATALOG_COVERAGE, (dataset_id,), request_id=request_id, max_rows=1
+    )
+
+
+def read_catalog_reference_records(
+    symbol_id: str, provider_id: str, *, request_id: str, limit: int
+) -> TransactionResult:
+    """Read one provider/symbol reference and its bounded active sessions."""
+    statement = """
+SELECT s.symbol_id, s.canonical_symbol, s.state,
+       p.provider_id, p.provider_code, p.enabled,
+       m.session_id, m.day_of_week, m.open_time_utc, m.close_time_utc
+FROM data_symbols s
+JOIN data_providers p ON p.provider_id = ?
+LEFT JOIN data_market_sessions m
+  ON m.symbol_id = s.symbol_id AND m.effective_to IS NULL
+WHERE s.symbol_id = ? AND s.deleted_at IS NULL
+ORDER BY m.day_of_week, m.open_time_utc
+""".strip()
+    return _execute_read(
+        statement,
+        (provider_id, symbol_id),
+        request_id=request_id,
+        max_rows=limit,
+    )
+
+
+def read_catalog_event_records(
+    symbol_id: str, *, request_id: str, limit: int
+) -> TransactionResult:
+    """Read bounded fetch and quality evidence for one canonical symbol."""
+    statement = """
+SELECT 'fetch' AS record_kind, fetch_id AS record_id, state, error_code
+FROM data_fetch_log WHERE symbol_id = ?
+UNION ALL
+SELECT 'quality' AS record_kind, event_id AS record_id, severity AS state,
+       issue_type AS error_code
+FROM data_quality_events WHERE symbol_id = ?
+ORDER BY record_id
+""".strip()
+    return _execute_read(
+        statement,
+        (symbol_id, symbol_id),
+        request_id=request_id,
+        max_rows=limit,
+    )
+
+
+def read_verified_research_source_record(
+    source_id: str, parser_version: str, *, request_id: str
+) -> TransactionResult:
+    """Read one persisted verified-source manifest exactly."""
+    statement = """
+SELECT source_id, parser_version, verified_at, external_record_id,
+       fixture_sha256, environments_json, license_policy
+FROM data_verified_research_sources
+WHERE source_id = ? AND parser_version = ?
+""".strip()
+    return _execute_read(
+        statement,
+        (source_id, parser_version),
+        request_id=request_id,
+        max_rows=1,
     )

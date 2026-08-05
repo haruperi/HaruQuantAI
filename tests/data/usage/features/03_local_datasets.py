@@ -201,6 +201,7 @@ def main() -> None:
             fr_data_017_csv()
             fr_data_017_parquet()
             fr_data_017_018_governed()
+            print("SUCCESS: FEAT-DATA-03 completed")
 
 
 if __name__ == "__main__":

@@ -157,6 +157,7 @@ def main() -> None:
     fr_data_039_request()
     fr_data_039_bars()
     fr_data_039_ticks()
+    print("SUCCESS: FEAT-DATA-04 completed")
 
 
 if __name__ == "__main__":

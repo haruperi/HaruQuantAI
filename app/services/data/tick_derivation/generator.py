@@ -992,8 +992,9 @@ def _build_dataset(
     logger.debug("Running DATA function: _build_dataset")
     generated_at = max(record.available_at for record in records)
     quality = DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=len(records),
         checked_count=len(records),
         truncated=False,

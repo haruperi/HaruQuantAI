@@ -174,6 +174,7 @@ def main() -> None:
         [project_research_source_evidence(value) for value in treasury_documents],
     )
     print("Persisted observation count:", len(point_in_time_observations))
+    print("SUCCESS: FEAT-DATA-16 completed")
 
 
 if __name__ == "__main__":

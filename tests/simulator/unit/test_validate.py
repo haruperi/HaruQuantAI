@@ -3,13 +3,14 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
+from typing import Any
 
 import pytest
-from app.services.data.contracts import (
-    DataQualityReport,
-    MarketDataset,
-    OHLCVRecord,
-    TickRecord,
+from app.services.data import (
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
+    build_tick_record,
 )
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.validation.contracts import MarketDataValidationContext
@@ -21,10 +22,10 @@ from app.services.simulator.validation.validate import (
 from app.utils import canonical_json
 
 
-def _dataset() -> MarketDataset:
+def _dataset() -> Any:
     """Build one valid Data-owned tick dataset."""
     instant = datetime(2025, 1, 2, 12, tzinfo=UTC)
-    record = TickRecord(
+    record = build_tick_record(
         timestamp=instant,
         source="fixture",
         source_symbol="EURUSD",
@@ -39,9 +40,10 @@ def _dataset() -> MarketDataset:
         tick_index_in_bar=0,
         bar_phase=1,
     )
-    quality = DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal(1),
+    quality = build_data_quality_report(
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=1,
         checked_count=1,
         truncated=False,
@@ -49,7 +51,7 @@ def _dataset() -> MarketDataset:
         schema_version="v1",
         generated_at=instant,
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="ticks",
         symbol="EURUSD",
@@ -69,7 +71,7 @@ def _dataset() -> MarketDataset:
     )
 
 
-def _context(dataset: MarketDataset) -> MarketDataValidationContext:
+def _context(dataset: Any) -> MarketDataValidationContext:
     """Build matching explicit validation evidence."""
     digest = sha256(
         canonical_json(dataset.model_dump(mode="python", warnings=False)).encode(
@@ -121,18 +123,21 @@ def test_validate_run_inputs_rejects_raw_code() -> None:
 def test_validate_market_data_blocks_invalid_ohlc() -> None:
     """Reject a tampered dataset before execution."""
     dataset = _dataset()
-    invalid_record = OHLCVRecord.model_construct(
+    valid_record = build_ohlcv_record(
         timestamp=dataset.start,
         source="fixture",
         source_symbol="EURUSD",
         available_at=dataset.start,
-        open=Decimal(2),
-        high=Decimal(1),
+        open=Decimal(1),
+        high=Decimal(2),
         low=Decimal(0),
         close=Decimal("0.5"),
         volume=Decimal(1),
         price_unit="quote",
         volume_unit="lot",
+    )
+    invalid_record = valid_record.model_copy(
+        update={"open": Decimal(2), "high": Decimal(1)}
     )
     tampered = dataset.model_copy(update={"records": (invalid_record,)})
     context = _context(tampered)

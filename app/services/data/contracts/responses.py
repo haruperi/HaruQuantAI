@@ -280,14 +280,32 @@ _TRAITS: Mapping[str, OperationTraits] = {
     ),
     # FEAT-DATA-11 - Economic Calendar.
     "data.economic_calendar.calendar_state_provenance": _traits("none", read_only=True),
+    "data.economic_calendar.backfill_history": _traits(
+        "medium", read_only=False, modifies_database=True, requires_network=True
+    ),
+    "data.economic_calendar.crawl_event_definitions": _traits(
+        "medium", read_only=False, modifies_database=True, requires_network=True
+    ),
+    "data.economic_calendar.import_csv": _traits(
+        "medium", read_only=False, modifies_database=True
+    ),
+    "data.economic_calendar.sync_current_week": _traits(
+        "medium", read_only=False, modifies_database=True, requires_network=True
+    ),
     "data.economic_calendar.derive_calendar_state": _traits("none", read_only=True),
     "data.economic_calendar.evaluate_calendar_state": _traits("none", read_only=True),
     "data.economic_calendar.from_row": _traits("none", read_only=True),
-    "data.economic_calendar.get_economic_events": _traits("low", read_only=True),
+    "data.economic_calendar.get_economic_events": _traits(
+        "medium", read_only=False, modifies_database=True, requires_network=True
+    ),
     "data.economic_calendar.get_persisted_events": _traits("low", read_only=True),
-    "data.economic_calendar.get_symbol_economic_events": _traits("low", read_only=True),
+    "data.economic_calendar.get_symbol_economic_events": _traits(
+        "medium", read_only=False, modifies_database=True, requires_network=True
+    ),
     "data.economic_calendar.get_symbol_event_profile": _traits("low", read_only=True),
-    "data.economic_calendar.is_news_restricted": _traits("low", read_only=True),
+    "data.economic_calendar.is_news_restricted": _traits(
+        "medium", read_only=False, modifies_database=True, requires_network=True
+    ),
     "data.economic_calendar.is_news_restricted_events": _traits("none", read_only=True),
     "data.economic_calendar.populate_market_context_calendar": _traits(
         "none", read_only=True

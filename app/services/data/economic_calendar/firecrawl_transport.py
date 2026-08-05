@@ -454,7 +454,9 @@ class _FirecrawlCalendarTransport(CalendarTransport):
                     "TIMEOUT", safe_details={"operation": "firecrawl_scrape"}
                 ) from error
             except urllib.error.HTTPError as error:
-                raise self._map_http_error(error) from error
+                mapped = self._map_http_error(error)
+                error.close()
+                raise mapped from error
             except (urllib.error.URLError, OSError, json.JSONDecodeError) as error:
                 raise DataError(
                     "NETWORK_ERROR", safe_details={"operation": "firecrawl_scrape"}

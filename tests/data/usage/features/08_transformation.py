@@ -66,8 +66,9 @@ def _sample_m1_dataset() -> Any:
         for i in range(10)
     )
     report = build_data_quality_report(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=len(records),
         checked_count=len(records),
         truncated=False,
@@ -227,6 +228,7 @@ def main() -> None:
     fr_data_037_080()
     fr_data_038()
     fr_data_081_082_083_085_086()
+    print("SUCCESS: FEAT-DATA-08 completed")
 
 
 if __name__ == "__main__":

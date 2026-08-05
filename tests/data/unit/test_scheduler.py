@@ -329,6 +329,47 @@ def test_run_once_success_and_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     assert failure.error_code == "JOB_NOT_FOUND"
 
 
+def test_calendar_job_requires_safe_weekly_shape_and_dispatches(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Accept only explicit non-production weekly jobs and route their run."""
+    with pytest.raises(DataError):
+        _definition(data_kinds=("economic_calendar",), symbols=(), timeframes=())
+    definition = _definition(
+        source_id="forexfactory",
+        data_kinds=("economic_calendar",),
+        symbols=(),
+        timeframes=(),
+        end=None,
+        interval_seconds=604800,
+        environment="dev",
+    )
+    assert definition.environment == "dev"
+
+    row = _row(
+        source_id="forexfactory",
+        symbols_json="[]",
+        timeframes_json="[]",
+        data_kinds_json='["economic_calendar"]',
+        environment="dev",
+    )
+    monkeypatch.setattr(job, "_acquire_job_run_lease", lambda *_args: row)
+    monkeypatch.setattr(job, "_execute_calendar_sync", lambda *_args: (1, 3, "week"))
+    monkeypatch.setattr(
+        job,
+        "update_job_run_success",
+        lambda *_args, **_kwargs: SimpleNamespace(rows=()),
+    )
+    result = job.run_data_update_job_once(
+        definition.job_id,
+        generate_id("req"),
+        clock=_SequenceClock(),
+        calendar_rows=(),
+    )
+    assert result.state == "succeeded"
+    assert result.record_count == 3
+
+
 def test_job_result_and_status_validation() -> None:
     """Reject status claims that lack their required durable evidence."""
     request_id = generate_id("req")

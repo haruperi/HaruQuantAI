@@ -9,7 +9,11 @@ from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import pytest
-from app.services.data.contracts import DataQualityReport, MarketDataset, OHLCVRecord
+from app.services.data import (
+    build_data_quality_report,
+    build_market_dataset,
+    build_ohlcv_record,
+)
 from app.services.strategy.contracts import (
     StrategyConfig,
     StrategyDecision,
@@ -51,7 +55,7 @@ def make_market(
     *,
     timeframe: str = "M5",
     symbol: str = "EURUSD",
-) -> MarketDataset:
+) -> Any:
     """Build canonical bar evidence from explicit OHLC strings.
 
     Args:
@@ -64,7 +68,7 @@ def make_market(
     """
     logger.debug("Building concrete Strategy market test evidence")
     records = tuple(
-        OHLCVRecord(
+        build_ohlcv_record(
             timestamp=NOW - timedelta(hours=1) + timedelta(minutes=5 * index),
             source="test",
             source_symbol=symbol,
@@ -79,9 +83,10 @@ def make_market(
         )
         for index, (open_price, high, low, close) in enumerate(prices)
     )
-    quality = DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal(1),
+    quality = build_data_quality_report(
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=len(records),
         checked_count=len(records),
         truncated=False,
@@ -89,7 +94,7 @@ def make_market(
         schema_version="v1",
         generated_at=records[-1].available_at,
     )
-    return MarketDataset(
+    return build_market_dataset(
         normalization_version="v1",
         data_kind="bars",
         symbol=symbol,
@@ -110,7 +115,7 @@ def make_market(
 
 
 def make_indicator(
-    market: MarketDataset,
+    market: Any,
     *,
     indicator_id: str,
     output_column: str,
@@ -195,9 +200,9 @@ def make_signal_config(
 
 
 def make_signal_evidence(
-    market: MarketDataset,
+    market: Any,
     *,
-    related_markets: Mapping[str, MarketDataset] | None = None,
+    related_markets: Mapping[str, Any] | None = None,
     feature_values: Mapping[str, tuple[Decimal, ...]] | None = None,
     feature_available_at: Mapping[str, datetime] | None = None,
     feature_refs: Mapping[str, str] | None = None,

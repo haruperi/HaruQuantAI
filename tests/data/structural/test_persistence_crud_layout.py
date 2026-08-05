@@ -1,4 +1,4 @@
-"""Structural regression tests for centralized Data-owned CRUD persistence."""
+"""Repository-scale guards for centralized Data-owned CRUD persistence."""
 
 from __future__ import annotations
 
@@ -22,6 +22,7 @@ def _production_files_outside_persistence() -> tuple[Path, ...]:
         path
         for path in DATA_ROOT.rglob("*.py")
         if "persistence" not in path.parts
+        and "migrations" not in path.parts
         and path.name != "migrations.py"
         and "__pycache__" not in path.parts
     )

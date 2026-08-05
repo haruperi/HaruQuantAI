@@ -67,7 +67,8 @@ def _resample_dataset_raw(
         logger.info("Empty source dataset records, returning empty dataset")
         quality_report = DataQualityReport(
             quality_status="not_checked",
-            quality_score=Decimal(1),
+            quality_decision="not_evaluated",
+            quality_score=Decimal(0),
             issues=(),
             warnings=(),
             record_count=0,
@@ -151,8 +152,9 @@ def _resample_dataset_raw(
         )
 
     quality_report = DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         issues=(),
         warnings=(),
         record_count=len(resampled_records),

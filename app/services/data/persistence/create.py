@@ -14,6 +14,72 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
+_UPSERT_CATALOG_SYMBOL = """
+INSERT INTO data_symbols (
+    symbol_id, canonical_symbol, asset_class, base_currency, quote_currency,
+    digits, tick_size_decimal, min_volume_decimal, max_volume_decimal,
+    volume_step_decimal, contract_size_decimal, spec_json, state,
+    request_id, correlation_id, created_at, updated_at, deleted_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
+ON CONFLICT(symbol_id) DO UPDATE SET
+    canonical_symbol = excluded.canonical_symbol,
+    asset_class = excluded.asset_class,
+    base_currency = excluded.base_currency,
+    quote_currency = excluded.quote_currency,
+    digits = excluded.digits,
+    tick_size_decimal = excluded.tick_size_decimal,
+    min_volume_decimal = excluded.min_volume_decimal,
+    max_volume_decimal = excluded.max_volume_decimal,
+    volume_step_decimal = excluded.volume_step_decimal,
+    contract_size_decimal = excluded.contract_size_decimal,
+    spec_json = excluded.spec_json,
+    state = excluded.state,
+    request_id = excluded.request_id,
+    correlation_id = excluded.correlation_id,
+    updated_at = excluded.updated_at,
+    deleted_at = NULL
+""".strip()
+
+_UPSERT_CATALOG_PROVIDER = """
+INSERT INTO data_providers (
+    provider_id, provider_code, provider_kind, priority, trust_tier,
+    rate_limit, rate_window_seconds, license_json, enabled,
+    request_id, correlation_id, created_at, updated_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT(provider_id) DO UPDATE SET
+    provider_code = excluded.provider_code,
+    provider_kind = excluded.provider_kind,
+    priority = excluded.priority,
+    trust_tier = excluded.trust_tier,
+    rate_limit = excluded.rate_limit,
+    rate_window_seconds = excluded.rate_window_seconds,
+    license_json = excluded.license_json,
+    enabled = excluded.enabled,
+    request_id = excluded.request_id,
+    correlation_id = excluded.correlation_id,
+    updated_at = excluded.updated_at
+""".strip()
+
+_UPSERT_CATALOG_SESSION = """
+INSERT INTO data_market_sessions (
+    session_id, symbol_id, session_name, day_of_week, open_time_utc,
+    close_time_utc, is_trading, effective_from, effective_to,
+    request_id, correlation_id, created_at, updated_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT(session_id) DO UPDATE SET
+    symbol_id = excluded.symbol_id,
+    session_name = excluded.session_name,
+    day_of_week = excluded.day_of_week,
+    open_time_utc = excluded.open_time_utc,
+    close_time_utc = excluded.close_time_utc,
+    is_trading = excluded.is_trading,
+    effective_from = excluded.effective_from,
+    effective_to = excluded.effective_to,
+    request_id = excluded.request_id,
+    correlation_id = excluded.correlation_id,
+    updated_at = excluded.updated_at
+""".strip()
+
 _INSERT_CATALOG_DATASET = """
 INSERT INTO data_datasets (
     dataset_id, dataset_kind, owner_domain, symbol_id, timeframe, provider_id,
@@ -22,6 +88,20 @@ INSERT INTO data_datasets (
     min_ts_utc, max_ts_utc, state, request_id, correlation_id,
     created_at, updated_at
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT(dataset_id) DO UPDATE SET
+    producer_ref = excluded.producer_ref,
+    root_path = excluded.root_path,
+    schema_version = excluded.schema_version,
+    normalization_version = excluded.normalization_version,
+    file_count = excluded.file_count,
+    total_rows = excluded.total_rows,
+    total_bytes = excluded.total_bytes,
+    min_ts_utc = excluded.min_ts_utc,
+    max_ts_utc = excluded.max_ts_utc,
+    state = excluded.state,
+    request_id = excluded.request_id,
+    correlation_id = excluded.correlation_id,
+    updated_at = excluded.updated_at
 """.strip()
 
 _INSERT_CATALOG_FILE = """
@@ -31,6 +111,25 @@ INSERT INTO data_partition_files (
     normalization_version, source_revision, provenance_json, license_json,
     verify_state, verified_at, request_id, correlation_id, created_at, updated_at
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT(dataset_id, relative_path) DO UPDATE SET
+    artifact_id = excluded.artifact_id,
+    file_id = excluded.file_id,
+    format = excluded.format,
+    content_hash = excluded.content_hash,
+    row_count = excluded.row_count,
+    byte_size = excluded.byte_size,
+    min_ts_utc = excluded.min_ts_utc,
+    max_ts_utc = excluded.max_ts_utc,
+    schema_version = excluded.schema_version,
+    normalization_version = excluded.normalization_version,
+    source_revision = excluded.source_revision,
+    provenance_json = excluded.provenance_json,
+    license_json = excluded.license_json,
+    verify_state = excluded.verify_state,
+    verified_at = excluded.verified_at,
+    request_id = excluded.request_id,
+    correlation_id = excluded.correlation_id,
+    updated_at = excluded.updated_at
 """.strip()
 
 _INSERT_FETCH_LOG = """
@@ -77,9 +176,9 @@ INSERT INTO data_source_attempts (
 _INSERT_UPDATE_JOB = """
 INSERT INTO data_update_jobs (
     job_id, source_id, symbols_json, timeframes_json, data_kinds_json,
-    start, end, interval_seconds, enabled, created_at, request_id,
+    start, end, interval_seconds, enabled, created_at, request_id, environment,
     state, recovery_state
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'created', 'clean')
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'created', 'clean')
 """.strip()
 _INSERT_BACKFILL_CHECKPOINT = """
 INSERT INTO data_backfill_checkpoints (
@@ -255,7 +354,11 @@ def create_runtime_put_once_record(
 __all__ = [
     "create_audit_event_record",
     "create_backfill_checkpoint_record",
+    "create_catalog_artifact_records",
+    "create_catalog_reference_records",
     "create_feed_record",
+    "create_fetch_log_record",
+    "create_quality_event_record",
     "create_research_observation_record",
     "create_research_source_record",
     "create_runtime_append_record",
@@ -280,6 +383,43 @@ def create_catalog_dataset_record(
     logger.debug("Creating Data catalog dataset record")
     return _execute_create(
         (_INSERT_CATALOG_DATASET,), (parameters,), request_id=request_id
+    )
+
+
+def create_catalog_artifact_records(
+    dataset_parameters: tuple[Any, ...],
+    file_parameters: tuple[Any, ...],
+    *,
+    request_id: str,
+) -> TransactionResult:
+    """Register one dataset and artifact atomically."""
+    return _execute_create(
+        (_INSERT_CATALOG_DATASET, _INSERT_CATALOG_FILE),
+        (dataset_parameters, file_parameters),
+        request_id=request_id,
+        max_rows=2,
+    )
+
+
+def create_catalog_reference_records(
+    provider_parameters: tuple[Any, ...],
+    symbol_parameters: tuple[Any, ...],
+    session_parameter_sets: tuple[tuple[Any, ...], ...],
+    *,
+    request_id: str,
+) -> TransactionResult:
+    """Synchronize one provider, symbol, and optional session set atomically."""
+    statements = (
+        _UPSERT_CATALOG_PROVIDER,
+        _UPSERT_CATALOG_SYMBOL,
+        *(_UPSERT_CATALOG_SESSION for _ in session_parameter_sets),
+    )
+    parameters = (provider_parameters, symbol_parameters, *session_parameter_sets)
+    return _execute_create(
+        statements,
+        parameters,
+        request_id=request_id,
+        max_rows=max(2, len(statements)),
     )
 
 

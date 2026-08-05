@@ -1,4 +1,4 @@
-"""Unit tests for symbol reference and availability access orchestration."""
+"""Component tests for symbol reference and availability orchestration."""
 
 from __future__ import annotations
 
@@ -74,8 +74,9 @@ def make_bar(timestamp=START_FIXTURE):
 def make_quality(count=1):
     """Return passing bounded quality evidence."""
     return DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         issues=(),
         warnings=(),
         record_count=count,

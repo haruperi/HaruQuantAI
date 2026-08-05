@@ -114,8 +114,9 @@ def _protective_dataset(request_id: str) -> object:
         for index, bid in enumerate(bids)
     )
     quality = build_data_quality_report(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=len(records),
         checked_count=len(records),
         truncated=False,

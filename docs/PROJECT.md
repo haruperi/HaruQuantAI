@@ -24,7 +24,7 @@ HaruQuantAI is an algorithmic trading platform that turns market data into gover
 
 This document defines the target system and the contract-governed continuation of
 the existing implementation. Utils and Brokers are completed implementation
-baselines. Data's functional baseline and owner-approved sixteen-capability focused
+baselines. Data's functional baseline and owner-approved eighteen-feature focused
 architecture are implemented by `CAP-DATA-028`. Later agile phases run
 compatibility/regression gates and add only requirements that are not already
 satisfied.
@@ -52,9 +52,9 @@ satisfied.
   and the explicit 207-name package-root API. Architectural acceptance of
   `CAP-DATA-026` was withdrawn because fourteen horizontal module folders and ten
   usage programs do not satisfy one feature = one module folder = one usage program.
-  `CAP-DATA-028` implements the approved sixteen-capability corrective target.
+  `CAP-DATA-028` implements the approved eighteen-feature corrective target.
   Feature-owned contracts and behavior live in their focused owners, removed
-  horizontal paths have no compatibility shims, and exactly sixteen numbered usage
+  horizontal paths have no compatibility shims, and exactly eighteen numbered usage
   programs supply deterministic evidence. Data is `Completed`: package-local
   implementation, validation, the production-consumer package-root boundary,
   standalone usage evidence, and the approved MT5 demo-provider validation pass. The
@@ -189,7 +189,7 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Boundaries**: Foundation layer with no trading decision logic. Brokers continues to own provider adapter implementations and connection/session mechanics. Data's package-root retrieval facade may privately and lazily compose a read-only adapter through the Brokers factory from Utils-loaded settings; manual adapter/source injection remains supported. Data does not expose that composition, invoke broker mutations, own strategy logic, backtest engines, sizing formulas, order dispatch, or other domains' tables, artifact schemas, and migration definitions (each domain owns its tables, artifact schemas, and migration definitions, utilizing the shared execution framework). Raw provider DataFrames, sockets, DB sessions, credentials, adapters, and provider SDK objects never cross its boundary. Data may explicitly project canonical bar or tick `MarketDataset` evidence into detached analytical DataFrames whose exact columns, missingness, units, and precision-loss boundaries are fixed in the Data README; the canonical dataset remains authoritative evidence.
 * **Key Limits**: Backfill chunks must be bounded and checkpointed; exclusive path-scoped write locks (`CONCURRENT_WRITE_LOCKED` on conflict); no-lookahead alignment by default; all broker/provider access is read-only and routed through Brokers. MT5 tick mode is independent of display timeframe and fails explicitly if a saturated read prevents proof of completeness; bar mode publishes closed bars only at the selected timeframe boundary. Quality evidence attached to a `MarketDataset` must be computed from the actual records; a constant or unexamined quality score is never emitted.
 * **Market-time authority**: Data owns broker-independent market-hour evaluation. Brokers supplies provider-authored symbol sessions (including cTrader weekly intervals and holidays); exchange-traded instruments require an explicit exchange calendar identifier; providers without a session API may use only an explicit revisioned weekly definition. Named Sydney/Tokyo/London/New York sessions are analytical liquidity labels and never establish tradability or order authority.
-* **Module structure**: All sixteen focused capabilities are complete, including `FEAT-DATA-16` `research_sources/` point-in-time evidence. Each registered capability owns exactly one folder and one standalone usage program. Historical interpretation remains owned by Research/Agentic.
+* **Module structure**: All eighteen focused capabilities are complete, including `FEAT-DATA-16` point-in-time evidence, `FEAT-DATA-17` runtime persistence adapters, and `FEAT-DATA-18` application-triggered artifact/reference catalog operations. Each registered capability owns exactly one folder and one standalone usage program. Historical interpretation remains owned by Research/Agentic.
 * **Documentation**: `app/services/data/README.md`
 
 #### 2.1.4 Indicators
@@ -1123,7 +1123,7 @@ Each persisted or long-lived state has exactly one owning domain. Data owns the 
 | Completed   | Simulation results and artifacts                                                                                                                                                                                                    | `Simulation`     | `Analytics`, `Optimization`, `Portfolio`, `UI/API` via `SimulationResult` / `PortfolioSimulationResult`                    | `Simulation` only                                                  | Incomplete runs never published                                                                                                                                 |
 | Completed | Optimization checkpoints and results                                                                                                                                                                                                | `Optimization`   | `UI/API` via `OptimizationResult`                                                                                                  | `Optimization` only                                                | Atomic checkpointing                                                                                                                                            |
 | Completed | Research artifacts                                                                                                                                                                                                                  | `Research`       | `UI/API` via `ResearchReport`                                                                                                      | `Research` only                                                    | SHA-256 config hashes stored with artifacts                                                                                                                     |
-| Missing   | Artifact catalog: instrument, provider, and session reference data; logical dataset registry; per-artifact index over written files; fetch and quality-event logs | `Data` | All consuming domains via Data catalog reads | `Data` only | Indexes artifacts written by the Data artifact writer. Every column is derivable from an artifact's sidecar manifest, so the catalog is a rebuildable index and the sidecar remains the record of truth; an artifact that fails hash verification blocks reads of its dataset |
+| Completed | Artifact catalog: instrument, provider, and session reference data; logical dataset registry; per-artifact index over written files; fetch and quality-event logs | `Data` | All consuming domains via Data package-root catalog reads | `Data` only | Application-triggered operations synchronize explicit reference evidence, atomically index committed artifacts, append bounded fetch/quality evidence, rebuild from authoritative sidecars, and fail closed on hash mismatch |
 | Completed | Indicator definitions, parameter sets, and materialisation references                                                                                                                                                              | `Indicators`     | `Strategy`, `Research`, `Agentic` via registered Indicators contracts                                                                  | `Indicators` only                                                   | Definitions and parameter sets are reference data; computed series are materialised to Parquet and referenced by `dataset_id`, never stored as rows. A formula change produces a new definition rather than rewriting history |
 | Completed | Utils persisted state                                                                                                                                                                                                               | `Utils`          | —                                                                                                                                     | —                                                                   | Verified absence: `app/utils` is the shared utility framework imported by every domain, so owning writable state would invert the system dependency direction. Logging and metrics go to rotating files, scheduling is Data-owned, bootstrap configuration is resolved from typed settings, and UI/API owns post-connection scoped settings state |
 | Completed | Analytics derived metric store: metric definitions and values, closed round-trip trade analysis, PnL attribution, equity-curve summaries, generated reports                                                                          | `Analytics`      | `UI/API` via Analytics report contracts                                                                                              | `Analytics` only                                                    | Derived and recomputable state only; Analytics owns no authoritative business state. Every row records the `source_hash` of its inputs so a stale value is detectable. Round-trip excursion analysis (MAE/MFE) has no other owner — Trading owns fills, not round trips |
@@ -1327,7 +1327,7 @@ The audit matrix is the system-level record of per-domain conformance.
 | 0. System | - | [ ] | - | - | - | - | [ ] | [ ] | [ ] | [ ] | - | - | |
 | 1. Utils | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | REG `app/utils/README.md:122`; TASK `app/utils/README.md:880`; GATE `app/utils/__init__.py:57`; FUNC `app/utils/__init__.py:57`; DEEP `app/services/data/_settings.py:18`; ROOT `app/utils/__init__.py:1`; USE `tests/utils/integration/test_usage_scripts.py:7`; WFE `tests/utils/usage/workflows/run_all.py:10`; UT `tests/utils/unit/test_logger.py:1`; IT `tests/utils/integration/test_import_safety.py:14`; COV `app/utils/README.md:872`; HYG `tests/utils/unit/test_boundaries.py:171` |
 | 2. Brokers | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 3. Data | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 3. Data | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | REG `tests/data/structural/test_import_graph.py:138`; TASK `app/services/data/README.md:2572`; GATE `app/services/data/__init__.py:306`; FUNC `tests/data/unit/test_api.py:11`; DEEP `tests/data/structural/test_import_graph.py:307`; ROOT `tests/data/structural/test_import_graph.py:149`; USE `tests/data/structural/test_import_graph.py:199`; WFE `tests/data/unit/test_workflow_usage_parity.py:51`; UT `tests/data/unit/test_api.py:9`; IT `tests/data/integration/test_database_boundary.py:16`; COV `app/services/data/README.md:2604`; HYG `tests/data/unit/test_standard_responses.py:305` |
 | 4. Indicators | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 5. Strategy | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 6. Risk | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
@@ -1336,12 +1336,12 @@ The audit matrix is the system-level record of per-domain conformance.
 | 9. Analytics | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 10. Optimization | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 11. Research | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 12. Portfolio | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 12. Portfolio | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 13. Agentic | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 14. UI-API | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 15. Configs | - | [ ] | - | - | - | - | - | - | - | - | [ ] | [ ] |
-| 16. UI | - | - | - | - | - | - | - | [ ] | [ ] | [ ] | - | |
-| 17. Schema Model | - | - | - | - | - | - | - | - | - | - | - | |
+| 15. Configs | - | [ ] | - | - | - | - | - | - | - | - | [ ] | [ ] | |
+| 16. UI | - | - | - | - | - | - | - | [ ] | [ ] | [ ] | - | - | |
+| 17. Schema Model | - | - | - | - | - | - | - | - | - | - | - | - | |
 
 Tier 1 dimension definitions:
 
@@ -1361,26 +1361,26 @@ Tier 1 dimension definitions:
 
 #### Tier 2 — reviewed conformance
 
-| Row | DB | SCHEMA | CONTRACT | LOG | SAFE | QUANT | NFR | DOCS | UI | Evidence |
-| --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | --- |
-| 0. System | - | - | [ ] | - | [ ] | [ ] | [ ] | [ ] | - | |
-| 1. Utils | - | - | OK | OK | OK | OK | OK | OK | - | CONTRACT `tests/utils/integration/test_auth_context_compatibility.py:1`; LOG `tests/utils/integration/test_structured_logging.py:12`; SAFE `app/utils/settings/models.py:258`; QUANT `app/utils/README.md:754`; NFR `app/utils/README.md:882`; DOCS `docs/CHANGELOG.md:5` |
-| 2. Brokers | - | - | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 3. Data | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 4. Indicators | - | - | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 5. Strategy | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 6. Risk | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 7. Trading | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 8. Simulator | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 9. Analytics | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 10. Optimization | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 11. Research | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 12. Portfolio | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 13. Agentic | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 14. UI-API | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 15. Configs | - | - | [ ] | - | [ ] | - | - | [ ] | [ ] | |
-| 16. UI | - | - | [ ] | [ ] | [ ] | - | [ ] | [ ] | [ ] | |
-| 17. Schema Model | [ ] | [ ] | - | - | - | - | [ ] | [ ] | - | |
+| Row | DB | SCHEMA | REACH | CONTRACT | LOG | SAFE | QUANT | NFR | DOCS | UI | Evidence |
+| --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | --- |
+| 0. System | - | - | - | [ ] | - | [ ] | [ ] | [ ] | [ ] | - | |
+| 1. Utils | - | - | - | OK | OK | OK | OK | OK | OK | - | CONTRACT `tests/utils/integration/test_auth_context_compatibility.py:1`; LOG `tests/utils/integration/test_structured_logging.py:12`; SAFE `app/utils/settings/models.py:258`; QUANT `app/utils/README.md:754`; NFR `app/utils/README.md:882`; DOCS `docs/CHANGELOG.md:5` |
+| 2. Brokers | - | - | - | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 3. Data | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `tests/data/unit/test_persistence_migrations.py:82`, `tests/data/unit/test_persistence_migrations.py:225`; SCHEMA `docs/schema/05_reconciliation.md:355`; REACH `tests/data/structural/test_catalog_table_reachability.py:9`, `app/services/data/artifact_catalog/operations.py:40`, `app/services/data/economic_calendar/service.py:85`, `tests/data/component/test_economic_calendar_ingestion.py:38`; CONTRACT `tests/data/integration/test_contract_boundaries.py:34`; LOG `app/services/data/sources/composition.py:371`, `app/services/data/sources/broker_adapter.py:452`; SAFE `tests/data/unit/test_account_state.py:22`, `tests/data/unit/test_errors.py:8`; QUANT `tests/data/unit/test_synthetic.py:25`, `tests/data/unit/test_ticks.py:273`; NFR `app/services/data/README.md:2556`; DOCS `app/services/data/README.md:2600`, `docs/CHANGELOG.md:5`; UI `app/services/api/routes/dashboards.py:95`, `app/ui/src/clients/routes.ts:264` |
+| 4. Indicators | - | - | - | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 5. Strategy | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 6. Risk | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 7. Trading | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 8. Simulator | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 9. Analytics | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 10. Optimization | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 11. Research | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 12. Portfolio | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 13. Agentic | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 14. UI-API | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
+| 15. Configs | - | - | - | [ ] | - | [ ] | - | - | [ ] | [ ] | |
+| 16. UI | - | - | - | [ ] | [ ] | [ ] | - | [ ] | [ ] | [ ] | |
+| 17. Schema Model | [ ] | [ ] | [ ] | - | - | - | - | [ ] | [ ] | - | |
 
 Tier 2 dimension definitions:
 
@@ -1388,6 +1388,7 @@ Tier 2 dimension definitions:
 | --- | --- | --- |
 | `DB` | Migrations run through the authoritative manifest with ledger verification, write locks, checksum validation, and transactional execution | `AGENTS.md` §5 |
 | `SCHEMA` | Target-vs-live reconciliation is current; divergences between `docs/schema/` and applied migrations are stated | `AGENTS.md` §4 |
+| `REACH` | Every table declared by the current domain is traced from its CRUD SQL builder or executor to a production application operation outside `persistence/` | `AGENTS.md` §1, §5 |
 | `CONTRACT` | Shared contracts are documented, owned, versioned, and covered by producer–consumer compatibility tests | Section 5 |
 | `LOG` | `logger` used at workflow boundaries, public entry points, external interactions, state transitions, side effects, decisions, retries, and failures, with no secret exposure | `AGENTS.md` §2 |
 | `SAFE` | Fail-closed under uncertainty, non-bypassable kill switch, no live action by default, environment boundaries enforced, credential hygiene | `AGENTS.md` §3 |
@@ -1406,6 +1407,15 @@ Tier 2 dimension definitions:
   dimension does not apply to that audit object and require no evidence.
 - This matrix records conformance. It does not restate feature status, which
   remains owned by the `### Feature Registry` of each package README.
+- `REACH` evidence must record the complete chain from a declared table through
+  its CRUD SQL builder or executor to a production caller outside `persistence/`
+  and the owning domain application operation. SQL declarations, statement
+  builders, CRUD exports, lifecycle-name mappings, or package-root `__all__`
+  membership alone do not prove application use.
+- Infrastructure tables, including migration ledgers and write locks, qualify
+  only when the evidence reaches the production migration or lock workflow that
+  invokes them. Test-only callers do not satisfy `REACH` without a corresponding
+  production caller.
 
 ---
 
@@ -1507,8 +1517,8 @@ The system is complete only when:
 - [ ] All tests and quality checks pass.
 
 Current status: `Missing` — the complete target system and system workflows are not
-implemented. Utils and Brokers are completed implementation baselines; Data is a
-partial implementation baseline. Indicators and the
+implemented. Utils, Brokers, and Data are completed domain implementation baselines;
+the overall system remains missing independently of those domain statuses. Indicators and the
 remaining domains are tracked independently, and current repository-wide
 documentation-quality cleanup does not erase completed functional domain evidence.
 

@@ -3,11 +3,11 @@
 # ruff: noqa: INP001
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from typing import Any
 
-from app.services.data.evidence.account_contracts import (
-    AccountOrder,
-    AccountPosition,
-    AccountStateSnapshot,
+from app.services.data import (
+    build_account_order,
+    build_account_state_snapshot,
 )
 from app.services.trading.contracts import TradingRequest
 from app.services.trading.validation import validate_order_request
@@ -50,9 +50,9 @@ def _request() -> TradingRequest:
     )
 
 
-def _account() -> AccountStateSnapshot:
+def _account() -> Any:
     """Build current connected Data-owned account evidence."""
-    return AccountStateSnapshot(
+    return build_account_state_snapshot(
         account_id="account-001",
         currency="USD",
         balances=(),
@@ -115,21 +115,34 @@ def test_invalid_order_never_reaches_authority() -> None:
     assert unit_error.status == "error"
     assert unit_error.error is not None
     assert unit_error.error.code == "VALIDATION_FAILED"
-    order = AccountOrder(
+    order = build_account_order(
         order_id="order-001",
         symbol="EURUSD",
         side="BUY",
         state="pending",
         quantity=Decimal("1.00"),
     )
-    position = AccountPosition(
-        position_id="position-001",
-        symbol="EURUSD",
-        side="LONG",
-        quantity=Decimal("1.00"),
-    )
-    addressed_account = _account().model_copy(
-        update={"orders": (order,), "positions": (position,)}
+    addressed_account = build_account_state_snapshot(
+        account_id="account-001",
+        currency="USD",
+        balances=(),
+        equity=Decimal(10000),
+        margin_available=Decimal(9000),
+        positions=(
+            {
+                "position_id": "position-001",
+                "symbol": "EURUSD",
+                "side": "LONG",
+                "quantity": Decimal("1.00"),
+            },
+        ),
+        orders=(order,),
+        connected=True,
+        trading_allowed=True,
+        source_id="simulator",
+        snapshot_at=NOW,
+        expires_at=NOW + timedelta(minutes=1),
+        request_id="req-dd37fc1c-2cd6-4d66-9f9a-7a7f9a2482ef",
     )
     modify_order = valid.model_copy(
         update={

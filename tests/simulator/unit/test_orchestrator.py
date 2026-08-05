@@ -46,8 +46,9 @@ def _dataset(request_id: str) -> Any:
         for index in range(2)
     )
     quality = build_data_quality_report(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=2,
         checked_count=2,
         truncated=False,

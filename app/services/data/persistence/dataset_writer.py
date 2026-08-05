@@ -217,7 +217,10 @@ def _check_overwrite_and_quality(
             request_id=request.request_id,
         )
 
-    if request.dataset.quality_report.quality_status == "failed":
+    if request.dataset.quality_report.quality_decision in {
+        "rejected",
+        "not_evaluated",
+    }:
         raise DataError(
             "DATA_QUALITY_FAILED",
             safe_details={
@@ -336,6 +339,11 @@ def _save_dataset_raw(
         DataError: For permission, validation, or write failures.
     """
     logger.info("Saving one canonical DATA dataset")
+    # Catalog registration is mandatory for new writes, so ensure the complete
+    # immutable Data manifest is present before committing filesystem evidence.
+    from app.services.data.persistence.migrations import _run_data_migrations_raw
+
+    _run_data_migrations_raw(request.request_id)
     data_dir = _resolve_data_dir(request.request_id)
     approved = _resolve_approved_roots(data_dir, request.request_id)
     absolute_path = (data_dir / request.relative_path).resolve()
@@ -358,9 +366,22 @@ def _save_dataset_raw(
     # Lock target to ensure exclusive lease
     with _acquire_write_lock_raw(absolute_path, request_id=request.request_id):
         try:
-            return _atomic_write_dataset(
+            manifest = _atomic_write_dataset(
                 df, request, absolute_path, manifest_path, clock
             )
+            # The sidecar is authoritative; the catalog is its rebuildable index.
+            # Registration occurs only after both files have committed and hashed.
+            from app.services.data.artifact_catalog.operations import (
+                register_catalog_artifact,
+            )
+
+            register_catalog_artifact(
+                request.dataset,
+                manifest,
+                byte_size=absolute_path.stat().st_size,
+                request_id=request.request_id,
+            )
+            return manifest
         except Exception as error:
             logger.exception("Dataset save failed")
             if isinstance(error, DataError):

@@ -15,6 +15,13 @@ from __future__ import annotations
 
 import hashlib
 
+from app.services.data.migrations.data_jobs import DATA_JOBS_ENVIRONMENT_MIGRATION_STEP
+from app.services.data.migrations.economic_calendar import (
+    ECONOMIC_CALENDAR_V2_MIGRATION_STEP,
+)
+from app.services.data.migrations.economic_event_definitions import (
+    ECONOMIC_EVENT_DEFINITIONS_MIGRATION_STEP,
+)
 from app.services.data.migrations.research_sources import (
     RESEARCH_PROVIDER_MIGRATION_STEP,
     RESEARCH_SOURCE_MIGRATION_STEP,
@@ -438,4 +445,7 @@ DATA_MIGRATION_STEPS = (
         checksum=_schema_checksum(_CATALOG_SCHEMA_STATEMENTS),
         statements=_CATALOG_SCHEMA_STATEMENTS,
     ),
+    ECONOMIC_CALENDAR_V2_MIGRATION_STEP,
+    DATA_JOBS_ENVIRONMENT_MIGRATION_STEP,
+    ECONOMIC_EVENT_DEFINITIONS_MIGRATION_STEP,
 )

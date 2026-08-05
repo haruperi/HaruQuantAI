@@ -43,7 +43,7 @@ def _bar(index: int) -> OHLCVRecord:
 def _dataset(
     bar_count: int = 20,
     timeframe: str = "M5",
-    quality_status: str = "passed",
+    quality_decision: str = "accepted",
 ) -> MarketDataset:
     """Build one normalized bar dataset for validation-layer tests."""
     records = tuple(_bar(i) for i in range(bar_count)) if bar_count else ()
@@ -56,11 +56,14 @@ def _dataset(
     else:
         start = end = available_at = _START
     quality = DataQualityReport(
-        quality_status=quality_status,  # type: ignore[arg-type]
-        quality_score=Decimal("1.0"),
+        quality_status=("critical" if quality_decision == "rejected" else "perfect"),
+        quality_decision=quality_decision,  # type: ignore[arg-type]
+        quality_score=(
+            Decimal("0.00") if quality_decision == "rejected" else Decimal("100.00")
+        ),
         issues=(
             ()
-            if quality_status != "failed"
+            if quality_decision != "rejected"
             else (
                 {
                     "code": "X",
@@ -229,10 +232,10 @@ def test_validate_indicator_accepts_short_non_empty_dataset() -> None:
     assert spec.indicator_id == "sma"
 
 
-def test_validate_indicator_rejects_failed_quality() -> None:
-    """Precedence 8: a failed Data quality status is rejected."""
+def test_validate_indicator_rejects_rejected_quality() -> None:
+    """Precedence 8: a rejected Data quality decision is rejected."""
     assert_error(
-        validate_indicator("sma", _dataset(quality_status="failed"), _config()),
+        validate_indicator("sma", _dataset(quality_decision="rejected"), _config()),
         "IND_INVALID_INPUT_SCHEMA",
     )
 
@@ -254,8 +257,9 @@ def test_validate_indicator_rejects_non_positive_rolling_volatility_source() -> 
     )
     records = (zero_price_bar, *(_bar(i) for i in range(1, 3)))
     quality = DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal("1.0"),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=len(records),
         checked_count=len(records),
         truncated=False,

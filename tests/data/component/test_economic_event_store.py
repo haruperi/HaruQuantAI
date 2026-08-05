@@ -1,4 +1,4 @@
-"""Unit tests for the `data_economic_events` SQLite store (FR-DATA-128).
+"""Component tests for the `data_economic_events` SQLite store (FR-DATA-128).
 
 DB configuration follows the same monkeypatch pattern as the DATA
 persistence migration tests (see ``test_persistence_migrations.py``).
@@ -156,9 +156,9 @@ def test_upsert_preserves_original_schedule_when_release_moves(
                 plan=StatementPlan(
                     statements=(
                         "SELECT scheduled_at, original_scheduled_at "
-                        "FROM data_economic_events WHERE provider_event_id = ?",
+                        "FROM data_economic_events WHERE event_id = ?",
                     ),
-                    parameter_sets=((original.id,),),
+                    parameter_sets=((f"{original.provider}:{original.id}",),),
                     max_rows=1,
                 ),
                 request_id=generate_id("req"),

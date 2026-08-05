@@ -37,6 +37,8 @@ class EconomicEvent:
         country: ISO-3166-1 alpha-2 country code, when known.
         currency: ISO-4217 currency code, when known.
         scheduled_at: Timezone-aware UTC release time.
+        original_scheduled_at: First observed UTC release time, retained when
+            the provider reschedules an event.
         impact: Normalized impact level.
         actual: Released numeric value, when available.
         forecast: Forecasted numeric value, when available.
@@ -49,6 +51,14 @@ class EconomicEvent:
         unit: Optional unit label (e.g. ``"%"`` or ``"K"``).
         source: Original provider/site name.
         source_url: Optional originating URL.
+        provider_definition_id: Stable provider event-definition identity.
+        source_original: Original publisher or institution URL.
+        source_latest: Provider's latest-release URL.
+        measures: Provider description of the measured quantity.
+        effect: Provider description of the usual currency effect.
+        frequency: Provider release-frequency description.
+        also_called: Alternative event name.
+        event_type: Provider event classification.
         updated_at: Optional last-mutated timestamp for stored events.
     """
 
@@ -60,6 +70,7 @@ class EconomicEvent:
     currency: str | None
     scheduled_at: datetime
     impact: EventImpact
+    original_scheduled_at: datetime | None = None
     actual: Decimal | None = None
     forecast: Decimal | None = None
     previous: Decimal | None = None
@@ -70,6 +81,14 @@ class EconomicEvent:
     unit: str | None = None
     source: str | None = None
     source_url: str | None = None
+    provider_definition_id: str | None = None
+    source_original: str | None = None
+    source_latest: str | None = None
+    measures: str | None = None
+    effect: str | None = None
+    frequency: str | None = None
+    also_called: str | None = None
+    event_type: str | None = None
     updated_at: datetime | None = None
 
     def __post_init__(self) -> None:
@@ -89,7 +108,7 @@ class EconomicEvent:
             if value is not None and (value != value.strip() or value != value.upper()):
                 detail = f"{field_name} must be an uppercase trimmed code"
                 raise ValueError(detail)
-        for field_name in ("scheduled_at", "updated_at"):
+        for field_name in ("scheduled_at", "original_scheduled_at", "updated_at"):
             value = getattr(self, field_name)
             if value is not None and (
                 value.tzinfo is None or value.utcoffset() != timedelta(0)
@@ -120,6 +139,11 @@ def project_economic_event(event: EconomicEvent) -> dict[str, Any]:
         "country": event.country,
         "currency": event.currency,
         "scheduled_at": event.scheduled_at.isoformat(),
+        "original_scheduled_at": (
+            None
+            if event.original_scheduled_at is None
+            else event.original_scheduled_at.isoformat()
+        ),
         "impact": event.impact.name.lower(),
         "actual": None if event.actual is None else str(event.actual),
         "forecast": None if event.forecast is None else str(event.forecast),
@@ -133,6 +157,14 @@ def project_economic_event(event: EconomicEvent) -> dict[str, Any]:
         "unit": event.unit,
         "source": event.source,
         "source_url": event.source_url,
+        "provider_definition_id": event.provider_definition_id,
+        "source_original": event.source_original,
+        "source_latest": event.source_latest,
+        "measures": event.measures,
+        "effect": event.effect,
+        "frequency": event.frequency,
+        "also_called": event.also_called,
+        "event_type": event.event_type,
         "updated_at": (
             None if event.updated_at is None else event.updated_at.isoformat()
         ),

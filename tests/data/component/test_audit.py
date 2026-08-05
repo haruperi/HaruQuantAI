@@ -1,4 +1,4 @@
-"""Unit tests for governed local audit event logging and queries.
+"""Component tests for governed local audit event logging and queries.
 
 [CAP-DATA-026 Phase 2] Copy of the legacy storage test, re-pointed at the
 new `persistence`/`audit` modules. The legacy copy still guards `storage/`

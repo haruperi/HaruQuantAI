@@ -284,10 +284,10 @@ def _validate_input_schema(data: MarketDataset) -> None:
             IndicatorErrorCode.IND_INVALID_INPUT_SCHEMA,
             "dataset must contain only bar records",
         )
-    if data.quality_report.quality_status == "failed":
+    if data.quality_report.quality_decision in {"rejected", "not_evaluated"}:
         raise IndicatorError(
             IndicatorErrorCode.IND_INVALID_INPUT_SCHEMA,
-            "dataset quality status is failed",
+            "dataset quality decision is not approved",
         )
 
 

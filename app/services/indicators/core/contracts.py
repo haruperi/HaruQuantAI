@@ -22,7 +22,22 @@ type StandardResponse[T] = Any
 class _DataQualityReport(Protocol):
     """Private structural view of Data-owned quality evidence."""
 
-    quality_status: Literal["passed", "passed_with_warnings", "failed", "not_checked"]
+    quality_status: Literal[
+        "perfect",
+        "excellent",
+        "good",
+        "degraded",
+        "poor",
+        "critical",
+        "not_checked",
+    ]
+    quality_decision: Literal[
+        "accepted",
+        "accepted_with_warnings",
+        "review_required",
+        "rejected",
+        "not_evaluated",
+    ]
     quality_score: Decimal
     schema_version: str
 

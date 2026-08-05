@@ -51,8 +51,9 @@ def _unwrap(response: object) -> object:
 def _quality(count: int) -> DataQualityReport:
     """Return passing quality evidence for a bounded fixture."""
     return DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal(1),
+        quality_status="perfect" if count else "not_checked",
+        quality_decision="accepted" if count else "not_evaluated",
+        quality_score=Decimal(100) if count else Decimal(0),
         record_count=count,
         checked_count=count,
         truncated=False,

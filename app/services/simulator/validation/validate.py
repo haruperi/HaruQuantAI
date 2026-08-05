@@ -201,7 +201,7 @@ def validate_market_data(
         _raise("SIM_LOOKAHEAD_DETECTED", "Market dataset is not yet available")
     if context.evaluated_at - dataset.available_at > context.maximum_staleness:
         _raise("SIM_DATA_STALE", "Market dataset is stale")
-    if dataset.quality_report.quality_status in {"failed", "not_checked"}:
+    if dataset.quality_report.quality_decision in {"rejected", "not_evaluated"}:
         _raise("SIM_DATA_SCHEMA_INVALID", "Market dataset quality is not approved")
     _validate_records(dataset)
     tick_model = dataset.source_metadata.get("tick_generation_model", "")

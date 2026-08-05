@@ -21,6 +21,12 @@
           "title": "Checked Count",
           "type": "integer"
         },
+        "contract_version": {
+          "const": "v2",
+          "default": "v2",
+          "title": "Contract Version",
+          "type": "string"
+        },
         "generated_at": {
           "format": "date-time",
           "title": "Generated At",
@@ -33,6 +39,17 @@
           },
           "title": "Issues",
           "type": "array"
+        },
+        "quality_decision": {
+          "enum": [
+            "accepted",
+            "accepted_with_warnings",
+            "review_required",
+            "rejected",
+            "not_evaluated"
+          ],
+          "title": "Quality Decision",
+          "type": "string"
         },
         "quality_score": {
           "anyOf": [
@@ -48,9 +65,12 @@
         },
         "quality_status": {
           "enum": [
-            "passed",
-            "passed_with_warnings",
-            "failed",
+            "perfect",
+            "excellent",
+            "good",
+            "degraded",
+            "poor",
+            "critical",
             "not_checked"
           ],
           "title": "Quality Status",
@@ -83,6 +103,7 @@
       },
       "required": [
         "quality_status",
+        "quality_decision",
         "quality_score",
         "record_count",
         "checked_count",

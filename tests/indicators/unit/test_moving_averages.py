@@ -62,8 +62,9 @@ def _dataset_from_bars(bars: list[dict], *, timeframe: str = "M5") -> MarketData
         for bar in bars
     )
     quality = DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal("1.0"),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=len(records),
         checked_count=len(records),
         truncated=False,
@@ -129,8 +130,9 @@ def _dataset(closes: list[float]) -> MarketDataset:
     """
     records = tuple(_bar(i, close) for i, close in enumerate(closes))
     quality = DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal("1.0"),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=len(records),
         checked_count=len(records),
         truncated=False,

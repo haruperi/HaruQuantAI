@@ -83,6 +83,51 @@ class _Provider:
         )
 
 
+class _Store:
+    """Fast database-port fake preserving query-before-acquire ordering."""
+
+    def __init__(
+        self, events: Sequence[EconomicEvent] = (), *, covered: bool = False
+    ) -> None:
+        self.events = list(events)
+        self.covered = covered
+        self.queries = 0
+
+    def missing_intervals(self, start, end, *, request_id):
+        del request_id
+        return () if self.covered else ((start, end),)
+
+    def upsert(self, events, *, request_id):
+        self.events = list(events)
+        return build_data_response(
+            operation="data.economic_calendar.economic_event_store.upsert",
+            request_id=request_id,
+            start_time=data_start_time(),
+            data=len(self.events),
+        )
+
+    def record_coverage(self, *_args, **_kwargs):
+        self.covered = True
+
+    def query(self, start, end, **kwargs):
+        self.queries += 1
+        currencies = kwargs.get("currencies")
+        minimum = kwargs.get("minimum_impact")
+        events = [
+            event
+            for event in self.events
+            if start <= event.scheduled_at < end
+            and (not currencies or event.currency in currencies)
+            and (minimum is None or event.impact >= minimum)
+        ]
+        return build_data_response(
+            operation="data.economic_calendar.economic_event_store.query",
+            request_id=kwargs["request_id"],
+            start_time=data_start_time(),
+            data=events,
+        )
+
+
 def test_get_economic_events_defensively_filters_provider_rows() -> None:
     """Service applies currency and impact filters even if a provider ignores them."""
     provider = _Provider(
@@ -102,6 +147,7 @@ def test_get_economic_events_defensively_filters_provider_rows() -> None:
                 _AT - timedelta(hours=1),
                 _AT + timedelta(hours=1),
                 provider=provider,
+                store=_Store(),
                 currencies=("USD",),
                 minimum_impact=EventImpact.HIGH,
             )
@@ -123,6 +169,7 @@ def test_get_symbol_events_accepts_currency_match_without_country() -> None:
                 _AT - timedelta(hours=1),
                 _AT + timedelta(hours=1),
                 provider=provider,
+                store=_Store(),
             )
         )
     )
@@ -142,6 +189,7 @@ def test_news_restriction_includes_exact_before_boundary() -> None:
                 "EURUSD",
                 _AT,
                 provider=provider,
+                store=_Store(),
                 minutes_before=10,
                 minutes_after=5,
             )
@@ -164,3 +212,25 @@ def test_service_rejects_non_utc_window() -> None:
                 )
             )
         )
+
+
+def test_complete_database_coverage_prevents_provider_call() -> None:
+    """Complete stored coverage is returned without external acquisition."""
+    event = _event(scheduled_at=_AT)
+    provider = _Provider(())
+    store = _Store((event,), covered=True)
+
+    events = _unwrap(
+        asyncio.run(
+            get_economic_events(
+                _AT - timedelta(hours=1),
+                _AT + timedelta(hours=1),
+                provider=provider,
+                store=store,
+            )
+        )
+    )
+
+    assert events == [event]
+    assert provider.calls == []
+    assert store.queries == 1

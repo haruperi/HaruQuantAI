@@ -36,8 +36,9 @@ def _sample_dataset() -> MarketDataset:
     """Construct a minimal valid MarketDataset for testing."""
     now = datetime.now(UTC)
     quality = DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal("1.0"),
+        quality_status="not_checked",
+        quality_decision="not_evaluated",
+        quality_score=Decimal(0),
         issues=(),
         warnings=(),
         record_count=0,

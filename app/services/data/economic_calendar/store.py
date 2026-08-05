@@ -24,8 +24,13 @@ from app.services.data.contracts.responses import (
     run_data_operation,
 )
 from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
+from app.services.data.economic_calendar.normalization import (
+    normalize_calendar_number,
+)
 from app.services.data.persistence import (
+    read_economic_calendar_coverage_records,
     read_economic_event_records,
+    update_economic_calendar_coverage_record,
     update_economic_event_records,
 )
 from app.utils import generate_id, get_logger
@@ -34,6 +39,7 @@ logger = get_logger(__name__)
 
 _REFRESH_NEXT_7_DAYS: Final[int] = 7
 _REFRESH_NEXT_24_HOURS: Final[int] = 24
+_CURRENCY_CODE_LENGTH: Final[int] = 3
 
 
 def _iso(value: datetime | None) -> str | None:
@@ -53,13 +59,6 @@ def _parse_dt(value: str | None) -> datetime | None:
     return parsed.astimezone(UTC)
 
 
-def _dec(value: str | None) -> Decimal | None:
-    """Re-parse one stored Decimal text exactly."""
-    if value is None:
-        return None
-    return Decimal(value)
-
-
 def _opt_str(row: dict[str, object], key: str) -> str | None:
     """Return one optional row value as a string or None.
 
@@ -74,29 +73,36 @@ def _opt_str(row: dict[str, object], key: str) -> str | None:
     return None if value is None else str(value)
 
 
-def _to_row(event: EconomicEvent) -> tuple[str | int | None, ...]:
+def _exact_value(raw: str | None, numeric: Decimal | None) -> str | None:
+    """Prefer exact provider text and fall back to normalized decimal text."""
+    return str(numeric) if numeric is not None else raw
+
+
+def _event_id(event: EconomicEvent) -> str:
+    """Return one provider-qualified stable event identity."""
+    prefix = f"{event.provider}:"
+    return event.id if event.id.startswith(prefix) else f"{prefix}{event.id}"
+
+
+def _to_row(event: EconomicEvent, *, request_id: str) -> tuple[str | int | None, ...]:
     """Pack one `EconomicEvent` for the upsert parameter set."""
     return (
-        event.provider,
-        event.id,
+        _event_id(event),
         event.name,
-        event.category,
-        event.country,
-        event.currency,
+        event.currency or event.country or "ALL",
         _iso(event.scheduled_at),
-        _iso(event.scheduled_at),
-        str(event.actual) if event.actual is not None else None,
-        str(event.forecast) if event.forecast is not None else None,
-        str(event.previous) if event.previous is not None else None,
-        str(event.revised_previous) if event.revised_previous is not None else None,
-        event.actual_raw,
-        event.forecast_raw,
-        event.previous_raw,
-        event.unit,
-        event.source,
-        event.source_url,
+        _iso(event.original_scheduled_at or event.scheduled_at),
         int(event.impact),
-        _iso(event.updated_at),
+        _exact_value(event.actual_raw, event.actual),
+        _exact_value(event.forecast_raw, event.forecast),
+        _exact_value(event.previous_raw, event.previous),
+        None if event.revised_previous is None else str(event.revised_previous),
+        event.provider,
+        event.source_url,
+        _iso(event.original_scheduled_at or event.updated_at or event.scheduled_at),
+        _iso(event.updated_at or datetime.now(UTC)),
+        request_id,
+        event.provider_definition_id,
     )
 
 
@@ -131,30 +137,44 @@ def _from_row_raw(row: dict[str, object]) -> EconomicEvent:
     """
     try:
         provider = _required_text(row, "provider")
-        provider_event_id = _required_text(row, "provider_event_id")
+        stored_id = _required_text(row, "event_id")
+        provider_event_id = stored_id.removeprefix(f"{provider}:")
+        scope = _required_text(row, "country")
+        currency = (
+            scope if len(scope) == _CURRENCY_CODE_LENGTH and scope != "ALL" else None
+        )
         return EconomicEvent(
             id=provider_event_id,
             provider=provider,
-            name=_required_text(row, "name"),
-            category=None if row.get("category") is None else str(row["category"]),
-            country=None if row.get("country") is None else str(row["country"]),
-            currency=None if row.get("currency") is None else str(row["currency"]),
+            name=_required_text(row, "title"),
+            category=None,
+            country=None if currency is not None or scope == "ALL" else scope,
+            currency=currency,
             scheduled_at=_required_dt(row, "scheduled_at"),
+            original_scheduled_at=_required_dt(row, "original_scheduled_at"),
             impact=EventImpact(int(_required_text(row, "impact"))),
-            actual=_dec(_opt_str(row, "actual")),
-            forecast=_dec(_opt_str(row, "forecast")),
-            previous=_dec(_opt_str(row, "previous")),
+            actual=normalize_calendar_number(_opt_str(row, "actual")),
+            forecast=normalize_calendar_number(_opt_str(row, "forecast")),
+            previous=normalize_calendar_number(_opt_str(row, "previous")),
             revised_previous=(
                 None
                 if row.get("revised_previous") is None
                 else Decimal(str(row["revised_previous"]))
             ),
-            actual_raw=_opt_str(row, "actual_raw"),
-            forecast_raw=_opt_str(row, "forecast_raw"),
-            previous_raw=_opt_str(row, "previous_raw"),
-            unit=_opt_str(row, "unit"),
-            source=_opt_str(row, "source"),
+            actual_raw=_opt_str(row, "actual"),
+            forecast_raw=_opt_str(row, "forecast"),
+            previous_raw=_opt_str(row, "previous"),
+            unit=None,
+            source=provider,
             source_url=_opt_str(row, "source_url"),
+            provider_definition_id=_opt_str(row, "provider_definition_id"),
+            source_original=_opt_str(row, "source_original"),
+            source_latest=_opt_str(row, "source_latest"),
+            measures=_opt_str(row, "measures"),
+            effect=_opt_str(row, "effect"),
+            frequency=_opt_str(row, "frequency"),
+            also_called=_opt_str(row, "also_called"),
+            event_type=_opt_str(row, "event_type"),
             updated_at=_parse_dt(_opt_str(row, "updated_at")),
         )
     except (KeyError, ValueError, TypeError, ArithmeticError) as error:
@@ -196,7 +216,9 @@ class EconomicEventStore:
         """
         if not events:
             return 0
-        parameter_sets = tuple(_to_row(event) for event in events)
+        parameter_sets = tuple(
+            _to_row(event, request_id=request_id) for event in events
+        )
         logger.info("Upserting %d economic events", len(events))
         update_economic_event_records(
             parameter_sets,
@@ -306,6 +328,63 @@ class EconomicEventStore:
                 provider=provider,
                 request_id=request_id,
             ),
+        )
+
+    def missing_intervals(
+        self, start: datetime, end: datetime, *, request_id: str
+    ) -> tuple[tuple[datetime, datetime], ...]:
+        """Return uncovered portions of one requested UTC window."""
+        if start.tzinfo is None or end.tzinfo is None or start >= end:
+            raise DataError("VALIDATION_FAILED", safe_details={"field": "window"})
+        result = read_economic_calendar_coverage_records(
+            start=str(_iso(start)), end=str(_iso(end)), request_id=request_id
+        )
+        intervals = sorted(
+            (
+                max(start, _required_dt(dict(row), "range_start")),
+                min(end, _required_dt(dict(row), "range_end")),
+            )
+            for row in result.rows
+            if row["status"] == "complete"
+        )
+        missing: list[tuple[datetime, datetime]] = []
+        cursor = start
+        for covered_start, covered_end in intervals:
+            if covered_end <= cursor:
+                continue
+            if covered_start > cursor:
+                missing.append((cursor, covered_start))
+            cursor = max(cursor, covered_end)
+            if cursor >= end:
+                break
+        if cursor < end:
+            missing.append((cursor, end))
+        return tuple(missing)
+
+    def record_coverage(
+        self,
+        start: datetime,
+        end: datetime,
+        *,
+        provider: str,
+        source_revision: str,
+        request_id: str,
+        complete: bool = True,
+        synchronized_at: datetime | None = None,
+    ) -> None:
+        """Record one coverage interval after its event transaction succeeds."""
+        observed = synchronized_at or datetime.now(UTC)
+        update_economic_calendar_coverage_record(
+            (
+                provider,
+                str(_iso(start)),
+                str(_iso(end)),
+                "complete" if complete else "partial",
+                source_revision,
+                str(_iso(observed)),
+                request_id,
+            ),
+            request_id=request_id,
         )
 
     def _refresh_windows_raw(

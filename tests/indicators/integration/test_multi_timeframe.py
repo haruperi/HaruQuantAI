@@ -54,8 +54,9 @@ def _dataset(
         )
     records_tuple = tuple(records)
     quality = DataQualityReport(
-        quality_status="passed",
-        quality_score=Decimal("1.0"),
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
         record_count=len(records_tuple),
         checked_count=len(records_tuple),
         truncated=False,

@@ -28,8 +28,9 @@ def test_intelligence_uses_persisted_eligible_source_evidence(
 ) -> None:
     """Build bounded evidence from a real Data record, not injected Research data."""
     now = datetime(2026, 1, 2, tzinfo=UTC)
-    monkeypatch.setattr(
-        "app.services.data.research_sources.ingestion._fetch",
+    monkeypatch.setitem(
+        ingest_research_source.__globals__,
+        "_fetch",
         lambda _request: (
             b"<rss><channel><item>"
             b"<title>Federal Reserve Board growth improves while risk declines</title>"

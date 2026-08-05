@@ -28,6 +28,8 @@ EXPECTED = {
     "WF-DATA-017": "wf_data_017_external_artifact_import.py",
     "WF-DATA-018": "wf_data_018_venue_authoritative_market_hours.py",
     "WF-DATA-019": "wf_data_019_analytical_named_session_classification.py",
+    "WF-DATA-020": "wf_data_020_economic_calendar_news_restriction.py",
+    "WF-DATA-021": "wf_data_021_persistence_lifecycle.py",
     "WF-DATA-022": "wf_data_022_data_audit_trail.py",
     "WF-DATA-023": "wf_data_023_versioned_cache_lifecycle.py",
     "WF-DATA-024": "wf_data_024_quality_inspection_remediation.py",

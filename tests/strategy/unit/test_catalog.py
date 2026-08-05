@@ -3,8 +3,7 @@
 from contextlib import AbstractContextManager
 from pathlib import Path
 
-from app.services.data import data_settings_context
-from app.services.data._settings import DataSettings
+from app.services.data import build_data_settings, data_settings_context
 from app.services.strategy.contracts import (
     StrategyLifecycleStatus,
     StrategyRegistrationRequest,
@@ -32,7 +31,7 @@ def storage_context(root: Path) -> AbstractContextManager[None]:
     """
     logger.debug("Building isolated Strategy storage context")
     return data_settings_context(
-        DataSettings(
+        build_data_settings(
             database_url="sqlite:///strategy.sqlite3",
             data_dir=root,
             sqlite_busy_timeout_seconds=1.5,
