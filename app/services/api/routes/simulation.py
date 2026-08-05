@@ -11,7 +11,12 @@ from app.services.api.contracts import (
     PortfolioSimulationRunRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     SimulationRunRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
-from app.services.api.identity import require_auth_context, require_human_permission
+from app.services.api.identity import (
+    require_auth_context,
+    require_human_permission,
+    run_idempotent_write,
+)
+from app.utils import generate_id
 
 type AuthContext = Any
 type _RunSource = Callable[
@@ -81,9 +86,17 @@ def _run_backtest(
         RuntimeError: If Simulator reports an unexpected runtime failure.
     """
     require_human_permission(auth, "simulation:run")
-    _require_idempotency(idempotency_key)
+    key = _require_idempotency(idempotency_key)
     try:
-        return source("run", request, auth)
+        return run_idempotent_write(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/simulation/run",
+            key=key,
+            request_material=request.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source("run", request, auth),
+        )
     except RuntimeError as error:
         if str(error) != "SIMULATION_RUNTIME_UNAVAILABLE":
             raise
@@ -110,9 +123,17 @@ def _run_portfolio_backtest(
         RuntimeError: If Simulator reports an unexpected runtime failure.
     """
     require_human_permission(auth, "simulation:run")
-    _require_idempotency(idempotency_key)
+    key = _require_idempotency(idempotency_key)
     try:
-        return source("portfolio-run", request, auth)
+        return run_idempotent_write(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/simulation/portfolio-run",
+            key=key,
+            request_material=request.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source("portfolio-run", request, auth),
+        )
     except RuntimeError as error:
         if str(error) != "SIMULATION_RUNTIME_UNAVAILABLE":
             raise

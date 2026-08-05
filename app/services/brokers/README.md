@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/brokers`
 > **Status:** `Completed`
-> **Last updated:** `2026-07-30`
+> **Last updated:** `2026-08-05`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -104,7 +104,7 @@ must never be inferred from SDK method presence.
 - **Registry release-gate defect (`registry/catalogue.py`):** the static capability catalogue marked every operation `UNAVAILABLE` unconditionally, including `connect`/`is_connected` — meaning no adapter created through `create_broker_adapter()` could ever connect or report its own connection state, regardless of implementation. Fixed by marking `connect`/`is_connected` `AVAILABLE` when implemented (the adapter's own verification act and a purely local state read); every other capability remains gated by credential-verified release evidence exactly as before.
 - **MT5 false-success defect (`mt5_account/adapter.py`):** `connect()` returned `status="success"` even when account/server verification failed via the boolean `verified` check (as opposed to a caught transport exception), because `self._last_error` was never set on that path and `_result()` derives `status` from `error` truthiness. Fixed by constructing a `BROKER_CONNECTION_FAILED` error before returning when verification fails without a caught exception.
 - **MT5 released-read implementation gap (`mt5_account/adapter.py`, `mt5_account/mapping.py`):** the catalogue declared historical bars and spread available while MT5 inherited deterministic unsupported defaults, and mapped bars had a zero-duration window. Implemented genuine bounded latest/ranged bar reads, provider-derived bid/ask spread, optional latest-tick lookup, SDK timeframe resolution, and valid closing timestamps.
-- **Yahoo zero-duration bar defect (`yahoo_history/mapping.py`):** every mapped bar set `closing_timestamp == opening_timestamp`, violating `BrokerBar`'s own `opening_timestamp < closing_timestamp` invariant and making every real Yahoo bar construction raise. Fixed by deriving the closing timestamp from the parsed provider interval (resolves `DEC-BRK-001`).
+- **Yahoo zero-duration bar defect (`yahoo_history/mapping.py`):** every mapped bar set `closing_timestamp == opening_timestamp`, violating `BrokerBar`'s own `opening_timestamp < closing_timestamp` invariant and making every real Yahoo bar construction raise. Fixed by deriving the closing timestamp from the parsed provider interval.
 
 Session lifecycle is the verified layer. MT5, Binance, Yahoo, cTrader, and Dukascopy have verified real connections (MT5 and cTrader against provider-confirmed demo accounts; Binance against the real testnet; Yahoo against the real Yahoo Finance service; Dukascopy against its research-only BI5 and web-chart endpoints). The 2026-07-27 validation also returned six genuine bounded ordered UTC cTrader `EURUSD` sessions and five genuine Dukascopy `EUR/USD` M1 bars, then disconnected without creating provider state. The static catalogue keeps operations without complete provider evidence unavailable, and direct unavailable calls fail before invoking the provider SDK.
 
@@ -272,7 +272,7 @@ it; no feature folder may host the package-root public operation surface.
 
 ```text
 brokers/
-├── __init__.py                         # Function-Only Public Surface (58 standalone functions in __all__)
+├── __init__.py                         # Function-Only Public Surface (86 standalone functions in __all__)
 ├── operations.py                       # Approved package-root public operations and DTO builders
 ├── README.md
 ├── contracts/                          # FEAT-BRK-00 — canonical provider-neutral boundary
@@ -349,9 +349,18 @@ brokers/
 │   ├── catalogue.py                    # Single static capability declaration source
 │   ├── factory.py                      # Explicit adapter creation and listing
 │   └── provider_connections.py         # Broker-owned non-production connection resolution
-└── testing/                            # FEAT-BRK-14 — public caller-test utilities
-    ├── __init__.py
-    └── fake.py                         # FakeBrokerAdapter
+├── testing/                            # FEAT-BRK-14 — public caller-test utilities
+│   ├── __init__.py
+│   └── fake.py                         # FakeBrokerAdapter
+├── migrations/                         # Support — immutable broker_symbol_map schema (see migrations/README.md)
+│   ├── __init__.py
+│   └── definitions.py                  # Single additive migration step with stable checksum
+└── persistence/                        # Support — bounded symbol-map statements via Data (see persistence/README.md)
+    ├── __init__.py                     # Internal export boundary
+    ├── create.py                       # INSERT one bitemporal mapping
+    ├── read.py                         # Forward/reverse/as-of bounded reads
+    ├── update.py                       # Close/disable mappings; never rewrite history
+    └── delete.py                       # Empty verb; mappings are closed, never deleted
 ```
 
 ### Module dependency diagram
@@ -1291,7 +1300,7 @@ No registry-specific setting exists. The composition root derives `BrokerConnect
 
 ### Feature usage examples
 
-`tests/brokers/usage/features/01_registry.py` (standalone script, run via `python`) contains one `example_*` function for each of FR-BRK-101–103.
+`tests/brokers/usage/features/01_registry.py` (standalone script, run via `python`) contains one `example_*` function for each of FR-BRK-101–103. `tests/brokers/unit/test_dashboard.py::test_dashboard_snapshot_reports_unavailable_without_socket()` covers the socket-free `get_broker_dashboard_snapshot` context requirement.
 
 ### Normative provider/profile capability matrix
 
@@ -1646,7 +1655,7 @@ explicit Yahoo symbol + bounded bar request
 | --------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Completed | `transport.py` | FR-BRK-130: perform bounded Yahoo historical-bar retrieval and verified provider probe without importing transitive pandas directly.                              | None                   | **Standard library:** `asyncio`**Required third-party:** `yfinance>=1.4.1`**Local:** `contracts → BrokerConnectionConfig, BrokerErrorCode`; `adapter_runtime → circuit breaker`; `app.utils → logging/redaction` |
 | Completed | `mapping.py`   | FR-BRK-131: map the yfinance-returned table through its public row/index iteration surface to canonical DTOs without importing pandas or generating observations. | None                   | **Standard library:** `datetime, decimal, typing`**Required third-party:** None**Local:** `contracts → BrokerBar, BrokerPage`                                                                                            |
-| Completed | `adapter.py`   | Implement approved historical bars, a genuine`connect()` verification (probe-symbol-gated per `DEC-BRK-001`), and deterministic unsupported defaults.         | `YahooBrokerAdapter` | **Standard library:** `asyncio, collections.abc`**Required third-party:** `yfinance>=1.4.1`**Local:** `contracts → BrokerAdapter and DTOs`; private transport/mapping modules                                          |
+| Completed | `adapter.py`   | Implement approved historical bars, a genuine`connect()` verification (probe-symbol-gated), and deterministic unsupported defaults.         | `YahooBrokerAdapter` | **Standard library:** `asyncio, collections.abc`**Required third-party:** `yfinance>=1.4.1`**Local:** `contracts → BrokerAdapter and DTOs`; private transport/mapping modules                                          |
 | Completed | `__init__.py`  | FR-BRK-132: expose the approved adapter type after implementation exists.                                                                                         | `YahooBrokerAdapter` | **Standard library:** None**Required third-party:** None**Local:** `adapter.py → YahooBrokerAdapter`                                                                                                                       |
 
 ### Configuration and Limits Manifest
@@ -1752,6 +1761,7 @@ These rows assign every remaining planned file an exact requirement. Private hel
 | Completed | `FR-BRK-134` | `testing/__init__.py`                                                   | Export only`FakeBrokerAdapter`; never register it as a provider.                                                                                                                                                                                                                                                                                                | `tests/brokers/usage/features/01_registry.py` (standalone script, run via `python`)                                       | `tests/brokers/unit/test_import_boundaries.py::test_testing_export_is_exact_and_unregistered()`                                                                                                                                              |
 | Completed | `FR-BRK-135` | `brokers/__init__.py`                                                   | Eagerly export contracts/registry, lazily resolve only the five adapter class names through the fixed`__getattr__` table, export no fake/private symbol, and import no provider SDK during ordinary package import.                                                                                                                                             | `tests/brokers/usage/features/01_registry.py`                                                                               | `tests/brokers/unit/test_import_boundaries.py::test_root_exports_and_lazy_imports_are_exact()`                                                                                                                                               |
 
+
 ---
 
 ## 5. Package-Wide Requirements and Shared Configuration
@@ -1777,7 +1787,7 @@ by UI/API and remains `Partial` in `docs/PROJECT.md` §6.
 | Completed | `provider_enabled` | `bool` | None | Yes | `create_broker_adapter()` | Composition root derives it from the matching `*_ENABLED` deployment flag; false returns `BROKER_CONFIGURATION_INVALID` before provider import. |
 | Completed | `account_reference` | `str | None` | Provider-dependent | Authenticated adapters | Redacted/fingerprinted in logs; immutable for the adapter lifetime. |
 | Completed | `credentials` | `Mapping[str, SecretStr] | None` resolved before construction | None | Provider-dependent | `connect()` | In memory only; Brokers never accepts or resolves a secret reference. Missing required values return `BROKER_CONFIGURATION_INVALID` and never appear in logs/errors. Typed composition/test settings inherit `app.utils.AppSettings`; only that shared boundary loads `.env`, and callers assemble the final `BrokerConnectionConfig`. |
-| Completed | `probe_symbol` | `str | None` | `None` | No | `YahooBrokerAdapter.connect()` (`DEC-BRK-001`) | When set, an explicit caller-supplied symbol used for one genuine connect-time verification probe; when unset, `connect()` verifies transport/session only. Never a hidden default provider symbol. |
+| Completed | `probe_symbol` | `str | None` | `None` | No | `YahooBrokerAdapter.connect()` | When set, an explicit caller-supplied symbol used for one genuine connect-time verification probe; when unset, `connect()` verifies transport/session only. Never a hidden default provider symbol. |
 | Completed | `connect_timeout_sec` | positive `float` | No numeric default approved | Yes | `connect()`, `reconnect()` | Exceeded before session verification returns `BROKER_TIMEOUT`. |
 | Completed | `request_timeout_sec` | positive `float` | No numeric default approved | Yes | Provider operations | Read timeout returns `BROKER_TIMEOUT`; mutation possible-transmission timeout returns `BROKER_UNKNOWN_OUTCOME`. |
 | Completed | `transport_reconnect_max_attempts` | non-negative `int` | No numeric default approved | Yes | Transport recovery | Bounds connection recovery only; zero disables automatic reconnect; operations are never replayed. |
@@ -1805,7 +1815,7 @@ by UI/API and remains `Partial` in `docs/PROJECT.md` §6.
 | Completed | `NFR-BRK-011` | Independence   | Brokers shall compile/test independently of Data, Trading, Risk, Strategy, Indicators, Simulation, Analytics, Optimization, Research, and UI/API.                                                                                                                                                     | Dependency audit                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Completed | `NFR-BRK-012` | Testing        | Every FR shall have one runnable usage example and unit coverage; every active workflow shall have one directly executable, stage-labelled workflow program; each provider shall pass the shared contract suite and the package shall maintain at least 80% coverage.                                 | Test/coverage audit — Sixteen feature-aligned standalone usage programs cover the registered`FEAT-BRK-NN` features, and nine standalone workflow programs cover `WF-BRK-001` through `WF-BRK-009`. Provider-backed programs use genuine enabled non-production sessions; released reads preserve provider truth, unavailable operations assert canonical errors, every directly owned session is closed, and no usage program transmits a broker mutation. |
 | Completed | `NFR-BRK-013` | Dependencies   | Provider library versions shall match`pyproject.toml`; directly imported transitive packages must be pinned before implementation.                                                                                                                                                                  | Dependency manifest audit — confirmed against`pyproject.toml`, including the explicit `twisted==24.3.0` pin required by the direct import in `ctrader/network.py`. The exact-version pin matches the constraint `ctrader-open-api==0.9.2` already imposes.                                                                                                                                                                                               |
-| Completed | `NFR-BRK-014` | Persistence    | Brokers shall own no database access, credential persistence, reusable market/account cache, business snapshot, order store, or migration.                                                                                                                                                            | Static and runtime side-effect tests                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Completed | `NFR-BRK-014` | Persistence    | Brokers shall own no database connections, credential persistence, reusable market/account cache, business snapshot, order store, or business migration; the sole persisted state is the bitemporal `broker_symbol_map` reference table whose schema and bounded statements Brokers owns and executes exclusively through Data's migration and transaction infrastructure.                                                                                                                                                            | Static and runtime side-effect tests                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Completed | `NFR-BRK-015` | Provider scope | Dukascopy and Yahoo shall be declared research-only and unavailable to production/live workflows; their provider results shall carry explicit provenance for Data.                                                                                                                                    | Capability and consumer-boundary tests                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 ---
@@ -1813,20 +1823,6 @@ by UI/API and remains `Partial` in `docs/PROJECT.md` §6.
 ## 6. Open Decisions
 
 None.
-
-Resolved requirements:
-
-- Dukascopy owns interface-specific market-data retrieval and mapping. BI5 files
-  provide ticks; the keyless web-chart feed provides BID candles mapped directly
-  to canonical bars. Brokers does not fabricate a spread or derive OHLC from ticks.
-- `registry/catalogue.py` gates release through `_RELEASED`. MT5 demo
-  `check_order`, `place_order`, `cancel_order`, and `close_position` have recorded
-  provider-demo evidence and explicit approval; adapter instances downgrade them
-  outside `demo`. Other MT5/cTrader mutations remain `UNAVAILABLE`.
-  Yahoo releases only `get_historical_bars`, backed by its deterministic
-  transport, mapping, and adapter evidence suites.
-- Yahoo requires an explicit non-empty `probe_symbol` for verified `connect()`.
-  Missing probe configuration fails closed and no hidden symbol is assumed.
 
 ---
 
@@ -1878,7 +1874,8 @@ canonical error; it does not mean every provider capability is released.
   fail-closed result without provider mutation.
 - **Support modules (not pytest-collected as tests):** `tests/brokers/response_factory.py`
   (shared StandardResponse fixture construction for consumer tests),
-  `tests/brokers/wf_support.py` (shared helpers for workflow usage scripts),
+  `tests/brokers/usage/_support.py` (the workflow usage programs' shared re-export
+  boundary for the feature support helpers),
   `tests/brokers/usage/features/_support.py`
   (non-production environment validation, genuine session lifecycle, and bounded display/result
   assertion helpers), and
@@ -1895,7 +1892,11 @@ uv run mypy app/services/brokers
 
 uv run pytest tests/brokers/unit
 uv run pytest tests/brokers/integration
-uv run coverage run --branch --source=app.services.brokers -m pytest tests/brokers --no-cov -q
+
+# COVERAGE_CORE=pytrace is required on the pinned Python 3.14 toolchain: coverage.py
+# 7.14.2's default sysmon collector races the C-accelerated asyncio task machinery
+# (running-loop TLS) on the real-provider blocking paths and flakes the suite.
+COVERAGE_CORE=pytrace uv run coverage run --branch --source=app.services.brokers -m pytest tests/brokers --no-cov -q
 uv run coverage report --include="app/services/brokers/*" --fail-under=80
 
 # Run each NN_*.py file under tests/brokers/usage directly.
@@ -1930,7 +1931,7 @@ During implementation, run only the targeted test file for the changed code befo
 - [X] Every module folder represents one coherent approved capability. `app/services/brokers/registry/catalogue.py:23`
 - [X] Every planned file has one focused responsibility. `app/services/brokers/registry/factory.py:78`
 - [X] Every requirement table has a status of `Completed`; the domain gate passes
-  424 unit and integration tests. `tests/brokers/unit/test_protocols.py:1`
+  439 unit and integration tests. `tests/brokers/unit/test_protocols.py:1`
 - [X] Every workflow has a status of `Completed` and integration evidence. Each
   `WF-BRK-*` test drives a real provider adapter over an injected transport, so
   session verification, provider mapping, subscription bounding, and
@@ -1938,7 +1939,9 @@ During implementation, run only the targeted test file for the changed code befo
 - [X] Every package-wide requirement has a status of `Completed`. `app/services/brokers/contracts/protocols.py:275`
 - [X] Every planned public export is listed under `Key exports` and appears in exactly one FR row. `app/services/brokers/__init__.py:24`
 - [X] Contracts owned by Brokers match `docs/PROJECT.md` in name, version, owner, and counterparty. `app/services/brokers/contracts/models.py:930`
-- [X] Persisted state matches the system ownership table: Brokers persists nothing. `app/services/brokers/registry/factory.py:78`
+- [X] Persisted state matches the system ownership table: Brokers persists only the
+  bitemporal `broker_symbol_map` reference table through Data-owned infrastructure.
+  `app/services/brokers/migrations/definitions.py:24`
 - [X] Every planned dependency is documented in standard-library, third-party, local order. `app/services/brokers/mt5_account/adapter.py:1`
 - [X] Every FR maps to one exact usage example and at least one exact unit test.
   Sixteen programs cover `FEAT-BRK-00`–`FEAT-BRK-15`, one each. `tests/brokers/usage/features/00_contracts.py:1`
@@ -1951,10 +1954,13 @@ During implementation, run only the targeted test file for the changed code befo
 - [X] Ruff, format, and strict `mypy` gates are clean over production and tests,
   verified on the pinned Windows toolchain via `uv run mypy app/services/brokers tests/brokers`. `pyproject.toml:34`
 - [X] Package coverage is at least 80%, verified on the pinned Windows toolchain via
-  `uv run coverage run --branch --source=app.services.brokers -m pytest tests/brokers --no-cov -q`
+  `COVERAGE_CORE=pytrace uv run coverage run --branch --source=app.services.brokers -m pytest tests/brokers --no-cov -q`
   followed by
   `uv run coverage report --include="app/services/brokers/*" --fail-under=80`;
-  standalone usage programs remain excluded from measurement. `tests/brokers/usage/features/conftest.py:3`
+  standalone usage programs remain excluded from measurement. `COVERAGE_CORE=pytrace`
+  is required because coverage.py 7.14.2's default `sysmon` collector races the
+  C-accelerated asyncio task machinery (running-loop TLS) on the real-provider
+  blocking paths under Python 3.14. `tests/brokers/usage/features/conftest.py:3`
 - [X] The dependency manifest resolves. `twisted` is pinned to the exact version
   `ctrader-open-api==0.9.2` requires, and `uv lock` succeeds. `pyproject.toml:30`
 - [X] Deterministic provider-shaped evidence supports every advertised operation.
@@ -1982,7 +1988,7 @@ are available:
 
 ```bash
 uv lock
-uv run coverage run --branch --source=app.services.brokers -m pytest tests/brokers --no-cov -q
+COVERAGE_CORE=pytrace uv run coverage run --branch --source=app.services.brokers -m pytest tests/brokers --no-cov -q
 uv run coverage report --include="app/services/brokers/*" --fail-under=80
 uv run mypy app/services/brokers tests/brokers
 ```

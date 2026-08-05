@@ -3,6 +3,7 @@
 import asyncio
 import sys
 import types
+from dataclasses import replace
 
 import pytest
 from app.services.brokers.contracts import (
@@ -122,7 +123,7 @@ def test_circuit_recovers_after_timeout_on_next_successful_call(
     monkeypatch.setitem(
         sys.modules, "yfinance", types.SimpleNamespace(Ticker=_RecoveringTicker)
     )
-    transport = _YahooTransport(_config())
+    transport = _YahooTransport(replace(_config(), circuit_recovery_timeout_sec=0.001))
 
     async def exercise() -> None:
         for _ in range(2):
@@ -131,7 +132,7 @@ def test_circuit_recovers_after_timeout_on_next_successful_call(
                     symbol="AAPL", timeframe="1d", start=None, end=None
                 )
         assert transport._circuit.state == "open"
-        await asyncio.sleep(0.11)
+        await asyncio.sleep(0.01)
         result = await transport.history(
             symbol="AAPL", timeframe="1d", start=None, end=None
         )

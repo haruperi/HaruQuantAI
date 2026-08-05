@@ -23,14 +23,18 @@ def test_provider_manifest_is_exact_and_deterministic() -> None:
     assert names == (
         "agentic.source",
         "dashboard.source",
+        "data.dataset_source",
         "operator.audit_source",
         "operator.event_source",
         "optimization.source",
         "portfolio.source",
+        "risk.command_source",
         "risk.source",
+        "simulation.live_source",
         "simulation.result_source",
         "simulation.run_source",
         "simulation.session_source",
+        "strategy.mutation_source",
         "trading.mutation_source",
         "trading.session_source",
     )

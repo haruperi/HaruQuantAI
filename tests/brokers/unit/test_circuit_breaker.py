@@ -15,7 +15,7 @@ def test_circuit_state_machine_and_failure_classification() -> None:
     async def exercise() -> None:
         circuit = _TransportCircuitBreaker(
             failure_threshold=2,
-            recovery_timeout_sec=0.1,
+            recovery_timeout_sec=0.03,
             half_open_max_calls=1,
         )
         await circuit.record_failure(BrokerErrorCode.BROKER_REQUEST_INVALID)
@@ -24,7 +24,7 @@ def test_circuit_state_machine_and_failure_classification() -> None:
         await circuit.record_failure(BrokerErrorCode.BROKER_CONNECTION_LOST)
         assert circuit.state == "open"
         assert await circuit.before_call() == BrokerErrorCode.BROKER_CIRCUIT_OPEN
-        await asyncio.sleep(0.11)
+        await asyncio.sleep(0.05)
         assert await circuit.before_call() is None
         await circuit.record_success()
         assert circuit.state == "closed"

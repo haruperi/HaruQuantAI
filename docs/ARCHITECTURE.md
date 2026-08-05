@@ -239,7 +239,7 @@
 * `app/utils/` is a completed implementation baseline for shared v1 contracts,
   errors, identifiers, UTC, canonical serialization, redaction/security helpers,
   settings, and structured logging.
-* `app/services/brokers/` is a partial implementation baseline for canonical
+* `app/services/brokers/` is a completed implementation baseline for canonical
   broker contracts, registry/factory, runtime safety, provider adapters, and its
   deterministic test adapter. Capability availability remains evidence-gated and
   fail-closed.

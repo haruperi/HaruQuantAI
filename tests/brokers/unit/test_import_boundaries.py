@@ -148,7 +148,6 @@ def test_broker_owned_public_consumers_use_only_the_root_boundary() -> None:
         *sorted((test_root / "usage").glob("*.py")),
         *sorted((test_root / "usage" / "workflows").glob("*.py")),
         *sorted((test_root / "integration").glob("*.py")),
-        test_root / "wf_support.py",
     )
     violations = [
         str(path.relative_to(test_root))

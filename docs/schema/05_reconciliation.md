@@ -323,7 +323,7 @@ all 71.** Sequence by whether the owning domain has a real gap:
 | 2 | `indicator_*` (3) | **Built (Phase 4B)** | No live Indicators persistence |
 | 3 | `analytics_*` (6) | **Built (Phase 4C)** | Derived store only. `analytics_trade_analysis` holds MAE/MFE per round-trip, which nothing else stores — Trading owns fills, no domain owns round-trip analysis. Requires the §5 amendment made under D10 |
 | 4 | `trading_orders`, `trading_fills`, `trading_positions`, `trading_order_transitions` | **Built (Phase 4D)** | Trading now writes authoritative events and rebuildable relational projections in one Data-owned transaction; no Trading state uses the generic runtime-record table |
-| 5 | `broker_symbol_map` (1) | **Built (Phase 4E)** | Bitemporal reference data. The other four `broker_*` tables are **withdrawn** — Brokers stays a stateless passthrough |
+| 5 | `broker_symbol_map` (1) | **Built (Phase 4E)** | Bitemporal reference data. The other four `broker_*` tables are **withdrawn** — Brokers stays a stateless passthrough. The step is ledger-ready (stable checksum, execution delegated to `run_domain_migrations`) but currently has no runtime composition wiring: nothing invokes `get_broker_migrations`, and the CRUD statements have no caller |
 | 6 | Everything else | Deferred | Defer until a feature needs it |
 
 ### Tier C — rebuild, blocked (13 tables)
@@ -370,7 +370,7 @@ The model stands at **103 tables**. All five sub-phases shipped.
 | 4B | Shipped | `indicator_*` (3), `FEAT-INDI-07`, `FR-INDI-036`–`040` |
 | 4C | Shipped | `analytics_*` (6), `FEAT-ANLT-06`, `FR-ANLT-055`–`059` |
 | 4D | Shipped | Trading materialisation (`trading_orders`, `trading_fills`, `trading_positions`, `trading_order_transitions`) and direct Trading-owned persistence |
-| 4E | Shipped | `broker_symbol_map` (1), `FEAT-BRK-16`, `FR-BRK-136`–`138` |
+| 4E | Schema shipped; registrations withdrawn | `broker_symbol_map` (1) applied as schema; `FEAT-BRK-16` and `FR-BRK-136`–`138` withdrawn 2026-08-03 (private persistence support) |
 
 `trading_events` remains the write model. The four Phase 4D tables are rebuildable read
 projections written atomically with the event and aggregate projection. Nullable

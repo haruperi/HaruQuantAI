@@ -10,13 +10,29 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, s
 from app.services.api.contracts import (  # noqa: TC001 - FastAPI runtime annotation.
     TradingMutationRequest,
 )
-from app.services.api.identity import require_auth_context, require_human_permission
+from app.services.api.identity import (
+    require_auth_context,
+    require_human_permission,
+    run_idempotent_write_async,
+)
+from app.utils import generate_id
 
 type AuthContext = Any
 type _SessionSource = Callable[[str, str, str, AuthContext], object | None]
 type _MutationSource = Callable[[str, object, AuthContext], Awaitable[object]]
 
 router = APIRouter(prefix="/api/v1/trading", tags=["trading"])
+
+# A request whose declared runtime contradicts the deployment is a caller
+# error, not an outage: it is refused deterministically rather than reported
+# as an unavailable dependency.
+_RUNTIME_POLICY_REFUSALS = frozenset(
+    {
+        "TRADING_RUNTIME_PROFILE_MISMATCH",
+        "TRADING_EXECUTION_ROUTE_MISMATCH",
+        "TRADING_LIVE_MUTATIONS_DISABLED",
+    }
+)
 
 
 def _trading_session_source() -> _SessionSource:
@@ -54,15 +70,20 @@ def _governed_preflight(
         HTTPException: If production, configuration, or idempotency policy fails.
     """
     settings = request.app.state.api_settings
-    if body.route == "live":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="PRODUCTION_EXECUTION_EXCLUDED",
-        )
-    if settings.execution_route != "paper" or settings.runtime_profile != "paper":
+    # Paper and live share one execution path and differ only by the
+    # credentials in the composed BrokerConnectionConfig (docs/PROJECT.md
+    # 2.1.9). The boundary therefore does not ban a route; it requires the
+    # request to name the route this deployment is actually configured for, so
+    # a paper deployment can never relay a live order even if asked.
+    if body.route != settings.execution_route:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="PAPER_EXECUTION_NOT_CONFIGURED",
+            detail="EXECUTION_ROUTE_NOT_CONFIGURED",
+        )
+    if body.route == "live" and not settings.allow_live_mutations:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="LIVE_MUTATIONS_DISABLED",
         )
     if idempotency_key is None or idempotency_key != body.idempotency_key:
         raise HTTPException(
@@ -76,7 +97,7 @@ def _get_session(
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_SessionSource, Depends(_trading_session_source)],
     authority_id: Annotated[str, Query(min_length=1, max_length=200)],
-    route: Annotated[Literal["sim", "paper"], Query()] = "paper",
+    route: Annotated[Literal["sim", "paper", "live"], Query()] = "paper",
 ) -> object:
     """Return one exact-scope aggregate Trading session projection.
 
@@ -118,8 +139,18 @@ async def _submit_order(
     if body.action != "submit_order":
         raise HTTPException(status_code=422, detail="TRADING_ACTION_MISMATCH")
     try:
-        return await source("submit_order", body, auth)
+        return await run_idempotent_write_async(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/trading/orders",
+            key=str(idempotency_key),
+            request_material=body.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source("submit_order", body, auth),
+        )
     except RuntimeError as error:
+        if str(error) in _RUNTIME_POLICY_REFUSALS:
+            raise HTTPException(status_code=422, detail=str(error)) from error
         if str(error) != "TRADING_MUTATIONS_UNAVAILABLE":
             raise
         raise HTTPException(status_code=503, detail=str(error)) from error
@@ -148,8 +179,18 @@ async def _cancel_order(
     if body.action != "cancel_order" or body.target_broker_order_id != order_id:
         raise HTTPException(status_code=422, detail="TRADING_ACTION_MISMATCH")
     try:
-        return await source("cancel_order", body, auth)
+        return await run_idempotent_write_async(
+            principal_id=auth.principal_id,
+            method="DELETE",
+            route="/api/v1/trading/orders/{order_id}",
+            key=str(idempotency_key),
+            request_material=body.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source("cancel_order", body, auth),
+        )
     except RuntimeError as error:
+        if str(error) in _RUNTIME_POLICY_REFUSALS:
+            raise HTTPException(status_code=422, detail=str(error)) from error
         if str(error) != "TRADING_MUTATIONS_UNAVAILABLE":
             raise
         raise HTTPException(status_code=503, detail=str(error)) from error
@@ -178,8 +219,18 @@ async def _close_position(
     if body.action != "close_position" or body.target_broker_position_id != position_id:
         raise HTTPException(status_code=422, detail="TRADING_ACTION_MISMATCH")
     try:
-        return await source("close_position", body, auth)
+        return await run_idempotent_write_async(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/trading/positions/{position_id}/close",
+            key=str(idempotency_key),
+            request_material=body.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source("close_position", body, auth),
+        )
     except RuntimeError as error:
+        if str(error) in _RUNTIME_POLICY_REFUSALS:
+            raise HTTPException(status_code=422, detail=str(error)) from error
         if str(error) != "TRADING_MUTATIONS_UNAVAILABLE":
             raise
         raise HTTPException(status_code=503, detail=str(error)) from error

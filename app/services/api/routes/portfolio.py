@@ -1,26 +1,46 @@
 """Authenticated Portfolio HTTP boundaries.
 
-Backend v1 exposes the three Portfolio operations that are clean thin
-delegations through the existing function-only public API: construction,
-active-status reads, and allocation-history reads. Governed writes that
-require non-HTTP-producible evidence (``activate_portfolio``,
-``rollback_portfolio``, ``assess_portfolio_drift``,
-``submit_portfolio_rebalance``, ``recompute_portfolio_measurement``) remain
-pending until Portfolio exposes the intermediate evidence/review objects
-through its public boundary; see FR-API-056 in the package README.
+Backend v1 exposes the complete Portfolio surface: construction, active-status
+and allocation-history reads, and the governed allocation lifecycle —
+activation, rollback, drift assessment, rebalance submission, and measurement
+recomputation.
+
+Every governed write delegates exactly once to the composed Portfolio
+dispatcher, which in turn reaches Portfolio only through its function-only
+public boundary and its allow-listed opaque handle operations. The gateway
+produces no evidence, computes no weight, and decides no approval: Risk remains
+the sole approval authority and Portfolio the sole activation authority.
+
+Production capital is not banned here. Paper and live differ only by the
+credentials in the composed broker configuration, so the rebalance boundary
+mirrors `routes/trading.py`: it requires the request to name the route this
+deployment is actually configured for, and requires live mutations to be
+explicitly enabled. Reachability is a deployment-settings question, not a
+routing one.
 """
 
 from __future__ import annotations
 
+import inspect
 from collections.abc import Callable
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 
 from app.services.api.contracts import (
+    PortfolioActivationRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     PortfolioConstructRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
+    PortfolioDriftRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
+    PortfolioMeasurementRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
+    PortfolioRebalanceRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
+    PortfolioRollbackRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
-from app.services.api.identity import require_auth_context, require_human_permission
+from app.services.api.identity import (
+    require_auth_context,
+    require_human_permission,
+    run_idempotent_write,
+)
+from app.utils import generate_id
 
 type AuthContext = Any
 type _PortfolioSource = Callable[..., object]
@@ -147,6 +167,241 @@ def _get_history(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(error),
         ) from error
+
+
+def _delegate(source: _PortfolioSource, operation: str, *args: object) -> object:
+    """Delegate once and translate the unavailable sentinel into HTTP 503.
+
+    Args:
+        source: Composed Portfolio operation dispatcher.
+        operation: Canonical Portfolio route operation name.
+        *args: Operation-specific positional inputs.
+
+    Returns:
+        Portfolio-owned standard response envelope.
+
+    Raises:
+        HTTPException: If no Portfolio dependency bundle is composed or the
+            active allocation required by the operation is unavailable.
+        RuntimeError: If Portfolio reports an unexpected runtime failure.
+    """
+    try:
+        return source(operation, *args)
+    except RuntimeError as error:
+        if str(error) not in {
+            "PORTFOLIO_RUNTIME_UNAVAILABLE",
+            "PORTFOLIO_ALLOCATION_UNAVAILABLE",
+        }:
+            raise
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(error),
+        ) from error
+
+
+@router.post("/{portfolio_id}/activate", response_model=None)
+def _activate(
+    portfolio_id: str,
+    request: PortfolioActivationRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+    source: Annotated[_PortfolioSource, Depends(_portfolio_source)],
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> object:
+    """Activate one fully reviewed Portfolio allocation version.
+
+    Returns:
+        Portfolio-owned active allocation envelope.
+
+    Raises:
+        HTTPException: If authentication, authorization, idempotency, the
+            portfolio identity binding, or composition fails.
+    """
+    require_human_permission(auth, "portfolio:activate")
+    key = _require_idempotency(idempotency_key)
+    _require_matching_portfolio(portfolio_id, request.construction.portfolio_id)
+    return run_idempotent_write(
+        principal_id=auth.principal_id,
+        method="POST",
+        route="/api/v1/portfolio/{portfolio_id}/activate",
+        key=key,
+        request_material=request.model_dump(mode="json"),
+        request_id=generate_id("req"),
+        operation=lambda: _delegate(source, "activate", request, auth, key),
+    )
+
+
+@router.post("/{portfolio_id}/rollback", response_model=None)
+def _rollback(
+    portfolio_id: str,
+    request: PortfolioRollbackRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+    source: Annotated[_PortfolioSource, Depends(_portfolio_source)],
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> object:
+    """Create one governed forward rollback version of a Portfolio.
+
+    Returns:
+        Portfolio-owned active allocation envelope.
+
+    Raises:
+        HTTPException: If authentication, authorization, idempotency, the
+            portfolio identity binding, or composition fails.
+    """
+    require_human_permission(auth, "portfolio:activate")
+    key = _require_idempotency(idempotency_key)
+    _require_matching_portfolio(portfolio_id, request.construction.portfolio_id)
+    return run_idempotent_write(
+        principal_id=auth.principal_id,
+        method="POST",
+        route="/api/v1/portfolio/{portfolio_id}/rollback",
+        key=key,
+        request_material=request.model_dump(mode="json"),
+        request_id=generate_id("req"),
+        operation=lambda: _delegate(source, "rollback", request, auth, key),
+    )
+
+
+@router.post("/{portfolio_id}/drift", response_model=None)
+def _assess_drift(
+    portfolio_id: str,
+    request: PortfolioDriftRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+    source: Annotated[_PortfolioSource, Depends(_portfolio_source)],
+) -> object:
+    """Assess allocation drift for one active Portfolio scope.
+
+    Returns:
+        Portfolio-owned drift observation envelope.
+
+    Raises:
+        HTTPException: If authorization or composition fails.
+    """
+    require_human_permission(auth, "portfolio:read")
+    return _delegate(source, "drift", portfolio_id, request, auth)
+
+
+def _require_configured_execution_route(route: str, http_request: Request) -> None:
+    """Require the named execution route to be the configured one.
+
+    Mirrors `routes/trading.py::_governed_preflight`. A paper deployment can
+    never relay a live rebalance even if asked, and a live deployment still
+    needs live mutations explicitly enabled.
+
+    Args:
+        route: Execution route named by the request.
+        http_request: Live request carrying the composed application settings.
+
+    Raises:
+        HTTPException: If the deployment is not configured for the route, or
+            live mutations are not explicitly enabled.
+    """
+    settings = http_request.app.state.api_settings
+    if route != settings.execution_route:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="EXECUTION_ROUTE_NOT_CONFIGURED",
+        )
+    if route == "live" and not settings.allow_live_mutations:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="LIVE_MUTATIONS_DISABLED",
+        )
+
+
+@router.post("/rebalance", response_model=None)
+async def _submit_rebalance(
+    request: PortfolioRebalanceRequest,
+    http_request: Request,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+    source: Annotated[_PortfolioSource, Depends(_portfolio_source)],
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> object:
+    """Submit one governed Portfolio rebalance on the configured route.
+
+    Returns:
+        Portfolio-owned rebalance submission envelope.
+
+    Raises:
+        HTTPException: If authentication, authorization, execution-route
+            configuration, idempotency, or composition fails.
+    """
+    require_human_permission(auth, "portfolio:rebalance")
+    _require_configured_execution_route(request.execution_route, http_request)
+    key = _require_idempotency(idempotency_key)
+    return await _await_result(
+        run_idempotent_write(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/portfolio/rebalance",
+            key=key,
+            request_material=request.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: _delegate(source, "rebalance", request, auth),
+        )
+    )
+
+
+@router.post("/measurement/recompute", response_model=None)
+def _recompute_measurement(
+    request: PortfolioMeasurementRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+    source: Annotated[_PortfolioSource, Depends(_portfolio_source)],
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> object:
+    """Recompute one Portfolio measurement from immutable Trading evidence.
+
+    Returns:
+        Portfolio-owned measurement envelope.
+
+    Raises:
+        HTTPException: If authentication, authorization, idempotency, or
+            composition fails.
+    """
+    require_human_permission(auth, "portfolio:write")
+    key = _require_idempotency(idempotency_key)
+    return run_idempotent_write(
+        principal_id=auth.principal_id,
+        method="POST",
+        route="/api/v1/portfolio/measurement/recompute",
+        key=key,
+        request_material=request.model_dump(mode="json"),
+        request_id=generate_id("req"),
+        operation=lambda: _delegate(source, "recompute", request, auth),
+    )
+
+
+def _require_matching_portfolio(path_id: str, body_id: str) -> None:
+    """Reject a governed write whose path and body disagree on identity.
+
+    Args:
+        path_id: Portfolio identity from the request path.
+        body_id: Portfolio identity carried by the construction command.
+
+    Raises:
+        HTTPException: If the two identities differ.
+    """
+    if path_id != body_id:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="PORTFOLIO_IDENTITY_MISMATCH",
+        )
+
+
+async def _await_result(value: object) -> object:
+    """Await a Portfolio operation result that is a coroutine.
+
+    ``submit_portfolio_rebalance`` is the one asynchronous Portfolio public
+    operation, and the opaque handle dispatcher returns its coroutine unchanged.
+
+    Args:
+        value: Direct result or awaitable returned by the dispatcher.
+
+    Returns:
+        Resolved Portfolio-owned response envelope.
+    """
+    if inspect.isawaitable(value):
+        return await value
+    return value
 
 
 __all__ = ("router",)

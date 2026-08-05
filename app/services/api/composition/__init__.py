@@ -16,8 +16,14 @@ from app.services.api.composition.optimization_dependencies import (
 from app.services.api.composition.portfolio_dependencies import (
     build_api_portfolio_dependencies,
 )
+from app.services.api.composition.risk_dependencies import (
+    build_api_risk_dependencies,
+)
 from app.services.api.composition.simulation_dependencies import (
     build_api_simulation_dependencies,
+)
+from app.services.api.composition.strategy_dependencies import (
+    build_api_strategy_dependencies,
 )
 from app.services.api.composition.trading_dependencies import (
     build_api_trading_dependencies,
@@ -29,7 +35,9 @@ __all__ = (
     "build_api_agentic_dependencies",
     "build_api_optimization_dependencies",
     "build_api_portfolio_dependencies",
+    "build_api_risk_dependencies",
     "build_api_simulation_dependencies",
+    "build_api_strategy_dependencies",
     "build_api_trading_dependencies",
     "build_broker_connection_config",
     "build_in_process_graph",

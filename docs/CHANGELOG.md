@@ -2,6 +2,78 @@
 
 ## [Unreleased]
 
+### Reconcile Brokers mechanical-conformance audit evidence
+
+The Brokers Tier-1 audit found broken workflow usage imports, a padding-brittle
+registry parity check, undocumented symbol-map persistence support, vacuous
+usage-program success on evidence failure, and a flaky coverage gate; all are
+now reconciled with their executable evidence.
+
+#### Removed (1)
+
+- Removed the orphaned `tests/brokers/wf_support.py` helper; workflow usage programs share the re-export boundary at `tests/brokers/usage/_support.py`.
+
+#### Fixed (5)
+
+- Fixed the nine Brokers workflow usage programs' shared-support import so `run_all.py` executes 10/10, and extended the workflow parity check to resolve every top-level local import.
+- Fixed the executable registry parity check to tolerate README table padding in the usage-evidence column.
+- Documented the Brokers `migrations/` and `persistence/` support directories and added pytest evidence for the symbol-map CRUD statements and the broker dashboard snapshot.
+- Fixed the twelve Brokers feature usage programs to exit non-zero on evidence failure instead of passing vacuously.
+- Fixed the flaky Brokers coverage gate by pinning `COVERAGE_CORE=pytrace`, avoiding the coverage.py 7.14.2 `sysmon`/CPython 3.14 asyncio running-loop race.
+
+### Resolve the recorded UI/API exclusions
+
+Live execution, external import, documentation scope, and the Simulator
+live-engine gap are all resolved. The UI/API boundary now carries no `Partial`,
+`Missing`, or `Excluded` row.
+
+#### Added (6)
+
+- Added governed external dataset import plus a dialect read delegating to Data's own parser, validator, and storage.
+- Added `advance_run_timeline`, a behaviour-preserving extraction of the Simulation tick loop that can advance in bounded increments.
+- Added `prepare_run_context`, which separates assembling a run from executing it, so a run can be opened without being driven to completion.
+- Added bounded live what-if sessions to the Simulator: open, step, read, branch, and close over a resumable engine, with branches replaying parent inputs on their own engine so the parent is never mutated.
+- Added the five gateway live-session operations and a `liveSimulation` typed client, taking backend v1 to 71 operations with matching frontend parity.
+- Added `WhatIfView`, kept deliberately separate from `PlaybackView`: a finalized run is evidence and must not be steerable.
+
+#### Changed (5)
+
+- Changed the live what-if exclusion test into a shape invariant: what-if is now reachable, but only as a session with recorded lineage, so no route may mutate a completed run in place.
+- Changed the Simulation routes' rate-limit class from `read` to `compute`. The compute class keyed on the owner string `simulation`, but every Simulation route declares its owner as `simulator`, so backtest runs had silently been limited as if they were reads.
+- Changed Trading's execution boundary from a hardcoded live ban to a configured-route match: paper and live share one path, and live additionally requires explicit enablement.
+- Changed the rebalance boundary and Trading session read to accept the live route, matching the construction contract that already did. Rebalance now applies Trading's execution gate rather than its own hardcoded refusal, so the two governed capital paths cannot disagree about whether a live request is reachable.
+- Changed the documentation capability to withdrawn scope: `NFR-API-015` and `CAP-UI-019` are retired to Appendix R rather than carried as standing exclusions.
+
+### Close the UI/API boundary at 64 operations with full frontend parity
+
+The gateway now exposes every capability its owner domains can produce, the
+frontend declares the same inventory, and each remaining exclusion carries a
+recorded reason and an absence test.
+
+#### Added (9)
+
+- Added the governed Portfolio allocation lifecycle: activation, rollback, drift assessment, rebalance submission, and measurement recomputation at five new operations.
+- Added governed Strategy registration and parameter updates behind an explicitly composed Strategy validation policy.
+- Added governed dataset preparation, delegating fetch and persist to Data and returning the owner-authored storage manifest.
+- Added the governed Risk kill-switch command, requiring a human operator, an approval attestation, and an explicitly composed Risk authority bundle.
+- Added one shared `run_idempotent_write` reserve-execute-finalize cycle so governed routes no longer re-implement durable HTTP idempotency.
+- Added typed frontend clients and route contracts for Portfolio, Optimization, Agentic, and journal playback, reaching 64 declared operations.
+- Added the completed-run journal playback view, closing the frontend half of `CAP-UI-012`.
+- Added `run_idempotent_write_async` so the three asynchronous Trading mutations reserve durably before the awaited call and finalize after it.
+- Added request-time runtime-policy enforcement: a Trading mutation whose declared profile or route contradicts the deployment is refused before delegation.
+
+#### Changed (4)
+
+- Changed `FR-API-056` and `WF-API-017` to completed: Portfolio evidence and review are reachable through the public workflow handle, so no owner-domain change was required.
+- Changed `WF-API-018` and `FR-API-068`–`FR-API-072` from a stale excluded status to completed, matching the Agentic operator tier already present in the code.
+- Changed `DATABASE_URL` and `DATA_DIR` from missing to declared settings that name the shared store without exposing a connection.
+- Changed the excluded families to authoritative exclusions, each recording whether it is blocked upstream, by safety policy, or by owner scope.
+
+#### Fixed (2)
+
+- Fixed the UI/API specification to match the merged code: the package tree omitted eight route files and five composition modules, and understated the frontend surface.
+- Fixed the in-process provider manifest ordering, which is derived from binding insertion order and is contractually required to be sorted.
+
 ### Align architecture documentation with the completed Utils boundary
 
 Stale status and settings references in `docs/ARCHITECTURE.md` are corrected to

@@ -28,7 +28,12 @@ from app.services.api.contracts import (
     OptimizationWalkForwardMatrixRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     OptimizationWalkForwardRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
-from app.services.api.identity import require_auth_context, require_human_permission
+from app.services.api.identity import (
+    require_auth_context,
+    require_human_permission,
+    run_idempotent_write,
+)
+from app.utils import generate_id
 
 type AuthContext = Any
 type _OptimizationSource = Callable[..., object]
@@ -107,9 +112,17 @@ def _run_parameter_sweep(
         RuntimeError: If Optimization reports an unexpected runtime failure.
     """
     require_human_permission(auth, "optimization:run")
-    _require_idempotency(idempotency_key)
+    key = _require_idempotency(idempotency_key)
     try:
-        return source("parameter-sweep", request.payload)
+        return run_idempotent_write(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/optimization/parameter-sweep",
+            key=key,
+            request_material=request.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source("parameter-sweep", request.payload),
+        )
     except RuntimeError as error:
         _translate(error)
 
@@ -132,9 +145,17 @@ def _run_walk_forward(
         RuntimeError: If Optimization reports an unexpected runtime failure.
     """
     require_human_permission(auth, "optimization:run")
-    _require_idempotency(idempotency_key)
+    key = _require_idempotency(idempotency_key)
     try:
-        return source("walk-forward", request.payload)
+        return run_idempotent_write(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/optimization/walk-forward",
+            key=key,
+            request_material=request.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source("walk-forward", request.payload),
+        )
     except RuntimeError as error:
         _translate(error)
 
@@ -157,10 +178,18 @@ def _run_walk_forward_matrix(
         RuntimeError: If Optimization reports an unexpected runtime failure.
     """
     require_human_permission(auth, "optimization:run")
-    _require_idempotency(idempotency_key)
+    key = _require_idempotency(idempotency_key)
     try:
-        return source(
-            "walk-forward-matrix", tuple(request.requests), request.max_requests
+        return run_idempotent_write(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/optimization/walk-forward-matrix",
+            key=key,
+            request_material=request.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source(
+                "walk-forward-matrix", tuple(request.requests), request.max_requests
+            ),
         )
     except RuntimeError as error:
         _translate(error)
@@ -184,9 +213,19 @@ def _run_robustness(
         RuntimeError: If Optimization reports an unexpected runtime failure.
     """
     require_human_permission(auth, "optimization:run")
-    _require_idempotency(idempotency_key)
+    key = _require_idempotency(idempotency_key)
     try:
-        return source("robustness", request.payload, request.max_simulations)
+        return run_idempotent_write(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/optimization/robustness",
+            key=key,
+            request_material=request.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source(
+                "robustness", request.payload, request.max_simulations
+            ),
+        )
     except RuntimeError as error:
         _translate(error)
 

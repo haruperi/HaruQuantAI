@@ -184,10 +184,10 @@ async function testUsageApiClientError(): Promise<void> {
   }
 }
 
-/** FR-API-041: focused clients map to the 21 registered operations. */
+/** FR-API-041: focused clients map to the 71 registered operations. */
 async function testUsageFocusedClients(): Promise<void> {
-  // Drift check: the catalog declares exactly the 21 approved operations.
-  assert(ROUTE_CONTRACT_COUNT === 21, "route count should be 21");
+  // Drift check: the catalog declares exactly the 71 approved operations.
+  assert(ROUTE_CONTRACT_COUNT === 71, "route count should be 71");
 
   // Exercise a representative slice of the catalog (one op per family) through
   // the typed client surface so the catalog is proven wired end-to-end.
@@ -195,9 +195,11 @@ async function testUsageFocusedClients(): Promise<void> {
   const symbolsCall = apiClients.data.symbols;
   const approvalsCall = apiClients.operator.approvals;
   const metricsCall = apiClients.metrics.scrape;
+  const liveBranchCall = apiClients.liveSimulation.branch;
   assert(typeof livenessCall === "function", "health.liveness missing");
   assert(typeof symbolsCall === "function", "data.symbols missing");
   assert(typeof approvalsCall === "function", "operator.approvals missing");
+  assert(typeof liveBranchCall === "function", "liveSimulation.branch missing");
   assert(typeof metricsCall === "function", "metrics.scrape missing");
 
   // Verify the metrics text-return path through the catalog.

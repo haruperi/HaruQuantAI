@@ -54,8 +54,10 @@ __all__ = (
     "build_api_optimization_dependencies",
     "build_api_portfolio_dependencies",
     "build_api_response",
+    "build_api_risk_dependencies",
     "build_api_settings",
     "build_api_simulation_dependencies",
+    "build_api_strategy_dependencies",
     "build_api_trading_dependencies",
     "build_authoritative_auth_context",
     "build_broker_connection_config",
@@ -531,6 +533,32 @@ def build_api_portfolio_dependencies(**values: object) -> object:
     """
     from app.services.api.composition import (
         build_api_portfolio_dependencies as build,
+    )
+
+    return build(**cast("Any", values))
+
+
+def build_api_strategy_dependencies(**values: object) -> object:
+    """Compose the Strategy validation-policy bundle for governed mutations.
+
+    Returns:
+        Opaque Strategy dependency bundle.
+    """
+    from app.services.api.composition import (
+        build_api_strategy_dependencies as build,
+    )
+
+    return build(**cast("Any", values))
+
+
+def build_api_risk_dependencies(**values: object) -> object:
+    """Compose the Risk kill-switch command authority bundle.
+
+    Returns:
+        Opaque Risk dependency bundle.
+    """
+    from app.services.api.composition import (
+        build_api_risk_dependencies as build,
     )
 
     return build(**cast("Any", values))

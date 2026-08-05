@@ -1,5 +1,6 @@
 /**
- * Data client for symbol discovery (1 cursor-paginated operation).
+ * Data client for symbol discovery, the market stream, governed dataset
+ * preparation, and external import (5 operations).
  *
  * The Data domain owns the exact row shape; the gateway returns it opaquely.
  * The client validates a minimal structural contract (opaque rows) and leaves
@@ -78,4 +79,48 @@ export function stream(
 }
 
 /** Aggregated data client. */
-export const data = { symbols, stream };
+/**
+ * Fetch and persist one market dataset through Data (requires `data:write`).
+ *
+ * Data performs both steps and authors the returned storage manifest; the
+ * gateway holds no dataset and chooses no storage location.
+ */
+export function prepareDataset(
+  body: { market_request: Record<string, unknown>; save_request: Record<string, unknown> },
+  options?: RequestOptions
+): Promise<ApiResponse<Record<string, unknown>>> {
+  return request<Record<string, unknown>>(dataRoutes.prepareDataset, {
+    schema: z.record(z.string(), z.unknown()),
+    body,
+    ...options,
+  });
+}
+
+/** Read the import dialects Data supports (requires `data:read`). */
+export function importDialects(
+  options?: RequestOptions
+): Promise<ApiResponse<Record<string, unknown>>> {
+  return request<Record<string, unknown>>(dataRoutes.importDialects, {
+    schema: z.record(z.string(), z.unknown()),
+    ...options,
+  });
+}
+
+/**
+ * Import one external dataset through Data (requires `data:write`).
+ *
+ * Data parses, validates, and persists the source and authors the returned
+ * manifest; the payload is forwarded unchanged.
+ */
+export function importDataset(
+  body: { payload: Record<string, unknown> },
+  options?: RequestOptions
+): Promise<ApiResponse<Record<string, unknown>>> {
+  return request<Record<string, unknown>>(dataRoutes.importDataset, {
+    schema: z.record(z.string(), z.unknown()),
+    body,
+    ...options,
+  });
+}
+
+export const data = { symbols, stream, prepareDataset, importDialects, importDataset };

@@ -37,7 +37,18 @@ def test_canonical_app_has_exact_cors_and_route_catalog() -> None:
     assert "/api/v1/auth/login" in paths
     assert "/api/v1/auth/me" in paths
     assert "/api/v1/data/stream" in paths
-    assert len(paths) == 53
+    assert len(paths) == 66
+    assert "/api/v1/portfolio/{portfolio_id}/activate" in paths
+    assert "/api/v1/portfolio/{portfolio_id}/rollback" in paths
+    assert "/api/v1/portfolio/{portfolio_id}/drift" in paths
+    assert "/api/v1/portfolio/rebalance" in paths
+    assert "/api/v1/portfolio/measurement/recompute" in paths
+    assert "/api/v1/data/datasets/prepare" in paths
+    assert "/api/v1/data/imports" in paths
+    assert "/api/v1/simulation/live-sessions" in paths
+    assert "/api/v1/simulation/live-sessions/{session_id}" in paths
+    assert "/api/v1/data/imports/dialects" in paths
+    assert "/api/v1/strategies/{strategy_id}/parameters" in paths
     assert "/api/v1/operator/approvals" in paths
     assert "/api/v1/operator/kill-switch" not in paths
     assert "/api/v1/backtest/run" not in paths

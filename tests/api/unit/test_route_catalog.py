@@ -14,10 +14,35 @@ def test_every_openapi_operation_has_exactly_one_contract() -> None:
     }
     declarations = {(item.method, item.path) for item in registry.all()}
     assert operations == declarations
-    assert registry.size == 55
+    assert registry.size == 71
     assert registry.get("GET", "/api/v1/auth/me") is not None
     assert registry.get("GET", "/api/v1/data/stream") is not None
     assert registry.get("POST", "/api/v1/portfolio/construct") is not None
+    assert registry.get("POST", "/api/v1/portfolio/{portfolio_id}/activate") is not None
+    assert registry.get("POST", "/api/v1/portfolio/{portfolio_id}/rollback") is not None
+    assert registry.get("POST", "/api/v1/portfolio/{portfolio_id}/drift") is not None
+    assert registry.get("POST", "/api/v1/portfolio/rebalance") is not None
+    assert registry.get("POST", "/api/v1/portfolio/measurement/recompute") is not None
+    assert registry.get("POST", "/api/v1/strategies") is not None
+    assert (
+        registry.get("PATCH", "/api/v1/strategies/{strategy_id}/parameters") is not None
+    )
+    assert registry.get("POST", "/api/v1/data/datasets/prepare") is not None
+    assert registry.get("POST", "/api/v1/risk/kill-switch") is not None
+    assert registry.get("POST", "/api/v1/simulation/live-sessions") is not None
+    assert (
+        registry.get("GET", "/api/v1/simulation/live-sessions/{session_id}") is not None
+    )
+    assert (
+        registry.get("POST", "/api/v1/simulation/live-sessions/{session_id}/step")
+        is not None
+    )
+    assert (
+        registry.get("POST", "/api/v1/simulation/live-sessions/{session_id}/branch")
+        is not None
+    )
+    assert registry.get("POST", "/api/v1/data/imports") is not None
+    assert registry.get("GET", "/api/v1/data/imports/dialects") is not None
     assert registry.get("GET", "/api/v1/agentic/runs/concrete-id") is not None
     assert registry.get("POST", "/api/v1/optimization/parameter-sweep") is not None
     assert registry.get("GET", "/api/v1/optimization/results/concrete-id") is not None

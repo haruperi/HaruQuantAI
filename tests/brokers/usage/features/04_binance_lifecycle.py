@@ -144,6 +144,7 @@ async def _run() -> None:
     except UsageEvidenceError as err:
         print("Output Result -> UsageEvidenceError : UsageEvidenceError")
         print(f"Data -> status='FAIL_CLOSED', reason='{err}'")
+        raise SystemExit(1) from err
 
 
 def main() -> None:

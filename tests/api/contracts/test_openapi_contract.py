@@ -23,9 +23,10 @@ def test_openapi_v1_matches_registered_contract_snapshot() -> None:
 def test_openapi_v1_contains_no_excluded_routes() -> None:
     """Unsupported backend-v1 workflow families remain absent."""
     paths = tuple(create_api_app().openapi()["paths"])
-    assert not any("/imports" in path for path in paths)
     assert not any("/docs/" in path for path in paths)
+    assert "/api/v1/data/imports" in paths
     assert "/api/v1/simulation/sessions" in paths
+    assert "/api/v1/simulation/live-sessions" in paths
     assert not any("/backtest/" in path for path in paths)
     assert "/api/v1/risk/kill-switch" in paths
     assert "/api/v1/trading/session" in paths

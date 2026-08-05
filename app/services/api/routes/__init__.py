@@ -14,6 +14,9 @@ from app.services.api.routes.research import router as research_router
 from app.services.api.routes.risk import router as risk_router
 from app.services.api.routes.settings import router as settings_router
 from app.services.api.routes.simulation import router as simulation_router
+from app.services.api.routes.simulation_live import (
+    router as simulation_live_router,
+)
 from app.services.api.routes.simulation_sessions import (
     router as simulation_sessions_router,
 )
@@ -34,6 +37,7 @@ __all__ = (
     "research_router",
     "risk_router",
     "settings_router",
+    "simulation_live_router",
     "simulation_router",
     "simulation_sessions_router",
     "strategies_router",

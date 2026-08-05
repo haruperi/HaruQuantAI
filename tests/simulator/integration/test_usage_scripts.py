@@ -23,7 +23,7 @@ _USAGE_SCRIPTS = (
 
 _USAGE_REQUIREMENTS = {
     "01_validation.py": {1, 2, 3},
-    "02_state.py": {41},
+    "02_state.py": {41, 97, 98, 99, 100, 101, 102},
     "03_timeline.py": {4, 5, 6},
     "04_accounting.py": {7, 8, 9, 10, 11, 12, 39, 42},
     "05_execution.py": {18, 19, 20, 21, 22, 23, 38, 43},

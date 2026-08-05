@@ -1,7 +1,7 @@
 /**
  * Drift test: the frontend client catalog mirrors the backend route inventory.
  *
- * Asserts that `ROUTE_CONTRACTS` in `routes.ts` contains exactly the 21
+ * Asserts that `ROUTE_CONTRACTS` in `routes.ts` contains exactly the 71
  * approved backend-v1 operations with the expected method/path/permission,
  * matching `app/services/api/contracts/catalog.py` (`_KNOWN_ROUTE_CONTRACTS`).
  * A backend route add/remove/rename must be reflected here or this test fails.
@@ -89,12 +89,51 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.trading.submit_order", method: "POST", path: "/api/v1/trading/orders", permission: "trading:write" },
   { id: "api.trading.cancel_order", method: "DELETE", path: "/api/v1/trading/orders/{order_id}", permission: "trading:write" },
   { id: "api.trading.close_position", method: "POST", path: "/api/v1/trading/positions/{position_id}/close", permission: "trading:write" },
+  { id: "api.data.prepare_dataset", method: "POST", path: "/api/v1/data/datasets/prepare", permission: "data:write" },
+  { id: "api.data.import_dialects", method: "GET", path: "/api/v1/data/imports/dialects", permission: "data:read" },
+  { id: "api.data.import_dataset", method: "POST", path: "/api/v1/data/imports", permission: "data:write" },
+  { id: "api.strategies.register", method: "POST", path: "/api/v1/strategies", permission: "strategy:write" },
+  { id: "api.strategies.update_parameters", method: "PATCH", path: "/api/v1/strategies/{strategy_id}/parameters", permission: "strategy:write" },
+  { id: "api.risk.apply_kill_switch", method: "POST", path: "/api/v1/risk/kill-switch", permission: "risk:kill_switch" },
+  { id: "api.simulation.session_create", method: "POST", path: "/api/v1/simulation/sessions", permission: "simulation:read" },
+  { id: "api.simulation.live_session_create", method: "POST", path: "/api/v1/simulation/live-sessions", permission: "simulation:run" },
+  { id: "api.simulation.live_session_read", method: "GET", path: "/api/v1/simulation/live-sessions/{session_id}", permission: "simulation:read" },
+  { id: "api.simulation.live_session_step", method: "POST", path: "/api/v1/simulation/live-sessions/{session_id}/step", permission: "simulation:run" },
+  { id: "api.simulation.live_session_branch", method: "POST", path: "/api/v1/simulation/live-sessions/{session_id}/branch", permission: "simulation:run" },
+  { id: "api.simulation.live_session_close", method: "DELETE", path: "/api/v1/simulation/live-sessions/{session_id}", permission: "simulation:run" },
+  { id: "api.simulation.session_frames", method: "GET", path: "/api/v1/simulation/sessions/{session_id}/frames", permission: "simulation:read" },
+  { id: "api.portfolio.construct", method: "POST", path: "/api/v1/portfolio/construct", permission: "portfolio:write" },
+  { id: "api.portfolio.status", method: "GET", path: "/api/v1/portfolio/{portfolio_id}/status", permission: "portfolio:read" },
+  { id: "api.portfolio.history", method: "GET", path: "/api/v1/portfolio/{portfolio_id}/history", permission: "portfolio:read" },
+  { id: "api.portfolio.activate", method: "POST", path: "/api/v1/portfolio/{portfolio_id}/activate", permission: "portfolio:activate" },
+  { id: "api.portfolio.rollback", method: "POST", path: "/api/v1/portfolio/{portfolio_id}/rollback", permission: "portfolio:activate" },
+  { id: "api.portfolio.drift", method: "POST", path: "/api/v1/portfolio/{portfolio_id}/drift", permission: "portfolio:read" },
+  { id: "api.portfolio.rebalance", method: "POST", path: "/api/v1/portfolio/rebalance", permission: "portfolio:rebalance" },
+  { id: "api.portfolio.recompute_measurement", method: "POST", path: "/api/v1/portfolio/measurement/recompute", permission: "portfolio:write" },
+  { id: "api.optimization.parameter_sweep", method: "POST", path: "/api/v1/optimization/parameter-sweep", permission: "optimization:run" },
+  { id: "api.optimization.walk_forward", method: "POST", path: "/api/v1/optimization/walk-forward", permission: "optimization:run" },
+  { id: "api.optimization.walk_forward_matrix", method: "POST", path: "/api/v1/optimization/walk-forward-matrix", permission: "optimization:run" },
+  { id: "api.optimization.robustness", method: "POST", path: "/api/v1/optimization/robustness", permission: "optimization:run" },
+  { id: "api.optimization.compare", method: "POST", path: "/api/v1/optimization/compare", permission: "optimization:read" },
+  { id: "api.optimization.stability", method: "POST", path: "/api/v1/optimization/stability", permission: "optimization:read" },
+  { id: "api.optimization.overfit", method: "POST", path: "/api/v1/optimization/overfit", permission: "optimization:read" },
+  { id: "api.optimization.rank", method: "POST", path: "/api/v1/optimization/rank", permission: "optimization:read" },
+  { id: "api.optimization.robustness_score", method: "POST", path: "/api/v1/optimization/robustness-score", permission: "optimization:read" },
+  { id: "api.optimization.handoff", method: "POST", path: "/api/v1/optimization/handoff", permission: "optimization:read" },
+  { id: "api.optimization.result", method: "GET", path: "/api/v1/optimization/results/{search_id}", permission: "optimization:read" },
+  { id: "api.agentic.submit_run", method: "POST", path: "/api/v1/agentic/runs", permission: "agentic:submit" },
+  { id: "api.agentic.inspect_run", method: "GET", path: "/api/v1/agentic/runs/{run_id}", permission: "agentic:read_run" },
+  { id: "api.agentic.cancel_run", method: "DELETE", path: "/api/v1/agentic/runs/{run_id}", permission: "agentic:cancel_run" },
+  { id: "api.agentic.audit_run", method: "GET", path: "/api/v1/agentic/runs/{run_id}/audit", permission: "agentic:read_audit" },
+  { id: "api.agentic.approve_handoff", method: "POST", path: "/api/v1/agentic/handoffs/approve", permission: "agentic:approve_promotion" },
+  { id: "api.agentic.quarantine_agent", method: "POST", path: "/api/v1/agentic/incidents/quarantine", permission: "agentic:operate" },
+  { id: "api.agentic.disable", method: "POST", path: "/api/v1/agentic/disable", permission: "agentic:operate" },
 ];
 
 describe("clients match the backend route catalog", () => {
-  it("has exactly the approved 32 operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(32);
-    expect(ROUTE_CONTRACTS).toHaveLength(32);
+  it("has exactly the approved 71 operations", () => {
+    expect(ROUTE_CONTRACT_COUNT).toBe(71);
+    expect(ROUTE_CONTRACTS).toHaveLength(71);
   });
 
   it("matches every expected id, method, path, and permission", () => {
@@ -168,5 +207,27 @@ describe("clients match the backend route catalog", () => {
       expect(contract?.idempotencyRequired, `${id} should require idempotency`).toBe(true);
       expect(contract?.sideEffect, `${id} should be write`).toBe("write");
     }
+  });
+
+  it("marks live session open and branch as governed + idempotent", () => {
+    for (const id of [
+      "api.simulation.live_session_create",
+      "api.simulation.live_session_branch",
+    ]) {
+      const contract = ROUTE_CONTRACTS_BY_ID[id];
+      expect(contract?.governed, `${id} should be governed`).toBe(true);
+      expect(contract?.idempotencyRequired, `${id} should require idempotency`).toBe(true);
+      expect(contract?.sideEffect, `${id} should be governed_write`).toBe("governed_write");
+    }
+  });
+
+  it("leaves the live step deliberately un-keyed", () => {
+    // Advancing is cumulative, not repeatable: a retried step is a further
+    // step, so an idempotency key would promise a replay the engine cannot
+    // give. The caller reconciles against the returned cursor instead.
+    const step = ROUTE_CONTRACTS_BY_ID["api.simulation.live_session_step"];
+    expect(step?.sideEffect).toBe("write");
+    expect(step?.governed).toBe(false);
+    expect(step?.idempotencyRequired).toBe(false);
   });
 });

@@ -1,5 +1,5 @@
 /**
- * Frozen typed route contracts for the 23 registered backend-v1 operations.
+ * Frozen typed route contracts for the 71 registered backend-v1 operations.
  *
  * Source of truth: `app/services/api/contracts/catalog.py` (`_KNOWN_ROUTE_CONTRACTS`).
  * The drift test in `clients.contract.test.ts` asserts that this module
@@ -158,9 +158,33 @@ export const dataRoutes = {
     sideEffect: "stream",
     stream: true,
   }),
+  prepareDataset: route({
+    id: "api.data.prepare_dataset",
+    method: "POST",
+    path: "/api/v1/data/datasets/prepare",
+    permission: "data:write",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  importDialects: route({
+    id: "api.data.import_dialects",
+    method: "GET",
+    path: "/api/v1/data/imports/dialects",
+    permission: "data:read",
+  }),
+  importDataset: route({
+    id: "api.data.import_dataset",
+    method: "POST",
+    path: "/api/v1/data/imports",
+    permission: "data:write",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
 } as const;
 
-// --- Strategies (2) ------------------------------------------------------
+// --- Strategies (4) ------------------------------------------------------
 
 export const strategiesRoutes = {
   catalogue: route({
@@ -174,6 +198,24 @@ export const strategiesRoutes = {
     method: "GET",
     path: "/api/v1/strategies/{strategy_id}/versions",
     permission: "strategy:read",
+  }),
+  register: route({
+    id: "api.strategies.register",
+    method: "POST",
+    path: "/api/v1/strategies",
+    permission: "strategy:write",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  updateParameters: route({
+    id: "api.strategies.update_parameters",
+    method: "PATCH",
+    path: "/api/v1/strategies/{strategy_id}/parameters",
+    permission: "strategy:write",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
   }),
 } as const;
 
@@ -296,7 +338,7 @@ export const simulationRoutes = {
   }),
 } as const;
 
-// --- Risk (2) ------------------------------------------------------------
+// --- Risk (3) ------------------------------------------------------------
 
 export const riskRoutes = {
   killSwitch: route({
@@ -310,6 +352,15 @@ export const riskRoutes = {
     method: "GET",
     path: "/api/v1/risk/decisions",
     permission: "risk:read",
+  }),
+  applyKillSwitch: route({
+    id: "api.risk.apply_kill_switch",
+    method: "POST",
+    path: "/api/v1/risk/kill-switch",
+    permission: "risk:kill_switch",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
   }),
 } as const;
 
@@ -351,8 +402,278 @@ export const tradingRoutes = {
   }),
 } as const;
 
+// --- Live what-if sessions (5) -------------------------------------------
+
+export const liveSimulationRoutes = {
+  createSession: route({
+    id: "api.simulation.live_session_create",
+    method: "POST",
+    path: "/api/v1/simulation/live-sessions",
+    permission: "simulation:run",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  readSession: route({
+    id: "api.simulation.live_session_read",
+    method: "GET",
+    path: "/api/v1/simulation/live-sessions/{session_id}",
+    permission: "simulation:read",
+  }),
+  step: route({
+    id: "api.simulation.live_session_step",
+    method: "POST",
+    path: "/api/v1/simulation/live-sessions/{session_id}/step",
+    permission: "simulation:run",
+    sideEffect: "write",
+  }),
+  branch: route({
+    id: "api.simulation.live_session_branch",
+    method: "POST",
+    path: "/api/v1/simulation/live-sessions/{session_id}/branch",
+    permission: "simulation:run",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  closeSession: route({
+    id: "api.simulation.live_session_close",
+    method: "DELETE",
+    path: "/api/v1/simulation/live-sessions/{session_id}",
+    permission: "simulation:run",
+    sideEffect: "write",
+  }),
+} as const;
+
+// --- Simulation journal playback sessions (2) ----------------------------
+
+export const simulationSessionRoutes = {
+  createSession: route({
+    id: "api.simulation.session_create",
+    method: "POST",
+    path: "/api/v1/simulation/sessions",
+    permission: "simulation:read",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  frames: route({
+    id: "api.simulation.session_frames",
+    method: "GET",
+    path: "/api/v1/simulation/sessions/{session_id}/frames",
+    permission: "simulation:read",
+    sideEffect: "stream",
+    stream: true,
+  }),
+} as const;
+
+// --- Portfolio (8) -------------------------------------------------------
+
+export const portfolioRoutes = {
+  construct: route({
+    id: "api.portfolio.construct",
+    method: "POST",
+    path: "/api/v1/portfolio/construct",
+    permission: "portfolio:write",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  status: route({
+    id: "api.portfolio.status",
+    method: "GET",
+    path: "/api/v1/portfolio/{portfolio_id}/status",
+    permission: "portfolio:read",
+  }),
+  history: route({
+    id: "api.portfolio.history",
+    method: "GET",
+    path: "/api/v1/portfolio/{portfolio_id}/history",
+    permission: "portfolio:read",
+  }),
+  activate: route({
+    id: "api.portfolio.activate",
+    method: "POST",
+    path: "/api/v1/portfolio/{portfolio_id}/activate",
+    permission: "portfolio:activate",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  rollback: route({
+    id: "api.portfolio.rollback",
+    method: "POST",
+    path: "/api/v1/portfolio/{portfolio_id}/rollback",
+    permission: "portfolio:activate",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  drift: route({
+    id: "api.portfolio.drift",
+    method: "POST",
+    path: "/api/v1/portfolio/{portfolio_id}/drift",
+    permission: "portfolio:read",
+  }),
+  rebalance: route({
+    id: "api.portfolio.rebalance",
+    method: "POST",
+    path: "/api/v1/portfolio/rebalance",
+    permission: "portfolio:rebalance",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  recomputeMeasurement: route({
+    id: "api.portfolio.recompute_measurement",
+    method: "POST",
+    path: "/api/v1/portfolio/measurement/recompute",
+    permission: "portfolio:write",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+} as const;
+
+// --- Optimization (11) ---------------------------------------------------
+
+/** The four true Optimization run routes share permission and idempotency.
+ * The analysis routes are reads and are declared individually. */
+function optimizationRun<TPath extends string>(
+  id: string,
+  path: TPath
+): RouteContract<"POST", TPath> {
+  return route({
+    id,
+    method: "POST",
+    path,
+    permission: "optimization:run",
+    sideEffect: "write",
+    idempotencyRequired: true,
+  });
+}
+
+export const optimizationRoutes = {
+  parameterSweep: optimizationRun(
+    "api.optimization.parameter_sweep",
+    "/api/v1/optimization/parameter-sweep"
+  ),
+  walkForward: optimizationRun(
+    "api.optimization.walk_forward",
+    "/api/v1/optimization/walk-forward"
+  ),
+  walkForwardMatrix: optimizationRun(
+    "api.optimization.walk_forward_matrix",
+    "/api/v1/optimization/walk-forward-matrix"
+  ),
+  robustness: optimizationRun(
+    "api.optimization.robustness",
+    "/api/v1/optimization/robustness"
+  ),
+  compare: route({
+    id: "api.optimization.compare",
+    method: "POST",
+    path: "/api/v1/optimization/compare",
+    permission: "optimization:read",
+  }),
+  stability: route({
+    id: "api.optimization.stability",
+    method: "POST",
+    path: "/api/v1/optimization/stability",
+    permission: "optimization:read",
+  }),
+  overfit: route({
+    id: "api.optimization.overfit",
+    method: "POST",
+    path: "/api/v1/optimization/overfit",
+    permission: "optimization:read",
+  }),
+  rank: route({
+    id: "api.optimization.rank",
+    method: "POST",
+    path: "/api/v1/optimization/rank",
+    permission: "optimization:read",
+  }),
+  robustnessScore: route({
+    id: "api.optimization.robustness_score",
+    method: "POST",
+    path: "/api/v1/optimization/robustness-score",
+    permission: "optimization:read",
+  }),
+  handoff: route({
+    id: "api.optimization.handoff",
+    method: "POST",
+    path: "/api/v1/optimization/handoff",
+    permission: "optimization:read",
+  }),
+  result: route({
+    id: "api.optimization.result",
+    method: "GET",
+    path: "/api/v1/optimization/results/{search_id}",
+    permission: "optimization:read",
+  }),
+} as const;
+
+// --- Agentic operator tier (7) -------------------------------------------
+
+export const agenticRoutes = {
+  submitRun: route({
+    id: "api.agentic.submit_run",
+    method: "POST",
+    path: "/api/v1/agentic/runs",
+    permission: "agentic:submit",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  getRun: route({
+    id: "api.agentic.inspect_run",
+    method: "GET",
+    path: "/api/v1/agentic/runs/{run_id}",
+    permission: "agentic:read_run",
+  }),
+  cancelRun: route({
+    id: "api.agentic.cancel_run",
+    method: "DELETE",
+    path: "/api/v1/agentic/runs/{run_id}",
+    permission: "agentic:cancel_run",
+    sideEffect: "governed_write",
+    governed: true,
+  }),
+  runAudit: route({
+    id: "api.agentic.audit_run",
+    method: "GET",
+    path: "/api/v1/agentic/runs/{run_id}/audit",
+    permission: "agentic:read_audit",
+  }),
+  approveHandoff: route({
+    id: "api.agentic.approve_handoff",
+    method: "POST",
+    path: "/api/v1/agentic/handoffs/approve",
+    permission: "agentic:approve_promotion",
+    sideEffect: "governed_write",
+    governed: true,
+  }),
+  quarantine: route({
+    id: "api.agentic.quarantine_agent",
+    method: "POST",
+    path: "/api/v1/agentic/incidents/quarantine",
+    permission: "agentic:operate",
+    sideEffect: "governed_write",
+    governed: true,
+  }),
+  disable: route({
+    id: "api.agentic.disable",
+    method: "POST",
+    path: "/api/v1/agentic/disable",
+    permission: "agentic:operate",
+    sideEffect: "governed_write",
+    governed: true,
+  }),
+} as const;
+
 /**
- * Frozen registry of all 32 route contracts.
+ * Frozen registry of all 71 route contracts.
  *
  * The count is exported for the drift test so a structural mismatch fails CI.
  */
@@ -389,10 +710,49 @@ export const ROUTE_CONTRACTS = [
   tradingRoutes.submitOrder,
   tradingRoutes.cancelOrder,
   tradingRoutes.closePosition,
+  dataRoutes.prepareDataset,
+  dataRoutes.importDialects,
+  dataRoutes.importDataset,
+  strategiesRoutes.register,
+  strategiesRoutes.updateParameters,
+  riskRoutes.applyKillSwitch,
+  liveSimulationRoutes.createSession,
+  liveSimulationRoutes.readSession,
+  liveSimulationRoutes.step,
+  liveSimulationRoutes.branch,
+  liveSimulationRoutes.closeSession,
+  simulationSessionRoutes.createSession,
+  simulationSessionRoutes.frames,
+  portfolioRoutes.construct,
+  portfolioRoutes.status,
+  portfolioRoutes.history,
+  portfolioRoutes.activate,
+  portfolioRoutes.rollback,
+  portfolioRoutes.drift,
+  portfolioRoutes.rebalance,
+  portfolioRoutes.recomputeMeasurement,
+  optimizationRoutes.parameterSweep,
+  optimizationRoutes.walkForward,
+  optimizationRoutes.walkForwardMatrix,
+  optimizationRoutes.robustness,
+  optimizationRoutes.compare,
+  optimizationRoutes.stability,
+  optimizationRoutes.overfit,
+  optimizationRoutes.rank,
+  optimizationRoutes.robustnessScore,
+  optimizationRoutes.handoff,
+  optimizationRoutes.result,
+  agenticRoutes.submitRun,
+  agenticRoutes.getRun,
+  agenticRoutes.cancelRun,
+  agenticRoutes.runAudit,
+  agenticRoutes.approveHandoff,
+  agenticRoutes.quarantine,
+  agenticRoutes.disable,
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 32;
+export const ROUTE_CONTRACT_COUNT = 71;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

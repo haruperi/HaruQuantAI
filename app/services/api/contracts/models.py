@@ -10,7 +10,7 @@ from enum import StrEnum
 from hashlib import blake2b
 from pathlib import Path
 from types import MappingProxyType
-from typing import Generic, Literal, Self, TypeVar, cast
+from typing import Any, Generic, Literal, Self, TypeVar, cast
 
 from pydantic import (
     BaseModel,
@@ -923,6 +923,108 @@ class PortfolioConstructRequest(_BaseApiContract):
     requested_at: datetime
 
 
+class PortfolioActivationRequest(_BaseApiContract):
+    """Governed Portfolio activation command.
+
+    Activation runs the complete owner workflow chain WF-PORT-001 through
+    WF-PORT-004 as one governed write: the composed Portfolio workflow handle
+    constructs the candidate and its validated evidence, coordinates the
+    Simulation and Risk review, and only then activates. The gateway supplies
+    no evidence of its own and never decides approval.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.portfolio_activation_request.v1"] = (
+        "api.portfolio_activation_request.v1"
+    )
+    construction: PortfolioConstructRequest
+    simulation: PortfolioSimulationRunRequest
+    approval_refs: tuple[str, ...] = ()
+    approval_attestation: Mapping[str, Any] | None = None
+    approval_validation: Mapping[str, Any] | None = None
+    expires_at: datetime
+    expected_predecessor: str | None = None
+    expected_revision: int
+
+
+class PortfolioRollbackRequest(_BaseApiContract):
+    """Governed Portfolio rollback command.
+
+    Rollback shares activation's evidence chain and additionally names the
+    immutable prior version being rolled back to. Portfolio creates a new
+    forward version; no historical version is mutated or deleted.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.portfolio_rollback_request.v1"] = (
+        "api.portfolio_rollback_request.v1"
+    )
+    construction: PortfolioConstructRequest
+    simulation: PortfolioSimulationRunRequest
+    rollback_of_version: str
+    approval_refs: tuple[str, ...] = ()
+    approval_attestation: Mapping[str, Any] | None = None
+    approval_validation: Mapping[str, Any] | None = None
+    expires_at: datetime
+    expected_predecessor: str | None = None
+    expected_revision: int
+
+
+class PortfolioDriftRequest(_BaseApiContract):
+    """Portfolio drift-assessment request over one active allocation.
+
+    The gateway reads the active allocation through the Portfolio public status
+    operation and forwards caller-supplied observed exposures. Drift thresholds
+    and the resulting judgement remain entirely Portfolio-owned.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.portfolio_drift_request.v1"] = (
+        "api.portfolio_drift_request.v1"
+    )
+    scope: Mapping[str, str]
+    actual_exposures: Mapping[str, Decimal]
+    evidence_as_of: datetime
+    risk_decision: Mapping[str, Any]
+    eligibility_decisions: Mapping[str, Mapping[str, Any]]
+
+
+class PortfolioRebalanceRequest(_BaseApiContract):
+    """Governed Portfolio rebalance submission.
+
+    Every evidence reference is opaque and owner-resolved. The runtime profile
+    and execution route must match the deployment's composed settings, and a
+    live route additionally requires ``allow_live_mutations``; the composition
+    layer enforces both before Portfolio is reached.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.portfolio_rebalance_request.v1"] = (
+        "api.portfolio_rebalance_request.v1"
+    )
+    plan: Mapping[str, Any]
+    account_evidence_ref: str
+    market_evidence_ref: str
+    fx_evidence_refs: tuple[str, ...]
+    runtime_profile: Literal["simulation", "paper", "live"]
+    execution_route: Literal["sim", "paper", "live"]
+    approval_refs: tuple[str, ...]
+    approval_token_ref: str
+    trading_request_id: str
+    valid_until: datetime
+
+
+class PortfolioMeasurementRequest(_BaseApiContract):
+    """Recompute one Portfolio measurement from immutable Trading evidence."""
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.portfolio_measurement_request.v1"] = (
+        "api.portfolio_measurement_request.v1"
+    )
+    plan_id: str
+    trading_request_id: str
+
+
 class PageContext(_BaseApiContract):
     """Frontend context before redaction."""
 
@@ -1489,6 +1591,96 @@ class OptimizationHandoffRequest(_BaseApiContract):
     payload: Mapping[str, object]
 
 
+class StrategyRegistrationRequestModel(_BaseApiContract):
+    """Serialized API projection of one Strategy registration command.
+
+    Strategy owns the registration schema and its validation policy. The gateway
+    forwards the caller payload to Strategy's package-root factory unchanged and
+    never supplies, defaults, or repairs a field.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.strategy_registration_request.v1"] = (
+        "api.strategy_registration_request.v1"
+    )
+    payload: Mapping[str, object]
+
+
+class StrategyParameterUpdateRequestModel(_BaseApiContract):
+    """Serialized API projection of one Strategy parameter update command."""
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.strategy_parameter_update_request.v1"] = (
+        "api.strategy_parameter_update_request.v1"
+    )
+    payload: Mapping[str, object]
+
+
+class DatasetPrepareRequest(_BaseApiContract):
+    """Governed dataset preparation command.
+
+    Preparation is a two-step owner delegation: Data fetches the requested
+    market dataset and then persists it. Both request shapes belong to Data; the
+    gateway forwards them and stores nothing itself.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.dataset_prepare_request.v1"] = (
+        "api.dataset_prepare_request.v1"
+    )
+    market_request: Mapping[str, object]
+    save_request: Mapping[str, object]
+
+
+class DatasetImportRequest(_BaseApiContract):
+    """Governed external dataset import command.
+
+    Data owns parsing, dialect handling, validation, and persistence, and
+    authors the resulting storage manifest. The gateway forwards the caller
+    payload unchanged: it never reads the source file and never selects a
+    dialect on the caller's behalf.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.dataset_import_request.v1"] = (
+        "api.dataset_import_request.v1"
+    )
+    payload: Mapping[str, object]
+
+
+class SimulationBranchRequest(_BaseApiContract):
+    """Live what-if branch command.
+
+    The overrides are Simulator-owned request fields. The gateway forwards them
+    unchanged; the Simulator validates them and refuses any override that
+    cannot produce a valid request, so no branch opens on bad input.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.simulation_branch_request.v1"] = (
+        "api.simulation_branch_request.v1"
+    )
+    overrides: Mapping[str, Any]
+
+
+class KillSwitchCommandRequest(_BaseApiContract):
+    """Operator kill-switch command projection.
+
+    Risk remains the sole kill-switch authority. The gateway authenticates a
+    human operator, requires a distinct-principal approval, and forwards the
+    command; it never computes, overrides, or clears canonical safety state.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.kill_switch_command_request.v1"] = (
+        "api.kill_switch_command_request.v1"
+    )
+    scope_level: str
+    scope: Mapping[str, str]
+    command: Mapping[str, object]
+    attestation: Mapping[str, Any] | None = None
+
+
 __all__ = (
     "AgenticDisableRequest",
     "AgenticHandoffApprovalRequest",
@@ -1499,8 +1691,11 @@ __all__ = (
     "ApiMetadata",
     "ApiResponse",
     "ApiStatus",
+    "DatasetImportRequest",
+    "DatasetPrepareRequest",
     "GovernedRequestContext",
     "HealthDependencyCheck",
+    "KillSwitchCommandRequest",
     "Liveness",
     "OptimizationCompareRequest",
     "OptimizationHandoffRequest",
@@ -1513,10 +1708,15 @@ __all__ = (
     "OptimizationWalkForwardMatrixRequest",
     "OptimizationWalkForwardRequest",
     "PageContext",
+    "PortfolioActivationRequest",
     "PortfolioComponentRunRequest",
     "PortfolioConstructRequest",
+    "PortfolioDriftRequest",
     "PortfolioEvidenceReferenceSet",
     "PortfolioFixedWeightInput",
+    "PortfolioMeasurementRequest",
+    "PortfolioRebalanceRequest",
+    "PortfolioRollbackRequest",
     "PortfolioSimulationRunRequest",
     "PortfolioStrategyAllocationRef",
     "Readiness",
@@ -1524,7 +1724,10 @@ __all__ = (
     "RouteContract",
     "RouteSideEffect",
     "RouteStability",
+    "SimulationBranchRequest",
     "SimulationRunRequest",
+    "StrategyParameterUpdateRequestModel",
+    "StrategyRegistrationRequestModel",
     "StreamEvent",
     "StreamEventType",
     "TradingMutationRequest",

@@ -27,6 +27,8 @@ from app.services.api.identity.idempotency import (
     IdempotencyDecision,
     finalize_idempotency_key,
     reserve_idempotency_key,
+    run_idempotent_write,
+    run_idempotent_write_async,
 )
 from app.services.api.identity.passwords import hash_password, verify_password
 from app.services.api.identity.sessions import (
@@ -78,6 +80,8 @@ __all__ = (
     "resolve_credential_reference",
     "revoke_session",
     "run_api_migrations",
+    "run_idempotent_write",
+    "run_idempotent_write_async",
     "store_credential",
     "update_system_settings",
     "update_user_settings",

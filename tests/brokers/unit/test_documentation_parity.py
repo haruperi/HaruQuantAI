@@ -11,7 +11,7 @@ def test_brokers_readme_has_one_reconciled_completed_registry() -> None:
     rows = re.findall(
         r"\| Completed \| `(?P<id>FEAT-BRK-\d{2})`[^|]*"
         r"\| `(?P<folder>[^`]+/)`[^|]*\|[^|]*\|[^|]*"
-        r"\| `(?P<usage>tests/brokers/usage/features/\d{2}_[^`]+\.py)` \|",
+        r"\| `(?P<usage>tests/brokers/usage/features/\d{2}_[^`]+\.py)`\s+\|",
         readme,
     )
     assert [feature_id for feature_id, _, _ in rows] == [

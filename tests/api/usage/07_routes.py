@@ -21,13 +21,20 @@ def main() -> None:
     contracts = get_canonical_route_contract_registry()
     declarations = {(item.method, item.path) for item in contracts.all()}
     assert operations == declarations
-    assert len(operations) == 55
+    assert len(operations) == 71
     assert ("POST", "/api/v1/simulation/run") in operations
     assert ("GET", "/api/v1/risk/kill-switch") in operations
     assert ("GET", "/api/v1/trading/session") in operations
     assert ("POST", "/api/v1/simulation/sessions") in operations
     assert ("GET", "/api/v1/simulation/sessions/{session_id}/frames") in operations
+    assert ("POST", "/api/v1/simulation/live-sessions") in operations
+    assert (
+        "POST",
+        "/api/v1/simulation/live-sessions/{session_id}/branch",
+    ) in operations
     assert not any("/backtest/" in path for _, path in operations)
+    # Live *execution* has no parallel route family; live *simulation* is a
+    # session surface, which is a different thing entirely.
     assert not any("/live/" in path for _, path in operations)
     assert any("/optimization/" in path for _, path in operations)
     assert any("/portfolio/" in path for _, path in operations)

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Iterable, Mapping
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -259,7 +260,219 @@ def _require_nonempty_timeline(timeline: tuple[Tick, ...]) -> None:
         )
 
 
-def _run_backtest_with_evidence(  # noqa: C901, PLR0915 - governed lifecycle.
+@dataclass(frozen=True, slots=True)
+class RunContext:
+    """Everything one prepared run needs before its timeline is advanced.
+
+    Assembling this is the deterministic half of a backtest: market data, tick
+    timeline, journal writer, ledger, engine, and the approved order intents.
+    Advancing the timeline is the other half. Separating them lets a caller
+    prepare once and advance in increments, which is what a live what-if
+    session does, without duplicating the preparation logic or letting it drift
+    from the official run.
+    """
+
+    timeline: tuple[Tick, ...]
+    evidence: Any
+    writer: Any
+    ledger: AccountLedger
+    profile: Any
+    engine: Any
+    order_intents: tuple[OrderIntent, ...]
+
+
+def prepare_run_context(
+    request: SimulationBacktestRequestV1,
+    dependencies: SimulationRunDependencies,
+    run_id: str,
+) -> RunContext:
+    """Assemble one run's deterministic execution context.
+
+    This is exactly the preparation `run_backtest` has always performed, in the
+    same order, extracted so a live session can reuse it. It appends the
+    ``run_started`` journal entry, so a caller that prepares a context owns the
+    resulting journal.
+
+    Args:
+        request: Exact receiver-owned backtest request.
+        dependencies: Explicit cross-domain and persistence composition.
+        run_id: Canonical run identity for journal attribution.
+
+    Returns:
+        Prepared context ready for timeline advancement.
+    """
+    source_dataset = unwrap_simulation_response(
+        dependencies.load_market_data(request),
+        operation="simulation.run.load_market_data",
+    )
+    tick_dataset = unwrap_simulation_response(
+        dependencies.generate_tick_series(source_dataset, request),
+        operation="simulation.run.generate_tick_series",
+    )
+    context = MarketDataValidationContext(
+        expected_data_hash=request.data_hash,
+        requested_start=request.start,
+        requested_end=request.end,
+        evaluated_at=tick_dataset.available_at,
+        maximum_staleness=timedelta(0),
+        allowed_tick_models=APPROVED_TICK_MODELS,
+    )
+    evidence = validate_market_data(tick_dataset, context)
+    timeline = build_tick_timeline(tick_dataset)
+    _require_nonempty_timeline(timeline)
+    writer = JournalWriter(
+        dependencies.state_store,
+        run_id,
+        request.request_id,
+        request.correlation_id,
+    )
+    unwrap_simulation_response(
+        writer.append(
+            "run_started",
+            {
+                "config_hash": request.config_hash,
+                "data_hash": evidence.data_hash,
+                "engine_version": _ENGINE_VERSION,
+            },
+            timeline[0].timestamp,
+        ),
+        operation="simulation.run.journal_append",
+    )
+    specification = unwrap_simulation_response(
+        dependencies.resolve_symbol_specification(request),
+        operation="simulation.run.resolve_symbol_specification",
+    )
+    cost_model = unwrap_simulation_response(
+        dependencies.resolve_cost_model(request),
+        operation="simulation.run.resolve_cost_model",
+    )
+    profile = unwrap_simulation_response(
+        dependencies.resolve_execution_profile(request),
+        operation="simulation.run.resolve_execution_profile",
+    )
+    ledger = AccountLedger(
+        request.initial_balance,
+        request.account_currency,
+        specification,
+        cost_model,
+    )
+    engine = EventDrivenExecutionEngine(ledger, writer, profile, _ENGINE_VERSION)
+    indicators = unwrap_simulation_response(
+        dependencies.calculate_indicators(source_dataset, request),
+        operation="simulation.run.calculate_indicators",
+    )
+    strategy_intents = unwrap_simulation_response(
+        dependencies.evaluate_strategy(source_dataset, indicators, request),
+        operation="simulation.run.evaluate_strategy",
+    )
+    risk_decisions = unwrap_simulation_response(
+        dependencies.review_risk(strategy_intents, request),
+        operation="simulation.run.review_risk",
+    )
+    approved_order_intents: tuple[OrderIntent, ...] = unwrap_simulation_response(
+        dependencies.build_order_intents(risk_decisions, request),
+        operation="simulation.run.build_order_intents",
+    )
+    order_intents = tuple(
+        sorted(
+            approved_order_intents,
+            key=lambda item: (item.created_at, item.client_order_id),
+        )
+    )
+    return RunContext(
+        timeline=timeline,
+        evidence=evidence,
+        writer=writer,
+        ledger=ledger,
+        profile=profile,
+        engine=engine,
+        order_intents=order_intents,
+    )
+
+
+def submit_orders_before(
+    engine: object,
+    unsent: list[OrderIntent],
+    receipts: list[object],
+    boundary: datetime,
+) -> None:
+    """Submit every intent created strictly before one timeline instant.
+
+    Args:
+        engine: Event-driven execution engine.
+        unsent: Ordered pending intents, drained in place.
+        receipts: Accumulated execution receipts, appended in place.
+        boundary: Exclusive upper bound on intent creation time.
+    """
+    while unsent and unsent[0].created_at < boundary:
+        receipts.append(
+            unwrap_simulation_response(
+                cast("Any", engine).submit_order(unsent.pop(0)),
+                operation="simulation.run.engine_submit_order",
+            )
+        )
+
+
+def advance_run_timeline(
+    engine: object,
+    timeline: tuple[Tick, ...],
+    unsent: list[OrderIntent],
+    receipts: list[object],
+    *,
+    start_index: int = 0,
+    max_ticks: int | None = None,
+) -> int:
+    """Advance one engine across a bounded slice of its tick timeline.
+
+    This is the exact loop `run_backtest` has always executed, extracted so a
+    caller can drive it in bounded increments instead of only to completion.
+    Default arguments run the whole timeline in one call, which is what an
+    uninterrupted backtest does — the per-tick order of `execute_tick` followed
+    by due-order submission is unchanged, so a completed run produces the same
+    receipts, journal, and result hash regardless of how many calls were used
+    to get there.
+
+    Args:
+        engine: Event-driven execution engine.
+        timeline: Complete ordered tick timeline.
+        unsent: Ordered pending intents, drained in place.
+        receipts: Accumulated execution receipts, appended in place.
+        start_index: Index of the first tick to execute.
+        max_ticks: Maximum ticks to execute, or ``None`` for the remainder.
+
+    Returns:
+        Index of the next unexecuted tick; equals ``len(timeline)`` when the
+        timeline is exhausted.
+    """
+    stop = (
+        len(timeline)
+        if max_ticks is None
+        else min(len(timeline), start_index + max_ticks)
+    )
+    index = start_index
+    while index < stop:
+        tick = timeline[index]
+        receipts.extend(
+            cast(
+                "Iterable[object]",
+                unwrap_simulation_response(
+                    cast("Any", engine).execute_tick(tick),
+                    operation="simulation.run.engine_execute_tick",
+                ),
+            )
+        )
+        while unsent and unsent[0].created_at <= tick.timestamp:
+            receipts.append(
+                unwrap_simulation_response(
+                    cast("Any", engine).submit_order(unsent.pop(0)),
+                    operation="simulation.run.engine_submit_order",
+                )
+            )
+        index += 1
+    return index
+
+
+def _run_backtest_with_evidence(  # noqa: PLR0915 - governed lifecycle.
     request: SimulationBacktestRequestV1,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
@@ -345,111 +558,18 @@ def _run_backtest_with_evidence(  # noqa: C901, PLR0915 - governed lifecycle.
         operation="simulation.run.record_idempotency",
     )
     try:
-        source_dataset = unwrap_simulation_response(
-            dependencies.load_market_data(request),
-            operation="simulation.run.load_market_data",
-        )
-        tick_dataset = unwrap_simulation_response(
-            dependencies.generate_tick_series(source_dataset, request),
-            operation="simulation.run.generate_tick_series",
-        )
-        context = MarketDataValidationContext(
-            expected_data_hash=request.data_hash,
-            requested_start=request.start,
-            requested_end=request.end,
-            evaluated_at=tick_dataset.available_at,
-            maximum_staleness=timedelta(0),
-            allowed_tick_models=APPROVED_TICK_MODELS,
-        )
-        evidence = validate_market_data(tick_dataset, context)
-        timeline = build_tick_timeline(tick_dataset)
-        _require_nonempty_timeline(timeline)
-        writer = JournalWriter(
-            dependencies.state_store,
-            run_id,
-            request.request_id,
-            request.correlation_id,
-        )
-        unwrap_simulation_response(
-            writer.append(
-                "run_started",
-                {
-                    "config_hash": request.config_hash,
-                    "data_hash": evidence.data_hash,
-                    "engine_version": _ENGINE_VERSION,
-                },
-                timeline[0].timestamp,
-            ),
-            operation="simulation.run.journal_append",
-        )
-        specification = unwrap_simulation_response(
-            dependencies.resolve_symbol_specification(request),
-            operation="simulation.run.resolve_symbol_specification",
-        )
-        cost_model = unwrap_simulation_response(
-            dependencies.resolve_cost_model(request),
-            operation="simulation.run.resolve_cost_model",
-        )
-        profile = unwrap_simulation_response(
-            dependencies.resolve_execution_profile(request),
-            operation="simulation.run.resolve_execution_profile",
-        )
-        ledger = AccountLedger(
-            request.initial_balance,
-            request.account_currency,
-            specification,
-            cost_model,
-        )
-        engine = EventDrivenExecutionEngine(ledger, writer, profile, _ENGINE_VERSION)
-        indicators = unwrap_simulation_response(
-            dependencies.calculate_indicators(source_dataset, request),
-            operation="simulation.run.calculate_indicators",
-        )
-        strategy_intents = unwrap_simulation_response(
-            dependencies.evaluate_strategy(source_dataset, indicators, request),
-            operation="simulation.run.evaluate_strategy",
-        )
-        risk_decisions = unwrap_simulation_response(
-            dependencies.review_risk(strategy_intents, request),
-            operation="simulation.run.review_risk",
-        )
-        approved_order_intents: tuple[OrderIntent, ...] = unwrap_simulation_response(
-            dependencies.build_order_intents(risk_decisions, request),
-            operation="simulation.run.build_order_intents",
-        )
-        order_intents = tuple(
-            sorted(
-                approved_order_intents,
-                key=lambda item: (item.created_at, item.client_order_id),
-            )
-        )
+        context = prepare_run_context(request, dependencies, run_id)
+        timeline = context.timeline
+        evidence = context.evidence
+        writer = context.writer
+        ledger = context.ledger
+        profile = context.profile
+        engine = context.engine
+        order_intents = context.order_intents
         unsent = list(order_intents)
         receipts: list[object] = []
-        first_time = timeline[0].timestamp
-        while unsent and unsent[0].created_at < first_time:
-            receipts.append(
-                unwrap_simulation_response(
-                    engine.submit_order(unsent.pop(0)),
-                    operation="simulation.run.engine_submit_order",
-                )
-            )
-        for tick in timeline:
-            receipts.extend(
-                cast(
-                    "Iterable[object]",
-                    unwrap_simulation_response(
-                        engine.execute_tick(tick),
-                        operation="simulation.run.engine_execute_tick",
-                    ),
-                )
-            )
-            while unsent and unsent[0].created_at <= tick.timestamp:
-                receipts.append(
-                    unwrap_simulation_response(
-                        engine.submit_order(unsent.pop(0)),
-                        operation="simulation.run.engine_submit_order",
-                    )
-                )
+        submit_orders_before(engine, unsent, receipts, timeline[0].timestamp)
+        advance_run_timeline(engine, timeline, unsent, receipts)
         terminal_state = unwrap_simulation_response(
             engine.snapshot(),
             operation="simulation.run.engine_snapshot",

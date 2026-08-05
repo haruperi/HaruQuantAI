@@ -1,5 +1,5 @@
 /**
- * Risk client for read-only risk state presentation (2 operations).
+ * Risk client for risk state reads and the governed kill-switch command (3 operations).
  *
  * The Risk domain owns the exact `KillSwitchState.v1` and
  * `RiskDecisionPackage.v1` shapes; the gateway returns them opaquely.
@@ -59,5 +59,22 @@ export function decisions(
   });
 }
 
+/**
+ * Request one governed kill-switch transition (requires `risk:kill_switch`).
+ *
+ * Risk validates the attestation and owns the resulting state; a command
+ * without attestation is refused by the backend before any owner call.
+ */
+export function applyKillSwitch(
+  body: Record<string, unknown>,
+  options?: RequestOptions
+): Promise<ApiResponse<KillSwitchState>> {
+  return request<KillSwitchState>(riskRoutes.applyKillSwitch, {
+    schema: killSwitchStateSchema,
+    body,
+    ...options,
+  });
+}
+
 /** Aggregated risk client. */
-export const risk = { killSwitch, decisions };
+export const risk = { killSwitch, decisions, applyKillSwitch };

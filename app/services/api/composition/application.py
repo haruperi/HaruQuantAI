@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.services.api._settings import ApiSettings, get_api_settings
 from app.services.api.composition.agentic_dependencies import build_agentic_source
+from app.services.api.composition.data_dependencies import build_dataset_source
 from app.services.api.composition.in_process import (
     build_in_process_graph,
     get_graph_closers,
@@ -16,6 +17,9 @@ from app.services.api.composition.in_process import (
     get_graph_probes,
 )
 from app.services.api.composition.lifecycle import lifespan
+from app.services.api.composition.live_simulation_dependencies import (
+    build_live_simulation_source,
+)
 from app.services.api.composition.optimization_dependencies import (
     build_optimization_source,
 )
@@ -27,12 +31,14 @@ from app.services.api.composition.owner_sources import (
     read_trading_events,
     read_trading_session,
 )
-from app.services.api.composition.portfolio_dependencies import (
-    build_portfolio_source,
-)
+from app.services.api.composition.portfolio_dependencies import build_portfolio_source
+from app.services.api.composition.risk_dependencies import build_risk_command_source
 from app.services.api.composition.simulation_dependencies import (
     build_simulation_run_source,
     build_simulation_session_source,
+)
+from app.services.api.composition.strategy_dependencies import (
+    build_strategy_mutation_source,
 )
 from app.services.api.composition.trading_dependencies import (
     build_trading_mutation_source,
@@ -67,6 +73,7 @@ from app.services.api.routes import (
     research_router,
     risk_router,
     settings_router,
+    simulation_live_router,
     simulation_router,
     simulation_sessions_router,
     strategies_router,
@@ -84,6 +91,7 @@ _ROUTERS = (
     data_stream_router,
     strategies_router,
     research_router,
+    simulation_live_router,
     simulation_router,
     simulation_sessions_router,
     portfolio_router,
@@ -105,6 +113,8 @@ def _build_canonical_graph(
     portfolio_dependencies: object | None = None,
     optimization_dependencies: object | None = None,
     agentic_dependencies: object | None = None,
+    strategy_dependencies: object | None = None,
+    risk_dependencies: object | None = None,
 ) -> object:
     """Build the exact owner-backed graph for the reduced backend v1.
 
@@ -115,11 +125,16 @@ def _build_canonical_graph(
         {
             "agentic.source": build_agentic_source(agentic_dependencies),
             "dashboard.source": read_dashboard_snapshot,
+            "data.dataset_source": build_dataset_source(),
             "operator.audit_source": read_audit_events,
             "operator.event_source": read_trading_events,
             "optimization.source": build_optimization_source(optimization_dependencies),
             "portfolio.source": build_portfolio_source(portfolio_dependencies),
+            "risk.command_source": build_risk_command_source(risk_dependencies),
             "risk.source": read_risk_state,
+            "simulation.live_source": build_live_simulation_source(
+                simulation_dependencies
+            ),
             "simulation.result_source": partial(
                 read_simulation_result,
                 artifact_root=settings.simulation_artifact_root,
@@ -130,8 +145,11 @@ def _build_canonical_graph(
             "simulation.session_source": build_simulation_session_source(
                 simulation_dependencies
             ),
+            "strategy.mutation_source": build_strategy_mutation_source(
+                strategy_dependencies
+            ),
             "trading.mutation_source": build_trading_mutation_source(
-                trading_dependencies
+                trading_dependencies, runtime_policy=settings
             ),
             "trading.session_source": read_trading_session,
         }
@@ -248,6 +266,8 @@ def create_app(
     portfolio_dependencies: object | None = None,
     optimization_dependencies: object | None = None,
     agentic_dependencies: object | None = None,
+    strategy_dependencies: object | None = None,
+    risk_dependencies: object | None = None,
 ) -> FastAPI:
     """Construct the single canonical UI/API application.
 
@@ -266,6 +286,10 @@ def create_app(
             closed with HTTP 503.
         agentic_dependencies: Complete Agentic ``AgenticDependencies`` bundle,
             or ``None`` to fail every Agentic route closed with HTTP 503.
+        strategy_dependencies: Strategy validation-policy bundle, or ``None`` to
+            fail Strategy mutation routes closed with HTTP 503.
+        risk_dependencies: Risk kill-switch command bundle, or ``None`` to fail
+            the kill-switch command route closed with HTTP 503.
 
     Returns:
         Fully composed FastAPI application.
@@ -298,6 +322,8 @@ def create_app(
         portfolio_dependencies=portfolio_dependencies,
         optimization_dependencies=optimization_dependencies,
         agentic_dependencies=agentic_dependencies,
+        strategy_dependencies=strategy_dependencies,
+        risk_dependencies=risk_dependencies,
     )
     graph_overrides = dict(get_graph_overrides(graph))
     graph_overrides.update(dependency_overrides or {})

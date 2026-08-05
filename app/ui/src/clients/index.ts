@@ -1,13 +1,13 @@
 /**
  * Typed frontend client catalog.
  *
- * Aggregates the 9 focused domain clients into one `apiClients` object so
+ * Aggregates the 17 focused domain clients into one `apiClients` object so
  * callers import a single entry point:
  *
  *   import { apiClients, unwrapData, ApiClientError } from "@/clients";
  *   const { data } = await apiClients.health.liveness();
  *
- * The catalog exposes typed clients only for the 32 registered backend-v1
+ * The catalog exposes typed clients only for the 71 registered backend-v1
  * operations. No parallel generic helper exists; every call delegates through
  * the single `request` transport. The drift test asserts this catalog matches
  * the backend route inventory exactly.
@@ -50,6 +50,7 @@ export type {
   AuditEventsPage,
   OperationalEvent,
 } from "./operator";
+export type { LiveSession } from "./liveSimulation";
 export type {
   PortfolioSimulationResult,
   SimulationResult,
@@ -93,6 +94,11 @@ import { metrics } from "./metrics";
 import { simulation } from "./simulation";
 import { risk } from "./risk";
 import { trading } from "./trading";
+import { portfolio } from "./portfolio";
+import { optimization } from "./optimization";
+import { agentic } from "./agentic";
+import { simulationSessions } from "./simulationSessions";
+import { liveSimulation } from "./liveSimulation";
 
 export {
   auth,
@@ -105,8 +111,13 @@ export {
   operator,
   metrics,
   simulation,
+  simulationSessions,
+  liveSimulation,
   risk,
   trading,
+  portfolio,
+  optimization,
+  agentic,
 };
 
 /**
@@ -127,8 +138,13 @@ export const apiClients = {
   operator,
   metrics,
   simulation,
+  simulationSessions,
+  liveSimulation,
   risk,
   trading,
+  portfolio,
+  optimization,
+  agentic,
 } as const;
 
 /** Aggregate type of the catalog, for callers that want to depend on the shape. */

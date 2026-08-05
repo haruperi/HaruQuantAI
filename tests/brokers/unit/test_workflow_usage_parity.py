@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import importlib.util
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +22,17 @@ EXPECTED = {
     "WF-BRK-009": "wf_brk_009_inject_canonical_broker_execution.py",
     "WF-BRK-010": "wf_brk_010_discover_registered_brokers_capabilities.py",
 }
+
+
+def _local_imports(tree: ast.Module) -> set[str]:
+    """Return top-level app/tests module imports that must resolve."""
+    names: set[str] = set()
+    for node in tree.body:
+        if isinstance(node, ast.ImportFrom) and node.module:
+            names.add(node.module)
+        elif isinstance(node, ast.Import):
+            names.update(alias.name for alias in node.names)
+    return {name for name in names if name.startswith(("app.", "tests."))}
 
 
 def _assignment(path: Path, name: str) -> Any:
@@ -47,6 +59,10 @@ def test_broker_workflow_registry_has_one_complete_program_per_workflow() -> Non
     for workflow_id, filename in EXPECTED.items():
         path = WORKFLOW_DIR / filename
         source = path.read_text(encoding="utf-8")
+        for module_name in _local_imports(ast.parse(source)):
+            assert importlib.util.find_spec(module_name) is not None, (
+                f"{filename} imports unresolvable module {module_name}"
+            )
         stages = _assignment(path, "STAGES")
         assert _assignment(path, "WORKFLOW_ID") == workflow_id
         assert source.count("# Stage ") == len(stages)

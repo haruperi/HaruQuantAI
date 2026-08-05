@@ -3,7 +3,7 @@
  *
  * Auth-aware shell plus freshness-aware dashboard, read-only strategy
  * catalogue, backtest simulation, risk state, trading session, and Edge Lab
- * research views. Each consumes the typed clients and (for the shell) the auth
+ * research, completed-run journal playback, and live what-if session views. Each consumes the typed clients and (for the shell) the auth
  * context built in Sections 4.9/4.10.
  */
 
@@ -26,3 +26,9 @@ export type { TradingViewProps } from "./trading";
 
 export { ResearchWorkspace } from "./research";
 export type { ResearchWorkspaceProps } from "./research";
+
+export { PlaybackView } from "./playback";
+export type { PlaybackViewProps } from "./playback";
+
+export { WhatIfView } from "./whatIf";
+export type { WhatIfViewProps } from "./whatIf";

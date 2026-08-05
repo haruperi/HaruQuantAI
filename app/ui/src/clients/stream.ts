@@ -14,6 +14,8 @@ import { ApiClientError, type QueryValue, type RequestOptions } from "./request"
 
 /** Options accepted by `openStream` (a subset of `RequestOptions`). */
 export interface StreamTransportOptions {
+  /** Path parameters interpolated into the route template. */
+  pathParams?: Record<string, string | number>;
   /** Query parameters. */
   query?: Record<string, QueryValue>;
   /** Explicit request id; generated when omitted. */
@@ -95,7 +97,12 @@ export async function* openStream(
     });
   }
 
-  const url = resolveBaseUrl() + contract.path + buildQuery(options.query);
+  const path = Object.entries(options.pathParams ?? {}).reduce(
+    (acc, [key, value]) =>
+      acc.replace(`{${key}}`, encodeURIComponent(String(value))),
+    contract.path
+  );
+  const url = resolveBaseUrl() + path + buildQuery(options.query);
   const requestId = options.requestId ?? generateRequestId();
   const headers: Record<string, string> = {
     "X-Request-Id": requestId,

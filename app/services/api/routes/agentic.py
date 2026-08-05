@@ -33,7 +33,12 @@ from app.services.api.contracts import (
     AgenticQuarantineRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     AgenticRunSubmitRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
-from app.services.api.identity import require_auth_context, require_human_permission
+from app.services.api.identity import (
+    require_auth_context,
+    require_human_permission,
+    run_idempotent_write,
+)
+from app.utils import generate_id
 
 type AuthContext = Any
 type _AgenticSource = Callable[..., object]
@@ -109,18 +114,26 @@ def _submit_run(
         HTTPException: If authorization, idempotency, or composition fails.
     """
     require_human_permission(auth, "agentic:submit")
-    _require_idempotency(idempotency_key)
+    key = _require_idempotency(idempotency_key)
     try:
-        return source(
-            "submit",
-            auth,
-            request.workflow_name,
-            request.objective,
-            request.input_refs,
-            idempotency_key,
-            request.deadline_seconds,
-            request.cost_budget,
-            None,
+        return run_idempotent_write(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/agentic/runs",
+            key=key,
+            request_material=request.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source(
+                "submit",
+                auth,
+                request.workflow_name,
+                request.objective,
+                request.input_refs,
+                idempotency_key,
+                request.deadline_seconds,
+                request.cost_budget,
+                None,
+            ),
         )
     except RuntimeError as error:
         _runtime_unavailable(error)
@@ -163,9 +176,19 @@ def _cancel_run(
         HTTPException: If authorization, idempotency, or composition fails.
     """
     require_human_permission(auth, "agentic:cancel_run")
-    _require_idempotency(idempotency_key)
+    key = _require_idempotency(idempotency_key)
     try:
-        return source("cancel", auth, run_id, "OPERATOR_CANCELLED", None)
+        return run_idempotent_write(
+            principal_id=auth.principal_id,
+            method="DELETE",
+            route="/api/v1/agentic/runs/{run_id}",
+            key=key,
+            request_material={"run_id": run_id},
+            request_id=generate_id("req"),
+            operation=lambda: source(
+                "cancel", auth, run_id, "OPERATOR_CANCELLED", None
+            ),
+        )
     except RuntimeError as error:
         _runtime_unavailable(error)
 
@@ -208,15 +231,23 @@ def _approve_handoff(
         HTTPException: If authorization, idempotency, or composition fails.
     """
     require_human_permission(auth, "agentic:approve_promotion")
-    _require_idempotency(idempotency_key)
+    key = _require_idempotency(idempotency_key)
     try:
-        return source(
-            "approve",
-            auth,
-            request.artifact_hash,
-            request.artifact_id,
-            request.rationale,
-            None,
+        return run_idempotent_write(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/agentic/handoffs/approve",
+            key=key,
+            request_material=request.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source(
+                "approve",
+                auth,
+                request.artifact_hash,
+                request.artifact_id,
+                request.rationale,
+                None,
+            ),
         )
     except RuntimeError as error:
         _runtime_unavailable(error)
@@ -238,18 +269,26 @@ def _quarantine_agent(
         HTTPException: If authorization, idempotency, or composition fails.
     """
     require_human_permission(auth, "agentic:operate")
-    _require_idempotency(idempotency_key)
+    key = _require_idempotency(idempotency_key)
     try:
-        return source(
-            "quarantine",
-            auth,
-            request.run_id,
-            request.kind,
-            request.trigger,
-            request.role_id,
-            request.preserved_evidence_refs,
-            request.checkpoint_ref,
-            None,
+        return run_idempotent_write(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/agentic/incidents/quarantine",
+            key=key,
+            request_material=request.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source(
+                "quarantine",
+                auth,
+                request.run_id,
+                request.kind,
+                request.trigger,
+                request.role_id,
+                request.preserved_evidence_refs,
+                request.checkpoint_ref,
+                None,
+            ),
         )
     except RuntimeError as error:
         _runtime_unavailable(error)
@@ -275,9 +314,19 @@ def _disable_agentic(
         HTTPException: If authorization, idempotency, or composition fails.
     """
     require_human_permission(auth, "agentic:operate")
-    _require_idempotency(idempotency_key)
+    key = _require_idempotency(idempotency_key)
     try:
-        return source("disable", auth, request.run_ids, request.policy, None)
+        return run_idempotent_write(
+            principal_id=auth.principal_id,
+            method="POST",
+            route="/api/v1/agentic/disable",
+            key=key,
+            request_material=request.model_dump(mode="json"),
+            request_id=generate_id("req"),
+            operation=lambda: source(
+                "disable", auth, request.run_ids, request.policy, None
+            ),
+        )
     except RuntimeError as error:
         _runtime_unavailable(error)
 

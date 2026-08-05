@@ -37,6 +37,12 @@ class ApiSettings(BaseSettings):
     execution_route: Literal["none", "sim", "paper", "live"] = "none"
     simulation_artifact_root: Path = Path("artifacts/simulation")
     allow_live_mutations: bool = False
+    # Shared persistence configuration. Data owns the connection, locking, and
+    # migration-execution infrastructure; UI/API only names the target so its
+    # own schemas and records resolve to the same store. A raw connection is
+    # never constructed here and never crosses the API boundary.
+    database_url: str | None = None
+    data_dir: Path | None = None
     ui_origins: tuple[str, ...] = ("http://localhost:3000",)
     session_ttl_seconds: int = Field(default=3600, ge=60, le=2_592_000)
     api_default_page_size: int = Field(default=API_DEFAULT_PAGE_SIZE, ge=1)

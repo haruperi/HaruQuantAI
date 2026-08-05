@@ -24,19 +24,32 @@ from app.services.data import (
     unwrap_data_response,
 )
 from app.services.simulator import (
+    branch_live_simulation,
     build_simulation_run_dependencies,
     build_simulation_state_store,
+    close_live_simulation_session,
+    create_live_simulation_session,
     create_simulation_handle,
     create_simulation_session,
     execute_simulation_handle_operation,
     execute_simulation_state_store_operation,
     get_simulation_migrations,
     get_simulation_value_field,
+    read_live_simulation_state,
     read_simulation_session,
+    reset_live_simulation_sessions,
+    step_live_simulation,
     stream_simulation_session_frames,
     unwrap_simulation_response,
 )
 from app.utils import canonical_json, generate_id
+from tests.simulator.usage.workflows._support import (
+    backtest_request,
+    live_tick_dataset,
+)
+from tests.simulator.usage.workflows._support import (
+    dependencies as run_dependencies,
+)
 
 
 def _feature_header(title: str) -> None:
@@ -133,7 +146,11 @@ def fr_sim_041() -> None:
 
 
 def fr_sim_094() -> None:
-    """FR-SIM-094: Persist lifecycle state directly in `sim_runs`."""
+    """
+    FR-SIM-094: Persist lifecycle state directly in `sim_runs`.
+
+    Simulator shall persist run identity, lifecycle state, and validated completed single-run or portfolio-result payloads directly in `sim_runs` through Data's public statement-plan and transaction boundary. Unknown and incomplete runs return no result and never synthesize one.
+    """
     _header("Direct Relational Run Persistence (FR-SIM-094)")
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)
@@ -158,7 +175,11 @@ def fr_sim_094() -> None:
 
 
 def fr_sim_095() -> None:
-    """FR-SIM-095: Enforce identity-bound lifecycle transitions."""
+    """
+    FR-SIM-095: Enforce identity-bound lifecycle transitions.
+
+    Lifecycle changes shall compare the persisted request hash, run identity, prior status, and prior result material. Identical replays are idempotent; identity conflicts, stale changes, backward transitions, and terminal-result mutation fail closed without a partial update.
+    """
     _header("Idempotent Lifecycle Compare-and-Swap (FR-SIM-095)")
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)
@@ -183,7 +204,11 @@ def fr_sim_095() -> None:
 
 
 def fr_sim_096() -> None:
-    """FR-SIM-096: Publish durable journals as canonical JSONL."""
+    """
+    FR-SIM-096: Publish durable journals as canonical JSONL.
+
+    Journal events shall stage in a partial canonical JSONL artifact, recover contiguous sequence state after adapter reconstruction, become durable through group-commit `fsync`, and publish by atomic rename only after exact event-count and tail-hash validation. No database journal staging or journal table is permitted.
+    """
     _header("Partial JSONL Group Commit and Atomic Publication (FR-SIM-096)")
     with tempfile.TemporaryDirectory() as tmp_dir:
         artifact_root = Path(tmp_dir) / "artifacts"
@@ -203,6 +228,99 @@ def fr_sim_096() -> None:
         )
         print(_format_result(checksum))
         print("Data -> artifact='journal.jsonl', partial_exists=False")
+
+
+def _unwrap_live(response: object) -> Any:
+    """Unwrap one live-session response from the Simulation root gate.
+
+    Args:
+        response: Root-gate response envelope.
+
+    Returns:
+        The session projection carried by the response.
+    """
+    return unwrap_simulation_response(
+        response, operation="simulator.usage.live_session"
+    )
+
+
+def fr_sim_097(root: Path) -> tuple[str, Any, Any]:
+    """
+    FR-SIM-097: Open one bounded live what-if session.
+
+    Simulator shall open one bounded in-process live what-if session over a prepared run context, positioned before the first tick. Session identity is derived from the request, so a repeated open re-attaches to the same session rather than starting a second engine over the same work. Live sessions are explicitly non-durable and are lost on restart; official runs remain fully durable.
+    """
+    _header("Live What-If Sessions (FR-SIM-097)")
+    dataset = live_tick_dataset()
+    request = backtest_request(dataset)
+    deps = run_dependencies(root, dataset)
+    state = _unwrap_live(
+        create_live_simulation_session(request, deps, request_id=generate_id("req"))
+    )
+    print(f"  opened cursor={state['cursor']} ticks={state['tick_count']}")
+    return str(state["session_id"]), request, deps
+
+
+def fr_sim_098(session_id: str) -> None:
+    """
+    FR-SIM-098: Advance a live session in bounded tick increments.
+
+    Simulator shall advance one live session by a bounded positive tick count using the same per-tick order the official run executes, so a session stepped to completion produces the same receipts as an uninterrupted run. A non-positive or oversized step never reaches the engine.
+    """
+    _header("Live What-If Sessions (FR-SIM-098)")
+    state = _unwrap_live(step_live_simulation(session_id, 2))
+    print(f"  advanced cursor={state['cursor']} complete={state['complete']}")
+
+
+def fr_sim_099(session_id: str) -> None:
+    """
+    FR-SIM-099: Project immutable live-session state.
+
+    Simulator shall expose an immutable non-secret projection of one live session carrying cursor, tick count, completion, receipt and pending-intent counts, branch lineage, and an explicit advisory marker. An unknown or expired session fails closed rather than being silently recreated.
+    """
+    _header("Live What-If Sessions (FR-SIM-099)")
+    state = _unwrap_live(read_live_simulation_state(session_id))
+    print(f"  advisory={state['advisory']} pending={state['pending_intents']}")
+
+
+def fr_sim_100(session_id: str, deps: Any) -> None:
+    """
+    FR-SIM-100: Fork an independent advisory what-if branch.
+
+    Simulator shall fork one live session into an independent what-if branch by replaying the parent's deterministic inputs to the divergence point and continuing under the overridden request. The branch never shares or mutates the parent's engine, journals under its own run identity, and is reproducible from its recorded lineage. Overrides that cannot produce a valid request open no branch.
+    """
+    _header("Live What-If Sessions (FR-SIM-100)")
+    branch = _unwrap_live(
+        branch_live_simulation(
+            session_id, {"seed": 7}, deps, request_id=generate_id("req")
+        )
+    )
+    print(
+        f"  branch_of={branch['branch_of']} diverged_at={branch['divergence_index']}"
+        f" run_id={branch['run_id']}"
+    )
+
+
+def fr_sim_101(session_id: str) -> None:
+    """
+    FR-SIM-101: Close a live session and release its engine.
+
+    Simulator shall close one live session, release its engine, and return the session's final projection. A closed session identity is not resolvable afterwards.
+    """
+    _header("Live What-If Sessions (FR-SIM-101)")
+    final = _unwrap_live(close_live_simulation_session(session_id))
+    print(f"  closed at cursor={final['cursor']}")
+
+
+def fr_sim_102() -> None:
+    """
+    FR-SIM-102: Bound live-session memory and reset the registry.
+
+    Simulator shall bound live-session memory by capping concurrent sessions and expiring idle ones, and shall expose a deterministic registry reset so an abandoned exploration cannot pin engine state beyond its window.
+    """
+    _header("Live What-If Sessions (FR-SIM-102)")
+    _unwrap_live(reset_live_simulation_sessions())
+    print("  live session registry cleared")
 
 
 def journal_playback_sessions() -> None:
@@ -325,6 +443,15 @@ def main() -> None:
 
     # Completed-run playback lifecycle and frame delivery
     journal_playback_sessions()
+
+    # Bounded live what-if sessions over the deterministic engine
+    with tempfile.TemporaryDirectory() as live_dir:
+        session_id, _request, deps = fr_sim_097(Path(live_dir))
+        fr_sim_098(session_id)
+        fr_sim_099(session_id)
+        fr_sim_100(session_id, deps)
+        fr_sim_101(session_id)
+        fr_sim_102()
 
 
 if __name__ == "__main__":

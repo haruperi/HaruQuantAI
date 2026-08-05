@@ -277,6 +277,80 @@ def create_simulation_session(
     )(run_id, request_id=request_id)
 
 
+def create_live_simulation_session(
+    request: object, dependencies: object, *, request_id: str
+) -> StandardResponse[object]:
+    """Open one bounded live what-if session over a prepared run."""
+    return _guarded(
+        _operation("app.services.simulator.state", "create_live_simulation_session"),
+        operation="simulation.state.create_live_simulation_session",
+        risk_level="low",
+        read_only=False,
+        modifies_database=False,
+    )(request, dependencies, request_id=request_id)
+
+
+def step_live_simulation(session_id: str, ticks: int) -> StandardResponse[object]:
+    """Advance one live what-if session by a bounded number of ticks."""
+    return _guarded(
+        _operation("app.services.simulator.state", "step_live_simulation"),
+        operation="simulation.state.step_live_simulation",
+        risk_level="low",
+        read_only=False,
+        modifies_database=False,
+    )(session_id, ticks)
+
+
+def read_live_simulation_state(session_id: str) -> StandardResponse[object]:
+    """Read one live what-if session projection."""
+    return _guarded(
+        _operation("app.services.simulator.state", "read_live_simulation_state"),
+        operation="simulation.state.read_live_simulation_state",
+        risk_level="low",
+        read_only=True,
+        modifies_database=False,
+    )(session_id)
+
+
+def branch_live_simulation(
+    session_id: str,
+    overrides: Mapping[str, object],
+    dependencies: object,
+    *,
+    request_id: str,
+) -> StandardResponse[object]:
+    """Fork one live session into an independent advisory what-if branch."""
+    return _guarded(
+        _operation("app.services.simulator.state", "branch_live_simulation"),
+        operation="simulation.state.branch_live_simulation",
+        risk_level="low",
+        read_only=False,
+        modifies_database=False,
+    )(session_id, overrides, dependencies, request_id=request_id)
+
+
+def close_live_simulation_session(session_id: str) -> StandardResponse[object]:
+    """Close one live what-if session and release its engine."""
+    return _guarded(
+        _operation("app.services.simulator.state", "close_live_simulation_session"),
+        operation="simulation.state.close_live_simulation_session",
+        risk_level="low",
+        read_only=False,
+        modifies_database=False,
+    )(session_id)
+
+
+def reset_live_simulation_sessions() -> StandardResponse[object]:
+    """Drop every live what-if session."""
+    return _guarded(
+        _operation("app.services.simulator.state", "reset_live_simulation_sessions"),
+        operation="simulation.state.reset_live_simulation_sessions",
+        risk_level="low",
+        read_only=False,
+        modifies_database=False,
+    )()
+
+
 def read_simulation_session(session_id: str) -> StandardResponse[object]:
     """Read one journal playback session projection."""
     return _guarded(
@@ -727,7 +801,8 @@ def validate_run_inputs(*args: object, **kwargs: object) -> StandardResponse[obj
     )(*args, **kwargs)
 
 
-__all__ = (
+__all__: tuple[str, ...] = (
+    "branch_live_simulation",
     "build_artifact_manifest",
     "build_json_report",
     "build_markdown_report",
@@ -738,7 +813,9 @@ __all__ = (
     "calculate_margin",
     "calculate_portfolio_backtest_config_hash",
     "calculate_simulation_backtest_config_hash",
+    "close_live_simulation_session",
     "convert_fx_amount",
+    "create_live_simulation_session",
     "create_simulation_handle",
     "create_simulation_session",
     "create_simulation_value",
@@ -762,12 +839,15 @@ __all__ = (
     "match_order",
     "normalize_volume",
     "price_order",
+    "read_live_simulation_state",
     "read_simulation_session",
     "replay_journal",
+    "reset_live_simulation_sessions",
     "resolve_idempotent_run",
     "run_backtest",
     "run_fast_research",
     "run_portfolio_backtest",
+    "step_live_simulation",
     "stream_simulation_session_frames",
     "to_simulation_error_payload",
     "unwrap_simulation_response",

@@ -1,8 +1,8 @@
 /**
- * Strategies client for the 2 read-only strategy catalogue operations.
+ * Strategies client for catalogue reads and governed mutations (4 operations).
  *
- * Mutations, raw import/export, and SQX handling are excluded from backend v1;
- * this client exposes only the registered reads.
+ * Raw import/export and SQX handling remain excluded from backend v1; this
+ * client exposes only the registered reads and the two governed mutations.
  */
 
 import { z } from "zod";
@@ -42,4 +42,35 @@ export function versions(
 }
 
 /** Aggregated strategies client. */
-export const strategies = { catalogue, versions };
+/**
+ * Register one new Strategy version (requires `strategy:write`).
+ *
+ * Strategy owns the registration schema and its validation policy; the payload
+ * is forwarded unchanged and Strategy returns immutable mutation truth.
+ */
+export function register(
+  body: { payload: Record<string, unknown> },
+  options?: RequestOptions
+): Promise<ApiResponse<Record<string, unknown>>> {
+  return request<Record<string, unknown>>(strategiesRoutes.register, {
+    schema: z.record(z.string(), z.unknown()),
+    body,
+    ...options,
+  });
+}
+
+/** Update approved parameters for one registered Strategy version. */
+export function updateParameters(
+  strategyId: string,
+  body: { payload: Record<string, unknown> },
+  options?: RequestOptions
+): Promise<ApiResponse<Record<string, unknown>>> {
+  return request<Record<string, unknown>>(strategiesRoutes.updateParameters, {
+    schema: z.record(z.string(), z.unknown()),
+    pathParams: { strategy_id: strategyId },
+    body,
+    ...options,
+  });
+}
+
+export const strategies = { catalogue, versions, register, updateParameters };

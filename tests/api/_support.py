@@ -14,6 +14,9 @@ def post_json(
     app: FastAPI,
     path: str,
     payload: Mapping[str, Any],
+    *,
+    headers: Mapping[str, str] | None = None,
+    method: str = "POST",
 ) -> tuple[int, dict[str, Any]]:
     """Submit one JSON request through the complete ASGI boundary.
 
@@ -21,13 +24,20 @@ def post_json(
         app: Configured FastAPI application.
         path: Exact request path.
         payload: JSON-compatible request body.
+        headers: Optional additional request headers, such as ``Idempotency-Key``
+            for governed writes.
+        method: HTTP method for the request body verb (``POST`` or ``PATCH``).
 
     Returns:
         HTTP status and decoded JSON response.
     """
 
     async def _invoke() -> tuple[int, dict[str, Any]]:
-        body = json.dumps(payload).encode("utf-8")
+        body = json.dumps(payload, default=str).encode("utf-8")
+        extra = tuple(
+            (key.lower().encode("ascii"), value.encode("ascii"))
+            for key, value in (headers or {}).items()
+        )
         request_sent = False
         messages: list[dict[str, Any]] = []
 
@@ -41,20 +51,26 @@ def post_json(
         async def send(message: dict[str, Any]) -> None:
             messages.append(message)
 
+        if "?" in path:
+            path_part, query_part = path.split("?", 1)
+        else:
+            path_part, query_part = path, ""
+
         await app(
             {
                 "type": "http",
                 "asgi": {"version": "3.0"},
                 "http_version": "1.1",
-                "method": "POST",
+                "method": method,
                 "scheme": "http",
-                "path": path,
-                "raw_path": path.encode("ascii"),
-                "query_string": b"",
+                "path": path_part,
+                "raw_path": path_part.encode("ascii"),
+                "query_string": query_part.encode("ascii"),
                 "headers": (
                     (b"host", b"testserver"),
                     (b"content-type", b"application/json"),
                     (b"content-length", str(len(body)).encode("ascii")),
+                    *extra,
                 ),
                 "client": ("127.0.0.1", 50000),
                 "server": ("testserver", 80),
