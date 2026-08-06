@@ -34,6 +34,7 @@ from app.services.strategy import (
     get_strategy_environment,
     get_strategy_lifecycle_status,
     get_strategy_timing_policy,
+    unwrap_strategy_response,
 )
 
 _HASH = "a" * 64
@@ -439,8 +440,8 @@ def fr_str_015() -> None:
         max_diagnostic_bytes=16_384,
     )
     result = export_strategy_diagnostics(context, {"error_context": "testing"})
-    print(_format_result(result))
-    print(f"Data -> status='{result.status}', has_data={result.data is not None}")
+    unwrapped = unwrap_strategy_response(result, operation="usage.contracts.fr_str_015")
+    print(f"Data -> status='{result.status}', unwrapped_id='{unwrapped.request_id}'")
 
 
 def fr_str_016() -> None:
@@ -584,8 +585,9 @@ def fr_str_039() -> None:
         active_position_tags=(),
     )
     print(_format_result(result))
+    unwrapped = result
     print(
-        f"Data -> evidence_id='{result.evidence_id}', symbol='{result.primary_market.symbol}'"
+        f"Data -> evidence_id='{unwrapped.evidence_id}', symbol='{unwrapped.primary_market.symbol}'"
     )
 
 

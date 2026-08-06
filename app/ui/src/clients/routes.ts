@@ -672,8 +672,31 @@ export const agenticRoutes = {
   }),
 } as const;
 
+// --- Indicators (3) ------------------------------------------------------
+
+export const indicatorsRoutes = {
+  catalogue: route({
+    id: "api.indicators.list",
+    method: "GET",
+    path: "/api/v1/indicators",
+    permission: "indicators:read",
+  }),
+  capabilities: route({
+    id: "api.indicators.capabilities",
+    method: "GET",
+    path: "/api/v1/indicators/capabilities",
+    permission: "indicators:read",
+  }),
+  spec: route({
+    id: "api.indicators.get_spec",
+    method: "GET",
+    path: "/api/v1/indicators/{indicator_id}",
+    permission: "indicators:read",
+  }),
+} as const;
+
 /**
- * Frozen registry of all 71 route contracts.
+ * Frozen registry of all 74 route contracts.
  *
  * The count is exported for the drift test so a structural mismatch fails CI.
  */
@@ -688,6 +711,9 @@ export const ROUTE_CONTRACTS = [
   settingsRoutes.update,
   dataRoutes.symbols,
   dataRoutes.stream,
+  indicatorsRoutes.catalogue,
+  indicatorsRoutes.capabilities,
+  indicatorsRoutes.spec,
   strategiesRoutes.catalogue,
   strategiesRoutes.versions,
   researchRoutes.run,
@@ -752,7 +778,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 71;
+export const ROUTE_CONTRACT_COUNT = 74;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

@@ -326,7 +326,7 @@ def test_checkpoint_and_listing_fail_closed_branches() -> None:
 
     with (
         patch(
-            "app.services.strategy.registry.listing.read_strategy_version_records",
+            "app.services.strategy.registry.listing.read_strategy_versions",
             side_effect=RuntimeError("database"),
         ),
         patch(
@@ -339,7 +339,7 @@ def test_checkpoint_and_listing_fail_closed_branches() -> None:
     assert failed_listing.error.code == "STRATEGY_INTERNAL_ERROR"
 
     with patch(
-        "app.services.strategy.registry.listing.read_strategy_version_records",
+        "app.services.strategy.registry.listing.read_strategy_versions",
         return_value=(),
     ):
         missing = list_strategy_versions("missing")

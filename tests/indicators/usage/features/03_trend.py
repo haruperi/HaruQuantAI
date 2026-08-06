@@ -20,6 +20,7 @@ from app.services.indicators import (
 from tests.indicators.usage._support import (
     print_indicator_evidence,
     print_market_evidence,
+    print_requirement_evidence,
     unwrap_indicator_response,
     unwrap_market_data_response,
 )
@@ -79,6 +80,7 @@ def fr_indi_015() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="EMA calculations")
+    print_requirement_evidence("FR-INDI-015", actual_data=values)
 
 
 def fr_indi_016() -> None:
@@ -89,6 +91,7 @@ def fr_indi_016() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="SMA calculations")
+    print_requirement_evidence("FR-INDI-016", actual_data=values)
 
 
 def fr_indi_017() -> None:
@@ -101,6 +104,7 @@ def fr_indi_017() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="ADX/+DI/-DI calculations")
+    print_requirement_evidence("FR-INDI-017", actual_data=values)
 
 
 def fr_indi_023() -> None:
@@ -111,6 +115,7 @@ def fr_indi_023() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="WMA calculations")
+    print_requirement_evidence("FR-INDI-023", actual_data=values)
 
 
 def fr_indi_024() -> None:
@@ -121,6 +126,7 @@ def fr_indi_024() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="Hull-MA calculations")
+    print_requirement_evidence("FR-INDI-024", actual_data=values)
 
 
 def fr_indi_025() -> None:
@@ -135,6 +141,7 @@ def fr_indi_025() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="Bollinger-band calculations")
+    print_requirement_evidence("FR-INDI-025", actual_data=values)
 
 
 def fr_indi_035() -> None:
@@ -147,6 +154,7 @@ def fr_indi_035() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="Causally confirmed Zigzag rows")
+    print_requirement_evidence("FR-INDI-035", actual_data=values)
 
 
 def main() -> None:

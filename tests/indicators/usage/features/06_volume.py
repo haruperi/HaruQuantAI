@@ -17,6 +17,7 @@ from app.services.indicators import (
 from tests.indicators.usage._support import (
     print_indicator_evidence,
     print_market_evidence,
+    print_requirement_evidence,
     unwrap_indicator_response,
     unwrap_market_data_response,
 )
@@ -31,7 +32,7 @@ def _feature_header(title: str) -> None:
 
 
 def _header(title: str) -> None:
-    """Print one section heading."""
+    """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
@@ -74,6 +75,7 @@ def fr_indi_027() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="CMF calculations")
+    print_requirement_evidence("FR-INDI-027", actual_data=values)
 
 
 def fr_indi_028() -> None:
@@ -84,6 +86,7 @@ def fr_indi_028() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="OBV calculations")
+    print_requirement_evidence("FR-INDI-028", actual_data=values)
 
 
 def fr_indi_029() -> None:
@@ -94,6 +97,7 @@ def fr_indi_029() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="MFI calculations")
+    print_requirement_evidence("FR-INDI-029", actual_data=values)
 
 
 def fr_indi_030() -> None:
@@ -108,6 +112,7 @@ def fr_indi_030() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="Price-volume distribution calculations")
+    print_requirement_evidence("FR-INDI-030", actual_data=values)
 
 
 def main() -> None:

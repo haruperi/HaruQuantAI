@@ -33,6 +33,8 @@
   public boundary, exposes standalone functions only, and coordinates genuine
   Data/Simulation evidence while keeping Risk approval and Trading execution in
   their owning domains.
+* Strategy domain persistence is implemented and `Completed`: `app/services/strategy//` owns seven persistent runtime tables (`strategy_definitions`, `strategy_versions`, `strategy_configs`, `strategy_state`, `strategy_checkpoints`, `strategy_signals`, `strategy_mutations`) backed by applied migrations `0001_strategy_domain` and `0002_strategy_seven_table_runtime`. Schema migrations flow through the Strategy migration manifest (`run_strategy_migrations`), private CRUD in `app/services/strategy/persistence/` constructs SQL statements and delegates transaction execution to `app.services.data`, feature operations outside `persistence/` provide production reachability, and database bootstrap/population (`scripts/strategy/populate_strategy_database.py`) is restricted to an explicitly selected non-production environment (`ENVIRONMENT=dev`).
+* Indicators domain is implemented and `Completed`: `app/services/indicators/` is pure, stateless, and read-only with zero active database tables (retired via migration 002). Backend v1 exposes 3 authenticated read-only API routes (`/api/v1/indicators`, `/api/v1/indicators/capabilities`, `/api/v1/indicators/{indicator_id}`), and the Next.js UI frontend mounts `IndicatorWorkspace` in `WorkspaceGrid` and `Sidebar`.
 * `app/agentic/README.md` defines the complete Agentic Firm target. The package now
   exists and Agentic status is `Partial`: `FEAT-AGT-01` implements the seven canonical
   provider-neutral contracts (`AgentTask`, `AgentMessage`, `AgentArtifact`,
@@ -281,10 +283,11 @@
 * `app/services/indicators/` is a completed implementation containing the
   immutable Core calculation boundary and 21 approved one-indicator-per-file
   implementations across trend, volatility, momentum, volume, and candles.
-  Its private `migrations/` and `persistence/` support directories carry the
-  ledger-ready `indicator_*` schema and CRUD statements applied through Data's
-  executor; feature registrations for that support surface were withdrawn (see
-  the changelog).
+  It is stateless and read-only: migration `001_indicator_schema_v1`
+  historically introduced three empty support tables, and immutable migration
+  `002_remove_unused_indicator_support_schema` retired them through Data's
+  authoritative executor. Indicators now owns no live tables or private
+  persistence package.
   Its package-root API, standalone usage programs, domain workflows, and its
   participation in `SYS-WF-001` and the verified MT5 demo `SYS-WF-002` path pass.
   Retrospective SMC/FVG/swing/BOS/CHoCH labels remain excluded to preserve the

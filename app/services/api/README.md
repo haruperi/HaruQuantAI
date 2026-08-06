@@ -2,7 +2,7 @@
 
 > **Specification location:** `app/services/api/README.md`
 > **Logical runtime packages:** FastAPI gateway at `app/services/api` plus Next.js frontend at `ui/` (per the `docs/PROJECT.md` registry), with canonical ASGI target `app.services.api.composition.application:app`; Next.js frontend at `ui/`
-> **Status:** `Backend v1 exposes 71 operations, including completed-run Simulation journal playback and live resumable what-if sessions; frontend parity complete at 71 typed route contracts`
+> **Status:** `Backend v1 exposes 74 operations, including authenticated read-only Indicators catalogue/capabilities/spec endpoints, completed-run Simulation journal playback, and live resumable what-if sessions; frontend parity complete at 74 typed route contracts`
 > **Last updated:** `2026-08-04`
 
 > This README is the UI/API domain's **single source of truth** for final requirements,

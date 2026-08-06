@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/indicators`
 > **Status:** `Completed`
-> **Last updated:** `2026-08-05`
+> **Last updated:** `2026-08-06`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -30,7 +30,7 @@ Indicators converts normalized market datasets into deterministic, vectorized de
 - Data acquisition, provider adapters, source readiness, provider normalization, symbol mapping, calendar/session normalization, quote-quality policy, or multi-timeframe orchestration; Data owns these.
 - Signal interpretation, crossover decisions, trade proposals, strategy lifecycle, or final position sizing.
 - Risk approval, orders, fills, journals, broker/account state, execution, or broker mutation.
-- Persistence execution and orchestration, cache storage, audit sinks, telemetry export, tracing backends, SLO enforcement, or alert routing. Indicators declares its own support schema and private CRUD statements, but Data executes them.
+- Persistence execution and orchestration, cache storage, audit sinks, telemetry export, tracing backends, SLO enforcement, or alert routing. Indicators has no persistence support schema or private CRUD statements; it is purely stateless and read-only.
 - Runtime custom registration, incremental/streaming state, chunking, out-of-core execution, acceleration, composition graphs, proprietary controls, or release engineering.
 - Retrospective SMC/FVG/swing/BOS/CHoCH labels in the production indicator surface.
 
@@ -92,73 +92,6 @@ Rows preserve the input record order. The index is a UTC `DatetimeIndex` named
 | `data_quality_status` | pandas string | Exact `MarketDataset.quality_report.quality_status`. |
 | `data_quality_decision` | pandas string | Exact `MarketDataset.quality_report.quality_decision`; operational gates use this field. |
 | `data_quality_score` | `float64` | Exact finite decimal score converted to float64 for display; the manifest retains canonical decimal-string evidence. |
-| `unavailable_reason` | pandas string | `"warmup"` before the first valid value and `NA` afterward. No other v1 reason is emitted for a successful result. |
-
-An empty dataset or one with no usable bar observations raises
-`IND_INSUFFICIENT_DATA`. A non-empty dataset shorter than the required warmup does
-not raise: all rows are returned with warmup output and
-`unavailable_reason="warmup"`.
-
-For every valid output, `computed_from_end` is the current source timestamp.
-`computed_from_start` is the earliest record on which that exact value causally
-depends: the first dataset record for EMA, ATR, ADX, and RSI; the first record in
-the current `period`-observation window for SMA, ADR, and Williams %R; and the first
-price in the current `period+1`-price window for rolling volatility. `available_at`
-is the maximum record `available_at` across that exact inclusive dependency range.
-
-**Consumed from other domains** — referenced only, never redefined:
-
-| Contract | Version | Owner | Used for |
-|---|---|---|---|
-| `MarketDataset` | `v1` | Data | Supply one normalized, immutable bar dataset for one symbol/timeframe with exact records, availability, provenance, and dataset-quality evidence. |
-
-Every official calculation accepts exactly one `MarketDataset v1`. Indicators
-validates that `data_kind == "bars"` and privately projects the canonical records to
-pandas/NumPy for vectorized calculation. Public callers never supply a Data-owned
-internal DataFrame. Multi-symbol batching is caller orchestration over independent
-datasets; no official v1 calculation accepts more than one symbol.
-
-### Persisted state
-
-Indicators owns three support tables — `indicator_definitions`,
-`indicator_param_sets`, and `indicator_materializations` — declared in
-`migrations/definitions.py` and applied through Data's authoritative migration
-executor by `run_indicators_migrations`, which the UI/API startup lifecycle
-invokes. The private CRUD modules in `persistence/` construct statements only
-and delegate execution to `app.services.data`. This is internal support, not a
-registered feature: no public Indicators calculation persists anything, and no
-production caller consumes these tables yet; computed series are recomputed on
-demand, and materialisation rows will record only artifact references once a
-future materialisation capability is registered. All public calculations have
-side effect `None`.
-Indicators is not an `AuditEvent` producer: its API is pure and deterministic, so
-the governed caller audits any surrounding action.
-
-### Four-level structure
-
-| Code level | Represents |
-|---|---|
-| **Package** | Indicators domain |
-| **Module folder** | One approved feature/capability |
-| **File** | One use case or focused responsibility |
-| **Class / function / method** | Observable functional requirement behavior |
-
-```text
-Package
-└── Module folder
-    └── File
-        └── Class / Function / Method
-```
-
-### Package capability map
-
-```mermaid
-flowchart TD
-    IND[[Indicators Package]]
-    IND --> CORE[[core: Contracts, validation, results, registry]]
-    IND --> TREND[[trend: EMA, SMA, WMA, Hull MA, Bollinger Bands, ADX]]
-    IND --> VOL[[volatility: ATR, ADR, rolling volatility, standard deviation]]
-    IND --> MOM[[momentum: RSI, Williams %R]]
     IND --> VOLU[[volume: CMF, OBV, MFI, price-volume distribution]]
     IND --> CAN[[candles: Doji, Engulfing, Pinbar, Inside Bar]]
 
@@ -167,121 +100,6 @@ flowchart TD
     CORE --> C3[results.py: Manifest and result behavior]
     CORE --> C4[registry.py: Immutable discovery]
     CORE --> C5[validation.py: Fail-fast request validation]
-    TREND --> T1[ema.py]
-    TREND --> T2[sma.py]
-    TREND --> T3[wma.py]
-    TREND --> T4[hull_ma.py]
-    TREND --> T5[bollinger_bands.py]
-    TREND --> T6[directional.py: ADX]
-    VOL --> V1[atr.py]
-    VOL --> V2[adr.py]
-    VOL --> V3[rolling_volatility.py: Rolling volatility]
-    VOL --> V4[standard_deviation.py]
-    MOM --> M1[rsi.py]
-    MOM --> M2[williams_r.py]
-    VOLU --> U1[cmf.py]
-    VOLU --> U2[obv.py]
-    VOLU --> U3[mfi.py]
-    VOLU --> U4[price_volume_distribution.py]
-    CAN --> D1[doji.py]
-    CAN --> D2[engulfing.py]
-    CAN --> D3[pinbar.py]
-    CAN --> D4[inside_bar.py]
-```
-
----
-
-## 2. Final Package Structure
-
-The following is the implemented V1 package tree.
-
-```text
-indicators/
-├── __init__.py                         # Approved domain-level exports only
-├── README.md
-├── core/                               # Feature: contracts and deterministic execution boundary
-│   ├── __init__.py
-│   ├── README.md
-│   ├── errors.py                       # Deterministic Core MVP error contract
-│   ├── contracts.py                    # Immutable config/spec/warmup/protocol contracts
-│   ├── results.py                      # IndicatorSeries manifest, values-only, and copied join
-│   ├── registry.py                     # Immutable official specs and capability matrix
-│   └── validation.py                   # Full fail-fast request validation
-├── trend/                              # Feature: trend indicators
-│   ├── __init__.py
-│   ├── README.md
-│   ├── ema.py                          # Exponential Moving Average
-│   ├── sma.py                          # Simple Moving Average
-│   ├── wma.py                          # Weighted Moving Average
-│   ├── hull_ma.py                      # Hull Moving Average
-│   ├── bollinger_bands.py              # Bollinger Bands
-│   ├── directional.py                  # ADX
-│   └── zigzag.py                       # Causal confirmed-pivot ZigZag
-├── volatility/                         # Feature: volatility indicators
-│   ├── __init__.py
-│   ├── README.md
-│   ├── atr.py                          # Average True Range
-│   ├── adr.py                          # Average Daily Range
-│   ├── rolling_volatility.py           # Return-based rolling volatility
-│   └── standard_deviation.py           # Rolling price standard deviation
-├── momentum/                           # Feature: momentum indicators
-│   ├── __init__.py
-│   ├── README.md
-│   ├── rsi.py                          # Relative Strength Index
-│   └── williams_r.py                   # Williams %R
-├── volume/                             # Feature: volume indicators
-│   ├── __init__.py
-│   ├── README.md
-│   ├── cmf.py                          # Chaikin Money Flow
-│   ├── obv.py                          # On-Balance Volume
-│   ├── mfi.py                          # Money Flow Index
-│   └── price_volume_distribution.py    # Rolling volume-by-price point of control
-├── candles/                            # Feature: single/two-bar candlestick patterns
-│   ├── __init__.py
-│   ├── README.md
-│   ├── doji.py                         # Doji pattern
-│   ├── engulfing.py                    # Engulfing pattern
-│   ├── pinbar.py                       # Pinbar pattern
-│   └── inside_bar.py                   # Inside bar pattern
-├── migrations/                         # Non-feature support: Indicators-owned schema
-│   ├── __init__.py
-│   └── definitions.py                  # Additive schema steps and startup runner
-└── persistence/                        # Non-feature support: private CRUD, no public API
-    ├── __init__.py
-    ├── create.py                       # Definition, parameter-set, materialisation inserts
-    ├── read.py                         # Definition, materialisation, stale-list reads
-    ├── update.py                       # State advancement and source invalidation
-    └── delete.py                       # Recomputable-series purges
-```
-
-Excluded from the structure: `base.py`, `batch/`, `incremental/`, `adapters/`, `custom/`, caching, composition, audit/telemetry, acceleration, and proprietary-access modules. MACD, crossover helpers, pip conversion, balance-scaled volume, and generic averaging/base-class abstractions have no final destination in this package. Retrospective SMC/FVG/swing/BOS/CHoCH labels remain excluded from the production indicator surface (see Section 1) because swing/BOS/CHoCH structure-break tracking is inherently retroactive (a later bar can rewrite an earlier bar's already-published signal), which is fundamentally incompatible with this package's immutable, non-repainting batch output guarantee; this exclusion is revisited only as a separately scoped decision, not silently reduced to a partial port.
-
-### Feature Registry
-
-Each registered feature is exactly one module folder with exactly one runnable
-usage program, satisfying the Focused Domain Architecture rule
-(one feature = one module folder = one usage example file). This section owns the
-feature IDs, and each ordinal matches its usage-program number.
-
-| Status | Feature | Owning module | Public API and contracts | Requirements | Usage evidence |
-|---|---|---|---|---|---|
-| Completed | `FEAT-INDI-01` Indicator Contracts, Registry Discovery and Request Validation | `core/` | `build_indicator_config`, `join_indicator_result`, `get_indicator_result_values`, discovery, capability, `get_warmup_requirement`, and validation declarations | `FR-INDI-001`–`FR-INDI-014`; exact declarations in Section 4.1 | `tests/indicators/usage/features/01_core.py` |
-| Completed | `FEAT-INDI-02` Candlestick Pattern Labelling | `candles/` | `doji`, `engulfing`, `pinbar`, `inside_bar` | `FR-INDI-031`–`FR-INDI-034`; exact declarations in Section 4.6 | `tests/indicators/usage/features/02_candles.py` |
-| Completed | `FEAT-INDI-03` Trend and Moving-Average Calculation | `trend/` | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag` | `FR-INDI-015`–`FR-INDI-017`, `FR-INDI-023`–`FR-INDI-025`, `FR-INDI-035`; exact declarations in Section 4.2 | `tests/indicators/usage/features/03_trend.py` |
-| Completed | `FEAT-INDI-04` Momentum Oscillator Calculation | `momentum/` | `rsi`, `williams_r` | `FR-INDI-021`, `FR-INDI-022`; exact declarations in Section 4.4 | `tests/indicators/usage/features/04_momentum.py` |
-| Completed | `FEAT-INDI-05` Volatility and Range Calculation | `volatility/` | `atr`, `adr`, `rolling_volatility`, `standard_deviation` | `FR-INDI-018`–`FR-INDI-020`, `FR-INDI-026`; exact declarations in Section 4.3 | `tests/indicators/usage/features/05_volatility.py` |
-| Completed | `FEAT-INDI-06` Volume-Flow and Price-Volume Calculation | `volume/` | `cmf`, `obv`, `mfi`, `price_volume_distribution` | `FR-INDI-027`–`FR-INDI-030`; exact declarations in Section 4.5 | `tests/indicators/usage/features/06_volume.py` |
-
-Module folders are named for the analytical family they calculate. Within each
-folder every file implements exactly one official indicator, and every public
-function implements exactly one `FR-INDI-*` behaviour, so the file and
-class/function levels of the rule are enforced per indicator rather than per
-folder.
-
-### Module dependency diagram
-
-```mermaid
-flowchart LR
     CORE[[core: Lowest dependency]]
     TREND[[trend]]
     VOL[[volatility]]
@@ -298,9 +116,26 @@ flowchart LR
 
 `trend`, `volatility`, `momentum`, `volume`, and `candles` do not depend on one another. `core/registry.py` stores immutable metadata and import-path identity without importing feature implementations, preventing a registry/built-in cycle.
 
+## 2. Feature Registry
+
+### Feature Registry
+
+This is the sole canonical current-state registry for Indicators features. Migration
+infrastructure is documented support and is excluded from feature-count
+reconciliation.
+
+| Status | Feature ID | Capability | Production module | Public operations | Requirements | Usage evidence |
+|---|---|---|---|---|---|---|
+| Completed | `FEAT-INDI-01` | Contracts, registry discovery, result projections, and request validation | `core/` | `build_indicator_config`, `join_indicator_result`, `get_indicator_result_values`, `get_indicator_result_metadata`, `get_indicator`, `list_indicators`, `get_capability_matrix`, `get_warmup_requirement`, `validate_indicator` | `FR-INDI-001`–`FR-INDI-014` | `tests/indicators/usage/features/01_core.py` |
+| Completed | `FEAT-INDI-02` | Candlestick pattern labelling | `candles/` | `doji`, `engulfing`, `pinbar`, `inside_bar` | `FR-INDI-031`–`FR-INDI-034` | `tests/indicators/usage/features/02_candles.py` |
+| Completed | `FEAT-INDI-03` | Trend and moving-average calculation | `trend/` | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag` | `FR-INDI-015`–`FR-INDI-017`, `FR-INDI-023`–`FR-INDI-025`, `FR-INDI-035` | `tests/indicators/usage/features/03_trend.py` |
+| Completed | `FEAT-INDI-04` | Momentum oscillator calculation | `momentum/` | `rsi`, `williams_r` | `FR-INDI-021`–`FR-INDI-022` | `tests/indicators/usage/features/04_momentum.py` |
+| Completed | `FEAT-INDI-05` | Volatility and range calculation | `volatility/` | `atr`, `adr`, `rolling_volatility`, `standard_deviation` | `FR-INDI-018`–`FR-INDI-020`, `FR-INDI-026` | `tests/indicators/usage/features/05_volatility.py` |
+| Completed | `FEAT-INDI-06` | Volume-flow and price-volume calculation | `volume/` | `cmf`, `obv`, `mfi`, `price_volume_distribution` | `FR-INDI-027`–`FR-INDI-030` | `tests/indicators/usage/features/06_volume.py` |
+
 ### Structure rules
 
-- The root contains only `README.md`, `__init__.py`, the six approved module folders, and the two documented non-feature support directories `migrations/` and `persistence/`.
+- The root contains only `README.md`, `__init__.py`, the six approved module folders, and the documented non-feature support directory `migrations/`.
 - Built-ins are stateless functions. Classes are limited to immutable data contracts, the structural protocol, and the domain exception.
 - Each trend/volatility/momentum/volume/candles file implements exactly one official indicator; a file is never shared by two indicators. Private vectorization helpers may be duplicated per file rather than factored into a shared base class.
 - Public callers import only from `app.services.indicators`; feature and leaf modules are not stable API.
@@ -815,8 +650,8 @@ config before validation. If an explicitly supplied config disagrees with wrappe
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-001` | The system shall expose exactly the approved Core MVP codes: `IND_INVALID_CONFIG`, `IND_INVALID_PARAMETER`, `IND_UNSUPPORTED_INDICATOR`, `IND_UNSUPPORTED_TIMEFRAME`, `IND_UNSUPPORTED_DTYPE`, `IND_INVALID_INPUT_SCHEMA`, `IND_MISSING_REQUIRED_COLUMN`, `IND_INVALID_OUTPUT_COLUMN`, `IND_OUTPUT_COLUMN_CONFLICT`, `IND_INVALID_OUTPUT_MODE`, `IND_INPUT_MUTATION_DETECTED`, `IND_DUPLICATE_TIMESTAMP`, `IND_NON_MONOTONIC_TIME`, `IND_AMBIGUOUS_TIMESTAMP`, `IND_INVALID_TIMEZONE`, `IND_INVALID_OHLC`, `IND_INSUFFICIENT_DATA`, `IND_LOOKAHEAD_RISK`, `IND_FORMULA_VERSION_MISMATCH`, `IND_RESOURCE_LIMIT_EXCEEDED`, `IND_PARTIAL_RESULT`, and `IND_INTERNAL_ERROR`. | `IndicatorErrorCode: StrEnum` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_errors.py::test_error_code_catalog_contains_only_core_codes()` |
-| Completed | `FR-INDI-002` | The system shall represent a deterministic, redacted failure with code, safe message, and structured details without exposing raw exceptions or sensitive input data. | `IndicatorError(code: IndicatorErrorCode, message: str, details: Mapping[str, object] | None = None)` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_errors.py::test_indicator_error_serializes_redacted_details()` |
+| Completed | `FR-INDI-001` | The system shall expose exactly the approved Core MVP codes: `IND_INVALID_CONFIG`, `IND_INVALID_PARAMETER`, `IND_UNSUPPORTED_INDICATOR`, `IND_UNSUPPORTED_TIMEFRAME`, `IND_UNSUPPORTED_DTYPE`, `IND_INVALID_INPUT_SCHEMA`, `IND_MISSING_REQUIRED_COLUMN`, `IND_INVALID_OUTPUT_COLUMN`, `IND_OUTPUT_COLUMN_CONFLICT`, `IND_INVALID_OUTPUT_MODE`, `IND_INPUT_MUTATION_DETECTED`, `IND_DUPLICATE_TIMESTAMP`, `IND_NON_MONOTONIC_TIME`, `IND_AMBIGUOUS_TIMESTAMP`, `IND_INVALID_TIMEZONE`, `IND_INVALID_OHLC`, `IND_INSUFFICIENT_DATA`, `IND_LOOKAHEAD_RISK`, `IND_FORMULA_VERSION_MISMATCH`, `IND_RESOURCE_LIMIT_EXCEEDED`, `IND_PARTIAL_RESULT`, and `IND_INTERNAL_ERROR`. | `IndicatorErrorCode: StrEnum` | None | None | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_errors.py::test_error_code_catalog_contains_only_core_codes()` |
+| Completed | `FR-INDI-002` | The system shall represent a deterministic, redacted failure with code, safe message, and structured details without exposing raw exceptions or sensitive input data. | `IndicatorError(code: IndicatorErrorCode, message: str, details: Mapping[str, object] | None = None)` | None | None | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_errors.py::test_indicator_error_serializes_redacted_details()` |
 
 **Rules:**
 
@@ -843,10 +678,10 @@ reconstruct historical public classes that are absent from the specification.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-003` | The system shall represent indicator ID, canonical parameters, source, formula version, output/precision/availability/quality policy, and error mode in one immutable batch config, excluding cache, calendar, backend, actor, tracing, SLO, entitlement, timeout, cancellation, and orchestration context. | `IndicatorConfig` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_indicator_config_is_immutable_and_core_only()` |
-| Completed | `FR-INDI-004` | The system shall describe each official indicator's ID, name, versions, tier, required columns, parameter/output schemas, warmup policy, supported batch capabilities, import path, stability, and workflow eligibility. | `IndicatorSpec` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_indicator_spec_contains_required_public_metadata()` |
-| Completed | `FR-INDI-005` | The system shall expose the exact normalized history requirement for an indicator/config without fetching data, including minimum observations, source timeframe, required columns, and availability basis. | `get_warmup_requirement(indicator_id: str, config: IndicatorConfig) -> StandardResponse[WarmupRequirement]` | None | `StandardResponse.error`: unsupported indicator or invalid configuration | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_get_warmup_requirement_resolves_every_official_policy()` |
-| Completed | `FR-INDI-006` | The system shall expose a minimal structural registered-calculator protocol whose approved calculation accepts one normalized `MarketDataset v1` plus a complete `IndicatorConfig` and returns `IndicatorResult`; public convenience wrappers construct the config and are not required to share this internal signature. | `IndicatorProtocol.calculate(data: MarketDataset, config: IndicatorConfig) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: deterministic request/calculation failure under the approved error mode | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_official_calculator_satisfies_indicator_protocol()` |
+| Completed | `FR-INDI-003` | The system shall represent indicator ID, canonical parameters, source, formula version, output/precision/availability/quality policy, and error mode in one immutable batch config, excluding cache, calendar, backend, actor, tracing, SLO, entitlement, timeout, cancellation, and orchestration context. | `IndicatorConfig` | None | None | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_indicator_config_is_immutable_and_core_only()` |
+| Completed | `FR-INDI-004` | The system shall describe each official indicator's ID, name, versions, tier, required columns, parameter/output schemas, warmup policy, supported batch capabilities, import path, stability, and workflow eligibility. | `IndicatorSpec` | None | None | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_indicator_spec_contains_required_public_metadata()` |
+| Completed | `FR-INDI-005` | The system shall expose the exact normalized history requirement for an indicator/config without fetching data, including minimum observations, source timeframe, required columns, and availability basis. | `get_warmup_requirement(indicator_id: str, config: IndicatorConfig) -> StandardResponse[WarmupRequirement]` | None | `StandardResponse.error`: unsupported indicator or invalid configuration | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_get_warmup_requirement_resolves_every_official_policy()` |
+| Completed | `FR-INDI-006` | The system shall expose a minimal structural registered-calculator protocol whose approved calculation accepts one normalized `MarketDataset v1` plus a complete `IndicatorConfig` and returns `IndicatorResult`; public convenience wrappers construct the config and are not required to share this internal signature. | `IndicatorProtocol.calculate(data: MarketDataset, config: IndicatorConfig) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: deterministic request/calculation failure under the approved error mode | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_contracts.py::test_official_calculator_satisfies_indicator_protocol()` |
 
 **Rules:** Contracts are frozen, typed, JSON-compatible where serialized, and contain only calculation-relevant metadata. Serialized field types are exactly those declared by the contract requirements.
 
@@ -870,10 +705,10 @@ Every official `period` is an integer satisfying
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-007` | The system shall expose a standalone serializable deterministic manifest containing manifest/indicator/formula/output-schema versions, canonical parameter hash, input/output checksums, output contract and shape, precision, availability policy, Data-provided provenance, and quality summary; volatile runtime/host data is excluded from identity. | `IndicatorManifest` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_results.py::test_manifest_is_stable_for_equivalent_inputs()` |
-| Completed | `FR-INDI-008` | The system shall return timestamp/symbol-aligned values, canonical output columns, availability, quality, errors, and manifest as `IndicatorSeries v1`, preserving warmup and unavailable rows and exposing no incremental state or metrics. | `IndicatorResult` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_results.py::test_indicator_result_matches_v1_contract()` |
-| Completed | `FR-INDI-009` | The system shall expose a copy-safe projection containing generated indicator, availability, and quality columns without original OHLCV columns. | `IndicatorResult.values_only: pd.DataFrame` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_results.py::test_values_only_excludes_source_columns()` |
-| Completed | `FR-INDI-010` | The system shall privately project one matching `MarketDataset v1`, append generated columns to that copied canonical tabular projection, and preserve source columns, row count/order, timestamp/symbol layout, warmup rows, and input identity; collisions fail. | `IndicatorResult.join_to(data: MarketDataset, mode: Literal["copy"] = "copy") -> StandardResponse[pd.DataFrame]` | None | `StandardResponse.error`: invalid mode, dataset/checksum mismatch, output collision, or detected mutation | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_results.py::test_join_to_preserves_input_and_alignment()` |
+| Completed | `FR-INDI-007` | The system shall expose a standalone serializable deterministic manifest containing manifest/indicator/formula/output-schema versions, canonical parameter hash, input/output checksums, output contract and shape, precision, availability policy, Data-provided provenance, and quality summary; volatile runtime/host data is excluded from identity. | `IndicatorManifest` | None | None | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_results.py::test_manifest_is_stable_for_equivalent_inputs()` |
+| Completed | `FR-INDI-008` | The system shall return timestamp/symbol-aligned values, canonical output columns, availability, quality, errors, and manifest as `IndicatorSeries v1`, preserving warmup and unavailable rows and exposing no incremental state or metrics. | `IndicatorResult` | None | None | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_results.py::test_indicator_result_matches_v1_contract()` |
+| Completed | `FR-INDI-009` | The system shall expose a copy-safe projection containing generated indicator, availability, and quality columns without original OHLCV columns. | `IndicatorResult.values_only: pd.DataFrame` | None | None | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_results.py::test_values_only_excludes_source_columns()` |
+| Completed | `FR-INDI-010` | The system shall privately project one matching `MarketDataset v1`, append generated columns to that copied canonical tabular projection, and preserve source columns, row count/order, timestamp/symbol layout, warmup rows, and input identity; collisions fail. | `IndicatorResult.join_to(data: MarketDataset, mode: Literal["copy"] = "copy") -> StandardResponse[pd.DataFrame]` | None | `StandardResponse.error`: invalid mode, dataset/checksum mismatch, output collision, or detected mutation | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_results.py::test_join_to_preserves_input_and_alignment()` |
 
 #### Exact manifest and result fields
 
@@ -958,9 +793,9 @@ modes without runtime mutation or implementation imports.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-011` | The system shall resolve one of the 21 official indicator IDs in the registry identity below to its immutable spec and reject every unknown ID before calculation. | `get_indicator(indicator_id: str) -> StandardResponse[IndicatorSpec]` | None | `StandardResponse.error`: `IND_UNSUPPORTED_INDICATOR` | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_registry.py::test_get_indicator_rejects_unknown_id()` |
-| Completed | `FR-INDI-012` | The system shall list official specs in stable indicator-ID order with no mutable registry handle. | `list_indicators() -> StandardResponse[tuple[IndicatorSpec, ...]]` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_registry.py::test_list_indicators_is_stable_and_immutable()` |
-| Completed | `FR-INDI-013` | The system shall expose a JSON/YAML-compatible matrix containing ID, versions, tier, batch/vectorized/multi-symbol/multi-timeframe support, unsupported optional modes, dependencies, deterministic unsupported codes, and official-workflow eligibility. | `get_capability_matrix() -> StandardResponse[tuple[Mapping[str, object], ...]]` | None | None | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_registry.py::test_capability_matrix_matches_registry()` |
+| Completed | `FR-INDI-011` | The system shall resolve one of the 21 official indicator IDs in the registry identity below to its immutable spec and reject every unknown ID before calculation. | `get_indicator(indicator_id: str) -> StandardResponse[IndicatorSpec]` | None | `StandardResponse.error`: `IND_UNSUPPORTED_INDICATOR` | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_registry.py::test_get_indicator_rejects_unknown_id()` |
+| Completed | `FR-INDI-012` | The system shall list official specs in stable indicator-ID order with no mutable registry handle. | `list_indicators() -> StandardResponse[tuple[IndicatorSpec, ...]]` | None | None | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_registry.py::test_list_indicators_is_stable_and_immutable()` |
+| Completed | `FR-INDI-013` | The system shall expose a JSON/YAML-compatible matrix containing ID, versions, tier, batch/vectorized/multi-symbol/multi-timeframe support, unsupported optional modes, dependencies, deterministic unsupported codes, and official-workflow eligibility. | `get_capability_matrix() -> StandardResponse[tuple[Mapping[str, object], ...]]` | None | None | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_registry.py::test_capability_matrix_matches_registry()` |
 
 **Rules:** Batch/vectorized is the only execution mode. Incremental, streaming, cache, composition, out-of-core, acceleration, audit/observability, custom registration, and proprietary modes are reported unsupported and expose no unused APIs.
 
@@ -1052,7 +887,7 @@ each leaf file's actual imports.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-014` | The system shall resolve the spec and atomically validate config, parameters, row limits, `MarketDataset v1` identity, bars-only kind, one symbol/timeframe, required OHLC fields, ordered unique UTC record timestamps, finite OHLC consistency, output names/collisions, quality evidence, and formula version before private projection/calculation; an empty dataset fails, while a non-empty short dataset remains valid warmup input. Upstream source-quality policy remains Data-owned. | `validate_indicator(indicator_id: str, data: MarketDataset, config: IndicatorConfig) -> StandardResponse[IndicatorSpec]` | None | `StandardResponse.error`: first deterministic Core validation failure | **Usage:** `tests/indicators/usage/01_core.py`<br>**Unit:** `tests/indicators/unit/test_validation.py::test_validate_indicator_fails_before_formula_execution()` |
+| Completed | `FR-INDI-014` | The system shall resolve the spec and atomically validate config, parameters, row limits, `MarketDataset v1` identity, bars-only kind, one symbol/timeframe, required OHLC fields, ordered unique UTC record timestamps, finite OHLC consistency, output names/collisions, quality evidence, and formula version before private projection/calculation; an empty dataset fails, while a non-empty short dataset remains valid warmup input. Upstream source-quality policy remains Data-owned. | `validate_indicator(indicator_id: str, data: MarketDataset, config: IndicatorConfig) -> StandardResponse[IndicatorSpec]` | None | `StandardResponse.error`: first deterministic Core validation failure | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_validation.py::test_validate_indicator_fails_before_formula_execution()` |
 
 **Rules:** Validation is whole-request and precedes private projection/formula work.
 The public Data contract already supplies immutable ordered records and UTC/exact
@@ -1120,7 +955,7 @@ tests/indicators/usage/
 └── 01_core.py
 ```
 
-`tests/indicators/usage/01_core.py` is a standalone, runnable example script
+`tests/indicators/usage/features/01_core.py` is a standalone, runnable example script
 (not a pytest test) that demonstrates each `FR-INDI-001` through `FR-INDI-014`
 end-to-end against real market data, using only public
 `app.services.indicators` exports. It is executed and its exit status verified
@@ -1215,13 +1050,13 @@ The following formula conventions are authoritative for implementation.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-015` | The system shall calculate EMA for one validated `MarketDataset v1` using the approved seed/smoothing contract, return `ema_{period}` or the exact source-qualified name, preserve warmup rows, and expose causal availability and a deterministic manifest without mutating input. | `ema(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_moving_averages.py::test_ema_matches_approved_golden_fixture()` |
+| Completed | `FR-INDI-015` | The system shall calculate EMA for one validated `MarketDataset v1` using the approved seed/smoothing contract, return `ema_{period}` or the exact source-qualified name, preserve warmup rows, and expose causal availability and a deterministic manifest without mutating input. | `ema(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_moving_averages.py::test_ema_matches_approved_golden_fixture()` |
 
 #### `sma.py` — SMA
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-016` | The system shall calculate SMA for one validated `MarketDataset v1` over the approved inclusive window, return the exact deterministic source-qualified output, preserve warmup rows, and expose causal availability and a deterministic manifest without mutating input. | `sma(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_moving_averages.py::test_sma_matches_approved_golden_fixture()` |
+| Completed | `FR-INDI-016` | The system shall calculate SMA for one validated `MarketDataset v1` over the approved inclusive window, return the exact deterministic source-qualified output, preserve warmup rows, and expose causal availability and a deterministic manifest without mutating input. | `sma(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_moving_averages.py::test_sma_matches_approved_golden_fixture()` |
 
 **Implementation notes:** `ema()` and `sma()` are each a single-indicator file;
 do not reintroduce a combined `moving_averages.py`, `BaseIndicator`, ignored
@@ -1231,7 +1066,7 @@ do not reintroduce a combined `moving_averages.py`, `BaseIndicator`, ignored
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-023` | The system shall calculate WMA for one validated `MarketDataset v1` using linear weights `1..period` over the inclusive window, return the exact source-qualified output, preserve warmup rows, and expose causal metadata. | `wma(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_wma.py::test_wma_matches_hand_calculated_fixture()` |
+| Completed | `FR-INDI-023` | The system shall calculate WMA for one validated `MarketDataset v1` using linear weights `1..period` over the inclusive window, return the exact source-qualified output, preserve warmup rows, and expose causal metadata. | `wma(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_wma.py::test_wma_matches_hand_calculated_fixture()` |
 
 **Implementation notes:** Implement directly from the linear-weight formula.
 The weighting loop is not vectorizable through a closed-form recursion, but is
@@ -1243,7 +1078,7 @@ weighted dot product; do not use pandas' `.rolling().apply(..., raw=True)`
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-024` | The system shall calculate Hull MA for one validated `MarketDataset v1` from two nested half/full-period WMA passes and one floor-sqrt-period-length WMA pass, return the exact source-qualified output, preserve warmup rows, and expose causal metadata. | `hull_ma(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_hull_ma.py::test_hull_ma_matches_nested_wma_fixture()` |
+| Completed | `FR-INDI-024` | The system shall calculate Hull MA for one validated `MarketDataset v1` from two nested half/full-period WMA passes and one floor-sqrt-period-length WMA pass, return the exact source-qualified output, preserve warmup rows, and expose causal metadata. | `hull_ma(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_hull_ma.py::test_hull_ma_matches_nested_wma_fixture()` |
 
 **Implementation notes:** Implement the private weighted-average helper
 locally (duplicated from `wma.py`'s approach, not imported from it) so
@@ -1253,7 +1088,7 @@ locally (duplicated from `wma.py`'s approach, not imported from it) so
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-025` | The system shall calculate Bollinger Bands for one validated `MarketDataset v1` as an SMA basis with symmetric standard-deviation bands, return the three canonical columns sharing one warmup mask, and expose causal metadata. | `bollinger_bands(data: MarketDataset, *, period: int, std_dev: float, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_bollinger_bands.py::test_bollinger_bands_matches_sample_deviation_fixture()` |
+| Completed | `FR-INDI-025` | The system shall calculate Bollinger Bands for one validated `MarketDataset v1` as an SMA basis with symmetric standard-deviation bands, return the three canonical columns sharing one warmup mask, and expose causal metadata. | `bollinger_bands(data: MarketDataset, *, period: int, std_dev: float, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_bollinger_bands.py::test_bollinger_bands_matches_sample_deviation_fixture()` |
 
 **Implementation notes:** `std_dev` is declared as a non-period numeric
 parameter via `_number_schema` in the registry, validated by the same generic
@@ -1263,17 +1098,17 @@ parameter-schema engine as `period`.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-017` | The system shall calculate approved ADX, +DI, and -DI values for one validated `MarketDataset v1`, return the three canonical columns with warmup/availability metadata, and handle zero range deterministically. | `adx(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_directional.py::test_adx_matches_approved_golden_fixture()` |
+| Completed | `FR-INDI-017` | The system shall calculate approved ADX, +DI, and -DI values for one validated `MarketDataset v1`, return the three canonical columns with warmup/availability metadata, and handle zero range deterministically. | `adx(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/03_trend.py`<br>**Unit:** `tests/indicators/unit/test_directional.py::test_adx_matches_approved_golden_fixture()` |
 
 #### `zigzag.py` — Causal confirmed-pivot ZigZag
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-035` | The system shall identify unique alternating high/low extrema over an explicit symmetric `depth` window and publish each value and type only on its causal confirmation row; tied extrema and consecutive candidates of the same type are not pivots, and a published pivot is never revised. | `zigzag(data: MarketDataset, *, depth: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/03_trend.py::fr_indi_035()`<br>**Unit:** `tests/indicators/unit/test_zigzag.py` |
+| Completed | `FR-INDI-035` | The system shall identify unique alternating high/low extrema over an explicit symmetric `depth` window and publish each value and type only on its causal confirmation row; tied extrema and consecutive candidates of the same type are not pivots, and a published pivot is never revised. | `zigzag(data: MarketDataset, *, depth: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/03_trend.py::fr_indi_035()`<br>**Unit:** `tests/indicators/unit/test_zigzag.py` |
 
 ### Feature usage examples
 
-`tests/indicators/usage/03_trend.py` is a runnable example script (not a pytest
+`tests/indicators/usage/features/03_trend.py` is a runnable example script (not a pytest
 test) demonstrating each trend requirement against real market data.
 
 ---
@@ -1344,13 +1179,13 @@ normalized OHLC/source values → Core validation → approved volatility formul
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-018` | The system shall calculate non-negative ATR for one validated `MarketDataset v1` using the approved true-range/smoothing/seed contract, preserve gap and warmup semantics, and return causal metadata without input mutation. | `atr(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/05_volatility.py`<br>**Unit:** `tests/indicators/unit/test_ranges.py::test_atr_matches_approved_gap_fixture()` |
+| Completed | `FR-INDI-018` | The system shall calculate non-negative ATR for one validated `MarketDataset v1` using the approved true-range/smoothing/seed contract, preserve gap and warmup semantics, and return causal metadata without input mutation. | `atr(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/05_volatility.py`<br>**Unit:** `tests/indicators/unit/test_ranges.py::test_atr_matches_approved_gap_fixture()` |
 
 #### `adr.py` — ADR
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-019` | The system shall calculate ADR for one validated D1 `MarketDataset v1` as the inclusive rolling mean of `high-low`, perform no timeframe aggregation, preserve warmup rows, and return deterministic availability and manifest metadata. | `adr(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, unsupported timeframe, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/05_volatility.py`<br>**Unit:** `tests/indicators/unit/test_ranges.py::test_adr_matches_approved_golden_fixture()` |
+| Completed | `FR-INDI-019` | The system shall calculate ADR for one validated D1 `MarketDataset v1` as the inclusive rolling mean of `high-low`, perform no timeframe aggregation, preserve warmup rows, and return deterministic availability and manifest metadata. | `adr(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, unsupported timeframe, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/05_volatility.py`<br>**Unit:** `tests/indicators/unit/test_ranges.py::test_adr_matches_approved_golden_fixture()` |
 
 **Implementation notes:** `atr()` and `adr()` are each a single-indicator file;
 do not reintroduce a combined `ranges.py`.
@@ -1359,7 +1194,7 @@ do not reintroduce a combined `ranges.py`.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-020` | The system shall calculate rolling volatility for one validated `MarketDataset v1` from `period` log returns using `ddof=1` and annualization 252, return the exact source-qualified output, treat constant prices as zero volatility, and return causal metadata. | `rolling_volatility(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/05_volatility.py`<br>**Unit:** `tests/indicators/unit/test_rolling_volatility.py::test_rolling_volatility_matches_approved_return_fixture()` |
+| Completed | `FR-INDI-020` | The system shall calculate rolling volatility for one validated `MarketDataset v1` from `period` log returns using `ddof=1` and annualization 252, return the exact source-qualified output, treat constant prices as zero volatility, and return causal metadata. | `rolling_volatility(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/05_volatility.py`<br>**Unit:** `tests/indicators/unit/test_rolling_volatility.py::test_rolling_volatility_matches_approved_return_fixture()` |
 
 **Implementation notes:** Implement only the approved log-return formula; a
 price-level standard deviation is non-conforming for this file (that formula
@@ -1369,7 +1204,7 @@ now lives in `standard_deviation.py`).
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-026` | The system shall calculate rolling sample standard deviation (`ddof=1`) for one validated `MarketDataset v1` over the selected price, return the exact source-qualified output, treat constant prices as zero, and expose causal metadata. | `standard_deviation(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/05_volatility.py`<br>**Unit:** `tests/indicators/unit/test_standard_deviation.py::test_standard_deviation_matches_sample_fixture()` |
+| Completed | `FR-INDI-026` | The system shall calculate rolling sample standard deviation (`ddof=1`) for one validated `MarketDataset v1` over the selected price, return the exact source-qualified output, treat constant prices as zero, and expose causal metadata. | `standard_deviation(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/05_volatility.py`<br>**Unit:** `tests/indicators/unit/test_standard_deviation.py::test_standard_deviation_matches_sample_fixture()` |
 
 **Implementation notes:** The file uses sample `ddof=1` and remains deliberately
 independent of `rolling_volatility.py`, because one is price-level and the other is
@@ -1377,7 +1212,7 @@ annualized log-return volatility.
 
 ### Feature usage examples
 
-`tests/indicators/usage/05_volatility.py` is a runnable example script (not a
+`tests/indicators/usage/features/05_volatility.py` is a runnable example script (not a
 pytest test) demonstrating each volatility requirement against real market data.
 
 ---
@@ -1435,15 +1270,15 @@ normalized OHLC/source values → Core validation → approved oscillator formul
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-021` | The system shall calculate RSI for one validated `MarketDataset v1` using the approved gain/loss smoothing and seed contract, return the exact source-qualified output, keep values within approved bounds, handle flat/zero-gain/zero-loss windows deterministically, and expose causal metadata. | `rsi(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/04_momentum.py`<br>**Unit:** `tests/indicators/unit/test_oscillators.py::test_rsi_matches_approved_flat_and_golden_fixtures()` |
-| Completed | `FR-INDI-022` | The system shall calculate Williams %R for one validated `MarketDataset v1` over the approved inclusive high/low window, enforce approved bounds and zero-range behavior, preserve warmup rows, and expose causal metadata. | `williams_r(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/04_momentum.py`<br>**Unit:** `tests/indicators/unit/test_oscillators.py::test_williams_r_matches_approved_zero_range_fixture()` |
+| Completed | `FR-INDI-021` | The system shall calculate RSI for one validated `MarketDataset v1` using the approved gain/loss smoothing and seed contract, return the exact source-qualified output, keep values within approved bounds, handle flat/zero-gain/zero-loss windows deterministically, and expose causal metadata. | `rsi(data: MarketDataset, *, period: int, source: str = "close", config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/04_momentum.py`<br>**Unit:** `tests/indicators/unit/test_oscillators.py::test_rsi_matches_approved_flat_and_golden_fixtures()` |
+| Completed | `FR-INDI-022` | The system shall calculate Williams %R for one validated `MarketDataset v1` over the approved inclusive high/low window, enforce approved bounds and zero-range behavior, preserve warmup rows, and expose causal metadata. | `williams_r(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/04_momentum.py`<br>**Unit:** `tests/indicators/unit/test_oscillators.py::test_williams_r_matches_approved_zero_range_fixture()` |
 
 **Implementation notes:** RSI and Williams %R remain independent leaf modules. The
 retired combined `oscillators.py` file and MACD are not part of the public package.
 
 ### Feature usage examples
 
-`tests/indicators/usage/04_momentum.py` is a runnable example script (not a
+`tests/indicators/usage/features/04_momentum.py` is a runnable example script (not a
 pytest test) demonstrating each momentum requirement against real market data.
 
 ---
@@ -1467,10 +1302,10 @@ features from normalized OHLCV bars.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-027` | The system shall sum money-flow volume over an inclusive `period` window for one validated `MarketDataset v1`; zero-range bars contribute zero and a complete zero-volume window returns zero. | `cmf(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/06_volume.py`<br>**Unit:** `tests/indicators/unit/test_cmf.py::test_cmf_matches_money_flow_volume_fixture()` |
-| Completed | `FR-INDI-028` | The system shall start at zero, add volume after a higher close, subtract it after a lower close, and carry forward after an unchanged close. | `obv(data: MarketDataset, *, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/06_volume.py`<br>**Unit:** `tests/indicators/unit/test_obv.py::test_obv_matches_directional_cumulative_fixture()` |
-| Completed | `FR-INDI-029` | The system shall use typical price x volume over an inclusive `period` flow window; both flows zero returns 50, negative flow zero returns 100, and positive flow zero returns 0. | `mfi(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/06_volume.py`<br>**Unit:** `tests/indicators/unit/test_mfi.py::test_mfi_rising_typical_price_reaches_upper_bound()` |
-| Completed | `FR-INDI-030` | The system shall assign each close to one of `bins` equal-width rolling price bins and return the center of the highest-volume bin; ties resolve to the lowest bin. | `price_volume_distribution(data: MarketDataset, *, period: int, bins: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/06_volume.py`<br>**Unit:** `tests/indicators/unit/test_price_volume_distribution.py::test_price_volume_distribution_returns_dominant_bin_center()` |
+| Completed | `FR-INDI-027` | The system shall sum money-flow volume over an inclusive `period` window for one validated `MarketDataset v1`; zero-range bars contribute zero and a complete zero-volume window returns zero. | `cmf(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/06_volume.py`<br>**Unit:** `tests/indicators/unit/test_cmf.py::test_cmf_matches_money_flow_volume_fixture()` |
+| Completed | `FR-INDI-028` | The system shall start at zero, add volume after a higher close, subtract it after a lower close, and carry forward after an unchanged close. | `obv(data: MarketDataset, *, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/06_volume.py`<br>**Unit:** `tests/indicators/unit/test_obv.py::test_obv_matches_directional_cumulative_fixture()` |
+| Completed | `FR-INDI-029` | The system shall use typical price x volume over an inclusive `period` flow window; both flows zero returns 50, negative flow zero returns 100, and positive flow zero returns 0. | `mfi(data: MarketDataset, *, period: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/06_volume.py`<br>**Unit:** `tests/indicators/unit/test_mfi.py::test_mfi_rising_typical_price_reaches_upper_bound()` |
+| Completed | `FR-INDI-030` | The system shall assign each close to one of `bins` equal-width rolling price bins and return the center of the highest-volume bin; ties resolve to the lowest bin. | `price_volume_distribution(data: MarketDataset, *, period: int, bins: int, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/06_volume.py`<br>**Unit:** `tests/indicators/unit/test_price_volume_distribution.py::test_price_volume_distribution_returns_dominant_bin_center()` |
 
 **Implementation notes (`FR-INDI-030`):** the rolling point-of-control window
 loop in `_point_of_control` is an approved `NFR-INDI-005` exception. Each
@@ -1501,10 +1336,10 @@ retrospective confirmation or repainting.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-031` | The system shall emit `1` when body/range is at most the explicit threshold and `0` otherwise; a zero-range candle is a Doji only when open equals close. | `doji(data: MarketDataset, *, threshold: float, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/02_candles.py`<br>**Unit:** `tests/indicators/unit/test_doji.py::test_doji_matches_body_to_range_fixture()` |
-| Completed | `FR-INDI-032` | The system shall emit `1`, `-1`, or `0`; the first row is warmup and each later result depends only on the current and prior candle bodies. | `engulfing(data: MarketDataset, *, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/02_candles.py`<br>**Unit:** `tests/indicators/unit/test_engulfing.py::test_engulfing_matches_bullish_fixture_with_warmup()` |
-| Completed | `FR-INDI-033` | The system shall emit `1`, `-1`, or `0` using fixed non-configurable shadow/body proportions, with bullish precedence for an otherwise ambiguous match. | `pinbar(data: MarketDataset, *, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/02_candles.py`<br>**Unit:** `tests/indicators/unit/test_pinbar.py::test_pinbar_matches_bullish_and_bearish_fixtures()` |
-| Completed | `FR-INDI-034` | The system shall emit `1` only when the current high/low is contained within the prior high/low; the first row is warmup. | `inside_bar(data: MarketDataset, *, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/02_candles.py`<br>**Unit:** `tests/indicators/unit/test_inside_bar.py::test_inside_bar_matches_containment_fixture_with_warmup()` |
+| Completed | `FR-INDI-031` | The system shall emit `1` when body/range is at most the explicit threshold and `0` otherwise; a zero-range candle is a Doji only when open equals close. | `doji(data: MarketDataset, *, threshold: float, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/02_candles.py`<br>**Unit:** `tests/indicators/unit/test_doji.py::test_doji_matches_body_to_range_fixture()` |
+| Completed | `FR-INDI-032` | The system shall emit `1`, `-1`, or `0`; the first row is warmup and each later result depends only on the current and prior candle bodies. | `engulfing(data: MarketDataset, *, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/02_candles.py`<br>**Unit:** `tests/indicators/unit/test_engulfing.py::test_engulfing_matches_bullish_fixture_with_warmup()` |
+| Completed | `FR-INDI-033` | The system shall emit `1`, `-1`, or `0` using fixed non-configurable shadow/body proportions, with bullish precedence for an otherwise ambiguous match. | `pinbar(data: MarketDataset, *, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/02_candles.py`<br>**Unit:** `tests/indicators/unit/test_pinbar.py::test_pinbar_matches_bullish_and_bearish_fixtures()` |
+| Completed | `FR-INDI-034` | The system shall emit `1` only when the current high/low is contained within the prior high/low; the first row is warmup. | `inside_bar(data: MarketDataset, *, config: IndicatorConfig \| None = None) -> StandardResponse[IndicatorResult]` | None | `StandardResponse.error`: validation, formula-version, limit, or atomic calculation failure | **Usage:** `tests/indicators/usage/features/02_candles.py`<br>**Unit:** `tests/indicators/unit/test_inside_bar.py::test_inside_bar_matches_containment_fixture_with_warmup()` |
 
 Retrospective SMC/FVG/swing/BOS/CHoCH labeling remains explicitly excluded from
 this immutable, non-repainting production surface.
@@ -1555,8 +1390,6 @@ tests/indicators/
 ├── unit/
 │   ├── __init__.py
 │   ├── test_public_api.py
-│   ├── test_import_boundaries.py
-│   ├── test_persistence_crud.py
 │   ├── test_errors.py
 │   ├── test_contracts.py
 │   ├── test_results.py
@@ -1658,7 +1491,7 @@ embedded in the fixture.
 - [X] `NFR-INDI-001` purity and dependency boundaries are proven by test, not by inspection. Evidence: `tests/indicators/unit/test_import_boundaries.py:90`.
 - [X] `NFR-INDI-010` thread safety is proven by test, not by inspection. Evidence: `tests/indicators/unit/test_concurrency.py:38`.
 - [X] Every public export documented in Sections 2 and 4 matches the implemented signature, verified against `inspect.signature` for all 31 public callables.
-- [X] Usage programs define `main()` and an `if __name__ == "__main__"` guard per `AGENTS.md` §4. Evidence: `tests/indicators/usage/01_core.py:205`.
+- [X] Usage programs define `main()` and an `if __name__ == "__main__"` guard per `AGENTS.md` §4. Evidence: `tests/indicators/usage/features/01_core.py:205`.
 - [X] Datasets far beyond the former 664-record serialization ceiling calculate correctly; `MAX_INPUT_ROWS` is the only input-size limit. Evidence: `app/services/indicators/core/results.py:219`, `tests/indicators/unit/test_large_input.py:53`.
 - [X] No raw upstream exception crosses the public port; all twenty-one calculators are boundary-guarded. Evidence: `app/services/indicators/core/errors.py`, `tests/indicators/unit/test_zigzag.py`.
 - [X] Unit, integration, lint, format, type, and coverage gates pass, and all six runnable usage-example scripts execute against MT5 demo market data. Evidence: `tests/indicators/integration/test_usage_scripts.py:20`; 2026-07-24 run — repository-wide `ruff check` and `ruff format --check` clean over 1091 files, `mypy` clean over 1116 source files, 151 passed, branch-enabled coverage 91.71%.

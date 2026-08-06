@@ -14,7 +14,8 @@ export type WidgetType =
   | "research"
   | "simulation"
   | "risk"
-  | "trading";
+  | "trading"
+  | "indicators";
 
 export interface Widget {
   id: string;

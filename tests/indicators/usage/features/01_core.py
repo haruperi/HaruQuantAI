@@ -12,6 +12,7 @@ from app.services.indicators import (
     get_capability_matrix,
     get_indicator,
     get_indicator_result_metadata,
+    get_indicator_result_values,
     get_warmup_requirement,
     join_indicator_result,
     list_indicators,
@@ -21,6 +22,7 @@ from app.services.indicators import (
 from tests.indicators.usage._support import (
     print_indicator_evidence,
     print_market_evidence,
+    print_requirement_evidence,
     unwrap_indicator_response,
     unwrap_market_data_response,
 )
@@ -32,8 +34,8 @@ def _feature_header(title: str) -> None:
 
 
 def _header(title: str) -> None:
-    """Print one section heading."""
-    print(f"\n{'-' * 88}\n{title}\n{'=' * 88}")
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _format_result(obj: Any) -> str:
@@ -54,11 +56,6 @@ def _format_result(obj: Any) -> str:
 
 MarketDataset = Any
 _CACHE: dict[str, MarketDataset] = {}
-
-
-def _header(title: str) -> None:
-    """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _config() -> object:
@@ -120,6 +117,7 @@ def fr_indi_001() -> None:
     print(_format_result(failure))
     codes = failure.error.code if failure.error else "unknown"
     print(f"Data -> failure_code={codes}")
+    print_requirement_evidence("FR-INDI-001", actual_data=codes)
 
 
 def fr_indi_002() -> None:
@@ -133,6 +131,7 @@ def fr_indi_002() -> None:
         f"Data -> message={failure.message}, "
         f"error_code={failure.error.code if failure.error else 'unknown'}"
     )
+    print_requirement_evidence("FR-INDI-002", actual_data=failure.message)
 
 
 def fr_indi_003() -> None:
@@ -144,6 +143,7 @@ def fr_indi_003() -> None:
         "Data -> ",
         f"indicator_id={config.indicator_id}, period={config.parameters[0][1]}, source={config.source}, version={config.formula_version}",
     )
+    print_requirement_evidence("FR-INDI-003", actual_data=config)
 
 
 def fr_indi_004() -> None:
@@ -154,6 +154,7 @@ def fr_indi_004() -> None:
     print(
         f"Data -> indicator_id={spec.indicator_id}, formula_version={spec.formula_version}"
     )
+    print_requirement_evidence("FR-INDI-004", actual_data=spec)
 
 
 def fr_indi_005() -> None:
@@ -167,6 +168,7 @@ def fr_indi_005() -> None:
         f"source_timeframe={requirement.source_timeframe}, "
         f"availability_basis={requirement.availability_basis}",
     )
+    print_requirement_evidence("FR-INDI-005", actual_data=requirement)
 
 
 def fr_indi_006() -> None:
@@ -177,6 +179,9 @@ def fr_indi_006() -> None:
     main_data = callable(sma)
     print(_format_result(main_data))
     print(f"Data -> sma_is_callable={main_data}")
+    print_requirement_evidence(
+        "FR-INDI-006", actual_data={"sma_is_callable": main_data}
+    )
 
 
 def fr_indi_007() -> None:
@@ -189,6 +194,7 @@ def fr_indi_007() -> None:
     print(
         f"Data -> checksum={manifest['output_checksum']}, rows={manifest['row_count']}"
     )
+    print_requirement_evidence("FR-INDI-007", actual_data=manifest)
 
 
 def fr_indi_008() -> None:
@@ -201,6 +207,9 @@ def fr_indi_008() -> None:
         f"Data -> schema={metadata['schema_id']}, columns={metadata['output_columns']}"
     )
     print_indicator_evidence(result, label="IndicatorSeries v1 rows")
+    print_requirement_evidence(
+        "FR-INDI-008", actual_data=get_indicator_result_values(result)
+    )
 
 
 def fr_indi_009() -> None:
@@ -214,6 +223,9 @@ def fr_indi_009() -> None:
         f"Data -> projection_columns={list(get_indicator_result_metadata(result)['output_columns'])}"
     )
     print_indicator_evidence(result, label="Copy-safe generated values")
+    print_requirement_evidence(
+        "FR-INDI-009", actual_data=get_indicator_result_values(result)
+    )
 
 
 def fr_indi_010() -> None:
@@ -224,6 +236,7 @@ def fr_indi_010() -> None:
     print(f"Data -> joined_shape={joined.shape}, columns={list(joined.columns)}")
     print("Joined source and generated columns:")
     print(joined.tail(8).to_string())
+    print_requirement_evidence("FR-INDI-010", actual_data=joined)
 
 
 def fr_indi_011() -> None:
@@ -232,6 +245,7 @@ def fr_indi_011() -> None:
     indicator = unwrap_indicator_response(get_indicator("rsi"))
     print(_format_result(indicator))
     print(f"Data -> resolved_indicator_id={indicator.indicator_id}")
+    print_requirement_evidence("FR-INDI-011", actual_data=indicator)
 
 
 def fr_indi_012() -> None:
@@ -241,6 +255,9 @@ def fr_indi_012() -> None:
     print(_format_result(specs))
     print(
         f"Data -> official_spec_count={len(specs)}, first_three={tuple(s.indicator_id for s in specs[:3])}"
+    )
+    print_requirement_evidence(
+        "FR-INDI-012", actual_data=[s.indicator_id for s in specs]
     )
 
 
@@ -253,6 +270,7 @@ def fr_indi_013() -> None:
     print(_format_result(matrix))
     print(f"Data -> capability_rows={len(matrix)}")
     print(f"Data -> first_row={dict(matrix[0]) if matrix else {}}")
+    print_requirement_evidence("FR-INDI-013", actual_data=matrix)
 
 
 def fr_indi_014() -> None:
@@ -267,6 +285,7 @@ def fr_indi_014() -> None:
     print(
         f"Data -> validated_indicator_id={validated.indicator_id}, formula={validated.formula_version}"
     )
+    print_requirement_evidence("FR-INDI-014", actual_data=validated)
 
 
 def main() -> None:

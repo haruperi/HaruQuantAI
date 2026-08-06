@@ -59,7 +59,7 @@ through a foreign schema's tables directly.
 | 1 | Utils | `util_` ¹ | **Nothing — stateless by design.** Prefix reserved, unused | — |
 | 2 | Brokers | `broker_` ¹ | Symbol mapping only — stateless by design (D10) | Bitemporal reference |
 | 3 | Data | `data_` | Symbols, sessions, providers, **Parquet catalog** | Catalog upsert |
-| 4 | Indicators | `indicator_` ¹ | Definitions, param sets, **materialisation refs** | Catalog upsert |
+| 4 | Indicators | `indicator_` ¹ | **Nothing — stateless by design.** Historical prefix reserved, unused | — |
 | 5 | Strategy | `strategy_` | Definitions, versions, configs, checkpoints | Versioned immutable |
 | 6 | Risk | `risk_` | Limits, policies, decisions, kill switches | **Hash-chained append** |
 | 7 | Trading | `trading_` | Orders, fills, positions, transitions | **Event-sourced** |
@@ -100,7 +100,7 @@ declare a foreign key into a domain that transitively depends on it.
    │                           │                           │
    │                    ┌──────▼───────┐                   │
    │                    │4. Indicators │                   │
-   │                    │  cached calc │                   │
+   │                    │ stateless calc│                  │
    │                    └──────┬───────┘                   │
    │                           │                           │
    │                    ┌──────▼───────┐                   │
@@ -153,6 +153,16 @@ declare a foreign key into a domain that transitively depends on it.
 | **L7 Orchestration** | Agentic | Reads everything through governed tools; writes only its own namespace. |
 | **Perimeter** | UI-API | Authentication, RBAC, audit. Writes only `api_*`. |
 
+### Indicators persistence history
+
+Indicators owns no target or live database tables. Migration
+`001_indicator_schema_v1` historically introduced `indicator_definitions`,
+`indicator_param_sets`, and `indicator_materializations`; immutable migration
+`002_remove_unused_indicator_support_schema` retired them after verifying that
+all three were empty. Indicator identity and provenance cross domain boundaries
+through versioned contracts and immutable value references, not database foreign
+keys.
+
 ---
 
 ## 3. Key cross-domain relationships
@@ -168,8 +178,6 @@ interpreted without the parent**. Everywhere else, the reference is a soft key
 | `data_partition_files.dataset_id` | `data_datasets.dataset_id` | N:1 | A file without its dataset has no schema and no semantics. |
 | `data_datasets.symbol_id` | `data_symbols.symbol_id` | N:1 | A price dataset without its instrument spec is uninterpretable. |
 | `data_fetch_log.dataset_id` | `data_datasets.dataset_id` | N:1 | Materialisation must name where it landed. |
-| `indicator_materializations.definition_id` | `indicator_definitions.definition_id` | N:1 | Output values are meaningless without the formula version. |
-| `indicator_materializations.param_set_id` | `indicator_param_sets.param_set_id` | N:1 | Same. |
 | `research_feature_materializations.feature_id` | `research_features.feature_id` | N:1 | Same. |
 | `strategy_configs.version_id` | `strategy_versions.version_id` | N:1 | Config binds to exactly one code version. |
 | `trading_fills.order_id` | `trading_orders.order_id` | N:1 | A fill without its order is orphaned money. |
@@ -190,10 +198,9 @@ interpreted without the parent**. Everywhere else, the reference is a soft key
 | `portfolio_cash_balances.account_id` | broker account identifier | Same — an opaque provider value, not a foreign key. |
 | `agentic_llm_calls.agent_id` | `agentic_agents` | Cost records must survive agent deletion for billing. |
 | `sim_*` → `data_*`, `strategy_*` | — | Simulation runs pin content hashes, not live rows. |
-| `indicator_materializations.dataset_id` | `data_datasets` | **Direction guard.** A hard FK here would make Data depend on Indicators, creating a cycle. |
 | `research_feature_materializations.dataset_id` | `data_datasets` | Same guard. |
 | `analytics_equity_curves.dataset_id` | `data_datasets` | Same guard. |
-| `data_datasets.producer_ref` | `indicator_param_sets` / `research_features` | Same guard, inverted: Data must not reference downstream domains. |
+| `data_datasets.producer_ref` | Indicators contract identity / `research_features` | Same guard, inverted: Data must not reference downstream domains. |
 
 **Design rule:** if the child is an immutable audit or financial record, the parent
 reference is **always soft**. Deleting a strategy must never cascade into deleting
@@ -258,7 +265,7 @@ Each is now a Parquet dataset registered in `data_datasets` with one
 |---|---|---|---|---|
 | `data_ticks` | Data | 10⁹+ | Parquet, monthly | `data_datasets` (kind `tick`) |
 | `data_candles` | Data | 10⁷–10⁸ | Parquet, monthly | `data_datasets` (kind `candle`) |
-| `ind_outputs` | Indicators | 10⁸ | Parquet, purgeable | `indicator_materializations` |
+| `ind_outputs` | Indicators | 10⁸ | Recomputed on demand or stored by a consuming owner | No Indicators-owned catalogue table |
 | `research_feature_values` | Research | 10⁸ | Parquet | `research_feature_materializations` |
 | `analytics_equity_curves` points | Analytics | 10⁶ | Parquet | `analytics_equity_curves` (summary row) |
 
@@ -294,7 +301,6 @@ Every domain that accepts user-defined configuration exposes exactly one
 |---|---|---|
 | `broker_symbol_map` | — | Brokers holds no JSON payload; execution tuning lives in typed settings |
 | `data_datasets` | `arrow_schema_json` | Parquet column names, Arrow types, nullability |
-| `indicator_param_sets` | `params_json` | Indicator inputs (period, source, …) |
 | `strategy_configs` | `inputs_json` | Strategy parameters |
 | `risk_policies` | `rules_json` | Limit rule tree |
 | `optimization_jobs` | `search_space_json` | Grid/genetic bounds |

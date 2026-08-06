@@ -66,6 +66,7 @@ from app.services.api.routes import (
     data_router,
     data_stream_router,
     health_router,
+    indicators_router,
     observability_router,
     operator_router,
     optimization_router,
@@ -86,6 +87,7 @@ _SESSION_COOKIE = "hq_session"
 _ROUTERS = (
     auth_router,
     health_router,
+    indicators_router,
     settings_router,
     data_router,
     data_stream_router,

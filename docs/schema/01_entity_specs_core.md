@@ -731,6 +731,113 @@ CREATE TABLE data_verified_research_sources (
     license_policy TEXT NOT NULL,
     request_id TEXT NOT NULL DEFAULT '',
     correlation_id TEXT NOT NULL DEFAULT '',
+
+#### `data_research_sources`
+
+```sql
+CREATE TABLE data_research_sources (
+    document_id TEXT PRIMARY KEY,
+    source_id TEXT NOT NULL,
+    source_kind TEXT NOT NULL,
+    external_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    source_url TEXT NOT NULL,
+    asset_scope_json TEXT NOT NULL,
+    issuer_scope_json TEXT NOT NULL,
+    language TEXT NOT NULL,
+    event_at TEXT,
+    published_at TEXT NOT NULL,
+    first_seen_at TEXT NOT NULL,
+    available_at TEXT NOT NULL,
+    retrieved_at TEXT NOT NULL,
+    revision INTEGER NOT NULL CHECK (revision > 0),
+    previous_document_id TEXT,
+    original_hash TEXT NOT NULL,
+    normalized_hash TEXT NOT NULL,
+    original_content BLOB NOT NULL,
+    normalized_text TEXT NOT NULL,
+    license_id TEXT NOT NULL,
+    retention_until TEXT NOT NULL,
+    trust_status TEXT NOT NULL,
+    manipulation_status TEXT NOT NULL,
+    injection_status TEXT NOT NULL,
+    currency TEXT,
+    unit TEXT,
+    provenance_json TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    UNIQUE (source_id, external_id, normalized_hash)
+) STRICT;
+```
+
+Externally sourced documents with their original bytes. `original_hash` proves what arrived and `normalized_hash` what the pipeline made of it, so a normalisation change is detectable without re-fetching. `available_at` is when the document became *knowable* — using `published_at` instead is how look-ahead enters a fundamental strategy.
+
+#### `data_runtime_records`
+
+```sql
+CREATE TABLE data_runtime_records (
+    namespace TEXT NOT NULL,
+    collection_name TEXT NOT NULL,
+    record_key TEXT NOT NULL,
+    partition_key TEXT NOT NULL,
+    sequence_number INTEGER NOT NULL,
+    codec_kind TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    revision INTEGER NOT NULL CHECK (revision > 0),
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    PRIMARY KEY (namespace, collection_name, record_key),
+    UNIQUE (namespace, collection_name, partition_key, sequence_number)
+) STRICT;
+```
+
+Generic keyed runtime store. `revision` carries `CHECK (revision > 0)` and the composite unique key orders records within a partition, so a compare-and-swap write cannot silently reorder history.
+
+#### `data_research_observations`
+
+```sql
+CREATE TABLE data_research_observations (
+    observation_id TEXT PRIMARY KEY,
+    document_id TEXT NOT NULL,
+    source_id TEXT NOT NULL,
+    series_id TEXT NOT NULL,
+    observation_period TEXT NOT NULL,
+    value_json TEXT NOT NULL,
+    unit TEXT,
+    published_at TEXT NOT NULL,
+    available_at TEXT NOT NULL,
+    retrieved_at TEXT NOT NULL,
+    revision INTEGER NOT NULL CHECK (revision > 0),
+    previous_observation_id TEXT,
+    content_hash TEXT NOT NULL,
+    parser_version TEXT NOT NULL,
+    trust_status TEXT NOT NULL,
+    provenance_json TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    UNIQUE ( source_id, series_id, observation_period, content_hash )
+) STRICT;
+```
+
+Extracted values, kept separate from the source document so a re-extraction produces new observations without rewriting the evidence they came from.
+
+#### `data_verified_research_sources`
+
+```sql
+CREATE TABLE data_verified_research_sources (
+    source_id TEXT NOT NULL,
+    parser_version TEXT NOT NULL,
+    verified_at TEXT NOT NULL,
+    external_record_id TEXT NOT NULL,
+    fixture_sha256 TEXT NOT NULL,
+    environments_json TEXT NOT NULL,
+    license_policy TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT '',
     created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
     PRIMARY KEY (source_id, parser_version)
 ) STRICT;
@@ -743,92 +850,17 @@ The allow-list of sources cleared for use. Absence is a denial.
 
 > Prefix `indicator_` is ratified (D1) and recorded in `docs/ARCHITECTURE.md`.
 
-Generated from migration step `001_indicator_schema_v1`. Computed series are not
-stored in the database; `indicator_materializations` records the artifact reference.
+Indicators owns no target database entities. Migration
+`001_indicator_schema_v1` historically introduced three empty support tables:
+`indicator_definitions`, `indicator_param_sets`, and
+`indicator_materializations`. Migration
+`002_remove_unused_indicator_support_schema` retired those tables transactionally
+with a fail-closed non-empty-row guard.
 
-### `indicator_definitions`
-
-```sql
-CREATE TABLE indicator_definitions (
-    definition_id TEXT PRIMARY KEY,
-    indicator_code TEXT NOT NULL,
-    version TEXT NOT NULL,
-    category TEXT NOT NULL,
-    formula_hash TEXT NOT NULL,
-    param_schema_json TEXT NOT NULL,
-    output_names_json TEXT NOT NULL,
-    lookback_bars INTEGER NOT NULL,
-    is_causal INTEGER NOT NULL DEFAULT 1 CHECK (is_causal IN (0, 1)),
-    state TEXT NOT NULL,
-    request_id TEXT NOT NULL DEFAULT '',
-    correlation_id TEXT NOT NULL DEFAULT '',
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
-    UNIQUE (indicator_code, version)
-) STRICT;
-
-CREATE INDEX idx_indicator_defs_code ON indicator_definitions(indicator_code, version);
-
-CREATE INDEX idx_indicator_defs_lookahead ON indicator_definitions(indicator_code) WHERE is_causal = 0;
-```
-
-`formula_hash` is computed over the implementation. If the formula changes the hash changes, forcing a new version and invalidating every materialisation built from it. Without this, a silent formula fix retroactively rewrites backtest history.
-
-`is_causal = 0` marks an indicator that reads future bars — a centred moving average, a zig-zag. Legitimate for research and catastrophic in a live signal path. As a column with its own partial index, Strategy can reject them structurally rather than by convention.
-
-### `indicator_param_sets`
-
-```sql
-CREATE TABLE indicator_param_sets (
-    param_set_id TEXT PRIMARY KEY,
-    definition_id TEXT NOT NULL,
-    params_json TEXT NOT NULL,
-    params_hash TEXT NOT NULL,
-    label TEXT NOT NULL DEFAULT '',
-    period INTEGER GENERATED ALWAYS AS (json_extract(params_json, '$.period')) VIRTUAL,
-    source_field TEXT GENERATED ALWAYS AS (json_extract(params_json, '$.source')) VIRTUAL,
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
-    UNIQUE (definition_id, params_hash)
-) STRICT;
-
-CREATE INDEX idx_indicator_params_period ON indicator_param_sets(definition_id, period);
-```
-
-The JSON-payload pattern from [00](00_domain_relationship_map.md) §8. `params_json` stays free-form; `period` and `source_field` are extracted into indexed generated columns, so the common query does not pay `json_extract` per row.
-
-### `indicator_materializations`
-
-```sql
-CREATE TABLE indicator_materializations (
-    materialization_id TEXT PRIMARY KEY,
-    definition_id TEXT NOT NULL,
-    param_set_id TEXT NOT NULL,
-    symbol_id TEXT NOT NULL,
-    timeframe TEXT NOT NULL,
-    dataset_id TEXT NOT NULL,
-    source_dataset_id TEXT,
-    source_data_hash TEXT NOT NULL,
-    formula_hash TEXT NOT NULL,
-    covered_from_utc INTEGER NOT NULL,
-    covered_to_utc INTEGER NOT NULL,
-    row_count INTEGER NOT NULL DEFAULT 0,
-    state TEXT NOT NULL,
-    built_at TEXT,
-    request_id TEXT NOT NULL DEFAULT '',
-    correlation_id TEXT NOT NULL DEFAULT '',
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
-    UNIQUE (definition_id, param_set_id, symbol_id, timeframe),
-    CHECK (covered_to_utc >= covered_from_utc)
-) STRICT;
-
-CREATE INDEX idx_indicator_mat_stale ON indicator_materializations(symbol_id, timeframe) WHERE state IN ('stale', 'invalidated');
-
-CREATE INDEX idx_indicator_mat_lookup ON indicator_materializations(definition_id, param_set_id) WHERE state = 'ready';
-```
-
-Computed series live in an artifact; this table holds the reference. Two hashes drive invalidation: `source_data_hash` covers the underlying bars, so a repair that rewrites them makes the derivation provably stale; `formula_hash` is copied at build time, so a formula fix invalidates every materialisation rather than silently changing what a stored series means.
+Indicator calculations are stateless and read-only. Registry definitions,
+parameters, results, manifests, availability evidence, and formula versions are
+represented by the Indicators public contracts and are not persisted by this
+domain.
 
 ---
 ## Entity count — this file
@@ -838,7 +870,7 @@ Computed series live in an artifact; this table holds the reference. Two hashes 
 | Utils | 0 | none — stateless by design |
 | Brokers | 1 | none — stateless by design (D10) |
 | Data | 21 | **none — catalog only** |
-| Indicators | 3 | **none — catalog only** |
-| **Total** | **25** | |
+| Indicators | 0 | **none — retired via migration 002** |
+| **Total** | **22** | |
 
 Next: [02_entity_specs_execution.md](02_entity_specs_execution.md)

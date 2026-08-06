@@ -1,11 +1,8 @@
 """Strategy reference and configuration validation tests."""
 
 # ruff: noqa: PT018
-from pathlib import Path
-
 import pytest
 from app.services.strategy import (
-    register_strategy_version,
     validate_strategy_config,
     validate_strategy_ref,
 )
@@ -17,27 +14,47 @@ from app.services.strategy.contracts import (
 from app.utils import get_logger
 from pydantic import ValidationError
 
-from tests.strategy.unit.test_catalog import make_registration, storage_context
-from tests.strategy.unit.test_models import COR, REQ, make_auth, make_policy, make_ref
+from tests.strategy.unit.test_models import (
+    COR,
+    HASH_B,
+    REQ,
+    make_manifest,
+    make_policy,
+    make_ref,
+)
 
 logger = get_logger(__name__)
 
 
-def test_version_constraint_resolves_exactly_one(tmp_path: Path) -> None:
+def test_version_constraint_resolves_exactly_one(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Verify a constraint must resolve one approved immutable version."""
     logger.debug("Testing Strategy version resolution")
-    with storage_context(tmp_path):
-        register_strategy_version(make_registration(), make_auth(), make_policy())
-        outcome = validate_strategy_ref(
-            StrategyRef(
-                strategy_id="mean-reversion",
-                exact_version="1.0.0",
-                environment=StrategyEnvironment.RESEARCH,
-                request_id=REQ,
-                correlation_id=COR,
-            ),
-            make_policy(),
-        )
+    manifest = make_manifest()
+    policy = make_policy()
+    row = {
+        "manifest_json": manifest.model_dump_json(),
+        "lifecycle_status": "APPROVED",
+        "policy_json": policy.model_dump_json(),
+        "record_hash": HASH_B,
+        "request_id": REQ,
+        "correlation_id": COR,
+    }
+    monkeypatch.setattr(
+        "app.services.strategy.registry.resolution.read_strategy_versions",
+        lambda *_args, **_kwargs: (row,),
+    )
+    outcome = validate_strategy_ref(
+        StrategyRef(
+            strategy_id="mean-reversion",
+            exact_version="1.0.0",
+            environment=StrategyEnvironment.RESEARCH,
+            request_id=REQ,
+            correlation_id=COR,
+        ),
+        make_policy(),
+    )
     assert outcome.status == "success"
 
 

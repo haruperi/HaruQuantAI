@@ -34,7 +34,7 @@ def test_validate_strategy_ref_handles_data_error() -> None:
     policy = MagicMock()
 
     with patch(
-        "app.services.strategy.registry.resolution.read_strategy_version_records",
+        "app.services.strategy.registry.resolution.read_strategy_versions",
         side_effect=build_data_error("DB_READ_FAILED"),
     ):
         res = validate_strategy_ref(ref, policy)
@@ -100,7 +100,7 @@ def test_validate_strategy_ref_search_results() -> None:
 
     # Empty rows -> NOT_FOUND
     with patch(
-        "app.services.strategy.registry.resolution.read_strategy_version_records",
+        "app.services.strategy.registry.resolution.read_strategy_versions",
         return_value=(),
     ):
         res_empty = validate_strategy_ref(ref, policy)
@@ -115,7 +115,7 @@ def test_validate_strategy_ref_search_results() -> None:
     err_code = StrategyErrorCode.VERSION_CONSTRAINT_UNSATISFIABLE.value
     with (
         patch(
-            "app.services.strategy.registry.resolution.read_strategy_version_records",
+            "app.services.strategy.registry.resolution.read_strategy_versions",
             return_value=(mock_row,),
         ),
         patch(

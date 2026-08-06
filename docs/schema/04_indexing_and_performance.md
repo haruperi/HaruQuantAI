@@ -296,7 +296,6 @@ is the catalog that finds those files, plus the system logs that stay in SQLite.
 | `idx_data_files_hash` | `data_partition_files` | `content_hash` | Content-addressed lookup; detects duplicate artifacts |
 | `idx_data_files_bad` | `data_partition_files` | `dataset_id` partial `verify_state IN ('hash_mismatch','missing')` | Integrity gate; empty when healthy |
 | `idx_data_datasets_lookup` | `data_datasets` | `dataset_kind, symbol_id, timeframe` partial `state='ready'` | Dataset resolution |
-| `idx_indicator_mat_lookup` | `indicator_materializations` | `definition_id, param_set_id` partial `state='ready'` | Cached-indicator hit test |
 | `idx_agentic_spans_bucket` | `agentic_trace_spans` | `bucket_month, agent_id` | Trace browse |
 | `idx_api_audit_bucket` | `api_audit_log` | `bucket_month, actor_kind` | Audit browse |
 
@@ -323,7 +322,6 @@ the rows anyone actually queries.
 | `idx_agentic_llm_breach` | `within_ceiling=0` | Budget breach |
 | `idx_api_keys_lookup` | `revoked_at IS NULL` | Auth hot path |
 | `idx_api_audit_denied` | `outcome='denied'` | Security monitoring |
-| `idx_indicator_cache_stale` | `state IN ('stale','invalidated')` | Cache rebuild queue |
 | `idx_opt_trials_pending` | `state='pending'` | Trial dispatch |
 | `idx_sim_runs_active` | `state IN ('queued','running')` | Run scheduler |
 | `idx_sim_sessions_expiry` | `status IN ('active','expired')` | Playback-session expiry and cleanup |
@@ -353,9 +351,6 @@ phrase the extra columns are pure overhead and should be dropped.
 ### 5.4 Expression / generated-column indexes
 
 ```sql
--- JSON hot keys surfaced as generated columns, then indexed
-CREATE INDEX idx_indicator_params_period ON indicator_param_sets(definition_id, period);
-
 -- date-truncated grouping without a scan
 CREATE INDEX idx_trades_day ON analytics_trade_analysis(
     strategy_version_id, substr(exit_at, 1, 10));
@@ -371,20 +366,19 @@ text — the first ten characters are the date. Epoch integers would need a
 
 **Never** filter on `json_extract` at read time on a large table:
 
-```sql
--- ✗ full scan + JSON parse per row
-SELECT * FROM indicator_param_sets WHERE json_extract(params_json, '$.period') = 14;
-
--- ✓ generated column + index, index seek, no parse
-SELECT * FROM indicator_param_sets WHERE period = 14;
-```
-
-The generated column is `VIRTUAL` — computed on read, stored only in the index.
 `STORED` would duplicate the value in the table for a marginal gain; `VIRTUAL` plus
 an index gives the seek without the duplication.
 
 Promote a JSON key to a generated column when it is filtered or joined on. Leave it
 in JSON when it is only ever read as part of the whole payload.
+
+### 6.1 Indicators
+
+Indicators owns no current table or index. The indexes introduced for the
+legacy empty support schema by `001_indicator_schema_v1` were removed with
+their tables by `002_remove_unused_indicator_support_schema`. Indicator
+calculation performance is governed by in-memory vectorized execution and the
+budgets documented in the owning Indicators README.
 
 ---
 

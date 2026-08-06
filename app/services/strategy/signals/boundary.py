@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+from datetime import UTC
 from typing import TYPE_CHECKING, Any
 
 from app.services.indicators import get_indicator_result_values, join_indicator_result
@@ -19,7 +21,11 @@ from app.services.strategy.signals._mechanics import (
     _SignalDataError,
     _SignalIndicatorError,
 )
-from app.utils import get_logger, get_standard_response_type
+from app.utils import (
+    canonical_json,
+    get_logger,
+    get_standard_response_type,
+)
 
 logger = get_logger(__name__)
 _STANDARD_RESPONSE_TYPE = get_standard_response_type()
@@ -313,4 +319,200 @@ def evaluate_strategy_signals(
     return success(signals)
 
 
-__all__ = ["evaluate_strategy_signals"]
+@guard_strategy_boundary
+def record_strategy_signals(
+    config_id: str,
+    signals: tuple[StrategySignal, ...],
+    *,
+    intents: tuple[Any, ...] = (),
+    request_id: str,
+    correlation_id: str,
+) -> tuple[Mapping[str, Any], ...]:
+    """Atomically persist genuine evaluator Strategy signal output records.
+
+    Args:
+        config_id: Strategy configuration record identifier.
+        signals: Bounded tuple of StrategySignal output contracts.
+        intents: Optional tuple of TradeIntent contracts.
+        request_id: Tracing request identifier.
+        correlation_id: Tracing correlation identifier.
+
+    Returns:
+        Tuple of persisted signal record mappings.
+    """
+    from app.services.strategy.persistence import create_strategy_signal_records
+
+    logger.info("Recording %d strategy signals for config %s", len(signals), config_id)
+    records = []
+    for idx, sig in enumerate(signals):
+        intent_id = (
+            intents[idx].intent_id
+            if idx < len(intents) and hasattr(intents[idx], "intent_id")
+            else None
+        )
+        rec = {
+            "signal_id": sig.signal_id,
+            "config_id": config_id,
+            "strategy_id": sig.strategy_id,
+            "strategy_version": sig.strategy_version,
+            "sequence": idx,
+            "symbol": sig.symbol,
+            "signal_name": sig.signal_name,
+            "side": sig.side,
+            "active": sig.active,
+            "signal_timestamp": sig.timestamp.isoformat()
+            if hasattr(sig.timestamp, "isoformat")
+            else str(sig.timestamp),
+            "signal_json": sig.model_dump_json(),
+            "lineage_json": canonical_json(sig.lineage)
+            if hasattr(sig, "lineage")
+            else "{}",
+            "facts_json": canonical_json(sig.facts) if hasattr(sig, "facts") else "{}",
+            "intent_id": intent_id,
+            "publication_status": "generated",
+            "risk_submission_ref": None,
+            "request_id": request_id,
+            "correlation_id": correlation_id,
+            "created_at": context_now_iso(),
+            "updated_at": context_now_iso(),
+        }
+        records.append(rec)
+    rec_tuple = tuple(records)
+    create_strategy_signal_records(rec_tuple, request_id)
+    return rec_tuple
+
+
+@guard_strategy_boundary
+def list_strategy_signals(
+    config_id: str,
+    *,
+    publication_status: str | None = None,
+) -> tuple[Mapping[str, Any], ...]:
+    """List bounded durable Strategy signal evidence.
+
+    Args:
+        config_id: Configuration record identifier.
+        publication_status: Optional publication status filter.
+
+    Returns:
+        Tuple of signal record mappings.
+    """
+    from app.services.strategy.persistence import read_strategy_signals
+    from app.utils import generate_id
+
+    logger.info("Listing strategy signals for %s", config_id)
+    request_id = generate_id("req")
+    rows = read_strategy_signals(config_id, request_id)
+    if publication_status:
+        rows = tuple(
+            r for r in rows if r.get("publication_status") == publication_status
+        )
+    return rows
+
+
+@guard_strategy_boundary
+def mark_strategy_signal_submitted(
+    signal_id: str,
+    *,
+    expected_status: str = "generated",
+    risk_submission_ref: str,
+    request_id: str,
+    correlation_id: str,
+) -> Mapping[str, Any]:
+    """Mark successful handoff to Risk without storing a Risk decision.
+
+    Args:
+        signal_id: Signal record identifier.
+        expected_status: Expected current status.
+        risk_submission_ref: Opaque risk submission reference string.
+        request_id: Tracing request identifier.
+        correlation_id: Tracing correlation identifier.
+
+    Returns:
+        Updated signal reference mapping.
+    """
+    from app.services.strategy.persistence import (
+        update_strategy_signal_publication_record,
+    )
+
+    logger.info("Marking strategy signal %s as submitted", signal_id)
+    success_sub = update_strategy_signal_publication_record(
+        signal_id=signal_id,
+        expected_status=expected_status,
+        new_status="submitted",
+        risk_submission_ref=risk_submission_ref,
+        request_id=request_id,
+    )
+    if not success_sub:
+        failure(
+            StrategyErrorCode.INTERNAL_ERROR,
+            f"Failed to mark signal {signal_id} as submitted",
+            request_id=request_id,
+            correlation_id=correlation_id,
+        )
+    return {
+        "signal_id": signal_id,
+        "publication_status": "submitted",
+        "risk_submission_ref": risk_submission_ref,
+    }
+
+
+@guard_strategy_boundary
+def evaluate_and_record_strategy_signals(
+    ref: ValidatedStrategyRef,
+    config: ValidatedStrategyConfig,
+    config_id: str,
+    evidence: StrategySignalEvidence,
+    indicators: tuple[Any, ...],
+    context: StrategyExecutionContext,
+    evaluator: SignalEvaluator,
+) -> tuple[StrategySignal, ...]:
+    """Evaluate and atomically record exact genuine signals.
+
+    Args:
+        ref: Validated exact strategy reference.
+        config: Validated strategy configuration.
+        config_id: Configuration record identifier.
+        evidence: Point-in-time signal evidence.
+        indicators: Calculated indicators.
+        context: Execution context.
+        evaluator: Signal evaluator.
+
+    Returns:
+        Tuple of emitted signals.
+    """
+    from app.services.strategy.contracts.responses import unwrap_strategy_response
+
+    logger.info(
+        "Evaluating and recording strategy signals for %s", ref.manifest.strategy_id
+    )
+    signals = unwrap_strategy_response(
+        evaluate_strategy_signals(
+            ref, config, evidence, indicators, context, evaluator
+        ),
+        operation="strategy.signals.evaluate_strategy_signals",
+    )
+    if signals:
+        record_strategy_signals(
+            config_id=config_id,
+            signals=signals,
+            request_id=context.request_id,
+            correlation_id=context.correlation_id,
+        )
+    return signals
+
+
+def context_now_iso() -> str:
+    """Return ISO format string for current UTC timestamp."""
+    from datetime import datetime
+
+    return datetime.now(UTC).isoformat()
+
+
+__all__ = [
+    "evaluate_and_record_strategy_signals",
+    "evaluate_strategy_signals",
+    "list_strategy_signals",
+    "mark_strategy_signal_submitted",
+    "record_strategy_signals",
+]

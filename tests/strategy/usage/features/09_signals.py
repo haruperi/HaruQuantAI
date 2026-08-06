@@ -27,18 +27,20 @@ from app.services.data import (
 from app.services.indicators import rsi
 from app.services.strategy import (
     create_strategy_evaluator,
-    create_strategy_execution_context,
     create_strategy_manifest,
-    create_strategy_signal_evidence,
     create_strategy_validation_policy,
     create_validated_strategy_config,
     create_validated_strategy_ref,
+    evaluate_and_record_strategy_signals,
     evaluate_strategy_signals,
     get_strategy_environment,
     get_strategy_lifecycle_status,
     get_strategy_timing_policy,
+    list_strategy_signals,
+    mark_strategy_signal_submitted,
+    record_strategy_signals,
 )
-from app.utils import canonical_digest
+from tests.strategy.unit.test_models import make_context, make_signal_evidence
 
 _UNAVAILABLE = 3
 _EVALUATOR_NAME = "decomposing_trade"
@@ -98,95 +100,65 @@ def _get_signal_evidence() -> tuple[Any, Any]:
             end=request_end,
             limit=300,
             use_cache=False,
-            quality_failure_behavior="warn",
         )
         meta_resp = get_symbol_metadata(source_id="mt5", symbol="EURUSD")
         if (
-            m_resp.status == "success"
-            and m_resp.data
-            and meta_resp.status == "success"
-            and meta_resp.data
+            getattr(m_resp, "status", None) == "success"
+            and getattr(m_resp, "data", None)
+            and getattr(meta_resp, "status", None) == "success"
+            and getattr(meta_resp, "data", None)
         ):
+            print("Successfully acquired real MT5 evidence for EURUSD H1.")
             return m_resp.data, meta_resp.data
-    except OSError, RuntimeError, ValueError:
-        pass
+    except (RuntimeError, ValueError, KeyError, TypeError, AttributeError) as exc:
+        print(f"MT5 query exception encountered: {exc}")
 
-    now = datetime.now(UTC)
+    print("Using synthetic fallback market dataset and symbol metadata.")
+    start_time = datetime(2026, 1, 1, 0, 0, tzinfo=UTC)
     records = []
-    for i in range(30):
-        t = now - timedelta(hours=30 - i)
+    base_price = Decimal("1.1000")
+    for i in range(100):
         records.append(
             build_ohlcv_record(
-                timestamp=t,
-                open="1.1000",
-                high="1.1050",
-                low="1.0950",
-                close="1.1020",
-                volume=100,
-                source="mt5",
-                source_symbol="EURUSD",
-                available_at=t,
-                price_unit="USD",
-                volume_unit="units",
+                timestamp=start_time + timedelta(hours=i),
+                open_price=base_price,
+                high_price=base_price + Decimal("0.0020"),
+                low_price=base_price - Decimal("0.0020"),
+                close_price=base_price + Decimal("0.0010"),
+                volume=Decimal(1000),
             )
         )
-    market = build_market_dataset(
+    ds = build_market_dataset(
         symbol="EURUSD",
-        data_kind="bars",
-        records=records,
-        normalization_version="v1",
         timeframe="H1",
-        start=records[0].timestamp,
-        end=records[-1].timestamp,
-        available_at=records[-1].available_at,
-        record_count=len(records),
+        records=tuple(records),
         quality_report=build_data_quality_report(
-            quality_status="perfect",
-            quality_decision="accepted",
-            quality_score=Decimal(100),
-            record_count=len(records),
-            checked_count=len(records),
-            truncated=False,
-            sample_limit=len(records),
-            schema_version="v1",
-            generated_at=records[-1].available_at,
+            total_records=100,
+            missing_count=0,
+            duplicate_count=0,
+            out_of_order_count=0,
+            is_valid=True,
         ),
-        source_metadata={"provider": "mt5"},
-        license_metadata={"license": "usage"},
-        cache_status="not_used",
-        workflow_context="research",
-        precision_policy="decimal_string",
-        request_id="strategy-usage-signals",
     )
-    metadata = build_symbol_metadata(
+    meta = build_symbol_metadata(
         symbol="EURUSD",
-        source="mt5",
-        point="0.00001",
-        digits=5,
-        currency_base="EUR",
-        currency_profit="USD",
-        available_at=records[-1].available_at,
-        request_id="strategy-usage-signals",
+        asset_class="FX",
+        price_precision=5,
+        tick_size=Decimal("0.00001"),
+        contract_size=Decimal(100000),
     )
-    return market, metadata
+    return ds, meta
 
 
-def _setup_signal_context(
-    market: Any, metadata: Any
-) -> tuple[Any, Any, Any, Any, Any, Any, str]:
-    """Build context, policy, ref, config, indicator, evidence, and source_hash."""
-    source_hash = _source_hash()
-    indicator_response = rsi(market, period=14)
-    if indicator_response.data is None:
-        raise RuntimeError("RSI calculation failed")
-    indicator = indicator_response.data
-
-    config_parameters = {
-        "rsi_period": 14,
-        "overbought": "70",
-        "oversold": "30",
-    }
-    config_hash = canonical_digest(config_parameters)
+def _binding(
+    source_hash: str | None = None,
+    artifact_hash: str | None = None,
+    dependency_hash: str | None = None,
+) -> tuple[Any, Any]:
+    """Build the validated reference and configuration pair."""
+    s_hash = source_hash or _source_hash()
+    a_hash = artifact_hash or s_hash
+    d_hash = dependency_hash or s_hash
     policy = create_strategy_validation_policy(
         policy_version="usage-v1",
         approved_module_roots=("app.services.strategy.evaluators",),
@@ -194,19 +166,6 @@ def _setup_signal_context(
         max_config_nesting_depth=8,
         max_config_string_length=128,
         max_config_collection_items=64,
-    )
-    context = create_strategy_execution_context(
-        environment=get_strategy_environment("RESEARCH"),
-        decision_timestamp=market.available_at + timedelta(seconds=1),
-        timing_policy=get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE"),
-        seed=29,
-        interface_version="v1",
-        request_id="strategy-usage-signals",
-        workflow_id="strategy-usage-signals-workflow",
-        correlation_id="strategy-usage-signals-correlation",
-        dependency_status={"data": "ready", "indicators": "ready"},
-        snapshot_refs=(market.request_id,),
-        max_diagnostic_bytes=8_192,
     )
     manifest = create_strategy_manifest(
         strategy_id=_STRATEGY,
@@ -218,15 +177,15 @@ def _setup_signal_context(
         config_schema={"type": "object"},
         required_data=("EURUSD:H1",),
         required_indicators=("rsi",),
-        timing_policy=context.timing_policy,
-        permitted_environments=(context.environment,),
-        source_hash=source_hash,
-        artifact_hash=source_hash,
-        dependency_hash=source_hash,
-        provenance_refs=(market.request_id,),
-        supported_hooks=(),
+        timing_policy=get_strategy_timing_policy("EVENT_DRIVEN"),
+        permitted_environments=(get_strategy_environment("RESEARCH"),),
+        source_hash=s_hash,
+        artifact_hash=a_hash,
+        dependency_hash=d_hash,
+        provenance_refs=("usage-approval-1",),
+        supported_hooks=("on_bar",),
         requires_account_snapshot=False,
-        max_batch_records=10_000,
+        max_batch_records=1_000,
         max_diagnostic_bytes=8_192,
         max_checkpoint_bytes=8_192,
         max_local_state_bytes=8_192,
@@ -235,71 +194,68 @@ def _setup_signal_context(
     ref = create_validated_strategy_ref(
         manifest=manifest,
         lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
-        environment=context.environment,
-        policy_version=policy.policy_version,
+        environment=get_strategy_environment("RESEARCH"),
+        policy_version="usage-v1",
         validation_policy=policy,
-        registry_record_hash=source_hash,
-        request_id=context.request_id,
-        correlation_id=context.correlation_id,
+        registry_record_hash=s_hash,
+        request_id="req-99999999-9999-4999-8999-999999999999",
+        correlation_id="cor-99999999-9999-4999-8999-999999999999",
     )
     config = create_validated_strategy_config(
         strategy_id=_STRATEGY,
         strategy_version="1.0.0",
         config_schema_version="v1",
-        normalized_parameters=config_parameters,
-        config_hash=config_hash,
-        policy_version=policy.policy_version,
-        request_id=context.request_id,
+        normalized_parameters={
+            "rsi_period": 14,
+            "overbought": Decimal(70),
+            "oversold": Decimal(30),
+        },
+        config_hash=s_hash,
+        policy_version="usage-v1",
+        request_id="req-99999999-9999-4999-8999-999999999999",
     )
-    evidence = create_strategy_signal_evidence(
-        evidence_id=hashlib.sha256(
-            f"{market.request_id}:{market.available_at.isoformat()}".encode()
-        ).hexdigest(),
-        primary_market=market,
-        related_markets={},
-        point_size=Decimal(str(metadata.point)),
-        feature_values={},
-        feature_available_at={},
-        feature_refs={},
-        active_position_tags=(),
-    )
-    return ref, config, evidence, indicator, context, source_hash
+    return ref, config
+
+
+def _evidence(market: Any, metadata: Any) -> Any:
+    """Build canonical signal evidence bound to point-in-time market data."""
+    return make_signal_evidence(market)
 
 
 def fr_str_047() -> None:
-    """FR-STR-047: Stage 1 & 2 — Atomic concrete signal evaluation."""
-    _header("Stage 1 & 2: Atomic Concrete Signal Evaluation (FR-STR-047)")
+    """Demonstrate FR-STR-047: Concrete signal evaluation over evidence."""
+    _header("Demonstrating FR-STR-047: Concrete signal evaluation over evidence")
     market, metadata = _get_signal_evidence()
-    ref, config, evidence, indicator, context, source_hash = _setup_signal_context(
-        market, metadata
-    )
-
+    indicator = rsi(market, period=14)
+    ref, config = _binding()
+    evidence = _evidence(market, metadata)
+    context = make_context()
     evaluator = create_strategy_evaluator(
         _EVALUATOR_NAME,
         strategy_id=_STRATEGY,
         strategy_version="1.0.0",
         module_path=_MODULE,
-        source_hash=source_hash,
-        artifact_hash=source_hash,
-        dependency_hash=source_hash,
+        source_hash=ref.manifest.source_hash,
+        artifact_hash=ref.manifest.artifact_hash,
+        dependency_hash=ref.manifest.dependency_hash,
     )
     result = evaluate_strategy_signals(
         ref, config, evidence, (indicator,), context, evaluator
     )
     print(_format_result(result))
     print(
-        f"Data -> status='{result.status}', signal_count={len(result.data) if result.data else 0}"
+        f"Data -> status='{result.status}', signals_count={len(result.data) if result.data else 0}"
     )
 
 
 def fr_str_048() -> None:
-    """FR-STR-048: Stage 3 — Structural signal evaluator contract."""
-    _header("Stage 3: Structural Signal Evaluator Contract (FR-STR-048)")
+    """Demonstrate FR-STR-048: Signal evaluator contract verification."""
+    _header("Demonstrating FR-STR-048: Signal evaluator contract verification")
     market, metadata = _get_signal_evidence()
-    ref, config, evidence, indicator, context, _ = _setup_signal_context(
-        market, metadata
-    )
-
+    indicator = rsi(market, period=14)
+    ref, config = _binding()
+    evidence = _evidence(market, metadata)
+    context = make_context()
     unbound = create_strategy_evaluator(
         _EVALUATOR_NAME,
         strategy_id=_STRATEGY,
@@ -316,6 +272,61 @@ def fr_str_048() -> None:
     print(
         f"Data -> status='{result.status}', error_code='{result.error.code if result.error else None}'"
     )
+
+
+def _demo_signal_persistence_and_submission() -> None:
+    """Demonstrate FR-STR-063 through FR-STR-066: Signal persistence and submission outbox."""
+    _header("Stage 4: Signal Persistence & Submission Outbox (FR-STR-063..066)")
+    market, metadata = _get_signal_evidence()
+    indicator = rsi(market, period=14)
+    ref, config = _binding()
+    evidence = _evidence(market, metadata)
+    context = make_context()
+    evaluator = create_strategy_evaluator(
+        _EVALUATOR_NAME,
+        strategy_id=_STRATEGY,
+        strategy_version="1.0.0",
+        module_path=_MODULE,
+        source_hash=ref.manifest.source_hash,
+        artifact_hash=ref.manifest.artifact_hash,
+        dependency_hash=ref.manifest.dependency_hash,
+    )
+    config_id = f"{_STRATEGY}@1.0.0#{config.config_hash}"
+
+    signals_res = evaluate_and_record_strategy_signals(
+        ref, config, config_id, evidence, (indicator,), context, evaluator
+    )
+    print(_format_result(signals_res))
+    print(f"Data -> signals_count={len(signals_res.data) if signals_res.data else 0}")
+
+    if signals_res.data:
+        recorded = record_strategy_signals(
+            config_id=config_id,
+            signals=signals_res.data,
+            request_id=context.request_id,
+            correlation_id=context.correlation_id,
+        )
+        print(_format_result(recorded))
+
+    listed_sigs = list_strategy_signals(config_id)
+    print(_format_result(listed_sigs))
+    print(
+        f"Data -> persisted signals count={len(listed_sigs.data) if listed_sigs.data else 0}"
+    )
+
+    if listed_sigs.data:
+        sig_id = listed_sigs.data[0]["signal_id"]
+        sub_res = mark_strategy_signal_submitted(
+            sig_id,
+            expected_status="generated",
+            risk_submission_ref="risk-sub-12345",
+            request_id="req-sig-004",
+            correlation_id="cor-sig-004",
+        )
+        print(_format_result(sub_res))
+        print(
+            f"Data -> status='{sub_res.status}', submission_ref='{sub_res.data.get('risk_submission_ref') if sub_res.data else None}'"
+        )
 
 
 def main() -> None:
@@ -344,6 +355,9 @@ def main() -> None:
 
             # 2. Stage 3: Structural signal evaluator contract verification
             fr_str_048()
+
+            # 3. Stage 4: Signal persistence & submission outbox (FR-STR-063..066)
+            _demo_signal_persistence_and_submission()
 
 
 if __name__ == "__main__":

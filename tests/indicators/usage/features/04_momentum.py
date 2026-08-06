@@ -15,6 +15,7 @@ from app.services.indicators import (
 from tests.indicators.usage._support import (
     print_indicator_evidence,
     print_market_evidence,
+    print_requirement_evidence,
     unwrap_indicator_response,
     unwrap_market_data_response,
 )
@@ -29,7 +30,7 @@ def _feature_header(title: str) -> None:
 
 
 def _header(title: str) -> None:
-    """Print one section heading."""
+    """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
@@ -72,6 +73,7 @@ def fr_indi_021() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="RSI calculations")
+    print_requirement_evidence("FR-INDI-021", actual_data=values)
 
 
 def fr_indi_022() -> None:
@@ -84,6 +86,7 @@ def fr_indi_022() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="Williams %R calculations")
+    print_requirement_evidence("FR-INDI-022", actual_data=values)
 
 
 def main() -> None:

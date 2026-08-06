@@ -1,16 +1,16 @@
 """Indicators-owned schema definitions executed by Data.
 
-Indicators declares its additive schema; Data owns migration execution, the
+Indicators declares its schema steps; Data owns migration execution, the
 immutable ledger, checksums, and write locks. This module declares values only —
 it opens no connection and executes nothing.
 
-Computed indicator series are **not** stored here. They are recomputed on demand
-or materialised to an artifact, and ``indicator_materializations`` records only
-the reference. The requirement rows that once registered this support surface
-(`FR-INDI-036`-`040`) were withdrawn together with `FEAT-INDI-07`; the tables,
-migrations, and private CRUD modules are unchanged and the evidence is kept as
-unit tests (see `docs/CHANGELOG.md`, "Withdraw feature status from the four
-persistence packages").
+Step ``001_indicator_schema_v1`` created the legacy support tables. Step
+``002_remove_unused_indicator_support_schema`` retired
+``indicator_definitions``, ``indicator_param_sets``, and
+``indicator_materializations`` with a fail-closed row guard. Indicators now
+owns no live tables, and its former private ``persistence/`` package has been
+removed. ``INDICATOR_SCHEMA_VERSION = "v1"`` identifies the domain schema
+namespace and is not the applied migration count.
 """
 
 from __future__ import annotations
@@ -114,6 +114,26 @@ _INDICATOR_SCHEMA_STATEMENTS = (
 )
 
 
+_INDICATOR_SCHEMA_V2_RETIREMENT_STATEMENTS = (
+    """
+    CREATE TEMP TABLE indicator_decommission_guard (
+        row_count INTEGER NOT NULL CHECK (row_count = 0)
+    ) STRICT
+    """.strip(),
+    """
+    INSERT INTO indicator_decommission_guard (row_count)
+    SELECT
+        (SELECT COUNT(*) FROM indicator_materializations)
+        + (SELECT COUNT(*) FROM indicator_param_sets)
+        + (SELECT COUNT(*) FROM indicator_definitions)
+    """.strip(),
+    "DROP TABLE indicator_materializations",
+    "DROP TABLE indicator_param_sets",
+    "DROP TABLE indicator_definitions",
+    "DROP TABLE indicator_decommission_guard",
+)
+
+
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Indicators schema statements.
 
@@ -134,6 +154,12 @@ INDICATOR_MIGRATIONS: tuple[Any, ...] = (
         migration_id="001_indicator_schema_v1",
         checksum=_migration_checksum(_INDICATOR_SCHEMA_STATEMENTS),
         statements=_INDICATOR_SCHEMA_STATEMENTS,
+    ),
+    build_migration_step(
+        domain="indicators",
+        migration_id="002_remove_unused_indicator_support_schema",
+        checksum=_migration_checksum(_INDICATOR_SCHEMA_V2_RETIREMENT_STATEMENTS),
+        statements=_INDICATOR_SCHEMA_V2_RETIREMENT_STATEMENTS,
     ),
 )
 

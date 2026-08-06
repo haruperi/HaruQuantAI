@@ -1,35 +1,30 @@
 """Atomic typed-hook event-driven Strategy evaluation."""
 
+# ruff: noqa: E501
+
 from __future__ import annotations
 
-import hashlib
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, Protocol, cast, runtime_checkable
 
-from app.services.strategy.contracts.execution import (
-    StrategyDecision,
+from app.services.strategy.contracts.execution import (  # noqa: TC001
     StrategyEvent,
     StrategyExecutionContext,
     StrategyExecutionResult,
 )
 from app.services.strategy.contracts.outcomes import (
     failure,
-    success,
 )
 from app.services.strategy.contracts.references import (  # noqa: TC001
     ValidatedStrategyConfig,
     ValidatedStrategyRef,
 )
 from app.services.strategy.contracts.responses import (
-    StrategyOperationError,
     guard_strategy_boundary,
     unwrap_evaluator_result,
     unwrap_strategy_response,
 )
-from app.services.strategy.diagnostics import export_strategy_diagnostics
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
-from app.services.strategy.intents import TradeIntent, build_trade_intent
-from app.services.strategy.replay import create_strategy_replay_manifest
 from app.utils import canonical_digest, canonical_json, get_logger
 
 type StandardResponse[T] = Any
@@ -43,7 +38,7 @@ if TYPE_CHECKING:
 
 @runtime_checkable
 class EventStrategyEvaluator(Protocol):
-    """Injected hash-bound typed event evaluator structural contract."""
+    """Structural protocol for concrete event-driven strategy evaluators."""
 
     strategy_id: str
     strategy_version: str
@@ -51,343 +46,424 @@ class EventStrategyEvaluator(Protocol):
     source_hash: str
     artifact_hash: str
     dependency_hash: str
-    supported_hooks: tuple[str, ...]
 
-    def evaluate_event(
+    def on_bar(
         self,
-        event: StrategyEvent,
+        ref: ValidatedStrategyRef,
         config: ValidatedStrategyConfig,
+        event: StrategyEvent,
         context: StrategyExecutionContext,
-        local_state: Mapping[str, JsonValue] | None,
-        account_snapshot: AccountStateSnapshot | None,
-    ) -> StandardResponse[tuple[StrategyDecision, ...]]:
-        """Evaluate one typed immutable event without external access.
-
-        Args:
-            event: Receiver-owned event evidence.
-            config: Validated immutable configuration.
-            context: Fixed deterministic evaluation context.
-            local_state: Optional validated Strategy-local state.
-            account_snapshot: Optional immutable Data-owned account evidence.
-
-        Raises:
-            NotImplementedError: Protocol declaration has no implementation.
-        """
-        logger.debug("Invoking injected event Strategy evaluator")
-        del event, config, context, local_state, account_snapshot
-        raise NotImplementedError
+        account_snapshot: AccountStateSnapshot | None = None,
+        local_state: Mapping[str, JsonValue] | None = None,
+    ) -> StandardResponse[StrategyExecutionResult] | StrategyExecutionResult:
+        """Evaluate one bar event hook."""
+        ...
 
 
-@guard_strategy_boundary
-def run_event_strategy_hook(  # noqa: PLR0911
-    ref: ValidatedStrategyRef,
-    config: ValidatedStrategyConfig,
-    event: StrategyEvent,
-    context: StrategyExecutionContext,
+def _validate_event_evaluator(
     evaluator: EventStrategyEvaluator,
-    local_state: Mapping[str, JsonValue] | None = None,
-    account_snapshot: AccountStateSnapshot | None = None,
-) -> StrategyExecutionResult:
-    """Validate and atomically invoke one declared typed event hook.
-
-    Args:
-        ref: Validated exact strategy reference.
-        config: Validated exact configuration.
-        event: Receiver-owned immutable external evidence.
-        context: Fixed-clock execution context.
-        evaluator: Injected evaluator bound to registry identity and hashes.
-        local_state: Optional validated Strategy-local prior state.
-        account_snapshot: Optional immutable account-state evidence.
-
-    Returns:
-        One atomic event execution result or deterministic failure.
-
-    Raises:
-        StrategyOperationError: If an evaluator or nested boundary fails.
-    """
-    logger.info("Running event Strategy hook %s", event.hook)
-    readiness = _validate_event_readiness(
-        ref, config, event, context, evaluator, local_state, account_snapshot
-    )
-    if readiness is not None:
-        return readiness
-    try:
-        decisions = unwrap_evaluator_result(
-            evaluator.evaluate_event(
-                event, config, context, local_state, account_snapshot
-            ),
-            operation="strategy.event.evaluate_event",
-        )
-    except StrategyOperationError:
-        raise
-    except Exception as error:
-        logger.exception("Event Strategy evaluator failed: %s", type(error).__name__)
-        return failure(
-            StrategyErrorCode.INTERNAL_ERROR,
-            "strategy evaluator failed",
-            request_id=context.request_id,
-            correlation_id=context.correlation_id,
-        )
-    if len(decisions) > ref.manifest.max_batch_records:
-        return failure(
-            StrategyErrorCode.RESOURCE_LIMIT_EXCEEDED,
-            "event decision batch exceeds the approved resource budget",
-            request_id=context.request_id,
-            correlation_id=context.correlation_id,
-        )
-    intents = _build_event_intents(decisions, context)
-    if len({intent.idempotency_key for intent in intents}) != len(intents):
-        return failure(
-            StrategyErrorCode.DUPLICATE_INTENT,
-            "event hook produced duplicate intents",
-            request_id=context.request_id,
-            correlation_id=context.correlation_id,
-        )
-    local_updates = tuple(
-        item.candidate_local_state
-        for item in decisions
-        if item.candidate_local_state is not None
-    )
-    if len(local_updates) > 1:
-        return failure(
-            StrategyErrorCode.CHECKPOINT_INVALID,
-            "event hook produced multiple local-state candidates",
-            request_id=context.request_id,
-            correlation_id=context.correlation_id,
-        )
-    candidate = local_updates[0] if local_updates else None
-    if candidate is not None and len(canonical_json(candidate).encode("utf-8")) > (
-        ref.manifest.max_local_state_bytes
-    ):
-        return failure(
-            StrategyErrorCode.RESOURCE_LIMIT_EXCEEDED,
-            "local-state candidate exceeds the approved resource budget",
-            request_id=context.request_id,
-            correlation_id=context.correlation_id,
-        )
-    indicator_hash = hashlib.sha256(
-        canonical_json(
-            {
-                "source_owner": event.source_owner,
-                "source_schema_id": event.source_schema_id,
-                "source_contract_version": event.source_contract_version,
-            }
-        ).encode("utf-8")
-    ).hexdigest()
-    replay = unwrap_strategy_response(
-        create_strategy_replay_manifest(
-            ref,
-            config,
-            context,
-            event.source_checksum,
-            indicator_hash,
-        ),
-        operation="strategy.replay.create_strategy_replay_manifest",
-    )
-    diagnostics = unwrap_strategy_response(
-        export_strategy_diagnostics(
-            context,
-            {
-                "status": "PROPOSED" if intents else "NEUTRAL",
-                "strategy_id": ref.manifest.strategy_id,
-                "strategy_version": ref.manifest.strategy_version,
-                "config_hash": config.config_hash,
-                "data_checksum": event.source_checksum,
-                "event_type": event.event_type,
-                "event_sequence": event.sequence,
-                "decision_count": len(decisions),
-                "intent_count": len(intents),
-            },
-        ),
-        operation="strategy.diagnostics.export_strategy_diagnostics",
-    )
-    material = {
-        "event": event.model_dump(mode="json"),
-        "decisions": tuple(item.model_dump(mode="json") for item in decisions),
-        "intents": tuple(item.model_dump(mode="json") for item in intents),
-        "replay_manifest": replay.model_dump(mode="json"),
-        "local_state_update": candidate,
-    }
-    try:
-        result_hash = canonical_digest(material)
-    except TypeError, ValueError:
-        logger.exception("Event Strategy result digest failed")
-        return failure(
-            StrategyErrorCode.INTERNAL_ERROR,
-            "strategy result digest failed",
-            request_id=context.request_id,
-            correlation_id=context.correlation_id,
-        )
-    return success(
-        StrategyExecutionResult(
-            decisions=decisions,
-            intents=intents,
-            diagnostics=diagnostics,
-            replay_manifest=replay,
-            local_state_update=candidate,
-            result_hash=result_hash,
-        )
-    )
-
-
-def _validate_event_readiness(  # noqa: PLR0911
     ref: ValidatedStrategyRef,
-    config: ValidatedStrategyConfig,
-    event: StrategyEvent,
     context: StrategyExecutionContext,
-    evaluator: EventStrategyEvaluator,
-    local_state: Mapping[str, JsonValue] | None,
-    account_snapshot: AccountStateSnapshot | None,
-) -> StrategyExecutionResult | None:
-    """Validate all event evidence before evaluator invocation.
-
-    Args:
-        ref: Validated strategy reference.
-        config: Validated configuration.
-        event: Receiver-owned event evidence.
-        context: Fixed-clock context.
-        evaluator: Injected event evaluator.
-        local_state: Optional prior local state.
-        account_snapshot: Optional account evidence.
-
-    Returns:
-        ``None`` when ready, otherwise deterministic failed outcome.
-    """
-    logger.debug("Validating event Strategy readiness")
-    if not isinstance(evaluator, EventStrategyEvaluator) or not _identity_matches(
-        ref, evaluator
+) -> None:
+    """Validate evaluator identity against registered manifest."""
+    manifest = ref.manifest
+    if (
+        evaluator.strategy_id != manifest.strategy_id
+        or evaluator.strategy_version != manifest.strategy_version
+        or evaluator.module_path != manifest.module_path
     ):
-        return failure(
-            StrategyErrorCode.ARTIFACT_HASH_MISMATCH,
-            "event evaluator identity does not match the registry reference",
-            request_id=context.request_id,
-            correlation_id=context.correlation_id,
-        )
-    if event.hook not in ref.manifest.supported_hooks or event.hook not in (
-        evaluator.supported_hooks
-    ):
-        return failure(
-            StrategyErrorCode.UNSUPPORTED_TIMING_POLICY,
-            "event hook is not declared by the manifest and evaluator",
+        failure(
+            StrategyErrorCode.UNAPPROVED_MODULE,
+            "evaluator identity does not match registry",
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
     if (
-        config.strategy_id != ref.manifest.strategy_id
-        or config.strategy_version != ref.manifest.strategy_version
-        or context.environment != ref.environment
-        or context.timing_policy != ref.manifest.timing_policy
+        evaluator.source_hash != manifest.source_hash
+        or evaluator.artifact_hash != manifest.artifact_hash
     ):
-        return failure(
-            StrategyErrorCode.INVALID_CONFIG,
-            "event execution identity does not match validated contracts",
+        failure(
+            StrategyErrorCode.ARTIFACT_HASH_MISMATCH,
+            "evaluator artifact hash does not match registry",
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
-    if event.occurred_at > context.decision_timestamp or event.source_as_of > (
-        context.decision_timestamp
-    ):
-        return failure(
-            StrategyErrorCode.LOOKAHEAD_DETECTED,
-            "event evidence is unavailable at the fixed decision clock",
+    if evaluator.dependency_hash != manifest.dependency_hash:
+        failure(
+            StrategyErrorCode.DEPENDENCY_HASH_MISMATCH,
+            "evaluator dependency hash does not match registry",
             request_id=context.request_id,
             correlation_id=context.correlation_id,
         )
-    last_sequence = context.dependency_status.get("last_event_sequence")
-    if isinstance(last_sequence, int) and event.sequence <= last_sequence:
-        return failure(
-            StrategyErrorCode.DUPLICATE_INTENT,
-            "event sequence is duplicated or out of order",
-            request_id=context.request_id,
-            correlation_id=context.correlation_id,
-        )
-    if local_state is not None and len(canonical_json(local_state).encode("utf-8")) > (
-        ref.manifest.max_local_state_bytes
-    ):
-        return failure(
-            StrategyErrorCode.RESOURCE_LIMIT_EXCEEDED,
-            "prior local state exceeds the approved resource budget",
-            request_id=context.request_id,
-            correlation_id=context.correlation_id,
-        )
-    if ref.manifest.requires_account_snapshot and account_snapshot is None:
-        return failure(
-            StrategyErrorCode.MISSING_REQUIRED_DATA,
-            "strategy requires account-state evidence",
-            request_id=context.request_id,
-            correlation_id=context.correlation_id,
-        )
-    if account_snapshot is not None and not (
-        account_snapshot.snapshot_at
-        <= context.decision_timestamp
-        < account_snapshot.expires_at
-    ):
-        return failure(
-            StrategyErrorCode.STALE_DATA,
-            "account-state evidence is stale or from the future",
-            request_id=context.request_id,
-            correlation_id=context.correlation_id,
-        )
-    return None
 
 
-def _identity_matches(
+def _validate_event_readiness(
     ref: ValidatedStrategyRef,
+    config: ValidatedStrategyConfig,
+    event: StrategyEvent,
+    context: StrategyExecutionContext,
+    account_snapshot: object | None,
+    local_state: Mapping[str, JsonValue] | None,
+) -> None:
+    """Validate event execution readiness before evaluator invocation."""
+    if config.strategy_id != ref.manifest.strategy_id:
+        failure(
+            StrategyErrorCode.INVALID_CONFIG,
+            "configuration strategy_id mismatch",
+            request_id=context.request_id,
+            correlation_id=context.correlation_id,
+        )
+    if event.occurred_at > context.decision_timestamp:
+        failure(
+            StrategyErrorCode.LOOKAHEAD_DETECTED,
+            "event occurred_at exceeds decision timestamp",
+            request_id=context.request_id,
+            correlation_id=context.correlation_id,
+        )
+    if context.dependency_status.get("last_event_sequence") is not None:
+        failure(
+            StrategyErrorCode.LOOKAHEAD_DETECTED,
+            "event sequence constraint violated",
+            request_id=context.request_id,
+            correlation_id=context.correlation_id,
+        )
+    if local_state is not None:
+        state_bytes = len(canonical_json(local_state).encode("utf-8"))
+        if state_bytes > ref.manifest.max_local_state_bytes:
+            failure(
+                StrategyErrorCode.RESOURCE_LIMIT_EXCEEDED,
+                "local state size exceeds manifest limit",
+                request_id=context.request_id,
+                correlation_id=context.correlation_id,
+            )
+    if ref.manifest.requires_account_snapshot and account_snapshot is None:
+        failure(
+            StrategyErrorCode.MISSING_REQUIRED_DATA,
+            "strategy requires account snapshot",
+            request_id=context.request_id,
+            correlation_id=context.correlation_id,
+        )
+    if account_snapshot is not None:
+        snapshot_at = getattr(
+            account_snapshot,
+            "snapshot_at",
+            account_snapshot.get("snapshot_at")
+            if isinstance(account_snapshot, Mapping)
+            else None,
+        )
+        expires_at = getattr(
+            account_snapshot,
+            "expires_at",
+            account_snapshot.get("expires_at")
+            if isinstance(account_snapshot, Mapping)
+            else None,
+        )
+        if (
+            snapshot_at is not None
+            and expires_at is not None
+            and not (snapshot_at <= context.decision_timestamp < expires_at)
+        ):
+            failure(
+                StrategyErrorCode.STALE_DATA,
+                "account snapshot is stale or future-dated",
+                request_id=context.request_id,
+                correlation_id=context.correlation_id,
+            )
+
+
+@guard_strategy_boundary
+def run_event_strategy_hook(
+    ref: ValidatedStrategyRef,
+    config: ValidatedStrategyConfig,
+    event: StrategyEvent,
+    context: StrategyExecutionContext,
     evaluator: EventStrategyEvaluator,
-) -> bool:
-    """Return whether event evaluator identity exactly matches the registry.
+    account_snapshot: AccountStateSnapshot | None = None,
+    local_state: Mapping[str, JsonValue] | None = None,
+) -> StrategyExecutionResult:
+    """Execute one bar event hook with deterministic validation.
 
     Args:
-        ref: Validated registry reference.
-        evaluator: Injected event evaluator.
+        ref: Validated exact strategy reference.
+        config: Validated strategy configuration.
+        event: Strategy event payload.
+        context: Execution context.
+        evaluator: Injected event strategy evaluator.
+        account_snapshot: Optional account snapshot.
+        local_state: Optional local state mapping.
 
     Returns:
-        Whether all immutable identity and hash fields match.
+        StrategyExecutionResult contract.
     """
-    logger.debug("Checking event evaluator hash binding")
-    manifest = ref.manifest
-    return (
-        evaluator.strategy_id == manifest.strategy_id
-        and evaluator.strategy_version == manifest.strategy_version
-        and evaluator.module_path == manifest.module_path
-        and evaluator.source_hash == manifest.source_hash
-        and evaluator.artifact_hash == manifest.artifact_hash
-        and evaluator.dependency_hash == manifest.dependency_hash
+    logger.info("Executing event-driven strategy hook for %s", ref.manifest.strategy_id)
+    _validate_event_evaluator(evaluator, ref, context)
+    _validate_event_readiness(
+        ref, config, event, context, account_snapshot, local_state
+    )
+    raw_res = evaluator.on_bar(
+        ref,
+        config,
+        event,
+        context,
+        account_snapshot=account_snapshot,
+        local_state=local_state,
+    )
+    result = unwrap_evaluator_result(
+        raw_res, operation="event_strategy_evaluator.on_bar"
+    )
+    candidate_states = []
+    if (
+        hasattr(result, "candidate_local_state")
+        and result.candidate_local_state is not None
+    ):
+        candidate_states.append(result.candidate_local_state)
+    elif isinstance(result, (tuple, list)):
+        for item in result:
+            st = getattr(item, "candidate_local_state", None)
+            if st is not None:
+                candidate_states.append(st)
+    for st in candidate_states:
+        st_bytes = len(canonical_json(st).encode("utf-8"))
+        if st_bytes > ref.manifest.max_local_state_bytes:
+            failure(
+                StrategyErrorCode.RESOURCE_LIMIT_EXCEEDED,
+                "local state size exceeds manifest limit",
+                request_id=context.request_id,
+                correlation_id=context.correlation_id,
+            )
+
+    if hasattr(result, "model_dump"):
+        _ = canonical_digest(result.model_dump(mode="json"))
+    elif isinstance(result, (tuple, list)):
+        local_states = [
+            getattr(item, "candidate_local_state", None)
+            for item in result
+            if getattr(item, "candidate_local_state", None) is not None
+        ]
+        if len(local_states) > 1 and any(
+            s != local_states[0] for s in local_states[1:]
+        ):
+            failure(
+                StrategyErrorCode.INVALID_CONFIG,
+                "multiple decisions carry conflicting candidate local state updates",
+                request_id=context.request_id,
+                correlation_id=context.correlation_id,
+            )
+        _ = canonical_digest(
+            [
+                item.model_dump(mode="json")
+                if hasattr(item, "model_dump")
+                else str(item)
+                for item in result
+            ]
+        )
+    else:
+        _ = canonical_digest(str(result))
+    return cast("StrategyExecutionResult", result)
+
+
+@guard_strategy_boundary
+def initialize_strategy_runtime_state(
+    config_id: str,
+    request_id: str = "",
+    correlation_id: str = "",
+) -> Mapping[str, Any]:
+    """Idempotently initialize empty evaluator-local state.
+
+    Args:
+        config_id: Strategy configuration identifier.
+        request_id: Tracing request identifier.
+        correlation_id: Tracing correlation identifier.
+
+    Returns:
+        Initial state mapping.
+    """
+    from app.services.strategy.persistence import read_strategy_state_record
+
+    logger.info("Initializing Strategy runtime state for %s", config_id)
+    rows = read_strategy_state_record(config_id, request_id)
+    if rows:
+        return dict(rows[0])
+    return {
+        "config_id": config_id,
+        "state_version": 0,
+        "evaluation_status": "initialized",
+        "bars_processed": 0,
+        "last_evidence_at": None,
+        "last_signal_id": None,
+        "local_state": {},
+        "local_state_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",  # pragma: allowlist secret
+        "request_id": request_id,
+        "correlation_id": correlation_id,
+    }
+
+
+@guard_strategy_boundary
+def load_strategy_runtime_state(
+    config_id: str,
+) -> Mapping[str, Any] | None:
+    """Load current evaluator-local state for a configuration.
+
+    Args:
+        config_id: Strategy configuration identifier.
+
+    Returns:
+        State mapping or None if uninitialized.
+    """
+    from app.services.strategy.persistence import read_strategy_state_record
+    from app.utils import generate_id
+
+    logger.info("Loading Strategy runtime state for %s", config_id)
+    request_id = generate_id("req")
+    rows = read_strategy_state_record(config_id, request_id)
+    if not rows:
+        return None
+    return dict(rows[0])
+
+
+@guard_strategy_boundary
+def commit_strategy_runtime_state(
+    config_id: str,
+    *,
+    expected_state_version: int,
+    evaluation_status: str,
+    bars_processed: int,
+    last_evidence_at: object | None = None,
+    last_signal_id: str | None = None,
+    local_state: Mapping[str, Any] | None = None,
+    request_id: str = "",
+    correlation_id: str = "",
+) -> Mapping[str, Any]:
+    """Compare-and-commit one validated local-state transition using optimistic concurrency.
+
+    Args:
+        config_id: Configuration identifier.
+        expected_state_version: Expected current state version.
+        evaluation_status: New evaluation status string.
+        bars_processed: Total bars processed.
+        last_evidence_at: Evidence ISO timestamp.
+        last_signal_id: Identifier of last emitted signal.
+        local_state: Local evaluator state mapping.
+        request_id: Tracing request identifier.
+        correlation_id: Tracing correlation identifier.
+
+    Returns:
+        Committed state mapping.
+    """
+    from app.services.strategy.persistence import update_strategy_runtime_state_record
+
+    logger.info("Committing Strategy state transition for %s", config_id)
+    state_dict = dict(local_state) if local_state is not None else {}
+    local_state_json = canonical_json(state_dict)
+    local_state_hash = canonical_digest(local_state_json)
+    evidence_str = (
+        last_evidence_at.isoformat()
+        if hasattr(last_evidence_at, "isoformat")
+        else str(last_evidence_at)
+        if last_evidence_at is not None
+        else None
     )
 
+    success_commit = update_strategy_runtime_state_record(
+        config_id=config_id,
+        expected_state_version=expected_state_version,
+        evaluation_status=evaluation_status,
+        bars_processed=bars_processed,
+        last_evidence_at=evidence_str,
+        last_signal_id=last_signal_id,
+        local_state_json=local_state_json,
+        local_state_hash=local_state_hash,
+        request_id=request_id,
+        correlation_id=correlation_id,
+    )
+    if not success_commit:
+        failure(
+            StrategyErrorCode.INTERNAL_ERROR,
+            f"Stale state version check failed for config {config_id}",
+            request_id=request_id,
+            correlation_id=correlation_id,
+        )
+    return {
+        "config_id": config_id,
+        "state_version": expected_state_version + 1,
+        "evaluation_status": evaluation_status,
+        "bars_processed": bars_processed,
+        "last_evidence_at": evidence_str,
+        "last_signal_id": last_signal_id,
+        "local_state": state_dict,
+        "local_state_hash": local_state_hash,
+        "request_id": request_id,
+        "correlation_id": correlation_id,
+    }
 
-def _build_event_intents(
-    decisions: tuple[StrategyDecision, ...],
+
+@guard_strategy_boundary
+def run_persisted_event_strategy_hook(
+    ref: ValidatedStrategyRef,
+    config: ValidatedStrategyConfig,
+    config_id: str,
+    event: StrategyEvent,
     context: StrategyExecutionContext,
-) -> tuple[TradeIntent, ...]:
-    """Build event proposal intents atomically.
+    evaluator: EventStrategyEvaluator,
+    account_snapshot: AccountStateSnapshot | None = None,
+) -> StrategyExecutionResult:
+    """Load state, evaluate event, and atomically commit accepted local state results.
 
     Args:
-        decisions: Ordered evaluator decisions.
-        context: Fixed-clock context.
+        ref: Validated exact strategy reference.
+        config: Validated strategy configuration.
+        config_id: Strategy configuration record identifier.
+        event: Strategy event payload.
+        context: Execution context.
+        evaluator: Injected event strategy evaluator.
+        account_snapshot: Optional account snapshot.
 
     Returns:
-        Complete ordered intent tuple or first deterministic failure.
+        StrategyExecutionResult contract.
     """
-    logger.debug("Building atomic event Strategy intent batch")
-    sequences = tuple(item.sequence for item in decisions)
-    if sequences != tuple(sorted(sequences)) or len(set(sequences)) != len(sequences):
-        return failure(
-            StrategyErrorCode.INVALID_CONFIG,
-            "event decisions are not deterministically ordered",
-            request_id=context.request_id,
-            correlation_id=context.correlation_id,
+    logger.info(
+        "Running persisted event strategy hook for %s", ref.manifest.strategy_id
+    )
+    state_res = unwrap_strategy_response(
+        load_strategy_runtime_state(config_id),
+        operation="strategy.event.load_strategy_runtime_state",
+    )
+    local_state = state_res.get("local_state", {}) if state_res else None
+
+    result = unwrap_strategy_response(
+        run_event_strategy_hook(
+            ref,
+            config,
+            event,
+            context,
+            evaluator,
+            local_state=local_state,
+            account_snapshot=account_snapshot,
+        ),
+        operation="strategy.event.run_event_strategy_hook",
+    )
+    if result.local_state_update is not None and state_res:
+        unwrap_strategy_response(
+            commit_strategy_runtime_state(
+                config_id,
+                expected_state_version=int(state_res.get("state_version", 0)),
+                evaluation_status="ready",
+                bars_processed=int(state_res.get("bars_processed", 0)) + 1,
+                last_evidence_at=context.decision_timestamp,
+                local_state=result.local_state_update,
+                request_id=context.request_id,
+                correlation_id=context.correlation_id,
+            ),
+            operation="strategy.event.commit_strategy_runtime_state",
         )
-    intents: list[TradeIntent] = []
-    for decision in decisions:
-        if decision.action == "NEUTRAL":
-            continue
-        outcome = unwrap_strategy_response(
-            build_trade_intent(decision, context, decision.sequence),
-            operation="strategy.intents.build_trade_intent",
-        )
-        intents.append(outcome)
-    return success(tuple(intents))
+    return result
 
 
-__all__ = ["EventStrategyEvaluator", "run_event_strategy_hook"]
+__all__ = [
+    "EventStrategyEvaluator",
+    "commit_strategy_runtime_state",
+    "initialize_strategy_runtime_state",
+    "load_strategy_runtime_state",
+    "run_event_strategy_hook",
+    "run_persisted_event_strategy_hook",
+]

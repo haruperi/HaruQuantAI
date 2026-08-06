@@ -17,6 +17,7 @@ from app.services.indicators import (
 from tests.indicators.usage._support import (
     print_indicator_evidence,
     print_market_evidence,
+    print_requirement_evidence,
     unwrap_indicator_response,
     unwrap_market_data_response,
 )
@@ -31,7 +32,7 @@ def _feature_header(title: str) -> None:
 
 
 def _header(title: str) -> None:
-    """Print one section heading."""
+    """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
@@ -74,6 +75,7 @@ def fr_indi_018() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="ATR calculations")
+    print_requirement_evidence("FR-INDI-018", actual_data=values)
 
 
 def fr_indi_019() -> None:
@@ -84,6 +86,7 @@ def fr_indi_019() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="ADR calculations")
+    print_requirement_evidence("FR-INDI-019", actual_data=values)
 
 
 def fr_indi_020() -> None:
@@ -96,6 +99,7 @@ def fr_indi_020() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="Rolling-volatility calculations")
+    print_requirement_evidence("FR-INDI-020", actual_data=values)
 
 
 def fr_indi_026() -> None:
@@ -108,6 +112,7 @@ def fr_indi_026() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(values)}, columns={list(values.columns)}")
     print_indicator_evidence(result, label="Standard-deviation calculations")
+    print_requirement_evidence("FR-INDI-026", actual_data=values)
 
 
 def main() -> None:

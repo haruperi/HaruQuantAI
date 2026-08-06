@@ -16,6 +16,7 @@ from app.services.indicators import (
 from tests.indicators.usage._support import (
     print_indicator_evidence,
     print_market_evidence,
+    print_requirement_evidence,
     unwrap_indicator_response,
     unwrap_market_data_response,
 )
@@ -27,8 +28,8 @@ def _feature_header(title: str) -> None:
 
 
 def _header(title: str) -> None:
-    """Print one section heading."""
-    print(f"\n{'-' * 88}\n{title}\n{'=' * 88}")
+    """Print one example heading."""
+    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _format_result(obj: Any) -> str:
@@ -49,11 +50,6 @@ def _format_result(obj: Any) -> str:
 
 MarketDataset = Any
 _CACHE: dict[str, MarketDataset] = {}
-
-
-def _header(title: str) -> None:
-    """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
 def _dataset() -> MarketDataset:
@@ -88,6 +84,7 @@ def fr_indi_031() -> None:
         f"Data -> rows={len(result.values)}, pattern_columns={list(result.values.columns)}"
     )
     print_indicator_evidence(result, label="Doji calculations")
+    print_requirement_evidence("FR-INDI-031", actual_data=result.values)
 
 
 def fr_indi_032() -> None:
@@ -97,6 +94,7 @@ def fr_indi_032() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(result.values)}, columns={list(result.values.columns)}")
     print_indicator_evidence(result, label="Engulfing calculations")
+    print_requirement_evidence("FR-INDI-032", actual_data=result.values)
 
 
 def fr_indi_033() -> None:
@@ -106,6 +104,7 @@ def fr_indi_033() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(result.values)}, columns={list(result.values.columns)}")
     print_indicator_evidence(result, label="Pinbar calculations")
+    print_requirement_evidence("FR-INDI-033", actual_data=result.values)
 
 
 def fr_indi_034() -> None:
@@ -115,6 +114,7 @@ def fr_indi_034() -> None:
     print(_format_result(result))
     print(f"Data -> rows={len(result.values)}, columns={list(result.values.columns)}")
     print_indicator_evidence(result, label="Inside-bar calculations")
+    print_requirement_evidence("FR-INDI-034", actual_data=result.values)
 
 
 def main() -> None:

@@ -785,3 +785,7 @@ artifacts/
 
 # Strategy signal-audit frames written by tests/strategy/usage/10_strategy_library.py
 tests/strategy/usage/signal_audit/
+
+# SQLite database backup files (created by VACUUM INTO and migration infrastructure)
+data/database/*.bak
+data/database/*.bak_*

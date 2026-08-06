@@ -72,7 +72,7 @@ actually contains and this model states what it should become.
 | Document | Contents |
 |---|---|
 | [00_domain_relationship_map.md](00_domain_relationship_map.md) | Ownership model, dependency DAG, cross-domain FK policy, universal conventions |
-| [01_entity_specs_core.md](01_entity_specs_core.md) | Utils, Brokers, Data, Indicators — 26 tables |
+| [01_entity_specs_core.md](01_entity_specs_core.md) | Utils, Brokers, Data, Indicators — 22 tables |
 | [02_entity_specs_execution.md](02_entity_specs_execution.md) | Strategy, Risk, Trading, Simulator — 26 tables |
 | [03_entity_specs_intelligence.md](03_entity_specs_intelligence.md) | Analytics, Optimization, Research, Portfolio, Agentic, UI-API — 52 tables |
 | [04_indexing_and_performance.md](04_indexing_and_performance.md) | PRAGMAs, Parquet layout, catalog-then-file read paths, index catalogue, throughput |
@@ -114,7 +114,7 @@ Five bulk tables were removed and replaced by catalog rows:
 |---|---|---|
 | `data_ticks` | 10⁹+/yr | `data_datasets` + `data_partition_files` |
 | `data_candles` | 10⁷–10⁸/yr | Same |
-| `ind_outputs` | 10⁸/yr | `indicator_materializations` |
+| `ind_outputs` | 10⁸/yr | Recomputed on demand; Indicators owns no target table |
 | `research_feature_values` | 10⁸/yr | `research_feature_materializations` |
 | `analytics_equity_curves` (points) | 10⁶/yr | `analytics_equity_curves` (summary row + `dataset_id`) |
 

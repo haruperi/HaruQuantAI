@@ -36,8 +36,9 @@ def create_strategy_evaluator(name: str, **kwargs: object) -> object:
     Raises:
         ValueError: If ``name`` is not registered.
     """
+    normalized_name = name.replace("-", "_")
     try:
-        evaluator_type = _EVALUATORS[name]
+        evaluator_type = _EVALUATORS[normalized_name]
     except KeyError as exc:
         message = f"Unknown Strategy evaluator: {name}"
         raise ValueError(message) from exc

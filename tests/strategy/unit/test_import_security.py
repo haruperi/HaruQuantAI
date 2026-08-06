@@ -23,7 +23,10 @@ def test_strategy_has_no_prohibited_direct_imports() -> None:
     }
     imports: set[str] = set()
     for path in root.rglob("*.py"):
-        tree = ast.parse(path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8")
+        if not any(mod in text for mod in prohibited):
+            continue
+        tree = ast.parse(text)
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 imports.update(alias.name.split(".")[0] for alias in node.names)

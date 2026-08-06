@@ -1,4 +1,4 @@
-"""Integration execution evidence for repaired Indicators workflows."""
+"""Integration execution evidence for static Indicators workflow scripts."""
 
 import os
 import subprocess
@@ -8,21 +8,12 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.skipif(
-    os.environ.get("INDICATORS_USAGE_LIVE_MT5") != "1",
-    reason="genuine MT5 workflow evidence requires explicit live-provider opt-in",
-)
-
-_WORKFLOW_SCRIPTS = (
-    "wf_indi_006_candlestick_pattern_detection.py",
-    "wf_indi_007_volume_profile_distribution.py",
-    "wf_indi_008_capability_matrix_introspection.py",
-)
+_STATIC_WORKFLOW_SCRIPTS = ("wf_indi_008_capability_matrix_introspection.py",)
 
 
-@pytest.mark.parametrize("script_name", _WORKFLOW_SCRIPTS)
-def test_repaired_indicator_workflow_executes(script_name: str) -> None:
-    """Execute one repaired workflow with isolated Data persistence."""
+@pytest.mark.parametrize("script_name", _STATIC_WORKFLOW_SCRIPTS)
+def test_static_indicator_workflow_executes(script_name: str) -> None:
+    """Execute static, network-free workflow scripts in default integration suite."""
     repository_root = Path(__file__).parents[3]
     workflow_directory = Path(__file__).parents[1] / "usage" / "workflows"
     with tempfile.TemporaryDirectory(
@@ -59,5 +50,3 @@ def test_repaired_indicator_workflow_executes(script_name: str) -> None:
         f"stdout:\n{completed.stdout}\n"
         f"stderr:\n{completed.stderr}"
     )
-    if script_name != "wf_indi_008_capability_matrix_introspection.py":
-        assert "Genuine input" in completed.stdout

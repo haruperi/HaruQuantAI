@@ -6,7 +6,7 @@ import hashlib
 from collections.abc import Mapping
 
 from app.services.strategy.contracts._base import JsonValue  # noqa: TC001
-from app.services.strategy.contracts.outcomes import failure, success
+from app.services.strategy.contracts.outcomes import failure
 from app.services.strategy.contracts.policy import (
     StrategyValidationPolicy,  # noqa: TC001
 )
@@ -73,16 +73,14 @@ def validate_strategy_config(
             correlation_id=ref.correlation_id,
         )
     config_hash = hashlib.sha256(canonical_json(normalized).encode("utf-8")).hexdigest()
-    return success(
-        ValidatedStrategyConfig(
-            strategy_id=config.strategy_id,
-            strategy_version=config.strategy_version,
-            config_schema_version=config.config_schema_version,
-            normalized_parameters=normalized,
-            config_hash=config_hash,
-            policy_version=policy.policy_version,
-            request_id=config.request_id,
-        )
+    return ValidatedStrategyConfig(
+        strategy_id=config.strategy_id,
+        strategy_version=config.strategy_version,
+        config_schema_version=config.config_schema_version,
+        normalized_parameters=normalized,
+        config_hash=config_hash,
+        policy_version=policy.policy_version,
+        request_id=config.request_id,
     )
 
 

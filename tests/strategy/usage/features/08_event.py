@@ -30,15 +30,17 @@ from app.services.strategy import (
     get_strategy_environment,
     get_strategy_lifecycle_status,
     get_strategy_timing_policy,
+    initialize_strategy_runtime_state,
     run_event_strategy_hook,
+    run_persisted_event_strategy_hook,
 )
 from app.utils import canonical_json
 
 _UNAVAILABLE = 3
 _HASH = "e" * 64
-_REQUEST = "strategy-usage-event"
-_WORKFLOW = "strategy-usage-event-workflow"
-_CORRELATION = "strategy-usage-event-correlation"
+_REQUEST = "req-00000000-0000-4000-8000-000000000008"
+_WORKFLOW = "wf-00000000-0000-4000-8000-000000000008"
+_CORRELATION = "cor-00000000-0000-4000-8000-000000000008"
 _STRATEGY = "usage-event-strategy"
 _HOOKS = ("on_init", "on_bar", "on_tick", "on_fill", "on_stop")
 
@@ -73,7 +75,7 @@ class BarCountingEvaluator:
     """Minimal declared-hook evaluator that counts observed closed bars."""
 
     def __init__(self, source_hash: str) -> None:
-        """Bind the evaluator to its immutable registry identity."""
+        """Initialize with source hash."""
         self.strategy_id = _STRATEGY
         self.strategy_version = "1.0.0"
         self.module_path = "app.services.strategy.evaluators.naive_ma_trend"
@@ -84,14 +86,16 @@ class BarCountingEvaluator:
 
     def evaluate_event(
         self,
-        event: Any,
+        ref: Any,
         config: Any,
+        event: Any,
         context: Any,
-        local_state: Any,
-        account_snapshot: Any,
+        *,
+        local_state: Any = None,
+        account_snapshot: Any = None,
     ) -> Any:
         """Return one neutral decision carrying an incremented candidate state."""
-        del config, account_snapshot
+        del ref, config, account_snapshot
         seen = int((local_state or {}).get("bars_seen", 0)) + 1
         decision = create_strategy_decision(
             decision_id=f"usage-event-{event.sequence}",
@@ -110,6 +114,8 @@ class BarCountingEvaluator:
             },
         )
         return (decision,)
+
+    on_bar = evaluate_event
 
 
 def _get_market_evidence() -> Any:
@@ -279,6 +285,16 @@ def fr_str_033() -> None:
     print(
         f"Data -> status='{result.status}', has_execution_result={result.data is not None}"
     )
+
+    config_id = f"{config.strategy_id}@{config.strategy_version}#{config.config_hash}"
+    state_init = initialize_strategy_runtime_state(
+        config_id, context.request_id, context.correlation_id
+    )
+    print(_format_result(state_init))
+    persisted_res = run_persisted_event_strategy_hook(
+        ref, config, config_id, event, context, evaluator
+    )
+    print(_format_result(persisted_res))
 
 
 def fr_str_037() -> None:

@@ -210,3 +210,57 @@ def test_make_signal_construction() -> None:
     assert sig.symbol == "EURUSD"
     assert sig.side == "BUY"
     assert sig.active is True
+
+
+def test_indicator_exception_handling_propagation() -> None:
+    """Verify focused test doubles fallback on TypeError/AttributeError and propagate RuntimeError."""
+    from unittest.mock import patch
+
+    from app.services.strategy.signals._mechanics import (
+        _indicator_frame,
+        _indicator_metadata,
+    )
+
+    # 1. Focused test double with values/manifest falls back correctly
+    double = MagicMock()
+    double.indicator_id = "test_ind"
+    double.output_columns = ("col1",)
+    double.manifest.output_checksum = "checksum-123"
+    double.values = {"col1": [1.0, 2.0]}
+
+    meta = _indicator_metadata(double)
+    assert meta["indicator_id"] == "test_ind"
+    assert meta["manifest"]["output_checksum"] == "checksum-123"
+
+    frame = _indicator_frame(double)
+    assert frame == {"col1": [1.0, 2.0]}
+
+    # 2. TypeError and AttributeError take the compatibility fallback path
+    mock_obj = object()
+    with (
+        patch(
+            "app.services.strategy.signals._mechanics._get_indicator_metadata",
+            side_effect=TypeError("Not an indicator"),
+        ),
+        pytest.raises(AttributeError),
+    ):
+        _indicator_metadata(mock_obj)
+
+    # 3. Unexpected exception (e.g. RuntimeError) propagates instead of being hidden
+    with (
+        patch(
+            "app.services.strategy.signals._mechanics._get_indicator_metadata",
+            side_effect=RuntimeError("Unexpected internal failure"),
+        ),
+        pytest.raises(RuntimeError, match="Unexpected internal failure"),
+    ):
+        _indicator_metadata(mock_obj)
+
+    with (
+        patch(
+            "app.services.strategy.signals._mechanics._get_indicator_values",
+            side_effect=RuntimeError("Unexpected getter failure"),
+        ),
+        pytest.raises(RuntimeError, match="Unexpected getter failure"),
+    ):
+        _indicator_frame(mock_obj)

@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import time
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from types import MappingProxyType, SimpleNamespace
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
 import pytest
@@ -23,6 +24,7 @@ from app.services.strategy.contracts import (
     StrategyExecutionResult,
     StrategyLifecycleStatus,
     StrategyManifest,
+    StrategyMutationResult,
     StrategyParameterUpdateRequest,
     StrategyRef,
     StrategySignalEvidence,
@@ -31,11 +33,72 @@ from app.services.strategy.contracts import (
     ValidatedStrategyConfig,
     ValidatedStrategyRef,
 )
-from app.utils import get_logger
+from app.utils import build_response_metadata, get_logger
 from app.utils.contracts.auth import AuthContext
+from app.utils.responses.models import StandardError, StandardResponse
 from pydantic import ValidationError
 
 logger = get_logger(__name__)
+
+
+def make_success_response[T](data: T) -> StandardResponse[T]:
+    """Build a valid Utils StandardResponse success envelope.
+
+    Args:
+        data: Success payload object to encapsulate.
+
+    Returns:
+        StandardResponse envelope with success status and metadata.
+    """
+    return StandardResponse[T](
+        status="success",
+        message="success",
+        data=data,
+        error=None,
+        metadata=build_response_metadata(
+            name="test.operation",
+            domain="test",
+            risk_level="none",
+            request_id=REQ,
+            start_time=time.perf_counter_ns(),
+            read_only=True,
+            writes_file=False,
+            modifies_database=False,
+            places_trade=False,
+            requires_network=False,
+        ),
+    )
+
+
+def make_error_response[T](code: str, message: str = "error") -> StandardResponse[T]:
+    """Build a valid Utils StandardResponse error envelope.
+
+    Args:
+        code: Error code string.
+        message: Human-readable error message summary.
+
+    Returns:
+        StandardResponse envelope with error status and metadata.
+    """
+    return StandardResponse[T](
+        status="error",
+        message=message,
+        data=None,
+        error=StandardError(code=code, details={}),
+        metadata=build_response_metadata(
+            name="test.operation",
+            domain="test",
+            risk_level="none",
+            request_id=REQ,
+            start_time=time.perf_counter_ns(),
+            read_only=True,
+            writes_file=False,
+            modifies_database=False,
+            places_trade=False,
+            requires_network=False,
+        ),
+    )
+
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -340,6 +403,71 @@ def make_config() -> ValidatedStrategyConfig:
     )
 
 
+def make_registration_mutation(
+    *,
+    status: Literal["ACCEPTED", "IDEMPOTENT"] = "ACCEPTED",
+    publication_pending: bool = False,
+) -> StrategyMutationResult:
+    """Build an accepted registration mutation with exact validated payload.
+
+    Args:
+        status: Mutation status ("ACCEPTED" or "IDEMPOTENT").
+        publication_pending: Whether audit publication remains pending.
+
+    Returns:
+        StrategyMutationResult instance for registration testing.
+    """
+    return StrategyMutationResult(
+        mutation_id="mut-1",
+        mutation_type="REGISTER_VERSION",
+        status=status,
+        strategy_id="mean-reversion",
+        strategy_version="1.0.0",
+        validated_ref=make_ref(),
+        record_ref="mean-reversion@1.0.0",
+        record_hash=HASH_B,
+        request_id=REQ,
+        correlation_id=COR,
+        workflow_id=WF,
+        completed_at=NOW,
+        publication_pending=publication_pending,
+    )
+
+
+def make_parameter_mutation(
+    *,
+    status: Literal["ACCEPTED", "IDEMPOTENT"] = "ACCEPTED",
+    publication_pending: bool = False,
+) -> StrategyMutationResult:
+    """Build an accepted parameter mutation with exact validated payload.
+
+    Args:
+        status: Mutation status ("ACCEPTED" or "IDEMPOTENT").
+        publication_pending: Whether audit publication remains pending.
+
+    Returns:
+        StrategyMutationResult instance for parameter update testing.
+    """
+    config = make_config()
+    return StrategyMutationResult(
+        mutation_id="mut-1",
+        mutation_type="UPDATE_PARAMETERS",
+        status=status,
+        strategy_id=config.strategy_id,
+        strategy_version=config.strategy_version,
+        validated_config=config,
+        record_ref=(
+            f"{config.strategy_id}@{config.strategy_version}#{config.config_hash}"
+        ),
+        record_hash=config.config_hash,
+        request_id=config.request_id,
+        correlation_id=COR,
+        workflow_id=WF,
+        completed_at=NOW,
+        publication_pending=publication_pending,
+    )
+
+
 def make_context(
     *, timing: StrategyTimingPolicy = StrategyTimingPolicy.EVENT_DRIVEN
 ) -> StrategyExecutionContext:
@@ -426,29 +554,36 @@ def make_event() -> StrategyEvent:
     )
 
 
-def make_auth(*, checkpoint: bool = False) -> AuthContext:
+def make_auth(
+    *,
+    checkpoint: bool = False,
+    permissions: tuple[str, ...] | None = None,
+    scopes: tuple[str, ...] | None = None,
+) -> AuthContext:
     """Build an authenticated Strategy test principal.
 
     Args:
         checkpoint: Whether to include checkpoint authorization scope.
+        permissions: Exact permission override, or ``None`` for normal defaults.
+        scopes: Exact scope override, or ``None`` for normal defaults.
 
     Returns:
         A complete AuthContext.
     """
     logger.debug("Building Strategy test authentication context")
-    permissions = ("strategy:register", "strategy:update")
-    scopes: tuple[str, ...] = ()
+    default_permissions = ("strategy:register", "strategy:update")
+    default_scopes: tuple[str, ...] = ()
     if checkpoint:
-        permissions += ("strategy:checkpoint",)
-        scopes = ("checkpoint-auth",)
+        default_permissions += ("strategy:checkpoint",)
+        default_scopes = ("checkpoint-auth",)
     return AuthContext(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
         principal_id="builder",
         principal_type="USER",
         roles=("strategy-admin",),
-        permissions=permissions,
-        scopes=scopes,
+        permissions=(default_permissions if permissions is None else permissions),
+        scopes=default_scopes if scopes is None else scopes,
         tenant_or_environment="test",
         request_id=REQ,
         workflow_id=WF,

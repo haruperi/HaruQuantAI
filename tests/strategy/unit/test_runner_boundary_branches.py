@@ -59,16 +59,17 @@ class _EventResultEvaluator(EventEvaluator):
         """Store the controlled evaluator result."""
         self._result = result
 
-    def evaluate_event(
+    def on_bar(
         self,
-        event: object,
+        ref: object,
         config: object,
+        event: object,
         context: object,
-        local_state: object,
-        account_snapshot: object,
+        account_snapshot: object = None,
+        local_state: object = None,
     ) -> object:
         """Return or raise the controlled result."""
-        del event, config, context, local_state, account_snapshot
+        del ref, event, config, context, local_state, account_snapshot
         if isinstance(self._result, BaseException):
             raise self._result
         return self._result
@@ -112,8 +113,8 @@ def _run_event(
         event or make_event(),
         context or make_context(),
         evaluator,
-        local_state,
-        account_snapshot,
+        account_snapshot=account_snapshot,
+        local_state=local_state,
     )
 
 

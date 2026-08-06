@@ -1,7 +1,7 @@
 """Tests for Strategy parameter registry."""
 
 from datetime import UTC, datetime
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from app.services.strategy.contracts import (
     StrategyConfig,
@@ -9,10 +9,18 @@ from app.services.strategy.contracts import (
     StrategyParameterUpdateRequest,
     StrategyRef,
 )
-from app.services.strategy.contracts.responses import StrategyOperationError
+from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.registry.parameters import update_strategy_parameters
 
-from tests.strategy.unit.test_models import make_auth
+from tests.strategy.unit.test_models import (
+    make_auth,
+    make_config,
+    make_error_response,
+    make_parameter_mutation,
+    make_policy,
+    make_ref,
+    make_success_response,
+)
 
 NOW = datetime(2026, 1, 2, 12, tzinfo=UTC)
 
@@ -51,10 +59,10 @@ def _make_request() -> StrategyParameterUpdateRequest:
 def test_update_parameters_authorization_denied() -> None:
     """Verify parameters update rejects unauthorized requests."""
     req = _make_request()
-    auth = make_auth()
-    auth.permissions = ()  # Missing strategy:update
+    auth = make_auth(permissions=())
     result = update_strategy_parameters(req, auth)
     assert result.status == "success"
+    assert result.data is not None
     assert result.data.status == "REJECTED"
     assert "AUTHORIZATION_DENIED" in result.data.reason_codes
 
@@ -67,6 +75,7 @@ def test_update_parameters_policy_not_found() -> None:
         mock_policy.return_value = None
         result = update_strategy_parameters(req, auth)
         assert result.status == "success"
+        assert result.data is not None
         assert result.data.status == "REJECTED"
         assert "STRATEGY_NOT_FOUND" in result.data.reason_codes
 
@@ -75,6 +84,7 @@ def test_update_parameters_config_validation_fails() -> None:
     """Verify parameters update rejects invalid config."""
     req = _make_request()
     auth = make_auth()
+    validated_ref = make_ref()
     with (
         patch("app.services.strategy.registry.parameters._load_policy") as mock_policy,
         patch(
@@ -84,15 +94,16 @@ def test_update_parameters_config_validation_fails() -> None:
             "app.services.strategy.registry.parameters.validate_strategy_config"
         ) as mock_val_cfg,
     ):
-        mock_policy.return_value = MagicMock()
-        mock_val_ref.return_value = {"status": "success", "data": MagicMock()}
-        mock_val_cfg.return_value = {
-            "status": "error",
-            "error": StrategyOperationError("ERROR", "Invalid config"),
-        }
+        mock_policy.return_value = make_policy()
+        mock_val_ref.return_value = make_success_response(data=validated_ref)
+        mock_val_cfg.return_value = make_error_response(
+            code=StrategyErrorCode.INVALID_CONFIG.value,
+            message="Invalid config",
+        )
 
         result = update_strategy_parameters(req, auth)
         assert result.status == "success"
+        assert result.data is not None
         assert result.data.status == "REJECTED"
         assert "CONFIG_VALIDATION_FAILED" in result.data.reason_codes
 
@@ -101,6 +112,9 @@ def test_update_parameters_success() -> None:
     """Verify parameters update persists valid config."""
     req = _make_request()
     auth = make_auth()
+    validated_ref = make_ref()
+    validated_config = make_config()
+    published_mutation = make_parameter_mutation()
     with (
         patch("app.services.strategy.registry.parameters._load_policy") as mock_policy,
         patch(
@@ -115,29 +129,29 @@ def test_update_parameters_success() -> None:
         ) as mock_load_mut,
         patch(
             "app.services.strategy.registry.parameters.update_strategy_configuration_record"
-        ),
+        ) as mock_update_rec,
         patch(
             "app.services.strategy.registry.parameters._publish_mutation"
         ) as mock_pub_mut,
     ):
-        mock_policy.return_value = MagicMock()
-        mock_val_ref.return_value = {"status": "success", "data": MagicMock()}
-        cfg = MagicMock()
-        cfg.strategy_id = "strat-1"
-        cfg.strategy_version = "1.0.0"
-        cfg.config_hash = "hash"
-        mock_val_cfg.return_value = {"status": "success", "data": cfg}
+        mock_policy.return_value = make_policy()
+        mock_val_ref.return_value = make_success_response(data=validated_ref)
+        mock_val_cfg.return_value = make_success_response(data=validated_config)
         mock_load_mut.return_value = None
-        mock_pub_mut.return_value = MagicMock()
+        mock_pub_mut.return_value = published_mutation
 
         result = update_strategy_parameters(req, auth)
         assert result.status == "success"
+        assert result.data == published_mutation
+        mock_update_rec.assert_called_once()
 
 
 def test_update_parameters_persistence_failure() -> None:
     """Verify parameters update returns error on persistence failure."""
     req = _make_request()
     auth = make_auth()
+    validated_ref = make_ref()
+    validated_config = make_config()
     with (
         patch("app.services.strategy.registry.parameters._load_policy") as mock_policy,
         patch(
@@ -150,16 +164,13 @@ def test_update_parameters_persistence_failure() -> None:
             "app.services.strategy.registry.parameters._ensure_strategy_storage"
         ) as mock_ensure,
     ):
-        mock_policy.return_value = MagicMock()
-        mock_val_ref.return_value = {"status": "success", "data": MagicMock()}
-        cfg = MagicMock()
-        cfg.strategy_id = "strat-1"
-        cfg.strategy_version = "1.0.0"
-        cfg.config_hash = "hash"
-        mock_val_cfg.return_value = {"status": "success", "data": cfg}
+        mock_policy.return_value = make_policy()
+        mock_val_ref.return_value = make_success_response(data=validated_ref)
+        mock_val_cfg.return_value = make_success_response(data=validated_config)
 
-        mock_ensure.side_effect = StrategyOperationError("DB_ERROR", "DB Failed")
+        mock_ensure.side_effect = Exception("Database failure")
 
         result = update_strategy_parameters(req, auth)
         assert result.status == "error"
-        assert result.error.code == "INTERNAL_ERROR"
+        assert result.error is not None
+        assert result.error.code == StrategyErrorCode.INTERNAL_ERROR.value

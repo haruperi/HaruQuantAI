@@ -18,7 +18,7 @@ _FEATURE_USAGE_SCRIPTS = (
     "05_volatility.py",
     "06_volume.py",
 )
-_USAGE_SCRIPTS = (*_FEATURE_USAGE_SCRIPTS, "features.py")
+_USAGE_SCRIPTS = _FEATURE_USAGE_SCRIPTS
 
 
 # Exit code a usage script returns when the live market-data source is
@@ -35,6 +35,15 @@ def test_usage_scripts_cover_exact_requirements_through_root_api() -> None:
     """Every FR has one exact, invoked package-root usage demonstration."""
     repository_root = Path(__file__).parents[3]
     usage_directory = Path(__file__).parents[1] / "usage" / "features"
+
+    # Reject additional .py files in usage/features except package/support infra
+    feature_py_files = {
+        f.name
+        for f in usage_directory.glob("*.py")
+        if not f.name.startswith("_") and f.name != "conftest.py"
+    }
+    assert feature_py_files == set(_FEATURE_USAGE_SCRIPTS)
+
     readme = (
         repository_root / "app" / "services" / "indicators" / "README.md"
     ).read_text(encoding="utf-8")
@@ -90,6 +99,15 @@ def test_indicators_usage_script_executes_successfully(script_name: str) -> None
     logs are redirected to one disposable directory. Any other code fails.
     """
     usage_directory = Path(__file__).parents[1] / "usage" / "features"
+    script_path = usage_directory / script_name
+    tree = ast.parse(script_path.read_text(encoding="utf-8"))
+    expected_frs = [
+        node.name.replace("fr_indi_", "FR-INDI-")
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+        and re.fullmatch(r"fr_indi_\d{3}", node.name)
+    ]
+
     with tempfile.TemporaryDirectory(
         prefix="haruquant-indicators-usage-"
     ) as temporary_directory:
@@ -111,7 +129,7 @@ def test_indicators_usage_script_executes_successfully(script_name: str) -> None
             }
         )
         completed = subprocess.run(  # noqa: S603 - fixed repository-controlled command
-            [sys.executable, str(usage_directory / script_name)],
+            [sys.executable, str(script_path)],
             check=False,
             capture_output=True,
             text=True,
@@ -126,4 +144,13 @@ def test_indicators_usage_script_executes_successfully(script_name: str) -> None
         f"{script_name} failed\n"
         f"stdout:\n{completed.stdout}\n"
         f"stderr:\n{completed.stderr}"
+    )
+
+    # Verify every demonstrated FR produced SUCCESS: and DATA: markers
+    for fr_id in expected_frs:
+        assert f"SUCCESS: {fr_id}" in completed.stdout, (
+            f"Missing 'SUCCESS: {fr_id}' marker in stdout of {script_name}:\n{completed.stdout}"
+        )
+    assert "DATA:" in completed.stdout, (
+        f"Missing 'DATA:' evidence marker in stdout of {script_name}:\n{completed.stdout}"
     )

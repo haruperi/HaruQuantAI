@@ -2,11 +2,12 @@
 
 import sys
 import tempfile
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+
+from datetime import UTC, datetime
 
 from app.services.data import (
     build_data_settings,
@@ -14,6 +15,7 @@ from app.services.data import (
     run_data_migrations,
 )
 from app.services.strategy import (
+    bootstrap_builtin_strategies,
     build_development_strategy_validation_policy,
     create_strategy_config,
     create_strategy_manifest,
@@ -21,16 +23,21 @@ from app.services.strategy import (
     create_strategy_ref,
     create_strategy_registration_request,
     create_strategy_validation_policy,
+    get_strategy_definition,
     get_strategy_environment,
     get_strategy_lifecycle_status,
     get_strategy_timing_policy,
+    list_builtin_strategy_descriptors,
+    list_strategy_configs,
+    list_strategy_definitions,
     list_strategy_versions,
     register_strategy_version,
+    resolve_strategy_config,
     update_strategy_parameters,
     validate_strategy_config,
     validate_strategy_ref,
 )
-from app.utils import create_auth_context
+from tests.strategy.unit.test_models import make_auth
 
 _HASH = "c" * 64
 _REQUEST = "req-44444444-4444-4444-8444-444444444444"
@@ -98,134 +105,62 @@ def _manifest() -> Any:
         required_data=("EURUSD:H1",),
         required_indicators=("sma",),
         timing_policy=get_strategy_timing_policy("BAR_OPEN_PREVIOUS_CLOSE"),
-        permitted_environments=(get_strategy_environment("RESEARCH"),),
+        permitted_environments=("RESEARCH",),
         source_hash=_HASH,
         artifact_hash=_HASH,
         dependency_hash=_HASH,
-        provenance_refs=("usage-approval-1",),
+        provenance_refs=("build-1",),
         supported_hooks=("on_bar",),
         requires_account_snapshot=False,
-        max_batch_records=1_000,
-        max_diagnostic_bytes=8_192,
-        max_checkpoint_bytes=8_192,
-        max_local_state_bytes=8_192,
-        decision_timeout_seconds=5,
+        max_batch_records=10000,
+        max_diagnostic_bytes=8192,
+        max_checkpoint_bytes=8192,
+        max_local_state_bytes=4096,
+        decision_timeout_seconds=5.0,
     )
 
 
 def fr_str_020() -> None:
-    """FR-STR-020: Stage 1 — Immutable version registration."""
-    _header("Stage 1: Register Immutable Version (FR-STR-020)")
-    now = datetime.now(UTC)
-    policy = _policy()
-    manifest = _manifest()
-    auth = create_auth_context(
-        contract_version="v1",
-        schema_id="utils.auth_context.v1",
-        principal_id="usage-principal",
-        principal_type="USER",
-        roles=("strategy-admin",),
-        permissions=("strategy:register", "strategy:update"),
-        scopes=("usage-approval-1",),
-        tenant_or_environment="research",
-        request_id=_REQUEST,
-        workflow_id=_WORKFLOW,
-        correlation_id=_CORRELATION,
-        issued_at=now,
-    )
-    request = create_strategy_registration_request(
-        command_id=f"usage-register-{now.isoformat()}",
-        strategy_id=manifest.strategy_id,
-        strategy_version=manifest.strategy_version,
-        module_path=manifest.module_path,
-        manifest=manifest,
-        config_schema=manifest.config_schema,
-        source_hash=manifest.source_hash,
-        artifact_hash=manifest.artifact_hash,
-        dependency_hash=manifest.dependency_hash,
-        provenance_refs=manifest.provenance_refs,
-        principal_id=auth.principal_id,
-        reason="usage example registration",
+    """Demonstrate FR-STR-020: Strategy version registration."""
+    _header("Demonstrating FR-STR-020: Strategy version registration")
+    m = _manifest()
+    req = create_strategy_registration_request(
+        command_id="cmd-reg-001",
+        strategy_id=m.strategy_id,
+        strategy_version=m.strategy_version,
+        module_path=m.module_path,
+        manifest=m,
+        config_schema=m.config_schema,
+        source_hash=m.source_hash,
+        artifact_hash=m.artifact_hash,
+        dependency_hash=m.dependency_hash,
+        provenance_refs=m.provenance_refs,
+        principal_id="caller-reg-001",
+        reason="registration usage demonstration",
         lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
-        authorization_ref="usage-approval-1",
-        requested_at=now,
+        authorization_ref="bootstrap-approval",
+        requested_at=datetime.now(UTC),
         request_id=_REQUEST,
         correlation_id=_CORRELATION,
     )
-    result = register_strategy_version(request, auth, policy)
+    auth = make_auth(permissions=("strategy:register",))
+    result = register_strategy_version(req, auth, _policy())
     print(_format_result(result))
     print(
-        f"Data -> status='{result.status}', record_ref='{result.data.record_ref if result.data else None}'"
+        f"Data -> status='{result.status}', mutation_id='{result.data.mutation_id if result.data else None}'"
     )
 
 
 def fr_str_021() -> None:
-    """FR-STR-021: Stage 2 — Record immutable parameter version."""
-    _header("Stage 2: Record Parameter Version (FR-STR-021)")
-    now = datetime.now(UTC)
-    auth = create_auth_context(
-        contract_version="v1",
-        schema_id="utils.auth_context.v1",
-        principal_id="usage-principal",
-        principal_type="USER",
-        roles=("strategy-admin",),
-        permissions=("strategy:register", "strategy:update"),
-        scopes=("usage-approval-1",),
-        tenant_or_environment="research",
-        request_id=_REQUEST,
-        workflow_id=_WORKFLOW,
-        correlation_id=_CORRELATION,
-        issued_at=now,
-    )
-    ref = create_strategy_ref(
-        strategy_id=_STRATEGY,
-        exact_version="1.0.0",
-        environment=get_strategy_environment("RESEARCH"),
-        request_id=_REQUEST,
-        correlation_id=_CORRELATION,
-    )
+    """Demonstrate FR-STR-021: Parameter update creation."""
+    _header("Demonstrating FR-STR-021: Parameter update creation")
     config = create_strategy_config(
         strategy_id=_STRATEGY,
         strategy_version="1.0.0",
         config_schema_version="v1",
-        parameters={"fast_ma_period": 20, "slow_ma_period": 50},
+        parameters={"fast_ma_period": 10, "slow_ma_period": 30},
         request_id=_REQUEST,
     )
-    update = create_strategy_parameter_update_request(
-        command_id=f"usage-config-{now.isoformat()}",
-        strategy_id=_STRATEGY,
-        strategy_version="1.0.0",
-        parameters=config.parameters,
-        principal_id=auth.principal_id,
-        reason="usage example parameter update",
-        ref=ref,
-        config=config,
-        authorization_ref="usage-approval-1",
-        requested_at=now,
-        request_id=_REQUEST,
-        correlation_id=_CORRELATION,
-    )
-    result = update_strategy_parameters(update, auth)
-    print(_format_result(result))
-    print(
-        f"Data -> status='{result.status}', record_hash='{result.data.record_hash[:16] if result.data else None}...'"
-    )
-
-
-def fr_str_022() -> None:
-    """FR-STR-022: Stage 2 — Deterministic registry listing."""
-    _header("Stage 2: Deterministic Registry Listing (FR-STR-022)")
-    result = list_strategy_versions()
-    print(_format_result(result))
-    print(
-        f"Data -> status='{result.status}', total_versions={len(result.data) if result.data else 0}"
-    )
-
-
-def fr_str_023() -> None:
-    """FR-STR-023: Stage 3 — Resolve exact registry reference."""
-    _header("Stage 3: Resolve Exact Strategy Reference (FR-STR-023)")
-    policy = _policy()
     ref = create_strategy_ref(
         strategy_id=_STRATEGY,
         exact_version="1.0.0",
@@ -233,7 +168,47 @@ def fr_str_023() -> None:
         request_id=_REQUEST,
         correlation_id=_CORRELATION,
     )
-    result = validate_strategy_ref(ref, policy)
+    req = create_strategy_parameter_update_request(
+        command_id="cmd-param-001",
+        strategy_id=_STRATEGY,
+        strategy_version="1.0.0",
+        parameters={"fast_ma_period": 10, "slow_ma_period": 30},
+        principal_id="caller-param-001",
+        reason="update usage demonstration",
+        ref=ref,
+        config=config,
+        authorization_ref="bootstrap-approval",
+        requested_at=datetime.now(UTC),
+        request_id=_REQUEST,
+        correlation_id=_CORRELATION,
+    )
+    auth = make_auth(permissions=("strategy:update",))
+    result = update_strategy_parameters(req, auth)
+    print(_format_result(result))
+    print(
+        f"Data -> status='{result.status}', mutation_id='{result.data.mutation_id if result.data else None}'"
+    )
+
+
+def fr_str_022() -> None:
+    """Demonstrate FR-STR-022: Version listing."""
+    _header("Demonstrating FR-STR-022: Version listing")
+    result = list_strategy_versions()
+    print(_format_result(result))
+    print(f"Data -> count={len(result.data) if result.data else 0}")
+
+
+def fr_str_023() -> None:
+    """Demonstrate FR-STR-023: Strategy reference validation."""
+    _header("Demonstrating FR-STR-023: Strategy reference validation")
+    ref = create_strategy_ref(
+        strategy_id=_STRATEGY,
+        exact_version="1.0.0",
+        environment=get_strategy_environment("RESEARCH"),
+        request_id=_REQUEST,
+        correlation_id=_CORRELATION,
+    )
+    result = validate_strategy_ref(ref, _policy())
     print(_format_result(result))
     print(
         f"Data -> status='{result.status}', strategy_id='{result.data.manifest.strategy_id if result.data else None}'"
@@ -241,9 +216,8 @@ def fr_str_023() -> None:
 
 
 def fr_str_024() -> None:
-    """FR-STR-024: Stage 3 — Validate declarative configuration."""
-    _header("Stage 3: Validate Configuration Identity (FR-STR-024)")
-    policy = _policy()
+    """Demonstrate FR-STR-024: Configuration validation."""
+    _header("Demonstrating FR-STR-024: Configuration validation")
     ref = create_strategy_ref(
         strategy_id=_STRATEGY,
         exact_version="1.0.0",
@@ -251,7 +225,7 @@ def fr_str_024() -> None:
         request_id=_REQUEST,
         correlation_id=_CORRELATION,
     )
-    resolved = validate_strategy_ref(ref, policy)
+    resolved = validate_strategy_ref(ref, _policy())
     if resolved.data is None:
         raise RuntimeError("Reference validation failed")
     config = create_strategy_config(
@@ -263,8 +237,44 @@ def fr_str_024() -> None:
     )
     result = validate_strategy_config(resolved.data, config)
     print(_format_result(result))
+    if result.data:
+        cfg_id = f"{result.data.strategy_id}@{result.data.strategy_version}#{result.data.config_hash}"
+        resolved_cfg = resolve_strategy_config(cfg_id)
+        print(_format_result(resolved_cfg))
     print(
         f"Data -> status='{result.status}', config_hash='{result.data.config_hash[:16] if result.data else None}...'"
+    )
+
+
+def _demo_catalogue_and_bootstrap() -> None:
+    """Demonstrate FR-STR-054 through FR-STR-058: Catalogue and Bootstrap operations."""
+    _header("Demonstrating FR-STR-054 to 058: Catalogue & Bootstrap Operations")
+    descriptors_res = list_builtin_strategy_descriptors()
+    print(_format_result(descriptors_res))
+    print(
+        f"Data -> built-in descriptors count={len(descriptors_res.data) if descriptors_res.data else 0}"
+    )
+
+    auth = make_auth(permissions=("strategy:register", "strategy:update"))
+    bootstrap_res = bootstrap_builtin_strategies(auth, _policy())
+    print(_format_result(bootstrap_res))
+    print(
+        f"Data -> bootstrap_status='{bootstrap_res.data.get('bootstrap_status') if bootstrap_res.data else None}'"
+    )
+
+    defs_res = list_strategy_definitions()
+    print(_format_result(defs_res))
+    print(
+        f"Data -> strategy definitions count={len(defs_res.data) if defs_res.data else 0}"
+    )
+
+    def_res = get_strategy_definition("naive-ma-trend")
+    print(_format_result(def_res))
+
+    configs_res = list_strategy_configs("naive-ma-trend", "1.0.0")
+    print(_format_result(configs_res))
+    print(
+        f"Data -> strategy configs count={len(configs_res.data) if configs_res.data else 0}"
     )
 
 
@@ -303,6 +313,9 @@ def main() -> None:
             # 3. Stage 3: Reference resolution & configuration validation
             fr_str_023()
             fr_str_024()
+
+            # 4. Stage 4: Catalogue & Bootstrap operations (FR-STR-054..058)
+            _demo_catalogue_and_bootstrap()
 
 
 if __name__ == "__main__":

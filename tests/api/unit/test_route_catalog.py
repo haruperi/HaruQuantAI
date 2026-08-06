@@ -14,7 +14,10 @@ def test_every_openapi_operation_has_exactly_one_contract() -> None:
     }
     declarations = {(item.method, item.path) for item in registry.all()}
     assert operations == declarations
-    assert registry.size == 71
+    assert registry.size == 74
+    assert registry.get("GET", "/api/v1/indicators") is not None
+    assert registry.get("GET", "/api/v1/indicators/capabilities") is not None
+    assert registry.get("GET", "/api/v1/indicators/{indicator_id}") is not None
     assert registry.get("GET", "/api/v1/auth/me") is not None
     assert registry.get("GET", "/api/v1/data/stream") is not None
     assert registry.get("POST", "/api/v1/portfolio/construct") is not None

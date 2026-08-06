@@ -746,6 +746,27 @@ _KNOWN_ROUTE_CONTRACTS: tuple[RouteContract, ...] = (
         governance_scope="required",
         success_statuses=(201,),
     ),
+    _contract(
+        "api.indicators.list",
+        "GET",
+        "/api/v1/indicators",
+        "indicators",
+        "indicators:read",
+    ),
+    _contract(
+        "api.indicators.capabilities",
+        "GET",
+        "/api/v1/indicators/capabilities",
+        "indicators",
+        "indicators:read",
+    ),
+    _contract(
+        "api.indicators.get_spec",
+        "GET",
+        "/api/v1/indicators/{indicator_id}",
+        "indicators",
+        "indicators:read",
+    ),
 )
 
 

@@ -73,9 +73,53 @@ def print_indicator_evidence(
     print(get_indicator_result_values(result).tail(rows).to_string())
 
 
+def print_requirement_evidence(
+    requirement_id: str,
+    *,
+    actual_data: object,
+) -> None:
+    """Print bounded success and result evidence for one requirement.
+
+    Args:
+        requirement_id: Registered Indicators functional requirement ID.
+        actual_data: Genuine data returned by the demonstrated operation.
+
+    Returns:
+        None.
+
+    Raises:
+        ValueError: If requirement_id is not an FR-INDI-NNN identifier.
+    """
+    import re
+
+    import pandas as pd
+
+    if not re.match(r"^FR-INDI-\d{3}$", requirement_id):
+        raise ValueError(
+            f"Requirement ID must match FR-INDI-NNN, got: {requirement_id}"
+        )
+
+    print(f"SUCCESS: {requirement_id}")
+
+    if isinstance(actual_data, (pd.DataFrame, pd.Series)):
+        rendered = actual_data.tail(8).to_string()
+    elif isinstance(actual_data, (list, tuple)):
+        rendered = str(actual_data[-8:])
+    elif isinstance(actual_data, dict):
+        rendered = str(actual_data)
+    else:
+        rendered = str(actual_data)
+
+    if len(rendered) > 2000:
+        rendered = rendered[:1997] + "..."
+
+    print(f"DATA: {rendered}")
+
+
 __all__ = [
     "print_indicator_evidence",
     "print_market_evidence",
+    "print_requirement_evidence",
     "unwrap_indicator_response",
     "unwrap_market_data_response",
 ]

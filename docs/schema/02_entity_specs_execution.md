@@ -64,9 +64,7 @@ CREATE INDEX idx_strategy_versions_active ON strategy_versions(strategy_id) WHER
 ```
 
 The final `CHECK` makes an unapproved strategy structurally unable to reach `active`.
-`indicator_deps_json` pins exact `indicator_definitions.definition_id` values, so a strategy
-version is reproducible: change an indicator formula and the dependency no longer
-resolves rather than silently producing different signals.
+`indicator_deps_json` pins exact indicator formula identifiers and parameter hashes, so a strategy version is reproducible: change an indicator formula and the dependency no longer resolves rather than silently producing different signals.
 
 ### `strategy_configs`
 
@@ -194,13 +192,11 @@ CREATE TABLE strategy_mutations (
 so a command that was accepted but not yet published is distinguishable from one that
 was fully processed.
 
-> **Divergence recorded.** The four shipped Strategy tables — `strategy_versions`,
-> `strategy_configs`, `strategy_checkpoints`, and `strategy_mutations` — are **not**
-> declared `STRICT` in code. They predate the convention and their migration step
-> `0001_strategy_domain` is applied, so they cannot be altered without a baseline
-> reset. This model states the target (`STRICT`); the applied schema does not yet
-> satisfy it. That gap is intentional and is what the target-versus-current split in
-> [README.md](README.md) exists to express.
+> **Reconciliation recorded.** All seven Strategy runtime tables — `strategy_definitions`,
+> `strategy_versions`, `strategy_configs`, `strategy_state`, `strategy_checkpoints`,
+> `strategy_signals`, and `strategy_mutations` — are shipped, populated in
+> `data/database/haruquant-dev.db`, and backed by applied migrations `0001_strategy_domain`
+> and `0002_strategy_seven_table_runtime`.
 ---
 
 ## Domain 6 — Risk (`risk_`)

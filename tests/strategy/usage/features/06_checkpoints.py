@@ -2,11 +2,14 @@
 
 import sys
 import tempfile
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+
+import hashlib
+import json
+from datetime import UTC, datetime
 
 from app.services.data import (
     build_data_settings,
@@ -14,6 +17,7 @@ from app.services.data import (
     run_data_migrations,
 )
 from app.services.strategy import (
+    commit_strategy_runtime_state,
     create_strategy_checkpoint,
     create_strategy_checkpoint_value,
     create_strategy_manifest,
@@ -23,15 +27,18 @@ from app.services.strategy import (
     get_strategy_environment,
     get_strategy_lifecycle_status,
     get_strategy_timing_policy,
+    initialize_strategy_runtime_state,
+    list_strategy_checkpoints,
+    load_strategy_runtime_state,
     validate_strategy_checkpoint,
 )
-from app.utils import create_auth_context
+from tests.strategy.unit.test_models import make_auth
 
 _HASH = "d" * 64
 _REQUEST = "req-77777777-7777-4777-8777-777777777777"
 _WORKFLOW = "wf-88888888-8888-4888-8888-888888888888"
 _CORRELATION = "cor-99999999-9999-4999-8999-999999999999"
-_AUTHORIZATION = "usage-checkpoint-auth"
+_AUTHORIZATION = "checkpoint-auth"
 
 
 def _feature_header(title: str) -> None:
@@ -98,53 +105,48 @@ def _binding() -> tuple[Any, Any]:
         manifest=manifest,
         lifecycle_status=get_strategy_lifecycle_status("APPROVED"),
         environment=get_strategy_environment("RESEARCH"),
-        policy_version=policy.policy_version,
+        policy_version="usage-v1",
         validation_policy=policy,
         registry_record_hash=_HASH,
         request_id=_REQUEST,
         correlation_id=_CORRELATION,
     )
     config = create_validated_strategy_config(
-        strategy_id=manifest.strategy_id,
-        strategy_version=manifest.strategy_version,
+        strategy_id="usage-replay-strategy",
+        strategy_version="1.0.0",
         config_schema_version="v1",
-        normalized_parameters={"fast_ma_period": 20},
+        normalized_parameters={"fast_ma_period": 20, "slow_ma_period": 50},
         config_hash=_HASH,
-        policy_version=policy.policy_version,
+        policy_version="usage-v1",
         request_id=_REQUEST,
     )
     return ref, config
 
 
 def _auth() -> Any:
-    """Build auth context for checkpoint operations."""
-    return create_auth_context(
-        contract_version="v1",
-        schema_id="utils.auth_context.v1",
-        principal_id="usage-principal",
-        principal_type="USER",
-        roles=("strategy-admin",),
-        permissions=("strategy:checkpoint",),
-        scopes=(_AUTHORIZATION,),
-        tenant_or_environment="research",
-        request_id=_REQUEST,
-        workflow_id=_WORKFLOW,
-        correlation_id=_CORRELATION,
-        issued_at=datetime.now(UTC),
-    )
+    """Build caller context authorized for checkpoint operations."""
+    return make_auth(checkpoint=True)
 
 
 def fr_str_028() -> None:
     """FR-STR-028: Stage 1 — Checkpoint contract creation."""
-    _header("Stage 1: Strategy Checkpoint Contract Creation (FR-STR-028)")
+    _header("Stage 1: Checkpoint Contract Creation (FR-STR-028)")
     ref, config = _binding()
-    auth = _auth()
-    res = create_strategy_checkpoint(
-        ref, config, {"bars_seen": 28}, _AUTHORIZATION, auth
+    state = {"bars_seen": 25, "last_signal": "BUY"}
+    state_bytes = json.dumps(state, sort_keys=True).encode("utf-8")
+    result = create_strategy_checkpoint_value(
+        checkpoint_id="chk-00000000-0000-4000-8000-000000000001",
+        strategy_id=ref.manifest.strategy_id,
+        strategy_version=ref.manifest.strategy_version,
+        config_hash=config.config_hash,
+        state=state,
+        state_checksum=hashlib.sha256(state_bytes).hexdigest(),
+        authorization_ref=_AUTHORIZATION,
+        created_at=datetime.now(UTC),
+        request_id=_REQUEST,
+        payload_bytes=len(state_bytes),
+        redacted_paths=(),
     )
-    if res.data is None:
-        raise RuntimeError("Checkpoint creation failed")
-    result = create_strategy_checkpoint_value(**res.data.model_dump())
     print(_format_result(result))
     print(
         f"Data -> checkpoint_id='{result.checkpoint_id}', payload_bytes={result.payload_bytes}"
@@ -182,6 +184,42 @@ def fr_str_031() -> None:
     )
 
 
+def _demo_checkpoints_persistence() -> None:
+    """FR-STR-059 to 062: Stage 4 — Runtime state initialization & optimistic commit."""
+    _header("Stage 4: Runtime State Operations & Checkpoint Listing (FR-STR-059..062)")
+    config_id = f"usage-replay-strategy@1.0.0#{_HASH}"
+    init_res = initialize_strategy_runtime_state(
+        config_id, request_id=_REQUEST, correlation_id=_CORRELATION
+    )
+    print(_format_result(init_res))
+    print(
+        f"Data -> status='{init_res.status}', evaluation_status='{init_res.data.get('evaluation_status') if init_res.data else None}'"
+    )
+
+    loaded_res = load_strategy_runtime_state(config_id)
+    print(_format_result(loaded_res))
+
+    commit_res = commit_strategy_runtime_state(
+        config_id,
+        expected_state_version=0,
+        evaluation_status="ready",
+        bars_processed=10,
+        local_state={"bars_seen": 35},
+        request_id=_REQUEST,
+        correlation_id=_CORRELATION,
+    )
+    print(_format_result(commit_res))
+    print(
+        f"Data -> status='{commit_res.status}', new_version={commit_res.data.get('state_version') if commit_res.data else None}"
+    )
+
+    checkpoints_res = list_strategy_checkpoints(config_id)
+    print(_format_result(checkpoints_res))
+    print(
+        f"Data -> checkpoints count={len(checkpoints_res.data) if checkpoints_res.data else 0}"
+    )
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -211,6 +249,9 @@ def main() -> None:
 
             # 3. Stage 3: Read-only checkpoint validation
             fr_str_031()
+
+            # 4. Stage 4: Runtime state & Checkpoint listing
+            _demo_checkpoints_persistence()
 
 
 if __name__ == "__main__":

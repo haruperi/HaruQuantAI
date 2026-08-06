@@ -1,22 +1,24 @@
-"""Exact approved Strategy reference resolution."""
+"""Strategy reference resolution and validation operations."""
 
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from app.services.data import is_data_error
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.manifest import StrategyManifest
-from app.services.strategy.contracts.outcomes import failure, success
-from app.services.strategy.contracts.policy import (
-    StrategyValidationPolicy,  # noqa: TC001
-)
+from app.services.strategy.contracts.outcomes import failure
 from app.services.strategy.contracts.references import (
     StrategyRef,
     ValidatedStrategyRef,
 )
 from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
-from app.services.strategy.persistence import read_strategy_version_records
+from app.services.strategy.persistence.read import read_strategy_versions
 from app.utils import get_logger
+
+if TYPE_CHECKING:
+    from app.services.strategy.contracts.policy import StrategyValidationPolicy
 
 logger = get_logger(__name__)
 
@@ -26,7 +28,7 @@ def validate_strategy_ref(
     ref: StrategyRef,
     policy: StrategyValidationPolicy,
 ) -> ValidatedStrategyRef:
-    """Resolve and validate exactly one approved immutable strategy version.
+    """Validate and resolve one Strategy reference to exactly one approved version.
 
     Args:
         ref: Caller-supplied version reference.
@@ -37,16 +39,15 @@ def validate_strategy_ref(
     """
     logger.info("Validating Strategy reference for %s", ref.strategy_id)
     try:
-        rows = read_strategy_version_records(
-            ref.strategy_id,
+        rows = read_strategy_versions(
             ref.request_id,
-            include_trace_ids=True,
+            strategy_id=ref.strategy_id,
         )
     except Exception as error:
         if not is_data_error(error):
             raise
         logger.exception("Strategy reference persistence read failed")
-        return failure(
+        failure(
             StrategyErrorCode.INTERNAL_ERROR,
             "strategy registry read failed",
             request_id=ref.request_id,
@@ -71,13 +72,13 @@ def validate_strategy_ref(
             if not rows
             else StrategyErrorCode.VERSION_CONSTRAINT_UNSATISFIABLE
         )
-        return failure(
+        failure(
             code,
             "strategy reference did not resolve to exactly one approved version",
             request_id=ref.request_id,
             correlation_id=ref.correlation_id,
         )
-    return success(matches[0])
+    return matches[0]
 
 
 def _version_matches(version: str, ref: StrategyRef) -> bool:
@@ -122,14 +123,14 @@ def _validate_record(
     """
     logger.debug("Validating resolved Strategy registry record")
     if lifecycle is not StrategyLifecycleStatus.APPROVED:
-        return failure(
+        failure(
             StrategyErrorCode.LIFECYCLE_NOT_APPROVED,
             "strategy lifecycle is not approved",
             request_id=ref.request_id,
             correlation_id=ref.correlation_id,
         )
     if ref.environment not in manifest.permitted_environments:
-        return failure(
+        failure(
             StrategyErrorCode.ENVIRONMENT_NOT_PERMITTED,
             "strategy is not permitted in the requested environment",
             request_id=ref.request_id,
@@ -139,23 +140,21 @@ def _validate_record(
         manifest.module_path == root or manifest.module_path.startswith(f"{root}.")
         for root in policy.approved_module_roots
     ):
-        return failure(
+        failure(
             StrategyErrorCode.UNAPPROVED_MODULE,
             "strategy module is outside approved roots",
             request_id=ref.request_id,
             correlation_id=ref.correlation_id,
         )
-    return success(
-        ValidatedStrategyRef(
-            manifest=manifest,
-            lifecycle_status=lifecycle,
-            environment=ref.environment,
-            policy_version=policy.policy_version,
-            validation_policy=policy,
-            registry_record_hash=record_hash,
-            request_id=ref.request_id,
-            correlation_id=ref.correlation_id,
-        )
+    return ValidatedStrategyRef(
+        manifest=manifest,
+        lifecycle_status=lifecycle,
+        environment=ref.environment,
+        policy_version=policy.policy_version,
+        validation_policy=policy,
+        registry_record_hash=record_hash,
+        request_id=ref.request_id,
+        correlation_id=ref.correlation_id,
     )
 
 

@@ -15,6 +15,9 @@ export { DashboardView } from "./dashboard";
 export { StrategyWorkspace } from "./strategies";
 export type { StrategyWorkspaceProps } from "./strategies";
 
+export { IndicatorWorkspace } from "./indicators";
+export type { IndicatorWorkspaceProps } from "./indicators";
+
 export { SimulationView } from "./simulation";
 export type { SimulationViewProps } from "./simulation";
 

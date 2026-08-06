@@ -1,6 +1,11 @@
 """Decomposing Trade concrete signal tests."""
 
-from app.services.strategy.evaluators.decomposing_trade import DecomposingTradeEvaluator
+from typing import Any
+
+import pytest
+from app.services.strategy.evaluators.decomposing_trade import (
+    DecomposingTradeEvaluator,
+)
 from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
@@ -15,9 +20,15 @@ from tests.strategy.unit.test_models import (
 logger = get_logger(__name__)
 
 
-def test_decomposing_trade_preserves_four_rsi_crossings() -> None:
-    """Verify all four recovered RSI signal states are explicit and ordered."""
-    logger.debug("Testing Decomposing Trade recovered RSI crossings")
+@pytest.fixture(scope="module")
+def decomposing_trade_inputs() -> tuple[
+    Any,
+    tuple[Any, ...],
+    Any,
+    Any,
+    DecomposingTradeEvaluator,
+]:
+    """Build immutable inputs shared by Decomposing Trade unit cases."""
     market = make_market(
         (("1", "2", "0", "1"), ("2", "3", "1", "2"), ("3", "4", "2", "3"))
     )
@@ -27,6 +38,8 @@ def test_decomposing_trade_preserves_four_rsi_crossings() -> None:
     config = make_signal_config(
         {"rsi_period": 14, "oversold": "30", "overbought": "70"}
     )
+    context = make_context()
+    evidence = make_signal_evidence(market)
     evaluator = DecomposingTradeEvaluator(
         strategy_id="mean-reversion",
         strategy_version="1.0.0",
@@ -35,9 +48,18 @@ def test_decomposing_trade_preserves_four_rsi_crossings() -> None:
         artifact_hash=HASH,
         dependency_hash=HASH,
     )
-    response = evaluator.evaluate_signals(
-        make_signal_evidence(market), (rsi,), config, make_context()
-    )
+    return evidence, (rsi,), config, context, evaluator
+
+
+def test_decomposing_trade_preserves_four_rsi_crossings(
+    decomposing_trade_inputs: tuple[
+        Any, tuple[Any, ...], Any, Any, DecomposingTradeEvaluator
+    ],
+) -> None:
+    """Verify all four recovered RSI signal states are explicit and ordered."""
+    logger.debug("Testing Decomposing Trade recovered RSI crossings")
+    evidence, indicators, config, context, evaluator = decomposing_trade_inputs
+    response = evaluator.evaluate_signals(evidence, indicators, config, context)
     assert response.data is not None
     signals = response.data
     assert tuple(signal.signal_name for signal in signals) == (

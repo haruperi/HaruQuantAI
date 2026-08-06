@@ -92,11 +92,7 @@ _get_indicator_values = cast(
 
 
 def _indicator_metadata(result: object) -> Mapping[str, object]:
-    """Project the metadata needed by Strategy from an indicator result.
-
-    Test doubles remain intentionally supported because Strategy only needs the
-    documented indicator identity, output columns, and manifest checksum at
-    this boundary; production results use the Indicators package-root getter.
+    """Return bounded indicator metadata through official getter or test double.
 
     Args:
         result: Official indicator result or focused test double.
@@ -106,7 +102,7 @@ def _indicator_metadata(result: object) -> Mapping[str, object]:
     """
     try:
         return _get_indicator_metadata(result)
-    except TypeError:
+    except TypeError, AttributeError:
         view = cast("_IndicatorResultView", result)
         return {
             "indicator_id": view.indicator_id,
@@ -125,11 +121,11 @@ def _indicator_frame(result: object) -> _IndicatorFrame:
         Structural indicator frame used by deterministic evaluators.
     """
     values = getattr(result, "values", None)
-    if isinstance(values, Mapping):
+    if hasattr(values, "columns") or isinstance(values, Mapping):
         return cast("_IndicatorFrame", values)
     try:
         return _get_indicator_values(result)
-    except TypeError:
+    except TypeError, AttributeError:
         return cast("_IndicatorResultView", result).values
 
 

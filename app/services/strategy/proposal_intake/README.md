@@ -13,7 +13,7 @@ and result values are constructed through standalone factory functions.
 
 | Status | Feature | Public operations | Requirements | Usage evidence |
 |---|---|---|---|---|
-| Completed | `FEAT-STR-11` External Research Proposal Evaluation | `create_strategy_proposal_evaluation_request`, `create_strategy_proposal_evaluation_result`, `validate_strategy_proposal`, `evaluate_strategy_proposal`, `bind_proposal_lineage` | `FR-STR-049`–`FR-STR-053` | `tests/strategy/usage/11_proposal_intake.py` |
+| Completed | `FEAT-STR-11` External Research Proposal Evaluation | `create_strategy_proposal_evaluation_request`, `create_strategy_proposal_evaluation_result`, `validate_strategy_proposal`, `evaluate_strategy_proposal`, `bind_proposal_lineage` | `FR-STR-049`–`FR-STR-053` | `tests/strategy/usage/features/11_proposal_intake.py` |
 
 Proposal confidence, consensus, rationale, requested size, approval language, and
 free text never enter deterministic evaluation or intent construction. Proposal

@@ -2,24 +2,61 @@
 
 ## [Unreleased]
 
-### Reconcile Indicators mechanical and reviewed conformance audit evidence
+### Remediate Indicators Domain Audit Controls
 
-The Indicators audit remediation aligns startup schema migration wiring, CRUD test coverage, unit-test speed, active documentation, and audit matrix tracking.
+The Indicators audit remediation brings the pure calculation domain into full audit conformance (`USE`, `IT`, `REACH`, `NFR`, `DOCS`, `UI` controls): retiring unused persistence support schema, standardizing requirement output evidence, enforcing a 100 ms unit test latency ceiling, exposing authenticated read-only API routes, and mounting a typed frontend workspace.
 
-#### Added (2)
+#### Added (3)
 
-- Added `run_indicators_migrations` package-root runner and API lifecycle startup migration execution for the `indicator_*` schema.
-- Added scratch-database CRUD unit tests in `tests/indicators/unit/test_persistence_crud.py` meeting the 80% coverage floor across all five persistence modules.
+- Added database migration retiring legacy unused indicator support schema with fail-closed row guards.
+- Added authenticated read-only indicator catalog and specification API routes under explicit read permissions.
+- Added interactive indicator catalog and specification workspace UI component with search and filtering.
 
 #### Changed (2)
 
-- Reconciled Indicators owning README, `docs/ARCHITECTURE.md`, `docs/schema/05_reconciliation.md`, and `docs/PROJECT.md` audit matrix to reflect 31 public export symbols, private persistence support, and documented D2-B UI exclusion.
-- Optimized thread-pool test allocations in `tests/indicators/unit/test_concurrency.py` so all unit tests execute within the 100 ms ceiling.
+- Standardized indicator requirement usage program execution outputs and evidence logging.
+- Isolated live broker indicator test workflows behind an explicit opt-in environment variable.
+
+#### Removed (1)
+
+- Removed unused indicator persistence support package and obsolete storage tests.
+
+### Activate Strategy seven-table database integration
+
+Strategy persistence is upgraded to a production-reachable seven-table model (`strategy_definitions`, `strategy_versions`, `strategy_configs`, `strategy_state`, `strategy_checkpoints`, `strategy_signals`, `strategy_mutations`) backed by immutable migration `0002_strategy_seven_table_runtime`. Seven built-in evaluators are bootstrapped and populated in `data/database/haruquant-dev.db`.
+
+#### Added (3)
+
+- Added immutable migration `0002_strategy_seven_table_runtime` in `app/services/strategy/migrations/definitions.py` and built-in strategy catalogue in `app/services/strategy/registry/catalogue.py`.
+- Added standalone public operations for definition, configuration, runtime state, checkpoint, and signal outbox management.
+- Added non-production Strategy database population tooling and verification for migration integrity, seven-table production reachability, and internal persistence contracts.
+
+#### Changed (1)
+
+- Extended Strategy persistence package (`create.py`, `read.py`, `update.py`) to support all seven Strategy tables using parameterized statements executed through `app.services.data`.
+
+### Reconcile Strategy mechanical and reviewed audit controls
+
+The Strategy audit remediation isolates SQLite operations from unit tests, fixes contract and response types, enforces unit test execution within 100 ms, removes stale aggregate usage scripts, and updates active package documentation.
+
+#### Added (1)
+
+- Added real SQLite integration coverage for Strategy registry reads, migration checks, and checkpoint restore workflows.
+
+#### Changed (2)
+
+- Reconciled `app/services/strategy/README.md` to index all production feature modules, numbered usage programs, and package status evidence.
+- Optimized fixture allocation in unit test suites to keep every individual unit test duration strictly under 100 ms.
+
+#### Removed (1)
+
+- Removed redundant aggregate Strategy feature program, maintaining exact parity across all numbered feature programs.
 
 #### Fixed (2)
 
-- Fixed public `__all__` export count and import boundary assertions (27/30 -> 31).
-- Corrected withdrawn feature requirement docstrings in migration definitions.
+- Fixed Strategy internal test models to produce valid `StandardResponse` envelopes and valid immutable mutation/request identity schemas.
+- Fixed unit test storage isolation by mocking persistence boundaries to eliminate SQLite setup overhead from unit testing.
+
 
 ### Reconcile Data mechanical and reviewed conformance evidence
 

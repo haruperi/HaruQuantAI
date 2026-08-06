@@ -19,6 +19,7 @@ import { ResearchWorkspace } from '../workflow/research';
 import { SimulationView } from '../workflow/simulation';
 import { RiskView } from '../workflow/risk';
 import { TradingView } from '../workflow/trading';
+import { IndicatorWorkspace } from '../workflow/indicators';
 import { X, Maximize2, Minimize2, GripHorizontal, Layers, ArrowRightLeft } from 'lucide-react';
 
 import {
@@ -238,6 +239,8 @@ export const WorkspaceGrid: React.FC = () => {
         return <RiskView />;
       case 'trading':
         return <TradingView />;
+      case 'indicators':
+        return <IndicatorWorkspace />;
       default:
         return <MarketsWidget />;
     }

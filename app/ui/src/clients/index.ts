@@ -68,6 +68,13 @@ export type {
   TradingProjection,
 } from "./trading";
 
+export type {
+  CapabilityMatrix,
+  IndicatorCapability,
+  IndicatorCatalogue,
+  IndicatorSpec,
+} from "./indicators";
+
 // Value re-exports (used both as stand-alone exports and inside apiClients).
 export { isApiSuccessResponse } from "./contracts";
 export {
@@ -86,6 +93,7 @@ import { auth } from "./auth";
 import { health } from "./health";
 import { settings } from "./settings";
 import { data } from "./data";
+import { indicators } from "./indicators";
 import { strategies } from "./strategies";
 import { research } from "./research";
 import { dashboards } from "./dashboards";
@@ -105,6 +113,7 @@ export {
   health,
   settings,
   data,
+  indicators,
   strategies,
   research,
   dashboards,
@@ -132,6 +141,7 @@ export const apiClients = {
   health,
   settings,
   data,
+  indicators,
   strategies,
   research,
   dashboards,

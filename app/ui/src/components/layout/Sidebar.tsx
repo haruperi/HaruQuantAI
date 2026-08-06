@@ -129,6 +129,11 @@ export const Sidebar: React.FC = () => {
           <TrendingUp size={15} />
           {!isCollapsed && <span>Trading</span>}
         </div>
+
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('indicators', 'Indicators')}>
+          <Layers size={15} />
+          {!isCollapsed && <span>Indicators</span>}
+        </div>
       </div>
 
       {/* Section 2: CHALLENGE */}

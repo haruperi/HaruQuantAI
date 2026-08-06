@@ -126,7 +126,7 @@ def create_strategy_checkpoint(  # noqa: PLR0911
         )
         _ensure_strategy_storage(auth.request_id)
         create_strategy_checkpoint_record(checkpoint)
-        return success(checkpoint)
+        return checkpoint
     except ValueError:
         logger.warning("Strategy checkpoint serialization failed")
         return failure(
@@ -247,4 +247,32 @@ def _contains_official_state(value: JsonValue) -> bool:
     return False
 
 
-__all__ = ["create_strategy_checkpoint", "validate_strategy_checkpoint"]
+@guard_strategy_boundary
+def list_strategy_checkpoints(
+    config_id: str,
+) -> tuple[StrategyCheckpoint, ...]:
+    """List immutable checkpoints newest-first for a configuration.
+
+    Args:
+        config_id: Unique configuration identifier.
+
+    Returns:
+        Tuple of StrategyCheckpoint contracts.
+    """
+    from app.services.strategy.persistence import read_strategy_checkpoints
+    from app.utils import generate_id
+
+    logger.info("Listing strategy checkpoints for %s", config_id)
+    request_id = generate_id("req")
+    rows = read_strategy_checkpoints(config_id, request_id)
+    return tuple(
+        StrategyCheckpoint.model_validate_json(str(row["checkpoint_json"]))
+        for row in rows
+    )
+
+
+__all__ = [
+    "create_strategy_checkpoint",
+    "list_strategy_checkpoints",
+    "validate_strategy_checkpoint",
+]

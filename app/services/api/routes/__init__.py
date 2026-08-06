@@ -6,6 +6,7 @@ from app.services.api.routes.dashboards import router as dashboards_router
 from app.services.api.routes.data import router as data_router
 from app.services.api.routes.data_stream import router as data_stream_router
 from app.services.api.routes.health import router as health_router
+from app.services.api.routes.indicators import router as indicators_router
 from app.services.api.routes.observability import router as observability_router
 from app.services.api.routes.operator import router as operator_router
 from app.services.api.routes.optimization import router as optimization_router
@@ -30,6 +31,7 @@ __all__ = (
     "data_router",
     "data_stream_router",
     "health_router",
+    "indicators_router",
     "observability_router",
     "operator_router",
     "optimization_router",
