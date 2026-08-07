@@ -1218,6 +1218,196 @@ deterministic signal evidence independently support it.
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `strategy_`.
+
+#### `strategy_definitions`
+
+The stable identity of a strategy across all its versions.
+
+```sql
+CREATE TABLE strategy_definitions (
+    strategy_id      TEXT    PRIMARY KEY,
+    strategy_code    TEXT    NOT NULL UNIQUE,
+    display_name     TEXT    NOT NULL,
+    strategy_class   TEXT    NOT NULL CHECK (strategy_class IN ('trend','mean_reversion','breakout','arbitrage','market_making','ml','composite')),
+    asset_classes_json TEXT  NOT NULL DEFAULT '[]' CHECK (json_valid(asset_classes_json)),
+    owner            TEXT    NOT NULL DEFAULT '',
+    description      TEXT    NOT NULL DEFAULT '',
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    deleted_at       TEXT
+) STRICT;
+```
+
+#### `strategy_versions`
+
+Immutable code versions. Never updated after `state` leaves `draft`.
+
+```sql
+CREATE TABLE strategy_versions (
+    version_id       TEXT    PRIMARY KEY,
+    strategy_id      TEXT    NOT NULL REFERENCES strategy_definitions(strategy_id) ON DELETE RESTRICT,
+    semver           TEXT    NOT NULL,
+    code_hash        TEXT    NOT NULL,
+    indicator_deps_json TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(indicator_deps_json)),
+    param_schema_json TEXT   NOT NULL CHECK (json_valid(param_schema_json)),
+    warmup_bars      INTEGER NOT NULL DEFAULT 0,
+    state            TEXT    NOT NULL CHECK (state IN ('draft','validated','approved','active','paused','deprecated','retired')),
+    approved_by      TEXT,
+    approved_at      TEXT,
+    policy_json      TEXT    NOT NULL DEFAULT '{}' CHECK (json_valid(policy_json)),
+    record_hash      TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    UNIQUE (strategy_id, semver),
+    UNIQUE (strategy_id, code_hash),
+    CHECK (state NOT IN ('approved','active') OR (approved_by IS NOT NULL AND approved_at IS NOT NULL))
+) STRICT;
+
+CREATE INDEX idx_strategy_versions_active ON strategy_versions(strategy_id) WHERE state = 'active';
+```
+
+The final `CHECK` makes an unapproved strategy structurally unable to reach `active`.
+`indicator_deps_json` pins exact indicator formula identifiers and parameter hashes, so a strategy version is reproducible: change an indicator formula and the dependency no longer resolves rather than silently producing different signals.
+
+#### `strategy_configs`
+
+Parameter bindings. Many configs per version.
+
+```sql
+CREATE TABLE strategy_configs (
+    config_id        TEXT    PRIMARY KEY,
+    version_id       TEXT    NOT NULL REFERENCES strategy_versions(version_id) ON DELETE RESTRICT,
+    config_name      TEXT    NOT NULL,
+    inputs_json      TEXT    NOT NULL CHECK (json_valid(inputs_json)),
+    inputs_hash      TEXT    NOT NULL,
+    symbol_id        TEXT    NOT NULL,
+    timeframe        TEXT    NOT NULL,
+    runtime_profile  TEXT    NOT NULL CHECK (runtime_profile IN ('research','simulation','paper','live')),
+    risk_budget_decimal TEXT NOT NULL DEFAULT '0',
+    state            TEXT    NOT NULL CHECK (state IN ('draft','active','paused','archived')),
+    policy_version   TEXT    NOT NULL DEFAULT '',
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    UNIQUE (version_id, inputs_hash, symbol_id, timeframe, runtime_profile)
+) STRICT;
+
+CREATE INDEX idx_strategy_configs_live ON strategy_configs(symbol_id, timeframe)
+    WHERE state = 'active' AND runtime_profile = 'live';
+```
+
+#### `strategy_state`
+
+Current runtime state per active config. Mutable, one row per config.
+
+```sql
+CREATE TABLE strategy_state (
+    config_id        TEXT    PRIMARY KEY REFERENCES strategy_configs(config_id) ON DELETE RESTRICT,
+    lifecycle_state  TEXT    NOT NULL CHECK (lifecycle_state IN ('stopped','warming_up','ready','running','halted','error')),
+    state_version    INTEGER NOT NULL DEFAULT 0,
+    bars_processed   INTEGER NOT NULL DEFAULT 0,
+    last_bar_ts_utc  INTEGER,
+    last_signal_id   TEXT,
+    context_json     TEXT    NOT NULL DEFAULT '{}' CHECK (json_valid(context_json)),
+    halt_reason      TEXT,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_strategy_state_running ON strategy_state(config_id) WHERE lifecycle_state = 'running';
+```
+
+`state_version` is an optimistic-concurrency guard: writers pass their expected
+version and the update fails rather than clobbering a concurrent change.
+
+#### `strategy_checkpoints`
+
+Point-in-time snapshots for restart and replay.
+
+```sql
+CREATE TABLE strategy_checkpoints (
+    checkpoint_id    TEXT    PRIMARY KEY,
+    config_id        TEXT    NOT NULL REFERENCES strategy_configs(config_id) ON DELETE RESTRICT,
+    sequence         INTEGER NOT NULL,
+    bar_ts_utc       INTEGER NOT NULL,
+    state_snapshot_json TEXT NOT NULL CHECK (json_valid(state_snapshot_json)),
+    snapshot_hash    TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    authorization_ref TEXT,
+    created_at       TEXT    NOT NULL,
+    UNIQUE (config_id, sequence)
+) STRICT;
+
+CREATE INDEX idx_strategy_ckpt_latest ON strategy_checkpoints(config_id, sequence DESC);
+```
+
+#### `strategy_signals`
+
+Generated trade intents. Append-only. The input to Risk.
+
+```sql
+CREATE TABLE strategy_signals (
+    signal_id        TEXT    PRIMARY KEY,
+    config_id        TEXT    NOT NULL REFERENCES strategy_configs(config_id) ON DELETE RESTRICT,
+    sequence         INTEGER NOT NULL,
+    symbol_id        TEXT    NOT NULL,
+    direction        TEXT    NOT NULL CHECK (direction IN ('long','short','flat','close')),
+    signal_strength  TEXT    NOT NULL DEFAULT '1',
+    intent_kind      TEXT    NOT NULL CHECK (intent_kind IN ('entry','exit','scale_in','scale_out','reverse')),
+    suggested_size_decimal TEXT,
+    stop_loss_decimal      TEXT,
+    take_profit_decimal    TEXT,
+    bar_ts_utc       INTEGER NOT NULL,
+    evidence_json    TEXT    NOT NULL DEFAULT '{}' CHECK (json_valid(evidence_json)),
+    state            TEXT    NOT NULL CHECK (state IN ('generated','submitted','approved','rejected','expired','executed')),
+    expires_at       TEXT,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    UNIQUE (config_id, sequence)
+) STRICT;
+
+CREATE INDEX idx_strategy_signals_pending ON strategy_signals(created_at)
+    WHERE state IN ('generated','submitted');
+CREATE INDEX idx_strategy_signals_symbol  ON strategy_signals(symbol_id, bar_ts_utc DESC);
+```
+
+A signal carries a *suggested* size. Risk owns the final size. Naming this
+`suggested_size_decimal` rather than `size` is deliberate — it keeps the ownership
+boundary legible in the schema itself.
+
+---
+
+#### `strategy_mutations`
+
+```sql
+CREATE TABLE strategy_mutations (
+    command_id TEXT PRIMARY KEY,
+    mutation_json TEXT NOT NULL,
+    publication_pending INTEGER NOT NULL
+) STRICT;
+```
+
+`publication_pending` gates whether a mutation command has been announced downstream,
+so a command that was accepted but not yet published is distinguishable from one that
+was fully processed.
+
+> **Reconciliation recorded.** All seven Strategy runtime tables — `strategy_definitions`,
+> `strategy_versions`, `strategy_configs`, `strategy_state`, `strategy_checkpoints`,
+> `strategy_signals`, and `strategy_mutations` — are shipped, populated in
+> `data/database/haruquant-dev.db`, and backed by applied migrations `0001_strategy_domain`
+> and `0002_strategy_seven_table_runtime`.
+
+---
+
 ### Shared configuration
 
 | Status    | Setting / Limit                 | Type           | Default                          | Required | Owner                              | Used by                                | Description                                                                                                                                                                                                                                                                                                                                  |

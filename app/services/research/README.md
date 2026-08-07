@@ -1393,6 +1393,205 @@ language coverage.
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `research_`.
+
+#### `research_studies`
+
+```sql
+CREATE TABLE research_studies (
+    study_id         TEXT    PRIMARY KEY,
+    study_name       TEXT    NOT NULL,
+    hypothesis       TEXT    NOT NULL,
+    study_kind       TEXT    NOT NULL CHECK (study_kind IN ('exploratory','confirmatory','replication','ablation')),
+    preregistered    INTEGER NOT NULL DEFAULT 0 CHECK (preregistered IN (0,1)),
+    prereg_hash      TEXT,
+    success_criteria_json TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(success_criteria_json)),
+    state            TEXT    NOT NULL CHECK (state IN ('draft','registered','running','concluded','abandoned')),
+    verdict          TEXT    CHECK (verdict IN ('supported','not_supported','inconclusive')),
+    concluded_at     TEXT,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    CHECK (preregistered = 0 OR prereg_hash IS NOT NULL),
+    CHECK (study_kind <> 'confirmatory' OR preregistered = 1)
+) STRICT;
+
+CREATE INDEX idx_research_studies_open ON research_studies(state) WHERE state IN ('registered','running');
+```
+
+Confirmatory studies must be preregistered. Without it, "we hypothesised this all
+along" is written after the results are known, and the hypothesis test means nothing.
+The `CHECK` enforces the discipline structurally.
+
+#### `research_hypothesis_tests`
+
+```sql
+CREATE TABLE research_hypothesis_tests (
+    test_id          TEXT    PRIMARY KEY,
+    study_id         TEXT    NOT NULL REFERENCES research_studies(study_id) ON DELETE RESTRICT,
+    test_name        TEXT    NOT NULL,
+    test_statistic   TEXT    NOT NULL CHECK (test_statistic IN ('t_test','wilcoxon','ks','chi2','adf','ljung_box','white_reality_check','bootstrap')),
+    null_hypothesis  TEXT    NOT NULL,
+    sample_size      INTEGER NOT NULL,
+    statistic_decimal TEXT   NOT NULL,
+    p_value_decimal  TEXT    NOT NULL,
+    alpha_decimal    TEXT    NOT NULL DEFAULT '0.05',
+    multiple_testing_correction TEXT NOT NULL DEFAULT 'none'
+                     CHECK (multiple_testing_correction IN ('none','bonferroni','benjamini_hochberg','holm')),
+    tests_in_family  INTEGER NOT NULL DEFAULT 1,
+    adjusted_p_value_decimal TEXT,
+    rejected_null    INTEGER NOT NULL CHECK (rejected_null IN (0,1)),
+    effect_size_decimal      TEXT,
+    confidence_low_decimal   TEXT,
+    confidence_high_decimal  TEXT,
+    tested_at        TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    CHECK (tests_in_family = 1 OR multiple_testing_correction <> 'none')
+) STRICT;
+
+CREATE INDEX idx_research_tests_study ON research_hypothesis_tests(study_id, tested_at DESC);
+```
+
+The final `CHECK` forces a correction whenever more than one test shares a family.
+Twenty uncorrected tests at α = 0.05 produce one "significant" result by chance;
+recording `tests_in_family` makes that arithmetic unavoidable.
+
+#### `research_features`
+
+Feature store definitions.
+
+```sql
+CREATE TABLE research_features (
+    feature_id       TEXT    PRIMARY KEY,
+    feature_name     TEXT    NOT NULL,
+    version          TEXT    NOT NULL,
+    spec_json        TEXT    NOT NULL CHECK (json_valid(spec_json)),
+    spec_hash        TEXT    NOT NULL,
+    source_kind      TEXT    NOT NULL CHECK (source_kind IN ('price','indicator','fundamental','sentiment','calendar','derived','external')),
+    dtype            TEXT    NOT NULL CHECK (dtype IN ('float','int','bool','categorical','timestamp')),
+    lookback_bars    INTEGER NOT NULL DEFAULT 0,
+    is_point_in_time INTEGER NOT NULL DEFAULT 1 CHECK (is_point_in_time IN (0,1)),
+    leakage_reviewed INTEGER NOT NULL DEFAULT 0 CHECK (leakage_reviewed IN (0,1)),
+    leakage_notes    TEXT    NOT NULL DEFAULT '',
+    state            TEXT    NOT NULL CHECK (state IN ('draft','validated','active','deprecated')),
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    UNIQUE (feature_name, version),
+    CHECK (state NOT IN ('validated','active') OR leakage_reviewed = 1)
+) STRICT;
+
+CREATE INDEX idx_research_features_active ON research_features(feature_name) WHERE state = 'active';
+```
+
+`is_point_in_time = 0` marks a feature computed with information unavailable at the
+timestamp it is attached to — restated fundamentals, survivorship-filtered universes.
+No feature reaches `validated` without an explicit leakage review.
+
+#### `research_feature_materializations`
+
+Feature values are **not stored in SQLite.** They are computed on demand and
+materialised to Parquet when a study needs a pinned, citable input. This table binds a
+feature version to its `data_datasets` entry.
+
+```sql
+CREATE TABLE research_feature_materializations (
+    materialization_id TEXT  PRIMARY KEY,
+    feature_id       TEXT    NOT NULL REFERENCES research_features(feature_id) ON DELETE RESTRICT,
+    symbol_id        TEXT    NOT NULL,
+    dataset_id       TEXT    NOT NULL,
+    source_data_hash TEXT    NOT NULL,
+    spec_hash        TEXT    NOT NULL,
+    covered_from_utc INTEGER NOT NULL,
+    covered_to_utc   INTEGER NOT NULL,
+    row_count        INTEGER NOT NULL DEFAULT 0,
+    null_count       INTEGER NOT NULL DEFAULT 0,
+    state            TEXT    NOT NULL CHECK (state IN ('building','ready','stale','invalidated','failed')),
+    built_at         TEXT,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    UNIQUE (feature_id, symbol_id),
+    CHECK (covered_to_utc >= covered_from_utc)
+) STRICT;
+
+CREATE INDEX idx_research_featmat_stale ON research_feature_materializations(feature_id)
+    WHERE state IN ('stale','invalidated');
+```
+
+`null_count` is tracked at the catalog level because it is the cheap integrity signal:
+a feature that suddenly goes 90 % null is a broken pipeline, and noticing that should
+not require scanning the Parquet. Within the file, a genuine missing observation is a
+real Arrow null — the distinction between "computed, genuinely missing" and "not yet
+computed" is carried by `state`, not by a per-row flag.
+
+`dataset_id` is a soft reference to `data_datasets`; Research depends on Data, never
+the reverse.
+
+#### `research_regimes`
+
+```sql
+CREATE TABLE research_regimes (
+    regime_id        TEXT    PRIMARY KEY,
+    regime_model     TEXT    NOT NULL,
+    model_version    TEXT    NOT NULL,
+    regime_label     TEXT    NOT NULL,                   -- 'trending_up', 'high_vol_range'
+    symbol_id        TEXT,
+    timeframe        TEXT,
+    start_ts_utc     INTEGER NOT NULL,
+    end_ts_utc       INTEGER,
+    confidence_decimal TEXT  NOT NULL DEFAULT '1',
+    characteristics_json TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(characteristics_json)),
+    detected_at      TEXT    NOT NULL,
+    is_retrospective INTEGER NOT NULL DEFAULT 0 CHECK (is_retrospective IN (0,1)),
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    CHECK (end_ts_utc IS NULL OR end_ts_utc > start_ts_utc)
+) STRICT;
+
+CREATE INDEX idx_research_regimes_span ON research_regimes(symbol_id, start_ts_utc, end_ts_utc);
+CREATE INDEX idx_research_regimes_current ON research_regimes(symbol_id) WHERE end_ts_utc IS NULL;
+```
+
+`is_retrospective = 1` marks a regime labelled with hindsight. Retrospective labels
+are valid for analysis and invalid for live signals; conflating the two produces a
+strategy that appears to know the regime before it was knowable.
+
+#### `research_artifacts`
+
+**A file manifest, not a general artifact catalog.** One row per written file: what it
+is, how large, whether the write was atomic, and which audit event authorised it.
+
+```sql
+CREATE TABLE research_artifacts (
+    relative_path    TEXT    PRIMARY KEY,
+    format           TEXT    NOT NULL,
+    size_bytes       INTEGER NOT NULL,
+    sha256           TEXT    NOT NULL,
+    atomic           INTEGER NOT NULL,
+    schema_version   TEXT    NOT NULL,
+    audit_event_id   TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL DEFAULT '',
+    correlation_id   TEXT    NOT NULL DEFAULT '',
+    created_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_research_artifacts_sha256 ON research_artifacts(sha256);
+CREATE INDEX idx_research_artifacts_audit  ON research_artifacts(audit_event_id);
+```
+
+Keyed by `relative_path`, so one path holds one artifact and a rewrite replaces rather
+than duplicates. `sha256` is indexed for content-addressed lookup — two studies
+producing byte-identical output are detectable.
+
+`atomic` records whether the write went through the temp-file-then-rename path. An
+artifact written non-atomically may be truncated, and that must be visible in the
+catalog rather than discovered on read.
+
+This is the same catalog pattern as `data_partition_files` and predates it in the
+codebase.
+
 Shared settings are consumed from `docs/PROJECT.md` and not redefined: `ENVIRONMENT`, `RUNTIME_PROFILE=research`, `DATABASE_URL/DATA_DIR`, UTC time policy, trace identifiers, secret redaction, and `LOG_LEVEL`. Research accepts only `RUNTIME_PROFILE=research` and performs no live mutation regardless of global toggles.
 
 | Status | Requirement ID | Type | Responsibility | Verification |

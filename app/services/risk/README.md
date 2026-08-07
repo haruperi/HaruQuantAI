@@ -2150,6 +2150,287 @@ Public response signatures:
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `risk_`.
+
+Risk is the mandatory admission gate. All decision tables are append-only;
+`risk_audit_records` is hash-chained.
+
+> **This domain follows the live implementation, not an independent design (B1).**
+> An earlier draft of this model proposed `risk_policies`, `risk_kill_switches`, and a
+> single `risk_admission_decisions` table. The shipped Risk domain splits admission
+> into *eligibility* (may this strategy trade at all?) and *allocation* (how much
+> budget does this portfolio get?), which are answered by different authorities on
+> different cadences. Collapsing them loses a real distinction, so the model adopts the
+> live names and the live split. Three tables below — `risk_limits`,
+> `risk_limit_checks`, `risk_exposure_snapshots` — have no live counterpart and remain
+> target-only.
+
+#### `risk_policy_versions`
+
+```sql
+CREATE TABLE risk_policy_versions (
+    config_hash      TEXT    PRIMARY KEY,
+    policy_version   TEXT    NOT NULL,
+    profile          TEXT    NOT NULL CHECK (profile IN ('research','simulation','paper','live')),
+    payload_json     TEXT    NOT NULL CHECK (json_valid(payload_json)),
+    effective_at     TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_risk_policy_profile ON risk_policy_versions(profile, effective_at DESC);
+```
+
+Keyed by `config_hash`, so an identical policy cannot be registered twice under two
+versions. `payload_json` carries the rule tree; per the hybrid rule (D9) only `profile`
+is normalised, because it is the sole field filtered on.
+
+#### `risk_eligibility_decisions`
+
+May this strategy trade at all?
+
+```sql
+CREATE TABLE risk_eligibility_decisions (
+    decision_id      TEXT    PRIMARY KEY,
+    strategy_id      TEXT    NOT NULL,
+    strategy_version TEXT    NOT NULL,
+    payload_json     TEXT    NOT NULL CHECK (json_valid(payload_json)),
+    expires_at       TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_risk_eligibility_strategy ON risk_eligibility_decisions(strategy_id, strategy_version);
+CREATE INDEX idx_risk_eligibility_expiry   ON risk_eligibility_decisions(expires_at);
+```
+
+`expires_at` is `NOT NULL`: an eligibility decision is time-bounded, so a stale
+approval cannot be replayed against a strategy whose behaviour has since changed.
+
+#### `risk_allocation_decisions`
+
+How much budget does this portfolio get?
+
+```sql
+CREATE TABLE risk_allocation_decisions (
+    decision_id      TEXT    PRIMARY KEY,
+    portfolio_id     TEXT    NOT NULL,
+    reviewed_version TEXT    NOT NULL,
+    active           INTEGER NOT NULL CHECK (active IN (0, 1)),
+    predecessor_version TEXT,
+    payload_json     TEXT    NOT NULL CHECK (json_valid(payload_json)),
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    UNIQUE (portfolio_id, reviewed_version)
+) STRICT;
+
+CREATE UNIQUE INDEX idx_risk_allocation_active
+    ON risk_allocation_decisions(portfolio_id) WHERE active = 1;
+```
+
+The partial unique index guarantees **at most one active allocation per portfolio**.
+Two simultaneously-active allocations is the failure mode where each sizing check
+passes under a different budget.
+
+`predecessor_version` makes a rollback legible rather than looking like an unexplained
+reallocation.
+
+#### `risk_kill_switch_states`
+
+```sql
+CREATE TABLE risk_kill_switch_states (
+    state_id         TEXT    PRIMARY KEY,
+    scope_level      TEXT    NOT NULL CHECK (scope_level IN ('global','portfolio','strategy','symbol')),
+    scope_json       TEXT    NOT NULL CHECK (json_valid(scope_json)),
+    state            TEXT    NOT NULL CHECK (state IN ('active','inactive')),
+    version          INTEGER NOT NULL,
+    payload_json     TEXT    NOT NULL CHECK (json_valid(payload_json)),
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_risk_kill_tripped ON risk_kill_switch_states(scope_level)
+    WHERE state = 'active';
+```
+
+`version` is the optimistic-concurrency guard: a reset passes its expected version and
+fails rather than racing a concurrent trip.
+
+The partial index is **empty in normal operation**, so the kill-switch check that runs
+before every order costs an empty-B-tree probe. The safety check that runs most often
+should cost least when nothing is wrong.
+
+Trip and reset attestations live in `payload_json`; per `AGENTS.md` §3 a kill switch is
+deterministic and no caller can bypass it.
+
+#### `risk_approval_tokens`
+
+```sql
+CREATE TABLE risk_approval_tokens (
+    token_id         TEXT    PRIMARY KEY,
+    decision_id      TEXT    NOT NULL,
+    scope_json       TEXT    NOT NULL CHECK (json_valid(scope_json)),
+    state            TEXT    NOT NULL CHECK (state IN ('issued','reserved','consumed','expired','revoked')),
+    reservation_id   TEXT,
+    expires_at       TEXT    NOT NULL,
+    payload_json     TEXT    NOT NULL CHECK (json_valid(payload_json)),
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_risk_tokens_open ON risk_approval_tokens(expires_at)
+    WHERE state IN ('issued','reserved');
+CREATE INDEX idx_risk_tokens_decision ON risk_approval_tokens(decision_id);
+```
+
+`state` plus `reservation_id` make an approval **single-use and atomically reservable**:
+the reservation is taken before execution, so the same token cannot authorise two
+orders.
+
+#### `risk_decision_snapshots`
+
+```sql
+CREATE TABLE risk_decision_snapshots (
+    record_id        TEXT    PRIMARY KEY,
+    record_type      TEXT    NOT NULL,
+    config_hash      TEXT    NOT NULL,
+    payload_json     TEXT    NOT NULL CHECK (json_valid(payload_json)),
+    occurred_at      TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_risk_snapshots_config ON risk_decision_snapshots(config_hash, occurred_at DESC);
+```
+
+`config_hash` binds every snapshot to the exact policy version that produced it, so a
+decision can be re-evaluated against the rules that actually applied at the time rather
+than against today's.
+
+#### `risk_audit_records`
+
+Hash-chained, append-only. The tamper-evident spine of the domain.
+
+```sql
+CREATE TABLE risk_audit_records (
+    record_id        TEXT    PRIMARY KEY,
+    sequence         INTEGER NOT NULL UNIQUE,
+    event_type       TEXT    NOT NULL,
+    payload_json     TEXT    NOT NULL CHECK (json_valid(payload_json)),
+    evidence_refs_json TEXT  NOT NULL CHECK (json_valid(evidence_refs_json)),
+    config_hash      TEXT    NOT NULL,
+    decision_id      TEXT,
+    occurred_at      TEXT    NOT NULL,
+    previous_hash    TEXT    NOT NULL,
+    record_hash      TEXT    NOT NULL UNIQUE,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_risk_audit_decision ON risk_audit_records(decision_id) WHERE decision_id IS NOT NULL;
+CREATE INDEX idx_risk_audit_seq      ON risk_audit_records(sequence DESC);
+```
+
+`previous_hash` → `record_hash` chains every record, so a deleted or edited decision
+breaks the chain and is detectable. `sequence` is `UNIQUE`, so a gap is visible too.
+
+---
+
+#### Target-only tables
+
+The following have **no live counterpart** and are not built. They are Tier B work and
+carry no conformance obligation until a feature requires them.
+
+##### `risk_limits`
+
+```sql
+CREATE TABLE risk_limits (
+    limit_id         TEXT    PRIMARY KEY,
+    config_hash      TEXT    NOT NULL REFERENCES risk_policy_versions(config_hash) ON DELETE RESTRICT,
+    limit_type       TEXT    NOT NULL CHECK (limit_type IN (
+                        'max_position_size','max_notional','max_leverage','max_open_positions',
+                        'max_daily_loss','max_drawdown','max_concentration','max_slippage_bps',
+                        'max_order_rate','max_correlation','min_free_margin')),
+    scope_key        TEXT    NOT NULL DEFAULT '',
+    threshold_decimal TEXT   NOT NULL,
+    threshold_unit   TEXT    NOT NULL CHECK (threshold_unit IN ('absolute','percent','bps','count','ratio')),
+    breach_action    TEXT    NOT NULL CHECK (breach_action IN ('reject','reduce','halt','kill_switch','warn')),
+    enabled          INTEGER NOT NULL DEFAULT 1 CHECK (enabled IN (0,1)),
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    UNIQUE (config_hash, limit_type, scope_key)
+) STRICT;
+
+CREATE INDEX idx_risk_limits_policy ON risk_limits(config_hash, limit_type) WHERE enabled = 1;
+```
+
+Normalises individual rules out of `risk_policy_versions.payload_json` so limits can be
+queried and reported on. Until this exists, limit inspection means parsing JSON.
+
+##### `risk_limit_checks`
+
+```sql
+CREATE TABLE risk_limit_checks (
+    check_seq        INTEGER PRIMARY KEY,
+    decision_id      TEXT    NOT NULL,
+    limit_id         TEXT,
+    limit_type       TEXT    NOT NULL,
+    observed_decimal TEXT    NOT NULL,
+    threshold_decimal TEXT   NOT NULL,
+    passed           INTEGER NOT NULL CHECK (passed IN (0,1)),
+    headroom_decimal TEXT,
+    evaluated_at     TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_risk_checks_decision ON risk_limit_checks(decision_id);
+CREATE INDEX idx_risk_checks_breach   ON risk_limit_checks(limit_type, evaluated_at DESC) WHERE passed = 0;
+```
+
+One row per limit evaluated per decision — the evidence trail behind a verdict.
+`decision_id` is a soft reference because it may name either an eligibility or an
+allocation decision.
+
+##### `risk_exposure_snapshots`
+
+```sql
+CREATE TABLE risk_exposure_snapshots (
+    snapshot_id      TEXT    PRIMARY KEY,
+    scope_level      TEXT    NOT NULL CHECK (scope_level IN ('account','portfolio','strategy','symbol','asset_class')),
+    scope_key        TEXT    NOT NULL,
+    gross_notional_decimal TEXT NOT NULL,
+    net_notional_decimal   TEXT NOT NULL,
+    open_positions   INTEGER NOT NULL DEFAULT 0,
+    used_margin_decimal    TEXT NOT NULL,
+    free_margin_decimal    TEXT NOT NULL,
+    unrealized_pnl_decimal TEXT NOT NULL,
+    peak_equity_decimal    TEXT NOT NULL,
+    current_drawdown_decimal TEXT NOT NULL,
+    breakdown_json   TEXT    NOT NULL DEFAULT '{}' CHECK (json_valid(breakdown_json)),
+    is_current       INTEGER NOT NULL DEFAULT 1 CHECK (is_current IN (0,1)),
+    observed_at      TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE UNIQUE INDEX idx_risk_exposure_current
+    ON risk_exposure_snapshots(scope_level, scope_key) WHERE is_current = 1;
+CREATE INDEX idx_risk_exposure_history
+    ON risk_exposure_snapshots(scope_level, scope_key, observed_at DESC);
+```
+
 ### Shared configuration
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |

@@ -644,6 +644,36 @@ infrastructure primitives are not bounded public operations under this rule.
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `util_` (reserved).
+
+#### Utils owns no tables — by design
+
+`app/utils/` is the shared utility framework, imported by every domain. Giving it
+write-ownership of state would invert the dependency direction of the whole system.
+`docs/PROJECT.md` §5 has no Utils row for exactly that reason.
+
+An earlier draft of this model defined seven `util_*` tables. **All are withdrawn.**
+Each was either already owned elsewhere or actively harmful:
+
+| Withdrawn | Why it is not needed |
+|---|---|
+| `util_logs` | `app/utils/logging/logger.py` writes through `_SafeRotatingFileHandler` to rotating files. A database log table would make the logger depend on Data, which depends on the logger — a cycle, and a poor fit for log volume. |
+| `util_metrics` | Same dependency inversion. Operational metrics belong outside the transactional store. |
+| `util_tasks` | Duplicates `data_update_jobs`, which already carries `next_run_at`, `interval_seconds`, `enabled`, `state`, `last_run_status`, `lease_owner`, `lease_expires_at`, and `recovery_state`. |
+| `util_task_runs` | Duplicates `data_backfill_checkpoints`, which already records committed ranges, record counts, content hashes, and publication state per chunk. |
+| `util_health_checks` | Health is computed on demand by `app/services/api/health/probes.py`. Storing a current-state snapshot invites serving a stale one. |
+| `util_settings` | Bootstrap configuration is resolved from the central JSON/process sources and typed settings objects. Versioned, non-secret user and post-connection system settings share the UI/API-owned `api_settings` table; Utils remains stateless and cannot depend on Data. |
+| `util_feature_flags` | No feature-flag mechanism exists in this system. The table described a capability that was never requested. |
+
+Durable cross-domain audit is already `data_audit_events`.
+
+The `util_` prefix stays **ratified but unused** (D1). Reserving it costs nothing and
+avoids re-litigating namespace ownership if Utils ever does acquire state.
+
+---
+
 ### 5.1 Normative implementation policy
 
 The following rules remove implementation ambiguity without adding public

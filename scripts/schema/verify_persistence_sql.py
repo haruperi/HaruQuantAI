@@ -15,7 +15,7 @@ the next such rename fails here instead.
 
 Run from anywhere::
 
-    python docs/schema/verify_persistence_sql.py
+    python scripts/schema/verify_persistence_sql.py
 
 Exits non-zero when a referenced table has no creating statement.
 """

@@ -1496,6 +1496,338 @@ collection and executed directly.
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `agentic_`.
+
+> **This domain follows the live implementation.** Agentic ships thirteen tables
+> across five migration steps. An earlier draft of this model proposed seven
+> different tables (`agentic_agents`, `agentic_tools`, `agentic_tool_grants`,
+> `agentic_model_profiles`, `agentic_traces`, `agentic_trace_spans`,
+> `agentic_llm_calls`) of which only two names overlapped what exists. The model now
+> records what is built; the seven are target-only.
+
+#### Workflow orchestration — step `001`
+
+##### `agentic_workflow_runs`
+
+```sql
+CREATE TABLE agentic_workflow_runs (
+    run_id TEXT PRIMARY KEY,
+    task_id TEXT NOT NULL,
+    workflow_name TEXT NOT NULL,
+    workflow_version TEXT NOT NULL,
+    state TEXT NOT NULL,
+    current_node TEXT NOT NULL,
+    sequence INTEGER NOT NULL,
+    revision INTEGER NOT NULL,
+    attempts INTEGER NOT NULL,
+    idempotency_key TEXT NOT NULL UNIQUE,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    deadline_at TEXT NOT NULL,
+    terminal_reason TEXT,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT ''
+) STRICT;
+```
+
+Durable orchestration state. `revision` is the expected-version guard and `idempotency_key` is `UNIQUE`, so a resubmitted task resumes rather than forking a second run.
+
+##### `agentic_workflow_checkpoints`
+
+```sql
+CREATE TABLE agentic_workflow_checkpoints (
+    checkpoint_id TEXT PRIMARY KEY,
+    task_id TEXT NOT NULL,
+    workflow_name TEXT NOT NULL,
+    workflow_version TEXT NOT NULL,
+    node_id TEXT NOT NULL,
+    sequence INTEGER NOT NULL,
+    state TEXT NOT NULL,
+    expected_version INTEGER NOT NULL,
+    state_payload_hash TEXT NOT NULL,
+    canonical_hash TEXT NOT NULL,
+    contract_version TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    workflow_id TEXT NOT NULL,
+    causation_id TEXT,
+    schema_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    correlation_id TEXT NOT NULL DEFAULT ''
+) STRICT;
+```
+
+`workflow_version` and `node_id` are what make a resume unambiguous: without them a checkpoint cannot say which node of which workflow definition it belongs to, and a resume after the graph changed would replay against the wrong shape.
+
+#### Evidence and memory — step `002`
+
+##### `agentic_evidence_claims`
+
+```sql
+CREATE TABLE agentic_evidence_claims (
+    claim_id TEXT PRIMARY KEY,
+    task_id TEXT NOT NULL,
+    statement TEXT NOT NULL,
+    source_ref TEXT NOT NULL,
+    source_trust TEXT NOT NULL,
+    licence_ref TEXT NOT NULL,
+    available_at TEXT NOT NULL,
+    observed_at TEXT NOT NULL,
+    content_hash TEXT NOT NULL,
+    injection_status TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+) STRICT;
+```
+
+`injection_status` and `source_trust` keep retrieved text out of instruction slots. Untrusted content is evidence, never instruction — the structural defence against prompt injection.
+
+##### `agentic_memory_records`
+
+```sql
+CREATE TABLE agentic_memory_records (
+    record_id TEXT PRIMARY KEY,
+    store_class TEXT NOT NULL,
+    task_id TEXT NOT NULL,
+    author_role_id TEXT NOT NULL,
+    content_json TEXT NOT NULL,
+    scope_json TEXT NOT NULL,
+    source_evidence_refs_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    expires_at TEXT,
+    retention_class TEXT NOT NULL,
+    sensitivity TEXT NOT NULL,
+    injection_status TEXT NOT NULL,
+    redacted_paths_json TEXT NOT NULL,
+    content_hash TEXT NOT NULL,
+    supersedes TEXT,
+    correlation_id TEXT NOT NULL DEFAULT ''
+) STRICT;
+```
+
+`redacted_paths_json` records what was removed before persistence; redact-before-persist is a control, not an oversight. `supersedes` appends corrections rather than overwriting, so what the agent previously believed survives.
+
+#### Artefact lifecycle — step `003`
+
+##### `agentic_lifecycle_transitions`
+
+```sql
+CREATE TABLE agentic_lifecycle_transitions (
+    artifact_hash TEXT NOT NULL,
+    sequence INTEGER NOT NULL,
+    record_id TEXT NOT NULL UNIQUE,
+    artifact_id TEXT NOT NULL,
+    previous_state TEXT,
+    state TEXT NOT NULL,
+    packet_hash TEXT,
+    termination_reason TEXT,
+    unresolved_concerns_json TEXT NOT NULL,
+    actor_id TEXT NOT NULL,
+    rationale TEXT NOT NULL,
+    recorded_at TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    PRIMARY KEY (artifact_hash, sequence)
+) STRICT;
+```
+
+The composite primary key is the enforcement point: an artefact's history is append-only because position `n` can be written exactly once.
+
+##### `agentic_promotion_packets`
+
+```sql
+CREATE TABLE agentic_promotion_packets (
+    packet_hash TEXT PRIMARY KEY,
+    packet_id TEXT NOT NULL,
+    task_id TEXT NOT NULL,
+    artifact_hash TEXT NOT NULL,
+    artifact_json TEXT NOT NULL,
+    experiment_verdict_json TEXT NOT NULL,
+    sweep_verdict_json TEXT NOT NULL,
+    critique_json TEXT NOT NULL,
+    simulation_manifest_ref TEXT NOT NULL,
+    lifetime_trial_ceiling INTEGER NOT NULL,
+    approver_id TEXT NOT NULL,
+    approval_environment TEXT NOT NULL,
+    assembled_at TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+) STRICT;
+```
+
+`lifetime_trial_ceiling` and `approval_environment` bound a promotion at the point of approval rather than at the point of use.
+
+#### Operations — step `004`
+
+##### `agentic_operations_traces`
+
+```sql
+CREATE TABLE agentic_operations_traces (
+    trace_hash TEXT PRIMARY KEY,
+    trace_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    task_id TEXT NOT NULL,
+    run_id TEXT NOT NULL,
+    spans_json TEXT NOT NULL,
+    redacted_paths_json TEXT NOT NULL,
+    record_count INTEGER NOT NULL,
+    observed_cost TEXT NOT NULL,
+    assembled_at TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+) STRICT;
+```
+
+Keyed on the trace digest, so re-assembling the same evidence yields the same row rather than a duplicate view of it. `observed_cost` is `TEXT` Decimal, never `REAL`.
+
+##### `agentic_operations_incidents`
+
+```sql
+CREATE TABLE agentic_operations_incidents (
+    incident_id TEXT PRIMARY KEY,
+    task_id TEXT NOT NULL,
+    run_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    trigger TEXT NOT NULL,
+    containment_action TEXT NOT NULL,
+    contained_state TEXT NOT NULL,
+    quarantined_role_id TEXT,
+    checkpoint_ref TEXT NOT NULL,
+    preserved_evidence_refs_json TEXT NOT NULL,
+    detected_at TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    UNIQUE (run_id, correlation_id, kind)
+) STRICT;
+```
+
+`UNIQUE (run_id, correlation_id, kind)` is the enforcement point: a second containment cannot quietly replace the first and its evidence.
+
+##### `agentic_operations_replays`
+
+```sql
+CREATE TABLE agentic_operations_replays (
+    replay_id TEXT PRIMARY KEY,
+    run_id TEXT NOT NULL,
+    task_id TEXT NOT NULL,
+    environment TEXT NOT NULL,
+    requested_by TEXT NOT NULL,
+    requested_at TEXT NOT NULL,
+    verified_references_json TEXT NOT NULL,
+    side_effects_attempted INTEGER NOT NULL,
+    executed INTEGER NOT NULL,
+    completed_at TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+) STRICT;
+```
+
+`side_effects_attempted` is a count and `executed` is a boolean. The immutable-reference list and completion time preserve the replay outcome rather than only its request.
+
+#### Experimentation — step `005`
+
+##### `agentic_experiment_specs`
+
+```sql
+CREATE TABLE agentic_experiment_specs (
+    spec_id TEXT PRIMARY KEY,
+    task_id TEXT NOT NULL,
+    thesis_id TEXT NOT NULL,
+    spec_hash TEXT NOT NULL UNIQUE,
+    seed INTEGER NOT NULL,
+    embargo_seconds INTEGER NOT NULL,
+    baseline_ref TEXT NOT NULL,
+    cost_model_ref TEXT NOT NULL,
+    falsification_outcome TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT ''
+) STRICT;
+```
+
+`spec_hash` is `UNIQUE`, so an identical pre-registered protocol cannot be registered twice under two identities.
+
+##### `agentic_experiment_runs`
+
+```sql
+CREATE TABLE agentic_experiment_runs (
+    run_id TEXT PRIMARY KEY,
+    spec_hash TEXT NOT NULL,
+    task_id TEXT NOT NULL,
+    evidence_class TEXT NOT NULL,
+    request_hash TEXT NOT NULL,
+    config_hash TEXT NOT NULL,
+    engine_version TEXT NOT NULL,
+    journal_ref TEXT NOT NULL,
+    artifact_manifest_ref TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT ''
+) STRICT;
+```
+
+`evidence_class` separates exploratory from confirmatory evidence at the row level.
+
+##### `agentic_experiment_holdout_use`
+
+```sql
+CREATE TABLE agentic_experiment_holdout_use (
+    spec_hash TEXT PRIMARY KEY,
+    task_id TEXT NOT NULL,
+    run_id TEXT NOT NULL,
+    consumed_at TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+) STRICT;
+```
+
+Keyed on `spec_hash` alone: a second look at holdout for the same pre-registered protocol cannot be recorded, so it cannot be performed. This is the strongest overfitting control in the system.
+
+##### `agentic_experiment_verdicts`
+
+```sql
+CREATE TABLE agentic_experiment_verdicts (
+    verdict_id TEXT PRIMARY KEY,
+    spec_id TEXT NOT NULL,
+    spec_hash TEXT NOT NULL,
+    task_id TEXT NOT NULL,
+    outcome TEXT NOT NULL,
+    holdout_consumed INTEGER NOT NULL,
+    canonical_hash TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT ''
+) STRICT;
+```
+
+`holdout_consumed` travels with the verdict, so a conclusion that spent the holdout is never mistaken for one that did not.
+
+---
+
+#### Target-only tables
+
+No live counterpart; not built. They would give Agentic a registry of agent
+identities, model profiles, tool grants, and per-call cost accounting.
+
+`agentic_agents` · `agentic_model_profiles` · `agentic_tools` ·
+`agentic_tool_grants` · `agentic_traces` · `agentic_trace_spans` ·
+`agentic_llm_calls`
+
+Their column definitions are omitted rather than carried as unbuilt DDL. The
+safety controls they encoded — permission classes that exclude mutation, tool
+names that cannot express an order or kill-switch capability, wildcard scopes
+that are unrepresentable — are enforced today in `app/agentic/permissions/`
+rather than by schema.
+
+---
+
 ### Configuration and Limits Manifest
 
 `_settings.py` owns the package-wide typed settings and inherits the central Utils

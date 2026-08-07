@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Localize database specifications to owning domains
+
+Database current state, target models, indexes, and reconciliation now live with their owning domain authorities while shared storage architecture remains centralized.
+
+#### Changed (1)
+
+- Folded the centralized schema documentation into each owning package README, relocated its verification gates to `scripts/schema/`, and removed `docs/schema/` as a second domain authority.
+
 ### Remediate Portfolio audit controls
 
 Portfolio now has complete requirement usage evidence, an authoritative migration

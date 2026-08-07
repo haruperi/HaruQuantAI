@@ -1,6 +1,6 @@
 """Risk-owned migration definitions executed by Data infrastructure.
 
-Conformed to the authoritative schema model in ``docs/schema`` (Domain 6). The
+Conformed to the authoritative schema model in ``app/services/risk/README.md``. The
 step has never been applied to a database, so the definition is edited in place
 rather than extended by a follow-on migration; see ``FR-RISK-069`` through
 ``FR-RISK-072``.

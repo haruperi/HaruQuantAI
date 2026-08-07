@@ -1,6 +1,6 @@
 """Research-owned artifact metadata migration definitions.
 
-Conformed to the authoritative schema model in ``docs/schema`` (Domain 11). The
+Conformed to the authoritative schema model in ``app/services/research/README.md``. The
 step has never been applied to a database, so the definition is edited in place
 rather than extended by a follow-on migration; see ``FR-RES-105`` and
 ``FR-RES-106``.

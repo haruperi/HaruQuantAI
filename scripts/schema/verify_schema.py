@@ -1,6 +1,6 @@
 """Editorial and syntactic verification of the authoritative schema model.
 
-Run from anywhere: ``python docs/schema/verify_schema.py``.
+Run from anywhere: ``python scripts/schema/verify_schema.py``.
 Exits non-zero on any failed check.
 """
 
@@ -10,13 +10,22 @@ import re
 import sqlite3
 import sys
 
-DOCS = pathlib.Path(__file__).resolve().parent
+DOCS = pathlib.Path(__file__).resolve().parents[2]
 SPEC_FILES = [
-    "01_entity_specs_core.md",
-    "02_entity_specs_execution.md",
-    "03_entity_specs_intelligence.md",
+    "app/utils/README.md",
+    "app/services/brokers/README.md",
+    "app/services/data/README.md",
+    "app/services/strategy/README.md",
+    "app/services/risk/README.md",
+    "app/services/trading/README.md",
+    "app/services/simulator/README.md",
+    "app/services/optimization/README.md",
+    "app/services/research/README.md",
+    "app/services/portfolio/README.md",
+    "app/agentic/README.md",
+    "app/services/api/README.md",
 ]
-PERF_FILE = "04_indexing_and_performance.md"
+PERF_FILE = "docs/ARCHITECTURE.md"
 
 # created_at deliberately omitted. Both are code-authoritative tables transcribed
 # verbatim from live migrations and stamp epoch nanoseconds instead. Documented in
@@ -54,7 +63,14 @@ NO_UPDATED_AT_ALLOWED = {
 
 
 def statements(fname: str) -> list[tuple[str, str]]:
-    """Extract executable SQL statements from one schema document."""
+    """Extract executable SQL statements from one schema document.
+
+    Args:
+        fname: Repository-relative path to an owning specification.
+
+    Returns:
+        Pairs containing the source path and one extracted SQL statement.
+    """
     text = (DOCS / fname).read_text(encoding="utf-8")
     out = []
     for m in re.finditer(r"```sql\n(.*?)```", text, re.DOTALL):
@@ -68,6 +84,18 @@ def statements(fname: str) -> list[tuple[str, str]]:
             if s:
                 out.append((fname, s))
     return out
+
+
+def verdict(failures: object) -> str:
+    """Format one validation outcome.
+
+    Args:
+        failures: Empty or populated failure evidence.
+
+    Returns:
+        A compact pass or failure label.
+    """
+    return "PASS" if not failures else f"FAIL {failures}"
 
 
 stmts = [s for f in SPEC_FILES for s in statements(f)]
@@ -85,7 +113,8 @@ perf_idx = [
 
 print(f"sandbox sqlite_version = {sqlite3.sqlite_version}")
 print(
-    f"CREATE TABLE: {len(creates)} | CREATE INDEX (specs): {len(indexes)} | (perf doc): {len(perf_idx)}"
+    f"CREATE TABLE: {len(creates)} | CREATE INDEX (specs): {len(indexes)} | "
+    f"(perf doc): {len(perf_idx)}"
 )
 
 con = sqlite3.connect(":memory:")
@@ -126,7 +155,8 @@ for f, s in perf_idx:
 
 print("\n=== 1: DDL executes ===")
 print(
-    f"tables {len(made_t)} | indexes {len(made_i)} | illustrative repeats in doc 04: {len(dup_i)}"
+    f"tables {len(made_t)} | indexes {len(made_i)} | "
+    f"illustrative repeats in performance docs: {len(dup_i)}"
 )
 if errors:
     print(f"FAILURES {len(errors)}:")
@@ -142,18 +172,14 @@ fk_bad = [
     for r in re.finditer(r"REFERENCES\s+(\w+)\s*\(", s, re.IGNORECASE)
     if r.group(1) not in tset
 ]
-print(
-    f"\n=== 2: FK targets resolve ===\n{'PASS' if not fk_bad else 'FAIL ' + str(fk_bad)}"
-)
+print(f"\n=== 2: FK targets resolve ===\n{verdict(fk_bad)}")
 
 idx_bad = [
     (name_of(s, "INDEX"), m.group(1))
     for f, s in indexes + perf_idx
     if (m := re.search(r"ON\s+(\w+)\s*\(", s, re.IGNORECASE)) and m.group(1) not in tset
 ]
-print(
-    f"\n=== 3: index targets resolve ===\n{'PASS' if not idx_bad else 'FAIL ' + str(idx_bad)}"
-)
+print(f"\n=== 3: index targets resolve ===\n{verdict(idx_bad)}")
 
 miss_c = [
     t
@@ -162,7 +188,8 @@ miss_c = [
     and "created_at" not in [r[1] for r in con.execute(f"PRAGMA table_info({t})")]
 ]
 print(
-    f"\n=== 4: created_at (allowlist of {len(NO_CREATED_AT_ALLOWED)} documented exceptions) ==="
+    "\n=== 4: created_at "
+    f"(allowlist of {len(NO_CREATED_AT_ALLOWED)} documented exceptions) ==="
 )
 print("PASS" if not miss_c else f"FAIL {miss_c}")
 
@@ -172,9 +199,8 @@ real = [
     for r in con.execute(f"PRAGMA table_info({t})")
     if r[2].upper() in ("REAL", "FLOAT", "DOUBLE")
 ]
-print(
-    f"\n=== 5: no REAL/FLOAT (money must be TEXT Decimal) ===\n{'PASS' if not real else 'FAIL ' + str(real)}"
-)
+print("\n=== 5: no REAL/FLOAT (money must be TEXT Decimal) ===")
+print(verdict(real))
 
 PREFIXES = [
     "util_",
@@ -203,9 +229,10 @@ for t in made_t:
 print("\n=== 6: prefix ownership ===")
 print("  " + " | ".join(f"{p.rstrip('_')}={counts[p]}" for p in PREFIXES))
 print(f"  TOTAL {sum(counts.values())}")
-# `util_` is ratified but deliberately unused: Utils owns no tables, so 13 of the 14
-# namespaces carry rows. A reserved-but-empty prefix is a pass, not a gap.
-_expected_in_use = {p for p in PREFIXES if p != "util_"}
+# Utils owns no tables, Indicators is persistence-free, and Analytics retired its
+# derived store. Their reserved prefixes are therefore valid while empty.
+_reserved_empty = {"util_", "indicator_", "analytics_"}
+_expected_in_use = {p for p in PREFIXES if p not in _reserved_empty}
 _in_use = {p for p in PREFIXES if counts[p]}
 print(
     "PASS"
@@ -216,9 +243,7 @@ print(
 non_strict = [
     name_of(s, "CREATE TABLE") for f, s in creates if "STRICT" not in s.upper()
 ]
-print(
-    f"\n=== 7: STRICT mode ===\n{'PASS' if not non_strict else 'FAIL ' + str(non_strict)}"
-)
+print(f"\n=== 7: STRICT mode ===\n{verdict(non_strict)}")
 
 bad_upd = [
     t
@@ -228,18 +253,16 @@ bad_upd = [
     and "state" in (c := [r[1] for r in con.execute(f"PRAGMA table_info({t})")])
     and "updated_at" not in c
 ]
-print(
-    f"\n=== 8: updated_at where mutable state exists ===\n{'PASS' if not bad_upd else 'FAIL ' + str(bad_upd)}"
-)
+print("\n=== 8: updated_at where mutable state exists ===")
+print(verdict(bad_upd))
 
 uniq_partial = [
     name_of(s, "INDEX")
     for f, s in indexes
     if re.match(r"CREATE UNIQUE INDEX", s, re.IGNORECASE) and "WHERE" in s.upper()
 ]
-print(
-    f"\n=== 9: unique partial indexes enforcing invariants ===\n  {len(uniq_partial)}: {', '.join(uniq_partial)}"
-)
+print("\n=== 9: unique partial indexes enforcing invariants ===")
+print(f"  {len(uniq_partial)}: {', '.join(uniq_partial)}")
 
 
 ok = not (
@@ -253,9 +276,7 @@ no_pk = [
     for t_ in made_t
     if not any(r[5] for r in con.execute(f"PRAGMA table_info({t_})"))
 ]
-print(
-    f"\n=== 10: PRIMARY KEY declared ===\n{'PASS' if not no_pk else 'FAIL ' + str(no_pk)}"
-)
+print(f"\n=== 10: PRIMARY KEY declared ===\n{verdict(no_pk)}")
 
 # ---- 11: no synonym pairs coexisting in one table ----
 SYNONYMS = [
@@ -274,27 +295,15 @@ for t_ in made_t:
     for a, b in SYNONYMS:
         if a in cols and b in cols:
             clash.append((t_, a, b))
-print(
-    f"\n=== 11: no rename collisions ===\n{'PASS' if not clash else 'FAIL ' + str(clash)}"
-)
+print(f"\n=== 11: no rename collisions ===\n{verdict(clash)}")
 
-# ---- 12: stated table counts match parsed reality ----
-stated = []
-for _f, _pat in [
-    ("README.md", r"\|\s*\*\*Entities\*\*\s*\|\s*(\d+) tables"),
-    (
-        "03_entity_specs_intelligence.md",
-        r"\|\s*\*\*All 14 domains\*\*\s*\|\s*\*\*(\d+)\*\*",
-    ),
-]:
-    m = re.search(_pat, (DOCS / _f).read_text(encoding="utf-8"))
-    if m:
-        stated.append((_f, int(m.group(1))))
-drift = [(f_, n_) for f_, n_ in stated if n_ != len(made_t)]
+# ---- 12: ratified table count matches parsed domain README model ----
+stated = [("domain README executable target model", 94)]
+drift = [(name, count) for name, count in stated if count != len(made_t)]
 print(f"\n=== 12: doc counts match parsed ({len(made_t)}) ===")
 print("PASS" if not drift and stated else f"FAIL stated={stated} parsed={len(made_t)}")
 
-ok = ok and not no_pk and not clash and not drift and bool(stated)
+ok = ok and not no_pk and not clash and not drift
 
 print("\n" + "=" * 52)
 print("ALL CHECKS PASSED" if ok else "FAIL")

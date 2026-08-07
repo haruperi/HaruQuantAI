@@ -1,9 +1,9 @@
 """Optimization-owned additive schema definitions executed by Data.
 
-Conformed to the authoritative schema model in ``docs/schema`` (Domain 10). The
-step has never been applied to a database, so the definition is edited in place
-rather than extended by a follow-on migration; see ``FR-OPT-070`` and
-``FR-OPT-071``.
+Conformed to the authoritative schema model in
+``app/services/optimization/README.md``. The step has never been applied to
+a database, so the definition is edited in place rather than extended by a
+follow-on migration; see ``FR-OPT-070`` and ``FR-OPT-071``.
 
 The model adopts this domain's shape rather than the reverse. A search is
 identified by ``search_id`` and its ranked candidates are stored as a payload;

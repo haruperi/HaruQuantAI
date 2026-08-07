@@ -1348,6 +1348,26 @@ this immutable, non-repainting production surface.
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `indicator_`.
+
+> Prefix `indicator_` is ratified (D1) and recorded in `docs/ARCHITECTURE.md`.
+
+Indicators owns no target database entities. Migration
+`001_indicator_schema_v1` historically introduced three empty support tables:
+`indicator_definitions`, `indicator_param_sets`, and
+`indicator_materializations`. Migration
+`002_remove_unused_indicator_support_schema` retired those tables transactionally
+with a fail-closed non-empty-row guard.
+
+Indicator calculations are stateless and read-only. Registry definitions,
+parameters, results, manifests, availability evidence, and formula versions are
+represented by the Indicators public contracts and are not persisted by this
+domain.
+
+---
+
 | Status | Requirement ID | Type | Responsibility | Verification |
 |---|---|---|---|---|
 | Completed | `NFR-INDI-001` | Architecture | The package shall remain a pure, persistence-free calculation domain with no broker, network, filesystem, cache, audit-sink, telemetry-export, or mutable registry I/O. | `tests/indicators/unit/test_import_boundaries.py` (dependency surface, forbidden-I/O, cross-domain, registry-import, and import-side-effect guards) |

@@ -3,7 +3,7 @@
 > **Status:** Documented non-feature support directory — CRUD statement construction only.
 
 Canonical five-file layout for the one Brokers-owned table, `broker_symbol_map`
-(`docs/schema` decision D10):
+(the Brokers README database specification):
 
 - `create.py` — insert one bitemporal mapping (`max_rows=1`).
 - `read.py` — forward, reverse, and as-of bounded reads (`max_rows=1`).

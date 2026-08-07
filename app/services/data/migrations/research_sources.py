@@ -1,6 +1,6 @@
 """Data-owned immutable research-source schema migration.
 
-Conformed to the authoritative schema model in ``docs/schema`` (Domain 3). Both
+Conformed to the authoritative schema model in ``app/services/data/README.md``. Both
 steps have never been applied to a database, so the definitions are edited in
 place rather than extended by follow-on migrations; see ``FR-DATA-152``.
 """

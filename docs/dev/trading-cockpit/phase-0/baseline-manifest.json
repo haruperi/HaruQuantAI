@@ -1,0 +1,547 @@
+{
+  "baseline_id": "HQA-TC-P0-20260807T075707Z-3b039544",
+  "captured_at_utc": "2026-08-07T07:57:07Z",
+  "work_package": "TC-IMP-BASE-01",
+  "prompt_id": "HQA-TC-PHASE0-AUDIT-001",
+  "prompt_version": "1.0",
+  "repository_root": "C:\\Users\\rharu\\AppDev\\HaruQuantAI",
+  "branch": "main",
+  "head_sha": "3b039544b7812a78f140530d39e744421eac1396",
+  "head_short_sha": "3b039544",
+  "upstream": {
+    "remote": "origin",
+    "url_sanitized": "https://github.com/haruperi/HaruQuantAI.git",
+    "tracking_branch": "origin/main",
+    "ahead": 70,
+    "behind": 0,
+    "credentials_in_url": false
+  },
+  "worktree_state": {
+    "clean_after_eol_normalization": true,
+    "raw_porcelain_modified_paths": 1969,
+    "content_modified_paths": 0,
+    "staged_paths": 0,
+    "untracked_non_ignored_paths": 0,
+    "deleted_paths": 0,
+    "renamed_paths": 0,
+    "submodules": [],
+    "git_lfs_in_use": false,
+    "eol_condition": {
+      "core_autocrlf": "false",
+      "index_eol": "lf",
+      "worktree_eol": "crlf",
+      "explanation": "Windows checkout with core.autocrlf=false makes git status report every tracked text file as modified. git -c core.autocrlf=input status --porcelain=v1 --untracked-files=all returns zero lines.",
+      "verification_command": "git -c core.autocrlf=input status --porcelain=v1 --untracked-files=all",
+      "classification": "PRE_EXISTING_REPOSITORY_CONDITION_NOT_OWNER_CHANGE"
+    }
+  },
+  "pre_existing_changes": {
+    "PRE_EXISTING_STAGED_CHANGE": [],
+    "PRE_EXISTING_TRACKED_CHANGE": [],
+    "PRE_EXISTING_UNTRACKED_FILE": [],
+    "PRE_EXISTING_IGNORED_ARTIFACT": [
+      ".coverage",
+      ".coverage-analytics.json",
+      ".mypy_cache/",
+      ".pytest_cache/",
+      ".ruff_cache/",
+      ".uv-cache/",
+      "tmp_uv_cache/",
+      "uv-cache/",
+      "htmlcov/",
+      ".venv/",
+      "build/",
+      "artifacts/",
+      "data/",
+      "app/ui/node_modules/",
+      "app/ui/.next/",
+      "app/ui/dist/",
+      "app/ui/coverage/"
+    ],
+    "owner_changes_overwritten": 0,
+    "note": "No pre-existing owner content change exists on this checkout. The branch is 70 commits ahead of origin/main; those commits were not touched."
+  },
+  "toolchain": {
+    "target_platform": {
+      "os": "Windows",
+      "evidence": ".venv/pyvenv.cfg home = C:\\Python314 ; .github/workflows/ci.yml runs-on: windows-latest",
+      "python_version": "3.14.3",
+      "uv_version_that_created_venv": "0.11.23"
+    },
+    "audit_platform": {
+      "os": "Linux 6.8.0-124-generic",
+      "arch": "x86_64",
+      "shell": "bash",
+      "python_version": "3.14.5",
+      "python_source": "downloaded by uv into /tmp/uvpy (outside the repository)",
+      "uv_version": "0.11.19"
+    },
+    "requires_python": ">=3.14",
+    "application_version": "2.2.11",
+    "package_name": "haruquantai",
+    "dependency_manager": "uv",
+    "resolved_packages": 125,
+    "linter": "ruff",
+    "formatter": "ruff format",
+    "type_checker": "mypy (strict = true, strict_equality_for_none = true)",
+    "test_runner": "pytest (--strict-markers, --strict-config, --import-mode=importlib)",
+    "coverage": "coverage.py (branch = true, source = app, fail_under = 80)",
+    "ci_entrypoint": "uv run python scripts/ci_check.py"
+  },
+  "package_metadata_files": [
+    "pyproject.toml",
+    "uv.lock",
+    ".pre-commit-config.yaml",
+    ".github/workflows/ci.yml"
+  ],
+  "lockfiles": [
+    {
+      "path": "uv.lock",
+      "sha256": "8ace32aa212299c27a9b67c9fc9b4c5f9a1fcbdc426504e88341c2766a200d60",
+      "consistency_check": "uv lock --check",
+      "consistency_exit_code": 0,
+      "status": "CONSISTENT"
+    }
+  ],
+  "configuration_hashes": [
+    {
+      "path": "pyproject.toml",
+      "sha256": "482cee6b2f9dd8986a9634860f6869f011c314332cd7eea8116772ef65dc20fa"
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "sha256": "29b265423c2a0fad83ebda2a51affa02b7ac0a5af4db83b40acef77546922c3c"
+    }
+  ],
+  "migration_state": {
+    "engine": "SQLite (STRICT tables)",
+    "tooling": "code-defined per-domain migration manifests applied under ledger verification, an explicit write lock and checksum validation",
+    "external_migration_tool": null,
+    "migrations_applied_during_phase_0": false,
+    "database_opened_during_phase_0": false,
+    "discovery_method": "static read of app/**/migrations/*.py",
+    "create_table_statements": 103,
+    "logical_tables": 94,
+    "indexes": 103,
+    "per_domain": {
+      "data": {
+        "modules": [
+          "core.py",
+          "economic_calendar.py",
+          "economic_event_definitions.py",
+          "research_sources.py",
+          "runtime_stores.py"
+        ],
+        "create_table_statements": 22,
+        "logical_tables": 21
+      },
+      "risk": {
+        "modules": [
+          "definitions.py"
+        ],
+        "create_table_statements": 14,
+        "logical_tables": 7,
+        "note": "seven live tables each paired with a __new rebuild table"
+      },
+      "agentic": {
+        "modules": [
+          "experiment.py",
+          "lifecycle.py",
+          "memory.py",
+          "operations.py",
+          "workflow.py",
+          "manifest.py"
+        ],
+        "create_table_statements": 13,
+        "logical_tables": 13
+      },
+      "api": {
+        "modules": [
+          "definitions.py"
+        ],
+        "create_table_statements": 12,
+        "logical_tables": 12
+      },
+      "strategy": {
+        "modules": [
+          "definitions.py"
+        ],
+        "create_table_statements": 11,
+        "logical_tables": 11,
+        "note": "four _v2 families coexist with their originals"
+      },
+      "trading": {
+        "modules": [
+          "definitions.py"
+        ],
+        "create_table_statements": 9,
+        "logical_tables": 8,
+        "note": "trading_positions__new rebuild in flight with a different primary key; plus one migration guard table"
+      },
+      "portfolio": {
+        "modules": [
+          "definitions.py",
+          "runner.py"
+        ],
+        "create_table_statements": 7,
+        "logical_tables": 7
+      },
+      "analytics": {
+        "modules": [
+          "definitions.py"
+        ],
+        "create_table_statements": 6,
+        "logical_tables": 6
+      },
+      "indicators": {
+        "modules": [
+          "definitions.py"
+        ],
+        "create_table_statements": 3,
+        "logical_tables": 3
+      },
+      "optimization": {
+        "modules": [
+          "definitions.py"
+        ],
+        "create_table_statements": 2,
+        "logical_tables": 2
+      },
+      "simulator": {
+        "modules": [
+          "definitions.py"
+        ],
+        "create_table_statements": 2,
+        "logical_tables": 2
+      },
+      "brokers": {
+        "modules": [
+          "definitions.py"
+        ],
+        "create_table_statements": 1,
+        "logical_tables": 1
+      },
+      "research": {
+        "modules": [
+          "definitions.py"
+        ],
+        "create_table_statements": 1,
+        "logical_tables": 1
+      },
+      "utils": {
+        "modules": [],
+        "create_table_statements": 0,
+        "logical_tables": 0
+      }
+    }
+  },
+  "source_documents": [
+    {
+      "path": "docs/dev/trading-cockpit/Trading_Cockpit_Game_Specification_v1.2.md",
+      "document_id": "TCS-TRADING-COCKPIT-001",
+      "version": "1.2",
+      "lines": 2941,
+      "sha256": "b460f314f0fdf6827af381278f917648ad36f3f82c9f27942e04b0ebbc97889c",
+      "role": "normative end-state specification"
+    },
+    {
+      "path": "docs/dev/trading-cockpit/Trading_Cockpit_Phased_Implementation_Plan_v1.0.md",
+      "document_id": "HQA-TCS-IMP-001",
+      "version": "1.0",
+      "lines": 1671,
+      "sha256": "e65fa81834be2dd6dbb5764a27d962dc70de9566f303bfafcd0a2ee68ac2d818",
+      "role": "implementation order and domain ownership"
+    },
+    {
+      "path": "docs/dev/trading-cockpit/Trading_Cockpit_Phase_0_Audit_Prompt.md",
+      "document_id": "HQA-TC-PHASE0-AUDIT-001",
+      "version": "1.0",
+      "lines": 1189,
+      "sha256": "8396968162fd80fbf7ffe45f4df272e97bad1c9676affbf77717aeaf686de252",
+      "role": "this audit's instruction set"
+    }
+  ],
+  "blocked_by_missing_source": false,
+  "write_boundary": {
+    "chosen_path": "docs/dev/trading-cockpit/phase-0/",
+    "rationale": "The repository places development programme documentation under docs/dev/ and both Trading Cockpit source documents already live in docs/dev/trading-cockpit/. TC-IMP-BASE-09 of the audit prompt names this exact path.",
+    "alternative_in_prompt_section_4_3": "docs/trading-cockpit/phase-0/",
+    "collisions_with_existing_files": 0,
+    "files_created_outside_boundary": 0,
+    "phase_0_created_artifacts": [
+      "docs/dev/trading-cockpit/phase-0/README.md",
+      "docs/dev/trading-cockpit/phase-0/baseline-manifest.json",
+      "docs/dev/trading-cockpit/phase-0/repository-baseline.md",
+      "docs/dev/trading-cockpit/phase-0/current-state-domain-inventory.md",
+      "docs/dev/trading-cockpit/phase-0/trading-cockpit-traceability-matrix.md",
+      "docs/dev/trading-cockpit/phase-0/trading-cockpit-traceability-matrix.csv",
+      "docs/dev/trading-cockpit/phase-0/trading-cockpit-contract-registry.md",
+      "docs/dev/trading-cockpit/phase-0/trading-cockpit-contract-registry.csv",
+      "docs/dev/trading-cockpit/phase-0/trading-cockpit-gap-matrix.md",
+      "docs/dev/trading-cockpit/phase-0/trading-cockpit-gap-matrix.csv",
+      "docs/dev/trading-cockpit/phase-0/trading-cockpit-database-ownership.md",
+      "docs/dev/trading-cockpit/phase-0/trading-cockpit-test-baseline.md",
+      "docs/dev/trading-cockpit/phase-0/trading-cockpit-safety-baseline.md",
+      "docs/dev/trading-cockpit/phase-0/trading-cockpit-change-control.md",
+      "docs/dev/trading-cockpit/phase-0/phase-0-findings-and-decisions.md"
+    ],
+    "phase_0_updated_artifacts": [],
+    "deliberate_omissions": [
+      {
+        "artifact": "ADR-0001-extend-existing-domains-for-trading-cockpit.md",
+        "reason": "AGENTS.md section 4 (Decision Hygiene) prohibits standalone ADR and decision-record documents. The repository owner directed that AGENTS.md takes precedence over the audit prompt on this point. The decision, rejected alternative and consequences are recorded in phase-0-findings-and-decisions.md section 9 (D-10) and as rule 1 of trading-cockpit-change-control.md."
+      }
+    ],
+    "gitignore_exclusion": {
+      "issue": ".gitignore line 634 (*.csv) excludes all three machine-readable Phase 0 artifacts",
+      "affected": [
+        "docs/dev/trading-cockpit/phase-0/trading-cockpit-gap-matrix.csv",
+        "docs/dev/trading-cockpit/phase-0/trading-cockpit-traceability-matrix.csv",
+        "docs/dev/trading-cockpit/phase-0/trading-cockpit-contract-registry.csv"
+      ],
+      "verified_with": "git check-ignore -v",
+      "files_exist_on_disk": true,
+      "row_sets_identical_to_markdown_twins": true,
+      "action_taken": "none - editing .gitignore is a configuration change outside the Phase 0 write boundary",
+      "owner_decision": "D-11"
+    }
+  },
+  "validation_commands": [
+    {
+      "validation": "lock consistency",
+      "command": "uv lock --check",
+      "exit_code": 0,
+      "result": "PASS",
+      "mutated_files": false
+    },
+    {
+      "validation": "dependency sync (audit env only)",
+      "command": "uv sync --frozen --all-extras --dev",
+      "env": "UV_PROJECT_ENVIRONMENT=/tmp/p0venv",
+      "exit_code": 0,
+      "result": "PASS",
+      "mutated_files": false
+    },
+    {
+      "validation": "ruff lint",
+      "command": "uv run --frozen ruff check .",
+      "exit_code": 1,
+      "result": "FAIL",
+      "findings": 2127,
+      "all_findings_rule": "EXE002 shebang-missing-executable-file",
+      "classification": "ENVIRONMENT_ARTIFACT",
+      "reason": "the audit mount presents every file with mode 0755; this rule cannot fire on Windows",
+      "mutated_files": false
+    },
+    {
+      "validation": "ruff format check",
+      "command": "uv run --frozen ruff format --check .",
+      "exit_code": 0,
+      "result": "PASS",
+      "files_already_formatted": 2130,
+      "mutated_files": false
+    },
+    {
+      "validation": "type check",
+      "command": "uv run --frozen mypy",
+      "exit_code": 1,
+      "result": "FAIL",
+      "errors": 1,
+      "source_files_checked": 2091,
+      "pre_existing": true,
+      "detail": "app/agentic/migrations/manifest.py:34:31 error: \"object\" has no attribute \"migration_id\" [attr-defined]",
+      "mutated_files": false
+    },
+    {
+      "validation": "pytest tests/utils",
+      "command": "uv run --frozen pytest tests/utils -q -p no:cacheprovider --no-cov",
+      "exit_code": 1,
+      "passed": 150,
+      "failed": 1,
+      "skipped": 0,
+      "duration_seconds": 23.15,
+      "pre_existing": true,
+      "detail": "tests/utils/integration/test_consumer_isolation.py::test_no_consumer_imports_or_mutates_utils_internals - FileNotFoundError on hardcoded tests/brokers/wf_support.py (line 27) which does not exist",
+      "mutated_files": false
+    },
+    {
+      "validation": "pytest tests/brokers",
+      "command": "uv run --frozen pytest tests/brokers -q -p no:cacheprovider --no-cov",
+      "exit_code": 1,
+      "passed": 432,
+      "failed": 7,
+      "skipped": 0,
+      "duration_seconds": 13.99,
+      "classification": "ENVIRONMENT_ARTIFACT",
+      "reason": "MetaTrader5 is Windows-only; all seven fail with BROKER_DEPENDENCY_MISSING at environment=demo",
+      "mutated_files": false
+    },
+    {
+      "validation": "pytest tests/indicators",
+      "command": "uv run --frozen pytest tests/indicators -q -p no:cacheprovider --no-cov",
+      "exit_code": 1,
+      "passed": 135,
+      "failed": 7,
+      "skipped": 2,
+      "classification": "UNCONFIRMED_ENVIRONMENT_SENSITIVE",
+      "reason": "usage scripts executed as subprocesses; assertion carries no captured reason",
+      "mutated_files": false
+    },
+    {
+      "validation": "pytest tests/portfolio",
+      "command": "uv run --frozen pytest tests/portfolio -q -p no:cacheprovider --no-cov",
+      "exit_code": 1,
+      "passed": 79,
+      "failed": 1,
+      "skipped": 1,
+      "classification": "UNCONFIRMED_ENVIRONMENT_SENSITIVE",
+      "mutated_files": false
+    },
+    {
+      "validation": "pytest tests/risk/unit",
+      "command": "uv run --frozen pytest tests/risk/unit -q -p no:cacheprovider --no-cov",
+      "exit_code": 0,
+      "passed": 186,
+      "failed": 0,
+      "result": "PASS",
+      "mutated_files": false
+    },
+    {
+      "validation": "pytest tests/trading/unit",
+      "command": "uv run --frozen pytest tests/trading/unit -q -p no:cacheprovider --no-cov",
+      "exit_code": 1,
+      "passed": 140,
+      "failed": 1,
+      "pre_existing": true,
+      "detail": "tests/trading/unit/test_workflow_usage_parity.py:113 - WF-TRD-017 does not declare EXECUTION_TARGET: Target = \"sim\"",
+      "safety_relevance": "HIGH",
+      "mutated_files": false
+    },
+    {
+      "validation": "pytest tests/agentic/unit",
+      "command": "uv run --frozen pytest tests/agentic/unit -q -p no:cacheprovider --no-cov",
+      "exit_code": 0,
+      "passed": 1189,
+      "failed": 0,
+      "result": "PASS",
+      "mutated_files": false
+    },
+    {
+      "validation": "full test suite",
+      "command": "uv run --frozen pytest",
+      "result": "BLOCKED",
+      "reason": "audit host caps a single command at approximately 178 seconds and detached background processes do not survive a call (per-call PID namespace); the full suite with coverage did not complete"
+    },
+    {
+      "validation": "coverage",
+      "command": "uv run --frozen pytest --cov=app --cov-fail-under=80",
+      "result": "BLOCKED",
+      "reason": "depends on a complete suite run; a partial figure would be misleading and is not reported"
+    },
+    {
+      "validation": "pre-commit",
+      "command": "pre-commit run --all-files",
+      "result": "DELIBERATELY_SKIPPED",
+      "reason": "the ruff-check hook runs with --fix and the ruff-format hook rewrites files; both are prohibited by the audit scope"
+    },
+    {
+      "validation": "detect-secrets",
+      "command": "detect-secrets scan --baseline .secrets.baseline",
+      "result": "DELIBERATELY_SKIPPED",
+      "reason": "would rewrite .secrets.baseline"
+    },
+    {
+      "validation": "CI gate",
+      "command": "uv run python scripts/ci_check.py",
+      "result": "NOT_EXECUTED",
+      "reason": "not inspected for mutating behavior within this phase"
+    },
+    {
+      "validation": "schema verification",
+      "command": "python docs/schema/verify_schema.py | compare_model_to_code.py | verify_persistence_sql.py",
+      "result": "NOT_EXECUTED",
+      "reason": "not proven read-only; recommended as the first action of Phase 1"
+    },
+    {
+      "validation": "frontend tests",
+      "command": "npm test (app/ui)",
+      "result": "NOT_EXECUTED",
+      "reason": "Node toolchain not provisioned in the audit sandbox"
+    },
+    {
+      "validation": "database migrations",
+      "command": "run_data_migrations / run_domain_migrations",
+      "result": "PROHIBITED",
+      "reason": "explicitly forbidden by the audit scope"
+    },
+    {
+      "validation": "broker write",
+      "command": "place_broker_order and equivalents",
+      "result": "PROHIBITED",
+      "reason": "explicitly forbidden by the audit scope"
+    }
+  ],
+  "safety_environment_summary": {
+    "classification": "PARTIAL",
+    "production_order_submitted": false,
+    "live_account_write_attempted": false,
+    "broker_connection_opened": false,
+    "migration_applied": false,
+    "database_opened": false,
+    "env_file_read_or_modified": false,
+    "secret_written_to_artifact": false,
+    "account_ids_recorded": false,
+    "credentials_in_recorded_urls": false,
+    "trading_routes": [
+      "sim",
+      "paper",
+      "live"
+    ],
+    "broker_environments": [
+      "live",
+      "demo",
+      "testnet",
+      "sandbox"
+    ],
+    "default_allow_live_mutations": false,
+    "non_bypassable_guards": 20,
+    "critical_findings": [
+      "S-1 HIGH: _require_non_production guards standalone provider connections only; registry/factory.py passes config.environment through without an observed assertion",
+      "S-2 HIGH: no cockpit mode exists, so no test can prove a cockpit session is restricted to simulation",
+      "S-3 MEDIUM: the kill switch is a single boolean and cannot preserve risk-reducing actions while locking new exposure",
+      "S-4 MEDIUM: _LiveRuntimeConfig.execution_route cannot express sim",
+      "S-5 MEDIUM: no first-class UNKNOWN order state preserved until reconciliation",
+      "S-6 MEDIUM: no protective-order lifecycle exists at all",
+      "S-7 LOW: app/configs/gcp-oauth.keys.json is tracked; contents not read"
+    ]
+  },
+  "inventory_summary": {
+    "domains_inventoried": 14,
+    "python_files": 910,
+    "python_lines": 198352,
+    "registered_features": 165,
+    "public_exports": 1064,
+    "class_like_public_exports": 0,
+    "test_files": 758,
+    "usage_programs": 374,
+    "logical_tables": 94,
+    "requirements_traced": 603,
+    "acceptance_criteria_traced": 40,
+    "checklist_steps_traced": 125,
+    "emergency_steps_traced": 24,
+    "work_packages_classified": 239,
+    "contracts_inventoried": 66
+  },
+  "exit_gate": {
+    "status": "NOT_READY",
+    "blocking_decisions": [
+      "D-1"
+    ],
+    "recommended_before_phase_1": [
+      "D-3",
+      "D-7",
+      "D-11"
+    ],
+    "reason": "All Phase 0 evidence artifacts exist and every exit-gate evidence condition is satisfied. Phase 1 is blocked by decision D-1: the AGENTS.md function-only public API rule and the plan's cross-domain contract registry are incompatible as written."
+  }
+}

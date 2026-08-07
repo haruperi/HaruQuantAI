@@ -1290,6 +1290,287 @@ the two authoritative sources; alert delivery never mutates either owner truth.
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `api_`.
+
+#### `api_accounts`
+
+```sql
+CREATE TABLE api_accounts (
+    account_id       TEXT    PRIMARY KEY,
+    username         TEXT    NOT NULL UNIQUE,
+    email            TEXT    NOT NULL UNIQUE,
+    password_hash    TEXT    NOT NULL,
+    password_algo    TEXT    NOT NULL DEFAULT 'argon2id',
+    mfa_enabled      INTEGER NOT NULL DEFAULT 0 CHECK (mfa_enabled IN (0,1)),
+    mfa_secret_ref   TEXT,
+    state            TEXT    NOT NULL CHECK (state IN ('pending','active','suspended','locked','closed')),
+    failed_attempts  INTEGER NOT NULL DEFAULT 0,
+    locked_until     TEXT,
+    last_login_at    TEXT,
+    password_changed_at TEXT NOT NULL,
+    environment      TEXT    NOT NULL CHECK (environment IN ('dev','test','staging','production')),
+    verified         INTEGER NOT NULL DEFAULT 0 CHECK (verified IN (0,1)),
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    deleted_at       TEXT
+) STRICT;
+
+CREATE INDEX idx_api_accounts_active ON api_accounts(username) WHERE state = 'active';
+```
+
+`mfa_secret_ref` is a key path, not the secret. `password_hash` stores an Argon2id
+digest; the plaintext never reaches the database, a log, or an exception payload
+(`AGENTS.md` §3).
+
+#### `api_roles` / `api_permissions` / `api_role_permissions` / `api_role_bindings`
+
+```sql
+CREATE TABLE api_roles (
+    role_id          TEXT    PRIMARY KEY,
+    role_name        TEXT    NOT NULL UNIQUE,
+    description      TEXT    NOT NULL DEFAULT '',
+    is_system        INTEGER NOT NULL DEFAULT 0 CHECK (is_system IN (0,1)),
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE TABLE api_permissions (
+    permission_id    TEXT    PRIMARY KEY,
+    permission_key   TEXT    NOT NULL UNIQUE,            -- 'trading:orders:read'
+    domain           TEXT    NOT NULL,
+    action           TEXT    NOT NULL CHECK (action IN ('read','write','execute','approve','admin')),
+    is_mutating      INTEGER NOT NULL DEFAULT 0 CHECK (is_mutating IN (0,1)),
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    CHECK (permission_key NOT LIKE '%*%')
+) STRICT;
+
+CREATE TABLE api_role_permissions (
+    role_id          TEXT    NOT NULL REFERENCES api_roles(role_id) ON DELETE RESTRICT,
+    permission_id    TEXT    NOT NULL REFERENCES api_permissions(permission_id) ON DELETE RESTRICT,
+    granted_at       TEXT    NOT NULL,
+    granted_by       TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    PRIMARY KEY (role_id, permission_id)
+) STRICT, WITHOUT ROWID;
+
+CREATE TABLE api_role_bindings (
+    binding_id       TEXT    PRIMARY KEY,
+    account_id       TEXT    NOT NULL REFERENCES api_accounts(account_id) ON DELETE RESTRICT,
+    role_id          TEXT    NOT NULL REFERENCES api_roles(role_id) ON DELETE RESTRICT,
+    scope_key        TEXT    NOT NULL DEFAULT '',
+    granted_by       TEXT    NOT NULL,
+    expires_at       TEXT,
+    revoked_at       TEXT,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    UNIQUE (account_id, role_id, scope_key)
+) STRICT;
+
+CREATE INDEX idx_api_bindings_account ON api_role_bindings(account_id) WHERE revoked_at IS NULL;
+```
+
+Wildcard permission keys are rejected, matching the Agentic grant rule. `is_mutating`
+lets the middleware apply stricter checks to write paths without re-parsing the key.
+The shipped additive `api-0005` migration references the immutable baseline account
+key `api_accounts.user_id` rather than this target model's `account_id`. It otherwise
+implements these four normalized RBAC relations. The old account claim JSON columns
+remain dormant compatibility fields because rebuilding the account baseline would
+require business attributes the current identity feature does not own.
+
+#### `api_keys`
+
+```sql
+CREATE TABLE api_keys (
+    key_id           TEXT    PRIMARY KEY,
+    account_id       TEXT    NOT NULL REFERENCES api_accounts(account_id) ON DELETE RESTRICT,
+    key_prefix       TEXT    NOT NULL UNIQUE,            -- displayable, e.g. 'hq_live_a1b2'
+    key_hash         TEXT    NOT NULL UNIQUE,            -- SHA-256 of full key
+    label            TEXT    NOT NULL DEFAULT '',
+    scopes_json      TEXT    NOT NULL DEFAULT '[]' CHECK (json_valid(scopes_json)),
+    allowed_ips_json TEXT    NOT NULL DEFAULT '[]' CHECK (json_valid(allowed_ips_json)),
+    rate_limit       INTEGER NOT NULL DEFAULT 60,
+    last_used_at     TEXT,
+    expires_at       TEXT    NOT NULL,
+    revoked_at       TEXT,
+    revoked_reason   TEXT,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    CHECK (scopes_json NOT LIKE '%"*"%')
+) STRICT;
+
+CREATE INDEX idx_api_keys_lookup  ON api_keys(key_hash) WHERE revoked_at IS NULL;
+CREATE INDEX idx_api_keys_account ON api_keys(account_id, created_at DESC);
+CREATE INDEX idx_api_keys_expiry  ON api_keys(expires_at) WHERE revoked_at IS NULL;
+```
+
+Only the hash is stored — a database disclosure yields no usable credential.
+`expires_at` is `NOT NULL`: keys that never expire become permanent liabilities.
+
+#### `api_sessions`
+
+```sql
+CREATE TABLE api_sessions (
+    session_id       TEXT    PRIMARY KEY,
+    account_id       TEXT    NOT NULL REFERENCES api_accounts(account_id) ON DELETE RESTRICT,
+    session_token_hash TEXT  NOT NULL UNIQUE,
+    transport        TEXT    NOT NULL CHECK (transport IN ('http','websocket')),
+    client_ip        TEXT    NOT NULL,
+    user_agent       TEXT    NOT NULL DEFAULT '',
+    subscriptions_json TEXT  NOT NULL DEFAULT '[]' CHECK (json_valid(subscriptions_json)),
+    state            TEXT    NOT NULL CHECK (state IN ('active','idle','expired','revoked')),
+    last_seen_at     TEXT    NOT NULL,
+    expires_at       TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    csrf_digest      TEXT,
+    revoked_at       TEXT,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_api_sessions_active ON api_sessions(account_id) WHERE state = 'active';
+CREATE INDEX idx_api_sessions_ws     ON api_sessions(last_seen_at)
+    WHERE transport = 'websocket' AND state = 'active';
+CREATE INDEX idx_api_sessions_expiry ON api_sessions(expires_at) WHERE state IN ('active','idle');
+```
+
+#### `api_audit_log`
+
+```sql
+CREATE TABLE api_audit_log (
+    audit_seq        INTEGER PRIMARY KEY,
+    account_id       TEXT,
+    actor_kind       TEXT    NOT NULL CHECK (actor_kind IN ('user','api_key','agent','system')),
+    actor_id         TEXT    NOT NULL,
+    action           TEXT    NOT NULL,
+    resource_kind    TEXT    NOT NULL,
+    resource_id      TEXT,
+    outcome          TEXT    NOT NULL CHECK (outcome IN ('allowed','denied','error')),
+    reason_code      TEXT,
+    http_method      TEXT,
+    http_path        TEXT,
+    http_status      INTEGER,
+    client_ip        TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    detail_json      TEXT    NOT NULL DEFAULT '{}' CHECK (json_valid(detail_json)),
+    bucket_month     TEXT    NOT NULL,
+    occurred_at      TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    CHECK (outcome = 'allowed' OR reason_code IS NOT NULL)
+) STRICT;
+
+CREATE INDEX idx_api_audit_account ON api_audit_log(account_id, occurred_at DESC);
+CREATE INDEX idx_api_audit_denied  ON api_audit_log(occurred_at DESC) WHERE outcome = 'denied';
+CREATE INDEX idx_api_audit_bucket  ON api_audit_log(bucket_month, actor_kind);
+CREATE INDEX idx_api_audit_corr    ON api_audit_log(correlation_id);
+```
+
+#### `api_idempotency`
+
+```sql
+CREATE TABLE api_idempotency (
+    idempotency_key  TEXT    PRIMARY KEY,
+    account_id       TEXT    NOT NULL,
+    scope_key        TEXT    NOT NULL,
+    endpoint         TEXT    NOT NULL,
+    request_hash     TEXT    NOT NULL,
+    response_status  INTEGER,
+    response_json    TEXT CHECK (response_json IS NULL OR json_valid(response_json)),
+    state            TEXT    NOT NULL CHECK (state IN ('in_flight','completed','failed')),
+    expires_at       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_api_idem_expiry ON api_idempotency(expires_at);
+```
+
+#### Further shipped tables
+
+Four API tables ship today and were absent from an earlier draft of this model.
+
+##### `api_approvals`
+
+```sql
+CREATE TABLE api_approvals (
+    approval_id TEXT PRIMARY KEY,
+    issuer_id TEXT NOT NULL,
+    subject_id TEXT NOT NULL,
+    scope TEXT NOT NULL,
+    evidence_hash TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    consumed_at TEXT
+) STRICT;
+```
+
+Human sign-off records for governed mutations. An approval is evidence, not a permission: it names what was approved and by whom, and is consumed once.
+
+##### `api_auth_failures`
+
+```sql
+CREATE TABLE api_auth_failures (
+    username_hash TEXT PRIMARY KEY,
+    failure_count INTEGER NOT NULL,
+    window_started_at TEXT NOT NULL,
+    locked_until TEXT
+) STRICT;
+```
+
+Failed authentication attempts, feeding lockout policy. Kept separate from `api_audit_log` so a brute-force sweep cannot flood the audit trail.
+
+##### `api_credentials`
+
+```sql
+CREATE TABLE api_credentials (
+    reference TEXT PRIMARY KEY,
+    owner_id TEXT NOT NULL,
+    key_id TEXT NOT NULL,
+    nonce_b64 TEXT NOT NULL,
+    ciphertext_b64 TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    version INTEGER NOT NULL
+) STRICT;
+```
+
+Encrypted credential material. `nonce_b64` and `ciphertext_b64` are stored apart from `key_id`, so ciphertext alone is useless; plaintext never reaches this table (`AGENTS.md` §3).
+
+##### `api_settings`
+
+```sql
+CREATE TABLE api_settings (
+    scope TEXT NOT NULL CHECK (scope IN ('system', 'user')),
+    subject_id TEXT NOT NULL CHECK (subject_id <> ''),
+    settings_json TEXT NOT NULL CHECK (
+        json_valid(settings_json) AND json_type(settings_json) = 'object'
+    ),
+    version INTEGER NOT NULL CHECK (version >= 1),
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    updated_by TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    PRIMARY KEY (scope, subject_id),
+    CHECK (
+        (scope = 'system' AND subject_id = 'global')
+        OR (scope = 'user' AND subject_id <> 'global')
+    )
+) STRICT, WITHOUT ROWID;
+```
+
+One versioned, secret-safe document shape serves per-account preferences and the
+single global post-connection system scope. User identities and the global subject
+are derived by authenticated API operations rather than accepted from request data.
+Database connection/bootstrap values and credentials remain outside this table
+because they are required before it can be reached.
+---
+
 ### Shared configuration and limits
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |

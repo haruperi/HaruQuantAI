@@ -688,9 +688,9 @@ Portfolio collaboration is contract-governed:
 
 * **Data Layout Conventions**: Core cross-module database tracking identifiers must use `TEXT` format. SQLite boolean fields enforce strict `0` or `1` constraints. JSON text structures map to an explicit `*_json` suffix name.
 * **Precision Standard**: Structural or broker-critical price, size, volume, and balance mathematics must bypass standard floating-point operations. Requires `decimal.Decimal` parsing to ensure transaction immutability.
-* **Authoritative Schema Model**: [`docs/schema/`](schema/README.md) is the authoritative cross-domain database schema model. It is canonical for storage tiers, the target table and column model across all 14 domains, prefix ownership, universal column conventions, indexing and Parquet policy, and the reconciliation record between target and live schema. It is not canonical for current-state feature registries (owning package `README.md`) or executable schema (owning domain migration definitions), and it authorises no migration.
-* **Table Namespace Prefixes**: Each persistent domain uses an owner-specific singular-full-word namespace: `util_`, `broker_`, `data_`, `indicator_`, `strategy_`, `risk_`, `trading_`, `sim_`, `optimization_`, `research_`, `portfolio_`, `agentic_`, and `api_`. `sim_` is canonical for Simulator and current code plus the inspected non-production database use `sim_runs`; the declared `sim_sessions` step remains unapplied in that inspected database. Analytics is read-only and has no current tables; its historical `analytics_` store is retired by complete-manifest migration step `002`. The target namespace set is defined in `docs/schema/`; exact current table names belong only in the owning domain README/migrations.
-* **Target vs Current Divergence**: A new table must conform to the schema model. An existing table that diverges is a documented state recorded in `docs/schema/05_reconciliation.md` with an adoption tier, not a defect to be silently migrated away. Closing a divergence requires an additive migration or an explicit baseline reset approval.
+* **Authoritative Schema Model**: Each owning package README's `### Persistence - Database` section is authoritative for that domain's current and target table model, prefix ownership, domain indexes, and target-vs-live reconciliation. This document remains canonical for cross-domain relationships, universal column conventions, storage tiers, and shared SQLite/Parquet policy. Executable schema remains in owning-domain migration definitions.
+* **Table Namespace Prefixes**: Each persistent domain uses an owner-specific singular-full-word namespace: `util_`, `broker_`, `data_`, `indicator_`, `strategy_`, `risk_`, `trading_`, `sim_`, `optimization_`, `research_`, `portfolio_`, `agentic_`, and `api_`. `sim_` is canonical for Simulator and current code plus the inspected non-production database use `sim_runs`; the declared `sim_sessions` step remains unapplied in that inspected database. Analytics is read-only and has no current tables; its historical `analytics_` store is retired by complete-manifest migration step `002`. Exact current and target table names belong only in the owning domain README and migrations.
+* **Target vs Current Divergence**: A new table must conform to its owning README model. An existing table that diverges is documented in that README with an adoption tier, not silently migrated away. Closing a divergence requires an additive migration or explicit baseline-reset approval.
 * **Migration Invariance**: Database tracking updates via additive structure migrations. Modifying applied structural migrations is prohibited without an explicit baseline reset approval.
 * **Migration Definition Location**: Immutable schema definitions live in `app/services/<domain>/migrations/` — one migration package per domain, aggregating that domain's schema. Migrations are schema evolution, not CRUD, and remain outside the domain `persistence/` package. Sites that predate this rule are non-conformant. Relocation is an import-path refactor, not a ledger risk: a step checksum is computed over its ordered SQL statements only, and the ledger keys on `(domain, migration_id)`, so neither module path nor file name is an input. The invariants a move must preserve are the statement tuple byte-for-byte, including whitespace, and the literal `domain` and `migration_id` values.
 * **Normalise vs Payload**: A field becomes a typed column only when it is filtered or joined on, enforceable by a `CHECK` constraint, or part of a unique key. Everything else is carried in a single `*_json` payload validated by `json_valid`, with frequently queried inner keys exposed as indexed generated columns rather than promoted to real columns. This keeps constraint enforcement where it earns its cost while allowing payload evolution without an additive migration.
@@ -794,3 +794,1361 @@ uv run mypy .
 # Unit Testing & Coverage Gates
 uv run pytest --cov=app --cov-fail-under=80
 ```
+
+## Database Architecture, Performance, and Reconciliation
+
+The owning domain README is canonical for each domain's current and target tables. The following system-level material is canonical only for cross-domain relationships, universal storage conventions, shared performance policy, and cross-domain reconciliation.
+
+> **AUTHORITATIVE — target schema model.** Canonical for cross-domain schema
+> structure and the target table/column model. Current-state feature registries remain
+> in each owning package `README.md`; executable schema remains in the owning domain's
+> migration definitions. Divergences are recorded in
+> [05_reconciliation.md](05_reconciliation.md). See [README.md](README.md) for the full
+> authority statement.
+**Target engine:** SQLite **3.37.0+** — the binding requirement is `STRICT` tables
+(3.37.0). Generated columns need 3.31, `json_valid` 3.9, partial indexes 3.8,
+`WITHOUT ROWID` 3.8.2, so `STRICT` sets the floor. Verified: the full DDL executes on
+SQLite 3.37.2.
+**Design basis:** `docs/ARCHITECTURE.md` L645–651 (Data Models & Schema Management).
+
+---
+
+## 0. Storage tiers — SQLite is not the data store
+
+**No bulk numeric series is stored in SQLite.** The database holds system state and a
+catalog of what exists elsewhere. Three tiers:
+
+| Tier | Holds | Medium |
+|---|---|---|
+| **Broker (MT5)** | Live and historical market data, on demand | Remote API. Default source. Nothing persisted. |
+| **Parquet** | Ranges pinned for reproducibility: bars, ticks, indicator outputs, research features, equity-curve points | Content-addressed `artifact-{sha256}`, flat layout, atomic temp-then-rename |
+| **Sidecar manifest** | The authoritative record of each artifact — `StorageManifest` JSON written beside the file | One `.json` per artifact |
+| **SQLite** | System state, decisions, orders, configuration — and a **rebuildable index** over the sidecar manifests | Single file + WAL |
+
+Consequences that shape everything below:
+
+- `data_ticks` and `data_candles` **do not exist as tables.** Their replacements are
+  `data_datasets` (logical dataset registry) and `data_partition_files` (per-file
+  manifest with SHA-256 and min/max timestamps).
+- No `FOREIGN KEY` can point at a price row, because there are no price rows. Joins
+  against market data happen in pandas/Arrow after a catalog-driven file selection.
+- **The sidecar manifest is authoritative; the SQLite catalog is a derived index (D8).**
+  `data_datasets` and `data_partition_files` may be dropped and rebuilt by rescanning
+  the artifact tree. The reverse is not true — a lost sidecar is unrecoverable. That
+  asymmetry is the reason for the ordering: a corrupt index is a rebuild, a corrupt
+  manifest is data loss.
+- Integrity between catalog and file is therefore checkable rather than assumed:
+  `content_hash` + `verify_state` on `data_partition_files` are compared against the
+  sidecar and the bytes, and an unverifiable partition fails closed rather than being
+  read.
+- Four domains that would otherwise hold 10⁷–10⁹ rows now hold hundreds:
+  Data, Indicators, Research, Analytics.
+
+---
+
+## 1. Ownership model
+
+The database is a **single SQLite file**, logically partitioned into 14 owner
+namespaces. There is no shared mutable table: every table has exactly one owning
+domain, and cross-domain reads occur through the owning domain's public API — never
+through a foreign schema's tables directly.
+
+| # | Domain | Prefix | Persists | Write pattern |
+|---|--------|--------|----------|---------------|
+| 1 | Utils | `util_` ¹ | **Nothing — stateless by design.** Prefix reserved, unused | — |
+| 2 | Brokers | `broker_` ¹ | Symbol mapping only — stateless by design (D10) | Bitemporal reference |
+| 3 | Data | `data_` | Symbols, sessions, providers, **Parquet catalog** | Catalog upsert |
+| 4 | Indicators | `indicator_` ¹ | **Nothing — stateless by design.** Historical prefix reserved, unused | — |
+| 5 | Strategy | `strategy_` | Definitions, versions, configs, checkpoints | Versioned immutable |
+| 6 | Risk | `risk_` | Limits, policies, decisions, kill switches | **Hash-chained append** |
+| 7 | Trading | `trading_` | Orders, fills, positions, transitions | **Event-sourced** |
+| 8 | Simulator | `sim_` ² | Backtest runs, latency/slippage models; journal is JSONL, not a table | Append + projection |
+| 9 | Analytics | `analytics_` ¹ (historical) | **Nothing — read-only by design.** | — |
+| 10 | Optimization | `optimization_` | Jobs, trials, hyperparameter states | Append + checkpoint |
+| 11 | Research | `research_` | Studies, artifacts, feature defs, regimes | Append + content-addressed |
+| 12 | Portfolio | `portfolio_` | Allocations, cash, rebalances | Versioned + outbox |
+| 13 | Agentic | `agentic_` | Agents, traces, tools, LLM costs, memory | **Append-only, high volume** |
+| 14 | UI-API | `api_` | Accounts, RBAC, API keys, sessions, scoped user/system settings, audit | Versioned upsert + append audit |
+
+¹ **Ratified (D1).** `util_`, `broker_`, `indicator_`, and `analytics_` follow the
+singular-full-word convention of the existing prefixes and are recorded in
+`docs/ARCHITECTURE.md`.
+
+² **Resolved (D2).** `sim_` is canonical. The `simulation_runs` form in
+`app/services/simulator/state/migrations.py` has never been applied to a database, so
+aligning it is a code edit and a checksum recompute, not a ledger event.
+
+---
+
+## 2. Dependency direction
+
+Arrows point from dependent to dependency. **The graph is acyclic.** No domain may
+declare a foreign key into a domain that transitively depends on it.
+
+```
+                        ┌──────────────┐
+                        │  1. Utils    │  (settings, logging, flags)
+                        └──────┬───────┘
+                               │  every domain reads; none writes back
+   ┌───────────────────────────┼───────────────────────────┐
+   │                           │                           │
+┌──▼──────────┐         ┌──────▼──────┐            ┌───────▼──────┐
+│ 2. Brokers  │────────▶│  3. Data    │◀───────────│  14. UI-API  │
+│ symbol map  │  feeds  │  catalog    │            │ auth / RBAC  │
+└──┬──────────┘         └──────┬──────┘            └───────┬──────┘
+   │                           │                           │
+   │                    ┌──────▼───────┐                   │
+   │                    │4. Indicators │                   │
+   │                    │ stateless calc│                  │
+   │                    └──────┬───────┘                   │
+   │                           │                           │
+   │                    ┌──────▼───────┐                   │
+   │                    │ 5. Strategy  │                   │
+   │                    │  signals     │                   │
+   │                    └──────┬───────┘                   │
+   │                           │                           │
+   │                    ┌──────▼───────┐                   │
+   │                    │  6. Risk     │  ◀── approval gate │
+   │                    │  admission   │      (mandatory)   │
+   │                    └──────┬───────┘                   │
+   │                           │                           │
+   └───────────────────▶┌──────▼───────┐                   │
+        execution        │ 7. Trading   │                   │
+                         │ orders/fills │                   │
+                         └──┬────────┬──┘                   │
+                            │        │                      │
+              ┌─────────────▼──┐  ┌──▼─────────────┐        │
+              │ 8. Simulator   │  │ 12. Portfolio  │        │
+              │ (mirrors 7)    │  │ allocation     │        │
+              └─────────┬──────┘  └──┬─────────────┘        │
+                        │            │                      │
+                     ┌──▼────────────▼──┐                   │
+                     │  9. Analytics    │                   │
+                     │  metrics / PnL   │                   │
+                     └──┬────────────┬──┘                   │
+                        │            │                      │
+        ┌───────────────▼──┐    ┌────▼──────────┐           │
+        │ 10. Optimization │    │ 11. Research  │           │
+        │ param search     │    │ features/regimes│         │
+        └───────────────┬──┘    └────┬──────────┘           │
+                        │            │                      │
+                     ┌──▼────────────▼──┐                   │
+                     │  13. Agentic     │◀──────────────────┘
+                     │  AI orchestration│   governed tool calls only
+                     └──────────────────┘
+```
+
+### Layer summary
+
+| Layer | Domains | Role |
+|---|---|---|
+| **L0 Foundation** | Utils | Cross-cutting. Depended on by all; depends on none. |
+| **L1 Ingress** | Brokers, Data | External world → canonical storage. |
+| **L2 Derivation** | Indicators | Deterministic transforms of L1. Fully recomputable. |
+| **L3 Decision** | Strategy, Risk | Intent generation and mandatory admission control. |
+| **L4 Execution** | Trading, Simulator | Live and simulated order lifecycle. Simulator mirrors Trading's shape exactly. |
+| **L5 Aggregation** | Portfolio, Analytics | Position rollup and performance measurement. |
+| **L6 Search** | Optimization, Research | Offline exploration over L5 outputs. |
+| **L7 Orchestration** | Agentic | Reads everything through governed tools; writes only its own namespace. |
+| **Perimeter** | UI-API | Authentication, RBAC, audit. Writes only `api_*`. |
+
+### Indicators persistence history
+
+Indicators owns no target or live database tables. Migration
+`001_indicator_schema_v1` historically introduced `indicator_definitions`,
+`indicator_param_sets`, and `indicator_materializations`; immutable migration
+`002_remove_unused_indicator_support_schema` retired them after verifying that
+all three were empty. Indicator identity and provenance cross domain boundaries
+through versioned contracts and immutable value references, not database foreign
+keys.
+
+---
+
+## 3. Key cross-domain relationships
+
+Cross-domain foreign keys are declared **only where the child cannot be meaningfully
+interpreted without the parent**. Everywhere else, the reference is a soft key
+(`TEXT` id with no `REFERENCES` clause) so a domain can be archived independently.
+
+### 3.1 Hard foreign keys (enforced, `ON DELETE RESTRICT`)
+
+| Child | → Parent | Cardinality | Reason |
+|---|---|---|---|
+| `data_partition_files.dataset_id` | `data_datasets.dataset_id` | N:1 | A file without its dataset has no schema and no semantics. |
+| `data_datasets.symbol_id` | `data_symbols.symbol_id` | N:1 | A price dataset without its instrument spec is uninterpretable. |
+| `data_fetch_log.dataset_id` | `data_datasets.dataset_id` | N:1 | Materialisation must name where it landed. |
+| `research_feature_materializations.feature_id` | `research_features.feature_id` | N:1 | Same. |
+| `strategy_configs.version_id` | `strategy_versions.version_id` | N:1 | Config binds to exactly one code version. |
+| `optimization_trials.job_id` | `optimization_jobs.job_id` | N:1 | Trials are scoped to a job. |
+| `agentic_trace_spans.trace_id` | `agentic_traces.trace_id` | N:1 | Span tree integrity. |
+| `api_api_keys.account_id` | `api_accounts.account_id` | N:1 | Credential must have an owner. |
+| `api_role_bindings.role_id` | `api_roles.role_id` | N:1 | RBAC integrity. |
+
+### 3.2 Soft references (no FK constraint; validated in application code)
+
+| From | → To | Why soft |
+|---|---|---|
+| `trading_orders.strategy_version_id` | `strategy_versions` | Orders must survive strategy retirement for audit. |
+| `trading_orders.risk_decision_id` | `risk_eligibility_decisions` | Risk records are hash-chained and may be archived separately. |
+| `trading_orders.broker_account_id` | broker account identifier | Brokers persists no account table (D10); the id is an opaque provider value carried for audit. |
+| Historical `analytics_metric_values.*` | any L4/L5 source | Retired; Analytics now computes from supplied versioned evidence. |
+| `portfolio_cash_balances.account_id` | broker account identifier | Same — an opaque provider value, not a foreign key. |
+| `agentic_llm_calls.agent_id` | `agentic_agents` | Cost records must survive agent deletion for billing. |
+| `sim_*` → `data_*`, `strategy_*` | — | Simulation runs pin content hashes, not live rows. |
+| `research_feature_materializations.dataset_id` | `data_datasets` | Same guard. |
+| Historical `analytics_equity_curves.dataset_id` | `data_datasets` | Retired with the empty Analytics derived store. |
+| `data_datasets.producer_ref` | Indicators contract identity / `research_features` | Same guard, inverted: Data must not reference downstream domains. |
+
+**Design rule:** if the child is an immutable audit or financial record, the parent
+reference is **always soft**. Deleting a strategy must never cascade into deleting
+evidence that money moved.
+
+---
+
+## 4. The Risk gate
+
+`Risk` is the only mandatory chokepoint in the graph.
+
+```
+strategy_signals ──▶ risk_eligibility_decisions ──▶ trading_orders
+                            │
+                            ├─▶ risk_limit_checks       (one row per limit evaluated)
+                            ├─▶ risk_kill_switch_states (deny-by-default on trip)
+                            └─▶ risk_audit_records      (hash-chained, append-only)
+```
+
+Schema-level enforcement:
+
+- `trading_orders.risk_decision_id` is `NOT NULL`. An order row cannot physically
+  exist without naming a risk decision.
+- `trading_orders.runtime_profile` carries a `CHECK` constraint; combined with a
+  partial unique index, `live` rows are structurally rejected unless the matching
+  decision is present and unexpired.
+- `risk_audit_records` chains `previous_hash` → `record_hash`, so a deleted or
+  edited decision breaks the chain and is detectable.
+
+This mirrors `app/services/risk/migrations/definitions.py` and is intentionally
+unchanged from it.
+
+---
+
+## 5. Simulator ≡ Trading shape parity
+
+`sim_*` execution tables are **column-for-column mirrors** of their `trading_*`
+counterparts, differing only in prefix and the addition of `run_id`.
+
+| Trading | Simulator |
+|---|---|
+| `trading_orders` | `sim_orders` (+ `run_id`) |
+| `trading_positions` | `sim_positions` (+ `run_id`) |
+
+**Rationale:** Analytics computes performance metrics from one shape. If backtest and
+live rows diverge structurally, every metric needs two implementations and the two
+drift apart — which is precisely how backtest overfitting hides. Parity is a
+correctness control, not convenience.
+
+---
+
+## 6. Where the volume went
+
+### 6.1 Series moved out of SQLite entirely
+
+Each is now a Parquet dataset registered in `data_datasets` with one
+`data_partition_files` row per `year=YYYY/month=MM` file.
+
+| Former table | Domain | Est. rows/yr | Now | Catalog row |
+|---|---|---|---|---|
+| `data_ticks` | Data | 10⁹+ | Parquet, monthly | `data_datasets` (kind `tick`) |
+| `data_candles` | Data | 10⁷–10⁸ | Parquet, monthly | `data_datasets` (kind `candle`) |
+| `ind_outputs` | Indicators | 10⁸ | Recomputed on demand or stored by a consuming owner | No Indicators-owned catalogue table |
+| `research_feature_values` | Research | 10⁸ | Parquet | `research_feature_materializations` |
+| Analytics equity-curve points | Analytics | 10⁶ | Upstream supplied artifact/evidence | No Analytics table |
+
+**Order of magnitude.** Ten symbols × ten years of M1 bars is ~37M SQLite rows, versus
+~1,200 catalog rows plus 150–400 MB of Parquet. The catalog fits comfortably in page
+cache; the bars never enter the database at all.
+
+### 6.2 Series that remain in SQLite
+
+These are system records, not market data. They stay because they are queried
+relationally, written transactionally alongside other state, and are orders of
+magnitude smaller.
+
+| Table | Domain | Est. rows/yr | Retention |
+|---|---|---|---|
+| `trading_events` | Trading | 10⁶ | Never purged (regulatory) |
+| `agentic_trace_spans` | Agentic | 10⁷ | TTL 12 months |
+| `api_audit_log` | UI-API | 10⁶ | Never purged |
+
+`agentic_trace_spans` is the one worth watching. If it becomes a size problem it
+follows the same route out — append-only, time-ordered, never joined, which is exactly
+the Parquet profile. Application logs and metrics are already outside the database
+(rotating files), so they are not listed here at all.
+
+---
+
+## 7. Extensibility surface
+
+Every domain that accepts user-defined configuration exposes exactly one
+`*_json TEXT` column guarded by `CHECK(json_valid(...))`, per `ARCHITECTURE.md` L647:
+
+| Table | Column | Holds |
+|---|---|---|
+| `broker_symbol_map` | — | Brokers holds no JSON payload; execution tuning lives in typed settings |
+| `data_datasets` | `arrow_schema_json` | Parquet column names, Arrow types, nullability |
+| `strategy_configs` | `inputs_json` | Strategy parameters |
+| `risk_policies` | `rules_json` | Limit rule tree |
+| `optimization_jobs` | `search_space_json` | Grid/genetic bounds |
+| `research_features` | `spec_json` | Feature transform definition |
+| `agentic_agents` | `manifest_json` | Role manifest, tool grants |
+
+Hot keys are surfaced as indexed `GENERATED ALWAYS AS (json_extract(...)) VIRTUAL`
+columns rather than being queried through `json_extract` at read time.
+
+---
+
+## 8. Universal conventions
+
+Applied to every table in this proposal without exception.
+
+| Concern | Rule |
+|---|---|
+| Identity | `TEXT` UUIDv7 for entities; monotonic `INTEGER` for append-only event logs. |
+| Timestamps | ISO-8601 UTC `TEXT` (`2026-08-03T14:22:05.123456Z`). Lexicographic sort = chronological sort. |
+| Audit | `created_at TEXT NOT NULL` and `updated_at TEXT NOT NULL` on **every** table with mutable state. No bulk-row tables remain in SQLite, so there is no volume-driven exemption. **Two exceptions**, both code-authoritative tables transcribed verbatim from live migrations and both stamping epoch nanoseconds instead: `data_migration_ledger` (`applied_at_ns`) and `data_write_locks` (`acquired_at_ns`, `expires_at_ns`). This model must not diverge from either. |
+| Traceability | `request_id` and/or `correlation_id` on any table whose rows record a decision, a side-effecting mutation, an external interaction, or an audit event — 21 tables. Deliberately **not** on reference, configuration, or derived-output tables, where the identifiers would be noise. |
+| Parquet refs | A table pointing at a materialised dataset carries `dataset_id` (soft ref to `data_datasets`), the `*_hash` of its inputs, a covered range, and a `state` in `building/ready/stale/invalidated/failed`. |
+| Lifecycle | `state TEXT NOT NULL` + `CHECK (state IN (...))` on every stateful entity. |
+| Booleans | `INTEGER NOT NULL CHECK (col IN (0,1))` per `ARCHITECTURE.md` L647. |
+| Money | `TEXT` holding a `decimal.Decimal` string. **Never `REAL`.** Per `ARCHITECTURE.md` L648. |
+| JSON | `TEXT` + `CHECK(json_valid(col))`, `*_json` suffix. |
+| Normalise vs. payload | **The hybrid rule (D9).** A field becomes a typed column only if it is (i) filtered or joined on, (ii) enforceable by a `CHECK`, or (iii) part of a unique key. Everything else stays in one `*_json` payload. Hot inner keys are exposed as indexed `GENERATED ALWAYS AS (json_extract(...)) VIRTUAL` columns rather than promoted to real columns. This keeps constraint enforcement where it earns its cost, without requiring an additive migration for every new parameter under the immutable ledger. |
+| Migration location | **`app/services/<domain>/migrations/` (D12).** One migration package per domain, aggregating that domain's schema definitions. Migrations are schema evolution, not CRUD, and stay outside the `persistence/` package. |
+| Strictness | `STRICT` on all tables (matches `trading_*` and `agentic_*` precedent). |
+| Soft delete | `deleted_at TEXT` (nullable) on config tables. Never on financial records. |
+
+---
+
+## 9. Next
+
+- [01_entity_specs_core.md](01_entity_specs_core.md) — Utils, Brokers, Data, Indicators
+- [02_entity_specs_execution.md](02_entity_specs_execution.md) — Strategy, Risk, Trading, Simulator
+- [03_entity_specs_intelligence.md](03_entity_specs_intelligence.md) — Analytics, Optimization, Research, Portfolio, Agentic, UI-API
+- [04_indexing_and_performance.md](04_indexing_and_performance.md) — Indexes, PRAGMAs, partitioning
+
+> **AUTHORITATIVE — target schema model.** Canonical for cross-domain schema
+> structure and the target table/column model. Current-state feature registries remain
+> in each owning package `README.md`; executable schema remains in the owning domain's
+> migration definitions. Divergences are recorded in
+> [05_reconciliation.md](05_reconciliation.md). See [README.md](README.md) for the full
+> authority statement.
+
+---
+
+## 1. Connection baseline
+
+Applied on every connection open, before any statement.
+
+```sql
+PRAGMA journal_mode   = WAL;          -- readers never block the writer
+PRAGMA synchronous    = NORMAL;       -- WAL-safe; FULL costs ~10x on ingest
+PRAGMA foreign_keys   = ON;           -- OFF by default in SQLite; must be set per connection
+PRAGMA busy_timeout   = 5000;         -- SQLITE_BUSY_TIMEOUT_SECONDS (AGENTS.md §5)
+PRAGMA cache_size     = -262144;      -- 256 MB page cache (negative = KiB)
+PRAGMA mmap_size      = 1073741824;   -- 1 GB memory-mapped I/O
+PRAGMA temp_store     = MEMORY;
+PRAGMA wal_autocheckpoint = 4000;     -- ~16 MB at 4 KiB pages
+PRAGMA analysis_limit = 1000;         -- bounded ANALYZE
+PRAGMA optimize;                      -- on connection CLOSE, not open
+```
+
+**Notes that matter.**
+
+- `foreign_keys = ON` is per-connection and defaults **off**. Every `REFERENCES`
+  clause in this design is inert on a connection that omits it. This is the single
+  most commonly missed line in SQLite deployments.
+- `synchronous = NORMAL` under WAL risks losing the last transaction on OS crash,
+  not corruption. Because no bulk ingest passes through SQLite any more, there is
+  little left to gain from `NORMAL`; use `FULL` on the `trading_*` and `risk_*` write
+  path, where a lost fill is a real financial discrepancy rather than a re-fetchable
+  row.
+- `PRAGMA optimize` belongs on close. Running it on open adds latency to every
+  connection for no benefit.
+
+### Per-workload overrides
+
+| Workload | Overrides |
+|---|---|
+| Catalog write | `synchronous=FULL` — volume is ~1 row per symbol-month, so durability is free |
+| Live execution | `synchronous=FULL`, `busy_timeout=30000` |
+| Backtest read | `query_only=ON` — bars come from Parquet, so SQLite serves catalog lookups only |
+| Migration | `synchronous=FULL`, exclusive write lock (`AGENTS.md` §5) |
+
+---
+
+## 2. Artifact layout (the hypertable substitute)
+
+> **Rewritten in Phase 4A to match `persistence/dataset_writer.py`.** An earlier
+> version of this section specified Hive `year=`/`month=` partitioning, `zstd` level 3,
+> and `DECIMAL(18,8)` prices. The shipped writer does none of those. Rather than change
+> a working write path to match a document, the document now describes what ships — and
+> one of the three turns out to be unnecessary anyway.
+
+### 2.1 What the writer does
+
+`save_market_data` writes **one artifact plus one sidecar manifest**, atomically:
+
+```
+temp file  →  fsync  →  sha256  →  os.replace()  →  manifest written  →  os.replace()
+```
+
+| Property | Value |
+|---|---|
+| Identity | `artifact-{sha256}` — content-addressed |
+| Path | caller-supplied `relative_path`; **no directory partitioning** |
+| Format | `parquet` or `csv` |
+| Compression | pyarrow default |
+| Prices | `Decimal` serialised to `str` |
+| Sidecar | `StorageManifest` JSON beside the file |
+
+### 2.2 Why directory partitioning is unnecessary here
+
+Hive `year=`/`month=` layout exists so that a reader **without an index** can prune by
+path. `idx_data_files_prune` on `(dataset_id, min_ts_utc, max_ts_utc)` does that job
+strictly better: it prunes by the data's actual time range rather than by a filename,
+and it works wherever the file sits.
+
+With a catalog, partitioning by directory buys nothing and costs a rename convention
+that the writer would have to enforce. The flat content-addressed layout is sufficient.
+
+**What is lost:** an external tool pointed at the artifact tree — DuckDB, a bare
+pyarrow dataset — cannot prune without consulting the catalog. That is the price of
+this simplification and it is real.
+
+### 2.3 Prices as strings
+
+`Decimal → str` is **safe**: no float precision loss, which is the property that
+matters for money (`ARCHITECTURE.md` L648). It costs numeric predicate pushdown on
+price columns and some file size, since strings compress less well than a decimal
+logical type.
+
+The canonical policy remains decimal strings. A fixed Parquet `DECIMAL(18,8)` would
+recover both properties but would also introduce a scale and overflow contract that
+the current source and dataset schemas do not define. Native decimal logical types are
+therefore excluded until bounded per-field precision and scale metadata is ratified;
+this is an accepted predicate-pushdown trade-off, not an open schema-programme item.
+
+### 2.4 Immutability
+
+Content-addressing makes artifacts immutable by construction: a changed byte is a
+changed hash, which is a different artifact. There is no `sealed` flag because there is
+nothing to seal — an artifact is never rewritten in place. A repair produces a new
+artifact and a `data_quality_events` row naming what it superseded.
+
+### 2.5 Retention
+
+| Dataset kind | Retention | Rationale |
+|---|---|---|
+| `tick`, `candle` | Indefinite | Expensive to re-source; brokers age out history |
+| `indicator` | Purge after 6 months | Deterministically recomputable from bars plus `formula_hash` |
+| `feature` | Purge on study conclusion | Regenerable from the feature spec |
+| `equity_curve` | Retain with the run | Small, and reruns are expensive |
+
+Purging sets `data_datasets.state = 'purged'` and deletes the files; the catalog row
+survives so a later reader learns the data *existed* and how to rebuild it, rather than
+silently finding nothing.
+
+---
+
+## 3. Market-data read paths
+
+### 3.1 The two-step read
+
+```sql
+-- Step 1: which artifacts cover this range?  (SQLite, sub-millisecond)
+SELECT f.relative_path, f.content_hash, f.format, f.verify_state
+FROM data_partition_files f
+JOIN data_datasets d ON d.dataset_id = f.dataset_id
+WHERE d.dataset_kind = 'candle'
+  AND d.symbol_id = ? AND d.timeframe = ?
+  AND d.state = 'ready'
+  AND f.max_ts_utc >= ? AND f.min_ts_utc <= ?
+ORDER BY f.min_ts_utc;
+```
+
+Served by `idx_data_datasets_lookup` then `idx_data_files_prune`. The overlap predicate
+is `f.max >= start AND f.min <= end` — standard interval intersection. Writing it as
+`f.min_ts_utc BETWEEN ? AND ?` is the common bug: it drops the artifact that *starts*
+before the window and extends into it.
+
+```python
+# Step 2: read only those artifacts
+import pyarrow.dataset as ds
+table = ds.dataset(paths, format="parquet").to_table(
+    columns=["timestamp", "open", "high", "low", "close", "volume"],
+)
+```
+
+Column projection still applies. Row-level time filtering happens after load, because
+prices and timestamps are strings — see §2.3.
+
+### 3.2 Live read (no catalog, no disk)
+
+```
+strategy → app.services.data → MT5 → in-memory records
+```
+
+Nothing is written. `data_fetch_log` records `served_from = 'broker'`,
+`materialized = 0`. This is the default path for live and paper trading.
+
+### 3.3 Integrity gate before every pinned read
+
+```sql
+SELECT COUNT(*) FROM data_partition_files
+WHERE dataset_id = ? AND verify_state IN ('hash_mismatch','missing');
+```
+
+Non-zero blocks the read. `idx_data_files_bad` is partial and **empty in normal
+operation**, so the check costs an empty-B-tree probe. Per `AGENTS.md` §3 Fail-Closed,
+an unverifiable artifact is a blocking condition, not a warning.
+
+### 3.4 Coverage question: "do I need to fetch?"
+
+```sql
+SELECT MIN(min_ts_utc) AS have_from, MAX(max_ts_utc) AS have_to,
+       SUM(row_count) AS rows, COUNT(*) AS artifacts
+FROM data_partition_files
+WHERE dataset_id = ? AND verify_state <> 'missing';
+```
+
+One aggregate over a handful of rows answers what would otherwise need a `MIN`/`MAX`
+over every stored bar.
+
+### 3.5 Catalog rebuild
+
+Because the sidecar manifests are authoritative (D8), the catalog is disposable:
+
+```sql
+DELETE FROM data_partition_files;
+DELETE FROM data_datasets;
+-- rescan the artifact tree, reading each StorageManifest sidecar
+```
+
+Every column except `verify_state` and `verified_at` is reconstructed from the
+manifests; those two are index-local operational state and reset to `unverified`.
+**A column that cannot be rebuilt this way must not be added to the catalog** — that
+constraint is what keeps D8's guarantee true.
+
+---
+
+## 4. Execution pipeline query paths
+
+Latency-critical. Every one of these must be an index seek.
+
+### 4.1 Open orders for an account
+
+```sql
+SELECT * FROM trading_orders
+WHERE account_id = ? AND symbol_id = ?
+  AND state IN ('pending_new','new','partially_filled','pending_cancel');
+```
+
+Served by the partial index `idx_trading_orders_open`. The partial predicate keeps
+the index at open-order cardinality (tens of rows) rather than total-order
+cardinality (millions). A full index on `state` would be ~1000× larger and mostly
+terminal rows nobody queries.
+
+### 4.2 Closed-position history
+
+```sql
+SELECT * FROM trading_positions
+WHERE account = ? AND symbol = ? ORDER BY exit_time DESC;
+```
+
+`idx_trading_positions_symbol_exit` supports account/symbol trade-history reads.
+Open-position lookup is intentionally broker/runtime state and is not a database
+query.
+
+### 4.3 Risk admission check
+
+```sql
+SELECT * FROM risk_admission_decisions
+WHERE decision_id = ? AND consumed_at IS NULL AND expires_at > ?;
+```
+
+PK seek plus two predicate filters. `idx_risk_admission_open` covers the sweep for
+expiring unconsumed approvals.
+
+### 4.4 Active policy resolution
+
+```sql
+SELECT * FROM risk_policies
+WHERE scope_level = ? AND scope_key = ? AND runtime_profile = ? AND state = 'active';
+```
+
+`idx_risk_policy_active` is partial unique — one seek, guaranteed at most one row.
+The uniqueness is the correctness property; the speed is a side effect.
+
+### 4.5 Kill-switch check (runs before every order)
+
+```sql
+SELECT 1 FROM risk_kill_switches
+WHERE state = 'tripped'
+  AND ((scope_level='global')
+    OR (scope_level='account'  AND scope_key = ?)
+    OR (scope_level='strategy' AND scope_key = ?)
+    OR (scope_level='symbol'   AND scope_key = ?))
+LIMIT 1;
+```
+
+`idx_risk_kill_tripped` is partial on `state = 'tripped'`. In normal operation that
+index is **empty**, so the check costs a single empty-B-tree probe — effectively
+free. This is the design goal: the safety check that runs most often should cost
+least when nothing is wrong.
+
+### 4.6 Event append (optimistic concurrency)
+
+```sql
+INSERT INTO trading_events (event_seq, event_id, scope_key, aggregate_version, ...)
+VALUES (NULL, ?, ?, ?, ...);
+-- UNIQUE(scope_key, aggregate_version) raises SQLITE_CONSTRAINT on a concurrent writer
+```
+
+`event_seq INTEGER PRIMARY KEY` appends at the B-tree's right edge — the cheapest
+insert SQLite offers, with no page splits mid-tree.
+
+---
+
+## 5. Full index catalogue
+
+### 5.1 Catalog & time-ordered indexes
+
+No `WITHOUT ROWID` bulk tables remain — the series they held are Parquet. What is left
+is the catalog that finds those files, plus the system logs that stay in SQLite.
+
+| Index | Table | Columns | Purpose |
+|---|---|---|---|
+| `idx_data_files_prune` | `data_partition_files` | `dataset_id, min_ts_utc, max_ts_utc` | **File selection by time range** — the hottest catalog query |
+| `idx_data_files_hash` | `data_partition_files` | `content_hash` | Content-addressed lookup; detects duplicate artifacts |
+| `idx_data_files_bad` | `data_partition_files` | `dataset_id` partial `verify_state IN ('hash_mismatch','missing')` | Integrity gate; empty when healthy |
+| `idx_data_datasets_lookup` | `data_datasets` | `dataset_kind, symbol_id, timeframe` partial `state='ready'` | Dataset resolution |
+| `idx_agentic_spans_bucket` | `agentic_trace_spans` | `bucket_month, agent_id` | Trace browse |
+| `idx_api_audit_bucket` | `api_audit_log` | `bucket_month, actor_kind` | Audit browse |
+
+`idx_data_files_prune` is the single most important index in the design. Every
+market-data read begins with it, and it is what makes the catalog cheaper than a
+directory walk.
+
+### 5.2 Partial indexes (hot-subset only)
+
+These carry most of the performance benefit. Each stays small because it indexes only
+the rows anyone actually queries.
+
+| Index | Predicate | Purpose |
+|---|---|---|
+| `idx_trading_orders_open` | `state IN (open states)` | Open-order sweep |
+| `idx_trading_positions_account_exit` | closed-trade account history | Ordinary history index |
+| `idx_risk_kill_tripped` | `state='active'` | Empty when healthy |
+| `idx_risk_policy_active` | `state='active'` | **Unique** — one policy per scope |
+| `idx_risk_admission_open` | `consumed_at IS NULL AND verdict IN (...)` | Unconsumed approvals |
+| `idx_risk_checks_breach` | `passed=0` | Breach analysis |
+| `idx_portfolio_alloc_active` | `is_active=1` | **Unique** — one allocation |
+| `idx_agentic_ckpt_terminal` | `is_terminal=1` | **Unique** — no resume after terminal |
+| `idx_agentic_spans_denied` | `outcome='refused'` | Denial audit |
+| `idx_agentic_llm_breach` | `within_ceiling=0` | Budget breach |
+| `idx_api_keys_lookup` | `revoked_at IS NULL` | Auth hot path |
+| `idx_api_audit_denied` | `outcome='denied'` | Security monitoring |
+| `idx_opt_trials_pending` | `state='pending'` | Trial dispatch |
+| `idx_sim_runs_status` | `status` | Run lifecycle lookup |
+| `idx_sim_sessions_expiry` | `status IN ('active','expired')` | Playback-session expiry and cleanup |
+
+Six of these are **unique partial indexes enforcing a business invariant**. That is
+their primary job; query acceleration is secondary.
+
+### 5.3 Covering indexes
+
+Where the index alone answers the query, avoiding a table lookup:
+
+```sql
+-- Historical only: retired with Analytics migration step 002.
+-- idx_analytics_trades_cover on analytics_trade_analysis
+
+-- Historical only: idx_equity_cover on analytics_equity_curves.
+```
+
+Verify with `EXPLAIN QUERY PLAN` — look for `USING COVERING INDEX`. Without that
+phrase the extra columns are pure overhead and should be dropped.
+
+### 5.4 Expression / generated-column indexes
+
+```sql
+-- date-truncated grouping without a scan
+-- Historical only: idx_trades_day on analytics_trade_analysis.
+```
+
+The `substr(exit_at,1,10)` index works precisely because timestamps are ISO-8601
+text — the first ten characters are the date. Epoch integers would need a
+`date(ts,'unixepoch')` expression index instead.
+
+---
+
+## 6. JSON access pattern
+
+**Never** filter on `json_extract` at read time on a large table:
+
+`STORED` would duplicate the value in the table for a marginal gain; `VIRTUAL` plus
+an index gives the seek without the duplication.
+
+Promote a JSON key to a generated column when it is filtered or joined on. Leave it
+in JSON when it is only ever read as part of the whole payload.
+
+### 6.1 Indicators
+
+Indicators owns no current table or index. The indexes introduced for the
+legacy empty support schema by `001_indicator_schema_v1` were removed with
+their tables by `002_remove_unused_indicator_support_schema`. Indicator
+calculation performance is governed by in-memory vectorized execution and the
+budgets documented in the owning Indicators README.
+
+---
+
+## 7. Write-path throughput
+
+### 7.1 Parquet write, then catalog commit
+
+Bulk writes no longer go through SQLite. The ordering is what matters:
+
+```python
+# 1. Write and fsync the Parquet file FIRST
+manifest = save_market_data(request)      # writes artifact + sidecar atomically
+
+# 2. THEN commit the catalog row in one transaction
+conn.execute("BEGIN IMMEDIATE")
+conn.execute("INSERT INTO data_partition_files (...) VALUES (...)", (..., manifest.content_hash, ...))
+conn.execute("UPDATE data_datasets SET file_count=..., total_rows=..., "
+             "max_ts_utc=..., updated_at=? WHERE dataset_id=?", (...))
+conn.execute("COMMIT")
+```
+
+**Never the reverse.** A catalog row pointing at a file that does not exist is a
+fail-closed read on the next query. An orphan file with no catalog row is invisible and
+harmless, and a reconciliation sweep reclaims it. Write-then-record makes the failure
+mode the recoverable one.
+
+`os.replace` gives atomic visibility — a reader never sees a half-written Parquet at
+the final path. Writing directly to `final_path` breaks that guarantee.
+
+### 7.2 Catalog write volume
+
+The catalog receives roughly one row per symbol-month. Ten symbols ingesting M1 bars
+generate ~120 catalog inserts per year. At that rate every SQLite write-throughput
+concern from the previous design disappears — `synchronous=FULL` everywhere costs
+nothing measurable.
+
+The transactions that still matter are `trading_*` and `risk_*`, which were never
+bulk paths.
+
+### 7.3 Single-writer discipline
+
+SQLite permits one writer at a time. Under WAL, readers proceed concurrently. The
+design assumes:
+
+- One writer process per database file, coordinated by `data_write_locks`
+  (`AGENTS.md` §5).
+- Unlimited concurrent readers.
+- Write batching at the application layer, not lock contention at the SQLite layer.
+
+`busy_timeout` handles incidental contention. It is not a substitute for a
+single-writer architecture — relying on it under sustained concurrent writes produces
+retry storms.
+
+---
+
+## 8. Statistics and maintenance
+
+```sql
+-- Weekly, all tables
+PRAGMA analysis_limit = 1000;
+PRAGMA optimize;
+
+-- Monthly — now cheap, since the database is state + catalog only
+VACUUM;
+
+-- Integrity, before backup
+PRAGMA integrity_check;
+PRAGMA foreign_key_check;
+```
+
+`VACUUM` was previously an outage on a multi-GB tick database. With bulk series in
+Parquet the SQLite file should stay in the tens-to-hundreds of MB, so `VACUUM`
+completes in seconds and can run on a normal maintenance window.
+
+### Catalog rebuild
+
+Because the sidecar manifests are authoritative (D8), the catalog is disposable:
+
+```sql
+DELETE FROM data_partition_files;
+DELETE FROM data_datasets;
+-- then rescan the artifact tree, reading each StorageManifest sidecar
+```
+
+A rebuild restores every column except `verify_state` and `verified_at`,
+which are index-local operational state and reset to `unverified`. Treat a corrupt
+catalog as a rebuild, never as data loss.
+
+### Parquet-side maintenance
+
+The catalog cannot detect drift on its own — it must be checked against the files:
+
+```python
+# Periodic sweep: does every catalog row still resolve, and does the hash match?
+for row in conn.execute("SELECT file_id, relative_path, content_hash "
+                        "FROM data_partition_files"):
+    state = ("missing" if not os.path.exists(path)
+             else "verified" if sha256_file(path) == row["content_hash"]
+             else "hash_mismatch")
+    conn.execute("UPDATE data_partition_files SET verify_state=?, verified_at=? "
+                 "WHERE file_id=?", (state, now_iso(), row["file_id"]))
+```
+
+Every artifact is checked: content-addressing means none is expected to change. A
+`hash_mismatch` should raise a `data_quality_events` row at `critical` and block reads
+of that dataset until resolved.
+
+Orphan reclamation is the other periodic job: an artifact written but never catalogued
+(a crash between the two commits) is invisible to readers and reclaimable by comparing
+the artifact tree against `data_partition_files`. `idx_data_files_hash` makes the
+reverse check — a catalogued artifact that no longer exists — a single indexed lookup.
+
+`PRAGMA foreign_key_check` is worth running in CI. It catches violations that
+accumulated while `foreign_keys` was off on some connection.
+
+---
+
+## 9. Expected performance envelope
+
+Indicative figures for a single-node deployment, NVMe SSD, 16 GB RAM. Measure before
+relying on any of them.
+
+| Operation | Scale | Target |
+|---|---|---|
+| Catalog file selection (SQLite) | ~12 rows | < 0.3 ms |
+| Integrity gate (`idx_data_files_bad`) | 0 rows | < 0.05 ms |
+| Coverage aggregate | ~120 rows | < 1 ms |
+| Bar range read, 1 month Parquet | 43k rows | < 40 ms |
+| Bar range read, 1 year Parquet | 370k rows | < 300 ms |
+| Tick range read, 1 month Parquet | 10M rows | < 2 s |
+| Live bar fetch from MT5 | 1k bars | 20–200 ms (network) |
+| Open-order lookup | ~10 rows | < 0.5 ms |
+| Kill-switch check | 0 rows | < 0.05 ms |
+| Position lookup | 1 row | < 0.2 ms |
+| Risk admission write | 1 row | < 2 ms (`synchronous=FULL`) |
+| Parquet write, 1 symbol-month M1 | 43k rows | < 500 ms incl. fsync |
+
+Parquet figures assume default compression, column projection to the OHLC columns, and warm
+page cache. Cold-cache first reads are roughly 2–3× slower.
+
+### When SQLite stops being the right answer
+
+Migrate to Postgres/TimescaleDB when any of these hold:
+
+1. Sustained concurrent writers > 1 (SQLite is fundamentally single-writer).
+2. The **catalog** itself outgrows SQLite — which now needs ~10⁵ datasets to happen,
+   since bulk rows left. Parquet volume is no longer a SQLite concern at all.
+3. Cross-machine access is required (SQLite over a network filesystem is unsafe —
+   file locking is unreliable on NFS/SMB).
+4. Sub-millisecond p99 needed on concurrent mixed read/write.
+
+Moving bulk series to Parquet pushes conditions 1 and 2 far out: SQLite now holds
+system state and a small catalog, which is the workload it is genuinely best at.
+Its zero network hop is a latency *advantage* over Postgres here, not a compromise.
+
+---
+
+## 10. Verification
+
+```sql
+-- Every listed index exists
+SELECT name, tbl_name, partial FROM sqlite_master WHERE type='index' ORDER BY tbl_name;
+
+-- No table scans on hot paths
+EXPLAIN QUERY PLAN SELECT ...;   -- expect SEARCH, never SCAN
+
+-- Index size audit (which indexes are worth their cost)
+SELECT name, SUM(pgsize) AS bytes FROM dbstat WHERE name LIKE 'idx_%'
+GROUP BY name ORDER BY bytes DESC;
+
+-- Unused indexes: cross-check against query logs before dropping
+```
+
+`dbstat` requires the `SQLITE_ENABLE_DBSTAT_VTAB` compile option, present in most
+CPython builds. If unavailable, fall back to file-size deltas around index creation.
+
+> **AUTHORITATIVE — reconciliation record.** This document is the canonical record of
+> divergence between the target model in this directory and the live schema. It records
+> adoption tiers; it changes no code and executes no migration. Open decisions arising
+> from it are recorded in [`docs/PROJECT.md`](../PROJECT.md) §12.
+
+**Method.** Every `CREATE TABLE` in `app/` was extracted from source and compared
+column-by-column against the 90 tables in this proposal. Figures below are machine-
+generated, not estimated.
+
+---
+
+## 0. Corrections to earlier statements
+
+Two things I asserted in Dry-Run Plan 1 were wrong. Both are corrected here.
+
+| Claimed | Actual | Why it matters |
+|---|---|---|
+| "~48 tables live across 10 domains" | **69 tables across 11 prefixes** | The current manifest includes 23 Data tables after catalog activation, explicit Economic Calendar coverage, and normalized event definitions; the original grep also missed tables declared with bare `CREATE TABLE`. |
+| Proposal is a clean greenfield target | **The live system already stores bulk data outside SQLite** | Simulator journals to append-only JSONL; Data writes CSV/Parquet artifacts with sidecar JSON manifests. The Parquet decision is not new architecture — it is *already the live pattern*, and the proposal partly reinvented it. |
+
+The second point reframes the whole reconciliation. See §4.
+
+---
+
+## 0. Model completeness
+
+**Closed.** The model now records **every table that ships**, in addition to its
+target-only entries. Three passes were needed to get there, which is itself the
+finding: a model asserting authority over the target schema was repeatedly missing
+tables that already existed.
+
+| Pass | Tables absorbed |
+|---|---|
+| Phase 3c | 13 Agentic + 4 Data research-source/runtime |
+| Dry-Run Plan 9 | 8 Data operational + 4 API + `strategy_mutations` |
+
+Current model size after Analytics retirement: **94 tables**. The six historical
+Analytics shapes remain documented but are not current target declarations. Of the
+current tables, 54 have a code definition and the remainder are
+explicitly labelled target-only in their domain sections.
+
+Two categories are recorded rather than corrected, because the tables are applied and
+cannot change without a baseline reset:
+
+- **Nine tables carry no `created_at`.** Each records time in a purpose-specific way
+  (`applied_at_ns`, `timestamp_ns`, `window_started_at`, `scheduled_at`). Listed in
+  `verify_schema.py` with the column each uses instead.
+- **Strategy seven-table schema reconciled.** All seven Strategy runtime tables (`strategy_definitions`, `strategy_versions`, `strategy_configs`, `strategy_state`, `strategy_checkpoints`, `strategy_signals`, `strategy_mutations`) are applied under migrations `0001_strategy_domain` and `0002_strategy_seven_table_runtime`. See [02](02_entity_specs_execution.md) Domain 5.
+- **Indicators schema retired and reconciled.** Migration `001_indicator_schema_v1`
+  historically introduced three empty support tables; immutable migration
+  `002_remove_unused_indicator_support_schema` retired them transactionally.
+  Indicators now owns zero target and live tables.
+
+---
+
+## 1. Headline numbers
+
+| | Count |
+|---|---|
+| Live tables | **59** |
+| Model tables (post-Phase 1, after Indicators retirement) | **83** |
+| Same name in both | **19** |
+| — of which additive (proposal is a superset) | **4** |
+| — of which mixed (minor column loss) | **2** |
+| — of which incompatible (rebuild required) | **13** |
+| Live-only — **proposal gaps** | **40** |
+| Proposal-only — new build | **68** |
+
+**Overlap is 19 of 59 (32 %).** The proposal is not a refinement of the live schema;
+it is largely a parallel design that rediscovered some of the same tables and missed
+two thirds of what exists.
+
+---
+
+## 2. Same-name tables — column-level verdict
+
+`live` / `prop` / `shared` are column counts.
+
+| Table | Verdict | live | prop | shared | Live columns absent from proposal |
+|---|---|---|---|---|---|
+| `risk_audit_records` | **ADDITIVE** | 12 | 13 | 12 | — |
+| `trading_events` | **ADDITIVE** | 7 | 12 | 7 | — |
+| `trading_idempotency` | **ADDITIVE** | 6 | 8 | 6 | — |
+| `trading_projections` | **ADDITIVE** | 4 | 6 | 4 | — |
+| `api_idempotency` | MIXED | 6 | 10 | 4 | `scope_key`, `status_code` |
+| `portfolio_audit_outbox` | **MATCH** | 11 | 11 | 11 | — |
+| `strategy_configs` | **REBUILD** | 6 | 12 | 0 | `config_hash`, `config_json`, `policy_version`, `request_id`, `strategy_id`, `strategy_version` |
+| `strategy_checkpoints` | **REBUILD** | 5 | 6 | 0 | `authorization_ref`, `checkpoint_id`, `checkpoint_json`, `checksum`, `request_id` |
+| `strategy_versions` | **REBUILD** | 8 | 12 | 1 | `lifecycle_status`, `manifest_json`, `policy_json`, `record_hash`, `request_id`, `correlation_id`, `strategy_version` |
+| `api_sessions` | **REBUILD** | 6 | 12 | 2 | `session_digest`, `csrf_digest`, `user_id`, `revoked_at` |
+| `api_accounts` | **REBUILD** | 11 | 15 | 4 | `user_id`, `roles_json`, `permissions_json`, `scopes_json`, `environment`, `active`, `verified` |
+| `portfolio_definitions` | **MATCH** | 8 | 8 | 8 | — |
+| `portfolio_allocation_versions` | **MATCH** | 10 | 10 | 10 | — |
+| `portfolio_rebalance_plans` | **MATCH** | 9 | 9 | 9 | — |
+| `optimization_checkpoints` | **RECONCILED** | 9 | 9 | 9 | — |
+| `agentic_memory_records` | **REBUILD** | 15 | 12 | 4 | `store_class`, `author_role_id`, `content_json`, `scope_json`, `retention_class`, `sensitivity`, `injection_status`, `redacted_paths_json` |
+| `agentic_workflow_checkpoints` | **REBUILD** | 11 | 8 | 4 | `task_id`, `workflow_name`, `workflow_version`, `node_id`, `state_payload_hash`, `canonical_hash` |
+| `research_artifacts` | **MATCH** | 10 | 10 | 2 | Executable migration and target model agree; production artifact writes persist traceable metadata through Data. |
+| `data_migration_ledger` | **REBUILD** | 4 | 4 | 1 | `migration_id`, `checksum`, `applied_at_ns` |
+
+> **Status: resolved in Phase 2.** The hybrid rule (D9) was applied to all 12 remaining
+> REBUILD tables — `data_migration_ledger` was the thirteenth and Phase 1 closed it.
+> **40 live columns were admitted, 26 rejected.** The model now carries the integrity
+> hashes, traceability identifiers, and state fields the live tables had; it does not
+> adopt payload blobs whose contents it normalises, nor columns that are renames.
+> Divergence is narrowed, not closed: the *live* tables are unchanged and Tier C
+> remains rejected.
+
+### Optimization reconciliation — 2026-08-07
+
+The complete Optimization manifest `001_optimization_schema_v1` was executed twice
+against an isolated dev SQLite database through `run_optimization_migrations`: the
+first call applied the checksummed step and the second was ledger-idempotent. The live
+dev tables and current executable definitions agree: `optimization_results` has nine
+columns plus `idx_optimization_results_repro`, and `optimization_checkpoints` has nine
+columns including `created_at`, `updated_at`, `request_id`, and `correlation_id`.
+The three normalized job/trial structures described as target-only in
+`03_entity_specs_intelligence.md` remain unapplied by design; they are not current
+Optimization-owned tables or registered persistence behavior.
+
+### What the REBUILD rows have in common
+
+Almost every one loses the same three things:
+
+1. **A canonical/record hash** — `canonical_hash`, `record_hash`, `content_hash`,
+   `checksum`, `reproducibility_hash`. The live schema hashes state so tampering and
+   drift are detectable. The proposal has this on some tables and dropped it on others.
+2. **A `*_json` payload column** — `config_json`, `manifest_json`, `allocation_json`,
+   `plan_json`, `checkpoint_json`. The live design stores a validated contract blob and
+   normalises only what it queries. The proposal normalised aggressively into typed
+   columns.
+3. **Request/correlation identifiers** — `request_id`, `correlation_id`. Present on
+   nearly every live table; inconsistently applied in the proposal.
+
+**The live pattern is better on points 1 and 3, and the disagreement on point 2 is a
+genuine trade-off**, not an error on either side. Normalised columns give indexed
+queries and `CHECK` constraints; a JSON blob gives schema evolution without a
+migration. The live choice is the right one for a system under an *immutable* ledger,
+because adding a field to a JSON payload needs no migration at all.
+
+### `data_migration_ledger` is a special case
+
+The proposal's version is **wrong and must be discarded**. I reproduced it from memory
+rather than from source. Live columns are `migration_id`, `domain`, `checksum`,
+`applied_at_ns`; the proposal invented `step_id`, `sequence`, `applied_at`. Per
+`AGENTS.md` §5 this table governs every other migration — proposing a variant of it
+was a mistake.
+
+---
+
+## 3. Proposal gaps — 49 live tables with no equivalent
+
+These are **not** candidates for deletion. They are things the proposal failed to
+account for, and each would have to be preserved or explicitly retired.
+
+### Data (23 live, proposal has 0 of them)
+
+`data_feeds` · `data_update_jobs` · `data_backfill_checkpoints` · `data_cache` ·
+`data_source_state` · `data_source_attempts` · `data_audit_events` ·
+`data_economic_events` · `data_economic_calendar_coverage` ·
+`data_economic_event_definitions` · `data_research_sources` ·
+`data_research_observations` · `data_verified_research_sources` ·
+`data_runtime_records` · `data_symbols` · `data_providers` ·
+`data_market_sessions` · `data_datasets` · `data_partition_files` ·
+`data_fetch_log` · `data_quality_events` · `data_write_locks` ·
+`data_migration_ledger`
+
+This is the proposal's largest failure. It designed a Data domain around storing bars
+— a thing the live system deliberately does not do — and consequently missed the
+domain's real responsibilities: **streaming feed lifecycle** (`data_feeds` has 24
+columns covering buffer depth, overflow policy, heartbeat, breaker state, drift),
+**scheduled backfill with leases and resumable checkpoints**, **response caching**, and
+**source readiness/circuit state**.
+
+`data_write_locks` is required by `AGENTS.md` §5 (write-lock leases) and its absence
+from the proposal is a correctness gap, not a stylistic one.
+
+### Risk (7 live, proposal has 0 by name)
+
+`risk_policy_versions` · `risk_eligibility_decisions` · `risk_allocation_decisions` ·
+`risk_kill_switch_states` · `risk_approval_tokens` · `risk_decision_snapshots` ·
+`risk_audit_records` *(the one overlap)*
+
+The proposal renamed nearly all of these — see §5.
+
+### Agentic (11 live absent)
+
+`agentic_workflow_runs` · `agentic_lifecycle_transitions` · `agentic_promotion_packets` ·
+`agentic_operations_traces` · `agentic_operations_incidents` · `agentic_operations_replays` ·
+`agentic_evidence_claims` · `agentic_experiment_specs` · `agentic_experiment_runs` ·
+`agentic_experiment_holdout_use` · `agentic_experiment_verdicts`
+
+Note `agentic_experiment_holdout_use` — the live system **already implements** the
+holdout-use ledger the proposal presented as a new idea in
+`optimization_holdout_uses`. Same control, different domain, already shipped.
+
+### Others (9)
+
+`api_credentials` · `api_approvals` · `api_auth_failures` · `api_settings` ·
+`portfolio_active_scopes` · `portfolio_construction_results` · `portfolio_idempotency` ·
+`optimization_results` · `strategy_mutations` · `sim_runs` · `hq_runtime_records`
+
+`hq_runtime_records` is a generic key-value runtime store with `namespace` /
+`collection_name` / `partition_key` / `codec_kind` — a deliberate escape hatch the
+proposal has no equivalent for.
+
+---
+
+## 4. The storage-architecture finding
+
+**The live system already does what the Parquet revision asked for**, and does it
+differently from the proposal.
+
+| Concern | Live implementation | Proposal (docs 00–04) |
+|---|---|---|
+| Bulk market data | `dataset_writer.py` → CSV/Parquet artifact + **sidecar JSON manifest file** | Parquet + **SQLite catalog tables** |
+| Manifest contract | `StorageManifest` (Pydantic, frozen): `artifact_id`, `relative_path`, `format`, `content_hash`, `schema_version`, `normalization_version`, `source_revision`, `row_count`, `start`, `end`, `license_metadata`, `provenance`, `created_at`, `request_id` | `data_datasets` + `data_partition_files` |
+| Simulator journal | Append-only **JSONL**, `JOURNAL_FORMAT = "jsonl-v1"`; the migration file states a SQLite journal sidecar is *"an explicit Phase 1 exclusion"* | Model now defers to JSONL; its table was withdrawn |
+| Artifact manifest | `research_artifacts`: strict relative-path manifest with content, atomicity, audit, request, and correlation evidence | Executable migration matches the target; `research_studies`, `research_hypothesis_tests`, `research_features`, `research_feature_materializations`, and `research_regimes` remain explicit target-only tables with no current migration. |
+| Atomicity | temp file → `os.replace`, sha256 after write | Same pattern, independently arrived at |
+
+Three consequences:
+
+1. **`sim_timeline_events` directly contradicted a documented live exclusion.**
+   Withdrawn in Phase 1 rather than reconciled.
+2. **`StorageManifest` already carries 11 of the 14 fields proposed for
+   `data_partition_files`.** Phase 1 adopted five of them; the model's genuine
+   additions are `verify_state`, `verified_at`, and the dataset grouping. Phase 4A
+   dropped `partition_year`, `partition_month`, `sealed`, and `row_group_count`: the
+   shipped writer emits flat content-addressed artifacts, and a catalog that prunes by
+   recorded time range makes directory partitioning redundant.
+3. **The real design question is not "Parquet or SQLite" — it is "sidecar manifest or
+   catalog table".** Live uses sidecars. That is decision **D8** below.
+
+### Sidecar vs. catalog — the actual trade
+
+| | Sidecar JSON (live) | SQLite catalog (proposal) |
+|---|---|---|
+| Self-describing on disk | Yes — copy the directory, keep the metadata | No — catalog and files can separate |
+| Find files for a time range | Walk directory, read N manifests | One indexed query |
+| Detect a missing/corrupt file | Only when you open it | `verify_state` sweep, indexed |
+| Transactional with other state | No | Yes |
+| Extra failure mode | None | Catalog row pointing at a missing file |
+
+Neither is wrong. The defensible synthesis is **both**: keep the sidecar as the
+authoritative record (self-describing, survives a database loss) and treat the SQLite
+catalog as a **rebuildable index** over the sidecars. A corrupt catalog is then
+recoverable by rescanning; a lost sidecar is not recoverable at all, which is the
+right asymmetry.
+
+---
+
+## 5. Renames — same concept, different name
+
+The proposal duplicated live concepts under new names. Adopting them would mean two
+tables for one job.
+
+| Proposal | Live equivalent | Recommendation |
+|---|---|---|
+| `risk_policies` | `risk_policy_versions` | Keep live name |
+| `risk_kill_switch_states` | `risk_kill_switch_states` | Keep live name |
+| `risk_eligibility_decisions` | `risk_eligibility_decisions` + `risk_allocation_decisions` | Live splits eligibility from allocation — that separation is deliberate; keep it |
+| `optimization_holdout_uses` | `agentic_experiment_holdout_use` | Keep live; do not build a second holdout ledger |
+| `optimization_jobs` / `optimization_trials` | `optimization_results` (`search_id`, `ranked_candidates_json`) | Live stores ranked candidates as JSON; proposal normalises to rows. Genuine trade-off — see §2 point 2 |
+| `sim_runs` | `sim_runs` | **Partially applied:** the inspected non-production database and ledger contain conformant `sim_runs` from `001_simulator_state_v1`; `002_simulator_playback_sessions_v1` and its conformant `sim_sessions` table remain unapplied. The complete immutable manifest is owned by `run_simulator_migrations`, and required API startup fails closed if either step cannot be verified or applied. |
+| `agentic_traces` / `agentic_trace_spans` | `agentic_operations_traces` | Keep live name |
+| `agentic_workflow_checkpoints` (proposal) | same name, different columns | Keep live |
+| ~~`util_settings`~~ | `api_settings` + typed bootstrap settings | **Withdrawn.** Utils owns no tables; UI/API owns the unified non-secret user/system documents and central JSON/process sources bootstrap the database; see [01](01_entity_specs_core.md) Domain 1 |
+
+---
+
+## 6. Reconciliation plan
+
+### Tier A — **conformed in Phase 3a & Risk Audit Remediation**
+
+> `trading_events`, `trading_idempotency`, and `trading_projections` match the target model.
+>
+> The seven active Risk tables (`risk_policy_versions`, `risk_eligibility_decisions`,
+> `risk_allocation_decisions`, `risk_kill_switch_states`, `risk_approval_tokens`,
+> `risk_decision_snapshots`, `risk_audit_records`) were initially created under `risk-0001-initial-state`.
+> Missing table constraints (`CHECK` constraints, JSON validity checks, `STRICT` mode, and partial index
+> predicate `idx_risk_audit_decision`) were conformed by table rebuild migration `risk-0002-schema-constraints`.
+> Three target tables (`risk_limits`, `risk_limit_checks`, `risk_exposure_snapshots`) remain target-only with no live implementation.
+
+### Original framing — adopt as-is, additive migration, no ledger break (4 tables)
+
+`trading_events`, `trading_idempotency`, `trading_projections`, `risk_audit_records`.
+
+Every live column survives; the proposal only adds. `ALTER TABLE ADD COLUMN` with
+defaults is additive and ledger-safe under `AGENTS.md` §5. **This is the only tier
+that can proceed without a baseline reset.**
+
+Suggested order: `trading_projections` → `trading_idempotency` → `trading_events` →
+`risk_audit_records`. Each is one migration step with its own checksum.
+
+**Identifier allocation.** These are additive changes to schema owned by *existing*
+registered features, so they need new `FR-*` requirements under the existing
+`FEAT-*`, not new feature IDs:
+
+| Domain | Owning feature | Next free `FR-*` | Next free `FEAT-*` |
+|---|---|---|---|
+| Trading | `FEAT-TRD-02` State and Deterministic Projections | `FR-TRD-070` | `FEAT-TRD-10` |
+| Risk | Risk audit chain | `FR-RISK-069` | `FEAT-RISK-16` |
+
+Registration is three-part and lives outside this model: the `FR-*` text in the owning
+package `README.md` Section 4.x, a row or amendment in that README's `### Feature
+Registry`, and exactly one usage program at
+`tests/<domain>/usage/features/NN_*.py`.
+
+Highest currently allocated, for reference when planning later phases:
+
+| Domain | `FR-` prefix | Highest | `FEAT-` highest |
+|---|---|---|---|
+| analytics | `FR-ANLT-` | 054 | 05 |
+| api | `FR-API-` | 072 | 13 |
+| brokers | `FR-BRK-` | 135 | 15 |
+| data | `FR-DATA-` | 150 | 17 |
+| indicators | `FR-INDI-` | 035 | 06 |
+| optimization | `FR-OPT-` | 069 | 09 |
+| portfolio | `FR-PORT-` | 040 | 08 |
+| research | `FR-RES-` | 104 | 16 |
+| risk | `FR-RISK-` | 068 | 15 |
+| simulator | `FR-SIM-` | 090 | 09 |
+| strategy | `FR-STR-` | 053 | 11 |
+| trading | `FR-TRD-` | 069 | 09 |
+| utils | `FR-UTL-` | 050 | — |
+| agentic | *none registered* | — | 22 |
+
+### Tier B — proposal-only, no live conflict (68 tables)
+
+New tables collide with nothing and are additive by construction. But **do not build
+all 71.** Sequence by whether the owning domain has a real gap:
+
+> **Revised after D10.** An earlier version of this table named `broker_*` as priority 1
+> and `analytics_*` as priority 5, on the assumption that both were gaps. `PROJECT.md`
+> §5 records Brokers as deliberately stateless and Analytics as read-only. D10 upheld
+> the first and overturned the second.
+
+| Priority | Tables | Status | Why |
+|---|---|---|---|
+| — | ~~`util_*` (7)~~ | Withdrawn | Utils is the shared framework and owns no state |
+| — | ~~`indicator_*` (3)~~ | **Retired** | Migration `002_remove_unused_indicator_support_schema` removed the empty support-only schema; Indicators is stateless and owns no target or live tables |
+| — | ~~`analytics_*` (6)~~ | **Retired** | Empty derived tables had no production operation outside persistence; migration `002_retire_unused_analytics_derived_store` drops them transactionally and blocks if any row exists |
+| 4 | `trading_orders`, `trading_positions` | **Built; reconciled** | Orders remain an event projection. Positions contain complete closed trades only; fill and transition projections were retired empty by migration `002_closed_position_ledger` |
+| 5 | `broker_symbol_map` (1) | **Built (Phase 4E)** | Bitemporal reference data. The other four `broker_*` tables are **withdrawn** — Brokers stays a stateless passthrough. The step is ledger-ready (stable checksum, execution delegated to `run_domain_migrations`) but currently has no runtime composition wiring: nothing invokes `get_broker_migrations`, and the CRUD statements have no caller |
+| 6 | Everything else | Deferred | Defer until a feature needs it |
+
+### Tier C — rebuild, blocked (13 tables)
+
+Each needs a baseline reset approval per `ARCHITECTURE.md` L650. **Recommendation:
+do not pursue.** In every case the live table is either equivalent or better, and the
+migration cost buys column naming.
+
+**Reassessed after Phase 2.** With the hybrid rule applied, the model now carries what
+made the live tables better — `canonical_hash`, `record_hash`, `request_id`,
+`correlation_id`, `retention_class`, `injection_status`, and the workflow-node columns.
+The residual differences are renames and payload-shape preferences, which do not
+justify a baseline reset.
+
+Exception worth considering: `api_accounts` / `api_sessions`. Live stores RBAC as
+`roles_json` / `permissions_json` / `scopes_json` denormalised onto the account. The
+proposal's `api_roles` / `api_permissions` / `api_role_bindings` normalisation is a
+real improvement — role changes currently require rewriting every affected account
+row, and there is no way to query "who holds this permission". That one is worth the
+migration; the other twelve are not.
+
+### Tier D — proposal defects to fix in these documents (5)
+
+**Status: applied** (Dry-Run Plan 3, Phase 1).
+
+| Fix | Reason | Outcome |
+|---|---|---|
+| Delete `sim_timeline_events` | Contradicts documented live exclusion (§4) | Withdrawn; rationale recorded in [02](02_entity_specs_execution.md) |
+| Replace `data_migration_ledger` with the live definition | Model version was invented (§2) | Transcribed verbatim; code is authoritative |
+| Add `data_write_locks` | Required by `AGENTS.md` §5 | Added from `locking.py` |
+| Add `request_id` / `correlation_id` where they belong | Live convention | Applied to **21** tables, not all 81 — admitted only where a row records a decision, side-effecting mutation, external interaction, or audit event |
+| Reconcile `data_partition_files` with `StorageManifest` | Reuse the live contract's fields | 5 fields adopted (`format`, `normalization_version`, `source_revision`, `provenance_json`, `request_id`); 3 rejected as duplicates |
+| **D10 split** | Brokers vs Analytics persistence | Historical decision superseded: `broker_symbol_map` retained; empty `analytics_*` store retired by migration `002` |
+
+Model size after Phase 1: **86 tables** (was 90).
+
+### Phase 4 — status
+
+The current model stands at **94 tables** after the historical Indicators and
+Analytics support schemas were retired empty.
+
+| Sub-phase | Status | Delivered |
+|---|---|---|
+| 4A | Shipped schema; application integration reactivated | Artifact catalogue (7 tables); the withdrawn conflicting `FR-DATA-154`–`160` allocation remains historical, while current `FEAT-DATA-18` uses `FR-DATA-161`–`167` |
+| 4B | Historical schema retired | `indicator_*` support tables were introduced by migration `001_indicator_schema_v1` and retired empty by immutable migration `002_remove_unused_indicator_support_schema` |
+| 4C | Historical schema retired | `analytics_*` tables were introduced by step `001` and retired empty by guarded step `002`; persistence feature/requirements withdrawn from the current registry |
+| 4D | Shipped; reconciled | Trading event/order materialisation plus an insert-only closed-position ledger; obsolete empty fill and transition tables retired |
+| 4E | Schema shipped; registrations withdrawn | `broker_symbol_map` (1) applied as schema; `FEAT-BRK-16` and `FR-BRK-136`–`138` withdrawn 2026-08-03 (private persistence support) |
+
+`trading_events` remains the write model. `trading_orders` is written atomically with
+events; `trading_positions` accepts only validated complete closed-trade evidence.
+The current executable Trading target is five tables: `trading_events`,
+`trading_idempotency`, `trading_orders`, `trading_positions`, and
+`trading_projections`. The authoritative complete manifest consists of immutable
+steps `001_initial_trading_schema` and `002_closed_position_ledger`; the second
+step retires the empty `trading_fills` and `trading_order_transitions` projections.
+Open positions and tick-valued unrealized PnL remain outside the database.
+
+Two defects were found and fixed while closing, both of a kind worth naming.
+
+The first: renaming `hq_runtime_records` to `data_runtime_records` updated the migration
+but not the ten statements in `create.py`, `read.py`, and `update.py` that read the
+table. Every one would have failed on first apply, for Trading, Risk, Portfolio,
+Simulator, and Agentic alike, since all five persist through that store. Nothing in the
+type system, the linter, or the test suite connects a SQL string constant to the
+`CREATE TABLE` that backs it, so the omission was invisible until execution.
+`verify_persistence_sql.py` now closes that gap and is proven against the bug itself.
+
+The second is smaller but the same shape: the harness extracted index names with a
+pattern that consumed `IF NOT EXISTS` as the name, so two partial unique indexes were
+reported as `IF`. A check that prints a wrong name still passes, which is why it
+survived several runs.
+
+**Phase 6 completed.** Trading, Risk, Portfolio, Simulator, and Agentic now persist
+their active durable state directly in domain-owned relational tables while Data
+retains connection, lock, statement-plan, and transaction execution ownership. No
+production domain writes `data_runtime_records`. Agentic uses eight owned tables for
+workflow, memory records, lifecycle, traces, incidents, and replays; its evidence-claim
+and experiment tables remain without production durable producers and were not
+populated speculatively. Simulator's canonical journal remains partial JSONL with
+group-commit durability and atomic filesystem publication; no database journal table
+was introduced.
+`portfolio_definitions` is now reached by the registered Portfolio definition
+command and exact-version read operation. The production path is Portfolio public
+API → repository → private Portfolio CRUD → Data transaction execution, with an
+atomic audit-outbox write and conflict-safe immutable version semantics.
+
+The development-only `api-0004` ledger orphan was repaired after an immutable backup
+and exact-row verification. Complete-manifest migration requests now reject any applied
+ID absent from code. The `data_migration_ledger.applied_at_ns` transcription error —
+the model said `INTEGER`, the shipped column is `TEXT` with a 19-digit `GLOB` check —
+is corrected in [01](01_entity_specs_core.md).
+
+---
+
+## 7. Recommendation
+
+**Do not adopt this proposal wholesale.** Overlap is 32 %, and where the two disagree
+the live schema is usually right — it is grounded in shipped features under an
+immutable ledger; the proposal is grounded in a blank page.
+
+Use it as three things instead:
+
+1. **A historical gap list.** Its Phase 4 and Phase 6 persistence gaps have been
+   reconciled; current state is governed by each owning package README and migration
+   manifest.
+2. **A design-control catalogue.** The `CHECK`-constraint patterns in
+   [README](README.md) §"Design controls" apply to live tables regardless of whether
+   the proposed tables are ever built.
+3. **A record of the Tier C exception that was migrated** — normalized API RBAC in
+   `api-0005`, with legacy account JSON claim columns retained only for immutable
+   baseline compatibility.
+
+Everything else should be retired rather than reconciled.
+
+---
+
+## 8. Decisions this raises
+
+Decisions arising from this reconciliation — **D2, D4, D8, D9**, plus **D10** and
+**D11** raised during Phase 0 — are recorded in [`docs/PROJECT.md`](../PROJECT.md) §12.
+Per `AGENTS.md` §4 *Decision Hygiene*, this document holds no decision ledger.

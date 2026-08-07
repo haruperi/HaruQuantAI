@@ -1280,6 +1280,206 @@ rolling/cost/distribution/contribution charts are excluded initially.
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `analytics_` (retired).
+
+Analytics is a pure, read-only calculation domain. Migration step
+`001_analytics_schema_v1` is retained as immutable history; complete-manifest step
+`002_retire_unused_analytics_derived_store` drops its six empty, unreachable derived
+tables and refuses to proceed if any contains rows. The definitions below are
+historical shapes only and are not part of the current target schema.
+
+> Prefix `analytics_` is ratified (D1) and recorded in `docs/ARCHITECTURE.md`.
+
+Generated from migration step `001_analytics_schema_v1`. Analytics owns **derived,
+recomputable state only**; every table records the `source_hash` of its inputs, so a
+stale value is detectable rather than merely wrong.
+
+#### `analytics_metric_definitions`
+
+```sql
+HISTORICAL TABLE analytics_metric_definitions (
+    metric_id TEXT PRIMARY KEY,
+    metric_code TEXT NOT NULL,
+    version TEXT NOT NULL,
+    category TEXT NOT NULL,
+    formula_hash TEXT NOT NULL,
+    min_sample_size INTEGER NOT NULL DEFAULT 1,
+    requires_benchmark INTEGER NOT NULL DEFAULT 0 CHECK (requires_benchmark IN (0, 1)),
+    higher_is_better INTEGER NOT NULL DEFAULT 1 CHECK (higher_is_better IN (0, 1)),
+    unit TEXT NOT NULL,
+    definition_json TEXT NOT NULL,
+    state TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE (metric_code, version)
+) STRICT;
+```
+
+`min_sample_size` is the catalogue's defence against reporting a Sharpe ratio from nine trades. Analytics refuses to emit a value below it rather than emitting a number that looks authoritative and means nothing.
+
+#### `analytics_metric_values`
+
+```sql
+HISTORICAL TABLE analytics_metric_values (
+    value_id TEXT PRIMARY KEY,
+    metric_id TEXT NOT NULL,
+    scope_level TEXT NOT NULL,
+    scope_key TEXT NOT NULL,
+    period_kind TEXT NOT NULL,
+    period_start_utc INTEGER NOT NULL,
+    period_end_utc INTEGER NOT NULL,
+    value_decimal TEXT,
+    sample_size INTEGER NOT NULL,
+    confidence_low_decimal TEXT,
+    confidence_high_decimal TEXT,
+    is_significant INTEGER CHECK (is_significant IN (0, 1)),
+    insufficient_sample INTEGER NOT NULL DEFAULT 0 CHECK (insufficient_sample IN (0, 1)),
+    source_hash TEXT NOT NULL,
+    computed_at TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE ( metric_id, scope_level, scope_key, period_kind, period_start_utc, period_end_utc ),
+    CHECK (insufficient_sample = 1 OR value_decimal IS NOT NULL)
+) STRICT;
+
+CREATE INDEX idx_analytics_values_scope ON analytics_metric_values(scope_level, scope_key, computed_at DESC);
+
+CREATE INDEX idx_analytics_values_metric ON analytics_metric_values(metric_id, period_end_utc DESC);
+```
+
+`insufficient_sample = 1` with a null value is how "not enough data" is represented. The `CHECK` makes the alternative — a `0` that reads as a real measurement — unrepresentable.
+
+#### `analytics_trade_analysis`
+
+```sql
+HISTORICAL TABLE analytics_trade_analysis (
+    trade_id TEXT PRIMARY KEY,
+    source_kind TEXT NOT NULL,
+    run_id TEXT,
+    position_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    symbol_id TEXT NOT NULL,
+    strategy_version_id TEXT,
+    direction TEXT NOT NULL,
+    entry_price_decimal TEXT NOT NULL,
+    exit_price_decimal TEXT NOT NULL,
+    quantity_decimal TEXT NOT NULL,
+    gross_pnl_decimal TEXT NOT NULL,
+    net_pnl_decimal TEXT NOT NULL,
+    commission_decimal TEXT NOT NULL DEFAULT '0',
+    swap_decimal TEXT NOT NULL DEFAULT '0',
+    slippage_decimal TEXT NOT NULL DEFAULT '0',
+    r_multiple_decimal TEXT,
+    mae_decimal TEXT,
+    mfe_decimal TEXT,
+    holding_seconds INTEGER NOT NULL,
+    bars_held INTEGER,
+    exit_reason TEXT NOT NULL,
+    regime_id TEXT,
+    entry_at TEXT NOT NULL,
+    exit_at TEXT NOT NULL,
+    source_hash TEXT NOT NULL,
+    created_at TEXT NOT NULL
+) STRICT;
+
+CREATE INDEX idx_analytics_trades_strategy ON analytics_trade_analysis(strategy_version_id, exit_at DESC);
+
+CREATE INDEX idx_analytics_trades_symbol ON analytics_trade_analysis(symbol_id, exit_at DESC);
+
+CREATE INDEX idx_analytics_trades_run ON analytics_trade_analysis(run_id) WHERE run_id IS NOT NULL;
+```
+
+One row per closed round-trip. `mae_decimal` and `mfe_decimal` are why this exists separately from the execution record: a winning trade that first ran 3 % against the position is a different trade from one that never did, and only excursion data distinguishes them. Nothing else stores round-trip analysis — Trading owns fills, not round trips.
+
+#### `analytics_pnl_attribution`
+
+```sql
+HISTORICAL TABLE analytics_pnl_attribution (
+    attribution_id TEXT PRIMARY KEY,
+    scope_level TEXT NOT NULL,
+    scope_key TEXT NOT NULL,
+    period_start_utc INTEGER NOT NULL,
+    period_end_utc INTEGER NOT NULL,
+    factor TEXT NOT NULL,
+    contribution_decimal TEXT NOT NULL,
+    contribution_percent_decimal TEXT NOT NULL,
+    trade_count INTEGER NOT NULL DEFAULT 0,
+    source_hash TEXT NOT NULL,
+    computed_at TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE ( scope_level, scope_key, period_start_utc, period_end_utc, factor )
+) STRICT;
+
+CREATE INDEX idx_analytics_attrib_scope ON analytics_pnl_attribution(scope_level, scope_key, period_end_utc DESC);
+```
+
+Factors must sum to total PnL with `residual` absorbing the remainder. A large residual is itself the signal: the attribution model is missing a real cost.
+
+#### `analytics_equity_curves`
+
+```sql
+HISTORICAL TABLE analytics_equity_curves (
+    curve_id TEXT PRIMARY KEY,
+    scope_level TEXT NOT NULL,
+    scope_key TEXT NOT NULL,
+    dataset_id TEXT,
+    period_start_utc INTEGER NOT NULL,
+    period_end_utc INTEGER NOT NULL,
+    point_count INTEGER NOT NULL DEFAULT 0,
+    start_equity_decimal TEXT NOT NULL,
+    end_equity_decimal TEXT NOT NULL,
+    peak_equity_decimal TEXT NOT NULL,
+    trough_equity_decimal TEXT NOT NULL,
+    max_drawdown_decimal TEXT NOT NULL DEFAULT '0',
+    max_drawdown_percent_decimal TEXT NOT NULL DEFAULT '0',
+    max_drawdown_start_utc INTEGER,
+    max_drawdown_end_utc INTEGER,
+    recovery_ts_utc INTEGER,
+    source_hash TEXT NOT NULL,
+    state TEXT NOT NULL,
+    computed_at TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE (scope_level, scope_key, period_start_utc, period_end_utc),
+    CHECK (period_end_utc >= period_start_utc)
+) STRICT;
+
+CREATE INDEX idx_analytics_equity_scope ON analytics_equity_curves(scope_level, scope_key, period_end_utc DESC);
+
+CREATE INDEX idx_analytics_equity_dd ON analytics_equity_curves(scope_level, max_drawdown_percent_decimal);
+```
+
+Curve **points** live in an artifact; this holds identity and summary statistics. The summary columns are the ones actually queried — "worst drawdown across all strategies" ranks a few hundred rows, not millions of points.
+
+`recovery_ts_utc IS NULL` on a completed curve means the drawdown never recovered, a distinct state rather than an absent value.
+
+#### `analytics_reports`
+
+```sql
+HISTORICAL TABLE analytics_reports (
+    report_id TEXT PRIMARY KEY,
+    report_kind TEXT NOT NULL,
+    scope_level TEXT NOT NULL,
+    scope_key TEXT NOT NULL,
+    period_start_utc INTEGER NOT NULL,
+    period_end_utc INTEGER NOT NULL,
+    content_json TEXT NOT NULL,
+    content_hash TEXT NOT NULL,
+    artifact_path TEXT,
+    state TEXT NOT NULL,
+    generated_at TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+) STRICT;
+
+CREATE INDEX idx_analytics_reports_scope ON analytics_reports(scope_level, scope_key, generated_at DESC);
+```
+
+`content_hash` makes a report reproducible: the same inputs must produce the same document.
+
+---
+
 | Status    | Requirement ID   | Type          | Responsibility                                                                                                                                                                                                                                                                                                                                         | Verification                                                                              |
 | --------- | ---------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
 | Completed | `NFR-ANLT-001` | API boundary  | Package-root exports shall contain only the static catalog-approved high-level operations and owned contracts; deep cross-domain imports and mutable registries are prohibited.                                                                                                                                                                        | Import/catalog tests                                                                      |

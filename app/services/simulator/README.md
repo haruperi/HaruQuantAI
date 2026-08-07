@@ -1351,6 +1351,98 @@ exported.
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `sim_`.
+
+> **This target domain model follows the current migration manifest.** The inspected
+> non-production database currently has `sim_runs` from step 001 but has not yet
+> applied step 002 for `sim_sessions`; API startup invokes the complete manifest and
+> fails closed until both steps verify. Simulator persists **run identity and
+> completed-run playback session cursors**. Its canonical journal is append-only JSONL and its results are published as
+> file artifacts; neither is backed by a table. The mirrored `sim_orders` /
+> `sim_fills` / `sim_positions` design an earlier draft proposed is target-only and is
+> not implied by this schema.
+
+#### `sim_runs`
+
+```sql
+CREATE TABLE sim_runs (
+    request_id       TEXT    PRIMARY KEY,
+    request_hash     TEXT    NOT NULL,
+    run_id           TEXT    NOT NULL UNIQUE,
+    status           TEXT    NOT NULL,
+    result_payload   TEXT,
+    correlation_id   TEXT    NOT NULL DEFAULT '',
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_sim_runs_status ON sim_runs(status);
+```
+
+Renamed from `simulation_runs` under the ratified `sim_` namespace (D2). The step was
+never applied, so this was a definition edit rather than a rename migration.
+
+`request_id` is the primary key and `run_id` is separately `UNIQUE`: one request maps
+to exactly one run, and a replayed request returns the original run instead of starting
+a second. `request_hash` makes a replay with changed material fail rather than silently
+reusing the prior run.
+
+`result_payload` is nullable — an incomplete run has no result, and per
+`AGENTS.md` §3 "No Invented Data" an absent result must read as absent rather than as
+an empty one.
+
+#### `sim_sessions`
+
+```sql
+CREATE TABLE sim_sessions (
+    session_id TEXT    PRIMARY KEY,
+    run_id     TEXT    NOT NULL,
+    status     TEXT    NOT NULL CHECK(status IN ('active', 'completed', 'expired')),
+    cursor     INTEGER NOT NULL CHECK(cursor >= -1),
+    created_at TEXT    NOT NULL,
+    expires_at TEXT    NOT NULL,
+    FOREIGN KEY(run_id) REFERENCES sim_runs(run_id)
+) STRICT;
+
+CREATE INDEX idx_sim_sessions_run ON sim_sessions(run_id);
+CREATE INDEX idx_sim_sessions_expiry ON sim_sessions(status, expires_at);
+```
+
+The row is a one-hour, stateless cursor over an already-finalized journal. Cursor
+updates are monotonic, `-1` means no frame has been delivered, and no engine state,
+positions, orders, or equity snapshots are stored in this table.
+
+#### Why there is no journal table
+
+`app/services/simulator/state/migrations.py` recorded the position before this model
+existed: the canonical journal is append-only JSONL (`JOURNAL_FORMAT = "jsonl-v1"`) and
+*"no table backs it, because a SQLite journal sidecar is an explicit Phase 1
+exclusion."* The model defers to that.
+
+A journal is written once, read sequentially, and never queried by predicate — the
+access pattern JSONL serves and SQLite does not. It is written to a temp path, renamed
+atomically, then hashed, the same integrity discipline used for Parquet partitions
+([00](00_domain_relationship_map.md) §0). Discarding a backtest costs a file delete
+rather than millions of row deletes and a `VACUUM`.
+
+---
+
+#### Target-only tables
+
+No live counterpart; not built. They would mirror the `trading_*` execution tables so
+Analytics could compute performance from one shape across live and backtest results.
+Until they exist, Analytics reads simulator results from published artifacts.
+
+`sim_execution_models` · `sim_orders` · `sim_fills` · `sim_positions` ·
+`sim_order_transitions`
+
+Their column definitions are omitted here rather than carried as unbuilt DDL; the
+`trading_*` tables in Domain 7 are the shape they would take, plus `run_id`.
+
+---
+
 | Status    | Requirement ID  | Type            | Responsibility                                                                                                                                                                                                                                                                                                       | Verification                                                                                                   |
 | --------- | --------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | Completed | `NFR-SIM-001` | Determinism     | Identical approved inputs, versions, configuration, and seeds shall produce byte-identical canonical reports and journal identities.                                                                                                                                                                                 | Golden and replay tests                                                                                        |

@@ -1766,6 +1766,71 @@ These rows assign every remaining planned file an exact requirement. Private hel
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `broker_`.
+
+> Prefix `broker_` is ratified (D1) and recorded in `docs/ARCHITECTURE.md`.
+
+#### Brokers persists almost nothing — by design
+
+`docs/PROJECT.md` §5 records Brokers persisted state as `Completed` by **verified
+absence**: *"Brokers is a stateless passthrough; technical session state is in-memory
+only and credentials are never persisted."* Decision **D10** upheld that.
+
+An earlier draft of this model defined `broker_providers`, `broker_connections`,
+`broker_accounts`, and `broker_connection_events`. All four are **withdrawn**:
+
+| Withdrawn table | Why it is not needed |
+|---|---|
+| `broker_providers` | Provider capability and rate-limit policy is configuration, not state. It belongs in typed settings or the adapter registry, not in a table. |
+| `broker_connections` | Connection and circuit-breaker state is in-memory by design (`_TransportCircuitBreaker`). Persisting it creates a recovery path that can resurrect a stale circuit state across restart. |
+| `broker_accounts` | Balance, equity, and margin are **fetched live**. Persisting them creates a staleness and reconciliation problem the current design does not have. |
+| `broker_connection_events` | Connection transitions are operational telemetry; they belong in the rotating application log, or in `data_audit_events` when they must be durable. |
+
+**One safety control was lost with them.** `broker_connections` carried
+`CHECK (environment <> 'production' OR enabled = 0)`, which made a production
+connection structurally unstorable in the enabled state — a schema-level enforcement
+of `AGENTS.md` §3 *No Live Action by Default*. That guarantee now rests entirely on
+application code and the `ALLOW_LIVE_MUTATIONS` toggle. This is a real reduction in
+structural safety, accepted as the price of keeping Brokers stateless.
+
+#### `broker_symbol_map`
+
+The single exception, generated from migration step `001_broker_symbol_map_v1`.
+
+
+
+```sql
+CREATE TABLE broker_symbol_map (
+    map_id TEXT PRIMARY KEY,
+    provider_code TEXT NOT NULL,
+    symbol_id TEXT NOT NULL,
+    provider_symbol TEXT NOT NULL,
+    contract_size_decimal TEXT NOT NULL DEFAULT '1',
+    digits_override INTEGER,
+    enabled INTEGER NOT NULL DEFAULT 1 CHECK (enabled IN (0, 1)),
+    effective_from TEXT NOT NULL,
+    effective_to TEXT,
+    request_id TEXT NOT NULL DEFAULT '',
+    correlation_id TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE (provider_code, provider_symbol, effective_from),
+    UNIQUE (provider_code, symbol_id, effective_from)
+) STRICT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_broker_symbol_active ON broker_symbol_map(provider_code, symbol_id) WHERE enabled = 1 AND effective_to IS NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_broker_symbol_reverse ON broker_symbol_map(provider_code, provider_symbol) WHERE enabled = 1 AND effective_to IS NULL;
+```
+
+`effective_from` / `effective_to` make the mapping **bitemporal**. A broker that renames an instrument mid-history must not retroactively rewrite what an earlier backtest traded, so a rename closes the old row and opens a new one.
+
+Both partial unique indexes are enforcement, not optimisation: at most one active mapping per instrument, and at most one per provider symbol. A duplicate active mapping is how an order reaches the wrong instrument.
+
+`provider_code` and `symbol_id` are plain values, not foreign keys. Brokers reaches Data through `app.services.data`, never through its schema.
+
 ### Shared Configuration and Limits Manifest
 
 These values apply across provider modules. Secrets are resolved by Utils at the composition root and injected; Brokers never reads environment variables, user tables, or a vault directly.

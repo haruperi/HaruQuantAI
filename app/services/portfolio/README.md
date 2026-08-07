@@ -799,6 +799,237 @@ The concrete constructor fields are intentionally not invented here; implementat
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `portfolio_`.
+
+> **This domain follows the live implementation, not an independent design.**
+> An earlier draft proposed a normalised Portfolio with `portfolio_definition_versions`,
+> `portfolio_positions`, and `portfolio_cash_balances`, on the belief that
+> `portfolio_definitions` keyed on `portfolio_id` alone and that child foreign keys
+> blocked composite-key versioning. **Both premises were wrong.** The shipped table
+> already keys on `(portfolio_id, portfolio_version)`, so definition history is
+> immutable without a second table, and **no Portfolio table declares a foreign key** —
+> version rows must survive independently, so references are soft and validated in the
+> owning feature modules. Decision D14 is withdrawn on that basis.
+
+#### `portfolio_definitions`
+
+Immutable versioned definitions. A change appends a new `portfolio_version`; rows are
+never updated.
+
+```sql
+CREATE TABLE portfolio_definitions (
+    portfolio_id     TEXT    NOT NULL,
+    portfolio_version TEXT   NOT NULL,
+    scope_key        TEXT    NOT NULL,
+    definition_json  TEXT    NOT NULL,
+    canonical_hash   TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    PRIMARY KEY (portfolio_id, portfolio_version)
+) STRICT;
+
+CREATE INDEX idx_portfolio_defs_scope ON portfolio_definitions(portfolio_id, scope_key);
+```
+
+The composite primary key **is** the immutable-history mechanism required by
+`docs/PROJECT.md` §5: *"rollback creates a new governed version and never rewrites
+history."* `canonical_hash` makes a definition tamper-evident.
+
+Per the hybrid rule (D9) only the identity, scope, and hash are normalised; the
+configuration itself stays in `definition_json`, so a new portfolio parameter needs no
+migration.
+
+#### `portfolio_construction_results`
+
+```sql
+CREATE TABLE portfolio_construction_results (
+    result_id        TEXT    PRIMARY KEY,
+    portfolio_id     TEXT    NOT NULL,
+    portfolio_version TEXT   NOT NULL,
+    canonical_hash   TEXT    NOT NULL,
+    result_json      TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_portfolio_results_portfolio
+    ON portfolio_construction_results(portfolio_id, created_at DESC);
+```
+
+`canonical_hash` binds a construction result to the exact definition version that
+produced it, so a result can be re-derived against the inputs that actually applied.
+
+#### `portfolio_allocation_versions`
+
+```sql
+CREATE TABLE portfolio_allocation_versions (
+    allocation_id    TEXT    PRIMARY KEY,
+    portfolio_id     TEXT    NOT NULL,
+    allocation_version TEXT  NOT NULL,
+    scope_key        TEXT    NOT NULL,
+    canonical_hash   TEXT    NOT NULL,
+    allocation_json  TEXT    NOT NULL,
+    activated_at     TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    UNIQUE (portfolio_id, allocation_version)
+) STRICT;
+```
+
+Append-only. Which allocation is *current* is not a flag on this table — it is the
+pointer in `portfolio_active_scopes`, so activation is one write to one row rather than
+a two-row flag swap that can interleave.
+
+#### `portfolio_active_scopes`
+
+The current-version pointer, one row per `(portfolio_id, scope_key)`.
+
+```sql
+CREATE TABLE portfolio_active_scopes (
+    portfolio_id     TEXT    NOT NULL,
+    scope_key        TEXT    NOT NULL,
+    allocation_version TEXT  NOT NULL,
+    revision         INTEGER NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    PRIMARY KEY (portfolio_id, scope_key)
+) STRICT;
+```
+
+`revision` is the compare-and-swap guard: an activation passes its expected revision
+and fails rather than clobbering a concurrent change. The primary key guarantees **at
+most one active allocation per scope** — the invariant an earlier draft tried to
+enforce with a partial unique index on an `is_active` flag.
+
+#### `portfolio_rebalance_plans`
+
+```sql
+CREATE TABLE portfolio_rebalance_plans (
+    plan_id          TEXT    NOT NULL,
+    plan_version     TEXT    NOT NULL,
+    portfolio_id     TEXT    NOT NULL,
+    allocation_version TEXT  NOT NULL,
+    canonical_hash   TEXT    NOT NULL,
+    plan_json        TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    PRIMARY KEY (plan_id, plan_version)
+) STRICT;
+
+CREATE INDEX idx_portfolio_plans_portfolio
+    ON portfolio_rebalance_plans(portfolio_id, created_at DESC);
+```
+
+Versioned like definitions: a revised plan is a new `plan_version`, never an update.
+
+#### `portfolio_idempotency`
+
+```sql
+CREATE TABLE portfolio_idempotency (
+    idempotency_key  TEXT    PRIMARY KEY,
+    material_hash    TEXT    NOT NULL,
+    result_type      TEXT    NOT NULL,
+    result_id        TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL
+) STRICT;
+```
+
+`material_hash` guards against key reuse with different contents: a replayed key
+carrying changed material must fail rather than silently returning the prior result.
+
+#### `portfolio_audit_outbox`
+
+Transactional outbox — the state change and its notification commit together.
+
+```sql
+CREATE TABLE portfolio_audit_outbox (
+    event_id         TEXT    PRIMARY KEY,
+    event_type       TEXT    NOT NULL,
+    aggregate_id     TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    payload_json     TEXT    NOT NULL,
+    occurred_at      TEXT    NOT NULL,
+    publication_state TEXT   NOT NULL DEFAULT 'pending',
+    attempts         INTEGER NOT NULL DEFAULT 0,
+    published_at     TEXT,
+    created_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_portfolio_outbox_pending ON portfolio_audit_outbox(occurred_at)
+    WHERE publication_state = 'pending';
+```
+
+The partial index is empty once the outbox drains, so the publisher's poll costs an
+empty-B-tree probe.
+
+---
+
+#### Target-only tables
+
+No live counterpart; not built. Tier B work with no conformance obligation.
+
+##### `portfolio_positions`
+
+```sql
+CREATE TABLE portfolio_positions (
+    portfolio_position_id TEXT PRIMARY KEY,
+    portfolio_id     TEXT    NOT NULL,
+    symbol_id        TEXT    NOT NULL,
+    account_id       TEXT    NOT NULL,
+    net_quantity_decimal TEXT NOT NULL,
+    notional_decimal     TEXT NOT NULL,
+    weight_decimal       TEXT NOT NULL,
+    target_weight_decimal TEXT NOT NULL,
+    drift_decimal        TEXT NOT NULL,
+    unrealized_pnl_decimal TEXT NOT NULL DEFAULT '0',
+    observed_at      TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    UNIQUE (portfolio_id, symbol_id, account_id)
+) STRICT;
+
+CREATE INDEX idx_portfolio_pos_drift ON portfolio_positions(portfolio_id, drift_decimal DESC);
+```
+
+`drift_decimal` stored rather than computed on read, so the threshold rebalance trigger
+is one indexed scan.
+
+##### `portfolio_cash_balances`
+
+```sql
+CREATE TABLE portfolio_cash_balances (
+    balance_id       TEXT    PRIMARY KEY,
+    portfolio_id     TEXT    NOT NULL,
+    account_id       TEXT    NOT NULL,
+    currency         TEXT    NOT NULL,
+    balance_decimal  TEXT    NOT NULL,
+    available_decimal TEXT   NOT NULL,
+    reserved_decimal TEXT    NOT NULL DEFAULT '0',
+    fx_rate_to_base_decimal TEXT NOT NULL DEFAULT '1',
+    base_value_decimal      TEXT NOT NULL,
+    fx_rate_source   TEXT    NOT NULL DEFAULT '',
+    fx_rate_at       TEXT,
+    observed_at      TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    UNIQUE (portfolio_id, account_id, currency)
+) STRICT;
+```
+
+`fx_rate_source` and `fx_rate_at` are mandatory companions to the rate: a converted
+balance without a timestamped, attributed rate cannot be reconciled.
+
 | ID           | Requirement                                                                                                                       | Verification                 |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
 | NFR-PORT-001 | Google Python Style, complete types, Google docstrings, absolute imports, and no `print`.                                         | Ruff/mypy/review             |

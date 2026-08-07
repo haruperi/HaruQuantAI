@@ -4,7 +4,7 @@
 
 Brokers persists exactly one table: the bitemporal `broker_symbol_map`
 provider-to-canonical symbol reference data (the `docs/PROJECT.md` §5
-persisted-state ownership table and `docs/schema` decision D10). A
+persisted-state ownership table and the Brokers README database specification). A
 mis-mapped symbol routes an order to the wrong instrument, so this reference
 data must be stable, versioned, and identical across restarts.
 

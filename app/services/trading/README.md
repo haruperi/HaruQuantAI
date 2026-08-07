@@ -1658,6 +1658,187 @@ No feature-specific setting. Report schema version follows `TRADING_CONTRACT_VER
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `trading_`.
+
+Event-sourced: `trading_events` is the write model and `trading_orders` is its
+order-state projection. `trading_positions` is an insert-only ledger of complete
+closed trades. Open positions and tick-valued unrealized state are deliberately
+excluded from relational persistence.
+
+#### `trading_events`
+
+The append-only write model. Source of truth.
+
+```sql
+CREATE TABLE trading_events (
+    event_seq        INTEGER PRIMARY KEY,
+    event_id         TEXT    NOT NULL UNIQUE,
+    event_type       TEXT    NOT NULL,
+    event_version    TEXT    NOT NULL,
+    scope_key        TEXT    NOT NULL,                   -- aggregate identity
+    aggregate_version INTEGER NOT NULL,
+    payload_json     TEXT    NOT NULL CHECK (json_valid(payload_json)),
+    occurred_at      TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    causation_id     TEXT,
+    bucket_year      TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    UNIQUE (scope_key, aggregate_version)
+) STRICT;
+
+CREATE INDEX idx_trading_events_scope ON trading_events(scope_key, aggregate_version);
+CREATE INDEX idx_trading_events_time  ON trading_events(occurred_at DESC);
+CREATE INDEX idx_trading_events_corr  ON trading_events(correlation_id);
+```
+
+`UNIQUE (scope_key, aggregate_version)` is the optimistic-concurrency control:
+two concurrent writers computing the same next version collide at insert. One wins,
+one retries. Without it, a double-submitted order silently doubles the position.
+
+#### `trading_idempotency`
+
+```sql
+CREATE TABLE trading_idempotency (
+    idempotency_key  TEXT    PRIMARY KEY,
+    material_hash    TEXT    NOT NULL,
+    material_version TEXT    NOT NULL,
+    status           TEXT    NOT NULL CHECK (status IN ('in_flight','succeeded','failed')),
+    receipt_id       TEXT,
+    expires_at       TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_trading_idem_expiry ON trading_idempotency(expires_at);
+```
+
+`material_hash` guards against key reuse with different payloads — a replayed key
+carrying changed contents must fail, not silently return the prior receipt.
+
+#### `trading_orders`
+
+```sql
+CREATE TABLE trading_orders (
+    order_id         TEXT    PRIMARY KEY,
+    client_order_id  TEXT    NOT NULL UNIQUE,
+    broker_order_id  TEXT,
+    account_id       TEXT    NOT NULL,                   -- opaque broker account id; no table (D10)
+    symbol_id        TEXT    NOT NULL,
+    strategy_version_id TEXT,                            -- soft ref
+    config_id        TEXT,                               -- soft ref
+    signal_id        TEXT,                               -- soft ref
+    risk_decision_id TEXT    NOT NULL,                   -- soft ref -> risk_eligibility_decisions; NOT NULL = mandatory gate
+    side             TEXT    NOT NULL CHECK (side IN ('buy','sell')),
+    order_type       TEXT    NOT NULL CHECK (order_type IN ('market','limit','stop','stop_limit','trailing_stop')),
+    time_in_force    TEXT    CHECK (time_in_force IN ('gtc','ioc','fok','day','gtd')),
+    quantity_decimal TEXT    NOT NULL,
+    filled_qty_decimal TEXT  NOT NULL DEFAULT '0',
+    limit_price_decimal TEXT,
+    stop_price_decimal  TEXT,
+    avg_fill_price_decimal TEXT,
+    stop_loss_decimal   TEXT,
+    take_profit_decimal TEXT,
+    state            TEXT    NOT NULL CHECK (state IN (
+                        'pending_new','new','partially_filled','filled',
+                        'pending_cancel','cancelled','rejected','expired')),
+    reject_reason    TEXT,
+    runtime_profile  TEXT    NOT NULL CHECK (runtime_profile IN ('research','simulation','paper','live')),
+    submitted_at     TEXT,
+    terminal_at      TEXT,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    CHECK (order_type NOT IN ('limit','stop_limit') OR limit_price_decimal IS NOT NULL),
+    CHECK (order_type NOT IN ('stop','stop_limit','trailing_stop') OR stop_price_decimal IS NOT NULL),
+    CHECK (state <> 'rejected' OR reject_reason IS NOT NULL)
+) STRICT;
+
+CREATE INDEX idx_trading_orders_open    ON trading_orders(account_id, symbol_id)
+    WHERE state IN ('pending_new','new','partially_filled','pending_cancel');
+CREATE INDEX idx_trading_orders_broker  ON trading_orders(broker_order_id) WHERE broker_order_id IS NOT NULL;
+CREATE INDEX idx_trading_orders_history ON trading_orders(account_id, created_at DESC);
+CREATE INDEX idx_trading_orders_risk    ON trading_orders(risk_decision_id);
+```
+
+`risk_decision_id TEXT NOT NULL` is the load-bearing constraint of the whole design.
+An order row cannot physically exist without naming a risk decision.
+
+`time_in_force` is nullable because the shipped Trading contract permits an authority
+to apply its documented order-type default. Persistence must retain absence and must
+not invent a broker instruction that was not present in the governed intent.
+
+Migration `002_closed_position_ledger` retired the empty `trading_fills` and
+`trading_order_transitions` projections and replaced the empty migration-`001`
+open-position projection. Historical executable DDL remains immutable in code;
+only the current target is specified below.
+
+#### `trading_positions`
+
+Completed closed trades only. Monetary and quantity values are canonical decimal
+text. Rows are insert-only and never track tick-valued open state.
+
+```sql
+CREATE TABLE trading_positions (
+    ticket TEXT PRIMARY KEY,
+    symbol TEXT NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('buy','sell')),
+    volume TEXT NOT NULL,
+    entry_time TEXT NOT NULL,
+    entry_price TEXT NOT NULL,
+    stop_loss TEXT,
+    take_profit TEXT,
+    exit_time TEXT NOT NULL,
+    exit_price TEXT NOT NULL,
+    exit_reason TEXT NOT NULL,
+    commission TEXT NOT NULL,
+    swap TEXT NOT NULL,
+    profit TEXT NOT NULL,
+    mae_points INTEGER NOT NULL CHECK (mae_points >= 0),
+    mfe_points INTEGER NOT NULL CHECK (mfe_points >= 0),
+    slippage_points INTEGER NOT NULL CHECK (slippage_points >= 0),
+    magic TEXT NOT NULL,
+    strategy TEXT NOT NULL,
+    account TEXT NOT NULL,
+    environment TEXT NOT NULL CHECK (environment IN ('demo','paper','sim','live')),
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    evidence_hash TEXT NOT NULL UNIQUE,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    CHECK (exit_time >= entry_time)
+) STRICT;
+
+CREATE INDEX idx_trading_positions_account_exit ON trading_positions(account, exit_time DESC);
+CREATE INDEX idx_trading_positions_strategy_exit ON trading_positions(account, strategy, exit_time DESC);
+CREATE INDEX idx_trading_positions_symbol_exit ON trading_positions(account, symbol, exit_time DESC);
+CREATE INDEX idx_trading_positions_magic_exit ON trading_positions(account, magic, exit_time DESC);
+```
+
+`trading_fills` and `trading_order_transitions` are not target tables after migration
+`002`; their authority facts remain in `trading_events`.
+
+#### `trading_projections`
+
+```sql
+CREATE TABLE trading_projections (
+    scope_key        TEXT    PRIMARY KEY,
+    projection_version INTEGER NOT NULL,
+    last_event_seq   INTEGER NOT NULL,
+    projection_json  TEXT    NOT NULL CHECK (json_valid(projection_json)),
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL
+) STRICT;
+```
+
+`last_event_seq` records how far the projection has consumed the event log — the
+resume point for rebuilds and the staleness check for readers.
+
+---
+
 | Status    | Requirement ID  | Type          | Responsibility                                                                                                                                                                                                         | Verification                                                            |
 | --------- | --------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | Completed | `NFR-TRD-001` | Safety        | Missing/unverifiable policy, context, authority, or state shall block mutation.                                                                                                                                        | Failure-path integration tests                                          |

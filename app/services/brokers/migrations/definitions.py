@@ -8,7 +8,7 @@ persisted. Decision D10 upheld that.
 One table is the exception. Provider-to-canonical symbol translation is
 reference data: it must be stable, versioned, and identical across restarts,
 because a mis-mapped symbol routes an order to the wrong instrument. Private
-support; see ``migrations/README.md`` and ``docs/schema`` decision D10.
+support; see ``migrations/README.md`` and the Brokers README database specification.
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 """Agentic-owned artefact lifecycle schema definitions executed by Data.
 
-Conformed to the authoritative schema model in ``docs/schema`` (Domain 13). The
+Conformed to the authoritative schema model in ``app/agentic/README.md``. The
 step has never been applied to a database, so the definition is edited in place
 rather than extended by a follow-on migration; see ``FR-AGT-003``.
 """

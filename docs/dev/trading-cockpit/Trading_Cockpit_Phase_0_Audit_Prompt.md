@@ -1,3 +1,4 @@
+
 # HaruQuantAI Trading Cockpit — Phase 0 Coding-Agent Prompt
 
 ## Current-State Inventory, Contract Registry, Gap Matrix, and Protected Implementation Baseline

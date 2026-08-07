@@ -1085,6 +1085,172 @@ alone maps domain results and errors to external transport responses.
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `optimization_`.
+
+> **This domain follows the live implementation.** A search is identified by
+> `search_id`, and its ranked candidates are stored as a payload rather than one row
+> per trial. The normalised job/trial decomposition below is target-only.
+> Current executable state is exactly `optimization_results` and
+> `optimization_checkpoints`; both are reached by the Optimization relational store,
+> while the complete manifest is applied only through Data's migration runner.
+
+#### `optimization_results`
+
+```sql
+CREATE TABLE optimization_results (
+    search_id        TEXT    PRIMARY KEY,
+    schema_version   TEXT    NOT NULL,
+    reproducibility_hash TEXT NOT NULL,
+    result_json      TEXT    NOT NULL,
+    ranked_candidates_json TEXT NOT NULL,
+    stored_at        TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_optimization_results_repro ON optimization_results(reproducibility_hash);
+```
+
+`reproducibility_hash` is indexed so an identical search is found rather than recomputed.
+A search that cannot be reproduced is not evidence of anything.
+
+#### `optimization_checkpoints`
+
+```sql
+CREATE TABLE optimization_checkpoints (
+    search_id        TEXT    PRIMARY KEY,
+    schema_version   TEXT    NOT NULL,
+    reproducibility_hash TEXT NOT NULL,
+    completed_candidate_position INTEGER NOT NULL,
+    checkpoint_json  TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL
+) STRICT;
+```
+
+`completed_candidate_position` is the resume point. Resuming without it — or with a
+fresh RNG — silently changes the search trajectory, so the resumed job is not the job
+that was started.
+
+---
+
+#### Target-only tables
+
+No live counterpart; not built. They normalise what `ranked_candidates_json` currently
+carries, enabling per-trial querying and overfit ratios.
+
+##### `optimization_jobs`
+
+```sql
+CREATE TABLE optimization_jobs (
+    job_id           TEXT    PRIMARY KEY,
+    job_name         TEXT    NOT NULL,
+    strategy_version_id TEXT NOT NULL,                   -- soft ref
+    method           TEXT    NOT NULL CHECK (method IN ('grid','random','genetic','bayesian','particle_swarm','walk_forward')),
+    search_space_json TEXT   NOT NULL CHECK (json_valid(search_space_json)),
+    objective_metric_id TEXT NOT NULL,                   -- soft ref → analytics_metric_definitions
+    objective_direction TEXT NOT NULL CHECK (objective_direction IN ('maximize','minimize')),
+    constraints_json TEXT    NOT NULL DEFAULT '{}' CHECK (json_valid(constraints_json)),
+    max_trials       INTEGER NOT NULL,
+    completed_trials INTEGER NOT NULL DEFAULT 0,
+    parallelism      INTEGER NOT NULL DEFAULT 1,
+    seed             INTEGER NOT NULL DEFAULT 0,
+    in_sample_start_utc  INTEGER NOT NULL,
+    in_sample_end_utc    INTEGER NOT NULL,
+    out_sample_start_utc INTEGER,
+    out_sample_end_utc   INTEGER,
+    holdout_locked   INTEGER NOT NULL DEFAULT 1 CHECK (holdout_locked IN (0,1)),
+    state            TEXT    NOT NULL CHECK (state IN ('draft','queued','running','paused','completed','failed','cancelled')),
+    best_trial_id    TEXT,
+    started_at       TEXT,
+    finished_at      TEXT,
+    request_id       TEXT    NOT NULL,
+    correlation_id   TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    CHECK (in_sample_end_utc > in_sample_start_utc),
+    CHECK (out_sample_start_utc IS NULL OR out_sample_start_utc >= in_sample_end_utc)
+) STRICT;
+
+CREATE INDEX idx_opt_jobs_active   ON optimization_jobs(job_id) WHERE state IN ('queued','running');
+CREATE INDEX idx_opt_jobs_strategy ON optimization_jobs(strategy_version_id, created_at DESC);
+```
+
+The `out_sample_start_utc >= in_sample_end_utc` check enforces temporal separation at
+the schema level. An overlapping out-of-sample window is not a validation — it is the
+in-sample result reported twice.
+
+`holdout_locked` pairs with `optimization_holdout_uses` below.
+
+##### `optimization_trials`
+
+```sql
+CREATE TABLE optimization_trials (
+    trial_id         TEXT    PRIMARY KEY,
+    job_id           TEXT    NOT NULL REFERENCES optimization_jobs(job_id) ON DELETE RESTRICT,
+    trial_number     INTEGER NOT NULL,
+    params_json      TEXT    NOT NULL CHECK (json_valid(params_json)),
+    params_hash      TEXT    NOT NULL,
+    run_id           TEXT,                               -- soft ref → sim_runs
+    objective_value_decimal TEXT,
+    metrics_json     TEXT    NOT NULL DEFAULT '{}' CHECK (json_valid(metrics_json)),
+    in_sample_score_decimal  TEXT,
+    out_sample_score_decimal TEXT,
+    overfit_ratio_decimal    TEXT,
+    generation        INTEGER,
+    parent_trial_ids_json TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(parent_trial_ids_json)),
+    state            TEXT    NOT NULL CHECK (state IN ('pending','running','completed','failed','pruned')),
+    error_code       TEXT,
+    started_at       TEXT,
+    finished_at      TEXT,
+    duration_ms      INTEGER,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    UNIQUE (job_id, trial_number),
+    UNIQUE (job_id, params_hash)
+) STRICT;
+
+CREATE INDEX idx_opt_trials_rank    ON optimization_trials(job_id, objective_value_decimal DESC)
+    WHERE state = 'completed';
+CREATE INDEX idx_opt_trials_pending ON optimization_trials(job_id, trial_number) WHERE state = 'pending';
+```
+
+`UNIQUE (job_id, params_hash)` prevents re-evaluating an already-tested point —
+significant compute saving in genetic search, where crossover regularly reproduces
+existing genomes.
+
+`overfit_ratio_decimal` (out-of-sample ÷ in-sample) is stored rather than derived so
+it can be indexed and filtered on directly. A ratio far below 1 is the primary
+overfitting tell.
+
+##### `optimization_holdout_uses`
+
+Every touch of the holdout set, recorded.
+
+```sql
+CREATE TABLE optimization_holdout_uses (
+    use_seq          INTEGER PRIMARY KEY,
+    job_id           TEXT    NOT NULL REFERENCES optimization_jobs(job_id) ON DELETE RESTRICT,
+    trial_id         TEXT,
+    holdout_hash     TEXT    NOT NULL,
+    purpose          TEXT    NOT NULL CHECK (purpose IN ('final_validation','promotion_check','audit')),
+    authorized_by    TEXT    NOT NULL,
+    used_at          TEXT    NOT NULL,
+    created_at       TEXT    NOT NULL
+) STRICT;
+
+CREATE INDEX idx_opt_holdout_job ON optimization_holdout_uses(job_id, used_at DESC);
+```
+
+A holdout set evaluated fifty times is no longer a holdout set — it has become a
+second training set through selection. Counting rows here makes that visible instead
+of leaving it to memory and good intentions.
+
 ### Shared configuration
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |

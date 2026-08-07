@@ -5,7 +5,7 @@ vice versa. Exits non-zero on any mismatch.
 
 Run from anywhere::
 
-    python docs/schema/compare_model_to_code.py
+    python scripts/schema/compare_model_to_code.py
 
 Note on the constraint matcher: ``CHECK``/``UNIQUE`` must be matched with a
 following ``(`` and ``PRIMARY KEY``/``FOREIGN KEY`` with the trailing keyword.
@@ -21,12 +21,23 @@ import re
 import sys
 
 _ROOT = pathlib.Path(__file__).resolve().parents[2]
-_DOCS = pathlib.Path(__file__).resolve().parent
+_DOCS = _ROOT
 
 _SPEC_FILES = (
-    "01_entity_specs_core.md",
-    "02_entity_specs_execution.md",
-    "03_entity_specs_intelligence.md",
+    "app/utils/README.md",
+    "app/services/brokers/README.md",
+    "app/services/data/README.md",
+    "app/services/indicators/README.md",
+    "app/services/strategy/README.md",
+    "app/services/risk/README.md",
+    "app/services/trading/README.md",
+    "app/services/simulator/README.md",
+    "app/services/analytics/README.md",
+    "app/services/optimization/README.md",
+    "app/services/research/README.md",
+    "app/services/portfolio/README.md",
+    "app/agentic/README.md",
+    "app/services/api/README.md",
 )
 
 # Migration definition modules whose DDL is expected to match the model.

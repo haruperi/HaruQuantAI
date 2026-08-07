@@ -4,7 +4,7 @@ Agentic declares its additive schema; Data owns migration execution, the
 immutable ledger, checksums, and write locks. This module declares values only
 — it opens no connection and executes nothing.
 
-Conformed to the authoritative schema model in ``docs/schema`` (Domain 13). The
+Conformed to the authoritative schema model in ``app/agentic/README.md``. The
 step has never been applied to a database, so the definition is edited in place
 rather than extended by a follow-on migration; see ``FR-AGT-001``.
 """
