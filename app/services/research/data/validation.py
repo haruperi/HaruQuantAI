@@ -24,6 +24,7 @@ from app.utils import get_logger
 logger = get_logger(__name__)
 
 _MIN_CONTINUITY_ROWS = 3
+_BYTES_PER_MEBIBYTE = 1024 * 1024
 
 
 class _MarketDataset(Protocol):
@@ -37,6 +38,34 @@ class _MarketDataset(Protocol):
     def model_dump(self, *, mode: str) -> Mapping[str, object]:
         """Return the canonical serialized dataset payload."""
         ...
+
+
+def _enforce_memory_budget(
+    frame: pd.DataFrame,
+    limits: ResearchResourceLimits,
+    *,
+    allocation_multiplier: int,
+) -> None:
+    """Fail before work whose deterministic allocation estimate exceeds policy.
+
+    Pandas and NumPy allocate outside Python's object allocator, so admission is
+    based on deep frame bytes and a documented per-stage copy multiplier rather
+    than an unverifiable process-wide memory claim.
+
+    Args:
+        frame: Input frame whose deep allocation is measurable.
+        limits: Approved Research resource ceilings.
+        allocation_multiplier: Maximum simultaneous frame-sized allocations.
+
+    Raises:
+        ValueError: If the estimated peak exceeds the approved memory budget.
+    """
+    estimated_peak = int(frame.memory_usage(index=True, deep=True).sum()) * max(
+        allocation_multiplier, 1
+    )
+    approved_bytes = limits.memory_budget_mb * _BYTES_PER_MEBIBYTE
+    if estimated_peak > approved_bytes:
+        raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", "MEMORY_BUDGET_EXCEEDED")
 
 
 def _fatal(code: str, field: str) -> Mapping[str, str]:
@@ -165,6 +194,8 @@ def validate_dataset(
             raise
         logger.exception("Data projection failed during Research validation")
         raise ValueError("RES_INPUT_INVALID", "DATA_PROJECTION_FAILED") from error
+    # Validation materializes numeric arrays plus boolean masks alongside the frame.
+    _enforce_memory_budget(frame, limits, allocation_multiplier=3)
     fatal = _frame_findings(frame)
     if not market_dataset.source_metadata:
         fatal.append(_fatal("MISSING_SOURCE_METADATA", "source_metadata"))

@@ -23,6 +23,10 @@ from app.agentic.migrations.lifecycle import (
     build_lifecycle_migration_request,
     get_lifecycle_migration_statements,
 )
+from app.agentic.migrations.manifest import (
+    get_agentic_migrations,
+    run_agentic_migrations,
+)
 from app.agentic.migrations.memory import (
     AGENTIC_MEMORY_MIGRATION_STEPS as AGENTIC_MEMORY_MIGRATION_STEPS,
 )
@@ -58,7 +62,9 @@ __all__ = [
     "build_operations_migration_request",
     "get_agentic_memory_migration_statements",
     "get_agentic_migration_statements",
+    "get_agentic_migrations",
     "get_experiment_migration_statements",
     "get_lifecycle_migration_statements",
     "get_operations_migration_statements",
+    "run_agentic_migrations",
 ]

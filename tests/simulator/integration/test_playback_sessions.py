@@ -2,23 +2,19 @@
 
 from pathlib import Path
 
-import pytest
 from app.services.data import (
     build_data_settings,
-    build_migration_request,
     data_settings_context,
-    run_domain_migrations,
     unwrap_data_response,
 )
 from app.services.simulator import (
     build_simulation_state_store,
     create_simulation_session,
     execute_simulation_state_store_operation,
-    get_simulation_migrations,
     read_simulation_session,
+    run_simulator_migrations,
     unwrap_simulation_response,
 )
-from app.services.simulator.errors import SimulationError
 from app.utils import generate_id
 
 
@@ -37,13 +33,7 @@ def _migrate() -> None:
     """Apply the complete Simulator migration manifest."""
     request_id = generate_id("req")
     unwrap_data_response(
-        run_domain_migrations(
-            build_migration_request(
-                domain="simulator",
-                steps=get_simulation_migrations(),
-                request_id=request_id,
-            )
-        ),
+        run_simulator_migrations(request_id),
         operation="tests.simulation.playback.migrations",
         request_id=request_id,
     )
@@ -92,9 +82,6 @@ def test_incomplete_run_cannot_create_playback_session(tmp_path: Path) -> None:
             "run-missing",
             request_id=generate_id("req"),
         )
-        with pytest.raises(SimulationError) as captured:
-            unwrap_simulation_response(
-                response,
-                operation="tests.simulation.playback.missing",
-            )
-        assert captured.value.code == "SIM_SESSION_NOT_FOUND"
+        assert response.status == "error"
+        assert response.error is not None
+        assert response.error.code == "SIM_SESSION_NOT_FOUND"

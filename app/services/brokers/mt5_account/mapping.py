@@ -85,13 +85,89 @@ def _map_symbol(value: object) -> BrokerSymbolInfo:
     symbol = str(_field(value, "name"))
     digits = int(_field(value, "digits"))
 
-    # Extract provider_metadata dynamically from value
-    raw_dict = {}
+    raw_dict: dict[str, object] = {}
     asdict_fn = getattr(value, "_asdict", None)
     if asdict_fn is not None:
-        raw_dict = asdict_fn()
+        raw_dict = dict(asdict_fn())
     elif isinstance(value, dict):
         raw_dict = dict(value)
+
+    trade_mode_raw = _optional(value, "trade_mode")
+    trade_mode_str = (
+        {
+            0: "DISABLED",
+            1: "LONGONLY",
+            2: "SHORTONLY",
+            3: "CLOSEONLY",
+            4: "FULL",
+        }.get(cast("int", trade_mode_raw), str(trade_mode_raw))
+        if trade_mode_raw is not None
+        else "FULL"
+    )
+    trade_mode_desc = (
+        {
+            0: "No trading allowed",
+            1: "Long positions only",
+            2: "Short positions only",
+            3: "Close positions only",
+            4: "Full trading access",
+        }.get(cast("int", trade_mode_raw), "Full access")
+        if trade_mode_raw is not None
+        else "Full trading access"
+    )
+
+    swap_mode_raw = _optional(value, "swap_mode")
+    swap_mode_str = (
+        {
+            0: "DISABLED",
+            1: "POINTS",
+            2: "CURRENCY_SYMBOL",
+            3: "CURRENCY_MARGIN",
+            4: "CURRENCY_DEPOSIT",
+            5: "INTEREST_CURRENT",
+            6: "REOPEN_CURRENT",
+            7: "REOPEN_BID",
+        }.get(cast("int", swap_mode_raw), str(swap_mode_raw))
+        if swap_mode_raw is not None
+        else "POINTS"
+    )
+
+    point = float(_optional(value, "point") or (10.0**-digits))
+    tick_size = float(
+        _optional(value, "trade_tick_size") or _optional(value, "tick_size") or point
+    )
+    contract_size = float(_optional(value, "trade_contract_size") or 100000.0)
+
+    bid = _optional(value, "bid")
+    ask = _optional(value, "ask")
+    last = _optional(value, "last")
+    spread = _optional(value, "spread")
+
+    raw_dict.update(
+        {
+            "name": symbol,
+            "digits": digits,
+            "point": point,
+            "tick_size": tick_size,
+            "trade_mode": trade_mode_str,
+            "trade_mode_description": trade_mode_desc,
+            "contract_size": contract_size,
+            "volume_min": float(_field(value, "volume_min")),
+            "volume_max": float(_field(value, "volume_max")),
+            "volume_step": float(_field(value, "volume_step")),
+            "swap_mode": swap_mode_str,
+            "swap_long": float(_optional(value, "swap_long") or 0.0),
+            "swap_short": float(_optional(value, "swap_short") or 0.0),
+        }
+    )
+    if bid is not None:
+        raw_dict["bid"] = float(bid)
+    if ask is not None:
+        raw_dict["ask"] = float(ask)
+    if last is not None:
+        raw_dict["last"] = float(last)
+    if spread is not None:
+        raw_dict["spread"] = int(spread)
 
     return BrokerSymbolInfo(
         provider_symbol=symbol,
@@ -229,15 +305,87 @@ def _map_account(value: object) -> BrokerAccountInfo:
     Returns:
         Canonical account information.
     """
+    currency = str(_field(value, "currency"))
+    balance = Decimal(str(_field(value, "balance")))
+    equity = Decimal(str(_field(value, "equity")))
+    margin = Decimal(str(_field(value, "margin")))
+    free_margin = Decimal(str(_field(value, "margin_free")))
+
+    trade_mode_raw = _optional(value, "trade_mode")
+    trade_mode_str = (
+        {0: "DEMO", 1: "CONTEST", 2: "REAL"}.get(
+            cast("int", trade_mode_raw), str(trade_mode_raw)
+        )
+        if trade_mode_raw is not None
+        else "DEMO"
+    )
+    trade_mode_desc = (
+        {0: "Demo account", 1: "Contest account", 2: "Real account"}.get(
+            cast("int", trade_mode_raw), "Unknown"
+        )
+        if trade_mode_raw is not None
+        else "Demo account"
+    )
+
+    margin_mode_raw = _optional(value, "margin_mode")
+    margin_mode_str = (
+        {0: "NETTING", 1: "HEDGING", 2: "EXCHANGE"}.get(
+            cast("int", margin_mode_raw), str(margin_mode_raw)
+        )
+        if margin_mode_raw is not None
+        else "HEDGING"
+    )
+    margin_mode_desc = (
+        {
+            0: "Netting position accounting",
+            1: "Hedging position accounting",
+            2: "Exchange position accounting",
+        }.get(cast("int", margin_mode_raw), "Unknown")
+        if margin_mode_raw is not None
+        else "Hedging position accounting"
+    )
+
+    credit = Decimal(str(_optional(value, "credit") or 0))
+    profit = Decimal(str(_optional(value, "profit") or 0))
+    leverage = _optional(value, "leverage") or 100
+    trade_allowed = _optional(value, "trade_allowed")
+    trade_expert = _optional(value, "trade_expert")
+    limit_orders = _optional(value, "limit_orders") or 0
+    margin_so_level = (
+        _optional(value, "margin_so_call") or _optional(value, "margin_so_so") or 0.0
+    )
+
+    margin_level = float((equity / margin) * Decimal(100)) if margin > 0 else None
+
+    details: dict[str, object] = {
+        "login": str(_field(value, "login")),
+        "name": str(_optional(value, "name") or "N/A"),
+        "server": str(_optional(value, "server") or "N/A"),
+        "company": str(_optional(value, "company") or "N/A"),
+        "leverage": leverage,
+        "trade_mode": trade_mode_str,
+        "trade_mode_description": trade_mode_desc,
+        "margin_mode": margin_mode_str,
+        "margin_mode_description": margin_mode_desc,
+        "trade_allowed": trade_allowed if trade_allowed is not None else True,
+        "trade_expert": trade_expert if trade_expert is not None else True,
+        "limit_orders": limit_orders,
+        "credit": float(credit),
+        "profit": float(profit),
+        "margin_so_level": float(margin_so_level),
+        "margin_level": margin_level,
+    }
+
     return BrokerAccountInfo(
         account_id=str(_field(value, "login")),
         retrieved_at=datetime.now(UTC),
         account_reference_redacted="***",
-        currency=str(_field(value, "currency")),
-        balance=Decimal(str(_field(value, "balance"))),
-        equity=Decimal(str(_field(value, "equity"))),
-        margin=Decimal(str(_field(value, "margin"))),
-        free_margin=Decimal(str(_field(value, "margin_free"))),
+        currency=currency,
+        balance=balance,
+        equity=equity,
+        margin=margin,
+        free_margin=free_margin,
+        details=details,
     )
 
 

@@ -25,6 +25,7 @@ WORKFLOWS = (
     "wf_trd_014_run_live_paper_evaluation_cycle.py",
     "wf_trd_015_pause_resume_strategy_route.py",
     "wf_trd_016_modify_working_order_or_open_position.py",
+    "wf_trd_017_broker_agnostic_main_operations.py",
 )
 
 

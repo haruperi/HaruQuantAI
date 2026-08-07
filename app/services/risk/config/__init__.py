@@ -1,5 +1,10 @@
 """Internal Risk configuration exports."""
 
+from app.services.risk.config.defaults import (
+    build_personal_account_risk_config,
+    build_prop_firm_risk_config,
+    register_default_risk_policies,
+)
 from app.services.risk.config.factories import (
     create_firm_mandate,
     create_risk_config,
@@ -20,6 +25,10 @@ from app.services.risk.config.profiles import (
     compute_config_hash,
     load_risk_config,
 )
+from app.services.risk.config.runtime import (
+    get_risk_policy,
+    register_risk_policy,
+)
 
 __all__ = [
     "ConsistencyRule",
@@ -30,10 +39,15 @@ __all__ = [
     "LossReferenceBasis",
     "ProfitTarget",
     "RiskConfig",
+    "build_personal_account_risk_config",
+    "build_prop_firm_risk_config",
     "compute_config_hash",
     "create_firm_mandate",
     "create_risk_config",
     "get_drawdown_mode",
+    "get_risk_policy",
     "load_firm_mandate",
     "load_risk_config",
+    "register_default_risk_policies",
+    "register_risk_policy",
 ]

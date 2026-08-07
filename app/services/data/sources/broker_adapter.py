@@ -28,6 +28,25 @@ from app.utils import get_logger, parse_utc_timestamp
 
 logger = get_logger(__name__)
 
+_SYMBOL_METADATA_AUTHORITY_FIELDS = frozenset(
+    {
+        "canonical_symbol",
+        "provider_symbol",
+        "asset_class",
+        "base_currency",
+        "quote_currency",
+        "digits",
+        "price_step",
+        "quantity_step",
+        "timezone",
+        "source_id",
+        "revision",
+        "retrieved_at",
+        "missing_fields",
+        "request_id",
+    }
+)
+
 if TYPE_CHECKING:
     from collections.abc import Coroutine
 
@@ -436,7 +455,17 @@ class ExternalMarketDataSource(MarketDataSource):
             "retrieved_at": retrieved_at,
             "request_id": request.request_id,
         }
-        metadata_dict.update(info.provider_metadata)
+        # Broker metadata is an open additive mapping, while Data's normalized
+        # contract is closed. Admit only receiver-declared extension fields and
+        # never allow provider material to replace Data-owned identity/lineage.
+        metadata_dict.update(
+            {
+                key: value
+                for key, value in info.provider_metadata.items()
+                if key in SymbolMetadata.model_fields
+                and key not in _SYMBOL_METADATA_AUTHORITY_FIELDS
+            }
+        )
         if "trade_contract_size" in info.provider_metadata:
             metadata_dict["lot_size"] = info.provider_metadata["trade_contract_size"]
 

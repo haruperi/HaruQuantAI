@@ -29,6 +29,12 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
+def _run_example(requirement: str, example: Any) -> None:
+    """Run one requirement example and print explicit success evidence."""
+    example()
+    print(f"SUCCESS: {requirement}")
+
+
 def _format_result(obj: Any) -> str:
     """Dynamically format the output result type name and field/key signature."""
     cls = type(obj)
@@ -179,15 +185,15 @@ def main() -> None:
     )
 
     # Stage 1: Method Selection
-    fr_port_010()
-    fr_port_013()
+    _run_example("FR-PORT-010", fr_port_010)
+    _run_example("FR-PORT-013", fr_port_013)
 
     # Stage 2: Fail-Closed Validation
-    fr_port_011()
+    _run_example("FR-PORT-011", fr_port_011)
 
     # Stage 3: Hashing & Publication
-    fr_port_012()
-    fr_port_014()
+    _run_example("FR-PORT-012", fr_port_012)
+    _run_example("FR-PORT-014", fr_port_014)
 
 
 if __name__ == "__main__":

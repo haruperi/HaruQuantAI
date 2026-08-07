@@ -30,12 +30,12 @@ _HASH = "e" * 64
 
 def _feature_header(title: str) -> None:
     """Print the feature header banner."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"SUCCESS: {title}")
 
 
 def _header(title: str) -> None:
     """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"SUCCESS: {title}")
 
 
 def _format_result(obj: Any) -> str:
@@ -125,7 +125,6 @@ def fr_res_062() -> None:
     _header(
         "FR-RES-062: Build seeded random-entry, R-space, and shuffled-return baselines with recorded data/split/config identity."
     )
-    print("Research Example 7: Edge Studies and Confirmation")
     split = _edge_split()
     study = create_research_value(
         "StudyConfig", {"side": "buy", "hold_bars": 2}, {}, {}

@@ -6,9 +6,13 @@ from typing import Any, Protocol, cast
 
 from fastapi import FastAPI
 
+from app.services.analytics import run_analytics_migrations
 from app.services.api.identity import run_api_migrations
 from app.services.data import build_data_settings, data_settings_context
 from app.services.indicators import run_indicators_migrations
+from app.services.optimization import run_optimization_migrations
+from app.services.portfolio import run_portfolio_migrations
+from app.services.simulator import run_simulator_migrations
 from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
@@ -26,7 +30,7 @@ class _MigrationResponse(Protocol):
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912, PLR0915
     """Initialize required storage and close gateway-owned resources.
 
     Args:
@@ -55,6 +59,34 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         if indicators_result.status != "success" or indicators_result.data is None:
             app.state.api_ready = False
             raise StartupError("INDICATORS_STORAGE_INITIALIZATION_FAILED")
+        simulator_result = cast(
+            "_MigrationResponse",
+            run_simulator_migrations(generate_id("req")),
+        )
+        if simulator_result.status != "success" or simulator_result.data is None:
+            app.state.api_ready = False
+            raise StartupError("SIMULATOR_STORAGE_INITIALIZATION_FAILED")
+        analytics_result = cast(
+            "_MigrationResponse",
+            run_analytics_migrations(generate_id("req")),
+        )
+        if analytics_result.status != "success" or analytics_result.data is None:
+            app.state.api_ready = False
+            raise StartupError("ANALYTICS_STORAGE_INITIALIZATION_FAILED")
+        optimization_result = cast(
+            "_MigrationResponse",
+            run_optimization_migrations(generate_id("req")),
+        )
+        if optimization_result.status != "success" or optimization_result.data is None:
+            app.state.api_ready = False
+            raise StartupError("OPTIMIZATION_STORAGE_INITIALIZATION_FAILED")
+        portfolio_result = cast(
+            "_MigrationResponse",
+            run_portfolio_migrations(generate_id("req")),
+        )
+        if portfolio_result.status != "success" or portfolio_result.data is None:
+            app.state.api_ready = False
+            raise StartupError("PORTFOLIO_STORAGE_INITIALIZATION_FAILED")
         required_probes: Mapping[str, Callable[[], object]] = getattr(
             app.state,
             "api_required_startup_probes",

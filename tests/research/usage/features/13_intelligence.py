@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 import tempfile
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -16,7 +17,6 @@ from app.services.data import (
     data_settings_context,
     normalize_research_provider_payload,
     persist_research_provider_records,
-    project_research_source_evidence,
     retrieve_research_provider_payload,
     run_data_migrations,
 )
@@ -32,6 +32,58 @@ from app.utils import generate_id
 def _feature_header(title: str) -> None:
     """Print the feature header banner."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _evidence_output(requirement: str, value: object) -> None:
+    """Print the required success line and bounded actual evidence."""
+    print(f"SUCCESS: {requirement}")
+    print(value)
+
+
+def fr_res_099(fundamental: Mapping[str, object]) -> None:
+    """FR-RES-099: demonstrate versioned fundamental evidence."""
+    _evidence_output("FR-RES-099", fundamental)
+
+
+def fr_res_100(fundamental: Mapping[str, object]) -> None:
+    """FR-RES-100: demonstrate eligible point-in-time coverage."""
+    _evidence_output("FR-RES-100", fundamental["coverage"])
+
+
+def fr_res_101(sentiment: Mapping[str, object]) -> None:
+    """FR-RES-101: demonstrate bounded sentiment source evidence."""
+    _evidence_output("FR-RES-101", sentiment)
+
+
+def fr_res_102(sentiment: Mapping[str, object]) -> None:
+    """FR-RES-102: demonstrate deterministic polarity and missingness."""
+    _evidence_output(
+        "FR-RES-102",
+        {
+            "polarity": sentiment["polarity"],
+            "missing_measurements": sentiment["missing_measurements"],
+        },
+    )
+
+
+def fr_res_103() -> None:
+    """FR-RES-103: demonstrate explicit asset-class applicability."""
+    applicability = assess_intelligence_applicability("sovereign_bond", model="issuer")
+    _evidence_output("FR-RES-103", applicability.status)
+
+
+def fr_res_104(
+    fundamental: Mapping[str, object], sentiment: Mapping[str, object]
+) -> None:
+    """FR-RES-104: demonstrate detached non-binding projections."""
+    _evidence_output(
+        "FR-RES-104",
+        {
+            "fundamental_schema": fundamental["schema_id"],
+            "sentiment_schema": sentiment["schema_id"],
+            "advisory_only": True,
+        },
+    )
 
 
 def main() -> None:
@@ -83,7 +135,7 @@ def main() -> None:
         )
         with data_settings_context(settings):
             run_data_migrations(generate_id("req"))
-            documents = persist_research_provider_records(
+            persist_research_provider_records(
                 normalized,
                 payload,
                 source_id="treasury-fiscal-data",
@@ -115,17 +167,14 @@ def main() -> None:
                 measurement_version="lexicon-v1",
             )
 
-    print("Actual Data-owned provider evidence supplied to Research:")
-    for document in documents:
-        print(project_research_source_evidence(document))
-    print("Official source-backed fundamental evidence:")
-    print(project_intelligence_evidence(fundamental))
-    print("Deterministic sentiment evidence with explicit missingness:")
-    print(project_intelligence_evidence(sentiment))
-    print(
-        "Issuer model applicability for sovereign bonds:",
-        assess_intelligence_applicability("sovereign_bond", model="issuer").status,
-    )
+    projected_fundamental = project_intelligence_evidence(fundamental)
+    projected_sentiment = project_intelligence_evidence(sentiment)
+    fr_res_099(projected_fundamental)
+    fr_res_100(projected_fundamental)
+    fr_res_101(projected_sentiment)
+    fr_res_102(projected_sentiment)
+    fr_res_103()
+    fr_res_104(projected_fundamental, projected_sentiment)
 
 
 if __name__ == "__main__":

@@ -7,7 +7,10 @@ from typing import TYPE_CHECKING
 from app.services.optimization.evidence.assemble import build_optimization_evidence
 from app.services.optimization.evidence.handoff import build_report_package
 from app.services.optimization.execution.adapter import execute_candidate
-from app.services.optimization.migrations import get_optimization_migrations
+from app.services.optimization.migrations import (
+    get_optimization_migrations,
+    run_optimization_migrations,
+)
 from app.services.optimization.parameters import (
     evaluate_constraints,
     get_executable_parameters,
@@ -17,6 +20,7 @@ from app.services.optimization.parameters.hashing import (
     candidate_hash,
     parameter_space_hash,
 )
+from app.services.optimization.persistence import create_optimization_state_store
 from app.services.optimization.public_api import (
     build_optimization_handoff,
     calculate_parameter_stability,
@@ -148,6 +152,7 @@ __all__ = (
     "candidate_hash",
     "compare_optimization_runs",
     "count_nominal_trials",
+    "create_optimization_state_store",
     "create_optimization_value",
     "detect_overfit_parameters",
     "dump_optimization_value",
@@ -171,6 +176,7 @@ __all__ = (
     "rank_parameter_sets",
     "run_bounded_search",
     "run_monte_carlo",
+    "run_optimization_migrations",
     "run_parameter_sweep",
     "run_parametric_simulation",
     "run_robustness_analysis",

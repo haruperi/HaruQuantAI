@@ -13,10 +13,12 @@ from app.services.analytics.migrations.definitions import (
 )
 from app.services.analytics.migrations.definitions import (
     get_analytics_migrations,
+    run_analytics_migrations,
 )
 
 __all__ = [
     "ANALYTICS_MIGRATIONS",
     "ANALYTICS_SCHEMA_VERSION",
     "get_analytics_migrations",
+    "run_analytics_migrations",
 ]

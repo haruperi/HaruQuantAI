@@ -13,7 +13,7 @@ from app.services.simulator.run import (
 from app.utils import canonical_digest
 from pydantic import ValidationError
 
-from tests.simulator.unit.test_orchestrator import _dataset, _fx_evidence, _request
+from tests.simulator.component.test_orchestrator import _dataset, _fx_evidence, _request
 
 
 def test_request_matches_project_section_5_exactly() -> None:

@@ -17,19 +17,33 @@ _RISK_TABLES = (
 
 
 def test_migration_definition_is_stable_and_complete() -> None:
-    """Register one checksummed migration covering all Risk durable state."""
-    assert len(_RISK_MIGRATION_STEPS) == 1
-    step = _RISK_MIGRATION_STEPS[0]
-    assert step.domain == "risk"
-    assert step.migration_id == "risk-0001-initial-state"
+    """Register ordered checksummed migrations covering all Risk durable state."""
+    assert len(_RISK_MIGRATION_STEPS) == 2
+    step1 = _RISK_MIGRATION_STEPS[0]
+    assert step1.domain == "risk"
+    assert step1.migration_id == "risk-0001-initial-state"
     assert (
-        step.checksum
-        == hashlib.sha256("\n".join(step.statements).encode("utf-8")).hexdigest()
+        step1.checksum
+        == hashlib.sha256("\n".join(step1.statements).encode("utf-8")).hexdigest()
     )
-    sql = " ".join(step.statements)
+    sql1 = " ".join(step1.statements)
     for table in _RISK_TABLES:
-        assert table in sql
-    assert "active INTEGER NOT NULL CHECK (active IN (0, 1))" in sql
+        assert table in sql1
+    assert "active INTEGER NOT NULL CHECK (active IN (0, 1))" in sql1
+
+    step2 = _RISK_MIGRATION_STEPS[1]
+    assert step2.domain == "risk"
+    assert step2.migration_id == "risk-0002-schema-constraints"
+    assert (
+        step2.checksum
+        == hashlib.sha256("\n".join(step2.statements).encode("utf-8")).hexdigest()
+    )
+    sql2 = " ".join(step2.statements)
+    for table in _RISK_TABLES:
+        assert f"{table}__new" in sql2
+    assert "json_valid(payload_json)" in sql2
+    assert "WHERE state = 'active'" in sql2
+    assert "WHERE decision_id IS NOT NULL" in sql2
 
 
 def test_every_risk_table_is_strict_and_audited() -> None:
@@ -44,8 +58,8 @@ def test_every_risk_table_is_strict_and_audited() -> None:
         assert "correlation_id TEXT NOT NULL" in statement
 
 
-def test_migration_defines_no_destructive_statement() -> None:
-    """Keep Risk schema evolution additive."""
+def test_migration_step_one_defines_no_destructive_statement() -> None:
+    """Keep Risk step 0001 schema evolution additive."""
     sql = " ".join(_RISK_MIGRATION_STEPS[0].statements).upper()
     assert "DROP " not in sql
     assert "DELETE " not in sql

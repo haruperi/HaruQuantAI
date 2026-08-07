@@ -4,7 +4,10 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from app.services.analytics.contracts import AnalyticsValidationError
-from app.services.analytics.dashboards.truncation import truncate_series
+from app.services.analytics.dashboards.truncation import (
+    _bucket_candidates,
+    truncate_series,
+)
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -166,3 +169,12 @@ def test_truncate_series_invalid_max_points() -> None:
 
     with pytest.raises(AnalyticsValidationError, match="point limit is invalid"):
         truncate_series(points, max_points=True)  # type: ignore[arg-type]
+
+
+def test_bucket_candidates_cover_empty_and_fill_paths() -> None:
+    """Select deterministic extrema and fill remaining bucket capacity."""
+    assert _bucket_candidates((), (), 2) == ()
+    assert _bucket_candidates((0, 1, 2), (3.0, 1.0, 2.0), 0) == ()
+    selected = _bucket_candidates((0, 1, 2, 3), (3.0, 1.0, 2.0, 4.0), 3)
+    assert len(selected) == 3
+    assert len(set(selected)) == 3

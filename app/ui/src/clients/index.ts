@@ -65,8 +65,10 @@ export type {
 export type {
   ExecutionReceipt,
   SubmitOrderInput,
+  TradingMutationInput,
   TradingProjection,
 } from "./trading";
+export type { PortfolioDefinitionBody, PortfolioRecord } from "./portfolio";
 
 export type {
   CapabilityMatrix,
@@ -104,6 +106,7 @@ import { risk } from "./risk";
 import { trading } from "./trading";
 import { portfolio } from "./portfolio";
 import { optimization } from "./optimization";
+export type { OptimizationRecord } from "./optimization";
 import { agentic } from "./agentic";
 import { simulationSessions } from "./simulationSessions";
 import { liveSimulation } from "./liveSimulation";

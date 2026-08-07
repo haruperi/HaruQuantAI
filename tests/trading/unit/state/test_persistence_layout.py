@@ -5,14 +5,17 @@
 import ast
 import inspect
 from pathlib import Path
+from types import SimpleNamespace
 
+import pytest
 from app.services.trading import persistence
-from app.services.trading.persistence import delete
+from app.services.trading.persistence import delete, update
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
 _TRADING_ROOT = _PROJECT_ROOT / "app" / "services" / "trading"
 _PERSISTENCE_ROOT = _TRADING_ROOT / "persistence"
 _PERSISTENCE_EXPORTS = {
+    "create_closed_position_record",
     "create_event_record",
     "create_idempotency_record",
     "create_projection_record",
@@ -84,3 +87,24 @@ def test_trading_persistence_no_longer_uses_generic_runtime_records() -> None:
     assert "execute_runtime_store_operation" not in source
     assert "build_trading_runtime_store" not in source
     assert "execute_transaction" in source
+
+
+def test_idempotency_update_detects_revision_conflict(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A zero-row compare-and-swap fails closed."""
+    value = SimpleNamespace(
+        status="completed",
+        receipt_id="receipt-1",
+        reserved_at=SimpleNamespace(isoformat=lambda: "2026-08-06T00:00:00Z"),
+    )
+    monkeypatch.setattr(update, "_require_store", lambda store: store)
+
+    def execute(*_args: object) -> SimpleNamespace:
+        return SimpleNamespace(affected_rows=0)
+
+    monkeypatch.setattr(update, "_execute", execute)
+    with pytest.raises(ValueError, match="revision conflict"):
+        update.update_idempotency_record(
+            object(), key="key-1", value=value, expected_revision="new"
+        )

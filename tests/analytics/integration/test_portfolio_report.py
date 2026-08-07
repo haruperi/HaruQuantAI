@@ -1,6 +1,5 @@
 """Integration evidence for Analytics portfolio composition."""
 
-# ruff: noqa: INP001
 from app.services.analytics import (
     build_portfolio_performance_report,
 )

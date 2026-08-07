@@ -64,7 +64,7 @@ through a foreign schema's tables directly.
 | 6 | Risk | `risk_` | Limits, policies, decisions, kill switches | **Hash-chained append** |
 | 7 | Trading | `trading_` | Orders, fills, positions, transitions | **Event-sourced** |
 | 8 | Simulator | `sim_` ² | Backtest runs, latency/slippage models; journal is JSONL, not a table | Append + projection |
-| 9 | Analytics | `analytics_` ¹ | Metrics, trade analysis, PnL attribution, curve summaries | Derived, recomputable |
+| 9 | Analytics | `analytics_` ¹ (historical) | **Nothing — read-only by design.** | — |
 | 10 | Optimization | `optimization_` | Jobs, trials, hyperparameter states | Append + checkpoint |
 | 11 | Research | `research_` | Studies, artifacts, feature defs, regimes | Append + content-addressed |
 | 12 | Portfolio | `portfolio_` | Allocations, cash, rebalances | Versioned + outbox |
@@ -180,8 +180,6 @@ interpreted without the parent**. Everywhere else, the reference is a soft key
 | `data_fetch_log.dataset_id` | `data_datasets.dataset_id` | N:1 | Materialisation must name where it landed. |
 | `research_feature_materializations.feature_id` | `research_features.feature_id` | N:1 | Same. |
 | `strategy_configs.version_id` | `strategy_versions.version_id` | N:1 | Config binds to exactly one code version. |
-| `trading_fills.order_id` | `trading_orders.order_id` | N:1 | A fill without its order is orphaned money. |
-| `trading_order_transitions.order_id` | `trading_orders.order_id` | N:1 | State log belongs to its aggregate. |
 | `optimization_trials.job_id` | `optimization_jobs.job_id` | N:1 | Trials are scoped to a job. |
 | `agentic_trace_spans.trace_id` | `agentic_traces.trace_id` | N:1 | Span tree integrity. |
 | `api_api_keys.account_id` | `api_accounts.account_id` | N:1 | Credential must have an owner. |
@@ -194,12 +192,12 @@ interpreted without the parent**. Everywhere else, the reference is a soft key
 | `trading_orders.strategy_version_id` | `strategy_versions` | Orders must survive strategy retirement for audit. |
 | `trading_orders.risk_decision_id` | `risk_eligibility_decisions` | Risk records are hash-chained and may be archived separately. |
 | `trading_orders.broker_account_id` | broker account identifier | Brokers persists no account table (D10); the id is an opaque provider value carried for audit. |
-| `analytics_metric_values.*` | any L4/L5 source | Analytics is recomputable and must tolerate archived inputs. |
+| Historical `analytics_metric_values.*` | any L4/L5 source | Retired; Analytics now computes from supplied versioned evidence. |
 | `portfolio_cash_balances.account_id` | broker account identifier | Same — an opaque provider value, not a foreign key. |
 | `agentic_llm_calls.agent_id` | `agentic_agents` | Cost records must survive agent deletion for billing. |
 | `sim_*` → `data_*`, `strategy_*` | — | Simulation runs pin content hashes, not live rows. |
 | `research_feature_materializations.dataset_id` | `data_datasets` | Same guard. |
-| `analytics_equity_curves.dataset_id` | `data_datasets` | Same guard. |
+| Historical `analytics_equity_curves.dataset_id` | `data_datasets` | Retired with the empty Analytics derived store. |
 | `data_datasets.producer_ref` | Indicators contract identity / `research_features` | Same guard, inverted: Data must not reference downstream domains. |
 
 **Design rule:** if the child is an immutable audit or financial record, the parent
@@ -243,9 +241,7 @@ counterparts, differing only in prefix and the addition of `run_id`.
 | Trading | Simulator |
 |---|---|
 | `trading_orders` | `sim_orders` (+ `run_id`) |
-| `trading_fills` | `sim_fills` (+ `run_id`) |
 | `trading_positions` | `sim_positions` (+ `run_id`) |
-| `trading_order_transitions` | `sim_order_transitions` (+ `run_id`) |
 
 **Rationale:** Analytics computes performance metrics from one shape. If backtest and
 live rows diverge structurally, every metric needs two implementations and the two
@@ -267,7 +263,7 @@ Each is now a Parquet dataset registered in `data_datasets` with one
 | `data_candles` | Data | 10⁷–10⁸ | Parquet, monthly | `data_datasets` (kind `candle`) |
 | `ind_outputs` | Indicators | 10⁸ | Recomputed on demand or stored by a consuming owner | No Indicators-owned catalogue table |
 | `research_feature_values` | Research | 10⁸ | Parquet | `research_feature_materializations` |
-| `analytics_equity_curves` points | Analytics | 10⁶ | Parquet | `analytics_equity_curves` (summary row) |
+| Analytics equity-curve points | Analytics | 10⁶ | Upstream supplied artifact/evidence | No Analytics table |
 
 **Order of magnitude.** Ten symbols × ten years of M1 bars is ~37M SQLite rows, versus
 ~1,200 catalog rows plus 150–400 MB of Parquet. The catalog fits comfortably in page

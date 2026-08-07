@@ -105,6 +105,8 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.simulation.live_session_branch", method: "POST", path: "/api/v1/simulation/live-sessions/{session_id}/branch", permission: "simulation:run" },
   { id: "api.simulation.live_session_close", method: "DELETE", path: "/api/v1/simulation/live-sessions/{session_id}", permission: "simulation:run" },
   { id: "api.simulation.session_frames", method: "GET", path: "/api/v1/simulation/sessions/{session_id}/frames", permission: "simulation:read" },
+  { id: "api.portfolio.definition_register", method: "POST", path: "/api/v1/portfolio/{portfolio_id}/definitions", permission: "portfolio:write" },
+  { id: "api.portfolio.definition", method: "GET", path: "/api/v1/portfolio/{portfolio_id}/definitions/{portfolio_version}", permission: "portfolio:read" },
   { id: "api.portfolio.construct", method: "POST", path: "/api/v1/portfolio/construct", permission: "portfolio:write" },
   { id: "api.portfolio.status", method: "GET", path: "/api/v1/portfolio/{portfolio_id}/status", permission: "portfolio:read" },
   { id: "api.portfolio.history", method: "GET", path: "/api/v1/portfolio/{portfolio_id}/history", permission: "portfolio:read" },
@@ -134,9 +136,9 @@ const EXPECTED: ReadonlyArray<{
 ];
 
 describe("clients match the backend route catalog", () => {
-  it("has exactly the approved 74 operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(74);
-    expect(ROUTE_CONTRACTS).toHaveLength(74);
+  it("has exactly the approved 76 operations", () => {
+    expect(ROUTE_CONTRACT_COUNT).toBe(76);
+    expect(ROUTE_CONTRACTS).toHaveLength(76);
   });
 
   it("matches every expected id, method, path, and permission", () => {

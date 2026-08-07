@@ -236,6 +236,7 @@ def fr_risk_027() -> None:
     _header(
         "Stage 2: Portfolio Limit Evaluation - Evaluate Portfolio Limits (FR-RISK-027)"
     )
+    print("SUCCESS: FR-RISK-027")
     portfolio_results = unwrap_risk_response(
         evaluate_portfolio_limits(_snapshot(), _config(), now=NOW),
         operation="evaluate_portfolio_limits",
@@ -251,6 +252,7 @@ def fr_risk_028() -> None:
     _header(
         "Stage 2: Market Context Evaluation - Evaluate Market Context Limits (FR-RISK-028)"
     )
+    print("SUCCESS: FR-RISK-028")
     market_results = unwrap_risk_response(
         evaluate_market_context(_market(), _config(), now=NOW),
         operation="evaluate_market_context",
@@ -264,6 +266,7 @@ def fr_risk_028() -> None:
 def fr_risk_062() -> None:
     """FR-RISK-062: Stage 2 — Consume only Data-normalized calendar state and exact blackout provenance, block configured release states, pass authoritative open evidence, and apply `missing_calendar_mode` to unavailable evidence; Risk remains the sole news-trading policy authority."""
     _header("Stage 2: Calendar Blackout Policy - Evaluate Calendar State (FR-RISK-062)")
+    print("SUCCESS: FR-RISK-062")
     market_results = unwrap_risk_response(
         evaluate_market_context(_market(), _config(), now=NOW),
         operation="evaluate_market_context",
@@ -278,6 +281,7 @@ def fr_risk_066() -> None:
     _header(
         "Stage 2: Drawdown Floor Evaluation - Absolute Drawdown Headroom (FR-RISK-066)"
     )
+    print("SUCCESS: FR-RISK-066")
     results = unwrap_risk_response(
         evaluate_portfolio_limits(_snapshot(), _config(), now=NOW, mandate=_mandate()),
         operation="evaluate_portfolio_limits",
@@ -290,6 +294,7 @@ def fr_risk_066() -> None:
 def fr_risk_067() -> None:
     """FR-RISK-067: Stage 2 — Evaluate daily and total loss against a configurable reference basis, supporting a fixed initial balance in addition to the existing day-start and inception equity bases, and record which basis was applied."""
     _header("Stage 2: Loss Basis Evaluation - Initial Balance Loss Basis (FR-RISK-067)")
+    print("SUCCESS: FR-RISK-067")
     results = unwrap_risk_response(
         evaluate_portfolio_limits(_snapshot(), _config(), now=NOW, mandate=_mandate()),
         operation="evaluate_portfolio_limits",
@@ -306,6 +311,7 @@ def fr_risk_068() -> None:
     _header(
         "Stage 2: Forward Profit Share Projection - Single Day Profit Share (FR-RISK-068)"
     )
+    print("SUCCESS: FR-RISK-068")
     result = unwrap_risk_response(
         evaluate_single_day_profit_share(_snapshot(), _mandate(), now=NOW),
         operation="evaluate_single_day_profit_share",
@@ -317,6 +323,7 @@ def fr_risk_068() -> None:
 def fr_risk_069() -> None:
     """FR-RISK-069: Risk migration definitions shall reside in `app/services/risk/migrations/`, keeping schema evolution outside the private CRUD package. Risk owns exactly one checksummed step covering all seven durable Risk tables and exposes a package-root runner that delegates application to Data."""
     _header("Stage 3: Risk Migration Manifest - Apply Through Data (FR-RISK-069)")
+    print("SUCCESS: FR-RISK-069")
     with _relational_risk_context() as result:
         print(_format_result(result))
         print("Data -> Risk migration manifest applied in an isolated database")
@@ -325,6 +332,7 @@ def fr_risk_069() -> None:
 def fr_risk_070() -> None:
     """FR-RISK-070: Every Risk table shall be declared `STRICT`, so a value of the wrong storage class is rejected at write time rather than silently coerced. A coerced decision hash or expiry timestamp would be undetectable downstream."""
     _header("Stage 3: Strict Risk Tables - Apply Verified Manifest (FR-RISK-070)")
+    print("SUCCESS: FR-RISK-070")
     with _relational_risk_context() as result:
         print(_format_result(result))
         print("Data -> all seven migrated Risk tables use SQLite STRICT mode")
@@ -333,6 +341,7 @@ def fr_risk_070() -> None:
 def fr_risk_071() -> None:
     """FR-RISK-071: Every Risk table shall carry `created_at`, `request_id`, and `correlation_id`, and every mutable Risk table shall additionally carry `updated_at`, so each decision, policy version, token, and snapshot is traceable to the operation that produced it."""
     _header("Stage 3: Risk Trace Columns - Apply Verified Manifest (FR-RISK-071)")
+    print("SUCCESS: FR-RISK-071")
     with _relational_risk_context() as result:
         print(_format_result(result))
         print("Data -> Risk migration completed with required trace columns")
@@ -341,6 +350,7 @@ def fr_risk_071() -> None:
 def fr_risk_072() -> None:
     """FR-RISK-072: Risk schema evolution shall remain additive: the migration definition shall contain no `DROP`, `DELETE`, or `ALTER` statement."""
     _header("Stage 3: Additive Risk Schema - Apply Verified Manifest (FR-RISK-072)")
+    print("SUCCESS: FR-RISK-072")
     with _relational_risk_context() as result:
         print(_format_result(result))
         print("Data -> immutable additive Risk migration completed")
@@ -349,6 +359,7 @@ def fr_risk_072() -> None:
 def fr_risk_073() -> None:
     """FR-RISK-073: Persist complete immutable `RiskDecisionPackage v1` records under their decision IDs, expose bounded newest-first reads, and expose exact-scope kill-switch reads through package-root functions; audit records are never relabelled as decisions."""
     _header("Stage 3: Canonical Risk Decisions - Relational Round Trip (FR-RISK-073)")
+    print("SUCCESS: FR-RISK-073")
     with _relational_risk_context():
         decision = create_risk_decision_package(
             decision_id="usage-decision-one",
@@ -380,6 +391,7 @@ def fr_risk_073() -> None:
 def fr_risk_074() -> None:
     """FR-RISK-074: Persist Risk runtime state directly in the seven Risk-owned relational tables while delegating connection, lock, statement-plan, and transaction execution to Data's public boundary; Risk persistence shall not read or write `data_runtime_records`."""
     _header("Stage 3: Direct Risk Persistence - Owned Relational Tables (FR-RISK-074)")
+    print("SUCCESS: FR-RISK-074")
     with _relational_risk_context():
         store = build_risk_state_store()
         decision = _allocation("v1", None)
@@ -396,6 +408,7 @@ def fr_risk_074() -> None:
 def fr_risk_075() -> None:
     """FR-RISK-075: Approval issuance/consumption, allocation activation, and kill-switch-plus-audit transitions shall use guarded atomic relational writes. A stale revision, predecessor, chain head, or conflicting identity fails closed without a partial state change."""
     _header("Stage 3: Guarded Risk Transition - Allocation CAS (FR-RISK-075)")
+    print("SUCCESS: FR-RISK-075")
     with _relational_risk_context():
         store = build_risk_state_store()
         first = _allocation("v1", None)

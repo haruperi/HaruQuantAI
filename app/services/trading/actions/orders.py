@@ -30,6 +30,7 @@ from app.services.trading.reconciliation import resolve_unknown_outcome
 from app.services.trading.routing.dispatcher import _dispatch_order_intent_value
 from app.services.trading.state import (
     TradingEvent,
+    TradingProjection,
 )
 from app.services.trading.state.idempotency import _reserve_idempotency_value
 from app.services.trading.state.projections import _apply_execution_event_value
@@ -518,6 +519,34 @@ async def _execute_request(
     return _envelope(request, receipt)
 
 
+def _extract_order_targets(projection: TradingProjection) -> set[str]:
+    """Collect all valid target order identifiers from projection orders.
+
+    Args:
+        projection: Target trading projection.
+
+    Returns:
+        Set of matching order identifiers.
+    """
+    targets: set[str] = set()
+    for identity, facts in projection.orders.items():
+        if isinstance(facts, dict):
+            b_id = facts.get("broker_order_id", identity)
+            if isinstance(b_id, str):
+                targets.add(b_id)
+            c_id = facts.get("client_order_id")
+            if isinstance(c_id, str):
+                targets.add(c_id)
+            intent = facts.get("intent")
+            if isinstance(intent, dict):
+                intent_c_id = intent.get("client_order_id")
+                if isinstance(intent_c_id, str):
+                    targets.add(intent_c_id)
+        if isinstance(identity, str):
+            targets.add(identity)
+    return targets
+
+
 def _require_order_target_state(
     request: TradingRequest, deps: TradingDependencies
 ) -> None:
@@ -538,14 +567,7 @@ def _require_order_target_state(
         raise TradingError("RECONCILIATION_REQUIRED", "Trading order state is absent")
     if request.expected_version != projection.version:
         raise TradingError("VERSION_CONFLICT", "Order projection version is stale")
-    targets = {
-        target
-        for identity, facts in projection.orders.items()
-        for target in (
-            facts.get("broker_order_id", identity) if isinstance(facts, dict) else None,
-        )
-        if isinstance(target, str)
-    }
+    targets = _extract_order_targets(projection)
     if request.target_broker_order_id not in targets:
         raise TradingError(
             "RECONCILIATION_REQUIRED", "Broker order target is not in Trading state"

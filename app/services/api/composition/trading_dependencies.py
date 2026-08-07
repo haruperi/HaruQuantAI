@@ -39,7 +39,7 @@ def build_trading_mutation_source(
     Args:
         dependencies: Complete Trading-owned dependency container.
         runtime_policy: Validated gateway runtime settings carrying
-            ``runtime_profile``, ``execution_route``, and
+            ``execution_route`` and
             ``allow_live_mutations``. When supplied, every mutation is checked
             against it before delegation; when omitted the check is skipped and
             Trading's own gates remain the only authority.
@@ -86,8 +86,8 @@ def _enforce_runtime_policy(policy: object | None, boundary_request: object) -> 
 
     The gateway does not decide whether a trade is safe — Trading and Risk do.
     What it can do is refuse to forward a request whose own declared
-    ``runtime_profile`` or ``execution_route`` contradicts the deployment it is
-    running in, so a paper deployment can never relay a live-routed command
+    ``route`` contradicts the deployment it is running in, so a paper
+    deployment can never relay a live-routed command
     even if a caller asks for one. Live routing additionally requires
     ``allow_live_mutations``, matching the settings-level rule in
     ``_settings.py`` and AGENTS.md section 3.
@@ -102,14 +102,12 @@ def _enforce_runtime_policy(policy: object | None, boundary_request: object) -> 
     """
     if policy is None:
         return
-    declared_profile = getattr(boundary_request, "runtime_profile", None)
-    declared_route = getattr(boundary_request, "execution_route", None)
-    expected_profile = getattr(policy, "runtime_profile", None)
+    declared_route = getattr(boundary_request, "route", None)
     expected_route = getattr(policy, "execution_route", None)
 
-    if declared_profile is not None and declared_profile != expected_profile:
-        raise RuntimeError("TRADING_RUNTIME_PROFILE_MISMATCH")
-    if declared_route is not None and declared_route != expected_route:
+    if declared_route is None or expected_route in (None, "none"):
+        raise RuntimeError("TRADING_EXECUTION_ROUTE_MISSING")
+    if declared_route != expected_route:
         raise RuntimeError("TRADING_EXECUTION_ROUTE_MISMATCH")
     if declared_route == "live" and not getattr(policy, "allow_live_mutations", False):
         raise RuntimeError("TRADING_LIVE_MUTATIONS_DISABLED")

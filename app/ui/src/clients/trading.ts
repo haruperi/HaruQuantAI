@@ -22,10 +22,53 @@ export type TradingProjection = z.infer<typeof tradingProjectionSchema>;
 export const executionReceiptSchema = z.record(z.string(), z.unknown());
 export type ExecutionReceipt = z.infer<typeof executionReceiptSchema>;
 
-/** Input for submitting a governed order (opaque; Trading-owned request). */
-export interface SubmitOrderInput {
-  [key: string]: unknown;
+/** Exact API projection of `trading.trading_request.v1`. */
+export interface TradingMutationInput {
+  contract_version?: "v1";
+  schema_id?: "trading.trading_request.v1";
+  request_id: string;
+  workflow_id: string;
+  correlation_id: string;
+  causation_id?: string | null;
+  route: "paper" | "live";
+  action: string;
+  provider_id?: string | null;
+  account_id: string;
+  portfolio_id?: string | null;
+  strategy_id: string;
+  strategy_version: string;
+  intent_id: string;
+  symbol?: string | null;
+  side?: "BUY" | "SELL" | null;
+  order_type: "MARKET" | "LIMIT" | "STOP" | "STOP_LIMIT";
+  quantity_unit: string;
+  quantity?: string | number | null;
+  price?: string | number | null;
+  stop_price?: string | number | null;
+  stop_loss?: string | number | null;
+  take_profit?: string | number | null;
+  time_in_force?: "GTC" | "IOC" | "FOK" | "GTD" | "DAY" | null;
+  expiration?: string | null;
+  target_broker_order_id?: string | null;
+  target_broker_position_id?: string | null;
+  order_id?: string | null;
+  position_id?: string | null;
+  expected_version?: number | null;
+  risk_decision_id: string;
+  action_policy_verdict_id: string;
+  approval_token_ref: string;
+  eligibility_decision_id?: string | null;
+  allocation_decision_id?: string | null;
+  scope_level?: "global" | "portfolio" | "strategy" | "symbol" | null;
+  control_reason?: string | null;
+  idempotency_key: string;
+  canonical_material_version: string;
+  system_time: string;
+  broker_time?: string | null;
+  valid_until: string;
 }
+
+export type SubmitOrderInput = TradingMutationInput;
 
 /** Read the aggregate trading session (requires `trading:read`). */
 export function session(
@@ -52,11 +95,13 @@ export function submitOrder(
 /** Cancel a governed order (requires `trading:write`; governed + idempotent). */
 export function cancelOrder(
   orderId: string,
+  input: TradingMutationInput,
   options?: RequestOptions
 ): Promise<ApiResponse<ExecutionReceipt>> {
   return request<ExecutionReceipt>(tradingRoutes.cancelOrder, {
     schema: executionReceiptSchema,
     pathParams: { order_id: orderId },
+    body: input,
     ...options,
   });
 }
@@ -64,11 +109,13 @@ export function cancelOrder(
 /** Close a governed position (requires `trading:write`; governed + idempotent). */
 export function closePosition(
   positionId: string,
+  input: TradingMutationInput,
   options?: RequestOptions
 ): Promise<ApiResponse<ExecutionReceipt>> {
   return request<ExecutionReceipt>(tradingRoutes.closePosition, {
     schema: executionReceiptSchema,
     pathParams: { position_id: positionId },
+    body: input,
     ...options,
   });
 }

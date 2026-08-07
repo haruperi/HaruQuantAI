@@ -154,6 +154,99 @@ def read_memory_records(
     )
 
 
+def read_evidence_claims(store: object, task_id: str, limit: int) -> tuple[object, ...]:
+    """Read bounded governed evidence claims for one task.
+
+    Returns:
+        Validated evidence claims in point-in-time order.
+    """
+    logger.debug("Reading Agentic evidence-claim persistence records")
+    rows = _rows(
+        "SELECT claim_id, task_id, statement, source_ref, source_trust, "
+        "licence_ref, available_at, observed_at, content_hash, confidence_basis, "
+        "falsifier, injection_status "
+        "FROM agentic_evidence_claims WHERE task_id=? "
+        "ORDER BY available_at, claim_id LIMIT ?",
+        (task_id, _bounded_limit(limit)),
+        limit,
+    )
+    return tuple(_decode(store, "evidence", dict(row)) for row in rows)
+
+
+def read_experiment_spec(store: object, spec_hash: str) -> object | None:
+    """Read one complete experiment specification.
+
+    Returns:
+        Validated specification or ``None``.
+
+    Raises:
+        TypeError: If stored JSON is not an object.
+    """
+    row = _one_row(
+        "SELECT spec_json FROM agentic_experiment_specs WHERE spec_hash=?",
+        (spec_hash,),
+    )
+    if row is None:
+        return None
+    payload = _nested(row["spec_json"])
+    if not isinstance(payload, Mapping):
+        raise TypeError("Experiment specification payload must be a mapping")
+    return _decode(store, "experiment-spec", payload)
+
+
+def read_experiment_runs(spec_hash: str, limit: int) -> tuple[dict[str, str], ...]:
+    """Read bounded receiver lineage for one experiment specification.
+
+    Returns:
+        Ordered detached run mappings.
+    """
+    rows = _rows(
+        "SELECT run_id, spec_hash, task_id, evidence_class, request_hash, "
+        "config_hash, engine_version, journal_ref, artifact_manifest_ref, "
+        "created_at FROM agentic_experiment_runs WHERE spec_hash=? "
+        "ORDER BY created_at, run_id LIMIT ?",
+        (spec_hash, _bounded_limit(limit)),
+        limit,
+    )
+    return tuple({str(key): str(value) for key, value in row.items()} for row in rows)
+
+
+def read_experiment_holdout_use(spec_hash: str) -> bool:
+    """Report whether a specification has consumed its single holdout use.
+
+    Returns:
+        Whether the unique reservation exists.
+    """
+    return (
+        _one_row(
+            "SELECT spec_hash FROM agentic_experiment_holdout_use WHERE spec_hash=?",
+            (spec_hash,),
+        )
+        is not None
+    )
+
+
+def read_experiment_verdict(store: object, verdict_id: str) -> object | None:
+    """Read one complete experiment verdict.
+
+    Returns:
+        Validated verdict or ``None``.
+
+    Raises:
+        TypeError: If stored JSON is not an object.
+    """
+    row = _one_row(
+        "SELECT verdict_json FROM agentic_experiment_verdicts WHERE verdict_id=?",
+        (verdict_id,),
+    )
+    if row is None:
+        return None
+    payload = _nested(row["verdict_json"])
+    if not isinstance(payload, Mapping):
+        raise TypeError("Experiment verdict payload must be a mapping")
+    return _decode(store, "experiment-verdict", payload)
+
+
 def read_lifecycle_records(
     store: object, artifact_hash: str, limit: int
 ) -> tuple[object, ...]:
@@ -333,6 +426,11 @@ def read_workflow_checkpoint_records(
 
 
 __all__ = [
+    "read_evidence_claims",
+    "read_experiment_holdout_use",
+    "read_experiment_runs",
+    "read_experiment_spec",
+    "read_experiment_verdict",
     "read_incident_records",
     "read_lifecycle_packet_record",
     "read_lifecycle_records",

@@ -3,6 +3,7 @@
 from decimal import Decimal
 from types import SimpleNamespace
 
+import pytest
 from app.services.analytics.contracts import ClosedTradeLedger
 from app.services.analytics.reports import (
     WorstDayDistribution,
@@ -78,3 +79,79 @@ def test_barrier_section_contains_mode_sensitivity() -> None:
     assert any(
         item.metric_key == "drawdown_mode_sensitivity" for item in section.metrics
     )
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("probability_target", Decimal("1.1"), "probability"),
+        ("median_termination_day", Decimal("NaN"), "median"),
+    ],
+)
+def test_barrier_section_rejects_invalid_single_account_evidence(
+    field: str, value: Decimal, message: str
+) -> None:
+    """Reject invalid probability and termination-day evidence."""
+    first, joint = _reports()
+    setattr(first, field, value)
+    worst = WorstDayDistribution(
+        percentiles={"0.95": Decimal(100)},
+        observations=4,
+        maximum_loss=Decimal(100),
+    )
+    with pytest.raises(Exception, match=message):
+        build_barrier_section(
+            first,
+            joint,
+            worst,
+            mandate_version="v1",
+            mode_sensitivity={get_drawdown_mode("STATIC"): first},
+        )
+
+
+def test_worst_day_distribution_supports_equity_mapping_and_validation() -> None:
+    """Build losses from mapped equity and reject malformed evidence."""
+    ledger = SimpleNamespace(
+        initial_balance=Decimal(100),
+        daily_equity_curve=(
+            {"equity": Decimal(90)},
+            {"equity": Decimal(95)},
+        ),
+    )
+    result = build_worst_day_distribution(ledger, percentiles=(Decimal("0.5"),))
+    assert result.maximum_loss == Decimal(10)
+    with pytest.raises(Exception, match="ordered"):
+        build_worst_day_distribution(
+            ledger, percentiles=(Decimal("0.5"), Decimal("0.5"))
+        )
+    with pytest.raises(Exception, match="required fields"):
+        build_worst_day_distribution(object(), percentiles=(Decimal("0.5"),))
+
+
+def test_barrier_section_rejects_invalid_joint_and_sensitivity_evidence() -> None:
+    """Reject incomplete joint evidence and invalid sensitivity values."""
+    first, joint = _reports()
+    worst = WorstDayDistribution(
+        percentiles={"0.95": Decimal(100)},
+        observations=4,
+        maximum_loss=Decimal(100),
+    )
+    joint.probability_none_survive = Decimal(2)
+    with pytest.raises(Exception, match="joint"):
+        build_barrier_section(
+            first,
+            joint,
+            worst,
+            mandate_version="v1",
+            mode_sensitivity={get_drawdown_mode("STATIC"): first},
+        )
+    _, valid_joint = _reports()
+    invalid_mode = SimpleNamespace(probability_target=Decimal(2))
+    with pytest.raises(Exception, match="sensitivity"):
+        build_barrier_section(
+            first,
+            valid_joint,
+            worst,
+            mandate_version="v1",
+            mode_sensitivity={get_drawdown_mode("STATIC"): invalid_mode},
+        )

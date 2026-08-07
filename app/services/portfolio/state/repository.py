@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from app.services.portfolio.contracts import (
         ActivePortfolioAllocation,
         PortfolioConstructionResult,
+        PortfolioDefinition,
         PortfolioRebalancePlan,
     )
 
@@ -38,6 +39,34 @@ class PortfolioStateStore(Protocol):
         """
         del result, audit_record
         logger.debug("Calling Portfolio construction persistence port")
+        raise NotImplementedError
+
+    def save_definition(
+        self,
+        definition: PortfolioDefinition,
+        audit_record: AuditOutboxRecord,
+    ) -> PortfolioDefinition:
+        """Atomically save one immutable definition and audit record.
+
+        Args:
+            definition: Immutable Portfolio definition.
+            audit_record: Redacted audit outbox record.
+        """
+        del definition, audit_record
+        logger.debug("Calling Portfolio definition persistence port")
+        raise NotImplementedError
+
+    def load_definition(
+        self, portfolio_id: str, portfolio_version: str
+    ) -> PortfolioDefinition | None:
+        """Load one exact immutable definition.
+
+        Args:
+            portfolio_id: Stable Portfolio identity.
+            portfolio_version: Exact immutable version.
+        """
+        del portfolio_id, portfolio_version
+        logger.debug("Calling Portfolio definition read port")
         raise NotImplementedError
 
     def activate_allocation(
@@ -203,6 +232,53 @@ class PortfolioRepository:
             raise
         except Exception as error:
             raise PortfolioError("PORT_PERSISTENCE_FAILED", "CONSTRUCTION") from error
+
+    def save_definition(
+        self,
+        definition: PortfolioDefinition,
+        audit_record: AuditOutboxRecord,
+    ) -> PortfolioDefinition:
+        """Atomically persist one immutable Portfolio definition.
+
+        Args:
+            definition: Immutable Portfolio definition.
+            audit_record: Redacted audit outbox record.
+
+        Returns:
+            Persisted or identical idempotent definition.
+
+        Raises:
+            PortfolioError: If persistence fails or conflicts.
+        """
+        logger.info("Persisting immutable Portfolio definition")
+        try:
+            return self._store.save_definition(definition, audit_record)
+        except PortfolioError:
+            raise
+        except Exception as error:
+            logger.warning("Portfolio definition persistence failed closed")
+            raise PortfolioError("PORT_PERSISTENCE_FAILED", "DEFINITION") from error
+
+    def definition(
+        self, portfolio_id: str, portfolio_version: str
+    ) -> PortfolioDefinition:
+        """Return one exact immutable definition or fail closed.
+
+        Args:
+            portfolio_id: Stable Portfolio identity.
+            portfolio_version: Exact immutable version.
+
+        Returns:
+            Stored definition.
+
+        Raises:
+            PortfolioError: If the definition is unknown.
+        """
+        logger.info("Loading exact Portfolio definition")
+        value = self._store.load_definition(portfolio_id, portfolio_version)
+        if value is None:
+            raise PortfolioError("PORT_NOT_FOUND", "DEFINITION")
+        return value
 
     def activate(
         self,

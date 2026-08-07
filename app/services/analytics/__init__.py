@@ -23,27 +23,41 @@ from app.services.analytics.contracts import (
     CONTRACT_COMPATIBILITY_MATRIX,
     EVIDENCE_CATALOG,
     METRIC_DEFINITION_CATALOG,
-    AnalyticsError,
     AnalyticsRunConfig,
-    AnalyticsValidationError,
     AnalyticsWarning,
     ClosedTrade,
     ClosedTradeLedger,
     DashboardPayload,
-    Lineage,
-    MetricEvidence,
     PerformanceReport,
     PortfolioAllocationEvidence,
     PortfolioPerformanceReport,
     PortfolioRebalanceMeasurementEvidence,
     PortfolioRebalanceMeasurementRequest,
     QualityFlag,
-    ReportSection,
     ReproducibilityHashes,
-    RiskFreeRateEvidence,
     SectionEvidence,
-    StatisticalValidationConfig,
     TradingResult,
+)
+from app.services.analytics.contracts import (
+    AnalyticsError as AnalyticsError,
+)
+from app.services.analytics.contracts import (
+    AnalyticsValidationError as AnalyticsValidationError,
+)
+from app.services.analytics.contracts import (
+    Lineage as Lineage,
+)
+from app.services.analytics.contracts import (
+    MetricEvidence as MetricEvidence,
+)
+from app.services.analytics.contracts import (
+    ReportSection as ReportSection,
+)
+from app.services.analytics.contracts import (
+    RiskFreeRateEvidence as RiskFreeRateEvidence,
+)
+from app.services.analytics.contracts import (
+    StatisticalValidationConfig as StatisticalValidationConfig,
 )
 from app.services.analytics.contracts import (
     build_quality_flag as _build_quality_flag,
@@ -120,6 +134,10 @@ from app.services.analytics.metrics import (
 )
 from app.services.analytics.metrics import (
     run_statistical_validation as _run_statistical_validation,
+)
+from app.services.analytics.migrations import (
+    get_analytics_migrations,
+    run_analytics_migrations,
 )
 from app.services.analytics.reports import (
     WorstDayDistribution,
@@ -901,13 +919,6 @@ def truncate_series(
 
 
 __all__: tuple[str, ...] = (
-    "AnalyticsError",
-    "AnalyticsValidationError",
-    "Lineage",
-    "MetricEvidence",
-    "ReportSection",
-    "RiskFreeRateEvidence",
-    "StatisticalValidationConfig",
     "adapt_trading_result",
     "align_benchmark_series",
     "build_barrier_section",
@@ -938,6 +949,7 @@ __all__: tuple[str, ...] = (
     "create_risk_free_rate_evidence",
     "create_statistical_validation_config",
     "get_analytics_dashboard_snapshot",
+    "get_analytics_migrations",
     "get_analytics_schema_version",
     "get_analytics_value_field",
     "get_annualization_policy",
@@ -947,6 +959,7 @@ __all__: tuple[str, ...] = (
     "get_metric_definition_catalog",
     "get_min_metric_samples",
     "is_analytics_value",
+    "run_analytics_migrations",
     "run_statistical_validation",
     "serialize_report",
     "to_analytics_error_payload",

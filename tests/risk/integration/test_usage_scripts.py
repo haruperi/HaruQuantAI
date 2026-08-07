@@ -94,11 +94,8 @@ def test_usage_functions_reconcile_exactly_with_section_four() -> None:
 
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)
 def test_risk_usage_script_executes(script_name: str) -> None:
-    """Run one standalone Risk usage script in an isolated Python process."""
+    """Run one standalone Risk usage script in an isolated Python process and enforce output contracts."""
     usage_directory = Path(__file__).parents[1] / "usage" / "features"
-    # Argument vector is the running interpreter plus a path built from a
-    # hard-coded literal name joined to this file's own directory. No external
-    # or caller-supplied input reaches the process boundary.
     completed = subprocess.run(  # noqa: S603
         [sys.executable, str(usage_directory / script_name)],
         check=False,
@@ -112,4 +109,36 @@ def test_risk_usage_script_executes(script_name: str) -> None:
         f"stdout:\n{completed.stdout}\n"
         f"stderr:\n{completed.stderr}"
     )
-    assert completed.stdout.strip(), f"{script_name} produced no visible output"
+    stdout = completed.stdout
+    assert stdout.strip(), f"{script_name} produced no visible output"
+
+    documented = _documented_usage_requirements()
+    if script_name in documented:
+        requirements = documented[script_name]
+        for req_id in requirements:
+            # 1. Assert exactly one SUCCESS: FR-RISK-NNN line
+            success_matches = re.findall(
+                rf"^SUCCESS:\s+{req_id}$", stdout, re.MULTILINE
+            )
+            assert len(success_matches) == 1, (
+                f"{script_name} must output exactly one SUCCESS: {req_id} line, got {len(success_matches)}"
+            )
+
+        # 2. Assert stdout contains at least one Data -> line
+        data_matches = re.findall(r"^Data\s+->", stdout, re.MULTILINE)
+        assert len(data_matches) >= len(requirements), (
+            f"{script_name} must output at least {len(requirements)} Data -> lines, got {len(data_matches)}"
+        )
+
+    # 3. Assert zero secret-like key/value patterns in stdout
+    secret_patterns = (
+        r"password\s*=",
+        r"signing_key\s*=",
+        r"private_key\s*=",
+        r"secret_key\s*=",
+    )
+    for pattern in secret_patterns:
+        match = re.search(pattern, stdout, re.IGNORECASE)
+        assert match is None, (
+            f"{script_name} stdout contains potential secret key/value pattern: {pattern}"
+        )

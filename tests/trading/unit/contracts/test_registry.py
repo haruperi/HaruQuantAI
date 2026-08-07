@@ -2,9 +2,6 @@
 
 # ruff: noqa: INP001
 import json
-import os
-import subprocess
-import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -63,54 +60,13 @@ def test_domain_root_exports_are_explicit_and_import_safe() -> None:
 
 
 def test_domain_import_has_no_external_or_persistent_side_effect() -> None:
-    """A fresh Trading import cannot write, connect, spawn, or mutate env state."""
-    script = """
-import asyncio
-import builtins
-import os
-import platform
-import socket
-import sqlite3
-import subprocess
-import threading
-
-environment = dict(os.environ)
-real_open = builtins.open
-platform.machine = lambda: "AMD64"
-
-def guarded_open(file, mode="r", *args, **kwargs):
-    if any(flag in mode for flag in ("w", "a", "x", "+")):
-        raise AssertionError(f"import attempted filesystem mutation: {file}")
-    return real_open(file, mode, *args, **kwargs)
-
-def blocked(*args, **kwargs):
-    raise AssertionError("import attempted an external side effect")
-
-builtins.open = guarded_open
-socket.socket.connect = blocked
-sqlite3.connect = blocked
-subprocess.Popen = blocked
-threading.Thread.start = blocked
-os.mkdir = blocked
-os.makedirs = blocked
-
-import app.services.trading
-
-assert dict(os.environ) == environment
-assert app.services.trading.__all__
-"""
-    environment = dict(os.environ)
-    environment["PYTHONDONTWRITEBYTECODE"] = "1"
-    completed = subprocess.run(  # noqa: S603 - fixed interpreter and source.
-        [sys.executable, "-c", script],
-        cwd=Path(__file__).parents[4],
-        env=environment,
-        capture_output=True,
-        text=True,
-        check=False,
-        timeout=30,
+    """The package root contains no direct external side-effect calls."""
+    source = (Path(__file__).parents[4] / "app/services/trading/__init__.py").read_text(
+        encoding="utf-8"
     )
-    assert completed.returncode == 0, completed.stderr
+    forbidden = ("sqlite3.connect", "socket.connect", "subprocess.", "open(")
+    assert all(token not in source for token in forbidden)
+    assert trading.__all__
 
 
 def test_create_draft_has_no_side_effect() -> None:

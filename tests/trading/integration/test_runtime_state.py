@@ -1,26 +1,27 @@
 """Integration evidence for durable Trading runtime state."""
 
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, cast
 
 from app.services.data import (
     build_data_settings,
-    build_migration_request,
     build_statement_plan,
     build_transaction_request,
     data_settings_context,
     execute_transaction,
-    run_domain_migrations,
     unwrap_data_response,
 )
 from app.services.trading import (
     apply_execution_event,
     build_trading_state_store,
+    create_closed_position_record,
     create_trading_event,
     create_trading_projection,
     execute_trading_state_store_operation,
-    get_trading_migrations,
+    persist_closed_position,
+    run_trading_migrations,
 )
 from app.utils import generate_id
 
@@ -42,18 +43,9 @@ def _settings(tmp_path: Path) -> object:
 
 def _run_trading_migrations() -> None:
     """Apply the isolated Trading-owned schema through Data."""
-    definition_response = get_trading_migrations()
-    assert definition_response.status == "success"
-    assert definition_response.data is not None
     request_id = generate_id("req")
     unwrap_data_response(
-        run_domain_migrations(
-            build_migration_request(
-                domain="trading",
-                steps=definition_response.data,
-                request_id=request_id,
-            )
-        ),
+        run_trading_migrations(request_id=request_id),
         operation="tests.trading.migrations",
         request_id=request_id,
     )
@@ -229,7 +221,7 @@ def test_trading_events_and_projection_survive_reconstruction(tmp_path: Path) ->
         assert evidence["unresolved_attempt_ids"] == [attempted.event_id]
 
 
-def test_atomic_event_application_materializes_trading_tables(tmp_path: Path) -> None:
+def test_atomic_event_application_materializes_orders_only(tmp_path: Path) -> None:
     """Persist an order, authority transition, fill, and position atomically."""
     with data_settings_context(_settings(tmp_path)):
         _run_trading_migrations()
@@ -339,12 +331,10 @@ def test_atomic_event_application_materializes_trading_tables(tmp_path: Path) ->
             assert response.status == "success"
 
         orders = _read_rows("SELECT order_id, time_in_force, state FROM trading_orders")
-        fills = _read_rows(
-            "SELECT order_id, broker_fill_id, executed_at FROM trading_fills"
-        )
-        positions = _read_rows("SELECT position_id, state FROM trading_positions")
-        transitions = _read_rows(
-            "SELECT order_id, from_state, to_state FROM trading_order_transitions"
+        positions = _read_rows("SELECT ticket FROM trading_positions")
+        removed = _read_rows(
+            "SELECT name FROM sqlite_master WHERE type = 'table' "
+            "AND name IN ('trading_fills', 'trading_order_transitions')"
         )
         assert orders == (
             {
@@ -353,19 +343,54 @@ def test_atomic_event_application_materializes_trading_tables(tmp_path: Path) ->
                 "state": "filled",
             },
         )
-        assert fills == (
-            {
-                "order_id": "client-materialized",
-                "broker_fill_id": "deal-one",
-                "executed_at": now.isoformat(),
-            },
+        assert positions == ()
+        assert removed == ()
+
+
+def test_closed_position_is_inserted_once_as_exact_evidence(tmp_path: Path) -> None:
+    """Persist only a complete closed position with slippage measured in points."""
+    with data_settings_context(_settings(tmp_path)):
+        _run_trading_migrations()
+        now = datetime(2026, 8, 1, tzinfo=UTC)
+        record = create_closed_position_record(
+            ticket="123456",
+            symbol="EURUSD",
+            type="buy",
+            volume=Decimal("0.10"),
+            entry_time=now,
+            entry_price=Decimal("1.10000"),
+            stop_loss=Decimal("1.09500"),
+            take_profit=Decimal("1.11000"),
+            exit_time=now + timedelta(hours=1),
+            exit_price=Decimal("1.10500"),
+            exit_reason="take_profit",
+            commission=Decimal("-0.70"),
+            swap=Decimal(0),
+            profit=Decimal("49.30"),
+            mae_points=12,
+            mfe_points=55,
+            slippage_points=1,
+            magic="10001",
+            strategy="trend_following",
+            account="90001",
+            environment="demo",
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
+            created_at=now + timedelta(hours=1),
+            updated_at=now + timedelta(hours=1),
         )
-        assert positions == ({"position_id": "position-one", "state": "open"},)
-        assert transitions == (
+
+        persist_closed_position(record)
+
+        rows = _read_rows(
+            "SELECT ticket, volume, slippage_points, environment FROM trading_positions"
+        )
+        assert rows == (
             {
-                "order_id": "client-materialized",
-                "from_state": "pending_new",
-                "to_state": "filled",
+                "ticket": "123456",
+                "volume": "0.10",
+                "slippage_points": 1,
+                "environment": "demo",
             },
         )
 

@@ -3,7 +3,12 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.data import build_market_context_evidence
+from app.services.data import (
+    build_account_state_snapshot,
+    build_fx_conversion_evidence,
+    build_fx_rate_leg,
+    build_market_context_evidence,
+)
 from app.services.risk import create_proposed_trade, validate_market_context_evidence
 from app.services.strategy import create_trade_intent_value
 
@@ -79,3 +84,75 @@ def test_risk_consumes_the_data_market_contract() -> None:
         request_id="req-12345678-1234-4234-8234-123456789abc",
     )
     validate_market_context_evidence(evidence, now=NOW)
+
+
+def test_risk_consumes_data_account_and_fx_contracts() -> None:
+    """Validate Data account state snapshot and FX conversion evidence at the Risk boundary."""
+    account = build_account_state_snapshot(
+        account_id="acc-1",
+        currency="USD",
+        balances=(
+            {
+                "asset": "USD",
+                "total": Decimal(100000),
+                "available": Decimal(100000),
+            },
+        ),
+        equity=Decimal(100000),
+        margin_used=Decimal(0),
+        margin_available=Decimal(100000),
+        positions=(),
+        orders=(),
+        connected=True,
+        trading_allowed=True,
+        source_id="broker-1",
+        snapshot_at=NOW,
+        expires_at=NOW + timedelta(minutes=1),
+        request_id="req-12345678-1234-4234-8234-123456789abc",
+    )
+    assert account.account_id == "acc-1"
+    assert account.currency == "USD"
+
+    leg = build_fx_rate_leg(
+        source_currency="EUR",
+        target_currency="USD",
+        rate=Decimal("1.0850"),
+        source_id="fx-source-1",
+        provider_symbol="EURUSD",
+        as_of=NOW,
+        provenance={"source": "data"},
+    )
+    fx = build_fx_conversion_evidence(
+        source_currency="EUR",
+        target_currency="USD",
+        legs=(leg,),
+        composite_rate=Decimal("1.0850"),
+        as_of=NOW,
+        expires_at=NOW + timedelta(minutes=1),
+        path_policy_id="direct",
+        path_policy_version="1",
+        provenance={"source": "data"},
+        request_id="req-12345678-1234-4234-8234-123456789abc",
+    )
+    assert fx.source_currency == "EUR"
+    assert fx.composite_rate == Decimal("1.0850")
+
+
+def test_risk_consumes_utils_auth_context_contract() -> None:
+    """Validate Utils auth context at the Risk boundary."""
+    from app.utils import create_auth_context
+
+    auth = create_auth_context(
+        principal_id="user-1",
+        principal_type="USER",
+        roles=("risk_admin",),
+        permissions=("kill_switch:activate", "kill_switch:clear"),
+        scopes=("global",),
+        tenant_or_environment="dev",
+        issued_at=NOW,
+        request_id="req-12345678-1234-4234-8234-123456789abc",
+        workflow_id="wf-12345678-1234-4234-8234-123456789abc",
+        correlation_id="cor-12345678-1234-4234-8234-123456789abc",
+    )
+    assert auth.principal_id == "user-1"
+    assert "risk_admin" in auth.roles

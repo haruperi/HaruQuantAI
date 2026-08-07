@@ -1,6 +1,5 @@
 """Integration evidence for Analytics serialization and hashing."""
 
-# ruff: noqa: INP001
 from app.services.analytics import serialize_report
 from app.utils import generate_id, get_logger
 

@@ -20,6 +20,9 @@ from app.services.research.intelligence.contracts import (
     SentimentSourceEvidence,
     evidence_hash,
 )
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _POSITIVE = frozenset(
     {"growth", "improve", "increase", "strong", "gain", "expand", "recovery"}
@@ -45,6 +48,7 @@ def _records(query: object) -> tuple[object, ...]:
     Raises:
         ValidationError: If Data returns an invalid page.
     """
+    logger.info("Querying eligible Data research-source evidence")
     page = query_research_sources(query)  # type: ignore[arg-type]
     records = get_research_source_value_field(page, "records")
     if not isinstance(records, tuple):
@@ -104,6 +108,7 @@ def assess_intelligence_applicability(
     Raises:
         ValidationError: If the model is unknown.
     """
+    logger.info("Assessing Research intelligence applicability")
     normalized = asset_class.strip().lower()
     if model == "issuer":
         applicable = normalized in _ISSUER_ASSET_CLASSES
@@ -112,6 +117,7 @@ def assess_intelligence_applicability(
     elif model == "sentiment":
         applicable = bool(normalized)
     else:
+        logger.warning("Rejecting unknown Research intelligence model")
         raise ValidationError("RES_INPUT_INVALID", "INTELLIGENCE_MODEL_UNKNOWN")
     return IntelligenceApplicability(
         status="applicable" if applicable else "not_applicable",
@@ -142,8 +148,10 @@ def build_fundamental_source_evidence(
     Raises:
         ValidationError: If the model or source coverage is ineligible.
     """
+    logger.info("Building bounded fundamental source evidence")
     applicability = assess_intelligence_applicability(asset_class, model=model)
     if applicability.status != "applicable":
+        logger.warning("Rejecting inapplicable fundamental evidence model")
         raise ValidationError("RES_INPUT_INVALID", "FUNDAMENTAL_MODEL_NOT_APPLICABLE")
     projections = tuple(
         project_research_source_evidence(item) for item in _records(query)
@@ -156,6 +164,7 @@ def build_fundamental_source_evidence(
     coverage = Counter(str(item["source_kind"]) for item in eligible)
     missing = tuple(kind for kind in required_kinds if coverage[kind] == 0)
     if not eligible or missing:
+        logger.warning("Rejecting insufficient fundamental source coverage")
         raise ValidationError("RES_INSUFFICIENT_DATA", "FUNDAMENTAL_COVERAGE_MISSING")
     references = tuple(str(item["document_id"]) for item in eligible)
     observed = min(
@@ -254,7 +263,9 @@ def build_sentiment_source_evidence(
     Raises:
         ValidationError: If the version or source coverage is ineligible.
     """
+    logger.info("Building deterministic sentiment source evidence")
     if measurement_version != "lexicon-v1":
+        logger.warning("Rejecting unsupported sentiment measurement version")
         raise ValidationError("RES_VERSION_INCOMPATIBLE", "SENTIMENT_VERSION_UNKNOWN")
     projections = tuple(
         project_research_source_evidence(item) for item in _records(query)
@@ -265,6 +276,7 @@ def build_sentiment_source_evidence(
         if str(item["source_kind"]) in {"news", "social", "alternative", "macro"}
     )
     if not eligible:
+        logger.warning("Rejecting insufficient sentiment source coverage")
         raise ValidationError("RES_INSUFFICIENT_DATA", "SENTIMENT_COVERAGE_MISSING")
     polarity = {
         str(item["document_id"]): _polarity(str(item["title"])) for item in eligible
@@ -346,6 +358,7 @@ def project_intelligence_evidence(
     Raises:
         ValidationError: If evidence has an unknown type.
     """
+    logger.info("Projecting bounded Research intelligence evidence")
     if isinstance(evidence, FundamentalSourceEvidence):
         references = evidence.document_references
         return {
@@ -370,6 +383,7 @@ def project_intelligence_evidence(
             "canonical_hash": evidence.canonical_hash,
             "advisory_only": True,
         }
+    logger.warning("Rejecting unknown Research intelligence evidence")
     raise ValidationError("RES_INPUT_INVALID", "INTELLIGENCE_EVIDENCE_UNKNOWN")
 
 

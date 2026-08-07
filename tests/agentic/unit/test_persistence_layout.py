@@ -12,6 +12,11 @@ _AGENTIC_ROOT = _PROJECT_ROOT / "app" / "agentic"
 _PERSISTENCE_ROOT = _AGENTIC_ROOT / "persistence"
 _PERSISTENCE_EXPORTS = {
     "create_agentic_persistence_store",
+    "create_evidence_claim",
+    "create_experiment_holdout_use",
+    "create_experiment_run",
+    "create_experiment_spec",
+    "create_experiment_verdict",
     "create_incident_record",
     "create_lifecycle_packet_record",
     "create_lifecycle_record",
@@ -21,6 +26,11 @@ _PERSISTENCE_EXPORTS = {
     "create_workflow_checkpoint_record",
     "create_workflow_run_reservation",
     "read_incident_records",
+    "read_evidence_claims",
+    "read_experiment_holdout_use",
+    "read_experiment_runs",
+    "read_experiment_spec",
+    "read_experiment_verdict",
     "read_lifecycle_packet_record",
     "read_lifecycle_records",
     "read_memory_records",

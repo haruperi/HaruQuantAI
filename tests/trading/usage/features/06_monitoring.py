@@ -17,9 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
     build_data_settings,
-    build_migration_request,
     data_settings_context,
-    run_domain_migrations,
     unwrap_data_response,
 )
 from app.services.trading import (
@@ -27,8 +25,8 @@ from app.services.trading import (
     create_execution_receipt,
     create_operational_event,
     emit_runtime_event,
-    get_trading_migrations,
     get_trading_operational_events,
+    run_trading_migrations,
     validate_budget_authority,
 )
 from tests.trading import conftest as examples
@@ -156,6 +154,22 @@ def fr_trd_068() -> None:
     )
 
 
+def _emit_requirement_success(function: object) -> object:
+    """Wrap one example so direct execution emits its success contract."""
+
+    def wrapped() -> None:
+        function()
+        requirement = function.__name__.removeprefix("fr_trd_").replace("_", "-")
+        print(f"SUCCESS: FR-TRD-{requirement}")
+
+    return wrapped
+
+
+for _example_name, _example_function in tuple(globals().items()):
+    if _example_name.startswith("fr_trd_") and callable(_example_function):
+        globals()[_example_name] = _emit_requirement_success(_example_function)
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -174,16 +188,8 @@ def main() -> None:
             write_lock_lease_seconds=10.0,
         )
         with data_settings_context(settings):
-            migration_response = get_trading_migrations()
-            assert migration_response.data is not None
             unwrap_data_response(
-                run_domain_migrations(
-                    build_migration_request(
-                        domain="trading",
-                        steps=migration_response.data,
-                        request_id=REQUEST_ID,
-                    )
-                ),
+                run_trading_migrations(request_id=REQUEST_ID),
                 operation="trading.usage.monitoring.migrations",
                 request_id=REQUEST_ID,
             )

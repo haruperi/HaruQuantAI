@@ -41,6 +41,7 @@ from app.services.brokers.mt5_account.mapping import (
     _map_quote,
     _map_symbol,
     _map_tick,
+    _optional,
 )
 from app.services.brokers.mt5_account.transport import _MT5Transport
 
@@ -480,6 +481,25 @@ class MT5BrokerAdapter(
     async def get_platform_info(self) -> StandardResponse[BrokerPlatformInfo]:
         """Return redacted terminal version and environment evidence."""
         version = await self._transport.call("version")
+        terminal = await self._transport.call("terminal_info")
+        endpoint_metadata: dict[str, object] = {}
+        if terminal is not None:
+            for key in (
+                "name",
+                "company",
+                "build",
+                "language",
+                "connected",
+                "trade_allowed",
+                "dlls_allowed",
+                "ping_last",
+                "path",
+                "data_path",
+                "common_data_path",
+            ):
+                val = _optional(terminal, key)
+                if val is not None:
+                    endpoint_metadata[key] = val
         return self._result(
             BrokerCapabilityId.GET_PLATFORM_INFO,
             data=BrokerPlatformInfo(
@@ -489,6 +509,7 @@ class MT5BrokerAdapter(
                 environment=self._config.environment,
                 observed_at=datetime.now(UTC),
                 api_or_terminal_version=str(version) if version is not None else None,
+                endpoint_metadata=endpoint_metadata,
             ),
         )
 

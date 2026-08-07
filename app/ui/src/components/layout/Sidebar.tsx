@@ -27,7 +27,8 @@ import {
   LayoutDashboard,
   FlaskConical,
   TrendingUp,
-  AlertTriangle
+  AlertTriangle,
+  PieChart
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -113,6 +114,18 @@ export const Sidebar: React.FC = () => {
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('research', 'Edge Lab')}>
           <FlaskConical size={15} />
           {!isCollapsed && <span>Edge Lab</span>}
+        </div>
+
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('optimization', 'Optimization')}>
+          <FlaskConical size={15} />
+          {!isCollapsed && <span>Optimization</span>}
+        </div>
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('portfolio', 'Portfolio')}>
+          <PieChart size={15} />
+          {!isCollapsed && <span>Portfolio</span>}
+        </div>
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('agentic', 'Agentic Operator')}>
+          <span>Agentic Operator</span>
         </div>
 
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('simulation', 'Backtest')}>

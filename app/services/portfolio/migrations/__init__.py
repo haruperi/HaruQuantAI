@@ -11,5 +11,10 @@ from app.services.portfolio.migrations.definitions import (
 from app.services.portfolio.migrations.definitions import (
     get_portfolio_migrations,
 )
+from app.services.portfolio.migrations.runner import run_portfolio_migrations
 
-__all__ = ["PORTFOLIO_MIGRATIONS", "get_portfolio_migrations"]
+__all__ = [
+    "PORTFOLIO_MIGRATIONS",
+    "get_portfolio_migrations",
+    "run_portfolio_migrations",
+]

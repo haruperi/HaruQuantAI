@@ -49,11 +49,8 @@ from app.agentic.agents.market_intelligence.sentiment_analyst.tools import (
 from app.agentic.runtime import ModelOutcome
 from app.services.research import (
     assess_intelligence_applicability,
+    create_research_value,
     project_intelligence_evidence,
-)
-from app.services.research.intelligence.contracts import (
-    FundamentalSourceEvidence,
-    SentimentSourceEvidence,
 )
 from app.utils import derive_stable_id, generate_id
 
@@ -83,9 +80,10 @@ WIRES = (
 )
 
 
-def _fundamental_evidence() -> FundamentalSourceEvidence:
+def _fundamental_evidence() -> object:
     """Build one real Research fundamental evidence object."""
-    return FundamentalSourceEvidence(
+    return create_research_value(
+        "FundamentalSourceEvidence",
         contract_version="v1",
         schema_id="research.fundamental_source_evidence.v1",
         asset_scope=(INTELLIGENCE_INSTRUMENT,),
@@ -103,9 +101,10 @@ def _fundamental_evidence() -> FundamentalSourceEvidence:
     )
 
 
-def _sentiment_evidence() -> SentimentSourceEvidence:
+def _sentiment_evidence() -> object:
     """Build one real Research sentiment evidence object."""
-    return SentimentSourceEvidence(
+    return create_research_value(
+        "SentimentSourceEvidence",
         contract_version="v1",
         schema_id="research.sentiment_source_evidence.v1",
         asset_scope=(INTELLIGENCE_INSTRUMENT,),

@@ -36,6 +36,8 @@ def test_map_symbol_preserves_exact_provider_values() -> None:
     assert symbol.provider_symbol == "EURUSD"
     assert symbol.price_precision == 5
     assert str(symbol.quantity_step) == "0.01"
+    assert symbol.provider_metadata["digits"] == 5
+    assert symbol.provider_metadata["trade_mode"] == "FULL"
 
 
 def test_map_quote_preserves_bid_ask_last() -> None:
@@ -142,6 +144,8 @@ def test_map_account_redacts_account_reference() -> None:
     )
     assert account.account_id == "12345"
     assert account.account_reference_redacted == "***"
+    assert account.details["login"] == "12345"
+    assert account.details["trade_mode"] == "DEMO"
 
 
 def test_map_position_derives_side_from_type_code() -> None:

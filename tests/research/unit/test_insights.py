@@ -62,9 +62,26 @@ def test_cluster_outperformance_records_sample_size() -> None:
     assert "sample_count" in result[0]
 
 
-def test_insight_report_has_no_signal_control() -> None:
-    """FR-RES-087: insight report excludes signal-adaptation."""
+def test_insight_report_has_no_signal_control(monkeypatch: pytest.MonkeyPatch) -> None:
+    """FR-RES-087: unit composition excludes signal adaptation.
+
+    Real PCA and K-Means collaboration is exercised by the integration suite.
+    """
     logger.debug("Testing Research insight report")
+    monkeypatch.setattr(
+        "app.services.research.modeling.insights.run_pca",
+        lambda _features, *, config: {
+            "loadings": [[1.0, 0.0]],
+            "feature_columns": list(config.feature_columns),
+        },
+    )
+    monkeypatch.setattr(
+        "app.services.research.modeling.insights.cluster_feature_space",
+        lambda _features, *, config: {
+            "n_clusters": config.clusters,
+            "labels": [0] * len(_features),
+        },
+    )
     result = build_unsupervised_insight_report(_features(), config=_config())
     assert result["schema_version"] == "v1"
     assert result["signal_adaptation"] == "excluded"

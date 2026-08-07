@@ -16,6 +16,7 @@ honours "No Live Action by Default".
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from datetime import UTC, datetime
 from typing import Any, cast
 
 from app.services import risk
@@ -27,9 +28,11 @@ from app.services.portfolio import (
     create_portfolio_handle,
     create_portfolio_value,
     execute_portfolio_handle_operation,
+    get_portfolio_definition,
     get_portfolio_history,
     get_portfolio_status,
     recompute_portfolio_measurement,
+    register_portfolio_definition,
     rollback_portfolio,
     submit_portfolio_rebalance,
 )
@@ -205,12 +208,47 @@ def _build_handlers(
         "history": lambda args: get_portfolio_history(
             service, cast("str", args[0]), cast("AuthContext", args[1])
         ),
+        "register_definition": lambda args: _register_definition(service, args),
+        "definition": lambda args: get_portfolio_definition(
+            service,
+            cast("str", args[0]),
+            cast("str", args[1]),
+            cast("AuthContext", args[2]),
+        ),
         "activate": lambda args: _activation(service, workflows, "activate", args),
         "rollback": lambda args: _activation(service, workflows, "rollback", args),
         "drift": lambda args: _drift(service, args),
         "rebalance": lambda args: _rebalance(service, args),
         "recompute": lambda args: _recompute(service, args),
     }
+
+
+def _register_definition(service: object, args: tuple[object, ...]) -> object:
+    """Project one boundary definition with authenticated trace evidence.
+
+    Args:
+        service: Composed Portfolio service handle.
+        args: Boundary definition and authenticated context.
+
+    Returns:
+        Portfolio-owned definition response.
+    """
+    boundary = cast("Any", args[0])
+    auth = cast("AuthContext", args[1])
+    fields = _dump(boundary)
+    fields.update(
+        {
+            "request_id": auth.request_id,
+            "workflow_id": auth.workflow_id,
+            "correlation_id": auth.correlation_id,
+            "created_at": datetime.now(UTC),
+        }
+    )
+    return register_portfolio_definition(
+        service,
+        create_portfolio_value("PortfolioDefinition", **fields),
+        auth,
+    )
 
 
 def _recompute(service: object, args: tuple[object, ...]) -> object:

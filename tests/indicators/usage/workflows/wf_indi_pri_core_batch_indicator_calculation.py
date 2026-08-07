@@ -77,10 +77,10 @@ def main() -> None:
     dataset = live_bars()
     spec = unwrap_indicator_response(get_indicator("sma"))
     config = indicator_config("sma", 5)
-    print(_format_result(spec))
+    print(f"\n\nIndicator Spec: {_format_result(spec)}")
     print(
-        f"Data -> indicator={spec.indicator_id}, formula={spec.formula_version}, "
-        f"cache_limit={len(dataset)}"
+        f"\nData -> indicator={spec.indicator_id}, formula={spec.formula_version}, "
+        f"\ncache_limit={dataset.record_count}"
     )
     print_market_evidence(dataset)
     # Stage 2
@@ -88,42 +88,36 @@ def main() -> None:
     resolved_spec = unwrap_indicator_response(
         validate_indicator("sma", dataset, config)
     )
-    print(_format_result(resolved_spec))
-    print(f"Data -> validated_indicator={resolved_spec.indicator_id}")
+    print(f"\n\nResolved Spec: {_format_result(resolved_spec)}")
+    print(f"\nData -> validated_indicator={resolved_spec.indicator_id}")
     # Stage 3
     _stage(3)
     result = unwrap_indicator_response(sma(dataset, period=5, config=config))
     result_values = get_indicator_result_values(result)
     unavailable_rows = int(result_values["unavailable_reason"].notna().sum())
-    print(_format_result(result))
-    print(f"Data -> rows={len(result_values)}, unavailable_rows={unavailable_rows}")
+    print(f"\n\nCalculated Result: {_format_result(result)}")
+    print(f"\nData -> rows={len(result_values)}, unavailable_rows={unavailable_rows}")
     print_indicator_evidence(result, label="Calculated SMA workflow rows")
     # Stage 4
     _stage(4)
     metadata = get_indicator_result_metadata(result)
     manifest = metadata["manifest"]
-    print(_format_result(manifest))
+    print(f"\n\nManifest: {_format_result(manifest)}")
     print(
-        "Data -> manifest_quality=",
-        manifest["quality_status"],
-        ", source_timeframe=",
-        manifest["source_timeframe"],
+        f"\nData -> manifest_quality={manifest['quality_status']}, "
+        f"source_timeframe={manifest['source_timeframe']}",
     )
     print(
-        "Evidence:",
-        manifest["quality_status"],
-        manifest["source_timeframe"],
-        result_values["unavailable_reason"].notna().sum(),
-        "unavailable rows",
+        f"\nEvidence: {manifest['quality_status']}, "
+        f"{manifest['source_timeframe']}, "
+        f"{result_values['unavailable_reason'].notna().sum()} unavailable rows",
     )
     # Stage 5
     _stage(5)
     print("OUTPUT BOUNDARY — atomic IndicatorResult")
-    print(_format_result(result))
+    print(f"\n\nOutput: {_format_result(result)}")
     print(
-        "Output: ",
-        type(result).__name__,
-        manifest["output_checksum"],
+        f"Output: {type(result).__name__}, {manifest['output_checksum']}",
     )
     print(f"Data -> unavailable_rows={unavailable_rows}")
 

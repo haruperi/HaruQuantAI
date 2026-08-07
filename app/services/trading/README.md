@@ -23,7 +23,7 @@ Trading orchestrates live and paper evaluation, converts independently approved 
 - Order and position action formulation using exactly the size approved by Risk.
 - One broker/simulator authority dispatch boundary, client-order identity, idempotency, and concurrency enforcement.
 - Live enablement, startup reconciliation, deterministic gates, session recovery, and safe shutdown.
-- Orders, fills, execution state, logical schemas, artifact schemas, and migration definitions.
+- Broker-authoritative active order state, closed-position execution records, receipts, execution evidence, logical schemas, artifact schemas, and migration definitions.
 - Reconciliation authority, unknown-outcome retry blocking, monitoring evidence,
   critical unknown-broker-state event production, and emergency execution controls.
 
@@ -120,9 +120,9 @@ filtering. This support directory is not a separately registered feature.
 
 | Status    | State / Store                                             | Read access (via contract)                                                 | Migration definitions   |
 | --------- | --------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------- |
-| Completed | Orders, fills, receipts, and execution projections        | Analytics, Portfolio, and UI/API via`TradeRecord` / `ExecutionReceipt` | `state/migrations.py` |
-| Completed | Idempotency reservations and canonical-material versions  | Trading only                                                               | `state/migrations.py` |
-| Completed | Reconciliation runs, authority transitions, and incidents | UI/API via`TradeRecord`; Risk via audit evidence where required          | `state/migrations.py` |
+| Completed | Closed positions, receipts, and execution projections      | Analytics, Portfolio, and UI/API via `TradeRecord` / `ExecutionReceipt` | `migrations/definitions.py` |
+| Completed | Idempotency reservations and canonical-material versions  | Trading only                                                             | `migrations/definitions.py` |
+| Completed | Reconciliation runs, authority transitions, and incidents | UI/API via `TradeRecord`; Risk via audit evidence where required         | `migrations/definitions.py` |
 
 ### Four-level structure
 
@@ -183,7 +183,7 @@ Modules and files are ordered from lowest dependency to highest dependency.
 | Status    | Feature                                             | Owning module       | Public API and contracts                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Requirements                        | Usage evidence                                        |
 | --------- | --------------------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ----------------------------------------------------- |
 | Completed | `FEAT-TRD-01` Canonical Contracts and Registries  | `contracts/`      | `get_trading_contract_version`, `get_trading_route`, `create_trading_request`, `create_order_intent`, `create_execution_receipt`, `create_trade_record`, `create_portfolio_rebalance_execution_request`, `create_execution_evidence_report`, `create_trading_error`, `is_trading_error`, `is_execution_receipt`, `map_trading_error`, `redact_trading_payload`, `get_public_contracts`, `create_trading_action_draft`; exact declarations and fields: Section 4.1 | Section 4.1 functional requirements | `tests/trading/usage/features/01_contracts.py`      |
-| Completed | `FEAT-TRD-02` State and Deterministic Projections | `state/`          | `get_trading_schema_version`, `create_idempotency_reservation`, `create_trading_event`, `create_trading_projection`, `apply_execution_event`, `get_trading_migrations`, `reserve_idempotency`; exact declarations: Section 4.2                                                                                                                                                                                                                                                    | Section 4.2 functional requirements | `tests/trading/usage/features/02_state.py`          |
+| Completed | `FEAT-TRD-02` State and Deterministic Projections | `state/`          | `get_trading_schema_version`, `create_idempotency_reservation`, `create_trading_event`, `create_trading_projection`, `apply_execution_event`, `get_trading_migrations`, `run_trading_migrations`, `reserve_idempotency`; exact declarations: Section 4.2                                                                                                                                                                                                                                                    | Section 4.2 functional requirements | `tests/trading/usage/features/02_state.py`          |
 | Completed | `FEAT-TRD-03` Validation, Readiness, and Plans    | `validation/`     | `create_readiness_assessment`, `create_route_snapshot`, `assess_execution_readiness`, `build_execution_plan`, `get_route_snapshot`, `validate_order_request`; exact declarations: Section 4.3                                                                                                                                                                                                                                                                                       | Section 4.3 functional requirements | `tests/trading/usage/features/03_validation.py`     |
 | Completed | `FEAT-TRD-04` Authority Selection and Dispatch    | `routing/`        | `classify_authority_response`, `dispatch_order_intent`, `validate_adapter_capability`; exact declarations: Section 4.4                                                                                                                                                                                                                                                                                                                                                                    | Section 4.4 functional requirements | `tests/trading/usage/features/04_routing.py`        |
 | Completed | `FEAT-TRD-05` Reconciliation and Retry Guard      | `reconciliation/` | `create_authority_resolution`, `create_authority_snapshot`, `create_reconciliation_report`, `compare_authority_state`, `resolve_unknown_outcome`; exact declarations: Section 4.5                                                                                                                                                                                                                                                                                                     | Section 4.5 functional requirements | `tests/trading/usage/features/05_reconciliation.py` |
@@ -309,9 +309,398 @@ flowchart LR
 
 > **Workflow usage evidence:** Each active workflow has one standalone
 > input-to-output program with README-aligned stages. Broker-relevant connection/gate
-> programs use genuine non-production MT5 sessions but remain package-only or fail
-> closed, transmitting no broker mutation. Run all programs with
+> programs use injected virtual non-production sessions and transmit no real broker
+> mutation. Run all programs with
 > `python tests/trading/usage/workflows/run_all.py`. This satisfies `NFR-TRD-007`.
+
+### Pipeline
+
+The Trading pipeline begins only after Strategy and Risk have produced an
+approved trade request. Trading does not create signals, determine strategy
+intent, approve risk, mint approval authority, or infer missing evidence.
+
+```text
+Trading signal
+    ↓
+Strategy creates canonical TradeIntent
+    ↓
+Risk approves size and issues decision/token
+    ↓
+Trading receives TradingRequest
+    ↓
+Validation and readiness gates
+    ↓
+Route selection and capability verification
+    ↓
+Idempotency reservation and pre-dispatch audit
+    ↓
+Deterministic OrderIntent execution plan
+    ↓
+Broker or Simulation dispatch
+    ↓
+Receipt and outcome classification
+    ↓
+Persistence and projection update
+    ↓
+Reconciliation
+    ↓
+Monitoring and reporting
+```
+
+#### Full Trading pipeline
+
+##### 1. Receive the approved request
+
+Trading receives a canonical `TradingRequest` containing:
+
+- Signal and intent lineage.
+- Account and strategy identity.
+- Requested action.
+- Symbol, direction, order type, and quantity.
+- Explicit route: `sim`, `paper`, or `live`.
+- Risk decision ID.
+- Action-policy verdict ID.
+- Approval-token reference.
+- Idempotency key and canonical-material version.
+- System time and validity deadline.
+- Request, workflow, correlation, and optional causation identifiers.
+
+Trading rejects raw trading signals. Strategy must translate its analytical
+signal into the canonical upstream trade intent before Trading is invoked.
+
+##### 2. Load current evidence
+
+Trading obtains current, timestamped evidence for the selected route:
+
+- Broker or Simulation readiness.
+- Account identity and permissions.
+- Instrument capabilities and quantity constraints.
+- Current authority-owned orders and open positions.
+- Route availability.
+- Market and session state.
+- Current reconciliation status.
+
+Missing, unavailable, stale, or mismatched evidence blocks execution. Empty or
+zero values are never substituted for unavailable authority facts.
+
+##### 3. Validate the request
+
+Trading validates:
+
+- Contract and schema versions.
+- Request, workflow, correlation, strategy, and intent identities.
+- Supported route and action.
+- Account and environment compatibility.
+- Symbol, side, order type, and time-in-force values.
+- Positive quantity, minimum/maximum quantity, and quantity step.
+- Price, stop-price, stop-loss, and take-profit constraints.
+- Request validity and expiry.
+- Mandatory Risk, policy, approval, and idempotency references.
+- Canonical-material version.
+
+A malformed, incomplete, mismatched, or expired request fails closed before any
+execution authority is contacted.
+
+##### 4. Verify the Risk decision
+
+The referenced Risk decision must:
+
+- Exist and be current.
+- Match the request's intent and trace lineage.
+- Be in the approved state.
+- Approve the requested quantity.
+- Carry valid policy and evidence provenance.
+- Match the referenced decision ID.
+- Remain within its issuance and expiry interval.
+
+Trading executes no more than the approved size and cannot reinterpret or expand
+Risk authority.
+
+##### 5. Check the kill-switch hierarchy
+
+Trading checks every applicable Risk-owned kill-switch scope:
+
+- Global.
+- Portfolio, when the request has a portfolio scope.
+- Strategy.
+- Symbol, when the request has a symbol scope.
+
+Any active, unknown, missing, mismatched, or stale applicable state blocks new
+execution. No caller, route, session, or emergency operation may bypass this
+gate.
+
+##### 6. Verify the action-policy verdict
+
+The Risk-owned action-policy verdict must:
+
+- Allow the exact requested action.
+- Match the verdict ID carried by the request.
+- Match the Risk decision and applicable scope.
+- Be current and unexpired.
+- Match the exact action, such as `submit_order`, `cancel_order`, or
+  `close_position`.
+
+A verdict for one action cannot authorize another action or a broader scope.
+
+##### 7. Validate approval authority
+
+For an action requiring explicit approval, Trading verifies:
+
+- Approval-token reference.
+- Authorized operation and scope.
+- Approved account, strategy, symbol, and quantity.
+- Token issuance and expiry interval.
+- Prior reservation or consumption state.
+- Required principal-separation evidence.
+
+Trading cannot issue its own approval token or treat caller assertions as
+approval authority.
+
+##### 8. Assess execution readiness
+
+`assess_execution_readiness()` combines:
+
+- Route evidence.
+- Risk decision.
+- Kill-switch state.
+- Action-policy verdict.
+- Configured evidence-age limits.
+
+It returns a deterministic readiness assessment containing:
+
+- Pass or fail result.
+- Ordered failure codes.
+- Evidence references.
+- Assessment timestamp.
+
+Any mandatory failed check prevents plan execution or dispatch. Readiness is
+reassessed from supplied evidence rather than inferred from prior success.
+
+##### 9. Enforce route and safety configuration
+
+The route is selected explicitly:
+
+- `sim`: dispatch to the injected Simulation executor.
+- `paper`: dispatch through the configured paper broker connection.
+- `live`: dispatch through the configured live broker connection.
+
+Live execution additionally requires:
+
+- `ALLOW_LIVE_MUTATIONS=true`.
+- Verified live configuration.
+- Correct live account and environment.
+- Valid injected credentials and provider readiness.
+- Complete Risk and approval authority.
+- Current adapter capability and security evidence.
+- Clear reconciliation state.
+
+Live action is disabled by default. Route selection cannot weaken validation,
+Risk, approval, kill-switch, idempotency, audit, or reconciliation gates.
+
+##### 10. Build the execution plan
+
+Trading builds a deterministic, side-effect-free `OrderIntent` execution plan
+containing:
+
+- Exact action and route.
+- Account and strategy identity.
+- Instrument and direction.
+- Approved quantity.
+- Validated order parameters.
+- Risk and approval references.
+- Canonical request identity and trace lineage.
+
+Plan construction does not contact a broker, mutate Simulation, or claim that
+execution occurred.
+
+##### 11. Reserve idempotency
+
+Before dispatch, Trading reserves the caller's idempotency key against the hash
+of the canonical request material.
+
+Possible outcomes are:
+
+- New key and material: reserve and continue.
+- Same key and same completed material: return the prior terminal result.
+- Same key and different material: reject as a conflict.
+- Same key with active or unresolved execution: remain locked for
+  reconciliation.
+
+This prevents duplicate orders and blind retries. A caller cannot replace a
+locked request merely by changing non-authoritative metadata.
+
+##### 12. Record the pre-dispatch attempt
+
+Trading writes the required redacted pre-mutation audit evidence before the
+execution authority is contacted. The ordered live gate also verifies session
+enablement, policy, Risk, kill-switch, readiness, concurrency, reconciliation,
+and adapter permission at this boundary.
+
+After plan admission, Trading records a versioned `send_attempted` execution
+event before transport. Failure to write required audit or attempt evidence
+blocks dispatch; failure is never silently ignored.
+
+##### 13. Dispatch through the selected authority
+
+Trading sends the exact approved request through one route:
+
+- The injected Simulation callable for `sim`.
+- A Brokers-owned adapter for `paper` or `live`.
+
+Only Trading may invoke broker mutation operations. The Brokers adapter owns:
+
+- Provider connection and session handling.
+- Transport behavior.
+- Provider-specific request translation.
+- Credential use.
+- Provider response normalization.
+
+Trading dispatches at most once after all mandatory gates pass. It does not own
+the broker connection implementation or Simulation's state mutation.
+
+##### 14. Classify the execution outcome
+
+An authority response is conservatively normalized into an
+`ExecutionReceipt`, including outcomes such as:
+
+- Accepted.
+- Rejected.
+- Cancelled.
+- Closed.
+- Partially completed.
+- Failed before transmission.
+- Broker or Simulation state unknown.
+
+The receipt retains authority identity, quantities, timestamps, request lineage,
+and reconciliation requirements. Trading never invents a receipt, broker order,
+deal, position, or fill.
+
+##### 15. Handle uncertain outcomes
+
+If transmission may have occurred but confirmation is unavailable, Trading:
+
+- Marks the outcome `unknown_outcome`.
+- Preserves the idempotency and conflict-scope lock.
+- Emits a critical operational event.
+- Blocks blind retry.
+- Requires authority reconciliation.
+
+This prevents duplicate execution after a timeout, malformed success response,
+transport interruption, or other ambiguous outcome. An unknown result is never
+converted into success or safe retry merely because the authority is unavailable.
+
+##### 16. Persist execution evidence
+
+Trading persists durable, redacted evidence such as:
+
+- Idempotency reservation.
+- Send-attempt event.
+- Execution receipt.
+- Projection state.
+- Reconciliation evidence.
+- Operational incidents and retry locks.
+
+Trading-owned persistence delegates database execution through Data's public
+infrastructure. Tick-valued open positions remain broker or runtime state and
+are not continually written to SQLite.
+
+##### 17. Update the Trading projection
+
+Ordered events update the durable Trading projection using logical ordering and
+optimistic version checks. Projection updates retain canonical request,
+authority, receipt, order, and reconciliation references.
+
+Duplicate, stale, conflicting, or out-of-order transitions are rejected. A
+projection is evidence of Trading's recorded state, not a substitute for broker
+or Simulation authority truth.
+
+##### 18. Reconcile against execution authority
+
+Trading compares its projection with the authoritative broker or Simulation
+state, including:
+
+- Order identity and status.
+- Position identity and quantity.
+- Execution outcome.
+- Broker ticket, order, deal, or position reference.
+- Expected projection version.
+- Applicable unresolved-attempt scope.
+
+Broker truth wins for paper/live and Simulation truth wins for `sim`.
+Divergence keeps unsafe mutations blocked until the discrepancy is resolved and
+the authority transition is recorded.
+
+##### 19. Persist a closed position
+
+Once a position is conclusively closed, Trading records it in
+`trading_positions` with:
+
+- Ticket.
+- Symbol and direction.
+- Volume.
+- Entry and exit times and prices.
+- Stop loss and take profit.
+- Exit reason.
+- Commission, swap, and profit.
+- MAE and MFE points.
+- Slippage points.
+- Strategy and magic number.
+- Account and environment.
+- Creation and update timestamps.
+
+Only completed closed positions belong in this table. Open positions and their
+tick-by-tick changing value remain authority/runtime state.
+
+##### 20. Finalize idempotency
+
+After a conclusive terminal outcome, Trading binds the final receipt and outcome
+evidence to the idempotency reservation. A valid same-material replay can then
+return the established terminal result without another authority mutation.
+
+An unresolved or ambiguous broker outcome is not finalized as success. Its lock
+remains active until reconciliation establishes authority truth.
+
+##### 21. Emit monitoring, audit, and reporting evidence
+
+Trading records structured, bounded, secret-safe evidence at:
+
+- Public workflow and service boundaries.
+- Safety and admission decisions.
+- Dispatch attempts.
+- Broker or Simulation interactions.
+- State transitions and side effects.
+- Idempotency and reconciliation decisions.
+- Failures, retries, and uncertain outcomes.
+
+It produces Trading-owned operational events and immutable execution evidence
+for authorized consumers. Critical unresolved broker state can trigger the
+UI/API operational-alert boundary. Logging or alert-delivery failure never
+clears a Risk state, releases a retry lock, changes execution truth, or permits a
+blocked mutation.
+
+Logs and reports must not expose credentials, approval secrets, account
+passwords, raw provider payloads, or other sensitive trading data.
+
+##### 22. Return the canonical response
+
+The caller receives a standard response containing one of:
+
+- A successful canonical execution receipt.
+- A deterministic rejection or failure.
+- An unresolved-outcome response requiring reconciliation.
+
+The response includes bounded request, workflow, correlation, operation, and
+trace evidence without exposing credentials or unsafe provider details. No
+failure status implies a fill, completed mutation, or safe retry unless
+authority evidence proves it.
+
+The executable walkthrough at
+`tests/trading/usage/workflows/wf_trd_pri_gate_dispatch_live_action.py` labels all
+22 stages as either actual Trading behavior or a virtual boundary. It executes
+the typed live gate, plan builder, idempotency reservation, pre-audit, and
+response classifier against in-memory dependencies. Its virtual positions,
+authority responses, reconciliation state, and closed-position data are teaching
+inputs—not broker observations, database records, fills, or performance claims.
 
 ### Workflow rank values
 
@@ -326,7 +715,7 @@ flowchart LR
 
 `WF-TRD-004`, `WF-TRD-001`, and `WF-TRD-007` were absorbed into `WF-TRD-PRI`,
 `WF-TRD-SEC`, and `WF-TRD-TER` respectively. Absorbed numbers are retired and are
-never reused. New workflows continue from `WF-TRD-015`.
+never reused. New workflows continue sequentially after `WF-TRD-017`.
 
 | Workflow       | Standalone program                                                                      |
 | -------------- | --------------------------------------------------------------------------------------- |
@@ -346,6 +735,7 @@ never reused. New workflows continue from `WF-TRD-015`.
 | `WF-TRD-014` | `tests/trading/usage/workflows/wf_trd_014_run_live_paper_evaluation_cycle.py`         |
 | `WF-TRD-015` | `tests/trading/usage/workflows/wf_trd_015_pause_resume_strategy_route.py`             |
 | `WF-TRD-016` | `tests/trading/usage/workflows/wf_trd_016_modify_working_order_or_open_position.py`   |
+| `WF-TRD-017` | `tests/trading/usage/workflows/wf_trd_017_broker_agnostic_main_operations.py`        |
 
 ### Status values
 
@@ -380,6 +770,7 @@ never reused. New workflows continue from `WF-TRD-015`.
 | Completed | Supporting | `WF-TRD-014` | Cross-domain | Run a live/paper evaluation cycle            | Live/paper market update or scheduled evaluation trigger                 | Neutral signal ends the cycle, or an approved`RiskDecision` enters the validate/gate/dispatch path                                  | `FR-TRD-065 → FR-TRD-012 → FR-TRD-036`                             |
 | Completed | Supporting | `WF-TRD-015` | Cross-domain | Pause and resume a strategy route            | Authorized operator or governance command naming an exact strategy scope | Durable paused/resumed route state; no position or order mutation                                                                     | `FR-TRD-019 → FR-TRD-020`                                           |
 | Completed | Supporting | `WF-TRD-016` | Cross-domain | Modify a working order or open position      | Approved modification request carrying current Risk authorization        | One broker modification or cancellation, or an audited fail-closed outcome                                                            | `FR-TRD-014 → FR-TRD-017`                                           |
+| Completed | Supporting | `WF-TRD-017` | Cross-domain | Demonstrate broker-agnostic main operations  | Explicit `sim`, `mt5`, or `ctrader` target plus governed authority        | Canonical reads and governed mutation results, or an explicit fail-closed provider outcome                                             | `FR-TRD-024 → FR-TRD-031`, `FR-TRD-014 → FR-TRD-017`               |
 
 ### `WF-TRD-SEC` — Validate and package a route-aware action
 
@@ -588,7 +979,7 @@ never comes from request text.
 **Output boundary:** Data infrastructure persists Trading-owned schemas; projections reconstruct without hidden side effects.
 
 1. Apply the Trading-owned schema migrations to the injected store —
-   `trading.get_trading_migrations()`, `data.run_domain_migrations()`.
+   `trading.run_trading_migrations()`.
 2. Redact each event payload before it is written —
    `trading.redact_trading_payload()`.
 3. Persist versioned Trading events transactionally —
@@ -796,6 +1187,60 @@ than being retried.
 
 **Integration test:** `tests/trading/integration/test_modifications.py::test_modifications_use_current_state_and_fresh_authority`
 
+### `WF-TRD-017` — Demonstrate broker-agnostic main operations
+
+**Scope:** `Cross-domain`
+**System workflow:** `SYS-WF-001`, `SYS-WF-002`
+**Input boundary:** One explicit `sim`, `mt5`, or `ctrader` execution-target
+selection plus current provider configuration and governed Trading authority.
+**Output boundary:** Seventeen canonical lifecycle, read, calculation, and
+governed-mutation examples, or an explicit fail-closed result.
+
+The standalone program defines one target-selection line:
+
+```python
+EXECUTION_TARGET: Target = "sim"
+```
+
+The same 17 example functions then demonstrate connection/readiness, platform,
+account, symbol, position, order, bounded order/deal history, governed market
+submission, margin/profit calculation, position modification, partial/full close,
+pending-order submission/modification/cancellation, and deterministic shutdown.
+Every example prints aligned, field-by-field canonical evidence for teaching and
+operator inspection. Simulation uses visibly labelled virtual evidence through the
+same renderers as MT5 and cTrader. Provider pages remain bounded to five records;
+raw payloads, credentials, and provider metadata are never printed. Legacy
+terminal-specific account fields such as account holder name, company, server,
+leverage, margin mode, expert permission, and stop-out level are shown as
+unavailable when the shared Brokers v1 contract does not expose them; the workflow
+never invents provider facts.
+
+- `sim` is the safe default and executes with deterministic in-memory evidence.
+- `mt5` and `ctrader` resolve the real provider implementation exclusively through
+  `app.services.brokers.create_broker_adapter()`.
+- Provider reads use the canonical Brokers operations without SDK-specific code.
+- Mutations enter through Trading public operations; the standalone program never
+  invokes an adapter mutation directly.
+- Provider mutations require the centralized application environment loaded by
+  `app.utils.load_settings()` to be `dev`, the explicit process opt-in
+  `TRADING_USAGE_ALLOW_PROVIDER_MUTATIONS=true`, verified non-production
+  configuration, and an application-composed live session. Missing authority
+  produces a bounded blocked result rather than a simulated fallback.
+- Terminal-only MT5 fields are intentionally replaced by canonical platform
+  information that is meaningful across MT5 and cTrader.
+
+Each mutation example uses fresh Risk, policy, idempotency, and virtual authority
+evidence. The examples are individually executable demonstrations rather than a
+claim that their accepted virtual receipts form one continuous broker position
+lifecycle.
+
+**Failure behavior:** provider selection never falls back silently; missing
+configuration, credentials, capability, Risk authority, session, or reconciliation
+evidence fails closed. Cleanup runs in `finally`.
+
+**Usage:** `tests/trading/usage/workflows/wf_trd_017_broker_agnostic_main_operations.py`
+**Unit:** `tests/trading/unit/test_workflow_usage_parity.py::test_trading_workflow_registry_has_one_complete_program_per_workflow`
+
 ---
 
 ## 4. Module and Requirement Specifications
@@ -883,7 +1328,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Completed | `idempotency.py` | Reserve caller keys and detect material conflicts                                                                                                                                 | `IdempotencyReservation`, `reserve_idempotency`                                                                              | **Standard library:** `datetime`, `decimal`, `hashlib`, `typing`**Required third-party:** `pydantic>=2.13.4`**Local:** contracts, `stores.py`; Utils canonical JSON/logger APIs                     |
 | Completed | `projections.py` | Apply ordered events with optimistic versions                                                                                                                                     | `TradingProjection`, `apply_execution_event`                                                                                 | **Standard library:** `collections.abc`, `datetime`, `types`, `typing`**Required third-party:** `pydantic>=2.13.4`**Local:** contracts, `events.py`, `stores.py`; Utils serialization/logger APIs |
 | Completed | `runtime.py`     | Coordinate durable idempotency, append-only events, projections, reconciliation evidence, and unresolved-attempt views while delegating all record CRUD to`trading/persistence` | `build_trading_state_store`, `execute_trading_state_store_operation`                                                         | **Standard library:** collections.abc, datetime, typing**Required third-party:** `pydantic>=2.13.4`**Local:** contracts, state models, `trading.persistence`, Utils logger                                  |
-| Completed | `migrations.py`  | Declare Trading-owned schema version and migrations                                                                                                                               | `TRADING_SCHEMA_VERSION`, `get_trading_migrations`                                                                           | **Standard library:** `hashlib`**Required third-party:** None**Local:** Data `MigrationStep`; Utils logger                                                                                                  |
+| Completed | `migrations/definitions.py` | Declare the Trading schema version and immutable two-step manifest, and execute it through Data's authoritative complete-manifest runner | `get_trading_schema_version`, `get_trading_migrations`, `run_trading_migrations` | **Standard library:** `hashlib` **Required third-party:** None **Local:** public Data migration functions; Utils logger |
 | Completed | `__init__.py`    | Expose state API                                                                                                                                                                  | All exports above                                                                                                                | **Standard library:** None**Required third-party:** None**Local:** files above                                                                                                                                  |
 
 ### Configuration and Limits Manifest
@@ -901,8 +1346,8 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Completed | `FR-TRD-038` | The system shall expose only minimal injected operations for idempotency, append, projection reads/writes, and reconciliation evidence.                                                                                                                                                                | `TradingStateStore`                                                                                                                                                                                                                                                                                                                                        | Read-only; persistence write | `TradingError`: store failure                                                         | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_038()`**Unit:** `tests/trading/unit/state/test_stores.py::test_store_contract_failure_is_visible()`                                                                                                   |
 | Completed | `FR-TRD-039` | The system shall reserve a caller-supplied key against versioned canonical SHA-256 material at an injected time for the required positive retention window, reject different-material reuse, and keep stale duplicate-active work locked for reconciliation.                                           | `reserve_idempotency(request: TradingRequest, store: TradingStateStore, *, reservation_time: datetime, retention_seconds: int, concurrency_lock_timeout_seconds: Decimal) -> StandardResponse[IdempotencyReservation]`                                                                                                                                     | Persistence write            | `TradingError`: missing/invalid policy, conflict, stale active lock, or write failure | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_039()`**Unit:** `tests/trading/unit/state/test_idempotency.py::test_same_key_different_material_rejected()`                                                                                           |
 | Completed | `FR-TRD-040` | The system shall apply deduplicated authority events in logical order with optimistic version checks.                                                                                                                                                                                                  | `apply_execution_event(event: TradingEvent, store: TradingStateStore) -> StandardResponse[TradingProjection]`                                                                                                                                                                                                                                              | Persistence write            | `TradingError`: duplicate conflict or stale version                                   | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_040()`**Unit:** `tests/trading/unit/state/test_projections.py::test_apply_event_rejects_stale_version()`                                                                                              |
-| Completed | `FR-TRD-041` | The system shall expose the current Trading schema version.                                                                                                                                                                                                                                            | `TRADING_SCHEMA_VERSION: str`                                                                                                                                                                                                                                                                                                                              | None                         | None                                                                                    | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_041()`**Unit:** `tests/trading/unit/state/test_migrations.py::test_schema_version_matches_events()`                                                                                                   |
-| Completed | `FR-TRD-042` | The system shall provide additive Trading migration definitions for execution-owned state without opening a database.                                                                                                                                                                                  | `get_trading_migrations() -> StandardResponse[tuple[MigrationStep, ...]]`                                                                                                                                                                                                                                                                                  | None                         | `TradingError`: invalid/non-additive definition                                       | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_042()`**Unit:** `tests/trading/unit/state/test_migrations.py::test_migrations_are_additive_and_ordered()`                                                                                             |
+| Completed | `FR-TRD-041` | The system shall expose the current Trading schema version through the function-only package boundary.                                                                                                                                                                                                 | `get_trading_schema_version() -> StandardResponse[str]`                                                                                                                                                                                                                                                                                                    | None                         | None                                                                                    | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_041()` **Unit:** `tests/trading/unit/state/test_migrations.py::test_schema_version_matches_events()`                                                                                                  |
+| Completed | `FR-TRD-042` | The system shall provide immutable ordered Trading migration definitions without opening a database. Forward retirement is guarded and fails closed when deprecated tables contain rows. | `get_trading_migrations() -> StandardResponse[tuple[MigrationStep, ...]]` | None | `TradingError`: invalid definition or non-empty retirement target | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_042()` **Unit:** `tests/trading/unit/state/test_migrations.py::test_migrations_are_ordered_and_forward_only()` |
 | Completed | `FR-TRD-051` | The store shall atomically reserve one caller key against canonical material and its injected reservation/expiry timestamps, returning the existing/new/conflict decision, and shall durably bind the exact receipt and terminal completed or reconciliation-required state after receipt persistence. | `TradingStateStore.reserve_idempotency(key: str, material_hash: str, material_version: str, reserved_at: datetime, expires_at: datetime) -> IdempotencyReservation`; `TradingStateStore.complete_idempotency(key: str, material_hash: str, receipt_id: str, completed_at: datetime, *, status: Literal["completed", "reconciliation_required"]) -> None` | Persistence write            | `TradingError`: conflict or write failure                                             | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_051()`**Unit:** `tests/trading/unit/state/test_stores.py::test_reserve_idempotency_is_atomic()`; `tests/trading/unit/actions/test_orders.py::test_completed_idempotency_replay_does_not_dispatch()` |
 | Completed | `FR-TRD-052` | The store shall append one versioned event without rewriting prior events.                                                                                                                                                                                                                             | `TradingStateStore.append_event(event: TradingEvent) -> None`                                                                                                                                                                                                                                                                                              | Persistence write            | `TradingError`: append/version failure                                                | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_052()`**Unit:** `tests/trading/unit/state/test_stores.py::test_append_event_is_append_only()`                                                                                                         |
 | Completed | `FR-TRD-053` | The store shall load the latest projection for an exact route/tenant/authority scope.                                                                                                                                                                                                                  | `TradingStateStore.load_projection(scope: tuple[TradingRoute, str, str]) -> TradingProjection \| None`                                                                                                                                                                                                                                                      | Read-only                    | `TradingError`: read or schema failure                                                | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_053()`**Unit:** `tests/trading/unit/state/test_stores.py::test_load_projection_is_scope_isolated()`                                                                                                   |
@@ -911,13 +1356,14 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Completed | `FR-TRD-067` | The store shall return exact stored JSON-safe report evidence for one route/tenant/authority scope without computing or enriching it.                                                                                                                                                                  | `TradingStateStore.load_report_evidence(scope: tuple[TradingRoute, str, str]) -> Mapping[str, JsonValue]`                                                                                                                                                                                                                                                  | Read-only                    | `TradingError`: read or schema failure                                                | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_067()`**Unit:** `tests/trading/unit/state/test_stores.py::test_report_evidence_is_scope_isolated()`                                                                                                   |
 | Completed | `FR-TRD-057` | The system shall expose an immutable reservation result distinguishing new, duplicate-completed, duplicate-active, conflict, and reconciliation-required states.                                                                                                                                       | `IdempotencyReservation`                                                                                                                                                                                                                                                                                                                                   | None                         | `TradingError`: invalid reservation state                                             | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_057()`**Unit:** `tests/trading/unit/state/test_idempotency.py::test_reservation_states_are_finite()`                                                                                                  |
 | Completed | `FR-TRD-058` | The system shall expose a route/tenant-scoped order, position, fill, receipt, and authority projection with optimistic version.                                                                                                                                                                        | `TradingProjection`                                                                                                                                                                                                                                                                                                                                        | None                         | `TradingError`: invalid projection/version                                            | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_058()`**Unit:** `tests/trading/unit/state/test_projections.py::test_projection_requires_scope_and_version()`                                                                                          |
-| Completed | `FR-TRD-070` | Trading migration definitions shall reside in`app/services/trading/migrations/` and be re-exported through `state/`, keeping schema evolution outside the private CRUD package.                                                                                                                    | `get_trading_migrations`, `TRADING_SCHEMA_VERSION`                                                                                                                                                                                                                                                                                                       | None                         | None                                                                                    | **Unit:** `tests/trading/unit/state/test_migrations.py::test_migrations_are_additive_and_ordered()`                                                                                                                                                                        |
+| Completed | `FR-TRD-070` | Trading migration definitions shall reside in `app/services/trading/migrations/` and be re-exported through `state/`, keeping schema evolution outside the private CRUD package.                                                                                                                    | `get_trading_migrations`, `get_trading_schema_version`                                                                                                                                                                                                                                                                                                   | None                         | None                                                                                    | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_070()` **Unit:** `tests/trading/unit/state/test_migrations.py::test_migrations_are_additive_and_ordered()`                                                                                                                                                           |
 | Completed | `FR-TRD-071` | The`trading_events` table shall carry a monotonic `event_seq`, a unique `event_id`, and a `UNIQUE (scope_key, aggregate_version)` constraint so that two concurrent writers computing the same next aggregate version collide at insert rather than double-appending.                          | Schema definition only                                                                                                                                                                                                                                                                                                                                       | None                         | `DataError`: constraint violation on concurrent append                                | **Unit:** `tests/trading/unit/state/test_migrations.py::test_migrations_are_additive_and_ordered()`                                                                                                                                                                        |
 | Completed | `FR-TRD-072` | Every Trading table shall carry`created_at`, and every mutable Trading table shall additionally carry `updated_at`; `trading_events` and `trading_idempotency` shall carry `correlation_id` so that an appended event or reservation is traceable to the operation that produced it.         | Schema definition only                                                                                                                                                                                                                                                                                                                                       | None                         | None                                                                                    | **Unit:** `tests/trading/unit/state/test_migrations.py::test_migrations_are_additive_and_ordered()`                                                                                                                                                                        |
 | Completed | `FR-TRD-073` | The`trading_projections` table shall record `last_event_seq`, the position to which the projection has consumed the event log, so a rebuild has a resume point and a reader can detect staleness.                                                                                                  | `TradingProjection`                                                                                                                                                                                                                                                                                                                                        | None                         | `TradingError`: invalid projection/version                                            | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_058()`                                                                                                                                                                                                        |
 | Completed | `FR-TRD-074` | Expose one exact-scope aggregate projection read keyed by route, tenant, and authority through`get_trading_projection`; absent state remains absent and no account, position, or order fact is invented.                                                                                             | `get_trading_projection`                                                                                                                                                                                                                                                                                                                                   | Persistence read             | `ValueError`: incomplete or invalid scope                                             | **Unit:** `tests/trading/unit/state/test_runtime_projection_read.py`                                                                                                                                                                                                       |
 | Completed | `FR-TRD-075` | Trading durable state shall persist directly to Trading-owned tables through Data's public transaction executor and shall not write Trading state to`data_runtime_records`.                                                                                                                          | `build_trading_state_store`, `apply_execution_event`                                                                                                                                                                                                                                                                                                     | Atomic persistence write     | `TradingError`: mapping, constraint, or transaction failure                           | **Integration:** `tests/trading/integration/test_runtime_state.py::test_atomic_event_application_materializes_trading_tables()`**Unit:** `tests/trading/unit/state/test_persistence_layout.py::test_trading_persistence_no_longer_uses_generic_runtime_records()`  |
 | Completed | `FR-TRD-076` | Event append, optimistic aggregate projection replacement, and applicable order, fill, position, and transition materialization shall commit atomically;`trading_events` remains authoritative and materialized rows remain rebuildable without invented order defaults or authority timestamps.     | `apply_execution_event`                                                                                                                                                                                                                                                                                                                                    | Atomic persistence write     | `TradingError`: incomplete canonical evidence or stale version                        | **Integration:** `tests/trading/integration/test_runtime_state.py::test_atomic_event_application_materializes_trading_tables()`                                                                                                                                            |
+| Completed | `FR-TRD-077` | Apply and verify the complete immutable Trading migration manifest through Data's ledger-verified, checksum-validating, write-locked transactional executor. | `run_trading_migrations` | Schema migration write | `DataError`: manifest, checksum, lock, or transaction failure | **Unit:** `tests/trading/unit/state/test_migrations.py` **Integration:** `tests/trading/integration/test_runtime_state.py` **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_077()` |
 
 **Rules:** A required persistence failure blocks broker mutation; import creates no store.
 **Implementation notes:** Depend on injected store ports and Data-executed Trading migrations; do not build a custom JSONL persistence engine. Implement deterministic hashing, deduplication, optimistic versioning, and projection math.
@@ -1253,7 +1699,7 @@ No feature-specific setting. Report schema version follows `TRADING_CONTRACT_VER
 | `CAP-TRD-013` | Modify   | `state/events.py`, `state/projections.py`                                                                                                                                                                         |
 | `CAP-TRD-014` | Modify   | `reconciliation/`                                                                                                                                                                                                   |
 | `CAP-TRD-015` | Modify   | `actions/controls.py`, `actions/emergency.py`                                                                                                                                                                     |
-| `CAP-TRD-016` | Merge    | `state/events.py`, `state/stores.py`, `state/migrations.py`                                                                                                                                                     |
+| `CAP-TRD-016` | Merge    | `state/events.py`, `state/stores.py`, `migrations/definitions.py`                                                                                                                                               |
 | `CAP-TRD-017` | Modify   | `monitoring/events.py`                                                                                                                                                                                              |
 | `CAP-TRD-018` | Add      | `actions/rebalance.py` (`FR-TRD-063`, `FR-TRD-064`) with `monitoring/budgets.py` (`FR-TRD-047`) — enforce registered Risk-owned portfolio budget decisions during authorized Portfolio rebalance execution |
 | `CAP-TRD-019` | Modify   | `reporting/evidence.py`                                                                                                                                                                                             |
@@ -1325,7 +1771,10 @@ uv run pytest tests/trading -o addopts="" --import-mode=importlib \
 - [X] No rejected capability appears in the architecture or public API. `app/services/trading/__init__.py:1`
 - [X] No unresolved Open Decision affects a completed requirement. `app/services/trading/README.md:953`
 - [X] Production live mutation is disabled by default and all safety gates fail closed. `app/services/trading/live/config.py:110`
-- [X] Ruff lint/format, 143 Trading tests, all nine numbered usage programs, verified MT5 demo cleanup/reconciliation, and 83.77% Trading-only coverage pass. The repository mypy command remains blocked by pre-existing Data response-contract errors outside this migration. `tests/trading/unit/contracts/test_registry.py:64`; `tests/trading/integration/test_mt5_demo_provider.py:100`
+- [X] Nine numbered usage programs exactly match the nine registered features; every active requirement emits explicit success and produced-data evidence, and retired `FR-TRD-011` remains absent. `tests/trading/integration/test_usage_scripts.py:32`
+- [X] Current Risk decision, kill-switch, and action-policy contracts pass through the real Trading readiness consumer, while non-authorizing state fails closed. `tests/trading/integration/test_risk_contract_compatibility.py:142`
+- [X] The workspace-mounted Trading panel exposes complete governed submit, cancel, and close inputs, defaults to paper, requires explicit authority references, and re-locks after each attempt. `app/ui/src/components/workflow/trading.tsx:121`
+- [X] Ruff, Trading mypy, unit/integration tests, workflow execution, per-file 80% branch coverage, and the individual 100 ms unit-test ceiling are recorded in the dated audit evidence. `docs/dev/trading_domain_audit_remediation_plan.md:10`
 
 ---
 

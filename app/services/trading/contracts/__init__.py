@@ -10,6 +10,7 @@ from app.services.trading.contracts.errors import (
     redact_trading_payload,
 )
 from app.services.trading.contracts.factories import (
+    create_closed_position_record,
     create_execution_evidence_report,
     create_execution_receipt,
     create_order_intent,
@@ -54,6 +55,7 @@ from app.services.trading.contracts.registry import (
 type StandardResponse[T] = Any
 
 __all__ = [
+    "create_closed_position_record",
     "create_execution_evidence_report",
     "create_execution_receipt",
     "create_order_intent",

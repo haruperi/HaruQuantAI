@@ -10,7 +10,7 @@
 | **Package path**     | `app/services/portfolio`                                                                                   |
 | **Domain ID**        | `PORT`                                                                                                     |
 | **Status**           | Completed — all eight feature owners have dedicated module folders, usage programs, and passing validation |
-| **Last updated**     | 2026-08-04                                                                                                 |
+| **Last updated**     | 2026-08-07                                                                                                 |
 | **System workflows** | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008`                                                                   |
 
 ## 1. Purpose and Boundary
@@ -24,7 +24,7 @@ Portfolio owns the deterministic construction, versioning, activation, drift ass
 - Portfolio definitions, objectives, scopes, and immutable versions.
 - Fixed-weight, equal-weight, and inverse-volatility construction.
 - Target capital weights and proposed risk-budget weights as construction metadata.
-- `PortfolioConstructionRequest v1`, `PortfolioConstructionResult v1`, `ActivePortfolioAllocation v1`, and `PortfolioRebalancePlan v1`.
+- `PortfolioDefinition v1`, `PortfolioConstructionRequest v1`, `PortfolioConstructionResult v1`, `ActivePortfolioAllocation v1`, and `PortfolioRebalancePlan v1`.
 - Activation state after Simulation validation, human approval where required, and Risk authorization.
 - Drift calculation, reduce-only planning for existing over-budget exposure, and rollback as a new governed version.
 - Portfolio-owned tables, migrations, artifacts, audit payloads, and public service API.
@@ -54,6 +54,7 @@ Portfolio owns the deterministic construction, versioning, activation, drift ass
 | In           | `PortfolioSimulationResult v1`                                        | Simulation | Supply deterministic portfolio validation                                           |
 | In           | Redacted reconciled `StandardTradingEnvelope` facts                   | Trading    | Supply immutable rebalance execution truth for receiver-owned Analytics measurement |
 | Owned input  | `PortfolioConstructionRequest v1`                                     | Portfolio  | Receive an authenticated construction command                                       |
+| Owned state  | `PortfolioDefinition v1`                                              | Portfolio  | Register and read exact immutable definition versions                               |
 | Owned output | `PortfolioConstructionResult v1`                                      | Portfolio  | Publish an immutable candidate allocation                                           |
 | Owned output | `ActivePortfolioAllocation v1`                                        | Portfolio  | Publish the canonical active allocation version                                     |
 | Owned output | `PortfolioRebalancePlan v1`                                           | Portfolio  | Publish immutable drift and proposed-action lineage                                 |
@@ -140,6 +141,7 @@ app/services/portfolio/
 ├── contracts/
 │   ├── __init__.py
 │   ├── errors.py
+│   ├── definitions.py
 │   ├── requests.py
 │   ├── results.py
 │   └── allocations.py
@@ -154,7 +156,10 @@ app/services/portfolio/
 │   ├── __init__.py
 │   ├── repository.py
 │   ├── runtime.py
-│   └── migrations.py
+├── migrations/
+│   ├── __init__.py
+│   ├── definitions.py
+│   └── runner.py
 ├── persistence/
 │   ├── __init__.py
 │   ├── create.py
@@ -254,15 +259,7 @@ Evidence programs:
 | Completed | Supporting | `WF-PORT-003` | Cross-domain | `SYS-WF-007`               | Coordinate simulation and Risk review   | Complete construction result | Current Simulation result and Risk decision                                                       | `FR-PORT-025 → FR-PORT-029`               |
 | Completed | Supporting | `WF-PORT-006` | Cross-domain | `SYS-WF-008`               | Submit and measure authorized rebalance | Current Risk approval        | Trading execution truth followed by Analytics evidence, or explicit executed-but-unmeasured state | `FR-PORT-025 → FR-PORT-029 → FR-PORT-038` |
 | Completed | Supporting | `WF-PORT-007` | Internal     | `SYS-WF-007`               | Roll back allocation                    | Authorized rollback request  | New governed allocation version                                                                   | `FR-PORT-018 → FR-PORT-019`               |
-| Completed | Supporting | `WF-PORT-008` | Cross-domain | `SYS-WF-007`, `SYS-WF-008` | Assess common-mode exposure and cross-account correlation | Active allocation plus account and FX evidence across every managed account | Common-mode exposure report and cross-account correlation measurement for Risk review | `Pending` |
-
-### Status values
-
-| Status        | Meaning                                    |
-| ------------- | ------------------------------------------ |
-| **Missing**   | Not implemented or not verified            |
-| **Partial**   | Partly implemented or tests are incomplete |
-| **Completed** | Implemented, tested, and verified          |
+| Completed | Supporting | `WF-PORT-008` | Cross-domain | `SYS-WF-007`, `SYS-WF-008` | Assess common-mode exposure and cross-account correlation | Active allocation plus account and FX evidence across every managed account | Common-mode exposure report and cross-account correlation measurement for Risk review | `FR-PORT-039 → FR-PORT-040` |
 
 ### Workflow scope values
 
@@ -433,7 +430,7 @@ fails closed rather than reporting lower common-mode exposure than actually exis
 Insufficient overlapping return history returns explicit missingness rather than a
 correlation computed from a short or misaligned window.
 
-**Integration test:** `Pending`
+**Integration test:** `tests/portfolio/integration/test_usage_scripts.py` executes the stage-labelled workflow program, while unit correlation and common-mode tests verify deterministic calculations and fail-closed evidence handling.
 
 #### End-to-end workflow diagram
 
@@ -585,11 +582,11 @@ internal and are created or inspected only through package-root functions.
 
 | Status    | File            | Responsibility                                                     | Key exports                                   | Dependencies                                                                                                         |
 | --------- | --------------- | ------------------------------------------------------------------ | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Completed | `migrations.py` | Define Portfolio-owned migrations executed by Data infrastructure. | `PORTFOLIO_MIGRATIONS`                        | **Standard library:** None; **Required third-party:** None; **Local:** Data migration protocol                   |
-| Completed | `repository.py` | Atomic repositories, version checks, and read models.              | `PortfolioRepository`                         | **Standard library:** `collections.abc`; **Required third-party:** None; **Local:** `contracts`, `migrations.py` |
+| Completed | `../migrations/` | Define and run the complete Portfolio-owned migration manifest through Data infrastructure. | `get_portfolio_migrations`, `run_portfolio_migrations` | **Local:** Data package-root migration request and runner functions |
+| Completed | `repository.py` | Atomic repositories, definition/version checks, and read models.              | `PortfolioRepository`                         | **Standard library:** `collections.abc`; **Required third-party:** None; **Local:** `contracts`, `../migrations/` |
 | Completed | `runtime.py` | Retain Portfolio codecs, validation, conflict policy, and opaque state-store dispatch while delegating CRUD. | `build_portfolio_state_store`, `execute_portfolio_state_store_operation` | **Standard library:** `json`, `typing`; **Required third-party:** Pydantic; **Local:** `contracts`, private `persistence/` |
 | Completed | `../persistence/` | Build construction/plan creates, active-allocation CAS updates, idempotency bindings, audit-outbox writes, and bounded reads against Portfolio-owned relational tables. | Private standalone CRUD functions | **Local:** Data package-root statement-plan and transaction functions |
-| Completed | `__init__.py`   | Expose state interfaces.                                           | `PortfolioRepository`, `PORTFOLIO_MIGRATIONS` | **Standard library:** None; **Required third-party:** None; **Local:** state files above                         |
+| Completed | `__init__.py`   | Expose internal state interfaces.                                  | `PortfolioRepository`                         | **Standard library:** None; **Required third-party:** None; **Local:** state files above                         |
 
 `PortfolioRepository` coordinates an injected `PortfolioStateStore` port. Portfolio
 never opens SQLite or imports Data storage internals. Migrations define immutable
@@ -606,9 +603,9 @@ split across CRUD files.
 The runtime writes `portfolio_construction_results`,
 `portfolio_allocation_versions`, `portfolio_active_scopes`,
 `portfolio_idempotency`, `portfolio_rebalance_plans`, and
-`portfolio_audit_outbox` directly. `portfolio_definitions` remains schema-owned but
-has no current producer; Portfolio does not invent definition records merely to
-populate the table.
+`portfolio_audit_outbox` directly. Immutable `portfolio_definitions` rows are
+registered and read through the public Portfolio service; registration commits the
+definition and its audit-outbox event atomically and rejects conflicting replays.
 
 | ID          | Requirement                                                          | Verification      |
 | ----------- | -------------------------------------------------------------------- | ----------------- |
@@ -618,6 +615,9 @@ populate the table.
 | FR-PORT-033 | Store references, hashes, and decisions needed to reproduce lineage. | Persistence tests |
 | FR-PORT-044 | Persist runtime state directly in Portfolio-owned relational tables while Data retains connection, locking, and transaction execution ownership. | Relational integration and boundary tests |
 | FR-PORT-045 | Commit construction-plus-outbox, plan-plus-outbox, and allocation-plus-idempotency-plus-active-scope-plus-outbox transitions atomically; conflicts and stale revisions fail closed without partial rows. | Atomicity, conflict, and rollback tests |
+| FR-PORT-046 | Register one immutable, hash-bound Portfolio definition version through the public boundary and atomically persist its audit event. | API and relational integration tests |
+| FR-PORT-047 | Read one exact Portfolio definition version through the public boundary without exposing persistence internals. | API and relational integration tests |
+| FR-PORT-048 | Apply the complete checksummed Portfolio migration manifest through Data's ledger verification, write lock, and transactional runner. | Migration and startup tests |
 
 ### 4.5 `allocation/` — Version and Activation Governance
 
@@ -723,7 +723,7 @@ never called again unless its owner contract explicitly declares idempotent repl
 
 | ID          | Requirement                                                                                 | Verification    |
 | ----------- | ------------------------------------------------------------------------------------------- | --------------- |
-| FR-PORT-034 | Expose construction, status, activation, drift/rebalance, rollback, and history operations. | API tests       |
+| FR-PORT-034 | Expose definition registration/read, construction, status, activation, drift/rebalance, rollback, and history operations. | API tests       |
 | FR-PORT-035 | Accept `AuthContext` and `request_id: str \| None = None` on governed entry points.         | Signature tests |
 | FR-PORT-036 | Return Utils `StandardResponse[T]` envelopes; never `None` or raw exceptions cross the public boundary. | Contract tests |
 | FR-PORT-037 | Keep authentication and presentation logic outside Portfolio.                               | Import review   |
@@ -731,7 +731,8 @@ never called again unless its owner contract explicitly declares idempotent repl
 The root functions `construct_portfolio`, `get_portfolio_status`,
 `activate_portfolio`, `assess_portfolio_drift`, `submit_portfolio_rebalance`,
 `recompute_portfolio_measurement`, `rollback_portfolio`, and
-`get_portfolio_history` delegate to an internal service handle. Every governed
+`get_portfolio_history`, `register_portfolio_definition`, and
+`get_portfolio_definition` delegate to an internal service handle. Every governed
 function accepts `AuthContext` and `request_id: str | None = None`; a supplied
 request ID must equal any ID carried by the command. Every function returns
 `StandardResponse[T]` with the raw Portfolio DTO directly in `data`, canonical
@@ -749,21 +750,23 @@ the immutable Portfolio error catalogue. `PortfolioError.to_payload` returns
 | `recompute_measurement` | `StandardResponse[PortfolioRebalancePlan]` |
 | `rollback` | `StandardResponse[ActivePortfolioAllocation]` |
 | `history` | `StandardResponse[tuple[ActivePortfolioAllocation, ...]]` |
+| `register_definition` | `StandardResponse[PortfolioDefinition]` |
+| `definition` | `StandardResponse[PortfolioDefinition]` |
 | `PortfolioError.to_payload` | `StandardResponse[PortfolioErrorPayload]` |
 
 #### Exact package-root public API
 
 | Category | Standalone functions |
 | --- | --- |
-| Governed application operations | `construct_portfolio`, `get_portfolio_status`, `activate_portfolio`, `assess_portfolio_drift`, `submit_portfolio_rebalance`, `recompute_portfolio_measurement`, `rollback_portfolio`, `get_portfolio_history` |
+| Governed application operations | `construct_portfolio`, `get_portfolio_status`, `activate_portfolio`, `assess_portfolio_drift`, `submit_portfolio_rebalance`, `recompute_portfolio_measurement`, `rollback_portfolio`, `get_portfolio_history`, `register_portfolio_definition`, `get_portfolio_definition` |
 | Opaque values and handles | `create_portfolio_value`, `dump_portfolio_value`, `get_portfolio_value_field`, `is_portfolio_value`, `create_portfolio_handle`, `execute_portfolio_handle_operation`, `is_portfolio_handle` |
 | Evidence and deterministic reports | `validate_construction_evidence`, `assess_common_mode_exposure`, `measure_cross_account_correlation` |
-| Errors and migrations | `get_portfolio_error_catalog`, `to_portfolio_error_payload`, `get_portfolio_migrations` |
+| Errors and migrations | `get_portfolio_error_catalog`, `to_portfolio_error_payload`, `get_portfolio_migrations`, `run_portfolio_migrations` |
 
 Registered value names are `ActivePortfolioAllocation`,
 `CommonModeExposureReport`, `ConstructionEvidenceInputs`,
 `CrossAccountCorrelationReport`, `DriftObservation`, `EvidenceReferenceSet`,
-`FixedWeightInput`, `PortfolioComponentWeight`, `PortfolioConstructionRequest`,
+`FixedWeightInput`, `PortfolioComponentWeight`, `PortfolioConstructionRequest`, `PortfolioDefinition`,
 `PortfolioConstructionResult`, `PortfolioRebalanceAction`,
 `PortfolioRebalancePlan`, `PortfolioReviewResult`, `PortfolioSettings`,
 `RebalanceSchedule`, `StrategyAllocationRef`, and
@@ -899,7 +902,7 @@ uv run mypy app/services/portfolio
 - [x] Activation, rollback, and rebalance semantics match Sections 3–5 and `docs/PROJECT.md`. `tests/system/integration/test_portfolio_activation.py:25`
 - [x] No hidden numeric defaults or live side effects exist. `app/services/portfolio/_settings.py:80`
 - [x] Targeted tests, Ruff, formatting, mypy, and 80% coverage pass. `tests/portfolio/unit/test_api_and_quality.py:188`
-- [x] Service status is updated from `Missing` only when evidence supports it. `app/services/portfolio/README.md:7`
+- [x] Service status is `Completed` only when evidence supports it. `app/services/portfolio/README.md:7`
 
 ## 8. Change Process
 

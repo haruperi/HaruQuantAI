@@ -4,28 +4,24 @@ import sqlite3
 from pathlib import Path
 
 from app.agentic import (
-    build_agentic_memory_migration_request,
-    build_agentic_migration_request,
     build_durable_agentic_dependencies,
+    build_evidence_claim,
     get_firm_run,
+    retrieve_evidence_claims,
+    run_agentic_migrations,
+    store_evidence_claim,
     store_memory,
     submit_firm_request,
 )
 from app.agentic.context_memory.runtime import DurableMemoryStore
 from app.agentic.lifecycle.models import build_lifecycle_record
 from app.agentic.lifecycle.runtime import DurableLifecycleStore
-from app.agentic.migrations import (
-    build_lifecycle_migration_request,
-    build_operations_migration_request,
-)
 from app.agentic.operations import build_incident_record, build_replay_request
 from app.agentic.operations.models import build_replay_outcome
 from app.agentic.operations.runtime import DurableOperationsStore
 from app.services.data import (
     build_data_settings,
     data_settings_context,
-    run_domain_migrations,
-    unwrap_data_response,
 )
 from app.utils import generate_id
 
@@ -76,19 +72,9 @@ def _durable_dependencies() -> object:
 
 
 def _run_agentic_migrations() -> None:
-    """Apply the four migrations used by the durable dependency bundle."""
-    for build_request in (
-        build_agentic_migration_request,
-        build_agentic_memory_migration_request,
-        build_lifecycle_migration_request,
-        build_operations_migration_request,
-    ):
-        request_id = generate_id("req")
-        unwrap_data_response(
-            run_domain_migrations(build_request(request_id)),
-            operation="tests.agentic.domain.migrations",
-            request_id=request_id,
-        )
+    """Apply the complete authoritative Agentic migration manifest."""
+    response = run_agentic_migrations(generate_id("req"))
+    assert response.status == "success"
 
 
 def test_agentic_run_survives_dependency_reconstruction(tmp_path: Path) -> None:
@@ -112,6 +98,32 @@ def test_agentic_run_survives_dependency_reconstruction(tmp_path: Path) -> None:
     assert submitted.status == "ok"
     assert inspected.status == "ok"
     assert inspected.payload["run_id"] == submitted.payload["run_id"]
+
+
+def test_evidence_claim_survives_store_reconstruction(tmp_path: Path) -> None:
+    """A governed claim round-trips through its Agentic-owned table."""
+    claim = build_evidence_claim(
+        {
+            "claim_id": "claim-durable-1",
+            "task_id": "task-durable-1",
+            "statement": "The governed source reports a bounded observation.",
+            "source_ref": "research:source:1",
+            "source_trust": "authoritative",
+            "licence_ref": "licence:internal",
+            "available_at": NOW,
+            "observed_at": NOW,
+            "content_hash": "a" * 64,
+            "confidence_basis": "The receiver supplied a governed projection.",
+            "falsifier": "The source withdraws or revises the observation.",
+            "injection_status": "clean",
+        }
+    )
+    with data_settings_context(_settings(tmp_path)):
+        _run_agentic_migrations()
+        store_evidence_claim(DurableMemoryStore(), claim)
+        restored = retrieve_evidence_claims(DurableMemoryStore(), claim.task_id)
+
+    assert restored == (claim,)
 
 
 def test_agentic_relational_stores_round_trip_losslessly(tmp_path: Path) -> None:

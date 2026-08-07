@@ -1,6 +1,5 @@
 """Integration evidence for canonical Analytics report construction."""
 
-# ruff: noqa: INP001
 from app.utils import get_logger
 
 logger = get_logger(__name__)

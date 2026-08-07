@@ -24,13 +24,6 @@ _ORDER_COLUMNS = (
     "runtime_profile, submitted_at, terminal_at, correlation_id, created_at, "
     "updated_at"
 )
-_POSITION_COLUMNS = (
-    "position_id, account_id, symbol_id, direction, quantity_decimal, "
-    "avg_entry_price_decimal, current_price_decimal, unrealized_pnl_decimal, "
-    "realized_pnl_decimal, commission_total_decimal, swap_total_decimal, "
-    "stop_loss_decimal, take_profit_decimal, strategy_version_id, state, "
-    "opened_at, closed_at, position_version, created_at, updated_at"
-)
 
 
 def update_idempotency_record(
@@ -226,25 +219,6 @@ def update_event_projection_records(
         # Empty order identity violates the table check and rolls back when the
         # receipt cannot be tied to an already-materialized order.
         statements.append(
-            "INSERT INTO trading_order_transitions "  # noqa: S608
-            "(order_id, from_state, to_state, reason_code, detail_json, "
-            "occurred_at, correlation_id, created_at) VALUES ("
-            f"COALESCE((SELECT order_id FROM trading_orders WHERE {lookup}), ''), "
-            f"(SELECT state FROM trading_orders WHERE {lookup}), ?, ?, ?, ?, ?, ?)"
-        )
-        parameters.append(
-            (
-                outcome.order_id,
-                outcome.order_id,
-                outcome.state,
-                outcome.reason_code,
-                outcome.detail_json,
-                outcome.updated_at,
-                outcome.correlation_id,
-                outcome.updated_at,
-            )
-        )
-        statements.append(
             "UPDATE trading_orders SET broker_order_id = COALESCE(?, broker_order_id), "  # noqa: S608
             "state = ?, filled_qty_decimal = ?, avg_fill_price_decimal = ?, "
             "reject_reason = ?, terminal_at = ?, updated_at = ? "
@@ -262,37 +236,6 @@ def update_event_projection_records(
                 outcome.order_id,
             )
         )
-
-    if batch.fill is not None:
-        statements.append(
-            "INSERT INTO trading_fills "
-            "(fill_id, order_id, broker_fill_id, sequence, quantity_decimal, "
-            "price_decimal, commission_decimal, swap_decimal, slippage_bps, "
-            "liquidity_flag, executed_at, reported_at, correlation_id, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        )
-        parameters.append(batch.fill.values)
-
-    if batch.position is not None:
-        statements.append(
-            f"INSERT INTO trading_positions ({_POSITION_COLUMNS}) "  # noqa: S608
-            f"VALUES ({', '.join('?' for _ in batch.position.values)}) "
-            "ON CONFLICT(position_id) DO UPDATE SET "
-            "quantity_decimal = excluded.quantity_decimal, "
-            "avg_entry_price_decimal = excluded.avg_entry_price_decimal, "
-            "current_price_decimal = excluded.current_price_decimal, "
-            "unrealized_pnl_decimal = excluded.unrealized_pnl_decimal, "
-            "realized_pnl_decimal = excluded.realized_pnl_decimal, "
-            "commission_total_decimal = excluded.commission_total_decimal, "
-            "swap_total_decimal = excluded.swap_total_decimal, "
-            "stop_loss_decimal = excluded.stop_loss_decimal, "
-            "take_profit_decimal = excluded.take_profit_decimal, "
-            "state = excluded.state, closed_at = excluded.closed_at, "
-            "position_version = CASE WHEN trading_positions.position_version < "
-            "excluded.position_version THEN excluded.position_version ELSE -1 END, "
-            "updated_at = excluded.updated_at"
-        )
-        parameters.append(batch.position.values)
 
     result = _execute(tuple(statements), tuple(parameters))
     if result.affected_rows < _MIN_ATOMIC_AFFECTED_ROWS:

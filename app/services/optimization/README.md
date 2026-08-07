@@ -70,8 +70,8 @@ The top-level data-ownership table assigns optimization checkpoints and results 
 
 | Status | State / Store | Read access (via contract) | Migration definitions |
 |---|---|---|---|
-| Completed | Optimization results and ranked-candidate evidence | `UI/API` through `OptimizationResult v1` | `app/services/optimization/state/migrations.py` |
-| Completed | Optimization checkpoints and reproducibility artifacts | Optimization only until a versioned public result is complete | `app/services/optimization/state/migrations.py` |
+| Completed | Optimization results and ranked-candidate evidence | `UI/API` through `OptimizationResult v1` | `app/services/optimization/migrations/definitions.py` |
+| Completed | Optimization checkpoints and reproducibility artifacts | Optimization only until a versioned public result is complete | `app/services/optimization/migrations/definitions.py` |
 
 No caller writes either store directly. A public operation that produces durable search state uses an injected Optimization-owned `OptimizationStateStore` and returns persistence success only after the store confirms the atomic write.
 
@@ -146,7 +146,15 @@ once in the referenced Section 4 specifications.
 optimization/
 ├── __init__.py                         # Approved domain-level public API only
 ├── README.md
-├── errors.py                           # Controlled domain failures
+├── contracts/                          # Non-feature shared error contracts
+│   ├── __init__.py
+│   └── errors.py
+├── persistence/                        # Non-feature relational CRUD support
+│   ├── __init__.py
+│   ├── create.py
+│   ├── read.py
+│   ├── update.py
+│   └── delete.py
 ├── parameters/                         # Feature: parameter space and provenance
 │   ├── __init__.py
 │   ├── contracts.py
@@ -569,13 +577,13 @@ sequenceDiagram
 
 This section is the implementation plan. Status reflects V1 evidence against the final structure and contracts, not similarly named legacy symbols.
 
-### 4.0 `errors.py` — Controlled Domain Failures
+### 4.0 `contracts/errors.py` — Controlled Domain Failures
 
 #### Files
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `errors.py` | Define cataloged, redacted Optimization failures | `OptimizationError` | **Standard library:** `collections.abc`, `types`<br>**Required third-party:** None<br>**Local:** `app.utils → HaruQuantError, logger, redact_mapping_value` |
+| Completed | `contracts/errors.py` | Define cataloged, redacted Optimization failures in the documented non-feature contract support package | `OptimizationError` | **Standard library:** `collections.abc`, `types`<br>**Required third-party:** None<br>**Local:** `app.utils → HaruQuantError, logger, redact_mapping_value` |
 
 #### Functional requirements
 
@@ -640,7 +648,7 @@ parameter definitions → validation/constraints → executable parameters → p
 - No `eval()` over unrestricted syntax, non-finite decimal, hidden fallback, or provider object is permitted.
 - Hash changes invalidate candidate reuse; canonical JSON is owned by Utils and must be consumed rather than reimplemented.
 
-**Feature usage examples:** `tests/optimization/usage/features/01_parameters.py` contains one `test_usage_*` function per requirement above.
+**Feature usage examples:** `tests/optimization/usage/features/01_parameters.py` is the standalone numbered program for this feature and prints bounded success evidence plus actual produced data.
 
 ---
 
@@ -999,6 +1007,10 @@ search/WFA/robustness evidence → completeness and decision labels → Optimiza
 | Completed | `persistence.py` | Coordinate atomic result and ranked-evidence persistence | `persist_optimization_result` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `contracts.py`, `stores.py`; evidence contracts |
 | Completed | `artifacts.py` | Build traversal-safe deterministic artifact paths below the approved root | `build_optimization_artifact_path` | **Standard library:** `pathlib`<br>**Required third-party:** None<br>**Local:** parameter hashing and state contracts |
 | Completed | `migrations/definitions.py` | Declare Optimization-owned additive schema definitions without importing the state package | `get_optimization_migrations` | **Standard library:** `hashlib`<br>**Required third-party:** None<br>**Local:** Data public migration-step builder |
+| Completed | `persistence/create.py` | Construct and execute atomic Optimization result inserts and initial checkpoint writes | Private SQL builders and relational store implementation | **Standard library:** `datetime`, `json`<br>**Required third-party:** None<br>**Local:** Data public transaction boundary; Optimization state/evidence contracts |
+| Completed | `persistence/read.py` | Read and normalize Optimization results and checkpoints by canonical identity | Private SQL builders and relational store implementation | **Standard library:** `json`<br>**Required third-party:** None<br>**Local:** Data public transaction boundary; Optimization state/evidence contracts |
+| Completed | `persistence/update.py` | Advance an existing checkpoint only through exact identity-matched atomic SQL | Private checkpoint update | **Standard library:** `datetime`, `json`<br>**Required third-party:** None<br>**Local:** Data public transaction boundary; Optimization state contracts |
+| Completed | `persistence/delete.py` | Explicitly declare deletion unsupported for immutable Optimization evidence | Empty `__all__` | **Standard library:** None<br>**Required third-party:** None |
 | Completed | `__init__.py` | Expose the supported state API | All key exports above | **Standard library:** None<br>**Required third-party:** None<br>**Local:** explicit imports from files above |
 
 #### Configuration and Limits Manifest
@@ -1016,9 +1028,9 @@ search/WFA/robustness evidence → completeness and decision labels → Optimiza
 | Completed | `FR-OPT-050` | The system shall define an injected store port limited to Optimization-owned checkpoint/result reads and atomic writes. | `OptimizationStateStore` | Read-only; persistence write | `OptimizationError`: unavailable store, version conflict, or failed write | **Usage:** `tests/optimization/usage/features/06_state.py`<br>**Unit:** `tests/optimization/unit/test_state_contracts.py::test_store_port_exposes_only_owned_state()` |
 | Completed | `FR-OPT-051` | The system shall define immutable checkpoint evidence with schema version, search ID, reproducibility hash, completed-candidate position, deterministic RNG state where applicable, evidence references, and UTC timestamp. | `OptimizationCheckpoint` | None | `pydantic.ValidationError`: malformed, incomplete, or incompatible checkpoint | **Usage:** `tests/optimization/usage/features/06_state.py`<br>**Unit:** `tests/optimization/unit/test_state_contracts.py::test_checkpoint_requires_reproducibility_identity()` |
 | Completed | `FR-OPT-052` | The system shall atomically save each completed-candidate checkpoint and recover only an exact schema/search/reproducibility match. | `save_search_checkpoint`, `load_search_checkpoint` | Read-only; persistence write | `OptimizationError`: stale version, identity mismatch, or store failure | **Usage:** `tests/optimization/usage/features/06_state.py`<br>**Unit:** `tests/optimization/unit/test_state_stores.py::test_checkpoint_recovery_requires_exact_hash()` |
-| Completed | `FR-OPT-053` | The system shall atomically persist one canonical `OptimizationResult v1` with its ranked-candidate evidence before reporting durable success. | `persist_optimization_result(result: OptimizationResult, store: OptimizationStateStore) -> OptimizationPersistenceReceipt` | Persistence write | `OptimizationError`: schema mismatch, conflicting result, or store failure | **Usage:** `tests/optimization/usage/features/06_state.py`<br>**Unit:** `tests/optimization/unit/test_state_persistence.py::test_result_success_requires_atomic_receipt()` |
+| Completed | `FR-OPT-053` | The system shall construct a Data-backed Optimization store and atomically persist one canonical `OptimizationResult v1` with its ranked-candidate evidence before reporting durable success. | `create_optimization_state_store(...) -> object`; `persist_optimization_result(result: OptimizationResult, store: OptimizationStateStore) -> OptimizationPersistenceReceipt` | Persistence write | `OptimizationError`: schema mismatch, conflicting result, or store failure | **Usage:** `tests/optimization/usage/features/06_state.py`<br>**Unit:** `tests/optimization/unit/test_state_persistence.py::test_result_success_requires_atomic_receipt()`<br>**Integration:** `tests/optimization/integration/test_relational_persistence.py` |
 | Completed | `FR-OPT-054` | The system shall build artifact locations only beneath the approved result/checkpoint roots from validated search and reproducibility identifiers. | `build_optimization_artifact_path(...) -> Path` | None | `OptimizationError`: invalid identifier or traversal attempt | **Usage:** `tests/optimization/usage/features/06_state.py`<br>**Unit:** `tests/optimization/unit/test_state_artifacts.py::test_artifact_path_cannot_escape_root()` |
-| Completed | `FR-OPT-055` | The system shall expose ordered additive Optimization migration definitions for `optimization_results` and `optimization_checkpoints` through Data's public migration contract without opening a database. | `get_optimization_migrations() -> tuple[MigrationStep, ...]` | None | `OptimizationError`: invalid or non-additive definition | **Usage:** `tests/optimization/usage/features/06_state.py`<br>**Unit:** `tests/optimization/unit/test_state_migrations.py::test_migrations_are_owned_additive_and_ordered()` |
+| Completed | `FR-OPT-055` | The system shall expose ordered additive Optimization migration definitions for `optimization_results` and `optimization_checkpoints` and execute the complete manifest only through Data's public migration runner with ledger verification, checksum validation, write locking, and transactional application. | `get_optimization_migrations() -> tuple[MigrationStep, ...]`; `run_optimization_migrations(request_id: str) -> object` | Database schema migration only when the runner is called | Data-owned structured migration failure | **Usage:** `tests/optimization/usage/features/06_state.py`<br>**Unit:** `tests/optimization/unit/test_state_migrations.py`<br>**Integration:** `tests/optimization/integration/test_migration_runtime.py` |
 
 **Rules and implementation notes:**
 
@@ -1054,7 +1066,7 @@ parallel business logic, or second response envelope exists.
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Completed | `FR-OPT-056` | The system shall run one bounded parameter sweep through the injected adapter and assemble advisory baseline evidence. | `run_parameter_sweep(request: SearchRequest, adapter: BacktestExecutionAdapter, *, request_id: str | None = None) -> StandardResponse[OptimizationResult]` | External API call | `StandardResponse.error`: catalogued Optimization failure; raw result is direct `data` | **Usage:** `tests/optimization/usage/features/09_public_api.py`<br>**Unit:** `tests/optimization/unit/test_public_api_operations.py::test_run_parameter_sweep_returns_advisory_result()` |
-| Completed | `FR-OPT-057` | The system shall run one walk-forward optimization or a caller-bounded compatible matrix through the canonical WFA workflow. | `run_walk_forward_optimization(...) -> StandardResponse[OptimizationResult]`; `run_walk_forward_matrix(..., max_requests: int, ...) -> StandardResponse[tuple[OptimizationResult, ...]]` | External API call | `StandardResponse.error`: catalogued Optimization failure; raw result is direct `data` | **Usage:** `tests/optimization/usage/features/09_public_api.py`, `test_usage_run_walk_forward_matrix()`<br>**Unit:** `tests/optimization/unit/test_public_api_operations.py::test_run_walk_forward_optimization_returns_fold_evidence()`, `test_run_walk_forward_matrix_is_bounded_and_ordered()` |
+| Completed | `FR-OPT-057` | The system shall run one walk-forward optimization or a caller-bounded compatible matrix through the canonical WFA workflow. | `run_walk_forward_optimization(...) -> StandardResponse[OptimizationResult]`; `run_walk_forward_matrix(..., max_requests: int, ...) -> StandardResponse[tuple[OptimizationResult, ...]]` | External API call | `StandardResponse.error`: catalogued Optimization failure; raw result is direct `data` | **Usage:** `tests/optimization/usage/features/09_public_api.py`<br>**Unit:** `tests/optimization/unit/test_public_api_operations.py::test_run_walk_forward_optimization_returns_fold_evidence()`, `test_run_walk_forward_matrix_is_bounded_and_ordered()` |
 | Completed | `FR-OPT-058` | The system shall run exactly one typed Monte Carlo or explicit same-unit execution-stress analysis. | `run_robustness_analysis(request: RobustnessRequest, *, max_simulations: int = 2000, request_id: str | None = None) -> StandardResponse[RobustnessAnalysisResult]` | Local state mutation for seeded simulation only | `StandardResponse.error`: catalogued Optimization failure; raw result is direct `data` | **Usage:** `tests/optimization/usage/features/09_public_api.py`<br>**Unit:** `tests/optimization/unit/test_public_api_operations.py::test_run_robustness_analysis_supports_both_request_forms()` |
 | Completed | `FR-OPT-059` | The system shall compare only non-empty schema-compatible result sequences without recomputing evidence. | `compare_optimization_runs(results: Sequence[OptimizationResult], *, request_id: str | None = None) -> StandardResponse[OptimizationComparison]` | None | `StandardResponse.error`: catalogued Optimization failure; raw result is direct `data` | **Usage:** `tests/optimization/usage/features/09_public_api.py`<br>**Unit:** `tests/optimization/unit/test_public_api_operations.py::test_compare_optimization_runs_preserves_existing_decisions()` |
 | Completed | `FR-OPT-060` | The system shall calculate exact-match stability from non-empty ranked executable-parameter evidence. | `calculate_parameter_stability(ranked_candidates: Sequence[Mapping[str, object]], *, request_id: str | None = None) -> StandardResponse[ParameterStabilityEvidence]` | None | `StandardResponse.error`: catalogued Optimization failure; raw result is direct `data` | **Usage:** `tests/optimization/usage/features/09_public_api.py`<br>**Unit:** `tests/optimization/unit/test_public_api_operations.py::test_calculate_parameter_stability_uses_exact_values()` |
@@ -1094,7 +1106,7 @@ alone maps domain results and errors to external transport responses.
 | Completed | `NFR-OPT-009` | Time | All cross-domain times and split boundaries shall be timezone-aware UTC; timeouts use a monotonic clock. | UTC and clock tests |
 | Completed | `NFR-OPT-010` | Compatibility | Breaking changes to the approved public API or `OptimizationResult v1` require a version bump. | Contract compatibility tests |
 | Completed | `NFR-OPT-011` | Persistence truth | Packaging/report functions shall never imply persistence; any public durable-success claim requires an `OptimizationPersistenceReceipt` from the injected Optimization store. | Side-effect tests |
-| Completed | `NFR-OPT-012` | Testing | Every public requirement shall have a unit test and runnable usage example; every active workflow shall have one standalone README-aligned usage program; package statement coverage shall be at least 80%. | `tests/optimization/unit/test_workflow_usage_parity.py`, direct workflow runner, traceability and coverage audit |
+| Completed | `NFR-OPT-012` | Testing | Every public requirement shall have a unit test and runnable usage example; every active workflow shall have one standalone README-aligned usage program; every production file and the package aggregate shall have at least 80% coverage; every unit-test call shall complete within 100 ms. | `tests/optimization/unit/test_workflow_usage_parity.py`, direct workflow runner, per-file coverage audit, and `pytest --durations=0` |
 
 The explicit feature limits above are binding safety bounds. Other production performance targets remain informational until measured evidence supports a numeric gate.
 
@@ -1114,7 +1126,7 @@ No open decisions.
 tests/optimization/
 ├── unit/                         # Every FR-OPT-* symbol and failure path
 ├── integration/                  # WF-OPT-* collaboration and Simulation adapter contract
-└── usage/                        # One runnable test_usage_* example per FR-OPT-*
+└── usage/                        # One numbered standalone program per feature plus workflow programs
 
 tests/system/integration/
 └── test_optimization.py          # SYS-WF-003 end-to-end contract
@@ -1143,18 +1155,18 @@ domain-wide commands only for final verification.
 
 - **Unit:** Verify every `FR-OPT-*`, documented error, validation boundary, deterministic fixture, and side-effect classification.
 - **Integration:** Verify each `WF-OPT-*`, the Simulation adapter contract, consumed shared contracts, and failure propagation.
-- **Usage:** Execute every documented `test_usage_*` against only public feature APIs.
+- **Usage:** Execute every documented numbered program directly against only public feature APIs; each example prints a success message and actual produced data.
 - **System:** Verify `SYS-WF-003` from Optimization through Strategy, Simulation, Analytics, and back to `OptimizationResult v1`.
 
 ### Package completion checklist
 
 - [X] The actual package tree matches Section 2. Evidence: `app/services/optimization/__init__.py:1`.
 - [X] Module and file order matches the dependency diagram. Evidence: `app/services/optimization/public_api/operations.py:1`.
-- [X] Every module represents one approved capability and every file has one focused responsibility. Evidence: `app/services/optimization/errors.py:1`.
+- [X] Every feature module and documented support package has one focused responsibility. Evidence: `app/services/optimization/contracts/errors.py:1`.
 - [X] Every `FR-OPT-*`, workflow, configuration, and `NFR-OPT-*` row is `Completed`. Evidence: `tests/optimization/integration/test_nonfunctional.py:157`.
 - [X] Root `__all__` includes only the approved official functions and catalog accessor. Evidence: `app/services/optimization/__init__.py:16`.
 - [X] `OptimizationResult v1` matches `docs/PROJECT.md` and passes producer-consumer compatibility tests. Evidence: `app/services/optimization/evidence/contracts.py:63`.
-- [X] Persisted state and migrations match the top-level ownership table; no other domain's state is written. Evidence: `app/services/optimization/state/migrations.py:31`.
+- [X] Persisted state and migrations match the top-level ownership table; no other domain's state is written. Evidence: `app/services/optimization/migrations/definitions.py:24`.
 - [X] Every public symbol has exactly one requirement row, usage example, and unit test. Evidence: `tests/optimization/integration/test_nonfunctional.py:157`.
 - [X] Every collaborative workflow has an integration test. Evidence: `tests/optimization/integration/test_request_workflow.py:13`, `tests/optimization/integration/test_bounded_sweep.py:8`, `tests/optimization/integration/test_scoring_workflow.py:15`, `tests/optimization/integration/test_walk_forward.py:8`, `tests/optimization/integration/test_robustness_workflow.py:14`, `tests/optimization/integration/test_persistence_handoff_workflow.py:10`.
 - [X] No removed or rejected capability appears in the architecture or implementation. Evidence: `tests/optimization/integration/test_nonfunctional.py:30`.

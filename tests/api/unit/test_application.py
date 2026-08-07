@@ -21,6 +21,20 @@ from app.services.api.routes.operator import _audit_source, _event_source
 from tests.api._support import get_json, post_json
 
 
+@pytest.fixture(autouse=True)
+def _stub_non_api_migrations(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep lifecycle unit tests isolated from domain database migrations."""
+
+    def success(_: object) -> SimpleNamespace:
+        """Return one successful inert migration response."""
+        return SimpleNamespace(status="success", data=object())
+
+    monkeypatch.setattr(lifecycle, "run_indicators_migrations", success)
+    monkeypatch.setattr(lifecycle, "run_simulator_migrations", success)
+    monkeypatch.setattr(lifecycle, "run_analytics_migrations", success)
+    monkeypatch.setattr(lifecycle, "run_portfolio_migrations", success)
+
+
 def _in_process_providers() -> dict[str, object]:
     """Build complete inert provider values for lifecycle tests."""
     return {
@@ -37,12 +51,14 @@ def test_canonical_app_has_exact_cors_and_route_catalog() -> None:
     assert "/api/v1/auth/login" in paths
     assert "/api/v1/auth/me" in paths
     assert "/api/v1/indicators" in paths
-    assert len(paths) == 69
+    assert len(paths) == 71
     assert "/api/v1/portfolio/{portfolio_id}/activate" in paths
     assert "/api/v1/portfolio/{portfolio_id}/rollback" in paths
     assert "/api/v1/portfolio/{portfolio_id}/drift" in paths
     assert "/api/v1/portfolio/rebalance" in paths
     assert "/api/v1/portfolio/measurement/recompute" in paths
+    assert "/api/v1/portfolio/{portfolio_id}/definitions" in paths
+    assert "/api/v1/portfolio/{portfolio_id}/definitions/{portfolio_version}" in paths
     assert "/api/v1/data/datasets/prepare" in paths
     assert "/api/v1/data/imports" in paths
     assert "/api/v1/simulation/live-sessions" in paths
@@ -133,6 +149,36 @@ def test_required_startup_failure_propagates(
         asyncio.run(enter_lifespan())
 
 
+def test_simulator_storage_failure_blocks_startup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Simulator migration failure blocks API readiness fail closed."""
+    monkeypatch.setattr(
+        lifecycle,
+        "run_api_migrations",
+        lambda _: SimpleNamespace(status="success", data=object()),
+    )
+    monkeypatch.setattr(
+        lifecycle,
+        "run_simulator_migrations",
+        lambda _: SimpleNamespace(status="error", data=None),
+    )
+    app = create_api_app(build_api_settings())
+
+    async def enter_lifespan() -> None:
+        async with lifecycle.lifespan(app):
+            raise AssertionError("startup failure must prevent serving")
+
+    import asyncio
+
+    with pytest.raises(
+        lifecycle.StartupError,
+        match="SIMULATOR_STORAGE_INITIALIZATION_FAILED",
+    ):
+        asyncio.run(enter_lifespan())
+    assert app.state.api_ready is False
+
+
 def test_optional_startup_failure_is_visible_degradation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -160,6 +206,36 @@ def test_optional_startup_failure_is_visible_degradation(
     import asyncio
 
     asyncio.run(enter_lifespan())
+
+
+def test_analytics_storage_failure_blocks_startup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Analytics migration failure blocks API readiness fail closed."""
+    monkeypatch.setattr(
+        lifecycle,
+        "run_api_migrations",
+        lambda _: SimpleNamespace(status="success", data=object()),
+    )
+    monkeypatch.setattr(
+        lifecycle,
+        "run_analytics_migrations",
+        lambda _: SimpleNamespace(status="error", data=None),
+    )
+    app = create_api_app(build_api_settings())
+
+    async def enter_lifespan() -> None:
+        async with lifecycle.lifespan(app):
+            raise AssertionError("startup failure must prevent serving")
+
+    import asyncio
+
+    with pytest.raises(
+        lifecycle.StartupError,
+        match="ANALYTICS_STORAGE_INITIALIZATION_FAILED",
+    ):
+        asyncio.run(enter_lifespan())
+    assert app.state.api_ready is False
 
 
 def test_required_provider_failure_blocks_readiness(

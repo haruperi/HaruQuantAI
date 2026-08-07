@@ -9,7 +9,7 @@ import time
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any, Literal, ParamSpec, TypeVar, cast
 
-from app.services.optimization.errors import (
+from app.services.optimization.contracts import (
     OPTIMIZATION_ERROR_CATALOG,
     OptimizationError,
 )

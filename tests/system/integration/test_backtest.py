@@ -38,7 +38,7 @@ from tests.analytics import _support as analytics_examples
 from tests.analytics.usage._support import unwrap
 from tests.indicators.helpers import unwrap_response
 from tests.risk import _support as risk_examples
-from tests.simulator.unit.test_orchestrator import (
+from tests.simulator.component.test_orchestrator import (
     FakeDependencies,
     _auth,
     _request,

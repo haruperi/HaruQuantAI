@@ -222,16 +222,16 @@ the index at open-order cardinality (tens of rows) rather than total-order
 cardinality (millions). A full index on `state` would be ~1000× larger and mostly
 terminal rows nobody queries.
 
-### 4.2 Position lookup
+### 4.2 Closed-position history
 
 ```sql
 SELECT * FROM trading_positions
-WHERE account_id = ? AND symbol_id = ? AND direction = ? AND state = 'open';
+WHERE account = ? AND symbol = ? ORDER BY exit_time DESC;
 ```
 
-`idx_trading_pos_open` is a partial **unique** index — the seek is O(log n) over an
-index containing only open positions, and it simultaneously enforces the netting
-invariant.
+`idx_trading_positions_symbol_exit` supports account/symbol trade-history reads.
+Open-position lookup is intentionally broker/runtime state and is not a database
+query.
 
 ### 4.3 Risk admission check
 
@@ -311,8 +311,8 @@ the rows anyone actually queries.
 | Index | Predicate | Purpose |
 |---|---|---|
 | `idx_trading_orders_open` | `state IN (open states)` | Open-order sweep |
-| `idx_trading_pos_open` | `state='open'` | **Unique** — netting invariant |
-| `idx_risk_kill_tripped` | `state='tripped'` | Empty when healthy |
+| `idx_trading_positions_account_exit` | closed-trade account history | Ordinary history index |
+| `idx_risk_kill_tripped` | `state='active'` | Empty when healthy |
 | `idx_risk_policy_active` | `state='active'` | **Unique** — one policy per scope |
 | `idx_risk_admission_open` | `consumed_at IS NULL AND verdict IN (...)` | Unconsumed approvals |
 | `idx_risk_checks_breach` | `passed=0` | Breach analysis |
@@ -323,7 +323,7 @@ the rows anyone actually queries.
 | `idx_api_keys_lookup` | `revoked_at IS NULL` | Auth hot path |
 | `idx_api_audit_denied` | `outcome='denied'` | Security monitoring |
 | `idx_opt_trials_pending` | `state='pending'` | Trial dispatch |
-| `idx_sim_runs_active` | `state IN ('queued','running')` | Run scheduler |
+| `idx_sim_runs_status` | `status` | Run lifecycle lookup |
 | `idx_sim_sessions_expiry` | `status IN ('active','expired')` | Playback-session expiry and cleanup |
 
 Six of these are **unique partial indexes enforcing a business invariant**. That is
@@ -334,15 +334,10 @@ their primary job; query acceleration is secondary.
 Where the index alone answers the query, avoiding a table lookup:
 
 ```sql
-CREATE INDEX idx_analytics_trades_cover
-    ON analytics_trade_analysis(strategy_version_id, exit_at DESC, net_pnl_decimal, r_multiple_decimal);
+-- Historical only: retired with Analytics migration step 002.
+-- idx_analytics_trades_cover on analytics_trade_analysis
 
-CREATE INDEX idx_trading_fills_cover
-    ON trading_fills(order_id, sequence, quantity_decimal, price_decimal, commission_decimal);
-
-CREATE INDEX idx_equity_cover
-    ON analytics_equity_curves(scope_level, scope_key, period_end_utc,
-                               max_drawdown_percent_decimal, end_equity_decimal);
+-- Historical only: idx_equity_cover on analytics_equity_curves.
 ```
 
 Verify with `EXPLAIN QUERY PLAN` — look for `USING COVERING INDEX`. Without that
@@ -352,8 +347,7 @@ phrase the extra columns are pure overhead and should be dropped.
 
 ```sql
 -- date-truncated grouping without a scan
-CREATE INDEX idx_trades_day ON analytics_trade_analysis(
-    strategy_version_id, substr(exit_at, 1, 10));
+-- Historical only: idx_trades_day on analytics_trade_analysis.
 ```
 
 The `substr(exit_at,1,10)` index works precisely because timestamps are ISO-8601

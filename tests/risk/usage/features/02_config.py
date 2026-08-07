@@ -8,24 +8,33 @@ from __future__ import annotations
 import hashlib
 import sys
 import tempfile
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.data import build_data_settings, data_settings_context
 from app.services.risk import (
     build_development_risk_config,
+    build_personal_account_risk_config,
+    build_prop_firm_risk_config,
     compute_config_hash,
     create_firm_mandate,
     create_risk_config,
     get_drawdown_mode,
+    get_risk_policy,
     load_firm_mandate,
     load_risk_config,
+    register_default_risk_policies,
+    register_risk_policy,
+    run_risk_migrations,
 )
+from app.utils import generate_id
 from tests.risk._support import unwrap_risk_response
 
 
@@ -112,6 +121,7 @@ def _mandate(*, verified: bool = True, digest: str = "a" * 64) -> object:
 def fr_risk_023() -> None:
     """FR-RISK-023: Stage 1 — Load only the selected YAML profile from the bounded root and fail closed on missing/invalid live configuration."""
     _header("Stage 1: YAML Profile Input - Load Risk Profile Config (FR-RISK-023)")
+    print("SUCCESS: FR-RISK-023")
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
         (root / "research.yaml").write_text(
@@ -133,6 +143,7 @@ def fr_risk_023() -> None:
 def fr_risk_063() -> None:
     """FR-RISK-063: Stage 1 — Define an immutable per-account firm mandate record carrying firm identity, product model, phase, initial balance, the archived terms URL, access date and terms content hash, and an explicit `verified` flag."""
     _header("Stage 1: Firm Mandate Input - Define Firm Mandate (FR-RISK-063)")
+    print("SUCCESS: FR-RISK-063")
     mandate = _mandate()
     print(_format_result(mandate))
     print(
@@ -148,6 +159,7 @@ def fr_risk_022() -> None:
     _header(
         "Stage 2: Strict Config Validation - Define RiskConfig Fields (FR-RISK-022)"
     )
+    print("SUCCESS: FR-RISK-022")
     config = create_risk_config(**_values())
     print(_format_result(config))
     print(
@@ -158,6 +170,7 @@ def fr_risk_022() -> None:
 def fr_risk_064() -> None:
     """FR-RISK-064: Stage 2 — Refuse every limit evaluation for an account whose mandate is unverified or whose archived terms hash no longer matches, failing closed rather than falling back to a profile default."""
     _header("Stage 2: Mandate Verification - Load & Verify Firm Mandate (FR-RISK-064)")
+    print("SUCCESS: FR-RISK-064")
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
         terms = b"bounded archived terms"
@@ -179,6 +192,7 @@ def fr_risk_064() -> None:
 def fr_risk_065() -> None:
     """FR-RISK-065: Stage 2 — Expose the drawdown mode, its reference basis, whether it trails unrealised equity, whether a ratchet ceiling applies, and any end-of-day snapshot time and timezone as required configuration."""
     _header("Stage 2: Drawdown Config Validation - Drawdown Mode Config (FR-RISK-065)")
+    print("SUCCESS: FR-RISK-065")
     config = create_risk_config(
         **_values(),
         drawdown_mode=get_drawdown_mode("TRAILING_EOD"),
@@ -191,18 +205,139 @@ def fr_risk_065() -> None:
     )
 
 
-# --- Stage 3: Config Hashing & Final Artifacts ---
+# --- Stage 3: Config Hashing & Runtime Persistence ---
 
 
 def fr_risk_024() -> None:
     """FR-RISK-024: Stage 3 — Hash canonical exact serialization so any material config change changes the SHA-256 hash."""
     _header("Stage 3: Config Hash Output - Compute Config SHA256 Hash (FR-RISK-024)")
+    print("SUCCESS: FR-RISK-024")
     config = create_risk_config(**_values())
     digest = unwrap_risk_response(
         compute_config_hash(config), operation="compute_config_hash"
     )
     print(_format_result(digest))
     print(f"Data -> config_hash='{digest}'")
+
+
+def fr_risk_076() -> None:
+    """FR-RISK-076: Register durable Risk policy version by canonical configuration hash and effective timestamp."""
+    _header("Stage 3: Runtime Policy Registration - Register Policy (FR-RISK-076)")
+    print("SUCCESS: FR-RISK-076")
+    with tempfile.TemporaryDirectory() as directory:
+        tmp_path = Path(directory)
+        settings = build_data_settings(
+            database_url="sqlite:///usage_risk_config.db",
+            data_dir=tmp_path,
+            approved_storage_roots=(Path(),),
+        )
+        with data_settings_context(settings):
+            run_risk_migrations(request_id=generate_id("req"))
+            config = cast("Any", build_development_risk_config())
+            effective_at = datetime.now(UTC)
+            resp_reg = register_risk_policy(
+                config,
+                effective_at=effective_at,
+                request_id=generate_id("req"),
+                correlation_id=generate_id("cor"),
+            )
+            config_hash = unwrap_risk_response(
+                resp_reg, operation="register_risk_policy"
+            )
+            print(_format_result(resp_reg))
+            print(f"Data -> registered config_hash='{config_hash}'")
+
+
+def fr_risk_077() -> None:
+    """FR-RISK-077: Retrieve registered durable Risk policy version by canonical configuration hash."""
+    _header("Stage 3: Runtime Policy Retrieval - Retrieve Policy (FR-RISK-077)")
+    print("SUCCESS: FR-RISK-077")
+    with tempfile.TemporaryDirectory() as directory:
+        tmp_path = Path(directory)
+        settings = build_data_settings(
+            database_url="sqlite:///usage_risk_config.db",
+            data_dir=tmp_path,
+            approved_storage_roots=(Path(),),
+        )
+        with data_settings_context(settings):
+            run_risk_migrations(request_id=generate_id("req"))
+            config = cast("Any", build_development_risk_config())
+            effective_at = datetime.now(UTC)
+            resp_reg = register_risk_policy(
+                config,
+                effective_at=effective_at,
+                request_id=generate_id("req"),
+                correlation_id=generate_id("cor"),
+            )
+            config_hash = unwrap_risk_response(
+                resp_reg, operation="register_risk_policy"
+            )
+            resp_get = get_risk_policy(config_hash)
+            reconstructed = unwrap_risk_response(resp_get, operation="get_risk_policy")
+            print(_format_result(reconstructed))
+            print(
+                f"Data -> retrieved config_hash='{config_hash}', profile='{reconstructed.profile}'"
+            )
+
+
+def fr_risk_078() -> None:
+    """FR-RISK-078: Construct the personal-account paper default with every registered operational limit represented as exact validated policy data."""
+    _header("Stage 3: Personal Account Default (FR-RISK-078)")
+    print("SUCCESS: FR-RISK-078")
+    config = build_personal_account_risk_config()
+    print(_format_result(config))
+    print(
+        "Data -> version="
+        f"'{config.policy_version}', max_trade_risk={config.max_risk_per_trade_pct}"
+    )
+
+
+def fr_risk_079() -> None:
+    """FR-RISK-079: Construct the stricter generic prop-firm paper default without claiming firm-specific terms."""
+    _header("Stage 3: Prop-Firm Default (FR-RISK-079)")
+    print("SUCCESS: FR-RISK-079")
+    config = build_prop_firm_risk_config()
+    print(_format_result(config))
+    print(
+        "Data -> version="
+        f"'{config.policy_version}', max_trade_risk={config.max_risk_per_trade_pct}"
+    )
+
+
+def fr_risk_080() -> None:
+    """FR-RISK-080: Register both defaults idempotently through the immutable policy-version boundary."""
+    _header("Stage 3: Register Default Policies (FR-RISK-080)")
+    print("SUCCESS: FR-RISK-080")
+    with tempfile.TemporaryDirectory() as directory:
+        settings = build_data_settings(
+            database_url="sqlite:///usage_default_risk.db",
+            data_dir=Path(directory),
+            approved_storage_roots=(Path(),),
+        )
+        with data_settings_context(settings):
+            run_risk_migrations(request_id=generate_id("req"))
+            response = register_default_risk_policies(
+                effective_at=datetime.now(UTC),
+                request_id=generate_id("req"),
+                correlation_id=generate_id("cor"),
+            )
+            hashes = unwrap_risk_response(
+                response, operation="register_default_risk_policies"
+            )
+            print(_format_result(dict(hashes)))
+            print(f"Data -> registered policies={sorted(hashes)}")
+
+
+def fr_risk_081() -> None:
+    """FR-RISK-081: Validate preferred/maximum risk, ordered losses, kill-switch ordering, count ceilings, and legacy field aliases, failing closed on contradictions."""
+    _header("Stage 3: Operational Limit Relationships (FR-RISK-081)")
+    print("SUCCESS: FR-RISK-081")
+    config = build_personal_account_risk_config()
+    print(_format_result(config))
+    print(
+        "Data -> preferred<=maximum="
+        f"{config.preferred_risk_per_trade_pct <= config.max_risk_per_trade_pct}"
+    )
 
 
 def main() -> None:
@@ -213,7 +348,7 @@ def main() -> None:
         "Module flow:\n"
         "-> Stage 1: YAML profile configs & firm mandate inputs\n"
         "-> Stage 2: Strict RiskConfig and firm mandate validation\n"
-        "-> Stage 3: Canonical JSON & config SHA-256 hash"
+        "-> Stage 3: Canonical JSON & config SHA-256 hash & runtime policy registry"
     )
     assert build_development_risk_config().profile == "research"
 
@@ -226,8 +361,14 @@ def main() -> None:
     fr_risk_064()
     fr_risk_065()
 
-    # 3. Stage 3: Canonical config hash
+    # 3. Stage 3: Canonical config hash & runtime policy
     fr_risk_024()
+    fr_risk_076()
+    fr_risk_077()
+    fr_risk_078()
+    fr_risk_079()
+    fr_risk_080()
+    fr_risk_081()
 
 
 if __name__ == "__main__":

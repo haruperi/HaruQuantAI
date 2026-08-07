@@ -108,6 +108,7 @@ def fr_risk_026() -> None:
     _header(
         "Stage 3: Position Sizing Calculation - Calculate Position Size (FR-RISK-026)"
     )
+    print("SUCCESS: FR-RISK-026")
 
     snapshot = _snapshot()
     request = create_position_sizing_request(

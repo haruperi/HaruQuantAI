@@ -376,6 +376,7 @@ def fr_risk_039() -> None:
     _header(
         "Stage 1: Risk Governor Construction - Construct Risk Governor (FR-RISK-039)"
     )
+    print("SUCCESS: FR-RISK-039")
     config = _config()
     governor = _governor(config)
     print(_format_result(governor))
@@ -387,6 +388,7 @@ def fr_risk_039() -> None:
 def fr_risk_040() -> None:
     """FR-RISK-040: Stage 3 — Validate and review one proposed trade in fixed precedence, include regime/projected risks/final capped size/concurrency disclosure, attach a token only when eligible and a valid optional attestation is supplied, and audit the decision. Missing attestation yields `needs_approval`, never synthetic approval."""
     _header("Stage 3: Pre-Trade Risk Review - Review Proposed Trade (FR-RISK-040)")
+    print("SUCCESS: FR-RISK-040")
     config = _config()
     governor = _governor(config)
     snapshot = _snapshot(config)
@@ -416,6 +418,7 @@ def fr_risk_041() -> None:
     _header(
         "Stage 3: Current Portfolio Governance - Run Portfolio Risk Governor (FR-RISK-041)"
     )
+    print("SUCCESS: FR-RISK-041")
     config = _config()
     governor = _governor(config)
     snapshot = _snapshot(config)

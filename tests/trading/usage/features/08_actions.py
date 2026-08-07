@@ -292,6 +292,28 @@ def fr_trd_065() -> None:
     print(f"Data -> status='{eval_res.status}'")
 
 
+def fr_trd_069() -> None:
+    """FR-TRD-069: Keep action admission behind current Risk approval."""
+    sub_res = asyncio.run(submit_order(request(), dependencies()))
+    print(f"Data -> risk_gated_status='{sub_res.status}'")
+
+
+def _emit_requirement_success(function: object) -> object:
+    """Wrap one example so direct execution emits its success contract."""
+
+    def wrapped() -> None:
+        function()
+        requirement = function.__name__.removeprefix("fr_trd_").replace("_", "-")
+        print(f"SUCCESS: FR-TRD-{requirement}")
+
+    return wrapped
+
+
+for _example_name, _example_function in tuple(globals().items()):
+    if _example_name.startswith("fr_trd_") and callable(_example_function):
+        globals()[_example_name] = _emit_requirement_success(_example_function)
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -324,6 +346,7 @@ def main() -> None:
     fr_trd_050()
     fr_trd_064()
     fr_trd_065()
+    fr_trd_069()
 
 
 if __name__ == "__main__":

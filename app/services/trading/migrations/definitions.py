@@ -1,15 +1,13 @@
-"""Additive Trading-owned schema definitions executed by Data.
-
-Conformed to the authoritative schema model in ``docs/schema`` (Domain 7). The
-step has never been applied to a database, so the definition is edited in place
-rather than extended by a follow-on migration; see ``FR-TRD-070`` through
-``FR-TRD-073``.
-"""
+"""Immutable Trading-owned schema definitions executed by Data."""
 
 from hashlib import sha256
 from typing import Any, Literal
 
-from app.services.data import build_migration_step
+from app.services.data import (
+    build_migration_request,
+    build_migration_step,
+    run_domain_migrations,
+)
 from app.services.trading.contracts.responses import success_trading_response
 from app.utils import get_logger
 
@@ -222,6 +220,76 @@ _TRADING_SCHEMA_STATEMENTS = (
     """.strip(),
 )
 
+_CLOSED_POSITION_LEDGER_STATEMENTS = (
+    """
+    CREATE TABLE trading_closed_position_migration_guard (
+        is_empty INTEGER NOT NULL CHECK (is_empty = 1)
+    ) STRICT
+    """.strip(),
+    """
+    INSERT INTO trading_closed_position_migration_guard (is_empty)
+    SELECT CASE WHEN
+        (SELECT COUNT(*) FROM trading_positions) = 0 AND
+        (SELECT COUNT(*) FROM trading_fills) = 0 AND
+        (SELECT COUNT(*) FROM trading_order_transitions) = 0
+    THEN 1 ELSE 0 END
+    """.strip(),
+    """
+    CREATE TABLE trading_positions__new (
+        ticket TEXT PRIMARY KEY,
+        symbol TEXT NOT NULL,
+        type TEXT NOT NULL CHECK (type IN ('buy', 'sell')),
+        volume TEXT NOT NULL,
+        entry_time TEXT NOT NULL,
+        entry_price TEXT NOT NULL,
+        stop_loss TEXT,
+        take_profit TEXT,
+        exit_time TEXT NOT NULL,
+        exit_price TEXT NOT NULL,
+        exit_reason TEXT NOT NULL,
+        commission TEXT NOT NULL,
+        swap TEXT NOT NULL,
+        profit TEXT NOT NULL,
+        mae_points INTEGER NOT NULL CHECK (mae_points >= 0),
+        mfe_points INTEGER NOT NULL CHECK (mfe_points >= 0),
+        slippage_points INTEGER NOT NULL CHECK (slippage_points >= 0),
+        magic TEXT NOT NULL,
+        strategy TEXT NOT NULL,
+        account TEXT NOT NULL,
+        environment TEXT NOT NULL CHECK (
+            environment IN ('demo', 'paper', 'sim', 'live')
+        ),
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        evidence_hash TEXT NOT NULL UNIQUE,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        CHECK (exit_time >= entry_time)
+    ) STRICT
+    """.strip(),
+    "DROP TABLE trading_order_transitions",
+    "DROP TABLE trading_fills",
+    "DROP TABLE trading_positions",
+    "ALTER TABLE trading_positions__new RENAME TO trading_positions",
+    (
+        "CREATE INDEX idx_trading_positions_account_exit "
+        "ON trading_positions(account, exit_time DESC)"
+    ),
+    (
+        "CREATE INDEX idx_trading_positions_strategy_exit "
+        "ON trading_positions(account, strategy, exit_time DESC)"
+    ),
+    (
+        "CREATE INDEX idx_trading_positions_symbol_exit "
+        "ON trading_positions(account, symbol, exit_time DESC)"
+    ),
+    (
+        "CREATE INDEX idx_trading_positions_magic_exit "
+        "ON trading_positions(account, magic, exit_time DESC)"
+    ),
+    "DROP TABLE trading_closed_position_migration_guard",
+)
+
 
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Trading schema statements.
@@ -251,6 +319,12 @@ def _get_trading_migrations_value() -> tuple[Any, ...]:
             checksum=_migration_checksum(_TRADING_SCHEMA_STATEMENTS),
             statements=_TRADING_SCHEMA_STATEMENTS,
         ),
+        build_migration_step(
+            domain="trading",
+            migration_id="002_closed_position_ledger",
+            checksum=_migration_checksum(_CLOSED_POSITION_LEDGER_STATEMENTS),
+            statements=_CLOSED_POSITION_LEDGER_STATEMENTS,
+        ),
     )
 
 
@@ -267,4 +341,30 @@ def get_trading_migrations() -> StandardResponse[tuple[Any, ...]]:
     )
 
 
-__all__ = ["TRADING_SCHEMA_VERSION", "get_trading_migrations"]
+def run_trading_migrations(*, request_id: str) -> object:
+    """Apply the complete authoritative Trading migration manifest.
+
+    Args:
+        request_id: Non-empty audit correlation identifier.
+
+    Returns:
+        Data-owned standard response carrying the migration result.
+
+    Raises:
+        ValueError: If ``request_id`` is empty.
+    """
+    normalized_request_id = request_id.strip()
+    if not normalized_request_id:
+        raise ValueError("request_id must not be empty")
+    logger.info("Running the authoritative Trading schema migration manifest")
+    return run_domain_migrations(
+        build_migration_request(
+            domain="trading",
+            steps=_get_trading_migrations_value(),
+            request_id=normalized_request_id,
+            complete_manifest=True,
+        )
+    )
+
+
+__all__ = ["TRADING_SCHEMA_VERSION", "get_trading_migrations", "run_trading_migrations"]

@@ -2,6 +2,165 @@
 
 ## [Unreleased]
 
+### Remediate Portfolio audit controls
+
+Portfolio now has complete requirement usage evidence, an authoritative migration
+runner, reachable immutable definitions, and a deliberate UI/API definition surface.
+
+#### Added (3)
+
+- Added Portfolio definition registration and exact-version reads through the function-only package root, API routes, typed frontend client, and Portfolio workspace widget.
+- Added the complete-manifest `run_portfolio_migrations` operation and required API startup execution through Data's ledger verification, checksum, write-lock, and transaction runner.
+- Added production reachability and compatibility coverage for the Portfolio-owned definition table and contract.
+
+#### Changed (2)
+
+- Completed all Portfolio workflow and functional-requirement usage evidence with actual bounded output and explicit success messages.
+- Reconciled Portfolio ownership, schema reachability, logging, tests, and target-versus-live documentation with the production implementation.
+
+### Remediate Research audit controls
+
+Research now has package-root-only consumption, deterministic resource admission,
+reachable artifact metadata, and reconciled executable evidence.
+
+#### Changed (1)
+
+- Reconciled Research package-root consumption, deterministic memory admission, Data-backed artifact metadata persistence, intelligence logging, usage evidence, per-file coverage, and target-versus-live schema documentation.
+
+### Remediate Optimization audit controls
+
+Optimization now owns a conforming support layout, authoritative migration runtime,
+reachable relational state, per-file verification, and an advisory frontend surface.
+
+#### Added (4)
+
+- Added a documented Optimization `contracts/` support package for shared controlled errors without prohibited package-root production behavior.
+- Added the five-file Optimization relational persistence support package tracing results and checkpoints through Data's public transaction boundary.
+- Added the complete-manifest `run_optimization_migrations` operation and required API startup execution through Data's ledger, checksum, lock, and transaction runner.
+- Added an advisory Optimization workspace widget invoking the typed bounded parameter-sweep client without trading or automatic Strategy-adoption authority.
+
+#### Changed (2)
+
+- Changed Optimization's testing gate to require at least 80% coverage for every production file and sub-100 ms unit-test calls.
+- Reconciled Optimization README and schema documentation with the current migration, persistence, usage-program, and UI paths.
+
+### Remediate Analytics audit controls
+
+Analytics now has a function-only public boundary, exact executable feature
+evidence, an authoritative migration runner, and no unreachable durable store.
+
+#### Added (3)
+
+- Added package-root `run_analytics_migrations` with Data-owned ledger, checksum, write-lock, and transactional execution.
+- Added guarded migration step `002_retire_unused_analytics_derived_store`, which refuses to drop the six historical tables if any contains rows.
+- Added focused migration, startup-readiness, workflow, function-boundary, latency, and per-file coverage evidence.
+
+#### Changed (3)
+
+- Changed all five numbered Analytics feature programs to emit explicit requirement success and actual bounded produced data.
+- Changed internal long-running behavioral tests into a component tier so the unit tier enforces the 100 ms ceiling.
+- Reconciled the Analytics README, architecture, project ownership record, and target schema model with the read-only implementation.
+
+#### Removed (3)
+
+- Removed the duplicate aggregate feature program and enforced exact five-feature-to-five-program reconciliation.
+- Removed seven class and type exports from the literal package-root `__all__` function surface.
+- Removed the unreachable Analytics CRUD support package and its six empty derived tables from the current target model.
+
+### Remediate Simulator audit controls
+
+Simulator now has a complete migration/readiness boundary, exact executable feature evidence, isolated test tiers, and current target-versus-live schema documentation.
+
+#### Added (3)
+
+- Added package-root `run_simulator_migrations` and executable `FR-SIM-103` evidence for the immutable complete Simulator manifest.
+- Added fail-closed API startup coverage for Simulator migration failure and focused branch tests for runtime dependencies, relational persistence, and session lifecycle paths.
+- Added a component-test tier for internal filesystem, journal, engine-loop, and orchestration behavior that is intentionally outside the 100 ms unit ceiling.
+
+#### Changed (3)
+
+- Changed all nine numbered Simulator feature programs to emit explicit success and produced-data evidence for every mapped functional requirement.
+- Changed Data's Broker symbol-metadata adapter to accept additive provider metadata without allowing unknown fields or provider overrides of Data-owned lineage fields.
+- Changed Simulator schema documentation to distinguish the complete target manifest from the inspected non-production database where step 002 remains unapplied.
+
+#### Fixed (4)
+
+- Removed the duplicate aggregate Simulator feature executable and enforced exact nine-feature-to-nine-program reconciliation.
+- Removed deep Simulator imports from integration consumers while retaining white-box coverage in component tests.
+- Wired the complete Simulator migration manifest into API readiness with Data-owned ledger, checksum, lock, and transactional enforcement.
+- Raised every Simulator production file and the aggregate package above the 80% branch-coverage floor while keeping every unit test below 100 ms.
+
+### Remediate Trading audit controls
+
+Trading now exposes an authoritative complete-manifest migration runner, executable requirement evidence, secret-safe virtual workflows, exact API route enforcement, and typed governed frontend mutations.
+
+#### Added (3)
+
+- Added `run_trading_migrations` for the immutable two-step Trading manifest and executable `FR-TRD-077` evidence.
+- Added focused coverage for Trading monitoring, state-boundary, and persistence conflict paths.
+- Added a 17-operation broker-agnostic Trading walkthrough with one explicit Simulation, MT5, or cTrader target selection and fail-closed provider safety.
+
+#### Changed (5)
+
+- Changed all Trading feature examples to emit requirement success and bounded data evidence.
+- Changed live workflow teaching programs to virtual non-production adapters that expose no account snapshots or credentials.
+- Changed API and UI mutations to use the exact paper/live route and closed Trading request contract.
+- Changed the workspace Trading panel to collect explicit order and authority inputs for governed submit, cancel, and close actions, default to paper, and re-lock after every attempt.
+- Expanded the primary Trading workflow into a documented and executable 22-stage virtual pipeline from canonical request through governed outcome.
+
+#### Fixed (3)
+
+- Removed the duplicate legacy Trading usage executable and enforced exact nine-feature-to-nine-program reconciliation.
+- Routed current Risk producer contracts through Trading's actual readiness consumer in compatibility tests, including fail-closed non-authorizing states.
+- Reconciled Trading persistence, API boundary, virtual workflow, test, and coverage statements across active documentation.
+
+### Expand the primary Risk workflow walkthrough
+
+#### Changed (1)
+
+- Expanded `WF-RISK-PRI` into a labelled 24-stage approved-and-blocked teaching trace with virtual portfolio evidence and a non-executing Trading handoff.
+
+### Add default Risk account profiles
+
+Risk now provides validated personal-account and generic prop-firm paper policies with immutable database registration.
+
+#### Added (2)
+
+- Added the complete operational-limit contract and cross-field fail-closed validation to `RiskConfig`.
+- Added idempotent builders and registration for `personal-account-default-v1` and `prop-firm-default-v1`.
+
+### Reconcile Trading closed-position persistence
+
+Trading now stores complete closed trades only and leaves live tick-valued positions to broker/runtime state.
+
+#### Added (1)
+
+- Added a validated insert-only closed-position ledger with exact decimals, MAE/MFE, and slippage points.
+
+#### Changed (1)
+
+- Changed `trading_positions` through immutable migration `002_closed_position_ledger` to the closed-trade schema.
+
+#### Removed (1)
+
+- Removed empty redundant `trading_fills` and `trading_order_transitions` projections after a fail-closed row guard.
+
+### Remediate Risk Domain Audit Controls
+
+The Risk audit remediation corrects all 7 audit findings (`USE`, `COV`, `SCHEMA`, `REACH`, `CONTRACT`, `LOG`, `DOCS`) across Workstreams A through G: adding `register_risk_policy` (`FR-RISK-076`) and `get_risk_policy` (`FR-RISK-077`), executing table rebuild migration `risk-0002-schema-constraints` with `STRICT` mode, `CHECK` constraints and partial indexes, implementing cross-domain producer-consumer compatibility test suites across Trading, Portfolio, API, and Risk, enforcing contract versioning and fail-closed rejection, adding secret-safe semantic logging at public persistence boundaries, updating all 69 requirement usage programs + FR-076/077 to print explicit SUCCESS lines, and raising every Risk production file above the 80% branch-coverage floor.
+
+#### Added (3)
+
+- Added `register_risk_policy` (`FR-RISK-076`) and `get_risk_policy` (`FR-RISK-077`) in `app.services.risk` for durable policy version persistence and canonical hash lookup.
+- Added immutable migration `risk-0002-schema-constraints` rebuilding Risk SQLite tables with `STRICT` mode, JSON validity checks, profile/scope/state enums, and partial index `idx_risk_audit_decision`.
+- Added producer-consumer contract compatibility integration test suites for Trading, Portfolio, and API domains asserting version, schema ID, required fields, and invalid version rejection.
+
+#### Changed (2)
+
+- Updated all 15 functional requirement usage programs (`01_contracts.py` through `15_reporting.py`) and integration tests to emit explicit `SUCCESS: FR-RISK-NNN` and `Data -> ...` output contracts.
+- Added semantic structured logging with trace IDs at public persistence and policy boundaries in `app/services/risk/audit/runtime.py` and `app/services/risk/config/runtime.py`.
+
+
 ### Remediate Indicators Domain Audit Controls
 
 The Indicators audit remediation brings the pure calculation domain into full audit conformance (`USE`, `IT`, `REACH`, `NFR`, `DOCS`, `UI` controls): retiring unused persistence support schema, standardizing requirement output evidence, enforcing a 100 ms unit test latency ceiling, exposing authenticated read-only API routes, and mounting a typed frontend workspace.

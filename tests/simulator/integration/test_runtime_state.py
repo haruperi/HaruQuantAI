@@ -6,18 +6,16 @@ from pathlib import Path
 
 from app.services.data import (
     build_data_settings,
-    build_migration_request,
     build_statement_plan,
     build_transaction_request,
     data_settings_context,
     execute_transaction,
-    run_domain_migrations,
     unwrap_data_response,
 )
 from app.services.simulator import (
     build_simulation_state_store,
     execute_simulation_state_store_operation,
-    get_simulation_migrations,
+    run_simulator_migrations,
     unwrap_simulation_response,
 )
 from app.utils import generate_id
@@ -45,13 +43,7 @@ def test_simulation_runtime_state_is_durable(tmp_path: Path) -> None:
     with data_settings_context(_settings(tmp_path)):
         request_id = generate_id("req")
         unwrap_data_response(
-            run_domain_migrations(
-                build_migration_request(
-                    domain="simulator",
-                    steps=get_simulation_migrations(),
-                    request_id=request_id,
-                )
-            ),
+            run_simulator_migrations(request_id),
             operation="tests.simulation.runtime.migrations",
             request_id=request_id,
         )
@@ -164,13 +156,7 @@ def test_completed_result_round_trips_from_sim_runs(tmp_path: Path) -> None:
     with data_settings_context(_settings(tmp_path)):
         migration_request_id = generate_id("req")
         unwrap_data_response(
-            run_domain_migrations(
-                build_migration_request(
-                    domain="simulator",
-                    steps=get_simulation_migrations(),
-                    request_id=migration_request_id,
-                )
-            ),
+            run_simulator_migrations(migration_request_id),
             operation="tests.simulation.result.migrations",
             request_id=migration_request_id,
         )

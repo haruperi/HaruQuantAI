@@ -362,18 +362,32 @@ def execute_risk_state_store_operation(
         raise TypeError("invalid Risk state-store handle")
     if operation not in allowed:
         raise ValueError("unsupported Risk state-store operation")
-    return getattr(store, operation)(*args, **kwargs)
+    logger.info("Executing Risk state store operation: %s", operation)
+    try:
+        result = getattr(store, operation)(*args, **kwargs)
+        logger.info("Risk state store operation %s completed successfully", operation)
+        return result
+    except Exception:
+        logger.exception("Risk state store operation %s failed", operation)
+        raise
 
 
 def get_kill_switch_state(scope_level: str, scope: object) -> object | None:
     """Return current canonical kill-switch state for one exact scope."""
+    logger.info("Getting kill switch state for scope_level=%s", scope_level)
     store = build_risk_state_store()
-    return execute_risk_state_store_operation(
+    result = execute_risk_state_store_operation(
         store,
         "load_kill_switch",
         scope_level,
         scope,
     )
+    logger.info(
+        "Kill switch state for scope_level=%s found=%s",
+        scope_level,
+        result is not None,
+    )
+    return result
 
 
 def persist_risk_decision(decision: object) -> None:
@@ -384,17 +398,28 @@ def persist_risk_decision(decision: object) -> None:
     """
     if not isinstance(decision, RiskDecisionPackage):
         raise TypeError("decision must be RiskDecisionPackage v1")
+    logger.info(
+        "Persisting risk decision decision_id=%s state=%s "
+        "request_id=%s correlation_id=%s",
+        getattr(decision, "decision_id", None),
+        getattr(decision, "state", None),
+        getattr(decision, "request_id", None),
+        getattr(decision, "correlation_id", None),
+    )
     store = build_risk_state_store()
     execute_risk_state_store_operation(store, "save_decision", decision)
 
 
 def list_risk_decisions(limit: int = 50) -> tuple[object, ...]:
     """Return a bounded newest-first page of canonical Risk decisions."""
+    logger.info("Listing risk decisions with limit=%s", limit)
     store = build_risk_state_store()
-    return cast(
+    records = cast(
         "tuple[object, ...]",
         execute_risk_state_store_operation(store, "list_decisions", limit),
     )
+    logger.info("Listed %s risk decisions", len(records))
+    return records
 
 
 __all__ = (

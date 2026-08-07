@@ -49,10 +49,8 @@ compatibility, currency conversion, or finite numeric validity cannot be proven.
   enforcement, or final governance decisions.
 - Advanced TCA, attribution, dynamic correlation, explainability,
   live/paper/backtest degradation, and prop-firm evidence in the initial build.
-- Strategy quality scorecards in the initial build. `scorecards/` is excluded
-  because its evaluation depends on owner-approved diagnostic thresholds and
-  recommendation language that do not exist; Analytics owns no
-  promotion-adjacent threshold. See §4.5 and `FR-ANLT-044`.
+- Strategy quality scoring is outside Analytics ownership because no approved
+  diagnostic-threshold or recommendation-language contract exists.
 
 ### Shared contracts
 
@@ -148,14 +146,12 @@ flowchart TD
     ANA --> ADP[[adapters: upstream result mapping]]
     ANA --> MET[[metrics: internal analytical evidence]]
     ANA --> REP[[reports: reports, comparison, serialization, hashes]]
-    ANA --> SCO[[scorecards: non-binding quality evidence]]
     ANA --> DAS[[dashboards: bounded report projection]]
 
     CON --> CONF[errors.py / models.py / catalogs.py / evidence.py]
     ADP --> ADPF[results.py]
     MET --> METF[focused metric-group files]
     REP --> REPF[hashes.py / serialization.py / comparison.py / portfolio.py / builder.py]
-    SCO --> SCOF[quality.py]
     DAS --> DASF[truncation.py / payloads.py]
 ```
 
@@ -176,14 +172,24 @@ The order is the implementation sequence.
 | Completed | `FEAT-ANLT-04` Canonical Reporting                    | `reports/`    | Exact declarations and report contracts: Section 4.4                                                                     | Section 4.4 functional requirements | `tests/analytics/usage/features/04_reports.py`    |
 | Completed | `FEAT-ANLT-05` Bounded Report Projection              | `dashboards/` | Exact declarations,`DashboardPayload`, and explicit context-required `get_analytics_dashboard_snapshot`: Section 4.6 | Section 4.6 functional requirements | `tests/analytics/usage/features/05_dashboards.py` |
 
-Excluded work has no `FEAT-*` registration and does not consume a feature ordinal.
+Work outside Analytics ownership has no `FEAT-*` registration and consumes no
+feature ordinal.
 The registry therefore maps the five active feature IDs one-to-one to the five
 numbered usage programs.
 
+`migrations/` is documented non-feature support containing immutable historical
+schema steps and the authoritative complete-manifest runner. Analytics owns no
+current relational tables: migration 002 retires the six empty derived-store
+tables created by historical step 001. The former `persistence/` support package
+is removed; read-only analytical behavior remains in the five registered features.
+
 ```text
 analytics/
-├── __init__.py                         # Approved domain-level exports only
+├── __init__.py                         # Sole function-only public boundary
 ├── README.md
+├── migrations/                         # Non-feature immutable manifest + runner
+│   ├── __init__.py
+│   └── definitions.py                  # Historical create + guarded retirement
 ├── contracts/                          # Feature: schemas, catalogs, evidence safety
 │   ├── __init__.py
 │   ├── errors.py                       # Focus: public Analytics error taxonomy
@@ -213,9 +219,6 @@ analytics/
 │   ├── portfolio.py                    # Focus: currency-safe portfolio aggregation
 │   ├── allocation.py                   # Focus: PortfolioAllocationEvidence v1 projection
 │   └── builder.py                      # Focus: canonical PerformanceReport orchestration
-├── scorecards/                         # Feature: non-binding strategy quality
-│   ├── __init__.py
-│   └── quality.py                      # Focus: report-derived quality evidence
 └── dashboards/                         # Feature: UI/API-ready report projection
     ├── __init__.py
     ├── truncation.py                   # Focus: deterministic bounded series
@@ -225,10 +228,9 @@ analytics/
 The final structure intentionally removes the mutable `registry/`, separate
 `boundaries/` and `statistics/` layers, duplicate distribution implementations,
 compatibility-export file, placeholder formatters, duplicate audit contracts,
-and explicit package-root exports. The initial public API contains the immutable
-configuration contracts required to call `build_performance_report`, the owned
-cross-domain result contracts, and the approved report builders; comparison,
-dashboard, and grouped-evidence functions remain focused feature APIs.
+and duplicate audit contracts. The public API exposes standalone construction,
+inspection, calculation, reporting, dashboard, and migration functions only;
+contracts and constants remain private implementation details.
 
 ### Package root files
 
@@ -236,7 +238,7 @@ dashboard, and grouped-evidence functions remain focused feature APIs.
 | --------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Completed | `__init__.py`            | Sole function-only public import boundary. Constants are read through`get_*`; opaque contracts are constructed and inspected through `create_*`, `get_analytics_value_field`, and `is_analytics_value`; calculations return standard responses. | `get_analytics_schema_version`, `get_annualization_policy`, `get_breakeven_epsilon`, `get_contract_compatibility_matrix`, `get_evidence_catalog`, `get_metric_definition_catalog`, `get_min_metric_samples`, `create_analytics_run_config`, `create_risk_free_rate_evidence`, `create_statistical_validation_config`, `create_portfolio_rebalance_measurement_request`, `get_analytics_value_field`, `is_analytics_value`, and registered Analytics operations | **Standard library:** None**Required third-party:** None**Local:** explicit imports from registered feature ports only                         |
 | Completed | `contracts/responses.py` | Shared Analytics response boundary, approved error catalogue, identifier handling, and monotonic response metadata construction.                                                                                                                        | `ANALYTICS_ERROR_CATALOG`, `run_analytics_operation`                                                                                                                                                                                                                                                                                                                                                                                                                                 | **Standard library:** `time`**Required third-party:** None**Local:** `app.utils → StandardResponse, response factories, metadata, logger` |
-| Completed | `README.md`              | Define the final Analytics requirements, structure, implementation order, workflows, public symbols, tests, status, and exclusions.                                                                                                                     | None                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | **Standard library:** None**Required third-party:** None**Local:** None                                                                        |
+| Completed | `README.md`              | Define the current Analytics requirements, structure, workflows, public symbols, tests, and explicit ownership boundaries.                                                                                                                     | None                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | **Standard library:** None**Required third-party:** None**Local:** None                                                                        |
 
 ### Module dependency diagram
 
@@ -246,7 +248,6 @@ flowchart LR
     ADP[[adapters]]
     MET[[metrics]]
     REP[[reports]]
-    SCO[[scorecards]]
     DAS[[dashboards]]
 
     CON --> ADP
@@ -255,14 +256,12 @@ flowchart LR
     CON --> REP
     ADP --> REP
     MET --> REP
-    CON --> SCO
-    REP --> SCO
     CON --> DAS
     REP --> DAS
 ```
 
-No module depends on `scorecards` or `dashboards`; neither can feed metrics or
-reports, so the graph is acyclic.
+No module depends on `dashboards`; it cannot feed metrics or reports, so the graph
+is acyclic.
 
 ### Structure rules
 
@@ -328,11 +327,7 @@ yet written.
 
 | Status              | Meaning                                                                                                                                                                                                  |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Missing**   | Final behavior is absent, contradicted, or unverified.                                                                                                                                                   |
-| **Partial**   | Useful behavior exists, but final contracts, relocation, validation, or tests remain.                                                                                                                    |
 | **Completed** | Final behavior, structure, runtime use, and tests are verified.                                                                                                                                          |
-| **Blocked**   | Specification is incomplete through no fault of this domain; an open decision or an unpublished upstream schema must be resolved before implementation may start. The blocking decision is named in §6. |
-| **Excluded**  | Deliberately outside the initial build. No implementation, usage example, or test is required until the exclusion is lifted by an owner decision recorded in`docs/CHANGELOG.md`.                       |
 
 ### Workflow registry
 
@@ -342,7 +337,6 @@ yet written.
 | Completed | Secondary  | `WF-ANLT-SEC` | Cross-domain | Adapt upstream result                                      | Versioned canonical closed-trade ledger projection emitted by Trading or Simulation                 | Canonical`TradingResult` or structured validation failure                                 | `FR-ANLT-021 → FR-ANLT-027`                              |
 | Completed | Tertiary   | `WF-ANLT-TER` | Internal     | Calculate grouped analytics evidence                       | Canonical trades/series                                                                             | Ordered`SectionEvidence` groups                                                           | `FR-ANLT-028 → FR-ANLT-038`                              |
 | Completed | Supporting | `WF-ANLT-003` | Internal     | Benchmark-relative analysis                                | Strategy result and Data-owned`MarketDataset v1` bars                                             | Benchmark evidence or explicit skipped/undefined section                                    | `FR-ANLT-027 → FR-ANLT-033 → FR-ANLT-034`               |
-| Excluded  | —         | `WF-ANLT-004` | Internal     | Evaluate strategy quality                                  | Canonical`PerformanceReport`                                                                      | Non-binding`StrategyQualityEvidence`                                                      | `FR-ANLT-044`                                             |
 | Completed | Supporting | `WF-ANLT-005` | Cross-domain | Build dashboard payload                                    | Canonical`PerformanceReport`                                                                      | Bounded`DashboardPayload` to UI/API                                                       | `FR-ANLT-045 → FR-ANLT-046`                              |
 | Completed | Supporting | `WF-ANLT-007` | Internal     | Run statistical validation                                 | Canonical numeric series, seed, bounded config                                                      | Deterministic confidence/permutation/sample evidence                                        | `FR-ANLT-036`                                             |
 | Completed | Supporting | `WF-ANLT-008` | Internal     | Serialize and hash report                                  | Validated report                                                                                    | Canonical JSON or minimal human-readable output plus hashes                                 | `FR-ANLT-025 → FR-ANLT-039 → FR-ANLT-040`               |
@@ -350,9 +344,9 @@ yet written.
 | Completed | Supporting | `WF-ANLT-010` | Internal     | Compare performance reports                                | Compatible reference and candidate reports                                                          | Actual metric deltas, omissions, and caveats                                                | `FR-ANLT-042`                                             |
 | Completed | Supporting | `WF-ANLT-013` | Cross-domain | Build portfolio allocation evidence                        | Component reports and required`PortfolioSimulationResult` plus FX evidence                        | `PortfolioAllocationEvidence v1`                                                          | `FR-SIM-033 → FR-ANLT-041 → FR-ANLT-047 → FR-ANLT-048` |
 | Completed | Supporting | `WF-ANLT-014` | Cross-domain | Measure reconciled Portfolio rebalance execution           | `PortfolioRebalanceMeasurementRequest v1` containing redacted hash-bound successful Trading facts | `PortfolioRebalanceMeasurementEvidence v1`                                                | `FR-ANLT-052`                                             |
-| Completed | Supporting | `WF-ANLT-015` | Internal     | Build closed-trade equity curve and worst-day distribution | Canonical closed-trade ledger plus required initial balance                                         | Equity curve series, worst-day distribution, and barrier section evidence                   | `Pending`                                                 |
-| Completed | Supporting | `WF-ANLT-016` | Internal     | Validate contract version and metric catalogue             | Inbound report or evidence envelope plus the registered metric catalogue                            | Accepted versioned envelope, or a structured incompatibility failure before any calculation | `Pending`                                                 |
-| Completed | Supporting | `WF-ANLT-017` | Internal     | Emit analytics error payload, quality flags, and warnings  | A failed or degraded calculation within any Analytics workflow                                      | Redacted error payload plus non-blocking quality flags and warnings attached to the result  | `Pending`                                                 |
+| Completed | Supporting | `WF-ANLT-015` | Internal     | Build closed-trade equity curve and worst-day distribution | Canonical closed-trade ledger plus required initial balance                                         | Equity curve series, worst-day distribution, and barrier section evidence                   | `FR-ANLT-050 → FR-ANLT-053 → FR-ANLT-054`                |
+| Completed | Supporting | `WF-ANLT-016` | Internal     | Validate contract version and metric catalogue             | Inbound report or evidence envelope plus the registered metric catalogue                            | Accepted versioned envelope, or a structured incompatibility failure before any calculation | `FR-ANLT-018 → FR-ANLT-020`                              |
+| Completed | Supporting | `WF-ANLT-017` | Internal     | Emit analytics error payload, quality flags, and warnings  | A failed or degraded calculation within any Analytics workflow                                      | Redacted error payload plus non-blocking quality flags and warnings attached to the result  | `FR-ANLT-003 → FR-ANLT-022 → FR-ANLT-023`               |
 
 ### Workflow boundaries and failures
 
@@ -435,26 +429,6 @@ metrics with a warning; invalid/future schemas fail.
 
 **Integration test:**
 `tests/analytics/integration/test_benchmark_workflow.py::test_benchmark_alignment_is_utc_and_window_bounded()`
-
-#### `WF-ANLT-004` — Evaluate Strategy Quality
-
-**Status:** `Excluded` from the initial build. `FR-ANLT-044` depends on
-`STRATEGY_QUALITY_THRESHOLDS` and `ALLOWED_RECOMMENDATION_LANGUAGE`, both of which
-are `Excluded` with no owner-approved value (§4.5). Analytics does not invent
-promotion-adjacent thresholds. The specification below is retained unchanged so the
-workflow can be activated without redesign once the owner supplies those settings.
-
-**System workflow:** None.
-`evaluate_strategy_quality()` reads canonical report sections, checks sample
-evidence and owner-approved diagnostic thresholds, and returns facts, warnings,
-and non-binding review context. It never emits approval, promotion, live
-readiness, prop-firm compliance, risk approval, or allocation decisions.
-
-**Failure behavior:** missing required report sections or absent threshold policy
-blocks evaluation; degraded inputs propagate degraded confidence.
-
-**Integration test:** Not required while excluded. Activation must add
-`tests/analytics/integration/test_strategy_quality.py` in the same approved change.
 
 #### `WF-ANLT-005` — Build Dashboard Payload
 
@@ -657,7 +631,7 @@ section evidence consumed by `WF-ANLT-PRI`.
 absent `initial_balance` fails closed rather than assuming a default, and an empty
 ledger produces explicit skipped evidence rather than a flat zero curve.
 
-**Integration test:** `Pending`
+**Integration test:** `tests/analytics/integration/test_supporting_workflows.py::test_workflow_015_executes_observed_distribution`
 
 #### `WF-ANLT-016` — Validate Contract Version and Metric Catalogue
 
@@ -680,7 +654,7 @@ incompatibility failure raised before any calculation runs.
 unrecognized version fails closed rather than being adapted on a best-effort basis,
 and an unapproved metric definition is never executed.
 
-**Integration test:** `Pending`
+**Integration test:** `tests/analytics/integration/test_supporting_workflows.py::test_workflow_016_validates_contract_and_catalogue`
 
 #### `WF-ANLT-017` — Emit Analytics Error Payload, Quality Flags, and Warnings
 
@@ -705,7 +679,7 @@ warnings attached to the returned result.
 never used to mask a required-section failure, and no payload carries raw upstream
 exception text across the boundary.
 
-**Integration test:** `Pending`
+**Integration test:** `tests/analytics/integration/test_supporting_workflows.py::test_workflow_017_emits_bounded_failure_evidence`
 
 ### Core workflow diagram
 
@@ -715,12 +689,10 @@ flowchart LR
     AD["FR-ANLT-027: adapt_trading_result"]
     GR["FR-ANLT-038: calculate_grouped_evidence"]
     RP["FR-ANLT-043: build_performance_report"]
-    SC["FR-ANLT-044: evaluate_strategy_quality"]
     DB["FR-ANLT-046: build_dashboard_payload"]
     OUT[Read-only evidence consumers]
 
     UP --> AD --> GR --> RP
-    RP --> SC --> OUT
     RP --> DB --> OUT
     RP --> OUT
 ```
@@ -788,7 +760,6 @@ raw contract value
 | Completed | `FR-ANLT-011` | The system shall expose the owned`PerformanceReport v1` cross-domain contract with ordered sections, caveats, lineage, hashes, precision metadata, and `non_binding=true`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | `PerformanceReport`                                                             | None         | `AnalyticsValidationError`: contract, finite-output, or section invariants fail                                                                                                  | **Usage:** `tests/analytics/usage/features/01_contracts.py::fr_anlt_011()`**Unit:** `tests/analytics/unit/test_models.py::test_performance_report_matches_v1_contract()`                |
 | Completed | `FR-ANLT-012` | The system shall represent real portfolio aggregation with component lineage, base currency, FX evidence, blocker flags, and no fabricated aggregate values.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | `PortfolioPerformanceReport`                                                    | None         | `AnalyticsValidationError`: component schema/currency/FX evidence is incompatible                                                                                                | **Usage:** `tests/analytics/usage/features/01_contracts.py::fr_anlt_012()`**Unit:** `tests/analytics/unit/test_models.py::test_portfolio_report_requires_fx_lineage()`                  |
 | Completed | `FR-ANLT-013` | The system shall represent versioned finite chart/table payloads, section statuses, warnings, units, and truncation metadata without UI rendering logic.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | `DashboardPayload`                                                              | None         | `AnalyticsValidationError`: payload is non-finite or exceeds approved limits                                                                                                     | **Usage:** `tests/analytics/usage/features/01_contracts.py::fr_anlt_013()`**Unit:** `tests/analytics/unit/test_models.py::test_dashboard_payload_is_json_safe()`                        |
-| Excluded  | `FR-ANLT-014` | The system shall represent report-derived facts, score inputs, warnings, and recommendation context while explicitly excluding governance authority. Excluded with the rest of`scorecards/` (§4.5); no implementation, usage example, or unit test is required until the exclusion is lifted.                                                                                                                                                                                                                                                                                                                                                                                                           | `StrategyQualityEvidence`                                                       | None         | `AnalyticsValidationError`: evidence claims approval/promotion authority                                                                                                         | **Evidence:** Not required while excluded.                                                                                                                                                        |
 | Completed | `FR-ANLT-047` | The system shall expose the owned`PortfolioAllocationEvidence v1` cross-domain contract carrying `contract_version="v1"`, `schema_id="analytics.portfolio_allocation_evidence.v1"`, allocation and result references, a UTC measurement window, ordered component and aggregate metric evidence, dependence and concentration evidence, ordered caveats, FX lineage, and `non_binding=true`. Field set matches the registered row in `docs/PROJECT.md` §5.                                                                                                                                                                                                                                      | `PortfolioAllocationEvidence`                                                   | None         | `AnalyticsValidationError`: references, measurement window, base currency, FX lineage, or finite-output invariants fail                                                          | **Usage:** `tests/analytics/usage/features/01_contracts.py::fr_anlt_047()`**Unit:** `tests/analytics/unit/test_models.py::test_allocation_evidence_is_non_binding_and_fx_provenanced()` |
 | Completed | `FR-ANLT-051` | The system shall accept one immutable caller-constructed runtime configuration containing every required positive input/response/iteration bound, optional source-backed risk-free-rate evidence, and deterministic statistical settings. Analytics reads no environment variable or configuration file and applies no fallback.                                                                                                                                                                                                                                                                                                                                                                           | `RiskFreeRateEvidence`, `StatisticalValidationConfig`, `AnalyticsRunConfig` | None         | `AnalyticsValidationError`: a bound is absent/non-positive, a statistical value is outside its approved range, iterations exceed their bound, or risk-free evidence is malformed | **Usage:** `tests/analytics/usage/features/01_contracts.py::fr_anlt_051()`**Unit:** `tests/analytics/unit/test_models.py::test_runtime_config_requires_every_positive_limit()`          |
 
@@ -1013,9 +984,8 @@ no generic response envelope and no duplicate model, envelope, or redactor.
 `tests/analytics/usage/features/01_contracts.py` contains one directly callable
 `fr_anlt_NNN()` demonstration for every active contract mapping in
 `FR-ANLT-001` through `FR-ANLT-026`, plus `FR-ANLT-047`, `FR-ANLT-049`, and
-`FR-ANLT-051`. Excluded from that coverage are reserved IDs `FR-ANLT-015` and
-`FR-ANLT-019`; removed requirements `FR-ANLT-024` and `FR-ANLT-026`, which have
-boundary verification only; and excluded requirement `FR-ANLT-014`.
+`FR-ANLT-051`. Reserved IDs `FR-ANLT-015` and `FR-ANLT-019` define no behavior;
+retired IDs `FR-ANLT-024` and `FR-ANLT-026` retain boundary verification only.
 
 ---
 
@@ -1097,7 +1067,7 @@ requires only a new mapping entry, not a new adapter module.
 ### 4.3 `metrics/` — Internal Pure Analytical Evidence
 
 **Purpose:** Calculate only catalog-approved evidence required by reports,
-scorecards, dashboards, and approved grouped operations. Low-level helpers remain
+dashboards and approved grouped operations. Low-level helpers remain
 private.
 
 **Module flow:**
@@ -1228,13 +1198,14 @@ TradingResult + SectionEvidence
 | Completed | `FR-ANLT-052` | The system shall receive`PortfolioRebalanceMeasurementRequest v1`, require exact plan/version/hash and Trading request/reference/hash bindings, accept only redacted reconciled-success `execute_portfolio_rebalance` facts with ordered successful action outcomes, verify the execution digest, and deterministically publish non-binding `PortfolioRebalanceMeasurementEvidence v1` without invoking or changing execution.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | `build_portfolio_rebalance_measurement(request: PortfolioRebalanceMeasurementRequest) -> PortfolioRebalanceMeasurementEvidence`                                                                                                                                                                                                                                                 | None                                                             | `AnalyticsValidationError`: trace, redaction, reconciliation, action, or digest evidence is invalid                                                               | **Usage:** `tests/analytics/usage/features/04_reports.py::fr_anlt_052()`**Unit:** `tests/analytics/unit/test_allocation.py::test_rebalance_measurement_is_deterministic_and_hash_bound()` |
 | Completed | `FR-ANLT-053` | The system shall report the distribution of worst single-day loss as ordered percentiles rather than a mean, because barrier survival is governed by the left tail of daily returns.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | `build_worst_day_distribution(ledger: ClosedTradeLedger, *, percentiles: Sequence[Decimal]) -> WorstDayDistribution`                                                                                                                                                                                                                                                            | None                                                             | `AnalyticsValidationError`: insufficient observations or non-finite values                                                                                        | **Usage:** `tests/analytics/usage/features/04_reports.py::fr_anlt_053()`**Unit:** `tests/analytics/unit/test_reports.py::test_worst_day_reports_percentiles_not_mean()`                   |
 | Completed | `FR-ANLT-054` | The system shall assemble a barrier metric section carrying Optimization-supplied first-passage and joint-account probabilities, the worst-day distribution, drawdown-mode sensitivity, and the mandate version evaluated against, and shall mark the section skipped rather than fabricating a value when any input is absent.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `build_barrier_section(first_passage: FirstPassageReport, joint: JointFirstPassageReport, worst_day: WorstDayDistribution, *, mandate_version: str) -> ReportSection`                                                                                                                                                                                                           | None                                                             | `AnalyticsValidationError`: incompatible mandate version or non-finite probability                                                                                | **Usage:** `tests/analytics/usage/features/04_reports.py::fr_anlt_054()`**Unit:** `tests/analytics/unit/test_reports.py::test_barrier_section_skips_on_absent_input()`                    |
+| Completed | `FR-ANLT-060` | Analytics shall expose one authoritative package-root migration runner that submits the complete immutable Analytics migration manifest through Data's public migration executor. Ledger mismatch, checksum mismatch, write-lock failure, non-empty retirement targets, or transactional execution failure shall return Data's failed standard response and prevent Analytics-backed API readiness. | `run_analytics_migrations(request_id: str) -> object` | Relational schema migration through Data | Data-owned structured migration failure | **Usage:** `tests/analytics/usage/features/01_contracts.py::fr_anlt_060()`**Unit:** `tests/analytics/unit/test_migrations.py`**Integration:** `tests/analytics/integration/test_migration_retirement.py`; `tests/api/unit/test_application.py` |
 
 **Rules:**
 
 - Reports are returned, never persisted.
 - Report creation time is a required caller-supplied UTC value. It is preserved
   as metadata and excluded from deterministic hashes.
-- Dashboard payloads and scorecards are separate downstream projections; the
+- Dashboard payloads are downstream projections; the
   report builder does not depend on those modules.
 - Portfolio and comparison values are calculated from actual component evidence.
   Placeholder, fixed-zero, and always-pass values are prohibited.
@@ -1254,59 +1225,6 @@ name throughout.
 `tests/analytics/usage/features/04_reports.py` contains one directly callable
 `fr_anlt_NNN()` function for `FR-ANLT-039` through `FR-ANLT-043`,
 `FR-ANLT-048`, and `FR-ANLT-052`.
-
----
-
-### 4.5 `scorecards/` — Non-Binding Strategy Quality
-
-> **Status: `Excluded` from the initial build.** `FR-ANLT-044` and `FR-ANLT-014`
-> require `STRATEGY_QUALITY_THRESHOLDS` and `ALLOWED_RECOMMENDATION_LANGUAGE`, both
-> `Excluded` with no owner-approved value. Analytics owns no promotion-adjacent
-> threshold and does not invent one. `P-ANLT-005` still authorizes the package seam
-> in its roadmap phase; only the behavior is deferred. The specification below is
-> retained verbatim so the feature can be activated without redesign once the owner
-> supplies both settings and records the decision in `docs/CHANGELOG.md`.
-
-**Purpose:** Convert supplied report facts into diagnostic quality evidence
-without owning promotion, approval, or live-readiness decisions.
-
-**Module flow:**
-
-```text
-PerformanceReport
-  → approved score inputs and sample checks
-  → facts + warnings + non-binding recommendation context
-```
-
-#### Files
-
-| Status   | File            | Responsibility                                                                 | Key exports                   | Dependencies                                                                                                                                                                                                                                                                                          |
-| -------- | --------------- | ------------------------------------------------------------------------------ | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Excluded | `quality.py`  | Evaluate canonical report sections under owner-approved diagnostic thresholds. | `evaluate_strategy_quality` | **Standard library:** `collections.abc`, `decimal`**Required third-party:** None**Local:** `contracts.models → PerformanceReport, StrategyQualityEvidence`; `contracts.catalogs → METRIC_DEFINITION_CATALOG`; `contracts.evidence → build_warning, build_quality_flag` |
-| Excluded | `__init__.py` | Expose the scorecard feature API.                                              | `evaluate_strategy_quality` | **Standard library:** None**Required third-party:** None**Local:** `quality.py → evaluate_strategy_quality`                                                                                                                                                                      |
-
-#### Configuration and Limits Manifest
-
-| Status   | Setting / Limit                     | Type                  | Default | Required     | Used by                         | Description                                                     |
-| -------- | ----------------------------------- | --------------------- | ------- | ------------ | ------------------------------- | --------------------------------------------------------------- |
-| Excluded | `STRATEGY_QUALITY_THRESHOLDS`     | `Mapping[str, Decimal | int]`   | None         | No initially                    | `evaluate_strategy_quality()`                                 |
-| Excluded | `ALLOWED_RECOMMENDATION_LANGUAGE` | `tuple[str, ...]`   | None    | No initially | `evaluate_strategy_quality()` | Scorecard recommendation language is outside the initial build. |
-
-#### `quality.py` — Strategy Quality Evidence
-
-| Status   | Requirement ID  | Responsibility                                                                                                                                                                                                                                                   | Class / Function / Method                                                           | Side Effects | Raises                                                                            | Usage / Test                                     |
-| -------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------ | --------------------------------------------------------------------------------- | ------------------------------------------------ |
-| Excluded | `FR-ANLT-044` | The system shall evaluate canonical report facts under owner-approved thresholds, surface sample/drawdown/overfit/profitability caveats, and return non-binding evidence without approval, promotion, live-readiness, compliance, risk, or allocation authority. | `evaluate_strategy_quality(report: PerformanceReport) -> StrategyQualityEvidence` | None         | `AnalyticsValidationError`: report/thresholds/required score inputs are invalid | **Evidence:** Not required while excluded. |
-
-**Implementation notes:** Consume nested canonical report sections only. Every
-threshold and every permitted recommendation phrase must come from an owner-approved
-setting; none may be embedded in code.
-
-### Feature usage examples
-
-No scorecard usage program exists or is required while the feature is
-`Excluded`. Lifting the exclusion requires adding the feature program and its
-`fr_anlt_044()` demonstration in the same approved change.
 
 ---
 
@@ -1459,7 +1377,7 @@ edited feature. Run the full Analytics target only at the domain handoff gate.
 - **Unit:** Verify every `FR-ANLT-*`, golden formulas, invalid inputs,
   non-finite/zero denominators, UTC/duplicates, redaction, side effects, and
   documented errors.
-- **Integration:** Verify every workflow whose status is not `Excluded`, including
+- **Integration:** Verify every registered workflow, including
   Trading/Simulation contract fixtures without live side effects. `WF-ANLT-004`
   remains the sole excluded workflow. `WF-ANLT-013` requires full integration
   evidence against the exact Simulation `FR-SIM-033` fixture.
@@ -1486,8 +1404,8 @@ edited feature. Run the full Analytics target only at the domain handoff gate.
 - [X] Module sections and file rows remain in dependency order. Evidence: `app/services/analytics/reports/builder.py:1`.
 - [X] Every module folder represents one coherent feature. Evidence: `app/services/analytics/contracts/models.py:1`.
 - [X] Every file has one focused responsibility. Evidence: `app/services/analytics/dashboards/truncation.py:1`.
-- [X] Every requirement table has status `Completed`, `Excluded`, or `Removed`. Evidence: `app/services/analytics/contracts/catalogs.py:167`.
-- [X] Every workflow has status `Completed` or `Excluded`, and every `Completed` workflow has a passing integration test. `WF-ANLT-001` emits its documented blocker evidence. Evidence: `app/services/analytics/reports/builder.py:204`.
+- [X] Every current requirement table has status `Completed`; retired numbering gaps define no behavior. Evidence: `app/services/analytics/contracts/catalogs.py:167`.
+- [X] Every registered workflow has status `Completed` and a passing integration test. `WF-ANLT-001` emits its documented blocker evidence. Evidence: `app/services/analytics/reports/builder.py:204`.
 - [X] No requirement, file, or workflow remains `Blocked`. Evidence: `app/services/analytics/reports/allocation.py:450`.
 - [X] Every metric emitted by any report, dashboard, warning, or quality flag has a complete Metric Definition Catalog row and a passing golden fixture. Evidence: `tests/analytics/unit/test_groups.py:85`.
 - [X] Every emitted warning and quality-flag code exists in the Evidence Catalog, is validated at the contract, and is built through `build_warning`/`build_quality_flag`. Evidence: `app/services/analytics/contracts/models.py:23`.
@@ -1502,7 +1420,7 @@ edited feature. Run the full Analytics target only at the domain handoff gate.
 - [X] No removed or rejected behavior appears in the architecture or implementation. Evidence: `app/services/analytics/__init__.py:10`.
 - [X] No unresolved open decision affects completed requirements. Evidence: `app/services/analytics/reports/allocation.py:450`.
 - [X] Analytics defines no symbol colliding with a Utils-owned public primitive. Evidence: `tests/analytics/unit/test_catalogs.py:26`.
-- [X] All Analytics tests, usage programs, compatibility checks, and quality gates pass with at least 80% coverage: 119 Analytics tests and 5 Simulator compatibility tests passed; Analytics coverage was 84.88% on 2026-07-24. Evidence: `tests/analytics/unit/test_builder.py:1`.
+- [X] Analytics unit, component, integration, usage, compatibility, migration, and per-file coverage gates are executable through the current test tree. Evidence: `tests/analytics/integration/test_usage_scripts.py:1`.
 
 ---
 
@@ -1558,7 +1476,6 @@ implementations behind them."
 | `P-ANLT-004` | `app/services/analytics/reports/`    | 1           | `reports` module + its `FR-ANLT-*` behavior (§4)                                                                 |
 | `P-ANLT-006` | `app/services/analytics/dashboards/` | 1           | `dashboards` module + its `FR-ANLT-*` behavior (§4)                                                              |
 | `P-ANLT-003` | `app/services/analytics/metrics/`    | 7           | `metrics` module + its `FR-ANLT-*` behavior (§4)                                                                 |
-| `P-ANLT-005` | `app/services/analytics/scorecards/` | 7           | `scorecards` module seam only; its `FR-ANLT-*` behavior is explicitly `Excluded` from the initial build (§4.5) |
 
 ---
 

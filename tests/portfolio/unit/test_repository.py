@@ -9,6 +9,7 @@ import pytest
 from app.services.portfolio.contracts import (
     ActivePortfolioAllocation,
     PortfolioConstructionResult,
+    PortfolioDefinition,
     PortfolioRebalancePlan,
 )
 from app.services.portfolio.contracts.errors import PortfolioError
@@ -31,6 +32,7 @@ class FakePortfolioStore:
         """Initialize empty immutable-history test state."""
         logger.debug("Initializing fake Portfolio atomic store")
         self.constructions: dict[str, PortfolioConstructionResult] = {}
+        self.definitions: dict[tuple[str, str], PortfolioDefinition] = {}
         self.allocations: dict[tuple[str, str], ActivePortfolioAllocation] = {}
         self.histories: dict[str, list[ActivePortfolioAllocation]] = {}
         self.active_scopes: dict[str, tuple[ActivePortfolioAllocation, int]] = {}
@@ -59,6 +61,26 @@ class FakePortfolioStore:
         self.constructions[result.result_id] = result
         self.audit_records.append(audit_record)
         return existing or result
+
+    def save_definition(
+        self,
+        definition: PortfolioDefinition,
+        audit_record: AuditOutboxRecord,
+    ) -> PortfolioDefinition:
+        """Store one immutable definition and audit record atomically."""
+        key = (definition.portfolio_id, definition.portfolio_version)
+        existing = self.definitions.get(key)
+        if existing is not None and existing != definition:
+            raise PortfolioError("PORT_IDEMPOTENCY_CONFLICT", "DEFINITION")
+        self.definitions[key] = definition
+        self.audit_records.append(audit_record)
+        return existing or definition
+
+    def load_definition(
+        self, portfolio_id: str, portfolio_version: str
+    ) -> PortfolioDefinition | None:
+        """Load one exact immutable definition."""
+        return self.definitions.get((portfolio_id, portfolio_version))
 
     def activate_allocation(
         self,

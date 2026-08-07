@@ -23,9 +23,28 @@ def _features(rows: int = 25) -> pd.DataFrame:
     return pd.DataFrame({"a": range(rows), "b": [i * 2 for i in range(rows)]})
 
 
-def test_workflow_is_stateless_seeded_and_advisory() -> None:
-    """FR-RES-088: workflow is stateless, seeded, and advisory-only."""
+def test_workflow_is_stateless_seeded_and_advisory(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """FR-RES-088: unit composition is seeded and advisory-only.
+
+    Real PCA and K-Means collaboration is exercised by the integration suite.
+    """
     logger.debug("Testing Research unsupervised workflow")
+    monkeypatch.setattr(
+        "app.services.research.modeling.workflow.cluster_feature_space",
+        lambda _features, *, config: {
+            "labels": [0] * len(_features),
+            "seed": config.seed,
+        },
+    )
+    monkeypatch.setattr(
+        "app.services.research.modeling.workflow.build_unsupervised_insight_report",
+        lambda _features, *, config: {
+            "descriptive": {"rows": len(_features)},
+            "pca": {"components": config.pca_components},
+        },
+    )
     result = run_unsupervised_research(
         _features(),
         config=_config(),

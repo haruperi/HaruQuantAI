@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.data import to_ohlcv_dataframe, unwrap_data_response
 from app.services.strategy import run_vectorized_strategy_signals
 from tests.strategy.usage.workflows._support import (
     MarketProposalEvaluator,
@@ -61,6 +62,35 @@ def main() -> None:
     print("Evaluation:", outcome.status)
     if outcome.data is None:
         raise RuntimeError(f"Vectorized evaluation failed: {outcome.error}")
+
+    response = to_ohlcv_dataframe(market)
+    frame = unwrap_data_response(
+        response,
+        operation="strategy.usage.workflow.to_ohlcv_dataframe",
+        request_id=response.metadata.request_id,
+    ).copy()
+
+    frame["action"] = "NEUTRAL"
+    frame["side"] = None
+    frame["quantity_hint"] = None
+    frame["intent_id"] = None
+
+    if outcome.data.decisions:
+        for decision in outcome.data.decisions:
+            frame.iloc[-1, frame.columns.get_loc("action")] = decision.action
+            frame.iloc[-1, frame.columns.get_loc("side")] = decision.side
+            frame.iloc[-1, frame.columns.get_loc("quantity_hint")] = str(
+                decision.quantity_hint
+            )
+
+    if outcome.data.intents:
+        for intent in outcome.data.intents:
+            frame.iloc[-1, frame.columns.get_loc("intent_id")] = (
+                intent.intent_id[:16] + "..."
+            )
+
+    print("\nMarket DataFrame with signals/intents attached:")
+    print(frame.tail(8).to_string())
 
     # Stage 5 — OUTPUT BOUNDARY: Return atomic result or StandardResponse error.
     _stage(5)

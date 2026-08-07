@@ -7,6 +7,7 @@ from app.services.risk.persistence.create import (
     create_audit_record,
     create_decision_record,
     create_eligibility_record,
+    create_policy_version,
     create_risk_runtime_store,
 )
 from app.services.risk.persistence.read import (
@@ -20,6 +21,7 @@ from app.services.risk.persistence.read import (
     read_decision_record,
     read_decision_records,
     read_kill_switch_record,
+    read_policy_version,
 )
 from app.services.risk.persistence.update import (
     update_active_allocation_record,
@@ -34,6 +36,7 @@ __all__ = [
     "create_audit_record",
     "create_decision_record",
     "create_eligibility_record",
+    "create_policy_version",
     "create_risk_runtime_store",
     "read_active_allocation_record",
     "read_active_allocation_record_with_revision",
@@ -45,6 +48,7 @@ __all__ = [
     "read_decision_record",
     "read_decision_records",
     "read_kill_switch_record",
+    "read_policy_version",
     "update_active_allocation_record",
     "update_approval_state_record",
     "update_kill_switch_with_audit",

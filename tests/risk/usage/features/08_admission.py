@@ -224,6 +224,7 @@ def fr_risk_029() -> None:
     _header(
         "Stage 3: Strategy Admission Review - Review Strategy Admission (FR-RISK-029)"
     )
+    print("SUCCESS: FR-RISK-029")
 
     config = _config()
     store = _ExampleEligibilityStore()

@@ -7,6 +7,7 @@ from app.services.portfolio.contracts.allocations import (
     PortfolioRebalanceAction,
     PortfolioRebalancePlan,
 )
+from app.services.portfolio.contracts.definitions import PortfolioDefinition
 from app.services.portfolio.contracts.requests import (
     ConstructionMethod,
     EvidenceReferenceSet,
@@ -32,6 +33,7 @@ __all__: tuple[str, ...] = (
     "PortfolioComponentWeight",
     "PortfolioConstructionRequest",
     "PortfolioConstructionResult",
+    "PortfolioDefinition",
     "PortfolioRebalanceAction",
     "PortfolioRebalancePlan",
     "RuntimeProfile",

@@ -20,6 +20,7 @@ from app.services.research.contracts.errors import (
     ValidationError,
 )
 from app.services.research.leakage import mask_research_artifact
+from app.services.research.persistence import create_artifact_metadata
 from app.services.research.profiles import render_research_report
 from app.utils import (
     canonical_json,
@@ -174,6 +175,11 @@ def write_research_artifact(
     resolved = _validate_destination(destination, config=config)
     if resolved.exists() and not config.overwrite:
         raise ValidationError("RES_INPUT_INVALID", "ARTIFACT_CONFLICT")
+    previous = resolved.read_bytes() if resolved.exists() else None
+    if previous is not None and len(previous) > limits.max_artifact_bytes:
+        raise ValidationError(
+            "RES_RESOURCE_LIMIT_EXCEEDED", "EXISTING_ARTIFACT_TOO_LARGE"
+        )
     resolved.parent.mkdir(parents=True, exist_ok=True)
     atomic = config.require_atomic
     if atomic:
@@ -193,9 +199,27 @@ def write_research_artifact(
             handle.write(data)
     sha256 = hashlib.sha256(data).hexdigest()
     relative = resolved.relative_to(config.allowed_root.resolve())
-    audit_event_id = _emit_audit_event(
-        auth=auth, relative_path=relative, size_bytes=len(data), sha256=sha256
-    )
+    try:
+        audit_event_id = _emit_audit_event(
+            auth=auth, relative_path=relative, size_bytes=len(data), sha256=sha256
+        )
+        create_artifact_metadata(
+            relative_path=relative.as_posix(),
+            format_name=config.format,
+            size_bytes=len(data),
+            sha256=sha256,
+            atomic=atomic,
+            schema_version="v1",
+            audit_event_id=audit_event_id,
+            request_id=auth.request_id,
+            correlation_id=auth.correlation_id,
+        )
+    except Exception:
+        if previous is None:
+            resolved.unlink(missing_ok=True)
+        else:
+            resolved.write_bytes(previous)
+        raise
     return ArtifactReference(
         relative_path=relative,
         format=config.format,

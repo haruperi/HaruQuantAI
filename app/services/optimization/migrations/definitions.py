@@ -15,7 +15,11 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
-from app.services.data import build_migration_step
+from app.services.data import (
+    build_migration_request,
+    build_migration_step,
+    run_domain_migrations,
+)
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -68,4 +72,23 @@ def get_optimization_migrations() -> tuple[Any, ...]:
     )
 
 
-__all__ = ["get_optimization_migrations"]
+def run_optimization_migrations(request_id: str) -> object:
+    """Apply the complete Optimization manifest through Data.
+
+    Args:
+        request_id: Canonical migration trace identifier.
+
+    Returns:
+        Data-owned standard migration response.
+    """
+    logger.info("Running the complete Optimization migration manifest")
+    request = build_migration_request(
+        domain="optimization",
+        steps=get_optimization_migrations(),
+        request_id=request_id,
+        complete_manifest=True,
+    )
+    return run_domain_migrations(request)
+
+
+__all__ = ["get_optimization_migrations", "run_optimization_migrations"]

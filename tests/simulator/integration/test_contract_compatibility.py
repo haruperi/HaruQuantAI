@@ -15,8 +15,8 @@ from app.services.simulator import (
 )
 from app.utils import get_logger
 
-from tests.simulator.unit.test_orchestrator import _dataset, _request
-from tests.simulator.unit.test_portfolio_run import _portfolio_request
+from tests.simulator.component.test_orchestrator import _dataset, _request
+from tests.simulator.component.test_portfolio_run import _portfolio_request
 from tests.simulator.unit.test_reporting_contracts import _result
 
 logger = get_logger(__name__)

@@ -543,6 +543,21 @@ def get_simulation_migrations() -> tuple[object, ...]:
     return SIMULATION_MIGRATIONS
 
 
+def run_simulator_migrations(request_id: str) -> object:
+    """Apply the complete immutable Simulator migration manifest through Data.
+
+    Args:
+        request_id: Canonical startup request identifier.
+
+    Returns:
+        Data-owned standard migration response.
+    """
+    operation = _operation(
+        "app.services.simulator.migrations", "run_simulator_migrations"
+    )
+    return operation(request_id)
+
+
 def get_supported_asset_classes() -> tuple[str, ...]:
     """Return the supported Simulation asset classes."""
     from app.services.simulator.validation import SUPPORTED_ASSET_CLASSES
@@ -847,6 +862,7 @@ __all__: tuple[str, ...] = (
     "run_backtest",
     "run_fast_research",
     "run_portfolio_backtest",
+    "run_simulator_migrations",
     "step_live_simulation",
     "stream_simulation_session_frames",
     "to_simulation_error_payload",

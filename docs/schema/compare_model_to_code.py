@@ -58,6 +58,7 @@ _BOOTSTRAP_CREATORS = (
     "app/services/data/persistence/locking.py",
 )
 _CREATE_NAME = re.compile(r"CREATE TABLE(?:\s+IF NOT EXISTS)?\s+(\w+)", re.IGNORECASE)
+_DROP_NAME = re.compile(r"DROP TABLE(?:\s+IF EXISTS)?\s+(\w+)", re.IGNORECASE)
 
 _CONSTRAINT = re.compile(
     r"(PRIMARY KEY|UNIQUE\s*\(|CHECK\s*\(|FOREIGN KEY)",
@@ -142,12 +143,26 @@ def _code_tables() -> dict[str, set[str]]:
     tables: dict[str, set[str]] = {}
     for relative in _CODE_MODULES:
         source = (_ROOT / relative).read_text(encoding="utf-8")
+        create_pattern = (
+            r"CREATE TABLE(?: IF NOT EXISTS)? (\w+) \((.*?)\n    \) STRICT"
+            if relative == "app/services/trading/migrations/definitions.py"
+            else r"CREATE TABLE IF NOT EXISTS (\w+) \((.*?)\n    \) STRICT"
+        )
         for match in re.finditer(
-            r"CREATE TABLE IF NOT EXISTS (\w+) \((.*?)\n    \) STRICT",
+            create_pattern,
             source,
             re.DOTALL,
         ):
             tables[match.group(1)] = _columns(match.group(2))
+        for table in _DROP_NAME.findall(source):
+            tables.pop(table, None)
+        if relative == "app/services/trading/migrations/definitions.py":
+            for source_name, target_name in re.findall(
+                r'"ALTER TABLE (\w+) RENAME TO (\w+)"', source
+            ):
+                columns = tables.pop(source_name, None)
+                if columns is not None:
+                    tables[target_name] = columns
     for relative, table in _CONCAT_MODULES:
         source = (_ROOT / relative).read_text(encoding="utf-8")
         joined = "".join(re.findall(r'"([^"]*)"', source))
@@ -174,7 +189,9 @@ def _all_created_tables() -> set[str]:
     paths = [path for pattern in _CREATOR_GLOBS for path in _ROOT.glob(pattern)]
     paths.extend(_ROOT / relative for relative in _BOOTSTRAP_CREATORS)
     for path in paths:
-        names |= set(_CREATE_NAME.findall(path.read_text(encoding="utf-8")))
+        source = path.read_text(encoding="utf-8")
+        names |= set(_CREATE_NAME.findall(source))
+        names -= set(_DROP_NAME.findall(source))
     return names
 
 

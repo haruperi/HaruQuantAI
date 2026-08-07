@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from hashlib import sha256
 
 from app.services.trading.contracts.errors import TradingError
 from app.services.trading.contracts.models import (
     TRADING_CONTRACT_VERSION,
+    ClosedPositionRecord,
     ExecutionEvidenceReport,
     ExecutionReceipt,
     JsonValue,
@@ -16,6 +18,7 @@ from app.services.trading.contracts.models import (
     TradingRequest,
     TradingRoute,
 )
+from app.utils import canonical_json
 
 
 def get_trading_contract_version() -> str:
@@ -85,6 +88,25 @@ def create_trade_record(**values: object) -> TradeRecord:
         Validated internal trade record.
     """
     return TradeRecord.model_validate(values)
+
+
+def create_closed_position_record(**values: object) -> ClosedPositionRecord:
+    """Construct one validated immutable closed-position record.
+
+    Args:
+        **values: Exact broker and strategy evidence. ``evidence_hash`` is derived.
+
+    Returns:
+        Validated internal closed-position record.
+
+    Raises:
+        ValueError: If a caller attempts to supply a digest or evidence is invalid.
+    """
+    if "evidence_hash" in values:
+        raise ValueError("evidence_hash is derived from closed-position evidence")
+    material = dict(values)
+    digest = sha256(canonical_json(material).encode("utf-8")).hexdigest()
+    return ClosedPositionRecord.model_validate({**material, "evidence_hash": digest})
 
 
 def create_portfolio_rebalance_execution_request(
@@ -157,6 +179,7 @@ def is_execution_receipt(value: object) -> bool:
 
 
 __all__ = [
+    "create_closed_position_record",
     "create_execution_evidence_report",
     "create_execution_receipt",
     "create_order_intent",

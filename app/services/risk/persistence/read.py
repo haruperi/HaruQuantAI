@@ -206,6 +206,20 @@ def read_kill_switch_record(store: object, key: str) -> object | None:
     return _require_store(store).decode("kill-switch", str(row["payload_json"]))
 
 
+def read_policy_version(config_hash: str) -> Mapping[str, object] | None:
+    """Read one normalized Risk policy row by exact hash.
+
+    Returns:
+        Stored row mapping or ``None``.
+    """
+    return _one_row(
+        "SELECT config_hash, policy_version, profile, payload_json, effective_at, "
+        "request_id, correlation_id, created_at, updated_at "
+        "FROM risk_policy_versions WHERE config_hash=?",
+        (config_hash,),
+    )
+
+
 __all__ = [
     "read_active_allocation_record",
     "read_active_allocation_record_with_revision",
@@ -217,4 +231,5 @@ __all__ = [
     "read_decision_record",
     "read_decision_records",
     "read_kill_switch_record",
+    "read_policy_version",
 ]

@@ -1,6 +1,5 @@
 """Unit tests for the fail-closed Trading budget gate."""
 
-# ruff: noqa: INP001
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256

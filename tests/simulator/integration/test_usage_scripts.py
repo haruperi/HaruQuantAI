@@ -18,12 +18,11 @@ _USAGE_SCRIPTS = (
     "07_run.py",
     "08_errors.py",
     "09_reporting.py",
-    "features.py",
 )
 
 _USAGE_REQUIREMENTS = {
     "01_validation.py": {1, 2, 3},
-    "02_state.py": {41, 97, 98, 99, 100, 101, 102},
+    "02_state.py": {41, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103},
     "03_timeline.py": {4, 5, 6},
     "04_accounting.py": {7, 8, 9, 10, 11, 12, 39, 42},
     "05_execution.py": {18, 19, 20, 21, 22, 23, 38, 43},
@@ -31,7 +30,6 @@ _USAGE_REQUIREMENTS = {
     "07_run.py": {29, 30, 31, 32, 34},
     "08_errors.py": {35, 36, 37},
     "09_reporting.py": {24, 25, 26, 27, 28, 33, 40},
-    "features.py": set(),
 }
 
 _README_REQUIREMENTS = {
@@ -69,6 +67,10 @@ def test_simulator_usage_script_executes(script_name: str) -> None:
         f"stderr:\n{completed.stderr}"
     )
     assert completed.stdout.strip(), f"{script_name} produced no visible output"
+    for requirement in _USAGE_REQUIREMENTS[script_name]:
+        assert f"FR-SIM-{requirement:03d}" in completed.stdout
+    assert "SUCCESS:" in completed.stdout
+    assert "Data ->" in completed.stdout
 
 
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)
@@ -76,14 +78,6 @@ def test_usage_script_maps_requirements_and_uses_root_api(script_name: str) -> N
     """Require one callable demonstration per mapped FR and no deep public import."""
     usage_path = Path(__file__).parents[1] / "usage" / "features" / script_name
     module = ast.parse(usage_path.read_text(encoding="utf-8"))
-    if script_name == "features.py":
-        assert not any(
-            isinstance(node, ast.ImportFrom)
-            and node.module is not None
-            and node.module.startswith("app.services.simulator.")
-            for node in ast.walk(module)
-        )
-        return
     functions = {
         node.name: node
         for node in module.body
@@ -101,11 +95,18 @@ def test_usage_script_maps_requirements_and_uses_root_api(script_name: str) -> N
     assert expected_functions <= functions.keys()
     assert expected_functions <= called_from_main
     for function_name in expected_functions:
-        docstring = ast.get_docstring(functions[function_name]) or ""
+        function = functions[function_name]
+        docstring = ast.get_docstring(function) or ""
         requirement = function_name.removeprefix("fr_sim_")
         assert f"FR-SIM-{requirement}" in docstring
         responsibility = _README_REQUIREMENTS[int(requirement)]
         assert _normalized_text(responsibility) in _normalized_text(docstring)
+        function_source = ast.get_source_segment(
+            usage_path.read_text(encoding="utf-8"), function
+        )
+        assert function_source is not None
+        assert "Data ->" in function_source
+        assert "SUCCESS:" in function_source or "_format_result" in function_source
     assert not any(
         isinstance(node, ast.ImportFrom)
         and node.module is not None

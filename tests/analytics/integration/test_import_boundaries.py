@@ -1,6 +1,5 @@
 """Repository import-boundary checks for the Analytics public API."""
 
-# ruff: noqa: INP001
 import ast
 from pathlib import Path
 
@@ -12,6 +11,7 @@ _ROOT = Path(__file__).resolve().parents[3]
 _ALLOWED_INTERNAL_PREFIXES = (
     _ROOT / "app" / "services" / "analytics",
     _ROOT / "tests" / "analytics" / "unit",
+    _ROOT / "tests" / "analytics" / "component",
 )
 
 

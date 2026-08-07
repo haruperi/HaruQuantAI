@@ -5,7 +5,9 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 import pytest
+from app.services.simulator import run_simulator_migrations
 from app.services.simulator.errors import SimulationError
+from app.services.simulator.migrations import definitions
 from app.services.simulator.state import SIMULATION_MIGRATIONS, SimulationStateStore
 from app.utils import canonical_json
 
@@ -31,10 +33,13 @@ def _imported_modules() -> set[str]:
     return names
 
 
+_IMPORTED_MODULES = _imported_modules()
+
+
 def test_simulation_imports_no_data_storage_module() -> None:
     """Keep Simulation independent of Data storage internals."""
     assert not any(
-        name.startswith("app.services.data.persistence") for name in _imported_modules()
+        name.startswith("app.services.data.persistence") for name in _IMPORTED_MODULES
     )
     assert SIMULATION_MIGRATIONS[0].domain == "simulator"
     assert [step.migration_id for step in SIMULATION_MIGRATIONS] == [
@@ -58,7 +63,34 @@ def test_simulation_imports_no_data_storage_module() -> None:
 
 def test_simulation_imports_no_sqlite_module() -> None:
     """Prove Simulation owns no database connection or schema execution."""
-    assert "sqlite3" not in _imported_modules()
+    assert "sqlite3" not in _IMPORTED_MODULES
+
+
+def test_authoritative_migration_runner_submits_complete_manifest(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Submit the complete immutable manifest once through Data's executor."""
+    captured: dict[str, object] = {}
+
+    def build_request(**kwargs: object) -> object:
+        captured.update(kwargs)
+        return "migration-request"
+
+    def run_request(request: object) -> object:
+        captured["request"] = request
+        return "migration-response"
+
+    monkeypatch.setattr(definitions, "build_migration_request", build_request)
+    monkeypatch.setattr(definitions, "run_domain_migrations", run_request)
+
+    assert run_simulator_migrations("req-test") == "migration-response"
+    assert captured == {
+        "domain": "simulator",
+        "steps": SIMULATION_MIGRATIONS,
+        "request_id": "req-test",
+        "complete_manifest": True,
+        "request": "migration-request",
+    }
 
 
 def test_state_store_is_a_protocol_only() -> None:

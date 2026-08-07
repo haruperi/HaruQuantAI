@@ -7,6 +7,7 @@ recorded in ``docs/ARCHITECTURE.md``.
 
 from app.services.optimization.migrations.definitions import (
     get_optimization_migrations,
+    run_optimization_migrations,
 )
 
-__all__ = ["get_optimization_migrations"]
+__all__ = ["get_optimization_migrations", "run_optimization_migrations"]

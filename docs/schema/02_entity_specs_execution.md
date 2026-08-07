@@ -197,6 +197,7 @@ was fully processed.
 > `strategy_signals`, and `strategy_mutations` — are shipped, populated in
 > `data/database/haruquant-dev.db`, and backed by applied migrations `0001_strategy_domain`
 > and `0002_strategy_seven_table_runtime`.
+
 ---
 
 ## Domain 6 — Risk (`risk_`)
@@ -293,9 +294,9 @@ reallocation.
 ```sql
 CREATE TABLE risk_kill_switch_states (
     state_id         TEXT    PRIMARY KEY,
-    scope_level      TEXT    NOT NULL CHECK (scope_level IN ('global','account','portfolio','strategy','symbol')),
+    scope_level      TEXT    NOT NULL CHECK (scope_level IN ('global','portfolio','strategy','symbol')),
     scope_json       TEXT    NOT NULL CHECK (json_valid(scope_json)),
-    state            TEXT    NOT NULL CHECK (state IN ('armed','tripped','resetting')),
+    state            TEXT    NOT NULL CHECK (state IN ('active','inactive')),
     version          INTEGER NOT NULL,
     payload_json     TEXT    NOT NULL CHECK (json_valid(payload_json)),
     request_id       TEXT    NOT NULL,
@@ -305,7 +306,7 @@ CREATE TABLE risk_kill_switch_states (
 ) STRICT;
 
 CREATE INDEX idx_risk_kill_tripped ON risk_kill_switch_states(scope_level)
-    WHERE state = 'tripped';
+    WHERE state = 'active';
 ```
 
 `version` is the optimistic-concurrency guard: a reset passes its expected version and
@@ -480,8 +481,10 @@ CREATE INDEX idx_risk_exposure_history
 
 ## Domain 7 — Trading (`trading_`)
 
-Event-sourced: `trading_events` is the write model; `trading_orders`,
-`trading_fills`, and `trading_positions` are read projections rebuildable from it.
+Event-sourced: `trading_events` is the write model and `trading_orders` is its
+order-state projection. `trading_positions` is an insert-only ledger of complete
+closed trades. Open positions and tick-valued unrealized state are deliberately
+excluded from relational persistence.
 
 ### `trading_events`
 
@@ -587,93 +590,55 @@ An order row cannot physically exist without naming a risk decision.
 to apply its documented order-type default. Persistence must retain absence and must
 not invent a broker instruction that was not present in the governed intent.
 
-### `trading_fills`
-
-Immutable execution records. Never updated.
-
-```sql
-CREATE TABLE trading_fills (
-    fill_id          TEXT    PRIMARY KEY,
-    order_id         TEXT    NOT NULL REFERENCES trading_orders(order_id) ON DELETE RESTRICT,
-    broker_fill_id   TEXT,
-    sequence         INTEGER NOT NULL,
-    quantity_decimal TEXT    NOT NULL,
-    price_decimal    TEXT    NOT NULL,
-    commission_decimal TEXT  NOT NULL DEFAULT '0',
-    swap_decimal     TEXT    NOT NULL DEFAULT '0',
-    slippage_bps     TEXT,
-    liquidity_flag   TEXT    CHECK (liquidity_flag IN ('maker','taker','unknown')),
-    executed_at      TEXT    NOT NULL,
-    reported_at      TEXT    NOT NULL,
-    correlation_id   TEXT    NOT NULL,
-    created_at       TEXT    NOT NULL,
-    UNIQUE (order_id, sequence),
-    UNIQUE (broker_fill_id)
-) STRICT;
-
-CREATE INDEX idx_trading_fills_order ON trading_fills(order_id, sequence);
-CREATE INDEX idx_trading_fills_time  ON trading_fills(executed_at DESC);
-```
-
-`executed_at` (venue) and `reported_at` (received) are separate. Their difference is
-the real execution latency; collapsing them makes latency unmeasurable and
-`slippage_bps` uninterpretable.
-
-`UNIQUE (broker_fill_id)` is the duplicate-fill guard on reconnect replay.
-
-### `trading_order_transitions`
-
-```sql
-CREATE TABLE trading_order_transitions (
-    transition_seq   INTEGER PRIMARY KEY,
-    order_id         TEXT    NOT NULL REFERENCES trading_orders(order_id) ON DELETE RESTRICT,
-    from_state       TEXT,
-    to_state         TEXT    NOT NULL,
-    reason_code      TEXT    NOT NULL,
-    detail_json      TEXT    NOT NULL DEFAULT '{}' CHECK (json_valid(detail_json)),
-    occurred_at      TEXT    NOT NULL,
-    correlation_id   TEXT    NOT NULL,
-    created_at       TEXT    NOT NULL
-) STRICT;
-
-CREATE INDEX idx_trading_transitions_order ON trading_order_transitions(order_id, transition_seq);
-```
+Migration `002_closed_position_ledger` retired the empty `trading_fills` and
+`trading_order_transitions` projections and replaced the empty migration-`001`
+open-position projection. Historical executable DDL remains immutable in code;
+only the current target is specified below.
 
 ### `trading_positions`
 
-Current open positions. One row per (account, symbol, direction).
+Completed closed trades only. Monetary and quantity values are canonical decimal
+text. Rows are insert-only and never track tick-valued open state.
 
 ```sql
 CREATE TABLE trading_positions (
-    position_id      TEXT    PRIMARY KEY,
-    account_id       TEXT    NOT NULL,
-    symbol_id        TEXT    NOT NULL,
-    direction        TEXT    NOT NULL CHECK (direction IN ('long','short')),
-    quantity_decimal TEXT    NOT NULL,
-    avg_entry_price_decimal TEXT NOT NULL,
-    current_price_decimal   TEXT,
-    unrealized_pnl_decimal  TEXT NOT NULL DEFAULT '0',
-    realized_pnl_decimal    TEXT NOT NULL DEFAULT '0',
-    commission_total_decimal TEXT NOT NULL DEFAULT '0',
-    swap_total_decimal      TEXT NOT NULL DEFAULT '0',
-    stop_loss_decimal       TEXT,
-    take_profit_decimal     TEXT,
-    strategy_version_id     TEXT,
-    state            TEXT    NOT NULL CHECK (state IN ('open','closing','closed')),
-    opened_at        TEXT    NOT NULL,
-    closed_at        TEXT,
-    position_version INTEGER NOT NULL DEFAULT 0,
-    created_at       TEXT    NOT NULL,
-    updated_at       TEXT    NOT NULL
+    ticket TEXT PRIMARY KEY,
+    symbol TEXT NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('buy','sell')),
+    volume TEXT NOT NULL,
+    entry_time TEXT NOT NULL,
+    entry_price TEXT NOT NULL,
+    stop_loss TEXT,
+    take_profit TEXT,
+    exit_time TEXT NOT NULL,
+    exit_price TEXT NOT NULL,
+    exit_reason TEXT NOT NULL,
+    commission TEXT NOT NULL,
+    swap TEXT NOT NULL,
+    profit TEXT NOT NULL,
+    mae_points INTEGER NOT NULL CHECK (mae_points >= 0),
+    mfe_points INTEGER NOT NULL CHECK (mfe_points >= 0),
+    slippage_points INTEGER NOT NULL CHECK (slippage_points >= 0),
+    magic TEXT NOT NULL,
+    strategy TEXT NOT NULL,
+    account TEXT NOT NULL,
+    environment TEXT NOT NULL CHECK (environment IN ('demo','paper','sim','live')),
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    evidence_hash TEXT NOT NULL UNIQUE,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    CHECK (exit_time >= entry_time)
 ) STRICT;
 
-CREATE UNIQUE INDEX idx_trading_pos_open
-    ON trading_positions(account_id, symbol_id, direction) WHERE state = 'open';
-CREATE INDEX idx_trading_pos_history ON trading_positions(account_id, closed_at DESC) WHERE state = 'closed';
+CREATE INDEX idx_trading_positions_account_exit ON trading_positions(account, exit_time DESC);
+CREATE INDEX idx_trading_positions_strategy_exit ON trading_positions(account, strategy, exit_time DESC);
+CREATE INDEX idx_trading_positions_symbol_exit ON trading_positions(account, symbol, exit_time DESC);
+CREATE INDEX idx_trading_positions_magic_exit ON trading_positions(account, magic, exit_time DESC);
 ```
 
-The partial unique index prevents duplicate open positions on the same instrument
-and side — the netting invariant, enforced by the database rather than by code.
+`trading_fills` and `trading_order_transitions` are not target tables after migration
+`002`; their authority facts remain in `trading_events`.
 
 ### `trading_projections`
 
@@ -695,8 +660,11 @@ resume point for rebuilds and the staleness check for readers.
 
 ## Domain 8 — Simulator (`sim_`)
 
-> **This domain follows the live implementation.** Simulator persists **run identity
-> and completed-run playback session cursors**. Its canonical journal is append-only JSONL and its results are published as
+> **This target domain model follows the current migration manifest.** The inspected
+> non-production database currently has `sim_runs` from step 001 but has not yet
+> applied step 002 for `sim_sessions`; API startup invokes the complete manifest and
+> fails closed until both steps verify. Simulator persists **run identity and
+> completed-run playback session cursors**. Its canonical journal is append-only JSONL and its results are published as
 > file artifacts; neither is backed by a table. The mirrored `sim_orders` /
 > `sim_fills` / `sim_positions` design an earlier draft proposed is target-only and is
 > not implied by this schema.
@@ -782,12 +750,12 @@ Their column definitions are omitted here rather than carried as unbuilt DDL; th
 
 ## Entity count — this file
 
-| Domain | Tables |
-|---|---|
-| Strategy | 7 |
-| Risk | 10 |
-| Trading | 7 |
-| Simulator | 2 |
+| Domain          | Tables       |
+| --------------- | ------------ |
+| Strategy        | 7            |
+| Risk            | 10           |
+| Trading         | 7            |
+| Simulator       | 2            |
 | **Total** | **26** |
 
 Next: [03_entity_specs_intelligence.md](03_entity_specs_intelligence.md)

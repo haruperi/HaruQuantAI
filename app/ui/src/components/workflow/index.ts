@@ -30,6 +30,15 @@ export type { TradingViewProps } from "./trading";
 export { ResearchWorkspace } from "./research";
 export type { ResearchWorkspaceProps } from "./research";
 
+export { OptimizationView } from "./optimization";
+export type { OptimizationViewProps } from "./optimization";
+
+export { PortfolioView } from "./portfolio";
+export type { PortfolioViewProps } from "./portfolio";
+
+export { AgenticView } from "./agentic";
+export type { AgenticViewProps } from "./agentic";
+
 export { PlaybackView } from "./playback";
 export type { PlaybackViewProps } from "./playback";
 

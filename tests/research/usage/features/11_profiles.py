@@ -29,12 +29,12 @@ _HASH = "e" * 64
 
 def _feature_header(title: str) -> None:
     """Print the feature header banner."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"SUCCESS: {title}")
 
 
 def _header(title: str) -> None:
     """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"SUCCESS: {title}")
 
 
 def _format_result(obj: Any) -> str:
@@ -133,7 +133,6 @@ def _report() -> object:
 def fr_res_089() -> None:
     """FR-RES-089: Build deterministic score rows, final score, and readiness."""
     _header("FR-RES-089: Build deterministic score rows, final score, and readiness.")
-    print("Research Example 11: Profiles, Snapshots, and Rendering")
     scorecard = _scorecard()
     print(f"FR-RES-089 readiness={scorecard.readiness} score={scorecard.final_score}")
 

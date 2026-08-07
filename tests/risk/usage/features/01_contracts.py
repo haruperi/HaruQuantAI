@@ -123,6 +123,7 @@ def _make_intent():
 def fr_risk_004() -> None:
     """FR-RISK-004: Stage 1 — Carry exact immutable Data-owned `build_account_state_snapshot v1` and `build_fx_conversion_evidence v1` values plus peak/day-start/inception equity, symbol mark prices, contract sizes, quote currencies, exposure dimensions, aligned timestamped per-symbol return histories, explicit pair correlations, UTC `as_of`, provenance, missingness, and schema version. Open `build_account_order.quantity` is the full remaining pending quantity for Risk exposure."""
     _header("Stage 1: Portfolio State Inputs - Construct Portfolio State (FR-RISK-004)")
+    print("SUCCESS: FR-RISK-004")
     account = build_account_state_snapshot(
         account_id="account-1",
         currency="USD",
@@ -170,6 +171,7 @@ def fr_risk_004() -> None:
 def fr_risk_006() -> None:
     """FR-RISK-006: Stage 1 — Define the Risk-owned receiver contract for one non-executable review. It embeds the complete immutable Strategy `create_trade_intent_value v1` unchanged and adds current valuation, stop-distance, account/portfolio scope, evidence timestamps, provenance references/hashes, and requested Risk profile. Risk rejects an incompatible intent version, conflicting duplicated fact, invalid scope/size, or absent required stop evidence."""
     _header("Stage 1: Trade Proposal Input - Proposed Trade Contract (FR-RISK-006)")
+    print("SUCCESS: FR-RISK-006")
     intent = _make_intent()
     proposed = create_proposed_trade(
         intent=intent,
@@ -196,6 +198,7 @@ def fr_risk_006() -> None:
 def fr_risk_007() -> None:
     """FR-RISK-007: Stage 1 — Represent one of six sizing methods and its complete evidence/config references."""
     _header("Stage 1: Sizing Request Input - Sizing Request Contract (FR-RISK-007)")
+    print("SUCCESS: FR-RISK-007")
     req = create_position_sizing_request(
         method="fixed_risk",
         requested_size=None,
@@ -225,6 +228,7 @@ def fr_risk_009() -> None:
     _header(
         "Stage 1: Allocation Request Input - Allocation Review Request (FR-RISK-009)"
     )
+    print("SUCCESS: FR-RISK-009")
     req = create_allocation_review_request(
         projection_kind="construction",
         portfolio_id="portfolio-1",
@@ -256,6 +260,7 @@ def fr_risk_010() -> None:
     _header(
         "Stage 1: Admission Request Input - Strategy Operational Eligibility Request (FR-RISK-010)"
     )
+    print("SUCCESS: FR-RISK-010")
     req = create_strategy_operational_eligibility_request(
         strategy_id="mean-reversion",
         strategy_version="1.0.0",
@@ -280,6 +285,7 @@ def fr_risk_010() -> None:
 def fr_risk_012() -> None:
     """FR-RISK-012: Stage 1 — Define a bounded immutable advisory scenario with deterministic shocks and optional explicit seed."""
     _header("Stage 1: Scenario Input - Advisory Scenario Definition (FR-RISK-012)")
+    print("SUCCESS: FR-RISK-012")
     scen = create_scenario_definition(
         scenario_id="equity-stress",
         shocks={"equity": Decimal("-0.10")},
@@ -294,6 +300,7 @@ def fr_risk_012() -> None:
 def fr_risk_016() -> None:
     """FR-RISK-016: Stage 1 — Implement `create_kill_switch_command v1` with action, explicit scope level, applicable portfolio/strategy/symbol identifiers, reason, UTC timestamp, request/workflow/correlation IDs, and schema identity. Principal authorization remains in the separate `create_auth_context`; clearance requires a separate matching current `create_approval_attestation`."""
     _header("Stage 1: Kill Switch Input - Kill Switch Command (FR-RISK-016)")
+    print("SUCCESS: FR-RISK-016")
     cmd = create_kill_switch_command(
         action="activate",
         scope_level="global",
@@ -315,6 +322,7 @@ def fr_risk_016() -> None:
 def fr_risk_047() -> None:
     """FR-RISK-047: Stage 1 — Define `create_approval_attestation v1` authenticated human approval evidence (principal, action, scope, policy reference/version, issue/expiry times, trace IDs); it carries no secret and is never execution authority by itself."""
     _header("Stage 1: Attestation Input - Approval Attestation (FR-RISK-047)")
+    print("SUCCESS: FR-RISK-047")
     att = create_approval_attestation(
         attestation_id="attest-1",
         principal_id="user-1",
@@ -339,6 +347,7 @@ def fr_risk_048() -> None:
     _header(
         "Stage 1: Budget Activation Input - Allocation Budget Activation Request (FR-RISK-048)"
     )
+    print("SUCCESS: FR-RISK-048")
     req = create_allocation_budget_activation_request(
         portfolio_id="portfolio-1",
         allocation_version="allocation-v1",
@@ -360,6 +369,7 @@ def fr_risk_048() -> None:
 def fr_risk_001() -> None:
     """FR-RISK-001: Stage 2 — Define `approve`, `warn`, `needs_approval`, `needs_more_evidence`, `reject`, `block`, and `error` exactly."""
     _header("Stage 2: Enum Validation - DecisionState (FR-RISK-001)")
+    print("SUCCESS: FR-RISK-001")
     state_cls = get_decision_state("approve")
     print(_format_result(state_cls))
     print("Data -> DecisionState value='approve'")
@@ -368,6 +378,7 @@ def fr_risk_001() -> None:
 def fr_risk_002() -> None:
     """FR-RISK-002: Stage 2 — Define `pass`, `warn`, `needs_more_evidence`, `fail`, and `blocked` exactly."""
     _header("Stage 2: Enum Validation - LimitStatus (FR-RISK-002)")
+    print("SUCCESS: FR-RISK-002")
     status_cls = get_limit_status("pass")
     print(_format_result(status_cls))
     print("Data -> LimitStatus value='pass'")
@@ -376,6 +387,7 @@ def fr_risk_002() -> None:
 def fr_risk_003() -> None:
     """FR-RISK-003: Stage 2 — Define exactly `INVALID_INPUT`, `VALIDATION_FAILED`, `INVALID_PORTFOLIO_STATE`, `INVALID_RISK_CONFIG`, `MISSING_EVIDENCE`, `STALE_EVIDENCE`, `LIMIT_FAILED`, `POLICY_BLOCKED`, `PERMISSION_DENIED`, `KILL_SWITCH_ACTIVE`, `KILL_SWITCH_UNKNOWN`, `APPROVAL_REQUIRED`, `APPROVAL_TOKEN_INVALID`, `APPROVAL_TOKEN_EXPIRED`, `APPROVAL_TOKEN_REVOKED`, `APPROVAL_TOKEN_CONSUMED`, `CONFIG_VERSION_MISMATCH`, `PENDING_APPROVAL_DOUBLE_SPEND_BLOCKED`, `PAYLOAD_TOO_LARGE`, `MISSING_STOP_LOSS`, `INSUFFICIENT_VOLATILITY_EVIDENCE`, `INSUFFICIENT_K_EVIDENCE`, `LIVE_STATE_STALE`, `IN_FLIGHT_TOLERANCE_EXCEEDED`, `IN_FLIGHT_RECONCILIATION_EXPIRED`, `AUDIT_CHAIN_TAMPER_DETECTED`, `CALCULATION_FAILED`, `SNAPSHOT_BUILD_FAILED`, `GOVERNOR_DECISION_FAILED`, `REPORT_GENERATION_FAILED`, `STORAGE_ERROR`, `TOOL_EXECUTION_FAILED`, and `UNKNOWN_ERROR`; historical VaR/CVaR is the sole supported VaR method."""
     _header("Stage 2: Enum Validation - RiskErrorCode (FR-RISK-003)")
+    print("SUCCESS: FR-RISK-003")
     code_val = get_risk_error_code("INVALID_INPUT")
     print(_format_result(code_val))
     print("Data -> RiskErrorCode value='INVALID_INPUT'")
@@ -384,6 +396,7 @@ def fr_risk_003() -> None:
 def fr_risk_021() -> None:
     """FR-RISK-021: Stage 2 — Raise one redacted domain exception carrying a `RiskErrorCode` and safe details for boundary mapping."""
     _header("Stage 2: Coded Exception - RiskDomainError (FR-RISK-021)")
+    print("SUCCESS: FR-RISK-021")
     err = create_risk_domain_error(
         get_risk_error_code("INVALID_INPUT"), details="Test detail"
     )
@@ -396,6 +409,7 @@ def fr_risk_058() -> None:
     _header(
         "Stage 2: Market Context Validation - validate_market_context_evidence (FR-RISK-058)"
     )
+    print("SUCCESS: FR-RISK-058")
     market = build_market_context_evidence(
         symbol="EURUSD",
         session_state="open",
@@ -429,6 +443,7 @@ def fr_risk_058() -> None:
 def fr_risk_005() -> None:
     """FR-RISK-005: Stage 3 — Carry reproducible base-currency equity, daily/total loss, exposure, drawdown, margin/leverage, historical tail-risk, volatility/correlation/contribution metrics, limit results, assumptions, coverage, regime, request/workflow IDs, evidence refs, and config hash."""
     _header("Stage 3: Portfolio Snapshot Result - PortfolioRiskSnapshot (FR-RISK-005)")
+    print("SUCCESS: FR-RISK-005")
     snap = create_portfolio_risk_snapshot(
         snapshot_id="snapshot-1",
         account_id="account-1",
@@ -465,6 +480,7 @@ def fr_risk_005() -> None:
 def fr_risk_008() -> None:
     """FR-RISK-008: Stage 3 — Return exact requested/normalized size, constraints applied, evidence gaps, fallback disclosure, and no approval claim."""
     _header("Stage 3: Sizing Output - PositionSizingResult (FR-RISK-008)")
+    print("SUCCESS: FR-RISK-008")
     res = create_position_sizing_result(
         method="fixed_risk",
         requested_size=Decimal("0.1"),
@@ -484,6 +500,7 @@ def fr_risk_008() -> None:
 def fr_risk_011() -> None:
     """FR-RISK-011: Stage 3 — Return classified volatility/liquidity/correlation/drawdown/crisis/news/session states, transition evidence, modifiers, and missingness."""
     _header("Stage 3: Regime Assessment Output - RegimeAssessment (FR-RISK-011)")
+    print("SUCCESS: FR-RISK-011")
     states = dict.fromkeys(
         (
             "volatility",
@@ -515,6 +532,7 @@ def fr_risk_011() -> None:
 def fr_risk_013() -> None:
     """FR-RISK-013: Stage 3 — Return baseline/projected risk comparison and state that the output is advisory and not approved."""
     _header("Stage 3: Scenario Output - ScenarioResult (FR-RISK-013)")
+    print("SUCCESS: FR-RISK-013")
     res = create_scenario_result(
         scenario_id="equity-stress",
         baseline={"equity": Decimal(10000)},
@@ -536,6 +554,7 @@ def fr_risk_013() -> None:
 def fr_risk_014() -> None:
     """FR-RISK-014: Stage 3 — Implement `RiskDecision` v1 with verdict, trade-only approved size, ordered checks, primary/composite reasons, provenance, expiry, concurrency disclosure, and optional token. A current-state compliance approval has no intent and no invented trade size."""
     _header("Stage 3: Risk Decision Package - RiskDecisionPackage (FR-RISK-014)")
+    print("SUCCESS: FR-RISK-014")
     dec = create_risk_decision_package(
         decision_id="dec-1",
         intent_id=None,
@@ -563,6 +582,7 @@ def fr_risk_014() -> None:
 def fr_risk_015() -> None:
     """FR-RISK-015: Stage 3 — Carry signed token scope, decision/config hashes, approver, expiry, nonce, schema version, and no secret key."""
     _header("Stage 3: Approval Token Output - RiskApprovalToken (FR-RISK-015)")
+    print("SUCCESS: FR-RISK-015")
     tok = create_risk_approval_token(
         token_id="tok-1",
         decision_id="dec-1",
@@ -587,6 +607,7 @@ def fr_risk_017() -> None:
     _header(
         "Stage 3: Kill Switch State Output - create_kill_switch_state (FR-RISK-017)"
     )
+    print("SUCCESS: FR-RISK-017")
     st = create_kill_switch_state(
         state_id="kill-1",
         scope_level="global",
@@ -603,6 +624,7 @@ def fr_risk_017() -> None:
 def fr_risk_018() -> None:
     """FR-RISK-018: Stage 3 — Carry canonical redacted audit payload and evidence/config/decision provenance in either an explicitly unsealed append input (`sealed=False`, null sequence/hashes) or a sealed result (`sealed=True`, complete sequence, previous hash, and record hash). Persisted or cross-domain audit results must be sealed."""
     _header("Stage 3: Audit Record Output - RiskAuditRecord (FR-RISK-018)")
+    print("SUCCESS: FR-RISK-018")
     rec = create_risk_audit_record(
         record_id="rec-1",
         event_type="trade_review",
@@ -627,6 +649,7 @@ def fr_risk_018() -> None:
 def fr_risk_019() -> None:
     """FR-RISK-019: Stage 3 — Carry Markdown or exact JSON summary with separated evidence, assumptions, warnings, decision, and recommendations."""
     _header("Stage 3: Risk Report Output - RiskReport (FR-RISK-019)")
+    print("SUCCESS: FR-RISK-019")
     rep = create_risk_report(
         report_id="rep-1",
         format="markdown",
@@ -648,6 +671,7 @@ def fr_risk_020() -> None:
     _header(
         "Stage 3: Approval Validation Result - ApprovalValidationResult (FR-RISK-020)"
     )
+    print("SUCCESS: FR-RISK-020")
     verdict = create_action_policy_verdict(
         verdict_id="verdict-1",
         action="trade",
@@ -681,6 +705,7 @@ def fr_risk_049() -> None:
     _header(
         "Stage 3: Eligibility Decision Output - StrategyOperationalEligibilityDecision (FR-RISK-049)"
     )
+    print("SUCCESS: FR-RISK-049")
     dec = create_strategy_operational_eligibility_decision(
         decision_id="dec-elig-1",
         strategy_id="strategy-1",
@@ -704,6 +729,7 @@ def fr_risk_050() -> None:
     _header(
         "Stage 3: Allocation Decision Output - AllocationRiskDecision (FR-RISK-050)"
     )
+    print("SUCCESS: FR-RISK-050")
     dec = create_allocation_risk_decision(
         decision_id="dec-alloc-1",
         portfolio_id="portfolio-1",
@@ -727,6 +753,7 @@ def fr_risk_050() -> None:
 def fr_risk_059() -> None:
     """FR-RISK-059: Stage 3 — Return `ActionPolicyVerdict v1` bound to action, scope, policy version, approval attestation, decision, reservation, expiry, reasons, and trace IDs."""
     _header("Stage 3: Action Policy Verdict - ActionPolicyVerdict (FR-RISK-059)")
+    print("SUCCESS: FR-RISK-059")
     ver = create_action_policy_verdict(
         verdict_id="verdict-1",
         action="trade",
@@ -750,6 +777,7 @@ def fr_risk_059() -> None:
 def fr_risk_060() -> None:
     """FR-RISK-060: Stage 3 — Carry one ordered limit result with status, observed/threshold values, reason code, evidence refs, and precedence without granting approval."""
     _header("Stage 3: Risk Limit Result - RiskLimitResult (FR-RISK-060)")
+    print("SUCCESS: FR-RISK-060")
     lim = create_risk_limit_result(
         limit_id="limit-1",
         status=get_limit_status("pass"),
@@ -768,6 +796,7 @@ def fr_risk_061() -> None:
     _header(
         "Stage 3: Budget Execution Verdict - PortfolioBudgetExecutionVerdict (FR-RISK-061)"
     )
+    print("SUCCESS: FR-RISK-061")
     ver = create_portfolio_budget_execution_verdict(
         verdict_id="verdict-1",
         allocation_decision_id="dec-alloc-1",

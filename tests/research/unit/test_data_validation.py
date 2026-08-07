@@ -13,6 +13,7 @@ from app.services.data import (
     build_ohlcv_record,
 )
 from app.services.research import create_research_value, validate_dataset
+from app.services.research.data.validation import _enforce_memory_budget
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -161,3 +162,11 @@ def test_validate_dataset_reports_nonfinite_irregular_and_missing_source(
         "MISSING_SOURCE_METADATA",
     }
     assert any(warning.code == "IRREGULAR_INTERVALS" for warning in report.warnings)
+
+
+def test_memory_admission_fails_before_over_budget_work() -> None:
+    """FR-RES-001: deterministic deep-memory admission fails closed."""
+    frame = pd.DataFrame({"payload": ("x" * 600_000, "y" * 600_000)})
+    limits = create_research_value("ResearchResourceLimits", 100, 10.0, 1_024, 1)
+    with pytest.raises(ValueError, match="MEMORY_BUDGET_EXCEEDED"):
+        _enforce_memory_budget(frame, limits, allocation_multiplier=1)

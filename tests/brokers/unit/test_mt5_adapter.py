@@ -92,7 +92,21 @@ class _FakeTransport:
                 "trade_allowed": True,
             },
             "terminal_info": (
-                {"connected": True, "trade_allowed": True} if self._verified else None
+                {
+                    "name": "MetaTrader 5",
+                    "company": "MetaQuotes Ltd.",
+                    "build": 4570,
+                    "language": "English",
+                    "connected": True,
+                    "trade_allowed": True,
+                    "dlls_allowed": True,
+                    "ping_last": 1500,
+                    "path": "C:\\Program Files\\MetaTrader 5\\terminal64.exe",
+                    "data_path": "C:\\Users\\Mock\\AppData\\Roaming\\MetaQuotes\\Terminal\\Instance",
+                    "common_data_path": "C:\\ProgramData\\MetaQuotes\\Terminal\\Common",
+                }
+                if self._verified
+                else None
             ),
             "version": "5.0.0",
             "symbols_get": (
@@ -472,6 +486,7 @@ def test_adapter_get_platform_info_reports_terminal_version() -> None:
         assert result.data is not None
         assert result.data.api_or_terminal_version == "5.0.0"
         assert result.data.observed_at.tzinfo is UTC
+        assert result.data.endpoint_metadata["name"] == "MetaTrader 5"
 
     asyncio.run(exercise())
 

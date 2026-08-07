@@ -36,6 +36,29 @@ def read_construction_record(store: object, key: str) -> object | None:
     return _require_store(store).decode("construction", str(row["result_json"]))
 
 
+def read_definition_record(
+    store: object, portfolio_id: str, portfolio_version: str
+) -> object | None:
+    """Read one exact immutable Portfolio definition.
+
+    Args:
+        store: Portfolio persistence handle.
+        portfolio_id: Stable Portfolio identity.
+        portfolio_version: Exact immutable version.
+
+    Returns:
+        Decoded definition or ``None``.
+    """
+    row = _one_row(
+        "SELECT definition_json FROM portfolio_definitions "
+        "WHERE portfolio_id=? AND portfolio_version=?",
+        (portfolio_id, portfolio_version),
+    )
+    if row is None:
+        return None
+    return _require_store(store).decode("definition", str(row["definition_json"]))
+
+
 def read_active_allocation_record(
     store: object, portfolio_id: str, scope_key: str
 ) -> tuple[object, int] | None:
@@ -161,6 +184,7 @@ __all__ = [
     "read_allocation_history_records",
     "read_allocation_record",
     "read_construction_record",
+    "read_definition_record",
     "read_idempotency_record",
     "read_plan_record",
     "read_plan_version_records",

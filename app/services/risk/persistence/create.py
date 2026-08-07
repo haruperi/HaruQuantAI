@@ -438,6 +438,54 @@ def create_active_allocation_record(store: object, key: str, value: object) -> N
         raise ValueError("Risk active allocation could not be created")
 
 
+def create_policy_version(
+    config_hash: str,
+    policy_version: str,
+    profile: str,
+    payload_json: str,
+    effective_at: str,
+    request_id: str,
+    correlation_id: str,
+) -> bool:
+    """Insert one immutable Risk policy version or verify an idempotent replay.
+
+    Returns:
+        True if inserted or idempotently matched.
+
+    Raises:
+        ValueError: If identity or payload conflicts with an existing hash.
+    """
+    result = _execute(
+        (
+            "INSERT INTO risk_policy_versions "
+            "(config_hash, policy_version, profile, payload_json, effective_at, "
+            "request_id, correlation_id, created_at, updated_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(config_hash) DO UPDATE SET config_hash=excluded.config_hash "
+            "WHERE risk_policy_versions.payload_json=excluded.payload_json "
+            "AND risk_policy_versions.policy_version=excluded.policy_version "
+            "AND risk_policy_versions.profile=excluded.profile",
+        ),
+        (
+            (
+                config_hash,
+                policy_version,
+                profile,
+                payload_json,
+                effective_at,
+                request_id,
+                correlation_id,
+                effective_at,
+                effective_at,
+            ),
+        ),
+        request_id=request_id,
+    )
+    if result.affected_rows != 1:
+        raise ValueError("Risk policy version identity conflict")
+    return True
+
+
 __all__ = [
     "create_active_allocation_record",
     "create_allocation_review_record",
@@ -445,5 +493,6 @@ __all__ = [
     "create_audit_record",
     "create_decision_record",
     "create_eligibility_record",
+    "create_policy_version",
     "create_risk_runtime_store",
 ]

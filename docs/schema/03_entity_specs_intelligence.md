@@ -14,7 +14,13 @@ apply to every table below. All tables are `STRICT`.
 
 ---
 
-## Domain 9 — Analytics (`analytics_`)
+## Domain 9 — Analytics (no current tables)
+
+Analytics is a pure, read-only calculation domain. Migration step
+`001_analytics_schema_v1` is retained as immutable history; complete-manifest step
+`002_retire_unused_analytics_derived_store` drops its six empty, unreachable derived
+tables and refuses to proceed if any contains rows. The definitions below are
+historical shapes only and are not part of the current target schema.
 
 > Prefix `analytics_` is ratified (D1) and recorded in `docs/ARCHITECTURE.md`.
 
@@ -25,7 +31,7 @@ stale value is detectable rather than merely wrong.
 ### `analytics_metric_definitions`
 
 ```sql
-CREATE TABLE analytics_metric_definitions (
+HISTORICAL TABLE analytics_metric_definitions (
     metric_id TEXT PRIMARY KEY,
     metric_code TEXT NOT NULL,
     version TEXT NOT NULL,
@@ -48,7 +54,7 @@ CREATE TABLE analytics_metric_definitions (
 ### `analytics_metric_values`
 
 ```sql
-CREATE TABLE analytics_metric_values (
+HISTORICAL TABLE analytics_metric_values (
     value_id TEXT PRIMARY KEY,
     metric_id TEXT NOT NULL,
     scope_level TEXT NOT NULL,
@@ -79,7 +85,7 @@ CREATE INDEX idx_analytics_values_metric ON analytics_metric_values(metric_id, p
 ### `analytics_trade_analysis`
 
 ```sql
-CREATE TABLE analytics_trade_analysis (
+HISTORICAL TABLE analytics_trade_analysis (
     trade_id TEXT PRIMARY KEY,
     source_kind TEXT NOT NULL,
     run_id TEXT,
@@ -121,7 +127,7 @@ One row per closed round-trip. `mae_decimal` and `mfe_decimal` are why this exis
 ### `analytics_pnl_attribution`
 
 ```sql
-CREATE TABLE analytics_pnl_attribution (
+HISTORICAL TABLE analytics_pnl_attribution (
     attribution_id TEXT PRIMARY KEY,
     scope_level TEXT NOT NULL,
     scope_key TEXT NOT NULL,
@@ -145,7 +151,7 @@ Factors must sum to total PnL with `residual` absorbing the remainder. A large r
 ### `analytics_equity_curves`
 
 ```sql
-CREATE TABLE analytics_equity_curves (
+HISTORICAL TABLE analytics_equity_curves (
     curve_id TEXT PRIMARY KEY,
     scope_level TEXT NOT NULL,
     scope_key TEXT NOT NULL,
@@ -183,7 +189,7 @@ Curve **points** live in an artifact; this holds identity and summary statistics
 ### `analytics_reports`
 
 ```sql
-CREATE TABLE analytics_reports (
+HISTORICAL TABLE analytics_reports (
     report_id TEXT PRIMARY KEY,
     report_kind TEXT NOT NULL,
     scope_level TEXT NOT NULL,
@@ -210,6 +216,9 @@ CREATE INDEX idx_analytics_reports_scope ON analytics_reports(scope_level, scope
 > **This domain follows the live implementation.** A search is identified by
 > `search_id`, and its ranked candidates are stored as a payload rather than one row
 > per trial. The normalised job/trial decomposition below is target-only.
+> Current executable state is exactly `optimization_results` and
+> `optimization_checkpoints`; both are reached by the Optimization relational store,
+> while the complete manifest is applied only through Data's migration runner.
 
 ### `optimization_results`
 
@@ -1405,13 +1414,13 @@ because they are required before it can be reached.
 
 | Domain | Tables |
 |---|---|
-| Analytics | 6 |
+| Analytics | 0 current (6 historical retired shapes) |
 | Optimization | 5 |
 | Research | 6 |
 | Portfolio | 9 |
 | Agentic | 13 |
 | UI-API | 13 |
-| **Total** | **52** |
+| **Total** | **46 current** |
 
 ## Grand total
 
@@ -1419,10 +1428,10 @@ because they are required before it can be reached.
 |---|---|
 | [01](01_entity_specs_core.md) — Core | 25 |
 | [02](02_entity_specs_execution.md) — Execution | 26 |
-| 03 — Intelligence & Perimeter | 40 |
-| **All 14 domains** | **105** |
+| 03 — Intelligence & Perimeter | 46 current |
+| **All 14 domains** | **99 current** |
 
-All 105 `CREATE TABLE` statements in this model have been
+All 99 current `CREATE TABLE` statements in this model have been
 executed against a live SQLite engine to confirm they parse, that every declared
 foreign key resolves, and that every index target exists.
 

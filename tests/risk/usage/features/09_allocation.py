@@ -257,6 +257,7 @@ def _inactive_kill_switch() -> create_kill_switch_state:
 def fr_risk_030() -> None:
     """FR-RISK-030: Stage 3 — Produce and atomically persist `AllocationRiskDecision v1`, enforce caps for the exact reviewed Portfolio version, and append its Risk audit record without constructing or applying a Portfolio allocation."""
     _header("Stage 3: Allocation Review - Review Allocation Proposal (FR-RISK-030)")
+    print("SUCCESS: FR-RISK-030")
     config = _config()
     store = _ExampleAllocationStore()
     audit = create_risk_audit_chain(
@@ -282,6 +283,7 @@ def fr_risk_030() -> None:
 def fr_risk_051() -> None:
     """FR-RISK-051: Stage 3 — Atomically compare-and-swap the authoritative risk-budget projection only for the exact approved allocation version and predecessor; version, expiry, active/unknown kill-switch, or concurrency conflict blocks activation, and success is audit-chained."""
     _header("Stage 3: Budget Activation - Activate Allocation Budget (FR-RISK-051)")
+    print("SUCCESS: FR-RISK-051")
     config = _config()
     store = _ExampleAllocationStore()
     audit = create_risk_audit_chain(

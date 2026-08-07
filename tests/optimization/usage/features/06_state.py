@@ -5,7 +5,9 @@ Demonstrates FEAT-OPT-06 durable state store interface, search checkpointing, re
 
 from __future__ import annotations
 
+import os
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -15,9 +17,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.optimization import (
     build_optimization_artifact_path,
     build_optimization_evidence,
+    create_optimization_state_store,
     get_optimization_migrations,
     load_search_checkpoint,
     persist_optimization_result,
+    run_optimization_migrations,
     save_search_checkpoint,
 )
 from tests.optimization.usage._support import (
@@ -59,9 +63,12 @@ def fr_opt_050() -> None:
     The system shall define an injected store port limited to Optimization-owned checkpoint/result reads and atomic writes.
     """
     _header("Stage 1: State Store Port - Initialize Store Interface (FR-OPT-050)")
-    store = SqliteOptimizationStore()
+    store = create_optimization_state_store(
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        correlation_id="cor-22222222-2222-4222-8222-222222222222",
+    )
     print(_format_result(store))
-    print(f"Data -> store_path='{store.path}'")
+    print("Data -> store_kind='Data-backed Optimization relational store'")
 
 
 def fr_opt_051() -> None:
@@ -138,8 +145,28 @@ def fr_opt_055() -> None:
         "Stage 2: Migration Declarations - Get Optimization Migrations (FR-OPT-055)"
     )
     migrations = get_optimization_migrations()
-    print(_format_result(migrations))
-    print(f"Data -> migration_count={len(migrations)}")
+    with tempfile.TemporaryDirectory(prefix="optimization-usage-") as directory:
+        previous = {
+            name: os.environ.get(name)
+            for name in ("DATABASE_URL", "DATA_DIR", "ENVIRONMENT")
+        }
+        try:
+            os.environ["DATABASE_URL"] = "sqlite:///optimization.sqlite3"
+            os.environ["DATA_DIR"] = directory
+            os.environ["ENVIRONMENT"] = "dev"
+            response = run_optimization_migrations(
+                "req-33333333-3333-4333-8333-333333333333"
+            )
+        finally:
+            for name, value in previous.items():
+                if value is None:
+                    os.environ.pop(name, None)
+                else:
+                    os.environ[name] = value
+    print(_format_result(response))
+    print(
+        f"Data -> migration_count={len(migrations)}, migration_status='{response.status}'"
+    )
 
 
 def main() -> None:

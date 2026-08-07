@@ -145,19 +145,16 @@ def _policy(
     )
 
 
-def _body(runtime_profile: str = "paper", execution_route: str = "paper") -> Any:
-    """Build one boundary request declaring its own runtime.
+def _body(route: str = "paper") -> Any:
+    """Build one boundary request declaring its governed route.
 
     Args:
-        runtime_profile: Caller-declared runtime profile.
-        execution_route: Caller-declared execution route.
+        route: Caller-declared paper or live route.
 
     Returns:
         Minimal stand-in for the Trading mutation boundary DTO.
     """
-    return SimpleNamespace(
-        runtime_profile=runtime_profile, execution_route=execution_route
-    )
+    return SimpleNamespace(route=route)
 
 
 def test_runtime_policy_allows_a_matching_request() -> None:
@@ -165,15 +162,17 @@ def test_runtime_policy_allows_a_matching_request() -> None:
     trading_dependencies._enforce_runtime_policy(_policy(), _body())
 
 
-def test_runtime_policy_rejects_profile_and_route_mismatch() -> None:
-    """A deployment never relays a request declaring a different runtime."""
-    with pytest.raises(RuntimeError, match="TRADING_RUNTIME_PROFILE_MISMATCH"):
-        trading_dependencies._enforce_runtime_policy(
-            _policy(), _body(runtime_profile="live")
-        )
+def test_runtime_policy_rejects_route_mismatch() -> None:
+    """A deployment never relays a request declaring a different route."""
     with pytest.raises(RuntimeError, match="TRADING_EXECUTION_ROUTE_MISMATCH"):
+        trading_dependencies._enforce_runtime_policy(_policy(), _body(route="live"))
+
+
+def test_runtime_policy_rejects_missing_route_authority() -> None:
+    """A deployment without mutation-route authority fails closed."""
+    with pytest.raises(RuntimeError, match="TRADING_EXECUTION_ROUTE_MISSING"):
         trading_dependencies._enforce_runtime_policy(
-            _policy(), _body(execution_route="live")
+            _policy(execution_route="none"), _body()
         )
 
 
@@ -181,17 +180,13 @@ def test_runtime_policy_requires_explicit_live_enablement() -> None:
     """Live routing stays refused until it is deliberately enabled."""
     live_policy = _policy(runtime_profile="live", execution_route="live")
     with pytest.raises(RuntimeError, match="TRADING_LIVE_MUTATIONS_DISABLED"):
-        trading_dependencies._enforce_runtime_policy(
-            live_policy, _body(runtime_profile="live", execution_route="live")
-        )
+        trading_dependencies._enforce_runtime_policy(live_policy, _body(route="live"))
     enabled = _policy(
         runtime_profile="live", execution_route="live", allow_live_mutations=True
     )
-    trading_dependencies._enforce_runtime_policy(
-        enabled, _body(runtime_profile="live", execution_route="live")
-    )
+    trading_dependencies._enforce_runtime_policy(enabled, _body(route="live"))
 
 
 def test_runtime_policy_is_skipped_when_none_is_composed() -> None:
     """Without a composed policy the gateway adds no rule of its own."""
-    trading_dependencies._enforce_runtime_policy(None, _body(execution_route="live"))
+    trading_dependencies._enforce_runtime_policy(None, _body(route="live"))

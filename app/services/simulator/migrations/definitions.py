@@ -15,7 +15,14 @@ migrations; see ``FR-SIM-091`` and ``FR-SIM-092``.
 from hashlib import sha256
 from typing import Any
 
-from app.services.data import build_migration_step
+from app.services.data import (
+    build_migration_request,
+    build_migration_step,
+    run_domain_migrations,
+)
+from app.utils import get_logger
+
+logger = get_logger(__name__)
 
 _STATEMENTS = (
     (
@@ -70,4 +77,24 @@ SIMULATION_MIGRATIONS += (
     ),
 )
 
-__all__ = ["SIMULATION_MIGRATIONS"]
+
+def run_simulator_migrations(request_id: str) -> object:
+    """Apply the complete immutable Simulator migration manifest through Data.
+
+    Args:
+        request_id: Canonical startup request identifier.
+
+    Returns:
+        Data-owned standard migration response.
+    """
+    logger.info("Running Simulator-owned schema migrations")
+    request = build_migration_request(
+        domain="simulator",
+        steps=SIMULATION_MIGRATIONS,
+        request_id=request_id,
+        complete_manifest=True,
+    )
+    return run_domain_migrations(request)
+
+
+__all__ = ["SIMULATION_MIGRATIONS", "run_simulator_migrations"]

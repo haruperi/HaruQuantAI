@@ -1,6 +1,5 @@
 """Sequential replay and parallel determinism evidence for Analytics."""
 
-# ruff: noqa: INP001
 from concurrent.futures import ThreadPoolExecutor
 
 from app.utils import generate_id, get_logger

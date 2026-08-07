@@ -923,6 +923,18 @@ class PortfolioConstructRequest(_BaseApiContract):
     requested_at: datetime
 
 
+class PortfolioDefinitionRequest(_BaseApiContract):
+    """Exact API projection of an immutable Portfolio definition."""
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["portfolio.definition.v1"] = "portfolio.definition.v1"
+    portfolio_id: str
+    portfolio_version: str
+    scope: Mapping[str, str]
+    definition: Mapping[str, Any]
+    canonical_hash: str
+
+
 class PortfolioActivationRequest(_BaseApiContract):
     """Governed Portfolio activation command.
 
@@ -1711,6 +1723,7 @@ __all__ = (
     "PortfolioActivationRequest",
     "PortfolioComponentRunRequest",
     "PortfolioConstructRequest",
+    "PortfolioDefinitionRequest",
     "PortfolioDriftRequest",
     "PortfolioEvidenceReferenceSet",
     "PortfolioFixedWeightInput",

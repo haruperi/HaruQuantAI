@@ -26,12 +26,12 @@ from app.services.research import (
 
 def _feature_header(title: str) -> None:
     """Print the feature header banner."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"SUCCESS: {title}")
 
 
 def _header(title: str) -> None:
     """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"SUCCESS: {title}")
 
 
 def _format_result(obj: Any) -> str:
@@ -71,7 +71,6 @@ def _ohlc(rows: int = 25) -> pd.DataFrame:
 def fr_res_081() -> None:
     """FR-RES-081: Scale selected finite features and return PCA evidence."""
     _header("FR-RES-081: Scale selected finite features and return PCA evidence.")
-    print("Research Example 10: Unsupervised Modeling")
     pca = run_pca(_features(), config=_config())
     print(f"FR-RES-081 components={pca['n_components']}")
 

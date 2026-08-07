@@ -105,6 +105,7 @@ def test_config_hash_is_stable_and_sensitive() -> None:
     same = RiskConfig.model_validate(_config_values())
     changed_values = _config_values()
     changed_values["max_daily_loss"] = Decimal("0.04")
+    changed_values["max_daily_loss_pct"] = Decimal("0.04")
     changed = RiskConfig.model_validate(changed_values)
     first = unwrap_risk_response(
         compute_config_hash(config), operation="compute_config_hash"

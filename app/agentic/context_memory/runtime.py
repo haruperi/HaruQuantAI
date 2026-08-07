@@ -6,10 +6,12 @@ from typing import cast
 
 from pydantic import BaseModel
 
-from app.agentic.context_memory.models import MemoryRecord
+from app.agentic.context_memory.models import EvidenceClaim, MemoryRecord
 from app.agentic.persistence import (
     create_agentic_persistence_store,
+    create_evidence_claim,
     create_memory_record,
+    read_evidence_claims,
     read_memory_records,
 )
 
@@ -34,7 +36,30 @@ class DurableMemoryStore:
     def __init__(self) -> None:
         """Build the relational persistence handle."""
         self._store = create_agentic_persistence_store(
-            {"memory": (_encode, MemoryRecord.model_validate_json)}
+            {
+                "evidence": (_encode, EvidenceClaim.model_validate_json),
+                "memory": (_encode, MemoryRecord.model_validate_json),
+            }
+        )
+
+    def append_claim(self, claim: EvidenceClaim) -> EvidenceClaim:
+        """Append one governed evidence claim.
+
+        Returns:
+            Appended claim.
+        """
+        create_evidence_claim(self._store, claim)
+        return claim
+
+    def list_claims(self, task_id: str) -> tuple[EvidenceClaim, ...]:
+        """List governed evidence claims for one task.
+
+        Returns:
+            Point-in-time ordered claims.
+        """
+        return cast(
+            "tuple[EvidenceClaim, ...]",
+            read_evidence_claims(self._store, task_id, 1_000),
         )
 
     def append(self, record: MemoryRecord) -> MemoryRecord:

@@ -22,12 +22,12 @@ from app.services.research import (
 
 def _feature_header(title: str) -> None:
     """Print the feature header banner."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"SUCCESS: {title}")
 
 
 def _header(title: str) -> None:
     """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"SUCCESS: {title}")
 
 
 def _format_result(obj: Any) -> str:

@@ -1,6 +1,5 @@
 """Integration evidence for Analytics report comparison."""
 
-# ruff: noqa: INP001
 from decimal import Decimal
 
 from app.services.analytics import compare_performance_reports

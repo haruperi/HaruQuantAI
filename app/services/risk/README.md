@@ -341,6 +341,503 @@ flowchart LR
 > with `python tests/risk/usage/workflows/run_all.py`. This satisfies
 > `NFR-RISK-010`; retired `WF-RISK-013` has no program.
 
+### Pipeline
+
+Risk is the independent gate between a Strategy signal and Trading execution. It never executes the trade itself. Its final output is an immutable decision: approve, needs approval, block, or reject.
+
+#### End-to-end Risk pipeline
+
+1. Receive a Strategy signal
+  ↓
+2. Construct immutable trade intent lineage
+  ↓
+3. Construct the Risk-owned proposed trade
+  ↓
+4. Collect virtual account, position and pending-order evidence
+  ↓
+5. Build the immutable portfolio snapshot
+  ↓
+6. Select and hash the active Risk policy
+  ↓
+7. Validate identities, environment, lineage and timestamps
+  ↓
+8. Assemble the complete kill-switch hierarchy
+  ↓
+9. Validate evidence freshness
+  ↓
+10. Assess the supplied market regime
+  ↓
+11. Evaluate portfolio limits in fixed precedence
+  ↓
+12. Evaluate market and execution-context limits
+  ↓
+13. Calculate or disclose the regime-capped requested size
+  ↓
+14. Project post-trade gross exposure
+  ↓
+15. Apply concurrent-capacity protection
+  ↓
+16. Determine authenticated approval requirements
+  ↓
+17. Invoke the canonical review_trade_risk() governor
+  ↓
+18. Inspect every ordered RiskLimitResult
+  ↓
+19. Inspect the final RiskDecisionPackage
+  ↓
+20. Inspect the scoped approval token when approved
+  ↓
+21. Verify the tamper-evident audit entry
+  ↓
+22. Illustrate the Trading revalidation and token-consumption handoff
+  ↓
+23. Illustrate post-trade evidence refresh using a virtual closed trade
+  ↓
+24. Illustrate continuing monitoring and kill-switch remediation
+
+#### 1. Receive a Strategy signal
+
+A Strategy identifies a potential trade, for example:
+
+EURUSD
+BUY
+entry around 1.1000
+stop loss 1.0950
+take profit 1.1100
+strategy: trend-following-v3
+
+A signal is only an analytical result. It has no authority to place an order.
+
+#### 2. Construct immutable trade intent lineage
+
+Strategy converts the signal into an immutable trade intent containing:
+
+- Intent ID
+- Strategy ID and version
+- Symbol
+- OPEN, INCREASE, REDUCE, or CLOSE
+- Buy or sell direction
+- Proposed entry, stop and target
+- Requested size, if Strategy supplies one
+- Account and portfolio identity
+- Request, workflow and correlation IDs
+- Creation and expiration timestamps
+
+Risk retains the complete Strategy intent for lineage.
+
+#### 3. Construct the Risk-owned proposed trade
+
+The system packages the intent into a Risk-owned ProposedTrade.
+
+The proposal adds facts required to evaluate risk:
+
+- Account ID
+- Risk profile
+- Current market price
+- Market observation time
+- Requested size
+- Stop-loss distance
+- Proposal expiry
+- Authenticated request identity
+- Strategy intent lineage
+
+Conflicting duplicated facts are rejected. For example, if the Strategy intent says EURUSD but the market evidence says GBPUSD, Risk fails closed.
+
+#### 4. Collect current account, position and pending-order evidence
+
+Risk requires point-in-time evidence rather than reading or inventing values itself.
+
+The input set normally includes:
+
+- Account balance, equity and available margin
+- Existing portfolio positions and exposures
+- Pending-order exposure
+- Daily and cumulative loss
+- Current drawdown
+- Symbol, currency and correlated exposure
+- Effective leverage
+- Historical VaR and CVaR evidence
+- Current spread and market state
+- Volatility and correlation regime evidence
+- Applicable firm mandate
+- Kill-switch states
+- Authenticated principal and permissions
+- Current policy configuration
+
+Evidence carries timestamps and provenance references. Missing required evidence does not become zero.
+
+#### 5. Build the immutable portfolio snapshot
+
+Risk normalizes the supplied account and portfolio facts into an immutable PortfolioRiskSnapshot.
+
+It calculates or records:
+
+- Balance and equity
+- Daily and total loss
+- Portfolio drawdown
+- Gross and net exposure
+- Exposure by symbol
+- Exposure by currency or another dimension
+- Margin utilization
+- Free-margin evidence
+- Effective leverage
+- Portfolio correlation
+- Historical VaR and CVaR
+- Existing strategy and position exposure
+- Evidence timestamps and references
+
+The snapshot is bound to:
+
+- Account
+- Request and workflow
+- Observation time
+- Risk configuration hash
+- Source evidence
+
+#### 6. Select and hash the active Risk policy
+
+The appropriate Risk policy is selected, such as:
+
+- personal-account-default-v1
+- prop-firm-default-v1
+- A later account-specific policy
+- A verified firm-specific mandate
+
+Risk computes the canonical SHA-256 configuration hash. The proposal, snapshot and eventual decision must all reference the same configuration.
+
+A policy mismatch blocks the request.
+
+The two defaults currently stored are paper-route policies; neither grants live-trading permission.
+
+#### 7. Validate identities, environment, lineage , timestamps and request boundaries
+
+Before evaluating limits, Risk validates:
+
+- Contract and schema versions
+- Request, workflow and correlation IDs
+- Account identity
+- Strategy and intent identity
+- Symbol identity
+- Risk profile and execution environment
+- Proposal expiration
+- UTC timestamps and clock skew
+- Snapshot configuration hash
+- Market observation binding
+- Authenticated caller identity and environment
+- Firm-mandate verification, when applicable
+
+Any inconsistency fails closed.
+
+#### 8. Assemble the complete kill-switch hierarchy
+
+Kill switches are evaluated before ordinary limits.
+
+The complete applicable hierarchy can include:
+
+1. Global kill switch
+2. Portfolio kill switch
+3. Strategy kill switch
+4. Symbol kill switch
+
+If any applicable state is active, the proposed risk increase is blocked.
+
+For live-sensitive processing, an incomplete or unknown kill-switch hierarchy also blocks. No caller can override it.
+
+#### 9. Validate evidence freshness
+
+Risk checks each evidence timestamp against the active policy's maximum age.
+
+Examples:
+
+- Portfolio evidence must be no older than its configured limit.
+- Market evidence must be no older than its configured limit.
+- The decision clock must remain within the permitted clock-skew tolerance.
+- Proposal and mandate evidence must still be valid.
+
+Missing, stale or future-dated evidence produces a blocking result rather than a substituted value.
+
+#### 10. Assess the supplied market regime
+
+Risk classifies the supplied market environment using evidence such as:
+
+- Volatility
+- Correlation
+- Drawdown state
+- Crisis-window evidence
+
+The regime might be normal, elevated, high-risk, crisis, or unknown.
+
+A regime modifier may reduce permitted size. For example:
+
+Requested size: 1.00 lot
+High-risk modifier: 0.50
+Regime-capped size: 0.50 lot
+
+Unknown required regime evidence blocks live-sensitive decisions.
+
+#### 11. Evaluate portfolio limits in fixed precedence
+
+Risk produces an ordered RiskLimitResult for every applicable check.
+
+The existing portfolio evaluator checks:
+
+1. Portfolio evidence freshness
+2. Snapshot consistency
+3. Daily loss
+4. Total loss
+5. Portfolio drawdown
+6. Symbol concentration
+7. Other configured concentration dimensions
+8. Margin utilization
+9. Effective leverage
+10. Historical VaR
+11. Historical CVaR
+12. Portfolio correlation
+
+A verified prop-firm mandate can replace generic daily-loss and drawdown limits with the firm's actual rules.
+
+The first failure becomes primary_failure_limit. All failures are retained as ordered composite_breach_flags.
+
+#### 12. Evaluate market and execution-context limits
+
+Market-context checks evaluate applicable conditions such as:
+
+- Spread
+- Trading session
+- Calendar/news blackout
+- Market-context freshness
+- Required market evidence
+
+The new policies also contain:
+
+- Maximum and preferred risk per trade
+- Daily, weekly and monthly loss limits
+- Portfolio, strategy and symbol drawdown limits
+- Symbol, currency-cluster and correlated exposure limits
+- Total, gross and net exposure limits
+- Leverage and margin limits
+- Position, order, strategy and trade-count ceilings
+- Consecutive-loss limit
+- Spread, slippage, commission and swap limits
+- Kill-switch loss and drawdown thresholds
+
+Important distinction: a configured limit is evaluated only when trustworthy evidence for it is supplied. Missing required evidence must block; it must not be treated as passing.
+
+#### 13. Calculate pozition size and / or disclose the regime-capped requested size
+
+Position sizing is deterministic and cannot approve a trade on its own.
+
+Inputs can include:
+
+- Account equity
+- Preferred and maximum risk per trade
+- Entry price
+- Stop-loss price or distance
+- Instrument point/tick value
+- Contract size
+- Minimum and maximum volume
+- Volume step
+- Existing exposure
+- Volatility or correlation adjustment
+- Regime modifier
+- Margin constraints
+
+Conceptually:
+
+risk capital = equity * permitted risk percentage
+
+raw size = risk capital / loss per unit at stop
+
+approved size = floor raw size to broker volume step
+
+Risk then caps the result using:
+
+- Maximum trade risk
+- Symbol and portfolio exposure
+- Available margin
+- Leverage
+- Strategy allocation
+- Regime modifier
+- Broker volume constraints
+
+If the stop or instrument valuation evidence is absent, Risk cannot safely calculate size.
+
+#### 14. Project post-trade gross exposure
+
+Risk evaluates the portfolio as it would look after the proposed trade.
+
+The current governor explicitly calculates:
+
+projected gross exposure
+    = current gross exposure
+    + abs(regime-capped size * current price)
+
+The proposal must not pass merely because the current portfolio is within limits. The projected portfolio must remain acceptable too.
+
+Pending orders must be included according to the configured policy or the operation blocks if their exposure cannot be established.
+
+#### 15. Apply concurrent-capacity protection
+
+Two individually valid trades might become unsafe if approved simultaneously.
+
+For a risk-increasing action, Risk therefore performs a concurrency or capacity gate:
+
+- Derive an identity from the intent, configuration hash and size.
+- Reserve account/strategy/symbol capacity.
+- Bind the reservation to an expiry.
+- Treat an exact existing reservation as idempotent.
+- Block if capacity is unavailable.
+- Fail closed if the capacity dependency is unavailable.
+
+Where no external capacity guard is configured, atomic approval-token consumption provides the double-spend protection.
+
+Risk-reducing actions do not need a risk-increase capacity reservation.
+
+#### 16. Determine authenticated approval requirements
+
+After the safety checks:
+
+- A blocked limit produces BLOCK or REJECT.
+- A safe risk-reducing action may proceed according to policy.
+- A safe risk-increasing action without the required attestation becomes NEEDS_APPROVAL.
+- A valid authenticated attestation allows approval processing to continue.
+
+The attestation must match:
+
+- Decision
+- Workflow
+- Action
+- Scope
+- Authenticated principal
+- Risk configuration
+- Validity period
+
+#### 17. Invoke the canonical review_trade_risk() governor
+
+Risk executes the single canonical `review_trade_risk()` governor function to evaluate all inputs, checks, sizing, concurrency, attestation, and audit persistence in fixed precedence.
+
+#### 18. Inspect every ordered RiskLimitResult
+
+The governor returns an ordered sequence of typed `RiskLimitResult` items, recording each evaluated limit, its precedence, pass/fail status, and reason code.
+
+#### 19. Inspect the final RiskDecisionPackage
+
+Risk creates an immutable RiskDecisionPackage containing:
+
+- Decision ID
+- Intent ID
+- Requested size
+- Approved size, if approved
+- Final state (APPROVE, NEEDS_APPROVAL, BLOCK, or REJECT)
+- Every ordered check
+- Primary failure limit
+- Composite breach flags
+- Evidence references
+- Configuration hash
+- Concurrency disclosure
+- Recommendations
+- Issue and expiration times
+- Request, workflow and correlation IDs
+- Optional approval token
+
+approved_size is absent unless the decision is approved.
+
+#### 20. Inspect the scoped approval token when approved
+
+For an approved risk-increasing action, Risk issues a short-lived approval token.
+
+The token is bound to:
+
+- Decision ID
+- Intent and action
+- Account and scope
+- Approved size
+- Workflow identity
+- Configuration hash
+- Expiration
+- Authenticated attestation
+
+The token does not grant general trading authority. It authorizes only the exact approved action.
+
+#### 21. Verify the tamper-evident audit entry
+
+Before returning the decision, Risk appends an audit record containing:
+
+- Decision and event identity
+- Ordered results
+- Evidence references
+- Configuration hash
+- Request and correlation IDs
+- Timestamp
+- Previous audit-record hash
+- Current record hash
+
+If mandatory audit persistence fails, approval fails closed.
+
+The decision is also eligible for durable storage in risk_decision_snapshots, while policy versions, approval state and kill-switch state use their respective Risk tables.
+
+#### 22. Illustrate the Trading revalidation and token-consumption handoff
+
+Risk returns the decision to the workflow coordinator. Risk does not send the order to the broker.
+
+Outcomes:
+
+- BLOCK or REJECT: stop the workflow.
+- NEEDS_APPROVAL: obtain a valid human attestation and repeat the controlled approval stage.
+- APPROVE: forward the exact decision, approved size and token to Trading.
+
+Before execution, Trading verifies:
+
+- Decision has not expired.
+- Intent, account, symbol and action match.
+- Approved size has not been increased.
+- Configuration hash matches.
+- Risk decision and token refer to one another.
+- Environment and route match.
+- Kill-switch state has not invalidated execution.
+- Required market and account evidence remains current.
+
+A changed order must return to Risk. Trading cannot enlarge the size or alter the risk-bearing terms.
+
+Immediately before the risk-increasing side effect, the approval token is:
+
+1. Validated
+2. Reserved
+3. Atomically consumed
+4. Audited
+
+A consumed token cannot be reused. Concurrent attempts result in only one valid consumer. Unknown token state or persistence failure blocks execution.
+
+#### 23. Illustrate post-trade evidence refresh using a virtual closed trade
+
+Trading may submit the approved order to simulation, paper or live execution. The order remains governed by:
+
+- Exact approved size
+- Exact account and symbol
+- Approved order action
+- Environment boundary
+- Idempotency controls
+
+A broker rejection or uncertain execution outcome does not cause Risk or Trading to invent a fill.
+
+After broker authority evidence arrives:
+
+- Trading records authoritative events.
+- Reduce exposure
+- Close positions
+- Pause a strategy
+- Require review
+
+Trading owns execution of those actions. Risk owns the decision and non-bypassable block state.
+
+#### 24. Illustrate continuing monitoring and kill-switch remediation
+
+Risk continues active monitoring of portfolio states. If a global, portfolio, strategy, or symbol kill switch is activated, all subsequent proposed risk increases are immediately blocked with non-bypassable enforcement.
+
+The essential rule is:
+
+> A signal becomes executable only after its identity, evidence, policy, kill-switch state, limits, size, concurrency, approval and audit trail all agree. Any uncertainty blocks the risk increase.
+
 ### Workflow rank values
 
 | Rank | Identifier | Meaning |
@@ -983,8 +1480,17 @@ by the selected profile. Missing paper/live configuration still fails closed.
 | Completed | `FR-RISK-063` | Define an immutable per-account firm mandate record carrying firm identity, product model, phase, initial balance, the archived terms URL, access date and terms content hash, and an explicit `verified` flag. | `create_firm_mandate` | None | `ValidationError`: missing terms provenance or unknown drawdown mode | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_063()`<br>**Unit:** `tests/risk/unit/test_mandate.py::test_mandate_requires_terms_hash()` |
 | Completed | `FR-RISK-064` | Refuse every limit evaluation for an account whose mandate is unverified or whose archived terms hash no longer matches, failing closed rather than falling back to a profile default. | `load_firm_mandate(account_id: str, config_root: Path) -> create_firm_mandate` | Read-only | `RiskDomainError(INVALID_RISK_CONFIG)`: unverified mandate or terms hash mismatch | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_064()`<br>**Unit:** `tests/risk/unit/test_mandate.py::test_unverified_mandate_blocks_evaluation()` |
 | Completed | `FR-RISK-065` | Expose the drawdown mode, its reference basis, whether it trails unrealised equity, whether a ratchet ceiling applies, and any end-of-day snapshot time and timezone as required configuration. | `DrawdownMode`, `RiskConfig.drawdown_mode` | None | `ValidationError`: mode absent, or `trailing_eod` without a snapshot time and timezone | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_065()`<br>**Unit:** `tests/risk/unit/test_profiles.py::test_trailing_eod_requires_snapshot_time()` |
+| Completed | `FR-RISK-076` | Register durable Risk policy version by canonical configuration hash and effective timestamp. | `register_risk_policy(config: RiskConfig, *, effective_at: datetime, request_id: str, correlation_id: str) -> StandardResponse[str]` | Insert row into `risk_policy_versions` | `RiskDomainError(INVALID_RISK_CONFIG, VALIDATION_FAILED)` | **Unit:** `tests/risk/unit/test_runtime_policy.py::test_register_and_get_risk_policy_end_to_end()` |
+| Completed | `FR-RISK-077` | Retrieve registered durable Risk policy version by canonical configuration hash. | `get_risk_policy(config_hash: str) -> StandardResponse[RiskConfig]` | Read row from `risk_policy_versions` | `RiskDomainError(VALIDATION_FAILED, MISSING_EVIDENCE, INVALID_RISK_CONFIG)` | **Unit:** `tests/risk/unit/test_runtime_policy.py::test_register_and_get_risk_policy_end_to_end()` |
+| Completed | `FR-RISK-078` | Construct the personal-account paper default with every registered operational limit represented as exact validated policy data. | `build_personal_account_risk_config()` | None | `ValidationError`: contradictory limit | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_078()` **Unit:** `tests/risk/unit/test_default_policies.py::test_default_policies_contain_every_registered_operational_limit()` |
+| Completed | `FR-RISK-079` | Construct the stricter generic prop-firm paper default without claiming firm-specific terms. | `build_prop_firm_risk_config()` | None | `ValidationError`: contradictory limit | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_079()` **Unit:** `tests/risk/unit/test_default_policies.py::test_default_policies_contain_every_registered_operational_limit()` |
+| Completed | `FR-RISK-080` | Register both defaults idempotently through the immutable policy-version boundary. | `register_default_risk_policies(*, effective_at, request_id, correlation_id)` | Insert two `risk_policy_versions` rows | Standard Risk persistence errors | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_080()` **Unit:** `tests/risk/unit/test_default_policies.py::test_default_policy_registration_round_trips_idempotently()` |
+| Completed | `FR-RISK-081` | Validate preferred/maximum risk, ordered losses, kill-switch ordering, count ceilings, and legacy field aliases, failing closed on contradictions. | `RiskConfig` validation | None | `ValidationError`: invalid relationship | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_081()` **Unit:** `tests/risk/unit/test_profiles.py` |
 
 **Rules and implementation notes:**
+
+- The registered operational keys are `max_risk_per_trade_pct`, `preferred_risk_per_trade_pct`, `max_daily_loss_pct`, `max_weekly_loss_pct`, `max_monthly_loss_pct`, `max_portfolio_drawdown_pct`, `max_strategy_drawdown_pct`, `max_symbol_drawdown_pct`, `max_symbol_exposure_pct`, `max_currency_cluster_exposure_pct`, `max_correlated_exposure_pct`, `max_total_exposure_pct`, `max_gross_exposure_pct`, `max_net_exposure_pct`, `max_leverage`, `max_total_margin_usage_pct`, `min_free_margin_pct`, `min_margin_level_pct`, `max_open_positions`, `max_pending_orders`, `max_live_strategies`, `max_trades_per_day`, `max_trades_per_strategy_per_day`, `max_consecutive_losses`, `max_spread_pips_default`, `max_slippage_pips_default`, `max_commission_burden_pct`, `max_swap_burden_pct`, `approval_token_ttl_seconds`, `kill_switch_daily_loss_pct`, and `kill_switch_portfolio_drawdown_pct`.
+- `personal-account-default-v1` and `prop-firm-default-v1` are paper-route defaults. They are not account assignments, live authorization, or substitutes for a verified firm mandate.
 
 - Implement threshold/hash logic from this specification; use no hidden defaults and no direct environment/provider reads.
 - Numeric risk limits are owner policy. The defaults are configurable starting

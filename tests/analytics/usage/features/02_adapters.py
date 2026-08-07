@@ -43,14 +43,14 @@ def _format_result(obj: Any) -> str:
     type_name = cls.__name__
     if hasattr(cls, "model_fields"):
         keys = ", ".join(cls.model_fields.keys())
-        return f"Output Result -> {type_name}({keys}) : {type_name}"
+        return f"SUCCESS: Output Result -> {type_name}({keys}) : {type_name}"
     if isinstance(obj, dict):
         keys = ", ".join(obj.keys())
-        return f"Output Result -> dict({keys}) : dict"
+        return f"SUCCESS: Output Result -> dict({keys}) : dict"
     if hasattr(obj, "__dict__"):
         keys = ", ".join(vars(obj).keys())
-        return f"Output Result -> {type_name}({keys}) : {type_name}"
-    return f"Output Result -> {type_name} : {type_name}"
+        return f"SUCCESS: Output Result -> {type_name}({keys}) : {type_name}"
+    return f"SUCCESS: Output Result -> {type_name} : {type_name}"
 
 
 def _config() -> AnalyticsRunConfig:

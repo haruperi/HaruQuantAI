@@ -30,6 +30,12 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
+def _run_example(requirement: str, example: Any) -> None:
+    """Run one requirement example and print explicit success evidence."""
+    example()
+    print(f"SUCCESS: {requirement}")
+
+
 def _format_result(obj: Any) -> str:
     """Dynamically format the output result type name and field/key signature."""
     cls = type(obj)
@@ -187,15 +193,15 @@ def main() -> None:
     )
 
     # Stage 1: Schemas & Invariants
-    fr_port_002()
-    fr_port_003()
-    fr_port_004()
+    _run_example("FR-PORT-002", fr_port_002)
+    _run_example("FR-PORT-003", fr_port_003)
+    _run_example("FR-PORT-004", fr_port_004)
 
     # Stage 2: Strict Validation
-    fr_port_001()
+    _run_example("FR-PORT-001", fr_port_001)
 
     # Stage 3: Contract Construction
-    fr_port_005()
+    _run_example("FR-PORT-005", fr_port_005)
 
 
 if __name__ == "__main__":

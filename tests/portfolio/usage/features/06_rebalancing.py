@@ -14,7 +14,11 @@ from typing import Any
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.portfolio import create_portfolio_value
+from app.services.portfolio import (
+    assess_common_mode_exposure,
+    create_portfolio_value,
+    measure_cross_account_correlation,
+)
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 
@@ -27,6 +31,12 @@ def _feature_header(title: str) -> None:
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _run_example(requirement: str, example: Any) -> None:
+    """Run one requirement example and print explicit success evidence."""
+    example()
+    print(f"SUCCESS: {requirement}")
 
 
 def _format_result(obj: Any) -> str:
@@ -171,6 +181,35 @@ def fr_port_024() -> None:
     print(f"Data -> status='{plan.status}', block_reasons={list(plan.block_reasons)}")
 
 
+def fr_port_039() -> None:
+    """FR-PORT-039: Measure deterministic cross-account correlation."""
+    report = measure_cross_account_correlation(
+        {
+            "a": (Decimal("0.01"), Decimal("0.02")),
+            "b": (Decimal("0.02"), Decimal("0.04")),
+        },
+        {"a": (Decimal(-1), Decimal(1)), "b": (Decimal(-1), Decimal(1))},
+        {"a": "broker-a", "b": "broker-b"},
+        window=2,
+        alert_threshold=Decimal("0.60"),
+    )
+    print(_format_result(report))
+    print(f"Data -> alert_pairs={report.alert_pairs}")
+
+
+def fr_port_040() -> None:
+    """FR-PORT-040: Aggregate common-mode loss-at-stop exposure."""
+    report = assess_common_mode_exposure(
+        {"a": {"EURUSD": Decimal(100)}, "b": {"EURUSD": Decimal(200)}},
+        {"a": Decimal(50), "b": Decimal(50)},
+        {"EURUSD": Decimal(1)},
+        software_dependencies={"a": ("runtime",), "b": ("runtime",)},
+        signal_dependencies={"a": ("trend",), "b": ("trend",)},
+    )
+    print(_format_result(report))
+    print(f"Data -> aggregate={dict(report.aggregate_loss_at_stop_by_factor)}")
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -183,15 +222,17 @@ def main() -> None:
     )
 
     # Stage 1: Binding
-    fr_port_020()
+    _run_example("FR-PORT-020", fr_port_020)
 
     # Stage 2: Calculation & Action Guard
-    fr_port_021()
-    fr_port_022()
-    fr_port_023()
+    _run_example("FR-PORT-021", fr_port_021)
+    _run_example("FR-PORT-022", fr_port_022)
+    _run_example("FR-PORT-023", fr_port_023)
 
     # Stage 3: Blocking Interlocks
-    fr_port_024()
+    _run_example("FR-PORT-024", fr_port_024)
+    _run_example("FR-PORT-039", fr_port_039)
+    _run_example("FR-PORT-040", fr_port_040)
 
 
 if __name__ == "__main__":

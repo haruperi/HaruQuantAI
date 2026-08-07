@@ -61,7 +61,7 @@ actually contains and this model states what it should become.
 | **Engine strategy** | SQLite-native equivalents for JSONB/hypertables (owner-selected) |
 | **Authored** | 2026-08-03 |
 | **Approval** | Dry-Run Plan 1 (authored), Dry-Run Plan 2 Phase 0 (promoted) |
-| **Entities** | 105 tables across 14 domains |
+| **Entities** | 99 current target tables across 14 domains; Analytics owns none |
 | **Storage model** | MT5 broker is the runtime source; Parquet is the pinned store; SQLite holds system state + a Parquet catalog. **No bulk series in the database.** |
 | **Verified** | All DDL executed against a live SQLite engine; FK targets, index targets, audit columns, prefix ownership, `STRICT` mode, and absence of `REAL` monetary columns all checked programmatically |
 
@@ -74,7 +74,7 @@ actually contains and this model states what it should become.
 | [00_domain_relationship_map.md](00_domain_relationship_map.md) | Ownership model, dependency DAG, cross-domain FK policy, universal conventions |
 | [01_entity_specs_core.md](01_entity_specs_core.md) | Utils, Brokers, Data, Indicators — 22 tables |
 | [02_entity_specs_execution.md](02_entity_specs_execution.md) | Strategy, Risk, Trading, Simulator — 26 tables |
-| [03_entity_specs_intelligence.md](03_entity_specs_intelligence.md) | Analytics, Optimization, Research, Portfolio, Agentic, UI-API — 52 tables |
+| [03_entity_specs_intelligence.md](03_entity_specs_intelligence.md) | Analytics, Optimization, Research, Portfolio, Agentic, UI-API — 46 current tables plus six historical retired Analytics shapes |
 | [04_indexing_and_performance.md](04_indexing_and_performance.md) | PRAGMAs, Parquet layout, catalog-then-file read paths, index catalogue, throughput |
 | [05_reconciliation.md](05_reconciliation.md) | **Live vs. proposal diff, adoption tiers, resolution of D4** |
 
@@ -146,10 +146,9 @@ written into the section named, and the row is retained here only as a pointer.
 | D4 | Adoption scope | Rewrite migration definitions for the **7 never-applied** REBUILD tables to match this model before first apply — zero ledger and zero data risk. The **6 applied** tables (`api_accounts`, `api_sessions`, `strategy_versions`, `strategy_configs`, `strategy_checkpoints`, `data_migration_ledger`) stay divergent and documented in [05](05_reconciliation.md). |
 | D8 | Sidecar manifest vs. SQLite catalog | **Sidecar authoritative; catalog is a rebuildable index.** A corrupt catalog is a rescan; a lost sidecar is data loss. Recorded in [00](00_domain_relationship_map.md) §0, [01](01_entity_specs_core.md) Domain 3, and [04](04_indexing_and_performance.md) §8. |
 | D9 | Normalised columns vs. `*_json` payload | **Hybrid rule.** Normalise only what is filtered/joined, `CHECK`-enforceable, or part of a unique key. Recorded in [00](00_domain_relationship_map.md) §8. |
-| D10 | Brokers and Analytics persistence | Brokers stays stateless (`broker_symbol_map` only); Analytics owns a derived store. Recorded in `docs/PROJECT.md` §5. |
+| D10 | Brokers and Analytics persistence | Brokers retains only `broker_symbol_map`; Analytics is read-only and its empty unreachable derived store is retired by guarded complete-manifest migration step `002`. Recorded in `docs/PROJECT.md` §5. |
 | D12 | Migration-definition location | `app/services/<domain>/migrations/`. Relocation is an import-path refactor, not a checksum risk. |
 | D13 | Authority form for `docs/schema/` | Canonical for cross-domain structure and the target model; owning package READMEs stay canonical for current state. `AGENTS.md` §1 unchanged. |
-| D14 | Immutable Portfolio definition history | **Split.** `portfolio_definitions` holds identity; `portfolio_definition_versions` holds append-only configuration history. Satisfies `PROJECT.md` §5 without breaking child foreign keys. |
 
 ---
 
@@ -165,7 +164,7 @@ worth reviewing:
 | Orders cannot exist without a risk decision | `trading_orders.risk_decision_id NOT NULL` | The admission gate is unbypassable |
 | Kill-switch reset requires a recorded approval | `risk_kill_switch_states` CHECK | `AGENTS.md` §3 "No caller can override" |
 | One active allocation per portfolio | `idx_risk_allocation_active` unique partial | No ambiguity about which budget applied |
-| One open position per account/symbol/side | `idx_trading_pos_open` unique partial | Netting invariant |
+| Closed-trade history by account and exit | `idx_trading_positions_account_exit` | Bounded history lookup |
 | Agents cannot hold mutating permissions | `agentic_agents.permission_class` CHECK | Classes are unrepresentable, not merely refused |
 | Order/kill-switch/deploy tools unregistrable | `agentic_tools` CHECKs | `FEAT-AGT-05` deny-by-default |
 | No wildcard scopes | `agentic_tool_grants`, `api_permissions` CHECKs | Absence of a grant is a denial |

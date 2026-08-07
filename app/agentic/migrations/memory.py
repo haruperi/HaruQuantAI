@@ -28,6 +28,8 @@ _EVIDENCE_STATEMENT = (
     "available_at TEXT NOT NULL, "
     "observed_at TEXT NOT NULL, "
     "content_hash TEXT NOT NULL, "
+    "confidence_basis TEXT NOT NULL, "
+    "falsifier TEXT NOT NULL, "
     "injection_status TEXT NOT NULL, "
     "request_id TEXT NOT NULL DEFAULT '', "
     "correlation_id TEXT NOT NULL DEFAULT '', "

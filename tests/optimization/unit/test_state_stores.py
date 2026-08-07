@@ -1,7 +1,7 @@
 """Tests for Optimization checkpoint store coordination."""
 
 import pytest
-from app.services.optimization.errors import OptimizationError
+from app.services.optimization.contracts import OptimizationError
 from app.services.optimization.state import (
     load_search_checkpoint,
     save_search_checkpoint,

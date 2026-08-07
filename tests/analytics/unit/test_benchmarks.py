@@ -21,7 +21,10 @@ from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 
-from tests.analytics.unit.test_results_adapter import _config, _source  # noqa: E402
+from tests.analytics.component.test_results_adapter import (  # noqa: E402
+    _config,
+    _source,
+)
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 _GOLDEN_DIRECTORY = Path("tests/analytics/fixtures/golden")

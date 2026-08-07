@@ -309,9 +309,6 @@ def main() -> None:
 
     from app.utils import create_auth_context
 
-    art_root = Path(tempfile.mkdtemp()) / "artifacts"
-    art_config = create_research_value("ArtifactWriteConfig", art_root, "json")
-    art_dest = art_root / "report.json"
     auth_ctx = create_auth_context(
         contract_version="v1",
         schema_id="utils.auth_context.v1",
@@ -326,13 +323,27 @@ def main() -> None:
         correlation_id="cor-01234567-89ab-4def-8123-456789abcdef",
         issued_at=NOW,
     )
-    artifact_meta = write_research_artifact(
-        report_response.data,
-        art_dest,
-        config=art_config,
-        auth=auth_ctx,
-        limits=limits,
-    )
+    with tempfile.TemporaryDirectory(prefix="research-artifact-") as directory:
+        data_dir = Path(directory)
+        settings = build_data_settings(
+            database_url="sqlite:///research.db",
+            data_dir=data_dir,
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
+            approved_storage_roots=(data_dir,),
+        )
+        art_root = data_dir / "artifacts"
+        art_config = create_research_value("ArtifactWriteConfig", art_root, "json")
+        art_dest = art_root / "report.json"
+        with data_settings_context(settings):
+            run_data_migrations(generate_id("req"))
+            artifact_meta = write_research_artifact(
+                report_response.data,
+                art_dest,
+                config=art_config,
+                auth=auth_ctx,
+                limits=limits,
+            )
     print(_format_result(artifact_meta))
     print(
         f"Data -> relative_path='{artifact_meta.relative_path}', atomic={artifact_meta.atomic}"

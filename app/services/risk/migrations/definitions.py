@@ -153,6 +153,198 @@ _STATEMENTS = (
 )
 
 
+_STATEMENTS_0002 = (
+    """CREATE TABLE risk_policy_versions__new (
+        config_hash TEXT PRIMARY KEY,
+        policy_version TEXT NOT NULL,
+        profile TEXT NOT NULL CHECK (
+            profile IN ('research', 'simulation', 'paper', 'live')
+        ),
+        payload_json TEXT NOT NULL CHECK (json_valid(payload_json)),
+        effective_at TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+    ) STRICT""",
+    """INSERT INTO risk_policy_versions__new (
+        config_hash, policy_version, profile, payload_json,
+        effective_at, request_id, correlation_id, created_at, updated_at
+    ) SELECT config_hash, policy_version, profile, payload_json,
+        effective_at, request_id, correlation_id, created_at, updated_at
+    FROM risk_policy_versions""",
+    "DROP TABLE risk_policy_versions",
+    "ALTER TABLE risk_policy_versions__new RENAME TO risk_policy_versions",
+    (
+        "CREATE INDEX IF NOT EXISTS idx_risk_policy_profile "
+        "ON risk_policy_versions(profile, effective_at DESC)"
+    ),
+    """CREATE TABLE risk_audit_records__new (
+        record_id TEXT PRIMARY KEY,
+        sequence INTEGER NOT NULL UNIQUE,
+        event_type TEXT NOT NULL,
+        payload_json TEXT NOT NULL CHECK (json_valid(payload_json)),
+        evidence_refs_json TEXT NOT NULL CHECK (json_valid(evidence_refs_json)),
+        config_hash TEXT NOT NULL,
+        decision_id TEXT,
+        occurred_at TEXT NOT NULL,
+        previous_hash TEXT NOT NULL,
+        record_hash TEXT NOT NULL UNIQUE,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    ) STRICT""",
+    """INSERT INTO risk_audit_records__new (
+        record_id, sequence, event_type, payload_json, evidence_refs_json,
+        config_hash, decision_id, occurred_at, previous_hash, record_hash,
+        request_id, correlation_id, created_at
+    ) SELECT record_id, sequence, event_type, payload_json, evidence_refs_json,
+        config_hash, decision_id, occurred_at, previous_hash, record_hash,
+        request_id, correlation_id, created_at
+    FROM risk_audit_records""",
+    "DROP TABLE risk_audit_records",
+    "ALTER TABLE risk_audit_records__new RENAME TO risk_audit_records",
+    (
+        "CREATE INDEX IF NOT EXISTS idx_risk_audit_decision "
+        "ON risk_audit_records(decision_id) WHERE decision_id IS NOT NULL"
+    ),
+    (
+        "CREATE INDEX IF NOT EXISTS idx_risk_audit_seq "
+        "ON risk_audit_records(sequence DESC)"
+    ),
+    """CREATE TABLE risk_eligibility_decisions__new (
+        decision_id TEXT PRIMARY KEY,
+        strategy_id TEXT NOT NULL,
+        strategy_version TEXT NOT NULL,
+        payload_json TEXT NOT NULL CHECK (json_valid(payload_json)),
+        expires_at TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    ) STRICT""",
+    """INSERT INTO risk_eligibility_decisions__new (
+        decision_id, strategy_id, strategy_version, payload_json,
+        expires_at, request_id, correlation_id, created_at
+    ) SELECT decision_id, strategy_id, strategy_version, payload_json,
+        expires_at, request_id, correlation_id, created_at
+    FROM risk_eligibility_decisions""",
+    "DROP TABLE risk_eligibility_decisions",
+    "ALTER TABLE risk_eligibility_decisions__new RENAME TO risk_eligibility_decisions",
+    (
+        "CREATE INDEX IF NOT EXISTS idx_risk_eligibility_strategy "
+        "ON risk_eligibility_decisions(strategy_id, strategy_version)"
+    ),
+    (
+        "CREATE INDEX IF NOT EXISTS idx_risk_eligibility_expiry "
+        "ON risk_eligibility_decisions(expires_at)"
+    ),
+    """CREATE TABLE risk_allocation_decisions__new (
+        decision_id TEXT PRIMARY KEY,
+        portfolio_id TEXT NOT NULL,
+        reviewed_version TEXT NOT NULL,
+        active INTEGER NOT NULL CHECK (active IN (0, 1)),
+        predecessor_version TEXT,
+        payload_json TEXT NOT NULL CHECK (json_valid(payload_json)),
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE(portfolio_id, reviewed_version)
+    ) STRICT""",
+    """INSERT INTO risk_allocation_decisions__new (
+        decision_id, portfolio_id, reviewed_version, active,
+        predecessor_version, payload_json, request_id, correlation_id, created_at
+    ) SELECT decision_id, portfolio_id, reviewed_version, active,
+        predecessor_version, payload_json, request_id, correlation_id, created_at
+    FROM risk_allocation_decisions""",
+    "DROP TABLE risk_allocation_decisions",
+    "ALTER TABLE risk_allocation_decisions__new RENAME TO risk_allocation_decisions",
+    (
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_risk_allocation_active "
+        "ON risk_allocation_decisions(portfolio_id) WHERE active = 1"
+    ),
+    """CREATE TABLE risk_kill_switch_states__new (
+        state_id TEXT PRIMARY KEY,
+        scope_level TEXT NOT NULL CHECK (
+            scope_level IN ('global', 'portfolio', 'strategy', 'symbol')
+        ),
+        scope_json TEXT NOT NULL CHECK (json_valid(scope_json)),
+        state TEXT NOT NULL CHECK (state IN ('active', 'inactive')),
+        version INTEGER NOT NULL,
+        payload_json TEXT NOT NULL CHECK (json_valid(payload_json)),
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+    ) STRICT""",
+    """INSERT INTO risk_kill_switch_states__new (
+        state_id, scope_level, scope_json, state, version, payload_json,
+        request_id, correlation_id, created_at, updated_at
+    ) SELECT state_id, scope_level, scope_json, state, version, payload_json,
+        request_id, correlation_id, created_at, updated_at
+    FROM risk_kill_switch_states""",
+    "DROP TABLE risk_kill_switch_states",
+    "ALTER TABLE risk_kill_switch_states__new RENAME TO risk_kill_switch_states",
+    (
+        "CREATE INDEX IF NOT EXISTS idx_risk_kill_tripped "
+        "ON risk_kill_switch_states(scope_level) WHERE state = 'active'"
+    ),
+    """CREATE TABLE risk_approval_tokens__new (
+        token_id TEXT PRIMARY KEY,
+        decision_id TEXT NOT NULL,
+        scope_json TEXT NOT NULL CHECK (json_valid(scope_json)),
+        state TEXT NOT NULL CHECK (
+            state IN ('issued', 'reserved', 'consumed', 'expired', 'revoked')
+        ),
+        reservation_id TEXT,
+        expires_at TEXT NOT NULL,
+        payload_json TEXT NOT NULL CHECK (json_valid(payload_json)),
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+    ) STRICT""",
+    """INSERT INTO risk_approval_tokens__new (
+        token_id, decision_id, scope_json, state, reservation_id, expires_at,
+        payload_json, request_id, correlation_id, created_at, updated_at
+    ) SELECT token_id, decision_id, scope_json, state, reservation_id, expires_at,
+        payload_json, request_id, correlation_id, created_at, updated_at
+    FROM risk_approval_tokens""",
+    "DROP TABLE risk_approval_tokens",
+    "ALTER TABLE risk_approval_tokens__new RENAME TO risk_approval_tokens",
+    (
+        "CREATE INDEX IF NOT EXISTS idx_risk_tokens_open "
+        "ON risk_approval_tokens(expires_at) "
+        "WHERE state IN ('issued', 'reserved')"
+    ),
+    (
+        "CREATE INDEX IF NOT EXISTS idx_risk_tokens_decision "
+        "ON risk_approval_tokens(decision_id)"
+    ),
+    """CREATE TABLE risk_decision_snapshots__new (
+        record_id TEXT PRIMARY KEY,
+        record_type TEXT NOT NULL,
+        config_hash TEXT NOT NULL,
+        payload_json TEXT NOT NULL CHECK (json_valid(payload_json)),
+        occurred_at TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    ) STRICT""",
+    """INSERT INTO risk_decision_snapshots__new (
+        record_id, record_type, config_hash, payload_json, occurred_at,
+        request_id, correlation_id, created_at
+    ) SELECT record_id, record_type, config_hash, payload_json, occurred_at,
+        request_id, correlation_id, created_at
+    FROM risk_decision_snapshots""",
+    "DROP TABLE risk_decision_snapshots",
+    "ALTER TABLE risk_decision_snapshots__new RENAME TO risk_decision_snapshots",
+    (
+        "CREATE INDEX IF NOT EXISTS idx_risk_snapshots_config "
+        "ON risk_decision_snapshots(config_hash, occurred_at DESC)"
+    ),
+)
+
+
 def _checksum(statements: tuple[str, ...]) -> str:
     """Calculate the deterministic migration checksum.
 
@@ -173,6 +365,12 @@ _RISK_MIGRATION_STEPS = (
         checksum=_checksum(_STATEMENTS),
         statements=_STATEMENTS,
     ),
+    build_migration_step(
+        domain="risk",
+        migration_id="risk-0002-schema-constraints",
+        checksum=_checksum(_STATEMENTS_0002),
+        statements=_STATEMENTS_0002,
+    ),
 )
 
 
@@ -190,6 +388,7 @@ def run_risk_migrations(request_id: str) -> object:
         domain="risk",
         steps=_RISK_MIGRATION_STEPS,
         request_id=request_id,
+        complete_manifest=True,
     )
     return run_domain_migrations(request)
 

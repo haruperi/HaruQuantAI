@@ -9,7 +9,7 @@ from app.services.simulator import (
 )
 from app.utils import get_logger
 
-from tests.simulator.unit.test_orchestrator import (
+from tests.simulator.component.test_orchestrator import (
     FakeDependencies,
     _auth,
     _dataset,

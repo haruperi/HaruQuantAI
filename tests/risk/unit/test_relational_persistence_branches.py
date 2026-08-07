@@ -441,3 +441,98 @@ def test_audit_runtime_rejects_invalid_handles_and_values() -> None:
     store = audit_runtime.build_risk_state_store()
     with pytest.raises(ValueError, match="unsupported"):
         audit_runtime.execute_risk_state_store_operation(store, "unknown")
+
+
+def test_audit_runtime_save_decision_conflicts_and_limits() -> None:
+    """Verify decision conflict error handling and list_decisions limit bounds."""
+    durable_store = cast("Any", audit_runtime.build_risk_state_store())
+    with pytest.raises(ValueError, match="between 1 and 200"):
+        durable_store.list_decisions(0)
+    with pytest.raises(ValueError, match="between 1 and 200"):
+        durable_store.list_decisions(201)
+    with pytest.raises(ValueError, match="between 1 and 200"):
+        durable_store.list_decisions(True)
+
+
+def test_audit_runtime_save_if_absent_and_cas_failures(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Verify save_if_absent and activate_compare_and_swap failure paths."""
+    durable_store = cast("Any", audit_runtime.build_risk_state_store())
+    dummy_decision = SimpleNamespace(decision_id="d1")
+
+    # save_if_absent returns False on ValueError
+    monkeypatch.setattr(
+        audit_runtime,
+        "create_eligibility_record",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(ValueError("exists")),
+    )
+    assert not durable_store.save_if_absent(
+        cast("Any", dummy_decision), timeout_seconds=None
+    )
+
+    # save_review_if_absent returns False on ValueError
+    monkeypatch.setattr(
+        audit_runtime,
+        "create_allocation_review_record",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(ValueError("exists")),
+    )
+    assert not durable_store.save_review_if_absent(
+        cast("Any", dummy_decision), timeout_seconds=None
+    )
+
+    # activate_compare_and_swap returns False on predecessor mismatch
+    fake_decision = SimpleNamespace(portfolio_id="p1", reviewed_version="v2")
+    monkeypatch.setattr(
+        audit_runtime,
+        "read_active_allocation_record_with_revision",
+        lambda _store, _key: (SimpleNamespace(reviewed_version="v1"), "rev1"),
+    )
+    assert not durable_store.activate_compare_and_swap(
+        cast("Any", fake_decision),
+        expected_predecessor_version="v0",
+        timeout_seconds=None,
+    )
+
+
+def test_audit_store_append_atomic_and_decision_branches(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Exercise append_atomic conflict/already_appended and save_decision retry paths."""
+    durable_store = cast("Any", audit_runtime.build_risk_state_store())
+    rec1 = SimpleNamespace(record_id="rec1", sequence=0, record_hash="0" * 64)
+    rec2 = SimpleNamespace(record_id="rec1", sequence=0, record_hash="1" * 64)
+
+    # append_atomic already_appended
+    monkeypatch.setattr(audit_runtime, "read_audit_record", lambda _store, _id: rec1)
+    assert (
+        durable_store.append_atomic(
+            cast("Any", rec1),
+            expected_sequence=0,
+            expected_previous_hash="0" * 64,
+            timeout_seconds=None,
+        )
+        == "already_appended"
+    )
+
+    # append_atomic conflict when existing differs
+    assert (
+        durable_store.append_atomic(
+            cast("Any", rec2),
+            expected_sequence=1,
+            expected_previous_hash="1" * 64,
+            timeout_seconds=None,
+        )
+        == "conflict"
+    )
+
+    # save_decision idempotent retry vs conflict
+    dec1 = SimpleNamespace(decision_id="dec1")
+    monkeypatch.setattr(audit_runtime, "read_decision_record", lambda _store, _id: dec1)
+    # matching decision is no-op
+    durable_store.save_decision(cast("Any", dec1))
+
+    # mismatched decision raises ValueError
+    dec2 = SimpleNamespace(decision_id="dec1", state="different")
+    with pytest.raises(ValueError, match="identity conflict"):
+        durable_store.save_decision(cast("Any", dec2))

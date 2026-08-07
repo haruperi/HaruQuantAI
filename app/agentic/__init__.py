@@ -27,6 +27,9 @@ from app.agentic.agents.experimentation.experiment_designer.agent import (
     coordinate_simulation,
     design_experiment,
 )
+from app.agentic.agents.experimentation.experiment_designer.runtime import (
+    build_durable_experiment_store,
+)
 from app.agentic.agents.experimentation.optimization_coordinator.agent import (
     coordinate_optimization,
     design_sweep,
@@ -68,7 +71,9 @@ from app.agentic.context_memory.models import (
 )
 from app.agentic.context_memory.repository import (
     build_in_memory_memory_store,
+    retrieve_evidence_claims,
     retrieve_memory,
+    store_evidence_claim,
     store_memory,
 )
 from app.agentic.contracts.models import (
@@ -99,6 +104,10 @@ from app.agentic.lifecycle.service import (
     get_artifact_history,
     get_artifact_state,
     transition_artifact,
+)
+from app.agentic.migrations.manifest import (
+    get_agentic_migrations,
+    run_agentic_migrations,
 )
 from app.agentic.migrations.memory import (
     build_agentic_memory_migration_request,
@@ -192,6 +201,7 @@ __all__: tuple[str, ...] = (
     "build_deterministic_adk_runtime",
     "build_deterministic_model_gateway",
     "build_durable_agentic_dependencies",
+    "build_durable_experiment_store",
     "build_evidence_claim",
     "build_firm_mandate",
     "build_in_memory_memory_store",
@@ -225,6 +235,7 @@ __all__: tuple[str, ...] = (
     "expire_task",
     "get_agentic_memory_migration_statements",
     "get_agentic_migration_statements",
+    "get_agentic_migrations",
     "get_artifact_history",
     "get_artifact_state",
     "get_exclusion_reasons",
@@ -249,8 +260,11 @@ __all__: tuple[str, ...] = (
     "replay_run",
     "resolve_role_manifest",
     "resume_task",
+    "retrieve_evidence_claims",
     "retrieve_memory",
+    "run_agentic_migrations",
     "run_deliberation",
+    "store_evidence_claim",
     "store_memory",
     "submit_firm_request",
     "submit_task",

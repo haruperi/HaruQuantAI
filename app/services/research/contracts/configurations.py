@@ -92,7 +92,7 @@ class ResearchResourceLimits:
     max_rows: int
     max_duration_seconds: float
     max_artifact_bytes: int
-    memory_budget_mb: int | None = None
+    memory_budget_mb: int = 256
 
     def __post_init__(self) -> None:
         """Validate approved resource ceilings.
@@ -107,7 +107,7 @@ class ResearchResourceLimits:
             _raise_configuration("INVALID_DURATION_LIMIT")
         if not 0 < self.max_artifact_bytes <= _MAX_ARTIFACT_BYTES:
             _raise_configuration("INVALID_ARTIFACT_LIMIT")
-        if self.memory_budget_mb is not None and self.memory_budget_mb <= 0:
+        if self.memory_budget_mb <= 0:
             _raise_configuration("INVALID_MEMORY_LIMIT")
 
 

@@ -10,7 +10,7 @@ from app.services.simulator import (
 )
 from app.utils import get_logger
 
-from tests.simulator.unit.test_engine import _engine, _intent, _tick
+from tests.simulator.component.test_engine import _engine, _intent, _tick
 
 logger = get_logger(__name__)
 

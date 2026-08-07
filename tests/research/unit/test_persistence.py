@@ -16,6 +16,15 @@ logger = get_logger(__name__)
 _HASH = "e" * 64
 
 
+@pytest.fixture(autouse=True)
+def _stub_relational_metadata(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep unit tests isolated from Data-owned relational integration."""
+    monkeypatch.setattr(
+        "app.services.research.artifacts.persistence.create_artifact_metadata",
+        lambda **values: values,
+    )
+
+
 def _report() -> object:
     """Build a canonical advisory report."""
     return create_research_value(

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from datetime import datetime
 from typing import cast
 
 from app.services.data import (
@@ -12,7 +13,7 @@ from app.services.data import (
     build_transaction_request,
     execute_transaction,
 )
-from app.utils import canonical_json, generate_id, get_logger
+from app.utils import canonical_digest, canonical_json, generate_id, get_logger
 
 logger = get_logger(__name__)
 type _Codec = tuple[Callable[[object], str], Callable[[str], object]]
@@ -173,6 +174,145 @@ def create_memory_record(
                 _json(_field(record, "redacted_paths")),
                 _field(record, "content_hash"),
                 record.get("supersedes"),
+            ),
+        ),
+    )
+
+
+def create_evidence_claim(store: object, value: object) -> None:
+    """Append one immutable governed evidence claim."""
+    claim = _model_value(store, "evidence", value)
+    _execute(
+        (
+            "INSERT INTO agentic_evidence_claims "
+            "(claim_id, task_id, statement, source_ref, source_trust, licence_ref, "
+            "available_at, observed_at, content_hash, confidence_basis, falsifier, "
+            "injection_status, request_id, correlation_id) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        ),
+        (
+            (
+                _field(claim, "claim_id"),
+                _field(claim, "task_id"),
+                _field(claim, "statement"),
+                _field(claim, "source_ref"),
+                _field(claim, "source_trust"),
+                _field(claim, "licence_ref"),
+                _field(claim, "available_at"),
+                _field(claim, "observed_at"),
+                _field(claim, "content_hash"),
+                _field(claim, "confidence_basis"),
+                _field(claim, "falsifier"),
+                _field(claim, "injection_status"),
+                claim.get("request_id", ""),
+                claim.get("correlation_id", ""),
+            ),
+        ),
+    )
+
+
+def create_experiment_spec(store: object, value: object) -> None:
+    """Create one immutable pre-registered experiment specification."""
+    spec = _model_value(store, "experiment-spec", value)
+    _execute(
+        (
+            "INSERT INTO agentic_experiment_specs "
+            "(spec_id, task_id, thesis_id, spec_hash, seed, embargo_seconds, "
+            "baseline_ref, cost_model_ref, falsification_outcome, spec_json) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        ),
+        (
+            (
+                _field(spec, "spec_id"),
+                _field(spec, "task_id"),
+                _field(spec, "thesis_id"),
+                _field(spec, "spec_hash"),
+                _field(spec, "seed"),
+                _field(spec, "embargo_seconds"),
+                _field(spec, "baseline_ref"),
+                _field(spec, "cost_model_ref"),
+                _field(spec, "falsification_outcome"),
+                _json(spec),
+            ),
+        ),
+    )
+
+
+def create_experiment_run(
+    *,
+    spec_hash: str,
+    run_id: str,
+    evidence_class: str,
+    lineage: Mapping[str, str],
+    at_time: datetime,
+) -> None:
+    """Record one immutable receiver-returned experiment run."""
+    _execute(
+        (
+            "INSERT INTO agentic_experiment_runs "
+            "(run_id, spec_hash, task_id, evidence_class, request_hash, "
+            "config_hash, engine_version, journal_ref, artifact_manifest_ref, "
+            "created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        ),
+        (
+            (
+                run_id,
+                spec_hash,
+                lineage["task_id"],
+                evidence_class,
+                lineage["request_hash"],
+                lineage["config_hash"],
+                lineage["engine_version"],
+                lineage["journal_ref"],
+                lineage["artifact_manifest_ref"],
+                at_time.isoformat(),
+            ),
+        ),
+    )
+
+
+def create_experiment_holdout_use(
+    *,
+    spec_hash: str,
+    task_id: str,
+    run_id: str,
+    consumed_at: datetime,
+) -> bool:
+    """Atomically reserve the single permitted holdout use.
+
+    Returns:
+        Whether this call inserted the unique reservation.
+    """
+    result = _execute(
+        (
+            "INSERT OR IGNORE INTO agentic_experiment_holdout_use "
+            "(spec_hash, task_id, run_id, consumed_at) VALUES (?, ?, ?, ?)",
+        ),
+        ((spec_hash, task_id, run_id, consumed_at.isoformat()),),
+    )
+    return result.affected_rows == 1
+
+
+def create_experiment_verdict(store: object, value: object) -> None:
+    """Create one immutable run-bound experiment verdict."""
+    verdict = _model_value(store, "experiment-verdict", value)
+    _execute(
+        (
+            "INSERT INTO agentic_experiment_verdicts "
+            "(verdict_id, spec_id, spec_hash, task_id, outcome, "
+            "holdout_consumed, canonical_hash, verdict_json) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        ),
+        (
+            (
+                _field(verdict, "verdict_id"),
+                _field(verdict, "spec_id"),
+                _field(verdict, "spec_hash"),
+                _field(verdict, "task_id"),
+                _field(verdict, "outcome"),
+                int(bool(_field(verdict, "holdout_consumed"))),
+                canonical_digest(verdict),
+                _json(verdict),
             ),
         ),
     )
@@ -470,6 +610,11 @@ def create_workflow_checkpoint_record(
 
 __all__ = [
     "create_agentic_persistence_store",
+    "create_evidence_claim",
+    "create_experiment_holdout_use",
+    "create_experiment_run",
+    "create_experiment_spec",
+    "create_experiment_verdict",
     "create_incident_record",
     "create_lifecycle_packet_record",
     "create_lifecycle_record",

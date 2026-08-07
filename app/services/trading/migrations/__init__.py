@@ -10,6 +10,7 @@ from app.services.trading.migrations.definitions import (
 )
 from app.services.trading.migrations.definitions import (
     get_trading_migrations,
+    run_trading_migrations,
 )
 
-__all__ = ["TRADING_SCHEMA_VERSION", "get_trading_migrations"]
+__all__ = ["TRADING_SCHEMA_VERSION", "get_trading_migrations", "run_trading_migrations"]

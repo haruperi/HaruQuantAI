@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from itertools import pairwise
 
-from app.services.optimization.errors import OptimizationError
+from app.services.optimization.contracts import OptimizationError
 from app.services.optimization.execution import (
     BacktestExecutionAdapter,
     BacktestExecutionRequest,

@@ -30,6 +30,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, s
 from app.services.api.contracts import (
     PortfolioActivationRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     PortfolioConstructRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
+    PortfolioDefinitionRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     PortfolioDriftRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     PortfolioMeasurementRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     PortfolioRebalanceRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
@@ -167,6 +168,44 @@ def _get_history(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(error),
         ) from error
+
+
+@router.post("/{portfolio_id}/definitions", response_model=None)
+def _register_definition(
+    portfolio_id: str,
+    request: PortfolioDefinitionRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+    source: Annotated[_PortfolioSource, Depends(_portfolio_source)],
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> object:
+    """Register one immutable Portfolio definition version.
+
+    Returns:
+        Portfolio-owned definition envelope.
+
+    Raises:
+        HTTPException: If identity, permission, idempotency, or composition fails.
+    """
+    require_human_permission(auth, "portfolio:write")
+    _require_matching_portfolio(portfolio_id, request.portfolio_id)
+    _require_idempotency(idempotency_key)
+    return _delegate(source, "register_definition", request, auth)
+
+
+@router.get("/{portfolio_id}/definitions/{portfolio_version}", response_model=None)
+def _get_definition(
+    portfolio_id: str,
+    portfolio_version: str,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+    source: Annotated[_PortfolioSource, Depends(_portfolio_source)],
+) -> object:
+    """Read one exact immutable Portfolio definition.
+
+    Returns:
+        Portfolio-owned definition envelope.
+    """
+    require_human_permission(auth, "portfolio:read")
+    return _delegate(source, "definition", portfolio_id, portfolio_version, auth)
 
 
 def _delegate(source: _PortfolioSource, operation: str, *args: object) -> object:

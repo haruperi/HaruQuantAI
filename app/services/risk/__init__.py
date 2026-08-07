@@ -30,12 +30,17 @@ from app.services.risk.audit import (
     verify_risk_audit_chain,
 )
 from app.services.risk.config import (
+    build_personal_account_risk_config,
+    build_prop_firm_risk_config,
     compute_config_hash,
     create_firm_mandate,
     create_risk_config,
     get_drawdown_mode,
+    get_risk_policy,
     load_firm_mandate,
     load_risk_config,
+    register_default_risk_policies,
+    register_risk_policy,
 )
 from app.services.risk.config.development import build_development_risk_config
 from app.services.risk.contracts import (
@@ -104,7 +109,9 @@ __all__ = (
     "build_allocation_runtime_operation",
     "build_development_risk_config",
     "build_governance_runtime_operation",
+    "build_personal_account_risk_config",
     "build_portfolio_risk_snapshot",
+    "build_prop_firm_risk_config",
     "build_risk_approval_state_store",
     "build_risk_state_store",
     "calculate_position_size",
@@ -152,12 +159,15 @@ __all__ = (
     "get_limit_status",
     "get_risk_error_catalog",
     "get_risk_error_code",
+    "get_risk_policy",
     "is_risk_domain_error",
     "issue_risk_approval_token",
     "list_risk_decisions",
     "load_firm_mandate",
     "load_risk_config",
     "persist_risk_decision",
+    "register_default_risk_policies",
+    "register_risk_policy",
     "revalidate_risk_decision",
     "review_allocation_proposal",
     "review_strategy_admission",

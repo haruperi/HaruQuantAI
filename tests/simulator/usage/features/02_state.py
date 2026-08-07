@@ -18,9 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
     build_data_settings,
-    build_migration_request,
     data_settings_context,
-    run_domain_migrations,
     unwrap_data_response,
 )
 from app.services.simulator import (
@@ -38,6 +36,7 @@ from app.services.simulator import (
     read_live_simulation_state,
     read_simulation_session,
     reset_live_simulation_sessions,
+    run_simulator_migrations,
     step_live_simulation,
     stream_simulation_session_frames,
     unwrap_simulation_response,
@@ -68,14 +67,14 @@ def _format_result(obj: Any) -> str:
     type_name = cls.__name__
     if hasattr(cls, "model_fields"):
         keys = ", ".join(cls.model_fields.keys())
-        return f"Output Result -> {type_name}({keys}) : {type_name}"
+        return f"SUCCESS: Output Result -> {type_name}({keys}) : {type_name}"
     if isinstance(obj, dict):
         keys = ", ".join(obj.keys())
-        return f"Output Result -> dict({keys}) : dict"
+        return f"SUCCESS: Output Result -> dict({keys}) : dict"
     if hasattr(obj, "__dict__"):
         keys = ", ".join(vars(obj).keys())
-        return f"Output Result -> {type_name}({keys}) : {type_name}"
-    return f"Output Result -> {type_name} : {type_name}"
+        return f"SUCCESS: Output Result -> {type_name}({keys}) : {type_name}"
+    return f"SUCCESS: Output Result -> {type_name} : {type_name}"
 
 
 def _settings(data_dir: Path) -> object:
@@ -93,13 +92,7 @@ def _run_migrations() -> None:
     """Apply Simulator's immutable manifest through Data's public boundary."""
     request_id = generate_id("req")
     unwrap_data_response(
-        run_domain_migrations(
-            build_migration_request(
-                domain="simulator",
-                steps=get_simulation_migrations(),
-                request_id=request_id,
-            )
-        ),
+        run_simulator_migrations(request_id),
         operation="simulator.usage.migrations",
         request_id=request_id,
     )
@@ -143,6 +136,31 @@ def fr_sim_041() -> None:
     migrations = get_simulation_migrations()
     print(_format_result(migrations))
     print(f"Data -> migration_step_count={len(migrations)}")
+
+
+def fr_sim_103() -> None:
+    """
+    FR-SIM-103: Run the complete authoritative Simulator migration manifest.
+
+    Simulator shall expose one authoritative package-root migration runner that submits the complete immutable Simulator migration manifest through Data's public migration executor. Ledger mismatch, checksum mismatch, write-lock failure, or transactional execution failure shall return Data's failed standard response and prevent Simulator-backed API readiness.
+    """
+    _header("Authoritative Simulator Migration Runner (FR-SIM-103)")
+    with (
+        tempfile.TemporaryDirectory() as tmp_dir,
+        data_settings_context(_settings(Path(tmp_dir))),
+    ):
+        request_id = generate_id("req")
+        result = run_simulator_migrations(request_id)
+        data = unwrap_data_response(
+            result,
+            operation="simulator.usage.authoritative_migrations",
+            request_id=request_id,
+        )
+        print(_format_result(result))
+        print(
+            "SUCCESS: FR-SIM-103 authoritative manifest applied; "
+            f"Data -> migration_result={data}"
+        )
 
 
 def fr_sim_094() -> None:
@@ -257,7 +275,10 @@ def fr_sim_097(root: Path) -> tuple[str, Any, Any]:
     state = _unwrap_live(
         create_live_simulation_session(request, deps, request_id=generate_id("req"))
     )
-    print(f"  opened cursor={state['cursor']} ticks={state['tick_count']}")
+    print(
+        "SUCCESS: FR-SIM-097 live session opened; "
+        f"Data -> cursor={state['cursor']}, ticks={state['tick_count']}"
+    )
     return str(state["session_id"]), request, deps
 
 
@@ -269,7 +290,10 @@ def fr_sim_098(session_id: str) -> None:
     """
     _header("Live What-If Sessions (FR-SIM-098)")
     state = _unwrap_live(step_live_simulation(session_id, 2))
-    print(f"  advanced cursor={state['cursor']} complete={state['complete']}")
+    print(
+        "SUCCESS: FR-SIM-098 live session advanced; "
+        f"Data -> cursor={state['cursor']}, complete={state['complete']}"
+    )
 
 
 def fr_sim_099(session_id: str) -> None:
@@ -280,7 +304,10 @@ def fr_sim_099(session_id: str) -> None:
     """
     _header("Live What-If Sessions (FR-SIM-099)")
     state = _unwrap_live(read_live_simulation_state(session_id))
-    print(f"  advisory={state['advisory']} pending={state['pending_intents']}")
+    print(
+        "SUCCESS: FR-SIM-099 live session projected; "
+        f"Data -> advisory={state['advisory']}, pending={state['pending_intents']}"
+    )
 
 
 def fr_sim_100(session_id: str, deps: Any) -> None:
@@ -296,8 +323,9 @@ def fr_sim_100(session_id: str, deps: Any) -> None:
         )
     )
     print(
-        f"  branch_of={branch['branch_of']} diverged_at={branch['divergence_index']}"
-        f" run_id={branch['run_id']}"
+        "SUCCESS: FR-SIM-100 advisory branch created; "
+        f"Data -> branch_of={branch['branch_of']}, "
+        f"diverged_at={branch['divergence_index']}, run_id={branch['run_id']}"
     )
 
 
@@ -309,7 +337,7 @@ def fr_sim_101(session_id: str) -> None:
     """
     _header("Live What-If Sessions (FR-SIM-101)")
     final = _unwrap_live(close_live_simulation_session(session_id))
-    print(f"  closed at cursor={final['cursor']}")
+    print(f"SUCCESS: FR-SIM-101 live session closed; Data -> cursor={final['cursor']}")
 
 
 def fr_sim_102() -> None:
@@ -320,7 +348,7 @@ def fr_sim_102() -> None:
     """
     _header("Live What-If Sessions (FR-SIM-102)")
     _unwrap_live(reset_live_simulation_sessions())
-    print("  live session registry cleared")
+    print("SUCCESS: FR-SIM-102 live session registry reset; Data -> active_sessions=0")
 
 
 def journal_playback_sessions() -> None:
@@ -431,6 +459,9 @@ def main() -> None:
 
     # Stage 3: State protocol & Migrations
     fr_sim_041()
+
+    # Authoritative complete-manifest execution
+    fr_sim_103()
 
     # Stage 4: Direct relational persistence
     fr_sim_094()

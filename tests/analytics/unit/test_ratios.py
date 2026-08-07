@@ -11,7 +11,10 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
-from tests.analytics.unit.test_results_adapter import _config, _source  # noqa: E402
+from tests.analytics.component.test_results_adapter import (  # noqa: E402
+    _config,
+    _source,
+)
 
 
 def test_ratio_evidence_never_returns_infinity() -> None:

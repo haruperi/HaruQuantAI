@@ -20,6 +20,47 @@ import { request, type RequestOptions } from "./request";
 export const portfolioRecordSchema = z.record(z.string(), z.unknown());
 export type PortfolioRecord = z.infer<typeof portfolioRecordSchema>;
 
+/** Immutable Portfolio definition registration body. */
+export interface PortfolioDefinitionBody {
+  contract_version: "v1";
+  schema_id: "portfolio.definition.v1";
+  portfolio_id: string;
+  portfolio_version: string;
+  scope: Record<string, string>;
+  definition: Record<string, unknown>;
+  canonical_hash: string;
+}
+
+/** Register one immutable definition version. */
+export function registerDefinition(
+  portfolioId: string,
+  body: PortfolioDefinitionBody,
+  options?: RequestOptions
+): Promise<ApiResponse<PortfolioRecord>> {
+  return request<PortfolioRecord>(portfolioRoutes.registerDefinition, {
+    schema: portfolioRecordSchema,
+    pathParams: { portfolio_id: portfolioId },
+    body,
+    ...options,
+  });
+}
+
+/** Read one exact immutable definition version. */
+export function definition(
+  portfolioId: string,
+  portfolioVersion: string,
+  options?: RequestOptions
+): Promise<ApiResponse<PortfolioRecord>> {
+  return request<PortfolioRecord>(portfolioRoutes.definition, {
+    schema: portfolioRecordSchema,
+    pathParams: {
+      portfolio_id: portfolioId,
+      portfolio_version: portfolioVersion,
+    },
+    ...options,
+  });
+}
+
 /** Governed activation or rollback command body. */
 export interface PortfolioLifecycleBody {
   construction: Record<string, unknown>;
@@ -148,6 +189,8 @@ export function recomputeMeasurement(
 
 /** Aggregated Portfolio client. */
 export const portfolio = {
+  registerDefinition,
+  definition,
   construct,
   status,
   history,

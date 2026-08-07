@@ -16,7 +16,11 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import Protocol, runtime_checkable
 
-from app.agentic.context_memory.models import MemoryRecord, derive_content_hash
+from app.agentic.context_memory.models import (
+    EvidenceClaim,
+    MemoryRecord,
+    derive_content_hash,
+)
 from app.utils import derive_stable_id, get_logger, redact_mapping_value, utc_now
 
 logger = get_logger(__name__)
@@ -34,6 +38,28 @@ class AgenticMemoryStore(Protocol):
 
         Returns:
             The appended record.
+        """
+        ...
+
+    def append_claim(self, claim: EvidenceClaim) -> EvidenceClaim:
+        """Append one immutable governed evidence claim.
+
+        Args:
+            claim: Validated evidence claim.
+
+        Returns:
+            The appended claim.
+        """
+        ...
+
+    def list_claims(self, task_id: str) -> tuple[EvidenceClaim, ...]:
+        """List governed evidence claims for one task.
+
+        Args:
+            task_id: Owning task identity.
+
+        Returns:
+            Point-in-time ordered claims.
         """
         ...
 
@@ -60,6 +86,30 @@ class _InMemoryMemoryStore:
     def __init__(self) -> None:
         """Initialise empty append-only record state."""
         self._records: list[MemoryRecord] = []
+        self._claims: list[EvidenceClaim] = []
+
+    def append_claim(self, claim: EvidenceClaim) -> EvidenceClaim:
+        """Append one immutable governed evidence claim.
+
+        Returns:
+            The appended claim.
+
+        Raises:
+            ValueError: If the claim identity already exists.
+        """
+        if any(stored.claim_id == claim.claim_id for stored in self._claims):
+            message = f"evidence claim {claim.claim_id} already exists"
+            raise ValueError(message)
+        self._claims.append(claim)
+        return claim
+
+    def list_claims(self, task_id: str) -> tuple[EvidenceClaim, ...]:
+        """List governed evidence claims for one task.
+
+        Returns:
+            Point-in-time ordered claims.
+        """
+        return tuple(claim for claim in self._claims if claim.task_id == task_id)
 
     def append(self, record: MemoryRecord) -> MemoryRecord:
         """Append one governed memory record.
@@ -196,6 +246,39 @@ def store_memory(
         task_id,
     )
     return store.append(record)
+
+
+def store_evidence_claim(
+    store: AgenticMemoryStore,
+    claim: EvidenceClaim,
+) -> EvidenceClaim:
+    """Append one already-validated immutable evidence claim.
+
+    Args:
+        store: Injected governed memory store.
+        claim: Claim built through the public contract builder.
+
+    Returns:
+        The appended claim.
+    """
+    logger.info("Appending governed evidence claim for task %s", claim.task_id)
+    return store.append_claim(claim)
+
+
+def retrieve_evidence_claims(
+    store: AgenticMemoryStore,
+    task_id: str,
+) -> tuple[EvidenceClaim, ...]:
+    """Retrieve point-in-time ordered evidence claims for one task.
+
+    Args:
+        store: Injected governed memory store.
+        task_id: Owning task identity.
+
+    Returns:
+        Bounded claims belonging to the task.
+    """
+    return store.list_claims(task_id)
 
 
 def retrieve_memory(

@@ -108,6 +108,7 @@ def _market() -> build_market_context_evidence:
 def fr_risk_031() -> None:
     """FR-RISK-031: Stage 3 — Classify volatility, liquidity, correlation, drawdown, crisis, news, and session regimes; record deterministic transitions/evidence; return only equal-or-stricter modifiers; fail closed on required missing/unknown live evidence."""
     _header("Stage 3: Regime Classification - Assess Risk Regime (FR-RISK-031)")
+    print("SUCCESS: FR-RISK-031")
 
     config = create_risk_config(
         profile="research",

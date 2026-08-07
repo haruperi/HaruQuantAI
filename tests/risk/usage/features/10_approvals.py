@@ -194,6 +194,7 @@ def _setup_service():
 def fr_risk_035() -> None:
     """FR-RISK-035: Stage 1 — Own internal HMAC signing plus an injected secret resolver, clock, durable state port, authorization verifier, and audit chain."""
     _header("Stage 1: Approval Token Service - Service Setup (FR-RISK-035)")
+    print("SUCCESS: FR-RISK-035")
     service, _, _ = _setup_service()
     print(_format_result(service))
     print(
@@ -204,6 +205,7 @@ def fr_risk_035() -> None:
 def fr_risk_036() -> None:
     """FR-RISK-036: Stage 3 — Validate Risk-owned, UI/API-produced `create_approval_attestation v1`, then issue a tamper-evident token only for an eligible decision, binding request/workflow/action/account/strategy/symbol/ config/decision/approver/expiry/nonce and writing audit/state durably."""
     _header("Stage 3: Token Issuance - Issue Approval Token (FR-RISK-036)")
+    print("SUCCESS: FR-RISK-036")
     service, config, _ = _setup_service()
     config_hash = unwrap_risk_response(
         compute_config_hash(config), operation="compute_config_hash"
@@ -254,6 +256,7 @@ def fr_risk_037() -> None:
     _header(
         "Stage 3: Token Validation & Consumption - Validate Approval Token (FR-RISK-037)"
     )
+    print("SUCCESS: FR-RISK-037")
     service, config, _ = _setup_service()
     config_hash = unwrap_risk_response(
         compute_config_hash(config), operation="compute_config_hash"
@@ -321,6 +324,7 @@ def fr_risk_037() -> None:
 def fr_risk_038() -> None:
     """FR-RISK-038: Stage 3 — Revoke every outstanding token intersecting an activated global/portfolio/strategy/symbol scope and write a material audit event."""
     _header("Stage 3: Scope Revocation - Revoke Approval Scope (FR-RISK-038)")
+    print("SUCCESS: FR-RISK-038")
     service, config, _ = _setup_service()
     config_hash = unwrap_risk_response(
         compute_config_hash(config), operation="compute_config_hash"

@@ -19,6 +19,7 @@ from app.services.trading.actions import (
     trigger_kill_switch,
 )
 from app.services.trading.contracts import (
+    create_closed_position_record,
     create_execution_evidence_report,
     create_execution_receipt,
     create_order_intent,
@@ -52,6 +53,9 @@ from app.services.trading.monitoring import (
     validate_budget_authority,
 )
 from app.services.trading.monitoring.runtime import get_trading_operational_events
+from app.services.trading.persistence import (
+    create_closed_position_record as persist_closed_position,
+)
 from app.services.trading.reconciliation import (
     compare_authority_state,
     create_authority_resolution,
@@ -76,6 +80,7 @@ from app.services.trading.state import (
     get_trading_projection,
     get_trading_schema_version,
     reserve_idempotency,
+    run_trading_migrations,
 )
 from app.services.trading.validation import (
     assess_execution_readiness,
@@ -102,6 +107,7 @@ __all__: tuple[str, ...] = (
     "compare_authority_state",
     "create_authority_resolution",
     "create_authority_snapshot",
+    "create_closed_position_record",
     "create_execution_evidence_report",
     "create_execution_receipt",
     "create_idempotency_reservation",
@@ -142,12 +148,14 @@ __all__: tuple[str, ...] = (
     "modify_order",
     "modify_position",
     "pause_strategy",
+    "persist_closed_position",
     "redact_trading_payload",
     "reduce_exposure",
     "reserve_idempotency",
     "resolve_unknown_outcome",
     "resume_strategy",
     "run_live_evaluation_cycle",
+    "run_trading_migrations",
     "start_live_session",
     "stop_live_session",
     "submit_order",

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from app.services.optimization.errors import OptimizationError
+from app.services.optimization.contracts import OptimizationError
 from app.services.optimization.evidence import OptimizationResult  # noqa: TC001
 from app.services.optimization.state.contracts import (
     OptimizationPersistenceReceipt,  # noqa: TC001

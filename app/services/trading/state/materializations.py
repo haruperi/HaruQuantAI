@@ -40,27 +40,11 @@ class OrderOutcome:
 
 
 @dataclass(frozen=True)
-class FillRow:
-    """One immutable normalized broker fill projection."""
-
-    values: tuple[object, ...]
-
-
-@dataclass(frozen=True)
-class PositionRow:
-    """One normalized position projection supplied by authority evidence."""
-
-    values: tuple[object, ...]
-
-
-@dataclass(frozen=True)
 class MaterializationBatch:
     """Table projections attributable to one authoritative event."""
 
     order: OrderRow | None = None
     outcome: OrderOutcome | None = None
-    fill: FillRow | None = None
-    position: PositionRow | None = None
 
 
 def _mapping(value: object, field: str) -> dict[str, Any]:
@@ -231,97 +215,6 @@ def _outcome(event: TradingEvent, projection: TradingProjection) -> OrderOutcome
     )
 
 
-def _fill(event: TradingEvent, projection: TradingProjection) -> FillRow:
-    """Normalize a fill event by resolving its stored authority receipt.
-
-    Returns:
-        Immutable normalized fill row.
-
-    Raises:
-        ValueError: If authority fill evidence is incomplete.
-    """
-    facts = dict(event.payload)
-    receipt_id = _text(facts, "receipt_id")
-    receipt_facts: dict[str, Any] | None = None
-    for candidate in projection.receipts.values():
-        if not isinstance(candidate, dict):
-            continue
-        receipt_candidate = candidate.get("receipt")
-        if (
-            isinstance(receipt_candidate, dict)
-            and receipt_candidate.get("receipt_id") == receipt_id
-        ):
-            receipt_facts = candidate
-            break
-    if receipt_facts is None:
-        raise ValueError("Trading fill requires its stored authority receipt")
-    receipt = _mapping(receipt_facts.get("receipt"), "stored receipt payload")
-    attempt_id = _text(receipt_facts, "attempt_event_id")
-    attempt = _mapping(projection.orders.get(attempt_id), "originating order attempt")
-    intent = _mapping(attempt.get("intent"), "originating intent")
-    deal_id = _text(facts, "provider_deal_id")
-    deal_ids = receipt.get("provider_deal_ids")
-    if not isinstance(deal_ids, list) or deal_id not in deal_ids:
-        raise ValueError("Trading fill is absent from its authority receipt")
-    price = _optional_text(facts, "average_price")
-    if price is None:
-        raise ValueError("Trading fill requires an authority-reported price")
-    values: tuple[object, ...] = (
-        event.event_id,
-        _text(intent, "client_order_id"),
-        deal_id,
-        deal_ids.index(deal_id) + 1,
-        _text(facts, "filled_quantity"),
-        price,
-        "0",
-        "0",
-        None,
-        "unknown",
-        _text(receipt, "authority_timestamp"),
-        _text(receipt, "received_at"),
-        event.correlation_id,
-        event.occurred_at.isoformat(),
-    )
-    return FillRow(values=values)
-
-
-def _position(event: TradingEvent) -> PositionRow | None:
-    """Normalize an explicitly supplied complete position snapshot.
-
-    Returns:
-        Normalized row, or ``None`` when no position was reported.
-    """
-    facts = dict(event.payload)
-    value = facts.get("position")
-    if value is None:
-        return None
-    position = _mapping(value, "position")
-    position_id = _text(facts, "position_id")
-    values: tuple[object, ...] = (
-        position_id,
-        _text(position, "account_id"),
-        _text(position, "symbol_id"),
-        _text(position, "direction"),
-        _text(position, "quantity_decimal"),
-        _text(position, "avg_entry_price_decimal"),
-        _optional_text(position, "current_price_decimal"),
-        _text(position, "unrealized_pnl_decimal"),
-        _text(position, "realized_pnl_decimal"),
-        _text(position, "commission_total_decimal"),
-        _text(position, "swap_total_decimal"),
-        _optional_text(position, "stop_loss_decimal"),
-        _optional_text(position, "take_profit_decimal"),
-        _optional_text(position, "strategy_version_id"),
-        _text(position, "state"),
-        _text(position, "opened_at"),
-        _optional_text(position, "closed_at"),
-        int(position.get("position_version", 0)),
-        _text(position, "created_at"),
-        _text(position, "updated_at"),
-    )
-    return PositionRow(values=values)
-
-
 def build_materialization_batch(
     event: TradingEvent,
     projection: TradingProjection,
@@ -344,11 +237,6 @@ def build_materialization_batch(
         return MaterializationBatch(order=_order_row(event, intent))
     if event.event_type == "receipt_recorded":
         return MaterializationBatch(outcome=_outcome(event, projection))
-    if event.event_type == "fill_recorded":
-        return MaterializationBatch(
-            fill=_fill(event, projection),
-            position=_position(event),
-        )
     return MaterializationBatch()
 
 

@@ -6,14 +6,59 @@ from datetime import datetime, timedelta
 
 import pytest
 from app.services.analytics import is_analytics_value
-from app.services.portfolio import execute_portfolio_handle_operation
+from app.services.portfolio import (
+    create_portfolio_value,
+    execute_portfolio_handle_operation,
+    get_portfolio_value_field,
+)
 from app.utils import get_logger
+from pydantic import ValidationError
 
 from tests.portfolio.unit.test_workflows import _plan, _service
 
 ActivePortfolioAllocation = object
 PortfolioSettings = object
 logger = get_logger(__name__)
+
+
+def test_definition_contract_is_versioned_and_rejects_incompatible_producers(
+    portfolio_now: datetime,
+) -> None:
+    """API and persistence consumers share the strict Portfolio definition v1."""
+    definition = create_portfolio_value(
+        "PortfolioDefinition",
+        portfolio_id="portfolio-alpha",
+        portfolio_version="v1",
+        scope={"environment": "simulation"},
+        definition={"objective": "balanced"},
+        canonical_hash="a" * 64,
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
+        created_at=portfolio_now,
+    )
+    assert get_portfolio_value_field(definition, "contract_version") == "v1"
+    assert (
+        get_portfolio_value_field(definition, "schema_id") == "portfolio.definition.v1"
+    )
+    assert get_portfolio_value_field(definition, "definition") == {
+        "objective": "balanced"
+    }
+
+    with pytest.raises(ValidationError):
+        create_portfolio_value(
+            "PortfolioDefinition",
+            contract_version="v2",
+            portfolio_id="portfolio-alpha",
+            portfolio_version="v1",
+            scope={"environment": "simulation"},
+            definition={"objective": "balanced"},
+            canonical_hash="a" * 64,
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
+            created_at=portfolio_now,
+        )
 
 
 @pytest.fixture

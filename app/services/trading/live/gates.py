@@ -233,6 +233,7 @@ async def evaluate_live_gate(
     try:
         return await _evaluate_live_gate_value(request, evidence, session)
     except TradingError as error:
+        logger.exception("LIVE GATE ERROR DETAILS: %s", error.details)
         from app.services.trading.contracts.errors import map_trading_error
 
         return map_trading_error(

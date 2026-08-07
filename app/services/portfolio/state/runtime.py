@@ -14,16 +14,19 @@ from pydantic import BaseModel
 from app.services.portfolio.contracts import (
     ActivePortfolioAllocation,
     PortfolioConstructionResult,
+    PortfolioDefinition,
     PortfolioRebalancePlan,
 )
 from app.services.portfolio.persistence import (
     create_construction_record,
+    create_definition_record,
     create_plan_record,
     create_portfolio_runtime_store,
     read_active_allocation_record,
     read_allocation_history_records,
     read_allocation_record,
     read_construction_record,
+    read_definition_record,
     read_idempotency_record,
     read_plan_record,
     read_plan_version_records,
@@ -231,6 +234,11 @@ class _DurablePortfolioStateStore:
                     _encode_model,
                     lambda payload: _decode_model(PortfolioConstructionResult, payload),
                 ),
+                "definition": (
+                    _encode_model,
+                    lambda payload: _decode_model(PortfolioDefinition, payload),
+                ),
+                "scope": (_encode_mapping, json.loads),
                 "outbox": (_encode_mapping, json.loads),
                 "plan": (
                     _encode_model,
@@ -290,6 +298,64 @@ class _DurablePortfolioStateStore:
             audit_record=audit_record,
         )
         return result
+
+    def save_definition(
+        self,
+        definition: PortfolioDefinition,
+        audit_record: AuditOutboxRecord,
+    ) -> PortfolioDefinition:
+        """Atomically save an immutable Portfolio definition.
+
+        Args:
+            definition: Validated immutable definition.
+            audit_record: Redacted audit evidence.
+
+        Returns:
+            Persisted or identical idempotent definition.
+
+        Raises:
+            ValueError: If the immutable identity conflicts.
+        """
+        logger.info("Saving immutable Portfolio definition")
+        existing = read_definition_record(
+            self._store, definition.portfolio_id, definition.portfolio_version
+        )
+        if existing is not None:
+            if existing == definition:
+                return definition
+            raise ValueError("Portfolio immutable definition conflicts")
+        outbox = {"audit": dict(audit_record), "definition": definition.portfolio_id}
+        committed = create_definition_record(
+            self._store,
+            state_value=definition,
+            event_key=_key(
+                "outbox",
+                "definitions",
+                definition.portfolio_id,
+                definition.portfolio_version,
+            ),
+            event_value=outbox,
+        )
+        if not committed:
+            raise ValueError("Portfolio definition transaction was not confirmed")
+        return definition
+
+    def load_definition(
+        self, portfolio_id: str, portfolio_version: str
+    ) -> PortfolioDefinition | None:
+        """Load one exact immutable Portfolio definition.
+
+        Args:
+            portfolio_id: Stable Portfolio identity.
+            portfolio_version: Exact immutable version.
+
+        Returns:
+            Stored definition or ``None``.
+        """
+        return cast(
+            "PortfolioDefinition | None",
+            read_definition_record(self._store, portfolio_id, portfolio_version),
+        )
 
     def activate_allocation(
         self,
@@ -496,8 +562,10 @@ def execute_portfolio_state_store_operation(
         "load_active",
         "load_allocation",
         "load_history",
+        "load_definition",
         "load_plan",
         "save_construction",
+        "save_definition",
         "save_plan",
     }
     if not isinstance(store, _DurablePortfolioStateStore):

@@ -54,6 +54,7 @@ class MemoryStore:
     def __init__(self) -> None:
         """Initialize empty observable state."""
         self.projection: TradingProjection | None = None
+        self.projections: dict[tuple[Any, Any, Any], TradingProjection] = {}
         self.events: list[TradingEvent] = []
         self.reservations: dict[str, IdempotencyReservation] = {}
 
@@ -114,15 +115,28 @@ class MemoryStore:
             }
         )
 
-    def load_projection(self, scope) -> TradingProjection | None:
+    def _scope_key(self, scope: Any) -> tuple[str, str, str]:
+        if isinstance(scope, (tuple, list)) and len(scope) == 3:
+            r, t, a = scope
+            r_str = str(r.value) if hasattr(r, "value") else str(r)
+            return (r_str, str(t), str(a))
+        return (str(scope), "", "")
+
+    def load_projection(self, scope: Any) -> TradingProjection | None:
         """Load the current projection when its scope matches."""
+        key = self._scope_key(scope)
+        if key in self.projections:
+            return self.projections[key]
         if self.projection is None:
             return None
-        if (
-            self.projection.route,
-            self.projection.tenant_id,
-            self.projection.authority_id,
-        ) == scope:
+        proj_key = self._scope_key(
+            (
+                self.projection.route,
+                self.projection.tenant_id,
+                self.projection.authority_id,
+            )
+        )
+        if proj_key == key:
             return self.projection
         return None
 
@@ -130,8 +144,13 @@ class MemoryStore:
         self, projection: TradingProjection, expected_version: int
     ) -> None:
         """Save one optimistic projection."""
-        current = 0 if self.projection is None else self.projection.version
+        key = self._scope_key(
+            (projection.route, projection.tenant_id, projection.authority_id)
+        )
+        current_proj = self.load_projection(key)
+        current = 0 if current_proj is None else current_proj.version
         assert current == expected_version
+        self.projections[key] = projection
         self.projection = projection
 
     def load_unresolved_attempts(self, _scope) -> tuple[TradingEvent, ...]:

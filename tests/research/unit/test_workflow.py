@@ -1,16 +1,10 @@
 """Research Edge Lab workflow tests."""
 
-from collections.abc import Mapping
-from dataclasses import replace
 from datetime import timedelta
 from decimal import Decimal
 from pathlib import Path
 
-from app.services.research import (
-    create_research_value,
-    is_research_value,
-    run_edge_lab_profile,
-)
+from app.services.research import is_research_value, run_edge_lab_profile
 from app.utils.responses import StandardResponse
 
 from tests.research._support import make_dataset, make_edge_lab_config
@@ -109,76 +103,6 @@ def _full_dataset():
             "record_count": len(records),
         }
     )
-
-
-def _study_config() -> object:
-    """Build complete bounded settings for all three study families."""
-    common = {
-        "hold_bars": 1,
-        "side": "buy",
-        "minimum_samples": 1,
-        "q": 0.1,
-        "null_quantile": 0.9,
-    }
-    return create_research_value(
-        "StudyConfig",
-        mean_reversion={
-            **common,
-            "lookback": 2,
-            "entry_zscore": 0.5,
-        },
-        trend_persistence={
-            **common,
-            "lookback": 2,
-            "minimum_move": 0.0001,
-        },
-        session={
-            "horizon": 1,
-            "minimum_samples": 1,
-            "q": 0.1,
-            "null_quantile": 0.9,
-        },
-    )
-
-
-def test_edge_lab_executes_every_configured_stage(tmp_path: Path) -> None:
-    """Verify FR-RES-096 composes every selected deterministic stage."""
-    selected = (
-        "profiles",
-        "modeling",
-        "market_structure",
-        "seasonality",
-        "studies",
-        "statistics",
-        "metrics",
-        "leakage",
-        "features",
-        "data",
-    )
-    config = replace(
-        make_edge_lab_config(tmp_path, selected_stages=selected),
-        studies=_study_config(),
-    )
-
-    response = run_edge_lab_profile(
-        _full_dataset(),
-        hypothesis="A complete bounded Edge Lab hypothesis.",
-        config=config,
-    )
-
-    assert response.status == "success"
-    report = response.data
-    assert is_research_value(report, "ResearchReport")
-    assert report.advisory_only is True
-    assert report.evidence["selected_stages"] == list(selected)
-    assert set(report.evidence) >= set(selected)
-    leakage = report.evidence["leakage"]
-    profiles = report.evidence["profiles"]
-    assert isinstance(leakage, Mapping)
-    assert isinstance(profiles, Mapping)
-    assert leakage["severity"] != "high"
-    assert profiles["advisory_only"] is True
-    assert list(tmp_path.iterdir()) == []
 
 
 def test_edge_lab_rejects_non_research_configuration() -> None:

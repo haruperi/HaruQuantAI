@@ -177,6 +177,7 @@ class SqlitePortfolioStore:
         self._connection = sqlite3.connect(self.path)
         register(self._connection.close)
         self.constructions: dict[str, object] = {}
+        self.definitions: dict[tuple[str, str], object] = {}
         self.allocations: dict[tuple[str, str], object] = {}
         self.histories: dict[str, list[object]] = {}
         self.active_scopes: dict[str, tuple[object, int]] = {}
@@ -246,6 +247,28 @@ class SqlitePortfolioStore:
         )
         self.constructions[result.result_id] = result
         return existing or result
+
+    def save_definition(self, definition: object, audit_record: object) -> object:
+        """Persist one immutable Portfolio definition version."""
+        key = (definition.portfolio_id, definition.portfolio_version)
+        existing = self.definitions.get(key)
+        if existing is not None and existing != definition:
+            raise RuntimeError("definition identity conflict")
+        self._persist(
+            "definition",
+            definition.portfolio_id,
+            definition.portfolio_version,
+            definition,
+            audit_record,
+        )
+        self.definitions[key] = definition
+        return existing or definition
+
+    def load_definition(
+        self, portfolio_id: str, portfolio_version: str
+    ) -> object | None:
+        """Load one exact Portfolio definition version."""
+        return self.definitions.get((portfolio_id, portfolio_version))
 
     def activate_allocation(
         self,

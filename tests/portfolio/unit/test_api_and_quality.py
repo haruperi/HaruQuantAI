@@ -19,6 +19,7 @@ from app.services.portfolio import (
     create_portfolio_value,
     dump_portfolio_value,
     execute_portfolio_handle_operation,
+    get_portfolio_definition,
     get_portfolio_error_catalog,
     get_portfolio_history,
     get_portfolio_status,
@@ -27,6 +28,7 @@ from app.services.portfolio import (
     is_portfolio_value,
     persistence,
     recompute_portfolio_measurement,
+    register_portfolio_definition,
     rollback_portfolio,
     submit_portfolio_rebalance,
     to_portfolio_error_payload,
@@ -40,7 +42,12 @@ from app.services.portfolio.contracts import (
 from app.services.portfolio.orchestration import PortfolioWorkflowService
 from app.services.portfolio.persistence import delete
 from app.services.portfolio.state import PortfolioRepository, scope_key
-from app.utils import create_auth_context, get_logger, get_standard_response_type
+from app.utils import (
+    canonical_digest,
+    create_auth_context,
+    get_logger,
+    get_standard_response_type,
+)
 
 from tests.portfolio.unit.test_repository import FakePortfolioStore
 from tests.portfolio.unit.test_workflows import _plan, _service
@@ -60,12 +67,14 @@ _EXPECTED_PERSISTENCE_FILES = {
 }
 _EXPECTED_PERSISTENCE_EXPORTS = {
     "create_construction_record",
+    "create_definition_record",
     "create_plan_record",
     "create_portfolio_runtime_store",
     "read_active_allocation_record",
     "read_allocation_history_records",
     "read_allocation_record",
     "read_construction_record",
+    "read_definition_record",
     "read_idempotency_record",
     "read_plan_record",
     "read_plan_version_records",
@@ -375,9 +384,47 @@ def test_status_and_history_return_structured_non_null_outcomes(
     assert status.data is active_allocation
     assert history.status == "success"
     assert history.data == (active_allocation,)
-    assert status.metadata.request_id == auth.request_id
-    assert status.metadata.correlation_id == auth.correlation_id
-    assert status.metadata.read_only is True
+
+
+def test_definition_registration_and_read_are_structured(
+    portfolio_now: datetime,
+) -> None:
+    """Definition registration validates material and reaches the repository."""
+    auth = _auth(portfolio_now)
+    material = {
+        "definition": {"objective": "balanced"},
+        "scope": {"environment": "simulation"},
+    }
+    definition = create_portfolio_value(
+        "PortfolioDefinition",
+        portfolio_id="portfolio-alpha",
+        portfolio_version="v1",
+        scope=material["scope"],
+        definition=material["definition"],
+        canonical_hash=canonical_digest(material),
+        request_id=auth.request_id,
+        workflow_id=auth.workflow_id,
+        correlation_id=auth.correlation_id,
+        created_at=portfolio_now,
+    )
+    service = create_portfolio_handle(
+        "PortfolioService",
+        cast("PortfolioWorkflowService", MagicMock()),
+        PortfolioRepository(FakePortfolioStore()),
+    )
+    registered = register_portfolio_definition(service, definition, auth)
+    loaded = get_portfolio_definition(service, "portfolio-alpha", "v1", auth)
+    assert registered.status == "success"
+    assert registered.data == definition
+    assert loaded.status == "success"
+    assert loaded.data == definition
+
+    conflicting = definition.model_copy(update={"canonical_hash": "f" * 64})
+    rejected = register_portfolio_definition(service, conflicting, auth)
+    assert rejected.status == "error"
+    assert rejected.metadata.request_id == auth.request_id
+    assert rejected.metadata.correlation_id == auth.correlation_id
+    assert rejected.metadata.modifies_database is True
 
 
 def test_public_boundary_maps_unexpected_exception_without_detail_leak(

@@ -17,19 +17,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
     build_data_settings,
-    build_migration_request,
     data_settings_context,
-    run_domain_migrations,
     unwrap_data_response,
 )
 from app.services.portfolio import (
     build_portfolio_state_store,
+    create_portfolio_handle,
     create_portfolio_value,
     execute_portfolio_state_store_operation,
+    get_portfolio_definition,
     get_portfolio_migrations,
     get_portfolio_value_field,
+    register_portfolio_definition,
+    run_portfolio_migrations,
 )
-from app.utils import canonical_json, generate_id
+from app.utils import canonical_digest, canonical_json, create_auth_context, generate_id
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 
@@ -42,6 +44,12 @@ def _feature_header(title: str) -> None:
 def _header(title: str) -> None:
     """Print one example heading."""
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+
+
+def _run_example(requirement: str, example: Any) -> None:
+    """Run one requirement example and print explicit success evidence."""
+    example()
+    print(f"SUCCESS: {requirement}")
 
 
 def _format_result(obj: Any) -> str:
@@ -122,13 +130,7 @@ def _run_migrations() -> None:
     """Apply Portfolio's immutable manifest through Data's public boundary."""
     request_id = generate_id("req")
     unwrap_data_response(
-        run_domain_migrations(
-            build_migration_request(
-                domain="portfolio",
-                steps=get_portfolio_migrations(),
-                request_id=request_id,
-            )
-        ),
+        run_portfolio_migrations(request_id),
         operation="portfolio.usage.migrations",
         request_id=request_id,
     )
@@ -142,13 +144,13 @@ def _scope_key(allocation: object) -> str:
     )
 
 
-def fr_port_033() -> None:
-    """FR-PORT-033: Stage 1 — Prevent direct writes by other domains.
+def fr_port_030() -> None:
+    """FR-PORT-030: Stage 1 — Prevent direct writes by other domains.
 
     The system shall enforce Portfolio domain ownership over active allocation persistence.
     """
     _header(
-        "Stage 1: Portfolio State Isolation - Prevent Direct Cross-Domain Writes (FR-PORT-033)"
+        "Stage 1: Portfolio State Isolation - Prevent Direct Cross-Domain Writes (FR-PORT-030)"
     )
     allocation = create_portfolio_value(
         "ActivePortfolioAllocation", **_allocation_data()
@@ -157,13 +159,13 @@ def fr_port_033() -> None:
     print(f"Data -> allocation_id='{allocation.allocation_id}'")
 
 
-def fr_port_034() -> None:
-    """FR-PORT-034: Stage 3 — Preserve every superseded and rolled-back version.
+def fr_port_031() -> None:
+    """FR-PORT-031: Stage 3 — Preserve every superseded and rolled-back version.
 
     The system shall preserve every superseded and rolled-back allocation version in durable history.
     """
     _header(
-        "Stage 3: Version Preservation - Retain Superseded Allocations (FR-PORT-034)"
+        "Stage 3: Version Preservation - Retain Superseded Allocations (FR-PORT-031)"
     )
     _allocation = create_portfolio_value(
         "ActivePortfolioAllocation", **_allocation_data()
@@ -185,19 +187,32 @@ def fr_port_034() -> None:
     )
 
 
-def fr_port_035() -> None:
-    """FR-PORT-035: Stage 2 — Use atomic activation and deterministic idempotency keys.
+def fr_port_032() -> None:
+    """FR-PORT-032: Stage 2 — Use atomic activation and deterministic idempotency keys.
 
     The system shall enforce atomic state activation using deterministic idempotency keys.
     """
     _header(
-        "Stage 2: Atomic State Activation - Enforce Idempotent Transitions (FR-PORT-035)"
+        "Stage 2: Atomic State Activation - Enforce Idempotent Transitions (FR-PORT-032)"
     )
     allocation = create_portfolio_value(
         "ActivePortfolioAllocation", **_allocation_data()
     )
     print(_format_result(allocation))
     print(f"Data -> idempotency_key='{allocation.idempotency_key}'")
+
+
+def fr_port_033() -> None:
+    """FR-PORT-033: Retain exact reproducibility lineage references."""
+    allocation = create_portfolio_value(
+        "ActivePortfolioAllocation", **_allocation_data()
+    )
+    print(_format_result(allocation))
+    print(
+        "Data -> lineage="
+        f"{allocation.construction_result_id}:{allocation.risk_decision_id}:"
+        f"{allocation.simulation_result_id}"
+    )
 
 
 def fr_port_044() -> None:
@@ -285,6 +300,104 @@ def fr_port_045() -> None:
         print(f"Data -> replay_equal={replay == first}, stale={stale_outcome}")
 
 
+def fr_port_041() -> None:
+    """FR-PORT-041: Keep one checksummed migration step outside CRUD support."""
+    steps = get_portfolio_migrations()
+    print(_format_result(steps[0]))
+    print(f"Data -> migration_steps={len(steps)}, module='portfolio.migrations'")
+
+
+def fr_port_042() -> None:
+    """FR-PORT-042: Preserve composite immutable history and active CAS state."""
+    statements = "\n".join(get_portfolio_migrations()[0].statements)
+    assert "PRIMARY KEY (portfolio_id, portfolio_version)" in statements
+    assert "PRIMARY KEY (plan_id, plan_version)" in statements
+    print(_format_result(get_portfolio_migrations()[0]))
+    print("Data -> definition_pk=composite, plan_pk=composite, active_revision=True")
+
+
+def fr_port_043() -> None:
+    """FR-PORT-043: Carry trace and visible outbox publication fields."""
+    statements = "\n".join(get_portfolio_migrations()[0].statements)
+    for field in ("request_id", "correlation_id", "publication_state", "attempts"):
+        assert field in statements
+    print(_format_result(get_portfolio_migrations()[0]))
+    print("Data -> trace_fields=True, publication_state=True, delivery_attempts=True")
+
+
+def _definition_round_trip() -> tuple[object, object]:
+    """Register and read one definition through public Portfolio operations."""
+    with (
+        TemporaryDirectory() as temp_dir,
+        data_settings_context(_settings(Path(temp_dir))),
+    ):
+        _run_migrations()
+        auth = create_auth_context(
+            contract_version="v1",
+            schema_id="utils.auth_context.v1",
+            principal_id="portfolio-owner",
+            principal_type="USER",
+            roles=("owner",),
+            permissions=("portfolio:read", "portfolio:write"),
+            scopes=("portfolio",),
+            tenant_or_environment="development",
+            request_id=generate_id("req"),
+            workflow_id=generate_id("wf"),
+            correlation_id=generate_id("cor"),
+            issued_at=NOW,
+        )
+        material = {
+            "definition": {"objective": "balanced"},
+            "scope": {"environment": "simulation"},
+        }
+        definition = create_portfolio_value(
+            "PortfolioDefinition",
+            portfolio_id="portfolio-alpha",
+            portfolio_version="v1",
+            scope=material["scope"],
+            definition=material["definition"],
+            canonical_hash=canonical_digest(material),
+            request_id=auth.request_id,
+            workflow_id=auth.workflow_id,
+            correlation_id=auth.correlation_id,
+            created_at=NOW,
+        )
+        repository = create_portfolio_handle(
+            "PortfolioRepository", build_portfolio_state_store()
+        )
+        service = create_portfolio_handle("PortfolioService", object(), repository)
+        registered = register_portfolio_definition(service, definition, auth)
+        loaded = get_portfolio_definition(service, "portfolio-alpha", "v1", auth)
+        return registered, loaded
+
+
+def fr_port_046() -> None:
+    """FR-PORT-046: Register one immutable definition version."""
+    registered, _loaded = _definition_round_trip()
+    print(_format_result(registered))
+    print(
+        f"Data -> registered={registered.status}, portfolio_id={registered.data.portfolio_id}"
+    )
+
+
+def fr_port_047() -> None:
+    """FR-PORT-047: Read one exact immutable definition version."""
+    _registered, loaded = _definition_round_trip()
+    print(_format_result(loaded))
+    print(f"Data -> read={loaded.status}, version={loaded.data.portfolio_version}")
+
+
+def fr_port_048() -> None:
+    """FR-PORT-048: Apply and verify the complete Portfolio manifest."""
+    with (
+        TemporaryDirectory() as temp_dir,
+        data_settings_context(_settings(Path(temp_dir))),
+    ):
+        response = run_portfolio_migrations(generate_id("req"))
+        print(_format_result(response))
+        print(f"Data -> migration_status={response.status}, complete_manifest=True")
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -297,19 +410,26 @@ def main() -> None:
     )
 
     # Stage 1: Domain Isolation
-    fr_port_033()
+    _run_example("FR-PORT-030", fr_port_030)
 
     # Stage 2: Atomic Activation
-    fr_port_035()
+    _run_example("FR-PORT-032", fr_port_032)
 
     # Stage 3: Version Preservation
-    fr_port_034()
+    _run_example("FR-PORT-031", fr_port_031)
+    _run_example("FR-PORT-033", fr_port_033)
 
     # Stage 4: Direct Relational Persistence
-    fr_port_044()
+    _run_example("FR-PORT-044", fr_port_044)
 
     # Stage 5: Atomic Compound Writes
-    fr_port_045()
+    _run_example("FR-PORT-045", fr_port_045)
+    _run_example("FR-PORT-041", fr_port_041)
+    _run_example("FR-PORT-042", fr_port_042)
+    _run_example("FR-PORT-043", fr_port_043)
+    _run_example("FR-PORT-046", fr_port_046)
+    _run_example("FR-PORT-047", fr_port_047)
+    _run_example("FR-PORT-048", fr_port_048)
 
 
 if __name__ == "__main__":

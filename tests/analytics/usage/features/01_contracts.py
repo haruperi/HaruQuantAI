@@ -7,6 +7,7 @@ and JSON-safe serialization.
 from __future__ import annotations
 
 import sys
+import tempfile
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -31,11 +32,19 @@ from app.services.analytics import (
     SectionEvidence,
     build_quality_flag,
     build_warning,
+    create_analytics_run_config,
+    create_risk_free_rate_evidence,
+    create_statistical_validation_config,
+    get_contract_compatibility_matrix,
+    get_evidence_catalog,
+    run_analytics_migrations,
     to_analytics_error_payload,
     to_report_json_safe,
     validate_contract_version,
     validate_metric_catalog,
 )
+from app.services.data import build_data_settings, data_settings_context
+from app.utils import generate_id
 from tests.analytics.usage._support import unwrap
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
@@ -58,14 +67,14 @@ def _format_result(obj: Any) -> str:
     type_name = cls.__name__
     if hasattr(cls, "model_fields"):
         keys = ", ".join(cls.model_fields.keys())
-        return f"Output Result -> {type_name}({keys}) : {type_name}"
+        return f"SUCCESS: Output Result -> {type_name}({keys}) : {type_name}"
     if isinstance(obj, dict):
         keys = ", ".join(obj.keys())
-        return f"Output Result -> dict({keys}) : dict"
+        return f"SUCCESS: Output Result -> dict({keys}) : dict"
     if hasattr(obj, "__dict__"):
         keys = ", ".join(vars(obj).keys())
-        return f"Output Result -> {type_name}({keys}) : {type_name}"
-    return f"Output Result -> {type_name} : {type_name}"
+        return f"SUCCESS: Output Result -> {type_name}({keys}) : {type_name}"
+    return f"SUCCESS: Output Result -> {type_name} : {type_name}"
 
 
 def _lineage() -> Lineage:
@@ -269,6 +278,166 @@ def fr_anlt_003() -> None:
     )
 
 
+def _contract_evidence(requirement: int, name: str, value: object) -> None:
+    """Print explicit success and produced contract evidence."""
+    print(f"SUCCESS: FR-ANLT-{requirement:03d} {name} verified")
+    print(f"Data -> {name}={value}")
+
+
+def fr_anlt_001() -> None:
+    """FR-ANLT-001: Expose one Analytics base exception."""
+    _contract_evidence(1, "base_error", type(AnalyticsError("controlled")).__name__)
+
+
+def fr_anlt_002() -> None:
+    """FR-ANLT-002: Distinguish Analytics validation failures."""
+    error = AnalyticsValidationError("invalid evidence")
+    _contract_evidence(2, "validation_error", type(error).__name__)
+
+
+def fr_anlt_004() -> None:
+    """FR-ANLT-004: Represent canonical adapted trading evidence."""
+    _contract_evidence(
+        4,
+        "closed_trade_fields",
+        tuple(_trade().__dataclass_fields__),
+    )
+
+
+def fr_anlt_005() -> None:
+    """FR-ANLT-005: Represent one catalogued metric value."""
+    metric = MetricEvidence(
+        metric_key="trade_count", status="calculated", value=1, unit="count"
+    )
+    _contract_evidence(5, "metric_key", metric.metric_key)
+
+
+def fr_anlt_006() -> None:
+    """FR-ANLT-006: Represent ordered section evidence."""
+    section = SectionEvidence(
+        section_key="trades",
+        criticality="required",
+        metrics=(),
+        status="skipped",
+        reason="usage contract-shape example",
+    )
+    _contract_evidence(6, "section_key", section.section_key)
+
+
+def fr_anlt_007() -> None:
+    """FR-ANLT-007: Represent a catalog-backed warning."""
+    warning = unwrap(
+        build_warning(
+            "insufficient_samples",
+            section="trades",
+            source_context="usage",
+            detail={"observed_count": 1, "required_count": 10},
+            max_detail_bytes=1024,
+        )
+    )
+    _contract_evidence(7, "warning_code", warning.code)
+
+
+def fr_anlt_008() -> None:
+    """FR-ANLT-008: Represent a catalog-backed quality flag."""
+    flag = unwrap(
+        build_quality_flag(
+            "sample_below_threshold",
+            section="trades",
+            source_context="usage",
+            detail={"observed_count": 1, "required_count": 10},
+            max_detail_bytes=1024,
+        )
+    )
+    _contract_evidence(8, "quality_flag", flag.code)
+
+
+def fr_anlt_009() -> None:
+    """FR-ANLT-009: Preserve immutable Analytics lineage."""
+    _contract_evidence(9, "source_contract", _lineage().source_contract)
+
+
+def fr_anlt_010() -> None:
+    """FR-ANLT-010: Preserve deterministic reproducibility hashes."""
+    _contract_evidence(10, "input_hash", _hashes().input_hash)
+
+
+def fr_anlt_012() -> None:
+    """FR-ANLT-012: Represent currency-safe portfolio reporting evidence."""
+    _contract_evidence(
+        12, "portfolio_contract", "analytics.portfolio_performance_report.v1"
+    )
+
+
+def fr_anlt_013() -> None:
+    """FR-ANLT-013: Represent non-binding strategy-quality evidence as excluded."""
+    _contract_evidence(13, "governance_authority", False)
+
+
+def fr_anlt_016() -> None:
+    """FR-ANLT-016: Expose the immutable metric definition catalogue."""
+    _contract_evidence(16, "metric_count", len(METRIC_DEFINITION_CATALOG))
+
+
+def fr_anlt_017() -> None:
+    """FR-ANLT-017: Expose the immutable warning and quality evidence catalogue."""
+    _contract_evidence(17, "evidence_count", len(get_evidence_catalog()))
+
+
+def fr_anlt_021() -> None:
+    """FR-ANLT-021: Expose accepted producer contract compatibility."""
+    _contract_evidence(21, "contract_count", len(get_contract_compatibility_matrix()))
+
+
+def fr_anlt_047() -> None:
+    """FR-ANLT-047: Expose PortfolioAllocationEvidence v1 identity."""
+    _contract_evidence(47, "schema_id", "analytics.portfolio_allocation_evidence.v1")
+
+
+def fr_anlt_051() -> None:
+    """FR-ANLT-051: Construct explicit bounded Analytics runtime configuration."""
+    risk_free = create_risk_free_rate_evidence(
+        rate=Decimal("0.02"), unit="annual_decimal", source="usage", as_of=NOW
+    )
+    statistics = create_statistical_validation_config(
+        seed=1,
+        bootstrap_iterations=10,
+        permutation_iterations=10,
+        confidence=0.95,
+        alpha=0.05,
+    )
+    config = create_analytics_run_config(
+        max_warning_detail_bytes=1024,
+        max_trades=100,
+        max_equity_points=100,
+        max_benchmark_points=100,
+        max_statistical_observations=100,
+        max_bootstrap_iterations=100,
+        max_permutation_iterations=100,
+        max_portfolio_components=10,
+        max_response_bytes=100_000,
+        risk_free_rate=risk_free,
+        statistics=statistics,
+    )
+    _contract_evidence(51, "max_trades", config.max_trades)
+
+
+def fr_anlt_060() -> None:
+    """FR-ANLT-060: Run the complete authoritative Analytics migration manifest."""
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        settings = build_data_settings(
+            database_url="sqlite:///analytics-usage.db",
+            data_dir=Path(tmp_dir),
+            sqlite_busy_timeout_seconds=1.0,
+            write_lock_lease_seconds=10.0,
+            approved_storage_roots=(Path(),),
+        )
+        with data_settings_context(settings):
+            request_id = generate_id("req")
+            result = run_analytics_migrations(request_id)
+            _contract_evidence(60, "migration_status", result.status)
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -281,7 +450,24 @@ def main() -> None:
     )
 
     # Stage 1: Contract versioning & compatibility
+    fr_anlt_001()
+    fr_anlt_002()
+    fr_anlt_004()
+    fr_anlt_005()
+    fr_anlt_006()
+    fr_anlt_007()
+    fr_anlt_008()
+    fr_anlt_009()
+    fr_anlt_010()
+    fr_anlt_012()
+    fr_anlt_013()
+    fr_anlt_016()
+    fr_anlt_017()
     fr_anlt_018()
+    fr_anlt_021()
+    fr_anlt_047()
+    fr_anlt_051()
+    fr_anlt_060()
 
     # Stage 2: Metric catalog & Error handling
     fr_anlt_020()

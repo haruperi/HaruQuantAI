@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from app.services.optimization.errors import OptimizationError
+from app.services.optimization.contracts import OptimizationError
 from app.utils import get_logger
 
 logger = get_logger(__name__)

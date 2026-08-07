@@ -15,6 +15,7 @@ from app.services.portfolio.contracts.errors import (
 )
 from app.utils import (
     build_response_metadata,
+    canonical_digest,
     error_response,
     generate_id,
     get_logger,
@@ -35,6 +36,7 @@ if TYPE_CHECKING:
         ActivePortfolioAllocation,
         PortfolioConstructionRequest,
         PortfolioConstructionResult,
+        PortfolioDefinition,
         PortfolioRebalancePlan,
     )
     from app.services.portfolio.evidence import ValidatedConstructionEvidence
@@ -60,6 +62,14 @@ _OPERATION_FACTS = MappingProxyType(
             True,
         ),
         "portfolio.api.service.status": ("low", True, False, False, False),
+        "portfolio.api.service.register_definition": (
+            "medium",
+            False,
+            True,
+            False,
+            True,
+        ),
+        "portfolio.api.service.definition": ("low", True, False, False, False),
         "portfolio.api.service.activate": (
             "critical",
             False,
@@ -380,6 +390,119 @@ class PortfolioService:
             return self._failure(
                 error,
                 operation="portfolio.api.service.construct",
+                request_id=safe_request_id,
+                correlation_id=correlation_id,
+                start_time=start_time,
+            )
+
+    def register_definition(
+        self,
+        definition: PortfolioDefinition,
+        auth_context: AuthContext,
+        request_id: str | None = None,
+    ) -> StandardResponse[PortfolioDefinition]:
+        """Register one immutable Portfolio definition version.
+
+        Args:
+            definition: Validated immutable Portfolio definition.
+            auth_context: Already authenticated Utils context.
+            request_id: Optional exact request identity.
+
+        Returns:
+            Structured persisted definition or failure.
+
+        Raises:
+            PortfolioError: If canonical definition material conflicts.
+        """
+        logger.info("Serving public Portfolio definition registration")
+        start_time = time.perf_counter_ns()
+        safe_request_id, correlation_id = self._fallback_trace(auth_context, request_id)
+        try:
+            safe_request_id, correlation_id = self._trace(
+                auth_context,
+                request_id,
+                command_request_id=definition.request_id,
+                command_workflow_id=definition.workflow_id,
+                command_correlation_id=definition.correlation_id,
+            )
+            self._validate_definition_hash(definition)
+            value = self._repository.save_definition(
+                definition,
+                {
+                    "action": "portfolio.definition_registered",
+                    "request_id": safe_request_id,
+                    "correlation_id": correlation_id,
+                },
+            )
+            return self._success(
+                value,
+                operation="portfolio.api.service.register_definition",
+                request_id=safe_request_id,
+                correlation_id=correlation_id,
+                start_time=start_time,
+            )
+        except Exception as error:  # noqa: BLE001 - public exception boundary.
+            return self._failure(
+                error,
+                operation="portfolio.api.service.register_definition",
+                request_id=safe_request_id,
+                correlation_id=correlation_id,
+                start_time=start_time,
+            )
+
+    @staticmethod
+    def _validate_definition_hash(definition: PortfolioDefinition) -> None:
+        """Require exact canonical definition material.
+
+        Args:
+            definition: Candidate immutable definition.
+
+        Raises:
+            PortfolioError: If the supplied digest conflicts.
+        """
+        expected_hash = canonical_digest(
+            {
+                "definition": dict(definition.definition),
+                "scope": dict(definition.scope),
+            }
+        )
+        if definition.canonical_hash != expected_hash:
+            raise PortfolioError("PORT_INVALID_INPUT", "DEFINITION_HASH")
+
+    def definition(
+        self,
+        portfolio_id: str,
+        portfolio_version: str,
+        auth_context: AuthContext,
+        request_id: str | None = None,
+    ) -> StandardResponse[PortfolioDefinition]:
+        """Read one exact immutable Portfolio definition.
+
+        Args:
+            portfolio_id: Stable Portfolio identity.
+            portfolio_version: Exact immutable version.
+            auth_context: Already authenticated Utils context.
+            request_id: Optional exact request identity.
+
+        Returns:
+            Structured definition or failure.
+        """
+        logger.info("Serving public Portfolio definition read")
+        start_time = time.perf_counter_ns()
+        safe_request_id, correlation_id = self._fallback_trace(auth_context, request_id)
+        try:
+            safe_request_id, correlation_id = self._trace(auth_context, request_id)
+            return self._success(
+                self._repository.definition(portfolio_id, portfolio_version),
+                operation="portfolio.api.service.definition",
+                request_id=safe_request_id,
+                correlation_id=correlation_id,
+                start_time=start_time,
+            )
+        except Exception as error:  # noqa: BLE001 - public exception boundary.
+            return self._failure(
+                error,
+                operation="portfolio.api.service.definition",
                 request_id=safe_request_id,
                 correlation_id=correlation_id,
                 start_time=start_time,
@@ -845,6 +968,44 @@ def get_portfolio_status(
     )
 
 
+def register_portfolio_definition(
+    service_handle: object,
+    definition: object,
+    auth_context: object,
+    request_id: str | None = None,
+) -> object:
+    """Register one immutable Portfolio definition.
+
+    Returns:
+        Structured Portfolio response envelope.
+    """
+    return _require_portfolio_service(service_handle).register_definition(
+        cast("PortfolioDefinition", definition),
+        cast("AuthContext", auth_context),
+        request_id,
+    )
+
+
+def get_portfolio_definition(
+    service_handle: object,
+    portfolio_id: str,
+    portfolio_version: str,
+    auth_context: object,
+    request_id: str | None = None,
+) -> object:
+    """Read one exact immutable Portfolio definition.
+
+    Returns:
+        Structured Portfolio response envelope.
+    """
+    return _require_portfolio_service(service_handle).definition(
+        portfolio_id,
+        portfolio_version,
+        cast("AuthContext", auth_context),
+        request_id,
+    )
+
+
 def activate_portfolio(
     service_handle: object,
     candidate: object,
@@ -1031,9 +1192,11 @@ __all__: tuple[str, ...] = (
     "activate_portfolio",
     "assess_portfolio_drift",
     "construct_portfolio",
+    "get_portfolio_definition",
     "get_portfolio_history",
     "get_portfolio_status",
     "recompute_portfolio_measurement",
+    "register_portfolio_definition",
     "rollback_portfolio",
     "submit_portfolio_rebalance",
 )

@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
+from app.services.simulator.errors import SimulationError
 from app.services.simulator.persistence import create, read, update
 from app.services.simulator.state import runtime
 from app.utils import canonical_json
@@ -81,6 +82,48 @@ def test_read_and_update_malformed_or_conflicting_rows(
             expected_status="started",
             expected_result_payload=None,
         )
+    with pytest.raises(ValueError, match="identity is inconsistent"):
+        update.update_run_record(
+            _store(),
+            key="different",
+            value=_run_value(),
+            expected_status="started",
+            expected_result_payload=None,
+        )
+
+
+def test_session_update_validates_and_reports_row_count(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Playback cursor updates validate values and preserve affected-row truth."""
+    with pytest.raises(ValueError, match="session update is invalid"):
+        update.update_session_record(
+            _store(),
+            session_id="session-one",
+            status="unknown",
+            cursor=-1,
+            request_id="req-one",
+        )
+    with pytest.raises(ValueError, match="session update is invalid"):
+        update.update_session_record(
+            _store(),
+            session_id="session-one",
+            status="active",
+            cursor=-2,
+            request_id="req-one",
+        )
+    monkeypatch.setattr(
+        update,
+        "_execute",
+        lambda *_args, **_kwargs: SimpleNamespace(affected_rows=1),
+    )
+    assert update.update_session_record(
+        _store(),
+        session_id="session-one",
+        status="completed",
+        cursor=3,
+        request_id="req-one",
+    )
 
 
 def test_result_decoder_routes_both_owner_contracts(
@@ -165,3 +208,86 @@ def test_public_runtime_rejects_invalid_result_identity(tmp_path: Path) -> None:
     response = store.load_result("")
     assert response.status == "error"
     assert response.error.code == "SIM_INVALID_CONFIG"
+
+
+def test_runtime_lifecycle_helpers_reject_invalid_and_terminal_material() -> None:
+    """Lifecycle helpers reject invalid statuses, payloads, and terminal changes."""
+    request_id = cast("str", _run_value()["request_id"])
+    with pytest.raises(ValueError, match="status is invalid"):
+        runtime._lifecycle_value(request_id, "a" * 64, "run-one", "queued", None)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="requires result"):
+        runtime._lifecycle_value(request_id, "a" * 64, "run-one", "completed", None)
+    with pytest.raises(ValueError, match="cannot carry"):
+        runtime._lifecycle_value(
+            request_id,
+            "a" * 64,
+            "run-one",
+            "failed",
+            {"status": "failed"},
+        )
+    with pytest.raises(SimulationError, match="identity conflicts"):
+        runtime._validate_existing_transition(
+            _run_value(),
+            request_hash="b" * 64,
+            run_id="run-one",
+            status="failed",
+            result_payload=None,
+        )
+    with pytest.raises(ValueError, match="stored Simulation lifecycle"):
+        runtime._validate_existing_transition(
+            _run_value(status="unknown"),
+            request_hash="a" * 64,
+            run_id="run-one",
+            status="failed",
+            result_payload=None,
+        )
+    with pytest.raises(TypeError, match="result payload"):
+        runtime._validate_existing_transition(
+            _run_value(result_payload=[]),
+            request_hash="a" * 64,
+            run_id="run-one",
+            status="failed",
+            result_payload=None,
+        )
+    with pytest.raises(ValueError, match="cannot change"):
+        runtime._validate_existing_transition(
+            _run_value(status="completed", result_payload={"status": "one"}),
+            request_hash="a" * 64,
+            run_id="run-one",
+            status="completed",
+            result_payload={"status": "two"},
+        )
+    with pytest.raises(ValueError, match="terminal state"):
+        runtime._validate_existing_transition(
+            _run_value(status="failed"),
+            request_hash="a" * 64,
+            run_id="run-one",
+            status="completed",
+            result_payload={"status": "completed"},
+        )
+
+
+def test_runtime_load_and_flush_failures_are_normalized(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Persistence read and journal flush failures return controlled errors."""
+    store = cast("Any", runtime.build_simulation_state_store(artifact_root=tmp_path))
+    monkeypatch.setattr(
+        runtime,
+        "read_run_record",
+        lambda *_: (_ for _ in ()).throw(ValueError("broken")),
+    )
+    assert store.load_run("request").error.code == "SIM_PERSISTENCE_FAILED"
+    monkeypatch.setattr(
+        runtime,
+        "read_result_record",
+        lambda *_: (_ for _ in ()).throw(TypeError("broken")),
+    )
+    assert store.load_result("run-one").error.code == "SIM_PERSISTENCE_FAILED"
+    monkeypatch.setattr(
+        runtime,
+        "_fsync",
+        lambda *_: (_ for _ in ()).throw(OSError("broken")),
+    )
+    assert store.flush_journal("run-one").error.code == "SIM_PERSISTENCE_FAILED"

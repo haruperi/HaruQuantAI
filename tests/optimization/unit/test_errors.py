@@ -1,7 +1,7 @@
 """Tests for controlled Optimization errors."""
 
 import pytest
-from app.services.optimization.errors import (
+from app.services.optimization.contracts import (
     OPTIMIZATION_ERROR_CATALOG,
     OptimizationError,
 )

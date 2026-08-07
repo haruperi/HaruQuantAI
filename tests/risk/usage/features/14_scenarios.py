@@ -87,6 +87,7 @@ def _snapshot() -> create_portfolio_risk_snapshot:
 def fr_risk_045() -> None:
     """FR-RISK-045: Stage 3 — Deterministically apply bounded scenarios to immutable snapshot evidence, return baseline/projected risk differences, preserve explicit seed, and mark every result advisory."""
     _header("Stage 3: Scenario Analysis - Run Risk Scenario Analysis (FR-RISK-045)")
+    print("SUCCESS: FR-RISK-045")
 
     config = create_risk_config(
         profile="research",

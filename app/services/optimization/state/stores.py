@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from app.services.optimization.errors import OptimizationError
+from app.services.optimization.contracts import OptimizationError
 from app.services.optimization.state.contracts import (
     OPTIMIZATION_SCHEMA_VERSION,
     OptimizationCheckpoint,

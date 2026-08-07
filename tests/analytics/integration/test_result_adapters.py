@@ -1,6 +1,5 @@
 """Workflow integration for producer-neutral Analytics adaptation."""
 
-# ruff: noqa: INP001
 from datetime import UTC, datetime
 from decimal import Decimal
 

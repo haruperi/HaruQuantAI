@@ -72,6 +72,7 @@ _EXPECTED: dict[str, tuple[str, ...]] = {
         "run_backtest",
         "run_fast_research",
         "run_portfolio_backtest",
+        "run_simulator_migrations",
         "step_live_simulation",
         "stream_simulation_session_frames",
         "to_simulation_error_payload",

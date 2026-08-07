@@ -1,5 +1,5 @@
 /**
- * Frozen typed route contracts for the 71 registered backend-v1 operations.
+ * Frozen typed route contracts for the 76 registered backend-v1 operations.
  *
  * Source of truth: `app/services/api/contracts/catalog.py` (`_KNOWN_ROUTE_CONTRACTS`).
  * The drift test in `clients.contract.test.ts` asserts that this module
@@ -467,9 +467,24 @@ export const simulationSessionRoutes = {
   }),
 } as const;
 
-// --- Portfolio (8) -------------------------------------------------------
+// --- Portfolio (10) ------------------------------------------------------
 
 export const portfolioRoutes = {
+  registerDefinition: route({
+    id: "api.portfolio.definition_register",
+    method: "POST",
+    path: "/api/v1/portfolio/{portfolio_id}/definitions",
+    permission: "portfolio:write",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  definition: route({
+    id: "api.portfolio.definition",
+    method: "GET",
+    path: "/api/v1/portfolio/{portfolio_id}/definitions/{portfolio_version}",
+    permission: "portfolio:read",
+  }),
   construct: route({
     id: "api.portfolio.construct",
     method: "POST",
@@ -750,6 +765,8 @@ export const ROUTE_CONTRACTS = [
   simulationSessionRoutes.createSession,
   simulationSessionRoutes.frames,
   portfolioRoutes.construct,
+  portfolioRoutes.registerDefinition,
+  portfolioRoutes.definition,
   portfolioRoutes.status,
   portfolioRoutes.history,
   portfolioRoutes.activate,
@@ -778,7 +795,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 74;
+export const ROUTE_CONTRACT_COUNT = 76;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

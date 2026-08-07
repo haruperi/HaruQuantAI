@@ -17,7 +17,10 @@ from uuid import uuid4
 import pytest
 from app.services.api import build_api_settings
 from app.services.api.composition import portfolio_dependencies
-from app.services.api.contracts import PortfolioConstructRequest
+from app.services.api.contracts import (
+    PortfolioConstructRequest,
+    PortfolioDefinitionRequest,
+)
 from app.services.api.identity import require_auth_context
 from app.services.api.routes import portfolio
 from app.utils import create_auth_context, utc_now
@@ -218,6 +221,62 @@ def test_status_and_history_delegate_to_owner(
         status_expected,
     )
     assert source("history", "port-1", auth) == ("port-1", history_expected)
+
+
+def test_definition_source_injects_authenticated_trace(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Definition registration derives trace identity from authenticated context."""
+    captured: dict[str, object] = {}
+    definition = object()
+    monkeypatch.setattr(
+        portfolio_dependencies,
+        "create_portfolio_value",
+        lambda _contract, **values: captured.update(values) or definition,
+    )
+    monkeypatch.setattr(
+        portfolio_dependencies,
+        "register_portfolio_definition",
+        lambda handle, value, auth: (handle, value, auth),
+    )
+    auth = _auth()
+    boundary = PortfolioDefinitionRequest(
+        portfolio_id="port-1",
+        portfolio_version="v1",
+        scope={"environment": "simulation"},
+        definition={"objective": "balanced"},
+        canonical_hash="a" * 64,
+    )
+    result = portfolio_dependencies.build_portfolio_source("handle")(
+        "register_definition", boundary, auth
+    )
+    assert result == ("handle", definition, auth)
+    assert captured["request_id"] == auth.request_id
+    assert captured["workflow_id"] == auth.workflow_id
+    assert captured["correlation_id"] == auth.correlation_id
+
+
+def test_definition_read_delegates_exact_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Definition reads delegate exact immutable identity."""
+    expected = object()
+    monkeypatch.setattr(
+        portfolio_dependencies,
+        "get_portfolio_definition",
+        lambda handle, portfolio_id, version, auth: (
+            handle,
+            portfolio_id,
+            version,
+            auth,
+            expected,
+        ),
+    )
+    auth = _auth()
+    result = portfolio_dependencies.build_portfolio_source("handle")(
+        "definition", "port-1", "v1", auth
+    )
+    assert result == ("handle", "port-1", "v1", auth, expected)
 
 
 def test_require_idempotency_rejects_blank_and_oversized() -> None:

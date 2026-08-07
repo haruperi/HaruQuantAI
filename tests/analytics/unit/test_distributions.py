@@ -7,7 +7,7 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
-from tests.analytics.unit.test_results_adapter import _config  # noqa: E402
+from tests.analytics.component.test_results_adapter import _config  # noqa: E402
 
 
 def test_distribution_constant_sample_is_explicit() -> None:

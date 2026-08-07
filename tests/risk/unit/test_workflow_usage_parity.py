@@ -65,3 +65,23 @@ def test_risk_workflow_registry_has_one_complete_program_per_workflow() -> None:
         _assignment(WORKFLOW_DIR / filename, "WORKFLOW_ID")
         for filename in EXPECTED.values()
     }
+
+
+def test_primary_workflow_is_the_complete_safe_teaching_trace() -> None:
+    """Keep the primary workflow complete without executing Trading or a broker."""
+    path = WORKFLOW_DIR / EXPECTED["WF-RISK-PRI"]
+    source = path.read_text(encoding="utf-8")
+    stages = _assignment(path, "STAGES")
+
+    assert len(stages) == 24
+    assert source.count("# Stage ") == 24
+    assert "virtual_positions" in source
+    assert "virtual_pending_orders" in source
+    assert "virtual_closed_trade" in source
+    assert source.count("review_trade_risk(") == 2
+    assert "Canonical verdict:" in source
+    assert "Blocked scenario:" in source
+    assert "ILLUSTRATIVE BOUNDARY" in source
+    assert "Trading must revalidate and atomically consume; not executed here" in source
+    for forbidden in ("submit_order(", "dispatch_order_intent(", "open_socket("):
+        assert forbidden not in source

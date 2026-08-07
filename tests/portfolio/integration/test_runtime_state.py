@@ -8,24 +8,23 @@ from typing import Any, cast
 import pytest
 from app.services.data import (
     build_data_settings,
-    build_migration_request,
     build_statement_plan,
     build_transaction_request,
     data_settings_context,
     execute_transaction,
-    run_domain_migrations,
     unwrap_data_response,
 )
 from app.services.portfolio import (
     build_portfolio_state_store,
     create_portfolio_value,
     execute_portfolio_state_store_operation,
-    get_portfolio_migrations,
     get_portfolio_value_field,
+    run_portfolio_migrations,
 )
 from app.utils import canonical_json, generate_id
 
 _ROW_COUNT_STATEMENTS = {
+    "portfolio_definitions": "SELECT COUNT(*) AS row_count FROM portfolio_definitions",
     "portfolio_active_scopes": (
         "SELECT COUNT(*) AS row_count FROM portfolio_active_scopes"
     ),
@@ -66,13 +65,7 @@ def _run_portfolio_migrations() -> None:
     """Apply the Portfolio manifest through Data's public executor."""
     request_id = generate_id("req")
     unwrap_data_response(
-        run_domain_migrations(
-            build_migration_request(
-                domain="portfolio",
-                steps=get_portfolio_migrations(),
-                request_id=request_id,
-            )
-        ),
+        run_portfolio_migrations(request_id),
         operation="tests.portfolio.migrations",
         request_id=request_id,
     )
@@ -261,3 +254,39 @@ def test_portfolio_construction_and_plan_are_durable(
         assert _row_count("portfolio_construction_results") == 1
         assert _row_count("portfolio_rebalance_plans") == 1
         assert _row_count("portfolio_audit_outbox") == 2
+
+
+def test_portfolio_definition_has_production_state_reachability(tmp_path: Path) -> None:
+    """Definition registration reaches its owned table and survives reconstruction."""
+    with data_settings_context(_settings(tmp_path)):
+        _run_portfolio_migrations()
+        definition = create_portfolio_value(
+            "PortfolioDefinition",
+            portfolio_id="portfolio-alpha",
+            portfolio_version="v1",
+            scope={"environment": "simulation"},
+            definition={"objective": "balanced"},
+            canonical_hash="a" * 64,
+            request_id="req-11111111-1111-4111-8111-111111111111",
+            workflow_id="wf-22222222-2222-4222-8222-222222222222",
+            correlation_id="cor-33333333-3333-4333-8333-333333333333",
+            created_at=datetime(2026, 8, 7, tzinfo=UTC),
+        )
+        store = build_portfolio_state_store()
+        saved = execute_portfolio_state_store_operation(
+            store,
+            "save_definition",
+            definition,
+            {"event": "portfolio.definition_registered"},
+        )
+        reconstructed = build_portfolio_state_store()
+        loaded = execute_portfolio_state_store_operation(
+            reconstructed,
+            "load_definition",
+            "portfolio-alpha",
+            "v1",
+        )
+        assert saved == definition
+        assert loaded == definition
+        assert _row_count("portfolio_definitions") == 1
+        assert _row_count("portfolio_audit_outbox") == 1

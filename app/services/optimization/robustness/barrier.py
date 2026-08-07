@@ -10,7 +10,7 @@ from typing import Any, cast
 
 import numpy as np
 
-from app.services.optimization.errors import OptimizationError
+from app.services.optimization.contracts import OptimizationError
 from app.services.risk import get_drawdown_mode
 from app.utils import get_logger
 

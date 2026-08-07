@@ -56,6 +56,7 @@ def fr_risk_025() -> None:
     _header(
         "Stage 3: Portfolio Risk Calculation - Build Portfolio Risk Snapshot (FR-RISK-025)"
     )
+    print("SUCCESS: FR-RISK-025")
 
     account = build_account_state_snapshot(
         account_id="account-1",

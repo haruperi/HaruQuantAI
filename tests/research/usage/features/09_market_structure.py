@@ -26,12 +26,12 @@ _HASH = "e" * 64
 
 def _feature_header(title: str) -> None:
     """Print the feature header banner."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"SUCCESS: {title}")
 
 
 def _header(title: str) -> None:
     """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"SUCCESS: {title}")
 
 
 def _format_result(obj: Any) -> str:
@@ -102,7 +102,6 @@ def _limits() -> object:
 def fr_res_075() -> None:
     """FR-RES-075: Build swings, directional legs, score, verdict, and fit."""
     _header("FR-RES-075: Build swings, directional legs, score, verdict, and fit.")
-    print("Research Example 9: Market-Structure Profile")
     profile = build_market_structure_profile(
         _prepared(), config=_config(), limits=_limits()
     )

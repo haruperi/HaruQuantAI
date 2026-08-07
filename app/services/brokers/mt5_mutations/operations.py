@@ -217,6 +217,15 @@ class _MT5MutationsMixin:
                 native["price"] = float(request.stop_price)
             if request.limit_price is not None:
                 native["stoplimit"] = float(request.limit_price)
+        elif request.order_type == "MARKET" and "price" not in native:
+            tick = await self._transport.call("symbol_info_tick", request.symbol)
+            if tick is not None:
+                price = (
+                    _field(tick, "ask")
+                    if request.side == "BUY"
+                    else _field(tick, "bid")
+                )
+                native["price"] = float(price)
         if request.stop_loss is not None:
             native["sl"] = float(request.stop_loss)
         if request.take_profit is not None:
@@ -229,6 +238,22 @@ class _MT5MutationsMixin:
             native["comment"] = request.comment
         if request.expiration is not None:
             native["expiration"] = int(request.expiration.timestamp())
+        if "type_filling" not in native:
+            info = await self._transport.call("symbol_info", request.symbol)
+            if info is not None:
+                filling_flags = int(_field(info, "filling_mode"))
+                if filling_flags & 1:
+                    native["type_filling"] = await self._transport.constant(
+                        "ORDER_FILLING_FOK"
+                    )
+                elif filling_flags & 2:
+                    native["type_filling"] = await self._transport.constant(
+                        "ORDER_FILLING_IOC"
+                    )
+                else:
+                    native["type_filling"] = await self._transport.constant(
+                        "ORDER_FILLING_RETURN"
+                    )
         return native
 
     async def _send_mutation(

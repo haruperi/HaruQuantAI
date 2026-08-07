@@ -15,7 +15,11 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
-from app.services.data import build_migration_step
+from app.services.data import (
+    build_migration_request,
+    build_migration_step,
+    run_domain_migrations,
+)
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -201,6 +205,31 @@ _ANALYTICS_SCHEMA_STATEMENTS = (
     ),
 )
 
+_ANALYTICS_SCHEMA_V2_RETIREMENT_STATEMENTS = (
+    """
+    CREATE TEMP TABLE analytics_decommission_guard (
+        row_count INTEGER NOT NULL CHECK (row_count = 0)
+    ) STRICT
+    """.strip(),
+    """
+    INSERT INTO analytics_decommission_guard (row_count)
+    SELECT
+        (SELECT COUNT(*) FROM analytics_metric_definitions)
+        + (SELECT COUNT(*) FROM analytics_metric_values)
+        + (SELECT COUNT(*) FROM analytics_trade_analysis)
+        + (SELECT COUNT(*) FROM analytics_pnl_attribution)
+        + (SELECT COUNT(*) FROM analytics_equity_curves)
+        + (SELECT COUNT(*) FROM analytics_reports)
+    """.strip(),
+    "DROP TABLE analytics_metric_values",
+    "DROP TABLE analytics_trade_analysis",
+    "DROP TABLE analytics_pnl_attribution",
+    "DROP TABLE analytics_equity_curves",
+    "DROP TABLE analytics_reports",
+    "DROP TABLE analytics_metric_definitions",
+    "DROP TABLE analytics_decommission_guard",
+)
+
 
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Analytics schema statements.
@@ -223,6 +252,12 @@ ANALYTICS_MIGRATIONS: tuple[Any, ...] = (
         checksum=_migration_checksum(_ANALYTICS_SCHEMA_STATEMENTS),
         statements=_ANALYTICS_SCHEMA_STATEMENTS,
     ),
+    build_migration_step(
+        domain="analytics",
+        migration_id="002_retire_unused_analytics_derived_store",
+        checksum=_migration_checksum(_ANALYTICS_SCHEMA_V2_RETIREMENT_STATEMENTS),
+        statements=_ANALYTICS_SCHEMA_V2_RETIREMENT_STATEMENTS,
+    ),
 )
 
 
@@ -235,8 +270,28 @@ def get_analytics_migrations() -> tuple[object, ...]:
     return ANALYTICS_MIGRATIONS
 
 
+def run_analytics_migrations(request_id: str) -> object:
+    """Apply the complete immutable Analytics migration manifest through Data.
+
+    Args:
+        request_id: Canonical startup request identifier.
+
+    Returns:
+        Data-owned standard migration response.
+    """
+    logger.info("Running Analytics-owned schema migrations")
+    request = build_migration_request(
+        domain="analytics",
+        steps=get_analytics_migrations(),
+        request_id=request_id,
+        complete_manifest=True,
+    )
+    return run_domain_migrations(request)
+
+
 __all__ = [
     "ANALYTICS_MIGRATIONS",
     "ANALYTICS_SCHEMA_VERSION",
     "get_analytics_migrations",
+    "run_analytics_migrations",
 ]

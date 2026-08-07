@@ -1,6 +1,7 @@
 """Private Trading-owned CRUD persistence boundary."""
 
 from app.services.trading.persistence.create import (
+    create_closed_position_record,
     create_event_record,
     create_idempotency_record,
     create_projection_record,
@@ -21,6 +22,7 @@ from app.services.trading.persistence.update import (
 )
 
 __all__ = [
+    "create_closed_position_record",
     "create_event_record",
     "create_idempotency_record",
     "create_projection_record",

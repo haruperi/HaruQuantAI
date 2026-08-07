@@ -1,6 +1,5 @@
 """Workflow integration test for Analytics dashboard projection."""
 
-# ruff: noqa: INP001
 from app.services.analytics import build_dashboard_payload
 from app.utils import get_logger
 

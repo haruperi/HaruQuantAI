@@ -88,6 +88,7 @@ def _execute(
         ValueError: If Data cannot confirm the transaction.
     """
     operation_id = request_id or generate_id("req")
+    logger.info("Executing Portfolio relational transaction")
     response = execute_transaction(
         build_transaction_request(
             plan=build_statement_plan(
@@ -99,7 +100,9 @@ def _execute(
         )
     )
     if response.status != "success" or response.data is None:
+        logger.error("Portfolio relational transaction failed closed")
         raise ValueError("Portfolio persistence transaction failed")
+    logger.info("Portfolio relational transaction committed")
     return cast("_TransactionResult", response.data)
 
 
@@ -223,6 +226,71 @@ _OUTBOX_INSERT = (
     "payload_json=CASE WHEN portfolio_audit_outbox.payload_json=excluded.payload_json "
     "THEN excluded.payload_json ELSE NULL END"
 )
+
+
+def create_definition_record(
+    store: object,
+    *,
+    state_value: object,
+    event_key: str,
+    event_value: object,
+) -> bool:
+    """Atomically create an immutable definition and outbox record.
+
+    Args:
+        store: Portfolio persistence handle.
+        state_value: Validated immutable definition.
+        event_key: Stable outbox event identity.
+        event_value: Redacted audit envelope.
+
+    Returns:
+        Whether both records committed atomically.
+
+    Raises:
+        ValueError: If Data cannot confirm both writes.
+    """
+    logger.info("Persisting immutable Portfolio definition and audit event")
+    persistence = _require_store(store)
+    created_at = _time_field(state_value, "created_at").isoformat()
+    request_id = _text_field(state_value, "request_id")
+    correlation_id = _text_field(state_value, "correlation_id")
+    portfolio_id = _text_field(state_value, "portfolio_id")
+    result = _execute(
+        (
+            "INSERT INTO portfolio_definitions "
+            "(portfolio_id, portfolio_version, scope_key, definition_json, "
+            "canonical_hash, request_id, correlation_id, created_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(portfolio_id, portfolio_version) DO UPDATE SET "
+            "definition_json=CASE WHEN portfolio_definitions.definition_json="
+            "excluded.definition_json AND portfolio_definitions.canonical_hash="
+            "excluded.canonical_hash THEN excluded.definition_json ELSE NULL END",
+            _OUTBOX_INSERT,
+        ),
+        (
+            (
+                portfolio_id,
+                _text_field(state_value, "portfolio_version"),
+                persistence.encode("scope", _mapping_field(state_value, "scope")),
+                persistence.encode("definition", state_value),
+                _text_field(state_value, "canonical_hash"),
+                request_id,
+                correlation_id,
+                created_at,
+            ),
+            _outbox_parameters(
+                persistence,
+                event_key=event_key,
+                aggregate_id=portfolio_id,
+                event_value=event_value,
+                occurred_at=created_at,
+                request_id=request_id,
+                correlation_id=correlation_id,
+            ),
+        ),
+        request_id=request_id,
+    )
+    return result.affected_rows >= _COMPOUND_WRITE_ROWS
 
 
 def create_construction_record(
@@ -352,6 +420,7 @@ def create_plan_record(
 
 __all__ = [
     "create_construction_record",
+    "create_definition_record",
     "create_plan_record",
     "create_portfolio_runtime_store",
 ]

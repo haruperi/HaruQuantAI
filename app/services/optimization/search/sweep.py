@@ -8,7 +8,7 @@ from collections.abc import Callable, Sequence
 from typing import TYPE_CHECKING
 
 from app.services.analytics import get_analytics_value_field
-from app.services.optimization.errors import OptimizationError
+from app.services.optimization.contracts import OptimizationError
 from app.services.optimization.execution import (
     BacktestExecutionAdapter,
     BacktestExecutionRequest,

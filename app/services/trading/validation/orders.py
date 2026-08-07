@@ -217,7 +217,8 @@ def _validate_operation(
             (
                 item
                 for item in account_state.orders
-                if item.order_id == request.order_id
+                if item.order_id in {request.order_id, request.target_broker_order_id}
+                or getattr(item, "client_order_id", None) == request.order_id
             ),
             None,
         )
@@ -230,7 +231,8 @@ def _validate_operation(
             (
                 item
                 for item in account_state.positions
-                if item.position_id == request.position_id
+                if item.position_id
+                in {request.position_id, request.target_broker_position_id}
             ),
             None,
         )

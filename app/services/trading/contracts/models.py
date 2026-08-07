@@ -1085,6 +1085,154 @@ class ExecutionReceipt(_TradingModel):
         return self
 
 
+class ClosedPositionRecord(_TradingModel):
+    """Validated immutable evidence for one fully closed broker position."""
+
+    contract_version: Literal["v1"] = TRADING_CONTRACT_VERSION
+    schema_id: Literal["trading.closed_position_record.v1"] = (
+        "trading.closed_position_record.v1"
+    )
+    ticket: str
+    symbol: str
+    type: Literal["buy", "sell"]
+    volume: _ExactDecimal
+    entry_time: datetime
+    entry_price: _ExactDecimal
+    stop_loss: _ExactDecimal | None = None
+    take_profit: _ExactDecimal | None = None
+    exit_time: datetime
+    exit_price: _ExactDecimal
+    exit_reason: str
+    commission: _ExactDecimal
+    swap: _ExactDecimal
+    profit: _ExactDecimal
+    mae_points: int
+    mfe_points: int
+    slippage_points: int
+    magic: str
+    strategy: str
+    account: str
+    environment: Literal["demo", "paper", "sim", "live"]
+    request_id: str
+    correlation_id: str
+    evidence_hash: str
+    created_at: datetime
+    updated_at: datetime
+
+    @field_validator(
+        "ticket",
+        "symbol",
+        "exit_reason",
+        "magic",
+        "strategy",
+        "account",
+    )
+    @classmethod
+    def _validate_closed_position_text(cls, value: str) -> str:
+        """Validate one required text field.
+
+        Returns:
+            Validated text.
+        """
+        return _validate_text(value, "closed position text")
+
+    @field_validator("request_id", "correlation_id")
+    @classmethod
+    def _validate_closed_position_trace(cls, value: str, info: ValidationInfo) -> str:
+        """Validate a trace identifier.
+
+        Returns:
+            Validated trace identifier.
+        """
+        field_name = _validation_field_name(info)
+        prefix = "req" if field_name == "request_id" else "cor"
+        return _validate_trace_id(value, prefix, field_name)
+
+    @field_validator("entry_time", "exit_time", "created_at", "updated_at")
+    @classmethod
+    def _validate_closed_position_time(cls, value: datetime) -> datetime:
+        """Validate a UTC timestamp.
+
+        Returns:
+            Validated timestamp.
+        """
+        return _validate_utc(value, "closed position timestamp")
+
+    @field_validator("volume", "entry_price", "exit_price")
+    @classmethod
+    def _validate_closed_position_positive_decimal(cls, value: Decimal) -> Decimal:
+        """Validate positive quantities and prices.
+
+        Returns:
+            Validated positive Decimal.
+
+        Raises:
+            ValueError: If the value is absent or not positive.
+        """
+        validated = _validate_decimal(value, "closed position value", positive=True)
+        if validated is None:
+            raise ValueError("closed position value is required")
+        return validated
+
+    @field_validator("stop_loss", "take_profit", "commission", "swap", "profit")
+    @classmethod
+    def _validate_closed_position_decimal(cls, value: Decimal | None) -> Decimal | None:
+        """Validate finite monetary evidence.
+
+        Returns:
+            Validated Decimal or ``None``.
+        """
+        return _validate_decimal(value, "closed position monetary value")
+
+    @field_validator("mae_points", "mfe_points", "slippage_points")
+    @classmethod
+    def _validate_closed_position_points(cls, value: int) -> int:
+        """Validate non-negative point values.
+
+        Returns:
+            Validated point count.
+
+        Raises:
+            ValueError: If the point count is negative.
+        """
+        if value < 0:
+            raise ValueError("closed position points must be non-negative")
+        return value
+
+    @field_validator("evidence_hash")
+    @classmethod
+    def _validate_closed_position_hash(cls, value: str) -> str:
+        """Validate a lowercase SHA-256 digest.
+
+        Returns:
+            Validated digest.
+
+        Raises:
+            ValueError: If the digest is malformed.
+        """
+        if len(value) != _SHA256_HEX_LENGTH or any(
+            character not in "0123456789abcdef" for character in value
+        ):
+            raise ValueError("evidence_hash must be lowercase SHA-256")
+        return value
+
+    @model_validator(mode="after")
+    def _validate_closed_position_invariants(self) -> Self:
+        """Require completed immutable chronology.
+
+        Returns:
+            Validated record.
+
+        Raises:
+            ValueError: If chronology or immutable timestamps conflict.
+        """
+        if self.exit_time < self.entry_time:
+            raise ValueError("exit_time cannot precede entry_time")
+        if self.updated_at != self.created_at:
+            raise ValueError("immutable closed positions require updated_at=created_at")
+        return self
+
+
 class TradeRecord(_TradingModel):
     """Official immutable execution and reconciliation record.
 
@@ -1651,6 +1799,7 @@ class PortfolioRebalanceExecutionRequest(_TradingModel):
 
 __all__ = [
     "TRADING_CONTRACT_VERSION",
+    "ClosedPositionRecord",
     "ExecutionEvidenceReport",
     "ExecutionReceipt",
     "JsonValue",

@@ -26,6 +26,7 @@ EXPECTED = {
     "WF-TRD-014": "wf_trd_014_run_live_paper_evaluation_cycle.py",
     "WF-TRD-015": "wf_trd_015_pause_resume_strategy_route.py",
     "WF-TRD-016": "wf_trd_016_modify_working_order_or_open_position.py",
+    "WF-TRD-017": "wf_trd_017_broker_agnostic_main_operations.py",
 }
 
 
@@ -65,3 +66,50 @@ def test_trading_workflow_registry_has_one_complete_program_per_workflow() -> No
     for workflow_id in ("WF-TRD-003", "WF-TRD-PRI", "WF-TRD-013"):
         source = (WORKFLOW_DIR / EXPECTED[workflow_id]).read_text(encoding="utf-8")
         assert "No broker mutation was transmitted" in source
+    assert (
+        len(
+            _assignment(
+                WORKFLOW_DIR / EXPECTED["WF-TRD-PRI"],
+                "STAGES",
+            )
+        )
+        == 22
+    )
+    broker_agnostic = WORKFLOW_DIR / EXPECTED["WF-TRD-017"]
+    assert len(_assignment(broker_agnostic, "STAGES")) == 17
+    source = broker_agnostic.read_text(encoding="utf-8")
+    expected_examples = (
+        "example_01_connect",
+        "example_02_platform",
+        "example_03_account",
+        "example_04_symbol",
+        "example_05_positions",
+        "example_06_orders",
+        "example_07_history_orders",
+        "example_08_history_deals",
+        "example_09_open_position",
+        "example_10_calculate_profit_margin",
+        "example_11_modify_position",
+        "example_12_partial_close_position",
+        "example_13_close_position",
+        "example_14_place_pending_order",
+        "example_15_modify_pending_order",
+        "example_16_cancel_pending_order",
+        "example_17_shutdown",
+    )
+    for example in expected_examples:
+        assert source.count(f"async def {example}(") == 1
+    for renderer in (
+        "_render_platform",
+        "_render_account",
+        "_render_symbol",
+        "_render_quote",
+        "_render_positions",
+        "_render_orders",
+        "_render_deals",
+        "_render_execution",
+    ):
+        assert f"def {renderer}(" in source
+    assert 'EXECUTION_TARGET: Target = "sim"' in source
+    assert "app.services.brokers.mt5" not in source
+    assert "app.services.brokers.ctrader" not in source

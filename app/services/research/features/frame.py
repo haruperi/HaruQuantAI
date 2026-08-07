@@ -11,6 +11,7 @@ from app.services.indicators import (
     get_indicator_result_metadata,
     get_indicator_result_values,
 )
+from app.services.research.data.validation import _enforce_memory_budget
 from app.services.research.features.calculations import (
     forward_returns,
     log_returns,
@@ -111,6 +112,8 @@ def build_research_feature_frame(
     logger.info("Building canonical Research feature frame")
     if len(prepared.data) > limits.max_rows:
         raise ValueError("RES_RESOURCE_LIMIT_EXCEEDED", "ROW_LIMIT_EXCEEDED")
+    # Feature assembly retains input, output, indicator, and forward-label frames.
+    _enforce_memory_budget(prepared.data, limits, allocation_multiplier=4)
     if "close" not in prepared.data:
         raise ValueError("RES_INPUT_INVALID", "CLOSE_COLUMN_REQUIRED")
     frame = pd.DataFrame(index=prepared.data.index.copy())

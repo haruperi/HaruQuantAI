@@ -243,3 +243,49 @@ async def test_get_symbol_metadata_async_invalid_timezone() -> None:
     with pytest.raises(DataError) as exc_info:
         await src._get_symbol_metadata_async(req)
     assert exc_info.value.code == "MISSING_ASSET_METADATA"
+
+
+@pytest.mark.anyio
+async def test_get_symbol_metadata_ignores_additive_broker_extensions() -> None:
+    """Open Broker metadata cannot break or replace Data's closed contract."""
+    adapter = MagicMock()
+    info = MagicMock()
+    info.provider_symbol = "EURUSD"
+    info.product_profile = "fx"
+    info.base_asset = "EUR"
+    info.quote_asset = "USD"
+    info.price_precision = 5
+    info.price_step = Decimal("0.00001")
+    info.quantity_step = Decimal("0.01")
+    info.provider_metadata = {
+        "timezone": "UTC",
+        "trade_contract_size": 100_000.0,
+        "tick_size": 0.00001,
+        "contract_size": 100_000.0,
+        "trade_mode_description": "Full trading access",
+        "request_id": "provider-must-not-override",
+        "api_key": "must-not-cross",  # pragma: allowlist secret
+    }
+    info_res = MagicMock()
+    info_res.error = None
+    info_res.data = info
+    info_res.metadata.extensions = {
+        "adapter_version": "v1",
+        "timestamp": "2026-07-01T12:00:00.000000Z",
+    }
+    adapter.get_symbol_info = AsyncMock(return_value=info_res)
+    src = ExternalMarketDataSource("mt5", adapter)
+    request = SymbolMetadataRequest(
+        source_id="mt5",
+        symbol="EURUSD",
+        request_id=_REQ_ID,
+    )
+
+    metadata = await src._get_symbol_metadata_async(request)
+
+    assert metadata.request_id == _REQ_ID
+    assert metadata.trade_contract_size == 100_000.0
+    assert metadata.timezone == "UTC"
+    assert "tick_size" not in metadata.model_fields_set
+    assert "contract_size" not in metadata.model_fields_set
+    assert "api_key" not in metadata.model_fields_set

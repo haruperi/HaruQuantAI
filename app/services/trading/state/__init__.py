@@ -5,6 +5,7 @@ from app.services.trading.migrations import (
 )
 from app.services.trading.migrations import (
     get_trading_migrations,
+    run_trading_migrations,
 )
 from app.services.trading.state.events import TradingEvent as TradingEvent
 from app.services.trading.state.factories import (
@@ -43,4 +44,5 @@ __all__ = [
     "get_trading_projection",
     "get_trading_schema_version",
     "reserve_idempotency",
+    "run_trading_migrations",
 ]

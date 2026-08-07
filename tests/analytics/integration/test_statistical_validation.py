@@ -1,6 +1,5 @@
 """Integration evidence for seeded Analytics statistical validation."""
 
-# ruff: noqa: INP001
 from app.services.analytics import run_statistical_validation
 from app.utils import get_logger
 

@@ -1,6 +1,5 @@
 """Import-safety evidence for the Analytics package root."""
 
-# ruff: noqa: INP001
 import os
 import subprocess
 import sys

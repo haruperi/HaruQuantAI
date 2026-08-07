@@ -342,6 +342,7 @@ def _attestation(config: create_risk_config) -> create_approval_attestation:
 def fr_risk_042() -> None:
     """FR-RISK-042: Stage 3 — Compare proposal/evidence/config/time with a prior decision and invalidate material changes, expiry, skew, stale state, config mismatch, or reconciliation expiry without granting action authority."""
     _header("Stage 3: Decision Revalidation - Revalidate Risk Decision (FR-RISK-042)")
+    print("SUCCESS: FR-RISK-042")
 
     config = _config()
     audit = create_risk_audit_chain(

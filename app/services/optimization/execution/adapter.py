@@ -11,7 +11,7 @@ from app.services.analytics import (
     build_performance_report,
     is_analytics_value,
 )
-from app.services.optimization.errors import OptimizationError
+from app.services.optimization.contracts import OptimizationError
 from app.services.optimization.execution.contracts import (
     BacktestExecutionAdapter,
     BacktestExecutionRequest,

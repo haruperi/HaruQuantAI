@@ -1,6 +1,5 @@
 """Workflow integration evidence for portfolio allocation Analytics."""
 
-# ruff: noqa: INP001
 import json
 from datetime import datetime
 from decimal import Decimal

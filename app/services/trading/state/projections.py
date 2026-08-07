@@ -214,6 +214,39 @@ def _merge_readiness(
         readiness.update(readiness_facts)
 
 
+def _project_receipt_event(
+    event_id: str,
+    facts: dict[str, Any],
+    receipts: dict[str, Any],
+    trade_records: dict[str, Any],
+    orders: dict[str, Any],
+    unresolved: list[str],
+) -> None:
+    """Project receipt event and update linked order state."""
+    receipts[event_id] = facts
+    trade_record = facts.get("trade_record")
+    if isinstance(trade_record, dict):
+        trade_records[event_id] = trade_record
+    attempt_id = facts.get("attempt_event_id")
+    receipt = facts.get("receipt")
+    if (
+        isinstance(attempt_id, str)
+        and attempt_id in orders
+        and isinstance(receipt, dict)
+    ):
+        order_entry = dict(orders[attempt_id])
+        if receipt.get("provider_order_id"):
+            order_entry["broker_order_id"] = receipt["provider_order_id"]
+        if receipt.get("client_order_id"):
+            order_entry["client_order_id"] = receipt["client_order_id"]
+        orders[attempt_id] = order_entry
+    outcome_known = not (
+        isinstance(receipt, dict) and receipt.get("status") == "unknown_outcome"
+    )
+    if outcome_known and isinstance(attempt_id, str) and attempt_id in unresolved:
+        unresolved.remove(attempt_id)
+
+
 def _project_event(
     current: TradingProjection,
     event: TradingEvent,
@@ -242,17 +275,9 @@ def _project_event(
         orders[event.event_id] = facts
         unresolved.append(event.event_id)
     elif event.event_type == "receipt_recorded":
-        receipts[event.event_id] = facts
-        trade_record = facts.get("trade_record")
-        if isinstance(trade_record, dict):
-            trade_records[event.event_id] = trade_record
-        attempt_id = facts.get("attempt_event_id")
-        receipt = facts.get("receipt")
-        outcome_known = not (
-            isinstance(receipt, dict) and receipt.get("status") == "unknown_outcome"
+        _project_receipt_event(
+            event.event_id, facts, receipts, trade_records, orders, unresolved
         )
-        if outcome_known and isinstance(attempt_id, str) and attempt_id in unresolved:
-            unresolved.remove(attempt_id)
     elif event.event_type == "fill_recorded":
         fills[event.event_id] = facts
         position_id = facts.get("position_id")

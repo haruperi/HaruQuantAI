@@ -22,7 +22,7 @@ from app.services.optimization import (
     save_search_checkpoint,
     validate_parameter_space,
 )
-from app.services.optimization.errors import OptimizationError
+from app.services.optimization.contracts import OptimizationError
 from app.services.optimization.parameters.constraints import _evaluate
 from app.services.optimization.parameters.contracts import (
     ParameterRange,

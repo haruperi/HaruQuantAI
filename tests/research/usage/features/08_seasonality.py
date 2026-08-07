@@ -28,12 +28,12 @@ _HASH = "e" * 64
 
 def _feature_header(title: str) -> None:
     """Print the feature header banner."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"SUCCESS: {title}")
 
 
 def _header(title: str) -> None:
     """Print one example heading."""
-    print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
+    print(f"SUCCESS: {title}")
 
 
 def _format_result(obj: Any) -> str:
@@ -87,7 +87,6 @@ def fr_res_069() -> None:
     _header(
         "FR-RES-069: Return every configured session active for a timezone-aware hour using canonical overlap precedence."
     )
-    print("Research Example 8: Sessions and Seasonality")
     active = active_sessions_for_hour(14, config=_config())
     print(f"FR-RES-069 active_sessions_at_14={active}")
 

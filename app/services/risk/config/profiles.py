@@ -44,6 +44,30 @@ _DECIMAL_FIELDS = frozenset(
         "fractional_kelly_multiplier",
         "correlation_size_penalty",
         "max_daily_loss",
+        "max_risk_per_trade_pct",
+        "preferred_risk_per_trade_pct",
+        "max_daily_loss_pct",
+        "max_weekly_loss_pct",
+        "max_monthly_loss_pct",
+        "max_portfolio_drawdown_pct",
+        "max_strategy_drawdown_pct",
+        "max_symbol_drawdown_pct",
+        "max_symbol_exposure_pct",
+        "max_currency_cluster_exposure_pct",
+        "max_correlated_exposure_pct",
+        "max_total_exposure_pct",
+        "max_gross_exposure_pct",
+        "max_net_exposure_pct",
+        "max_leverage",
+        "max_total_margin_usage_pct",
+        "min_free_margin_pct",
+        "min_margin_level_pct",
+        "max_spread_pips_default",
+        "max_slippage_pips_default",
+        "max_commission_burden_pct",
+        "max_swap_burden_pct",
+        "kill_switch_daily_loss_pct",
+        "kill_switch_portfolio_drawdown_pct",
         "max_total_loss",
         "max_drawdown",
         "max_historical_var_ratio",
@@ -280,6 +304,36 @@ class RiskConfig(BaseModel):
     monthly_target: Decimal | None = Decimal("0.10")
     max_margin_utilization: Decimal | None = Decimal("0.50")
     max_effective_leverage: Decimal | None = Decimal(10)
+    max_risk_per_trade_pct: Decimal = Decimal("0.01")
+    preferred_risk_per_trade_pct: Decimal = Decimal("0.005")
+    max_daily_loss_pct: Decimal = Decimal("0.05")
+    max_weekly_loss_pct: Decimal = Decimal("0.10")
+    max_monthly_loss_pct: Decimal = Decimal("0.15")
+    max_portfolio_drawdown_pct: Decimal = Decimal("0.10")
+    max_strategy_drawdown_pct: Decimal = Decimal("0.10")
+    max_symbol_drawdown_pct: Decimal = Decimal("0.10")
+    max_symbol_exposure_pct: Decimal = Decimal("0.10")
+    max_currency_cluster_exposure_pct: Decimal = Decimal("0.25")
+    max_correlated_exposure_pct: Decimal = Decimal("0.25")
+    max_total_exposure_pct: Decimal = Decimal("1.00")
+    max_gross_exposure_pct: Decimal = Decimal("1.00")
+    max_net_exposure_pct: Decimal = Decimal("1.00")
+    max_leverage: Decimal = Decimal(10)
+    max_total_margin_usage_pct: Decimal = Decimal("0.50")
+    min_free_margin_pct: Decimal = Decimal("0.30")
+    min_margin_level_pct: Decimal = Decimal(200)
+    max_open_positions: int = 10
+    max_pending_orders: int = 10
+    max_live_strategies: int = 3
+    max_trades_per_day: int = 20
+    max_trades_per_strategy_per_day: int = 5
+    max_consecutive_losses: int = 5
+    max_spread_pips_default: Decimal = Decimal("2.0")
+    max_slippage_pips_default: Decimal = Decimal("1.0")
+    max_commission_burden_pct: Decimal = Decimal("0.20")
+    max_swap_burden_pct: Decimal = Decimal("0.10")
+    kill_switch_daily_loss_pct: Decimal = Decimal("0.06")
+    kill_switch_portfolio_drawdown_pct: Decimal = Decimal("0.15")
     max_spread: Mapping[str, Decimal] = {}
     news_blackout_before_minutes: int = 10
     news_blackout_after_minutes: int = 10
@@ -375,6 +429,30 @@ class RiskConfig(BaseModel):
         "fractional_kelly_multiplier",
         "correlation_size_penalty",
         "max_daily_loss",
+        "max_risk_per_trade_pct",
+        "preferred_risk_per_trade_pct",
+        "max_daily_loss_pct",
+        "max_weekly_loss_pct",
+        "max_monthly_loss_pct",
+        "max_portfolio_drawdown_pct",
+        "max_strategy_drawdown_pct",
+        "max_symbol_drawdown_pct",
+        "max_symbol_exposure_pct",
+        "max_currency_cluster_exposure_pct",
+        "max_correlated_exposure_pct",
+        "max_total_exposure_pct",
+        "max_gross_exposure_pct",
+        "max_net_exposure_pct",
+        "max_leverage",
+        "max_total_margin_usage_pct",
+        "min_free_margin_pct",
+        "min_margin_level_pct",
+        "max_spread_pips_default",
+        "max_slippage_pips_default",
+        "max_commission_burden_pct",
+        "max_swap_burden_pct",
+        "kill_switch_daily_loss_pct",
+        "kill_switch_portfolio_drawdown_pct",
         "max_total_loss",
         "max_drawdown",
         "max_historical_var_ratio",
@@ -619,6 +697,7 @@ class RiskConfig(BaseModel):
             ValueError: If a ratio or ordered limit is invalid.
         """
         logger.debug("Validating RiskConfig ratio policy")
+        self._validate_operational_limits()
         if not Decimal(0) < self.var_confidence < Decimal(1):
             raise ValueError("var confidence must be between zero and one")
         if not Decimal(0) <= self.max_correlation <= Decimal(1):
@@ -653,6 +732,86 @@ class RiskConfig(BaseModel):
             and self.clock_skew_tolerance_seconds < 0
         ):
             raise ValueError("clock skew tolerance must be non-negative")
+
+    def _validate_operational_limits(self) -> None:
+        """Validate the registered account-profile operational limits.
+
+        Raises:
+            ValueError: If limits conflict or fall outside their declared units.
+        """
+        ratios = (
+            self.max_risk_per_trade_pct,
+            self.preferred_risk_per_trade_pct,
+            self.max_daily_loss_pct,
+            self.max_weekly_loss_pct,
+            self.max_monthly_loss_pct,
+            self.max_portfolio_drawdown_pct,
+            self.max_strategy_drawdown_pct,
+            self.max_symbol_drawdown_pct,
+            self.max_symbol_exposure_pct,
+            self.max_currency_cluster_exposure_pct,
+            self.max_correlated_exposure_pct,
+            self.max_total_margin_usage_pct,
+            self.min_free_margin_pct,
+            self.max_commission_burden_pct,
+            self.max_swap_burden_pct,
+        )
+        if any(not Decimal(0) < value <= Decimal(1) for value in ratios):
+            raise ValueError("operational percentage limits must be in (0, 1]")
+        if not (
+            self.preferred_risk_per_trade_pct <= self.max_risk_per_trade_pct
+            and self.max_daily_loss_pct
+            <= self.max_weekly_loss_pct
+            <= self.max_monthly_loss_pct
+        ):
+            raise ValueError("operational risk and loss limits are unordered")
+        positive = (
+            self.max_total_exposure_pct,
+            self.max_gross_exposure_pct,
+            self.max_net_exposure_pct,
+            self.max_leverage,
+            self.min_margin_level_pct,
+        )
+        non_negative = (
+            self.max_spread_pips_default,
+            self.max_slippage_pips_default,
+        )
+        if any(value <= 0 for value in positive) or any(
+            value < 0 for value in non_negative
+        ):
+            raise ValueError("operational exposure or execution limits are invalid")
+        counts = (
+            self.max_open_positions,
+            self.max_pending_orders,
+            self.max_live_strategies,
+            self.max_trades_per_day,
+            self.max_trades_per_strategy_per_day,
+            self.max_consecutive_losses,
+        )
+        if any(value <= 0 for value in counts):
+            raise ValueError("operational count limits must be positive")
+        if self.max_trades_per_strategy_per_day > self.max_trades_per_day:
+            raise ValueError("strategy trade limit exceeds account trade limit")
+        if self.kill_switch_daily_loss_pct < self.max_daily_loss_pct or (
+            self.kill_switch_portfolio_drawdown_pct < self.max_portfolio_drawdown_pct
+        ):
+            raise ValueError("kill-switch thresholds must not precede policy limits")
+        self._validate_operational_aliases()
+
+    def _validate_operational_aliases(self) -> None:
+        """Keep established fields synchronized with explicit percentage names.
+
+        Raises:
+            ValueError: If an established field contradicts its canonical alias.
+        """
+        if self.max_daily_loss != self.max_daily_loss_pct:
+            raise ValueError("max_daily_loss aliases max_daily_loss_pct")
+        if self.max_drawdown != self.max_portfolio_drawdown_pct:
+            raise ValueError("max_drawdown aliases max_portfolio_drawdown_pct")
+        if self.max_margin_utilization != self.max_total_margin_usage_pct:
+            raise ValueError("margin utilization aliases margin usage percentage")
+        if self.max_effective_leverage != self.max_leverage:
+            raise ValueError("effective leverage aliases max_leverage")
 
     def _validate_timeout_policy(self) -> None:
         """Validate required and conditional timeout values.

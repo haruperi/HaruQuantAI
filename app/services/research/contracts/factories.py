@@ -3,16 +3,32 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import asdict, is_dataclass
+from dataclasses import fields, is_dataclass
 from typing import Any
 
 from app.services.research.contracts import configurations as _configurations
 from app.services.research.contracts import results as _results
+from app.services.research.intelligence import contracts as _intelligence
 from app.services.research.metrics import registry as _metrics
 from app.services.research.seasonality import analysis as _seasonality
 
-_MODULES = (_configurations, _results, _metrics, _seasonality)
+_MODULES = (_configurations, _results, _intelligence, _metrics, _seasonality)
 _MAX_PROJECTED_FIELDS = 64
+
+
+def _detach(value: object) -> object:
+    """Recursively detach frozen contract containers without deep-copy hooks.
+
+    Returns:
+        A detached equivalent made from ordinary containers.
+    """
+    if isinstance(value, Mapping):
+        return {str(key): _detach(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return tuple(_detach(item) for item in value)
+    if isinstance(value, list):
+        return [_detach(item) for item in value]
+    return value
 
 
 def _model(value_type: str) -> type[Any]:
@@ -128,7 +144,9 @@ def project_research_value(value: object) -> Mapping[str, object]:
     """
     if not is_dataclass(value) or isinstance(value, type):
         raise TypeError("Research value is not projectable")
-    projected = asdict(value)
+    projected = {
+        field.name: _detach(getattr(value, field.name)) for field in fields(value)
+    }
     if len(projected) > _MAX_PROJECTED_FIELDS:
         raise ValueError("Research value projection is too large")
     return projected

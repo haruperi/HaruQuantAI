@@ -86,6 +86,7 @@ def _snapshot() -> create_portfolio_risk_snapshot:
 def fr_risk_046() -> None:
     """FR-RISK-046: Stage 3 — Render evidence, calculations, assumptions, warnings, decision, and recommendations separately; show primary failure first; never claim live approval without valid decision/token evidence. Active config and explicit time are required so format/timeout policy and generated time are deterministic."""
     _header("Stage 3: Risk Reporting - Generate Risk Report (FR-RISK-046)")
+    print("SUCCESS: FR-RISK-046")
 
     config = create_risk_config(
         profile="research",

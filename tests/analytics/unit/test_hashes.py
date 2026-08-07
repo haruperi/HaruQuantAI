@@ -8,7 +8,10 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
-from tests.analytics.unit.test_results_adapter import _config, _source  # noqa: E402
+from tests.analytics.component.test_results_adapter import (  # noqa: E402
+    _config,
+    _source,
+)
 
 
 def test_hashes_change_only_for_material_input() -> None:

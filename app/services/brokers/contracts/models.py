@@ -607,6 +607,7 @@ class BrokerAccountInfo(_Schema):
     free_margin: Decimal | None = None
     status: str | None = None
     provider_timestamp: datetime | None = None
+    details: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Validate the immutable BrokerAccountInfo invariants."""
@@ -618,6 +619,7 @@ class BrokerAccountInfo(_Schema):
         _utc(self.retrieved_at, "retrieved_at")
         for name in ("balance", "equity", "margin", "free_margin"):
             _finite(getattr(self, name), name)
+        object.__setattr__(self, "details", _redacted(self.details, "details"))
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

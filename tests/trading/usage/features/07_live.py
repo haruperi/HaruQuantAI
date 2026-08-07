@@ -195,6 +195,22 @@ def fr_trd_036() -> None:
     print(f"Data -> status='{gate_res.status}'")
 
 
+def _emit_requirement_success(function: object) -> object:
+    """Wrap one example so direct execution emits its success contract."""
+
+    def wrapped() -> None:
+        function()
+        requirement = function.__name__.removeprefix("fr_trd_").replace("_", "-")
+        print(f"SUCCESS: FR-TRD-{requirement}")
+
+    return wrapped
+
+
+for _example_name, _example_function in tuple(globals().items()):
+    if _example_name.startswith("fr_trd_") and callable(_example_function):
+        globals()[_example_name] = _emit_requirement_success(_example_function)
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(

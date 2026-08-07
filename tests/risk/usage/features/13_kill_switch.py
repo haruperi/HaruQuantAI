@@ -204,6 +204,7 @@ def _setup():
 def fr_risk_043() -> None:
     """FR-RISK-043: Stage 3 — Apply an authorized, version-checked activation/clearance under `global > portfolio > strategy > symbol` precedence, atomically compare-and-swap canonical state with its Risk audit record in the injected store, revoke affected approvals on activation, and never mutate execution controls. Activation requires one authorized `create_auth_context` and remains immediate and unilateral. Clearance additionally requires a matching current `create_approval_attestation v1` from a different authorized principal; same-principal clearance leaves the active state unchanged and fails deterministically. Active config is explicit so permission, timeout, policy reference, and audit hashing never use implicit state."""
     _header("Stage 3: Kill Switch Transition - Apply Kill Switch Command (FR-RISK-043)")
+    print("SUCCESS: FR-RISK-043")
     config, auth, kill_store, audit, approvals, inactive_state = _setup()
 
     command = create_kill_switch_command(
@@ -240,6 +241,7 @@ def fr_risk_043() -> None:
 def fr_risk_044() -> None:
     """FR-RISK-044: Stage 3 — Return deterministic block/recovery eligibility; active or unknown applicable state blocks live risk increase, and recovery requires all applicable scopes inactive plus Trading reconciliation. Config and authenticated trace context are required so the returned canonical decision contains no invented policy or trace identity."""
     _header("Stage 3: Kill Switch Check - Check Risk Kill Switch (FR-RISK-044)")
+    print("SUCCESS: FR-RISK-044")
     config, auth, _, _, _, inactive_state = _setup()
 
     decision_package = unwrap_risk_response(

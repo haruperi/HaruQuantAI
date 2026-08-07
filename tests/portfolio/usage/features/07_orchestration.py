@@ -29,6 +29,12 @@ def _header(title: str) -> None:
     print(f"\n{'=' * 88}\n{title}\n{'=' * 88}")
 
 
+def _run_example(requirement: str, example: Any) -> None:
+    """Run one requirement example and print explicit success evidence."""
+    example()
+    print(f"SUCCESS: {requirement}")
+
+
 def _format_result(obj: Any) -> str:
     """Dynamically format the output result type name and field/key signature."""
     cls = type(obj)
@@ -209,16 +215,16 @@ def main() -> None:
     )
 
     # Stage 1: Contracts & Tracing
-    fr_port_025()
-    fr_port_027()
+    _run_example("FR-PORT-025", fr_port_025)
+    _run_example("FR-PORT-027", fr_port_027)
 
     # Stage 2: Gate Revalidation & Idempotency
-    fr_port_026()
-    fr_port_029()
+    _run_example("FR-PORT-026", fr_port_026)
+    _run_example("FR-PORT-029", fr_port_029)
 
     # Stage 3: Audit & Measurement
-    fr_port_028()
-    fr_port_038()
+    _run_example("FR-PORT-028", fr_port_028)
+    _run_example("FR-PORT-038", fr_port_038)
 
 
 if __name__ == "__main__":

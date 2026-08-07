@@ -29,6 +29,7 @@ from app.services.optimization import (
     calculate_parameter_stability,
     calculate_robustness_score,
     compare_optimization_runs,
+    create_optimization_state_store,
     create_optimization_value,
     detect_overfit_parameters,
     load_optimization_result,
@@ -69,7 +70,8 @@ def build_api_optimization_dependencies(
         engine_type: Expected backtest execution engine type.
         engine_version: Expected engine implementation version.
         state_store: Optional Optimization state port used to read persisted
-            results. When omitted the result-read route fails closed.
+            results. When omitted, Optimization constructs its Data-backed
+            relational store through the package-root factory.
 
     Returns:
         Opaque bundle accepted by Optimization public run operations.
@@ -84,7 +86,7 @@ def build_api_optimization_dependencies(
     return {
         "adapter": adapter,
         "auth_context": auth_context,
-        "state_store": state_store,
+        "state_store": state_store or create_optimization_state_store(),
     }
 
 

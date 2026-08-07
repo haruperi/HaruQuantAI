@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import pytest
 from app.services.analytics import contracts
 from app.services.analytics.contracts import (
@@ -18,7 +19,7 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
-from tests.analytics.unit.test_results_adapter import _config  # noqa: E402
+from tests.analytics.component.test_results_adapter import _config  # noqa: E402
 
 
 def test_build_warning_bounds_detail() -> None:
@@ -72,6 +73,21 @@ def test_to_report_json_safe_normalizes_numpy() -> None:
     """Finite NumPy arrays become Utils-supported values."""
     logger.debug("Testing Analytics NumPy normalization")
     assert to_report_json_safe(np.array([1.0, 2.0])) == [1.0, 2.0]
+
+
+def test_to_report_json_safe_normalizes_pandas_evidence() -> None:
+    """Pandas timestamps, indexes, series, and frames become safe values."""
+    timestamp = pd.Timestamp("2026-01-01T00:00:00Z")
+    value = {
+        "timestamp": timestamp,
+        "series": pd.Series([1, 2]),
+        "index": pd.Index(["a", "b"]),
+        "frame": pd.DataFrame({"value": [1, 2]}),
+    }
+    safe = to_report_json_safe(value)
+    assert safe["series"] == [1, 2]
+    assert safe["index"] == ["a", "b"]
+    assert safe["frame"] == [{"value": 1}, {"value": 2}]
 
 
 def test_analytics_defines_no_utils_duplicate_primitive() -> None:

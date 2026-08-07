@@ -1,6 +1,5 @@
 """Integration evidence for the Analytics benchmark workflow."""
 
-# ruff: noqa: INP001
 from app.services.analytics import calculate_benchmark_evidence
 from app.utils import get_logger
 

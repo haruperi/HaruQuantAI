@@ -16,6 +16,9 @@ import { ChallengesWidget } from '../widgets/ChallengesWidget';
 import { DashboardView } from '../workflow/dashboard';
 import { StrategyWorkspace } from '../workflow/strategies';
 import { ResearchWorkspace } from '../workflow/research';
+import { OptimizationView } from '../workflow/optimization';
+import { PortfolioView } from '../workflow/portfolio';
+import { AgenticView } from '../workflow/agentic';
 import { SimulationView } from '../workflow/simulation';
 import { RiskView } from '../workflow/risk';
 import { TradingView } from '../workflow/trading';
@@ -233,6 +236,12 @@ export const WorkspaceGrid: React.FC = () => {
         return <StrategyWorkspace />;
       case 'research':
         return <ResearchWorkspace />;
+      case 'optimization':
+        return <OptimizationView />;
+      case 'portfolio':
+        return <PortfolioView />;
+      case 'agentic':
+        return <AgenticView />;
       case 'simulation':
         return <SimulationView />;
       case 'risk':

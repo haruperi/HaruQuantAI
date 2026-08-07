@@ -28,7 +28,7 @@
 * Tooling configured: `ruff` (full rule set), `mypy`, `pytest`, `pre-commit` (hygiene checks, ruff, ruff-format, detect-secrets, mypy).
 * Code present: `app/` package with implemented service modules under `app/services/`, including Trading as the surviving live-route runtime and broker-dispatch owner.
 * The retired Live service has been folded into `app/services/trading/`; live execution remains a runtime route/mode, not a standalone service package.
-* `app/services/api/README.md` defines the approved gateway/UI boundary and state ownership. Backend v1 has 23 registered owner-backed operations, including server-side session identity recovery and an authenticated SSE bridge over Data-owned MT5 streams, plus a deterministic OpenAPI digest and validated in-process composition graph. Unsupported Simulation, Risk, Trading mutation, Optimization, Portfolio, and Agentic HTTP families are explicitly absent.
+* `app/services/api/README.md` defines the approved gateway/UI boundary and state ownership. Backend v1 exposes registered owner-backed operations, including server-side session identity recovery, an authenticated SSE bridge over Data-owned MT5 streams, Risk reads/commands, and Trading session plus governed submit/cancel/close routes. Trading mutations require complete authority evidence, idempotency, the configured paper/live route, and all owner-side safety gates; live remains disabled by default.
 * Portfolio is implemented and `Completed`: `app.services.portfolio` is its sole
   public boundary, exposes standalone functions only, and coordinates genuine
   Data/Simulation evidence while keeping Risk approval and Trading execution in
@@ -289,7 +289,9 @@
   authoritative executor. Indicators now owns no live tables or private
   persistence package.
   Its package-root API, standalone usage programs, domain workflows, and its
-  participation in `SYS-WF-001` and the verified MT5 demo `SYS-WF-002` path pass.
+  participation in `SYS-WF-001` and the virtual non-production `SYS-WF-002`
+  teaching path pass. Genuine MT5 demo checks are explicit opt-in integration
+  operations and are not a default verification claim.
   Retrospective SMC/FVG/swing/BOS/CHoCH labels remain excluded to preserve the
   non-repainting contract.
 * `app/services/strategy/` is completed across contracts, diagnostics, registry,
@@ -319,10 +321,20 @@
   `FR-SIM-033` fixture parity are verified without reverse imports. Analytics
   derives its equity curve deterministically from the closed-trade ledger and has
   no open decisions.
+* `app/services/optimization/` is completed across bounded parameter search,
+  validation, scoring, robustness, evidence, and Data-backed relational state.
+  Its complete checksummed manifest runs through Data's ledger, lock, and
+  transactional migration boundary; its two current tables are reached through
+  Optimization-owned CRUD builders. UI/API surfaces advisory evidence only and
+  cannot automatically adopt parameters or place trades.
 * `app/services/research/` provides a completed thirteen-feature deterministic
   research baseline. `FEAT-RES-13` projects bounded fundamental and deterministic
   sentiment evidence from eligible point-in-time Data records without exposing
-  unrestricted source content or granting strategy/execution authority.
+  unrestricted source content or granting strategy/execution authority. External
+  consumers use package-root functions and treat intelligence values as opaque.
+  Research artifact files are paired with a strict `research_artifacts` manifest
+  through Research-owned five-file persistence support and Data-owned migration,
+  ledger, lock, and transaction execution.
 
 ---
 
@@ -330,7 +342,7 @@
 
 ### Workspace Directory Layout (Target)
 
-* `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, API composition, and channel-neutral critical operational alert delivery. Backend v1 exposes exactly 23 owner-backed operations and composes dashboard, audit-event, Trading operational-event, and Data market-stream sources in-process. The stream route owns authentication, quota admission, SSE framing, and cleanup only; Data owns stream acquisition and cadence. Simulation, Risk, Trading mutation, Optimization, Portfolio, and Agentic HTTP families remain excluded until exact public owner/runtime contracts exist. UI/API owns user/session/unified user-and-system settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration.
+* `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, API composition, and channel-neutral critical operational alert delivery. Registered owner-backed operations include Trading session and governed submit/cancel/close routes alongside dashboard, audit-event, Trading operational-event, and Data market-stream sources. The stream route owns authentication, quota admission, SSE framing, and cleanup only; Data owns stream acquisition and cadence. Trading write routes compose exact owner requests and never replace Risk, kill-switch, approval, route, or reconciliation authority. UI/API owns user/session/unified user-and-system settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration.
 * `app/agentic/`: Approved top-level orchestration domain with one focused owning module per registered feature. Ten shared infrastructure features remain root packages for portable contracts/governance, Google ADK adaptation, durable orchestration, permissions, context/memory, bounded deliberation, lifecycle, operations, and public API. Twelve role-bearing feature modules are leaf packages under the namespace-only `agents/<department>/<agent_name>/` hierarchy; each owns `agent.py`, `prompt.md`, schemas, README, and only its declared optional files. Agentic submits untrusted typed requests only and has no direct execution path.
 * `app/`: Core domain modules (utils, brokers, data, indicators, strategy, risk, trading, simulator, analytics, optimization, research, portfolio, agentic, and API). Live-route execution is owned by Trading.
 * `data/`: SQLite databases, migration tracking, cache/log dumps, market/research assets.
@@ -659,11 +671,12 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
 Portfolio collaboration is contract-governed:
 
 - Strategy owns immutable registration; Risk separately owns `StrategyOperationalEligibilityRequest/Decision v1`.
-- Portfolio owns `PortfolioConstructionRequest/Result v1`, `ActivePortfolioAllocation v1`, and `PortfolioRebalancePlan v1`.
+- Portfolio owns `PortfolioDefinition v1`, `PortfolioConstructionRequest/Result v1`, `ActivePortfolioAllocation v1`, and `PortfolioRebalancePlan v1`; immutable definitions are registered/read through the Portfolio root boundary and stored atomically with audit-outbox evidence.
 - Risk owns `AllocationReviewRequest`, `AllocationRiskDecision`, `AllocationBudgetActivationRequest`, and the authoritative risk-budget projection.
 - Simulation owns `PortfolioBacktestRequestV1` / `PortfolioSimulationResult v1`; Analytics owns `PortfolioAllocationEvidence v1`; Data owns `FXConversionEvidence v1`.
 - Simulation composes its historical loop through a typed receiver-owned dependency bundle. Its state store is constructed before its journal writer; one injected `SimTrader` instance supplies the asynchronous Trading sim-route callable. Canonical manifests hash `journal.jsonl`, `result.json`, and `report.md` and exclude the `manifest.json` envelope itself, preventing self-referential hashes.
 - Completed Simulation runs may be traversed through durable one-hour `sim_sessions` cursors. Frame delivery validates the finalized JSONL hash chain before exposure and emits raw causative journal events over SSE; no live engine is retained and no mutation/what-if operation is admitted.
+- Simulator owns the complete immutable two-step schema manifest and exposes `run_simulator_migrations`; the runner delegates ledger verification, write locking, checksum validation, and transactional execution to Data. Required API startup applies/verifies this manifest before Simulator-backed routes become ready and fails closed on any unsuccessful migration response.
 - Trading owns `PortfolioRebalanceExecutionRequest v1` and remains the only route to broker mutations.
 - Risk and Simulation requests carry self-contained receiver-owned projections using
   scalar values, ordered components, identifiers, versions, references, and hashes;
@@ -676,7 +689,7 @@ Portfolio collaboration is contract-governed:
 * **Data Layout Conventions**: Core cross-module database tracking identifiers must use `TEXT` format. SQLite boolean fields enforce strict `0` or `1` constraints. JSON text structures map to an explicit `*_json` suffix name.
 * **Precision Standard**: Structural or broker-critical price, size, volume, and balance mathematics must bypass standard floating-point operations. Requires `decimal.Decimal` parsing to ensure transaction immutability.
 * **Authoritative Schema Model**: [`docs/schema/`](schema/README.md) is the authoritative cross-domain database schema model. It is canonical for storage tiers, the target table and column model across all 14 domains, prefix ownership, universal column conventions, indexing and Parquet policy, and the reconciliation record between target and live schema. It is not canonical for current-state feature registries (owning package `README.md`) or executable schema (owning domain migration definitions), and it authorises no migration.
-* **Table Namespace Prefixes**: Each persistent domain uses an owner-specific singular-full-word namespace: `util_`, `broker_`, `data_`, `indicator_`, `strategy_`, `risk_`, `trading_`, `sim_`, `analytics_`, `optimization_`, `research_`, `portfolio_`, `agentic_`, and `api_`. `sim_` is canonical for Simulator; the `simulation_` form in code predates this rule and is unapplied. The target namespace set is defined in `docs/schema/`; exact current table names belong only in the owning domain README/migrations.
+* **Table Namespace Prefixes**: Each persistent domain uses an owner-specific singular-full-word namespace: `util_`, `broker_`, `data_`, `indicator_`, `strategy_`, `risk_`, `trading_`, `sim_`, `optimization_`, `research_`, `portfolio_`, `agentic_`, and `api_`. `sim_` is canonical for Simulator and current code plus the inspected non-production database use `sim_runs`; the declared `sim_sessions` step remains unapplied in that inspected database. Analytics is read-only and has no current tables; its historical `analytics_` store is retired by complete-manifest migration step `002`. The target namespace set is defined in `docs/schema/`; exact current table names belong only in the owning domain README/migrations.
 * **Target vs Current Divergence**: A new table must conform to the schema model. An existing table that diverges is a documented state recorded in `docs/schema/05_reconciliation.md` with an adoption tier, not a defect to be silently migrated away. Closing a divergence requires an additive migration or an explicit baseline reset approval.
 * **Migration Invariance**: Database tracking updates via additive structure migrations. Modifying applied structural migrations is prohibited without an explicit baseline reset approval.
 * **Migration Definition Location**: Immutable schema definitions live in `app/services/<domain>/migrations/` — one migration package per domain, aggregating that domain's schema. Migrations are schema evolution, not CRUD, and remain outside the domain `persistence/` package. Sites that predate this rule are non-conformant. Relocation is an import-path refactor, not a ledger risk: a step checksum is computed over its ordered SQL statements only, and the ledger keys on `(domain, migration_id)`, so neither module path nor file name is an input. The invariants a move must preserve are the statement tuple byte-for-byte, including whitespace, and the literal `domain` and `migration_id` values.

@@ -20,6 +20,7 @@ from app.services.portfolio.contracts.allocations import (
     PortfolioRebalanceAction,
     PortfolioRebalancePlan,
 )
+from app.services.portfolio.contracts.definitions import PortfolioDefinition
 from app.services.portfolio.contracts.errors import (
     PORTFOLIO_ERROR_CATALOG,
     PortfolioError,
@@ -63,6 +64,7 @@ _VALUE_TYPES = MappingProxyType(
             PortfolioComponentWeight,
             PortfolioConstructionRequest,
             PortfolioConstructionResult,
+            PortfolioDefinition,
             PortfolioRebalanceAction,
             PortfolioRebalancePlan,
             PortfolioReviewResult,
@@ -93,9 +95,11 @@ _HANDLE_OPERATIONS = MappingProxyType(
                 "active",
                 "activate",
                 "allocation",
+                "definition",
                 "history",
                 "plan",
                 "save_construction",
+                "save_definition",
                 "save_plan",
             }
         ),
@@ -104,7 +108,9 @@ _HANDLE_OPERATIONS = MappingProxyType(
                 "activate",
                 "assess_drift",
                 "construct",
+                "definition",
                 "history",
+                "register_definition",
                 "recompute_measurement",
                 "rollback",
                 "status",

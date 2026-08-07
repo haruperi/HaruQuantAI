@@ -2,10 +2,12 @@
 
 import json
 from datetime import UTC, datetime
+from decimal import Decimal
 from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
+from app.services.portfolio import create_portfolio_value
 from app.services.portfolio.persistence import create, read, update
 from app.services.portfolio.state import runtime
 
@@ -159,3 +161,55 @@ def test_read_and_runtime_guards(monkeypatch: pytest.MonkeyPatch) -> None:
     state_store = runtime.build_portfolio_state_store()
     with pytest.raises(ValueError, match="unsupported"):
         runtime.execute_portfolio_state_store_operation(state_store, "unknown")
+
+
+def test_runtime_codec_shape_and_union_guards() -> None:
+    """Exercise strict restoration for malformed and compatible stored shapes."""
+    with pytest.raises(TypeError, match="nested Portfolio"):
+        runtime._coerce_model_field(cast("Any", object), [])
+    with pytest.raises(TypeError, match="tuple must be"):
+        runtime._coerce_sequence((str,), {})
+    with pytest.raises(TypeError, match="mapping must be"):
+        runtime._coerce_mapping((str, str), [])
+    with pytest.raises(TypeError, match="datetime must be"):
+        runtime._coerce_field(datetime, 1)
+    with pytest.raises(TypeError, match="decimal is malformed"):
+        runtime._coerce_field(Decimal, True)
+    assert runtime._coerce_sequence((Decimal,), ["1.25"]) == (Decimal("1.25"),)
+    assert runtime._coerce_mapping((str, Decimal), {"weight": "0.5"}) == {
+        "weight": Decimal("0.5")
+    }
+    assert runtime._coerce_union((type(None), Decimal), "2.5") == Decimal("2.5")
+    assert runtime._coerce_union((datetime,), object()).__class__ is object
+
+
+def test_definition_runtime_conflict_and_commit_guards(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Definition state replays idempotently and all conflicts fail closed."""
+    definition = create_portfolio_value(
+        "PortfolioDefinition",
+        portfolio_id="portfolio-one",
+        portfolio_version="v1",
+        scope={"environment": "simulation"},
+        definition={"objective": "balanced"},
+        canonical_hash="a" * 64,
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
+        created_at=_NOW,
+    )
+    state_store = cast("Any", runtime.build_portfolio_state_store())
+    monkeypatch.setattr(runtime, "read_definition_record", lambda *_args: definition)
+    assert state_store.save_definition(definition, {"event": "saved"}) == definition
+
+    monkeypatch.setattr(runtime, "read_definition_record", lambda *_args: object())
+    with pytest.raises(ValueError, match="immutable definition conflicts"):
+        state_store.save_definition(definition, {"event": "saved"})
+
+    monkeypatch.setattr(runtime, "read_definition_record", lambda *_args: None)
+    monkeypatch.setattr(
+        runtime, "create_definition_record", lambda *_args, **_kw: False
+    )
+    with pytest.raises(ValueError, match="transaction was not confirmed"):
+        state_store.save_definition(definition, {"event": "saved"})

@@ -36,7 +36,9 @@ tables that already existed.
 | Phase 3c | 13 Agentic + 4 Data research-source/runtime |
 | Dry-Run Plan 9 | 8 Data operational + 4 API + `strategy_mutations` |
 
-Model size: **100 tables**. Of these, 60 have a code definition and the remainder are
+Current model size after Analytics retirement: **94 tables**. The six historical
+Analytics shapes remain documented but are not current target declarations. Of the
+current tables, 54 have a code definition and the remainder are
 explicitly labelled target-only in their domain sections.
 
 Two categories are recorded rather than corrected, because the tables are applied and
@@ -83,19 +85,19 @@ two thirds of what exists.
 | `trading_idempotency` | **ADDITIVE** | 6 | 8 | 6 | — |
 | `trading_projections` | **ADDITIVE** | 4 | 6 | 4 | — |
 | `api_idempotency` | MIXED | 6 | 10 | 4 | `scope_key`, `status_code` |
-| `portfolio_audit_outbox` | MIXED | 7 | 10 | 4 | `correlation_id`, `event_id`, `request_id` |
+| `portfolio_audit_outbox` | **MATCH** | 11 | 11 | 11 | — |
 | `strategy_configs` | **REBUILD** | 6 | 12 | 0 | `config_hash`, `config_json`, `policy_version`, `request_id`, `strategy_id`, `strategy_version` |
 | `strategy_checkpoints` | **REBUILD** | 5 | 6 | 0 | `authorization_ref`, `checkpoint_id`, `checkpoint_json`, `checksum`, `request_id` |
 | `strategy_versions` | **REBUILD** | 8 | 12 | 1 | `lifecycle_status`, `manifest_json`, `policy_json`, `record_hash`, `request_id`, `correlation_id`, `strategy_version` |
 | `api_sessions` | **REBUILD** | 6 | 12 | 2 | `session_digest`, `csrf_digest`, `user_id`, `revoked_at` |
 | `api_accounts` | **REBUILD** | 11 | 15 | 4 | `user_id`, `roles_json`, `permissions_json`, `scopes_json`, `environment`, `active`, `verified` |
-| `portfolio_definitions` | **REBUILD** | 5 | 12 | 1 | `portfolio_version`, `scope_key`, `definition_json`, `canonical_hash` |
-| `portfolio_allocation_versions` | **REBUILD** | 7 | 14 | 1 | `allocation_id`, `allocation_version`, `scope_key`, `allocation_json`, `canonical_hash`, `activated_at` |
-| `portfolio_rebalance_plans` | **REBUILD** | 7 | 14 | 3 | `plan_version`, `allocation_version`, `plan_json`, `canonical_hash` |
-| `optimization_checkpoints` | **REBUILD** | 6 | 7 | 1 | `search_id`, `schema_version`, `reproducibility_hash`, `checkpoint_json`, `completed_candidate_position` |
+| `portfolio_definitions` | **MATCH** | 8 | 8 | 8 | — |
+| `portfolio_allocation_versions` | **MATCH** | 10 | 10 | 10 | — |
+| `portfolio_rebalance_plans` | **MATCH** | 9 | 9 | 9 | — |
+| `optimization_checkpoints` | **RECONCILED** | 9 | 9 | 9 | — |
 | `agentic_memory_records` | **REBUILD** | 15 | 12 | 4 | `store_class`, `author_role_id`, `content_json`, `scope_json`, `retention_class`, `sensitivity`, `injection_status`, `redacted_paths_json` |
 | `agentic_workflow_checkpoints` | **REBUILD** | 11 | 8 | 4 | `task_id`, `workflow_name`, `workflow_version`, `node_id`, `state_payload_hash`, `canonical_hash` |
-| `research_artifacts` | **REBUILD** | 8 | 13 | 1 | `relative_path`, `format`, `size_bytes`, `sha256`, `atomic`, `schema_version`, `audit_event_id` |
+| `research_artifacts` | **MATCH** | 10 | 10 | 2 | Executable migration and target model agree; production artifact writes persist traceable metadata through Data. |
 | `data_migration_ledger` | **REBUILD** | 4 | 4 | 1 | `migration_id`, `checksum`, `applied_at_ns` |
 
 > **Status: resolved in Phase 2.** The hybrid rule (D9) was applied to all 12 remaining
@@ -105,6 +107,18 @@ two thirds of what exists.
 > adopt payload blobs whose contents it normalises, nor columns that are renames.
 > Divergence is narrowed, not closed: the *live* tables are unchanged and Tier C
 > remains rejected.
+
+### Optimization reconciliation — 2026-08-07
+
+The complete Optimization manifest `001_optimization_schema_v1` was executed twice
+against an isolated dev SQLite database through `run_optimization_migrations`: the
+first call applied the checksummed step and the second was ledger-idempotent. The live
+dev tables and current executable definitions agree: `optimization_results` has nine
+columns plus `idx_optimization_results_repro`, and `optimization_checkpoints` has nine
+columns including `created_at`, `updated_at`, `request_id`, and `correlation_id`.
+The three normalized job/trial structures described as target-only in
+`03_entity_specs_intelligence.md` remain unapplied by design; they are not current
+Optimization-owned tables or registered persistence behavior.
 
 ### What the REBUILD rows have in common
 
@@ -186,7 +200,7 @@ holdout-use ledger the proposal presented as a new idea in
 
 `api_credentials` · `api_approvals` · `api_auth_failures` · `api_settings` ·
 `portfolio_active_scopes` · `portfolio_construction_results` · `portfolio_idempotency` ·
-`optimization_results` · `strategy_mutations` · `simulation_runs` · `hq_runtime_records`
+`optimization_results` · `strategy_mutations` · `sim_runs` · `hq_runtime_records`
 
 `hq_runtime_records` is a generic key-value runtime store with `namespace` /
 `collection_name` / `partition_key` / `codec_kind` — a deliberate escape hatch the
@@ -204,7 +218,7 @@ differently from the proposal.
 | Bulk market data | `dataset_writer.py` → CSV/Parquet artifact + **sidecar JSON manifest file** | Parquet + **SQLite catalog tables** |
 | Manifest contract | `StorageManifest` (Pydantic, frozen): `artifact_id`, `relative_path`, `format`, `content_hash`, `schema_version`, `normalization_version`, `source_revision`, `row_count`, `start`, `end`, `license_metadata`, `provenance`, `created_at`, `request_id` | `data_datasets` + `data_partition_files` |
 | Simulator journal | Append-only **JSONL**, `JOURNAL_FORMAT = "jsonl-v1"`; the migration file states a SQLite journal sidecar is *"an explicit Phase 1 exclusion"* | Model now defers to JSONL; its table was withdrawn |
-| Artifact catalog | `research_artifacts` table: `relative_path` PK, `sha256`, `size_bytes`, `atomic`, `schema_version` | `research_artifacts` with different columns |
+| Artifact manifest | `research_artifacts`: strict relative-path manifest with content, atomicity, audit, request, and correlation evidence | Executable migration matches the target; `research_studies`, `research_hypothesis_tests`, `research_features`, `research_feature_materializations`, and `research_regimes` remain explicit target-only tables with no current migration. |
 | Atomicity | temp file → `os.replace`, sha256 after write | Same pattern, independently arrived at |
 
 Three consequences:
@@ -250,7 +264,7 @@ tables for one job.
 | `risk_eligibility_decisions` | `risk_eligibility_decisions` + `risk_allocation_decisions` | Live splits eligibility from allocation — that separation is deliberate; keep it |
 | `optimization_holdout_uses` | `agentic_experiment_holdout_use` | Keep live; do not build a second holdout ledger |
 | `optimization_jobs` / `optimization_trials` | `optimization_results` (`search_id`, `ranked_candidates_json`) | Live stores ranked candidates as JSON; proposal normalises to rows. Genuine trade-off — see §2 point 2 |
-| `sim_runs` | `simulation_runs` | **Prefix conflict D2**: live `simulation_`, `ARCHITECTURE.md` L649 says `sim_`. Doc is wrong or code is; pick one |
+| `sim_runs` | `sim_runs` | **Partially applied:** the inspected non-production database and ledger contain conformant `sim_runs` from `001_simulator_state_v1`; `002_simulator_playback_sessions_v1` and its conformant `sim_sessions` table remain unapplied. The complete immutable manifest is owned by `run_simulator_migrations`, and required API startup fails closed if either step cannot be verified or applied. |
 | `agentic_traces` / `agentic_trace_spans` | `agentic_operations_traces` | Keep live name |
 | `agentic_workflow_checkpoints` (proposal) | same name, different columns | Keep live |
 | ~~`util_settings`~~ | `api_settings` + typed bootstrap settings | **Withdrawn.** Utils owns no tables; UI/API owns the unified non-secret user/system documents and central JSON/process sources bootstrap the database; see [01](01_entity_specs_core.md) Domain 1 |
@@ -259,16 +273,16 @@ tables for one job.
 
 ## 6. Reconciliation plan
 
-### Tier A — **conformed in Phase 3a**
+### Tier A — **conformed in Phase 3a & Risk Audit Remediation**
 
-> **Superseded framing.** This tier was written assuming the four tables were applied
-> and would need additive `ALTER` migrations. They were never applied. Phase 3a edited
-> the definitions in place instead — no ledger event, no checksum conflict.
+> `trading_events`, `trading_idempotency`, and `trading_projections` match the target model.
 >
-> `trading_events`, `trading_idempotency`, `trading_projections`, and all seven Risk
-> tables now match the model exactly, verified column-by-column. Trading moved to
-> `app/services/trading/migrations/`, Risk to `app/services/risk/migrations/` (D12).
-> Requirements registered as `FR-TRD-070`–`073` and `FR-RISK-069`–`072`.
+> The seven active Risk tables (`risk_policy_versions`, `risk_eligibility_decisions`,
+> `risk_allocation_decisions`, `risk_kill_switch_states`, `risk_approval_tokens`,
+> `risk_decision_snapshots`, `risk_audit_records`) were initially created under `risk-0001-initial-state`.
+> Missing table constraints (`CHECK` constraints, JSON validity checks, `STRICT` mode, and partial index
+> predicate `idx_risk_audit_decision`) were conformed by table rebuild migration `risk-0002-schema-constraints`.
+> Three target tables (`risk_limits`, `risk_limit_checks`, `risk_exposure_snapshots`) remain target-only with no live implementation.
 
 ### Original framing — adopt as-is, additive migration, no ledger break (4 tables)
 
@@ -328,8 +342,8 @@ all 71.** Sequence by whether the owning domain has a real gap:
 |---|---|---|---|
 | — | ~~`util_*` (7)~~ | Withdrawn | Utils is the shared framework and owns no state |
 | — | ~~`indicator_*` (3)~~ | **Retired** | Migration `002_remove_unused_indicator_support_schema` removed the empty support-only schema; Indicators is stateless and owns no target or live tables |
-| 3 | `analytics_*` (6) | **Built (Phase 4C)** | Derived store only. `analytics_trade_analysis` holds MAE/MFE per round-trip, which nothing else stores — Trading owns fills, no domain owns round-trip analysis. Requires the §5 amendment made under D10 |
-| 4 | `trading_orders`, `trading_fills`, `trading_positions`, `trading_order_transitions` | **Built (Phase 4D)** | Trading now writes authoritative events and rebuildable relational projections in one Data-owned transaction; no Trading state uses the generic runtime-record table |
+| — | ~~`analytics_*` (6)~~ | **Retired** | Empty derived tables had no production operation outside persistence; migration `002_retire_unused_analytics_derived_store` drops them transactionally and blocks if any row exists |
+| 4 | `trading_orders`, `trading_positions` | **Built; reconciled** | Orders remain an event projection. Positions contain complete closed trades only; fill and transition projections were retired empty by migration `002_closed_position_ledger` |
 | 5 | `broker_symbol_map` (1) | **Built (Phase 4E)** | Bitemporal reference data. The other four `broker_*` tables are **withdrawn** — Brokers stays a stateless passthrough. The step is ledger-ready (stable checksum, execution delegated to `run_domain_migrations`) but currently has no runtime composition wiring: nothing invokes `get_broker_migrations`, and the CRUD statements have no caller |
 | 6 | Everything else | Deferred | Defer until a feature needs it |
 
@@ -363,27 +377,31 @@ migration; the other twelve are not.
 | Add `data_write_locks` | Required by `AGENTS.md` §5 | Added from `locking.py` |
 | Add `request_id` / `correlation_id` where they belong | Live convention | Applied to **21** tables, not all 81 — admitted only where a row records a decision, side-effecting mutation, external interaction, or audit event |
 | Reconcile `data_partition_files` with `StorageManifest` | Reuse the live contract's fields | 5 fields adopted (`format`, `normalization_version`, `source_revision`, `provenance_json`, `request_id`); 3 rejected as duplicates |
-| **D10 split** | Brokers vs Analytics persistence | 4 `broker_*` withdrawn, `broker_symbol_map` retained, `analytics_*` kept |
+| **D10 split** | Brokers vs Analytics persistence | Historical decision superseded: `broker_symbol_map` retained; empty `analytics_*` store retired by migration `002` |
 
 Model size after Phase 1: **86 tables** (was 90).
 
 ### Phase 4 — status
 
-The model stands at **100 tables**. All five sub-phases shipped; the historical
-Phase 4B Indicators support schema was subsequently retired empty.
+The current model stands at **94 tables** after the historical Indicators and
+Analytics support schemas were retired empty.
 
 | Sub-phase | Status | Delivered |
 |---|---|---|
 | 4A | Shipped schema; application integration reactivated | Artifact catalogue (7 tables); the withdrawn conflicting `FR-DATA-154`–`160` allocation remains historical, while current `FEAT-DATA-18` uses `FR-DATA-161`–`167` |
 | 4B | Historical schema retired | `indicator_*` support tables were introduced by migration `001_indicator_schema_v1` and retired empty by immutable migration `002_remove_unused_indicator_support_schema` |
-| 4C | Shipped | `analytics_*` (6), `FEAT-ANLT-06`, `FR-ANLT-055`–`059` |
-| 4D | Shipped | Trading materialisation (`trading_orders`, `trading_fills`, `trading_positions`, `trading_order_transitions`) and direct Trading-owned persistence |
+| 4C | Historical schema retired | `analytics_*` tables were introduced by step `001` and retired empty by guarded step `002`; persistence feature/requirements withdrawn from the current registry |
+| 4D | Shipped; reconciled | Trading event/order materialisation plus an insert-only closed-position ledger; obsolete empty fill and transition tables retired |
 | 4E | Schema shipped; registrations withdrawn | `broker_symbol_map` (1) applied as schema; `FEAT-BRK-16` and `FR-BRK-136`–`138` withdrawn 2026-08-03 (private persistence support) |
 
-`trading_events` remains the write model. The four Phase 4D tables are rebuildable read
-projections written atomically with the event and aggregate projection. Nullable
-`time_in_force` preserves the shipped Trading contract instead of inventing a broker
-default, and fill execution time is taken from authority evidence.
+`trading_events` remains the write model. `trading_orders` is written atomically with
+events; `trading_positions` accepts only validated complete closed-trade evidence.
+The current executable Trading target is five tables: `trading_events`,
+`trading_idempotency`, `trading_orders`, `trading_positions`, and
+`trading_projections`. The authoritative complete manifest consists of immutable
+steps `001_initial_trading_schema` and `002_closed_position_ledger`; the second
+step retires the empty `trading_fills` and `trading_order_transitions` projections.
+Open positions and tick-valued unrealized PnL remain outside the database.
 
 Two defects were found and fixed while closing, both of a kind worth naming.
 
@@ -409,8 +427,10 @@ and experiment tables remain without production durable producers and were not
 populated speculatively. Simulator's canonical journal remains partial JSONL with
 group-commit durability and atomic filesystem publication; no database journal table
 was introduced.
-`portfolio_definitions` remains intentionally without a runtime producer until a
-registered feature supplies a definition command.
+`portfolio_definitions` is now reached by the registered Portfolio definition
+command and exact-version read operation. The production path is Portfolio public
+API → repository → private Portfolio CRUD → Data transaction execution, with an
+atomic audit-outbox write and conflict-safe immutable version semantics.
 
 The development-only `api-0004` ledger orphan was repaired after an immutable backup
 and exact-row verification. Complete-manifest migration requests now reject any applied
