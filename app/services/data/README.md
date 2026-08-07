@@ -1,8 +1,8 @@
 # Data
 
 > **Package:** `app/services/data`
-> **Status:** `Completed`
-> **Last updated:** `2026-07-30`
+> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 18 registered features remain implemented, but 13 work packages (`TC-IMP-DATA-01`..`TC-IMP-DATA-13`) add target behavior that is not yet implemented. See `### Trading Cockpit Phase 0 reconciliation`.
+> **Last updated:** `2026-08-07`
 
 > This README is the package's **single source of truth** for requirements,
 > final structure, implementation sequence, progress, usage examples, and tests.
@@ -169,6 +169,42 @@ but retain schema ownership.
 | Completed | Economic events, original schedules, exact provider values, and explicit synchronized-range coverage | Database-first calendar queries and Risk restriction evidence        | `app/services/data/migrations/economic_calendar.py` |
 | Completed | Shared migration ledger and path-scoped lock records                                                 | Persistent domains through migration results; no direct table access | `app/services/data/persistence/migrations.py`       |
 
+### Trading Cockpit Phase 0 reconciliation
+
+This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-DATA-01`..`TC-IMP-DATA-13`) into this authoritative README so that it is self-contained. Phase 0 classified the thirteen Data work packages as **one `CREATE` and twelve `EXTEND`** against located behavior. New target work is `Missing`; extended existing features become `Partial` until the target is implemented and verified.
+
+Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1. Data exposes every required cockpit contract below as a function-pair boundary.
+
+**Reused existing assets (no duplication):**
+
+| Cockpit capability | Existing Data asset reused | Phase 0 gap |
+| --- | --- | --- |
+| Economic calendar (the one correctly-named-and-owned contract) | `economic_calendar/` (`FEAT-DATA-11`), `EconomicEvent` (`events.py:29`), 3 tables | `TC-IMP-DATA-04` |
+| Point-in-time research source evidence | `research_sources/` (`FEAT-DATA-16`), 3 tables | `TC-IMP-RES-01` (Research consumes) |
+| Market stream event model | `realtime_feeds/contracts.py::MarketStreamEvent` (`FEAT-DATA-12`) | `TC-IMP-DATA-01` |
+| Dataset/source governance & quality | `local_datasets/`, `sources/`, `quality/`, `artifact_catalog/` | `TC-IMP-DATA-06`, `TC-IMP-DATA-07`, `TC-IMP-DATA-12` |
+| FX conversion evidence & rate provider | `evidence/fx_contracts.py`, `fx_conversion.py` | (consumed by Portfolio `TC-IMP-PORT-06`) |
+
+**Target contracts/features to add or extend:**
+
+| Status | Target | Reuses / extends | Phase 0 gap |
+| --- | --- | --- | --- |
+| Partial | Unified `MarketEvent v1` model | Extends `MarketStreamEvent` to cover trades, depth updates, venue state, halts, auctions, and corporate actions (currently quotes only). | `TC-IMP-DATA-01` |
+| Partial | Level-1 snapshots | Extends `market_data/` reads. Adds bid/ask/last/spread/volume with source/event/receive times and quote freshness. | `TC-IMP-DATA-02` |
+| Partial | Level-2 order-book state | **LOW confidence — re-investigate before implementing (`TC-IMP-DATA-03`).** The only order-book model located is Brokers' `BrokerOrderBook` (`brokers/contracts/models.py:941`). **Open Decision OD-DATA-01:** the plan assigns L2 state to Data; the only model lives in Brokers. Owner must decide ownership before implementation. | `TC-IMP-DATA-03` |
+| Partial | Point-in-time economic calendar | Extends `economic_calendar/`. Adds original-release vs revision publication timestamps and replay visibility timestamps. | `TC-IMP-DATA-04` |
+| Partial | Session and venue calendar | Extends `time_sessions/`. Adds halts, reopening states, and close/roll windows. | `TC-IMP-DATA-05` |
+| Partial | Data-integrity engine | Extends `quality/`. Adds stale/gap/duplicate/crossed/out-of-order/clock-drift taxonomy and primary/backup disagreement. | `TC-IMP-DATA-06` |
+| Partial | Dataset manifest and hashing | Extends `local_datasets/`. Adds content hash, coverage, point-in-time status, and compatibility metadata. | `TC-IMP-DATA-07` |
+| Missing | Replay data package | **New feature** — see Feature Registry `FEAT-DATA-19`. Streams events in deterministic source order with explicit availability timestamps and no future visibility. Depends on `TC-IMP-SIM-01` (SimulationClock). | `TC-IMP-DATA-08` |
+| Partial | Bar construction | Extends `transformation/`. Adds closed-bar semantics, incomplete-bar state, multi-timeframe resampling, no-lookahead alignment. | `TC-IMP-DATA-09` |
+| Partial | Multi-symbol alignment | Extends `transformation/`. Datetime-indexed alignment with declared missing-data behavior; no silent forward knowledge. | `TC-IMP-DATA-10` |
+| Partial | Market snapshot service | Extends `market_data/`. Produces bounded current snapshots for Strategy, Risk, Simulator, Analytics, UI-API. | `TC-IMP-DATA-11` |
+| Partial | Data provenance and quality score | Extends `artifact_catalog/` + `sources/`. Adds license/use classification, trust score, revisions, scope, coverage, quality state. | `TC-IMP-DATA-12` |
+| Partial | Replay evidence export | Extends `market_data/` + `evidence/`. Reconstructs the exact visible data set for any player decision or automated action. | `TC-IMP-DATA-13` |
+
+**Boundary clarifications folded in:** Data owns trusted acquisition, normalization, point-in-time availability, market/reference evidence, source governance, data quality, streaming data, and Data-owned persistence infrastructure. It does not own trade decisions, risk verdicts, orders, fills, or simulated financial state. **No cockpit durable state may be placed in `data_runtime_records`** (`FEAT-DATA-17`, the generic namespaced key-value store) — every cockpit record gets a named, owned table (Phase 0 finding P-3 / change-control rule 8). Data's 22nd `CREATE TABLE` is a correct legacy rebuild of `data_economic_events`, not a duplicate. Data owns the shared transaction/lock/migration-ledger/outbox infrastructure at `app/services/data/persistence/` under its documented `AGENTS.md` exemption (decision D-3 settled); Utils supplies the idempotency-key contract those mechanisms consume.
+
 ### Four-level structure
 
 In `app/services/data`, everything must be focused:
@@ -198,7 +234,9 @@ cohesive capability, not as one public function. A feature may expose multiple
 operations when they serve the same actor outcome; each operation still implements
 one focused functional-requirement behaviour. The target contains eighteen registered
 capabilities: sixteen business features and one foundational contract capability,
-for eighteen registered features in total.
+for eighteen registered features in total. Trading Cockpit Phase 0 reconciliation adds
+one `Missing` target feature, `FEAT-DATA-19` (Replay Data Package), bringing the
+registry to nineteen features (eighteen `Completed`, one `Missing`).
 
 | Status    | Feature                                                        | Owning module          | Public API and contracts                                                                                                                                                                                                                                                                                                | Requirements                                                                 | Usage evidence                                                                                                                                                                                                                                                                                             |
 | --------- | -------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -220,6 +258,7 @@ for eighteen registered features in total.
 | Completed | `FEAT-DATA-16` Point-in-Time Research Source Evidence        | `research_sources/`  | Function-only root operations retrieve, normalize, persist, query, assess, inspect, and project opaque source documents, observations, and verification manifests; exact declarations: Section 9                                                                                                                        | `FR-DATA-130`–`145`                                                     | `tests/data/usage/features/16_research_sources.py`                                                                                                                                                                                                                                                       |
 | Completed | `FEAT-DATA-17` Cross-Domain Runtime Persistence Adapters     | `runtime_stores/`    | Opaque namespaced durable-state handles, allowlisted codecs, atomic record/transition operations, deterministic bounded cross-partition reads, and owner-specific construction functions                                                                                                                                | `FR-DATA-146`–`150`                                                     | `tests/data/usage/features/17_runtime_stores.py`; `tests/data/unit/test_runtime_store_codecs.py`; `tests/data/integration/test_runtime_store_persistence.py`                                                                                                                                         |
 | Completed | `FEAT-DATA-18` Artifact and Reference Catalog                | `artifact_catalog/`  | Application-triggered reference synchronization, atomic artifact indexing, bounded fetch/quality evidence, sidecar reconstruction, table lifecycle evidence, and verified-source retrieval                                                                                                                              | `FR-DATA-161`–`167`; amended `FR-DATA-143`                            | `tests/data/usage/features/18_artifact_catalog.py`; `tests/data/component/test_artifact_catalog_persistence.py`; `tests/data/structural/test_catalog_table_reachability.py`                                                                                                                          |
+| Missing   | `FEAT-DATA-19` Replay Data Package                            | `replay_packages/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `build_replay_package`/`parse_replay_package`, `stream_replay_events` ordered, no-lookahead deterministic-source-order replay with explicit availability timestamps | `FR-DATA-181`..`FR-DATA-183` *(planned)*                         | `tests/data/usage/features/19_replay_packages.py` *(planned)*                                                                                                                                                                                                                                            |
 
 Private root files such as `_settings.py` and `_limits.py` may remain only for
 genuinely domain-wide infrastructure. They are not feature modules, expose no public
@@ -3143,7 +3182,10 @@ their owning manifests.
 
 ## 6. Open Decisions
 
-No open decisions.
+These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
+
+- **OD-DATA-01 — Level-2 order-book ownership.** The plan assigns L2 order-book state to Data (`TC-IMP-DATA-03`, `LOW` confidence), but the only order-book model in the repository is Brokers' `BrokerOrderBook` (`app/services/brokers/contracts/models.py:941`). The owner must decide whether Data owns a new `OrderBookSnapshot` contract and Brokers consumes it, or Brokers retains L2 and the plan is amended. Re-investigate before implementing.
+- **OD-DATA-02 — Normalized account snapshot ownership.** The plan assigns a normalized account snapshot to Brokers (`TC-IMP-BRK-04`), but the existing `AccountStateSnapshot` model lives in Data at `app/services/data/evidence/account_contracts.py:199`. Paired with Brokers `OD-BRK-01`. Until decided, Data continues to own and export the model and Brokers documents its consumption.
 
 ---
 

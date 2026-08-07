@@ -1,7 +1,7 @@
 # Strategy
 
 > **Package:** `app/services/strategy`
-> **Status:** `Completed`
+> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 11 registered features remain implemented, but 11 work packages (`TC-IMP-STRAT-01`..`TC-IMP-STRAT-11`) add target behavior that is not yet implemented. See `### Trading Cockpit Phase 0 reconciliation`.
 > **Last updated:** `2026-07-30`
 
 > This README is the package's **single source of truth** for final requirements, structure, implementation sequence, workflows, public contracts, configuration, limits, progress, usage examples, and tests.
@@ -163,6 +163,40 @@ Data provides shared connection, locking, and migration execution infrastructure
 
 No strategy source code, broker state, official positions, orders, fills, analytics reports, or secrets may be stored in these records.
 
+### Trading Cockpit Phase 0 reconciliation
+
+This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-STRAT-01`..`TC-IMP-STRAT-11`) into this authoritative README so that it is self-contained. Phase 0 classified the eleven Strategy work packages as **three `CREATE`, seven `EXTEND`, and one `DEFERRED_INTEGRATION`**. New target work is `Missing`; extended existing features become `Partial`.
+
+Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
+
+**Reused existing assets (no duplication):**
+
+| Cockpit capability | Existing Strategy asset reused | Phase 0 gap |
+| --- | --- | --- |
+| Strategy profile & versioned registry | `registry/` (`FEAT-STR-03`), `contracts/` (`FEAT-STR-01`); tables `strategy_definitions`, `strategy_versions(_v2)`, `strategy_configs(_v2)` | `TC-IMP-STRAT-01`, `TC-IMP-STRAT-11` |
+| TradeIntent proposals | `intents/` (`FEAT-STR-04`) | `TC-IMP-STRAT-04` |
+| Deterministic replay manifests | `replay/` (`FEAT-STR-05`) | (ReplayIdentity split recorded under Simulator `TC-IMP-SIM-04`) |
+| Setup evaluators | `evaluators/` (`FEAT-STR-10`), `vectorized/` (`FEAT-STR-07`), `event/` (`FEAT-STR-08`) | `TC-IMP-STRAT-03` |
+| Proposal intake | `proposal_intake/` (`FEAT-STR-11`) | `TC-IMP-STRAT-09` |
+
+**Target contracts/features to add or extend:**
+
+| Status | Target | Reuses / extends | Phase 0 gap |
+| --- | --- | --- | --- |
+| Partial | `StrategyProfile v1` additions | Extends `FEAT-STR-01`/`FEAT-STR-03`. Adds permitted instruments/sessions/regimes, indicator deps, entry/exit/invalidation rules, automation permissions. | `TC-IMP-STRAT-01` |
+| Partial | Strategy playbook | Extends `FEAT-STR-10`. Human + machine-evaluable setup definition for pre-market planning/debrief. | `TC-IMP-STRAT-02` |
+| Partial | `SetupEvaluation v1` | Extends `evaluators/`. Returns `MATCH`/`NO_MATCH`/`STALE`/`REGIME_MISMATCH`/`INSUFFICIENT_EVIDENCE` with source snapshots. | `TC-IMP-STRAT-03` |
+| Partial | `TradePlan v1` | Extends `FEAT-STR-04` (`TradeIntent`). **Open Decision OD-STR-01:** the existing canonical proposal contract is named `TradeIntent`; the cockpit requires a richer `TradePlan` (direction, entry rule/price, invalidation, stop, target/exit, requested size basis, planned rationale, profile refs). The name divergence and field gap must be resolved before implementation — Strategy will not silently rename `TradeIntent`; the owner decides extend-in-place vs. add a distinct `TradePlan`. | `TC-IMP-STRAT-04` |
+| Partial | Trade-plan lifecycle | Extends `intents/`. Adds `DRAFT → READY_FOR_RISK → APPROVED/REJECTED → RELEASED → MANAGED → CLOSED/ABORTED`; released plans immutable except versioned amendments. | `TC-IMP-STRAT-05` |
+| Missing | Operating envelope | **New feature** — see Feature Registry `FEAT-STR-12`. Permitted volatility, spread, liquidity, regime, session, holding, event conditions. | `TC-IMP-STRAT-06` |
+| Missing | Exit and management plan | **New feature** — see Feature Registry `FEAT-STR-13`. Initial protection, target, partial exits, trailing, time stop, invalidation, automation handoff. | `TC-IMP-STRAT-07` |
+| Deferred | Expectancy reference | Strategy holds a version-exact reference to an approved expectancy profile and never decides eligibility locally. **Deferred to Research `TC-IMP-RES-03`** (Phase 11). Until then a missing expectancy provider returns `NOT_ELIGIBLE` (fallback to the normal risk-to-reward gate); it never returns an inferred approval. | `TC-IMP-STRAT-08` |
+| Partial | Automation mode policy | Extends `proposal_intake/` (`FEAT-STR-11`). **LOW confidence — re-investigate before implementing (`TC-IMP-STRAT-09`).** Adds `OFF`/`ADVISORY`/`SUPERVISED`/`AUTOMATED`; subordinate to Risk/Trading interlocks. | `TC-IMP-STRAT-09` |
+| Missing | Manual-plan support | **New feature** — see Feature Registry `FEAT-STR-14`. Player-authored plan uses the same contract/validation path as automated strategies. | `TC-IMP-STRAT-10` |
+| Partial | Strategy lifecycle governance | Extends `registry/`. Draft, test, approve, suspend, retire, version strategies without changing replay meaning. **Open Decision OD-STR-02:** the `strategy_*` and `strategy_*_v2` table families coexist in `definitions.py` (`strategy_state`/`strategy_signals` FK to the `_v2` side); authoritative-vs-superseded status is not determinable from migrations alone and must be resolved before Phase 5 implementation. | `TC-IMP-STRAT-11` |
+
+**Boundary clarifications folded in:** Strategy owns playbook definitions, setup qualification, trade plans, entry/exit intent, operating envelopes, and approved management rules. It does not size or approve risk, dispatch orders, or own financial accounting.
+
 ### Four-level structure
 
 | Code level                                     | Represents                             |
@@ -242,6 +276,9 @@ Folders and files are ordered from lowest dependency to highest dependency. This
 | Completed | `FEAT-STR-09` Concrete Signal Execution Boundary    | `signals/`         | Exact declarations and signal contracts: Section 4.9                                                                                                                                       | Section 4.9 functional requirements  | `tests/strategy/usage/features/09_signals.py`          |
 | Completed | `FEAT-STR-10` Strategy Signal Library               | `evaluators/`      | Exact declarations: Section 4.10                                                                                                                                                           | Section 4.10 functional requirements | `tests/strategy/usage/features/10_strategy_library.py` |
 | Completed | `FEAT-STR-11` External Research Proposal Evaluation | `proposal_intake/` | `create_strategy_proposal_evaluation_request`, `create_strategy_proposal_evaluation_result`, `validate_strategy_proposal`, `evaluate_strategy_proposal`, `bind_proposal_lineage` | `FR-STR-049`–`053`              | `tests/strategy/usage/features/11_proposal_intake.py`  |
+| Missing | `FEAT-STR-12` Operating Envelope | `operating_envelope/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `build_operating_envelope`/`parse_operating_envelope` permitted volatility, spread, liquidity, regime, session, holding, event conditions | `FR-STR-054`..`FR-STR-056` *(planned)* | `tests/strategy/usage/features/12_operating_envelope.py` *(planned)* |
+| Missing | `FEAT-STR-13` Exit and Management Plan | `exit_plans/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `build_exit_plan`/`parse_exit_plan` initial protection, target, partial exits, trailing, time stop, invalidation, automation handoff | `FR-STR-057`..`FR-STR-059` *(planned)* | `tests/strategy/usage/features/13_exit_plans.py` *(planned)* |
+| Missing | `FEAT-STR-14` Manual-Plan Support | `manual_plans/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); player-authored plan uses the same contract/validation path as automated strategies | `FR-STR-060`..`FR-STR-062` *(planned)* | `tests/strategy/usage/features/14_manual_plans.py` *(planned)* |
 
 ```text
 app/services/strategy/
@@ -1506,7 +1543,10 @@ values. Deep imports from Strategy feature packages are not supported.
 
 ## 6. Open Decisions
 
-No open decisions.
+These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
+
+- **OD-STR-01 — `TradeIntent` vs `TradePlan`.** The existing canonical proposal contract is `TradeIntent` (`FEAT-STR-04`); the cockpit requires a richer `TradePlan` with direction, entry rule/price, invalidation, stop, target/exit, requested size basis, and profile references. The owner must decide whether to extend `TradeIntent` in place or add a distinct `TradePlan` contract. Until decided, Strategy does not silently rename or duplicate.
+- **OD-STR-02 — `strategy_*` vs `strategy_*_v2` table authority.** Four table families (`strategy_versions`, `strategy_configs`, `strategy_checkpoints`, `strategy_mutations`) coexist with `_v2` variants in `app/services/strategy/migrations/definitions.py`; `strategy_state` and `strategy_signals` already FK to the `_v2` side. Which family is authoritative is not determinable from migrations alone (Phase 0 finding P-4) and must be confirmed before Phase 5 implementation. This documentation treats the `_v2` family as the operative target because the runtime tables depend on it.
 
 ---
 

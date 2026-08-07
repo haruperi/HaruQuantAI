@@ -1,7 +1,7 @@
 # Optimization
 
 > **Package:** `app/services/optimization`
-> **Status:** `Completed`
+> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 9 registered features remain implemented, but 10 work packages (`TC-IMP-OPT-01`..`TC-IMP-OPT-10`) add target behavior that is not yet implemented (7 `EXTEND`, 3 `DEFERRED_INTEGRATION`, 0 `CREATE`). Optimization is the best-aligned cockpit domain. See `### Trading Cockpit Phase 0 reconciliation`.
 > **Last updated:** `2026-07-30`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -74,6 +74,29 @@ The top-level data-ownership table assigns optimization checkpoints and results 
 | Completed | Optimization checkpoints and reproducibility artifacts | Optimization only until a versioned public result is complete | `app/services/optimization/migrations/definitions.py` |
 
 No caller writes either store directly. A public operation that produces durable search state uses an injected Optimization-owned `OptimizationStateStore` and returns persistence success only after the store confirms the atomic write.
+
+### Trading Cockpit Phase 0 reconciliation
+
+This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-OPT-01`..`TC-IMP-OPT-10`) into this authoritative README so that it is self-contained. Phase 0 classified the ten Optimization work packages as **seven `EXTEND` and three `DEFERRED_INTEGRATION`** (zero `CREATE`) — Optimization is the best-aligned cockpit domain; the parameter-space, search, validation, robustness, evidence, and promotion machinery already exists (`FEAT-OPT-01`..`09`).
+
+Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
+
+**Target features to extend (no new features; all gaps extend existing `FEAT-OPT-*`):**
+
+| Status | Target | Reuses / extends | Phase 0 gap |
+| --- | --- | --- | --- |
+| Partial | `OptimizationStudy v1` additions | Extends `FEAT-OPT-01`/`FEAT-OPT-06`. Adds dataset/replay identity and budget fields to the study contract. | `TC-IMP-OPT-01` |
+| Deferred | Fill-model calibration | Estimate latency, slippage, partial-fill, queue, market-impact parameters from approved evidence. **Deferred to Simulator `TC-IMP-SIM-16`..`TC-IMP-SIM-20`** (Phase 8 must build the fill/latency/slippage/queue models first). Nothing to calibrate until then. | `TC-IMP-OPT-02` |
+| Deferred | Scenario difficulty calibration | Tune event intensity, info load, time pressure, liquidity loss, compound failures to target competence. **Deferred to Simulator `TC-IMP-SIM-11`..`TC-IMP-SIM-15`** (Phase 8 scenario engine must exist first). | `TC-IMP-OPT-03` |
+| Partial | Strategy parameter studies | Extends `FEAT-OPT-03`/`FEAT-OPT-08`. Optimizes within approved strategy/instrument envelopes with WFA/OOS validation. **Depends on Strategy `TC-IMP-STRAT-06`** (operating envelope). | `TC-IMP-OPT-04` |
+| Partial | Risk sensitivity analysis | Extends `FEAT-OPT-05`. Sensitivity to risk-per-trade, drawdown warnings, stress limits, exposure caps without weakening hard limits. **Depends on Risk `TC-IMP-RISK-01`** (TradingPolicyProfile). | `TC-IMP-OPT-05` |
+| Deferred | Stress-profile calibration | Calibrate shock magnitudes/dependencies while preserving transparent assumptions. **Deferred to Risk `TC-IMP-RISK-12` / Research `TC-IMP-RES-06`** (no stress-shock profile exists to calibrate). | `TC-IMP-OPT-06` |
+| Partial | Multi-objective evaluation | Extends `FEAT-OPT-02`. Safety, process adherence, stability, execution realism, risk-adjusted performance; raw profit never the sole objective. **Depends on Analytics `TC-IMP-ANL-02`** (process scoring). | `TC-IMP-OPT-07` |
+| Partial | Anti-leakage controls | Extends `FEAT-OPT-08`. Strict train/val/test splits, point-in-time data, **scenario holdouts** (absent because Simulator scenarios are absent), no future revisions. **Depends on Simulator `TC-IMP-SIM-11`** (scenarios). | `TC-IMP-OPT-08` |
+| Partial | Robustness and overfit checks | Extends `FEAT-OPT-05`/`FEAT-OPT-02`. Parameter stability, perturbation tests, regime splits, multiple seeds, uncertainty intervals. Largely satisfied by existing `robustness/` + scoring overfit evidence. | `TC-IMP-OPT-09` |
+| Partial | Promotion contract | Extends `FEAT-OPT-07`. Outputs become versioned candidate profiles; require Research/Strategy/Risk approval before use. **Depends on Research `TC-IMP-RES-10`** (cross-domain approval gate). | `TC-IMP-OPT-10` |
+
+**Boundary clarifications folded in:** Optimization owns bounded calibration, parameter studies, scenario difficulty tuning, robustness evaluation, and anti-leakage optimization evidence. It **does not silently change approved production policies or strategy profiles** — promotion requires Research/Strategy/Risk approval (`TC-IMP-OPT-10`). The three `DEFERRED_INTEGRATION` packages document Optimization's contract boundary and future integration triggers; they do not make Optimization own behavior assigned to a later canonical provider.
 
 ### Four-level structure
 
@@ -1280,7 +1303,9 @@ The explicit feature limits above are binding safety bounds. Other production pe
 
 ## 6. Open Decisions
 
-No open decisions.
+These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
+
+- **OD-OPT-01 — Calibration provider readiness.** Three work packages (`TC-IMP-OPT-02` fill-model calibration, `TC-IMP-OPT-03` scenario difficulty calibration, `TC-IMP-OPT-06` stress-profile calibration) are `DEFERRED_INTEGRATION` because their authoritative providers do not exist yet (Simulator fill/latency/slippage/queue models `TC-IMP-SIM-16`..`20`; Simulator scenario engine `TC-IMP-SIM-11`..`15`; Risk/Research stress-shock profile `TC-IMP-RISK-12`/`TC-IMP-RES-06`). Optimization documents its contract boundary and future integration triggers for each; it does not own the deferred provider behavior and must not label it implemented.
 
 ---
 

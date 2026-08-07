@@ -2,8 +2,8 @@
 
 > **Specification location:** `app/services/api/README.md`
 > **Logical runtime packages:** FastAPI gateway at `app/services/api` plus Next.js frontend at `ui/` (per the `docs/PROJECT.md` registry), with canonical ASGI target `app.services.api.composition.application:app`; Next.js frontend at `ui/`
-> **Status:** `Backend v1 exposes 74 operations, including authenticated read-only Indicators catalogue/capabilities/spec endpoints, completed-run Simulation journal playback, and live resumable what-if sessions; frontend parity complete at 74 typed route contracts`
-> **Last updated:** `2026-08-04`
+> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 13 registered features remain implemented, but 35 work packages (`TC-IMP-UIAPI-01`..`TC-IMP-UIAPI-35`) add target behavior that is not yet implemented (23 `CREATE`, 6 `EXTEND`, 6 `DEFERRED_INTEGRATION`). The backend-v1 74-operation surface and frontend typed parity remain; the cockpit panel/command/event/UX layer is built here. Backend v1 exposes 74 operations, including authenticated read-only Indicators catalogue/capabilities/spec endpoints, completed-run Simulation journal playback, and live resumable what-if sessions; frontend parity complete at 74 typed route contracts. See `### Trading Cockpit Phase 0 reconciliation`.
+> **Last updated:** `2026-08-07`
 
 > This README is the UI/API domain's **single source of truth** for final requirements,
 > structure, implementation sequence, workflows, public symbols, boundary contracts,
@@ -135,6 +135,43 @@ Service accounts use bearer authentication. HTTP idempotency is scoped by princi
 method, canonical route, and key; terminal replay-safe records are retained at least
 24 hours. Business/execution idempotency remains with each command-owning domain.
 
+### Trading Cockpit Phase 0 reconciliation
+
+This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-UIAPI-01`..`TC-IMP-UIAPI-35`) into this authoritative README so that it is self-contained. Phase 0 classified the thirty-five UI-API work packages as **twenty-three `CREATE`, six `EXTEND`, and six `DEFERRED_INTEGRATION`** (CSV-authoritative). UI-API owns the cockpit presentation layer; it owns **zero new tables** (every row is `NOT_APPLICABLE` for persistence) and **must not become a business authority** — domain calculations, validation, policies, and authoritative states remain in their business owners.
+
+Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
+
+**Reused existing assets (no duplication):**
+
+| Cockpit capability | Existing UI-API asset reused | Phase 0 gap |
+| --- | --- | --- |
+| Session API (create/read/step/branch/close) | `routes/simulation_sessions.py`, `routes/simulation_live.py`, SSE frames | `TC-IMP-UIAPI-01` |
+| Ordered, secret-safe event delivery | `streams/events.py::build_stream_event`/`_assert_secret_free` (`FEAT-API-06`), SSE | `TC-IMP-UIAPI-04` |
+| RBAC + protected workflow pages | `identity/` (`FEAT-API-02`/`03`), `ui/app/workflow-page.tsx` (`FEAT-API-12`) | `TC-IMP-UIAPI-06` |
+| Mandatory HTTP idempotency + boundary contracts | `api_idempotency`, `contracts/` (`FEAT-API-01`) | `TC-IMP-UIAPI-07` |
+| Order/cancel/close command routes | `routes/trading.py` | `TC-IMP-UIAPI-03` |
+| Typed Python↔TypeScript transport (76-op parity) | `ui/clients/` (`FEAT-API-09`), `pages.contract.test.ts` | (foundation for all cockpit DTOs) |
+| Critical alert delivery (backend only) | `alerts/` (`FEAT-API-13`) | `TC-IMP-UIAPI-24`..`29` (lifecycle owned by Simulator) |
+
+**Target features to add or extend.** The twenty-three `CREATE` gaps group into cohesive new capabilities, registered as `FEAT-API-14`..`FEAT-API-20`.
+
+| Status | Target (feature / cluster) | Phase 0 gaps |
+| --- | --- | --- |
+| Partial | Session API additions (EXTEND `FEAT-API-07`/`-08`) | `TC-IMP-UIAPI-01` (mode/scenario/replay identity/clock/integrity on the session resource) |
+| Missing | **`FEAT-API-14` Cockpit Read Model and Command API** *(planned)* | `TC-IMP-UIAPI-02` (aggregate panel-ready state without duplicating domain calcs); `TC-IMP-UIAPI-03` (pre-market, plan creation, risk review, orders, emergency, checklist ack, journaling, explicit re-arm commands) |
+| Partial | Real-time event stream additions (EXTEND `FEAT-API-06`) | `TC-IMP-UIAPI-04` (cockpit topics: market, order, portfolio, risk, checklist, alert, score) |
+| Partial | Optimistic-concurrency control (EXTEND) — **LOW confidence, re-investigate (`TC-IMP-UIAPI-05`)** | `TC-IMP-UIAPI-05` (expected-state/version on commands; only session resume located) |
+| Partial | Authentication & authorization additions (EXTEND `FEAT-API-02`/`-03`) | `TC-IMP-UIAPI-06` (player/instructor/reviewer/admin/agent roles + simulation-environment enforcement) |
+| Partial | API idempotency & error model additions (EXTEND `FEAT-API-01`) | `TC-IMP-UIAPI-07` (reason codes, corrective actions, retryability, correlation IDs) |
+| Missing | **`FEAT-API-15` Cockpit Instrument Panels** *(planned)* | `TC-IMP-UIAPI-08` (market: speed/regime/trend/spread/depth/S-R/news radar/data integrity), `TC-IMP-UIAPI-09` (portfolio: equity altimeter/P&L velocity/margin/leverage/drawdown heat/VaR/CVaR/stress), `TC-IMP-UIAPI-10` (trade controls: order ticket/exposure throttle/stops/execution flaps/cancel-flatten/automation mode) |
+| Missing | **`FEAT-API-16` Navigation, Planning, and Warning Panels** *(planned)* | `TC-IMP-UIAPI-11` (charts/market radar/session planner/economic calendar/playbook/trade plan/journal), `TC-IMP-UIAPI-12` (annunciator/connectivity/redundancy/margin stall/emergency checklist/lockout/recovery/re-arm) |
+| Missing | **`FEAT-API-17` Workflow Pages** *(planned)* | `TC-IMP-UIAPI-13` (pre-market), `TC-IMP-UIAPI-14` (trade planning), `TC-IMP-UIAPI-15` (risk decision), `TC-IMP-UIAPI-16` (order execution), `TC-IMP-UIAPI-17` (position management), `TC-IMP-UIAPI-18` (post-market: reconciliation/journal/screenshots/execution review/score/lessons/reset/secure session) |
+| Missing | **`FEAT-API-18` Emergency and Recovery UX** *(planned)* | `TC-IMP-UIAPI-19` (flash-crash checklist), `TC-IMP-UIAPI-20` (API/network failure checklist), `TC-IMP-UIAPI-21` (drawdown-breach checklist), `TC-IMP-UIAPI-22` (recovery screen — never imply recovery before verification), `TC-IMP-UIAPI-23` (emergency control ergonomics — guard accidental flatten; preserve controls during locks) |
+| Missing | **`FEAT-API-19` Human-Factors and Alarm Model** *(planned)* | `TC-IMP-UIAPI-24` (alert priority & lifecycle — severity/source/root cause/ack/clearance; lifecycle owned by Simulator `FEAT-SIM-14`), `TC-IMP-UIAPI-25` (alarm-flood control), `TC-IMP-UIAPI-26` (multimodal warnings — never color/sound-only), `TC-IMP-UIAPI-27` (data freshness visibility), `TC-IMP-UIAPI-28` (responsive cockpit layout), `TC-IMP-UIAPI-29` (interaction safety — confirmations that don't obstruct emergency action) |
+| Deferred | **`FEAT-API-20` Training, Replay, and Qualification UX** *(planned, deferred)* | `TC-IMP-UIAPI-30` (Flight School), `TC-IMP-UIAPI-31` (Guided/Standard/Expert/Challenge UX), `TC-IMP-UIAPI-32` (scenario browser), `TC-IMP-UIAPI-33` (replay workstation), `TC-IMP-UIAPI-34` (debrief & journal), `TC-IMP-UIAPI-35` (qualification & progression). **All six deferred to Simulator `TC-IMP-SIM-09`/`TC-IMP-SIM-11`/`TC-IMP-SIM-04` and Analytics `TC-IMP-ANL-09`/`TC-IMP-ANL-10`** — training/replay/progression UX cannot exist before the deterministic providers exist. |
+
+**Boundary clarifications folded in:** UI-API owns external API transport, browser interaction, cockpit read models, panel composition, warnings/annunciators, player actions, real-time delivery, accessibility, and presentation state. It **does not own authoritative calculations, policy decisions, orders, or portfolio accounting** (Phase 0 §9.7). A Risk gauge displays a Risk decision; it does not move the calculation into UI-API. An annunciator displays a Simulator alert; it does not own the alert lifecycle. `api_idempotency` is one of four idempotency stores (consolidation target → Utils `TC-IMP-UTIL-07`); `api_approvals` is a second approval store alongside Risk's `risk_approval_tokens` — **Open Decision OD-UIAPI-01** (which authorizes a cockpit action must be clarified before Phase 14; `api_approvals` is evidence of human sign-off, not a permission — Risk remains sole approval-token authority).
+
 ### Four-level structure
 
 | Code level | Represents |
@@ -208,6 +245,13 @@ invariant rather than outstanding scope.
 | Completed | `FEAT-API-11` Workflow Presentation Components | `ui/components/workflow/` | `AppShell`, `DashboardView`, `StrategyWorkspace`, `SimulationView`, `RiskView`, `TradingView`, `ResearchWorkspace`, `PlaybackView` | `FR-API-046`–`FR-API-051` | `tests/api/usage/16_frontend_components.tsx`; `app/ui/src/components/workflow/*.test.tsx` |
 | Completed | `FEAT-API-12` Protected Workflow Pages | `ui/app/` | `AuthenticationPage` (at `/login`), `ProtectedLayout`, `WorkflowPage` | `FR-API-053`–`FR-API-055` | `tests/api/usage/17_frontend_pages.tsx`; `app/ui/src/app/{authentication-page,protected-layout,pages.contract}.test.tsx` |
 | Completed | `FEAT-API-13` Critical Operational Alert Delivery | `alerts/` | `CriticalAlertTrigger`, `CriticalOperationalAlert`, `CriticalAlertDeliveryResult`, `CriticalAlertError`, `CriticalAlertSink`, `build_kill_switch_activation_alert`, `build_unknown_broker_state_alert`, `deliver_critical_alert` | `FR-API-064`–`FR-API-067` | `tests/api/usage/13_alerts.py` |
+| Missing | `FEAT-API-14` Cockpit Read Model and Command API | `cockpit/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); aggregate cockpit read model + cockpit command API (pre-market, plan, risk review, orders, emergency, checklist ack, journaling, re-arm) | `FR-API-078`..`FR-API-083` *(planned)* | `tests/api/usage/14_cockpit.py` *(planned)* |
+| Missing | `FEAT-API-15` Cockpit Instrument Panels | `panels/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); market/portfolio/trade-control instrument panel groups | `FR-API-084`..`FR-API-089` *(planned)* | `tests/api/usage/15_panels.py` *(planned)* |
+| Missing | `FEAT-API-16` Navigation, Planning, and Warning Panels | `planning/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); navigation/planning panels + warning/annunciator panels | `FR-API-090`..`FR-API-094` *(planned)* | `tests/api/usage/16_planning.py` *(planned)* |
+| Missing | `FEAT-API-17` Workflow Pages | `workflow_pages/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); pre-market → trade-planning → risk → execution → management → post-market workflow pages | `FR-API-095`..`FR-API-101` *(planned)* | `tests/api/usage/17_workflow_pages.py` *(planned)* |
+| Missing | `FEAT-API-18` Emergency and Recovery UX | `emergency_ux/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); flash-crash/API-failure/drawdown-breach checklists, recovery screen, emergency control ergonomics | `FR-API-102`..`FR-API-106` *(planned)* | `tests/api/usage/18_emergency_ux.py` *(planned)* |
+| Missing | `FEAT-API-19` Human-Factors and Alarm Model | `human_factors/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); alert priority/lifecycle display, alarm-flood control, multimodal warnings, freshness visibility, responsive layout, interaction safety | `FR-API-107`..`FR-API-112` *(planned)* | `tests/api/usage/19_human_factors.py` *(planned)* |
+| Missing | `FEAT-API-20` Training, Replay, and Qualification UX | `training_ux/` *(planned, deferred)* | Trading Cockpit Phase 0 reconciliation (§1); Flight School, mode UX, scenario browser, replay workstation, debrief & journal, qualification & progression — **deferred to Simulator/Analytics providers** | `FR-API-113`..`FR-API-118` *(planned)* | `tests/api/usage/20_training_ux.py` *(planned)* |
 
 #### Backend foundation evidence and remaining gate (`API-BE-001`)
 
@@ -1619,7 +1663,12 @@ No unresolved owner decision blocks the reduced backend v1. Path 1 resolved
 `API-OD-005` and `API-OD-006` by excluding HTTP operations that lack exact request or
 runtime owner contracts. Reintroducing any excluded family requires a new approved
 plan. Production credential rotation remains a deployment-transition task and never
-permits credentials in tracked source.
+permits credentials in tracked source. The following are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit; they are recorded here, not resolved by this documentation task.
+
+- **OD-UIAPI-01 — Second approval store.** `api_approvals` is a second approval store alongside Risk's `risk_approval_tokens` (Phase 0 finding P-9 / collision O-9). The owner must clarify which authorizes a cockpit action before Phase 14. UI-API's `api_approvals` records human sign-off evidence; it is not a permission, and Risk remains the sole approval-token authority.
+- **OD-UIAPI-02 — Optimistic-concurrency evidence (`TC-IMP-UIAPI-05`, LOW confidence).** Only session resume was located; it is unknown whether any command carries an expected-version field. Re-investigate before implementing. Until proven, treat optimistic-concurrency control as unimplemented.
+
+
 
 ---
 

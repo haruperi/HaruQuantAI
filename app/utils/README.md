@@ -1,8 +1,8 @@
 # Utils
 
 > **Package:** `app/utils`
-> **Status:** `Completed`
-> **Last updated:** `2026-08-04`
+> **Status:** `Partial`
+> **Last updated:** `2026-08-07`
 
 > This README is the package's single source of truth for requirements, final
 > structure, implementation sequence, progress, usage examples, and tests.
@@ -33,6 +33,26 @@ It makes no trading or domain decision.
 - Immutable runtime settings and the sole repository `app/configs/env.json` loading boundary.
 - Import-safe structured logging with immutable bound context, a lazy approved
   default profile, and explicit override support for specialized routing.
+- Exact decimal unit primitives for money, price, quantity, percentage, basis
+  points, ticks, points, lots/contracts/shares, and currency codes, including
+  unit-mixing rejection.
+- Generic state-machine primitives: transition results, allowed-transition
+  validation, terminal-state handling, regression detection, and transition
+  audit records.
+- The single cross-domain validation-result taxonomy `PASS`, `WARN`, `BLOCK`,
+  `FAIL`, `UNKNOWN` with structured reason codes, corrective actions, severity,
+  and source-evidence references.
+- Idempotency primitives: key generation, owner binding, TTL semantics, duplicate
+  detection, and exactly-once economic-intent helpers.
+- Deterministic seeded random streams for reproducible simulation draws.
+- Versioned profile and version references (`ProfileRef`, `VersionRef`) with
+  strict schema validation, immutable loaded representation, compatibility
+  checks, and no-silent-fallback resolution.
+- Event envelope sequencing metadata: source ID, source sequence, correlation and
+  causation identifiers, deduplication key, integrity hash, and schema version.
+- The business-neutral error and health taxonomy: transient, permanent,
+  integrity, policy, data-stale, and unknown-state categories with retryability
+  and operator-action metadata.
 
 ### Does not own
 
@@ -53,6 +73,18 @@ It makes no trading or domain decision.
   generic validation façades, or domain-specific wrapper response envelopes.
 - Import-time configuration, filesystem writes, environment-file reads, network
   connections, compatibility aliases, or fallback modules.
+- Database connection, transaction, write-lock, migration-ledger, backup,
+  recovery, and outbox infrastructure. Data owns these under its documented
+  `AGENTS.md` exemption at `app/services/data/persistence/`. Utils supplies the
+  idempotency key contract that those mechanisms consume; it never opens a
+  connection, begins a transaction, or persists an outbox record.
+- Broker, market, risk, order, simulation, portfolio, scoring, or cockpit
+  business semantics. Utils supplies the neutral shape; the owning domain
+  supplies the meaning. A domain event type, a risk verdict, an order state, and
+  a mission outcome are owned by Trading, Risk, Trading, and Simulator
+  respectively even when they travel inside a Utils envelope.
+- Domain quantization policy. Utils fixes the exact representation rule for a
+  unit; the enforcing domain fixes tick size, lot step, and rounding direction.
 
 ### Shared contracts
 
@@ -61,6 +93,34 @@ It makes no trading or domain decision.
 | Completed | `AuthContext`         | `v1`, `v2` | UI/API                         | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, Agentic                              | Immutable authenticated principal and trace context. Version 2 separates deployment tenancy from the bounded execution-safety runtime profile.     |
 | Completed | `AuditEvent`          | `v1`         | Every emitting domain          | Data (direct persistence consumer); Risk and UI/API query persisted events only through Data-owned query contracts | Redacted, versioned trace record persisted by Data; each producer owns its payload meaning.                                                        |
 | Completed | `StandardResponse[T]` | `v1`         | Every bounded public operation | Every internal or external caller of that operation                                                                | Immutable five-field function-level response preserving the raw result directly in`data` and prior envelope evidence in `metadata.extensions`. |
+| Missing   | `ProfileRef`          | `v1`         | Utils                          | Brokers, Data, Indicators, Strategy, Risk, Trading, Simulator, Analytics, Optimization, Research, Portfolio, UI/API | Versioned reference to a named configuration profile: profile kind, profile ID, version, and content hash.                                     |
+| Missing   | `VersionRef`          | `v1`         | Utils                          | Every domain that pins an evidence, policy, scenario, scoring, or strategy version                                 | Versioned reference to any immutable domain artifact: artifact kind, artifact ID, version, and content hash.                                   |
+| Missing   | `ExactUnit`           | `v1`         | Utils                          | Brokers, Data, Indicators, Risk, Trading, Simulator, Analytics, Portfolio, UI/API                                   | Exact decimal amount carrying its unit kind and, for monetary kinds, its ISO currency code.                                                     |
+| Missing   | `ValidationOutcome`   | `v1`         | Utils                          | Data, Indicators, Strategy, Risk, Trading, Simulator, Analytics, Portfolio, Agentic, UI/API                        | `PASS`/`WARN`/`BLOCK`/`FAIL`/`UNKNOWN` verdict with reason codes, severity, corrective actions, and evidence references.                       |
+| Missing   | `EventEnvelope`       | `v1`         | Utils                          | Brokers, Data, Strategy, Risk, Trading, Simulator, Analytics, Portfolio, UI/API                                     | Ordered, deduplicable event metadata wrapping a domain-owned payload whose meaning the producing domain retains.                               |
+| Missing   | `IdempotencyKey`      | `v1`         | Utils                          | Data, Trading, Portfolio, Simulator, UI/API                                                                        | Owner-bound, TTL-bearing exactly-once key for one economic intent.                                                                             |
+| Missing   | `TransitionResult`    | `v1`         | Utils                          | Strategy, Risk, Trading, Simulator, Portfolio, UI/API                                                              | Result of one attempted state transition: accepted, rejected, terminal, or regressed, with the audit record.                                    |
+| Missing   | `HealthState`         | `v1`         | Utils                          | Brokers, Data, Trading, Simulator, UI/API                                                                          | Category, retryability, operator action, and observation instant for one monitored dependency.                                                  |
+
+#### Cross-domain contract transport
+
+Every contract above crosses a domain boundary as a **validated JSON-safe
+mapping**, never as an imported class. `AGENTS.md` §1 *Function-Only Public API
+Surface* stands unchanged: `app/utils/__init__.py` exports only standalone
+functions, and each contract is reached through a `build_*` constructor and a
+`parse_*` validator pair. The frozen implementation type stays private to its
+feature module.
+
+Each mapping carries `contract_version` and `schema_id` as required top-level
+keys. A consumer that receives an absent, unknown, or incompatible
+`contract_version` **shall** reject the mapping and fail closed; it never applies
+a default version, coerces an unknown field, or drops an unrecognized key
+silently. Producers construct through the Utils constructor so that field
+presence, exact-decimal representation, and redaction are enforced once.
+
+This preserves determinism at the boundary at the cost of static typing across
+it: `mypy --strict` verifies each domain's internal frozen type, and the
+`parse_*` validators supply the runtime guarantee where the type is erased.
 
 `AuthContext v1` contains `contract_version`, `schema_id`, `principal_id`,
 `principal_type`, roles, permissions, scopes, tenant/environment, request ID,
@@ -95,6 +155,14 @@ Shared business-neutral capabilities have at least two explicit domain consumers
 | Error metadata and injected routing                          | Brokers, Risk, Trading, Simulation, Analytics, Research, Portfolio, UI/API                               |
 | Standard operation responses and immutable error definitions | Every service domain and UI/API                                                                          |
 | Structured logging and specialized routing                   | Brokers, Risk, Trading, Data                                                                             |
+| Exact unit primitives                                        | Brokers, Data, Indicators, Risk, Trading, Simulator, Analytics, Portfolio, UI/API                        |
+| State-machine primitives                                     | Strategy, Risk, Trading, Simulator, Portfolio, UI/API                                                    |
+| Validation-result taxonomy                                   | Data, Indicators, Strategy, Risk, Trading, Simulator, Analytics, Portfolio, Agentic, UI/API              |
+| Idempotency primitives                                       | Data, Trading, Portfolio, Simulator, UI/API                                                              |
+| Deterministic seeded random streams                          | Simulator, Optimization, Research                                                                        |
+| Profile and version references                               | Every domain that pins a versioned profile or immutable artifact                                         |
+| Event envelope sequencing                                    | Brokers, Data, Strategy, Risk, Trading, Simulator, Analytics, Portfolio, UI/API                          |
+| Error and health taxonomy                                    | Brokers, Data, Trading, Simulator, UI/API                                                                |
 
 ### Transferred ownership
 
@@ -111,7 +179,13 @@ cross-domain contract. Generic sequence chunking is not part of Utils.
 
 ### Persisted state
 
-Utils owns no durable business state, tables, artifacts, or migrations.
+Utils owns no durable business state, tables, artifacts, or migrations. This
+remains true after the idempotency primitives are added: Utils defines the
+`IdempotencyKey v1` shape, its owner binding, and its TTL and duplicate-detection
+rules, while each state-owning domain persists its own reservation records in its
+own table through Data-owned transaction infrastructure. Utils never reads or
+writes `trading_idempotency`, `portfolio_idempotency`, `api_idempotency`, or
+`data_backfill_checkpoints`.
 
 ---
 
@@ -123,15 +197,31 @@ Folders are ordered from lowest to highest dependency.
 
 | Status    | Feature                                                           | Owning module      | Public API and contracts                               | Requirements                        | Usage evidence                                          |
 | --------- | ----------------------------------------------------------------- | ------------------ | ------------------------------------------------------ | ----------------------------------- | ------------------------------------------------------- |
-| Completed | `FEAT-UTIL-00` Shared Authentication and Audit Contracts        | `contracts/`     | Exact declarations and contract fields: Section 4.1    | Section 4.1 functional requirements | `tests/utils/usage/features/01_contracts.py`          |
-| Completed | `FEAT-UTIL-01` Error Mapping and Exception Normalization        | `errors/`        | Exact declarations: Section 4.2                        | Section 4.2 functional requirements | `tests/utils/usage/features/02_errors.py`             |
-| Completed | `FEAT-UTIL-02` Prefixed and Deterministic Identity Generation   | `identity/`      | Exact declarations: Section 4.3                        | Section 4.3 functional requirements | `tests/utils/usage/features/03_identity.py`           |
-| Completed | `FEAT-UTIL-03` Aware UTC Time and Timestamp Utilities           | `time/`          | Exact declarations: Section 4.4                        | Section 4.4 functional requirements | `tests/utils/usage/features/04_time.py`               |
-| Completed | `FEAT-UTIL-04` Canonical JSON Serialization and Safe Conversion | `serialization/` | Exact declarations: Section 4.5                        | Section 4.5 functional requirements | `tests/utils/usage/features/05_serialization.py`      |
-| Completed | `FEAT-UTIL-05` Sensitive Data Redaction                         | `security/`      | Exact declarations: Section 4.6                        | Section 4.6 functional requirements | `tests/utils/usage/features/06_security.py`           |
-| Completed | `FEAT-UTIL-06` Precedence-Ordered Settings Loading              | `settings/`      | Exact declarations and settings contracts: Section 4.7 | Section 4.7 functional requirements | `tests/utils/usage/features/07_settings.py`           |
-| Completed | `FEAT-UTIL-07` Non-Blocking Logging Configuration               | `logging/`       | Exact declarations and logging contracts: Section 4.8  | Section 4.8 functional requirements | `tests/utils/usage/features/08_logging.py`            |
+| Partial   | `FEAT-UTIL-00` Shared Authentication and Audit Contracts        | `contracts/`     | Exact declarations and contract fields: Section 4.1    | Section 4.1 functional requirements | `tests/utils/usage/features/01_contracts.py`          |
+| Partial   | `FEAT-UTIL-01` Error Mapping and Exception Normalization        | `errors/`        | Exact declarations: Section 4.2                        | Section 4.2 functional requirements | `tests/utils/usage/features/02_errors.py`             |
+| Partial   | `FEAT-UTIL-02` Prefixed and Deterministic Identity Generation   | `identity/`      | Exact declarations: Section 4.3                        | Section 4.3 functional requirements | `tests/utils/usage/features/03_identity.py`           |
+| Partial   | `FEAT-UTIL-03` Aware UTC Time and Timestamp Utilities           | `time/`          | Exact declarations: Section 4.4                        | Section 4.4 functional requirements | `tests/utils/usage/features/04_time.py`               |
+| Partial   | `FEAT-UTIL-04` Canonical JSON Serialization and Safe Conversion | `serialization/` | Exact declarations: Section 4.5                        | Section 4.5 functional requirements | `tests/utils/usage/features/05_serialization.py`      |
+| Partial   | `FEAT-UTIL-05` Sensitive Data Redaction                         | `security/`      | Exact declarations: Section 4.6                        | Section 4.6 functional requirements | `tests/utils/usage/features/06_security.py`           |
+| Partial   | `FEAT-UTIL-06` Precedence-Ordered Settings Loading              | `settings/`      | Exact declarations and settings contracts: Section 4.7 | Section 4.7 functional requirements | `tests/utils/usage/features/07_settings.py`           |
+| Partial   | `FEAT-UTIL-07` Non-Blocking Logging Configuration               | `logging/`       | Exact declarations and logging contracts: Section 4.8  | Section 4.8 functional requirements | `tests/utils/usage/features/08_logging.py`            |
 | Completed | `FEAT-UTIL-08` Standard Operation Responses                     | `responses/`     | Exact declarations and response fields: Section 4.9    | Section 4.9 functional requirements | `tests/utils/usage/features/09_standard_responses.py` |
+| Missing   | `FEAT-UTIL-09` Exact Unit Primitives                            | `units/`         | Planned declarations: Section 4.10                     | Section 4.10 functional requirements | Planned: `tests/utils/usage/features/10_units.py`     |
+| Missing   | `FEAT-UTIL-10` Generic State-Machine Primitives                 | `state_machine/` | Planned declarations: Section 4.11                     | Section 4.11 functional requirements | Planned: `tests/utils/usage/features/11_state_machine.py` |
+| Missing   | `FEAT-UTIL-11` Validation Result Taxonomy                       | `validation/`    | Planned declarations: Section 4.12                     | Section 4.12 functional requirements | Planned: `tests/utils/usage/features/12_validation.py` |
+| Missing   | `FEAT-UTIL-12` Idempotency Primitives                           | `idempotency/`   | Planned declarations: Section 4.13                     | Section 4.13 functional requirements | Planned: `tests/utils/usage/features/13_idempotency.py` |
+| Missing   | `FEAT-UTIL-13` Deterministic Random Streams                     | `random_streams/` | Planned declarations: Section 4.14                    | Section 4.14 functional requirements | Planned: `tests/utils/usage/features/14_random_streams.py` |
+
+Fourteen features are registered: `FEAT-UTIL-00` through `FEAT-UTIL-13`. One
+(`FEAT-UTIL-08`) is `Completed`; eight are `Partial` — their existing behavior is
+implemented and verified, and each carries a documented target delta that is not;
+five are `Missing` with no implementation, no module folder, and no usage program.
+The planned usage paths above are targets, not existing files.
+
+The eight `Partial` features are not regressions. Every requirement previously
+marked `Completed` in Section 4 remains `Completed` with its original evidence
+intact. The feature status reflects the added `Missing` requirements listed
+alongside them.
 
 This table is the sole current registry for Utils. Detailed signatures, contract
 fields, failure behavior, and evidence remain authoritative in the referenced
@@ -177,12 +267,38 @@ utils/
 |-- logging/
 |   |-- __init__.py
 |   `-- logger.py
-`-- responses/
+|-- responses/
+|   |-- __init__.py
+|   |-- factories.py
+|   |-- models.py
+|   `-- timing.py
+|-- units/                  # target (FEAT-UTIL-09) - not yet created
+|   |-- __init__.py
+|   |-- kinds.py
+|   |-- amounts.py
+|   `-- conversion.py
+|-- state_machine/          # target (FEAT-UTIL-10) - not yet created
+|   |-- __init__.py
+|   |-- transitions.py
+|   `-- audit.py
+|-- validation/             # target (FEAT-UTIL-11) - not yet created
+|   |-- __init__.py
+|   |-- outcomes.py
+|   `-- reasons.py
+|-- idempotency/            # target (FEAT-UTIL-12) - not yet created
+|   |-- __init__.py
+|   |-- keys.py
+|   `-- reservations.py
+`-- random_streams/         # target (FEAT-UTIL-13) - not yet created
     |-- __init__.py
-    |-- factories.py
-    |-- models.py
-    `-- timing.py
+    `-- streams.py
 ```
+
+The five target folders are approved but do not exist. They are created only when
+their feature is implemented; no empty folder or stub module is added ahead of
+the behavior. Each new folder hosts exactly one registered feature and exposes
+its operations as standalone functions through the package root, matching the
+existing nine.
 
 Package and feature `__init__.py` files expose only documented standalone
 functions through explicit `__all__` declarations. Class-based implementations
@@ -207,14 +323,30 @@ flowchart LR
     E --> RESP[responses]
     I --> RESP
     R --> RESP
+    E --> U[units]
+    E --> SM[state_machine]
+    E --> V[validation]
+    U --> V
+    E --> IDEM[idempotency]
+    I --> IDEM
+    S --> IDEM
+    E --> RS[random_streams]
 ```
+
+`units`, `state_machine`, `validation`, `idempotency`, and `random_streams` sit at
+the same dependency level as the existing leaf features: each depends only on
+`errors` and, where noted, on `identity` or `serialization`. None of them depends
+on `logging`, `settings`, or `responses`, and none introduces a cycle.
 
 Standalone executable usage examples live under `tests/utils/usage/features/`. They are
 ordinary programs with `main()` and `if __name__ == "__main__"` entry points, not
-pytest tests. The nine numbered programs map one-to-one to `FEAT-UTIL-00` through
-`FEAT-UTIL-08`, while `features.py` ties all nine features together into a single
-sequential, homogeneous end-to-end domain pipeline. Pytest explicitly ignores these
-programs, and verification executes each one directly with Python.
+pytest tests. Nine numbered programs currently map one-to-one to `FEAT-UTIL-00`
+through `FEAT-UTIL-08`, and `features.py` ties those nine together into a single
+sequential, homogeneous end-to-end domain pipeline. Five further programs
+(`10_units.py` through `14_random_streams.py`) are planned for `FEAT-UTIL-09`
+through `FEAT-UTIL-13` and are added with their features; `features.py` extends to
+fourteen at that point. Pytest explicitly ignores these programs, and verification
+executes each one directly with Python.
 
 ---
 
@@ -250,6 +382,7 @@ never reused; new workflows continue from `WF-UTL-004`.
 | `WF-UTL-005` | `tests/utils/usage/workflows/wf_utl_005_error_normalization_and_routing.py`      |
 | `WF-UTL-006` | `tests/utils/usage/workflows/wf_utl_006_trace_identity_and_utc_time.py`          |
 | `WF-UTL-007` | `tests/utils/usage/workflows/wf_utl_007_canonical_serialization_and_digest.py`   |
+| `WF-UTL-008` | Planned: `tests/utils/usage/workflows/wf_utl_008_cockpit_contract_envelope.py`   |
 
 | Status    | Rank       | Workflow ID    | Scope        | Workflow                                   | Input boundary                              | Final outcome                                                           | Requirement sequence                                                                                                                                  |
 | --------- | ---------- | -------------- | ------------ | ------------------------------------------ | ------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -260,6 +393,35 @@ never reused; new workflows continue from `WF-UTL-004`.
 | Completed | Supporting | `WF-UTL-005` | Cross-domain | Error normalization, metadata, and routing | Raw exception or domain error code          | Canonical error code, resolved metadata, and one routed error event     | `FR-UTL-004` through `FR-UTL-006`, `FR-UTL-009`, `FR-UTL-012`                                                                                 |
 | Completed | Supporting | `WF-UTL-006` | Cross-domain | Trace identity and UTC time discipline     | Caller-supplied identity seed or timestamp  | Validated trace identifier plus aware UTC instant and freshness verdict | `FR-UTL-001`, `FR-UTL-025`, `FR-UTL-037`                                                                                                        |
 | Completed | Supporting | `WF-UTL-007` | Cross-domain | Canonical serialization and digest         | Arbitrary domain payload                    | Deterministic redacted canonical JSON and stable digest                 | `FR-UTL-036`, `FR-UTL-038`                                                                                                                        |
+| Missing   | Supporting | `WF-UTL-008` | Cross-domain | Cockpit contract envelope build and verify | Domain-owned facts plus profile/version refs and a unit-bearing amount | One validated JSON-safe contract mapping accepted by a consumer, or a fail-closed rejection naming the incompatible version | `FR-UTL-052` through `FR-UTL-055`, `FR-UTL-057` through `FR-UTL-060`, `FR-UTL-066`, `FR-UTL-067` |
+
+### `WF-UTL-008` — Cockpit Contract Envelope Build and Verify
+
+Status `Missing`. No stage of this workflow is implemented.
+
+1. The producing domain resolves the profile and artifact versions its output is
+   bound to — `utils.build_profile_ref()`, `utils.build_version_ref()`.
+2. Monetary and quantity fields are constructed as exact unit-bearing amounts so
+   that no float or bare `Decimal` enters the mapping —
+   `utils.build_exact_unit()`.
+3. Sequencing metadata is attached: source ID, monotonic source sequence,
+   correlation and causation IDs, and a deterministic deduplication key —
+   `utils.build_event_envelope()`.
+4. The payload is redacted and canonicalized, and an integrity hash is computed
+   over the canonical bytes — `utils.redact_mapping_value()`,
+   `utils.canonical_json()`, `utils.canonical_digest()`.
+5. The consuming domain validates the mapping against its declared
+   `contract_version` and `schema_id` before reading any field —
+   `utils.parse_event_envelope()`, `utils.parse_profile_ref()`.
+6. A duplicate deduplication key is detected and the repeat delivery is
+   suppressed without re-applying the economic effect —
+   `utils.is_duplicate_event()`.
+
+**Failure behaviour:** an absent, unknown, or incompatible `contract_version`
+raises at step 5 and the consumer fails closed. A payload carrying a bare float
+in a monetary field is rejected at step 2 rather than silently converted. An
+out-of-order source sequence is surfaced to the consumer as a gap, never
+reordered or dropped inside Utils.
 
 ### `WF-UTL-PRI` — Structured Logging and Redaction
 
@@ -397,6 +559,9 @@ functional behavior.
 | Completed | `FR-UTL-001` | Define immutable backward-compatible`AuthContext v1` and current `AuthContext v2`; v2 requires a bounded runtime profile separate from deployment tenancy. Only `USER` and `SERVICE_ACCOUNT` principal types are valid. | `create_auth_context`, `get_auth_context_type`                         | None         | `ValidationError`: version/schema mismatch, missing or invalid v2 runtime profile, naive time, empty identity/trace field, or unsupported principal type | **Usage:** `tests/utils/usage/features/01_contracts.py::fr_utils_001_auth_context()`**Unit:** `tests/utils/unit/test_auth.py::test_auth_context_v2_requires_separate_runtime_profile()`          |
 | Completed | `FR-UTL-002` | Define immutable redacted`AuditEvent v1` with bounded JSON-safe payload. The class remains internal; callers construct it with the factory and may resolve its runtime type only through the getter.                          | `create_audit_event`, `get_audit_event_type`                           | None         | `ValidationError`: naive timestamp, empty identity/trace field, or unsafe payload                                                                        | **Usage:** `tests/utils/usage/features/01_contracts.py::fr_utils_002_audit_event()`**Unit:** `tests/utils/unit/test_audit.py::test_audit_event_requires_json_safe_payload()`                     |
 | Completed | `FR-UTL-003` | Reject naive timestamps, empty identity/trace fields, unsupported principal types, and malformed schema identity.                                                                                                               | Strict contract-field validation used by`AuditEvent` and `AuthContext` | None         | `ValidationError`: naive time, empty field, unsupported principal type, or malformed schema identity                                                     | **Usage:** `tests/utils/usage/features/01_contracts.py::fr_utils_003_contract_validation()`**Unit:** `tests/utils/unit/test_audit.py::test_contract_field_validation_rejects_malformed_schema()` |
+| Missing   | `FR-UTL-058` | Build `EventEnvelope v1` as a JSON-safe mapping carrying `contract_version`, `schema_id`, event ID, source ID, monotonic source sequence, correlation ID, optional causation ID, deduplication key, integrity hash, aware UTC emission time, and the producer's opaque payload. The envelope shall not interpret, rename, or validate any payload field beyond JSON-safety and redaction. | `build_event_envelope`, `parse_event_envelope` | None | `ValidationError`: missing required key, non-monotonic sequence, naive time, unsafe payload, or unknown/incompatible `contract_version` | **Usage:** planned `tests/utils/usage/features/01_contracts.py::fr_utils_058_event_envelope()` **Unit:** planned `tests/utils/unit/test_event_envelope.py::test_envelope_requires_sequence_and_dedup_key()` |
+| Missing   | `FR-UTL-059` | Compute the envelope integrity hash as the canonical digest of the redacted canonical JSON of the envelope excluding the hash field itself, so that two processes derive byte-identical hashes for the same envelope. | `build_event_envelope` integrity hashing | None | `ValidationError`: payload cannot be canonicalized | **Usage:** planned `tests/utils/usage/features/01_contracts.py::fr_utils_059_envelope_integrity()` **Unit:** planned `tests/utils/unit/test_event_envelope.py::test_integrity_hash_excludes_itself_and_is_stable()` |
+| Missing   | `FR-UTL-060` | Return a duplicate verdict for an envelope whose deduplication key was already observed within the caller-supplied observation set, and report an ordering gap when a source sequence exceeds the expected successor. Utils shall neither store the observation set nor reorder, buffer, or discard an envelope. | `is_duplicate_event`, `find_sequence_gap` | None | `ValidationError`: malformed envelope or non-integer sequence | **Usage:** planned `tests/utils/usage/features/01_contracts.py::fr_utils_060_duplicate_and_gap()` **Unit:** planned `tests/utils/unit/test_event_envelope.py::test_duplicate_key_and_sequence_gap_are_reported()` |
 
 ### 4.2 `errors/` — Shared Errors, Metadata, and Routing
 
@@ -428,6 +593,9 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 | Completed | `FR-UTL-034` | Normalize an error code and look up immutable safe metadata without a mutable registry.                                                                                                | `ErrorMetadata`, `normalize_error_code`, `get_error_metadata`                                          | None                            | `ValidationError`: empty or malformed error code                                | **Usage:** `tests/utils/usage/features/02_errors.py::fr_utils_034_error_metadata()`**Unit:** `tests/utils/unit/test_error_metadata.py::test_normalize_and_lookup_error_metadata()`              |
 | Completed | `FR-UTL-035` | Map an exception and synchronously deliver its safe payload to an explicitly injected sink.                                                                                            | `ErrorSink`, `route_error_event`                                                                         | Caller-provided sink invocation | Sink exception is propagated                                                      | **Usage:** `tests/utils/usage/features/02_errors.py::fr_utils_035_route_error_event()`**Unit:** `tests/utils/unit/test_error_routing.py::test_route_error_event_invokes_injected_sink()`        |
 | Completed | `FR-UTL-048` | Define immutable business-neutral and root-system error metadata, validate detached domain catalogues, and reject unapproved codes without importing service-domain policy into Utils. | `ErrorDefinition`, `COMMON_ERROR_CATALOG`, `validate_error_catalog`, `require_error_definition`      | None                            | `ValidationError`: empty, malformed, inconsistent, or unapproved catalogue/code | **Usage:** `tests/utils/usage/features/02_errors.py::fr_utils_048_error_catalogues()`**Unit:** `tests/utils/unit/test_error_catalog.py`                                                         |
+| Missing   | `FR-UTL-062` | Classify every error definition into exactly one of the categories `TRANSIENT`, `PERMANENT`, `INTEGRITY`, `POLICY`, `DATA_STALE`, or `UNKNOWN_STATE`. An unclassified definition shall be rejected at catalogue validation rather than defaulted, so no caller infers retry behavior from an absent category. | Error category taxonomy in `contracts.py`, enforced by `validate_error_catalog` | None | `ValidationError`: definition carries no category or an unsupported category | **Usage:** planned `tests/utils/usage/features/02_errors.py::fr_utils_062_error_categories()` **Unit:** planned `tests/utils/unit/test_error_catalog.py::test_catalogue_rejects_uncategorized_definition()` |
+| Missing   | `FR-UTL-063` | Return retryability and operator-action metadata for a normalized code: whether the caller may retry, the minimum backoff class, and whether human action is required. `UNKNOWN_STATE` shall report retryable=false and operator action required, so an ambiguous broker or persistence outcome is never blindly resubmitted. | `get_error_metadata` retryability fields | None | `ValidationError`: unregistered code | **Usage:** planned `tests/utils/usage/features/02_errors.py::fr_utils_063_retryability()` **Unit:** planned `tests/utils/unit/test_error_metadata.py::test_unknown_state_is_not_retryable()` |
+| Missing   | `FR-UTL-064` | Build and parse `HealthState v1` as a JSON-safe mapping carrying dependency name, category, degraded/failed/unknown state, retryability, operator action, and aware UTC observation instant. A missing observation instant shall produce `UNKNOWN`, never `healthy`. | `build_health_state`, `parse_health_state` | None | `ValidationError`: missing dependency name, naive instant, or unsupported state | **Usage:** planned `tests/utils/usage/features/02_errors.py::fr_utils_064_health_state()` **Unit:** planned `tests/utils/unit/test_health_state.py::test_absent_observation_yields_unknown()` |
 
 ### 4.3 `identity/` — Trace Identifiers
 
@@ -449,6 +617,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 | Completed | `FR-UTL-007` | Generate prefixed UUID4 identifiers without embedded secrets.                                                                                            | `generate_id`           | Entropy read | `ValidationError`: unsupported prefix                                          | **Usage:** `tests/utils/usage/features/03_identity.py::fr_utils_007_generate_id()`**Unit:** `tests/utils/unit/test_identifiers.py::test_generate_id_is_prefixed_and_secret_free()` |
 | Completed | `FR-UTL-008` | Validate supported prefixes and canonical identifier syntax.                                                                                             | `validate_id`           | None         | `ValidationError`: unsupported prefix or malformed identifier                  | **Usage:** `tests/utils/usage/features/03_identity.py::fr_utils_008_validate_id()`**Unit:** `tests/utils/unit/test_identifiers.py::test_validate_id_rejects_malformed()`           |
 | Completed | `FR-UTL-009` | Derive deterministic`id`-prefixed SHA-256 identifiers from canonical caller-supplied identity material; stable IDs are never shared trace identifiers. | `derive_stable_id`      | None         | `ValidationError`: unsupported prefix or empty/non-canonical identity material | **Usage:** `tests/utils/usage/features/03_identity.py::fr_utils_009_derive_stable_id()`**Unit:** `tests/utils/unit/test_identifiers.py::test_derive_stable_id_is_deterministic()`  |
+| Missing   | `FR-UTL-051` | Extend the supported generated-prefix set with the cockpit entity prefixes `ses` (session), `rpl` (replay), `scn` (scenario), `prf` (profile), `ord` (order), `fil` (fill), `led` (ledger entry), `ply` (player), and `brn` (branch). Prefixes remain a closed set; an unsupported prefix is rejected, never coerced. Existing trace prefixes `req`, `wf`, `cor`, `cau`, and `evt` are unchanged. | `generate_id`, `validate_id` extended prefix set | Entropy read | `ValidationError`: unsupported prefix | **Usage:** planned `tests/utils/usage/features/03_identity.py::fr_utils_051_cockpit_prefixes()` **Unit:** planned `tests/utils/unit/test_identifiers.py::test_cockpit_prefixes_are_supported_and_closed()` |
 
 ### 4.4 `time/` — UTC Clocks and Timestamps
 
@@ -471,6 +640,9 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 | Completed | `FR-UTL-010` | Return aware UTC time from an injectable clock.                                | `Clock`, `SystemClock`, `utc_now`           | Clock read   | None                                                        | **Usage:** `tests/utils/usage/features/04_time.py::fr_utils_010_utc_now()`**Unit:** `tests/utils/unit/test_clocks.py::test_system_clock_returns_aware_utc()`                    |
 | Completed | `FR-UTL-011` | Parse and format UTC timestamps using canonical`Z` output.                   | `parse_utc_timestamp`, `format_utc_timestamp` | None         | `ValidationError`: naive, non-UTC, or malformed timestamp | **Usage:** `tests/utils/usage/features/04_time.py::fr_utils_011_parse_format_timestamp()`**Unit:** `tests/utils/unit/test_timestamps.py::test_format_uses_canonical_z_suffix()` |
 | Completed | `FR-UTL-012` | Calculate non-negative age and explicit freshness against an injected instant. | `age_seconds`, `is_fresh`                     | None         | `ValidationError`: naive or invalid reference instant     | **Usage:** `tests/utils/usage/features/04_time.py::fr_utils_012_age_and_freshness()`**Unit:** `tests/utils/unit/test_timestamps.py::test_age_seconds_is_non_negative()`         |
+| Missing   | `FR-UTL-055` | Define the closed set of time domains `MARKET_EVENT`, `BROKER_RECEIVE`, `CLIENT_RECEIVE`, `DISPLAY`, `PLAYER_ACTION`, `VENUE_ACCEPT`, `FILL`, `REPORT`, and `PROCESS`, and build a JSON-safe stamp binding an aware UTC instant to exactly one domain. A stamp shall not be compared against, or substituted for, a stamp of a different domain. | `build_time_stamp`, `parse_time_stamp` | None | `ValidationError`: unsupported domain, naive instant, or cross-domain comparison | **Usage:** planned `tests/utils/usage/features/04_time.py::fr_utils_055_time_domains()` **Unit:** planned `tests/utils/unit/test_time_domains.py::test_cross_domain_comparison_is_rejected()` |
+| Missing   | `FR-UTL-056` | Convert an aware UTC instant to a caller-supplied venue-local zone and back without loss, returning both the local rendering and the originating UTC instant. Utils shall not hold a venue calendar; the caller supplies the zone, and Data owns which zone a venue uses. | `to_venue_local`, `from_venue_local` | None | `ValidationError`: naive instant, unknown zone key, or ambiguous local time without an explicit fold selection | **Usage:** planned `tests/utils/usage/features/04_time.py::fr_utils_056_venue_local()` **Unit:** planned `tests/utils/unit/test_time_domains.py::test_ambiguous_local_time_requires_explicit_fold()` |
+| Missing   | `FR-UTL-057` | Allocate strictly increasing monotonic sequence numbers within a caller-named scope from an injected counter, so that two events emitted inside the same aware UTC millisecond remain totally ordered. The allocator shall never reuse or decrease a value within a scope. | `next_sequence` | Counter read | `ValidationError`: empty scope name or non-monotonic injected counter | **Usage:** planned `tests/utils/usage/features/04_time.py::fr_utils_057_monotonic_sequence()` **Unit:** planned `tests/utils/unit/test_time_domains.py::test_sequence_is_strictly_increasing_within_scope()` |
 
 ### 4.5 `serialization/` — Canonical Serialization
 
@@ -517,6 +689,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 | Completed | `FR-UTL-019` | Recursively redact a JSON-safe mapping without mutating input.                               | `redact_mapping_value`                              | None         | `ValidationError`: non-JSON-safe mapping                    | **Usage:** `tests/utils/usage/features/06_security.py::fr_utils_019_redaction_mapping()`**Unit:** `tests/utils/unit/test_redaction.py::test_redact_mapping_value_is_recursive()`                                                             |
 | Completed | `FR-UTL-020` | Return redacted paths and truncation diagnostics without secret values.                      | `RedactionResult`                                   | None         | None                                                          | **Usage:** `tests/utils/usage/features/06_security.py::fr_utils_020_redaction_result()`**Unit:** `tests/utils/unit/test_redaction.py::test_redaction_result_omits_secret_values()`                                                           |
 | Completed | `FR-UTL-021` | Reject policies that allow protected credential fields.                                      | `RedactionPolicy` validation                        | None         | `SecurityError`: policy allows a protected credential field | **Usage:** `tests/utils/usage/features/06_security.py::fr_utils_021_policy_validation()`**Unit:** `tests/utils/unit/test_redaction.py::test_policy_rejects_protected_credential_field()`                                                     |
+| Missing   | `FR-UTL-065` | Redact a cross-domain contract mapping before its integrity hash is computed, so that the hash covers the redacted form a consumer will actually receive and two processes cannot disagree because one redacted and the other did not. Broker account identifiers, credential fields, and player personal identifiers shall be redacted; contract version, schema identity, sequence, and reference fields shall not. | `redact_contract_mapping` | None | `SecurityError`: policy would allow a protected credential field; `ValidationError`: non-JSON-safe mapping | **Usage:** planned `tests/utils/usage/features/06_security.py::fr_utils_065_contract_redaction()` **Unit:** planned `tests/utils/unit/test_redaction.py::test_contract_redaction_preserves_version_and_reference_fields()` |
 
 ### 4.7 `settings/` — Runtime Settings
 
@@ -540,6 +713,9 @@ repository `app/configs/env.json` loading base for typed domain settings.
 | Completed | `FR-UTL-022` | Define the immutable central settings base and generic runtime/logging settings, including the approved human-readable default logging profile.                                                             | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | `app/configs/env.json`/environment read only when a settings instance is created | `ConfigurationError`: invalid generic setting value          | **Usage:** `tests/utils/usage/features/07_settings.py::fr_utils_022_construct_configuration()`**Unit:** `tests/utils/unit/test_models.py::test_default_logging_profile()`                                                                 |
 | Completed | `FR-UTL-023` | Load explicit values and centralized`app/configs/env.json`/process settings in documented precedence order only when called; expose broker-provider settings as an opaque value through the package root. | `load_broker_provider_settings`, `load_settings`      | Settings read                                                                      | `ConfigurationError`: unsupported or invalid runtime value   | **Usage:** `tests/utils/usage/features/07_settings.py::fr_utils_023_load_active_configuration()`, `fr_utils_023_load_broker_provider_configuration()`**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
 | Completed | `FR-UTL-024` | Reject unknown, incompatible, or unsafe deployment/runtime values without partial mutation.                                                                                                                 | Settings-model validation                                 | None                                                                               | `ConfigurationError`: unknown, incompatible, or unsafe value | **Usage:** `tests/utils/usage/features/07_settings.py::fr_utils_024_environment_constraints()`, `fr_utils_024_validate_settings()`**Unit:** `tests/utils/unit/test_models.py::test_settings_reject_unknown_value_without_mutation()`    |
+| Missing   | `FR-UTL-052` | Build and parse `ProfileRef v1` as a JSON-safe mapping carrying profile kind, profile ID, version, and content hash. A reference shall identify a profile without embedding its contents, so that a consumer records exactly which profile governed a decision without importing the owning domain's schema. | `build_profile_ref`, `parse_profile_ref` | None | `ValidationError`: empty kind or ID, malformed version, or missing content hash | **Usage:** planned `tests/utils/usage/features/07_settings.py::fr_utils_052_profile_ref()` **Unit:** planned `tests/utils/unit/test_references.py::test_profile_ref_carries_hash_not_contents()` |
+| Missing   | `FR-UTL-053` | Build and parse `VersionRef v1` as a JSON-safe mapping carrying artifact kind, artifact ID, version, and content hash, for any immutable domain artifact including policy versions, scenario definitions, scoring profiles, datasets, and strategy versions. | `build_version_ref`, `parse_version_ref` | None | `ValidationError`: empty kind or ID, malformed version, or missing content hash | **Usage:** planned `tests/utils/usage/features/07_settings.py::fr_utils_053_version_ref()` **Unit:** planned `tests/utils/unit/test_references.py::test_version_ref_round_trips()` |
+| Missing   | `FR-UTL-054` | Load a versioned profile document under strict schema validation and return an immutable representation together with its resolved `ProfileRef`. A version the caller did not declare compatible, an unknown field, or an absent required field shall fail closed. No default profile, no partial load, and no silent field drop is permitted. | `load_profile_document` | Profile source read | `ConfigurationError`: unknown field, missing required field, or incompatible declared version | **Usage:** planned `tests/utils/usage/features/07_settings.py::fr_utils_054_profile_loading()` **Unit:** planned `tests/utils/unit/test_references.py::test_incompatible_profile_version_fails_closed()` |
 
 ### 4.8 `logging/` — Structured Logging
 
@@ -575,6 +751,8 @@ exporting the logger class.
 | Completed | `FR-UTL-039` | Expose an import-safe global bound logger with standard levels, exception traceback capture, immutable context binding, and automatic approved-default activation on the first runtime emission. Import-time log attempts remain inert.                                                                                             | `BoundLogger`, `logger`                                                                          | First runtime call may configure logging and create bounded sinks; every runtime call emits a log record      | `ConfigurationError`: default sink cannot be configured  | **Usage:** `tests/utils/usage/features/08_logging.py::fr_utils_027_standard_levels()`, `fr_utils_039_exception_logging()`, `fr_utils_039_bound_context()`**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_activates_default_profile()`, `test_bound_logger_preserves_context()`                                                                                        |
 | Completed | `FR-UTL-040` | Route access-context records to`access.log`, exact DEBUG records to `debug.log`, and ERROR-or-higher records to `errors.log`.                                                                                                                                                                                                 | `configure_logging` specialized handlers                                                           | Explicit bounded file writes                                                                                  | `ConfigurationError`: unavailable directory or file sink | **Usage:** `tests/utils/usage/features/08_logging.py::fr_utils_040_specialized_routing()`**Unit:** `tests/utils/unit/test_logger.py::test_specialized_log_routing()`                                                                                                                                                                                                                           |
 | Completed | `FR-UTL-041` | Provide the approved lazy default profile: human-readable DEBUG stdout with ANSI color limited to level and message content,`data/logs`, 10 MB ZIP rotation, ten-day retention, ten backups, queued delivery, automatic process-exit cleanup, optional non-destructive synchronization, and deterministic explicit override/stop. | `LoggingSettings`, `BoundLogger`, `configure_logging`, `flush_logging`, `shutdown_logging` | First runtime bound-log emission or explicit override creates the directory, queue thread, and bounded files  | `ConfigurationError`: invalid logging settings or sink   | **Usage:** `tests/utils/usage/features/08_logging.py::main()`**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_activates_default_profile()`, `test_explicit_configuration_is_not_replaced_by_lazy_default()`, `test_human_formatter_colors_only_level_and_message()`, `test_flush_logging_synchronizes_delivery_without_shutdown()`, `test_zip_rollover_and_shutdown()` |
+
+| Missing   | `FR-UTL-061` | Define the append-only audit sink interface every state-owning domain implements: accept one redacted `AuditEvent v1` or `EventEnvelope v1`, never update or delete a previously accepted record, and surface a persistence failure to the caller rather than dropping the record. Utils declares the interface and its obligations; it neither implements a sink nor persists a record. | `AuditSink` protocol; `route_audit_event` | Caller-provided sink invocation | Sink exception is propagated | **Usage:** planned `tests/utils/usage/features/08_logging.py::fr_utils_061_audit_sink()` **Unit:** planned `tests/utils/unit/test_audit_sink.py::test_sink_failure_is_surfaced_not_swallowed()` |
 
 ### 4.9 `responses/` — Standard Operation Responses
 
@@ -639,6 +817,179 @@ infrastructure primitives are not bounded public operations under this rule.
 | Completed | `FR-UTL-047` | Build metadata and success/error responses without wrapping the raw data, while requiring error codes to exist in the supplied catalogue.                                                                                 | `build_response_metadata`, `success_response`, `error_response` | Monotonic clock read during metadata construction | `ValidationError`: unapproved error code; model validation failures are propagated                                       | **Usage:** `tests/utils/usage/features/09_standard_responses.py::fr_utils_042_through_047_standard_response()`**Unit:** `tests/utils/unit/test_response_factories.py::test_success_factory_keeps_raw_result_without_embedding()`, `test_error_factory_requires_approved_error_code()`                      |
 | Completed | `FR-UTL-049` | Convert approved shared/domain exceptions to structured errors and map unknown or unapproved exceptions to`INTERNAL_ERROR` without retaining raw exception text; cancellation and process-control exceptions propagate. | `exception_response`                                                | None                                              | `CancelledError`, `GeneratorExit`, `KeyboardInterrupt`, `SystemExit`, and model validation failures are propagated | **Usage:** `tests/utils/usage/features/09_standard_responses.py::fr_utils_042_through_047_standard_response()`**Unit:** `tests/utils/unit/test_response_factories.py::test_exception_factory_preserves_approved_code_and_hides_unknown_text()`, `test_exception_factory_propagates_process_control()`      |
 | Completed | `FR-UTL-050` | Preserve an immutable mapping-proxy raw result by identity at runtime while emitting an equivalent detached JSON-safe mapping without changing serialization of other result types.                                       | `StandardResponse[T]` JSON serializer                               | JSON-safe detached representation only            | `ValidationError`: immutable mapping contents are unsupported, cyclic, unsafe, or exceed shared serialization bounds     | **Usage:** `tests/utils/usage/features/09_standard_responses.py::fr_utils_050_immutable_mapping_data()`**Unit:** `tests/utils/unit/test_response_factories.py::test_success_factory_serializes_mapping_proxy_without_replacing_raw_data()`                                                                   |
+
+### 4.10 `units/` — Exact Unit Primitives
+
+**Status:** `Missing`. No file in this section exists.
+
+**Purpose:** Represent every monetary, price, quantity, and rate amount as an
+exact decimal carrying its unit, so that a value cannot be added to, compared
+with, or substituted for a value of a different unit anywhere in the system.
+
+**Module flow:** `caller decimal + unit kind (+ currency) → strict construction → immutable ExactUnit → unit-checked arithmetic`
+
+Ownership boundary: Utils owns the representation and the mixing prohibition.
+The enforcing domain owns quantization policy — Brokers supplies tick size and
+quantity step from the instrument profile, Risk applies round-down-to-step, and
+Portfolio applies its rounding rule for postings. Utils supplies the quantizer
+and never chooses the increment or the direction on the caller's behalf.
+
+This feature is the canonical home for the fixed-precision account math currently
+implemented inside Simulator (`app/services/simulator/accounting/`). Simulator
+becomes a consumer; the arithmetic is not duplicated.
+
+#### Files
+
+| Status  | File            | Responsibility                                                                        | Key exports                                                                        | Dependencies                                                                                              |
+| ------- | --------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Missing | `kinds.py`      | Define the closed unit-kind set and which kinds require a currency.                    | Internal `UnitKind`; public `get_supported_unit_kinds`, `unit_kind_requires_currency` | **Standard library:** `enum`, `types` **Required third-party:** None **Local:** `errors/exceptions.py` |
+| Missing | `amounts.py`    | Define the immutable exact amount and its unit-checked arithmetic.                     | Internal `ExactUnit`; public `build_exact_unit`, `parse_exact_unit`, `add_exact`, `subtract_exact`, `scale_exact`, `compare_exact` | **Standard library:** `decimal`, `typing` **Required third-party:** None **Local:** `kinds.py`, `errors/exceptions.py` |
+| Missing | `conversion.py` | Quantize an exact amount to a caller-supplied increment and rounding direction.        | `quantize_exact`, `get_max_decimal_places`                                          | **Standard library:** `decimal` **Required third-party:** None **Local:** `amounts.py`, `errors/exceptions.py` |
+| Missing | `__init__.py`   | Expose the function-only unit API.                                                     | Construction, arithmetic, comparison, and quantization functions                    | **Standard library:** None **Required third-party:** None **Local:** feature files → approved exports  |
+
+#### Functional requirements
+
+| Status  | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+| ------- | -------------- | -------------- | ------------------------- | ------------ | ------ | ------------ |
+| Missing | `FR-UTL-066` | Define the closed unit-kind set `MONEY`, `PRICE`, `QUANTITY`, `PERCENTAGE`, `BASIS_POINTS`, `TICKS`, `POINTS`, `LOTS`, `CONTRACTS`, and `SHARES`, and build an immutable `ExactUnit v1` from an exact `Decimal` and one kind. A `float` input shall be rejected rather than converted, so binary rounding never enters a financial value. | `build_exact_unit`, `get_supported_unit_kinds` | None | `ValidationError`: float input, non-finite decimal, or unsupported kind | **Usage:** planned `tests/utils/usage/features/10_units.py::fr_utils_066_build_amount()` **Unit:** planned `tests/utils/unit/test_units.py::test_float_input_is_rejected()` |
+| Missing | `FR-UTL-067` | Reject any arithmetic or comparison between two amounts whose unit kinds differ, or whose currencies differ for monetary kinds. The rejection shall name both operands' units so the caller can locate the mixing site. | `add_exact`, `subtract_exact`, `compare_exact` | None | `ValidationError`: unit-kind mismatch or currency mismatch | **Usage:** planned `tests/utils/usage/features/10_units.py::fr_utils_067_reject_mixing()` **Unit:** planned `tests/utils/unit/test_units.py::test_money_plus_quantity_is_rejected()` |
+| Missing | `FR-UTL-068` | Require a valid ISO 4217 currency code for every `MONEY` amount and forbid a currency on every non-monetary kind. A monetary amount without a currency shall be rejected at construction, never defaulted to a base currency. | `build_exact_unit` currency validation | None | `ValidationError`: missing currency on `MONEY`, or currency supplied on a non-monetary kind | **Usage:** planned `tests/utils/usage/features/10_units.py::fr_utils_068_currency_required()` **Unit:** planned `tests/utils/unit/test_units.py::test_money_without_currency_is_rejected()` |
+| Missing | `FR-UTL-069` | Perform addition, subtraction, and scalar multiplication on exact amounts using `Decimal` arithmetic at the shared precision, preserving the operand unit in the result and rejecting a non-finite outcome. Division is not provided; a rate is constructed explicitly as its own kind. | `add_exact`, `subtract_exact`, `scale_exact` | None | `ValidationError`: non-finite result or non-exact scalar | **Usage:** planned `tests/utils/usage/features/10_units.py::fr_utils_069_arithmetic()` **Unit:** planned `tests/utils/unit/test_units.py::test_arithmetic_preserves_unit_and_precision()` |
+| Missing | `FR-UTL-070` | Quantize an exact amount to a caller-supplied increment using an explicit rounding direction of `DOWN`, `UP`, or `HALF_EVEN`. The direction shall be a required argument with no default, so a sizing caller cannot accidentally round a quantity up past a venue step. | `quantize_exact` | None | `ValidationError`: non-positive increment, absent direction, or increment finer than the shared precision | **Usage:** planned `tests/utils/usage/features/10_units.py::fr_utils_070_quantize()` **Unit:** planned `tests/utils/unit/test_units.py::test_rounding_direction_is_required()` |
+
+### 4.11 `state_machine/` — Generic State-Machine Primitives
+
+**Status:** `Missing`. No file in this section exists.
+
+**Purpose:** Provide the neutral transition mechanics that order-, plan-,
+session-, checklist-, alert-, and recovery-state machines all share, without
+holding any domain's state names or business rules.
+
+**Module flow:** `declared transition table + current state + attempted state → validated TransitionResult + audit record`
+
+Ownership boundary: Utils owns the mechanics — is this edge declared, is this
+state terminal, is this a regression, what does the audit record look like. Each
+domain owns its own state names and the meaning of every transition. Trading owns
+the order lifecycle, Strategy owns the trade-plan lifecycle, Simulator owns the
+session, checklist, alert, and recovery lifecycles. Utils never enumerates them.
+
+#### Files
+
+| Status  | File               | Responsibility                                                                    | Key exports                                                                    | Dependencies                                                                            |
+| ------- | ------------------ | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| Missing | `transitions.py` | Validate a declared transition table and evaluate one attempted transition.       | Internal `TransitionResult`; public `build_transition_table`, `attempt_transition`, `is_terminal_state` | **Standard library:** `types`, `typing` **Required third-party:** None **Local:** `errors/exceptions.py` |
+| Missing | `audit.py`       | Build the immutable transition audit record for the owning domain to persist.     | `build_transition_record`                                                      | **Standard library:** `datetime` **Required third-party:** None **Local:** `transitions.py`, `identity/`, `time/` |
+| Missing | `__init__.py`    | Expose the function-only state-machine API.                                        | Table construction, transition evaluation, terminal check, audit-record build  | **Standard library:** None **Required third-party:** None **Local:** feature files   |
+
+#### Functional requirements
+
+| Status  | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+| ------- | -------------- | -------------- | ------------------------- | ------------ | ------ | ------------ |
+| Missing | `FR-UTL-071` | Build an immutable transition table from a caller-supplied mapping of source state to permitted target states plus an explicit terminal-state set. A table declaring an edge out of a terminal state, an unreachable state, or a duplicate edge shall be rejected at construction. | `build_transition_table` | None | `ValidationError`: edge out of a terminal state, unreachable state, empty table, or duplicate edge | **Usage:** planned `tests/utils/usage/features/11_state_machine.py::fr_utils_071_build_table()` **Unit:** planned `tests/utils/unit/test_state_machine.py::test_edge_out_of_terminal_state_is_rejected()` |
+| Missing | `FR-UTL-072` | Evaluate one attempted transition against the table and return `TransitionResult v1` as `ACCEPTED`, `REJECTED_UNDECLARED_EDGE`, `REJECTED_TERMINAL`, or `REGRESSED`, together with the source state, target state, and reason code. The evaluation shall be pure: it never mutates caller state or performs the transition. | `attempt_transition` | None | `ValidationError`: unknown source or target state | **Usage:** planned `tests/utils/usage/features/11_state_machine.py::fr_utils_072_attempt()` **Unit:** planned `tests/utils/unit/test_state_machine.py::test_undeclared_edge_is_rejected_not_raised()` |
+| Missing | `FR-UTL-073` | Report whether a state is terminal and reject any transition attempt whose source is terminal, so that a closed order, a secured session, or a revoked approval cannot be reopened by a late event. | `is_terminal_state`, terminal handling in `attempt_transition` | None | None | **Usage:** planned `tests/utils/usage/features/11_state_machine.py::fr_utils_073_terminal()` **Unit:** planned `tests/utils/unit/test_state_machine.py::test_terminal_state_blocks_further_transitions()` |
+| Missing | `FR-UTL-074` | Detect regression when the attempted target has a lower declared rank than the current state and return `REGRESSED` rather than silently accepting it. Rank is supplied by the owning domain; Utils shall not infer ordering from state names. | Regression detection in `attempt_transition` | None | `ValidationError`: table declares ranks for some states and not others | **Usage:** planned `tests/utils/usage/features/11_state_machine.py::fr_utils_074_regression()` **Unit:** planned `tests/utils/unit/test_state_machine.py::test_regression_is_reported_not_accepted()` |
+| Missing | `FR-UTL-075` | Build an immutable JSON-safe transition audit record carrying entity ID, source state, target state, outcome, reason code, actor reference, aware UTC instant, and monotonic sequence, for the owning domain to persist through its own append-only store. Utils shall not persist the record. | `build_transition_record` | None | `ValidationError`: missing entity ID, naive instant, or unknown outcome | **Usage:** planned `tests/utils/usage/features/11_state_machine.py::fr_utils_075_audit_record()` **Unit:** planned `tests/utils/unit/test_state_machine.py::test_audit_record_is_json_safe_and_complete()` |
+
+### 4.12 `validation/` — Validation Result Taxonomy
+
+**Status:** `Missing`. No file in this section exists.
+
+**Purpose:** Provide the one verdict shape every gate, check, and validator in the
+system returns, so that a caller can combine results from Data quality, Risk
+gates, checklist steps, and reconciliation without translating between shapes.
+
+**Module flow:** `check outcome + reason code + evidence refs → immutable ValidationOutcome → strictest-wins combination`
+
+This feature supersedes two divergent shapes:
+`app/services/portfolio/allocation/service.py::ApprovalValidationResult` and
+`app/services/risk/contracts/results.py::DecisionReuseValidationResult`. Neither
+is canonical today. Both become consumers of `ValidationOutcome v1`, and their
+existing fields map onto its reason-code and evidence-reference structure. This
+is a caller migration, not a clean addition.
+
+#### Files
+
+| Status  | File           | Responsibility                                                              | Key exports                                                                  | Dependencies                                                                              |
+| ------- | -------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Missing | `outcomes.py`  | Define the immutable verdict and its strictest-wins combination.            | Internal `ValidationOutcome`; public `build_validation_outcome`, `parse_validation_outcome`, `combine_validation_outcomes` | **Standard library:** `enum`, `typing` **Required third-party:** None **Local:** `errors/exceptions.py`, `reasons.py` |
+| Missing | `reasons.py`   | Define reason-code syntax, severity ranks, and corrective-action shape.     | `validate_reason_code`, `get_severity_rank`                                  | **Standard library:** `re` **Required third-party:** None **Local:** `errors/exceptions.py` |
+| Missing | `__init__.py`  | Expose the function-only validation API.                                    | Construction, parsing, combination, reason-code validation                   | **Standard library:** None **Required third-party:** None **Local:** feature files     |
+
+#### Functional requirements
+
+| Status  | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+| ------- | -------------- | -------------- | ------------------------- | ------------ | ------ | ------------ |
+| Missing | `FR-UTL-076` | Build `ValidationOutcome v1` carrying exactly one verdict from `PASS`, `WARN`, `BLOCK`, `FAIL`, or `UNKNOWN`, plus the check identity and aware UTC evaluation instant. `UNKNOWN` shall mean the check could not be evaluated and shall never be treated as `PASS` by any consumer. | `build_validation_outcome`, `parse_validation_outcome` | None | `ValidationError`: unsupported verdict, empty check identity, or naive instant | **Usage:** planned `tests/utils/usage/features/12_validation.py::fr_utils_076_build_outcome()` **Unit:** planned `tests/utils/unit/test_validation.py::test_unknown_is_not_pass()` |
+| Missing | `FR-UTL-077` | Require at least one structured reason code on every non-`PASS` verdict, in canonical uppercase dotted form, together with a severity of `INFO`, `WARNING`, `ERROR`, or `CRITICAL`. A `BLOCK` or `FAIL` without a reason code shall be rejected, so no gate rejects an action without saying why. | `validate_reason_code`, `get_severity_rank` | None | `ValidationError`: missing reason code on a non-`PASS` verdict, or malformed code | **Usage:** planned `tests/utils/usage/features/12_validation.py::fr_utils_077_reason_codes()` **Unit:** planned `tests/utils/unit/test_validation.py::test_block_requires_reason_code()` |
+| Missing | `FR-UTL-078` | Carry zero or more corrective actions and zero or more evidence references (`VersionRef v1` or dataset/record identifiers) on an outcome, so a rejected action can be explained and reproduced. Corrective actions shall be bounded, redacted text; they shall not embed a secret or a full payload. | Corrective-action and evidence fields in `build_validation_outcome` | None | `ValidationError`: unbounded action text or malformed evidence reference | **Usage:** planned `tests/utils/usage/features/12_validation.py::fr_utils_078_corrective_actions()` **Unit:** planned `tests/utils/unit/test_validation.py::test_evidence_references_are_validated()` |
+| Missing | `FR-UTL-079` | Combine an ordered set of outcomes into one using strictest-wins precedence `FAIL` > `BLOCK` > `UNKNOWN` > `WARN` > `PASS`, preserving every contributing reason code. `UNKNOWN` shall outrank `WARN` so that an unevaluated check never hides behind a softer verdict. An empty input shall raise rather than return `PASS`. | `combine_validation_outcomes` | None | `ValidationError`: empty outcome set | **Usage:** planned `tests/utils/usage/features/12_validation.py::fr_utils_079_combine()` **Unit:** planned `tests/utils/unit/test_validation.py::test_unknown_outranks_warn_and_empty_set_raises()` |
+
+### 4.13 `idempotency/` — Idempotency Primitives
+
+**Status:** `Missing`. No file in this section exists.
+
+**Purpose:** Define one exactly-once key contract for economic intent so that
+four independently-designed stores stop disagreeing about what a duplicate is.
+
+**Module flow:** `canonical intent material + owner + TTL → deterministic IdempotencyKey → duplicate verdict for the owning store`
+
+Ownership boundary — this is the resolution of a three-way split. Utils owns the
+**key contract**: how a key is derived, who owns it, how long it lives, and what
+counts as a duplicate. Data owns the **transaction, lock, and outbox
+infrastructure** under its documented `AGENTS.md` exemption. Each state-owning
+domain owns **its own reservation table**. Utils opens no connection and persists
+nothing.
+
+The four existing stores — `trading_idempotency`, `portfolio_idempotency`,
+`api_idempotency`, and `data_backfill_checkpoints` — keep their tables and their
+owners. They converge on this key derivation, this owner binding, and this TTL
+rule, replacing four different key columns with one derivation. Migrating them is
+a caller change in each owning domain, not a Utils change.
+
+#### Files
+
+| Status  | File                | Responsibility                                                                  | Key exports                                                              | Dependencies                                                                             |
+| ------- | ------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Missing | `keys.py`           | Derive and validate owner-bound idempotency keys.                               | `derive_idempotency_key`, `parse_idempotency_key`, `get_key_owner`       | **Standard library:** `hashlib`, `re` **Required third-party:** None **Local:** `identity/`, `serialization/`, `errors/exceptions.py` |
+| Missing | `reservations.py`   | Define TTL semantics and the duplicate verdict for an owning store.             | `build_reservation`, `evaluate_reservation`, `is_reservation_expired`     | **Standard library:** `datetime` **Required third-party:** None **Local:** `keys.py`, `time/`, `errors/exceptions.py` |
+| Missing | `__init__.py`       | Expose the function-only idempotency API.                                       | Derivation, parsing, reservation construction and evaluation             | **Standard library:** None **Required third-party:** None **Local:** feature files    |
+
+#### Functional requirements
+
+| Status  | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+| ------- | -------------- | -------------- | ------------------------- | ------------ | ------ | ------------ |
+| Missing | `FR-UTL-080` | Derive `IdempotencyKey v1` deterministically as a SHA-256 digest over the canonical JSON of the caller's economic-intent material, so that the same intent yields the same key in every process and a different intent never collides. The key shall not embed the intent contents or any secret. | `derive_idempotency_key` | None | `ValidationError`: empty intent material, non-canonicalizable material, or material containing a protected credential key | **Usage:** planned `tests/utils/usage/features/13_idempotency.py::fr_utils_080_derive_key()` **Unit:** planned `tests/utils/unit/test_idempotency.py::test_same_intent_yields_same_key_across_processes()` |
+| Missing | `FR-UTL-081` | Bind every key to exactly one owning scope naming the domain and the store, and reject any evaluation that presents a key under a different owner. One domain shall not consume, expire, or release another domain's reservation. | `get_key_owner`, owner check in `evaluate_reservation` | None | `ValidationError`: owner mismatch or empty owner scope | **Usage:** planned `tests/utils/usage/features/13_idempotency.py::fr_utils_081_owner_binding()` **Unit:** planned `tests/utils/unit/test_idempotency.py::test_cross_owner_evaluation_is_rejected()` |
+| Missing | `FR-UTL-082` | Carry an explicit TTL on every reservation and report expiry against an injected instant. A reservation with no TTL shall be rejected at construction; there is no unbounded default. An expired reservation shall report `EXPIRED`, distinct from both `NEW` and `DUPLICATE`. | `build_reservation`, `is_reservation_expired` | None | `ValidationError`: absent or non-positive TTL, or naive instant | **Usage:** planned `tests/utils/usage/features/13_idempotency.py::fr_utils_082_ttl()` **Unit:** planned `tests/utils/unit/test_idempotency.py::test_missing_ttl_is_rejected()` |
+| Missing | `FR-UTL-083` | Return the duplicate verdict `NEW`, `DUPLICATE_IN_FLIGHT`, `DUPLICATE_COMPLETED`, or `EXPIRED` from the caller-supplied prior reservation state. `DUPLICATE_IN_FLIGHT` shall not be reported as completed, so a caller never assumes an outcome for an intent whose result is not yet known. | `evaluate_reservation` | None | `ValidationError`: malformed prior state | **Usage:** planned `tests/utils/usage/features/13_idempotency.py::fr_utils_083_duplicate_verdict()` **Unit:** planned `tests/utils/unit/test_idempotency.py::test_in_flight_duplicate_is_distinct_from_completed()` |
+| Missing | `FR-UTL-084` | Declare the exactly-once obligation the owning store must satisfy: the reservation is committed in the same transaction as the economic effect, a `DUPLICATE_COMPLETED` verdict returns the recorded prior result rather than re-applying the effect, and a `DUPLICATE_IN_FLIGHT` verdict blocks rather than retries. Utils states and tests the contract; each owning domain proves it against its own store. | `evaluate_reservation` contract; exactly-once obligation | None | None | **Usage:** planned `tests/utils/usage/features/13_idempotency.py::fr_utils_084_exactly_once_contract()` **Unit:** planned `tests/utils/unit/test_idempotency.py::test_exactly_once_contract_is_documented_and_checked()` |
+
+### 4.14 `random_streams/` — Deterministic Random Streams
+
+**Status:** `Missing`. No file in this section exists.
+
+**Purpose:** Produce reproducible pseudo-random draws for simulated latency,
+queue position, fill outcomes, and scenario triggers, so that a replay of the
+same session with the same seed produces byte-identical results.
+
+**Module flow:** `master seed + stream name → derived independent stream → reproducible draw + recorded seed identity`
+
+#### Files
+
+| Status  | File           | Responsibility                                                            | Key exports                                                                        | Dependencies                                                                          |
+| ------- | -------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Missing | `streams.py`   | Derive named independent streams and produce reproducible bounded draws.  | Internal `RandomStream`; public `derive_random_stream`, `next_uniform`, `next_int`, `next_choice`, `get_stream_identity` | **Standard library:** `hashlib`, `random` **Required third-party:** None **Local:** `errors/exceptions.py`, `serialization/` |
+| Missing | `__init__.py`  | Expose the function-only random-stream API.                                | Stream derivation, draw functions, identity accessor                               | **Standard library:** None **Required third-party:** None **Local:** `streams.py`      |
+
+#### Functional requirements
+
+| Status  | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+| ------- | -------------- | -------------- | ------------------------- | ------------ | ------ | ------------ |
+| Missing | `FR-UTL-085` | Derive a named stream deterministically from a master seed and a stream name, so that the same pair always yields the same stream regardless of construction order or process. The stream shall never read process entropy, the system clock, or an environment value. | `derive_random_stream` | None | `ValidationError`: empty stream name or non-integer master seed | **Usage:** planned `tests/utils/usage/features/14_random_streams.py::fr_utils_085_derive_stream()` **Unit:** planned `tests/utils/unit/test_random_streams.py::test_derivation_is_deterministic_and_order_independent()` |
+| Missing | `FR-UTL-086` | Produce bounded uniform, integer, and weighted-choice draws that reproduce exactly across processes and platforms for the same stream and draw index. Floating-point draws shall be returned as exact decimals at a declared precision so that a replay comparison is exact rather than approximate. | `next_uniform`, `next_int`, `next_choice` | Stream state advance | `ValidationError`: inverted bounds, empty choice set, or non-positive weight | **Usage:** planned `tests/utils/usage/features/14_random_streams.py::fr_utils_086_draws()` **Unit:** planned `tests/utils/unit/test_random_streams.py::test_draws_reproduce_exactly_across_processes()` |
+| Missing | `FR-UTL-087` | Guarantee that two differently-named streams derived from one master seed are independent: consuming draws from one shall not change any draw from the other. This lets a scenario advance its latency stream without perturbing its fill stream. | Stream independence in `derive_random_stream` | None | None | **Usage:** planned `tests/utils/usage/features/14_random_streams.py::fr_utils_087_independence()` **Unit:** planned `tests/utils/unit/test_random_streams.py::test_streams_are_mutually_independent()` |
+| Missing | `FR-UTL-088` | Return the stream identity — master seed, stream name, algorithm version, and current draw index — for the owning domain to record in its replay manifest. Changing the algorithm shall change the version so a replay against a different implementation is detected rather than silently diverging. | `get_stream_identity` | None | None | **Usage:** planned `tests/utils/usage/features/14_random_streams.py::fr_utils_088_stream_identity()` **Unit:** planned `tests/utils/unit/test_random_streams.py::test_algorithm_version_is_reported_for_replay()` |
 
 ---
 
@@ -785,6 +1136,9 @@ capabilities beyond the Section 4 exports.
 | Completed | `NFR-UTL-005` | Maintainability | Public signatures are typed and documented; files have one focused responsibility.                                                                                                                                          | Ruff, mypy, and documentation review                                                                   |
 | Completed | `NFR-UTL-006` | Testing         | Every requirement has a usage example and targeted unit test; every active workflow has one directly executable, stage-labelled workflow program; collaborative workflows have integration tests; coverage is at least 80%. | Traceability and coverage audit; three workflow programs and`tests/utils/usage/workflows/run_all.py` |
 | Completed | `NFR-UTL-007` | Persistence     | Utils owns no durable business state or migration definition.                                                                                                                                                               | Ownership review                                                                                       |
+| Missing   | `NFR-UTL-008` | Boundary        | Every cross-domain contract crosses a domain boundary as a validated JSON-safe mapping carrying required `contract_version` and `schema_id` keys, reached through a `build_*`/`parse_*` function pair. Frozen implementation types remain private to their feature module and are never exported from `app/utils/__init__.py`. A consumer receiving an absent, unknown, or incompatible `contract_version` fails closed; no default version is applied and no unrecognized key is dropped silently. | Structural export test asserting zero class-like exports; per-contract round-trip and version-rejection tests |
+| Missing   | `NFR-UTL-009` | Determinism     | Unit arithmetic, quantization, key derivation, stream derivation, and every random draw are reproducible across processes and platforms for identical inputs. No primitive in `units/`, `idempotency/`, or `random_streams/` reads process entropy, the system clock, the environment, or a filesystem path. | Cross-process replay tests comparing byte-identical canonical output for the same seed and inputs |
+| Missing   | `NFR-UTL-010` | Exclusion       | Transaction, write-lock, migration-ledger, backup, recovery, and outbox infrastructure remain owned by Data at `app/services/data/persistence/`. Utils supplies only the idempotency key contract those mechanisms consume, and no Utils module opens a database connection, begins a transaction, or writes an outbox record. | Dependency test asserting no `sqlite3`, connection, or transaction import under `app/utils/` |
 
 | Status    | Setting                       | Type     | Default                                    | Required | Consumers                                              | Description                                                                                                                                                                                   |
 | --------- | ----------------------------- | -------- | ------------------------------------------ | -------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -803,12 +1157,42 @@ capabilities beyond the Section 4 exports.
 | Completed | `LOG_ENQUEUE`               | `bool` | `true`                                   | No       | All domains                                            | Deliver records through one in-process queue listener.                                                                                                                                        |
 | Completed | `LOG_COLORIZE`              | `bool` | `true`                                   | No       | All domains                                            | Apply ANSI level color to only the level and message portions of human stdout records; timestamps, separators, and caller locations remain plain.                                             |
 | Completed | Decimal representation policy | policy   | Precision at least 28; finite exact values | Yes      | Data, Risk, Trading, Simulation, Analytics             | Utils owns the shared representation rule; each enforcing domain owns quantization.                                                                                                           |
+| Missing   | Contract transport policy     | policy   | Validated JSON-safe mapping                | Yes      | All domains                                            | Cross-domain contracts travel as mappings with required`contract_version` and `schema_id`; unknown or incompatible versions fail closed. No universal default version exists.               |
+| Missing   | Unit-mixing policy            | policy   | Reject on kind or currency mismatch        | Yes      | Brokers, Data, Indicators, Risk, Trading, Simulator, Analytics, Portfolio, UI/API | Arithmetic and comparison across differing unit kinds or currencies is rejected. Utils owns the rule; there is no universal base currency.                                                     |
+| Missing   | Quantization direction        | policy   | No default — direction is required         | Yes      | Brokers, Risk, Trading, Simulator, Portfolio           | `quantize_exact` requires an explicit `DOWN`/`UP`/`HALF_EVEN` argument. Increment comes from the instrument profile owned by Brokers, never from Utils.                                    |
+| Missing   | `IDEMPOTENCY_DEFAULT_TTL_SECONDS` | `int` | No universal default                   | Yes      | Data, Trading, Portfolio, Simulator, UI/API            | Each owning store declares its own TTL; a reservation without an explicit TTL is rejected. Utils supplies no fallback value.                                                                   |
+| Missing   | `RANDOM_STREAM_ALGORITHM_VERSION` | `str` | `v1`                                   | Yes      | Simulator, Optimization, Research                      | Recorded in every replay manifest. A change to draw derivation requires a version bump so replays detect divergence instead of silently differing.                                             |
+
+### Explicit exclusions
+
+- **Transaction and outbox primitives.** The Trading Cockpit programme proposed
+  relocating transaction and outbox helpers into Utils. They stay in Data at
+  `app/services/data/persistence/` under the documented `AGENTS.md` exemption.
+  Utils owns the idempotency key contract only. Recorded as `NFR-UTL-010`.
+- **Domain event meaning.** Utils owns `EventEnvelope v1` metadata and ordering.
+  Trading, Portfolio, Simulator, and Analytics own their own event types and
+  meanings. No domain event vocabulary is centralized here.
+- **Domain state vocabularies.** Utils owns transition mechanics; it holds no
+  order, plan, session, checklist, alert, or recovery state name.
+- **Venue calendars and instrument increments.** Utils converts to a
+  caller-supplied zone and quantizes to a caller-supplied increment. Data owns
+  session calendars; Brokers owns tick size, quantity step, and contract
+  multiplier.
+- **Financial accounting.** Utils owns exact representation and arithmetic. It
+  owns no ledger, posting, balance, valuation, or P&L behavior; Portfolio does.
 
 ---
 
 ## 6. Open Decisions
 
-No open decisions.
+No open decisions. The two decisions that previously blocked this package are
+resolved and recorded as requirements above:
+
+- Cross-domain contract transport is settled as validated JSON-safe mappings
+  behind `build_*`/`parse_*` function pairs (`NFR-UTL-008`). The function-only
+  public API rule in `AGENTS.md` §1 stands unchanged and requires no amendment.
+- Transaction and outbox ownership is settled: Data retains the infrastructure,
+  Utils owns the idempotency key contract (`NFR-UTL-010`, `FEAT-UTIL-12`).
 
 ---
 
@@ -845,6 +1229,25 @@ Feature-integration tests are assigned as follows:
   production and public evidence sources for deep `app.utils` imports or
   private-attribute mutation.
 
+Planned feature-integration tests for the target requirements:
+
+- `tests/utils/integration/test_contract_transport.py` verifies `NFR-UTL-008`:
+  every `build_*`/`parse_*` pair round-trips, `app/utils/__init__.py` exports no
+  class-like symbol, and an unknown or incompatible `contract_version` is
+  rejected rather than defaulted.
+- `tests/utils/integration/test_cross_process_determinism.py` verifies
+  `NFR-UTL-009` by running unit arithmetic, key derivation, and seeded draws in a
+  fresh interpreter and comparing byte-identical canonical output.
+- `tests/utils/integration/test_persistence_exclusion.py` verifies `NFR-UTL-010`
+  by asserting no `app/utils/**` module imports a database driver, connection,
+  or transaction helper.
+- `tests/utils/integration/test_cockpit_envelope_workflow.py` verifies
+  `WF-UTL-008` end to end within Utils: reference resolution, exact-unit
+  construction, envelope sequencing, redaction, hashing, consumer validation, and
+  duplicate suppression.
+
+These four files do not exist yet.
+
 No test under `tests/utils/` imports `app.services`; the Utils suite is runnable in
 isolation, matching the foundation-layer dependency direction in `docs/PROJECT.md`.
 
@@ -862,6 +1265,18 @@ isolation, matching the foundation-layer dependency direction in `docs/PROJECT.m
 - Exact-shape, raw-data preservation, metadata, approved-code, exception-safety,
   and monotonic-timing tests for `StandardResponse v1`.
 - Determinism tests for canonical JSON, stable IDs, and UTC calculations.
+- Cross-process determinism tests for exact unit arithmetic and quantization,
+  idempotency key derivation, and seeded random draws.
+- Unit-mixing rejection tests proving money, quantity, price, and tick amounts
+  cannot be added, subtracted, or compared across kinds or currencies.
+- Version-rejection tests for every cross-domain contract mapping, proving a
+  missing, unknown, or incompatible `contract_version` fails closed.
+- Structural export tests proving `app/utils/__init__.py` exposes only standalone
+  functions after the five new features are added.
+- Exactly-once contract tests for the idempotency verdicts, proving
+  `DUPLICATE_IN_FLIGHT` is never reported as completed.
+- Strictest-wins combination tests proving `UNKNOWN` outranks `WARN` and an empty
+  outcome set raises rather than passing.
 - Dependency checks proving DataFrame/OHLC, path, limit, business validation,
   permission, and domain-result behavior is absent from Utils.
 - `uv run ruff check app/utils tests/utils`
@@ -906,13 +1321,63 @@ set `PYTHONPATH` to the repository root before invoking each program directly.
   `tests/utils/integration/test_audit_event_construction.py:1`
 - [X] Ruff, formatting, strict mypy, 151 targeted unit/integration tests, and all
   nine directly executed standalone usage programs pass.
+- [ ] `units/` exists with exact unit kinds, unit-mixing rejection, currency
+  enforcement, and explicit-direction quantization. `FR-UTL-066`–`FR-UTL-070`
+- [ ] `state_machine/` exists with table validation, transition evaluation,
+  terminal handling, regression detection, and audit records.
+  `FR-UTL-071`–`FR-UTL-075`
+- [ ] `validation/` exists with the five-verdict taxonomy and strictest-wins
+  combination, and Portfolio and Risk have migrated off their two divergent
+  result shapes. `FR-UTL-076`–`FR-UTL-079`
+- [ ] `idempotency/` exists, and `trading_idempotency`, `portfolio_idempotency`,
+  `api_idempotency`, and `data_backfill_checkpoints` converge on one key
+  derivation, owner binding, and TTL rule. `FR-UTL-080`–`FR-UTL-084`
+- [ ] `random_streams/` exists with order-independent derivation, exact
+  reproducible draws, stream independence, and recorded algorithm version.
+  `FR-UTL-085`–`FR-UTL-088`
+- [ ] Cockpit entity prefixes, `ProfileRef v1`, and `VersionRef v1` are
+  available and their version mismatches fail closed.
+  `FR-UTL-051`–`FR-UTL-054`
+- [ ] Time domains, venue-local conversion, and monotonic sequence allocation
+  are available. `FR-UTL-055`–`FR-UTL-057`
+- [ ] `EventEnvelope v1` construction, integrity hashing, duplicate detection,
+  and sequence-gap reporting are available.
+  `FR-UTL-058`–`FR-UTL-060`
+- [ ] The append-only audit sink interface is declared and its failure surfacing
+  is proven. `FR-UTL-061`
+- [ ] Error categories, retryability metadata, and `HealthState v1` are
+  available, with `UNKNOWN_STATE` proven non-retryable.
+  `FR-UTL-062`–`FR-UTL-064`
+- [ ] Contract-mapping redaction runs before integrity hashing. `FR-UTL-065`
+- [ ] Five new feature usage programs (`10_units.py` through
+  `14_random_streams.py`) exist and execute, and `features.py` covers all
+  fourteen features.
+- [ ] `WF-UTL-008` has its standalone stage-labelled workflow program.
+- [ ] `NFR-UTL-008`, `NFR-UTL-009`, and `NFR-UTL-010` have structural,
+  cross-process determinism, and dependency evidence.
+- [ ] Every new source file exceeds 80% branch-aware coverage individually.
 
-Current implementation status: `Completed — verified implementation baseline`.
-The 2026-08-04 gate is green: Ruff and formatting pass over the Utils source and
-test scope, strict mypy passes over 81 source/test files, 151 targeted tests pass,
-aggregate branch coverage is 89.76%, every one of the 30 Utils source files exceeds
-80% coverage (minimum 81%), and all nine feature-aligned usage programs execute
-successfully.
+Current implementation status: `Partial — nine features implemented and verified,
+five features and thirty-eight requirements not started`.
+
+The 2026-08-04 gate remains green for everything implemented: Ruff and formatting
+pass over the Utils source and test scope, strict mypy passes over 81 source/test
+files, 151 targeted tests pass, aggregate branch coverage is 89.76%, every one of
+the 30 Utils source files exceeds 80% coverage (minimum 81%), and all nine
+feature-aligned usage programs execute successfully. No previously verified
+behavior was withdrawn or downgraded.
+
+The package status is `Partial` because `FEAT-UTIL-09` through `FEAT-UTIL-13` and
+`FR-UTL-051` through `FR-UTL-088` are approved target requirements with no
+implementation. Eight existing features carry a documented target delta and are
+therefore `Partial`; `FEAT-UTIL-08` remains `Completed`.
+
+**Known unrelated baseline failure.** `tests/utils/integration/test_consumer_isolation.py`
+currently errors on a hardcoded path (`tests/brokers/wf_support.py`) that does not
+exist, so the cross-domain import guard is presently unenforced. This predates the
+requirements above and is not caused by them, but it guards exactly the boundary
+`NFR-UTL-008` depends on and should be repaired before the five new features add
+contracts every domain imports.
 
 ---
 
@@ -920,8 +1385,13 @@ successfully.
 
 ### Full-domain pipeline (`tests/utils/usage/features/features.py`)
 
-The standalone program [`tests/utils/usage/features/features.py`](../../tests/utils/usage/features/features.py) ties all Utils features (`FEAT-UTIL-00` through `FEAT-UTIL-08`) together into one homogeneous, realistic operational sequence:
+The standalone program [`tests/utils/usage/features/features.py`](../../tests/utils/usage/features/features.py) ties the implemented Utils features (`FEAT-UTIL-00` through `FEAT-UTIL-08`) together into one homogeneous, realistic operational sequence:
 `Settings Bootstrap -> Logging Initialization -> Trace Identity & Clock -> Auth & Audit Contracts -> Payload Redaction -> Canonical Serialization & Digesting -> Error Normalization & Event Routing -> Standard Response Envelopes`. Run it directly with `uv run python tests/utils/usage/features/features.py`.
+
+When `FEAT-UTIL-09` through `FEAT-UTIL-13` are implemented, this program extends
+to fourteen features and the sequence gains
+`-> Exact Units -> State Transition -> Validation Outcome -> Idempotent Reservation -> Seeded Draw`
+after `Trace Identity & Clock`.
 
 ### Shared context
 

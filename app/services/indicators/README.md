@@ -1,8 +1,8 @@
 # Indicators
 
 > **Package:** `app/services/indicators`
-> **Status:** `Completed`
-> **Last updated:** `2026-08-06`
+> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 6 registered features remain implemented, but 10 work packages (`TC-IMP-IND-01`..`TC-IMP-IND-10`) add target behavior that is not yet implemented. See `### Trading Cockpit Phase 0 reconciliation`.
+> **Last updated:** `2026-08-07`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -116,6 +116,31 @@ Rows preserve the input record order. The index is a UTC `DatetimeIndex` named
 
 `trend`, `volatility`, `momentum`, `volume`, and `candles` do not depend on one another. `core/registry.py` stores immutable metadata and import-path identity without importing feature implementations, preventing a registry/built-in cycle.
 
+### Trading Cockpit Phase 0 reconciliation
+
+This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-IND-01`..`TC-IMP-IND-10`) into this authoritative README so that it is self-contained. Phase 0 classified the ten Indicators work packages as **two `CREATE` and eight `EXTEND`** against the located 21-indicator library. New target work is `Missing`; extended existing features become `Partial`. Indicators owns zero database tables and remains stateless and read-only — none of the ten gaps add persistence.
+
+Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
+
+**Reused existing assets (no duplication):** every cockpit derived gauge below is built **on top of** the existing 21-indicator library (`FEAT-INDI-01`..`06`) — it reuses `atr`, `adr`, `rolling_volatility`, `standard_deviation`, `rsi`, `williams_r`, `ema`, `sma`, `adx`, `bollinger_bands`, `cmf`, `obv`, `mfi`, `price_volume_distribution`, and the candle patterns — rather than reimplementing the mathematics. The indicator library is the strongest cockpit reuse asset in this domain.
+
+**Target contracts/features to add or extend:**
+
+| Status | Target | Reuses / extends | Phase 0 gap |
+| --- | --- | --- | --- |
+| Partial | Market-speed composite | Extends `volatility/` + `momentum/` + `volume/`. Composite momentum, realized vol, ATR/range expansion, volume acceleration, order-flow velocity with `SLOW`/`NORMAL`/`FAST`/`EXTREME` bands. | `TC-IMP-IND-01` |
+| Partial | `MarketRegimeSnapshot v1` | Extends `trend/` + `volatility/`. Point-in-time classification (trend, range, breakout, event, unstable, low-liquidity) with confidence and reason codes. | `TC-IMP-IND-02` |
+| Partial | Trend strength & higher-TF direction | Extends `trend/` (`adx`, directional, `ema`/`sma` stacks). Strategy-independent directional and strength measurements. | `TC-IMP-IND-03` |
+| Partial | Support/resistance & structural levels | Extends `trend/zigzag` + `volume/price_volume_distribution`. Deterministic levels, pivots, volume-profile zones, gaps, invalidation refs with timestamps. | `TC-IMP-IND-04` |
+| Partial | `LiquiditySnapshot v1` | Extends `volatility/` + `volume/`. Spread, executable depth, imbalance, volume, fill-probability inputs, liquidity regime. | `TC-IMP-IND-05` |
+| Partial | Order-flow & depth features | Extends `volume/`. Imbalance, pressure, queue/depth changes, sweep events, liquidity gaps. | `TC-IMP-IND-06` |
+| Partial | Volatility envelope | Extends `volatility/`. Current vs historical vol, strategy-operating-envelope inputs, extreme-event thresholds. | `TC-IMP-IND-07` |
+| Partial | Chart-pattern evidence | Extends `candles/`. Bounded, deterministic pattern observations used by Strategy; no direct trade approval. | `TC-IMP-IND-08` |
+| Missing | `IndicatorSnapshot v1` contract | **New feature** — see Feature Registry `FEAT-INDI-07`. Carries value, unit, state, timestamp, source data range, completeness, confidence, data-health dependency. | `TC-IMP-IND-09` |
+| Missing | Closed-input enforcement | **New feature** — see Feature Registry `FEAT-INDI-08`. Rejects incomplete bars, future data, stale snapshots, or incompatible timeframes. | `TC-IMP-IND-10` |
+
+**Boundary clarifications folded in:** Indicators owns deterministic derived market measurements, regimes, volatility, momentum, liquidity, structure, and cockpit-ready analytical gauge values. UI-API owns the cockpit gauge/read model that *displays* an indicator result; Indicators does not authorize trades or own UI rendering (Phase 0 Example C). A `MarketRegimeSnapshot` or `IndicatorSnapshot` produced here is consumed by Strategy, Risk, and UI-API without redefinition.
+
 ## 2. Feature Registry
 
 ### Feature Registry
@@ -132,6 +157,8 @@ reconciliation.
 | Completed | `FEAT-INDI-04` | Momentum oscillator calculation | `momentum/` | `rsi`, `williams_r` | `FR-INDI-021`–`FR-INDI-022` | `tests/indicators/usage/features/04_momentum.py` |
 | Completed | `FEAT-INDI-05` | Volatility and range calculation | `volatility/` | `atr`, `adr`, `rolling_volatility`, `standard_deviation` | `FR-INDI-018`–`FR-INDI-020`, `FR-INDI-026` | `tests/indicators/usage/features/05_volatility.py` |
 | Completed | `FEAT-INDI-06` | Volume-flow and price-volume calculation | `volume/` | `cmf`, `obv`, `mfi`, `price_volume_distribution` | `FR-INDI-027`–`FR-INDI-030` | `tests/indicators/usage/features/06_volume.py` |
+| Missing | `FEAT-INDI-07` | Indicator snapshot contract | `snapshots/` *(planned)* | `build_indicator_snapshot`/`parse_indicator_snapshot` carrying value, unit, state, timestamp, source data range, completeness, confidence, data-health dependency | `FR-INDI-036`..`FR-INDI-038` *(planned)* | `tests/indicators/usage/features/07_snapshots.py` *(planned)* |
+| Missing | `FEAT-INDI-08` | Closed-input enforcement | `input_guards/` *(planned)* | `assert_closed_input` rejecting incomplete bars, future data, stale snapshots, or incompatible timeframes | `FR-INDI-039`..`FR-INDI-041` *(planned)* | `tests/indicators/usage/features/08_input_guards.py` *(planned)* |
 
 ### Structure rules
 
@@ -1391,7 +1418,9 @@ Shared settings are defined once in the Core Configuration and Limits Manifest. 
 
 ## 6. Open Decisions
 
-No open decisions.
+These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
+
+- **OD-INDI-01 — Derived-gauge feature placement.** The eight `EXTEND` derived gauges (market speed, regime, trend strength, S/R, liquidity, order-flow, volatility envelope, chart-pattern) each reuse the existing 21-indicator mathematics. The owner must confirm whether each gauge is a new focused operation appended to its mathematical owner feature (`volatility/`, `trend/`, `volume/`, `candles/`) or warrants its own module folder. This documentation records them as extending their mathematical owner; final placement is an implementation-phase decision that must preserve one-feature-per-folder and not duplicate the library.
 
 ---
 

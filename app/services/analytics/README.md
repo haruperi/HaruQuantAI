@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/analytics`
 > **Domain ID:** `ANLT`
-> **Status:** `Completed`
+> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 5 registered features remain implemented, but 13 work packages (`TC-IMP-ANL-01`..`TC-IMP-ANL-13`) add target behavior that is not yet implemented (10 `CREATE`, 3 `EXTEND`). See `### Trading Cockpit Phase 0 reconciliation`.
 > **Last updated:** `2026-07-28`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -100,6 +100,35 @@ catalogs, caches, or intermediate results, as required by `docs/PROJECT.md`.
 Analytics is not an `AuditEvent` producer: it is pure/read-only, so the governed
 caller audits the action and persists any durable audit evidence through Data.
 
+### Trading Cockpit Phase 0 reconciliation
+
+This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-ANL-01`..`TC-IMP-ANL-13`) into this authoritative README so that it is self-contained. Phase 0 classified the thirteen Analytics work packages as **ten `CREATE` and three `EXTEND`**. The existing Analytics domain is reporting-only (`FEAT-ANLT-01`..`05`); the cockpit adds process scoring, journaling, debriefs, and qualification — all `Missing`. Analytics currently owns zero live tables (the six historical `analytics_*` tables were retired by migration `002`); the `CREATE` features imply new named, owned `analytics_*` tables whose field-level detail is an **Open Decision OD-ANLT-01** (target-only schema until evidence is sufficient).
+
+Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
+
+**Reused existing assets (no duplication):**
+
+| Cockpit capability | Existing Analytics asset reused | Phase 0 gap |
+| --- | --- | --- |
+| Trading-event analytics stream | `adapters/` (`FEAT-ANLT-02`), `metrics/` (`FEAT-ANLT-03`) | `TC-IMP-ANL-01` |
+| Execution-quality analytics | `metrics/` (`FEAT-ANLT-03`); retired `analytics_trade_analysis`/`analytics_pnl_attribution`/`analytics_equity_curves` shapes | `TC-IMP-ANL-05` |
+| Canonical reporting & debrief base | `reports/` (`FEAT-ANLT-04`), retired `analytics_reports` shape | `TC-IMP-ANL-09` |
+
+**Target features to add or extend.** The ten `CREATE` gaps group into seven cohesive new capabilities, registered as `FEAT-ANLT-06`..`FEAT-ANLT-12`.
+
+| Status | Target (feature / gap) | Reuses / extends | Phase 0 gaps |
+| --- | --- | --- | --- |
+| Partial | Trading-event analytics stream (EXTEND `FEAT-ANLT-02`/`-03`) | Extends adapters/metrics. Consumes immutable market, checklist, risk, order, fill, portfolio, alert, player-action events. | `TC-IMP-ANL-01` |
+| Missing | **`FEAT-ANLT-06` Process Scoring** *(planned)* | New feature. Process-first scoring (preparation/risk/execution/plan-adherence/portfolio-mgmt/emergency/discipline/post-review), critical-failure override (a critical safety/integrity/replay failure caps or invalidates scores regardless of P&L), score reproducibility (rebuild from stored events + scoring-profile version), comparative scoring (leaderboard eligibility; process/safety/risk-adjusted ranking; profit secondary), and no-trade scoring (award competence for correct stand-down and controlled loss). | `TC-IMP-ANL-02`, `TC-IMP-ANL-03`, `TC-IMP-ANL-11`, `TC-IMP-ANL-12`, `TC-IMP-ANL-13` |
+| Missing | **`FEAT-ANLT-07` Player Trade Journal** *(planned)* | New feature. **Name-collision avoidance (finding C-6):** the player trade journal is distinct from Simulator's `journal/` (`FEAT-SIM-06`, an immutable replay record). Analytics uses a distinct name (e.g. `PlayerJournal`/`JournalEntry`) and module. Stores plan, context, screenshots/refs, entries/exits, management actions, notes, result. | `TC-IMP-ANL-04` |
+| Partial | Execution quality (EXTEND `FEAT-ANLT-03`) | Extends metrics. Expected vs actual price, spread, slippage, latency, queue outcome, partial fills, missed/canceled. | `TC-IMP-ANL-05` |
+| Missing | **`FEAT-ANLT-08` Plan-Adherence and Behavioral Analytics** *(planned)* | New feature. Compares every action with the released TradePlan and management rules; detects overtrading, order churn, revenge patterns, impulsive size, stop widening, unapproved averaging. | `TC-IMP-ANL-06`, `TC-IMP-ANL-07` |
+| Missing | **`FEAT-ANLT-09` Emergency-Response Analytics** *(planned)* | New feature. Detection/perception/action/recovery time, correct sequence, unnecessary exposure, survival. | `TC-IMP-ANL-08` |
+| Partial | Debrief generator (EXTEND `FEAT-ANLT-04`/`-05`) | Extends reports/dashboards. Answer-first session report with decisions, causes, warnings, counterfactuals, replay links. (`Debrief` is distinct from `analytics_reports`.) | `TC-IMP-ANL-09` |
+| Missing | **`FEAT-ANLT-10` Player Qualification** *(planned)* | New feature. Curriculum prerequisites, ratings, checkrides, remediation, recurrent validity, disqualifying breaches. | `TC-IMP-ANL-10` |
+
+**Boundary clarifications folded in:** Analytics owns journals, scoring, debriefs, execution-quality analysis, behavior/process analysis, qualifications, and replay-derived learning evidence. It does not redefine trade, risk, or portfolio authority. **Name-collision rules:** Analytics' `Scorecard` is distinct from Research's `ResearchScorecard` (`research/contracts/results.py:446`, which measures research edges); Analytics' player journal is distinct from Simulator's replay `journal/`. Neither reuses the other's name or module.
+
 ### Four-level structure
 
 | Code level                                     | Represents                                      |
@@ -171,6 +200,11 @@ The order is the implementation sequence.
 | Completed | `FEAT-ANLT-03` Internal Pure Analytical Evidence      | `metrics/`    | Exact declarations: Section 4.3                                                                                          | Section 4.3 functional requirements | `tests/analytics/usage/features/03_metrics.py`    |
 | Completed | `FEAT-ANLT-04` Canonical Reporting                    | `reports/`    | Exact declarations and report contracts: Section 4.4                                                                     | Section 4.4 functional requirements | `tests/analytics/usage/features/04_reports.py`    |
 | Completed | `FEAT-ANLT-05` Bounded Report Projection              | `dashboards/` | Exact declarations,`DashboardPayload`, and explicit context-required `get_analytics_dashboard_snapshot`: Section 4.6 | Section 4.6 functional requirements | `tests/analytics/usage/features/05_dashboards.py` |
+| Missing | `FEAT-ANLT-06` Process Scoring | `scoring/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); process-first scoring, critical-failure override, score reproducibility, comparative scoring, no-trade scoring | `FR-ANLT-061`..`FR-ANLT-066` *(planned)* | `tests/analytics/usage/features/06_scoring.py` *(planned)* |
+| Missing | `FEAT-ANLT-07` Player Trade Journal | `journal/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); player trade journal (distinct from Simulator's replay journal) | `FR-ANLT-067`..`FR-ANLT-069` *(planned)* | `tests/analytics/usage/features/07_journal.py` *(planned)* |
+| Missing | `FEAT-ANLT-08` Plan-Adherence and Behavioral Analytics | `behavior/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); plan-adherence and behavioral analytics | `FR-ANLT-070`..`FR-ANLT-072` *(planned)* | `tests/analytics/usage/features/08_behavior.py` *(planned)* |
+| Missing | `FEAT-ANLT-09` Emergency-Response Analytics | `emergency_response/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); emergency-response analytics | `FR-ANLT-073`..`FR-ANLT-074` *(planned)* | `tests/analytics/usage/features/09_emergency_response.py` *(planned)* |
+| Missing | `FEAT-ANLT-10` Player Qualification | `qualification/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); curriculum, ratings, checkrides, remediation, recurrent validity | `FR-ANLT-075`..`FR-ANLT-078` *(planned)* | `tests/analytics/usage/features/10_qualification.py` *(planned)* |
 
 Work outside Analytics ownership has no `FEAT-*` registration and consumes no
 feature ordinal.
@@ -1540,7 +1574,9 @@ new approved requirement before implementation.
 
 ## 6. Open Decisions
 
-None.
+These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
+
+- **OD-ANLT-01 — New `analytics_*` table field-level detail.** The cockpit `CREATE` features (scoring, journal, plan-adherence, behavioral, emergency-response, debrief, qualification) imply new named, owned tables, but Analytics currently owns zero live tables (the six historical `analytics_*` tables were retired by migration `002`). The approved evidence is not sufficient to specify each table's fields safely; target-only schema is recorded and the field-level detail is deferred to the implementation phase. No cockpit durable state may be placed in Data's `data_runtime_records`.
 
 ---
 

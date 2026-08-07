@@ -1,7 +1,7 @@
 # Trading
 
 > **Package:** `app/services/trading`
-> **Status:** `Completed`
+> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 9 registered features remain implemented, but 14 work packages (`TC-IMP-TRD-01`..`TC-IMP-TRD-14`) add target behavior that is not yet implemented. See `### Trading Cockpit Phase 0 reconciliation`.
 > **Last updated:** `2026-08-03`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -124,6 +124,47 @@ filtering. This support directory is not a separately registered feature.
 | Completed | Idempotency reservations and canonical-material versions  | Trading only                                                             | `migrations/definitions.py` |
 | Completed | Reconciliation runs, authority transitions, and incidents | UI/API via `TradeRecord`; Risk via audit evidence where required         | `migrations/definitions.py` |
 
+### Trading Cockpit Phase 0 reconciliation
+
+This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-TRD-01`..`TC-IMP-TRD-14`) into this authoritative README so that it is self-contained. Phase 0 classified the fourteen Trading work packages as **two `CREATE` and twelve `EXTEND`** against located behavior. New target work is `Missing`; extended existing features become `Partial`.
+
+Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
+
+**Reused existing assets (no duplication):**
+
+| Cockpit capability | Existing Trading asset reused | Phase 0 gap |
+| --- | --- | --- |
+| Order intent (authoritative) | `contracts/models.py::OrderIntent` (`FEAT-TRD-01`); `trading_orders`, `trading_idempotency` | `TC-IMP-TRD-01` |
+| State & deterministic projections | `state/` (`FEAT-TRD-02`); `trading_orders`, `trading_order_transitions`, `trading_projections` | `TC-IMP-TRD-03`, `TC-IMP-TRD-04` |
+| Reconciliation & retry guard | `reconciliation/` (`FEAT-TRD-05`); `resolve_unknown_outcome` | `TC-IMP-TRD-10` |
+| Operational/budget evidence & events | `monitoring/` (`FEAT-TRD-06`), `trading_events` (UQ `scope_key, aggregate_version`) | `TC-IMP-TRD-11`, `TC-IMP-TRD-14` |
+| Live/paper session gates | `live/` (`FEAT-TRD-07`), `live/gates.py` fail-fast sequence, `allow_live_mutations` (default `False`) | `TC-IMP-TRD-02`, `TC-IMP-TRD-09` |
+| Route-aware actions (submit/modify/cancel/close/reduce/flatten/cancel-all) | `actions/` (`FEAT-TRD-08`); `actions/controls.py`, `actions/emergency.py` | `TC-IMP-TRD-05`, `TC-IMP-TRD-13` |
+| Immutable execution evidence | `reporting/` (`FEAT-TRD-09`), `ExecutionEvidenceReport` | `TC-IMP-TRD-14` |
+| Sim-route isolation | `routing/dispatcher.py` guard G-4 (`route.value == "sim"` rejects broker authority) | `TC-IMP-TRD-01` |
+| Fills with good idempotency key | `trading_fills` (UQ `broker_fill_id`, UQ `order_id, sequence`) | `TC-IMP-TRD-06` |
+
+**Target contracts/features to add or extend:**
+
+| Status | Target | Reuses / extends | Phase 0 gap |
+| --- | --- | --- | --- |
+| Partial | `OrderIntent v1` additions | Extends `FEAT-TRD-01`. Adds trade-plan, risk-decision, and policy/profile version links. **Defect to fix (finding C-3):** `app/services/simulator/execution/engine.py:32` and `app/services/simulator/run/orchestrator.py:41` each declare `OrderIntent = Any`, erasing the authoritative Trading type at the Simulator boundary. The cockpit removes those aliases; Trading remains the sole authority. | `TC-IMP-TRD-01` |
+| Partial | Write-before-send proof | Extends `FEAT-TRD-02` + `live/gates.py`. Persist intent and idempotency state durably before any broker/simulator submission; proven ordering; fail-closed. | `TC-IMP-TRD-02` |
+| Partial | Order state machine | Extends `FEAT-TRD-02`. Adds `CREATED→STAGED→SENT→ACKNOWLEDGED→PARTIALLY_FILLED→FILLED` plus reject/cancel/expire/replace/**`unknown`**/reconciled branches. **Defect to fix (finding S-5):** `trading_orders.state` CHECK has 8 values and no `unknown`/`reconciled`; a first-class `UNKNOWN` state preserved until reconciliation is required and untested. Blind-resubmission prohibition must be proven. | `TC-IMP-TRD-03` |
+| Partial | Order transition enforcement | Extends `FEAT-TRD-02` + `trading_order_transitions`. Validates allowed edges, stores source sequence, records every transition once; fail-closed. | `TC-IMP-TRD-04` |
+| Partial | Cancel/replace lifecycle | Extends `FEAT-TRD-08`. Preserves executable cancel-pending state, models non-atomic replacement, prevents duplicate exposure; fail-closed. | `TC-IMP-TRD-05` |
+| Partial | Partial fills and residuals | Extends `FEAT-TRD-02` + `trading_fills`. Updates avg price, filled/residual qty, residual risk, and protection after every fill; fail-closed. | `TC-IMP-TRD-06` |
+| Partial | Execution position state | Extends `FEAT-TRD-02` + `trading_positions`. 9 states: `FLAT`, `OPENING`, `OPEN`, `REDUCING`, `CLOSING`, `OVERNIGHT_APPROVED`, `EMERGENCY_CONTROLLED`, `LIQUIDATION_PENDING`, `UNKNOWN`. **Open Decision OD-TRD-01:** `trading_positions` (PK `position_id`, 20 cols, an open/closing/closed projection) coexists with `trading_positions__new` (PK `ticket`, 26 cols, a closed-trade ledger) plus `trading_closed_position_migration_guard`. Migration `002_closed_position_ledger` renames `__new`→`trading_positions`. The authoritative shape for the cockpit's 9-state machine must be confirmed before Phase 7 (finding P-3/P-5). | `TC-IMP-TRD-07` |
+| Missing | Protective-order lifecycle | **New feature** — see Feature Registry `FEAT-TRD-10`. Attach/verify stop & target, coverage ratio, bracket/OCO, residual resize, orphan prevention, reverse-exposure prevention; fail-closed. (Phase 0 finding S-6: no protective-order lifecycle exists today — a safety gap, not merely a feature gap.) | `TC-IMP-TRD-08` |
+| Partial | Master trading enable | Extends `FEAT-TRD-07`/`FEAT-TRD-08` + Risk `kill_switch/`. New-exposure kill switch separated from cancel, protection, reduction, closure permissions (finding S-3; paired with `TC-IMP-RISK-14`). | `TC-IMP-TRD-09` |
+| Partial | Reconciliation orchestrator | Extends `FEAT-TRD-05`. Compares internal intents/orders/fills/positions with broker snapshots; preserves `UNKNOWN` until resolved; fail-closed. | `TC-IMP-TRD-10` |
+| Partial | Economic execution events | Extends `FEAT-TRD-06` + `trading_events`. Emits fill, fee estimate, correction, financing trigger, corporate-action trigger, liquidation events for Portfolio posting. **Consumer `TC-IMP-PORT-02`** (Phase 12 ledger ingestion) lands later. | `TC-IMP-TRD-11` |
+| Missing | Trade ownership | **New feature** — see Feature Registry `FEAT-TRD-11`. Records player / supervised-automation / automated owner; detects orphaned positions; fail-closed. | `TC-IMP-TRD-12` |
+| Partial | Session order controls | Extends `FEAT-TRD-08`. Cancel-all entries, flatten, reduce-only, close-only, explicit re-arm commands; fail-closed. | `TC-IMP-TRD-13` |
+| Partial | Execution audit | Extends `FEAT-TRD-09`. Stores request, broker ack, fill, cancellation, error, reconciliation evidence with causation links; fail-closed. | `TC-IMP-TRD-14` |
+
+**Boundary clarifications folded in:** Trading owns order intent, order/position operational state, execution orchestration, idempotent dispatch, partial-fill handling, protective-order integrity, cancel/replace semantics, and reconciliation orchestration. It does not own the authoritative balanced portfolio ledger (Portfolio owns it, `TC-IMP-PORT-01`). The cockpit live-money boundary is enforced structurally: a cockpit session may only produce `TradingRoute.SIM` intents and guard G-4 forbids broker authority on the sim route (finding S-4; `_LiveRuntimeConfig.execution_route` cannot yet express `sim` and must admit it if the cockpit uses the live-session machinery).
+
 ### Four-level structure
 
 | Code level                          | Represents                         |
@@ -191,6 +232,8 @@ Modules and files are ordered from lowest dependency to highest dependency.
 | Completed | `FEAT-TRD-07` Live and Paper Session Lifecycle    | `live/`           | `create_live_session`, `start_live_session`, `stop_live_session`, `get_live_session_status`, `is_live_session_started`, `is_live_session_reconciliation_ready`, `is_live_session_admission_enabled`, `evaluate_live_gate`; exact declarations and configuration: Section 4.7                                                                                                                                                                                                    | Section 4.7 functional requirements | `tests/trading/usage/features/07_live.py`           |
 | Completed | `FEAT-TRD-08` Route-Aware Public Actions          | `actions/`        | `create_trading_dependencies`, `submit_order`, `modify_order`, `cancel_order`, `close_position`, `modify_position`, `reduce_exposure`, `pause_strategy`, `resume_strategy`, `sync_positions`, `trigger_kill_switch`, `clear_kill_switch`, `cancel_all_orders`, `close_all_positions`, `execute_portfolio_rebalance`, `run_live_evaluation_cycle`; exact declarations: Section 4.8                                                                               | Section 4.8 functional requirements | `tests/trading/usage/features/08_actions.py`        |
 | Completed | `FEAT-TRD-09` Immutable Execution Evidence        | `reporting/`      | `build_trading_report` returning `ExecutionEvidenceReport`; exact declarations: Section 4.9                                                                                                                                                                                                                                                                                                                                                                                                 | Section 4.9 functional requirements | `tests/trading/usage/features/09_reporting.py`      |
+| Missing | `FEAT-TRD-10` Protective-Order Lifecycle | `protective_orders/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); attach/verify stop & target, coverage ratio, bracket/OCO, residual resize, orphan prevention, reverse-exposure prevention | `FR-TRD-078`..`FR-TRD-080` *(planned)* | `tests/trading/usage/features/10_protective_orders.py` *(planned)* |
+| Missing | `FEAT-TRD-11` Trade Ownership | `trade_ownership/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); records player / supervised-automation / automated owner; detects orphaned positions | `FR-TRD-081`..`FR-TRD-083` *(planned)* | `tests/trading/usage/features/11_trade_ownership.py` *(planned)* |
 
 ```text
 trading/
@@ -1897,7 +1940,10 @@ not reuse that identifier.
 
 ## 6. Open Decisions
 
-No open decisions.
+These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
+
+- **OD-TRD-01 — `trading_positions` authoritative shape.** `trading_positions` (PK `position_id`, 20 cols, an open/closing/closed projection) coexists with `trading_positions__new` (PK `ticket`, 26 cols, a closed-trade ledger) plus `trading_closed_position_migration_guard`. Migration `002_closed_position_ledger` renames `__new`→`trading_positions` after a non-empty guard. The cockpit requires a 9-state execution-position machine (`FLAT`/`OPENING`/`OPEN`/`REDUCING`/`CLOSING`/`OVERNIGHT_APPROVED`/`EMERGENCY_CONTROLLED`/`LIQUIDATION_PENDING`/`UNKNOWN`) that neither current shape carries. The owner must confirm the authoritative table and whether the closed-trade ledger and the 9-state projection are one table or two before Phase 7 implementation (findings P-3, P-5).
+- **OD-TRD-02 — `OrderIntent = Any` Simulator boundary fix.** Two Simulator modules rebind the authoritative Trading type: `app/services/simulator/execution/engine.py:32` and `app/services/simulator/run/orchestrator.py:41` declare `OrderIntent = Any`. The fix removes the aliases and restores the typed Trading contract at the Simulator boundary. It is recorded here (the authority) and in the Simulator README; the actual code change is an implementation-phase task.
 
 ---
 

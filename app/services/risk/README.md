@@ -1,7 +1,7 @@
 # Risk
 
 > **Package:** `app/services/risk`
-> **Status:** `Completed`
+> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 15 registered features remain implemented, but 17 work packages (`TC-IMP-RISK-01`..`TC-IMP-RISK-17`) add target behavior that is not yet implemented. See `### Trading Cockpit Phase 0 reconciliation`.
 
 > **API-BE-003 runtime seam:** Allocation and governor composition bind their
 > durable state, approval-token state, and audit ports for `FR-RISK-030` and
@@ -114,6 +114,49 @@ submits Risk's immutable manifest to Data's public migration executor.
 | Completed | Allocation decisions and active authoritative risk-budget projections | Portfolio, Trading, UI/API through `AllocationRiskDecision` and approved Risk views | `app/services/risk/migrations/definitions.py` |
 | Completed | Optional decision/snapshot records enabled by an approved profile | Callers through Risk-owned result contracts only | `app/services/risk/migrations/definitions.py` |
 
+### Trading Cockpit Phase 0 reconciliation
+
+This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-RISK-01`..`TC-IMP-RISK-17`) into this authoritative README so that it is self-contained. Phase 0 classified the seventeen Risk work packages as **two `CREATE`, twelve `EXTEND`, one `REFACTOR`, and two `DEFERRED_INTEGRATION`**. New target work is `Missing`; extended existing features become `Partial`.
+
+Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
+
+**Reused existing assets (no duplication):**
+
+| Cockpit capability | Existing Risk asset reused | Phase 0 gap |
+| --- | --- | --- |
+| Risk policy profiles & stable config | `config/` (`FEAT-RISK-02`), `risk_policy_versions` | `TC-IMP-RISK-01` |
+| Portfolio risk snapshot & market-context evidence | `portfolio/` (`FEAT-RISK-03`); `PortfolioState` (`contracts/evidence.py:240`) | `TC-IMP-RISK-09` |
+| Position sizing | `sizing/` (`FEAT-RISK-04`) | `TC-IMP-RISK-05` |
+| Limits & regime tightening | `limits/` (`FEAT-RISK-06`), `regimes/` (`FEAT-RISK-07`) | `TC-IMP-RISK-09`, `TC-IMP-RISK-11` |
+| Durable kill switch (CAS) + approval tokens | `kill_switch/` (`FEAT-RISK-13`), `approvals/` (`FEAT-RISK-10`), `risk_kill_switch_states` | `TC-IMP-RISK-14` |
+| Canonical risk governor | `governor/` (`FEAT-RISK-12`) | `TC-IMP-RISK-13` |
+| Advisory scenario analysis | `scenarios/` (`FEAT-RISK-14`), `ScenarioDefinition` (`contracts/requests.py`) | `TC-IMP-RISK-12` |
+| Risk decision summaries | `reporting/` (`FEAT-RISK-15`), `RiskDecisionPackage` | `TC-IMP-RISK-16` |
+
+**Target contracts/features to add or extend:**
+
+| Status | Target | Reuses / extends | Phase 0 gap |
+| --- | --- | --- | --- |
+| Partial | `TradingPolicyProfile v1` additions | Extends `FEAT-RISK-02`. Adds drawdown, emergency, and assessment rule groups. | `TC-IMP-RISK-01` |
+| Partial | Effective-rule resolver | Extends `FEAT-RISK-06`/`FEAT-RISK-07`. Combines scenario, account, venue/instrument, strategy, simulator defaults via strictest-wins; fail-closed. | `TC-IMP-RISK-02` |
+| Partial | Trade readiness gate | Extends `FEAT-RISK-12`. Re-evaluates session/news/lock/entry/stop/exit/strategy/broker/data/margin/correlation/stress at submit; fail-closed. | `TC-IMP-RISK-03` |
+| Partial | Planned risk and net reward | Extends `FEAT-RISK-04`. Includes stop distance, contract value, qty, fees, spread, estimated slippage; fail-closed. | `TC-IMP-RISK-04` |
+| Partial | Position sizing additions | Extends `FEAT-RISK-04`. Min of risk/margin/symbol/portfolio/liquidity/strategy/stress caps; round down to venue step. Adds a property test that size never exceeds any cap. | `TC-IMP-RISK-05` |
+| Missing | Stop-loss validator | **New feature** — see Feature Registry `FEAT-RISK-16`. Side, tick validity, invalidation, noise/venue distance, projected loss, widening permissions; fail-closed. | `TC-IMP-RISK-06` |
+| Deferred | RR / expectancy gate | Applies min RR unless a current approved exactly-matched expectancy profile is eligible. **Deferred to Research `TC-IMP-RES-03`/`TC-IMP-RES-04`** (Phase 11). Fails closed to the normal risk-to-reward gate until then; never returns an inferred approval. | `TC-IMP-RISK-07` |
+| Partial | Drawdown engine | Extends `FEAT-RISK-06`. Static/trailing, realized/unrealized, daily/total reference; `NORMAL`/`CAUTION`/`RESTRICTED`/`CRITICAL`/`LOCKED` state machine; fail-closed. | `TC-IMP-RISK-08` |
+| Partial | Exposure and correlation gates | Extends `FEAT-RISK-06`. Symbol/strategy/currency/directional/gross/correlated-cluster limits via Portfolio view; fail-closed. **Depends on `TC-IMP-PORT-09`/`TC-IMP-PORT-17`** (Phase 12 authoritative portfolio view). | `TC-IMP-RISK-09` |
+| Deferred | Margin and leverage gates | Pre-trade projected margin, reserve, leverage, maintenance, liquidation proximity; fail-closed. **Deferred to Portfolio `TC-IMP-PORT-07`** (Phase 12 margin and buying power). | `TC-IMP-RISK-10` |
+| Partial | Market restrictions | Extends `FEAT-RISK-07`/`FEAT-RISK-08`. Session, news blackout, quote freshness, spread, liquidity, weekend, overnight, venue-state; fail-closed. | `TC-IMP-RISK-11` |
+| Partial (REFACTOR) | Stress-loss and gap-risk model | Extends `FEAT-RISK-14`. Nominal, liquidity-adjusted, gap, event, margin-liquidation, portfolio stress layers. **Open Decision OD-RISK-01:** Risk's `ScenarioDefinition` (`contracts/requests.py`) is explicitly advisory and cannot block; the cockpit requires a blocking stress model. Paired with Simulator `OD-SIM-02`. The refactor migrates callers and resolves the name collision with Simulator's blocking `ScenarioDefinition`; it is documented here and in the Simulator README, not executed in this documentation task. | `TC-IMP-RISK-12` |
+| Partial | Emergency risk governor | Extends `FEAT-RISK-12`. Flash crash, data/connectivity failure, margin emergency, drawdown breach, unknown state, recovery lock; fail-closed. | `TC-IMP-RISK-13` |
+| Partial | Account lock and cooldown | Extends `FEAT-RISK-13` + `risk_kill_switch_states` (CAS). Durable lockout, close-only/reduction-only permissions, cooldown timer, explicit re-arming, review. **Phase 0 finding S-3:** the kill switch is a single boolean today and cannot separate the new-exposure lock from cancel/protection/reduction/closure (required by acceptance criterion 12 and steps `FLASH_002`/`DD_002`). | `TC-IMP-RISK-14` |
+| Partial | Continuous monitoring | **LOW confidence — re-investigate before implementing (`TC-IMP-RISK-15`).** Recalculate risk after market events, fills, cancellations, position/valuation/policy changes. Only revalidation-on-reuse is currently evidenced; an event-driven recalc loop is unconfirmed. | `TC-IMP-RISK-15` |
+| Partial | Explainable risk decision | Extends `FEAT-RISK-15` (`RiskDecisionPackage`). Structured allow/block/resize/restrict result, failed rules, inputs, effective limits, source versions, corrective actions. Adds `RESIZE`/`RESTRICT` outcomes. | `TC-IMP-RISK-16` |
+| Missing | No-trade success state | **New feature** — see Feature Registry `FEAT-RISK-17`. Distinguishes a safe stand-down from failed gameplay when mandatory gates reject a setup; a correctly identified no-trade day is a passing outcome. | `TC-IMP-RISK-17` |
+
+**Boundary clarifications folded in:** Risk owns policies, validation gates, risk decisions, sizing authority, drawdown restrictions, lockouts, stress gates, and emergency risk governance. It consumes evidence and portfolio views but does not own broker execution or the financial ledger. Risk's `PortfolioState` (`contracts/evidence.py:240`) is a Risk-owned **input** contract carrying normalized portfolio evidence; the authoritative account/equity/drawdown state is owned by Portfolio (`TC-IMP-PORT-17`, Open Decision OD-PORT-02) — Risk does not redefine the authoritative ledger.
+
 ### Four-level structure
 
 | Code level | Represents |
@@ -193,6 +236,8 @@ Modules and files are ordered from lowest dependency to highest dependency. Priv
 | Completed | `FEAT-RISK-13` Kill-Switch Authority and Block State | `kill_switch/` | Exact declarations and state contracts: Section 4.13 | Section 4.13 functional requirements | `tests/risk/usage/features/13_kill_switch.py` |
 | Completed | `FEAT-RISK-14` Advisory Scenario Analysis | `scenarios/` | Exact declarations: Section 4.14 | Section 4.14 functional requirements | `tests/risk/usage/features/14_scenarios.py` |
 | Completed | `FEAT-RISK-15` Risk Decision Summaries | `reporting/` | Exact declarations and report contracts: Section 4.15 | Section 4.15 functional requirements | `tests/risk/usage/features/15_reporting.py` |
+| Missing | `FEAT-RISK-16` Stop-Loss Validator | `stop_validation/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `build_stop_validation`/`parse_stop_validation` side, tick validity, invalidation, noise/venue distance, projected loss, widening permissions | `FR-RISK-082`..`FR-RISK-084` *(planned)* | `tests/risk/usage/features/16_stop_validation.py` *(planned)* |
+| Missing | `FEAT-RISK-17` No-Trade Success State | `no_trade_state/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `build_no_trade_outcome`/`parse_no_trade_outcome` distinguishing safe stand-down from failed gameplay when mandatory gates reject a setup | `FR-RISK-085`..`FR-RISK-087` *(planned)* | `tests/risk/usage/features/17_no_trade_state.py` *(planned)* |
 
 ```text
 risk/
@@ -2466,7 +2511,11 @@ The V2 timing observations—100 ms pre-trade, 250 ms snapshot, 50 ms prepared g
 
 ## 6. Open Decisions
 
-No open decisions.
+These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
+
+- **OD-RISK-01 — `ScenarioDefinition` name collision with Simulator.** Risk's `ScenarioDefinition` (`contracts/requests.py`, `FEAT-RISK-14`) is an explicitly **advisory** scenario request. The cockpit requires a **blocking** `ScenarioDefinition` owned by Simulator with incompatible semantics (Phase 0 collision C-2, work package `TC-IMP-SIM-11`). The owner must decide whether Simulator takes the name and Risk migrates callers, or Simulator uses a distinct name (e.g. `MissionDefinition`). This README records Risk's advisory model as retained and namespaced; the relocation/rename is paired with Simulator `OD-SIM-02` and is not executed here.
+- **OD-RISK-02 — `PortfolioState` boundary with Portfolio.** Risk defines a `PortfolioState` input contract at `contracts/evidence.py:240`. The authoritative account/equity/drawdown state is owned by Portfolio (`TC-IMP-PORT-17`). Paired with Portfolio `OD-PORT-02`. Until decided, Risk documents its input contract and does not redefine the authoritative ledger.
+- **OD-RISK-03 — Kill-switch granularity.** The kill switch is a single boolean today (finding S-3); acceptance criterion 12 and steps `FLASH_002`/`DD_002` require risk-reducing actions (cancel, protection, reduction, closure) to stay available while new exposure is locked. The granularity split between Risk policy (`TC-IMP-RISK-14`) and the Trading master enable (`TC-IMP-TRD-09`) is approved; the concrete schema/state-machine shape is an implementation-phase decision.
 
 ---
 
