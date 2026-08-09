@@ -14,12 +14,18 @@ from typing import Any, cast
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
+    build_auction_payload,
+    build_corporate_action_payload,
     build_data_settings,
+    build_depth_update_payload,
     build_feed_config,
     build_feed_status_request,
+    build_halt_payload,
     build_market_stream_request,
     build_raw_feed_event,
     build_reconnect_policy,
+    build_trade_payload,
+    build_venue_state_payload,
     data_settings_context,
     ingest_feed_event,
     read_feed_status,
@@ -162,6 +168,44 @@ def fr_data_154_157() -> None:
     asyncio.run(demonstrate())
 
 
+def fr_data_184_189() -> None:
+    """FR-DATA-184..189: Unified MarketEvent v1 — trade, depth, venue-state, halt, auction, and corporate-action payloads."""
+    _header(
+        "Stage 5: Unified MarketEvent v1 Payloads (FR-DATA-184..189, TC-IMP-DATA-01)"
+    )
+    now = datetime.now(UTC)
+
+    trade = build_trade_payload(price=1.0850, size=1.0, side="buy", trade_id="T-1")
+    print(_format_result(trade))
+    print(f"Data -> TradePayload(price={trade.price}, side={trade.side})")
+
+    depth = build_depth_update_payload(side="bid", level=0, price=1.0849, size=2.5)
+    print(_format_result(depth))
+    print(f"Data -> DepthUpdatePayload(side={depth.side}, level={depth.level})")
+
+    venue_state = build_venue_state_payload(state="pre_open", reason="scheduled open")
+    print(_format_result(venue_state))
+    print(f"Data -> VenueStatePayload(state={venue_state.state})")
+
+    halt = build_halt_payload(reason="volatility circuit breaker", resumes_at=now)
+    print(_format_result(halt))
+    print(f"Data -> HaltPayload(reason={halt.reason})")
+
+    auction = build_auction_payload(
+        reference_price=1.0850, matched_size=5000.0, imbalance=120.0
+    )
+    print(_format_result(auction))
+    print(f"Data -> AuctionPayload(reference_price={auction.reference_price})")
+
+    corporate_action = build_corporate_action_payload(
+        action_type="split", effective_date=now, ratio=2.0
+    )
+    print(_format_result(corporate_action))
+    print(
+        f"Data -> CorporateActionPayload(action_type={corporate_action.action_type}, ratio={corporate_action.ratio})"
+    )
+
+
 def main() -> None:
     """Execute every functional-requirement demonstration."""
     with TemporaryDirectory(prefix="usage-feeds-") as directory:
@@ -197,6 +241,7 @@ def main() -> None:
             fr_data_047()
             fr_data_048()
             fr_data_154_157()
+            fr_data_184_189()
             print("SUCCESS: FEAT-DATA-12 completed")
 
 

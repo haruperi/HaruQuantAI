@@ -6,6 +6,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
 from app.services.brokers import (
@@ -17,7 +18,11 @@ from app.services.brokers import (
     get_broker_id,
     get_broker_value_field,
 )
+from app.services.trading import build_order_intent, parse_order_intent
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent, TradingError
+from app.services.trading.routing.dispatcher import (
+    _broker_evidence,
+)
 from app.services.trading.routing.dispatcher import (
     dispatch_order_intent as _dispatch_order_intent,
 )
@@ -26,6 +31,22 @@ from tests.brokers.response_factory import broker_response
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 BROKER_REQUEST_ID = "req-dd37fc1c-2cd6-4d66-9f9a-7a7f9a2482ef"
+
+
+def test_broker_evidence_rejects_incomplete_or_malformed_metadata() -> None:
+    """Authority metadata cannot be inferred when absent or malformed."""
+    with pytest.raises(TradingError, match="MALFORMED_RECEIPT"):
+        _broker_evidence(SimpleNamespace(metadata=SimpleNamespace(extensions={})))
+    extensions = {
+        "broker": "mt5",
+        "operation": "place_order",
+        "environment": "demo",
+        "timestamp": "not-a-timestamp",
+    }
+    with pytest.raises(TradingError, match="MALFORMED_RECEIPT"):
+        _broker_evidence(
+            SimpleNamespace(metadata=SimpleNamespace(extensions=extensions))
+        )
 
 
 async def dispatch_order_intent(
@@ -86,6 +107,24 @@ def _intent(*, route: str = "paper", action: str = "submit_order") -> OrderInten
         created_at=NOW,
         valid_until=NOW + timedelta(minutes=5),
     )
+
+
+def test_order_intent_v1_transport_requires_complete_lineage() -> None:
+    """Cockpit intent transport round-trips only complete governed lineage."""
+    material = _intent(route="sim").model_dump()
+    with pytest.raises(ValueError, match="complete versioned lineage"):
+        build_order_intent(**material)
+    material.update(
+        {
+            "trade_plan_id": "plan-001",
+            "trade_plan_version": "v1",
+            "risk_decision_version": "v1",
+            "policy_version": "v1",
+            "profile_version": "v1",
+        }
+    )
+    mapping = build_order_intent(**material)
+    assert parse_order_intent(mapping).trade_plan_id == "plan-001"
 
 
 def _connection() -> object:
@@ -310,15 +349,15 @@ def test_dispatch_has_single_mutation_boundary() -> None:
     assert get_broker_value_field(adapter.mutations[5], "quantity_unit") == "lots"
 
     rejected_adapter = _ErrorAdapter(get_broker_error_code("BROKER_REQUEST_REJECTED"))
-    rejected = asyncio.run(
-        dispatch_order_intent(
-            _intent(),
-            _connection(),
-            rejected_adapter,
-            None,
+    with pytest.raises(TradingError, match="UNKNOWN_OUTCOME"):
+        asyncio.run(
+            dispatch_order_intent(
+                _intent(),
+                _connection(),
+                rejected_adapter,
+                None,
+            )
         )
-    )
-    assert rejected.status == "rejected"
     limited_adapter = _ErrorAdapter(get_broker_error_code("BROKER_RATE_LIMITED"))
     limited_response = asyncio.run(
         _dispatch_order_intent(

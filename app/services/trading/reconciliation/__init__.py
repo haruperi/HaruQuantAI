@@ -17,6 +17,7 @@ from app.services.trading.reconciliation.factories import (
     create_authority_snapshot,
     create_reconciliation_report,
 )
+from app.services.trading.reconciliation.orchestrator import reconcile_execution_state
 from app.services.trading.reconciliation.snapshots import (
     AuthoritySnapshot as AuthoritySnapshot,
 )
@@ -26,5 +27,6 @@ __all__ = [
     "create_authority_resolution",
     "create_authority_snapshot",
     "create_reconciliation_report",
+    "reconcile_execution_state",
     "resolve_unknown_outcome",
 ]

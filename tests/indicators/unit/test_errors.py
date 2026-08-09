@@ -1,8 +1,15 @@
 """Public Indicators error-boundary tests."""
 
 from app.services.indicators import build_indicator_config, get_indicator, sma
+from app.services.indicators.core.error_catalog import INDICATOR_ERROR_CATALOG
+from app.utils import validate_error_catalog
 
 from tests.indicators.helpers import assert_error, build_dataset
+
+
+def test_indicator_error_catalog_matches_current_utils_contract() -> None:
+    """Every Indicators error definition passes the public Utils validator."""
+    assert validate_error_catalog(INDICATOR_ERROR_CATALOG) == INDICATOR_ERROR_CATALOG
 
 
 def test_error_catalog_is_exposed_as_safe_response_codes() -> None:

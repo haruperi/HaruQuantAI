@@ -111,7 +111,6 @@ def test_apply_event_rejects_stale_version() -> None:
         authority_id="simulator",
         version=0,
         orders={},
-        positions={},
         fills={},
         receipts={},
         authority_state={},
@@ -135,7 +134,6 @@ def test_projection_requires_scope_and_version() -> None:
             authority_id="simulator",
             version=-1,
             orders={},
-            positions={},
             fills={},
             receipts={},
             authority_state={},
@@ -184,5 +182,6 @@ def test_projection_requires_scope_and_version() -> None:
     fill = fill_response.data
     reconciled = reconciled_response.data
     assert receipt.unresolved_attempt_ids == ()
-    assert fill.positions["position-001"] == {"size": "1.00"}
+    assert fill.positions == {}
+    assert "positions" not in fill.model_dump(mode="json")
     assert reconciled.version == 4

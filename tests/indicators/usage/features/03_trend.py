@@ -13,6 +13,8 @@ from app.services.indicators import (
     ema,
     get_indicator_result_values,
     hull_ma,
+    measure_trend_strength,
+    project_structural_levels,
     sma,
     wma,
     zigzag,
@@ -183,6 +185,27 @@ def main() -> None:
     fr_indi_024()
     fr_indi_025()
     fr_indi_035()
+    trend = measure_trend_strength(
+        adx_value=30.0,
+        positive_directional=25.0,
+        negative_directional=10.0,
+        fast_average=1.1,
+        slow_average=1.0,
+        strength_threshold=25.0,
+    )
+    levels = project_structural_levels(
+        [
+            {
+                "kind": "support",
+                "price": float(_dataset().records[-1].low),
+                "observed_at": _dataset().records[-1].timestamp,
+                "invalidation_price": float(_dataset().records[-1].low),
+            }
+        ],
+        decision_time=_dataset().records[-1].available_at,
+    )
+    print(f"Trend-strength DATA: {trend.data}")
+    print(f"Structural-level DATA: {levels.data}")
 
 
 if __name__ == "__main__":

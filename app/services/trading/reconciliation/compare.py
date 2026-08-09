@@ -180,12 +180,14 @@ def _scoped_facts(
 def _compare_authority_state_value(
     authority: AuthoritySnapshot,
     internal: TradingProjection,
+    internal_positions: Mapping[str, JsonValue] | None = None,
 ) -> ReconciliationReport:
     """Compare authority truth with one exact Trading projection.
 
     Args:
         authority: Normalized route-authority evidence.
-        internal: Trading-owned projection for the same scope.
+        internal: Trading-owned durable projection for the same scope.
+        internal_positions: Current process-local execution positions.
 
     Returns:
         Deterministic non-mutating reconciliation report.
@@ -203,7 +205,7 @@ def _compare_authority_state_value(
     ):
         raise ValueError("authority and Trading projection scopes differ")
     authority_facts = _scoped_facts(authority.orders, authority.positions)
-    internal_facts = _scoped_facts(internal.orders, internal.positions)
+    internal_facts = _scoped_facts(internal.orders, internal_positions or {})
     authority_ids = set(authority_facts)
     internal_ids = set(internal_facts)
     missing_internal = tuple(sorted(authority_ids - internal_ids))
@@ -262,18 +264,20 @@ def _compare_authority_state_value(
 def compare_authority_state(
     authority: AuthoritySnapshot,
     internal: TradingProjection,
+    internal_positions: Mapping[str, JsonValue] | None = None,
 ) -> StandardResponse[ReconciliationReport]:
     """Compare authority truth and return a standard response.
 
     Args:
         authority: Normalized route-authority evidence.
-        internal: Trading-owned projection for the same scope.
+        internal: Trading-owned durable projection for the same scope.
+        internal_positions: Current process-local execution positions.
 
     Returns:
         Canonical response containing the deterministic reconciliation report.
     """
     try:
-        report = _compare_authority_state_value(authority, internal)
+        report = _compare_authority_state_value(authority, internal, internal_positions)
     except (TradingError, ValueError) as error:
         from app.services.trading.contracts.errors import map_trading_error
 

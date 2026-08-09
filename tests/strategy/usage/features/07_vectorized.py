@@ -33,9 +33,9 @@ from app.services.strategy import (
 
 _UNAVAILABLE = 3
 _HASH = "f" * 64
-_REQUEST = "strategy-usage-vectorized"
-_WORKFLOW = "strategy-usage-vectorized-workflow"
-_CORRELATION = "strategy-usage-vectorized-correlation"
+_REQUEST = "req-11111111-1111-4111-8111-111111111111"
+_WORKFLOW = "wf-22222222-2222-4222-8222-222222222222"
+_CORRELATION = "cor-33333333-3333-4333-8333-333333333333"
 _STRATEGY = "usage-vectorized-strategy"
 _MODULE = "app.services.strategy.evaluators.naive_ma_trend"
 

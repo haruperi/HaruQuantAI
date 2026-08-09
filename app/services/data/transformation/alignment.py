@@ -12,6 +12,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 from decimal import Decimal
+from typing import Literal
 
 from app.services.data.contracts import DataError
 from app.services.data.contracts.dataset import DataQualityReport, MarketDataset
@@ -51,7 +52,10 @@ def _validate_alignment_target(target: Sequence[datetime]) -> None:
 
 
 def _align_datasets_raw(
-    datasets: Mapping[str, MarketDataset], target: Sequence[datetime]
+    datasets: Mapping[str, MarketDataset],
+    target: Sequence[datetime],
+    *,
+    missing_policy: Literal["reject", "skip"] = "reject",
 ) -> Mapping[str, MarketDataset]:
     """Backward-align multiple datasets using only values available by target.
 
@@ -60,12 +64,18 @@ def _align_datasets_raw(
     Args:
         datasets: Map of dataset keys to MarketDataset.
         target: Ordered sequence of aware UTC target datetimes.
+        missing_policy: ``reject`` (default) fails the whole batch atomically
+            on any missing target, preserving prior behavior. ``skip``
+            declares the gap explicitly by omitting that target from the
+            aligned output instead of raising; it never fills the gap with
+            a forward-carried or invented value (`TC-IMP-DATA-10`).
 
     Returns:
         Map of dataset keys to backward-aligned MarketDatasets.
 
     Raises:
-        DataError: If validation fails or lookahead/empty values are found.
+        DataError: If validation fails, or a target is missing under the
+            ``reject`` policy.
     """
     logger.info("Aligning %d datasets to target sequence", len(datasets))
     if not datasets:
@@ -80,6 +90,13 @@ def _align_datasets_raw(
             # Find last record available at/before t
             valid = [r for r in ds.records if r.timestamp <= t and r.available_at <= t]
             if not valid:
+                if missing_policy == "skip":
+                    logger.info(
+                        "Declaring an explicit alignment gap for dataset '%s' at %s",
+                        name,
+                        t,
+                    )
+                    continue
                 raise DataError(
                     "VALIDATION_FAILED",
                     safe_details={
@@ -150,9 +167,9 @@ def _align_datasets_raw(
                 )
 
         quality_report = DataQualityReport(
-            quality_status="perfect",
-            quality_decision="accepted",
-            quality_score=Decimal(100),
+            quality_status="perfect" if aligned_records else "not_checked",
+            quality_decision="accepted" if aligned_records else "not_evaluated",
+            quality_score=Decimal(100) if aligned_records else Decimal(0),
             issues=(),
             warnings=(),
             record_count=len(aligned_records),
@@ -160,11 +177,24 @@ def _align_datasets_raw(
             truncated=False,
             sample_limit=1000,
             schema_version="v1",
-            generated_at=max(record.available_at for record in aligned_records),
+            generated_at=(
+                max(record.available_at for record in aligned_records)
+                if aligned_records
+                else target[0]
+            ),
         )
 
-        max_avail = max(r.available_at for r in aligned_records)
-        dataset_avail = max(max_avail, target[-1])
+        # `MarketDataset` requires start/end to match the first/last record
+        # timestamp exactly when records are present; an empty result (every
+        # target skipped) falls back to the declared target bounds.
+        bounds_start = aligned_records[0].timestamp if aligned_records else target[0]
+        bounds_end = aligned_records[-1].timestamp if aligned_records else target[-1]
+        max_avail = (
+            max(r.available_at for r in aligned_records)
+            if aligned_records
+            else target[0]
+        )
+        dataset_avail = max(max_avail, bounds_end)
 
         aligned_datasets[name] = MarketDataset(
             normalization_version=ds.normalization_version,
@@ -172,8 +202,8 @@ def _align_datasets_raw(
             symbol=ds.symbol,
             timeframe=ds.timeframe,
             records=tuple(aligned_records),
-            start=target[0],
-            end=target[-1],
+            start=bounds_start,
+            end=bounds_end,
             available_at=dataset_avail,
             record_count=len(aligned_records),
             quality_report=quality_report,
@@ -189,7 +219,10 @@ def _align_datasets_raw(
 
 
 def align_datasets(
-    datasets: Mapping[str, MarketDataset], target: Sequence[datetime]
+    datasets: Mapping[str, MarketDataset],
+    target: Sequence[datetime],
+    *,
+    missing_policy: Literal["reject", "skip"] = "reject",
 ) -> StandardResponse[Mapping[str, MarketDataset]]:
     """Backward-align multiple datasets using only values available by target.
 
@@ -198,25 +231,34 @@ def align_datasets(
     Args:
         datasets: Map of dataset keys to MarketDataset.
         target: Ordered sequence of aware UTC target datetimes.
+        missing_policy: ``reject`` (default) fails the whole batch atomically
+            on any missing target. ``skip`` declares the gap explicitly by
+            omitting that target instead — never a forward-carried or
+            invented value (`TC-IMP-DATA-10`).
 
     Returns:
         Standard response carrying a map of dataset keys to backward-aligned
         MarketDatasets.
 
     Raises:
-        (in-band) ``VALIDATION_FAILED`` on validation or lookahead failure.
+        (in-band) ``VALIDATION_FAILED`` on validation or (under ``reject``)
+        a missing target.
     """
     return run_data_operation(
         operation="data.transformation.align_datasets",
         request_id=generate_id("req"),
         start_time=data_start_time(),
-        raw=lambda: _align_datasets_raw(datasets, target),
+        raw=lambda: _align_datasets_raw(
+            datasets, target, missing_policy=missing_policy
+        ),
     )
 
 
 def align_multitimeframe_data(
     datasets: Mapping[str, MarketDataset],
     target_timestamps: Sequence[datetime],
+    *,
+    missing_policy: Literal["reject", "skip"] = "reject",
 ) -> StandardResponse[Mapping[str, MarketDataset]]:
     """Align multiple datasets to a uniform timestamp index with forward fill."""
     logger.info("Executing public DATA multi-timeframe alignment")
@@ -224,7 +266,9 @@ def align_multitimeframe_data(
         operation="data.transformation.align_multitimeframe_data",
         request_id=generate_id("req"),
         start_time=data_start_time(),
-        raw=lambda: _align_datasets_raw(datasets, target_timestamps),
+        raw=lambda: _align_datasets_raw(
+            datasets, target_timestamps, missing_policy=missing_policy
+        ),
     )
 
 

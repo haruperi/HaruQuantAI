@@ -1,8 +1,8 @@
 # Trading
 
 > **Package:** `app/services/trading`
-> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 9 registered features remain implemented, but 14 work packages (`TC-IMP-TRD-01`..`TC-IMP-TRD-14`) add target behavior that is not yet implemented. See `### Trading Cockpit Phase 0 reconciliation`.
-> **Last updated:** `2026-08-03`
+> **Status:** `Partial` — all fourteen Trading Cockpit Phase 0 work packages and all eleven registered features are implemented and Trading-scoped gates pass, but the binding repository-wide HYG command remains red because of out-of-scope Analytics owner changes. Later Simulator and Portfolio consumer wiring remains explicitly deferred to those owning domains.
+> **Last updated:** `2026-08-07`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -148,20 +148,20 @@ Cross-domain contract transport is settled per the Utils domain: versioned cross
 
 | Status | Target | Reuses / extends | Phase 0 gap |
 | --- | --- | --- | --- |
-| Partial | `OrderIntent v1` additions | Extends `FEAT-TRD-01`. Adds trade-plan, risk-decision, and policy/profile version links. **Defect to fix (finding C-3):** `app/services/simulator/execution/engine.py:32` and `app/services/simulator/run/orchestrator.py:41` each declare `OrderIntent = Any`, erasing the authoritative Trading type at the Simulator boundary. The cockpit removes those aliases; Trading remains the sole authority. | `TC-IMP-TRD-01` |
-| Partial | Write-before-send proof | Extends `FEAT-TRD-02` + `live/gates.py`. Persist intent and idempotency state durably before any broker/simulator submission; proven ordering; fail-closed. | `TC-IMP-TRD-02` |
-| Partial | Order state machine | Extends `FEAT-TRD-02`. Adds `CREATED→STAGED→SENT→ACKNOWLEDGED→PARTIALLY_FILLED→FILLED` plus reject/cancel/expire/replace/**`unknown`**/reconciled branches. **Defect to fix (finding S-5):** `trading_orders.state` CHECK has 8 values and no `unknown`/`reconciled`; a first-class `UNKNOWN` state preserved until reconciliation is required and untested. Blind-resubmission prohibition must be proven. | `TC-IMP-TRD-03` |
-| Partial | Order transition enforcement | Extends `FEAT-TRD-02` + `trading_order_transitions`. Validates allowed edges, stores source sequence, records every transition once; fail-closed. | `TC-IMP-TRD-04` |
-| Partial | Cancel/replace lifecycle | Extends `FEAT-TRD-08`. Preserves executable cancel-pending state, models non-atomic replacement, prevents duplicate exposure; fail-closed. | `TC-IMP-TRD-05` |
-| Partial | Partial fills and residuals | Extends `FEAT-TRD-02` + `trading_fills`. Updates avg price, filled/residual qty, residual risk, and protection after every fill; fail-closed. | `TC-IMP-TRD-06` |
-| Partial | Execution position state | Extends `FEAT-TRD-02` + `trading_positions`. 9 states: `FLAT`, `OPENING`, `OPEN`, `REDUCING`, `CLOSING`, `OVERNIGHT_APPROVED`, `EMERGENCY_CONTROLLED`, `LIQUIDATION_PENDING`, `UNKNOWN`. **Open Decision OD-TRD-01:** `trading_positions` (PK `position_id`, 20 cols, an open/closing/closed projection) coexists with `trading_positions__new` (PK `ticket`, 26 cols, a closed-trade ledger) plus `trading_closed_position_migration_guard`. Migration `002_closed_position_ledger` renames `__new`→`trading_positions`. The authoritative shape for the cockpit's 9-state machine must be confirmed before Phase 7 (finding P-3/P-5). | `TC-IMP-TRD-07` |
-| Missing | Protective-order lifecycle | **New feature** — see Feature Registry `FEAT-TRD-10`. Attach/verify stop & target, coverage ratio, bracket/OCO, residual resize, orphan prevention, reverse-exposure prevention; fail-closed. (Phase 0 finding S-6: no protective-order lifecycle exists today — a safety gap, not merely a feature gap.) | `TC-IMP-TRD-08` |
-| Partial | Master trading enable | Extends `FEAT-TRD-07`/`FEAT-TRD-08` + Risk `kill_switch/`. New-exposure kill switch separated from cancel, protection, reduction, closure permissions (finding S-3; paired with `TC-IMP-RISK-14`). | `TC-IMP-TRD-09` |
-| Partial | Reconciliation orchestrator | Extends `FEAT-TRD-05`. Compares internal intents/orders/fills/positions with broker snapshots; preserves `UNKNOWN` until resolved; fail-closed. | `TC-IMP-TRD-10` |
-| Partial | Economic execution events | Extends `FEAT-TRD-06` + `trading_events`. Emits fill, fee estimate, correction, financing trigger, corporate-action trigger, liquidation events for Portfolio posting. **Consumer `TC-IMP-PORT-02`** (Phase 12 ledger ingestion) lands later. | `TC-IMP-TRD-11` |
-| Missing | Trade ownership | **New feature** — see Feature Registry `FEAT-TRD-11`. Records player / supervised-automation / automated owner; detects orphaned positions; fail-closed. | `TC-IMP-TRD-12` |
-| Partial | Session order controls | Extends `FEAT-TRD-08`. Cancel-all entries, flatten, reduce-only, close-only, explicit re-arm commands; fail-closed. | `TC-IMP-TRD-13` |
-| Partial | Execution audit | Extends `FEAT-TRD-09`. Stores request, broker ack, fill, cancellation, error, reconciliation evidence with causation links; fail-closed. | `TC-IMP-TRD-14` |
+| Completed | `OrderIntent v1` additions | Trading owns validated `v1` JSON transport with complete versioned lineage. Simulator consumer alias removal is deferred to Simulator. **Evidence:** `contracts/factories.py`; `tests/trading/unit/routing/test_dispatcher.py`. | `TC-IMP-TRD-01` |
+| Completed | Write-before-send proof | Governed intent, idempotency reservation, and send-attempt evidence are durable before dispatch; persistence failure blocks mutation. **Evidence:** `actions/orders.py`; `tests/trading/integration/test_runtime_state.py`. | `TC-IMP-TRD-02` |
+| Completed | Order state machine | The complete lifecycle includes first-class `UNKNOWN`/`RECONCILED`; migration `004_order_lifecycle_states` makes it durable. **Evidence:** `state/order_lifecycle.py`; `migrations/definitions.py`; `tests/trading/unit/state/test_cockpit_lifecycle.py`. | `TC-IMP-TRD-03` |
+| Completed | Order transition enforcement | Allowed edges are monotonic and authoritative transitions append once with source sequence in the event transaction. **Evidence:** `state/materializations.py`; `persistence/update.py`; `tests/trading/integration/test_runtime_state.py`. | `TC-IMP-TRD-04` |
+| Completed | Cancel/replace lifecycle | Exact target/version evidence is mandatory; pending/completed replacement states and UNKNOWN prevent duplicate exposure. **Evidence:** `actions/orders.py`; `state/order_lifecycle.py`; `tests/trading/integration/test_modifications.py`. | `TC-IMP-TRD-05` |
+| Completed | Partial fills and residuals | Unique fills update weighted average and exact residual quantity, persist atomically, and protection cannot exceed residual exposure. **Evidence:** `state/fills.py`; `protective_orders/lifecycle.py`; `tests/trading/unit/state/test_cockpit_lifecycle.py`. | `TC-IMP-TRD-06` |
+| Completed | Execution position state | Extends `FEAT-TRD-02`. Current execution positions are process-local only and use the 9 states `FLAT`, `OPENING`, `OPEN`, `REDUCING`, `CLOSING`, `OVERNIGHT_APPROVED`, `EMERGENCY_CONTROLLED`, `LIQUIDATION_PENDING`, `UNKNOWN`. Durable projections reject current-position bodies; restart uncertainty remains `UNKNOWN` until authority reconciliation, and exposure cannot increase from `UNKNOWN`. `trading_positions` remains the append-only closed-trade ledger. **Evidence:** `app/services/trading/state/execution_positions.py:126`; `app/services/trading/state/execution_positions.py:171`; `tests/trading/unit/state/test_execution_positions.py:34`; `tests/trading/unit/state/test_execution_positions.py:53`; `tests/trading/integration/test_pause_resume.py:28`. | `TC-IMP-TRD-07` |
+| Completed | Protective-order lifecycle | **New feature** — see Feature Registry `FEAT-TRD-10`. Validates stop/target bracket identity, verifies exact acknowledged coverage, and permits only monotonic residual resizing so missing evidence and reverse exposure fail closed. **Evidence:** `app/services/trading/protective_orders/lifecycle.py`; `tests/trading/unit/test_cockpit_features.py`; `tests/trading/usage/features/10_protective_orders.py`. | `TC-IMP-TRD-08` |
+| Completed | Master trading enable | New/increased exposure requires enabled, reconciled, protected, owned state; risk-reducing commands remain independently available. **Evidence:** `actions/controls.py`; `tests/trading/unit/test_cockpit_features.py`. | `TC-IMP-TRD-09` |
+| Completed | Reconciliation orchestrator | Internal projections and memory-only positions are compared with authority evidence; UNKNOWN persists until explicit resolution. **Evidence:** `reconciliation/orchestrator.py`; `tests/trading/integration/test_unknown_outcome.py`. | `TC-IMP-TRD-10` |
+| Completed | Economic execution events | Trading builds validated `v1` economic events. Portfolio ingestion remains deferred to `TC-IMP-PORT-02`. **Evidence:** `monitoring/economic_events.py`; `tests/trading/unit/test_execution_transports.py`. | `TC-IMP-TRD-11` |
+| Completed | Trade ownership | **New feature** — see Feature Registry `FEAT-TRD-11`. Validates player / supervised-automation / automated ownership, rejects ambiguous active assignment, and treats absent or released ownership as orphaned. **Evidence:** `app/services/trading/trade_ownership/registry.py`; `tests/trading/unit/test_cockpit_features.py`; `tests/trading/usage/features/11_trade_ownership.py`. | `TC-IMP-TRD-12` |
+| Completed | Session order controls | Cancel-all, flatten, reduce-only, close-only, and governed clear/re-arm commands are independently fail-closed. **Evidence:** `actions/emergency.py`; `actions/controls.py`; `tests/trading/unit/actions/test_emergency.py`. | `TC-IMP-TRD-13` |
+| Completed | Execution audit | Immutable `v1` execution audit evidence retains correlation, causation, and source sequence. **Evidence:** `reporting/audit.py`; `tests/trading/unit/test_execution_transports.py`. | `TC-IMP-TRD-14` |
 
 **Boundary clarifications folded in:** Trading owns order intent, order/position operational state, execution orchestration, idempotent dispatch, partial-fill handling, protective-order integrity, cancel/replace semantics, and reconciliation orchestration. It does not own the authoritative balanced portfolio ledger (Portfolio owns it, `TC-IMP-PORT-01`). The cockpit live-money boundary is enforced structurally: a cockpit session may only produce `TradingRoute.SIM` intents and guard G-4 forbids broker authority on the sim route (finding S-4; `_LiveRuntimeConfig.execution_route` cannot yet express `sim` and must admit it if the cockpit uses the live-session machinery).
 
@@ -223,17 +223,17 @@ Modules and files are ordered from lowest dependency to highest dependency.
 
 | Status    | Feature                                             | Owning module       | Public API and contracts                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Requirements                        | Usage evidence                                        |
 | --------- | --------------------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ----------------------------------------------------- |
-| Completed | `FEAT-TRD-01` Canonical Contracts and Registries  | `contracts/`      | `get_trading_contract_version`, `get_trading_route`, `create_trading_request`, `create_order_intent`, `create_execution_receipt`, `create_trade_record`, `create_portfolio_rebalance_execution_request`, `create_execution_evidence_report`, `create_trading_error`, `is_trading_error`, `is_execution_receipt`, `map_trading_error`, `redact_trading_payload`, `get_public_contracts`, `create_trading_action_draft`; exact declarations and fields: Section 4.1 | Section 4.1 functional requirements | `tests/trading/usage/features/01_contracts.py`      |
-| Completed | `FEAT-TRD-02` State and Deterministic Projections | `state/`          | `get_trading_schema_version`, `create_idempotency_reservation`, `create_trading_event`, `create_trading_projection`, `apply_execution_event`, `get_trading_migrations`, `run_trading_migrations`, `reserve_idempotency`; exact declarations: Section 4.2                                                                                                                                                                                                                                                    | Section 4.2 functional requirements | `tests/trading/usage/features/02_state.py`          |
+| Completed | `FEAT-TRD-01` Canonical Contracts and Registries  | `contracts/`      | `build_order_intent`, `parse_order_intent`, `get_trading_contract_version`, `get_trading_route`, `create_trading_request`, `create_order_intent`, `create_execution_receipt`, `create_trade_record`, `create_portfolio_rebalance_execution_request`, `create_execution_evidence_report`, `create_trading_error`, `is_trading_error`, `is_execution_receipt`, `map_trading_error`, `redact_trading_payload`, `get_public_contracts`, `create_trading_action_draft`; exact declarations and fields: Section 4.1 | Section 4.1 functional requirements | `tests/trading/usage/features/01_contracts.py`      |
+| Completed | `FEAT-TRD-02` State and Deterministic Projections | `state/`          | Existing state API plus `create_order_lifecycle`, `transition_order_lifecycle`, `create_fill_aggregate`, `apply_order_fill`, and `get_fill_residual`; exact declarations: Section 4.2 | Section 4.2 functional requirements | `tests/trading/usage/features/02_state.py` |
 | Completed | `FEAT-TRD-03` Validation, Readiness, and Plans    | `validation/`     | `create_readiness_assessment`, `create_route_snapshot`, `assess_execution_readiness`, `build_execution_plan`, `get_route_snapshot`, `validate_order_request`; exact declarations: Section 4.3                                                                                                                                                                                                                                                                                       | Section 4.3 functional requirements | `tests/trading/usage/features/03_validation.py`     |
 | Completed | `FEAT-TRD-04` Authority Selection and Dispatch    | `routing/`        | `classify_authority_response`, `dispatch_order_intent`, `validate_adapter_capability`; exact declarations: Section 4.4                                                                                                                                                                                                                                                                                                                                                                    | Section 4.4 functional requirements | `tests/trading/usage/features/04_routing.py`        |
-| Completed | `FEAT-TRD-05` Reconciliation and Retry Guard      | `reconciliation/` | `create_authority_resolution`, `create_authority_snapshot`, `create_reconciliation_report`, `compare_authority_state`, `resolve_unknown_outcome`; exact declarations: Section 4.5                                                                                                                                                                                                                                                                                                     | Section 4.5 functional requirements | `tests/trading/usage/features/05_reconciliation.py` |
-| Completed | `FEAT-TRD-06` Operational and Budget Evidence     | `monitoring/`     | `create_operational_event`, `validate_budget_authority`, `build_broker_state_unknown_event`, `emit_runtime_event`, `get_trading_operational_events`; exact declarations: Section 4.6                                                                                                                                                                                                                                                                                                  | Section 4.6 functional requirements | `tests/trading/usage/features/06_monitoring.py`     |
+| Completed | `FEAT-TRD-05` Reconciliation and Retry Guard      | `reconciliation/` | `create_authority_resolution`, `create_authority_snapshot`, `create_reconciliation_report`, `compare_authority_state`, `reconcile_execution_state`, `resolve_unknown_outcome`; exact declarations: Section 4.5 | Section 4.5 functional requirements | `tests/trading/usage/features/05_reconciliation.py` |
+| Completed | `FEAT-TRD-06` Operational and Budget Evidence     | `monitoring/`     | Existing monitoring API plus `build_economic_execution_event` and `parse_economic_execution_event`; exact declarations: Section 4.6 | Section 4.6 functional requirements | `tests/trading/usage/features/06_monitoring.py`     |
 | Completed | `FEAT-TRD-07` Live and Paper Session Lifecycle    | `live/`           | `create_live_session`, `start_live_session`, `stop_live_session`, `get_live_session_status`, `is_live_session_started`, `is_live_session_reconciliation_ready`, `is_live_session_admission_enabled`, `evaluate_live_gate`; exact declarations and configuration: Section 4.7                                                                                                                                                                                                    | Section 4.7 functional requirements | `tests/trading/usage/features/07_live.py`           |
 | Completed | `FEAT-TRD-08` Route-Aware Public Actions          | `actions/`        | `create_trading_dependencies`, `submit_order`, `modify_order`, `cancel_order`, `close_position`, `modify_position`, `reduce_exposure`, `pause_strategy`, `resume_strategy`, `sync_positions`, `trigger_kill_switch`, `clear_kill_switch`, `cancel_all_orders`, `close_all_positions`, `execute_portfolio_rebalance`, `run_live_evaluation_cycle`; exact declarations: Section 4.8                                                                               | Section 4.8 functional requirements | `tests/trading/usage/features/08_actions.py`        |
-| Completed | `FEAT-TRD-09` Immutable Execution Evidence        | `reporting/`      | `build_trading_report` returning `ExecutionEvidenceReport`; exact declarations: Section 4.9                                                                                                                                                                                                                                                                                                                                                                                                 | Section 4.9 functional requirements | `tests/trading/usage/features/09_reporting.py`      |
-| Missing | `FEAT-TRD-10` Protective-Order Lifecycle | `protective_orders/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); attach/verify stop & target, coverage ratio, bracket/OCO, residual resize, orphan prevention, reverse-exposure prevention | `FR-TRD-078`..`FR-TRD-080` *(planned)* | `tests/trading/usage/features/10_protective_orders.py` *(planned)* |
-| Missing | `FEAT-TRD-11` Trade Ownership | `trade_ownership/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); records player / supervised-automation / automated owner; detects orphaned positions | `FR-TRD-081`..`FR-TRD-083` *(planned)* | `tests/trading/usage/features/11_trade_ownership.py` *(planned)* |
+| Completed | `FEAT-TRD-09` Immutable Execution Evidence        | `reporting/`      | `build_trading_report`, `build_execution_audit_record`, and `parse_execution_audit_record`; exact declarations: Section 4.9 | Section 4.9 functional requirements | `tests/trading/usage/features/09_reporting.py`      |
+| Completed | `FEAT-TRD-10` Protective-Order Lifecycle | `protective_orders/` | Validated bracket/OCO plan transport, exact coverage proof, safe residual resizing, append-only persistence, orphan/reverse-exposure prevention | `FR-TRD-078`..`FR-TRD-080` | `tests/trading/usage/features/10_protective_orders.py` |
+| Completed | `FEAT-TRD-11` Trade Ownership | `trade_ownership/` | Validated player / supervised-automation / automated ownership, append-only persistence, and fail-closed orphan detection | `FR-TRD-081`..`FR-TRD-083` | `tests/trading/usage/features/11_trade_ownership.py` |
 
 ```text
 trading/
@@ -1370,6 +1370,7 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Completed | `stores.py`      | Define minimal injected state operations                                                                                                                                          | `TradingStateStore` and its seven public operations, including terminal idempotency completion and exact report-evidence reads | **Standard library:** `collections.abc`, `datetime`, `typing`**Required third-party:** None**Local:** `events.py`; `contracts.models`                                                                 |
 | Completed | `idempotency.py` | Reserve caller keys and detect material conflicts                                                                                                                                 | `IdempotencyReservation`, `reserve_idempotency`                                                                              | **Standard library:** `datetime`, `decimal`, `hashlib`, `typing`**Required third-party:** `pydantic>=2.13.4`**Local:** contracts, `stores.py`; Utils canonical JSON/logger APIs                     |
 | Completed | `projections.py` | Apply ordered events with optimistic versions                                                                                                                                     | `TradingProjection`, `apply_execution_event`                                                                                 | **Standard library:** `collections.abc`, `datetime`, `types`, `typing`**Required third-party:** `pydantic>=2.13.4`**Local:** contracts, `events.py`, `stores.py`; Utils serialization/logger APIs |
+| Completed | `execution_positions.py` | Maintain validated current execution positions in process memory and enforce the nine-state transition graph | Function-only memory-store, create/read/snapshot/set/transition facades | **Standard library:** `decimal`, `threading`, `typing` **Required third-party:** `pydantic>=2.13.4` **Local:** Trading errors; Utils logger |
 | Completed | `runtime.py`     | Coordinate durable idempotency, append-only events, projections, reconciliation evidence, and unresolved-attempt views while delegating all record CRUD to`trading/persistence` | `build_trading_state_store`, `execute_trading_state_store_operation`                                                         | **Standard library:** collections.abc, datetime, typing**Required third-party:** `pydantic>=2.13.4`**Local:** contracts, state models, `trading.persistence`, Utils logger                                  |
 | Completed | `migrations/definitions.py` | Declare the Trading schema version and immutable two-step manifest, and execute it through Data's authoritative complete-manifest runner | `get_trading_schema_version`, `get_trading_migrations`, `run_trading_migrations` | **Standard library:** `hashlib` **Required third-party:** None **Local:** public Data migration functions; Utils logger |
 | Completed | `__init__.py`    | Expose state API                                                                                                                                                                  | All exports above                                                                                                                | **Standard library:** None**Required third-party:** None**Local:** files above                                                                                                                                  |
@@ -1407,6 +1408,13 @@ This section is the implementation plan. Modules, files, and requirements are in
 | Completed | `FR-TRD-075` | Trading durable state shall persist directly to Trading-owned tables through Data's public transaction executor and shall not write Trading state to`data_runtime_records`.                                                                                                                          | `build_trading_state_store`, `apply_execution_event`                                                                                                                                                                                                                                                                                                     | Atomic persistence write     | `TradingError`: mapping, constraint, or transaction failure                           | **Integration:** `tests/trading/integration/test_runtime_state.py::test_atomic_event_application_materializes_trading_tables()`**Unit:** `tests/trading/unit/state/test_persistence_layout.py::test_trading_persistence_no_longer_uses_generic_runtime_records()`  |
 | Completed | `FR-TRD-076` | Event append, optimistic aggregate projection replacement, and applicable order, fill, position, and transition materialization shall commit atomically;`trading_events` remains authoritative and materialized rows remain rebuildable without invented order defaults or authority timestamps.     | `apply_execution_event`                                                                                                                                                                                                                                                                                                                                    | Atomic persistence write     | `TradingError`: incomplete canonical evidence or stale version                        | **Integration:** `tests/trading/integration/test_runtime_state.py::test_atomic_event_application_materializes_trading_tables()`                                                                                                                                            |
 | Completed | `FR-TRD-077` | Apply and verify the complete immutable Trading migration manifest through Data's ledger-verified, checksum-validating, write-locked transactional executor. | `run_trading_migrations` | Schema migration write | `DataError`: manifest, checksum, lock, or transaction failure | **Unit:** `tests/trading/unit/state/test_migrations.py` **Integration:** `tests/trading/integration/test_runtime_state.py` **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_077()` |
+| Completed | `FR-TRD-084` | Maintain active execution positions only in injected process memory through the nine-state machine; reject stale or invalid transitions, require explicit `UNKNOWN` evidence, prohibit exposure increases from `UNKNOWN`, and omit current-position bodies from durable Trading projections. | `create_execution_position_store`, `create_execution_position`, `set_execution_position`, `get_execution_position`, `get_execution_position_snapshot`, `transition_execution_position` | Process-local memory mutation; append-only transition evidence remains separately durable | `TradingError`: invalid state, stale sequence/version, absent state, or reconciliation required | **Usage:** `tests/trading/usage/features/02_state.py::fr_trd_084()` **Unit:** `tests/trading/unit/state/test_execution_positions.py` **Integration:** `tests/trading/integration/test_pause_resume.py` |
+| Completed | `FR-TRD-078` | Create one validated protective stop/target bracket carrying exact quantity, OCO identity, Risk decision, and source sequence. | `create_protective_order_plan` | None | Validation failure | **Usage:** `tests/trading/usage/features/10_protective_orders.py::fr_trd_078()` **Unit:** `tests/trading/unit/test_cockpit_features.py` |
+| Completed | `FR-TRD-079` | Transport protective-order plans as validated JSON-safe `v1` mappings through the package boundary. | `build_protective_order_plan`, `parse_protective_order_plan` | None | Invalid mapping | **Usage:** `tests/trading/usage/features/10_protective_orders.py::fr_trd_079()` **Unit:** `tests/trading/unit/test_cockpit_features.py` |
+| Completed | `FR-TRD-080` | Prove acknowledged protection covers the exact open quantity and allow only newer residual reductions; uncertain coverage is `UNKNOWN` and exposure-increasing resize is rejected. | `verify_protective_order_coverage`, `resize_protective_orders` | None | `TradingError` | **Usage:** `tests/trading/usage/features/10_protective_orders.py::fr_trd_080()` **Unit:** `tests/trading/unit/test_cockpit_features.py` |
+| Completed | `FR-TRD-081` | Build and parse validated `v1` ownership evidence for player, supervised-automation, or automated owners. | `build_trade_ownership`, `parse_trade_ownership` | None | Invalid mapping | **Usage:** `tests/trading/usage/features/11_trade_ownership.py::fr_trd_081()` **Unit:** `tests/trading/unit/test_cockpit_features.py` |
+| Completed | `FR-TRD-082` | Assign one unambiguous active owner to an execution position and reject duplicate active assignment. | `create_trade_ownership_registry`, `assign_trade_ownership`, `get_trade_ownership` | Process-local ownership registry mutation | `TradingError` | **Usage:** `tests/trading/usage/features/11_trade_ownership.py::fr_trd_082()` **Unit:** `tests/trading/unit/test_cockpit_features.py` |
+| Completed | `FR-TRD-083` | Treat missing or released ownership evidence as an orphaned trade and never infer an owner. | `detect_orphaned_trade` | None | None | **Usage:** `tests/trading/usage/features/11_trade_ownership.py::fr_trd_083()` **Unit:** `tests/trading/unit/test_cockpit_features.py` |
 
 **Rules:** A required persistence failure blocks broker mutation; import creates no store.
 **Implementation notes:** Depend on injected store ports and Data-executed Trading migrations; do not build a custom JSONL persistence engine. Implement deterministic hashing, deduplication, optimistic versioning, and projection math.
@@ -1786,8 +1794,10 @@ CREATE TABLE trading_orders (
     stop_loss_decimal   TEXT,
     take_profit_decimal TEXT,
     state            TEXT    NOT NULL CHECK (state IN (
-                        'pending_new','new','partially_filled','filled',
-                        'pending_cancel','cancelled','rejected','expired')),
+                        'CREATED','STAGED','SENT','ACKNOWLEDGED',
+                        'PARTIALLY_FILLED','FILLED','CANCEL_PENDING','CANCELLED',
+                        'REPLACE_PENDING','REPLACED','REJECTED','EXPIRED',
+                        'UNKNOWN','RECONCILED')),
     reject_reason    TEXT,
     runtime_profile  TEXT    NOT NULL CHECK (runtime_profile IN ('research','simulation','paper','live')),
     submitted_at     TEXT,
@@ -1801,7 +1811,8 @@ CREATE TABLE trading_orders (
 ) STRICT;
 
 CREATE INDEX idx_trading_orders_open    ON trading_orders(account_id, symbol_id)
-    WHERE state IN ('pending_new','new','partially_filled','pending_cancel');
+    WHERE state IN ('CREATED','STAGED','SENT','ACKNOWLEDGED','PARTIALLY_FILLED',
+                    'CANCEL_PENDING','REPLACE_PENDING','UNKNOWN','RECONCILED');
 CREATE INDEX idx_trading_orders_broker  ON trading_orders(broker_order_id) WHERE broker_order_id IS NOT NULL;
 CREATE INDEX idx_trading_orders_history ON trading_orders(account_id, created_at DESC);
 CREATE INDEX idx_trading_orders_risk    ON trading_orders(risk_decision_id);
@@ -1861,8 +1872,76 @@ CREATE INDEX idx_trading_positions_symbol_exit ON trading_positions(account, sym
 CREATE INDEX idx_trading_positions_magic_exit ON trading_positions(account, magic, exit_time DESC);
 ```
 
-`trading_fills` and `trading_order_transitions` are not target tables after migration
-`002`; their authority facts remain in `trading_events`.
+Migration `003_execution_lifecycle` restores append-only `trading_fills` and
+`trading_order_transitions` evidence and introduces `trading_protective_orders` and
+`trading_trade_ownership`. These records retain execution evidence for the life of
+the account; corrections append newer source-sequenced facts and never rewrite
+financial history. Current open-position bodies remain process-local and are never
+stored in these tables. Atomic execution-event materialization reaches transitions
+and fills; `persist_protective_order_plan` and `persist_trade_ownership` reach the
+protection and ownership tables through Data's transactional public boundary.
+
+```sql
+CREATE TABLE trading_order_transitions (
+    transition_id TEXT PRIMARY KEY,
+    order_id TEXT NOT NULL REFERENCES trading_orders(order_id) ON DELETE RESTRICT,
+    from_state TEXT,
+    to_state TEXT NOT NULL,
+    source_sequence INTEGER NOT NULL,
+    reason_code TEXT NOT NULL,
+    occurred_at TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    causation_id TEXT,
+    created_at TEXT NOT NULL,
+    UNIQUE (order_id, source_sequence)
+) STRICT;
+
+CREATE TABLE trading_fills (
+    fill_id TEXT PRIMARY KEY,
+    order_id TEXT NOT NULL REFERENCES trading_orders(order_id) ON DELETE RESTRICT,
+    broker_fill_id TEXT UNIQUE,
+    source_sequence INTEGER NOT NULL,
+    quantity_decimal TEXT NOT NULL,
+    price_decimal TEXT NOT NULL,
+    fee_estimate_decimal TEXT,
+    executed_at TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE (order_id, source_sequence)
+) STRICT;
+
+CREATE TABLE trading_protective_orders (
+    protective_order_id TEXT PRIMARY KEY,
+    position_id TEXT NOT NULL,
+    order_id TEXT NOT NULL,
+    protection_type TEXT NOT NULL CHECK (protection_type IN ('stop','target')),
+    quantity_decimal TEXT NOT NULL,
+    price_decimal TEXT NOT NULL,
+    state TEXT NOT NULL CHECK (state IN ('pending','acknowledged','unknown','cancelled')),
+    oco_group_id TEXT NOT NULL,
+    source_sequence INTEGER NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE (position_id, protection_type, source_sequence)
+) STRICT;
+
+CREATE TABLE trading_trade_ownership (
+    ownership_id TEXT PRIMARY KEY,
+    position_id TEXT NOT NULL,
+    owner_type TEXT NOT NULL CHECK (
+        owner_type IN ('player','supervised_automation','automated')
+    ),
+    owner_id TEXT NOT NULL,
+    trade_plan_id TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    source_sequence INTEGER NOT NULL,
+    released INTEGER NOT NULL DEFAULT 0 CHECK (released IN (0,1)),
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE (position_id, source_sequence)
+) STRICT;
+```
 
 #### `trading_projections`
 
@@ -1940,10 +2019,13 @@ not reuse that identifier.
 
 ## 6. Open Decisions
 
-These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
+None.
 
-- **OD-TRD-01 — `trading_positions` authoritative shape.** `trading_positions` (PK `position_id`, 20 cols, an open/closing/closed projection) coexists with `trading_positions__new` (PK `ticket`, 26 cols, a closed-trade ledger) plus `trading_closed_position_migration_guard`. Migration `002_closed_position_ledger` renames `__new`→`trading_positions` after a non-empty guard. The cockpit requires a 9-state execution-position machine (`FLAT`/`OPENING`/`OPEN`/`REDUCING`/`CLOSING`/`OVERNIGHT_APPROVED`/`EMERGENCY_CONTROLLED`/`LIQUIDATION_PENDING`/`UNKNOWN`) that neither current shape carries. The owner must confirm the authoritative table and whether the closed-trade ledger and the 9-state projection are one table or two before Phase 7 implementation (findings P-3, P-5).
-- **OD-TRD-02 — `OrderIntent = Any` Simulator boundary fix.** Two Simulator modules rebind the authoritative Trading type: `app/services/simulator/execution/engine.py:32` and `app/services/simulator/run/orchestrator.py:41` declare `OrderIntent = Any`. The fix removes the aliases and restores the typed Trading contract at the Simulator boundary. It is recorded here (the authority) and in the Simulator README; the actual code change is an implementation-phase task.
+### Deferred integrations
+
+- Simulator owns removal of its local `OrderIntent = Any` consumer aliases. Trading's authoritative `build_order_intent`/`parse_order_intent` `v1` contract is complete and fail-closed.
+- Portfolio owns later ingestion of Trading economic execution events under `TC-IMP-PORT-02`; Trading never posts Portfolio ledger business logic.
+- UI-API owns cockpit routes, read models, and frontend panels. Trading intentionally contains no UI or HTTP behavior.
 
 ---
 
@@ -1998,7 +2080,7 @@ uv run pytest tests/trading -o addopts="" --import-mode=importlib \
 - [X] No rejected capability appears in the architecture or public API. `app/services/trading/__init__.py:1`
 - [X] No unresolved Open Decision affects a completed requirement. `app/services/trading/README.md:953`
 - [X] Production live mutation is disabled by default and all safety gates fail closed. `app/services/trading/live/config.py:110`
-- [X] Nine numbered usage programs exactly match the nine registered features; every active requirement emits explicit success and produced-data evidence, and retired `FR-TRD-011` remains absent. `tests/trading/integration/test_usage_scripts.py:32`
+- [X] Eleven numbered usage programs exactly match the eleven registered features; every active requirement emits explicit success and produced-data evidence, and retired `FR-TRD-011` remains absent. `tests/trading/integration/test_usage_scripts.py:32`
 - [X] Current Risk decision, kill-switch, and action-policy contracts pass through the real Trading readiness consumer, while non-authorizing state fails closed. `tests/trading/integration/test_risk_contract_compatibility.py:142`
 - [X] The workspace-mounted Trading panel exposes complete governed submit, cancel, and close inputs, defaults to paper, requires explicit authority references, and re-locks after each attempt. `app/ui/src/components/workflow/trading.tsx:121`
 - [X] Ruff, Trading mypy, unit/integration tests, workflow execution, per-file 80% branch coverage, and the individual 100 ms unit-test ceiling are recorded in the dated audit evidence. `docs/dev/trading_domain_audit_remediation_plan.md:10`

@@ -93,12 +93,8 @@ docs/dev/trading-cockpit/phase-0/
 ├── trading-cockpit-test-baseline.md
 ├── trading-cockpit-safety-baseline.md
 ├── trading-cockpit-change-control.md
-├── phase-0-findings-and-decisions.md
-├── ADR-0001-extend-existing-domains-for-trading-cockpit.md
-└── phase-0-closeout.md
 ```
 
-Also read the independent read-only review result when it is stored separately.
 
 ### 4.3 Supporting product documents
 
@@ -881,14 +877,14 @@ List the exact fourteen README paths and identify which were changed or unchange
 ### 15.3 Per-domain summary
 
 | Domain | README | Gap rows considered | Existing features modified | New features | Existing FRs modified | New FRs | Workflows changed/added | Contracts / Persistence / NFR updates | Final README status |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- | --- |
+| ------ | ------ | ------------------: | -------------------------: | -----------: | --------------------: | ------: | ----------------------- | ------------------------------------- | ------------------- |
 
 ### 15.4 Temporary gap-to-README mapping
 
 For every actionable Phase 0 gap, report:
 
 | Gap ID | Classification | Approved action | Canonical domain | README destination | Feature ID | FR / NFR / WF / Contract destination | Result |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+| ------ | -------------- | --------------- | ---------------- | ------------------ | ---------- | ------------------------------------ | ------ |
 
 This mapping is temporary evidence and must not be required by the updated READMEs.
 

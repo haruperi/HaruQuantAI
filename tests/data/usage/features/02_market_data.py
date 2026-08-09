@@ -14,11 +14,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.data import (
     build_availability_request,
     build_data_settings,
+    build_level1_snapshot_request,
     build_market_data_request,
     build_symbol_list_request,
     build_symbol_metadata_request,
     data_settings_context,
     get_data_availability,
+    get_level1_snapshot,
     get_market_data,
     get_symbol_metadata,
     list_symbols,
@@ -256,6 +258,34 @@ def fr_data_035() -> None:
     )
 
 
+def fr_data_190() -> None:
+    """FR-DATA-190/191: Stage 8 — Compose a bounded Level-1 bid/ask/last/spread/volume snapshot with disclosed source/receive time and computed freshness (TC-IMP-DATA-02)."""
+    _header("Stage 8: Level-1 Quote Snapshot - Bounded Snapshot (FR-DATA-190/191)")
+    req = build_level1_snapshot_request(
+        source_id="mt5",
+        symbol="EURUSD",
+        request_id=generate_id("req"),
+    )
+    print(_format_result(req))
+    try:
+        response = get_level1_snapshot(req)
+        print(_format_result(response))
+        if response.status == "success" and response.data is not None:
+            snapshot = response.data
+            print(
+                f"Data -> Level1Snapshot(symbol={snapshot.symbol}, bid={snapshot.bid}, "
+                f"ask={snapshot.ask}, spread={snapshot.spread}, "
+                f"quote_age_seconds={snapshot.quote_age_seconds})"
+            )
+        else:
+            print(
+                f"Data -> StandardResponse(status={response.status}, message={response.message})"
+            )
+    except Exception as exc:
+        print(f"Output Result -> {type(exc).__name__} : {type(exc).__name__}")
+        print(f"Data -> Exception({exc})")
+
+
 def main() -> None:
     """Execute every functional-requirement demonstration."""
     with TemporaryDirectory(prefix="usage-market-data-") as directory:
@@ -295,6 +325,7 @@ def main() -> None:
             fr_data_032()
             fr_data_007_033()
             fr_data_035()
+            fr_data_190()
             print("SUCCESS: FEAT-DATA-02 completed")
 
 

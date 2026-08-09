@@ -14,6 +14,7 @@ _USAGE_SCRIPTS = (
     "03_metrics.py",
     "04_reports.py",
     "05_dashboards.py",
+    "06_scoring.py",
 )
 
 _README_REQUIREMENTS = {

@@ -290,6 +290,227 @@ _CLOSED_POSITION_LEDGER_STATEMENTS = (
     "DROP TABLE trading_closed_position_migration_guard",
 )
 
+_EXECUTION_LIFECYCLE_STATEMENTS = (
+    """
+    CREATE TABLE IF NOT EXISTS trading_order_transitions (
+        transition_id TEXT PRIMARY KEY,
+        order_id TEXT NOT NULL REFERENCES trading_orders(order_id) ON DELETE RESTRICT,
+        from_state TEXT,
+        to_state TEXT NOT NULL,
+        source_sequence INTEGER NOT NULL,
+        reason_code TEXT NOT NULL,
+        occurred_at TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        causation_id TEXT,
+        created_at TEXT NOT NULL,
+        UNIQUE (order_id, source_sequence)
+    ) STRICT
+    """.strip(),
+    """
+    CREATE TABLE IF NOT EXISTS trading_fills (
+        fill_id TEXT PRIMARY KEY,
+        order_id TEXT NOT NULL REFERENCES trading_orders(order_id) ON DELETE RESTRICT,
+        broker_fill_id TEXT,
+        source_sequence INTEGER NOT NULL,
+        quantity_decimal TEXT NOT NULL,
+        price_decimal TEXT NOT NULL,
+        fee_estimate_decimal TEXT,
+        executed_at TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (order_id, source_sequence),
+        UNIQUE (broker_fill_id)
+    ) STRICT
+    """.strip(),
+    """
+    CREATE TABLE IF NOT EXISTS trading_protective_orders (
+        protective_order_id TEXT PRIMARY KEY,
+        position_id TEXT NOT NULL,
+        order_id TEXT NOT NULL,
+        protection_type TEXT NOT NULL CHECK (protection_type IN ('stop', 'target')),
+        quantity_decimal TEXT NOT NULL,
+        price_decimal TEXT NOT NULL,
+        state TEXT NOT NULL CHECK (
+            state IN ('pending', 'acknowledged', 'unknown', 'cancelled')
+        ),
+        oco_group_id TEXT NOT NULL,
+        source_sequence INTEGER NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        UNIQUE (position_id, protection_type, source_sequence)
+    ) STRICT
+    """.strip(),
+    """
+    CREATE TABLE IF NOT EXISTS trading_trade_ownership (
+        ownership_id TEXT PRIMARY KEY,
+        position_id TEXT NOT NULL,
+        owner_type TEXT NOT NULL CHECK (
+            owner_type IN ('player', 'supervised_automation', 'automated')
+        ),
+        owner_id TEXT NOT NULL,
+        trade_plan_id TEXT NOT NULL,
+        session_id TEXT NOT NULL,
+        source_sequence INTEGER NOT NULL,
+        released INTEGER NOT NULL DEFAULT 0 CHECK (released IN (0, 1)),
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (position_id, source_sequence)
+    ) STRICT
+    """.strip(),
+)
+
+_ORDER_LIFECYCLE_STATE_STATEMENTS = (
+    """
+    CREATE TABLE trading_orders__lifecycle (
+        order_id TEXT PRIMARY KEY,
+        client_order_id TEXT NOT NULL UNIQUE,
+        broker_order_id TEXT,
+        account_id TEXT NOT NULL,
+        symbol_id TEXT NOT NULL,
+        strategy_version_id TEXT,
+        config_id TEXT,
+        signal_id TEXT,
+        risk_decision_id TEXT NOT NULL,
+        side TEXT NOT NULL CHECK (side IN ('buy', 'sell')),
+        order_type TEXT NOT NULL CHECK (
+            order_type IN ('market', 'limit', 'stop', 'stop_limit', 'trailing_stop')
+        ),
+        time_in_force TEXT CHECK (time_in_force IN ('gtc', 'ioc', 'fok', 'day', 'gtd')),
+        quantity_decimal TEXT NOT NULL,
+        filled_qty_decimal TEXT NOT NULL DEFAULT '0',
+        limit_price_decimal TEXT,
+        stop_price_decimal TEXT,
+        avg_fill_price_decimal TEXT,
+        stop_loss_decimal TEXT,
+        take_profit_decimal TEXT,
+        state TEXT NOT NULL CHECK (state IN (
+            'CREATED', 'STAGED', 'SENT', 'ACKNOWLEDGED', 'PARTIALLY_FILLED',
+            'FILLED', 'CANCEL_PENDING', 'CANCELLED', 'REPLACE_PENDING',
+            'REPLACED', 'REJECTED', 'EXPIRED', 'UNKNOWN', 'RECONCILED'
+        )),
+        reject_reason TEXT,
+        runtime_profile TEXT NOT NULL CHECK (
+            runtime_profile IN ('research', 'simulation', 'paper', 'live')
+        ),
+        submitted_at TEXT,
+        terminal_at TEXT,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        CHECK (
+            order_type NOT IN ('limit', 'stop_limit')
+            OR limit_price_decimal IS NOT NULL
+        ),
+        CHECK (
+            order_type NOT IN ('stop', 'stop_limit', 'trailing_stop')
+            OR stop_price_decimal IS NOT NULL
+        ),
+        CHECK (state <> 'REJECTED' OR reject_reason IS NOT NULL)
+    ) STRICT
+    """.strip(),
+    """
+    INSERT INTO trading_orders__lifecycle
+    SELECT
+        order_id, client_order_id, broker_order_id, account_id, symbol_id,
+        strategy_version_id, config_id, signal_id, risk_decision_id, side,
+        order_type, time_in_force, quantity_decimal, filled_qty_decimal,
+        limit_price_decimal, stop_price_decimal, avg_fill_price_decimal,
+        stop_loss_decimal, take_profit_decimal,
+        CASE state
+            WHEN 'pending_new' THEN 'STAGED'
+            WHEN 'new' THEN 'ACKNOWLEDGED'
+            WHEN 'partially_filled' THEN 'PARTIALLY_FILLED'
+            WHEN 'filled' THEN 'FILLED'
+            WHEN 'pending_cancel' THEN 'CANCEL_PENDING'
+            WHEN 'cancelled' THEN 'CANCELLED'
+            WHEN 'rejected' THEN 'REJECTED'
+            WHEN 'expired' THEN 'EXPIRED'
+        END,
+        reject_reason, runtime_profile, submitted_at, terminal_at,
+        correlation_id, created_at, updated_at
+    FROM trading_orders
+    """.strip(),
+    """
+    CREATE TABLE trading_order_transitions__lifecycle (
+        transition_id TEXT PRIMARY KEY,
+        order_id TEXT NOT NULL
+            REFERENCES trading_orders__lifecycle(order_id) ON DELETE RESTRICT,
+        from_state TEXT,
+        to_state TEXT NOT NULL,
+        source_sequence INTEGER NOT NULL,
+        reason_code TEXT NOT NULL,
+        occurred_at TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        causation_id TEXT,
+        created_at TEXT NOT NULL,
+        UNIQUE (order_id, source_sequence)
+    ) STRICT
+    """.strip(),
+    """
+    INSERT INTO trading_order_transitions__lifecycle
+    SELECT * FROM trading_order_transitions
+    """.strip(),
+    """
+    CREATE TABLE trading_fills__lifecycle (
+        fill_id TEXT PRIMARY KEY,
+        order_id TEXT NOT NULL
+            REFERENCES trading_orders__lifecycle(order_id) ON DELETE RESTRICT,
+        broker_fill_id TEXT,
+        source_sequence INTEGER NOT NULL,
+        quantity_decimal TEXT NOT NULL,
+        price_decimal TEXT NOT NULL,
+        fee_estimate_decimal TEXT,
+        executed_at TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (order_id, source_sequence),
+        UNIQUE (broker_fill_id)
+    ) STRICT
+    """.strip(),
+    "INSERT INTO trading_fills__lifecycle SELECT * FROM trading_fills",
+    """
+    CREATE TABLE trading_order_lifecycle_migration_guard (
+        preserved INTEGER NOT NULL CHECK (preserved = 1)
+    ) STRICT
+    """.strip(),
+    """
+    INSERT INTO trading_order_lifecycle_migration_guard (preserved)
+    SELECT CASE WHEN
+        (SELECT COUNT(*) FROM trading_orders) =
+            (SELECT COUNT(*) FROM trading_orders__lifecycle) AND
+        (SELECT COUNT(*) FROM trading_order_transitions) =
+            (SELECT COUNT(*) FROM trading_order_transitions__lifecycle) AND
+        (SELECT COUNT(*) FROM trading_fills) =
+            (SELECT COUNT(*) FROM trading_fills__lifecycle)
+    THEN 1 ELSE 0 END
+    """.strip(),
+    "DROP TABLE trading_order_transitions",
+    "DROP TABLE trading_fills",
+    "DROP TABLE trading_orders",
+    "ALTER TABLE trading_orders__lifecycle RENAME TO trading_orders",
+    "ALTER TABLE trading_order_transitions__lifecycle RENAME TO trading_order_transitions",  # noqa: E501
+    "ALTER TABLE trading_fills__lifecycle RENAME TO trading_fills",
+    """
+    CREATE INDEX idx_trading_orders_open
+    ON trading_orders(account_id, symbol_id)
+    WHERE state IN (
+        'CREATED', 'STAGED', 'SENT', 'ACKNOWLEDGED', 'PARTIALLY_FILLED',
+        'CANCEL_PENDING', 'REPLACE_PENDING', 'UNKNOWN', 'RECONCILED'
+    )
+    """.strip(),
+    """
+    CREATE INDEX idx_trading_orders_broker
+    ON trading_orders(broker_order_id) WHERE broker_order_id IS NOT NULL
+    """.strip(),
+    (
+        "CREATE INDEX idx_trading_orders_history "
+        "ON trading_orders(account_id, created_at DESC)"
+    ),
+    ("CREATE INDEX idx_trading_orders_risk ON trading_orders(risk_decision_id)"),
+    "DROP TABLE trading_order_lifecycle_migration_guard",
+)
+
 
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Trading schema statements.
@@ -324,6 +545,18 @@ def _get_trading_migrations_value() -> tuple[Any, ...]:
             migration_id="002_closed_position_ledger",
             checksum=_migration_checksum(_CLOSED_POSITION_LEDGER_STATEMENTS),
             statements=_CLOSED_POSITION_LEDGER_STATEMENTS,
+        ),
+        build_migration_step(
+            domain="trading",
+            migration_id="003_execution_lifecycle",
+            checksum=_migration_checksum(_EXECUTION_LIFECYCLE_STATEMENTS),
+            statements=_EXECUTION_LIFECYCLE_STATEMENTS,
+        ),
+        build_migration_step(
+            domain="trading",
+            migration_id="004_order_lifecycle_states",
+            checksum=_migration_checksum(_ORDER_LIFECYCLE_STATE_STATEMENTS),
+            statements=_ORDER_LIFECYCLE_STATE_STATEMENTS,
         ),
     )
 

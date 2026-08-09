@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import time
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 from app.services.data.contracts import DataError
@@ -408,6 +409,52 @@ def promote_source(
     )
 
 
+_TRUST_SCORE_SAMPLE_LIMIT = 50
+
+
+def _compute_source_trust_score_raw(source_id: str, request_id: str) -> Decimal:
+    """Compute one deterministic trust score from durable attempt evidence.
+
+    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-12`): the score is
+    the observed success ratio over the most recent bounded attempt window,
+    never an inferred or default-optimistic value. A source with no
+    recorded attempts fails closed to `0` rather than assuming trust.
+
+    Returns:
+        Success-ratio trust score in `[0, 100]`, quantized to `0.01`.
+    """
+    attempts = _recent_attempts(source_id, _TRUST_SCORE_SAMPLE_LIMIT, request_id)
+    if not attempts:
+        return Decimal(0)
+    successes = sum(1 for status, _ in attempts if status == "SUCCESS")
+    ratio = Decimal(successes) / Decimal(len(attempts))
+    return (ratio * Decimal(100)).quantize(Decimal("0.01"))
+
+
+def compute_source_trust_score(
+    source_id: str, *, request_id: str | None = None
+) -> StandardResponse[Decimal]:
+    """Compute one bounded deterministic source trust score.
+
+    Args:
+        source_id: Registered source identifier.
+        request_id: Optional trace identifier; generated when omitted.
+
+    Returns:
+        Standard response carrying the success-ratio trust score.
+
+    Raises:
+        (in-band) ``DATABASE_ERROR`` if durable attempt evidence is unreadable.
+    """
+    trace_id = request_id if request_id is not None else generate_id("req")
+    return run_data_operation(
+        operation="data.sources.compute_source_trust_score",
+        request_id=trace_id,
+        start_time=data_start_time(),
+        raw=lambda: _compute_source_trust_score_raw(source_id, trace_id),
+    )
+
+
 def _record_failure(source_id: str, request_id: str) -> None:
     """Record one durable failure for focused circuit tests."""
     logger.info("Recording source failure for %s", source_id)
@@ -422,6 +469,7 @@ def _reset_policy_registry() -> None:
 
 __all__ = [
     "SourcePolicyConfig",
+    "compute_source_trust_score",
     "evaluate_source_policy",
     "promote_source",
     "record_source_attempt",

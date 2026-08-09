@@ -205,6 +205,63 @@ def fr_risk_065() -> None:
     )
 
 
+def fr_risk_088() -> None:
+    """FR-RISK-088: Stage 2 — Define the optional ordered drawdown state-machine thresholds (caution/restricted/critical) bounded by max_drawdown."""
+    _header(
+        "Stage 2: Drawdown State Thresholds - Caution/Restricted/Critical (FR-RISK-088)"
+    )
+    print("SUCCESS: FR-RISK-088")
+    config = create_risk_config(
+        **_values(),
+        drawdown_caution_threshold=Decimal("0.03"),
+        drawdown_restricted_threshold=Decimal("0.06"),
+        drawdown_critical_threshold=Decimal("0.08"),
+    )
+    print(_format_result(config))
+    print(
+        "Data -> caution="
+        f"{config.drawdown_caution_threshold}, restricted={config.drawdown_restricted_threshold}, "
+        f"critical={config.drawdown_critical_threshold}"
+    )
+
+
+def fr_risk_089() -> None:
+    """FR-RISK-089: Stage 2 — Define the optional emergency rule group (flash crash, connectivity loss, margin call, recovery lock) required together and bounded."""
+    _header(
+        "Stage 2: Emergency Rule Group - Flash Crash/Connectivity/Margin (FR-RISK-089)"
+    )
+    print("SUCCESS: FR-RISK-089")
+    config = create_risk_config(
+        **_values(),
+        emergency_flash_crash_move_pct=Decimal("0.05"),
+        emergency_flash_crash_window_seconds=60,
+        emergency_connectivity_loss_seconds=30,
+        emergency_margin_call_utilization_pct=Decimal("0.8"),
+        emergency_recovery_lock_seconds=900,
+    )
+    print(_format_result(config))
+    print(
+        "Data -> flash_crash_move="
+        f"{config.emergency_flash_crash_move_pct}, recovery_lock_seconds={config.emergency_recovery_lock_seconds}"
+    )
+
+
+def fr_risk_090() -> None:
+    """FR-RISK-090: Stage 2 — Define the optional continuous-assessment rule group naming registered recalculation-trigger events and a staleness bound."""
+    _header("Stage 2: Assessment Rule Group - Recalculation Triggers (FR-RISK-090)")
+    print("SUCCESS: FR-RISK-090")
+    config = create_risk_config(
+        **_values(),
+        assessment_recalc_events=("fill", "position_change"),
+        assessment_max_staleness_seconds=120,
+    )
+    print(_format_result(config))
+    print(
+        "Data -> recalc_events="
+        f"{config.assessment_recalc_events}, max_staleness_seconds={config.assessment_max_staleness_seconds}"
+    )
+
+
 # --- Stage 3: Config Hashing & Runtime Persistence ---
 
 
@@ -360,6 +417,9 @@ def main() -> None:
     fr_risk_022()
     fr_risk_064()
     fr_risk_065()
+    fr_risk_088()
+    fr_risk_089()
+    fr_risk_090()
 
     # 3. Stage 3: Canonical config hash & runtime policy
     fr_risk_024()

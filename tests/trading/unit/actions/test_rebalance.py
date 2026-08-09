@@ -18,7 +18,12 @@ from app.services.trading.contracts import (
     PortfolioRebalanceExecutionRequest,
     TradingError,
 )
-from app.services.trading.state import TradingProjection
+from app.services.trading.state import (
+    TradingProjection,
+    create_execution_position,
+    create_execution_position_store,
+    set_execution_position,
+)
 from app.utils import canonical_json
 from pydantic import ValidationError
 
@@ -148,16 +153,26 @@ def rebalance_dependencies(item: PortfolioRebalanceExecutionRequest):
         authority_id="simulation",
         version=1,
         orders={},
-        positions={
-            "position-001": {
-                "symbol": "EURUSD",
-                "broker_position_id": "position-001",
-            }
-        },
+        positions={},
         fills={},
         receipts={},
         authority_state={},
         updated_at=NOW,
+    )
+    store.execution_positions = create_execution_position_store()
+    set_execution_position(
+        store.execution_positions,
+        create_execution_position(
+            position_id="position-001",
+            account_id="account-001",
+            symbol="EURUSD",
+            broker_position_id="position-001",
+            state="OPEN",
+            quantity=Decimal("2.00"),
+            average_entry_price=Decimal("1.10"),
+            source_sequence=1,
+            version=1,
+        ),
     )
     return replace(
         dependencies(store=store),

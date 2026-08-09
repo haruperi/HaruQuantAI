@@ -36,6 +36,15 @@ _HASH_PATTERN = re.compile(r"[0-9a-f]{64}\Z")
 _PROFILES = frozenset({"research", "simulation", "paper", "live"})
 _MAX_SCENARIOS = 100
 _MAX_SCENARIO_POSITIONS = 500
+_ASSESSMENT_EVENTS = frozenset(
+    {
+        "fill",
+        "cancellation",
+        "position_change",
+        "valuation_change",
+        "policy_change",
+    }
+)
 _DECIMAL_FIELDS = frozenset(
     {
         "clock_skew_tolerance_seconds",
@@ -44,6 +53,11 @@ _DECIMAL_FIELDS = frozenset(
         "fractional_kelly_multiplier",
         "correlation_size_penalty",
         "max_daily_loss",
+        "drawdown_caution_threshold",
+        "drawdown_restricted_threshold",
+        "drawdown_critical_threshold",
+        "emergency_flash_crash_move_pct",
+        "emergency_margin_call_utilization_pct",
         "max_risk_per_trade_pct",
         "preferred_risk_per_trade_pct",
         "max_daily_loss_pct",
@@ -230,6 +244,7 @@ def _coerce_yaml_collections(normalized: dict[str, object]) -> dict[str, object]
         "blocked_calendar_states",
         "kill_switch_activation_permissions",
         "kill_switch_clearance_permissions",
+        "assessment_recalc_events",
     ):
         value = normalized.get(field_name)
         if isinstance(value, list):
@@ -295,6 +310,9 @@ class RiskConfig(BaseModel):
     drawdown_trail_stops_at_initial: bool = False
     drawdown_eod_snapshot_time: str | None = None
     drawdown_eod_snapshot_timezone: str | None = None
+    drawdown_caution_threshold: Decimal | None = None
+    drawdown_restricted_threshold: Decimal | None = None
+    drawdown_critical_threshold: Decimal | None = None
     daily_loss_basis: LossReferenceBasis = LossReferenceBasis.DAY_START
     total_loss_basis: LossReferenceBasis = LossReferenceBasis.INCEPTION
     max_historical_var_ratio: Decimal = Decimal("0.02")
@@ -363,6 +381,13 @@ class RiskConfig(BaseModel):
     }
     stressed_lookback_days: int | None = None
     crisis_windows_utc: Mapping[str, tuple[datetime, datetime]] = {}
+    emergency_flash_crash_move_pct: Decimal | None = None
+    emergency_flash_crash_window_seconds: int | None = None
+    emergency_connectivity_loss_seconds: int | None = None
+    emergency_margin_call_utilization_pct: Decimal | None = None
+    emergency_recovery_lock_seconds: int | None = None
+    assessment_recalc_events: tuple[str, ...] = ()
+    assessment_max_staleness_seconds: int | None = None
     audit_hash_algorithm: Literal["sha256"] = "sha256"
     audit_genesis_hash: str = "0" * 64
     audit_timeout_seconds: Decimal | None = None
@@ -429,6 +454,11 @@ class RiskConfig(BaseModel):
         "fractional_kelly_multiplier",
         "correlation_size_penalty",
         "max_daily_loss",
+        "drawdown_caution_threshold",
+        "drawdown_restricted_threshold",
+        "drawdown_critical_threshold",
+        "emergency_flash_crash_move_pct",
+        "emergency_margin_call_utilization_pct",
         "max_risk_per_trade_pct",
         "preferred_risk_per_trade_pct",
         "max_daily_loss_pct",
@@ -550,6 +580,27 @@ class RiskConfig(BaseModel):
             raise ValueError("policy values must be non-empty and unique")
         return checked
 
+    @field_validator("assessment_recalc_events", mode="after")
+    @classmethod
+    def _validate_assessment_events(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        """Validate declared continuous-assessment recalculation triggers.
+
+        Args:
+            value: Declared recalculation event names.
+
+        Returns:
+            Validated event tuple.
+
+        Raises:
+            ValueError: If an event is duplicated or unregistered.
+        """
+        logger.debug("Validating RiskConfig assessment recalculation events")
+        if len(set(value)) != len(value):
+            raise ValueError("assessment recalculation events must be unique")
+        if any(item not in _ASSESSMENT_EVENTS for item in value):
+            raise ValueError("assessment recalculation event is not registered")
+        return value
+
     @field_validator("crisis_windows_utc", mode="after")
     @classmethod
     def _validate_crisis_windows(
@@ -649,7 +700,85 @@ class RiskConfig(BaseModel):
         self._validate_capability_policy()
         self._validate_live_policy()
         self._validate_drawdown_policy()
+        self._validate_drawdown_state_thresholds()
+        self._validate_emergency_policy()
+        self._validate_assessment_policy()
         return self
+
+    def _validate_drawdown_state_thresholds(self) -> None:
+        """Validate the optional ordered drawdown state-machine thresholds.
+
+        Raises:
+            ValueError: If the thresholds are partially specified or unordered.
+        """
+        logger.debug("Validating RiskConfig drawdown state thresholds")
+        caution = self.drawdown_caution_threshold
+        restricted = self.drawdown_restricted_threshold
+        critical = self.drawdown_critical_threshold
+        if caution is None and restricted is None and critical is None:
+            return
+        if caution is None or restricted is None or critical is None:
+            raise ValueError(
+                "drawdown state thresholds must be fully specified together"
+            )
+        if not Decimal(0) < caution < restricted < critical <= self.max_drawdown:
+            raise ValueError(
+                "drawdown state thresholds must be ordered and bounded by max_drawdown"
+            )
+
+    def _validate_emergency_policy(self) -> None:
+        """Validate the optional emergency rule group.
+
+        Raises:
+            ValueError: If the group is partially specified or a value is invalid.
+        """
+        logger.debug("Validating RiskConfig emergency rule group")
+        move_pct = self.emergency_flash_crash_move_pct
+        window_seconds = self.emergency_flash_crash_window_seconds
+        connectivity_seconds = self.emergency_connectivity_loss_seconds
+        margin_pct = self.emergency_margin_call_utilization_pct
+        recovery_seconds = self.emergency_recovery_lock_seconds
+        if (
+            move_pct is None
+            and window_seconds is None
+            and connectivity_seconds is None
+            and margin_pct is None
+            and recovery_seconds is None
+        ):
+            return
+        if (
+            move_pct is None
+            or window_seconds is None
+            or connectivity_seconds is None
+            or margin_pct is None
+            or recovery_seconds is None
+        ):
+            raise ValueError(
+                "emergency rule group values must be fully specified together"
+            )
+        if not Decimal(0) < move_pct <= Decimal(1):
+            raise ValueError("flash crash move threshold must be in (0, 1]")
+        if window_seconds <= 0:
+            raise ValueError("flash crash window must be positive")
+        if connectivity_seconds <= 0:
+            raise ValueError("connectivity loss threshold must be positive")
+        if not Decimal(0) < margin_pct <= Decimal(1):
+            raise ValueError("margin call utilization threshold must be in (0, 1]")
+        if recovery_seconds <= 0:
+            raise ValueError("recovery lock duration must be positive")
+
+    def _validate_assessment_policy(self) -> None:
+        """Validate the optional continuous-assessment rule group.
+
+        Raises:
+            ValueError: If the staleness bound is non-positive.
+        """
+        logger.debug("Validating RiskConfig assessment rule group")
+        if (
+            self.assessment_max_staleness_seconds is not None
+            and self.assessment_max_staleness_seconds <= 0
+        ):
+            raise ValueError("assessment staleness bound must be positive")
 
     def _validate_drawdown_policy(self) -> None:
         """Validate drawdown mode-specific reference evidence policy.
@@ -952,9 +1081,20 @@ class RiskConfig(BaseModel):
             self.audit_timeout_seconds,
             self.token_state_timeout_seconds,
             self.double_spend_owner,
+            self.drawdown_caution_threshold,
+            self.drawdown_restricted_threshold,
+            self.drawdown_critical_threshold,
+            self.emergency_flash_crash_move_pct,
+            self.emergency_flash_crash_window_seconds,
+            self.emergency_connectivity_loss_seconds,
+            self.emergency_margin_call_utilization_pct,
+            self.emergency_recovery_lock_seconds,
+            self.assessment_max_staleness_seconds,
         )
         if any(value is None for value in required):
             raise ValueError("live profile is missing mandatory safety policy")
+        if not self.assessment_recalc_events:
+            raise ValueError("live profile requires assessment recalculation events")
         if not self.audit_persistence_required:
             raise ValueError("live profile requires durable audit persistence")
 

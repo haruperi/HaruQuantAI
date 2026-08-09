@@ -15,6 +15,11 @@ _EXPECTED_OUTPUT = {
     "07_settings.py": "Data -> environment='test', runtime_profile='research'",
     "08_logging.py": "Data -> non_empty_log_files=",
     "09_standard_responses.py": "Data -> immutable_mapping_keys=",
+    "10_units.py": "Data -> exact_unit=",
+    "11_state_machine.py": "Data -> transition=",
+    "12_validation.py": "Data -> validation=",
+    "13_idempotency.py": "Data -> reservation_verdict=",
+    "14_random_streams.py": "Data -> draws=",
     "features.py": "Data -> full_domain_pipeline_status='completed'",
 }
 

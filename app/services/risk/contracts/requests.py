@@ -527,16 +527,20 @@ class KillSwitchCommand(_RequestModel):
     request_id: str
     workflow_id: str
     correlation_id: str
+    locked_permissions: tuple[
+        Literal["new_exposure", "close_only", "reduction_only", "cancel_only"], ...
+    ] = ()
+    cooldown_seconds: Decimal | None = None
 
     @model_validator(mode="after")
     def _validate_command(self) -> KillSwitchCommand:
-        """Validate exact scope identifiers and reason.
+        """Validate exact scope identifiers, reason, and lock granularity.
 
         Returns:
             Validated command.
 
         Raises:
-            ValueError: If scope identifiers conflict.
+            ValueError: If scope identifiers or lock granularity conflict.
         """
         logger.debug("Validating kill-switch command")
         _utc(self.requested_at)
@@ -549,6 +553,12 @@ class KillSwitchCommand(_RequestModel):
         }[self.scope_level]
         if any(value is None for value in required):
             raise ValueError("kill-switch scope identifier is missing")
+        if len(set(self.locked_permissions)) != len(self.locked_permissions):
+            raise ValueError("kill-switch locked permissions must be unique")
+        if self.locked_permissions and self.action != "activate":
+            raise ValueError("locked permissions apply only to activation")
+        if self.cooldown_seconds is not None and self.cooldown_seconds <= 0:
+            raise ValueError("kill-switch cooldown must be positive")
         return self
 
 

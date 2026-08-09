@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 from dataclasses import FrozenInstanceError
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
+from app.services.data.economic_calendar.events import (
+    EconomicEvent,
+    EventImpact,
+    is_event_visible_at,
+)
 
 
 def _event(**overrides: object) -> EconomicEvent:
@@ -108,3 +112,38 @@ def test_economic_event_rejects_non_finite_numeric_values() -> None:
     """Normalized numeric values cannot contain NaN or infinity."""
     with pytest.raises(ValueError, match="actual must be finite"):
         _event(actual=Decimal("NaN"))
+
+
+def test_economic_event_exposes_first_seen_at() -> None:
+    """`first_seen_at` round-trips as an optional aware-UTC timestamp."""
+    published = datetime(2026, 1, 1, tzinfo=UTC)
+    event = _event(first_seen_at=published)
+    assert event.first_seen_at == published
+
+
+def test_economic_event_rejects_naive_first_seen_at() -> None:
+    """`first_seen_at` must be timezone-aware UTC like the other timestamps."""
+    with pytest.raises(ValueError, match="timezone-aware UTC"):
+        _event(first_seen_at=datetime(2026, 1, 1))  # noqa: DTZ001
+
+
+def test_is_event_visible_at_is_true_once_published() -> None:
+    """An event becomes visible exactly at its `first_seen_at` timestamp."""
+    published = datetime(2026, 1, 1, tzinfo=UTC)
+    event = _event(first_seen_at=published)
+    assert is_event_visible_at(event, published) is True
+    assert is_event_visible_at(event, published + timedelta(seconds=1)) is True
+    assert is_event_visible_at(event, published - timedelta(seconds=1)) is False
+
+
+def test_is_event_visible_at_fails_closed_when_publication_unknown() -> None:
+    """An event with no recorded publication time is never visible."""
+    event = _event(first_seen_at=None)
+    assert is_event_visible_at(event, datetime(2026, 1, 1, tzinfo=UTC)) is False
+
+
+def test_is_event_visible_at_rejects_naive_as_of() -> None:
+    """The replay boundary itself must be timezone-aware UTC."""
+    event = _event(first_seen_at=datetime(2026, 1, 1, tzinfo=UTC))
+    with pytest.raises(ValueError, match="as_of must be timezone-aware UTC"):
+        is_event_visible_at(event, datetime(2026, 1, 1))  # noqa: DTZ001

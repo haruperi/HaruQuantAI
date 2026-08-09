@@ -348,7 +348,7 @@ def main() -> None:
             write_lock_lease_seconds=30,
         )
         with data_settings_context(settings):
-            run_data_migrations("strategy-usage-signals")
+            run_data_migrations("req-11111111-1111-4111-8111-111111111111")
 
             # 1. Stage 1 & 2: Atomic concrete signal evaluation
             fr_str_047()

@@ -58,7 +58,7 @@ def main() -> None:
         event,
         context,
         MarketEventEvaluator(),
-        {"bars_seen": 0},
+        local_state={"bars_seen": 0},
     )
     print("Hook status:", outcome.status)
     if outcome.data is None:
@@ -66,7 +66,7 @@ def main() -> None:
 
     # Stage 4: Inspect the fully validated candidate update.
     _stage(4)
-    update = outcome.data.local_state_update
+    update = outcome.data[0].candidate_local_state
     print("Candidate local state:", update)
 
     # Stage 5 — OUTPUT BOUNDARY: Return validated result or StandardResponse error.

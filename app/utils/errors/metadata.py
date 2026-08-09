@@ -21,12 +21,18 @@ class ErrorMetadata:
         title: User-facing descriptive summary of the error.
         severity: Diagnostic classification: info, warning, error, critical.
         retryable: True if the operation can be retried.
+        category: Closed error category.
+        backoff_class: Minimum retry backoff class.
+        operator_action_required: Whether human action is required.
     """
 
     code: str
     title: str
     severity: Literal["info", "warning", "error", "critical"]
     retryable: bool
+    category: str = "PERMANENT"
+    backoff_class: str = "NONE"
+    operator_action_required: bool = True
 
 
 _ERROR_METADATA = {
@@ -35,6 +41,9 @@ _ERROR_METADATA = {
         title=definition.description,
         severity=definition.severity,
         retryable=definition.retryable,
+        category=definition.category,
+        backoff_class="BOUNDED" if definition.retryable else "NONE",
+        operator_action_required=not definition.retryable,
     )
     for code, definition in COMMON_ERROR_CATALOG.items()
 }
@@ -83,5 +92,8 @@ def get_error_metadata(code: str) -> ErrorMetadata:
             title="Application error",
             severity="error",
             retryable=False,
+            category="UNKNOWN_STATE",
+            backoff_class="NONE",
+            operator_action_required=True,
         ),
     )

@@ -8,10 +8,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import get_market_data
 from app.services.indicators import (
+    build_liquidity_snapshot,
     cmf,
     get_indicator_result_values,
+    measure_order_flow,
     mfi,
     obv,
+    parse_liquidity_snapshot,
     price_volume_distribution,
 )
 from tests.indicators.usage._support import (
@@ -139,6 +142,28 @@ def main() -> None:
     fr_indi_028()
     fr_indi_029()
     fr_indi_030()
+    order_flow = measure_order_flow(
+        bid_depth=120.0,
+        ask_depth=100.0,
+        previous_bid_depth=110.0,
+        previous_ask_depth=105.0,
+        aggressive_buy_volume=60.0,
+        aggressive_sell_volume=40.0,
+        sweep_threshold=0.7,
+    )
+    snapshot = build_liquidity_snapshot(
+        observed_at=_dataset().records[-1].available_at,
+        spread=0.0002,
+        executable_depth=220.0,
+        imbalance=float(order_flow.data["imbalance"]),
+        volume=float(_dataset().records[-1].volume),
+        fill_probability=None,
+        regime="NORMAL",
+        complete=False,
+    )
+    parsed = parse_liquidity_snapshot(snapshot.data)
+    print(f"Order-flow DATA: {order_flow.data}")
+    print(f"Liquidity-snapshot DATA: {parsed.data}")
 
 
 if __name__ == "__main__":

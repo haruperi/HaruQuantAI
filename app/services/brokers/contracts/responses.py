@@ -39,6 +39,8 @@ _TRADE_OPERATIONS = frozenset(
         BrokerCapabilityId.MODIFY_POSITION,
         BrokerCapabilityId.CLOSE_POSITION,
         BrokerCapabilityId.REPLACE_ORDER,
+        BrokerCapabilityId.ATTACH_PROTECTION,
+        BrokerCapabilityId.REDUCE_POSITION,
     }
 )
 _STATE_MUTATION_OPERATIONS = frozenset(

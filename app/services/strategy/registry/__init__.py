@@ -5,6 +5,7 @@ from app.services.strategy.registry.catalogue import (
     list_builtin_strategy_descriptors,
 )
 from app.services.strategy.registry.configuration import validate_strategy_config
+from app.services.strategy.registry.lifecycle import govern_strategy_lifecycle
 from app.services.strategy.registry.listing import (
     get_strategy_definition,
     list_strategy_configs,
@@ -23,6 +24,7 @@ __all__ = [
     "adopt_approved_optimization_parameters",
     "bootstrap_builtin_strategies",
     "get_strategy_definition",
+    "govern_strategy_lifecycle",
     "list_builtin_strategy_descriptors",
     "list_strategy_configs",
     "list_strategy_definitions",

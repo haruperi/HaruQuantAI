@@ -179,6 +179,75 @@ def read_plan_version_records(
     return tuple({"plan": json.loads(str(row["plan_json"]))} for row in rows)
 
 
+def read_ledger_account_record(store: object, account_id: str) -> object | None:
+    """Read one immutable ledger account.
+
+    Args:
+        store: Portfolio persistence handle.
+        account_id: Chart-of-accounts identity.
+
+    Returns:
+        Decoded ``LedgerAccount`` mapping or ``None``.
+    """
+    row = _one_row(
+        "SELECT account_json FROM portfolio_ledger_accounts WHERE account_id=?",
+        (account_id,),
+    )
+    if row is None:
+        return None
+    return _require_store(store).decode("ledger_account", str(row["account_json"]))
+
+
+def read_ledger_batch_record(
+    store: object, source_event_id: str, source_sequence: int
+) -> object | None:
+    """Read one ledger batch by its exactly-once event identity.
+
+    Args:
+        store: Portfolio persistence handle.
+        source_event_id: External economic event identity.
+        source_sequence: Exactly-once monotonic event sequence.
+
+    Returns:
+        Decoded ``PostingBatch`` mapping or ``None``.
+    """
+    row = _one_row(
+        "SELECT batch_json FROM portfolio_ledger_posting_batches "
+        "WHERE source_event_id=? AND source_sequence=?",
+        (source_event_id, source_sequence),
+    )
+    if row is None:
+        return None
+    return _require_store(store).decode("ledger_batch", str(row["batch_json"]))
+
+
+def read_ledger_entries_for_account(
+    store: object, account_id: str
+) -> tuple[Mapping[str, object], ...]:
+    """Read ordered ledger legs for one account.
+
+    Args:
+        store: Portfolio persistence handle.
+        account_id: Chart-of-accounts identity.
+
+    Returns:
+        Ordered normalized leg mappings.
+    """
+    _require_store(store)
+    rows = _execute(
+        (
+            "SELECT entry_id, batch_id, entry_sequence, account_id, side, "
+            "amount_decimal AS amount, currency, posting_type, posted_at, "
+            "request_id, correlation_id FROM portfolio_ledger_entries "
+            "WHERE account_id=? ORDER BY posted_at ASC, entry_sequence ASC "
+            "LIMIT 1000",
+        ),
+        ((account_id,),),
+        max_rows=1_000,
+    ).rows
+    return tuple(rows)
+
+
 __all__ = [
     "read_active_allocation_record",
     "read_allocation_history_records",
@@ -186,6 +255,9 @@ __all__ = [
     "read_construction_record",
     "read_definition_record",
     "read_idempotency_record",
+    "read_ledger_account_record",
+    "read_ledger_batch_record",
+    "read_ledger_entries_for_account",
     "read_plan_record",
     "read_plan_version_records",
 ]

@@ -109,6 +109,13 @@ _NORMATIVE_MATRIX: tuple[tuple[tuple[str, ...], tuple[str, ...]], ...] = (
         ),
         ("U", "U", "U", "U", "U", "U", "U"),
     ),
+    (
+        # Trading Cockpit Phase 0 safe-order-command additions (TC-IMP-BRK-06).
+        # attach_protection and reduce_position are fail-closed UNAVAILABLE for
+        # every profile until a provider records release evidence.
+        ("attach_protection", "reduce_position"),
+        ("U", "U", "U", "U", "U", "U", "U"),
+    ),
     (("get_trading_sessions",), ("U", "A", "U", "U", "U", "U", "U")),
 )
 

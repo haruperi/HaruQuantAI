@@ -7,6 +7,14 @@ from dataclasses import dataclass
 from typing import Literal
 
 type ErrorSeverity = Literal["info", "warning", "error", "critical"]
+_CATEGORIES = {
+    "TRANSIENT",
+    "PERMANENT",
+    "INTEGRITY",
+    "POLICY",
+    "DATA_STALE",
+    "UNKNOWN_STATE",
+}
 
 _SYMBOLIC_CODE = re.compile(r"[A-Z][A-Z0-9_]{0,127}\Z")
 _DOMAIN_NAME = re.compile(r"[a-z][a-z0-9_]{0,63}\Z")

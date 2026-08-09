@@ -16,6 +16,7 @@ from app.services.brokers.contracts.enums import (
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
+    BrokerUncertainty,
 )
 from app.utils import (
     format_utc_timestamp,
@@ -373,6 +374,28 @@ class BrokerCapability(_Schema):
     verification_evidence: tuple[str, ...] = ()
     release_approval_reference: str | None = None
     reason: str | None = None
+    # Trading Cockpit Phase 0 capability matrix additions (``TC-IMP-BRK-02``).
+    # Every trait defaults to ``UNDECLARED`` so a capability that does not
+    # declare the trait is fail-closed: callers must not infer support.
+    bracket_order_support: Literal["UNDECLARED", "SUPPORTED", "UNSUPPORTED"] = (
+        "UNDECLARED"
+    )
+    oco_order_support: Literal["UNDECLARED", "SUPPORTED", "UNSUPPORTED"] = "UNDECLARED"
+    position_mode: Literal[
+        "UNDECLARED", "NETTING", "HEDGING", "NETTING_AND_HEDGING"
+    ] = "UNDECLARED"
+    partial_fill_support: Literal["UNDECLARED", "SUPPORTED", "UNSUPPORTED"] = (
+        "UNDECLARED"
+    )
+    modification_support: Literal["UNDECLARED", "SUPPORTED", "UNSUPPORTED"] = (
+        "UNDECLARED"
+    )
+    cancellation_support: Literal["UNDECLARED", "SUPPORTED", "UNSUPPORTED"] = (
+        "UNDECLARED"
+    )
+    sandbox_availability: Literal["UNDECLARED", "AVAILABLE", "UNAVAILABLE"] = (
+        "UNDECLARED"
+    )
 
     def __post_init__(self) -> None:
         """Validate the immutable BrokerCapability invariants.
@@ -399,6 +422,8 @@ class BrokerCapability(_Schema):
             BrokerCapabilityId.MODIFY_POSITION,
             BrokerCapabilityId.CLOSE_POSITION,
             BrokerCapabilityId.REPLACE_ORDER,
+            BrokerCapabilityId.ATTACH_PROTECTION,
+            BrokerCapabilityId.REDUCE_POSITION,
         }
         if self.capability in mutation_capabilities and self.access_mode != "WRITE":
             raise ValueError("mutation capability must use WRITE access mode")
@@ -419,6 +444,28 @@ class BrokerCapability(_Schema):
             _text(evidence, "verification_evidence")
         _optional_text(self.release_approval_reference, "release_approval_reference")
         _optional_text(self.reason, "reason")
+        for trait_name in (
+            "bracket_order_support",
+            "oco_order_support",
+            "partial_fill_support",
+            "modification_support",
+            "cancellation_support",
+        ):
+            _choice(
+                getattr(self, trait_name),
+                {"UNDECLARED", "SUPPORTED", "UNSUPPORTED"},
+                trait_name,
+            )
+        _choice(
+            self.position_mode,
+            {"UNDECLARED", "NETTING", "HEDGING", "NETTING_AND_HEDGING"},
+            "position_mode",
+        )
+        _choice(
+            self.sandbox_availability,
+            {"UNDECLARED", "AVAILABLE", "UNAVAILABLE"},
+            "sandbox_availability",
+        )
         if (
             self.implementation_status == "NOT_IMPLEMENTED"
             and self.availability != "UNAVAILABLE"
@@ -1033,9 +1080,17 @@ class BrokerPosition(_Schema):
     stop_loss: Decimal | None = None
     take_profit: Decimal | None = None
     provider_timestamp: datetime | None = None
+    source_sequence: int | None = None
+    receive_time: datetime | None = None
+    raw_payload_ref: str | None = None
+    uncertainty: BrokerUncertainty = BrokerUncertainty.KNOWN
 
     def __post_init__(self) -> None:
-        """Validate the immutable BrokerPosition invariants."""
+        """Validate the immutable BrokerPosition invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
         _choice(self.side, {"LONG", "SHORT", "UNKNOWN"}, "position side")
         _choice(self.state, {"OPEN", "CLOSED", "UNKNOWN"}, "position state")
         _text(self.position_id, "position_id")
@@ -1055,6 +1110,14 @@ class BrokerPosition(_Schema):
         _optional_text(self.ownership_ref, "ownership_ref")
         _utc(self.provider_timestamp, "provider_timestamp")
         _utc(self.retrieved_at, "retrieved_at")
+        if isinstance(self.source_sequence, bool) or (
+            self.source_sequence is not None and self.source_sequence < 0
+        ):
+            raise ValueError("source_sequence must be a non-negative integer")
+        _utc(self.receive_time, "receive_time")
+        _optional_text(self.raw_payload_ref, "raw_payload_ref")
+        if not isinstance(self.uncertainty, BrokerUncertainty):
+            raise ValueError("unknown position uncertainty")  # noqa: TRY004
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -1121,6 +1184,10 @@ class BrokerOrder(_Schema):
     product_profile: str | None = None
     provider_timestamp: datetime | None = None
     provider_metadata: Mapping[str, object] = field(default_factory=dict)
+    source_sequence: int | None = None
+    receive_time: datetime | None = None
+    raw_payload_ref: str | None = None
+    uncertainty: BrokerUncertainty = BrokerUncertainty.KNOWN
 
     def __post_init__(self) -> None:
         """Validate the immutable BrokerOrder invariants.
@@ -1176,6 +1243,14 @@ class BrokerOrder(_Schema):
             "provider_metadata",
             _redacted(self.provider_metadata, "provider_metadata"),
         )
+        if isinstance(self.source_sequence, bool) or (
+            self.source_sequence is not None and self.source_sequence < 0
+        ):
+            raise ValueError("source_sequence must be a non-negative integer")
+        _utc(self.receive_time, "receive_time")
+        _optional_text(self.raw_payload_ref, "raw_payload_ref")
+        if not isinstance(self.uncertainty, BrokerUncertainty):
+            raise ValueError("unknown order uncertainty")  # noqa: TRY004
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -1506,6 +1581,68 @@ class BrokerPositionCloseRequest(_Schema):
         _text(self.position_id, "position_id")
         _text(self.quantity_unit, "quantity_unit")
         _positive(self.quantity, "quantity")
+        _request_id(self.client_request_id, "client_request_id")
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class BrokerOrderProtectionRequest(_Schema):
+    """Attach bracketing protection to one open order (``TC-IMP-BRK-06``)."""
+
+    SCHEMA_ID: ClassVar[str] = "brokers.order_protection_request.v1"
+    order_id: str
+    idempotency_key: str
+    stop_loss: Decimal | None = None
+    take_profit: Decimal | None = None
+    trailing_distance: Decimal | None = None
+    client_request_id: str | None = None
+
+    def __post_init__(self) -> None:
+        """Validate the immutable BrokerOrderProtectionRequest invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
+        _text(self.order_id, "order_id")
+        _text(self.idempotency_key, "idempotency_key")
+        _request_id(self.client_request_id, "client_request_id")
+        if (
+            self.stop_loss is None
+            and self.take_profit is None
+            and self.trailing_distance is None
+        ):
+            raise ValueError(
+                "order protection requires stop loss, take profit, or trailing distance"
+            )
+        for name in ("stop_loss", "take_profit", "trailing_distance"):
+            value = getattr(self, name)
+            if value is not None:
+                _finite(value, name)
+                if value <= 0:
+                    message = f"{name} must be positive"
+                    raise ValueError(message)
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class BrokerPositionReductionRequest(_Schema):
+    """Reduce one open position by an explicit quantity (``TC-IMP-BRK-06``)."""
+
+    SCHEMA_ID: ClassVar[str] = "brokers.position_reduction_request.v1"
+    position_id: str
+    quantity: Decimal
+    quantity_unit: str
+    idempotency_key: str
+    client_request_id: str | None = None
+
+    def __post_init__(self) -> None:
+        """Validate the immutable BrokerPositionReductionRequest invariants.
+
+        Raises:
+            ValueError: If the documented operation cannot complete.
+        """
+        _text(self.position_id, "position_id")
+        _text(self.quantity_unit, "quantity_unit")
+        _positive(self.quantity, "quantity")
+        _text(self.idempotency_key, "idempotency_key")
         _request_id(self.client_request_id, "client_request_id")
 
 

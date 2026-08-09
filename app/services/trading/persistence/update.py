@@ -237,6 +237,24 @@ def update_event_projection_records(
             )
         )
 
+    if batch.transition is not None:
+        statements.append(
+            "INSERT INTO trading_order_transitions "
+            "(transition_id, order_id, from_state, to_state, source_sequence, "
+            "reason_code, occurred_at, correlation_id, causation_id, created_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        )
+        parameters.append(batch.transition.values)
+
+    if batch.fill is not None:
+        statements.append(
+            "INSERT INTO trading_fills "
+            "(fill_id, order_id, broker_fill_id, source_sequence, "
+            "quantity_decimal, price_decimal, fee_estimate_decimal, executed_at, "
+            "correlation_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        )
+        parameters.append(batch.fill.values)
+
     result = _execute(tuple(statements), tuple(parameters))
     if result.affected_rows < _MIN_ATOMIC_AFFECTED_ROWS:
         raise ValueError("Trading atomic persistence was incomplete")

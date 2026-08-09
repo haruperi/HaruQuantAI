@@ -176,6 +176,7 @@ def _from_row_raw(row: dict[str, object]) -> EconomicEvent:
             also_called=_opt_str(row, "also_called"),
             event_type=_opt_str(row, "event_type"),
             updated_at=_parse_dt(_opt_str(row, "updated_at")),
+            first_seen_at=_parse_dt(_opt_str(row, "first_seen_at")),
         )
     except (KeyError, ValueError, TypeError, ArithmeticError) as error:
         logger.exception("Failed to reconstruct an economic event row")

@@ -38,6 +38,7 @@ from app.services.data import (
     get_symbol_economic_events,
     get_symbol_event_profile,
     get_symbol_event_profiles,
+    is_event_visible_at,
     is_news_restricted,
     is_news_restricted_events,
     persist_economic_events,
@@ -428,8 +429,42 @@ def main() -> None:
             "historical_transport": type(historical_transport).__name__,
             "production_crawler_gate": crawler_gate,
         }
+    _show_point_in_time_visibility(start)
     print(f"ACTUAL DATA: {actual}")
     print("SUCCESS: FEAT-DATA-11 completed with honest provider status")
+
+
+def _show_point_in_time_visibility(start: datetime) -> None:
+    """FR-DATA-192/193: original-publication timestamp and replay visibility."""
+    published_at = start - timedelta(days=1)
+    event = build_economic_event(
+        id="recorded:us-cpi-point-in-time",
+        provider="recorded:forexfactory",
+        name="US CPI",
+        category="inflation",
+        country="US",
+        currency="USD",
+        scheduled_at=start,
+        impact=build_event_impact(3),
+        actual=None,
+        forecast=None,
+        previous=None,
+        actual_raw=None,
+        forecast_raw=None,
+        previous_raw=None,
+        unit="percent",
+        source="forexfactory",
+        source_url="https://www.forexfactory.com/calendar",
+        updated_at=published_at,
+        first_seen_at=published_at,
+    )
+    before_publication = published_at - timedelta(hours=1)
+    print(
+        "\nPoint-in-time replay visibility (FR-DATA-192/193): "
+        f"first_seen_at={event.first_seen_at.isoformat()}, "
+        f"visible_at_publication={is_event_visible_at(event, published_at)}, "
+        f"visible_before_publication={is_event_visible_at(event, before_publication)}"
+    )
 
 
 if __name__ == "__main__":

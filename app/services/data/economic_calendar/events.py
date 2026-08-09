@@ -59,7 +59,12 @@ class EconomicEvent:
         frequency: Provider release-frequency description.
         also_called: Alternative event name.
         event_type: Provider event classification.
-        updated_at: Optional last-mutated timestamp for stored events.
+        updated_at: Optional last-mutated timestamp for stored events; also the
+            event's most recent replay-visibility timestamp.
+        first_seen_at: Optional original publication timestamp — when this
+            event was first persisted, distinct from a later revision
+            recorded through `updated_at` (Trading Cockpit Phase 0
+            `TC-IMP-DATA-04`).
     """
 
     id: str
@@ -90,6 +95,7 @@ class EconomicEvent:
     also_called: str | None = None
     event_type: str | None = None
     updated_at: datetime | None = None
+    first_seen_at: datetime | None = None
 
     def __post_init__(self) -> None:
         """Validate the normalized provider boundary.
@@ -108,7 +114,12 @@ class EconomicEvent:
             if value is not None and (value != value.strip() or value != value.upper()):
                 detail = f"{field_name} must be an uppercase trimmed code"
                 raise ValueError(detail)
-        for field_name in ("scheduled_at", "original_scheduled_at", "updated_at"):
+        for field_name in (
+            "scheduled_at",
+            "original_scheduled_at",
+            "updated_at",
+            "first_seen_at",
+        ):
             value = getattr(self, field_name)
             if value is not None and (
                 value.tzinfo is None or value.utcoffset() != timedelta(0)
@@ -168,7 +179,40 @@ def project_economic_event(event: EconomicEvent) -> dict[str, Any]:
         "updated_at": (
             None if event.updated_at is None else event.updated_at.isoformat()
         ),
+        "first_seen_at": (
+            None if event.first_seen_at is None else event.first_seen_at.isoformat()
+        ),
     }
 
 
-__all__ = ["EconomicEvent", "EventImpact", "project_economic_event"]
+def is_event_visible_at(event: EconomicEvent, as_of: datetime) -> bool:
+    """Return whether one event's currently-known state was visible at `as_of`.
+
+    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-04`): a replay
+    consumer must never see an event before its original publication, and an
+    event whose publication time is unknown is never treated as visible.
+
+    Args:
+        event: Normalized economic event to check.
+        as_of: Point-in-time UTC boundary supplied by the caller.
+
+    Returns:
+        ``True`` only when `event.first_seen_at` is known and does not
+        exceed `as_of`; ``False`` otherwise (fail-closed).
+
+    Raises:
+        ValueError: If `as_of` is not timezone-aware UTC.
+    """
+    if as_of.tzinfo is None or as_of.utcoffset() != timedelta(0):
+        raise ValueError("as_of must be timezone-aware UTC")
+    if event.first_seen_at is None:
+        return False
+    return event.first_seen_at <= as_of
+
+
+__all__ = [
+    "EconomicEvent",
+    "EventImpact",
+    "is_event_visible_at",
+    "project_economic_event",
+]

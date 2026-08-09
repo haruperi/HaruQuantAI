@@ -18,14 +18,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.data import build_data_settings, data_settings_context
 from app.services.trading import (
     apply_execution_event,
+    create_execution_position,
+    create_execution_position_store,
     create_idempotency_reservation,
     create_trading_event,
     create_trading_projection,
     create_trading_request,
+    get_execution_position,
+    get_execution_position_snapshot,
     get_trading_migrations,
     get_trading_schema_version,
     reserve_idempotency,
     run_trading_migrations,
+    set_execution_position,
+    transition_execution_position,
 )
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
@@ -463,6 +469,35 @@ def fr_trd_077() -> None:
     )
 
 
+def fr_trd_084() -> None:
+    """FR-TRD-084: Maintain current execution positions only in memory."""
+    store = create_execution_position_store()
+    position = create_execution_position(
+        position_id="usage-position-001",
+        account_id="usage-account-001",
+        symbol="EURUSD",
+        broker_position_id="sim-position-001",
+        state="OPEN",
+        quantity=Decimal("1.00"),
+        average_entry_price=Decimal("1.10"),
+        source_sequence=1,
+        version=1,
+    )
+    set_execution_position(store, position)
+    reduced = transition_execution_position(
+        store,
+        "usage-position-001",
+        state="REDUCING",
+        quantity=Decimal("0.50"),
+        source_sequence=2,
+    )
+    current = get_execution_position(store, "usage-position-001")
+    snapshot = get_execution_position_snapshot(store)
+    print(
+        f"Data -> state={reduced.state}, quantity={reduced.quantity}, current={getattr(current, 'state', None)}, snapshot_count={len(snapshot)}"
+    )
+
+
 def _emit_requirement_success(function: object) -> object:
     """Wrap one example so direct execution emits its success contract."""
 
@@ -506,6 +541,7 @@ def main() -> None:
     fr_trd_075()
     fr_trd_076()
     fr_trd_077()
+    fr_trd_084()
 
     # Stage 2: Idempotency check & Validation
     fr_trd_039()

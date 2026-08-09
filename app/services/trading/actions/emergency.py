@@ -23,6 +23,7 @@ from app.services.trading.contracts import (
 )
 from app.services.trading.contracts.errors import _redacted_envelope_data
 from app.services.trading.contracts.responses import success_trading_response
+from app.services.trading.state import get_execution_position
 from app.utils import generate_id, get_logger
 
 type StandardResponse[T] = Any
@@ -308,21 +309,14 @@ async def _close_all_positions_value(
         raise TradingError(
             "RECONCILIATION_REQUIRED", "Bulk closure requires Trading state"
         )
-    state_targets = {
-        target
-        for identity, facts in projection.positions.items()
-        for target in (
-            facts.get("broker_position_id", identity)
-            if isinstance(facts, dict)
-            else None,
-        )
-        if isinstance(target, str)
-    }
     if len(snapshot.positions) > limit:
         raise TradingError("GATE_BLOCKED", "Bulk closure exceeds policy ceiling")
     results: list[dict[str, JsonValue]] = []
     for position in snapshot.positions:
-        if position.position_id not in state_targets:
+        if (
+            get_execution_position(deps.execution_positions, position.position_id)
+            is None
+        ):
             results.append(
                 {
                     "position_id": position.position_id,

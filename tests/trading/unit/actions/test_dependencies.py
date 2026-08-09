@@ -21,6 +21,7 @@ from app.services.risk import (
     create_risk_decision_package,
     get_decision_state,
 )
+from app.services.trading import create_trading_dependencies
 from app.services.trading.actions import TradingDependencies
 from app.services.trading.contracts import (
     ExecutionReceipt,
@@ -34,6 +35,9 @@ from app.services.trading.state import (
     IdempotencyReservation,
     TradingEvent,
     TradingProjection,
+    create_execution_position,
+    create_execution_position_store,
+    set_execution_position,
 )
 from app.utils import get_logger
 
@@ -46,6 +50,12 @@ logger = get_logger(__name__)
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 DATA_REQUEST_ID = "req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+
+
+def test_dependency_factory_injects_position_store_before_validation() -> None:
+    """Dependency construction always supplies the memory-only position port."""
+    with pytest.raises(TypeError):
+        create_trading_dependencies()
 
 
 class MemoryStore:
@@ -483,6 +493,9 @@ def dependencies(
         risk_source=unavailable,
         child_risk_decision_source=lambda item: None,
         execution_risk_decision_source=risk_decision,
+        execution_positions=getattr(
+            memory, "execution_positions", create_execution_position_store()
+        ),
     )
 
 
@@ -495,16 +508,26 @@ def execution_store() -> MemoryStore:
         authority_id="simulation",
         version=1,
         orders={"order-001": {"symbol": "EURUSD", "broker_order_id": "order-001"}},
-        positions={
-            "position-001": {
-                "symbol": "EURUSD",
-                "broker_position_id": "position-001",
-            }
-        },
+        positions={},
         fills={},
         receipts={},
         authority_state={},
         updated_at=NOW,
+    )
+    store.execution_positions = create_execution_position_store()
+    set_execution_position(
+        store.execution_positions,
+        create_execution_position(
+            position_id="position-001",
+            account_id="account-001",
+            symbol="EURUSD",
+            broker_position_id="position-001",
+            state="OPEN",
+            quantity=Decimal("2.00"),
+            average_entry_price=Decimal("1.10"),
+            source_sequence=1,
+            version=1,
+        ),
     )
     return store
 

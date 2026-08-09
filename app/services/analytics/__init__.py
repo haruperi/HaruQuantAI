@@ -169,6 +169,30 @@ from app.services.analytics.reports import (
 from app.services.analytics.reports import (
     serialize_report as _serialize_report,
 )
+from app.services.analytics.scoring import (
+    build_process_score_mapping as _build_process_score_mapping,
+)
+from app.services.analytics.scoring import (
+    build_scoring_profile_mapping as _build_scoring_profile_mapping,
+)
+from app.services.analytics.scoring import (
+    build_session_score as _build_session_score,
+)
+from app.services.analytics.scoring import (
+    compute_leaderboard_ranking as _compute_leaderboard_ranking,
+)
+from app.services.analytics.scoring import (
+    create_critical_failure_record as _create_critical_failure_record,
+)
+from app.services.analytics.scoring import (
+    create_process_scoring_profile as _create_process_scoring_profile,
+)
+from app.services.analytics.scoring import (
+    parse_process_score_mapping as _parse_process_score_mapping,
+)
+from app.services.analytics.scoring import (
+    parse_scoring_profile_mapping as _parse_scoring_profile_mapping,
+)
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
@@ -918,6 +942,184 @@ def truncate_series(
     )
 
 
+def create_process_scoring_profile(
+    profile_version: str,
+    dimension_weights: Mapping[str, float],
+    *,
+    critical_failure_policy: str = "invalidate",
+    critical_failure_cap: float = 0.0,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Create a validated process scoring profile.
+
+    Returns:
+        Standard response containing the immutable scoring profile.
+    """
+    return run_analytics_operation(
+        operation="analytics.scoring.create_process_scoring_profile",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _create_process_scoring_profile(
+            profile_version,
+            dimension_weights,
+            critical_failure_policy=critical_failure_policy,
+            critical_failure_cap=critical_failure_cap,
+        ),
+    )
+
+
+def create_critical_failure_record(
+    kind: str,
+    severity: str,
+    detail: str,
+    *,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Create one validated critical-failure observation record.
+
+    Returns:
+        Standard response containing the immutable failure record.
+    """
+    return run_analytics_operation(
+        operation="analytics.scoring.create_critical_failure_record",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _create_critical_failure_record(kind, severity, detail),
+    )
+
+
+def build_session_score(
+    profile: object,
+    dimension_scores: Mapping[str, float],
+    *,
+    session_id: str,
+    scored_at: datetime,
+    critical_failures: Sequence[object] = (),
+    no_trade: bool = False,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Compute one deterministic process-first session score.
+
+    Returns:
+        Standard response containing the immutable session score.
+    """
+    return run_analytics_operation(
+        operation="analytics.scoring.build_session_score",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _build_session_score(
+            cast("Any", profile),
+            dimension_scores,
+            session_id=session_id,
+            scored_at=scored_at,
+            critical_failures=cast("Any", critical_failures),
+            no_trade=no_trade,
+        ),
+    )
+
+
+def compute_leaderboard_ranking(
+    scores: Sequence[object],
+    profits: Mapping[str, str] | None = None,
+    *,
+    limit: int | None = None,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Rank sessions deterministically with process score primary.
+
+    Returns:
+        Standard response containing ordered ranking rows.
+    """
+    return run_analytics_operation(
+        operation="analytics.scoring.compute_leaderboard_ranking",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _compute_leaderboard_ranking(
+            cast("Any", scores), profits, limit=limit
+        ),
+    )
+
+
+def build_process_score_mapping(
+    score: object,
+    *,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Serialize one session score to a JSON-safe v1 mapping.
+
+    Returns:
+        Standard response containing the validated JSON-safe mapping.
+    """
+    return run_analytics_operation(
+        operation="analytics.scoring.build_process_score_mapping",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _build_process_score_mapping(cast("Any", score)),
+    )
+
+
+def parse_process_score_mapping(
+    mapping: Mapping[str, object],
+    *,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Validate and denormalize a v1 process-score mapping.
+
+    Returns:
+        Standard response containing the immutable session score.
+    """
+    return run_analytics_operation(
+        operation="analytics.scoring.parse_process_score_mapping",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _parse_process_score_mapping(mapping),
+    )
+
+
+def build_scoring_profile_mapping(
+    profile: object,
+    *,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Serialize one scoring profile to a JSON-safe v1 mapping.
+
+    Returns:
+        Standard response containing the validated JSON-safe mapping.
+    """
+    return run_analytics_operation(
+        operation="analytics.scoring.build_scoring_profile_mapping",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _build_scoring_profile_mapping(cast("Any", profile)),
+    )
+
+
+def parse_scoring_profile_mapping(
+    mapping: Mapping[str, object],
+    *,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Validate and denormalize a v1 scoring-profile mapping.
+
+    Returns:
+        Standard response containing the immutable scoring profile.
+    """
+    return run_analytics_operation(
+        operation="analytics.scoring.parse_scoring_profile_mapping",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _parse_scoring_profile_mapping(mapping),
+    )
+
+
 __all__: tuple[str, ...] = (
     "adapt_trading_result",
     "align_benchmark_series",
@@ -928,7 +1130,10 @@ __all__: tuple[str, ...] = (
     "build_portfolio_allocation_evidence",
     "build_portfolio_performance_report",
     "build_portfolio_rebalance_measurement",
+    "build_process_score_mapping",
     "build_quality_flag",
+    "build_scoring_profile_mapping",
+    "build_session_score",
     "build_warning",
     "build_worst_day_distribution",
     "calculate_benchmark_evidence",
@@ -941,11 +1146,14 @@ __all__: tuple[str, ...] = (
     "calculate_risk_evidence",
     "calculate_trade_evidence",
     "compare_performance_reports",
+    "compute_leaderboard_ranking",
     "compute_reproducibility_hashes",
     "create_analytics_run_config",
     "create_analytics_value",
     "create_closed_trade_ledger",
+    "create_critical_failure_record",
     "create_portfolio_rebalance_measurement_request",
+    "create_process_scoring_profile",
     "create_risk_free_rate_evidence",
     "create_statistical_validation_config",
     "get_analytics_dashboard_snapshot",
@@ -959,6 +1167,8 @@ __all__: tuple[str, ...] = (
     "get_metric_definition_catalog",
     "get_min_metric_samples",
     "is_analytics_value",
+    "parse_process_score_mapping",
+    "parse_scoring_profile_mapping",
     "run_analytics_migrations",
     "run_statistical_validation",
     "serialize_report",

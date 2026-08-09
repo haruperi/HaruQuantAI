@@ -36,6 +36,18 @@ _EXPECTED_EXPORTS = {
 _SQL_PREFIXES = ("SELECT ", "INSERT ", "UPDATE ", "DELETE ")
 
 
+def _business_module_trees() -> tuple[tuple[Path, ast.AST], ...]:
+    """Parse Strategy business modules once during test-module discovery."""
+    return tuple(
+        (path, ast.parse(path.read_text(encoding="utf-8")))
+        for path in _STRATEGY_ROOT.rglob("*.py")
+        if _PERSISTENCE_ROOT not in path.parents and "migrations" not in path.parts
+    )
+
+
+_BUSINESS_MODULE_TREES = _business_module_trees()
+
+
 def test_persistence_package_has_exact_crud_layout() -> None:
     """Verify the private package has only its boundary and four CRUD modules."""
     logger.debug("Checking exact Strategy persistence package layout")
@@ -56,10 +68,7 @@ def test_strategy_sql_is_confined_to_persistence_and_migrations() -> None:
     """Verify Strategy business modules contain no CRUD SQL or transaction calls."""
     logger.debug("Checking Strategy SQL ownership boundary")
     violations: list[str] = []
-    for path in _STRATEGY_ROOT.rglob("*.py"):
-        if _PERSISTENCE_ROOT in path.parents or "migrations" in path.parts:
-            continue
-        tree = ast.parse(path.read_text(encoding="utf-8"))
+    for path, tree in _BUSINESS_MODULE_TREES:
         for node in ast.walk(tree):
             if isinstance(node, ast.Call):
                 name = getattr(node.func, "id", None) or getattr(

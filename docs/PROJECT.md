@@ -69,7 +69,7 @@ satisfied.
 - These domains are not rebuilt phase-by-phase. Current repository-wide
   semantic-docstring/format cleanup is tracked separately from functional domain
   completion.
-- Indicators is built as one complete domain before Strategy, covering all approved
+- Indicators is built as one domain before Strategy, covering all approved
   Core, trend, volatility, momentum, volume, and candle-pattern indicators.
   Later roadmap allocations for those completed features become regression gates
   rather than duplicate builds.
@@ -193,6 +193,12 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Documentation**: `app/services/data/README.md`
 
 #### 2.1.4 Indicators
+
+Indicators owns deterministic measurements and versioned snapshot transports;
+Risk remains the sole authoritative regime-classification and policy-modifier owner.
+Trading Cockpit Phase 0 behavior is implemented, while package promotion remains
+temporarily blocked by the current Data error-catalogue compatibility failure in
+Indicators migration failure-path verification.
 
 * **Package**: `app/services/indicators`
 * **Responsibility**: Compute deterministic, pure-function indicator values from normalized data.

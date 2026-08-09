@@ -15,6 +15,7 @@ WORKFLOWS = (
     "wf_utl_005_error_normalization_and_routing.py",
     "wf_utl_006_trace_identity_and_utc_time.py",
     "wf_utl_007_canonical_serialization_and_digest.py",
+    "wf_utl_008_cockpit_contract_envelope.py",
 )
 
 

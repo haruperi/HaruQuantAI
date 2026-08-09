@@ -414,7 +414,13 @@ class DatasetSaveRequest(_Contract):
 
 
 class StorageManifest(_Contract):
-    """Immutable normalized artifact identity and integrity manifest."""
+    """Immutable normalized artifact identity and integrity manifest.
+
+    `available_at` (Trading Cockpit Phase 0 `TC-IMP-DATA-07`) promotes the
+    source dataset's point-in-time availability to a first-class typed
+    field so a consumer can reason about coverage/point-in-time status
+    without parsing the free-form `provenance` mapping.
+    """
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="forbid", frozen=True)
 
@@ -428,6 +434,7 @@ class StorageManifest(_Contract):
     row_count: int
     start: datetime
     end: datetime
+    available_at: datetime
     license_metadata: Mapping[str, str]
     provenance: Mapping[str, str]
     created_at: datetime
@@ -463,7 +470,7 @@ class StorageManifest(_Contract):
             raise ValueError("row_count must be non-negative")
         return value
 
-    @field_validator("start", "end", "created_at")
+    @field_validator("start", "end", "available_at", "created_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
         """Validate one DATA value or contract invariant."""

@@ -8,6 +8,7 @@ from app.services.data.sources.composition import (
     list_composable_sources,
 )
 from app.services.data.sources.policy import (
+    compute_source_trust_score,
     evaluate_source_policy,
     promote_source,
     register_source_policy,
@@ -22,6 +23,7 @@ from app.services.data.sources.registry import (
 
 __all__ = [
     "MarketDataSource",
+    "compute_source_trust_score",
     "ensure_source",
     "ensure_source_access",
     "evaluate_source_policy",

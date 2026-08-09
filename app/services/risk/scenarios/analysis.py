@@ -8,9 +8,11 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Literal
 
 from app.services.risk.contracts import (
+    LimitStatus,
     PortfolioRiskSnapshot,
     RiskDomainError,
     RiskErrorCode,
+    RiskLimitResult,
     ScenarioDefinition,
     ScenarioResult,
 )
@@ -221,4 +223,76 @@ def run_risk_scenario_analysis(
         ) from error
 
 
-__all__ = ["run_risk_scenario_analysis"]
+_STRESS_LAYERS = frozenset(
+    {
+        "nominal",
+        "liquidity_adjusted",
+        "gap",
+        "event",
+        "margin_liquidation",
+        "portfolio_stress",
+    }
+)
+
+
+@guard_risk_boundary(risk_level="medium", read_only=True)
+def evaluate_stress_loss_gate(
+    snapshot: PortfolioRiskSnapshot,
+    layer_loss_ratios: Mapping[str, Decimal],
+    max_stress_loss_ratio: Decimal,
+    *,
+    now: datetime,
+) -> RiskLimitResult:
+    """Evaluate a blocking stress-loss gate combining named stress layers.
+
+    Distinct from the advisory :func:`run_risk_scenario_analysis`/
+    ``ScenarioDefinition`` what-if analysis (``OD-RISK-01``): this is a
+    separate, new, blocking check the governor precedence can consume,
+    layering nominal, liquidity-adjusted, gap, event, margin-liquidation,
+    and portfolio-stress loss ratios without touching or renaming Risk's
+    existing advisory scenario model, pending the Simulator naming
+    decision.
+
+    Args:
+        snapshot: Immutable portfolio Risk evidence.
+        layer_loss_ratios: Non-negative equity-loss ratio per registered
+            stress layer (``nominal``, ``liquidity_adjusted``, ``gap``,
+            ``event``, ``margin_liquidation``, ``portfolio_stress``).
+        max_stress_loss_ratio: Configured maximum combined stress-loss
+            ratio.
+        now: Caller-supplied UTC evaluation time.
+
+    Returns:
+        Ordered blocking stress-loss gate result.
+
+    Raises:
+        RiskDomainError: If a layer is unregistered or a ratio is negative.
+    """
+    logger.info("Evaluating blocking Risk stress-loss gate")
+    checked_now = _utc(now)
+    del checked_now
+    unknown = set(layer_loss_ratios) - _STRESS_LAYERS
+    if unknown or any(value < 0 for value in layer_loss_ratios.values()):
+        raise RiskDomainError(
+            RiskErrorCode.CALCULATION_FAILED,
+            "stress layer identity or loss ratio is invalid",
+        )
+    total_loss_ratio = sum(layer_loss_ratios.values(), Decimal(0))
+    status = (
+        LimitStatus.FAIL
+        if total_loss_ratio > max_stress_loss_ratio
+        else LimitStatus.PASS
+    )
+    return RiskLimitResult(
+        limit_id="stress_loss_gate",
+        status=status,
+        observed_value=total_loss_ratio,
+        threshold_value=max_stress_loss_ratio,
+        reason_code=RiskErrorCode.LIMIT_FAILED if status is LimitStatus.FAIL else None,
+        evidence_refs=(snapshot.snapshot_id,),
+        precedence=0,
+        headroom_value=max_stress_loss_ratio - total_loss_ratio,
+    )
+
+
+__all__ = ["evaluate_stress_loss_gate", "run_risk_scenario_analysis"]

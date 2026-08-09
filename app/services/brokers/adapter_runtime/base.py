@@ -66,6 +66,8 @@ class _UnsupportedAdapterBase:
             BrokerCapabilityId.MODIFY_POSITION,
             BrokerCapabilityId.CLOSE_POSITION,
             BrokerCapabilityId.REPLACE_ORDER,
+            BrokerCapabilityId.ATTACH_PROTECTION,
+            BrokerCapabilityId.REDUCE_POSITION,
         }
     )
 

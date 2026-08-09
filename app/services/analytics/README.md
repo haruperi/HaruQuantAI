@@ -2,7 +2,15 @@
 
 > **Package:** `app/services/analytics`
 > **Domain ID:** `ANLT`
-> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 5 registered features remain implemented, but 13 work packages (`TC-IMP-ANL-01`..`TC-IMP-ANL-13`) add target behavior that is not yet implemented (10 `CREATE`, 3 `EXTEND`). See `### Trading Cockpit Phase 0 reconciliation`.
+> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in. The
+> 5 original features remain implemented and **`FEAT-ANLT-06` Process Scoring is now
+> `Completed`** (TC-IMP-ANL-02/03/11/12/13), including a repaired error-catalog
+> boundary. Four `CREATE` features remain missing (`FEAT-ANLT-07` Player Trade
+> Journal, `FEAT-ANLT-08` Plan-Adherence and Behavioral, `FEAT-ANLT-09`
+> Emergency-Response, `FEAT-ANLT-10` Player Qualification) and the three `EXTEND`
+> capabilities (`TC-IMP-ANL-01` trading-event stream, `TC-IMP-ANL-05` execution
+> quality, `TC-IMP-ANL-09` debrief) are still not implemented. See
+> `### Trading Cockpit Phase 0 reconciliation`.
 > **Last updated:** `2026-07-28`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -200,7 +208,7 @@ The order is the implementation sequence.
 | Completed | `FEAT-ANLT-03` Internal Pure Analytical Evidence      | `metrics/`    | Exact declarations: Section 4.3                                                                                          | Section 4.3 functional requirements | `tests/analytics/usage/features/03_metrics.py`    |
 | Completed | `FEAT-ANLT-04` Canonical Reporting                    | `reports/`    | Exact declarations and report contracts: Section 4.4                                                                     | Section 4.4 functional requirements | `tests/analytics/usage/features/04_reports.py`    |
 | Completed | `FEAT-ANLT-05` Bounded Report Projection              | `dashboards/` | Exact declarations,`DashboardPayload`, and explicit context-required `get_analytics_dashboard_snapshot`: Section 4.6 | Section 4.6 functional requirements | `tests/analytics/usage/features/05_dashboards.py` |
-| Missing | `FEAT-ANLT-06` Process Scoring | `scoring/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); process-first scoring, critical-failure override, score reproducibility, comparative scoring, no-trade scoring | `FR-ANLT-061`..`FR-ANLT-066` *(planned)* | `tests/analytics/usage/features/06_scoring.py` *(planned)* |
+| Completed | `FEAT-ANLT-06` Process Scoring | `scoring/` | Trading Cockpit Phase 0 reconciliation (§1); process-first scoring, critical-failure override, score reproducibility, comparative scoring, no-trade scoring | Section 4.7 functional requirements | `tests/analytics/usage/features/06_scoring.py` |
 | Missing | `FEAT-ANLT-07` Player Trade Journal | `journal/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); player trade journal (distinct from Simulator's replay journal) | `FR-ANLT-067`..`FR-ANLT-069` *(planned)* | `tests/analytics/usage/features/07_journal.py` *(planned)* |
 | Missing | `FEAT-ANLT-08` Plan-Adherence and Behavioral Analytics | `behavior/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); plan-adherence and behavioral analytics | `FR-ANLT-070`..`FR-ANLT-072` *(planned)* | `tests/analytics/usage/features/08_behavior.py` *(planned)* |
 | Missing | `FEAT-ANLT-09` Emergency-Response Analytics | `emergency_response/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); emergency-response analytics | `FR-ANLT-073`..`FR-ANLT-074` *(planned)* | `tests/analytics/usage/features/09_emergency_response.py` *(planned)* |
@@ -257,6 +265,10 @@ analytics/
     ├── __init__.py
     ├── truncation.py                   # Focus: deterministic bounded series
     └── payloads.py                     # Focus: DashboardPayload projection
+└── scoring/                            # Feature: process-first scoring
+    ├── __init__.py
+    ├── models.py                       # Focus: immutable scoring contracts
+    └── scoring.py                      # Focus: deterministic scoring + transport
 ```
 
 The final structure intentionally removes the mutable `registry/`, separate
@@ -1309,6 +1321,44 @@ rolling/cost/distribution/contribution charts are excluded initially.
 
 `tests/analytics/usage/features/05_dashboards.py` demonstrates `FR-ANLT-045` and
 `FR-ANLT-046`.
+
+### 4.7 `scoring/` — Process Scoring *(FEAT-ANLT-06)*
+
+Deterministic process-first scoring over the approved eight canonical
+dimensions (`preparation`, `risk`, `execution`, `plan_adherence`,
+`portfolio_management`, `emergency`, `discipline`, `post_review`). A critical
+safety/integrity/replay failure overrides the score regardless of P&L;
+identical inputs plus the scoring-profile version rebuild an identical
+SHA-256 reproducibility hash; comparative leaderboard ranking is
+process/safety/risk-adjusted with profit only secondary; and correct no-trade
+stand-downs are scored for competence. Cross-domain evidence travels as
+validated JSON-safe mappings behind `build_*`/`parse_*` function pairs (`v1`).
+Analytics remains pure/read-only: it publishes evidence and writes nothing, so
+no new `analytics_*` tables are introduced (OD-ANLT-01 stays non-blocking).
+
+**Public API and contracts:**
+`create_process_scoring_profile`, `create_critical_failure_record`,
+`build_session_score`, `compute_leaderboard_ranking`,
+`build_process_score_mapping`, `parse_process_score_mapping`,
+`build_scoring_profile_mapping`, `parse_scoring_profile_mapping` — all
+standalone functions exported from the package root.
+
+#### Functional requirements
+
+| Status | ID | Requirement | Public operation | Contracts | Failure behavior | Evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| Completed | `FR-ANLT-061` | The system shall create a versioned scoring profile whose positive dimension weights cover every canonical dimension exactly and sum to one, and transport it as a JSON-safe `analytics.scoring_profile.v1` mapping. | `create_process_scoring_profile(...)`, `build_scoring_profile_mapping(...)`, `parse_scoring_profile_mapping(...)` | `analytics.scoring_profile.v1` | `AnalyticsValidationError`: profile `file:line` invariants or transport version/schema conflict | Usage `tests/analytics/usage/features/06_scoring.py::fr_anlt_061()`; Unit `test_scoring.py::test_profile_*`, `test_profile_mapping_round_trip` |
+| Completed | `FR-ANLT-062` | The system shall create bounded critical-failure observations for safety/integrity/replay kinds with approved severities. | `create_critical_failure_record(...)` | internal | `AnalyticsValidationError`: unknown kind/severity or blank detail | Usage `06_scoring.py::fr_anlt_062()`; Unit `test_critical_failure_record_*` |
+| Completed | `FR-ANLT-063` | The system shall score one session deterministically as the weighted sum of its canonical dimension scores, including correct no-trade stand-downs, with explicit leaderboard eligibility. | `build_session_score(...)` | internal | `AnalyticsValidationError`: missing dimension, non-finite/out-of-range score, non-UTC timestamp | Usage `06_scoring.py::fr_anlt_063()`; Unit `test_complete_score_*`, `test_no_trade_*` |
+| Completed | `FR-ANLT-064` | The system shall rank sessions comparatively with process/safety/risk-adjusted score primary and profit only a deterministic secondary tiebreaker, with invalidated scores never ranked above eligible scores. | `compute_leaderboard_ranking(...)` | internal | `AnalyticsValidationError`: non-finite profit or non-positive limit | Usage `06_scoring.py::fr_anlt_064()`; Unit `test_eligible_scores_rank_above_invalidated`, `test_profit_is_secondary_to_process_score` |
+| Completed | `FR-ANLT-065` | The system shall transport one session score as a validated JSON-safe `analytics.process_score.v1` mapping with a deterministic reproducibility hash. | `build_process_score_mapping(...)`, `parse_process_score_mapping(...)` | `analytics.process_score.v1` | `AnalyticsValidationError`: version/schema conflict, invalid timestamp | Usage `06_scoring.py::fr_anlt_065()`; Unit `test_process_score_mapping_*` |
+| Completed | `FR-ANLT-066` | The system shall apply the critical-failure override (invalidate or cap a critical safety/integrity/replay score regardless of P&L) and rebuild identical scores from stored inputs plus the scoring-profile version. | `build_session_score(...)` | internal | `AnalyticsValidationError`: invalid profile or failure records | Usage `06_scoring.py::fr_anlt_066()`; Unit `test_critical_failure_invalidates_score`, `test_critical_failure_cap_policy_bounds_total`, `test_reproducibility_hash_is_deterministic` |
+
+**Implementation notes:** profiles live in `app/services/analytics/scoring/models.py`; behavior and transport in `app/services/analytics/scoring/scoring.py`; package-root wrappers in `app/services/analytics/__init__.py`. The score `scored_at` timestamp is excluded from the reproducibility hash so identical inputs rebuild an identical digest. Fail-closed classification is verified by `tests/analytics/unit/test_scoring.py` response-status assertions.
+
+### Feature usage examples
+
+`tests/analytics/usage/features/06_scoring.py` demonstrates `FR-ANLT-061`–`FR-ANLT-066`.
 
 ---
 

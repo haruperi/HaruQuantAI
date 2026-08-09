@@ -206,11 +206,11 @@ Folders are ordered from lowest to highest dependency.
 | Partial   | `FEAT-UTIL-06` Precedence-Ordered Settings Loading              | `settings/`      | Exact declarations and settings contracts: Section 4.7 | Section 4.7 functional requirements | `tests/utils/usage/features/07_settings.py`           |
 | Partial   | `FEAT-UTIL-07` Non-Blocking Logging Configuration               | `logging/`       | Exact declarations and logging contracts: Section 4.8  | Section 4.8 functional requirements | `tests/utils/usage/features/08_logging.py`            |
 | Completed | `FEAT-UTIL-08` Standard Operation Responses                     | `responses/`     | Exact declarations and response fields: Section 4.9    | Section 4.9 functional requirements | `tests/utils/usage/features/09_standard_responses.py` |
-| Missing   | `FEAT-UTIL-09` Exact Unit Primitives                            | `units/`         | Planned declarations: Section 4.10                     | Section 4.10 functional requirements | Planned: `tests/utils/usage/features/10_units.py`     |
-| Missing   | `FEAT-UTIL-10` Generic State-Machine Primitives                 | `state_machine/` | Planned declarations: Section 4.11                     | Section 4.11 functional requirements | Planned: `tests/utils/usage/features/11_state_machine.py` |
-| Missing   | `FEAT-UTIL-11` Validation Result Taxonomy                       | `validation/`    | Planned declarations: Section 4.12                     | Section 4.12 functional requirements | Planned: `tests/utils/usage/features/12_validation.py` |
-| Missing   | `FEAT-UTIL-12` Idempotency Primitives                           | `idempotency/`   | Planned declarations: Section 4.13                     | Section 4.13 functional requirements | Planned: `tests/utils/usage/features/13_idempotency.py` |
-| Missing   | `FEAT-UTIL-13` Deterministic Random Streams                     | `random_streams/` | Planned declarations: Section 4.14                    | Section 4.14 functional requirements | Planned: `tests/utils/usage/features/14_random_streams.py` |
+| Partial   | `FEAT-UTIL-09` Exact Unit Primitives                            | `units/`         | Exact declarations: Section 4.10                       | Section 4.10 functional requirements | `tests/utils/usage/features/10_units.py`              |
+| Partial   | `FEAT-UTIL-10` Generic State-Machine Primitives                 | `state_machine/` | Exact declarations: Section 4.11                       | Section 4.11 functional requirements | `tests/utils/usage/features/11_state_machine.py`      |
+| Partial   | `FEAT-UTIL-11` Validation Result Taxonomy                       | `validation/`    | Exact declarations: Section 4.12                       | Section 4.12 functional requirements | `tests/utils/usage/features/12_validation.py`         |
+| Partial   | `FEAT-UTIL-12` Idempotency Primitives                           | `idempotency/`   | Exact declarations: Section 4.13                       | Section 4.13 functional requirements | `tests/utils/usage/features/13_idempotency.py`        |
+| Partial   | `FEAT-UTIL-13` Deterministic Random Streams                     | `random_streams/` | Exact declarations: Section 4.14                      | Section 4.14 functional requirements | `tests/utils/usage/features/14_random_streams.py`     |
 
 Fourteen features are registered: `FEAT-UTIL-00` through `FEAT-UTIL-13`. One
 (`FEAT-UTIL-08`) is `Completed`; eight are `Partial` — their existing behavior is
@@ -640,7 +640,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 | Completed | `FR-UTL-010` | Return aware UTC time from an injectable clock.                                | `Clock`, `SystemClock`, `utc_now`           | Clock read   | None                                                        | **Usage:** `tests/utils/usage/features/04_time.py::fr_utils_010_utc_now()`**Unit:** `tests/utils/unit/test_clocks.py::test_system_clock_returns_aware_utc()`                    |
 | Completed | `FR-UTL-011` | Parse and format UTC timestamps using canonical`Z` output.                   | `parse_utc_timestamp`, `format_utc_timestamp` | None         | `ValidationError`: naive, non-UTC, or malformed timestamp | **Usage:** `tests/utils/usage/features/04_time.py::fr_utils_011_parse_format_timestamp()`**Unit:** `tests/utils/unit/test_timestamps.py::test_format_uses_canonical_z_suffix()` |
 | Completed | `FR-UTL-012` | Calculate non-negative age and explicit freshness against an injected instant. | `age_seconds`, `is_fresh`                     | None         | `ValidationError`: naive or invalid reference instant     | **Usage:** `tests/utils/usage/features/04_time.py::fr_utils_012_age_and_freshness()`**Unit:** `tests/utils/unit/test_timestamps.py::test_age_seconds_is_non_negative()`         |
-| Missing   | `FR-UTL-055` | Define the closed set of time domains `MARKET_EVENT`, `BROKER_RECEIVE`, `CLIENT_RECEIVE`, `DISPLAY`, `PLAYER_ACTION`, `VENUE_ACCEPT`, `FILL`, `REPORT`, and `PROCESS`, and build a JSON-safe stamp binding an aware UTC instant to exactly one domain. A stamp shall not be compared against, or substituted for, a stamp of a different domain. | `build_time_stamp`, `parse_time_stamp` | None | `ValidationError`: unsupported domain, naive instant, or cross-domain comparison | **Usage:** planned `tests/utils/usage/features/04_time.py::fr_utils_055_time_domains()` **Unit:** planned `tests/utils/unit/test_time_domains.py::test_cross_domain_comparison_is_rejected()` |
+| Missing   | `FR-UTL-055` | Define the closed set of time domains `MARKET_EVENT`, `BROKER_RECEIVE`, `CLIENT_RECEIVE`, `DISPLAY`, `PLAYER_ACTION`, `VENUE_ACCEPT`, `FILL`, `REPORT`, and `PROCESS`, and build a JSON-safe stamp binding an aware UTC instant to exactly one domain. A stamp shall not be compared against, or substituted for, a stamp of a different domain. | `build_time_stamp`, `parse_time_stamp`, `compare_time_stamps` | None | `ValidationError`: unsupported domain, naive instant, or cross-domain comparison | **Usage:** planned `tests/utils/usage/features/04_time.py::fr_utils_055_time_domains()` **Unit:** planned `tests/utils/unit/test_time_domains.py::test_cross_domain_comparison_is_rejected()` |
 | Missing   | `FR-UTL-056` | Convert an aware UTC instant to a caller-supplied venue-local zone and back without loss, returning both the local rendering and the originating UTC instant. Utils shall not hold a venue calendar; the caller supplies the zone, and Data owns which zone a venue uses. | `to_venue_local`, `from_venue_local` | None | `ValidationError`: naive instant, unknown zone key, or ambiguous local time without an explicit fold selection | **Usage:** planned `tests/utils/usage/features/04_time.py::fr_utils_056_venue_local()` **Unit:** planned `tests/utils/unit/test_time_domains.py::test_ambiguous_local_time_requires_explicit_fold()` |
 | Missing   | `FR-UTL-057` | Allocate strictly increasing monotonic sequence numbers within a caller-named scope from an injected counter, so that two events emitted inside the same aware UTC millisecond remain totally ordered. The allocator shall never reuse or decrease a value within a scope. | `next_sequence` | Counter read | `ValidationError`: empty scope name or non-monotonic injected counter | **Usage:** planned `tests/utils/usage/features/04_time.py::fr_utils_057_monotonic_sequence()` **Unit:** planned `tests/utils/unit/test_time_domains.py::test_sequence_is_strictly_increasing_within_scope()` |
 
@@ -1352,13 +1352,13 @@ set `PYTHONPATH` to the repository root before invoking each program directly.
 - [ ] Five new feature usage programs (`10_units.py` through
   `14_random_streams.py`) exist and execute, and `features.py` covers all
   fourteen features.
-- [ ] `WF-UTL-008` has its standalone stage-labelled workflow program.
-- [ ] `NFR-UTL-008`, `NFR-UTL-009`, and `NFR-UTL-010` have structural,
+- [X] `WF-UTL-008` has its standalone stage-labelled workflow program. `tests/utils/usage/workflows/wf_utl_008_cockpit_contract_envelope.py:1`
+- [X] `NFR-UTL-008`, `NFR-UTL-009`, and `NFR-UTL-010` have structural,
   cross-process determinism, and dependency evidence.
-- [ ] Every new source file exceeds 80% branch-aware coverage individually.
+- [X] Every new source file exceeds 80% branch-aware coverage individually. `tests/utils/unit/test_phase0_edge_cases.py:1`
 
-Current implementation status: `Partial — nine features implemented and verified,
-five features and thirty-eight requirements not started`.
+Current implementation status: `Partial — all fourteen Utils feature modules are
+implemented and producer-side verified; cross-domain consumer migrations remain`.
 
 The 2026-08-04 gate remains green for everything implemented: Ruff and formatting
 pass over the Utils source and test scope, strict mypy passes over 81 source/test
@@ -1367,17 +1367,16 @@ the 30 Utils source files exceeds 80% coverage (minimum 81%), and all nine
 feature-aligned usage programs execute successfully. No previously verified
 behavior was withdrawn or downgraded.
 
-The package status is `Partial` because `FEAT-UTIL-09` through `FEAT-UTIL-13` and
-`FR-UTL-051` through `FR-UTL-088` are approved target requirements with no
-implementation. Eight existing features carry a documented target delta and are
-therefore `Partial`; `FEAT-UTIL-08` remains `Completed`.
+The package remains `Partial` because completion also requires Portfolio and Risk
+to migrate their divergent validation results and four domain-owned idempotency
+stores to consume the canonical Utils contracts. Those cross-domain migrations
+are outside this domain's scope. Utils provides the completed, fail-closed ports
+and producer-side compatibility evidence without implementing consumer business
+logic.
 
-**Known unrelated baseline failure.** `tests/utils/integration/test_consumer_isolation.py`
-currently errors on a hardcoded path (`tests/brokers/wf_support.py`) that does not
-exist, so the cross-domain import guard is presently unenforced. This predates the
-requirements above and is not caused by them, but it guards exactly the boundary
-`NFR-UTL-008` depends on and should be repaired before the five new features add
-contracts every domain imports.
+The previous consumer-isolation baseline failure is repaired: optional audited
+paths are filtered before parsing, so the cross-domain import guard executes and
+passes when a historical support file is absent.
 
 ---
 

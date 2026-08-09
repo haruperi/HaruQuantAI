@@ -62,7 +62,7 @@ class TradingProjection(BaseModel):
     version: int
     event_ids: tuple[str, ...] = ()
     orders: Mapping[str, JsonValue]
-    positions: Mapping[str, JsonValue]
+    positions: Mapping[str, JsonValue] = Field(default_factory=dict, exclude=True)
     fills: Mapping[str, JsonValue]
     receipts: Mapping[str, JsonValue]
     authority_state: Mapping[str, JsonValue]
@@ -135,6 +135,26 @@ class TradingProjection(BaseModel):
         """
         logger.debug("Validating TradingProjection facts")
         return _freeze_mapping(value)
+
+    @field_validator("positions")
+    @classmethod
+    def _reject_persisted_positions(
+        cls, value: Mapping[str, JsonValue]
+    ) -> Mapping[str, JsonValue]:
+        """Reject active position bodies in a durable projection.
+
+        Args:
+            value: Candidate compatibility field.
+
+        Returns:
+            The empty compatibility mapping.
+
+        Raises:
+            ValueError: If any current-position body is supplied.
+        """
+        if value:
+            raise ValueError("current positions are memory-only")
+        return value
 
     @field_validator("updated_at")
     @classmethod
@@ -262,7 +282,6 @@ def _project_event(
     """
     logger.debug("Projecting Trading event type %s", event.event_type)
     orders = dict(current.orders)
-    positions = dict(current.positions)
     fills = dict(current.fills)
     receipts = dict(current.receipts)
     authority_state = dict(current.authority_state)
@@ -280,10 +299,6 @@ def _project_event(
         )
     elif event.event_type == "fill_recorded":
         fills[event.event_id] = facts
-        position_id = facts.get("position_id")
-        position = facts.get("position")
-        if isinstance(position_id, str) and isinstance(position, dict):
-            positions[position_id] = position
     elif event.event_type == "reconciliation_transitioned":
         authority_state[event.event_id] = facts
         _merge_readiness(facts, readiness)
@@ -299,7 +314,7 @@ def _project_event(
         version=current.version + 1,
         event_ids=(*current.event_ids, event.event_id),
         orders=orders,
-        positions=positions,
+        positions={},
         fills=fills,
         receipts=receipts,
         authority_state=authority_state,

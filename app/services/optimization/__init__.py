@@ -6,7 +6,16 @@ from typing import TYPE_CHECKING
 
 from app.services.optimization.evidence.assemble import build_optimization_evidence
 from app.services.optimization.evidence.handoff import build_report_package
+from app.services.optimization.evidence.promotion import (
+    evaluate_promotion_gate,
+    get_promotion_contract_version,
+)
 from app.services.optimization.execution.adapter import execute_candidate
+from app.services.optimization.execution.calibration import (
+    get_calibration_contract_version,
+    resolve_fill_model_calibration,
+    resolve_scenario_difficulty_calibration,
+)
 from app.services.optimization.migrations import (
     get_optimization_migrations,
     run_optimization_migrations,
@@ -19,6 +28,12 @@ from app.services.optimization.parameters import (
 from app.services.optimization.parameters.hashing import (
     candidate_hash,
     parameter_space_hash,
+)
+from app.services.optimization.parameters.study import (
+    build_optimization_study,
+    get_optimization_study_contract_version,
+    get_optimization_study_schema_id,
+    parse_optimization_study,
 )
 from app.services.optimization.persistence import create_optimization_state_store
 from app.services.optimization.public_api import (
@@ -55,11 +70,27 @@ from app.services.optimization.robustness.monte_carlo import (
     run_monte_carlo,
     run_parametric_simulation,
 )
+from app.services.optimization.robustness.risk_sensitivity import (
+    evaluate_risk_sensitivity,
+    get_risk_sensitivity_contract_version,
+    summarize_drawdown_threshold_sensitivity,
+)
 from app.services.optimization.robustness.stress import apply_execution_cost_stress
+from app.services.optimization.robustness.stress_calibration import (
+    get_stress_calibration_contract_version,
+    resolve_stress_profile_calibration,
+)
 from app.services.optimization.scoring.metrics import (
     calculate_candidate_score,
     calculate_deflated_sharpe,
     count_nominal_trials,
+)
+from app.services.optimization.scoring.multi_objective import (
+    build_multi_objective_mapping,
+    evaluate_multi_objective_candidate,
+    get_multi_objective_contract_version,
+    get_multi_objective_schema_id,
+    parse_multi_objective_mapping,
 )
 from app.services.optimization.scoring.overfit import assess_overfit_evidence
 from app.services.optimization.scoring.ranking import (
@@ -78,6 +109,16 @@ from app.services.optimization.state.read import load_optimization_result
 from app.services.optimization.state.stores import (
     load_search_checkpoint,
     save_search_checkpoint,
+)
+from app.services.optimization.validation.envelope_gate import (
+    evaluate_candidate_envelope,
+    filter_candidates_by_envelope,
+    get_envelope_gate_contract_version,
+)
+from app.services.optimization.validation.scenario_holdout import (
+    detect_scenario_leakage,
+    evaluate_scenario_holdout,
+    get_scenario_holdout_contract_version,
 )
 from app.services.optimization.validation.splits import build_time_series_splits
 from app.services.optimization.validation.walk_forward import (
@@ -137,9 +178,11 @@ __all__ = (
     "apply_execution_cost_stress",
     "assess_overfit_evidence",
     "assess_strategy_robustness",
+    "build_multi_objective_mapping",
     "build_optimization_artifact_path",
     "build_optimization_evidence",
     "build_optimization_handoff",
+    "build_optimization_study",
     "build_report_package",
     "build_simulation_analytics_backtest_adapter",
     "build_time_series_splits",
@@ -155,25 +198,47 @@ __all__ = (
     "create_optimization_state_store",
     "create_optimization_value",
     "detect_overfit_parameters",
+    "detect_scenario_leakage",
     "dump_optimization_value",
     "estimate_drawdown_mode_sensitivity",
     "estimate_first_passage",
     "estimate_joint_first_passage",
+    "evaluate_candidate_envelope",
     "evaluate_constraints",
+    "evaluate_multi_objective_candidate",
+    "evaluate_promotion_gate",
+    "evaluate_risk_sensitivity",
+    "evaluate_scenario_holdout",
     "execute_candidate",
+    "filter_candidates_by_envelope",
+    "get_calibration_contract_version",
+    "get_envelope_gate_contract_version",
     "get_executable_parameters",
+    "get_multi_objective_contract_version",
+    "get_multi_objective_schema_id",
     "get_official_optimization_tools",
     "get_optimization_migrations",
+    "get_optimization_study_contract_version",
+    "get_optimization_study_schema_id",
     "get_optimization_trace_id",
     "get_optimization_value_field",
+    "get_promotion_contract_version",
+    "get_risk_sensitivity_contract_version",
+    "get_scenario_holdout_contract_version",
+    "get_stress_calibration_contract_version",
     "is_optimization_value",
     "iter_grid_candidates",
     "load_optimization_result",
     "load_search_checkpoint",
     "parameter_space_hash",
+    "parse_multi_objective_mapping",
+    "parse_optimization_study",
     "persist_optimization_result",
     "rank_candidates",
     "rank_parameter_sets",
+    "resolve_fill_model_calibration",
+    "resolve_scenario_difficulty_calibration",
+    "resolve_stress_profile_calibration",
     "run_bounded_search",
     "run_monte_carlo",
     "run_optimization_migrations",
@@ -187,6 +252,7 @@ __all__ = (
     "save_search_checkpoint",
     "select_pareto_candidates",
     "select_top_candidates",
+    "summarize_drawdown_threshold_sensitivity",
     "validate_parameter_space",
     "validate_request_id",
 )

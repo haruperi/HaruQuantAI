@@ -16,6 +16,7 @@ from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 type _Codec = tuple[Callable[[object], str], Callable[[str], object]]
+_PROTECTIVE_LEG_COUNT = 2
 
 
 class _TransactionResult(Protocol):
@@ -334,10 +335,111 @@ def create_closed_position_record(record: object) -> None:
         raise ValueError("closed position was not persisted")
 
 
+def create_protective_order_records(
+    plan: object, *, correlation_id: str, occurred_at: datetime
+) -> None:
+    """Persist the stop and target legs of one validated protection plan atomically.
+
+    Raises:
+        TypeError: If the value is not a Trading protective-order plan.
+        ValueError: If both append-only legs cannot be confirmed.
+    """
+    from app.services.trading.protective_orders.contracts import _ProtectiveOrderPlan
+
+    if not isinstance(plan, _ProtectiveOrderPlan):
+        raise TypeError("protective-order persistence requires a validated plan")
+    timestamp = occurred_at.isoformat()
+    statement = (
+        "INSERT INTO trading_protective_orders "
+        "(protective_order_id, position_id, order_id, protection_type, "
+        "quantity_decimal, price_decimal, state, oco_group_id, source_sequence, "
+        "correlation_id, created_at, updated_at) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    )
+    common = (
+        plan.position_id,
+        plan.order_id,
+        str(plan.quantity),
+        "pending",
+        plan.oco_group_id,
+        plan.source_sequence,
+        correlation_id,
+        timestamp,
+        timestamp,
+    )
+    result = _execute(
+        (statement, statement),
+        (
+            (
+                f"{plan.plan_id}:stop",
+                common[0],
+                common[1],
+                "stop",
+                common[2],
+                str(plan.stop_price),
+                *common[3:],
+            ),
+            (
+                f"{plan.plan_id}:target",
+                common[0],
+                common[1],
+                "target",
+                common[2],
+                str(plan.target_price),
+                *common[3:],
+            ),
+        ),
+        max_rows=2,
+    )
+    if result.affected_rows != _PROTECTIVE_LEG_COUNT:
+        raise ValueError("protective-order plan was not persisted atomically")
+
+
+def create_trade_ownership_record(
+    ownership: object, *, correlation_id: str, occurred_at: datetime
+) -> None:
+    """Append one validated ownership fact.
+
+    Raises:
+        TypeError: If the value is not a Trading ownership contract.
+        ValueError: If the append cannot be confirmed.
+    """
+    from app.services.trading.trade_ownership.contracts import _TradeOwnership
+
+    if not isinstance(ownership, _TradeOwnership):
+        raise TypeError("ownership persistence requires validated evidence")
+    result = _execute(
+        (
+            "INSERT INTO trading_trade_ownership "
+            "(ownership_id, position_id, owner_type, owner_id, trade_plan_id, "
+            "session_id, source_sequence, released, correlation_id, created_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        ),
+        (
+            (
+                ownership.ownership_id,
+                ownership.position_id,
+                ownership.owner_type,
+                ownership.owner_id,
+                ownership.trade_plan_id,
+                ownership.session_id,
+                ownership.source_sequence,
+                int(ownership.released),
+                correlation_id,
+                occurred_at.isoformat(),
+            ),
+        ),
+    )
+    if result.affected_rows != 1:
+        raise ValueError("trade ownership was not persisted")
+
+
 __all__ = [
     "create_closed_position_record",
     "create_event_record",
     "create_idempotency_record",
     "create_projection_record",
+    "create_protective_order_records",
+    "create_trade_ownership_record",
     "create_trading_runtime_store",
 ]

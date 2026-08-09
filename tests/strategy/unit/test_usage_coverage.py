@@ -29,6 +29,12 @@ _FEATURE_REQUIREMENTS = {
     "signals": ("09_signals.py", {47, 48}),
     "evaluators": ("10_strategy_library.py", set(range(40, 47))),
     "proposal_intake": ("11_proposal_intake.py", set(range(49, 54))),
+    "operating_envelope": (
+        "12_operating_envelope.py",
+        {*range(54, 57), *range(63, 83)},
+    ),
+    "exit_plans": ("13_exit_plans.py", set(range(57, 60))),
+    "manual_plans": ("14_manual_plans.py", set(range(60, 63))),
 }
 
 
@@ -77,7 +83,7 @@ def test_every_requirement_has_one_feature_local_demonstration() -> None:
         duplicates = observed & actual
         assert not duplicates, f"duplicate FR demonstrations: {duplicates}"
         observed.update(actual)
-    assert observed == set(range(1, 54))
+    assert observed == set(range(1, 83))
 
 
 def test_usage_programs_import_domain_dependencies_from_package_roots() -> None:

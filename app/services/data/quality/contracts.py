@@ -45,6 +45,19 @@ class QualityFlag(StrEnum):
     Values are the exact issue codes emitted by the detectors, so a flag can be
     compared against a raw ``QualityIssue.code`` without translation.
 
+    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-06`) targeted a
+    seven-concept data-integrity taxonomy: stale, gap, duplicate, crossed,
+    out-of-order, clock-drift, and primary/backup disagreement. Rechecked
+    (rule 9) against the current repository: `MISSING_BARS` (gap) and
+    `DUPLICATE_BARS` (duplicate) already existed. A crossed quote (`ask <
+    bid`) can never reach a series in the first place — `TickRecord`
+    rejects it fail-closed at construction (`contracts/records.py:218`) per
+    this module's own stated principle that record-level conditions are
+    enforced before construction, not re-detected here — so no
+    `CROSSED_QUOTE` series flag exists or is needed. `OUT_OF_ORDER`,
+    `CLOCK_DRIFT`, `STALE_QUOTE`, and `SOURCE_DISAGREEMENT` are new,
+    each backed by a real detector in `anomalies.py`.
+
     Attributes:
         MISSING_BARS: Expected bars absent against the timeframe frequency.
         DUPLICATE_BARS: Two records share a timestamp.
@@ -52,6 +65,10 @@ class QualityFlag(StrEnum):
         FLAT_LINE: Price unchanged across a run longer than the profile allows.
         ZERO_VOLUME: Volume zero across a run longer than the profile allows.
         SPREAD_BREACH: Spread exceeded the profile ceiling.
+        OUT_OF_ORDER: A record's timestamp preceded the immediately prior record.
+        CLOCK_DRIFT: A record's receive time drifted from its own event time.
+        STALE_QUOTE: The newest record's receive time exceeded the maximum age.
+        SOURCE_DISAGREEMENT: Primary and backup sources disagreed beyond tolerance.
     """
 
     MISSING_BARS = "MISSING_BARS"
@@ -60,6 +77,10 @@ class QualityFlag(StrEnum):
     FLAT_LINE = "FLAT_LINE"
     ZERO_VOLUME = "ZERO_VOLUME"
     SPREAD_BREACH = "SPREAD_BREACH"
+    OUT_OF_ORDER = "OUT_OF_ORDER"
+    CLOCK_DRIFT = "CLOCK_DRIFT"
+    STALE_QUOTE = "STALE_QUOTE"
+    SOURCE_DISAGREEMENT = "SOURCE_DISAGREEMENT"
 
 
 def _aggregate_flags_raw(report: DataQualityReport) -> tuple[QualityFlag, ...]:

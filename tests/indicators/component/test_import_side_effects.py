@@ -23,7 +23,7 @@ def test_importing_indicators_has_no_persistent_side_effects() -> None:
         "assert ind.join_indicator_result is not None;"
         "after={p.name for p in pathlib.Path.cwd().iterdir()};"
         "assert before==after,'import created filesystem entries';"
-        "assert len(ind.__all__)==31,'unexpected public surface';"
+        "assert len(ind.__all__)==42,'unexpected public surface';"
         "assert all(callable(getattr(ind, name)) for name in ind.__all__),'non-function in public surface';"
         "assert callable(ind.doji),'public numerical export did not resolve';"
         "print('OK')"

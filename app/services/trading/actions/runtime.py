@@ -22,6 +22,7 @@ from app.services.trading.contracts import (
 )
 from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.monitoring import OperationalEvent, emit_runtime_event
+from app.services.trading.state import get_execution_position_snapshot
 from app.utils import canonical_json, get_logger
 
 type StandardResponse[T] = Any
@@ -144,14 +145,15 @@ def _state_target(
         if not isinstance(target, str):
             raise TradingError("RECONCILIATION_REQUIRED", "Order target is malformed")
         return target, None, projection.version
+    positions = get_execution_position_snapshot(deps.execution_positions)
     matches = [
         identity
-        for identity, facts in projection.positions.items()
+        for identity, facts in positions.items()
         if isinstance(facts, dict) and facts.get("symbol") == intent.symbol
     ]
     if len(matches) != 1:
         raise TradingError("RECONCILIATION_REQUIRED", "Position target is ambiguous")
-    facts = projection.positions[matches[0]]
+    facts = positions[matches[0]]
     target = (
         facts.get("broker_position_id", matches[0])
         if isinstance(facts, dict)

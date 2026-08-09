@@ -27,6 +27,8 @@ def test_no_consumer_imports_or_mutates_utils_internals() -> None:
         repository_root / "tests" / "brokers" / "wf_support.py",
     ]
     for source_file in source_files:
+        if not source_file.is_file():
+            continue
         if source_root in source_file.parents or source_file == source_root:
             continue
         tree = ast.parse(source_file.read_text(encoding="utf-8"))

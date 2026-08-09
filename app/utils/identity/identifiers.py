@@ -8,7 +8,24 @@ import uuid
 
 from app.utils.errors.exceptions import ValidationError
 
-SUPPORTED_TRACE_PREFIXES = frozenset({"req", "wf", "cor", "cau", "evt"})
+SUPPORTED_TRACE_PREFIXES = frozenset(
+    {
+        "brn",
+        "cau",
+        "cor",
+        "evt",
+        "fil",
+        "led",
+        "ord",
+        "ply",
+        "prf",
+        "req",
+        "rpl",
+        "scn",
+        "ses",
+        "wf",
+    }
+)
 SUPPORTED_STABLE_PREFIXES = frozenset({"id"})
 _STABLE_HEX = re.compile(r"[0-9a-f]{64}\Z")
 _MAX_IDENTITY_MATERIAL_BYTES = 4_096

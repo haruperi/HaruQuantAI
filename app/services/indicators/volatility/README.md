@@ -1,5 +1,9 @@
 # Volatility Indicators
 
+Trading Cockpit Phase 0 extends this feature with `measure_market_speed` and
+`measure_volatility_envelope`. Both consume explicit causal measurements and
+thresholds, perform no I/O, and publish no Risk regime or trading decision.
+
 This module owns `FEAT-INDI-05`: ATR, ADR, rolling return volatility, and
 rolling price standard deviation. Each production file implements one official
 indicator.

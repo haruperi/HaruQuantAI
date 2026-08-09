@@ -101,7 +101,7 @@ def _broker_evidence(
         )
     try:
         parsed_timestamp = parse_utc_timestamp(timestamp)
-    except ValueError as error:
+    except Exception as error:
         raise TradingError(
             "MALFORMED_RECEIPT",
             "Broker result timestamp is malformed",

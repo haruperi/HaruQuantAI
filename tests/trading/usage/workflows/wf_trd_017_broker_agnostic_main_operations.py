@@ -60,7 +60,7 @@ Target = Literal["sim", "mt5", "ctrader"]
 
 # Change only this line to select the execution target. Broker targets still
 # require verified non-production settings and explicit mutation opt-in.
-EXECUTION_TARGET: Target = "mt5"
+EXECUTION_TARGET: Target = "sim"
 
 WORKFLOW_ID = "WF-TRD-017"
 STAGES = (
@@ -1412,7 +1412,11 @@ async def example_10_calculate_profit_margin(context: OperationsContext) -> None
     _stage(10)
     adapter = context.adapter
     virtual = adapter is None
-    if adapter is None and load_settings().environment == "dev":
+    if (
+        adapter is None
+        and context.target != "sim"
+        and load_settings().environment == "dev"
+    ):
         try:
             connection = resolve_provider_connection_config(
                 "mt5",
@@ -1429,6 +1433,13 @@ async def example_10_calculate_profit_margin(context: OperationsContext) -> None
             adapter = None
 
     if adapter is None:
+        quantity = Decimal("0.02")
+        contract_size = Decimal(100000)
+        input_price = Decimal("1.1000")
+        target_price = Decimal("1.1100")
+        leverage = Decimal(100)
+        required_margin = quantity * contract_size * input_price / leverage
+        hypothetical_profit = quantity * contract_size * (target_price - input_price)
         _print_section(
             "PROFIT AND MARGIN CALCULATION",
             (
@@ -1437,10 +1448,10 @@ async def example_10_calculate_profit_margin(context: OperationsContext) -> None
                 ("Quantity", "0.02 lots"),
                 ("Input Price", "1.1000"),
                 ("Target Price", "1.1100"),
-                ("Required Margin", "22.00 USD"),
-                ("Hypothetical Profit", "20.00 USD"),
+                ("Required Margin", f"{required_margin:.2f} USD"),
+                ("Hypothetical Profit", f"{hypothetical_profit:.2f} USD"),
                 ("Virtual", "Yes"),
-                ("Evidence", "Teaching values; not observed performance"),
+                ("Evidence", "Deterministic calculation; not observed performance"),
             ),
         )
         return

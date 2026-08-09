@@ -2,7 +2,6 @@
 
 # ruff: noqa: INP001
 
-import ast
 import inspect
 from pathlib import Path
 from types import SimpleNamespace
@@ -58,14 +57,15 @@ def test_data_runtime_crud_calls_are_confined_to_persistence() -> None:
     for path in _TRADING_ROOT.rglob("*.py"):
         if _PERSISTENCE_ROOT in path.parents:
             continue
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        for node in ast.walk(tree):
-            if (
-                isinstance(node, ast.Call)
-                and isinstance(node.func, ast.Name)
-                and node.func.id in _DATA_RUNTIME_OPERATIONS
+        source = path.read_text(encoding="utf-8")
+        for line_number, line in enumerate(source.splitlines(), start=1):
+            stripped = line.strip()
+            if stripped.startswith("def "):
+                continue
+            if any(
+                f"{operation}(" in stripped for operation in _DATA_RUNTIME_OPERATIONS
             ):
-                violations.append(f"{path.relative_to(_PROJECT_ROOT)}:{node.lineno}")
+                violations.append(f"{path.relative_to(_PROJECT_ROOT)}:{line_number}")
     assert violations == []
 
 

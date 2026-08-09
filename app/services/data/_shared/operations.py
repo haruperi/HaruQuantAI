@@ -71,7 +71,9 @@ from app.services.data.evidence.market_context_contracts import (
     MarketContextRequest,
 )
 from app.services.data.local_datasets import contracts as _local_contracts
+from app.services.data.market_data import level1 as _level1
 from app.services.data.market_data import requests as _market_requests
+from app.services.data.market_data import snapshot as _snapshot
 from app.services.data.market_data import symbol_metadata as _symbol_metadata
 from app.services.data.market_data.requests import MarketDataRequest
 from app.services.data.market_data.symbol_metadata import SymbolMetadata
@@ -660,3 +662,43 @@ def build_audit_event_query(*args: Any, **kwargs: Any) -> Any:
 def build_audit_event_page(*args: Any, **kwargs: Any) -> Any:
     """Build one bounded audit-event query page."""
     return AuditEventPage(*args, **kwargs)
+
+
+def build_trade_payload(*args: Any, **kwargs: Any) -> Any:
+    """Build one TradePayload value through the Data public boundary."""
+    return _feed_contracts.TradePayload(*args, **kwargs)
+
+
+def build_depth_update_payload(*args: Any, **kwargs: Any) -> Any:
+    """Build one DepthUpdatePayload value through the Data public boundary."""
+    return _feed_contracts.DepthUpdatePayload(*args, **kwargs)
+
+
+def build_venue_state_payload(*args: Any, **kwargs: Any) -> Any:
+    """Build one VenueStatePayload value through the Data public boundary."""
+    return _feed_contracts.VenueStatePayload(*args, **kwargs)
+
+
+def build_halt_payload(*args: Any, **kwargs: Any) -> Any:
+    """Build one HaltPayload value through the Data public boundary."""
+    return _feed_contracts.HaltPayload(*args, **kwargs)
+
+
+def build_auction_payload(*args: Any, **kwargs: Any) -> Any:
+    """Build one AuctionPayload value through the Data public boundary."""
+    return _feed_contracts.AuctionPayload(*args, **kwargs)
+
+
+def build_corporate_action_payload(*args: Any, **kwargs: Any) -> Any:
+    """Build one CorporateActionPayload value through the Data public boundary."""
+    return _feed_contracts.CorporateActionPayload(*args, **kwargs)
+
+
+def build_level1_snapshot_request(*args: Any, **kwargs: Any) -> Any:
+    """Build one Level1SnapshotRequest value through the Data public boundary."""
+    return _level1.Level1SnapshotRequest(*args, **kwargs)
+
+
+def build_market_snapshot_request(*args: Any, **kwargs: Any) -> Any:
+    """Build one MarketSnapshotRequest value through the Data public boundary."""
+    return _snapshot.MarketSnapshotRequest(*args, **kwargs)

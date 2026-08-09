@@ -149,18 +149,44 @@ class MarketHoursRequest(TracedOpenContract):
 
 
 class MarketHours(MarketSchedule):
-    """Evaluated venue tradability derived from authoritative sessions."""
+    """Evaluated venue tradability derived from authoritative sessions.
+
+    `halted`, `halt_reason`, and `reopen_at` (Trading Cockpit Phase 0
+    `TC-IMP-DATA-05`) default to the safe "no halt evidence supplied" state
+    and are only ever set from genuine caller-supplied venue evidence (for
+    example a Data-owned `halt`/`venue_state` stream event) through
+    `apply_venue_halt`; this contract never infers a halt on its own.
+    `close_window` and `roll_window` are likewise only populated from
+    genuine caller-supplied schedule evidence.
+    """
 
     is_open: bool
     checked_at: datetime
     current_session: SessionWindow | None
     next_session: SessionWindow | None
+    halted: bool = False
+    halt_reason: str | None = None
+    reopen_at: datetime | None = None
+    close_window: SessionWindow | None = None
+    roll_window: SessionWindow | None = None
 
     @field_validator("checked_at")
     @classmethod
     def _validate_checked_at(cls, value: datetime) -> datetime:
         """Validate the evaluation time as aware UTC."""
         return require_utc(value)
+
+    @field_validator("halt_reason")
+    @classmethod
+    def _validate_halt_reason(cls, value: str | None) -> str | None:
+        """Validate an optional halt reason."""
+        return None if value is None else _text(value)
+
+    @field_validator("reopen_at")
+    @classmethod
+    def _validate_reopen_at(cls, value: datetime | None) -> datetime | None:
+        """Validate an optional expected reopening time as aware UTC."""
+        return None if value is None else require_utc(value)
 
     @model_validator(mode="after")
     def _validate_selection(self) -> MarketHours:
@@ -178,6 +204,12 @@ class MarketHours(MarketSchedule):
             and self.next_session.opens_at <= self.checked_at
         ):
             raise ValueError("next_session must open after checked_at")
+        if self.halted and self.is_open:
+            raise ValueError("a halted venue cannot report is_open")
+        if not self.halted and (
+            self.halt_reason is not None or self.reopen_at is not None
+        ):
+            raise ValueError("halt_reason and reopen_at require halted=True")
         return self
 
 

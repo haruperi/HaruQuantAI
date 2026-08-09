@@ -10,6 +10,8 @@ def test_decision_state_values_are_stable() -> None:
         "warn",
         "needs_approval",
         "needs_more_evidence",
+        "resize",
+        "restrict",
         "reject",
         "block",
         "error",

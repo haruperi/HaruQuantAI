@@ -20,7 +20,9 @@ from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.risk.limits import (
     evaluate_market_context,
     evaluate_portfolio_limits,
+    evaluate_reward_risk_gate,
     evaluate_single_day_profit_share,
+    resolve_effective_rules,
 )
 
 from tests.risk.unit.test_mandate import _mandate
@@ -64,6 +66,16 @@ def _config(*, live: bool = False) -> RiskConfig:
             audit_timeout_seconds=Decimal(2),
             token_state_timeout_seconds=Decimal(2),
             double_spend_owner="risk_store",
+            drawdown_caution_threshold=Decimal("0.03"),
+            drawdown_restricted_threshold=Decimal("0.06"),
+            drawdown_critical_threshold=Decimal("0.08"),
+            emergency_flash_crash_move_pct=Decimal("0.05"),
+            emergency_flash_crash_window_seconds=60,
+            emergency_connectivity_loss_seconds=30,
+            emergency_margin_call_utilization_pct=Decimal("0.8"),
+            emergency_recovery_lock_seconds=900,
+            assessment_recalc_events=("fill", "position_change"),
+            assessment_max_staleness_seconds=120,
         )
     return RiskConfig.model_validate(values)
 
@@ -165,6 +177,196 @@ def test_limit_order_and_composite_failures() -> None:
         "historical_cvar",
         "correlation",
     }.issubset(failures)
+
+
+def test_drawdown_state_locked_when_at_or_above_max_drawdown() -> None:
+    """Classify the drawdown state as locked once at or above max_drawdown."""
+    config = _config(live=True)
+    results = unwrap_risk_response(
+        evaluate_portfolio_limits(_snapshot(config), config, now=NOW),
+        operation="evaluate_portfolio_limits",
+    )
+    state_result = next(item for item in results if item.limit_id == "drawdown_state")
+    assert state_result.reference_basis == "locked"
+    assert state_result.status is LimitStatus.BLOCKED
+
+
+def test_drawdown_state_caution_between_caution_and_restricted() -> None:
+    """Classify the drawdown state as caution inside the first band."""
+    config = _config(live=True)
+    snapshot = _snapshot(config).model_copy(update={"drawdown": Decimal("0.04")})
+    results = unwrap_risk_response(
+        evaluate_portfolio_limits(snapshot, config, now=NOW),
+        operation="evaluate_portfolio_limits",
+    )
+    state_result = next(item for item in results if item.limit_id == "drawdown_state")
+    assert state_result.reference_basis == "caution"
+    assert state_result.status is LimitStatus.WARN
+    assert state_result.headroom_value == Decimal("0.02")
+
+
+def test_drawdown_state_disabled_without_configured_thresholds() -> None:
+    """Pass the drawdown state check when no thresholds are configured."""
+    config = _config()
+    results = unwrap_risk_response(
+        evaluate_portfolio_limits(_snapshot(config), config, now=NOW),
+        operation="evaluate_portfolio_limits",
+    )
+    state_result = next(item for item in results if item.limit_id == "drawdown_state")
+    assert state_result.status is LimitStatus.PASS
+    assert state_result.reference_basis == "normal"
+
+
+def test_portfolio_view_provider_overrides_concentration_exposure() -> None:
+    """Use the injected authoritative Portfolio exposure view when supplied."""
+    config = _config()
+    snapshot = _snapshot(config)
+    results = unwrap_risk_response(
+        evaluate_portfolio_limits(
+            snapshot,
+            config,
+            now=NOW,
+            portfolio_view_provider=lambda _account_id: {"symbol:EURUSD": Decimal(100)},
+        ),
+        operation="evaluate_portfolio_limits",
+    )
+    concentration = next(
+        item for item in results if item.limit_id == "concentration:symbol:EURUSD"
+    )
+    assert concentration.observed_value == Decimal(100) / snapshot.gross_exposure
+
+
+def test_portfolio_view_provider_none_falls_back_to_snapshot_exposure() -> None:
+    """Fail closed to Risk's own snapshot exposure when the port returns None."""
+    config = _config()
+    snapshot = _snapshot(config)
+    results = unwrap_risk_response(
+        evaluate_portfolio_limits(
+            snapshot,
+            config,
+            now=NOW,
+            portfolio_view_provider=lambda _account_id: None,
+        ),
+        operation="evaluate_portfolio_limits",
+    )
+    concentration = next(
+        item for item in results if item.limit_id == "concentration:symbol:EURUSD"
+    )
+    expected = (
+        abs(snapshot.exposure_by_dimension["symbol:EURUSD"]) / snapshot.gross_exposure
+    )
+    assert concentration.observed_value == expected
+
+
+def test_margin_view_provider_overrides_static_snapshot_values() -> None:
+    """Use the injected authoritative margin/leverage view when supplied."""
+    config = _config()
+    snapshot = _snapshot(config)
+    results = unwrap_risk_response(
+        evaluate_portfolio_limits(
+            snapshot,
+            config,
+            now=NOW,
+            margin_view_provider=lambda _account_id: {
+                "margin_utilization": Decimal("0.01")
+            },
+        ),
+        operation="evaluate_portfolio_limits",
+    )
+    margin = next(item for item in results if item.limit_id == "margin_utilization")
+    leverage = next(item for item in results if item.limit_id == "effective_leverage")
+    assert margin.observed_value == Decimal("0.01")
+    assert leverage.observed_value == snapshot.effective_leverage
+
+
+def test_reward_risk_gate_fails_below_configured_minimum() -> None:
+    """Fail the gate when the planned ratio is below the configured minimum."""
+    result = unwrap_risk_response(
+        evaluate_reward_risk_gate(
+            "strategy-1", Decimal("1.2"), Decimal("2.0"), ("snapshot-1",)
+        ),
+        operation="evaluate_reward_risk_gate",
+    )
+    assert result.status is LimitStatus.FAIL
+
+
+def test_reward_risk_gate_passes_at_or_above_configured_minimum() -> None:
+    """Pass the gate when the planned ratio meets the configured minimum."""
+    result = unwrap_risk_response(
+        evaluate_reward_risk_gate(
+            "strategy-1", Decimal("2.0"), Decimal("2.0"), ("snapshot-1",)
+        ),
+        operation="evaluate_reward_risk_gate",
+    )
+    assert result.status is LimitStatus.PASS
+
+
+def test_reward_risk_gate_falls_back_when_provider_returns_none() -> None:
+    """Fail closed to the configured minimum when the expectancy port abstains."""
+    result = unwrap_risk_response(
+        evaluate_reward_risk_gate(
+            "strategy-1",
+            Decimal("1.2"),
+            Decimal("2.0"),
+            ("snapshot-1",),
+            expectancy_provider=lambda _strategy_id: None,
+        ),
+        operation="evaluate_reward_risk_gate",
+    )
+    assert result.status is LimitStatus.FAIL
+
+
+def test_reward_risk_gate_uses_eligible_expectancy_override() -> None:
+    """Use an eligible approved expectancy override instead of the baseline."""
+    result = unwrap_risk_response(
+        evaluate_reward_risk_gate(
+            "strategy-1",
+            Decimal("1.2"),
+            Decimal("2.0"),
+            ("snapshot-1",),
+            expectancy_provider=lambda _strategy_id: Decimal("1.0"),
+        ),
+        operation="evaluate_reward_risk_gate",
+    )
+    assert result.status is LimitStatus.PASS
+
+
+def test_effective_rules_pick_strictest_upper_bound() -> None:
+    """Resolve an upper-bound rule to the minimum across sources."""
+    resolved = unwrap_risk_response(
+        resolve_effective_rules(
+            {
+                "account": {"max_risk_per_trade_pct": Decimal("0.02")},
+                "venue_instrument": {"max_risk_per_trade_pct": Decimal("0.01")},
+            },
+            {"max_risk_per_trade_pct": "upper_bound"},
+        ),
+        operation="resolve_effective_rules",
+    )
+    assert resolved["max_risk_per_trade_pct"] == Decimal("0.01")
+
+
+def test_effective_rules_pick_strictest_lower_bound() -> None:
+    """Resolve a lower-bound rule to the maximum across sources."""
+    resolved = unwrap_risk_response(
+        resolve_effective_rules(
+            {
+                "account": {"min_reward_risk_ratio": Decimal("1.5")},
+                "strategy": {"min_reward_risk_ratio": Decimal("2.0")},
+            },
+            {"min_reward_risk_ratio": "lower_bound"},
+        ),
+        operation="resolve_effective_rules",
+    )
+    assert resolved["min_reward_risk_ratio"] == Decimal("2.0")
+
+
+def test_effective_rules_fail_closed_on_unregistered_direction() -> None:
+    """Fail closed when a present key has no registered strictness direction."""
+    response = resolve_effective_rules(
+        {"account": {"max_risk_per_trade_pct": Decimal("0.02")}}, {}
+    )
+    assert response.status == "error"
 
 
 def test_timezone_failure_blocks_live() -> None:

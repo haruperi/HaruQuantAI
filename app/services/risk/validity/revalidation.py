@@ -209,4 +209,56 @@ def revalidate_risk_decision(
         ) from error
 
 
-__all__ = ["revalidate_risk_decision"]
+@guard_risk_boundary(risk_level="low", read_only=True)
+def requires_risk_recalculation(
+    event: str,
+    *,
+    last_evaluated_at: datetime,
+    config: RiskConfig,
+    now: datetime,
+) -> bool:
+    """Determine whether a triggering event requires Risk recalculation.
+
+    Pure event/staleness classifier for continuous monitoring
+    (``TC-IMP-RISK-15``): Risk owns no event loop or poller. A caller-owned
+    workflow invokes this after a market event, fill, cancellation, or
+    position/valuation/policy change to decide whether an existing decision
+    must be recalculated rather than reused via
+    :func:`revalidate_risk_decision`. Disabled configuration (no
+    ``assessment_recalc_events``/``assessment_max_staleness_seconds``
+    configured) fails closed to ``True`` rather than silently skipping
+    monitoring.
+
+    Args:
+        event: Triggering event name.
+        last_evaluated_at: Aware UTC time of the last Risk evaluation.
+        config: Active validated Risk configuration.
+        now: Explicit aware-UTC current time.
+
+    Returns:
+        ``True`` when the event or elapsed staleness requires recalculation.
+
+    Raises:
+        RiskDomainError: If ``now``/``last_evaluated_at`` are not aware UTC.
+    """
+    logger.info("Classifying whether Risk recalculation is required: %s", event)
+    try:
+        checked_now = _utc(now)
+        checked_last = _utc(last_evaluated_at)
+    except ValueError as error:
+        raise RiskDomainError(
+            RiskErrorCode.STALE_EVIDENCE,
+            "recalculation classification time is invalid",
+        ) from error
+    if (
+        not config.assessment_recalc_events
+        or config.assessment_max_staleness_seconds is None
+    ):
+        return True
+    if event in config.assessment_recalc_events:
+        return True
+    staleness = (checked_now - checked_last).total_seconds()
+    return staleness < 0 or staleness > config.assessment_max_staleness_seconds
+
+
+__all__ = ["requires_risk_recalculation", "revalidate_risk_decision"]

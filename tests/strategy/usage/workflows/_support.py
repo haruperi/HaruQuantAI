@@ -515,17 +515,19 @@ class MarketEventEvaluator:
 
     def evaluate_event(
         self,
-        event: object,
+        ref: object,
         config: object,
+        event: object,
         context: object,
-        local_state: Mapping[str, object] | None,
-        account_snapshot: object,
+        account_snapshot: object | None = None,
+        local_state: Mapping[str, object] | None = None,
     ) -> tuple[object, ...]:
         """Derive one neutral state update from genuine event evidence.
 
         Args:
-            event: Typed genuine market event.
+            ref: Validated exact Strategy reference.
             config: Validated immutable configuration.
+            event: Typed genuine market event.
             context: Fixed Strategy execution context.
             local_state: Prior bounded Strategy-local state.
             account_snapshot: Optional Data account evidence.
@@ -533,7 +535,7 @@ class MarketEventEvaluator:
         Returns:
             One neutral decision carrying the observed bar state.
         """
-        del config, account_snapshot
+        del ref, config, account_snapshot
         seen = int((local_state or {}).get("bars_seen", 0)) + 1
         return (
             create_strategy_decision(
@@ -556,6 +558,8 @@ class MarketEventEvaluator:
                 },
             ),
         )
+
+    on_bar = evaluate_event
 
 
 @contextmanager

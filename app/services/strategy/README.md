@@ -1,8 +1,8 @@
 # Strategy
 
 > **Package:** `app/services/strategy`
-> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 11 registered features remain implemented, but 11 work packages (`TC-IMP-STRAT-01`..`TC-IMP-STRAT-11`) add target behavior that is not yet implemented. See `### Trading Cockpit Phase 0 reconciliation`.
-> **Last updated:** `2026-07-30`
+> **Status:** `Completed` — all 14 registered features and Trading Cockpit Phase 0 consumer ports are implemented and verified. Research remains the authoritative future expectancy-profile provider; Strategy fails closed until it is available.
+> **Last updated:** `2026-08-07`
 
 > This README is the package's **single source of truth** for final requirements, structure, implementation sequence, workflows, public contracts, configuration, limits, progress, usage examples, and tests.
 > Update this file before changing Strategy code.
@@ -183,17 +183,17 @@ Cross-domain contract transport is settled per the Utils domain: versioned cross
 
 | Status | Target | Reuses / extends | Phase 0 gap |
 | --- | --- | --- | --- |
-| Partial | `StrategyProfile v1` additions | Extends `FEAT-STR-01`/`FEAT-STR-03`. Adds permitted instruments/sessions/regimes, indicator deps, entry/exit/invalidation rules, automation permissions. | `TC-IMP-STRAT-01` |
-| Partial | Strategy playbook | Extends `FEAT-STR-10`. Human + machine-evaluable setup definition for pre-market planning/debrief. | `TC-IMP-STRAT-02` |
-| Partial | `SetupEvaluation v1` | Extends `evaluators/`. Returns `MATCH`/`NO_MATCH`/`STALE`/`REGIME_MISMATCH`/`INSUFFICIENT_EVIDENCE` with source snapshots. | `TC-IMP-STRAT-03` |
-| Partial | `TradePlan v1` | Extends `FEAT-STR-04` (`TradeIntent`). **Open Decision OD-STR-01:** the existing canonical proposal contract is named `TradeIntent`; the cockpit requires a richer `TradePlan` (direction, entry rule/price, invalidation, stop, target/exit, requested size basis, planned rationale, profile refs). The name divergence and field gap must be resolved before implementation — Strategy will not silently rename `TradeIntent`; the owner decides extend-in-place vs. add a distinct `TradePlan`. | `TC-IMP-STRAT-04` |
-| Partial | Trade-plan lifecycle | Extends `intents/`. Adds `DRAFT → READY_FOR_RISK → APPROVED/REJECTED → RELEASED → MANAGED → CLOSED/ABORTED`; released plans immutable except versioned amendments. | `TC-IMP-STRAT-05` |
-| Missing | Operating envelope | **New feature** — see Feature Registry `FEAT-STR-12`. Permitted volatility, spread, liquidity, regime, session, holding, event conditions. | `TC-IMP-STRAT-06` |
-| Missing | Exit and management plan | **New feature** — see Feature Registry `FEAT-STR-13`. Initial protection, target, partial exits, trailing, time stop, invalidation, automation handoff. | `TC-IMP-STRAT-07` |
-| Deferred | Expectancy reference | Strategy holds a version-exact reference to an approved expectancy profile and never decides eligibility locally. **Deferred to Research `TC-IMP-RES-03`** (Phase 11). Until then a missing expectancy provider returns `NOT_ELIGIBLE` (fallback to the normal risk-to-reward gate); it never returns an inferred approval. | `TC-IMP-STRAT-08` |
-| Partial | Automation mode policy | Extends `proposal_intake/` (`FEAT-STR-11`). **LOW confidence — re-investigate before implementing (`TC-IMP-STRAT-09`).** Adds `OFF`/`ADVISORY`/`SUPERVISED`/`AUTOMATED`; subordinate to Risk/Trading interlocks. | `TC-IMP-STRAT-09` |
-| Missing | Manual-plan support | **New feature** — see Feature Registry `FEAT-STR-14`. Player-authored plan uses the same contract/validation path as automated strategies. | `TC-IMP-STRAT-10` |
-| Partial | Strategy lifecycle governance | Extends `registry/`. Draft, test, approve, suspend, retire, version strategies without changing replay meaning. **Open Decision OD-STR-02:** the `strategy_*` and `strategy_*_v2` table families coexist in `definitions.py` (`strategy_state`/`strategy_signals` FK to the `_v2` side); authoritative-vs-superseded status is not determinable from migrations alone and must be resolved before Phase 5 implementation. | `TC-IMP-STRAT-11` |
+| Completed | `StrategyProfile v1` additions | Extends `FEAT-STR-01`/`FEAT-STR-03`; strict mapping transport and cockpit permissions are implemented in `contracts/profile.py`. | `TC-IMP-STRAT-01` |
+| Completed | Strategy playbook | Human-readable and machine-evaluable setup transport is implemented in `contracts/playbook.py`. | `TC-IMP-STRAT-02` |
+| Completed | `SetupEvaluation v1` | Five fail-closed outcomes with explicit source snapshots are implemented in `contracts/playbook.py`. | `TC-IMP-STRAT-03` |
+| Completed | `TradePlan v1` | Distinct immutable planning contract; `TradeIntent v1` remains the canonical Strategy-to-Risk proposal. | `TC-IMP-STRAT-04` |
+| Completed | Trade-plan lifecycle | Deterministic transitions and versioned amendments are implemented in `intents/lifecycle.py`. | `TC-IMP-STRAT-05` |
+| Completed | Operating envelope | `FEAT-STR-12` implements strict transport and fail-closed evaluation. | `TC-IMP-STRAT-06` |
+| Completed | Exit and management plan | `FEAT-STR-13` implements protection rules and non-executable handoff. | `TC-IMP-STRAT-07` |
+| Completed | Expectancy reference consumer port | Version-exact references are implemented; missing/invalid Research provider returns `NOT_ELIGIBLE`. Provider remains deferred to Research `TC-IMP-RES-03`. | `TC-IMP-STRAT-08` |
+| Completed | Automation mode policy | `OFF`/`ADVISORY`/`SUPERVISED`/`AUTOMATED` are implemented subordinate to Risk/Trading interlocks and sim-only routing. | `TC-IMP-STRAT-09` |
+| Completed | Manual-plan support | `FEAT-STR-14` uses the canonical `TradePlan` builder and validation path. | `TC-IMP-STRAT-10` |
+| Completed | Strategy lifecycle governance | Deterministic draft/test/approve/suspend/retire transition evidence preserves immutable strategy-version identity. | `TC-IMP-STRAT-11` |
 
 **Boundary clarifications folded in:** Strategy owns playbook definitions, setup qualification, trade plans, entry/exit intent, operating envelopes, and approved management rules. It does not size or approve risk, dispatch orders, or own financial accounting.
 
@@ -276,9 +276,9 @@ Folders and files are ordered from lowest dependency to highest dependency. This
 | Completed | `FEAT-STR-09` Concrete Signal Execution Boundary    | `signals/`         | Exact declarations and signal contracts: Section 4.9                                                                                                                                       | Section 4.9 functional requirements  | `tests/strategy/usage/features/09_signals.py`          |
 | Completed | `FEAT-STR-10` Strategy Signal Library               | `evaluators/`      | Exact declarations: Section 4.10                                                                                                                                                           | Section 4.10 functional requirements | `tests/strategy/usage/features/10_strategy_library.py` |
 | Completed | `FEAT-STR-11` External Research Proposal Evaluation | `proposal_intake/` | `create_strategy_proposal_evaluation_request`, `create_strategy_proposal_evaluation_result`, `validate_strategy_proposal`, `evaluate_strategy_proposal`, `bind_proposal_lineage` | `FR-STR-049`–`053`              | `tests/strategy/usage/features/11_proposal_intake.py`  |
-| Missing | `FEAT-STR-12` Operating Envelope | `operating_envelope/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `build_operating_envelope`/`parse_operating_envelope` permitted volatility, spread, liquidity, regime, session, holding, event conditions | `FR-STR-054`..`FR-STR-056` *(planned)* | `tests/strategy/usage/features/12_operating_envelope.py` *(planned)* |
-| Missing | `FEAT-STR-13` Exit and Management Plan | `exit_plans/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `build_exit_plan`/`parse_exit_plan` initial protection, target, partial exits, trailing, time stop, invalidation, automation handoff | `FR-STR-057`..`FR-STR-059` *(planned)* | `tests/strategy/usage/features/13_exit_plans.py` *(planned)* |
-| Missing | `FEAT-STR-14` Manual-Plan Support | `manual_plans/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); player-authored plan uses the same contract/validation path as automated strategies | `FR-STR-060`..`FR-STR-062` *(planned)* | `tests/strategy/usage/features/14_manual_plans.py` *(planned)* |
+| Completed | `FEAT-STR-12` Operating Envelope | `operating_envelope/` | `build_operating_envelope`, `parse_operating_envelope`, `evaluate_operating_envelope` | `FR-STR-054`–`FR-STR-056` | `tests/strategy/usage/features/12_operating_envelope.py` |
+| Completed | `FEAT-STR-13` Exit and Management Plan | `exit_plans/` | `build_exit_plan`, `parse_exit_plan`, `build_exit_plan_handoff` | `FR-STR-057`–`FR-STR-059` | `tests/strategy/usage/features/13_exit_plans.py` |
+| Completed | `FEAT-STR-14` Manual-Plan Support | `manual_plans/` | `build_manual_trade_plan`, `validate_manual_trade_plan` | `FR-STR-060`–`FR-STR-062` | `tests/strategy/usage/features/14_manual_plans.py` |
 
 ```text
 app/services/strategy/
@@ -1528,6 +1528,27 @@ factory and getter functions above are the only supported way for external
 consumers, usage evidence, workflows, and integration tests to obtain Strategy
 values. Deep imports from Strategy feature packages are not supported.
 
+### Trading Cockpit Phase 0 functional requirements
+
+| Status | Requirement | Responsibility | Evidence |
+| --- | --- | --- | --- |
+| Completed | `FR-STR-054` | Build strict JSON-safe `OperatingEnvelope v1`. | `app/services/strategy/operating_envelope/models.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-055` | Parse and reject incompatible operating-envelope mappings. | `app/services/strategy/operating_envelope/models.py`; `tests/strategy/usage/features/12_operating_envelope.py` |
+| Completed | `FR-STR-056` | Return `PERMITTED` only when all required point-in-time evidence satisfies the envelope; missing evidence is `RESTRICTED`. | `app/services/strategy/operating_envelope/evaluation.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-057` | Build strict JSON-safe `ExitPlan v1`. | `app/services/strategy/exit_plans/models.py`; `tests/strategy/usage/features/13_exit_plans.py` |
+| Completed | `FR-STR-058` | Validate protection, partial-exit, trailing, time-stop, and invalidation relationships. | `app/services/strategy/exit_plans/models.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-059` | Build a non-executable exit-plan handoff subordinate to Risk/Trading interlocks and sim-only routing. | `app/services/strategy/exit_plans/handoff.py`; `tests/strategy/usage/features/13_exit_plans.py` |
+| Completed | `FR-STR-060` | Build player-authored plans through the canonical `TradePlan v1` builder. | `app/services/strategy/manual_plans/builder.py`; `tests/strategy/usage/features/14_manual_plans.py` |
+| Completed | `FR-STR-061` | Validate manual and deterministic plans through the same immutable contract. | `app/services/strategy/manual_plans/validation.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-062` | Preserve player identity as lineage only, never authority. | `app/services/strategy/manual_plans/validation.py`; `tests/strategy/usage/features/14_manual_plans.py` |
+| Completed | `FR-STR-063`–`FR-STR-065` | Build/parse `StrategyProfile v1` and enforce closed automation permissions. | `app/services/strategy/contracts/profile.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-066`–`FR-STR-068` | Build/parse human-readable and machine-evaluable playbooks. | `app/services/strategy/contracts/playbook.py`; `tests/strategy/usage/features/12_operating_envelope.py` |
+| Completed | `FR-STR-069`–`FR-STR-071` | Build/parse `SetupEvaluation v1` with explicit source snapshots and fail-closed outcomes. | `app/services/strategy/contracts/playbook.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-072`–`FR-STR-075` | Build/parse distinct `TradePlan v1`, enforce lifecycle transitions, sim-only intent eligibility, and versioned amendments. | `app/services/strategy/intents/`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-076`–`FR-STR-077` | Hold a version-exact expectancy reference; absent, failed, or mismatched Research provider returns `NOT_ELIGIBLE`. | `app/services/strategy/contracts/expectancy.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-078`–`FR-STR-079` | Validate automation modes subordinate to Risk/Trading interlocks and sim-only routing. | `app/services/strategy/proposal_intake/automation.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-080`–`FR-STR-082` | Validate lifecycle transitions and produce append-only mutation evidence without changing historical version identity. | `app/services/strategy/registry/lifecycle.py`; `tests/strategy/usage/features/12_operating_envelope.py` |
+
 ### Initial limitations and deferrals
 
 - Raw or sandboxed arbitrary code, archives, and user paths are not supported.
@@ -1538,15 +1559,16 @@ values. Deep imports from Strategy feature packages are not supported.
 - Strategy does not calculate indicators, cost models, fills, risk decisions, portfolio allocations, analytics, or optimization artifacts.
 - CPU, memory, symbol-count, and concurrency resource budgets are deferred. The initial manifest enforces batch-record, diagnostic-byte, checkpoint-byte, local-state-byte, and decision-timeout budgets only.
 - Data-latency tolerance (`max_data_latency_tolerance`) and maximum tolerable state loss (`max_tolerable_state_loss`) are deferred; freshness is enforced by the fixed decision clock and point-in-time availability checks instead.
+- UI/API and frontend cockpit exposure is explicitly deferred to the UI-API domain's Phase 14 integration. Strategy publishes function-only JSON-safe read contracts and does not own routes, read models, or panels.
 
 ---
 
 ## 6. Open Decisions
 
-These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
-
-- **OD-STR-01 — `TradeIntent` vs `TradePlan`.** The existing canonical proposal contract is `TradeIntent` (`FEAT-STR-04`); the cockpit requires a richer `TradePlan` with direction, entry rule/price, invalidation, stop, target/exit, requested size basis, and profile references. The owner must decide whether to extend `TradeIntent` in place or add a distinct `TradePlan` contract. Until decided, Strategy does not silently rename or duplicate.
-- **OD-STR-02 — `strategy_*` vs `strategy_*_v2` table authority.** Four table families (`strategy_versions`, `strategy_configs`, `strategy_checkpoints`, `strategy_mutations`) coexist with `_v2` variants in `app/services/strategy/migrations/definitions.py`; `strategy_state` and `strategy_signals` already FK to the `_v2` side. Which family is authoritative is not determinable from migrations alone (Phase 0 finding P-4) and must be confirmed before Phase 5 implementation. This documentation treats the `_v2` family as the operative target because the runtime tables depend on it.
+None. `TradePlan v1` is distinct from the preserved `TradeIntent v1`. Migration
+`0002_strategy_seven_table_runtime` backfills the richer temporary `_v2` tables,
+drops the legacy tables, and renames the richer tables to their canonical unsuffixed
+runtime names; those post-migration unsuffixed tables are authoritative.
 
 ---
 
@@ -1618,6 +1640,10 @@ dataset provenance and does not rewrite historical record availability.
 - [X] Every module folder represents one coherent approved capability. `tests/strategy/unit/test_usage_coverage.py:125`
 - [X] Every file has one focused responsibility. `tests/strategy/unit/test_usage_coverage.py:58`
 - [X] Every requirement owned by `FEAT-STR-01` through `FEAT-STR-11` is `Completed` with evidence. `tests/strategy/unit/test_usage_coverage.py:66`
+- [X] `FEAT-STR-12` operating-envelope construction and fail-closed evaluation are complete. `app/services/strategy/operating_envelope/models.py:54`
+- [X] `FEAT-STR-13` exit-plan construction and non-executable handoff are complete. `app/services/strategy/exit_plans/models.py:53`
+- [X] `FEAT-STR-14` manual plans use the canonical TradePlan validation path. `app/services/strategy/manual_plans/builder.py:15`
+- [X] `TradePlan v1`, expectancy fallback, automation policy, and lifecycle governance are sim-only and fail closed. `tests/strategy/unit/test_cockpit_contracts.py:93`
 - [X] `FEAT-STR-11` and `FR-STR-049` through `FR-STR-053` have direct genuine-MT5 proposal-intake evidence. `tests/strategy/usage/features/11_proposal_intake.py:75`
 - [X] Every registered workflow has executable evidence and passing integration or parity coverage. `tests/strategy/unit/test_workflow_usage_parity.py:39`
 - [X] `WF-STR-011` and `WF-STR-012` execute without importing or modifying Optimization, Simulator, Analytics, or Research. `tests/strategy/usage/workflows/run_all.py:13`

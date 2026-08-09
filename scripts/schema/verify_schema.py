@@ -298,7 +298,7 @@ for t_ in made_t:
 print(f"\n=== 11: no rename collisions ===\n{verdict(clash)}")
 
 # ---- 12: ratified table count matches parsed domain README model ----
-stated = [("domain README executable target model", 94)]
+stated = [("domain README executable target model", 98)]
 drift = [(name, count) for name, count in stated if count != len(made_t)]
 print(f"\n=== 12: doc counts match parsed ({len(made_t)}) ===")
 print("PASS" if not drift and stated else f"FAIL stated={stated} parsed={len(made_t)}")

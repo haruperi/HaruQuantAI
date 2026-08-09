@@ -14,6 +14,11 @@ from app.services.research.contracts.configurations import (
     StudyConfig,
     UnsupervisedResearchConfig,
 )
+from app.services.research.contracts.evidence_fields import (
+    ResearchSourceClassification,
+    build_research_source_classification,
+    parse_research_source_classification,
+)
 from app.services.research.contracts.results import (
     ArtifactReference,
     CoreMetricProfile,
@@ -51,6 +56,7 @@ __all__ = (
     "ResearchReport",
     "ResearchResourceLimits",
     "ResearchScorecard",
+    "ResearchSourceClassification",
     "ResearchWarning",
     "SessionConfig",
     "StatisticalConfig",
@@ -58,4 +64,6 @@ __all__ = (
     "TimeSplitResult",
     "UnsupervisedResearchConfig",
     "UnsupervisedResearchResult",
+    "build_research_source_classification",
+    "parse_research_source_classification",
 )

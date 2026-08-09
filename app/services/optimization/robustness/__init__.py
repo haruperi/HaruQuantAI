@@ -20,7 +20,17 @@ from app.services.optimization.robustness.monte_carlo import (
     run_monte_carlo,
     run_parametric_simulation,
 )
+from app.services.optimization.robustness.risk_sensitivity import (
+    evaluate_risk_sensitivity,
+    get_risk_sensitivity_contract_version,
+    summarize_drawdown_threshold_sensitivity,
+)
 from app.services.optimization.robustness.stress import apply_execution_cost_stress
+from app.services.optimization.robustness.stress_calibration import (
+    StressProfileCalibrationPort,
+    get_stress_calibration_contract_version,
+    resolve_stress_profile_calibration,
+)
 
 __all__ = [
     "ExecutionStressRequest",
@@ -29,6 +39,7 @@ __all__ = [
     "MonteCarloMethod",
     "MonteCarloRequest",
     "MonteCarloResult",
+    "StressProfileCalibrationPort",
     "apply_execution_cost_stress",
     "assess_strategy_robustness",
     "calculate_confidence_intervals",
@@ -36,6 +47,11 @@ __all__ = [
     "estimate_drawdown_mode_sensitivity",
     "estimate_first_passage",
     "estimate_joint_first_passage",
+    "evaluate_risk_sensitivity",
+    "get_risk_sensitivity_contract_version",
+    "get_stress_calibration_contract_version",
+    "resolve_stress_profile_calibration",
     "run_monte_carlo",
     "run_parametric_simulation",
+    "summarize_drawdown_threshold_sensitivity",
 ]

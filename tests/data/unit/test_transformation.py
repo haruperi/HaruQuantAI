@@ -145,6 +145,43 @@ def test_transformations_produce_canonical_datasets() -> None:
     )
 
 
+def test_resample_drop_incomplete_trailing_bucket_closed_bar_semantics() -> None:
+    """`drop_incomplete_trailing_bucket` removes an unfinished trailing bar
+    but never a bucket the source dataset fully covers (TC-IMP-DATA-09)."""
+    bars = _dataset(_bars(), "bars", "M1")
+    assert bars.end == _START + timedelta(minutes=4)
+
+    # The single M5 bucket (00:00-00:05) is not fully covered: end is 00:04.
+    trimmed = _unwrap(
+        resample_dataset(bars, "M5", drop_incomplete_trailing_bucket=True)
+    )
+    assert trimmed.record_count == 0  # type: ignore[attr-defined]
+
+    # Extending coverage to exactly the bucket boundary makes it closed.
+    extra_bar = OHLCVRecord(
+        timestamp=_START + timedelta(minutes=5),
+        open=Decimal(15),
+        high=Decimal(16),
+        low=Decimal(14),
+        close=Decimal("15.5"),
+        volume=Decimal(105),
+        spread=Decimal("0.2"),
+        price_unit="USD",
+        volume_unit="units",
+        spread_unit="USD",
+        source="fixture",
+        source_symbol="EURUSD",
+        source_revision="v1",
+        available_at=_START + timedelta(minutes=5, seconds=1),
+    )
+    closed_records = (*_bars(), extra_bar)
+    closed_dataset = _dataset(closed_records, "bars", "M1")
+    closed = _unwrap(
+        resample_dataset(closed_dataset, "M5", drop_incomplete_trailing_bucket=True)
+    )
+    assert closed.record_count == 1  # type: ignore[attr-defined]
+
+
 def test_alignment_supports_all_record_types_and_rejects_bad_targets() -> None:
     """Cover tick/spread projection and fail-closed target validation."""
     ticks = _dataset(_ticks(), "ticks", None)
@@ -169,6 +206,31 @@ def test_alignment_supports_all_record_types_and_rejects_bad_targets() -> None:
         assert response.status == "error"
     response = align_datasets({"ticks": ticks}, (_START,))
     assert response.status == "error"
+
+
+def test_align_datasets_skip_policy_declares_gaps_without_forward_fill() -> None:
+    """`missing_policy="skip"` omits a missing target instead of raising or
+    forward-filling it, and never silently invents a value (TC-IMP-DATA-10)."""
+    ticks = _dataset(_ticks(), "ticks", None)
+    before_coverage = _START - timedelta(seconds=1)
+    within_coverage = _START + timedelta(seconds=5)
+    target = (before_coverage, within_coverage)
+
+    skipped = _unwrap(align_datasets({"ticks": ticks}, target, missing_policy="skip"))
+    aligned = skipped["ticks"]  # type: ignore[index]
+    assert aligned.record_count == 1
+    assert aligned.records[0].timestamp == within_coverage
+
+
+def test_align_datasets_skip_policy_never_forward_fills_all_missing() -> None:
+    """A target sequence entirely before coverage yields zero records, not
+    an error and not a fabricated value."""
+    ticks = _dataset(_ticks(), "ticks", None)
+    target = (_START - timedelta(hours=1),)
+
+    skipped = _unwrap(align_datasets({"ticks": ticks}, target, missing_policy="skip"))
+    aligned = skipped["ticks"]  # type: ignore[index]
+    assert aligned.record_count == 0
 
 
 @pytest.mark.parametrize("policy", ["bid", "ask", "last"])

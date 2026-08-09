@@ -168,3 +168,86 @@ def test_config_rejects_invalid_policy_values(
     values[field] = value
     with pytest.raises(ValidationError):
         RiskConfig.model_validate(values)
+
+
+def _live_config_values() -> dict[str, object]:
+    """Return the minimum valid live Risk configuration values."""
+    values = _config_values()
+    values.update(
+        {
+            "profile": "live",
+            "execution_route": "live",
+            "clock_skew_tolerance_seconds": Decimal(1),
+            "var_min_observations": 30,
+            "max_margin_utilization": Decimal("0.5"),
+            "max_effective_leverage": Decimal(10),
+            "missing_calendar_mode": "block",
+            "audit_timeout_seconds": Decimal(5),
+            "token_state_timeout_seconds": Decimal(5),
+            "double_spend_owner": "risk_store",
+            "drawdown_caution_threshold": Decimal("0.03"),
+            "drawdown_restricted_threshold": Decimal("0.06"),
+            "drawdown_critical_threshold": Decimal("0.08"),
+            "emergency_flash_crash_move_pct": Decimal("0.05"),
+            "emergency_flash_crash_window_seconds": 60,
+            "emergency_connectivity_loss_seconds": 30,
+            "emergency_margin_call_utilization_pct": Decimal("0.8"),
+            "emergency_recovery_lock_seconds": 900,
+            "assessment_recalc_events": ("fill", "position_change"),
+            "assessment_max_staleness_seconds": 120,
+        }
+    )
+    return values
+
+
+def test_live_profile_requires_drawdown_state_thresholds() -> None:
+    """Fail closed when a live profile omits drawdown state thresholds."""
+    values = _live_config_values()
+    del values["drawdown_caution_threshold"]
+    with pytest.raises(ValidationError):
+        RiskConfig.model_validate(values)
+
+
+def test_live_profile_requires_emergency_rule_group() -> None:
+    """Fail closed when a live profile omits the emergency rule group."""
+    values = _live_config_values()
+    del values["emergency_recovery_lock_seconds"]
+    with pytest.raises(ValidationError):
+        RiskConfig.model_validate(values)
+
+
+def test_live_profile_requires_assessment_rule_group() -> None:
+    """Fail closed when a live profile omits assessment recalculation events."""
+    values = _live_config_values()
+    values["assessment_recalc_events"] = ()
+    with pytest.raises(ValidationError):
+        RiskConfig.model_validate(values)
+
+
+def test_live_profile_accepts_complete_new_rule_groups() -> None:
+    """Construct a live configuration once every new rule group is complete."""
+    config = RiskConfig.model_validate(_live_config_values())
+    assert config.drawdown_critical_threshold == Decimal("0.08")
+    assert config.emergency_recovery_lock_seconds == 900
+    assert config.assessment_recalc_events == ("fill", "position_change")
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("drawdown_caution_threshold", Decimal("0.09")),
+        ("emergency_flash_crash_move_pct", Decimal(0)),
+        ("emergency_flash_crash_window_seconds", 0),
+        ("emergency_connectivity_loss_seconds", 0),
+        ("emergency_recovery_lock_seconds", 0),
+        ("assessment_max_staleness_seconds", 0),
+        ("assessment_recalc_events", ("unregistered_event",)),
+        ("assessment_recalc_events", ("fill", "fill")),
+    ],
+)
+def test_new_rule_groups_reject_invalid_values(field: str, value: object) -> None:
+    """Reject invalid drawdown, emergency, and assessment rule group values."""
+    values = _live_config_values()
+    values[field] = value
+    with pytest.raises(ValidationError):
+        RiskConfig.model_validate(values)

@@ -1,6 +1,7 @@
 """Unit tests for hierarchical canonical Risk kill-switch policy."""
 
 from datetime import timedelta
+from decimal import Decimal
 
 from app.services.risk import create_risk_audit_chain
 from app.services.risk.config import compute_config_hash
@@ -14,6 +15,7 @@ from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.risk.kill_switch import (
     apply_kill_switch_command,
     check_risk_kill_switch,
+    permits_risk_action,
 )
 from app.utils import canonical_json
 
@@ -70,6 +72,186 @@ def test_recovery_requires_clear_hierarchy_and_reconciliation() -> None:
     )
     assert unreconciled.state is DecisionState.BLOCK
     assert recovered.state is DecisionState.APPROVE
+
+
+def test_granular_activation_locks_only_named_permissions() -> None:
+    """Activate with a partial lock and permit only the unlocked actions."""
+    config = examples._config()
+    _, approvals, _ = examples._services(config)
+    store = examples._KillStore()
+    audit = create_risk_audit_chain(
+        config,
+        store,
+        lambda: examples.NOW,
+        canonical_json,
+    )
+    current = examples._inactive_state()
+    command = KillSwitchCommand(
+        action="activate",
+        scope_level="global",
+        portfolio_id=None,
+        strategy_id=None,
+        symbol=None,
+        reason="new-exposure lock only",
+        requested_at=examples.NOW,
+        request_id=examples.REQUEST_ID,
+        workflow_id=examples.WORKFLOW_ID,
+        correlation_id=examples.CORRELATION_ID,
+        locked_permissions=("new_exposure",),
+    )
+    new_state = unwrap_risk_response(
+        apply_kill_switch_command(
+            command,
+            current,
+            examples._auth(config),
+            approvals,
+            audit,
+            store,
+            config,
+            now=examples.NOW,
+        ),
+        operation="apply_kill_switch_command",
+    )
+    assert new_state.locked_permissions == ("new_exposure",)
+    assert not unwrap_risk_response(
+        permits_risk_action((new_state,), {}, "new_exposure"),
+        operation="permits_risk_action",
+    )
+    assert unwrap_risk_response(
+        permits_risk_action((new_state,), {}, "close_only"),
+        operation="permits_risk_action",
+    )
+    assert unwrap_risk_response(
+        permits_risk_action((new_state,), {}, "reduction_only"),
+        operation="permits_risk_action",
+    )
+
+
+def test_legacy_full_activation_blocks_every_action() -> None:
+    """A legacy activation without locked_permissions blocks every action."""
+    config = examples._config()
+    _, approvals, _ = examples._services(config)
+    store = examples._KillStore()
+    audit = create_risk_audit_chain(
+        config,
+        store,
+        lambda: examples.NOW,
+        canonical_json,
+    )
+    current = examples._inactive_state()
+    command = KillSwitchCommand(
+        action="activate",
+        scope_level="global",
+        portfolio_id=None,
+        strategy_id=None,
+        symbol=None,
+        reason="full safety stop",
+        requested_at=examples.NOW,
+        request_id=examples.REQUEST_ID,
+        workflow_id=examples.WORKFLOW_ID,
+        correlation_id=examples.CORRELATION_ID,
+    )
+    new_state = unwrap_risk_response(
+        apply_kill_switch_command(
+            command,
+            current,
+            examples._auth(config),
+            approvals,
+            audit,
+            store,
+            config,
+            now=examples.NOW,
+        ),
+        operation="apply_kill_switch_command",
+    )
+    assert new_state.locked_permissions == ()
+    assert not unwrap_risk_response(
+        permits_risk_action((new_state,), {}, "close_only"),
+        operation="permits_risk_action",
+    )
+
+
+def test_cooldown_blocks_clearance_before_expiry() -> None:
+    """Block clearance before the configured cooldown elapses."""
+    config = examples._config()
+    _, approvals, _ = examples._services(config)
+    store = examples._KillStore()
+    audit = create_risk_audit_chain(
+        config,
+        store,
+        lambda: examples.NOW,
+        canonical_json,
+    )
+    current = examples._inactive_state()
+    activate = KillSwitchCommand(
+        action="activate",
+        scope_level="global",
+        portfolio_id=None,
+        strategy_id=None,
+        symbol=None,
+        reason="cooldown-guarded stop",
+        requested_at=examples.NOW,
+        request_id=examples.REQUEST_ID,
+        workflow_id=examples.WORKFLOW_ID,
+        correlation_id=examples.CORRELATION_ID,
+        cooldown_seconds=Decimal(600),
+    )
+    activated = unwrap_risk_response(
+        apply_kill_switch_command(
+            activate,
+            current,
+            examples._auth(config),
+            approvals,
+            audit,
+            store,
+            config,
+            now=examples.NOW,
+        ),
+        operation="apply_kill_switch_command",
+    )
+    assert activated.cooldown_until == examples.NOW + timedelta(seconds=600)
+    later = examples.NOW + timedelta(seconds=10)
+    clear = KillSwitchCommand(
+        action="clear",
+        scope_level="global",
+        portfolio_id=None,
+        strategy_id=None,
+        symbol=None,
+        reason="premature clear",
+        requested_at=later,
+        request_id=examples.REQUEST_ID,
+        workflow_id=examples.WORKFLOW_ID,
+        correlation_id=examples.CORRELATION_ID,
+    )
+    attestation = ApprovalAttestation(
+        attestation_id="clearance-cooldown-1",
+        principal_id="operator-2",
+        action="risk.kill.clear",
+        scope={"global": "*"},
+        policy_ref=examples._risk_value(
+            compute_config_hash(config), "compute_config_hash"
+        ),
+        policy_version=config.policy_version,
+        issued_at=later,
+        expires_at=later + timedelta(minutes=1),
+        request_id=examples.REQUEST_ID,
+        workflow_id=examples.WORKFLOW_ID,
+        correlation_id=examples.CORRELATION_ID,
+    )
+    response = apply_kill_switch_command(
+        clear,
+        activated,
+        examples._auth(config, clearance=True),
+        approvals,
+        audit,
+        store,
+        config,
+        attestation=attestation,
+        now=later,
+    )
+    assert response.status == "error"
+    assert response.error is not None
+    assert response.error.code == RiskErrorCode.POLICY_BLOCKED.value
 
 
 def test_runtime_profile_mismatch_fails_closed_independent_of_tenancy() -> None:

@@ -13,6 +13,17 @@ from app.services.strategy.checkpoints import (
     validate_strategy_checkpoint,
 )
 from app.services.strategy.checkpoints.factories import create_strategy_checkpoint_value
+from app.services.strategy.contracts import (
+    build_expectancy_reference,
+    build_setup_evaluation,
+    build_strategy_playbook,
+    build_strategy_profile,
+    evaluate_expectancy_reference,
+    parse_expectancy_reference,
+    parse_setup_evaluation,
+    parse_strategy_playbook,
+    parse_strategy_profile,
+)
 from app.services.strategy.contracts.factories import (
     create_strategy_config,
     create_strategy_decision,
@@ -48,12 +59,34 @@ from app.services.strategy.event import (
     run_event_strategy_hook,
     run_persisted_event_strategy_hook,
 )
-from app.services.strategy.intents import build_trade_intent
+from app.services.strategy.exit_plans import (
+    build_exit_plan,
+    build_exit_plan_handoff,
+    parse_exit_plan,
+)
+from app.services.strategy.intents import (
+    amend_trade_plan,
+    build_trade_intent,
+    build_trade_plan,
+    parse_trade_plan,
+    transition_trade_plan,
+    validate_trade_plan_for_intent,
+)
 from app.services.strategy.intents.factories import create_trade_intent_value
+from app.services.strategy.manual_plans import (
+    build_manual_trade_plan,
+    validate_manual_trade_plan,
+)
+from app.services.strategy.operating_envelope import (
+    build_operating_envelope,
+    evaluate_operating_envelope,
+    parse_operating_envelope,
+)
 from app.services.strategy.proposal_intake import (
     bind_proposal_lineage,
     create_strategy_proposal_evaluation_request,
     create_strategy_proposal_evaluation_result,
+    evaluate_automation_mode,
     evaluate_strategy_proposal,
     validate_strategy_proposal,
 )
@@ -61,6 +94,7 @@ from app.services.strategy.registry import (
     adopt_approved_optimization_parameters,
     bootstrap_builtin_strategies,
     get_strategy_definition,
+    govern_strategy_lifecycle,
     list_builtin_strategy_descriptors,
     list_strategy_configs,
     list_strategy_definitions,
@@ -87,10 +121,20 @@ from app.services.strategy.vectorized import run_vectorized_strategy_signals
 
 __all__ = (
     "adopt_approved_optimization_parameters",
+    "amend_trade_plan",
     "bind_proposal_lineage",
     "bootstrap_builtin_strategies",
     "build_development_strategy_validation_policy",
+    "build_exit_plan",
+    "build_exit_plan_handoff",
+    "build_expectancy_reference",
+    "build_manual_trade_plan",
+    "build_operating_envelope",
+    "build_setup_evaluation",
+    "build_strategy_playbook",
+    "build_strategy_profile",
     "build_trade_intent",
+    "build_trade_plan",
     "commit_strategy_runtime_state",
     "create_strategy_checkpoint",
     "create_strategy_checkpoint_value",
@@ -117,6 +161,9 @@ __all__ = (
     "create_validated_strategy_config",
     "create_validated_strategy_ref",
     "evaluate_and_record_strategy_signals",
+    "evaluate_automation_mode",
+    "evaluate_expectancy_reference",
+    "evaluate_operating_envelope",
     "evaluate_strategy_proposal",
     "evaluate_strategy_signals",
     "export_strategy_diagnostics",
@@ -126,6 +173,7 @@ __all__ = (
     "get_strategy_error_code",
     "get_strategy_lifecycle_status",
     "get_strategy_timing_policy",
+    "govern_strategy_lifecycle",
     "initialize_strategy_runtime_state",
     "list_builtin_strategy_descriptors",
     "list_strategy_checkpoints",
@@ -135,16 +183,26 @@ __all__ = (
     "list_strategy_versions",
     "load_strategy_runtime_state",
     "mark_strategy_signal_submitted",
+    "parse_exit_plan",
+    "parse_expectancy_reference",
+    "parse_operating_envelope",
+    "parse_setup_evaluation",
+    "parse_strategy_playbook",
+    "parse_strategy_profile",
+    "parse_trade_plan",
     "record_strategy_signals",
     "register_strategy_version",
     "resolve_strategy_config",
     "run_event_strategy_hook",
     "run_persisted_event_strategy_hook",
     "run_vectorized_strategy_signals",
+    "transition_trade_plan",
     "unwrap_strategy_response",
     "update_strategy_parameters",
+    "validate_manual_trade_plan",
     "validate_strategy_checkpoint",
     "validate_strategy_config",
     "validate_strategy_proposal",
     "validate_strategy_ref",
+    "validate_trade_plan_for_intent",
 )

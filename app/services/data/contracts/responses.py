@@ -128,6 +128,15 @@ _TRAITS: Mapping[str, OperationTraits] = {
     "data.market_data.get_spread_data": _traits(
         "low", read_only=True, requires_network=True
     ),
+    "data.market_data.get_level1_snapshot": _traits(
+        "low", read_only=True, requires_network=True
+    ),
+    "data.market_data.get_market_snapshot": _traits(
+        "low", read_only=True, requires_network=True
+    ),
+    "data.market_data.export_replay_evidence": _traits(
+        "low", read_only=True, requires_network=True
+    ),
     "data.market_data.discover_symbols": _traits(
         "low", read_only=True, requires_network=True
     ),
@@ -218,6 +227,10 @@ _TRAITS: Mapping[str, OperationTraits] = {
     "data.quality.detect_price_jumps": _traits("none", read_only=True),
     "data.quality.detect_timestamp_gaps": _traits("none", read_only=True),
     "data.quality.detect_zero_volume_bars": _traits("none", read_only=True),
+    "data.quality.detect_out_of_order_records": _traits("none", read_only=True),
+    "data.quality.detect_clock_drift": _traits("none", read_only=True),
+    "data.quality.detect_stale_quote": _traits("none", read_only=True),
+    "data.quality.detect_source_disagreement": _traits("none", read_only=True),
     "data.quality.get_quality_policy": _traits("none", read_only=True),
     "data.quality.inspect_data_quality": _traits("none", read_only=True),
     "data.quality.inspect_dataset_quality": _traits("none", read_only=True),
@@ -254,6 +267,7 @@ _TRAITS: Mapping[str, OperationTraits] = {
     "data.sources.ensure_source": _traits("low", read_only=False),
     "data.sources.ensure_source_access": _traits("low", read_only=False),
     "data.sources.evaluate_source_policy": _traits("low", read_only=True),
+    "data.sources.compute_source_trust_score": _traits("low", read_only=True),
     "data.sources.get_source_descriptor": _traits("low", read_only=True),
     "data.sources.list_composable_sources": _traits("low", read_only=True),
     "data.sources.list_registered_sources": _traits("low", read_only=True),

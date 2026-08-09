@@ -10,6 +10,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
+    apply_venue_halt,
     build_active_market_sessions_request,
     build_exchange_session_request,
     build_market_hours_request,
@@ -180,6 +181,44 @@ def fr_data_121_122() -> None:
         print(f"Data -> ActiveMarketSessions(sessions={list(result.sessions)})")
 
 
+def fr_data_194_195() -> None:
+    """FR-DATA-194/195: Stage 6 — Overlay genuine venue-halt and close/roll window evidence onto computed tradability (TC-IMP-DATA-05)."""
+    _header(
+        "Stage 6: Venue Halt & Roll Window Overlay - apply_venue_halt (FR-DATA-194/195)"
+    )
+    provider = build_weekly_schedule_provider(
+        build_weekly_schedule_definition(
+            source_id="configured-demo",
+            symbol="EURUSD",
+            timezone="UTC",
+            sessions={day: ((time(0), time(23, 59)),) for day in range(7)},
+            effective_from=date(2020, 1, 1),
+            revision="usage-v1",
+        )
+    )
+    res = get_market_hours(
+        build_market_hours_request(
+            source_id="configured-demo",
+            symbol="EURUSD",
+            request_id=generate_id("req"),
+        ),
+        provider,
+    )
+    if res.status == "success" and res.data is not None:
+        hours = res.data
+        halted = apply_venue_halt(
+            hours,
+            halted=True,
+            reason="usage-demo circuit breaker",
+            reopen_at=hours.checked_at,
+        )
+        print(_format_result(halted))
+        print(
+            f"Data -> MarketHours(halted={halted.halted}, is_open={halted.is_open}, "
+            f"halt_reason={halted.halt_reason})"
+        )
+
+
 def main() -> None:
     """Execute every functional-requirement demonstration."""
     print("=" * 80)
@@ -198,6 +237,7 @@ def main() -> None:
     fr_data_118()
     fr_data_120()
     fr_data_121_122()
+    fr_data_194_195()
     print("SUCCESS: FEAT-DATA-09 completed")
 
 

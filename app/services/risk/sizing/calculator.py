@@ -1,5 +1,6 @@
 """Migration-evidenced deterministic position sizing recommendations."""
 
+from collections.abc import Mapping
 from decimal import ROUND_FLOOR, Decimal
 from typing import Literal
 
@@ -258,24 +259,56 @@ def _apply_correlation_penalty(
     return raw_size, None
 
 
+def _effective_cap(
+    request: PositionSizingRequest,
+    additional_caps: Mapping[str, Decimal | None] | None,
+) -> tuple[Decimal, str]:
+    """Resolve the strictest of the broker cap and every supplied named cap.
+
+    Args:
+        request: Broker size constraints.
+        additional_caps: Optional named caps (e.g. risk, margin, symbol,
+            portfolio, liquidity, strategy, stress); ``None`` values are
+            treated as not-applicable rather than as a zero cap.
+
+    Returns:
+        The minimum applicable cap and the constraint name that produced it.
+    """
+    logger.debug("Resolving strictest Risk sizing cap")
+    cap = request.broker_max_size
+    name = "broker_maximum_cap"
+    for cap_name, value in (additional_caps or {}).items():
+        if value is not None and value < cap:
+            cap = value
+            name = f"{cap_name}_cap"
+    return cap, name
+
+
 def _normalize(
-    raw_size: Decimal, request: PositionSizingRequest, constraints: list[str]
+    raw_size: Decimal,
+    request: PositionSizingRequest,
+    constraints: list[str],
+    additional_caps: Mapping[str, Decimal | None] | None = None,
 ) -> Decimal:
-    """Cap and floor size to exact broker constraints.
+    """Cap and floor size to the strictest broker and named-cap constraints.
 
     Args:
         raw_size: Non-negative raw size.
         request: Broker size constraints.
         constraints: Mutable local disclosure list.
+        additional_caps: Optional named caps combined with the broker cap
+            via minimum ("cap-of-caps").
 
     Returns:
-        Exact normalized size, possibly zero.
+        Exact normalized size, possibly zero; never exceeds any supplied
+        cap.
     """
     logger.debug("Normalizing size to migrated broker-step behavior")
+    cap, cap_name = _effective_cap(request, additional_caps)
     capped = raw_size
-    if capped > request.broker_max_size:
-        capped = request.broker_max_size
-        constraints.append("broker_maximum_cap")
+    if capped > cap:
+        capped = cap
+        constraints.append(cap_name)
     steps = (capped / request.broker_size_step).to_integral_value(rounding=ROUND_FLOOR)
     normalized = steps * request.broker_size_step
     if normalized != capped:
@@ -309,6 +342,8 @@ def calculate_position_size(
     request: PositionSizingRequest,
     snapshot: PortfolioRiskSnapshot,
     config: RiskConfig,
+    *,
+    additional_caps: Mapping[str, Decimal | None] | None = None,
 ) -> PositionSizingResult:
     """Calculate one deterministic non-authorizing position-size recommendation.
 
@@ -316,6 +351,10 @@ def calculate_position_size(
         request: Complete method and broker evidence.
         snapshot: Current immutable portfolio Risk snapshot.
         config: Active immutable Risk policy.
+        additional_caps: Optional named caps (e.g. ``margin``, ``symbol``,
+            ``portfolio``, ``liquidity``, ``strategy``, ``stress``) combined
+            with the broker cap via minimum; the normalized size never
+            exceeds any supplied cap.
 
     Returns:
         Exact normalized sizing recommendation.
@@ -332,7 +371,7 @@ def calculate_position_size(
         adjusted, correlation_adjustment = _apply_correlation_penalty(
             raw, snapshot, config, constraints
         )
-        normalized = _normalize(adjusted, request, constraints)
+        normalized = _normalize(adjusted, request, constraints, additional_caps)
         return PositionSizingResult(
             method=request.method,
             requested_size=request.requested_size,
@@ -354,4 +393,67 @@ def calculate_position_size(
         ) from error
 
 
-__all__ = ["calculate_position_size"]
+@guard_risk_boundary(risk_level="low", read_only=True)
+def calculate_planned_risk_reward(
+    *,
+    stop_distance: Decimal,
+    target_distance: Decimal,
+    contract_value: Decimal,
+    quantity: Decimal,
+    fees: Decimal = Decimal(0),
+    spread_cost: Decimal = Decimal(0),
+    estimated_slippage: Decimal = Decimal(0),
+) -> dict[str, Decimal]:
+    """Calculate planned monetary risk, reward, and their ratio for a trade.
+
+    Args:
+        stop_distance: Positive price-space distance from entry to stop.
+        target_distance: Positive price-space distance from entry to target.
+        contract_value: Positive account-currency value per price unit.
+        quantity: Positive requested size.
+        fees: Non-negative estimated fees added to planned risk.
+        spread_cost: Non-negative estimated spread cost added to planned
+            risk.
+        estimated_slippage: Non-negative estimated slippage cost added to
+            planned risk.
+
+    Returns:
+        Mapping with ``planned_risk``, ``planned_reward``, and
+        ``reward_risk_ratio`` (zero when planned risk is zero).
+
+    Raises:
+        RiskDomainError: If a distance/value/quantity is non-positive or a
+            cost is negative.
+    """
+    logger.info("Calculating planned Risk and net reward")
+    if (
+        stop_distance <= 0
+        or target_distance <= 0
+        or contract_value <= 0
+        or quantity <= 0
+    ):
+        raise RiskDomainError(
+            RiskErrorCode.CALCULATION_FAILED,
+            "planned risk/reward distances, value, and quantity must be positive",
+        )
+    if fees < 0 or spread_cost < 0 or estimated_slippage < 0:
+        raise RiskDomainError(
+            RiskErrorCode.CALCULATION_FAILED,
+            "planned risk/reward costs must be non-negative",
+        )
+    planned_risk = (
+        stop_distance * contract_value * quantity
+        + fees
+        + spread_cost
+        + estimated_slippage
+    )
+    planned_reward = target_distance * contract_value * quantity
+    ratio = planned_reward / planned_risk if planned_risk > 0 else Decimal(0)
+    return {
+        "planned_risk": planned_risk,
+        "planned_reward": planned_reward,
+        "reward_risk_ratio": ratio,
+    }
+
+
+__all__ = ["calculate_planned_risk_reward", "calculate_position_size"]

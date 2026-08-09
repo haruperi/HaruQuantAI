@@ -98,15 +98,33 @@ def _definition(code: str) -> ErrorDefinition:
         The validated Utils error definition.
     """
     category = (
-        "internal"
+        "INTEGRITY"
         if code == "STRATEGY_INTERNAL_ERROR"
-        else "safety"
-        if code in {"STRATEGY_HARD_KILLED", "STRATEGY_LOOKAHEAD_DETECTED"}
-        else "resource"
-        if code in {"STRATEGY_RESOURCE_LIMIT_EXCEEDED", "STRATEGY_TIMEOUT"}
-        else "validation"
+        else "DATA_STALE"
+        if code
+        in {
+            "STRATEGY_DATA_NOT_READY",
+            "STRATEGY_INDICATOR_NOT_READY",
+            "STRATEGY_STALE_DATA",
+        }
+        else "TRANSIENT"
+        if code == "STRATEGY_TIMEOUT"
+        else "POLICY"
+        if code
+        in {
+            "STRATEGY_ARBITRARY_CODE_REJECTED",
+            "STRATEGY_ENVIRONMENT_NOT_PERMITTED",
+            "STRATEGY_HARD_KILLED",
+            "STRATEGY_LIFECYCLE_NOT_APPROVED",
+            "STRATEGY_LOOKAHEAD_DETECTED",
+            "STRATEGY_POSITION_LIMIT_EXCEEDED",
+            "STRATEGY_RISK_PROFILE_REQUIRED",
+            "STRATEGY_UNAPPROVED_MODULE",
+            "STRATEGY_VALIDATION_ARTIFACT_REQUIRED",
+        }
+        else "PERMANENT"
     )
-    severity = "critical" if category in {"internal", "safety"} else "error"
+    severity = "critical" if category in {"INTEGRITY", "POLICY"} else "error"
     return ErrorDefinition(
         code=code,
         domain="strategy",

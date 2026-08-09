@@ -11,6 +11,8 @@ from app.services.brokers.contracts.enums import (
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
+    BrokerResubmissionPolicy,
+    BrokerUncertainty,
 )
 from app.services.brokers.contracts.models import (
     BrokerAccountInfo,
@@ -32,6 +34,7 @@ from app.services.brokers.contracts.models import (
     BrokerOrderCheck,
     BrokerOrderFilter,
     BrokerOrderModificationRequest,
+    BrokerOrderProtectionRequest,
     BrokerOrderRequest,
     BrokerOrderResult,
     BrokerPage,
@@ -41,6 +44,7 @@ from app.services.brokers.contracts.models import (
     BrokerPositionCloseRequest,
     BrokerPositionFilter,
     BrokerPositionModificationRequest,
+    BrokerPositionReductionRequest,
     BrokerProfitRequest,
     BrokerQuote,
     BrokerServerTime,
@@ -197,6 +201,8 @@ def create_configured_fake_broker_adapter(
         BrokerCapabilityId.MODIFY_POSITION,
         BrokerCapabilityId.CLOSE_POSITION,
         BrokerCapabilityId.REPLACE_ORDER,
+        BrokerCapabilityId.ATTACH_PROTECTION,
+        BrokerCapabilityId.REDUCE_POSITION,
     }
     capabilities = {
         capability: BrokerCapability(
@@ -1543,3 +1549,250 @@ async def replace_broker_order(
         The canonical replacement result.
     """
     return await adapter.replace_order(request)
+
+
+# --- Trading Cockpit Phase 0 contract transport and safe-order extensions ---
+
+
+def build_broker_order_protection_request(
+    order_id: str,
+    idempotency_key: str,
+    stop_loss: Decimal | float | str | None = None,
+    take_profit: Decimal | float | str | None = None,
+    trailing_distance: Decimal | float | str | None = None,
+    client_request_id: str | None = None,
+) -> BrokerOrderProtectionRequest:
+    """Build a BrokerOrderProtectionRequest instance (``TC-IMP-BRK-06``).
+
+    Args:
+        order_id: Target order identifier.
+        idempotency_key: Explicit adapter-boundary idempotency key.
+        stop_loss: Optional stop-loss price.
+        take_profit: Optional take-profit price.
+        trailing_distance: Optional trailing-stop distance.
+        client_request_id: Optional caller request identifier.
+
+    Returns:
+        Configured BrokerOrderProtectionRequest instance.
+    """
+    return BrokerOrderProtectionRequest(
+        order_id=order_id,
+        idempotency_key=idempotency_key,
+        stop_loss=Decimal(str(stop_loss)) if stop_loss is not None else None,
+        take_profit=Decimal(str(take_profit)) if take_profit is not None else None,
+        trailing_distance=(
+            Decimal(str(trailing_distance)) if trailing_distance is not None else None
+        ),
+        client_request_id=client_request_id,
+    )
+
+
+def build_broker_position_reduce_request(
+    position_id: str,
+    quantity: Decimal | float | str,
+    quantity_unit: str,
+    idempotency_key: str,
+    client_request_id: str | None = None,
+) -> BrokerPositionReductionRequest:
+    """Build a BrokerPositionReductionRequest instance (``TC-IMP-BRK-06``).
+
+    Args:
+        position_id: Target position identifier.
+        quantity: Quantity to reduce.
+        quantity_unit: Provider quantity unit.
+        idempotency_key: Explicit adapter-boundary idempotency key.
+        client_request_id: Optional caller request identifier.
+
+    Returns:
+        Configured BrokerPositionReductionRequest instance.
+    """
+    return BrokerPositionReductionRequest(
+        position_id=position_id,
+        quantity=Decimal(str(quantity)),
+        quantity_unit=quantity_unit,
+        idempotency_key=idempotency_key,
+        client_request_id=client_request_id,
+    )
+
+
+async def attach_broker_protection(
+    adapter: BrokerAdapter, request: BrokerOrderProtectionRequest
+) -> StandardResponse[BrokerOrderResult]:
+    """Attach bracketing protection to one order through the root boundary.
+
+    Args:
+        adapter: Targeted broker adapter.
+        request: Order protection request.
+
+    Returns:
+        Standard response containing the protection attachment result.
+    """
+    return await adapter.attach_protection(request)
+
+
+async def reduce_broker_position(
+    adapter: BrokerAdapter, request: BrokerPositionReductionRequest
+) -> StandardResponse[BrokerOrderResult]:
+    """Reduce one open position by an explicit quantity through the root boundary.
+
+    Args:
+        adapter: Targeted broker adapter.
+        request: Position reduction request.
+
+    Returns:
+        Standard response containing the reduction result.
+    """
+    return await adapter.reduce_position(request)
+
+
+def get_broker_uncertainty(value: str) -> BrokerUncertainty:
+    """Return the canonical BrokerUncertainty enum value.
+
+    Args:
+        value: Candidate uncertainty value.
+
+    Returns:
+        Validated BrokerUncertainty.
+    """
+    return BrokerUncertainty(value)
+
+
+def get_broker_resubmission_policy(value: str) -> BrokerResubmissionPolicy:
+    """Return the canonical BrokerResubmissionPolicy enum value.
+
+    Args:
+        value: Candidate policy value.
+
+    Returns:
+        Validated BrokerResubmissionPolicy.
+    """
+    return BrokerResubmissionPolicy(value)
+
+
+# --- Trading Cockpit Phase 0 contract-transport aliases (FEAT-BRK-16) ---
+#
+# The route-discipline feature owns the canonical ``build_route_plan``/
+# ``parse_route_plan`` and ``build_failover_decision``/``parse_failover_decision``
+# implementations. The package-root public API exposes them under the
+# ``build_broker_*`` naming convention so the entire Brokers public surface
+# shares one prefix while the function-only rule is preserved.
+
+
+def build_broker_route_plan(
+    *,
+    plan_id: str,
+    primary_broker: BrokerId | str,
+    primary_environment: BrokerEnvironment | str,
+    primary_readiness: str,
+    backup_broker: BrokerId | str | None,
+    backup_environment: BrokerEnvironment | str | None,
+    backup_readiness: str | None,
+    selected_route: str | None,
+    route_state: str,
+    write_failover_policy: str,
+    created_at: datetime,
+) -> dict[str, object]:
+    """Build and hash a redacted RoutePlan v1 mapping (``TC-IMP-BRK-09``).
+
+    Args:
+        plan_id: Caller-owned plan identifier.
+        primary_broker: Primary broker identifier.
+        primary_environment: Primary broker environment.
+        primary_readiness: Primary route health readiness.
+        backup_broker: Optional backup broker identifier.
+        backup_environment: Optional backup broker environment.
+        backup_readiness: Optional backup route health readiness.
+        selected_route: Selected route identifier, or ``None`` when unavailable.
+        route_state: Aggregate route state verdict.
+        write_failover_policy: Write failover policy.
+        created_at: Aware UTC plan creation instant.
+
+    Returns:
+        RoutePlan v1 mapping.
+    """
+    from app.services.brokers.route_discipline.plans import build_route_plan
+
+    return build_route_plan(
+        plan_id=plan_id,
+        primary_broker=primary_broker,
+        primary_environment=primary_environment,
+        primary_readiness=primary_readiness,
+        backup_broker=backup_broker,
+        backup_environment=backup_environment,
+        backup_readiness=backup_readiness,
+        selected_route=selected_route,
+        route_state=route_state,
+        write_failover_policy=write_failover_policy,
+        created_at=created_at,
+    )
+
+
+def parse_broker_route_plan(value: Mapping[str, object]) -> dict[str, object]:
+    """Validate a RoutePlan v1 mapping and integrity hash (``TC-IMP-BRK-09``).
+
+    Args:
+        value: Candidate mapping.
+
+    Returns:
+        Validated detached route plan.
+    """
+    from app.services.brokers.route_discipline.plans import parse_route_plan
+
+    return parse_route_plan(value)
+
+
+def build_broker_failover_decision(
+    *,
+    decision_id: str,
+    plan_id: str,
+    decision: str,
+    active_broker: BrokerId | str | None,
+    active_environment: BrokerEnvironment | str | None,
+    write_permitted: bool,
+    read_permitted: bool,
+    reason: str,
+    decided_at: datetime,
+) -> dict[str, object]:
+    """Build and hash a redacted FailoverDecision v1 mapping (``TC-IMP-BRK-09``).
+
+    Args:
+        decision_id: Caller-owned decision identifier.
+        plan_id: Originating route plan identifier.
+        decision: Deterministic failover decision.
+        active_broker: Active broker after the decision, or ``None`` when blocked.
+        active_environment: Active broker environment, or ``None`` when blocked.
+        write_permitted: Whether the active route may submit new writes.
+        read_permitted: Whether the active route may be read.
+        reason: Short deterministic reason label.
+        decided_at: Aware UTC decision instant.
+
+    Returns:
+        FailoverDecision v1 mapping.
+    """
+    from app.services.brokers.route_discipline.failover import build_failover_decision
+
+    return build_failover_decision(
+        decision_id=decision_id,
+        plan_id=plan_id,
+        decision=decision,
+        active_broker=active_broker,
+        active_environment=active_environment,
+        write_permitted=write_permitted,
+        read_permitted=read_permitted,
+        reason=reason,
+        decided_at=decided_at,
+    )
+
+
+def parse_broker_failover_decision(value: Mapping[str, object]) -> dict[str, object]:
+    """Validate a FailoverDecision v1 mapping and integrity hash (``TC-IMP-BRK-09``).
+
+    Args:
+        value: Candidate mapping.
+
+    Returns:
+        Validated detached failover decision.
+    """
+    from app.services.brokers.route_discipline.failover import parse_failover_decision
+
+    return parse_failover_decision(value)

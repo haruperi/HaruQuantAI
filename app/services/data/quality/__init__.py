@@ -28,9 +28,13 @@ if TYPE_CHECKING:
     )
 
 from app.services.data.quality.anomalies import (
+    detect_clock_drift,
     detect_extreme_spread_widening,
     detect_flatline_periods,
+    detect_out_of_order_records,
     detect_price_jumps,
+    detect_source_disagreement,
+    detect_stale_quote,
     detect_zero_volume_bars,
 )
 from app.services.data.quality.asset_metadata import validate_symbol_metadata
@@ -75,9 +79,13 @@ __all__ = [
     "QualityFlag",
     "QualityPolicy",
     "aggregate_flags",
+    "detect_clock_drift",
     "detect_extreme_spread_widening",
     "detect_flatline_periods",
+    "detect_out_of_order_records",
     "detect_price_jumps",
+    "detect_source_disagreement",
+    "detect_stale_quote",
     "detect_timestamp_gaps",
     "detect_zero_volume_bars",
     "get_quality_policy",

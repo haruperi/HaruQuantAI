@@ -3,6 +3,11 @@
 from app.services.risk.kill_switch.authority import (
     apply_kill_switch_command,
     check_risk_kill_switch,
+    permits_risk_action,
 )
 
-__all__ = ["apply_kill_switch_command", "check_risk_kill_switch"]
+__all__ = [
+    "apply_kill_switch_command",
+    "check_risk_kill_switch",
+    "permits_risk_action",
+]

@@ -57,12 +57,17 @@ def test_bind_child_authority_sim_and_failures() -> None:
     assert exc_info.value.code == "PERMISSION_DENIED"
 
 
-def test_bulk_cancellation_and_closure_edge_cases() -> None:
+def test_bulk_cancellation_and_closure_edge_cases() -> None:  # noqa: PLR0915
     """Verify cancel_all_orders and close_all_positions failure modes."""
     from datetime import UTC, datetime, timedelta
     from decimal import Decimal
 
     from app.services.trading.contracts import TradingRequest
+    from app.services.trading.state import (
+        create_execution_position,
+        create_execution_position_store,
+        set_execution_position,
+    )
 
     now = datetime.now(UTC)
     request = TradingRequest(
@@ -167,8 +172,20 @@ def test_bulk_cancellation_and_closure_edge_cases() -> None:
             quantity=Decimal("1.0"),
         )
         deps.account_state_source.return_value = MagicMock(positions=[pos_open])
-        deps.store.load_projection.return_value = MagicMock(
-            version=1, positions={"pos-open": {"broker_position_id": "pos-open"}}
+        deps.store.load_projection.return_value = MagicMock(version=1)
+        deps.execution_positions = create_execution_position_store()
+        set_execution_position(
+            deps.execution_positions,
+            create_execution_position(
+                position_id="pos-open",
+                account_id="acc-1",
+                symbol="EURUSD",
+                broker_position_id="pos-open",
+                state="OPEN",
+                quantity=Decimal("1.0"),
+                source_sequence=1,
+                version=1,
+            ),
         )
 
         with patch(

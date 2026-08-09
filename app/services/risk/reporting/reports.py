@@ -103,6 +103,39 @@ def _decision_approval_claimed(decision: RiskDecisionPackage, now: datetime) -> 
     )
 
 
+def classify_decision_outcome(decision: RiskDecisionPackage) -> DecisionState:
+    """Classify a decision's explainable outcome, adding resize/restrict.
+
+    Purely additive read-only classification layered on top of the
+    governor's authoritative persisted ``decision.state``; it never mutates
+    or re-derives the underlying precedence decision. ``RESIZE`` marks an
+    approved decision whose size was reduced below the requested size;
+    ``RESTRICT`` marks a block caused specifically by kill-switch policy
+    (a restriction, distinct from a hard limit-breach rejection).
+
+    Args:
+        decision: Canonical Risk decision package.
+
+    Returns:
+        The explainable outcome: ``decision.state`` unchanged unless the
+        decision qualifies as a resize or a kill-switch restriction.
+    """
+    logger.debug("Classifying explainable Risk decision outcome")
+    if (
+        decision.state is DecisionState.APPROVE
+        and decision.approved_size is not None
+        and decision.requested_size is not None
+        and 0 < decision.approved_size < decision.requested_size
+    ):
+        return DecisionState.RESIZE
+    if (
+        decision.state is DecisionState.BLOCK
+        and decision.primary_failure_limit == "kill_switch"
+    ):
+        return DecisionState.RESTRICT
+    return decision.state
+
+
 def _decision_sections(decision: RiskDecisionPackage) -> dict[str, tuple[str, ...]]:
     """Build focused report sections from one canonical decision.
 
@@ -118,7 +151,8 @@ def _decision_sections(decision: RiskDecisionPackage) -> dict[str, tuple[str, ..
         if decision.primary_failure_limit is not None
         else ()
     )
-    decision_items = (*decision_items, f"state={decision.state.value}")
+    outcome = classify_decision_outcome(decision)
+    decision_items = (*decision_items, f"state={outcome.value}")
     calculations = tuple(
         f"{item.precedence}:{item.limit_id}={item.status.value}"
         for item in decision.ordered_checks
@@ -330,4 +364,4 @@ def generate_risk_report(
         ) from error
 
 
-__all__ = ["generate_risk_report"]
+__all__ = ["classify_decision_outcome", "generate_risk_report"]

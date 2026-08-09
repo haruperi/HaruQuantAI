@@ -20,6 +20,8 @@ from app.services.portfolio.contracts import (
 from app.services.portfolio.persistence import (
     create_construction_record,
     create_definition_record,
+    create_ledger_account_record,
+    create_ledger_batch_record,
     create_plan_record,
     create_portfolio_runtime_store,
     read_active_allocation_record,
@@ -28,6 +30,9 @@ from app.services.portfolio.persistence import (
     read_construction_record,
     read_definition_record,
     read_idempotency_record,
+    read_ledger_account_record,
+    read_ledger_batch_record,
+    read_ledger_entries_for_account,
     read_plan_record,
     read_plan_version_records,
     update_active_allocation_record,
@@ -244,6 +249,8 @@ class _DurablePortfolioStateStore:
                     _encode_model,
                     lambda payload: _decode_model(PortfolioRebalancePlan, payload),
                 ),
+                "ledger_account": (_encode_mapping, json.loads),
+                "ledger_batch": (_encode_mapping, json.loads),
             }
         )
 
@@ -534,6 +541,127 @@ class _DurablePortfolioStateStore:
             ),
         )
 
+    def save_ledger_account(
+        self,
+        account: Mapping[str, object],
+        audit_record: AuditOutboxRecord,
+    ) -> Mapping[str, object]:
+        """Atomically save an immutable ledger account.
+
+        Args:
+            account: ``LedgerAccount`` mapping.
+            audit_record: Redacted audit evidence.
+
+        Returns:
+            Persisted account mapping.
+
+        Raises:
+            ValueError: If the immutable identity conflicts.
+        """
+        logger.info("Saving immutable Portfolio ledger account")
+        account_id = str(account.get("account_id", ""))
+        existing = read_ledger_account_record(self._store, account_id)
+        if existing is not None:
+            if existing == account:
+                return account
+            raise ValueError("Portfolio ledger account conflicts")
+        outbox = {"audit": dict(audit_record), "account": account_id}
+        committed = create_ledger_account_record(
+            self._store,
+            state_value=account,
+            event_key=_key("outbox", "ledger-accounts", account_id),
+            event_value=outbox,
+        )
+        if not committed:
+            raise ValueError("Portfolio ledger account transaction was not confirmed")
+        return account
+
+    def save_ledger_batch(
+        self,
+        batch: Mapping[str, object],
+        entry_rows: tuple[tuple[object, ...], ...],
+        audit_record: AuditOutboxRecord,
+    ) -> Mapping[str, object]:
+        """Atomically append one balanced batch and its legs.
+
+        Args:
+            batch: ``PostingBatch`` mapping.
+            entry_rows: Normalized per-leg parameter tuples.
+            audit_record: Redacted audit evidence.
+
+        Returns:
+            Persisted batch mapping.
+
+        Raises:
+            ValueError: If the batch conflicts with recorded material.
+        """
+        logger.info("Appending immutable Portfolio ledger batch")
+        source_event_id = str(batch.get("source_event_id", ""))
+        source_sequence = batch.get("source_sequence", 0)
+        if not isinstance(source_sequence, int) or source_sequence <= 0:
+            raise ValueError("Portfolio ledger batch sequence must be positive")
+        existing = read_ledger_batch_record(
+            self._store, source_event_id, source_sequence
+        )
+        if existing is not None:
+            if existing == batch:
+                return batch
+            raise ValueError("Portfolio ledger batch conflicts")
+        batch_id = str(batch.get("batch_id", ""))
+        outbox = {"audit": dict(audit_record), "batch": batch_id}
+        committed = create_ledger_batch_record(
+            self._store,
+            batch_value=batch,
+            entry_rows=entry_rows,
+            event_key=_key("outbox", "ledger-batches", batch_id),
+            event_value=outbox,
+        )
+        if not committed:
+            raise ValueError("Portfolio ledger batch transaction was not confirmed")
+        return batch
+
+    def load_ledger_account(self, account_id: str) -> Mapping[str, object] | None:
+        """Load one immutable ledger account.
+
+        Args:
+            account_id: Chart-of-accounts identity.
+
+        Returns:
+            Account mapping or ``None``.
+        """
+        return cast(
+            "Mapping[str, object] | None",
+            read_ledger_account_record(self._store, account_id),
+        )
+
+    def load_ledger_batch(
+        self, source_event_id: str, source_sequence: int
+    ) -> Mapping[str, object] | None:
+        """Load one ledger batch by its exactly-once event identity.
+
+        Args:
+            source_event_id: External economic event identity.
+            source_sequence: Exactly-once monotonic event sequence.
+
+        Returns:
+            Batch mapping or ``None``.
+        """
+        return cast(
+            "Mapping[str, object] | None",
+            read_ledger_batch_record(self._store, source_event_id, source_sequence),
+        )
+
+    def load_ledger_entries(self, account_id: str) -> tuple[Mapping[str, object], ...]:
+        """Load ordered ledger legs for one account.
+
+        Args:
+            account_id: Chart-of-accounts identity.
+
+        Returns:
+            Ordered normalized leg mappings.
+        """
+        return read_ledger_entries_for_account(self._store, account_id)
+
 
 def build_portfolio_state_store() -> object:
     """Build the durable Portfolio state adapter.
@@ -567,6 +695,11 @@ def execute_portfolio_state_store_operation(
         "save_construction",
         "save_definition",
         "save_plan",
+        "save_ledger_account",
+        "save_ledger_batch",
+        "load_ledger_account",
+        "load_ledger_batch",
+        "load_ledger_entries",
     }
     if not isinstance(store, _DurablePortfolioStateStore):
         raise TypeError("invalid Portfolio state-store handle")

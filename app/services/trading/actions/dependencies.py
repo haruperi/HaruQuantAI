@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Protocol
@@ -18,6 +18,7 @@ from app.services.trading.contracts import (
 )
 from app.services.trading.contracts.models import JsonValue
 from app.services.trading.reconciliation import AuthoritySnapshot
+from app.services.trading.state import create_execution_position_store
 from app.utils import get_logger
 
 AccountStateSnapshot = Any
@@ -146,6 +147,7 @@ class TradingDependencies:
         risk_source: Risk decision evaluation port.
         child_risk_decision_source: Exact per-child emergency Risk authority.
         execution_risk_decision_source: Exact per-request Simulation Risk authority.
+        execution_positions: Process-local Trading execution-position state.
     """
 
     store: TradingStateStore
@@ -177,6 +179,7 @@ class TradingDependencies:
     risk_source: RiskSource
     child_risk_decision_source: ChildRiskDecisionSource
     execution_risk_decision_source: ExecutionRiskDecisionSource
+    execution_positions: object = field(default_factory=create_execution_position_store)
 
     def __post_init__(self) -> None:
         """Reject explicit absence without resolving any dependency.
@@ -207,6 +210,7 @@ class TradingDependencies:
             self.risk_source,
             self.child_risk_decision_source,
             self.execution_risk_decision_source,
+            self.execution_positions,
         )
         if any(dependency is None for dependency in required):
             raise TradingError(

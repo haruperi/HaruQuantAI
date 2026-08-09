@@ -32,5 +32,6 @@ def test_report_separates_evidence_and_decision() -> None:
     )
     assert report.evidence != report.decision
     assert report.decision[0] == "primary_failure=kill_switch"
-    assert report.decision[1] == "state=block"
+    assert decision.state.value == "block"
+    assert report.decision[1] == "state=restrict"
     assert report.approval_claimed is False

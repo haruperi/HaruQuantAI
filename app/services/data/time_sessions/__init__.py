@@ -16,6 +16,7 @@ from app.services.data.time_sessions.contracts import (
 )
 from app.services.data.time_sessions.exchange_calendar import get_exchange_sessions
 from app.services.data.time_sessions.gaps import GapType, classify_gap
+from app.services.data.time_sessions.market_hours import apply_venue_halt
 from app.services.data.time_sessions.named_sessions import (
     FOREX_NAMED_SESSIONS,
     get_active_market_sessions,
@@ -54,6 +55,7 @@ __all__ = [
     "WeeklyHoliday",
     "WeeklyScheduleDefinition",
     "WeeklyScheduleProvider",
+    "apply_venue_halt",
     "classify_gap",
     "get_active_market_sessions",
     "get_current_schedule",

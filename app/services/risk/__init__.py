@@ -80,25 +80,49 @@ from app.services.risk.contracts import (
 from app.services.risk.governor import (
     build_governance_runtime_operation,
     create_risk_governor,
+    evaluate_emergency_state,
+    evaluate_trade_readiness,
     review_trade_risk,
     run_portfolio_risk_governor,
 )
 from app.services.risk.kill_switch import (
     apply_kill_switch_command,
     check_risk_kill_switch,
+    permits_risk_action,
 )
 from app.services.risk.limits import (
     evaluate_market_context,
     evaluate_portfolio_limits,
+    evaluate_reward_risk_gate,
     evaluate_single_day_profit_share,
+    resolve_effective_rules,
 )
 from app.services.risk.migrations.definitions import run_risk_migrations
+from app.services.risk.no_trade_state import (
+    build_no_trade_outcome,
+    classify_no_trade_outcome,
+    parse_no_trade_outcome,
+)
 from app.services.risk.portfolio import build_portfolio_risk_snapshot
 from app.services.risk.regimes import assess_risk_regime
-from app.services.risk.reporting import generate_risk_report
-from app.services.risk.scenarios import run_risk_scenario_analysis
-from app.services.risk.sizing import calculate_position_size
-from app.services.risk.validity import revalidate_risk_decision
+from app.services.risk.reporting import classify_decision_outcome, generate_risk_report
+from app.services.risk.scenarios import (
+    evaluate_stress_loss_gate,
+    run_risk_scenario_analysis,
+)
+from app.services.risk.sizing import (
+    calculate_planned_risk_reward,
+    calculate_position_size,
+)
+from app.services.risk.stop_validation import (
+    build_stop_validation,
+    parse_stop_validation,
+    validate_stop_loss,
+)
+from app.services.risk.validity import (
+    requires_risk_recalculation,
+    revalidate_risk_decision,
+)
 
 __all__ = (
     "activate_allocation_budget",
@@ -109,13 +133,18 @@ __all__ = (
     "build_allocation_runtime_operation",
     "build_development_risk_config",
     "build_governance_runtime_operation",
+    "build_no_trade_outcome",
     "build_personal_account_risk_config",
     "build_portfolio_risk_snapshot",
     "build_prop_firm_risk_config",
     "build_risk_approval_state_store",
     "build_risk_state_store",
+    "build_stop_validation",
+    "calculate_planned_risk_reward",
     "calculate_position_size",
     "check_risk_kill_switch",
+    "classify_decision_outcome",
+    "classify_no_trade_outcome",
     "compute_config_hash",
     "create_action_policy_verdict",
     "create_allocation_budget_activation_request",
@@ -148,9 +177,13 @@ __all__ = (
     "create_scenario_result",
     "create_strategy_operational_eligibility_decision",
     "create_strategy_operational_eligibility_request",
+    "evaluate_emergency_state",
     "evaluate_market_context",
     "evaluate_portfolio_limits",
+    "evaluate_reward_risk_gate",
     "evaluate_single_day_profit_share",
+    "evaluate_stress_loss_gate",
+    "evaluate_trade_readiness",
     "execute_risk_state_store_operation",
     "generate_risk_report",
     "get_decision_state",
@@ -165,9 +198,14 @@ __all__ = (
     "list_risk_decisions",
     "load_firm_mandate",
     "load_risk_config",
+    "parse_no_trade_outcome",
+    "parse_stop_validation",
+    "permits_risk_action",
     "persist_risk_decision",
     "register_default_risk_policies",
     "register_risk_policy",
+    "requires_risk_recalculation",
+    "resolve_effective_rules",
     "revalidate_risk_decision",
     "review_allocation_proposal",
     "review_strategy_admission",
@@ -178,5 +216,6 @@ __all__ = (
     "run_risk_scenario_analysis",
     "validate_market_context_evidence",
     "validate_risk_approval_token",
+    "validate_stop_loss",
     "verify_risk_audit_chain",
 )

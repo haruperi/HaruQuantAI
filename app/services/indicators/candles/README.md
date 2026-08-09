@@ -1,5 +1,8 @@
 # Candlestick Patterns
 
+Trading Cockpit Phase 0 adds `build_chart_pattern_evidence`, a bounded causal
+projection of official labels that explicitly carries no trade authority.
+
 This module owns `FEAT-INDI-02`: Doji, Engulfing, Pinbar, and Inside Bar
 labelling. Each production file implements one official indicator.
 

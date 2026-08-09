@@ -157,6 +157,52 @@ def _mapping_field(value: object, field: str) -> Mapping[str, object]:
     return cast("Mapping[str, object]", item)
 
 
+def _mapping_text(value: Mapping[str, object], field: str) -> str:
+    """Return one required non-empty textual field from a mapping.
+
+    Args:
+        value: Source mapping.
+        field: Required text field name.
+
+    Returns:
+        Validated text.
+
+    Raises:
+        TypeError: If the field is missing or not non-empty text.
+    """
+    item = value.get(field)
+    if not isinstance(item, str) or not item:
+        message = f"Portfolio persistence mapping field {field} must be text"
+        raise TypeError(message)
+    return item
+
+
+def _mapping_time(value: Mapping[str, object], field: str) -> datetime:
+    """Return one required timestamp field from a mapping.
+
+    Args:
+        value: Source mapping.
+        field: Required timestamp field name.
+
+    Returns:
+        Validated timestamp.
+
+    Raises:
+        TypeError: If the field is missing or not an ISO-format timestamp.
+    """
+    item = value.get(field)
+    if isinstance(item, datetime):
+        return item
+    if isinstance(item, str):
+        try:
+            return datetime.fromisoformat(item)
+        except ValueError as error:
+            message = f"Portfolio persistence field {field} must be ISO datetime"
+            raise TypeError(message) from error
+    message = f"Portfolio persistence field {field} must be a timestamp"
+    raise TypeError(message)
+
+
 def _outbox_event_type(value: object) -> str:
     """Extract a verified event type from the redacted audit envelope.
 
@@ -418,9 +464,177 @@ def create_plan_record(
     return result.affected_rows >= _COMPOUND_WRITE_ROWS
 
 
+def create_ledger_account_record(
+    store: object,
+    *,
+    state_value: object,
+    event_key: str,
+    event_value: object,
+) -> bool:
+    """Atomically create an immutable ledger account and outbox record.
+
+    Args:
+        store: Portfolio persistence handle.
+        state_value: Validated ``LedgerAccount`` mapping.
+        event_key: Stable outbox event identity.
+        event_value: Redacted audit envelope.
+
+    Returns:
+        Whether both records committed atomically.
+
+    Raises:
+        TypeError: If the value is not a mapping.
+        ValueError: If Data cannot confirm both writes.
+    """
+    logger.info("Persisting immutable Portfolio ledger account")
+    persistence = _require_store(store)
+    if not isinstance(state_value, Mapping):
+        raise TypeError("Portfolio ledger account value must be a mapping")
+    created_at = _mapping_time(state_value, "registered_at").isoformat()
+    request_id = _mapping_text(state_value, "request_id")
+    correlation_id = _mapping_text(state_value, "correlation_id")
+    account_id = _mapping_text(state_value, "account_id")
+    portfolio_id = _mapping_text(state_value, "portfolio_id")
+    result = _execute(
+        (
+            "INSERT INTO portfolio_ledger_accounts "
+            "(account_id, portfolio_id, currency, normal_balance, category, "
+            "account_json, registered_at, request_id, correlation_id, created_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(account_id) DO UPDATE SET "
+            "account_json=CASE WHEN portfolio_ledger_accounts.account_json="
+            "excluded.account_json THEN excluded.account_json ELSE NULL END",
+            _OUTBOX_INSERT,
+        ),
+        (
+            (
+                account_id,
+                portfolio_id,
+                _mapping_text(state_value, "currency"),
+                _mapping_text(state_value, "normal_balance"),
+                _mapping_text(state_value, "category"),
+                persistence.encode("ledger_account", state_value),
+                created_at,
+                request_id,
+                correlation_id,
+                created_at,
+            ),
+            _outbox_parameters(
+                persistence,
+                event_key=event_key,
+                aggregate_id=portfolio_id,
+                event_value=event_value,
+                occurred_at=created_at,
+                request_id=request_id,
+                correlation_id=correlation_id,
+            ),
+        ),
+        request_id=request_id,
+    )
+    return result.affected_rows >= _COMPOUND_WRITE_ROWS
+
+
+def create_ledger_batch_record(
+    store: object,
+    *,
+    batch_value: object,
+    entry_rows: tuple[tuple[object, ...], ...],
+    event_key: str,
+    event_value: object,
+) -> bool:
+    """Atomically append one balanced batch, its legs, and an outbox record.
+
+    The batch and its entries are append-only (financial records are never
+    edited; corrections are reversal batches). A replayed
+    ``(source_event_id, source_sequence)`` with identical material is idempotent.
+
+    Args:
+        store: Portfolio persistence handle.
+        batch_value: Validated ``PostingBatch`` mapping.
+        entry_rows: Normalized per-leg parameter tuples.
+        event_key: Stable outbox event identity.
+        event_value: Redacted audit envelope.
+
+    Returns:
+        Whether the batch, all legs, and the outbox row committed atomically.
+
+    Raises:
+        TypeError: If the batch value is not a mapping.
+        ValueError: If Data cannot confirm the transaction.
+    """
+    logger.info("Persisting immutable Portfolio ledger batch and entries")
+    persistence = _require_store(store)
+    if not isinstance(batch_value, Mapping):
+        raise TypeError("Portfolio ledger batch value must be a mapping")
+    posted_at = _mapping_time(batch_value, "posted_at").isoformat()
+    request_id = _mapping_text(batch_value, "request_id")
+    correlation_id = _mapping_text(batch_value, "correlation_id")
+    batch_id = _mapping_text(batch_value, "batch_id")
+    batch_json = persistence.encode("ledger_batch", batch_value)
+    batch_insert = (
+        "INSERT INTO portfolio_ledger_posting_batches "
+        "(batch_id, source_event_id, source_sequence, entry_sequence, "
+        "reversal_of, posted_at, canonical_hash, batch_json, request_id, "
+        "correlation_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+        "ON CONFLICT(batch_id) DO UPDATE SET "
+        "batch_json=CASE WHEN portfolio_ledger_posting_batches.batch_json="
+        "excluded.batch_json THEN excluded.batch_json ELSE NULL END"
+    )
+    statements: tuple[str, ...] = (batch_insert,)
+    parameters: list[tuple[object, ...]] = [
+        (
+            batch_id,
+            _mapping_text(batch_value, "source_event_id"),
+            batch_value.get("source_sequence", 0),
+            batch_value.get("entry_sequence", 0),
+            batch_value.get("reversal_of"),
+            posted_at,
+            _mapping_text(batch_value, "canonical_hash"),
+            batch_json,
+            request_id,
+            correlation_id,
+            posted_at,
+        )
+    ]
+    statements = (*statements, *(_LEDGER_ENTRY_INSERT for _ in entry_rows))
+    parameters.extend(entry_rows)
+    statements = (*statements, _OUTBOX_INSERT)
+    parameters.append(
+        _outbox_parameters(
+            persistence,
+            event_key=event_key,
+            aggregate_id=batch_id,
+            event_value=event_value,
+            occurred_at=posted_at,
+            request_id=request_id,
+            correlation_id=correlation_id,
+        )
+    )
+    result = _execute(
+        tuple(statements),
+        tuple(parameters),
+        max_rows=max(len(parameters), 1),
+        request_id=request_id,
+    )
+    return result.affected_rows >= len(parameters)
+
+
+_LEDGER_ENTRY_INSERT = (
+    "INSERT INTO portfolio_ledger_entries "
+    "(entry_id, batch_id, entry_sequence, account_id, side, amount_decimal, "
+    "currency, posting_type, posted_at, request_id, correlation_id, created_at) "
+    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+    "ON CONFLICT(entry_id, batch_id) DO UPDATE SET "
+    "amount_decimal=CASE WHEN portfolio_ledger_entries.amount_decimal="
+    "excluded.amount_decimal THEN excluded.amount_decimal ELSE NULL END"
+)
+
+
 __all__ = [
     "create_construction_record",
     "create_definition_record",
+    "create_ledger_account_record",
+    "create_ledger_batch_record",
     "create_plan_record",
     "create_portfolio_runtime_store",
 ]

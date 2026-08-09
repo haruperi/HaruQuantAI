@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import get_market_data
 from app.services.indicators import (
+    build_chart_pattern_evidence,
     doji,
     engulfing,
     inside_bar,
@@ -143,6 +144,10 @@ def main() -> None:
     fr_indi_032()
     fr_indi_033()
     fr_indi_034()
+    evidence = build_chart_pattern_evidence(
+        {"doji": 1, "engulfing": 0}, observed_at=_dataset().records[-1].timestamp
+    )
+    print(f"Chart-pattern evidence DATA: {evidence.data}")
 
 
 if __name__ == "__main__":

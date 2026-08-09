@@ -10,6 +10,13 @@ from pydantic_settings import (
 
 from app.utils.settings.loader import load_broker_provider_settings, load_settings
 from app.utils.settings.models import AppSettings as _AppSettings
+from app.utils.settings.references import (
+    build_profile_ref,
+    build_version_ref,
+    load_profile_document,
+    parse_profile_ref,
+    parse_version_ref,
+)
 
 
 def get_app_settings_model_config() -> SettingsConfigDict:
@@ -50,8 +57,13 @@ def get_app_settings_sources(
 
 
 __all__ = [
+    "build_profile_ref",
+    "build_version_ref",
     "get_app_settings_model_config",
     "get_app_settings_sources",
     "load_broker_provider_settings",
+    "load_profile_document",
     "load_settings",
+    "parse_profile_ref",
+    "parse_version_ref",
 ]

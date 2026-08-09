@@ -18,7 +18,7 @@ from app.services.trading.contracts.models import (
     TradingRequest,
     TradingRoute,
 )
-from app.utils import canonical_json
+from app.utils import canonical_json, to_json_safe
 
 
 def get_trading_contract_version() -> str:
@@ -64,6 +64,47 @@ def create_order_intent(**values: object) -> OrderIntent:
         Validated internal order intent.
     """
     return OrderIntent.model_validate(values)
+
+
+def build_order_intent(**values: object) -> dict[str, JsonValue]:
+    """Build one validated JSON-safe ``OrderIntent v1`` mapping.
+
+    Args:
+        **values: Complete order-intent fields.
+
+    Returns:
+        Validated JSON-safe contract mapping.
+
+    Raises:
+        ValueError: If required cockpit lineage is absent.
+        TypeError: If serialization does not produce a mapping.
+    """
+    intent = OrderIntent.model_validate(values)
+    lineage = (
+        intent.trade_plan_id,
+        intent.trade_plan_version,
+        intent.risk_decision_version,
+        intent.policy_version,
+        intent.profile_version,
+    )
+    if any(value is None for value in lineage):
+        raise ValueError("cockpit OrderIntent requires complete versioned lineage")
+    safe = to_json_safe(intent.model_dump(mode="json"))
+    if not isinstance(safe, dict):
+        raise TypeError("OrderIntent transport must be a mapping")
+    return safe
+
+
+def parse_order_intent(value: Mapping[str, object]) -> OrderIntent:
+    """Parse one validated JSON-safe ``OrderIntent v1`` mapping.
+
+    Args:
+        value: Candidate contract mapping.
+
+    Returns:
+        Validated internal order intent.
+    """
+    return OrderIntent.model_validate(build_order_intent(**dict(value)))
 
 
 def create_execution_receipt(**values: object) -> ExecutionReceipt:
@@ -179,6 +220,7 @@ def is_execution_receipt(value: object) -> bool:
 
 
 __all__ = [
+    "build_order_intent",
     "create_closed_position_record",
     "create_execution_evidence_report",
     "create_execution_receipt",
@@ -191,4 +233,5 @@ __all__ = [
     "get_trading_route",
     "is_execution_receipt",
     "is_trading_error",
+    "parse_order_intent",
 ]

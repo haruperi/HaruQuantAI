@@ -2,7 +2,11 @@
 
 from datetime import datetime
 
-from app.services.data.time_sessions.contracts import MarketHours, MarketSchedule
+from app.services.data.time_sessions.contracts import (
+    MarketHours,
+    MarketSchedule,
+    SessionWindow,
+)
 from app.services.data.time_sessions.utc import _require_utc_raw as require_utc
 
 
@@ -45,4 +49,50 @@ def evaluate_market_hours(
     )
 
 
-__all__ = ["evaluate_market_hours"]
+def apply_venue_halt(
+    hours: MarketHours,
+    *,
+    halted: bool,
+    reason: str | None = None,
+    reopen_at: datetime | None = None,
+    close_window: SessionWindow | None = None,
+    roll_window: SessionWindow | None = None,
+) -> MarketHours:
+    """Overlay genuine caller-supplied venue-halt and window evidence.
+
+    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-05`): this function
+    never infers a halt on its own. It composes evidence the caller already
+    holds (for example a Data-owned `halt`/`venue_state` stream event) onto
+    computed schedule tradability. A halted venue is never reported open.
+
+    Args:
+        hours: Previously evaluated market hours to overlay.
+        halted: Whether the venue is currently halted, per caller evidence.
+        reason: Halt reason; only meaningful when `halted` is `True`.
+        reopen_at: Expected UTC resumption time; only meaningful when
+            `halted` is `True`.
+        close_window: Optional caller-supplied close/rollover window.
+        roll_window: Optional caller-supplied roll window.
+
+    Returns:
+        Market hours with the halt and window evidence applied.
+
+    Raises:
+        ValueError: If the resulting contract is internally inconsistent.
+    """
+    fields = dict(hours)
+    fields.update(
+        {
+            "is_open": False if halted else hours.is_open,
+            "current_session": None if halted else hours.current_session,
+            "halted": halted,
+            "halt_reason": reason if halted else None,
+            "reopen_at": reopen_at if halted else None,
+            "close_window": close_window,
+            "roll_window": roll_window,
+        }
+    )
+    return MarketHours(**fields)
+
+
+__all__ = ["apply_venue_halt", "evaluate_market_hours"]

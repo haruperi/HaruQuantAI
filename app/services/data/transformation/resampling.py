@@ -30,8 +30,27 @@ from app.utils import generate_id, get_logger
 logger = get_logger(__name__)
 
 
+def _bucket_is_closed(
+    bucket_start: datetime, duration: object, source_end: datetime
+) -> bool:
+    """Return whether one resampled bucket is fully covered by source evidence.
+
+    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-09`): a bucket whose
+    full period extends past the source dataset's `end` has not finished
+    forming and must never be presented identically to a genuinely closed bar.
+
+    Returns:
+        ``True`` only when the bucket's full duration ends at or before the
+        source dataset's observed end.
+    """
+    return bucket_start + duration <= source_end  # type: ignore[operator]
+
+
 def _resample_dataset_raw(
-    dataset: MarketDataset, target_timeframe: str
+    dataset: MarketDataset,
+    target_timeframe: str,
+    *,
+    drop_incomplete_trailing_bucket: bool = False,
 ) -> MarketDataset:
     """Resample ordered canonical OHLCV only to a supported higher timeframe.
 
@@ -40,6 +59,12 @@ def _resample_dataset_raw(
     Args:
         dataset: The source MarketDataset.
         target_timeframe: The target timeframe key (e.g. "M5").
+        drop_incomplete_trailing_bucket: When ``True``, drop the final
+            resampled bar if the source dataset's `end` does not cover its
+            full target-timeframe duration (`TC-IMP-DATA-09` closed-bar
+            semantics). Every non-trailing bucket is always fully covered
+            by construction, since a later bucket exists only when the
+            source data extends past the earlier one's boundary.
 
     Returns:
         A new resampled MarketDataset.
@@ -151,6 +176,52 @@ def _resample_dataset_raw(
             )
         )
 
+    if (
+        drop_incomplete_trailing_bucket
+        and resampled_records
+        and not _bucket_is_closed(
+            resampled_records[-1].timestamp, target_spec.duration, dataset.end
+        )
+    ):
+        logger.info(
+            "Dropping incomplete trailing resampled bucket for symbol %s",
+            dataset.symbol,
+        )
+        resampled_records.pop()
+
+    if not resampled_records:
+        quality_report = DataQualityReport(
+            quality_status="not_checked",
+            quality_decision="not_evaluated",
+            quality_score=Decimal(0),
+            issues=(),
+            warnings=(),
+            record_count=0,
+            checked_count=0,
+            truncated=False,
+            sample_limit=1000,
+            schema_version="v1",
+            generated_at=dataset.quality_report.generated_at,
+        )
+        return MarketDataset(
+            normalization_version=dataset.normalization_version,
+            data_kind="bars",
+            symbol=dataset.symbol,
+            timeframe=target_timeframe,
+            records=(),
+            start=dataset.start,
+            end=dataset.end,
+            available_at=dataset.available_at,
+            record_count=0,
+            quality_report=quality_report,
+            source_metadata=dataset.source_metadata,
+            license_metadata=dataset.license_metadata,
+            cache_status="not_used",
+            workflow_context=dataset.workflow_context,
+            precision_policy=dataset.precision_policy,
+            request_id=dataset.request_id,
+        )
+
     quality_report = DataQualityReport(
         quality_status="perfect",
         quality_decision="accepted",
@@ -191,7 +262,10 @@ def _resample_dataset_raw(
 
 
 def resample_dataset(
-    dataset: MarketDataset, target_timeframe: str
+    dataset: MarketDataset,
+    target_timeframe: str,
+    *,
+    drop_incomplete_trailing_bucket: bool = False,
 ) -> StandardResponse[MarketDataset]:
     """Resample ordered canonical OHLCV only to a supported higher timeframe.
 
@@ -200,6 +274,9 @@ def resample_dataset(
     Args:
         dataset: The source MarketDataset.
         target_timeframe: The target timeframe key (e.g. "M5").
+        drop_incomplete_trailing_bucket: When ``True``, drop a trailing bar
+            whose full period is not yet covered by the source dataset's
+            `end` (`TC-IMP-DATA-09` closed-bar semantics).
 
     Returns:
         Standard response carrying a new resampled MarketDataset.
@@ -212,12 +289,19 @@ def resample_dataset(
         operation="data.transformation.resample_dataset",
         request_id=generate_id("req"),
         start_time=data_start_time(),
-        raw=lambda: _resample_dataset_raw(dataset, target_timeframe),
+        raw=lambda: _resample_dataset_raw(
+            dataset,
+            target_timeframe,
+            drop_incomplete_trailing_bucket=drop_incomplete_trailing_bucket,
+        ),
     )
 
 
 def resample_ohlcv(
-    dataset: MarketDataset, target_timeframe: str
+    dataset: MarketDataset,
+    target_timeframe: str,
+    *,
+    drop_incomplete_trailing_bucket: bool = False,
 ) -> StandardResponse[MarketDataset]:
     """Roll up OHLCV records to a larger timeframe."""
     logger.info("Executing public DATA OHLCV resample")
@@ -225,7 +309,11 @@ def resample_ohlcv(
         operation="data.transformation.resample_ohlcv",
         request_id=generate_id("req"),
         start_time=data_start_time(),
-        raw=lambda: _resample_dataset_raw(dataset, target_timeframe),
+        raw=lambda: _resample_dataset_raw(
+            dataset,
+            target_timeframe,
+            drop_incomplete_trailing_bucket=drop_incomplete_trailing_bucket,
+        ),
     )
 
 

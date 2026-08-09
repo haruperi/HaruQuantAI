@@ -7,12 +7,13 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, cast
 
-from app.services.trading.actions._shared import authority_id, require_action
+from app.services.trading.actions._shared import require_action
 from app.services.trading.actions.orders import _execute_request
 from app.services.trading.contracts import (
     TradingError,
     TradingRequest,
 )
+from app.services.trading.state import get_execution_position
 from app.utils import get_logger
 
 type StandardResponse[T] = Any
@@ -42,26 +43,14 @@ def _current_position_quantity(
     target = request.target_broker_position_id
     if target is None:
         raise TradingError("INVALID_REQUEST", "Position target is required")
-    projection = deps.store.load_projection(
-        (request.route, request.account_id, authority_id(request))
-    )
-    if projection is None:
+    position_state = get_execution_position(deps.execution_positions, target)
+    if position_state is None:
         raise TradingError(
             "RECONCILIATION_REQUIRED", "Trading position state is absent"
         )
-    targets = {
-        broker_target
-        for identity, facts in projection.positions.items()
-        for broker_target in (
-            facts.get("broker_position_id", identity)
-            if isinstance(facts, dict)
-            else None,
-        )
-        if isinstance(broker_target, str)
-    }
-    if target not in targets:
+    if getattr(position_state, "state", "UNKNOWN") == "UNKNOWN":
         raise TradingError(
-            "RECONCILIATION_REQUIRED", "Broker position target is not in Trading state"
+            "RECONCILIATION_REQUIRED", "Trading position state is unknown"
         )
     snapshot = deps.account_state_source(request)
     for position in snapshot.positions:

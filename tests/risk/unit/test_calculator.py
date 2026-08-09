@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 
+import pytest
 from app.services.risk.config import RiskConfig
 from app.services.risk.contracts import (
     PortfolioRiskSnapshot,
@@ -10,7 +11,10 @@ from app.services.risk.contracts import (
 )
 from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.risk.portfolio import build_portfolio_risk_snapshot
-from app.services.risk.sizing import calculate_position_size
+from app.services.risk.sizing import (
+    calculate_planned_risk_reward,
+    calculate_position_size,
+)
 
 from tests.risk.unit.test_snapshot import _config, _state
 
@@ -235,3 +239,72 @@ def test_broker_step_floor_is_disclosed() -> None:
     )
     assert result.normalized_size == Decimal("1.00")
     assert "broker_step_floor" in result.constraints_applied
+
+
+def test_additional_cap_binds_tighter_than_broker_maximum() -> None:
+    """The strictest of the broker cap and every named cap applies."""
+    request = _request_with("fixed_lot", fixed_lot=Decimal(50))
+    result = unwrap_risk_response(
+        calculate_position_size(
+            request,
+            _snapshot(),
+            _config(),
+            additional_caps={"margin": Decimal(2), "symbol": None},
+        ),
+        operation="calculate_position_size",
+    )
+    assert result.normalized_size == Decimal(2)
+    assert "margin_cap" in result.constraints_applied
+
+
+@pytest.mark.parametrize(
+    ("raw", "caps"),
+    [
+        (Decimal(1000), {"risk": Decimal(30)}),
+        (Decimal(1000), {"margin": Decimal(5), "symbol": Decimal(40)}),
+        (Decimal(1000), {"portfolio": Decimal(0), "liquidity": Decimal(90)}),
+        (Decimal(1000), {}),
+        (Decimal("0.5"), {"strategy": Decimal(60)}),
+    ],
+)
+def test_normalized_size_never_exceeds_any_supplied_cap(
+    raw: Decimal, caps: dict[str, Decimal]
+) -> None:
+    """Property: the normalized size never exceeds any individual cap."""
+    request = _request_with("fixed_lot", fixed_lot=raw)
+    result = unwrap_risk_response(
+        calculate_position_size(request, _snapshot(), _config(), additional_caps=caps),
+        operation="calculate_position_size",
+    )
+    assert result.normalized_size <= request.broker_max_size
+    for value in caps.values():
+        if value is not None:
+            assert result.normalized_size <= value
+
+
+def test_planned_risk_reward_calculates_ratio() -> None:
+    """Calculate planned risk, reward, and their ratio from bounded distances."""
+    result = unwrap_risk_response(
+        calculate_planned_risk_reward(
+            stop_distance=Decimal(10),
+            target_distance=Decimal(30),
+            contract_value=Decimal(10),
+            quantity=Decimal(1),
+            fees=Decimal(5),
+        ),
+        operation="calculate_planned_risk_reward",
+    )
+    assert result["planned_risk"] == Decimal(105)
+    assert result["planned_reward"] == Decimal(300)
+    assert result["reward_risk_ratio"] == Decimal(300) / Decimal(105)
+
+
+def test_planned_risk_reward_rejects_non_positive_distance() -> None:
+    """Reject a non-positive stop distance."""
+    response = calculate_planned_risk_reward(
+        stop_distance=Decimal(0),
+        target_distance=Decimal(30),
+        contract_value=Decimal(10),
+        quantity=Decimal(1),
+    )
+    assert response.status == "error"

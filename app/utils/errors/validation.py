@@ -9,6 +9,15 @@ from typing import TYPE_CHECKING
 from app.utils.errors.exceptions import ValidationError
 from app.utils.errors.metadata import normalize_error_code
 
+_CATEGORIES = {
+    "TRANSIENT",
+    "PERMANENT",
+    "INTEGRITY",
+    "POLICY",
+    "DATA_STALE",
+    "UNKNOWN_STATE",
+}
+
 if TYPE_CHECKING:
     from app.utils.errors.contracts import ErrorDefinition
 
@@ -39,6 +48,8 @@ def validate_error_catalog(
             raise ValidationError("ERROR_CATALOG_INVALID", "CODE_MISMATCH")
         if code in validated:
             raise ValidationError("ERROR_CATALOG_INVALID", "CODE_DUPLICATE")
+        if definition.category not in _CATEGORIES:
+            raise ValidationError("ERROR_CATALOG_INVALID", "CATEGORY_INVALID")
         validated[code] = definition
     return MappingProxyType(validated)
 

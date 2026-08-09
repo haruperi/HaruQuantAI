@@ -26,6 +26,7 @@ FEATURE_DIRECTORIES = frozenset(
         "persistence",
         "quality",
         "realtime_feeds",
+        "replay_packages",
         "research_sources",
         "runtime_stores",
         "sources",

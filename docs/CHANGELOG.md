@@ -2,6 +2,166 @@
 
 ## [Unreleased]
 
+### Add Portfolio balanced double-entry ledger
+
+Portfolio now owns the cockpit's foundational financial authority: a deterministic balanced double-entry ledger with a chart of accounts, exactly-once economic-event ingestion, settled/unsettled cash with accrued income and costs, reproducible balance rebuild, append-only reversal corrections, and snapshot accelerators validated against canonical entry truth. This closes Phase 0 finding P-1 ("the cockpit's entire financial authority is missing") for the four foundational gaps `TC-IMP-PORT-01,02,03,15`.
+
+#### Added (4)
+
+- Added `FEAT-PORT-09` Balanced Double-Entry Ledger and Accounts (`ledger/`) covering the sixteen posting-type catalogue, balanced postings, exactly-once `(source_event_id, source_sequence)` ingestion, settled/unsettled cash, and rebuild-validated snapshots.
+- Added `LedgerEntry v1`, `PostingBatch v1`, and `LedgerAccount v1` JSON-safe `build_*`/`parse_*` contract transports exported from the package root.
+- Added migration step `002_portfolio_ledger_schema` creating five append-only ledger tables (`portfolio_ledger_accounts`, `portfolio_ledger_posting_batches`, `portfolio_ledger_entries`, `portfolio_ledger_balances`, `portfolio_ledger_snapshots`) through Data's ledger-verified, write-locked, transactional runner.
+- Added the `09_ledger.py` usage program (`FR-PORT-049`..`FR-PORT-055`), `tests/portfolio/unit/test_ledger.py` (34 tests), and `tests/portfolio/integration/test_ledger_persistence.py` (5 tests).
+
+#### Changed (1)
+
+- Migrated the Portfolio error catalogue categories to the Utils-approved uppercase set (`TRANSIENT`/`PERMANENT`/`INTEGRITY`/`POLICY`/`DATA_STALE`/`UNKNOWN_STATE`) so the package imports under the strict error-catalogue whitelist.
+
+### Complete Optimization Trading Cockpit reconciliation
+
+Optimization now covers all 10 approved Trading Cockpit Phase 0 work packages: a versioned OptimizationStudy contract, three now-unblocked EXTEND items consuming the resolved Strategy operating-envelope, Risk TradingPolicyProfile, and Analytics process-scoring providers, and five fail-closed deferred-integration consumer ports for the still-absent Simulator fill/scenario and Risk/Research stress-shock providers.
+
+#### Added (4)
+
+- Added `OptimizationStudy v1` (`parameters/study.py`) carrying dataset/replay identity and approved budget caps behind `build_optimization_study`/`parse_optimization_study`.
+- Added the operating-envelope candidate gate (`validation/envelope_gate.py`) consuming Strategy's `evaluate_operating_envelope` to bound searches to approved strategy/instrument envelopes.
+- Added multi-objective candidate evaluation (`scoring/multi_objective.py`) combining the core objective with Analytics process-score dimensions, with a critical-failure override so raw profit is never the sole driver.
+- Added five deferred-integration consumer ports with fail-closed fallback: fill-model calibration, scenario-difficulty calibration, scenario-holdout anti-leakage, stress-profile calibration, and the promotion gate (`execution/calibration.py`, `validation/scenario_holdout.py`, `robustness/stress_calibration.py`, `evidence/promotion.py`).
+
+#### Changed (2)
+
+- Extended risk-sensitivity analysis to measure outcome sensitivity to Risk TradingPolicyProfile parameters without weakening hard limits (`robustness/risk_sensitivity.py`).
+- Flipped all 10 `TC-IMP-OPT-*` reconciliation rows to Completed; OD-OPT-01 marked non-blocking.
+
+### Add Analytics process scoring and repair the error boundary
+
+Analytics now publishes deterministic process-first scoring with a critical-failure override, reproducibility hashes, comparative leaderboard ranking, and no-trade scoring, and repairs the domain error catalog so boundary failures return structured responses instead of raising.
+
+#### Added (4)
+
+- Added `FEAT-ANLT-06` Process Scoring (`scoring/`) covering versioned profiles, deterministic session scores, critical-failure override (invalidate/cap regardless of P&L), reproducibility hashes, comparative leaderboard ranking with profit secondary, and no-trade scoring.
+- Added `create_process_scoring_profile`, `create_critical_failure_record`, `build_session_score`, and `compute_leaderboard_ranking` package-root operations.
+- Added `analytics.process_score.v1` and `analytics.scoring_profile.v1` JSON-safe `build_*`/`parse_*` contract transports with producer–consumer compatibility tests.
+- Added the `06_scoring.py` usage program (`FR-ANLT-061`..`FR-ANLT-066`) and `tests/analytics/unit/test_scoring.py` (25 tests).
+
+#### Changed (1)
+
+- Corrected `ANALYTICS_ERROR_CATALOG` categories to the Utils-approved set so `error_response` no longer rejects the Analytics catalog, repairing a latent fail-closed boundary crash.
+
+### Complete Risk Trading Cockpit reconciliation
+
+Risk now covers all 17 approved Trading Cockpit Phase 0 work packages: config threshold groups, a drawdown state machine, an emergency governor, a continuous-monitoring recalculation classifier, a stop-loss validator, a no-trade outcome classifier, planned risk/reward and cap-of-caps sizing, a strictest-wins effective-rule resolver, a fixed-precedence trade readiness gate, a blocking stress-loss gate, granular kill-switch lock/cooldown, and explainable resize/restrict decision outcomes.
+
+#### Added (5)
+
+- Added `FEAT-RISK-16` deterministic stop-loss side/tick/distance/loss/widening validation.
+- Added `FEAT-RISK-17` no-trade outcome classification distinguishing a safe stand-down from failed gameplay.
+- Added drawdown state-machine, emergency-governor, and continuous-monitoring-recalculation classifiers to the existing limits, governor, and validity modules.
+- Added a fixed-precedence submit-time trade readiness gate composing market, lock, stop, portfolio, and stress checks.
+- Added a blocking stress-loss gate alongside Risk's unchanged advisory scenario model.
+
+#### Changed (3)
+
+- Extended position sizing with planned risk/reward and a strictest-of-every-cap normalization.
+- Extended the kill switch with additive granular lock permissions and a cooldown/re-arming requirement.
+- Extended `RiskDecisionPackage` reporting with resize/restrict outcome classification layered on the authoritative decision state.
+
+### Add Trading protection and ownership contracts
+
+Trading now exposes fail-closed protective-order and trade-ownership capabilities while keeping current execution positions process-local.
+
+#### Added (2)
+
+- Added `FEAT-TRD-10` protective-order plans with versioned transport, exact coverage proof, and exposure-safe residual resizing.
+- Added `FEAT-TRD-11` trade-ownership evidence with exclusive assignment and fail-closed orphan detection.
+
+#### Changed (1)
+
+- Completed the Trading execution lifecycle with transactional transition/fill materialization, durable protection/ownership evidence, first-class `UNKNOWN` reconciliation, and migration `004_order_lifecycle_states`.
+
+### Keep current Trading positions memory-only
+
+Trading now enforces its nine-state execution-position lifecycle in injected process memory while retaining `trading_positions` exclusively as the append-only closed-trade ledger.
+
+#### Changed (1)
+
+- Moved active Trading position authority out of durable projections, with restart uncertainty kept `UNKNOWN` until reconciliation and exposure increases blocked while unknown.
+
+### Complete Strategy Trading Cockpit planning contracts
+
+Strategy now provides versioned profiles, playbooks, setup evaluations, immutable trade plans, operating envelopes, exit plans, manual-plan parity, and fail-closed expectancy and automation ports while preserving `TradeIntent v1` as the Strategy-to-Risk proposal.
+
+#### Added (3)
+
+- Added `FEAT-STR-12` operating-envelope evaluation with missing evidence restricted by default.
+- Added `FEAT-STR-13` immutable exit and management plans with non-executable automation handoffs.
+- Added `FEAT-STR-14` manual-plan support through the canonical `TradePlan v1` validation path.
+
+#### Changed (2)
+
+- Extended Strategy profiles, playbooks, setup evaluation, lifecycle governance, automation policy, and expectancy references with strict JSON-safe contract transport.
+- Classified Strategy errors under the canonical Utils taxonomy and preserved the authoritative post-migration unsuffixed Strategy table family.
+
+### Add Brokers Trading Cockpit contract transport and route discipline
+
+Brokers now publishes the versioned cross-domain contract pairs and the health-aware primary/backup route discipline the Trading Cockpit Phase 0 audit requires, transported as validated JSON-safe mappings behind `build_*`/`parse_*` function pairs.
+
+#### Added (8)
+
+- Added the `FEAT-BRK-16` Health-Aware Primary/Backup Route Discipline feature (`route_discipline/`) with `RoutePlan v1` and `FailoverDecision v1` contracts that are fail-closed, never submit a duplicate order, and never silently reroute a write across brokers.
+- Added the `InstrumentVenueProfile v1`, `BrokerHealth v1`, `BrokerAccountSnapshot v1`, and `BrokerReconciliationSnapshot v1` versioned contract build/parse pairs covering instrument/venue rules, normalized health, normalized account reads, and consolidated reconciliation.
+- Added a first-class broker-side `UNKNOWN` result for timeouts and lost acknowledgements with a deterministic blind-resubmission prohibition.
+- Added safe order command port extensions (`attach_protection`, `reduce_position`) with explicit adapter-boundary idempotency keys and fail-closed unsupported defaults.
+- Added ordered, deduplicated broker `EventEnvelope` normalization consuming the Utils `EventEnvelope v1` functions.
+- Added one reusable adapter conformance suite (`run_adapter_conformance`) applied uniformly to every enabled route.
+- Added the `BrokerUncertainty` and `BrokerResubmissionPolicy` enumerations backing the first-class `UNKNOWN` lifecycle.
+- Added the `ATTACH_PROTECTION` and `REDUCE_POSITION` capability identifiers, declared fail-closed `NOT_IMPLEMENTED`/`UNAVAILABLE` for every provider.
+
+#### Changed (3)
+
+- Extended `BrokerOrder`, `BrokerPosition`, and `BrokerCapability` with additive Phase 0 fields defaulting to fail-closed values so existing constructors and tests remain green.
+- Extended the capability matrix normative test and adapter mutation sets to cover the two new safe-order write capabilities.
+- Updated the Brokers package-root public API to 109 function-only exports carrying the new contract-transport and safe-order operations.
+
+### Add deterministic Indicators cockpit measurements
+
+Indicators now publishes fail-closed snapshot transports, closed-input guards,
+and causal market-speed, trend, structure, liquidity, order-flow, volatility,
+and chart-pattern measurements while retaining Risk as regime-policy authority.
+
+#### Added (2)
+
+- Added the versioned JSON-safe IndicatorSnapshot contract with strict producer-consumer validation and explicit completeness, confidence, health, and causal-range evidence.
+- Added closed-input enforcement rejecting incomplete, future, stale, unknown, and incompatible timeframe evidence.
+
+#### Changed (1)
+
+- Extended existing mathematical feature owners with neutral cockpit measurements and remapped Indicators error categories to the current Utils catalogue contract without changing error codes.
+
+### Add Utils Trading Cockpit foundation primitives
+
+Utils now provides versioned, fail-closed shared mappings and deterministic business-neutral primitives for later cockpit-domain integrations.
+
+#### Added (5)
+
+- Added exact unit arithmetic with explicit quantization direction and unit/currency mixing rejection.
+- Added generic state-transition evaluation and append-only transition evidence construction.
+- Added strict validation outcomes with fail-closed `UNKNOWN` precedence and structured remediation evidence.
+- Added owner-bound idempotency keys with explicit TTL and distinct in-flight, completed, and expired verdicts.
+- Added versioned hash-derived random streams with cross-process deterministic draws and replay identity.
+
+#### Changed (1)
+
+- Extended Utils with versioned references, time domains, event envelopes, health metadata, audit-sink routing, cockpit identifiers, and producer-side compatibility evidence while leaving consumer migrations to their owning domains.
+
+### Extend Data real-time streaming with Trading Cockpit event coverage
+
+Data's unified market-event model now carries the trade, order-book, venue, and corporate-action event families the Trading Cockpit Phase 0 audit requires beyond quotes and bars.
+
+#### Added (1)
+
+- Added `trade`, `depth`, `venue_state`, `halt`, `auction`, and `corporate_action` event families to the real-time market-event model, each with its own validated payload contract.
+
 ### Localize database specifications to owning domains
 
 Database current state, target models, indexes, and reconciliation now live with their owning domain authorities while shared storage architecture remains centralized.

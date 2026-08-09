@@ -25,6 +25,7 @@ logger = get_logger(__name__)
 
 _DOMAIN = "research"
 _MIGRATION_ID = "001_research_artifacts_v1"
+_EXPECTANCY_MIGRATION_ID = "002_research_expectancy_profiles_v1"
 
 _CREATE_STATEMENT = (
     "CREATE TABLE IF NOT EXISTS research_artifacts ("
@@ -54,6 +55,47 @@ _AUDIT_INDEX_STATEMENT = (
 
 _STATEMENTS = (_CREATE_STATEMENT, _INDEX_STATEMENT, _AUDIT_INDEX_STATEMENT)
 
+# ``research_expectancy_profiles`` owns the approved-expectancy governance
+# lifecycle (``OD-RES-01``). It replaces the brittle ``relative_path`` business
+# key with a stable surrogate ``profile_id`` so Strategy's exact-version
+# reference and Risk's eligibility lookup resolve to one authoritative row.
+# Profiles are append-only lifecycle records: corrections advance
+# ``governance_state`` to ``revoked``/``superseded`` rather than mutating or
+# deleting history (settled decision: financial records are append-only).
+_CREATE_EXPECTANCY_STATEMENT = (
+    "CREATE TABLE IF NOT EXISTS research_expectancy_profiles ("
+    "profile_id TEXT PRIMARY KEY, "
+    "exact_version TEXT NOT NULL, "
+    "strategy_ref TEXT NOT NULL, "
+    "hypothesis TEXT NOT NULL, "
+    "match_keys_json TEXT NOT NULL CHECK (json_valid(match_keys_json)), "
+    "envelope_json TEXT NOT NULL CHECK (json_valid(envelope_json)), "
+    "governance_state TEXT NOT NULL CHECK (governance_state IN "
+    "('draft','under_review','approved','suspended','expired','revoked')), "
+    "reviewer TEXT NOT NULL DEFAULT '', "
+    "decision TEXT NOT NULL DEFAULT '', "
+    "reason TEXT NOT NULL DEFAULT '', "
+    "superseded_by TEXT NOT NULL DEFAULT '', "
+    "evidence_ref TEXT NOT NULL, "
+    "canonical_hash TEXT NOT NULL, "
+    "created_at TEXT NOT NULL DEFAULT "
+    "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now')), "
+    "updated_at TEXT NOT NULL DEFAULT "
+    "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now')), "
+    "UNIQUE (exact_version)"
+    ") STRICT"
+)
+
+_EXPECTANCY_MATCH_INDEX_STATEMENT = (
+    "CREATE INDEX IF NOT EXISTS idx_research_expectancy_strategy "
+    "ON research_expectancy_profiles (strategy_ref, governance_state)"
+)
+
+_EXPECTANCY_STATEMENTS = (
+    _CREATE_EXPECTANCY_STATEMENT,
+    _EXPECTANCY_MATCH_INDEX_STATEMENT,
+)
+
 
 def _checksum(statements: tuple[str, ...]) -> str:
     """Compute a stable sha256 checksum over canonical joined statements.
@@ -74,6 +116,12 @@ RESEARCH_MIGRATION_STEPS: tuple[object, ...] = (
         migration_id=_MIGRATION_ID,
         checksum=_checksum(_STATEMENTS),
         statements=_STATEMENTS,
+    ),
+    build_migration_step(
+        domain=_DOMAIN,
+        migration_id=_EXPECTANCY_MIGRATION_ID,
+        checksum=_checksum(_EXPECTANCY_STATEMENTS),
+        statements=_EXPECTANCY_STATEMENTS,
     ),
 )
 

@@ -112,6 +112,28 @@ def test_upsert_inserts_and_returns_count(monkeypatch, tmp_path: Path) -> None:
     assert stored[0].impact is EventImpact.HIGH
 
 
+def test_upsert_exposes_first_seen_at_for_replay_visibility(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """`first_seen_at` survives the upsert/query round-trip (`TC-IMP-DATA-04`)."""
+    _configure_db(monkeypatch, tmp_path)
+    _apply_migrations(generate_id("req"))
+    store = EconomicEventStore()
+    event = _event(delta=timedelta(minutes=5))
+
+    _unwrap(store.upsert([event], request_id=generate_id("req")))
+
+    stored = _unwrap(
+        store.query(
+            datetime(2026, 7, 26, tzinfo=UTC),
+            datetime(2026, 7, 27, tzinfo=UTC),
+        )
+    )
+    assert len(stored) == 1
+    assert stored[0].first_seen_at is not None
+    assert stored[0].first_seen_at.tzinfo is not None
+
+
 def test_upsert_is_idempotent_on_composite_key(monkeypatch, tmp_path: Path) -> None:
     """Re-upserting the same provider/id pair overwrites in place."""
     _configure_db(monkeypatch, tmp_path)

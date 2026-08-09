@@ -11,10 +11,21 @@ from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
-from app.services.data import build_market_stream_request
+from app.services.data import (
+    build_auction_payload,
+    build_corporate_action_payload,
+    build_depth_update_payload,
+    build_halt_payload,
+    build_market_stream_request,
+    build_trade_payload,
+    build_venue_state_payload,
+)
 from app.services.data.contracts import DataError, TickRecord
 from app.services.data.realtime_feeds import mt5_bars, mt5_ticks, subscriptions
-from app.services.data.realtime_feeds.contracts import MarketStreamRequest
+from app.services.data.realtime_feeds.contracts import (
+    MarketStreamEvent,
+    MarketStreamRequest,
+)
 from app.services.data.realtime_feeds.mt5_bars import _BarLike, _seconds_until_boundary
 from app.services.data.realtime_feeds.mt5_ticks import (
     _signature,
@@ -426,3 +437,85 @@ def test_hub_registry_evicts_only_inactive_streams(
     with pytest.raises(DataError, match="LIMIT_EXCEEDED"):
         _admit_hub(("mt5", "GBPUSD", "ticks", "M1"), second)
     _HUBS.clear()
+
+
+def _base_event_fields() -> dict[str, Any]:
+    """Return one reusable MarketStreamEvent identity/timing fixture.
+
+    Returns:
+        Non-payload fields shared by every unified-market-event assertion.
+    """
+    return {
+        "feed_id": "feed-abc",
+        "sequence": 0,
+        "mode": "ticks",
+        "source_id": "mt5",
+        "symbol": "EURUSD",
+        "timeframe": "M1",
+        "occurred_at": _NOW,
+        "cursor": "0",
+        "request_id": generate_id("req"),
+    }
+
+
+@pytest.mark.parametrize(
+    ("event_type", "payload"),
+    [
+        (
+            "trade",
+            build_trade_payload(price=1.1000, size=1.0, side="buy", trade_id="T1"),
+        ),
+        (
+            "depth",
+            build_depth_update_payload(side="bid", level=0, price=1.1000, size=1.0),
+        ),
+        ("venue_state", build_venue_state_payload(state="halted", reason="drift")),
+        ("halt", build_halt_payload(reason="news pending")),
+        (
+            "auction",
+            build_auction_payload(
+                reference_price=1.1000, matched_size=10.0, imbalance=1.0
+            ),
+        ),
+        (
+            "corporate_action",
+            build_corporate_action_payload(
+                action_type="split", effective_date=_NOW, ratio=2.0
+            ),
+        ),
+    ],
+)
+def test_unified_market_event_accepts_each_new_event_family(
+    event_type: str, payload: object
+) -> None:
+    """Every Trading Cockpit Phase 0 event family validates with its own payload."""
+    event = MarketStreamEvent(
+        event_type=event_type, payload=payload, **_base_event_fields()
+    )
+    assert event.event_type == event_type
+    assert event.payload is payload
+
+
+def test_unified_market_event_rejects_mismatched_payload_type() -> None:
+    """A payload built for one event family cannot validate another."""
+    halt_payload = build_halt_payload(reason="news pending")
+    with pytest.raises(DataError, match="INVALID_INPUT"):
+        MarketStreamEvent(
+            event_type="trade", payload=halt_payload, **_base_event_fields()
+        )
+
+
+def test_unified_market_event_rejects_missing_payload_for_new_families() -> None:
+    """Every new market-payload event family requires a typed payload."""
+    for event_type in (
+        "trade",
+        "depth",
+        "venue_state",
+        "halt",
+        "auction",
+        "corporate_action",
+    ):
+        with pytest.raises(DataError, match="INVALID_INPUT"):
+            MarketStreamEvent(
+                event_type=event_type, payload=None, **_base_event_fields()
+            )

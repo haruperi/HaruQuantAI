@@ -1,7 +1,7 @@
 # Brokers
 
 > **Package:** `app/services/brokers`
-> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 16 registered features remain implemented, but 12 work packages (`TC-IMP-BRK-01`..`TC-IMP-BRK-12`) add target behavior that is not yet implemented. See `### Trading Cockpit Phase 0 reconciliation`.
+> **Status:** `Partial` — Trading Cockpit Phase 0 reconciliation in progress: 10 of 12 work packages (`TC-IMP-BRK-01`..`TC-IMP-BRK-09`, `TC-IMP-BRK-11`, `TC-IMP-BRK-12`) are implemented and verified, and `FEAT-BRK-16` is registered `Completed`. The package remains `Partial` because `TC-IMP-BRK-10` is blocked by Open Decision `OD-BRK-02` (gated on `TC-IMP-SIM-09`, the Phase 8 cockpit mode model), and `OD-BRK-01` (account-snapshot ownership relocation) remains a pending cross-domain decision. See `### Trading Cockpit Phase 0 reconciliation` and `## 6. Open Decisions`.
 > **Last updated:** `2026-08-07`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -194,18 +194,18 @@ Cross-domain contract transport is settled per the Utils domain: versioned cross
 
 | Status | Contract | Owner | Reuses / extends | Phase 0 gap |
 | --- | --- | --- | --- | --- |
-| Missing | `InstrumentVenueProfile v1` | Brokers | Extends `broker_symbol_map` + `registry/` + `provider_calculations/`. Adds tick size, quantity step, contract multiplier, session calendar, margin, shorting, settlement, halt, order-type/TIF eligibility, and lifecycle eligibility. | `TC-IMP-BRK-01` |
-| Missing | Adapter capability matrix additions (bracket/OCO, netting/hedging, partial-fill, modification/cancellation, sandbox availability) | Brokers | Extends `registry/catalogue.py` capability traits; fail-closed when undeclared. | `TC-IMP-BRK-02` |
-| Missing | `BrokerHealth v1` | Brokers | Extends `adapter_runtime/` + `BrokerConnectionState`. Adds normalized heartbeat, latency, error rate, maintenance, and route readiness; fail-closed when stale. | `TC-IMP-BRK-03` |
-| Missing | `BrokerAccountSnapshot v1` (normalized account) | Brokers | Extends `mt5_account/` reads. Carries broker-reported balance/equity/margin/currency/permissions/source timestamp. **Open Decision OD-BRK-01:** the existing `AccountStateSnapshot` model lives in Data (`app/services/data/evidence/account_contracts.py:199`); the approved plan assigns the normalized account snapshot to Brokers. Ownership relocation is recorded as a cross-domain decision here and in the Data README; it is **not** executed in this documentation task. | `TC-IMP-BRK-04` |
-| Partial | `BrokerOrderSnapshot` / `BrokerPositionSnapshot` field additions | Brokers | Extends `contracts/models.py` `BrokerOrder`/`BrokerPosition`. Adds source sequence, receive time, raw payload reference, and an `UNKNOWN` uncertainty state. | `TC-IMP-BRK-05` |
-| Partial | Safe order command port additions | Brokers | Extends `contracts/protocols.py` + `operations.py`. Adds attach-protection, reduce, and explicit adapter-boundary idempotency. | `TC-IMP-BRK-06` |
-| Missing | First-class `UNKNOWN` result preservation | Brokers | Adds a broker-side `UNKNOWN` result for timeouts/lost acks; preserves until reconciliation; prohibits blind resubmission. (Trading's `_timeout_receipt` at `trading/routing/dispatcher.py` is the matching consumer.) | `TC-IMP-BRK-07` |
-| Missing | Read-based reconciliation port | Brokers | Extends `execution_history/` into a consolidated port returning open orders + fills + positions + balances + venue status; fail-closed. | `TC-IMP-BRK-08` |
-| Missing | Health-aware primary/backup route discipline | Brokers | **New feature** — see Feature Registry `FEAT-BRK-16`. Fail-closed; no duplicate order submission; no silent cross-broker rerouting. | `TC-IMP-BRK-09` |
-| Partial | Cockpit-scoped simulation/sandbox isolation proof | Brokers | Extends `_require_non_production` + dispatcher guards G-2/G-3/G-4. Adds a test asserting a cockpit session can never select a `LIVE` route or environment. **Gated on `TC-IMP-SIM-09`** (mode model) — the proof cannot be completed until the cockpit mode exists. | `TC-IMP-BRK-10` |
-| Partial | Ordered, deduplicated broker `EventEnvelope` records | Brokers | Extends `price_streams/` normalization. **Gated on `TC-IMP-UTIL-06`** (Utils `EventEnvelope`). | `TC-IMP-BRK-11` |
-| Partial | One reusable adapter conformance suite | Brokers | Extends `testing/` (`FEAT-BRK-14`) into a single conformance suite applied uniformly to every enabled route. | `TC-IMP-BRK-12` |
+| Completed | `InstrumentVenueProfile v1` (`brokers.instrument_venue_profile.v1`) | Brokers | `contracts/venue_profiles.py:build_instrument_venue_profile`/`parse_instrument_venue_profile`. Evidence: `tests/brokers/integration/test_cockpit_contract_transport.py`. | `TC-IMP-BRK-01` |
+| Completed | Adapter capability matrix additions (bracket/OCO, netting/hedging, partial-fill, modification/cancellation, sandbox availability) | Brokers | `contracts/models.py:BrokerCapability` additive traits defaulting to `UNDECLARED`; `registry/catalogue.py` declares the two new writes `NOT_IMPLEMENTED`/`UNAVAILABLE`. Evidence: `tests/brokers/unit/test_cockpit_snapshot_fields.py`. | `TC-IMP-BRK-02` |
+| Completed | `BrokerHealth v1` (`brokers.health.v1`) | Brokers | `contracts/health.py:build_broker_health`/`parse_broker_health`; fail-closed stale downgrade. Evidence: `tests/brokers/unit/test_cockpit_contracts.py`, `tests/brokers/integration/test_cockpit_contract_transport.py`. | `TC-IMP-BRK-03` |
+| Completed | `BrokerAccountSnapshot v1` (`brokers.account_snapshot.v1`, distinct Brokers name) | Brokers | `contracts/account_snapshot.py:build_broker_account_snapshot`/`parse_broker_account_snapshot`. **Open Decision OD-BRK-01 (port-level Completed):** the distinct Brokers-owned name is implemented; Data's `AccountStateSnapshot` is untouched and the cross-domain relocation remains pending. Evidence: `tests/brokers/unit/test_cockpit_contracts.py::test_broker_account_snapshot_is_distinct_from_data_model`. | `TC-IMP-BRK-04` |
+| Completed | `BrokerOrderSnapshot` / `BrokerPositionSnapshot` field additions | Brokers | `contracts/models.py:BrokerOrder`/`BrokerPosition` additive `source_sequence`, `receive_time`, `raw_payload_ref`, `uncertainty` (default `KNOWN`). Evidence: `tests/brokers/unit/test_cockpit_snapshot_fields.py`. | `TC-IMP-BRK-05` |
+| Completed | Safe order command port additions | Brokers | `contracts/protocols.py:TradeExecutionProvider.attach_protection`/`reduce_position`; `BrokerOrderProtectionRequest`/`BrokerPositionReductionRequest` with explicit idempotency keys; `operations.py:attach_broker_protection`/`reduce_broker_position`. Evidence: `tests/brokers/unit/test_cockpit_snapshot_fields.py`. | `TC-IMP-BRK-06` |
+| Completed | First-class `UNKNOWN` result preservation | Brokers | `contracts/unknown_outcome.py:build_broker_unknown_result`/`is_broker_unknown_result`/`enforce_no_blind_resubmission`; `contracts/enums.py:BrokerUncertainty`/`BrokerResubmissionPolicy`. Evidence: `tests/brokers/unit/test_cockpit_contracts.py`. | `TC-IMP-BRK-07` |
+| Completed | Read-based reconciliation port | Brokers | `contracts/reconciliation.py:build_broker_reconciliation_snapshot`/`parse_broker_reconciliation_snapshot` (fail-closed section states). Evidence: `tests/brokers/unit/test_cockpit_contracts.py`, `tests/brokers/integration/test_cockpit_contract_transport.py`. | `TC-IMP-BRK-08` |
+| Completed | Health-aware primary/backup route discipline | Brokers | New feature `FEAT-BRK-16` — `route_discipline/plans.py:build_route_plan`/`parse_route_plan`, `route_discipline/failover.py:build_failover_decision`/`parse_failover_decision`; fail-closed, no duplicate write, no silent cross-broker write reroute. Evidence: `tests/brokers/unit/test_cockpit_contracts.py`, `tests/brokers/usage/features/16_route_discipline.py`. | `TC-IMP-BRK-09` |
+| Partial | Cockpit-scoped simulation/sandbox isolation proof | Brokers | Extends `_require_non_production` + dispatcher guards G-2/G-3/G-4. **Blocking Open Decision OD-BRK-02:** gated on `TC-IMP-SIM-09` (Phase 8 cockpit mode model); the proof cannot be completed until the cockpit mode exists. | `TC-IMP-BRK-10` |
+| Completed | Ordered, deduplicated broker `EventEnvelope` records | Brokers | `price_streams/envelopes.py:normalize_broker_event_envelope`/`classify_broker_event` consume the Utils `EventEnvelope v1` functions. **Note:** the Utils consumer port (`TC-IMP-UTIL-06`) is implemented and exported but its README still records it `Missing`; the upstream Utils doc reconciliation is a separate pending item outside this domain. Evidence: `tests/brokers/unit/test_cockpit_event_envelope.py`. | `TC-IMP-BRK-11` |
+| Completed | One reusable adapter conformance suite | Brokers | `testing/conformance.py:run_adapter_conformance` applies five uniform invariants to any enabled route. Evidence: `tests/brokers/unit/test_cockpit_event_envelope.py`. | `TC-IMP-BRK-12` |
 
 **Boundary clarifications folded in:** Brokers still does not own risk approval, trade intent, portfolio accounting, or simulation game rules. The cockpit live-money boundary (`TC-IMP-BRK-10`) is a test, not a convention: until a test asserts that a cockpit session cannot obtain a `BrokerEnvironment.LIVE` connection or produce a non-`SIM` route, the boundary is `Partial`, not `Completed` (Phase 0 finding S-1, S-2). The single-boolean kill switch cannot yet separate new-exposure lock from cancel/protection/reduction/closure (finding S-3); Risk owns the policy granularity (`TC-IMP-RISK-14`) and Trading owns the master enable (`TC-IMP-TRD-09`).
 
@@ -280,9 +280,9 @@ The tree below defines the final layout. The following table is the sole normati
 | Completed | `FEAT-BRK-13` Dukascopy BID Bars                        | `dukascopy_bars/`        | Section 4.6                                                                   | Section 4.6 requirements                   | `tests/brokers/usage/features/13_dukascopy_bars.py`      |
 | Completed | `FEAT-BRK-14` Deterministic Fake Adapter                | `testing/`               | Section 4.9                                                                   | Section 4.9 requirements                   | `tests/brokers/usage/features/14_fake_adapter.py`        |
 | Completed | `FEAT-BRK-15` Adapter Runtime                           | `adapter_runtime/`       | Section 4.10                                                                  | Runtime and transport-control requirements | `tests/brokers/usage/features/15_adapter_runtime.py`     |
-| Missing   | `FEAT-BRK-16` Health-Aware Primary/Backup Route Discipline | `route_discipline/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `build_route_plan`/`parse_route_plan`, `build_failover_decision`/`parse_failover_decision` | `FR-BRK-136`..`FR-BRK-138` *(planned)* | `tests/brokers/usage/features/16_route_discipline.py` *(planned)* |
+| Completed | `FEAT-BRK-16` Health-Aware Primary/Backup Route Discipline | `route_discipline/` | Trading Cockpit Phase 0 reconciliation (§1); `build_broker_route_plan`/`parse_broker_route_plan`, `build_broker_failover_decision`/`parse_broker_failover_decision` (`brokers.route_plan.v1`, `brokers.failover_decision.v1`) | `FR-BRK-136`..`FR-BRK-138` | `tests/brokers/usage/features/16_route_discipline.py` |
 
-Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private feature mixins; unreleased write implementations remain unreachable through public release policy. The registry holds **seventeen** features: `FEAT-BRK-00`..`FEAT-BRK-15` are `Completed`, and `FEAT-BRK-16` (Health-Aware Primary/Backup Route Discipline) is a `Missing` Trading Cockpit Phase 0 target with a planned folder `route_discipline/`, planned requirements `FR-BRK-136`..`FR-BRK-138`, and planned usage program `tests/brokers/usage/features/16_route_discipline.py`.
+Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private feature mixins; unreleased write implementations remain unreachable through public release policy. The registry holds **seventeen** features, all `Completed`: `FEAT-BRK-00`..`FEAT-BRK-16`. `FEAT-BRK-16` (Health-Aware Primary/Backup Route Discipline) is a Trading Cockpit Phase 0 target with folder `route_discipline/`, requirements `FR-BRK-136`..`FR-BRK-138`, and usage program `tests/brokers/usage/features/16_route_discipline.py`.
 
 | Order | Feature                    | File order                                                                                                                                        |
 | ----: | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -311,7 +311,7 @@ it; no feature folder may host the package-root public operation surface.
 
 ```text
 brokers/
-├── __init__.py                         # Function-Only Public Surface (86 standalone functions in __all__)
+├── __init__.py                         # Function-Only Public Surface (109 standalone functions in __all__)
 ├── operations.py                       # Approved package-root public operations and DTO builders
 ├── README.md
 ├── contracts/                          # FEAT-BRK-00 — canonical provider-neutral boundary
@@ -390,7 +390,12 @@ brokers/
 │   └── provider_connections.py         # Broker-owned non-production connection resolution
 ├── testing/                            # FEAT-BRK-14 — public caller-test utilities
 │   ├── __init__.py
+│   ├── conformance.py                  # TC-IMP-BRK-12 — one reusable adapter conformance suite
 │   └── fake.py                         # FakeBrokerAdapter
+├── route_discipline/                   # FEAT-BRK-16 — health-aware primary/backup route discipline (TC-IMP-BRK-09)
+│   ├── __init__.py
+│   ├── plans.py                        # RoutePlan v1 build/parse (FR-BRK-136)
+│   └── failover.py                     # FailoverDecision v1 build/parse (FR-BRK-137/138)
 ├── migrations/                         # Support — immutable broker_symbol_map schema (see migrations/README.md)
 │   ├── __init__.py
 │   └── definitions.py                  # Single additive migration step with stable checksum
@@ -458,7 +463,7 @@ Registry imports provider factories lazily; provider modules never import Regist
 - Provider SDK objects, protobuf messages, terminal handles, sockets, and exceptions never cross the package boundary.
 - Usage examples live under `tests/brokers/usage/`: exactly one standalone
   numbered program for each registered feature, `FEAT-BRK-00` through
-  `FEAT-BRK-15`. Programs use a main guard and bounded secret-safe inputs. Each
+  `FEAT-BRK-16`. Programs use a main guard and bounded secret-safe inputs. Each
   provider-backed program resolves a genuine adapter through the public factory,
   establishes only an enabled demo/testnet/sandbox session, exercises bounded
   released reads, and closes the session deterministically. Unreleased and
@@ -514,6 +519,22 @@ credentials or open connections directly.
 - FR-BRK-043–047 and FR-BRK-112 capability/subscription protocols;
 - FR-BRK-101–103 registry functions;
 - FR-BRK-104–108 approved adapter types.
+
+The Trading Cockpit Phase 0 reconciliation adds the following function-only
+cross-domain contract transport and safe-order extensions to the public
+surface: `build_instrument_venue_profile`/`parse_instrument_venue_profile`
+(`TC-IMP-BRK-01`), `build_broker_health`/`parse_broker_health` (`TC-IMP-BRK-03`),
+`build_broker_account_snapshot`/`parse_broker_account_snapshot` (`TC-IMP-BRK-04`),
+`build_broker_reconciliation_snapshot`/`parse_broker_reconciliation_snapshot`
+(`TC-IMP-BRK-08`), `build_broker_unknown_result`/`is_broker_unknown_result`/
+`enforce_no_blind_resubmission` (`TC-IMP-BRK-07`), `attach_broker_protection`/
+`reduce_broker_position` and their request builders (`TC-IMP-BRK-06`),
+`normalize_broker_event_envelope`/`classify_broker_event` (`TC-IMP-BRK-11`),
+`build_broker_route_plan`/`parse_broker_route_plan` and
+`build_broker_failover_decision`/`parse_broker_failover_decision`
+(`FEAT-BRK-16`/`TC-IMP-BRK-09`), and the enum getters `get_broker_uncertainty`/
+`get_broker_resubmission_policy`. Each versioned contract travels as a validated
+JSON-safe mapping behind its `build_*`/`parse_*` pair (settled decision D-1).
 
 The root file itself is assigned FR-BRK-135. Private helper/export requirements FR-BRK-110–111 and FR-BRK-113–134 do not add root exports unless explicitly stated above.
 
@@ -1801,6 +1822,31 @@ These rows assign every remaining planned file an exact requirement. Private hel
 | Completed | `FR-BRK-135` | `brokers/__init__.py`                                                   | Eagerly export contracts/registry, lazily resolve only the five adapter class names through the fixed`__getattr__` table, export no fake/private symbol, and import no provider SDK during ordinary package import.                                                                                                                                             | `tests/brokers/usage/features/01_registry.py`                                                                               | `tests/brokers/unit/test_import_boundaries.py::test_root_exports_and_lazy_imports_are_exact()`                                                                                                                                               |
 
 
+### 4.11 `route_discipline/` — Health-Aware Primary/Backup Route Discipline
+
+**Feature:** `FEAT-BRK-16` (Trading Cockpit Phase 0, `TC-IMP-BRK-09`). This is the only `CREATE`-classified Phase 0 work package for Brokers: a fail-closed health-aware primary/backup route discipline that never submits a duplicate order and never silently reroutes a write across brokers.
+
+#### Files
+
+| Status | File       | Purpose (FR)                                                                                                                                            | Public symbols                                                  |
+| ------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Completed | `plans.py`     | `FR-BRK-136`: build/parse one redacted `RoutePlan v1` (`brokers.route_plan.v1`) naming an explicit primary and optional backup with health verdicts. | `build_route_plan`, `parse_route_plan`                          |
+| Completed | `failover.py`  | `FR-BRK-137`/`FR-BRK-138`: build/parse one redacted `FailoverDecision v1` (`brokers.failover_decision.v1`); fail-closed, no silent cross-broker write reroute. | `build_failover_decision`, `parse_failover_decision`            |
+| Completed | `__init__.py`  | Re-export the four route-discipline functions.                                                                                                          | `build_route_plan`, `parse_route_plan`, `build_failover_decision`, `parse_failover_decision` |
+
+The package-root public API exposes these as `build_broker_route_plan`/`parse_broker_route_plan` and `build_broker_failover_decision`/`parse_broker_failover_decision` so the entire Brokers public surface shares one prefix while the function-only rule is preserved.
+
+#### Requirements
+
+| Status | ID | Requirement | Implementation | Test |
+| --- | --- | --- | --- | --- |
+| Completed | `FR-BRK-136` | The system shall build and parse a versioned `RoutePlan v1` naming one explicit primary route and an optional backup route, with the health verdicts that admitted them and a caller-declared write-failover policy. The plan is fail-closed: when no route is health-ready, `selected_route` is `None` and `route_state` reports `UNAVAILABLE`/`FAILOVER_REQUIRED`; a non-ready primary may never yield a ready aggregate verdict. | `build_route_plan`/`parse_route_plan` (`route_discipline/plans.py`) | `tests/brokers/unit/test_cockpit_contracts.py::test_route_plan_round_trip`, `test_route_plan_fail_closed_when_no_ready_route` |
+| Completed | `FR-BRK-137` | The system shall build and parse a versioned `FailoverDecision v1` recording the deterministic outcome of evaluating a route plan against current health: hold primary, fail over to backup for reads/recovery only, or block. The decision is fail-closed and never silently reroutes a write across brokers: `FAILOVER_READ_ONLY` and `FAILOVER_RECOVERY` force `write_permitted=False`; `BLOCK` permits neither reads nor writes. | `build_failover_decision`/`parse_failover_decision` (`route_discipline/failover.py`) | `tests/brokers/unit/test_cockpit_contracts.py::test_failover_decision_round_trip`, `test_failover_decision_blocks_writes_on_failover`, `test_failover_decision_block_permits_neither` |
+| Completed | `FR-BRK-138` | The system shall prohibit duplicate order submission and blind resubmission across brokers: a cockpit-execution resubmission policy of `PROHIBITED` raises on an `UNKNOWN` prior outcome, and no failover decision may admit a write to the backup. | `route_discipline/failover.py` + `contracts/unknown_outcome.py` | `tests/brokers/unit/test_cockpit_contracts.py::test_broker_unknown_result_prohibits_blind_resubmission`; usage `tests/brokers/usage/features/16_route_discipline.py::fr_brokers_138_no_silent_write_reroute` |
+
+`tests/brokers/usage/features/16_route_discipline.py` (standalone script, run via `python`) demonstrates `FR-BRK-136`..`FR-BRK-138` through the public API without a live provider connection.
+
+
 ---
 
 ## 5. Package-Wide Requirements and Shared Configuration
@@ -1928,8 +1974,8 @@ by UI/API and remains `Partial` in `docs/PROJECT.md` §6.
 
 These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
 
-- **OD-BRK-01 — Normalized account snapshot ownership.** The approved plan assigns the normalized account snapshot (`BrokerAccountSnapshot`) to Brokers, but the existing `AccountStateSnapshot` model lives in Data at `app/services/data/evidence/account_contracts.py:199`. Phase 0 classified this `PARTIAL + EXTEND` with an ownership-conflict note (`TC-IMP-BRK-04`). The owner must decide whether Brokers reclaims the name and Data migrates callers, or the plan adopts a distinct Brokers-owned name. Until decided, Brokers documents its consumption of the Data-owned snapshot and does not redefine it.
-- **OD-BRK-02 — Cockpit live-money boundary proof date.** `TC-IMP-BRK-10` (simulation/sandbox isolation) cannot be proven until the cockpit mode model exists (`TC-IMP-SIM-09`, Phase 8). The owner must decide whether to lift a minimal mode marker earlier or formally re-date the `TC-IMP-BRK-10` proof to Phase 8 (Phase 0 decision D-6). Until then the boundary stays `Partial`.
+- **OD-BRK-01 — Normalized account snapshot ownership (port-level Completed; relocation pending).** The approved plan assigns the normalized account snapshot to Brokers, but the existing `AccountStateSnapshot` model lives in Data at `app/services/data/evidence/account_contracts.py:199`. Phase 0 classified this `PARTIAL + EXTEND` with an ownership-conflict note (`TC-IMP-BRK-04`). `TC-IMP-BRK-04` is now `Completed` at the port level under the distinct-name direction offered by this decision: Brokers ships a separate `BrokerAccountSnapshot v1` (`brokers.account_snapshot.v1`) that does not import or mutate Data's model. The owner must still decide whether to finalize the full cross-domain relocation (reclaim the `AccountStateSnapshot` name in Brokers and migrate Data callers) or retain the distinct Brokers-owned name permanently. This is a pending cross-domain decision; it is no longer a port blocker but keeps the package `Partial` until resolved.
+- **OD-BRK-02 — Cockpit live-money boundary proof date (blocking).** `TC-IMP-BRK-10` (simulation/sandbox isolation) cannot be proven until the cockpit mode model exists (`TC-IMP-SIM-09`, Phase 8). The owner must decide whether to lift a minimal mode marker earlier or formally re-date the `TC-IMP-BRK-10` proof to Phase 8 (Phase 0 decision D-6). Until then `TC-IMP-BRK-10` stays `Partial` and is the sole work-package blocker for package promotion to `Completed`.
 
 ---
 
@@ -2051,7 +2097,7 @@ During implementation, run only the targeted test file for the changed code befo
   `app/services/brokers/migrations/definitions.py:24`
 - [X] Every planned dependency is documented in standard-library, third-party, local order. `app/services/brokers/mt5_account/adapter.py:1`
 - [X] Every FR maps to one exact usage example and at least one exact unit test.
-  Sixteen programs cover `FEAT-BRK-00`–`FEAT-BRK-15`, one each. `tests/brokers/usage/features/00_contracts.py:1`
+  Seventeen programs cover `FEAT-BRK-00`–`FEAT-BRK-16`, one each. `tests/brokers/usage/features/00_contracts.py:1`
 - [X] Removed, rejected, and excluded behavior is absent from the public surface. `app/services/brokers/contracts/unsupported.py:1`
 - [X] Every retained V1 behavior has a final destination or explicit removal condition. `app/services/brokers/registry/catalogue.py:148`
 - [X] No Brokers open decisions remain. Dukascopy candle mapping is adapter-local;
@@ -2131,5 +2177,5 @@ This keeps requirements, dependency order, implementation, provider truth, usage
 
 ### Full-domain pipeline (`tests/brokers/usage/features/features.py`)
 
-The standalone program [`tests/brokers/usage/features/features.py`](../../tests/brokers/usage/features/features.py) ties all Brokers features (`FEAT-BRK-00` through `FEAT-BRK-15`) together into one homogeneous, realistic operational sequence:
+The standalone program [`tests/brokers/usage/features/features.py`](../../tests/brokers/usage/features/features.py) ties all Brokers features (`FEAT-BRK-00` through `FEAT-BRK-16`) together into one homogeneous, realistic operational sequence:
 `Registry & Capability Discovery -> Connection Config & Adapter Creation -> Session Lifecycle & Health -> Account State & Balances -> Market Data Reads -> Margin & Profit Calculations -> Real-Time Streaming Subscriptions -> Order Mutation Validation & Controlled Session Teardown`. Run it directly with `uv run .\tests\brokers\usage\features\features.py`.

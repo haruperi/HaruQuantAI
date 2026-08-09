@@ -2,6 +2,7 @@
 
 from app.services.trading.actions.controls import (
     clear_kill_switch,
+    evaluate_trading_permissions,
     pause_strategy,
     resume_strategy,
     sync_positions,
@@ -31,6 +32,7 @@ __all__ = [
     "close_all_positions",
     "close_position",
     "create_trading_dependencies",
+    "evaluate_trading_permissions",
     "execute_portfolio_rebalance",
     "modify_order",
     "modify_position",

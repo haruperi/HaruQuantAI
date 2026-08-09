@@ -12,6 +12,7 @@ same runs.
 
 from __future__ import annotations
 
+from datetime import datetime
 from decimal import Decimal
 from itertools import pairwise
 from typing import TYPE_CHECKING
@@ -153,6 +154,123 @@ def _detect_spread_breach(
         "Observed spreads exceeded the configured ceiling.",
         len(breaches),
         breaches,
+        limit,
+    )
+
+
+def _detect_out_of_order(
+    records: Sequence[CanonicalRecord], limit: int
+) -> QualityIssue | None:
+    """Detect a record whose timestamp precedes the immediately prior record."""
+    reversals: list[str] = [
+        current.timestamp.isoformat()
+        for previous, current in pairwise(records)
+        if current.timestamp < previous.timestamp
+    ]
+    if not reversals:
+        return None
+    return _issue(
+        "OUT_OF_ORDER",
+        "error",
+        "A record's timestamp preceded the immediately prior record.",
+        len(reversals),
+        reversals,
+        limit,
+    )
+
+
+def _detect_clock_drift(
+    records: Sequence[CanonicalRecord],
+    max_drift_seconds: float,
+    limit: int,
+) -> QualityIssue | None:
+    """Detect a record's receive time drifting from its own event time.
+
+    A negative drift (received before the event occurred) is not checked
+    here: the base record contract already rejects it fail-closed at
+    construction (`contracts/records.py:75`), so it can never reach a
+    series, per this module's stated principle that record-level
+    conditions are enforced before construction, not re-detected here.
+    """
+    drifted: list[str] = []
+    for record in records:
+        available_at = getattr(record, "available_at", None)
+        if available_at is None:
+            continue
+        drift_seconds = (available_at - record.timestamp).total_seconds()
+        if drift_seconds > max_drift_seconds:
+            drifted.append(record.timestamp.isoformat())
+    if not drifted:
+        return None
+    return _issue(
+        "CLOCK_DRIFT",
+        "warning",
+        "A record's receive time drifted from its event time beyond the bound.",
+        len(drifted),
+        drifted,
+        limit,
+    )
+
+
+def _detect_stale(
+    records: Sequence[CanonicalRecord],
+    as_of: datetime,
+    max_age_seconds: float,
+    limit: int,
+) -> QualityIssue | None:
+    """Detect the newest record's receive time exceeding a caller-supplied age.
+
+    Never infers staleness from a fabricated clock; `as_of` must be supplied
+    by the caller (for example the request time or a simulated replay clock).
+    """
+    if not records:
+        return None
+    latest = records[-1]
+    available_at = getattr(latest, "available_at", None)
+    if available_at is None:
+        return None
+    age_seconds = (as_of - available_at).total_seconds()
+    if age_seconds <= max_age_seconds:
+        return None
+    return _issue(
+        "STALE_QUOTE",
+        "warning",
+        "The newest record's receive time exceeded the maximum allowed age.",
+        1,
+        (latest.timestamp.isoformat(),),
+        limit,
+    )
+
+
+def _detect_source_disagreement(
+    primary: Sequence[CanonicalRecord],
+    backup: Sequence[CanonicalRecord],
+    tolerance: Decimal,
+    limit: int,
+) -> QualityIssue | None:
+    """Detect a primary/backup close disagreeing beyond a fixed tolerance.
+
+    Compares only timestamps present in both series; a timestamp seen in
+    only one source is not evidence of disagreement.
+    """
+    backup_by_time = {record.timestamp: record for record in backup}
+    disagreements: list[str] = []
+    for record in primary:
+        counterpart = backup_by_time.get(record.timestamp)
+        primary_close = getattr(record, "close", None)
+        backup_close = getattr(counterpart, "close", None) if counterpart else None
+        if primary_close is None or backup_close is None:
+            continue
+        if abs(Decimal(primary_close) - Decimal(backup_close)) > tolerance:
+            disagreements.append(record.timestamp.isoformat())
+    if not disagreements:
+        return None
+    return _issue(
+        "SOURCE_DISAGREEMENT",
+        "error",
+        "Primary and backup sources disagreed beyond the configured tolerance.",
+        len(disagreements),
+        disagreements,
         limit,
     )
 
@@ -350,10 +468,116 @@ def detect_unexpected_gaps(
     )
 
 
+def detect_out_of_order_records(
+    records: Sequence[CanonicalRecord],
+    *,
+    limit: int = QUALITY_SAMPLE_LIMIT,
+) -> StandardResponse[QualityIssue | None]:
+    """Detect a record's timestamp preceding the immediately prior record.
+
+    Args:
+        records: Records in their as-received order (not pre-sorted by the caller).
+        limit: Maximum number of bounded samples to attach to the issue.
+
+    Returns:
+        Standard response carrying one ``OUT_OF_ORDER`` issue, or ``None`` when the
+        series is monotonically ordered.
+    """
+    return run_data_operation(
+        operation="data.quality.detect_out_of_order_records",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _detect_out_of_order(records, limit),
+    )
+
+
+def detect_clock_drift(
+    records: Sequence[CanonicalRecord],
+    *,
+    max_drift_seconds: float = 5.0,
+    limit: int = QUALITY_SAMPLE_LIMIT,
+) -> StandardResponse[QualityIssue | None]:
+    """Detect a record's receive time drifting from its own event time.
+
+    Args:
+        records: Already-normalized records carrying `timestamp`/`available_at`.
+        max_drift_seconds: Maximum allowed receive delay before flagging drift.
+        limit: Maximum number of bounded samples to attach to the issue.
+
+    Returns:
+        Standard response carrying one ``CLOCK_DRIFT`` issue, or ``None`` when every
+        record's receive time is within bound.
+    """
+    return run_data_operation(
+        operation="data.quality.detect_clock_drift",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _detect_clock_drift(records, max_drift_seconds, limit),
+    )
+
+
+def detect_stale_quote(
+    records: Sequence[CanonicalRecord],
+    as_of: datetime,
+    *,
+    max_age_seconds: float = 60.0,
+    limit: int = QUALITY_SAMPLE_LIMIT,
+) -> StandardResponse[QualityIssue | None]:
+    """Detect the newest record's receive time exceeding a caller-supplied age.
+
+    Args:
+        records: Already-normalized records in timestamp order.
+        as_of: Caller-supplied UTC evaluation instant; never inferred internally.
+        max_age_seconds: Maximum allowed age of the newest record's receive time.
+        limit: Maximum number of bounded samples to attach to the issue.
+
+    Returns:
+        Standard response carrying one ``STALE_QUOTE`` issue, or ``None`` when the
+        newest record is within the allowed age.
+    """
+    return run_data_operation(
+        operation="data.quality.detect_stale_quote",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _detect_stale(records, as_of, max_age_seconds, limit),
+    )
+
+
+def detect_source_disagreement(
+    primary: Sequence[CanonicalRecord],
+    backup: Sequence[CanonicalRecord],
+    *,
+    tolerance: Decimal = Decimal(0),
+    limit: int = QUALITY_SAMPLE_LIMIT,
+) -> StandardResponse[QualityIssue | None]:
+    """Detect a primary/backup close disagreeing beyond a fixed tolerance.
+
+    Args:
+        primary: Primary-source records in timestamp order.
+        backup: Backup-source records in timestamp order.
+        tolerance: Maximum allowed absolute close difference before flagging.
+        limit: Maximum number of bounded samples to attach to the issue.
+
+    Returns:
+        Standard response carrying one ``SOURCE_DISAGREEMENT`` issue, or ``None`` when
+        every shared timestamp agrees within tolerance.
+    """
+    return run_data_operation(
+        operation="data.quality.detect_source_disagreement",
+        request_id=generate_id("req"),
+        start_time=data_start_time(),
+        raw=lambda: _detect_source_disagreement(primary, backup, tolerance, limit),
+    )
+
+
 __all__ = [
+    "detect_clock_drift",
     "detect_extreme_spread_widening",
     "detect_flatline_periods",
+    "detect_out_of_order_records",
     "detect_price_jumps",
+    "detect_source_disagreement",
+    "detect_stale_quote",
     "detect_unexpected_gaps",
     "detect_zero_volume_bars",
 ]

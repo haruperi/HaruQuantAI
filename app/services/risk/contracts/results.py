@@ -365,21 +365,31 @@ class KillSwitchState(_ResultModel):
     reason: str
     version: int
     updated_at: datetime
+    locked_permissions: tuple[
+        Literal["new_exposure", "close_only", "reduction_only", "cancel_only"], ...
+    ] = ()
+    cooldown_until: datetime | None = None
 
     @model_validator(mode="after")
     def _validate_state(self) -> KillSwitchState:
-        """Validate canonical state version and time.
+        """Validate canonical state version, time, and lock granularity.
 
         Returns:
             Validated state.
 
         Raises:
-            ValueError: If version or scope is invalid.
+            ValueError: If version, scope, or lock granularity is invalid.
         """
         logger.debug("Validating kill-switch state")
         _utc(self.updated_at)
+        if self.cooldown_until is not None:
+            _utc(self.cooldown_until)
         if self.version < 0 or (self.scope_level != "global" and not self.scope):
             raise ValueError("kill-switch state version or scope is invalid")
+        if len(set(self.locked_permissions)) != len(self.locked_permissions):
+            raise ValueError("kill-switch locked permissions must be unique")
+        if self.locked_permissions and self.state != "active":
+            raise ValueError("locked permissions apply only to an active state")
         return self
 
 

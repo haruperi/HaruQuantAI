@@ -13,7 +13,12 @@ from app.services.trading.actions import (
 from app.services.trading.actions.emergency import _validated_child
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent, TradingError
 from app.services.trading.reconciliation import AuthoritySnapshot
-from app.services.trading.state import TradingProjection
+from app.services.trading.state import (
+    TradingProjection,
+    create_execution_position,
+    create_execution_position_store,
+    set_execution_position,
+)
 from app.utils import validate_id
 
 from tests.trading.unit.actions.test_dependencies import (
@@ -67,16 +72,26 @@ def emergency_dependencies(action: str):
                 "broker_order_id": "order-filled",
             },
         },
-        positions={
-            "position-001": {
-                "symbol": "EURUSD",
-                "broker_position_id": "position-001",
-            }
-        },
+        positions={},
         fills={},
         receipts={},
         authority_state={},
         updated_at=NOW,
+    )
+    store.execution_positions = create_execution_position_store()
+    set_execution_position(
+        store.execution_positions,
+        create_execution_position(
+            position_id="position-001",
+            account_id="account-001",
+            symbol="EURUSD",
+            broker_position_id="position-001",
+            state="OPEN",
+            quantity=Decimal("2.00"),
+            average_entry_price=Decimal("1.10"),
+            source_sequence=1,
+            version=1,
+        ),
     )
     deps = dependencies(store=store)
 

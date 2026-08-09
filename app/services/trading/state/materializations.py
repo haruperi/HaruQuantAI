@@ -40,11 +40,27 @@ class OrderOutcome:
 
 
 @dataclass(frozen=True)
+class TransitionRow:
+    """One append-only order transition supported by an authority event."""
+
+    values: tuple[object, ...]
+
+
+@dataclass(frozen=True)
+class FillRow:
+    """One append-only fill supported by broker receipt evidence."""
+
+    values: tuple[object, ...]
+
+
+@dataclass(frozen=True)
 class MaterializationBatch:
     """Table projections attributable to one authoritative event."""
 
     order: OrderRow | None = None
     outcome: OrderOutcome | None = None
+    transition: TransitionRow | None = None
+    fill: FillRow | None = None
 
 
 def _mapping(value: object, field: str) -> dict[str, Any]:
@@ -133,7 +149,7 @@ def _order_row(event: TradingEvent, intent: dict[str, Any]) -> OrderRow | None:
         None,
         _optional_text(intent, "stop_loss"),
         _optional_text(intent, "take_profit"),
-        "pending_new",
+        "STAGED",
         None,
         runtime_profile,
         event.occurred_at.isoformat(),
@@ -170,23 +186,23 @@ def _outcome(event: TradingEvent, projection: TradingProjection) -> OrderOutcome
     receipt, intent = _receipt_facts(event, projection)
     status = _text(receipt, "status")
     states = {
-        "accepted": "new",
-        "rejected": "rejected",
-        "partial": "partially_filled",
-        "filled": "filled",
-        "cancelled": "cancelled",
-        "unknown_outcome": "pending_new",
+        "accepted": "ACKNOWLEDGED",
+        "rejected": "REJECTED",
+        "partial": "PARTIALLY_FILLED",
+        "filled": "FILLED",
+        "cancelled": "CANCELLED",
+        "unknown_outcome": "UNKNOWN",
     }
     state = states.get(status)
     if state is None:
         raise ValueError("Trading materialization received an unknown receipt status")
     terminal_at = (
         event.occurred_at.isoformat()
-        if state in {"rejected", "filled", "cancelled"}
+        if state in {"REJECTED", "FILLED", "CANCELLED"}
         else None
     )
     reject_reason = (
-        _text(receipt, "response_classification") if state == "rejected" else None
+        _text(receipt, "response_classification") if state == "REJECTED" else None
     )
     submit_order = intent.get("action") == "submit_order"
     order_id = (
@@ -215,6 +231,80 @@ def _outcome(event: TradingEvent, projection: TradingProjection) -> OrderOutcome
     )
 
 
+def _transition(
+    event: TradingEvent,
+    *,
+    order_id: str,
+    from_state: str | None,
+    to_state: str,
+    reason_code: str,
+) -> TransitionRow:
+    """Build one source-sequenced transition row from an authority event.
+
+    Returns:
+        Append-only transition materialization.
+    """
+    occurred_at = event.occurred_at.isoformat()
+    return TransitionRow(
+        values=(
+            f"{event.event_id}:transition",
+            order_id,
+            from_state,
+            to_state,
+            event.aggregate_version + 1,
+            reason_code,
+            occurred_at,
+            event.correlation_id,
+            event.causation_id,
+            occurred_at,
+        )
+    )
+
+
+def _fill(event: TradingEvent, projection: TradingProjection) -> FillRow:
+    """Normalize one fill without inventing missing receipt or order evidence.
+
+    Returns:
+        Append-only fill materialization.
+
+    Raises:
+        ValueError: If receipt, order, quantity, or price evidence is absent.
+    """
+    facts = _mapping(dict(event.payload), "fill facts")
+    receipt_id = _text(facts, "receipt_id")
+    receipt_facts: dict[str, Any] | None = None
+    for value in projection.receipts.values():
+        if not isinstance(value, dict):
+            continue
+        receipt = value.get("receipt")
+        if isinstance(receipt, dict) and receipt.get("receipt_id") == receipt_id:
+            receipt_facts = _mapping(value, "receipt event")
+            break
+    if receipt_facts is None:
+        raise ValueError("Trading fill has no authoritative receipt")
+    attempt_id = _text(receipt_facts, "attempt_event_id")
+    attempt = _mapping(projection.orders.get(attempt_id), "originating order attempt")
+    intent = _mapping(attempt.get("intent"), "originating intent")
+    price = _optional_text(facts, "average_price")
+    if price is None:
+        raise ValueError("Trading fill requires an executed price")
+    occurred_at = event.occurred_at.isoformat()
+    return FillRow(
+        values=(
+            event.event_id,
+            _text(intent, "client_order_id"),
+            _text(facts, "provider_deal_id"),
+            event.aggregate_version + 1,
+            _text(facts, "filled_quantity"),
+            price,
+            None,
+            occurred_at,
+            event.correlation_id,
+            occurred_at,
+        )
+    )
+
+
 def build_materialization_batch(
     event: TradingEvent,
     projection: TradingProjection,
@@ -234,9 +324,31 @@ def build_materialization_batch(
     logger.debug("Building Trading materialization for %s", event.event_type)
     if event.event_type == "send_attempted":
         intent = _mapping(dict(event.payload).get("intent"), "order intent")
-        return MaterializationBatch(order=_order_row(event, intent))
+        order = _order_row(event, intent)
+        transition = None
+        if order is not None:
+            transition = _transition(
+                event,
+                order_id=_text(intent, "client_order_id"),
+                from_state=None,
+                to_state="STAGED",
+                reason_code="intent_persisted",
+            )
+        return MaterializationBatch(order=order, transition=transition)
     if event.event_type == "receipt_recorded":
-        return MaterializationBatch(outcome=_outcome(event, projection))
+        outcome = _outcome(event, projection)
+        return MaterializationBatch(
+            outcome=outcome,
+            transition=_transition(
+                event,
+                order_id=outcome.order_id,
+                from_state="STAGED",
+                to_state=outcome.state,
+                reason_code=outcome.reason_code,
+            ),
+        )
+    if event.event_type == "fill_recorded":
+        return MaterializationBatch(fill=_fill(event, projection))
     return MaterializationBatch()
 
 

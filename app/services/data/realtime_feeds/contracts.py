@@ -366,12 +366,224 @@ class MarketStreamRequest(_Contract):
         return self
 
 
+class TradePayload(_Contract):
+    """Single executed-trade print for the`trade` market event family."""
+
+    price: float
+    size: float
+    side: Literal["buy", "sell", "unknown"]
+    trade_id: str
+
+    @field_validator("trade_id")
+    @classmethod
+    def _validate_trade_id(cls, value: str) -> str:
+        """Validate the required trade identifier.
+
+        Returns:
+            Non-empty trimmed trade identifier.
+        """
+        return _text(value)
+
+    @field_validator("price", "size")
+    @classmethod
+    def _validate_positive(cls, value: float) -> float:
+        """Validate a required positive trade magnitude.
+
+        Returns:
+            Validated positive value.
+
+        Raises:
+            ValueError: If the value is not strictly positive.
+        """
+        if value <= 0:
+            raise ValueError("trade price and size must be positive")
+        return value
+
+
+class DepthUpdatePayload(_Contract):
+    """Book-level bid/ask update for the`depth` market event family."""
+
+    side: Literal["bid", "ask"]
+    level: int
+    price: float
+    size: float
+
+    @field_validator("level")
+    @classmethod
+    def _validate_level(cls, value: int) -> int:
+        """Validate the required non-negative book level.
+
+        Returns:
+            Validated non-negative level.
+
+        Raises:
+            ValueError: If the level is negative.
+        """
+        if value < 0:
+            raise ValueError("depth level must be non-negative")
+        return value
+
+    @field_validator("price", "size")
+    @classmethod
+    def _validate_non_negative(cls, value: float) -> float:
+        """Validate a required non-negative depth magnitude.
+
+        Returns:
+            Validated non-negative value.
+
+        Raises:
+            ValueError: If the value is negative.
+        """
+        if value < 0:
+            raise ValueError("depth price and size must be non-negative")
+        return value
+
+
+class VenueStatePayload(_Contract):
+    """Venue trading-state transition for the`venue_state` event family."""
+
+    state: Literal["open", "closed", "pre_open", "pre_close", "auction", "halted"]
+    reason: str | None = None
+
+    @field_validator("reason")
+    @classmethod
+    def _validate_reason(cls, value: str | None) -> str | None:
+        """Validate an optional venue-state reason.
+
+        Returns:
+            Non-empty trimmed reason or ``None``.
+        """
+        return _optional_text(value)
+
+
+class HaltPayload(_Contract):
+    """Trading halt for the`halt` market event family."""
+
+    reason: str
+    resumes_at: datetime | None = None
+
+    @field_validator("reason")
+    @classmethod
+    def _validate_reason(cls, value: str) -> str:
+        """Validate the required halt reason.
+
+        Returns:
+            Non-empty trimmed reason.
+        """
+        return _text(value)
+
+    @field_validator("resumes_at")
+    @classmethod
+    def _validate_resumes_at(cls, value: datetime | None) -> datetime | None:
+        """Validate an optional expected resumption time as aware UTC.
+
+        Returns:
+            Validated timestamp or ``None``.
+        """
+        return None if value is None else _utc(value)
+
+
+class AuctionPayload(_Contract):
+    """Opening/closing auction state for the`auction` event family."""
+
+    reference_price: float
+    matched_size: float
+    imbalance: float
+
+    @field_validator("reference_price", "matched_size")
+    @classmethod
+    def _validate_non_negative(cls, value: float) -> float:
+        """Validate a required non-negative auction magnitude.
+
+        Returns:
+            Validated non-negative value.
+
+        Raises:
+            ValueError: If the value is negative.
+        """
+        if value < 0:
+            raise ValueError(
+                "auction reference price and matched size must be non-negative"
+            )
+        return value
+
+
+class CorporateActionPayload(_Contract):
+    """Corporate-action notice for the`corporate_action` event family."""
+
+    action_type: Literal["split", "dividend", "merger", "symbol_change"]
+    effective_date: datetime
+    ratio: float | None = None
+
+    @field_validator("effective_date")
+    @classmethod
+    def _validate_effective_date(cls, value: datetime) -> datetime:
+        """Validate the effective date as aware UTC.
+
+        Returns:
+            Validated timestamp.
+        """
+        return _utc(value)
+
+    @field_validator("ratio")
+    @classmethod
+    def _validate_ratio(cls, value: float | None) -> float | None:
+        """Validate an optional required-positive corporate-action ratio.
+
+        Returns:
+            Validated positive ratio or ``None``.
+
+        Raises:
+            ValueError: If the ratio is not strictly positive.
+        """
+        if value is not None and value <= 0:
+            raise ValueError("corporate action ratio must be positive")
+        return value
+
+
+_MARKET_PAYLOAD_EVENT_TYPES = frozenset(
+    {
+        "tick",
+        "bar",
+        "trade",
+        "depth",
+        "venue_state",
+        "halt",
+        "auction",
+        "corporate_action",
+    }
+)
+
+_TYPED_PAYLOAD_CLASSES: Mapping[str, type[_Contract]] = MappingProxyType(
+    {
+        "trade": TradePayload,
+        "depth": DepthUpdatePayload,
+        "venue_state": VenueStatePayload,
+        "halt": HaltPayload,
+        "auction": AuctionPayload,
+        "corporate_action": CorporateActionPayload,
+    }
+)
+
+
 class MarketStreamEvent(_Contract):
     """Ordered canonical event emitted by a Data-owned market stream."""
 
     feed_id: str
     sequence: int
-    event_type: Literal["tick", "bar", "heartbeat", "gap", "error"]
+    event_type: Literal[
+        "tick",
+        "bar",
+        "trade",
+        "depth",
+        "venue_state",
+        "halt",
+        "auction",
+        "corporate_action",
+        "heartbeat",
+        "gap",
+        "error",
+    ]
     mode: Literal["bars", "ticks"]
     source_id: str
     symbol: str
@@ -435,13 +647,22 @@ class MarketStreamEvent(_Contract):
         Raises:
             ValueError: If the event family has an inconsistent shape.
         """
-        if self.event_type in {"tick", "bar"} and self.payload is None:
+        if self.event_type in _MARKET_PAYLOAD_EVENT_TYPES and self.payload is None:
             raise ValueError("market payload events require payload")
         if (
             self.event_type in {"heartbeat", "gap", "error"}
             and self.payload is not None
         ):
             raise ValueError("control stream events cannot include payload")
+        typed_payload_class = _TYPED_PAYLOAD_CLASSES.get(self.event_type)
+        if typed_payload_class is not None and not isinstance(
+            self.payload, typed_payload_class
+        ):
+            message = (
+                f"{self.event_type} events require a "
+                f"{typed_payload_class.__name__} payload"
+            )
+            raise ValueError(message)
         if self.event_type in {"gap", "error"} and self.error is None:
             raise ValueError("gap and error events require an error code")
         if self.event_type not in {"gap", "error"} and self.error is not None:
@@ -452,12 +673,18 @@ class MarketStreamEvent(_Contract):
 
 
 __all__ = [
+    "AuctionPayload",
+    "CorporateActionPayload",
+    "DepthUpdatePayload",
     "FeedConfig",
     "FeedEventResult",
     "FeedStatus",
     "FeedStatusRequest",
+    "HaltPayload",
     "MarketStreamEvent",
     "MarketStreamRequest",
     "RawFeedEvent",
     "ReconnectPolicy",
+    "TradePayload",
+    "VenueStatePayload",
 ]

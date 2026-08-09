@@ -10,6 +10,7 @@ from app.services.trading.contracts.errors import (
     redact_trading_payload,
 )
 from app.services.trading.contracts.factories import (
+    build_order_intent,
     create_closed_position_record,
     create_execution_evidence_report,
     create_execution_receipt,
@@ -22,6 +23,7 @@ from app.services.trading.contracts.factories import (
     get_trading_route,
     is_execution_receipt,
     is_trading_error,
+    parse_order_intent,
 )
 from app.services.trading.contracts.models import (
     TRADING_CONTRACT_VERSION as TRADING_CONTRACT_VERSION,
@@ -55,6 +57,7 @@ from app.services.trading.contracts.registry import (
 type StandardResponse[T] = Any
 
 __all__ = [
+    "build_order_intent",
     "create_closed_position_record",
     "create_execution_evidence_report",
     "create_execution_receipt",
@@ -70,5 +73,6 @@ __all__ = [
     "is_execution_receipt",
     "is_trading_error",
     "map_trading_error",
+    "parse_order_intent",
     "redact_trading_payload",
 ]

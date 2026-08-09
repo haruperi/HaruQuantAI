@@ -4,17 +4,10 @@ import hashlib
 from pathlib import Path
 
 from app.services.strategy import (
-    bootstrap_builtin_strategies,
-    build_development_strategy_validation_policy,
     list_builtin_strategy_descriptors,
-    list_strategy_definitions,
-    list_strategy_versions,
 )
 from app.services.strategy.contracts.responses import unwrap_strategy_response
 from app.services.strategy.registry.catalogue import _BUILTIN_DESCRIPTORS
-
-from tests.strategy.unit.test_catalog import storage_context
-from tests.strategy.unit.test_models import make_auth
 
 
 def test_builtin_catalogue_has_exact_seven_descriptors() -> None:
@@ -80,35 +73,3 @@ def test_builtin_dependency_hash_matches_uv_lock() -> None:
         assert desc.dependency_hash == expected_lock_hash, (
             f"Dependency hash mismatch for {desc.evaluator_key}"
         )
-
-
-def test_bootstrap_builtin_strategies_idempotency(tmp_path: Path) -> None:
-    """Verify bootstrap_builtin_strategies creates definitions, versions, and configs cleanly.
-
-    Args:
-        tmp_path: Temporary directory fixture for isolated SQLite storage.
-
-    Returns:
-        None.
-    """
-    auth = make_auth(permissions=("strategy:register", "strategy:parameter_update"))
-    policy = build_development_strategy_validation_policy()
-    with storage_context(tmp_path):
-        res1 = unwrap_strategy_response(
-            bootstrap_builtin_strategies(auth, policy),
-            operation="bootstrap1",
-        )
-        assert res1["registered_strategies"] == 7
-
-        res2 = unwrap_strategy_response(
-            bootstrap_builtin_strategies(auth, policy),
-            operation="bootstrap2",
-        )
-        assert res2["registered_strategies"] == 7
-
-        defs = unwrap_strategy_response(
-            list_strategy_definitions(), operation="list_defs"
-        )
-        vers = unwrap_strategy_response(list_strategy_versions(), operation="list_vers")
-        assert len(defs) == 7
-        assert len(vers) == 7

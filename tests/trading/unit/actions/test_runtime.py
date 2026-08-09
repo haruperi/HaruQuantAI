@@ -21,7 +21,11 @@ from app.services.trading.contracts import (
     TradingRequest,
 )
 from app.services.trading.contracts.responses import success_trading_response
-from app.services.trading.state import TradingProjection
+from app.services.trading.state import (
+    TradingProjection,
+    create_execution_position,
+    set_execution_position,
+)
 
 from tests.trading.unit.actions.test_dependencies import (
     NOW,
@@ -251,16 +255,24 @@ def test_runtime_reads_modify_targets_only_from_trading_state() -> None:
         authority_id="simulation",
         version=3,
         orders={"local-order": {"symbol": "EURUSD", "broker_order_id": "broker-order"}},
-        positions={
-            "local-position": {
-                "symbol": "EURUSD",
-                "broker_position_id": "broker-position",
-            }
-        },
+        positions={},
         fills={},
         receipts={},
         authority_state={},
         updated_at=NOW,
+    )
+    set_execution_position(
+        deps.execution_positions,
+        create_execution_position(
+            position_id="local-position",
+            account_id="account-001",
+            symbol="EURUSD",
+            broker_position_id="broker-position",
+            state="OPEN",
+            quantity=Decimal("1.00"),
+            source_sequence=1,
+            version=1,
+        ),
     )
     base = TradingRequest.model_validate(
         {

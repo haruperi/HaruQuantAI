@@ -35,6 +35,32 @@ class BrokerConnectionState(StrEnum):
     FAILED = "failed"
 
 
+class BrokerUncertainty(StrEnum):
+    """First-class outcome uncertainty verdict for snapshots and results.
+
+    ``KNOWN`` is the default for every existing record so legacy constructors
+    remain green; ``UNKNOWN`` is the Trading Cockpit Phase 0 first-class state
+    (``TC-IMP-BRK-07``) preserved until reconciliation and never silently
+    resolved to a plausible success or rejection.
+    """
+
+    KNOWN = "known"
+    UNKNOWN = "unknown"
+
+
+class BrokerResubmissionPolicy(StrEnum):
+    """Adapter-boundary blind-resubmission policy (``TC-IMP-BRK-07``).
+
+    ``PROHIBITED`` is the only policy a cockpit-execution path may adopt: an
+    ``UNKNOWN`` broker result must be preserved until reconciliation and may
+    never be blindly resubmitted. ``PERMITTED`` exists only for explicit
+    caller-acknowledged retry outside the cockpit execution boundary.
+    """
+
+    PROHIBITED = "prohibited"
+    PERMITTED = "permitted"
+
+
 class BrokerErrorCode(StrEnum):
     """Stable canonical broker error taxonomy."""
 
@@ -124,6 +150,8 @@ class BrokerCapabilityId(StrEnum):
     MODIFY_POSITION = "modify_position"
     CLOSE_POSITION = "close_position"
     REPLACE_ORDER = "replace_order"
+    ATTACH_PROTECTION = "attach_protection"
+    REDUCE_POSITION = "reduce_position"
     CALCULATE_MARGIN = "calculate_margin"
     CALCULATE_PROFIT = "calculate_profit"
     GET_COMMISSION_ESTIMATE = "get_commission_estimate"

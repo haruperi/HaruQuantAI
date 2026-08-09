@@ -7,20 +7,28 @@ from typing import Any, cast
 
 from app.services.data import (
     build_data_settings,
+    build_migration_request,
     build_statement_plan,
     build_transaction_request,
     data_settings_context,
     execute_transaction,
+    run_domain_migrations,
     unwrap_data_response,
 )
 from app.services.trading import (
     apply_execution_event,
+    build_trade_ownership,
     build_trading_state_store,
     create_closed_position_record,
+    create_protective_order_plan,
     create_trading_event,
     create_trading_projection,
     execute_trading_state_store_operation,
+    get_trading_migrations,
+    parse_trade_ownership,
     persist_closed_position,
+    persist_protective_order_plan,
+    persist_trade_ownership,
     run_trading_migrations,
 )
 from app.utils import generate_id
@@ -332,7 +340,7 @@ def test_atomic_event_application_materializes_orders_only(tmp_path: Path) -> No
 
         orders = _read_rows("SELECT order_id, time_in_force, state FROM trading_orders")
         positions = _read_rows("SELECT ticket FROM trading_positions")
-        removed = _read_rows(
+        lifecycle_tables = _read_rows(
             "SELECT name FROM sqlite_master WHERE type = 'table' "
             "AND name IN ('trading_fills', 'trading_order_transitions')"
         )
@@ -340,11 +348,14 @@ def test_atomic_event_application_materializes_orders_only(tmp_path: Path) -> No
             {
                 "order_id": "client-materialized",
                 "time_in_force": None,
-                "state": "filled",
+                "state": "FILLED",
             },
         )
         assert positions == ()
-        assert removed == ()
+        assert lifecycle_tables == (
+            {"name": "trading_order_transitions"},
+            {"name": "trading_fills"},
+        )
 
 
 def test_closed_position_is_inserted_once_as_exact_evidence(tmp_path: Path) -> None:
@@ -424,3 +435,119 @@ def test_materialization_failure_writes_no_event_or_projection(tmp_path: Path) -
         assert _read_rows("SELECT COUNT(*) AS count FROM trading_projections") == (
             {"count": 0},
         )
+
+
+def test_protection_and_ownership_have_reachable_append_only_writes(
+    tmp_path: Path,
+) -> None:
+    """Persist exact protection and ownership evidence without position bodies."""
+    with data_settings_context(_settings(tmp_path)):
+        _run_trading_migrations()
+        now = datetime(2026, 8, 7, tzinfo=UTC)
+        plan = create_protective_order_plan(
+            plan_id="protect-001",
+            position_id="position-001",
+            order_id="order-001",
+            risk_decision_id="risk-001",
+            quantity=Decimal(1),
+            stop_price=Decimal(9),
+            target_price=Decimal(12),
+            oco_group_id="oco-001",
+            source_sequence=1,
+        )
+        ownership = parse_trade_ownership(
+            build_trade_ownership(
+                ownership_id="ownership-001",
+                owner_type="player",
+                owner_id="player-001",
+                account_id="account-001",
+                position_id="position-001",
+                trade_plan_id="plan-001",
+                strategy_version="v1",
+                session_id="session-001",
+                source_sequence=1,
+            )
+        )
+        persist_protective_order_plan(
+            plan, correlation_id="correlation-001", occurred_at=now
+        )
+        persist_trade_ownership(
+            ownership, correlation_id="correlation-001", occurred_at=now
+        )
+        assert _read_rows(
+            "SELECT COUNT(*) AS count FROM trading_protective_orders"
+        ) == ({"count": 2},)
+        assert _read_rows("SELECT COUNT(*) AS count FROM trading_trade_ownership") == (
+            {"count": 1},
+        )
+        assert _read_rows("SELECT COUNT(*) AS count FROM trading_positions") == (
+            {"count": 0},
+        )
+
+
+def test_migration_004_preserves_existing_order_and_is_idempotent(
+    tmp_path: Path,
+) -> None:
+    """Upgrade a populated migration-003 database without losing order evidence."""
+    with data_settings_context(_settings(tmp_path)):
+        response = get_trading_migrations()
+        assert response.status == "success"
+        assert response.data is not None
+        steps = response.data
+        request_id = "req-44444444-4444-4444-8444-444444444444"
+        unwrap_data_response(
+            run_domain_migrations(
+                build_migration_request(
+                    domain="trading",
+                    steps=steps[:3],
+                    request_id=request_id,
+                    complete_manifest=False,
+                )
+            ),
+            operation="tests.trading.migration_003",
+            request_id=request_id,
+        )
+        now = datetime(2026, 8, 7, tzinfo=UTC)
+        insert_response = execute_transaction(
+            build_transaction_request(
+                plan=build_statement_plan(
+                    statements=(
+                        "INSERT INTO trading_orders "
+                        "(order_id, client_order_id, account_id, symbol_id, "
+                        "risk_decision_id, side, order_type, quantity_decimal, "
+                        "state, runtime_profile, correlation_id, created_at, "
+                        "updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    ),
+                    parameter_sets=(
+                        (
+                            "client-upgrade",
+                            "client-upgrade",
+                            "account-one",
+                            "EURUSD",
+                            "risk-one",
+                            "buy",
+                            "market",
+                            "1",
+                            "pending_new",
+                            "simulation",
+                            "cor-33333333-3333-4333-8333-333333333333",
+                            now.isoformat(),
+                            now.isoformat(),
+                        ),
+                    ),
+                    max_rows=1,
+                ),
+                request_id="req-55555555-5555-4555-8555-555555555555",
+            )
+        )
+        assert insert_response.status == "success"
+        _run_trading_migrations()
+        _run_trading_migrations()
+        assert _read_rows(
+            "SELECT order_id, state FROM trading_orders "
+            "WHERE order_id = 'client-upgrade'"
+        ) == ({"order_id": "client-upgrade", "state": "STAGED"},)
+        assert _read_rows(
+            "SELECT COUNT(*) AS count FROM data_migration_ledger "
+            "WHERE domain = 'trading'"
+        ) == ({"count": 4},)

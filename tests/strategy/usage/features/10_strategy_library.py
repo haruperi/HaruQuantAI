@@ -306,7 +306,7 @@ def _get_library_evidence() -> tuple[Any, Decimal]:
         cache_status="not_used",
         workflow_context="research",
         precision_policy="decimal_string",
-        request_id="strategy-usage-library",
+        request_id="req-11111111-1111-4111-8111-111111111111",
     )
     return market, Decimal("0.00001")
 
@@ -522,7 +522,7 @@ def main() -> None:
             write_lock_lease_seconds=30,
         )
         with data_settings_context(settings):
-            run_data_migrations("strategy-usage-library")
+            run_data_migrations("req-11111111-1111-4111-8111-111111111111")
 
             # 1. Stage 1: Naive MA Trend signal parity
             fr_str_040()

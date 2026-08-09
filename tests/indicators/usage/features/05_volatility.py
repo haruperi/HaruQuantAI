@@ -11,6 +11,8 @@ from app.services.indicators import (
     adr,
     atr,
     get_indicator_result_values,
+    measure_market_speed,
+    measure_volatility_envelope,
     rolling_volatility,
     standard_deviation,
 )
@@ -142,6 +144,24 @@ def main() -> None:
     fr_indi_019()
     fr_indi_020()
     fr_indi_026()
+    speed = measure_market_speed(
+        {
+            "momentum": 1.0,
+            "realized_volatility": 1.2,
+            "range_expansion": 1.1,
+            "volume_acceleration": 0.9,
+            "order_flow_velocity": 1.0,
+        },
+        thresholds=(0.5, 1.5, 2.5),
+    )
+    envelope = measure_volatility_envelope(
+        current=1.2,
+        historical=1.0,
+        operating_ratio=1.5,
+        extreme_ratio=2.5,
+    )
+    print(f"Market-speed DATA: {speed.data}")
+    print(f"Volatility-envelope DATA: {envelope.data}")
 
 
 if __name__ == "__main__":

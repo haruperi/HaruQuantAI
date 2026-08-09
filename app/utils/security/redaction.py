@@ -337,3 +337,21 @@ def get_default_redaction_policy() -> RedactionPolicy:
         The default RedactionPolicy instance.
     """
     return RedactionPolicy()
+
+
+def redact_contract_mapping(value: Mapping[str, object]) -> dict[str, object]:
+    """Redact a JSON-safe contract mapping before integrity hashing.
+
+    Args:
+        value: Contract mapping to detach and redact.
+
+    Returns:
+        Redacted mapping suitable for hashing and transport.
+
+    Raises:
+        ValidationError: If the mapping is unsafe.
+    """
+    result = redact_mapping_value(value)
+    if not isinstance(result.value, dict):
+        raise ValidationError("CONTRACT_MAPPING_INVALID")
+    return result.value

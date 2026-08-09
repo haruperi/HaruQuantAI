@@ -10,6 +10,8 @@ class DecisionState(StrEnum):
     WARN = "warn"
     NEEDS_APPROVAL = "needs_approval"
     NEEDS_MORE_EVIDENCE = "needs_more_evidence"
+    RESIZE = "resize"
+    RESTRICT = "restrict"
     REJECT = "reject"
     BLOCK = "block"
     ERROR = "error"

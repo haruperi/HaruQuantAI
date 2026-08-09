@@ -2,6 +2,12 @@
 
 from app.utils.contracts.audit import AuditEvent, create_audit_event
 from app.utils.contracts.auth import AuthContext, create_auth_context
+from app.utils.contracts.envelopes import (
+    build_event_envelope,
+    find_sequence_gap,
+    is_duplicate_event,
+    parse_event_envelope,
+)
 
 
 def get_auth_context_type() -> type[object]:
@@ -23,8 +29,12 @@ def get_audit_event_type() -> type[object]:
 
 
 __all__ = [
+    "build_event_envelope",
     "create_audit_event",
     "create_auth_context",
+    "find_sequence_gap",
     "get_audit_event_type",
     "get_auth_context_type",
+    "is_duplicate_event",
+    "parse_event_envelope",
 ]

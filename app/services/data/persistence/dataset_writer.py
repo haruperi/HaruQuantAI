@@ -299,6 +299,7 @@ def _atomic_write_dataset(
             row_count=len(request.dataset.records),
             start=request.dataset.start,
             end=request.dataset.end,
+            available_at=request.dataset.available_at,
             license_metadata=request.dataset.license_metadata,
             provenance=provenance,
             created_at=utc_now(clock),

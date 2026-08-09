@@ -31,4 +31,16 @@ class DatasetLoadRequest(TracedOpenContract):
         return _relative_path(value)
 
 
-__all__ = ["DatasetLoadRequest"]
+class ManifestCompatibility(TracedOpenContract):
+    """Bounded schema/normalization compatibility verdict for one manifest.
+
+    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-07`): an explicit,
+    deterministic compatibility check against a caller-declared expectation,
+    never an inferred or default-true verdict.
+    """
+
+    compatible: bool
+    reasons: tuple[str, ...] = ()
+
+
+__all__ = ["DatasetLoadRequest", "ManifestCompatibility"]

@@ -1,5 +1,9 @@
 """Public Research market-structure API."""
 
+from app.services.research.market_structure.assumptions import (
+    build_market_assumption_evidence,
+    parse_market_assumption_evidence,
+)
 from app.services.research.market_structure.calibration import (
     calibrate_market_structure,
 )
@@ -16,10 +20,12 @@ from app.services.research.market_structure.validation import (
 )
 
 __all__ = (
+    "build_market_assumption_evidence",
     "build_market_structure_profile",
     "build_strategy_fit",
     "build_validation_summary",
     "calibrate_market_structure",
     "evaluate_market_structure_quality",
     "label_realized_market_behavior",
+    "parse_market_assumption_evidence",
 )

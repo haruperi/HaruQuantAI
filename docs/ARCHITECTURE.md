@@ -280,7 +280,7 @@
   and file focus only; active requirements, public behaviour, contract versions,
   schema identifiers, error codes, and the explicit package-root API remain
   compatible.
-* `app/services/indicators/` is a completed implementation containing the
+* `app/services/indicators/` contains the implemented
   immutable Core calculation boundary and 21 approved one-indicator-per-file
   implementations across trend, volatility, momentum, volume, and candles.
   It is stateless and read-only: migration `001_indicator_schema_v1`
@@ -288,6 +288,11 @@
   `002_remove_unused_indicator_support_schema` retired them through Data's
   authoritative executor. Indicators now owns no live tables or private
   persistence package.
+  It also owns JSON-safe IndicatorSnapshot and LiquiditySnapshot transports,
+  closed-input enforcement, and neutral cockpit measurements. Risk alone owns
+  authoritative regime classification and tightening policy. Package promotion
+  remains blocked while the current Data error catalogue cannot be validated by
+  the Utils catalogue boundary during migration failure-path handling.
   Its package-root API, standalone usage programs, domain workflows, and its
   participation in `SYS-WF-001` and the virtual non-production `SYS-WF-002`
   teaching path pass. Genuine MT5 demo checks are explicit opt-in integration
@@ -469,6 +474,16 @@ private persistence boundary.
 ## Technical Contracts & Envelopes
 
 ### Shared Utility Framework (`app/utils/`)
+
+Trading Cockpit foundation contracts cross domain boundaries only as validated
+JSON-safe `v1` mappings built and parsed by function pairs exported from
+`app.utils`. Runtime implementation classes remain private. Utils owns exact-unit
+representation, generic transition evaluation, validation-outcome combination,
+idempotency-key semantics, and versioned deterministic random-stream derivation;
+it owns no business state, transaction, outbox, migration, venue-calendar,
+instrument-increment, or domain-event meaning. Missing or incompatible contract
+versions fail closed, and random draws depend only on explicit seed, stream name,
+algorithm version, and draw index.
 
 * **Public Export Rule**: `app/utils/__init__.py` exposes only the approved shared surface through an explicit `__all__`. No fallback imports, shims, duplicate modules, or single-consumer helpers are permitted.
 * **Target Submodule Footprint**: shared `AuthContext`, `AuditEvent`, and `StandardResponse[T]` contracts; shared base errors, immutable error definitions, catalogue validation, injected error routing, identity/trace IDs, UTC and monotonic duration handling, canonical serialization, redaction, centralized typed runtime settings, and structured logging with immutable bound context, explicit app/access/debug/error routing, compressed bounded rotation, queued delivery, and deterministic shutdown. Deployment tenancy/environment and the selected execution runtime profile are distinct authority dimensions; the current single `tenant_or_environment` claim cannot represent both Risk and Agentic admission semantics, and canonical API composition remains blocked until the split specified by `API-OD-004` is implemented. The internal `AppSettings` base — reached only through the `app.utils` settings boundary — is the sole repository `app/configs/env.json` loading boundary; domains inherit it for typed owned settings and never parse environment files or read process environment directly. Imports and import-time log attempts remain inert; the first runtime bound-log emission atomically activates the centralized default profile, while explicit logging configuration is reserved for specialized overrides. Runtime logging activation—not import—may create its configured sink directory. UI/API owns authentication, password hashing, credential encryption/persistence, active-key selection, credential-reference resolution, composition-root Brokers configuration, and permission enforcement; externally provisioned key infrastructure owns encryption-key generation/storage/rotation; Data owns normalized market contracts, cross-domain tabular processing, quality policy, and the only public detached OHLCV/spread and tick DataFrame projections from canonical `MarketDataset v1`; Indicators may privately project the same contract to pandas/NumPy for pure formula evaluation and owns its resulting tabular contract; each domain owns its paths, limits, validation, typed payloads, business outcomes, and error-code policy.
@@ -670,7 +685,8 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
 
 Portfolio collaboration is contract-governed:
 
-- Strategy owns immutable registration; Risk separately owns `StrategyOperationalEligibilityRequest/Decision v1`.
+- Strategy owns immutable registration and `TradePlan v1` planning lifecycle. A validated `READY_FOR_RISK` plan may deterministically project to the preserved `TradeIntent v1`; Risk separately owns approval, sizing, and `StrategyOperationalEligibilityRequest/Decision v1`.
+- Strategy holds only a version-exact expectancy reference. Research remains the authoritative expectancy-profile provider; an absent, failed, stale, or mismatched provider yields `NOT_ELIGIBLE` and falls back to the normal risk-to-reward gate.
 - Portfolio owns `PortfolioDefinition v1`, `PortfolioConstructionRequest/Result v1`, `ActivePortfolioAllocation v1`, and `PortfolioRebalancePlan v1`; immutable definitions are registered/read through the Portfolio root boundary and stored atomically with audit-outbox evidence.
 - Risk owns `AllocationReviewRequest`, `AllocationRiskDecision`, `AllocationBudgetActivationRequest`, and the authoritative risk-budget projection.
 - Simulation owns `PortfolioBacktestRequestV1` / `PortfolioSimulationResult v1`; Analytics owns `PortfolioAllocationEvidence v1`; Data owns `FXConversionEvidence v1`.
@@ -1721,7 +1737,7 @@ tables that already existed.
 | Phase 3c | 13 Agentic + 4 Data research-source/runtime |
 | Dry-Run Plan 9 | 8 Data operational + 4 API + `strategy_mutations` |
 
-Current model size after Analytics retirement: **94 tables**. The six historical
+Current model size after Trading lifecycle completion: **98 tables**. The six historical
 Analytics shapes remain documented but are not current target declarations. Of the
 current tables, 54 have a code definition and the remainder are
 explicitly labelled target-only in their domain sections.
@@ -2002,7 +2018,7 @@ Highest currently allocated, for reference when planning later phases:
 | api | `FR-API-` | 072 | 13 |
 | brokers | `FR-BRK-` | 135 | 15 |
 | data | `FR-DATA-` | 150 | 17 |
-| indicators | `FR-INDI-` | 035 | 06 |
+| indicators | `FR-INDI-` | 041 | 08 |
 | optimization | `FR-OPT-` | 069 | 09 |
 | portfolio | `FR-PORT-` | 040 | 08 |
 | research | `FR-RES-` | 104 | 16 |
@@ -2028,7 +2044,7 @@ all 71.** Sequence by whether the owning domain has a real gap:
 | — | ~~`util_*` (7)~~ | Withdrawn | Utils is the shared framework and owns no state |
 | — | ~~`indicator_*` (3)~~ | **Retired** | Migration `002_remove_unused_indicator_support_schema` removed the empty support-only schema; Indicators is stateless and owns no target or live tables |
 | — | ~~`analytics_*` (6)~~ | **Retired** | Empty derived tables had no production operation outside persistence; migration `002_retire_unused_analytics_derived_store` drops them transactionally and blocks if any row exists |
-| 4 | `trading_orders`, `trading_positions` | **Built; reconciled** | Orders remain an event projection. Positions contain complete closed trades only; fill and transition projections were retired empty by migration `002_closed_position_ledger` |
+| 4 | Trading execution and closed-ledger tables | **Built; reconciled** | Orders remain an event projection and positions contain complete closed trades only. Migrations `003_execution_lifecycle` and `004_order_lifecycle_states` provide reachable append-only transition/fill/protection/ownership evidence and the complete order lifecycle. |
 | 5 | `broker_symbol_map` (1) | **Built (Phase 4E)** | Bitemporal reference data. The other four `broker_*` tables are **withdrawn** — Brokers stays a stateless passthrough. The step is ledger-ready (stable checksum, execution delegated to `run_domain_migrations`) but currently has no runtime composition wiring: nothing invokes `get_broker_migrations`, and the CRUD statements have no caller |
 | 6 | Everything else | Deferred | Defer until a feature needs it |
 
@@ -2068,7 +2084,7 @@ Model size after Phase 1: **86 tables** (was 90).
 
 ### Phase 4 — status
 
-The current model stands at **94 tables** after the historical Indicators and
+The current model stands at **98 tables** after the historical Indicators and
 Analytics support schemas were retired empty.
 
 | Sub-phase | Status | Delivered |
@@ -2076,17 +2092,21 @@ Analytics support schemas were retired empty.
 | 4A | Shipped schema; application integration reactivated | Artifact catalogue (7 tables); the withdrawn conflicting `FR-DATA-154`–`160` allocation remains historical, while current `FEAT-DATA-18` uses `FR-DATA-161`–`167` |
 | 4B | Historical schema retired | `indicator_*` support tables were introduced by migration `001_indicator_schema_v1` and retired empty by immutable migration `002_remove_unused_indicator_support_schema` |
 | 4C | Historical schema retired | `analytics_*` tables were introduced by step `001` and retired empty by guarded step `002`; persistence feature/requirements withdrawn from the current registry |
-| 4D | Shipped; reconciled | Trading event/order materialisation plus an insert-only closed-position ledger; obsolete empty fill and transition tables retired |
+| 4D | Shipped; reconciled | Trading event/order materialisation, an insert-only closed-position ledger, and migrations `003`–`004` lifecycle evidence tables with production CRUD reachability |
 | 4E | Schema shipped; registrations withdrawn | `broker_symbol_map` (1) applied as schema; `FEAT-BRK-16` and `FR-BRK-136`–`138` withdrawn 2026-08-03 (private persistence support) |
 
 `trading_events` remains the write model. `trading_orders` is written atomically with
 events; `trading_positions` accepts only validated complete closed-trade evidence.
-The current executable Trading target is five tables: `trading_events`,
-`trading_idempotency`, `trading_orders`, `trading_positions`, and
-`trading_projections`. The authoritative complete manifest consists of immutable
-steps `001_initial_trading_schema` and `002_closed_position_ledger`; the second
-step retires the empty `trading_fills` and `trading_order_transitions` projections.
+The current executable Trading target includes `trading_events`,
+`trading_idempotency`, `trading_orders`, `trading_positions`,
+`trading_projections`, and migration-`003` transition, fill, protection, and
+ownership evidence tables. The authoritative manifest retains immutable steps
+`001_initial_trading_schema` and `002_closed_position_ledger`, followed by
+`003_execution_lifecycle` and `004_order_lifecycle_states`.
 Open positions and tick-valued unrealized PnL remain outside the database.
+Trading holds current execution positions only in injected process memory under
+the nine-state lifecycle; after restart, unresolved active-position evidence is
+`UNKNOWN` and cannot increase exposure until route-authority reconciliation.
 
 Two defects were found and fixed while closing, both of a kind worth naming.
 

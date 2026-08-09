@@ -17,6 +17,8 @@ _FEATURE_USAGE_SCRIPTS = (
     "04_momentum.py",
     "05_volatility.py",
     "06_volume.py",
+    "07_snapshots.py",
+    "08_input_guards.py",
 )
 _USAGE_SCRIPTS = _FEATURE_USAGE_SCRIPTS
 

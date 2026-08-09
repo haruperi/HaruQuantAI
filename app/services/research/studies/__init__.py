@@ -11,11 +11,17 @@ from app.services.research.studies.null_baseline import (
     get_acceptance_criteria,
     run_eds_null_baseline,
 )
+from app.services.research.studies.strategy_bundle import (
+    build_strategy_evidence_bundle,
+    parse_strategy_evidence_bundle,
+)
 
 __all__ = (
+    "build_strategy_evidence_bundle",
     "classify_symbol",
     "compare_to_null",
     "get_acceptance_criteria",
+    "parse_strategy_evidence_bundle",
     "run_eds_mean_reversion",
     "run_eds_null_baseline",
     "run_eds_session",

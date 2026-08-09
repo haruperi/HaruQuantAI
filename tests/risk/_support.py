@@ -844,6 +844,16 @@ def _values(
         kill_switch_clearance_permissions=("risk.kill.clear",),
         report_timeout_seconds=Decimal(5),
         double_spend_owner="risk_store" if live else None,
+        drawdown_caution_threshold=Decimal("0.03") if live else None,
+        drawdown_restricted_threshold=Decimal("0.06") if live else None,
+        drawdown_critical_threshold=Decimal("0.08") if live else None,
+        emergency_flash_crash_move_pct=Decimal("0.05") if live else None,
+        emergency_flash_crash_window_seconds=60 if live else None,
+        emergency_connectivity_loss_seconds=30 if live else None,
+        emergency_margin_call_utilization_pct=Decimal("0.8") if live else None,
+        emergency_recovery_lock_seconds=900 if live else None,
+        assessment_recalc_events=("fill", "position_change") if live else (),
+        assessment_max_staleness_seconds=120 if live else None,
     )
     token_store = _TokenStore()
     audit = create_risk_audit_chain(config, _AuditStore(), lambda: NOW, canonical_json)

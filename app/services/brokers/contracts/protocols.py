@@ -46,6 +46,7 @@ from app.services.brokers.contracts.models import (
     BrokerOrderCheck,
     BrokerOrderFilter,
     BrokerOrderModificationRequest,
+    BrokerOrderProtectionRequest,
     BrokerOrderRequest,
     BrokerOrderResult,
     BrokerPage,
@@ -55,6 +56,7 @@ from app.services.brokers.contracts.models import (
     BrokerPositionCloseRequest,
     BrokerPositionFilter,
     BrokerPositionModificationRequest,
+    BrokerPositionReductionRequest,
     BrokerProfitRequest,
     BrokerQuote,
     BrokerServerTime,
@@ -645,6 +647,32 @@ class TradeExecutionProvider(Protocol):
         self, request: BrokerOrderModificationRequest
     ) -> StandardResponse[BrokerOrderResult]:
         """Handle replace order.
+
+        Args:
+            request: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def attach_protection(
+        self, request: BrokerOrderProtectionRequest
+    ) -> StandardResponse[BrokerOrderResult]:
+        """Attach bracketing stop-loss/take-profit protection to one order.
+
+        Args:
+            request: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
+    async def reduce_position(
+        self, request: BrokerPositionReductionRequest
+    ) -> StandardResponse[BrokerOrderResult]:
+        """Reduce one open position by an explicit quantity (partial close).
 
         Args:
             request: Value supplied to the operation.

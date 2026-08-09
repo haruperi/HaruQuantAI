@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import sys
 import time
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -23,15 +24,24 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.utils import (
+    add_exact,
     age_seconds,
+    attempt_transition,
+    build_exact_unit,
+    build_reservation,
     build_response_metadata,
+    build_transition_table,
+    build_validation_outcome,
     canonical_digest,
     canonical_json,
     configure_logging,
     create_audit_event,
     create_auth_context,
+    derive_idempotency_key,
+    derive_random_stream,
     derive_stable_id,
     error_response,
+    evaluate_reservation,
     exception_response,
     flush_logging,
     format_utc_timestamp,
@@ -52,6 +62,7 @@ from app.utils import (
     load_settings,
     log_info,
     map_exception,
+    next_int,
     normalize_error_code,
     parse_utc_timestamp,
     redact_mapping_value,
@@ -65,6 +76,39 @@ from app.utils import (
     validate_error_catalog,
     validate_id,
 )
+
+
+def _run_stage_9_new_primitives() -> None:
+    """Execute FEAT-UTIL-09 through FEAT-UTIL-13 in dependency order."""
+    _print_stage(
+        9,
+        "Cockpit Foundation Primitives",
+        "Exercise exact units, transitions, validation, idempotency, and seeded draws.",
+    )
+    amount = add_exact(
+        build_exact_unit("1", kind="MONEY", currency="USD"),
+        build_exact_unit("2", kind="MONEY", currency="USD"),
+    )
+    table = build_transition_table(
+        {"OPEN": ["CLOSED"], "CLOSED": []}, terminal_states=["CLOSED"]
+    )
+    transition = attempt_transition(table, "OPEN", "CLOSED")
+    instant = datetime(2026, 1, 1, tzinfo=UTC)
+    validation = build_validation_outcome(
+        verdict="PASS", check_id="pipeline", evaluated_at=instant
+    )
+    key = derive_idempotency_key(owner="utils:pipeline", intent={"operation": "demo"})
+    reservation = build_reservation(key=key, reserved_at=instant, ttl_seconds=30)
+    verdict = evaluate_reservation(
+        key=key,
+        owner="utils:pipeline",
+        prior_reservation=reservation,
+        observed_at=instant,
+    )
+    draw, _ = next_int(derive_random_stream(7, "pipeline"), lower=1, upper=10)
+    print(
+        f"Data -> amount={amount['amount']}, transition={transition['outcome']}, validation={validation['verdict']}, duplicate={verdict['verdict']}, draw={draw}"
+    )
 
 
 def _print_stage(stage_num: int, name: str, summary: str) -> None:
@@ -345,12 +389,13 @@ def main() -> None:
     )
     common_catalog = _run_stage_7_error_routing()
     _run_stage_8_responses(trace_info, digest_hash, common_catalog)
+    _run_stage_9_new_primitives()
 
     shutdown_logging()
 
     print("\n" + "=" * 88)
     print("Data -> full_domain_pipeline_status='completed'")
-    print("SUCCESS: All 9 Utils features executed in realistic pipeline order!")
+    print("SUCCESS: All 14 Utils features executed in realistic pipeline order!")
     print("=" * 88)
 
 

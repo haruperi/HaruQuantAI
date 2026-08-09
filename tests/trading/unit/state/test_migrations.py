@@ -33,6 +33,8 @@ def test_migrations_are_ordered_and_forward_only() -> None:
     assert tuple(step.migration_id for step in steps) == (
         "001_initial_trading_schema",
         "002_closed_position_ledger",
+        "003_execution_lifecycle",
+        "004_order_lifecycle_states",
     )
     replacement = tuple(item for item in statements if "POSITIONS__NEW" in item)
     assert replacement

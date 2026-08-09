@@ -19,6 +19,7 @@ from app.services.trading.reconciliation.compare import _compare_authority_state
 from app.services.trading.state import (
     TradingEvent,
     TradingProjection,
+    get_execution_position_snapshot,
 )
 from app.services.trading.state.projections import _apply_execution_event_value
 from app.services.trading.validation.authority import (
@@ -33,6 +34,28 @@ KillSwitchCommand = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 logger = get_logger(__name__)
+
+
+def evaluate_trading_permissions(
+    *, enabled: bool, reconciled: bool, protection_known: bool, ownership_known: bool
+) -> dict[str, bool]:
+    """Return the non-bypassable session action-permission matrix.
+
+    Risk-reducing actions remain available when new exposure is disabled, but
+    uncertainty blocks re-arm and exposure creation.
+    """
+    known = reconciled and protection_known and ownership_known
+    return {
+        "new_exposure": enabled and known,
+        "increase_exposure": enabled and known,
+        "cancel": True,
+        "protect": True,
+        "reduce": True,
+        "close": True,
+        "flatten": True,
+        "rearm": enabled and known,
+    }
+
 
 if TYPE_CHECKING:
     from app.services.trading.actions.dependencies import TradingDependencies
@@ -188,7 +211,14 @@ async def _resume_strategy_value(
     current = deps.store.load_projection(
         (request.route, request.account_id, authority_id(request))
     )
-    if current is None or _compare_authority_state_value(snapshot, current).unresolved:
+    if (
+        current is None
+        or _compare_authority_state_value(
+            snapshot,
+            current,
+            get_execution_position_snapshot(deps.execution_positions),
+        ).unresolved
+    ):
         raise TradingError("RECONCILIATION_REQUIRED", "Route state is not reconciled")
     projection = _record_control(
         request,
@@ -219,7 +249,11 @@ async def _sync_positions_value(
     unresolved = (
         True
         if current is None
-        else _compare_authority_state_value(snapshot, current).unresolved
+        else _compare_authority_state_value(
+            snapshot,
+            current,
+            get_execution_position_snapshot(deps.execution_positions),
+        ).unresolved
     )
     projection = _record_control(
         request,
@@ -405,6 +439,7 @@ async def clear_kill_switch(
 
 __all__ = [
     "clear_kill_switch",
+    "evaluate_trading_permissions",
     "pause_strategy",
     "resume_strategy",
     "sync_positions",

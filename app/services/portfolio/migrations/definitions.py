@@ -139,6 +139,103 @@ _PORTFOLIO_SCHEMA_STATEMENTS = (
 )
 
 
+_PORTFOLIO_LEDGER_SCHEMA_STATEMENTS = (
+    """
+    CREATE TABLE IF NOT EXISTS portfolio_ledger_accounts (
+        account_id TEXT PRIMARY KEY,
+        portfolio_id TEXT NOT NULL,
+        currency TEXT NOT NULL,
+        normal_balance TEXT NOT NULL,
+        category TEXT NOT NULL,
+        account_json TEXT NOT NULL,
+        registered_at TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (portfolio_id, account_id)
+    ) STRICT
+    """.strip(),
+    (
+        "CREATE INDEX IF NOT EXISTS idx_portfolio_ledger_accounts_portfolio "
+        "ON portfolio_ledger_accounts(portfolio_id)"
+    ),
+    """
+    CREATE TABLE IF NOT EXISTS portfolio_ledger_posting_batches (
+        batch_id TEXT PRIMARY KEY,
+        source_event_id TEXT NOT NULL,
+        source_sequence INTEGER NOT NULL,
+        entry_sequence INTEGER NOT NULL,
+        reversal_of TEXT,
+        posted_at TEXT NOT NULL,
+        canonical_hash TEXT NOT NULL,
+        batch_json TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (source_event_id, source_sequence)
+    ) STRICT
+    """.strip(),
+    (
+        "CREATE INDEX IF NOT EXISTS idx_portfolio_ledger_batches_event "
+        "ON portfolio_ledger_posting_batches(source_event_id, source_sequence)"
+    ),
+    """
+    CREATE TABLE IF NOT EXISTS portfolio_ledger_entries (
+        entry_id TEXT NOT NULL,
+        batch_id TEXT NOT NULL,
+        entry_sequence INTEGER NOT NULL,
+        account_id TEXT NOT NULL,
+        side TEXT NOT NULL CHECK (side IN ('debit', 'credit')),
+        amount_decimal TEXT NOT NULL,
+        currency TEXT NOT NULL,
+        posting_type TEXT NOT NULL,
+        posted_at TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (entry_id, batch_id)
+    ) STRICT
+    """.strip(),
+    (
+        "CREATE INDEX IF NOT EXISTS idx_portfolio_ledger_entries_account "
+        "ON portfolio_ledger_entries(account_id, currency)"
+    ),
+    """
+    CREATE TABLE IF NOT EXISTS portfolio_ledger_balances (
+        balance_id TEXT PRIMARY KEY,
+        portfolio_id TEXT NOT NULL,
+        account_id TEXT NOT NULL,
+        currency TEXT NOT NULL,
+        settled_decimal TEXT NOT NULL,
+        unsettled_decimal TEXT NOT NULL,
+        accrued_income_decimal TEXT NOT NULL,
+        accrued_cost_decimal TEXT NOT NULL,
+        as_of TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE (account_id, currency, as_of)
+    ) STRICT
+    """.strip(),
+    (
+        "CREATE INDEX IF NOT EXISTS idx_portfolio_ledger_balances_account "
+        "ON portfolio_ledger_balances(account_id, as_of DESC)"
+    ),
+    """
+    CREATE TABLE IF NOT EXISTS portfolio_ledger_snapshots (
+        snapshot_id TEXT PRIMARY KEY,
+        entry_range_start INTEGER NOT NULL,
+        entry_range_end INTEGER NOT NULL,
+        balances_json TEXT NOT NULL,
+        material_hash TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    ) STRICT
+    """.strip(),
+)
+
+
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Portfolio schema statements.
 
@@ -159,6 +256,12 @@ PORTFOLIO_MIGRATIONS: tuple[Any, ...] = (
         migration_id="001_initial_portfolio_schema",
         checksum=_migration_checksum(_PORTFOLIO_SCHEMA_STATEMENTS),
         statements=_PORTFOLIO_SCHEMA_STATEMENTS,
+    ),
+    build_migration_step(
+        domain="portfolio",
+        migration_id="002_portfolio_ledger_schema",
+        checksum=_migration_checksum(_PORTFOLIO_LEDGER_SCHEMA_STATEMENTS),
+        statements=_PORTFOLIO_LEDGER_SCHEMA_STATEMENTS,
     ),
 )
 

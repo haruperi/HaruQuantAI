@@ -39,6 +39,8 @@ _WRITE = {
     BrokerCapabilityId.MODIFY_POSITION,
     BrokerCapabilityId.CLOSE_POSITION,
     BrokerCapabilityId.REPLACE_ORDER,
+    BrokerCapabilityId.ATTACH_PROTECTION,
+    BrokerCapabilityId.REDUCE_POSITION,
 }
 _MT5_DEMO_RELEASED_WRITES = {
     BrokerCapabilityId.CHECK_ORDER,

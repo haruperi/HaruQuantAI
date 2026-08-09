@@ -691,6 +691,12 @@ class OrderIntent(_TradingModel):
     idempotency_hash: str
     canonical_material_version: str
     risk_decision_id: str
+    trade_plan_id: str | None = None
+    trade_plan_version: str | None = None
+    risk_decision_version: str | None = None
+    policy_version: str | None = None
+    profile_version: str | None = None
+    ownership_id: str | None = None
     action_policy_verdict_id: str
     approval_token_ref: str
     created_at: datetime
@@ -724,6 +730,26 @@ class OrderIntent(_TradingModel):
         """
         logger.debug("Validating OrderIntent text")
         return _validate_text(value, "order intent text")
+
+    @field_validator(
+        "trade_plan_id",
+        "trade_plan_version",
+        "risk_decision_version",
+        "policy_version",
+        "profile_version",
+        "ownership_id",
+    )
+    @classmethod
+    def _validate_intent_lineage(cls, value: str | None) -> str | None:
+        """Validate optional cockpit lineage references.
+
+        Args:
+            value: Candidate lineage text.
+
+        Returns:
+            Validated optional text.
+        """
+        return _validate_optional_text(value, "order intent lineage")
 
     @field_validator("request_id", "workflow_id", "correlation_id")
     @classmethod

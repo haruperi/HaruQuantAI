@@ -253,6 +253,15 @@ def _validate_apply_request(
             RiskErrorCode.PERMISSION_DENIED,
             "kill-switch authorization or scope invalid",
         )
+    if (
+        command.action == "clear"
+        and current.cooldown_until is not None
+        and now < current.cooldown_until
+    ):
+        raise RiskDomainError(
+            RiskErrorCode.POLICY_BLOCKED,
+            "kill-switch cooldown requires explicit re-arming before clearing",
+        )
 
 
 def _validate_check_request(
@@ -323,6 +332,11 @@ def apply_kill_switch_command(
         state_value: Literal["active", "inactive"] = (
             "active" if command.action == "activate" else "inactive"
         )
+        cooldown_until = (
+            checked_now + timedelta(seconds=float(command.cooldown_seconds))
+            if command.action == "activate" and command.cooldown_seconds is not None
+            else None
+        )
         new_state = KillSwitchState(
             state_id=_identity(
                 "kill_switch.state",
@@ -340,6 +354,10 @@ def apply_kill_switch_command(
             reason=command.reason,
             version=current.version + 1,
             updated_at=checked_now,
+            locked_permissions=(
+                command.locked_permissions if command.action == "activate" else ()
+            ),
+            cooldown_until=cooldown_until,
         )
         revoked_count = 0
         if command.action == "activate":
@@ -520,4 +538,37 @@ def check_risk_kill_switch(
         ) from error
 
 
-__all__ = ["apply_kill_switch_command", "check_risk_kill_switch"]
+@guard_risk_boundary(risk_level="critical", read_only=True)
+def permits_risk_action(
+    states: Sequence[KillSwitchState],
+    scope: Mapping[str, str],
+    action: Literal["new_exposure", "close_only", "reduction_only", "cancel_only"],
+) -> bool:
+    """Determine whether an active kill switch still permits one exact action.
+
+    Distinguishes a granular lock (only ``locked_permissions`` are blocked;
+    e.g. a ``new_exposure``-only lock still permits ``close_only``/
+    ``reduction_only``/``cancel_only`` actions, per Phase 0 finding S-3) from
+    a legacy full-block activation (an active state with no
+    ``locked_permissions`` blocks every action, preserving prior behavior).
+    An inactive or unknown applicable state never blocks.
+
+    Args:
+        states: Canonical state collection.
+        scope: Exact action portfolio/strategy/symbol scope.
+        action: Exact action being requested.
+
+    Returns:
+        ``True`` only when no applicable active state blocks this action.
+    """
+    logger.info("Checking granular Risk kill-switch action permission: %s", action)
+    applicable = _applicable_states(states, scope)
+    for state in applicable:
+        if state.state != "active":
+            continue
+        if not state.locked_permissions or action in state.locked_permissions:
+            return False
+    return True
+
+
+__all__ = ["apply_kill_switch_command", "check_risk_kill_switch", "permits_risk_action"]

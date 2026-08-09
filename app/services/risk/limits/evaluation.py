@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, Literal
@@ -333,6 +333,83 @@ def _drawdown_result(
     )
 
 
+_DRAWDOWN_STATE_NORMAL = "normal"
+_DRAWDOWN_STATE_CAUTION = "caution"
+_DRAWDOWN_STATE_RESTRICTED = "restricted"
+_DRAWDOWN_STATE_CRITICAL = "critical"
+_DRAWDOWN_STATE_LOCKED = "locked"
+
+
+def _drawdown_state_result(
+    snapshot: PortfolioRiskSnapshot,
+    config: RiskConfig,
+    evidence_refs: tuple[str, ...],
+    precedence: int,
+) -> RiskLimitResult:
+    """Classify the drawdown state machine from configured ordered thresholds.
+
+    Args:
+        snapshot: Portfolio evidence carrying the current drawdown ratio.
+        config: Active Risk configuration.
+        evidence_refs: Exact evidence references.
+        precedence: Stable evaluation order.
+
+    Returns:
+        Ordered drawdown-state result naming the classified state and headroom
+        to the next stricter threshold; disabled (no configured thresholds)
+        always passes.
+    """
+    logger.debug("Classifying Policy drawdown state")
+    caution = config.drawdown_caution_threshold
+    restricted = config.drawdown_restricted_threshold
+    critical = config.drawdown_critical_threshold
+    if caution is None or restricted is None or critical is None:
+        return _result(
+            "drawdown_state",
+            LimitStatus.PASS,
+            snapshot.drawdown,
+            None,
+            evidence_refs,
+            precedence,
+            reference_basis=_DRAWDOWN_STATE_NORMAL,
+        )
+    drawdown = snapshot.drawdown
+    ordered = (
+        (caution, _DRAWDOWN_STATE_CAUTION),
+        (restricted, _DRAWDOWN_STATE_RESTRICTED),
+        (critical, _DRAWDOWN_STATE_CRITICAL),
+        (config.max_drawdown, _DRAWDOWN_STATE_LOCKED),
+    )
+    state = _DRAWDOWN_STATE_NORMAL
+    next_threshold = caution
+    for threshold, name in ordered:
+        if drawdown >= threshold:
+            state = name
+        else:
+            next_threshold = threshold
+            break
+    else:
+        next_threshold = config.max_drawdown
+    status = (
+        LimitStatus.BLOCKED
+        if state == _DRAWDOWN_STATE_LOCKED
+        else LimitStatus.WARN
+        if state != _DRAWDOWN_STATE_NORMAL
+        else LimitStatus.PASS
+    )
+    return _result(
+        "drawdown_state",
+        status,
+        drawdown,
+        next_threshold,
+        evidence_refs,
+        precedence,
+        reason=RiskErrorCode.LIMIT_FAILED if status is LimitStatus.BLOCKED else None,
+        headroom=next_threshold - drawdown,
+        reference_basis=state,
+    )
+
+
 def _freshness_result(
     as_of: datetime,
     now: datetime,
@@ -410,11 +487,85 @@ def _consistency_result(
     )
 
 
+PortfolioViewProvider = Callable[[str], Mapping[str, Decimal] | None]
+"""Injectable authoritative Portfolio exposure-view port.
+
+Consumer port for the deferred Portfolio integration
+(``TC-IMP-PORT-09``/``TC-IMP-PORT-17``, Phase 12): given an account
+identity, returns the authoritative exposure-by-dimension mapping, or
+``None`` when unavailable. Risk never implements the provider's business
+logic here; it only calls an injected provider and fails closed to its own
+snapshot-derived view.
+"""
+
+
+def _resolve_exposure_by_dimension(
+    snapshot: PortfolioRiskSnapshot,
+    portfolio_view_provider: PortfolioViewProvider | None,
+) -> Mapping[str, Decimal]:
+    """Resolve the authoritative exposure view or fail closed to Risk's own.
+
+    Args:
+        snapshot: Portfolio evidence carrying Risk's own exposure view.
+        portfolio_view_provider: Optional injected authoritative Portfolio
+            exposure-view port.
+
+    Returns:
+        The authoritative view when the provider is supplied and returns
+        one; otherwise Risk's own snapshot-derived exposure view. Never an
+        inferred or synthesized view.
+    """
+    if portfolio_view_provider is not None:
+        view = portfolio_view_provider(snapshot.account_id)
+        if view is not None:
+            return view
+    return snapshot.exposure_by_dimension
+
+
+MarginViewProvider = Callable[[str], Mapping[str, Decimal] | None]
+"""Injectable authoritative Portfolio margin/leverage-view port.
+
+Consumer port for the deferred Portfolio integration (``TC-IMP-PORT-07``,
+Phase 12 margin and buying power): given an account identity, returns a
+mapping with optional ``margin_utilization``/``effective_leverage`` keys, or
+``None`` when unavailable. Risk never implements the provider's business
+logic here; it only calls an injected provider and fails closed to its own
+static snapshot-derived checks — the check is never silently skipped.
+"""
+
+
+def _resolve_margin_view(
+    snapshot: PortfolioRiskSnapshot,
+    margin_view_provider: MarginViewProvider | None,
+) -> tuple[Decimal | None, Decimal | None]:
+    """Resolve authoritative margin utilization and leverage, or fail closed.
+
+    Args:
+        snapshot: Portfolio evidence carrying Risk's own static values.
+        margin_view_provider: Optional injected authoritative Portfolio
+            margin/leverage-view port.
+
+    Returns:
+        ``(margin_utilization, effective_leverage)``; each falls back
+        independently to Risk's own snapshot value when the provider is
+        absent or omits that key.
+    """
+    margin_utilization = snapshot.margin_utilization
+    effective_leverage = snapshot.effective_leverage
+    if margin_view_provider is not None:
+        view = margin_view_provider(snapshot.account_id)
+        if view is not None:
+            margin_utilization = view.get("margin_utilization", margin_utilization)
+            effective_leverage = view.get("effective_leverage", effective_leverage)
+    return margin_utilization, effective_leverage
+
+
 def _concentration_results(
     snapshot: PortfolioRiskSnapshot,
     config: RiskConfig,
     evidence_refs: tuple[str, ...],
     start_precedence: int,
+    portfolio_view_provider: PortfolioViewProvider | None = None,
 ) -> tuple[RiskLimitResult, ...]:
     """Evaluate symbol then other-dimension concentration in stable key order.
 
@@ -423,16 +574,20 @@ def _concentration_results(
         config: Active Risk policy.
         evidence_refs: Exact snapshot evidence references.
         start_precedence: First concentration precedence.
+        portfolio_view_provider: Optional injected authoritative Portfolio
+            exposure-view port (``TC-IMP-PORT-09``/``TC-IMP-PORT-17``);
+            falls back to Risk's own snapshot exposure when absent.
 
     Returns:
         Ordered per-dimension concentration results.
     """
     logger.debug("Evaluating Policy concentration limits")
-    symbols = sorted(
-        key for key in snapshot.exposure_by_dimension if key.startswith("symbol:")
+    exposure_by_dimension = _resolve_exposure_by_dimension(
+        snapshot, portfolio_view_provider
     )
+    symbols = sorted(key for key in exposure_by_dimension if key.startswith("symbol:"))
     others = sorted(
-        key for key in snapshot.exposure_by_dimension if not key.startswith("symbol:")
+        key for key in exposure_by_dimension if not key.startswith("symbol:")
     )
     results: list[RiskLimitResult] = []
     for offset, key in enumerate((*symbols, *others)):
@@ -445,7 +600,7 @@ def _concentration_results(
         observed = (
             Decimal(0)
             if snapshot.gross_exposure == 0
-            else abs(snapshot.exposure_by_dimension[key]) / snapshot.gross_exposure
+            else abs(exposure_by_dimension[key]) / snapshot.gross_exposure
         )
         results.append(
             _threshold_result(
@@ -466,6 +621,8 @@ def evaluate_portfolio_limits(
     *,
     now: datetime,
     mandate: FirmMandate | None = None,
+    portfolio_view_provider: PortfolioViewProvider | None = None,
+    margin_view_provider: MarginViewProvider | None = None,
 ) -> tuple[RiskLimitResult, ...]:
     """Evaluate portfolio limits in the authoritative deterministic precedence.
 
@@ -474,6 +631,14 @@ def evaluate_portfolio_limits(
         config: Active validated Risk policy.
         now: Injected current UTC time.
         mandate: Optional verified firm mandate for account-specific limits.
+        portfolio_view_provider: Optional injected authoritative Portfolio
+            exposure-view port consumed by concentration checks
+            (``TC-IMP-PORT-09``/``TC-IMP-PORT-17``, deferred integration);
+            falls back to Risk's own snapshot exposure when absent.
+        margin_view_provider: Optional injected authoritative Portfolio
+            margin/leverage-view port (``TC-IMP-PORT-07``, deferred
+            integration); falls back to Risk's own static snapshot checks
+            when absent.
 
     Returns:
         Complete ordered limit results; the first failing item is primary.
@@ -551,24 +716,28 @@ def evaluate_portfolio_limits(
                 4,
                 mandate,
             ),
+            _drawdown_state_result(snapshot, config, evidence_refs, 5),
         ]
         concentrations = _concentration_results(
-            snapshot, config, evidence_refs, len(results)
+            snapshot, config, evidence_refs, len(results), portfolio_view_provider
         )
         results.extend(concentrations)
         precedence = len(results)
+        margin_utilization, effective_leverage = _resolve_margin_view(
+            snapshot, margin_view_provider
+        )
         results.extend(
             (
                 _threshold_result(
                     "margin_utilization",
-                    snapshot.margin_utilization,
+                    margin_utilization,
                     config.max_margin_utilization,
                     evidence_refs,
                     precedence,
                 ),
                 _threshold_result(
                     "effective_leverage",
-                    snapshot.effective_leverage,
+                    effective_leverage,
                     config.max_effective_leverage,
                     evidence_refs,
                     precedence + 1,
@@ -604,6 +773,116 @@ def evaluate_portfolio_limits(
     except RiskDomainError:
         logger.exception("Portfolio Policy limit evaluation failed closed")
         raise
+
+
+RuleDirection = Literal["upper_bound", "lower_bound"]
+"""Strictness direction for one named rule key.
+
+``upper_bound`` rules (e.g. exposure/risk caps) tighten toward the minimum
+across sources; ``lower_bound`` rules (e.g. minimum reward/risk) tighten
+toward the maximum.
+"""
+
+
+@guard_risk_boundary(risk_level="medium", read_only=True)
+def resolve_effective_rules(
+    sources: Mapping[str, Mapping[str, Decimal]],
+    directions: Mapping[str, RuleDirection],
+) -> dict[str, Decimal]:
+    """Resolve the effective rule set across sources via strictest-wins.
+
+    Combines named rule sources (e.g. ``scenario``, ``account``,
+    ``venue_instrument``, ``strategy``, ``simulator_default``) into one
+    effective rule mapping. For every key present in at least one source,
+    the resolved value is the strictest across every source that defines
+    it — the minimum for an ``upper_bound`` rule, the maximum for a
+    ``lower_bound`` rule. A key without a registered direction fails closed
+    rather than guessing a strictness convention.
+
+    Args:
+        sources: Named rule-source mappings; a source may omit any key.
+        directions: Registered strictness direction per rule key that
+            appears in any source.
+
+    Returns:
+        Effective rule mapping containing every key present in any source.
+
+    Raises:
+        RiskDomainError: If a present key has no registered direction.
+    """
+    logger.info("Resolving effective Risk rules via strictest-wins")
+    keys: set[str] = set()
+    for source in sources.values():
+        keys.update(source)
+    resolved: dict[str, Decimal] = {}
+    for key in sorted(keys):
+        direction = directions.get(key)
+        if direction is None:
+            raise RiskDomainError(
+                RiskErrorCode.INVALID_RISK_CONFIG,
+                "effective rule key has no registered strictness direction",
+            )
+        values = [source[key] for source in sources.values() if key in source]
+        resolved[key] = min(values) if direction == "upper_bound" else max(values)
+    return resolved
+
+
+ExpectancyProvider = Callable[[str], Decimal | None]
+"""Injectable approved-expectancy-profile eligibility port.
+
+Consumer port for the deferred Research integration
+(``TC-IMP-RES-03``/``TC-IMP-RES-04``, Phase 11): given a strategy identity,
+returns an eligible exactly-matched minimum reward/risk override, or
+``None`` when no approved profile is eligible. Risk never implements the
+provider's expectancy-eligibility logic here; an absent or ``None``
+provider result falls back to the normal configured minimum reward/risk
+gate — never an inferred approval.
+"""
+
+
+@guard_risk_boundary(risk_level="medium", read_only=True)
+def evaluate_reward_risk_gate(
+    strategy_id: str,
+    reward_risk_ratio: Decimal,
+    min_reward_risk_ratio: Decimal,
+    evidence_refs: tuple[str, ...],
+    *,
+    expectancy_provider: ExpectancyProvider | None = None,
+) -> RiskLimitResult:
+    """Apply the minimum reward/risk gate, deferring to an eligible expectancy profile.
+
+    Args:
+        strategy_id: Identity used to look up an eligible expectancy
+            profile.
+        reward_risk_ratio: Planned reward/risk ratio (e.g. from
+            :func:`app.services.risk.sizing.calculate_planned_risk_reward`).
+        min_reward_risk_ratio: Configured baseline minimum ratio.
+        evidence_refs: Exact evidence references.
+        expectancy_provider: Optional injected approved-expectancy-profile
+            eligibility port (``TC-IMP-RES-03``/``TC-IMP-RES-04``, deferred
+            integration).
+
+    Returns:
+        Ordered reward/risk gate result.
+    """
+    logger.info("Evaluating Risk minimum reward/risk gate: %s", strategy_id)
+    effective_min = min_reward_risk_ratio
+    if expectancy_provider is not None:
+        override = expectancy_provider(strategy_id)
+        if override is not None:
+            effective_min = override
+    status = (
+        LimitStatus.PASS if reward_risk_ratio >= effective_min else LimitStatus.FAIL
+    )
+    return _result(
+        "reward_risk_ratio",
+        status,
+        reward_risk_ratio,
+        effective_min,
+        evidence_refs,
+        0,
+        reason=RiskErrorCode.LIMIT_FAILED if status is LimitStatus.FAIL else None,
+    )
 
 
 @guard_risk_boundary(risk_level="medium", read_only=True)

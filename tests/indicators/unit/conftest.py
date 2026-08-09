@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -35,7 +36,14 @@ def pytest_runtest_makereport(
     """
     outcome = yield
     report = outcome.get_result()
-    if report.when == "call" and report.duration > _MAX_UNIT_CALL_SECONDS:
+    # Coverage tracing measures instrumentation overhead rather than the unit's
+    # runtime budget. The normal untraced unit command remains the NFR authority.
+    if (
+        report.when == "call"
+        and sys.gettrace() is None
+        and not item.config.pluginmanager.hasplugin("_cov")
+        and report.duration > _MAX_UNIT_CALL_SECONDS
+    ):
         report.outcome = "failed"
         report.longrepr = (
             f"Unit test {item.nodeid} exceeded the call-phase latency ceiling: "

@@ -9,8 +9,8 @@
 | -------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **Package path**     | `app/services/portfolio`                                                                                   |
 | **Domain ID**        | `PORT`                                                                                                     |
-| **Status**           | Partial — approved Trading Cockpit Phase 0 findings folded in; the 8 registered features remain implemented, but 17 work packages (`TC-IMP-PORT-01`..`TC-IMP-PORT-17`) add target behavior that is not yet implemented (12 `CREATE`, 3 `EXTEND`, 2 `REFACTOR`). The cockpit's entire financial authority (ledger, account, cash, P&L, margin) is built here from nothing. See `### Trading Cockpit Phase 0 reconciliation`. |
-| **Last updated**     | 2026-08-07                                                                                                 |
+| **Status**           | Partial — approved Trading Cockpit Phase 0 findings folded in; 9 of 12 registered features are implemented (`FEAT-PORT-01`..`09`), but 3 planned features (`FEAT-PORT-10`..`12`) and the remaining work packages remain `Missing`. The foundational balanced double-entry ledger (`FEAT-PORT-09`) is implemented; valuation/P&L, margin/risk-health, and reconciliation are not yet built. See `### Trading Cockpit Phase 0 reconciliation`. |
+| **Last updated**     | 2026-08-08                                                                                                 |
 | **System workflows** | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008`                                                                   |
 
 ## 1. Purpose and Boundary
@@ -87,7 +87,7 @@ Risk separately persists the authoritative risk-budget projection. Portfolio sto
 
 ### Trading Cockpit Phase 0 reconciliation
 
-This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-PORT-01`..`TC-IMP-PORT-17`) into this authoritative README so that it is self-contained. Phase 0 classified the seventeen Portfolio work packages as **twelve `CREATE`, three `EXTEND`, and two `REFACTOR`** (CSV-authoritative). This is the highest-risk domain in the programme: **the cockpit's entire financial authority is missing.** Across all 103 `CREATE TABLE` statements there is no ledger, account, cash, balance, equity, margin, buying-power, or P&L model anywhere in `app/`. The existing Portfolio domain is an **allocation and rebalancing engine** (`FEAT-PORT-01`..`08`), not an accounting system. The cockpit builds the accounting system here.
+This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-PORT-01`..`TC-IMP-PORT-17`) into this authoritative README so that it is self-contained. Phase 0 classified the seventeen Portfolio work packages as **twelve `CREATE`, three `EXTEND`, and two `REFACTOR`** (CSV-authoritative). This is the highest-risk domain in the programme: **the cockpit's entire financial authority was missing.** Across all 103 `CREATE TABLE` statements there was no ledger, account, cash, balance, equity, margin, buying-power, or P&L model anywhere in `app/`. The existing Portfolio domain was an **allocation and rebalancing engine** (`FEAT-PORT-01`..`08`), not an accounting system. The cockpit builds the accounting system here. The foundational `FEAT-PORT-09` balanced double-entry ledger (`TC-IMP-PORT-01,02,03,15`) is now **implemented**; `FEAT-PORT-10`..`12` remain planned.
 
 Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
 
@@ -104,7 +104,7 @@ Cross-domain contract transport is settled per the Utils domain: versioned cross
 
 | Status | Target (feature / gap) | Reuses / extends | Phase 0 gaps |
 | --- | --- | --- | --- |
-| Missing | **`FEAT-PORT-09` Balanced Double-Entry Ledger and Accounts** *(planned)* | New feature. **`TC-IMP-PORT-01`** defines `LedgerEntry v1` and the balanced double-entry ledger (debit/credit postings: deposits, withdrawals, fills, commissions, fees, spread, financing, funding, borrow, dividends, FX translation, MTM, settlement, corporate action, liquidation, correction) — the foundational `CREATE`, Phase 0 finding P-1. **`TC-IMP-PORT-02`** consumes Trading/Broker/Simulator economic events exactly-once via event+source-sequence invariants. **`TC-IMP-PORT-03`** owns account balance and cash (settled/unsettled, accrued income/costs, reproducible balance). **`TC-IMP-PORT-15`** rebuilds state from ledger/events with snapshots as accelerators (not alternative truth). | `TC-IMP-PORT-01`, `TC-IMP-PORT-02`, `TC-IMP-PORT-03`, `TC-IMP-PORT-15` |
+| Completed | **`FEAT-PORT-09` Balanced Double-Entry Ledger and Accounts** | `ledger/` | Trading Cockpit Phase 0 reconciliation (§1); `LedgerEntry v1`/`PostingBatch v1`/`LedgerAccount v1` via `build_ledger_entry`/`parse_ledger_entry`/`build_posting_batch`/`parse_posting_batch`/`build_ledger_account`/`parse_ledger_account`, balanced postings, exactly-once ingestion, settled/unsettled cash, snapshot-rebuild validation | `FR-PORT-049`..`FR-PORT-055` | `tests/portfolio/usage/features/09_ledger.py` |
 | Missing | **`FEAT-PORT-10` Valuation and P&L** *(planned)* | New feature. **`TC-IMP-PORT-04`** owns `ValuationPolicy v1` (bid/ask/mid/mark/last/settlement rules by instrument/side; stale/unknown valuation state). **`TC-IMP-PORT-05`** owns realized/unrealized P&L (lot matching or venue netting/hedging, fees/costs, exact event linkage). | `TC-IMP-PORT-04`, `TC-IMP-PORT-05` |
 | Partial (REFACTOR) | **Multi-currency accounting** (`TC-IMP-PORT-06`) | **REFACTOR — Open Decision OD-PORT-01:** FX authority is split across Data (`evidence/fx_contracts.py::FXConversionRequest`/`FXRateLeg`/`FXConversionEvidence`, `fx_conversion.py::FXRateProvider`) and Simulator (`accounting/calculations.py::ValidatedFXConversionEvidence`). Portfolio owns neither. The cockpit consolidates FX conversion authority into Portfolio with caller migration; the relocation is documented here and in the Data/Simulator READMEs, not executed in this documentation task. Adds timestamped conversion, freshness limits, translation postings, unknown state on missing/stale rates. | `TC-IMP-PORT-06` |
 | Missing | **`FEAT-PORT-11` Margin, Buying Power, and Risk Health** *(planned)* | New feature. **`TC-IMP-PORT-07`** owns used/available/reserved margin, maintenance, reserve, leverage, liquidation proximity — **blocks Risk `TC-IMP-RISK-10`** (Risk cannot compute margin health until Portfolio owns it). **`TC-IMP-PORT-10`** owns drawdown references (daily/total reference equity, high-water marks, realized/unrealized inclusion). **`TC-IMP-PORT-11`** owns VaR/CVaR and versioned portfolio risk metrics with labeled model assumptions. **`TC-IMP-PORT-12`** aggregates Risk/Research shock profiles into projected portfolio stress loss. | `TC-IMP-PORT-07`, `TC-IMP-PORT-10`, `TC-IMP-PORT-11`, `TC-IMP-PORT-12` |
@@ -206,6 +206,14 @@ app/services/portfolio/
 │   └── service.py
 ├── rebalancing/
 │   ├── __init__.py
+│   └── service.py
+├── ledger/
+│   ├── __init__.py
+│   ├── contracts.py
+│   ├── postings.py
+│   ├── ingestion.py
+│   ├── balances.py
+│   ├── snapshots.py
 │   └── service.py
 ├── orchestration/
 │   ├── __init__.py
@@ -797,6 +805,7 @@ the immutable Portfolio error catalogue. `PortfolioError.to_payload` returns
 | Opaque values and handles | `create_portfolio_value`, `dump_portfolio_value`, `get_portfolio_value_field`, `is_portfolio_value`, `create_portfolio_handle`, `execute_portfolio_handle_operation`, `is_portfolio_handle` |
 | Evidence and deterministic reports | `validate_construction_evidence`, `assess_common_mode_exposure`, `measure_cross_account_correlation` |
 | Errors and migrations | `get_portfolio_error_catalog`, `to_portfolio_error_payload`, `get_portfolio_migrations`, `run_portfolio_migrations` |
+| Ledger contracts (D-1 transport) | `build_ledger_entry`, `parse_ledger_entry`, `build_posting_batch`, `parse_posting_batch`, `build_ledger_account`, `parse_ledger_account` |
 
 Registered value names are `ActivePortfolioAllocation`,
 `CommonModeExposureReport`, `ConstructionEvidenceInputs`,
@@ -831,6 +840,36 @@ result = construct_portfolio(
 ```
 
 The concrete constructor fields are intentionally not invented here; implementation must match the ratified `v1` schema in `docs/PROJECT.md` and this README.
+
+### 4.9 `ledger/` — Balanced Double-Entry Ledger and Accounts
+
+**Purpose:** Build the cockpit's foundational financial authority: a balanced
+double-entry ledger with a chart of accounts, exactly-once economic-event
+ingestion, settled/unsettled cash, reproducible balance rebuild, append-only
+reversal corrections, and snapshot accelerators validated against canonical truth.
+
+**Module flow:** economic event → exactly-once ingestion → balanced posting batch →
+deterministic account/cash balances (with snapshot acceleration).
+
+| Status    | File           | Responsibility                                                                                                | Key exports                                                                                                                                                                                                | Dependencies                                                                                                                               |
+| --------- | -------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Completed | `contracts.py` | Versioned `LedgerEntry v1`, `PostingBatch v1`, `LedgerAccount v1` JSON-safe `build_*`/`parse_*` pairs.        | `build_ledger_entry`/`parse_ledger_entry`, `build_posting_batch`/`parse_posting_batch`, `build_ledger_account`/`parse_ledger_account`                                                                       | **Standard library:** `datetime`, `decimal`; **Required third-party:** `pydantic`; **Local:** `app.utils`                                  |
+| Completed | `postings.py`  | Deterministic balanced double-entry posting, balance rebuild, reversal batch builder.                        | `is_balanced`, `recompute_balances`, `total_entries`, `account_balance`, `build_reversal_batch`, `balance_from_models`, `batch_from_mapping`                                                              | **Standard library:** `decimal`; **Required third-party:** None; **Local:** `contracts`, `app.utils`                                       |
+| Completed | `ingestion.py` | Exactly-once economic-event ingestion via `(source_event_id, source_sequence)` invariants.                   | `ingest_event`, `event_identity`, `material_hash`, `detect_sequence_gap`                                                                                                                                   | **Standard library:** None; **Required third-party:** None; **Local:** `contracts`, `app.utils`                                            |
+| Completed | `balances.py`  | Settled/unsettled cash, accrued income/costs, reproducible cash-balance view.                                | `cash_balance`, `settled_balance`, `unsettled_balance`, `accrued_income`, `accrued_cost`, `all_account_balances`, `CashBalance`                                                                            | **Standard library:** `decimal`; **Required third-party:** None; **Local:** `postings`, `app.utils`                                        |
+| Completed | `snapshots.py` | Snapshot accelerators validated against canonical rebuild (never alternative truth).                         | `build_snapshot`, `validate_snapshot`, `LedgerSnapshot`                                                                                                                                                    | **Standard library:** `decimal`; **Required third-party:** None; **Local:** `postings`, `app.utils`                                        |
+| Completed | `service.py`   | Stateless coordinator over ingestion, posting, balance, and snapshot operations.                             | `LedgerService`, `create_ledger_service`                                                                                                                                                                   | **Standard library:** `datetime`, `decimal`; **Required third-party:** None; **Local:** `balances`, `ingestion`, `postings`, `snapshots`   |
+| Completed | `__init__.py`  | Expose the internal ledger feature API.                                                                      | All ledger functions above                                                                                                                                                                                 | **Standard library:** None; **Required third-party:** None; **Local:** ledger files above                                                   |
+
+| ID          | Requirement                                                                                                          | Verification                       |
+| ----------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| FR-PORT-049 | Every posting batch must balance to zero in every currency (double-entry invariant).                                 | `tests/portfolio/unit/test_ledger.py` |
+| FR-PORT-050 | Economic events are ingested exactly once: identical-material replay is idempotent; differing-material replay is rejected. | `tests/portfolio/unit/test_ledger.py`, `tests/portfolio/integration/test_ledger_persistence.py` |
+| FR-PORT-051 | Cash balances split settled from unsettled and accrue income and costs reproducibly.                                 | `tests/portfolio/unit/test_ledger.py` |
+| FR-PORT-052 | Balance rebuild from ordered legs is deterministic for identical input.                                              | `tests/portfolio/unit/test_ledger.py` |
+| FR-PORT-053 | Corrections are append-only reversal postings referencing `reversal_of`; no historical row is ever edited.           | `tests/portfolio/unit/test_ledger.py` |
+| FR-PORT-054 | Snapshots are accelerators that must validate against a rebuild or be treated as stale.                               | `tests/portfolio/unit/test_ledger.py` |
+| FR-PORT-055 | Identical versioned inputs produce identical contract output (QUANT determinism).                                    | `tests/portfolio/unit/test_ledger.py` |
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
@@ -1008,6 +1047,103 @@ CREATE INDEX idx_portfolio_outbox_pending ON portfolio_audit_outbox(occurred_at)
 The partial index is empty once the outbox drains, so the publisher's poll costs an
 empty-B-tree probe.
 
+#### Ledger tables (`FEAT-PORT-09`)
+
+The balanced double-entry ledger owns five append-only tables created by migration
+step `002_portfolio_ledger_schema`. Financial records are never edited; corrections
+are reversal postings (`posting_type='correction'`, `reversal_of=<batch_id>`).
+
+```sql
+CREATE TABLE portfolio_ledger_accounts (
+    account_id TEXT PRIMARY KEY,
+    portfolio_id TEXT NOT NULL,
+    currency TEXT NOT NULL,
+    normal_balance TEXT NOT NULL,
+    category TEXT NOT NULL,
+    account_json TEXT NOT NULL,
+    registered_at TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE (portfolio_id, account_id)
+) STRICT;
+```
+
+```sql
+CREATE TABLE portfolio_ledger_posting_batches (
+    batch_id TEXT PRIMARY KEY,
+    source_event_id TEXT NOT NULL,
+    source_sequence INTEGER NOT NULL,
+    entry_sequence INTEGER NOT NULL,
+    reversal_of TEXT,
+    posted_at TEXT NOT NULL,
+    canonical_hash TEXT NOT NULL,
+    batch_json TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE (source_event_id, source_sequence)
+) STRICT;
+```
+
+The `(source_event_id, source_sequence)` unique key is the exactly-once
+ingestion invariant (`TC-IMP-PORT-02`): a replayed event with identical material
+is idempotent; a replay with different material is rejected.
+
+```sql
+CREATE TABLE portfolio_ledger_entries (
+    entry_id TEXT NOT NULL,
+    batch_id TEXT NOT NULL,
+    entry_sequence INTEGER NOT NULL,
+    account_id TEXT NOT NULL,
+    side TEXT NOT NULL CHECK (side IN ('debit', 'credit')),
+    amount_decimal TEXT NOT NULL,
+    currency TEXT NOT NULL,
+    posting_type TEXT NOT NULL,
+    posted_at TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (entry_id, batch_id)
+) STRICT;
+```
+
+```sql
+CREATE TABLE portfolio_ledger_balances (
+    balance_id TEXT PRIMARY KEY,
+    portfolio_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    currency TEXT NOT NULL,
+    settled_decimal TEXT NOT NULL,
+    unsettled_decimal TEXT NOT NULL,
+    accrued_income_decimal TEXT NOT NULL,
+    accrued_cost_decimal TEXT NOT NULL,
+    as_of TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE (account_id, currency, as_of)
+) STRICT;
+```
+
+```sql
+CREATE TABLE portfolio_ledger_snapshots (
+    snapshot_id TEXT PRIMARY KEY,
+    entry_range_start INTEGER NOT NULL,
+    entry_range_end INTEGER NOT NULL,
+    balances_json TEXT NOT NULL,
+    material_hash TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL
+) STRICT;
+```
+
+Snapshots are accelerators only (`TC-IMP-PORT-15`): canonical state is always
+rebuilt from `portfolio_ledger_entries`, and a snapshot must validate against a
+rebuild or it is treated as stale. `REACH`: `portfolio_ledger_entries` is written
+by `save_ledger_batch`; `portfolio_ledger_accounts` by `save_ledger_account`.
+
 ---
 
 #### Target-only tables
@@ -1086,7 +1222,10 @@ These are unresolved owner choices raised by the approved Trading Cockpit Phase 
 
 - **OD-PORT-01 — FX conversion authority consolidation.** FX authority is split across Data (`evidence/fx_contracts.py::FXConversionRequest`/`FXRateLeg`/`FXConversionEvidence`, `fx_conversion.py::FXRateProvider`) and Simulator (`accounting/calculations.py::ValidatedFXConversionEvidence`). Portfolio owns neither today. The cockpit consolidates FX conversion authority into Portfolio (`TC-IMP-PORT-06`) with caller migration. The concrete migration path (reclaim names vs. distinct Portfolio-owned names) is an implementation-phase decision; this documentation records the consolidation direction and does not relocate code.
 - **OD-PORT-02 — `PortfolioState` authoritative ownership.** `PortfolioState` is defined in Risk (`contracts/evidence.py:240`) as an input contract; Portfolio owns a differently-shaped `PortfolioStateStore` (`state/repository.py:25`). The cockpit assigns the authoritative account/equity/drawdown read model to Portfolio (`TC-IMP-PORT-17`), consumed by Risk, Simulator, Analytics, UI-API. Phase 0 collision C-1 / ownership conflict O-2. Paired with Risk `OD-RISK-02`. The owner must decide whether Portfolio reclaims the `PortfolioState` name and Risk migrates callers, or the plan adopts a distinct Portfolio-owned name. This documentation records the direction and does not relocate code.
-- **OD-PORT-03 — Ledger schema detail.** The cockpit's balanced double-entry ledger (`FEAT-PORT-09`) has no existing table, model, or migration anywhere (finding P-1). The approved evidence is sufficient to specify the cohesive capability and its append-only/reversal-correction rule, but the full chart of accounts, posting types, and reconciliation invariants are deferred to the implementation phase. Financial records are append-only; corrections are reversal or correction events.
+
+### Resolved decisions (folded into requirements)
+
+- **OD-PORT-03 — Ledger schema detail (RESOLVED).** The balanced double-entry ledger (`FEAT-PORT-09`) is implemented as five tables: `portfolio_ledger_accounts` (chart of accounts), `portfolio_ledger_posting_batches` (exactly-once ingestion keyed on `(source_event_id, source_sequence)`), `portfolio_ledger_entries` (immutable balanced legs), `portfolio_ledger_balances` (reproducible settled/unsettled cash), and `portfolio_ledger_snapshots` (accelerators validated against rebuild). The sixteen posting types from `TC-IMP-PORT-01` are catalogued in `ledger/contracts.py::PostingType`. Financial records are append-only; corrections are reversal (`correction`) postings that reference `reversal_of`, never edits to a prior row. Implemented in `app/services/portfolio/ledger/`.
 
 
 
@@ -1119,10 +1258,12 @@ tests/portfolio/unit/test_allocation.py
 tests/portfolio/unit/test_rebalancing.py
 tests/portfolio/unit/test_workflows.py
 tests/portfolio/unit/test_api_and_quality.py
+tests/portfolio/unit/test_ledger.py
 tests/portfolio/integration/test_construction_workflow.py
 tests/portfolio/integration/test_activation_workflow.py
 tests/portfolio/integration/test_rebalance_workflow.py
 tests/portfolio/integration/test_owner_contract_compatibility.py
+tests/portfolio/integration/test_ledger_persistence.py
 tests/portfolio/usage/features/01_contracts.py
 tests/portfolio/usage/features/02_evidence.py
 tests/portfolio/usage/features/03_construction.py
@@ -1131,6 +1272,7 @@ tests/portfolio/usage/features/05_allocation.py
 tests/portfolio/usage/features/06_rebalancing.py
 tests/portfolio/usage/features/07_orchestration.py
 tests/portfolio/usage/features/08_public_api.py
+tests/portfolio/usage/features/09_ledger.py
 tests/portfolio/usage/features/features.py
 tests/portfolio/integration/test_usage_scripts.py
 tests/system/integration/test_strategy_eligibility.py

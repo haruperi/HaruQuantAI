@@ -44,6 +44,10 @@ def test_error_codes_cover_accepted_failures() -> None:
 
 
 def test_capabilities_match_protocol_methods() -> None:
-    """The complete operation manifest contains 53 unique values."""
-    assert len(BrokerCapabilityId) == 53
-    assert len({item.value for item in BrokerCapabilityId}) == 53
+    """The complete operation manifest contains 55 unique values.
+
+    The Trading Cockpit Phase 0 safe-order-command port (``TC-IMP-BRK-06``)
+    added ``attach_protection`` and ``reduce_position`` to the 53 prior values.
+    """
+    assert len(BrokerCapabilityId) == 55
+    assert len({item.value for item in BrokerCapabilityId}) == 55

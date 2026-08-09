@@ -29,7 +29,10 @@ from app.services.risk.contracts.responses import (
     guard_risk_boundary,
     unwrap_risk_response,
 )
+from app.services.risk.kill_switch import permits_risk_action
 from app.services.risk.limits import evaluate_market_context, evaluate_portfolio_limits
+from app.services.risk.scenarios import evaluate_stress_loss_gate
+from app.services.risk.stop_validation import validate_stop_loss
 from app.utils import canonical_json, get_logger
 
 type AuthContext = Any
@@ -872,6 +875,154 @@ class RiskGovernor:
             ) from error
 
 
+@guard_risk_boundary(risk_level="medium", read_only=True)
+def evaluate_emergency_state(
+    snapshot: PortfolioRiskSnapshot,
+    config: RiskConfig,
+    *,
+    now: datetime,
+) -> RiskLimitResult:
+    """Evaluate configured emergency triggers and derive lock/recovery state.
+
+    Detects margin-call, drawdown-breach, and data/connectivity-failure
+    emergencies using the emergency rule group added by ``TC-IMP-RISK-01``.
+    Flash-crash detection is intentionally not evaluated here: no Data-owned
+    evidence contract currently carries a bounded recent price-move
+    measurement, so this trigger is not approximated from an unrelated
+    field; it remains a documented gap pending that upstream evidence
+    contract. Disabled configuration (no emergency group configured) always
+    passes. An active or unknown-evidence emergency fails closed to
+    ``BLOCKED``.
+
+    Args:
+        snapshot: Current immutable portfolio evidence.
+        config: Active validated Risk configuration.
+        now: Explicit aware-UTC evaluation time.
+
+    Returns:
+        Ordered emergency-state check; ``BLOCKED`` marks an active emergency.
+
+    Raises:
+        RiskDomainError: If evaluation time is not aware UTC.
+    """
+    logger.info("Evaluating configured Risk emergency triggers")
+    checked_now = _utc(now)
+    evidence_refs = (snapshot.snapshot_id,)
+    if config.emergency_margin_call_utilization_pct is None:
+        return _limit("emergency_state", LimitStatus.PASS, 0, evidence_refs)
+    triggers: list[str] = []
+    if (
+        snapshot.margin_utilization is not None
+        and snapshot.margin_utilization >= config.emergency_margin_call_utilization_pct
+    ):
+        triggers.append("margin_emergency")
+    if snapshot.drawdown >= config.max_drawdown:
+        triggers.append("drawdown_breach")
+    staleness = (checked_now - snapshot.as_of).total_seconds()
+    connectivity_bound = config.emergency_connectivity_loss_seconds or 0
+    if staleness < 0 or staleness > connectivity_bound:
+        triggers.append("connectivity_failure")
+    if triggers:
+        logger.warning("Risk emergency state active: %s", ", ".join(triggers))
+        return _limit(
+            "emergency_state",
+            LimitStatus.BLOCKED,
+            0,
+            evidence_refs,
+            reason=RiskErrorCode.LIMIT_FAILED,
+        )
+    return _limit("emergency_state", LimitStatus.PASS, 0, evidence_refs)
+
+
+@guard_risk_boundary(risk_level="high", read_only=True)
+def evaluate_trade_readiness(
+    stop_validation: Mapping[str, object],
+    kill_switch_states: Sequence[KillSwitchState],
+    scope: Mapping[str, str],
+    snapshot: PortfolioRiskSnapshot,
+    market: _MarketContextEvidenceView,
+    config: RiskConfig,
+    stress_layer_loss_ratios: Mapping[str, Decimal],
+    max_stress_loss_ratio: Decimal,
+    *,
+    now: datetime,
+) -> tuple[RiskLimitResult, ...]:
+    """Re-evaluate the fixed-precedence submit-time trade readiness gate.
+
+    Composes already-built gates into one explicit re-validation step at
+    order submission, in fixed precedence: session/news (market context),
+    lock (kill-switch ``new_exposure`` permission), entry/stop validity,
+    broker/data freshness plus margin/correlation/drawdown (portfolio
+    limits), and the blocking stress-loss gate. Strategy operational
+    eligibility (:func:`app.services.risk.admission.review_strategy_admission`)
+    is a separate persistence-owning gate the caller composes alongside this
+    one; it is not re-implemented here because it requires an eligibility
+    store and audit chain this pure gate does not own. The first non-pass
+    result is the primary failure; every failing result is preserved.
+
+    Args:
+        stop_validation: JSON-safe ``StopValidation v1`` mapping built by
+            :func:`app.services.risk.stop_validation.build_stop_validation`.
+        kill_switch_states: Complete applicable kill-switch state hierarchy.
+        scope: Exact action portfolio/strategy/symbol scope for the lock
+            check.
+        snapshot: Current immutable portfolio evidence.
+        market: Current normalized market-context evidence.
+        config: Active validated Risk configuration.
+        stress_layer_loss_ratios: Non-negative equity-loss ratio per
+            registered stress layer.
+        max_stress_loss_ratio: Configured maximum combined stress-loss
+            ratio.
+        now: Explicit aware-UTC evaluation time.
+
+    Returns:
+        Ordered readiness-gate results across every composed check.
+    """
+    logger.info("Evaluating fixed-precedence Risk trade readiness gate")
+    checked_now = _utc(now)
+    market_results = unwrap_risk_response(
+        evaluate_market_context(market, config, now=checked_now),
+        operation="evaluate_market_context",
+    )
+    lock_permitted = unwrap_risk_response(
+        permits_risk_action(kill_switch_states, scope, "new_exposure"),
+        operation="permits_risk_action",
+    )
+    lock_result = _limit(
+        "lock",
+        LimitStatus.PASS if lock_permitted else LimitStatus.BLOCKED,
+        0,
+        (snapshot.snapshot_id,),
+        reason=None if lock_permitted else RiskErrorCode.KILL_SWITCH_ACTIVE,
+    )
+    stop_results = unwrap_risk_response(
+        validate_stop_loss(stop_validation), operation="validate_stop_loss"
+    )
+    portfolio_results = unwrap_risk_response(
+        evaluate_portfolio_limits(snapshot, config, now=checked_now),
+        operation="evaluate_portfolio_limits",
+    )
+    stress_result = unwrap_risk_response(
+        evaluate_stress_loss_gate(
+            snapshot,
+            stress_layer_loss_ratios,
+            max_stress_loss_ratio,
+            now=checked_now,
+        ),
+        operation="evaluate_stress_loss_gate",
+    )
+    return _reindex(
+        (
+            *market_results,
+            lock_result,
+            *stop_results,
+            *portfolio_results,
+            stress_result,
+        ),
+        0,
+    )
+
+
 def create_risk_governor(
     config: RiskConfig,
     approvals: ApprovalTokenService,
@@ -981,6 +1132,8 @@ def run_portfolio_risk_governor(
 __all__ = [
     "RiskGovernor",
     "create_risk_governor",
+    "evaluate_emergency_state",
+    "evaluate_trade_readiness",
     "review_trade_risk",
     "run_portfolio_risk_governor",
 ]
