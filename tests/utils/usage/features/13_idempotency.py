@@ -2,7 +2,14 @@
 
 from datetime import UTC, datetime
 
-from app.utils import build_reservation, derive_idempotency_key, evaluate_reservation
+from app.utils import (
+    build_reservation,
+    derive_idempotency_key,
+    evaluate_reservation,
+    get_key_owner,
+    is_reservation_expired,
+    parse_idempotency_key,
+)
 
 
 def main() -> None:
@@ -10,6 +17,9 @@ def main() -> None:
     instant = datetime(2026, 1, 1, tzinfo=UTC)
     key = derive_idempotency_key(owner="simulator:orders", intent={"order": "ord-demo"})
     reservation = build_reservation(key=key, reserved_at=instant, ttl_seconds=60)
+    parsed_key = parse_idempotency_key(key)
+    assert get_key_owner(parsed_key) == "simulator:orders"
+    assert not is_reservation_expired(reservation, observed_at=instant)
     result = evaluate_reservation(
         key=key,
         owner="simulator:orders",

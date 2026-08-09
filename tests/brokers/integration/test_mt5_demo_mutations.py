@@ -225,6 +225,13 @@ async def _exercise_demo_mutation(
             "provider_account_classification=demo operation=place_order"
         )
         placed = await place_broker_order(adapter, request)
+        if get_broker_value_field(placed, "status") == "error":
+            error = get_broker_value_field(placed, "error")
+            if (
+                error is not None
+                and get_broker_value_field(error, "code") == "BROKER_MARKET_CLOSED"
+            ):
+                pytest.skip("MT5 demo market is closed")
         assert get_broker_value_field(placed, "status") == "success"
         pl_data = get_broker_value_field(placed, "data")
         assert pl_data is not None

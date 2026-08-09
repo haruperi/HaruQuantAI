@@ -24,7 +24,7 @@ def get_agentic_migrations() -> tuple[Any, ...]:
     Raises:
         ValueError: If the assembled manifest contains duplicate identities.
     """
-    steps = (
+    steps: tuple[Any, ...] = (
         *AGENTIC_MIGRATION_STEPS,
         *AGENTIC_MEMORY_MIGRATION_STEPS,
         *AGENTIC_LIFECYCLE_MIGRATION_STEPS,

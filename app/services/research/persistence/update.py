@@ -19,11 +19,13 @@ from app.services.research.migrations import build_research_migration_request
 from app.utils import get_logger
 
 logger = get_logger(__name__)
+_TRANSITION_STATEMENT_COUNT = 2
 
 
 def update_expectancy_governance(
     *,
     profile_id: str,
+    source_state: str,
     governance_state: str,
     reviewer: str,
     decision: str,
@@ -39,6 +41,7 @@ def update_expectancy_governance(
 
     Args:
         profile_id: Stable surrogate governance identity.
+        source_state: Expected current lifecycle state.
         governance_state: Target lifecycle state.
         reviewer: Reviewer principal recording the transition.
         decision: Recorded governance decision label.
@@ -63,24 +66,42 @@ def update_expectancy_governance(
     )
     if migration.status != "success" or migration.data is None:
         raise ValidationError("RES_PERSISTENCE_FAILED", "MIGRATION_FAILED")
-    statement = """UPDATE research_expectancy_profiles SET
+    update_statement = """UPDATE research_expectancy_profiles SET
         governance_state = ?, reviewer = ?, decision = ?, reason = ?,
         superseded_by = ?,
         updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-        WHERE profile_id = ?"""
-    parameters = (
+        WHERE profile_id = ? AND governance_state = ?"""
+    history_statement = """INSERT INTO research_expectancy_transitions (
+        profile_id, source_state, target_state, reviewer, decision, reason,
+        superseded_by, request_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
+    update_parameters = (
         governance_state,
         reviewer,
         decision,
         reason,
         superseded_by,
         profile_id,
+        source_state,
+    )
+    history_parameters = (
+        profile_id,
+        source_state,
+        governance_state,
+        reviewer,
+        decision,
+        reason,
+        superseded_by,
+        request_id,
     )
     response = execute_transaction(
         build_transaction_request(
             plan=build_statement_plan(
-                statements=(statement,),
-                parameter_sets=(cast("tuple[Any, ...]", parameters),),
+                statements=(update_statement, history_statement),
+                parameter_sets=(
+                    cast("tuple[Any, ...]", update_parameters),
+                    cast("tuple[Any, ...]", history_parameters),
+                ),
                 max_rows=1,
             ),
             request_id=request_id,
@@ -89,8 +110,8 @@ def update_expectancy_governance(
     if response.status != "success" or response.data is None:
         raise ValidationError("RES_PERSISTENCE_FAILED", "EXPECTANCY_TRANSITION_FAILED")
     result = cast("Any", response.data)
-    if result.affected_rows != 1:
-        raise ValidationError("RES_PERSISTENCE_FAILED", "EXPECTANCY_NOT_FOUND")
+    if result.affected_rows != _TRANSITION_STATEMENT_COUNT:
+        raise ValidationError("RES_PERSISTENCE_FAILED", "EXPECTANCY_STATE_CONFLICT")
     return {
         "profile_id": profile_id,
         "governance_state": governance_state,

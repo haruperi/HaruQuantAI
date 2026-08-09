@@ -1,7 +1,11 @@
 # Optimization
 
+The Optimization error catalogue uses only the Utils-owned `TRANSIENT`,
+`PERMANENT`, `INTEGRITY`, `POLICY`, `DATA_STALE`, and `UNKNOWN_STATE`
+categories. An unconfirmed persistence result is non-retryable `UNKNOWN_STATE`.
+
 > **Package:** `app/services/optimization`
-> **Status:** `Completed` — all 9 registered features (`FEAT-OPT-01`..`09`) are implemented. Deferred provider integrations use tested fail-closed consumer ports.
+> **Status:** `Completed` — all 9 registered features (`FEAT-OPT-01`..`09`) are implemented. Research `FEAT-RES-16` supplies the injectable stress-calibration provider; absent evidence continues to use the tested fail-closed consumer-port result.
 > **Last updated:** `2026-08-08`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.

@@ -1,3 +1,4 @@
+# ruff: noqa: DOC501, N812
 """FailoverDecision v1 cross-domain contract transport.
 
 A ``FailoverDecision`` records the deterministic outcome of evaluating a route
@@ -13,8 +14,8 @@ from datetime import UTC, datetime
 from typing import cast
 
 from app.services.brokers.contracts.enums import BrokerEnvironment, BrokerId
-from app.utils.errors.exceptions import ValidationError
-from app.utils.serialization import canonical_digest, to_json_safe
+from app.utils import canonical_digest, to_json_safe
+from app.utils import create_validation_error as ValidationError
 
 CONTRACT_VERSION = "v1"
 SCHEMA_ID = "brokers.failover_decision.v1"

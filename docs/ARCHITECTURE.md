@@ -332,14 +332,15 @@
   transactional migration boundary; its two current tables are reached through
   Optimization-owned CRUD builders. UI/API surfaces advisory evidence only and
   cannot automatically adopt parameters or place trades.
-* `app/services/research/` provides a completed thirteen-feature deterministic
-  research baseline. `FEAT-RES-13` projects bounded fundamental and deterministic
-  sentiment evidence from eligible point-in-time Data records without exposing
-  unrestricted source content or granting strategy/execution authority. External
-  consumers use package-root functions and treat intelligence values as opaque.
-  Research artifact files are paired with a strict `research_artifacts` manifest
-  through Research-owned five-file persistence support and Data-owned migration,
-  ledger, lock, and transaction execution.
+* `app/services/research/` provides a completed sixteen-feature deterministic
+  research baseline. In addition to bounded point-in-time intelligence,
+  Research owns approved expectancy governance, performance-drift evidence, and
+  cited stress-scenario evidence. Function-only injected adapters satisfy the
+  Strategy exact-version, Risk `Decimal` override, and Optimization calibration
+  consumer ports without reversing domain dependencies. Research artifact,
+  expectancy projection/history, drift, and stress records use Research-owned
+  five-file persistence support with Data-owned migration, ledger, lock, and
+  transaction execution.
 
 ---
 
@@ -2038,7 +2039,7 @@ Highest currently allocated, for reference when planning later phases:
 | indicators | `FR-INDI-` | 041 | 08 |
 | optimization | `FR-OPT-` | 069 | 09 |
 | portfolio | `FR-PORT-` | 040 | 08 |
-| research | `FR-RES-` | 104 | 16 |
+| research | `FR-RES-` | 120 | 16 |
 | risk | `FR-RISK-` | 068 | 15 |
 | simulator | `FR-SIM-` | 090 | 09 |
 | strategy | `FR-STR-` | 053 | 11 |

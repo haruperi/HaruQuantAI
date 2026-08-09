@@ -7,10 +7,15 @@ from typing import Any, override
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.utils import (
+    build_profile_ref,
+    build_version_ref,
     get_app_settings_model_config,
     get_app_settings_sources,
     load_broker_provider_settings,
+    load_profile_document,
     load_settings,
+    parse_profile_ref,
+    parse_version_ref,
 )
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
@@ -193,6 +198,32 @@ def main() -> None:
     # Stage 3: Immutable settings output construction
     fr_utils_022_construct_configuration()
     fr_utils_022_app_settings_integration()
+    profile = build_profile_ref(
+        profile_kind="usage",
+        profile_id="profile-demo",
+        version="1",
+        content_hash="a" * 64,
+    )
+    assert parse_profile_ref(profile) == profile
+    version = build_version_ref(
+        artifact_kind="usage",
+        artifact_id="artifact-demo",
+        version="1",
+        content_hash="b" * 64,
+    )
+    assert parse_version_ref(version) == version
+    document, resolved = load_profile_document(
+        {
+            "profile_kind": "usage",
+            "profile_id": "profile-demo",
+            "version": "1",
+            "threshold": 1,
+        },
+        required_fields=("threshold",),
+        compatible_versions=("1",),
+    )
+    assert document["threshold"] == 1
+    assert resolved["profile_id"] == "profile-demo"
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from app.utils import (
     get_default_redaction_policy,
     is_sensitive_key,
+    redact_contract_mapping,
     redact_mapping_value,
     redact_text_value,
     to_json_safe,
@@ -117,6 +118,9 @@ def main() -> None:
 
     # Stage 3: Redacted value and diagnostics output
     fr_utils_020_redaction_result()
+    assert (
+        redact_contract_mapping({"token": "synthetic-value"})["token"] == "[REDACTED]"
+    )
 
 
 if __name__ == "__main__":

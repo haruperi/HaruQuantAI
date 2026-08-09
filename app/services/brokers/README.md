@@ -1,5 +1,9 @@
 # Brokers
 
+The immutable Broker error catalogue uses only the Utils-owned `TRANSIENT`,
+`PERMANENT`, `INTEGRITY`, `POLICY`, `DATA_STALE`, and `UNKNOWN_STATE`
+categories. Ambiguous mutation outcomes remain non-retryable `UNKNOWN_STATE`.
+
 > **Package:** `app/services/brokers`
 > **Status:** `Completed` — all 17 registered features (`FEAT-BRK-00`..`16`) are implemented with package-root APIs, tests, and numbered usage evidence.
 > **Last updated:** `2026-08-07`

@@ -2,6 +2,27 @@
 
 ## [Unreleased]
 
+### Complete Utils and Research evidence capabilities
+
+The sixteen formerly partial features are now fully implemented and evidenced,
+leaving the consolidated 204-feature registry with no partial entries.
+
+#### Added (3)
+
+- Added Research expectancy provider adapters for Strategy and Risk, plus an Optimization-compatible stress calibration adapter.
+- Added immutable Research expectancy-transition, performance-drift, and stress-scenario persistence under additive migration `003_research_governed_evidence_v1`.
+- Added standalone usage and targeted unit/integration evidence for `FEAT-RES-14` through `FEAT-RES-16` and complete public-operation usage coverage for all Utils features.
+
+#### Changed (2)
+
+- Completed all fourteen Utils feature registrations, including the function-only shared validation-error constructor used by audited consumers.
+- Updated the canonical registry totals to 204 features: 185 Completed, 0 Partial, and 19 Missing.
+
+#### Fixed (2)
+
+- Normalized the complete Research error catalogue to the shared six-category taxonomy so `FEAT-RES-11` workflow failures return their approved structured responses.
+- Repaired repository-wide pre-push validation by normalizing remaining domain error categories, restoring Data contract schema identity and deterministic calendar coverage, and correcting Risk usage reconciliation and Agentic migration typing.
+
 ### Consolidate canonical feature documentation
 
 Domain documentation now uses the owning `FEAT-*` registry as the only capability
@@ -10,7 +31,7 @@ matrices.
 
 #### Changed (2)
 
-- Reconciled the canonical registry to 204 features: 169 Completed, 16 Partial, and 19 Missing.
+- Reconciled the canonical registry baseline to 204 features; the later completion entry above records the current 185 Completed, 0 Partial, and 19 Missing state.
 - Retired the obsolete development planning archive after folding current capability ownership, requirements, and evidence into owning package READMEs.
 
 ### Add Portfolio balanced double-entry ledger

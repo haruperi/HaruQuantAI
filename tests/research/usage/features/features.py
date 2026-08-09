@@ -1,8 +1,8 @@
 # ruff: noqa: PLR0915
 """Executable Research full-domain operational pipeline usage example.
 
-Demonstrates end-to-end execution of all 13 registered Research features
-(FEAT-RES-01 through FEAT-RES-13) in sequential operational order through the package-root public API.
+Demonstrates end-to-end execution of all 16 registered Research features
+(FEAT-RES-01 through FEAT-RES-16) in sequential operational order through the package-root public API.
 """
 
 from __future__ import annotations
@@ -29,13 +29,17 @@ from app.services.data import (
 from app.services.research import (
     assess_intelligence_applicability,
     build_core_metric_profile,
+    build_expectancy_profile,
     build_fundamental_source_evidence,
     build_market_structure_profile,
+    build_reasoned_stress_shock,
     build_sentiment_source_evidence,
     build_strategy_fit,
+    build_stress_scenario_evidence,
     calibrate_market_structure,
     create_research_value,
     hurst_exponent,
+    monitor_performance_drift,
     project_intelligence_evidence,
     run_edge_lab_profile,
     run_eds_mean_reversion,
@@ -43,6 +47,7 @@ from app.services.research import (
     shuffle_returns_null,
     simple_returns,
     tag_sessions,
+    transition_expectancy_governance,
     validate_dataset,
     validate_no_lookahead_features,
     write_research_artifact,
@@ -80,9 +85,9 @@ def _format_result(obj: Any) -> str:
 
 
 def main() -> None:
-    """Execute all 13 Research domain features in a single operational pipeline."""
+    """Execute all 16 Research domain features in a single operational pipeline."""
     _pipeline_header(
-        "RESEARCH DOMAIN: FULL OPERATIONAL PIPELINE (FEAT-RES-01 -> FEAT-RES-13)\n\n"
+        "RESEARCH DOMAIN: FULL OPERATIONAL PIPELINE (FEAT-RES-01 -> FEAT-RES-16)\n\n"
         "Pipeline Sequence:\n"
         "1. FEAT-RES-01: Versioned Contracts & Configuration\n"
         "2. FEAT-RES-02: Deterministic Dataset Preparation\n"
@@ -96,7 +101,10 @@ def main() -> None:
         "10. FEAT-RES-10: Deterministic Unsupervised Modeling (PCA/K-Means)\n"
         "11. FEAT-RES-11: Scorecards, Snapshots, & Edge Lab Profiles\n"
         "12. FEAT-RES-12: Safe Research Artifact Persistence\n"
-        "13. FEAT-RES-13: Fundamental & Sentiment Source Evidence Projection"
+        "13. FEAT-RES-13: Fundamental & Sentiment Source Evidence Projection\n"
+        "14. FEAT-RES-14: Approved Expectancy Governance\n"
+        "15. FEAT-RES-15: Performance Drift Evidence\n"
+        "16. FEAT-RES-16: Stress-Scenario Evidence"
     )
 
     # -------------------------------------------------------------------------
@@ -433,8 +441,61 @@ def main() -> None:
                 f"Data -> fund_schema='{proj_fund['schema_id']}', applicability='{applicability.status}'"
             )
 
+    # Stages 14-16: governed expectancy, drift, and cited stress evidence.
+    expectancy = build_expectancy_profile(
+        exact_version="1",
+        hypothesis="bounded edge",
+        strategy_ref="strategy-demo",
+        instruments=("EURUSD",),
+        regimes=("trend",),
+        sessions=("london",),
+        sample_from_utc=NOW.replace(day=1),
+        sample_to_utc=NOW,
+        sample_size=100,
+        out_of_sample_status="walk_forward",
+        win_rate=0.6,
+        avg_win_r=2.0,
+        avg_loss_r=1.0,
+        expected_value_r=0.8,
+        max_drawdown_r=4.0,
+        min_reward_risk=1.5,
+        evidence_ref="artifact-demo",
+    )
+    for state in ("under_review", "approved"):
+        expectancy = transition_expectancy_governance(
+            expectancy,
+            target_state=state,
+            reviewer="usage",
+            decision=state,
+            reason="EVIDENCE_ACCEPTED",
+            now_utc=NOW,
+        )
+    drift = monitor_performance_drift(
+        approved_profile=expectancy,
+        observed_from_utc=NOW,
+        observed_to_utc=NOW,
+        observed_win_rate=0.4,
+        observed_expected_value_r=0.2,
+        observed_max_drawdown_r=6.0,
+        generated_at_utc=NOW,
+    )
+    stress = build_stress_scenario_evidence(
+        scenario_id="scenario-demo",
+        hypothesis="network interruption",
+        shocks=(
+            build_reasoned_stress_shock(
+                shock_type="connectivity",
+                magnitude=30.0,
+                assumption_ref="assumption-network-1",
+                rationale="Recovery objective boundary",
+            ),
+        ),
+        generated_at_utc=NOW,
+    )
+    print(_format_result(drift))
+    print(_format_result(stress))
     print(
-        f"\n{'=' * 88}\nRESEARCH DOMAIN FULL-PIPELINE EXECUTION COMPLETE (13 STAGES PASSED)\n{'=' * 88}\n"
+        f"\n{'=' * 88}\nRESEARCH DOMAIN FULL-PIPELINE EXECUTION COMPLETE (16 STAGES PASSED)\n{'=' * 88}\n"
     )
 
 

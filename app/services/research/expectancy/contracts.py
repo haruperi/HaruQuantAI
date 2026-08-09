@@ -361,6 +361,9 @@ def _parse_datetime(value: object) -> datetime | None:
     """
     if value is None:
         return None
+    if isinstance(value, datetime):
+        _utc(value)
+        return value
     if not isinstance(value, str):
         raise ValidationError("RES_INPUT_INVALID", "EXPECTANCY_TIME_INVALID")
     parsed = datetime.fromisoformat(value)
@@ -383,6 +386,9 @@ def _parse_required_datetime(value: object, *, detail: str) -> datetime:
     """
     if value is None:
         raise ValidationError("RES_INPUT_INVALID", detail)
+    if isinstance(value, datetime):
+        _utc(value)
+        return value
     if not isinstance(value, str):
         raise ValidationError("RES_INPUT_INVALID", detail)
     parsed = datetime.fromisoformat(value)
@@ -561,6 +567,7 @@ def parse_approved_expectancy_profile(
         Re-validated JSON-safe profile mapping.
 
     Raises:
+        ConfigurationError: If the supplied canonical hash does not match.
         ValidationError: If the mapping is structurally or semantically invalid.
     """
     if not isinstance(value, Mapping):
@@ -581,7 +588,7 @@ def parse_approved_expectancy_profile(
         raise ValidationError("RES_INPUT_INVALID", "EXPECTANCY_SCOPE_INVALID")
     if not isinstance(sessions, (tuple, list)):
         raise ValidationError("RES_INPUT_INVALID", "EXPECTANCY_SCOPE_INVALID")
-    return build_approved_expectancy_profile(
+    parsed = build_approved_expectancy_profile(
         profile_id=_as_str(value["profile_id"], detail="EXPECTANCY_PROFILE_ID_INVALID"),
         exact_version=_as_str(
             value["exact_version"], detail="EXPECTANCY_VERSION_EMPTY"
@@ -622,6 +629,11 @@ def parse_approved_expectancy_profile(
         ),
         evidence_ref=str(value["evidence_ref"]),
     )
+    if parsed["canonical_hash"] != value.get("canonical_hash"):
+        raise ConfigurationError(
+            "RES_CONFIGURATION_INVALID", "EXPECTANCY_HASH_MISMATCH"
+        )
+    return parsed
 
 
 def expect_profile_mapping(value: Mapping[str, object]) -> Mapping[str, object]:

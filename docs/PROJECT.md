@@ -276,7 +276,7 @@ All eight registered Indicators features are `Completed`.
 * **Responsibility**: Provide a sandboxed, leakage-gated environment for data exploration and hypothesis evaluation, producing advisory reports and deterministic source-evidence projections only.
 * **Inputs**: Datasets and eligible point-in-time `ResearchSourceDocument` and structured-observation evidence from Data; Analytics public metric contracts.
 * **Outputs**: Advisory `ResearchReport`s, insights, feature definitions, hypothesis evaluations, and bounded `FundamentalSourceEvidence`/`SentimentSourceEvidence`.
-* **Owns**: Research artifact persistence, its own tables/schemas/migrations, sandboxed analysis, feature engineering, deterministic historical labeling, leakage/bias validation, null models, edge discovery, statistical sign-off, deterministic fundamental/sentiment source-evidence preparation, approved-expectancy governance, drift evidence, and scenario/stress evidence packages. The final three features remain `Partial` as recorded in the Research registry.
+* **Owns**: Research artifact persistence, its own tables/schemas/migrations, sandboxed analysis, feature engineering, deterministic historical labeling, leakage/bias validation, null models, edge discovery, statistical sign-off, deterministic fundamental/sentiment source-evidence preparation, approved-expectancy governance, drift evidence, and scenario/stress evidence packages. All 16 registered Research features are completed as recorded in the Research registry.
 * **Boundaries**: Read-only toward live systems. Does not own live mutations, risk decisions, strategy promotion, or roadmap/code selection. Advisory only.
 * **Key Limits**: Non-deterministic routines require seed injection and output logs; persisted artifacts store SHA-256 config hashes; implicit/hidden data filling or dropping is forbidden (`CleaningConfig` explicit).
 * **Documentation**: `app/services/research/README.md`
@@ -431,8 +431,8 @@ features. No secondary programme or work-package identifier namespace is active.
 
 | Status | Count |
 | --- | ---: |
-| Completed | 169 |
-| Partial | 16 |
+| Completed | 185 |
+| Partial | 0 |
 | Missing | 19 |
 | **Total** | **204** |
 

@@ -20,6 +20,9 @@ _USAGE_SCRIPTS = (
     "11_profiles.py",
     "12_artifacts.py",
     "13_intelligence.py",
+    "14_expectancy.py",
+    "15_drift.py",
+    "16_stress_evidence.py",
     "features.py",
 )
 

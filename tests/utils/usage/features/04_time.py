@@ -10,9 +10,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.utils import (
     age_seconds,
+    build_time_stamp,
+    compare_time_stamps,
     format_utc_timestamp,
+    from_venue_local,
     is_fresh,
+    next_sequence,
+    parse_time_stamp,
     parse_utc_timestamp,
+    to_venue_local,
     utc_now,
 )
 
@@ -93,6 +99,14 @@ def main() -> None:
 
     # Stage 3: Aware instant or freshness verdict output
     fr_utils_012_age_and_freshness()
+    instant = datetime(2026, 1, 1, tzinfo=UTC)
+    stamp = build_time_stamp(domain="MARKET_EVENT", instant=instant)
+    parsed = parse_time_stamp(stamp)
+    assert compare_time_stamps(stamp, parsed) == 0
+    local = to_venue_local(instant, "UTC")
+    assert local["zone_key"] == "UTC"
+    assert from_venue_local("2026-01-01T00:00:00", "UTC") == instant
+    assert next_sequence("usage", {}) == 0
 
 
 if __name__ == "__main__":

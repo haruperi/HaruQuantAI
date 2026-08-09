@@ -92,7 +92,7 @@ def read_approved_expectancy_profile(
     rows = _read_rows(
         "SELECT profile_id, exact_version, strategy_ref, hypothesis, "
         "match_keys_json, envelope_json, governance_state, reviewer, decision, "
-        "reason, superseded_by, evidence_ref, canonical_hash FROM "
+        "reason, superseded_by, evidence_ref, canonical_hash, updated_at FROM "
         "research_expectancy_profiles WHERE profile_id = ?",
         (profile_id,),
         request_id=request_id,
@@ -123,7 +123,7 @@ def read_eligible_expectancy_profile(
     rows = _read_rows(
         "SELECT profile_id, exact_version, strategy_ref, hypothesis, "
         "match_keys_json, envelope_json, governance_state, reviewer, decision, "
-        "reason, superseded_by, evidence_ref, canonical_hash FROM "
+        "reason, superseded_by, evidence_ref, canonical_hash, updated_at FROM "
         "research_expectancy_profiles WHERE strategy_ref = ? "
         "AND governance_state = 'approved' "
         "ORDER BY updated_at DESC LIMIT 1",
@@ -134,7 +134,52 @@ def read_eligible_expectancy_profile(
     return rows[0] if rows else None
 
 
+def read_latest_governed_evidence(
+    *,
+    table: str,
+    identity_column: str,
+    identity: str,
+    request_id: str,
+) -> Mapping[str, Any] | None:
+    """Read the latest immutable evidence record for one identity.
+
+    Args:
+        table: Approved Research evidence table.
+        identity_column: Approved identity column.
+        identity: Profile or scenario identity.
+        request_id: Request trace identifier.
+
+    Returns:
+        Latest normalized evidence row, or ``None``.
+
+    Raises:
+        ValidationError: If the target is unsupported or the read fails.
+    """
+    targets = {
+        ("research_performance_drift_evidence", "profile_id", "evidence_id"),
+        ("research_stress_scenario_evidence", "scenario_id", "created_at"),
+    }
+    order_column = next(
+        (
+            order
+            for candidate_table, candidate_identity, order in targets
+            if (candidate_table, candidate_identity) == (table, identity_column)
+        ),
+        None,
+    )
+    if order_column is None:
+        raise ValidationError("RES_PERSISTENCE_FAILED", "EVIDENCE_TARGET_INVALID")
+    _confirm_migration(request_id)
+    statement = (
+        f"SELECT evidence_json, canonical_hash FROM {table} "  # noqa: S608
+        f"WHERE {identity_column} = ? ORDER BY {order_column} DESC LIMIT 1"
+    )
+    rows = _read_rows(statement, (identity,), request_id=request_id, max_rows=1)
+    return rows[0] if rows else None
+
+
 __all__ = (
     "read_approved_expectancy_profile",
     "read_eligible_expectancy_profile",
+    "read_latest_governed_evidence",
 )

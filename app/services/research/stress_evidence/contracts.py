@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any, Literal, cast
 
-from app.services.research.contracts.errors import ValidationError
+from app.services.research.contracts.errors import ConfigurationError, ValidationError
 from app.utils import canonical_digest, to_json_safe
 
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
@@ -35,6 +35,17 @@ _SHOCK_TYPES = frozenset(
     }
 )
 _BASIS_KINDS = frozenset({"historical", "reasoned"})
+_SHOCK_UNITS = {
+    "price": "percentage",
+    "spread": "basis_points",
+    "liquidity": "percentage",
+    "correlation": "correlation_delta",
+    "fx": "percentage",
+    "margin": "percentage",
+    "halt": "seconds",
+    "gap": "percentage",
+    "connectivity": "seconds",
+}
 _MAX_SHOCKS = 64
 
 
@@ -48,7 +59,7 @@ def _utc(value: datetime) -> None:
         raise ValidationError("RES_INPUT_INVALID", "STRESS_TIME_NOT_UTC")
 
 
-def _validate_shocks(shocks: tuple[Mapping[str, object], ...]) -> None:
+def _validate_shocks(shocks: tuple[Mapping[str, object], ...]) -> None:  # noqa: C901
     """Validate each shock cites a basis and a finite magnitude.
 
     Args:
@@ -70,10 +81,12 @@ def _validate_shocks(shocks: tuple[Mapping[str, object], ...]) -> None:
         magnitude = shock.get("magnitude")
         if not isinstance(magnitude, (int, float)) or isinstance(magnitude, bool):
             raise ValidationError("RES_STRESS_SCENARIO_INVALID", "STRESS_MAGNITUDE")
-        if math.isnan(magnitude):
+        if not math.isfinite(magnitude):
             raise ValidationError("RES_STRESS_SCENARIO_INVALID", "STRESS_MAGNITUDE")
         basis_kind = shock.get("basis_kind")
         basis_ref = shock.get("basis_ref")
+        rationale = shock.get("rationale")
+        unit = shock.get("unit")
         if basis_kind not in _BASIS_KINDS:
             raise ValidationError("RES_STRESS_SCENARIO_INVALID", "STRESS_BASIS_KIND")
         # Every magnitude must cite its basis — no invented data. A historical
@@ -82,6 +95,12 @@ def _validate_shocks(shocks: tuple[Mapping[str, object], ...]) -> None:
         if not isinstance(basis_ref, str) or not basis_ref.strip():
             raise ValidationError(
                 "RES_STRESS_SCENARIO_INVALID", "STRESS_BASIS_REF_EMPTY"
+            )
+        if unit != _SHOCK_UNITS[shock_type]:
+            raise ValidationError("RES_STRESS_SCENARIO_INVALID", "STRESS_UNIT_INVALID")
+        if not isinstance(rationale, str) or not rationale.strip():
+            raise ValidationError(
+                "RES_STRESS_SCENARIO_INVALID", "STRESS_RATIONALE_EMPTY"
             )
 
 
@@ -141,6 +160,8 @@ def _stress_material(evidence: StressScenarioEvidence) -> Mapping[str, object]:
                 "magnitude": shock["magnitude"],
                 "basis_kind": str(shock["basis_kind"]),
                 "basis_ref": str(shock["basis_ref"]),
+                "unit": str(shock["unit"]),
+                "rationale": str(shock["rationale"]),
             }
             for shock in evidence.shocks
         ),
@@ -180,6 +201,8 @@ def build_stress_scenario_evidence(
                 "magnitude": shock["magnitude"],
                 "basis_kind": str(shock["basis_kind"]),
                 "basis_ref": str(shock["basis_ref"]),
+                "unit": str(shock["unit"]),
+                "rationale": str(shock["rationale"]),
             }
             for shock in shocks
         ),
@@ -197,6 +220,8 @@ def build_stress_scenario_evidence(
                 "magnitude": shock["magnitude"],
                 "basis_kind": str(shock["basis_kind"]),
                 "basis_ref": str(shock["basis_ref"]),
+                "unit": str(shock["unit"]),
+                "rationale": str(shock["rationale"]),
             }
             for shock in shocks
         ),
@@ -232,6 +257,7 @@ def parse_stress_scenario_evidence(
         Re-validated JSON-safe stress evidence mapping.
 
     Raises:
+        ConfigurationError: If the supplied canonical hash does not match.
         ValidationError: If the mapping is structurally or semantically invalid.
     """
     if not isinstance(value, Mapping):
@@ -245,7 +271,7 @@ def parse_stress_scenario_evidence(
     shocks = value.get("shocks")
     if not isinstance(shocks, (tuple, list)):
         raise ValidationError("RES_INPUT_INVALID", "STRESS_SHOCKS_INVALID")
-    return build_stress_scenario_evidence(
+    parsed = build_stress_scenario_evidence(
         scenario_id=str(value["scenario_id"]),
         hypothesis=str(value["hypothesis"]),
         shocks=tuple(
@@ -254,11 +280,16 @@ def parse_stress_scenario_evidence(
                 "magnitude": cast("Mapping[str, object]", shock)["magnitude"],
                 "basis_kind": str(cast("Mapping[str, object]", shock)["basis_kind"]),
                 "basis_ref": str(cast("Mapping[str, object]", shock)["basis_ref"]),
+                "unit": str(cast("Mapping[str, object]", shock)["unit"]),
+                "rationale": str(cast("Mapping[str, object]", shock)["rationale"]),
             }
             for shock in shocks
         ),
         generated_at_utc=datetime.fromisoformat(str(value["generated_at_utc"])),
     )
+    if parsed["canonical_hash"] != value.get("canonical_hash"):
+        raise ConfigurationError("RES_CONFIGURATION_INVALID", "STRESS_HASH_MISMATCH")
+    return parsed
 
 
 def validate_shock_basis(
@@ -284,11 +315,16 @@ def validate_shock_basis(
             )
         basis_kind = shock.get("basis_kind")
         basis_ref = shock.get("basis_ref")
+        rationale = shock.get("rationale")
+        unit = shock.get("unit")
         shock_type = str(shock.get("shock_type", "unknown"))
         if (
             basis_kind not in _BASIS_KINDS
             or not isinstance(basis_ref, str)
             or not basis_ref.strip()
+            or _SHOCK_UNITS.get(shock_type) != unit
+            or not isinstance(rationale, str)
+            or not rationale.strip()
         ):
             rejected.append(shock_type)
     return tuple(rejected)

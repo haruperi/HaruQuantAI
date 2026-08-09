@@ -26,6 +26,7 @@ logger = get_logger(__name__)
 _DOMAIN = "research"
 _MIGRATION_ID = "001_research_artifacts_v1"
 _EXPECTANCY_MIGRATION_ID = "002_research_expectancy_profiles_v1"
+_GOVERNED_EVIDENCE_MIGRATION_ID = "003_research_governed_evidence_v1"
 
 _CREATE_STATEMENT = (
     "CREATE TABLE IF NOT EXISTS research_artifacts ("
@@ -96,6 +97,55 @@ _EXPECTANCY_STATEMENTS = (
     _EXPECTANCY_MATCH_INDEX_STATEMENT,
 )
 
+_CREATE_EXPECTANCY_TRANSITIONS_STATEMENT = (
+    "CREATE TABLE IF NOT EXISTS research_expectancy_transitions ("
+    "transition_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+    "profile_id TEXT NOT NULL, "
+    "source_state TEXT NOT NULL, "
+    "target_state TEXT NOT NULL, "
+    "reviewer TEXT NOT NULL, "
+    "decision TEXT NOT NULL, "
+    "reason TEXT NOT NULL, "
+    "superseded_by TEXT NOT NULL DEFAULT '', "
+    "request_id TEXT NOT NULL, "
+    "created_at TEXT NOT NULL DEFAULT "
+    "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now')), "
+    "FOREIGN KEY (profile_id) REFERENCES research_expectancy_profiles(profile_id)"
+    ") STRICT"
+)
+_CREATE_DRIFT_EVIDENCE_STATEMENT = (
+    "CREATE TABLE IF NOT EXISTS research_performance_drift_evidence ("
+    "evidence_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+    "profile_id TEXT NOT NULL, "
+    "evidence_json TEXT NOT NULL CHECK (json_valid(evidence_json)), "
+    "canonical_hash TEXT NOT NULL UNIQUE, "
+    "request_id TEXT NOT NULL, "
+    "created_at TEXT NOT NULL DEFAULT "
+    "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
+    ") STRICT"
+)
+_CREATE_STRESS_EVIDENCE_STATEMENT = (
+    "CREATE TABLE IF NOT EXISTS research_stress_scenario_evidence ("
+    "scenario_id TEXT NOT NULL, "
+    "canonical_hash TEXT NOT NULL, "
+    "evidence_json TEXT NOT NULL CHECK (json_valid(evidence_json)), "
+    "request_id TEXT NOT NULL, "
+    "created_at TEXT NOT NULL DEFAULT "
+    "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now')), "
+    "PRIMARY KEY (scenario_id, canonical_hash)"
+    ") STRICT"
+)
+_GOVERNED_EVIDENCE_INDEX_STATEMENT = (
+    "CREATE INDEX IF NOT EXISTS idx_research_drift_profile "
+    "ON research_performance_drift_evidence (profile_id, evidence_id)"
+)
+_GOVERNED_EVIDENCE_STATEMENTS = (
+    _CREATE_EXPECTANCY_TRANSITIONS_STATEMENT,
+    _CREATE_DRIFT_EVIDENCE_STATEMENT,
+    _CREATE_STRESS_EVIDENCE_STATEMENT,
+    _GOVERNED_EVIDENCE_INDEX_STATEMENT,
+)
+
 
 def _checksum(statements: tuple[str, ...]) -> str:
     """Compute a stable sha256 checksum over canonical joined statements.
@@ -122,6 +172,12 @@ RESEARCH_MIGRATION_STEPS: tuple[object, ...] = (
         migration_id=_EXPECTANCY_MIGRATION_ID,
         checksum=_checksum(_EXPECTANCY_STATEMENTS),
         statements=_EXPECTANCY_STATEMENTS,
+    ),
+    build_migration_step(
+        domain=_DOMAIN,
+        migration_id=_GOVERNED_EVIDENCE_MIGRATION_ID,
+        checksum=_checksum(_GOVERNED_EVIDENCE_STATEMENTS),
+        statements=_GOVERNED_EVIDENCE_STATEMENTS,
     ),
 )
 

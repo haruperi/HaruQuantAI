@@ -8,10 +8,13 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.utils import (
+    build_health_state,
+    create_validation_error,
     get_common_error_catalog,
     get_error_metadata,
     map_exception,
     normalize_error_code,
+    parse_health_state,
     require_error_definition,
     route_error_event,
     validate_error_catalog,
@@ -125,6 +128,16 @@ def main() -> None:
 
     # Stage 3: Sanitized boundary evidence and event routing
     fr_utils_035_route_error_event()
+    health = build_health_state(
+        dependency="usage",
+        category="UNKNOWN_STATE",
+        state="UNKNOWN",
+        retryable=False,
+        operator_action="NONE",
+        observed_at=None,
+    )
+    assert parse_health_state(health) == health
+    assert isinstance(create_validation_error("VALIDATION_FAILED"), Exception)
 
 
 if __name__ == "__main__":

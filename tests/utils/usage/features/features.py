@@ -1,6 +1,6 @@
 """Homogeneous full-domain usage program for app.utils.
 
-Ties all Utils features (FEAT-UTIL-00 through FEAT-UTIL-08) into one sequential,
+Ties all Utils features (FEAT-UTIL-00 through FEAT-UTIL-13) into one sequential,
 realistic end-to-end domain pipeline:
 1. Settings Bootstrap (FEAT-UTIL-06)
 2. Structured Logging Setup & Execution (FEAT-UTIL-07)
@@ -10,6 +10,8 @@ realistic end-to-end domain pipeline:
 6. Canonical Serialization & Digesting (FEAT-UTIL-04)
 7. Shared Error Mapping, Metadata & Event Routing (FEAT-UTIL-01)
 8. Standard Operation Responses (FEAT-UTIL-08)
+9. Exact Units, State Machine, Validation, Idempotency, and Random Streams
+   (FEAT-UTIL-09 through FEAT-UTIL-13)
 """
 
 from __future__ import annotations
@@ -82,7 +84,7 @@ def _run_stage_9_new_primitives() -> None:
     """Execute FEAT-UTIL-09 through FEAT-UTIL-13 in dependency order."""
     _print_stage(
         9,
-        "Cockpit Foundation Primitives",
+        "Shared Foundation Primitives",
         "Exercise exact units, transitions, validation, idempotency, and seeded draws.",
     )
     amount = add_exact(
@@ -375,7 +377,7 @@ def main() -> None:
     print("=" * 88)
     print("UTILS DOMAIN: FULL HOMOGENEOUS END-TO-END PIPELINE EXAMPLE")
     print(
-        "Ties FEAT-UTIL-00 through FEAT-UTIL-08 sequentially in realistic runtime order."
+        "Ties FEAT-UTIL-00 through FEAT-UTIL-13 sequentially in realistic runtime order."
     )
     print("=" * 88)
 

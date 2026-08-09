@@ -318,12 +318,32 @@ def sync_current_week_economic_calendar(
     *,
     environment: str,
     rows: Sequence[Mapping[str, object]] | None = None,
+    observed_at: datetime | None = None,
 ) -> StandardResponse[dict[str, int]]:
-    """Upsert the current week from explicit rows or the official CSV source."""
+    """Upsert the observed week from explicit rows or the official CSV source.
+
+    Args:
+        environment: Explicit non-production runtime environment.
+        rows: Optional bounded official-format rows; fetched when omitted.
+        observed_at: Optional aware UTC instant used to select the current week.
+
+    Returns:
+        Structured counts for imported and rejected rows.
+
+    Raises:
+        DataError: If the environment, observation instant, source, or rows fail
+            closed validation.
+    """
     request_id = generate_id("req")
 
     def _raw() -> dict[str, int]:
         _require_non_production(environment)
+        observation = observed_at or datetime.now(UTC)
+        if observation.tzinfo is None or observation.utcoffset() != timedelta(0):
+            raise DataError(
+                "VALIDATION_FAILED",
+                safe_details={"field": "observed_at"},
+            )
         source_rows = rows if rows is not None else _fetch_weekly_csv()
         events = _weekly_events(source_rows)
         if not events:
@@ -354,7 +374,7 @@ def sync_current_week_economic_calendar(
             operation="data.economic_calendar.sync_current_week",
             request_id=request_id,
         )
-        start = _week_start(datetime.now(UTC))
+        start = _week_start(observation)
         coverage_end = max(
             start + timedelta(days=7),
             _weekly_coverage_end(source_rows),

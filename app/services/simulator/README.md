@@ -1,5 +1,9 @@
 # Simulation
 
+The Simulation error catalogue uses only the Utils-owned `TRANSIENT`,
+`PERMANENT`, `INTEGRITY`, `POLICY`, `DATA_STALE`, and `UNKNOWN_STATE`
+categories. An unconfirmed persistence result is non-retryable.
+
 > **Package:** `app/services/simulator`
 > **Status:** `Partial` — 14 features are registered: `FEAT-SIM-01`..`09` are `Completed`, while `FEAT-SIM-10`..`14` are `Missing`.
 > **Last updated:** `2026-08-04`

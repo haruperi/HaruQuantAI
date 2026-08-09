@@ -206,7 +206,13 @@ def fr_risk_065() -> None:
 
 
 def fr_risk_088() -> None:
-    """FR-RISK-088: Stage 2 — Define the optional ordered drawdown state-machine thresholds (caution/restricted/critical) bounded by max_drawdown."""
+    """Demonstrate FR-RISK-088.
+
+    Define optional ordered drawdown state-machine thresholds
+    (`drawdown_caution_threshold`/`drawdown_restricted_threshold`/
+    `drawdown_critical_threshold`), mandatory together and bounded by
+    `max_drawdown`; live profile requires them.
+    """
     _header(
         "Stage 2: Drawdown State Thresholds - Caution/Restricted/Critical (FR-RISK-088)"
     )
@@ -226,7 +232,12 @@ def fr_risk_088() -> None:
 
 
 def fr_risk_089() -> None:
-    """FR-RISK-089: Stage 2 — Define the optional emergency rule group (flash crash, connectivity loss, margin call, recovery lock) required together and bounded."""
+    """Demonstrate FR-RISK-089.
+
+    Define the optional emergency rule group (flash-crash move/window,
+    connectivity-loss window, margin-call utilization, recovery-lock duration),
+    mandatory together; live profile requires them.
+    """
     _header(
         "Stage 2: Emergency Rule Group - Flash Crash/Connectivity/Margin (FR-RISK-089)"
     )
@@ -247,7 +258,13 @@ def fr_risk_089() -> None:
 
 
 def fr_risk_090() -> None:
-    """FR-RISK-090: Stage 2 — Define the optional continuous-assessment rule group naming registered recalculation-trigger events and a staleness bound."""
+    """Demonstrate FR-RISK-090.
+
+    Define the optional continuous-assessment rule group naming registered
+    recalculation-trigger events (`fill`/`cancellation`/`position_change`/
+    `valuation_change`/`policy_change`) and a positive staleness bound; live
+    profile requires a non-empty event set and staleness bound.
+    """
     _header("Stage 2: Assessment Rule Group - Recalculation Triggers (FR-RISK-090)")
     print("SUCCESS: FR-RISK-090")
     config = create_risk_config(

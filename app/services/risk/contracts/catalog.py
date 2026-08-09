@@ -61,7 +61,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.INVALID_INPUT,
         "Risk input is invalid",
-        "validation",
+        "PERMANENT",
         "warning",
         False,
         "Correct the supplied Risk input",
@@ -69,7 +69,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.VALIDATION_FAILED,
         "Risk validation failed",
-        "validation",
+        "PERMANENT",
         "warning",
         False,
         "Correct the supplied Risk evidence",
@@ -77,7 +77,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.INVALID_PORTFOLIO_STATE,
         "Portfolio state is invalid",
-        "evidence",
+        "DATA_STALE",
         "critical",
         False,
         "Provide complete valid portfolio evidence",
@@ -85,7 +85,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.INVALID_RISK_CONFIG,
         "Risk configuration is invalid",
-        "configuration",
+        "PERMANENT",
         "critical",
         False,
         "Correct the active Risk configuration",
@@ -93,7 +93,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.MISSING_EVIDENCE,
         "Required Risk evidence is missing",
-        "evidence",
+        "DATA_STALE",
         "critical",
         False,
         "Provide the required evidence",
@@ -101,7 +101,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.STALE_EVIDENCE,
         "Required Risk evidence is stale",
-        "evidence",
+        "DATA_STALE",
         "critical",
         False,
         "Refresh the required evidence",
@@ -109,7 +109,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.LIMIT_FAILED,
         "A Risk limit failed",
-        "policy",
+        "POLICY",
         "critical",
         False,
         "Review the failed Risk limit",
@@ -117,7 +117,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.POLICY_BLOCKED,
         "Risk policy blocked the operation",
-        "policy",
+        "POLICY",
         "critical",
         False,
         "Resolve the governing Risk policy block",
@@ -125,7 +125,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.PERMISSION_DENIED,
         "Risk permission was denied",
-        "authorization",
+        "POLICY",
         "critical",
         False,
         "Use an authorized Risk principal",
@@ -133,7 +133,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.KILL_SWITCH_ACTIVE,
         "A Risk kill switch is active",
-        "safety",
+        "POLICY",
         "critical",
         False,
         "Keep execution blocked until authorized clearance",
@@ -141,7 +141,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.KILL_SWITCH_UNKNOWN,
         "Risk kill-switch state is unproven",
-        "safety",
+        "UNKNOWN_STATE",
         "critical",
         False,
         "Reconcile and prove kill-switch state",
@@ -149,7 +149,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.APPROVAL_REQUIRED,
         "Risk approval is required",
-        "authorization",
+        "POLICY",
         "warning",
         False,
         "Provide valid approval evidence",
@@ -157,7 +157,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.APPROVAL_TOKEN_INVALID,
         "Risk approval token is invalid",
-        "authorization",
+        "POLICY",
         "critical",
         False,
         "Reject the token and request a valid one",
@@ -165,7 +165,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.APPROVAL_TOKEN_EXPIRED,
         "Risk approval token is expired",
-        "authorization",
+        "POLICY",
         "critical",
         False,
         "Issue a current approval token",
@@ -173,7 +173,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.APPROVAL_TOKEN_REVOKED,
         "Risk approval token is revoked",
-        "authorization",
+        "POLICY",
         "critical",
         False,
         "Issue a new approval after review",
@@ -181,7 +181,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.APPROVAL_TOKEN_CONSUMED,
         "Risk approval token is already consumed",
-        "authorization",
+        "POLICY",
         "critical",
         False,
         "Do not replay the token",
@@ -189,7 +189,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.CONFIG_VERSION_MISMATCH,
         "Risk configuration version mismatched",
-        "configuration",
+        "PERMANENT",
         "critical",
         False,
         "Refresh the Risk decision and configuration",
@@ -197,7 +197,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.PENDING_APPROVAL_DOUBLE_SPEND_BLOCKED,
         "Pending approval double spend was blocked",
-        "concurrency",
+        "UNKNOWN_STATE",
         "critical",
         False,
         "Reconcile pending approval state",
@@ -205,7 +205,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.PAYLOAD_TOO_LARGE,
         "Risk payload exceeds the configured bound",
-        "validation",
+        "PERMANENT",
         "warning",
         False,
         "Reduce the bounded Risk payload",
@@ -213,7 +213,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.MISSING_STOP_LOSS,
         "Required stop-loss evidence is missing",
-        "evidence",
+        "DATA_STALE",
         "critical",
         False,
         "Provide a valid stop-loss",
@@ -221,7 +221,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.INSUFFICIENT_VOLATILITY_EVIDENCE,
         "Volatility evidence is insufficient",
-        "evidence",
+        "DATA_STALE",
         "critical",
         False,
         "Provide sufficient volatility evidence",
@@ -229,7 +229,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.INSUFFICIENT_K_EVIDENCE,
         "Kelly evidence is insufficient",
-        "evidence",
+        "DATA_STALE",
         "critical",
         False,
         "Provide sufficient Kelly evidence",
@@ -237,7 +237,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.LIVE_STATE_STALE,
         "Live Risk state is stale",
-        "evidence",
+        "DATA_STALE",
         "critical",
         False,
         "Refresh live state before proceeding",
@@ -245,7 +245,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.IN_FLIGHT_TOLERANCE_EXCEEDED,
         "In-flight tolerance was exceeded",
-        "reconciliation",
+        "UNKNOWN_STATE",
         "critical",
         False,
         "Freeze execution and reconcile state",
@@ -253,7 +253,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.IN_FLIGHT_RECONCILIATION_EXPIRED,
         "In-flight reconciliation evidence expired",
-        "reconciliation",
+        "DATA_STALE",
         "critical",
         False,
         "Reconcile current execution state",
@@ -261,7 +261,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.AUDIT_CHAIN_TAMPER_DETECTED,
         "Risk audit-chain tamper was detected",
-        "integrity",
+        "INTEGRITY",
         "critical",
         False,
         "Stop processing and investigate the audit chain",
@@ -269,7 +269,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.CALCULATION_FAILED,
         "Risk calculation failed",
-        "calculation",
+        "PERMANENT",
         "critical",
         False,
         "Inspect the bounded calculation failure",
@@ -277,7 +277,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.SNAPSHOT_BUILD_FAILED,
         "Risk snapshot construction failed",
-        "calculation",
+        "PERMANENT",
         "critical",
         False,
         "Refresh and validate portfolio evidence",
@@ -285,7 +285,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.GOVERNOR_DECISION_FAILED,
         "Risk governor decision failed",
-        "governance",
+        "POLICY",
         "critical",
         False,
         "Keep the action blocked and inspect evidence",
@@ -293,7 +293,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.REPORT_GENERATION_FAILED,
         "Risk report generation failed",
-        "reporting",
+        "PERMANENT",
         "error",
         False,
         "Retry only after verifying the source result",
@@ -301,15 +301,15 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.STORAGE_ERROR,
         "Risk persistence failed",
-        "persistence",
+        "UNKNOWN_STATE",
         "critical",
-        True,
+        False,
         "Keep the operation blocked and verify storage",
     ),
     _definition(
         RiskErrorCode.TOOL_EXECUTION_FAILED,
         "Risk tool execution failed",
-        "execution",
+        "TRANSIENT",
         "critical",
         False,
         "Keep the operation blocked and inspect the boundary",
@@ -317,7 +317,7 @@ _DEFINITIONS = (
     _definition(
         RiskErrorCode.UNKNOWN_ERROR,
         "An unknown Risk error occurred",
-        "internal",
+        "UNKNOWN_STATE",
         "critical",
         False,
         "Inspect redacted diagnostic evidence",

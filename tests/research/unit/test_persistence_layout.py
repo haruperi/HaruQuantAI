@@ -8,11 +8,14 @@ from app.services.research.persistence.create import create_artifact_metadata
 from app.utils import generate_id
 
 
-def test_unsupported_persistence_verbs_are_explicitly_empty() -> None:
-    """Read, update, and delete modules remain explicit unsupported seams."""
-    for verb in ("read", "update", "delete"):
-        module = importlib.import_module(f"app.services.research.persistence.{verb}")
-        assert module.__all__ == ()
+def test_persistence_verbs_match_registered_feature_needs() -> None:
+    """Read/update support evidence while delete remains unsupported."""
+    read_module = importlib.import_module("app.services.research.persistence.read")
+    update_module = importlib.import_module("app.services.research.persistence.update")
+    delete_module = importlib.import_module("app.services.research.persistence.delete")
+    assert read_module.__all__
+    assert update_module.__all__ == ("update_expectancy_governance",)
+    assert delete_module.__all__ == ()
 
 
 def test_metadata_create_fails_when_migration_is_unconfirmed(

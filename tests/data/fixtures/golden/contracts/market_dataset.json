@@ -84,6 +84,12 @@
           "title": "Sample Limit",
           "type": "integer"
         },
+        "schema_id": {
+          "const": "data.quality_report.v2",
+          "default": "data.quality_report.v2",
+          "title": "Schema Id",
+          "type": "string"
+        },
         "schema_version": {
           "title": "Schema Version",
           "type": "string"

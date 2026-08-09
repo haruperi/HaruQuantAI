@@ -37,10 +37,18 @@ def test_research_migration_runs_idempotently_through_data(tmp_path: Path) -> No
         )
     assert first.status == "success"
     assert first.data is not None
-    assert first.data.applied_ids == ("001_research_artifacts_v1",)
+    assert first.data.applied_ids == (
+        "001_research_artifacts_v1",
+        "002_research_expectancy_profiles_v1",
+        "003_research_governed_evidence_v1",
+    )
     assert second.status == "success"
     assert second.data is not None
-    assert second.data.skipped_ids == ("001_research_artifacts_v1",)
+    assert second.data.skipped_ids == (
+        "001_research_artifacts_v1",
+        "002_research_expectancy_profiles_v1",
+        "003_research_governed_evidence_v1",
+    )
 
 
 def test_research_migration_checksum_mismatch_fails_closed(tmp_path: Path) -> None:

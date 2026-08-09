@@ -2,7 +2,13 @@
 
 from datetime import UTC, datetime
 
-from app.utils import build_validation_outcome, combine_validation_outcomes
+from app.utils import (
+    build_validation_outcome,
+    combine_validation_outcomes,
+    get_severity_rank,
+    parse_validation_outcome,
+    validate_reason_code,
+)
 
 
 def main() -> None:
@@ -16,6 +22,9 @@ def main() -> None:
         severity="ERROR",
     )
     result = combine_validation_outcomes([outcome])
+    assert parse_validation_outcome(result) == result
+    assert get_severity_rank("ERROR") > get_severity_rank("INFO")
+    assert validate_reason_code("FEED.UNKNOWN") == "FEED.UNKNOWN"
     print("SUCCESS: FEAT-UTIL-11 validation completed")
     print(f"Data -> validation={result}")
 

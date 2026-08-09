@@ -1,8 +1,8 @@
 """FEAT-BRK-16: exercise health-aware primary/backup route discipline.
 
 This standalone usage program drives every public operation of the
-``route_discipline`` feature (``TC-IMP-BRK-09``) through the documented public
-API using bounded, secret-safe, deterministic data. It builds and parses a
+``route_discipline`` feature through the documented public API using bounded,
+secret-safe, deterministic data. It builds and parses a
 ``RoutePlan v1`` and ``FailoverDecision v1`` contract and proves the
 fail-closed policy that no write is silently rerouted across brokers.
 """
@@ -17,10 +17,11 @@ import _support  # noqa: F401
 from app.services.brokers import (
     build_broker_failover_decision,
     build_broker_route_plan,
+    get_broker_environment,
+    get_broker_id,
     parse_broker_failover_decision,
     parse_broker_route_plan,
 )
-from app.services.brokers.contracts.enums import BrokerEnvironment, BrokerId
 
 _OBSERVED_AT = datetime(2026, 8, 7, 12, 0, 0, tzinfo=UTC)
 
@@ -40,13 +41,13 @@ def fr_brokers_136_route_plan() -> None:
     _header("FR-BRK-136: Health-Aware Route Plan (build/parse)")
     plan = build_broker_route_plan(
         plan_id="plan-cockpit-1",
-        primary_broker=BrokerId.MT5,
-        primary_environment=BrokerEnvironment.DEMO,
+        primary_broker=get_broker_id("mt5"),
+        primary_environment=get_broker_environment("demo"),
         primary_readiness="READY",
-        backup_broker=BrokerId.CTRADER,
-        backup_environment=BrokerEnvironment.DEMO,
+        backup_broker=get_broker_id("ctrader"),
+        backup_environment=get_broker_environment("demo"),
         backup_readiness="DEGRADED",
-        selected_route=BrokerId.MT5.value,
+        selected_route="mt5",
         route_state="READY",
         write_failover_policy="RECOVERY_ONLY",
         created_at=_OBSERVED_AT,
@@ -67,8 +68,8 @@ def fr_brokers_137_failover_decision() -> None:
         decision_id="dec-cockpit-1",
         plan_id="plan-cockpit-1",
         decision="FAILOVER_READ_ONLY",
-        active_broker=BrokerId.CTRADER,
-        active_environment=BrokerEnvironment.DEMO,
+        active_broker=get_broker_id("ctrader"),
+        active_environment=get_broker_environment("demo"),
         write_permitted=False,
         read_permitted=True,
         reason="primary_degraded",
@@ -90,8 +91,8 @@ def fr_brokers_138_no_silent_write_reroute() -> None:
             decision_id="dec-blocked",
             plan_id="plan-cockpit-1",
             decision="FAILOVER_READ_ONLY",
-            active_broker=BrokerId.CTRADER,
-            active_environment=BrokerEnvironment.DEMO,
+            active_broker=get_broker_id("ctrader"),
+            active_environment=get_broker_environment("demo"),
             write_permitted=True,
             read_permitted=True,
             reason="primary_degraded",

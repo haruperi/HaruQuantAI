@@ -24,7 +24,7 @@ from app.services.brokers import (
     parse_broker_route_plan,
     parse_instrument_venue_profile,
 )
-from app.utils.errors.exceptions import ValidationError
+from app.utils import create_validation_error
 
 _NOW = datetime(2026, 8, 7, 12, 0, 0, tzinfo=UTC)
 
@@ -234,5 +234,5 @@ def test_unknown_contract_version_is_rejected() -> None:
     )
     tampered = dict(health)
     tampered["contract_version"] = "v2"
-    with pytest.raises(ValidationError):
+    with pytest.raises(type(create_validation_error("VALIDATION_FAILED"))):
         parse_broker_health(tampered)

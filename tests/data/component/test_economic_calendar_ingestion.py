@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sqlite3
 from contextlib import closing
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -55,6 +56,7 @@ def test_csv_bootstrap_and_weekly_json_populate_reduced_schema(
     weekly = _unwrap(
         sync_current_week_economic_calendar(
             environment="dev",
+            observed_at=datetime(2026, 8, 3, tzinfo=UTC),
             rows=(
                 {
                     "title": "Final Manufacturing PMI",

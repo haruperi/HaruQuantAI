@@ -17,11 +17,17 @@ from app.services.research.expectancy.persistence import (
     load_expectancy_profile,
     persist_expectancy_profile,
 )
+from app.services.research.expectancy.providers import (
+    build_risk_expectancy_provider,
+    build_strategy_expectancy_provider,
+)
 
 __all__ = (
     "apply_expectancy_transition",
     "build_approved_expectancy_profile",
     "build_expectancy_profile",
+    "build_risk_expectancy_provider",
+    "build_strategy_expectancy_provider",
     "evaluate_expectancy_eligibility",
     "get_min_reward_risk_override",
     "is_governance_transition_permitted",

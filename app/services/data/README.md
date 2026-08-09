@@ -1,5 +1,10 @@
 # Data
 
+`DataQualityReport v2` has immutable `schema_id="data.quality_report.v2"`.
+The official weekly-calendar synchronization accepts optional aware-UTC
+`observed_at` evidence for deterministic coverage-window selection and otherwise
+uses the runtime UTC clock.
+
 > **Package:** `app/services/data`
 > **Status:** `Completed` — all 19 registered features (`FEAT-DATA-01`..`19`) are implemented. Canonical Level-2 state remains an extension requirement of `FEAT-DATA-12`, while Brokers retains provider-specific order-book transport.
 > **Last updated:** `2026-08-07`

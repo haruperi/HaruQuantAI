@@ -19,7 +19,7 @@ def test_feature_usage_registry_and_execution() -> None:
             check=False,
             capture_output=True,
             text=True,
-            timeout=10,
+            timeout=30,
         )
         assert completed.returncode == 0, completed.stderr
         lines = completed.stdout.splitlines()

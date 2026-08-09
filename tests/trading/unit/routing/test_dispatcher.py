@@ -349,15 +349,17 @@ def test_dispatch_has_single_mutation_boundary() -> None:
     assert get_broker_value_field(adapter.mutations[5], "quantity_unit") == "lots"
 
     rejected_adapter = _ErrorAdapter(get_broker_error_code("BROKER_REQUEST_REJECTED"))
-    with pytest.raises(TradingError, match="UNKNOWN_OUTCOME"):
-        asyncio.run(
-            dispatch_order_intent(
-                _intent(),
-                _connection(),
-                rejected_adapter,
-                None,
-            )
+    rejected_receipt = asyncio.run(
+        dispatch_order_intent(
+            _intent(),
+            _connection(),
+            rejected_adapter,
+            None,
         )
+    )
+    assert rejected_receipt.status == "rejected"
+    assert rejected_receipt.response_classification == "confirmed"
+    assert not rejected_receipt.reconciliation_required
     limited_adapter = _ErrorAdapter(get_broker_error_code("BROKER_RATE_LIMITED"))
     limited_response = asyncio.run(
         _dispatch_order_intent(

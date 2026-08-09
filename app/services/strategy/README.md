@@ -1,7 +1,7 @@
 # Strategy
 
 > **Package:** `app/services/strategy`
-> **Status:** `Completed` — all 14 registered features and the capability specification consumer ports are implemented and verified. Research remains the authoritative future expectancy-profile provider; Strategy fails closed until it is available.
+> **Status:** `Completed` — all 14 registered features and consumer ports are implemented and verified. Research `FEAT-RES-14` now supplies the injectable exact-version expectancy provider; absence, failure, or mismatch still fails closed.
 > **Last updated:** `2026-08-07`
 
 > This README is the package's **single source of truth** for final requirements, structure, implementation sequence, workflows, public contracts, configuration, limits, progress, usage examples, and tests.

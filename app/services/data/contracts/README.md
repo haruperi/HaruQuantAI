@@ -2,6 +2,8 @@
 
 Owns immutable canonical records, datasets, quality vocabulary, validation, and
 deterministic Data errors. Public names are imported from `app.services.data`.
+`DataQualityReport` pairs `contract_version="v2"` with the immutable
+`schema_id="data.quality_report.v2"` identity.
 
 - Production files: `_base.py`, `dataset.py`, `errors.py`, `records.py`,
   `validation.py`.

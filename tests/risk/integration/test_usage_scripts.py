@@ -39,7 +39,9 @@ def _documented_usage_requirements() -> dict[str, dict[str, str]]:
     readme = (repository / "app" / "services" / "risk" / "README.md").read_text(
         encoding="utf-8"
     )
-    section_four = readme.split("## 4.", maxsplit=1)[1].split("## 5.", maxsplit=1)[0]
+    section_four = readme.split(
+        "## 4. Module and Requirement Specifications", maxsplit=1
+    )[1].split("## 5.", maxsplit=1)[0]
     feature_number: int | None = None
     expected = {name: {} for name in _USAGE_SCRIPTS if name != "features.py"}
     for line in section_four.splitlines():
@@ -50,9 +52,21 @@ def _documented_usage_requirements() -> dict[str, dict[str, str]]:
         if not line.startswith("|") or "FR-RISK-" not in line:
             continue
         cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-        requirement = re.search(r"FR-RISK-\d{3}", cells[1])
-        if requirement is not None and feature_number is not None:
-            expected[_USAGE_SCRIPTS[feature_number - 1]][requirement.group()] = cells[2]
+        requirement_cell = next(
+            (
+                (index, match)
+                for index, cell in enumerate(cells)
+                if (match := re.search(r"FR-RISK-\d{3}", cell)) is not None
+            ),
+            None,
+        )
+        if requirement_cell is not None and feature_number is not None:
+            index, requirement = requirement_cell
+            if index + 1 >= len(cells):
+                raise AssertionError("Risk requirement responsibility is missing")
+            expected[_USAGE_SCRIPTS[feature_number - 1]][requirement.group()] = cells[
+                index + 1
+            ]
     return expected
 
 

@@ -138,6 +138,7 @@ class DataQualityReport(_Contract):
     """Bounded quality evidence for one normalized dataset."""
 
     contract_version: Literal["v2"] = "v2"
+    schema_id: Literal["data.quality_report.v2"] = "data.quality_report.v2"
     quality_status: Literal[
         "perfect",
         "excellent",

@@ -1,3 +1,4 @@
+# ruff: noqa: DOC501, N812
 """BrokerHealth v1 cross-domain contract transport.
 
 The Trading Cockpit Phase 0 reconciliation (``TC-IMP-BRK-03``) requires a
@@ -15,8 +16,8 @@ from datetime import UTC, datetime, timedelta
 from typing import cast
 
 from app.services.brokers.contracts.enums import BrokerEnvironment, BrokerId
-from app.utils.errors.exceptions import ValidationError
-from app.utils.serialization import canonical_digest, to_json_safe
+from app.utils import canonical_digest, to_json_safe
+from app.utils import create_validation_error as ValidationError
 
 CONTRACT_VERSION = "v1"
 SCHEMA_ID = "brokers.health.v1"

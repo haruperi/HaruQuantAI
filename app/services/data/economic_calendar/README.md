@@ -6,6 +6,10 @@ discovery and specifications, normalization, projection,
 approved-root persistence, explicit coverage, symbol relevance, and Risk-ready
 calendar evidence.
 
+`sync_current_week_economic_calendar` accepts an optional aware UTC `observed_at`
+instant for deterministic coverage-window selection; normal runtime calls omit it
+and use the current UTC clock.
+
 - Production files: `firecrawl_transport.py`, `reader_transport.py`, `event_urls.py`, `ingestion.py`, `normalization.py`, `parsing.py`,
   `scraper.py`, `events.py`,
   `profiling.py`, `providers.py`, `restriction.py`, `calendar_state.py`,

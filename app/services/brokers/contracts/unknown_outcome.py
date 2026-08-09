@@ -1,3 +1,4 @@
+# ruff: noqa: DOC501, N812
 """First-class UNKNOWN broker result and blind-resubmission prohibition.
 
 The Trading Cockpit Phase 0 reconciliation (``TC-IMP-BRK-07``) requires a
@@ -19,7 +20,7 @@ from app.services.brokers.contracts.enums import (
     BrokerResubmissionPolicy,
     BrokerUncertainty,
 )
-from app.utils.errors.exceptions import ValidationError
+from app.utils import create_validation_error as ValidationError
 
 _OUTCOME_VERDICTS = frozenset({"ACCEPTED", "REJECTED", "PARTIAL", "UNKNOWN"})
 

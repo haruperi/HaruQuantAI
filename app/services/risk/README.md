@@ -1,7 +1,11 @@
 # Risk
 
+The Risk error catalogue uses only the Utils-owned `TRANSIENT`, `PERMANENT`,
+`INTEGRITY`, `POLICY`, `DATA_STALE`, and `UNKNOWN_STATE` categories. Ambiguous
+persistence and reconciliation outcomes remain non-retryable `UNKNOWN_STATE`.
+
 > **Package:** `app/services/risk`
-> **Status:** `Completed` — all 17 registered features (`FEAT-RISK-01`..`17`) are implemented. Cross-domain provider absence is handled through documented fail-closed consumer ports.
+> **Status:** `Completed` — all 17 registered features (`FEAT-RISK-01`..`17`) are implemented. Research `FEAT-RES-14` supplies the injectable `Decimal` expectancy override provider; absence remains a documented fail-closed fallback.
 
 > **API-BE-003 runtime seam:** Allocation and governor composition bind their
 > durable state, approval-token state, and audit ports for `FR-RISK-030` and

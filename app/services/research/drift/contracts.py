@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any, Literal, cast
 
-from app.services.research.contracts.errors import ValidationError
+from app.services.research.contracts.errors import ConfigurationError, ValidationError
 from app.utils import canonical_digest, to_json_safe
 
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
@@ -74,6 +74,7 @@ class PerformanceDriftEvidence:
         observed_max_drawdown_r: Observed live-sim/paper drawdown magnitude.
         envelope_win_rate: Approved envelope win rate.
         envelope_expected_value_r: Approved envelope EV in R.
+        envelope_max_drawdown_r: Approved envelope drawdown magnitude.
         win_rate_drift: Relative win-rate drop vs envelope (non-negative).
         expected_value_drift: Relative EV drop vs envelope (non-negative).
         drawdown_exceeded: Whether observed drawdown breached the envelope.
@@ -96,6 +97,7 @@ class PerformanceDriftEvidence:
     observed_max_drawdown_r: float
     envelope_win_rate: float
     envelope_expected_value_r: float
+    envelope_max_drawdown_r: float
     win_rate_drift: float
     expected_value_drift: float
     drawdown_exceeded: bool
@@ -130,6 +132,9 @@ class PerformanceDriftEvidence:
             _finite_non_negative(value, detail=detail)
         if not isinstance(self.observed_max_drawdown_r, (int, float)):
             raise ValidationError("RES_INPUT_INVALID", "DRIFT_OBSERVED_DRAWDOWN")
+        _finite_non_negative(
+            self.envelope_max_drawdown_r, detail="DRIFT_ENVELOPE_DRAWDOWN"
+        )
         self._validate_thresholds_and_breaches()
         if (
             not isinstance(self.canonical_hash, str)
@@ -170,6 +175,7 @@ def _drift_material(evidence: PerformanceDriftEvidence) -> Mapping[str, object]:
         "observed_max_drawdown_r": evidence.observed_max_drawdown_r,
         "envelope_win_rate": evidence.envelope_win_rate,
         "envelope_expected_value_r": evidence.envelope_expected_value_r,
+        "envelope_max_drawdown_r": evidence.envelope_max_drawdown_r,
         "thresholds": dict(evidence.thresholds),
         "generated_at_utc": evidence.generated_at_utc.isoformat(),
     }
@@ -257,6 +263,7 @@ def build_performance_drift_evidence(
         "observed_max_drawdown_r": observed_max_drawdown_r,
         "envelope_win_rate": envelope_win_rate,
         "envelope_expected_value_r": envelope_expected_value_r,
+        "envelope_max_drawdown_r": envelope_max_drawdown_r,
         "thresholds": dict(thresholds),
         "generated_at_utc": generated_at_utc.isoformat(),
     }
@@ -272,6 +279,7 @@ def build_performance_drift_evidence(
         observed_max_drawdown_r=observed_max_drawdown_r,
         envelope_win_rate=envelope_win_rate,
         envelope_expected_value_r=envelope_expected_value_r,
+        envelope_max_drawdown_r=envelope_max_drawdown_r,
         win_rate_drift=win_rate_drift,
         expected_value_drift=expected_value_drift,
         drawdown_exceeded=drawdown_exceeded,
@@ -297,6 +305,7 @@ def _drift_mapping(evidence: PerformanceDriftEvidence) -> Mapping[str, object]:
         "observed_max_drawdown_r": evidence.observed_max_drawdown_r,
         "envelope_win_rate": evidence.envelope_win_rate,
         "envelope_expected_value_r": evidence.envelope_expected_value_r,
+        "envelope_max_drawdown_r": evidence.envelope_max_drawdown_r,
         "win_rate_drift": evidence.win_rate_drift,
         "expected_value_drift": evidence.expected_value_drift,
         "drawdown_exceeded": evidence.drawdown_exceeded,
@@ -321,6 +330,7 @@ def parse_performance_drift_evidence(
         Re-validated JSON-safe drift evidence mapping.
 
     Raises:
+        ConfigurationError: If the supplied canonical hash does not match.
         ValidationError: If the mapping is structurally or semantically invalid.
     """
     if not isinstance(value, Mapping):
@@ -331,7 +341,7 @@ def parse_performance_drift_evidence(
         raise ValidationError("RES_VERSION_INCOMPATIBLE", "DRIFT_SCHEMA")
     if value.get("advisory_only") is not True:
         raise ValidationError("RES_INPUT_INVALID", "DRIFT_NOT_ADVISORY")
-    return build_performance_drift_evidence(
+    parsed = build_performance_drift_evidence(
         profile_id=str(value["profile_id"]),
         observed_from_utc=datetime.fromisoformat(str(value["observed_from_utc"])),
         observed_to_utc=datetime.fromisoformat(str(value["observed_to_utc"])),
@@ -344,10 +354,13 @@ def parse_performance_drift_evidence(
         envelope_expected_value_r=float(
             cast("Any", value["envelope_expected_value_r"])
         ),
-        envelope_max_drawdown_r=float(cast("Any", value["observed_max_drawdown_r"])),
+        envelope_max_drawdown_r=float(cast("Any", value["envelope_max_drawdown_r"])),
         thresholds=cast("Mapping[str, float]", value["thresholds"]),
         generated_at_utc=datetime.fromisoformat(str(value["generated_at_utc"])),
     )
+    if parsed["canonical_hash"] != value.get("canonical_hash"):
+        raise ConfigurationError("RES_CONFIGURATION_INVALID", "DRIFT_HASH_MISMATCH")
+    return parsed
 
 
 __all__ = (

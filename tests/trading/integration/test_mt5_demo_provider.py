@@ -6,6 +6,7 @@ import asyncio
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
+import pytest
 from app.services.brokers import create_broker_adapter, get_broker_id
 from app.services.trading import create_order_intent, dispatch_order_intent
 from app.utils import generate_id, get_logger
@@ -89,6 +90,12 @@ async def _exercise_trading_demo_dispatch() -> None:
         assert dispatch_response.status == "success", dispatch_response.error
         receipt = dispatch_response.data
         assert receipt is not None
+        if receipt.status == "rejected":
+            assert receipt.response_classification == "confirmed"
+            assert receipt.provider_order_id is None
+            assert receipt.filled_quantity == 0
+            assert not receipt.reconciliation_required
+            pytest.skip("MT5 demo provider rejected the validated order")
         assert receipt.status == "accepted"
         assert receipt.provider_order_id is not None
         assert not receipt.reconciliation_required

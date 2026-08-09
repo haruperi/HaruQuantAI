@@ -82,6 +82,72 @@ _GROUPS: dict[str, tuple[str, ...]] = {
     "safe_fallback": ("SIM_INTERNAL_ERROR",),
 }
 
+_DATA_STALE_CODES = frozenset(
+    {
+        "SIM_DATA_STALE",
+        "SIM_DATA_COVERAGE_INSUFFICIENT",
+        "SIM_SPREAD_MISSING",
+        "SIM_LIQUIDITY_UNAVAILABLE",
+        "SIM_FX_EVIDENCE_UNAVAILABLE",
+        "SIM_POSITION_NOT_FOUND",
+        "SIM_ORDER_NOT_FOUND",
+        "SIM_SESSION_NOT_FOUND",
+        "SIM_SESSION_EXPIRED",
+    }
+)
+_INTEGRITY_CODES = frozenset(
+    {
+        "SIM_DATA_CHECKSUM_MISMATCH",
+        "SIM_DATA_SCHEMA_INVALID",
+        "SIM_DATA_NON_MONOTONIC",
+        "SIM_DATA_DUPLICATE_TIMESTAMP",
+        "SIM_DATA_OHLC_INVALID",
+        "SIM_DATA_SPREAD_NEGATIVE",
+        "SIM_LOOKAHEAD_DETECTED",
+        "SIM_FEATURE_LOOKAHEAD_DETECTED",
+        "SIM_EVENT_PRIORITY_AMBIGUOUS",
+        "SIM_ACCOUNT_INVARIANT_BROKEN",
+        "SIM_COMPONENT_INCOMPLETE",
+        "SIM_AGGREGATE_UNRECONCILED",
+    }
+)
+_POLICY_CODES = frozenset(
+    {
+        "SIM_ARBITRARY_CODE_REJECTED",
+        "SIM_SLIPPAGE_EXCEEDED",
+        "SIM_MARKET_CLOSED",
+        "SIM_INSUFFICIENT_MARGIN",
+    }
+)
+_TRANSIENT_CODES = frozenset(
+    {
+        "SIM_COMMISSION_CALCULATION_FAILED",
+        "SIM_SWAP_CALCULATION_FAILED",
+    }
+)
+_UNKNOWN_STATE_CODES = frozenset(
+    {
+        "SIM_PERSISTENCE_FAILED",
+        "SIM_RUN_ID_CONFLICT",
+        "SIM_INTERNAL_ERROR",
+    }
+)
+
+
+def _category_for(code: str) -> str:
+    """Return the Utils-owned closed category for one Simulation error code."""
+    if code in _DATA_STALE_CODES:
+        return "DATA_STALE"
+    if code in _INTEGRITY_CODES:
+        return "INTEGRITY"
+    if code in _POLICY_CODES:
+        return "POLICY"
+    if code in _TRANSIENT_CODES:
+        return "TRANSIENT"
+    if code in _UNKNOWN_STATE_CODES:
+        return "UNKNOWN_STATE"
+    return "PERMANENT"
+
 
 def _build_catalog() -> Mapping[str, ErrorDefinition]:
     """Build the immutable authoritative error catalog.
@@ -95,7 +161,7 @@ def _build_catalog() -> Mapping[str, ErrorDefinition]:
             code=code,
             domain="simulation",
             description=code.removeprefix("SIM_").replace("_", " ").capitalize(),
-            category=group,
+            category=_category_for(code),
             severity="critical" if group == "safe_fallback" else "error",
             retryable=False,
             operator_action="Review Simulation evidence and correct the request",

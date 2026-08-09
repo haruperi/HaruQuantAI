@@ -8,11 +8,15 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.utils import (
+    build_event_envelope,
     create_audit_event,
     create_auth_context,
+    find_sequence_gap,
     generate_id,
     get_audit_event_type,
     get_auth_context_type,
+    is_duplicate_event,
+    parse_event_envelope,
     redact_mapping_value,
 )
 from pydantic import ValidationError as PydanticValidationError
@@ -138,6 +142,20 @@ def main() -> None:
 
     # Stage 3: Immutable AuthContext output construction
     fr_utils_001_auth_context()
+
+    envelope = build_event_envelope(
+        event_id="evt-demo",
+        source_id="usage",
+        source_sequence=1,
+        correlation_id="cor-demo",
+        causation_id=None,
+        deduplication_key="dedupe-demo",
+        emitted_at=datetime(2026, 1, 1, tzinfo=UTC),
+        payload={"status": "accepted"},
+    )
+    parsed = parse_event_envelope(envelope)
+    assert not is_duplicate_event(parsed, set())
+    assert find_sequence_gap(parsed, expected_sequence=1) is None
 
 
 if __name__ == "__main__":

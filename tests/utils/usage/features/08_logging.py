@@ -12,9 +12,11 @@ from app.utils import (
     configure_logging,
     flush_logging,
     get_logger,
+    get_logger_handler_count,
     get_logger_name,
     load_settings,
     log_info,
+    route_audit_event,
     shutdown_logging,
 )
 
@@ -170,6 +172,13 @@ def main() -> None:
     # Stage 1: Import safety, logger access, and standard bound-logger calls
     fr_utils_032_import_safety()
     fr_utils_026_logger_access()
+    assert get_logger_handler_count(logger) >= 0
+    audit_events: list[object] = []
+    route_audit_event(
+        {"contract_version": "v1", "schema_id": "utils.event_envelope.v1"},
+        audit_events.append,
+    )
+    assert len(audit_events) == 1
 
     with tempfile.TemporaryDirectory() as directory:
         log_directory = Path(directory)

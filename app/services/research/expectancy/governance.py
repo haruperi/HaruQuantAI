@@ -11,6 +11,7 @@ never returns an inferred approval (settled decision D-4 / change-control 3).
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from decimal import Decimal
 from typing import Any, Literal, cast
 
 from app.services.research.contracts.errors import (
@@ -366,7 +367,7 @@ def get_min_reward_risk_override(
     *,
     strategy_ref: str,
     now_utc: datetime,
-) -> float | None:
+) -> Decimal | None:
     """Return the Risk min-R/R override for an eligible approved profile.
 
     Implements Risk's ``ExpectancyProvider = Callable[[str], Decimal | None]``
@@ -391,7 +392,7 @@ def get_min_reward_risk_override(
         return None
     if profile["strategy_ref"] != strategy_ref:
         return None
-    return float(cast("Any", profile["min_reward_risk"]))
+    return Decimal(str(cast("Any", profile["min_reward_risk"])))
 
 
 __all__ = (

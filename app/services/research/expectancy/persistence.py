@@ -49,6 +49,9 @@ def _envelope_json(profile: Mapping[str, object]) -> str:
         "sample_from_utc": profile["sample_from_utc"],
         "sample_to_utc": profile["sample_to_utc"],
         "sample_size": profile["sample_size"],
+        "approved_at_utc": profile["approved_at_utc"],
+        "next_review_at_utc": profile["next_review_at_utc"],
+        "expires_at_utc": profile["expires_at_utc"],
     }
     return canonical_json(envelope)
 
@@ -205,9 +208,13 @@ def _row_to_profile(row: Mapping[str, Any]) -> dict[str, Any]:
             "max_drawdown_r": envelope["max_drawdown_r"],
             "min_reward_risk": envelope["min_reward_risk"],
             "governance_state": row["governance_state"],
-            "approved_at_utc": None,
-            "next_review_at_utc": None,
-            "expires_at_utc": None,
+            "approved_at_utc": (
+                row["updated_at"]
+                if row["governance_state"] == "approved"
+                else envelope["approved_at_utc"]
+            ),
+            "next_review_at_utc": envelope["next_review_at_utc"],
+            "expires_at_utc": envelope["expires_at_utc"],
             "superseded_by": row["superseded_by"] or None,
             "evidence_ref": row["evidence_ref"],
             "canonical_hash": row["canonical_hash"],
@@ -219,6 +226,7 @@ def _row_to_profile(row: Mapping[str, Any]) -> dict[str, Any]:
 def apply_expectancy_transition(
     *,
     profile_id: str,
+    source_state: str,
     governance_state: str,
     reviewer: str,
     decision: str,
@@ -230,6 +238,7 @@ def apply_expectancy_transition(
 
     Args:
         profile_id: Stable surrogate governance identity.
+        source_state: Expected current lifecycle state.
         governance_state: Target lifecycle state.
         reviewer: Reviewer principal recording the transition.
         decision: Recorded governance decision label.
@@ -246,6 +255,7 @@ def apply_expectancy_transition(
     logger.info("Applying expectancy transition %s -> %s", profile_id, governance_state)
     return update_expectancy_governance(
         profile_id=profile_id,
+        source_state=source_state,
         governance_state=governance_state,
         reviewer=reviewer,
         decision=decision,

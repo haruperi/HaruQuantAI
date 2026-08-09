@@ -198,4 +198,70 @@ def create_expectancy_profile(
     }
 
 
-__all__ = ("create_artifact_metadata", "create_expectancy_profile")
+def create_governed_evidence(
+    *,
+    table: str,
+    identity_column: str,
+    identity: str,
+    evidence_json: str,
+    canonical_hash: str,
+    request_id: str,
+) -> Mapping[str, object]:
+    """Append one immutable Research evidence record.
+
+    Args:
+        table: Approved Research evidence table.
+        identity_column: Approved identity column.
+        identity: Profile or scenario identity.
+        evidence_json: Canonical evidence JSON.
+        canonical_hash: Canonical evidence digest.
+        request_id: Request trace identifier.
+
+    Returns:
+        Detached persistence acknowledgement.
+
+    Raises:
+        ValidationError: If the target is unsupported or persistence fails.
+    """
+    targets = {
+        ("research_performance_drift_evidence", "profile_id"),
+        ("research_stress_scenario_evidence", "scenario_id"),
+    }
+    if (table, identity_column) not in targets:
+        raise ValidationError("RES_PERSISTENCE_FAILED", "EVIDENCE_TARGET_INVALID")
+    migration = run_domain_migrations(
+        cast("Any", build_research_migration_request(request_id))
+    )
+    if migration.status != "success" or migration.data is None:
+        raise ValidationError("RES_PERSISTENCE_FAILED", "MIGRATION_FAILED")
+    statement = (
+        f"INSERT INTO {table} "  # noqa: S608 - table is closed above.
+        f"({identity_column}, evidence_json, canonical_hash, request_id) "
+        "VALUES (?, ?, ?, ?)"
+    )
+    response = execute_transaction(
+        build_transaction_request(
+            plan=build_statement_plan(
+                statements=(statement,),
+                parameter_sets=((identity, evidence_json, canonical_hash, request_id),),
+                max_rows=1,
+            ),
+            request_id=request_id,
+        )
+    )
+    if response.status != "success" or response.data is None:
+        raise ValidationError("RES_PERSISTENCE_FAILED", "EVIDENCE_WRITE_FAILED")
+    if cast("Any", response.data).affected_rows != 1:
+        raise ValidationError("RES_PERSISTENCE_FAILED", "EVIDENCE_CONFLICT")
+    return {
+        identity_column: identity,
+        "canonical_hash": canonical_hash,
+        "request_id": request_id,
+    }
+
+
+__all__ = (
+    "create_artifact_metadata",
+    "create_expectancy_profile",
+    "create_governed_evidence",
+)

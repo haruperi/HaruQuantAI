@@ -1,10 +1,8 @@
 # Research
 
 > **Package:** `app/services/research`
-> **Status:** `Partial` — 16 features are registered: `FEAT-RES-01`..`13` are `Completed`, while `FEAT-RES-14`..`16` are `Partial`. The final three features still lack complete provider wiring, persistence, requirement evidence, or standalone usage programs as recorded in the registry. The thirteen completed features, including
-> `FEAT-RES-13` fundamental and sentiment source evidence, are implemented and
-> verified.
-> **Last updated:** `2026-07-30`
+> **Status:** `Completed` — all 16 registered features are implemented, package-root exported, documented, and verified by standalone usage plus targeted unit/integration evidence.
+> **Last updated:** `2026-08-09`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -234,9 +232,9 @@ remain external.
 | Completed | `FEAT-RES-11` Scorecards, Snapshots, and Edge Lab Profiles | `profiles/` | Implemented declarations: Section 4.11 | `FR-RES-089`–`096` | `tests/research/usage/features/11_profiles.py` |
 | Completed | `FEAT-RES-12` Safe Research Artifact Persistence | `artifacts/` | Implemented declarations: Section 4.12 | Section 4.12 functional requirements | `tests/research/usage/features/12_artifacts.py` |
 | Completed | `FEAT-RES-13` Fundamental and Sentiment Source Evidence | `intelligence/` | `assess_intelligence_applicability`, `build_fundamental_source_evidence`, `build_sentiment_source_evidence`, `project_intelligence_evidence`; internal evidence values remain opaque | `FR-RES-099`–`104` | `tests/research/usage/features/13_intelligence.py` |
-| Partial | `FEAT-RES-14` Approved Expectancy Profile and Governance | `expectancy/` | Contract construction, parsing, governance transitions, eligibility, loading, and persistence operations are implemented; provider wiring, complete requirement evidence, and the standalone usage program remain incomplete | `FR-RES-107`..`FR-RES-111` Partial | `tests/research/usage/features/14_expectancy.py` *(missing)* |
-| Partial | `FEAT-RES-15` Performance Drift Evidence | `drift/` | Evidence construction, parsing, drift monitoring, and suspension proposals are implemented; durable drift records and the standalone usage program remain incomplete | `FR-RES-112`..`FR-RES-114` Partial | `tests/research/usage/features/15_drift.py` *(missing)* |
-| Partial | `FEAT-RES-16` Stress-Scenario Evidence | `stress_evidence/` | Contract construction and parsing are implemented; derivation, persistence, provider wiring, scenario-evidence packaging, and the standalone usage program remain incomplete | `FR-RES-115`..`FR-RES-120` Partial/Missing | `tests/research/usage/features/16_stress_evidence.py` *(missing)* |
+| Completed | `FEAT-RES-14` Approved Expectancy Profile and Governance | `expectancy/` | Versioned profile contract, lifecycle state machine, exact eligibility, atomic projection/history persistence, and injected Strategy/Risk adapters | `FR-RES-107`..`FR-RES-111` | `tests/research/usage/features/14_expectancy.py` |
+| Completed | `FEAT-RES-15` Performance Drift Evidence | `drift/` | Drift contract, threshold monitoring, advisory suspension, and immutable persistence/retrieval | `FR-RES-112`..`FR-RES-114` | `tests/research/usage/features/15_drift.py` |
+| Completed | `FEAT-RES-16` Stress-Scenario Evidence | `stress_evidence/` | Historical/reasoned shock derivation, unit/basis validation, immutable persistence, and injected Optimization calibration adapter | `FR-RES-115`..`FR-RES-120` | `tests/research/usage/features/16_stress_evidence.py` |
 
 ```text
 research/
@@ -741,7 +739,7 @@ sequenceDiagram
 
 ## 4. Module and Requirement Specifications
 
-This section is the implementation plan. Statuses reflect V1 audit evidence, not intention. `Partial` means reusable V1 behavior exists but the final structure/contracts/tests are not complete.
+This section records the implemented contracts, requirements, and current verification evidence for all completed Research features.
 
 ### Owner-resolved implementation policy
 
@@ -754,7 +752,18 @@ details:
 | `ConfigurationError` | `RES_CONFIGURATION_INVALID`, `RES_STAGE_DEPENDENCY_INVALID`, `RES_STAGE_UNAVAILABLE` |
 | `ValidationError` | `RES_INPUT_INVALID`, `RES_INSUFFICIENT_DATA`, `RES_NONFINITE_DATA`, `RES_RESOURCE_LIMIT_EXCEEDED`, `RES_VERSION_INCOMPATIBLE`, `RES_MODEL_FIT_FAILED` |
 | `SecurityError` | `RES_PERMISSION_DENIED`, `RES_LEAKAGE_DETECTED`, `RES_ARTIFACT_PATH_REJECTED`, `RES_SENSITIVE_OUTPUT_REJECTED` |
-| `ResearchError` | `RES_ARTIFACT_CONFLICT`, `RES_ARTIFACT_TOO_LARGE`, `RES_ARTIFACT_ATOMICITY_UNAVAILABLE`, `RES_ARTIFACT_WRITE_FAILED`, `RES_AUDIT_PERSISTENCE_FAILED` |
+| `ResearchError` | `RES_ARTIFACT_CONFLICT`, `RES_ARTIFACT_TOO_LARGE`, `RES_ARTIFACT_ATOMICITY_UNAVAILABLE`, `RES_ARTIFACT_WRITE_FAILED`, `RES_AUDIT_PERSISTENCE_FAILED`, `RES_PERSISTENCE_FAILED`, `RES_GOVERNANCE_TRANSITION_INVALID`, `RES_EXPECTANCY_NOT_ELIGIBLE`, `RES_DRIFT_INSUFFICIENT_EVIDENCE`, `RES_STRESS_SCENARIO_INVALID` |
+
+Every catalogue entry uses the Utils-approved closed category taxonomy:
+
+| Category | Research codes |
+|---|---|
+| `TRANSIENT` | `RES_ARTIFACT_WRITE_FAILED`, `RES_AUDIT_PERSISTENCE_FAILED` |
+| `PERMANENT` | `RES_CONFIGURATION_INVALID`, `RES_STAGE_DEPENDENCY_INVALID`, `RES_STAGE_UNAVAILABLE`, `RES_INPUT_INVALID`, `RES_VERSION_INCOMPATIBLE`, `RES_MODEL_FIT_FAILED`, `RES_ARTIFACT_CONFLICT`, `RES_ARTIFACT_ATOMICITY_UNAVAILABLE` |
+| `INTEGRITY` | `RES_NONFINITE_DATA`, `RES_LEAKAGE_DETECTED`, `RES_STRESS_SCENARIO_INVALID` |
+| `POLICY` | `RES_RESOURCE_LIMIT_EXCEEDED`, `RES_PERMISSION_DENIED`, `RES_ARTIFACT_PATH_REJECTED`, `RES_SENSITIVE_OUTPUT_REJECTED`, `RES_ARTIFACT_TOO_LARGE`, `RES_GOVERNANCE_TRANSITION_INVALID`, `RES_EXPECTANCY_NOT_ELIGIBLE` |
+| `DATA_STALE` | `RES_INSUFFICIENT_DATA`, `RES_DRIFT_INSUFFICIENT_EVIDENCE` |
+| `UNKNOWN_STATE` | `RES_PERSISTENCE_FAILED`; this outcome is non-retryable until the approved persistence target is reconciled |
 
 Exact hard bounds are 500,000 rows, 600 seconds per heavy operation, 50 MiB per
 serialized artifact, 1–10,000 resampling/null iterations, 1–128 calibration
@@ -1394,11 +1403,63 @@ Transcript evidence currently establishes official document existence and scope;
 sentiment remains deterministic title analysis and does not claim transcript-body
 language coverage.
 
+### 4.14 `expectancy/` â€” Approved Expectancy Profile and Governance
+
+**Status:** `Completed`
+
+| Status | Requirement ID | Responsibility | Public operations | Evidence |
+|---|---|---|---|---|
+| Completed | `FR-RES-107` | Build and parse a canonical-hash-verified approved expectancy profile. | `build_expectancy_profile`, `build_approved_expectancy_profile`, `parse_approved_expectancy_profile` | `tests/research/unit/test_expectancy.py`; `tests/research/usage/features/14_expectancy.py` |
+| Completed | `FR-RES-108` | Enforce the declared governance state machine without inferred approval. | `transition_expectancy_governance`, `is_governance_transition_permitted` | `tests/research/unit/test_expectancy.py` |
+| Completed | `FR-RES-109` | Return eligibility only for exact strategy, instrument, regime, session, version, and active-lifecycle matches. | `evaluate_expectancy_eligibility`, `get_min_reward_risk_override` | `tests/research/unit/test_expectancy.py` |
+| Completed | `FR-RES-110` | Persist the current projection and every guarded transition atomically; transition history is append-only. | `persist_expectancy_profile`, `apply_expectancy_transition`, `load_expectancy_profile`, `load_eligible_expectancy_profile` | `tests/research/integration/test_expectancy_persistence.py` |
+| Completed | `FR-RES-111` | Supply injected adapters matching Strategy's exact-version reference and Risk's `Decimal` override ports. | `build_strategy_expectancy_provider`, `build_risk_expectancy_provider` | `tests/research/integration/test_expectancy_consumers.py` |
+
+### 4.15 `drift/` â€” Performance Drift Evidence
+
+**Status:** `Completed`
+
+| Status | Requirement ID | Responsibility | Public operations | Evidence |
+|---|---|---|---|---|
+| Completed | `FR-RES-112` | Build canonical-hash-verified drift evidence against an approved expectancy envelope. | `build_performance_drift_evidence`, `parse_performance_drift_evidence`, `monitor_performance_drift` | `tests/research/unit/test_drift.py` |
+| Completed | `FR-RES-113` | Produce an advisory suspension proposal when declared thresholds are breached; never mutate governance state. | `propose_drift_suspension` | `tests/research/unit/test_drift.py` |
+| Completed | `FR-RES-114` | Append and retrieve immutable drift evidence through Data's transaction authority. | `persist_performance_drift_evidence`, `load_latest_performance_drift_evidence` | `tests/research/integration/test_drift_persistence.py`; `tests/research/usage/features/15_drift.py` |
+
+### 4.16 `stress_evidence/` â€” Stress-Scenario Evidence
+
+**Status:** `Completed`
+
+| Status | Requirement ID | Responsibility | Public operations | Evidence |
+|---|---|---|---|---|
+| Completed | `FR-RES-115` | Build and parse canonical stress-scenario evidence over the closed shock taxonomy. | `build_stress_scenario_evidence`, `parse_stress_scenario_evidence` | `tests/research/unit/test_stress.py` |
+| Completed | `FR-RES-116` | Derive bounded shock magnitudes from cited historical observations. | `derive_historical_stress_shock` | `tests/research/unit/test_stress.py` |
+| Completed | `FR-RES-117` | Represent reasoned shocks with explicit magnitude, unit, rationale, and durable assumption reference. | `build_reasoned_stress_shock` | `tests/research/unit/test_stress.py` |
+| Completed | `FR-RES-118` | Reject unsupported units, non-finite magnitudes, empty rationale, or absent/fabricated basis evidence. | `validate_shock_basis` and contract validation | `tests/research/unit/test_stress.py` |
+| Completed | `FR-RES-119` | Append and retrieve immutable stress evidence through Data's transaction authority. | `persist_stress_scenario_evidence`, `load_latest_stress_scenario_evidence` | `tests/research/integration/test_stress_persistence.py` |
+| Completed | `FR-RES-120` | Supply an injected Optimization-compatible stress calibration provider. | `build_stress_calibration_provider` | `tests/research/integration/test_stress_provider.py`; `tests/research/usage/features/16_stress_evidence.py` |
+
 ## 5. Package-Wide Requirements and Shared Configuration
 
 ### Persistence - Database
 
 This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `research_`.
+
+The applied manifest currently includes `001_research_artifacts_v1`,
+`002_research_expectancy_profiles_v1`, and additive
+`003_research_governed_evidence_v1`. The live governed-evidence model is:
+
+| Table | Identity | Responsibility |
+|---|---|---|
+| `research_artifacts` | `relative_path` | Traceable file-manifest projection for safe Research artifacts. |
+| `research_expectancy_profiles` | `profile_id` | Current expectancy profile and governance projection; `exact_version` is unique. |
+| `research_expectancy_transitions` | `transition_id` | Append-only source/target governance transition history with reviewer, decision, reason, request, and supersession evidence. |
+| `research_performance_drift_evidence` | `evidence_id` | Immutable canonical drift envelopes, unique by `canonical_hash`. |
+| `research_stress_scenario_evidence` | (`scenario_id`, `canonical_hash`) | Immutable cited stress-scenario envelopes. |
+
+All JSON columns are guarded by `json_valid`, all live tables are `STRICT`, and
+execution remains delegated to Data's migration, locking, checksum, and
+transaction boundaries. Migration definitions are the executable live schema;
+the broader target tables below remain a target model and authorize no migration.
 
 #### `research_studies`
 
@@ -1623,7 +1684,7 @@ The error taxonomy, dependency boundaries, statistical policy,
 market-structure score, scorecard readiness, resource ceilings, artifact migration,
 and persistence policy are resolved in the owner-resolved implementation policy. The following are unresolved owner choices raised by the approved capability audit; they are recorded here, not resolved by this documentation task.
 
-- **OD-RES-01 — `research_artifacts` surrogate key for expectancy governance.** `research_artifacts` is keyed by a filesystem relative path (`FR-RES-025`), a brittle business key for approved-expectancy governance. The approved expectancy profile (`FEAT-RES-14`) needs a stable surrogate identity rather than a path string. Its field-level schema and migration path remain unresolved.
+
 
 
 

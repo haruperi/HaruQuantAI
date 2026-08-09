@@ -1,6 +1,7 @@
 """Public shared-error exports."""
 
 from app.utils.errors.catalog import get_common_error_catalog
+from app.utils.errors.factories import create_validation_error
 from app.utils.errors.health import build_health_state, parse_health_state
 from app.utils.errors.mapping import map_exception
 from app.utils.errors.metadata import get_error_metadata, normalize_error_code
@@ -12,6 +13,7 @@ from app.utils.errors.validation import (
 
 __all__ = [
     "build_health_state",
+    "create_validation_error",
     "get_common_error_catalog",
     "get_error_metadata",
     "map_exception",

@@ -12,6 +12,7 @@ from app.utils.contracts import (
 )
 from app.utils.errors import (
     build_health_state,
+    create_validation_error,
     get_common_error_catalog,
     get_error_metadata,
     map_exception,
@@ -136,6 +137,7 @@ __all__ = (
     "configure_logging",
     "create_audit_event",
     "create_auth_context",
+    "create_validation_error",
     "derive_idempotency_key",
     "derive_random_stream",
     "derive_stable_id",

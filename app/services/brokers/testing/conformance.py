@@ -18,7 +18,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Protocol, cast
 
-from app.utils.serialization import canonical_digest
+from app.utils import canonical_digest
 
 if TYPE_CHECKING:
     from app.services.brokers.contracts.protocols import BrokerAdapter
