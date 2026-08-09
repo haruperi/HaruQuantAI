@@ -68,7 +68,7 @@ def _align_datasets_raw(
             on any missing target, preserving prior behavior. ``skip``
             declares the gap explicitly by omitting that target from the
             aligned output instead of raising; it never fills the gap with
-            a forward-carried or invented value (`TC-IMP-DATA-10`).
+            a forward-carried or invented value (`feature`).
 
     Returns:
         Map of dataset keys to backward-aligned MarketDatasets.
@@ -234,7 +234,7 @@ def align_datasets(
         missing_policy: ``reject`` (default) fails the whole batch atomically
             on any missing target. ``skip`` declares the gap explicitly by
             omitting that target instead — never a forward-carried or
-            invented value (`TC-IMP-DATA-10`).
+            invented value (`feature`).
 
     Returns:
         Standard response carrying a map of dataset keys to backward-aligned

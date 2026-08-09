@@ -1498,21 +1498,21 @@ values. Deep imports from Strategy feature packages are not supported.
 
 | Status | Requirement | Responsibility | Evidence |
 | --- | --- | --- | --- |
-| Completed | `FR-STR-054` | Build strict JSON-safe `OperatingEnvelope v1`. | `app/services/strategy/operating_envelope/models.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-054` | Build strict JSON-safe `OperatingEnvelope v1`. | `app/services/strategy/operating_envelope/models.py`; `tests/strategy/unit/test_operational_contracts.py` |
 | Completed | `FR-STR-055` | Parse and reject incompatible operating-envelope mappings. | `app/services/strategy/operating_envelope/models.py`; `tests/strategy/usage/features/12_operating_envelope.py` |
-| Completed | `FR-STR-056` | Return `PERMITTED` only when all required point-in-time evidence satisfies the envelope; missing evidence is `RESTRICTED`. | `app/services/strategy/operating_envelope/evaluation.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-056` | Return `PERMITTED` only when all required point-in-time evidence satisfies the envelope; missing evidence is `RESTRICTED`. | `app/services/strategy/operating_envelope/evaluation.py`; `tests/strategy/unit/test_operational_contracts.py` |
 | Completed | `FR-STR-057` | Build strict JSON-safe `ExitPlan v1`. | `app/services/strategy/exit_plans/models.py`; `tests/strategy/usage/features/13_exit_plans.py` |
-| Completed | `FR-STR-058` | Validate protection, partial-exit, trailing, time-stop, and invalidation relationships. | `app/services/strategy/exit_plans/models.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-058` | Validate protection, partial-exit, trailing, time-stop, and invalidation relationships. | `app/services/strategy/exit_plans/models.py`; `tests/strategy/unit/test_operational_contracts.py` |
 | Completed | `FR-STR-059` | Build a non-executable exit-plan handoff subordinate to Risk/Trading interlocks and sim-only routing. | `app/services/strategy/exit_plans/handoff.py`; `tests/strategy/usage/features/13_exit_plans.py` |
 | Completed | `FR-STR-060` | Build player-authored plans through the canonical `TradePlan v1` builder. | `app/services/strategy/manual_plans/builder.py`; `tests/strategy/usage/features/14_manual_plans.py` |
-| Completed | `FR-STR-061` | Validate manual and deterministic plans through the same immutable contract. | `app/services/strategy/manual_plans/validation.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-061` | Validate manual and deterministic plans through the same immutable contract. | `app/services/strategy/manual_plans/validation.py`; `tests/strategy/unit/test_operational_contracts.py` |
 | Completed | `FR-STR-062` | Preserve player identity as lineage only, never authority. | `app/services/strategy/manual_plans/validation.py`; `tests/strategy/usage/features/14_manual_plans.py` |
-| Completed | `FR-STR-063`–`FR-STR-065` | Build/parse `StrategyProfile v1` and enforce closed automation permissions. | `app/services/strategy/contracts/profile.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-063`–`FR-STR-065` | Build/parse `StrategyProfile v1` and enforce closed automation permissions. | `app/services/strategy/contracts/profile.py`; `tests/strategy/unit/test_operational_contracts.py` |
 | Completed | `FR-STR-066`–`FR-STR-068` | Build/parse human-readable and machine-evaluable playbooks. | `app/services/strategy/contracts/playbook.py`; `tests/strategy/usage/features/12_operating_envelope.py` |
-| Completed | `FR-STR-069`–`FR-STR-071` | Build/parse `SetupEvaluation v1` with explicit source snapshots and fail-closed outcomes. | `app/services/strategy/contracts/playbook.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
-| Completed | `FR-STR-072`–`FR-STR-075` | Build/parse distinct `TradePlan v1`, enforce lifecycle transitions, sim-only intent eligibility, and versioned amendments. | `app/services/strategy/intents/`; `tests/strategy/unit/test_cockpit_contracts.py` |
-| Completed | `FR-STR-076`–`FR-STR-077` | Hold a version-exact expectancy reference; absent, failed, or mismatched Research provider returns `NOT_ELIGIBLE`. | `app/services/strategy/contracts/expectancy.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
-| Completed | `FR-STR-078`–`FR-STR-079` | Validate automation modes subordinate to Risk/Trading interlocks and sim-only routing. | `app/services/strategy/proposal_intake/automation.py`; `tests/strategy/unit/test_cockpit_contracts.py` |
+| Completed | `FR-STR-069`–`FR-STR-071` | Build/parse `SetupEvaluation v1` with explicit source snapshots and fail-closed outcomes. | `app/services/strategy/contracts/playbook.py`; `tests/strategy/unit/test_operational_contracts.py` |
+| Completed | `FR-STR-072`–`FR-STR-075` | Build/parse distinct `TradePlan v1`, enforce lifecycle transitions, sim-only intent eligibility, and versioned amendments. | `app/services/strategy/intents/`; `tests/strategy/unit/test_operational_contracts.py` |
+| Completed | `FR-STR-076`–`FR-STR-077` | Hold a version-exact expectancy reference; absent, failed, or mismatched Research provider returns `NOT_ELIGIBLE`. | `app/services/strategy/contracts/expectancy.py`; `tests/strategy/unit/test_operational_contracts.py` |
+| Completed | `FR-STR-078`–`FR-STR-079` | Validate automation modes subordinate to Risk/Trading interlocks and sim-only routing. | `app/services/strategy/proposal_intake/automation.py`; `tests/strategy/unit/test_operational_contracts.py` |
 | Completed | `FR-STR-080`–`FR-STR-082` | Validate lifecycle transitions and produce append-only mutation evidence without changing historical version identity. | `app/services/strategy/registry/lifecycle.py`; `tests/strategy/usage/features/12_operating_envelope.py` |
 
 ### Initial limitations and deferrals
@@ -1525,7 +1525,7 @@ values. Deep imports from Strategy feature packages are not supported.
 - Strategy does not calculate indicators, cost models, fills, risk decisions, portfolio allocations, analytics, or optimization artifacts.
 - CPU, memory, symbol-count, and concurrency resource budgets are deferred. The initial manifest enforces batch-record, diagnostic-byte, checkpoint-byte, local-state-byte, and decision-timeout budgets only.
 - Data-latency tolerance (`max_data_latency_tolerance`) and maximum tolerable state loss (`max_tolerable_state_loss`) are deferred; freshness is enforced by the fixed decision clock and point-in-time availability checks instead.
-- UI/API and frontend cockpit exposure is explicitly deferred to the UI-API domain's Phase 14 integration. Strategy publishes function-only JSON-safe read contracts and does not own routes, read models, or panels.
+- UI/API and frontend workstation exposure is owned by the UI/API domain. Strategy publishes function-only JSON-safe read contracts and does not own routes, read models, or panels.
 
 ---
 
@@ -1609,7 +1609,7 @@ dataset provenance and does not rewrite historical record availability.
 - [X] `FEAT-STR-12` operating-envelope construction and fail-closed evaluation are complete. `app/services/strategy/operating_envelope/models.py:54`
 - [X] `FEAT-STR-13` exit-plan construction and non-executable handoff are complete. `app/services/strategy/exit_plans/models.py:53`
 - [X] `FEAT-STR-14` manual plans use the canonical TradePlan validation path. `app/services/strategy/manual_plans/builder.py:15`
-- [X] `TradePlan v1`, expectancy fallback, automation policy, and lifecycle governance are sim-only and fail closed. `tests/strategy/unit/test_cockpit_contracts.py:93`
+- [X] `TradePlan v1`, expectancy fallback, automation policy, and lifecycle governance are sim-only and fail closed. `tests/strategy/unit/test_operational_contracts.py:93`
 - [X] `FEAT-STR-11` and `FR-STR-049` through `FR-STR-053` have direct genuine-MT5 proposal-intake evidence. `tests/strategy/usage/features/11_proposal_intake.py:75`
 - [X] Every registered workflow has executable evidence and passing integration or parity coverage. `tests/strategy/unit/test_workflow_usage_parity.py:39`
 - [X] `WF-STR-011` and `WF-STR-012` execute without importing or modifying Optimization, Simulator, Analytics, or Research. `tests/strategy/usage/workflows/run_all.py:13`

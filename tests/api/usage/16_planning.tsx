@@ -1,0 +1,1 @@
+import React from "react"; import { renderToStaticMarkup } from "react-dom/server"; import { PlanningPanels } from "../../../app/ui/src/features/planning"; function main(): void { console.log(renderToStaticMarkup(<PlanningPanels mode="planning" warnings={[]}/>)); } main();

@@ -115,7 +115,7 @@ def test_upsert_inserts_and_returns_count(monkeypatch, tmp_path: Path) -> None:
 def test_upsert_exposes_first_seen_at_for_replay_visibility(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    """`first_seen_at` survives the upsert/query round-trip (`TC-IMP-DATA-04`)."""
+    """`first_seen_at` survives the upsert/query round-trip (`feature`)."""
     _configure_db(monkeypatch, tmp_path)
     _apply_migrations(generate_id("req"))
     store = EconomicEventStore()

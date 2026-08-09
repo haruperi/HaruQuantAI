@@ -161,7 +161,7 @@ def build_route_plan(
     surface ``route_state`` of ``UNAVAILABLE`` or ``FAILOVER_REQUIRED`` and a
     ``selected_route`` of ``None`` when no backup is ready; it may never report
     a ready primary that contradicts the supplied readiness verdict. The
-    ``write_failover_policy`` defaults to ``RECOVERY_ONLY`` for cockpit routes:
+    ``write_failover_policy`` defaults to ``RECOVERY_ONLY`` for operational routes:
     a write is never silently rerouted to the backup broker.
 
     Args:

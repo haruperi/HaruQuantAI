@@ -1,12 +1,12 @@
 # ruff: noqa: DOC501, N812
 """BrokerAccountSnapshot v1 cross-domain contract transport.
 
-The Trading Cockpit Phase 0 reconciliation (``TC-IMP-BRK-04``) requires a
+The application Phase 0 reconciliation (``feature``) requires a
 normalized account snapshot carrying broker-reported balance, equity, margin,
 currency, permissions, and source timestamp. Open Decision ``OD-BRK-01`` records
 that the existing ``AccountStateSnapshot`` model lives in Data
 (``app/services/data/evidence/account_contracts.py``); the approved in-domain
-direction (see Brokers README ``### Trading Cockpit Phase 0 reconciliation``) is
+direction (see Brokers README ``### application Phase 0 reconciliation``) is
 to adopt a **distinct Brokers-owned name** rather than relocate the Data model.
 
 This module therefore defines ``BrokerAccountSnapshot v1`` as a fresh

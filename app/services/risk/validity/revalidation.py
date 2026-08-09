@@ -220,7 +220,7 @@ def requires_risk_recalculation(
     """Determine whether a triggering event requires Risk recalculation.
 
     Pure event/staleness classifier for continuous monitoring
-    (``TC-IMP-RISK-15``): Risk owns no event loop or poller. A caller-owned
+    (``feature``): Risk owns no event loop or poller. A caller-owned
     workflow invokes this after a market event, fill, cancellation, or
     position/valuation/policy change to decide whether an existing decision
     must be recalculated rather than reused via

@@ -416,7 +416,7 @@ class DatasetSaveRequest(_Contract):
 class StorageManifest(_Contract):
     """Immutable normalized artifact identity and integrity manifest.
 
-    `available_at` (Trading Cockpit Phase 0 `TC-IMP-DATA-07`) promotes the
+    `available_at` (application Phase 0 `feature`) promotes the
     source dataset's point-in-time availability to a first-class typed
     field so a consumer can reason about coverage/point-in-time status
     without parsing the free-form `provenance` mapping.

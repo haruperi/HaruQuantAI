@@ -1,6 +1,6 @@
-"""Ordered, deduplicated broker EventEnvelope normalization (``TC-IMP-BRK-11``).
+"""Ordered, deduplicated broker EventEnvelope normalization (``feature``).
 
-The Trading Cockpit Phase 0 reconciliation requires converting adapter
+The application Phase 0 reconciliation requires converting adapter
 callbacks and polls into ordered, deduplicated ``EventEnvelope`` records. The
 ``EventEnvelope`` contract (schema ``utils.event_envelope.v1``) is owned by
 Utils and consumed here through its public ``build_event_envelope``,

@@ -51,7 +51,7 @@ def test_canonical_app_has_exact_cors_and_route_catalog() -> None:
     assert "/api/v1/auth/login" in paths
     assert "/api/v1/auth/me" in paths
     assert "/api/v1/indicators" in paths
-    assert len(paths) == 71
+    assert len(paths) == 73
     assert "/api/v1/portfolio/{portfolio_id}/activate" in paths
     assert "/api/v1/portfolio/{portfolio_id}/rollback" in paths
     assert "/api/v1/portfolio/{portfolio_id}/drift" in paths
@@ -66,6 +66,8 @@ def test_canonical_app_has_exact_cors_and_route_catalog() -> None:
     assert "/api/v1/data/imports/dialects" in paths
     assert "/api/v1/strategies/{strategy_id}/parameters" in paths
     assert "/api/v1/operator/approvals" in paths
+    assert "/api/v1/workstation" in paths
+    assert "/api/v1/workstation/commands" in paths
     assert "/api/v1/operator/kill-switch" not in paths
     assert "/api/v1/backtest/run" not in paths
     assert all(path.startswith("/api/v1/") for path in paths)

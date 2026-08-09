@@ -2,6 +2,46 @@
 
 ## [Unreleased]
 
+### Complete Analytics, Portfolio, and operational workstation capabilities
+
+Analytics, Portfolio, and UI/API now complete the final fourteen registered features, bringing the consolidated 204-feature registry to full completion.
+
+#### Added (4)
+
+- Added immutable player journals, evidence-only behavioral and emergency-response analytics, and versioned qualification evaluation under `FEAT-ANLT-07` through `FEAT-ANLT-10` with additive Analytics migration `003_player_evidence_schema`.
+- Added Decimal valuation/P&L, margin and buying-power views, portfolio risk health, broker reconciliation, and balanced corporate-action/settlement postings under `FEAT-PORT-10` through `FEAT-PORT-12` with additive Portfolio migration `003_portfolio_operations_schema`.
+- Added the versioned operational workstation read model and optimistic command boundary under `FEAT-API-14`, including two authenticated HTTP operations and matching typed frontend transport.
+- Added accessible instrument, planning, workflow, emergency, alarm, training, replay, and qualification presentation capabilities under `FEAT-API-15` through `FEAT-API-20`.
+
+#### Changed (3)
+
+- Completed all 204 canonical `FEAT-*` registrations with no partial or missing features remaining.
+- Renumbered existing API frontend usage programs to `09` through `12`, reserving `14` through `20` for their owning feature evidence.
+- Replaced the retired programme terminology in package READMEs and evidence filenames with consolidated application feature terminology.
+
+#### Fixed (2)
+
+- Made stream reconnection conditional on retryable transport errors so terminal and validation failures return immediately.
+- Rendered the Indicators capability count, resolving the strict frontend unused-state type-check failure.
+
+### Complete Simulator mission and recovery capabilities
+
+Simulator now completes all fourteen registered features with deterministic mission training, scenario and realism providers, durable secured-session recovery, and simulated alert lifecycle evidence.
+
+#### Added (5)
+
+- Added `FEAT-SIM-10` actual-state-bound checklists, four simulation-only assistance modes, governed optional bypass, and Risk-owned safe-stand-down mission completion.
+- Added `FEAT-SIM-11` immutable mission definitions, deterministic trigger evaluation, emergency and abnormal templates, total injected-event priority, and Research/Optimization scenario providers.
+- Added `FEAT-SIM-12` causal latency, queue-position fills, Decimal slippage and market impact, venue race ordering, no-leakage player views, and Optimization fill calibration.
+- Added `FEAT-SIM-13` canonical replay identity, hash-linked secured-session checkpoints, verified restore, practice branching, scored anti-rewind, integrity failure, and explicit rearm under migration `003_simulator_secured_sessions_v1`.
+- Added `FEAT-SIM-14` immutable simulated alerts, latched lifecycle, root-cause grouping, perception timing, and emergency-control availability.
+
+#### Changed (3)
+
+- Completed all fourteen Simulator feature registrations and updated the consolidated registry totals to 190 Completed, 0 Partial, 14 Missing, and 204 total.
+- Activated the existing Optimization fill/scenario calibration and holdout consumer ports through Simulator-owned providers while retaining fail-closed provider absence.
+- Resolved Simulator replay-identity ownership in favor of Simulator and retained UI/API as the external operational-alert delivery owner.
+
 ### Complete Utils and Research evidence capabilities
 
 The sixteen formerly partial features are now fully implemented and evidenced,
@@ -155,7 +195,7 @@ Brokers now publishes the versioned cross-domain contract pairs and the health-a
 - Extended the capability matrix normative test and adapter mutation sets to cover the two new safe-order write capabilities.
 - Updated the Brokers package-root public API to 109 function-only exports carrying the new contract-transport and safe-order operations.
 
-### Add deterministic Indicators cockpit measurements
+### Add deterministic Indicators operational measurements
 
 Indicators now publishes fail-closed snapshot transports, closed-input guards,
 and causal market-speed, trend, structure, liquidity, order-flow, volatility,
@@ -168,11 +208,11 @@ and chart-pattern measurements while retaining Risk as regime-policy authority.
 
 #### Changed (1)
 
-- Extended existing mathematical feature owners with neutral cockpit measurements and remapped Indicators error categories to the current Utils catalogue contract without changing error codes.
+- Extended existing mathematical feature owners with neutral operational measurements and remapped Indicators error categories to the current Utils catalogue contract without changing error codes.
 
 ### Add Utils application foundation primitives
 
-Utils now provides versioned, fail-closed shared mappings and deterministic business-neutral primitives for later cockpit-domain integrations.
+Utils now provides versioned, fail-closed shared mappings and deterministic business-neutral primitives for later operational-domain integrations.
 
 #### Added (5)
 
@@ -184,7 +224,7 @@ Utils now provides versioned, fail-closed shared mappings and deterministic busi
 
 #### Changed (1)
 
-- Extended Utils with versioned references, time domains, event envelopes, health metadata, audit-sink routing, cockpit identifiers, and producer-side compatibility evidence while leaving consumer migrations to their owning domains.
+- Extended Utils with versioned references, time domains, event envelopes, health metadata, audit-sink routing, operational identifiers, and producer-side compatibility evidence while leaving consumer migrations to their owning domains.
 
 ### Extend Data real-time streaming with application event coverage
 

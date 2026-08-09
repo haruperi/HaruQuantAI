@@ -1,9 +1,9 @@
-"""Scenario-holdout anti-leakage consumer port (TC-IMP-OPT-08).
+"""Scenario-holdout anti-leakage consumer port.
 
 Extends ``FEAT-OPT-08``: anti-leakage controls for strict train/val/test splits,
 point-in-time data, and **scenario holdouts**. Optimization already owns rolling and
 anchored/expanding time-series splits with purge/embargo. Scenario holdouts are absent
-because Simulator scenarios are absent (``TC-IMP-SIM-11``). This module declares the
+through the `FEAT-SIM-11` provider. This module declares the
 narrow consumer port and a deterministic fail-closed fallback: a missing scenario
 provider yields ``SCENARIO_HOLDOUT_UNAVAILABLE``, which forces the walk-forward
 ``validation_needed`` path rather than an inferred clean holdout (rule 4).
@@ -26,7 +26,7 @@ SCENARIO_HOLDOUT_UNAVAILABLE = "SCENARIO_HOLDOUT_UNAVAILABLE"
 class ScenarioHoldoutPort(Protocol):
     """Narrow consumer port for Simulator-owned scenario holdout evidence.
 
-    The Simulator provider (``TC-IMP-SIM-11`` scenario engine) supplies the production
+    The Simulator provider (`FEAT-SIM-11`) supplies the production
     implementation that masks scenario identifiers in the validation set.
     """
 
@@ -82,7 +82,7 @@ def evaluate_scenario_holdout(
             "status": SCENARIO_HOLDOUT_UNAVAILABLE,
             "decision": "validation_needed",
             "reason": "scenario_engine_absent",
-            "deferred_to": "TC-IMP-SIM-11",
+            "provider_feature": "FEAT-SIM-11",
         }
         if observed_scenario_ids is not None:
             evidence["observed_scenario_count"] = len(observed_scenario_ids)

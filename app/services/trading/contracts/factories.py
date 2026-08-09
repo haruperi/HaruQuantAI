@@ -76,7 +76,7 @@ def build_order_intent(**values: object) -> dict[str, JsonValue]:
         Validated JSON-safe contract mapping.
 
     Raises:
-        ValueError: If required cockpit lineage is absent.
+        ValueError: If required operational lineage is absent.
         TypeError: If serialization does not produce a mapping.
     """
     intent = OrderIntent.model_validate(values)
@@ -88,7 +88,7 @@ def build_order_intent(**values: object) -> dict[str, JsonValue]:
         intent.profile_version,
     )
     if any(value is None for value in lineage):
-        raise ValueError("cockpit OrderIntent requires complete versioned lineage")
+        raise ValueError("operational OrderIntent requires complete versioned lineage")
     safe = to_json_safe(intent.model_dump(mode="json"))
     if not isinstance(safe, dict):
         raise TypeError("OrderIntent transport must be a mapping")

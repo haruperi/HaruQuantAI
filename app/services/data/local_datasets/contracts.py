@@ -34,7 +34,7 @@ class DatasetLoadRequest(TracedOpenContract):
 class ManifestCompatibility(TracedOpenContract):
     """Bounded schema/normalization compatibility verdict for one manifest.
 
-    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-07`): an explicit,
+    application Phase 0 reconciliation (`feature`): an explicit,
     deterministic compatibility check against a caller-declared expectation,
     never an inferred or default-true verdict.
     """

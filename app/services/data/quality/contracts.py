@@ -45,7 +45,7 @@ class QualityFlag(StrEnum):
     Values are the exact issue codes emitted by the detectors, so a flag can be
     compared against a raw ``QualityIssue.code`` without translation.
 
-    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-06`) targeted a
+    application Phase 0 reconciliation (`feature`) targeted a
     seven-concept data-integrity taxonomy: stale, gap, duplicate, crossed,
     out-of-order, clock-drift, and primary/backup disagreement. Rechecked
     (rule 9) against the current repository: `MISSING_BARS` (gap) and

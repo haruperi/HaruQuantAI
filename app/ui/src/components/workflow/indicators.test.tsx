@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 
 import { IndicatorWorkspace } from "./indicators";
+import { WorkspaceGrid } from "../layout/WorkspaceGrid";
+import { useTradingStore } from "../../store/useTradingStore";
 
 function successEnvelope(data: unknown, route: string, operation: string): Response {
   return new Response(
@@ -104,9 +106,6 @@ describe("IndicatorWorkspace", () => {
   });
 
   it("is reachable through WorkspaceGrid when rendering a widget of type indicators", async () => {
-    const { WorkspaceGrid } = await import("../layout/WorkspaceGrid");
-    const { useTradingStore } = await import("../../store/useTradingStore");
-
     // Set initial workspace with an indicators widget
     useTradingStore.setState({
       activeWorkspaceId: 1,

@@ -1,4 +1,4 @@
-"""Unit tests for the data-integrity taxonomy detectors (TC-IMP-DATA-06)."""
+"""Unit tests for the data-integrity taxonomy detectors (feature)."""
 
 from __future__ import annotations
 

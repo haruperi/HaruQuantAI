@@ -1,4 +1,4 @@
-"""Tests for the OptimizationStudy v1 contract (TC-IMP-OPT-01)."""
+"""Tests for the OptimizationStudy v1 contract (feature)."""
 
 from decimal import Decimal
 

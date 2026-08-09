@@ -1,4 +1,4 @@
-"""Point-in-time evidence projection gate (TC-IMP-RES-09, EXTEND FEAT-RES-02/04).
+"""Point-in-time evidence projection gate (feature, EXTEND FEAT-RES-02/04).
 
 Exposes only the evidence available at the supplied simulation timestamp,
 refusing any record whose availability instant is after the decision time.

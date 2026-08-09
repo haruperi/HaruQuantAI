@@ -1,4 +1,4 @@
-"""Standalone Strategy cockpit contract and operating-envelope evidence."""
+"""Standalone Strategy operational contract and operating-envelope evidence."""
 
 import sys
 from datetime import UTC, datetime
@@ -301,7 +301,7 @@ def fr_str_082() -> None:
 
 
 def main() -> None:
-    """Run every operating-envelope and extended cockpit requirement."""
+    """Run every operating-envelope and extended operational requirement."""
     for number in (*range(54, 57), *range(63, 83)):
         globals()[f"fr_str_{number:03d}"]()
 

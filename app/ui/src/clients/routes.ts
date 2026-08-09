@@ -715,6 +715,11 @@ export const indicatorsRoutes = {
  *
  * The count is exported for the drift test so a structural mismatch fails CI.
  */
+export const workstationRoutes = {
+  read: route({ id: "api.workstation.read", method: "GET", path: "/api/v1/workstation", permission: "workstation:read" }),
+  command: route({ id: "api.workstation.command", method: "POST", path: "/api/v1/workstation/commands", permission: "workstation:command", sideEffect: "governed_write", governed: true, idempotencyRequired: true }),
+} as const;
+
 export const ROUTE_CONTRACTS = [
   authRoutes.register,
   authRoutes.login,
@@ -792,10 +797,12 @@ export const ROUTE_CONTRACTS = [
   agenticRoutes.approveHandoff,
   agenticRoutes.quarantine,
   agenticRoutes.disable,
+  workstationRoutes.read,
+  workstationRoutes.command,
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 76;
+export const ROUTE_CONTRACT_COUNT = 78;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

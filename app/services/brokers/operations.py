@@ -1551,7 +1551,7 @@ async def replace_broker_order(
     return await adapter.replace_order(request)
 
 
-# --- Trading Cockpit Phase 0 contract transport and safe-order extensions ---
+# --- application Phase 0 contract transport and safe-order extensions ---
 
 
 def build_broker_order_protection_request(
@@ -1562,7 +1562,7 @@ def build_broker_order_protection_request(
     trailing_distance: Decimal | float | str | None = None,
     client_request_id: str | None = None,
 ) -> BrokerOrderProtectionRequest:
-    """Build a BrokerOrderProtectionRequest instance (``TC-IMP-BRK-06``).
+    """Build a BrokerOrderProtectionRequest instance (``feature``).
 
     Args:
         order_id: Target order identifier.
@@ -1594,7 +1594,7 @@ def build_broker_position_reduce_request(
     idempotency_key: str,
     client_request_id: str | None = None,
 ) -> BrokerPositionReductionRequest:
-    """Build a BrokerPositionReductionRequest instance (``TC-IMP-BRK-06``).
+    """Build a BrokerPositionReductionRequest instance (``feature``).
 
     Args:
         position_id: Target position identifier.
@@ -1669,7 +1669,7 @@ def get_broker_resubmission_policy(value: str) -> BrokerResubmissionPolicy:
     return BrokerResubmissionPolicy(value)
 
 
-# --- Trading Cockpit Phase 0 contract-transport aliases (FEAT-BRK-16) ---
+# --- application Phase 0 contract-transport aliases (FEAT-BRK-16) ---
 #
 # The route-discipline feature owns the canonical ``build_route_plan``/
 # ``parse_route_plan`` and ``build_failover_decision``/``parse_failover_decision``
@@ -1692,7 +1692,7 @@ def build_broker_route_plan(
     write_failover_policy: str,
     created_at: datetime,
 ) -> dict[str, object]:
-    """Build and hash a redacted RoutePlan v1 mapping (``TC-IMP-BRK-09``).
+    """Build and hash a redacted RoutePlan v1 mapping (``feature``).
 
     Args:
         plan_id: Caller-owned plan identifier.
@@ -1728,7 +1728,7 @@ def build_broker_route_plan(
 
 
 def parse_broker_route_plan(value: Mapping[str, object]) -> dict[str, object]:
-    """Validate a RoutePlan v1 mapping and integrity hash (``TC-IMP-BRK-09``).
+    """Validate a RoutePlan v1 mapping and integrity hash (``feature``).
 
     Args:
         value: Candidate mapping.
@@ -1753,7 +1753,7 @@ def build_broker_failover_decision(
     reason: str,
     decided_at: datetime,
 ) -> dict[str, object]:
-    """Build and hash a redacted FailoverDecision v1 mapping (``TC-IMP-BRK-09``).
+    """Build and hash a redacted FailoverDecision v1 mapping (``feature``).
 
     Args:
         decision_id: Caller-owned decision identifier.
@@ -1785,7 +1785,7 @@ def build_broker_failover_decision(
 
 
 def parse_broker_failover_decision(value: Mapping[str, object]) -> dict[str, object]:
-    """Validate a FailoverDecision v1 mapping and integrity hash (``TC-IMP-BRK-09``).
+    """Validate a FailoverDecision v1 mapping and integrity hash (``feature``).
 
     Args:
         value: Candidate mapping.

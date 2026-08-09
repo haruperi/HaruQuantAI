@@ -1,8 +1,8 @@
-"""Strategy operating-envelope candidate gate (TC-IMP-OPT-04).
+"""Strategy operating-envelope candidate gate (feature).
 
 Extends ``FEAT-OPT-03``/``FEAT-OPT-08``: filter optimization candidates so the search
 optimizes only within an approved Strategy operating envelope. The envelope is owned by
-Strategy (``TC-IMP-STRAT-06`` → ``FEAT-STR-12``) and is consumed here only through its
+Strategy (``feature`` → ``FEAT-STR-12``) and is consumed here only through its
 documented public ``evaluate_operating_envelope`` boundary (shallow cross-domain import,
 per AGENTS.md §1).
 

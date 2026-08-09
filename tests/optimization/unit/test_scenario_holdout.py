@@ -1,4 +1,4 @@
-"""Tests for the scenario-holdout anti-leakage port (TC-IMP-OPT-08)."""
+"""Tests for the scenario-holdout anti-leakage port (feature)."""
 
 from collections.abc import Mapping
 
@@ -19,7 +19,7 @@ def test_scenario_holdout_fails_closed_without_provider() -> None:
     )
     assert result["status"] == "SCENARIO_HOLDOUT_UNAVAILABLE"
     assert result["decision"] == "validation_needed"
-    assert result["deferred_to"] == "TC-IMP-SIM-11"
+    assert result["provider_feature"] == "FEAT-SIM-11"
 
 
 def test_scenario_holdout_passes_through_provider_evidence() -> None:

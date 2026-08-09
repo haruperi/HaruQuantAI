@@ -118,7 +118,7 @@ export async function* consumeStream(
     } catch (error) {
       // A genuine transport failure mid-stream is treated like a gap: attempt
       // bounded reconnection before giving up.
-      if (error instanceof ApiClientError && attempt < maxReconnects) {
+      if (error instanceof ApiClientError && error.retryable && attempt < maxReconnects) {
         attempt += 1;
         await delay(reconnectDelayMs, options.signal).catch(() => {});
         resumeAfter = lastSequence ?? undefined;

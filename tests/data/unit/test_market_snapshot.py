@@ -1,4 +1,4 @@
-"""Unit tests for the composed market snapshot feature (TC-IMP-DATA-11)."""
+"""Unit tests for the composed market snapshot feature (feature)."""
 
 from __future__ import annotations
 

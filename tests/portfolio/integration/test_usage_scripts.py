@@ -13,6 +13,10 @@ _USAGE_SCRIPTS = (
     "06_rebalancing.py",
     "07_orchestration.py",
     "08_public_api.py",
+    "09_ledger.py",
+    "10_valuation.py",
+    "11_margin.py",
+    "12_reconciliation.py",
     "features.py",
 )
 

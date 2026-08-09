@@ -1,6 +1,6 @@
 """Approved expectancy governance state machine and exact-match eligibility.
 
-Implements ``TC-IMP-RES-04`` (governance) and ``TC-IMP-RES-03`` (eligibility).
+Implements ``feature`` (governance) and ``feature`` (eligibility).
 The state machine enforces the approved lifecycle:
 ``draft -> under_review -> approved -> {suspended, expired, revoked}``.
 Eligibility requires an exact match on strategy/instrument/regime/session

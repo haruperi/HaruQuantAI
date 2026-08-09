@@ -1,12 +1,12 @@
 """Versioned Portfolio ledger and account transport contracts.
 
-Implements ``FEAT-PORT-09`` (``TC-IMP-PORT-01``, ``TC-IMP-PORT-02``). Cross-domain
+Implements ``FEAT-PORT-09`` (``feature``, ``feature``). Cross-domain
 contracts travel as validated JSON-safe mappings behind ``build_*``/``parse_*``
 function pairs per architectural decision D-1. Internal Pydantic models stay
 private; only the standalone build/parse functions are exported.
 
 Each posting type names an economic event the ledger consumes exactly once
-(``TC-IMP-PORT-01``). Corrections are ``correction`` or reversal postings and
+(``feature``). Corrections are ``correction`` or reversal postings and
 never mutate a prior row; financial records are append-only.
 """
 
@@ -25,7 +25,7 @@ from app.utils import get_logger, to_json_safe
 
 logger = get_logger(__name__)
 
-# Posting type catalogue (gap TC-IMP-PORT-01). Every posting names one economic
+# Posting type catalogue (gap feature). Every posting names one economic
 # event; ``correction`` reverses or amends without editing prior rows.
 PostingType = Literal[
     "deposit",

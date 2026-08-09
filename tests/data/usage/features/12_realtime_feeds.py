@@ -170,9 +170,7 @@ def fr_data_154_157() -> None:
 
 def fr_data_184_189() -> None:
     """FR-DATA-184..189: Unified MarketEvent v1 — trade, depth, venue-state, halt, auction, and corporate-action payloads."""
-    _header(
-        "Stage 5: Unified MarketEvent v1 Payloads (FR-DATA-184..189, TC-IMP-DATA-01)"
-    )
+    _header("Stage 5: Unified MarketEvent v1 Payloads (FR-DATA-184..189, feature)")
     now = datetime.now(UTC)
 
     trade = build_trade_payload(price=1.0850, size=1.0, side="buy", trade_id="T-1")

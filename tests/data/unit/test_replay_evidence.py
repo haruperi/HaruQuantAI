@@ -1,4 +1,4 @@
-"""Unit tests for point-in-time replay evidence export (TC-IMP-DATA-13)."""
+"""Unit tests for point-in-time replay evidence export (feature)."""
 
 from __future__ import annotations
 

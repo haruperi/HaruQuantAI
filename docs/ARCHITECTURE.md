@@ -32,7 +32,18 @@
 * Portfolio is implemented and `Completed`: `app.services.portfolio` is its sole
   public boundary, exposes standalone functions only, and coordinates genuine
   Data/Simulation evidence while keeping Risk approval and Trading execution in
-  their owning domains.
+  their owning domains. It publishes `PortfolioMarginView v1` and
+  `PortfolioRiskHealth v1`, consumes Data-owned FX evidence without duplicating
+  rates, and persists immutable valuation, margin, reconciliation, and lifecycle
+  evidence under additive migration 003.
+* Analytics is persistent only for immutable journal, adherence, behavior,
+  emergency-response, and qualification evidence under additive migration 003;
+  its existing calculations remain pure. Durable mutations are audit-event
+  producers and corrections append rather than rewrite evidence.
+* UI/API owns `OperationalWorkstation v1`, the authenticated workstation read and
+  optimistic command routes, and the accessible workstation presentation. Human
+  API approval is attestation only; Risk-owned authorization remains authoritative,
+  and owner handlers verify expected versions before mutation.
 * Strategy domain persistence is implemented and `Completed`: `app/services/strategy//` owns seven persistent runtime tables (`strategy_definitions`, `strategy_versions`, `strategy_configs`, `strategy_state`, `strategy_checkpoints`, `strategy_signals`, `strategy_mutations`) backed by applied migrations `0001_strategy_domain` and `0002_strategy_seven_table_runtime`. Schema migrations flow through the Strategy migration manifest (`run_strategy_migrations`), private CRUD in `app/services/strategy/persistence/` constructs SQL statements and delegates transaction execution to `app.services.data`, feature operations outside `persistence/` provide production reachability, and database bootstrap/population (`scripts/strategy/populate_strategy_database.py`) is restricted to an explicitly selected non-production environment (`ENVIRONMENT=dev`).
 * Indicators domain is implemented and `Completed`: `app/services/indicators/` is pure, stateless, and read-only with zero active database tables (retired via migration 002). Backend v1 exposes 3 authenticated read-only API routes (`/api/v1/indicators`, `/api/v1/indicators/capabilities`, `/api/v1/indicators/{indicator_id}`), and the Next.js UI frontend mounts `IndicatorWorkspace` in `WorkspaceGrid` and `Sidebar`.
 * `app/agentic/README.md` defines the complete Agentic Firm target. The package now
@@ -289,7 +300,7 @@
   authoritative executor. Indicators now owns no live tables or private
   persistence package.
   It also owns JSON-safe IndicatorSnapshot and LiquiditySnapshot transports,
-  closed-input enforcement, and neutral cockpit measurements. Risk alone owns
+  closed-input enforcement, and neutral operational measurements. Risk alone owns
   authoritative regime classification and tightening policy. Package promotion
   remains blocked while the current Data error catalogue cannot be validated by
   the Utils catalogue boundary during migration failure-path handling.
@@ -723,7 +734,7 @@ Portfolio collaboration is contract-governed:
 * **Data Layout Conventions**: Core cross-module database tracking identifiers must use `TEXT` format. SQLite boolean fields enforce strict `0` or `1` constraints. JSON text structures map to an explicit `*_json` suffix name.
 * **Precision Standard**: Structural or broker-critical price, size, volume, and balance mathematics must bypass standard floating-point operations. Requires `decimal.Decimal` parsing to ensure transaction immutability.
 * **Authoritative Schema Model**: Each owning package README's `### Persistence - Database` section is authoritative for that domain's current and target table model, prefix ownership, domain indexes, and target-vs-live reconciliation. This document remains canonical for cross-domain relationships, universal column conventions, storage tiers, and shared SQLite/Parquet policy. Executable schema remains in owning-domain migration definitions.
-* **Table Namespace Prefixes**: Each persistent domain uses an owner-specific singular-full-word namespace: `util_`, `broker_`, `data_`, `indicator_`, `strategy_`, `risk_`, `trading_`, `sim_`, `optimization_`, `research_`, `portfolio_`, `agentic_`, and `api_`. `sim_` is canonical for Simulator and current code plus the inspected non-production database use `sim_runs`; the declared `sim_sessions` step remains unapplied in that inspected database. Analytics is read-only and has no current tables; its historical `analytics_` store is retired by complete-manifest migration step `002`. Exact current and target table names belong only in the owning domain README and migrations.
+* **Table Namespace Prefixes**: Each persistent domain uses an owner-specific singular-full-word namespace: `util_`, `broker_`, `data_`, `indicator_`, `strategy_`, `risk_`, `trading_`, `sim_`, `optimization_`, `research_`, `portfolio_`, `agentic_`, and `api_`. `sim_` is canonical for Simulator; its immutable manifest contains `sim_runs`, playback/secured `sim_sessions`, and hash-linked `sim_session_checkpoints`, while journals remain JSONL artifacts rather than tables. Analytics is read-only and has no current tables; its historical `analytics_` store is retired by complete-manifest migration step `002`. Exact current and target table names belong only in the owning domain README and migrations.
 * **Target vs Current Divergence**: A new table must conform to its owning README model. An existing table that diverges is documented in that README with an adoption tier, not silently migrated away. Closing a divergence requires an additive migration or explicit baseline-reset approval.
 * **Migration Invariance**: Database tracking updates via additive structure migrations. Modifying applied structural migrations is prohibited without an explicit baseline reset approval.
 * **Migration Definition Location**: Immutable schema definitions live in `app/services/<domain>/migrations/` — one migration package per domain, aggregating that domain's schema. Migrations are schema evolution, not CRUD, and remain outside the domain `persistence/` package. Sites that predate this rule are non-conformant. Relocation is an import-path refactor, not a ledger risk: a step checksum is computed over its ordered SQL statements only, and the ledger keys on `(domain, migration_id)`, so neither module path nor file name is an input. The invariants a move must preserve are the statement tuple byte-for-byte, including whitespace, and the literal `domain` and `migration_id` values.
@@ -1983,7 +1994,7 @@ tables for one job.
 | `risk_eligibility_decisions` | `risk_eligibility_decisions` + `risk_allocation_decisions` | Live splits eligibility from allocation — that separation is deliberate; keep it |
 | `optimization_holdout_uses` | `agentic_experiment_holdout_use` | Keep live; do not build a second holdout ledger |
 | `optimization_jobs` / `optimization_trials` | `optimization_results` (`search_id`, `ranked_candidates_json`) | Live stores ranked candidates as JSON; proposal normalises to rows. Genuine trade-off — see §2 point 2 |
-| `sim_runs` | `sim_runs` | **Partially applied:** the inspected non-production database and ledger contain conformant `sim_runs` from `001_simulator_state_v1`; `002_simulator_playback_sessions_v1` and its conformant `sim_sessions` table remain unapplied. The complete immutable manifest is owned by `run_simulator_migrations`, and required API startup fails closed if either step cannot be verified or applied. |
+| `sim_runs` | `sim_runs` | **Partially applied inspected database:** the ledger contains conformant `sim_runs` from `001_simulator_state_v1`; later immutable steps add playback/secured `sim_sessions` and hash-linked `sim_session_checkpoints`. The complete three-step manifest is owned by `run_simulator_migrations`, and required API startup fails closed if any step cannot be verified or applied. |
 | `agentic_traces` / `agentic_trace_spans` | `agentic_operations_traces` | Keep live name |
 | `agentic_workflow_checkpoints` (proposal) | same name, different columns | Keep live |
 | ~~`util_settings`~~ | `api_settings` + typed bootstrap settings | **Withdrawn.** Utils owns no tables; UI/API owns the unified non-secret user/system documents and central JSON/process sources bootstrap the database; see [01](01_entity_specs_core.md) Domain 1 |

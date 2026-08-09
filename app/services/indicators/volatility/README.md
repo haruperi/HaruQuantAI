@@ -1,6 +1,6 @@
 # Volatility Indicators
 
-consolidated capability programme extends this feature with `measure_market_speed` and
+feature programme extends this feature with `measure_market_speed` and
 `measure_volatility_envelope`. Both consume explicit causal measurements and
 thresholds, perform no I/O, and publish no Risk regime or trading decision.
 

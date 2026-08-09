@@ -5,8 +5,8 @@ The Simulation error catalogue uses only the Utils-owned `TRANSIENT`,
 categories. An unconfirmed persistence result is non-retryable.
 
 > **Package:** `app/services/simulator`
-> **Status:** `Partial` — 14 features are registered: `FEAT-SIM-01`..`09` are `Completed`, while `FEAT-SIM-10`..`14` are `Missing`.
-> **Last updated:** `2026-08-04`
+> **Status:** `Completed` — all 14 registered features, `FEAT-SIM-01`..`14`, are implemented and verified.
+> **Last updated:** `2026-08-09`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -32,6 +32,7 @@ The package is implemented as a clean-start V1 domain. No migration path, compat
 - Append-only simulation journals, deterministic replay, run idempotency evidence, and incomplete-run isolation.
 - `SimulationResult`, `PortfolioSimulationResult`, execution reports, artifact manifests, and Simulation-owned persistence schemas and migration definitions.
 - An explicitly non-canonical fast-research mode that cannot produce official fills or promotion evidence.
+- Deterministic simulation checklists, assistance modes, mission completion, scenarios, execution-realism evidence, secured-session recovery, and simulated alert lifecycle.
 
 ### Does not own
 
@@ -58,6 +59,9 @@ Contract definitions must match the name, version, and owner recorded in `docs/P
 | Completed | `SimulationResult`            | `v1`  | Analytics, Optimization, UI/API                                     | Publish a deterministic completed backtest outcome containing run/config/data/engine identities, simulated fills, journal and artifact references, accounting totals, diagnostics, and realism disclosures. Incomplete runs are never published.                                               |
 | Completed | `PortfolioBacktestRequestV1`  | `v1`  | Portfolio submits; Simulation receives                              | Receive one self-contained Simulation-owned projection of an immutable Portfolio candidate, with scalar values, ordered components, identifiers, versions, references, and hashes only. Defined by `FR-SIM-032`.                                                                              |
 | Completed | `PortfolioSimulationResult`   | `v1`  | Portfolio, Analytics, UI/API                                        | Publish complete component and aggregate journals, risk-budget history, metrics/artifact references, and reproducibility identity.                                                                                                                                                             |
+| Completed | `MissionDefinition` | `v1` | Optimization, Research, UI/API | Define Simulator-owned blocking missions, deterministic triggers, injected events, difficulty, and evidence identity without colliding with Risk's advisory scenario contract. |
+| Completed | `ReplayIdentity` | `v1` | Strategy, Optimization, UI/API | Publish canonical run/scenario/data/execution-profile/rules/seed/branch identity; Strategy retains its strategy-specific replay manifest and consumes this mapping as lineage. |
+| Completed | `AlertEvent` | `v1` | Analytics, UI/API | Publish simulated-session alert state and timing evidence; UI/API remains the external operational-alert delivery owner. |
 
 **Consumed from other domains** — referenced only, never redefined:
 
@@ -104,6 +108,7 @@ publication. This support directory is not a separately registered feature.
 | --------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | Completed | Run identity, lifecycle, and completed simulation result records in `sim_runs` | Analytics, Optimization, UI/API via `SimulationResult`; Portfolio, Analytics, UI/API via `PortfolioSimulationResult` | `app/services/simulator/migrations/definitions.py` |
 | Completed | Completed-run playback session lifecycle and monotonic cursor in `sim_sessions` | UI/API through package-root session create/read/frame functions | `app/services/simulator/migrations/definitions.py` |
+| Completed | Secured-session aggregate state and immutable hash-linked checkpoints in `sim_sessions` and `sim_session_checkpoints` | Simulator recovery through package-root secure/checkpoint/load/restore/rearm functions | `app/services/simulator/migrations/definitions.py`, additive step `003_simulator_secured_sessions_v1` |
 | Completed | Append-only versioned JSONL journal and replay metadata                         | Simulation replay; consumers through `SimulationResult` references                                                                   | Partial JSONL staging, group-commit `fsync`, and atomic publication under the approved artifact root; no database journal records or table |
 | Completed | Canonical JSON and Markdown execution reports                                   | Analytics, Optimization, Portfolio, UI/API through applicable `SimulationResult` / `PortfolioSimulationResult` artifact references | Artifact schema under `reporting/`                                                                                                         |
 | Completed | Artifact manifest and checksums                                                 | Analytics, Optimization, Portfolio, UI/API through the applicable `SimulationResult` / `PortfolioSimulationResult`                 | Artifact schema under `reporting/`                                                                                                         |
@@ -141,6 +146,11 @@ flowchart TD
     SIM --> RUN[[run: Official and research orchestration]]
     SIM --> ERR[[errors: Domain error taxonomy]]
     SIM --> STA[[state: Owned persistence contracts]]
+    SIM --> CHK[[checklists: Checklists, modes, and missions]]
+    SIM --> SCN[[scenarios: Mission scenarios and injected events]]
+    SIM --> RLS[[realism: Execution realism]]
+    SIM --> RCV[[recovery: Secured-session recovery]]
+    SIM --> ALT[[alerts: Simulated alert lifecycle]]
 
     VAL --> VALF[contracts.py; validate.py]
     TIME --> TIMEF[contracts.py; timeline.py]
@@ -152,6 +162,11 @@ flowchart TD
     ERR --> ERRF[catalog.py; exception.py; payload.py]
     STA --> STAF[store.py; runtime.py; sessions.py]
     STA --> MIG[migrations/definitions.py]
+    CHK --> CHKF[contracts.py; runtime.py; policies.py; missions.py]
+    SCN --> SCNF[contracts.py; triggers.py; catalog.py; providers.py]
+    RLS --> RLSF[contracts.py; latency.py; queue.py; pricing.py; races.py; views.py; providers.py]
+    RCV --> RCVF[contracts.py; checkpoints.py; lifecycle.py; service.py]
+    ALT --> ALTF[contracts.py; lifecycle.py; grouping.py; controls.py]
 ```
 
 ---
@@ -173,11 +188,11 @@ Module folders and files are ordered from lowest dependency to highest dependenc
 | Completed | `FEAT-SIM-07` Official and Research Orchestration | `run/`        | Exact declarations and run contracts: Section 4.7        | Section 4.7 functional requirements  | `tests/simulator/usage/features/07_run.py`        |
 | Completed | `FEAT-SIM-08` Domain Error Taxonomy               | `errors/`     | Exact declarations: Section 4.0                          | Section 4.0 functional requirements  | `tests/simulator/usage/features/08_errors.py`     |
 | Completed | `FEAT-SIM-09` Results and Canonical Artifacts     | `reporting/`  | Exact declarations and result contracts: Section 4.6     | Section 4.6 functional requirements  | `tests/simulator/usage/features/09_reporting.py`  |
-| Missing | `FEAT-SIM-10` Cockpit Checklists, Modes, and Missions | `checklists/` *(planned)* | checklist definition/runtime, actual-state binding, cockpit mode behavior, no-trade mission completion | `FR-SIM-091`..`FR-SIM-097` *(planned)* | `tests/simulator/usage/features/10_checklists.py` *(planned)* |
-| Missing | `FEAT-SIM-11` Scenario Engine | `scenarios/` *(planned)* | `MissionDefinition` (distinct from Risk's advisory `ScenarioDefinition`), trigger engine, emergency/abnormal scenarios, event priority, `InjectedEvent` | `FR-SIM-098`..`FR-SIM-104` *(planned)* | `tests/simulator/usage/features/11_scenarios.py` *(planned)* |
-| Missing | `FEAT-SIM-12` Execution Realism Models | `realism/` *(planned)* | latency profile, queue model, slippage & market impact, cancel/replace race, data/execution-view separation | `FR-SIM-105`..`FR-SIM-110` *(planned)* | `tests/simulator/usage/features/12_realism.py` *(planned)* |
-| Missing | `FEAT-SIM-13` Session Recovery | `recovery/` *(planned)* | recovery state machine, crash recovery, save/branch integrity, corruption handling | `FR-SIM-111`..`FR-SIM-115` *(planned)* | `tests/simulator/usage/features/13_recovery.py` *(planned)* |
-| Missing | `FEAT-SIM-14` Alert Lifecycle | `alerts/` *(planned)* | `AlertEvent` lifecycle, root-cause grouping, perception timestamp, emergency-control availability | `FR-SIM-116`..`FR-SIM-120` *(planned)* | `tests/simulator/usage/features/14_alerts.py` *(planned)* |
+| Completed | `FEAT-SIM-10` Simulation Checklists, Modes, and Missions | `checklists/` | checklist definition/runtime, actual-state binding, mode policy, simulation-route isolation, Risk-owned no-trade mission completion | `FR-SIM-104`..`FR-SIM-110` | `tests/simulator/usage/features/10_checklists.py` |
+| Completed | `FEAT-SIM-11` Scenario Engine | `scenarios/` | `MissionDefinition v1`, deterministic triggers, emergency/abnormal templates, event priority, `InjectedEvent`, Research/Optimization providers | `FR-SIM-111`..`FR-SIM-117` | `tests/simulator/usage/features/11_scenarios.py` |
+| Completed | `FEAT-SIM-12` Execution Realism Models | `realism/` | latency profile, queue model, slippage and market impact, cancel/replace race, data/execution-view separation, fill calibration | `FR-SIM-118`..`FR-SIM-123` | `tests/simulator/usage/features/12_realism.py` |
+| Completed | `FEAT-SIM-13` Session Recovery | `recovery/` | canonical replay identity, recovery state machine, durable checkpoints, practice branching, scored anti-rewind, integrity failure and explicit rearm | `FR-SIM-124`..`FR-SIM-128` | `tests/simulator/usage/features/13_recovery.py` |
+| Completed | `FEAT-SIM-14` Alert Lifecycle | `alerts/` | `AlertEvent v1`, latched lifecycle, root-cause grouping, perception timestamp, emergency-control availability | `FR-SIM-129`..`FR-SIM-133` | `tests/simulator/usage/features/14_alerts.py` |
 
 The Simulation feature IDs follow the numbered standalone usage programs.
 
@@ -317,6 +332,26 @@ explicit `__all__` contains standalone functions only:
   `to_simulation_error_payload`, and `unwrap_simulation_response`.
 - Completed-run playback: `create_simulation_session`,
   `read_simulation_session`, and `stream_simulation_session_frames`.
+- Checklists, modes, and missions: `build_checklist_definition`,
+  `start_simulation_checklist`, `evaluate_simulation_checklist`,
+  `bypass_simulation_checklist_step`, `get_simulation_mode_policy`, and
+  `complete_simulation_mission`.
+- Scenarios and execution realism: `build_mission_definition`,
+  `build_injected_event`, `evaluate_scenario_triggers`,
+  `order_injected_events`, `get_scenario_templates`,
+  `build_scenario_provider`, `build_scenario_evidence_provider`,
+  `build_latency_profile`, `build_queue_model`,
+  `project_latency_timestamps`, `simulate_queue_fill`,
+  `price_realistic_execution`, `resolve_cancel_replace_race`,
+  `project_execution_views`, and `build_fill_model_provider`.
+- Secured recovery and alerts: `build_replay_identity`,
+  `create_recovery_checkpoint`, `verify_recovery_checkpoints`,
+  `branch_recovery_checkpoint`, `secure_simulation_session`,
+  `persist_recovery_checkpoint`, `load_recovery_checkpoints`,
+  `persist_recovery_state`, `restore_simulation_session`,
+  `explicitly_rearm_simulation_session`, `build_simulation_alert`,
+  `transition_simulation_alert`, `group_simulation_alerts`, and
+  `evaluate_emergency_controls`.
 
 Every external consumer and standalone usage program imports these names through
 `from app.services.simulator import ...`. Feature subpackages remain internal
@@ -382,6 +417,11 @@ catalogued `SimulationError` with preserved safe trace evidence on the error bra
 The requirement evidence tables below retain raw core implementation signatures
 to describe feature behavior; the package-root signatures above are the supported
 public API and are the signatures callers must consume.
+
+The FEAT-SIM-10 through FEAT-SIM-14 package-root operations are typed pure or
+bounded persistence operations and return their documented immutable values
+directly. They do not mutate execution authority, and they are not part of the
+`StandardResponse` run-orchestration boundary listed above.
 
 ---
 
@@ -1417,11 +1457,33 @@ CREATE TABLE sim_sessions (
 
 CREATE INDEX idx_sim_sessions_run ON sim_sessions(run_id);
 CREATE INDEX idx_sim_sessions_expiry ON sim_sessions(status, expires_at);
+
+-- Additive migration 003 adds secured-session projections.
+ALTER TABLE sim_sessions ADD COLUMN session_kind TEXT NOT NULL DEFAULT 'playback';
+ALTER TABLE sim_sessions ADD COLUMN mode TEXT NOT NULL DEFAULT 'Standard';
+ALTER TABLE sim_sessions ADD COLUMN recovery_state TEXT NOT NULL DEFAULT 'RUNNING';
+ALTER TABLE sim_sessions ADD COLUMN secured_at TEXT;
+-- Migration 003 also adds validated JSON columns for clock, scenario, replay
+-- identity, checklist, alert, emergency, counter, and branch-lineage state.
+
+CREATE TABLE sim_session_checkpoints (
+    session_id           TEXT    NOT NULL,
+    sequence             INTEGER NOT NULL CHECK(sequence >= 0),
+    checkpoint_hash      TEXT    NOT NULL UNIQUE,
+    previous_hash        TEXT,
+    replay_identity_json TEXT    NOT NULL CHECK(json_valid(replay_identity_json)),
+    state_payload_json   TEXT    NOT NULL CHECK(json_valid(state_payload_json)),
+    created_at           TEXT    NOT NULL,
+    PRIMARY KEY(session_id, sequence),
+    FOREIGN KEY(session_id) REFERENCES sim_sessions(session_id)
+) STRICT;
 ```
 
-The row is a one-hour, stateless cursor over an already-finalized journal. Cursor
-updates are monotonic, `-1` means no frame has been delivered, and no engine state,
-positions, orders, or equity snapshots are stored in this table.
+An ordinary `session_kind='playback'` row remains a one-hour stateless cursor over an
+already-finalized journal. A caller must explicitly secure a row before recovery state
+may be written. Secured aggregate JSON remains a projection; immutable checkpoints are
+the recovery evidence. Their composite key and previous-hash chain prevent sequence
+replacement, missing-sequence acceptance, and cross-session replay.
 
 #### Why there is no journal table
 
@@ -1449,6 +1511,63 @@ Until they exist, Analytics reads simulator results from published artifacts.
 
 Their column definitions are omitted here rather than carried as unbuilt DDL; the
 `trading_*` tables in Domain 7 are the shape they would take, plus `run_id`.
+
+---
+
+### 4.10 `checklists/` — Simulation Checklists, Modes, and Missions
+
+| Status | Requirement ID | Responsibility | Public operations | Side effects | Failure | Verification |
+| --- | --- | --- | --- | --- | --- | --- |
+| Completed | `FR-SIM-104` | Simulator shall validate immutable checklist definitions with ordered unique steps, prerequisites, actual-state evidence keys, allowlisted comparators, expected values, and mandatory declarations. | `build_checklist_definition` | None | Validation error | **Usage:** `tests/simulator/usage/features/10_checklists.py::fr_sim_104()` **Unit:** `tests/simulator/unit/test_checklists.py` |
+| Completed | `FR-SIM-105` | Simulator shall maintain deterministic `LOCKED`, `AVAILABLE`, `ACTIVE`, `SATISFIED`, `FAILED`, `BLOCKED`, `BYPASSED`, and `REGRESSED` checklist step states. | `start_simulation_checklist`, `evaluate_simulation_checklist` | None | `SIM_CHECKLIST_INVALID` | **Usage:** `tests/simulator/usage/features/10_checklists.py::fr_sim_105()` **Unit:** `tests/simulator/unit/test_checklists.py` |
+| Completed | `FR-SIM-106` | Simulator shall satisfy checklist steps only from validated actual-domain-state evidence; no caller may directly assert step satisfaction. | `evaluate_simulation_checklist` | None | `SIM_CHECKLIST_INVALID` | **Usage:** `tests/simulator/usage/features/10_checklists.py::fr_sim_106()` **Unit:** `tests/simulator/unit/test_checklists.py` |
+| Completed | `FR-SIM-107` | Simulator shall define deterministic `Guided`, `Standard`, `Expert`, and `Challenge` hint, sequencing, optional-bypass, scoring, and rewind policy. | `get_simulation_mode_policy` | None | Unsupported mode | **Usage:** `tests/simulator/usage/features/10_checklists.py::fr_sim_107()` **Unit:** `tests/simulator/unit/test_checklists.py` |
+| Completed | `FR-SIM-108` | Simulator shall deny mandatory-step bypass, empty bypass reasons, unsupported mode overrides, and any optional bypass that mode policy does not permit. | `bypass_simulation_checklist_step` | None | `SIM_CHECKLIST_BYPASS_DENIED` | **Usage:** `tests/simulator/usage/features/10_checklists.py::fr_sim_108()` **Unit:** `tests/simulator/unit/test_checklists.py` |
+| Completed | `FR-SIM-109` | Simulator shall complete a no-trade mission only when mandatory checklist steps are satisfied and a validated Risk-owned `NoTradeOutcome v1` classifies the outcome as a safe stand-down. | `complete_simulation_mission` | None | Incomplete or failed outcome | **Usage:** `tests/simulator/usage/features/10_checklists.py::fr_sim_109()` **Unit:** `tests/simulator/unit/test_checklists.py` |
+| Completed | `FR-SIM-110` | Every simulation mode shall expose `route="sim"`, deny live-route authority, and remain compatible with Trading's existing simulation-dispatch isolation guard. | `get_simulation_mode_policy` | None | Fail closed | **Usage:** `tests/simulator/usage/features/10_checklists.py::fr_sim_110()` **Integration:** `tests/simulator/integration/test_mode_route_isolation.py` |
+
+### 4.11 `scenarios/` — Scenario Engine
+
+| Status | Requirement ID | Responsibility | Public operations | Side effects | Failure | Verification |
+| --- | --- | --- | --- | --- | --- | --- |
+| Completed | `FR-SIM-111` | Simulator shall define immutable `MissionDefinition v1` separately from Risk's advisory scenario contract, with explicit identity, data reference, difficulty, seed, triggers, events, and competence tags. | `build_mission_definition` | None | Validation error | **Usage:** `tests/simulator/usage/features/11_scenarios.py::fr_sim_111()` **Unit:** `tests/simulator/unit/test_scenarios.py` |
+| Completed | `FR-SIM-112` | Simulator shall evaluate time, price, volatility, liquidity, player-action, checklist, account-state, compound, and seeded probabilistic triggers deterministically. | `evaluate_scenario_triggers` | None | Validation error | **Usage:** `tests/simulator/usage/features/11_scenarios.py::fr_sim_112()` **Unit:** `tests/simulator/unit/test_scenarios.py` |
+| Completed | `FR-SIM-113` | Simulator shall expose validated emergency scenario templates for flash crashes, API failure, drawdown breach, margin survival, and recovery failure. | `get_scenario_templates` | None | None | **Usage:** `tests/simulator/usage/features/11_scenarios.py::fr_sim_113()` **Unit:** `tests/simulator/unit/test_scenarios.py` |
+| Completed | `FR-SIM-114` | Simulator shall expose abnormal-operation templates for bad ticks, feed disagreement, market halts and gaps, margin changes, rejection, cancel-fill races, clock drift, and process failure. | `get_scenario_templates` | None | None | **Usage:** `tests/simulator/usage/features/11_scenarios.py::fr_sim_114()` **Unit:** `tests/simulator/unit/test_scenarios.py` |
+| Completed | `FR-SIM-115` | Simulator shall define immutable `InjectedEvent` values with causative, effective, venue, and perception timestamps that preserve causal order. | `build_injected_event` | None | Validation error | **Usage:** `tests/simulator/usage/features/11_scenarios.py::fr_sim_115()` **Unit:** `tests/simulator/unit/test_scenarios.py` |
+| Completed | `FR-SIM-116` | Simulator shall apply a total effective-time and priority order to injected events, suspend incompatible normal transitions, and fail closed on ambiguous priority. | `order_injected_events` | None | `SIM_EVENT_PRIORITY_AMBIGUOUS` | **Usage:** `tests/simulator/usage/features/11_scenarios.py::fr_sim_116()` **Unit:** `tests/simulator/unit/test_scenarios.py` |
+| Completed | `FR-SIM-117` | Simulator shall provide bounded scenario evidence, difficulty calibration, and holdout-mask adapters for the Research and Optimization consumer ports. | `build_scenario_provider`, `build_scenario_evidence_provider` | None | Provider absence remains fail closed | **Usage:** `tests/simulator/usage/features/11_scenarios.py::fr_sim_117()` **Integration:** `tests/simulator/integration/test_scenario_consumers.py` |
+
+### 4.12 `realism/` — Execution Realism Models
+
+| Status | Requirement ID | Responsibility | Public operations | Side effects | Failure | Verification |
+| --- | --- | --- | --- | --- | --- | --- |
+| Completed | `FR-SIM-118` | Simulator shall validate non-negative deterministic market, client, network, broker, venue, report, and processing latency and project their complete causal timestamp chain. | `build_latency_profile`, `project_latency_timestamps` | None | Validation error | **Usage:** `tests/simulator/usage/features/12_realism.py::fr_sim_118()` **Unit:** `tests/simulator/unit/test_realism.py` |
+| Completed | `FR-SIM-119` | Simulator shall model price level, order quantity, quantity ahead, cancellation rate, traded volume, remaining queue position, and bounded fill probability. | `build_queue_model`, `simulate_queue_fill` | None | Validation error | **Usage:** `tests/simulator/usage/features/12_realism.py::fr_sim_119()` **Unit:** `tests/simulator/unit/test_realism.py` |
+| Completed | `FR-SIM-120` | Simulator shall calculate finite Decimal adverse slippage and linear market impact within an explicit maximum movement ceiling. | `price_realistic_execution` | None | `SIM_INVALID_PRICE`, `SIM_SLIPPAGE_EXCEEDED` | **Usage:** `tests/simulator/usage/features/12_realism.py::fr_sim_120()` **Unit:** `tests/simulator/unit/test_realism.py` |
+| Completed | `FR-SIM-121` | Simulator shall resolve cancel, replace, and fill races by aware venue timestamps with an explicit fill-before-cancel-before-replace tie priority. | `resolve_cancel_replace_race` | None | Invalid timing evidence | **Usage:** `tests/simulator/usage/features/12_realism.py::fr_sim_121()` **Unit:** `tests/simulator/unit/test_realism.py` |
+| Completed | `FR-SIM-122` | Simulator shall separate venue-effective state from player-perceived state and expose no event before its perception timestamp. | `project_execution_views` | None | Invalid timing evidence | **Usage:** `tests/simulator/usage/features/12_realism.py::fr_sim_122()` **Unit:** `tests/simulator/unit/test_realism.py` |
+| Completed | `FR-SIM-123` | Simulator shall provide explicit instrument and market-data-bound fill-model calibration evidence to Optimization without inferred defaults. | `build_fill_model_provider` | None | Provider absence remains fail closed | **Usage:** `tests/simulator/usage/features/12_realism.py::fr_sim_123()` **Integration:** `tests/simulator/integration/test_scenario_consumers.py` |
+
+### 4.13 `recovery/` — Session Recovery
+
+| Status | Requirement ID | Responsibility | Public operations | Side effects | Failure | Verification |
+| --- | --- | --- | --- | --- | --- | --- |
+| Completed | `FR-SIM-124` | Simulator shall own canonical `ReplayIdentity v1` across exact run, scenario, dataset, execution-profile, rules, seed, parent, and branch-point identity. | `build_replay_identity` | None | Validation error | **Usage:** `tests/simulator/usage/features/13_recovery.py::fr_sim_124()` **Unit:** `tests/simulator/unit/test_recovery.py` |
+| Completed | `FR-SIM-125` | Secured-session recovery shall follow `STARTING` through lock, restore, reconciliation, verification, explicit rearm, and running without undeclared or regressive transitions. | `restore_simulation_session`, `explicitly_rearm_simulation_session` | In-memory projection | `SIM_RECOVERY_STATE_INVALID` | **Usage:** `tests/simulator/usage/features/13_recovery.py::fr_sim_125()` **Unit:** `tests/simulator/unit/test_recovery.py` |
+| Completed | `FR-SIM-126` | Simulator shall persist and restore immutable hash-linked checkpoints containing complete bounded orders, fills, positions, protection, portfolio-reference, lockout, cooldown, alert, checklist, counter, and score-event state. | `secure_simulation_session`, `persist_recovery_checkpoint`, `load_recovery_checkpoints` | Relational write/read through Data | `SIM_PERSISTENCE_FAILED` | **Usage:** `tests/simulator/usage/features/13_recovery.py::fr_sim_126()` **Integration:** `tests/simulator/integration/test_recovery_persistence.py` |
+| Completed | `FR-SIM-127` | Simulator shall isolate practice branches under child replay identity and prohibit scored-session branch or rewind. | `branch_recovery_checkpoint` | None | `SIM_RECOVERY_REWIND_DENIED` | **Usage:** `tests/simulator/usage/features/13_recovery.py::fr_sim_127()` **Unit:** `tests/simulator/unit/test_recovery.py` |
+| Completed | `FR-SIM-128` | Checksum mismatch, missing sequence, broken hash linkage, or replay-identity mismatch shall enter integrity failure and leave exposure blocked until a complete verified chain receives explicit rearm. | `verify_recovery_checkpoints`, `restore_simulation_session`, `explicitly_rearm_simulation_session` | None | `SIM_INTEGRITY_FAILURE` | **Usage:** `tests/simulator/usage/features/13_recovery.py::fr_sim_128()` **Unit:** `tests/simulator/unit/test_recovery.py` |
+
+### 4.14 `alerts/` — Alert Lifecycle
+
+| Status | Requirement ID | Responsibility | Public operations | Side effects | Failure | Verification |
+| --- | --- | --- | --- | --- | --- | --- |
+| Completed | `FR-SIM-129` | Simulator shall define immutable `AlertEvent v1` identity, severity, source, root cause, observation, perception, acknowledgement, resolution, clearing, latching, and bounded detail evidence. | `build_simulation_alert` | None | Validation error | **Usage:** `tests/simulator/usage/features/14_alerts.py::fr_sim_129()` **Unit:** `tests/simulator/unit/test_alerts.py` |
+| Completed | `FR-SIM-130` | Simulator shall enforce `INACTIVE`, `ACTIVE_UNACKNOWLEDGED`, `ACTIVE_ACKNOWLEDGED`, `RESOLVED`, and `CLEARED` alert transitions with resolution-before-clear latching. | `transition_simulation_alert` | None | `SIM_ALERT_TRANSITION_INVALID` | **Usage:** `tests/simulator/usage/features/14_alerts.py::fr_sim_130()` **Unit:** `tests/simulator/unit/test_alerts.py` |
+| Completed | `FR-SIM-131` | Simulator shall group derivative alert symptoms under deterministic root-cause incidents with stable severity, observation-time, and identity ordering. | `group_simulation_alerts` | None | None | **Usage:** `tests/simulator/usage/features/14_alerts.py::fr_sim_131()` **Unit:** `tests/simulator/unit/test_alerts.py` |
+| Completed | `FR-SIM-132` | Simulator shall preserve the first player perception timestamp separately from causal and venue timing for fair response-time scoring. | `build_simulation_alert` | None | Validation error | **Usage:** `tests/simulator/usage/features/14_alerts.py::fr_sim_132()` **Unit:** `tests/simulator/unit/test_alerts.py` |
+| Completed | `FR-SIM-133` | Simulator shall keep cancel, close, reduce, and kill-switch controls available during lock states while blocking risk-increasing and unknown actions. | `evaluate_emergency_controls` | None | Fail closed | **Usage:** `tests/simulator/usage/features/14_alerts.py::fr_sim_133()` **Unit:** `tests/simulator/unit/test_alerts.py` |
 
 ---
 
@@ -1489,10 +1608,10 @@ constructed, so adding a failure path adds a catalog row first.
 
 ## 6. Open Decisions
 
-These are unresolved owner choices raised by the approved capability audit. They are recorded here, not resolved by this documentation task.
-
-- **OD-SIM-01 — Replay identity ownership split with Strategy.** Unified `ReplayIdentity` is currently split between Simulator's immutable journal (`FEAT-SIM-06`) and Strategy's replay manifests (`FEAT-STR-05`). The cockpit assigns canonical replay identity to Simulator; Strategy becomes a consumer. The concrete identity field set (scenario/data/profile hashes, seeds, rules version, branch lineage) and the Strategy migration are implementation-phase decisions.
-- **OD-SIM-03 — Mode sequencing.** `FEAT-SIM-10` supplies the mode state required by the cross-domain Broker simulation-isolation proof. The owner must decide whether to implement a minimal mode marker before the rest of `FEAT-SIM-10` or deliver the proof only when that feature is complete.
+No unresolved Simulator owner decisions remain. Simulator owns `ReplayIdentity v1`;
+Strategy consumes it as lineage while retaining its strategy-specific manifest. All
+four mode policies are complete and simulation-only, resolving the former sequencing
+choice without a temporary mode marker.
 
 
 
@@ -1510,7 +1629,7 @@ The following are excluded from the initial implementation and must not appear a
 tests/simulator/
 ├── unit/                         # Each public symbol and failure path
 ├── integration/                  # WF-SIM-* module/domain collaboration
-└── usage/                        # Nine numbered standalone feature programs
+└── usage/                        # Fourteen numbered standalone feature programs
 ```
 
 ### Commands
@@ -1555,7 +1674,7 @@ During iterative implementation, run only the specific files associated with the
 - [X] No raw code, live adapter, broker SDK, credential resolution, network call, or live mutation is reachable. Evidence: `tests/simulator/integration/test_strategy_security.py:10`.
 - [X] Every `FR-SIM-*` has one usage example and at least one unit test; every workflow has an integration test. Evidence: `tests/simulator/integration/test_official_backtest.py:78`.
 - [X] Golden, replay, persistence-failure, security, boundary, and import-safety tests pass. Evidence: `tests/simulator/integration/test_replay.py:23`.
-- [X] Simulator tests, standalone feature usage, and all 11 registered workflows pass on the 2026-08-06 audit-remediation tree; each production file and the aggregate package exceed 80% branch coverage, and every unit test remains below 100 ms. Evidence: `tests/simulator/component/test_import_safety.py`; `tests/simulator/unit/test_properties.py`; `tests/simulator/integration/test_usage_scripts.py`; `tests/simulator/unit/conftest.py`.
+- [X] Simulator tests, fourteen standalone feature programs, and all 11 registered workflows pass; each production file and the aggregate package meet the required coverage gate, and every unit test remains below 100 ms. Evidence: `tests/simulator/integration/test_usage_scripts.py`; `tests/simulator/unit/conftest.py`.
 - [X] Every raised code exists in `SIM_ERROR_CATALOG`, and every catalog code has a fail-closed raise path. Evidence: `app/services/simulator/errors/catalog.py`.
 - [X] Bound `SimTrader.submit_order` is assignable to Trading's injected `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]` port. Evidence: `app/services/simulator/execution/trader.py:28`.
 - [X] No module imports `app.services.data.storage.*` or `app.services.optimization.*`. Evidence: `tests/simulator/unit/test_state.py:12`.

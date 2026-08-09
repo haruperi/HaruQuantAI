@@ -137,4 +137,61 @@ def update_session_record(
     return result.affected_rows == 1
 
 
-__all__ = ["complete_run_record", "update_run_record", "update_session_record"]
+def update_secured_session_record(
+    store: object,
+    *,
+    session_id: str,
+    mode: str,
+    recovery_state: str,
+    secured_at: str,
+    state: Mapping[str, object],
+    request_id: str,
+) -> bool:
+    """Replace one secured session's validated aggregate projection.
+
+    Args:
+        store: Opaque Simulator persistence handle.
+        session_id: Stable session identity.
+        mode: Supported simulation mode.
+        recovery_state: Current recovery lifecycle state.
+        secured_at: Aware canonical timestamp text.
+        state: Aggregate state mappings.
+        request_id: Trace identifier for transaction execution.
+
+    Returns:
+        Whether exactly one session row was updated.
+    """
+    _require_store(store)
+    fields = (
+        "clock_state",
+        "scenario_state",
+        "replay_identity",
+        "checklist_state",
+        "alert_state",
+        "emergency_state",
+        "counters",
+        "branch_lineage",
+    )
+    payloads = tuple(
+        canonical_json(state.get(field, {}), max_items=None) for field in fields
+    )
+    result = _execute(
+        (
+            "UPDATE sim_sessions SET session_kind='secured', mode=?, "
+            "recovery_state=?, secured_at=?, clock_state_json=?, "
+            "scenario_state_json=?, replay_identity_json=?, checklist_state_json=?, "
+            "alert_state_json=?, emergency_state_json=?, counters_json=?, "
+            "branch_lineage_json=? WHERE session_id=?",
+        ),
+        ((mode, recovery_state, secured_at, *payloads, session_id),),
+        request_id=request_id,
+    )
+    return result.affected_rows == 1
+
+
+__all__ = [
+    "complete_run_record",
+    "update_run_record",
+    "update_secured_session_record",
+    "update_session_record",
+]

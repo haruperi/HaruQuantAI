@@ -1,10 +1,10 @@
-"""Market and instrument research assumption evidence (TC-IMP-RES-08).
+"""Market and instrument research assumption evidence (feature).
 
 Provides advisory evidence supporting session, liquidity, cost, margin,
 lifecycle, and event assumptions drawn from Research's market-structure and
 seasonality work. This does not replace Brokers profiles: Brokers owns live
 instrument/margin specification; Research owns the research-baseline evidence
-that informs cockpit assumptions.
+that informs operational assumptions.
 """
 
 from __future__ import annotations

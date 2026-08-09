@@ -1,6 +1,6 @@
-"""One reusable adapter conformance suite (``TC-IMP-BRK-12``).
+"""One reusable adapter conformance suite (``feature``).
 
-The Trading Cockpit Phase 0 reconciliation requires a single conformance suite
+The application Phase 0 reconciliation requires a single conformance suite
 applied uniformly to every enabled HaruQuantAI broker route. This module
 exposes one pure function, ``run_adapter_conformance``, that returns a
 deterministic verdict mapping for one adapter under test. The suite is

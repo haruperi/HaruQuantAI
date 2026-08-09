@@ -94,6 +94,7 @@ export async function* openStream(
       message: "fetch is not available in this environment",
       status: 0,
       code: "UPSTREAM_UNAVAILABLE",
+      retryable: true,
     });
   }
 
@@ -127,6 +128,7 @@ export async function* openStream(
       message: `network error opening stream ${contract.id}`,
       status: 0,
       code: "UPSTREAM_UNAVAILABLE",
+      retryable: true,
       requestId,
       traceId: options.traceId ?? null,
       cause,
@@ -139,6 +141,7 @@ export async function* openStream(
       message: text || `HTTP ${response.status} opening stream ${contract.id}`,
       status: response.status,
       code: response.status === 401 ? "AUTHENTICATION_REQUIRED" : "UPSTREAM_UNAVAILABLE",
+      retryable: response.status >= 500,
       requestId,
       traceId: options.traceId ?? null,
     });
@@ -173,6 +176,7 @@ export async function* openStream(
       message: `stream read error for ${contract.id}`,
       status: 0,
       code: "UPSTREAM_UNAVAILABLE",
+      retryable: true,
       requestId,
       traceId: options.traceId ?? null,
       cause,

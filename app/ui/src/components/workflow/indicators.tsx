@@ -114,6 +114,10 @@ export function IndicatorWorkspace({ className }: IndicatorWorkspaceProps = {}):
               <span className="card-label">Core MVP Tier</span>
               <span className="card-value">{mvpCount}</span>
             </div>
+            <div className="summary-card">
+              <span className="card-label">Capabilities</span>
+              <span className="card-value">{capabilities?.length ?? 0}</span>
+            </div>
           </div>
 
           <div className="workflow-indicators-filter">

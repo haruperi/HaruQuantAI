@@ -1,4 +1,4 @@
-"""Tests for the stress-profile calibration consumer port (TC-IMP-OPT-06)."""
+"""Tests for the stress-profile calibration consumer port (feature)."""
 
 from collections.abc import Mapping
 
@@ -16,7 +16,7 @@ def test_stress_profile_fails_closed_without_provider() -> None:
         provider=None,
     )
     assert result["status"] == "STRESS_PROFILE_UNCALIBRATED"
-    assert result["deferred_to"] == "TC-IMP-RISK-12 / TC-IMP-RES-06"
+    assert result["deferred_to"] == "feature / feature"
 
 
 def test_stress_profile_passes_through_provider_evidence() -> None:

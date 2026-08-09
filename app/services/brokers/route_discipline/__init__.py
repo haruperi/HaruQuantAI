@@ -1,6 +1,6 @@
 """Health-aware primary/backup route discipline (``FEAT-BRK-16``).
 
-The Trading Cockpit Phase 0 reconciliation (``TC-IMP-BRK-09``) requires a
+The application Phase 0 reconciliation (``feature``) requires a
 health-aware primary/backup route discipline that is fail-closed, never
 submits a duplicate order, and never silently reroutes a write across brokers.
 

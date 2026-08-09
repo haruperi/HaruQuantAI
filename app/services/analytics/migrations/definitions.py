@@ -24,7 +24,7 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
-ANALYTICS_SCHEMA_VERSION = "v1"
+ANALYTICS_SCHEMA_VERSION = "v3"
 
 _ANALYTICS_SCHEMA_STATEMENTS = (
     """
@@ -230,6 +230,25 @@ _ANALYTICS_SCHEMA_V2_RETIREMENT_STATEMENTS = (
     "DROP TABLE analytics_decommission_guard",
 )
 
+_ANALYTICS_PLAYER_EVIDENCE_STATEMENTS = tuple(
+    f"""CREATE TABLE IF NOT EXISTS {table} (
+        record_id TEXT PRIMARY KEY,
+        subject_id TEXT NOT NULL,
+        version TEXT NOT NULL,
+        evidence_json TEXT NOT NULL,
+        canonical_hash TEXT NOT NULL,
+        occurred_at TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    ) STRICT""".strip()
+    for table in (
+        "analytics_journal_entries",
+        "analytics_adherence_findings",
+        "analytics_behavior_findings",
+        "analytics_emergency_response_findings",
+        "analytics_qualification_records",
+    )
+)
+
 
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Analytics schema statements.
@@ -257,6 +276,12 @@ ANALYTICS_MIGRATIONS: tuple[Any, ...] = (
         migration_id="002_retire_unused_analytics_derived_store",
         checksum=_migration_checksum(_ANALYTICS_SCHEMA_V2_RETIREMENT_STATEMENTS),
         statements=_ANALYTICS_SCHEMA_V2_RETIREMENT_STATEMENTS,
+    ),
+    build_migration_step(
+        domain="analytics",
+        migration_id="003_player_evidence_schema",
+        checksum=_migration_checksum(_ANALYTICS_PLAYER_EVIDENCE_STATEMENTS),
+        statements=_ANALYTICS_PLAYER_EVIDENCE_STATEMENTS,
     ),
 )
 

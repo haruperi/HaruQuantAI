@@ -1,8 +1,7 @@
-"""Scenario evidence consumer port (TC-IMP-RES-07, DEFERRED_INTEGRATION).
+"""Research consumer port for `FEAT-SIM-11` scenario evidence.
 
-Declares the Research consumer port for Simulator-owned scenario evidence
-(``TC-IMP-SIM-11``). Scenario evidence cannot exist before scenarios exist, so
-this module implements only the consumer port and a fail-closed fallback: a
+Research consumes an injected Simulator-owned provider. This module implements
+only the consumer port and a fail-closed fallback: a
 missing Simulator provider returns ``UNAVAILABLE`` and the caller degrades
 safely. No Simulator provider business logic is implemented here (change-
 control rule 3).

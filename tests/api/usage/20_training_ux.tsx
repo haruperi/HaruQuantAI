@@ -1,0 +1,1 @@
+import React from "react"; import { renderToStaticMarkup } from "react-dom/server"; import { TrainingPanel } from "../../../app/ui/src/features/training-ux"; function main(): void { console.log(renderToStaticMarkup(<TrainingPanel qualification={{status:"unknown",curriculumVersion:null,remediation:[]}}/>)); } main();

@@ -1,6 +1,6 @@
 """Ledger snapshots as rebuild accelerators, never alternative truth.
 
-Implements ``TC-IMP-PORT-15``. A snapshot records a materialized balance view
+Implements ``feature``. A snapshot records a materialized balance view
 over a bounded entry range and must always agree with a rebuild from the raw
 entries. If a snapshot disagrees, the rebuild wins and the snapshot is treated
 as stale; the ledger never substitutes a snapshot for canonical entry truth.

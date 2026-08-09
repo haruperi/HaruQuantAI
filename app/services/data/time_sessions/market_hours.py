@@ -60,7 +60,7 @@ def apply_venue_halt(
 ) -> MarketHours:
     """Overlay genuine caller-supplied venue-halt and window evidence.
 
-    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-05`): this function
+    application Phase 0 reconciliation (`feature`): this function
     never infers a halt on its own. It composes evidence the caller already
     holds (for example a Data-owned `halt`/`venue_state` stream event) onto
     computed schedule tradability. A halted venue is never reported open.

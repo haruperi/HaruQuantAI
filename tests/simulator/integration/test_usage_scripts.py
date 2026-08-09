@@ -18,6 +18,11 @@ _USAGE_SCRIPTS = (
     "07_run.py",
     "08_errors.py",
     "09_reporting.py",
+    "10_checklists.py",
+    "11_scenarios.py",
+    "12_realism.py",
+    "13_recovery.py",
+    "14_alerts.py",
 )
 
 _USAGE_REQUIREMENTS = {
@@ -30,6 +35,11 @@ _USAGE_REQUIREMENTS = {
     "07_run.py": {29, 30, 31, 32, 34},
     "08_errors.py": {35, 36, 37},
     "09_reporting.py": {24, 25, 26, 27, 28, 33, 40},
+    "10_checklists.py": {104, 105, 106, 107, 108, 109, 110},
+    "11_scenarios.py": {111, 112, 113, 114, 115, 116, 117},
+    "12_realism.py": {118, 119, 120, 121, 122, 123},
+    "13_recovery.py": {124, 125, 126, 127, 128},
+    "14_alerts.py": {129, 130, 131, 132, 133},
 }
 
 _README_REQUIREMENTS = {

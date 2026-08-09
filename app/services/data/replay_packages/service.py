@@ -1,4 +1,4 @@
-"""Deterministic no-lookahead replay streaming (`TC-IMP-DATA-08`, `FEAT-DATA-19`)."""
+"""Deterministic no-lookahead replay streaming (`feature`, `FEAT-DATA-19`)."""
 
 from __future__ import annotations
 
@@ -90,7 +90,7 @@ def stream_replay_events(
 
     `as_of` is required and never defaulted to a wall-clock "now" — it is the
     fail-closed consumer port standing in for Simulator's not-yet-built
-    `SimulationClock` (`TC-IMP-SIM-01`). Only events whose evidence was
+    `SimulationClock` (`feature`). Only events whose evidence was
     already available at `as_of` are ever yielded.
 
     Args:

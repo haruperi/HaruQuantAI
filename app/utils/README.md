@@ -78,7 +78,7 @@ It makes no trading or domain decision.
   `AGENTS.md` exemption at `app/services/data/persistence/`. Utils supplies the
   idempotency key contract that those mechanisms consume; it never opens a
   connection, begins a transaction, or persists an outbox record.
-- Broker, market, risk, order, simulation, portfolio, scoring, or cockpit
+- Broker, market, risk, order, simulation, portfolio, scoring, or operational
   business semantics. Utils supplies the neutral shape; the owning domain
   supplies the meaning. A domain event type, a risk verdict, an order state, and
   a mission outcome are owned by Trading, Risk, Trading, and Simulator
@@ -374,7 +374,7 @@ never reused; new workflows continue from `WF-UTL-004`.
 | `WF-UTL-005` | `tests/utils/usage/workflows/wf_utl_005_error_normalization_and_routing.py`      |
 | `WF-UTL-006` | `tests/utils/usage/workflows/wf_utl_006_trace_identity_and_utc_time.py`          |
 | `WF-UTL-007` | `tests/utils/usage/workflows/wf_utl_007_canonical_serialization_and_digest.py`   |
-| `WF-UTL-008` | Completed: `tests/utils/usage/workflows/wf_utl_008_cockpit_contract_envelope.py`   |
+| `WF-UTL-008` | Completed: `tests/utils/usage/workflows/wf_utl_008_operational_contract_envelope.py`   |
 
 | Status    | Rank       | Workflow ID    | Scope        | Workflow                                   | Input boundary                              | Final outcome                                                           | Requirement sequence                                                                                                                                  |
 | --------- | ---------- | -------------- | ------------ | ------------------------------------------ | ------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -385,9 +385,9 @@ never reused; new workflows continue from `WF-UTL-004`.
 | Completed | Supporting | `WF-UTL-005` | Cross-domain | Error normalization, metadata, and routing | Raw exception or domain error code          | Canonical error code, resolved metadata, and one routed error event     | `FR-UTL-004` through `FR-UTL-006`, `FR-UTL-009`, `FR-UTL-012`                                                                                 |
 | Completed | Supporting | `WF-UTL-006` | Cross-domain | Trace identity and UTC time discipline     | Caller-supplied identity seed or timestamp  | Validated trace identifier plus aware UTC instant and freshness verdict | `FR-UTL-001`, `FR-UTL-025`, `FR-UTL-037`                                                                                                        |
 | Completed | Supporting | `WF-UTL-007` | Cross-domain | Canonical serialization and digest         | Arbitrary domain payload                    | Deterministic redacted canonical JSON and stable digest                 | `FR-UTL-036`, `FR-UTL-038`                                                                                                                        |
-| Completed | Supporting | `WF-UTL-008` | Cross-domain | Cockpit contract envelope build and verify | Domain-owned facts plus profile/version refs and a unit-bearing amount | One validated JSON-safe contract mapping accepted by a consumer, or a fail-closed rejection naming the incompatible version | `FR-UTL-052` through `FR-UTL-055`, `FR-UTL-057` through `FR-UTL-060`, `FR-UTL-066`, `FR-UTL-067` |
+| Completed | Supporting | `WF-UTL-008` | Cross-domain | Operational contract envelope build and verify | Domain-owned facts plus profile/version refs and a unit-bearing amount | One validated JSON-safe contract mapping accepted by a consumer, or a fail-closed rejection naming the incompatible version | `FR-UTL-052` through `FR-UTL-055`, `FR-UTL-057` through `FR-UTL-060`, `FR-UTL-066`, `FR-UTL-067` |
 
-### `WF-UTL-008` — Cockpit Contract Envelope Build and Verify
+### `WF-UTL-008` — Operational Contract Envelope Build and Verify
 
 Status `Completed`. Every workflow stage has executable evidence.
 
@@ -609,7 +609,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 | Completed | `FR-UTL-007` | Generate prefixed UUID4 identifiers without embedded secrets.                                                                                            | `generate_id`           | Entropy read | `ValidationError`: unsupported prefix                                          | **Usage:** `tests/utils/usage/features/03_identity.py::fr_utils_007_generate_id()`**Unit:** `tests/utils/unit/test_identifiers.py::test_generate_id_is_prefixed_and_secret_free()` |
 | Completed | `FR-UTL-008` | Validate supported prefixes and canonical identifier syntax.                                                                                             | `validate_id`           | None         | `ValidationError`: unsupported prefix or malformed identifier                  | **Usage:** `tests/utils/usage/features/03_identity.py::fr_utils_008_validate_id()`**Unit:** `tests/utils/unit/test_identifiers.py::test_validate_id_rejects_malformed()`           |
 | Completed | `FR-UTL-009` | Derive deterministic`id`-prefixed SHA-256 identifiers from canonical caller-supplied identity material; stable IDs are never shared trace identifiers. | `derive_stable_id`      | None         | `ValidationError`: unsupported prefix or empty/non-canonical identity material | **Usage:** `tests/utils/usage/features/03_identity.py::fr_utils_009_derive_stable_id()`**Unit:** `tests/utils/unit/test_identifiers.py::test_derive_stable_id_is_deterministic()`  |
-| Completed | `FR-UTL-051` | Extend the supported generated-prefix set with the cockpit entity prefixes `ses` (session), `rpl` (replay), `scn` (scenario), `prf` (profile), `ord` (order), `fil` (fill), `led` (ledger entry), `ply` (player), and `brn` (branch). Prefixes remain a closed set; an unsupported prefix is rejected, never coerced. Existing trace prefixes `req`, `wf`, `cor`, `cau`, and `evt` are unchanged. | `generate_id`, `validate_id` extended prefix set | Entropy read | `ValidationError`: unsupported prefix | **Usage:** `tests/utils/usage/features/03_identity.py::fr_utils_051_cockpit_prefixes()` **Unit:** `tests/utils/unit/test_identifiers.py::test_cockpit_prefixes_are_supported_and_closed()` |
+| Completed | `FR-UTL-051` | Extend the supported generated-prefix set with the operational entity prefixes `ses` (session), `rpl` (replay), `scn` (scenario), `prf` (profile), `ord` (order), `fil` (fill), `led` (ledger entry), `ply` (player), and `brn` (branch). Prefixes remain a closed set; an unsupported prefix is rejected, never coerced. Existing trace prefixes `req`, `wf`, `cor`, `cau`, and `evt` are unchanged. | `generate_id`, `validate_id` extended prefix set | Entropy read | `ValidationError`: unsupported prefix | **Usage:** `tests/utils/usage/features/03_identity.py::fr_utils_051_operational_prefixes()` **Unit:** `tests/utils/unit/test_identifiers.py::test_operational_prefixes_are_supported_and_closed()` |
 
 ### 4.4 `time/` — UTC Clocks and Timestamps
 
@@ -1233,7 +1233,7 @@ Planned feature-integration tests for the target requirements:
 - `tests/utils/integration/test_persistence_exclusion.py` verifies `NFR-UTL-010`
   by asserting no `app/utils/**` module imports a database driver, connection,
   or transaction helper.
-- `tests/utils/integration/test_cockpit_envelope_workflow.py` verifies
+- `tests/utils/integration/test_operational_envelope_workflow.py` verifies
   `WF-UTL-008` end to end within Utils: reference resolution, exact-unit
   construction, envelope sequencing, redaction, hashing, consumer validation, and
   duplicate suppression.
@@ -1327,7 +1327,7 @@ set `PYTHONPATH` to the repository root before invoking each program directly.
 - [ ] `random_streams/` exists with order-independent derivation, exact
   reproducible draws, stream independence, and recorded algorithm version.
   `FR-UTL-085`–`FR-UTL-088`
-- [ ] Cockpit entity prefixes, `ProfileRef v1`, and `VersionRef v1` are
+- [ ] Operational entity prefixes, `ProfileRef v1`, and `VersionRef v1` are
   available and their version mismatches fail closed.
   `FR-UTL-051`–`FR-UTL-054`
 - [ ] Time domains, venue-local conversion, and monotonic sequence allocation
@@ -1344,7 +1344,7 @@ set `PYTHONPATH` to the repository root before invoking each program directly.
 - [ ] Five new feature usage programs (`10_units.py` through
   `14_random_streams.py`) exist and execute, and `features.py` covers all
   fourteen features.
-- [X] `WF-UTL-008` has its standalone stage-labelled workflow program. `tests/utils/usage/workflows/wf_utl_008_cockpit_contract_envelope.py:1`
+- [X] `WF-UTL-008` has its standalone stage-labelled workflow program. `tests/utils/usage/workflows/wf_utl_008_operational_contract_envelope.py:1`
 - [X] `NFR-UTL-008`, `NFR-UTL-009`, and `NFR-UTL-010` have structural,
   cross-process determinism, and dependency evidence.
 - [X] Every new source file exceeds 80% branch-aware coverage individually. `tests/utils/unit/test_phase0_edge_cases.py:1`

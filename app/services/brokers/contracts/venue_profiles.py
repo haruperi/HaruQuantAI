@@ -1,7 +1,7 @@
 # ruff: noqa: DOC501, N812
 """InstrumentVenueProfile v1 cross-domain contract transport.
 
-The Trading Cockpit Phase 0 reconciliation (``TC-IMP-BRK-01``) requires an
+The application Phase 0 reconciliation (``feature``) requires an
 authoritative ``InstrumentVenueProfile`` covering symbol identity, asset class,
 venue, tick size, price precision, quantity step, contract multiplier, session
 calendar, order types, time-in-force, margin, shorting, settlement, halt state,

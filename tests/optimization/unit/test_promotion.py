@@ -1,4 +1,4 @@
-"""Tests for the promotion contract consumer port (TC-IMP-OPT-10)."""
+"""Tests for the promotion contract consumer port (feature)."""
 
 from collections.abc import Mapping
 
@@ -21,7 +21,7 @@ def test_promotion_fails_closed_without_provider() -> None:
     )
     assert result["promotion_status"] == "NOT_PROMOTED"
     assert result["advisory_final_decision"] == "ready_for_risk_review"
-    assert result["deferred_to"] == "TC-IMP-RES-10"
+    assert result["deferred_to"] == "feature"
 
 
 def test_promotion_passes_through_provider_evidence() -> None:

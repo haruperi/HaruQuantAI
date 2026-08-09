@@ -89,7 +89,7 @@ def _open_hours() -> MarketHours:
 
 
 def test_apply_venue_halt_overrides_tradability_with_genuine_evidence() -> None:
-    """A halted venue is never reported open, even mid-session (TC-IMP-DATA-05)."""
+    """A halted venue is never reported open, even mid-session (feature)."""
     hours = _open_hours()
     assert hours.is_open is True
 

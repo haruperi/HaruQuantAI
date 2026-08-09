@@ -40,7 +40,7 @@ def fr_brokers_136_route_plan() -> None:
     """FR-BRK-136: build and parse a health-aware RoutePlan v1."""
     _header("FR-BRK-136: Health-Aware Route Plan (build/parse)")
     plan = build_broker_route_plan(
-        plan_id="plan-cockpit-1",
+        plan_id="plan-operational-1",
         primary_broker=get_broker_id("mt5"),
         primary_environment=get_broker_environment("demo"),
         primary_readiness="READY",
@@ -65,8 +65,8 @@ def fr_brokers_137_failover_decision() -> None:
     """FR-BRK-137: build and parse a fail-closed FailoverDecision v1."""
     _header("FR-BRK-137: Failover Decision (build/parse, fail-closed)")
     decision = build_broker_failover_decision(
-        decision_id="dec-cockpit-1",
-        plan_id="plan-cockpit-1",
+        decision_id="dec-operational-1",
+        plan_id="plan-operational-1",
         decision="FAILOVER_READ_ONLY",
         active_broker=get_broker_id("ctrader"),
         active_environment=get_broker_environment("demo"),
@@ -89,7 +89,7 @@ def fr_brokers_138_no_silent_write_reroute() -> None:
     try:
         build_broker_failover_decision(
             decision_id="dec-blocked",
-            plan_id="plan-cockpit-1",
+            plan_id="plan-operational-1",
             decision="FAILOVER_READ_ONLY",
             active_broker=get_broker_id("ctrader"),
             active_environment=get_broker_environment("demo"),

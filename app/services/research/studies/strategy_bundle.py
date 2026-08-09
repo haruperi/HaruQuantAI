@@ -1,4 +1,4 @@
-"""Versioned strategy evidence bundle (TC-IMP-RES-02, EXTEND FEAT-RES-07).
+"""Versioned strategy evidence bundle (feature, EXTEND FEAT-RES-07).
 
 Packages the hypothesis, instruments, regimes, sessions, methodology, sample,
 costs, results, limitations, and versioned strategy linkage into one advisory

@@ -1,0 +1,1 @@
+import React from "react"; import { renderToStaticMarkup } from "react-dom/server"; import { EmergencyPanel } from "../../../app/ui/src/features/emergency-ux"; function main(): void { console.log(renderToStaticMarkup(<EmergencyPanel active={false} steps={[]} onAcknowledge={()=>undefined}/>)); } main();

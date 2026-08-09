@@ -1,9 +1,9 @@
-"""Risk-parameter sensitivity analysis (TC-IMP-OPT-05).
+"""Risk-parameter sensitivity analysis (feature).
 
-Extends ``FEAT-OPT-05``: measure how candidate outcomes shift as the cockpit risk
+Extends ``FEAT-OPT-05``: measure how candidate outcomes shift as the operational risk
 parameters vary — risk per trade, drawdown warning thresholds, stress limits, and
 exposure caps — without weakening any hard limit. Risk owns the authoritative
-``TradingPolicyProfile v1`` (``TC-IMP-RISK-01`` → ``RiskConfig`` in
+``TradingPolicyProfile v1`` (``feature`` → ``RiskConfig`` in
 ``app/services/risk/config/profiles.py``). Optimization consumes only a caller-supplied
 JSON-safe mapping of the risk fields it needs; it never imports Risk internals (DEEP
 gate) and never mutates or relaxes a hard limit (NFR-OPT-003 safety).

@@ -30,6 +30,29 @@ from app.utils import canonical_json, get_logger
 logger = get_logger(__name__)
 
 
+def _execute_schema_statement(connection: sqlite3.Connection, statement: str) -> None:
+    """Execute one migration statement with additive-column idempotence.
+
+    The fixture may open the same database more than once in a usage workflow.
+    Production migrations use the Data-owned ledger; this lightweight test
+    store instead checks whether an additive column already exists.
+
+    Args:
+        connection: Open fixture database connection.
+        statement: Simulator-owned migration statement.
+    """
+    tokens = statement.split()
+    match tokens:
+        case ["ALTER", "TABLE", "sim_sessions", "ADD", "COLUMN", column_name, *_]:
+            existing_columns = {
+                str(row[1])
+                for row in connection.execute("PRAGMA table_info(sim_sessions)")
+            }
+            if column_name in existing_columns:
+                return
+    connection.execute(statement)
+
+
 def _parse_canonical_event(canonical_event: str) -> tuple[dict[str, object], int]:
     """Parse and validate one canonical journal record.
 
@@ -117,7 +140,7 @@ class SqliteSimulationStateStore:
             with closing(self._connect()) as connection, connection:
                 for migration in SIMULATION_MIGRATIONS:
                     for statement in migration.statements:
-                        connection.execute(statement)
+                        _execute_schema_statement(connection, statement)
         except (OSError, sqlite3.Error) as error:
             raise SimulationError(
                 "SIM_PERSISTENCE_FAILED", "State initialization failed"

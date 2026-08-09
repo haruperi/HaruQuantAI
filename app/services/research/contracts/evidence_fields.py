@@ -1,4 +1,4 @@
-"""Research source evidence classification additions (TC-IMP-RES-01).
+"""Research source evidence classification additions (feature).
 
 Adds license/use classification, trust score, revisions, scope, coverage, and
 quality state to the evidence contract surface. These are additive transport

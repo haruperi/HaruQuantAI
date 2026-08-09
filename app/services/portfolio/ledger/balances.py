@@ -1,6 +1,6 @@
 """Account balance and cash computation for the Portfolio ledger.
 
-Implements ``TC-IMP-PORT-03``: settled and unsettled cash, accrued income and
+Implements ``feature``: settled and unsettled cash, accrued income and
 costs, and reproducible balance rebuild. Cash postings are tagged with a
 ``settlement`` or operational posting type so balances can be split into
 settled and unsettled (pending) components.

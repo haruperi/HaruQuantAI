@@ -16,6 +16,10 @@ from app.services.api.middleware import (
 from app.services.api.middleware import (
     build_secret_redaction_middleware as _build_secret_redaction_middleware,
 )
+from app.services.api.workstation import (
+    build_workstation_read_model,
+    execute_workstation_command,
+)
 
 if TYPE_CHECKING:
     from starlette.requests import Request
@@ -77,6 +81,7 @@ __all__ = (
     "build_secret_redaction_middleware",
     "build_stream_event",
     "build_unknown_broker_state_alert",
+    "build_workstation_read_model",
     "check_clock_drift",
     "consume_api_approval",
     "create_api_app",
@@ -85,6 +90,7 @@ __all__ = (
     "create_in_process_metric_sink",
     "create_stream_manager",
     "deliver_critical_alert",
+    "execute_workstation_command",
     "export_prometheus_metrics",
     "finalize_api_idempotency_key",
     "get_api_settings",

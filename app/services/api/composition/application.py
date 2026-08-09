@@ -79,6 +79,7 @@ from app.services.api.routes import (
     simulation_sessions_router,
     strategies_router,
     trading_router,
+    workstation_router,
 )
 from app.services.api.streams import create_stream_connection_manager
 from app.utils import generate_id, utc_now
@@ -104,6 +105,7 @@ _ROUTERS = (
     operator_router,
     observability_router,
     agentic_router,
+    workstation_router,
 )
 
 

@@ -26,4 +26,5 @@ def test_runner_submits_complete_manifest_once(monkeypatch) -> None:
     assert [step.migration_id for step in request.steps] == [
         "001_analytics_schema_v1",
         "002_retire_unused_analytics_derived_store",
+        "003_player_evidence_schema",
     ]

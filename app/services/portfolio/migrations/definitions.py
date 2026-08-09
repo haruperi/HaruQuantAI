@@ -23,7 +23,7 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
-PORTFOLIO_SCHEMA_VERSION = "v1"
+PORTFOLIO_SCHEMA_VERSION = "v3"
 
 _PORTFOLIO_SCHEMA_STATEMENTS = (
     """
@@ -235,6 +235,26 @@ _PORTFOLIO_LEDGER_SCHEMA_STATEMENTS = (
     """.strip(),
 )
 
+_PORTFOLIO_OPERATIONS_SCHEMA_STATEMENTS = tuple(
+    f"""CREATE TABLE IF NOT EXISTS {table} (
+        record_id TEXT PRIMARY KEY,
+        portfolio_id TEXT NOT NULL,
+        version TEXT NOT NULL,
+        record_json TEXT NOT NULL,
+        canonical_hash TEXT NOT NULL,
+        occurred_at TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    ) STRICT""".strip()
+    for table in (
+        "portfolio_valuation_policies",
+        "position_lots",
+        "valuation_snapshots",
+        "margin_risk_snapshots",
+        "reconciliation_incidents",
+        "lifecycle_events",
+    )
+)
+
 
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Portfolio schema statements.
@@ -262,6 +282,12 @@ PORTFOLIO_MIGRATIONS: tuple[Any, ...] = (
         migration_id="002_portfolio_ledger_schema",
         checksum=_migration_checksum(_PORTFOLIO_LEDGER_SCHEMA_STATEMENTS),
         statements=_PORTFOLIO_LEDGER_SCHEMA_STATEMENTS,
+    ),
+    build_migration_step(
+        domain="portfolio",
+        migration_id="003_portfolio_operations_schema",
+        checksum=_migration_checksum(_PORTFOLIO_OPERATIONS_SCHEMA_STATEMENTS),
+        statements=_PORTFOLIO_OPERATIONS_SCHEMA_STATEMENTS,
     ),
 )
 

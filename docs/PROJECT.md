@@ -1,8 +1,8 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `Missing`
-> **Last updated:** `2026-07-22`
+> **Status:** `Completed` — all 204 registered application features are implemented and verified; deployment and external-provider readiness remain separate runtime concerns.
+> **Last updated:** `2026-08-09`
 
 > This document is the system-level source of truth.
 > It defines how domains fit together, how cross-domain workflows operate, which rules apply system-wide, and how the complete system is verified.
@@ -240,11 +240,11 @@ All eight registered Indicators features are `Completed`.
 #### 2.1.8 Simulation
 
 * **Package**: `app/services/simulator`
-* **Responsibility**: Orchestrate the historical backtest loop, replay strategies deterministically over historical data through the core trading path, and produce simulated fills, journals, and execution reports.
+  * **Responsibility**: Orchestrate deterministic historical backtests and governed simulation missions with scenarios, execution realism, secured recovery, and simulated alert evidence.
 * **Inputs**: Historical datasets from Data, order intents via the Trading `sim` route, vetted strategy registry references, backtest configuration.
-* **Outputs**: `StandardResponse[SimulationResult]` and `StandardResponse[PortfolioSimulationResult]` at the public boundary, with raw simulated trades, journals, artifact manifests, and execution reports directly in `data`.
-* **Owns**: Simulation results and artifacts persistence, its own tables, schemas, and migration definitions, orchestration of the historical backtest loop (`Data → Indicators → Strategy → Risk → Trading(sim) → Simulation fills`), backtest runtime, tick-based execution replay, simulated fill models and all simulated state (the broker analogue for the sim route, as MT5 owns state on the live route), artifact manifests.
-* **Boundaries**: No live side effects; in-memory execution state (though final backtest results and artifacts may be persisted). Does not own live broker channels, live adapter code, or execution of arbitrary strategy code strings.
+  * **Outputs**: `StandardResponse[SimulationResult]`, `StandardResponse[PortfolioSimulationResult]`, `MissionDefinition v1`, `ReplayIdentity v1`, scenario/realism provider evidence, secured checkpoints, and simulated `AlertEvent v1` evidence.
+  * **Owns**: Simulation results and artifacts persistence, its own tables/schemas/migrations, the historical backtest loop (`Data → Indicators → Strategy → Risk → Trading(sim) → Simulation fills`), simulation-only modes and actual-state checklists, scenario triggers and injected events, execution-realism models, canonical replay identity, secured-session recovery, and simulated alert lifecycle.
+  * **Boundaries**: No live side effects. Ordinary live what-if state remains in memory; only explicitly secured durable sessions receive checkpoint recovery. Simulator does not own live broker channels/adapters, external alert delivery, or arbitrary strategy code execution.
 * **Key Limits**: Initial balance must be positive; only vetted registry references accepted (no raw code); deterministic replay required; public operations return Utils-owned `StandardResponse[T]` with raw producer values in `data` and structured `SIM_*` errors in `error`. The synchronous public run receives an explicit Simulation-owned dependency bundle, uses the request as the sole request-id authority, and binds Trading's sim route to one injected `SimTrader.submit_order` instance. Official execution has no ambient clock, implicit execution model, inferred session calendar, or module-global active engine.
 * **Documentation**: `app/services/simulator/README.md`
 
@@ -431,9 +431,9 @@ features. No secondary programme or work-package identifier namespace is active.
 
 | Status | Count |
 | --- | ---: |
-| Completed | 185 |
+| Completed | 204 |
 | Partial | 0 |
-| Missing | 19 |
+| Missing | 0 |
 | **Total** | **204** |
 
 Feature descriptions, requirements, public APIs, persistence, and evidence remain

@@ -544,11 +544,11 @@ def test_resolve_request_id_rejects_invalid_explicit() -> None:
 
 # ---------------------------------------------------------------------------
 # Registry completeness sanity (the full 142-candidate coverage gate lives in
-# the boundary test added with the final slice; `TC-IMP-DATA-02` added
-# `data.market_data.get_level1_snapshot`, `TC-IMP-DATA-06` added four
-# data-integrity detector operations, `TC-IMP-DATA-11` added
-# `data.market_data.get_market_snapshot`, `TC-IMP-DATA-12` added
-# `data.sources.compute_source_trust_score`, and `TC-IMP-DATA-13` added
+# the boundary test added with the final slice; `feature` added
+# `data.market_data.get_level1_snapshot`, `feature` added four
+# data-integrity detector operations, `feature` added
+# `data.market_data.get_market_snapshot`, `feature` added
+# `data.sources.compute_source_trust_score`, and `feature` added
 # `data.market_data.export_replay_evidence`).
 # ---------------------------------------------------------------------------
 

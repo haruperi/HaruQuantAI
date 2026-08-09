@@ -1,9 +1,9 @@
-"""Multi-objective candidate evaluation (TC-IMP-OPT-07).
+"""Multi-objective candidate evaluation (feature).
 
 Extends ``FEAT-OPT-02``: combine the enabled core objective (risk-adjusted
 performance) with process-adherence, stability, safety, and execution-realism
 dimensions so that raw profit is never the sole objective. Analytics owns process
-scoring (``TC-IMP-ANL-02`` → ``FEAT-ANLT-06``), consumed here only through its
+scoring (``feature`` → ``FEAT-ANLT-06``), consumed here only through its
 documented JSON-safe ``analytics.process_score.v1`` mapping transport; Optimization
 never imports Analytics internals (DEEP gate) and never redefines a metric.
 

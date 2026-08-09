@@ -1,4 +1,4 @@
-"""Tests for the Strategy operating-envelope candidate gate (TC-IMP-OPT-04)."""
+"""Tests for the Strategy operating-envelope candidate gate (feature)."""
 
 from decimal import Decimal
 

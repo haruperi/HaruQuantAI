@@ -1,0 +1,2 @@
+import { render, screen } from "@testing-library/react"; import { describe, expect, it } from "vitest"; import { TrainingPanel } from ".";
+describe("TrainingPanel", () => { it("fails closed on unknown qualification", () => { render(<TrainingPanel qualification={{status:"unknown",curriculumVersion:null,remediation:[]}} />); expect(screen.getByText(/Curriculum: Unknown/)).toBeInTheDocument(); }); });

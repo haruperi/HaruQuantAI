@@ -30,6 +30,10 @@ from app.services.portfolio.ledger.contracts import (
     parse_ledger_entry,
     parse_posting_batch,
 )
+from app.services.portfolio.margin import (
+    build_portfolio_risk_health,
+    calculate_margin_view,
+)
 from app.services.portfolio.migrations import (
     get_portfolio_migrations,
     run_portfolio_migrations,
@@ -38,10 +42,15 @@ from app.services.portfolio.rebalancing.cross_account import (
     assess_common_mode_exposure,
     measure_cross_account_correlation,
 )
+from app.services.portfolio.reconciliation import (
+    build_lifecycle_postings,
+    reconcile_portfolio,
+)
 from app.services.portfolio.state.runtime import (
     build_portfolio_state_store,
     execute_portfolio_state_store_operation,
 )
+from app.services.portfolio.valuation import calculate_portfolio_valuation
 
 __all__ = (
     "activate_portfolio",
@@ -49,8 +58,12 @@ __all__ = (
     "assess_portfolio_drift",
     "build_ledger_account",
     "build_ledger_entry",
+    "build_lifecycle_postings",
+    "build_portfolio_risk_health",
     "build_portfolio_state_store",
     "build_posting_batch",
+    "calculate_margin_view",
+    "calculate_portfolio_valuation",
     "construct_portfolio",
     "create_portfolio_handle",
     "create_portfolio_value",
@@ -70,6 +83,7 @@ __all__ = (
     "parse_ledger_entry",
     "parse_posting_batch",
     "recompute_portfolio_measurement",
+    "reconcile_portfolio",
     "register_portfolio_definition",
     "rollback_portfolio",
     "run_portfolio_migrations",

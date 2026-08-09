@@ -27,7 +27,7 @@ def test_verify_dataset_manifest_delegates_to_load_dataset() -> None:
 
 
 def _manifest(*, schema_version: str, normalization_version: str) -> StorageManifest:
-    """Return one minimal valid StorageManifest fixture (TC-IMP-DATA-07)."""
+    """Return one minimal valid StorageManifest fixture (feature)."""
     now = datetime(2026, 1, 1, tzinfo=UTC)
     return StorageManifest(
         artifact_id="artifact-fixture",

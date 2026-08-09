@@ -253,7 +253,7 @@ doji, engulfing, pinbar, inside_bar, build_chart_pattern_evidence
 | `validate_indicator` | Stable | `WF-INDI-001..005` | No cache access | None |
 | `run_indicators_migrations` | Stable | None (startup support) | No cache access | Applies the Indicators support schema through Data's migration executor |
 | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag`, `atr`, `adr`, `rolling_volatility`, `standard_deviation`, `rsi`, `williams_r`, `cmf`, `obv`, `mfi`, `price_volume_distribution`, `doji`, `engulfing`, `pinbar`, `inside_bar` | Stable | `WF-INDI-001..004`; official in `SYS-WF-001` and `SYS-WF-002` | No cache access; returns canonical checksum material | None |
-| `measure_market_speed`, `measure_volatility_envelope`, `measure_trend_strength`, `project_structural_levels`, `measure_order_flow`, `build_chart_pattern_evidence` | Stable | Cockpit measurement consumption | None; pure deterministic projection | None |
+| `measure_market_speed`, `measure_volatility_envelope`, `measure_trend_strength`, `project_structural_levels`, `measure_order_flow`, `build_chart_pattern_evidence` | Stable | Operational measurement consumption | None; pure deterministic projection | None |
 | `build_indicator_snapshot`, `parse_indicator_snapshot`, `build_liquidity_snapshot`, `parse_liquidity_snapshot` | Stable v1 contract transport | Producer-consumer handoff | None; detached JSON-safe mappings | None |
 | `assert_closed_input` | Stable | Decision-time input admission | None; fail-closed validation | None |
 
@@ -1367,7 +1367,7 @@ this immutable, non-repainting production surface.
 |---|---|---|---|---|
 | Completed | `FR-INDI-039` | Reject an incomplete interval, an interval whose duration does not match its canonical source timeframe, or evidence unavailable at the decision time. | `assert_closed_input` | `tests/indicators/unit/test_closed_input.py`; `tests/indicators/usage/features/08_input_guards.py::fr_indi_039` |
 | Completed | `FR-INDI-040` | Reject unknown, future, or stale availability evidence using an explicit positive caller-supplied maximum age and no hidden default. | `assert_closed_input` | `tests/indicators/integration/test_closed_input_workflow.py`; `tests/indicators/usage/features/08_input_guards.py::fr_indi_040` |
-| Completed | `FR-INDI-041` | Reject unknown or incompatible canonical source/requested timeframes and require the source interval to be fully closed by decision time. | `assert_closed_input` | `tests/indicators/integration/test_no_lookahead_cockpit.py`; `tests/indicators/usage/features/08_input_guards.py::fr_indi_041` |
+| Completed | `FR-INDI-041` | Reject unknown or incompatible canonical source/requested timeframes and require the source interval to be fully closed by decision time. | `assert_closed_input` | `tests/indicators/integration/test_no_lookahead_operational.py`; `tests/indicators/usage/features/08_input_guards.py::fr_indi_041` |
 
 ## 5. Package-Wide Requirements and Shared Configuration
 

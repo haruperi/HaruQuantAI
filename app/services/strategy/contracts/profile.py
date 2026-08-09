@@ -1,4 +1,4 @@
-"""Versioned Strategy cockpit profile transport."""
+"""Versioned Strategy operational profile transport."""
 
 # mypy: disable-error-code="arg-type"
 # ruff: noqa: DOC201

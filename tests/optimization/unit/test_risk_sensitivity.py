@@ -1,4 +1,4 @@
-"""Tests for risk-parameter sensitivity analysis (TC-IMP-OPT-05)."""
+"""Tests for risk-parameter sensitivity analysis (feature)."""
 
 from decimal import Decimal
 

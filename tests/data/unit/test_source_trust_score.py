@@ -1,4 +1,4 @@
-"""Unit tests for the deterministic source trust score (TC-IMP-DATA-12)."""
+"""Unit tests for the deterministic source trust score (feature)."""
 
 from __future__ import annotations
 

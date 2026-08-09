@@ -133,12 +133,14 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.agentic.approve_handoff", method: "POST", path: "/api/v1/agentic/handoffs/approve", permission: "agentic:approve_promotion" },
   { id: "api.agentic.quarantine_agent", method: "POST", path: "/api/v1/agentic/incidents/quarantine", permission: "agentic:operate" },
   { id: "api.agentic.disable", method: "POST", path: "/api/v1/agentic/disable", permission: "agentic:operate" },
+  { id: "api.workstation.read", method: "GET", path: "/api/v1/workstation", permission: "workstation:read" },
+  { id: "api.workstation.command", method: "POST", path: "/api/v1/workstation/commands", permission: "workstation:command" },
 ];
 
 describe("clients match the backend route catalog", () => {
-  it("has exactly the approved 76 operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(76);
-    expect(ROUTE_CONTRACTS).toHaveLength(76);
+  it("has exactly the approved 78 operations", () => {
+    expect(ROUTE_CONTRACT_COUNT).toBe(78);
+    expect(ROUTE_CONTRACTS).toHaveLength(78);
   });
 
   it("matches every expected id, method, path, and permission", () => {

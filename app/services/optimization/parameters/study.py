@@ -1,6 +1,6 @@
 """OptimizationStudy v1 — dataset/replay identity and budget contract.
 
-This module implements the Trading Cockpit Phase 0 ``TC-IMP-OPT-01`` addition to
+This module implements the application Phase 0 ``feature`` addition to
 ``FEAT-OPT-01``/``FEAT-OPT-06``: an Optimization-owned versioned study identity that
 binds a bounded search to the dataset it runs over, a deterministic replay identity,
 and the approved resource budget. Per decision D-1 the contract travels as a validated

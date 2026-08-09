@@ -45,6 +45,7 @@ def test_simulation_imports_no_data_storage_module() -> None:
     assert [step.migration_id for step in SIMULATION_MIGRATIONS] == [
         "001_simulator_state_v1",
         "002_simulator_playback_sessions_v1",
+        "003_simulator_secured_sessions_v1",
     ]
     session_ddl = SIMULATION_MIGRATIONS[1].statements[0]
     assert "CREATE TABLE IF NOT EXISTS sim_sessions" in session_ddl
@@ -59,6 +60,10 @@ def test_simulation_imports_no_data_storage_module() -> None:
             "expires_at",
         )
     )
+    secured_ddl = "\n".join(SIMULATION_MIGRATIONS[2].statements)
+    assert "sim_session_checkpoints" in secured_ddl
+    assert "recovery_state" in secured_ddl
+    assert "replay_identity_json" in secured_ddl
 
 
 def test_simulation_imports_no_sqlite_module() -> None:

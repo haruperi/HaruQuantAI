@@ -259,7 +259,7 @@ def fr_data_035() -> None:
 
 
 def fr_data_190() -> None:
-    """FR-DATA-190/191: Stage 8 — Compose a bounded Level-1 bid/ask/last/spread/volume snapshot with disclosed source/receive time and computed freshness (TC-IMP-DATA-02)."""
+    """FR-DATA-190/191: Stage 8 — Compose a bounded Level-1 bid/ask/last/spread/volume snapshot with disclosed source/receive time and computed freshness (feature)."""
     _header("Stage 8: Level-1 Quote Snapshot - Bounded Snapshot (FR-DATA-190/191)")
     req = build_level1_snapshot_request(
         source_id="mt5",

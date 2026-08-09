@@ -182,7 +182,7 @@ def fr_data_121_122() -> None:
 
 
 def fr_data_194_195() -> None:
-    """FR-DATA-194/195: Stage 6 — Overlay genuine venue-halt and close/roll window evidence onto computed tradability (TC-IMP-DATA-05)."""
+    """FR-DATA-194/195: Stage 6 — Overlay genuine venue-halt and close/roll window evidence onto computed tradability (feature)."""
     _header(
         "Stage 6: Venue Halt & Roll Window Overlay - apply_venue_halt (FR-DATA-194/195)"
     )

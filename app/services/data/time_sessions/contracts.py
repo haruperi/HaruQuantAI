@@ -151,8 +151,8 @@ class MarketHoursRequest(TracedOpenContract):
 class MarketHours(MarketSchedule):
     """Evaluated venue tradability derived from authoritative sessions.
 
-    `halted`, `halt_reason`, and `reopen_at` (Trading Cockpit Phase 0
-    `TC-IMP-DATA-05`) default to the safe "no halt evidence supplied" state
+    `halted`, `halt_reason`, and `reopen_at` (application Phase 0
+    `feature`) default to the safe "no halt evidence supplied" state
     and are only ever set from genuine caller-supplied venue evidence (for
     example a Data-owned `halt`/`venue_state` stream event) through
     `apply_venue_halt`; this contract never infers a halt on its own.

@@ -1,0 +1,2 @@
+import type { Alarm } from "./contracts";
+export function AlarmModel({ alarms }: { alarms: readonly Alarm[] }): React.JSX.Element { const roots = new Map<string, Alarm>(); [...alarms].sort((a,b) => b.priority-a.priority).forEach((alarm) => { if (!roots.has(alarm.rootId)) roots.set(alarm.rootId, alarm); }); return <section aria-live="polite" aria-labelledby="alarms-heading"><h2 id="alarms-heading">Alarm model</h2>{[...roots.values()].map((alarm) => <div key={alarm.id} role={alarm.priority >= 3 ? "alert" : "status"}>{alarm.message} ({alarm.state})</div>)}</section>; }

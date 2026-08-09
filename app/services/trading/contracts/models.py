@@ -741,7 +741,7 @@ class OrderIntent(_TradingModel):
     )
     @classmethod
     def _validate_intent_lineage(cls, value: str | None) -> str | None:
-        """Validate optional cockpit lineage references.
+        """Validate optional operational lineage references.
 
         Args:
             value: Candidate lineage text.

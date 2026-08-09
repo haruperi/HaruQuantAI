@@ -111,24 +111,82 @@ def read_session_record(store: object, session_id: str) -> Mapping[str, object] 
     """
     _require_store(store)
     row = _one_row(
-        "SELECT session_id, run_id, status, cursor, created_at, expires_at "
+        "SELECT session_id, run_id, status, cursor, created_at, expires_at, "
+        "session_kind, mode, recovery_state, secured_at, clock_state_json, "
+        "scenario_state_json, replay_identity_json, checklist_state_json, "
+        "alert_state_json, emergency_state_json, counters_json, branch_lineage_json "
         "FROM sim_sessions WHERE session_id=?",
         (session_id,),
     )
     if row is None:
         return None
-    return {
+    result: dict[str, object] = {
         "session_id": str(row["session_id"]),
         "run_id": str(row["run_id"]),
         "status": str(row["status"]),
         "cursor": int(str(row["cursor"])),
         "created_at": str(row["created_at"]),
         "expires_at": str(row["expires_at"]),
+        "session_kind": str(row["session_kind"]),
+        "mode": str(row["mode"]),
+        "recovery_state": str(row["recovery_state"]),
+        "secured_at": None if row.get("secured_at") is None else str(row["secured_at"]),
     }
+    for field in (
+        "clock_state",
+        "scenario_state",
+        "replay_identity",
+        "checklist_state",
+        "alert_state",
+        "emergency_state",
+        "counters",
+        "branch_lineage",
+    ):
+        result[field] = _decode_payload(row[f"{field}_json"]) or {}
+    return result
+
+
+def read_recovery_checkpoint_records(
+    store: object, session_id: str
+) -> tuple[Mapping[str, object], ...]:
+    """Read one session's ordered immutable recovery checkpoints.
+
+    Args:
+        store: Opaque Simulator persistence handle.
+        session_id: Secured simulation-session identity.
+
+    Returns:
+        Ordered normalized checkpoint mappings.
+    """
+    _require_store(store)
+    rows = _execute(
+        (
+            "SELECT session_id, sequence, checkpoint_hash, previous_hash, "
+            "replay_identity_json, state_payload_json, created_at "
+            "FROM sim_session_checkpoints WHERE session_id=? ORDER BY sequence",
+        ),
+        ((session_id,),),
+        max_rows=10_000,
+    ).rows
+    return tuple(
+        {
+            "session_id": str(row["session_id"]),
+            "sequence": int(str(row["sequence"])),
+            "checkpoint_hash": str(row["checkpoint_hash"]),
+            "previous_hash": (
+                None if row.get("previous_hash") is None else str(row["previous_hash"])
+            ),
+            "replay_identity": _decode_payload(row["replay_identity_json"]),
+            "state_payload": _decode_payload(row["state_payload_json"]),
+            "created_at": str(row["created_at"]),
+        }
+        for row in rows
+    )
 
 
 __all__ = [
     "read_completed_run_record",
+    "read_recovery_checkpoint_records",
     "read_result_record",
     "read_run_record",
     "read_session_record",

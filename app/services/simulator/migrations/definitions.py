@@ -77,6 +77,82 @@ SIMULATION_MIGRATIONS += (
     ),
 )
 
+_SECURED_SESSION_STATEMENTS = (
+    (
+        "ALTER TABLE sim_sessions ADD COLUMN session_kind TEXT NOT NULL "
+        "DEFAULT 'playback' CHECK(session_kind IN ('playback', 'secured'))"
+    ),
+    (
+        "ALTER TABLE sim_sessions ADD COLUMN mode TEXT NOT NULL DEFAULT 'Standard' "
+        "CHECK(mode IN ('Guided', 'Standard', 'Expert', 'Challenge'))"
+    ),
+    (
+        "ALTER TABLE sim_sessions ADD COLUMN recovery_state TEXT NOT NULL "
+        "DEFAULT 'RUNNING' CHECK(recovery_state IN ('STARTING', "
+        "'RECOVERY_LOCKED', 'RESTORING', 'RECONCILING', 'VERIFIED', "
+        "'EXPLICIT_REARM', 'RUNNING', 'INTEGRITY_FAILURE'))"
+    ),
+    "ALTER TABLE sim_sessions ADD COLUMN secured_at TEXT",
+    (
+        "ALTER TABLE sim_sessions ADD COLUMN clock_state_json TEXT NOT NULL "
+        "DEFAULT '{}' CHECK(json_valid(clock_state_json))"
+    ),
+    (
+        "ALTER TABLE sim_sessions ADD COLUMN scenario_state_json TEXT NOT NULL "
+        "DEFAULT '{}' CHECK(json_valid(scenario_state_json))"
+    ),
+    (
+        "ALTER TABLE sim_sessions ADD COLUMN replay_identity_json TEXT NOT NULL "
+        "DEFAULT '{}' CHECK(json_valid(replay_identity_json))"
+    ),
+    (
+        "ALTER TABLE sim_sessions ADD COLUMN checklist_state_json TEXT NOT NULL "
+        "DEFAULT '{}' CHECK(json_valid(checklist_state_json))"
+    ),
+    (
+        "ALTER TABLE sim_sessions ADD COLUMN alert_state_json TEXT NOT NULL "
+        "DEFAULT '{}' CHECK(json_valid(alert_state_json))"
+    ),
+    (
+        "ALTER TABLE sim_sessions ADD COLUMN emergency_state_json TEXT NOT NULL "
+        "DEFAULT '{}' CHECK(json_valid(emergency_state_json))"
+    ),
+    (
+        "ALTER TABLE sim_sessions ADD COLUMN counters_json TEXT NOT NULL "
+        "DEFAULT '{}' CHECK(json_valid(counters_json))"
+    ),
+    (
+        "ALTER TABLE sim_sessions ADD COLUMN branch_lineage_json TEXT NOT NULL "
+        "DEFAULT '{}' CHECK(json_valid(branch_lineage_json))"
+    ),
+    (
+        "CREATE TABLE IF NOT EXISTS sim_session_checkpoints ("
+        "session_id TEXT NOT NULL, sequence INTEGER NOT NULL CHECK(sequence >= 0), "
+        "checkpoint_hash TEXT NOT NULL, previous_hash TEXT, "
+        "replay_identity_json TEXT NOT NULL CHECK(json_valid(replay_identity_json)), "
+        "state_payload_json TEXT NOT NULL CHECK(json_valid(state_payload_json)), "
+        "created_at TEXT NOT NULL, PRIMARY KEY(session_id, sequence), "
+        "UNIQUE(checkpoint_hash), "
+        "FOREIGN KEY(session_id) REFERENCES sim_sessions(session_id)"
+        ") STRICT"
+    ),
+    (
+        "CREATE INDEX IF NOT EXISTS idx_sim_session_checkpoints_hash "
+        "ON sim_session_checkpoints(session_id, checkpoint_hash)"
+    ),
+)
+
+SIMULATION_MIGRATIONS += (
+    build_migration_step(
+        domain="simulator",
+        migration_id="003_simulator_secured_sessions_v1",
+        checksum=sha256(
+            "\n".join(_SECURED_SESSION_STATEMENTS).encode("utf-8")
+        ).hexdigest(),
+        statements=_SECURED_SESSION_STATEMENTS,
+    ),
+)
+
 
 def run_simulator_migrations(request_id: str) -> object:
     """Apply the complete immutable Simulator migration manifest through Data.

@@ -3163,7 +3163,7 @@ their owning manifests.
 
 These are unresolved owner choices raised by the approved capability audit. They are recorded here, not resolved by this documentation task.
 
-- **OD-DATA-01 — Level-2 order-book ownership.** The consolidated capability model assigns L2 order-book state to Data (`LOW` confidence), but the only order-book model in the repository is Brokers' `BrokerOrderBook` (`app/services/brokers/contracts/models.py:941`). The owner must decide whether Data owns a new `OrderBookSnapshot` contract and Brokers consumes it, or Brokers retains L2 and the capability model is amended. Re-investigate before implementing.
+- **OD-DATA-01 — Level-2 order-book ownership.** The feature model assigns L2 order-book state to Data (`LOW` confidence), but the only order-book model in the repository is Brokers' `BrokerOrderBook` (`app/services/brokers/contracts/models.py:941`). The owner must decide whether Data owns a new `OrderBookSnapshot` contract and Brokers consumes it, or Brokers retains L2 and the capability model is amended. Re-investigate before implementing.
 - **OD-DATA-02 — Normalized account snapshot ownership.** Data owns and exports `AccountStateSnapshot`, while Brokers publishes the distinct `BrokerAccountSnapshot v1`. Paired with Brokers `OD-BRK-01`, the owner must decide whether to retain both names or migrate normalized account-state ownership and consumers.
 
 ---

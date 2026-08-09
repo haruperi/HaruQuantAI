@@ -786,6 +786,23 @@ _KNOWN_ROUTE_CONTRACTS: tuple[RouteContract, ...] = (
         "indicators",
         "indicators:read",
     ),
+    _contract(
+        "api.workstation.read",
+        "GET",
+        "/api/v1/workstation",
+        "api",
+        "workstation:read",
+    ),
+    _contract(
+        "api.workstation.command",
+        "POST",
+        "/api/v1/workstation/commands",
+        "api",
+        "workstation:command",
+        side_effect=RouteSideEffect.GOVERNED_WRITE,
+        idempotency_policy="required",
+        governance_scope="required",
+    ),
 )
 
 

@@ -1,4 +1,4 @@
-"""Tests for deferred-integration calibration ports (TC-IMP-OPT-02, TC-IMP-OPT-03)."""
+"""Tests for deferred-integration calibration ports (feature, feature)."""
 
 from collections.abc import Mapping
 
@@ -15,7 +15,7 @@ def test_fill_model_calibration_fails_closed_without_provider() -> None:
         market_data_ref="data-1", instrument="EURUSD", provider=None
     )
     assert result["status"] == "NOT_CALIBRATED"
-    assert result["deferred_to"] == "TC-IMP-SIM-16..20"
+    assert result["provider_feature"] == "FEAT-SIM-12"
     assert "reason" in result
 
 
@@ -25,7 +25,7 @@ def test_scenario_difficulty_fails_closed_without_provider() -> None:
         market_data_ref="data-1", competence_target="intermediate", provider=None
     )
     assert result["status"] == "NOT_CALIBRATED"
-    assert result["deferred_to"] == "TC-IMP-SIM-11..15"
+    assert result["provider_feature"] == "FEAT-SIM-11"
 
 
 def test_fill_model_passes_through_provider_evidence() -> None:

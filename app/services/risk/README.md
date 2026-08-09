@@ -43,7 +43,7 @@ Risk is HaruQuantAI's independent, deterministic master gate for risk-increasing
 - Market, broker, account, position, pending-order, calendar, session, liquidity, or execution-state acquisition.
 - Strategy signal generation or registry mutation; Portfolio-owned construction, allocation versioning, drift detection, or rebalance planning; portfolio execution, broker submission, fills, reconciliation, or emergency execution mutation.
 - MT5 connections, provider SDK objects, broker credentials, database connection/locking infrastructure, broad performance reporting, cost reporting, incident management, or enterprise audit services.
-- Full replay/timeline/cockpit infrastructure, ranked recommendation engines,
+- Full replay/timeline/workstation infrastructure, ranked recommendation engines,
   parametric VaR, exit-liquidity stress, or a separate persisted graduated
   step-down subsystem in the initial build.
 - Live approval from unverified text or any override of deterministic policy or kill-switch state.
@@ -2083,7 +2083,7 @@ affected approvals on activation.
 |---|---|---|---|---|---|---|
 | Completed | `FR-RISK-045` | Deterministically apply bounded scenarios to immutable snapshot evidence, return baseline/projected risk differences, preserve explicit seed, and mark every result advisory. | `run_risk_scenario_analysis(snapshot: PortfolioRiskSnapshot, scenarios: Sequence[ScenarioDefinition], config: RiskConfig, *, now: datetime) -> tuple[ScenarioResult, ...]` | None | `RiskDomainError(PAYLOAD_TOO_LARGE, CALCULATION_FAILED)` | **Usage:** `tests/risk/usage/features/14_scenarios.py::fr_risk_045()`<br>**Unit:** `tests/risk/unit/test_analysis.py::test_analysis_is_immutable_and_deterministic()` |
 
-**Implementation notes:** Implement scenario/what-if behavior from this specification (no V1 `WhatIfEngine` artifact exists in the repository); exclude replay clock/timeline/cockpit/recommendation infrastructure.
+**Implementation notes:** Implement scenario/what-if behavior from this specification (no V1 `WhatIfEngine` artifact exists in the repository); exclude replay clock/timeline/workstation/recommendation infrastructure.
 V1 scenario shock keys are exactly `equity`, `gross_exposure`, `net_exposure`,
 `historical_var`, `historical_cvar`, `drawdown`, `margin_utilization`,
 `volatility`, and `portfolio_correlation`. Monetary/exposure/tail values use a

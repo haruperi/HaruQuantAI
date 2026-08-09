@@ -15,6 +15,10 @@ _USAGE_SCRIPTS = (
     "04_reports.py",
     "05_dashboards.py",
     "06_scoring.py",
+    "07_journal.py",
+    "08_behavior.py",
+    "09_emergency_response.py",
+    "10_qualification.py",
 )
 
 _README_REQUIREMENTS = {

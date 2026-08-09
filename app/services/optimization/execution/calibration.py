@@ -1,12 +1,10 @@
-"""Deferred-integration calibration ports for the execution boundary.
+"""Consumer calibration ports for Simulator execution and scenarios.
 
-Implements the consumer side of Trading Cockpit Phase 0 ``TC-IMP-OPT-02`` (fill-model
-calibration) and ``TC-IMP-OPT-03`` (scenario difficulty calibration). Their
-authoritative providers do not yet exist:
+`FEAT-SIM-12` provides fill-model calibration and `FEAT-SIM-11` provides
+scenario-difficulty calibration through narrow Optimization consumer protocols.
 
-- ``TC-IMP-OPT-02`` is deferred to Simulator ``TC-IMP-SIM-16..20`` (fill, latency,
-  slippage, queue, market-impact models).
-- ``TC-IMP-OPT-03`` is deferred to Simulator ``TC-IMP-SIM-11..15`` (scenario engine).
+- `FEAT-SIM-12` owns fill, latency, slippage, queue, and market-impact models.
+- `FEAT-SIM-11` owns scenario-engine evidence.
 
 Per the deferred-integration rule (AGENTS.md §1 and change-control rule 3) this module
 declares only the narrow fields Optimization needs and a deterministic fail-closed
@@ -31,7 +29,7 @@ CALIBRATION_AVAILABLE = "CALIBRATED"
 class FillModelCalibrationPort(Protocol):
     """Narrow consumer port for Simulator-owned fill-model calibration.
 
-    The Simulator provider (``TC-IMP-SIM-16..20``) supplies the production
+    The Simulator provider (`FEAT-SIM-12`) supplies the production
     implementation. The port is declared here so Optimization can degrade safely when
     the provider is absent.
     """
@@ -58,7 +56,7 @@ class FillModelCalibrationPort(Protocol):
 class ScenarioDifficultyCalibrationPort(Protocol):
     """Narrow consumer port for Simulator-owned scenario difficulty calibration.
 
-    The Simulator provider (``TC-IMP-SIM-11..15``) supplies the production
+    The Simulator provider (`FEAT-SIM-11`) supplies the production
     implementation.
     """
 
@@ -109,7 +107,7 @@ def resolve_fill_model_calibration(
         return {
             "status": CALIBRATION_NOT_AVAILABLE,
             "reason": "fill_model_provider_absent",
-            "deferred_to": "TC-IMP-SIM-16..20",
+            "provider_feature": "FEAT-SIM-12",
         }
     evidence = dict(
         provider.fill_model_calibration(
@@ -146,7 +144,7 @@ def resolve_scenario_difficulty_calibration(
         return {
             "status": CALIBRATION_NOT_AVAILABLE,
             "reason": "scenario_engine_absent",
-            "deferred_to": "TC-IMP-SIM-11..15",
+            "provider_feature": "FEAT-SIM-11",
         }
     evidence = dict(
         provider.scenario_difficulty_calibration(

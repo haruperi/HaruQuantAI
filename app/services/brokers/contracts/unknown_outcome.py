@@ -1,15 +1,15 @@
 # ruff: noqa: DOC501, N812
 """First-class UNKNOWN broker result and blind-resubmission prohibition.
 
-The Trading Cockpit Phase 0 reconciliation (``TC-IMP-BRK-07``) requires a
+The application Phase 0 reconciliation (``feature``) requires a
 broker-side first-class ``UNKNOWN`` result for timeouts and lost acknowledgements
 that is preserved until reconciliation, and a deterministic prohibition on blind
 resubmission. The matching Trading consumer is ``_timeout_receipt`` in
 ``app/services/trading/routing/dispatcher.py``.
 
 This module is fail-closed: an ``UNKNOWN`` outcome may never be silently
-resolved to ``ACCEPTED`` or ``REJECTED``, and a cockpit-execution resubmission
-policy of ``PROHIBITED`` is the only verdict a cockpit path may adopt.
+resolved to ``ACCEPTED`` or ``REJECTED``, and a operational-execution resubmission
+policy of ``PROHIBITED`` is the only verdict a operational path may adopt.
 """
 
 from __future__ import annotations
@@ -111,7 +111,7 @@ def enforce_no_blind_resubmission(
 
     Raises:
         ValidationError: If the prior outcome is UNKNOWN and the policy does not
-            deterministically permit resubmission. A cockpit-execution policy of
+            deterministically permit resubmission. A operational-execution policy of
             ``PROHIBITED`` always raises on an UNKNOWN prior outcome.
     """
     policy_value = (

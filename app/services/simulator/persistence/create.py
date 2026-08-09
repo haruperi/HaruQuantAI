@@ -204,7 +204,49 @@ def create_session_record(
         raise ValueError("Simulator playback session was not created")
 
 
+def create_recovery_checkpoint_record(
+    store: object,
+    value: Mapping[str, object],
+    *,
+    request_id: str,
+) -> None:
+    """Persist one immutable hash-linked session checkpoint.
+
+    Args:
+        store: Opaque Simulator persistence handle.
+        value: Validated checkpoint fields.
+        request_id: Trace identifier for the delegated transaction.
+
+    Raises:
+        ValueError: If the checkpoint is not inserted exactly once.
+    """
+    _require_store(store)
+    result = _execute(
+        (
+            "INSERT INTO sim_session_checkpoints "
+            "(session_id, sequence, checkpoint_hash, previous_hash, "
+            "replay_identity_json, state_payload_json, created_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+        ),
+        (
+            (
+                _text_field(value, "session_id"),
+                value["sequence"],
+                _text_field(value, "checkpoint_hash"),
+                value.get("previous_hash"),
+                canonical_json(value["replay_identity"], max_items=None),
+                canonical_json(value["state_payload"], max_items=None),
+                _text_field(value, "created_at"),
+            ),
+        ),
+        request_id=request_id,
+    )
+    if result.affected_rows != 1:
+        raise ValueError("Simulator recovery checkpoint was not created")
+
+
 __all__ = [
+    "create_recovery_checkpoint_record",
     "create_run_record",
     "create_session_record",
     "create_simulator_persistence_store",

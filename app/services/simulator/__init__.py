@@ -816,60 +816,456 @@ def validate_run_inputs(*args: object, **kwargs: object) -> StandardResponse[obj
     )(*args, **kwargs)
 
 
+def _call_feature(module: str, name: str, *args: object, **kwargs: object) -> Any:
+    """Call one allowlisted focused feature operation."""
+    return _operation(module, name)(*args, **kwargs)
+
+
+def build_checklist_definition(**fields: object) -> object:
+    """Build one validated Simulation checklist definition."""
+    return _call_feature(
+        "app.services.simulator.checklists", "build_checklist_definition", **fields
+    )
+
+
+def start_simulation_checklist(*args: object, **kwargs: object) -> object:
+    """Start one deterministic Simulation checklist runtime."""
+    return _call_feature(
+        "app.services.simulator.checklists", "start_checklist", *args, **kwargs
+    )
+
+
+def evaluate_simulation_checklist(*args: object, **kwargs: object) -> object:
+    """Evaluate checklist steps against actual-state evidence."""
+    return _call_feature(
+        "app.services.simulator.checklists", "evaluate_checklist", *args, **kwargs
+    )
+
+
+def bypass_simulation_checklist_step(*args: object, **kwargs: object) -> object:
+    """Bypass one optional checklist step under mode policy."""
+    return _call_feature(
+        "app.services.simulator.checklists",
+        "bypass_checklist_step",
+        *args,
+        **kwargs,
+    )
+
+
+def get_simulation_mode_policy(mode: str) -> Mapping[str, object]:
+    """Return immutable assistance and route policy for one mode."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.checklists", "get_simulation_mode_policy", mode
+        ),
+    )
+
+
+def complete_simulation_mission(*args: object, **kwargs: object) -> object:
+    """Resolve one checklist-bound simulation mission outcome."""
+    return _call_feature(
+        "app.services.simulator.checklists",
+        "complete_simulation_mission",
+        *args,
+        **kwargs,
+    )
+
+
+def build_mission_definition(**fields: object) -> object:
+    """Build one validated Simulator-owned mission definition."""
+    return _call_feature(
+        "app.services.simulator.scenarios", "build_mission_definition", **fields
+    )
+
+
+def build_injected_event(**fields: object) -> object:
+    """Build one validated injected scenario event."""
+    return _call_feature(
+        "app.services.simulator.scenarios", "build_injected_event", **fields
+    )
+
+
+def evaluate_scenario_triggers(*args: object, **kwargs: object) -> tuple[str, ...]:
+    """Evaluate deterministic scenario triggers."""
+    return cast(
+        "tuple[str, ...]",
+        _call_feature(
+            "app.services.simulator.scenarios",
+            "evaluate_scenario_triggers",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def order_injected_events(*args: object, **kwargs: object) -> tuple[object, ...]:
+    """Return totally ordered compatible injected events."""
+    return cast(
+        "tuple[object, ...]",
+        _call_feature(
+            "app.services.simulator.scenarios",
+            "order_injected_events",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def get_scenario_templates() -> Mapping[str, object]:
+    """Return supported emergency and abnormal scenario templates."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature("app.services.simulator.scenarios", "get_scenario_templates"),
+    )
+
+
+def build_scenario_provider(*args: object, **kwargs: object) -> object:
+    """Build an opaque Optimization scenario provider."""
+    return _call_feature(
+        "app.services.simulator.scenarios", "build_scenario_provider", *args, **kwargs
+    )
+
+
+def build_scenario_evidence_provider(
+    *args: object, **kwargs: object
+) -> Callable[[str], Mapping[str, object] | None]:
+    """Build a callable Research scenario-evidence provider."""
+    return cast(
+        "Callable[[str], Mapping[str, object] | None]",
+        _call_feature(
+            "app.services.simulator.scenarios",
+            "build_scenario_evidence_provider",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def build_latency_profile(**fields: object) -> object:
+    """Build one deterministic execution latency profile."""
+    return _call_feature(
+        "app.services.simulator.realism", "build_latency_profile", **fields
+    )
+
+
+def build_queue_model(**fields: object) -> object:
+    """Build one deterministic execution queue model."""
+    return _call_feature(
+        "app.services.simulator.realism", "build_queue_model", **fields
+    )
+
+
+def project_latency_timestamps(*args: object, **kwargs: object) -> Mapping[str, object]:
+    """Project explicit causal timestamps across modeled latency domains."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.realism",
+            "project_latency_timestamps",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def simulate_queue_fill(*args: object, **kwargs: object) -> object:
+    """Project one deterministic price-level queue fill."""
+    return _call_feature(
+        "app.services.simulator.realism", "simulate_queue_fill", *args, **kwargs
+    )
+
+
+def price_realistic_execution(*args: object, **kwargs: object) -> object:
+    """Apply bounded slippage and market impact to one base match."""
+    return _call_feature(
+        "app.services.simulator.realism", "price_realistic_execution", *args, **kwargs
+    )
+
+
+def resolve_cancel_replace_race(
+    *args: object, **kwargs: object
+) -> Mapping[str, object]:
+    """Resolve one cancel, replace, and fill race."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.realism",
+            "resolve_cancel_replace_race",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def project_execution_views(*args: object, **kwargs: object) -> Mapping[str, object]:
+    """Separate venue-effective and player-perceived execution views."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.realism",
+            "project_execution_views",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def build_fill_model_provider(*args: object, **kwargs: object) -> object:
+    """Build an opaque Optimization fill-model provider."""
+    return _call_feature(
+        "app.services.simulator.realism", "build_fill_model_provider", *args, **kwargs
+    )
+
+
+def build_replay_identity(**fields: object) -> object:
+    """Build the canonical Simulator replay identity."""
+    return _call_feature(
+        "app.services.simulator.recovery", "build_replay_identity", **fields
+    )
+
+
+def create_recovery_checkpoint(*args: object, **kwargs: object) -> object:
+    """Create one immutable hash-linked recovery checkpoint."""
+    return _call_feature(
+        "app.services.simulator.recovery",
+        "create_recovery_checkpoint",
+        *args,
+        **kwargs,
+    )
+
+
+def verify_recovery_checkpoints(*args: object, **kwargs: object) -> bool:
+    """Verify one complete recovery checkpoint chain."""
+    return cast(
+        "bool",
+        _call_feature(
+            "app.services.simulator.recovery",
+            "verify_recovery_checkpoints",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def branch_recovery_checkpoint(
+    *args: object, **kwargs: object
+) -> tuple[object, object]:
+    """Create an isolated practice recovery branch."""
+    return cast(
+        "tuple[object, object]",
+        _call_feature(
+            "app.services.simulator.recovery",
+            "branch_recovery_checkpoint",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def restore_simulation_session(*args: object, **kwargs: object) -> Mapping[str, object]:
+    """Restore the latest verified secured-session state."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.recovery",
+            "restore_simulation_session",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def explicitly_rearm_simulation_session(
+    *args: object, **kwargs: object
+) -> Mapping[str, object]:
+    """Explicitly rearm one verified restored session."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.recovery",
+            "explicitly_rearm_simulation_session",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def secure_simulation_session(*args: object, **kwargs: object) -> Mapping[str, object]:
+    """Secure one durable session for governed recovery."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.recovery",
+            "secure_simulation_session",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def persist_recovery_checkpoint(*args: object, **kwargs: object) -> None:
+    """Persist one immutable recovery checkpoint."""
+    _call_feature(
+        "app.services.simulator.recovery",
+        "persist_recovery_checkpoint",
+        *args,
+        **kwargs,
+    )
+
+
+def load_recovery_checkpoints(*args: object, **kwargs: object) -> tuple[object, ...]:
+    """Load one secured session's ordered checkpoints."""
+    return cast(
+        "tuple[object, ...]",
+        _call_feature(
+            "app.services.simulator.recovery",
+            "load_recovery_checkpoints",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def persist_recovery_state(*args: object, **kwargs: object) -> None:
+    """Persist one secured session recovery projection."""
+    _call_feature(
+        "app.services.simulator.recovery", "persist_recovery_state", *args, **kwargs
+    )
+
+
+def build_simulation_alert(**fields: object) -> object:
+    """Build one immutable simulated-session alert."""
+    return _call_feature(
+        "app.services.simulator.alerts", "build_simulation_alert", **fields
+    )
+
+
+def transition_simulation_alert(*args: object, **kwargs: object) -> object:
+    """Apply one declared latched alert transition."""
+    return _call_feature(
+        "app.services.simulator.alerts",
+        "transition_simulation_alert",
+        *args,
+        **kwargs,
+    )
+
+
+def group_simulation_alerts(*args: object, **kwargs: object) -> Mapping[str, object]:
+    """Group simulated alerts by deterministic root cause."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.alerts",
+            "group_simulation_alerts",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def evaluate_emergency_controls(*args: object, **kwargs: object) -> Mapping[str, bool]:
+    """Evaluate fail-closed emergency-control availability."""
+    return cast(
+        "Mapping[str, bool]",
+        _call_feature(
+            "app.services.simulator.alerts",
+            "evaluate_emergency_controls",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
 __all__: tuple[str, ...] = (
     "branch_live_simulation",
+    "branch_recovery_checkpoint",
     "build_artifact_manifest",
+    "build_checklist_definition",
+    "build_fill_model_provider",
+    "build_injected_event",
     "build_json_report",
+    "build_latency_profile",
     "build_markdown_report",
+    "build_mission_definition",
+    "build_queue_model",
+    "build_replay_identity",
+    "build_scenario_evidence_provider",
+    "build_scenario_provider",
+    "build_simulation_alert",
     "build_simulation_run_dependencies",
     "build_simulation_state_store",
     "build_tick_timeline",
+    "bypass_simulation_checklist_step",
     "calculate_execution_costs",
     "calculate_margin",
     "calculate_portfolio_backtest_config_hash",
     "calculate_simulation_backtest_config_hash",
     "close_live_simulation_session",
+    "complete_simulation_mission",
     "convert_fx_amount",
     "create_live_simulation_session",
+    "create_recovery_checkpoint",
     "create_simulation_handle",
     "create_simulation_session",
     "create_simulation_value",
     "dump_simulation_value",
+    "evaluate_emergency_controls",
     "evaluate_protective_exit",
+    "evaluate_scenario_triggers",
+    "evaluate_simulation_checklist",
     "execute_simulation_handle_operation",
     "execute_simulation_state_store_operation",
+    "explicitly_rearm_simulation_session",
     "get_approved_tick_models",
     "get_canonical_artifact_types",
     "get_journal_policy",
     "get_report_schema_version",
     "get_same_tick_priority",
+    "get_scenario_templates",
     "get_simulation_error_catalog",
     "get_simulation_migrations",
+    "get_simulation_mode_policy",
     "get_simulation_result",
     "get_simulation_value_field",
     "get_simulation_value_fields",
     "get_supported_asset_classes",
     "get_supported_fill_policies",
+    "group_simulation_alerts",
     "is_simulation_value",
+    "load_recovery_checkpoints",
     "match_order",
     "normalize_volume",
+    "order_injected_events",
+    "persist_recovery_checkpoint",
+    "persist_recovery_state",
     "price_order",
+    "price_realistic_execution",
+    "project_execution_views",
+    "project_latency_timestamps",
     "read_live_simulation_state",
     "read_simulation_session",
     "replay_journal",
     "reset_live_simulation_sessions",
+    "resolve_cancel_replace_race",
     "resolve_idempotent_run",
+    "restore_simulation_session",
     "run_backtest",
     "run_fast_research",
     "run_portfolio_backtest",
     "run_simulator_migrations",
+    "secure_simulation_session",
+    "simulate_queue_fill",
+    "start_simulation_checklist",
     "step_live_simulation",
     "stream_simulation_session_frames",
     "to_simulation_error_payload",
+    "transition_simulation_alert",
     "unwrap_simulation_response",
     "validate_fx_evidence",
     "validate_intent_timing",
     "validate_market_data",
     "validate_phase_one_scope",
     "validate_run_inputs",
+    "verify_recovery_checkpoints",
 )

@@ -1,0 +1,1 @@
+import React from "react"; import { renderToStaticMarkup } from "react-dom/server"; import { AlarmModel } from "../../../app/ui/src/features/human-factors"; function main(): void { console.log(renderToStaticMarkup(<AlarmModel alarms={[]}/>)); } main();

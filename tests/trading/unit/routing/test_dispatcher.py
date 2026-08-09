@@ -110,7 +110,7 @@ def _intent(*, route: str = "paper", action: str = "submit_order") -> OrderInten
 
 
 def test_order_intent_v1_transport_requires_complete_lineage() -> None:
-    """Cockpit intent transport round-trips only complete governed lineage."""
+    """Operational intent transport round-trips only complete governed lineage."""
     material = _intent(route="sim").model_dump()
     with pytest.raises(ValueError, match="complete versioned lineage"):
         build_order_intent(**material)

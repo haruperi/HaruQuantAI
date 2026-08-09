@@ -32,6 +32,9 @@ _GROUPS: dict[str, tuple[str, ...]] = {
         "SIM_UNSUPPORTED_OPERATION",
         "SIM_UNSUPPORTED_ASSET_CLASS",
         "SIM_UNSUPPORTED_FEATURE",
+        "SIM_CHECKLIST_INVALID",
+        "SIM_ALERT_TRANSITION_INVALID",
+        "SIM_RECOVERY_STATE_INVALID",
     ),
     "data_timing": (
         "SIM_DATA_CHECKSUM_MISMATCH",
@@ -66,6 +69,7 @@ _GROUPS: dict[str, tuple[str, ...]] = {
         "SIM_ORDER_NOT_FOUND",
         "SIM_EVENT_PRIORITY_AMBIGUOUS",
         "SIM_ACCOUNT_INVARIANT_BROKEN",
+        "SIM_INTEGRITY_FAILURE",
     ),
     "persistence_replay": (
         "SIM_PERSISTENCE_FAILED",
@@ -74,6 +78,8 @@ _GROUPS: dict[str, tuple[str, ...]] = {
         "SIM_SESSION_NOT_FOUND",
         "SIM_SESSION_EXPIRED",
         "SIM_PLAYBACK_CURSOR_INVALID",
+        "SIM_CHECKLIST_BYPASS_DENIED",
+        "SIM_RECOVERY_REWIND_DENIED",
     ),
     "portfolio": (
         "SIM_COMPONENT_INCOMPLETE",
@@ -109,6 +115,7 @@ _INTEGRITY_CODES = frozenset(
         "SIM_ACCOUNT_INVARIANT_BROKEN",
         "SIM_COMPONENT_INCOMPLETE",
         "SIM_AGGREGATE_UNRECONCILED",
+        "SIM_INTEGRITY_FAILURE",
     }
 )
 _POLICY_CODES = frozenset(
@@ -117,6 +124,8 @@ _POLICY_CODES = frozenset(
         "SIM_SLIPPAGE_EXCEEDED",
         "SIM_MARKET_CLOSED",
         "SIM_INSUFFICIENT_MARGIN",
+        "SIM_CHECKLIST_BYPASS_DENIED",
+        "SIM_RECOVERY_REWIND_DENIED",
     }
 )
 _TRANSIENT_CODES = frozenset(

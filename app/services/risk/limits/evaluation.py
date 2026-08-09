@@ -491,7 +491,7 @@ PortfolioViewProvider = Callable[[str], Mapping[str, Decimal] | None]
 """Injectable authoritative Portfolio exposure-view port.
 
 Consumer port for the deferred Portfolio integration
-(``TC-IMP-PORT-09``/``TC-IMP-PORT-17``, Phase 12): given an account
+(``feature``/``feature``, Phase 12): given an account
 identity, returns the authoritative exposure-by-dimension mapping, or
 ``None`` when unavailable. Risk never implements the provider's business
 logic here; it only calls an injected provider and fails closed to its own
@@ -525,7 +525,7 @@ def _resolve_exposure_by_dimension(
 MarginViewProvider = Callable[[str], Mapping[str, Decimal] | None]
 """Injectable authoritative Portfolio margin/leverage-view port.
 
-Consumer port for the deferred Portfolio integration (``TC-IMP-PORT-07``,
+Consumer port for the deferred Portfolio integration (``feature``,
 Phase 12 margin and buying power): given an account identity, returns a
 mapping with optional ``margin_utilization``/``effective_leverage`` keys, or
 ``None`` when unavailable. Risk never implements the provider's business
@@ -575,7 +575,7 @@ def _concentration_results(
         evidence_refs: Exact snapshot evidence references.
         start_precedence: First concentration precedence.
         portfolio_view_provider: Optional injected authoritative Portfolio
-            exposure-view port (``TC-IMP-PORT-09``/``TC-IMP-PORT-17``);
+            exposure-view port (``feature``/``feature``);
             falls back to Risk's own snapshot exposure when absent.
 
     Returns:
@@ -633,10 +633,10 @@ def evaluate_portfolio_limits(
         mandate: Optional verified firm mandate for account-specific limits.
         portfolio_view_provider: Optional injected authoritative Portfolio
             exposure-view port consumed by concentration checks
-            (``TC-IMP-PORT-09``/``TC-IMP-PORT-17``, deferred integration);
+            (``feature``/``feature``, deferred integration);
             falls back to Risk's own snapshot exposure when absent.
         margin_view_provider: Optional injected authoritative Portfolio
-            margin/leverage-view port (``TC-IMP-PORT-07``, deferred
+            margin/leverage-view port (``feature``, deferred
             integration); falls back to Risk's own static snapshot checks
             when absent.
 
@@ -831,7 +831,7 @@ ExpectancyProvider = Callable[[str], Decimal | None]
 """Injectable approved-expectancy-profile eligibility port.
 
 Consumer port for the deferred Research integration
-(``TC-IMP-RES-03``/``TC-IMP-RES-04``, Phase 11): given a strategy identity,
+(``feature``/``feature``, Phase 11): given a strategy identity,
 returns an eligible exactly-matched minimum reward/risk override, or
 ``None`` when no approved profile is eligible. Risk never implements the
 provider's expectancy-eligibility logic here; an absent or ``None``
@@ -859,7 +859,7 @@ def evaluate_reward_risk_gate(
         min_reward_risk_ratio: Configured baseline minimum ratio.
         evidence_refs: Exact evidence references.
         expectancy_provider: Optional injected approved-expectancy-profile
-            eligibility port (``TC-IMP-RES-03``/``TC-IMP-RES-04``, deferred
+            eligibility port (``feature``/``feature``, deferred
             integration).
 
     Returns:

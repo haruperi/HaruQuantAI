@@ -37,6 +37,7 @@ database infrastructure, and strategy registration remain outside this package.
 - Bounded fundamental and deterministic sentiment evidence projected from eligible,
   point-in-time Data source records, with explicit applicability and missingness.
 - `ResearchReport v1` and the explicit classified Research public API.
+- Research's fail-closed consumer adapter for Simulator `FEAT-SIM-11` scenario evidence through the injected `ScenarioEvidenceProvider`; provider absence or failure remains `UNAVAILABLE` and never produces inferred evidence.
 
 ### Does not own
 

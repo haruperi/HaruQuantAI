@@ -110,6 +110,7 @@ export type { OptimizationRecord } from "./optimization";
 import { agentic } from "./agentic";
 import { simulationSessions } from "./simulationSessions";
 import { liveSimulation } from "./liveSimulation";
+import { workstation } from "./workstation";
 
 export {
   auth,
@@ -130,6 +131,7 @@ export {
   portfolio,
   optimization,
   agentic,
+  workstation,
 };
 
 /**
@@ -158,6 +160,7 @@ export const apiClients = {
   portfolio,
   optimization,
   agentic,
+  workstation,
 } as const;
 
 /** Aggregate type of the catalog, for callers that want to depend on the shape. */

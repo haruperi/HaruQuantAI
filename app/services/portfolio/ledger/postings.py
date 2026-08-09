@@ -1,7 +1,7 @@
 """Deterministic balanced double-entry posting and balance computation.
 
-Implements the balance arithmetic for ``FEAT-PORT-09`` (``TC-IMP-PORT-01``,
-``TC-IMP-PORT-03``). All money math uses ``decimal.Decimal``; the same ordered
+Implements the balance arithmetic for ``FEAT-PORT-09`` (``feature``,
+``feature``). All money math uses ``decimal.Decimal``; the same ordered
 batches always produce the same balances (NFR-PORT-002, QUANT gate).
 
 Financial records are append-only: a correction is a reversal batch that posts
@@ -117,7 +117,7 @@ def recompute_balances(
 ) -> dict[tuple[str, str], Decimal]:
     """Rebuild every account/currency balance from ordered legs.
 
-    This is the canonical state rebuild used by ``TC-IMP-PORT-15``: snapshots
+    This is the canonical state rebuild used by ``feature``: snapshots
     are accelerators only, and the rebuilt balances are the authoritative
     truth.
 

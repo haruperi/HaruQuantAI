@@ -39,8 +39,8 @@ class BrokerUncertainty(StrEnum):
     """First-class outcome uncertainty verdict for snapshots and results.
 
     ``KNOWN`` is the default for every existing record so legacy constructors
-    remain green; ``UNKNOWN`` is the Trading Cockpit Phase 0 first-class state
-    (``TC-IMP-BRK-07``) preserved until reconciliation and never silently
+    remain green; ``UNKNOWN`` is the application Phase 0 first-class state
+    (``feature``) preserved until reconciliation and never silently
     resolved to a plausible success or rejection.
     """
 
@@ -49,12 +49,12 @@ class BrokerUncertainty(StrEnum):
 
 
 class BrokerResubmissionPolicy(StrEnum):
-    """Adapter-boundary blind-resubmission policy (``TC-IMP-BRK-07``).
+    """Adapter-boundary blind-resubmission policy (``feature``).
 
-    ``PROHIBITED`` is the only policy a cockpit-execution path may adopt: an
+    ``PROHIBITED`` is the only policy a operational-execution path may adopt: an
     ``UNKNOWN`` broker result must be preserved until reconciliation and may
     never be blindly resubmitted. ``PERMITTED`` exists only for explicit
-    caller-acknowledged retry outside the cockpit execution boundary.
+    caller-acknowledged retry outside the operational execution boundary.
     """
 
     PROHIBITED = "prohibited"

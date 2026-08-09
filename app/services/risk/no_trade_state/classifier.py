@@ -62,9 +62,9 @@ def classify_no_trade_outcome(
     """Classify a rejected setup as a safe stand-down or failed gameplay.
 
     Distinguishes a correctly-identified no-trade day (every failed rule was
-    a mandatory Risk gate — a passing cockpit outcome) from a rejection
+    a mandatory Risk gate — a passing operational outcome) from a rejection
     caused by an avoidable execution mistake (e.g. an invalid stop
-    placement or a concentration breach — a failed cockpit outcome).
+    placement or a concentration breach — a failed operational outcome).
 
     Args:
         decision_id: Identity of the originating Risk decision.

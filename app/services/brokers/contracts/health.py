@@ -1,7 +1,7 @@
 # ruff: noqa: DOC501, N812
 """BrokerHealth v1 cross-domain contract transport.
 
-The Trading Cockpit Phase 0 reconciliation (``TC-IMP-BRK-03``) requires a
+The application Phase 0 reconciliation (``feature``) requires a
 normalized ``BrokerHealth`` extending the adapter runtime and connection state
 with heartbeat, latency, error rate, maintenance, and route readiness. The
 contract is fail-closed: a health sample that is stale beyond the caller-declared

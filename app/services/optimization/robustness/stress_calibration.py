@@ -1,8 +1,8 @@
-"""Stress-profile calibration consumer port (TC-IMP-OPT-06).
+"""Stress-profile calibration consumer port (feature).
 
 Declares the narrow consumer port for calibrating shock magnitudes and dependencies
 while preserving transparent assumptions. The authoritative provider does not yet
-exist: Risk ``TC-IMP-RISK-12`` / Research ``TC-IMP-RES-06`` own the stress-shock
+exist: Risk ``feature`` / Research ``feature`` own the stress-shock
 profile. Optimization supplies only the consumer port and a deterministic fail-closed
 fallback (``STRESS_PROFILE_UNCALIBRATED``); it never fabricates a shock profile and
 never implements the provider's business logic (change-control rule 3, deferred
@@ -25,7 +25,7 @@ STRESS_PROFILE_CALIBRATED = "STRESS_PROFILE_CALIBRATED"
 class StressProfileCalibrationPort(Protocol):
     """Narrow consumer port for Risk/Research-owned stress-shock calibration.
 
-    The provider (Risk ``TC-IMP-RISK-12`` / Research ``TC-IMP-RES-06``) supplies the
+    The provider (Risk ``feature`` / Research ``feature``) supplies the
     production stress-shock profile.
     """
 
@@ -74,7 +74,7 @@ def resolve_stress_profile_calibration(
             "status": STRESS_PROFILE_UNCALIBRATED,
             "decision": "stress_evidence_uncalibrated",
             "reason": "stress_shock_profile_absent",
-            "deferred_to": "TC-IMP-RISK-12 / TC-IMP-RES-06",
+            "deferred_to": "feature / feature",
         }
     evidence = dict(
         provider.stress_profile_calibration(

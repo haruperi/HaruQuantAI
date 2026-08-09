@@ -1,0 +1,2 @@
+import { render, screen } from "@testing-library/react"; import { describe, expect, it } from "vitest"; import { AlarmModel } from ".";
+describe("AlarmModel", () => { it("groups alarm floods by root", () => { render(<AlarmModel alarms={[{id:"1",rootId:"r",message:"Root",priority:3,state:"active"},{id:"2",rootId:"r",message:"Child",priority:1,state:"active"}]} />); expect(screen.queryByText(/Child/)).not.toBeInTheDocument(); }); });

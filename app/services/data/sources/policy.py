@@ -415,7 +415,7 @@ _TRUST_SCORE_SAMPLE_LIMIT = 50
 def _compute_source_trust_score_raw(source_id: str, request_id: str) -> Decimal:
     """Compute one deterministic trust score from durable attempt evidence.
 
-    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-12`): the score is
+    application Phase 0 reconciliation (`feature`): the score is
     the observed success ratio over the most recent bounded attempt window,
     never an inferred or default-optimistic value. A source with no
     recorded attempts fails closed to `0` rather than assuming trust.

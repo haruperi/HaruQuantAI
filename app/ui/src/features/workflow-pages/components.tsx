@@ -1,0 +1,2 @@
+import type { WorkflowStage } from "./contracts";
+export function WorkflowStages({ active, allowed }: { active: WorkflowStage; allowed: readonly WorkflowStage[] }): React.JSX.Element { const stages: WorkflowStage[] = ["pre-market","trade-planning","execution","management","post-market"]; return <nav aria-label="Trading workflow">{stages.map((stage) => <button type="button" key={stage} disabled={!allowed.includes(stage)} aria-current={active === stage ? "step" : undefined}>{stage}</button>)}</nav>; }

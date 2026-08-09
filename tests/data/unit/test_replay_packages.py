@@ -1,4 +1,4 @@
-"""Unit tests for deterministic no-lookahead replay packages (TC-IMP-DATA-08)."""
+"""Unit tests for deterministic no-lookahead replay packages (feature)."""
 
 from __future__ import annotations
 

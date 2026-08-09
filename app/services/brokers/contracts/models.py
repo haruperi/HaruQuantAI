@@ -374,7 +374,7 @@ class BrokerCapability(_Schema):
     verification_evidence: tuple[str, ...] = ()
     release_approval_reference: str | None = None
     reason: str | None = None
-    # Trading Cockpit Phase 0 capability matrix additions (``TC-IMP-BRK-02``).
+    # application Phase 0 capability matrix additions (``feature``).
     # Every trait defaults to ``UNDECLARED`` so a capability that does not
     # declare the trait is fail-closed: callers must not infer support.
     bracket_order_support: Literal["UNDECLARED", "SUPPORTED", "UNSUPPORTED"] = (
@@ -1586,7 +1586,7 @@ class BrokerPositionCloseRequest(_Schema):
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BrokerOrderProtectionRequest(_Schema):
-    """Attach bracketing protection to one open order (``TC-IMP-BRK-06``)."""
+    """Attach bracketing protection to one open order (``feature``)."""
 
     SCHEMA_ID: ClassVar[str] = "brokers.order_protection_request.v1"
     order_id: str
@@ -1624,7 +1624,7 @@ class BrokerOrderProtectionRequest(_Schema):
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BrokerPositionReductionRequest(_Schema):
-    """Reduce one open position by an explicit quantity (``TC-IMP-BRK-06``)."""
+    """Reduce one open position by an explicit quantity (``feature``)."""
 
     SCHEMA_ID: ClassVar[str] = "brokers.position_reduction_request.v1"
     position_id: str

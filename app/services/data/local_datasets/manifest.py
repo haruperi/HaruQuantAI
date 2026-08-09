@@ -24,7 +24,7 @@ def verify_manifest_compatibility(
 ) -> ManifestCompatibility:
     """Verify a manifest's schema and normalization version compatibility.
 
-    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-07`): compatibility
+    application Phase 0 reconciliation (`feature`): compatibility
     is checked against caller-declared expectations only; it is never
     inferred or defaulted to compatible.
 

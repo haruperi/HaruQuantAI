@@ -35,7 +35,7 @@ def _bucket_is_closed(
 ) -> bool:
     """Return whether one resampled bucket is fully covered by source evidence.
 
-    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-09`): a bucket whose
+    application Phase 0 reconciliation (`feature`): a bucket whose
     full period extends past the source dataset's `end` has not finished
     forming and must never be presented identically to a genuinely closed bar.
 
@@ -61,7 +61,7 @@ def _resample_dataset_raw(
         target_timeframe: The target timeframe key (e.g. "M5").
         drop_incomplete_trailing_bucket: When ``True``, drop the final
             resampled bar if the source dataset's `end` does not cover its
-            full target-timeframe duration (`TC-IMP-DATA-09` closed-bar
+            full target-timeframe duration (`feature` closed-bar
             semantics). Every non-trailing bucket is always fully covered
             by construction, since a later bucket exists only when the
             source data extends past the earlier one's boundary.
@@ -276,7 +276,7 @@ def resample_dataset(
         target_timeframe: The target timeframe key (e.g. "M5").
         drop_incomplete_trailing_bucket: When ``True``, drop a trailing bar
             whose full period is not yet covered by the source dataset's
-            `end` (`TC-IMP-DATA-09` closed-bar semantics).
+            `end` (`feature` closed-bar semantics).
 
     Returns:
         Standard response carrying a new resampled MarketDataset.

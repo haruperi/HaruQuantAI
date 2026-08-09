@@ -488,7 +488,7 @@ def _base_event_fields() -> dict[str, Any]:
 def test_unified_market_event_accepts_each_new_event_family(
     event_type: str, payload: object
 ) -> None:
-    """Every Trading Cockpit Phase 0 event family validates with its own payload."""
+    """Every application Phase 0 event family validates with its own payload."""
     event = MarketStreamEvent(
         event_type=event_type, payload=payload, **_base_event_fields()
     )

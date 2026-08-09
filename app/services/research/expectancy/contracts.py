@@ -1,9 +1,9 @@
 """Approved expectancy profile contract and governance transport (FEAT-RES-14).
 
 Implements the authoritative Research-owned approved-expectancy profile
-(``TC-IMP-RES-03``/``TC-IMP-RES-04``). The profile is the governance
-prerequisite that unblocks Strategy (``TC-IMP-STRAT-08``) and Risk
-(``TC-IMP-RISK-07``): Strategy holds a version-exact ``profile_id``/
+(``feature``/``feature``). The profile is the governance
+prerequisite that unblocks Strategy (``feature``) and Risk
+(``feature``): Strategy holds a version-exact ``profile_id``/
 ``exact_version`` reference and Risk consumes an exact-match eligibility
 override.
 

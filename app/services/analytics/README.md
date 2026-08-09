@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/analytics`
 > **Domain ID:** `ANLT`
-> **Status:** `Partial` — 10 features are registered: `FEAT-ANLT-01`..`06` are `Completed`, while `FEAT-ANLT-07`..`10` are `Missing`.
+> **Status:** `Complete` — all 10 registered features are implemented.
 > **Last updated:** `2026-07-28`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -172,21 +172,38 @@ The order is the implementation sequence.
 | Completed | `FEAT-ANLT-04` Canonical Reporting                    | `reports/`    | Exact declarations and report contracts: Section 4.4                                                                     | Section 4.4 functional requirements | `tests/analytics/usage/features/04_reports.py`    |
 | Completed | `FEAT-ANLT-05` Bounded Report Projection              | `dashboards/` | Exact declarations,`DashboardPayload`, and explicit context-required `get_analytics_dashboard_snapshot`: Section 4.6 | Section 4.6 functional requirements | `tests/analytics/usage/features/05_dashboards.py` |
 | Completed | `FEAT-ANLT-06` Process Scoring | `scoring/` | process-first scoring, critical-failure override, score reproducibility, comparative scoring, no-trade scoring | Section 4.7 functional requirements | `tests/analytics/usage/features/06_scoring.py` |
-| Missing | `FEAT-ANLT-07` Player Trade Journal | `journal/` *(planned)* | player trade journal (distinct from Simulator's replay journal) | `FR-ANLT-067`..`FR-ANLT-069` *(planned)* | `tests/analytics/usage/features/07_journal.py` *(planned)* |
-| Missing | `FEAT-ANLT-08` Plan-Adherence and Behavioral Analytics | `behavior/` *(planned)* | plan-adherence and behavioral analytics | `FR-ANLT-070`..`FR-ANLT-072` *(planned)* | `tests/analytics/usage/features/08_behavior.py` *(planned)* |
-| Missing | `FEAT-ANLT-09` Emergency-Response Analytics | `emergency_response/` *(planned)* | emergency-response analytics | `FR-ANLT-073`..`FR-ANLT-074` *(planned)* | `tests/analytics/usage/features/09_emergency_response.py` *(planned)* |
-| Missing | `FEAT-ANLT-10` Player Qualification | `qualification/` *(planned)* | curriculum, ratings, checkrides, remediation, recurrent validity | `FR-ANLT-075`..`FR-ANLT-078` *(planned)* | `tests/analytics/usage/features/10_qualification.py` *(planned)* |
+| Completed | `FEAT-ANLT-07` Player Trade Journal | `journal/` | `append_player_journal_entry`, `read_player_journal_entry`; immutable canonical hash and evidence references | `FR-ANLT-067`..`FR-ANLT-069` | `tests/analytics/usage/features/07_journal.py` |
+| Completed | `FEAT-ANLT-08` Plan-Adherence and Behavioral Analytics | `behavior/` | `assess_plan_adherence`, `detect_behavior_patterns`; exact plan and threshold versions | `FR-ANLT-070`..`FR-ANLT-072` | `tests/analytics/usage/features/08_behavior.py` |
+| Completed | `FEAT-ANLT-09` Emergency-Response Analytics | `emergency_response/` | `analyze_emergency_response`; sequence, timing, completeness, and survival evidence | `FR-ANLT-073`..`FR-ANLT-074` | `tests/analytics/usage/features/09_emergency_response.py` |
+| Completed | `FEAT-ANLT-10` Player Qualification | `qualification/` | `evaluate_player_qualification`; prerequisites, attempts, remediation, expiry, and eligibility | `FR-ANLT-075`..`FR-ANLT-078` | `tests/analytics/usage/features/10_qualification.py` |
+
+#### Player evidence requirements
+
+| Status | Requirement | Responsibility | Evidence |
+| --- | --- | --- | --- |
+| Completed | `FR-ANLT-067` | Create versioned immutable journal entries with session, plan, author, time, and bounded narrative. | `app/services/analytics/journal/service.py`; `tests/analytics/usage/features/07_journal.py::fr_anlt_067` |
+| Completed | `FR-ANLT-068` | Bind journal entries to orders, fills, actions, alerts, results, artifact references, and replay identity. | `app/services/analytics/journal/service.py`; `tests/analytics/usage/features/07_journal.py::fr_anlt_068` |
+| Completed | `FR-ANLT-069` | Append/read journal evidence through a deterministic canonical hash without rewriting prior entries. | `app/services/analytics/journal/service.py`; `tests/analytics/usage/features/07_journal.py::fr_anlt_069` |
+| Completed | `FR-ANLT-070` | Compare observed actions with the exact released plan and rule version. | `app/services/analytics/behavior/adherence.py`; `tests/analytics/usage/features/08_behavior.py::fr_anlt_070` |
+| Completed | `FR-ANLT-071` | Preserve adherent, deviation, unavailable, and not-applicable findings without inferring omitted rules. | `app/services/analytics/behavior/adherence.py`; `tests/analytics/usage/features/08_behavior.py::fr_anlt_071` |
+| Completed | `FR-ANLT-072` | Run evidence-only behavioral detectors with caller-supplied versioned thresholds. | `app/services/analytics/behavior/detectors.py`; `tests/analytics/usage/features/08_behavior.py::fr_anlt_072` |
+| Completed | `FR-ANLT-073` | Measure emergency perception, acknowledgement, safe action, resolution, and recovery timing from Simulator evidence. | `app/services/analytics/emergency_response/analysis.py`; `tests/analytics/usage/features/09_emergency_response.py::fr_anlt_073` |
+| Completed | `FR-ANLT-074` | Evaluate required sequence and survival while preserving unknown or incomplete evidence. | `app/services/analytics/emergency_response/analysis.py`; `tests/analytics/usage/features/09_emergency_response.py::fr_anlt_074` |
+| Completed | `FR-ANLT-075` | Evaluate versioned curricula, prerequisites, and expiry. | `app/services/analytics/qualification/service.py`; `tests/analytics/usage/features/10_qualification.py::fr_anlt_075` |
+| Completed | `FR-ANLT-076` | Evaluate checkrides against exact mission, scoring, and integrity evidence. | `app/services/analytics/qualification/service.py`; `tests/analytics/usage/features/10_qualification.py::fr_anlt_076` |
+| Completed | `FR-ANLT-077` | Require remediation after failed or disqualifying evidence. | `app/services/analytics/qualification/service.py`; `tests/analytics/usage/features/10_qualification.py::fr_anlt_077` |
+| Completed | `FR-ANLT-078` | Derive recurrent validity and leaderboard eligibility from attempts, expiry, and integrity breaches. | `app/services/analytics/qualification/service.py`; `tests/analytics/usage/features/10_qualification.py::fr_anlt_078` |
 
 Work outside Analytics ownership has no `FEAT-*` registration and consumes no
 feature ordinal.
-The registry therefore maps the five active feature IDs one-to-one to the five
-numbered usage programs.
+The registry maps ten feature IDs one-to-one to ten numbered usage programs.
 
 `migrations/` is documented non-feature support containing immutable historical
-schema steps and the authoritative complete-manifest runner. Analytics owns no
-current relational tables: migration 002 retires the six empty derived-store
-tables created by historical step 001. The former `persistence/` support package
-is removed; read-only analytical behavior remains in the five registered features.
+schema steps and the authoritative complete-manifest runner. Migration 002 retires
+the six empty derived-store tables created by historical step 001. Migration 003
+adds the immutable player-evidence tables used by features 07 through 10. The
+documented five-file `persistence/` support package builds allow-listed statements;
+policy and public behavior remain in the owning feature modules.
 
 ```text
 analytics/
@@ -1329,13 +1346,20 @@ standalone functions exported from the package root.
 
 ### Persistence - Database
 
-This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `analytics_` (retired).
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `analytics_`.
 
-Analytics is a pure, read-only calculation domain. Migration step
+Analytics calculations remain pure and read-only. Player journals, adherence and
+behavior findings, emergency-response findings, and qualification records are
+immutable durable evidence. Migration step
 `001_analytics_schema_v1` is retained as immutable history; complete-manifest step
 `002_retire_unused_analytics_derived_store` drops its six empty, unreachable derived
 tables and refuses to proceed if any contains rows. The definitions below are
-historical shapes only and are not part of the current target schema.
+historical shapes only and are not part of the current target schema. Migration
+`003_player_evidence_schema` creates `analytics_journal_entries`,
+`analytics_adherence_findings`, `analytics_behavior_findings`,
+`analytics_emergency_response_findings`, and `analytics_qualification_records`.
+Each carries `record_id`, `subject_id`, `version`, canonical `evidence_json`,
+`canonical_hash`, `occurred_at`, and `created_at`; records are append-only.
 
 > Prefix `analytics_` is ratified (D1) and recorded in `docs/ARCHITECTURE.md`.
 
@@ -1589,7 +1613,6 @@ new approved requirement before implementation.
 
 These are unresolved owner choices raised by the approved capability audit. They are recorded here, not resolved by this documentation task.
 
-- **OD-ANLT-01 — New `analytics_*` table field-level detail.** The cockpit `CREATE` features (scoring, journal, plan-adherence, behavioral, emergency-response, debrief, qualification) imply new named, owned tables, but Analytics currently owns zero live tables (the six historical `analytics_*` tables were retired by migration `002`). The approved evidence is not sufficient to specify each table's fields safely; target-only schema is recorded and the field-level detail is deferred to the implementation phase. No cockpit durable state may be placed in Data's `data_runtime_records`.
 
 ---
 

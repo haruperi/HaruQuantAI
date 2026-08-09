@@ -885,7 +885,7 @@ def evaluate_emergency_state(
     """Evaluate configured emergency triggers and derive lock/recovery state.
 
     Detects margin-call, drawdown-breach, and data/connectivity-failure
-    emergencies using the emergency rule group added by ``TC-IMP-RISK-01``.
+    emergencies using the emergency rule group added by ``feature``.
     Flash-crash detection is intentionally not evaluated here: no Data-owned
     evidence contract currently carries a bounded recent price-move
     measurement, so this trigger is not approximated from an unrelated

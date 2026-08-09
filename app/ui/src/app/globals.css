@@ -1,1 +1,12 @@
 @import "../index.css";
+/* Operational workstation: dense, accessible, evidence-first layout. */
+.workstation-shell { min-height: 100vh; padding: 2rem; color: #eef4f7; background: radial-gradient(circle at top right, #173447, #071116 55%); }
+.workstation-shell header { display: flex; align-items: baseline; gap: 1rem; border-bottom: 1px solid #38505c; }
+.workstation-shell .eyebrow, .freshness { color: #7ed6c4; text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; }
+.workstation-shell nav { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+.workstation-shell button { min-height: 44px; border: 1px solid #4f6874; border-radius: .35rem; padding: .55rem .85rem; color: inherit; background: #10232d; }
+.workstation-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .75rem; }
+.instrument, .workstation-shell section { border: 1px solid #304b58; border-radius: .5rem; padding: 1rem; margin-block: .75rem; background: rgba(10, 27, 35, .9); }
+.instrument.unknown { border-color: #c6a15b; }
+.emergency.active { border-color: #ff756f; box-shadow: 0 0 0 2px rgba(255,117,111,.2); }
+@media (max-width: 640px) { .workstation-shell { padding: 1rem; } .workstation-shell header { align-items: flex-start; flex-direction: column; } }

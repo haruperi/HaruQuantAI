@@ -1,0 +1,1 @@
+import React from "react"; import { renderToStaticMarkup } from "react-dom/server"; import { WorkflowStages } from "../../../app/ui/src/features/workflow-pages"; function main(): void { console.log(renderToStaticMarkup(<WorkflowStages active="pre-market" allowed={["pre-market"]}/>)); } main();

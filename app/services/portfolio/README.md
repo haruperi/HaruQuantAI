@@ -9,7 +9,7 @@
 | -------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **Package path**     | `app/services/portfolio`                                                                                   |
 | **Domain ID**        | `PORT`                                                                                                     |
-| **Status**           | Partial — 9 of 12 registered features are implemented (`FEAT-PORT-01`..`09`); `FEAT-PORT-10`..`12` remain `Missing`. The balanced double-entry ledger is implemented, while valuation/P&L, margin/risk-health, and reconciliation remain planned. |
+| **Status**           | Complete — all 12 registered features are implemented. |
 | **Last updated**     | 2026-08-08                                                                                                 |
 | **System workflows** | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008`                                                                   |
 
@@ -125,9 +125,22 @@ flowchart TD
 | Completed | `FEAT-PORT-07` Cross-Domain Workflow Coordination  | `orchestration/` | Exact declarations: Section 4.7                         | Section 4.7 functional requirements | `tests/portfolio/usage/features/07_orchestration.py` |
 | Completed | `FEAT-PORT-08` Public Portfolio API                | `api/`           | Exact declarations and package API: Section 4.8         | Section 4.8 functional requirements | `tests/portfolio/usage/features/08_public_api.py`    |
 | Completed | `FEAT-PORT-09` Balanced Double-Entry Ledger and Accounts | `ledger/` | `LedgerEntry v1`, `PostingBatch v1`, and `LedgerAccount v1`; balanced postings, exactly-once economic-event ingestion, settled/unsettled cash, and snapshot/rebuild validation | `FR-PORT-049`..`FR-PORT-055` | `tests/portfolio/usage/features/09_ledger.py` |
-| Missing | `FEAT-PORT-10` Valuation and P&L | `valuation/` *(planned)* | `ValuationPolicy v1`, realized/unrealized P&L, lot matching | `FR-PORT-056`..`FR-PORT-060` *(planned)* | `tests/portfolio/usage/features/10_valuation.py` *(planned)* |
-| Missing | `FEAT-PORT-11` Margin, Buying Power, and Risk Health | `margin/` *(planned)* | margin/buying power (blocks Risk ), drawdown refs, VaR/CVaR, stress aggregation | `FR-PORT-061`..`FR-PORT-066` *(planned)* | `tests/portfolio/usage/features/11_margin.py` *(planned)* |
-| Missing | `FEAT-PORT-12` Broker Reconciliation and Corporate Actions | `reconciliation/` *(planned)* | broker reconciliation, corporate-action/settlement handling | `FR-PORT-067`..`FR-PORT-069` *(planned)* | `tests/portfolio/usage/features/12_reconciliation.py` *(planned)* |
+| Completed | `FEAT-PORT-10` Valuation and P&L | `valuation/` | `calculate_portfolio_valuation`; `ValuationPolicy v1`, Decimal P&L, lot matching, Data-owned FX evidence | `FR-PORT-056`..`FR-PORT-060` | `tests/portfolio/usage/features/10_valuation.py` |
+| Completed | `FEAT-PORT-11` Margin, Buying Power, and Risk Health | `margin/` | `calculate_margin_view`, `build_portfolio_risk_health`; `PortfolioMarginView v1`, `PortfolioRiskHealth v1` | `FR-PORT-061`..`FR-PORT-066` | `tests/portfolio/usage/features/11_margin.py` |
+| Completed | `FEAT-PORT-12` Broker Reconciliation and Corporate Actions | `reconciliation/` | `reconcile_portfolio`, `build_lifecycle_postings`; unknown/recovery evidence and balanced idempotent postings | `FR-PORT-067`..`FR-PORT-069` | `tests/portfolio/usage/features/12_reconciliation.py` |
+
+The completed requirements are: `FR-PORT-056` versioned valuation-source policy;
+`057` side-aware current/stale/unknown pricing; `058` explicit FIFO,
+weighted-average, or venue-netting lot policy; `059` Decimal realized/unrealized P&L
+with cost lineage; `060` snapshot FX evidence or explicit unknown; `061` used,
+available, reserved, and maintenance margin; `062` buying-power, reserve, leverage,
+and liquidation policy; `063` Risk-compatible `PortfolioMarginView v1`; `064`
+drawdown references and high-water marks; `065` explicit VaR/CVaR model,
+confidence, window, and observations; `066` stress aggregation; `067` broker-truth
+reconciliation with tolerance, unknown, and recovery evidence; `068` balanced,
+idempotent corporate-action and settlement postings; and `069` append-only
+incidents and corrections. Evidence is in `tests/portfolio/unit/test_operations.py`
+and the numbered usage programs.
 
 The package root, `app.services.portfolio`, is the sole public import boundary.
 Its `__all__` contains standalone functions only. Contract values and stateful
@@ -812,7 +825,7 @@ The concrete constructor fields are intentionally not invented here; implementat
 
 ### 4.9 `ledger/` — Balanced Double-Entry Ledger and Accounts
 
-**Purpose:** Build the cockpit's foundational financial authority: a balanced
+**Purpose:** Build the application's foundational financial authority: a balanced
 double-entry ledger with a chart of accounts, exactly-once economic-event
 ingestion, settled/unsettled cash, reproducible balance rebuild, append-only
 reversal corrections, and snapshot accelerators validated against canonical truth.
@@ -855,6 +868,14 @@ This section is the canonical current-state and target database specification fo
 > immutable without a second table, and **no Portfolio table declares a foreign key** —
 > version rows must survive independently, so references are soft and validated in the
 > owning feature modules. Decision D14 is withdrawn on that basis.
+
+Migration `003_portfolio_operations_schema` adds the current operational evidence
+tables `portfolio_valuation_policies`, `position_lots`, `valuation_snapshots`,
+`margin_risk_snapshots`, `reconciliation_incidents`, and `lifecycle_events`.
+Each stores an immutable `record_id`, `portfolio_id`, version, canonical JSON/hash,
+event time, and creation time. Data-owned FX evidence is referenced, never copied;
+reconciliation and lifecycle corrections append new evidence rather than rewriting
+prior economic history.
 
 #### `portfolio_definitions`
 
@@ -1189,7 +1210,7 @@ Shared settings consumed from `docs/PROJECT.md`: `ENVIRONMENT`, `RUNTIME_PROFILE
 
 These are unresolved owner choices raised by the approved capability audit. They are recorded here, not resolved by this documentation task.
 
-- **OD-PORT-01 — FX conversion authority consolidation.** FX authority is split across Data (`evidence/fx_contracts.py::FXConversionRequest`/`FXRateLeg`/`FXConversionEvidence`, `fx_conversion.py::FXRateProvider`) and Simulator (`accounting/calculations.py::ValidatedFXConversionEvidence`). Portfolio owns neither today. The consolidated capability model assigns FX conversion authority to Portfolio, with caller migration. The concrete migration path (reclaim names vs. distinct Portfolio-owned names) is an implementation-phase decision; this documentation records the consolidation direction and does not relocate code.
+- **OD-PORT-01 — FX conversion authority consolidation.** FX authority is split across Data (`evidence/fx_contracts.py::FXConversionRequest`/`FXRateLeg`/`FXConversionEvidence`, `fx_conversion.py::FXRateProvider`) and Simulator (`accounting/calculations.py::ValidatedFXConversionEvidence`). Portfolio owns neither today. The feature model assigns FX conversion authority to Portfolio, with caller migration. The concrete migration path (reclaim names vs. distinct Portfolio-owned names) is an implementation-phase decision; this documentation records the consolidation direction and does not relocate code.
 - **OD-PORT-02 — `PortfolioState` authoritative ownership.** Risk defines `PortfolioState` as an input contract while Portfolio owns a differently shaped `PortfolioStateStore`. The owner must decide whether Portfolio reclaims the `PortfolioState` name and Risk migrates callers, or Portfolio publishes its authoritative account/equity/drawdown projection under a distinct name.
 
 ### Resolved decisions (folded into requirements)

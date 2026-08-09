@@ -147,7 +147,7 @@ def test_transformations_produce_canonical_datasets() -> None:
 
 def test_resample_drop_incomplete_trailing_bucket_closed_bar_semantics() -> None:
     """`drop_incomplete_trailing_bucket` removes an unfinished trailing bar
-    but never a bucket the source dataset fully covers (TC-IMP-DATA-09)."""
+    but never a bucket the source dataset fully covers (feature)."""
     bars = _dataset(_bars(), "bars", "M1")
     assert bars.end == _START + timedelta(minutes=4)
 
@@ -210,7 +210,7 @@ def test_alignment_supports_all_record_types_and_rejects_bad_targets() -> None:
 
 def test_align_datasets_skip_policy_declares_gaps_without_forward_fill() -> None:
     """`missing_policy="skip"` omits a missing target instead of raising or
-    forward-filling it, and never silently invents a value (TC-IMP-DATA-10)."""
+    forward-filling it, and never silently invents a value (feature)."""
     ticks = _dataset(_ticks(), "ticks", None)
     before_coverage = _START - timedelta(seconds=1)
     within_coverage = _START + timedelta(seconds=5)

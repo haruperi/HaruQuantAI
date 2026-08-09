@@ -1,9 +1,9 @@
 """Executable Portfolio ledger usage example.
 
 Demonstrates ``FEAT-PORT-09`` balanced double-entry ledger and accounts feature
-through the package-root public API. Covers ``TC-IMP-PORT-01`` (balanced
-postings), ``TC-IMP-PORT-02`` (exactly-once ingestion), ``TC-IMP-PORT-03``
-(settled cash), and ``TC-IMP-PORT-15`` (snapshot rebuild).
+through the package-root public API. Covers ``feature`` (balanced
+postings), ``feature`` (exactly-once ingestion), ``feature``
+(settled cash), and ``feature`` (snapshot rebuild).
 """
 
 from __future__ import annotations
@@ -283,17 +283,17 @@ def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
         "FEATURE: FEAT-PORT-09 — ledger/ — Balanced Double-Entry Ledger and Accounts\n\n"
-        "Purpose: Build the cockpit's foundational financial authority: a balanced\n"
+        "Purpose: Build the operational's foundational financial authority: a balanced\n"
         "double-entry ledger with accounts, exactly-once economic-event ingestion,\n"
         "settled/unsettled cash, reproducible balance rebuild, append-only reversal\n"
         "corrections, and snapshot accelerators validated against canonical truth.\n\n"
         "Module flow:\n"
-        "-> Stage 1: Balanced postings (TC-IMP-PORT-01)\n"
-        "-> Stage 2: Exactly-once ingestion (TC-IMP-PORT-02)\n"
-        "-> Stage 3: Settled cash (TC-IMP-PORT-03)\n"
+        "-> Stage 1: Balanced postings (feature)\n"
+        "-> Stage 2: Exactly-once ingestion (feature)\n"
+        "-> Stage 3: Settled cash (feature)\n"
         "-> Stage 4: Deterministic rebuild\n"
         "-> Stage 5: Append-only reversal correction\n"
-        "-> Stage 6: Snapshot rebuild validation (TC-IMP-PORT-15)\n"
+        "-> Stage 6: Snapshot rebuild validation (feature)\n"
         "-> Stage 7: Determinism (QUANT gate)\n"
         "-> Stage 8: D-1 contract transport\n"
         "-> Stage 9: Ledger service coordination\n"

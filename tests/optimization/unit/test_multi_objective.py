@@ -1,4 +1,4 @@
-"""Tests for multi-objective candidate evaluation (TC-IMP-OPT-07)."""
+"""Tests for multi-objective candidate evaluation (feature)."""
 
 import pytest
 from app.services.optimization import (

@@ -18,6 +18,12 @@ from app.services.analytics.adapters import (
 from app.services.analytics.adapters import (
     build_closed_trade_equity_curve as _build_closed_trade_equity_curve,
 )
+from app.services.analytics.behavior import (
+    assess_plan_adherence as _assess_plan_adherence,
+)
+from app.services.analytics.behavior import (
+    detect_behavior_patterns as _detect_behavior_patterns,
+)
 from app.services.analytics.contracts import (
     ANALYTICS_SCHEMA_VERSION,
     CONTRACT_COMPATIBILITY_MATRIX,
@@ -97,6 +103,15 @@ from app.services.analytics.dashboards import (
 from app.services.analytics.dashboards.snapshots import (
     get_analytics_dashboard_snapshot,
 )
+from app.services.analytics.emergency_response import (
+    analyze_emergency_response as _analyze_emergency_response,
+)
+from app.services.analytics.journal import (
+    append_journal_entry as _append_journal_entry,
+)
+from app.services.analytics.journal import (
+    read_journal_entry as _read_journal_entry,
+)
 from app.services.analytics.metrics import (
     ANNUALIZATION_POLICY,
     BREAKEVEN_EPSILON,
@@ -138,6 +153,9 @@ from app.services.analytics.metrics import (
 from app.services.analytics.migrations import (
     get_analytics_migrations,
     run_analytics_migrations,
+)
+from app.services.analytics.qualification import (
+    evaluate_qualification as _evaluate_qualification,
 )
 from app.services.analytics.reports import (
     WorstDayDistribution,
@@ -199,6 +217,164 @@ RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 if TYPE_CHECKING:
     MarketDataset = Any
+
+
+def append_player_journal_entry(
+    entry_id: str,
+    *,
+    session_id: str,
+    plan_version: str,
+    author_id: str,
+    occurred_at: datetime,
+    narrative: str,
+    evidence_refs: Sequence[str] = (),
+    replay_id: str | None = None,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Append one immutable player journal entry.
+
+    Returns:
+        Standard response containing journal evidence.
+    """
+    return run_analytics_operation(
+        operation="analytics.journal.append",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        risk_level="none",
+        raw=lambda: _append_journal_entry(
+            entry_id,
+            session_id=session_id,
+            plan_version=plan_version,
+            author_id=author_id,
+            occurred_at=occurred_at,
+            narrative=narrative,
+            evidence_refs=evidence_refs,
+            replay_id=replay_id,
+        ),
+    )
+
+
+def read_player_journal_entry(
+    entry_id: str, *, request_id: str | None = None, correlation_id: str | None = None
+) -> StandardResponse[object]:
+    """Read one player journal entry.
+
+    Returns:
+        Standard response containing journal evidence or ``None``.
+    """
+    return run_analytics_operation(
+        operation="analytics.journal.read",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        risk_level="none",
+        raw=lambda: _read_journal_entry(entry_id),
+    )
+
+
+def assess_plan_adherence(
+    planned_rules: Mapping[str, object],
+    observed_actions: Sequence[Mapping[str, object]],
+    *,
+    plan_version: str,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Assess evidence against an exact plan version.
+
+    Returns:
+        Standard response containing adherence findings.
+    """
+    return run_analytics_operation(
+        operation="analytics.behavior.adherence",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        risk_level="none",
+        raw=lambda: _assess_plan_adherence(
+            planned_rules, observed_actions, plan_version=plan_version
+        ),
+    )
+
+
+def detect_behavior_patterns(
+    actions: Sequence[Mapping[str, object]],
+    *,
+    threshold_version: str,
+    thresholds: Mapping[str, int],
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Run versioned evidence-only behavior detectors.
+
+    Returns:
+        Standard response containing detector findings.
+    """
+    return run_analytics_operation(
+        operation="analytics.behavior.detect",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        risk_level="none",
+        raw=lambda: _detect_behavior_patterns(
+            actions,
+            threshold_version=threshold_version,
+            thresholds=thresholds,
+        ),
+    )
+
+
+def analyze_emergency_response(
+    events: Sequence[Mapping[str, object]],
+    *,
+    required_sequence: Sequence[str],
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Analyze Simulator emergency lifecycle evidence.
+
+    Returns:
+        Standard response containing emergency-response evidence.
+    """
+    return run_analytics_operation(
+        operation="analytics.emergency.analyze",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        risk_level="none",
+        raw=lambda: _analyze_emergency_response(
+            events, required_sequence=required_sequence
+        ),
+    )
+
+
+def evaluate_player_qualification(
+    *,
+    curriculum_version: str,
+    completed_prerequisites: Sequence[str],
+    required_prerequisites: Sequence[str],
+    attempts: Sequence[Mapping[str, object]],
+    valid_until: datetime,
+    now: datetime,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Evaluate player qualification and recurrent validity.
+
+    Returns:
+        Standard response containing qualification evidence.
+    """
+    return run_analytics_operation(
+        operation="analytics.qualification.evaluate",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        risk_level="none",
+        raw=lambda: _evaluate_qualification(
+            curriculum_version=curriculum_version,
+            completed_prerequisites=completed_prerequisites,
+            required_prerequisites=required_prerequisites,
+            attempts=attempts,
+            valid_until=valid_until,
+            now=now,
+        ),
+    )
 
 
 def get_analytics_schema_version() -> str:
@@ -1123,6 +1299,9 @@ def parse_scoring_profile_mapping(
 __all__: tuple[str, ...] = (
     "adapt_trading_result",
     "align_benchmark_series",
+    "analyze_emergency_response",
+    "append_player_journal_entry",
+    "assess_plan_adherence",
     "build_barrier_section",
     "build_closed_trade_equity_curve",
     "build_dashboard_payload",
@@ -1156,6 +1335,8 @@ __all__: tuple[str, ...] = (
     "create_process_scoring_profile",
     "create_risk_free_rate_evidence",
     "create_statistical_validation_config",
+    "detect_behavior_patterns",
+    "evaluate_player_qualification",
     "get_analytics_dashboard_snapshot",
     "get_analytics_migrations",
     "get_analytics_schema_version",
@@ -1169,6 +1350,7 @@ __all__: tuple[str, ...] = (
     "is_analytics_value",
     "parse_process_score_mapping",
     "parse_scoring_profile_mapping",
+    "read_player_journal_entry",
     "run_analytics_migrations",
     "run_statistical_validation",
     "serialize_report",

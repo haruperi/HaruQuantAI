@@ -1,4 +1,4 @@
-"""Versioned candidate profile promotion (TC-IMP-RES-10, EXTEND FEAT-RES-12).
+"""Versioned candidate profile promotion (feature, EXTEND FEAT-RES-12).
 
 Produces versioned candidate profiles for Strategy/Risk/Simulator/Optimization
 with review evidence. A candidate profile is an advisory promotion artifact: it
@@ -261,7 +261,7 @@ def parse_candidate_profile(
     )
 
 
-# ---- TC-IMP-RES-11 evidence audit trail additions (EXTEND FEAT-RES-12) ----
+# ---- feature evidence audit trail additions (EXTEND FEAT-RES-12) ----
 
 
 @dataclass(frozen=True, slots=True)

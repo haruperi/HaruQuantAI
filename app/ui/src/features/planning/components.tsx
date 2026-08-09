@@ -1,0 +1,2 @@
+import type { WarningItem } from "./contracts";
+export function PlanningPanels({ mode, warnings }: { mode: string; warnings: readonly WarningItem[] }): React.JSX.Element { return <section aria-labelledby="planning-heading"><h2 id="planning-heading">Navigation and planning</h2><p>Mode: <strong>{mode}</strong></p><ul aria-label="Warnings">{warnings.map((warning) => <li key={warning.id} role={warning.severity === "critical" ? "alert" : undefined}>{warning.message} — {warning.acknowledged ? "acknowledged" : "active"}</li>)}</ul></section>; }

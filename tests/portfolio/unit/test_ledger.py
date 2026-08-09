@@ -1,9 +1,9 @@
 """Unit tests for the Portfolio balanced double-entry ledger (``FEAT-PORT-09``).
 
-Covers ``FR-PORT-049``..``FR-PORT-055`` and the four Trading Cockpit gaps
-``TC-IMP-PORT-01`` (balanced postings), ``TC-IMP-PORT-02`` (exactly-once
-ingestion), ``TC-IMP-PORT-03`` (settled/unsettled cash), and
-``TC-IMP-PORT-15`` (snapshot rebuild). All money math is deterministic
+Covers ``FR-PORT-049``..``FR-PORT-055`` and the four application gaps
+``feature`` (balanced postings), ``feature`` (exactly-once
+ingestion), ``feature`` (settled/unsettled cash), and
+``feature`` (snapshot rebuild). All money math is deterministic
 ``decimal.Decimal`` (NFR-PORT-007, QUANT gate).
 """
 
@@ -537,7 +537,7 @@ def test_posting_batch_requires_at_least_two_entries() -> None:
 
 
 def test_all_sixteen_posting_types_are_accepted() -> None:
-    """Every posting type in the TC-IMP-PORT-01 catalogue is accepted."""
+    """Every posting type in the feature catalogue is accepted."""
     accepted = {
         "deposit",
         "withdrawal",

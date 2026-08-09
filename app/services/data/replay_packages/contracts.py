@@ -1,10 +1,10 @@
 """Contracts for deterministic, no-lookahead replay packages.
 
-Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-08`, `FEAT-DATA-19`):
+application Phase 0 reconciliation (`feature`, `FEAT-DATA-19`):
 a replay package declares what bounded evidence to replay; `stream_replay_events`
 (`service.py`) streams it in deterministic source order with an explicit
 per-event availability timestamp and no future visibility relative to a
-caller-supplied `as_of` boundary. `TC-IMP-SIM-01` (Simulator's
+caller-supplied `as_of` boundary. `feature` (Simulator's
 `SimulationClock`) does not exist yet, so this package never assumes a
 wall-clock "now" — the required `as_of` argument is itself the fail-closed
 consumer port (§8): a caller that supplies no boundary sees no events,

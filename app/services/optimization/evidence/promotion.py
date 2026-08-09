@@ -1,8 +1,8 @@
-"""Promotion contract consumer port (TC-IMP-OPT-10).
+"""Promotion contract consumer port (feature).
 
 Extends ``FEAT-OPT-07``: Optimization outputs become versioned candidate profiles that
 require Research/Strategy/Risk approval before use. The authoritative cross-domain
-approval gate is owned by Research (``TC-IMP-RES-10``), which is still ``Partial``.
+approval gate is owned by Research (``feature``), which is still ``Partial``.
 This module declares the narrow consumer port and a deterministic fail-closed fallback:
 a missing approval provider yields ``NOT_PROMOTED`` and the candidate stays at
 ``ready_for_risk_review`` / ``research_only``. Optimization never auto-promotes a
@@ -26,7 +26,7 @@ PROMOTION_NOT_PROMOTED = "NOT_PROMOTED"
 class PromotionGatePort(Protocol):
     """Narrow consumer port for the Research-owned cross-domain approval gate.
 
-    The provider (Research ``TC-IMP-RES-10``) supplies the production approval gate
+    The provider (Research ``feature``) supplies the production approval gate
     that coordinates Research/Strategy/Risk sign-off before a candidate profile may be
     adopted.
     """
@@ -94,7 +94,7 @@ def evaluate_promotion_gate(
             "promotion_status": PROMOTION_NOT_PROMOTED,
             "advisory_final_decision": final_decision,
             "reason": "approval_gate_absent",
-            "deferred_to": "TC-IMP-RES-10",
+            "deferred_to": "feature",
         }
     evidence = dict(
         provider.evaluate_promotion(

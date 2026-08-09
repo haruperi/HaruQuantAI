@@ -63,8 +63,8 @@ class EconomicEvent:
             event's most recent replay-visibility timestamp.
         first_seen_at: Optional original publication timestamp — when this
             event was first persisted, distinct from a later revision
-            recorded through `updated_at` (Trading Cockpit Phase 0
-            `TC-IMP-DATA-04`).
+            recorded through `updated_at` (application Phase 0
+            `feature`).
     """
 
     id: str
@@ -188,7 +188,7 @@ def project_economic_event(event: EconomicEvent) -> dict[str, Any]:
 def is_event_visible_at(event: EconomicEvent, as_of: datetime) -> bool:
     """Return whether one event's currently-known state was visible at `as_of`.
 
-    Trading Cockpit Phase 0 reconciliation (`TC-IMP-DATA-04`): a replay
+    application Phase 0 reconciliation (`feature`): a replay
     consumer must never see an event before its original publication, and an
     event whose publication time is unknown is never treated as visible.
 

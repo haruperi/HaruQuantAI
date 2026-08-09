@@ -1,6 +1,6 @@
 """Exactly-once ledger economic-event ingestion.
 
-Implements ``TC-IMP-PORT-02``. The ledger consumes Trading/Broker/Simulator
+Implements ``feature``. The ledger consumes Trading/Broker/Simulator
 economic events exactly once using the ``(source_event_id, source_sequence)``
 invariant: a replayed event with identical material is idempotent, and a
 replayed key carrying changed material is rejected (``PORT_IDEMPOTENCY_CONFLICT``).

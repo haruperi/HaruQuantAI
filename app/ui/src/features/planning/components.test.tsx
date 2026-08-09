@@ -1,0 +1,2 @@
+import { render, screen } from "@testing-library/react"; import { describe, expect, it } from "vitest"; import { PlanningPanels } from ".";
+describe("PlanningPanels", () => { it("exposes critical warnings as alerts", () => { render(<PlanningPanels mode="execution" warnings={[{id:"w",severity:"critical",message:"Stop",acknowledged:false}]} />); expect(screen.getByRole("alert")).toHaveTextContent("Stop"); }); });

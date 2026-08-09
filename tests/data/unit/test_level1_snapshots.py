@@ -1,4 +1,4 @@
-"""Unit tests for the Level-1 quote snapshot feature (TC-IMP-DATA-02)."""
+"""Unit tests for the Level-1 quote snapshot feature (feature)."""
 
 from __future__ import annotations
 

@@ -1,0 +1,2 @@
+import type { QualificationView } from "./contracts";
+export function TrainingPanel({ qualification }: { qualification: QualificationView }): React.JSX.Element { return <section aria-labelledby="training-heading"><h2 id="training-heading">Training, replay, and qualification</h2><p>Status: <strong>{qualification.status}</strong></p><p>Curriculum: {qualification.curriculumVersion ?? "Unknown"}</p>{qualification.remediation.length > 0 && <ul>{qualification.remediation.map((item) => <li key={item}>{item}</li>)}</ul>}</section>; }

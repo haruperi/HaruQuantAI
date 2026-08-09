@@ -3,8 +3,8 @@
 Verifies the migration step ``002_portfolio_ledger_schema`` applies through
 Data's ledger-verified, write-locked, transactional runner, and that ledger
 accounts, balanced batches, and their legs are durably persisted and rebuilt
-identically (``TC-IMP-PORT-01``, ``TC-IMP-PORT-02``, ``TC-IMP-PORT-03``,
-``TC-IMP-PORT-15``; REACH gate).
+identically (``feature``, ``feature``, ``feature``,
+``feature``; REACH gate).
 """
 
 from __future__ import annotations

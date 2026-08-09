@@ -1,7 +1,7 @@
 # ruff: noqa: DOC501, N812
 """BrokerReconciliationSnapshot v1 cross-domain contract transport.
 
-The Trading Cockpit Phase 0 reconciliation (``TC-IMP-BRK-08``) extends the
+The application Phase 0 reconciliation (``feature``) extends the
 existing ``execution_history`` read paths into one consolidated port returning
 open orders, fills, positions, balances, and venue status for Trading and
 Simulator recovery. The contract is fail-closed: when any component read is

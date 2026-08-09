@@ -23,6 +23,7 @@ from app.services.api.routes.simulation_sessions import (
 )
 from app.services.api.routes.strategies import router as strategies_router
 from app.services.api.routes.trading import router as trading_router
+from app.services.api.routes.workstation import router as workstation_router
 
 __all__ = (
     "agentic_router",
@@ -44,4 +45,5 @@ __all__ = (
     "simulation_sessions_router",
     "strategies_router",
     "trading_router",
+    "workstation_router",
 )
