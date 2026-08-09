@@ -1,6 +1,6 @@
 # Volume Indicators
 
-Trading Cockpit Phase 0 extends this feature with `measure_order_flow` and the
+consolidated capability programme extends this feature with `measure_order_flow` and the
 validated JSON-safe `indicators.liquidity_snapshot.v1` build/parse boundary.
 Unavailable fill probability remains null and is never inferred.
 

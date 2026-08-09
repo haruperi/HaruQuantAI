@@ -4,7 +4,7 @@
 source order with an explicit per-event `available_at` timestamp and no future
 visibility. `stream_replay_events` never assumes a wall-clock "now": its required
 `as_of` argument is the fail-closed consumer port standing in for Simulator's
-not-yet-built `SimulationClock` (`TC-IMP-SIM-01`) — omitting it is a validation
+not-yet-built Simulator clock — omitting it is a validation
 error, never an inferred boundary.
 
 `build_replay_package`/`parse_replay_package` construct and JSON-round-trip the

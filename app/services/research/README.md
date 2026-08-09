@@ -1,7 +1,7 @@
 # Research
 
 > **Package:** `app/services/research`
-> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 13 registered features remain implemented, but 11 work packages (`TC-IMP-RES-01`..`TC-IMP-RES-11`) add target behavior that is not yet implemented (4 `CREATE`, 6 `EXTEND`, 1 `DEFERRED_INTEGRATION`). See `### Trading Cockpit Phase 0 reconciliation`. The thirteen registered features, including
+> **Status:** `Partial` — 16 features are registered: `FEAT-RES-01`..`13` are `Completed`, while `FEAT-RES-14`..`16` are `Partial`. The final three features still lack complete provider wiring, persistence, requirement evidence, or standalone usage programs as recorded in the registry. The thirteen completed features, including
 > `FEAT-RES-13` fundamental and sentiment source evidence, are implemented and
 > verified.
 > **Last updated:** `2026-07-30`
@@ -133,40 +133,6 @@ The documented non-feature `persistence/` support package contains exactly
 artifact-manifest SQL construction and Data transaction delegation; read, update,
 and delete are intentionally unsupported with empty literal `__all__` declarations.
 
-### Trading Cockpit Phase 0 reconciliation
-
-This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-RES-01`..`TC-IMP-RES-11`) into this authoritative README so that it is self-contained. Phase 0 classified the eleven Research work packages as **four `CREATE`, six `EXTEND`, and one `DEFERRED_INTEGRATION`**. The most consequential `CREATE` is the approved expectancy profile (`TC-IMP-RES-03`), which blocks Strategy (`TC-IMP-STRAT-08`) and Risk (`TC-IMP-RISK-07`); until it exists, Risk fails closed to `NOT_ELIGIBLE` and Strategy never decides eligibility locally.
-
-Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
-
-**Reused existing assets (no duplication):**
-
-| Cockpit capability | Existing Research asset reused | Phase 0 gap |
-| --- | --- | --- |
-| Research evidence contract | `contracts/` (`FEAT-RES-01`) + Data `data_research_sources`/`data_verified_research_sources`/`data_research_observations` | `TC-IMP-RES-01` |
-| Strategy evidence package | `studies/` (`FEAT-RES-07`), `modeling/`, `statistics/` (`FEAT-RES-06`) | `TC-IMP-RES-02` |
-| Market/instrument research | `market_structure/` (`FEAT-RES-09`), `seasonality/` (`FEAT-RES-08`) | `TC-IMP-RES-08` |
-| Point-in-time evidence projection | `data/` (`FEAT-RES-02`), Data `research_sources/` (`FEAT-DATA-16`), `leakage/` (`FEAT-RES-04`) | `TC-IMP-RES-09` |
-| Research-to-profile promotion | `artifacts/` (`FEAT-RES-12`), `research_artifacts`, `tests/system/integration/test_research_to_strategy.py` | `TC-IMP-RES-10` |
-| Evidence audit trail | `research_artifacts` + Agentic `agentic_evidence_claims`/`agentic_lifecycle_transitions` | `TC-IMP-RES-11` |
-
-**Target features to add or extend.** The four `CREATE` gaps group into cohesive new capabilities, registered as `FEAT-RES-14`..`FEAT-RES-16`.
-
-| Status | Target (feature / gap) | Reuses / extends | Phase 0 gaps |
-| --- | --- | --- | --- |
-| Partial | Research evidence contract additions (EXTEND `FEAT-RES-01`) | Extends contracts. Adds license/use classification, trust score, revisions, scope, coverage, quality state. | `TC-IMP-RES-01` |
-| Partial | Strategy evidence package additions (EXTEND `FEAT-RES-07`) | Extends studies. Adds versioned strategy bundle (hypothesis, instruments, regimes, sessions, methodology, sample, costs, results, limitations). | `TC-IMP-RES-02` |
-| Missing | **`FEAT-RES-14` Approved Expectancy Profile and Governance** *(planned)* | New feature. **`TC-IMP-RES-03`** defines `ApprovedExpectancyProfile v1` (sample dates/size, OOS status, win rate, avg win/loss in R, expected value, drawdown, operating envelope, approval/review/expiry) — **blocks Strategy `TC-IMP-STRAT-08` and Risk `TC-IMP-RISK-07`**. **`TC-IMP-RES-04`** adds the `DRAFT`/`UNDER_REVIEW`/`APPROVED`/`SUSPENDED`/`EXPIRED`/`REVOKED` governance state machine with exact strategy/instrument/regime/session matching. | `TC-IMP-RES-03`, `TC-IMP-RES-04` |
-| Missing | **`FEAT-RES-15` Performance Drift Evidence** *(planned)* | New feature. Monitors live-sim/paper outcomes vs the approved envelope; proposes suspension at drift thresholds. | `TC-IMP-RES-05` |
-| Missing | **`FEAT-RES-16` Stress-Scenario Evidence** *(planned)* | New feature. Historical/reasoned basis for price, spread, liquidity, correlation, FX, margin, halt, gap, connectivity shocks. | `TC-IMP-RES-06` |
-| Deferred | Scenario evidence package | Learning objective, event realism, information fairness, trigger justification, expected recovery, golden-run notes. **Deferred to Simulator `TC-IMP-SIM-11`** (scenario definition) — scenario evidence cannot exist before scenarios exist. | `TC-IMP-RES-07` |
-| Partial | Market/instrument research additions (EXTEND `FEAT-RES-08`/`-09`) | Extends market_structure/seasonality. Evidence for session, liquidity, cost, margin, lifecycle, event assumptions (without replacing Brokers profiles). | `TC-IMP-RES-08` |
-| Partial | Point-in-time evidence projection (EXTEND `FEAT-RES-02`/`-04`) | Extends data/leakage. Consumes eligible Data-owned records; exposes only evidence available at the simulation timestamp. | `TC-IMP-RES-09` |
-| Partial | Research-to-profile promotion additions (EXTEND `FEAT-RES-12`) | Extends artifacts. Produces versioned candidate profiles for Strategy/Risk/Simulator/Optimization with review evidence. | `TC-IMP-RES-10` |
-| Partial | Evidence audit trail additions (EXTEND `FEAT-RES-12`) | Extends artifacts + Agentic claims. Adds expectancy-approval reviewer/decision/reason/superseded fields. | `TC-IMP-RES-11` |
-
-**Boundary clarifications folded in:** Research owns research interpretation, approved expectancy evidence, strategy evidence governance, scenario/stress assumptions, drift review, and research approvals. It consumes point-in-time Data evidence and does not own market-data acquisition. Research's `ResearchScorecard` (`contracts/results.py:446`) measures research edges and is distinct from Analytics' player `Scorecard` (Phase 0 finding C-6) — the two must not be conflated. **Open Decision OD-RES-01:** `research_artifacts` is keyed by a filesystem relative_path (`FR-RES-025`), a brittle business key for approved-expectancy governance (findings P-7, P-11); the approved expectancy profile needs a stable surrogate identity, and the field-level schema is deferred to the implementation phase.
-
 ### Four-level structure
 
 | Code level | Represents |
@@ -268,9 +234,9 @@ remain external.
 | Completed | `FEAT-RES-11` Scorecards, Snapshots, and Edge Lab Profiles | `profiles/` | Implemented declarations: Section 4.11 | `FR-RES-089`–`096` | `tests/research/usage/features/11_profiles.py` |
 | Completed | `FEAT-RES-12` Safe Research Artifact Persistence | `artifacts/` | Implemented declarations: Section 4.12 | Section 4.12 functional requirements | `tests/research/usage/features/12_artifacts.py` |
 | Completed | `FEAT-RES-13` Fundamental and Sentiment Source Evidence | `intelligence/` | `assess_intelligence_applicability`, `build_fundamental_source_evidence`, `build_sentiment_source_evidence`, `project_intelligence_evidence`; internal evidence values remain opaque | `FR-RES-099`–`104` | `tests/research/usage/features/13_intelligence.py` |
-| Missing | `FEAT-RES-14` Approved Expectancy Profile and Governance | `expectancy/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `build_approved_expectancy_profile`/`parse_approved_expectancy_profile` + governance state machine; blocks Strategy `TC-IMP-STRAT-08` and Risk `TC-IMP-RISK-07` | `FR-RES-107`..`FR-RES-111` *(planned)* | `tests/research/usage/features/14_expectancy.py` *(planned)* |
-| Missing | `FEAT-RES-15` Performance Drift Evidence | `drift/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); monitors live-sim/paper outcomes vs approved envelope; proposes suspension at drift thresholds | `FR-RES-112`..`FR-RES-114` *(planned)* | `tests/research/usage/features/15_drift.py` *(planned)* |
-| Missing | `FEAT-RES-16` Stress-Scenario Evidence | `stress_evidence/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); historical/reasoned basis for price/spread/liquidity/correlation/FX/margin/halt/gap/connectivity shocks | `FR-RES-115`..`FR-RES-117` *(planned)* | `tests/research/usage/features/16_stress_evidence.py` *(planned)* |
+| Partial | `FEAT-RES-14` Approved Expectancy Profile and Governance | `expectancy/` | Contract construction, parsing, governance transitions, eligibility, loading, and persistence operations are implemented; provider wiring, complete requirement evidence, and the standalone usage program remain incomplete | `FR-RES-107`..`FR-RES-111` Partial | `tests/research/usage/features/14_expectancy.py` *(missing)* |
+| Partial | `FEAT-RES-15` Performance Drift Evidence | `drift/` | Evidence construction, parsing, drift monitoring, and suspension proposals are implemented; durable drift records and the standalone usage program remain incomplete | `FR-RES-112`..`FR-RES-114` Partial | `tests/research/usage/features/15_drift.py` *(missing)* |
+| Partial | `FEAT-RES-16` Stress-Scenario Evidence | `stress_evidence/` | Contract construction and parsing are implemented; derivation, persistence, provider wiring, scenario-evidence packaging, and the standalone usage program remain incomplete | `FR-RES-115`..`FR-RES-120` Partial/Missing | `tests/research/usage/features/16_stress_evidence.py` *(missing)* |
 
 ```text
 research/
@@ -1655,9 +1621,9 @@ Shared settings are consumed from `docs/PROJECT.md` and not redefined: `ENVIRONM
 
 The error taxonomy, dependency boundaries, statistical policy,
 market-structure score, scorecard readiness, resource ceilings, artifact migration,
-and persistence policy are resolved in the owner-resolved implementation policy. The following are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit; they are recorded here, not resolved by this documentation task.
+and persistence policy are resolved in the owner-resolved implementation policy. The following are unresolved owner choices raised by the approved capability audit; they are recorded here, not resolved by this documentation task.
 
-- **OD-RES-01 — `research_artifacts` surrogate key for expectancy governance.** `research_artifacts` is keyed by a filesystem relative_path (`FR-RES-025`), a brittle business key for approved-expectancy governance (Phase 0 findings P-7, P-11). The approved expectancy profile (`FEAT-RES-14`) needs a stable surrogate identity rather than a path string. The field-level schema for the new profile table and the migration path are deferred to the implementation phase.
+- **OD-RES-01 — `research_artifacts` surrogate key for expectancy governance.** `research_artifacts` is keyed by a filesystem relative path (`FR-RES-025`), a brittle business key for approved-expectancy governance. The approved expectancy profile (`FEAT-RES-14`) needs a stable surrogate identity rather than a path string. Its field-level schema and migration path remain unresolved.
 
 
 

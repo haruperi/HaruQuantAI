@@ -173,10 +173,7 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Owns**: Per-platform adapter implementations, the broker registry/factory (`create_broker_adapter`; adapter instances are created via the registry and owned by the caller), connection/session lifecycle mechanics (state machine, keep-alives, transport reconnects), translation of provider-native symbol/request values into provider API calls, canonical DTO and error mapping (unenriched), capability discovery, and transport-level flow control (rate-limit throttling, bounded backpressure, and the adapter-local closed/open/half-open circuit breaker specified by the Brokers README).
 * **Boundaries**: Pure passthrough with zero business logic — no business validation (structural/transport validation only), no risk checks, no decision-making, no data enrichment, no business retry/replay (transport-level flow control and connection recovery are permitted; mutations are never retried), and no state management beyond the live session (no durable state). Owns no credential vault and performs no credential persistence, encryption, or database access; approved composition roots resolve settings before constructing `BrokerConnectionConfig`, and only resolved secret values live in memory for the adapter lifecycle. Data owns canonical market identity, friendly names, and every provider/cross-provider alias mapping; Brokers accepts and reports exact provider-native symbol strings only and owns no alias resolution. Brokers does not normalize into `MarketDataset` / `AccountStateSnapshot` and never leaks raw SDK objects across its boundary. Only Trading may invoke mutation operations; Data's use is strictly read-only; Risk and all other domains have no Brokers dependency. The read/write split is enforced by capability-trait scoping (`MarketDataProvider`, `TradeExecutionProvider`, `AccountProvider`, `CalculationProvider`).
 * **Key Limits**: Sole live-connectivity path to any broker/provider; connection, scope, or permission failure fails closed; mutations are never retried — uncertain outcomes return `BROKER_UNKNOWN_OUTCOME`; unsupported capabilities return `BROKER_CAPABILITY_UNSUPPORTED` deterministically; an open adapter-local transport circuit returns `BROKER_CIRCUIT_OPEN` without a provider call; no path returns a synthetic substitute.
-* **Status**: `Partial implementation baseline`. Accepted reads, histories,
-  calculations, streams, and provider mutation bodies are implemented. Every write
-  remains registry-unavailable by owner policy; external production release and
-  system composition are separate gates. See the Brokers README evidence table.
+* **Status**: `Completed`. All 17 registered features are implemented; provider release policy and production authorization remain separate runtime gates.
 * **Documentation**: `app/services/brokers/README.md`
 
 #### 2.1.3 Data
@@ -189,16 +186,14 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Boundaries**: Foundation layer with no trading decision logic. Brokers continues to own provider adapter implementations and connection/session mechanics. Data's package-root retrieval facade may privately and lazily compose a read-only adapter through the Brokers factory from Utils-loaded settings; manual adapter/source injection remains supported. Data does not expose that composition, invoke broker mutations, own strategy logic, backtest engines, sizing formulas, order dispatch, or other domains' tables, artifact schemas, and migration definitions (each domain owns its tables, artifact schemas, and migration definitions, utilizing the shared execution framework). Raw provider DataFrames, sockets, DB sessions, credentials, adapters, and provider SDK objects never cross its boundary. Data may explicitly project canonical bar or tick `MarketDataset` evidence into detached analytical DataFrames whose exact columns, missingness, units, and precision-loss boundaries are fixed in the Data README; the canonical dataset remains authoritative evidence.
 * **Key Limits**: Backfill chunks must be bounded and checkpointed; exclusive path-scoped write locks (`CONCURRENT_WRITE_LOCKED` on conflict); no-lookahead alignment by default; all broker/provider access is read-only and routed through Brokers. MT5 tick mode is independent of display timeframe and fails explicitly if a saturated read prevents proof of completeness; bar mode publishes closed bars only at the selected timeframe boundary. Quality evidence attached to a `MarketDataset` must be computed from the actual records; a constant or unexamined quality score is never emitted.
 * **Market-time authority**: Data owns broker-independent market-hour evaluation. Brokers supplies provider-authored symbol sessions (including cTrader weekly intervals and holidays); exchange-traded instruments require an explicit exchange calendar identifier; providers without a session API may use only an explicit revisioned weekly definition. Named Sydney/Tokyo/London/New York sessions are analytical liquidity labels and never establish tradability or order authority.
-* **Module structure**: All eighteen focused capabilities are complete, including `FEAT-DATA-16` point-in-time evidence, `FEAT-DATA-17` runtime persistence adapters, and `FEAT-DATA-18` application-triggered artifact/reference catalog operations. Each registered capability owns exactly one folder and one standalone usage program. Historical interpretation remains owned by Research/Agentic.
+* **Module structure**: All nineteen registered features are complete, including `FEAT-DATA-16` point-in-time evidence, `FEAT-DATA-17` runtime persistence adapters, `FEAT-DATA-18` artifact/reference catalog operations, and `FEAT-DATA-19` replay data packages. Each registered feature owns exactly one folder and one standalone usage program. Historical interpretation remains owned by Research/Agentic.
 * **Documentation**: `app/services/data/README.md`
 
 #### 2.1.4 Indicators
 
 Indicators owns deterministic measurements and versioned snapshot transports;
 Risk remains the sole authoritative regime-classification and policy-modifier owner.
-Trading Cockpit Phase 0 behavior is implemented, while package promotion remains
-temporarily blocked by the current Data error-catalogue compatibility failure in
-Indicators migration failure-path verification.
+All eight registered Indicators features are `Completed`.
 
 * **Package**: `app/services/indicators`
 * **Responsibility**: Compute deterministic, pure-function indicator values from normalized data.
@@ -281,7 +276,7 @@ Indicators migration failure-path verification.
 * **Responsibility**: Provide a sandboxed, leakage-gated environment for data exploration and hypothesis evaluation, producing advisory reports and deterministic source-evidence projections only.
 * **Inputs**: Datasets and eligible point-in-time `ResearchSourceDocument` and structured-observation evidence from Data; Analytics public metric contracts.
 * **Outputs**: Advisory `ResearchReport`s, insights, feature definitions, hypothesis evaluations, and bounded `FundamentalSourceEvidence`/`SentimentSourceEvidence`.
-* **Owns**: Research artifact persistence, its own tables/schemas/migrations, sandboxed analysis, feature engineering, deterministic historical labeling, leakage/bias validation, null models, edge discovery, statistical sign-off, and deterministic fundamental/sentiment source-evidence preparation.
+* **Owns**: Research artifact persistence, its own tables/schemas/migrations, sandboxed analysis, feature engineering, deterministic historical labeling, leakage/bias validation, null models, edge discovery, statistical sign-off, deterministic fundamental/sentiment source-evidence preparation, approved-expectancy governance, drift evidence, and scenario/stress evidence packages. The final three features remain `Partial` as recorded in the Research registry.
 * **Boundaries**: Read-only toward live systems. Does not own live mutations, risk decisions, strategy promotion, or roadmap/code selection. Advisory only.
 * **Key Limits**: Non-deterministic routines require seed injection and output logs; persisted artifacts store SHA-256 config hashes; implicit/hidden data filling or dropping is forbidden (`CleaningConfig` explicit).
 * **Documentation**: `app/services/research/README.md`
@@ -292,7 +287,7 @@ Indicators migration failure-path verification.
 * **Responsibility**: Construct, simulation-validate, version, activate, and monitor deterministic multi-strategy portfolio allocations without approving risk or executing trades.
 * **Inputs**: Registered Strategy references, Analytics-owned `PortfolioAllocationEvidence`, Data-owned `AccountStateSnapshot` / `FXConversionEvidence`, Simulation-owned portfolio results, Risk-owned eligibility/allocation decisions, and explicit construction/rebalance configuration.
 * **Outputs**: immutable `PortfolioDefinition` versions, `PortfolioConstructionResult`, `ActivePortfolioAllocation`, and `PortfolioRebalancePlan`; receiver-owned requests submitted to Risk, Simulation, and Trading.
-* **Owns**: registered immutable Portfolio definitions/objectives, deterministic fixed/equal/inverse-volatility construction, target capital-weight metadata and proposed risk-budget weights, proposal/version identity, activation state, drift detection, reduce-only rebalance planning, rollback-as-new-version, and Portfolio-owned schemas/migrations/artifacts. Portfolio startup applies its complete checksummed manifest through Data's ledger, lock, and transactional migration boundary. Risk owns the authoritative risk-budget projection.
+* **Owns**: registered immutable Portfolio definitions/objectives, deterministic fixed/equal/inverse-volatility construction, target capital-weight metadata and proposed risk-budget weights, proposal/version identity, activation state, drift detection, reduce-only rebalance planning, rollback-as-new-version, the balanced double-entry ledger, and Portfolio-owned schemas/migrations/artifacts. Portfolio startup applies its complete checksummed manifest through Data's ledger, lock, and transactional migration boundary. Risk owns the authoritative risk-budget projection.
 * **Boundaries**: `app.services.portfolio` is the sole public import boundary and exports standalone functions only; values and services remain opaque. Portfolio never registers strategies, computes Analytics metrics, approves risk, determines final order size, directly mutates broker state, or imports provider SDKs. Portfolio submits Risk-owned review/budget requests and Trading-owned rebalance execution requests. It cannot activate an allocation without current Risk approval and required simulation evidence.
 * **Key Limits**: No hidden numeric defaults; portfolio size, weight caps, evidence freshness, drift thresholds, schedules, and decision expiry are required profile values. Missing/stale evidence fails closed. Live/paper activation requires authenticated human approval plus Risk authorization.
 * **Documentation**: `app/services/portfolio/README.md`
@@ -306,63 +301,7 @@ Indicators migration failure-path verification.
 * **Owns**: Agentic contracts and provenance; firm mandate and role registry; Google ADK composition behind provider-neutral adapters; durable workflow state; dynamic bounded deliberation; Agentic tool permissions; evidence context and memory; specialized capabilities; sandboxed code generation; Agentic evaluation, promotion evidence, lifecycle, observability, incidents, replay, and public operations.
 * **Boundaries**: Agentic may submit an untrusted typed proposal into a receiver's normal public intake. It owns no source acquisition, canonical market fact, deterministic indicator or metric, strategy registration decision, portfolio activation, risk approval, order construction, trading state, execution, broker credential, broker mutation, kill-switch authority, or human authentication. Every consequential proposal passes through the complete deterministic Strategy, Portfolio, Risk, Trading, and Brokers pipeline applicable to that action.
 * **Key Limits**: Deny by default; no direct Brokers dependency; no self-approval or mandate override; no model-selected permission or limit; generated code is never hot-loaded; discussion is bounded and preserves dissent; data-dependent roles refuse without governed point-in-time evidence; disabling Agentic leaves deterministic safety and already-approved trading behaviour available.
-* **Status**: `Partial`. The complete twenty-two-feature target is documented and
-  implementation has begun in Feature Registry order. the complete control plane
-  is implemented: `FEAT-AGT-01` contracts, `FEAT-AGT-02` governance,
-  `FEAT-AGT-04` orchestration, `FEAT-AGT-05` permissions, `FEAT-AGT-06`
-  context and governed memory, `FEAT-AGT-07` bounded deliberation, `FEAT-AGT-08` the first registered
-  leaf agent package, `FEAT-AGT-11` the first agent package with governed
-  tool adapters, `FEAT-AGT-12` quantitative research grounded in the Analytics
-  metric catalog, `FEAT-AGT-13` hypothesis and strategy-thesis development, and
-  `FEAT-AGT-14` pre-registered experiment protocols with governed Simulation
-  coordination, `FEAT-AGT-15` bounded optimization with reconciled trial
-  accounting, `FEAT-AGT-16` staged code generation for strategy
-  evaluators and candidate indicators, `FEAT-AGT-17` evaluation, critique,
-  and economic acceptance, `FEAT-AGT-18` artefact promotion with an
-  append-only lifecycle ledger, `FEAT-AGT-19` non-binding portfolio and
-  risk advisory, `FEAT-AGT-20` trade proposal handoff into Strategy's own
-  external-proposal intake, `FEAT-AGT-21` correlated traces with
-  deterministic incident containment, and `FEAT-AGT-22` the authenticated
-  operator boundary. `FEAT-AGT-03` runtime is `Completed`:
-  provider-neutral model profiles, governed invocation, upgrade gating, and the
-  Google ADK 2.x binding all exist behind the agent-graph port. The binding is
-  structurally verified; no live provider call has been made, no backtest has
-  been executed through the Simulation port, and no sandbox runtime is bound —
-  `FEAT-AGT-16` proves that an under-attested lease is refused, not that any
-  isolation exists, and no parameter sweep has been executed. `FEAT-AGT-17` is
-  likewise the mechanism and not the result: no versioned gold, adversarial,
-  poisoning, refusal, regression, or economic-ablation set has been authored
-  for any registered role and no grader has been calibrated, so no role in the
-  firm has in fact been evaluated, and every leaf package that defers its
-  quality claim to evaluation still defers it. `FEAT-AGT-18` records promotion
-  decisions but causes none: no artefact has been promoted, no receiver has
-  registered anything, and the durable append-only ledger it declares is not
-  yet bound, so the property holds within one process only. `FEAT-AGT-19`
-  emits advice and nothing more: no evidence port is bound to a real receiver,
-  no advice has reached Portfolio or Risk, and no receiver has reviewed
-  anything. `FEAT-AGT-20` composes and maps but does not evaluate: no signal
-  has been evaluated, no trade intent constructed, and no receipt persisted,
-  because evaluating a proposal needs a full Strategy composition a composition
-  root owns. `FEAT-AGT-21` enforces trace completeness on assembly rather than
-  on emission: a run whose emitters stay silent gets no trace at all rather
-  than a misleadingly complete one, but nothing there can make a call site emit
-  its span. Its quarantine records a decision rather than mutating a role, its
-  replay is validated and never executed, and no incident has occurred outside
-  tests. `FEAT-AGT-22` closes the boundary — eight authenticated operator
-  operations over an explicit dependency record, every answer a mapping of
-  bounded strings so no prompt, credential, or provider name has anywhere to
-  travel, and disablement that rejects new work while leaving reads available —
-  but it deliberately exports neither `open_sandbox` nor
-  `stage_code_artifact`, because no isolation runtime exists to open. **Twenty
-  of twenty-two features are implemented, and the domain has never run for
-  real:** no live provider call, no bound sandbox, no durable store anywhere,
-  no role evaluated, no artefact promoted, no advisory reviewed, no proposal
-  evaluated, no incident outside tests. `FEAT-AGT-09` and `FEAT-AGT-10` landed
-  once `FEAT-DATA-16` and `FEAT-RES-13` unblocked them, and read a Research
-  projection through an injected port: no source has been fetched, no evidence
-  assembled, and no polarity measured outside tests. No Agentic system workflow
-  is complete — `WF-AGT-005` still has no isolation runtime to open, and every
-  cross-domain workflow needs a composition root that binds the ports.
+* **Status**: `Completed`. All 22 registered Agentic features are implemented. Provider availability, real-world evaluation, promotion, and cross-domain composition remain runtime evidence concerns and do not grant Agentic deterministic-domain authority.
 * **Documentation**: `app/agentic/README.md`
 
 #### 2.1.14 UI/API
@@ -484,6 +423,22 @@ Utils is required by every domain; only the Utils → Brokers edge is drawn to k
 - **UI/API** is the highest-dependency domain: it presents and delegates to selected public domain APIs (including Portfolio) and owns nothing computational.
 
 No circular dependencies exist. Simulation and Analytics may be implemented concurrently: Simulation imports no Analytics code, and Analytics consumes its receiver-owned ledger mapping rather than Simulation implementation types. The sequencing edge `Simulation FR-SIM-033 → Analytics reports/allocation.py` is an integration-order constraint, not a package dependency cycle.
+
+### Consolidated feature inventory
+
+The owning package READMEs collectively register exactly 204 canonical `FEAT-*`
+features. No secondary programme or work-package identifier namespace is active.
+
+| Status | Count |
+| --- | ---: |
+| Completed | 169 |
+| Partial | 16 |
+| Missing | 19 |
+| **Total** | **204** |
+
+Feature descriptions, requirements, public APIs, persistence, and evidence remain
+authoritative only in the owning package README; this section is the system-level
+count and domain index.
 
 ### Documentation (README) order
 

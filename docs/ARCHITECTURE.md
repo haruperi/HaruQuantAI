@@ -473,9 +473,26 @@ private persistence boundary.
 
 ## Technical Contracts & Envelopes
 
+### Cross-Domain Capability Ownership
+
+Canonical capability identity uses only the owning package's `FEAT-*` registry.
+Cross-domain integration never creates a second feature namespace and never transfers
+business authority:
+
+- Data owns canonical market, timing, replay, and evidence transport facts.
+- Indicators owns deterministic measurements; Risk owns policy interpretation.
+- Strategy proposes; Risk authorizes; Trading executes; Brokers transports.
+- Portfolio owns accounting state; Simulator owns simulated execution and replay state.
+- Analytics owns scoring and reporting; Optimization and Research own advisory evidence.
+- Agentic may explain or propose but cannot bypass deterministic owners.
+- UI/API presents and delegates without becoming a business authority.
+
+Provider absence, stale evidence, incompatible versions, or unknown state fails closed
+at the consuming feature boundary.
+
 ### Shared Utility Framework (`app/utils/`)
 
-Trading Cockpit foundation contracts cross domain boundaries only as validated
+application foundation contracts cross domain boundaries only as validated
 JSON-safe `v1` mappings built and parsed by function pairs exported from
 `app.utils`. Runtime implementation classes remain private. Utils owns exact-unit
 representation, generic transition evaluation, validation-outcome combination,
@@ -2170,5 +2187,5 @@ Everything else should be retired rather than reconciled.
 ## 8. Decisions this raises
 
 Decisions arising from this reconciliation — **D2, D4, D8, D9**, plus **D10** and
-**D11** raised during Phase 0 — are recorded in [`docs/PROJECT.md`](../PROJECT.md) §12.
+**D11** raised during an earlier architecture review — are recorded in [`docs/PROJECT.md`](../PROJECT.md) §12.
 Per `AGENTS.md` §4 *Decision Hygiene*, this document holds no decision ledger.

@@ -1,6 +1,6 @@
 # Trend Indicators
 
-Trading Cockpit Phase 0 extends this feature with `measure_trend_strength` and
+consolidated capability programme extends this feature with `measure_trend_strength` and
 `project_structural_levels`. They project strategy-independent causal evidence;
 Risk remains the authoritative regime-policy owner.
 

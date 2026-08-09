@@ -1165,7 +1165,7 @@ capabilities beyond the Section 4 exports.
 
 ### Explicit exclusions
 
-- **Transaction and outbox primitives.** The Trading Cockpit programme proposed
+- **Transaction and outbox primitives.** The application programme proposed
   relocating transaction and outbox helpers into Utils. They stay in Data at
   `app/services/data/persistence/` under the documented `AGENTS.md` exemption.
   Utils owns the idempotency key contract only. Recorded as `NFR-UTL-010`.

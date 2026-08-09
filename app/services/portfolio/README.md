@@ -9,7 +9,7 @@
 | -------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **Package path**     | `app/services/portfolio`                                                                                   |
 | **Domain ID**        | `PORT`                                                                                                     |
-| **Status**           | Partial — approved Trading Cockpit Phase 0 findings folded in; 9 of 12 registered features are implemented (`FEAT-PORT-01`..`09`), but 3 planned features (`FEAT-PORT-10`..`12`) and the remaining work packages remain `Missing`. The foundational balanced double-entry ledger (`FEAT-PORT-09`) is implemented; valuation/P&L, margin/risk-health, and reconciliation are not yet built. See `### Trading Cockpit Phase 0 reconciliation`. |
+| **Status**           | Partial — 9 of 12 registered features are implemented (`FEAT-PORT-01`..`09`); `FEAT-PORT-10`..`12` remain `Missing`. The balanced double-entry ledger is implemented, while valuation/P&L, margin/risk-health, and reconciliation remain planned. |
 | **Last updated**     | 2026-08-08                                                                                                 |
 | **System workflows** | `SYS-WF-006`, `SYS-WF-007`, `SYS-WF-008`                                                                   |
 
@@ -85,37 +85,6 @@ trace, candidate, component-weight, profile, and route bindings before submissio
 
 Risk separately persists the authoritative risk-budget projection. Portfolio stores only the Risk decision and budget-projection references needed for lineage.
 
-### Trading Cockpit Phase 0 reconciliation
-
-This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-PORT-01`..`TC-IMP-PORT-17`) into this authoritative README so that it is self-contained. Phase 0 classified the seventeen Portfolio work packages as **twelve `CREATE`, three `EXTEND`, and two `REFACTOR`** (CSV-authoritative). This is the highest-risk domain in the programme: **the cockpit's entire financial authority was missing.** Across all 103 `CREATE TABLE` statements there was no ledger, account, cash, balance, equity, margin, buying-power, or P&L model anywhere in `app/`. The existing Portfolio domain was an **allocation and rebalancing engine** (`FEAT-PORT-01`..`08`), not an accounting system. The cockpit builds the accounting system here. The foundational `FEAT-PORT-09` balanced double-entry ledger (`TC-IMP-PORT-01,02,03,15`) is now **implemented**; `FEAT-PORT-10`..`12` remain planned.
-
-Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
-
-**Reused existing assets (no duplication):**
-
-| Cockpit capability | Existing Portfolio asset reused | Phase 0 gap |
-| --- | --- | --- |
-| Position/exposure state | `PortfolioStateStore` (`state/repository.py`), construction (`FEAT-PORT-03`), `portfolio_active_scopes` | `TC-IMP-PORT-08` |
-| Correlation & concentration | `measure_cross_account_correlation` (package root), `allocation/` | `TC-IMP-PORT-09` |
-| Capital allocation / fuel selector (strongest reuse asset) | `allocation/` (`FEAT-PORT-05`), `portfolio_allocation_versions`/`portfolio_active_scopes`, Risk `risk/allocation/`, `tests/system/integration/test_portfolio_activation.py` | `TC-IMP-PORT-13` |
-| Public Portfolio API | `api/` (`FEAT-PORT-08`) | (consumer of the new read models) |
-
-**Target features to add or extend.** The twelve `CREATE` gaps group into cohesive new capabilities, registered as `FEAT-PORT-09`..`FEAT-PORT-14`. Financial records are append-only; corrections are reversal or correction events (change-control rule 8).
-
-| Status | Target (feature / gap) | Reuses / extends | Phase 0 gaps |
-| --- | --- | --- | --- |
-| Completed | **`FEAT-PORT-09` Balanced Double-Entry Ledger and Accounts** | `ledger/` | Trading Cockpit Phase 0 reconciliation (§1); `LedgerEntry v1`/`PostingBatch v1`/`LedgerAccount v1` via `build_ledger_entry`/`parse_ledger_entry`/`build_posting_batch`/`parse_posting_batch`/`build_ledger_account`/`parse_ledger_account`, balanced postings, exactly-once ingestion, settled/unsettled cash, snapshot-rebuild validation | `FR-PORT-049`..`FR-PORT-055` | `tests/portfolio/usage/features/09_ledger.py` |
-| Missing | **`FEAT-PORT-10` Valuation and P&L** *(planned)* | New feature. **`TC-IMP-PORT-04`** owns `ValuationPolicy v1` (bid/ask/mid/mark/last/settlement rules by instrument/side; stale/unknown valuation state). **`TC-IMP-PORT-05`** owns realized/unrealized P&L (lot matching or venue netting/hedging, fees/costs, exact event linkage). | `TC-IMP-PORT-04`, `TC-IMP-PORT-05` |
-| Partial (REFACTOR) | **Multi-currency accounting** (`TC-IMP-PORT-06`) | **REFACTOR — Open Decision OD-PORT-01:** FX authority is split across Data (`evidence/fx_contracts.py::FXConversionRequest`/`FXRateLeg`/`FXConversionEvidence`, `fx_conversion.py::FXRateProvider`) and Simulator (`accounting/calculations.py::ValidatedFXConversionEvidence`). Portfolio owns neither. The cockpit consolidates FX conversion authority into Portfolio with caller migration; the relocation is documented here and in the Data/Simulator READMEs, not executed in this documentation task. Adds timestamped conversion, freshness limits, translation postings, unknown state on missing/stale rates. | `TC-IMP-PORT-06` |
-| Missing | **`FEAT-PORT-11` Margin, Buying Power, and Risk Health** *(planned)* | New feature. **`TC-IMP-PORT-07`** owns used/available/reserved margin, maintenance, reserve, leverage, liquidation proximity — **blocks Risk `TC-IMP-RISK-10`** (Risk cannot compute margin health until Portfolio owns it). **`TC-IMP-PORT-10`** owns drawdown references (daily/total reference equity, high-water marks, realized/unrealized inclusion). **`TC-IMP-PORT-11`** owns VaR/CVaR and versioned portfolio risk metrics with labeled model assumptions. **`TC-IMP-PORT-12`** aggregates Risk/Research shock profiles into projected portfolio stress loss. | `TC-IMP-PORT-07`, `TC-IMP-PORT-10`, `TC-IMP-PORT-11`, `TC-IMP-PORT-12` |
-| Partial | Position and exposure state (EXTEND `FEAT-PORT-04`/`FEAT-PORT-08`) | Extends `PortfolioStateStore` + `portfolio_active_scopes`. Adds instrument, strategy sleeve, currency, direction, gross/net, beta/delta, ownership refs. | `TC-IMP-PORT-08` |
-| Partial | Correlation and concentration (EXTEND `FEAT-PORT-05`) | Extends `measure_cross_account_correlation`. Adds cluster exposure, correlated risk, concentration drift, portfolio-attitude inputs. | `TC-IMP-PORT-09` |
-| Partial | Capital allocation / fuel selector (EXTEND `FEAT-PORT-05`) | Extends the strongest reuse asset. Strategy sleeves, account allocations, reserved risk budgets, prohibited routes. | `TC-IMP-PORT-13` |
-| Missing | **`FEAT-PORT-12` Broker Reconciliation and Corporate Actions** *(planned)* | New feature. **`TC-IMP-PORT-14`** compares broker-reported vs rebuilt state (unknown/recovery state beyond tolerance). **`TC-IMP-PORT-16`** handles profile-driven corporate-action/settlement lifecycle events without corrupting historical positions/P&L. | `TC-IMP-PORT-14`, `TC-IMP-PORT-16` |
-| Partial (REFACTOR) | **`PortfolioState v1` authoritative read model** (`TC-IMP-PORT-17`) | **REFACTOR — Open Decision OD-PORT-02:** `PortfolioState` is defined in **Risk** (`contracts/evidence.py:240`) as an input contract; Portfolio owns a differently-shaped `PortfolioStateStore` (`state/repository.py:25`). The cockpit assigns the authoritative account/equity/drawdown read model to Portfolio (consumed by Risk, Simulator, Analytics, UI-API). Phase 0 collision C-1/O-2. The resolution reclaims/renames and migrates Risk callers; it is documented here and in the Risk README (`OD-RISK-02`), not executed in this documentation task. | `TC-IMP-PORT-17` |
-
-**Boundary clarifications folded in:** Portfolio owns the authoritative financial ledger, valuation, P&L, margin, currencies, exposure, correlation, drawdown state, VaR/CVaR, stress state, and account-level portfolio view. It does **not** own broker order state (Trading) or risk-policy decisions (Risk). No ledger table exists today (P-1); `portfolio_idempotency` is one of four idempotency stores (consolidation target → Utils `TC-IMP-UTIL-07`); `portfolio_audit_outbox` is the only outbox and stays in Portfolio (decision D-3 settled — outbox *infrastructure* remains in Data; Portfolio owns its outbox *records*). No Portfolio table declares a foreign key (decision D14 withdrawn); version rows survive independently.
-
 ### Four-level structure
 
 | Level | Package area                  | Responsibility                                               |
@@ -155,10 +124,10 @@ flowchart TD
 | Completed | `FEAT-PORT-06` Drift and Rebalance Planning        | `rebalancing/`   | Exact declarations and rebalance contracts: Section 4.6 | Section 4.6 functional requirements | `tests/portfolio/usage/features/06_rebalancing.py`   |
 | Completed | `FEAT-PORT-07` Cross-Domain Workflow Coordination  | `orchestration/` | Exact declarations: Section 4.7                         | Section 4.7 functional requirements | `tests/portfolio/usage/features/07_orchestration.py` |
 | Completed | `FEAT-PORT-08` Public Portfolio API                | `api/`           | Exact declarations and package API: Section 4.8         | Section 4.8 functional requirements | `tests/portfolio/usage/features/08_public_api.py`    |
-| Missing | `FEAT-PORT-09` Balanced Double-Entry Ledger and Accounts | `ledger/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `LedgerEntry v1`, balanced postings, account/cash, ledger event ingestion, snapshots/event rebuild | `FR-PORT-049`..`FR-PORT-055` *(planned)* | `tests/portfolio/usage/features/09_ledger.py` *(planned)* |
-| Missing | `FEAT-PORT-10` Valuation and P&L | `valuation/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `ValuationPolicy v1`, realized/unrealized P&L, lot matching | `FR-PORT-056`..`FR-PORT-060` *(planned)* | `tests/portfolio/usage/features/10_valuation.py` *(planned)* |
-| Missing | `FEAT-PORT-11` Margin, Buying Power, and Risk Health | `margin/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); margin/buying power (blocks Risk `TC-IMP-RISK-10`), drawdown refs, VaR/CVaR, stress aggregation | `FR-PORT-061`..`FR-PORT-066` *(planned)* | `tests/portfolio/usage/features/11_margin.py` *(planned)* |
-| Missing | `FEAT-PORT-12` Broker Reconciliation and Corporate Actions | `reconciliation/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); broker reconciliation, corporate-action/settlement handling | `FR-PORT-067`..`FR-PORT-069` *(planned)* | `tests/portfolio/usage/features/12_reconciliation.py` *(planned)* |
+| Completed | `FEAT-PORT-09` Balanced Double-Entry Ledger and Accounts | `ledger/` | `LedgerEntry v1`, `PostingBatch v1`, and `LedgerAccount v1`; balanced postings, exactly-once economic-event ingestion, settled/unsettled cash, and snapshot/rebuild validation | `FR-PORT-049`..`FR-PORT-055` | `tests/portfolio/usage/features/09_ledger.py` |
+| Missing | `FEAT-PORT-10` Valuation and P&L | `valuation/` *(planned)* | `ValuationPolicy v1`, realized/unrealized P&L, lot matching | `FR-PORT-056`..`FR-PORT-060` *(planned)* | `tests/portfolio/usage/features/10_valuation.py` *(planned)* |
+| Missing | `FEAT-PORT-11` Margin, Buying Power, and Risk Health | `margin/` *(planned)* | margin/buying power (blocks Risk ), drawdown refs, VaR/CVaR, stress aggregation | `FR-PORT-061`..`FR-PORT-066` *(planned)* | `tests/portfolio/usage/features/11_margin.py` *(planned)* |
+| Missing | `FEAT-PORT-12` Broker Reconciliation and Corporate Actions | `reconciliation/` *(planned)* | broker reconciliation, corporate-action/settlement handling | `FR-PORT-067`..`FR-PORT-069` *(planned)* | `tests/portfolio/usage/features/12_reconciliation.py` *(planned)* |
 
 The package root, `app.services.portfolio`, is the sole public import boundary.
 Its `__all__` contains standalone functions only. Contract values and stateful
@@ -1087,7 +1056,7 @@ CREATE TABLE portfolio_ledger_posting_batches (
 ```
 
 The `(source_event_id, source_sequence)` unique key is the exactly-once
-ingestion invariant (`TC-IMP-PORT-02`): a replayed event with identical material
+ingestion invariant: a replayed event with identical material
 is idempotent; a replay with different material is rejected.
 
 ```sql
@@ -1139,7 +1108,7 @@ CREATE TABLE portfolio_ledger_snapshots (
 ) STRICT;
 ```
 
-Snapshots are accelerators only (`TC-IMP-PORT-15`): canonical state is always
+Snapshots are accelerators only: canonical state is always
 rebuilt from `portfolio_ledger_entries`, and a snapshot must validate against a
 rebuild or it is treated as stale. `REACH`: `portfolio_ledger_entries` is written
 by `save_ledger_batch`; `portfolio_ledger_accounts` by `save_ledger_account`.
@@ -1218,14 +1187,13 @@ Shared settings consumed from `docs/PROJECT.md`: `ENVIRONMENT`, `RUNTIME_PROFILE
 
 ## 6. Open Decisions
 
-These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
+These are unresolved owner choices raised by the approved capability audit. They are recorded here, not resolved by this documentation task.
 
-- **OD-PORT-01 — FX conversion authority consolidation.** FX authority is split across Data (`evidence/fx_contracts.py::FXConversionRequest`/`FXRateLeg`/`FXConversionEvidence`, `fx_conversion.py::FXRateProvider`) and Simulator (`accounting/calculations.py::ValidatedFXConversionEvidence`). Portfolio owns neither today. The cockpit consolidates FX conversion authority into Portfolio (`TC-IMP-PORT-06`) with caller migration. The concrete migration path (reclaim names vs. distinct Portfolio-owned names) is an implementation-phase decision; this documentation records the consolidation direction and does not relocate code.
-- **OD-PORT-02 — `PortfolioState` authoritative ownership.** `PortfolioState` is defined in Risk (`contracts/evidence.py:240`) as an input contract; Portfolio owns a differently-shaped `PortfolioStateStore` (`state/repository.py:25`). The cockpit assigns the authoritative account/equity/drawdown read model to Portfolio (`TC-IMP-PORT-17`), consumed by Risk, Simulator, Analytics, UI-API. Phase 0 collision C-1 / ownership conflict O-2. Paired with Risk `OD-RISK-02`. The owner must decide whether Portfolio reclaims the `PortfolioState` name and Risk migrates callers, or the plan adopts a distinct Portfolio-owned name. This documentation records the direction and does not relocate code.
+- **OD-PORT-01 — FX conversion authority consolidation.** FX authority is split across Data (`evidence/fx_contracts.py::FXConversionRequest`/`FXRateLeg`/`FXConversionEvidence`, `fx_conversion.py::FXRateProvider`) and Simulator (`accounting/calculations.py::ValidatedFXConversionEvidence`). Portfolio owns neither today. The consolidated capability model assigns FX conversion authority to Portfolio, with caller migration. The concrete migration path (reclaim names vs. distinct Portfolio-owned names) is an implementation-phase decision; this documentation records the consolidation direction and does not relocate code.
+- **OD-PORT-02 — `PortfolioState` authoritative ownership.** Risk defines `PortfolioState` as an input contract while Portfolio owns a differently shaped `PortfolioStateStore`. The owner must decide whether Portfolio reclaims the `PortfolioState` name and Risk migrates callers, or Portfolio publishes its authoritative account/equity/drawdown projection under a distinct name.
 
 ### Resolved decisions (folded into requirements)
 
-- **OD-PORT-03 — Ledger schema detail (RESOLVED).** The balanced double-entry ledger (`FEAT-PORT-09`) is implemented as five tables: `portfolio_ledger_accounts` (chart of accounts), `portfolio_ledger_posting_batches` (exactly-once ingestion keyed on `(source_event_id, source_sequence)`), `portfolio_ledger_entries` (immutable balanced legs), `portfolio_ledger_balances` (reproducible settled/unsettled cash), and `portfolio_ledger_snapshots` (accelerators validated against rebuild). The sixteen posting types from `TC-IMP-PORT-01` are catalogued in `ledger/contracts.py::PostingType`. Financial records are append-only; corrections are reversal (`correction`) postings that reference `reversal_of`, never edits to a prior row. Implemented in `app/services/portfolio/ledger/`.
 
 
 

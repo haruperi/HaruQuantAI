@@ -1,7 +1,7 @@
 # Strategy
 
 > **Package:** `app/services/strategy`
-> **Status:** `Completed` — all 14 registered features and Trading Cockpit Phase 0 consumer ports are implemented and verified. Research remains the authoritative future expectancy-profile provider; Strategy fails closed until it is available.
+> **Status:** `Completed` — all 14 registered features and the capability specification consumer ports are implemented and verified. Research remains the authoritative future expectancy-profile provider; Strategy fails closed until it is available.
 > **Last updated:** `2026-08-07`
 
 > This README is the package's **single source of truth** for final requirements, structure, implementation sequence, workflows, public contracts, configuration, limits, progress, usage examples, and tests.
@@ -162,40 +162,6 @@ Data provides shared connection, locking, and migration execution infrastructure
 | Completed | Bounded strategy-local checkpoints and replay links                     | Simulation and Trading through checkpoint/replay contracts                         | `app/services/strategy/migrations/definitions.py` |
 
 No strategy source code, broker state, official positions, orders, fills, analytics reports, or secrets may be stored in these records.
-
-### Trading Cockpit Phase 0 reconciliation
-
-This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-STRAT-01`..`TC-IMP-STRAT-11`) into this authoritative README so that it is self-contained. Phase 0 classified the eleven Strategy work packages as **three `CREATE`, seven `EXTEND`, and one `DEFERRED_INTEGRATION`**. New target work is `Missing`; extended existing features become `Partial`.
-
-Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
-
-**Reused existing assets (no duplication):**
-
-| Cockpit capability | Existing Strategy asset reused | Phase 0 gap |
-| --- | --- | --- |
-| Strategy profile & versioned registry | `registry/` (`FEAT-STR-03`), `contracts/` (`FEAT-STR-01`); tables `strategy_definitions`, `strategy_versions(_v2)`, `strategy_configs(_v2)` | `TC-IMP-STRAT-01`, `TC-IMP-STRAT-11` |
-| TradeIntent proposals | `intents/` (`FEAT-STR-04`) | `TC-IMP-STRAT-04` |
-| Deterministic replay manifests | `replay/` (`FEAT-STR-05`) | (ReplayIdentity split recorded under Simulator `TC-IMP-SIM-04`) |
-| Setup evaluators | `evaluators/` (`FEAT-STR-10`), `vectorized/` (`FEAT-STR-07`), `event/` (`FEAT-STR-08`) | `TC-IMP-STRAT-03` |
-| Proposal intake | `proposal_intake/` (`FEAT-STR-11`) | `TC-IMP-STRAT-09` |
-
-**Target contracts/features to add or extend:**
-
-| Status | Target | Reuses / extends | Phase 0 gap |
-| --- | --- | --- | --- |
-| Completed | `StrategyProfile v1` additions | Extends `FEAT-STR-01`/`FEAT-STR-03`; strict mapping transport and cockpit permissions are implemented in `contracts/profile.py`. | `TC-IMP-STRAT-01` |
-| Completed | Strategy playbook | Human-readable and machine-evaluable setup transport is implemented in `contracts/playbook.py`. | `TC-IMP-STRAT-02` |
-| Completed | `SetupEvaluation v1` | Five fail-closed outcomes with explicit source snapshots are implemented in `contracts/playbook.py`. | `TC-IMP-STRAT-03` |
-| Completed | `TradePlan v1` | Distinct immutable planning contract; `TradeIntent v1` remains the canonical Strategy-to-Risk proposal. | `TC-IMP-STRAT-04` |
-| Completed | Trade-plan lifecycle | Deterministic transitions and versioned amendments are implemented in `intents/lifecycle.py`. | `TC-IMP-STRAT-05` |
-| Completed | Operating envelope | `FEAT-STR-12` implements strict transport and fail-closed evaluation. | `TC-IMP-STRAT-06` |
-| Completed | Exit and management plan | `FEAT-STR-13` implements protection rules and non-executable handoff. | `TC-IMP-STRAT-07` |
-| Completed | Expectancy reference consumer port | Version-exact references are implemented; missing/invalid Research provider returns `NOT_ELIGIBLE`. Provider remains deferred to Research `TC-IMP-RES-03`. | `TC-IMP-STRAT-08` |
-| Completed | Automation mode policy | `OFF`/`ADVISORY`/`SUPERVISED`/`AUTOMATED` are implemented subordinate to Risk/Trading interlocks and sim-only routing. | `TC-IMP-STRAT-09` |
-| Completed | Manual-plan support | `FEAT-STR-14` uses the canonical `TradePlan` builder and validation path. | `TC-IMP-STRAT-10` |
-| Completed | Strategy lifecycle governance | Deterministic draft/test/approve/suspend/retire transition evidence preserves immutable strategy-version identity. | `TC-IMP-STRAT-11` |
-
-**Boundary clarifications folded in:** Strategy owns playbook definitions, setup qualification, trade plans, entry/exit intent, operating envelopes, and approved management rules. It does not size or approve risk, dispatch orders, or own financial accounting.
 
 ### Four-level structure
 
@@ -1528,7 +1494,7 @@ factory and getter functions above are the only supported way for external
 consumers, usage evidence, workflows, and integration tests to obtain Strategy
 values. Deep imports from Strategy feature packages are not supported.
 
-### Trading Cockpit Phase 0 functional requirements
+### the capability specification functional requirements
 
 | Status | Requirement | Responsibility | Evidence |
 | --- | --- | --- | --- |

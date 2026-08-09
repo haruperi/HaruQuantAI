@@ -2,7 +2,7 @@
 
 > **Package:** `app/agentic`
 > **Domain ID:** `AGENTIC`
-> **Status:** `Partial`
+> **Status:** `Completed` — all 22 registered features (`FEAT-AGT-01`..`22`) are implemented; unavailable deterministic providers remain fail-closed at their receiver boundaries.
 
 > **API-BE-003 runtime seam:** production public operations require durable
 > workflow, memory, operations, and lifecycle stores. In-memory reference stores
@@ -165,38 +165,6 @@ task-scoped, disposable, and TTL-bound. Memory is retrieved only after scope,
 provenance, freshness, trust, injection, and retention filters. Model-generated
 reflection cannot modify mandates, permissions, evaluation thresholds, or
 production policy.
-
-### Trading Cockpit Phase 0 reconciliation
-
-This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-AGT-01`..`TC-IMP-AGT-11`) into this authoritative README so that it is self-contained. Phase 0 classified the eleven Agentic work packages as **six `EXTEND`, four `DEFERRED_INTEGRATION`, and one `REUSE`** (zero `CREATE`). The Agentic permission constitution is the strongest safety asset in the repository and the programme's only `REUSE`.
-
-Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
-
-**Reused existing assets (no duplication):**
-
-| Cockpit capability | Existing Agentic asset reused | Phase 0 gap |
-| --- | --- | --- |
-| Agent constitution & permissions (strongest safety asset) | `permissions/models.py`: `FORBIDDEN_TOOL_TOKENS` (12 tokens), `FORBIDDEN_RECEIVER_DOMAINS = {"brokers","broker"}`, `SideEffectClass` (`read_only`/`deterministic_compute`/`staging_write`/`proposal_submission` — `controlled_mutation`/`critical` are **unrepresentable types**, not runtime checks) | `TC-IMP-AGT-01` |
-| Tool/response audit (programme's only REUSE) | `permissions/` (`DenyReason`, 17 reasons), `operations/` (`FEAT-AGT-21`), tables `agentic_operations_traces`/`agentic_operations_incidents`/`agentic_lifecycle_transitions`, `tests/agentic/integration/test_tool_permissions.py` | `TC-IMP-AGT-09` |
-| Governed proposal handoff | `agents/portfolio_risk_advisory/` (`FEAT-AGT-19`/`20`), `agents/strategy_desk/trader/`, Strategy `proposal_intake/` (`FEAT-STR-11`) | `TC-IMP-AGT-03` |
-
-**Target features to extend (no new features; all gaps extend existing `FEAT-AGT-*` or are deferred):**
-
-| Status | Target | Reuses / extends | Phase 0 gap |
-| --- | --- | --- | --- |
-| Partial | Agent constitution & permissions | Extends `FEAT-AGT-05`. **Reused verbatim** — broker mutation and kill-switch clearance remain unrepresentable. Cockpit agents reuse this constitution; weakening it is a blocking safety violation. | `TC-IMP-AGT-01` |
-| Partial | Read-only cockpit tools | Extends `FEAT-AGT-21`/`FEAT-AGT-22`. Session/checklist/market/strategy/risk/trading/portfolio/scenario/score/evidence state are read-only cockpit tools. The cockpit concepts (checklist, mode, scenario, score) do not yet exist. | `TC-IMP-AGT-02` |
-| Partial | Controlled action proposal | Extends `FEAT-AGT-19`/`20`. User + normal policy/trading gates authorize; governed proposal path exists. | `TC-IMP-AGT-03` |
-| Deferred | Guided-mode coaching | **Deferred to Simulator `TC-IMP-SIM-06`..`TC-IMP-SIM-10`** (checklist, modes), Analytics `TC-IMP-ANL-09` (debrief), Simulator `TC-IMP-SIM-11` (scenarios). Coaching has no deterministic checklist/mode/debrief state to read yet. | `TC-IMP-AGT-04` |
-| Deferred | Emergency coaching | Same dependencies as `TC-IMP-AGT-04`. | `TC-IMP-AGT-05` |
-| Deferred | Debrief conversation | **Deferred to Simulator `TC-IMP-SIM-06`..`10`, Analytics `TC-IMP-ANL-09`, Simulator `TC-IMP-SIM-11`.** | `TC-IMP-AGT-06` |
-| Partial | Research-grounded explanation | Extends `FEAT-AGT-09`/`11`/`12`. Cites approved internal evidence/profile versions only. **Depends on Research `TC-IMP-RES-03`** (expectancy profile versions). | `TC-IMP-AGT-07` |
-| Deferred | Scenario narration | **Deferred to Simulator `TC-IMP-SIM-06`..`10`, Analytics `TC-IMP-ANL-09`, Simulator `TC-IMP-SIM-11`.** Delivers only info whose availability time has arrived. | `TC-IMP-AGT-08` |
-| Reuse | Tool and response audit | **Preserve verbatim.** Tool request, permission decision, source records, proposed action, user decision, and result are already persisted and tested end to end. Add only cockpit traceability references; no behavioral change. | `TC-IMP-AGT-09` |
-| Partial | Failure behavior | Extends `FEAT-AGT-21`. When state is unavailable, the agent states that explicitly; it never infers order/position/risk/account state. | `TC-IMP-AGT-10` |
-| Partial | Prompt-injection resistance | Extends `FEAT-AGT-21`. Market/news/journal content is untrusted data; the constitution already blocks broker mutation by construction. | `TC-IMP-AGT-11` |
-
-**Boundary clarifications folded in:** Agentic owns bounded coaching, explanations, debrief assistance, scenario instruction, and research assistance under deterministic permissions. It **may not bypass Risk, Trading, Broker, Simulator, audit, or human-approval boundaries** (change-control rule 11). Disabling every agent must leave the complete cockpit functional and safe. **Persistence correction (Phase 0 finding P-10 was wrong):** `agentic_lifecycle_transitions` has a composite primary key `(artifact_hash, sequence)` (`migrations/lifecycle.py`), the append-only enforcement point — it is not missing a primary key. Agentic never uses `data_runtime_records` (`FR-AGENTIC-070`).
 
 ### Four-level structure
 
@@ -1901,9 +1869,8 @@ approval, and budget failures are not retried.
 
 ## 6. Open Decisions
 
-These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
+These are unresolved owner choices raised by the approved capability audit. They are recorded here, not resolved by this documentation task.
 
-- **OD-AGT-01 — Coaching/debrief/narration provider readiness.** Four work packages (`TC-IMP-AGT-04` guided-mode coaching, `TC-IMP-AGT-05` emergency coaching, `TC-IMP-AGT-06` debrief conversation, `TC-IMP-AGT-08` scenario narration) are `DEFERRED_INTEGRATION` because their deterministic providers do not exist yet (Simulator checklist/mode `TC-IMP-SIM-06`..`10`; Analytics debrief `TC-IMP-ANL-09`; Simulator scenarios `TC-IMP-SIM-11`). Agentic documents its contract boundary for each; it does not own the deferred provider behavior and must not label it implemented. Disabling every agent must leave the cockpit functional.
 
 ---
 

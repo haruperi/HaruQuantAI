@@ -1,7 +1,7 @@
 # Indicators
 
 > **Package:** `app/services/indicators`
-> **Status:** `Partial` — all Indicators-owned Trading Cockpit Phase 0 behavior is implemented, but package promotion remains blocked by the Data error-catalogue compatibility failure reached by Indicators migration failure-path tests and unrelated repository-wide Brokers Ruff failures. See `### Trading Cockpit Phase 0 reconciliation`.
+> **Status:** `Completed` — all 8 registered features (`FEAT-INDI-01`..`08`) are implemented with deterministic, stateless behavior and numbered usage evidence.
 > **Last updated:** `2026-08-07`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -116,46 +116,6 @@ Rows preserve the input record order. The index is a UTC `DatetimeIndex` named
 
 `trend`, `volatility`, `momentum`, `volume`, and `candles` do not depend on one another. `core/registry.py` stores immutable metadata and import-path identity without importing feature implementations, preventing a registry/built-in cycle.
 
-### Trading Cockpit Phase 0 reconciliation
-
-This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-IND-01`..`TC-IMP-IND-10`) into this authoritative README so that it is self-contained. Phase 0 classified the ten Indicators work packages as **two `CREATE` and eight `EXTEND`** against the located 21-indicator library. New target work is `Missing`; extended existing features become `Partial`. Indicators owns zero database tables and remains stateless and read-only — none of the ten gaps add persistence.
-
-Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
-
-**Reused existing assets (no duplication):** every cockpit derived gauge below is built **on top of** the existing 21-indicator library (`FEAT-INDI-01`..`06`) — it reuses `atr`, `adr`, `rolling_volatility`, `standard_deviation`, `rsi`, `williams_r`, `ema`, `sma`, `adx`, `bollinger_bands`, `cmf`, `obv`, `mfi`, `price_volume_distribution`, and the candle patterns — rather than reimplementing the mathematics. The indicator library is the strongest cockpit reuse asset in this domain.
-
-**Target contracts/features to add or extend:**
-
-| Status | Target | Reuses / extends | Phase 0 gap |
-| --- | --- | --- | --- |
-| Completed | Market-speed composite | `measure_market_speed` extends `volatility/` and consumes explicit normalized momentum, volatility, range, volume, and order-flow evidence without reimplementing formulas. | `TC-IMP-IND-01` |
-| Completed | Risk-owned regime assessment | Risk `FEAT-RISK-07` remains the sole authoritative regime classifier; Indicators publishes neutral trend, volatility, liquidity, and speed measurements and does not redefine `RegimeAssessment`. | `TC-IMP-IND-02` |
-| Completed | Trend strength & higher-TF direction | `measure_trend_strength` extends `trend/` using caller-supplied official ADX/directional and moving-average evidence. | `TC-IMP-IND-03` |
-| Completed | Support/resistance & structural levels | `project_structural_levels` extends `trend/` with causal timestamped level and invalidation evidence. | `TC-IMP-IND-04` |
-| Completed | `LiquiditySnapshot v1` | `build_liquidity_snapshot`/`parse_liquidity_snapshot` extend `volume/` with validated JSON-safe supplied spread, depth, imbalance, volume, optional fill-probability, regime, and completeness evidence. | `TC-IMP-IND-05` |
-| Completed | Order-flow & depth features | `measure_order_flow` extends `volume/` with deterministic imbalance, pressure, depth-change, sweep, and gap evidence. | `TC-IMP-IND-06` |
-| Completed | Volatility envelope | `measure_volatility_envelope` extends `volatility/` with explicit current/baseline ratios and caller-supplied operating/extreme thresholds. | `TC-IMP-IND-07` |
-| Completed | Chart-pattern evidence | `build_chart_pattern_evidence` extends `candles/` with bounded timestamped observations that explicitly cannot authorize trades. | `TC-IMP-IND-08` |
-| Completed | `IndicatorSnapshot v1` contract | `FEAT-INDI-07` carries value, unit, state, timestamp, source data range, completeness, confidence, data-health dependency, and evidence references. | `TC-IMP-IND-09` |
-| Completed | Closed-input enforcement | `FEAT-INDI-08` rejects incomplete bars, future data, stale or unknown snapshots, and incompatible timeframes. | `TC-IMP-IND-10` |
-
-**Boundary clarifications folded in:** Indicators owns deterministic derived market measurements, volatility, momentum, liquidity, structure, and cockpit-ready analytical gauge values. Risk `FEAT-RISK-07` alone owns authoritative regime classification and policy modifiers. UI-API owns the cockpit gauge/read model that *displays* an indicator result; Indicators does not authorize trades or own UI rendering (Phase 0 Example C). An `IndicatorSnapshot` or `LiquiditySnapshot` produced here is consumed without redefinition.
-
-**Implementation evidence:**
-
-- `TC-IMP-IND-01`: `app/services/indicators/volatility/market_speed.py:19`; `tests/indicators/unit/test_market_speed.py:4`.
-- `TC-IMP-IND-02`: Risk authority retained; neutral measurement inputs are implemented by `app/services/indicators/trend/strength.py:19`, `app/services/indicators/volatility/envelope.py:19`, and `app/services/indicators/volume/liquidity_snapshot.py:157`.
-- `TC-IMP-IND-03`: `app/services/indicators/trend/strength.py:19`; `tests/indicators/unit/test_trend_strength.py:4`.
-- `TC-IMP-IND-04`: `app/services/indicators/trend/structural_levels.py:21`; `tests/indicators/unit/test_structural_levels.py:6`.
-- `TC-IMP-IND-05`: `app/services/indicators/volume/liquidity_snapshot.py:157`; `tests/indicators/unit/test_liquidity_snapshot.py:6`.
-- `TC-IMP-IND-06`: `app/services/indicators/volume/order_flow.py:19`; `tests/indicators/unit/test_order_flow.py:4`.
-- `TC-IMP-IND-07`: `app/services/indicators/volatility/envelope.py:19`; `tests/indicators/unit/test_volatility_envelope.py:4`.
-- `TC-IMP-IND-08`: `app/services/indicators/candles/evidence.py:20`; `tests/indicators/unit/test_chart_pattern_evidence.py:6`.
-- `TC-IMP-IND-09`: `app/services/indicators/snapshots/snapshot.py:173`; `tests/indicators/integration/test_snapshot_contract_compatibility.py:6`.
-- `TC-IMP-IND-10`: `app/services/indicators/input_guards/closed_input.py:46`; `tests/indicators/integration/test_closed_input_workflow.py:6`.
-
-## 2. Feature Registry
-
 ### Feature Registry
 
 This is the sole canonical current-state registry for Indicators features. Migration
@@ -165,11 +125,11 @@ reconciliation.
 | Status | Feature ID | Capability | Production module | Public operations | Requirements | Usage evidence |
 |---|---|---|---|---|---|---|
 | Completed | `FEAT-INDI-01` | Contracts, registry discovery, result projections, and request validation | `core/` | `build_indicator_config`, `join_indicator_result`, `get_indicator_result_values`, `get_indicator_result_metadata`, `get_indicator`, `list_indicators`, `get_capability_matrix`, `get_warmup_requirement`, `validate_indicator` | `FR-INDI-001`–`FR-INDI-014` | `tests/indicators/usage/features/01_core.py` |
-| Completed | `FEAT-INDI-02` | Candlestick pattern labelling | `candles/` | `doji`, `engulfing`, `pinbar`, `inside_bar`, `build_chart_pattern_evidence` | `FR-INDI-031`–`FR-INDI-034`; `TC-IMP-IND-08` | `tests/indicators/usage/features/02_candles.py` |
-| Completed | `FEAT-INDI-03` | Trend and moving-average calculation | `trend/` | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag`, `measure_trend_strength`, `project_structural_levels` | `FR-INDI-015`–`FR-INDI-017`, `FR-INDI-023`–`FR-INDI-025`, `FR-INDI-035`; `TC-IMP-IND-03`–`04` | `tests/indicators/usage/features/03_trend.py` |
+| Completed | `FEAT-INDI-02` | Candlestick pattern labelling | `candles/` | `doji`, `engulfing`, `pinbar`, `inside_bar`, `build_chart_pattern_evidence` | `FR-INDI-031`–`FR-INDI-034` | `tests/indicators/usage/features/02_candles.py` |
+| Completed | `FEAT-INDI-03` | Trend and moving-average calculation | `trend/` | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag`, `measure_trend_strength`, `project_structural_levels` | `FR-INDI-015`–`FR-INDI-017`, `FR-INDI-023`–`FR-INDI-025`, `FR-INDI-035` | `tests/indicators/usage/features/03_trend.py` |
 | Completed | `FEAT-INDI-04` | Momentum oscillator calculation | `momentum/` | `rsi`, `williams_r` | `FR-INDI-021`–`FR-INDI-022` | `tests/indicators/usage/features/04_momentum.py` |
-| Completed | `FEAT-INDI-05` | Volatility and range calculation | `volatility/` | `atr`, `adr`, `rolling_volatility`, `standard_deviation`, `measure_market_speed`, `measure_volatility_envelope` | `FR-INDI-018`–`FR-INDI-020`, `FR-INDI-026`; `TC-IMP-IND-01`, `07` | `tests/indicators/usage/features/05_volatility.py` |
-| Completed | `FEAT-INDI-06` | Volume-flow and price-volume calculation | `volume/` | `cmf`, `obv`, `mfi`, `price_volume_distribution`, `build_liquidity_snapshot`, `parse_liquidity_snapshot`, `measure_order_flow` | `FR-INDI-027`–`FR-INDI-030`; `TC-IMP-IND-05`–`06` | `tests/indicators/usage/features/06_volume.py` |
+| Completed | `FEAT-INDI-05` | Volatility and range calculation | `volatility/` | `atr`, `adr`, `rolling_volatility`, `standard_deviation`, `measure_market_speed`, `measure_volatility_envelope` | `FR-INDI-018`–`FR-INDI-020`, `FR-INDI-026` | `tests/indicators/usage/features/05_volatility.py` |
+| Completed | `FEAT-INDI-06` | Volume-flow and price-volume calculation | `volume/` | `cmf`, `obv`, `mfi`, `price_volume_distribution`, `build_liquidity_snapshot`, `parse_liquidity_snapshot`, `measure_order_flow` | `FR-INDI-027`–`FR-INDI-030` | `tests/indicators/usage/features/06_volume.py` |
 | Completed | `FEAT-INDI-07` | Indicator snapshot contract | `snapshots/` | `build_indicator_snapshot`, `parse_indicator_snapshot` | `FR-INDI-036`–`FR-INDI-038` | `tests/indicators/usage/features/07_snapshots.py` |
 | Completed | `FEAT-INDI-08` | Closed-input enforcement | `input_guards/` | `assert_closed_input` | `FR-INDI-039`–`FR-INDI-041` | `tests/indicators/usage/features/08_input_guards.py` |
 
@@ -256,7 +216,7 @@ correct.
 | `candles/inside_bar.py` | `FR-INDI-034` |
 | `trend/zigzag.py` | `FR-INDI-035` |
 | Feature `__init__.py` files | No independent `FR-*`; re-export only their feature's assigned symbols. |
-| Root `__init__.py` | No independent `FR-*`; re-export only the approved `FR-INDI-001` through `FR-INDI-041` public symbols and registered Phase 0 measurement operations. |
+| Root `__init__.py` | No independent `FR-*`; re-export only the approved `FR-INDI-001` through `FR-INDI-041` public symbols and registered feature operations. |
 | `README.md` | No implementation requirement; authoritative specification and evidence ledger. |
 
 ### Public import and API contract

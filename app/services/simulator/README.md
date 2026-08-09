@@ -1,7 +1,7 @@
 # Simulation
 
 > **Package:** `app/services/simulator`
-> **Status:** `Partial` — approved Trading Cockpit Phase 0 findings folded in; the 9 registered features remain implemented, but 31 work packages (`TC-IMP-SIM-01`..`TC-IMP-SIM-31`) add target behavior that is not yet implemented (24 `CREATE`, 6 `EXTEND`, 1 `REFACTOR`). Simulator is the largest cockpit build domain. See `### Trading Cockpit Phase 0 reconciliation`.
+> **Status:** `Partial` — 14 features are registered: `FEAT-SIM-01`..`09` are `Completed`, while `FEAT-SIM-10`..`14` are `Missing`.
 > **Last updated:** `2026-08-04`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -106,41 +106,6 @@ publication. This support directory is not a separately registered feature.
 
 Incomplete, failed, or diagnostic-failed runs may retain bounded diagnostic evidence but must not be published as completed `SimulationResult` records.
 
-### Trading Cockpit Phase 0 reconciliation
-
-This subsection folds the approved Trading Cockpit Phase 0 audit (`TC-IMP-SIM-01`..`TC-IMP-SIM-31`) into this authoritative README so that it is self-contained. Phase 0 classified the thirty-one Simulator work packages as **twenty-four `CREATE`, six `EXTEND`, and one `REFACTOR`** (CSV-authoritative). Simulator is the cockpit's strongest reuse asset — a durable simulation session with an orchestrator, a create/read/step/branch/close HTTP API, an SSE frame stream, an immutable journal, a canonical tick timeline, and fixed-precision account math already runs (`FEAT-SIM-02`/`03`/`04`/`06`/`07`). The cockpit expands from it, not beside it.
-
-Cross-domain contract transport is settled per the Utils domain: versioned cross-domain contracts travel as **validated JSON-safe mappings behind `build_*`/`parse_*` function pairs** exported from the package root, preserving the function-only public-API rule in `AGENTS.md` §1.
-
-**Reused existing assets (no duplication):**
-
-| Cockpit capability | Existing Simulator asset reused | Phase 0 gap |
-| --- | --- | --- |
-| Canonical tick timeline / simulation clock | `timeline/` (`FEAT-SIM-03`) | `TC-IMP-SIM-01` |
-| Durable session + orchestrator + stepping/branching API + SSE | `state/` (`FEAT-SIM-02`), `run/` (`FEAT-SIM-07`), `sim_runs`, `sim_sessions`, API routes | `TC-IMP-SIM-03`, `TC-IMP-SIM-23` |
-| Immutable journal & replay | `journal/` (`FEAT-SIM-06`) | `TC-IMP-SIM-04`, `TC-IMP-SIM-05` |
-| Matching / simulated execution | `execution/` (`FEAT-SIM-05`) | `TC-IMP-SIM-18`, `TC-IMP-SIM-22` |
-| Fixed-precision account math | `accounting/` (`FEAT-SIM-04`) | (refactor candidate → Utils `TC-IMP-UTIL-02`) |
-| Domain error taxonomy | `errors/` (`FEAT-SIM-08`) | (feeds Utils `TC-IMP-UTIL-09`) |
-| Sim-route isolation | `trading/routing/dispatcher.py` guard G-4 + `brokers/testing/` fake adapter | `TC-IMP-SIM-22` |
-
-**Target features to add or extend.** The twenty-four `CREATE` gaps group into eight cohesive new capabilities, registered as `FEAT-SIM-10`..`FEAT-SIM-17` (one feature per cohesive capability; individual requirements are data/FRs inside each, per Section 9.1). The six `EXTEND` and one `REFACTOR` extend existing features.
-
-| Status | Target (feature / gap) | Reuses / extends | Phase 0 gaps |
-| --- | --- | --- | --- |
-| Partial | Simulation clock & time-domain chain (EXTEND `FEAT-SIM-03`) | Extends `timeline/`. Adds replay speed, pause, branch, integrity state (SIM-01) and the full market→broker-receive→client→display→player→venue-accept→fill→report→processing time-domain propagation (SIM-02). | `TC-IMP-SIM-01`, `TC-IMP-SIM-02` |
-| Partial | Global session state machine (EXTEND `FEAT-SIM-02`) | Extends `state/`. Adds `SESSION_SECURED`..`MARKET_READY` states, checklist binding, and the cockpit mode (SIM-03). | `TC-IMP-SIM-03` |
-| Partial | Replay identity & integrity (EXTEND `FEAT-SIM-06`) | Extends `journal/`. **Open Decision OD-SIM-01:** unified `ReplayIdentity` is split between Simulator's immutable journal (`FEAT-SIM-06`) and Strategy's replay manifests (`FEAT-STR-05`). Simulator must own the canonical identity; Strategy becomes a consumer. Adds scenario/data/profile hashes, seeds, rules version, branch lineage (SIM-04) and `VALID`/`TAINTED`/`INVALID` integrity state with rewind prohibition for scored sessions (SIM-05). | `TC-IMP-SIM-04`, `TC-IMP-SIM-05` |
-| Missing | **`FEAT-SIM-10` Cockpit Checklists, Modes, and Missions** *(planned)* | New feature. Checklist definition + runtime (`LOCKED`→`AVAILABLE`→`ACTIVE`→`SATISFIED` + failed/blocked/bypassed/regressed), actual-state binding (step satisfied only by real domain state; UI never mutates financial state), cockpit **mode behavior** (`Guided`/`Standard`/`Expert`/`Challenge` assistance/override) — **`TC-IMP-SIM-09` blocks Brokers `TC-IMP-BRK-10`** (the cockpit-mode interlock cannot be written until this exists), and no-trade mission completion (safe stand-down = pass). | `TC-IMP-SIM-06`..`TC-IMP-SIM-10` |
-| Missing | **`FEAT-SIM-11` Scenario Engine** *(planned)* | New feature. **REFACTOR `TC-IMP-SIM-11`:** the blocking `ScenarioDefinition` collides with Risk's advisory `ScenarioDefinition` (`risk/contracts/requests.py`); Simulator uses a distinct name (e.g. `MissionDefinition`) per **Open Decision OD-SIM-02** (paired with Risk `OD-RISK-01`). Includes trigger engine (time/price/vol/liquidity/player-action/checklist/account-state/compound/probabilistic seeded), emergency scenarios (flash crash/API failure/drawdown breach/margin survival/recovery-failure), abnormal operations (bad-tick/feed disagreement/halt/gap/margin change/rejection/cancel-fill race/clock drift/corporate action/process failure), and event-priority ordering that suspends incompatible normal transitions. Also owns `InjectedEvent`. | `TC-IMP-SIM-11`..`TC-IMP-SIM-15` |
-| Missing | **`FEAT-SIM-12` Execution Realism Models** *(planned)* | New feature. Latency profile (market/client/network/broker/venue/report/processing delay), queue model (price-level/quantity-ahead/queue-position/traded-volume/cancellation/fill-probability), slippage & market impact, cancel/replace race simulation, and data/execution-view separation (player-view vs venue-execution divergence by modeled latency; no leakage). **`TC-IMP-SIM-18` (fill engine) extends `FEAT-SIM-05`** and depends on Brokers `TC-IMP-BRK-01` (InstrumentVenueProfile drives fill rules). | `TC-IMP-SIM-16`..`TC-IMP-SIM-19`, `TC-IMP-SIM-20`, `TC-IMP-SIM-21`; `TC-IMP-SIM-18` |
-| Partial | Simulator broker adapter (EXTEND `FEAT-SIM-05`) | Extends matching engine. Simulator exposes itself through the Brokers adapter protocol so the cockpit routes through the standard dispatch path (guard G-4 already enforces sim-route isolation). | `TC-IMP-SIM-22` |
-| Partial | Durable session state expansion (EXTEND `FEAT-SIM-02` + `TC-IMP-SIM-23`) | Extends `sim_sessions` (currently 6 columns: `session_id`, `run_id`, `status`, `cursor`, `created_at`, `expires_at`) to carry clock, scenario, replay identity, checklist, alerts, emergency state, counters, branches, and a secured marker. | `TC-IMP-SIM-23` |
-| Missing | **`FEAT-SIM-13` Session Recovery** *(planned)* | New feature. Recovery state machine (`STARTING`→`RECOVERY_LOCKED`→`RESTORING`→`RECONCILING`→`VERIFIED`→`EXPLICIT_REARM`→`RUNNING`), crash recovery (restore orders/fills/positions/protection/Portfolio refs/lockouts/cooldowns/alerts/score events), save/branch integrity (practice-branch isolation + scored-restart anti-save-scumming), and corruption handling (hash-mismatch/missing-sequence/inconsistent-snapshot → `INTEGRITY_FAILURE` exposure block). Data owns DB-level recovery only. | `TC-IMP-SIM-24`..`TC-IMP-SIM-27` |
-| Missing | **`FEAT-SIM-14` Alert Lifecycle** *(planned)* | New feature. `AlertEvent` with `INACTIVE`/`ACTIVE_UNACKNOWLEDGED`/`ACTIVE_ACKNOWLEDGED`/`RESOLVED`/`CLEARED` states and latching rules, root-cause grouping (derivative symptoms under one actionable incident), perception timestamp (when a condition became visible/audible for fair response-time scoring), and emergency-control availability (keep risk-reducing controls technically available during lock states). UI-API `alerts/` (`FEAT-API-13`) delivers only; it does not own the lifecycle. | `TC-IMP-SIM-28`..`TC-IMP-SIM-31` |
-
-**Boundary clarifications folded in:** Simulator owns the simulation clock, replay, no-lookahead enforcement, scenarios, game modes, checklists, latency/queue/fill models, simulated broker behavior, emergency injection, session persistence, and crash recovery for simulated sessions. It **must remain isolated from uncontrolled real-money execution** — the cockpit session may only produce `TradingRoute.SIM` intents and guard G-4 forbids broker authority on the sim route. Simulator's `journal/` is an immutable replay record; the player trade journal is a distinct Analytics concept (`TC-IMP-ANL-04`) and must not reuse the name. Simulator's `FEAT-SIM-04` fixed-precision account math is the precision owner the cockpit refactors into Utils (`TC-IMP-UTIL-02`) so all domains can share it.
-
 ### Four-level structure
 
 | Code level                          | Represents                         |
@@ -204,11 +169,11 @@ Module folders and files are ordered from lowest dependency to highest dependenc
 | Completed | `FEAT-SIM-07` Official and Research Orchestration | `run/`        | Exact declarations and run contracts: Section 4.7        | Section 4.7 functional requirements  | `tests/simulator/usage/features/07_run.py`        |
 | Completed | `FEAT-SIM-08` Domain Error Taxonomy               | `errors/`     | Exact declarations: Section 4.0                          | Section 4.0 functional requirements  | `tests/simulator/usage/features/08_errors.py`     |
 | Completed | `FEAT-SIM-09` Results and Canonical Artifacts     | `reporting/`  | Exact declarations and result contracts: Section 4.6     | Section 4.6 functional requirements  | `tests/simulator/usage/features/09_reporting.py`  |
-| Missing | `FEAT-SIM-10` Cockpit Checklists, Modes, and Missions | `checklists/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); checklist definition/runtime, actual-state binding, cockpit mode behavior, no-trade mission completion | `FR-SIM-091`..`FR-SIM-097` *(planned)* | `tests/simulator/usage/features/10_checklists.py` *(planned)* |
-| Missing | `FEAT-SIM-11` Scenario Engine | `scenarios/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `MissionDefinition` (distinct from Risk's advisory `ScenarioDefinition`), trigger engine, emergency/abnormal scenarios, event priority, `InjectedEvent` | `FR-SIM-098`..`FR-SIM-104` *(planned)* | `tests/simulator/usage/features/11_scenarios.py` *(planned)* |
-| Missing | `FEAT-SIM-12` Execution Realism Models | `realism/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); latency profile, queue model, slippage & market impact, cancel/replace race, data/execution-view separation | `FR-SIM-105`..`FR-SIM-110` *(planned)* | `tests/simulator/usage/features/12_realism.py` *(planned)* |
-| Missing | `FEAT-SIM-13` Session Recovery | `recovery/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); recovery state machine, crash recovery, save/branch integrity, corruption handling | `FR-SIM-111`..`FR-SIM-115` *(planned)* | `tests/simulator/usage/features/13_recovery.py` *(planned)* |
-| Missing | `FEAT-SIM-14` Alert Lifecycle | `alerts/` *(planned)* | Trading Cockpit Phase 0 reconciliation (§1); `AlertEvent` lifecycle, root-cause grouping, perception timestamp, emergency-control availability | `FR-SIM-116`..`FR-SIM-120` *(planned)* | `tests/simulator/usage/features/14_alerts.py` *(planned)* |
+| Missing | `FEAT-SIM-10` Cockpit Checklists, Modes, and Missions | `checklists/` *(planned)* | checklist definition/runtime, actual-state binding, cockpit mode behavior, no-trade mission completion | `FR-SIM-091`..`FR-SIM-097` *(planned)* | `tests/simulator/usage/features/10_checklists.py` *(planned)* |
+| Missing | `FEAT-SIM-11` Scenario Engine | `scenarios/` *(planned)* | `MissionDefinition` (distinct from Risk's advisory `ScenarioDefinition`), trigger engine, emergency/abnormal scenarios, event priority, `InjectedEvent` | `FR-SIM-098`..`FR-SIM-104` *(planned)* | `tests/simulator/usage/features/11_scenarios.py` *(planned)* |
+| Missing | `FEAT-SIM-12` Execution Realism Models | `realism/` *(planned)* | latency profile, queue model, slippage & market impact, cancel/replace race, data/execution-view separation | `FR-SIM-105`..`FR-SIM-110` *(planned)* | `tests/simulator/usage/features/12_realism.py` *(planned)* |
+| Missing | `FEAT-SIM-13` Session Recovery | `recovery/` *(planned)* | recovery state machine, crash recovery, save/branch integrity, corruption handling | `FR-SIM-111`..`FR-SIM-115` *(planned)* | `tests/simulator/usage/features/13_recovery.py` *(planned)* |
+| Missing | `FEAT-SIM-14` Alert Lifecycle | `alerts/` *(planned)* | `AlertEvent` lifecycle, root-cause grouping, perception timestamp, emergency-control availability | `FR-SIM-116`..`FR-SIM-120` *(planned)* | `tests/simulator/usage/features/14_alerts.py` *(planned)* |
 
 The Simulation feature IDs follow the numbered standalone usage programs.
 
@@ -1520,11 +1485,10 @@ constructed, so adding a failure path adds a catalog row first.
 
 ## 6. Open Decisions
 
-These are unresolved owner choices raised by the approved Trading Cockpit Phase 0 audit. They are recorded here, not resolved by this documentation task.
+These are unresolved owner choices raised by the approved capability audit. They are recorded here, not resolved by this documentation task.
 
 - **OD-SIM-01 — Replay identity ownership split with Strategy.** Unified `ReplayIdentity` is currently split between Simulator's immutable journal (`FEAT-SIM-06`) and Strategy's replay manifests (`FEAT-STR-05`). The cockpit assigns canonical replay identity to Simulator; Strategy becomes a consumer. The concrete identity field set (scenario/data/profile hashes, seeds, rules version, branch lineage) and the Strategy migration are implementation-phase decisions.
-- **OD-SIM-02 — `ScenarioDefinition` name collision with Risk.** The blocking `ScenarioDefinition` the cockpit requires collides with Risk's advisory `ScenarioDefinition` (`risk/contracts/requests.py`, `FEAT-RISK-14`). Phase 0 collision C-2. Paired with Risk `OD-RISK-01`. This README records that Simulator uses a distinct name (`MissionDefinition`) for the blocking concept and retains Risk's advisory model as-is; the actual rename/migration is an implementation-phase task. The owner may instead choose to reclaim the name for Simulator and migrate Risk callers.
-- **OD-SIM-03 — Mode sequencing (`TC-IMP-SIM-09`).** The cockpit mode model blocks Brokers `TC-IMP-BRK-10` (the cockpit live-money boundary proof). The owner must decide whether to sequence `TC-IMP-SIM-09` early (lift a minimal mode marker before Phase 8) or formally re-date the `TC-IMP-BRK-10` proof to Phase 8 (Phase 0 decision D-6).
+- **OD-SIM-03 — Mode sequencing.** `FEAT-SIM-10` supplies the mode state required by the cross-domain Broker simulation-isolation proof. The owner must decide whether to implement a minimal mode marker before the rest of `FEAT-SIM-10` or deliver the proof only when that feature is complete.
 
 
 

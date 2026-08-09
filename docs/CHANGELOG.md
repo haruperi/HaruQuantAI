@@ -2,9 +2,20 @@
 
 ## [Unreleased]
 
+### Consolidate canonical feature documentation
+
+Domain documentation now uses the owning `FEAT-*` registry as the only capability
+inventory and removes the retired planning namespace and duplicate reconciliation
+matrices.
+
+#### Changed (2)
+
+- Reconciled the canonical registry to 204 features: 169 Completed, 16 Partial, and 19 Missing.
+- Retired the obsolete development planning archive after folding current capability ownership, requirements, and evidence into owning package READMEs.
+
 ### Add Portfolio balanced double-entry ledger
 
-Portfolio now owns the cockpit's foundational financial authority: a deterministic balanced double-entry ledger with a chart of accounts, exactly-once economic-event ingestion, settled/unsettled cash with accrued income and costs, reproducible balance rebuild, append-only reversal corrections, and snapshot accelerators validated against canonical entry truth. This closes Phase 0 finding P-1 ("the cockpit's entire financial authority is missing") for the four foundational gaps `TC-IMP-PORT-01,02,03,15`.
+Portfolio now owns the application's foundational financial authority: a deterministic balanced double-entry ledger with a chart of accounts, exactly-once economic-event ingestion, settled/unsettled cash with accrued income and costs, reproducible balance rebuild, append-only reversal corrections, and snapshot accelerators validated against canonical entry truth.
 
 #### Added (4)
 
@@ -17,9 +28,9 @@ Portfolio now owns the cockpit's foundational financial authority: a determinist
 
 - Migrated the Portfolio error catalogue categories to the Utils-approved uppercase set (`TRANSIENT`/`PERMANENT`/`INTEGRITY`/`POLICY`/`DATA_STALE`/`UNKNOWN_STATE`) so the package imports under the strict error-catalogue whitelist.
 
-### Complete Optimization Trading Cockpit reconciliation
+### Complete Optimization feature reconciliation
 
-Optimization now covers all 10 approved Trading Cockpit Phase 0 work packages: a versioned OptimizationStudy contract, three now-unblocked EXTEND items consuming the resolved Strategy operating-envelope, Risk TradingPolicyProfile, and Analytics process-scoring providers, and five fail-closed deferred-integration consumer ports for the still-absent Simulator fill/scenario and Risk/Research stress-shock providers.
+Optimization now covers all 10 approved application capabilities: a versioned OptimizationStudy contract, three now-unblocked EXTEND items consuming the resolved Strategy operating-envelope, Risk TradingPolicyProfile, and Analytics process-scoring providers, and five fail-closed deferred-integration consumer ports for the still-absent Simulator fill/scenario and Risk/Research stress-shock providers.
 
 #### Added (4)
 
@@ -31,7 +42,7 @@ Optimization now covers all 10 approved Trading Cockpit Phase 0 work packages: a
 #### Changed (2)
 
 - Extended risk-sensitivity analysis to measure outcome sensitivity to Risk TradingPolicyProfile parameters without weakening hard limits (`robustness/risk_sensitivity.py`).
-- Flipped all 10 `TC-IMP-OPT-*` reconciliation rows to Completed; OD-OPT-01 marked non-blocking.
+- Reconciled all nine Optimization features as Completed and documented fail-closed provider ports.
 
 ### Add Analytics process scoring and repair the error boundary
 
@@ -48,9 +59,9 @@ Analytics now publishes deterministic process-first scoring with a critical-fail
 
 - Corrected `ANALYTICS_ERROR_CATALOG` categories to the Utils-approved set so `error_response` no longer rejects the Analytics catalog, repairing a latent fail-closed boundary crash.
 
-### Complete Risk Trading Cockpit reconciliation
+### Complete Risk feature reconciliation
 
-Risk now covers all 17 approved Trading Cockpit Phase 0 work packages: config threshold groups, a drawdown state machine, an emergency governor, a continuous-monitoring recalculation classifier, a stop-loss validator, a no-trade outcome classifier, planned risk/reward and cap-of-caps sizing, a strictest-wins effective-rule resolver, a fixed-precedence trade readiness gate, a blocking stress-loss gate, granular kill-switch lock/cooldown, and explainable resize/restrict decision outcomes.
+Risk now covers all 17 approved application capabilities: config threshold groups, a drawdown state machine, an emergency governor, a continuous-monitoring recalculation classifier, a stop-loss validator, a no-trade outcome classifier, planned risk/reward and cap-of-caps sizing, a strictest-wins effective-rule resolver, a fixed-precedence trade readiness gate, a blocking stress-loss gate, granular kill-switch lock/cooldown, and explainable resize/restrict decision outcomes.
 
 #### Added (5)
 
@@ -87,7 +98,7 @@ Trading now enforces its nine-state execution-position lifecycle in injected pro
 
 - Moved active Trading position authority out of durable projections, with restart uncertainty kept `UNKNOWN` until reconciliation and exposure increases blocked while unknown.
 
-### Complete Strategy Trading Cockpit planning contracts
+### Complete Strategy application planning contracts
 
 Strategy now provides versioned profiles, playbooks, setup evaluations, immutable trade plans, operating envelopes, exit plans, manual-plan parity, and fail-closed expectancy and automation ports while preserving `TradeIntent v1` as the Strategy-to-Risk proposal.
 
@@ -102,9 +113,9 @@ Strategy now provides versioned profiles, playbooks, setup evaluations, immutabl
 - Extended Strategy profiles, playbooks, setup evaluation, lifecycle governance, automation policy, and expectancy references with strict JSON-safe contract transport.
 - Classified Strategy errors under the canonical Utils taxonomy and preserved the authoritative post-migration unsuffixed Strategy table family.
 
-### Add Brokers Trading Cockpit contract transport and route discipline
+### Add Brokers application contract transport and route discipline
 
-Brokers now publishes the versioned cross-domain contract pairs and the health-aware primary/backup route discipline the Trading Cockpit Phase 0 audit requires, transported as validated JSON-safe mappings behind `build_*`/`parse_*` function pairs.
+Brokers now publishes the versioned cross-domain contract pairs and the health-aware primary/backup route discipline the capability audit requires, transported as validated JSON-safe mappings behind `build_*`/`parse_*` function pairs.
 
 #### Added (8)
 
@@ -119,7 +130,7 @@ Brokers now publishes the versioned cross-domain contract pairs and the health-a
 
 #### Changed (3)
 
-- Extended `BrokerOrder`, `BrokerPosition`, and `BrokerCapability` with additive Phase 0 fields defaulting to fail-closed values so existing constructors and tests remain green.
+- Extended `BrokerOrder`, `BrokerPosition`, and `BrokerCapability` with additive fail-closed fields so existing constructors and tests remain green.
 - Extended the capability matrix normative test and adapter mutation sets to cover the two new safe-order write capabilities.
 - Updated the Brokers package-root public API to 109 function-only exports carrying the new contract-transport and safe-order operations.
 
@@ -138,7 +149,7 @@ and chart-pattern measurements while retaining Risk as regime-policy authority.
 
 - Extended existing mathematical feature owners with neutral cockpit measurements and remapped Indicators error categories to the current Utils catalogue contract without changing error codes.
 
-### Add Utils Trading Cockpit foundation primitives
+### Add Utils application foundation primitives
 
 Utils now provides versioned, fail-closed shared mappings and deterministic business-neutral primitives for later cockpit-domain integrations.
 
@@ -154,9 +165,9 @@ Utils now provides versioned, fail-closed shared mappings and deterministic busi
 
 - Extended Utils with versioned references, time domains, event envelopes, health metadata, audit-sink routing, cockpit identifiers, and producer-side compatibility evidence while leaving consumer migrations to their owning domains.
 
-### Extend Data real-time streaming with Trading Cockpit event coverage
+### Extend Data real-time streaming with application event coverage
 
-Data's unified market-event model now carries the trade, order-book, venue, and corporate-action event families the Trading Cockpit Phase 0 audit requires beyond quotes and bars.
+Data's unified market-event model now carries the trade, order-book, venue, and corporate-action event families the capability audit requires beyond quotes and bars.
 
 #### Added (1)
 
