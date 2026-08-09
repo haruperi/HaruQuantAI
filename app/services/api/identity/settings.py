@@ -7,9 +7,14 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from app.services.api.identity.errors import IdentityError
+from app.services.api.identity.system_settings import (
+    get_system_settings_manifest,
+    system_settings_require_restart,
+    validate_system_settings,
+)
 from app.services.api.persistence import (
     create_settings_record,
     read_settings_record,
@@ -17,7 +22,8 @@ from app.services.api.persistence import (
 )
 from app.utils import canonical_json, is_sensitive_key, utc_now
 
-_MAX_SETTINGS = 32
+_MAX_USER_SETTINGS = 32
+_MAX_SYSTEM_SETTINGS = len(get_system_settings_manifest())
 _MAX_SETTING_KEY_LENGTH = 64
 _MAX_SETTING_VALUE_LENGTH = 256
 _GLOBAL_SETTINGS_SUBJECT = "global"
@@ -38,6 +44,7 @@ class SettingsRecord(BaseModel):
     created_at: datetime
     updated_at: datetime
     updated_by: str
+    restart_required: bool = False
 
     @field_validator("settings", mode="before")
     @classmethod
@@ -56,7 +63,7 @@ class SettingsRecord(BaseModel):
         """
         if not isinstance(value, Mapping):
             raise TypeError("settings must be a mapping")
-        if len(value) > _MAX_SETTINGS:
+        if len(value) > max(_MAX_USER_SETTINGS, _MAX_SYSTEM_SETTINGS):
             raise ValueError("settings exceed maximum entries")
         result: dict[str, str] = {}
         for key, item in value.items():
@@ -70,6 +77,23 @@ class SettingsRecord(BaseModel):
                 raise ValueError("settings contain an unsafe or oversized value")
             result[key] = item
         return result
+
+    @model_validator(mode="after")
+    def _validate_scoped_settings(self) -> SettingsRecord:
+        """Apply the exact validator owned by the selected settings scope.
+
+        Returns:
+            Validated scoped record.
+
+        Raises:
+            ValueError: If user settings exceed their bounded entry count.
+            IdentityError: If system settings are not manifest-approved.
+        """
+        if self.scope == "system":
+            validate_system_settings(self.settings)
+        elif len(self.settings) > _MAX_USER_SETTINGS:
+            raise ValueError("user settings exceed maximum entries")
+        return self
 
 
 def _get_settings(
@@ -175,6 +199,10 @@ def _update_settings(
     current = _get_settings(scope, subject_id, request_id=request_id)
     if current.version != expected_version:
         raise IdentityError("SETTINGS_VERSION_CONFLICT")
+    restart_required = scope == "system" and system_settings_require_restart(
+        current.settings,
+        settings,
+    )
     validated = SettingsRecord(
         scope=scope,
         subject_id=subject_id,
@@ -184,6 +212,7 @@ def _update_settings(
         created_at=current.created_at if current.version else observed_at,
         updated_at=observed_at,
         updated_by=actor_id,
+        restart_required=restart_required,
     )
     serialized = canonical_json(dict(validated.settings))
     if expected_version == 0:

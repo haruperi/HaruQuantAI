@@ -20,7 +20,6 @@ _EXPECTED_OUTPUT = {
     "12_validation.py": "Data -> validation=",
     "13_idempotency.py": "Data -> reservation_verdict=",
     "14_random_streams.py": "Data -> draws=",
-    "features.py": "Data -> full_domain_pipeline_status='completed'",
 }
 
 

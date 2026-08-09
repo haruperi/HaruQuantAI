@@ -184,10 +184,10 @@ async function testUsageApiClientError(): Promise<void> {
   }
 }
 
-/** FR-API-041: focused clients map to the 78 registered operations. */
+/** FR-API-041: focused clients map to the 81 registered operations. */
 async function testUsageFocusedClients(): Promise<void> {
-  // Drift check: the catalog declares exactly the 78 approved operations.
-  assert(ROUTE_CONTRACT_COUNT === 78, "route count should be 78");
+  // Drift check: the catalog declares exactly the 81 approved operations.
+  assert(ROUTE_CONTRACT_COUNT === 81, "route count should be 81");
 
   // Exercise a representative slice of the catalog (one op per family) through
   // the typed client surface so the catalog is proven wired end-to-end.

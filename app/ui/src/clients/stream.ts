@@ -49,15 +49,9 @@ function buildQuery(params?: Record<string, QueryValue>): string {
   return query ? `?${query}` : "";
 }
 
-/** Generate a request identifier. */
+/** Generate a canonical prefixed UUID4 request identifier. */
 function generateRequestId(): string {
-  const bytes = new Uint8Array(12);
-  globalThis.crypto.getRandomValues(bytes);
-  const alphabet =
-    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  let id = "";
-  for (const byte of bytes) id += alphabet[byte % alphabet.length];
-  return `req_${id}`;
+  return `req-${globalThis.crypto.randomUUID()}`;
 }
 
 /**

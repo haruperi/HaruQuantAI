@@ -12,6 +12,10 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from pydantic import BaseModel, ConfigDict, SecretStr
 
 from app.services.api.identity.errors import IdentityError
+from app.services.api.identity.system_settings import (
+    get_credential_manifest,
+    validate_credential_material,
+)
 from app.services.api.persistence import (
     read_credential_record,
     update_credential_record,
@@ -162,4 +166,77 @@ def resolve_credential_reference(
     return {name: SecretStr(value) for name, value in parsed.items()}
 
 
-__all__ = ("CredentialRecord", "resolve_credential_reference", "store_credential")
+def get_system_credential_statuses(
+    *,
+    request_id: str,
+) -> tuple[Mapping[str, object], ...]:
+    """Return secret-free status for every manifest-approved credential slot.
+
+    Args:
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Ordered credential-slot status mappings with no protected values.
+    """
+    statuses: list[Mapping[str, object]] = []
+    for definition in get_credential_manifest():
+        slot = str(definition["slot"])
+        reference_id = derive_stable_id("id", f"api-credential:system:{slot}")
+        rows = read_credential_record(
+            f"secret://{reference_id}",
+            request_id=request_id,
+        )
+        status: dict[str, object] = {
+            "slot": slot,
+            "label": definition["label"],
+            "fields": definition["fields"],
+            "activation": definition["activation"],
+            "configured": bool(rows),
+            "version": int(str(rows[0]["version"])) if rows else 0,
+            "updated_at": str(rows[0]["created_at"]) if rows else None,
+        }
+        statuses.append(status)
+    return tuple(statuses)
+
+
+def store_system_credential(
+    slot: str,
+    material: Mapping[str, str],
+    *,
+    key_set: Mapping[str, bytes],
+    active_key_id: str,
+    request_id: str,
+) -> CredentialRecord:
+    """Validate and encrypt one system-owned credential slot.
+
+    Args:
+        slot: Manifest-approved credential slot.
+        material: Complete write-only credential material.
+        key_set: Externally provisioned encryption keys.
+        active_key_id: Explicit active encryption key identifier.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Secret-free persisted credential metadata.
+
+    Raises:
+        IdentityError: If slot validation, encryption, or persistence fails.
+    """
+    validated = validate_credential_material(slot, material)
+    return store_credential(
+        owner_id="system",
+        label=slot,
+        material=validated,
+        key_set=key_set,
+        active_key_id=active_key_id,
+        request_id=request_id,
+    )
+
+
+__all__ = (
+    "CredentialRecord",
+    "get_system_credential_statuses",
+    "resolve_credential_reference",
+    "store_credential",
+    "store_system_credential",
+)

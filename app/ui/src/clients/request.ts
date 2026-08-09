@@ -57,19 +57,11 @@ export class ApiClientError extends Error {
 /**
  * Generate a request identifier.
  *
- * Mirrors the backend request-id shape (`req_` prefix + base62). Used only
- * when the caller has not supplied one explicitly.
+ * Mirrors the backend request-id shape (`req-` prefix + lowercase UUID4).
+ * Used only when the caller has not supplied one explicitly.
  */
 function generateRequestId(): string {
-  const bytes = new Uint8Array(12);
-  globalThis.crypto.getRandomValues(bytes);
-  const alphabet =
-    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  let id = "";
-  for (const byte of bytes) {
-    id += alphabet[byte % alphabet.length];
-  }
-  return `req_${id}`;
+  return `req-${globalThis.crypto.randomUUID()}`;
 }
 
 /** Read a document cookie by name; returns null when unavailable (SSR, disabled). */

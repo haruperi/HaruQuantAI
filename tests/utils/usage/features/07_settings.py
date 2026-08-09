@@ -180,7 +180,7 @@ def main() -> None:
     _feature_header(
         "FEATURE: FEAT-UTIL-06 — settings/ — Runtime Settings\n\n"
         "Purpose: Define immutable generic runtime/logging settings and provide the sole\n"
-        "repository app/configs/env.json loading base for typed domain settings.\n\n"
+        "explicit/process bootstrap base for typed domain settings.\n\n"
         "Module flow:\n"
         "-> explicit values + environment\n"
         "-> strict validation\n"

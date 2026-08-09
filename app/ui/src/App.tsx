@@ -5,6 +5,7 @@ import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
 import { WorkspaceGrid } from './components/layout/WorkspaceGrid';
 import { OrderTicketModal } from './components/widgets/OrderTicketModal';
+import { SystemSettingsModal } from './components/widgets/SystemSettingsModal';
 import { useTradingStore } from './store/useTradingStore';
 
 export function App(): React.JSX.Element {
@@ -26,6 +27,7 @@ export function App(): React.JSX.Element {
         <WorkspaceGrid />
       </div>
       <OrderTicketModal />
+      <SystemSettingsModal />
     </div>
   );
 }

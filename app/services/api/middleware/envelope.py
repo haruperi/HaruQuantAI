@@ -22,9 +22,13 @@ _SUCCESS_MIN = 200
 _ERROR_MIN = 400
 _NO_CONTENT = 204
 _ENVELOPE_KEYS = {"status", "message", "data", "error", "metadata"}
+_FRAMEWORK_PATHS = frozenset(
+    {"/docs", "/docs/oauth2-redirect", "/openapi.json", "/redoc"}
+)
 _STATUS_ERROR_CODES = {
     status.HTTP_401_UNAUTHORIZED: ApiErrorCode.AUTHENTICATION_REQUIRED,
     status.HTTP_403_FORBIDDEN: ApiErrorCode.AUTHORIZATION_DENIED,
+    status.HTTP_404_NOT_FOUND: ApiErrorCode.NOT_FOUND,
     status.HTTP_429_TOO_MANY_REQUESTS: ApiErrorCode.RATE_LIMITED,
 }
 _VALIDATION_STATUSES = {
@@ -100,6 +104,8 @@ class _CanonicalEnvelopeMiddleware(BaseHTTPMiddleware):
             Canonical response or the unchanged non-JSON/204 response.
         """
         response = await call_next(request)
+        if request.url.path in _FRAMEWORK_PATHS:
+            return response
         content_type = response.headers.get("content-type", "")
         if (
             response.status_code == _NO_CONTENT

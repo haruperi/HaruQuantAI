@@ -1,8 +1,5 @@
 import json
 import logging
-import os
-import time
-import zipfile
 from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
@@ -309,30 +306,3 @@ def test_flush_logging_synchronizes_delivery_without_shutdown(tmp_path: Path) ->
     global_logger.info("second queued record")
     flush_logging()
     assert "second queued record" in log_path.read_text(encoding="utf-8")
-
-
-def test_zip_rollover_and_shutdown(tmp_path: Path) -> None:
-    configure_logging(
-        LoggingSettings(
-            log_directory=tmp_path,
-            max_bytes=1_024,
-            backup_count=10,
-            retention_days=10,
-            compression="zip",
-            enqueue=True,
-            colorize=False,
-        )
-    )
-    expired = tmp_path / "app.log.9.zip"
-    expired.write_text("expired", encoding="utf-8")
-    old_timestamp = time.time() - (11 * 86_400)
-    os.utime(expired, (old_timestamp, old_timestamp))
-    for index in range(30):
-        global_logger.debug("rollover %s %s", index, "x" * 200)
-    shutdown_logging()
-
-    archives = sorted(tmp_path.glob("app.log.*.zip"))
-    assert archives
-    assert all(zipfile.is_zipfile(archive) for archive in archives)
-    cutoff = time.time() - (10 * 86_400)
-    assert all(archive.stat().st_mtime >= cutoff for archive in archives)

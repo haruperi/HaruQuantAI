@@ -391,8 +391,8 @@ rows**, passes integrity and foreign-key checks, and exposes exactly one setting
 table. Its settings rows are empty because the fresh rebuild contained no user
 preferences and no system values were invented.
 
-`DataSettings` now consumes the repository's central JSON/process source order, so
-API startup reaches the development database without transient shell injection.
+`DataSettings` consumes externally provisioned process bootstrap values, so API
+startup reaches the development database without a repository credential file.
 Connection-bootstrap paths, lock timeouts, credentials, and encryption material stay
 outside `api_settings` because the application needs them before the table is
 reachable. The pre-migration recovery point is immutable backup manifest

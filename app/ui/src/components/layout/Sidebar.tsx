@@ -29,11 +29,12 @@ import {
   TrendingUp,
   AlertTriangle,
   PieChart
+  ,Settings
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { addWidgetToWorkspace } = useTradingStore();
+  const { addWidgetToWorkspace, openSettings } = useTradingStore();
 
   const handleAddWidget = (type: string, title: string) => {
     addWidgetToWorkspace(type as WidgetType, title);
@@ -162,6 +163,11 @@ export const Sidebar: React.FC = () => {
       {/* Section 3: RESOURCES */}
       <div className="sidebar-section">
         {!isCollapsed && <div className="sidebar-section-title">RESOURCES</div>}
+
+        <div className="sidebar-menu-item" onClick={openSettings}>
+          <Settings size={15} />
+          {!isCollapsed && <span>System Settings</span>}
+        </div>
 
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('education', 'Education Resources')}>
           <GraduationCap size={15} />

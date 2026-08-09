@@ -64,7 +64,7 @@ class DataSettings(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
-        """Load explicit and process values before the central JSON source.
+        """Load explicit and externally provisioned process values.
 
         Args:
             settings_cls: Concrete Data settings model.

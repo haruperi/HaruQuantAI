@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal, override
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
 from app.services.api._limits import (
@@ -68,6 +68,7 @@ class ApiSettings(BaseSettings):
     stream_resume_window: int = Field(default=256, ge=1, le=100_000)
     auth_transport: Literal["cookie_and_bearer"] = "cookie_and_bearer"
     active_credential_key_id: str | None = None
+    credential_encryption_key: SecretStr | None = None
     credential_key_refs: tuple[str, ...] = ()
     rate_limits_by_class: Mapping[str, tuple[int, float]] = Field(
         default_factory=lambda: dict(get_default_rate_limits())
@@ -83,7 +84,7 @@ class ApiSettings(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
-        """Load explicit and process values before the central JSON source.
+        """Load explicit and externally provisioned process values.
 
         Returns:
             Canonical settings sources in descending precedence order.
@@ -165,6 +166,12 @@ class ApiSettings(BaseSettings):
             and self.active_credential_key_id not in self.credential_key_refs
         ):
             raise ValueError("active credential key must be declared")
+        if (self.active_credential_key_id is None) != (
+            self.credential_encryption_key is None
+        ):
+            raise ValueError(
+                "active credential key ID and encryption key must be supplied together"
+            )
         expected_rate_classes = {
             "authentication",
             "compute",

@@ -155,6 +155,65 @@ def test_missing_request_ids_are_generated_for_untrusted_clients() -> None:
     assert body["correlation_id"].startswith("cor-")
 
 
+def test_canonical_request_id_is_accepted() -> None:
+    """Canonical prefixed UUID4 request IDs should cross the API boundary."""
+
+    request_id = "req-11111111-1111-4111-8111-111111111111"
+    app = FastAPI()
+
+    @app.get("/api/middleware/identified")
+    async def identified(request: Request) -> dict[str, object]:
+        return {"request_id": request.state.api_request_context.request_id}
+
+    app = build_request_context_middleware(
+        app, route_contract_registry=build_route_contract_registry()
+    )
+    status_code, body = _send_get(
+        app,
+        "/api/middleware/identified",
+        headers={"x-request-id": request_id},
+    )
+    assert status_code == 200
+    assert body["request_id"] == request_id
+
+
+def test_obsolete_request_id_is_rejected_before_authentication() -> None:
+    """Obsolete frontend IDs must fail before authentication or persistence."""
+
+    calls: list[str] = []
+
+    def _provider(_: Request) -> AuthContext:
+        calls.append("called")
+        return _auth()
+
+    app = FastAPI()
+
+    @app.get("/api/middleware/protected")
+    async def protected() -> dict[str, bool]:
+        return {"ok": True}
+
+    contract = build_route_contract(
+        route_id="api.middleware.protected",
+        method="GET",
+        path="/api/middleware/protected",
+        owner="api",
+        auth_required=True,
+    )
+    app = build_request_context_middleware(
+        app,
+        route_contract_registry=build_route_contract_registry((contract,)),
+        auth_context_provider=_provider,
+    )
+    status_code, body = _send_get(
+        app,
+        "/api/middleware/protected",
+        headers={"x-request-id": "req_6qzCQpkvKQJ5"},
+    )
+    assert status_code == 400
+    assert body["detail"] == "VALIDATION_ERROR"
+    assert calls == []
+
+
 def test_request_context_calls_auth_provider_for_protected_route() -> None:
     """Authenticated routes must execute the requested provider once."""
 

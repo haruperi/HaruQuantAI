@@ -48,7 +48,7 @@ def test_enabled_settings_require_the_complete_configuration() -> None:
     settings = get_agentic_settings(
         {
             "agentic_enabled": True,
-            "agentic_mandate_path": Path("app/configs/agentic_mandate.json"),
+            "agentic_mandate_path": Path("data/agentic/agentic_mandate.json"),
             "agentic_limits_profile": LIMITS_PROFILE_ID,
             "agentic_model_profiles": ("profile-a",),
         },

@@ -222,7 +222,7 @@ def read_credential_record(
     """
     logger.debug("Reading API credential persistence record")
     return _read_rows(
-        "SELECT owner_id, key_id, nonce_b64, ciphertext_b64, version "
+        "SELECT owner_id, key_id, nonce_b64, ciphertext_b64, created_at, version "
         "FROM api_credentials WHERE reference = ?",
         (reference,),
         request_id=request_id,

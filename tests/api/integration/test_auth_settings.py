@@ -1,5 +1,6 @@
 """Integration evidence for UI/API-owned identity and settings state."""
 
+import base64
 import sqlite3
 from pathlib import Path
 
@@ -123,14 +124,14 @@ def test_login_settings_credentials_logout(tmp_path: Path) -> None:
         assert updated.scope == "user"
         system_initial = get_system_settings(request_id=generate_id("req"))
         system_updated = update_system_settings(
-            {"theme": "light"},
+            {"APP_NAME": "HaruQuantAI"},
             actor_id=registered.user_id,
             expected_version=system_initial.version,
             request_id=generate_id("req"),
         )
         assert system_updated.scope == "system"
         assert system_updated.subject_id == "global"
-        assert system_updated.settings == {"theme": "light"}
+        assert system_updated.settings == {"APP_NAME": "HaruQuantAI"}
         with pytest.raises(ValueError, match="unsafe or oversized"):
             update_system_settings(
                 {"api_key": "forbidden"},  # pragma: allowlist secret
@@ -140,7 +141,7 @@ def test_login_settings_credentials_logout(tmp_path: Path) -> None:
             )
         with pytest.raises(RuntimeError, match="SETTINGS_VERSION_CONFLICT"):
             update_system_settings(
-                {"theme": "dark"},
+                {"APP_NAME": "Conflicting Name"},
                 actor_id=registered.user_id,
                 expected_version=0,
                 request_id=generate_id("req"),
@@ -306,7 +307,7 @@ def test_system_settings_route_requires_admin_permission(
             },
             json={
                 "scope": "system",
-                "settings": {"theme": "light"},
+                "settings": {"APP_NAME": "HaruQuantAI"},
                 "expected_version": 0,
             },
         )
@@ -318,4 +319,82 @@ def test_system_settings_route_requires_admin_permission(
             headers={"Authorization": f"Bearer {admin_session.session_token}"},
         )
         assert read.status_code == 200
-        assert read.json()["data"]["settings"] == {"theme": "light"}
+        assert read.json()["data"]["settings"] == {"APP_NAME": "HaruQuantAI"}
+
+
+def test_system_credentials_are_write_only_and_encrypted(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Administer one credential slot without returning protected material."""
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///api-system-credentials.db")
+    monkeypatch.setenv("DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("SQLITE_BUSY_TIMEOUT_SECONDS", "1.0")
+    monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "10.0")
+    encoded_key = base64.urlsafe_b64encode(b"k" * 32).decode("ascii")
+    app = create_api_app(
+        build_api_settings(
+            active_credential_key_id="bootstrap-v1",
+            credential_key_refs=("bootstrap-v1",),
+            credential_encryption_key=SecretStr(encoded_key),
+        )
+    )
+    with TestClient(app) as client:
+        admin = register_api_user(
+            username="credential-admin",
+            password="bounded credential password",  # pragma: allowlist secret
+            roles=("admin",),
+            permissions=("settings:admin",),
+            request_id=generate_id("req"),
+        )
+        session = create_api_session(
+            admin,
+            request_id=generate_id("req"),
+            ttl_seconds=60,
+        )
+        headers = {"Authorization": f"Bearer {session.session_token}"}
+
+        manifest = client.get("/api/v1/settings/manifest", headers=headers)
+        assert manifest.status_code == 200
+        assert any(item["key"] == "APP_NAME" for item in manifest.json()["data"])
+
+        initial = client.get("/api/v1/settings/credentials", headers=headers)
+        assert initial.status_code == 200
+        openai_status = next(
+            item for item in initial.json()["data"] if item["slot"] == "openai"
+        )
+        assert openai_status["configured"] is False
+
+        updated = client.put(
+            "/api/v1/settings/credentials/openai",
+            headers={**headers, "Idempotency-Key": "credential-update-1"},
+            json={
+                "material": {
+                    "api_key": "test-only-openai-value",  # pragma: allowlist secret
+                },
+            },
+        )
+        assert updated.status_code == 200
+        payload = updated.json()
+        assert payload["data"]["configured"] is True
+        assert "test-only-openai-value" not in str(payload)
+
+        status_response = client.get(
+            "/api/v1/settings/credentials",
+            headers=headers,
+        )
+        status_payload = status_response.json()
+        assert "test-only-openai-value" not in str(status_payload)
+        assert (
+            next(item for item in status_payload["data"] if item["slot"] == "openai")[
+                "configured"
+            ]
+            is True
+        )
+
+    with sqlite3.connect(tmp_path / "api-system-credentials.db") as connection:
+        stored = connection.execute(
+            "SELECT ciphertext_b64 FROM api_credentials"
+        ).fetchone()
+    assert stored is not None
+    assert "test-only-openai-value" not in stored[0]

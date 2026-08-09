@@ -125,7 +125,7 @@ actually ephemeral, credential-free, or network-denied — no in-process double
 could. Binding a runtime that genuinely provides those properties is the
 composition root's obligation, and until one is bound, generated code executed
 elsewhere in this process would have that process's full privileges, including
-read access to `app/configs/env.json`.
+no direct credential or bootstrap-setting access.
 
 `build_bound_sandbox` is the seam for that runtime. Adding one is a binding
 change, not a redesign.

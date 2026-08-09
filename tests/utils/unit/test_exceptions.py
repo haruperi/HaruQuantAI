@@ -1,4 +1,5 @@
 import pytest
+from app.utils import create_validation_error
 from app.utils.errors.exceptions import (
     ConfigurationError,
     ExternalServiceError,
@@ -16,6 +17,14 @@ def test_shared_exception_hierarchy() -> None:
         ExternalServiceError("PROVIDER_FAILED"),
     )
     assert all(isinstance(error, HaruQuantError) for error in exceptions)
+
+
+def test_create_validation_error_preserves_safe_symbolic_evidence() -> None:
+    error = create_validation_error("VALIDATION_FAILED", "VALUE_INVALID")
+
+    assert isinstance(error, ValidationError)
+    assert error.code == "VALIDATION_FAILED"
+    assert error.detail == "VALUE_INVALID"
 
 
 def test_domains_extend_shared_base() -> None:

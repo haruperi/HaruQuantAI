@@ -30,7 +30,7 @@ It makes no trading or domain decision.
 - UTC clocks, timestamps, and freshness calculations.
 - Deterministic canonical JSON serialization.
 - Denylist-first secret redaction.
-- Immutable runtime settings and the sole repository `app/configs/env.json` loading boundary.
+- Immutable explicit/process bootstrap settings with no repository configuration-file source.
 - Import-safe structured logging with immutable bound context, a lazy approved
   default profile, and explicit override support for specialized routing.
 - Exact decimal unit primitives for money, price, quantity, percentage, basis
@@ -211,9 +211,10 @@ Folders are ordered from lowest to highest dependency.
 | Completed | `FEAT-UTIL-11` Validation Result Taxonomy                       | `validation/`    | Exact declarations: Section 4.12                       | Section 4.12 functional requirements | `tests/utils/usage/features/12_validation.py`         |
 | Completed | `FEAT-UTIL-12` Idempotency Primitives                           | `idempotency/`   | Exact declarations: Section 4.13                       | Section 4.13 functional requirements | `tests/utils/usage/features/13_idempotency.py`        |
 | Completed | `FEAT-UTIL-13` Deterministic Random Streams                     | `random_streams/` | Exact declarations: Section 4.14                      | Section 4.14 functional requirements | `tests/utils/usage/features/14_random_streams.py`     |
+| Completed | `FEAT-UTIL-14` Unified Notification Service                     | `notifications/` | Exact declarations: Section 4.15                       | `FR-UTL-089` through `FR-UTL-096` | `tests/utils/usage/features/15_notifications.py`      |
 
-Fourteen features are registered: `FEAT-UTIL-00` through `FEAT-UTIL-13`. All
-fourteen are `Completed`, package-root exported, and covered by exactly one
+Fifteen features are registered: `FEAT-UTIL-00` through `FEAT-UTIL-14`. All
+fifteen are `Completed`, package-root exported, and covered by exactly one
 standalone numbered usage program. Shared validation exceptions remain private;
 consumers construct them through the function-only `create_validation_error`
 boundary when a shared exception instance is required.
@@ -284,9 +285,17 @@ utils/
 |   |-- __init__.py
 |   |-- keys.py
 |   `-- reservations.py
-`-- random_streams/         # FEAT-UTIL-13
+|-- random_streams/         # FEAT-UTIL-13
     |-- __init__.py
-    `-- streams.py
+|   `-- streams.py
+`-- notifications/         # FEAT-UTIL-14
+    |-- __init__.py
+    |-- desktop.py
+    |-- email.py
+    |-- telegram.py
+    |-- sms.py
+    |-- manager.py
+    `-- templates.py
 ```
 
 The five target folders are approved but do not exist. They are created only when
@@ -335,8 +344,8 @@ on `logging`, `settings`, or `responses`, and none introduces a cycle.
 
 Standalone executable usage examples live under `tests/utils/usage/features/`. They are
 ordinary programs with `main()` and `if __name__ == "__main__"` entry points, not
-pytest tests. Fourteen numbered programs map one-to-one to `FEAT-UTIL-00`
-through `FEAT-UTIL-13`, and `features.py` ties all fourteen into a single
+pytest tests. Fifteen numbered programs map one-to-one to `FEAT-UTIL-00`
+through `FEAT-UTIL-14`, and `features.py` ties all fifteen into a single
 sequential, homogeneous end-to-end domain pipeline. Pytest explicitly ignores
 these programs, and verification executes each one directly with Python.
 
@@ -375,6 +384,8 @@ never reused; new workflows continue from `WF-UTL-004`.
 | `WF-UTL-006` | `tests/utils/usage/workflows/wf_utl_006_trace_identity_and_utc_time.py`          |
 | `WF-UTL-007` | `tests/utils/usage/workflows/wf_utl_007_canonical_serialization_and_digest.py`   |
 | `WF-UTL-008` | Completed: `tests/utils/usage/workflows/wf_utl_008_operational_contract_envelope.py`   |
+| `WF-UTL-009` | `tests/utils/usage/workflows/wf_utl_009_notification_orchestration.py`                |
+| `WF-UTL-010` | `tests/utils/usage/workflows/wf_utl_010_main_operations.py`                          |
 
 | Status    | Rank       | Workflow ID    | Scope        | Workflow                                   | Input boundary                              | Final outcome                                                           | Requirement sequence                                                                                                                                  |
 | --------- | ---------- | -------------- | ------------ | ------------------------------------------ | ------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -386,6 +397,20 @@ never reused; new workflows continue from `WF-UTL-004`.
 | Completed | Supporting | `WF-UTL-006` | Cross-domain | Trace identity and UTC time discipline     | Caller-supplied identity seed or timestamp  | Validated trace identifier plus aware UTC instant and freshness verdict | `FR-UTL-001`, `FR-UTL-025`, `FR-UTL-037`                                                                                                        |
 | Completed | Supporting | `WF-UTL-007` | Cross-domain | Canonical serialization and digest         | Arbitrary domain payload                    | Deterministic redacted canonical JSON and stable digest                 | `FR-UTL-036`, `FR-UTL-038`                                                                                                                        |
 | Completed | Supporting | `WF-UTL-008` | Cross-domain | Operational contract envelope build and verify | Domain-owned facts plus profile/version refs and a unit-bearing amount | One validated JSON-safe contract mapping accepted by a consumer, or a fail-closed rejection naming the incompatible version | `FR-UTL-052` through `FR-UTL-055`, `FR-UTL-057` through `FR-UTL-060`, `FR-UTL-066`, `FR-UTL-067` |
+| Completed | Supporting | `WF-UTL-009` | Cross-domain | Unified notification orchestration | Database-backed settings and caller message | Rate-limited delivery results or deterministic fail-closed rejection | `FR-UTL-089` through `FR-UTL-096` |
+| Completed | Supporting | `WF-UTL-010` | Cross-domain | Main Utils operations | Legacy usage intent reconciled to current package-root operations | Nine-stage current-operation evidence plus explicit retired/reassigned exclusions | Existing requirements exercised by `FEAT-UTIL-00` through `FEAT-UTIL-14` |
+
+### `WF-UTL-010` — Main Utils Operations
+
+Status `Completed`. The standalone workflow preserves the logic of the legacy
+all-in-one Utils demonstration using only current `app.utils` operations. Its nine
+stages cover logging, errors, standard responses and canonical identity, redaction,
+settings policy, validation outcomes, immutable event envelopes, authentication
+context evidence, and real non-production notification delivery. Safe paths,
+DataFrame combinations, OHLCV quality, mutable event buses, circuit breakers,
+metrics, password hashing, encryption, and authorization policy are explicitly
+excluded because those capabilities were removed from Utils or reassigned to their
+current owning domains.
 
 ### `WF-UTL-008` — Operational Contract Envelope Build and Verify
 
@@ -433,7 +458,7 @@ reordered or dropped inside Utils.
 
 ### `WF-UTL-SEC` — Shared Settings Bootstrap
 
-1. The loader reads the repository `app/configs/env.json` and process overrides at
+1. The loader reads explicit values and externally provisioned process overrides at
    the shared Utils boundary; callers may supply explicit values without parsing
    files — `utils.load_settings()`.
 2. The loader validates supported deployment and runtime settings —
@@ -686,7 +711,7 @@ secret-safe boundary mapping, and explicit injected event routing every domain c
 ### 4.7 `settings/` — Runtime Settings
 
 **Purpose:** Define immutable generic runtime/logging settings and provide the sole
-repository `app/configs/env.json` loading base for typed domain settings.
+explicit/process bootstrap base for typed domain settings.
 
 **Module flow:** `explicit values + environment → strict validation → immutable RuntimeSettings`
 
@@ -694,7 +719,7 @@ repository `app/configs/env.json` loading base for typed domain settings.
 
 | Status    | File            | Responsibility                                                                                                                  | Key exports                                                                                                                                                                                            | Dependencies                                                                                                                                                                                     |
 | --------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Completed | `models.py`   | Define the immutable central`app/configs/env.json` settings base plus generic runtime/logging settings and strict validation. | `AppSettings`, `RuntimeSettings`, `LoggingSettings`; module-level, not re-exported through `__init__.py`: `LogLevel`, `LogRender`, `LogCompression`, `Environment`, `RuntimeProfile` | **Standard library:** `pathlib`, `typing`**Required third-party:** `pydantic`, `pydantic-settings`**Local:** `errors/exceptions.py` → `ConfigurationError`        |
+| Completed | `models.py`   | Define the immutable explicit/process bootstrap settings base plus generic runtime/logging settings and strict validation. | `AppSettings`, `RuntimeSettings`, `LoggingSettings`; module-level, not re-exported through `__init__.py`: `LogLevel`, `LogRender`, `LogCompression`, `Environment`, `RuntimeProfile` | **Standard library:** `pathlib`, `typing`**Required third-party:** `pydantic`, `pydantic-settings`**Local:** `errors/exceptions.py` → `ConfigurationError`        |
 | Completed | `loader.py`   | Load supported runtime settings through`AppSettings` or an explicit mapping, and expose broker-provider settings opaquely.    | `load_broker_provider_settings`, `load_settings`                                                                                                                                                   | **Standard library:** `collections.abc`**Required third-party:** `pydantic`**Local:** `models.py` → settings models; `errors/exceptions.py` → `ConfigurationError` |
 | Completed | `__init__.py` | Expose the function-only supported settings API.                                                                                | `get_app_settings_model_config`, `get_app_settings_sources`, `load_broker_provider_settings`, `load_settings`                                                                                      | **Standard library:** None**Required third-party:** None**Local:** `loader.py` → approved exports                                                                           |
 
@@ -702,8 +727,8 @@ repository `app/configs/env.json` loading base for typed domain settings.
 
 | Status    | Requirement ID | Responsibility                                                                                                                                                                                              | Class / Function / Method                                 | Side Effects                                                                       | Raises                                                         | Usage / Test                                                                                                                                                                                                                                              |
 | --------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Completed | `FR-UTL-022` | Define the immutable central settings base and generic runtime/logging settings, including the approved human-readable default logging profile.                                                             | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | `app/configs/env.json`/environment read only when a settings instance is created | `ConfigurationError`: invalid generic setting value          | **Usage:** `tests/utils/usage/features/07_settings.py::fr_utils_022_construct_configuration()`**Unit:** `tests/utils/unit/test_models.py::test_default_logging_profile()`                                                                 |
-| Completed | `FR-UTL-023` | Load explicit values and centralized`app/configs/env.json`/process settings in documented precedence order only when called; expose broker-provider settings as an opaque value through the package root. | `load_broker_provider_settings`, `load_settings`      | Settings read                                                                      | `ConfigurationError`: unsupported or invalid runtime value   | **Usage:** `tests/utils/usage/features/07_settings.py::fr_utils_023_load_active_configuration()`, `fr_utils_023_load_broker_provider_configuration()`**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
+| Completed | `FR-UTL-022` | Define the immutable explicit/process bootstrap settings base and generic runtime/logging settings, including the approved human-readable default logging profile.                                                             | `AppSettings`, `RuntimeSettings`, `LoggingSettings` | Explicit/process environment read only when a settings instance is created | `ConfigurationError`: invalid generic setting value          | **Usage:** `tests/utils/usage/features/07_settings.py::fr_utils_022_construct_configuration()`**Unit:** `tests/utils/unit/test_models.py::test_default_logging_profile()`                                                                 |
+| Completed | `FR-UTL-023` | Load explicit values and externally provisioned process settings in documented precedence order only when called; expose explicitly injected broker-provider settings as an opaque value through the package root. | `load_broker_provider_settings`, `load_settings`      | Settings read                                                                      | `ConfigurationError`: unsupported or invalid runtime value   | **Usage:** `tests/utils/usage/features/07_settings.py::fr_utils_023_load_active_configuration()`, `fr_utils_023_load_broker_provider_configuration()`**Unit:** `tests/utils/unit/test_loader.py::test_load_settings_precedence_order()` |
 | Completed | `FR-UTL-024` | Reject unknown, incompatible, or unsafe deployment/runtime values without partial mutation.                                                                                                                 | Settings-model validation                                 | None                                                                               | `ConfigurationError`: unknown, incompatible, or unsafe value | **Usage:** `tests/utils/usage/features/07_settings.py::fr_utils_024_environment_constraints()`, `fr_utils_024_validate_settings()`**Unit:** `tests/utils/unit/test_models.py::test_settings_reject_unknown_value_without_mutation()`    |
 | Completed | `FR-UTL-052` | Build and parse `ProfileRef v1` as a JSON-safe mapping carrying profile kind, profile ID, version, and content hash. A reference shall identify a profile without embedding its contents, so that a consumer records exactly which profile governed a decision without importing the owning domain's schema. | `build_profile_ref`, `parse_profile_ref` | None | `ValidationError`: empty kind or ID, malformed version, or missing content hash | **Usage:** `tests/utils/usage/features/07_settings.py::fr_utils_052_profile_ref()` **Unit:** `tests/utils/unit/test_references.py::test_profile_ref_carries_hash_not_contents()` |
 | Completed | `FR-UTL-053` | Build and parse `VersionRef v1` as a JSON-safe mapping carrying artifact kind, artifact ID, version, and content hash, for any immutable domain artifact including policy versions, scenario definitions, scoring profiles, datasets, and strategy versions. | `build_version_ref`, `parse_version_ref` | None | `ValidationError`: empty kind or ID, malformed version, or missing content hash | **Usage:** `tests/utils/usage/features/07_settings.py::fr_utils_053_version_ref()` **Unit:** `tests/utils/unit/test_references.py::test_version_ref_round_trips()` |
@@ -741,7 +766,7 @@ exporting the logger class.
 | Completed | `FR-UTL-032` | Keep import free of handler registration, environment reads, and filesystem writes.                                                                                                                                                                                                                                                 | Module import contract                                                                               | None                                                                                                          | None                                                       | **Usage:** `tests/utils/usage/features/08_logging.py::fr_utils_032_import_safety()`**Unit:** `tests/utils/unit/test_boundaries.py::test_utils_has_no_print_calls_or_import_time_log_emission()`                                                                                                                                                                                                |
 | Completed | `FR-UTL-033` | Respect the shared`LOG_LEVEL` setting without redefining domain observability policy.                                                                                                                                                                                                                                             | Logging level application in`configure_logging`                                                    | Logging configuration                                                                                         | None                                                       | **Usage:** `tests/utils/usage/features/08_logging.py::main()`**Unit:** `tests/utils/unit/test_logger.py::test_configure_logging_applies_log_level()`                                                                                                                                                                                                                                           |
 | Completed | `FR-UTL-039` | Expose an import-safe global bound logger with standard levels, exception traceback capture, immutable context binding, and automatic approved-default activation on the first runtime emission. Import-time log attempts remain inert.                                                                                             | `BoundLogger`, `logger`                                                                          | First runtime call may configure logging and create bounded sinks; every runtime call emits a log record      | `ConfigurationError`: default sink cannot be configured  | **Usage:** `tests/utils/usage/features/08_logging.py::fr_utils_027_standard_levels()`, `fr_utils_039_exception_logging()`, `fr_utils_039_bound_context()`**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_activates_default_profile()`, `test_bound_logger_preserves_context()`                                                                                        |
-| Completed | `FR-UTL-040` | Route access-context records to`access.log`, exact DEBUG records to `debug.log`, and ERROR-or-higher records to `errors.log`.                                                                                                                                                                                                 | `configure_logging` specialized handlers                                                           | Explicit bounded file writes                                                                                  | `ConfigurationError`: unavailable directory or file sink | **Usage:** `tests/utils/usage/features/08_logging.py::fr_utils_040_specialized_routing()`**Unit:** `tests/utils/unit/test_logger.py::test_specialized_log_routing()`                                                                                                                                                                                                                           |
+| Completed | `FR-UTL-040` | Route every record to `app.log`, records explicitly classified with `log_type="access"` to `access.log`, exact DEBUG records to `debug.log`, and ERROR-or-higher records to `errors.log`. API request telemetry is the canonical access-record producer. | `configure_logging` specialized handlers | Explicit bounded file writes | `ConfigurationError`: unavailable directory or file sink | **Usage:** `tests/utils/usage/features/08_logging.py::fr_utils_040_specialized_routing()` **Unit:** `tests/utils/unit/test_logger.py::test_specialized_log_routing()` **Integration:** `tests/api/integration/test_access_logging.py::test_api_request_reaches_general_and_access_logs()` |
 | Completed | `FR-UTL-041` | Provide the approved lazy default profile: human-readable DEBUG stdout with ANSI color limited to level and message content,`data/logs`, 10 MB ZIP rotation, ten-day retention, ten backups, queued delivery, automatic process-exit cleanup, optional non-destructive synchronization, and deterministic explicit override/stop. | `LoggingSettings`, `BoundLogger`, `configure_logging`, `flush_logging`, `shutdown_logging` | First runtime bound-log emission or explicit override creates the directory, queue thread, and bounded files  | `ConfigurationError`: invalid logging settings or sink   | **Usage:** `tests/utils/usage/features/08_logging.py::main()`**Unit:** `tests/utils/unit/test_logger.py::test_first_bound_log_activates_default_profile()`, `test_explicit_configuration_is_not_replaced_by_lazy_default()`, `test_human_formatter_colors_only_level_and_message()`, `test_flush_logging_synchronizes_delivery_without_shutdown()`, `test_zip_rollover_and_shutdown()` |
 
 | Completed | `FR-UTL-061` | Define the append-only audit sink interface every state-owning domain implements: accept one redacted `AuditEvent v1` or `EventEnvelope v1`, never update or delete a previously accepted record, and surface a persistence failure to the caller rather than dropping the record. Utils declares the interface and its obligations; it neither implements a sink nor persists a record. | `AuditSink` protocol; `route_audit_event` | Caller-provided sink invocation | Sink exception is propagated | **Usage:** `tests/utils/usage/features/08_logging.py::fr_utils_061_audit_sink()` **Unit:** `tests/utils/unit/test_audit_sink.py::test_sink_failure_is_surfaced_not_swallowed()` |
@@ -985,6 +1010,30 @@ same session with the same seed produces byte-identical results.
 
 ---
 
+### 4.15 `notifications/` — Unified Notification Service
+
+`FEAT-UTIL-14` provides Desktop, SMTP email, Telegram Bot API, and Twilio SMS
+adapters behind the function-only `app.utils` boundary. API-owned database-backed
+settings and encrypted credentials are injected into opaque configuration builders;
+Utils does not read database state. Built-ins cover trading, position, system,
+connection, error, performance, market, news, risk, custom, and test messages.
+
+- `FR-UTL-089`: build validated opaque configurations for every channel.
+- `FR-UTL-090`: deliver OS-native desktop notifications on supported platforms.
+- `FR-UTL-091`: deliver plain-text and HTML email with explicit SMTP TLS policy.
+- `FR-UTL-092`: deliver escaped HTML messages to one or more Telegram chat IDs.
+- `FR-UTL-093`: deliver bounded SMS messages through Twilio.
+- `FR-UTL-094`: initialize engines once per thread-safe manager session.
+- `FR-UTL-095`: enforce master/channel switches and per-channel rate limits.
+- `FR-UTL-096`: provide built-in and session-local custom templates.
+
+All outbound delivery is disabled by default. No adapter retries an uncertain
+outcome, and status, exceptions, and logs exclude credentials and message payloads.
+The feature and workflow usage programs are explicit real-operation evidence: they
+run only in a verified non-production environment, resolve API-owned database
+settings and encrypted credentials in memory, send one labelled test message per
+enabled channel, and fail closed when any required switch or destination is absent.
+
 ## 5. Package-Wide Requirements and Shared Configuration
 
 ### Persistence - Database
@@ -1007,7 +1056,7 @@ Each was either already owned elsewhere or actively harmful:
 | `util_tasks` | Duplicates `data_update_jobs`, which already carries `next_run_at`, `interval_seconds`, `enabled`, `state`, `last_run_status`, `lease_owner`, `lease_expires_at`, and `recovery_state`. |
 | `util_task_runs` | Duplicates `data_backfill_checkpoints`, which already records committed ranges, record counts, content hashes, and publication state per chunk. |
 | `util_health_checks` | Health is computed on demand by `app/services/api/health/probes.py`. Storing a current-state snapshot invites serving a stale one. |
-| `util_settings` | Bootstrap configuration is resolved from the central JSON/process sources and typed settings objects. Versioned, non-secret user and post-connection system settings share the UI/API-owned `api_settings` table; Utils remains stateless and cannot depend on Data. |
+| `util_settings` | Bootstrap configuration is resolved from explicit/process sources and typed settings objects. Versioned, non-secret user and post-connection system settings share the UI/API-owned `api_settings` table; Utils remains stateless and cannot depend on Data. |
 | `util_feature_flags` | No feature-flag mechanism exists in this system. The table described a capability that was never requested. |
 
 Durable cross-domain audit is already `data_audit_events`.
@@ -1060,7 +1109,7 @@ capabilities beyond the Section 4 exports.
     4,096 characters, mapping depth is 16, and aggregate items are 1,000.
   - `load_settings(explicit_values=None, environment=None) -> RuntimeSettings`.
     Precedence is explicit values, then the supplied mapping (or centralized
-    `AppSettings` `app/configs/env.json`/process values when omitted), then documented defaults. Input keys are
+    `AppSettings` process values when omitted), then documented defaults. Input keys are
     the exact uppercase setting names; unknown keys are rejected.
   - `get_app_settings_model_config() -> SettingsConfigDict` and
     `get_app_settings_sources(settings_cls, init_settings, env_settings, dotenv_settings, file_secret_settings) -> tuple[PydanticBaseSettingsSource, ...]`.
@@ -1177,14 +1226,7 @@ capabilities beyond the Section 4 exports.
 
 ## 6. Open Decisions
 
-No open decisions. The two decisions that previously blocked this package are
-resolved and recorded as requirements above:
-
-- Cross-domain contract transport is settled as validated JSON-safe mappings
-  behind `build_*`/`parse_*` function pairs (`NFR-UTL-008`). The function-only
-  public API rule in `AGENTS.md` §1 stands unchanged and requires no amendment.
-- Transaction and outbox ownership is settled: Data retains the infrastructure,
-  Utils owns the idempotency key contract (`NFR-UTL-010`, `FEAT-UTIL-12`).
+No open decisions.
 
 ---
 
@@ -1201,10 +1243,10 @@ tests/utils/
 
 Feature-integration tests are assigned as follows:
 
-- `tests/utils/integration/test_settings_bootstrap.py` verifies `WF-UTL-002`.
-- `tests/utils/integration/test_structured_logging.py` verifies `WF-UTL-001`.
+- `tests/utils/integration/test_settings_bootstrap.py` verifies `WF-UTL-SEC`.
+- `tests/utils/integration/test_structured_logging.py` verifies `WF-UTL-PRI`.
 - `tests/utils/integration/test_audit_event_construction.py` verifies steps 1-4 of
-  `WF-UTL-003`, the Utils-owned construction, validation, redaction, and
+  `WF-UTL-TER`, the Utils-owned construction, validation, redaction, and
   canonicalization portion. Step 5, Data persistence, is verified by the
   Data-owned `tests/data/integration/test_audit_event_handoff.py`.
 - `tests/utils/integration/test_auth_context_compatibility.py` provides the
@@ -1213,15 +1255,15 @@ Feature-integration tests are assigned as follows:
   reconstruction, and fail-closed rejection of version, schema, principal-type, or
   unknown-field drift. Consumer-side acceptance is proven inside each consuming
   domain's own suite.
-- `tests/utils/integration/test_usage_scripts.py` executes all nine standalone
-  usage programs directly and asserts their bounded expected output.
+- `tests/utils/integration/test_usage_scripts.py` executes all fifteen numbered
+  feature programs directly and asserts their bounded expected output.
 - `tests/utils/integration/test_import_safety.py` runs fresh-interpreter import
   safety proofs for `FR-UTL-032` and the import-inert portion of `FR-UTL-039`.
 - `tests/utils/integration/test_consumer_isolation.py` scans audited-domain
   production and public evidence sources for deep `app.utils` imports or
   private-attribute mutation.
 
-Planned feature-integration tests for the target requirements:
+Additional feature-integration evidence:
 
 - `tests/utils/integration/test_contract_transport.py` verifies `NFR-UTL-008`:
   every `build_*`/`parse_*` pair round-trips, `app/utils/__init__.py` exports no
@@ -1237,8 +1279,6 @@ Planned feature-integration tests for the target requirements:
   `WF-UTL-008` end to end within Utils: reference resolution, exact-unit
   construction, envelope sequencing, redaction, hashing, consumer validation, and
   duplicate suppression.
-
-These four files do not exist yet.
 
 No test under `tests/utils/` imports `app.services`; the Utils suite is runnable in
 isolation, matching the foundation-layer dependency direction in `docs/PROJECT.md`.
@@ -1304,52 +1344,53 @@ set `PYTHONPATH` to the repository root before invoking each program directly.
   nesting and preserves non-payload envelope evidence in redacted extensions.
   `tests/utils/unit/test_response_models.py:38`,
   `tests/utils/unit/test_response_factories.py:38`
-- [X] Every individual Utils source file exceeds 80% branch-aware coverage. The
-  verified minimum is 81% (`errors/contracts.py` and `errors/validation.py`) and
-  aggregate coverage is 89.76% across 30 files.
+- [X] Every individual Utils source file meets the 80% branch-aware coverage floor;
+  the verified minimum is 80% (`units/kinds.py`) and aggregate coverage is 89.72%
+  across 51 files. `tests/utils/unit/test_exceptions.py:22`
 - [X] `AuthContext v1` and `AuditEvent v1` each have producer-side contract
   compatibility evidence, and no Utils test depends on another domain.
   `tests/utils/integration/test_auth_context_compatibility.py:1`,
   `tests/utils/integration/test_audit_event_construction.py:1`
-- [X] Ruff, formatting, strict mypy, 151 targeted unit/integration tests, and all
-  nine directly executed standalone usage programs pass.
-- [ ] `units/` exists with exact unit kinds, unit-mixing rejection, currency
-  enforcement, and explicit-direction quantization. `FR-UTL-066`–`FR-UTL-070`
-- [ ] `state_machine/` exists with table validation, transition evaluation,
-  terminal handling, regression detection, and audit records.
-  `FR-UTL-071`–`FR-UTL-075`
-- [ ] `validation/` exists with the five-verdict taxonomy and strictest-wins
-  combination, and Portfolio and Risk have migrated off their two divergent
-  result shapes. `FR-UTL-076`–`FR-UTL-079`
-- [ ] `idempotency/` exists, and `trading_idempotency`, `portfolio_idempotency`,
-  `api_idempotency`, and `data_backfill_checkpoints` converge on one key
-  derivation, owner binding, and TTL rule. `FR-UTL-080`–`FR-UTL-084`
-- [ ] `random_streams/` exists with order-independent derivation, exact
-  reproducible draws, stream independence, and recorded algorithm version.
-  `FR-UTL-085`–`FR-UTL-088`
-- [ ] Operational entity prefixes, `ProfileRef v1`, and `VersionRef v1` are
-  available and their version mismatches fail closed.
-  `FR-UTL-051`–`FR-UTL-054`
-- [ ] Time domains, venue-local conversion, and monotonic sequence allocation
-  are available. `FR-UTL-055`–`FR-UTL-057`
-- [ ] `EventEnvelope v1` construction, integrity hashing, duplicate detection,
-  and sequence-gap reporting are available.
-  `FR-UTL-058`–`FR-UTL-060`
-- [ ] The append-only audit sink interface is declared and its failure surfacing
-  is proven. `FR-UTL-061`
-- [ ] Error categories, retryability metadata, and `HealthState v1` are
-  available, with `UNKNOWN_STATE` proven non-retryable.
-  `FR-UTL-062`–`FR-UTL-064`
-- [ ] Contract-mapping redaction runs before integrity hashing. `FR-UTL-065`
-- [ ] Five new feature usage programs (`10_units.py` through
-  `14_random_streams.py`) exist and execute, and `features.py` covers all
-  fourteen features.
+- [X] Ruff, formatting, strict mypy, 146 unit tests, 36 integration tests, and all
+  fifteen directly executed numbered feature programs pass.
+  `tests/utils/integration/test_usage_scripts.py:22`
+- [X] `units/` provides exact unit kinds, unit-mixing rejection, currency
+  enforcement, and explicit-direction quantization. `app/utils/units/amounts.py:19`
+- [X] `state_machine/` provides table validation, transition evaluation, terminal
+  handling, regression detection, and audit records.
+  `app/utils/state_machine/transitions.py:24`
+- [X] `validation/` provides the five-verdict taxonomy and strictest-wins
+  combination; consumer-domain result adoption remains owned by those domains.
+  `app/utils/validation/outcomes.py:64`
+- [X] `idempotency/` provides common key derivation, owner binding, TTL, and
+  reservation verdicts; each persistent consumer retains its own store.
+  `app/utils/idempotency/keys.py:16`
+- [X] `random_streams/` provides order-independent derivation, reproducible draws,
+  stream independence, and a recorded algorithm version.
+  `app/utils/random_streams/streams.py:48`
+- [X] Operational entity prefixes, `ProfileRef v1`, and `VersionRef v1` are
+  available and version mismatches fail closed.
+  `tests/utils/integration/test_contract_transport.py:17`
+- [X] Time domains, venue-local conversion, and monotonic sequence allocation are
+  available. `tests/utils/unit/test_time_domains.py:1`
+- [X] `EventEnvelope v1` construction, integrity hashing, duplicate detection, and
+  sequence-gap reporting are available.
+  `tests/utils/integration/test_operational_envelope_workflow.py:1`
+- [X] The append-only audit sink interface and failure surfacing are proven.
+  `tests/utils/unit/test_audit_sink.py:1`
+- [X] Error categories, retryability metadata, and `HealthState v1` are available,
+  with `UNKNOWN_STATE` non-retryable. `tests/utils/unit/test_health_state.py:1`
+- [X] Contract-mapping redaction runs before integrity hashing.
+  `tests/utils/unit/test_event_envelope.py:1`
+- [X] Numbered feature programs `01_contracts.py` through `14_random_streams.py`
+  execute directly, and `features.py` covers all fifteen features.
+  `tests/utils/integration/test_usage_scripts.py:22`
 - [X] `WF-UTL-008` has its standalone stage-labelled workflow program. `tests/utils/usage/workflows/wf_utl_008_operational_contract_envelope.py:1`
 - [X] `NFR-UTL-008`, `NFR-UTL-009`, and `NFR-UTL-010` have structural,
   cross-process determinism, and dependency evidence.
 - [X] Every new source file exceeds 80% branch-aware coverage individually. `tests/utils/unit/test_phase0_edge_cases.py:1`
 
-Current implementation status: `Completed — all fourteen Utils feature modules are
+Current implementation status: `Completed — all fifteen Utils feature modules are
 implemented, package-root exported, producer-side verified, and covered by one
 numbered usage program each`.
 
@@ -1367,8 +1408,28 @@ Data paths import Utils operations exclusively through `app.utils`.
 
 ### Full-domain pipeline (`tests/utils/usage/features/features.py`)
 
-The standalone program [`tests/utils/usage/features/features.py`](../../tests/utils/usage/features/features.py) ties all implemented Utils features (`FEAT-UTIL-00` through `FEAT-UTIL-13`) together into one homogeneous, realistic operational sequence:
-`Settings Bootstrap -> Logging Initialization -> Trace Identity & Clock -> Exact Units -> State Transition -> Validation Outcome -> Idempotent Reservation -> Seeded Draw -> Auth & Audit Contracts -> Payload Redaction -> Canonical Serialization & Digesting -> Error Normalization & Event Routing -> Standard Response Envelopes`. Run it directly with `uv run python tests/utils/usage/features/features.py`.
+The standalone program [`tests/utils/usage/features/features.py`](../../tests/utils/usage/features/features.py) ties every implemented Utils feature (`FEAT-UTIL-00` through `FEAT-UTIL-14`) into the complete wrapper lifecycle around one explicitly injected, domain-owned operation. Its canonical 18 stages are:
+
+1. Load and validate runtime settings.
+2. Configure redacting non-blocking logging.
+3. Generate and validate operation identifiers.
+4. Establish aware UTC time, sequencing, and freshness.
+5. Construct immutable authentication context.
+6. Convert inputs into JSON-safe primitives.
+7. Redact sensitive inputs.
+8. Construct exact unit-bearing values.
+9. Build and combine validation outcomes.
+10. Derive and reserve the idempotency key.
+11. Derive a deterministic random stream.
+12. Execute an injected domain-owned operation.
+13. Validate and record the resulting state transition.
+14. Redact, serialize, and digest the outcome.
+15. Construct audit and event envelopes.
+16. Construct success and normalized failure responses.
+17. Render and dispatch real non-production notifications.
+18. Emit completion telemetry, flush logging, and shut down.
+
+This full-domain evidence does not redefine `WF-UTL-PRI`: that workflow remains the focused structured-logging and redaction primary workflow. Stage 17 deliberately uses configured real non-production notification adapters and is therefore excluded from automated pytest execution. Run the full sequence directly with `uv run python tests/utils/usage/features/features.py` in an approved development environment.
 
 ### Shared context
 

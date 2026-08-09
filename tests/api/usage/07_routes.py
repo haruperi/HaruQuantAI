@@ -21,7 +21,7 @@ def main() -> None:
     contracts = get_canonical_route_contract_registry()
     declarations = {(item.method, item.path) for item in contracts.all()}
     assert operations == declarations
-    assert len(operations) == 71
+    assert len(operations) == 81
     assert ("POST", "/api/v1/simulation/run") in operations
     assert ("GET", "/api/v1/risk/kill-switch") in operations
     assert ("GET", "/api/v1/trading/session") in operations

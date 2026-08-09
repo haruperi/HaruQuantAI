@@ -228,6 +228,9 @@ export const useTradingStore = create<TradingStoreState>((set) => ({
     defaultTab: 'futures'
   },
 
+  // System Settings modal state (in-place popup; no navigation).
+  isSettingsOpen: false,
+
   // State Actions
   setMode: (mode) => set({ mode }),
   toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
@@ -499,6 +502,10 @@ export const useTradingStore = create<TradingStoreState>((set) => ({
     orderTicketProps: { ...state.orderTicketProps, ...props }
   })),
   closeOrderTicket: () => set({ isOrderTicketOpen: false }),
+
+  // System Settings Modal Controls
+  openSettings: () => set({ isSettingsOpen: true }),
+  closeSettings: () => set({ isSettingsOpen: false }),
 
   // Order Execution & Simulation Engine
   submitOrder: (orderData) => set((state) => {

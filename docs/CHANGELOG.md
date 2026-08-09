@@ -4,25 +4,35 @@
 
 ### Complete Analytics, Portfolio, and operational workstation capabilities
 
-Analytics, Portfolio, and UI/API now complete the final fourteen registered features, bringing the consolidated 204-feature registry to full completion.
+Analytics, Portfolio, UI/API, and Utils notifications bring the consolidated 205-feature registry to full completion.
 
-#### Added (4)
+#### Added (5)
 
 - Added immutable player journals, evidence-only behavioral and emergency-response analytics, and versioned qualification evaluation under `FEAT-ANLT-07` through `FEAT-ANLT-10` with additive Analytics migration `003_player_evidence_schema`.
 - Added Decimal valuation/P&L, margin and buying-power views, portfolio risk health, broker reconciliation, and balanced corporate-action/settlement postings under `FEAT-PORT-10` through `FEAT-PORT-12` with additive Portfolio migration `003_portfolio_operations_schema`.
 - Added the versioned operational workstation read model and optimistic command boundary under `FEAT-API-14`, including two authenticated HTTP operations and matching typed frontend transport.
 - Added accessible instrument, planning, workflow, emergency, alarm, training, replay, and qualification presentation capabilities under `FEAT-API-15` through `FEAT-API-20`.
+- Added `FEAT-UTIL-14`, a disabled-by-default unified Desktop, SMTP, Telegram, and Twilio notification service with operational templates and rate-limited orchestration.
 
-#### Changed (3)
+#### Changed (6)
 
-- Completed all 204 canonical `FEAT-*` registrations with no partial or missing features remaining.
+- Completed all 205 canonical `FEAT-*` registrations with no partial or missing features remaining.
 - Renumbered existing API frontend usage programs to `09` through `12`, reserving `14` through `20` for their owning feature evidence.
 - Replaced the retired programme terminology in package READMEs and evidence filenames with consolidated application feature terminology.
+- Replaced the repository JSON settings source with UI/API-owned versioned database settings, encrypted write-only credential slots, an administrator frontend, and a fail-closed one-time migration utility.
+- Added `WF-UTL-010` as current package-root evidence for surviving legacy main Utils operations, with removed and reassigned responsibilities explicitly excluded.
+- Replaced the abbreviated Utils aggregate usage sequence with the canonical 18-stage full-domain wrapper pipeline across all fifteen registered Utils features.
 
-#### Fixed (2)
+#### Fixed (8)
 
 - Made stream reconnection conditional on retryable transport errors so terminal and validation failures return immediately.
 - Rendered the Indicators capability count, resolving the strict frontend unused-state type-check failure.
+- Reconciled Utils verification evidence, restored its per-file coverage floor, moved real ZIP rollover IO to integration scope, and documented the completed `AuthContext v2` tenancy/profile split.
+- Preserved raw OpenAPI and documentation responses for Swagger rendering and classified unknown routes with the stable `NOT_FOUND` API envelope.
+- Reconciled frontend request identifiers with the canonical `req-<UUID4>` contract and rejected incompatible identifiers before authentication or persistence.
+- Reconciled current API specifications, tests, and usage evidence to the authoritative 81-operation backend/frontend route inventory.
+- Restored isolated API lifecycle tests by stubbing post-migration database-backed runtime settings alongside mocked migration success.
+- Routed canonical secret-safe API request telemetry to both the general application log and specialized access log.
 
 ### Complete Simulator mission and recovery capabilities
 

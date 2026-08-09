@@ -232,8 +232,7 @@ DOMAINS: tuple[Domain, ...] = (
     ),
     Domain("13", "agentic", "Agentic", "app/agentic", "tests/agentic", "python"),
     Domain("14", "api", "UI-API", "app/services/api", "tests/api", "python"),
-    Domain("15", "configs", "Configs", "app/configs", None, "config"),
-    Domain("16", "ui", "UI", "app/ui", None, "frontend"),
+    Domain("15", "ui", "UI", "app/ui", None, "frontend"),
 )
 
 

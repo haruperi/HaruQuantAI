@@ -201,9 +201,9 @@ invariant rather than outstanding scope.
 | Completed | `FEAT-API-04` Liveness and Readiness | `health/` | `get_liveness`, `get_readiness`, `check_clock_drift` | `FR-API-018`-`FR-API-019`, `FR-API-059` | `tests/api/usage/04_health.py` |
 | Completed | `FEAT-API-05` Operational Telemetry and Exposition | `observability/` | `record_metric`, `validate_metric_labels`, `build_metric_snapshot`, `export_prometheus_metrics`, `get_metrics`, `create_in_process_metric_sink` | `FR-API-060`â€“`FR-API-063` | `tests/api/usage/05_observability.py` |
 | Completed | `FEAT-API-06` Ordered Event Delivery | `streams/` | `normalize_stream_event`, `create_stream_manager` through the package root | `FR-API-020`–`FR-API-021` | `tests/api/usage/06_streams.py`; `tests/api/unit/test_streams.py` |
-| Completed | `FEAT-API-07` Thin HTTP Boundaries | `routes/` | Exactly 78 backend-v1 operations, including completed-run journal playback, live resumable what-if sessions, and Portfolio definition registration/read | `FR-API-022`–`FR-API-034`, `FR-API-056`, `FR-API-068`–`FR-API-072` | `tests/api/usage/07_routes.py`; `tests/api/unit/test_route_catalog.py`; `tests/api/contracts/test_openapi_contract.py`; `tests/api/unit/test_simulation_sessions_route.py`; `tests/api/unit/test_simulation_live_routes.py` |
+| Completed | `FEAT-API-07` Thin HTTP Boundaries | `routes/` | Exactly 81 backend-v1 operations, including completed-run journal playback, live resumable what-if sessions, Portfolio definition registration/read, and administrator-managed system settings | `FR-API-022`–`FR-API-034`, `FR-API-056`, `FR-API-068`–`FR-API-072` | `tests/api/usage/07_routes.py`; `tests/api/unit/test_route_catalog.py`; `tests/api/contracts/test_openapi_contract.py`; `tests/api/unit/test_simulation_sessions_route.py`; `tests/api/unit/test_simulation_live_routes.py` |
 | Completed | `FEAT-API-08` Canonical Application Lifecycle | `composition/` | `create_api_app`, dependency-bundle builders, exact twelve-provider graph, and canonical `app.services.api.composition.application:app` | `FR-API-035`–`FR-API-037`, `FR-API-058` | `tests/api/usage/08_composition.py`; `tests/api/unit/test_application.py`; `tests/api/unit/test_in_process_composition.py` |
-| Completed | `FEAT-API-09` Typed Frontend Transport | `ui/clients/` | `request`, `unwrapData`, `ApiClientError`, `openStream`, `apiClients` (18 focused clients covering all 78 operations) | `FR-API-038`–`FR-API-041` | `tests/api/usage/09_frontend_clients.ts`; `app/ui/src/clients/request.test.ts`; `app/ui/src/clients/clients.test.ts`; `app/ui/src/clients/clients.contract.test.ts` |
+| Completed | `FEAT-API-09` Typed Frontend Transport | `ui/clients/` | `request`, `unwrapData`, `ApiClientError`, `openStream`, `apiClients` (18 focused clients covering all 81 operations) | `FR-API-038`–`FR-API-041` | `tests/api/usage/09_frontend_clients.ts`; `app/ui/src/clients/request.test.ts`; `app/ui/src/clients/clients.test.ts`; `app/ui/src/clients/clients.contract.test.ts` |
 | Completed | `FEAT-API-10` Frontend Session and Page Context | `ui/context/` | `AuthProvider`, `useAuth`, `PageContextProvider`, `usePageContext`, `buildGovernedOptions`, `isGovernedFresh`, `consumeStream`, `StreamGapError`, `PageContextError`, `GovernedPreflightError` | `FR-API-042`–`FR-API-045` | `tests/api/usage/10_frontend_context.tsx`; `app/ui/src/context/{auth,page,governed,streams}.test.ts(x)` |
 | Completed | `FEAT-API-11` Workflow Presentation Components | `ui/components/workflow/` | `AppShell`, `DashboardView`, `StrategyWorkspace`, `SimulationView`, `RiskView`, `TradingView`, `ResearchWorkspace`, `PlaybackView` | `FR-API-046`–`FR-API-051` | `tests/api/usage/11_frontend_components.tsx`; `app/ui/src/components/workflow/*.test.tsx` |
 | Completed | `FEAT-API-12` Protected Workflow Pages | `ui/app/` | `AuthenticationPage` (at `/login`), `ProtectedLayout`, `WorkflowPage` | `FR-API-053`–`FR-API-055` | `tests/api/usage/12_frontend_pages.tsx`; `app/ui/src/app/{authentication-page,protected-layout,pages.contract}.test.tsx` |
@@ -234,7 +234,7 @@ invariant rather than outstanding scope.
 
 The owner selected Path 1: backend v1 exposes only capabilities that the canonical
 in-process application can compose and execute from existing package-root owner APIs.
-The public surface is exactly 78 HTTP operations. Simulation contributes its existing
+The public surface is exactly 81 HTTP operations across 76 unique paths. Simulation contributes its existing
 synchronous run/result routes, two completed-run journal playback operations, and five
 live what-if session operations; Optimization, Portfolio, and Agentic operations are
 composed where their current route contracts declare them. Only the duplicate
@@ -280,7 +280,7 @@ graph-owned resources in reverse acquisition order. Evidence:
 `app/services/api/composition/lifecycle.py:50`,
 `tests/api/integration/test_in_process_boundary.py:31`.
 
-The same audit completed canonical non-stream JSON envelope enforcement, including
+The same audit completed canonical application JSON envelope enforcement, including
 middleware-generated authentication, authorization, validation, rate-limit, and
 dependency errors. HTTP 204 remains bodyless and repeated `Set-Cookie` headers are
 preserved. Evidence: `app/services/api/middleware/envelope.py`,
@@ -634,6 +634,8 @@ below describe responsibilities; only symbols registered in Section 4 are public
 
 #### `WF-API-TER` — Authentication, Settings, and Credential Composition
 
+Global non-secret settings are manifest-validated and versioned in `api_settings`; approved provider credentials are AES-GCM encrypted in `api_credentials` and exposed to administrators only as write-only configured status. The frontend administrator surface is `/workstation/settings`. Updates require optimistic locking and activate after controlled restart. Environment/runtime safety, database location, API bind/origins, JWT signing material, and credential-encryption keys remain externally provisioned because they are required before the database can safely open or decrypt itself.
+
 1. Validate submitted credentials against API-owned account state —
    `api.verify_api_password()`.
 2. Issue the validated typed principal; no fallback identity exists —
@@ -745,7 +747,7 @@ without importing any business domain.
 |---|---|---|---|---|---|---|
 | Completed | `FR-API-001` | Carry request/trace, route, operation, side-effect, timing, timestamp, stale, pagination, and idempotency-replay metadata. | `ApiMetadata(BaseModel)` | None | `ValidationError`: invalid or missing required metadata | **Usage:** `tests/api/usage/01_contracts.py::fr_api_001()`<br>**Unit:** `tests/api/contracts/test_contract_models.py` |
 | Completed | `FR-API-002` | Expose a bounded redacted error with deterministic code, message, details, request/trace IDs, and retryability. | `ApiError(BaseModel)` | None | `ValidationError`: unbounded or invalid error data | **Usage:** `tests/api/usage/01_contracts.py::fr_api_002()`<br>**Unit:** `tests/api/contracts/test_contract_models.py` |
-| Completed | `FR-API-003` | Return exactly `status`, `message`, `data`, `error`, and `metadata` for non-streaming responses; HTTP 204 has no body. | `ApiResponse[T](BaseModel)` | None | `ValidationError`: success/error fields conflict | **Usage:** `tests/api/usage/01_contracts.py::fr_api_003()`<br>**Unit:** `tests/api/contracts/test_contract_models.py` |
+| Completed | `FR-API-003` | Return exactly `status`, `message`, `data`, `error`, and `metadata` for non-streaming application responses; HTTP 204 has no body, framework OpenAPI/documentation endpoints remain raw, and unknown paths return `NOT_FOUND`. | `ApiResponse[T](BaseModel)` | None | `ValidationError`: success/error fields conflict | **Usage:** `tests/api/usage/01_contracts.py::fr_api_003()`<br>**Unit:** `tests/api/contracts/test_contract_models.py`, `tests/api/unit/test_application.py` |
 | Completed | `FR-API-004` | Validate ordered stream events with type, data, request/trace IDs, sequence, UTC timestamp, heartbeat, and terminal error. | `StreamEvent[T](BaseModel)` | None | `ValidationError`: invalid sequence or event shape | **Usage:** `tests/api/usage/01_contracts.py::fr_api_004()`<br>**Unit:** `tests/api/contracts/test_contract_models.py` |
 | Completed | `FR-API-005` | Declare classification, stability, method/path, auth, permission, schemas, status/errors, side effects, owner, pagination, idempotency, audit, rate class, and observability for each route/stream. | `RouteContract(BaseModel)` | None | `ValidationError`: required route metadata is absent | **Usage:** `tests/api/usage/01_contracts.py::fr_api_005()`<br>**Unit:** `tests/api/contracts/test_contract_catalog.py` |
 | Completed | `FR-API-006` | Carry validated request, workflow, permission, approval, audit, idempotency, and safety context without granting authority itself. | `GovernedRequestContext(BaseModel)` | None | `ValidationError`: governed context is incomplete | **Usage:** `tests/api/usage/01_contracts.py::fr_api_006()`<br>**Unit:** `tests/api/contracts/test_contract_models.py` |
@@ -847,8 +849,8 @@ chat identity, or caller-controlled operator headers.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-API-016` | Redact secrets before any log/trace/metric emission and log only allowlisted method, route, identifiers, status, duration, and error code. | `SecretRedactionMiddleware` | Log publication | `TelemetryError`: safe telemetry cannot be emitted where required | **Usage:** `tests/api/usage/03_middlewares.py::fr_api_016()`<br>**Unit:** `tests/api/unit/middleware/test_redaction.py::test_tokens_never_logged()` |
-| Completed | `FR-API-017` | Create/validate request and correlation IDs, classify registered route intent, authenticate where required, and attach canonical context. | `RequestContextMiddleware` | Local state mutation | `AuthenticationError`: protected request lacks valid authority; `ValidationError`: invalid identifiers | **Usage:** `tests/api/usage/03_middlewares.py::fr_api_017()`<br>**Unit:** `tests/api/unit/test_context.py::test_unknown_route_has_bounded_metadata()` |
+| Completed | `FR-API-016` | Redact secrets before any log/trace/metric emission and log only allowlisted method, route, identifiers, status, duration, and error code. Canonical HTTP telemetry is classified as access traffic and written to both the general application log and specialized access log. | `SecretRedactionMiddleware` | Log publication | `TelemetryError`: safe telemetry cannot be emitted where required | **Usage:** `tests/api/usage/03_middlewares.py::fr_api_016()`<br>**Unit:** `tests/api/unit/middleware/test_redaction.py::test_tokens_never_logged()`<br>**Integration:** `tests/api/integration/test_access_logging.py::test_api_request_reaches_general_and_access_logs()` |
+| Completed | `FR-API-017` | Create/validate request and correlation IDs, reject non-canonical client request IDs before authentication or persistence, classify registered route intent, authenticate where required, and attach canonical context. Request IDs use `req-<UUID4>`. | `RequestContextMiddleware` | Local state mutation | `AuthenticationError`: protected request lacks valid authority; `ValidationError`: invalid identifiers | **Usage:** `tests/api/usage/03_middlewares.py::fr_api_017()`<br>**Unit:** `tests/api/unit/middleware/test_context.py::test_obsolete_request_id_is_rejected_before_authentication()` |
 
 **Configuration and Limits Manifest:** None. The module consumes shared redaction and
 trace policy from Utils and route metadata from `contracts/`.
@@ -1060,7 +1062,7 @@ declared by the Data owner, not route-locally. Live what-if sessions are bounded
 Simulator: at most 16 concurrent sessions, a 1800-second idle expiry, and at most 10,000
 ticks per step, refused at the route contract rather than at the engine.
 
-**Implementation notes:** backend v1 registers exactly 78 operations. Playback uses raw
+**Implementation notes:** backend v1 registers exactly 81 operations. Playback uses raw
 causative journal events (Option A); per-event equity reconstruction requires a
 separately approved enhancement. Live what-if results are advisory rather than recorded
 runs, and branching replays parent inputs on an independent engine so the parent is
@@ -1125,16 +1127,16 @@ feature folders. Required imports and required storage initialization never fail
 | Status | File group | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `contracts.ts` | Zod schemas + inferred types mirroring `ApiResponse/ApiError/ApiMetadata` and the 21 stable error codes | `apiResponseSchema`, `apiMetadataSchema`, `apiErrorSchema`, `apiErrorCode`, `isApiSuccessResponse` | **Standard library:** None<br>**Required third-party:** `zod@^3.23.8`<br>**Local:** None |
-| Completed | `routes.ts` | Frozen typed `RouteContract` definitions for all 78 registered operations, plus the drift-test count | `ROUTE_CONTRACTS`, `ROUTE_CONTRACT_COUNT`, `ROUTE_CONTRACTS_BY_ID`, per-family route groups | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `contracts.ts` |
+| Completed | `routes.ts` | Frozen typed `RouteContract` definitions for all 81 registered operations, plus the drift-test count | `ROUTE_CONTRACTS`, `ROUTE_CONTRACT_COUNT`, `ROUTE_CONTRACTS_BY_ID`, per-family route groups | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `contracts.ts` |
 | Completed | `request.ts` | One transport primitive, typed errors, safe retry, stale metadata, governed options | `request`, `unwrapData`, `ApiClientError`, `resolveBaseUrl` | **Standard library:** browser `fetch` API, `crypto`, `URLSearchParams`<br>**Required third-party:** `zod@^3.23.8`<br>**Local:** `contracts.ts`, `routes.ts` |
 | Completed | Focused domain client files (`auth`, `health`, `settings`, `data`, `strategies`, `research`, `dashboards`, `operator`, `metrics`, `simulation`, `simulationSessions`, `risk`, `trading`, `portfolio`, `optimization`, `agentic`) plus `index.ts` | Map approved route groups to typed operations while exporting one catalog | `apiClients` | **Standard library:** None<br>**Required third-party:** `zod@^3.23.8`<br>**Local:** `request.ts`, `routes.ts` |
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-API-038` | Send typed requests with configured base URL, approved auth transport, request/trace IDs, safe JSON/204 parsing, contract validation, one opt-in transient GET retry, and stale metadata. | `request<T>(contract: RouteContract, options: RequestOptions) => Promise<ApiResponse<T>>` | External API call; telemetry | `ApiClientError`: typed HTTP/contract/transport failure | **Usage:** `tests/api/usage/09_frontend_clients.ts::testUsageRequest()`<br>**Unit:** `app/ui/src/clients/request.test.ts` |
+| Completed | `FR-API-038` | Send typed requests with configured base URL, approved auth transport, canonical `req-<UUID4>` request IDs, trace IDs, safe JSON/204 parsing, contract validation, one opt-in transient GET retry, and stale metadata. | `request<T>(contract: RouteContract, options: RequestOptions) => Promise<ApiResponse<T>>` | External API call; telemetry | `ApiClientError`: typed HTTP/contract/transport failure | **Usage:** `tests/api/usage/09_frontend_clients.ts::testUsageRequest()`<br>**Unit:** `app/ui/src/clients/request.test.ts` |
 | Completed | `FR-API-039` | Expose only `data` from a successful envelope without creating another transport stack. | `unwrapData<T>(response: ApiResponse<T>) => T` | None | `ApiClientError`: response is not successful | **Usage:** `tests/api/usage/09_frontend_clients.ts::testUsageUnwrapData()`<br>**Unit:** `app/ui/src/clients/request.test.ts` |
 | Completed | `FR-API-040` | Carry status, code, request/trace IDs, retryability, and bounded details for frontend failures. | `ApiClientError extends Error` | None | None | **Usage:** `tests/api/usage/09_frontend_clients.ts::testUsageApiClientError()`<br>**Unit:** `app/ui/src/clients/request.test.ts` |
-| Completed | `FR-API-041` | Provide one catalog containing typed clients for all 78 registered operations across auth, health, settings, data, Strategy, Research, dashboards, operator, metrics, Simulation, playback, Risk, Trading, Portfolio, Optimization, and Agentic. | `apiClients: ApiClients` | External API call | `ApiClientError`: route contract fails | **Usage:** `tests/api/usage/09_frontend_clients.ts::testUsageFocusedClients()`<br>**Unit:** `app/ui/src/clients/clients.contract.test.ts`; `app/ui/src/clients/clients.test.ts` |
+| Completed | `FR-API-041` | Provide one catalog containing typed clients for all 81 registered operations across auth, health, settings, data, Strategy, Research, dashboards, operator, metrics, Simulation, playback, Risk, Trading, Portfolio, Optimization, and Agentic. | `apiClients: ApiClients` | External API call | `ApiClientError`: route contract fails | **Usage:** `tests/api/usage/09_frontend_clients.ts::testUsageFocusedClients()`<br>**Unit:** `app/ui/src/clients/clients.contract.test.ts`; `app/ui/src/clients/clients.test.ts` |
 
 **Configuration and Limits Manifest**
 
@@ -1613,7 +1615,7 @@ because they are required before it can be reached.
 | Completed | `NFR-API-001` | Architecture | UI/API shall import only documented public cross-domain APIs, contain no domain calculations, and confine broker access to credential-safe composition. | Package-root import, persistence-layout, and exact-provider graph tests. |
 | Completed | `NFR-API-002` | Security | Protected endpoints require validated user/service context; governed writes require permission, audit, idempotency, fresh evidence, and approval when applicable. | `tests/api/nfr/test_nfr_002_security.py` |
 | Completed | `NFR-API-003` | Safety | Live/paper mutations cannot bypass Trading/Risk live flags, broker readiness, reconciliation, idempotency, audit, or kill-switch gates. Live is reachable only when the request names the deployment's configured `execution_route` **and** `allow_live_mutations` is set **and** a live `BrokerConnectionConfig` is composed; the boundary adds no live-only route, so there is one execution path to audit rather than two. | `tests/api/nfr/test_nfr_003_safety.py`; `tests/api/unit/test_trading_routes.py::test_live_execution_requires_explicit_enablement`; `tests/api/contracts/test_route_absence.py::test_no_separate_live_execution_surface_exists` |
-| Completed | `NFR-API-004` | Contracts | Non-stream responses use `ApiResponse`; streams use `StreamEvent`; API/UI drift fails CI. | Backend OpenAPI digest and operation inventory are frozen at 78 operations; the frontend declares the same 76 contracts and the drift test asserts id/method/path/permission parity (`app/ui/src/clients/clients.contract.test.ts`). |
+| Completed | `NFR-API-004` | Contracts | Non-stream responses use `ApiResponse`; streams use `StreamEvent`; API/UI drift fails CI. | Backend OpenAPI digest and operation inventory are frozen at 81 operations; the frontend declares the same 81 contracts and the drift test asserts id/method/path/permission parity (`app/ui/src/clients/clients.contract.test.ts`). |
 | Completed | `NFR-API-005` | Security | Logs, errors, traces, telemetry, examples, and screenshots contain no tokens, credentials, passwords, CSRF values, raw secrets, or private broker data. | `tests/api/nfr/test_nfr_005_redaction.py` |
 | Completed | `NFR-API-006` | Reliability | Required-route/dependency failures block startup/readiness; only explicitly optional routes degrade with a visible reason. | `tests/api/nfr/test_nfr_006_startup.py` |
 | Completed | `NFR-API-007` | Streaming | Disconnect stops delivery, releases resources, preserves authoritative owner state, and emits no later client events. | `tests/api/nfr/test_nfr_007_streaming.py` |
@@ -1624,7 +1626,7 @@ because they are required before it can be reached.
 | Completed | `NFR-API-012` | Timeouts | Non-stream endpoints complete or return a structured timeout within 30 seconds; no initial Simulation/Optimization async contract exists. | `tests/api/unit/middleware/test_policies.py:31` |
 | Completed | `NFR-API-013` | Resilience | Only opt-in idempotent reads retry once for classified transient failures; governed writes and unknown broker outcomes never retry blindly. | `tests/api/nfr/test_nfr_013_resilience.py` |
 | Completed | `NFR-API-014` | Imports | External dataset import is exposed as one governed write plus one dialect read, both delegating to Data's own parser, validator, and storage. The gateway never reads the source file and never selects a dialect. | `tests/api/unit/test_data_routes.py` |
-| Completed | `NFR-API-016` | Testing | Every public symbol has one usage example and unit test; every collaborative workflow has an integration test; coverage is at least 80%. | API-domain coverage is 82.19% (`pytest -o addopts='' tests/api --cov=app/services/api --cov-branch --cov-fail-under=80` passes with 236 tests); 17 numbered usage programs, 8 NFR suites, unit/integration/contract/absence tests across `tests/api/`. The frontend suite runs under `vitest`: 109 tests across 20 files, including the 71-contract drift test. |
+| Completed | `NFR-API-016` | Testing | Every public symbol has one usage example and unit test; every collaborative workflow has an integration test; coverage is at least 80%. | API-domain coverage is 82.19% (`pytest -o addopts='' tests/api --cov=app/services/api --cov-branch --cov-fail-under=80` passes with 236 tests); 17 numbered usage programs, 8 NFR suites, unit/integration/contract/absence tests across `tests/api/`. The frontend suite runs under `vitest`: 127 tests across 32 files, including the 81-contract drift test. |
 | Completed | `NFR-API-017` | Quality | Backend and frontend build, lint, format, type, contract, security, and targeted tests are runnable in CI. | `.github/workflows/ci.yml` runs `scripts/ci_check.py` (ruff format, ruff check, mypy, pytest) on every push/PR; frontend runs `tsc`, `vitest`, `next lint`, `next build`. |
 | Completed | `NFR-API-018` | Determinism | Contract registration, route ordering, cursor ordering, and idempotency conflict behavior are deterministic. | `tests/api/nfr/test_nfr_018_determinism.py` (registry order, size, OpenAPI paths + operation inventory deterministic across builds) |
 
@@ -1725,15 +1727,15 @@ created. During iterative work, run only tests associated with changed files.
 - [x] Every owned and consumed contract is version-compatible with its owner/consumer.
 - [x] UI/API owns no undocumented durable state and writes no other domain's state.
 - [x] Every route contract is registered and every frontend client maps to one
-  (78 backend operations, 78 frontend contracts, drift-tested both ways).
+  (81 backend operations, 81 frontend contracts, drift-tested both ways).
 - [x] All unit, integration, contract, usage, accessibility, security, and quality
   checks pass with at least 80% backend coverage (236 passed, 82.19% branch coverage;
   `ruff`, `ruff format`, and `mypy` clean across 78 source files; 225 Simulator tests
-  pass; frontend `vitest` includes the 78-contract
+  pass; frontend `vitest` includes the 81-contract
   drift test).
 - [x] No unresolved decision affects completed behavior.
 
-Current implementation status: `Completed` for backend v1 at 78 operations with matching
+Current implementation status: `Completed` for backend v1 at 81 operations with matching
 frontend parity, and no remaining capability gap. Every requirement, workflow, feature,
 and capability row is closed; nothing is `Partial`, `Missing`, or `Excluded`.
 

@@ -95,13 +95,17 @@ __all__ = (
     "finalize_api_idempotency_key",
     "get_api_settings",
     "get_canonical_route_contract_registry",
+    "get_credential_manifest",
     "get_critical_alert_error_type",
+    "get_legacy_settings_classification",
     "get_liveness",
     "get_metrics",
     "get_readiness",
     "get_required_in_process_provider_names",
     "get_route_contract_registry",
+    "get_system_credential_statuses",
     "get_system_settings",
+    "get_system_settings_manifest",
     "get_user_settings",
     "hash_api_password",
     "normalize_stream_event",
@@ -112,9 +116,11 @@ __all__ = (
     "require_api_permission",
     "reserve_api_idempotency_key",
     "resolve_api_credential_reference",
+    "resolve_system_credential_slot",
     "revoke_api_session",
     "run_api_migrations",
     "store_api_credential",
+    "store_system_credential",
     "update_system_settings",
     "update_user_settings",
     "validate_api_csrf",
@@ -756,6 +762,76 @@ def resolve_api_credential_reference(reference: str, **values: object) -> object
     )
 
 
+def resolve_system_credential_slot(slot: str, *, request_id: str) -> object:
+    """Resolve one system credential slot for immediate in-process composition.
+
+    Args:
+        slot: Manifest-approved system credential slot.
+        request_id: Canonical request identifier.
+
+    Returns:
+        In-memory secret values for immediate use by an authorized composition.
+
+    Raises:
+        ValueError: If bootstrap encryption-key configuration is unavailable.
+        IdentityError: If the credential is unavailable or cannot be verified.
+    """
+    from app.services.api.composition.runtime_settings import build_credential_key_set
+    from app.services.api.identity import resolve_credential_reference
+    from app.utils import derive_stable_id
+
+    reference_id = derive_stable_id("id", f"api-credential:system:{slot}")
+    return resolve_credential_reference(
+        f"secret://{reference_id}",
+        owner_id="system",
+        key_set=build_credential_key_set(get_api_settings()),
+        request_id=request_id,
+    )
+
+
+def get_credential_manifest() -> object:
+    """Return secret-free credential-slot definitions.
+
+    Returns:
+        Ordered credential manifest mappings.
+    """
+    from app.services.api.identity import get_credential_manifest as _get_manifest
+
+    return _get_manifest()
+
+
+def get_system_credential_statuses(**values: object) -> object:
+    """Return secret-free status for system credential slots.
+
+    Returns:
+        Ordered credential status mappings.
+    """
+    from app.services.api.identity import (
+        get_system_credential_statuses as _get_statuses,
+    )
+
+    return _get_statuses(**cast("Any", values))
+
+
+def store_system_credential(
+    slot: str,
+    material: Mapping[str, str],
+    **values: object,
+) -> object:
+    """Validate, encrypt, and persist one system credential slot.
+
+    Returns:
+        Secret-free credential metadata.
+    """
+    from app.services.api.identity import store_system_credential as _store_credential
+
+    return _store_credential(
+        slot,
+        material,
+        **cast("Any", values),
+    )
+
+
 def build_broker_connection_config(**values: object) -> object:
     """Resolve credentials and construct a Brokers-owned connection config.
 
@@ -789,6 +865,30 @@ def get_system_settings(**values: object) -> object:
     from app.services.api.identity import get_system_settings as _get_system_settings
 
     return _get_system_settings(**cast("Any", values))
+
+
+def get_system_settings_manifest() -> object:
+    """Return secret-free system-settings field definitions.
+
+    Returns:
+        Ordered system-settings manifest mappings.
+    """
+    from app.services.api.identity import get_system_settings_manifest as _get_manifest
+
+    return _get_manifest()
+
+
+def get_legacy_settings_classification() -> object:
+    """Return the exhaustive legacy-file migration classification.
+
+    Returns:
+        Source paths classified as system, credential, or external bootstrap.
+    """
+    from app.services.api.identity import (
+        get_legacy_settings_classification as _get_classification,
+    )
+
+    return _get_classification()
 
 
 def update_user_settings(

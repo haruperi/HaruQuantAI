@@ -18,7 +18,7 @@ from app.services.api.contracts.catalog import (
     ROUTE_CONTRACT_REGISTRY,
     RouteContractRegistry,
 )
-from app.utils import generate_id, get_auth_context_type, utc_now
+from app.utils import generate_id, get_auth_context_type, utc_now, validate_id
 
 if TYPE_CHECKING:
     from app.services.api.contracts.models import RouteContract
@@ -80,10 +80,20 @@ def _build_request_id(value: str | None = None) -> str:
 
     Returns:
         The validated, bounded result.
+
+    Raises:
+        HTTPException: If a caller-supplied request identifier is invalid.
     """
     if value is None:
         return generate_id("req")
-    return _normalize_identifier(value)
+    normalized = _normalize_identifier(value)
+    try:
+        return validate_id(normalized, expected_prefix="req")
+    except Exception as error:
+        raise HTTPException(
+            status_code=400,
+            detail=_VALIDATION_ERROR_CODE,
+        ) from error
 
 
 def _build_correlation_id(value: str | None = None) -> str:
@@ -179,12 +189,18 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         Returns:
             The validated, bounded result.
         """
-        request_id = _build_request_id(
-            request.headers.get(self._request_id_header),
-        )
-        correlation_id = _build_correlation_id(
-            request.headers.get(self._correlation_id_header),
-        )
+        try:
+            request_id = _build_request_id(
+                request.headers.get(self._request_id_header),
+            )
+            correlation_id = _build_correlation_id(
+                request.headers.get(self._correlation_id_header),
+            )
+        except HTTPException as error:
+            return JSONResponse(
+                content={"detail": error.detail},
+                status_code=error.status_code,
+            )
         path = _normalize_path(request.url.path)
         method = request.method.upper()
         route_contract = _resolve_route_contract(

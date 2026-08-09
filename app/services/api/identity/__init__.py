@@ -19,8 +19,10 @@ from app.services.api.identity.authorization import (
 )
 from app.services.api.identity.credentials import (
     CredentialRecord,
+    get_system_credential_statuses,
     resolve_credential_reference,
     store_credential,
+    store_system_credential,
 )
 from app.services.api.identity.errors import IdentityError
 from app.services.api.identity.idempotency import (
@@ -47,6 +49,13 @@ from app.services.api.identity.settings import (
     update_system_settings,
     update_user_settings,
 )
+from app.services.api.identity.system_settings import (
+    get_credential_manifest,
+    get_legacy_settings_classification,
+    get_system_settings_manifest,
+    validate_credential_material,
+    validate_system_settings,
+)
 from app.services.api.migrations import (
     get_api_migration_steps,
     run_api_migrations,
@@ -68,7 +77,12 @@ __all__ = (
     "create_session",
     "finalize_idempotency_key",
     "get_api_migration_steps",
+    "get_credential_manifest",
+    "get_legacy_settings_classification",
+    "get_legacy_settings_classification",
+    "get_system_credential_statuses",
     "get_system_settings",
+    "get_system_settings_manifest",
     "get_user_settings",
     "hash_password",
     "recover_session_identity",
@@ -83,10 +97,13 @@ __all__ = (
     "run_idempotent_write",
     "run_idempotent_write_async",
     "store_credential",
+    "store_system_credential",
     "update_system_settings",
     "update_user_settings",
+    "validate_credential_material",
     "validate_csrf",
     "validate_governed_request",
     "validate_session",
+    "validate_system_settings",
     "verify_password",
 )

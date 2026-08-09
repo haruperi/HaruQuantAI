@@ -33,6 +33,7 @@ from app.services.api.composition.owner_sources import (
 )
 from app.services.api.composition.portfolio_dependencies import build_portfolio_source
 from app.services.api.composition.risk_dependencies import build_risk_command_source
+from app.services.api.composition.runtime_settings import build_credential_key_set
 from app.services.api.composition.simulation_dependencies import (
     build_simulation_run_source,
     build_simulation_session_source,
@@ -309,6 +310,8 @@ def create_app(
         lifespan=lifespan,
     )
     application.state.api_settings = settings
+    application.state.api_credential_key_set = build_credential_key_set(settings)
+    application.state.api_active_credential_key_id = settings.active_credential_key_id
     application.state.api_route_contract_registry = route_contracts
     application.state.api_stream_connection_manager = create_stream_connection_manager(
         max_connections_per_actor=settings.stream_max_connections_per_actor,

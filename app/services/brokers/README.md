@@ -473,7 +473,7 @@ Broker credential resolution and standalone connection are owned by Brokers.
 `resolve_provider_connection_config(broker_id, *, settings=None, ...)` resolves a
 governed non-production `BrokerConnectionConfig` from the public
 opaque settings value returned by `load_broker_provider_settings` (read from
-`app/configs/env.json` via the Utils settings layer); it rejects disabled
+database-backed composition via the Utils settings layer); it rejects disabled
 providers, missing credentials, and any live environment before an adapter is
 built. `create_connected_broker(broker_id, *, settings=None, connect=True)` builds
 and (by default) connects that adapter, so cross-domain callers (the Data

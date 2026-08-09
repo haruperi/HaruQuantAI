@@ -50,7 +50,11 @@ class _BodyIteratorResponse(Protocol):
 
 def _default_emitter(event: TelemetryEvent) -> None:
     """Emit one bounded telemetry event through the shared logger."""
-    log_info(_LOGGER, "api.request_telemetry", context=event)
+    log_info(
+        _LOGGER,
+        "api.request_telemetry",
+        context={**event, "log_type": "access"},
+    )
 
 
 def _read_context(request: Request) -> Mapping[str, object]:

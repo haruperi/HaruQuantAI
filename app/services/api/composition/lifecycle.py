@@ -7,6 +7,9 @@ from typing import Any, Protocol, cast
 from fastapi import FastAPI
 
 from app.services.analytics import run_analytics_migrations
+from app.services.api.composition.runtime_settings import (
+    load_runtime_settings_snapshot,
+)
 from app.services.api.identity import run_api_migrations
 from app.services.data import build_data_settings, data_settings_context
 from app.services.indicators import run_indicators_migrations
@@ -52,6 +55,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
         if result.status != "success" or result.data is None:
             app.state.api_ready = False
             raise StartupError("API_STORAGE_INITIALIZATION_FAILED")
+        app.state.api_runtime_settings = load_runtime_settings_snapshot(
+            request_id=generate_id("req")
+        )
         indicators_result = cast(
             "_MigrationResponse",
             run_indicators_migrations(generate_id("req")),

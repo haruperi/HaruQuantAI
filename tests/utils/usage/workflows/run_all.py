@@ -16,6 +16,8 @@ WORKFLOWS = (
     "wf_utl_006_trace_identity_and_utc_time.py",
     "wf_utl_007_canonical_serialization_and_digest.py",
     "wf_utl_008_operational_contract_envelope.py",
+    "wf_utl_009_notification_orchestration.py",
+    "wf_utl_010_main_operations.py",
 )
 
 

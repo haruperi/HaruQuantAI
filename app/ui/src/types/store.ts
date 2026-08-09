@@ -32,6 +32,8 @@ export interface TradingStoreState {
   tradeLog: TradeLogEntry[];
   isOrderTicketOpen: boolean;
   orderTicketProps: OrderTicketProps;
+  // System Settings modal open state (in-place popup, no route change).
+  isSettingsOpen: boolean;
 
   // preferences
   setMode: (mode: "practice" | "challenge") => void;
@@ -61,6 +63,10 @@ export interface TradingStoreState {
   // order ticket
   openOrderTicket: (props?: Partial<OrderTicketProps>) => void;
   closeOrderTicket: () => void;
+
+  // system settings modal
+  openSettings: () => void;
+  closeSettings: () => void;
 
   // trading engine
   submitOrder: (orderData: SubmitOrderInput) => void;

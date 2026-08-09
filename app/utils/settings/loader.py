@@ -246,14 +246,19 @@ def load_settings(
         raise ConfigurationError("CONFIGURATION_INVALID") from None
 
 
-def load_broker_provider_settings() -> object:
+def load_broker_provider_settings(
+    explicit_values: Mapping[str, object] | None = None,
+) -> object:
     """Load validated broker-provider settings as an opaque value.
 
     The concrete settings model remains internal to Utils. Brokers receives the
     validated object and owns all interpretation of provider credentials and
     environments.
 
+    Args:
+        explicit_values: Values injected by an approved composition root.
+
     Returns:
         An immutable, secret-redacting broker-provider settings value.
     """
-    return BrokerProviderSettings()
+    return BrokerProviderSettings.model_validate(dict(explicit_values or {}))

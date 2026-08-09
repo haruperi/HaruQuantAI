@@ -515,7 +515,7 @@ versions fail closed, and random draws depend only on explicit seed, stream name
 algorithm version, and draw index.
 
 * **Public Export Rule**: `app/utils/__init__.py` exposes only the approved shared surface through an explicit `__all__`. No fallback imports, shims, duplicate modules, or single-consumer helpers are permitted.
-* **Target Submodule Footprint**: shared `AuthContext`, `AuditEvent`, and `StandardResponse[T]` contracts; shared base errors, immutable error definitions, catalogue validation, injected error routing, identity/trace IDs, UTC and monotonic duration handling, canonical serialization, redaction, centralized typed runtime settings, and structured logging with immutable bound context, explicit app/access/debug/error routing, compressed bounded rotation, queued delivery, and deterministic shutdown. Deployment tenancy/environment and the selected execution runtime profile are distinct authority dimensions; the current single `tenant_or_environment` claim cannot represent both Risk and Agentic admission semantics, and canonical API composition remains blocked until the split specified by `API-OD-004` is implemented. The internal `AppSettings` base — reached only through the `app.utils` settings boundary — is the sole repository `app/configs/env.json` loading boundary; domains inherit it for typed owned settings and never parse environment files or read process environment directly. Imports and import-time log attempts remain inert; the first runtime bound-log emission atomically activates the centralized default profile, while explicit logging configuration is reserved for specialized overrides. Runtime logging activation—not import—may create its configured sink directory. UI/API owns authentication, password hashing, credential encryption/persistence, active-key selection, credential-reference resolution, composition-root Brokers configuration, and permission enforcement; externally provisioned key infrastructure owns encryption-key generation/storage/rotation; Data owns normalized market contracts, cross-domain tabular processing, quality policy, and the only public detached OHLCV/spread and tick DataFrame projections from canonical `MarketDataset v1`; Indicators may privately project the same contract to pandas/NumPy for pure formula evaluation and owns its resulting tabular contract; each domain owns its paths, limits, validation, typed payloads, business outcomes, and error-code policy.
+* **Target Submodule Footprint**: shared contracts, errors, IDs, time, canonical serialization, redaction, typed bootstrap settings, and structured logging. `AppSettings` accepts explicit values and process environment only; repository configuration files are not runtime sources. UI/API owns versioned global non-secret settings in `api_settings`, AES-GCM encrypted write-only provider credentials in `api_credentials`, typed manifests, validation, active-key selection, and startup snapshots. Deployment infrastructure exclusively owns the bootstrap values needed before SQLite or decryption is available: environment/runtime safety controls, database/path configuration, API origin/bind configuration, JWT signing material, and credential-encryption keys. Database-backed changes activate after a controlled restart so composition roots can inject one coherent snapshot into owning domains.
 * **Contract Ownership Rule**: Domain contract modules own their payload and business-outcome behavior locally. Utils owns only the shared five-field public-operation response envelope and business-neutral error-definition shape; domains do not inherit any other centralized contract base.
 
 ### Standard Public-Operation Response
@@ -819,7 +819,7 @@ domain and not an execution-control authority:
 | **System Persistence** | `DATABASE_URL`, `DATA_DIR`, `ARTIFACT_DIR`, `DATA_CACHE_PATH` |
 | **Operational Protection** | `ALLOW_LIVE_MUTATIONS` (defaults to `false`), `RUNTIME_PROFILE`, `EXECUTION_ROUTE` |
 | **Structured Logging** | `LOG_LEVEL`, `LOG_RENDER` |
-| **Settings Loading** | Repository `app/configs/env.json` and process overrides bootstrap typed settings through the `app.utils` settings boundary (`load_settings` and the shared settings-model config/source getters), including values required before SQLite can open. After connection, UI/API's `api_settings` stores one secret-safe versioned document shape for user and global-system scopes; it never stores bootstrap paths or secrets. |
+| **Settings Loading** | Explicit values and process environment bootstrap only the values required before SQLite can open or credentials can decrypt. After API migrations, UI/API loads the versioned global non-secret document from `api_settings`; provider secrets are encrypted in `api_credentials` and are never returned through read APIs. All database-backed changes require a controlled restart. |
 | **Broker Integration** | Provider-neutral adapter selection/readiness plus adapter-specific settings; UI/API composition resolves credential references and injects Brokers-owned `BrokerConnectionConfig` instances. |
 
 ---
@@ -1997,7 +1997,7 @@ tables for one job.
 | `sim_runs` | `sim_runs` | **Partially applied inspected database:** the ledger contains conformant `sim_runs` from `001_simulator_state_v1`; later immutable steps add playback/secured `sim_sessions` and hash-linked `sim_session_checkpoints`. The complete three-step manifest is owned by `run_simulator_migrations`, and required API startup fails closed if any step cannot be verified or applied. |
 | `agentic_traces` / `agentic_trace_spans` | `agentic_operations_traces` | Keep live name |
 | `agentic_workflow_checkpoints` (proposal) | same name, different columns | Keep live |
-| ~~`util_settings`~~ | `api_settings` + typed bootstrap settings | **Withdrawn.** Utils owns no tables; UI/API owns the unified non-secret user/system documents and central JSON/process sources bootstrap the database; see [01](01_entity_specs_core.md) Domain 1 |
+| ~~`util_settings`~~ | `api_settings` + typed bootstrap settings | **Withdrawn.** Utils owns no tables; UI/API owns unified non-secret user/system documents while externally provisioned process values bootstrap the database; see [01](01_entity_specs_core.md) Domain 1 |
 
 ---
 
@@ -2193,6 +2193,26 @@ Use it as three things instead:
    baseline compatibility.
 
 Everything else should be retired rather than reconciled.
+
+### Notification configuration and delivery
+
+`FEAT-UTIL-14` owns transport-neutral notification orchestration and Desktop,
+SMTP, Telegram, and Twilio adapters. API-owned database-backed settings and
+encrypted credential slots are injected as validated opaque configurations; Utils
+never queries persistence. Delivery is disabled by default, governed by master and
+channel switches plus per-channel rate limits, and exposes only secret-safe status.
+
+### Utils full-domain wrapper lifecycle
+
+The complete Utils pipeline is an 18-stage wrapper around an injected operation
+owned by another domain: settings, logging, trace identity, UTC/freshness, auth,
+JSON-safe conversion, redaction, exact units, validation, idempotency,
+deterministic randomness, injected execution, state transition evidence,
+canonical outcome integrity, audit/event contracts, response normalization,
+real non-production notification delivery, and logging finalization. Utils owns
+the wrapper primitives only; stage 12 preserves dependency inversion and does not
+move business policy into Utils. The executable authority is
+`tests/utils/usage/features/features.py`.
 
 ---
 

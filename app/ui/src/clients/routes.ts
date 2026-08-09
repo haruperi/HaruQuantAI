@@ -1,5 +1,5 @@
 /**
- * Frozen typed route contracts for the 76 registered backend-v1 operations.
+ * Frozen typed route contracts for the 81 registered backend-v1 operations.
  *
  * Source of truth: `app/services/api/contracts/catalog.py` (`_KNOWN_ROUTE_CONTRACTS`).
  * The drift test in `clients.contract.test.ts` asserts that this module
@@ -121,7 +121,7 @@ export const healthRoutes = {
   }),
 } as const;
 
-// --- Settings (2) --------------------------------------------------------
+// --- Settings (5) --------------------------------------------------------
 
 export const settingsRoutes = {
   read: route({
@@ -135,6 +135,26 @@ export const settingsRoutes = {
     method: "PUT",
     path: "/api/v1/settings",
     permission: "settings:write",
+    sideEffect: "write",
+    idempotencyRequired: true,
+  }),
+  manifest: route({
+    id: "api.settings.manifest",
+    method: "GET",
+    path: "/api/v1/settings/manifest",
+    permission: "settings:admin",
+  }),
+  credentials: route({
+    id: "api.settings.credentials.read",
+    method: "GET",
+    path: "/api/v1/settings/credentials",
+    permission: "settings:admin",
+  }),
+  updateCredential: route({
+    id: "api.settings.credentials.update",
+    method: "PUT",
+    path: "/api/v1/settings/credentials/{slot}",
+    permission: "settings:admin",
     sideEffect: "write",
     idempotencyRequired: true,
   }),
@@ -729,6 +749,9 @@ export const ROUTE_CONTRACTS = [
   healthRoutes.readiness,
   settingsRoutes.read,
   settingsRoutes.update,
+  settingsRoutes.manifest,
+  settingsRoutes.credentials,
+  settingsRoutes.updateCredential,
   dataRoutes.symbols,
   dataRoutes.stream,
   indicatorsRoutes.catalogue,
@@ -802,7 +825,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 78;
+export const ROUTE_CONTRACT_COUNT = 81;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

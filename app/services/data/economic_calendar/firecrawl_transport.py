@@ -574,7 +574,7 @@ def build_firecrawl_calendar_transport(
 
     Args:
         api_key: Explicit licensed key; when absent, the key is resolved from
-            the central settings file through the shared
+            database-backed composition through the shared
             `load_broker_provider_settings` boundary.
         request_timeout_sec: Per-page bound for the licensed scrape call.
         max_parallel_requests: Client-side cap on concurrent licensed requests.

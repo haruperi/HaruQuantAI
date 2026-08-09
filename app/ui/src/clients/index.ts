@@ -7,7 +7,7 @@
  *   import { apiClients, unwrapData, ApiClientError } from "@/clients";
  *   const { data } = await apiClients.health.liveness();
  *
- * The catalog exposes typed clients only for the 71 registered backend-v1
+ * The catalog exposes typed clients only for the 81 registered backend-v1
  * operations. No parallel generic helper exists; every call delegates through
  * the single `request` transport. The drift test asserts this catalog matches
  * the backend route inventory exactly.
@@ -36,7 +36,13 @@ export type {
   Liveness,
   Readiness,
 } from "./health";
-export type { SettingsUpdate, UserSettings } from "./settings";
+export type {
+  CredentialStatus,
+  SettingsUpdate,
+  SystemSettingDefinition,
+  SystemSettings,
+  UserSettings,
+} from "./settings";
 export type { StreamQuery, SymbolPage, SymbolRow, SymbolsQuery } from "./data";
 export { openStream } from "./stream";
 export type { StreamTransportOptions } from "./stream";

@@ -97,7 +97,7 @@ def _dependencies(*, enabled: bool = True):
         settings=get_agentic_settings(
             {
                 "agentic_enabled": True,
-                "agentic_mandate_path": "app/configs/agentic-mandate.json",
+                "agentic_mandate_path": "data/agentic/agentic-mandate.json",
                 "agentic_model_profiles": ("profile-market-analysis-a",),
                 "agentic_limits_profile": "agentic-limits-sandbox-v1",
             }

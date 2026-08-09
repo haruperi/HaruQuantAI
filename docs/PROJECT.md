@@ -1,7 +1,7 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `Completed` — all 204 registered application features are implemented and verified; deployment and external-provider readiness remain separate runtime concerns.
+> **Status:** `Completed` — all 205 registered application features are implemented and verified; deployment and external-provider readiness remain separate runtime concerns.
 > **Last updated:** `2026-08-09`
 
 > This document is the system-level source of truth.
@@ -156,7 +156,7 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Responsibility**: Provide business-neutral shared infrastructure to all other domains.
 * **Inputs**: Raw log records, error conditions, audit payloads, bounded public-operation results, and environment settings.
 * **Outputs**: Structured and specialized logs, mapped/routed errors, prefixed IDs, canonical JSON, shared context/audit/response contracts, redacted values, and loaded settings.
-* **Owns**: Structured and bound-context logging, UTC time policy and formatting, monotonic execution-duration calculation, shared `AuthContext`, `AuditEvent`, and `StandardResponse[T]` contracts, shared base errors, immutable business-neutral error definitions and catalogue validation, injected error-event routing, ID generation, canonical serialization, the sole repository `app/configs/env.json` loading base for typed settings, and denylist-first redaction.
+* **Owns**: Structured and bound-context logging, UTC time policy and formatting, monotonic execution-duration calculation, shared `AuthContext`, `AuditEvent`, and `StandardResponse[T]` contracts, shared base errors, immutable business-neutral error definitions and catalogue validation, injected error-event routing, ID generation, canonical serialization, explicit/process bootstrap settings models, and denylist-first redaction. Utils owns no repository configuration file or database state.
 * **Boundaries**: Owns no durable business state and makes no business decisions. It owns the shared response envelope but not the typed domain payload, completed business outcome, or domain error-code policy carried through that envelope. It does not own authentication, identity verification, password hashing, credential encryption or persistence, credential-reference resolution, encryption-key generation/storage/rotation, active-key selection, strategy logic, risk rules, broker operations, persistence, or any other domain contract base classes. UI/API's composition root owns the single-consumer credential-protection and resolution workflow.
 * **Key Limits**: No business decisions; no durable business state; secret redaction is denylist-first and case-insensitive before any persistence or emission.
 * **Documentation**: `app/utils/README.md`
@@ -307,7 +307,7 @@ All eight registered Indicators features are `Completed`.
 #### 2.1.14 UI/API
 
 * **Package**: `app/services/api` (FastAPI gateway) + `app/ui/` (Next.js frontend) — one logical domain implemented by two deployable packages.
-* **Responsibility**: Expose the system to users and clients through authenticated HTTP interfaces and frontend views. Backend v1 delegates exactly 76 operations, including the governed Portfolio definition and allocation lifecycle, Strategy mutations, dataset preparation and external import, the Risk kill-switch command, the Agentic operator tier, completed-run Simulation journal playback, and live resumable what-if sessions, through composed owner-domain boundaries. The frontend declares the same 76 typed contracts and a drift test enforces parity.
+* **Responsibility**: Expose the system to users and clients through authenticated HTTP interfaces and frontend views. Backend v1 delegates exactly 81 operations across 76 unique paths, including the governed Portfolio definition and allocation lifecycle, Strategy mutations, dataset preparation and external import, the Risk kill-switch command, the Agentic operator tier, completed-run Simulation journal playback, live resumable what-if sessions, and administrator-managed system settings, through composed owner-domain boundaries. The frontend declares the same 81 typed contracts and a drift test enforces parity.
 * **Inputs**: HTTP and SSE connections, client payloads, authenticated principals.
 * **Outputs**: HTTP responses, SSE events, views/DTOs, `AuthContext` propagated to downstream domains.
 * **Owns**: Routes, HTTP wrappers, frontend views and client stores, auth/authz enforcement, password hashing, credential encryption/persistence, active-key selection, composition-root credential-reference resolution, DTO translation, operational telemetry recording through explicitly injected sinks, metric-label hygiene, the Prometheus exposition surface, and clock-drift readiness diagnostics.
@@ -426,15 +426,15 @@ No circular dependencies exist. Simulation and Analytics may be implemented conc
 
 ### Consolidated feature inventory
 
-The owning package READMEs collectively register exactly 204 canonical `FEAT-*`
+The owning package READMEs collectively register exactly 205 canonical `FEAT-*`
 features. No secondary programme or work-package identifier namespace is active.
 
 | Status | Count |
 | --- | ---: |
-| Completed | 204 |
+| Completed | 205 |
 | Partial | 0 |
 | Missing | 0 |
-| **Total** | **204** |
+| **Total** | **205** |
 
 Feature descriptions, requirements, public APIs, persistence, and evidence remain
 authoritative only in the owning package README; this section is the system-level
@@ -1089,7 +1089,7 @@ Each persisted or long-lived state has exactly one owning domain. Data owns the 
 | Completed | Utils persisted state                                                                                                                                                                                                               | `Utils`          | —                                                                                                                                     | —                                                                   | Verified absence: `app/utils` is the shared utility framework imported by every domain, so owning writable state would invert the system dependency direction. Logging and metrics go to rotating files, scheduling is Data-owned, bootstrap configuration is resolved from typed settings, and UI/API owns post-connection scoped settings state |
 | Completed | No durable Analytics state; reports, metrics, allocation evidence, and dashboard payloads are computed from supplied immutable evidence and returned through versioned contracts | `Analytics` | `UI/API`, Optimization, Portfolio, and Risk via Analytics report contracts | None | Historical empty `analytics_*` derived tables are retired by complete-manifest migration step `002`; the guard blocks retirement if any row exists |
 | Completed | Brokers persisted state                                                                                                                                                                                                             | `Brokers`        | —                                                                                                                                     | —                                                                   | Verified absence: Brokers is a stateless passthrough; technical session state is in-memory only and credentials are never persisted. Provider-to-canonical symbol mapping is the sole persisted state: bitemporal reference data that must be stable across restarts, because a mis-mapped symbol routes an order to the wrong instrument. Connection and circuit state remain in-memory, balances are fetched live, and credentials are never persisted                        |
-| Completed | User, session, and unified user/system settings state                                                                                                                                                                                | `UI/API`         | UI/API public identity/settings contracts only                                                                                         | `UI/API` only                                                      | One `api_settings` table holds versioned secret-safe user and global-system documents; bootstrap connection settings remain in central JSON/process sources; Data supplies shared persistence infrastructure |
+| Completed | User, session, and unified user/system settings state                                                                                                                                                                                | `UI/API`         | UI/API public identity/settings contracts only                                                                                         | `UI/API` only                                                      | `api_settings` holds versioned secret-safe user/global documents and `api_credentials` holds encrypted write-only provider material; pre-database and key bootstrap remains externally provisioned; Data supplies shared persistence infrastructure |
 | Missing   | API HTTP-idempotency records                                                                                                                                                                                                        | `UI/API`         | UI/API replay/conflict checks only                                                                                                     | `UI/API` only                                                      | Scope is principal + method + canonical route + key; terminal replay-safe records retained at least 24 hours; domain execution idempotency remains domain-owned |
 
 Rules:
@@ -1102,7 +1102,7 @@ Rules:
 
 ## 6. Shared Configuration and Limits Manifest
 
-Only settings or limits shared across multiple domains belong here. Feature-specific limits belong in the owning domain README. Repository `app/configs/env.json` loading is centralized in `app.utils.AppSettings`; domains inherit that base for typed owned settings and never parse environment files or read process environment directly.
+Only settings or limits shared across multiple domains belong here. Feature-specific limits belong in the owning domain README. `app.utils.AppSettings` accepts explicit values and externally provisioned process bootstrap only. UI/API owns post-connection global settings and encrypted credentials, loaded once by application composition and injected through public owner boundaries.
 
 | Status    | Setting / Limit                                                              | Type               | Default                                       | Required    | Owner       | Used by                                                                              | Description                                                                                                                                                                                        |
 | --------- | ---------------------------------------------------------------------------- | ------------------ | --------------------------------------------- | ----------- | ----------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1265,8 +1265,7 @@ The audit matrix is the system-level record of per-domain conformance.
 | 12. Portfolio | Domain package | `app/services/portfolio` |
 | 13. Agentic | Orchestration domain package | `app/agentic` |
 | 14. UI-API | Domain package | `app/services/api` |
-| 15. Configs | Shared configuration and limits manifest (Section 6) | `app/configs` |
-| 16. UI | Frontend application | `app/ui` |
+| 15. UI | Frontend application | `app/ui` |
 
 #### Status legend
 
@@ -1285,7 +1284,7 @@ The audit matrix is the system-level record of per-domain conformance.
 | Row | REG | TASK | GATE | FUNC | DEEP | ROOT | USE | WFE | UT | IT | COV | HYG | Evidence |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | --- |
 | 0. System | - | [ ] | - | - | - | - | [ ] | [ ] | [ ] | [ ] | - | - | |
-| 1. Utils | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | REG `app/utils/README.md:122`; TASK `app/utils/README.md:880`; GATE `app/utils/__init__.py:57`; FUNC `app/utils/__init__.py:57`; DEEP `app/services/data/_settings.py:18`; ROOT `app/utils/__init__.py:1`; USE `tests/utils/integration/test_usage_scripts.py:7`; WFE `tests/utils/usage/workflows/run_all.py:10`; UT `tests/utils/unit/test_logger.py:1`; IT `tests/utils/integration/test_import_safety.py:14`; COV `app/utils/README.md:872`; HYG `tests/utils/unit/test_boundaries.py:171` |
+| 1. Utils | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | REG `app/utils/README.md:196`; TASK `app/utils/README.md:1276`; GATE/FUNC `app/utils/__init__.py:117`, `tests/utils/unit/test_boundaries.py:230`; DEEP `tests/utils/integration/test_consumer_isolation.py:14`; ROOT `app/utils/__init__.py:1`; USE `tests/utils/integration/test_usage_scripts.py:28`; WFE `tests/utils/unit/test_workflow_usage_parity.py:36`; UT `tests/utils/unit/` (146 passed; slowest call 0.07s); IT `tests/utils/integration/` (36 passed); COV `app/utils/README.md:1298` (89.72% branch coverage; every file at least 80%); HYG `tests/utils/unit/test_boundaries.py:286` |
 | 2. Brokers | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 3. Data | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | REG `tests/data/structural/test_import_graph.py:138`; TASK `app/services/data/README.md:2572`; GATE `app/services/data/__init__.py:306`; FUNC `tests/data/unit/test_api.py:11`; DEEP `tests/data/structural/test_import_graph.py:307`; ROOT `tests/data/structural/test_import_graph.py:149`; USE `tests/data/structural/test_import_graph.py:199`; WFE `tests/data/unit/test_workflow_usage_parity.py:51`; UT `tests/data/unit/test_api.py:9`; IT `tests/data/integration/test_database_boundary.py:16`; COV `app/services/data/README.md:2604`; HYG `tests/data/unit/test_standard_responses.py:305` |
 | 4. Indicators | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | REG `app/services/indicators/README.md`; TASK `app/services/indicators/README.md`; GATE `app/services/indicators/__init__.py`; FUNC `app/services/indicators/__init__.py`; DEEP `tests/indicators/structural/test_import_boundaries.py`; ROOT `app/services/indicators/__init__.py`; USE `tests/indicators/integration/test_usage_scripts.py`; WFE `tests/indicators/usage/workflows/run_all.py`; UT `tests/indicators/unit/test_public_api.py`; IT `tests/indicators/integration/test_batch_calculation.py`; COV `app/services/indicators/README.md`; HYG `tests/indicators/structural/test_import_boundaries.py` |
@@ -1299,8 +1298,7 @@ The audit matrix is the system-level record of per-domain conformance.
 | 12. Portfolio | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 13. Agentic | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 14. UI-API | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 15. Configs | - | [ ] | - | - | - | - | - | - | - | - | [ ] | [ ] | |
-| 16. UI | - | - | - | - | - | - | - | [ ] | [ ] | [ ] | - | - | |
+| 15. UI | - | - | - | - | - | - | - | [ ] | [ ] | [ ] | - | - | |
 | 17. Schema Model | - | - | - | - | - | - | - | - | - | - | - | - | |
 
 Tier 1 dimension definitions:
@@ -1324,7 +1322,7 @@ Tier 1 dimension definitions:
 | Row | DB | SCHEMA | REACH | CONTRACT | LOG | SAFE | QUANT | NFR | DOCS | UI | Evidence |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | --- |
 | 0. System | - | - | - | [ ] | - | [ ] | [ ] | [ ] | [ ] | - | |
-| 1. Utils | - | - | - | OK | OK | OK | OK | OK | OK | - | CONTRACT `tests/utils/integration/test_auth_context_compatibility.py:1`; LOG `tests/utils/integration/test_structured_logging.py:12`; SAFE `app/utils/settings/models.py:258`; QUANT `app/utils/README.md:754`; NFR `app/utils/README.md:882`; DOCS `docs/CHANGELOG.md:5` |
+| 1. Utils | - | - | - | OK | OK | OK | OK | OK | OK | - | CONTRACT `tests/utils/integration/test_auth_context_compatibility.py:53`; LOG `tests/utils/integration/test_structured_logging.py:18`; SAFE `app/utils/settings/models.py:258`; QUANT `tests/utils/integration/test_cross_process_determinism.py:9`; NFR `tests/utils/integration/test_structured_logging.py:54`, `app/utils/README.md:1298`; DOCS `app/utils/README.md:1178`, `docs/ARCHITECTURE.md:518`, `docs/CHANGELOG.md:5` |
 | 2. Brokers | - | - | - | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 3. Data | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `tests/data/unit/test_persistence_migrations.py:82`, `tests/data/unit/test_persistence_migrations.py:225`; SCHEMA `app/services/data/README.md`; REACH `tests/data/structural/test_catalog_table_reachability.py:9`, `app/services/data/artifact_catalog/operations.py:40`, `app/services/data/economic_calendar/service.py:85`, `tests/data/component/test_economic_calendar_ingestion.py:38`; CONTRACT `tests/data/integration/test_contract_boundaries.py:34`; LOG `app/services/data/sources/composition.py:371`, `app/services/data/sources/broker_adapter.py:452`; SAFE `tests/data/unit/test_account_state.py:22`, `tests/data/unit/test_errors.py:8`; QUANT `tests/data/unit/test_synthetic.py:25`, `tests/data/unit/test_ticks.py:273`; NFR `app/services/data/README.md:2556`; DOCS `app/services/data/README.md:2600`, `docs/CHANGELOG.md:5`; UI `app/services/api/routes/dashboards.py:95`, `app/ui/src/clients/routes.ts:264` |
 | 4. Indicators | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `app/services/indicators/migrations/definitions.py`, `app/services/api/composition/lifecycle.py`; SCHEMA `the owning package `README.md`; REACH zero current Indicators-owned tables after migration `002_remove_unused_indicator_support_schema`; CONTRACT `app/services/indicators/README.md`, `tests/indicators/unit/test_contracts.py`; LOG `app/services/indicators/migrations/definitions.py`, `app/services/indicators/core/registry.py`; SAFE `app/services/indicators/core/errors.py`, `tests/indicators/structural/test_import_boundaries.py`; QUANT `tests/indicators/unit/test_zigzag.py`, `app/services/indicators/README.md`; NFR `tests/indicators/unit/conftest.py`; DOCS `app/services/indicators/README.md`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`; UI `app/services/api/routes/indicators.py`, `app/ui/src/components/layout/WorkspaceGrid.tsx`, `app/ui/src/components/layout/Sidebar.tsx` |
@@ -1338,8 +1336,7 @@ Tier 1 dimension definitions:
 | 12. Portfolio | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 13. Agentic | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 14. UI-API | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 15. Configs | - | - | - | [ ] | - | [ ] | - | - | [ ] | [ ] | |
-| 16. UI | - | - | - | [ ] | [ ] | [ ] | - | [ ] | [ ] | [ ] | |
+| 15. UI | - | - | - | [ ] | [ ] | [ ] | - | [ ] | [ ] | [ ] | |
 | 17. Schema Model | [ ] | [ ] | [ ] | - | - | - | - | [ ] | [ ] | - | |
 
 Tier 2 dimension definitions:

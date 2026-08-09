@@ -17,22 +17,34 @@ from app.services.api.composition.owner_sources import (
 )
 from app.services.api.routes.dashboards import _dashboard_source
 from app.services.api.routes.operator import _audit_source, _event_source
+from fastapi.testclient import TestClient
 
 from tests.api._support import get_json, post_json
 
 
 @pytest.fixture(autouse=True)
-def _stub_non_api_migrations(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Keep lifecycle unit tests isolated from domain database migrations."""
+def _stub_lifecycle_storage_dependencies(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep lifecycle unit tests isolated from database-backed startup work."""
 
     def success(_: object) -> SimpleNamespace:
         """Return one successful inert migration response."""
         return SimpleNamespace(status="success", data=object())
 
+    def runtime_settings(*, request_id: str) -> object:
+        """Return an inert snapshot for one canonical startup request."""
+        assert request_id.startswith("req-")
+        return object()
+
     monkeypatch.setattr(lifecycle, "run_indicators_migrations", success)
     monkeypatch.setattr(lifecycle, "run_simulator_migrations", success)
     monkeypatch.setattr(lifecycle, "run_analytics_migrations", success)
+    monkeypatch.setattr(lifecycle, "run_optimization_migrations", success)
     monkeypatch.setattr(lifecycle, "run_portfolio_migrations", success)
+    monkeypatch.setattr(
+        lifecycle,
+        "load_runtime_settings_snapshot",
+        runtime_settings,
+    )
 
 
 def _in_process_providers() -> dict[str, object]:
@@ -51,7 +63,7 @@ def test_canonical_app_has_exact_cors_and_route_catalog() -> None:
     assert "/api/v1/auth/login" in paths
     assert "/api/v1/auth/me" in paths
     assert "/api/v1/indicators" in paths
-    assert len(paths) == 73
+    assert len(paths) == 76
     assert "/api/v1/portfolio/{portfolio_id}/activate" in paths
     assert "/api/v1/portfolio/{portfolio_id}/rollback" in paths
     assert "/api/v1/portfolio/{portfolio_id}/drift" in paths
@@ -128,6 +140,29 @@ def test_canonical_app_wraps_successful_json_responses() -> None:
     assert response_body["status"] == "success"
     assert response_body["error"] is None
     assert response_body["metadata"]["operation"] == "api.get_liveness"
+
+
+def test_framework_documentation_responses_remain_raw() -> None:
+    """Serve Swagger and its OpenAPI document outside the API envelope."""
+    app = create_api_app(build_api_settings())
+    client = TestClient(app)
+    schema = client.get("/openapi.json")
+    docs = client.get("/docs")
+    assert schema.status_code == 200
+    assert schema.json()["openapi"].startswith("3.")
+    assert "data" not in schema.json()
+    assert docs.status_code == 200
+    assert "/openapi.json" in docs.text
+
+
+def test_unknown_route_returns_not_found_envelope() -> None:
+    """Classify an unknown application path as a stable not-found error."""
+    app = create_api_app(build_api_settings())
+    response_status, response_body = get_json(app, "/")
+    assert response_status == 404
+    assert response_body["status"] == "error"
+    assert response_body["error"]["code"] == "NOT_FOUND"
+    assert response_body["metadata"]["operation"] == "api.unknown"
 
 
 def test_required_startup_failure_propagates(

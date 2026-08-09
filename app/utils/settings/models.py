@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
-from typing import Any, Literal, override
+from typing import Literal, override
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 from pydantic import ValidationError as PydanticValidationError
 from pydantic_settings import (
     BaseSettings,
-    JsonConfigSettingsSource,
     PydanticBaseSettingsSource,
     SettingsConfigDict,
 )
@@ -22,107 +20,12 @@ LogRender = Literal["json", "human"]
 LogCompression = Literal["zip", "none"]
 Environment = Literal["dev", "test", "staging", "production"]
 RuntimeProfile = Literal["research", "simulation", "paper", "live"]
-_REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
-
-
-def _flatten_leaf(
-    next_path: tuple[str, ...], value: object, result: dict[str, Any]
-) -> None:
-    """Record candidate field key names for a primitive JSON leaf node.
-
-    Args:
-        next_path: Sequence of path keys identifying the leaf node.
-        value: Primitive value to assign to candidate key names.
-        result: Dictionary accumulator receiving candidate settings mappings.
-    """
-    if len(next_path) > 1:
-        joined = "_".join(next_path)
-        result[joined] = value
-        result[joined.upper()] = value
-
-    if next_path == ("environment", "current"):
-        result["environment"] = value
-        result["ENVIRONMENT"] = value
-    elif next_path == ("google_genai", "agent_model"):
-        result["google_agent_model"] = value
-        result["GOOGLE_AGENT_MODEL"] = value
-
-    leaf_key = next_path[-1]
-    if leaf_key.lower() == "environment" and next_path != ("environment", "current"):
-        return
-
-    if leaf_key not in result:
-        result[leaf_key] = value
-        result[leaf_key.upper()] = value
-
-
-def _flatten_json(obj: object, path: tuple[str, ...] = ()) -> dict[str, Any]:
-    """Recursively flatten nested JSON objects into a lookup dictionary.
-
-    Args:
-        obj: Raw JSON object node.
-        path: Accumulated path of dictionary keys.
-
-    Returns:
-        Mapping of candidate field key names to primitive JSON values.
-    """
-    result: dict[str, Any] = {}
-    if isinstance(obj, dict):
-        for key, value in obj.items():
-            if isinstance(key, str):
-                next_path = (*path, key) if path or key != "settings" else ()
-                if isinstance(value, dict):
-                    result.update(_flatten_json(value, next_path))
-                elif next_path:
-                    _flatten_leaf(next_path, value, result)
-    return result
-
-
-class _CentralJsonSettingsSource(JsonConfigSettingsSource):
-    """Central JSON source matching aliases, uppercase, and exact field names.
-
-    The stock JSON source matches file keys to field names case-sensitively,
-    while the repository central settings file uses uppercase environment-style
-    or nested snake_case keys. This source reproduces the previous dotenv
-    name-matching behavior so every ``AppSettings`` subclass loads identically
-    from the JSON file.
-    """
-
-    @override
-    def __call__(self) -> dict[str, Any]:
-        """Return field values loaded from the central JSON settings file.
-
-        Returns:
-            Mapping of field aliases or names to raw JSON values; empty when the
-            configured file is missing or its root is not an object.
-        """
-        json_file = self.settings_cls.model_config.get("json_file")
-        if json_file is None or not Path(str(json_file)).is_file():
-            return {}
-        raw: object = json.loads(Path(str(json_file)).read_text(encoding="utf-8"))
-        if not isinstance(raw, dict):
-            return {}
-        flattened = _flatten_json(raw)
-        values: dict[str, Any] = {}
-        for field_name, field in self.settings_cls.model_fields.items():
-            alias = (
-                field.validation_alias
-                if isinstance(field.validation_alias, str)
-                else None
-            )
-            candidates = ([alias] if alias else []) + [field_name.upper(), field_name]
-            for key in candidates:
-                if key in flattened:
-                    values[alias or field_name] = flattened[key]
-                    break
-        return values
 
 
 class AppSettings(BaseSettings):
-    """Immutable base for typed settings loaded from the central environment."""
+    """Immutable base for explicit values and external bootstrap environment."""
 
     model_config = SettingsConfigDict(
-        json_file=_REPOSITORY_ROOT / "app" / "configs" / "env.json",
         env_file_encoding="utf-8",
         env_ignore_empty=True,
         case_sensitive=False,
@@ -140,7 +43,7 @@ class AppSettings(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
-        """Add the centralized JSON settings file after process overrides.
+        """Declare explicit and external bootstrap settings sources.
 
         Args:
             settings_cls: The settings class being constructed.
@@ -150,13 +53,12 @@ class AppSettings(BaseSettings):
             file_secret_settings: File secrets source.
 
         Returns:
-            Settings sources in precedence order.
+            Settings sources in precedence order, excluding repository files.
         """
         return (
             init_settings,
             env_settings,
             dotenv_settings,
-            _CentralJsonSettingsSource(settings_cls),
             file_secret_settings,
         )
 
@@ -224,15 +126,13 @@ class RuntimeSettings(_ConfigurationModel):
     logging: LoggingSettings = Field(default_factory=LoggingSettings)
 
 
-class BrokerProviderSettings(AppSettings):
-    """Immutable broker-provider credentials loaded from the central settings file.
+class BrokerProviderSettings(_ConfigurationModel):
+    """Immutable broker-provider settings supplied by a composition root.
 
-    This is the single source of truth for broker connection material. It extends
-    ``AppSettings`` so values are read from ``app/configs/env.json`` (under
-    ``settings.<provider>.*``) through the shared ``_CentralJsonSettingsSource``,
-    with process environment overrides taking precedence. Broker credential
-    resolution is owned by the Brokers domain; Data and usage examples select a
-    route only and never read these fields directly.
+    UI/API resolves database-backed values and injects this secret-redacting
+    model at the application composition boundary. Constructing it without
+    explicit values is deliberately disabled/default-only and cannot discover
+    credentials from repository files or process environment.
 
     Attributes:
         mt5_enabled: Whether the MT5 provider connection is permitted.

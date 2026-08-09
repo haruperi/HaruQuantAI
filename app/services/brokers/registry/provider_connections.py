@@ -1,12 +1,10 @@
 """Broker-owned provider connection resolution.
 
 The Brokers domain owns broker credential resolution and connection. Credentials
-are read from the central settings file (``app/configs/env.json`` under
-``settings.<provider>.*``) through the public
-:func:`app.utils.load_broker_provider_settings`, with process environment
-overrides taking precedence. Cross-domain consumers (the Data composition root,
-usage examples, and integration tests) select a route only and never read
-credentials directly.
+are injected by an approved composition root through the public
+:func:`app.utils.load_broker_provider_settings`. Cross-domain consumers (the
+Data composition root, usage examples, and integration tests) select a route
+only and never read credentials directly.
 
 Only non-production environments (demo, testnet, sandbox) are permitted through
 this boundary. Any live configuration is rejected before an adapter is built so

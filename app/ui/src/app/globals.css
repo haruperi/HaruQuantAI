@@ -10,3 +10,549 @@
 .instrument.unknown { border-color: #c6a15b; }
 .emergency.active { border-color: #ff756f; box-shadow: 0 0 0 2px rgba(255,117,111,.2); }
 @media (max-width: 640px) { .workstation-shell { padding: 1rem; } .workstation-shell header { align-items: flex-start; flex-direction: column; } }
+
+/* ==========================================================================
+   AUTHENTICATION / ACCESS GATE (Split-screen login)
+   ========================================================================== */
+.auth-page {
+  min-height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  background: var(--bg-main);
+  color: var(--text-white);
+  overflow: hidden;
+}
+
+/* --- Left: form panel --- */
+.auth-form-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 2.5rem 2.5rem 2rem;
+  background: var(--cme-navy-darkest);
+  position: relative;
+  overflow-y: auto;
+}
+
+.auth-brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--cme-blue-bright);
+}
+
+.auth-brand-mark .auth-brand-icon {
+  flex: 0 0 auto;
+}
+
+.auth-brand-name {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  color: var(--text-white);
+}
+
+.auth-form-wrap {
+  width: 100%;
+  max-width: 360px;
+  margin: 3.25rem auto 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-white);
+  margin: 0;
+}
+
+.auth-subheading {
+  margin: 0.5rem 0 1.75rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+/* --- Tabs --- */
+.auth-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.auth-tab {
+  flex: 1;
+  min-height: 38px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.auth-tab:hover {
+  color: var(--text-white);
+}
+
+.auth-tab.active {
+  background: var(--cme-blue-primary);
+  color: var(--text-white);
+}
+
+/* --- Form --- */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.auth-field > span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted-grey);
+}
+
+.auth-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.auth-input-wrap input {
+  width: 100%;
+  height: 44px;
+  padding: 0 0.9rem 0 2.4rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-white);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  /* Override global body { user-select: none } so credentials can be edited. */
+  user-select: text;
+}
+
+.auth-input-wrap input::placeholder {
+  color: var(--text-dim);
+}
+
+.auth-input-wrap input:focus {
+  border-color: var(--cme-blue-bright);
+  background: rgba(60, 200, 255, 0.06);
+}
+
+/* --- Error + submit --- */
+.auth-error {
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  background: rgba(255, 0, 61, 0.12);
+  border: 1px solid rgba(255, 0, 61, 0.35);
+  color: #ff8a9c;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.auth-submit {
+  margin-top: 0.4rem;
+  height: 46px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--cme-blue-primary);
+  color: var(--text-white);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: var(--cme-blue-bright);
+}
+
+.auth-submit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.auth-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.auth-disclaimer {
+  margin-top: 1.75rem;
+  text-align: center;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+/* --- Right: brand / marketing panel --- */
+.auth-brand-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 25% 20%, rgba(60, 200, 255, 0.22), transparent 55%),
+    radial-gradient(circle at 80% 85%, rgba(0, 110, 182, 0.35), transparent 60%),
+    linear-gradient(135deg, #0a2540 0%, #081d37 55%, #051019 100%);
+}
+
+/* Subtle grid texture so the panel reads as a trading surface. */
+.auth-brand-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at 50% 45%, #000 35%, transparent 78%);
+  -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 35%, transparent 78%);
+  pointer-events: none;
+}
+
+.auth-brand-panel-glow {
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(60, 200, 255, 0.28), transparent 70%);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.auth-brand-panel-content {
+  position: relative;
+  z-index: 1;
+  max-width: 440px;
+}
+
+.auth-brand-eyebrow {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid rgba(60, 200, 255, 0.4);
+  border-radius: 999px;
+  background: rgba(60, 200, 255, 0.1);
+  color: var(--cme-blue-bright);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.auth-brand-headline {
+  margin: 1.25rem 0 0.75rem;
+  font-size: 2.3rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text-white);
+}
+
+.auth-brand-tagline {
+  margin: 0 0 2.25rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text-light-grey);
+}
+
+.auth-feature-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.auth-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.auth-feature-icon {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(60, 200, 255, 0.14);
+  border: 1px solid rgba(60, 200, 255, 0.28);
+  color: var(--cme-blue-bright);
+}
+
+.auth-feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.auth-feature-text strong {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-white);
+}
+
+.auth-feature-text em {
+  font-style: normal;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text-muted-grey);
+}
+
+/* --- Responsive: collapse the brand panel on small screens --- */
+@media (max-width: 860px) {
+  .auth-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-brand-panel {
+    display: none;
+  }
+
+  .auth-form-wrap {
+    margin-top: 2.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-form-panel {
+    padding: 1.75rem 1.25rem;
+  }
+}
+
+/* ==========================================================================
+   SYSTEM SETTINGS MODAL (in-place popup over the workstation)
+   ========================================================================== */
+.system-settings-modal {
+  width: 680px;
+  max-width: 94vw;
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.system-settings-modal .modal-header {
+  padding: 14px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.system-settings-modal .modal-body {
+  padding: 16px 18px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.system-settings-intro {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.system-settings-message {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: rgba(60, 200, 255, 0.1);
+  border: 1px solid rgba(60, 200, 255, 0.3);
+  color: var(--cme-blue-bright);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.system-settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.system-settings-section:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.system-settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.system-settings-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-white);
+}
+
+.system-settings-field-desc {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.system-settings-save {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.system-settings-subheading {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-white);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.system-settings-cred-note {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.system-settings-credential {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.system-settings-cred-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.system-settings-cred-head strong {
+  font-size: 12px;
+  color: var(--text-white);
+}
+
+.system-settings-cred-head .cred-on {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0, 228, 115, 0.15);
+  color: var(--financial-positive);
+  border: 1px solid rgba(0, 228, 115, 0.35);
+}
+
+.system-settings-cred-head .cred-off {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 179, 0, 0.15);
+  color: var(--accent-amber);
+  border: 1px solid rgba(255, 179, 0, 0.35);
+}
+
+.system-settings-cred-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.system-settings-cred-save {
+  align-self: flex-start;
+}
+
+.app-container[data-theme="light"] .system-settings-message {
+  background: rgba(0, 102, 204, 0.08);
+  border-color: rgba(0, 102, 204, 0.3);
+  color: var(--cme-blue-primary);
+}
+
+.app-container[data-theme="light"] .system-settings-credential {
+  background: #F9FAFB;
+}
+
+/* Selects align with text inputs inside the settings modal. */
+.system-settings-modal select.form-select {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--border-color);
+  padding: 0 0.9rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  /* Override global body { user-select: none } so the select text is readable. */
+  user-select: text;
+}
+
+.system-settings-modal select.form-select:focus {
+  border-color: var(--cme-blue-bright);
+  background: rgba(60, 200, 255, 0.06);
+  outline: none;
+}
+
+.system-settings-modal select.form-select option {
+  background: var(--cme-navy-darkest);
+  color: var(--text-white);
+}
+
+.app-container[data-theme="light"] .system-settings-modal select.form-select {
+  background: #FFFFFF;
+  border-color: #E5E7EB;
+}
+
+.app-container[data-theme="light"] .system-settings-modal select.form-select option {
+  background: #FFFFFF;
+  color: #111827;
+}

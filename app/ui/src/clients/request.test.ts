@@ -97,7 +97,9 @@ describe("request — FR-API-038 typed transport", () => {
     // Request id header is attached and forwarded.
     const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
     const headers = init.headers as Record<string, string>;
-    expect(headers["X-Request-Id"]).toMatch(/^req_/);
+    expect(headers["X-Request-Id"]).toMatch(
+      /^req-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+    );
     // credentials: include is always set.
     expect(init.credentials).toBe("include");
   });
