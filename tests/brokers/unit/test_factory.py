@@ -1,21 +1,21 @@
-"""Explicit registry factory tests."""
+"""Explicit adapter-runtime factory tests."""
 
 import asyncio
 import sys
 from collections.abc import Mapping
 from unittest.mock import patch
 
-from app.services.brokers.contracts import (
+from app.services.brokers import (
+    create_broker_adapter,
+    get_registered_brokers,
+)
+from app.services.brokers._shared.factory import _ProviderRegistration
+from app.services.brokers.canonical_contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
 )
-from app.services.brokers.registry import (
-    create_broker_adapter,
-    get_registered_brokers,
-)
-from app.services.brokers.registry.factory import _ProviderRegistration
 from app.utils.identity import validate_id
 from app.utils.responses.models import RiskLevel
 
@@ -44,7 +44,7 @@ def test_listing_does_not_import_optional_sdks() -> None:
     assert response.message == "Registered broker profiles retrieved"
     assert response.data == tuple(BrokerId)
     assert response.error is None
-    assert response.metadata.name == "brokers.registry.get_registered_brokers"
+    assert response.metadata.name == "brokers.adapter_runtime.get_registered_brokers"
     assert response.metadata.domain == "brokers"
     assert response.metadata.risk_level is RiskLevel.NONE
     assert validate_id(response.metadata.request_id, expected_prefix="req")
@@ -133,7 +133,7 @@ def test_create_adapter_missing_dependency() -> None:
             "brokers",
         )
     }
-    with patch("app.services.brokers.registry.factory._FACTORIES", fake_factories):
+    with patch("app.services.brokers._shared.factory._FACTORIES", fake_factories):
         result = create_broker_adapter(BrokerId.YAHOO, _config())
         assert result.error is not None
         assert result.error.code == BrokerErrorCode.BROKER_DEPENDENCY_MISSING.value
@@ -155,7 +155,7 @@ def test_create_adapter_dukascopy_missing_dependency() -> None:
             "brokers",
         )
     }
-    with patch("app.services.brokers.registry.factory._FACTORIES", fake_factories):
+    with patch("app.services.brokers._shared.factory._FACTORIES", fake_factories):
         config = _config()
         config = BrokerConnectionConfig(
             broker_id=BrokerId.DUKASCOPY,
@@ -185,7 +185,7 @@ def test_create_adapter_value_error() -> None:
 
     fake_factories = {
         BrokerId.YAHOO: _ProviderRegistration(
-            "app.services.brokers.yahoo_history",
+            "app.services.brokers.yahoo",
             "InvalidClass",
             None,
             "yfinance",
@@ -200,10 +200,8 @@ def test_create_adapter_value_error() -> None:
             raise ValueError("Invalid config")
 
     with (
-        patch("app.services.brokers.registry.factory._FACTORIES", fake_factories),
-        patch(
-            "app.services.brokers.yahoo_history.InvalidClass", MockAdapter, create=True
-        ),
+        patch("app.services.brokers._shared.factory._FACTORIES", fake_factories),
+        patch("app.services.brokers.yahoo.InvalidClass", MockAdapter, create=True),
     ):
         result = create_broker_adapter(BrokerId.YAHOO, _config())
         assert result.error is not None

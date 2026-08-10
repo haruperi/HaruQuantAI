@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
@@ -22,7 +22,7 @@ from app.services.brokers.contracts import (
     BrokerPositionModificationRequest,
     BrokerProfitRequest,
 )
-from app.services.brokers.mt5_account.adapter import MT5BrokerAdapter
+from app.services.brokers.metatrader.adapter import MT5BrokerAdapter
 from pydantic import SecretStr
 
 
@@ -52,7 +52,7 @@ def _capabilities() -> dict[BrokerCapabilityId, BrokerCapability]:
 
     The real registry catalogue keeps every non-connection capability
     ``UNAVAILABLE`` until credential-gated release evidence is recorded
-    (see ``registry/catalogue.py``). Unit tests exercise the adapter's own
+    (see ``capabilities/matrix.py``). Unit tests exercise the adapter's own
     method bodies directly, so they assert availability locally instead of
     depending on that release gate.
     """
@@ -728,7 +728,7 @@ def test_adapter_ping_unsupported_if_terminal_none() -> None:
 
     transport = _NoTerminalTransport()
     adapter = MT5BrokerAdapter(_config(), transport=transport)
-    from app.services.brokers.contracts import BrokerConnectionState
+    from app.services.brokers.canonical_contracts import BrokerConnectionState
 
     async def exercise() -> None:
         await adapter.connect()

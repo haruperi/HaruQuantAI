@@ -13,12 +13,12 @@ from app.services.brokers import (
     create_configured_fake_broker_adapter,
     normalize_broker_event_envelope,
 )
-from app.services.brokers.contracts.enums import (
+from app.services.brokers.canonical_contracts.enums import (
     BrokerCapabilityId,
     BrokerEnvironment,
     BrokerId,
 )
-from app.services.brokers.testing.conformance import run_adapter_conformance
+from app.services.brokers.conformance.suite import run_adapter_conformance
 
 _NOW = datetime(2026, 8, 7, 12, 0, 0, tzinfo=UTC)
 

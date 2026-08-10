@@ -5,7 +5,7 @@ import inspect
 from decimal import Decimal
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
@@ -13,7 +13,7 @@ from app.services.brokers.contracts import (
     BrokerId,
     BrokerOrderRequest,
 )
-from app.services.brokers.mt5_account import MT5BrokerAdapter
+from app.services.brokers.metatrader.adapter import MT5BrokerAdapter
 from pydantic import SecretStr
 
 

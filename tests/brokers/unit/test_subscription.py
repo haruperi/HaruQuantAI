@@ -4,8 +4,8 @@ import asyncio
 import contextlib
 from datetime import UTC, datetime
 
-from app.services.brokers.adapter_runtime.subscription import _BrokerSubscription
-from app.services.brokers.contracts import (
+from app.services.brokers._shared.subscription import _BrokerSubscription
+from app.services.brokers.canonical_contracts import (
     BrokerCapabilityId,
     BrokerEnvironment,
     BrokerError,

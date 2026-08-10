@@ -11,6 +11,7 @@ from app.services.api.composition.runtime_settings import (
     load_runtime_settings_snapshot,
 )
 from app.services.api.identity import run_api_migrations
+from app.services.brokers import run_broker_migrations
 from app.services.data import build_data_settings, data_settings_context
 from app.services.indicators import run_indicators_migrations
 from app.services.optimization import run_optimization_migrations
@@ -65,6 +66,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
         if indicators_result.status != "success" or indicators_result.data is None:
             app.state.api_ready = False
             raise StartupError("INDICATORS_STORAGE_INITIALIZATION_FAILED")
+        brokers_result = cast(
+            "_MigrationResponse",
+            run_broker_migrations(generate_id("req")),
+        )
+        if brokers_result.status != "success" or brokers_result.data is None:
+            app.state.api_ready = False
+            raise StartupError("BROKERS_STORAGE_INITIALIZATION_FAILED")
         simulator_result = cast(
             "_MigrationResponse",
             run_simulator_migrations(generate_id("req")),

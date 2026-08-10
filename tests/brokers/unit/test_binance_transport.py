@@ -7,8 +7,8 @@ from dataclasses import replace
 from typing import ClassVar
 
 import pytest
-from app.services.brokers.binance_session.transport import _BinanceTransport
-from app.services.brokers.contracts import (
+from app.services.brokers.binance.transport import _BinanceTransport
+from app.services.brokers.canonical_contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,

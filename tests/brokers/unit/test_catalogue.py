@@ -4,12 +4,12 @@ from collections.abc import Mapping
 from types import MappingProxyType
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers import get_broker_capability_catalogue
+from app.services.brokers.canonical_contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerId,
 )
-from app.services.brokers.registry import get_broker_capability_catalogue
 from app.utils.identity import validate_id
 from app.utils.responses.models import RiskLevel
 
@@ -169,7 +169,7 @@ def test_catalogue_response_preserves_immutable_raw_data_and_metadata() -> None:
     with pytest.raises(TypeError):
         response.data[BrokerId.MT5] = ()
     assert response.metadata.name == (
-        "brokers.registry.get_broker_capability_catalogue"
+        "brokers.capabilities.get_broker_capability_catalogue"
     )
     assert response.metadata.domain == "brokers"
     assert response.metadata.risk_level is RiskLevel.NONE
@@ -369,3 +369,30 @@ def test_every_order_mutation_is_declared_write_everywhere(
             assert entry.release_approval_reference == "FR-BRK-010:MT5_DEMO_ONLY"
         else:
             assert entry.availability == "UNAVAILABLE"
+
+
+def test_adapter_and_route_traits_are_explicit_and_fail_closed() -> None:
+    """Every matrix entry declares the requested routing semantics."""
+    catalogue = _catalogue()
+    for entries in catalogue.values():
+        for entry in entries:
+            assert entry.bracket_order_support != "UNDECLARED"
+            assert entry.oco_order_support != "UNDECLARED"
+            assert entry.position_mode != "UNDECLARED"
+            assert entry.partial_fill_support != "UNDECLARED"
+            assert entry.modification_support != "UNDECLARED"
+            assert entry.cancellation_support != "UNDECLARED"
+            assert entry.sandbox_availability != "UNDECLARED"
+
+    mt5 = {entry.capability: entry for entry in catalogue[BrokerId.MT5]}
+    place_order = mt5[BrokerCapabilityId.PLACE_ORDER]
+    assert place_order.supported_order_types == (
+        "MARKET",
+        "LIMIT",
+        "STOP",
+        "STOP_LIMIT",
+    )
+    assert place_order.supported_time_in_force == ("IOC", "FOK")
+    assert place_order.position_mode == "ACCOUNT_DEPENDENT"
+    assert place_order.partial_fill_support == "SUPPORTED"
+    assert place_order.sandbox_availability == "AVAILABLE"

@@ -1,12 +1,11 @@
 """Dukascopy adapter tests using an injected fake transport."""
 
 import asyncio
-import struct
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
@@ -14,10 +13,8 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerId,
 )
-from app.services.brokers.dukascopy_ticks.adapter import DukascopyBrokerAdapter
-from app.services.brokers.dukascopy_ticks.candle_transport import _CandleBatch
-
-_RECORD = struct.Struct(">3I2f")
+from app.services.brokers.dukascopy.adapter import DukascopyBrokerAdapter
+from app.services.brokers.dukascopy.candle_transport import _CandleBatch
 
 
 def _config() -> BrokerConnectionConfig:
@@ -54,18 +51,27 @@ class _FakeTransport:
     def __init__(self, *, fails: bool = False) -> None:
         self._fails = fails
 
-    async def get_hour(self, symbol: str, hour: object) -> bytes:
-        del symbol, hour
+    async def get_ticks(
+        self,
+        symbol: str,
+        start: datetime,
+        end: datetime,
+        limit: int,
+    ) -> tuple[tuple[object, ...], ...]:
+        del symbol, end
         if self._fails:
             raise OSError("network unreachable")
-        return _RECORD.pack(0, 110_000, 109_990, 1.0, 1.0)
+        return ((int(start.timestamp() * 1000), 1.0999, 1.1, 1_000_000, 1_000_000),)[
+            :limit
+        ]
 
 
 class _FakeCandleTransport:
     """Return bounded recorded Dukascopy web-chart rows."""
 
-    def __init__(self, *, truncated: bool = False) -> None:
+    def __init__(self, *, truncated: bool = False, empty: bool = False) -> None:
         self.truncated = truncated
+        self.empty = empty
         self.requests: list[tuple[str, str, datetime, datetime, int]] = []
 
     async def get_candles(
@@ -78,7 +84,11 @@ class _FakeCandleTransport:
     ) -> _CandleBatch:
         """Return one recorded candle batch."""
         self.requests.append((symbol, timeframe, start, end, limit))
-        rows = ((int(start.timestamp() * 1000), 1.1, 1.2, 1.0, 1.15, 10.0),)
+        rows = (
+            ()
+            if self.empty
+            else ((int(start.timestamp() * 1000), 1.1, 1.2, 1.0, 1.15, 10.0),)
+        )
         return _CandleBatch(
             rows=rows[:limit],
             provider_symbol="EUR/USD",
@@ -107,19 +117,31 @@ def test_adapter_rejects_non_sandbox_environment() -> None:
 
 
 def test_adapter_connect_verifies_via_bounded_probe() -> None:
-    """A successful bounded EURUSD probe verifies the session."""
-    adapter = DukascopyBrokerAdapter(_config(), transport=_FakeTransport())
+    """A genuine bounded EUR/USD candle verifies the session."""
+    candle_transport = _FakeCandleTransport()
+    adapter = DukascopyBrokerAdapter(
+        _config(),
+        transport=_FakeTransport(),
+        candle_transport=candle_transport,
+    )
 
     async def exercise() -> None:
         result = await adapter.connect()
         assert result.status == "success"
+        symbol, timeframe, start, end, limit = candle_transport.requests[0]
+        assert (symbol, timeframe, limit) == ("EURUSD", "H1", 1)
+        assert end - start == timedelta(days=7)
 
     asyncio.run(exercise())
 
 
 def test_adapter_connect_fails_closed_on_transport_error() -> None:
-    """A transport failure never reports a successful connection."""
-    adapter = DukascopyBrokerAdapter(_config(), transport=_FakeTransport(fails=True))
+    """An empty provider response never reports a successful connection."""
+    adapter = DukascopyBrokerAdapter(
+        _config(),
+        transport=_FakeTransport(),
+        candle_transport=_FakeCandleTransport(empty=True),
+    )
 
     async def exercise() -> None:
         result = await adapter.connect()
@@ -204,7 +226,10 @@ def test_adapter_get_ticks_maps_bounded_genuine_ticks() -> None:
     async def exercise() -> None:
         await adapter.connect()
         result = await adapter.get_ticks(
-            "EURUSD", start=datetime(2026, 1, 1, tzinfo=UTC), limit=1
+            "EURUSD",
+            start=datetime(2026, 1, 1, tzinfo=UTC),
+            end=datetime(2026, 1, 1, 1, tzinfo=UTC),
+            limit=1,
         )
         assert result.data is not None
         assert len(result.data.items) == 1

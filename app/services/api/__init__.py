@@ -80,6 +80,7 @@ __all__ = (
     "build_route_contract_registry",
     "build_secret_redaction_middleware",
     "build_stream_event",
+    "build_system_broker_connection_config",
     "build_unknown_broker_state_alert",
     "build_workstation_read_model",
     "check_clock_drift",
@@ -843,6 +844,23 @@ def build_broker_connection_config(**values: object) -> object:
     )
 
     return _build_broker_connection_config(**cast("Any", values))
+
+
+def build_system_broker_connection_config(broker_id: str, *, request_id: str) -> object:
+    """Build a provider config from stored system settings and credentials.
+
+    Args:
+        broker_id: Exact Brokers provider identifier.
+        request_id: Canonical request identifier.
+
+    Returns:
+        Immutable Brokers-owned non-production connection configuration.
+    """
+    from app.services.api.composition import (
+        build_system_broker_connection_config as _build_system_config,
+    )
+
+    return _build_system_config(broker_id, request_id=request_id)
 
 
 def get_user_settings(user_id: str, **values: object) -> object:

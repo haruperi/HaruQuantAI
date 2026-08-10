@@ -5,14 +5,14 @@ import time
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from app.services.brokers.adapter_runtime.circuit_breaker import _CircuitState
-from app.services.brokers.binance_session.transport import _BinanceTransport
-from app.services.brokers.contracts import (
+from app.services.brokers._shared.circuit_breaker import _CircuitState
+from app.services.brokers.binance.transport import _BinanceTransport
+from app.services.brokers.canonical_contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
 )
-from app.services.brokers.contracts.protocols import (
+from app.services.brokers.canonical_contracts.protocols import (
     _CircuitOpenError,
     _RateLimitedError,
 )

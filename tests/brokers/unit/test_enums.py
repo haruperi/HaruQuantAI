@@ -1,6 +1,6 @@
 """Broker enum contract tests."""
 
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerCapabilityId,
     BrokerConnectionState,
     BrokerEnvironment,

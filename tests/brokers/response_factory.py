@@ -5,14 +5,14 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
 
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerCapabilityId,
     BrokerEnvironment,
     BrokerError,
     BrokerErrorCode,
     BrokerId,
 )
-from app.services.brokers.contracts.responses import build_broker_response
+from app.services.brokers.canonical_contracts.responses import build_broker_response
 from app.utils import generate_id, get_standard_response_type, utc_now
 
 StandardResponse: Any = get_standard_response_type()

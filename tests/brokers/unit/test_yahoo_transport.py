@@ -6,12 +6,12 @@ import types
 from dataclasses import replace
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
 )
-from app.services.brokers.yahoo_history.transport import _YahooTransport
+from app.services.brokers.yahoo.transport import _YahooTransport
 
 
 def _config() -> BrokerConnectionConfig:

@@ -4,7 +4,11 @@ import asyncio
 from datetime import UTC, datetime
 from decimal import Decimal
 
-from app.services.brokers.contracts import (
+from app.services.brokers import (
+    create_fake_broker_adapter,
+    get_broker_capability_catalogue,
+)
+from app.services.brokers.canonical_contracts import (
     BrokerAdapter,
     BrokerCapability,
     BrokerCapabilityId,
@@ -15,8 +19,7 @@ from app.services.brokers.contracts import (
     BrokerId,
     BrokerQuote,
 )
-from app.services.brokers.registry import get_broker_capability_catalogue
-from app.services.brokers.testing import FakeBrokerAdapter, create_fake_broker_adapter
+from app.services.brokers.conformance.fake import FakeBrokerAdapter
 
 _BUFFER_SIZE = 2
 _MUTATIONS = {

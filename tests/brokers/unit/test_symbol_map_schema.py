@@ -9,7 +9,10 @@ point-in-time properties below are enforced by the database.
 import sqlite3
 
 import pytest
-from app.services.brokers.migrations.definitions import _BROKER_SCHEMA_STATEMENTS
+from app.services.brokers.migrations.definitions import (
+    _BROKER_CHANNEL_STATE_STATEMENTS,
+    _BROKER_SCHEMA_STATEMENTS,
+)
 
 _NOW = "2026-08-03T00:00:00.000Z"
 
@@ -130,3 +133,25 @@ def test_a_provider_symbol_resolves_back_to_its_instrument(connection):
         ("mt5", "EURUSD.r"),
     ).fetchone()[0]
     assert canonical == "EURUSD"
+
+
+def test_channel_state_tables_are_additive_and_strict() -> None:
+    """Create all four operational checkpoint tables in one empty database."""
+    connection = sqlite3.connect(":memory:")
+    try:
+        for statement in _BROKER_CHANNEL_STATE_STATEMENTS:
+            connection.execute(statement)
+        tables = {
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            ).fetchall()
+        }
+    finally:
+        connection.close()
+    assert {
+        "broker_health_history",
+        "broker_route_recovery",
+        "broker_environment_permissions",
+        "broker_event_checkpoints",
+    } <= tables

@@ -16,12 +16,16 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
-from app.services.data import build_migration_step
+from app.services.data import (
+    build_migration_request,
+    build_migration_step,
+    run_domain_migrations,
+)
 from app.utils import get_logger
 
 logger = get_logger(__name__)
 
-BROKER_SCHEMA_VERSION = "v1"
+BROKER_SCHEMA_VERSION = "v2"
 
 _BROKER_SCHEMA_STATEMENTS = (
     """
@@ -55,6 +59,67 @@ _BROKER_SCHEMA_STATEMENTS = (
     ),
 )
 
+_BROKER_CHANNEL_STATE_STATEMENTS = (
+    """
+    CREATE TABLE IF NOT EXISTS broker_health_history (
+        checkpoint_id TEXT PRIMARY KEY,
+        provider_code TEXT NOT NULL,
+        account_ref_digest TEXT NOT NULL,
+        environment TEXT NOT NULL,
+        health_status TEXT NOT NULL,
+        latency_ms_decimal TEXT,
+        error_rate_decimal TEXT,
+        maintenance INTEGER NOT NULL CHECK (maintenance IN (0, 1)),
+        route_ready INTEGER NOT NULL CHECK (route_ready IN (0, 1)),
+        observed_at TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    ) STRICT
+    """.strip(),
+    """
+    CREATE TABLE IF NOT EXISTS broker_route_recovery (
+        route_ref TEXT PRIMARY KEY,
+        provider_code TEXT NOT NULL,
+        account_ref_digest TEXT NOT NULL,
+        environment TEXT NOT NULL,
+        recovery_cursor TEXT NOT NULL,
+        uncertainty TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+    ) STRICT
+    """.strip(),
+    """
+    CREATE TABLE IF NOT EXISTS broker_environment_permissions (
+        permission_id TEXT PRIMARY KEY,
+        provider_code TEXT NOT NULL,
+        account_ref_digest TEXT NOT NULL,
+        environment TEXT NOT NULL,
+        allow_read INTEGER NOT NULL CHECK (allow_read IN (0, 1)),
+        allow_mutation INTEGER NOT NULL CHECK (allow_mutation IN (0, 1)),
+        enabled INTEGER NOT NULL CHECK (enabled IN (0, 1)),
+        effective_from TEXT NOT NULL,
+        effective_to TEXT,
+        request_id TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        UNIQUE (provider_code, account_ref_digest, environment, effective_from)
+    ) STRICT
+    """.strip(),
+    """
+    CREATE TABLE IF NOT EXISTS broker_event_checkpoints (
+        checkpoint_id TEXT PRIMARY KEY,
+        provider_code TEXT NOT NULL,
+        account_ref_digest TEXT NOT NULL,
+        source_stream TEXT NOT NULL,
+        source_cursor TEXT NOT NULL,
+        source_sequence INTEGER,
+        event_digest TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        UNIQUE (provider_code, account_ref_digest, source_stream)
+    ) STRICT
+    """.strip(),
+)
+
 
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Brokers schema statements.
@@ -77,6 +142,12 @@ BROKER_MIGRATIONS: tuple[Any, ...] = (
         checksum=_migration_checksum(_BROKER_SCHEMA_STATEMENTS),
         statements=_BROKER_SCHEMA_STATEMENTS,
     ),
+    build_migration_step(
+        domain="brokers",
+        migration_id="002_broker_channel_state_v1",
+        checksum=_migration_checksum(_BROKER_CHANNEL_STATE_STATEMENTS),
+        statements=_BROKER_CHANNEL_STATE_STATEMENTS,
+    ),
 )
 
 
@@ -89,8 +160,28 @@ def get_broker_migrations() -> tuple[object, ...]:
     return BROKER_MIGRATIONS
 
 
+def run_broker_migrations(request_id: str) -> object:
+    """Apply the immutable Brokers migration manifest through Data.
+
+    Args:
+        request_id: Canonical startup request identifier.
+
+    Returns:
+        Data-owned standard migration response.
+    """
+    logger.info("Running Brokers-owned schema migrations")
+    request = build_migration_request(
+        domain="brokers",
+        steps=get_broker_migrations(),
+        request_id=request_id,
+        complete_manifest=True,
+    )
+    return run_domain_migrations(request)
+
+
 __all__ = [
     "BROKER_MIGRATIONS",
     "BROKER_SCHEMA_VERSION",
     "get_broker_migrations",
+    "run_broker_migrations",
 ]

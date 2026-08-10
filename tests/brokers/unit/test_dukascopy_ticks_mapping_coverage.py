@@ -4,21 +4,18 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.brokers.contracts import BrokerTick
-from app.services.brokers.contracts.protocols import _ProviderResponseError
-from app.services.brokers.dukascopy_ticks.mapping import (
-    _RECORD,
-    _aggregate_bars,
-    _map_ticks,
-)
+from app.services.brokers.canonical_contracts import BrokerTick
+from app.services.brokers.canonical_contracts.protocols import _ProviderResponseError
+from app.services.brokers.dukascopy.mapping import _aggregate_bars, _map_ticks
 
 
 def test_map_ticks_valid_payload() -> None:
-    """Verify decoding valid Dukascopy BI5 binary record payload."""
-    hour = datetime(2026, 7, 6, 12, 0, 0, tzinfo=UTC)
-    # Binary record: 100ms, ask 123450, bid 123400, ask_vol 1.5, bid_vol 2.5
-    data = _RECORD.pack(100, 123450, 123400, 1.5, 2.5)
-    ticks = _map_ticks(data, symbol="EURUSD", hour=hour, price_divisor=100000, limit=10)
+    """Verify mapping one valid Dukascopy web-chart row."""
+    start = datetime(2026, 7, 6, 12, 0, 0, tzinfo=UTC)
+    rows = ((int(start.timestamp() * 1000) + 100, 1.234, 1.2345, 2_500_000, 1_500_000),)
+    ticks = _map_ticks(
+        rows, symbol="EURUSD", start=start, end=start + timedelta(hours=1), limit=10
+    )
 
     assert len(ticks) == 1
     assert ticks[0].symbol == "EURUSD"
@@ -29,20 +26,25 @@ def test_map_ticks_valid_payload() -> None:
 
 
 def test_map_ticks_malformed_length() -> None:
-    """Verify malformed payload byte length raises _ProviderResponseError."""
-    hour = datetime(2026, 7, 6, 12, 0, 0, tzinfo=UTC)
-    with pytest.raises(
-        _ProviderResponseError, match="malformed Dukascopy BI5 record length"
-    ):
-        _map_ticks(b"1234", symbol="EURUSD", hour=hour, price_divisor=100000, limit=10)
+    """Verify malformed row length raises _ProviderResponseError."""
+    start = datetime(2026, 7, 6, 12, 0, 0, tzinfo=UTC)
+    with pytest.raises(_ProviderResponseError, match="malformed Dukascopy tick row"):
+        _map_ticks(
+            ((1, 2),),
+            symbol="EURUSD",
+            start=start,
+            end=start + timedelta(hours=1),
+            limit=10,
+        )
 
 
 def test_map_ticks_naive_hour() -> None:
     """Verify timezone-naive hour parameter raises ValueError."""
-    hour = datetime(2026, 7, 6, 12, 0, 0)  # noqa: DTZ001
-    data = _RECORD.pack(100, 123450, 123400, 1.5, 2.5)
-    with pytest.raises(ValueError, match="Dukascopy hour must be timezone-aware"):
-        _map_ticks(data, symbol="EURUSD", hour=hour, price_divisor=100000, limit=10)
+    start = datetime(2026, 7, 6, 12, 0, 0)  # noqa: DTZ001
+    with pytest.raises(ValueError, match="timezone-aware"):
+        _map_ticks(
+            (), symbol="EURUSD", start=start, end=start + timedelta(hours=1), limit=10
+        )
 
 
 def test_aggregate_bars_unsupported_timeframe() -> None:
@@ -65,11 +67,12 @@ def test_aggregate_bars_invalid_range() -> None:
 
 def test_map_ticks_limit_reached() -> None:
     """Verify limit parameter bounds decoded ticks."""
-    hour = datetime(2026, 7, 6, 12, 0, 0, tzinfo=UTC)
-    data = _RECORD.pack(100, 123450, 123400, 1.5, 2.5) + _RECORD.pack(
-        200, 123460, 123410, 1.5, 2.5
+    start = datetime(2026, 7, 6, 12, 0, 0, tzinfo=UTC)
+    stamp = int(start.timestamp() * 1000)
+    rows = ((stamp + 100, 1.2, 1.3, 1, 1), (stamp + 200, 1.3, 1.4, 1, 1))
+    ticks = _map_ticks(
+        rows, symbol="EURUSD", start=start, end=start + timedelta(hours=1), limit=1
     )
-    ticks = _map_ticks(data, symbol="EURUSD", hour=hour, price_divisor=100000, limit=1)
     assert len(ticks) == 1
 
 

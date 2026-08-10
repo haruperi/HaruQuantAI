@@ -3,7 +3,7 @@
 from datetime import UTC, date, datetime
 
 import pytest
-from app.services.brokers.ctrader_market_data.sessions import _map_trading_sessions
+from app.services.brokers.ctrader.sessions import _map_trading_sessions
 
 
 def test_ctrader_schedule_subtracts_partial_broker_holiday() -> None:

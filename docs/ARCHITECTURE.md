@@ -253,7 +253,7 @@
   errors, identifiers, UTC, canonical serialization, redaction/security helpers,
   settings, and structured logging.
 * `app/services/brokers/` is a completed implementation baseline for canonical
-  broker contracts, registry/factory, runtime safety, provider adapters, and its
+  broker contracts, immutable capability matrix, runtime factory/safety, provider adapters, and its
   deterministic test adapter. Capability availability remains evidence-gated and
   fail-closed.
 * `app/services/data/` has an implemented functional baseline containing immutable
@@ -359,7 +359,7 @@
 
 ### Workspace Directory Layout (Target)
 
-* `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, API composition, and channel-neutral critical operational alert delivery. Registered owner-backed operations include Trading session and governed submit/cancel/close routes alongside dashboard, audit-event, Trading operational-event, and Data market-stream sources. The stream route owns authentication, quota admission, SSE framing, and cleanup only; Data owns stream acquisition and cadence. Trading write routes compose exact owner requests and never replace Risk, kill-switch, approval, route, or reconciliation authority. UI/API owns user/session/unified user-and-system settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration.
+* `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, API composition, and channel-neutral critical operational alert delivery. Registered owner-backed operations include Trading session and governed submit/cancel/close routes alongside dashboard, audit-event, Trading operational-event, and Data market-stream sources. The stream route owns authentication, quota admission, SSE framing, and cleanup only; Data owns stream acquisition and cadence. Trading write routes compose exact owner requests and never replace Risk, kill-switch, approval, route, or reconciliation authority. UI/API owns user/session/unified user-and-system settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration. System Broker composition reads persisted enablement, resolves the approved encrypted credential slot in memory, and admits only fixed non-production targets.
 * `app/agentic/`: Approved top-level orchestration domain with one focused owning module per registered feature. Ten shared infrastructure features remain root packages for portable contracts/governance, Google ADK adaptation, durable orchestration, permissions, context/memory, bounded deliberation, lifecycle, operations, and public API. Twelve role-bearing feature modules are leaf packages under the namespace-only `agents/<department>/<agent_name>/` hierarchy; each owns `agent.py`, `prompt.md`, schemas, README, and only its declared optional files. Agentic submits untrusted typed requests only and has no direct execution path.
 * `app/`: Core domain modules (utils, brokers, data, indicators, strategy, risk, trading, simulator, analytics, optimization, research, portfolio, agentic, and API). Live-route execution is owned by Trading.
 * `data/`: SQLite databases, migration tracking, cache/log dumps, market/research assets.
@@ -901,7 +901,7 @@ through a foreign schema's tables directly.
 | # | Domain | Prefix | Persists | Write pattern |
 |---|--------|--------|----------|---------------|
 | 1 | Utils | `util_` ¹ | **Nothing — stateless by design.** Prefix reserved, unused | — |
-| 2 | Brokers | `broker_` ¹ | Symbol mapping only — stateless by design (D10) | Bitemporal reference |
+| 2 | Brokers | `broker_` ¹ | Symbol mapping plus redacted health, route-recovery, environment-permission, and event checkpoints | Bitemporal reference and bounded operational evidence |
 | 3 | Data | `data_` | Symbols, sessions, providers, **Parquet catalog** | Catalog upsert |
 | 4 | Indicators | `indicator_` ¹ | **Nothing — stateless by design.** Historical prefix reserved, unused | — |
 | 5 | Strategy | `strategy_` | Definitions, versions, configs, checkpoints | Versioned immutable |
@@ -2074,7 +2074,7 @@ all 71.** Sequence by whether the owning domain has a real gap:
 | — | ~~`indicator_*` (3)~~ | **Retired** | Migration `002_remove_unused_indicator_support_schema` removed the empty support-only schema; Indicators is stateless and owns no target or live tables |
 | — | ~~`analytics_*` (6)~~ | **Retired** | Empty derived tables had no production operation outside persistence; migration `002_retire_unused_analytics_derived_store` drops them transactionally and blocks if any row exists |
 | 4 | Trading execution and closed-ledger tables | **Built; reconciled** | Orders remain an event projection and positions contain complete closed trades only. Migrations `003_execution_lifecycle` and `004_order_lifecycle_states` provide reachable append-only transition/fill/protection/ownership evidence and the complete order lifecycle. |
-| 5 | `broker_symbol_map` (1) | **Built (Phase 4E)** | Bitemporal reference data. The other four `broker_*` tables are **withdrawn** — Brokers stays a stateless passthrough. The step is ledger-ready (stable checksum, execution delegated to `run_domain_migrations`) but currently has no runtime composition wiring: nothing invokes `get_broker_migrations`, and the CRUD statements have no caller |
+| 5 | `broker_symbol_map` (1) | **Built; reconciled (Phase 4E)** | Bitemporal reference data. The other four `broker_*` tables are **withdrawn**. `run_broker_migrations` is invoked during API startup and delegates ledger verification, checksum validation, write locking, and transactional execution to Data. `FEAT-BRK-00` (`instrument_profiles/`) owns current, reverse, and as-of identity reads; Registry owns mapping administration. Package-root functions preserve the sole external boundary. |
 | 6 | Everything else | Deferred | Defer until a feature needs it |
 
 ### Tier C — rebuild, blocked (13 tables)
@@ -2122,7 +2122,7 @@ Analytics support schemas were retired empty.
 | 4B | Historical schema retired | `indicator_*` support tables were introduced by migration `001_indicator_schema_v1` and retired empty by immutable migration `002_remove_unused_indicator_support_schema` |
 | 4C | Historical schema retired | `analytics_*` tables were introduced by step `001` and retired empty by guarded step `002`; persistence feature/requirements withdrawn from the current registry |
 | 4D | Shipped; reconciled | Trading event/order materialisation, an insert-only closed-position ledger, and migrations `003`–`004` lifecycle evidence tables with production CRUD reachability |
-| 4E | Schema shipped; registrations withdrawn | `broker_symbol_map` (1) applied as schema; `FEAT-BRK-16` and `FR-BRK-136`–`138` withdrawn 2026-08-03 (private persistence support) |
+| 4E | Shipped; reconciled | `broker_symbol_map` (1) is owned by the Brokers support manifest, applied before API readiness, and reachable through validated package-root operations. `FEAT-BRK-00` owns instrument/venue profile evidence plus identity reads (`FR-BRK-142`–`144`, `147`); Registry owns mapping administration (`FR-BRK-141`, `145`–`146`). |
 
 `trading_events` remains the write model. `trading_orders` is written atomically with
 events; `trading_positions` accepts only validated complete closed-trade evidence.

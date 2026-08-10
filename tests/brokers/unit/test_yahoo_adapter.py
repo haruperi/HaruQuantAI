@@ -4,14 +4,14 @@ import asyncio
 from datetime import UTC, datetime
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerConnectionConfig,
     BrokerConnectionState,
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
 )
-from app.services.brokers.yahoo_history.adapter import YahooBrokerAdapter
+from app.services.brokers.yahoo.adapter import YahooBrokerAdapter
 
 
 def _config(**overrides: object) -> BrokerConnectionConfig:

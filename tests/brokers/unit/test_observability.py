@@ -3,7 +3,7 @@
 import asyncio
 import logging
 
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
@@ -12,7 +12,7 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerId,
 )
-from app.services.brokers.testing import FakeBrokerAdapter
+from app.services.brokers.conformance.fake import FakeBrokerAdapter
 from pydantic import SecretStr
 
 _SECRET = "super-secret-credential-value"

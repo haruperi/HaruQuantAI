@@ -7,7 +7,7 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
@@ -23,7 +23,7 @@ from app.services.brokers.contracts import (
     BrokerPositionModificationRequest,
     BrokerProfitRequest,
 )
-from app.services.brokers.ctrader_session.adapter import CTraderBrokerAdapter
+from app.services.brokers.ctrader.adapter import CTraderBrokerAdapter
 from pydantic import SecretStr
 
 

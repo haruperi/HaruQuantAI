@@ -1,31 +1,26 @@
 """Safety contract for genuine non-production Brokers usage programs."""
 
 import ast
+import asyncio
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 from app.services.brokers import resolve_provider_connection_config
-from app.services.brokers.contracts import BrokerEnvironment, BrokerId
+from app.services.brokers._shared import connections
+from app.services.brokers.canonical_contracts import BrokerEnvironment, BrokerId
 from pydantic import SecretStr
 
 from tests.brokers.usage.features import _support
 
 _USAGE_DIR = Path("tests/brokers/usage/features")
 _PROVIDER_PROGRAMS = (
-    "02_mt5_account.py",
-    "03_ctrader_lifecycle.py",
-    "04_binance_lifecycle.py",
-    "05_dukascopy_lifecycle.py",
-    "06_yahoo_lifecycle.py",
-    "07_mt5_mutations.py",
-    "08_ctrader_mutations.py",
-    "09_history_reads.py",
-    "10_calculations.py",
-    "11_price_streams.py",
-    "12_ctrader_market_data.py",
-    "13_dukascopy_bars.py",
-    "15_adapter_runtime.py",
+    "02_metatrader.py",
+    "03_ctrader.py",
+    "04_binance.py",
+    "05_dukascopy.py",
+    "06_yahoo.py",
 )
 _MUTATION_METHODS = {
     "check_order",
@@ -66,7 +61,20 @@ def test_real_usage_configs_are_non_production(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Every provider usage profile resolves only to approved non-production."""
-    monkeypatch.setattr(_support, "load_broker_provider_settings", _settings)
+    environments = {
+        "mt5": BrokerEnvironment.DEMO,
+        "ctrader": BrokerEnvironment.DEMO,
+        "binance_spot": BrokerEnvironment.TESTNET,
+        "dukascopy": BrokerEnvironment.SANDBOX,
+        "yahoo": BrokerEnvironment.SANDBOX,
+    }
+    monkeypatch.setattr(
+        _support,
+        "build_system_broker_connection_config",
+        lambda broker_id, **_values: SimpleNamespace(
+            environment=environments[broker_id]
+        ),
+    )
     expected = {
         BrokerId.MT5: BrokerEnvironment.DEMO,
         BrokerId.CTRADER: BrokerEnvironment.DEMO,
@@ -82,12 +90,12 @@ def test_real_usage_rejects_live_before_adapter_creation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """A live setting cannot enter a standalone usage adapter."""
-    monkeypatch.setattr(
-        _support,
-        "load_broker_provider_settings",
-        lambda: _settings(mt5_environment="live"),
-    )
-    with pytest.raises(_support.UsageEvidenceError, match="reject live"):
+
+    def _reject_live(*_args: object, **_kwargs: object) -> object:
+        raise ValueError("production broker environments are excluded")
+
+    monkeypatch.setattr(_support, "build_system_broker_connection_config", _reject_live)
+    with pytest.raises(_support.UsageEvidenceError, match="production"):
         _support.config(BrokerId.MT5)
 
 
@@ -112,6 +120,77 @@ def test_provider_resolution_fails_closed_for_incomplete_settings(
             broker_id,
             settings=_settings(**overrides),
         )
+
+
+def test_every_enabled_provider_resolves_a_bounded_configuration() -> None:
+    """Exercise every credentialed and credential-free configuration branch."""
+    expected = {
+        BrokerId.MT5: BrokerEnvironment.DEMO,
+        BrokerId.CTRADER: BrokerEnvironment.DEMO,
+        BrokerId.BINANCE_SPOT: BrokerEnvironment.TESTNET,
+        BrokerId.DUKASCOPY: BrokerEnvironment.SANDBOX,
+        BrokerId.YAHOO: BrokerEnvironment.SANDBOX,
+    }
+    for broker_id, environment in expected.items():
+        config = resolve_provider_connection_config(broker_id, settings=_settings())
+        assert config.broker_id is broker_id
+        assert config.environment is environment
+
+
+def test_provider_resolution_rejects_live_and_unsupported_routes() -> None:
+    """Reject production and non-provider adapter profiles before construction."""
+    with pytest.raises(ValueError, match="reject live"):
+        resolve_provider_connection_config(
+            BrokerId.MT5,
+            settings=_settings(mt5_environment="live"),
+        )
+    with pytest.raises(ValueError, match="not a valid BrokerId"):
+        resolve_provider_connection_config("unsupported", settings=_settings())
+
+
+def test_connected_broker_construction_and_connection_failures(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Cover deferred connection, construction failure, and connection failure."""
+
+    async def _exercise() -> None:
+        """Run construction branches on one event loop."""
+        adapter = object()
+        config = SimpleNamespace(broker_id=BrokerId.MT5)
+        monkeypatch.setattr(
+            connections, "resolve_provider_connection_config", Mock(return_value=config)
+        )
+        monkeypatch.setattr(
+            connections,
+            "create_broker_adapter",
+            Mock(return_value=SimpleNamespace(data=adapter, error=None)),
+        )
+        assert (
+            await connections.create_connected_broker(BrokerId.MT5, connect=False)
+            is adapter
+        )
+        monkeypatch.setattr(
+            connections,
+            "create_broker_adapter",
+            Mock(return_value=SimpleNamespace(data=None, error=object())),
+        )
+        with pytest.raises(ValueError, match="construction failed"):
+            await connections.create_connected_broker(BrokerId.MT5, connect=False)
+        monkeypatch.setattr(
+            connections,
+            "create_broker_adapter",
+            Mock(return_value=SimpleNamespace(data=adapter, error=None)),
+        )
+
+        async def _failed_connect(_adapter: object) -> object:
+            """Return one canonical-looking failed connection result."""
+            return SimpleNamespace(error=object())
+
+        monkeypatch.setattr(connections, "connect_broker", _failed_connect)
+        with pytest.raises(ValueError, match="connection failed"):
+            await connections.create_connected_broker(BrokerId.MT5)
+
+    asyncio.run(_exercise())
 
 
 def test_provider_usage_programs_use_real_session_helper() -> None:
@@ -140,19 +219,15 @@ def test_support_has_one_deterministic_disconnect_boundary() -> None:
     )
 
 
-def test_mt5_mutations_are_outside_connected_context() -> None:
-    """The standalone MT5 mutation program never transmits while connected."""
-    tree = ast.parse((_USAGE_DIR / "07_mt5_mutations.py").read_text(encoding="utf-8"))
-    run = next(
-        node
-        for node in tree.body
-        if isinstance(node, ast.AsyncFunctionDef) and node.name == "_run"
-    )
-    connected_calls = {
-        node.attr
-        for context in run.body
-        if isinstance(context, ast.AsyncWith)
-        for node in ast.walk(context)
-        if isinstance(node, ast.Attribute)
-    }
-    assert not connected_calls & _MUTATION_METHODS
+def test_provider_channels_never_mutate_inside_usage_sessions() -> None:
+    """No consolidated provider usage program transmits a broker mutation."""
+    for filename in _PROVIDER_PROGRAMS:
+        tree = ast.parse((_USAGE_DIR / filename).read_text(encoding="utf-8"))
+        connected_calls = {
+            node.attr
+            for context in ast.walk(tree)
+            if isinstance(context, ast.AsyncWith)
+            for node in ast.walk(context)
+            if isinstance(node, ast.Attribute)
+        }
+        assert not connected_calls & _MUTATION_METHODS, filename

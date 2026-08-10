@@ -3,8 +3,8 @@
 from datetime import UTC, datetime
 
 import numpy as np
-from app.services.brokers.contracts import BrokerErrorCode
-from app.services.brokers.mt5_account.mapping import (
+from app.services.brokers.canonical_contracts import BrokerErrorCode
+from app.services.brokers.metatrader.mapping import (
     _map_account,
     _map_bar,
     _map_error_code,

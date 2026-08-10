@@ -5,12 +5,12 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
 )
-from app.services.brokers.ctrader_session.network import (
+from app.services.brokers.ctrader.network import (
     _CTraderNetworkClient,
     _expect_response,
     _validate_account_environment,

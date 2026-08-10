@@ -12,19 +12,19 @@ import pytest
 from app.services.brokers import (
     build_broker_order_protection_request,
     build_broker_position_reduce_request,
+    get_broker_capability_catalogue,
 )
-from app.services.brokers.contracts.enums import (
+from app.services.brokers.canonical_contracts.enums import (
     BrokerCapabilityId,
     BrokerUncertainty,
 )
-from app.services.brokers.contracts.models import (
+from app.services.brokers.canonical_contracts.models import (
     BrokerCapability,
     BrokerOrder,
     BrokerOrderProtectionRequest,
     BrokerPosition,
     BrokerPositionReductionRequest,
 )
-from app.services.brokers.registry.catalogue import get_broker_capability_catalogue
 
 _NOW = datetime(2026, 8, 7, 12, 0, 0, tzinfo=UTC)
 
@@ -187,7 +187,7 @@ def test_build_position_reduce_request_builder_round_trip() -> None:
 
 def test_protocols_expose_attach_protection_and_reduce_position() -> None:
     """The adapter protocol exposes the two new safe-order methods."""
-    from app.services.brokers.contracts.protocols import BrokerAdapter
+    from app.services.brokers.canonical_contracts.protocols import BrokerAdapter
 
     assert hasattr(BrokerAdapter, "attach_protection")
     assert hasattr(BrokerAdapter, "reduce_position")

@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta, timezone
 from decimal import Decimal
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerAccountInfo,
     BrokerAccountTransaction,
     BrokerAssetInfo,

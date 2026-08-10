@@ -6,72 +6,34 @@ standalone functions. Classes, contracts, DTOs, enums, and protocols remain
 internal implementation details.
 """
 
-from app.services.brokers.contracts.account_snapshot import (
-    build_broker_account_snapshot,
-    parse_broker_account_snapshot,
+from app.services.brokers._shared.connections import (
+    create_connected_broker,
+    resolve_provider_connection_config,
 )
-from app.services.brokers.contracts.error_catalog import get_broker_error_catalog
-from app.services.brokers.contracts.health import (
-    build_broker_health,
-    parse_broker_health,
+from app.services.brokers._shared.factory import (
+    create_broker_adapter,
+    get_registered_brokers,
 )
-from app.services.brokers.contracts.reconciliation import (
-    build_broker_reconciliation_snapshot,
-    parse_broker_reconciliation_snapshot,
-)
-from app.services.brokers.contracts.unknown_outcome import (
-    build_broker_unknown_result,
-    enforce_no_blind_resubmission,
-    is_broker_unknown_result,
-)
-from app.services.brokers.contracts.venue_profiles import (
-    build_instrument_venue_profile,
-    parse_instrument_venue_profile,
-)
-from app.services.brokers.operations import (
+from app.services.brokers._shared.public import (
     attach_broker_protection,
-    build_broker_connection_config,
-    build_broker_failover_decision,
-    build_broker_margin_request,
-    build_broker_order_filter,
-    build_broker_order_modification_request,
     build_broker_order_protection_request,
-    build_broker_order_request,
-    build_broker_position_close_request,
-    build_broker_position_filter,
-    build_broker_position_modification_request,
     build_broker_position_reduce_request,
-    build_broker_profit_request,
-    build_broker_route_plan,
-    build_broker_value,
     calculate_broker_margin,
     calculate_broker_profit,
     cancel_broker_order,
     check_broker_order,
     close_broker_position,
     connect_broker,
-    create_configured_fake_broker_adapter,
     disconnect_broker,
     get_broker_account_info,
-    get_broker_adapter_contract_version,
-    get_broker_adapter_schema_id,
     get_broker_asset_info,
     get_broker_balances,
-    get_broker_capability_id,
     get_broker_commission_estimate,
-    get_broker_connection_account_reference,
-    get_broker_connection_environment,
     get_broker_connection_events,
-    get_broker_connection_id,
     get_broker_connection_status,
     get_broker_deal,
-    get_broker_environment,
-    get_broker_error_code,
-    get_broker_feature_flag_environment,
-    get_broker_feature_flag_id,
     get_broker_feature_flags,
     get_broker_historical_bars,
-    get_broker_id,
     get_broker_last_error,
     get_broker_market_status,
     get_broker_order,
@@ -82,17 +44,13 @@ from app.services.brokers.operations import (
     get_broker_position,
     get_broker_positions,
     get_broker_quote,
-    get_broker_resubmission_policy,
     get_broker_server_time,
     get_broker_spread,
     get_broker_symbol_info,
     get_broker_symbols,
     get_broker_ticks,
     get_broker_trading_sessions,
-    get_broker_uncertainty,
-    get_broker_value_field,
     is_broker_connected,
-    is_broker_connection_enabled,
     list_broker_account_transactions,
     list_broker_accounts,
     list_broker_assets,
@@ -101,8 +59,6 @@ from app.services.brokers.operations import (
     list_broker_subscriptions,
     modify_broker_order,
     modify_broker_position,
-    parse_broker_failover_decision,
-    parse_broker_route_plan,
     ping_broker,
     place_broker_order,
     reconnect_broker,
@@ -111,32 +67,112 @@ from app.services.brokers.operations import (
     replace_broker_order,
     select_broker_account,
     select_broker_symbol,
-    set_fake_broker_error,
     subscribe_broker_bars,
     subscribe_broker_order_book,
     subscribe_broker_quotes,
     supports_broker_capability,
     unsubscribe_broker,
 )
-from app.services.brokers.price_streams.envelopes import (
+from app.services.brokers.binance.health import record_binance_health_checkpoint
+from app.services.brokers.canonical_contracts.account_snapshot import (
+    build_broker_account_snapshot,
+    parse_broker_account_snapshot,
+)
+from app.services.brokers.canonical_contracts.error_catalog import (
+    get_broker_error_catalog,
+)
+from app.services.brokers.canonical_contracts.health import (
+    build_broker_health,
+    parse_broker_health,
+)
+from app.services.brokers.canonical_contracts.public import (
+    build_broker_connection_config,
+    build_broker_margin_request,
+    build_broker_order_filter,
+    build_broker_order_modification_request,
+    build_broker_order_request,
+    build_broker_position_close_request,
+    build_broker_position_filter,
+    build_broker_position_modification_request,
+    build_broker_profit_request,
+    build_broker_value,
+    get_broker_adapter_contract_version,
+    get_broker_adapter_schema_id,
+    get_broker_capability_id,
+    get_broker_connection_account_reference,
+    get_broker_connection_environment,
+    get_broker_connection_id,
+    get_broker_environment,
+    get_broker_error_code,
+    get_broker_feature_flag_environment,
+    get_broker_feature_flag_id,
+    get_broker_id,
+    get_broker_resubmission_policy,
+    get_broker_uncertainty,
+    get_broker_value_field,
+    is_broker_connection_enabled,
+)
+from app.services.brokers.canonical_contracts.reconciliation import (
+    build_broker_reconciliation_snapshot,
+    parse_broker_reconciliation_snapshot,
+)
+from app.services.brokers.canonical_contracts.unknown_outcome import (
+    build_broker_unknown_result,
+    enforce_no_blind_resubmission,
+    is_broker_unknown_result,
+)
+from app.services.brokers.capabilities.dashboard import get_broker_dashboard_snapshot
+from app.services.brokers.capabilities.matrix import (
+    get_broker_capability_catalogue,
+)
+from app.services.brokers.conformance.public import (
+    create_configured_fake_broker_adapter,
+    create_fake_broker_adapter,
+    set_fake_broker_error,
+)
+from app.services.brokers.ctrader.health import record_ctrader_health_checkpoint
+from app.services.brokers.dukascopy.health import record_dukascopy_health_checkpoint
+from app.services.brokers.environment_guards.permissions import (
+    get_broker_environment_permission,
+    register_broker_environment_permission,
+)
+from app.services.brokers.events.checkpoints import (
+    get_broker_event_checkpoint,
+    record_broker_event_checkpoint,
+)
+from app.services.brokers.events.normalization import (
     classify_broker_event,
     normalize_broker_event_envelope,
 )
-from app.services.brokers.registry.catalogue import (
-    get_broker_capability_catalogue,
+from app.services.brokers.instrument_profiles.mappings import (
+    close_broker_symbol_mapping,
+    disable_broker_symbol_mapping,
+    register_broker_symbol_mapping,
 )
-from app.services.brokers.registry.dashboard import get_broker_dashboard_snapshot
-from app.services.brokers.registry.factory import (
-    create_broker_adapter,
-    get_registered_brokers,
+from app.services.brokers.instrument_profiles.profiles import (
+    build_instrument_venue_profile,
+    parse_instrument_venue_profile,
 )
-from app.services.brokers.registry.provider_connections import (
-    create_connected_broker,
-    resolve_provider_connection_config,
+from app.services.brokers.instrument_profiles.symbols import (
+    resolve_broker_canonical_symbol,
+    resolve_broker_provider_symbol,
+    resolve_broker_provider_symbol_as_of,
 )
-from app.services.brokers.testing import (
-    create_fake_broker_adapter,
+from app.services.brokers.metatrader.health import (
+    record_metatrader_health_checkpoint,
 )
+from app.services.brokers.migrations.public import run_broker_migrations
+from app.services.brokers.reconciliation.checkpoints import (
+    get_broker_route_recovery,
+    record_broker_route_recovery,
+)
+from app.services.brokers.reconciliation.public import (
+    build_broker_failover_decision,
+    build_broker_route_plan,
+    parse_broker_failover_decision,
+    parse_broker_route_plan,
+)
+from app.services.brokers.yahoo.health import record_yahoo_health_checkpoint
 
 __all__ = (
     "attach_broker_protection",
@@ -165,11 +201,13 @@ __all__ = (
     "check_broker_order",
     "classify_broker_event",
     "close_broker_position",
+    "close_broker_symbol_mapping",
     "connect_broker",
     "create_broker_adapter",
     "create_configured_fake_broker_adapter",
     "create_connected_broker",
     "create_fake_broker_adapter",
+    "disable_broker_symbol_mapping",
     "disconnect_broker",
     "enforce_no_blind_resubmission",
     "get_broker_account_info",
@@ -188,8 +226,10 @@ __all__ = (
     "get_broker_dashboard_snapshot",
     "get_broker_deal",
     "get_broker_environment",
+    "get_broker_environment_permission",
     "get_broker_error_catalog",
     "get_broker_error_code",
+    "get_broker_event_checkpoint",
     "get_broker_feature_flag_environment",
     "get_broker_feature_flag_id",
     "get_broker_feature_flags",
@@ -206,6 +246,7 @@ __all__ = (
     "get_broker_positions",
     "get_broker_quote",
     "get_broker_resubmission_policy",
+    "get_broker_route_recovery",
     "get_broker_server_time",
     "get_broker_spread",
     "get_broker_symbol_info",
@@ -236,10 +277,23 @@ __all__ = (
     "ping_broker",
     "place_broker_order",
     "reconnect_broker",
+    "record_binance_health_checkpoint",
+    "record_broker_event_checkpoint",
+    "record_broker_route_recovery",
+    "record_ctrader_health_checkpoint",
+    "record_dukascopy_health_checkpoint",
+    "record_metatrader_health_checkpoint",
+    "record_yahoo_health_checkpoint",
     "reduce_broker_position",
     "refresh_broker_session",
+    "register_broker_environment_permission",
+    "register_broker_symbol_mapping",
     "replace_broker_order",
+    "resolve_broker_canonical_symbol",
+    "resolve_broker_provider_symbol",
+    "resolve_broker_provider_symbol_as_of",
     "resolve_provider_connection_config",
+    "run_broker_migrations",
     "select_broker_account",
     "select_broker_symbol",
     "set_fake_broker_error",

@@ -4,7 +4,7 @@
 
 ### Complete Analytics, Portfolio, and operational workstation capabilities
 
-Analytics, Portfolio, UI/API, and Utils notifications bring the consolidated 205-feature registry to full completion.
+Analytics, Portfolio, UI/API, and Utils notifications bring the consolidated 199-feature registry to full completion.
 
 #### Added (5)
 
@@ -14,18 +14,23 @@ Analytics, Portfolio, UI/API, and Utils notifications bring the consolidated 205
 - Added accessible instrument, planning, workflow, emergency, alarm, training, replay, and qualification presentation capabilities under `FEAT-API-15` through `FEAT-API-20`.
 - Added `FEAT-UTIL-14`, a disabled-by-default unified Desktop, SMTP, Telegram, and Twilio notification service with operational templates and rate-limited orchestration.
 
-#### Changed (6)
+#### Changed (10)
 
-- Completed all 205 canonical `FEAT-*` registrations with no partial or missing features remaining.
+- Completed all 199 canonical `FEAT-*` registrations with no partial or missing features remaining.
 - Renumbered existing API frontend usage programs to `09` through `12`, reserving `14` through `20` for their owning feature evidence.
 - Replaced the retired programme terminology in package READMEs and evidence filenames with consolidated application feature terminology.
 - Replaced the repository JSON settings source with UI/API-owned versioned database settings, encrypted write-only credential slots, an administrator frontend, and a fail-closed one-time migration utility.
 - Added `WF-UTL-010` as current package-root evidence for surviving legacy main Utils operations, with removed and reassigned responsibilities explicitly excluded.
 - Replaced the abbreviated Utils aggregate usage sequence with the canonical 18-stage full-domain wrapper pipeline across all fifteen registered Utils features.
+- Reconciled Brokers into eleven focused feature folders, moved canonical contracts and public operations under their owners, and activated the authoritative symbol-map migration and CRUD boundary during API startup.
+- Reassigned `FEAT-BRK-00` to focused `instrument_profiles/` ownership, classified shared Broker contracts as non-feature support, and consolidated profile identity reads and mapping administration within the eleven-feature registry.
+- Reassigned `FEAT-BRK-01` to `capabilities/`, made adapter/route traits explicit and fail-closed, moved factory/connection behavior to `_shared/`, and removed the mixed `registry/` implementation folder.
+- Consolidated Brokers into five direct provider channels plus reconciliation, environment isolation, event normalization, and conformance; added immutable migration `002_broker_channel_state_v1` for redacted operational checkpoints.
 
-#### Fixed (8)
+#### Fixed (11)
 
 - Made stream reconnection conditional on retryable transport errors so terminal and validation failures return immediately.
+- Corrected standalone Broker composition to use database-backed provider enablement and encrypted system credential slots instead of default-disabled Utils settings.
 - Rendered the Indicators capability count, resolving the strict frontend unused-state type-check failure.
 - Reconciled Utils verification evidence, restored its per-file coverage floor, moved real ZIP rollover IO to integration scope, and documented the completed `AuthContext v2` tenancy/profile split.
 - Preserved raw OpenAPI and documentation responses for Swagger rendering and classified unknown routes with the stable `NOT_FOUND` API envelope.
@@ -33,6 +38,8 @@ Analytics, Portfolio, UI/API, and Utils notifications bring the consolidated 205
 - Reconciled current API specifications, tests, and usage evidence to the authoritative 81-operation backend/frontend route inventory.
 - Restored isolated API lifecycle tests by stubbing post-migration database-backed runtime settings alongside mocked migration success.
 - Routed canonical secret-safe API request telemetry to both the general application log and specialized access log.
+- Restored the Brokers per-file coverage floor and corrected stale architecture claims that its route-discipline requirements and symbol-map application wiring were withdrawn.
+- Replaced the inaccessible Dukascopy BI5 tick route with bounded, validated keyless web-chart ticks and enforced applicable Google docstring sections across Brokers.
 
 ### Complete Simulator mission and recovery capabilities
 
@@ -190,7 +197,7 @@ Brokers now publishes the versioned cross-domain contract pairs and the health-a
 
 #### Added (8)
 
-- Added the `FEAT-BRK-16` Health-Aware Primary/Backup Route Discipline feature (`route_discipline/`) with `RoutePlan v1` and `FailoverDecision v1` contracts that are fail-closed, never submit a duplicate order, and never silently reroute a write across brokers.
+- Added the `FEAT-BRK-16` Health-Aware Primary/Backup Route Discipline feature (`reconciliation/`) with `RoutePlan v1` and `FailoverDecision v1` contracts that are fail-closed, never submit a duplicate order, and never silently reroute a write across brokers.
 - Added the `InstrumentVenueProfile v1`, `BrokerHealth v1`, `BrokerAccountSnapshot v1`, and `BrokerReconciliationSnapshot v1` versioned contract build/parse pairs covering instrument/venue rules, normalized health, normalized account reads, and consolidated reconciliation.
 - Added a first-class broker-side `UNKNOWN` result for timeouts and lost acknowledgements with a deterministic blind-resubmission prohibition.
 - Added safe order command port extensions (`attach_protection`, `reduce_position`) with explicit adapter-boundary idempotency keys and fail-closed unsupported defaults.

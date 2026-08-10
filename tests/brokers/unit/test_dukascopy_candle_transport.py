@@ -7,13 +7,13 @@ from datetime import UTC, datetime, timedelta
 from typing import Self
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
 )
-from app.services.brokers.contracts.protocols import _ProviderResponseError
-from app.services.brokers.dukascopy_ticks.candle_transport import (
+from app.services.brokers.canonical_contracts.protocols import _ProviderResponseError
+from app.services.brokers.dukascopy.candle_transport import (
     _DukascopyCandleTransport,
 )
 

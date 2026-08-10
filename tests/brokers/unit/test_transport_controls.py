@@ -3,13 +3,13 @@
 import asyncio
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
 )
-from app.services.brokers.contracts.protocols import _CircuitOpenError
-from app.services.brokers.mt5_account.transport import _MT5Transport
+from app.services.brokers.canonical_contracts.protocols import _CircuitOpenError
+from app.services.brokers.metatrader.transport import _MT5Transport
 from pydantic import SecretStr
 
 

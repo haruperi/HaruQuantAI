@@ -6,8 +6,8 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pytest
-from app.services.brokers.binance_session.adapter import BinanceBrokerAdapter
-from app.services.brokers.contracts import (
+from app.services.brokers.binance.adapter import BinanceBrokerAdapter
+from app.services.brokers.canonical_contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,

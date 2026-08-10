@@ -9,15 +9,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.api import build_system_broker_connection_config
 from app.services.brokers import (
     connect_broker,
     create_broker_adapter,
     disconnect_broker,
     get_broker_id,
     get_broker_value_field,
-    resolve_provider_connection_config,
 )
-from app.utils import load_broker_provider_settings
+from app.utils import generate_id
 
 _NON_PRODUCTION_ENVIRONMENTS = frozenset({"demo", "testnet", "sandbox"})
 
@@ -34,9 +34,9 @@ def config(broker_id: str | object) -> object:
         else broker_id
     )
     try:
-        return resolve_provider_connection_config(
-            get_broker_id(str(raw_id)),
-            settings=load_broker_provider_settings(),
+        return build_system_broker_connection_config(
+            str(raw_id),
+            request_id=generate_id("req"),
         )
     except ValueError as error:
         raise UsageEvidenceError(str(error)) from error
@@ -102,7 +102,7 @@ def require_error(
 
 
 def show(label: str, result: object) -> None:
-    """Print a bounded canonical result including its substantive payload."""
+    """Print separate success and bounded substantive-data evidence."""
     detail = ""
     error = get_broker_value_field(result, "error")
     if error is not None:
@@ -112,12 +112,9 @@ def show(label: str, result: object) -> None:
     operation = extensions.get("operation", "unknown")
     data = get_broker_value_field(result, "data")
     rendered = "<none>" if data is None else repr(data)[:500]
-    print(
-        label,
-        get_broker_value_field(result, "status"),
-        str(operation) + detail,
-        "data=" + rendered,
-    )
+    status = get_broker_value_field(result, "status")
+    print(f"SUCCESS {label}: {status} {operation}{detail}")
+    print(f"DATA {label}: {rendered}")
 
 
 def show_value(

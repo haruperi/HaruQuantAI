@@ -9,10 +9,10 @@ import time
 from datetime import UTC, datetime
 
 import pytest
-from app.services.brokers.adapter_runtime.circuit_breaker import (
+from app.services.brokers._shared.circuit_breaker import (
     _TransportCircuitBreaker,
 )
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
@@ -21,7 +21,7 @@ from app.services.brokers.contracts import (
     BrokerErrorCode,
     BrokerId,
 )
-from app.services.brokers.yahoo_history.adapter import YahooBrokerAdapter
+from app.services.brokers.yahoo.adapter import YahooBrokerAdapter
 from app.utils.responses.models import StandardResponse
 
 

@@ -36,6 +36,7 @@ def _stub_lifecycle_storage_dependencies(monkeypatch: pytest.MonkeyPatch) -> Non
         return object()
 
     monkeypatch.setattr(lifecycle, "run_indicators_migrations", success)
+    monkeypatch.setattr(lifecycle, "run_broker_migrations", success)
     monkeypatch.setattr(lifecycle, "run_simulator_migrations", success)
     monkeypatch.setattr(lifecycle, "run_analytics_migrations", success)
     monkeypatch.setattr(lifecycle, "run_optimization_migrations", success)
@@ -105,7 +106,11 @@ def test_runtime_profile_and_execution_route_fail_closed() -> None:
     with pytest.raises(ValueError, match="runtime profile"):
         build_api_settings(runtime_profile="simulation", execution_route="paper")
     with pytest.raises(ValueError, match="live execution"):
-        build_api_settings(runtime_profile="live", execution_route="live")
+        build_api_settings(
+            runtime_profile="live",
+            execution_route="live",
+            allow_live_mutations=False,
+        )
     settings = build_api_settings(
         runtime_profile="live",
         execution_route="live",
@@ -211,6 +216,31 @@ def test_simulator_storage_failure_blocks_startup(
     with pytest.raises(
         lifecycle.StartupError,
         match="SIMULATOR_STORAGE_INITIALIZATION_FAILED",
+    ):
+        asyncio.run(enter_lifespan())
+    assert app.state.api_ready is False
+
+
+def test_brokers_storage_failure_blocks_startup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Brokers migration failure blocks API readiness fail closed."""
+    monkeypatch.setattr(
+        lifecycle,
+        "run_broker_migrations",
+        lambda _: SimpleNamespace(status="error", data=None),
+    )
+    app = create_api_app(build_api_settings())
+
+    async def enter_lifespan() -> None:
+        async with lifecycle.lifespan(app):
+            raise AssertionError("startup failure must prevent serving")
+
+    import asyncio
+
+    with pytest.raises(
+        lifecycle.StartupError,
+        match="BROKERS_STORAGE_INITIALIZATION_FAILED",
     ):
         asyncio.run(enter_lifespan())
     assert app.state.api_ready is False

@@ -11,7 +11,9 @@ from app.services.brokers.migrations import (
     BROKER_MIGRATIONS,
     BROKER_SCHEMA_VERSION,
     get_broker_migrations,
+    run_broker_migrations,
 )
+from app.services.brokers.migrations import definitions as migration_definitions
 from app.services.brokers.persistence import create, delete, read, update
 
 _FAKE_RESULT: dict[str, object] = {"status": "success", "data": ("row",)}
@@ -31,9 +33,15 @@ def _capture_executor(
     """
     captured: dict[str, Any] = {}
 
-    def fake_build_transaction_request(**kwargs: Any) -> dict[str, Any]:
-        captured["request"] = kwargs
+    def fake_build_statement_plan(**kwargs: Any) -> dict[str, Any]:
         return kwargs
+
+    def fake_build_transaction_request(
+        *, plan: dict[str, Any], request_id: str
+    ) -> dict[str, Any]:
+        request = {**plan, "request_id": request_id}
+        captured["request"] = request
+        return request
 
     def fake_execute_transaction(request: object) -> dict[str, object]:
         captured["executed"] = request
@@ -42,6 +50,7 @@ def _capture_executor(
     monkeypatch.setattr(
         module, "build_transaction_request", fake_build_transaction_request
     )
+    monkeypatch.setattr(module, "build_statement_plan", fake_build_statement_plan)
     monkeypatch.setattr(module, "execute_transaction", fake_execute_transaction)
     return captured
 
@@ -153,22 +162,62 @@ def test_delete_verb_remains_an_empty_module() -> None:
 
 
 def test_persistence_package_exports_exactly_the_crud_boundary() -> None:
-    """Expose exactly the six statement constructors at the package boundary."""
+    """Expose exactly the approved domain-record CRUD operations."""
     assert persistence.__all__ == [
         "close_symbol_mapping",
+        "create_environment_permission_record",
+        "create_health_record",
         "create_symbol_map_record",
         "disable_symbol_mapping",
         "read_canonical_symbol",
+        "read_environment_permission",
+        "read_event_checkpoint",
         "read_provider_symbol",
         "read_provider_symbol_as_of",
+        "read_route_recovery",
+        "upsert_event_checkpoint_record",
+        "upsert_route_recovery_record",
     ]
     for name in persistence.__all__:
         assert callable(getattr(persistence, name))
 
 
-def test_get_broker_migrations_returns_the_immutable_step() -> None:
-    """Return the one immutable Brokers migration step in application order."""
+def test_get_broker_migrations_returns_the_immutable_steps() -> None:
+    """Return both immutable Brokers migration steps in application order."""
     migrations = get_broker_migrations()
     assert migrations == BROKER_MIGRATIONS
-    assert len(migrations) == 1
-    assert BROKER_SCHEMA_VERSION == "v1"
+    assert len(migrations) == 2
+    assert migrations[1].migration_id == "002_broker_channel_state_v1"
+    assert BROKER_SCHEMA_VERSION == "v2"
+
+
+def test_run_broker_migrations_delegates_complete_manifest(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Delegate the complete immutable manifest through Data's runner."""
+    captured: dict[str, object] = {}
+
+    def build_request(**values: object) -> object:
+        captured.update(values)
+        captured["built"] = values
+        return values
+
+    def run(request: object) -> object:
+        captured["request"] = request
+        return _FAKE_RESULT
+
+    monkeypatch.setattr(
+        migration_definitions,
+        "build_migration_request",
+        build_request,
+    )
+    monkeypatch.setattr(migration_definitions, "run_domain_migrations", run)
+
+    result = run_broker_migrations("req-migration")
+
+    assert captured["domain"] == "brokers"
+    assert captured["steps"] == BROKER_MIGRATIONS
+    assert captured["request_id"] == "req-migration"
+    assert captured["complete_manifest"] is True
+    assert captured["request"] is captured["built"]
+    assert result is _FAKE_RESULT

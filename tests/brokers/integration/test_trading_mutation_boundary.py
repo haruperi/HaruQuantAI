@@ -64,7 +64,7 @@ def test_structurally_invalid_request_is_rejected_before_transmission() -> None:
 
 
 def test_registry_created_real_adapter_requires_connection_for_released_write() -> None:
-    """The genuine registry/MT5 boundary requires a ready connection."""
+    """The genuine adapter-runtime/MT5 boundary requires a ready connection."""
     created = create_broker_adapter(get_broker_id("mt5"), _config())
     assert get_broker_value_field(created, "status") == "success"
     adapter = get_broker_value_field(created, "data")

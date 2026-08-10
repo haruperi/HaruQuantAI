@@ -42,11 +42,60 @@ def test_opaque_helpers_reject_unknown_values_and_private_fields() -> None:
         get_broker_value_field(object(), "missing")
     with pytest.raises(TypeError, match="BrokerConnectionConfig"):
         get_broker_connection_id(object())
+    for accessor in (
+        get_broker_connection_environment,
+        get_broker_connection_account_reference,
+        is_broker_connection_enabled,
+    ):
+        with pytest.raises(TypeError, match="BrokerConnectionConfig"):
+            accessor(object())
+
+
+def test_public_contract_metadata_helpers_validate_opaque_values() -> None:
+    """Metadata getters return strings and reject malformed opaque objects."""
+    import app.services.brokers as operations
+
+    adapter = Mock(contract_version="v1", schema_id="brokers.adapter.v1")
+    flags = Mock(broker_id="mt5", environment="demo")
+    assert operations.get_broker_adapter_contract_version(adapter) == "v1"
+    assert operations.get_broker_adapter_schema_id(adapter) == "brokers.adapter.v1"
+    assert operations.get_broker_feature_flag_id(flags) == "mt5"
+    assert operations.get_broker_feature_flag_environment(flags) == "demo"
+    assert operations.get_broker_uncertainty("unknown").value == "unknown"
+    assert operations.get_broker_resubmission_policy("prohibited").value == "prohibited"
+
+    for accessor in (
+        operations.get_broker_adapter_contract_version,
+        operations.get_broker_adapter_schema_id,
+        operations.get_broker_feature_flag_id,
+        operations.get_broker_feature_flag_environment,
+    ):
+        with pytest.raises(TypeError):
+            accessor(object())
+
+
+def test_fake_adapter_public_controls_validate_and_apply_fixtures() -> None:
+    """Fake-adapter controls reject foreign values and apply bounded errors."""
+    import app.services.brokers as operations
+
+    with pytest.raises(TypeError, match="Broker connection configuration"):
+        operations.create_configured_fake_broker_adapter(object())
+    with pytest.raises(TypeError, match="fake broker adapter"):
+        operations.set_fake_broker_error(object(), "get_quote")
+
+    connection = operations.build_broker_connection_config(
+        "yahoo", "sandbox", provider_enabled=True
+    )
+    adapter = operations.create_configured_fake_broker_adapter(connection)
+    result = operations.set_fake_broker_error(adapter, "get_quote", "BROKER_TIMEOUT")
+    assert result.status == "success"
+    cleared = operations.set_fake_broker_error(adapter, "get_quote")
+    assert cleared.status == "success"
 
 
 def test_public_builders_construct_valid_opaque_contract_values() -> None:
     """Package-root builders preserve validated caller values."""
-    from app.services.brokers import operations
+    import app.services.brokers as operations
 
     assert operations.build_broker_value("position_filter") is not None
     assert operations.get_broker_environment("demo") is not None
@@ -98,7 +147,7 @@ def test_public_builders_construct_valid_opaque_contract_values() -> None:
 
 def test_public_async_operations_delegate_without_hidden_transformation() -> None:  # noqa: PLR0915
     """Every thin package-root operation delegates with bounded arguments."""
-    from app.services.brokers import operations
+    import app.services.brokers as operations
 
     adapter = AsyncMock()
     adapter.connection_events = Mock(return_value=iter(()))

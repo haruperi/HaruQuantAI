@@ -2,8 +2,8 @@
 
 import asyncio
 
-from app.services.brokers.adapter_runtime.base import _UnsupportedAdapterBase
-from app.services.brokers.contracts import (
+from app.services.brokers._shared.base import _UnsupportedAdapterBase
+from app.services.brokers.canonical_contracts import (
     BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerEnvironment,

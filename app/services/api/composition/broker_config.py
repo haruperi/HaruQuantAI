@@ -1,12 +1,111 @@
 """Secret-reference resolution at the Brokers composition boundary."""
 
 from collections.abc import Mapping
+from typing import cast
 
-from app.services.api.identity import resolve_credential_reference
+from pydantic import SecretStr
+
+from app.services.api._settings import get_api_settings
+from app.services.api.composition.runtime_settings import build_credential_key_set
+from app.services.api.identity import get_system_settings, resolve_credential_reference
 from app.services.brokers import build_broker_connection_config as _build_broker_config
-from app.utils import get_logger
+from app.utils import derive_stable_id, get_logger
 
 logger = get_logger(__name__)
+
+_PROVIDER_SETTINGS = {
+    "mt5": ("MT5_ENABLED", "demo", "mt5"),
+    "ctrader": ("CTRADER_ENABLED", "demo", "ctrader"),
+    "binance_spot": ("BINANCE_ENABLED", "testnet", None),
+    "dukascopy": ("DUKASCOPY_ENABLED", "sandbox", None),
+    "yahoo": ("YAHOO_ENABLED", "sandbox", None),
+}
+
+
+def _enabled(value: object) -> bool:
+    """Interpret one persisted provider enablement value.
+
+    Args:
+        value: Persisted system-setting value.
+
+    Returns:
+        Whether the value is the canonical enabled representation.
+    """
+    return str(value).strip().lower() == "true"
+
+
+def _resolve_system_credentials(
+    slot: str, *, request_id: str
+) -> Mapping[str, SecretStr]:
+    """Resolve one encrypted system credential slot for immediate composition.
+
+    Args:
+        slot: Manifest-approved system credential slot.
+        request_id: Canonical request identifier.
+
+    Returns:
+        Decrypted values wrapped in secret-redacting objects.
+
+    Raises:
+        ValueError: If the external encryption key is unavailable.
+        IdentityError: If the stored credential cannot be resolved safely.
+    """
+    reference_id = derive_stable_id("id", f"api-credential:system:{slot}")
+    return cast(
+        "Mapping[str, SecretStr]",
+        resolve_credential_reference(
+            f"secret://{reference_id}",
+            owner_id="system",
+            key_set=build_credential_key_set(get_api_settings()),
+            request_id=request_id,
+        ),
+    )
+
+
+def build_system_broker_connection_config(broker_id: str, *, request_id: str) -> object:
+    """Build a non-production Broker config from authoritative stored settings.
+
+    Args:
+        broker_id: Exact Brokers provider identifier.
+        request_id: Canonical request identifier.
+
+    Returns:
+        Immutable Brokers-owned connection configuration.
+
+    Raises:
+        ValueError: If the provider is unsupported, disabled, or its resolved
+            target is not an approved non-production environment.
+        IdentityError: If required credentials cannot be resolved safely.
+    """
+    if broker_id not in _PROVIDER_SETTINGS:
+        raise ValueError("unsupported system broker provider")
+    enabled_key, environment, credential_slot = _PROVIDER_SETTINGS[broker_id]
+    settings_record = get_system_settings(request_id=request_id)
+    if not _enabled(settings_record.settings.get(enabled_key, "false")):
+        message = f"{broker_id} system provider is disabled"
+        raise ValueError(message)
+    credentials: Mapping[str, SecretStr] = {}
+    if credential_slot is not None:
+        credentials = _resolve_system_credentials(
+            credential_slot,
+            request_id=request_id,
+        )
+    account_field = {"mt5": "login", "ctrader": "account_id"}.get(broker_id)
+    account_reference = (
+        credentials[account_field].get_secret_value()
+        if account_field is not None and account_field in credentials
+        else None
+    )
+    probe_symbol = "AAPL" if broker_id == "yahoo" else None
+    logger.info("Composing one enabled non-production system broker configuration")
+    return _build_broker_config(
+        broker_id=broker_id,
+        environment=environment,
+        account_reference=account_reference,
+        credentials=credentials or None,
+        provider_enabled=True,
+        probe_symbol=probe_symbol,
+    )
 
 
 def build_broker_connection_config(
@@ -51,4 +150,7 @@ def build_broker_connection_config(
     )
 
 
-__all__ = ("build_broker_connection_config",)
+__all__ = (
+    "build_broker_connection_config",
+    "build_system_broker_connection_config",
+)

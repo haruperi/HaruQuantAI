@@ -3,12 +3,12 @@
 import asyncio
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
 )
-from app.services.brokers.ctrader_session.transport import _CTraderTransport
+from app.services.brokers.ctrader.transport import _CTraderTransport
 
 
 class _Response:

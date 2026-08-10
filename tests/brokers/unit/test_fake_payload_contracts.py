@@ -1,13 +1,13 @@
 """Validate operation-specific FakeBrokerAdapter success payloads."""
 
 import pytest
-from app.services.brokers.contracts import (
+from app.services.brokers.canonical_contracts import (
     BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
 )
-from app.services.brokers.testing import FakeBrokerAdapter
+from app.services.brokers.conformance.fake import FakeBrokerAdapter
 from pydantic import SecretStr
 
 
