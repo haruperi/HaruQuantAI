@@ -23,23 +23,23 @@ def _app(*, authenticated: bool = True) -> FastAPI:
 
 
 def test_list_indicator_catalogue_authenticated() -> None:
-    """GET /api/v1/indicators returns standard response with 21 specs."""
+    """GET /api/v1/indicators returns all 64 registered specs."""
     status_code, body = get_json(_app(authenticated=True), "/api/v1/indicators")
     assert status_code == 200
     assert isinstance(body, dict)
     assert body["status"] == "success"
-    assert len(body["data"]) == 21
+    assert len(body["data"]) == 64
 
 
 def test_get_indicator_capabilities_authenticated() -> None:
-    """GET /api/v1/indicators/capabilities returns standard response with 21 capability records."""
+    """GET /api/v1/indicators/capabilities returns all 64 capability records."""
     status_code, body = get_json(
         _app(authenticated=True), "/api/v1/indicators/capabilities"
     )
     assert status_code == 200
     assert isinstance(body, dict)
     assert body["status"] == "success"
-    assert len(body["data"]) == 21
+    assert len(body["data"]) == 64
 
 
 def test_get_indicator_spec_authenticated() -> None:

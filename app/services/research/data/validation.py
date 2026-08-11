@@ -12,7 +12,6 @@ from app.services.data import (
     is_data_error,
     is_market_dataset,
     to_ohlcv_dataframe,
-    unwrap_data_response,
 )
 from app.services.research.contracts import (
     DataQualityReport,
@@ -178,17 +177,7 @@ def validate_dataset(
         raise ValueError("RES_INPUT_INVALID", "NONEMPTY_BAR_DATASET_REQUIRED")
     try:
         # Data contracts are intentionally opaque outside their package root.
-        frame_response = to_ohlcv_dataframe(dataset)  # type: ignore[arg-type]
-        if isinstance(frame_response, pd.DataFrame):
-            # Keep isolated legacy test doubles compatible while production
-            # Data calls are consumed through the StandardResponse boundary.
-            frame = frame_response
-        else:
-            frame = unwrap_data_response(
-                frame_response,
-                operation="research.data.validate_dataset",
-                request_id=frame_response.metadata.request_id,
-            )
+        frame = to_ohlcv_dataframe(dataset)  # type: ignore[arg-type]
     except Exception as error:
         if not is_data_error(error):
             raise

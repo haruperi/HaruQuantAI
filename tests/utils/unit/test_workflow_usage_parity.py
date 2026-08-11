@@ -18,6 +18,8 @@ EXPECTED = {
     "WF-UTL-006": "wf_utl_006_trace_identity_and_utc_time.py",
     "WF-UTL-007": "wf_utl_007_canonical_serialization_and_digest.py",
     "WF-UTL-008": "wf_utl_008_operational_contract_envelope.py",
+    "WF-UTL-009": "wf_utl_009_notification_orchestration.py",
+    "WF-UTL-010": "wf_utl_010_main_operations.py",
 }
 
 

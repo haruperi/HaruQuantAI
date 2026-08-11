@@ -642,6 +642,10 @@ async def submit_order(
 ) -> StandardResponse[object]:
     """Submit one governed order and return its canonical response.
 
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
+
     Returns:
         Standard response containing the raw receipt or an error.
     """
@@ -658,6 +662,10 @@ async def modify_order(
 ) -> StandardResponse[object]:
     """Modify one governed order and return its canonical response.
 
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
+
     Returns:
         Standard response containing the raw receipt or an error.
     """
@@ -673,6 +681,10 @@ async def cancel_order(
     request: TradingRequest, deps: TradingDependencies
 ) -> StandardResponse[object]:
     """Cancel one governed order and return its canonical response.
+
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
 
     Returns:
         Standard response containing the raw receipt or an error.

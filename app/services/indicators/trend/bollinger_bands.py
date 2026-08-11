@@ -85,12 +85,15 @@ def _rolling_available_at(
     """Return the inclusive rolling maximum availability timestamp.
 
     Args:
-        records: Validated OHLCV records.
-        index: Canonical result index.
-        period: Inclusive rolling window size.
+            records: Validated OHLCV records.
+            index: Canonical result index.
+            period: Inclusive rolling window size.
 
     Returns:
-        Row-aligned UTC availability timestamps.
+            Row-aligned UTC availability timestamps.
+
+    Raises:
+        None.
     """
     nanos = pd.DatetimeIndex([record.available_at for record in records]).asi8
     result = nanos.copy()

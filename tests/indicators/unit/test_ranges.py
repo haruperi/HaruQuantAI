@@ -245,6 +245,20 @@ def test_atr_short_history_is_entirely_warmup() -> None:
     assert (values["unavailable_reason"] == "warmup").all()
 
 
+def test_atr_exposes_true_range_alongside_atr() -> None:
+    """ATR publishes ``true_range`` as a second output, per IND-VOL-01."""
+    fixture = _load_fixture()
+    data = _dataset_from_bars(fixture["atr_bars"], timeframe="M5")
+    result = unwrap_response(atr(data, period=2))
+    values = result_values(result)
+    assert "true_range" in values.columns
+    valid = values["unavailable_reason"].isna()
+    assert valid.any()
+    # First valid true_range (index 1): TR = max(11-10, |11-9.5|, |10-9.5|) = 1.5
+    assert values.loc[valid, "true_range"].iloc[0] == pytest.approx(1.5, abs=1e-9)
+    assert values.loc[~valid, "true_range"].isna().all()
+
+
 def test_atr_manifest_row_count_matches_input() -> None:
     """ATR's manifest row count matches the input dataset row count."""
     fixture = _load_fixture()

@@ -96,11 +96,14 @@ def _timestamps_and_available(
     """Project one dataset's row timestamps and availability timestamps.
 
     Args:
-        data: One normalized, validated ``MarketDataset v1``.
+            data: One normalized, validated ``MarketDataset v1``.
 
     Returns:
-        A UTC ``DatetimeIndex`` plus parallel lists of row timestamps and
-        row ``available_at`` timestamps, all in dataset row order.
+            A UTC ``DatetimeIndex`` plus parallel lists of row timestamps and
+            row ``available_at`` timestamps, all in dataset row order.
+
+    Raises:
+        None.
     """
     timestamps = [record.timestamp for record in data.records]
     available_ats = [record.available_at for record in data.records]
@@ -111,14 +114,17 @@ def _timestamps_and_available(
 def _epoch_micros(available_ats: list[datetime]) -> np.ndarray:
     """Convert row ``available_at`` timestamps to exact epoch microseconds.
 
-    Uses exact integer ``timedelta`` division so no floating-point epoch
-    conversion can lose precision.
+        Uses exact integer ``timedelta`` division so no floating-point epoch
+        conversion can lose precision.
 
     Args:
-        available_ats: Row-ordered ``available_at`` timestamps.
+            available_ats: Row-ordered ``available_at`` timestamps.
 
     Returns:
-        An ``int64`` array of exact epoch-microsecond values.
+            An ``int64`` array of exact epoch-microsecond values.
+
+    Raises:
+        None.
     """
     return np.array(
         [(moment - _EPOCH) // timedelta(microseconds=1) for moment in available_ats],
@@ -132,11 +138,14 @@ def _cumulative_max_available_at(
     """Compute the cumulative maximum ``available_at`` up to each row.
 
     Args:
-        available_ats: Row-ordered ``available_at`` timestamps.
-        index: The result's UTC row index.
+            available_ats: Row-ordered ``available_at`` timestamps.
+            index: The result's UTC row index.
 
     Returns:
-        A UTC datetime64 Series of the running maximum ``available_at``.
+            A UTC datetime64 Series of the running maximum ``available_at``.
+
+    Raises:
+        None.
     """
     micros = _epoch_micros(available_ats)
     cumulative = np.maximum.accumulate(micros)
@@ -148,16 +157,19 @@ def _true_range_and_directional_moves(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Vectorize the per-row true range and directional movement arrays.
 
-    Observation 1 has true range ``high-low`` with no directional move.
-    Later rows use the standard true-range and +DM/-DM conventions.
+        Observation 1 has true range ``high-low`` with no directional move.
+        Later rows use the standard true-range and +DM/-DM conventions.
 
     Args:
-        high: Row-ordered high prices.
-        low: Row-ordered low prices.
-        close: Row-ordered close prices.
+            high: Row-ordered high prices.
+            low: Row-ordered low prices.
+            close: Row-ordered close prices.
 
     Returns:
-        Parallel ``(true_range, plus_dm, minus_dm)`` arrays.
+            Parallel ``(true_range, plus_dm, minus_dm)`` arrays.
+
+    Raises:
+        None.
     """
     row_count = len(high)
     previous_close = np.full(row_count, np.nan, dtype="float64")
@@ -184,20 +196,23 @@ def _wilder_adx(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Compute Wilder-smoothed +DI, -DI, DX, and ADX arrays.
 
-    Wilder smoothing and the DX/ADX chain are recursive, mathematically
-    stateful dependencies that cannot be vectorized safely; this function
-    is that documented exception (NFR-INDI-005).
+        Wilder smoothing and the DX/ADX chain are recursive, mathematically
+        stateful dependencies that cannot be vectorized safely; this function
+        is that documented exception (NFR-INDI-005).
 
     Args:
-        true_range: Per-row true range.
-        plus_dm: Per-row +DM.
-        minus_dm: Per-row -DM.
-        period: The approved smoothing period.
+            true_range: Per-row true range.
+            plus_dm: Per-row +DM.
+            minus_dm: Per-row -DM.
+            period: The approved smoothing period.
 
     Returns:
-        Parallel ``(plus_di, minus_di, adx_values, is_valid)`` arrays,
-        where ``is_valid`` marks rows at or after observation
-        ``2 * period``.
+            Parallel ``(plus_di, minus_di, adx_values, is_valid)`` arrays,
+            where ``is_valid`` marks rows at or after observation
+            ``2 * period``.
+
+    Raises:
+        None.
     """
     row_count = len(true_range)
     plus_di = np.full(row_count, np.nan, dtype="float64")

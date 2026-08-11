@@ -16,7 +16,17 @@ _WEEKLY_INTERVAL_SECONDS = 7 * 24 * 60 * 60
 
 
 def _text(value: str) -> str:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _text")
     if not value or value != value.strip():
         raise ValueError("value must be a non-empty trimmed string")
@@ -24,13 +34,30 @@ def _text(value: str) -> str:
 
 
 def _optional_text(value: str | None) -> str | None:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _optional_text")
     return None if value is None else _text(value)
 
 
 def _utc(value: datetime) -> datetime:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _utc")
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         raise ValueError("timestamp must be aware UTC")
@@ -62,28 +89,59 @@ class BackfillChunkRequest(_Contract):
     )
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("timeframe")
     @classmethod
     def _validate_timeframe(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_timeframe")
         return _optional_text(value)
 
     @field_validator("start", "end")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return _utc(value)
 
     @field_validator("max_records")
     @classmethod
     def _validate_bound(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_bound")
         if value <= 0:
             raise ValueError("max_records must be positive")
@@ -91,7 +149,14 @@ class BackfillChunkRequest(_Contract):
 
     @model_validator(mode="after")
     def _validate_request(self) -> BackfillChunkRequest:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_request")
         if self.start >= self.end:
             raise ValueError("start must precede end")
@@ -124,21 +189,45 @@ class BackfillChunkResult(_Contract):
     )
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("committed_start", "committed_end")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return _utc(value)
 
     @field_validator("record_count")
     @classmethod
     def _validate_count(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_count")
         if value <= 0:
             raise ValueError("record_count must be positive")
@@ -146,7 +235,14 @@ class BackfillChunkResult(_Contract):
 
     @model_validator(mode="after")
     def _validate_result(self) -> BackfillChunkResult:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_result")
         if self.committed_start >= self.committed_end:
             raise ValueError("committed_start must precede committed_end")
@@ -166,7 +262,17 @@ class RecoveryReport(_Contract):
     @field_validator("recovered_job_ids", "blocked_job_ids")
     @classmethod
     def _validate_ids(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_ids")
         validated = tuple(_text(item) for item in value)
         if len(set(validated)) != len(validated):
@@ -176,20 +282,41 @@ class RecoveryReport(_Contract):
     @field_validator("recovered_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return _utc(value)
 
     @field_validator("request_id")
     @classmethod
     def _validate_request_id(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_request_id")
         return _text(value)
 
     @model_validator(mode="after")
     def _validate_report(self) -> RecoveryReport:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_report")
         if set(self.recovered_job_ids) & set(self.blocked_job_ids):
             raise ValueError("a job cannot be both recovered and blocked")
@@ -215,14 +342,31 @@ class JobDefinition(_Contract):
     @field_validator("job_id", "source_id", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("symbols", "timeframes")
     @classmethod
     def _validate_text_tuple(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_text_tuple")
         validated = tuple(_text(item) for item in value)
         if len(set(validated)) != len(validated):
@@ -235,7 +379,17 @@ class JobDefinition(_Contract):
         cls,
         value: tuple[Literal["ohlcv", "tick", "spread", "economic_calendar"], ...],
     ) -> tuple[Literal["ohlcv", "tick", "spread", "economic_calendar"], ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_kinds")
         if not value or len(set(value)) != len(value):
             raise ValueError("data_kinds must be non-empty and unique")
@@ -244,13 +398,27 @@ class JobDefinition(_Contract):
     @field_validator("start", "end", "created_at")
     @classmethod
     def _validate_time(cls, value: datetime | None) -> datetime | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return None if value is None else _utc(value)
 
     @model_validator(mode="after")
     def _validate_definition(self) -> JobDefinition:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_definition")
         if self.end is not None and self.start >= self.end:
             raise ValueError("start must precede end")
@@ -269,7 +437,11 @@ class JobDefinition(_Contract):
         return self
 
     def _validate_calendar_job(self) -> None:
-        """Validate the exclusive, non-production weekly calendar job shape."""
+        """Validate the exclusive, non-production weekly calendar job shape.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         if self.data_kinds != ("economic_calendar",):
             raise ValueError("economic_calendar cannot be mixed with market data")
         if self.symbols or self.timeframes:
@@ -293,13 +465,27 @@ class ScheduleJobRequest(_Contract):
     @field_validator("job_id", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @model_validator(mode="after")
     def _validate_action(self) -> ScheduleJobRequest:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_action")
         if self.action == "create":
             if self.definition is None or self.definition.job_id != self.job_id:
@@ -326,28 +512,59 @@ class JobRunResult(_Contract):
     @field_validator("job_id", "run_id", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("last_checkpoint", "error_code")
     @classmethod
     def _validate_optional_text(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_optional_text")
         return _optional_text(value)
 
     @field_validator("started_at", "finished_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return _utc(value)
 
     @field_validator("committed_chunks", "record_count")
     @classmethod
     def _validate_count(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_count")
         if value < 0:
             raise ValueError("run counters must be non-negative")
@@ -355,7 +572,14 @@ class JobRunResult(_Contract):
 
     @model_validator(mode="after")
     def _validate_result(self) -> JobRunResult:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_result")
         if self.started_at >= self.finished_at:
             raise ValueError("started_at must precede finished_at")
@@ -383,7 +607,14 @@ class JobStatusRequest(_Contract):
     @field_validator("job_id", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
@@ -405,27 +636,55 @@ class JobStatus(_Contract):
     @field_validator("job_id", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("last_checkpoint", "last_error")
     @classmethod
     def _validate_optional_text(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_optional_text")
         return _optional_text(value)
 
     @field_validator("next_run_at")
     @classmethod
     def _validate_time(cls, value: datetime | None) -> datetime | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return None if value is None else _utc(value)
 
     @model_validator(mode="after")
     def _validate_status(self) -> JobStatus:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_status")
         if self.state == "running" and self.lease_state != "held":
             raise ValueError("running status requires a held lease")

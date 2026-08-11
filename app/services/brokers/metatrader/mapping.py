@@ -413,6 +413,14 @@ def _map_position(value: object) -> BrokerPosition:
         "LONG" if position_type == 0 else "SHORT" if position_type == 1 else "UNKNOWN"
     )
     magic = _optional(value, "magic")
+    sl_raw = _optional(value, "sl")
+    tp_raw = _optional(value, "tp")
+    stop_loss = (
+        Decimal(str(sl_raw)) if sl_raw is not None and float(sl_raw) > 0 else None
+    )
+    take_profit = (
+        Decimal(str(tp_raw)) if tp_raw is not None and float(tp_raw) > 0 else None
+    )
     return BrokerPosition(
         position_id=str(_field(value, "ticket")),
         symbol=str(_field(value, "symbol")),
@@ -425,6 +433,8 @@ def _map_position(value: object) -> BrokerPosition:
         open_price=Decimal(str(_field(value, "price_open"))),
         current_price=Decimal(str(_field(value, "price_current"))),
         profit=Decimal(str(_field(value, "profit"))),
+        stop_loss=stop_loss,
+        take_profit=take_profit,
         provider_timestamp=_time(value, "time_update"),
     )
 
@@ -702,7 +712,7 @@ def _map_order_result(value: object) -> BrokerOrderResult:
         Canonical explicit mutation outcome.
     """
     retcode = int(_field(value, "retcode"))
-    accepted = retcode in {10008, 10009}
+    accepted = retcode in {10008, 10009, 10025}
     partial = retcode == 10010
     order = _optional(value, "order")
     deal = _optional(value, "deal")

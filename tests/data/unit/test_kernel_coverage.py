@@ -7,7 +7,7 @@ import numpy as np
 # Ensure numba JIT is disabled so coverage can trace line execution
 os.environ["NUMBA_DISABLE_JIT"] = "1"
 
-from app.services.data.tick_derivation._kernel import (
+from app.services.data.transformation._tick_kernel import (
     _add_ratio_half_even,
     _phase_mask,
     _write_volume_bar,

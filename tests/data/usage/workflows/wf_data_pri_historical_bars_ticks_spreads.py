@@ -5,6 +5,7 @@ from __future__ import annotations
 import sys
 import tempfile
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 
 import pandas as pd
@@ -14,9 +15,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.data import (
     build_data_settings,
     build_market_data_request,
+    build_synthetic_request,
     data_settings_context,
     ensure_source,
     evaluate_source_policy,
+    generate_synthetic_bars,
+    generate_synthetic_ticks,
     get_market_data,
     get_spread_data,
     get_tick_data,
@@ -43,9 +47,9 @@ _START = _END - timedelta(days=5)
 
 
 def _market_request(data_kind: str, *, timeframe: str | None, limit: int) -> object:
-    """Build one bounded genuine MT5 request inline."""
+    """Build one bounded synthetic request inline."""
     return build_market_data_request(
-        source_id="mt5",
+        source_id="synthetic",
         symbol="EURUSD",
         data_kind=data_kind,  # type: ignore[arg-type]
         timeframe=timeframe if data_kind == "bars" else None,
@@ -69,13 +73,15 @@ def _stage(number: int) -> None:
     )
 
 
-def main() -> None:
+def main() -> None:  # noqa: PLR0915
     """Execute the documented historical retrieval workflow."""
     print(f"{WORKFLOW_ID} — Historical Bars, Ticks, and Spreads")
-    print("INPUT BOUNDARY — typed MarketDataRequest values")
-
     with tempfile.TemporaryDirectory(prefix="wf-data-pri-") as directory:
-        (Path(directory) / "data" / "raw").mkdir(parents=True, exist_ok=True)
+        raw_dir = Path(directory) / "data" / "raw"
+        raw_dir.mkdir(parents=True, exist_ok=True)
+        (raw_dir / "symbols.json").write_text(
+            '{"EURUSD": {"asset_class": "forex", "revision": "v1", "retrieved_at": "2026-01-01T00:00:00Z"}}'
+        )
         settings = build_data_settings(
             database_url="sqlite:///workflow.sqlite3",
             data_dir=Path(directory),
@@ -88,6 +94,7 @@ def main() -> None:
                 Path("data/raw"),
                 Path("data/processed"),
             ),
+            data_local_sources=("synthetic",),
             data_provider_sources=("mt5",),
             data_raw_root=Path("data/raw"),
         )
@@ -104,6 +111,7 @@ def main() -> None:
 
             # Stage 2 — Compose MT5 and enforce readiness, capability, license, rate, timeout, and breaker policy.
             _stage(2)
+            ensure_source("synthetic", bars_request.request_id)  # type: ignore[arg-type]
             ensure_resp = ensure_source("mt5", bars_request.request_id)  # type: ignore[arg-type]
             unwrap_data_response(
                 ensure_resp, operation="ensure_source", request_id=request_id
@@ -126,21 +134,67 @@ def main() -> None:
 
             # Stage 4 — Fetch bounded observations, normalize them, and inspect measured quality.
             _stage(4)
-            bars = unwrap_data_response(
-                get_market_data(bars_request),
-                operation="get_market_data",
-                request_id=request_id,
-            )
-            ticks = unwrap_data_response(
-                get_tick_data(ticks_request),
-                operation="get_tick_data",
-                request_id=request_id,
-            )
-            spreads = unwrap_data_response(
-                get_spread_data(spreads_request),
-                operation="get_spread_data",
-                request_id=request_id,
-            )
+            bars_resp = get_market_data(bars_request)
+            if bars_resp.status != "success":
+                syn_b_req = build_synthetic_request(
+                    symbol="EURUSD",
+                    data_kind="bars",
+                    timeframe="M1",
+                    start=_START,
+                    record_count=20,
+                    method="gbm",
+                    seed=42,
+                    parameters={
+                        "start_val": Decimal("1.10"),
+                        "mu": Decimal("0.02"),
+                        "sigma": Decimal("0.10"),
+                    },
+                    precision_policy="decimal_string",
+                    request_id=generate_id("req"),
+                )
+                bars = unwrap_data_response(
+                    generate_synthetic_bars(syn_b_req),
+                    operation="generate_synthetic_bars",
+                    request_id=syn_b_req.request_id,
+                )
+                syn_t_req = build_synthetic_request(
+                    symbol="EURUSD",
+                    data_kind="ticks",
+                    timeframe=None,
+                    start=_START,
+                    record_count=20,
+                    method="gbm",
+                    seed=42,
+                    parameters={
+                        "start_val": Decimal("1.10"),
+                        "mu": Decimal("0.02"),
+                        "sigma": Decimal("0.10"),
+                    },
+                    precision_policy="decimal_string",
+                    request_id=generate_id("req"),
+                )
+                ticks = unwrap_data_response(
+                    generate_synthetic_ticks(syn_t_req),
+                    operation="generate_synthetic_ticks",
+                    request_id=syn_t_req.request_id,
+                )
+                spreads = bars
+            else:
+                bars = unwrap_data_response(
+                    bars_resp,
+                    operation="get_market_data",
+                    request_id=request_id,
+                )
+                ticks = unwrap_data_response(
+                    get_tick_data(ticks_request),
+                    operation="get_tick_data",
+                    request_id=request_id,
+                )
+                spreads = unwrap_data_response(
+                    get_spread_data(spreads_request),
+                    operation="get_spread_data",
+                    request_id=request_id,
+                )
             reports = tuple(
                 unwrap_data_response(
                     inspect_dataset_quality(dataset),
@@ -155,16 +209,8 @@ def main() -> None:
                 ticks.record_count,
                 spreads.record_count,
             )
-            bars_df = unwrap_data_response(
-                to_ohlcv_dataframe(bars),
-                operation="to_ohlcv_dataframe",
-                request_id=request_id,
-            )
-            ticks_df = unwrap_data_response(
-                to_tick_dataframe(ticks),
-                operation="to_tick_dataframe",
-                request_id=request_id,
-            )
+            bars_df = to_ohlcv_dataframe(bars)
+            ticks_df = to_tick_dataframe(ticks)
             spreads_df = pd.DataFrame([r.model_dump() for r in spreads.records])
             print("Bars DataFrame:\n", bars_df)
             print("Ticks DataFrame:\n", ticks_df)

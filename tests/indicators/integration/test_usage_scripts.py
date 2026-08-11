@@ -6,19 +6,26 @@ import re
 import subprocess
 import sys
 import tempfile
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
+from tests.indicators.usage import _support as usage_support
+
 _FEATURE_USAGE_SCRIPTS = (
     "01_core.py",
-    "02_candles.py",
-    "03_trend.py",
-    "04_momentum.py",
-    "05_volatility.py",
-    "06_volume.py",
-    "07_snapshots.py",
-    "08_input_guards.py",
+    "02_trend.py",
+    "03_momentum.py",
+    "04_volatility.py",
+    "05_volume.py",
+    "06_snapshots.py",
+    "07_structure.py",
+    "08_order_flow.py",
+    "09_market_speed.py",
+    "10_regime.py",
+    "11_liquidity.py",
+    "12_patterns.py",
 )
 _USAGE_SCRIPTS = _FEATURE_USAGE_SCRIPTS
 
@@ -31,6 +38,55 @@ _REQUIREMENT_ROW = re.compile(
     r"\| (?P<responsibility>.*?) \|",
     re.MULTILINE,
 )
+
+
+def test_usage_market_request_is_mt5_h1_for_exactly_100_days(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Usage calculators share the required genuine MT5 request boundary."""
+    fixed_end = datetime(2026, 8, 10, 12, tzinfo=UTC)
+    captured: dict[str, object] = {}
+    dataset = object()
+
+    class _FixedDateTime(datetime):
+        @classmethod
+        def now(cls, tz: object = None) -> datetime:
+            del cls, tz
+            return fixed_end
+
+    def _get_market_data(**kwargs: object) -> object:
+        captured.update(kwargs)
+        return object()
+
+    def _unwrap_market_data_response(response: object) -> object:
+        assert response is not None
+        return dataset
+
+    monkeypatch.setattr(usage_support, "datetime", _FixedDateTime)
+    monkeypatch.setattr(usage_support, "get_market_data", _get_market_data)
+    monkeypatch.setattr(
+        usage_support,
+        "unwrap_market_data_response",
+        _unwrap_market_data_response,
+    )
+    monkeypatch.setattr(usage_support, "_MARKET_DATASET_CACHE", {})
+
+    assert usage_support.get_mt5_usage_dataset() is dataset
+    assert captured == {
+        "source_id": "mt5",
+        "symbol": "EURUSD",
+        "timeframe": "H1",
+        "start": fixed_end - timedelta(days=100),
+        "end": fixed_end,
+    }
+
+
+def test_migrated_formula_examples_do_not_use_synthetic_bars() -> None:
+    """Migrated calculator examples use the shared genuine-data boundary."""
+    support_path = Path(__file__).parents[1] / "usage" / "_migration_support.py"
+    source = support_path.read_text(encoding="utf-8")
+    assert "build_dataset" not in source
+    assert "get_mt5_usage_dataset" in source
 
 
 def test_usage_scripts_cover_exact_requirements_through_root_api() -> None:
@@ -153,6 +209,12 @@ def test_indicators_usage_script_executes_successfully(script_name: str) -> None
         assert f"SUCCESS: {fr_id}" in completed.stdout, (
             f"Missing 'SUCCESS: {fr_id}' marker in stdout of {script_name}:\n{completed.stdout}"
         )
-    assert "DATA:" in completed.stdout, (
-        f"Missing 'DATA:' evidence marker in stdout of {script_name}:\n{completed.stdout}"
+    assert "Data:" in completed.stdout, (
+        f"Missing 'Data:' output in stdout of {script_name}:\n{completed.stdout}"
+    )
+    assert "Status:" in completed.stdout, (
+        f"Missing 'Status:' output in stdout of {script_name}:\n{completed.stdout}"
+    )
+    assert "Message:" in completed.stdout, (
+        f"Missing 'Message:' output in stdout of {script_name}:\n{completed.stdout}"
     )

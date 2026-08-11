@@ -321,13 +321,21 @@ class MT5BrokerAdapter(
         del cursor
         if limit is None or limit <= 0:
             raise ValueError("positive tick limit is required")
-        if (start is None) != (end is None):
-            raise ValueError("tick start and end must be supplied together")
-        if start is None or end is None:
+        if start is None and end is None:
             latest = await self._transport.call("symbol_info_tick", symbol)
             available = () if latest is None else (latest,)
             items = tuple(_map_tick(value, symbol) for value in available)
-        else:
+        elif start is not None and end is None:
+            values = await self._transport.call(
+                "copy_ticks_from",
+                symbol,
+                start,
+                limit,
+                7,
+            )
+            available = values if values is not None else ()
+            items = tuple(_map_tick(value, symbol) for value in available[:limit])
+        elif start is not None and end is not None:
             if start >= end:
                 raise ValueError("tick start must precede end")
             values = await self._transport.call(
@@ -343,6 +351,8 @@ class MT5BrokerAdapter(
                 for tick in (_map_tick(value, symbol) for value in available[:limit])
                 if tick.event_timestamp <= end
             )
+        else:
+            raise ValueError("tick end cannot be supplied without start")
         return self._result(
             BrokerCapabilityId.GET_TICKS,
             data=BrokerPage(

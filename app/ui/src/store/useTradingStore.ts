@@ -45,7 +45,8 @@ export const useTradingStore = create<TradingStoreState>((set) => ({
       expandedWidgetId: null,
       widgets: [
         { id: 'watchlist-1', type: 'watchlist', title: 'Watchlist', col: 1, row: 1, colSpan: 6, rowSpan: 2 },
-        { id: 'options-1', type: 'optionsGrid', title: 'ESU5 Options', symbol: 'ESU5', col: 7, row: 1, colSpan: 6, rowSpan: 2 }
+        { id: 'options-1', type: 'optionsGrid', title: 'ESU5 Options', symbol: 'ESU5', col: 7, row: 1, colSpan: 6, rowSpan: 2 },
+        { id: 'data-1', type: 'data', title: 'Data Capabilities', col: 1, row: 3, colSpan: 12, rowSpan: 3 }
       ]
     }
   ],

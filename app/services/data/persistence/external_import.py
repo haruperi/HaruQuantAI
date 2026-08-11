@@ -30,6 +30,9 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
+from app.services.data.integrity.series import (
+    _inspect_records_quality_raw as inspect_records_quality,
+)
 from app.services.data.persistence.contracts import (
     IMPORT_DIALECTS,
     DatasetSaveRequest,
@@ -37,9 +40,6 @@ from app.services.data.persistence.contracts import (
     StorageManifest,
 )
 from app.services.data.persistence.dataset_writer import _save_dataset_raw
-from app.services.data.quality.series import (
-    _inspect_records_quality_raw as inspect_records_quality,
-)
 from app.utils import create_audit_event, generate_id, get_logger
 
 logger = get_logger(__name__)
@@ -57,7 +57,14 @@ else:
         """Load pandas only when an external import operation requires it."""
 
         def __getattr__(self, name: str) -> object:
-            """Resolve one pandas attribute at the runtime operation boundary."""
+            """Resolve one pandas attribute at the runtime operation boundary.
+
+            Args:
+                name: The ``name`` argument.
+
+            Returns:
+                The result produced by the operation.
+            """
             return getattr(import_module("pandas"), name)
 
     pd = _LazyPandas()
@@ -67,7 +74,11 @@ _MT5_TIME_COLUMNS = ("<DATE>", "<TIME>")
 
 
 def _describe_import_dialects_raw() -> Mapping[str, str]:
-    """Return the supported deterministic header and delimiter dialects."""
+    """Return the supported deterministic header and delimiter dialects.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Describing supported DATA import dialects")
     return IMPORT_DIALECTS
 
@@ -90,6 +101,12 @@ def describe_import_dialects() -> StandardResponse[Mapping[str, str]]:
 
 def _resolve_source_path(request: ExternalImportRequest) -> Path:
     """Resolve the artifact path under the configured data directory.
+
+    Args:
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
 
     Raises:
         DataError: If `DATA_DIR` is unset or the artifact is absent.
@@ -114,6 +131,13 @@ def _resolve_source_path(request: ExternalImportRequest) -> Path:
 def _read_frame(path: Path, request: ExternalImportRequest) -> pd.DataFrame:
     """Read the artifact under its declared dialect.
 
+    Args:
+        path: The ``path`` argument.
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         DataError: If the artifact cannot be decoded under the declared dialect.
     """
@@ -134,6 +158,10 @@ def _read_frame(path: Path, request: ExternalImportRequest) -> pd.DataFrame:
 
 def _require_columns(frame: pd.DataFrame, request: ExternalImportRequest) -> None:
     """Fail closed when the declared mapping does not match the artifact.
+
+    Args:
+        frame: The ``frame`` argument.
+        request: The ``request`` argument.
 
     Raises:
         DataError: If any declared source column is absent.
@@ -162,6 +190,14 @@ def _timestamp(
 ) -> datetime:
     """Return one UTC timestamp from the declared column or MT5 date/time pair.
 
+    Args:
+        row: The ``row`` argument.
+        request: The ``request`` argument.
+        frame_columns: The ``frame_columns`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         DataError: If the timestamp cannot be parsed as UTC.
     """
@@ -189,6 +225,14 @@ def _timestamp(
 def _decimal(value: object, field: str, request_id: str) -> Decimal:
     """Convert one source value to an exact decimal without float rounding.
 
+    Args:
+        value: The ``value`` argument.
+        field: The ``field`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         DataError: If the value is absent or not an exact numeric.
     """
@@ -209,7 +253,16 @@ def _decimal(value: object, field: str, request_id: str) -> Decimal:
 
 
 def _optional_decimal(value: object, field: str, request_id: str) -> Decimal | None:
-    """Return an exact decimal or an explicit absence."""
+    """Return an exact decimal or an explicit absence.
+
+    Args:
+        value: The ``value`` argument.
+        field: The ``field`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     if value is None or (isinstance(value, float) and pd.isna(value)):
         return None
     return _decimal(value, field, request_id)
@@ -221,7 +274,17 @@ def _bar_record(
     request: ExternalImportRequest,
     available_at: datetime,
 ) -> OHLCVRecord:
-    """Build one canonical bar from a mapped source row."""
+    """Build one canonical bar from a mapped source row.
+
+    Args:
+        row: The ``row`` argument.
+        timestamp: The ``timestamp`` argument.
+        request: The ``request`` argument.
+        available_at: The ``available_at`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     mapping: ColumnMapping = request.mapping
     request_id = request.request_id
     return OHLCVRecord(
@@ -255,7 +318,17 @@ def _tick_record(
     request: ExternalImportRequest,
     available_at: datetime,
 ) -> TickRecord:
-    """Build one canonical tick from a mapped source row."""
+    """Build one canonical tick from a mapped source row.
+
+    Args:
+        row: The ``row`` argument.
+        timestamp: The ``timestamp`` argument.
+        request: The ``request`` argument.
+        available_at: The ``available_at`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     mapping: ColumnMapping = request.mapping
     request_id = request.request_id
     return TickRecord(
@@ -291,7 +364,17 @@ def _spread_record(
     request: ExternalImportRequest,
     available_at: datetime,
 ) -> SpreadRecord:
-    """Build one canonical spread observation from a mapped source row."""
+    """Build one canonical spread observation from a mapped source row.
+
+    Args:
+        row: The ``row`` argument.
+        timestamp: The ``timestamp`` argument.
+        request: The ``request`` argument.
+        available_at: The ``available_at`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     mapping: ColumnMapping = request.mapping
     spread = _decimal(row[mapping.spread], "spread", request.request_id)
     return SpreadRecord(
@@ -313,6 +396,13 @@ def _build_records(
     request: ExternalImportRequest,
 ) -> tuple[CanonicalRecord, ...]:
     """Map and validate every source row into canonical records.
+
+    Args:
+        frame: The ``frame`` argument.
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
 
     Raises:
         DataError: If any row violates the canonical contract or ordering.
@@ -400,9 +490,14 @@ def _require_acceptable_quality(
 
 
 def _audit_import(request: ExternalImportRequest, record_count: int) -> None:
-    """Record the external origin of an admitted artifact."""
+    """Record the external origin of an admitted artifact.
+
+    Args:
+        request: The ``request`` argument.
+        record_count: The ``record_count`` argument.
+    """
     # Import at the side-effect boundary because audit delegates its CRUD back here.
-    from app.services.data.audit.store import _persist_audit_event_raw
+    from app.services.data.evidence.audit_store import _persist_audit_event_raw
 
     logger.info("Recording external import provenance for %s", request.symbol)
     _persist_audit_event_raw(

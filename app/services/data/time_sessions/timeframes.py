@@ -60,6 +60,12 @@ TIMEFRAME_MANIFEST: Final[Mapping[str, TimeframeSpec]] = {
 def _get_timeframe_spec_raw(key: str) -> TimeframeSpec:
     """Retrieve the spec for a timeframe key, raising if unsupported.
 
+    Args:
+        key: The ``key`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         DataError: If the timeframe key is not supported.
     """
@@ -94,6 +100,10 @@ def get_timeframe_spec(key: str) -> StandardResponse[TimeframeSpec]:
 
 def _validate_resample_target_raw(source_key: str | None, target_key: str) -> None:
     """Validate that the target timeframe is strictly higher than the source.
+
+    Args:
+        source_key: The ``source_key`` argument.
+        target_key: The ``target_key`` argument.
 
     Raises:
         DataError: If validation fails.

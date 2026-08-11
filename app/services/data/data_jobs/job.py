@@ -70,7 +70,15 @@ _BACKGROUND_TASKS: dict[str, asyncio.Task[None]] = {}
 def _get_active_lease_state(
     lease_expires_at: str | None, now: datetime
 ) -> Literal["none", "held", "expired"]:
-    """Compute lease state based on lease_expires_at timestamp."""
+    """Compute lease state based on lease_expires_at timestamp.
+
+    Args:
+        lease_expires_at: The ``lease_expires_at`` argument.
+        now: The ``now`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _get_active_lease_state")
     if not lease_expires_at:
         return "none"
@@ -79,7 +87,14 @@ def _get_active_lease_state(
 
 
 def _handle_create(request: ScheduleJobRequest) -> None:
-    """Handle creation of a job definition in SQLite."""
+    """Handle creation of a job definition in SQLite.
+
+    Args:
+        request: The ``request`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _handle_create")
     definition = request.definition
     if definition is None:
@@ -192,7 +207,15 @@ def _handle_create(request: ScheduleJobRequest) -> None:
 
 
 def _handle_start(request: ScheduleJobRequest, clock: Any | None = None) -> None:
-    """Handle starting an update job."""
+    """Handle starting an update job.
+
+    Args:
+        request: The ``request`` argument.
+        clock: The ``clock`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _handle_start")
     job_res = read_update_job_start_state(
         request.job_id,
@@ -230,7 +253,14 @@ def _handle_start(request: ScheduleJobRequest, clock: Any | None = None) -> None
 
 
 def _handle_stop(request: ScheduleJobRequest) -> None:
-    """Handle stopping an update job."""
+    """Handle stopping an update job.
+
+    Args:
+        request: The ``request`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _handle_stop")
     job_res = read_update_job_identity(
         request.job_id,
@@ -302,6 +332,9 @@ def read_update_job_status(
 
     Returns:
         The fetched JobStatus.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
     """
     logger.info("Reading status for update job %s", request.job_id)
 
@@ -346,7 +379,19 @@ def read_update_job_status(
 def _acquire_job_run_lease(
     job_id: str, started_at: datetime, request_id: str
 ) -> dict[str, object]:
-    """Verify job execution permissions and acquire the lease in SQLite."""
+    """Verify job execution permissions and acquire the lease in SQLite.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        started_at: The ``started_at`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _acquire_job_run_lease")
     res = read_update_job_definition_record(job_id, request_id=request_id)
     if not res.rows:
@@ -394,7 +439,17 @@ def _determine_run_range(
     request_id: str,
     observed_at: datetime,
 ) -> tuple[datetime, datetime]:
-    """Calculate the precise start and end times for the backfill run."""
+    """Calculate the precise start and end times for the backfill run.
+
+    Args:
+        row: The ``row`` argument.
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+        observed_at: The ``observed_at`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _determine_run_range")
     job_start = datetime.fromisoformat(str(row["start"]))
     job_end = datetime.fromisoformat(str(row["end"])) if row["end"] else None
@@ -424,7 +479,18 @@ def _execute_run_chunks(
     request_id: str,
     clock: Any | None,
 ) -> tuple[int, int, str | None]:
-    """Loop and execute all required backfill chunk requests."""
+    """Loop and execute all required backfill chunk requests.
+
+    Args:
+        row: The ``row`` argument.
+        start_time: The ``start_time`` argument.
+        end_time: The ``end_time`` argument.
+        request_id: The ``request_id`` argument.
+        clock: The ``clock`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _execute_run_chunks")
     job_id = str(row["job_id"])
     symbols = json.loads(str(row["symbols_json"]))
@@ -471,7 +537,19 @@ def _execute_calendar_sync(
     request_id: str,
     rows: Sequence[Mapping[str, object]] | None = None,
 ) -> tuple[int, int, str]:
-    """Synchronize the official current week for one calendar job."""
+    """Synchronize the official current week for one calendar job.
+
+    Args:
+        row: The ``row`` argument.
+        request_id: The ``request_id`` argument.
+        rows: The ``rows`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     environment = row.get("environment")
     if not isinstance(environment, str):
         raise DataError(
@@ -583,13 +661,25 @@ def run_data_update_job_once(
 
 
 def _start_background_loop(job_id: str, interval_seconds: int) -> None:
-    """Helper to start the background asyncio scheduler loop for one job."""
+    """Helper to start the background asyncio scheduler loop for one job.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        interval_seconds: The ``interval_seconds`` argument.
+
+    Raises:
+        Exception: If the operation cannot be completed safely.
+    """
     if job_id in _BACKGROUND_TASKS:
         logger.info("Scheduler task for job %s is already running", job_id)
         return
 
     async def _loop() -> None:
-        """Execute one private DATA operation."""
+        """Execute one private DATA operation.
+
+        Raises:
+            Exception: If the operation cannot be completed safely.
+        """
         logger.info("Entering background scheduler loop for job %s", job_id)
         try:
             while True:
@@ -632,7 +722,11 @@ def _start_background_loop(job_id: str, interval_seconds: int) -> None:
 
 
 def _stop_background_loop(job_id: str) -> None:
-    """Helper to stop/cancel the background asyncio loop for one job."""
+    """Helper to stop/cancel the background asyncio loop for one job.
+
+    Args:
+        job_id: The ``job_id`` argument.
+    """
     task = _BACKGROUND_TASKS.pop(job_id, None)
     if task:
         logger.info("Cancelling background loop task for job %s", job_id)
@@ -643,7 +737,15 @@ def _stop_background_loop(job_id: str) -> None:
 
 
 def create_data_update_job(definition: JobDefinition, request_id: str) -> JobStatus:
-    """Register a new persistent update/backfill job schedule."""
+    """Register a new persistent update/backfill job schedule.
+
+    Args:
+        definition: The ``definition`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Executing public DATA job creation")
     req = ScheduleJobRequest(
         action="create",
@@ -655,7 +757,15 @@ def create_data_update_job(definition: JobDefinition, request_id: str) -> JobSta
 
 
 def start_data_update_job(job_id: str, request_id: str) -> JobStatus:
-    """Transitions a configured job state to active scheduling."""
+    """Transitions a configured job state to active scheduling.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Executing public DATA job start")
     req = ScheduleJobRequest(
         action="start",
@@ -666,7 +776,15 @@ def start_data_update_job(job_id: str, request_id: str) -> JobStatus:
 
 
 def stop_data_update_job(job_id: str, request_id: str) -> JobStatus:
-    """Transitions an active job state to stopped."""
+    """Transitions an active job state to stopped.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Executing public DATA job stop")
     req = ScheduleJobRequest(
         action="stop",
@@ -677,7 +795,14 @@ def stop_data_update_job(job_id: str, request_id: str) -> JobStatus:
 
 
 def get_data_update_job_status(request: JobStatusRequest) -> JobStatus:
-    """Query configuration, schedules, and active run status of a job."""
+    """Query configuration, schedules, and active run status of a job.
+
+    Args:
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Executing public DATA job-status query")
     return read_update_job_status(request)
 

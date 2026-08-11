@@ -233,7 +233,7 @@ def test_to_ohlcv_dataframe_returns_float64_analytical_copy() -> None:
     """Project canonical bars to the exact public analytical frame shape."""
     dataset = _bar_dataset()
 
-    frame = _unwrap(to_ohlcv_dataframe(dataset))
+    frame = to_ohlcv_dataframe(dataset)
 
     assert list(frame.columns) == [  # type: ignore[union-attr]
         "open",
@@ -266,29 +266,23 @@ def test_to_ohlcv_dataframe_rejects_non_bar_dataset() -> None:
         update={"data_kind": "ticks", "timeframe": None},
     )
 
-    response = to_ohlcv_dataframe(dataset)
-
-    assert response.status == "error"
-    assert response.error is not None
-    assert response.error.code == "VALIDATION_FAILED"
+    with pytest.raises(DataError, match="VALIDATION_FAILED"):
+        to_ohlcv_dataframe(dataset)
 
 
 def test_to_ohlcv_dataframe_rejects_float64_overflow() -> None:
     """Reject canonical Decimal values that overflow analytical float64."""
     dataset = _bar_dataset(price=Decimal("1e999"))
 
-    response = to_ohlcv_dataframe(dataset)
-
-    assert response.status == "error"
-    assert response.error is not None
-    assert response.error.code == "PRECISION_MISMATCH"
+    with pytest.raises(DataError, match="PRECISION_MISMATCH"):
+        to_ohlcv_dataframe(dataset)
 
 
 def test_to_ohlcv_dataframe_preserves_missing_spread_as_nan() -> None:
     """Preserve missing historical spread without inventing a value or unit."""
     dataset = _bar_dataset(include_spread=False)
 
-    frame = _unwrap(to_ohlcv_dataframe(dataset))
+    frame = to_ohlcv_dataframe(dataset)
 
     assert frame["spread"].isna().all()  # type: ignore[union-attr]
     assert str(frame["spread"].dtype) == "float64"  # type: ignore[union-attr]
@@ -305,7 +299,7 @@ def test_to_ohlcv_dataframe_preserves_partial_spread_evidence() -> None:
         ),
     )
 
-    frame = _unwrap(to_ohlcv_dataframe(dataset.model_copy(update={"records": records})))
+    frame = to_ohlcv_dataframe(dataset.model_copy(update={"records": records}))
 
     assert frame.iloc[0]["spread"] == 2.0  # type: ignore[union-attr]
     assert pd.isna(frame.iloc[1]["spread"])  # type: ignore[union-attr]
@@ -320,11 +314,8 @@ def test_to_ohlcv_dataframe_rejects_conflicting_spread_units() -> None:
         dataset.records[1].model_copy(update={"spread_unit": "pips"}),
     )
 
-    response = to_ohlcv_dataframe(dataset.model_copy(update={"records": records}))
-
-    assert response.status == "error"
-    assert response.error is not None
-    assert response.error.code == "DATA_QUALITY_FAILED"
+    with pytest.raises(DataError, match="DATA_QUALITY_FAILED"):
+        to_ohlcv_dataframe(dataset.model_copy(update={"records": records}))
 
 
 def test_ohlcv_record_requires_spread_unit_with_spread() -> None:
@@ -340,7 +331,7 @@ def test_to_tick_dataframe_returns_float64_analytical_copy() -> None:
     """Project canonical ticks while preserving genuine missing values."""
     dataset = _tick_dataset()
 
-    frame = _unwrap(to_tick_dataframe(dataset))
+    frame = to_tick_dataframe(dataset)
 
     assert list(frame.columns) == ["bid", "ask", "last", "volume"]  # type: ignore[union-attr]
     assert frame.index.name == "timestamp"  # type: ignore[union-attr]
@@ -365,44 +356,32 @@ def test_to_tick_dataframe_rejects_non_tick_dataset() -> None:
     """Reject a dataset whose declared kind is not ticks."""
     dataset = _bar_dataset()
 
-    response = to_tick_dataframe(dataset)
-
-    assert response.status == "error"
-    assert response.error is not None
-    assert response.error.code == "VALIDATION_FAILED"
+    with pytest.raises(DataError, match="VALIDATION_FAILED"):
+        to_tick_dataframe(dataset)
 
 
 def test_to_tick_dataframe_rejects_inconsistent_price_units() -> None:
     """Reject a frame that would mix incomparable provider price units."""
     dataset = _tick_dataset(second_price_unit="USD")
 
-    response = to_tick_dataframe(dataset)
-
-    assert response.status == "error"
-    assert response.error is not None
-    assert response.error.code == "DATA_QUALITY_FAILED"
+    with pytest.raises(DataError, match="DATA_QUALITY_FAILED"):
+        to_tick_dataframe(dataset)
 
 
 def test_to_tick_dataframe_rejects_inconsistent_volume_units() -> None:
     """Reject a frame that would mix incomparable provider volume units."""
     dataset = _tick_dataset(first_volume_unit="contracts")
 
-    response = to_tick_dataframe(dataset)
-
-    assert response.status == "error"
-    assert response.error is not None
-    assert response.error.code == "DATA_QUALITY_FAILED"
+    with pytest.raises(DataError, match="DATA_QUALITY_FAILED"):
+        to_tick_dataframe(dataset)
 
 
 def test_to_tick_dataframe_rejects_float64_overflow() -> None:
     """Reject canonical Decimal tick values that overflow analytical float64."""
     dataset = _tick_dataset(price=Decimal("1e999"))
 
-    response = to_tick_dataframe(dataset)
-
-    assert response.status == "error"
-    assert response.error is not None
-    assert response.error.code == "PRECISION_MISMATCH"
+    with pytest.raises(DataError, match="PRECISION_MISMATCH"):
+        to_tick_dataframe(dataset)
 
 
 def test_serialize_dataframe_records() -> None:

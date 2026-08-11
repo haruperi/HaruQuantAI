@@ -43,14 +43,28 @@ _CURRENCY_CODE_LENGTH: Final[int] = 3
 
 
 def _iso(value: datetime | None) -> str | None:
-    """Render one aware UTC datetime as ISO text or NULL."""
+    """Render one aware UTC datetime as ISO text or NULL.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     if value is None:
         return None
     return value.astimezone(UTC).isoformat()
 
 
 def _parse_dt(value: str | None) -> datetime | None:
-    """Re-parse one stored ISO timestamp, returning timezone-aware UTC."""
+    """Re-parse one stored ISO timestamp, returning timezone-aware UTC.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     if value is None:
         return None
     parsed = datetime.fromisoformat(value)
@@ -74,18 +88,41 @@ def _opt_str(row: dict[str, object], key: str) -> str | None:
 
 
 def _exact_value(raw: str | None, numeric: Decimal | None) -> str | None:
-    """Prefer exact provider text and fall back to normalized decimal text."""
+    """Prefer exact provider text and fall back to normalized decimal text.
+
+    Args:
+        raw: The ``raw`` argument.
+        numeric: The ``numeric`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return str(numeric) if numeric is not None else raw
 
 
 def _event_id(event: EconomicEvent) -> str:
-    """Return one provider-qualified stable event identity."""
+    """Return one provider-qualified stable event identity.
+
+    Args:
+        event: The ``event`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     prefix = f"{event.provider}:"
     return event.id if event.id.startswith(prefix) else f"{prefix}{event.id}"
 
 
 def _to_row(event: EconomicEvent, *, request_id: str) -> tuple[str | int | None, ...]:
-    """Pack one `EconomicEvent` for the upsert parameter set."""
+    """Pack one `EconomicEvent` for the upsert parameter set.
+
+    Args:
+        event: The ``event`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return (
         _event_id(event),
         event.name,
@@ -107,7 +144,18 @@ def _to_row(event: EconomicEvent, *, request_id: str) -> tuple[str | int | None,
 
 
 def _required_text(row: dict[str, object], key: str) -> str:
-    """Return one required row scalar as text."""
+    """Return one required row scalar as text.
+
+    Args:
+        row: The ``row`` argument.
+        key: The ``key`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     value = row[key]
     if value is None:
         detail = f"{key} is required"
@@ -116,7 +164,18 @@ def _required_text(row: dict[str, object], key: str) -> str:
 
 
 def _required_dt(row: dict[str, object], key: str) -> datetime:
-    """Return one required stored UTC timestamp."""
+    """Return one required stored UTC timestamp.
+
+    Args:
+        row: The ``row`` argument.
+        key: The ``key`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     value = _parse_dt(_required_text(row, key))
     if value is None:
         raise ValueError("stored timestamp is required")
@@ -212,6 +271,13 @@ class EconomicEventStore:
     def _upsert_raw(self, events: Sequence[EconomicEvent], *, request_id: str) -> int:
         """Insert or refresh events under their composite provider key.
 
+        Args:
+            events: The ``events`` argument.
+            request_id: The ``request_id`` argument.
+
+        Returns:
+            The result produced by the operation.
+
         Raises:
             DataError: If the bounded write transaction fails.
         """
@@ -263,6 +329,18 @@ class EconomicEventStore:
         request_id: str | None = None,
     ) -> list[EconomicEvent]:
         """Return stored events for a UTC window under optional filters.
+
+        Args:
+            start: The ``start`` argument.
+            end: The ``end`` argument.
+            currencies: The ``currencies`` argument.
+            countries: The ``countries`` argument.
+            minimum_impact: The ``minimum_impact`` argument.
+            provider: The ``provider`` argument.
+            request_id: The ``request_id`` argument.
+
+        Returns:
+            The result produced by the operation.
 
         Raises:
             DataError: If the window is invalid or the read transaction fails.
@@ -334,7 +412,19 @@ class EconomicEventStore:
     def missing_intervals(
         self, start: datetime, end: datetime, *, request_id: str
     ) -> tuple[tuple[datetime, datetime], ...]:
-        """Return uncovered portions of one requested UTC window."""
+        """Return uncovered portions of one requested UTC window.
+
+        Args:
+            start: The ``start`` argument.
+            end: The ``end`` argument.
+            request_id: The ``request_id`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            DataError: If the operation cannot be completed safely.
+        """
         if start.tzinfo is None or end.tzinfo is None or start >= end:
             raise DataError("VALIDATION_FAILED", safe_details={"field": "window"})
         result = read_economic_calendar_coverage_records(
@@ -373,7 +463,17 @@ class EconomicEventStore:
         complete: bool = True,
         synchronized_at: datetime | None = None,
     ) -> None:
-        """Record one coverage interval after its event transaction succeeds."""
+        """Record one coverage interval after its event transaction succeeds.
+
+        Args:
+            start: The ``start`` argument.
+            end: The ``end`` argument.
+            provider: The ``provider`` argument.
+            source_revision: The ``source_revision`` argument.
+            request_id: The ``request_id`` argument.
+            complete: The ``complete`` argument.
+            synchronized_at: The ``synchronized_at`` argument.
+        """
         observed = synchronized_at or datetime.now(UTC)
         update_economic_calendar_coverage_record(
             (
@@ -392,6 +492,12 @@ class EconomicEventStore:
         self, *, now: datetime | None = None
     ) -> tuple[tuple[datetime, datetime], tuple[datetime, datetime]]:
         """Return the next-7-day and next-24-hour refresh windows as UTC bounds.
+
+        Args:
+            now: The ``now`` argument.
+
+        Returns:
+            The result produced by the operation.
 
         Raises:
                     DataError: If `

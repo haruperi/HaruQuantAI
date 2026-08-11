@@ -2,21 +2,51 @@
 
 ## [Unreleased]
 
+### Reorganize Strategy operational-planning features into focused modules
+
+Strategy's operational-planning capabilities were promoted into focused feature modules
+(`profiles/`, `playbooks/`, `setup_evaluation/`, `trade_plan/`, `management_plan/`,
+`automation/`, `lifecycle/`) while preserving the package-root public API and all engine
+features. An additive migration `0003_strategy_operational_planning` defines the new
+operational-planning tables.
+
+#### Added (7)
+
+- Added `profiles/` for strategy profiles and exact approved-expectancy references under `FEAT-STR-13`.
+- Added `playbooks/` for human-readable and machine-evaluable setup definitions under `FEAT-STR-14`.
+- Added `setup_evaluation/` for deterministic match/stale/regime/evidence outcomes under `FEAT-STR-15`.
+- Added `trade_plan/` for canonical trade plans, versions, amendments, and manual-plan support under `FEAT-STR-16`.
+- Added `management_plan/` for exit and management plans and ownership handoff under `FEAT-STR-17`.
+- Added `automation/` for `OFF/ADVISORY/SUPERVISED/AUTOMATED` mode policy under `FEAT-STR-18`.
+- Added `lifecycle/` for strategy lifecycle governance under `FEAT-STR-19`.
+
+#### Changed (6)
+
+- Reorganized Strategy operational-planning features into the eight focused modules (`profiles/`, `playbooks/`, `setup_evaluation/`, `trade_plan/`, `operating_envelope/`, `management_plan/`, `automation/`, `lifecycle/`) while preserving the package-root public API byte-for-byte.
+- Folded `exit_plans/` into `management_plan/` and `manual_plans/` into `trade_plan/`, removing the old horizontal feature folders.
+- Moved profile, playbook, setup-evaluation, and expectancy transports out of `contracts/` into their owning feature modules.
+- Moved `evaluate_automation_mode` and `govern_strategy_lifecycle` out of `proposal_intake/` and `registry/` into `automation/` and `lifecycle/`.
+- Consolidated the Strategy usage evidence set to 19 standalone feature programs with redistributed `FR-STR-*` demonstrations.
+- Added additive migration `0003_strategy_operational_planning` with `strategy_profiles`, `strategy_playbooks`, `strategy_setup_evaluations`, `strategy_plans`, `strategy_automation_policy`, and `strategy_lifecycle` and gave each operational-planning table production reachability through `persist_*`/`list_*` operations and the public `ensure_strategy_storage` boundary.
+- Corrected the Strategy usage-script MT5 fallback paths to build the current Data contracts and fall back to deterministic offline evidence when the live source is unavailable, and optimized the structural unit tests below the 100 ms ceiling.
+
 ### Complete Analytics, Portfolio, and operational workstation capabilities
 
-Analytics, Portfolio, UI/API, and Utils notifications bring the consolidated 199-feature registry to full completion.
+Analytics, Portfolio, UI/API, and Utils notifications brought the registry to full completion; subsequent feature-folder absorption leaves 192 registered application features.
 
-#### Added (5)
+#### Added (6)
 
 - Added immutable player journals, evidence-only behavioral and emergency-response analytics, and versioned qualification evaluation under `FEAT-ANLT-07` through `FEAT-ANLT-10` with additive Analytics migration `003_player_evidence_schema`.
 - Added Decimal valuation/P&L, margin and buying-power views, portfolio risk health, broker reconciliation, and balanced corporate-action/settlement postings under `FEAT-PORT-10` through `FEAT-PORT-12` with additive Portfolio migration `003_portfolio_operations_schema`.
 - Added the versioned operational workstation read model and optimistic command boundary under `FEAT-API-14`, including two authenticated HTTP operations and matching typed frontend transport.
 - Added accessible instrument, planning, workflow, emergency, alarm, training, replay, and qualification presentation capabilities under `FEAT-API-15` through `FEAT-API-20`.
 - Added `FEAT-UTIL-14`, a disabled-by-default unified Desktop, SMTP, Telegram, and Twilio notification service with operational templates and rate-limited orchestration.
+- Added an unnumbered supplemental Data usage catalogue that preserves all legacy monolithic example scenarios on the current fourteen-feature public boundaries.
 
-#### Changed (10)
+#### Changed (15)
 
 - Completed all 199 canonical `FEAT-*` registrations with no partial or missing features remaining.
+- Consolidated Data from nineteen registered features into fourteen focused owners while preserving its package-root API, requirements, migrations, and runtime behavior.
 - Renumbered existing API frontend usage programs to `09` through `12`, reserving `14` through `20` for their owning feature evidence.
 - Replaced the retired programme terminology in package READMEs and evidence filenames with consolidated application feature terminology.
 - Replaced the repository JSON settings source with UI/API-owned versioned database settings, encrypted write-only credential slots, an administrator frontend, and a fail-closed one-time migration utility.
@@ -26,8 +56,12 @@ Analytics, Portfolio, UI/API, and Utils notifications bring the consolidated 199
 - Reassigned `FEAT-BRK-00` to focused `instrument_profiles/` ownership, classified shared Broker contracts as non-feature support, and consolidated profile identity reads and mapping administration within the eleven-feature registry.
 - Reassigned `FEAT-BRK-01` to `capabilities/`, made adapter/route traits explicit and fail-closed, moved factory/connection behavior to `_shared/`, and removed the mixed `registry/` implementation folder.
 - Consolidated Brokers into five direct provider channels plus reconciliation, environment isolation, event normalization, and conformance; added immutable migration `002_broker_channel_state_v1` for redacted operational checkpoints.
+- Returned detached analytical DataFrames directly from the deterministic OHLCV and tick projection helpers, removing unnecessary standard-response unwrapping from consumers.
+- Completed the calculable Indicators formula-ownership migration with 64 registered formulas across twelve focused features while leaving unavailable book/trade-dependent formulas fail-closed.
+- Folded Indicators `candles/` into `patterns/` and `input_guards/` into `core/`, then renumbered the twelve surviving owners and usage programs contiguously as `FEAT-INDI-01` through `FEAT-INDI-12` while preserving all package-root operations.
+- Standardized Indicators calculator usage programs on genuine MT5 `EURUSD` H1 data for the dynamic 100-day interval ending at execution time, with explicit failure output and no synthetic fallback.
 
-#### Fixed (11)
+#### Fixed (15)
 
 - Made stream reconnection conditional on retryable transport errors so terminal and validation failures return immediately.
 - Corrected standalone Broker composition to use database-backed provider enablement and encrypted system credential slots instead of default-disabled Utils settings.
@@ -35,11 +69,15 @@ Analytics, Portfolio, UI/API, and Utils notifications bring the consolidated 199
 - Reconciled Utils verification evidence, restored its per-file coverage floor, moved real ZIP rollover IO to integration scope, and documented the completed `AuthContext v2` tenancy/profile split.
 - Preserved raw OpenAPI and documentation responses for Swagger rendering and classified unknown routes with the stable `NOT_FOUND` API envelope.
 - Reconciled frontend request identifiers with the canonical `req-<UUID4>` contract and rejected incompatible identifiers before authentication or persistence.
-- Reconciled current API specifications, tests, and usage evidence to the authoritative 81-operation backend/frontend route inventory.
+- Reconciled current API specifications, tests, and usage evidence to the authoritative 82-operation backend/frontend route inventory, including the authenticated fourteen-feature Data capability surface.
 - Restored isolated API lifecycle tests by stubbing post-migration database-backed runtime settings alongside mocked migration success.
+- Activated the validated global `LOG_LEVEL` after API migrations while retaining a persistence-independent safe `INFO` logging bootstrap.
+- Injected validated database-backed provider enablement into Data/Brokers for the API lifespan, restoring configured MT5 source composition without lower-domain persistence access.
+- Made direct supplemental Data provider examples use verified persisted development/demo settings automatically while retaining an explicit offline validation mode.
 - Routed canonical secret-safe API request telemetry to both the general application log and specialized access log.
 - Restored the Brokers per-file coverage floor and corrected stale architecture claims that its route-discipline requirements and symbol-map application wiring were withdrawn.
 - Replaced the inaccessible Dukascopy BI5 tick route with bounded, validated keyless web-chart ticks and enforced applicable Google docstring sections across Brokers.
+- Reconciled Data's fourteen-feature registry, schema and usage evidence, applicable Google-style docstrings, per-file coverage, test-tier performance ceiling, and frontend capability presentation.
 
 ### Complete Simulator mission and recovery capabilities
 

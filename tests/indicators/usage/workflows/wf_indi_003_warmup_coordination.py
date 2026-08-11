@@ -91,7 +91,7 @@ def main() -> None:
     dataset = live_bars(limit=max(40, requirement.minimum_observations + 1))
     print_market_evidence(dataset)
     print(_format_result(dataset))
-    print(f"Data -> requested_rows={len(dataset)}")
+    print(f"Data -> requested_rows={dataset.record_count}")
     # Stage 4
     _stage(4)
     unwrap_indicator_response(validate_indicator("sma", dataset, config))

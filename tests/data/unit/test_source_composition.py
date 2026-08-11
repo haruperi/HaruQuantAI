@@ -91,7 +91,11 @@ def test_ensure_source_registers_mt5_without_connecting(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Source composition remains lazy until a provider read resolves it."""
-    monkeypatch.setenv("MT5_ENABLED", "true")
+    monkeypatch.setattr(
+        _runtime,
+        "get_data_provider_settings",
+        lambda: BrokerProviderSettings(mt5_enabled=True),
+    )
     monkeypatch.setattr(
         _runtime._LazyBrokerSession,
         "adapter",
@@ -110,7 +114,11 @@ def test_ensure_source_registers_ctrader_session_capability_without_connecting(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """cTrader advertises the Brokers-owned read-only session capability."""
-    monkeypatch.setenv("CTRADER_ENABLED", "true")
+    monkeypatch.setattr(
+        _runtime,
+        "get_data_provider_settings",
+        lambda: BrokerProviderSettings(ctrader_enabled=True),
+    )
     monkeypatch.setattr(
         _runtime._LazyBrokerSession,
         "adapter",
@@ -139,7 +147,7 @@ def test_lazy_mt5_session_maps_disabled_and_missing_credentials(
     session = _runtime._LazyBrokerSession("mt5")
     monkeypatch.setattr(
         _runtime,
-        "load_broker_provider_settings",
+        "get_data_provider_settings",
         lambda: SimpleNamespace(mt5_enabled=False),
     )
     with pytest.raises(DataError) as disabled:
@@ -148,7 +156,7 @@ def test_lazy_mt5_session_maps_disabled_and_missing_credentials(
 
     monkeypatch.setattr(
         _runtime,
-        "load_broker_provider_settings",
+        "get_data_provider_settings",
         lambda: SimpleNamespace(
             mt5_enabled=True,
             mt5_login=None,
@@ -162,11 +170,39 @@ def test_lazy_mt5_session_maps_disabled_and_missing_credentials(
     assert missing.value.code == "CREDENTIALS_MISSING"
 
 
+def test_lazy_session_uses_injected_connection_resolver(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """API-owned credential resolution replaces standalone secret discovery."""
+    request_id = generate_id("req")
+    expected = object()
+    captured: list[tuple[str, str]] = []
+
+    def resolve(provider_id: str, resolved_request_id: str) -> object:
+        captured.append((provider_id, resolved_request_id))
+        return expected
+
+    monkeypatch.setattr(
+        _runtime,
+        "get_data_provider_connection_resolver",
+        lambda: resolve,
+    )
+
+    result = _runtime._LazyBrokerSession("mt5")._provider_config(object(), request_id)
+
+    assert result is expected
+    assert captured == [("mt5", request_id)]
+
+
 def test_ensure_source_access_connects_with_the_call_request_id(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Provider connection errors retain the public caller's request identity."""
-    monkeypatch.setenv("MT5_ENABLED", "true")
+    monkeypatch.setattr(
+        _runtime,
+        "get_data_provider_settings",
+        lambda: BrokerProviderSettings(mt5_enabled=True),
+    )
     request_id = generate_id("req")
     captured: list[str] = []
 
@@ -195,7 +231,7 @@ def test_lazy_mt5_session_builds_connects_and_caches_adapter(
     captured: dict[str, Any] = {}
     monkeypatch.setattr(
         _runtime,
-        "load_broker_provider_settings",
+        "get_data_provider_settings",
         lambda: SimpleNamespace(
             mt5_enabled=True,
             mt5_environment="demo",
@@ -352,7 +388,7 @@ def test_yahoo_source_registers_exact_standalone_identity(
     )
     monkeypatch.setattr(
         _runtime,
-        "load_broker_provider_settings",
+        "get_data_provider_settings",
         lambda: SimpleNamespace(yahoo_enabled=True),
     )
 

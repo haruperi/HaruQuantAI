@@ -212,6 +212,21 @@ def test_rolling_volatility_short_history_is_entirely_warmup() -> None:
     assert (values["unavailable_reason"] == "warmup").all()
 
 
+def test_rolling_volatility_custom_annualization_factor_changes_output() -> None:
+    """A declared non-default annualization factor A changes the output."""
+    import math
+
+    data = _dataset([100.0, 101.0, 99.0, 102.0])
+    default_result = unwrap_response(rolling_volatility(data, period=2))
+    custom_result = unwrap_response(
+        rolling_volatility(data, period=2, annualization_factor=365.0)
+    )
+    default_values = result_values(default_result)["rolling_volatility_2"]
+    custom_values = result_values(custom_result)["rolling_volatility_2"]
+    ratio = custom_values.iloc[-1] / default_values.iloc[-1]
+    assert ratio == pytest.approx(math.sqrt(365.0 / 252.0), abs=1e-9)
+
+
 def test_rolling_volatility_non_default_source_uses_qualified_output_name() -> None:
     """A non-close source produces the exact source-qualified output name."""
     data = _dataset([1.0, 2.0, 3.0, 4.0, 5.0])

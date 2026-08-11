@@ -247,7 +247,7 @@ def _audit(
         DataError: If durable audit persistence fails.
     """
     # Import at the side-effect boundary because audit delegates its CRUD back here.
-    from app.services.data.audit.store import _persist_audit_event_raw
+    from app.services.data.evidence.audit_store import _persist_audit_event_raw
 
     logger.info("Persisting %s audit evidence", action)
     _persist_audit_event_raw(

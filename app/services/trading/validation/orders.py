@@ -333,6 +333,11 @@ def validate_order_request(
 ) -> StandardResponse[TradingRequest]:
     """Validate an order request and return the raw request in ``data``.
 
+    Args:
+        request: Governed trading request envelope.
+        account_state: Current account state snapshot.
+        symbol_capability: Symbol market capability mapping.
+
     Returns:
         Standard response containing the validated request or an error.
     """

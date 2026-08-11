@@ -18,7 +18,7 @@ from app.services.data.evidence.account_contracts import (
 from app.services.data.evidence.account_state import get_account_state_snapshot
 
 
-def test_account_snapshot_fails_closed_when_incomplete() -> None:
+def component_account_snapshot_fails_closed_when_incomplete() -> None:
     """Account reads fail closed when the injected adapter lacks evidence."""
 
     req = AccountSnapshotRequest(

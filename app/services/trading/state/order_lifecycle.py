@@ -1,4 +1,3 @@
-# ruff: noqa: DOC201, DOC501
 """Deterministic order lifecycle with monotonic source sequencing."""
 
 from typing import Literal, Self
@@ -77,7 +76,14 @@ class _OrderLifecycle(BaseModel):
 
 
 def create_order_lifecycle(**values: object) -> object:
-    """Create one validated order lifecycle value."""
+    """Create one validated order lifecycle value.
+
+    Args:
+        **values: Field values matching _OrderLifecycle schema.
+
+    Returns:
+        Validated _OrderLifecycle model instance.
+    """
     return _OrderLifecycle.model_validate(values)
 
 
@@ -88,7 +94,21 @@ def transition_order_lifecycle(
     source_sequence: int,
     unknown_reason: str | None = None,
 ) -> object:
-    """Apply one allowed newer order transition or fail closed."""
+    """Apply one allowed newer order transition or fail closed.
+
+    Args:
+        current: Current _OrderLifecycle instance.
+        state: Target order state string.
+        source_sequence: Monotonic source sequence integer.
+        unknown_reason: Optional diagnostic string when state is UNKNOWN.
+
+    Returns:
+        New _OrderLifecycle instance with updated state and version.
+
+    Raises:
+        TradingError: If current order lifecycle is invalid, sequence is
+            stale, or transition is forbidden.
+    """
     if not isinstance(current, _OrderLifecycle):
         raise TradingError("INVALID_REQUEST", "Order lifecycle is invalid")
     if source_sequence <= current.source_sequence:

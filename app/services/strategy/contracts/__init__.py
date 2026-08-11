@@ -11,26 +11,11 @@ from app.services.strategy.contracts.execution import (
     StrategyExecutionContext,
     StrategyExecutionResult,
 )
-from app.services.strategy.contracts.expectancy import (
-    build_expectancy_reference,
-    evaluate_expectancy_reference,
-    parse_expectancy_reference,
-)
 from app.services.strategy.contracts.manifest import StrategyManifest
 from app.services.strategy.contracts.outcomes import (
     StrategyMutationResult,
 )
-from app.services.strategy.contracts.playbook import (
-    build_setup_evaluation,
-    build_strategy_playbook,
-    parse_setup_evaluation,
-    parse_strategy_playbook,
-)
 from app.services.strategy.contracts.policy import StrategyValidationPolicy
-from app.services.strategy.contracts.profile import (
-    build_strategy_profile,
-    parse_strategy_profile,
-)
 from app.services.strategy.contracts.references import (
     StrategyConfig,
     StrategyRef,
@@ -65,13 +50,4 @@ __all__ = [
     "StrategyValidationPolicy",
     "ValidatedStrategyConfig",
     "ValidatedStrategyRef",
-    "build_expectancy_reference",
-    "build_setup_evaluation",
-    "build_strategy_playbook",
-    "build_strategy_profile",
-    "evaluate_expectancy_reference",
-    "parse_expectancy_reference",
-    "parse_setup_evaluation",
-    "parse_strategy_playbook",
-    "parse_strategy_profile",
 ]

@@ -116,6 +116,7 @@ def test_email_starttls_auth_success_and_failures(
 ) -> None:
     """Cover SMTP assembly, TLS, authentication, refusal, and connection error."""
     monkeypatch.setattr(smtplib, "SMTP", _SMTP)
+    monkeypatch.setattr("ssl.create_default_context", lambda: None)
     config = build_email_notification_config(
         host="smtp.example.test",
         port=587,

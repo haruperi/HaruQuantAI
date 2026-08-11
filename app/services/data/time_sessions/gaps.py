@@ -120,6 +120,14 @@ def _classify_gap_raw(
 ) -> GapType:
     """Classify one gap against declared session windows without response wrapping.
 
+    Args:
+        gap_start: The ``gap_start`` argument.
+        gap_end: The ``gap_end`` argument.
+        sessions: The ``sessions`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         ValueError: If ``gap_end`` does not follow ``gap_start``.
     """
@@ -166,6 +174,14 @@ def classify_gap(
     from app.services.data.contracts import DataError
 
     def _raw() -> GapType:
+        """Classify the gap and translate invalid interval evidence.
+
+        Returns:
+            The classified session gap type.
+
+        Raises:
+            DataError: If the gap interval is invalid.
+        """
         try:
             return _classify_gap_raw(gap_start, gap_end, sessions)
         except ValueError as error:

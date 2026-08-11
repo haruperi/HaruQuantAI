@@ -6,6 +6,11 @@ def build_analytics_select(
 ) -> tuple[str, tuple[object, ...]]:
     """Build a parameterized record lookup.
 
+    Args:
+        table: Target allow-listed analytics table name.
+        key_column: Key column name string.
+        key: Bound key parameter value.
+
     Returns:
         SQL and bound parameters.
 

@@ -10,6 +10,9 @@ type _Codec = tuple[Callable[[object], str], Callable[[str], object]]
 def build_risk_runtime_store(codecs: Mapping[str, _Codec]) -> object:
     """Build an opaque Risk runtime-record handle.
 
+    Args:
+        codecs: The ``codecs`` argument.
+
     Returns:
         Namespaced Data-owned handle.
     """

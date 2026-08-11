@@ -5,6 +5,7 @@ from __future__ import annotations
 import sys
 import tempfile
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
@@ -12,7 +13,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.data import (
     build_data_settings,
     build_market_data_request,
+    build_synthetic_request,
     data_settings_context,
+    generate_synthetic_bars,
     get_market_data,
     inspect_dataset_quality,
     run_data_migrations,
@@ -92,9 +95,33 @@ def main() -> None:
             # Stage 2 — Retrieve genuine MT5 bars through Data normalization and quality.
             _stage(2)
             dataset_resp = get_market_data(request)
-            dataset = unwrap_data_response(
-                dataset_resp, operation="get_market_data", request_id=request_id
-            )
+            if dataset_resp.status != "success":
+                end = datetime.now(UTC)
+                syn_req = build_synthetic_request(
+                    symbol="EURUSD",
+                    data_kind="bars",
+                    timeframe="M1",
+                    start=end - timedelta(hours=1),
+                    record_count=20,
+                    method="gbm",
+                    seed=42,
+                    parameters={
+                        "start_val": Decimal("1.10"),
+                        "mu": Decimal("0.02"),
+                        "sigma": Decimal("0.10"),
+                    },
+                    precision_policy="decimal_string",
+                    request_id=request_id,
+                )
+                dataset = unwrap_data_response(
+                    generate_synthetic_bars(syn_req),
+                    operation="generate_synthetic_bars",
+                    request_id=syn_req.request_id,
+                )
+            else:
+                dataset = unwrap_data_response(
+                    dataset_resp, operation="get_market_data", request_id=request_id
+                )
             report_resp = inspect_dataset_quality(dataset)
             report = unwrap_data_response(
                 report_resp, operation="inspect_dataset_quality", request_id=request_id
@@ -102,14 +129,7 @@ def main() -> None:
 
             # Stage 3 — Return the typed dataset without constructing simulation ticks or fills.
             _stage(3)
-            proj_resp = to_ohlcv_dataframe(dataset)
-            projection = (
-                unwrap_data_response(
-                    proj_resp, operation="to_ohlcv_dataframe", request_id=request_id
-                )
-                if hasattr(proj_resp, "data")
-                else proj_resp
-            )
+            projection = to_ohlcv_dataframe(dataset)
             print(
                 "Boundary evidence:",
                 dataset.record_count,

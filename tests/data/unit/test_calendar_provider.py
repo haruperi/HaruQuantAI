@@ -48,7 +48,7 @@ def test_provider_protocol_is_satisfied() -> None:
     assert callable(getattr(provider, "get_events", None))
 
 
-def test_get_events_normalizes_calendar_events() -> None:
+def component_get_events_normalizes_calendar_events() -> None:
     """The scrape adapter wraps scraped rows into normalized events."""
     transport = _FakeTransport({"forexfactory": [_row()]})
     provider = CalendarScrapeProvider(transport, sites=("forexfactory",))

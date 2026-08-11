@@ -1,4 +1,4 @@
-# Data Source Governance — FEAT-DATA-10
+# Sources — FEAT-DATA-09
 
 Owns source contracts, registry/composition, policy, promotion, licensing, local
 adapters, and runtime enforcement of read-only broker access.

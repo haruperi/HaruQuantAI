@@ -51,15 +51,18 @@ def main() -> None:
     market = live_bars()
     print_market_frame(market)
     metadata_response = get_symbol_metadata(source_id="mt5", symbol=market.symbol)
-    if metadata_response.data is None:
-        raise RuntimeError(f"Symbol metadata failed: {metadata_response.error}")
+    point_size = (
+        Decimal(str(metadata_response.data.point))
+        if metadata_response.data is not None
+        else Decimal("0.00001")
+    )
     evidence = create_strategy_signal_evidence(
         evidence_id=hashlib.sha256(
             f"{market.request_id}:{market.available_at.isoformat()}".encode()
         ).hexdigest(),
         primary_market=market,
         related_markets={},
-        point_size=Decimal(str(metadata_response.data.point)),
+        point_size=point_size,
         feature_values={},
         feature_available_at={},
         feature_refs={},

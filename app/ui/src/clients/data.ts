@@ -25,6 +25,31 @@ export const symbolPageSchema = z.object({
 });
 export type SymbolPage = z.infer<typeof symbolPageSchema>;
 
+/** One bounded Data feature summary. */
+export const dataCapabilitySchema = z.object({
+  feature_id: z.string(),
+  name: z.string(),
+  summary: z.string(),
+  availability: z.literal("available"),
+});
+export type DataCapability = z.infer<typeof dataCapabilitySchema>;
+
+/** Complete Data feature catalogue returned by the authenticated gateway. */
+export const dataCapabilitiesSchema = z.object({
+  capabilities: z.array(dataCapabilitySchema).length(14),
+});
+export type DataCapabilities = z.infer<typeof dataCapabilitiesSchema>;
+
+/** List the complete Data capability surface (requires `data:read`). */
+export function capabilities(
+  options?: RequestOptions
+): Promise<ApiResponse<DataCapabilities>> {
+  return request<DataCapabilities>(dataRoutes.capabilities, {
+    schema: dataCapabilitiesSchema,
+    ...options,
+  });
+}
+
 /** Query parameters for symbol discovery. */
 export interface SymbolsQuery {
   source_id?: string;
@@ -46,6 +71,66 @@ export function symbols(
   if (params.limit !== undefined) query.limit = params.limit;
   return request<SymbolPage>(dataRoutes.symbols, {
     schema: symbolPageSchema,
+    query,
+    ...options,
+  });
+}
+
+/** One categorized tradable-symbol row from the market directory. */
+export const marketRowSchema = z.object({
+  symbol: z.string().min(1),
+  name: z.string().min(1),
+  asset_class: z.string().min(1),
+  source_id: z.string().min(1),
+  digits: z.number().int().nullable(),
+  last: z.number().nullable(),
+  bid: z.number().nullable(),
+  ask: z.number().nullable(),
+  spread: z.number().nullable(),
+  volume: z.number().nullable(),
+  open: z.number().nullable(),
+  high: z.number().nullable(),
+  low: z.number().nullable(),
+  close: z.number().nullable(),
+  change: z.number().nullable(),
+  change_percent: z.number().nullable(),
+});
+export type MarketRow = z.infer<typeof marketRowSchema>;
+
+/** Categorized market-directory page (Data-owned row shape). */
+export const marketDirectorySchema = z.object({
+  source_id: z.string().min(1),
+  rows: z.array(marketRowSchema),
+  limit: z.number().int().min(1),
+  next_cursor: z.string().nullable().nullish(),
+  revision: z.string().min(1),
+  generated_at: z.string().min(1),
+  request_id: z.string().min(1),
+});
+export type MarketDirectory = z.infer<typeof marketDirectorySchema>;
+
+/** Query parameters for the categorized market directory. */
+export interface MarketsQuery {
+  /** Defaults to the configured runtime broker when omitted. */
+  source_id?: string;
+  query?: string;
+  cursor?: string;
+  /** Page size 1..200; defaults to the backend `API_DEFAULT_PAGE_SIZE`. */
+  limit?: number;
+}
+
+/** Read the categorized market directory (requires `data:read`). */
+export function markets(
+  params: MarketsQuery = {},
+  options?: RequestOptions
+): Promise<ApiResponse<MarketDirectory>> {
+  const query: Record<string, QueryValue> = {};
+  if (params.source_id !== undefined) query.source_id = params.source_id;
+  if (params.query !== undefined) query.query = params.query;
+  if (params.cursor !== undefined) query.cursor = params.cursor;
+  if (params.limit !== undefined) query.limit = params.limit;
+  return request<MarketDirectory>(dataRoutes.markets, {
+    schema: marketDirectorySchema,
     query,
     ...options,
   });
@@ -123,4 +208,12 @@ export function importDataset(
   });
 }
 
-export const data = { symbols, stream, prepareDataset, importDialects, importDataset };
+export const data = {
+  capabilities,
+  symbols,
+  markets,
+  stream,
+  prepareDataset,
+  importDialects,
+  importDataset,
+};

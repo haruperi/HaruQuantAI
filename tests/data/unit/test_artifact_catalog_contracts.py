@@ -10,8 +10,8 @@ from app.services.data import (
     reconcile_data_catalog,
     sync_catalog_reference,
 )
-from app.services.data.artifact_catalog import operations
 from app.services.data.contracts import DataError
+from app.services.data.datasets import catalog as operations
 from app.utils import generate_id
 
 _REQUEST_ID = generate_id("req")

@@ -85,12 +85,15 @@ def _rolling_available_at(
     """Return the inclusive rolling maximum availability timestamp.
 
     Args:
-        records: Validated OHLCV records.
-        index: Canonical result index.
-        period: Inclusive rolling window size.
+            records: Validated OHLCV records.
+            index: Canonical result index.
+            period: Inclusive rolling window size.
 
     Returns:
-        Row-aligned UTC availability timestamps.
+            Row-aligned UTC availability timestamps.
+
+    Raises:
+        None.
     """
     nanos = pd.DatetimeIndex([record.available_at for record in records]).asi8
     result = nanos.copy()
@@ -110,15 +113,18 @@ def _point_of_control(
     """Calculate rolling volume-by-close point-of-control prices.
 
     Args:
-        high: Row-ordered high prices.
-        low: Row-ordered low prices.
-        close: Row-ordered close prices.
-        volume: Row-ordered volumes.
-        period: Inclusive rolling window size.
-        bins: Number of equal-width price bins.
+            high: Row-ordered high prices.
+            low: Row-ordered low prices.
+            close: Row-ordered close prices.
+            volume: Row-ordered volumes.
+            period: Inclusive rolling window size.
+            bins: Number of equal-width price bins.
 
     Returns:
-        A float64 array with ``NaN`` warmup values.
+            A float64 array with ``NaN`` warmup values.
+
+    Raises:
+        None.
     """
     values = np.full(len(close), np.nan, dtype="float64")
     # NFR-INDI-005 approved window-local exception: each window's bin edges

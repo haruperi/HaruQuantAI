@@ -217,8 +217,372 @@ def create_strategy_signal_records(
     )
 
 
+def create_strategy_profile_record(
+    *,
+    profile_id: str,
+    strategy_id: str,
+    strategy_version: str,
+    profile_json: str,
+    expectancy_profile_ref: str | None,
+    expectancy_exact_version: str | None,
+    record_hash: str,
+    request_id: str,
+    correlation_id: str,
+) -> None:
+    """Persist one versioned Strategy profile record.
+
+    Args:
+        profile_id: Stable profile identifier.
+        strategy_id: Owning strategy identifier.
+        strategy_version: Exact strategy version.
+        profile_json: JSON serialized StrategyProfile v1.
+        expectancy_profile_ref: Optional exact expectancy profile reference.
+        expectancy_exact_version: Optional exact expectancy version.
+        record_hash: Canonical profile-record digest.
+        request_id: Request trace identifier.
+        correlation_id: Correlation trace identifier.
+
+    Raises:
+        StrategyOperationError: If Data rejects the transaction.
+    """
+    logger.info("Creating Strategy profile persistence record")
+    unwrap_data_response(
+        execute_transaction(
+            build_transaction_request(
+                plan=build_statement_plan(
+                    statements=(
+                        "INSERT OR IGNORE INTO strategy_profiles (profile_id, "
+                        "strategy_id, strategy_version, profile_json, "
+                        "expectancy_profile_ref, expectancy_exact_version, record_hash, "
+                        "request_id, correlation_id, created_at) VALUES "
+                        "(?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))",
+                    ),
+                    parameter_sets=(
+                        (
+                            profile_id,
+                            strategy_id,
+                            strategy_version,
+                            profile_json,
+                            expectancy_profile_ref,
+                            expectancy_exact_version,
+                            record_hash,
+                            request_id,
+                            correlation_id,
+                        ),
+                    ),
+                    max_rows=1,
+                ),
+                request_id=request_id,
+            )
+        ),
+        operation="data.execute_transaction.strategy_profile_create",
+    )
+
+
+def create_strategy_playbook_record(
+    *,
+    playbook_id: str,
+    playbook_version: int,
+    strategy_profile_ref: str,
+    playbook_json: str,
+    record_hash: str,
+    request_id: str,
+    correlation_id: str,
+) -> None:
+    """Persist one versioned Strategy playbook record.
+
+    Args:
+        playbook_id: Stable playbook identifier.
+        playbook_version: Positive playbook version.
+        strategy_profile_ref: Referenced strategy profile.
+        playbook_json: JSON serialized StrategyPlaybook v1.
+        record_hash: Canonical playbook-record digest.
+        request_id: Request trace identifier.
+        correlation_id: Correlation trace identifier.
+
+    Raises:
+        StrategyOperationError: If Data rejects the transaction.
+    """
+    logger.info("Creating Strategy playbook persistence record")
+    unwrap_data_response(
+        execute_transaction(
+            build_transaction_request(
+                plan=build_statement_plan(
+                    statements=(
+                        "INSERT OR IGNORE INTO strategy_playbooks (playbook_id, "
+                        "playbook_version, strategy_profile_ref, playbook_json, "
+                        "record_hash, request_id, correlation_id, created_at) VALUES "
+                        "(?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))",
+                    ),
+                    parameter_sets=(
+                        (
+                            playbook_id,
+                            playbook_version,
+                            strategy_profile_ref,
+                            playbook_json,
+                            record_hash,
+                            request_id,
+                            correlation_id,
+                        ),
+                    ),
+                    max_rows=1,
+                ),
+                request_id=request_id,
+            )
+        ),
+        operation="data.execute_transaction.strategy_playbook_create",
+    )
+
+
+def create_strategy_setup_evaluation_record(
+    *,
+    evaluation_id: str,
+    playbook_ref: str,
+    outcome: str,
+    source_snapshot_json: str,
+    reason_code_json: str,
+    record_hash: str,
+    request_id: str,
+    correlation_id: str,
+) -> None:
+    """Append one Strategy setup evaluation evidence record.
+
+    Args:
+        evaluation_id: Evaluation evidence identifier.
+        playbook_ref: Evaluated playbook reference.
+        outcome: Deterministic setup-evaluation outcome.
+        source_snapshot_json: JSON serialized source snapshot references.
+        reason_code_json: JSON serialized reason codes.
+        record_hash: Canonical evaluation-record digest.
+        request_id: Request trace identifier.
+        correlation_id: Correlation trace identifier.
+
+    Raises:
+        StrategyOperationError: If Data rejects the transaction.
+    """
+    logger.info("Creating Strategy setup evaluation persistence record")
+    unwrap_data_response(
+        execute_transaction(
+            build_transaction_request(
+                plan=build_statement_plan(
+                    statements=(
+                        "INSERT INTO strategy_setup_evaluations (evaluation_id, "
+                        "playbook_ref, outcome, source_snapshot_json, reason_code_json, "
+                        "record_hash, request_id, correlation_id, created_at) VALUES "
+                        "(?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))",
+                    ),
+                    parameter_sets=(
+                        (
+                            evaluation_id,
+                            playbook_ref,
+                            outcome,
+                            source_snapshot_json,
+                            reason_code_json,
+                            record_hash,
+                            request_id,
+                            correlation_id,
+                        ),
+                    ),
+                    max_rows=1,
+                ),
+                request_id=request_id,
+            )
+        ),
+        operation="data.execute_transaction.strategy_setup_evaluation_create",
+    )
+
+
+def create_strategy_plan_record(
+    *,
+    plan_id: str,
+    plan_version: int,
+    status: str,
+    strategy_id: str,
+    strategy_version: str,
+    plan_json: str,
+    parent_plan_id: str | None,
+    record_hash: str,
+    request_id: str,
+    correlation_id: str,
+) -> None:
+    """Persist one canonical Strategy trade plan record.
+
+    Args:
+        plan_id: Stable plan identifier.
+        plan_version: Positive plan version.
+        status: Plan lifecycle status.
+        strategy_id: Owning strategy identifier.
+        strategy_version: Exact strategy version.
+        plan_json: JSON serialized TradePlan v1.
+        parent_plan_id: Optional parent plan for amendments.
+        record_hash: Canonical plan-record digest.
+        request_id: Request trace identifier.
+        correlation_id: Correlation trace identifier.
+
+    Raises:
+        StrategyOperationError: If Data rejects the transaction.
+    """
+    logger.info("Creating Strategy trade plan persistence record")
+    unwrap_data_response(
+        execute_transaction(
+            build_transaction_request(
+                plan=build_statement_plan(
+                    statements=(
+                        "INSERT OR IGNORE INTO strategy_plans (plan_id, plan_version, "
+                        "status, strategy_id, strategy_version, plan_json, parent_plan_id, "
+                        "record_hash, request_id, correlation_id, created_at) VALUES "
+                        "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))",
+                    ),
+                    parameter_sets=(
+                        (
+                            plan_id,
+                            plan_version,
+                            status,
+                            strategy_id,
+                            strategy_version,
+                            plan_json,
+                            parent_plan_id,
+                            record_hash,
+                            request_id,
+                            correlation_id,
+                        ),
+                    ),
+                    max_rows=1,
+                ),
+                request_id=request_id,
+            )
+        ),
+        operation="data.execute_transaction.strategy_plan_create",
+    )
+
+
+def create_strategy_automation_policy_record(
+    *,
+    policy_id: str,
+    strategy_id: str,
+    strategy_version: str,
+    policy_version: int,
+    mode: str,
+    policy_json: str,
+    record_hash: str,
+    request_id: str,
+    correlation_id: str,
+) -> None:
+    """Persist one versioned Strategy automation policy record.
+
+    Args:
+        policy_id: Stable policy identifier.
+        strategy_id: Owning strategy identifier.
+        strategy_version: Exact strategy version.
+        policy_version: Positive policy version.
+        mode: Effective automation mode.
+        policy_json: JSON serialized policy body.
+        record_hash: Canonical policy-record digest.
+        request_id: Request trace identifier.
+        correlation_id: Correlation trace identifier.
+
+    Raises:
+        StrategyOperationError: If Data rejects the transaction.
+    """
+    logger.info("Creating Strategy automation policy persistence record")
+    unwrap_data_response(
+        execute_transaction(
+            build_transaction_request(
+                plan=build_statement_plan(
+                    statements=(
+                        "INSERT OR IGNORE INTO strategy_automation_policy (policy_id, "
+                        "strategy_id, strategy_version, policy_version, mode, policy_json, "
+                        "record_hash, request_id, correlation_id, created_at) VALUES "
+                        "(?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))",
+                    ),
+                    parameter_sets=(
+                        (
+                            policy_id,
+                            strategy_id,
+                            strategy_version,
+                            policy_version,
+                            mode,
+                            policy_json,
+                            record_hash,
+                            request_id,
+                            correlation_id,
+                        ),
+                    ),
+                    max_rows=1,
+                ),
+                request_id=request_id,
+            )
+        ),
+        operation="data.execute_transaction.strategy_automation_policy_create",
+    )
+
+
+def create_strategy_lifecycle_record(
+    *,
+    strategy_id: str,
+    strategy_version: str,
+    from_status: str,
+    to_status: str,
+    reason: str,
+    decision_json: str,
+    request_id: str,
+    correlation_id: str,
+) -> None:
+    """Append one Strategy lifecycle decision record.
+
+    Args:
+        strategy_id: Owning strategy identifier.
+        strategy_version: Exact strategy version.
+        from_status: Source lifecycle status.
+        to_status: Target lifecycle status.
+        reason: Governance reason.
+        decision_json: JSON serialized lifecycle decision.
+        request_id: Request trace identifier.
+        correlation_id: Correlation trace identifier.
+
+    Raises:
+        StrategyOperationError: If Data rejects the transaction.
+    """
+    logger.info("Creating Strategy lifecycle persistence record")
+    unwrap_data_response(
+        execute_transaction(
+            build_transaction_request(
+                plan=build_statement_plan(
+                    statements=(
+                        "INSERT INTO strategy_lifecycle (strategy_id, strategy_version, "
+                        "from_status, to_status, reason, decision_json, request_id, "
+                        "correlation_id, created_at) VALUES "
+                        "(?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))",
+                    ),
+                    parameter_sets=(
+                        (
+                            strategy_id,
+                            strategy_version,
+                            from_status,
+                            to_status,
+                            reason,
+                            decision_json,
+                            request_id,
+                            correlation_id,
+                        ),
+                    ),
+                    max_rows=1,
+                ),
+                request_id=request_id,
+            )
+        ),
+        operation="data.execute_transaction.strategy_lifecycle_create",
+    )
+
+
 __all__: list[str] = [
+    "create_strategy_automation_policy_record",
     "create_strategy_checkpoint_record",
+    "create_strategy_lifecycle_record",
+    "create_strategy_plan_record",
+    "create_strategy_playbook_record",
+    "create_strategy_profile_record",
+    "create_strategy_setup_evaluation_record",
     "create_strategy_signal_records",
     "create_strategy_version_record",
 ]

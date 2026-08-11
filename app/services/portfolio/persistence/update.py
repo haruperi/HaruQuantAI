@@ -26,6 +26,14 @@ def update_active_allocation_record(
 ) -> bool:
     """Atomically persist allocation, idempotency, active CAS, and outbox.
 
+    Args:
+        store: Portfolio persistence handle.
+        state_value: Allocation model object.
+        expected_revision: Expected active scope revision.
+        event_key: Stable outbox event identity.
+        event_sequence: Positive sequence number.
+        event_value: Redacted audit event object.
+
     Returns:
         Whether all four records committed atomically.
 

@@ -138,10 +138,13 @@ def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Indicators schema statements.
 
     Args:
-        statements: Ordered additive SQL definitions.
+            statements: Ordered additive SQL definitions.
 
     Returns:
-        Lowercase SHA-256 checksum.
+            Lowercase SHA-256 checksum.
+
+    Raises:
+        None.
     """
     logger.debug("Calculating Indicators migration checksum")
     material = "\n-- statement --\n".join(statements).encode("utf-8")
@@ -167,8 +170,14 @@ INDICATOR_MIGRATIONS: tuple[Any, ...] = (
 def get_indicator_migrations() -> tuple[object, ...]:
     """Return immutable Indicators-owned migration steps.
 
+    Args:
+        None.
+
     Returns:
-        Indicator migration steps in application order.
+            Indicator migration steps in application order.
+
+    Raises:
+        None.
     """
     return INDICATOR_MIGRATIONS
 
@@ -177,10 +186,13 @@ def run_indicators_migrations(request_id: str) -> object:
     """Apply the immutable Indicators migration manifest through Data.
 
     Args:
-        request_id: Canonical startup request identifier.
+            request_id: Canonical startup request identifier.
 
     Returns:
-        Data-owned standard migration response.
+            Data-owned standard migration response.
+
+    Raises:
+        None.
     """
     logger.info("Running Indicators-owned schema migrations")
     request = build_migration_request(

@@ -14,7 +14,7 @@ def test_indicator_error_catalog_matches_current_utils_contract() -> None:
 
 def test_error_catalog_is_exposed_as_safe_response_codes() -> None:
     """FR-INDI-001: unknown identifiers use the approved symbolic code."""
-    assert_error(get_indicator("macd"), "IND_UNSUPPORTED_INDICATOR")
+    assert_error(get_indicator("unknown_indicator"), "IND_UNSUPPORTED_INDICATOR")
 
 
 def test_invalid_parameter_response_is_redacted() -> None:

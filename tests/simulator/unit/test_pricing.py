@@ -133,3 +133,74 @@ def test_price_order_rejects_invalid_price_and_slippage_outcomes() -> None:
     low_tick = SimpleNamespace(bid=Decimal("0.1"), ask=Decimal("0.2"))
     with pytest.raises(SimulationError, match="invalid"):
         price_order(_intent("SELL"), low_tick, slipped)
+
+
+def test_price_realistic_execution_error_paths() -> None:
+    """Test realism pricing error branches."""
+    from app.services.simulator import build_latency_profile, price_realistic_execution
+
+    latency = build_latency_profile(
+        market_ms=Decimal(1),
+        client_ms=Decimal(1),
+        network_ms=Decimal(1),
+        broker_ms=Decimal(1),
+        venue_ms=Decimal(1),
+        report_ms=Decimal(1),
+        processing_ms=Decimal(1),
+    )
+
+    # Test invalid (non-positive) base price
+    with pytest.raises(SimulationError, match="invalid"):
+        price_realistic_execution(
+            side="BUY",
+            base_price=Decimal(0),
+            quantity=Decimal(1),
+            point_value=Decimal("0.0001"),
+            price_quantum=Decimal("0.0001"),
+            fixed_slippage_points=Decimal(0),
+            impact_points_per_unit=Decimal(0),
+            maximum_total_points=Decimal(10),
+            latency=latency,
+        )
+
+    # Test negative config values
+    with pytest.raises(SimulationError, match="non-negative"):
+        price_realistic_execution(
+            side="BUY",
+            base_price=Decimal("1.08"),
+            quantity=Decimal(1),
+            point_value=Decimal("0.0001"),
+            price_quantum=Decimal("0.0001"),
+            fixed_slippage_points=Decimal(-1),
+            impact_points_per_unit=Decimal(0),
+            maximum_total_points=Decimal(10),
+            latency=latency,
+        )
+
+    # Test slippage exceeded
+    with pytest.raises(SimulationError, match="exceeds maximum"):
+        price_realistic_execution(
+            side="BUY",
+            base_price=Decimal("1.08"),
+            quantity=Decimal(10),
+            point_value=Decimal("0.0001"),
+            price_quantum=Decimal("0.0001"),
+            fixed_slippage_points=Decimal(5),
+            impact_points_per_unit=Decimal(1),
+            maximum_total_points=Decimal(5),
+            latency=latency,
+        )
+
+    # Test execution price <= 0 on SELL
+    with pytest.raises(SimulationError, match="invalid price"):
+        price_realistic_execution(
+            side="SELL",
+            base_price=Decimal("0.0001"),
+            quantity=Decimal(1),
+            point_value=Decimal("0.001"),
+            price_quantum=Decimal("0.0001"),
+            fixed_slippage_points=Decimal(10),
+            impact_points_per_unit=Decimal(0),
+            maximum_total_points=Decimal(100),
+            latency=latency,
+        )

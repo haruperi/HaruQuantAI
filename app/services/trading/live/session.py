@@ -359,6 +359,10 @@ class LiveSession:
     ) -> StandardResponse[None]:
         """Write pre-mutation audit evidence in a standard response.
 
+        Args:
+            request: Governed trading request envelope.
+            evidence: Route fact and environment evidence mapping.
+
         Returns:
             Standard response containing no data or a canonical error.
         """
@@ -672,6 +676,10 @@ class LiveSession:
         evidence: Mapping[str, JsonValue],
     ) -> StandardResponse[Mapping[str, JsonValue]]:
         """Start the session and return a canonical lifecycle response.
+
+        Args:
+            config: Session configuration mapping.
+            evidence: Route fact and environment evidence mapping.
 
         Returns:
             Standard response containing lifecycle evidence or an error.

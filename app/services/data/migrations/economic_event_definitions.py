@@ -42,7 +42,14 @@ _STATEMENTS = (
 
 
 def _checksum(statements: tuple[str, ...]) -> str:
-    """Return the immutable ordered-statement checksum."""
+    """Return the immutable ordered-statement checksum.
+
+    Args:
+        statements: The ``statements`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     material = "\n-- statement --\n".join(statements).encode("utf-8")
     return hashlib.sha256(material).hexdigest()
 

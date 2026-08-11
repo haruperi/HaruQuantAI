@@ -228,7 +228,17 @@ def _execute_create(
     request_id: str,
     max_rows: int = 1,
 ) -> TransactionResult:
-    """Execute one bounded Data-owned create transaction."""
+    """Execute one bounded Data-owned create transaction.
+
+    Args:
+        statements: The ``statements`` argument.
+        parameter_sets: The ``parameter_sets`` argument.
+        request_id: The ``request_id`` argument.
+        max_rows: The ``max_rows`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
@@ -264,7 +274,15 @@ def create_audit_event_record(
 def create_feed_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Create one initial persisted feed-state record."""
+    """Create one initial persisted feed-state record.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Creating Data feed persistence record")
     return _execute_create((_INSERT_FEED,), (parameters,), request_id=request_id)
 
@@ -272,7 +290,15 @@ def create_feed_record(
 def create_source_attempt_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Create one immutable source-attempt record."""
+    """Create one immutable source-attempt record.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Creating Data source-attempt persistence record")
     return _execute_create(
         (_INSERT_SOURCE_ATTEMPT,),
@@ -284,7 +310,15 @@ def create_source_attempt_record(
 def create_update_job_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Create one persisted update-job definition."""
+    """Create one persisted update-job definition.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Creating Data update-job persistence record")
     return _execute_create(
         (_INSERT_UPDATE_JOB,),
@@ -296,7 +330,15 @@ def create_update_job_record(
 def create_backfill_checkpoint_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Create one prepared backfill-checkpoint record."""
+    """Create one prepared backfill-checkpoint record.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Creating Data backfill-checkpoint persistence record")
     return _execute_create(
         (_INSERT_BACKFILL_CHECKPOINT,),
@@ -308,7 +350,15 @@ def create_backfill_checkpoint_record(
 def create_research_source_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Create one immutable research-source revision."""
+    """Create one immutable research-source revision.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Creating Data research-source persistence record")
     return _execute_create(
         (_INSERT_RESEARCH_SOURCE,),
@@ -320,7 +370,15 @@ def create_research_source_record(
 def create_research_observation_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Create one immutable research-observation revision."""
+    """Create one immutable research-observation revision.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Creating Data research-observation persistence record")
     return _execute_create(
         (_INSERT_RESEARCH_OBSERVATION,),
@@ -332,7 +390,15 @@ def create_research_observation_record(
 def create_runtime_append_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Append one immutable namespaced runtime record."""
+    """Append one immutable namespaced runtime record.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_create(
         (_APPEND_RUNTIME_RECORD,),
         (parameters,),
@@ -343,7 +409,15 @@ def create_runtime_append_record(
 def create_runtime_put_once_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Create one namespaced runtime record if its identity is unused."""
+    """Create one namespaced runtime record if its identity is unused.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_create(
         (_PUT_ONCE_RUNTIME_RECORD,),
         (parameters,),
@@ -392,7 +466,16 @@ def create_catalog_artifact_records(
     *,
     request_id: str,
 ) -> TransactionResult:
-    """Register one dataset and artifact atomically."""
+    """Register one dataset and artifact atomically.
+
+    Args:
+        dataset_parameters: The ``dataset_parameters`` argument.
+        file_parameters: The ``file_parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_create(
         (_INSERT_CATALOG_DATASET, _INSERT_CATALOG_FILE),
         (dataset_parameters, file_parameters),
@@ -408,7 +491,17 @@ def create_catalog_reference_records(
     *,
     request_id: str,
 ) -> TransactionResult:
-    """Synchronize one provider, symbol, and optional session set atomically."""
+    """Synchronize one provider, symbol, and optional session set atomically.
+
+    Args:
+        provider_parameters: The ``provider_parameters`` argument.
+        symbol_parameters: The ``symbol_parameters`` argument.
+        session_parameter_sets: The ``session_parameter_sets`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     statements = (
         _UPSERT_CATALOG_PROVIDER,
         _UPSERT_CATALOG_SYMBOL,

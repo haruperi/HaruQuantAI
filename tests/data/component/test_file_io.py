@@ -21,7 +21,7 @@ from app.services.data import (
 )
 from app.services.data.contracts import DataQualityReport
 from app.services.data.contracts.responses import unwrap_data_response
-from app.services.data.local_datasets.contracts import DatasetLoadRequest
+from app.services.data.datasets.contracts import DatasetLoadRequest
 from app.services.data.persistence.contracts import (
     DatasetSaveRequest,
 )

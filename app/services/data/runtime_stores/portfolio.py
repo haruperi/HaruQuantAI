@@ -10,6 +10,9 @@ type _Codec = tuple[Callable[[object], str], Callable[[str], object]]
 def build_portfolio_runtime_store(codecs: Mapping[str, _Codec]) -> object:
     """Build an opaque Portfolio runtime-record handle.
 
+    Args:
+        codecs: The ``codecs`` argument.
+
     Returns:
         Namespaced Data-owned handle.
     """

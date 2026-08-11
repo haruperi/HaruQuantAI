@@ -33,7 +33,17 @@ type EvidenceKind = Literal[
 
 
 def _text(value: str) -> str:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _text")
     if not value or value != value.strip():
         raise ValueError("value must be a non-empty trimmed string")
@@ -41,13 +51,30 @@ def _text(value: str) -> str:
 
 
 def _optional_text(value: str | None) -> str | None:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _optional_text")
     return None if value is None else _text(value)
 
 
 def _utc(value: datetime) -> datetime:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _utc")
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         raise ValueError("timestamp must be aware UTC")
@@ -68,28 +95,59 @@ class MarketContextRequest(_Contract):
     @field_validator("symbol", "timezone", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("account_id")
     @classmethod
     def _validate_account(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_account")
         return _optional_text(value)
 
     @field_validator("as_of")
     @classmethod
     def _validate_as_of(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_as_of")
         return _utc(value)
 
     @field_validator("max_age_seconds")
     @classmethod
     def _validate_age(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_age")
         if value <= 0:
             raise ValueError("max_age_seconds must be positive")
@@ -100,7 +158,17 @@ class MarketContextRequest(_Contract):
     def _validate_requested(
         cls, value: tuple[EvidenceKind, ...]
     ) -> tuple[EvidenceKind, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_requested")
         if not value or len(set(value)) != len(value):
             raise ValueError("requested_evidence must be non-empty and unique")
@@ -131,21 +199,45 @@ class MarketContextEvidence(_Contract):
     @field_validator("symbol", "timezone", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("session_state", "calendar_state", "spread_unit")
     @classmethod
     def _validate_optional_text(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_optional_text")
         return _optional_text(value)
 
     @field_validator("spread", "liquidity", "volatility")
     @classmethod
     def _validate_numeric(cls, value: Decimal | None) -> Decimal | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_numeric")
         if value is not None and not value.is_finite():
             raise ValueError("evidence numeric must be finite")
@@ -158,7 +250,17 @@ class MarketContextEvidence(_Contract):
     def _freeze_correlations(
         cls, value: Mapping[str, Decimal]
     ) -> Mapping[str, Decimal]:
-        """Freeze one DATA contract value against mutation."""
+        """Freeze one DATA contract value against mutation.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _freeze_correlations")
         validated: dict[str, Decimal] = {}
         for key, item in value.items():
@@ -170,7 +272,17 @@ class MarketContextEvidence(_Contract):
     @field_validator("crisis_flags", "missing_fields")
     @classmethod
     def _validate_texts(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_texts")
         validated = tuple(_text(item) for item in value)
         if len(set(validated)) != len(validated):
@@ -180,14 +292,28 @@ class MarketContextEvidence(_Contract):
     @field_validator("as_of", "expires_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return _utc(value)
 
     @field_validator("provenance", mode="after")
     @classmethod
     def _freeze_provenance(cls, value: Mapping[str, str]) -> Mapping[str, str]:
-        """Freeze one DATA contract value against mutation."""
+        """Freeze one DATA contract value against mutation.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _freeze_provenance")
         return MappingProxyType(
             {_text(key): _text(item) for key, item in value.items()}
@@ -195,13 +321,27 @@ class MarketContextEvidence(_Contract):
 
     @field_serializer("provenance", when_used="json")
     def _serialize_provenance(self, value: Mapping[str, str]) -> dict[str, str]:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_provenance")
         return dict(value)
 
     @model_validator(mode="after")
     def _validate_evidence(self) -> MarketContextEvidence:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_evidence")
         if self.expires_at <= self.as_of:
             raise ValueError("expires_at must follow as_of")
@@ -221,13 +361,27 @@ class MarketContextEvidence(_Contract):
 
     @field_serializer("spread", "liquidity", "volatility", when_used="json")
     def _serialize_decimal(self, value: Decimal | None) -> str | None:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_decimal")
         return None if value is None else str(value)
 
     @field_serializer("correlations", when_used="json")
     def _serialize_correlations(self, value: Mapping[str, Decimal]) -> dict[str, str]:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_correlations")
         return {key: str(item) for key, item in value.items()}
 

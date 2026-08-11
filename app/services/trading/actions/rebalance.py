@@ -201,6 +201,10 @@ async def execute_portfolio_rebalance(
 ) -> StandardResponse[dict[str, JsonValue]]:
     """Execute a portfolio rebalance and return a standard response.
 
+    Args:
+        request: Receiver-owned rebalance execution request.
+        deps: Active trading runtime dependencies.
+
     Returns:
         Standard response containing ordered child results or an error.
     """

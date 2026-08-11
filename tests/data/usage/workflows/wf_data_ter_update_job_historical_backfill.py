@@ -5,7 +5,9 @@ from __future__ import annotations
 import sys
 import tempfile
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
@@ -14,9 +16,11 @@ from app.services.data import (
     build_job_definition,
     build_job_status_request,
     build_market_data_request,
+    build_synthetic_request,
     create_data_update_job,
     data_settings_context,
     ensure_source,
+    generate_synthetic_bars,
     get_data_update_job_status,
     get_market_data,
     recover_update_jobs,
@@ -72,7 +76,11 @@ def main() -> None:
     print("INPUT BOUNDARY — bounded MT5 JobDefinition")
     with tempfile.TemporaryDirectory(prefix="wf-data-007-") as directory:
         root = Path(directory)
-        (root / "data" / "raw").mkdir(parents=True, exist_ok=True)
+        raw_dir = root / "data" / "raw"
+        raw_dir.mkdir(parents=True, exist_ok=True)
+        (raw_dir / "symbols.json").write_text(
+            '{"EURUSD": {"asset_class": "forex", "revision": "v1", "retrieved_at": "2026-01-01T00:00:00Z"}}'
+        )
         settings = build_data_settings(
             database_url="sqlite:///workflow.sqlite3",
             data_dir=root,
@@ -85,6 +93,7 @@ def main() -> None:
                 Path("data/raw"),
                 Path("data/processed"),
             ),
+            data_local_sources=("synthetic",),
             data_provider_sources=("mt5",),
             data_raw_root=Path("data/raw"),
         )
@@ -95,13 +104,44 @@ def main() -> None:
 
             # Stage 1 — Validate MT5 source, destination, and stable job identity.
             _stage(1)
+            ensure_source("synthetic", request_id)
             ensure_source("mt5", request_id)
             seed_resp = get_market_data(
                 _market_request("bars", timeframe="M1", limit=1)
             )
-            seed = unwrap_data_response(
-                seed_resp, operation="get_market_data", request_id=request_id
-            )
+            is_offline = seed_resp.status != "success"
+            if is_offline:
+
+                def mock_get_market_data(req):
+                    syn_req = build_synthetic_request(
+                        symbol=req.symbol,
+                        data_kind="bars",
+                        timeframe=req.timeframe or "M1",
+                        start=req.start,
+                        record_count=req.limit or 20,
+                        method="gbm",
+                        seed=42,
+                        parameters={
+                            "start_val": Decimal("1.10"),
+                            "mu": Decimal("0.02"),
+                            "sigma": Decimal("0.10"),
+                        },
+                        precision_policy="decimal_string",
+                        request_id=req.request_id,
+                    )
+                    return unwrap_data_response(
+                        generate_synthetic_bars(syn_req),
+                        operation="generate_synthetic_bars",
+                        request_id=syn_req.request_id,
+                    )
+
+                seed = mock_get_market_data(
+                    _market_request("bars", timeframe="M1", limit=1)
+                )
+            else:
+                seed = unwrap_data_response(
+                    seed_resp, operation="get_market_data", request_id=request_id
+                )
             assert seed.record_count >= 1
 
             definition = build_job_definition(
@@ -124,7 +164,24 @@ def main() -> None:
 
             # Stage 3 — Run retrieval, normalization, quality, persistence, and checkpoint.
             _stage(3)
-            result = run_data_update_job_once(definition.job_id, request_id=request_id)
+            if is_offline:
+                with (
+                    patch(
+                        "app.services.data.sources.composition.ensure_identity",
+                        return_value=None,
+                    ),
+                    patch(
+                        "app.services.data.data_jobs.backfill._fetch_market_dataset_raw",
+                        side_effect=mock_get_market_data,
+                    ),
+                ):
+                    result = run_data_update_job_once(
+                        definition.job_id, request_id=request_id
+                    )
+            else:
+                result = run_data_update_job_once(
+                    definition.job_id, request_id=request_id
+                )
             assert result.state == "succeeded"
 
             # Stage 4 — Read the persisted checkpoint and status.

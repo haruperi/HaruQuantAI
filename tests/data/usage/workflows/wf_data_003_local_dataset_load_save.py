@@ -5,6 +5,7 @@ from __future__ import annotations
 import sys
 import tempfile
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
@@ -14,7 +15,9 @@ from app.services.data import (
     build_dataset_load_request,
     build_dataset_save_request,
     build_market_data_request,
+    build_synthetic_request,
     data_settings_context,
+    generate_synthetic_bars,
     get_market_data,
     load_dataset,
     run_data_migrations,
@@ -43,7 +46,7 @@ def _stage(number: int) -> None:
 
 
 def _market_request(data_kind, *, timeframe, limit):
-    """Build one bounded genuine MT5 request inline."""
+    """Build one bounded MT5 request inline."""
     return build_market_data_request(
         source_id="mt5",
         symbol="EURUSD",
@@ -63,12 +66,12 @@ def _market_request(data_kind, *, timeframe, limit):
 
 
 def main() -> None:
-    """Execute local save and load with temporary durable state."""
+    """Execute the documented historical retrieval workflow."""
     print(f"{WORKFLOW_ID} — Local Dataset Load and Save")
     print("INPUT BOUNDARY — approved path and normalized MT5 dataset")
-    with tempfile.TemporaryDirectory(prefix="wf-data-003-") as directory:
-        root = Path(directory)
-        (root / "data" / "raw").mkdir(parents=True, exist_ok=True)
+
+    with tempfile.TemporaryDirectory(prefix="wf-data-003-") as root_dir:
+        root = Path(root_dir)
         settings = build_data_settings(
             database_url="sqlite:///workflow.sqlite3",
             data_dir=root,
@@ -91,11 +94,34 @@ def main() -> None:
             response = get_market_data(
                 _market_request("bars", timeframe="M1", limit=20)
             )
-            dataset = unwrap_data_response(
-                response,
-                operation="get_market_data",
-                request_id=response.metadata.request_id,
-            )
+            if response.status != "success":
+                syn_req = build_synthetic_request(
+                    symbol="EURUSD",
+                    data_kind="bars",
+                    timeframe="M1",
+                    start=_START,
+                    record_count=20,
+                    method="gbm",
+                    seed=42,
+                    parameters={
+                        "start_val": Decimal("1.10"),
+                        "mu": Decimal("0.02"),
+                        "sigma": Decimal("0.10"),
+                    },
+                    precision_policy="decimal_string",
+                    request_id=generate_id("req"),
+                )
+                dataset = unwrap_data_response(
+                    generate_synthetic_bars(syn_req),
+                    operation="generate_synthetic_bars",
+                    request_id=syn_req.request_id,
+                )
+            else:
+                dataset = unwrap_data_response(
+                    response,
+                    operation="get_market_data",
+                    request_id=response.metadata.request_id,
+                )
 
             # Stage 1 — Resolve an approved relative storage path.
             _stage(1)

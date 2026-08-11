@@ -21,7 +21,17 @@ ACCOUNT_SNAPSHOT_SCHEMA: Final = "data.account_state_snapshot.v1"
 
 
 def _text(value: str) -> str:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _text")
     if not value or value != value.strip():
         raise ValueError("value must be a non-empty trimmed string")
@@ -29,7 +39,17 @@ def _text(value: str) -> str:
 
 
 def _utc(value: datetime) -> datetime:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _utc")
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         raise ValueError("timestamp must be aware UTC")
@@ -37,7 +57,17 @@ def _utc(value: datetime) -> datetime:
 
 
 def _finite(value: Decimal | None) -> Decimal | None:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _finite")
     if value is not None and not value.is_finite():
         raise ValueError("numeric value must be finite")
@@ -54,14 +84,31 @@ class AccountBalance(_Contract):
     @field_validator("asset")
     @classmethod
     def _validate_asset(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_asset")
         return _text(value)
 
     @field_validator("total", "available")
     @classmethod
     def _validate_amount(cls, value: Decimal) -> Decimal:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_amount")
         validated = _finite(value)
         if validated is None:
@@ -70,7 +117,14 @@ class AccountBalance(_Contract):
 
     @model_validator(mode="after")
     def _validate_balance(self) -> AccountBalance:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_balance")
         if self.total < 0 or self.available < 0 or self.available > self.total:
             raise ValueError("balance amounts are inconsistent")
@@ -78,7 +132,14 @@ class AccountBalance(_Contract):
 
     @field_serializer("total", "available", when_used="json")
     def _serialize_amount(self, value: Decimal) -> str:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_amount")
         return str(value)
 
@@ -96,26 +157,54 @@ class AccountPosition(_Contract):
     @field_validator("position_id", "symbol")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("ownership_ref")
     @classmethod
     def _validate_optional_text(cls, value: str | None) -> str | None:
-        """Validate optional normalized provider ownership evidence."""
+        """Validate optional normalized provider ownership evidence.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return None if value is None else _text(value)
 
     @field_validator("quantity", "entry_price")
     @classmethod
     def _validate_numeric(cls, value: Decimal | None) -> Decimal | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_numeric")
         return _finite(value)
 
     @model_validator(mode="after")
     def _validate_position(self) -> AccountPosition:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_position")
         if self.quantity <= 0:
             raise ValueError("position quantity must be positive")
@@ -125,7 +214,14 @@ class AccountPosition(_Contract):
 
     @field_serializer("quantity", "entry_price", when_used="json")
     def _serialize_decimal(self, value: Decimal | None) -> str | None:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_decimal")
         return None if value is None else str(value)
 
@@ -143,20 +239,41 @@ class AccountOrder(_Contract):
     @field_validator("order_id", "symbol", "state")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("quantity", "price")
     @classmethod
     def _validate_numeric(cls, value: Decimal | None) -> Decimal | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_numeric")
         return _finite(value)
 
     @model_validator(mode="after")
     def _validate_order(self) -> AccountOrder:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_order")
         if self.quantity <= 0:
             raise ValueError("order quantity must be positive")
@@ -166,7 +283,14 @@ class AccountOrder(_Contract):
 
     @field_serializer("quantity", "price", when_used="json")
     def _serialize_decimal(self, value: Decimal | None) -> str | None:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_decimal")
         return None if value is None else str(value)
 
@@ -182,14 +306,31 @@ class AccountSnapshotRequest(_Contract):
     @field_validator("source_id", "account_id", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("max_age_seconds")
     @classmethod
     def _validate_age(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_age")
         if value <= 0:
             raise ValueError("max_age_seconds must be positive")
@@ -219,27 +360,55 @@ class AccountStateSnapshot(_Contract):
     @field_validator("account_id", "currency", "source_id", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("equity", "margin_used", "margin_available")
     @classmethod
     def _validate_numeric(cls, value: Decimal | None) -> Decimal | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_numeric")
         return _finite(value)
 
     @field_validator("snapshot_at", "expires_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return _utc(value)
 
     @model_validator(mode="after")
     def _validate_snapshot(self) -> AccountStateSnapshot:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_snapshot")
         if self.expires_at <= self.snapshot_at:
             raise ValueError("expires_at must follow snapshot_at")
@@ -259,7 +428,14 @@ class AccountStateSnapshot(_Contract):
 
     @field_serializer("equity", "margin_used", "margin_available", when_used="json")
     def _serialize_decimal(self, value: Decimal | None) -> str | None:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_decimal")
         return None if value is None else str(value)
 

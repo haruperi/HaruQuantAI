@@ -54,7 +54,11 @@ class SourcePolicyConfig:
     breaker_recovery_seconds: int
 
     def __post_init__(self) -> None:
-        """Validate all policy bounds before persistence or source access."""
+        """Validate all policy bounds before persistence or source access.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Validating source policy configuration")
         if not self.source_id or self.source_id != self.source_id.strip():
             raise ValueError("source_id must be a non-empty trimmed string")
@@ -74,7 +78,14 @@ _policy_configs: dict[str, SourcePolicyConfig] = {}
 
 
 def register_source_policy(config: SourcePolicyConfig) -> None:
-    """Register one explicit source policy during application composition."""
+    """Register one explicit source policy during application composition.
+
+    Args:
+        config: The ``config`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.info("Registering source policy for %s", config.source_id)
     if config.source_id in _policy_configs:
         raise DataError("INVALID_INPUT", safe_details={"field": "source_id"})
@@ -82,7 +93,15 @@ def register_source_policy(config: SourcePolicyConfig) -> None:
 
 
 def _policy_for(source_id: str, request_id: str) -> SourcePolicyConfig:
-    """Return required source policy or fallback to a default permissive config."""
+    """Return required source policy or fallback to a default permissive config.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Resolving source policy for %s (Request: %s)", source_id, request_id)
     config = _policy_configs.get(source_id)
     if config is None:
@@ -104,7 +123,19 @@ def record_source_attempt(
     *,
     timestamp_ns: int | None = None,
 ) -> None:
-    """Persist one source attempt without an in-memory success fallback."""
+    """Persist one source attempt without an in-memory success fallback.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        request_id: The ``request_id`` argument.
+        status: The ``status`` argument.
+        error_code: The ``error_code`` argument.
+        timestamp_ns: The ``timestamp_ns`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.info("Recording durable %s source attempt for %s", status, source_id)
     observed_ns = time.time_ns() if timestamp_ns is None else timestamp_ns
     if observed_ns < 0:
@@ -134,7 +165,19 @@ def _recent_attempts(
     limit: int,
     request_id: str,
 ) -> tuple[tuple[str, int], ...]:
-    """Read durable recent source attempts or fail closed."""
+    """Read durable recent source attempts or fail closed.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        limit: The ``limit`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Reading durable source attempts for %s", source_id)
     try:
         result = read_recent_source_attempt_records(
@@ -158,7 +201,19 @@ def _rate_limit_exceeded(
     request_id: str,
     now_ns: int,
 ) -> bool:
-    """Determine whether the configured durable rate window is exhausted."""
+    """Determine whether the configured durable rate window is exhausted.
+
+    Args:
+        config: The ``config`` argument.
+        request_id: The ``request_id`` argument.
+        now_ns: The ``now_ns`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Checking source rate limit for %s", config.source_id)
     window_ns = config.rate_window_seconds * 1_000_000_000
     try:
@@ -187,7 +242,16 @@ def _circuit_open(
     request_id: str,
     now_ns: int,
 ) -> bool:
-    """Evaluate the configured persistent consecutive-failure circuit."""
+    """Evaluate the configured persistent consecutive-failure circuit.
+
+    Args:
+        config: The ``config`` argument.
+        request_id: The ``request_id`` argument.
+        now_ns: The ``now_ns`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Checking source circuit for %s", config.source_id)
     attempts = _recent_attempts(
         config.source_id,
@@ -206,7 +270,15 @@ def _validate_descriptor(
     descriptor: SourceDescriptor,
     request: MarketDataRequest,
 ) -> None:
-    """Validate readiness, capability, and license for one planned source."""
+    """Validate readiness, capability, and license for one planned source.
+
+    Args:
+        descriptor: The ``descriptor`` argument.
+        request: The ``request`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Validating descriptor policy for %s", descriptor.source_id)
     if descriptor.readiness == "disabled":
         raise DataError(
@@ -229,7 +301,18 @@ def _persisted_descriptor(
     descriptor: SourceDescriptor,
     request_id: str,
 ) -> SourceDescriptor:
-    """Overlay a durable readiness transition on the configured descriptor."""
+    """Overlay a durable readiness transition on the configured descriptor.
+
+    Args:
+        descriptor: The ``descriptor`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Resolving durable readiness for %s", descriptor.source_id)
     result = read_source_state_record(
         descriptor.source_id,
@@ -263,7 +346,18 @@ def _evaluate_source_policy_raw(
     *,
     now_ns: int | None = None,
 ) -> SourcePlan:
-    """Build and validate the exact requested-plus-fallback source plan."""
+    """Build and validate the exact requested-plus-fallback source plan.
+
+    Args:
+        request: The ``request`` argument.
+        now_ns: The ``now_ns`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.info("Evaluating source policy for request %s", request.request_id)
     observed_ns = time.time_ns() if now_ns is None else now_ns
     ordered_sources = (request.source_id, *request.fallback_sources)
@@ -308,6 +402,10 @@ def evaluate_source_policy(
 ) -> StandardResponse[SourcePlan]:
     """Build and validate the exact requested-plus-fallback source plan.
 
+    Args:
+        request: The ``request`` argument.
+        now_ns: The ``now_ns`` argument.
+
     Returns:
         Standard response carrying the validated source plan.
     """
@@ -325,7 +423,19 @@ def _promote_source_raw(
     *,
     timestamp_ns: int | None = None,
 ) -> SourceDescriptor:
-    """Atomically persist source readiness and its required audit event."""
+    """Atomically persist source readiness and its required audit event.
+
+    Args:
+        request: The ``request`` argument.
+        auth: The ``auth`` argument.
+        timestamp_ns: The ``timestamp_ns`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.info(
         "Applying governed source readiness transition for %s", request.source_id
     )
@@ -398,6 +508,11 @@ def promote_source(
 ) -> StandardResponse[SourceDescriptor]:
     """Atomically persist source readiness and its required audit event.
 
+    Args:
+        request: The ``request`` argument.
+        auth: The ``auth`` argument.
+        timestamp_ns: The ``timestamp_ns`` argument.
+
     Returns:
         Standard response carrying the promoted source descriptor.
     """
@@ -419,6 +534,10 @@ def _compute_source_trust_score_raw(source_id: str, request_id: str) -> Decimal:
     the observed success ratio over the most recent bounded attempt window,
     never an inferred or default-optimistic value. A source with no
     recorded attempts fails closed to `0` rather than assuming trust.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        request_id: The ``request_id`` argument.
 
     Returns:
         Success-ratio trust score in `[0, 100]`, quantized to `0.01`.
@@ -456,7 +575,12 @@ def compute_source_trust_score(
 
 
 def _record_failure(source_id: str, request_id: str) -> None:
-    """Record one durable failure for focused circuit tests."""
+    """Record one durable failure for focused circuit tests.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        request_id: The ``request_id`` argument.
+    """
     logger.info("Recording source failure for %s", source_id)
     record_source_attempt(source_id, request_id, "FAILURE")
 

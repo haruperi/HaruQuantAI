@@ -35,6 +35,10 @@ class _PortfolioPersistenceStore:
     def encode(self, kind: str, value: object) -> str:
         """Encode one allowlisted value.
 
+        Args:
+            kind: Registered record kind string.
+            value: Value object to encode.
+
         Returns:
             Canonical JSON text.
 
@@ -48,6 +52,10 @@ class _PortfolioPersistenceStore:
 
     def decode(self, kind: str, value: str) -> object:
         """Decode one allowlisted value.
+
+        Args:
+            kind: Registered record kind string.
+            value: Canonical JSON text to decode.
 
         Returns:
             Validated Portfolio value.
@@ -63,6 +71,12 @@ class _PortfolioPersistenceStore:
 
 def _require_store(store: object) -> _PortfolioPersistenceStore:
     """Return a validated private Portfolio persistence handle.
+
+    Args:
+        store: Persistence handle object.
+
+    Returns:
+        Validated Portfolio persistence store.
 
     Raises:
         TypeError: If the handle is not Portfolio-owned.
@@ -80,6 +94,12 @@ def _execute(
     request_id: str | None = None,
 ) -> _TransactionResult:
     """Execute one bounded relational plan through Data.
+
+    Args:
+        statements: Tuple of SQL statement strings.
+        parameter_sets: Tuple of SQL parameter tuples.
+        max_rows: Bounded expected row limit.
+        request_id: Optional request trace identifier.
 
     Returns:
         Confirmed normalized transaction result.
@@ -109,6 +129,13 @@ def _execute(
 def _field(value: object, field: str) -> object:
     """Return one required model field.
 
+    Args:
+        value: Object exposing the attribute.
+        field: Name of required attribute.
+
+    Returns:
+        Value of requested attribute.
+
     Raises:
         TypeError: If the value does not expose the field.
     """
@@ -120,6 +147,13 @@ def _field(value: object, field: str) -> object:
 
 def _text_field(value: object, field: str) -> str:
     """Return one required nonempty textual field.
+
+    Args:
+        value: Object exposing the attribute.
+        field: Name of required attribute.
+
+    Returns:
+        Nonempty text string.
 
     Raises:
         TypeError: If the field is not text.
@@ -134,6 +168,13 @@ def _text_field(value: object, field: str) -> str:
 def _time_field(value: object, field: str) -> datetime:
     """Return one required timestamp field.
 
+    Args:
+        value: Object exposing the attribute.
+        field: Name of required attribute.
+
+    Returns:
+        Datetime object.
+
     Raises:
         TypeError: If the field is not a timestamp.
     """
@@ -146,6 +187,13 @@ def _time_field(value: object, field: str) -> datetime:
 
 def _mapping_field(value: object, field: str) -> Mapping[str, object]:
     """Return one required mapping field.
+
+    Args:
+        value: Object exposing the attribute.
+        field: Name of required attribute.
+
+    Returns:
+        Mapping dictionary object.
 
     Raises:
         TypeError: If the field is not a mapping.
@@ -206,6 +254,9 @@ def _mapping_time(value: Mapping[str, object], field: str) -> datetime:
 def _outbox_event_type(value: object) -> str:
     """Extract a verified event type from the redacted audit envelope.
 
+    Args:
+        value: Redacted audit envelope mapping object.
+
     Returns:
         Existing event-type evidence.
 
@@ -248,6 +299,15 @@ def _outbox_parameters(
     correlation_id: str,
 ) -> tuple[object, ...]:
     """Build one normalized outbox parameter set.
+
+    Args:
+        persistence: Portfolio persistence store instance.
+        event_key: Stable outbox event identity string.
+        aggregate_id: Aggregate root ID string.
+        event_value: Redacted audit event object.
+        occurred_at: ISO timestamp string.
+        request_id: Request trace ID string.
+        correlation_id: Correlation trace ID string.
 
     Returns:
         Ordered outbox values.
@@ -350,6 +410,14 @@ def create_construction_record(
 ) -> bool:
     """Atomically create immutable construction and outbox records.
 
+    Args:
+        store: Portfolio persistence handle.
+        state_key: Canonical hash string matching result.
+        state_value: Construction result model object.
+        event_key: Stable outbox event identity.
+        event_sequence: Positive sequence number.
+        event_value: Redacted audit event object.
+
     Returns:
         Whether both records committed atomically.
 
@@ -413,6 +481,13 @@ def create_plan_record(
     event_value: object,
 ) -> bool:
     """Atomically create immutable plan and outbox records.
+
+    Args:
+        store: Portfolio persistence handle.
+        state_value: Rebalance plan model object.
+        event_key: Stable outbox event identity.
+        event_sequence: Positive sequence number.
+        event_value: Redacted audit event object.
 
     Returns:
         Whether both records committed atomically.

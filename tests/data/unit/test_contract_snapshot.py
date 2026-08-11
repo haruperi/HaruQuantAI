@@ -18,9 +18,9 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from app.services.data.audit.contracts import AuditEventPage, AuditEventQuery
 from app.services.data.contracts import MarketDataset
 from app.services.data.evidence.account_contracts import AccountStateSnapshot
+from app.services.data.evidence.audit_contracts import AuditEventPage, AuditEventQuery
 from app.services.data.evidence.fx_contracts import FXConversionEvidence
 from app.services.data.evidence.market_context_contracts import MarketContextEvidence
 

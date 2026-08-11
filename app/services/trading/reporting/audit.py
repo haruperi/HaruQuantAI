@@ -1,4 +1,3 @@
-# ruff: noqa: DOC201, DOC501
 """Causally linked immutable execution-audit evidence."""
 
 from collections.abc import Mapping
@@ -34,7 +33,17 @@ class _ExecutionAuditRecord(BaseModel):
 
 
 def build_execution_audit_record(**values: object) -> dict[str, Any]:
-    """Build one validated JSON-safe immutable audit record."""
+    """Build one validated JSON-safe immutable audit record.
+
+    Args:
+        **values: Field values matching _ExecutionAuditRecord schema.
+
+    Returns:
+        JSON-safe dictionary representation of the execution audit record.
+
+    Raises:
+        TypeError: If serialized payload is not a mapping.
+    """
     model = _ExecutionAuditRecord.model_validate(values)
     safe = to_json_safe(model.model_dump(mode="json"))
     if not isinstance(safe, dict):
@@ -43,7 +52,14 @@ def build_execution_audit_record(**values: object) -> dict[str, Any]:
 
 
 def parse_execution_audit_record(value: Mapping[str, object]) -> object:
-    """Parse one immutable execution-audit mapping."""
+    """Parse one immutable execution-audit mapping.
+
+    Args:
+        value: Mapping payload to validate against schema.
+
+    Returns:
+        Validated _ExecutionAuditRecord Pydantic model instance.
+    """
     return _ExecutionAuditRecord.model_validate(value)
 
 

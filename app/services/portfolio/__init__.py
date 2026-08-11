@@ -22,6 +22,16 @@ from app.services.portfolio.api import (
     to_portfolio_error_payload,
 )
 from app.services.portfolio.evidence import validate_construction_evidence
+from app.services.portfolio.ledger import (
+    build_reversal_batch,
+    build_snapshot,
+    cash_balance,
+    create_ledger_service,
+    ingest_event,
+    is_balanced,
+    recompute_balances,
+    validate_snapshot,
+)
 from app.services.portfolio.ledger.contracts import (
     build_ledger_account,
     build_ledger_entry,
@@ -62,9 +72,13 @@ __all__ = (
     "build_portfolio_risk_health",
     "build_portfolio_state_store",
     "build_posting_batch",
+    "build_reversal_batch",
+    "build_snapshot",
     "calculate_margin_view",
     "calculate_portfolio_valuation",
+    "cash_balance",
     "construct_portfolio",
+    "create_ledger_service",
     "create_portfolio_handle",
     "create_portfolio_value",
     "dump_portfolio_value",
@@ -76,12 +90,15 @@ __all__ = (
     "get_portfolio_migrations",
     "get_portfolio_status",
     "get_portfolio_value_field",
+    "ingest_event",
+    "is_balanced",
     "is_portfolio_handle",
     "is_portfolio_value",
     "measure_cross_account_correlation",
     "parse_ledger_account",
     "parse_ledger_entry",
     "parse_posting_batch",
+    "recompute_balances",
     "recompute_portfolio_measurement",
     "reconcile_portfolio",
     "register_portfolio_definition",
@@ -90,4 +107,5 @@ __all__ = (
     "submit_portfolio_rebalance",
     "to_portfolio_error_payload",
     "validate_construction_evidence",
+    "validate_snapshot",
 )

@@ -24,7 +24,17 @@ CURRENCY_CODE_LENGTH = 3
 
 
 def _text(value: str) -> str:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _text")
     if not value or value != value.strip():
         raise ValueError("value must be a non-empty trimmed string")
@@ -32,7 +42,17 @@ def _text(value: str) -> str:
 
 
 def _currency(value: str) -> str:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _currency")
     validated = _text(value)
     if len(validated) != CURRENCY_CODE_LENGTH or validated != validated.upper():
@@ -41,7 +61,17 @@ def _currency(value: str) -> str:
 
 
 def _utc(value: datetime) -> datetime:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _utc")
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         raise ValueError("timestamp must be aware UTC")
@@ -49,7 +79,14 @@ def _utc(value: datetime) -> datetime:
 
 
 def _freeze_text_mapping(value: Mapping[str, str]) -> Mapping[str, str]:
-    """Freeze one DATA contract value against mutation."""
+    """Freeze one DATA contract value against mutation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _freeze_text_mapping")
     return MappingProxyType({_text(key): _text(item) for key, item in value.items()})
 
@@ -70,14 +107,31 @@ class FXConversionRequest(_Contract):
     @field_validator("source_currency", "target_currency")
     @classmethod
     def _validate_currency(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_currency")
         return _currency(value)
 
     @field_validator("allowed_intermediates")
     @classmethod
     def _validate_intermediates(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_intermediates")
         validated = tuple(_currency(item) for item in value)
         if len(set(validated)) != len(validated):
@@ -87,14 +141,31 @@ class FXConversionRequest(_Contract):
     @field_validator("as_of")
     @classmethod
     def _validate_as_of(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_as_of")
         return _utc(value)
 
     @field_validator("max_age_seconds", "max_legs")
     @classmethod
     def _validate_positive(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_positive")
         if value <= 0:
             raise ValueError("bound must be positive")
@@ -103,13 +174,27 @@ class FXConversionRequest(_Contract):
     @field_validator("path_policy_id", "path_policy_version", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @model_validator(mode="after")
     def _validate_request(self) -> FXConversionRequest:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_request")
         if self.source_currency == self.target_currency:
             raise ValueError("source and target currencies must differ")
@@ -136,14 +221,31 @@ class FXRateLeg(_Contract):
     @field_validator("source_currency", "target_currency")
     @classmethod
     def _validate_currency(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_currency")
         return _currency(value)
 
     @field_validator("rate")
     @classmethod
     def _validate_rate(cls, value: Decimal) -> Decimal:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_rate")
         if not value.is_finite() or value <= 0:
             raise ValueError("rate must be finite and positive")
@@ -152,33 +254,68 @@ class FXRateLeg(_Contract):
     @field_validator("source_id", "provider_symbol")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("as_of")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return _utc(value)
 
     @field_validator("provenance", mode="after")
     @classmethod
     def _validate_provenance(cls, value: Mapping[str, str]) -> Mapping[str, str]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_provenance")
         return _freeze_text_mapping(value)
 
     @field_serializer("provenance", when_used="json")
     def _serialize_provenance(self, value: Mapping[str, str]) -> dict[str, str]:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_provenance")
         return dict(value)
 
     @model_validator(mode="after")
     def _validate_leg(self) -> FXRateLeg:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_leg")
         if self.source_currency == self.target_currency:
             raise ValueError("rate leg cannot convert a currency to itself")
@@ -186,7 +323,14 @@ class FXRateLeg(_Contract):
 
     @field_serializer("rate", when_used="json")
     def _serialize_rate(self, value: Decimal) -> str:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_rate")
         return str(value)
 
@@ -210,14 +354,31 @@ class FXConversionEvidence(_Contract):
     @field_validator("source_currency", "target_currency")
     @classmethod
     def _validate_currency(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_currency")
         return _currency(value)
 
     @field_validator("composite_rate")
     @classmethod
     def _validate_rate(cls, value: Decimal) -> Decimal:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_rate")
         if not value.is_finite() or value <= 0:
             raise ValueError("composite_rate must be finite and positive")
@@ -226,33 +387,68 @@ class FXConversionEvidence(_Contract):
     @field_validator("as_of", "expires_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return _utc(value)
 
     @field_validator("path_policy_id", "path_policy_version", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("provenance", mode="after")
     @classmethod
     def _validate_provenance(cls, value: Mapping[str, str]) -> Mapping[str, str]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_provenance")
         return _freeze_text_mapping(value)
 
     @field_serializer("provenance", when_used="json")
     def _serialize_provenance(self, value: Mapping[str, str]) -> dict[str, str]:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_provenance")
         return dict(value)
 
     @model_validator(mode="after")
     def _validate_evidence(self) -> FXConversionEvidence:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_evidence")
         if not self.legs:
             raise ValueError("conversion evidence requires at least one leg")
@@ -281,7 +477,14 @@ class FXConversionEvidence(_Contract):
 
     @field_serializer("composite_rate", when_used="json")
     def _serialize_rate(self, value: Decimal) -> str:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_rate")
         return str(value)
 

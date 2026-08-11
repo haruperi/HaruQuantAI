@@ -74,3 +74,46 @@ def test_portfolio_request_is_self_contained() -> None:
     )
     request = PortfolioBacktestRequestV1.model_validate(payload)
     assert request.components[0].backtest_request is not None
+
+
+def test_emit_simulation_audit_exception_handling() -> None:
+    """Test emit_simulation_audit converting unexpected persistence exceptions to SimulationError."""
+    from datetime import UTC, datetime
+    from types import SimpleNamespace
+
+    from app.services.simulator.errors import SimulationError
+    from app.services.simulator.run.audit import emit_simulation_audit
+
+    class FailingDeps:
+        def persist_audit_event(self, _event: object) -> object:
+            raise RuntimeError("Database connection crashed")
+
+    deps = FailingDeps()
+    auth = SimpleNamespace(
+        principal_id="user1", request_id="req1", correlation_id="cor1"
+    )
+    with pytest.raises(SimulationError, match="Simulation audit persistence failed"):
+        emit_simulation_audit(
+            dependencies=deps,  # type: ignore[arg-type]
+            auth_context=auth,
+            action="run_started",
+            timestamp=datetime.now(UTC),
+            payload={},
+        )
+
+
+def test_portfolio_run_grid_and_validation_error_paths() -> None:
+    """Test portfolio grid construction and component validation error paths."""
+    from datetime import UTC, datetime, timedelta
+
+    from app.services.simulator.errors import SimulationError
+    from app.services.simulator.run.portfolio import _measurement_grid
+
+    now = datetime.now(UTC)
+    # Test invalid span <= 0
+    with pytest.raises(SimulationError, match="Measurement window cannot carry"):
+        _measurement_grid(now, now, 30)
+
+    # Test count < 30
+    with pytest.raises(SimulationError, match="Measurement window cannot carry"):
+        _measurement_grid(now, now + timedelta(days=1), 10)

@@ -1,5 +1,5 @@
 /**
- * Frozen typed route contracts for the 81 registered backend-v1 operations.
+ * Frozen typed route contracts for the 82 registered backend-v1 operations.
  *
  * Source of truth: `app/services/api/contracts/catalog.py` (`_KNOWN_ROUTE_CONTRACTS`).
  * The drift test in `clients.contract.test.ts` asserts that this module
@@ -163,10 +163,23 @@ export const settingsRoutes = {
 // --- Data / symbol discovery + market stream (2) -------------------------
 
 export const dataRoutes = {
+  capabilities: route({
+    id: "api.data.capabilities",
+    method: "GET",
+    path: "/api/v1/data/capabilities",
+    permission: "data:read",
+  }),
   symbols: route({
     id: "api.data.symbols",
     method: "GET",
     path: "/api/v1/data/symbols",
+    permission: "data:read",
+    paginated: true,
+  }),
+  markets: route({
+    id: "api.data.markets",
+    method: "GET",
+    path: "/api/v1/data/markets",
     permission: "data:read",
     paginated: true,
   }),
@@ -753,6 +766,8 @@ export const ROUTE_CONTRACTS = [
   settingsRoutes.credentials,
   settingsRoutes.updateCredential,
   dataRoutes.symbols,
+  dataRoutes.markets,
+  dataRoutes.capabilities,
   dataRoutes.stream,
   indicatorsRoutes.catalogue,
   indicatorsRoutes.capabilities,
@@ -825,7 +840,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 81;
+export const ROUTE_CONTRACT_COUNT = 83;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

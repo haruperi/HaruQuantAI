@@ -126,13 +126,15 @@ def _get_market_evidence() -> tuple[Any, Any]:
         request_id=REQ,
     )
     metadata = build_symbol_metadata(
-        symbol="EURUSD",
-        source="mt5",
-        point="0.00001",
-        digits=5,
-        currency_base="EUR",
-        currency_profit="USD",
-        available_at=record.available_at,
+        canonical_symbol="EURUSD",
+        provider_symbol="EURUSD",
+        asset_class="FX",
+        quote_currency="USD",
+        timezone="UTC",
+        source_id="synthetic",
+        revision="metadata-v1",
+        retrieved_at=record.available_at,
+        missing_fields=("base_currency", "digits", "price_step", "quantity_step"),
         request_id=REQ,
     )
     return market, metadata
@@ -189,7 +191,7 @@ def _setup_proposal_data() -> tuple[Any, Any, Any, Any, Any]:
         evidence_id=canonical_digest(proposal_material),
         primary_market=market,
         related_markets={},
-        point_size=Decimal(str(metadata.point)),
+        point_size=Decimal(str(metadata.price_step or "0.0001")),
         feature_values={},
         feature_available_at={},
         feature_refs={},

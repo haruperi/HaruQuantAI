@@ -80,3 +80,51 @@ def test_fill_provider_requires_exact_market_evidence() -> None:
         ]
         == "NOT_CALIBRATED"
     )
+
+
+def test_race_cancel_and_replace_winners() -> None:
+    """Test CANCEL and REPLACE winner resolution in resolve_cancel_replace_race."""
+    import pytest
+
+    now = datetime.now(UTC)
+    later = now + timedelta(seconds=1)
+
+    # Cancel earlier than fill -> CANCEL wins
+    race_cancel = resolve_cancel_replace_race(
+        fill_at=later, cancel_at=now, replace_at=None
+    )
+    assert race_cancel["winner"] == "CANCEL"
+
+    # Replace earlier than fill -> REPLACE wins
+    race_replace = resolve_cancel_replace_race(
+        fill_at=later, cancel_at=None, replace_at=now
+    )
+    assert race_replace["winner"] == "REPLACE"
+
+    # Error path: no timestamps
+    with pytest.raises(ValueError, match="at least one race timestamp is required"):
+        resolve_cancel_replace_race(fill_at=None, cancel_at=None, replace_at=None)
+
+    # Error path: naive timestamp
+    with pytest.raises(ValueError, match="timezone-aware"):
+        resolve_cancel_replace_race(
+            fill_at=datetime.now(UTC).replace(tzinfo=None),
+            cancel_at=None,
+            replace_at=None,
+        )
+
+
+def test_project_execution_views_player_visibility() -> None:
+    """Test player view visibility filtering in project_execution_views."""
+    now = datetime.now(UTC)
+    earlier = now - timedelta(seconds=1)
+    later = now + timedelta(seconds=1)
+
+    events = (
+        {"event_id": "visible", "venue_at": earlier, "perceived_at": earlier},
+        {"event_id": "future", "venue_at": earlier, "perceived_at": later},
+    )
+    views = project_execution_views(events, as_of=now)
+    assert len(views["venue"]) == 2
+    assert len(views["player"]) == 1
+    assert views["player"][0]["event_id"] == "visible"

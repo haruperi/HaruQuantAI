@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.data import to_ohlcv_dataframe, unwrap_data_response
+from app.services.data import to_ohlcv_dataframe
 from app.services.strategy import run_vectorized_strategy_signals
 from tests.strategy.usage.workflows._support import (
     MarketProposalEvaluator,
@@ -63,12 +63,7 @@ def main() -> None:
     if outcome.data is None:
         raise RuntimeError(f"Vectorized evaluation failed: {outcome.error}")
 
-    response = to_ohlcv_dataframe(market)
-    frame = unwrap_data_response(
-        response,
-        operation="strategy.usage.workflow.to_ohlcv_dataframe",
-        request_id=response.metadata.request_id,
-    ).copy()
+    frame = to_ohlcv_dataframe(market).copy()
 
     frame["action"] = "NEUTRAL"
     frame["side"] = None

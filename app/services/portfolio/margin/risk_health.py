@@ -17,6 +17,14 @@ def build_portfolio_risk_health(
 ) -> Mapping[str, object]:
     """Build explicit drawdown, VaR/CVaR, and stress evidence.
 
+    Args:
+        values: Sequence of portfolio value observations.
+        confidence: Confidence level for VaR/CVaR calculation.
+        model: Model name string.
+        window: Historical window size.
+        stress_losses: Mapping of scenario names to stress losses.
+        high_water_mark: High-water mark value for drawdown calculation.
+
     Returns:
         Versioned Portfolio risk-health evidence.
     """

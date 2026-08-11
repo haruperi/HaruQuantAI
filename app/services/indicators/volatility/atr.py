@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from app.services.indicators.core.results import IndicatorResult
 
 _FORMULA_VERSION = "1.0.0"
-_INDICATOR_VERSION = "1.0.0"
+_INDICATOR_VERSION = "1.1.0"
 
 
 def _build_config(period: int, config: IndicatorConfig | None) -> IndicatorConfig:
@@ -79,10 +79,13 @@ def _true_range(records: tuple[OHLCVRecord, ...]) -> np.ndarray:
     """Calculate standard true range for every record.
 
     Args:
-        records: Validated OHLCV records.
+            records: Validated OHLCV records.
 
     Returns:
-        A float64 true-range array.
+            A float64 true-range array.
+
+    Raises:
+        None.
     """
     high = np.asarray([float(record.high) for record in records], dtype="float64")
     low = np.asarray([float(record.low) for record in records], dtype="float64")
@@ -147,13 +150,23 @@ def atr(
     unavailable_reason = pd.Series(pd.NA, index=index, dtype=object)
     unavailable_reason[~is_valid] = "warmup"
     output_column = f"atr_{period}"
+    true_range_column = "true_range"
+    # ``true_range`` is mathematically available from the first row (it only
+    # needs a prior close, seeded from the first close), but Core's atomic
+    # finalization requires every output column in one result to share the
+    # exact same warmup mask (see ``_validate_finalization_shape``). This
+    # file therefore publishes ``true_range`` under the same warmup window
+    # as ``atr`` rather than a second, independently warmed-up column.
+    true_range_masked = np.where(is_valid, true_range, np.nan)
 
     return build_indicator_result(
         data=data,
         config=resolved_config,
         indicator_version=_INDICATOR_VERSION,
-        output_columns=(output_column,),
-        output_values=pd.DataFrame({output_column: values}, index=index),
+        output_columns=(output_column, true_range_column),
+        output_values=pd.DataFrame(
+            {output_column: values, true_range_column: true_range_masked}, index=index
+        ),
         available_at=available_at,
         computed_from_start=computed_from_start,
         computed_from_end=computed_from_end,

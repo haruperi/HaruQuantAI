@@ -10,6 +10,7 @@ export type WidgetType =
   | "education"
   | "challenges"
   | "dashboard"
+  | "data"
   | "strategies"
   | "research"
   | "optimization"

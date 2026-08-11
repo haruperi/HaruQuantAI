@@ -27,12 +27,30 @@ class _Runner(Protocol):
         capture_output: bool,
         text: bool,
         timeout: float,
-    ) -> subprocess.CompletedProcess[str]: ...
+    ) -> subprocess.CompletedProcess[str]:
+        """Execute a command list and return completed process result.
+
+        Args:
+            args: Command line arguments list.
+            check: Whether to raise on non-zero exit code.
+            capture_output: Whether to capture stdout and stderr.
+            text: Whether to decode output as string.
+            timeout: Command timeout in seconds.
+
+        Returns:
+            Completed process instance.
+        """
+        ...
 
 
 @dataclass(frozen=True, slots=True)
 class DesktopConfig:
-    """Validated internal desktop notification configuration."""
+    """Validated internal desktop notification configuration.
+
+    Attributes:
+        enabled: Whether desktop delivery is active.
+        timeout_seconds: Subprocess execution timeout in seconds.
+    """
 
     enabled: bool = False
     timeout_seconds: float = 5.0
@@ -42,12 +60,22 @@ class DesktopNotifier:
     """Deliver bounded messages through the current OS notification command."""
 
     def __init__(self, config: DesktopConfig, runner: _Runner = subprocess.run) -> None:
+        """Initialize DesktopNotifier.
+
+        Args:
+            config: Desktop notification configuration.
+            runner: Subprocess runner function.
+        """
         self._config = config
         self._runner = runner
 
     @property
     def active(self) -> bool:
-        """Return whether desktop delivery is enabled and supported."""
+        """Return whether desktop delivery is enabled and supported.
+
+        Returns:
+            True if enabled and host platform is supported.
+        """
         return self._config.enabled and platform.system() in {
             "Windows",
             "Darwin",
@@ -62,6 +90,7 @@ class DesktopNotifier:
         Args:
             title: Bounded notification title.
             message: Bounded notification body.
+            _html_body: Unused HTML body for uniform channel protocol compatibility.
 
         Returns:
             Secret-safe channel delivery result.

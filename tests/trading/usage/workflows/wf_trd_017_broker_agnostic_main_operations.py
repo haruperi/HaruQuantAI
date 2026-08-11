@@ -16,6 +16,7 @@ from typing import Any, Literal
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.api import build_system_broker_connection_config
 from app.services.brokers import (
     build_broker_margin_request,
     build_broker_profit_request,
@@ -53,14 +54,14 @@ from app.services.trading import (
     stop_live_session,
     submit_order,
 )
-from app.utils import load_broker_provider_settings, load_settings
+from app.utils import generate_id, load_broker_provider_settings, load_settings
 from tests.trading.usage.workflows._support import examples
 
 Target = Literal["sim", "mt5", "ctrader"]
 
 # Change only this line to select the execution target. Broker targets still
 # require verified non-production settings and explicit mutation opt-in.
-EXECUTION_TARGET: Target = "sim"
+EXECUTION_TARGET: Target = "mt5"
 
 WORKFLOW_ID = "WF-TRD-017"
 STAGES = (
@@ -805,6 +806,42 @@ def _live_adapter_capability(request: object) -> dict[str, object]:
     }
 
 
+def _provider_settings(target: str) -> object:
+    """Load active provider settings with process environment overrides."""
+    explicit: dict[str, object] = {}
+    if target == "mt5" or os.environ.get("MT5_ENABLED", "").lower() in (
+        "true",
+        "1",
+        "yes",
+    ):
+        explicit["mt5_enabled"] = True
+        explicit["mt5_environment"] = os.environ.get("MT5_ENVIRONMENT", "demo")
+        for env_key, setting_key in (
+            ("MT5_LOGIN", "mt5_login"),
+            ("MT5_PASSWORD", "mt5_password"),
+            ("MT5_SERVER", "mt5_server"),
+            ("MT5_TERMINAL_PATH", "mt5_terminal_path"),
+        ):
+            if env_key in os.environ:
+                explicit[setting_key] = os.environ[env_key]
+    elif target == "ctrader" or os.environ.get("CTRADER_ENABLED", "").lower() in (
+        "true",
+        "1",
+        "yes",
+    ):
+        explicit["ctrader_enabled"] = True
+        explicit["ctrader_environment"] = os.environ.get("CTRADER_ENVIRONMENT", "demo")
+        for env_key, setting_key in (
+            ("CTRADER_ACCOUNT_ID", "ctrader_account_id"),
+            ("CTRADER_CLIENT_ID", "ctrader_client_id"),
+            ("CTRADER_CLIENT_SECRET", "ctrader_client_secret"),
+            ("CTRADER_ACCESS_TOKEN", "ctrader_access_token"),
+        ):
+            if env_key in os.environ:
+                explicit[setting_key] = os.environ[env_key]
+    return load_broker_provider_settings(explicit or None)
+
+
 async def _compose_context(target: Target) -> OperationsContext:
     """Compose one selected target through current public boundaries.
 
@@ -832,10 +869,16 @@ async def _compose_context(target: Target) -> OperationsContext:
 
     if load_settings().environment != "dev":
         raise RuntimeError("MT5/cTrader usage requires application environment dev")
-    connection = resolve_provider_connection_config(
-        get_broker_id(target),
-        settings=load_broker_provider_settings(),
-    )
+    try:
+        connection = build_system_broker_connection_config(
+            get_broker_id(target),
+            request_id=generate_id("req"),
+        )
+    except ValueError, RuntimeError, KeyError, AttributeError, OSError:
+        connection = resolve_provider_connection_config(
+            get_broker_id(target),
+            settings=_provider_settings(target),
+        )
     broker_env = get_broker_connection_environment(connection)
     if not any(
         name in broker_env.lower() for name in ("demo", "paper", "sandbox", "test")
@@ -1418,10 +1461,16 @@ async def example_10_calculate_profit_margin(context: OperationsContext) -> None
         and load_settings().environment == "dev"
     ):
         try:
-            connection = resolve_provider_connection_config(
-                "mt5",
-                settings=load_broker_provider_settings(),
-            )
+            try:
+                connection = build_system_broker_connection_config(
+                    "mt5",
+                    request_id=generate_id("req"),
+                )
+            except ValueError, RuntimeError, KeyError, AttributeError, OSError:
+                connection = resolve_provider_connection_config(
+                    "mt5",
+                    settings=_provider_settings("mt5"),
+                )
             created = create_broker_adapter("mt5", connection)
             if _status(created) == "success":
                 cand = get_broker_value_field(created, "data")
@@ -1667,16 +1716,16 @@ async def run() -> None:
     context = await _compose_context(EXECUTION_TARGET)
     operations = (
         example_01_connect,
-        example_02_platform,
-        example_03_account,
-        example_04_symbol,
-        example_05_positions,
-        example_06_orders,
-        example_07_history_orders,
-        example_08_history_deals,
-        example_09_open_position,
-        example_10_calculate_profit_margin,
-        example_11_modify_position,
+        # example_02_platform,
+        # example_03_account,
+        # example_04_symbol,
+        # example_05_positions,
+        # example_06_orders,
+        # example_07_history_orders,
+        # example_08_history_deals,
+        # example_09_open_position,
+        # example_10_calculate_profit_margin,
+        # example_11_modify_position,
         # example_12_partial_close_position,
         # example_13_close_position,
         # example_14_place_pending_order,

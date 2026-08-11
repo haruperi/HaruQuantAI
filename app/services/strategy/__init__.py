@@ -7,23 +7,17 @@ and raw constants remain internal implementation details. Feature subpackages
 are private implementation details.
 """
 
+from app.services.strategy.automation import (
+    evaluate_automation_mode,
+    list_automation_policies,
+    persist_automation_policy,
+)
 from app.services.strategy.checkpoints import (
     create_strategy_checkpoint,
     list_strategy_checkpoints,
     validate_strategy_checkpoint,
 )
 from app.services.strategy.checkpoints.factories import create_strategy_checkpoint_value
-from app.services.strategy.contracts import (
-    build_expectancy_reference,
-    build_setup_evaluation,
-    build_strategy_playbook,
-    build_strategy_profile,
-    evaluate_expectancy_reference,
-    parse_expectancy_reference,
-    parse_setup_evaluation,
-    parse_strategy_playbook,
-    parse_strategy_profile,
-)
 from app.services.strategy.contracts.factories import (
     create_strategy_config,
     create_strategy_decision,
@@ -59,34 +53,43 @@ from app.services.strategy.event import (
     run_event_strategy_hook,
     run_persisted_event_strategy_hook,
 )
-from app.services.strategy.exit_plans import (
+from app.services.strategy.intents import build_trade_intent
+from app.services.strategy.intents.factories import create_trade_intent_value
+from app.services.strategy.lifecycle import (
+    govern_strategy_lifecycle,
+    list_lifecycle,
+    persist_lifecycle_decision,
+)
+from app.services.strategy.management_plan import (
     build_exit_plan,
     build_exit_plan_handoff,
     parse_exit_plan,
 )
-from app.services.strategy.intents import (
-    amend_trade_plan,
-    build_trade_intent,
-    build_trade_plan,
-    parse_trade_plan,
-    transition_trade_plan,
-    validate_trade_plan_for_intent,
-)
-from app.services.strategy.intents.factories import create_trade_intent_value
-from app.services.strategy.manual_plans import (
-    build_manual_trade_plan,
-    validate_manual_trade_plan,
-)
+from app.services.strategy.migrations.definitions import _ensure_strategy_storage
 from app.services.strategy.operating_envelope import (
     build_operating_envelope,
     evaluate_operating_envelope,
     parse_operating_envelope,
 )
+from app.services.strategy.playbooks import (
+    build_strategy_playbook,
+    list_strategy_playbooks,
+    parse_strategy_playbook,
+    persist_strategy_playbook,
+)
+from app.services.strategy.profiles import (
+    build_expectancy_reference,
+    build_strategy_profile,
+    evaluate_expectancy_reference,
+    list_strategy_profiles,
+    parse_expectancy_reference,
+    parse_strategy_profile,
+    persist_strategy_profile,
+)
 from app.services.strategy.proposal_intake import (
     bind_proposal_lineage,
     create_strategy_proposal_evaluation_request,
     create_strategy_proposal_evaluation_result,
-    evaluate_automation_mode,
     evaluate_strategy_proposal,
     validate_strategy_proposal,
 )
@@ -94,7 +97,6 @@ from app.services.strategy.registry import (
     adopt_approved_optimization_parameters,
     bootstrap_builtin_strategies,
     get_strategy_definition,
-    govern_strategy_lifecycle,
     list_builtin_strategy_descriptors,
     list_strategy_configs,
     list_strategy_definitions,
@@ -110,6 +112,12 @@ from app.services.strategy.registry.runtime import (
 )
 from app.services.strategy.replay import create_strategy_replay_manifest
 from app.services.strategy.replay.factories import create_strategy_replay_manifest_value
+from app.services.strategy.setup_evaluation import (
+    build_setup_evaluation,
+    list_setup_evaluations,
+    parse_setup_evaluation,
+    persist_setup_evaluation,
+)
 from app.services.strategy.signals import (
     evaluate_and_record_strategy_signals,
     evaluate_strategy_signals,
@@ -117,7 +125,31 @@ from app.services.strategy.signals import (
     mark_strategy_signal_submitted,
     record_strategy_signals,
 )
+from app.services.strategy.trade_plan import (
+    amend_trade_plan,
+    build_manual_trade_plan,
+    build_trade_plan,
+    list_trade_plans,
+    parse_trade_plan,
+    persist_trade_plan,
+    transition_trade_plan,
+    validate_manual_trade_plan,
+    validate_trade_plan_for_intent,
+)
 from app.services.strategy.vectorized import run_vectorized_strategy_signals
+
+
+def ensure_strategy_storage(request_id: str) -> None:
+    """Ensure Strategy-owned persistence schema exists idempotently.
+
+    Args:
+        request_id: Canonical request trace identifier.
+
+    Raises:
+        StrategyOperationError: If Data rejects the migration transaction.
+    """
+    _ensure_strategy_storage(request_id)
+
 
 __all__ = (
     "adopt_approved_optimization_parameters",
@@ -160,6 +192,7 @@ __all__ = (
     "create_trade_intent_value",
     "create_validated_strategy_config",
     "create_validated_strategy_ref",
+    "ensure_strategy_storage",
     "evaluate_and_record_strategy_signals",
     "evaluate_automation_mode",
     "evaluate_expectancy_reference",
@@ -175,12 +208,18 @@ __all__ = (
     "get_strategy_timing_policy",
     "govern_strategy_lifecycle",
     "initialize_strategy_runtime_state",
+    "list_automation_policies",
     "list_builtin_strategy_descriptors",
+    "list_lifecycle",
+    "list_setup_evaluations",
     "list_strategy_checkpoints",
     "list_strategy_configs",
     "list_strategy_definitions",
+    "list_strategy_playbooks",
+    "list_strategy_profiles",
     "list_strategy_signals",
     "list_strategy_versions",
+    "list_trade_plans",
     "load_strategy_runtime_state",
     "mark_strategy_signal_submitted",
     "parse_exit_plan",
@@ -190,6 +229,12 @@ __all__ = (
     "parse_strategy_playbook",
     "parse_strategy_profile",
     "parse_trade_plan",
+    "persist_automation_policy",
+    "persist_lifecycle_decision",
+    "persist_setup_evaluation",
+    "persist_strategy_playbook",
+    "persist_strategy_profile",
+    "persist_trade_plan",
     "record_strategy_signals",
     "register_strategy_version",
     "resolve_strategy_config",

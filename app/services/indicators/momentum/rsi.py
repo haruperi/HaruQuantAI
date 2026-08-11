@@ -83,11 +83,14 @@ def _wilder_rsi(prices: np.ndarray, period: int) -> tuple[np.ndarray, np.ndarray
     """Calculate Wilder-smoothed RSI values and their valid mask.
 
     Args:
-        prices: Row-ordered selected prices.
-        period: Validated smoothing period.
+            prices: Row-ordered selected prices.
+            period: Validated smoothing period.
 
     Returns:
-        A values array and Boolean valid-row mask.
+            A values array and Boolean valid-row mask.
+
+    Raises:
+        None.
     """
     values = np.full(len(prices), np.nan, dtype="float64")
     is_valid = np.zeros(len(prices), dtype=bool)

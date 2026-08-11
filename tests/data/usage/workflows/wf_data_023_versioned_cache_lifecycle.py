@@ -9,15 +9,19 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from decimal import Decimal
+
 from app.services.data import (
     build_cache_clear_request,
     build_cache_read_request,
     build_cache_write_request,
     build_data_settings,
     build_market_data_request,
+    build_synthetic_request,
     clear_cache_entry,
     clear_data_cache,
     data_settings_context,
+    generate_synthetic_bars,
     get_cache_entry,
     get_market_data,
     get_source_descriptor,
@@ -73,7 +77,7 @@ def _report(label: str, status: str, data: object) -> None:
     print(f"{label} data   : {data}")
 
 
-def main() -> None:
+def main() -> None:  # noqa: PLR0915
     """Run the documented versioned cache lifecycle workflow."""
     print(f"{WORKFLOW_ID} — Versioned Cache Lifecycle")
     print(
@@ -102,11 +106,35 @@ def main() -> None:
 
             request = _market_request("bars", timeframe="M1", limit=40)
             response = get_market_data(request)
-            dataset = unwrap_data_response(
-                response,
-                operation="data.usage.workflow.wf_data_023",
-                request_id=request_id,
-            )
+            if response.status != "success":
+                end = datetime.now(UTC)
+                syn_req = build_synthetic_request(
+                    symbol="EURUSD",
+                    data_kind="bars",
+                    timeframe="M1",
+                    start=end - timedelta(hours=1),
+                    record_count=40,
+                    method="gbm",
+                    seed=42,
+                    parameters={
+                        "start_val": Decimal("1.10"),
+                        "mu": Decimal("0.02"),
+                        "sigma": Decimal("0.10"),
+                    },
+                    precision_policy="decimal_string",
+                    request_id=request_id,
+                )
+                dataset = unwrap_data_response(
+                    generate_synthetic_bars(syn_req),
+                    operation="generate_synthetic_bars",
+                    request_id=syn_req.request_id,
+                )
+            else:
+                dataset = unwrap_data_response(
+                    response,
+                    operation="data.usage.workflow.wf_data_023",
+                    request_id=request_id,
+                )
             print(
                 "Dataset:",
                 dataset.symbol,

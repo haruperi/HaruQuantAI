@@ -79,6 +79,13 @@ class _DurableTradingStateStore:
     ) -> IdempotencyReservation:
         """Atomically reserve or compare one caller key.
 
+        Args:
+            key: Idempotency key string.
+            material_hash: Hash of key material.
+            material_version: Version of key material.
+            reserved_at: Aware UTC reservation timestamp.
+            expires_at: Aware UTC expiration timestamp.
+
         Returns:
             Exact reservation outcome.
         """
@@ -121,6 +128,13 @@ class _DurableTradingStateStore:
     ) -> None:
         """Persist one terminal reservation outcome.
 
+        Args:
+            key: Idempotency key string.
+            material_hash: Hash of key material.
+            receipt_id: Outcome receipt identifier string.
+            completed_at: Aware UTC completion timestamp.
+            status: Terminal status literal.
+
         Raises:
             ValueError: If the reservation is missing or mismatched.
         """
@@ -150,7 +164,11 @@ class _DurableTradingStateStore:
         )
 
     def append_event(self, event: TradingEvent) -> None:
-        """Append one immutable versioned Trading event."""
+        """Append one immutable versioned Trading event.
+
+        Args:
+            event: TradingEvent instance to append.
+        """
         scope = (event.route, event.tenant_id, event.authority_id)
         create_event_record(
             self._store,
@@ -185,6 +203,9 @@ class _DurableTradingStateStore:
     def load_projection(self, scope: TradingScope) -> TradingProjection | None:
         """Load one exact-scope projection.
 
+        Args:
+            scope: Target TradingScope tuple.
+
         Returns:
             Stored projection or ``None``.
         """
@@ -197,6 +218,10 @@ class _DurableTradingStateStore:
         self, projection: TradingProjection, expected_version: int
     ) -> None:
         """Save a projection under optimistic owner and storage guards.
+
+        Args:
+            projection: TradingProjection instance to save.
+            expected_version: Expected optimistic projection version integer.
 
         Raises:
             ValueError: If the optimistic version is stale.
@@ -223,6 +248,9 @@ class _DurableTradingStateStore:
     def load_unresolved_attempts(self, scope: TradingScope) -> tuple[TradingEvent, ...]:
         """Load unresolved send attempts for one exact scope.
 
+        Args:
+            scope: Target TradingScope tuple.
+
         Returns:
             Ordered unresolved events.
         """
@@ -246,6 +274,9 @@ class _DurableTradingStateStore:
     def load_all_unresolved_attempts(self, limit: int) -> tuple[TradingEvent, ...]:
         """Load bounded unresolved attempts across every exact scope.
 
+        Args:
+            limit: Maximum number of attempts to return.
+
         Returns:
             Deterministically ordered unresolved Trading events.
         """
@@ -257,6 +288,9 @@ class _DurableTradingStateStore:
 
     def load_report_evidence(self, scope: TradingScope) -> Mapping[str, JsonValue]:
         """Return exact stored projection evidence.
+
+        Args:
+            scope: Target TradingScope tuple.
 
         Returns:
             JSON-safe stored evidence without enrichment.
@@ -285,6 +319,12 @@ def execute_trading_state_store_operation(
     **kwargs: object,
 ) -> object:
     """Execute one allowlisted Trading state operation.
+
+    Args:
+        store: Durable Trading state-store adapter handle.
+        operation: Name of state operation method to invoke.
+        *args: Positional arguments for state operation.
+        **kwargs: Keyword arguments for state operation.
 
     Returns:
         Exact state operation result.

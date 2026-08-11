@@ -43,6 +43,15 @@ def evaluate_trading_permissions(
 
     Risk-reducing actions remain available when new exposure is disabled, but
     uncertainty blocks re-arm and exposure creation.
+
+    Args:
+        enabled: Whether live session admission is enabled.
+        reconciled: Whether execution state is fully reconciled.
+        protection_known: Whether protective order coverage is verified.
+        ownership_known: Whether trade ownership is verified.
+
+    Returns:
+        Mapping of action permission flags to boolean state.
     """
     known = reconciled and protection_known and ownership_known
     return {
@@ -362,6 +371,10 @@ async def pause_strategy(
 ) -> StandardResponse[dict[str, JsonValue]]:
     """Pause strategy admission and return a standard response.
 
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
+
     Returns:
         Standard response containing control evidence or an error.
     """
@@ -377,6 +390,10 @@ async def resume_strategy(
     request: TradingRequest, deps: TradingDependencies
 ) -> StandardResponse[dict[str, JsonValue]]:
     """Resume strategy admission and return a standard response.
+
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
 
     Returns:
         Standard response containing control evidence or an error.
@@ -394,6 +411,10 @@ async def sync_positions(
 ) -> StandardResponse[dict[str, JsonValue]]:
     """Synchronize route positions and return a standard response.
 
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
+
     Returns:
         Standard response containing synchronization evidence or an error.
     """
@@ -410,6 +431,10 @@ async def trigger_kill_switch(
 ) -> StandardResponse[dict[str, JsonValue]]:
     """Trigger a kill switch and return a standard response.
 
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
+
     Returns:
         Standard response containing transition evidence or an error.
     """
@@ -425,6 +450,10 @@ async def clear_kill_switch(
     request: TradingRequest, deps: TradingDependencies
 ) -> StandardResponse[dict[str, JsonValue]]:
     """Clear a kill switch and return a standard response.
+
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
 
     Returns:
         Standard response containing transition evidence or an error.

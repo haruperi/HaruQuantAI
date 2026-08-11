@@ -12,7 +12,7 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
-from app.services.data.local_datasets.contracts import DatasetLoadRequest
+from app.services.data.datasets.contracts import DatasetLoadRequest
 from app.services.data.market_data.symbol_metadata import (
     SymbolListRequest,
     SymbolMetadata,
@@ -105,7 +105,17 @@ class LocalMarketDataSource(MarketDataSource):
         raise DataError("DATA_NOT_FOUND", safe_details={"field": "symbol"})
 
     def _fetch_raw(self, request: SourceReadRequest) -> RawSourceBatch:
-        """Load an exact local artifact through the governed dataset boundary."""
+        """Load an exact local artifact through the governed dataset boundary.
+
+        Args:
+            request: The ``request`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            DataError: If the operation cannot be completed safely.
+        """
         logger.info("Fetching local data for source %s", self._source_id)
         if request.source_id != self._source_id:
             raise DataError(
@@ -159,6 +169,9 @@ class LocalMarketDataSource(MarketDataSource):
     def fetch(self, request: SourceReadRequest) -> StandardResponse[RawSourceBatch]:
         """Fetch provider-neutral raw records and metadata.
 
+        Args:
+            request: The ``request`` argument.
+
         Returns:
             Standard response carrying the raw source batch.
         """
@@ -197,7 +210,17 @@ class LocalMarketDataSource(MarketDataSource):
         return selected[: request.limit]
 
     def _list_symbols_raw(self, request: SymbolListRequest) -> SymbolPage:
-        """Return a stable, cursor-bounded page of configured local symbols."""
+        """Return a stable, cursor-bounded page of configured local symbols.
+
+        Args:
+            request: The ``request`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            DataError: If the operation cannot be completed safely.
+        """
         logger.info("Listing symbols for local source %s", self._source_id)
         if request.source_id != self._source_id:
             raise DataError(
@@ -233,6 +256,9 @@ class LocalMarketDataSource(MarketDataSource):
     def list_symbols(self, request: SymbolListRequest) -> StandardResponse[SymbolPage]:
         """List provider symbols with cursor pagination support.
 
+        Args:
+            request: The ``request`` argument.
+
         Returns:
             Standard response carrying the symbol page.
         """
@@ -246,7 +272,17 @@ class LocalMarketDataSource(MarketDataSource):
     def _get_symbol_metadata_raw(
         self, request: SymbolMetadataRequest
     ) -> SymbolMetadata:
-        """Return caller-supplied authoritative metadata for one local symbol."""
+        """Return caller-supplied authoritative metadata for one local symbol.
+
+        Args:
+            request: The ``request`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            DataError: If the operation cannot be completed safely.
+        """
         logger.info("Reading configured local metadata for source %s", self._source_id)
         if request.source_id != self._source_id:
             raise DataError(
@@ -268,6 +304,9 @@ class LocalMarketDataSource(MarketDataSource):
         self, request: SymbolMetadataRequest
     ) -> StandardResponse[SymbolMetadata]:
         """Retrieve normalized symbol metadata.
+
+        Args:
+            request: The ``request`` argument.
 
         Returns:
             Standard response carrying the local symbol metadata.

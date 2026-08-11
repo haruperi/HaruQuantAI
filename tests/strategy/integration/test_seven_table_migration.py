@@ -12,7 +12,7 @@ from tests.strategy.unit.test_catalog import storage_context
 
 
 def test_migration_steps_contain_0001_and_0002() -> None:
-    """Verify Strategy migration steps return two ordered steps.
+    """Verify Strategy migration steps return three ordered steps.
 
     Args:
         None.
@@ -21,9 +21,10 @@ def test_migration_steps_contain_0001_and_0002() -> None:
         None.
     """
     steps = _strategy_migration_steps()
-    assert len(steps) == 2
+    assert len(steps) == 3
     assert steps[0].migration_id == "0001_strategy_domain"
     assert steps[1].migration_id == "0002_strategy_seven_table_runtime"
+    assert steps[2].migration_id == "0003_strategy_operational_planning"
 
 
 def test_seven_table_schema_initialization(tmp_path: Path) -> None:

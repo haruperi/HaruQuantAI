@@ -7,6 +7,7 @@ composition, and the exact two-step Data delegation.
 
 from __future__ import annotations
 
+from types import SimpleNamespace
 from typing import Any
 from uuid import uuid4
 
@@ -82,6 +83,17 @@ def _app(source: Any, permissions: tuple[str, ...] | None = None) -> FastAPI:
     )
     app.dependency_overrides[data._dataset_source] = lambda: source
     return app
+
+
+def test_capability_catalog_surfaces_all_data_features() -> None:
+    """The authenticated read surface reports every Data feature exactly once."""
+    status_code, body = get_json(_app(lambda *_args: None), "/api/v1/data/capabilities")
+
+    assert status_code == 200
+    capabilities = body["data"]["capabilities"]
+    assert [item["feature_id"] for item in capabilities] == [
+        f"FEAT-DATA-{index:02d}" for index in range(1, 15)
+    ]
 
 
 def test_prepare_requires_idempotency_key() -> None:
@@ -316,3 +328,109 @@ def test_source_delegates_fetch_then_save(monkeypatch: pytest.MonkeyPatch) -> No
     result = source("prepare", {"symbol": "EURUSD"}, {"destination": "x"})
     assert calls == ["market", "fetch", "save-request", "save"]
     assert result["dataset"] == "dataset-value"  # type: ignore[index]
+
+
+def _markets_app() -> FastAPI:
+    """Build one router-only application for the markets route.
+
+    The markets handler requires only ``data:read`` and delegates to Data's
+    directory builder, so no dataset-source stub is needed.
+
+    Returns:
+        Configured FastAPI application.
+    """
+    app = FastAPI()
+    app.include_router(data.router)
+    app.dependency_overrides[require_auth_context] = lambda: _auth(
+        permissions=("data:read",)
+    )
+    return app
+
+
+def test_markets_requires_read_permission() -> None:
+    """The markets route refuses callers without data:read permission."""
+    app = FastAPI()
+    app.include_router(data.router)
+    app.dependency_overrides[require_auth_context] = lambda: _auth(permissions=())
+    status_code, _body = get_json(app, "/api/v1/data/markets")
+    assert status_code == 403
+
+
+def test_markets_delegates_once_with_resolved_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The markets route resolves the runtime broker and delegates once to Data."""
+    from fastapi.testclient import TestClient
+
+    captured: dict[str, str | None] = {}
+
+    def _fake_resolve(
+        override: str | None = None, *, request_id: str | None = None
+    ) -> str:
+        captured["override"] = override
+        return "mt5"
+
+    def _fake_directory(request: object) -> object:
+        captured["source_id"] = request.source_id
+        captured["limit"] = request.limit
+        return SimpleNamespace(
+            status="success",
+            data={
+                "source_id": "mt5",
+                "rows": [],
+                "limit": 25,
+                "next_cursor": None,
+                "revision": "rev-1",
+                "generated_at": "2026-08-10T12:00:00Z",
+                "request_id": "req-1",
+            },
+            message="ok",
+            error=None,
+            metadata={},
+        )
+
+    monkeypatch.setattr(data, "resolve_runtime_source_id", _fake_resolve)
+    monkeypatch.setattr(data, "list_market_directory", _fake_directory)
+
+    client = TestClient(_markets_app(), raise_server_exceptions=True)
+    response = client.get("/api/v1/data/markets?limit=25")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["data"]["source_id"] == "mt5"
+    assert captured["override"] is None
+    assert captured["source_id"] == "mt5"
+    assert captured["limit"] == 25
+
+
+def test_markets_forwards_explicit_source_id(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An explicit source_id query parameter overrides runtime-broker resolution."""
+    from fastapi.testclient import TestClient
+
+    captured: dict[str, str | None] = {}
+
+    def _fake_resolve(
+        override: str | None = None, *, request_id: str | None = None
+    ) -> str:
+        captured["override"] = override
+        return override or ""
+
+    monkeypatch.setattr(data, "resolve_runtime_source_id", _fake_resolve)
+    monkeypatch.setattr(
+        data,
+        "list_market_directory",
+        lambda _request: SimpleNamespace(
+            status="success",
+            data={},
+            message="ok",
+            error=None,
+            metadata={},
+        ),
+    )
+
+    client = TestClient(_markets_app(), raise_server_exceptions=True)
+    response = client.get("/api/v1/data/markets?source_id=binance_spot")
+    assert response.status_code == 200
+    assert captured["override"] == "binance_spot"

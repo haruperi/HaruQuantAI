@@ -1,8 +1,8 @@
 # Strategy
 
 > **Package:** `app/services/strategy`
-> **Status:** `Completed` — all 14 registered features and consumer ports are implemented and verified. Research `FEAT-RES-14` now supplies the injectable exact-version expectancy provider; absence, failure, or mismatch still fails closed.
-> **Last updated:** `2026-08-07`
+> **Status:** `Completed` — all 19 registered features and consumer ports are implemented and verified. Operational-planning capabilities (profiles, playbooks, setup evaluation, trade plans, management plans, automation, lifecycle) are organized into focused feature modules. Research `FEAT-RES-14` now supplies the injectable exact-version expectancy provider; absence, failure, or mismatch still fails closed.
+> **Last updated:** `2026-08-10`
 
 > This README is the package's **single source of truth** for final requirements, structure, implementation sequence, workflows, public contracts, configuration, limits, progress, usage examples, and tests.
 > Update this file before changing Strategy code.
@@ -160,6 +160,10 @@ Data provides shared connection, locking, and migration execution infrastructure
 | Completed | Immutable strategy registry entries and lifecycle/provenance references | Trading, Simulation, Optimization, Portfolio, UI/API via exact registry resolution | `app/services/strategy/migrations/definitions.py` |
 | Completed | Versioned parameter schemas and approved configuration hashes           | Trading, Simulation, Optimization, Portfolio via validated references              | `app/services/strategy/migrations/definitions.py` |
 | Completed | Bounded strategy-local checkpoints and replay links                     | Simulation and Trading through checkpoint/replay contracts                         | `app/services/strategy/migrations/definitions.py` |
+| Completed | Versioned strategy profiles and exact expectancy references             | Internal operational-planning features via profile contracts                        | `app/services/strategy/migrations/definitions.py` |
+| Completed | Versioned playbooks and append-only setup evaluations                   | Internal operational-planning features via playbook/setup-evaluation contracts     | `app/services/strategy/migrations/definitions.py` |
+| Completed | Canonical trade plans, versions, and amendments                         | Internal operational-planning features via `trade_plan/` contracts                 | `app/services/strategy/migrations/definitions.py` |
+| Completed | Versioned automation policy and append-only lifecycle governance        | Internal operational-planning features via automation/lifecycle contracts          | `app/services/strategy/migrations/definitions.py` |
 
 No strategy source code, broker state, official positions, orders, fills, analytics reports, or secrets may be stored in these records.
 
@@ -195,6 +199,14 @@ flowchart TD
     STR --> SIG[[signals: Concrete signal execution boundary]]
     STR --> EVAL[[evaluators: The strategy signal library]]
     STR --> PROP[[proposal_intake: External proposal evaluation]]
+    STR --> OENV[[operating_envelope: Operating envelope]]
+    STR --> PROF[[profiles: Profiles and expectancy references]]
+    STR --> PLAY[[playbooks: Strategy playbooks]]
+    STR --> SEVAL[[setup_evaluation: Setup evaluation]]
+    STR --> TPLAN[[trade_plan: Canonical trade plans and lifecycle]]
+    STR --> MPLAN[[management_plan: Exit and management plan]]
+    STR --> AUTO[[automation: Automation mode policy]]
+    STR --> LIFEC[[lifecycle: Strategy lifecycle governance]]
     STR --> MIG[[migrations: Non-feature persistence support]]
 
     CON --> CONF[enums / policy / manifest / references / requests / execution / signals]
@@ -218,6 +230,14 @@ flowchart TD
     PROP --> PR[requests.py / results.py: Receiver-owned contracts]
     PROP --> PV[validation.py / evaluation.py: Fail-closed evaluation]
     PROP --> PL[lineage.py: Lineage-only source binding]
+    OENV --> OE[models.py / evaluation.py: Envelope contract and evaluation]
+    PROF --> PF[models.py / expectancy.py: Profile and expectancy reference]
+    PLAY --> PB[models.py: Playbook contract]
+    SEVAL --> SE[models.py: Setup evaluation contract]
+    TPLAN --> TP[models.py / lifecycle.py / transport.py / manual.py: Plan lifecycle]
+    MPLAN --> MP[models.py / handoff.py: Plan and handoff]
+    AUTO --> AU[policy.py: Automation mode]
+    LIFEC --> LC[governance.py: Lifecycle governance]
     MIG --> MD[definitions.py: Strategy-owned schema definitions]
 ```
 
@@ -243,8 +263,13 @@ Folders and files are ordered from lowest dependency to highest dependency. This
 | Completed | `FEAT-STR-10` Strategy Signal Library               | `evaluators/`      | Exact declarations: Section 4.10                                                                                                                                                           | Section 4.10 functional requirements | `tests/strategy/usage/features/10_strategy_library.py` |
 | Completed | `FEAT-STR-11` External Research Proposal Evaluation | `proposal_intake/` | `create_strategy_proposal_evaluation_request`, `create_strategy_proposal_evaluation_result`, `validate_strategy_proposal`, `evaluate_strategy_proposal`, `bind_proposal_lineage` | `FR-STR-049`–`053`              | `tests/strategy/usage/features/11_proposal_intake.py`  |
 | Completed | `FEAT-STR-12` Operating Envelope | `operating_envelope/` | `build_operating_envelope`, `parse_operating_envelope`, `evaluate_operating_envelope` | `FR-STR-054`–`FR-STR-056` | `tests/strategy/usage/features/12_operating_envelope.py` |
-| Completed | `FEAT-STR-13` Exit and Management Plan | `exit_plans/` | `build_exit_plan`, `parse_exit_plan`, `build_exit_plan_handoff` | `FR-STR-057`–`FR-STR-059` | `tests/strategy/usage/features/13_exit_plans.py` |
-| Completed | `FEAT-STR-14` Manual-Plan Support | `manual_plans/` | `build_manual_trade_plan`, `validate_manual_trade_plan` | `FR-STR-060`–`FR-STR-062` | `tests/strategy/usage/features/14_manual_plans.py` |
+| Completed | `FEAT-STR-13` Strategy Profiles and Expectancy References | `profiles/` | `build_strategy_profile`, `parse_strategy_profile`, `build_expectancy_reference`, `parse_expectancy_reference`, `evaluate_expectancy_reference` | `FR-STR-063`–`065`, `FR-STR-076`–`077` | `tests/strategy/usage/features/13_profiles.py` |
+| Completed | `FEAT-STR-14` Strategy Playbooks | `playbooks/` | `build_strategy_playbook`, `parse_strategy_playbook` | `FR-STR-066`–`068` | `tests/strategy/usage/features/14_playbooks.py` |
+| Completed | `FEAT-STR-15` Setup Evaluation | `setup_evaluation/` | `build_setup_evaluation`, `parse_setup_evaluation` | `FR-STR-069`–`071` | `tests/strategy/usage/features/15_setup_evaluation.py` |
+| Completed | `FEAT-STR-16` Canonical Trade Plans and Lifecycle | `trade_plan/` | `build_trade_plan`, `parse_trade_plan`, `transition_trade_plan`, `amend_trade_plan`, `validate_trade_plan_for_intent`, `build_manual_trade_plan`, `validate_manual_trade_plan` | `FR-STR-060`–`062`, `FR-STR-072`–`075` | `tests/strategy/usage/features/16_trade_plan.py` |
+| Completed | `FEAT-STR-17` Exit and Management Plan | `management_plan/` | `build_exit_plan`, `parse_exit_plan`, `build_exit_plan_handoff` | `FR-STR-057`–`059` | `tests/strategy/usage/features/17_management_plan.py` |
+| Completed | `FEAT-STR-18` Automation Mode Policy | `automation/` | `evaluate_automation_mode` | `FR-STR-078`–`079` | `tests/strategy/usage/features/18_automation.py` |
+| Completed | `FEAT-STR-19` Strategy Lifecycle Governance | `lifecycle/` | `govern_strategy_lifecycle` | `FR-STR-080`–`082` | `tests/strategy/usage/features/19_lifecycle.py` |
 
 ```text
 app/services/strategy/
@@ -326,6 +351,44 @@ app/services/strategy/
 │   ├── validation.py
 │   ├── evaluation.py
 │   └── lineage.py
+├── operating_envelope/                 # FEAT-STR-12 strategy operating envelope
+│   ├── __init__.py
+│   ├── README.md
+│   ├── models.py                       # OperatingEnvelope v1 contract
+│   └── evaluation.py                   # Point-in-time envelope evaluation
+├── profiles/                           # FEAT-STR-13 profiles and expectancy references
+│   ├── __init__.py
+│   ├── README.md
+│   ├── models.py                       # StrategyProfile v1 contract
+│   └── expectancy.py                   # Exact expectancy reference port
+├── playbooks/                          # FEAT-STR-14 strategy playbooks
+│   ├── __init__.py
+│   ├── README.md
+│   └── models.py                       # StrategyPlaybook v1 contract
+├── setup_evaluation/                   # FEAT-STR-15 setup evaluation
+│   ├── __init__.py
+│   ├── README.md
+│   └── models.py                       # SetupEvaluation v1 contract
+├── trade_plan/                         # FEAT-STR-16 canonical trade plans and lifecycle
+│   ├── __init__.py
+│   ├── README.md
+│   ├── models.py                       # TradePlan v1 contract
+│   ├── lifecycle.py                    # Plan transitions and amendments
+│   ├── transport.py                    # Plan-to-intent projection guards
+│   └── manual.py                       # Player-authored plan construction
+├── management_plan/                    # FEAT-STR-17 exit and management plan
+│   ├── __init__.py
+│   ├── README.md
+│   ├── models.py                       # Exit and management plan contract
+│   └── handoff.py                      # Approved ownership handoff
+├── automation/                         # FEAT-STR-18 automation mode policy
+│   ├── __init__.py
+│   ├── README.md
+│   └── policy.py                       # OFF/ADVISORY/SUPERVISED/AUTOMATED
+├── lifecycle/                          # FEAT-STR-19 strategy lifecycle governance
+│   ├── __init__.py
+│   ├── README.md
+│   └── governance.py                   # Draft/test/approve/suspend/retire
 ├── persistence/                        # Private non-feature CRUD support
 │   ├── __init__.py                     # Internal CRUD export boundary
 │   ├── create.py                       # Version and checkpoint inserts
@@ -364,6 +427,14 @@ flowchart LR
     SIG[[signals]]
     EVAL[[evaluators]]
     PROP[[proposal_intake]]
+    OENV[[operating_envelope]]
+    PROF[[profiles]]
+    PLAY[[playbooks]]
+    SEVAL[[setup_evaluation]]
+    TPLAN[[trade_plan]]
+    MPLAN[[management_plan]]
+    AUTO[[automation]]
+    LIFEC[[lifecycle]]
 
     CON --> DIA
     CON --> REG
@@ -390,6 +461,16 @@ flowchart LR
     CON --> SIG
     DIA --> SIG
     SIG --> EVAL
+    CON --> PROF
+    PROF --> PLAY
+    PLAY --> SEVAL
+    PROF --> OENV
+    TPLAN --> MPLAN
+    TPLAN --> OENV
+    TPLAN --> INT
+    CON --> TPLAN
+    CON --> AUTO
+    REG --> LIFEC
 ```
 
 No dependency points from Strategy into Risk, Trading, Simulation internals, Optimization, Analytics, or UI/API. Cross-domain values are consumed only through their owners' public contracts.
@@ -1403,11 +1484,139 @@ CREATE TABLE strategy_mutations (
 so a command that was accepted but not yet published is distinguishable from one that
 was fully processed.
 
-> **Reconciliation recorded.** All seven Strategy runtime tables — `strategy_definitions`,
+#### `strategy_profiles`
+
+Versioned strategy profiles with exact links to approved expectancy profiles.
+
+```sql
+CREATE TABLE strategy_profiles (
+    profile_id TEXT PRIMARY KEY,
+    strategy_id TEXT NOT NULL,
+    strategy_version TEXT NOT NULL,
+    profile_json TEXT NOT NULL CHECK (json_valid(profile_json)),
+    expectancy_profile_ref TEXT,
+    expectancy_exact_version TEXT,
+    record_hash TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE (strategy_id, strategy_version),
+    CHECK (length(record_hash) = 64)
+) STRICT;
+```
+
+#### `strategy_playbooks`
+
+Versioned playbook definitions.
+
+```sql
+CREATE TABLE strategy_playbooks (
+    playbook_id TEXT PRIMARY KEY,
+    playbook_version INTEGER NOT NULL CHECK (playbook_version >= 1),
+    strategy_profile_ref TEXT NOT NULL,
+    playbook_json TEXT NOT NULL CHECK (json_valid(playbook_json)),
+    record_hash TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE (playbook_id, playbook_version),
+    CHECK (length(record_hash) = 64)
+) STRICT;
+```
+
+#### `strategy_setup_evaluations`
+
+Append-only setup evaluation evidence.
+
+```sql
+CREATE TABLE strategy_setup_evaluations (
+    evaluation_id TEXT PRIMARY KEY,
+    playbook_ref TEXT NOT NULL,
+    outcome TEXT NOT NULL CHECK (
+        outcome IN ('MATCH','NO_MATCH','STALE','REGIME_MISMATCH','INSUFFICIENT_EVIDENCE')
+    ),
+    source_snapshot_json TEXT NOT NULL CHECK (json_valid(source_snapshot_json)),
+    reason_code_json TEXT NOT NULL CHECK (json_valid(reason_code_json)),
+    record_hash TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    CHECK (length(record_hash) = 64)
+) STRICT;
+```
+
+#### `strategy_plans`
+
+Canonical trade plans with immutable release and versioned amendments.
+
+```sql
+CREATE TABLE strategy_plans (
+    plan_id TEXT PRIMARY KEY,
+    plan_version INTEGER NOT NULL CHECK (plan_version >= 1),
+    status TEXT NOT NULL CHECK (
+        status IN ('DRAFT','READY_FOR_RISK','APPROVED','REJECTED','RELEASED','MANAGED','CLOSED','ABORTED')
+    ),
+    strategy_id TEXT NOT NULL,
+    strategy_version TEXT NOT NULL,
+    plan_json TEXT NOT NULL CHECK (json_valid(plan_json)),
+    parent_plan_id TEXT,
+    record_hash TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE (plan_id, plan_version),
+    CHECK (length(record_hash) = 64)
+) STRICT;
+```
+
+#### `strategy_automation_policy`
+
+Versioned automation policy.
+
+```sql
+CREATE TABLE strategy_automation_policy (
+    policy_id TEXT PRIMARY KEY,
+    strategy_id TEXT NOT NULL,
+    strategy_version TEXT NOT NULL,
+    policy_version INTEGER NOT NULL CHECK (policy_version >= 1),
+    mode TEXT NOT NULL CHECK (mode IN ('OFF','ADVISORY','SUPERVISED','AUTOMATED')),
+    policy_json TEXT NOT NULL CHECK (json_valid(policy_json)),
+    record_hash TEXT NOT NULL,
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE (strategy_id, strategy_version, policy_version),
+    CHECK (length(record_hash) = 64)
+) STRICT;
+```
+
+#### `strategy_lifecycle`
+
+Append-only lifecycle decisions and approvals preserving replay meaning.
+
+```sql
+CREATE TABLE strategy_lifecycle (
+    lifecycle_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    strategy_id TEXT NOT NULL,
+    strategy_version TEXT NOT NULL,
+    from_status TEXT NOT NULL,
+    to_status TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    decision_json TEXT NOT NULL CHECK (json_valid(decision_json)),
+    request_id TEXT NOT NULL,
+    correlation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL
+) STRICT;
+```
+
+> **Reconciliation recorded.** The seven Strategy runtime tables — `strategy_definitions`,
 > `strategy_versions`, `strategy_configs`, `strategy_state`, `strategy_checkpoints`,
 > `strategy_signals`, and `strategy_mutations` — are shipped, populated in
 > `data/database/haruquant-dev.db`, and backed by applied migrations `0001_strategy_domain`
-> and `0002_strategy_seven_table_runtime`.
+> and `0002_strategy_seven_table_runtime`. The operational-planning tables
+> (`strategy_profiles`, `strategy_playbooks`, `strategy_setup_evaluations`,
+> `strategy_plans`, `strategy_automation_policy`, `strategy_lifecycle`) are defined by
+> additive migration `0003_strategy_operational_planning`.
 
 ---
 
@@ -1501,19 +1710,19 @@ values. Deep imports from Strategy feature packages are not supported.
 | Completed | `FR-STR-054` | Build strict JSON-safe `OperatingEnvelope v1`. | `app/services/strategy/operating_envelope/models.py`; `tests/strategy/unit/test_operational_contracts.py` |
 | Completed | `FR-STR-055` | Parse and reject incompatible operating-envelope mappings. | `app/services/strategy/operating_envelope/models.py`; `tests/strategy/usage/features/12_operating_envelope.py` |
 | Completed | `FR-STR-056` | Return `PERMITTED` only when all required point-in-time evidence satisfies the envelope; missing evidence is `RESTRICTED`. | `app/services/strategy/operating_envelope/evaluation.py`; `tests/strategy/unit/test_operational_contracts.py` |
-| Completed | `FR-STR-057` | Build strict JSON-safe `ExitPlan v1`. | `app/services/strategy/exit_plans/models.py`; `tests/strategy/usage/features/13_exit_plans.py` |
-| Completed | `FR-STR-058` | Validate protection, partial-exit, trailing, time-stop, and invalidation relationships. | `app/services/strategy/exit_plans/models.py`; `tests/strategy/unit/test_operational_contracts.py` |
-| Completed | `FR-STR-059` | Build a non-executable exit-plan handoff subordinate to Risk/Trading interlocks and sim-only routing. | `app/services/strategy/exit_plans/handoff.py`; `tests/strategy/usage/features/13_exit_plans.py` |
-| Completed | `FR-STR-060` | Build player-authored plans through the canonical `TradePlan v1` builder. | `app/services/strategy/manual_plans/builder.py`; `tests/strategy/usage/features/14_manual_plans.py` |
-| Completed | `FR-STR-061` | Validate manual and deterministic plans through the same immutable contract. | `app/services/strategy/manual_plans/validation.py`; `tests/strategy/unit/test_operational_contracts.py` |
-| Completed | `FR-STR-062` | Preserve player identity as lineage only, never authority. | `app/services/strategy/manual_plans/validation.py`; `tests/strategy/usage/features/14_manual_plans.py` |
-| Completed | `FR-STR-063`–`FR-STR-065` | Build/parse `StrategyProfile v1` and enforce closed automation permissions. | `app/services/strategy/contracts/profile.py`; `tests/strategy/unit/test_operational_contracts.py` |
-| Completed | `FR-STR-066`–`FR-STR-068` | Build/parse human-readable and machine-evaluable playbooks. | `app/services/strategy/contracts/playbook.py`; `tests/strategy/usage/features/12_operating_envelope.py` |
-| Completed | `FR-STR-069`–`FR-STR-071` | Build/parse `SetupEvaluation v1` with explicit source snapshots and fail-closed outcomes. | `app/services/strategy/contracts/playbook.py`; `tests/strategy/unit/test_operational_contracts.py` |
-| Completed | `FR-STR-072`–`FR-STR-075` | Build/parse distinct `TradePlan v1`, enforce lifecycle transitions, sim-only intent eligibility, and versioned amendments. | `app/services/strategy/intents/`; `tests/strategy/unit/test_operational_contracts.py` |
-| Completed | `FR-STR-076`–`FR-STR-077` | Hold a version-exact expectancy reference; absent, failed, or mismatched Research provider returns `NOT_ELIGIBLE`. | `app/services/strategy/contracts/expectancy.py`; `tests/strategy/unit/test_operational_contracts.py` |
-| Completed | `FR-STR-078`–`FR-STR-079` | Validate automation modes subordinate to Risk/Trading interlocks and sim-only routing. | `app/services/strategy/proposal_intake/automation.py`; `tests/strategy/unit/test_operational_contracts.py` |
-| Completed | `FR-STR-080`–`FR-STR-082` | Validate lifecycle transitions and produce append-only mutation evidence without changing historical version identity. | `app/services/strategy/registry/lifecycle.py`; `tests/strategy/usage/features/12_operating_envelope.py` |
+| Completed | `FR-STR-057` | Build strict JSON-safe `ExitPlan v1`. | `app/services/strategy/management_plan/models.py`; `tests/strategy/usage/features/17_management_plan.py` |
+| Completed | `FR-STR-058` | Validate protection, partial-exit, trailing, time-stop, and invalidation relationships. | `app/services/strategy/management_plan/models.py`; `tests/strategy/unit/test_operational_contracts.py` |
+| Completed | `FR-STR-059` | Build a non-executable exit-plan handoff subordinate to Risk/Trading interlocks and sim-only routing. | `app/services/strategy/management_plan/handoff.py`; `tests/strategy/usage/features/17_management_plan.py` |
+| Completed | `FR-STR-060` | Build player-authored plans through the canonical `TradePlan v1` builder. | `app/services/strategy/trade_plan/manual.py`; `tests/strategy/usage/features/16_trade_plan.py` |
+| Completed | `FR-STR-061` | Validate manual and deterministic plans through the same immutable contract. | `app/services/strategy/trade_plan/manual.py`; `tests/strategy/unit/test_operational_contracts.py` |
+| Completed | `FR-STR-062` | Preserve player identity as lineage only, never authority. | `app/services/strategy/trade_plan/manual.py`; `tests/strategy/usage/features/16_trade_plan.py` |
+| Completed | `FR-STR-063`–`FR-STR-065` | Build/parse `StrategyProfile v1` and enforce closed automation permissions. | `app/services/strategy/profiles/models.py`; `tests/strategy/unit/test_operational_contracts.py` |
+| Completed | `FR-STR-066`–`FR-STR-068` | Build/parse human-readable and machine-evaluable playbooks. | `app/services/strategy/playbooks/models.py`; `tests/strategy/usage/features/14_playbooks.py` |
+| Completed | `FR-STR-069`–`FR-STR-071` | Build/parse `SetupEvaluation v1` with explicit source snapshots and fail-closed outcomes. | `app/services/strategy/setup_evaluation/models.py`; `tests/strategy/unit/test_operational_contracts.py` |
+| Completed | `FR-STR-072`–`FR-STR-075` | Build/parse distinct `TradePlan v1`, enforce lifecycle transitions, sim-only intent eligibility, and versioned amendments. | `app/services/strategy/trade_plan/`; `tests/strategy/unit/test_operational_contracts.py` |
+| Completed | `FR-STR-076`–`FR-STR-077` | Hold a version-exact expectancy reference; absent, failed, or mismatched Research provider returns `NOT_ELIGIBLE`. | `app/services/strategy/profiles/expectancy.py`; `tests/strategy/unit/test_operational_contracts.py` |
+| Completed | `FR-STR-078`–`FR-STR-079` | Validate automation modes subordinate to Risk/Trading interlocks and sim-only routing. | `app/services/strategy/automation/policy.py`; `tests/strategy/unit/test_operational_contracts.py` |
+| Completed | `FR-STR-080`–`FR-STR-082` | Validate lifecycle transitions and produce append-only mutation evidence without changing historical version identity. | `app/services/strategy/lifecycle/governance.py`; `tests/strategy/usage/features/19_lifecycle.py` |
 
 ### Initial limitations and deferrals
 
@@ -1531,10 +1740,7 @@ values. Deep imports from Strategy feature packages are not supported.
 
 ## 6. Open Decisions
 
-None. `TradePlan v1` is distinct from the preserved `TradeIntent v1`. Migration
-`0002_strategy_seven_table_runtime` backfills the richer temporary `_v2` tables,
-drops the legacy tables, and renames the richer tables to their canonical unsuffixed
-runtime names; those post-migration unsuffixed tables are authoritative.
+None.
 
 ---
 
@@ -1607,8 +1813,13 @@ dataset provenance and does not rewrite historical record availability.
 - [X] Every file has one focused responsibility. `tests/strategy/unit/test_usage_coverage.py:58`
 - [X] Every requirement owned by `FEAT-STR-01` through `FEAT-STR-11` is `Completed` with evidence. `tests/strategy/unit/test_usage_coverage.py:66`
 - [X] `FEAT-STR-12` operating-envelope construction and fail-closed evaluation are complete. `app/services/strategy/operating_envelope/models.py:54`
-- [X] `FEAT-STR-13` exit-plan construction and non-executable handoff are complete. `app/services/strategy/exit_plans/models.py:53`
-- [X] `FEAT-STR-14` manual plans use the canonical TradePlan validation path. `app/services/strategy/manual_plans/builder.py:15`
+- [X] `FEAT-STR-13` strategy profiles and exact expectancy references are complete. `app/services/strategy/profiles/models.py:53`
+- [X] `FEAT-STR-14` strategy playbooks and deterministic setup evaluation are complete. `app/services/strategy/playbooks/models.py:53`
+- [X] `FEAT-STR-15` build/parse `SetupEvaluation v1` with fail-closed outcomes and source snapshots. `app/services/strategy/setup_evaluation/models.py:51`
+- [X] `FEAT-STR-16` canonical trade plans use the versioned `TradePlan v1` lifecycle and manual-plan path. `app/services/strategy/trade_plan/manual.py:15`
+- [X] `FEAT-STR-17` exit and management plans and non-executable handoff are complete. `app/services/strategy/management_plan/models.py:53`
+- [X] `FEAT-STR-18` automation mode policy is subordinate to Risk/Trading interlocks. `app/services/strategy/automation/policy.py`
+- [X] `FEAT-STR-19` strategy lifecycle governance produces append-only evidence. `app/services/strategy/lifecycle/governance.py`
 - [X] `TradePlan v1`, expectancy fallback, automation policy, and lifecycle governance are sim-only and fail closed. `tests/strategy/unit/test_operational_contracts.py:93`
 - [X] `FEAT-STR-11` and `FR-STR-049` through `FR-STR-053` have direct genuine-MT5 proposal-intake evidence. `tests/strategy/usage/features/11_proposal_intake.py:75`
 - [X] Every registered workflow has executable evidence and passing integration or parity coverage. `tests/strategy/unit/test_workflow_usage_parity.py:39`

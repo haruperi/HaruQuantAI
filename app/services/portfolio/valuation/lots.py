@@ -9,6 +9,14 @@ from decimal import Decimal
 def cost_basis(lots: Sequence[tuple[Decimal, Decimal]], method: str) -> Decimal:
     """Return FIFO or weighted-average cost basis for complete lots.
 
+    Args:
+        lots: Sequence of (quantity, price) tuples for open position lots.
+        method: Lot matching method string ('fifo',
+            'weighted_average', 'venue_netting').
+
+    Returns:
+        Decimal cost basis per unit.
+
     Raises:
         ValueError: If the method is unsupported.
     """

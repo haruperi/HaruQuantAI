@@ -44,7 +44,14 @@ JOB_LEASE_TIMEOUT_SECONDS: Final = 300
 
 
 def derive_backfill_key(request: BackfillChunkRequest) -> str:
-    """Derive a stable content-identity key for one bounded chunk request."""
+    """Derive a stable content-identity key for one bounded chunk request.
+
+    Args:
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Deriving backfill idempotency key")
     material = "|".join(
         (
@@ -62,7 +69,14 @@ def derive_backfill_key(request: BackfillChunkRequest) -> str:
 
 
 def _check_limits(request: BackfillChunkRequest) -> None:
-    """Validate all chunk bounds before storage or source access."""
+    """Validate all chunk bounds before storage or source access.
+
+    Args:
+        request: The ``request`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Validating backfill chunk limits")
     if request.max_records > BACKFILL_MAX_RECORDS_PER_CHUNK:
         raise DataError(
@@ -85,7 +99,15 @@ def _result_from_row(
     request: BackfillChunkRequest,
     row: Mapping[str, None | bool | int | float | str],
 ) -> BackfillChunkResult:
-    """Build committed result evidence from one durable checkpoint row."""
+    """Build committed result evidence from one durable checkpoint row.
+
+    Args:
+        request: The ``request`` argument.
+        row: The ``row`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Building committed backfill result from durable evidence")
     return BackfillChunkResult(
         job_id=str(row["job_id"]),
@@ -105,7 +127,15 @@ def _committed_result(
     request: BackfillChunkRequest,
     key: str,
 ) -> BackfillChunkResult | None:
-    """Return an existing committed idempotency result."""
+    """Return an existing committed idempotency result.
+
+    Args:
+        request: The ``request`` argument.
+        key: The ``key`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Checking committed backfill idempotency state")
     result = read_committed_backfill_record(
         key,
@@ -115,7 +145,15 @@ def _committed_result(
 
 
 def _acquire_lease(request: BackfillChunkRequest, now: datetime) -> None:
-    """Atomically acquire or renew the job lease with one conditional mutation."""
+    """Atomically acquire or renew the job lease with one conditional mutation.
+
+    Args:
+        request: The ``request`` argument.
+        now: The ``now`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.info("Acquiring atomic backfill lease for job %s", request.job_id)
     expires_at = now + timedelta(seconds=JOB_LEASE_TIMEOUT_SECONDS)
     result = update_backfill_lease(
@@ -141,7 +179,17 @@ def _acquire_lease(request: BackfillChunkRequest, now: datetime) -> None:
 
 
 def _fetch_backfill_data(request: BackfillChunkRequest) -> MarketDataset:
-    """Fetch one bounded canonical dataset and persist only safe failure state."""
+    """Fetch one bounded canonical dataset and persist only safe failure state.
+
+    Args:
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        Exception: If the operation cannot be completed safely.
+    """
     logger.info("Fetching canonical backfill observations")
     from app.services.data.sources.composition import ensure_identity, ensure_storage
 
@@ -182,7 +230,17 @@ def _fetch_backfill_data(request: BackfillChunkRequest) -> MarketDataset:
 
 
 def _configured_data_dir(request_id: str) -> Path:
-    """Resolve the required existing DATA_DIR without a working-directory fallback."""
+    """Resolve the required existing DATA_DIR without a working-directory fallback.
+
+    Args:
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Resolving configured backfill storage root")
     try:
         data_dir = get_data_settings().data_dir
@@ -208,7 +266,18 @@ def _artifact_paths(
     request: BackfillChunkRequest,
     key: str,
 ) -> tuple[Path, Path, Path, Path]:
-    """Create and verify deterministic paths under approved raw storage."""
+    """Create and verify deterministic paths under approved raw storage.
+
+    Args:
+        request: The ``request`` argument.
+        key: The ``key`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Resolving recoverable backfill artifact paths")
     root = _configured_data_dir(request.request_id)
     source_component = hashlib.sha256(request.source_id.encode()).hexdigest()[:16]
@@ -238,7 +307,17 @@ def _prepare_artifact(
     key: str,
     now: datetime,
 ) -> tuple[str, str, str, str]:
-    """Write a pending artifact and durably record prepared publication state."""
+    """Write a pending artifact and durably record prepared publication state.
+
+    Args:
+        request: The ``request`` argument.
+        dataset: The ``dataset`` argument.
+        key: The ``key`` argument.
+        now: The ``now`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Preparing recoverable backfill artifact")
     pending_relative, final_relative, _, _ = _artifact_paths(request, key)
     manifest = _save_dataset_raw(
@@ -272,7 +351,14 @@ def _prepare_artifact(
 
 
 def _file_hash(path: Path) -> str:
-    """Hash one bounded artifact without loading it into memory."""
+    """Hash one bounded artifact without loading it into memory.
+
+    Args:
+        path: The ``path`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Hashing prepared backfill artifact")
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -287,7 +373,17 @@ def _publish_artifact(
     final_relative: str,
     content_hash: str,
 ) -> None:
-    """Atomically publish a verified prepared data/manifest pair."""
+    """Atomically publish a verified prepared data/manifest pair.
+
+    Args:
+        request_id: The ``request_id`` argument.
+        pending_relative: The ``pending_relative`` argument.
+        final_relative: The ``final_relative`` argument.
+        content_hash: The ``content_hash`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.info("Publishing prepared backfill artifact")
     root = _configured_data_dir(request_id)
     pending = (root / pending_relative).resolve()
@@ -324,7 +420,17 @@ def _finalize_checkpoint(
     key: str,
     final_relative: str,
 ) -> None:
-    """Atomically finalize checkpoint and job evidence after publication."""
+    """Atomically finalize checkpoint and job evidence after publication.
+
+    Args:
+        request_id: The ``request_id`` argument.
+        job_id: The ``job_id`` argument.
+        key: The ``key`` argument.
+        final_relative: The ``final_relative`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.info("Finalizing committed backfill checkpoint")
     result = update_backfill_finalization(
         final_relative,
@@ -345,7 +451,15 @@ def execute_backfill_chunk(
     *,
     clock: Any | None = None,
 ) -> BackfillChunkResult:
-    """Execute one bounded chunk through a recoverable publication protocol."""
+    """Execute one bounded chunk through a recoverable publication protocol.
+
+    Args:
+        request: The ``request`` argument.
+        clock: The ``clock`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Executing backfill chunk for job %s", request.job_id)
     _check_limits(request)
     key = derive_backfill_key(request)

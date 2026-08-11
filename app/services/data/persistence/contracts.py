@@ -31,7 +31,17 @@ CACHE_CLEAR_MAX_ENTRIES: Final = 10_000
 
 
 def _text(value: str) -> str:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _text")
     if not value or value != value.strip():
         raise ValueError("value must be a non-empty trimmed string")
@@ -39,13 +49,30 @@ def _text(value: str) -> str:
 
 
 def _optional_text(value: str | None) -> str | None:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _optional_text")
     return None if value is None else _text(value)
 
 
 def _utc(value: datetime) -> datetime:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _utc")
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         raise ValueError("timestamp must be aware UTC")
@@ -53,7 +80,17 @@ def _utc(value: datetime) -> datetime:
 
 
 def _relative_path(value: Path) -> Path:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _relative_path")
     if value.is_absolute() or not value.parts or ".." in value.parts:
         raise ValueError("path must be relative and traversal-free")
@@ -72,7 +109,17 @@ class StatementPlan(_Contract):
     @field_validator("statements")
     @classmethod
     def _validate_statements(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_statements")
         validated = tuple(_text(statement) for statement in value)
         if not validated:
@@ -82,7 +129,17 @@ class StatementPlan(_Contract):
     @field_validator("max_rows")
     @classmethod
     def _validate_rows(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_rows")
         if value <= 0:
             raise ValueError("max_rows must be positive")
@@ -90,7 +147,14 @@ class StatementPlan(_Contract):
 
     @model_validator(mode="after")
     def _validate_plan(self) -> StatementPlan:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_plan")
         if len(self.statements) != len(self.parameter_sets):
             raise ValueError("each statement requires one parameter set")
@@ -106,7 +170,14 @@ class TransactionRequest(_Contract):
     @field_validator("request_id")
     @classmethod
     def _validate_request_id(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_request_id")
         return _text(value)
 
@@ -126,7 +197,14 @@ class TransactionResult(_Contract):
     def _freeze_rows(
         cls, value: tuple[Mapping[str, ResultScalar], ...]
     ) -> tuple[Mapping[str, ResultScalar], ...]:
-        """Freeze one DATA contract value against mutation."""
+        """Freeze one DATA contract value against mutation.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _freeze_rows")
         return tuple(MappingProxyType(dict(row)) for row in value)
 
@@ -134,14 +212,31 @@ class TransactionResult(_Contract):
     def _serialize_rows(
         self, value: tuple[Mapping[str, ResultScalar], ...]
     ) -> tuple[dict[str, ResultScalar], ...]:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_rows")
         return tuple(dict(row) for row in value)
 
     @field_validator("affected_rows")
     @classmethod
     def _validate_count(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_count")
         if value < 0:
             raise ValueError("affected_rows must be non-negative")
@@ -150,7 +245,14 @@ class TransactionResult(_Contract):
     @field_validator("request_id")
     @classmethod
     def _validate_request_id(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_request_id")
         return _text(value)
 
@@ -166,14 +268,31 @@ class MigrationStep(_Contract):
     @field_validator("domain", "migration_id", "checksum")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("statements")
     @classmethod
     def _validate_statements(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_statements")
         validated = tuple(_text(statement) for statement in value)
         if not validated:
@@ -192,13 +311,27 @@ class MigrationRequest(_Contract):
     @field_validator("domain", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @model_validator(mode="after")
     def _validate_steps(self) -> MigrationRequest:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_steps")
         if not self.steps:
             raise ValueError("migration request must not be empty")
@@ -223,14 +356,31 @@ class MigrationResult(_Contract):
     @field_validator("domain", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("applied_ids", "skipped_ids")
     @classmethod
     def _validate_ids(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_ids")
         validated = tuple(_text(item) for item in value)
         if len(set(validated)) != len(validated):
@@ -239,7 +389,14 @@ class MigrationResult(_Contract):
 
     @model_validator(mode="after")
     def _validate_result(self) -> MigrationResult:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_result")
         if set(self.applied_ids) & set(self.skipped_ids):
             raise ValueError("migration cannot be both applied and skipped")
@@ -283,14 +440,25 @@ class ColumnMapping(_Contract):
     @field_validator("*")
     @classmethod
     def _validate_optional_column(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_optional_column")
         if value is None:
             return None
         return _text(value)
 
     def bar_columns(self) -> tuple[str, ...]:
-        """Return the declared OHLC column names in canonical order."""
+        """Return the declared OHLC column names in canonical order.
+
+        Returns:
+            The result produced by the operation.
+        """
         return tuple(
             name
             for name in (self.open, self.high, self.low, self.close)
@@ -331,28 +499,59 @@ class ExternalImportRequest(_Contract):
     @field_validator("relative_path", "destination_path")
     @classmethod
     def _validate_path(cls, value: Path) -> Path:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_path")
         return _relative_path(value)
 
     @field_validator("symbol", "source_id", "price_unit", "volume_unit", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("timeframe")
     @classmethod
     def _validate_timeframe(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_timeframe")
         return None if value is None else _text(value)
 
     @field_validator("dialect")
     @classmethod
     def _validate_dialect(cls, value: str) -> str:
-        """Reject any dialect outside the supported deterministic set."""
+        """Reject any dialect outside the supported deterministic set.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_dialect")
         dialect = _text(value)
         if dialect not in IMPORT_DIALECTS:
@@ -362,7 +561,14 @@ class ExternalImportRequest(_Contract):
 
     @model_validator(mode="after")
     def _validate_request(self) -> ExternalImportRequest:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_request")
         if self.data_kind == "bars":
             if self.timeframe is None:
@@ -393,20 +599,41 @@ class DatasetSaveRequest(_Contract):
     @field_validator("relative_path")
     @classmethod
     def _validate_path(cls, value: Path) -> Path:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_path")
         return _relative_path(value)
 
     @field_validator("request_id")
     @classmethod
     def _validate_request_id(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_request_id")
         return _text(value)
 
     @model_validator(mode="after")
     def _validate_request(self) -> DatasetSaveRequest:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_request")
         if self.dataset.request_id != self.request_id:
             raise ValueError("dataset and save request IDs must match")
@@ -450,21 +677,45 @@ class StorageManifest(_Contract):
     )
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("relative_path")
     @classmethod
     def _validate_path(cls, value: Path) -> Path:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_path")
         return _relative_path(value)
 
     @field_validator("row_count")
     @classmethod
     def _validate_count(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_count")
         if value < 0:
             raise ValueError("row_count must be non-negative")
@@ -473,14 +724,28 @@ class StorageManifest(_Contract):
     @field_validator("start", "end", "available_at", "created_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return _utc(value)
 
     @field_validator("license_metadata", "provenance", mode="after")
     @classmethod
     def _freeze_metadata(cls, value: Mapping[str, str]) -> Mapping[str, str]:
-        """Freeze one DATA contract value against mutation."""
+        """Freeze one DATA contract value against mutation.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _freeze_metadata")
         return MappingProxyType(
             {_text(key): _text(item) for key, item in value.items()}
@@ -488,13 +753,27 @@ class StorageManifest(_Contract):
 
     @field_serializer("license_metadata", "provenance", when_used="json")
     def _serialize_metadata(self, value: Mapping[str, str]) -> dict[str, str]:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_metadata")
         return dict(value)
 
     @model_validator(mode="after")
     def _validate_manifest(self) -> StorageManifest:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_manifest")
         if self.start > self.end:
             raise ValueError("start must not follow end")
@@ -511,14 +790,28 @@ class BackupTarget(_Contract):
     @field_validator("relative_path")
     @classmethod
     def _validate_path(cls, value: Path) -> Path:
-        """Reject absolute, traversing, or hidden backup targets."""
+        """Reject absolute, traversing, or hidden backup targets.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Validating a backup target path")
         return _relative_path(value)
 
     @field_validator("schema_version", "normalization_version")
     @classmethod
     def _validate_versions(cls, value: str) -> str:
-        """Require explicit non-empty version evidence."""
+        """Require explicit non-empty version evidence.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Validating backup target version evidence")
         return _text(value)
 
@@ -535,21 +828,45 @@ class BackupEntry(_Contract):
     @field_validator("relative_path")
     @classmethod
     def _validate_path(cls, value: Path) -> Path:
-        """Validate the original approved-root-relative file identity."""
+        """Validate the original approved-root-relative file identity.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Validating a backup entry path")
         return _relative_path(value)
 
     @field_validator("content_hash", "schema_version", "normalization_version")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Require non-empty integrity and version evidence."""
+        """Require non-empty integrity and version evidence.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Validating backup entry text evidence")
         return _text(value)
 
     @field_validator("byte_count")
     @classmethod
     def _validate_byte_count(cls, value: int) -> int:
-        """Require a non-negative measured byte count."""
+        """Require a non-negative measured byte count.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Validating a backup entry byte count")
         if value < 0:
             raise ValueError("byte_count must be non-negative")
@@ -568,7 +885,14 @@ class BackupManifest(_Contract):
     @field_validator("manifest_id", "manifest_hash", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Require non-empty backup manifest identifiers."""
+        """Require non-empty backup manifest identifiers.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Validating backup manifest identity evidence")
         return _text(value)
 
@@ -578,7 +902,17 @@ class BackupManifest(_Contract):
         cls,
         value: tuple[BackupEntry, ...],
     ) -> tuple[BackupEntry, ...]:
-        """Require a non-empty, unique, deterministically ordered entry set."""
+        """Require a non-empty, unique, deterministically ordered entry set.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Validating backup manifest entries")
         if not value:
             raise ValueError("backup manifest must not be empty")
@@ -592,7 +926,14 @@ class BackupManifest(_Contract):
     @field_validator("created_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Require an aware UTC creation time."""
+        """Require an aware UTC creation time.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Validating backup manifest creation time")
         return _utc(value)
 
@@ -609,21 +950,45 @@ class RestoreReport(_Contract):
     @field_validator("manifest_id", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Require non-empty restore identifiers."""
+        """Require non-empty restore identifiers.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Validating restore report identity evidence")
         return _text(value)
 
     @field_validator("restored_paths")
     @classmethod
     def _validate_paths(cls, value: tuple[Path, ...]) -> tuple[Path, ...]:
-        """Validate every restored relative path."""
+        """Validate every restored relative path.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Validating restored path evidence")
         return tuple(_relative_path(path) for path in value)
 
     @field_validator("restored_count")
     @classmethod
     def _validate_count(cls, value: int) -> int:
-        """Require a non-negative restored target count."""
+        """Require a non-negative restored target count.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Validating restored target count")
         if value < 0:
             raise ValueError("restored_count must be non-negative")
@@ -632,13 +997,27 @@ class RestoreReport(_Contract):
     @field_validator("restored_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Require an aware UTC restore time."""
+        """Require an aware UTC restore time.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Validating restore report time")
         return _utc(value)
 
     @model_validator(mode="after")
     def _validate_report(self) -> RestoreReport:
-        """Require the count to match the restored path evidence."""
+        """Require the count to match the restored path evidence.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Validating restore report relationships")
         if self.restored_count != len(self.restored_paths):
             raise ValueError("restored_count must match restored_paths")
@@ -655,7 +1034,14 @@ class CacheReadRequest(_Contract):
     @field_validator("key", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
@@ -683,20 +1069,41 @@ class CacheEntry(_Contract):
     )
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("created_at", "expires_at")
     @classmethod
     def _validate_time(cls, value: datetime | None) -> datetime | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return None if value is None else _utc(value)
 
     @model_validator(mode="after")
     def _validate_entry(self) -> CacheEntry:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_entry")
         if self.expires_at is not None and self.expires_at <= self.created_at:
             raise ValueError("expires_at must follow created_at")
@@ -716,14 +1123,31 @@ class CacheWriteRequest(_Contract):
     @field_validator("key", "source_revision", "raw_data_hash", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("ttl_seconds")
     @classmethod
     def _validate_ttl(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_ttl")
         if not 0 <= value <= CACHE_TTL_MAX_SECONDS:
             raise ValueError("ttl_seconds is outside the bounded cache policy")
@@ -740,7 +1164,14 @@ class CacheWriteResult(_Contract):
     @field_validator("key", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
@@ -759,21 +1190,45 @@ class CacheClearRequest(_Contract):
     @field_validator("namespace", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("source_id", "symbol", "data_kind")
     @classmethod
     def _validate_optional_text(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_optional_text")
         return _optional_text(value)
 
     @field_validator("max_entries")
     @classmethod
     def _validate_limit(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_limit")
         if not 0 < value <= CACHE_CLEAR_MAX_ENTRIES:
             raise ValueError("max_entries is outside the bounded cache policy")
@@ -791,7 +1246,17 @@ class CacheClearResult(_Contract):
     @field_validator("matched_count", "deleted_count")
     @classmethod
     def _validate_count(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_count")
         if value < 0:
             raise ValueError("cache counts must be non-negative")
@@ -800,13 +1265,27 @@ class CacheClearResult(_Contract):
     @field_validator("request_id")
     @classmethod
     def _validate_request_id(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_request_id")
         return _text(value)
 
     @model_validator(mode="after")
     def _validate_result(self) -> CacheClearResult:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_result")
         if self.deleted_count > self.matched_count:
             raise ValueError("deleted_count must not exceed matched_count")

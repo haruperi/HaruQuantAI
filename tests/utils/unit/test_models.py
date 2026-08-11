@@ -15,7 +15,7 @@ from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
 def test_default_logging_profile() -> None:
     settings = LoggingSettings()
-    assert settings.level == "DEBUG"
+    assert settings.level == "INFO"
     assert settings.render == "human"
     assert settings.log_directory == Path("data/logs")
     assert settings.max_bytes == 10_000_000

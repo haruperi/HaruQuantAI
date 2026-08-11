@@ -74,7 +74,14 @@ class StrategyMutationResult(BaseModel):
 
 
 def success(data: T) -> T:
-    """Return raw data from an internal Strategy operation."""
+    """Return raw data from an internal Strategy operation.
+
+    Args:
+        data: Internal operation result value.
+
+    Returns:
+        The raw operation result value.
+    """
     logger.debug("Returning successful raw Strategy result")
     return data
 

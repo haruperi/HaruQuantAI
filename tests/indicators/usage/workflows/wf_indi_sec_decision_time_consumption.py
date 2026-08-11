@@ -222,7 +222,7 @@ def main() -> None:
     indicator = unwrap_indicator_response(rsi(dataset, period=2))
     print(_format_result(indicator))
     print(
-        f"Data -> indicator_rows={indicator.record_count}, available_at={dataset.available_at}"
+        f"Data -> indicator_rows={indicator.manifest.row_count}, available_at={dataset.available_at}"
     )
     print_indicator_evidence(indicator, label="Decision-time RSI rows")
     # Stage 3

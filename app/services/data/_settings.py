@@ -6,7 +6,7 @@ The root-private location is approved domain-wide infrastructure under
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from pathlib import Path
@@ -19,6 +19,7 @@ from app.utils import (
     get_app_settings_model_config,
     get_app_settings_sources,
     get_logger,
+    load_broker_provider_settings,
 )
 
 logger = get_logger(__name__)
@@ -87,7 +88,17 @@ class DataSettings(BaseSettings):
     @field_validator("database_url", mode="before")
     @classmethod
     def _validate_database_url(cls, value: object) -> object:
-        """Reject blank or padded database URLs at the settings boundary."""
+        """Reject blank or padded database URLs at the settings boundary.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Validating the DATA database URL setting")
         if isinstance(value, str) and (not value or value != value.strip()):
             raise ValueError("database_url must be non-blank and trimmed")
@@ -102,7 +113,17 @@ class DataSettings(BaseSettings):
     )
     @classmethod
     def _reject_padded_numeric_settings(cls, value: object) -> object:
-        """Reject padded numeric strings before Pydantic conversion."""
+        """Reject padded numeric strings before Pydantic conversion.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Validating a numeric DATA setting")
         if isinstance(value, str) and value != value.strip():
             raise ValueError("numeric DATA settings must be trimmed")
@@ -111,7 +132,17 @@ class DataSettings(BaseSettings):
     @field_validator("approved_storage_roots", mode="before")
     @classmethod
     def _parse_approved_storage_roots(cls, value: object) -> object:
-        """Parse a comma-separated approved-root setting without JSON guessing."""
+        """Parse a comma-separated approved-root setting without JSON guessing.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Parsing approved DATA storage roots")
         if not isinstance(value, str):
             return value
@@ -127,6 +158,15 @@ class DataSettings(BaseSettings):
 
         An empty configured value is a valid explicit choice meaning "compose no
         source of this kind", so it is preserved rather than replaced by a default.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
         """
         logger.debug("Parsing configured DATA source identifiers")
         if not isinstance(value, str):
@@ -139,7 +179,17 @@ class DataSettings(BaseSettings):
     @field_validator("data_raw_root")
     @classmethod
     def _validate_raw_root(cls, value: Path) -> Path:
-        """Reject absolute or traversing raw roots at the settings boundary."""
+        """Reject absolute or traversing raw roots at the settings boundary.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Validating the DATA raw artifact root")
         if value.is_absolute() or ".." in value.parts:
             raise ValueError("data_raw_root must be a relative path without traversal")
@@ -150,18 +200,56 @@ _DATA_SETTINGS_OVERRIDE: ContextVar[DataSettings | None] = ContextVar(
     "data_settings_override",
     default=None,
 )
+_DATA_PROVIDER_SETTINGS_OVERRIDE: ContextVar[object | None] = ContextVar(
+    "data_provider_settings_override",
+    default=None,
+)
+_DATA_PROVIDER_CONNECTION_RESOLVER: ContextVar[Callable[[str, str], object] | None] = (
+    ContextVar("data_provider_connection_resolver", default=None)
+)
 
 
 def get_data_settings() -> DataSettings:
-    """Return the active typed DATA settings for the current call context."""
+    """Return the active typed DATA settings for the current call context.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Resolving typed DATA settings")
     override = _DATA_SETTINGS_OVERRIDE.get()
     return override if override is not None else DataSettings()
 
 
+def get_data_provider_settings() -> object:
+    """Return the active opaque provider settings for the current context.
+
+    Returns:
+        The injected immutable provider settings, or the safe Utils defaults.
+    """
+    logger.debug("Resolving context-local DATA provider settings")
+    override = _DATA_PROVIDER_SETTINGS_OVERRIDE.get()
+    return override if override is not None else load_broker_provider_settings()
+
+
+def get_data_provider_connection_resolver() -> Callable[[str, str], object] | None:
+    """Return the active connection-config resolver, if one was injected.
+
+    Returns:
+        Context-local provider and request resolver, otherwise None.
+    """
+    return _DATA_PROVIDER_CONNECTION_RESOLVER.get()
+
+
 @contextmanager
 def data_settings_context(settings: DataSettings) -> Iterator[None]:
-    """Temporarily install explicit DATA settings for an isolated call context."""
+    """Temporarily install explicit DATA settings for an isolated call context.
+
+    Args:
+        settings: The ``settings`` argument.
+
+    Yields:
+        The next value produced by the operation.
+    """
     logger.debug("Installing explicit context-local DATA settings")
     token = _DATA_SETTINGS_OVERRIDE.set(settings)
     try:
@@ -171,9 +259,51 @@ def data_settings_context(settings: DataSettings) -> Iterator[None]:
         logger.debug("Restored the preceding DATA settings context")
 
 
+@contextmanager
+def data_provider_settings_context(settings: object) -> Iterator[None]:
+    """Temporarily install validated opaque provider settings.
+
+    Args:
+        settings: Immutable provider settings built by the Utils public boundary.
+
+    Yields:
+        Control while the provider settings are active for this call context.
+    """
+    logger.debug("Installing context-local DATA provider settings")
+    token = _DATA_PROVIDER_SETTINGS_OVERRIDE.set(settings)
+    try:
+        yield
+    finally:
+        _DATA_PROVIDER_SETTINGS_OVERRIDE.reset(token)
+        logger.debug("Restored the preceding DATA provider settings context")
+
+
+@contextmanager
+def data_provider_connection_resolver_context(
+    resolver: Callable[[str, str], object],
+) -> Iterator[None]:
+    """Install an API-owned governed connection-config resolver.
+
+    Args:
+        resolver: Callable accepting provider ID and request ID.
+
+    Yields:
+        Control while the resolver is active in the current context.
+    """
+    token = _DATA_PROVIDER_CONNECTION_RESOLVER.set(resolver)
+    try:
+        yield
+    finally:
+        _DATA_PROVIDER_CONNECTION_RESOLVER.reset(token)
+
+
 __all__ = [
     "LOCAL_SYMBOL_MANIFEST_NAME",
     "DataSettings",
+    "data_provider_connection_resolver_context",
+    "data_provider_settings_context",
     "data_settings_context",
+    "get_data_provider_connection_resolver",
+    "get_data_provider_settings",
     "get_data_settings",
 ]

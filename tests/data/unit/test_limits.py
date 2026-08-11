@@ -29,7 +29,6 @@ def test_manifest_matches_every_legacy_constant() -> None:
     Raises:
         AssertionError: If the manifest and the owning module have drifted.
     """
-    from app.services.data.audit.contracts import AUDIT_QUERY_HARD_MAX_LIMIT
     from app.services.data.contracts import QUALITY_SAMPLE_LIMIT
     from app.services.data.contracts.errors import (
         ERROR_SAFE_DETAILS_MAX_BYTES,
@@ -37,6 +36,7 @@ def test_manifest_matches_every_legacy_constant() -> None:
     )
     from app.services.data.data_jobs import backfill
     from app.services.data.data_jobs import job as scheduler
+    from app.services.data.evidence.audit_contracts import AUDIT_QUERY_HARD_MAX_LIMIT
     from app.services.data.market_data import pipeline as historical
     from app.services.data.market_data import symbol_discovery as reference
     from app.services.data.persistence.contracts import (
@@ -44,7 +44,7 @@ def test_manifest_matches_every_legacy_constant() -> None:
         CACHE_TTL_MAX_SECONDS,
     )
     from app.services.data.synthetic_data import gbm as synthetic
-    from app.services.data.tick_derivation import generator as ticks
+    from app.services.data.transformation import tick_derivation as ticks
 
     expected = {
         "TICK_MAX_LIMIT": historical.TICK_MAX_LIMIT,

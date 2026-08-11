@@ -5,6 +5,7 @@ from __future__ import annotations
 import sys
 import tempfile
 from datetime import UTC, date, datetime, time, timedelta
+from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
@@ -13,9 +14,11 @@ from app.services.data import (
     build_data_settings,
     build_market_data_request,
     build_market_hours_request,
+    build_synthetic_request,
     build_weekly_schedule_definition,
     build_weekly_schedule_provider,
     data_settings_context,
+    generate_synthetic_bars,
     get_market_data,
     get_market_hours,
     run_data_migrations,
@@ -93,9 +96,33 @@ def main() -> None:
             evidence_resp = get_market_data(
                 _market_request("bars", timeframe="M1", limit=1)
             )
-            evidence = unwrap_data_response(
-                evidence_resp, operation="get_market_data", request_id=request_id
-            )
+            if evidence_resp.status != "success":
+                end = datetime.now(UTC)
+                syn_req = build_synthetic_request(
+                    symbol="EURUSD",
+                    data_kind="bars",
+                    timeframe="M1",
+                    start=end - timedelta(hours=1),
+                    record_count=1,
+                    method="gbm",
+                    seed=42,
+                    parameters={
+                        "start_val": Decimal("1.10"),
+                        "mu": Decimal("0.02"),
+                        "sigma": Decimal("0.10"),
+                    },
+                    precision_policy="decimal_string",
+                    request_id=request_id,
+                )
+                evidence = unwrap_data_response(
+                    generate_synthetic_bars(syn_req),
+                    operation="generate_synthetic_bars",
+                    request_id=syn_req.request_id,
+                )
+            else:
+                evidence = unwrap_data_response(
+                    evidence_resp, operation="get_market_data", request_id=request_id
+                )
             assert evidence.symbol == "EURUSD"
 
             # Stage 2 — Select an explicit revisioned weekly definition because MT5 exposes no sessions.

@@ -213,11 +213,10 @@ export const initialProducts = [
 ] satisfies Product[];
 
 export const assetClasses = [
-  'Equity Index',
-  'Energy',
-  'Metals',
-  'FX',
-  'Interest Rates',
-  'Agriculture',
+  'Forex',
+  'Commodities',
+  'Indices',
+  'Stocks',
+  'ETFs',
   'Cryptocurrencies'
 ];

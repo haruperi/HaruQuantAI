@@ -1,13 +1,14 @@
 """Executable usage evidence for the Indicators Core feature."""
 
 import sys
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.data import get_market_data
 from app.services.indicators import (
+    assert_closed_input,
     build_indicator_config,
     get_capability_matrix,
     get_indicator,
@@ -20,11 +21,11 @@ from app.services.indicators import (
     validate_indicator,
 )
 from tests.indicators.usage._support import (
+    get_mt5_usage_dataset,
     print_indicator_evidence,
     print_market_evidence,
     print_requirement_evidence,
     unwrap_indicator_response,
-    unwrap_market_data_response,
 )
 
 
@@ -88,14 +89,7 @@ def _dataset() -> MarketDataset:
         RuntimeError: If the configured read-only source is unavailable.
     """
     if "dataset" not in _CACHE:
-        _CACHE["dataset"] = unwrap_market_data_response(
-            get_market_data(
-                source_id="mt5",
-                symbol="EURUSD",
-                timeframe="M5",
-                limit=20,
-            )
-        )
+        _CACHE["dataset"] = get_mt5_usage_dataset()
     return _CACHE["dataset"]
 
 
@@ -288,6 +282,59 @@ def fr_indi_014() -> None:
     print_requirement_evidence("FR-INDI-014", actual_data=validated)
 
 
+def _closed_input_response() -> object:
+    """Return one successful closed-input validation response.
+
+    Returns:
+        Successful closed-input response.
+    """
+    now = datetime(2026, 1, 1, 12, tzinfo=UTC)
+    return assert_closed_input(
+        source_start=now - timedelta(hours=1),
+        source_end=now,
+        available_at=now,
+        decision_time=now,
+        source_timeframe="H1",
+        requested_timeframe="H4",
+        max_age=timedelta(hours=1),
+        complete=True,
+    )
+
+
+def _demonstrate_closed_input(requirement_id: str, heading: str) -> None:
+    """Display one closed-input requirement result.
+
+    Args:
+        requirement_id: Registered requirement identifier.
+        heading: Human-readable example heading.
+
+    Returns:
+        None.
+
+    Raises:
+        RuntimeError: If closed-input validation fails.
+    """
+    _header(heading)
+    response = _closed_input_response()
+    data = unwrap_indicator_response(response)
+    print_requirement_evidence(requirement_id, actual_data=data)
+
+
+def fr_indi_039() -> None:
+    """FR-INDI-039: Require a fully closed source interval."""
+    _demonstrate_closed_input("FR-INDI-039", "Closed Interval Enforcement")
+
+
+def fr_indi_040() -> None:
+    """FR-INDI-040: Require explicit fresh temporal evidence."""
+    _demonstrate_closed_input("FR-INDI-040", "Fresh Availability Evidence")
+
+
+def fr_indi_041() -> None:
+    """FR-INDI-041: Require compatible canonical timeframes."""
+    _demonstrate_closed_input("FR-INDI-041", "Compatible Closed Timeframes")
+
+
 def main() -> None:
     """Run all feature requirements in sequential module flow order."""
     _feature_header(
@@ -327,6 +374,9 @@ def main() -> None:
     fr_indi_012()
     fr_indi_013()
     fr_indi_010()
+    fr_indi_039()
+    fr_indi_040()
+    fr_indi_041()
 
 
 if __name__ == "__main__":

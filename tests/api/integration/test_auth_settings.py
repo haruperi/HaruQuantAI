@@ -3,6 +3,7 @@
 import base64
 import sqlite3
 from pathlib import Path
+from typing import Any
 
 import pytest
 from app.services.api import (
@@ -22,10 +23,82 @@ from app.services.api import (
     validate_api_csrf,
     validate_api_session,
 )
-from app.services.data import build_data_settings, data_settings_context
+from app.services.api.composition import runtime_settings
+from app.services.api.identity import IdentityError
+from app.services.data import (
+    build_data_settings,
+    data_provider_settings_context,
+    data_settings_context,
+    list_composable_sources,
+)
 from app.utils import generate_id
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
+
+
+def test_persisted_log_level_activates_after_migrations(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Activate the global LOG_LEVEL through the post-migration snapshot."""
+    settings = build_data_settings(
+        database_url="sqlite:///api-logging-integration.db",
+        data_dir=tmp_path,
+        sqlite_busy_timeout_seconds=1.0,
+        write_lock_lease_seconds=10.0,
+        approved_storage_roots=(Path(),),
+    )
+    configured: list[Any] = []
+    monkeypatch.setattr(runtime_settings, "configure_logging", configured.append)
+
+    with data_settings_context(settings):
+        migration = run_api_migrations(generate_id("req"))
+        assert migration.status == "success"
+        initial = get_system_settings(request_id=generate_id("req"))
+        update_system_settings(
+            {"LOG_LEVEL": "INFO"},
+            actor_id="user-logging-operator",
+            expected_version=initial.version,
+            request_id=generate_id("req"),
+        )
+        snapshot = runtime_settings.load_runtime_settings_snapshot(
+            request_id=generate_id("req")
+        )
+        runtime_settings.activate_runtime_logging(snapshot)
+
+    assert len(configured) == 1
+    assert configured[0].level == "INFO"
+
+
+def test_persisted_provider_settings_reach_data_composition(tmp_path: Path) -> None:
+    """Inject the validated global provider snapshot into Data composition."""
+    settings = build_data_settings(
+        database_url="sqlite:///api-provider-integration.db",
+        data_dir=tmp_path,
+        sqlite_busy_timeout_seconds=1.0,
+        write_lock_lease_seconds=10.0,
+        approved_storage_roots=(Path(),),
+    )
+    with data_settings_context(settings):
+        migration = run_api_migrations(generate_id("req"))
+        assert migration.status == "success"
+        initial = get_system_settings(request_id=generate_id("req"))
+        update_system_settings(
+            {"MT5_ENABLED": "true", "MT5_TERMINAL_PATH": "terminal64.exe"},
+            actor_id="user-provider-operator",
+            expected_version=initial.version,
+            request_id=generate_id("req"),
+        )
+        snapshot = runtime_settings.load_runtime_settings_snapshot(
+            request_id=generate_id("req")
+        )
+        provider_settings = runtime_settings.build_runtime_provider_settings(snapshot)
+        with data_provider_settings_context(provider_settings):
+            response = list_composable_sources()
+
+    assert response.status == "success"
+    assert response.data is not None
+    assert "mt5" in response.data
 
 
 def test_login_settings_credentials_logout(tmp_path: Path) -> None:
@@ -132,7 +205,7 @@ def test_login_settings_credentials_logout(tmp_path: Path) -> None:
         assert system_updated.scope == "system"
         assert system_updated.subject_id == "global"
         assert system_updated.settings == {"APP_NAME": "HaruQuantAI"}
-        with pytest.raises(ValueError, match="unsafe or oversized"):
+        with pytest.raises(IdentityError, match="SYSTEM_SETTING_KEY_UNKNOWN"):
             update_system_settings(
                 {"api_key": "forbidden"},  # pragma: allowlist secret
                 actor_id=registered.user_id,

@@ -77,7 +77,15 @@ class CalendarStateResult:
 def _relevant_events(
     events: Sequence[EconomicEvent], profile: SymbolEventProfile
 ) -> list[EconomicEvent]:
-    """Return events whose currency or country intersects the profile."""
+    """Return events whose currency or country intersects the profile.
+
+    Args:
+        events: The ``events`` argument.
+        profile: The ``profile`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     relevant: list[EconomicEvent] = []
     for event in events:
         if event.currency is not None and event.currency in profile.currencies:
@@ -266,6 +274,17 @@ def _populate_market_context_calendar_raw(
     evidence_ref: str | None = None,
 ) -> MarketContextEvidence:
     """Return a copy of ``evidence`` with populated ``calendar_state``.
+
+    Args:
+        evidence: The ``evidence`` argument.
+        events: The ``events`` argument.
+        before_minutes: The ``before_minutes`` argument.
+        after_minutes: The ``after_minutes`` argument.
+        minimum_impact: The ``minimum_impact`` argument.
+        evidence_ref: The ``evidence_ref`` argument.
+
+    Returns:
+        The result produced by the operation.
 
     Raises:
         DataError: If the result cannot be derived for the supplied symbol.

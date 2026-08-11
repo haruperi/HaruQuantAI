@@ -16,7 +16,15 @@ logger = get_logger(__name__)
 def delete_cache_records(
     keys: tuple[str, ...], *, request_id: str
 ) -> TransactionResult:
-    """Delete a bounded explicit set of cache records."""
+    """Delete a bounded explicit set of cache records.
+
+    Args:
+        keys: The ``keys`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     placeholders = ",".join("?" for _ in keys)
     statement = f"DELETE FROM data_cache WHERE key IN ({placeholders})"  # noqa: S608
     logger.debug("Deleting Data cache persistence records")

@@ -15,7 +15,17 @@ _LAST_WEEKDAY = 6
 
 
 def _text(value: str) -> str:
-    """Validate one required trimmed text value."""
+    """Validate one required trimmed text value.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     if not value or value != value.strip():
         raise ValueError("value must be a non-empty trimmed string")
     return value
@@ -33,7 +43,14 @@ class ScheduleRequest(TracedOpenContract):
     @field_validator("source_id", "symbol", "timezone", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate a required request field."""
+        """Validate a required request field.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return _text(value)
 
 
@@ -47,18 +64,39 @@ class SessionWindow(TracedOpenContract):
     @field_validator("label")
     @classmethod
     def _validate_label(cls, value: str) -> str:
-        """Validate the session label."""
+        """Validate the session label.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return _text(value)
 
     @field_validator("opens_at", "closes_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one session boundary as aware UTC."""
+        """Validate one session boundary as aware UTC.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return require_utc(value)
 
     @model_validator(mode="after")
     def _validate_window(self) -> SessionWindow:
-        """Validate that the session opens before it closes."""
+        """Validate that the session opens before it closes.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         if self.opens_at >= self.closes_at:
             raise ValueError("opens_at must precede closes_at")
         return self
@@ -76,24 +114,52 @@ class TradingSession(FrozenContract):
     @field_validator("symbol", "source")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate required session identity."""
+        """Validate required session identity.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return _text(value)
 
     @field_validator("label")
     @classmethod
     def _validate_optional_text(cls, value: str | None) -> str | None:
-        """Validate an optional session label."""
+        """Validate an optional session label.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return None if value is None else _text(value)
 
     @field_validator("opens_at", "closes_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one session boundary as aware UTC."""
+        """Validate one session boundary as aware UTC.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return require_utc(value)
 
     @model_validator(mode="after")
     def _validate_window(self) -> TradingSession:
-        """Validate that the session opens before it closes."""
+        """Validate that the session opens before it closes.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         if self.opens_at >= self.closes_at:
             raise ValueError("opens_at must precede closes_at")
         return self
@@ -113,13 +179,27 @@ class MarketSchedule(TracedOpenContract):
     @field_validator("source_id", "symbol", "timezone", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one required schedule field."""
+        """Validate one required schedule field.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return _text(value)
 
     @field_validator("observed_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate the schedule observation time as aware UTC."""
+        """Validate the schedule observation time as aware UTC.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return require_utc(value)
 
     @field_validator("hours", "sessions")
@@ -127,7 +207,17 @@ class MarketSchedule(TracedOpenContract):
     def _validate_order(
         cls, value: tuple[SessionWindow, ...]
     ) -> tuple[SessionWindow, ...]:
-        """Validate deterministic session ordering."""
+        """Validate deterministic session ordering.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         if value != tuple(sorted(value, key=lambda window: window.opens_at)):
             raise ValueError("schedule windows must be ordered by opens_at")
         return value
@@ -144,7 +234,14 @@ class MarketHoursRequest(TracedOpenContract):
     @field_validator("source_id", "symbol", "timezone", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one required request field."""
+        """Validate one required request field.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return _text(value)
 
 
@@ -173,24 +270,52 @@ class MarketHours(MarketSchedule):
     @field_validator("checked_at")
     @classmethod
     def _validate_checked_at(cls, value: datetime) -> datetime:
-        """Validate the evaluation time as aware UTC."""
+        """Validate the evaluation time as aware UTC.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return require_utc(value)
 
     @field_validator("halt_reason")
     @classmethod
     def _validate_halt_reason(cls, value: str | None) -> str | None:
-        """Validate an optional halt reason."""
+        """Validate an optional halt reason.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return None if value is None else _text(value)
 
     @field_validator("reopen_at")
     @classmethod
     def _validate_reopen_at(cls, value: datetime | None) -> datetime | None:
-        """Validate an optional expected reopening time as aware UTC."""
+        """Validate an optional expected reopening time as aware UTC.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return None if value is None else require_utc(value)
 
     @model_validator(mode="after")
     def _validate_selection(self) -> MarketHours:
-        """Validate deterministic current-session selection."""
+        """Validate deterministic current-session selection.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         if self.is_open != (self.current_session is not None):
             raise ValueError("is_open must match current_session presence")
         if self.current_session is not None and not (
@@ -224,7 +349,14 @@ class NamedSessionDefinition(FrozenContract):
     @field_validator("name", "timezone")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate session identity."""
+        """Validate session identity.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return _text(value)
 
 
@@ -238,13 +370,27 @@ class ActiveMarketSessionsRequest(TracedOpenContract):
     @field_validator("symbol", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate request identity."""
+        """Validate request identity.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return _text(value)
 
     @field_validator("at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate the evaluation time as aware UTC."""
+        """Validate the evaluation time as aware UTC.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return require_utc(value)
 
 
@@ -259,19 +405,43 @@ class ActiveMarketSessions(TracedOpenContract):
     @field_validator("symbol", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate result identity."""
+        """Validate result identity.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return _text(value)
 
     @field_validator("checked_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate the evaluation time as aware UTC."""
+        """Validate the evaluation time as aware UTC.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return require_utc(value)
 
     @field_validator("sessions")
     @classmethod
     def _validate_sessions(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate unique deterministic label order."""
+        """Validate unique deterministic label order.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         if any(_text(item) != item for item in value) or len(set(value)) != len(value):
             raise ValueError("sessions must contain unique non-empty labels")
         return value
@@ -286,7 +456,14 @@ class WeeklyHoliday(FrozenContract):
 
     @model_validator(mode="after")
     def _validate_override(self) -> WeeklyHoliday:
-        """Require both boundaries for a shortened day, or neither for closure."""
+        """Require both boundaries for a shortened day, or neither for closure.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         if (self.opens_at is None) != (self.closes_at is None):
             raise ValueError("holiday boundaries must both be set or both be absent")
         return self
@@ -307,12 +484,26 @@ class WeeklyScheduleDefinition(FrozenContract):
     @field_validator("source_id", "symbol", "timezone", "revision")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate schedule identity."""
+        """Validate schedule identity.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return _text(value)
 
     @model_validator(mode="after")
     def _validate_definition(self) -> WeeklyScheduleDefinition:
-        """Validate weekday keys, effective bounds, and holiday uniqueness."""
+        """Validate weekday keys, effective bounds, and holiday uniqueness.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         if any(day < 0 or day > _LAST_WEEKDAY for day in self.sessions):
             raise ValueError("weekly session keys must be Python weekdays 0 through 6")
         if self.effective_to is not None and self.effective_to < self.effective_from:
@@ -335,12 +526,26 @@ class ExchangeSessionRequest(TracedOpenContract):
     @field_validator("symbol", "calendar_code", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate request identity."""
+        """Validate request identity.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return _text(value)
 
     @model_validator(mode="after")
     def _validate_range(self) -> ExchangeSessionRequest:
-        """Validate the inclusive date range."""
+        """Validate the inclusive date range.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         if self.start > self.end:
             raise ValueError("start must not follow end")
         return self

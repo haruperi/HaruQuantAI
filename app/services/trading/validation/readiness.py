@@ -286,6 +286,14 @@ def assess_execution_readiness(
 ) -> StandardResponse[ReadinessAssessment]:
     """Assess readiness and return the raw assessment in ``data``.
 
+    Args:
+        request: Governed trading request envelope.
+        snapshot: Route snapshot containing evidence facts.
+        risk_decision: Risk decision package object.
+        kill_switch_state: Kill switch state object.
+        action_policy: Action policy verdict mapping.
+        max_staleness_seconds: Maximum allowed staleness bounds mapping.
+
     Returns:
         Standard response containing the readiness assessment or an error.
     """

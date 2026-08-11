@@ -1,8 +1,8 @@
 # Indicators Core
 
 This module owns `FEAT-INDI-01`: immutable calculation contracts, deterministic
-errors and results, official registry discovery, warmup resolution, and
-whole-request validation.
+errors and results, official registry discovery, warmup resolution,
+whole-request validation, and closed-input enforcement.
 
 The canonical feature status, requirements, public signatures, workflow mapping,
 and usage evidence remain in the package
@@ -18,6 +18,7 @@ Production files:
 - `results.py`: manifest, checksums, projections, and copied joins.
 - `registry.py`: immutable official indicator metadata.
 - `validation.py`: request validation and exact warmup resolution.
+- `closed_input.py`: fail-closed interval, availability, and timeframe checks.
 
 Public consumers import all approved names through `app.services.indicators`.
 Every Core operation returns `StandardResponse[T]`; successful `T` is stored

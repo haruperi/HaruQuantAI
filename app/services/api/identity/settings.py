@@ -199,15 +199,18 @@ def _update_settings(
     current = _get_settings(scope, subject_id, request_id=request_id)
     if current.version != expected_version:
         raise IdentityError("SETTINGS_VERSION_CONFLICT")
+    validated_settings = (
+        validate_system_settings(settings) if scope == "system" else settings
+    )
     restart_required = scope == "system" and system_settings_require_restart(
         current.settings,
-        settings,
+        validated_settings,
     )
     validated = SettingsRecord(
         scope=scope,
         subject_id=subject_id,
         user_id=subject_id if scope == "user" else None,
-        settings=settings,
+        settings=validated_settings,
         version=expected_version + 1,
         created_at=current.created_at if current.version else observed_at,
         updated_at=observed_at,

@@ -39,7 +39,11 @@ class MarketContextProvider(Protocol):
         self,
         request: MarketContextRequest,
     ) -> StandardResponse[MarketContextEvidence]:
-        """Return normalized context evidence for the exact request."""
+        """Return normalized context evidence for the exact request.
+
+        Args:
+            request: The ``request`` argument.
+        """
         ...
 
 

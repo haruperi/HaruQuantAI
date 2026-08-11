@@ -11,6 +11,12 @@ def build_lifecycle_postings(
 ) -> Mapping[str, object]:
     """Build a balanced immutable posting batch for a lifecycle event.
 
+    Args:
+        event_id: Event identifier string.
+        event_kind: Kind of lifecycle event (e.g. 'dividend', 'split').
+        amount: Decimal monetary amount.
+        currency: Currency code string.
+
     Returns:
         Idempotent balanced posting evidence.
     """

@@ -35,6 +35,12 @@ def update_idempotency_record(
 ) -> None:
     """Compare and swap one idempotency reservation by finite state.
 
+    Args:
+        store: Persistence handle object.
+        key: Idempotency reservation key string.
+        value: Reservation value object.
+        expected_revision: Revision object expected to match current state.
+
     Raises:
         ValueError: If the stored state no longer matches.
     """
@@ -70,6 +76,12 @@ def update_projection_record(
     A stale version is deliberately mapped to ``-1`` so the table constraint
     aborts and rolls back the transaction rather than committing a zero-row CAS.
 
+    Args:
+        store: Persistence handle object.
+        key: Scope key string.
+        value: Projection value object.
+        expected_revision: Revision integer expected to match current state.
+
     Raises:
         ValueError: If the projection version no longer matches.
     """
@@ -103,6 +115,11 @@ def _event_statement(
     scope_key: str,
 ) -> tuple[str, tuple[object, ...]]:
     """Build the authoritative event append statement and parameters.
+
+    Args:
+        store: Persistence handle object.
+        event: Event value object.
+        scope_key: Partition scope key string.
 
     Returns:
         Parameterized SQL and its bound values.
@@ -138,6 +155,13 @@ def _projection_statement(
     event_id: str,
 ) -> tuple[str, tuple[object, ...]]:
     """Build a constraint-backed optimistic projection upsert.
+
+    Args:
+        store: Persistence handle object.
+        projection: Projection value object.
+        scope_key: Scope key string.
+        expected_version: Expected projection version integer.
+        event_id: Associated event ID string.
 
     Returns:
         Parameterized SQL and its bound values.
@@ -175,6 +199,13 @@ def update_event_projection_records(
     expected_version: int,
 ) -> None:
     """Atomically append an event, save its projection, and materialize facts.
+
+    Args:
+        store: Persistence handle object.
+        event: TradingEvent instance.
+        projection: TradingProjection instance.
+        scope_key: Scope key string.
+        expected_version: Expected projection version integer.
 
     Raises:
         TypeError: If state values are not validated Trading contracts.

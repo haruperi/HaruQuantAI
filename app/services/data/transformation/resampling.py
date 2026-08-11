@@ -39,6 +39,11 @@ def _bucket_is_closed(
     full period extends past the source dataset's `end` has not finished
     forming and must never be presented identically to a genuinely closed bar.
 
+    Args:
+        bucket_start: The ``bucket_start`` argument.
+        duration: The ``duration`` argument.
+        source_end: The ``source_end`` argument.
+
     Returns:
         ``True`` only when the bucket's full duration ends at or before the
         source dataset's observed end.
@@ -303,7 +308,16 @@ def resample_ohlcv(
     *,
     drop_incomplete_trailing_bucket: bool = False,
 ) -> StandardResponse[MarketDataset]:
-    """Roll up OHLCV records to a larger timeframe."""
+    """Roll up OHLCV records to a larger timeframe.
+
+    Args:
+        dataset: The ``dataset`` argument.
+        target_timeframe: The ``target_timeframe`` argument.
+        drop_incomplete_trailing_bucket: The ``drop_incomplete_trailing_bucket`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Executing public DATA OHLCV resample")
     return run_data_operation(
         operation="data.transformation.resample_ohlcv",

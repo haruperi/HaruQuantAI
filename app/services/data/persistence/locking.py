@@ -97,7 +97,16 @@ RETURNING owner_request_id
 
 
 def _error(code: str, request_id: str | None, stage: str) -> DataError:
-    """Build one redacted locking-boundary error."""
+    """Build one redacted locking-boundary error.
+
+    Args:
+        code: The ``code`` argument.
+        request_id: The ``request_id`` argument.
+        stage: The ``stage`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _error")
     return DataError(
         code,
@@ -107,7 +116,17 @@ def _error(code: str, request_id: str | None, stage: str) -> DataError:
 
 
 def _validate_request_id(request_id: str) -> str:
-    """Validate the caller-owned trace identifier."""
+    """Validate the caller-owned trace identifier.
+
+    Args:
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        _error: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _validate_request_id")
     if not request_id or request_id != request_id.strip():
         raise _error("INVALID_INPUT", None, "request_id")
@@ -115,7 +134,18 @@ def _validate_request_id(request_id: str) -> str:
 
 
 def _resolve_path(path: Path, request_id: str) -> Path:
-    """Resolve one path identity without creating or opening it."""
+    """Resolve one path identity without creating or opening it.
+
+    Args:
+        path: The ``path`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        _error: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _resolve_path")
     if not isinstance(path, Path):
         raise _error("INVALID_INPUT", request_id, "path")
@@ -126,7 +156,18 @@ def _resolve_path(path: Path, request_id: str) -> Path:
 
 
 def _parse_lease_nanoseconds(value: float | None, now_ns: int) -> int:
-    """Parse one required positive lease within SQLite integer bounds."""
+    """Parse one required positive lease within SQLite integer bounds.
+
+    Args:
+        value: The ``value`` argument.
+        now_ns: The ``now_ns`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _parse_lease_nanoseconds")
     if now_ns < 0 or now_ns > _SQLITE_INTEGER_MAX:
         raise ValueError("system time exceeds persistent timestamp bounds")
@@ -141,13 +182,30 @@ def _parse_lease_nanoseconds(value: float | None, now_ns: int) -> int:
 
 
 def _timestamp_text(value: int) -> str:
-    """Encode one bounded Unix-nanosecond timestamp as ordered fixed-width text."""
+    """Encode one bounded Unix-nanosecond timestamp as ordered fixed-width text.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _timestamp_text")
     return f"{value:019d}"
 
 
 def _lease_expiry(request_id: str) -> tuple[int, int]:
-    """Return the current and configured expiry times in Unix nanoseconds."""
+    """Return the current and configured expiry times in Unix nanoseconds.
+
+    Args:
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        _error: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _lease_expiry")
     now_ns = time.time_ns()
     try:
@@ -170,7 +228,14 @@ class WriteLock:
     _released: bool = field(default=False, init=False, repr=False)
 
     def __enter__(self) -> Self:
-        """Enter this acquired lease exactly once."""
+        """Enter this acquired lease exactly once.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            _error: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: __enter__")
         if self._entered or self._released:
             raise _error("CONCURRENT_WRITE_LOCKED", self.request_id, "context")
@@ -183,7 +248,16 @@ class WriteLock:
         _exception: BaseException | None,
         _traceback: TracebackType | None,
     ) -> None:
-        """Release this lease without deleting another owner's record."""
+        """Release this lease without deleting another owner's record.
+
+        Args:
+            _exception_type: The ``_exception_type`` argument.
+            _exception: The ``_exception`` argument.
+            _traceback: The ``_traceback`` argument.
+
+        Raises:
+            _error: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: __exit__")
         result = _execute_transaction_raw(
             TransactionRequest(

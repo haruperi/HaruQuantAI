@@ -371,6 +371,10 @@ async def cancel_all_orders(
 ) -> StandardResponse[dict[str, JsonValue]]:
     """Cancel eligible orders and return a standard bulk response.
 
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
+
     Returns:
         Standard response containing ordered child results or an error.
     """
@@ -386,6 +390,10 @@ async def close_all_positions(
     request: TradingRequest, deps: TradingDependencies
 ) -> StandardResponse[dict[str, JsonValue]]:
     """Close eligible positions and return a standard bulk response.
+
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
 
     Returns:
         Standard response containing ordered child results or an error.

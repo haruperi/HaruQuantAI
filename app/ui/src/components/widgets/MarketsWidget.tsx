@@ -1,60 +1,110 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import { assetClasses } from '../../mock/productsData';
-import type { Product } from '../../types/market';
+import { apiClients, unwrapData, type MarketRow } from '@/clients';
 import { MoreVertical, LineChart, AlignJustify, Layers } from 'lucide-react';
 
-interface DerivedProduct extends Product {
-  range: number;
-  adr: number;
-  volatility: number;
-  rangePct: number;
+/**
+ * Derived display row built from a real market-directory row.
+ *
+ * The directory endpoint returns categorized symbols with Level-1 + latest
+ * D1-bar evidence. Historical ATR(14) and ADR(10) are not part of the
+ * directory surface yet, so Volatility/ADR/Range are nullable and render
+ * an em-dash when absent. The fields that are populated (range, rangePct)
+ * are derived from today's high/low.
+ */
+interface DisplayRow {
+  symbol: string;
+  name: string;
+  assetClass: string;
+  decimals: number;
+  last: number | null;
+  change: number | null;
+  changePercent: number | null;
+  open: number | null;
+  high: number | null;
+  low: number | null;
+  volume: number | null;
+  range: number | null;
+  rangePct: number | null;
+  adr: number | null;
+  volatility: number | null;
+}
+
+/** Map one API row into a display row with derived intraday range. */
+function toDisplayRow(row: MarketRow): DisplayRow {
+  const high = row.high;
+  const low = row.low;
+  const range = high !== null && low !== null ? high - low : null;
+  return {
+    symbol: row.symbol,
+    name: row.name,
+    assetClass: row.asset_class,
+    decimals: row.digits ?? 2,
+    last: row.last,
+    change: row.change,
+    changePercent: row.change_percent,
+    open: row.open,
+    high,
+    low,
+    volume: row.volume,
+    range,
+    rangePct: range !== null && row.open ? (range / row.open) * 100 : null,
+    adr: null,
+    volatility: null,
+  };
 }
 
 export const MarketsWidget: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('Equity Index');
+  const [selectedCategory, setSelectedCategory] = useState<string>('Forex');
   const [sortBy, setSortBy] = useState<string>('Volume');
   const [activeMenuSymbol, setActiveMenuSymbol] = useState<string | null>(null);
+  const [directory, setDirectory] = useState<DisplayRow[]>([]);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const { products, openOrderTicket, submitOrder, oneClickTrading, addWidgetToWorkspace } = useTradingStore();
+  const { openOrderTicket, submitOrder, oneClickTrading, addWidgetToWorkspace } = useTradingStore();
 
-  const filteredProducts = products.filter((p) => p.assetClass === selectedCategory);
-
-  /**
-   * Derived trading metrics.
-   *  volatility - ATR(14) as a percentage of last price, i.e. the typical daily
-   *               move in percent, comparable across contracts of any tick size.
-   *  range      - today's high minus low, live off the quote feed.
-   *  rangePct   - how much of the average day is already used. Above 100% means
-   *               the contract has exceeded its normal range and may be extended.
-   */
-  const withMetrics: DerivedProduct[] = filteredProducts.map((p) => {
-    const range = p.high - p.low;
-    const adr = p.adr10 || 0;
-    return {
-      ...p,
-      range,
-      adr,
-      volatility: p.lastPrice ? (p.atr14 / p.lastPrice) * 100 : 0,
-      rangePct: adr ? (range / adr) * 100 : 0
+  // Fetch the categorized market directory from the configured runtime broker
+  // on mount. The backend resolves the runtime broker when source_id is omitted,
+  // so this widget needs no broker identity of its own.
+  useEffect(() => {
+    let cancelled = false;
+    setStatus('loading');
+    void apiClients.data
+      .markets({ limit: 200 })
+      .then((response) => {
+        if (cancelled) return;
+        const page = unwrapData(response);
+        setDirectory(page.rows.map(toDisplayRow));
+        setStatus('ready');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setErrorMsg('Unable to load markets from the runtime broker.');
+        setStatus('error');
+      });
+    return () => {
+      cancelled = true;
     };
-  });
+  }, []);
 
-  const sortedProducts = [...withMetrics].sort((a, b) => {
-    if (sortBy === 'Volume') return b.volume - a.volume;
-    if (sortBy === 'Change') return Math.abs(b.changePercent) - Math.abs(a.changePercent);
-    if (sortBy === 'Volatility') return b.volatility - a.volatility;
-    // ADR and Range are absolute point values, so they are only comparable
-    // within a contract - rank by percentage terms to keep the sort meaningful
-    // across, say, Gold and Copper sitting in the same Metals list.
-    if (sortBy === 'ADR') return b.adr / b.lastPrice - a.adr / a.lastPrice;
-    if (sortBy === 'Range') return b.rangePct - a.rangePct;
+  const filteredProducts = directory.filter((p) => p.assetClass === selectedCategory);
+
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (sortBy === 'Volume') return (b.volume ?? -1) - (a.volume ?? -1);
+    if (sortBy === 'Change') return Math.abs(b.changePercent ?? 0) - Math.abs(a.changePercent ?? 0);
+    if (sortBy === 'Volatility') return (b.volatility ?? -1) - (a.volatility ?? -1);
+    if (sortBy === 'ADR') return (b.adr ?? -1) - (a.adr ?? -1);
+    if (sortBy === 'Range') return (b.rangePct ?? -1) - (a.rangePct ?? -1);
     return a.name.localeCompare(b.name);
   });
 
-  const fmt = (value: number, p: Product) => value.toFixed(p.decimals ?? 2);
+  /** Format a nullable numeric cell, or an em-dash when evidence is absent. */
+  const fmt = (value: number | null, p: DisplayRow): string =>
+    value === null || value === undefined || Number.isNaN(value) ? '—' : value.toFixed(p.decimals ?? 2);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -90,6 +140,22 @@ export const MarketsWidget: React.FC = () => {
 
       {/* Main Markets Table */}
       <div style={{ flex: 1, overflow: 'auto' }}>
+        {status === 'loading' && (
+          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted, #718294)' }}>
+            Loading markets from the runtime broker…
+          </div>
+        )}
+        {status === 'error' && (
+          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--financial-negative, #ff4975)' }}>
+            {errorMsg}
+          </div>
+        )}
+        {status === 'ready' && sortedProducts.length === 0 && (
+          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted, #718294)' }}>
+            No symbols available for {selectedCategory}.
+          </div>
+        )}
+        {status === 'ready' && sortedProducts.length > 0 && (
         <table className="cme-table">
           <thead>
             <tr>
@@ -108,29 +174,37 @@ export const MarketsWidget: React.FC = () => {
           </thead>
           <tbody>
             {sortedProducts.map((p) => {
-              const isUp = p.change > 0;
-              const isDown = p.change < 0;
+              const isUp = (p.change ?? 0) > 0;
+              const isDown = (p.change ?? 0) < 0;
               const priceClass = isUp ? 'price-up' : isDown ? 'price-down' : 'price-flat';
+              const changeCell =
+                p.change === null || p.changePercent === null
+                  ? '—'
+                  : `${isUp ? '+' : ''}${p.change.toFixed(2)} (${p.changePercent.toFixed(2)}%)`;
+              const rangePctCell =
+                p.rangePct === null ? '—' : `${p.rangePct.toFixed(0)}%`;
+              const volumeCell =
+                p.volume === null ? '—' : p.volume.toLocaleString();
 
               return (
                 <tr key={p.symbol}>
                   <td style={{ fontWeight: 600 }}>{p.name}</td>
-                  <td className={priceClass}>{fmt(p.lastPrice, p)}</td>
-                  <td className={priceClass}>
-                    {isUp ? `+${p.change.toFixed(2)} (${p.changePercent.toFixed(2)}%)` : `${p.change.toFixed(2)} (${p.changePercent.toFixed(2)}%)`}
+                  <td className={priceClass}>{fmt(p.last, p)}</td>
+                  <td className={priceClass}>{changeCell}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)' }}>
+                    {p.volatility === null ? '—' : `${p.volatility.toFixed(2)}%`}
                   </td>
-                  <td style={{ fontFamily: 'var(--font-mono)' }}>{p.volatility.toFixed(2)}%</td>
                   <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.adr, p)}</td>
                   <td style={{ fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>
                     {fmt(p.range, p)}
-                    <span className={`range-pct ${p.rangePct >= 100 ? 'range-extended' : ''}`}>
-                      {p.rangePct.toFixed(0)}%
+                    <span className={`range-pct ${(p.rangePct ?? 0) >= 100 ? 'range-extended' : ''}`}>
+                      {rangePctCell}
                     </span>
                   </td>
                   <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.open, p)}</td>
                   <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.high, p)}</td>
                   <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.low, p)}</td>
-                  <td style={{ fontFamily: 'var(--font-mono)' }}>{p.volume.toLocaleString()}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)' }}>{volumeCell}</td>
                   <td style={{ textAlign: 'center', position: 'relative' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                       <button
@@ -192,6 +266,7 @@ export const MarketsWidget: React.FC = () => {
             })}
           </tbody>
         </table>
+        )}
       </div>
     </div>
   );

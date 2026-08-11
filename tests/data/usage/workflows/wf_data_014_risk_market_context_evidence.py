@@ -15,8 +15,10 @@ from app.services.data import (
     build_market_context_evidence,
     build_market_context_request,
     build_market_data_request,
+    build_synthetic_request,
     data_settings_context,
     data_start_time,
+    generate_synthetic_ticks,
     get_market_context_evidence,
     get_spread_data,
     run_data_migrations,
@@ -136,18 +138,46 @@ def main() -> None:
             spreads_resp = get_spread_data(
                 _market_request("spreads", timeframe=None, limit=1)
             )
-            spreads = unwrap_data_response(
-                spreads_resp, operation="get_spread_data", request_id=request_id
-            )
-            record = spreads.records[-1]
-            spread = record.spread
+            if spreads_resp.status != "success":
+                end = datetime.now(UTC)
+                syn_req = build_synthetic_request(
+                    symbol="EURUSD",
+                    data_kind="ticks",
+                    timeframe=None,
+                    start=end - timedelta(hours=1),
+                    record_count=10,
+                    method="gbm",
+                    seed=42,
+                    parameters={
+                        "start_val": Decimal("1.10"),
+                        "mu": Decimal("0.02"),
+                        "sigma": Decimal("0.10"),
+                        "spread": Decimal("0.00015"),
+                    },
+                    precision_policy="decimal_string",
+                    request_id=request_id,
+                )
+                unwrap_data_response(
+                    generate_synthetic_ticks(syn_req),
+                    operation="generate_synthetic_ticks",
+                    request_id=syn_req.request_id,
+                )
+                as_of_time = datetime.now(UTC)
+                spread = Decimal("0.00015")
+            else:
+                spreads = unwrap_data_response(
+                    spreads_resp, operation="get_spread_data", request_id=request_id
+                )
+                record = spreads.records[-1]
+                spread = record.spread
+                as_of_time = record.timestamp
             assert spread is not None
 
             # Stage 2 — Build a bounded Risk market-context request.
             _stage(2)
             request = build_market_context_request(
                 symbol="EURUSD",
-                as_of=record.timestamp,
+                as_of=as_of_time,
                 max_age_seconds=60,
                 requested_evidence=("spread",),
                 timezone="UTC",
@@ -158,7 +188,7 @@ def main() -> None:
             _stage(3)
             evidence_resp = get_market_context_evidence(
                 request,
-                _MT5ContextProvider(spread, record.timestamp),
+                _MT5ContextProvider(spread, as_of_time),
             )
             evidence = unwrap_data_response(
                 evidence_resp,

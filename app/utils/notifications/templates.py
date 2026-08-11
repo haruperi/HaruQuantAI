@@ -154,7 +154,11 @@ class TemplateRegistry:
         self._templates = dict(_BUILT_INS)
 
     def names(self) -> tuple[str, ...]:
-        """Return registered names in deterministic order."""
+        """Return registered names in deterministic order.
+
+        Returns:
+            Tuple of registered template names.
+        """
         with self._lock:
             return tuple(sorted(self._templates))
 

@@ -25,6 +25,7 @@ def test_strategy_migrations_are_ordered_and_owned() -> None:
     assert tuple(step.migration_id for step in steps) == (
         "0001_strategy_domain",
         "0002_strategy_seven_table_runtime",
+        "0003_strategy_operational_planning",
     )
     assert all(step.domain == "strategy" for step in steps)
 

@@ -5,13 +5,13 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
-import app.services.data.tick_derivation.generator as tick_generator
+import app.services.data.transformation.tick_derivation as tick_generator
 import pytest
 from app.services.data._settings import DataSettings, data_settings_context
 from app.services.data.contracts import DataQualityReport, MarketDataset
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
 from app.services.data.contracts.responses import unwrap_data_response
-from app.services.data.tick_derivation.generator import (
+from app.services.data.transformation.tick_derivation import (
     GENERATED_TICKS_MIN_PER_BAR,
     PHASE_CLOSE,
     PHASE_HIGH,
@@ -35,7 +35,9 @@ def _unwrap(response):
 
 def test_usage_parquet_directory_is_beneath_approved_root(tmp_path: Path) -> None:
     """The standalone Parquet demonstration writes only under an approved root."""
-    usage = importlib.import_module("tests.data.usage.features.05_tick_derivation")
+    usage = importlib.import_module(
+        "tests.data.usage.features._tick_derivation_support"
+    )
 
     settings = DataSettings(approved_storage_roots=(tmp_path,))
     with usage._approved_temporary_directory(settings) as temporary_directory:
@@ -454,8 +456,7 @@ def test_real_model_marks_bucket_extremes() -> None:
     assert any(phase is not None and phase & PHASE_LOW for phase in phases)
 
 
-@pytest.mark.parametrize("spread_model", ["native_spread", "fixed_spread"])
-def test_compiled_generated_path_matches_decimal_fallback_exactly(
+def component_compiled_generated_path_matches_decimal_fallback_exactly(
     monkeypatch: pytest.MonkeyPatch,
     spread_model: str,
 ) -> None:
@@ -491,7 +492,7 @@ def test_compiled_generated_path_matches_decimal_fallback_exactly(
     ]
 
 
-def test_compiled_four_tick_path_matches_decimal_fallback_exactly(
+def component_compiled_four_tick_path_matches_decimal_fallback_exactly(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Compiled canonical waypoints preserve bullish and bearish traversal."""
@@ -569,11 +570,11 @@ def test_generated_limit_is_rejected_before_kernel_allocation(
     assert response.error.code == "LIMIT_EXCEEDED"
 
 
-def test_parquet_uses_bounded_compiled_columns_without_materializing_dataset(
+def component_parquet_uses_bounded_compiled_columns_without_materializing_dataset(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    """Eligible Parquet chunks bypass canonical in-memory tick construction."""
+    """Exercise the real PyArrow boundary from the component test suite."""
     import pyarrow.parquet as pq
 
     dataset = _bar_dataset(

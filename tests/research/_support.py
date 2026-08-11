@@ -16,11 +16,14 @@ from app.services.research import (
 _REQUEST_ID = "req-21234567-89ab-4def-8123-456789abcdef"
 
 
-def make_dataset() -> object:
+def make_dataset(rows: int = 40) -> object:
     """Build bounded canonical Research input.
 
+    Args:
+        rows: Number of records to construct (default 40).
+
     Returns:
-        Five-row Data-owned market dataset.
+        Bounded Data-owned market dataset.
     """
     start = datetime(2026, 1, 5, tzinfo=UTC)
     records = tuple(
@@ -29,17 +32,17 @@ def make_dataset() -> object:
             source="research-fixture",
             source_symbol="TEST",
             available_at=start + timedelta(minutes=index, seconds=1),
-            open=Decimal(10),
-            high=Decimal(11),
-            low=Decimal(9),
-            close=Decimal(str(10 + index / 10)),
+            open=Decimal("10.0"),
+            high=Decimal("15.0"),
+            low=Decimal("5.0"),
+            close=Decimal(str(10 + (index % 4) - (1 if index % 2 == 0 else -1))),
             volume=Decimal(100),
             spread=Decimal("0.1"),
             price_unit="USD",
             volume_unit="units",
             spread_unit="price",
         )
-        for index in range(5)
+        for index in range(rows)
     )
     quality = build_data_quality_report(
         quality_status="perfect",

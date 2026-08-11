@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import functools
 import importlib
+import re
 import sys
 from pathlib import Path
 
@@ -36,6 +37,22 @@ FORBIDDEN_MODULES = {
     "threading",
     "urllib",
 }
+
+EXPECTED_FEATURE_DIRECTORIES = {
+    "core",
+    "liquidity",
+    "market_speed",
+    "momentum",
+    "order_flow",
+    "patterns",
+    "regime",
+    "snapshots",
+    "structure",
+    "trend",
+    "volatility",
+    "volume",
+}
+EXPECTED_FEATURE_IDS = tuple(f"FEAT-INDI-{index:02d}" for index in range(1, 13))
 
 
 def _python_files() -> list[Path]:
@@ -100,6 +117,35 @@ def test_indicators_imports_only_approved_modules() -> None:
     assert violations == [], f"unapproved imports: {violations}"
 
 
+def test_production_feature_directories_match_consolidated_registry() -> None:
+    """Production feature folders match the twelve registered owners."""
+    actual = {
+        path.name
+        for path in INDICATORS_ROOT.iterdir()
+        if path.is_dir()
+        and path.name not in {"__pycache__", "migrations"}
+        and any(path.glob("*.py"))
+    }
+    assert actual == EXPECTED_FEATURE_DIRECTORIES
+    assert not any((INDICATORS_ROOT / "candles").glob("*.py"))
+    assert not any((INDICATORS_ROOT / "input_guards").glob("*.py"))
+
+
+def test_feature_registry_ids_are_contiguous() -> None:
+    """The owning registry uses the contiguous 01-through-12 identity range."""
+    readme = (INDICATORS_ROOT / "README.md").read_text(encoding="utf-8")
+    start = readme.index("### Feature Registry")
+    end = readme.index("\n### ", start + 1)
+    feature_ids = tuple(
+        re.findall(
+            r"^\| Completed \| `(FEAT-INDI-\d{2})`",
+            readme[start:end],
+            re.MULTILINE,
+        )
+    )
+    assert feature_ids == EXPECTED_FEATURE_IDS
+
+
 def test_indicators_declares_no_forbidden_io_modules() -> None:
     """NFR-INDI-001: the domain holds no I/O, network, or nondeterminism capability."""
     violations: list[str] = []
@@ -125,7 +171,7 @@ def test_indicators_never_imports_a_peer_service_domain() -> None:
 def test_registry_does_not_import_feature_implementations() -> None:
     """The immutable registry stores import-path identity, never live imports."""
     registry_path = INDICATORS_ROOT / "core" / "registry.py"
-    feature_packages = ("trend", "volatility", "momentum", "volume", "candles")
+    feature_packages = ("trend", "volatility", "momentum", "volume", "patterns")
     imported = _imported_roots(registry_path)
     for module in imported:
         for feature in feature_packages:
@@ -144,7 +190,6 @@ def test_public_port_exposes_no_callable_stub_for_unsupported_modes() -> None:
         "composition",
         "custom_registration",
         "out_of_core",
-        "acceleration",
         "proprietary",
     )
     for name in module.__all__:

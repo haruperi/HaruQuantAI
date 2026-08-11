@@ -253,7 +253,17 @@ def _execute_update(
     request_id: str,
     max_rows: int = 1,
 ) -> TransactionResult:
-    """Execute one bounded Data-owned update transaction."""
+    """Execute one bounded Data-owned update transaction.
+
+    Args:
+        statements: The ``statements`` argument.
+        parameter_sets: The ``parameter_sets`` argument.
+        request_id: The ``request_id`` argument.
+        max_rows: The ``max_rows`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
@@ -269,7 +279,15 @@ def _execute_update(
 def update_cache_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Upsert one versioned cache record."""
+    """Upsert one versioned cache record.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Updating Data cache persistence record")
     return _execute_update(
         (_PUT_CACHE_ENTRY,),
@@ -281,7 +299,15 @@ def update_cache_record(
 def update_economic_event_records(
     parameter_sets: tuple[tuple[Any, ...], ...], *, request_id: str
 ) -> TransactionResult:
-    """Upsert a bounded group of economic-event records atomically."""
+    """Upsert a bounded group of economic-event records atomically.
+
+    Args:
+        parameter_sets: The ``parameter_sets`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Updating Data economic-event persistence records")
     return _execute_update(
         tuple(_UPSERT_ECONOMIC_EVENT for _ in parameter_sets),
@@ -294,7 +320,15 @@ def update_economic_event_records(
 def update_economic_calendar_coverage_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Upsert one explicit Economic Calendar coverage interval."""
+    """Upsert one explicit Economic Calendar coverage interval.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Updating Data economic-calendar coverage")
     return _execute_update(
         (_UPSERT_ECONOMIC_COVERAGE,), (parameters,), request_id=request_id
@@ -304,7 +338,15 @@ def update_economic_calendar_coverage_record(
 def update_economic_event_definition_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Upsert one verified Economic Calendar event definition."""
+    """Upsert one verified Economic Calendar event definition.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Updating one Economic Calendar event definition")
     return _execute_update(
         (_UPSERT_ECONOMIC_EVENT_DEFINITION,), (parameters,), request_id=request_id
@@ -314,7 +356,14 @@ def update_economic_event_definition_record(
 def reconcile_economic_event_definition_records(
     *, request_id: str
 ) -> TransactionResult:
-    """Link exact unambiguous occurrence rows to verified definitions."""
+    """Link exact unambiguous occurrence rows to verified definitions.
+
+    Args:
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Reconciling Economic Calendar event definitions")
     return _execute_update(
         (_RECONCILE_ECONOMIC_EVENT_DEFINITIONS,),
@@ -327,7 +376,15 @@ def reconcile_economic_event_definition_records(
 def update_feed_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Update one persisted feed-state record."""
+    """Update one persisted feed-state record.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Updating Data feed persistence record")
     return _execute_update((_UPDATE_FEED,), (parameters,), request_id=request_id)
 
@@ -338,7 +395,16 @@ def update_source_state_with_audit(
     *,
     request_id: str,
 ) -> TransactionResult:
-    """Atomically update source readiness and append its audit evidence."""
+    """Atomically update source readiness and append its audit evidence.
+
+    Args:
+        state_parameters: The ``state_parameters`` argument.
+        audit_parameters: The ``audit_parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Updating atomic Data source-state persistence records")
     return _execute_update(
         (_UPSERT_SOURCE_STATE, _INSERT_SOURCE_PROMOTION_AUDIT),
@@ -348,19 +414,43 @@ def update_source_state_with_audit(
 
 
 def update_job_start(job_id: str, *, request_id: str) -> TransactionResult:
-    """Enable one persisted update job."""
+    """Enable one persisted update job.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_update((_START_UPDATE_JOB,), ((job_id,),), request_id=request_id)
 
 
 def update_job_stop(job_id: str, *, request_id: str) -> TransactionResult:
-    """Stop one persisted update job and release its lease."""
+    """Stop one persisted update job and release its lease.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_update((_STOP_UPDATE_JOB,), ((job_id,),), request_id=request_id)
 
 
 def update_job_run_lease(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Acquire one update-job run lease."""
+    """Acquire one update-job run lease.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_update(
         (_ACQUIRE_JOB_RUN_LEASE,), (parameters,), request_id=request_id
     )
@@ -369,7 +459,15 @@ def update_job_run_lease(
 def update_backfill_lease(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Conditionally acquire or renew one backfill lease."""
+    """Conditionally acquire or renew one backfill lease.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_update(
         (_ACQUIRE_BACKFILL_LEASE,), (parameters,), request_id=request_id
     )
@@ -378,7 +476,16 @@ def update_backfill_lease(
 def update_backfill_failure(
     error_code: str, job_id: str, *, request_id: str
 ) -> TransactionResult:
-    """Mark one backfill job as requiring recovery."""
+    """Mark one backfill job as requiring recovery.
+
+    Args:
+        error_code: The ``error_code`` argument.
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_update(
         (_MARK_BACKFILL_FAILURE,),
         ((error_code, job_id),),
@@ -393,7 +500,17 @@ def update_backfill_finalization(
     *,
     request_id: str,
 ) -> TransactionResult:
-    """Atomically commit checkpoint and job success evidence."""
+    """Atomically commit checkpoint and job success evidence.
+
+    Args:
+        final_path: The ``final_path`` argument.
+        idempotency_key: The ``idempotency_key`` argument.
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_update(
         (_FINALIZE_BACKFILL_CHECKPOINT, _FINALIZE_BACKFILL_JOB),
         ((final_path, idempotency_key), (final_path, job_id)),
@@ -408,7 +525,17 @@ def update_job_run_success(
     *,
     request_id: str,
 ) -> TransactionResult:
-    """Persist successful update-job completion."""
+    """Persist successful update-job completion.
+
+    Args:
+        last_checkpoint: The ``last_checkpoint`` argument.
+        next_run_at: The ``next_run_at`` argument.
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_update(
         (_COMPLETE_UPDATE_JOB_RUN,),
         ((last_checkpoint, next_run_at, job_id),),
@@ -419,7 +546,16 @@ def update_job_run_success(
 def update_job_run_failure(
     error_code: str, job_id: str, *, request_id: str
 ) -> TransactionResult:
-    """Persist failed update-job completion."""
+    """Persist failed update-job completion.
+
+    Args:
+        error_code: The ``error_code`` argument.
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_update(
         (_FAIL_UPDATE_JOB_RUN,),
         ((error_code, job_id),),
@@ -428,7 +564,15 @@ def update_job_run_failure(
 
 
 def update_job_recovery_blocked(job_id: str, *, request_id: str) -> TransactionResult:
-    """Block one update job after unprovable checkpoint recovery."""
+    """Block one update job after unprovable checkpoint recovery.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_update(
         (_BLOCK_UPDATE_JOB_RECOVERY,),
         ((job_id,),),
@@ -439,7 +583,15 @@ def update_job_recovery_blocked(job_id: str, *, request_id: str) -> TransactionR
 def update_verified_research_source_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Upsert one verified research-source manifest."""
+    """Upsert one verified research-source manifest.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_update(
         (_UPSERT_VERIFIED_RESEARCH_SOURCE,),
         (parameters,),
@@ -450,7 +602,15 @@ def update_verified_research_source_record(
 def update_runtime_upsert_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Upsert one namespaced runtime record and advance its revision."""
+    """Upsert one namespaced runtime record and advance its revision.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_update(
         (_UPSERT_RUNTIME_RECORD,),
         (parameters,),
@@ -461,7 +621,15 @@ def update_runtime_upsert_record(
 def update_runtime_compare_and_swap_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
-    """Compare-and-swap one namespaced runtime record."""
+    """Compare-and-swap one namespaced runtime record.
+
+    Args:
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_update(
         (_COMPARE_AND_SWAP_RUNTIME_RECORD,),
         (parameters,),
@@ -476,7 +644,17 @@ def update_runtime_transition_records(
     create_state: bool,
     request_id: str,
 ) -> TransactionResult:
-    """Atomically CAS runtime state and append its evidence event."""
+    """Atomically CAS runtime state and append its evidence event.
+
+    Args:
+        state_parameters: The ``state_parameters`` argument.
+        event_parameters: The ``event_parameters`` argument.
+        create_state: The ``create_state`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     state_statement = (
         _INSERT_RUNTIME_TRANSITION_STATE
         if create_state

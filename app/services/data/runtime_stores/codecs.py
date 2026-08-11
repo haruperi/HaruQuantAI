@@ -65,6 +65,10 @@ class _RuntimeStore:
 def _name(value: object, field: str) -> str:
     """Validate a bounded storage identifier.
 
+    Args:
+        value: The ``value`` argument.
+        field: The ``field`` argument.
+
     Returns:
         Validated identifier.
 
@@ -79,6 +83,9 @@ def _name(value: object, field: str) -> str:
 
 def _contains_sensitive_key(value: object) -> bool:
     """Return whether decoded JSON contains a prohibited field name.
+
+    Args:
+        value: The ``value`` argument.
 
     Returns:
         True when a prohibited field is present.
@@ -95,6 +102,9 @@ def _contains_sensitive_key(value: object) -> bool:
 
 def _validate_payload(payload: str) -> str:
     """Validate bounded secret-safe JSON emitted by an owner codec.
+
+    Args:
+        payload: The ``payload`` argument.
 
     Returns:
         Validated JSON payload.
@@ -152,6 +162,9 @@ def build_runtime_store(
 def _require_store(value: object) -> _RuntimeStore:
     """Validate an opaque runtime-store handle.
 
+    Args:
+        value: The ``value`` argument.
+
     Returns:
         Internal runtime-store value.
 
@@ -165,6 +178,11 @@ def _require_store(value: object) -> _RuntimeStore:
 
 def _encode(store: _RuntimeStore, kind: str, value: object) -> str:
     """Encode one allowlisted owner value.
+
+    Args:
+        store: The ``store`` argument.
+        kind: The ``kind`` argument.
+        value: The ``value`` argument.
 
     Returns:
         Validated JSON text.
@@ -180,6 +198,11 @@ def _encode(store: _RuntimeStore, kind: str, value: object) -> str:
 
 def _decode(store: _RuntimeStore, kind: str, payload: object) -> object:
     """Decode one stored value through its registered owner codec.
+
+    Args:
+        store: The ``store`` argument.
+        kind: The ``kind`` argument.
+        payload: The ``payload`` argument.
 
     Returns:
         Decoded owner value.
@@ -206,6 +229,14 @@ def _read_rows(
     all_partitions: bool = False,
 ) -> tuple[Mapping[str, object], ...]:
     """Read bounded runtime rows by exact key or ordered partition.
+
+    Args:
+        store: The ``store`` argument.
+        collection: The ``collection`` argument.
+        key: The ``key`` argument.
+        partition: The ``partition`` argument.
+        limit: The ``limit`` argument.
+        all_partitions: The ``all_partitions`` argument.
 
     Returns:
         Detached normalized row mappings.
@@ -250,6 +281,18 @@ def execute_runtime_store_operation(  # noqa: C901, PLR0911, PLR0912
     limit: int = 100,
 ) -> object:
     """Execute one allowlisted atomic runtime-record operation.
+
+    Args:
+        handle: The ``handle`` argument.
+        operation: The ``operation`` argument.
+        collection: The ``collection`` argument.
+        key: The ``key`` argument.
+        partition: The ``partition`` argument.
+        sequence: The ``sequence`` argument.
+        kind: The ``kind`` argument.
+        value: The ``value`` argument.
+        expected_revision: The ``expected_revision`` argument.
+        limit: The ``limit`` argument.
 
     Returns:
         Decoded value, ordered value tuple, or committed revision.
@@ -368,6 +411,20 @@ def execute_runtime_store_transition(
     event_value: object,
 ) -> bool:
     """Atomically compare-and-swap state and append its exact evidence event.
+
+    Args:
+        handle: The ``handle`` argument.
+        state_collection: The ``state_collection`` argument.
+        state_key: The ``state_key`` argument.
+        state_kind: The ``state_kind`` argument.
+        state_value: The ``state_value`` argument.
+        expected_revision: The ``expected_revision`` argument.
+        event_collection: The ``event_collection`` argument.
+        event_key: The ``event_key`` argument.
+        event_partition: The ``event_partition`` argument.
+        event_sequence: The ``event_sequence`` argument.
+        event_kind: The ``event_kind`` argument.
+        event_value: The ``event_value`` argument.
 
     Returns:
         True when both writes commit; false on a state revision conflict.

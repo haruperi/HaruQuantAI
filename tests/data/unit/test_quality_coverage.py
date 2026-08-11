@@ -6,9 +6,9 @@ from unittest.mock import MagicMock
 
 from app.services.data.contracts import DataQualityReport, QualityIssue
 from app.services.data.contracts.responses import unwrap_data_response
-from app.services.data.quality.contracts import QualityFlag, aggregate_flags
-from app.services.data.quality.policy import get_quality_policy
-from app.services.data.quality.series import (
+from app.services.data.integrity.contracts import QualityFlag, aggregate_flags
+from app.services.data.integrity.policy import get_quality_policy
+from app.services.data.integrity.series import (
     _count_weekend_days,
     _detect_duplicates,
     _detect_gaps,

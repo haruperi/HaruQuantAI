@@ -92,6 +92,22 @@ def success_trading_response(
 ) -> StandardResponse[T]:
     """Build a successful Trading response containing raw result data.
 
+    Args:
+        data: Result payload object or None.
+        operation: Governed operation identifier.
+        message: Human-readable success message.
+        risk_level: Operation risk severity level.
+        request_id: Request trace identifier.
+        correlation_id: Correlation trace identifier.
+        started_at: Operation start timestamp in milliseconds.
+        read_only: Whether the operation is read-only.
+        writes_file: Whether the operation writes to local files.
+        modifies_database: Whether the operation modifies database state.
+        places_trade: Whether the operation places order/position trades.
+        requires_network: Whether the operation requires external network.
+        legacy_status: Optional legacy outcome status string.
+        extensions: Optional response extension mapping.
+
     Returns:
         Standard success response containing ``data``.
     """

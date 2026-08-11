@@ -10,13 +10,29 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 from app.services.api.identity import get_system_settings
-from app.utils import get_logger
+from app.utils import (
+    configure_logging,
+    get_logger,
+    load_broker_provider_settings,
+    load_settings,
+)
 
 if TYPE_CHECKING:
     from app.services.api._settings import ApiSettings
 
 logger = get_logger(__name__)
 _CREDENTIAL_KEY_BYTES = 32
+_LOG_LEVELS = frozenset({"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"})
+_PROVIDER_SETTING_FIELDS = MappingProxyType(
+    {
+        "MT5_ENABLED": "mt5_enabled",
+        "MT5_TERMINAL_PATH": "mt5_terminal_path",
+        "CTRADER_ENABLED": "ctrader_enabled",
+        "BINANCE_ENABLED": "binance_enabled",
+        "DUKASCOPY_ENABLED": "dukascopy_enabled",
+        "YAHOO_ENABLED": "yahoo_enabled",
+    }
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -74,6 +90,52 @@ def load_runtime_settings_snapshot(*, request_id: str) -> object:
     )
 
 
+def activate_runtime_logging(snapshot: object) -> None:
+    """Activate the validated database-backed logging level.
+
+    The API composition root calls this only after migrations and the global
+    settings snapshot are available. Utils remains responsible for logging
+    mechanics and has no persistence dependency.
+
+    Args:
+        snapshot: Snapshot created by ``load_runtime_settings_snapshot``.
+
+    Raises:
+        TypeError: If the snapshot did not originate from this module.
+        ValueError: If the persisted logging level is invalid.
+        ConfigurationError: If the logging sinks cannot be configured.
+    """
+    level = get_runtime_setting(snapshot, "LOG_LEVEL", "INFO")
+    if level not in _LOG_LEVELS:
+        raise ValueError("LOG_LEVEL_INVALID")
+    logging_settings = load_settings({"LOG_LEVEL": level}, {}).logging
+    configure_logging(logging_settings)
+    logger.info("Activated database-backed logging configuration")
+
+
+def build_runtime_provider_settings(snapshot: object) -> object:
+    """Build opaque provider settings from the global runtime snapshot.
+
+    Args:
+        snapshot: Snapshot created by ``load_runtime_settings_snapshot``.
+
+    Returns:
+        Immutable provider settings validated by the Utils public boundary.
+
+    Raises:
+        TypeError: If the snapshot did not originate from this module.
+        ConfigurationError: If a persisted provider value is invalid.
+    """
+    if not isinstance(snapshot, _RuntimeSettingsSnapshot):
+        raise TypeError("runtime settings snapshot is invalid")
+    explicit_values = {
+        field: snapshot.values[key]
+        for key, field in _PROVIDER_SETTING_FIELDS.items()
+        if key in snapshot.values
+    }
+    return load_broker_provider_settings(explicit_values)
+
+
 def get_runtime_setting(
     snapshot: object,
     key: str,
@@ -98,7 +160,9 @@ def get_runtime_setting(
 
 
 __all__ = (
+    "activate_runtime_logging",
     "build_credential_key_set",
+    "build_runtime_provider_settings",
     "get_runtime_setting",
     "load_runtime_settings_snapshot",
 )

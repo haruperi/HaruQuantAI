@@ -1,4 +1,4 @@
-# Canonical Data Contracts — FEAT-DATA-01
+# Canonical Data Contracts — Support Package
 
 Owns immutable canonical records, datasets, quality vocabulary, validation, and
 deterministic Data errors. Public names are imported from `app.services.data`.

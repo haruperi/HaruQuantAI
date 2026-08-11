@@ -217,17 +217,38 @@ def create_strategy_mutation_result(**kwargs: object) -> StrategyMutationResult:
 
 
 def get_strategy_environment(value: str) -> StrategyEnvironment:
-    """Return the approved Strategy environment represented by ``value``."""
+    """Return the approved Strategy environment represented by ``value``.
+
+    Args:
+        value: Environment string representation.
+
+    Returns:
+        Approved Strategy environment enum instance.
+    """
     return StrategyEnvironment(value)
 
 
 def get_strategy_timing_policy(value: str) -> StrategyTimingPolicy:
-    """Return the approved Strategy timing policy represented by ``value``."""
+    """Return the approved Strategy timing policy represented by ``value``.
+
+    Args:
+        value: Timing policy string representation.
+
+    Returns:
+        Approved Strategy timing policy enum instance.
+    """
     return StrategyTimingPolicy(value)
 
 
 def get_strategy_lifecycle_status(value: str) -> StrategyLifecycleStatus:
-    """Return the Strategy lifecycle status represented by ``value``."""
+    """Return the Strategy lifecycle status represented by ``value``.
+
+    Args:
+        value: Lifecycle status string representation.
+
+    Returns:
+        Approved Strategy lifecycle status enum instance.
+    """
     return StrategyLifecycleStatus(value)
 
 

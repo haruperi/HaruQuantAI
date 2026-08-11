@@ -227,6 +227,11 @@ async def evaluate_live_gate(
 ) -> StandardResponse[Mapping[str, JsonValue]]:
     """Run live gates and return a standard response.
 
+    Args:
+        request: Governed trading request envelope.
+        evidence: Route fact and environment evidence mapping.
+        session: Active live session instance.
+
     Returns:
         Standard response containing gate evidence or a canonical error.
     """

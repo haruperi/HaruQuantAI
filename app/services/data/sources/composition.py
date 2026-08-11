@@ -18,6 +18,8 @@ from app.services.brokers import (
 )
 from app.services.data._settings import (
     LOCAL_SYMBOL_MANIFEST_NAME,
+    get_data_provider_connection_resolver,
+    get_data_provider_settings,
     get_data_settings,
 )
 from app.services.data.contracts import DataError
@@ -48,7 +50,7 @@ from app.services.data.sources.registry import (
     resolve_source_identity,
 )
 from app.services.data.time_sessions.contracts import MarketSchedule, SessionWindow
-from app.utils import generate_id, get_logger, load_broker_provider_settings
+from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 
@@ -112,6 +114,10 @@ _YAHOO_PROBE_SYMBOL: Final = "AAPL"
 def _run[T](operation: Coroutine[Any, Any, T], request_id: str) -> T:
     """Run one async Brokers operation behind the synchronous Data facade.
 
+    Args:
+        operation: The ``operation`` argument.
+        request_id: The ``request_id`` argument.
+
     Returns:
         The completed operation result.
 
@@ -138,6 +144,14 @@ def _require_broker_result[T](
     request_id: str,
 ) -> T:
     """Return a successful Brokers value or map the failure to Data.
+
+    Args:
+        result: The ``result`` argument.
+        operation: The ``operation`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
 
     Raises:
         DataError: If Brokers returned an error or no result value.
@@ -171,6 +185,12 @@ class _LazyBrokerSession:
         created and consumed on the same event loop. Other providers retain a
         connected adapter.
 
+        Args:
+            request_id: The ``request_id`` argument.
+
+        Returns:
+            The result produced by the operation.
+
         Raises:
             DataError: If configuration, credentials, or connection fail.
         """
@@ -184,7 +204,7 @@ class _LazyBrokerSession:
                     request_id=request_id,
                 )
             try:
-                settings = load_broker_provider_settings()
+                settings = get_data_provider_settings()
             except ValueError as error:
                 raise DataError(
                     "INVALID_INPUT",
@@ -225,6 +245,9 @@ class _LazyBrokerSession:
             DataError: If credentials are missing, the environment is live, or
                 the broker identifier is unsupported.
         """
+        resolver = get_data_provider_connection_resolver()
+        if resolver is not None:
+            return resolver(self._source_id, request_id)
         try:
             return resolve_provider_connection_config(
                 self._source_id, settings=settings
@@ -326,7 +349,14 @@ class _LazyBrokerSession:
             adapter = self.adapter(request_id)
 
             async def execute() -> T:
-                """Connect, execute, and release one loop-bound read session."""
+                """Connect, execute, and release one loop-bound read session.
+
+                Returns:
+                    The result produced by the operation.
+
+                Raises:
+                    DataError: If the operation cannot be completed safely.
+                """
                 connected = False
                 try:
                     connect_result = await adapter.connect()
@@ -362,6 +392,9 @@ class _LazyBrokerSession:
         Args:
             settings: Effective broker provider settings.
             request_id: Canonical request identity.
+
+        Returns:
+            The result produced by the operation.
 
         Raises:
             DataError: If credentials are required, or construction or connection
@@ -429,11 +462,26 @@ class _BrokerMarketCalendar:
         observed_at: datetime,
         request_id: str,
     ) -> MarketSchedule:
-        """Return current provider-supplied sessions as normalized UTC windows."""
+        """Return current provider-supplied sessions as normalized UTC windows.
+
+        Args:
+            source_id: The ``source_id`` argument.
+            symbol: The ``symbol`` argument.
+            timezone: The ``timezone`` argument.
+            observed_at: The ``observed_at`` argument.
+            request_id: The ``request_id`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         adapter = self._session.adapter(request_id)
 
         async def read_sessions() -> StandardResponse[Any]:
-            """Resolve and call the guarded operation after session connection."""
+            """Resolve and call the guarded operation after session connection.
+
+            Returns:
+                The result produced by the operation.
+            """
             return await adapter.get_trading_sessions(
                 symbol=symbol,
                 start=observed_at,
@@ -477,6 +525,12 @@ def _provider_descriptor(source_id: str) -> SourceDescriptor:
     does, reads fail closed with the Brokers capability reason rather than silently
     returning nothing.
 
+    Args:
+        source_id: The ``source_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         DataError: If the identifier is not a supported provider facade.
     """
@@ -511,7 +565,11 @@ def _provider_descriptor(source_id: str) -> SourceDescriptor:
 
 
 def _mt5_descriptor() -> SourceDescriptor:
-    """Return the Data-owned policy declaration for the Brokers MT5 profile."""
+    """Return the Data-owned policy declaration for the Brokers MT5 profile.
+
+    Returns:
+        The result produced by the operation.
+    """
     source_id = _MT5
     return SourceDescriptor(
         source_id=source_id,
@@ -548,6 +606,12 @@ def _local_descriptor(source_id: str) -> SourceDescriptor:
     offline, deterministic, and credential-free, and every claim below is
     verifiable against the descriptor's own `requires_credentials` and
     `requires_network` fields. No operational evidence is asserted.
+
+    Args:
+        source_id: The ``source_id`` argument.
+
+    Returns:
+        The result produced by the operation.
     """
     return SourceDescriptor(
         source_id=source_id,
@@ -584,6 +648,12 @@ def _local_descriptor(source_id: str) -> SourceDescriptor:
 def _resolve_raw_root(request_id: str) -> Path:
     """Resolve the configured absolute local artifact root.
 
+    Args:
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         DataError: If `DATA_DIR` is unset or the raw root is not a directory.
     """
@@ -600,6 +670,9 @@ def _resolve_raw_root(request_id: str) -> Path:
 
 def _require_manifest_object(declared: object) -> None:
     """Reject a local symbol manifest whose root is not a JSON object.
+
+    Args:
+        declared: The ``declared`` argument.
 
     Raises:
         TypeError: If the decoded manifest root is not a mapping.
@@ -619,6 +692,14 @@ def _load_local_symbol_metadata(
     `asset_class`, so an absent manifest yields no symbols rather than a fabricated
     default. Discovery then returns an empty page and retrieval fails closed with
     `MISSING_ASSET_METADATA` for the requested symbol.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        raw_root: The ``raw_root`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
 
     Raises:
         DataError: If the manifest exists but is unreadable or malformed.
@@ -660,7 +741,15 @@ def _load_local_symbol_metadata(
 
 
 def _register_local_source(source_id: str, request_id: str) -> None:
-    """Register one configured local artifact source and its declared identities."""
+    """Register one configured local artifact source and its declared identities.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     raw_root = _resolve_raw_root(request_id)
     if not raw_root.is_dir():
         raise DataError(
@@ -706,7 +795,7 @@ def _list_composable_sources_raw() -> tuple[str, ...]:
     """
     logger.debug("Listing composable DATA source identifiers")
     settings = get_data_settings()
-    provider_settings = load_broker_provider_settings()
+    provider_settings = get_data_provider_settings()
     enabled_providers = {
         broker_id
         for broker_id, field in _PROVIDER_ENABLED_FIELDS.items()
@@ -748,6 +837,10 @@ def _ensure_source_raw(source_id: str, request_id: str) -> None:
     credentials, network, or promotion evidence and register at `production`
     readiness; the MT5 broker profile composes a lazy read-only provider session.
 
+    Args:
+        source_id: The ``source_id`` argument.
+        request_id: The ``request_id`` argument.
+
     Raises:
         DataError: If the source is unsupported or registration fails.
     """
@@ -758,7 +851,7 @@ def _ensure_source_raw(source_id: str, request_id: str) -> None:
         if error.code != "SOURCE_UNAVAILABLE":
             raise
     settings = get_data_settings()
-    provider_settings = load_broker_provider_settings()
+    provider_settings = get_data_provider_settings()
     enabled_providers = {
         broker_id
         for broker_id, field in _PROVIDER_ENABLED_FIELDS.items()
@@ -816,6 +909,10 @@ def ensure_source(source_id: str, request_id: str) -> StandardResponse[None]:
     credentials, network, or promotion evidence and register at `production`
     readiness; the MT5 broker profile composes a lazy read-only provider session.
 
+    Args:
+        source_id: The ``source_id`` argument.
+        request_id: The ``request_id`` argument.
+
     Returns:
         Standard response confirming source composition.
 
@@ -833,6 +930,10 @@ def ensure_source(source_id: str, request_id: str) -> StandardResponse[None]:
 def _ensure_source_access_raw(source_id: str, request_id: str) -> None:
     """Connect a facade-composed source before its first provider read.
 
+    Args:
+        source_id: The ``source_id`` argument.
+        request_id: The ``request_id`` argument.
+
     Raises:
         DataError: If provider composition or connection fails.
     """
@@ -845,6 +946,10 @@ def _ensure_source_access_raw(source_id: str, request_id: str) -> None:
 
 def ensure_source_access(source_id: str, request_id: str) -> StandardResponse[None]:
     """Connect a facade-composed source before its first provider read.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        request_id: The ``request_id`` argument.
 
     Returns:
         Standard response confirming source access.
@@ -895,6 +1000,11 @@ def _resolve_realtime_session_raw(
 def ensure_identity(source_id: str, symbol: str, request_id: str) -> None:
     """Resolve or register one provider-confirmed identity mapping.
 
+    Args:
+        source_id: The ``source_id`` argument.
+        symbol: The ``symbol`` argument.
+        request_id: The ``request_id`` argument.
+
     Raises:
         DataError: If provider metadata cannot confirm the identity.
     """
@@ -942,7 +1052,11 @@ def ensure_identity(source_id: str, symbol: str, request_id: str) -> None:
 
 
 def ensure_storage(request_id: str) -> None:
-    """Apply Data migrations once per configured storage target."""
+    """Apply Data migrations once per configured storage target.
+
+    Args:
+        request_id: The ``request_id`` argument.
+    """
     settings = get_data_settings()
     target = (str(settings.data_dir), str(settings.database_url))
     with _lock:
@@ -954,6 +1068,13 @@ def ensure_storage(request_id: str) -> None:
 
 def resolve_calendar(source_id: str, request_id: str) -> MarketCalendar:
     """Return the private authoritative calendar for one source.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
 
     Raises:
         DataError: If the source has no authoritative calendar.

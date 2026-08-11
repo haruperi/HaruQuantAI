@@ -215,7 +215,14 @@ def put_cache_entry(
 
 
 def _raise_cache_write_failed(request_id: str) -> None:
-    """Raise one deterministic cache write failure."""
+    """Raise one deterministic cache write failure.
+
+    Args:
+        request_id: The ``request_id`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.error("Cache transaction did not commit a row")
     raise DataError(
         "DB_WRITE_FAILED",
@@ -227,7 +234,15 @@ def _raise_cache_write_failed(request_id: str) -> None:
 def _filter_cached_keys(
     rows: tuple[Mapping[str, object], ...], request: CacheClearRequest
 ) -> list[str]:
-    """Filter cache keys matching the clear request criteria."""
+    """Filter cache keys matching the clear request criteria.
+
+    Args:
+        rows: The ``rows`` argument.
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Filtering bounded cache keys for a clear request")
     import json
 
@@ -343,6 +358,18 @@ def cache_clear_request(
 ) -> CacheClearRequest:
     """Return a typed cache clear request from either supported call style.
 
+    Args:
+        request: The ``request`` argument.
+        source_id: The ``source_id`` argument.
+        symbol: The ``symbol`` argument.
+        data_kind: The ``data_kind`` argument.
+        dry_run: The ``dry_run`` argument.
+        max_entries: The ``max_entries`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         DataError: If call styles are mixed or validation fails.
     """
@@ -389,6 +416,15 @@ def _clear_data_cache_raw(
 ) -> CacheClearResult:
     """Clear cached entries using a request or direct keywords.
 
+    Args:
+        request: The ``request`` argument.
+        source_id: The ``source_id`` argument.
+        symbol: The ``symbol`` argument.
+        data_kind: The ``data_kind`` argument.
+        dry_run: The ``dry_run`` argument.
+        max_entries: The ``max_entries`` argument.
+        request_id: The ``request_id`` argument.
+
     Returns:
         The outcomes and deleted counts.
     """
@@ -416,6 +452,15 @@ def clear_data_cache(
     request_id: str | None = None,
 ) -> StandardResponse[CacheClearResult]:
     """Clear cached entries using a request or direct keywords.
+
+    Args:
+        request: The ``request`` argument.
+        source_id: The ``source_id`` argument.
+        symbol: The ``symbol`` argument.
+        data_kind: The ``data_kind`` argument.
+        dry_run: The ``dry_run`` argument.
+        max_entries: The ``max_entries`` argument.
+        request_id: The ``request_id`` argument.
 
     Returns:
         Standard response carrying the outcomes and deleted counts.

@@ -1,6 +1,6 @@
 # Momentum Indicators
 
-This module owns `FEAT-INDI-04`: RSI and Williams %R calculations. Each
+This module owns `FEAT-INDI-03`: RSI and Williams %R calculations. Each
 production file implements one official indicator.
 
 The canonical status, requirements, formulas, public signatures, and usage

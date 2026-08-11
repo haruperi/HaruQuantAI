@@ -34,11 +34,19 @@ class _ResponseError(Protocol):
 
     @property
     def code(self) -> str:
-        """Return the stable error code."""
+        """Return the stable error code.
+
+        Returns:
+            Stable error code string.
+        """
 
     @property
     def details(self) -> Mapping[str, JsonValue]:
-        """Return bounded structured error details."""
+        """Return bounded structured error details.
+
+        Returns:
+            Bounded structured error details mapping.
+        """
 
 
 class _ResponseMetadata(Protocol):
@@ -46,11 +54,19 @@ class _ResponseMetadata(Protocol):
 
     @property
     def request_id(self) -> str:
-        """Return the canonical request identifier."""
+        """Return the canonical request identifier.
+
+        Returns:
+            Canonical request identifier string.
+        """
 
     @property
     def correlation_id(self) -> str | None:
-        """Return the optional correlation identifier."""
+        """Return the optional correlation identifier.
+
+        Returns:
+            Optional correlation identifier string.
+        """
 
 
 class StandardResponse[T](Protocol):
@@ -58,23 +74,43 @@ class StandardResponse[T](Protocol):
 
     @property
     def status(self) -> Literal["success", "error"]:
-        """Return the response status."""
+        """Return the response status.
+
+        Returns:
+            Response status literal.
+        """
 
     @property
     def message(self) -> str:
-        """Return the bounded response message."""
+        """Return the bounded response message.
+
+        Returns:
+            Bounded response message string.
+        """
 
     @property
     def data(self) -> T | None:
-        """Return successful response data."""
+        """Return successful response data.
+
+        Returns:
+            Successful response data value.
+        """
 
     @property
     def error(self) -> _ResponseError | None:
-        """Return structured failure evidence."""
+        """Return structured failure evidence.
+
+        Returns:
+            Structured failure evidence error instance.
+        """
 
     @property
     def metadata(self) -> _ResponseMetadata:
-        """Return operation metadata."""
+        """Return operation metadata.
+
+        Returns:
+            Operation metadata instance.
+        """
 
 
 def _is_standard_response(value: object) -> TypeGuard[StandardResponse[object]]:

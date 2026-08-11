@@ -1,4 +1,4 @@
-# Cross-Domain Evidence — FEAT-DATA-14
+# Evidence — FEAT-DATA-12
 
 Owns normalized account-state, market-context, freshness, and FX-conversion
 evidence. Account positions preserve optional genuine broker ownership

@@ -1,6 +1,6 @@
 """Pytest collection guard for standalone indicators feature usage programs.
 
-The numbered ``NN_*.py`` files and ``features.py`` in this directory are
+The numbered ``NN_*.py`` files in this directory are
 intentionally *not* pytest tests: they are standalone, runnable examples that
 exercise the public Indicators API against real market data and real connections.
 They are executed (and their exit status verified) by

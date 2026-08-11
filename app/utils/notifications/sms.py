@@ -18,7 +18,16 @@ _MAX_TIMEOUT_SECONDS = 60.0
 
 @dataclass(frozen=True, slots=True)
 class SMSConfig:
-    """Validated internal Twilio SMS configuration."""
+    """Validated internal Twilio SMS configuration.
+
+    Attributes:
+        account_sid: Twilio Account SID.
+        auth_token: Twilio Auth Token.
+        from_phone: Originating Twilio phone number.
+        recipients: Target recipient phone numbers tuple.
+        enabled: Whether SMS delivery is active.
+        timeout_seconds: HTTP request timeout in seconds.
+    """
 
     account_sid: str
     auth_token: str
@@ -32,11 +41,20 @@ class SMSNotifier:
     """Deliver bounded warning text through Twilio's Message resource."""
 
     def __init__(self, config: SMSConfig) -> None:
+        """Initialize SMSNotifier.
+
+        Args:
+            config: SMS configuration settings.
+        """
         self._config = config
 
     @property
     def active(self) -> bool:
-        """Return whether Twilio delivery is fully configured and enabled."""
+        """Return whether Twilio delivery is fully configured and enabled.
+
+        Returns:
+            True if enabled with non-empty recipients.
+        """
         return self._config.enabled and bool(self._config.recipients)
 
     def send(
@@ -47,6 +65,7 @@ class SMSNotifier:
         Args:
             _title: Uniform manager title, unused by SMS.
             message: Bounded SMS body.
+            _html_body: Unused HTML body for uniform channel protocol compatibility.
 
         Returns:
             Secret-safe channel delivery result.

@@ -58,3 +58,22 @@ def test_qualification_fails_closed_on_integrity_breach() -> None:
         )
     )
     assert result["status"] == "remediation_required"
+
+
+def test_read_journal_entry_lookup_and_validation() -> None:
+    """Lookup existing entry returns dict copy, absent returns None, invalid raises."""
+    import pytest
+    from app.services.analytics.contracts import AnalyticsValidationError
+    from app.services.analytics.journal.service import read_journal_entry
+
+    # Lookup appended entry
+    entry = read_journal_entry("entry_unit")
+    assert entry is not None
+    assert entry["entry_id"] == "entry_unit"
+
+    # Lookup non-existent entry
+    assert read_journal_entry("non_existent_id") is None
+
+    # Invalid entry_id raises AnalyticsValidationError
+    with pytest.raises(AnalyticsValidationError, match="non-empty trimmed text"):
+        read_journal_entry("")

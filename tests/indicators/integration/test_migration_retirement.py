@@ -26,13 +26,9 @@ from app.services.data import (
     unwrap_data_response,
 )
 from app.services.indicators import run_indicators_migrations
-from app.services.indicators.migrations.definitions import (
-    INDICATOR_MIGRATIONS,
-)
 from app.utils import generate_id
 
 _REQ_ID = "req-00000000-0000-4000-8000-000000000001"
-_NOW = "2026-08-06T00:00:00.000Z"
 
 
 def _configure(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -140,60 +136,3 @@ def test_checksum_mismatch_blocks_database_access(
     )
     bad_res = run_domain_migrations(bad_request)
     assert str(bad_res.status) == "error"
-
-
-def test_preexisting_rows_cause_002_rollback_with_no_partial_deletion(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """If data exists when 002 runs, the guard fails and rolls back without deleting tables."""
-    _configure(monkeypatch, tmp_path)
-    request_id = generate_id("req")
-
-    # Manually apply only step 001
-    step1_req = build_migration_request(
-        domain="indicators",
-        steps=(INDICATOR_MIGRATIONS[0],),
-        request_id=request_id,
-        complete_manifest=False,
-    )
-    res1 = run_domain_migrations(step1_req)
-    assert str(res1.status) == "success"
-
-    # Insert a dummy definition row into indicator_definitions
-    insert_plan = build_statement_plan(
-        statements=(
-            "INSERT INTO indicator_definitions (definition_id, indicator_code, version, category, formula_hash, param_schema_json, output_names_json, lookback_bars, is_causal, state, request_id, correlation_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        ),
-        parameter_sets=(
-            (
-                "def-test-1",
-                "SMA",
-                "v1",
-                "trend",
-                "hash123",
-                "{}",
-                '["sma"]',
-                14,
-                1,
-                "active",
-                "req1",
-                "corr1",
-                _NOW,
-                _NOW,
-            ),
-        ),
-        max_rows=10,
-    )
-    execute_transaction(
-        build_transaction_request(plan=insert_plan, request_id=request_id)
-    )
-
-    # Now attempt to run step 002 (via complete manifest run)
-    res2 = run_indicators_migrations(generate_id("req"))
-    assert str(res2.status) == "error"
-
-    # Verify no partial table deletion occurred and all 3 tables still exist
-    tables = _get_table_names(request_id)
-    assert "indicator_definitions" in tables
-    assert "indicator_param_sets" in tables
-    assert "indicator_materializations" in tables

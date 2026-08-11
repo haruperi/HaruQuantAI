@@ -42,7 +42,15 @@ def recover_update_jobs(
     *,
     clock: Any | None = None,
 ) -> RecoveryReport:
-    """Finish prepared publications and classify unrecoverable checkpoints."""
+    """Finish prepared publications and classify unrecoverable checkpoints.
+
+    Args:
+        request_id: The ``request_id`` argument.
+        clock: The ``clock`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     rid = request_id or generate_id("req")
     logger.info("Recovering prepared DATA backfill publications")
     prepared = read_prepared_backfill_records(request_id=rid, limit=1_000)

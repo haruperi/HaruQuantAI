@@ -84,11 +84,14 @@ def _weighted_average(values: np.ndarray, period: int) -> np.ndarray:
     """Calculate vectorized WMA while preserving incomplete windows.
 
     Args:
-        values: Row-ordered input values, possibly with leading ``NaN``.
-        period: Inclusive rolling window size.
+            values: Row-ordered input values, possibly with leading ``NaN``.
+            period: Inclusive rolling window size.
 
     Returns:
-        A float64 array with ``NaN`` for incomplete windows.
+            A float64 array with ``NaN`` for incomplete windows.
+
+    Raises:
+        None.
     """
     result = np.full(len(values), np.nan, dtype="float64")
     if len(values) < period:
@@ -108,12 +111,15 @@ def _rolling_available_at(
     """Return the inclusive rolling maximum availability timestamp.
 
     Args:
-        records: Validated OHLCV records.
-        index: Canonical result index.
-        window: Exact causal price-window size.
+            records: Validated OHLCV records.
+            index: Canonical result index.
+            window: Exact causal price-window size.
 
     Returns:
-        Row-aligned UTC availability timestamps.
+            Row-aligned UTC availability timestamps.
+
+    Raises:
+        None.
     """
     nanos = pd.DatetimeIndex([record.available_at for record in records]).asi8
     result = nanos.copy()

@@ -45,7 +45,16 @@ class _DatabaseConfig:
 
 
 def _error(code: str, request_id: str, stage: str) -> DataError:
-    """Build one redacted database-boundary error."""
+    """Build one redacted database-boundary error.
+
+    Args:
+        code: The ``code`` argument.
+        request_id: The ``request_id`` argument.
+        stage: The ``stage`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _error")
     return DataError(
         code,
@@ -55,7 +64,17 @@ def _error(code: str, request_id: str, stage: str) -> DataError:
 
 
 def _parse_database_config(settings: DataSettings) -> _DatabaseConfig:
-    """Parse Data-owned database configuration or raise a safe local error."""
+    """Parse Data-owned database configuration or raise a safe local error.
+
+    Args:
+        settings: The ``settings`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _parse_database_config")
     database_url = settings.database_url
     data_directory = settings.data_dir
@@ -87,7 +106,18 @@ def _parse_database_config(settings: DataSettings) -> _DatabaseConfig:
 
 
 def _load_database_config(settings: DataSettings, request_id: str) -> _DatabaseConfig:
-    """Resolve and map call-time database configuration failures."""
+    """Resolve and map call-time database configuration failures.
+
+    Args:
+        settings: The ``settings`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        _error: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _load_database_config")
     try:
         return _parse_database_config(settings)
@@ -97,7 +127,18 @@ def _load_database_config(settings: DataSettings, request_id: str) -> _DatabaseC
 
 
 def _open_connection(config: _DatabaseConfig, request_id: str) -> sqlite3.Connection:
-    """Open one configured short-lived PEP 249 transaction connection."""
+    """Open one configured short-lived PEP 249 transaction connection.
+
+    Args:
+        config: The ``config`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        _error: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _open_connection")
     try:
         return sqlite3.connect(
@@ -110,7 +151,14 @@ def _open_connection(config: _DatabaseConfig, request_id: str) -> sqlite3.Connec
 
 
 def _is_lock_conflict(error: sqlite3.OperationalError) -> bool:
-    """Return whether an operational error is SQLite busy/locked evidence."""
+    """Return whether an operational error is SQLite busy/locked evidence.
+
+    Args:
+        error: The ``error`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _is_lock_conflict")
     error_code = getattr(error, "sqlite_errorcode", None)
     if not isinstance(error_code, int):
@@ -126,7 +174,18 @@ def _authorize_sql(
     _database_name: str | None,
     _trigger_name: str | None,
 ) -> int:
-    """Deny caller transaction control and cross-database attachment."""
+    """Deny caller transaction control and cross-database attachment.
+
+    Args:
+        action_code: The ``action_code`` argument.
+        _arg1: The ``_arg1`` argument.
+        _arg2: The ``_arg2`` argument.
+        _database_name: The ``_database_name`` argument.
+        _trigger_name: The ``_trigger_name`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _authorize_sql")
     if action_code in _DISALLOWED_SQL_ACTIONS:
         return sqlite3.SQLITE_DENY
@@ -134,7 +193,18 @@ def _authorize_sql(
 
 
 def _normalize_result_value(value: object, request_id: str) -> ResultScalar:
-    """Validate one SQLite value against the public result scalar contract."""
+    """Validate one SQLite value against the public result scalar contract.
+
+    Args:
+        value: The ``value`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        _error: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _normalize_result_value")
     if value is None or isinstance(value, bool | int | str):
         return value
@@ -149,7 +219,17 @@ def _collect_rows(
     max_rows: int,
     request_id: str,
 ) -> None:
-    """Append one ordered result set without exceeding its caller bound."""
+    """Append one ordered result set without exceeding its caller bound.
+
+    Args:
+        cursor: The ``cursor`` argument.
+        rows: The ``rows`` argument.
+        max_rows: The ``max_rows`` argument.
+        request_id: The ``request_id`` argument.
+
+    Raises:
+        _error: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _collect_rows")
     if cursor.description is None:
         return
@@ -170,7 +250,15 @@ def _collect_rows(
 def _execute_plan(
     connection: sqlite3.Connection, request: TransactionRequest
 ) -> tuple[tuple[Mapping[str, ResultScalar], ...], int]:
-    """Execute every caller statement in order under one open transaction."""
+    """Execute every caller statement in order under one open transaction.
+
+    Args:
+        connection: The ``connection`` argument.
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _execute_plan")
     rows: list[Mapping[str, ResultScalar]] = []
     affected_rows = 0
@@ -195,7 +283,17 @@ def _rollback_and_raise(
     error: DataError,
     request_id: str,
 ) -> NoReturn:
-    """Roll back once, replacing the failure only when rollback itself fails."""
+    """Roll back once, replacing the failure only when rollback itself fails.
+
+    Args:
+        connection: The ``connection`` argument.
+        error: The ``error`` argument.
+        request_id: The ``request_id`` argument.
+
+    Raises:
+        _error: If the operation cannot be completed safely.
+        error: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _rollback_and_raise")
     try:
         connection.rollback()

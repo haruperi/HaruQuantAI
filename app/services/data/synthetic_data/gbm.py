@@ -44,19 +44,41 @@ _RANDOM_DENOMINATOR = Decimal(1 << 53)
 
 
 def _uniform(rng: random.Random) -> Decimal:
-    """Return one deterministic 53-bit Decimal uniform variate in [0, 1)."""
+    """Return one deterministic 53-bit Decimal uniform variate in [0, 1).
+
+    Args:
+        rng: The ``rng`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Generating deterministic Decimal uniform variate")
     return Decimal(rng.getrandbits(53)) / _RANDOM_DENOMINATOR
 
 
 def _normal(rng: random.Random) -> Decimal:
-    """Return one deterministic zero-mean unit-variance CLT normal approximation."""
+    """Return one deterministic zero-mean unit-variance CLT normal approximation.
+
+    Args:
+        rng: The ``rng`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Generating deterministic Decimal normal variate")
     return sum((_uniform(rng) for _ in range(12)), start=Decimal(0)) - Decimal(6)
 
 
 def _exponential(rng: random.Random, mean: Decimal) -> Decimal:
-    """Return one deterministic Decimal exponential variate."""
+    """Return one deterministic Decimal exponential variate.
+
+    Args:
+        rng: The ``rng`` argument.
+        mean: The ``mean`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Generating deterministic Decimal exponential variate")
     uniform = _uniform(rng)
     if uniform == 1:
@@ -70,7 +92,18 @@ def _exponential(rng: random.Random, mean: Decimal) -> Decimal:
 # not. Merging them under one name silently dropped the guard from one half, so both
 # are kept with distinct names and their original behaviour.
 def _quantize_synthetic(value: Decimal, quantum: Decimal) -> Decimal:
-    """Quantize a finite generated value with the approved rounding policy."""
+    """Quantize a finite generated value with the approved rounding policy.
+
+    Args:
+        value: The ``value`` argument.
+        quantum: The ``quantum`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Quantizing synthetic Decimal value")
     if not value.is_finite():
         raise DataError("PRECISION_MISMATCH")
@@ -86,7 +119,22 @@ def _gbm_path(
     steps: int,
     rng: random.Random,
 ) -> tuple[Decimal, ...]:
-    """Generate a bounded Decimal geometric-Brownian path."""
+    """Generate a bounded Decimal geometric-Brownian path.
+
+    Args:
+        start: The ``start`` argument.
+        mu: The ``mu`` argument.
+        sigma: The ``sigma`` argument.
+        step_seconds: The ``step_seconds`` argument.
+        steps: The ``steps`` argument.
+        rng: The ``rng`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.info("Generating deterministic Decimal GBM path")
     dt = step_seconds / _ANNUAL_SECONDS
     with localcontext() as context:
@@ -109,7 +157,17 @@ def _generate_bars(
     spec: TimeframeSpec,
     rng: random.Random,
 ) -> tuple[OHLCVRecord, ...]:
-    """Build deterministic canonical bars from one Decimal path."""
+    """Build deterministic canonical bars from one Decimal path.
+
+    Args:
+        request: The ``request`` argument.
+        path: The ``path`` argument.
+        spec: The ``spec`` argument.
+        rng: The ``rng`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Building synthetic bars")
     records: list[OHLCVRecord] = []
     timestamp = request.start
@@ -155,7 +213,16 @@ def _generate_ticks(
     path: tuple[Decimal, ...],
     rng: random.Random,
 ) -> tuple[TickRecord, ...]:
-    """Build deterministic canonical ticks from one Decimal path."""
+    """Build deterministic canonical ticks from one Decimal path.
+
+    Args:
+        request: The ``request`` argument.
+        path: The ``path`` argument.
+        rng: The ``rng`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Building synthetic ticks")
     records: list[TickRecord] = []
     timestamp = request.start
@@ -186,7 +253,17 @@ def _generate_ticks(
 def _validate_synthetic_request(
     request: SyntheticRequest,
 ) -> tuple[Decimal, Decimal, Decimal]:
-    """Validate input parameters for synthetic generation."""
+    """Validate input parameters for synthetic generation.
+
+    Args:
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Validating synthetic generation request parameters")
     if request.seed is None:
         raise DataError(
@@ -236,6 +313,12 @@ def _validate_synthetic_request(
 
 def _generate_synthetic_dataset_raw(request: SyntheticRequest) -> MarketDataset:
     """Generate a byte-reproducible bounded Decimal GBM dataset.
+
+    Args:
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
 
     Raises:
         DataError: On any validation, limit, or generation failure.
@@ -349,6 +432,12 @@ def generate_synthetic_dataset(
 def _generate_synthetic_ticks_raw(request: SyntheticRequest) -> MarketDataset:
     """Generate GBM-based synthetic tick records; raises if kind is not ticks.
 
+    Args:
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         DataError: ``VALIDATION_FAILED`` if ``data_kind`` is not ``ticks``.
     """
@@ -391,6 +480,12 @@ def generate_synthetic_ticks(
 
 def _generate_synthetic_bars_raw(request: SyntheticRequest) -> MarketDataset:
     """Generate GBM-based synthetic OHLCV bar records; raises if kind is not bars.
+
+    Args:
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
 
     Raises:
         DataError: ``VALIDATION_FAILED`` if ``data_kind`` is not ``bars``.

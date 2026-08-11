@@ -1,7 +1,8 @@
 """Shared DATA persistence infrastructure: SQLite, locks, migrations, files, cache.
 
-Owns storage mechanics only. Durable audit evidence lives in ``app.services.data.audit``
-because it carries a cross-domain contract with its own authorization semantics.
+Owns storage mechanics only. Durable audit evidence lives in
+``app.services.data.evidence`` because it carries a cross-domain contract with its
+own authorization semantics.
 
 The package surface exposes the governed storage operations while focused files own
 their individual persistence use cases.

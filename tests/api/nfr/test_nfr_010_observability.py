@@ -56,7 +56,7 @@ class TestNfrApi010Observability:
     @staticmethod
     def test_custom_request_id_is_respected(client: TestClient) -> None:
         """A caller-supplied X-Request-Id is carried in the response metadata."""
-        custom_id = "req-nfr-010-custom"
+        custom_id = "req-01000000-0000-4000-8000-000000000010"
         response = client.get(
             "/api/v1/health/liveness",
             headers={"X-Request-Id": custom_id},

@@ -234,6 +234,18 @@ def append_player_journal_entry(
 ) -> StandardResponse[object]:
     """Append one immutable player journal entry.
 
+    Args:
+        entry_id: Unique journal entry identifier.
+        session_id: Session id instance or value.
+        plan_version: Plan version instance or value.
+        author_id: Author id instance or value.
+        occurred_at: Occurred at instance or value.
+        narrative: Narrative instance or value.
+        evidence_refs: Evidence refs instance or value.
+        replay_id: Replay id instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing journal evidence.
     """
@@ -260,6 +272,11 @@ def read_player_journal_entry(
 ) -> StandardResponse[object]:
     """Read one player journal entry.
 
+    Args:
+        entry_id: Unique journal entry identifier.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing journal evidence or ``None``.
     """
@@ -281,6 +298,13 @@ def assess_plan_adherence(
     correlation_id: str | None = None,
 ) -> StandardResponse[object]:
     """Assess evidence against an exact plan version.
+
+    Args:
+        planned_rules: Planned rules instance or value.
+        observed_actions: Observed actions instance or value.
+        plan_version: Plan version instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing adherence findings.
@@ -306,6 +330,13 @@ def detect_behavior_patterns(
 ) -> StandardResponse[object]:
     """Run versioned evidence-only behavior detectors.
 
+    Args:
+        actions: Actions instance or value.
+        threshold_version: Threshold version instance or value.
+        thresholds: Thresholds instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing detector findings.
     """
@@ -330,6 +361,12 @@ def analyze_emergency_response(
     correlation_id: str | None = None,
 ) -> StandardResponse[object]:
     """Analyze Simulator emergency lifecycle evidence.
+
+    Args:
+        events: Events instance or value.
+        required_sequence: Required sequence instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing emergency-response evidence.
@@ -357,6 +394,16 @@ def evaluate_player_qualification(
     correlation_id: str | None = None,
 ) -> StandardResponse[object]:
     """Evaluate player qualification and recurrent validity.
+
+    Args:
+        curriculum_version: Curriculum version instance or value.
+        completed_prerequisites: Completed prerequisites instance or value.
+        required_prerequisites: Required prerequisites instance or value.
+        attempts: Attempts instance or value.
+        valid_until: Valid until instance or value.
+        now: Now instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing qualification evidence.
@@ -421,6 +468,12 @@ def validate_contract_version(
 ) -> StandardResponse[str]:
     """Validate one Analytics compatibility version.
 
+    Args:
+        contract: Contract instance or value.
+        version: Version instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing the accepted compatibility status.
     """
@@ -440,6 +493,11 @@ def validate_metric_catalog(
     correlation_id: str | None = None,
 ) -> StandardResponse[None]:
     """Validate the immutable Analytics metric catalogue.
+
+    Args:
+        catalog: Catalog instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response with ``data=None`` on successful validation.
@@ -464,6 +522,15 @@ def build_quality_flag(
     correlation_id: str | None = None,
 ) -> StandardResponse[QualityFlag]:
     """Build one catalog-backed Analytics quality flag.
+
+    Args:
+        code: Code instance or value.
+        section: Section instance or value.
+        source_context: Source context instance or value.
+        detail: Detail instance or value.
+        max_detail_bytes: Max detail bytes instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing the quality flag in ``data``.
@@ -495,6 +562,15 @@ def build_warning(
 ) -> StandardResponse[AnalyticsWarning]:
     """Build one catalog-backed Analytics warning.
 
+    Args:
+        code: Code instance or value.
+        section: Section instance or value.
+        source_context: Source context instance or value.
+        detail: Detail instance or value.
+        max_detail_bytes: Max detail bytes instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing the warning in ``data``.
     """
@@ -522,6 +598,12 @@ def to_analytics_error_payload(
 ) -> StandardResponse[dict[str, object]]:
     """Convert one Analytics exception to bounded public error data.
 
+    Args:
+        error: Error instance or value.
+        max_detail_bytes: Max detail bytes instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing the bounded error mapping in ``data``.
     """
@@ -543,6 +625,11 @@ def to_report_json_safe(
     correlation_id: str | None = None,
 ) -> StandardResponse[object]:
     """Normalize one report value through the Utils JSON-safety contract.
+
+    Args:
+        value: Value instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing the JSON-safe value in ``data``.
@@ -567,6 +654,13 @@ def build_closed_trade_equity_curve(
     tuple[tuple[Mapping[str, object], ...], tuple[Mapping[str, object], ...]]
 ]:
     """Build deterministic closed-trade equity curves.
+
+    Args:
+        trades: Trades instance or value.
+        initial_balance: Initial balance instance or value.
+        config: Analytics configuration instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing the trade-indexed and daily curves in
@@ -596,6 +690,17 @@ def adapt_trading_result(
 ) -> StandardResponse[TradingResult]:
     """Adapt a producer-neutral closed-trade ledger.
 
+    Args:
+        source: Source instance or value.
+        source_contract: Source contract instance or value.
+        initial_balance: Initial balance instance or value.
+        account_currency: Account currency instance or value.
+        config: Analytics configuration instance.
+        benchmark: Benchmark instance or value.
+        fx_evidence: Fx evidence instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing the canonical TradingResult in ``data``.
     """
@@ -624,6 +729,12 @@ def align_benchmark_series(
 ) -> StandardResponse[tuple[tuple[float, ...], tuple[float, ...]]]:
     """Align strategy and benchmark return observations.
 
+    Args:
+        strategy: Strategy instance or value.
+        benchmark: Benchmark instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing the aligned strategy and benchmark series.
     """
@@ -643,6 +754,12 @@ def calculate_benchmark_evidence(
     correlation_id: str | None = None,
 ) -> StandardResponse[SectionEvidence]:
     """Calculate catalog-approved benchmark evidence.
+
+    Args:
+        result: Source trading result or payload object.
+        config: Analytics configuration instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing benchmark section evidence in ``data``.
@@ -664,6 +781,12 @@ def calculate_cost_efficiency_evidence(
 ) -> StandardResponse[SectionEvidence]:
     """Calculate catalog-approved cost and efficiency evidence.
 
+    Args:
+        result: Source trading result or payload object.
+        config: Analytics configuration instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing cost-efficiency evidence in ``data``.
     """
@@ -683,6 +806,12 @@ def calculate_distribution_evidence(
     correlation_id: str | None = None,
 ) -> StandardResponse[SectionEvidence]:
     """Calculate catalog-approved distribution evidence.
+
+    Args:
+        values: Values instance or value.
+        config: Analytics configuration instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing distribution evidence in ``data``.
@@ -704,6 +833,12 @@ def calculate_drawdown_evidence(
 ) -> StandardResponse[SectionEvidence]:
     """Calculate closed-trade drawdown evidence.
 
+    Args:
+        result: Source trading result or payload object.
+        config: Analytics configuration instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing drawdown evidence in ``data``.
     """
@@ -723,6 +858,12 @@ def calculate_grouped_evidence(
     correlation_id: str | None = None,
 ) -> StandardResponse[tuple[SectionEvidence, ...]]:
     """Calculate all catalog-approved Analytics evidence groups.
+
+    Args:
+        result: Source trading result or payload object.
+        config: Analytics configuration instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing ordered section evidence in ``data``.
@@ -745,6 +886,13 @@ def calculate_ratio_evidence(
 ) -> StandardResponse[SectionEvidence]:
     """Calculate catalog-approved ratio evidence.
 
+    Args:
+        result: Source trading result or payload object.
+        returns: Returns instance or value.
+        config: Analytics configuration instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing ratio evidence in ``data``.
     """
@@ -764,6 +912,12 @@ def calculate_return_evidence(
     correlation_id: str | None = None,
 ) -> StandardResponse[SectionEvidence]:
     """Calculate catalog-approved return evidence.
+
+    Args:
+        result: Source trading result or payload object.
+        config: Analytics configuration instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing return evidence in ``data``.
@@ -785,6 +939,13 @@ def calculate_risk_evidence(
     correlation_id: str | None = None,
 ) -> StandardResponse[SectionEvidence]:
     """Calculate catalog-approved risk evidence.
+
+    Args:
+        daily_returns: Daily returns instance or value.
+        config: Analytics configuration instance.
+        confidence: Confidence instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing risk evidence in ``data``.
@@ -809,6 +970,13 @@ def calculate_trade_evidence(
 ) -> StandardResponse[SectionEvidence]:
     """Calculate catalog-approved closed-trade evidence.
 
+    Args:
+        result: Source trading result or payload object.
+        config: Analytics configuration instance.
+        source_context: Source context instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing trade evidence in ``data``.
     """
@@ -830,6 +998,12 @@ def run_statistical_validation(
     correlation_id: str | None = None,
 ) -> StandardResponse[SectionEvidence]:
     """Run bounded seeded statistical validation.
+
+    Args:
+        values: Values instance or value.
+        config: Analytics configuration instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing statistical evidence in ``data``.
@@ -857,6 +1031,19 @@ def build_performance_report(
     diagnostic_partial_mode: bool = False,
 ) -> StandardResponse[PerformanceReport]:
     """Build one canonical Analytics performance report.
+
+    Args:
+        source: Source instance or value.
+        source_contract: Source contract instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+        created_at: Created at instance or value.
+        initial_balance: Initial balance instance or value.
+        account_currency: Account currency instance or value.
+        config: Analytics configuration instance.
+        benchmark: Benchmark instance or value.
+        fx_evidence: Fx evidence instance or value.
+        diagnostic_partial_mode: Diagnostic partial mode instance or value.
 
     Returns:
         Standard response containing the PerformanceReport in ``data``.
@@ -893,6 +1080,15 @@ def build_portfolio_allocation_evidence(
 ) -> StandardResponse[PortfolioAllocationEvidence]:
     """Build non-binding portfolio allocation evidence.
 
+    Args:
+        reports: Reports instance or value.
+        base_currency: Base currency instance or value.
+        fx_evidence: Fx evidence instance or value.
+        config: Analytics configuration instance.
+        portfolio_simulation_result: Portfolio simulation result instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing allocation evidence in ``data``.
     """
@@ -921,6 +1117,14 @@ def build_portfolio_performance_report(
 ) -> StandardResponse[PortfolioPerformanceReport]:
     """Build a currency-safe internal portfolio performance report.
 
+    Args:
+        reports: Reports instance or value.
+        base_currency: Base currency instance or value.
+        fx_evidence: Fx evidence instance or value.
+        config: Analytics configuration instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing the portfolio report in ``data``.
     """
@@ -945,6 +1149,11 @@ def build_portfolio_rebalance_measurement(
 ) -> StandardResponse[PortfolioRebalanceMeasurementEvidence]:
     """Measure reconciled portfolio rebalance facts without execution authority.
 
+    Args:
+        request: Request instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing measurement evidence in ``data``.
     """
@@ -965,6 +1174,12 @@ def compare_performance_reports(
 ) -> StandardResponse[SectionEvidence]:
     """Compare compatible reports using actual common metrics.
 
+    Args:
+        reference: Reference instance or value.
+        candidate: Candidate instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing comparison evidence in ``data``.
     """
@@ -984,6 +1199,12 @@ def compute_reproducibility_hashes(
     correlation_id: str | None = None,
 ) -> StandardResponse[ReproducibilityHashes]:
     """Compute deterministic Analytics reproducibility hashes.
+
+    Args:
+        result: Source trading result or payload object.
+        report: Performance report instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing reproducibility hashes in ``data``.
@@ -1006,6 +1227,13 @@ def serialize_report(
 ) -> StandardResponse[str]:
     """Serialize a validated report without writing a file.
 
+    Args:
+        report: Performance report instance.
+        format_name: Format name instance or value.
+        config: Analytics configuration instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing the exact serialized string in ``data``.
     """
@@ -1025,6 +1253,11 @@ def build_dashboard_payload(
 ) -> StandardResponse[DashboardPayload]:
     """Project a validated report into a bounded dashboard payload.
 
+    Args:
+        report: Performance report instance.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing the dashboard payload in ``data``.
     """
@@ -1041,6 +1274,9 @@ def _truncate_transform(
 ) -> tuple[tuple[Mapping[str, object], ...], Mapping[str, object]]:
     """Place the truncated series in data and its evidence in extensions.
 
+    Args:
+        result: Source trading result or payload object.
+
     Returns:
         The series and its response-extension metadata.
     """
@@ -1056,6 +1292,12 @@ def build_worst_day_distribution(
     correlation_id: str | None = None,
 ) -> StandardResponse[object]:
     """Build worst-day distribution evidence from an Analytics ledger.
+
+    Args:
+        ledger: Ledger instance or value.
+        percentiles: Percentiles instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing the calculated distribution.
@@ -1079,6 +1321,15 @@ def build_barrier_section(
     correlation_id: str | None = None,
 ) -> StandardResponse[object]:
     """Build barrier evidence when verified first-passage inputs are supplied.
+
+    Args:
+        first_passage: First passage instance or value.
+        joint: Joint instance or value.
+        worst_day: Worst day instance or value.
+        mandate_version: Mandate version instance or value.
+        mode_sensitivity: Mode sensitivity instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing the barrier report section.
@@ -1106,6 +1357,12 @@ def truncate_series(
 ) -> StandardResponse[tuple[Mapping[str, object], ...]]:
     """Deterministically bound a dashboard series.
 
+    Args:
+        points: Points instance or value.
+        max_points: Max points instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing the truncated series in ``data``.
     """
@@ -1128,6 +1385,14 @@ def create_process_scoring_profile(
     correlation_id: str | None = None,
 ) -> StandardResponse[object]:
     """Create a validated process scoring profile.
+
+    Args:
+        profile_version: Profile version instance or value.
+        dimension_weights: Dimension weights instance or value.
+        critical_failure_policy: Critical failure policy instance or value.
+        critical_failure_cap: Critical failure cap instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing the immutable scoring profile.
@@ -1155,6 +1420,13 @@ def create_critical_failure_record(
 ) -> StandardResponse[object]:
     """Create one validated critical-failure observation record.
 
+    Args:
+        kind: Kind instance or value.
+        severity: Severity instance or value.
+        detail: Detail instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing the immutable failure record.
     """
@@ -1178,6 +1450,16 @@ def build_session_score(
     correlation_id: str | None = None,
 ) -> StandardResponse[object]:
     """Compute one deterministic process-first session score.
+
+    Args:
+        profile: Profile instance or value.
+        dimension_scores: Dimension scores instance or value.
+        session_id: Session id instance or value.
+        scored_at: Scored at instance or value.
+        critical_failures: Critical failures instance or value.
+        no_trade: No trade instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing the immutable session score.
@@ -1207,6 +1489,13 @@ def compute_leaderboard_ranking(
 ) -> StandardResponse[object]:
     """Rank sessions deterministically with process score primary.
 
+    Args:
+        scores: Scores instance or value.
+        profits: Profits instance or value.
+        limit: Limit instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing ordered ranking rows.
     """
@@ -1228,6 +1517,11 @@ def build_process_score_mapping(
 ) -> StandardResponse[object]:
     """Serialize one session score to a JSON-safe v1 mapping.
 
+    Args:
+        score: Score instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing the validated JSON-safe mapping.
     """
@@ -1246,6 +1540,11 @@ def parse_process_score_mapping(
     correlation_id: str | None = None,
 ) -> StandardResponse[object]:
     """Validate and denormalize a v1 process-score mapping.
+
+    Args:
+        mapping: Mapping instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing the immutable session score.
@@ -1266,6 +1565,11 @@ def build_scoring_profile_mapping(
 ) -> StandardResponse[object]:
     """Serialize one scoring profile to a JSON-safe v1 mapping.
 
+    Args:
+        profile: Profile instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
     Returns:
         Standard response containing the validated JSON-safe mapping.
     """
@@ -1284,6 +1588,11 @@ def parse_scoring_profile_mapping(
     correlation_id: str | None = None,
 ) -> StandardResponse[object]:
     """Validate and denormalize a v1 scoring-profile mapping.
+
+    Args:
+        mapping: Mapping instance or value.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
 
     Returns:
         Standard response containing the immutable scoring profile.

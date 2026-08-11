@@ -17,7 +17,14 @@ _MAX_TIMEOUT_SECONDS = 60.0
 
 @dataclass(frozen=True, slots=True)
 class TelegramConfig:
-    """Validated internal Telegram configuration."""
+    """Validated internal Telegram configuration.
+
+    Attributes:
+        bot_token: Telegram Bot API token.
+        chat_ids: Target chat ID string tuple.
+        enabled: Whether Telegram delivery is active.
+        timeout_seconds: HTTP request timeout in seconds.
+    """
 
     bot_token: str
     chat_ids: tuple[str, ...]
@@ -29,11 +36,20 @@ class TelegramNotifier:
     """Deliver formatted messages through Telegram ``sendMessage``."""
 
     def __init__(self, config: TelegramConfig) -> None:
+        """Initialize TelegramNotifier.
+
+        Args:
+            config: Telegram configuration settings.
+        """
         self._config = config
 
     @property
     def active(self) -> bool:
-        """Return whether Telegram delivery is fully configured and enabled."""
+        """Return whether Telegram delivery is fully configured and enabled.
+
+        Returns:
+            True if enabled with non-empty bot token and chat IDs.
+        """
         return self._config.enabled and bool(
             self._config.bot_token and self._config.chat_ids
         )

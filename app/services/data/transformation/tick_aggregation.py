@@ -32,7 +32,15 @@ logger = get_logger(__name__)
 
 
 def _resolve_price(r: TickRecord, policy: str) -> Decimal | None:
-    """Resolve price for a tick based on spread policy."""
+    """Resolve price for a tick based on spread policy.
+
+    Args:
+        r: The ``r`` argument.
+        policy: The ``policy`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _resolve_price")
     if policy == "bid":
         return r.bid
@@ -46,7 +54,17 @@ def _resolve_price(r: TickRecord, policy: str) -> Decimal | None:
 
 
 def _validate_units(records: Sequence[TickRecord]) -> tuple[str, str]:
-    """Validate tick records are homogeneous in units."""
+    """Validate tick records are homogeneous in units.
+
+    Args:
+        records: The ``records`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _validate_units")
     price_units = {r.price_unit for r in records if r.price_unit}
     if len(price_units) > 1:
@@ -236,7 +254,16 @@ def aggregate_ticks_to_bars(
     target_timeframe: str,
     price_policy: str = "last",
 ) -> StandardResponse[MarketDataset]:
-    """Aggregate tick records into custom-timeframe OHLCV bars."""
+    """Aggregate tick records into custom-timeframe OHLCV bars.
+
+    Args:
+        dataset: The ``dataset`` argument.
+        target_timeframe: The ``target_timeframe`` argument.
+        price_policy: The ``price_policy`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Executing public DATA tick aggregation")
     return run_data_operation(
         operation="data.transformation.aggregate_ticks_to_bars",

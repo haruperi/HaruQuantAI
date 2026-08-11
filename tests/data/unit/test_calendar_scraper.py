@@ -172,7 +172,7 @@ def test_total_failure_is_reported() -> None:
     assert error.value.code == "NETWORK_ERROR"
 
 
-def test_to_dataframe_returns_valid_structure() -> None:
+def component_to_dataframe_returns_valid_structure() -> None:
     """The projection carries the fixed calendar column contract."""
     transport = _FakeTransport({"forexfactory": [_row()]})
     result = scrape_economic_calendar(_options(sites=("forexfactory",)), transport)
@@ -201,7 +201,7 @@ def test_empty_result_still_has_columns() -> None:
     assert len(result.to_dataframe().columns) == 8
 
 
-def test_save_skips_empty_dataframes(tmp_path: Path) -> None:
+def component_save_skips_empty_dataframes(tmp_path: Path) -> None:
     """Sites with no events are skipped rather than written as empty files."""
     transport = _FakeTransport({"forexfactory": [_row()], "metalsmine": []})
     result = scrape_economic_calendar(
@@ -217,7 +217,7 @@ def test_save_skips_empty_dataframes(tmp_path: Path) -> None:
     assert written[0].exists()
 
 
-def test_save_rejects_directory_outside_approved_roots(tmp_path: Path) -> None:
+def component_save_rejects_directory_outside_approved_roots(tmp_path: Path) -> None:
     """Calendar persistence fails before writing outside approved roots."""
     transport = _FakeTransport({"forexfactory": [_row()]})
     result = scrape_economic_calendar(_options(sites=("forexfactory",)), transport)

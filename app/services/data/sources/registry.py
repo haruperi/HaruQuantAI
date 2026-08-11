@@ -179,6 +179,9 @@ def update_source_descriptor_readiness(
 
     Returns:
         The updated descriptor.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
     """
     logger.info(
         "Updating descriptor readiness for source %s to %s", source_id, readiness

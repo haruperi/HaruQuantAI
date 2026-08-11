@@ -291,3 +291,10 @@ def test_runtime_load_and_flush_failures_are_normalized(
         lambda *_: (_ for _ in ()).throw(OSError("broken")),
     )
     assert store.flush_journal("run-one").error.code == "SIM_PERSISTENCE_FAILED"
+
+
+def test_delete_persistence_module_export() -> None:
+    """Verify delete persistence module is importable and exports expected symbols."""
+    from app.services.simulator.persistence import delete
+
+    assert isinstance(delete.__all__, list)

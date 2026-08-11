@@ -9,6 +9,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from decimal import Decimal
+
 from app.services.data import (
     build_data_settings,
     build_feed_config,
@@ -16,7 +18,9 @@ from app.services.data import (
     build_market_data_request,
     build_raw_feed_event,
     build_reconnect_policy,
+    build_synthetic_request,
     data_settings_context,
+    generate_synthetic_ticks,
     get_tick_data,
     ingest_feed_event,
     read_feed_status,
@@ -96,9 +100,32 @@ def main() -> None:
             ticks_resp = get_tick_data(
                 _market_request("ticks", timeframe=None, limit=1)
             )
-            ticks = unwrap_data_response(
-                ticks_resp, operation="get_tick_data", request_id=request_id
-            )
+            if ticks_resp.status != "success":
+                syn_req = build_synthetic_request(
+                    symbol="EURUSD",
+                    data_kind="ticks",
+                    timeframe=None,
+                    start=_START,
+                    record_count=1,
+                    method="gbm",
+                    seed=42,
+                    parameters={
+                        "start_val": Decimal("1.10"),
+                        "mu": Decimal("0.02"),
+                        "sigma": Decimal("0.10"),
+                    },
+                    precision_policy="decimal_string",
+                    request_id=request_id,
+                )
+                ticks = unwrap_data_response(
+                    generate_synthetic_ticks(syn_req),
+                    operation="generate_synthetic_ticks",
+                    request_id=syn_req.request_id,
+                )
+            else:
+                ticks = unwrap_data_response(
+                    ticks_resp, operation="get_tick_data", request_id=request_id
+                )
             tick = ticks.records[-1]
 
             # Stage 2 — Start the bounded internal feed runtime.

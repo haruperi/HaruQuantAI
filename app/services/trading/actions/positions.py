@@ -151,6 +151,10 @@ async def close_position(
 ) -> StandardResponse[object]:
     """Close a governed position and return a standard response.
 
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
+
     Returns:
         Standard response containing the raw receipt or an error.
     """
@@ -167,6 +171,10 @@ async def modify_position(
 ) -> StandardResponse[object]:
     """Modify a governed position and return a standard response.
 
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
+
     Returns:
         Standard response containing the raw receipt or an error.
     """
@@ -182,6 +190,10 @@ async def reduce_exposure(
     request: TradingRequest, deps: TradingDependencies
 ) -> StandardResponse[object]:
     """Reduce governed exposure and return a standard response.
+
+    Args:
+        request: Governed trading request envelope.
+        deps: Active trading runtime dependencies.
 
     Returns:
         Standard response containing the raw receipt or an error.

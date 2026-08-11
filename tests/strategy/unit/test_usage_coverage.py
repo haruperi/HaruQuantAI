@@ -29,12 +29,20 @@ _FEATURE_REQUIREMENTS = {
     "signals": ("09_signals.py", {47, 48}),
     "evaluators": ("10_strategy_library.py", set(range(40, 47))),
     "proposal_intake": ("11_proposal_intake.py", set(range(49, 54))),
-    "operating_envelope": (
-        "12_operating_envelope.py",
-        {*range(54, 57), *range(63, 83)},
+    "operating_envelope": ("12_operating_envelope.py", {*range(54, 57)}),
+    "profiles": (
+        "13_profiles.py",
+        {63, 64, 65, 76, 77},
     ),
-    "exit_plans": ("13_exit_plans.py", set(range(57, 60))),
-    "manual_plans": ("14_manual_plans.py", set(range(60, 63))),
+    "playbooks": ("14_playbooks.py", {66, 67, 68}),
+    "setup_evaluation": ("15_setup_evaluation.py", {69, 70, 71}),
+    "trade_plan": (
+        "16_trade_plan.py",
+        {*range(60, 63), *range(72, 76)},
+    ),
+    "management_plan": ("17_management_plan.py", {57, 58, 59}),
+    "automation": ("18_automation.py", {78, 79}),
+    "lifecycle": ("19_lifecycle.py", {80, 81, 82}),
 }
 
 
@@ -51,19 +59,31 @@ def _programs() -> tuple[Path, ...]:
     )
 
 
+def _program_trees() -> dict[Path, ast.AST]:
+    """Parse every usage program once and cache the trees for repeated tests."""
+    return {path: ast.parse(path.read_text(encoding="utf-8")) for path in _programs()}
+
+
+_PROGRAM_TREES = _program_trees()
+
+
+def _calls_in(tree: ast.AST, *, referenced: set[str]) -> None:
+    """Collect every called name from one parsed usage program tree."""
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        if isinstance(node.func, ast.Name):
+            referenced.add(node.func.id)
+        elif isinstance(node.func, ast.Attribute):
+            referenced.add(node.func.attr)
+
+
 def test_every_public_symbol_is_called_in_usage_evidence() -> None:
     """Verify every exported symbol is actually called in a usage program."""
     logger.debug("Testing Strategy usage symbol coverage")
     referenced: set[str] = set()
-    for path in _programs():
-        tree = ast.parse(path.read_text(encoding="utf-8"))
-        for node in ast.walk(tree):
-            if not isinstance(node, ast.Call):
-                continue
-            if isinstance(node.func, ast.Name):
-                referenced.add(node.func.id)
-            elif isinstance(node.func, ast.Attribute):
-                referenced.add(node.func.attr)
+    for tree in _PROGRAM_TREES.values():
+        _calls_in(tree, referenced=referenced)
     missing = sorted(set(strategy.__all__) - referenced)
     assert not missing, f"public symbols without usage evidence: {missing}"
 
@@ -73,7 +93,7 @@ def test_every_requirement_has_one_feature_local_demonstration() -> None:
     logger.debug("Testing Strategy requirement-to-usage mapping")
     observed: set[int] = set()
     for feature, (program_name, expected) in _FEATURE_REQUIREMENTS.items():
-        tree = ast.parse((_USAGE_DIR / program_name).read_text(encoding="utf-8"))
+        tree = _PROGRAM_TREES[_USAGE_DIR / program_name]
         actual = {
             int(node.name.removeprefix("fr_str_"))
             for node in tree.body
@@ -89,8 +109,7 @@ def test_every_requirement_has_one_feature_local_demonstration() -> None:
 def test_usage_programs_import_domain_dependencies_from_package_roots() -> None:
     """Verify usage programs contain no external deep service imports."""
     logger.debug("Testing Strategy usage import boundaries")
-    for path in _programs():
-        tree = ast.parse(path.read_text(encoding="utf-8"))
+    for path, tree in _PROGRAM_TREES.items():
         for node in ast.walk(tree):
             if not isinstance(node, ast.ImportFrom) or node.module is None:
                 continue
@@ -104,8 +123,7 @@ def test_usage_programs_import_domain_dependencies_from_package_roots() -> None:
 def test_every_program_is_a_standalone_main_program() -> None:
     """Verify each program defines main() behind a __main__ guard."""
     logger.debug("Testing Strategy usage program structure")
-    for path in _programs():
-        tree = ast.parse(path.read_text(encoding="utf-8"))
+    for path, tree in _PROGRAM_TREES.items():
         functions = {
             node.name for node in tree.body if isinstance(node, ast.FunctionDef)
         }

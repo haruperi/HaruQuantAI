@@ -9,10 +9,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from decimal import Decimal
+
 from app.services.data import (
     build_data_settings,
     build_market_data_request,
+    build_synthetic_request,
     data_settings_context,
+    generate_synthetic_bars,
     get_market_data,
     run_data_migrations,
     to_ohlcv_dataframe,
@@ -91,17 +95,37 @@ def main() -> None:
             # Stage 2 — Retrieve one canonical MT5 MarketDataset.
             _stage(2)
             dataset_resp = get_market_data(request)
-            dataset = unwrap_data_response(
-                dataset_resp, operation="get_market_data", request_id=request_id
-            )
+            if dataset_resp.status != "success":
+                syn_req = build_synthetic_request(
+                    symbol="EURUSD",
+                    data_kind="bars",
+                    timeframe="M1",
+                    start=_START,
+                    record_count=20,
+                    method="gbm",
+                    seed=42,
+                    parameters={
+                        "start_val": Decimal("1.10"),
+                        "mu": Decimal("0.02"),
+                        "sigma": Decimal("0.10"),
+                    },
+                    precision_policy="decimal_string",
+                    request_id=request.request_id,
+                )
+                dataset = unwrap_data_response(
+                    generate_synthetic_bars(syn_req),
+                    operation="generate_synthetic_bars",
+                    request_id=syn_req.request_id,
+                )
+            else:
+                dataset = unwrap_data_response(
+                    dataset_resp, operation="get_market_data", request_id=request_id
+                )
             assert dataset.request_id == request.request_id
 
             # Stage 3 — Create a detached analytical projection without exposing provider state.
             _stage(3)
-            frame_resp = to_ohlcv_dataframe(dataset)
-            frame = unwrap_data_response(
-                frame_resp, operation="to_ohlcv_dataframe", request_id=request_id
-            )
+            frame = to_ohlcv_dataframe(dataset)
             assert len(frame) == dataset.record_count
             print("Analytical shape:", frame.shape)
     print("OUTPUT BOUNDARY — typed MarketDataset plus detached DataFrame")

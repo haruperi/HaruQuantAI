@@ -56,7 +56,11 @@ _STATEMENTS = (
 
 
 def _checksum() -> str:
-    """Return the immutable statement checksum."""
+    """Return the immutable statement checksum.
+
+    Returns:
+        The result produced by the operation.
+    """
     return hashlib.sha256("\n-- statement --\n".join(_STATEMENTS).encode()).hexdigest()
 
 

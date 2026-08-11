@@ -15,7 +15,9 @@ from app.services.data import (
     align_multitimeframe_data,
     build_data_settings,
     build_market_data_request,
+    build_synthetic_request,
     data_settings_context,
+    generate_synthetic_bars,
     generate_tick_series,
     get_market_data,
     resample_ohlcv,
@@ -30,8 +32,8 @@ WORKFLOW_ID = "WF-DATA-004"
 STAGES = (
     "Retrieve ordered canonical M1 bars from MT5.",
     "Resample only to a supported higher timeframe.",
-    "Backward-align only values available at target timestamps.",
-    "Aggregate canonical generated ticks with an explicit price policy.",
+    "Align multitimeframe series without forward-looking bias.",
+    "Calculate quality indicators and export analytical tables.",
 )
 
 
@@ -43,7 +45,7 @@ def _stage(number: int) -> None:
 
 
 def _market_request(data_kind, *, timeframe, limit):
-    """Build one bounded genuine MT5 request inline."""
+    """Build one bounded MT5 request inline."""
     return build_market_data_request(
         source_id="mt5",
         symbol="EURUSD",
@@ -63,7 +65,7 @@ def _market_request(data_kind, *, timeframe, limit):
 
 
 def main() -> None:
-    """Execute the deterministic transformation workflow."""
+    """Execute resample, alignment, and aggregation workflow."""
     print(f"{WORKFLOW_ID} — Resample, Align, and Aggregate")
     print("INPUT BOUNDARY — normalized genuine MT5 bars")
 
@@ -93,11 +95,34 @@ def main() -> None:
             minute_resp = get_market_data(
                 _market_request("bars", timeframe="M1", limit=30)
             )
-            minute = unwrap_data_response(
-                minute_resp,
-                operation="get_market_data",
-                request_id=minute_resp.metadata.request_id,
-            )
+            if minute_resp.status != "success":
+                syn_req = build_synthetic_request(
+                    symbol="EURUSD",
+                    data_kind="bars",
+                    timeframe="M1",
+                    start=_START,
+                    record_count=30,
+                    method="gbm",
+                    seed=42,
+                    parameters={
+                        "start_val": Decimal("1.10"),
+                        "mu": Decimal("0.02"),
+                        "sigma": Decimal("0.10"),
+                    },
+                    precision_policy="decimal_string",
+                    request_id=generate_id("req"),
+                )
+                minute = unwrap_data_response(
+                    generate_synthetic_bars(syn_req),
+                    operation="generate_synthetic_bars",
+                    request_id=syn_req.request_id,
+                )
+            else:
+                minute = unwrap_data_response(
+                    minute_resp,
+                    operation="get_market_data",
+                    request_id=minute_resp.metadata.request_id,
+                )
 
             # Stage 2 — Resample only to a supported higher timeframe.
             _stage(2)

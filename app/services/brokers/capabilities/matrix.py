@@ -72,7 +72,9 @@ _WRITE = {
 _MT5_DEMO_RELEASED_WRITES = {
     BrokerCapabilityId.CHECK_ORDER,
     BrokerCapabilityId.PLACE_ORDER,
+    BrokerCapabilityId.MODIFY_ORDER,
     BrokerCapabilityId.CANCEL_ORDER,
+    BrokerCapabilityId.MODIFY_POSITION,
     BrokerCapabilityId.CLOSE_POSITION,
 }
 # Operations that mutate provider watch-list or session subscription state

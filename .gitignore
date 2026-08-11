@@ -789,3 +789,7 @@ tests/strategy/usage/signal_audit/
 # SQLite database backup files (created by VACUUM INTO and migration infrastructure)
 data/database/*.bak
 data/database/*.bak_*
+
+# DATA owns this source package; global dataset-artifact exclusions do not apply.
+!app/services/data/datasets/
+!app/services/data/datasets/**

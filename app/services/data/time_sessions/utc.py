@@ -42,6 +42,14 @@ def require_utc(value: datetime) -> StandardResponse[datetime]:
     from app.services.data.contracts.responses import run_data_operation
 
     def _raw() -> datetime:
+        """Validate UTC evidence and translate invalid timestamps.
+
+        Returns:
+            The validated aware UTC timestamp.
+
+        Raises:
+            DataError: If the timestamp is naive or not UTC.
+        """
         try:
             return _require_utc_raw(value)
         except ValueError as error:

@@ -5,6 +5,7 @@ from decimal import Decimal
 
 import pandas as pd
 import pytest
+from app.services.data.alignment.operations import align_datasets
 from app.services.data.contracts import (
     DataError,
     DataQualityReport,
@@ -14,7 +15,6 @@ from app.services.data.contracts import (
     TickRecord,
 )
 from app.services.data.contracts.responses import unwrap_data_response
-from app.services.data.transformation.alignment import align_datasets
 from app.services.data.transformation.resampling import resample_dataset
 from app.services.data.transformation.tabular import (
     align_dataframe_datetime,
@@ -256,8 +256,8 @@ def test_tabular_projection_and_serialization() -> None:
     """Project detached frames and serialize supported exact values."""
     bars = _dataset(_bars(), "bars", "M1")
     ticks = _dataset(_ticks(), "ticks", None)
-    bar_frame = _unwrap(to_ohlcv_dataframe(bars))
-    tick_frame = _unwrap(to_tick_dataframe(ticks))
+    bar_frame = to_ohlcv_dataframe(bars)
+    tick_frame = to_tick_dataframe(ticks)
 
     assert bar_frame.attrs["spread_unit"] == "USD"  # type: ignore[union-attr]
     assert tick_frame.attrs["price_unit"] == "USD"  # type: ignore[union-attr]
@@ -317,8 +317,10 @@ def test_tabular_operations_reject_ambiguous_inputs() -> None:
         )
     bars = _dataset(_bars(), "bars", "M1")
     ticks = _dataset(_ticks(), "ticks", None)
-    assert to_ohlcv_dataframe(ticks).status == "error"
-    assert to_tick_dataframe(bars).status == "error"
+    with pytest.raises(DataError):
+        to_ohlcv_dataframe(ticks)
+    with pytest.raises(DataError):
+        to_tick_dataframe(bars)
     with pytest.raises(DataError):
         compare_ohlc(pd.DataFrame({"open": [1]}), pd.DataFrame({"open": [1]}))
     with pytest.raises(DataError):

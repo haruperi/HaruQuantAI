@@ -73,3 +73,25 @@ def test_integrity_failure_and_scored_rewind_fail_closed() -> None:
         branch_recovery_checkpoint(
             checkpoint, practice=False, created_at=datetime.now(UTC)
         )
+
+
+def test_recovery_service_error_paths() -> None:
+    """Test non-existent session and invalid transition error paths in recovery service."""
+    from app.services.simulator import secure_simulation_session
+    from app.services.simulator.recovery.service import persist_recovery_state
+
+    identity = _identity()
+    with pytest.raises(SimulationError, match="not found"):
+        secure_simulation_session(
+            session_id="nonexistent-sess",
+            mode="Standard",
+            replay_identity=identity,
+            state={},
+            request_id="req1",
+        )
+    with pytest.raises(SimulationError, match="not found"):
+        persist_recovery_state(
+            session_id="nonexistent-sess",
+            recovery_state="RUNNING",
+            state={},
+        )

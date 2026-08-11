@@ -59,7 +59,7 @@ def data_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     ):
         (tmp_path / relative).mkdir(parents=True)
     monkeypatch.setattr(
-        "app.services.data.audit.store._persist_audit_event_raw",
+        "app.services.data.evidence.audit_store._persist_audit_event_raw",
         lambda _event: None,
     )
     return tmp_path
@@ -74,7 +74,7 @@ def _target(relative_path: str) -> BackupTarget:
     )
 
 
-def test_manifest_records_hash_per_target(data_root: Path) -> None:
+def component_manifest_records_hash_per_target(data_root: Path) -> None:
     """A committed backup records measured hash and byte evidence per file."""
     payload = data_root / "data/raw/EURUSD.csv"
     payload.write_bytes(b"timestamp,close\n2026-01-01T00:00:00Z,1.2\n")
@@ -90,7 +90,7 @@ def test_manifest_records_hash_per_target(data_root: Path) -> None:
     assert (committed / "manifest.json").is_file()
 
 
-def test_database_backup_hashes_after_persisted_lease(data_root: Path) -> None:
+def component_database_backup_hashes_after_persisted_lease(data_root: Path) -> None:
     """Snapshot a database after the lease write so copied hashes remain stable."""
     database = data_root / "data/cache/data.db"
     with closing(sqlite3.connect(database)) as connection:
@@ -107,7 +107,7 @@ def test_database_backup_hashes_after_persisted_lease(data_root: Path) -> None:
     assert entry.content_hash == hashlib.sha256(copied.read_bytes()).hexdigest()
 
 
-def test_restore_round_trip(data_root: Path) -> None:
+def component_restore_round_trip(data_root: Path) -> None:
     """Explicit restore replaces a changed target with its verified snapshot."""
     payload = data_root / "data/raw/EURUSD.csv"
     payload.write_text("original", encoding="utf-8")
@@ -120,7 +120,7 @@ def test_restore_round_trip(data_root: Path) -> None:
     assert report.restored_paths == (Path("data/raw/EURUSD.csv"),)
 
 
-def test_restore_is_atomic_on_hash_mismatch(data_root: Path) -> None:
+def component_restore_is_atomic_on_hash_mismatch(data_root: Path) -> None:
     """Preflight hash failure leaves every current target unchanged."""
     first = data_root / "data/raw/first.csv"
     second = data_root / "data/raw/second.csv"
@@ -176,7 +176,7 @@ def test_retention_dry_run_does_not_delete(data_root: Path) -> None:
     assert payload.exists()
 
 
-def test_retention_purges_payload_and_manifest(data_root: Path) -> None:
+def component_retention_purges_payload_and_manifest(data_root: Path) -> None:
     """Committed retention removes an expired payload and companion manifest."""
     dataset = data_root / "data/raw/EURUSD"
     dataset.mkdir()

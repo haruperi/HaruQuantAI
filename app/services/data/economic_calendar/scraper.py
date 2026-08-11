@@ -39,7 +39,14 @@ else:
         """Load pandas only when calendar parsing or projection requires it."""
 
         def __getattr__(self, name: str) -> object:
-            """Resolve one pandas attribute at the runtime operation boundary."""
+            """Resolve one pandas attribute at the runtime operation boundary.
+
+            Args:
+                name: The ``name`` argument.
+
+            Returns:
+                The result produced by the operation.
+            """
             return getattr(import_module("pandas"), name)
 
     pd = _LazyPandas()
@@ -74,7 +81,13 @@ class CalendarTransport(Protocol):
         start: datetime,
         end: datetime,
     ) -> Sequence[Mapping[str, object]]:
-        """Return raw provider rows for one site and UTC window."""
+        """Return raw provider rows for one site and UTC window.
+
+        Args:
+            site: The ``site`` argument.
+            start: The ``start`` argument.
+            end: The ``end`` argument.
+        """
         ...
 
 
@@ -211,13 +224,13 @@ class ScrapeResult:
     def serialize(self) -> bytes:
         """Return a pickled representation of this result.
 
+        Returns:
+            The pickled result bytes.
+
         Note:
             `FR-DATA-099` specifies pickle. Pickle payloads execute arbitrary code
             on load, so only trusted, locally produced bytes may be deserialized.
             Never load a payload received across a trust boundary.
-
-        Returns:
-            The pickled result bytes.
         """
         logger.debug("Serializing a calendar scrape result")
         return pickle.dumps(self)
@@ -252,7 +265,14 @@ class ScrapeResult:
 
 
 def _decimal(value: object) -> Decimal | None:
-    """Return an exact decimal or explicit absence for a raw calendar value."""
+    """Return an exact decimal or explicit absence for a raw calendar value.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     if value is None:
         return None
     text = str(value).strip().replace(",", "")
@@ -273,7 +293,14 @@ def _decimal(value: object) -> Decimal | None:
 
 
 def _raw_value(value: object) -> str | None:
-    """Return the trimmed provider representation or explicit absence."""
+    """Return the trimmed provider representation or explicit absence.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     if value is None:
         return None
     text = str(value).strip()
@@ -288,7 +315,18 @@ def _provider_event_id(
     title: str,
     country: str,
 ) -> str:
-    """Return a provider identifier stable across intraday schedule changes."""
+    """Return a provider identifier stable across intraday schedule changes.
+
+    Args:
+        site: The ``site`` argument.
+        row: The ``row`` argument.
+        timestamp: The ``timestamp`` argument.
+        title: The ``title`` argument.
+        country: The ``country`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     for key in ("provider_event_id", "event_id", "id"):
         value = _raw_value(row.get(key))
         if value is not None:
@@ -298,7 +336,15 @@ def _provider_event_id(
 
 
 def _clean_row(site: str, row: Mapping[str, object]) -> CalendarEvent | None:
-    """Validate one raw row into a canonical event, or discard it."""
+    """Validate one raw row into a canonical event, or discard it.
+
+    Args:
+        site: The ``site`` argument.
+        row: The ``row`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     title = str(row.get("title", "")).strip()
     country = str(row.get("country", "")).strip()
     impact = str(row.get("impact", "")).strip().lower()
@@ -337,7 +383,17 @@ async def _scrape_site(
     transport: CalendarTransport,
     semaphore: asyncio.Semaphore,
 ) -> tuple[str, tuple[CalendarEvent, ...], str | None]:
-    """Fetch and clean one site under the shared concurrency bound."""
+    """Fetch and clean one site under the shared concurrency bound.
+
+    Args:
+        site: The ``site`` argument.
+        options: The ``options`` argument.
+        transport: The ``transport`` argument.
+        semaphore: The ``semaphore`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     async with semaphore:
         logger.info("Scraping economic calendar site %s", site)
         try:
@@ -358,7 +414,15 @@ async def _scrape_site(
 
 
 async def _gather(options: ScrapeOptions, transport: CalendarTransport) -> ScrapeResult:
-    """Run every site scrape concurrently under the declared bound."""
+    """Run every site scrape concurrently under the declared bound.
+
+    Args:
+        options: The ``options`` argument.
+        transport: The ``transport`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     semaphore = asyncio.Semaphore(options.max_parallel_tasks)
     outcomes = await asyncio.gather(
         *(_scrape_site(site, options, transport, semaphore) for site in options.sites)
@@ -421,24 +485,51 @@ def scrape_economic_calendar(
 
 
 def scrape_result_to_dataframe(result: ScrapeResult) -> pd.DataFrame:
-    """Project a scrape result through the public function boundary."""
+    """Project a scrape result through the public function boundary.
+
+    Args:
+        result: The ``result`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return result.to_dataframe()
 
 
 def save_scrape_result(
     result: ScrapeResult, directory: Path, file_format: str = "csv"
 ) -> None:
-    """Persist a scrape result through the public function boundary."""
+    """Persist a scrape result through the public function boundary.
+
+    Args:
+        result: The ``result`` argument.
+        directory: The ``directory`` argument.
+        file_format: The ``file_format`` argument.
+    """
     result.save(directory, file_format)
 
 
 def serialize_scrape_result(result: ScrapeResult) -> bytes:
-    """Serialize a scrape result through the public function boundary."""
+    """Serialize a scrape result through the public function boundary.
+
+    Args:
+        result: The ``result`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return result.serialize()
 
 
 def deserialize_scrape_result(payload: bytes) -> ScrapeResult:
-    """Deserialize a trusted scrape result through the public boundary."""
+    """Deserialize a trusted scrape result through the public boundary.
+
+    Args:
+        payload: The ``payload`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return ScrapeResult.deserialize(payload)
 
 

@@ -4,7 +4,7 @@ feature programme extends this feature with `measure_trend_strength` and
 `project_structural_levels`. They project strategy-independent causal evidence;
 Risk remains the authoritative regime-policy owner.
 
-This module owns `FEAT-INDI-03`: EMA, SMA, WMA, Hull MA, Bollinger Bands, ADX,
+This module owns `FEAT-INDI-02`: EMA, SMA, WMA, Hull MA, Bollinger Bands, ADX,
 and causal confirmed-pivot ZigZag calculations. Each production file implements
 one official indicator.
 

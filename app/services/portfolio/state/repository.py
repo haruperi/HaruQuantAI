@@ -35,7 +35,6 @@ class PortfolioStateStore(Protocol):
         Args:
             result: Immutable construction result.
             audit_record: Redacted audit outbox record.
-
         """
         del result, audit_record
         logger.debug("Calling Portfolio construction persistence port")
@@ -85,7 +84,6 @@ class PortfolioStateStore(Protocol):
             expected_revision: Caller-observed active-scope revision.
             material_hash: Canonical idempotency material digest.
             audit_record: Redacted audit outbox record.
-
         """
         del (
             allocation,
@@ -107,7 +105,6 @@ class PortfolioStateStore(Protocol):
         Args:
             plan: Immutable rebalance plan.
             audit_record: Redacted audit outbox record.
-
         """
         del plan, audit_record
         logger.debug("Calling Portfolio plan persistence port")
@@ -123,7 +120,6 @@ class PortfolioStateStore(Protocol):
         Args:
             portfolio_id: Portfolio identity.
             scope_key: Canonical governed scope.
-
         """
         del portfolio_id, scope_key
         logger.debug("Calling Portfolio active allocation read port")
@@ -139,7 +135,6 @@ class PortfolioStateStore(Protocol):
         Args:
             portfolio_id: Portfolio identity.
             allocation_version: Exact allocation version.
-
         """
         del portfolio_id, allocation_version
         logger.debug("Calling Portfolio allocation-version read port")
@@ -150,7 +145,6 @@ class PortfolioStateStore(Protocol):
 
         Args:
             portfolio_id: Portfolio identity.
-
         """
         del portfolio_id
         logger.debug("Calling Portfolio allocation history read port")
@@ -166,7 +160,6 @@ class PortfolioStateStore(Protocol):
         Args:
             plan_id: Plan identity.
             plan_version: Exact version or ``None`` for latest.
-
         """
         del plan_id, plan_version
         logger.debug("Calling Portfolio rebalance plan read port")

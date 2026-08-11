@@ -97,7 +97,16 @@ def _matches_scope(
     currencies: Sequence[str] | None,
     countries: Sequence[str] | None,
 ) -> bool:
-    """Return whether an event matches any supplied relevance dimension."""
+    """Return whether an event matches any supplied relevance dimension.
+
+    Args:
+        event: The ``event`` argument.
+        currencies: The ``currencies`` argument.
+        countries: The ``countries`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     if currencies is None and countries is None:
         return True
     currency_match = (
@@ -114,7 +123,15 @@ def _matches_scope(
 
 
 def _currency_for(country: str | None, currency: str | None) -> str | None:
-    """Return the trusted currency, the slot's currency alias, or the dominant one."""
+    """Return the trusted currency, the slot's currency alias, or the dominant one.
+
+    Args:
+        country: The ``country`` argument.
+        currency: The ``currency`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     if currency:
         return currency
     if country is None:
@@ -127,12 +144,26 @@ def _currency_for(country: str | None, currency: str | None) -> str | None:
 
 
 def _event_id(event: CalendarEvent) -> str:
-    """Return the provider-stable event identifier."""
+    """Return the provider-stable event identifier.
+
+    Args:
+        event: The ``event`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return event.provider_event_id
 
 
 def _unit(*values: str | None) -> str | None:
-    """Infer a provider unit suffix without changing the raw representation."""
+    """Infer a provider unit suffix without changing the raw representation.
+
+    Args:
+        values: The ``values`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     for value in values:
         if value is None:
             continue
@@ -145,7 +176,15 @@ def _unit(*values: str | None) -> str | None:
 
 
 def _normalize(site: str, event: CalendarEvent) -> EconomicEvent:
-    """Map one scraped `CalendarEvent` to a normalized `EconomicEvent`."""
+    """Map one scraped `CalendarEvent` to a normalized `EconomicEvent`.
+
+    Args:
+        site: The ``site`` argument.
+        event: The ``event`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     raw_country = event.country.strip().upper() if event.country else None
     # Some portals put the currency code (USD, EUR) in the country slot. We
     # detect that and split it back out: a real currency code populates
@@ -217,7 +256,15 @@ class CalendarScrapeProvider:
         self._request_id = request_id
 
     async def _scrape(self, start: datetime, end: datetime) -> ScrapeResult:
-        """Run the legacy synchronous scraper on a fresh event loop."""
+        """Run the legacy synchronous scraper on a fresh event loop.
+
+        Args:
+            start: The ``start`` argument.
+            end: The ``end`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         options = ScrapeOptions(
             start=start,
             end=end,
@@ -241,7 +288,21 @@ class CalendarScrapeProvider:
         countries: Sequence[str] | None = None,
         minimum_impact: EventImpact | None = None,
     ) -> list[EconomicEvent]:
-        """Retrieve and normalize calendar events for the supplied window."""
+        """Retrieve and normalize calendar events for the supplied window.
+
+        Args:
+            start: The ``start`` argument.
+            end: The ``end`` argument.
+            currencies: The ``currencies`` argument.
+            countries: The ``countries`` argument.
+            minimum_impact: The ``minimum_impact`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            DataError: If the operation cannot be completed safely.
+        """
         if (
             start.tzinfo is None
             or end.tzinfo is None

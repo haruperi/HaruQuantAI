@@ -1,0 +1,176 @@
+"""Volume acceleration calculator."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, cast
+
+import numpy as np
+import pandas as pd
+
+from app.services.indicators.core.contracts import IndicatorConfig
+from app.services.indicators.core.errors import (
+    IndicatorError,
+    IndicatorErrorCode,
+    _unwrap_indicator_response,
+    guard_public_boundary,
+)
+from app.services.indicators.core.results import build_indicator_result
+from app.services.indicators.core.validation import validate_indicator
+from app.utils import get_logger
+
+logger = get_logger(__name__)
+
+if TYPE_CHECKING:
+    from app.services.indicators.core.contracts import (
+        _MarketDataset as MarketDataset,
+    )
+    from app.services.indicators.core.contracts import (
+        _OHLCVRecord as OHLCVRecord,
+    )
+    from app.services.indicators.core.results import IndicatorResult
+
+_FORMULA_VERSION = "1.0.0"
+_INDICATOR_VERSION = "1.0.0"
+_EPSILON = 1e-9
+
+
+def _build_config(
+    window: int, k: int, unit_seconds: float, config: IndicatorConfig | None
+) -> IndicatorConfig:
+    """Build or validate the immutable volume-acceleration configuration.
+
+    Args:
+        window: The window value.
+        k: The k value.
+        unit_seconds: The unit seconds value.
+        config: The config value.
+
+    Returns:
+        The IndicatorConfig result.
+
+    Raises:
+        IndicatorError: If the operation cannot complete.
+    """
+    expected = IndicatorConfig(
+        indicator_id="volume_acceleration",
+        parameters=(("k", k), ("unit_seconds", unit_seconds), ("window", window)),
+        source=None,
+        formula_version=_FORMULA_VERSION,
+        output_mode="values",
+        column_conflict_policy="error",
+        precision_dtype="float64",
+        availability_policy="source_available_at",
+        quality_policy="propagate_dataset",
+        error_mode="raise",
+    )
+    if config is None:
+        return expected
+    if (
+        config.indicator_id != expected.indicator_id
+        or config.parameters != expected.parameters
+        or config.source is not None
+        or config.formula_version != expected.formula_version
+    ):
+        raise IndicatorError(
+            IndicatorErrorCode.IND_INVALID_CONFIG,
+            "supplied config disagrees with volume_acceleration wrapper arguments",
+            {"indicator_id": "volume_acceleration"},
+        )
+    return config
+
+
+@guard_public_boundary
+def volume_acceleration(
+    data: MarketDataset,
+    *,
+    window: int,
+    k: int,
+    unit_seconds: float,
+    config: IndicatorConfig | None = None,
+) -> IndicatorResult:
+    """Calculate spec ``IND-MS-03`` volume acceleration.
+
+    Args:
+        data: One normalized immutable ``MarketDataset v1``.
+        window: Required rolling activity-volume aggregation window.
+        k: Required lag of at least one bar.
+        unit_seconds: Required positive output time-unit denominator.
+        config: Optional explicit configuration matching the arguments.
+
+    Returns:
+        A deterministic volume-acceleration ``IndicatorResult``.
+
+    Raises:
+        IndicatorError: On validation or atomic calculation failure.
+    """
+    logger.info(
+        "Calculating volume_acceleration for %s (window=%d, k=%d, unit_seconds=%s)",
+        data.symbol,
+        window,
+        k,
+        unit_seconds,
+    )
+    resolved_config = _build_config(window, k, unit_seconds, config)
+    _unwrap_indicator_response(
+        validate_indicator("volume_acceleration", data, resolved_config)
+    )
+    records = cast("tuple[OHLCVRecord, ...]", data.records)
+    index = pd.DatetimeIndex(
+        [record.timestamp for record in records], name="timestamp", tz="UTC"
+    )
+    volume = np.asarray([float(record.volume) for record in records], dtype="float64")
+    row_count = len(records)
+    epoch_seconds = np.array(
+        [ts.timestamp() for ts in [record.timestamp for record in records]],
+        dtype="float64",
+    )
+
+    rolling_volume = (
+        pd.Series(volume, index=index)
+        .rolling(window=window, min_periods=window)
+        .sum()
+        .to_numpy(dtype="float64")
+    )
+    rv_valid = np.isfinite(rolling_volume)
+
+    acceleration = np.full(row_count, np.nan, dtype="float64")
+    is_valid = np.zeros(row_count, dtype=bool)
+    if row_count > k:
+        candidate = rv_valid[k:] & rv_valid[:-k]
+        elapsed = (epoch_seconds[k:] - epoch_seconds[:-k]) / unit_seconds
+        safe_elapsed = np.where(elapsed > 0.0, elapsed, np.nan)
+        log_diff = np.log(rolling_volume[k:] + _EPSILON) - np.log(
+            rolling_volume[:-k] + _EPSILON
+        )
+        computed = log_diff / safe_elapsed
+        acceleration[k:] = np.where(candidate, computed, np.nan)
+        is_valid[k:] = candidate & np.isfinite(acceleration[k:])
+
+    computed_from_start = pd.Series(pd.NaT, index=index, dtype="datetime64[ns, UTC]")
+    computed_from_end = pd.Series(pd.NaT, index=index, dtype="datetime64[ns, UTC]")
+    if is_valid.any():
+        computed_from_start[is_valid] = records[0].timestamp
+        computed_from_end[is_valid] = index[is_valid]
+    available_at = pd.Series([record.available_at for record in records], index=index)
+    cumulative_available = available_at.cummax()
+    available_at[is_valid] = cumulative_available[is_valid]
+    unavailable_reason = pd.Series(pd.NA, index=index, dtype=object)
+    unavailable_reason[~is_valid] = "warmup"
+
+    output_column = f"volume_acceleration_{window}_{k}"
+    return build_indicator_result(
+        data=data,
+        config=resolved_config,
+        indicator_version=_INDICATOR_VERSION,
+        output_columns=(output_column,),
+        output_values=pd.DataFrame(
+            {output_column: np.where(is_valid, acceleration, np.nan)}, index=index
+        ),
+        available_at=available_at,
+        computed_from_start=computed_from_start,
+        computed_from_end=computed_from_end,
+        unavailable_reason=unavailable_reason,
+    )
+
+
+__all__ = ["volume_acceleration"]

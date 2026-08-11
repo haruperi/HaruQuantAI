@@ -30,6 +30,12 @@ class HaruQuantError(Exception):
     """Local safe Trading error base."""
 
     def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
+        """Initialize a local safe Trading error.
+
+        Args:
+            code: Error code string.
+            detail: Diagnostic detail message.
+        """
         self.code = code
         self.detail = detail
         super().__init__(f"{code}:{detail}")

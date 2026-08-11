@@ -60,7 +60,15 @@ class MarketCalendar(Protocol):
         observed_at: datetime,
         request_id: str,
     ) -> StandardResponse[MarketSchedule]:
-        """Return versioned provider/exchange schedule evidence."""
+        """Return versioned provider/exchange schedule evidence.
+
+        Args:
+            source_id: The ``source_id`` argument.
+            symbol: The ``symbol`` argument.
+            timezone: The ``timezone`` argument.
+            observed_at: The ``observed_at`` argument.
+            request_id: The ``request_id`` argument.
+        """
         ...
 
 
@@ -185,6 +193,17 @@ def schedule_request(
 ) -> ScheduleRequest:
     """Return a typed schedule request from either supported call style.
 
+    Args:
+        request: The ``request`` argument.
+        view: The ``view`` argument.
+        source_id: The ``source_id`` argument.
+        symbol: The ``symbol`` argument.
+        timezone: The ``timezone`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         DataError: If call styles are mixed or validation fails.
     """
@@ -231,6 +250,14 @@ def _get_market_hours_raw(
     request_id: str | None = None,
 ) -> MarketHours:
     """Retrieve market hours using a request or direct keywords.
+
+    Args:
+        request: The ``request`` argument.
+        calendar: The ``calendar`` argument.
+        source_id: The ``source_id`` argument.
+        symbol: The ``symbol`` argument.
+        timezone: The ``timezone`` argument.
+        request_id: The ``request_id`` argument.
 
     Returns:
         Evaluated current authoritative market hours.
@@ -286,6 +313,14 @@ def get_market_hours(
 ) -> StandardResponse[MarketHours]:
     """Retrieve market hours using a request or direct keywords.
 
+    Args:
+        request: The ``request`` argument.
+        calendar: The ``calendar`` argument.
+        source_id: The ``source_id`` argument.
+        symbol: The ``symbol`` argument.
+        timezone: The ``timezone`` argument.
+        request_id: The ``request_id`` argument.
+
     Returns:
         Standard response carrying evaluated current authoritative market hours.
     """
@@ -319,6 +354,14 @@ def _get_trading_sessions_raw(
     request_id: str | None = None,
 ) -> MarketSchedule:
     """Retrieve trading sessions using a request or direct keywords.
+
+    Args:
+        request: The ``request`` argument.
+        calendar: The ``calendar`` argument.
+        source_id: The ``source_id`` argument.
+        symbol: The ``symbol`` argument.
+        timezone: The ``timezone`` argument.
+        request_id: The ``request_id`` argument.
 
     Returns:
         The current authoritative trading-session schedule.
@@ -359,6 +402,14 @@ def get_trading_sessions(
     request_id: str | None = None,
 ) -> StandardResponse[MarketSchedule]:
     """Retrieve trading sessions using a request or direct keywords.
+
+    Args:
+        request: The ``request`` argument.
+        calendar: The ``calendar`` argument.
+        source_id: The ``source_id`` argument.
+        symbol: The ``symbol`` argument.
+        timezone: The ``timezone`` argument.
+        request_id: The ``request_id`` argument.
 
     Returns:
         Standard response carrying the current authoritative trading-session schedule.

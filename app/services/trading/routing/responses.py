@@ -286,6 +286,10 @@ def classify_authority_response(
 ) -> StandardResponse[ExecutionReceipt]:
     """Classify an authority response into standard response data.
 
+    Args:
+        raw: Raw broker/simulator response payload or mapping.
+        capability: Provider route capability specification.
+
     Returns:
         Standard response containing the raw execution receipt.
     """

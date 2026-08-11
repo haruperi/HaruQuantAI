@@ -316,7 +316,7 @@ def runtime(
         "app.services.data.sources.registry._instances",
         "app.services.data.sources.registry._identities",
         "app.services.data.sources.policy._policy_configs",
-        "app.services.data.realtime_feeds.state._ACTIVE_FEEDS",
+        "app.services.data.market_events.state._ACTIVE_FEEDS",
     ):
         monkeypatch.setattr(target, {})
     return build_data_settings(
@@ -653,7 +653,7 @@ def test_wf_data_009_discovers_metadata_and_measures_local_availability(
                 )
             )
         )
-        analytical = _unwrap(to_ohlcv_dataframe(history))
+        analytical = to_ohlcv_dataframe(history)
         availability = _unwrap(
             get_data_availability(
                 build_availability_request(

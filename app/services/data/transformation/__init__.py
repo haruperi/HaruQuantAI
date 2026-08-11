@@ -7,10 +7,6 @@ trustworthiness of the observations behind it. A caller needing post-transform
 evidence asks ``quality`` for it explicitly.
 """
 
-from app.services.data.transformation.alignment import (
-    align_datasets,
-    align_multitimeframe_data,
-)
 from app.services.data.transformation.resampling import resample_dataset, resample_ohlcv
 from app.services.data.transformation.tabular import (
     to_ohlcv_dataframe,
@@ -20,12 +16,16 @@ from app.services.data.transformation.tick_aggregation import (
     aggregate_ticks,
     aggregate_ticks_to_bars,
 )
+from app.services.data.transformation.tick_derivation import (
+    generate_tick_series,
+    generate_tick_series_to_parquet,
+)
 
 __all__ = [
     "aggregate_ticks",
     "aggregate_ticks_to_bars",
-    "align_datasets",
-    "align_multitimeframe_data",
+    "generate_tick_series",
+    "generate_tick_series_to_parquet",
     "resample_dataset",
     "resample_ohlcv",
     "to_ohlcv_dataframe",

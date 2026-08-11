@@ -7,12 +7,12 @@ from decimal import Decimal
 
 from app.services.data.contracts import OHLCVRecord, TickRecord
 from app.services.data.contracts.responses import unwrap_data_response
-from app.services.data.quality import (
+from app.services.data.integrity import (
     get_quality_policy,
     inspect_records_quality,
     summarize_quality_remediation,
 )
-from app.services.data.quality.policy import QUALITY_PROFILE_THRESHOLDS
+from app.services.data.integrity.policy import QUALITY_PROFILE_THRESHOLDS
 from app.services.data.time_sessions.contracts import SessionWindow
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)

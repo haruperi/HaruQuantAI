@@ -327,7 +327,18 @@ DATA_ERROR_MANIFEST: Mapping[str, ErrorDefinition] = MappingProxyType(
 def _validate_safe_details(
     details: Mapping[str, JsonScalar] | None,
 ) -> Mapping[str, JsonScalar]:
-    """Validate and freeze flat boundary-safe error details."""
+    """Validate and freeze flat boundary-safe error details.
+
+    Args:
+        details: The ``details`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        TypeError: If the operation cannot be completed safely.
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Validating redacted Data error details")
     if details is None:
         return MappingProxyType({})

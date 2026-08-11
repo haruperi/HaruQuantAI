@@ -553,9 +553,9 @@ def test_resolve_request_id_rejects_invalid_explicit() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_operation_registry_covers_142_candidates() -> None:
-    """The static registry carries the 142 qualifying Data operations."""
-    assert len(OPERATION_TRAITS) == 142
+def test_operation_registry_covers_141_candidates() -> None:
+    """The static registry carries the 141 qualifying Data operations."""
+    assert len(OPERATION_TRAITS) == 141
 
 
 def test_every_trait_is_immutable_instance() -> None:

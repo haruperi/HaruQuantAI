@@ -22,7 +22,17 @@ type PrecisionPolicy = Literal[
 
 
 def _text(value: str) -> str:
-    """Validate one required trimmed string."""
+    """Validate one required trimmed string.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     if not value or value != value.strip():
         raise ValueError("value must be a non-empty trimmed string")
     return value
@@ -45,25 +55,56 @@ class SyntheticRequest(TracedOpenContract):
     @field_validator("symbol", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one required request field."""
+        """Validate one required request field.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return _text(value)
 
     @field_validator("timeframe")
     @classmethod
     def _validate_timeframe(cls, value: str | None) -> str | None:
-        """Validate the optional timeframe."""
+        """Validate the optional timeframe.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return None if value is None else _text(value)
 
     @field_validator("start")
     @classmethod
     def _validate_start(cls, value: datetime) -> datetime:
-        """Validate the generation start as aware UTC."""
+        """Validate the generation start as aware UTC.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return require_utc(value)
 
     @field_validator("record_count")
     @classmethod
     def _validate_count(cls, value: int) -> int:
-        """Validate the positive record bound."""
+        """Validate the positive record bound.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         if value <= 0:
             raise ValueError("record_count must be positive")
         return value
@@ -71,7 +112,17 @@ class SyntheticRequest(TracedOpenContract):
     @field_validator("parameters", mode="after")
     @classmethod
     def _freeze_parameters(cls, value: Mapping[str, Decimal]) -> Mapping[str, Decimal]:
-        """Validate and freeze exact generation parameters."""
+        """Validate and freeze exact generation parameters.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         validated: dict[str, Decimal] = {}
         for key, item in value.items():
             if not item.is_finite():
@@ -81,7 +132,14 @@ class SyntheticRequest(TracedOpenContract):
 
     @model_validator(mode="after")
     def _validate_synthetic_request(self) -> SyntheticRequest:
-        """Validate kind, timeframe, and precision relationships."""
+        """Validate kind, timeframe, and precision relationships.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         if self.data_kind == "bars" and self.timeframe is None:
             raise ValueError("synthetic bars require timeframe")
         if self.precision_policy == "float_research_only":
@@ -90,7 +148,14 @@ class SyntheticRequest(TracedOpenContract):
 
     @field_serializer("parameters", when_used="json")
     def _serialize_parameters(self, value: Mapping[str, Decimal]) -> dict[str, str]:
-        """Serialize generation parameters deterministically."""
+        """Serialize generation parameters deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         return {key: str(item) for key, item in value.items()}
 
 

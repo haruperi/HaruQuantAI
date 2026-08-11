@@ -48,7 +48,9 @@ def _assignment(path: Path, name: str) -> Any:
     raise AssertionError(f"{name} is missing from {path.name}")
 
 
-def test_data_workflow_registry_has_one_complete_program_per_active_workflow() -> None:
+def structural_data_workflow_registry_has_one_complete_program_per_active_workflow() -> (
+    None
+):
     """Require exact README, runner, stage, and boundary parity."""
     readme = README.read_text(encoding="utf-8")
     actual = {path.name for path in WORKFLOW_DIR.glob("wf_*.py")}

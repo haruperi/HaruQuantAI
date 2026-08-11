@@ -41,14 +41,21 @@ if TYPE_CHECKING:
     import pandas as pd
 
     from app.services.data.contracts.dataset import CanonicalRecord
-    from app.services.data.local_datasets.contracts import DatasetLoadRequest
+    from app.services.data.datasets.contracts import DatasetLoadRequest
 else:
 
     class _LazyPandas:
         """Load pandas only when a dataset operation requires it."""
 
         def __getattr__(self, name: str) -> object:
-            """Resolve one pandas attribute at the runtime operation boundary."""
+            """Resolve one pandas attribute at the runtime operation boundary.
+
+            Args:
+                name: The ``name`` argument.
+
+            Returns:
+                The result produced by the operation.
+            """
             return getattr(import_module("pandas"), name)
 
     pd = _LazyPandas()
@@ -57,7 +64,17 @@ _APPROVED_ROOTS = "APPROVED_STORAGE_ROOTS"
 
 
 def _resolve_data_dir(request_id: str) -> Path:
-    """Resolve and validate the configured DATA_DIR."""
+    """Resolve and validate the configured DATA_DIR.
+
+    Args:
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Resolving configured DATA dataset directory")
     try:
         data_dir = get_data_settings().data_dir
@@ -83,7 +100,18 @@ def _resolve_data_dir(request_id: str) -> Path:
 
 
 def _resolve_approved_roots(data_dir: Path, request_id: str) -> list[Path]:
-    """Resolve the list of absolute approved storage roots."""
+    """Resolve the list of absolute approved storage roots.
+
+    Args:
+        data_dir: The ``data_dir`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Resolving approved DATA storage roots")
     try:
         roots_list = get_data_settings().approved_storage_roots
@@ -111,7 +139,19 @@ def _resolve_approved_roots(data_dir: Path, request_id: str) -> list[Path]:
 def _validate_path(
     target_path: Path, approved_roots: list[Path], request_id: str
 ) -> Path:
-    """Validate that the target path resolved is strictly under an approved root."""
+    """Validate that the target path resolved is strictly under an approved root.
+
+    Args:
+        target_path: The ``target_path`` argument.
+        approved_roots: The ``approved_roots`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Validating a DATA storage path against approved roots")
     resolved = target_path.resolve()
     for root in approved_roots:
@@ -128,7 +168,14 @@ def _validate_path(
 
 
 def _compute_sha256(file_path: Path) -> str:
-    """Compute the SHA256 checksum of a file."""
+    """Compute the SHA256 checksum of a file.
+
+    Args:
+        file_path: The ``file_path`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Computing a DATA artifact content hash")
     sha256 = hashlib.sha256()
     with file_path.open("rb") as f:
@@ -205,7 +252,15 @@ def resolve_approved_storage_path(relative_path: Path, request_id: str) -> Path:
 def _check_overwrite_and_quality(
     request: DatasetSaveRequest, absolute_path: Path
 ) -> None:
-    """Check overwrite permissions and dataset quality status."""
+    """Check overwrite permissions and dataset quality status.
+
+    Args:
+        request: The ``request`` argument.
+        absolute_path: The ``absolute_path`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Checking DATA overwrite and quality policy")
     if absolute_path.exists() and not request.overwrite:
         raise DataError(
@@ -232,7 +287,14 @@ def _check_overwrite_and_quality(
 
 
 def _serialize_to_dataframe(dataset: MarketDataset) -> pd.DataFrame:
-    """Serialize market dataset records to a pandas DataFrame."""
+    """Serialize market dataset records to a pandas DataFrame.
+
+    Args:
+        dataset: The ``dataset`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Serializing canonical records to a private DataFrame")
     rows = []
     for rec in dataset.records:
@@ -251,7 +313,21 @@ def _atomic_write_dataset(
     manifest_path: Path,
     clock: Any | None,
 ) -> StorageManifest:
-    """Write DataFrame and manifest to temporary files, then atomic rename."""
+    """Write DataFrame and manifest to temporary files, then atomic rename.
+
+    Args:
+        df: The ``df`` argument.
+        request: The ``request`` argument.
+        absolute_path: The ``absolute_path`` argument.
+        manifest_path: The ``manifest_path`` argument.
+        clock: The ``clock`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        Exception: If the operation cannot be completed safely.
+    """
     logger.info("Writing a DATA artifact and manifest atomically")
     temp_data_path = absolute_path.with_name(
         f"{absolute_path.name}.{request.request_id}.tmp"
@@ -372,7 +448,7 @@ def _save_dataset_raw(
             )
             # The sidecar is authoritative; the catalog is its rebuildable index.
             # Registration occurs only after both files have committed and hashed.
-            from app.services.data.artifact_catalog.operations import (
+            from app.services.data.datasets.catalog import (
                 register_catalog_artifact,
             )
 
@@ -419,7 +495,16 @@ def save_dataset(
 def _verify_manifest_integrity(
     absolute_path: Path, manifest: StorageManifest, request_id: str
 ) -> None:
-    """Verify the content hash of the dataset matches the manifest."""
+    """Verify the content hash of the dataset matches the manifest.
+
+    Args:
+        absolute_path: The ``absolute_path`` argument.
+        manifest: The ``manifest`` argument.
+        request_id: The ``request_id`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Verifying DATA artifact integrity against its manifest")
     current_hash = _compute_sha256(absolute_path)
     if current_hash != manifest.content_hash:
@@ -434,7 +519,15 @@ def _verify_manifest_integrity(
 
 
 def _raise_manifest_field_error(field: str, request_id: str) -> None:
-    """Raise deterministic corruption for absent or conflicting manifest evidence."""
+    """Raise deterministic corruption for absent or conflicting manifest evidence.
+
+    Args:
+        field: The ``field`` argument.
+        request_id: The ``request_id`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.error("Required DATA manifest field is invalid: %s", field)
     raise DataError(
         "FILE_CORRUPTED",
@@ -446,7 +539,15 @@ def _raise_manifest_field_error(field: str, request_id: str) -> None:
 def _read_dataframe(
     absolute_path: Path, format_type: Literal["csv", "parquet"]
 ) -> pd.DataFrame:
-    """Read DataFrame from either CSV or Parquet format."""
+    """Read DataFrame from either CSV or Parquet format.
+
+    Args:
+        absolute_path: The ``absolute_path`` argument.
+        format_type: The ``format_type`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Reading a private DATA artifact DataFrame")
     if format_type == "csv":
         return pd.read_csv(absolute_path)
@@ -454,7 +555,15 @@ def _read_dataframe(
 
 
 def _parse_row(row: pd.Series, tz: timezone) -> dict[str, Any]:
-    """Parse a single pandas Series row into Pydantic-compatible dict."""
+    """Parse a single pandas Series row into Pydantic-compatible dict.
+
+    Args:
+        row: The ``row`` argument.
+        tz: The ``tz`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Parsing one private DATA artifact row")
     row_dict: dict[str, Any] = {}
     for col, val in row.items():
@@ -478,7 +587,19 @@ def _parse_dataframe_to_records(
     data_kind: Literal["bars", "ticks", "spreads"],
     request_id: str,
 ) -> list[CanonicalRecord]:
-    """Parse a DataFrame into list of CanonicalRecord objects."""
+    """Parse a DataFrame into list of CanonicalRecord objects.
+
+    Args:
+        df: The ``df`` argument.
+        data_kind: The ``data_kind`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.info("Parsing canonical records from a DATA artifact")
     records: list[CanonicalRecord] = []
     tz = UTC
@@ -627,7 +748,14 @@ def load_dataset(
 
 
 def _save_market_data_raw(request: DatasetSaveRequest) -> StorageManifest:
-    """Atomically commit a normalized dataset to disk with manifest signature."""
+    """Atomically commit a normalized dataset to disk with manifest signature.
+
+    Args:
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Executing public DATA dataset save")
     return _save_dataset_raw(request)
 
@@ -652,7 +780,14 @@ def save_market_data(
 
 
 def _load_local_dataset_raw(request: DatasetLoadRequest) -> MarketDataset:
-    """Atomically read a local CSV/Parquet dataset with checksum verification."""
+    """Atomically read a local CSV/Parquet dataset with checksum verification.
+
+    Args:
+        request: The ``request`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Executing public DATA dataset load")
     return _load_dataset_raw(request)
 

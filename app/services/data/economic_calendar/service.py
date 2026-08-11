@@ -47,14 +47,29 @@ if TYPE_CHECKING:
 
 
 def _default_store() -> EconomicEventStore:
-    """Construct the internal database-backed event store lazily."""
+    """Construct the internal database-backed event store lazily.
+
+    Returns:
+        The result produced by the operation.
+    """
     from app.services.data.economic_calendar.store import EconomicEventStore
 
     return EconomicEventStore()
 
 
 def _require_aware(name: str, value: datetime) -> datetime:
-    """Validate one window bound is timezone-aware UTC."""
+    """Validate one window bound is timezone-aware UTC.
+
+    Args:
+        name: The ``name`` argument.
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         raise DataError("VALIDATION_FAILED", safe_details={"field": name})
     return value
@@ -65,7 +80,16 @@ def _matches_scope(
     currencies: Sequence[str] | None,
     countries: Sequence[str] | None,
 ) -> bool:
-    """Return whether a normalized event matches any supplied scope filter."""
+    """Return whether a normalized event matches any supplied scope filter.
+
+    Args:
+        event: The ``event`` argument.
+        currencies: The ``currencies`` argument.
+        countries: The ``countries`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     if currencies is None and countries is None:
         return True
     return bool(
@@ -94,6 +118,19 @@ async def _get_economic_events_raw(
     request_id: str | None = None,
 ) -> list[EconomicEvent]:
     """Retrieve normalized economic events for a UTC window.
+
+    Args:
+        start: The ``start`` argument.
+        end: The ``end`` argument.
+        provider: The ``provider`` argument.
+        store: The ``store`` argument.
+        currencies: The ``currencies`` argument.
+        countries: The ``countries`` argument.
+        minimum_impact: The ``minimum_impact`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
 
     Raises:
         DataError: If the window is invalid or the provider fails.
@@ -233,6 +270,18 @@ async def _get_symbol_economic_events_raw(
 ) -> list[EconomicEvent]:
     """Retrieve economic events relevant to one tradable symbol.
 
+    Args:
+        symbol: The ``symbol`` argument.
+        start: The ``start`` argument.
+        end: The ``end`` argument.
+        provider: The ``provider`` argument.
+        store: The ``store`` argument.
+        minimum_impact: The ``minimum_impact`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         DataError: If the symbol/profile is unknown or the window is invalid.
     """
@@ -316,6 +365,19 @@ async def _is_news_restricted_raw(
 ) -> bool:
     """Return True when ``at`` falls inside a relevant news-window for ``symbol``.
 
+    Args:
+        symbol: The ``symbol`` argument.
+        at: The ``at`` argument.
+        provider: The ``provider`` argument.
+        store: The ``store`` argument.
+        minutes_before: The ``minutes_before`` argument.
+        minutes_after: The ``minutes_after`` argument.
+        minimum_impact: The ``minimum_impact`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         ValueError: If ``at`` is timezone-naive.
         DataError: If the symbol is unknown or retrieval fails.
@@ -384,7 +446,21 @@ async def is_news_restricted(
     """
 
     def _raw() -> Coroutine[Any, Any, bool]:
+        """Implement raw behavior.
+
+        Returns:
+            The result produced by the operation.
+        """
+
         async def _coro() -> bool:
+            """Evaluate the asynchronous news-restriction request.
+
+            Returns:
+                Whether the supplied instant is news restricted.
+
+            Raises:
+                DataError: If the evaluation time is invalid.
+            """
             try:
                 return await _is_news_restricted_raw(
                     symbol,
@@ -424,6 +500,19 @@ def _get_persisted_events_raw(
     request_id: str | None = None,
 ) -> list[EconomicEvent]:
     """Synchronous read-only accessor over one stored economic-event set.
+
+    Args:
+        start: The ``start`` argument.
+        end: The ``end`` argument.
+        store: The ``store`` argument.
+        currencies: The ``currencies`` argument.
+        countries: The ``countries`` argument.
+        minimum_impact: The ``minimum_impact`` argument.
+        provider: The ``provider`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
 
     Raises:
         DataError: If the window is invalid or the read fails.

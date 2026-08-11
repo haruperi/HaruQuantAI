@@ -1,7 +1,7 @@
 /**
  * Drift test: the frontend client catalog mirrors the backend route inventory.
  *
- * Asserts that `ROUTE_CONTRACTS` in `routes.ts` contains exactly the 81
+ * Asserts that `ROUTE_CONTRACTS` in `routes.ts` contains exactly the 83
  * approved backend-v1 operations with the expected method/path/permission,
  * matching `app/services/api/contracts/catalog.py` (`_KNOWN_ROUTE_CONTRACTS`).
  * A backend route add/remove/rename must be reflected here or this test fails.
@@ -35,6 +35,8 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.settings.credentials.read", method: "GET", path: "/api/v1/settings/credentials", permission: "settings:admin" },
   { id: "api.settings.credentials.update", method: "PUT", path: "/api/v1/settings/credentials/{slot}", permission: "settings:admin" },
   { id: "api.data.symbols", method: "GET", path: "/api/v1/data/symbols", permission: "data:read" },
+  { id: "api.data.markets", method: "GET", path: "/api/v1/data/markets", permission: "data:read" },
+  { id: "api.data.capabilities", method: "GET", path: "/api/v1/data/capabilities", permission: "data:read" },
   { id: "api.data.stream", method: "GET", path: "/api/v1/data/stream", permission: "data:read" },
   { id: "api.indicators.list", method: "GET", path: "/api/v1/indicators", permission: "indicators:read" },
   { id: "api.indicators.capabilities", method: "GET", path: "/api/v1/indicators/capabilities", permission: "indicators:read" },
@@ -141,9 +143,9 @@ const EXPECTED: ReadonlyArray<{
 ];
 
 describe("clients match the backend route catalog", () => {
-  it("has exactly the approved 81 operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(81);
-    expect(ROUTE_CONTRACTS).toHaveLength(81);
+  it("has exactly the approved 83 operations", () => {
+    expect(ROUTE_CONTRACT_COUNT).toBe(83);
+    expect(ROUTE_CONTRACTS).toHaveLength(83);
   });
 
   it("matches every expected id, method, path, and permission", () => {

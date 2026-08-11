@@ -103,6 +103,18 @@ _EXPECTED_EXPORTS.update(
         "to_venue_local",
         "unit_kind_requires_currency",
         "validate_reason_code",
+        "build_desktop_notification_config",
+        "build_email_notification_config",
+        "build_notification_manager_config",
+        "build_sms_notification_config",
+        "build_telegram_notification_config",
+        "close_notification_manager",
+        "create_notification_manager",
+        "get_notification_manager_status",
+        "get_notification_template_names",
+        "register_notification_template",
+        "render_notification_template",
+        "send_notification",
     }
 )
 _FORBIDDEN_IMPORT_ROOTS = {
@@ -223,6 +235,20 @@ _EXPECTED_USAGE_CALLS = {
         "next_uniform",
         "next_int",
         "next_choice",
+    },
+    "15_notifications.py": {
+        "build_desktop_notification_config",
+        "build_email_notification_config",
+        "build_notification_manager_config",
+        "build_sms_notification_config",
+        "build_telegram_notification_config",
+        "close_notification_manager",
+        "create_notification_manager",
+        "get_notification_manager_status",
+        "get_notification_template_names",
+        "register_notification_template",
+        "render_notification_template",
+        "send_notification",
     },
 }
 

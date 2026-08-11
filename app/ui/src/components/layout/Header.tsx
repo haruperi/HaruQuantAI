@@ -15,6 +15,8 @@ import {
   Check,
   FileJson
 } from 'lucide-react';
+import { apiClients, unwrapData } from '@/clients';
+import { formatClockAtOffset, localOffsetMinutes, parseUtcOffset } from './clock';
 
 export const Header: React.FC = () => {
   const {
@@ -38,21 +40,76 @@ export const Header: React.FC = () => {
   } = useTradingStore();
 
   const [currentTime, setCurrentTime] = useState('');
+  const [timeMismatch, setTimeMismatch] = useState(false);
   const [workspaceMenuId, setWorkspaceMenuId] = useState<number | null>(null);
   const [renameWorkspaceId, setRenameWorkspaceId] = useState<number | null>(null);
   const [renameDraft, setRenameDraft] = useState('');
   const [workspaceToast, setWorkspaceToast] = useState('');
 
+  // Configured display timezone from the TIMEZONE system setting. Held in
+  // state so the clock effect can recompute without refetching each tick.
+  // Null/undefined means "use device-local time" (the safe fallback when the
+  // setting is absent, unparseable, or the backend is unreachable).
+  const [tzValue, setTzValue] = useState<string | undefined>(undefined);
+  const [tzLoaded, setTzLoaded] = useState(false);
+
+  useEffect(() => {
+    if (tzLoaded) return;
+    let cancelled = false;
+    void apiClients.settings
+      .readSystem()
+      .then((response) => {
+        if (cancelled) return;
+        const current = unwrapData(response);
+        setTzValue(current.settings.TIMEZONE);
+      })
+      .catch(() => {
+        // Auth failure or backend unreachable: fall back to local time.
+        if (!cancelled) setTzValue(undefined);
+      })
+      .finally(() => {
+        if (!cancelled) setTzLoaded(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [tzLoaded]);
+
   useEffect(() => {
     const updateTime = () => {
+      const parsed = parseUtcOffset(tzValue);
       const now = new Date();
-      const timeStr = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' }).toLowerCase() + ' CDT 07/21/2026';
-      setCurrentTime(timeStr);
+      if (parsed === null) {
+        // No valid configured offset: render device-local time and never flag
+        // a mismatch (there is nothing to compare against).
+        const label = tzValue && tzValue.trim() ? tzValue : `UTC${localOffsetMinutes() / 60 >= 0 ? '+' : ''}${localOffsetMinutes() / 60}`;
+        setCurrentTime(
+          now.toLocaleTimeString('en-US', {
+            hour12: true,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          }).toLowerCase() +
+            ' ' +
+            label +
+            ' ' +
+            now.toLocaleDateString('en-US', {
+              month: '2-digit',
+              day: '2-digit',
+              year: 'numeric',
+            }),
+        );
+        setTimeMismatch(false);
+        return;
+      }
+      const local = localOffsetMinutes();
+      setCurrentTime(formatClockAtOffset(now.getTime(), parsed, tzValue as string));
+      setTimeMismatch(parsed !== local);
     };
     updateTime();
     const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [tzValue]);
 
   const isChallenge = mode === 'challenge';
   const displayFunds = isChallenge ? challengeBalance : practiceBalance;
@@ -148,7 +205,7 @@ export const Header: React.FC = () => {
 
         {/* Right Info, 1-Click Toggle & Profile Badge */}
         <div className="cme-header-actions">
-          <span className="cme-clock-text">
+          <span className={`cme-clock-text${timeMismatch ? ' mismatch' : ''}`}>
             {currentTime}
           </span>
 

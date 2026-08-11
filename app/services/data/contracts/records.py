@@ -19,7 +19,17 @@ logger = get_logger(__name__)
 
 
 def _text(value: str) -> str:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _text")
     if not value or value != value.strip():
         raise ValueError("value must be a non-empty trimmed string")
@@ -27,7 +37,17 @@ def _text(value: str) -> str:
 
 
 def _utc(value: datetime) -> datetime:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _utc")
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         raise ValueError("timestamp must be aware UTC")
@@ -35,7 +55,17 @@ def _utc(value: datetime) -> datetime:
 
 
 def _finite(value: Decimal | None) -> Decimal | None:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _finite")
     if value is not None and not value.is_finite():
         raise ValueError("numeric value must be finite")
@@ -56,20 +86,41 @@ class _Record(BaseModel):
     @field_validator("timestamp", "available_at")
     @classmethod
     def _validate_timestamp(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_timestamp")
         return _utc(value)
 
     @field_validator("source", "source_symbol", "source_revision")
     @classmethod
     def _validate_text(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return None if value is None else _text(value)
 
     @model_validator(mode="after")
     def _validate_availability(self) -> _Record:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_availability")
         if self.available_at < self.timestamp:
             raise ValueError("available_at must not precede timestamp")
@@ -92,7 +143,17 @@ class OHLCVRecord(_Record):
     @field_validator("open", "high", "low", "close", "volume")
     @classmethod
     def _validate_numeric(cls, value: Decimal) -> Decimal:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_numeric")
         validated = _finite(value)
         if validated is None:
@@ -104,6 +165,9 @@ class OHLCVRecord(_Record):
     def _validate_optional_numeric(cls, value: Decimal | None) -> Decimal | None:
         """Validate optional spread evidence.
 
+        Args:
+            value: The ``value`` argument.
+
         Returns:
             The exact finite spread, or None when the provider supplied none.
         """
@@ -113,13 +177,27 @@ class OHLCVRecord(_Record):
     @field_validator("price_unit", "volume_unit", "spread_unit")
     @classmethod
     def _validate_unit(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_unit")
         return None if value is None else _text(value)
 
     @model_validator(mode="after")
     def _validate_ohlcv(self) -> OHLCVRecord:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_ohlcv")
         if self.volume < 0:
             raise ValueError("volume must be non-negative")
@@ -145,7 +223,14 @@ class OHLCVRecord(_Record):
         when_used="json",
     )
     def _serialize_decimal(self, value: Decimal | None) -> str | None:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_decimal")
         return None if value is None else str(value)
 
@@ -173,21 +258,45 @@ class TickRecord(_Record):
     @field_validator("bid", "ask", "last", "volume")
     @classmethod
     def _validate_numeric(cls, value: Decimal | None) -> Decimal | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_numeric")
         return _finite(value)
 
     @field_validator("source_bar_time")
     @classmethod
     def _validate_source_bar_time(cls, value: datetime | None) -> datetime | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_source_bar_time")
         return None if value is None else _utc(value)
 
     @field_validator("tick_index_in_bar")
     @classmethod
     def _validate_tick_index(cls, value: int | None) -> int | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_tick_index")
         if value is not None and value < 0:
             raise ValueError("tick_index_in_bar must be non-negative")
@@ -196,7 +305,17 @@ class TickRecord(_Record):
     @field_validator("bar_phase")
     @classmethod
     def _validate_bar_phase(cls, value: int | None) -> int | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_bar_phase")
         if value is not None and not 0 <= value <= 15:  # noqa: PLR2004
             raise ValueError("bar_phase must be a 4-bit open/high/low/close mask")
@@ -205,13 +324,27 @@ class TickRecord(_Record):
     @field_validator("price_unit", "volume_unit")
     @classmethod
     def _validate_unit(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_unit")
         return None if value is None else _text(value)
 
     @model_validator(mode="after")
     def _validate_tick(self) -> TickRecord:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_tick")
         if self.bid is None and self.ask is None and self.last is None:
             raise ValueError("at least one genuine price must be present")
@@ -225,7 +358,14 @@ class TickRecord(_Record):
 
     @field_serializer("bid", "ask", "last", "volume", when_used="json")
     def _serialize_optional_decimal(self, value: Decimal | None) -> str | None:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_optional_decimal")
         return None if value is None else str(value)
 
@@ -240,7 +380,17 @@ class SpreadRecord(_Record):
     @field_validator("spread")
     @classmethod
     def _validate_spread(cls, value: Decimal) -> Decimal:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_spread")
         validated = _finite(value)
         if validated is None:
@@ -252,14 +402,31 @@ class SpreadRecord(_Record):
     @field_validator("unit")
     @classmethod
     def _validate_unit(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_unit")
         return _text(value)
 
     @field_validator("scale")
     @classmethod
     def _validate_scale(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_scale")
         if value < 0:
             raise ValueError("scale must be non-negative")
@@ -267,7 +434,14 @@ class SpreadRecord(_Record):
 
     @field_serializer("spread", when_used="json")
     def _serialize_spread(self, value: Decimal) -> str:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_spread")
         return str(value)
 

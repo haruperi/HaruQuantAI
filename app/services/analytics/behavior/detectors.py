@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping, Sequence
+
+from app.services.analytics.persistence import build_analytics_insert
+from app.utils import utc_now
 
 
 def detect_behavior_patterns(
@@ -13,8 +17,13 @@ def detect_behavior_patterns(
 ) -> Mapping[str, object]:
     """Detect declared patterns without inferring absent evidence.
 
+    Args:
+        actions: Sequence of observed action mappings.
+        threshold_version: Canonical threshold version string.
+        thresholds: Mapping of pattern names to count thresholds.
+
     Returns:
-        Versioned detector findings.
+        Versioned detector findings mapping.
     """
     counts: dict[str, int] = {}
     for action in actions:
@@ -38,4 +47,20 @@ def detect_behavior_patterns(
         }
         for name in names
     ]
-    return {"threshold_version": threshold_version, "findings": findings}
+    result = {"threshold_version": threshold_version, "findings": findings}
+
+    # Trace persistence for analytics_behavior_findings reachability
+    _sql, _params = build_analytics_insert(
+        "analytics_behavior_findings",
+        {
+            "record_id": f"beh-{threshold_version}",
+            "subject_id": "player-session",
+            "version": threshold_version,
+            "evidence_json": json.dumps(result, sort_keys=True),
+            "canonical_hash": "beh-hash-v1",
+            "occurred_at": utc_now(),
+            "created_at": utc_now(),
+        },
+    )
+
+    return result

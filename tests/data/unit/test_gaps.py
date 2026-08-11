@@ -159,7 +159,7 @@ def test_detect_unexpected_gaps_ignores_a_declared_session_break() -> None:
     Raises:
         AssertionError: If a declared break is reported as missing bars.
     """
-    from app.services.data.quality.anomalies import detect_unexpected_gaps
+    from app.services.data.integrity.anomalies import detect_unexpected_gaps
 
     base = datetime(2024, 1, 8, 9, 0, tzinfo=UTC)
     records = (
@@ -182,7 +182,7 @@ def test_detect_unexpected_gaps_reports_a_gap_during_open_hours() -> None:
     Raises:
         AssertionError: If an anomalous gap is missed.
     """
-    from app.services.data.quality.anomalies import detect_unexpected_gaps
+    from app.services.data.integrity.anomalies import detect_unexpected_gaps
 
     base = datetime(2024, 1, 8, 9, 0, tzinfo=UTC)
     records = (
@@ -202,7 +202,7 @@ def test_detect_unexpected_gaps_needs_a_timeframe() -> None:
     Raises:
         AssertionError: If gaps are reported without a timeframe.
     """
-    from app.services.data.quality.anomalies import detect_unexpected_gaps
+    from app.services.data.integrity.anomalies import detect_unexpected_gaps
 
     base = datetime(2024, 1, 8, 9, 0, tzinfo=UTC)
     records = (_bar(base), _bar(base + timedelta(minutes=30)))

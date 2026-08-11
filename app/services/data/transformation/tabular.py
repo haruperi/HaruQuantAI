@@ -19,12 +19,7 @@ from typing import TYPE_CHECKING, Any
 
 from app.services.data.contracts import DataError
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
-from app.services.data.contracts.responses import (
-    StandardResponse,
-    data_start_time,
-    run_data_operation,
-)
-from app.utils import generate_id, get_logger
+from app.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -39,11 +34,22 @@ else:
         """Load one scientific module only at an analytical operation boundary."""
 
         def __init__(self, module_name: str) -> None:
-            """Retain the module name without importing it."""
+            """Retain the module name without importing it.
+
+            Args:
+                module_name: The ``module_name`` argument.
+            """
             self._module_name = module_name
 
         def __getattr__(self, name: str) -> object:
-            """Resolve one attribute from the lazily imported module."""
+            """Resolve one attribute from the lazily imported module.
+
+            Args:
+                name: The ``name`` argument.
+
+            Returns:
+                The result produced by the operation.
+            """
             return getattr(import_module(self._module_name), name)
 
     np = _LazyScientificModule("numpy")
@@ -57,6 +63,9 @@ _TICK_COLUMNS = ("bid", "ask", "last", "volume")
 
 def _raise_naive_datetime(field: str) -> None:
     """Reject ambiguous timestamps instead of guessing UTC.
+
+    Args:
+        field: The ``field`` argument.
 
     Raises:
         DataError: Always, because the supplied timestamp evidence is ambiguous.
@@ -242,7 +251,7 @@ def _to_ohlcv_dataframe_raw(dataset: MarketDataset) -> pd.DataFrame:
 
 def to_ohlcv_dataframe(
     dataset: MarketDataset,
-) -> StandardResponse[pd.DataFrame]:
+) -> pd.DataFrame:
     """Project one canonical bar dataset to an analytical OHLCV/spread DataFrame.
 
     The returned frame is a new mutable analytical copy. The source
@@ -253,18 +262,15 @@ def to_ohlcv_dataframe(
         dataset: Canonical Data-owned market dataset containing OHLCV bars.
 
     Returns:
-        Standard response carrying a DataFrame with a UTC ``timestamp`` index and
-        float64 ``open``, ``high``, ``low``, ``close``, ``volume``, and
-        ``spread`` columns. The provider-reported spread unit is stored in
-        ``frame.attrs["spread_unit"]``. Genuine missing spread values are
-        represented as ``NaN``.
+        A DataFrame with a UTC ``timestamp`` index and float64 ``open``, ``high``,
+        ``low``, ``close``, ``volume``, and ``spread`` columns. The
+        provider-reported spread unit is stored in ``frame.attrs["spread_unit"]``.
+        Genuine missing spread values are represented as ``NaN``.
+
+    Raises:
+        DataError: If the dataset cannot be projected safely.
     """
-    return run_data_operation(
-        operation="data.transformation.to_ohlcv_dataframe",
-        request_id=generate_id("req"),
-        start_time=data_start_time(),
-        raw=lambda: _to_ohlcv_dataframe_raw(dataset),
-    )
+    return _to_ohlcv_dataframe_raw(dataset)
 
 
 def _to_tick_dataframe_raw(dataset: MarketDataset) -> pd.DataFrame:
@@ -361,7 +367,7 @@ def _to_tick_dataframe_raw(dataset: MarketDataset) -> pd.DataFrame:
 
 def to_tick_dataframe(
     dataset: MarketDataset,
-) -> StandardResponse[pd.DataFrame]:
+) -> pd.DataFrame:
     """Project one canonical tick dataset to an analytical DataFrame.
 
     Genuine missing optional tick values become ``NaN``. The returned frame is a
@@ -372,21 +378,21 @@ def to_tick_dataframe(
         dataset: Canonical Data-owned market dataset containing ticks.
 
     Returns:
-        Standard response carrying a DataFrame with a UTC ``timestamp`` index and
-        float64 ``bid``, ``ask``, ``last``, and ``volume`` columns. Common units
-        are stored in ``frame.attrs["price_unit"]`` and
-        ``frame.attrs["volume_unit"]``.
+        A DataFrame with a UTC ``timestamp`` index and float64 ``bid``, ``ask``,
+        ``last``, and ``volume`` columns. Common units are stored in
+        ``frame.attrs["price_unit"]`` and ``frame.attrs["volume_unit"]``.
+
+    Raises:
+        DataError: If the dataset cannot be projected safely.
     """
-    return run_data_operation(
-        operation="data.transformation.to_tick_dataframe",
-        request_id=generate_id("req"),
-        start_time=data_start_time(),
-        raw=lambda: _to_tick_dataframe_raw(dataset),
-    )
+    return _to_tick_dataframe_raw(dataset)
 
 
 def _serialize_value(val: object) -> object:
     """Serialize one private tabular cell safely for JSON.
+
+    Args:
+        val: The ``val`` argument.
 
     Returns:
         JSON-safe scalar value.

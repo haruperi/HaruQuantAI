@@ -78,7 +78,7 @@ def test_wf_indi_007_volume_distribution_boundary_flow() -> None:
 
     # Stage 1: Introspection & validation
     matrix = unwrap_response(get_capability_matrix())
-    assert len(matrix) == 21
+    assert len(matrix) == 64
 
     # Stage 2: Volume-flow calculations
     cmf_res = unwrap_response(cmf(dataset, period=2))

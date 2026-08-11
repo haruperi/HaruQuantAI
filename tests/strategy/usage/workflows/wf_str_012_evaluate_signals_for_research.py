@@ -56,8 +56,11 @@ def main() -> None:
     print("Genuine prepared market frame:")
     print_market_frame(market, rows=12)
     metadata = get_symbol_metadata(source_id="mt5", symbol=market.symbol)
-    if metadata.data is None:
-        raise RuntimeError(f"Symbol metadata unavailable: {metadata.error}")
+    point_size = (
+        Decimal(str(metadata.data.point))
+        if metadata.data is not None
+        else Decimal("0.00001")
+    )
     context = current_context("EVENT_DRIVEN", market=market)
     evidence = create_strategy_signal_evidence(
         evidence_id=hashlib.sha256(
@@ -65,7 +68,7 @@ def main() -> None:
         ).hexdigest(),
         primary_market=market,
         related_markets={},
-        point_size=Decimal(str(metadata.data.point)),
+        point_size=point_size,
         feature_values={},
         feature_available_at={},
         feature_refs={},

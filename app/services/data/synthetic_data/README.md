@@ -1,4 +1,4 @@
-# Synthetic Data — FEAT-DATA-04
+# Synthetic Data — FEAT-DATA-03
 
 Owns bounded seeded GBM fixture generation and explicit synthetic provenance.
 

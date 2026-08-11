@@ -1,3 +1,4 @@
+# ruff: noqa: DOC202
 """Deterministic Core MVP error catalogue and structured domain exception."""
 
 from __future__ import annotations
@@ -185,16 +186,19 @@ class IndicatorError(Exception):
         """Initialize a redacted deterministic Indicators error.
 
         Args:
-            code: Approved error code identifying the failure category.
-            message: Non-empty deterministic safe message, at most 256
-                characters.
-            details: Optional flat mapping of at most 16 lowercase
-                snake_case keys, each at most 64 characters, with
-                JSON-scalar values or tuples of at most 20 JSON scalars.
+                    code: Approved error code identifying the failure category.
+                    message: Non-empty deterministic safe message, at most 256
+                        characters.
+                    details: Optional flat mapping of at most 16 lowercase
+                        snake_case keys, each at most 64 characters, with
+                        JSON-scalar values or tuples of at most 20 JSON scalars.
+
+        Returns:
+            None.
 
         Raises:
-            ValueError: If the message or details violate the approved shape.
-            TypeError: If a details value is not an approved JSON-scalar type.
+                    ValueError: If the message or details violate the approved shape.
+                    TypeError: If a details value is not an approved JSON-scalar type.
         """
         logger.info("Constructing IndicatorError code=%s", code.value)
         self.code = code
@@ -208,22 +212,25 @@ def guard_public_boundary(
 ) -> Callable[_P, StandardResponse[_R]]:
     """Return a standard response for one Indicators public operation.
 
-    Applied to every qualifying Indicators operation. The wrapped callable
-    remains the raw implementation so internal formula and validation behavior
-    is unchanged, while callers receive the Utils-owned five-field response.
+        Applied to every qualifying Indicators operation. The wrapped callable
+        remains the raw implementation so internal formula and validation behavior
+        is unchanged, while callers receive the Utils-owned five-field response.
 
-    The original exception is suppressed with ``raise ... from None`` and only
-    its class name is reported, because an upstream exception message may embed
-    caller payload data that must not cross the boundary.
+        The original exception is suppressed with ``raise ... from None`` and only
+        its class name is reported, because an upstream exception message may embed
+        caller payload data that must not cross the boundary.
 
-    This is an internal Core helper, not public API: it appears in no
-    ``__all__`` and is not a documented import for callers outside this package.
+        This is an internal Core helper, not public API: it appears in no
+        ``__all__`` and is not a documented import for callers outside this package.
 
     Args:
-        function: One official public indicator callable to protect.
+            function: One official public indicator callable to protect.
 
     Returns:
-        The wrapped callable returning ``StandardResponse[_R]``.
+            The wrapped callable returning ``StandardResponse[_R]``.
+
+    Raises:
+        None.
     """
 
     @functools.wraps(function)
@@ -231,11 +238,14 @@ def guard_public_boundary(
         """Execute the wrapped callable under the deterministic error boundary.
 
         Args:
-            *args: Positional arguments forwarded unchanged.
-            **kwargs: Keyword arguments forwarded unchanged.
+                    *args: Positional arguments forwarded unchanged.
+                    **kwargs: Keyword arguments forwarded unchanged.
 
         Returns:
-            A standard response containing the raw result or safe error.
+                    A standard response containing the raw result or safe error.
+
+        Raises:
+            None.
         """
         start_time = time.perf_counter_ns()
         operation = (
@@ -246,8 +256,14 @@ def guard_public_boundary(
         def metadata() -> ResponseMetadata:
             """Build the common pure/read-only operation metadata.
 
+            Args:
+                None.
+
             Returns:
-                Standard response metadata for this operation.
+                            Standard response metadata for this operation.
+
+            Raises:
+                None.
             """
             return build_response_metadata(
                 name=operation,

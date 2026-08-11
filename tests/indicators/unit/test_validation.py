@@ -129,7 +129,9 @@ def test_validate_indicator_fails_before_formula_execution() -> None:
 def test_validate_indicator_rejects_unknown_indicator() -> None:
     """Precedence 1: an unknown indicator ID is rejected first."""
     assert_error(
-        validate_indicator("macd", _dataset(), _config(indicator_id="macd")),
+        validate_indicator(
+            "unknown_indicator", _dataset(), _config(indicator_id="unknown_indicator")
+        ),
         "IND_UNSUPPORTED_INDICATOR",
     )
 

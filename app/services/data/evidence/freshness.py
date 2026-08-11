@@ -4,7 +4,16 @@ from datetime import datetime, timedelta
 
 
 def is_fresh(available_at: datetime, now: datetime, maximum_age: timedelta) -> bool:
-    """Return whether evidence is UTC-aware, non-future, and within the age bound."""
+    """Return whether evidence is UTC-aware, non-future, and within the age bound.
+
+    Args:
+        available_at: The ``available_at`` argument.
+        now: The ``now`` argument.
+        maximum_age: The ``maximum_age`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     if available_at.tzinfo is None or now.tzinfo is None:
         return False
     age = now - available_at

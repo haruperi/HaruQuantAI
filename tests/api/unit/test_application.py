@@ -1,6 +1,7 @@
 """Tests for canonical application composition and lifecycle."""
 
 from types import SimpleNamespace
+from typing import Any
 
 import pytest
 from app.services.api import (
@@ -9,7 +10,7 @@ from app.services.api import (
     create_api_app,
     get_required_in_process_provider_names,
 )
-from app.services.api.composition import application, lifecycle
+from app.services.api.composition import application, lifecycle, runtime_settings
 from app.services.api.composition.owner_sources import (
     read_audit_events,
     read_dashboard_snapshot,
@@ -46,6 +47,10 @@ def _stub_lifecycle_storage_dependencies(monkeypatch: pytest.MonkeyPatch) -> Non
         "load_runtime_settings_snapshot",
         runtime_settings,
     )
+    monkeypatch.setattr(lifecycle, "activate_runtime_logging", lambda _: None)
+    monkeypatch.setattr(
+        lifecycle, "build_runtime_provider_settings", lambda _: object()
+    )
 
 
 def _in_process_providers() -> dict[str, object]:
@@ -56,6 +61,88 @@ def _in_process_providers() -> dict[str, object]:
     }
 
 
+@pytest.mark.parametrize("level", ["INFO", "ERROR"])
+def test_database_logging_level_is_activated(
+    monkeypatch: pytest.MonkeyPatch,
+    level: str,
+) -> None:
+    """Activate a validated logging level from the global settings snapshot."""
+    configured: list[Any] = []
+    monkeypatch.setattr(
+        runtime_settings,
+        "get_system_settings",
+        lambda **_: SimpleNamespace(settings={"LOG_LEVEL": level}, version=3),
+    )
+    monkeypatch.setattr(runtime_settings, "configure_logging", configured.append)
+
+    snapshot = runtime_settings.load_runtime_settings_snapshot(request_id="req-test")
+    runtime_settings.activate_runtime_logging(snapshot)
+
+    assert len(configured) == 1
+    assert configured[0].level == level
+
+
+def test_database_logging_level_defaults_to_info(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Use the safe INFO bootstrap when the global document omits LOG_LEVEL."""
+    configured: list[Any] = []
+    monkeypatch.setattr(
+        runtime_settings,
+        "get_system_settings",
+        lambda **_: SimpleNamespace(settings={}, version=1),
+    )
+    monkeypatch.setattr(runtime_settings, "configure_logging", configured.append)
+
+    snapshot = runtime_settings.load_runtime_settings_snapshot(request_id="req-test")
+    runtime_settings.activate_runtime_logging(snapshot)
+
+    assert configured[0].level == "INFO"
+
+
+def test_invalid_database_logging_level_blocks_activation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Reject an invalid persisted logging policy without changing handlers."""
+    monkeypatch.setattr(
+        runtime_settings,
+        "get_system_settings",
+        lambda **_: SimpleNamespace(settings={"LOG_LEVEL": "TRACE"}, version=2),
+    )
+    configured: list[Any] = []
+    monkeypatch.setattr(runtime_settings, "configure_logging", configured.append)
+
+    snapshot = runtime_settings.load_runtime_settings_snapshot(request_id="req-test")
+    with pytest.raises(ValueError, match="LOG_LEVEL_INVALID"):
+        runtime_settings.activate_runtime_logging(snapshot)
+    assert configured == []
+
+
+def test_database_provider_settings_are_validated(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Translate only approved global provider values into an opaque snapshot."""
+    monkeypatch.setattr(
+        runtime_settings,
+        "get_system_settings",
+        lambda **_: SimpleNamespace(
+            settings={
+                "MT5_ENABLED": "true",
+                "MT5_TERMINAL_PATH": "terminal64.exe",
+                "APP_NAME": "ignored",
+            },
+            version=4,
+        ),
+    )
+
+    snapshot = runtime_settings.load_runtime_settings_snapshot(request_id="req-test")
+    providers = runtime_settings.build_runtime_provider_settings(snapshot)
+
+    assert providers.mt5_enabled is True
+    assert providers.mt5_terminal_path.get_secret_value() == "terminal64.exe"
+    assert providers.ctrader_enabled is False
+
+
 def test_canonical_app_has_exact_cors_and_route_catalog() -> None:
     """One app exposes every registered route under `/api/v1`."""
     config = build_api_settings(ui_origins=("https://ui.example.test",))
@@ -64,7 +151,7 @@ def test_canonical_app_has_exact_cors_and_route_catalog() -> None:
     assert "/api/v1/auth/login" in paths
     assert "/api/v1/auth/me" in paths
     assert "/api/v1/indicators" in paths
-    assert len(paths) == 76
+    assert len(paths) == 77
     assert "/api/v1/portfolio/{portfolio_id}/activate" in paths
     assert "/api/v1/portfolio/{portfolio_id}/rollback" in paths
     assert "/api/v1/portfolio/{portfolio_id}/drift" in paths
@@ -189,6 +276,36 @@ def test_required_startup_failure_propagates(
 
     with pytest.raises(lifecycle.StartupError):
         asyncio.run(enter_lifespan())
+
+
+def test_invalid_runtime_logging_blocks_startup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Invalid persisted logging policy prevents the API becoming ready."""
+    monkeypatch.setattr(
+        lifecycle,
+        "run_api_migrations",
+        lambda _: SimpleNamespace(status="success", data=object()),
+    )
+    monkeypatch.setattr(
+        lifecycle,
+        "activate_runtime_logging",
+        lambda _: (_ for _ in ()).throw(ValueError("LOG_LEVEL_INVALID")),
+    )
+    app = create_api_app(build_api_settings())
+
+    async def enter_lifespan() -> None:
+        async with lifecycle.lifespan(app):
+            raise AssertionError("invalid logging must prevent serving")
+
+    import asyncio
+
+    with pytest.raises(
+        lifecycle.StartupError,
+        match="API_LOGGING_CONFIGURATION_INVALID",
+    ):
+        asyncio.run(enter_lifespan())
+    assert app.state.api_ready is False
 
 
 def test_simulator_storage_failure_blocks_startup(

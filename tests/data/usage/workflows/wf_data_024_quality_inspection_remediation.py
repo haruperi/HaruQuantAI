@@ -9,10 +9,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from decimal import Decimal
+
 from app.services.data import (
     aggregate_flags,
     build_data_settings,
     build_market_data_request,
+    build_synthetic_request,
     classify_gap,
     data_settings_context,
     detect_extreme_spread_widening,
@@ -20,6 +23,7 @@ from app.services.data import (
     detect_price_jumps,
     detect_timestamp_gaps,
     detect_zero_volume_bars,
+    generate_synthetic_bars,
     get_market_data,
     get_quality_policy,
     inspect_dataset_quality,
@@ -77,7 +81,7 @@ def _report(label: str, status: str, data: object) -> None:
     print(f"{label} data   : {data}")
 
 
-def main() -> None:
+def main() -> None:  # noqa: PLR0915
     """Run the documented standalone quality inspection and remediation workflow."""
     print(f"{WORKFLOW_ID} — Standalone Quality Inspection and Remediation")
     print(
@@ -108,11 +112,35 @@ def main() -> None:
             response = get_market_data(
                 _market_request("bars", timeframe="M1", limit=80)
             )
-            dataset = unwrap_data_response(
-                response,
-                operation="get_market_data",
-                request_id=request_id,
-            )
+            if response.status != "success":
+                end = datetime.now(UTC)
+                syn_req = build_synthetic_request(
+                    symbol="EURUSD",
+                    data_kind="bars",
+                    timeframe="M1",
+                    start=end - timedelta(hours=1),
+                    record_count=80,
+                    method="gbm",
+                    seed=42,
+                    parameters={
+                        "start_val": Decimal("1.10"),
+                        "mu": Decimal("0.02"),
+                        "sigma": Decimal("0.10"),
+                    },
+                    precision_policy="decimal_string",
+                    request_id=request_id,
+                )
+                dataset = unwrap_data_response(
+                    generate_synthetic_bars(syn_req),
+                    operation="generate_synthetic_bars",
+                    request_id=syn_req.request_id,
+                )
+            else:
+                dataset = unwrap_data_response(
+                    response,
+                    operation="get_market_data",
+                    request_id=request_id,
+                )
             print(
                 "Dataset:",
                 dataset.symbol,

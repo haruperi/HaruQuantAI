@@ -11,14 +11,14 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
-from app.services.data.audit import (
+from app.services.data import (
     persist_audit_event,
     query_audit_events,
 )
-from app.services.data.audit.contracts import (
+from app.services.data.contracts.responses import unwrap_data_response
+from app.services.data.evidence.audit_contracts import (
     AuditEventQuery,
 )
-from app.services.data.contracts.responses import unwrap_data_response
 from app.utils import create_audit_event, create_auth_context, generate_id
 from app.utils.contracts.auth import AuthContext
 
@@ -237,7 +237,7 @@ def test_persist_audit_uncommitted_transaction_error(
     """Verify that DB_WRITE_FAILED is raised if the commit fails."""
     _configure_audit(monkeypatch, tmp_path)
 
-    import app.services.data.audit.store as audit_mod
+    import app.services.data.evidence.audit_store as audit_mod
     from app.services.data.persistence.contracts import TransactionResult
 
     def mock_execute(*args, **kwargs):
@@ -264,7 +264,7 @@ def test_persist_audit_exception_mapping(
     """Verify database write exception mapping in persist_audit_event."""
     _configure_audit(monkeypatch, tmp_path)
 
-    import app.services.data.audit.store as audit_mod
+    import app.services.data.evidence.audit_store as audit_mod
 
     def mock_execute(*args, **kwargs):
         raise ValueError("Mock write database error")
@@ -284,7 +284,7 @@ def test_query_audit_exception_mapping(
     """Verify database query exception mapping in query_audit_events."""
     _configure_audit(monkeypatch, tmp_path)
 
-    import app.services.data.audit.query as audit_mod
+    import app.services.data.evidence.audit_query as audit_mod
 
     def mock_execute(*args, **kwargs):
         raise ValueError("Mock query database error")

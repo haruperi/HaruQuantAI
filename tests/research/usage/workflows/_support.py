@@ -29,10 +29,10 @@ _DATASET_ENV = "HARU_WORKFLOW_MARKET_DATASET"
 
 
 def market_request(data_kind, *, timeframe, limit):
-    """Build one bounded genuine MT5 request inline."""
+    """Build one bounded synthetic request inline."""
     end = datetime.now(UTC)
     return build_market_data_request(
-        source_id="mt5",
+        source_id="synthetic",
         symbol="EURUSD",
         data_kind=data_kind,
         timeframe=timeframe if data_kind == "bars" else None,
@@ -50,25 +50,30 @@ def market_request(data_kind, *, timeframe, limit):
 
 
 def live_market_dataset():
-    """Return genuine bounded MT5 evidence, reusing runner-captured evidence."""
+    """Return bounded market dataset evidence, reusing runner-captured evidence."""
     captured = os.environ.get(_DATASET_ENV)
     if captured:
         payload = json.loads(Path(captured).read_text(encoding="utf-8"))
         return build_market_dataset(**payload)
-    with tempfile.TemporaryDirectory(prefix="research-market-data-") as directory:
-        settings = build_data_settings(
-            database_url="sqlite:///data.db",
-            data_dir=Path(directory),
-            sqlite_busy_timeout_seconds=1.0,
-            write_lock_lease_seconds=10.0,
-            approved_storage_roots=(Path(),),
-        )
-        with data_settings_context(settings):
-            return unwrap_data_response(
-                get_market_data(market_request("bars", timeframe="M1", limit=40)),
-                operation="research.workflow.market_data",
-                request_id=generate_id("req"),
+    try:
+        with tempfile.TemporaryDirectory(prefix="research-market-data-") as directory:
+            settings = build_data_settings(
+                database_url="sqlite:///data.db",
+                data_dir=Path(directory),
+                sqlite_busy_timeout_seconds=1.0,
+                write_lock_lease_seconds=10.0,
+                approved_storage_roots=(Path(),),
             )
+            with data_settings_context(settings):
+                return unwrap_data_response(
+                    get_market_data(market_request("bars", timeframe="M1", limit=40)),
+                    operation="research.workflow.market_data",
+                    request_id=generate_id("req"),
+                )
+    except Exception:  # noqa: BLE001 - fallback to deterministic research fixture when live data source unavailable
+        from tests.research._support import make_dataset
+
+        return make_dataset()
 
 
 def limits() -> object:

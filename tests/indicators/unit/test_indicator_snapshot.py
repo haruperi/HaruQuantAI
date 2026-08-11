@@ -1,6 +1,10 @@
 from datetime import UTC, datetime
 
-from app.services.indicators import build_indicator_snapshot, parse_indicator_snapshot
+from app.services.indicators import (
+    build_indicator_snapshot,
+    parse_indicator_snapshot,
+)
+from app.services.indicators.snapshots.snapshot import evaluate_publication_state
 
 NOW = datetime(2026, 1, 1, 12, tzinfo=UTC)
 
@@ -66,3 +70,28 @@ def test_indicator_snapshot_rejects_invalid_transport_fields() -> None:
     )
     for case in cases:
         assert parse_indicator_snapshot(case).status == "error"
+
+
+def test_publication_state_uses_declared_fail_closed_priority() -> None:
+    """Return every publication state from its ordered triggering condition."""
+    names = (
+        "any_source_after_as_of",
+        "required_bar_not_closed",
+        "required_source_stale",
+        "timeframe_misaligned",
+        "warmup_insufficient",
+        "dependency_unavailable",
+    )
+    expected = (
+        "INVALID_FUTURE_INPUT",
+        "INCOMPLETE_INPUT",
+        "STALE_INPUT",
+        "MISALIGNED_INPUT",
+        "WARMING_UP",
+        "DEPENDENCY_UNAVAILABLE",
+    )
+    defaults = dict.fromkeys(names, False)
+    for name, state in zip(names, expected, strict=True):
+        response = evaluate_publication_state(**(defaults | {name: True}))
+        assert response.data == state
+    assert evaluate_publication_state(**defaults).data == "VALID"

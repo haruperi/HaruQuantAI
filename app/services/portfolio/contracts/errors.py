@@ -23,6 +23,12 @@ class HaruQuantError(Exception):
     """Local safe error base for Portfolio exceptions."""
 
     def __init__(self, code: str, detail: str = "UNSPECIFIED") -> None:
+        """Initialize safe Portfolio error.
+
+        Args:
+            code: Canonical domain error code string.
+            detail: Contextual detail message.
+        """
         self.code = code
         self.detail = detail
         super().__init__(f"{code}:{detail}")

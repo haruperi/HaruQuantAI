@@ -37,7 +37,7 @@ def test_transport_enforces_host_bounds_and_rate(
 ) -> None:
     """Retrieve approved bytes and reject unsafe or excessive access."""
     monkeypatch.setattr(
-        "app.services.data.research_sources.transport.urlopen",
+        "app.services.data.sources.research_transport.urlopen",
         lambda *_args, **_kwargs: _Response(b'{"data":[]}'),
     )
     now = datetime(2026, 1, 1, tzinfo=UTC)
@@ -75,7 +75,7 @@ def test_transport_bounds_failures_and_circuit(
     """Reject oversized payloads and open a circuit after repeated failures."""
     now = datetime(2026, 1, 1, tzinfo=UTC)
     monkeypatch.setattr(
-        "app.services.data.research_sources.transport.urlopen",
+        "app.services.data.sources.research_transport.urlopen",
         lambda *_args, **_kwargs: _Response(b"0123456789", "https://example.test/data"),
     )
     with pytest.raises(Exception, match="LIMIT_EXCEEDED"):
@@ -92,7 +92,7 @@ def test_transport_bounds_failures_and_circuit(
         raise OSError("offline")
 
     monkeypatch.setattr(
-        "app.services.data.research_sources.transport.urlopen",
+        "app.services.data.sources.research_transport.urlopen",
         _offline,
     )
     for offset in range(3):
@@ -123,7 +123,7 @@ def test_transport_rejects_unapproved_response_metadata(
     response = _Response(b"content", "https://unapproved.test/data")
     response.headers = {"Content-Type": "text/html"}
     monkeypatch.setattr(
-        "app.services.data.research_sources.transport.urlopen",
+        "app.services.data.sources.research_transport.urlopen",
         lambda *_args, **_kwargs: response,
     )
     with pytest.raises(Exception, match="INVALID_INPUT"):

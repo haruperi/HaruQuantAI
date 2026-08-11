@@ -19,6 +19,14 @@ def calculate_portfolio_valuation(
 ) -> Mapping[str, object]:
     """Calculate side-aware Decimal P&L or return explicit unknown status.
 
+    Args:
+        positions: Sequence of position mapping dictionaries.
+        policy_version: Version identifier string for valuation policy.
+        policy: Mapping of valuation source policy configuration.
+        lot_method: Lot matching method string ('fifo',
+            'weighted_average', 'venue_netting').
+        fx_evidence: Optional FX conversion evidence mapping.
+
     Returns:
         Valuation evidence with source lineage.
     """

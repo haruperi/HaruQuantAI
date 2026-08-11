@@ -1,14 +1,17 @@
 """Unit tests for tick derivation contracts, provenance, and compiled kernel."""
 
 import numpy as np
-from app.services.data.tick_derivation._kernel import (
+from app.services.data.transformation._tick_kernel import (
     _add_ratio_half_even,
     _phase_mask,
     generate_four_tick_arrays,
     generate_volume_tick_arrays,
 )
-from app.services.data.tick_derivation.contracts import SpreadModel, TickDerivationModel
-from app.services.data.tick_derivation.provenance import DERIVED_TICK_SOURCE
+from app.services.data.transformation.tick_contracts import (
+    SpreadModel,
+    TickDerivationModel,
+)
+from app.services.data.transformation.tick_provenance import DERIVED_TICK_SOURCE
 
 
 def test_tick_derivation_provenance_and_contracts() -> None:

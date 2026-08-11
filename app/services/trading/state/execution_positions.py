@@ -119,6 +119,7 @@ class _ExecutionPositionStore:
     """Thread-safe process-local position registry with no persistence hooks."""
 
     def __init__(self) -> None:
+        """Initialize empty process-local position dictionary and lock."""
         self._positions: dict[str, _ExecutionPosition] = {}
         self._lock = RLock()
 
@@ -146,6 +147,10 @@ def create_execution_position(**values: object) -> object:
 
 def set_execution_position(store: object, position: object) -> object:
     """Insert one newer position state into the process-local store.
+
+    Args:
+        store: Execution-position store instance.
+        position: Execution position object to insert.
 
     Returns:
         Stored position.
@@ -178,6 +183,14 @@ def transition_execution_position(
     unknown_reason: str | None = None,
 ) -> object:
     """Apply one allowed deterministic position transition in memory.
+
+    Args:
+        store: Execution-position store instance.
+        position_id: Target position identifier.
+        state: New target position state.
+        quantity: New position quantity.
+        source_sequence: Update sequence number.
+        unknown_reason: Optional diagnostic string for UNKNOWN state.
 
     Returns:
         Updated position.
@@ -224,6 +237,10 @@ def transition_execution_position(
 def get_execution_position(store: object, position_id: str) -> object | None:
     """Return one current process-local position without persistence.
 
+    Args:
+        store: Execution-position store instance.
+        position_id: Target position identifier.
+
     Returns:
         Current position or ``None``.
 
@@ -238,6 +255,9 @@ def get_execution_position(store: object, position_id: str) -> object | None:
 
 def get_execution_position_snapshot(store: object) -> dict[str, Any]:
     """Return a detached JSON-safe snapshot for reconciliation only.
+
+    Args:
+        store: Execution-position store instance.
 
     Returns:
         Position facts keyed by position identity.

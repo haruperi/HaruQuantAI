@@ -15,23 +15,18 @@ DOMAIN_PREFIX = "app.services.data"
 
 FEATURE_DIRECTORIES = frozenset(
     {
-        "audit",
-        "artifact_catalog",
-        "contracts",
+        "alignment",
         "data_jobs",
+        "datasets",
         "economic_calendar",
         "evidence",
-        "local_datasets",
+        "integrity",
         "market_data",
-        "persistence",
-        "quality",
-        "realtime_feeds",
-        "replay_packages",
-        "research_sources",
+        "market_events",
+        "replay",
         "runtime_stores",
         "sources",
         "synthetic_data",
-        "tick_derivation",
         "time_sessions",
         "transformation",
     }
@@ -40,7 +35,7 @@ FEATURE_DIRECTORIES = frozenset(
 # carry no `FEAT-DATA-NN` row. `migrations/` holds schema definitions applied by
 # the runner in `persistence/`; it is deliberately not a feature, per the decision
 # that persistence and schema packages are private support packages.
-SUPPORT_DIRECTORIES = frozenset({"_shared", "migrations"})
+SUPPORT_DIRECTORIES = frozenset({"_shared", "contracts", "migrations", "persistence"})
 PERMITTED_ROOT_FILES = frozenset(
     {
         "README.md",
@@ -56,15 +51,23 @@ REQUIRED_ROOT_FILES = frozenset(
 REMOVED_LEGACY_DIRECTORIES = frozenset(
     {
         "adapters",
+        "artifact_catalog",
+        "audit",
         "config",
         "gateway",
         "limits",
+        "local_datasets",
         "models",
+        "quality",
+        "realtime_feeds",
+        "replay_packages",
+        "research_sources",
         "retrieval",
         "scheduler",
         "security",
         "storage",
         "time",
+        "tick_derivation",
         "validation",
     }
 )
@@ -142,7 +145,7 @@ def test_registered_feature_directories_match_the_current_package() -> None:
     actual = {
         path.name
         for path in DATA_ROOT.iterdir()
-        if path.is_dir() and path.name != "__pycache__"
+        if path.is_dir() and path.name != "__pycache__" and any(path.glob("*.py"))
     } - SUPPORT_DIRECTORIES
     assert actual == FEATURE_DIRECTORIES
     assert _registered_feature_modules() == FEATURE_DIRECTORIES
@@ -226,7 +229,9 @@ def test_registered_features_have_exactly_one_numbered_usage_program() -> None:
 def test_removed_legacy_packages_are_absent_and_unreferenced() -> None:
     """Assert retired parallel implementations cannot re-enter the package."""
     assert not REMOVED_LEGACY_DIRECTORIES & {
-        path.name for path in DATA_ROOT.iterdir() if path.is_dir()
+        path.name
+        for path in DATA_ROOT.iterdir()
+        if path.is_dir() and any(path.glob("*.py"))
     }
     legacy_prefixes = tuple(
         f"{DOMAIN_PREFIX}.{name}" for name in REMOVED_LEGACY_DIRECTORIES

@@ -105,3 +105,123 @@ def test_update_strategy_mutation_publication_branches() -> None:
             request_id=REQ,
         )
         assert res_sig is True
+
+
+def test_operational_planning_persistence_create_and_read() -> None:
+    """Verify production reachability for the six operational planning tables."""
+    from app.services.strategy.automation.persistence import (
+        list_automation_policies,
+        persist_automation_policy,
+    )
+    from app.services.strategy.lifecycle.persistence import (
+        list_lifecycle,
+        persist_lifecycle_decision,
+    )
+    from app.services.strategy.playbooks.persistence import (
+        list_strategy_playbooks,
+        persist_strategy_playbook,
+    )
+    from app.services.strategy.profiles.persistence import (
+        list_strategy_profiles,
+        persist_strategy_profile,
+    )
+    from app.services.strategy.setup_evaluation.persistence import (
+        list_setup_evaluations,
+        persist_setup_evaluation,
+    )
+    from app.services.strategy.trade_plan.persistence import (
+        list_trade_plans,
+        persist_trade_plan,
+    )
+
+    with patch(
+        "app.services.strategy.persistence.create.execute_transaction"
+    ) as mock_exec:
+        mock_exec.return_value = make_success_response(data=SimpleNamespace(rows=[]))
+        profile = persist_strategy_profile(
+            {
+                "strategy_id": "trend",
+                "strategy_version": "1.0.0",
+                "permitted_instruments": ["EURUSD"],
+                "permitted_sessions": ["LONDON"],
+                "permitted_regimes": ["TREND"],
+                "indicator_dependencies": ["ema-20"],
+                "entry_rules": ["breakout"],
+                "exit_rules": ["target"],
+                "invalidation_rules": ["close-below"],
+                "automation_permissions": ["SUPERVISED"],
+            },
+            request_id=REQ,
+            correlation_id="cor-1",
+        )
+        assert profile["record_hash"]
+        playbook = persist_strategy_playbook(
+            {
+                "playbook_id": "play-1",
+                "strategy_profile_ref": "trend@1.0.0",
+                "title": "t",
+                "summary": "s",
+                "setup_rules": ["trend"],
+                "debrief_prompts": ["q"],
+            },
+            request_id=REQ,
+            correlation_id="cor-1",
+        )
+        assert playbook["record_hash"]
+        evaluation = persist_setup_evaluation(
+            {
+                "evaluation_id": "eval-1",
+                "playbook_ref": "play-1",
+                "outcome": "MATCH",
+                "source_snapshot_refs": ["snap-1"],
+                "reason_codes": [],
+            },
+            request_id=REQ,
+            correlation_id="cor-1",
+        )
+        assert evaluation["record_hash"]
+        plan = persist_trade_plan(
+            {
+                "plan_id": "plan-1",
+                "plan_version": 1,
+                "status": "DRAFT",
+                "strategy_id": "trend",
+                "strategy_version": "1.0.0",
+                "parent_plan_id": None,
+            },
+            request_id=REQ,
+            correlation_id="cor-1",
+        )
+        assert plan["record_hash"]
+        policy = persist_automation_policy(
+            strategy_id="trend",
+            strategy_version="1.0.0",
+            mode="SUPERVISED",
+            request_id=REQ,
+            correlation_id="cor-1",
+        )
+        assert policy["record_hash"]
+        decision = persist_lifecycle_decision(
+            {
+                "strategy_id": "trend",
+                "strategy_version": "1.0.0",
+                "from_status": "TESTING",
+                "to_status": "APPROVED",
+                "reason": "passed",
+            },
+            request_id=REQ,
+            correlation_id="cor-1",
+        )
+        assert decision["decision"]
+        assert mock_exec.called
+
+    with patch(
+        "app.services.strategy.persistence.read._read_rows", return_value=()
+    ) as mock_read:
+        list_strategy_profiles(request_id=REQ)
+        list_strategy_playbooks(request_id=REQ)
+        list_setup_evaluations(request_id=REQ)
+        list_trade_plans(request_id=REQ)
+        list_automation_policies(request_id=REQ)
+        list_lifecycle(request_id=REQ)
+        assert mock_read.called

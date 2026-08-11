@@ -85,7 +85,18 @@ def _traits(
     modifies_database: bool = False,
     requires_network: bool = False,
 ) -> OperationTraits:
-    """Build one immutable static capability declaration."""
+    """Build one immutable static capability declaration.
+
+    Args:
+        risk_level: The ``risk_level`` argument.
+        read_only: The ``read_only`` argument.
+        writes_file: The ``writes_file`` argument.
+        modifies_database: The ``modifies_database`` argument.
+        requires_network: The ``requires_network`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return OperationTraits(
         risk_level=risk_level,
         read_only=read_only,
@@ -153,6 +164,9 @@ _TRAITS: Mapping[str, OperationTraits] = {
         "low", read_only=True, requires_network=True
     ),
     "data.market_data.list_symbols": _traits(
+        "low", read_only=True, requires_network=True
+    ),
+    "data.market_data.list_market_directory": _traits(
         "low", read_only=True, requires_network=True
     ),
     "data.market_data.get_data_availability": _traits(
@@ -244,8 +258,6 @@ _TRAITS: Mapping[str, OperationTraits] = {
     "data.transformation.align_multitimeframe_data": _traits("none", read_only=True),
     "data.transformation.resample_dataset": _traits("none", read_only=True),
     "data.transformation.resample_ohlcv": _traits("none", read_only=True),
-    "data.transformation.to_ohlcv_dataframe": _traits("none", read_only=True),
-    "data.transformation.to_tick_dataframe": _traits("none", read_only=True),
     # FEAT-DATA-09 - Time and Session Handling (pure).
     "data.time_sessions.require_utc": _traits("none", read_only=True),
     "data.time_sessions.get_timeframe_spec": _traits("none", read_only=True),

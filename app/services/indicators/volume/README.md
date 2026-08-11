@@ -4,7 +4,7 @@ feature programme extends this feature with `measure_order_flow` and the
 validated JSON-safe `indicators.liquidity_snapshot.v1` build/parse boundary.
 Unavailable fill probability remains null and is never inferred.
 
-This module owns `FEAT-INDI-06`: CMF, OBV, MFI, and rolling price-volume point
+This module owns `FEAT-INDI-05`: CMF, OBV, MFI, and rolling price-volume point
 of control. Each production file implements one official indicator.
 
 The canonical status, requirements, formulas, public signatures, and usage

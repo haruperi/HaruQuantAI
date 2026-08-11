@@ -37,7 +37,11 @@ class _ReservationValue(Protocol):
 
     @property
     def status(self) -> object:
-        """Return the validated finite reservation status."""
+        """Return the validated finite reservation status.
+
+        Returns:
+            Reservation status object.
+        """
         ...
 
 
@@ -52,12 +56,20 @@ class _EventValue(Protocol):
 
     @property
     def event_type(self) -> object:
-        """Return the validated finite event type."""
+        """Return the validated finite event type.
+
+        Returns:
+            Event type object.
+        """
         ...
 
     @property
     def event_version(self) -> object:
-        """Return the validated event contract version."""
+        """Return the validated event contract version.
+
+        Returns:
+            Event version object.
+        """
         ...
 
 
@@ -77,6 +89,10 @@ class _TradingPersistenceStore:
     def encode(self, kind: str, value: object) -> str:
         """Encode one validated Trading value.
 
+        Args:
+            kind: Registered record kind string.
+            value: Object to encode.
+
         Returns:
             Canonical JSON text.
 
@@ -90,6 +106,10 @@ class _TradingPersistenceStore:
 
     def decode(self, kind: str, value: str) -> object:
         """Decode one validated Trading value.
+
+        Args:
+            kind: Registered record kind string.
+            value: Canonical JSON text to decode.
 
         Returns:
             Validated Trading value.
@@ -165,6 +185,11 @@ def create_idempotency_record(
 ) -> None:
     """Create one immutable idempotency reservation.
 
+    Args:
+        store: Persistence handle object.
+        key: Idempotency reservation key string.
+        value: Reservation value object.
+
     Raises:
         ValueError: If the reservation cannot be created.
     """
@@ -209,6 +234,13 @@ def create_event_record(
 ) -> None:
     """Append one immutable Trading event directly to its owned table.
 
+    Args:
+        store: Persistence handle object.
+        key: Event key string.
+        partition: Partition scope string.
+        sequence: Event sequence integer.
+        value: Event value object.
+
     Raises:
         ValueError: If the event cannot be appended.
     """
@@ -247,6 +279,11 @@ def create_projection_record(
     value: _ProjectionValue,
 ) -> None:
     """Create one initial exact-scope Trading projection.
+
+    Args:
+        store: Persistence handle object.
+        key: Scope key string.
+        value: Projection value object.
 
     Raises:
         ValueError: If the projection cannot be created.
@@ -340,6 +377,11 @@ def create_protective_order_records(
 ) -> None:
     """Persist the stop and target legs of one validated protection plan atomically.
 
+    Args:
+        plan: Validated protective order plan object.
+        correlation_id: Correlation trace identifier string.
+        occurred_at: Aware UTC timestamp when plan occurred.
+
     Raises:
         TypeError: If the value is not a Trading protective-order plan.
         ValueError: If both append-only legs cannot be confirmed.
@@ -399,6 +441,11 @@ def create_trade_ownership_record(
     ownership: object, *, correlation_id: str, occurred_at: datetime
 ) -> None:
     """Append one validated ownership fact.
+
+    Args:
+        ownership: Validated ownership contract object.
+        correlation_id: Correlation trace identifier string.
+        occurred_at: Aware UTC timestamp when ownership fact occurred.
 
     Raises:
         TypeError: If the value is not a Trading ownership contract.

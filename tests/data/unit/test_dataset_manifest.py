@@ -4,8 +4,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from app.services.data.local_datasets.contracts import DatasetLoadRequest
-from app.services.data.local_datasets.manifest import (
+from app.services.data.datasets.contracts import DatasetLoadRequest
+from app.services.data.datasets.manifest import (
     verify_dataset_manifest,
     verify_manifest_compatibility,
 )
@@ -18,7 +18,7 @@ def test_verify_dataset_manifest_delegates_to_load_dataset() -> None:
     request = MagicMock(spec=DatasetLoadRequest)
     expected_dataset = MagicMock()
     with patch(
-        "app.services.data.local_datasets.manifest._load_dataset_raw",
+        "app.services.data.datasets.manifest._load_dataset_raw",
         return_value=expected_dataset,
     ) as mock_load:
         result = verify_dataset_manifest(request)

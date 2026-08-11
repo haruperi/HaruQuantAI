@@ -1,4 +1,3 @@
-# ruff: noqa: DOC201, DOC501
 """Versioned economic execution-event transport for later Portfolio ingestion."""
 
 from collections.abc import Mapping
@@ -32,7 +31,17 @@ class _EconomicExecutionEvent(BaseModel):
 
 
 def build_economic_execution_event(**values: object) -> dict[str, Any]:
-    """Build one validated JSON-safe economic execution event."""
+    """Build one validated JSON-safe economic execution event.
+
+    Args:
+        **values: Field values matching _EconomicExecutionEvent schema.
+
+    Returns:
+        JSON-safe dictionary representation of the economic execution event.
+
+    Raises:
+        TypeError: If serialized payload is not a mapping.
+    """
     model = _EconomicExecutionEvent.model_validate(values)
     safe = to_json_safe(model.model_dump(mode="json"))
     if not isinstance(safe, dict):
@@ -41,7 +50,14 @@ def build_economic_execution_event(**values: object) -> dict[str, Any]:
 
 
 def parse_economic_execution_event(value: Mapping[str, object]) -> object:
-    """Parse one economic execution event mapping."""
+    """Parse one economic execution event mapping.
+
+    Args:
+        value: Mapping payload to validate against schema.
+
+    Returns:
+        Validated _EconomicExecutionEvent Pydantic model instance.
+    """
     return _EconomicExecutionEvent.model_validate(value)
 
 

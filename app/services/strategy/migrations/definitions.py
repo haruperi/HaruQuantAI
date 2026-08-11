@@ -350,6 +350,118 @@ _STATEMENTS_0002 = (
 )
 
 
+_STATEMENTS_0003 = (
+    # Versioned strategy profiles with exact links to approved expectancy profiles.
+    """CREATE TABLE IF NOT EXISTS strategy_profiles (
+        profile_id TEXT PRIMARY KEY,
+        strategy_id TEXT NOT NULL,
+        strategy_version TEXT NOT NULL,
+        profile_json TEXT NOT NULL CHECK (json_valid(profile_json)),
+        expectancy_profile_ref TEXT,
+        expectancy_exact_version TEXT,
+        record_hash TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE(strategy_id, strategy_version),
+        CHECK (length(record_hash) = 64)
+    ) STRICT""",
+    # Versioned playbook definitions.
+    """CREATE TABLE IF NOT EXISTS strategy_playbooks (
+        playbook_id TEXT PRIMARY KEY,
+        playbook_version INTEGER NOT NULL CHECK (playbook_version >= 1),
+        strategy_profile_ref TEXT NOT NULL,
+        playbook_json TEXT NOT NULL CHECK (json_valid(playbook_json)),
+        record_hash TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE(playbook_id, playbook_version),
+        CHECK (length(record_hash) = 64)
+    ) STRICT""",
+    # Append-only setup evaluation evidence.
+    """CREATE TABLE IF NOT EXISTS strategy_setup_evaluations (
+        evaluation_id TEXT PRIMARY KEY,
+        playbook_ref TEXT NOT NULL,
+        outcome TEXT NOT NULL CHECK (
+            outcome IN (
+                'MATCH',
+                'NO_MATCH',
+                'STALE',
+                'REGIME_MISMATCH',
+                'INSUFFICIENT_EVIDENCE'
+            )
+        ),
+        source_snapshot_json TEXT NOT NULL CHECK (json_valid(source_snapshot_json)),
+        reason_code_json TEXT NOT NULL CHECK (json_valid(reason_code_json)),
+        record_hash TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        CHECK (length(record_hash) = 64)
+    ) STRICT""",
+    # Canonical trade plans with immutable release and versioned amendments.
+    """CREATE TABLE IF NOT EXISTS strategy_plans (
+        plan_id TEXT PRIMARY KEY,
+        plan_version INTEGER NOT NULL CHECK (plan_version >= 1),
+        status TEXT NOT NULL CHECK (
+            status IN (
+                'DRAFT',
+                'READY_FOR_RISK',
+                'APPROVED',
+                'REJECTED',
+                'RELEASED',
+                'MANAGED',
+                'CLOSED',
+                'ABORTED'
+            )
+        ),
+        strategy_id TEXT NOT NULL,
+        strategy_version TEXT NOT NULL,
+        plan_json TEXT NOT NULL CHECK (json_valid(plan_json)),
+        parent_plan_id TEXT,
+        record_hash TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE(plan_id, plan_version),
+        CHECK (length(record_hash) = 64)
+    ) STRICT""",
+    # Versioned automation policy.
+    """CREATE TABLE IF NOT EXISTS strategy_automation_policy (
+        policy_id TEXT PRIMARY KEY,
+        strategy_id TEXT NOT NULL,
+        strategy_version TEXT NOT NULL,
+        policy_version INTEGER NOT NULL CHECK (policy_version >= 1),
+        mode TEXT NOT NULL CHECK (
+            mode IN ('OFF', 'ADVISORY', 'SUPERVISED', 'AUTOMATED')
+        ),
+        policy_json TEXT NOT NULL CHECK (json_valid(policy_json)),
+        record_hash TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE(strategy_id, strategy_version, policy_version),
+        CHECK (length(record_hash) = 64)
+    ) STRICT""",
+    # Append-only lifecycle decisions and approvals preserving replay meaning.
+    """CREATE TABLE IF NOT EXISTS strategy_lifecycle (
+        lifecycle_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        strategy_id TEXT NOT NULL,
+        strategy_version TEXT NOT NULL,
+        from_status TEXT NOT NULL,
+        to_status TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        decision_json TEXT NOT NULL CHECK (json_valid(decision_json)),
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    ) STRICT""",
+    """CREATE INDEX IF NOT EXISTS idx_strategy_lifecycle_strategy
+    ON strategy_lifecycle(strategy_id, created_at)""",
+)
+
+
 def _strategy_migration_steps() -> tuple[Any, ...]:
     """Return ordered immutable Strategy migration definitions.
 
@@ -359,6 +471,7 @@ def _strategy_migration_steps() -> tuple[Any, ...]:
     logger.debug("Building Strategy migration definitions")
     material_0001 = "\n".join(_STATEMENTS_0001).encode("utf-8")
     material_0002 = "\n".join(_STATEMENTS_0002).encode("utf-8")
+    material_0003 = "\n".join(_STATEMENTS_0003).encode("utf-8")
     return (
         build_migration_step(
             domain="strategy",
@@ -371,6 +484,12 @@ def _strategy_migration_steps() -> tuple[Any, ...]:
             migration_id="0002_strategy_seven_table_runtime",
             checksum=hashlib.sha256(material_0002).hexdigest(),
             statements=_STATEMENTS_0002,
+        ),
+        build_migration_step(
+            domain="strategy",
+            migration_id="0003_strategy_operational_planning",
+            checksum=hashlib.sha256(material_0003).hexdigest(),
+            statements=_STATEMENTS_0003,
         ),
     )
 

@@ -40,13 +40,28 @@ _EVENT_URL_PATTERN: Final = re.compile(
 
 
 def _plain(value: str) -> str:
-    """Remove Markdown presentation syntax without changing provider text."""
+    """Remove Markdown presentation syntax without changing provider text.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     without_images = _IMAGE_PATTERN.sub("", value)
     return _LINK_PATTERN.sub(r"\1", without_images).strip()
 
 
 def _timestamp(day: datetime, label: str) -> datetime | None:
-    """Map one Forex Factory America/Chicago clock label to UTC when defined."""
+    """Map one Forex Factory America/Chicago clock label to UTC when defined.
+
+    Args:
+        day: The ``day`` argument.
+        label: The ``label`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     normalized = label.strip().lower()
     # Multi-day conference labels ("Day 1", etc.) publish no clock time.
     # Anchor them to page-local day start exactly like Forex Factory's All Day rows.
@@ -68,7 +83,15 @@ def _timestamp(day: datetime, label: str) -> datetime | None:
 
 
 def _day(match: re.Match[str], year: int) -> datetime:
-    """Build one page-local calendar day from a validated heading."""
+    """Build one page-local calendar day from a validated heading.
+
+    Args:
+        match: The ``match`` argument.
+        year: The ``year`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return datetime.strptime(
         f"{match.group(2)} {match.group(3)} {year} -0600",
         "%b %d %Y %z",
@@ -76,7 +99,15 @@ def _day(match: re.Match[str], year: int) -> datetime:
 
 
 def _parse_reader_markdown(markdown: str, *, year: int) -> list[Mapping[str, object]]:
-    """Parse Reader's bounded Forex Factory Markdown table."""
+    """Parse Reader's bounded Forex Factory Markdown table.
+
+    Args:
+        markdown: The ``markdown`` argument.
+        year: The ``year`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     rows: list[Mapping[str, object]] = []
     current_day: datetime | None = None
     current_time = ""
@@ -142,7 +173,14 @@ class _ReaderCalendarTransport(CalendarTransport):
     """Read Forex Factory weekly pages through the credential-free Reader API."""
 
     def __init__(self, *, request_timeout_sec: float = 30.0) -> None:
-        """Initialize the fixed-host bounded transport."""
+        """Initialize the fixed-host bounded transport.
+
+        Args:
+            request_timeout_sec: The ``request_timeout_sec`` argument.
+
+        Raises:
+            DataError: If the operation cannot be completed safely.
+        """
         if request_timeout_sec <= 0:
             raise DataError(
                 "VALIDATION_FAILED", safe_details={"field": "request_timeout_sec"}
@@ -156,7 +194,19 @@ class _ReaderCalendarTransport(CalendarTransport):
         start: datetime,
         end: datetime,
     ) -> Sequence[Mapping[str, object]]:
-        """Return Forex Factory rows for at most nine weekly pages."""
+        """Return Forex Factory rows for at most nine weekly pages.
+
+        Args:
+            site: The ``site`` argument.
+            start: The ``start`` argument.
+            end: The ``end`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            DataError: If the operation cannot be completed safely.
+        """
         if site != "forexfactory":
             raise DataError("VALIDATION_FAILED", safe_details={"field": "site"})
         rows: list[Mapping[str, object]] = []
@@ -171,7 +221,17 @@ class _ReaderCalendarTransport(CalendarTransport):
         return [row for row in rows if start <= row["timestamp"] < end]  # type: ignore[operator]
 
     def _fetch_week(self, week: str) -> str:
-        """Fetch one fixed Reader URL with response bounds."""
+        """Fetch one fixed Reader URL with response bounds.
+
+        Args:
+            week: The ``week`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            DataError: If the operation cannot be completed safely.
+        """
         target = f"{_FOREX_FACTORY_ORIGIN}/calendar?week={week}"
         url = f"{_READER_ORIGIN}/{target}"
         request = urllib.request.Request(
@@ -201,7 +261,14 @@ class _ReaderCalendarTransport(CalendarTransport):
 def build_reader_calendar_transport(
     *, request_timeout_sec: float = 30.0
 ) -> CalendarTransport:
-    """Build the bounded credential-free historical calendar transport."""
+    """Build the bounded credential-free historical calendar transport.
+
+    Args:
+        request_timeout_sec: The ``request_timeout_sec`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.info("Building the bounded Jina Reader calendar transport")
     return _ReaderCalendarTransport(request_timeout_sec=request_timeout_sec)
 
@@ -209,7 +276,18 @@ def build_reader_calendar_transport(
 def fetch_reader_event_page(
     source_url: str, *, request_timeout_sec: float = 30.0
 ) -> str:
-    """Fetch one validated Forex Factory detail page through Jina Reader."""
+    """Fetch one validated Forex Factory detail page through Jina Reader.
+
+    Args:
+        source_url: The ``source_url`` argument.
+        request_timeout_sec: The ``request_timeout_sec`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     if not _EVENT_URL_PATTERN.fullmatch(source_url) or request_timeout_sec <= 0:
         raise DataError("VALIDATION_FAILED", safe_details={"field": "source_url"})
     url = f"{_READER_ORIGIN}/{source_url}"

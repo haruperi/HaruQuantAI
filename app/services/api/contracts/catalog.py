@@ -254,6 +254,20 @@ _KNOWN_ROUTE_CONTRACTS: tuple[RouteContract, ...] = (
     ),
     _contract("api.data.symbols", "GET", "/api/v1/data/symbols", "data", "data:read"),
     _contract(
+        "api.data.markets",
+        "GET",
+        "/api/v1/data/markets",
+        "data",
+        "data:read",
+    ),
+    _contract(
+        "api.data.capabilities",
+        "GET",
+        "/api/v1/data/capabilities",
+        "data",
+        "data:read",
+    ),
+    _contract(
         "api.data.stream",
         "GET",
         "/api/v1/data/stream",

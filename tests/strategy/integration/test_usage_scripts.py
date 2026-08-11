@@ -20,11 +20,16 @@ _USAGE_SCRIPTS = (
     "10_strategy_library.py",
     "11_proposal_intake.py",
     "12_operating_envelope.py",
-    "13_exit_plans.py",
-    "14_manual_plans.py",
+    "13_profiles.py",
+    "14_playbooks.py",
+    "15_setup_evaluation.py",
+    "16_trade_plan.py",
+    "17_management_plan.py",
+    "18_automation.py",
+    "19_lifecycle.py",
 )
 
-assert len(_USAGE_SCRIPTS) == 14, "Strategy must register exactly 14 feature programs"
+assert len(_USAGE_SCRIPTS) == 19, "Strategy must register exactly 19 feature programs"
 
 
 @pytest.mark.parametrize("script_name", _USAGE_SCRIPTS)

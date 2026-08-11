@@ -1,4 +1,4 @@
-# Data Persistence — FEAT-DATA-06
+# Data Persistence — Support Package
 
 Owns the private Data CRUD boundary plus bounded SQLite transactions, migrations,
 locks, dataset/cache storage, external import, backup, restore, retention, and

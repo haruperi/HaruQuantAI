@@ -56,7 +56,17 @@ def _execute_read(
     request_id: str,
     max_rows: int,
 ) -> TransactionResult:
-    """Execute one bounded Data-owned read transaction."""
+    """Execute one bounded Data-owned read transaction.
+
+    Args:
+        statement: The ``statement`` argument.
+        parameters: The ``parameters`` argument.
+        request_id: The ``request_id`` argument.
+        max_rows: The ``max_rows`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_transaction_raw(
         TransactionRequest(
             plan=StatementPlan(
@@ -70,7 +80,15 @@ def _execute_read(
 
 
 def read_cache_record(key: str, *, request_id: str) -> TransactionResult:
-    """Read one cache record by exact identity."""
+    """Read one cache record by exact identity.
+
+    Args:
+        key: The ``key`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Reading Data cache persistence record")
     return _execute_read(
         f"SELECT {_CACHE_COLUMNS} FROM data_cache WHERE key = ?",  # noqa: S608
@@ -81,7 +99,15 @@ def read_cache_record(key: str, *, request_id: str) -> TransactionResult:
 
 
 def read_cache_records(*, request_id: str, limit: int) -> TransactionResult:
-    """Read a bounded cache-record candidate set for filtering."""
+    """Read a bounded cache-record candidate set for filtering.
+
+    Args:
+        request_id: The ``request_id`` argument.
+        limit: The ``limit`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Reading Data cache persistence records")
     return _execute_read(
         "SELECT key, dataset_json FROM data_cache",
@@ -104,7 +130,23 @@ def read_audit_event_records(
     limit: int,
     request_id: str,
 ) -> TransactionResult:
-    """Read one bounded, deterministically ordered audit-event page."""
+    """Read one bounded, deterministically ordered audit-event page.
+
+    Args:
+        start: The ``start`` argument.
+        end: The ``end`` argument.
+        domain: The ``domain`` argument.
+        action: The ``action`` argument.
+        principal_id: The ``principal_id`` argument.
+        correlation_id: The ``correlation_id`` argument.
+        cursor_timestamp: The ``cursor_timestamp`` argument.
+        cursor_event_id: The ``cursor_event_id`` argument.
+        limit: The ``limit`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     sql_parts = [
         "SELECT event_id, timestamp, domain, action, principal_id, request_id, "
         "correlation_id, causation_id, payload_json FROM data_audit_events "
@@ -145,7 +187,21 @@ def read_economic_event_records(
     request_id: str,
     limit: int = 100_000,
 ) -> TransactionResult:
-    """Read bounded stored economic events under optional filters."""
+    """Read bounded stored economic events under optional filters.
+
+    Args:
+        start: The ``start`` argument.
+        end: The ``end`` argument.
+        currencies: The ``currencies`` argument.
+        countries: The ``countries`` argument.
+        minimum_impact: The ``minimum_impact`` argument.
+        provider: The ``provider`` argument.
+        request_id: The ``request_id`` argument.
+        limit: The ``limit`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     sql = (
         f"SELECT {_ECONOMIC_EVENT_COLUMNS} FROM data_economic_events e "  # noqa: S608
         "LEFT JOIN data_economic_event_definitions d "
@@ -181,7 +237,17 @@ def read_economic_event_records(
 def read_economic_calendar_coverage_records(
     *, start: str, end: str, request_id: str, limit: int = 1000
 ) -> TransactionResult:
-    """Read complete coverage intervals overlapping one requested window."""
+    """Read complete coverage intervals overlapping one requested window.
+
+    Args:
+        start: The ``start`` argument.
+        end: The ``end`` argument.
+        request_id: The ``request_id`` argument.
+        limit: The ``limit`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         "SELECT provider, range_start, range_end, status, source_revision, "
         "synchronized_at FROM data_economic_calendar_coverage "
@@ -194,7 +260,15 @@ def read_economic_calendar_coverage_records(
 
 
 def read_feed_record(feed_id: str, *, request_id: str) -> TransactionResult:
-    """Read one complete persisted feed-state record."""
+    """Read one complete persisted feed-state record.
+
+    Args:
+        feed_id: The ``feed_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Reading Data feed persistence record")
     return _execute_read(
         f"SELECT {_FEED_COLUMNS} FROM data_feeds WHERE feed_id = ?",  # noqa: S608
@@ -207,7 +281,16 @@ def read_feed_record(feed_id: str, *, request_id: str) -> TransactionResult:
 def read_recent_source_attempt_records(
     source_id: str, limit: int, *, request_id: str
 ) -> TransactionResult:
-    """Read recent source attempts in reverse observation order."""
+    """Read recent source attempts in reverse observation order.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        limit: The ``limit`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Reading Data source-attempt persistence records")
     return _execute_read(
         "SELECT status, timestamp_ns FROM data_source_attempts "
@@ -221,7 +304,16 @@ def read_recent_source_attempt_records(
 def read_source_attempt_count(
     source_id: str, minimum_timestamp_ns: str, *, request_id: str
 ) -> TransactionResult:
-    """Count source attempts inside one durable policy window."""
+    """Count source attempts inside one durable policy window.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        minimum_timestamp_ns: The ``minimum_timestamp_ns`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Reading Data source-attempt persistence count")
     return _execute_read(
         "SELECT COUNT(*) AS count_val FROM data_source_attempts "
@@ -233,7 +325,15 @@ def read_source_attempt_count(
 
 
 def read_source_state_record(source_id: str, *, request_id: str) -> TransactionResult:
-    """Read one persisted source-readiness state."""
+    """Read one persisted source-readiness state.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Reading Data source-state persistence record")
     return _execute_read(
         "SELECT readiness, descriptor_revision FROM data_source_state "
@@ -245,7 +345,15 @@ def read_source_state_record(source_id: str, *, request_id: str) -> TransactionR
 
 
 def read_update_job_identity(job_id: str, *, request_id: str) -> TransactionResult:
-    """Read whether one update-job identity exists."""
+    """Read whether one update-job identity exists.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         "SELECT job_id FROM data_update_jobs WHERE job_id = ?",
         (job_id,),
@@ -255,7 +363,15 @@ def read_update_job_identity(job_id: str, *, request_id: str) -> TransactionResu
 
 
 def read_update_job_start_state(job_id: str, *, request_id: str) -> TransactionResult:
-    """Read update-job state required by the start transition."""
+    """Read update-job state required by the start transition.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         "SELECT job_id, interval_seconds, state, lease_owner, lease_expires_at "
         "FROM data_update_jobs WHERE job_id = ?",
@@ -266,7 +382,15 @@ def read_update_job_start_state(job_id: str, *, request_id: str) -> TransactionR
 
 
 def read_update_job_status_record(job_id: str, *, request_id: str) -> TransactionResult:
-    """Read one update-job status record."""
+    """Read one update-job status record.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         "SELECT job_id, state, enabled, last_run_status, last_checkpoint, "
         "last_error, next_run_at, lease_owner, lease_expires_at, recovery_state "
@@ -280,7 +404,15 @@ def read_update_job_status_record(job_id: str, *, request_id: str) -> Transactio
 def read_update_job_definition_record(
     job_id: str, *, request_id: str
 ) -> TransactionResult:
-    """Read the persisted definition and lease state for one update job."""
+    """Read the persisted definition and lease state for one update job.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         "SELECT job_id, source_id, symbols_json, timeframes_json, data_kinds_json, "
         "start, end, interval_seconds, enabled, state, lease_owner, lease_expires_at, "
@@ -293,7 +425,15 @@ def read_update_job_definition_record(
 
 
 def read_update_job_enabled(job_id: str, *, request_id: str) -> TransactionResult:
-    """Read the persisted enabled flag for one update job."""
+    """Read the persisted enabled flag for one update job.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         "SELECT enabled FROM data_update_jobs WHERE job_id = ?",
         (job_id,),
@@ -303,7 +443,15 @@ def read_update_job_enabled(job_id: str, *, request_id: str) -> TransactionResul
 
 
 def read_latest_backfill_end(job_id: str, *, request_id: str) -> TransactionResult:
-    """Read the latest committed backfill end for one job."""
+    """Read the latest committed backfill end for one job.
+
+    Args:
+        job_id: The ``job_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         "SELECT MAX(committed_end) AS max_end FROM data_backfill_checkpoints "
         "WHERE job_id = ?",
@@ -316,7 +464,15 @@ def read_latest_backfill_end(job_id: str, *, request_id: str) -> TransactionResu
 def read_committed_backfill_record(
     idempotency_key: str, *, request_id: str
 ) -> TransactionResult:
-    """Read one committed backfill checkpoint by idempotency identity."""
+    """Read one committed backfill checkpoint by idempotency identity.
+
+    Args:
+        idempotency_key: The ``idempotency_key`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         "SELECT job_id, chunk_id, idempotency_key, committed_start, "
         "committed_end, record_count, content_hash, artifact_final "
@@ -329,7 +485,15 @@ def read_committed_backfill_record(
 
 
 def read_prepared_backfill_records(*, request_id: str, limit: int) -> TransactionResult:
-    """Read ordered prepared backfill checkpoints for recovery."""
+    """Read ordered prepared backfill checkpoints for recovery.
+
+    Args:
+        request_id: The ``request_id`` argument.
+        limit: The ``limit`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         "SELECT idempotency_key, job_id, content_hash, artifact_temp, "
         "artifact_final FROM data_backfill_checkpoints "
@@ -344,7 +508,16 @@ def read_prepared_backfill_records(*, request_id: str, limit: int) -> Transactio
 def read_latest_research_source_record(
     source_id: str, external_id: str, *, request_id: str
 ) -> TransactionResult:
-    """Read the latest immutable revision for one research-source identity."""
+    """Read the latest immutable revision for one research-source identity.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        external_id: The ``external_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         f"SELECT {_RESEARCH_SOURCE_COLUMNS} FROM data_research_sources "  # noqa: S608
         "WHERE source_id = ? AND external_id = ? "
@@ -362,7 +535,17 @@ def read_research_source_records(
     *,
     request_id: str,
 ) -> TransactionResult:
-    """Read a decision-time ordered research-source page."""
+    """Read a decision-time ordered research-source page.
+
+    Args:
+        decision_time: The ``decision_time`` argument.
+        limit: The ``limit`` argument.
+        offset: The ``offset`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         f"SELECT {_RESEARCH_SOURCE_COLUMNS} FROM data_research_sources "  # noqa: S608
         "WHERE available_at <= ? "
@@ -380,7 +563,17 @@ def read_latest_research_observation_record(
     *,
     request_id: str,
 ) -> TransactionResult:
-    """Read the latest immutable revision for one research observation."""
+    """Read the latest immutable revision for one research observation.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        series_id: The ``series_id`` argument.
+        observation_period: The ``observation_period`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         f"SELECT {_RESEARCH_OBSERVATION_COLUMNS} "  # noqa: S608
         "FROM data_research_observations WHERE source_id = ? AND series_id = ? "
@@ -399,7 +592,18 @@ def read_research_observation_records(
     *,
     request_id: str,
 ) -> TransactionResult:
-    """Read bounded research observations available by decision time."""
+    """Read bounded research observations available by decision time.
+
+    Args:
+        decision_time: The ``decision_time`` argument.
+        source_id: The ``source_id`` argument.
+        series_id: The ``series_id`` argument.
+        limit: The ``limit`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         f"SELECT {_RESEARCH_OBSERVATION_COLUMNS} "  # noqa: S608
         "FROM data_research_observations WHERE available_at <= ? "
@@ -418,7 +622,17 @@ def read_runtime_record(
     *,
     request_id: str,
 ) -> TransactionResult:
-    """Read one namespaced runtime record by exact key."""
+    """Read one namespaced runtime record by exact key.
+
+    Args:
+        namespace: The ``namespace`` argument.
+        collection: The ``collection`` argument.
+        key: The ``key`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         "SELECT codec_kind, payload_json, revision FROM data_runtime_records "
         "WHERE namespace = ? AND collection_name = ? AND record_key = ?",
@@ -436,7 +650,18 @@ def read_runtime_partition_records(
     *,
     request_id: str,
 ) -> TransactionResult:
-    """Read ordered runtime records from one exact partition."""
+    """Read ordered runtime records from one exact partition.
+
+    Args:
+        namespace: The ``namespace`` argument.
+        collection: The ``collection`` argument.
+        partition: The ``partition`` argument.
+        limit: The ``limit`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         "SELECT codec_kind, payload_json, revision FROM data_runtime_records "
         "WHERE namespace = ? AND collection_name = ? AND partition_key = ? "
@@ -454,7 +679,17 @@ def read_runtime_collection_records(
     *,
     request_id: str,
 ) -> TransactionResult:
-    """Read deterministic runtime records across collection partitions."""
+    """Read deterministic runtime records across collection partitions.
+
+    Args:
+        namespace: The ``namespace`` argument.
+        collection: The ``collection`` argument.
+        limit: The ``limit`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     return _execute_read(
         "SELECT codec_kind, payload_json, revision FROM data_runtime_records "
         "WHERE namespace = ? AND collection_name = ? "
@@ -638,7 +873,17 @@ def read_catalog_coverage(dataset_id: str, *, request_id: str) -> TransactionRes
 def read_catalog_reference_records(
     symbol_id: str, provider_id: str, *, request_id: str, limit: int
 ) -> TransactionResult:
-    """Read one provider/symbol reference and its bounded active sessions."""
+    """Read one provider/symbol reference and its bounded active sessions.
+
+    Args:
+        symbol_id: The ``symbol_id`` argument.
+        provider_id: The ``provider_id`` argument.
+        request_id: The ``request_id`` argument.
+        limit: The ``limit`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     statement = """
 SELECT s.symbol_id, s.canonical_symbol, s.state,
        p.provider_id, p.provider_code, p.enabled,
@@ -661,7 +906,16 @@ ORDER BY m.day_of_week, m.open_time_utc
 def read_catalog_event_records(
     symbol_id: str, *, request_id: str, limit: int
 ) -> TransactionResult:
-    """Read bounded fetch and quality evidence for one canonical symbol."""
+    """Read bounded fetch and quality evidence for one canonical symbol.
+
+    Args:
+        symbol_id: The ``symbol_id`` argument.
+        request_id: The ``request_id`` argument.
+        limit: The ``limit`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     statement = """
 SELECT 'fetch' AS record_kind, fetch_id AS record_id, state, error_code
 FROM data_fetch_log WHERE symbol_id = ?
@@ -682,7 +936,16 @@ ORDER BY record_id
 def read_verified_research_source_record(
     source_id: str, parser_version: str, *, request_id: str
 ) -> TransactionResult:
-    """Read one persisted verified-source manifest exactly."""
+    """Read one persisted verified-source manifest exactly.
+
+    Args:
+        source_id: The ``source_id`` argument.
+        parser_version: The ``parser_version`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     statement = """
 SELECT source_id, parser_version, verified_at, external_record_id,
        fixture_sha256, environments_json, license_policy

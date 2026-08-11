@@ -82,18 +82,21 @@ def _confirmed_pivots(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Return alternating pivots on their causal confirmation rows.
 
-    A pivot centered at position ``p`` is emitted only at ``p + depth``.
-    Tied extrema are not pivots. Consecutive candidates of the same type are
-    ignored so an already confirmed pivot is never retrospectively replaced.
+        A pivot centered at position ``p`` is emitted only at ``p + depth``.
+        Tied extrema are not pivots. Consecutive candidates of the same type are
+        ignored so an already confirmed pivot is never retrospectively replaced.
 
     Args:
-        high: Ordered finite high prices.
-        low: Ordered finite low prices.
-        depth: Required bars on either side of a pivot.
+            high: Ordered finite high prices.
+            low: Ordered finite low prices.
+            depth: Required bars on either side of a pivot.
 
     Returns:
-        Parallel pivot values, pivot types (``1`` high, ``-1`` low), and a
-        Boolean readiness mask indexed by confirmation row.
+            Parallel pivot values, pivot types (``1`` high, ``-1`` low), and a
+            Boolean readiness mask indexed by confirmation row.
+
+    Raises:
+        None.
     """
     size = len(high)
     values = np.full(size, np.nan, dtype="float64")

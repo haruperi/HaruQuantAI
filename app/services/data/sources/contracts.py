@@ -28,7 +28,17 @@ type DataKind = Literal["bars", "ticks", "spreads", "volume"]
 
 
 def _text(value: str) -> str:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _text")
     if not value or value != value.strip():
         raise ValueError("value must be a non-empty trimmed string")
@@ -36,13 +46,30 @@ def _text(value: str) -> str:
 
 
 def _optional_text(value: str | None) -> str | None:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _optional_text")
     return None if value is None else _text(value)
 
 
 def _utc(value: datetime) -> datetime:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _utc")
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         raise ValueError("timestamp must be aware UTC")
@@ -50,7 +77,17 @@ def _utc(value: datetime) -> datetime:
 
 
 def _unique_texts(values: tuple[str, ...]) -> tuple[str, ...]:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        values: The ``values`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _unique_texts")
     validated = tuple(_text(value) for value in values)
     if len(set(validated)) != len(validated):
@@ -72,7 +109,14 @@ class SourceLicensePolicy(_Contract):
     @field_validator("source_id")
     @classmethod
     def _validate_source_id(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_source_id")
         return _text(value)
 
@@ -81,7 +125,17 @@ class SourceLicensePolicy(_Contract):
     def _validate_workflows(
         cls, value: tuple[WorkflowContext, ...]
     ) -> tuple[WorkflowContext, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_workflows")
         if len(set(value)) != len(value):
             raise ValueError("permitted_workflows must be unique")
@@ -90,7 +144,17 @@ class SourceLicensePolicy(_Contract):
     @field_validator("retention_days")
     @classmethod
     def _validate_retention(cls, value: int | None) -> int | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_retention")
         if value is not None and value < 0:
             raise ValueError("retention_days must be non-negative")
@@ -99,13 +163,27 @@ class SourceLicensePolicy(_Contract):
     @field_validator("attribution_text")
     @classmethod
     def _validate_attribution(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_attribution")
         return _optional_text(value)
 
     @model_validator(mode="after")
     def _validate_attribution_relation(self) -> SourceLicensePolicy:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_attribution_relation")
         if self.attribution_required and self.attribution_text is None:
             raise ValueError("attribution_text is required")
@@ -141,20 +219,41 @@ class SourceDescriptor(_Contract):
     )
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("capabilities", "promotion_evidence")
     @classmethod
     def _validate_text_tuple(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text_tuple")
         return _unique_texts(value)
 
     @model_validator(mode="after")
     def _validate_descriptor(self) -> SourceDescriptor:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_descriptor")
         if not self.capabilities:
             raise ValueError("capabilities must not be empty")
@@ -180,28 +279,59 @@ class SourceReadRequest(_Contract):
     @field_validator("source_id", "provider_symbol", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("timeframe")
     @classmethod
     def _validate_timeframe(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_timeframe")
         return _optional_text(value)
 
     @field_validator("start", "end")
     @classmethod
     def _validate_time(cls, value: datetime | None) -> datetime | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return None if value is None else _utc(value)
 
     @field_validator("limit")
     @classmethod
     def _validate_limit(cls, value: int) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_limit")
         if value <= 0:
             raise ValueError("limit must be positive")
@@ -209,7 +339,14 @@ class SourceReadRequest(_Contract):
 
     @model_validator(mode="after")
     def _validate_range(self) -> SourceReadRequest:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_range")
         if (self.start is None) != (self.end is None):
             raise ValueError("start and end must be supplied together")
@@ -236,14 +373,28 @@ class RawSourceBatch(_Contract):
     @field_validator("source_id", "provider_symbol", "revision", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("retrieved_at")
     @classmethod
     def _validate_retrieved_at(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_retrieved_at")
         return _utc(value)
 
@@ -252,7 +403,14 @@ class RawSourceBatch(_Contract):
     def _freeze_records(
         cls, value: tuple[Mapping[str, object], ...]
     ) -> tuple[Mapping[str, object], ...]:
-        """Freeze one DATA contract value against mutation."""
+        """Freeze one DATA contract value against mutation.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _freeze_records")
         return tuple(MappingProxyType(dict(record)) for record in value)
 
@@ -260,7 +418,14 @@ class RawSourceBatch(_Contract):
     def _serialize_records(
         self, value: tuple[Mapping[str, object], ...]
     ) -> tuple[dict[str, object], ...]:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_records")
         return tuple(dict(record) for record in value)
 
@@ -275,7 +440,14 @@ class SourceIdentityRequest(_Contract):
     @field_validator("source_id", "identity", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
@@ -303,14 +475,31 @@ class SourceIdentity(_Contract):
     )
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("provenance", mode="after")
     @classmethod
     def _freeze_provenance(cls, value: Mapping[str, str]) -> Mapping[str, str]:
-        """Freeze one DATA contract value against mutation."""
+        """Freeze one DATA contract value against mutation.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _freeze_provenance")
         frozen = MappingProxyType(
             {_text(key): _text(item) for key, item in value.items()}
@@ -321,7 +510,14 @@ class SourceIdentity(_Contract):
 
     @field_serializer("provenance", when_used="json")
     def _serialize_provenance(self, value: Mapping[str, str]) -> dict[str, str]:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_provenance")
         return dict(value)
 
@@ -337,20 +533,41 @@ class SourcePlan(_Contract):
     @field_validator("requested_source", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("ordered_sources", "attempted_sources")
     @classmethod
     def _validate_sources(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_sources")
         return _unique_texts(value)
 
     @model_validator(mode="after")
     def _validate_plan(self) -> SourcePlan:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_plan")
         if not self.ordered_sources or self.ordered_sources[0] != self.requested_source:
             raise ValueError("ordered_sources must begin with requested_source")
@@ -370,14 +587,31 @@ class SourcePromotionRequest(_Contract):
     @field_validator("source_id", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("evidence")
     @classmethod
     def _validate_evidence(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_evidence")
         validated = _unique_texts(value)
         if not validated:

@@ -44,7 +44,7 @@
   optimistic command routes, and the accessible workstation presentation. Human
   API approval is attestation only; Risk-owned authorization remains authoritative,
   and owner handlers verify expected versions before mutation.
-* Strategy domain persistence is implemented and `Completed`: `app/services/strategy//` owns seven persistent runtime tables (`strategy_definitions`, `strategy_versions`, `strategy_configs`, `strategy_state`, `strategy_checkpoints`, `strategy_signals`, `strategy_mutations`) backed by applied migrations `0001_strategy_domain` and `0002_strategy_seven_table_runtime`. Schema migrations flow through the Strategy migration manifest (`run_strategy_migrations`), private CRUD in `app/services/strategy/persistence/` constructs SQL statements and delegates transaction execution to `app.services.data`, feature operations outside `persistence/` provide production reachability, and database bootstrap/population (`scripts/strategy/populate_strategy_database.py`) is restricted to an explicitly selected non-production environment (`ENVIRONMENT=dev`).
+* Strategy domain persistence is implemented and `Completed`: `app/services/strategy//` owns seven persistent runtime tables (`strategy_definitions`, `strategy_versions`, `strategy_configs`, `strategy_state`, `strategy_checkpoints`, `strategy_signals`, `strategy_mutations`) backed by applied migrations `0001_strategy_domain` and `0002_strategy_seven_table_runtime`, plus operational-planning tables (`strategy_profiles`, `strategy_playbooks`, `strategy_setup_evaluations`, `strategy_plans`, `strategy_automation_policy`, `strategy_lifecycle`) defined by additive migration `0003_strategy_operational_planning`. Schema migrations flow through the Strategy migration manifest (`run_strategy_migrations`), private CRUD in `app/services/strategy/persistence/` constructs SQL statements and delegates transaction execution to `app.services.data`, feature operations outside `persistence/` provide production reachability, and database bootstrap/population (`scripts/strategy/populate_strategy_database.py`) is restricted to an explicitly selected non-production environment (`ENVIRONMENT=dev`).
 * Indicators domain is implemented and `Completed`: `app/services/indicators/` is pure, stateless, and read-only with zero active database tables (retired via migration 002). Backend v1 exposes 3 authenticated read-only API routes (`/api/v1/indicators`, `/api/v1/indicators/capabilities`, `/api/v1/indicators/{indicator_id}`), and the Next.js UI frontend mounts `IndicatorWorkspace` in `WorkspaceGrid` and `Sidebar`.
 * `app/agentic/README.md` defines the complete Agentic Firm target. The package now
   exists and Agentic status is `Partial`: `FEAT-AGT-01` implements the seven canonical
@@ -232,8 +232,9 @@
   disabling a package that never held safety authority cannot weaken safety.
   `WF-AGT-005`'s planned `open_sandbox` and `stage_code_artifact` are
   deliberately not exported, because no isolation runtime exists to open.
-  `FEAT-AGT-09` and `FEAT-AGT-10` complete the twenty-two once `FEAT-DATA-16`
-  and `FEAT-RES-13` unblocked them. Both read a Research projection through an
+  `FEAT-AGT-09` and `FEAT-AGT-10` complete the twenty-two once Data's
+  point-in-time source evidence capability and `FEAT-RES-13` unblocked them. Both
+  read a Research projection through an
   injected port rather than importing a receiver, so the chain stays
   Agentic to Research to Data. Applicability is the receiver's answer read
   before any model call, which is why a fundamental reading of an FX instrument
@@ -274,26 +275,21 @@
   synchronization, normalized permanent event definitions and specifications,
   exact provider-value
   normalization, symbol-scoped restriction evidence, and governed SQLite coverage,
-  plus
-  `FEAT-DATA-16` point-in-time licensed source documents, structured observations,
+  plus point-in-time licensed source documents, structured observations,
   immutable revisions, verified-source manifests, and bounded projections for
   Research consumption.
-  `CAP-DATA-028` locates the behavior in
-  eighteen approved capabilities: `contracts/`, `market_data/`,
-  `local_datasets/`, `synthetic_data/`, `tick_derivation/`, `persistence/`,
-  `quality/`, `transformation/`, `time_sessions/`, `sources/`,
-  `economic_calendar/`, `realtime_feeds/`, `data_jobs/`, `evidence/`, `audit/`,
-  `research_sources/`, and `runtime_stores/`. Private `_shared/` construction
-  adapters and `migrations/` definitions are documented support directories. Exactly
-  eighteen numbered standalone usage programs cover
-  those owners, and removed
+  `CAP-DATA-028` locates the behavior in fourteen approved feature owners indexed by
+  the Data package README. Contracts, persistence, migrations, and private `_shared/`
+  construction adapters remain documented support directories rather than extra
+  features. Exactly fourteen numbered standalone usage programs cover those owners,
+  and removed
   horizontal packages have no compatibility shims. The correction changes ownership
   and file focus only; active requirements, public behaviour, contract versions,
   schema identifiers, error codes, and the explicit package-root API remain
   compatible.
-* `app/services/indicators/` contains the implemented
-  immutable Core calculation boundary and 21 approved one-indicator-per-file
-  implementations across trend, volatility, momentum, volume, and candles.
+* `app/services/indicators/` contains the completed immutable Core calculation
+  boundary and 64 approved one-indicator-per-file implementations across its 14
+  registered formula and transport features.
   It is stateless and read-only: migration `001_indicator_schema_v1`
   historically introduced three empty support tables, and immutable migration
   `002_remove_unused_indicator_support_schema` retired them through Data's
@@ -327,8 +323,9 @@
   `TradeRecord v1`, and `OperationalEvent v1`. Production live mutation remains
   disabled by default.
 * Later agile phases reuse these completed domains and run compatibility/regression
-  checks; they do not rebuild them. Current semantic-docstring/format cleanup is a
-  separate repository-quality gate.
+  checks; they do not rebuild them. Data docstring conformance is structurally
+  enforced; remaining semantic-docstring/format cleanup is a separate
+  repository-quality gate.
 * `app/services/analytics/` is a completed read-only implementation across
   contracts, producer-neutral ledger and Data-owned benchmark adaptation, 60
   cataloged metrics, report/allocation evidence, bounded dashboards, all active
@@ -359,7 +356,7 @@
 
 ### Workspace Directory Layout (Target)
 
-* `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, API composition, and channel-neutral critical operational alert delivery. Registered owner-backed operations include Trading session and governed submit/cancel/close routes alongside dashboard, audit-event, Trading operational-event, and Data market-stream sources. The stream route owns authentication, quota admission, SSE framing, and cleanup only; Data owns stream acquisition and cadence. Trading write routes compose exact owner requests and never replace Risk, kill-switch, approval, route, or reconciliation authority. UI/API owns user/session/unified user-and-system settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration. System Broker composition reads persisted enablement, resolves the approved encrypted credential slot in memory, and admits only fixed non-production targets.
+* `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, API composition, and channel-neutral critical operational alert delivery. Registered owner-backed operations include Trading session and governed submit/cancel/close routes alongside dashboard, audit-event, Trading operational-event, and Data market-stream sources. Its authenticated Data capability catalogue presents bounded metadata for all fourteen Data features without invoking providers, fabricating evidence, or duplicating Data policy. The stream route owns authentication, quota admission, SSE framing, and cleanup only; Data owns stream acquisition and cadence. Trading write routes compose exact owner requests and never replace Risk, kill-switch, approval, route, or reconciliation authority. UI/API owns user/session/unified user-and-system settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration. System Broker composition reads persisted enablement, resolves the approved encrypted credential slot in memory, and admits only fixed non-production targets.
 * `app/agentic/`: Approved top-level orchestration domain with one focused owning module per registered feature. Ten shared infrastructure features remain root packages for portable contracts/governance, Google ADK adaptation, durable orchestration, permissions, context/memory, bounded deliberation, lifecycle, operations, and public API. Twelve role-bearing feature modules are leaf packages under the namespace-only `agents/<department>/<agent_name>/` hierarchy; each owns `agent.py`, `prompt.md`, schemas, README, and only its declared optional files. Agentic submits untrusted typed requests only and has no direct execution path.
 * `app/`: Core domain modules (utils, brokers, data, indicators, strategy, risk, trading, simulator, analytics, optimization, research, portfolio, agentic, and API). Live-route execution is owned by Trading.
 * `data/`: SQLite databases, migration tracking, cache/log dumps, market/research assets.
@@ -515,7 +512,7 @@ versions fail closed, and random draws depend only on explicit seed, stream name
 algorithm version, and draw index.
 
 * **Public Export Rule**: `app/utils/__init__.py` exposes only the approved shared surface through an explicit `__all__`. No fallback imports, shims, duplicate modules, or single-consumer helpers are permitted.
-* **Target Submodule Footprint**: shared contracts, errors, IDs, time, canonical serialization, redaction, typed bootstrap settings, and structured logging. `AppSettings` accepts explicit values and process environment only; repository configuration files are not runtime sources. UI/API owns versioned global non-secret settings in `api_settings`, AES-GCM encrypted write-only provider credentials in `api_credentials`, typed manifests, validation, active-key selection, and startup snapshots. Deployment infrastructure exclusively owns the bootstrap values needed before SQLite or decryption is available: environment/runtime safety controls, database/path configuration, API origin/bind configuration, JWT signing material, and credential-encryption keys. Database-backed changes activate after a controlled restart so composition roots can inject one coherent snapshot into owning domains.
+* **Target Submodule Footprint**: shared contracts, errors, IDs, time, canonical serialization, redaction, typed bootstrap settings, and structured logging. `AppSettings` accepts explicit values and process environment only; repository configuration files are not runtime sources. Logging starts with the Utils-owned safe `INFO` bootstrap profile; after API migrations, UI/API reads the global document from `api_settings`, validates and activates `LOG_LEVEL`, translates only approved provider enablement/path values into an opaque Utils settings object, and installs it through Data's context-local public boundary for the complete API lifespan. Data, Brokers, and Utils never query API persistence. UI/API owns versioned global non-secret settings in `api_settings`, AES-GCM encrypted write-only provider credentials in `api_credentials`, typed manifests, validation, active-key selection, and startup snapshots. Deployment infrastructure exclusively owns the bootstrap values needed before SQLite or decryption is available: environment/runtime safety controls, database/path configuration, API origin/bind configuration, JWT signing material, and credential-encryption keys. Database-backed changes activate after a controlled restart so composition roots can inject one coherent snapshot into owning domains.
 * **Contract Ownership Rule**: Domain contract modules own their payload and business-outcome behavior locally. Utils owns only the shared five-field public-operation response envelope and business-neutral error-definition shape; domains do not inherit any other centralized contract base.
 
 ### Standard Public-Operation Response
@@ -623,7 +620,7 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
   and source readiness/licence/promotion policy belong in
   `app.services.data.sources`.
 - Real-time market acquisition and subscription semantics belong in
-  `app.services.data.realtime_feeds`. MT5 tick mode polls the verified Brokers
+  `app.services.data.market_events`. MT5 tick mode polls the verified Brokers
   tick-copy read without timeframe throttling; bar mode emits genuine closed bars at
   the selected canonical UTC boundary. Shared sequencing, heartbeat, bounded replay,
   explicit gap/backpressure failure, and producer cleanup remain Data behavior. The
@@ -819,7 +816,7 @@ domain and not an execution-control authority:
 | **System Persistence** | `DATABASE_URL`, `DATA_DIR`, `ARTIFACT_DIR`, `DATA_CACHE_PATH` |
 | **Operational Protection** | `ALLOW_LIVE_MUTATIONS` (defaults to `false`), `RUNTIME_PROFILE`, `EXECUTION_ROUTE` |
 | **Structured Logging** | `LOG_LEVEL`, `LOG_RENDER` |
-| **Settings Loading** | Explicit values and process environment bootstrap only the values required before SQLite can open or credentials can decrypt. After API migrations, UI/API loads the versioned global non-secret document from `api_settings`; provider secrets are encrypted in `api_credentials` and are never returned through read APIs. All database-backed changes require a controlled restart. |
+| **Settings Loading** | Explicit values and process environment bootstrap only the values required before SQLite can open or credentials can decrypt. Logging uses safe `INFO` and providers remain disabled during that phase. After API migrations, UI/API loads the versioned global document, activates `LOG_LEVEL`, and injects its validated provider enablement/path snapshot into Data/Brokers for the API lifespan; provider secrets remain encrypted in `api_credentials` and are never returned through read APIs. All database-backed changes require a controlled restart. |
 | **Broker Integration** | Provider-neutral adapter selection/readiness plus adapter-specific settings; UI/API composition resolves credential references and injects Brokers-owned `BrokerConnectionConfig` instances. |
 
 ---
@@ -2118,7 +2115,7 @@ Analytics support schemas were retired empty.
 
 | Sub-phase | Status | Delivered |
 |---|---|---|
-| 4A | Shipped schema; application integration reactivated | Artifact catalogue (7 tables); the withdrawn conflicting `FR-DATA-154`–`160` allocation remains historical, while current `FEAT-DATA-18` uses `FR-DATA-161`–`167` |
+| 4A | Shipped schema; application integration reactivated | Artifact catalogue (7 tables); the withdrawn conflicting `FR-DATA-154`–`160` allocation remains historical, while current `FEAT-DATA-02` uses `FR-DATA-161`–`167` |
 | 4B | Historical schema retired | `indicator_*` support tables were introduced by migration `001_indicator_schema_v1` and retired empty by immutable migration `002_remove_unused_indicator_support_schema` |
 | 4C | Historical schema retired | `analytics_*` tables were introduced by step `001` and retired empty by guarded step `002`; persistence feature/requirements withdrawn from the current registry |
 | 4D | Shipped; reconciled | Trading event/order materialisation, an insert-only closed-position ledger, and migrations `003`–`004` lifecycle evidence tables with production CRUD reachability |

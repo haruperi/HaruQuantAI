@@ -27,16 +27,40 @@ class _Notifier(Protocol):
     """Internal notifier substitution contract."""
 
     @property
-    def active(self) -> bool: ...
+    def active(self) -> bool:
+        """Return whether the channel is active.
+
+        Returns:
+            True if active and ready.
+        """
+        ...
 
     def send(
         self, title: str, text: str, html_body: str | None = None
-    ) -> Mapping[str, object]: ...
+    ) -> Mapping[str, object]:
+        """Send a message through the notifier.
+
+        Args:
+            title: Notification title.
+            text: Plain text body.
+            html_body: Optional HTML body.
+
+        Returns:
+            Channel delivery result mapping.
+        """
+        ...
 
 
 @dataclass(frozen=True, slots=True)
 class NotificationManagerConfig:
-    """Validated internal manager configuration."""
+    """Validated internal manager configuration.
+
+    Attributes:
+        enabled: Whether notification management is enabled.
+        default_channels: Default target channel names.
+        rate_limit: Maximum allowed sends per rate window per channel.
+        rate_window_seconds: Rate window duration in seconds.
+    """
 
     enabled: bool = False
     default_channels: tuple[str, ...] = ()
@@ -50,7 +74,12 @@ class NotificationManager:
     def __init__(
         self, config: NotificationManagerConfig, notifiers: Mapping[str, _Notifier]
     ) -> None:
-        """Initialize one manager session."""
+        """Initialize one manager session.
+
+        Args:
+            config: Manager configuration settings.
+            notifiers: Channel name to notifier adapter map.
+        """
         self._config = config
         self._notifiers = dict(notifiers)
         self._templates = TemplateRegistry()
@@ -59,7 +88,11 @@ class NotificationManager:
         self._closed = False
 
     def status(self) -> Mapping[str, object]:
-        """Return secret-safe manager and channel state."""
+        """Return secret-safe manager and channel state.
+
+        Returns:
+            Mapping of manager state and channel availability.
+        """
         with self._lock:
             return MappingProxyType(
                 {
@@ -158,13 +191,24 @@ class NotificationManager:
             self._events.clear()
 
     def template_names(self) -> tuple[str, ...]:
-        """Return registered template names."""
+        """Return registered template names.
+
+        Returns:
+            Tuple of registered template names.
+        """
         return self._templates.names()
 
     def register_template(
         self, name: str, title: str, text: str, html_body: str
     ) -> None:
-        """Register a session-local custom template."""
+        """Register a session-local custom template.
+
+        Args:
+            name: Template name.
+            title: Title format string.
+            text: Plain text body format string.
+            html_body: HTML body format string.
+        """
         self._templates.register(name, title, text, html_body)
 
     def render_template(
@@ -256,7 +300,7 @@ def create_notification_manager(
         if value is not None:
             if not isinstance(value, expected):
                 raise ConfigurationError("NOTIFICATION_CONFIG_INVALID")
-            notifiers[name] = factory(value)  # type: ignore[arg-type,assignment]
+            notifiers[name] = factory(value)  # type: ignore[arg-type]
     return NotificationManager(config, notifiers)
 
 

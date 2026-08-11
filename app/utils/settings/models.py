@@ -100,7 +100,7 @@ class LoggingSettings(_ConfigurationModel):
         colorize: If True, adds color escape sequences to terminal logs.
     """
 
-    level: LogLevel = "DEBUG"
+    level: LogLevel = "INFO"
     render: LogRender = "human"
     file_path: Path | None = None
     log_directory: Path | None = Path("data/logs")

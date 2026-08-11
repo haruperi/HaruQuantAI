@@ -10,6 +10,10 @@ def select_price(
 ) -> tuple[object | None, str]:
     """Select a side-aware price or preserve unknown evidence.
 
+    Args:
+        position: Mapping containing position details including side.
+        policy: Valuation policy mapping containing source rules.
+
     Returns:
         Selected price and declared source name.
     """

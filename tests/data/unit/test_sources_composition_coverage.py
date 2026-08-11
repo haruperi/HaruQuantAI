@@ -86,7 +86,7 @@ def test_lazy_broker_session_disabled_provider() -> None:
     mock_settings = BrokerProviderSettings(mt5_enabled=False)
 
     with patch(
-        "app.services.data.sources.composition.load_broker_provider_settings",
+        "app.services.data.sources.composition.get_data_provider_settings",
         return_value=mock_settings,
     ):
         with pytest.raises(DataError) as exc_info:
@@ -106,7 +106,7 @@ def test_lazy_broker_session_mt5_missing_credentials() -> None:
         mt5_server=None,
     )
     with patch(
-        "app.services.data.sources.composition.load_broker_provider_settings",
+        "app.services.data.sources.composition.get_data_provider_settings",
         return_value=mock_settings,
     ):
         with pytest.raises(DataError) as exc_info:
@@ -135,7 +135,7 @@ def test_credential_free_adapters_and_sources() -> None:
                 }
             )
             with patch(
-                "app.services.data.sources.composition.load_broker_provider_settings",
+                "app.services.data.sources.composition.get_data_provider_settings",
                 return_value=mock_settings,
             ):
                 adapter = session.adapter(_REQ_ID)
@@ -219,7 +219,7 @@ def test_ensure_source_and_access_dukascopy() -> None:
             return_value=mock_result,
         ),
         patch(
-            "app.services.data.sources.composition.load_broker_provider_settings",
+            "app.services.data.sources.composition.get_data_provider_settings",
             return_value=mock_provider_settings,
         ),
     ):

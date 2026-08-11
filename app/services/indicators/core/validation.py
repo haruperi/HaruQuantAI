@@ -1,3 +1,4 @@
+# ruff: noqa: C901, DOC202
 """Fail-fast whole-request validation preceding official calculation.
 
 Resolves the official spec and atomically validates configuration,
@@ -56,12 +57,15 @@ def _validate_config_identity(indicator_id: str, config: IndicatorConfig) -> Non
     """Validate that config identity and fixed policy fields agree.
 
     Args:
-        indicator_id: Requested official indicator identifier.
-        config: The candidate calculation configuration.
+            indicator_id: Requested official indicator identifier.
+            config: The candidate calculation configuration.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_INVALID_CONFIG`` if the config disagrees with
-            the requested indicator or a fixed policy field is non-approved.
+            IndicatorError: ``IND_INVALID_CONFIG`` if the config disagrees with
+                the requested indicator or a fixed policy field is non-approved.
     """
     if config.indicator_id != indicator_id:
         raise IndicatorError(
@@ -86,10 +90,13 @@ def _validate_output_mode(config: IndicatorConfig) -> None:
     """Validate that the output mode is exactly ``values``.
 
     Args:
-        config: The candidate calculation configuration.
+            config: The candidate calculation configuration.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_INVALID_OUTPUT_MODE`` otherwise.
+            IndicatorError: ``IND_INVALID_OUTPUT_MODE`` otherwise.
     """
     if config.output_mode != "values":
         raise IndicatorError(
@@ -102,10 +109,13 @@ def _validate_precision_dtype(config: IndicatorConfig) -> None:
     """Validate that the precision dtype is exactly ``float64``.
 
     Args:
-        config: The candidate calculation configuration.
+            config: The candidate calculation configuration.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_UNSUPPORTED_DTYPE`` otherwise.
+            IndicatorError: ``IND_UNSUPPORTED_DTYPE`` otherwise.
     """
     if config.precision_dtype != "float64":
         raise IndicatorError(
@@ -118,11 +128,14 @@ def _validate_formula_version(spec: IndicatorSpec, config: IndicatorConfig) -> N
     """Validate that the config formula version matches the registry.
 
     Args:
-        spec: The resolved official spec.
-        config: The candidate calculation configuration.
+            spec: The resolved official spec.
+            config: The candidate calculation configuration.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_FORMULA_VERSION_MISMATCH`` otherwise.
+            IndicatorError: ``IND_FORMULA_VERSION_MISMATCH`` otherwise.
     """
     if config.formula_version != spec.formula_version:
         raise IndicatorError(
@@ -137,21 +150,24 @@ def _validate_one_declared_parameter(
 ) -> None:
     """Validate one config parameter against its declared schema entry.
 
-    Generalizes period-only validation to any declared parameter (for
-    example a formula-specific ``threshold`` or ``std_dev`` multiplier),
-    using the same ``type``/``minimum``/``maximum``/``required`` schema
-    shape ``_period_schema`` already produces for ``period``.
+        Generalizes period-only validation to any declared parameter (for
+        example a formula-specific ``threshold`` or ``std_dev`` multiplier),
+        using the same ``type``/``minimum``/``maximum``/``required`` schema
+        shape ``_period_schema`` already produces for ``period``.
 
     Args:
-        name: The declared parameter's canonical key.
-        schema: The parameter's frozen schema entry.
-        value: The candidate value supplied in ``config.parameters``, or
-            ``None`` if the caller omitted it.
+            name: The declared parameter's canonical key.
+            schema: The parameter's frozen schema entry.
+            value: The candidate value supplied in ``config.parameters``, or
+                ``None`` if the caller omitted it.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_INVALID_PARAMETER`` if a required parameter is
-            missing, its type disagrees with the schema, or it falls outside
-            the declared minimum/maximum.
+            IndicatorError: ``IND_INVALID_PARAMETER`` if a required parameter is
+                missing, its type disagrees with the schema, or it falls outside
+                the declared minimum/maximum.
     """
     if value is None:
         if schema.get("required", False):
@@ -198,13 +214,16 @@ def _validate_parameters(spec: IndicatorSpec, config: IndicatorConfig) -> None:
     """Validate canonical parameter shape, declared parameters, and source.
 
     Args:
-        spec: The resolved official spec.
-        config: The candidate calculation configuration.
+            spec: The resolved official spec.
+            config: The candidate calculation configuration.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_INVALID_PARAMETER`` if keys are malformed, a
-            declared parameter is missing/invalid, an undeclared parameter
-            is supplied, or the source is invalid for this indicator.
+            IndicatorError: ``IND_INVALID_PARAMETER`` if keys are malformed, a
+                declared parameter is missing/invalid, an undeclared parameter
+                is supplied, or the source is invalid for this indicator.
     """
     keys = [key for key, _ in config.parameters]
     if keys != sorted(keys) or len(set(keys)) != len(keys):
@@ -248,10 +267,13 @@ def _validate_row_limit(data: MarketDataset) -> None:
     """Validate that the input row count does not exceed the approved limit.
 
     Args:
-        data: The candidate input dataset.
+            data: The candidate input dataset.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_RESOURCE_LIMIT_EXCEEDED`` otherwise.
+            IndicatorError: ``IND_RESOURCE_LIMIT_EXCEEDED`` otherwise.
     """
     if len(data.records) > MAX_INPUT_ROWS:
         raise IndicatorError(
@@ -265,12 +287,15 @@ def _validate_input_schema(data: MarketDataset) -> None:
     """Validate dataset contract identity, bars-only kind, and quality.
 
     Args:
-        data: The candidate input dataset.
+            data: The candidate input dataset.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_INVALID_INPUT_SCHEMA`` if the contract
-            version, schema ID, data kind, record types, or quality status
-            are not approved for Indicators.
+            IndicatorError: ``IND_INVALID_INPUT_SCHEMA`` if the contract
+                version, schema ID, data kind, record types, or quality status
+                are not approved for Indicators.
     """
     if data.contract_version != "v1" or data.schema_id != "data.market_dataset.v1":
         raise IndicatorError(
@@ -295,12 +320,15 @@ def _validate_adr_timeframe(indicator_id: str, data: MarketDataset) -> None:
     """Validate that ADR receives only a ``D1`` source dataset.
 
     Args:
-        indicator_id: Requested official indicator identifier.
-        data: The candidate input dataset.
+            indicator_id: Requested official indicator identifier.
+            data: The candidate input dataset.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_UNSUPPORTED_TIMEFRAME`` if ADR is requested
-            against a non-``D1`` dataset.
+            IndicatorError: ``IND_UNSUPPORTED_TIMEFRAME`` if ADR is requested
+                against a non-``D1`` dataset.
     """
     if indicator_id == "adr" and data.timeframe != "D1":
         raise IndicatorError(
@@ -314,10 +342,13 @@ def _validate_sufficient_data(data: MarketDataset) -> None:
     """Validate that the dataset contains at least one usable record.
 
     Args:
-        data: The candidate input dataset.
+            data: The candidate input dataset.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_INSUFFICIENT_DATA`` if the dataset is empty.
+            IndicatorError: ``IND_INSUFFICIENT_DATA`` if the dataset is empty.
     """
     if len(data.records) == 0:
         raise IndicatorError(
@@ -332,11 +363,14 @@ def _resolve_price_fields(
     """Resolve an indicator's required columns to concrete record fields.
 
     Args:
-        spec: The resolved official spec.
-        config: The candidate calculation configuration.
+            spec: The resolved official spec.
+            config: The candidate calculation configuration.
 
     Returns:
-        The concrete OHLC record field names this indicator reads.
+            The concrete OHLC record field names this indicator reads.
+
+    Raises:
+        None.
     """
     return tuple(
         config.source if column == "source" and config.source else column
@@ -348,12 +382,15 @@ def _validate_required_columns(spec: IndicatorSpec, config: IndicatorConfig) -> 
     """Validate that required fixed/source columns resolve to real fields.
 
     Args:
-        spec: The resolved official spec.
-        config: The candidate calculation configuration.
+            spec: The resolved official spec.
+            config: The candidate calculation configuration.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_MISSING_REQUIRED_COLUMN`` if a resolved field
-            is not one of the dataset's always-present OHLCV columns.
+            IndicatorError: ``IND_MISSING_REQUIRED_COLUMN`` if a resolved field
+                is not one of the dataset's always-present OHLCV columns.
     """
     fields = _resolve_price_fields(spec, config)
     missing = tuple(field for field in fields if field not in _SOURCE_OHLCV_COLUMNS)
@@ -369,10 +406,13 @@ def _validate_timezone(data: MarketDataset) -> None:
     """Validate that every record timestamp is UTC-aware.
 
     Args:
-        data: The candidate input dataset.
+            data: The candidate input dataset.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_INVALID_TIMEZONE`` otherwise.
+            IndicatorError: ``IND_INVALID_TIMEZONE`` otherwise.
     """
     for record in data.records:
         if record.timestamp.tzinfo is None or record.timestamp.utcoffset() != timedelta(
@@ -388,11 +428,14 @@ def _validate_no_ambiguous_timestamps(data: MarketDataset) -> None:
     """Validate that timestamps round-trip uniquely into a pandas index.
 
     Args:
-        data: The candidate input dataset.
+            data: The candidate input dataset.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_AMBIGUOUS_TIMESTAMP`` if conversion fails or
-            round-trips to a different value or row count.
+            IndicatorError: ``IND_AMBIGUOUS_TIMESTAMP`` if conversion fails or
+                round-trips to a different value or row count.
     """
     timestamps = [record.timestamp for record in data.records]
     try:
@@ -416,10 +459,13 @@ def _validate_unique_timestamps(data: MarketDataset) -> None:
     """Validate that record timestamps are unique.
 
     Args:
-        data: The candidate input dataset.
+            data: The candidate input dataset.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_DUPLICATE_TIMESTAMP`` otherwise.
+            IndicatorError: ``IND_DUPLICATE_TIMESTAMP`` otherwise.
     """
     timestamps = [record.timestamp for record in data.records]
     if len(set(timestamps)) != len(timestamps):
@@ -433,10 +479,13 @@ def _validate_monotonic_timestamps(data: MarketDataset) -> None:
     """Validate that record timestamps are strictly increasing.
 
     Args:
-        data: The candidate input dataset.
+            data: The candidate input dataset.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_NON_MONOTONIC_TIME`` otherwise.
+            IndicatorError: ``IND_NON_MONOTONIC_TIME`` otherwise.
     """
     timestamps = [record.timestamp for record in data.records]
     if timestamps != sorted(timestamps):
@@ -452,13 +501,16 @@ def _validate_finite_numeric(
     """Validate that selected numeric values convert to finite float64.
 
     Args:
-        spec: The resolved official spec.
-        config: The candidate calculation configuration.
-        data: The candidate input dataset.
+            spec: The resolved official spec.
+            config: The candidate calculation configuration.
+            data: The candidate input dataset.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_UNSUPPORTED_DTYPE`` if a selected value does
-            not convert to a finite float.
+            IndicatorError: ``IND_UNSUPPORTED_DTYPE`` if a selected value does
+                not convert to a finite float.
     """
     fields = _resolve_price_fields(spec, config)
     for record in data.records:
@@ -480,29 +532,81 @@ def _validate_finite_numeric(
                 )
 
 
+_POSITIVE_SOURCE_INDICATORS = frozenset(
+    {
+        "rolling_volatility",
+        "ewma_volatility",
+        "volatility_percentile",
+        "volatility_of_volatility",
+    }
+)
+_POSITIVE_CLOSE_INDICATORS = frozenset({"atr_percent"})
+_POSITIVE_HIGH_LOW_INDICATORS = frozenset({"parkinson_volatility"})
+_POSITIVE_OHLC_INDICATORS = frozenset(
+    {"garman_klass_volatility", "rogers_satchell_volatility"}
+)
+
+
 def _validate_formula_specific_invariants(
     indicator_id: str, config: IndicatorConfig, data: MarketDataset
 ) -> None:
     """Validate formula-specific OHLC/positive-price invariants.
 
     Args:
-        indicator_id: Requested official indicator identifier.
-        config: The candidate calculation configuration.
-        data: The candidate input dataset.
+            indicator_id: Requested official indicator identifier.
+            config: The candidate calculation configuration.
+            data: The candidate input dataset.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_INVALID_OHLC`` if rolling_volatility receives
-            a non-positive selected price.
+            IndicatorError: ``IND_INVALID_OHLC`` if a formula requiring strictly
+                positive prices (return-based volatility, ATR%, and the
+                range-based volatility estimators) receives a non-positive
+                price, or Parkinson receives a high below its paired low.
     """
-    if indicator_id != "rolling_volatility":
+    if indicator_id in _POSITIVE_SOURCE_INDICATORS:
+        source = config.source or "close"
+        for record in data.records:
+            if getattr(record, source) <= 0:
+                raise IndicatorError(
+                    IndicatorErrorCode.IND_INVALID_OHLC,
+                    f"{indicator_id} requires strictly positive source prices",
+                    {"indicator_id": indicator_id},
+                )
         return
-    source = config.source or "close"
-    for record in data.records:
-        if getattr(record, source) <= 0:
-            raise IndicatorError(
-                IndicatorErrorCode.IND_INVALID_OHLC,
-                "rolling_volatility requires strictly positive source prices",
-            )
+    if indicator_id in _POSITIVE_CLOSE_INDICATORS:
+        for record in data.records:
+            if record.close <= 0:
+                raise IndicatorError(
+                    IndicatorErrorCode.IND_INVALID_OHLC,
+                    f"{indicator_id} requires a strictly positive close",
+                    {"indicator_id": indicator_id},
+                )
+        return
+    if indicator_id in _POSITIVE_HIGH_LOW_INDICATORS:
+        for record in data.records:
+            if record.high <= 0 or record.low <= 0 or record.high < record.low:
+                raise IndicatorError(
+                    IndicatorErrorCode.IND_INVALID_OHLC,
+                    f"{indicator_id} requires positive high/low with high >= low",
+                    {"indicator_id": indicator_id},
+                )
+        return
+    if indicator_id in _POSITIVE_OHLC_INDICATORS:
+        for record in data.records:
+            if (
+                record.open <= 0
+                or record.high <= 0
+                or record.low <= 0
+                or record.close <= 0
+            ):
+                raise IndicatorError(
+                    IndicatorErrorCode.IND_INVALID_OHLC,
+                    f"{indicator_id} requires strictly positive OHLC prices",
+                    {"indicator_id": indicator_id},
+                )
 
 
 def _resolve_output_columns(
@@ -511,11 +615,14 @@ def _resolve_output_columns(
     """Resolve the deterministic output column names for one config.
 
     Args:
-        spec: The resolved official spec.
-        config: The candidate calculation configuration.
+            spec: The resolved official spec.
+            config: The candidate calculation configuration.
 
     Returns:
-        The resolved, deterministic output column names in canonical order.
+            The resolved, deterministic output column names in canonical order.
+
+    Raises:
+        None.
     """
     format_kwargs = dict(config.parameters)
     templates = spec.output_templates
@@ -531,10 +638,13 @@ def _validate_output_column_names(output_columns: tuple[str, ...]) -> None:
     """Validate that resolved output names are lowercase snake_case.
 
     Args:
-        output_columns: The resolved output column names.
+            output_columns: The resolved output column names.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_INVALID_OUTPUT_COLUMN`` otherwise.
+            IndicatorError: ``IND_INVALID_OUTPUT_COLUMN`` otherwise.
     """
     for column in output_columns:
         if not _SNAKE_CASE_KEY.fullmatch(column):
@@ -549,10 +659,13 @@ def _validate_no_output_collision(output_columns: tuple[str, ...]) -> None:
     """Validate that resolved outputs do not collide with reserved columns.
 
     Args:
-        output_columns: The resolved output column names.
+            output_columns: The resolved output column names.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: ``IND_OUTPUT_COLUMN_CONFLICT`` otherwise.
+            IndicatorError: ``IND_OUTPUT_COLUMN_CONFLICT`` otherwise.
     """
     reserved = set(_FIXED_RESULT_COLUMNS) | set(_SOURCE_OHLCV_COLUMNS)
     colliding = tuple(column for column in output_columns if column in reserved)

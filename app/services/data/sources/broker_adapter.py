@@ -61,12 +61,21 @@ class _AsyncRunner(Protocol):
         operation: Coroutine[Any, Any, T],
         request_id: str,
     ) -> T:
-        """Return the completed coroutine result."""
+        """Return the completed coroutine result.
+
+        Args:
+            operation: The ``operation`` argument.
+            request_id: The ``request_id`` argument.
+        """
         ...
 
 
 def _run[T](operation: Coroutine[Any, Any, T], request_id: str) -> T:
     """Run one bounded asynchronous broker read from the synchronous DATA API.
+
+    Args:
+        operation: The ``operation`` argument.
+        request_id: The ``request_id`` argument.
 
     Returns:
         Completed broker read result.
@@ -94,6 +103,11 @@ def _require_result[T](
     request_id: str,
 ) -> T:
     """Return a canonical Brokers result value or map it to a DATA failure.
+
+    Args:
+        result: The ``result`` argument.
+        operation: The ``operation`` argument.
+        request_id: The ``request_id`` argument.
 
     Returns:
         Successful result payload.
@@ -148,6 +162,14 @@ def _require_broker_timestamp[T](
 ) -> datetime:
     """Return the required Brokers completion timestamp.
 
+    Args:
+        result: The ``result`` argument.
+        operation: The ``operation`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         DataError: If the timestamp extension is absent or malformed.
     """
@@ -192,6 +214,9 @@ class ExternalMarketDataSource(MarketDataSource):
 
     async def _fetch_async(self, request: SourceReadRequest) -> RawSourceBatch:
         """Fetch bounded raw records without mutating adapter lifecycle.
+
+        Args:
+            request: The ``request`` argument.
 
         Returns:
             Provider-neutral raw source batch.
@@ -374,6 +399,9 @@ class ExternalMarketDataSource(MarketDataSource):
     async def _list_symbols_async(self, request: SymbolListRequest) -> SymbolPage:
         """Read an exact bounded provider-native symbol page.
 
+        Args:
+            request: The ``request`` argument.
+
         Returns:
             Bounded normalized symbol page.
 
@@ -411,6 +439,9 @@ class ExternalMarketDataSource(MarketDataSource):
         request: SymbolMetadataRequest,
     ) -> SymbolMetadata:
         """Read exact provider metadata without assigning guessed values.
+
+        Args:
+            request: The ``request`` argument.
 
         Returns:
             Normalized symbol metadata.
@@ -475,6 +506,9 @@ class ExternalMarketDataSource(MarketDataSource):
     def fetch(self, request: SourceReadRequest) -> StandardResponse[RawSourceBatch]:
         """Fetch raw records through the injected adapter.
 
+        Args:
+            request: The ``request`` argument.
+
         Returns:
             Standard response carrying the provider-neutral raw source batch.
         """
@@ -489,6 +523,9 @@ class ExternalMarketDataSource(MarketDataSource):
     @override
     def list_symbols(self, request: SymbolListRequest) -> StandardResponse[SymbolPage]:
         """List provider-native symbols through the injected adapter.
+
+        Args:
+            request: The ``request`` argument.
 
         Returns:
             Standard response carrying the bounded normalized symbol page.
@@ -508,6 +545,9 @@ class ExternalMarketDataSource(MarketDataSource):
         self, request: SymbolMetadataRequest
     ) -> StandardResponse[SymbolMetadata]:
         """Read provider-native symbol metadata through the injected adapter.
+
+        Args:
+            request: The ``request`` argument.
 
         Returns:
             Standard response carrying the normalized symbol metadata.

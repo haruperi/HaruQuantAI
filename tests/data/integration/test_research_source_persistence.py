@@ -100,7 +100,7 @@ def test_ingest_is_idempotent_and_query_is_point_in_time(
     """Persist verified bytes once and exclude them before availability."""
     now = datetime(2026, 1, 2, tzinfo=UTC)
     monkeypatch.setattr(
-        "app.services.data.research_sources.ingestion._fetch",
+        "app.services.data.sources.research_ingestion._fetch",
         lambda _request: _feed("release-1"),
     )
     settings = _settings(tmp_path)
@@ -150,7 +150,7 @@ def test_ingest_fetch_and_metadata_fail_closed(
     with data_settings_context(settings):
         run_data_migrations(generate_id("req"))
         monkeypatch.setattr(
-            "app.services.data.research_sources.ingestion.urlopen",
+            "app.services.data.sources.research_ingestion.urlopen",
             lambda *_args, **_kwargs: _Response(
                 b"Federal Reserve Board official statement"
             ),
@@ -166,7 +166,7 @@ def test_ingest_fetch_and_metadata_fail_closed(
         assert get_research_source_value_field(document, "external_id") == "press-all"
 
         monkeypatch.setattr(
-            "app.services.data.research_sources.ingestion.urlopen",
+            "app.services.data.sources.research_ingestion.urlopen",
             lambda *_args, **_kwargs: _Response(b"0123456789"),
         )
         with pytest.raises(Exception, match="LIMIT_EXCEEDED"):
@@ -184,21 +184,21 @@ def test_ingest_fetch_and_metadata_fail_closed(
             raise OSError("offline")
 
         monkeypatch.setattr(
-            "app.services.data.research_sources.ingestion.urlopen",
+            "app.services.data.sources.research_ingestion.urlopen",
             _unavailable,
         )
         with pytest.raises(Exception, match="SOURCE_UNAVAILABLE"):
             ingest_research_source(_request(now), policy=policy, now=now)
 
         monkeypatch.setattr(
-            "app.services.data.research_sources.ingestion._fetch",
+            "app.services.data.sources.research_ingestion._fetch",
             lambda _request: b"<rss></rss>",
         )
         with pytest.raises(Exception, match="EMPTY_RESULT"):
             ingest_research_source(_request(now), policy=policy, now=now)
 
         monkeypatch.setattr(
-            "app.services.data.research_sources.ingestion._fetch",
+            "app.services.data.sources.research_ingestion._fetch",
             lambda _request: (
                 b"<rss><channel><item><title>Another publisher</title>"
                 b"</item></channel></rss>"
@@ -208,7 +208,7 @@ def test_ingest_fetch_and_metadata_fail_closed(
             ingest_research_source(_request(now), policy=policy, now=now)
 
         monkeypatch.setattr(
-            "app.services.data.research_sources.ingestion._fetch",
+            "app.services.data.sources.research_ingestion._fetch",
             lambda _request: (
                 b"<rss><channel><item><title>Federal Reserve Board</title>"
                 b"</item></channel></rss>"
@@ -226,7 +226,7 @@ def test_query_filters_pagination_projection_and_eligibility(
     now = datetime(2026, 1, 2, tzinfo=UTC)
     payloads = iter((_feed("release-1"), _feed("release-2")))
     monkeypatch.setattr(
-        "app.services.data.research_sources.ingestion._fetch",
+        "app.services.data.sources.research_ingestion._fetch",
         lambda _request: next(payloads),
     )
     with data_settings_context(_settings(tmp_path)):

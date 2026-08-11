@@ -4,6 +4,7 @@ import json
 from dataclasses import replace
 from datetime import UTC, datetime
 from decimal import Decimal
+from functools import lru_cache
 from pathlib import Path
 
 from app.services.analytics.adapters.results import adapt_trading_result
@@ -28,6 +29,13 @@ from tests.analytics.component.test_results_adapter import (  # noqa: E402
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 _GOLDEN_DIRECTORY = Path("tests/analytics/fixtures/golden")
+
+
+@lru_cache(maxsize=32)
+def _read_golden_fixture(metric_key: str) -> dict[str, str | None]:
+    return json.loads(
+        (_GOLDEN_DIRECTORY / f"{metric_key}.json").read_text(encoding="utf-8")
+    )
 
 
 def test_align_benchmark_series_uses_timestamp_intersection() -> None:
@@ -121,8 +129,6 @@ def test_benchmark_zero_variance_is_undefined() -> None:
     section = calculate_benchmark_evidence(result, config=config)
     metrics = {item.metric_key: item for item in section.metrics}
     for metric_key, metric in metrics.items():
-        fixture = json.loads(
-            (_GOLDEN_DIRECTORY / f"{metric_key}.json").read_text(encoding="utf-8")
-        )
+        fixture = _read_golden_fixture(metric_key)
         assert metric.status == fixture["expected_status"]
         assert metric.value == fixture["expected_value"]

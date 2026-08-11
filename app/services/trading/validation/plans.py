@@ -130,6 +130,10 @@ def build_execution_plan(
 ) -> StandardResponse[OrderIntent]:
     """Build a deterministic execution plan in standard response data.
 
+    Args:
+        request: Governed trading request envelope.
+        readiness: Validated readiness assessment object.
+
     Returns:
         Standard response containing the executable intent or an error.
     """

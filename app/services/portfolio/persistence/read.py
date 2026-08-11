@@ -13,6 +13,10 @@ def _one_row(
 ) -> Mapping[str, object] | None:
     """Read at most one normalized row.
 
+    Args:
+        statement: SQL query string.
+        parameters: SQL parameters tuple.
+
     Returns:
         Stored row or ``None``.
     """
@@ -22,6 +26,10 @@ def _one_row(
 
 def read_construction_record(store: object, key: str) -> object | None:
     """Read one immutable construction by canonical hash.
+
+    Args:
+        store: Portfolio persistence handle.
+        key: Canonical hash string.
 
     Returns:
         Decoded construction or ``None``.
@@ -64,6 +72,11 @@ def read_active_allocation_record(
 ) -> tuple[object, int] | None:
     """Read one active allocation and revision for an exact scope.
 
+    Args:
+        store: Portfolio persistence handle.
+        portfolio_id: Stable Portfolio identity string.
+        scope_key: Governed scope key string.
+
     Returns:
         Decoded allocation and revision, or ``None``.
 
@@ -93,6 +106,11 @@ def read_allocation_record(
 ) -> object | None:
     """Read one immutable allocation version.
 
+    Args:
+        store: Portfolio persistence handle.
+        portfolio_id: Stable Portfolio identity string.
+        allocation_version: Exact allocation version string.
+
     Returns:
         Decoded allocation or ``None``.
     """
@@ -110,6 +128,10 @@ def read_allocation_history_records(
     store: object, portfolio_id: str
 ) -> tuple[Mapping[str, object], ...]:
     """Read ordered immutable allocation-history records.
+
+    Args:
+        store: Portfolio persistence handle.
+        portfolio_id: Stable Portfolio identity string.
 
     Returns:
         Ordered allocation payload mappings.
@@ -132,6 +154,10 @@ def read_allocation_history_records(
 def read_idempotency_record(store: object, key: str) -> Mapping[str, object] | None:
     """Read one allocation idempotency binding.
 
+    Args:
+        store: Portfolio persistence handle.
+        key: Unique idempotency key string.
+
     Returns:
         Normalized binding or ``None``.
     """
@@ -145,6 +171,11 @@ def read_idempotency_record(store: object, key: str) -> Mapping[str, object] | N
 
 def read_plan_record(store: object, plan_id: str, plan_version: str) -> object | None:
     """Read one exact immutable rebalance-plan version.
+
+    Args:
+        store: Portfolio persistence handle.
+        plan_id: Plan identity string.
+        plan_version: Exact plan version string.
 
     Returns:
         Decoded plan or ``None``.
@@ -163,6 +194,10 @@ def read_plan_version_records(
     store: object, plan_id: str
 ) -> tuple[Mapping[str, object], ...]:
     """Read ordered immutable plan-version records.
+
+    Args:
+        store: Portfolio persistence handle.
+        plan_id: Plan identity string.
 
     Returns:
         Ordered plan payload mappings.

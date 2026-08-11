@@ -7,8 +7,8 @@ from types import SimpleNamespace
 
 import pytest
 from app.services.data import export_replay_evidence
-from app.services.data.market_data.replay_evidence import ReplayEvidenceRequest
-from app.services.data.replay_packages import service
+from app.services.data.replay import packages as service
+from app.services.data.replay.evidence import ReplayEvidenceRequest
 from app.utils import generate_id
 
 _T0 = datetime(2026, 8, 7, 12, tzinfo=UTC)

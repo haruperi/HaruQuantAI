@@ -70,7 +70,17 @@ class _MarketDataset(Protocol):
     license_metadata: Mapping[str, str]
 
     def model_dump(self, *, mode: str = "python") -> dict[str, object]:
-        """Return the dataset's deterministic public serialization."""
+        """Return the dataset's deterministic public serialization.
+
+        Args:
+            mode: The mode value.
+
+        Returns:
+            The dict[str, object] result.
+
+        Raises:
+            None.
+        """
         ...
 
 
@@ -202,13 +212,16 @@ class IndicatorProtocol(Protocol):
         """Calculate one official indicator for a normalized dataset.
 
         Args:
-            data: One normalized, immutable ``MarketDataset v1`` for a single
-                symbol/timeframe.
-            config: Complete, validated calculation configuration.
+                    data: One normalized, immutable ``MarketDataset v1`` for a single
+                        symbol/timeframe.
+                    config: Complete, validated calculation configuration.
 
         Returns:
-            A standard response containing the deterministic
-            ``IndicatorResult`` for the supplied dataset.
+                    A standard response containing the deterministic
+                    ``IndicatorResult`` for the supplied dataset.
+
+        Raises:
+            None.
         """
         ...
 
@@ -228,22 +241,25 @@ def build_indicator_config(
     """Construct a validated IndicatorConfig instance.
 
     Args:
-        indicator_id: Exact lowercase official registry identifier.
-        parameters: Canonical key-sorted immutable parameter pairs.
-        source: Selected price source among open, high, low, or close.
-        formula_version: Version of the approved mathematical convention.
-        output_mode: Core output mode; only "values" is supported.
-        column_conflict_policy: Output-collision policy; only "error" is
-            supported.
-        precision_dtype: Numerical output dtype; only "float64" is supported.
-        availability_policy: Availability basis; only "source_available_at"
-            is supported.
-        quality_policy: Quality propagation policy; only "propagate_dataset"
-            is supported.
-        error_mode: Failure policy; only "raise" is supported.
+            indicator_id: Exact lowercase official registry identifier.
+            parameters: Canonical key-sorted immutable parameter pairs.
+            source: Selected price source among open, high, low, or close.
+            formula_version: Version of the approved mathematical convention.
+            output_mode: Core output mode; only "values" is supported.
+            column_conflict_policy: Output-collision policy; only "error" is
+                supported.
+            precision_dtype: Numerical output dtype; only "float64" is supported.
+            availability_policy: Availability basis; only "source_available_at"
+                is supported.
+            quality_policy: Quality propagation policy; only "propagate_dataset"
+                is supported.
+            error_mode: Failure policy; only "raise" is supported.
 
     Returns:
-        An immutable IndicatorConfig instance.
+            An immutable IndicatorConfig instance.
+
+    Raises:
+        None.
     """
     return IndicatorConfig(
         indicator_id=indicator_id,

@@ -353,6 +353,10 @@ body {
   font-weight: 500;
 }
 
+.cme-clock-text.mismatch {
+  color: var(--financial-negative);
+}
+
 .one-click-toggle {
   display: flex;
   align-items: center;

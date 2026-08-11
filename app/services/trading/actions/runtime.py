@@ -369,6 +369,10 @@ async def run_live_evaluation_cycle(
 ) -> StandardResponse[object]:
     """Run one evaluation cycle and return a standard response.
 
+    Args:
+        deps: Active trading runtime dependencies.
+        evidence: Immutable cycle context evidence map.
+
     Returns:
         Standard response containing cycle evidence or an error.
     """

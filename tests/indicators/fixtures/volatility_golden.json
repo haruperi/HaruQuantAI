@@ -41,5 +41,46 @@
     "output_column": "rolling_volatility_2",
     "derivation": "Hand-calculated as the sample standard deviation (ddof=1) of each pair of consecutive log returns of the close-price series [100, 101, 99, 102, 98, 103], multiplied by sqrt(252), using the approved period+1-price rolling window.",
     "expected": [null, null, 0.33619911378304584, 0.5596056072285265, 0.7841574475614046, 1.0076303267592]
+  },
+  "atr_percent": {
+    "period": 2,
+    "output_column": "atr_percent_2",
+    "derivation": "Hand-calculated as 100*ATR/close over the atr_bars fixture (period=2), reusing the atr golden ATR values [null, 1.25, 1.125, 1.5625, 1.28125, 1.640625] divided by the matching close [9.5, 10.5, 10.0, 11.5, 11.0, 12.5].",
+    "expected": [null, 11.904761904761905, 11.25, 13.586956521739131, 11.647727272727273, 13.125]
+  },
+  "parkinson_volatility": {
+    "period": 2,
+    "annualization_factor": 252.0,
+    "output_column": "parkinson_volatility_2",
+    "derivation": "Hand-calculated as sqrt(A/(4*n*ln2) * mean(ln(H/L)^2)) over a trailing 2-bar window of the atr_bars fixture high/low pairs.",
+    "expected": [null, 0.9577573863967999, 0.9316815995815485, 0.8940191144336539, 0.8486213228075852, 0.8168559961605968]
+  },
+  "garman_klass_volatility": {
+    "period": 2,
+    "annualization_factor": 252.0,
+    "output_column": "garman_klass_volatility_2",
+    "derivation": "Hand-calculated as sqrt(A/n * mean(0.5*ln(H/L)^2 - (2ln2-1)*ln(C/O)^2)) over a trailing 2-bar window of the atr_bars fixture OHLC, clamping any negative windowed mean to zero within a tiny tolerance.",
+    "expected": [null, 0.7973853284150006, 0.775675811862398, 0.74431973618486, 0.7065235954302002, 0.6800772262553195]
+  },
+  "rogers_satchell_volatility": {
+    "period": 2,
+    "annualization_factor": 252.0,
+    "output_column": "rogers_satchell_volatility_2",
+    "derivation": "Hand-calculated as sqrt(A/n * mean(ln(H/O)*ln(H/C) + ln(L/O)*ln(L/C))) over a trailing 2-bar window of the atr_bars fixture OHLC.",
+    "expected": [null, 0.7976390672980886, 0.7759076433564815, 0.7445280485435861, 0.706698743881474, 0.6802356573371133]
+  },
+  "ewma_volatility": {
+    "decay": 0.94,
+    "annualization_factor": 252.0,
+    "output_column": "ewma_volatility",
+    "derivation": "Hand-calculated as the seeded RiskMetrics EWMA of squared log returns of the rolling_bars close series [100, 101, 99, 102, 98, 103], with the first squared return as the seed variance, annualized by sqrt(252).",
+    "expected": [null, 0.15795660540177556, 0.17176051661998354, 0.2029938659829185, 0.25086365266436395, 0.3108003866445533]
+  },
+  "bollinger_bandwidth": {
+    "period": 2,
+    "std_dev": 2.0,
+    "output_column": "bollinger_bandwidth_percent_2",
+    "derivation": "Hand-calculated as 100*(Upper-Lower)/Middle over a trailing 2-bar SMA/sample-stdev (ddof=1) window of the rolling_bars close series [100, 101, 99, 102, 98, 103], with k=2.",
+    "expected": [null, 2.8143553480061536, 5.656854249492369, 8.44306604401849, 11.313708498984765, 14.071776740030797]
   }
 }

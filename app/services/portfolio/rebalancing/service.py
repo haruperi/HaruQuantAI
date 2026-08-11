@@ -89,6 +89,11 @@ class RebalancingService:
     ) -> CrossAccountCorrelationReport:
         """Measure configured rolling cross-account return/decision correlation.
 
+        Args:
+            return_series: Return series mapping by account.
+            decision_series: Decision series mapping by account.
+            counterparties: Counterparty mapping by account.
+
         Returns:
             Correlation evidence using the configured window and alert threshold.
         """
@@ -110,6 +115,13 @@ class RebalancingService:
         signal_dependencies: Mapping[str, Sequence[str]],
     ) -> CommonModeExposureReport:
         """Aggregate cross-account loss-at-stop exposure by risk factor.
+
+        Args:
+            loss_at_stop_by_account: Loss-at-stop mapping per account and factor.
+            account_headroom: Headroom mapping by account.
+            shared_adverse_scenario: Scenario shocks mapping by factor.
+            software_dependencies: Software dependency tags per account.
+            signal_dependencies: Signal dependency tags per account.
 
         Returns:
             Common-mode exposure evidence for the supplied scenario.

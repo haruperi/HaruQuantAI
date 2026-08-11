@@ -16,7 +16,19 @@ _MAX_TIMEOUT_SECONDS = 60.0
 
 @dataclass(frozen=True, slots=True)
 class EmailConfig:
-    """Validated internal SMTP configuration."""
+    """Validated internal SMTP configuration.
+
+    Attributes:
+        host: SMTP server hostname.
+        port: SMTP server port number.
+        tls_mode: TLS mode ("none", "starttls", or "ssl").
+        username: Optional SMTP authentication username.
+        password: Optional SMTP authentication password.
+        sender: Sender email address.
+        recipients: Recipient email address tuple.
+        enabled: Whether email delivery is active.
+        timeout_seconds: Network connection timeout in seconds.
+    """
 
     host: str
     port: int
@@ -33,11 +45,20 @@ class EmailNotifier:
     """Deliver multipart email through a bounded SMTP session."""
 
     def __init__(self, config: EmailConfig) -> None:
+        """Initialize EmailNotifier.
+
+        Args:
+            config: Email notification configuration.
+        """
         self._config = config
 
     @property
     def active(self) -> bool:
-        """Return whether complete SMTP delivery configuration is enabled."""
+        """Return whether complete SMTP delivery configuration is enabled.
+
+        Returns:
+            True if enabled with non-empty host and recipients.
+        """
         return self._config.enabled and bool(
             self._config.host and self._config.recipients
         )
@@ -67,15 +88,21 @@ class EmailNotifier:
             message.add_alternative(html, subtype="html")
         context = ssl.create_default_context()
         try:
-            smtp_type = (
-                smtplib.SMTP_SSL if self._config.tls_mode == "ssl" else smtplib.SMTP
-            )
-            with smtp_type(
-                self._config.host,
-                self._config.port,
-                timeout=self._config.timeout_seconds,
-                **({"context": context} if self._config.tls_mode == "ssl" else {}),
-            ) as client:
+            client_cm: smtplib.SMTP | smtplib.SMTP_SSL
+            if self._config.tls_mode == "ssl":
+                client_cm = smtplib.SMTP_SSL(
+                    self._config.host,
+                    self._config.port,
+                    timeout=self._config.timeout_seconds,
+                    context=context,
+                )
+            else:
+                client_cm = smtplib.SMTP(
+                    self._config.host,
+                    self._config.port,
+                    timeout=self._config.timeout_seconds,
+                )
+            with client_cm as client:
                 if self._config.tls_mode == "starttls":
                     client.starttls(context=context)
                 if (

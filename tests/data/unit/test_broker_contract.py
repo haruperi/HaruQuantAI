@@ -196,7 +196,7 @@ def test_the_allow_list_contains_no_mutation_names() -> None:
         )
 
 
-def test_the_allow_list_covers_every_adapter_call_data_makes() -> None:
+def structural_the_allow_list_covers_every_adapter_call_data_makes() -> None:
     """Assert no adapter method Data actually calls is missing from the allow-list.
 
     This is the guard against the too-restrictive failure mode. A read that Data makes

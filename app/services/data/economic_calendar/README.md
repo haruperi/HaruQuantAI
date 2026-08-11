@@ -1,4 +1,4 @@
-# Economic Calendar — FEAT-DATA-11
+# Economic Calendar — FEAT-DATA-08
 
 Owns database-first calendar retrieval, licensed bounded historical acquisition,
 current-week CSV synchronization, CSV bootstrap, permanent event-definition

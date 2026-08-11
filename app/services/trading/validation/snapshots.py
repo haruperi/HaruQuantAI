@@ -208,6 +208,10 @@ def get_route_snapshot(
 ) -> StandardResponse[RouteSnapshot]:
     """Read route facts and return the raw snapshot in ``data``.
 
+    Args:
+        request: Governed trading request envelope.
+        source: Callable source providing route facts mapping.
+
     Returns:
         Standard response containing the route snapshot or an error.
     """

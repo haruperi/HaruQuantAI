@@ -10,6 +10,10 @@ def build_analytics_insert(
 ) -> tuple[str, tuple[object, ...]]:
     """Build a parameterized insert for an allow-listed Analytics table.
 
+    Args:
+        table: Target allow-listed analytics table name.
+        record: Parameter mapping for insertion.
+
     Returns:
         SQL and bound parameters.
 

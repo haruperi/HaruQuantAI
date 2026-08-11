@@ -39,6 +39,8 @@ class TradingStateStore(Protocol):  # pragma: no cover - structural port declara
             reserved_at: Injected UTC reservation creation time.
             expires_at: UTC reservation expiry.
 
+        Raises:
+            NotImplementedError: Structural port declaration.
         """
         del key, material_hash, material_version, reserved_at, expires_at
         logger.debug("Calling Trading store idempotency reservation port")
@@ -61,6 +63,9 @@ class TradingStateStore(Protocol):  # pragma: no cover - structural port declara
             receipt_id: Persisted authority receipt identifier.
             completed_at: Injected UTC outcome time.
             status: Proven completion or reconciliation-required state.
+
+        Raises:
+            NotImplementedError: Structural port declaration.
         """
         del key, material_hash, receipt_id, completed_at, status
         logger.debug("Calling Trading store idempotency completion port")
@@ -71,6 +76,9 @@ class TradingStateStore(Protocol):  # pragma: no cover - structural port declara
 
         Args:
             event: Event to append without rewriting history.
+
+        Raises:
+            NotImplementedError: Structural port declaration.
         """
         del event
         logger.debug("Calling Trading store append-event port")
@@ -82,6 +90,8 @@ class TradingStateStore(Protocol):  # pragma: no cover - structural port declara
         Args:
             scope: Route, tenant, and authority identity.
 
+        Raises:
+            NotImplementedError: Structural port declaration.
         """
         del scope
         logger.debug("Calling Trading store projection-read port")
@@ -97,6 +107,9 @@ class TradingStateStore(Protocol):  # pragma: no cover - structural port declara
         Args:
             projection: New immutable projection.
             expected_version: Version that must currently be stored.
+
+        Raises:
+            NotImplementedError: Structural port declaration.
         """
         del projection, expected_version
         logger.debug("Calling Trading store projection-write port")
@@ -111,6 +124,8 @@ class TradingStateStore(Protocol):  # pragma: no cover - structural port declara
         Args:
             scope: Route, tenant, and authority conflict scope.
 
+        Raises:
+            NotImplementedError: Structural port declaration.
         """
         del scope
         logger.debug("Calling Trading store unresolved-attempt port")
@@ -125,6 +140,8 @@ class TradingStateStore(Protocol):  # pragma: no cover - structural port declara
         Args:
             scope: Route, tenant, and authority identity.
 
+        Raises:
+            NotImplementedError: Structural port declaration.
         """
         del scope
         logger.debug("Calling Trading store report-evidence port")

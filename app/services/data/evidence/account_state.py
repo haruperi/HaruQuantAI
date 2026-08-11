@@ -49,7 +49,16 @@ def _failure(
     operation: str,
     code: str = "STALE_EVIDENCE",
 ) -> DataError:
-    """Build a secret-free canonical error for one broker read."""
+    """Build a secret-free canonical error for one broker read.
+
+    Args:
+        request_id: The ``request_id`` argument.
+        operation: The ``operation`` argument.
+        code: The ``code`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.warning("Broker account evidence is unavailable for %s", operation)
     return DataError(
         code,
@@ -69,7 +78,18 @@ async def _fetch_from_adapter(
     BrokerPermissions,
     bool,
 ]:
-    """Read account evidence without owning adapter connection lifecycle."""
+    """Read account evidence without owning adapter connection lifecycle.
+
+    Args:
+        adapter: The ``adapter`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        _failure: If the operation cannot be completed safely.
+    """
     logger.info("Reading account evidence from an injected broker adapter")
     account_limit = get_limit("ACCOUNT_SNAPSHOT_MAX_RECORDS", "execution_bound")
     info_result = await adapter.get_account_info()
@@ -112,7 +132,19 @@ def _required_decimal(
     field: str,
     request_id: str,
 ) -> Decimal:
-    """Return required finite broker numeric evidence or fail closed."""
+    """Return required finite broker numeric evidence or fail closed.
+
+    Args:
+        value: The ``value`` argument.
+        field: The ``field`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        _failure: If the operation cannot be completed safely.
+    """
     logger.debug("Validating required broker numeric evidence for %s", field)
     if value is None or not value.is_finite():
         raise _failure(request_id, field)
@@ -124,7 +156,16 @@ def _map_balances(
     account_info: BrokerAccountInfo,
     request_id: str,
 ) -> tuple[AccountBalance, ...]:
-    """Map exact broker balances with account-currency margin availability."""
+    """Map exact broker balances with account-currency margin availability.
+
+    Args:
+        balances: The ``balances`` argument.
+        account_info: The ``account_info`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Normalizing %d broker balances", len(balances))
     return tuple(
         AccountBalance(
@@ -156,7 +197,18 @@ def _map_positions(
     positions: tuple[BrokerPosition, ...],
     request_id: str,
 ) -> tuple[AccountPosition, ...]:
-    """Map exact broker positions and reject unknown direction evidence."""
+    """Map exact broker positions and reject unknown direction evidence.
+
+    Args:
+        positions: The ``positions`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        _failure: If the operation cannot be completed safely.
+    """
     logger.debug("Normalizing %d broker positions", len(positions))
     normalized: list[AccountPosition] = []
     for position in positions:
@@ -179,7 +231,18 @@ def _map_orders(
     orders: tuple[BrokerOrder, ...],
     request_id: str,
 ) -> tuple[AccountOrder, ...]:
-    """Map exact broker orders and reject unknown direction evidence."""
+    """Map exact broker orders and reject unknown direction evidence.
+
+    Args:
+        orders: The ``orders`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        _failure: If the operation cannot be completed safely.
+    """
     logger.debug("Normalizing %d broker orders", len(orders))
     normalized: list[AccountOrder] = []
     for order in orders:
@@ -204,7 +267,17 @@ def _validate_freshness(
     max_age_seconds: int,
     request_id: str,
 ) -> None:
-    """Fail closed when broker evidence is future-dated or stale."""
+    """Fail closed when broker evidence is future-dated or stale.
+
+    Args:
+        observed_at: The ``observed_at`` argument.
+        retrieved_at: The ``retrieved_at`` argument.
+        max_age_seconds: The ``max_age_seconds`` argument.
+        request_id: The ``request_id`` argument.
+
+    Raises:
+        _failure: If the operation cannot be completed safely.
+    """
     logger.debug("Validating broker account evidence freshness")
     age = observed_at - retrieved_at
     if age < timedelta(0) or age > timedelta(seconds=max_age_seconds):

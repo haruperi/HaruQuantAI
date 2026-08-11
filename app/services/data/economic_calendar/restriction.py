@@ -37,7 +37,15 @@ CALENDAR_STATE_UNKNOWN: Final[str] = "unknown"
 
 
 def _meets_minimum(impact: EventImpact, minimum: EventImpact | None) -> bool:
-    """Return True when ``impact`` is at least ``minimum`` (or no minimum)."""
+    """Return True when ``impact`` is at least ``minimum`` (or no minimum).
+
+    Args:
+        impact: The ``impact`` argument.
+        minimum: The ``minimum`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     if minimum is None:
         return True
     return impact >= minimum
@@ -128,6 +136,14 @@ def evaluate_calendar_state(
     """
 
     def _raw() -> str:
+        """Evaluate the calendar state and translate validation failures.
+
+        Returns:
+            The point-in-time calendar state.
+
+        Raises:
+            DataError: If the calendar-state inputs are invalid.
+        """
         try:
             return _evaluate_calendar_state_raw(
                 events,
@@ -164,6 +180,16 @@ def _is_news_restricted_events_raw(
     calendar gate: returns ``True`` for any blocking state and ``False`` only
     for ``open``. The ``unknown`` (empty-events) case is excluded from blocking
     by this helper; callers decide their own missing-evidence policy.
+
+    Args:
+        events: The ``events`` argument.
+        at: The ``at`` argument.
+        minutes_before: The ``minutes_before`` argument.
+        minutes_after: The ``minutes_after`` argument.
+        minimum_impact: The ``minimum_impact`` argument.
+
+    Returns:
+        The result produced by the operation.
 
     Raises:
         ValueError: If ``at`` is timezone-naive or blackout minutes negative.
@@ -209,6 +235,14 @@ def is_news_restricted_events(
     """
 
     def _raw() -> bool:
+        """Evaluate the news restriction and translate validation failures.
+
+        Returns:
+            Whether the supplied instant is news restricted.
+
+        Raises:
+            DataError: If the restriction inputs are invalid.
+        """
         try:
             return _is_news_restricted_events_raw(
                 events,

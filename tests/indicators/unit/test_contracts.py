@@ -56,12 +56,25 @@ def test_list_indicators_is_stable() -> None:
     assert isinstance(first, tuple)
 
 
+def test_get_warmup_requirement_resolves_new_volatility_indicators() -> None:
+    """FR-INDI-005: warmup resolves for the 8 new spec-migrated volatility indicators."""
+    config = build_indicator_config(
+        indicator_id="atr_percent",
+        parameters=(("period", 3),),
+        source=None,
+        formula_version="1.0.0",
+    )
+    requirement = unwrap_response(get_warmup_requirement("atr_percent", config))
+    assert requirement.indicator_id == "atr_percent"
+    assert requirement.minimum_observations == 3
+
+
 def test_config_validation_uses_the_public_boundary() -> None:
     """Invalid public configuration fails with the catalogue error."""
     response = get_warmup_requirement(
-        "macd",
+        "unknown_indicator",
         build_indicator_config(
-            indicator_id="macd",
+            indicator_id="unknown_indicator",
             parameters=(),
             source="close",
             formula_version="1.0.0",

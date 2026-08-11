@@ -10,6 +10,9 @@ type _Codec = tuple[Callable[[object], str], Callable[[str], object]]
 def build_trading_runtime_store(codecs: Mapping[str, _Codec]) -> object:
     """Build an opaque Trading runtime-record handle.
 
+    Args:
+        codecs: The ``codecs`` argument.
+
     Returns:
         Namespaced Data-owned handle.
     """

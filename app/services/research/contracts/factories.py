@@ -96,6 +96,12 @@ def execute_research_value_operation(
 ) -> object:
     """Execute one allowlisted operation on an opaque Research value.
 
+    Args:
+        value: Target opaque Research object instance.
+        operation: Name of public method to invoke.
+        *args: Positional operation arguments.
+        **kwargs: Keyword operation arguments.
+
     Returns:
         Operation result.
 
@@ -113,6 +119,13 @@ def execute_research_value_operation(
 def get_research_value_field(value: object, field: str) -> object:
     """Return one public field from an opaque Research value.
 
+    Args:
+        value: Target opaque Research object instance.
+        field: Name of public field to access.
+
+    Returns:
+        Field value object.
+
     Raises:
         ValueError: If the field is private or unavailable.
     """
@@ -122,12 +135,27 @@ def get_research_value_field(value: object, field: str) -> object:
 
 
 def is_research_metric_calculator(value: object) -> bool:
-    """Return whether a value satisfies the Research calculator protocol."""
+    """Return whether a value satisfies the Research calculator protocol.
+
+    Args:
+        value: Candidate object to inspect.
+
+    Returns:
+        True if value is a valid MetricCalculator, False otherwise.
+    """
     return isinstance(value, _metrics.MetricCalculator)
 
 
 def is_research_value(value: object, value_type: str) -> bool:
-    """Return whether a value is one registered internal Research type."""
+    """Return whether a value is one registered internal Research type.
+
+    Args:
+        value: Candidate object to inspect.
+        value_type: Registered internal type name.
+
+    Returns:
+        True if value is an instance of the registered model, False otherwise.
+    """
     try:
         model = _model(value_type)
     except TypeError:
@@ -137,6 +165,12 @@ def is_research_value(value: object, value_type: str) -> bool:
 
 def project_research_value(value: object) -> Mapping[str, object]:
     """Return a detached bounded mapping for one dataclass Research value.
+
+    Args:
+        value: Dataclass Research value instance.
+
+    Returns:
+        Mapping from field names to detached field values.
 
     Raises:
         TypeError: If the value is not a registered dataclass contract.

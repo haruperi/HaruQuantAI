@@ -93,7 +93,7 @@ def main() -> None:
     )
     print(_format_result(aligned))
     print(
-        f"Data -> aligned_primary={len(aligned['primary'])}, aligned_higher={len(aligned['higher'])}"
+        f"Data -> aligned_primary={aligned['primary'].record_count}, aligned_higher={aligned['higher'].record_count}"
     )
     # Stage 3
     _stage(3)

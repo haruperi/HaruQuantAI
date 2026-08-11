@@ -418,7 +418,14 @@ _CATALOG_SCHEMA_STATEMENTS = (
 
 
 def _schema_checksum(statements: tuple[str, ...]) -> str:
-    """Return the stable checksum for one ordered migration statement set."""
+    """Return the stable checksum for one ordered migration statement set.
+
+    Args:
+        statements: The ``statements`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Calculating DATA schema migration checksum")
     material = "\n-- statement --\n".join(statements).encode("utf-8")
     return hashlib.sha256(material).hexdigest()

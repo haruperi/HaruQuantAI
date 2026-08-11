@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import inspect
+import math
 import sys
 import tempfile
 from datetime import UTC, datetime, timedelta
@@ -40,7 +41,10 @@ from app.services.strategy import (
     mark_strategy_signal_submitted,
     record_strategy_signals,
 )
+from app.utils import generate_id, get_logger
 from tests.strategy.unit.test_models import make_context, make_signal_evidence
+
+logger = get_logger(__name__)
 
 _UNAVAILABLE = 3
 _EVALUATOR_NAME = "decomposing_trade"
@@ -89,63 +93,101 @@ def _source_hash() -> str:
 
 
 def _get_signal_evidence() -> tuple[Any, Any]:
-    """Fetch MT5 evidence or fallback to normalized synthetic dataset and metadata."""
-    request_end = datetime.now(UTC) - timedelta(hours=2)
+    """Fetch MT5 evidence (2025-07-01 to 2026-07-31) or fallback to synthetic dataset and metadata."""
+    start_dt = datetime(2025, 7, 1, 0, 0, 0, tzinfo=UTC)
+    end_dt = datetime(2026, 7, 31, 23, 59, 59, tzinfo=UTC)
     try:
         m_resp = get_market_data(
             source_id="mt5",
             symbol="EURUSD",
             timeframe="H1",
-            start=request_end - timedelta(days=30),
-            end=request_end,
-            limit=300,
+            start=start_dt,
+            end=end_dt,
+            limit=10000,
             use_cache=False,
         )
         meta_resp = get_symbol_metadata(source_id="mt5", symbol="EURUSD")
         if (
             getattr(m_resp, "status", None) == "success"
-            and getattr(m_resp, "data", None)
+            and getattr(m_resp, "data", None) is not None
+            and len(m_resp.data.records) > 0
             and getattr(meta_resp, "status", None) == "success"
-            and getattr(meta_resp, "data", None)
+            and getattr(meta_resp, "data", None) is not None
         ):
             print("Successfully acquired real MT5 evidence for EURUSD H1.")
             return m_resp.data, meta_resp.data
-    except (RuntimeError, ValueError, KeyError, TypeError, AttributeError) as exc:
+    except Exception as exc:  # noqa: BLE001 - source-availability dependent
         print(f"MT5 query exception encountered: {exc}")
 
-    print("Using synthetic fallback market dataset and symbol metadata.")
-    start_time = datetime(2026, 1, 1, 0, 0, tzinfo=UTC)
+    print(
+        "Using synthetic fallback EURUSD H1 market dataset (1 July 2025 - 31 July 2026)."
+    )
     records = []
-    base_price = Decimal("1.1000")
-    for i in range(100):
-        records.append(
-            build_ohlcv_record(
-                timestamp=start_time + timedelta(hours=i),
-                open_price=base_price,
-                high_price=base_price + Decimal("0.0020"),
-                low_price=base_price - Decimal("0.0020"),
-                close_price=base_price + Decimal("0.0010"),
-                volume=Decimal(1000),
-            )
+    curr = start_dt
+    price = 1.0850
+    step = 0
+    while curr <= end_dt:
+        wave = math.sin(step * 0.08) * 0.0120 + math.cos(step * 0.03) * 0.0060
+        op = price + wave
+        hi = op + 0.0015
+        lo = op - 0.0015
+        cl = op + (0.0008 if step % 2 == 0 else -0.0008)
+        rec = build_ohlcv_record(
+            timestamp=curr,
+            open=f"{op:.5f}",
+            high=f"{hi:.5f}",
+            low=f"{lo:.5f}",
+            close=f"{cl:.5f}",
+            volume=Decimal(1000 + (step % 100)),
+            source="synthetic",
+            source_symbol="EURUSD",
+            available_at=curr + timedelta(minutes=5),
+            price_unit="USD",
+            volume_unit="units",
         )
+        records.append(rec)
+        curr += timedelta(hours=4)
+        step += 1
+
     ds = build_market_dataset(
         symbol="EURUSD",
-        timeframe="H1",
+        data_kind="bars",
         records=tuple(records),
+        normalization_version="v1",
+        timeframe="H1",
+        start=records[0].timestamp,
+        end=records[-1].timestamp,
+        available_at=records[-1].available_at,
+        record_count=len(records),
         quality_report=build_data_quality_report(
-            total_records=100,
-            missing_count=0,
-            duplicate_count=0,
-            out_of_order_count=0,
-            is_valid=True,
+            quality_status="perfect",
+            quality_decision="accepted",
+            quality_score=Decimal(100),
+            record_count=len(records),
+            checked_count=len(records),
+            truncated=False,
+            sample_limit=len(records),
+            schema_version="v1",
+            generated_at=records[-1].available_at,
         ),
+        source_metadata={"provider": "synthetic"},
+        license_metadata={"license": "usage"},
+        cache_status="not_used",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id="req-00000000-0000-4000-8000-000000000099",
     )
     meta = build_symbol_metadata(
-        symbol="EURUSD",
+        canonical_symbol="EURUSD",
+        provider_symbol="EURUSD",
         asset_class="FX",
-        price_precision=5,
-        tick_size=Decimal("0.00001"),
-        contract_size=Decimal(100000),
+        quote_currency="USD",
+        timezone="UTC",
+        source_id="synthetic",
+        revision="metadata-v1",
+        retrieved_at=start_dt,
+        missing_fields=("base_currency", "digits", "price_step", "quantity_step"),
+        request_id="req-00000000-0000-4000-8000-000000000099",
     )
     return ds, meta
 
@@ -329,6 +371,93 @@ def _demo_signal_persistence_and_submission() -> None:
         )
 
 
+def _demo_event_driven_bar_by_bar_simulation() -> None:
+    """Simulate a live/replay environment by iterating bar-by-bar (EURUSD H1 2025-2026)."""
+    _header(
+        "--- Event-Driven Bar-by-Bar Replay Simulation (EURUSD H1: 1 July 2025 - 31 July 2026) ---"
+    )
+    market, metadata = _get_signal_evidence()
+    ref, config = _binding()
+    evaluator = create_strategy_evaluator(
+        _EVALUATOR_NAME,
+        strategy_id=_STRATEGY,
+        strategy_version="1.0.0",
+        module_path=_MODULE,
+        source_hash=ref.manifest.source_hash,
+        artifact_hash=ref.manifest.artifact_hash,
+        dependency_hash=ref.manifest.dependency_hash,
+    )
+
+    records = market.records
+    total_bars = len(records)
+    warmup_bars = 20
+    print(
+        f"Starting bar-by-bar replay simulation from bar {warmup_bars} to {total_bars}..."
+    )
+
+    emitted_count = 0
+    for i in range(warmup_bars, total_bars, 25):
+        current_bar = records[i]
+        snapshot_records = records[: i + 1]
+        market_slice = build_market_dataset(
+            symbol=market.symbol,
+            data_kind=market.data_kind,
+            records=snapshot_records,
+            normalization_version=market.normalization_version,
+            timeframe=market.timeframe,
+            start=snapshot_records[0].timestamp,
+            end=snapshot_records[-1].timestamp,
+            available_at=snapshot_records[-1].available_at,
+            record_count=len(snapshot_records),
+            quality_report=build_data_quality_report(
+                quality_status="perfect",
+                quality_decision="accepted",
+                quality_score=Decimal(100),
+                record_count=len(snapshot_records),
+                checked_count=len(snapshot_records),
+                truncated=False,
+                sample_limit=len(snapshot_records),
+                schema_version="v1",
+                generated_at=snapshot_records[-1].available_at,
+            ),
+            source_metadata=market.source_metadata,
+            license_metadata=market.license_metadata,
+            cache_status=market.cache_status,
+            workflow_context=market.workflow_context,
+            precision_policy=market.precision_policy,
+            request_id=generate_id("req"),
+        )
+        indicator_res = rsi(market_slice, period=14)
+        if indicator_res.data is None:
+            continue
+        indicator = indicator_res.data
+        evidence = _evidence(market_slice, metadata)
+        context = make_context()
+
+        result = evaluate_strategy_signals(
+            ref, config, evidence, (indicator,), context, evaluator
+        )
+        if result.status == "success" and result.data:
+            emitted_count += len(result.data)
+            for sig in result.data:
+                logger.info(
+                    "[Replay Time: %s] Emitted Trade Intent/Signal: SignalName=%s, Side=%s, ClosePrice=%s",
+                    current_bar.timestamp,
+                    sig.signal_name,
+                    sig.side,
+                    current_bar.close,
+                )
+                print(
+                    f"[Replay Time: {current_bar.timestamp}] Emitted Intent: "
+                    f"Side={sig.side}, Signal='{sig.signal_name}', "
+                    f"Price={current_bar.close}"
+                )
+
+    print(
+        f"\nReplay loop completed. Emitted {emitted_count} trade signals/intents across {total_bars} EURUSD H1 bars."
+    )
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -358,6 +487,9 @@ def main() -> None:
 
             # 3. Stage 4: Signal persistence & submission outbox (FR-STR-063..066)
             _demo_signal_persistence_and_submission()
+
+            # 4. Stage 5: Event-Driven Bar-by-Bar Replay Simulation (EURUSD H1 2025-2026)
+            _demo_event_driven_bar_by_bar_simulation()
 
 
 if __name__ == "__main__":

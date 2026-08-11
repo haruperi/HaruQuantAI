@@ -12,6 +12,8 @@ export type { AppShellProps } from "./shell";
 
 export { DashboardView } from "./dashboard";
 
+export { DataWorkspace } from "./data";
+
 export { StrategyWorkspace } from "./strategies";
 export type { StrategyWorkspaceProps } from "./strategies";
 

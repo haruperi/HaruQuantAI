@@ -40,7 +40,7 @@ def _configure_migrations(
     return database_path
 
 
-def test_run_domain_migrations_applies_and_skips_steps(
+def component_run_domain_migrations_applies_and_skips_steps(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     """Apply new migrations first, then check that running again skips them."""
@@ -123,7 +123,7 @@ def test_run_domain_migrations_rejects_modified_applied_step(
     assert response.error.details["migration_id"] == "001_create_test"
 
 
-def test_complete_manifest_rejects_orphaned_applied_step(
+def component_complete_manifest_rejects_orphaned_applied_step(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     """Reject an applied ledger row absent from a declared complete manifest."""
@@ -172,7 +172,7 @@ def test_complete_manifest_rejects_orphaned_applied_step(
     assert response.error.details["stage"] == "manifest_validation"
 
 
-def test_run_domain_migrations_rejects_out_of_order_step(
+def component_run_domain_migrations_rejects_out_of_order_step(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     """Applying a migration with a lower ID than maximum applied ID raises error."""

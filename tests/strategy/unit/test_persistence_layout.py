@@ -14,17 +14,29 @@ _STRATEGY_ROOT = Path(__file__).parents[3] / "app" / "services" / "strategy"
 _PERSISTENCE_ROOT = _STRATEGY_ROOT / "persistence"
 _EXPECTED_FILES = {"__init__.py", "create.py", "read.py", "update.py", "delete.py"}
 _EXPECTED_EXPORTS = {
+    "create_strategy_automation_policy_record",
     "create_strategy_checkpoint_record",
+    "create_strategy_lifecycle_record",
+    "create_strategy_plan_record",
+    "create_strategy_playbook_record",
+    "create_strategy_profile_record",
+    "create_strategy_setup_evaluation_record",
     "create_strategy_signal_records",
     "create_strategy_version_record",
+    "read_strategy_automation_policies",
     "read_strategy_checkpoint_record",
     "read_strategy_checkpoints",
     "read_strategy_config_record",
     "read_strategy_configs",
     "read_strategy_definitions",
+    "read_strategy_lifecycle",
     "read_strategy_manifest_record",
     "read_strategy_mutation_record",
+    "read_strategy_plans",
+    "read_strategy_playbooks",
     "read_strategy_policy_record",
+    "read_strategy_profiles",
+    "read_strategy_setup_evaluations",
     "read_strategy_signals",
     "read_strategy_state_record",
     "read_strategy_versions",
@@ -64,9 +76,8 @@ def test_persistence_boundary_exports_only_crud_functions() -> None:
     assert delete.__all__ == []
 
 
-def test_strategy_sql_is_confined_to_persistence_and_migrations() -> None:
-    """Verify Strategy business modules contain no CRUD SQL or transaction calls."""
-    logger.debug("Checking Strategy SQL ownership boundary")
+def _sql_confinement_violations() -> list[str]:
+    """Compute Strategy business-module SQL confinement violations once."""
     violations: list[str] = []
     for path, tree in _BUSINESS_MODULE_TREES:
         for node in ast.walk(tree):
@@ -80,4 +91,13 @@ def test_strategy_sql_is_confined_to_persistence_and_migrations() -> None:
                 normalized = " ".join(node.value.upper().split())
                 if normalized.startswith(_SQL_PREFIXES):
                     violations.append(f"{path}: SQL literal")
-    assert not violations, violations
+    return violations
+
+
+_SQL_CONFINEMENT_VIOLATIONS = _sql_confinement_violations()
+
+
+def test_strategy_sql_is_confined_to_persistence_and_migrations() -> None:
+    """Verify Strategy business modules contain no CRUD SQL or transaction calls."""
+    logger.debug("Checking Strategy SQL ownership boundary")
+    assert not _SQL_CONFINEMENT_VIOLATIONS, _SQL_CONFINEMENT_VIOLATIONS

@@ -1,18 +1,28 @@
 """Required UI/API startup, readiness, and shutdown lifecycle."""
 
 from collections.abc import AsyncIterator, Callable, Mapping
-from contextlib import asynccontextmanager
+from contextlib import ExitStack, asynccontextmanager
 from typing import Any, Protocol, cast
 
 from fastapi import FastAPI
 
 from app.services.analytics import run_analytics_migrations
+from app.services.api.composition.broker_config import (
+    build_system_broker_connection_config,
+)
 from app.services.api.composition.runtime_settings import (
+    activate_runtime_logging,
+    build_runtime_provider_settings,
     load_runtime_settings_snapshot,
 )
 from app.services.api.identity import run_api_migrations
 from app.services.brokers import run_broker_migrations
-from app.services.data import build_data_settings, data_settings_context
+from app.services.data import (
+    build_data_settings,
+    data_provider_connection_resolver_context,
+    data_provider_settings_context,
+    data_settings_context,
+)
 from app.services.indicators import run_indicators_migrations
 from app.services.optimization import run_optimization_migrations
 from app.services.portfolio import run_portfolio_migrations
@@ -48,7 +58,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
     """
     logger.info("Starting canonical UI/API lifecycle")
     data_settings = build_data_settings()
-    with data_settings_context(data_settings):
+    with ExitStack() as settings_stack:
+        settings_stack.enter_context(data_settings_context(data_settings))
         result = cast(
             "_MigrationResponse",
             run_api_migrations(generate_id("req")),
@@ -59,6 +70,29 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
         app.state.api_runtime_settings = load_runtime_settings_snapshot(
             request_id=generate_id("req")
         )
+        try:
+            activate_runtime_logging(app.state.api_runtime_settings)
+        except (TypeError, ValueError) as error:
+            app.state.api_ready = False
+            raise StartupError("API_LOGGING_CONFIGURATION_INVALID") from error
+        try:
+            provider_settings = build_runtime_provider_settings(
+                app.state.api_runtime_settings
+            )
+            settings_stack.enter_context(
+                data_provider_settings_context(provider_settings)
+            )
+            settings_stack.enter_context(
+                data_provider_connection_resolver_context(
+                    lambda broker_id, request_id: build_system_broker_connection_config(
+                        broker_id,
+                        request_id=request_id,
+                    )
+                )
+            )
+        except (TypeError, ValueError) as error:
+            app.state.api_ready = False
+            raise StartupError("API_PROVIDER_CONFIGURATION_INVALID") from error
         indicators_result = cast(
             "_MigrationResponse",
             run_indicators_migrations(generate_id("req")),

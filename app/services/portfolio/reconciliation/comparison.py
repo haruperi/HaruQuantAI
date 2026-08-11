@@ -15,6 +15,12 @@ def reconcile_portfolio(
 ) -> Mapping[str, object]:
     """Compare rebuilt state with broker truth and preserve unknown.
 
+    Args:
+        rebuilt: Mapping of rebuilt account/position balances.
+        broker: Optional mapping of broker truth balances.
+        tolerance: Numerical tolerance threshold.
+        incident_id: Incident tracking ID string.
+
     Returns:
         Reconciliation status and material differences.
     """

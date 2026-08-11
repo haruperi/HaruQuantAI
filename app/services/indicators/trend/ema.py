@@ -82,11 +82,14 @@ def _output_column(source: str, period: int) -> str:
     """Return the canonical EMA output column.
 
     Args:
-        source: Selected OHLC source.
-        period: Validated smoothing period.
+            source: Selected OHLC source.
+            period: Validated smoothing period.
 
     Returns:
-        The deterministic output column name.
+            The deterministic output column name.
+
+    Raises:
+        None.
     """
     return f"ema_{period}" if source == "close" else f"ema_{source}_{period}"
 

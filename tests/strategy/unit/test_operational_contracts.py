@@ -310,3 +310,36 @@ def test_operational_contracts_reject_invalid_relationships() -> None:
             max_holding_seconds=1,
             blocked_event_types=(),
         )
+
+
+def test_setup_evaluation_rejects_invalid_shapes() -> None:
+    """Cover strict setup-evaluation validation branches."""
+    with pytest.raises(ValueError, match="identity must be non-empty"):
+        build_setup_evaluation(
+            evaluation_id="",
+            playbook_ref="play-1",
+            outcome="MATCH",
+            source_snapshot_refs=("snapshot-1",),
+        )
+    with pytest.raises(ValueError, match="requires source snapshots"):
+        build_setup_evaluation(
+            evaluation_id="eval-1",
+            playbook_ref="play-1",
+            outcome="MATCH",
+            source_snapshot_refs=(),
+        )
+    with pytest.raises(ValueError, match="cannot carry failure reasons"):
+        build_setup_evaluation(
+            evaluation_id="eval-1",
+            playbook_ref="play-1",
+            outcome="MATCH",
+            source_snapshot_refs=("snapshot-1",),
+            reason_codes=("STALE",),
+        )
+    with pytest.raises(ValueError, match="require reason codes"):
+        build_setup_evaluation(
+            evaluation_id="eval-1",
+            playbook_ref="play-1",
+            outcome="STALE",
+            source_snapshot_refs=("snapshot-1",),
+        )

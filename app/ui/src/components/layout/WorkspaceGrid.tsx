@@ -14,6 +14,7 @@ import { TradePlanWidget } from '../widgets/TradePlanWidget';
 import { EducationWidget } from '../widgets/EducationWidget';
 import { ChallengesWidget } from '../widgets/ChallengesWidget';
 import { DashboardView } from '../workflow/dashboard';
+import { DataWorkspace } from '../workflow/data';
 import { StrategyWorkspace } from '../workflow/strategies';
 import { ResearchWorkspace } from '../workflow/research';
 import { OptimizationView } from '../workflow/optimization';
@@ -232,6 +233,8 @@ export const WorkspaceGrid: React.FC = () => {
         return <ChallengesWidget />;
       case 'dashboard':
         return <DashboardView />;
+      case 'data':
+        return <DataWorkspace />;
       case 'strategies':
         return <StrategyWorkspace />;
       case 'research':

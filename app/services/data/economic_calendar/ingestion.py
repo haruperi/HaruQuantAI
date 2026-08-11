@@ -79,13 +79,31 @@ _NON_PRODUCTION_ENVIRONMENTS: Final = frozenset(
 
 
 def _require_non_production(environment: str) -> None:
-    """Block every population operation outside an explicit safe environment."""
+    """Block every population operation outside an explicit safe environment.
+
+    Args:
+        environment: The ``environment`` argument.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     if environment not in _NON_PRODUCTION_ENVIRONMENTS:
         raise DataError("PERMISSION_DENIED", safe_details={"field": "environment"})
 
 
 def _exact(value: str, unit: str) -> str | None:
-    """Return an exact CSV value with its declared unit suffix."""
+    """Return an exact CSV value with its declared unit suffix.
+
+    Args:
+        value: The ``value`` argument.
+        unit: The ``unit`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     value = value.strip()
     if not value:
         return None
@@ -95,7 +113,17 @@ def _exact(value: str, unit: str) -> str | None:
 
 
 def _csv_event(row: Mapping[str, str]) -> EconomicEvent:
-    """Normalize one trusted historical CSV row without inventing values."""
+    """Normalize one trusted historical CSV row without inventing values.
+
+    Args:
+        row: The ``row`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     try:
         scheduled = datetime.strptime(row["datetime"], "%Y-%m-%d %H:%M:%S").replace(
             tzinfo=UTC
@@ -132,7 +160,19 @@ def _csv_event(row: Mapping[str, str]) -> EconomicEvent:
 def _import_csv_raw(
     path: Path, *, store: EconomicEventStore, request_id: str
 ) -> dict[str, int]:
-    """Stream the approved historical interval into bounded transactions."""
+    """Stream the approved historical interval into bounded transactions.
+
+    Args:
+        path: The ``path`` argument.
+        store: The ``store`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     if not path.is_file():
         raise DataError("FILE_NOT_FOUND", safe_details={"field": "path"})
     digest = hashlib.sha256()
@@ -185,10 +225,23 @@ def import_economic_calendar_csv(
     *,
     environment: str,
 ) -> StandardResponse[dict[str, int]]:
-    """Populate the governed historical CSV interval transactionally."""
+    """Populate the governed historical CSV interval transactionally.
+
+    Args:
+        path: The ``path`` argument.
+        environment: The ``environment`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     request_id = generate_id("req")
 
     def _raw() -> dict[str, int]:
+        """Implement raw behavior.
+
+        Returns:
+            The result produced by the operation.
+        """
         _require_non_production(environment)
         return _import_csv_raw(
             path,
@@ -205,13 +258,27 @@ def import_economic_calendar_csv(
 
 
 def _week_start(value: datetime) -> datetime:
-    """Return Sunday 00:00 UTC for the week containing one UTC instant."""
+    """Return Sunday 00:00 UTC for the week containing one UTC instant.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     day_start = value.astimezone(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
     return day_start - timedelta(days=(day_start.weekday() + 1) % 7)
 
 
 def _weekly_coverage_end(rows: Sequence[Mapping[str, object]]) -> datetime:
-    """Return the latest source-local week end represented by weekly rows."""
+    """Return the latest source-local week end represented by weekly rows.
+
+    Args:
+        rows: The ``rows`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     ends: list[datetime] = []
     for row in rows:
         if "Date" in row:
@@ -227,7 +294,17 @@ def _weekly_coverage_end(rows: Sequence[Mapping[str, object]]) -> datetime:
 
 
 def _weekly_events(rows: Sequence[Mapping[str, object]]) -> list[EconomicEvent]:
-    """Validate and normalize official weekly CSV or injected JSON rows."""
+    """Validate and normalize official weekly CSV or injected JSON rows.
+
+    Args:
+        rows: The ``rows`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     csv_keys = {
         "Title",
         "Country",
@@ -298,7 +375,14 @@ def _weekly_events(rows: Sequence[Mapping[str, object]]) -> list[EconomicEvent]:
 
 
 def _fetch_weekly_csv() -> Sequence[Mapping[str, object]]:
-    """Fetch the bounded official weekly CSV resource with permanent URLs."""
+    """Fetch the bounded official weekly CSV resource with permanent URLs.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     request = urllib.request.Request(
         _WEEKLY_URL,
         headers={"Accept": "text/csv", "User-Agent": "HaruQuantAI/1"},
@@ -337,6 +421,14 @@ def sync_current_week_economic_calendar(
     request_id = generate_id("req")
 
     def _raw() -> dict[str, int]:
+        """Implement raw behavior.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            DataError: If the operation cannot be completed safely.
+        """
         _require_non_production(environment)
         observation = observed_at or datetime.now(UTC)
         if observation.tzinfo is None or observation.utcoffset() != timedelta(0):
@@ -400,7 +492,14 @@ def sync_current_week_economic_calendar(
 
 
 def _fetch_definition_with_retries(source_url: str) -> str | None:
-    """Fetch one definition with bounded retries."""
+    """Fetch one definition with bounded retries.
+
+    Args:
+        source_url: The ``source_url`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     for attempt in range(_HISTORICAL_MAX_ATTEMPTS):
         try:
             return fetch_reader_event_page(source_url)
@@ -413,7 +512,16 @@ def _fetch_definition_with_retries(source_url: str) -> str | None:
 def _crawl_definitions_raw(
     start_id: int, end_id: int, request_id: str
 ) -> dict[str, int]:
-    """Persist one bounded definition-ID interval and reconcile occurrences."""
+    """Persist one bounded definition-ID interval and reconcile occurrences.
+
+    Args:
+        start_id: The ``start_id`` argument.
+        end_id: The ``end_id`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     discovered = 0
     rejected = 0
     for definition_id in range(start_id, end_id + 1):
@@ -452,10 +560,27 @@ def _crawl_definitions_raw(
 def crawl_forexfactory_event_definitions(
     *, environment: str, start_id: int = 1, end_id: int = 1024
 ) -> StandardResponse[dict[str, int]]:
-    """Discover, persist, and reconcile bounded Forex Factory definitions."""
+    """Discover, persist, and reconcile bounded Forex Factory definitions.
+
+    Args:
+        environment: The ``environment`` argument.
+        start_id: The ``start_id`` argument.
+        end_id: The ``end_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     request_id = generate_id("req")
 
     def _raw() -> dict[str, int]:
+        """Implement raw behavior.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            DataError: If the operation cannot be completed safely.
+        """
         _require_non_production(environment)
         if start_id < 1 or end_id < start_id or end_id > _MAX_DEFINITION_ID:
             raise DataError("VALIDATION_FAILED", safe_details={"field": "id_range"})
@@ -476,10 +601,28 @@ async def backfill_forexfactory_history(
     provider: EconomicCalendarProvider,
     environment: str,
 ) -> StandardResponse[dict[str, int]]:
-    """Acquire historical Forex Factory data in bounded eight-week intervals."""
+    """Acquire historical Forex Factory data in bounded eight-week intervals.
+
+    Args:
+        start: The ``start`` argument.
+        end: The ``end`` argument.
+        provider: The ``provider`` argument.
+        environment: The ``environment`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     request_id = generate_id("req")
 
     async def _raw() -> dict[str, int]:
+        """Implement raw behavior.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            DataError: If the operation cannot be completed safely.
+        """
         _require_non_production(environment)
         if start.tzinfo is None or end.tzinfo is None or start >= end:
             raise DataError("VALIDATION_FAILED", safe_details={"field": "window"})

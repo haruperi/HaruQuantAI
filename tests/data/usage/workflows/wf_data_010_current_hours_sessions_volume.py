@@ -5,20 +5,25 @@ from __future__ import annotations
 import sys
 import tempfile
 from datetime import UTC, date, datetime, time, timedelta
+from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import (
     build_data_settings,
+    build_dataset_save_request,
     build_market_hours_request,
+    build_synthetic_request,
     build_volume_request,
     build_weekly_schedule_definition,
     build_weekly_schedule_provider,
     data_settings_context,
+    generate_synthetic_bars,
     get_historical_volume,
     get_market_hours,
     run_data_migrations,
+    save_dataset,
     unwrap_data_response,
 )
 from app.utils import generate_id
@@ -46,7 +51,11 @@ def main() -> None:
 
     with tempfile.TemporaryDirectory(prefix="wf-data-010-") as directory:
         root = Path(directory)
-        (root / "data" / "raw").mkdir(parents=True, exist_ok=True)
+        raw_dir = root / "data" / "raw"
+        raw_dir.mkdir(parents=True, exist_ok=True)
+        (raw_dir / "symbols.json").write_text(
+            '{"EURUSD": {"asset_class": "forex", "revision": "v1", "retrieved_at": "2026-01-01T00:00:00Z"}}'
+        )
         settings = build_data_settings(
             database_url="sqlite:///workflow.sqlite3",
             data_dir=root,
@@ -59,6 +68,7 @@ def main() -> None:
                 Path("data/raw"),
                 Path("data/processed"),
             ),
+            data_local_sources=("synthetic",),
             data_provider_sources=("mt5",),
             data_raw_root=Path("data/raw"),
         )
@@ -104,6 +114,47 @@ def main() -> None:
                 request_id=generate_id("req"),
             )
             volume_resp = get_historical_volume(req2)
+            if volume_resp.status != "success":
+                syn_req = build_synthetic_request(
+                    symbol="EURUSD",
+                    data_kind="bars",
+                    timeframe="M1",
+                    start=end - timedelta(hours=1),
+                    record_count=20,
+                    method="gbm",
+                    seed=42,
+                    parameters={
+                        "start_val": Decimal("1.10"),
+                        "mu": Decimal("0.02"),
+                        "sigma": Decimal("0.10"),
+                    },
+                    precision_policy="decimal_string",
+                    request_id=generate_id("req"),
+                )
+                bars = unwrap_data_response(
+                    generate_synthetic_bars(syn_req),
+                    operation="generate_synthetic_bars",
+                    request_id=syn_req.request_id,
+                )
+                save_dataset(
+                    build_dataset_save_request(
+                        dataset=bars,
+                        relative_path=Path("data/raw/EURUSD_M1.parquet"),
+                        format="parquet",
+                        overwrite=True,
+                        request_id=bars.request_id,
+                    )
+                )
+                req2 = build_volume_request(
+                    source_id="synthetic",
+                    symbol="EURUSD",
+                    start=end - timedelta(hours=1),
+                    end=end,
+                    mode="summary",
+                    limit=100,
+                    request_id=generate_id("req"),
+                )
+                volume_resp = get_historical_volume(req2)
             volume = unwrap_data_response(
                 volume_resp,
                 operation="get_historical_volume",

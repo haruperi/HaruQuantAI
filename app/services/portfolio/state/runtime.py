@@ -47,6 +47,9 @@ _MAPPING_TYPE_ARGUMENT_COUNT = 2
 def _encode_model(value: object) -> str:
     """Encode one allowlisted Portfolio model.
 
+    Args:
+        value: Model instance to encode.
+
     Returns:
         JSON text.
 
@@ -61,6 +64,9 @@ def _encode_model(value: object) -> str:
 def _encode_mapping(value: object) -> str:
     """Encode one bounded outbox envelope.
 
+    Args:
+        value: Mapping object to encode.
+
     Returns:
         Canonical JSON text.
 
@@ -74,6 +80,10 @@ def _encode_mapping(value: object) -> str:
 
 def _coerce_model_field(annotation: type[BaseModel], value: object) -> BaseModel:
     """Restore and validate one nested strict contract.
+
+    Args:
+        annotation: Target model class.
+        value: Dictionary of nested model fields.
 
     Returns:
         Validated nested model.
@@ -91,6 +101,10 @@ def _coerce_sequence(
 ) -> tuple[object, ...]:
     """Restore one JSON array as a typed tuple.
 
+    Args:
+        arguments: Type arguments tuple for sequence elements.
+        value: List of raw items to coerce.
+
     Returns:
         Restored tuple.
 
@@ -107,6 +121,10 @@ def _coerce_mapping(
     arguments: tuple[object, ...], value: object
 ) -> dict[object, object]:
     """Restore one JSON object as a typed mapping.
+
+    Args:
+        arguments: Type arguments tuple for mapping key and value.
+        value: Dictionary of raw items to coerce.
 
     Returns:
         Restored mapping.
@@ -128,6 +146,10 @@ def _coerce_mapping(
 def _coerce_union(arguments: tuple[object, ...], value: object) -> object:
     """Restore one optional or union field using its declared alternatives.
 
+    Args:
+        arguments: Tuple of allowed union member types.
+        value: Value to coerce into union member.
+
     Returns:
         First compatible restored alternative, or the original value.
     """
@@ -145,6 +167,10 @@ def _coerce_union(arguments: tuple[object, ...], value: object) -> object:
 
 def _coerce_field(annotation: object, value: object) -> object:
     """Restore JSON values to the exact Python types used by strict contracts.
+
+    Args:
+        annotation: Declared field type or annotation.
+        value: Raw JSON value to coerce.
 
     Returns:
         Restored field value.
@@ -296,6 +322,10 @@ class _DurablePortfolioStateStore:
     ) -> PortfolioConstructionResult:
         """Atomically save construction state and audit outbox.
 
+        Args:
+            result: Construction result model object.
+            audit_record: Redacted audit outbox record mapping.
+
         Returns:
             Persisted construction result.
         """
@@ -374,6 +404,13 @@ class _DurablePortfolioStateStore:
     ) -> ActivePortfolioAllocation:
         """Atomically activate an allocation and append history/audit evidence.
 
+        Args:
+            allocation: Allocation model object to activate.
+            expected_predecessor: Caller-observed predecessor version string.
+            expected_revision: Caller-observed scope revision integer.
+            material_hash: Expected canonical hash string.
+            audit_record: Redacted audit outbox record mapping.
+
         Returns:
             Persisted active allocation.
 
@@ -441,6 +478,10 @@ class _DurablePortfolioStateStore:
     ) -> PortfolioRebalancePlan:
         """Atomically save a plan and its outbox evidence.
 
+        Args:
+            plan: Rebalance plan model object.
+            audit_record: Redacted audit outbox record mapping.
+
         Returns:
             Persisted plan.
 
@@ -475,6 +516,10 @@ class _DurablePortfolioStateStore:
     ) -> tuple[ActivePortfolioAllocation, int] | None:
         """Load active allocation and revision for an exact scope.
 
+        Args:
+            portfolio_id: Stable portfolio identity string.
+            scope_key: Governed scope key string.
+
         Returns:
             Active allocation with revision or ``None``.
         """
@@ -488,6 +533,10 @@ class _DurablePortfolioStateStore:
     ) -> ActivePortfolioAllocation | None:
         """Load one immutable allocation version.
 
+        Args:
+            portfolio_id: Stable portfolio identity string.
+            allocation_version: Exact allocation version string.
+
         Returns:
             Allocation or ``None``.
         """
@@ -498,6 +547,9 @@ class _DurablePortfolioStateStore:
 
     def load_history(self, portfolio_id: str) -> tuple[ActivePortfolioAllocation, ...]:
         """Load ordered immutable allocation history.
+
+        Args:
+            portfolio_id: Stable portfolio identity string.
 
         Returns:
             Ordered allocation versions.

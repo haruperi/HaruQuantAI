@@ -1,14 +1,15 @@
 {
-  "artifact_id": "artifact-261658985aa083d44589051d09b7b68a9d31c8bdb30c10ba38a46b9d63991365",
+  "artifact_id": "artifact-affb2d8f0d7767aec206fa441ecf14d010c914d6caa365eb0d135a436e8750b8",
   "relative_path": "data\\raw\\EURUSD_H1.parquet",
   "format": "parquet",
-  "content_hash": "261658985aa083d44589051d09b7b68a9d31c8bdb30c10ba38a46b9d63991365",
+  "content_hash": "affb2d8f0d7767aec206fa441ecf14d010c914d6caa365eb0d135a436e8750b8",
   "schema_version": "data.market_dataset.v1",
   "normalization_version": "v1",
   "source_revision": "v1",
   "row_count": 24,
   "start": "2026-06-01T00:00:00Z",
   "end": "2026-06-01T23:00:00Z",
+  "available_at": "2026-06-01T23:00:00Z",
   "license_metadata": {
     "license": "synthetic-public"
   },
@@ -21,9 +22,9 @@
     "data.available_at": "2026-06-01T23:00:00+00:00",
     "data.workflow_context": "validation",
     "data.precision_policy": "decimal_string",
-    "data.quality_report": "{\"quality_status\":\"passed\",\"quality_score\":\"1\",\"issues\":[],\"warnings\":[],\"record_count\":24,\"checked_count\":24,\"truncated\":false,\"sample_limit\":24,\"schema_version\":\"v1\",\"generated_at\":\"2026-06-01T23:00:00Z\"}",
+    "data.quality_report": "{\"contract_version\":\"v2\",\"schema_id\":\"data.quality_report.v2\",\"quality_status\":\"perfect\",\"quality_decision\":\"accepted\",\"quality_score\":\"100.00\",\"issues\":[],\"warnings\":[],\"record_count\":24,\"checked_count\":24,\"truncated\":false,\"sample_limit\":24,\"schema_version\":\"v1\",\"generated_at\":\"2026-06-01T23:00:00Z\"}",
     "data.timeframe": "H1"
   },
-  "created_at": "2026-07-23T20:44:37.002331Z",
-  "request_id": "req-6eb0d55e-ddc0-44e6-b3be-3b8b38d4f9db"
+  "created_at": "2026-08-10T12:41:51.832159Z",
+  "request_id": "req-b02c5489-b08f-4653-a319-5ecacd11dffc"
 }

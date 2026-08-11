@@ -197,7 +197,15 @@ class PortfolioService:
         context_correlation_id = getattr(auth_context, "correlation_id", None)
 
         def canonical_or_generated(value: object, prefix: Literal["req", "cor"]) -> str:
-            """Return a valid trace ID without retaining malformed input."""
+            """Return a valid trace ID without retaining malformed input.
+
+            Args:
+                value: Untrusted trace ID object.
+                prefix: Expected trace ID prefix ('req' or 'cor').
+
+            Returns:
+                Valid canonical or generated trace ID string.
+            """
             if isinstance(value, str):
                 try:
                     return validate_id(value, expected_prefix=prefix)
@@ -938,6 +946,12 @@ def construct_portfolio(
 ) -> object:
     """Run governed Portfolio construction.
 
+    Args:
+        service_handle: Portfolio service instance or handle.
+        request: Construction request object.
+        auth_context: Caller authentication context.
+        request_id: Optional request trace identifier.
+
     Returns:
         Structured Portfolio response envelope.
     """
@@ -956,6 +970,13 @@ def get_portfolio_status(
     request_id: str | None = None,
 ) -> object:
     """Read the active Portfolio allocation.
+
+    Args:
+        service_handle: Portfolio service instance or handle.
+        portfolio_id: Stable portfolio identifier.
+        scope: Governed scope dictionary.
+        auth_context: Caller authentication context.
+        request_id: Optional request trace identifier.
 
     Returns:
         Structured Portfolio response envelope.
@@ -976,6 +997,12 @@ def register_portfolio_definition(
 ) -> object:
     """Register one immutable Portfolio definition.
 
+    Args:
+        service_handle: Portfolio service instance or handle.
+        definition: Portfolio definition object to register.
+        auth_context: Caller authentication context.
+        request_id: Optional request trace identifier.
+
     Returns:
         Structured Portfolio response envelope.
     """
@@ -994,6 +1021,13 @@ def get_portfolio_definition(
     request_id: str | None = None,
 ) -> object:
     """Read one exact immutable Portfolio definition.
+
+    Args:
+        service_handle: Portfolio service instance or handle.
+        portfolio_id: Stable portfolio identifier.
+        portfolio_version: Exact immutable version string.
+        auth_context: Caller authentication context.
+        request_id: Optional request trace identifier.
 
     Returns:
         Structured Portfolio response envelope.
@@ -1022,6 +1056,20 @@ def activate_portfolio(
     request_id: str | None = None,
 ) -> object:
     """Run governed Portfolio activation.
+
+    Args:
+        service_handle: Portfolio service instance or handle.
+        candidate: Candidate construction result.
+        evidence: Validated construction evidence.
+        review: Review result object.
+        approval_attestation: Optional approval attestation.
+        approval_validation: Optional approval validation result.
+        expires_at: Expiration UTC datetime.
+        idempotency_key: Unique idempotency key.
+        expected_predecessor: Caller-observed predecessor version.
+        expected_revision: Caller-observed active-scope revision.
+        auth_context: Caller authentication context.
+        request_id: Optional request trace identifier.
 
     Returns:
         Structured Portfolio response envelope.
@@ -1055,6 +1103,16 @@ def assess_portfolio_drift(
     request_id: str | None = None,
 ) -> object:
     """Run Portfolio drift assessment.
+
+    Args:
+        service_handle: Portfolio service instance or handle.
+        allocation: Active portfolio allocation.
+        actual_exposures: Mapping of actual exposures per component.
+        evidence_as_of: UTC timestamp of actual evidence.
+        risk_decision: Current allocation risk decision.
+        eligibility_decisions: Mapping of strategy eligibility decisions.
+        auth_context: Caller authentication context.
+        request_id: Optional request trace identifier.
 
     Returns:
         Structured Portfolio response envelope.
@@ -1091,6 +1149,21 @@ async def submit_portfolio_rebalance(
 ) -> object:
     """Submit one governed Portfolio rebalance.
 
+    Args:
+        service_handle: Portfolio service instance or handle.
+        plan: Rebalance plan object.
+        account_evidence_ref: Account snapshot reference string.
+        market_evidence_ref: Market dataset reference string.
+        fx_evidence_refs: Tuple of FX evidence reference strings.
+        runtime_profile: Runtime profile name ('simulation', 'paper', 'live').
+        execution_route: Execution route name ('sim', 'paper', 'live').
+        approval_refs: Tuple of approval reference strings.
+        approval_token_ref: Approval token reference string.
+        trading_request_id: Trading submission request ID string.
+        valid_until: Plan validity UTC datetime.
+        auth_context: Caller authentication context.
+        request_id: Optional request trace identifier.
+
     Returns:
         Structured Portfolio response envelope.
     """
@@ -1119,6 +1192,13 @@ def recompute_portfolio_measurement(
     request_id: str | None = None,
 ) -> object:
     """Recompute measurement from immutable Trading evidence.
+
+    Args:
+        service_handle: Portfolio service instance or handle.
+        plan_id: Plan identity string.
+        trading_request_id: Trading request ID string.
+        auth_context: Caller authentication context.
+        request_id: Optional request trace identifier.
 
     Returns:
         Structured Portfolio response envelope.
@@ -1149,6 +1229,21 @@ def rollback_portfolio(
 ) -> object:
     """Create a new governed Portfolio rollback version.
 
+    Args:
+        service_handle: Portfolio service instance or handle.
+        candidate: Prior candidate construction result.
+        evidence: Validated construction evidence.
+        review: Review result object.
+        rollback_of_version: Version string being rolled back.
+        approval_attestation: Optional approval attestation.
+        approval_validation: Optional approval validation.
+        expires_at: Expiration UTC datetime.
+        idempotency_key: Unique idempotency key.
+        expected_predecessor: Expected predecessor version.
+        expected_revision: Expected active scope revision.
+        auth_context: Caller authentication context.
+        request_id: Optional request trace identifier.
+
     Returns:
         Structured Portfolio response envelope.
     """
@@ -1177,6 +1272,12 @@ def get_portfolio_history(
     request_id: str | None = None,
 ) -> object:
     """Read immutable Portfolio allocation history.
+
+    Args:
+        service_handle: Portfolio service instance or handle.
+        portfolio_id: Stable portfolio identifier string.
+        auth_context: Caller authentication context.
+        request_id: Optional request trace identifier.
 
     Returns:
         Structured Portfolio response envelope.

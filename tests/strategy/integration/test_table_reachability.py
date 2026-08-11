@@ -26,6 +26,113 @@ from tests.strategy.unit.test_catalog import storage_context
 from tests.strategy.unit.test_models import NOW, make_auth
 
 
+def test_operational_planning_tables_have_production_reachability(
+    tmp_path: Path,
+) -> None:
+    """Verify the six operational-planning tables are reachable via production ops."""
+    from app.services.strategy import (
+        list_automation_policies,
+        list_lifecycle,
+        list_setup_evaluations,
+        list_strategy_playbooks,
+        list_strategy_profiles,
+        list_trade_plans,
+        persist_automation_policy,
+        persist_lifecycle_decision,
+        persist_setup_evaluation,
+        persist_strategy_playbook,
+        persist_strategy_profile,
+        persist_trade_plan,
+    )
+    from app.services.strategy.migrations.definitions import _ensure_strategy_storage
+
+    req = "req-00000000-0000-4000-8000-000000000099"
+    cor = "cor-00000000-0000-4000-8000-000000000099"
+
+    with storage_context(tmp_path):
+        _ensure_strategy_storage(req)
+        persist_strategy_profile(
+            {
+                "strategy_id": "trend",
+                "strategy_version": "1.0.0",
+                "permitted_instruments": ["EURUSD"],
+                "permitted_sessions": ["LONDON"],
+                "permitted_regimes": ["TREND"],
+                "indicator_dependencies": ["ema-20"],
+                "entry_rules": ["breakout"],
+                "exit_rules": ["target"],
+                "invalidation_rules": ["close-below"],
+                "automation_permissions": ["SUPERVISED"],
+            },
+            request_id=req,
+            correlation_id=cor,
+        )
+        assert list_strategy_profiles(request_id=req)
+
+        persist_strategy_playbook(
+            {
+                "playbook_id": "play-1",
+                "strategy_profile_ref": "trend@1.0.0",
+                "title": "t",
+                "summary": "s",
+                "setup_rules": ["trend"],
+                "debrief_prompts": ["q"],
+            },
+            request_id=req,
+            correlation_id=cor,
+        )
+        assert list_strategy_playbooks(request_id=req)
+
+        persist_setup_evaluation(
+            {
+                "evaluation_id": "eval-1",
+                "playbook_ref": "play-1",
+                "outcome": "MATCH",
+                "source_snapshot_refs": ["snap-1"],
+                "reason_codes": [],
+            },
+            request_id=req,
+            correlation_id=cor,
+        )
+        assert list_setup_evaluations(request_id=req)
+
+        persist_trade_plan(
+            {
+                "plan_id": "plan-1",
+                "plan_version": 1,
+                "status": "DRAFT",
+                "strategy_id": "trend",
+                "strategy_version": "1.0.0",
+                "parent_plan_id": None,
+            },
+            request_id=req,
+            correlation_id=cor,
+        )
+        assert list_trade_plans(request_id=req)
+
+        persist_automation_policy(
+            strategy_id="trend",
+            strategy_version="1.0.0",
+            mode="SUPERVISED",
+            request_id=req,
+            correlation_id=cor,
+        )
+        assert list_automation_policies(request_id=req)
+
+        persist_lifecycle_decision(
+            {
+                "strategy_id": "trend",
+                "strategy_version": "1.0.0",
+                "from_status": "TESTING",
+                "to_status": "APPROVED",
+                "reason": "passed",
+            },
+            request_id=req,
+            correlation_id=cor,
+        )
+        assert list_lifecycle(request_id=req)
+
+
 def test_all_seven_tables_have_production_reachability(tmp_path: Path) -> None:
     """Verify production operations write and read all seven Strategy tables.
 

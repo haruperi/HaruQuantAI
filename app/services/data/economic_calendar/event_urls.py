@@ -51,7 +51,15 @@ class _EventDefinition:
 
 
 def _section(markdown: str, label: str) -> str | None:
-    """Extract one bounded Specs value from Reader Markdown."""
+    """Extract one bounded Specs value from Reader Markdown.
+
+    Args:
+        markdown: The ``markdown`` argument.
+        label: The ``label`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     pattern = re.compile(
         rf"^#+\s*{re.escape(label)}:\s*$\s*(.*?)(?=^#+\s*.+?:\s*$|^##\s|\Z)",
         re.MULTILINE | re.DOTALL,
@@ -121,6 +129,17 @@ def discover_event_definitions(
 
     The caller owns rate limiting, retries, and incremental persistence so this
     deterministic iterator remains directly unit-testable without network I/O.
+
+    Args:
+        fetch_page: The ``fetch_page`` argument.
+        start_id: The ``start_id`` argument.
+        end_id: The ``end_id`` argument.
+
+    Yields:
+        The next value produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
     """
     if start_id < 1 or end_id < start_id or end_id > _MAX_DEFINITION_ID:
         raise DataError("VALIDATION_FAILED", safe_details={"field": "id_range"})
@@ -136,7 +155,15 @@ def discover_event_definitions(
 def definition_parameters(
     definition: dict[str, str | None], *, request_id: str
 ) -> tuple[object, ...]:
-    """Return one definition's ordered persistence parameters."""
+    """Return one definition's ordered persistence parameters.
+
+    Args:
+        definition: The ``definition`` argument.
+        request_id: The ``request_id`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     now = datetime.now(UTC).isoformat()
     return (
         "forexfactory",

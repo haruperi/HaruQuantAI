@@ -51,7 +51,17 @@ type CanonicalRecord = OHLCVRecord | TickRecord | SpreadRecord
 
 
 def _text(value: str) -> str:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _text")
     if not value or value != value.strip():
         raise ValueError("value must be a non-empty trimmed string")
@@ -59,13 +69,30 @@ def _text(value: str) -> str:
 
 
 def _optional_text(value: str | None) -> str | None:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     logger.debug("Running DATA function: _optional_text")
     return None if value is None else _text(value)
 
 
 def _utc(value: datetime) -> datetime:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _utc")
     if value.tzinfo is None or value.utcoffset() != timedelta(0):
         raise ValueError("timestamp must be aware UTC")
@@ -73,7 +100,17 @@ def _utc(value: datetime) -> datetime:
 
 
 def _unique_texts(values: tuple[str, ...]) -> tuple[str, ...]:
-    """Execute one private DATA operation."""
+    """Execute one private DATA operation.
+
+    Args:
+        values: The ``values`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _unique_texts")
     validated = tuple(_text(value) for value in values)
     if len(set(validated)) != len(validated):
@@ -95,21 +132,45 @@ class QualityIssue(_Contract):
     @field_validator("code", "message")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("field")
     @classmethod
     def _validate_field(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_field")
         return _optional_text(value)
 
     @field_validator("affected_count")
     @classmethod
     def _validate_count(cls, value: int | None) -> int | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_count")
         if value is not None and value < 0:
             raise ValueError("affected_count must be non-negative")
@@ -118,7 +179,14 @@ class QualityIssue(_Contract):
     @field_validator("samples")
     @classmethod
     def _validate_samples(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_samples")
         return tuple(_text(item) for item in value)
 
@@ -127,7 +195,17 @@ class QualityIssue(_Contract):
     def _validate_workflows(
         cls, value: tuple[WorkflowContext, ...]
     ) -> tuple[WorkflowContext, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_workflows")
         if len(set(value)) != len(value):
             raise ValueError("blocking_workflows must be unique")
@@ -168,7 +246,17 @@ class DataQualityReport(_Contract):
     @field_validator("quality_score")
     @classmethod
     def _validate_score(cls, value: Decimal) -> Decimal:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_score")
         if not value.is_finite() or not Decimal(0) <= value <= Decimal(100):
             raise ValueError("quality_score must be finite and between zero and 100")
@@ -177,7 +265,18 @@ class DataQualityReport(_Contract):
     @field_validator("record_count", "checked_count", "sample_limit")
     @classmethod
     def _validate_count(cls, value: int, info: object) -> int:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+            info: The ``info`` argument.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_count")
         field_name = str(getattr(info, "field_name", "count"))
         if value < 0 or (field_name == "sample_limit" and value == 0):
@@ -188,27 +287,55 @@ class DataQualityReport(_Contract):
     @field_validator("warnings")
     @classmethod
     def _validate_warnings(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_warnings")
         return tuple(_text(item) for item in value)
 
     @field_validator("schema_version")
     @classmethod
     def _validate_schema(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_schema")
         return _text(value)
 
     @field_validator("generated_at")
     @classmethod
     def _validate_generated_at(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_generated_at")
         return _utc(value)
 
     @model_validator(mode="after")
     def _validate_report(self) -> DataQualityReport:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_report")
         if self.checked_count > self.record_count:
             raise ValueError("checked_count must not exceed record_count")
@@ -232,13 +359,27 @@ class DataQualityReport(_Contract):
 
     @field_serializer("quality_score", when_used="json")
     def _serialize_score(self, value: Decimal) -> str:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_score")
         return str(value)
 
 
 def _quality_status_for_score(score: Decimal) -> str:
-    """Return the deterministic percentage grade for an examined score."""
+    """Return the deterministic percentage grade for an examined score.
+
+    Args:
+        score: The ``score`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     if score == Decimal(100):
         return "perfect"
     if score >= Decimal(95):
@@ -253,7 +394,14 @@ def _quality_status_for_score(score: Decimal) -> str:
 
 
 def _quality_decision_for_report(report: DataQualityReport) -> str:
-    """Return the fail-closed operational decision for one graded report."""
+    """Return the fail-closed operational decision for one graded report.
+
+    Args:
+        report: The ``report`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     if any(issue.code in {"MISSING_BARS", "DUPLICATE_BARS"} for issue in report.issues):
         return "rejected"
     if report.quality_status in {"poor", "critical"}:
@@ -290,28 +438,56 @@ class MarketDataset(_Contract):
     @field_validator("normalization_version", "symbol", "request_id")
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 
     @field_validator("timeframe")
     @classmethod
     def _validate_timeframe(cls, value: str | None) -> str | None:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_timeframe")
         return _optional_text(value)
 
     @field_validator("start", "end", "available_at")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return _utc(value)
 
     @field_validator("source_metadata", "license_metadata", mode="after")
     @classmethod
     def _freeze_metadata(cls, value: Mapping[str, str]) -> Mapping[str, str]:
-        """Freeze one DATA contract value against mutation."""
+        """Freeze one DATA contract value against mutation.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _freeze_metadata")
         return MappingProxyType(
             {_text(key): _text(item) for key, item in value.items()}
@@ -319,13 +495,24 @@ class MarketDataset(_Contract):
 
     @field_serializer("source_metadata", "license_metadata", when_used="json")
     def _serialize_metadata(self, value: Mapping[str, str]) -> dict[str, str]:
-        """Serialize one DATA contract value deterministically."""
+        """Serialize one DATA contract value deterministically.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _serialize_metadata")
         return dict(value)
 
     @model_validator(mode="after")
     def _validate_dataset(self) -> MarketDataset:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_dataset")
         _validate_dataset_counts(self)
         _validate_dataset_record_type(self)
@@ -335,7 +522,14 @@ class MarketDataset(_Contract):
 
 
 def _validate_dataset_counts(dataset: MarketDataset) -> None:
-    """Validate dataset bounds and record-count relationships."""
+    """Validate dataset bounds and record-count relationships.
+
+    Args:
+        dataset: The ``dataset`` argument.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _validate_dataset_counts")
     if dataset.start > dataset.end:
         raise ValueError("start must not follow end")
@@ -346,7 +540,14 @@ def _validate_dataset_counts(dataset: MarketDataset) -> None:
 
 
 def _validate_dataset_record_type(dataset: MarketDataset) -> None:
-    """Validate the declared kind against canonical record types."""
+    """Validate the declared kind against canonical record types.
+
+    Args:
+        dataset: The ``dataset`` argument.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _validate_dataset_record_type")
     if dataset.data_kind == "bars" and dataset.timeframe is None:
         raise ValueError("bar datasets require timeframe")
@@ -369,7 +570,14 @@ def _validate_dataset_record_type(dataset: MarketDataset) -> None:
 
 
 def _validate_dataset_times(dataset: MarketDataset) -> None:
-    """Validate deterministic ordering and evidence availability."""
+    """Validate deterministic ordering and evidence availability.
+
+    Args:
+        dataset: The ``dataset`` argument.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _validate_dataset_times")
     if dataset.records:
         timestamps = tuple(record.timestamp for record in dataset.records)
@@ -387,7 +595,14 @@ def _validate_dataset_times(dataset: MarketDataset) -> None:
 
 
 def _validate_dataset_policy(dataset: MarketDataset) -> None:
-    """Validate workflow-specific precision restrictions."""
+    """Validate workflow-specific precision restrictions.
+
+    Args:
+        dataset: The ``dataset`` argument.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
     logger.debug("Running DATA function: _validate_dataset_policy")
     if (
         dataset.workflow_context != "research"
@@ -405,13 +620,27 @@ class DataRange(_Contract):
     @field_validator("start", "end")
     @classmethod
     def _validate_time(cls, value: datetime) -> datetime:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         logger.debug("Running DATA function: _validate_time")
         return _utc(value)
 
     @model_validator(mode="after")
     def _validate_range(self) -> DataRange:
-        """Validate one DATA value or contract invariant."""
+        """Validate one DATA value or contract invariant.
+
+        Returns:
+            The result produced by the operation.
+
+        Raises:
+            ValueError: If the operation cannot be completed safely.
+        """
         logger.debug("Running DATA function: _validate_range")
         if self.start > self.end:
             raise ValueError("start must not follow end")

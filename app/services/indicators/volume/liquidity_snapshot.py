@@ -1,3 +1,4 @@
+# ruff: noqa: DOC202
 """Validated JSON-safe LiquiditySnapshot v1 transport."""
 
 from __future__ import annotations
@@ -34,10 +35,13 @@ def _validate_timestamp(value: object) -> None:
     """Validate canonical UTC liquidity time.
 
     Args:
-        value: Candidate timestamp text.
+            value: Candidate timestamp text.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: If the timestamp is invalid or not UTC.
+            IndicatorError: If the timestamp is invalid or not UTC.
     """
     if not isinstance(value, str) or not value.endswith("Z"):
         raise IndicatorError(
@@ -59,10 +63,13 @@ def _validate_numeric(value: Mapping[str, object]) -> None:
     """Validate liquidity numeric fields.
 
     Args:
-        value: Candidate snapshot mapping.
+            value: Candidate snapshot mapping.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: If a numeric field violates its bounds.
+            IndicatorError: If a numeric field violates its bounds.
     """
     numeric = ("spread", "executable_depth", "imbalance", "volume")
     for field in numeric:
@@ -96,10 +103,13 @@ def _validate_optional(value: Mapping[str, object]) -> None:
     """Validate optional probability and state fields.
 
     Args:
-        value: Candidate snapshot mapping.
+            value: Candidate snapshot mapping.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: If an optional or state field is invalid.
+            IndicatorError: If an optional or state field is invalid.
     """
     probability = value["fill_probability"]
     if probability is not None and (

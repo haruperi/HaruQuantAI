@@ -1,0 +1,63 @@
+"""Contracts for loading an approved local CSV or Parquet dataset."""
+
+from pathlib import Path
+from typing import Literal
+
+from pydantic import field_validator
+
+from app.services.data.contracts._base import TracedOpenContract
+
+
+def _relative_path(value: Path) -> Path:
+    """Validate an approved-root-relative, traversal-free artifact path.
+
+    Args:
+        value: The ``value`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        ValueError: If the operation cannot be completed safely.
+    """
+    if value.is_absolute() or not value.parts or ".." in value.parts:
+        raise ValueError("path must be relative and traversal-free")
+    if any(part.startswith(".") for part in value.parts):
+        raise ValueError("hidden path segments are not allowed")
+    return value
+
+
+class DatasetLoadRequest(TracedOpenContract):
+    """Approved-root-relative local dataset load request."""
+
+    relative_path: Path
+    format: Literal["csv", "parquet"]
+    request_id: str
+
+    @field_validator("relative_path")
+    @classmethod
+    def _validate_path(cls, value: Path) -> Path:
+        """Validate the requested relative artifact path.
+
+        Args:
+            value: The ``value`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
+        return _relative_path(value)
+
+
+class ManifestCompatibility(TracedOpenContract):
+    """Bounded schema/normalization compatibility verdict for one manifest.
+
+    application Phase 0 reconciliation (`feature`): an explicit,
+    deterministic compatibility check against a caller-declared expectation,
+    never an inferred or default-true verdict.
+    """
+
+    compatible: bool
+    reasons: tuple[str, ...] = ()
+
+
+__all__ = ["DatasetLoadRequest", "ManifestCompatibility"]

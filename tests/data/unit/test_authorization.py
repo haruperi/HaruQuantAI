@@ -2,7 +2,7 @@
 
 from types import SimpleNamespace
 
-from app.services.data.audit.authorization import may_query_audit
+from app.services.data.evidence.audit_authorization import may_query_audit
 
 
 def test_may_query_audit_returns_true_when_permission_present() -> None:

@@ -91,3 +91,57 @@ def test_safe_stand_down_completes_a_no_trade_mission() -> None:
     )
     assert outcome.status == "PASSED"
     assert outcome.safe_stand_down is True
+
+
+def test_checklist_runtime_comparators_and_error_paths() -> None:
+    """Test ne, gte, lte comparators and identity mismatch errors."""
+    def_comp = build_checklist_definition(
+        checklist_id="comp-test",
+        version="v1",
+        steps=(
+            {
+                "step_id": "ne-step",
+                "evidence_key": "val_ne",
+                "comparator": "ne",
+                "expected": 10,
+            },
+            {
+                "step_id": "gte-step",
+                "evidence_key": "val_gte",
+                "comparator": "gte",
+                "expected": 5,
+            },
+            {
+                "step_id": "lte-step",
+                "evidence_key": "val_lte",
+                "comparator": "lte",
+                "expected": 5,
+            },
+        ),
+    )
+    runtime = start_simulation_checklist(def_comp, "Standard")
+    evaluated = evaluate_simulation_checklist(
+        def_comp, runtime, {"val_ne": 20, "val_gte": 10, "val_lte": 3}
+    )
+    assert [step.state for step in evaluated.steps] == [
+        "SATISFIED",
+        "SATISFIED",
+        "SATISFIED",
+    ]
+
+    # Test identity mismatch
+    wrong_def = build_checklist_definition(
+        checklist_id="wrong-id",
+        version="v1",
+        steps=({"step_id": "other-step", "evidence_key": "k", "comparator": "truthy"},),
+    )
+    with pytest.raises(SimulationError, match="mismatch"):
+        evaluate_simulation_checklist(wrong_def, runtime, {})
+
+
+def test_mission_completion_failed_outcome() -> None:
+    """Test mission completion when mandatory step is not satisfied."""
+    definition = _definition()
+    runtime = start_simulation_checklist(definition, "Standard")
+    outcome = complete_simulation_mission(definition, runtime, trade_count=0)
+    assert outcome.status == "INCOMPLETE"

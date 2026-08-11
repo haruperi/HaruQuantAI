@@ -21,18 +21,18 @@ from app.services.data import (
     build_venue_state_payload,
 )
 from app.services.data.contracts import DataError, TickRecord
-from app.services.data.realtime_feeds import mt5_bars, mt5_ticks, subscriptions
-from app.services.data.realtime_feeds.contracts import (
+from app.services.data.market_events import mt5_bars, mt5_ticks, subscriptions
+from app.services.data.market_events.contracts import (
     MarketStreamEvent,
     MarketStreamRequest,
 )
-from app.services.data.realtime_feeds.mt5_bars import _BarLike, _seconds_until_boundary
-from app.services.data.realtime_feeds.mt5_ticks import (
+from app.services.data.market_events.mt5_bars import _BarLike, _seconds_until_boundary
+from app.services.data.market_events.mt5_ticks import (
     _signature,
     _TickLike,
     _unseen_ticks,
 )
-from app.services.data.realtime_feeds.subscriptions import (
+from app.services.data.market_events.subscriptions import (
     _HUBS,
     _admit_hub,
     _StreamHub,

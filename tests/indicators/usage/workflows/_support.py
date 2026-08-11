@@ -3,43 +3,16 @@
 from __future__ import annotations
 
 import sys
-from datetime import UTC, datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+
 from typing import Any
 
-from app.services.data import (
-    build_market_data_request,
-    get_market_data,
-    unwrap_data_response,
-)
 from app.services.indicators import build_indicator_config
-from app.utils import generate_id
-
-
-def market_request(data_kind, *, timeframe, limit):
-    """Build one bounded genuine MT5 request inline."""
-    end = datetime.now(UTC)
-    return build_market_data_request(
-        source_id="mt5",
-        symbol="EURUSD",
-        data_kind=data_kind,
-        timeframe=timeframe if data_kind == "bars" else None,
-        start=end - timedelta(days=5),
-        end=end,
-        limit=limit,
-        use_cache=False,
-        quality_failure_behavior="warn",
-        workflow_context="research",
-        precision_policy="decimal_string",
-        stale_cache_policy="refresh",
-        fallback_sources=(),
-        request_id=generate_id("req"),
-    )
-
+from tests.indicators.usage._support import get_mt5_usage_dataset
 
 MarketDataset = Any
 
@@ -47,12 +20,8 @@ MarketDataset = Any
 @lru_cache(maxsize=4)
 def live_bars(timeframe: str = "M1", limit: int = 80) -> MarketDataset:
     """Read bounded genuine MT5 bars through the Data public boundary."""
-    response = get_market_data(market_request("bars", timeframe=timeframe, limit=limit))
-    return unwrap_data_response(
-        response,
-        operation="indicators.usage.workflow.live_bars",
-        request_id=response.metadata.request_id,
-    )
+    del limit
+    return get_mt5_usage_dataset(timeframe=timeframe)
 
 
 def indicator_config(

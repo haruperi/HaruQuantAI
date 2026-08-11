@@ -96,7 +96,14 @@ _DAY_START_TIMES: Final = {"all day", "tentative"}
 
 
 def _week_param(sunday: date) -> str:
-    """Format one Sunday week start as the provider's ``week`` URL parameter."""
+    """Format one Sunday week start as the provider's ``week`` URL parameter.
+
+    Args:
+        sunday: The ``sunday`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     month_abbrev = next(key for key, value in _MONTHS.items() if value == sunday.month)
     return f"{month_abbrev}{sunday.day}.{sunday.year}"
 
@@ -105,6 +112,13 @@ def _week_params_covering(start: datetime, end: datetime) -> tuple[str, ...]:
     """Return the Sunday-anchored week parameters covering ``[start, end)``.
 
     Computation is date-based so time components never affect page selection.
+
+    Args:
+        start: The ``start`` argument.
+        end: The ``end`` argument.
+
+    Returns:
+        The result produced by the operation.
 
     Raises:
         DataError: If the window spans more than the bounded page count.
@@ -129,6 +143,13 @@ def _resolve_offset_minutes(synced_text: str, utc_reference: datetime) -> int:
     The page's synced-time display truncates to the minute; rounding to the
     nearest quarter hour absorbs that truncation plus render latency. World
     timezone offsets are whole quarter hours.
+
+    Args:
+        synced_text: The ``synced_text`` argument.
+        utc_reference: The ``utc_reference`` argument.
+
+    Returns:
+        The result produced by the operation.
     """
     local_hour, local_minute = _parse_clock(synced_text)
     local_minutes = local_hour * 60 + local_minute
@@ -144,6 +165,12 @@ def _resolve_offset_minutes(synced_text: str, utc_reference: datetime) -> int:
 def _parse_clock(text: str) -> tuple[int, int]:
     """Parse one ``h:mmam``/``h:mmpm`` clock label into a 24-hour ``(hour, minute)``.
 
+    Args:
+        text: The ``text`` argument.
+
+    Returns:
+        The result produced by the operation.
+
     Raises:
         ValueError: If the label does not match the provider clock format.
     """
@@ -158,13 +185,27 @@ def _parse_clock(text: str) -> tuple[int, int]:
 
 
 def _cell_value(raw: object) -> str | None:
-    """Return the trimmed visible cell text or explicit absence."""
+    """Return the trimmed visible cell text or explicit absence.
+
+    Args:
+        raw: The ``raw`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     text = str(raw or "").strip()
     return text or None
 
 
 def _resolve_currency(row: Mapping[str, Any]) -> str | None:
-    """Return the row currency from the currency cell or the title prefix."""
+    """Return the row currency from the currency cell or the title prefix.
+
+    Args:
+        row: The ``row`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     currency = str(row.get("currency") or "").strip()
     if currency:
         return currency
@@ -178,7 +219,12 @@ class _CalendarPageParser(HTMLParser):
     """Class-driven parser for one rendered Fair Economy calendar page."""
 
     def __init__(self, *, year: int, offset_minutes: int) -> None:
-        """Initialize the parser with the page year and UTC offset context."""
+        """Initialize the parser with the page year and UTC offset context.
+
+        Args:
+            year: The ``year`` argument.
+            offset_minutes: The ``offset_minutes`` argument.
+        """
         super().__init__(convert_charrefs=True)
         self._year = year
         self._offset = timedelta(minutes=offset_minutes)
@@ -195,6 +241,10 @@ class _CalendarPageParser(HTMLParser):
         Cells never nest inside one another in this table, so no depth counter
         is required; void elements such as ``<img>`` never emit end tags and
         must not influence cell state.
+
+        Args:
+            tag: The ``tag`` argument.
+            attrs: The ``attrs`` argument.
         """
         attr = dict(attrs)
         classes = (attr.get("class") or "").split()
@@ -222,7 +272,11 @@ class _CalendarPageParser(HTMLParser):
 
     @override
     def handle_endtag(self, tag: str) -> None:
-        """Close the active cell on ``</td>`` and emit completed rows on ``</tr>``."""
+        """Close the active cell on ``</td>`` and emit completed rows on ``</tr>``.
+
+        Args:
+            tag: The ``tag`` argument.
+        """
         if self._row is None:
             return
         if tag in {"td", "th"}:
@@ -235,7 +289,11 @@ class _CalendarPageParser(HTMLParser):
 
     @override
     def handle_data(self, data: str) -> None:
-        """Accumulate visible text for the active row or cell."""
+        """Accumulate visible text for the active row or cell.
+
+        Args:
+            data: The ``data`` argument.
+        """
         if self._row is None:
             return
         if "_day_breaker" in self._row:
@@ -294,7 +352,14 @@ class _CalendarPageParser(HTMLParser):
         )
 
     def _parse_day(self, text: str) -> datetime | None:
-        """Parse one ``Sun Jul 26`` style label into the page-year date."""
+        """Parse one ``Sun Jul 26`` style label into the page-year date.
+
+        Args:
+            text: The ``text`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         match = re.search(r"([A-Za-z]{3})\s+(\d{1,2})\b", text)
         if not match:
             return None
@@ -310,6 +375,12 @@ class _CalendarPageParser(HTMLParser):
 
         An empty time label is the provider's same-time-as-above marker: the
         row inherits the most recent explicit clock time of the current day.
+
+        Args:
+            time_text: The ``time_text`` argument.
+
+        Returns:
+            The result produced by the operation.
         """
         if self._day is None:
             return None
@@ -333,7 +404,14 @@ class _CalendarPageParser(HTMLParser):
 
     @staticmethod
     def _parse_impact(row: Mapping[str, Any]) -> str:
-        """Map the provider impact metadata to the canonical literal."""
+        """Map the provider impact metadata to the canonical literal.
+
+        Args:
+            row: The ``row`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         title = row.get("_impact_title") or ""
         if title in _IMPACT_BY_TITLE:
             return _IMPACT_BY_TITLE[title]
@@ -350,7 +428,17 @@ def _parse_page(
     year: int,
     offset_minutes: int,
 ) -> list[Mapping[str, object]]:
-    """Parse one rendered calendar page into raw `_clean_row`-compatible rows."""
+    """Parse one rendered calendar page into raw `_clean_row`-compatible rows.
+
+    Args:
+        site: The ``site`` argument.
+        html: The ``html`` argument.
+        year: The ``year`` argument.
+        offset_minutes: The ``offset_minutes`` argument.
+
+    Returns:
+        The result produced by the operation.
+    """
     parser = _CalendarPageParser(year=year, offset_minutes=offset_minutes)
     parser.feed(html)
     parser.close()
@@ -379,6 +467,12 @@ class _FirecrawlCalendarTransport(CalendarTransport):
         wait_for_ms: int = 8000,
     ) -> None:
         """Initialize the transport with licensed credentials and bounds.
+
+        Args:
+            api_key: The ``api_key`` argument.
+            request_timeout_sec: The ``request_timeout_sec`` argument.
+            max_parallel_requests: The ``max_parallel_requests`` argument.
+            wait_for_ms: The ``wait_for_ms`` argument.
 
         Raises:
             DataError: If any bound is invalid.
@@ -440,6 +534,12 @@ class _FirecrawlCalendarTransport(CalendarTransport):
     async def _post(self, page_url: str) -> tuple[str, datetime]:
         """POST one licensed scrape and return ``(html, utc_reference)``.
 
+        Args:
+            page_url: The ``page_url`` argument.
+
+        Returns:
+            The result produced by the operation.
+
         Raises:
             DataError: Mapped transport failure; never carries credentials.
         """
@@ -465,6 +565,12 @@ class _FirecrawlCalendarTransport(CalendarTransport):
 
     def _post_sync(self, page_url: str) -> tuple[str, datetime]:
         """Execute the blocking licensed POST off the event loop.
+
+        Args:
+            page_url: The ``page_url`` argument.
+
+        Returns:
+            The result produced by the operation.
 
         Raises:
             DataError: If the intermediary reports failure or malformed output.
@@ -536,7 +642,14 @@ class _FirecrawlCalendarTransport(CalendarTransport):
 
     @staticmethod
     def _map_http_error(error: urllib.error.HTTPError) -> DataError:
-        """Map one licensed-intermediary HTTP failure to a canonical code."""
+        """Map one licensed-intermediary HTTP failure to a canonical code.
+
+        Args:
+            error: The ``error`` argument.
+
+        Returns:
+            The result produced by the operation.
+        """
         if error.code in {401, 402, 403}:
             return DataError(
                 "SOURCE_UNAVAILABLE",
@@ -550,6 +663,13 @@ class _FirecrawlCalendarTransport(CalendarTransport):
     @staticmethod
     def _page_offset(html: str, utc_reference: datetime) -> int:
         """Derive the page-local offset from the synced-time element.
+
+        Args:
+            html: The ``html`` argument.
+            utc_reference: The ``utc_reference`` argument.
+
+        Returns:
+            The result produced by the operation.
 
         Raises:
             DataError: If the page does not publish its local time; the

@@ -47,7 +47,14 @@ class FXRateProvider(Protocol):
         as_of: datetime,
         request_id: str,
     ) -> StandardResponse[FXRateLeg]:
-        """Return one exact direct leg or a canonical DATA failure response."""
+        """Return one exact direct leg or a canonical DATA failure response.
+
+        Args:
+            source_currency: The ``source_currency`` argument.
+            target_currency: The ``target_currency`` argument.
+            as_of: The ``as_of`` argument.
+            request_id: The ``request_id`` argument.
+        """
         ...
 
 
@@ -57,7 +64,20 @@ def _read_leg(
     source_currency: str,
     target_currency: str,
 ) -> FXRateLeg | None:
-    """Read and validate one exact direct rate leg."""
+    """Read and validate one exact direct rate leg.
+
+    Args:
+        request: The ``request`` argument.
+        provider: The ``provider`` argument.
+        source_currency: The ``source_currency`` argument.
+        target_currency: The ``target_currency`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.debug("Reading explicit FX leg %s/%s", source_currency, target_currency)
     try:
         leg = cast(
@@ -101,7 +121,18 @@ def _select_path(
     request: FXConversionRequest,
     provider: FXRateProvider,
 ) -> tuple[FXRateLeg, ...]:
-    """Select direct first, then declared intermediates in caller order."""
+    """Select direct first, then declared intermediates in caller order.
+
+    Args:
+        request: The ``request`` argument.
+        provider: The ``provider`` argument.
+
+    Returns:
+        The result produced by the operation.
+
+    Raises:
+        DataError: If the operation cannot be completed safely.
+    """
     logger.info("Selecting deterministic FX path for request %s", request.request_id)
     direct = _read_leg(
         request,

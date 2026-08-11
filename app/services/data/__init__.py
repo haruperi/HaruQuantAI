@@ -8,7 +8,11 @@ implementation details and are never exported through a public Data boundary.
 
 # Import order is dependency order, not lexical order.
 
-from app.services.data._settings import data_settings_context
+from app.services.data._settings import (
+    data_provider_connection_resolver_context,
+    data_provider_settings_context,
+    data_settings_context,
+)
 from app.services.data._shared.operations import (
     build_account_order,
     build_account_snapshot_request,
@@ -122,17 +126,7 @@ from app.services.data._shared.operations import (
     is_research_source_value,
     is_tick_record,
 )
-from app.services.data.artifact_catalog import (
-    get_catalog_evidence,
-    get_catalog_table_lifecycles,
-    get_verified_research_source,
-    reconcile_data_catalog,
-    record_catalog_fetch,
-    record_catalog_quality_event,
-    register_catalog_artifact,
-    sync_catalog_reference,
-)
-from app.services.data.audit import persist_audit_event, query_audit_events
+from app.services.data.alignment import align_datasets, align_multitimeframe_data
 from app.services.data.contracts.responses import (
     build_data_response,
     build_exception_response,
@@ -155,6 +149,21 @@ from app.services.data.data_jobs.job import (
     run_data_update_job_once,
     start_data_update_job,
     stop_data_update_job,
+)
+from app.services.data.datasets import (
+    get_catalog_evidence,
+    get_catalog_table_lifecycles,
+    get_verified_research_source,
+    load_csv,
+    load_dataset,
+    load_local_dataset,
+    load_parquet,
+    reconcile_data_catalog,
+    record_catalog_fetch,
+    record_catalog_quality_event,
+    register_catalog_artifact,
+    sync_catalog_reference,
+    verify_manifest_compatibility,
 )
 from app.services.data.economic_calendar import (
     backfill_forexfactory_history,
@@ -186,53 +195,12 @@ from app.services.data.economic_calendar import (
 from app.services.data.economic_calendar.dashboard import (
     get_calendar_dashboard_snapshot,
 )
-from app.services.data.evidence import (
-    get_account_state_snapshot,
-    get_fx_conversion_evidence,
-    get_market_context_evidence,
-)
-from app.services.data.local_datasets import (
-    load_csv,
-    load_dataset,
-    load_local_dataset,
-    load_parquet,
-    verify_manifest_compatibility,
-)
-from app.services.data.market_data import (
-    discover_symbols,
-    export_replay_evidence,
-    fetch_historical_volume,
-    fetch_market_dataset,
-    fetch_symbol_metadata,
-    get_data_availability,
-    get_historical_volume,
-    get_level1_snapshot,
-    get_market_data,
-    get_market_snapshot,
-    get_spread_data,
-    get_symbol_metadata,
-    get_tick_data,
-    inspect_availability,
-    list_symbols,
-)
-from app.services.data.persistence import (
-    acquire_write_lock,
-    clear_cache_entry,
-    clear_data_cache,
-    create_backup,
-    describe_import_dialects,
-    enforce_retention_policy,
-    execute_transaction,
-    get_cache_entry,
-    import_external_dataset,
-    put_cache_entry,
-    restore_from_backup,
-    run_data_migrations,
-    run_domain_migrations,
-    save_dataset,
-    save_market_data,
-)
-from app.services.data.quality import (
+from app.services.data.evidence.account_state import get_account_state_snapshot
+from app.services.data.evidence.audit_query import query_audit_events
+from app.services.data.evidence.audit_store import persist_audit_event
+from app.services.data.evidence.fx_conversion import get_fx_conversion_evidence
+from app.services.data.evidence.market_context import get_market_context_evidence
+from app.services.data.integrity import (
     aggregate_flags,
     detect_clock_drift,
     detect_extreme_spread_widening,
@@ -250,7 +218,27 @@ from app.services.data.quality import (
     summarize_quality_remediation,
     validate_symbol_metadata,
 )
-from app.services.data.realtime_feeds import (
+from app.services.data.market_data import (
+    DISPLAY_ASSET_CLASSES,
+    build_market_directory_request,
+    classify_symbol,
+    discover_symbols,
+    fetch_historical_volume,
+    fetch_market_dataset,
+    fetch_symbol_metadata,
+    get_data_availability,
+    get_historical_volume,
+    get_level1_snapshot,
+    get_market_data,
+    get_market_snapshot,
+    get_spread_data,
+    get_symbol_metadata,
+    get_tick_data,
+    inspect_availability,
+    list_market_directory,
+    list_symbols,
+)
+from app.services.data.market_events import (
     build_market_stream_request,
     ingest_feed_event,
     read_feed_status,
@@ -259,25 +247,29 @@ from app.services.data.realtime_feeds import (
     start_internal_feed,
     stream_market_data,
 )
-from app.services.data.realtime_feeds.status import get_feed_status
-from app.services.data.replay_packages import (
+from app.services.data.market_events.status import get_feed_status
+from app.services.data.persistence import (
+    acquire_write_lock,
+    clear_cache_entry,
+    clear_data_cache,
+    create_backup,
+    describe_import_dialects,
+    enforce_retention_policy,
+    execute_transaction,
+    get_cache_entry,
+    import_external_dataset,
+    put_cache_entry,
+    restore_from_backup,
+    run_data_migrations,
+    run_domain_migrations,
+    save_dataset,
+    save_market_data,
+)
+from app.services.data.replay import (
     build_replay_package,
+    export_replay_evidence,
     parse_replay_package,
     stream_replay_events,
-)
-from app.services.data.research_sources import (
-    assess_research_source_eligibility,
-    ingest_research_source,
-    normalize_research_provider_payload,
-    persist_research_provider_records,
-    persist_research_source_observations,
-    persist_verified_research_source,
-    project_research_source_evidence,
-    project_research_source_observation,
-    query_research_source_observations,
-    query_research_sources,
-    retrieve_research_provider_payload,
-    validate_research_source_policy,
 )
 from app.services.data.runtime_stores import (
     build_agentic_runtime_store,
@@ -307,14 +299,34 @@ from app.services.data.sources.read_only import (
     verify_read_only_call,
     wrap_broker_client,
 )
+from app.services.data.sources.research_ingestion import ingest_research_source
+from app.services.data.sources.research_normalization import (
+    normalize_research_provider_payload,
+)
+from app.services.data.sources.research_observations import (
+    persist_research_source_observations,
+    project_research_source_observation,
+    query_research_source_observations,
+)
+from app.services.data.sources.research_policy import (
+    assess_research_source_eligibility,
+    validate_research_source_policy,
+)
+from app.services.data.sources.research_providers import (
+    persist_research_provider_records,
+)
+from app.services.data.sources.research_queries import (
+    project_research_source_evidence,
+    query_research_sources,
+)
+from app.services.data.sources.research_transport import (
+    retrieve_research_provider_payload,
+)
+from app.services.data.sources.verified_research import persist_verified_research_source
 from app.services.data.synthetic_data import (
     generate_synthetic_bars,
     generate_synthetic_dataset,
     generate_synthetic_ticks,
-)
-from app.services.data.tick_derivation import (
-    generate_tick_series,
-    generate_tick_series_to_parquet,
 )
 from app.services.data.time_sessions import (
     apply_venue_halt,
@@ -334,13 +346,23 @@ from app.services.data.time_sessions.dashboard import (
 from app.services.data.transformation import (
     aggregate_ticks,
     aggregate_ticks_to_bars,
-    align_datasets,
-    align_multitimeframe_data,
+    generate_tick_series,
+    generate_tick_series_to_parquet,
     resample_dataset,
     resample_ohlcv,
     to_ohlcv_dataframe,
     to_tick_dataframe,
 )
+
+
+def get_display_asset_classes() -> tuple[str, ...]:
+    """Return the canonical Markets-widget display asset classes.
+
+    Returns:
+        Immutable ordered display asset-class tokens.
+    """
+    return DISPLAY_ASSET_CLASSES
+
 
 __all__ = (
     "acquire_write_lock",
@@ -399,6 +421,7 @@ __all__ = (
     "build_market_context_request",
     "build_market_data_request",
     "build_market_dataset",
+    "build_market_directory_request",
     "build_market_hours_request",
     "build_market_schedule",
     "build_market_snapshot_request",
@@ -446,12 +469,15 @@ __all__ = (
     "build_weekly_schedule_provider",
     "calendar_state_provenance",
     "classify_gap",
+    "classify_symbol",
     "clear_cache_entry",
     "clear_data_cache",
     "compute_source_trust_score",
     "crawl_forexfactory_event_definitions",
     "create_backup",
     "create_data_update_job",
+    "data_provider_connection_resolver_context",
+    "data_provider_settings_context",
     "data_settings_context",
     "data_start_time",
     "derive_backfill_key",
@@ -503,6 +529,7 @@ __all__ = (
     "get_data_migration_steps",
     "get_data_update_job_status",
     "get_default_minimum_impact",
+    "get_display_asset_classes",
     "get_economic_events",
     "get_exchange_sessions",
     "get_feed_status",
@@ -560,6 +587,7 @@ __all__ = (
     "is_research_source_value",
     "is_tick_record",
     "list_composable_sources",
+    "list_market_directory",
     "list_registered_sources",
     "list_symbols",
     "load_csv",

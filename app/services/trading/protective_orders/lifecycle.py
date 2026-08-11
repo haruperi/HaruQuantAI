@@ -1,4 +1,3 @@
-# ruff: noqa: DOC201, DOC501
 """Fail-closed protective-order lifecycle operations."""
 
 from collections.abc import Mapping
@@ -12,7 +11,14 @@ from app.utils import to_json_safe
 
 
 def create_protective_order_plan(**values: object) -> object:
-    """Create one validated protective-order plan."""
+    """Create one validated protective-order plan.
+
+    Args:
+        **values: Field values for _ProtectiveOrderPlan schema.
+
+    Returns:
+        Validated _ProtectiveOrderPlan instance.
+    """
     return _ProtectiveOrderPlan.model_validate(values)
 
 
@@ -23,7 +29,20 @@ def verify_protective_order_coverage(
     stop_acknowledged: bool,
     target_acknowledged: bool,
 ) -> dict[str, Any]:
-    """Return exact coverage evidence or fail closed."""
+    """Return exact coverage evidence or fail closed.
+
+    Args:
+        plan: Active _ProtectiveOrderPlan instance.
+        open_quantity: Current open position quantity.
+        stop_acknowledged: Whether the stop-loss order is acknowledged.
+        target_acknowledged: Whether the take-profit order is acknowledged.
+
+    Returns:
+        Dictionary containing protection status and covered quantities.
+
+    Raises:
+        TradingError: If plan is invalid or open_quantity is negative.
+    """
     if not isinstance(plan, _ProtectiveOrderPlan) or open_quantity < 0:
         raise TradingError("INVALID_REQUEST", "Protection evidence is invalid")
     covered = (
@@ -39,7 +58,20 @@ def verify_protective_order_coverage(
 def resize_protective_orders(
     plan: object, *, residual_quantity: Decimal, source_sequence: int
 ) -> object:
-    """Resize protection to an exact residual without reverse exposure."""
+    """Resize protection to an exact residual without reverse exposure.
+
+    Args:
+        plan: Active _ProtectiveOrderPlan instance.
+        residual_quantity: Residual open position quantity Decimal.
+        source_sequence: Update sequence number.
+
+    Returns:
+        Resized _ProtectiveOrderPlan instance.
+
+    Raises:
+        TradingError: If residual quantity or sequence is invalid, or if
+            resize would increase exposure.
+    """
     if not isinstance(plan, _ProtectiveOrderPlan) or residual_quantity <= 0:
         raise TradingError("VALIDATION_FAILED", "Residual protection must be positive")
     if residual_quantity > plan.quantity or source_sequence <= plan.source_sequence:
@@ -56,7 +88,18 @@ def resize_protective_orders(
 
 
 def build_protective_order_plan(plan: object) -> dict[str, Any]:
-    """Build a validated JSON-safe protective-order mapping."""
+    """Build a validated JSON-safe protective-order mapping.
+
+    Args:
+        plan: _ProtectiveOrderPlan instance to serialize.
+
+    Returns:
+        JSON-safe dictionary representation of the protective order plan.
+
+    Raises:
+        TradingError: If plan is invalid.
+        TypeError: If serialized output is not a mapping.
+    """
     if not isinstance(plan, _ProtectiveOrderPlan):
         raise TradingError("INVALID_REQUEST", "Protective-order plan is invalid")
     safe = to_json_safe(plan.model_dump(mode="json"))
@@ -66,14 +109,27 @@ def build_protective_order_plan(plan: object) -> dict[str, Any]:
 
 
 def parse_protective_order_plan(value: Mapping[str, object]) -> object:
-    """Parse a protective-order mapping."""
+    """Parse a protective-order mapping.
+
+    Args:
+        value: Mapping payload to parse and validate.
+
+    Returns:
+        Validated _ProtectiveOrderPlan model instance.
+    """
     return _ProtectiveOrderPlan.model_validate(value)
 
 
 def persist_protective_order_plan(
     plan: object, *, correlation_id: str, occurred_at: datetime
 ) -> None:
-    """Append both protection legs through the Trading persistence boundary."""
+    """Append both protection legs through the Trading persistence boundary.
+
+    Args:
+        plan: Validated protective-order plan object.
+        correlation_id: Audit correlation identifier.
+        occurred_at: Aware UTC timestamp when plan occurred.
+    """
     from app.services.trading.persistence.create import create_protective_order_records
 
     create_protective_order_records(

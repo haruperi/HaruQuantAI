@@ -20,7 +20,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-FEEDS = Path("app/services/data/realtime_feeds").resolve()
+FEEDS = Path("app/services/data/market_events").resolve()
 STATE_SYMBOL = "_ACTIVE_FEEDS"
 
 
@@ -75,7 +75,7 @@ def test_every_feed_module_shares_the_same_registry_object() -> None:
     Raises:
         AssertionError: If any module holds a different registry object.
     """
-    from app.services.data.realtime_feeds import buffer, reconnection, state
+    from app.services.data.market_events import buffer, reconnection, state
 
     assert buffer._ACTIVE_FEEDS is state._ACTIVE_FEEDS
     assert reconnection._ACTIVE_FEEDS is state._ACTIVE_FEEDS
@@ -90,15 +90,15 @@ def test_a_feed_registered_through_buffer_is_visible_to_status() -> None:
     Raises:
         AssertionError: If a directly registered feed is not observable.
     """
-    from app.services.data.realtime_feeds import status
-    from app.services.data.realtime_feeds.state import _ACTIVE_FEEDS, ActiveFeed
+    from app.services.data.market_events import status
+    from app.services.data.market_events.state import _ACTIVE_FEEDS, ActiveFeed
 
     probe = ActiveFeed.__new__(ActiveFeed)
     _ACTIVE_FEEDS["probe-feed"] = probe
     try:
         # `status` reads the registry it imported; if that were a second dict, the probe
         # would be invisible here.
-        from app.services.data.realtime_feeds.state import _ACTIVE_FEEDS as STATUS_SIDE
+        from app.services.data.market_events.state import _ACTIVE_FEEDS as STATUS_SIDE
 
         assert "probe-feed" in STATUS_SIDE
         assert STATUS_SIDE["probe-feed"] is probe

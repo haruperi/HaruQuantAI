@@ -20,6 +20,10 @@ def _one_row(
 ) -> Mapping[str, object] | None:
     """Read at most one normalized row.
 
+    Args:
+        statement: SQL query string.
+        parameters: Tuple of query parameters.
+
     Returns:
         Stored row or ``None``.
     """
@@ -29,6 +33,10 @@ def _one_row(
 
 def _decode_reservation(store: object, row: Mapping[str, object]) -> object:
     """Reconstruct one validated reservation from relational columns.
+
+    Args:
+        store: Persistence handle object.
+        row: Column mapping dictionary from relational query.
 
     Returns:
         Validated reservation value.
@@ -55,6 +63,10 @@ def _decode_reservation(store: object, row: Mapping[str, object]) -> object:
 def read_idempotency_record(store: object, key: str) -> object | None:
     """Read one idempotency reservation.
 
+    Args:
+        store: Persistence handle object.
+        key: Idempotency reservation key string.
+
     Returns:
         Reservation or ``None``.
     """
@@ -73,6 +85,10 @@ def read_idempotency_record_with_revision(
 ) -> tuple[object, str] | None:
     """Read one reservation with its finite-state compare token.
 
+    Args:
+        store: Persistence handle object.
+        key: Idempotency reservation key string.
+
     Returns:
         Reservation and token, or ``None``.
     """
@@ -89,6 +105,10 @@ def read_idempotency_record_with_revision(
 
 def read_projection_record(store: object, key: str) -> object | None:
     """Read one exact-scope projection.
+
+    Args:
+        store: Persistence handle object.
+        key: Scope key string.
 
     Returns:
         Projection or ``None``.
@@ -108,6 +128,10 @@ def read_projection_record_with_revision(
 ) -> tuple[object, int] | None:
     """Read one exact-scope projection and optimistic version.
 
+    Args:
+        store: Persistence handle object.
+        key: Scope key string.
+
     Returns:
         Projection and version, or ``None``.
     """
@@ -124,6 +148,10 @@ def read_projection_record_with_revision(
 
 def read_event_records(store: object, partition: str) -> tuple[object, ...]:
     """Read ordered Trading events for one exact-scope partition.
+
+    Args:
+        store: Persistence handle object.
+        partition: Partition scope string.
 
     Returns:
         Ordered decoded events.
@@ -142,6 +170,10 @@ def read_event_records(store: object, partition: str) -> tuple[object, ...]:
 
 def read_all_event_records(store: object, limit: int) -> tuple[object, ...]:
     """Read bounded Trading events across all exact-scope partitions.
+
+    Args:
+        store: Persistence handle object.
+        limit: Maximum number of events to return.
 
     Returns:
         Ordered decoded events.

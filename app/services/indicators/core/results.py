@@ -1,3 +1,4 @@
+# ruff: noqa: DOC202
 """Deterministic ``IndicatorSeries v1`` manifest and result behavior.
 
 Builds and exposes the immutable ``IndicatorResult``/``IndicatorManifest``
@@ -53,10 +54,13 @@ else:
             """Resolve one pandas attribute at the runtime operation boundary.
 
             Args:
-                name: Requested pandas attribute name.
+                            name: Requested pandas attribute name.
 
             Returns:
-                The resolved pandas attribute.
+                            The resolved pandas attribute.
+
+            Raises:
+                None.
             """
             return getattr(import_module("pandas"), name)
 
@@ -161,9 +165,15 @@ class IndicatorResult:
     def __post_init__(self) -> None:
         """Defensively deep-copy the stored values frame.
 
+        Args:
+            None.
+
+        Returns:
+            None.
+
         Raises:
-            IndicatorError: Never raised; present for interface symmetry
-                with other public Core operations.
+                    IndicatorError: Never raised; present for interface symmetry
+                        with other public Core operations.
         """
         object.__setattr__(self, "values", self.values.copy(deep=True))
 
@@ -171,10 +181,16 @@ class IndicatorResult:
     def values_only(self) -> pd.DataFrame:
         """Return a copy-safe projection excluding original OHLCV columns.
 
+        Args:
+            None.
+
         Returns:
-            A deep copy of the generated indicator, availability, and
-            quality columns. The stored ``values`` frame never carries
-            original OHLCV columns, so this is a defensive full copy.
+                    A deep copy of the generated indicator, availability, and
+                    quality columns. The stored ``values`` frame never carries
+                    original OHLCV columns, so this is a defensive full copy.
+
+        Raises:
+            None.
         """
         return self.values.copy(deep=True)
 
@@ -230,10 +246,13 @@ def _parameter_hash(config: IndicatorConfig) -> str:
     """Compute the canonical SHA-256 parameter-hash digest.
 
     Args:
-        config: The complete, validated calculation configuration.
+            config: The complete, validated calculation configuration.
 
     Returns:
-        Lowercase 64-character SHA-256 hexadecimal digest.
+            Lowercase 64-character SHA-256 hexadecimal digest.
+
+    Raises:
+        None.
     """
     material = {
         "indicator_id": config.indicator_id,
@@ -248,20 +267,23 @@ def _parameter_hash(config: IndicatorConfig) -> str:
 def _input_checksum(data: MarketDataset) -> str:
     """Compute the canonical SHA-256 input-dataset digest.
 
-    The digest folds one ``canonical_json`` call for the dataset-level fields
-    and one per fixed-size record chunk, in exact record order, rather than
-    canonicalizing the whole dataset in a single call.
-    ``app.utils.canonical_json`` enforces a cumulative 10,000-item traversal
-    bound, so a single-call implementation failed for any dataset beyond 664
-    records. Chunking keeps every call bounded well under that limit
-    regardless of history length, while keeping the digest deterministic and
-    order-sensitive.
+        The digest folds one ``canonical_json`` call for the dataset-level fields
+        and one per fixed-size record chunk, in exact record order, rather than
+        canonicalizing the whole dataset in a single call.
+        ``app.utils.canonical_json`` enforces a cumulative 10,000-item traversal
+        bound, so a single-call implementation failed for any dataset beyond 664
+        records. Chunking keeps every call bounded well under that limit
+        regardless of history length, while keeping the digest deterministic and
+        order-sensitive.
 
     Args:
-        data: One normalized ``MarketDataset v1``.
+            data: One normalized ``MarketDataset v1``.
 
     Returns:
-        Lowercase 64-character SHA-256 hexadecimal digest.
+            Lowercase 64-character SHA-256 hexadecimal digest.
+
+    Raises:
+        None.
     """
     payload = data.model_dump(mode="json")
     records = cast("list[object]", payload.pop("records"))
@@ -280,12 +302,15 @@ def _serialize_output_cell(value: object) -> object:
     """Serialize one output cell to its canonical checksum representation.
 
     Args:
-        value: One cell value from the assembled output frame.
+            value: One cell value from the assembled output frame.
 
     Returns:
-        A JSON-safe representation: ``None`` for missing values, a ``Z``
-        UTC ISO string for timestamps, a ``float.hex()`` string for finite
-        floats (normalizing negative zero), or the original value.
+            A JSON-safe representation: ``None`` for missing values, a ``Z``
+            UTC ISO string for timestamps, a ``float.hex()`` string for finite
+            floats (normalizing negative zero), or the original value.
+
+    Raises:
+        None.
     """
     if value is None or (isinstance(value, float) and math.isnan(value)):
         return None
@@ -303,11 +328,14 @@ def _output_checksum(frame: pd.DataFrame) -> str:
     """Compute the canonical SHA-256 output-values digest.
 
     Args:
-        frame: The fully assembled result values frame, in exact row and
-            column order.
+            frame: The fully assembled result values frame, in exact row and
+                column order.
 
     Returns:
-        Lowercase 64-character SHA-256 hexadecimal digest.
+            Lowercase 64-character SHA-256 hexadecimal digest.
+
+    Raises:
+        None.
     """
     rows = [
         [_serialize_output_cell(cell) for cell in row]
@@ -323,11 +351,14 @@ def _project_source_frame(data: MarketDataset) -> pd.DataFrame:
     """Privately project one ``MarketDataset`` into its canonical columns.
 
     Args:
-        data: One normalized ``MarketDataset v1`` of bar records.
+            data: One normalized ``MarketDataset v1`` of bar records.
 
     Returns:
-        A UTC-indexed DataFrame with the dataset's symbol and OHLCV
-        columns, in dataset row order.
+            A UTC-indexed DataFrame with the dataset's symbol and OHLCV
+            columns, in dataset row order.
+
+    Raises:
+        None.
     """
     records = cast("tuple[OHLCVRecord, ...]", data.records)
     index = pd.DatetimeIndex(
@@ -406,15 +437,18 @@ def _validate_finalization_causality(
     """Validate causal, internally consistent availability metadata.
 
     Args:
-        computed_from_start: Per-row inclusive dependency start.
-        computed_from_end: Per-row inclusive dependency end.
-        available_at: Per-row earliest safe decision time.
-        unavailable_reason: Per-row warmup marker.
-        timestamps: The result's UTC row timestamps.
+            computed_from_start: Per-row inclusive dependency start.
+            computed_from_end: Per-row inclusive dependency end.
+            available_at: Per-row earliest safe decision time.
+            unavailable_reason: Per-row warmup marker.
+            timestamps: The result's UTC row timestamps.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: If a valid row's causal bounds are inconsistent
-            (``IND_LOOKAHEAD_RISK``).
+            IndicatorError: If a valid row's causal bounds are inconsistent
+                (``IND_LOOKAHEAD_RISK``).
     """
     is_valid = unavailable_reason.isna()
     if not is_valid.any():
@@ -441,12 +475,15 @@ def _validate_finalization_values(
     """Validate that every non-warmup output value is finite.
 
     Args:
-        output_values: The computed indicator output columns.
-        unavailable_reason: Per-row warmup marker aligned to the output.
+            output_values: The computed indicator output columns.
+            unavailable_reason: Per-row warmup marker aligned to the output.
+
+    Returns:
+        None.
 
     Raises:
-        IndicatorError: If a non-warmup output value is not finite
-            (``IND_INTERNAL_ERROR``).
+            IndicatorError: If a non-warmup output value is not finite
+                (``IND_INTERNAL_ERROR``).
     """
     is_valid = unavailable_reason.isna()
     for column in output_values.columns:
@@ -473,7 +510,7 @@ def build_indicator_result(
 ) -> IndicatorResult:
     """Assemble the deterministic ``IndicatorResult`` for one calculation.
 
-    This internal helper is shared by all twenty-one official trend, volatility,
+    This internal helper is shared by all twenty-nine official trend, volatility,
     momentum, volume, and candle calculators so identity, checksum, and
     finalization logic is implemented exactly once, per ``FR-INDI-007``
     through ``FR-INDI-010``.
@@ -584,12 +621,15 @@ def join_indicator_result(
     """Join generated columns onto a copied projection of one dataset.
 
     Args:
-        result: The IndicatorResult instance.
-        data: The MarketDataset v1 matching the result.
-        mode: Join mode; only "copy" is supported.
+            result: The IndicatorResult instance.
+            data: The MarketDataset v1 matching the result.
+            mode: Join mode; only "copy" is supported.
 
     Returns:
-        A new DataFrame with generated indicator columns appended.
+            A new DataFrame with generated indicator columns appended.
+
+    Raises:
+        None.
     """
     return result.join_to(data, mode=mode)
 
