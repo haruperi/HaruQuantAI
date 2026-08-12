@@ -2,6 +2,29 @@
 
 ## [Unreleased]
 
+### Prevent automated Indicators usage from replacing MT5 credentials
+
+Indicators usage now resolves only the configured database-backed MT5 account,
+while ordinary pytest remains connection-free and unit fakes stay unit-only.
+
+#### Fixed (1)
+
+- Removed Indicators usage fallback credentials and provider-enablement writes, gated genuine usage behind explicit development opt-in, and made missing persisted configuration fail closed.
+
+### Populate Markets rows from governed quote and D1 evidence
+
+The Markets widget now fills its requested price, change, volatility, ADR, range,
+and OHLC columns progressively from Data and Indicators while preserving explicit
+missing-value presentation.
+
+#### Changed (1)
+
+- Reconciled `FEAT-DATA-01` directory, classification, composite-snapshot, and exact-symbol quote operations with focused modules, registered requirements, and numbered usage evidence.
+
+#### Fixed (1)
+
+- Populated Markets-widget columns using the documented usage formulas, corrected OTC zero-last fallback to bid, and bounded active-watchlist loading to sequential four-symbol batches.
+
 ### Reorganize Strategy operational-planning features into focused modules
 
 Strategy's operational-planning capabilities were promoted into focused feature modules

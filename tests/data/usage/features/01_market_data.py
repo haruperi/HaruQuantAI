@@ -1,5 +1,5 @@
 # ruff: noqa: BLE001
-"""Demonstrate FEAT-DATA-02 market-data retrieval surface across all sources."""
+"""Demonstrate FEAT-DATA-01 market-data retrieval surface across all sources."""
 
 from __future__ import annotations
 
@@ -17,13 +17,21 @@ from app.services.data import (
     build_data_settings,
     build_level1_snapshot_request,
     build_market_data_request,
+    build_market_directory_request,
+    build_market_snapshot_request,
     build_symbol_list_request,
     build_symbol_metadata_request,
+    build_symbols_quote_request,
+    classify_symbol,
     data_settings_context,
     get_data_availability,
+    get_display_asset_classes,
     get_level1_snapshot,
     get_market_data,
+    get_market_snapshot,
     get_symbol_metadata,
+    get_symbols_quotes,
+    list_market_directory,
     list_symbols,
     run_data_migrations,
     to_ohlcv_dataframe,
@@ -287,13 +295,88 @@ def fr_data_190() -> None:
         print(f"Data -> Exception({exc})")
 
 
+def fr_data_203_207() -> None:
+    """FR-DATA-203/207: Build and retrieve a composite quote/latest-bar snapshot."""
+    _header(
+        "Stage 9: Composite Market Snapshot - Level-1 and Latest Bar (FR-DATA-203/207)"
+    )
+    request = build_market_snapshot_request(
+        source_id="mt5",
+        symbol="EURUSD",
+        timeframe="D1",
+        request_id=generate_id("req"),
+    )
+    print(_format_result(request))
+    if not _provider_opted_in("mt5"):
+        print("Output Result -> ProviderOptedOut : ProviderOptedOut")
+        print("Data -> Skipped mt5: provider is disabled in settings.")
+        return
+    response = get_market_snapshot(request)
+    print(_format_result(response))
+    if response.status == "success" and response.data is not None:
+        snapshot = response.data
+        print(
+            "Data -> MarketSnapshot("
+            f"symbol={snapshot.symbol}, latest_bar={snapshot.latest_bar is not None})"
+        )
+
+
+def fr_data_208_209() -> None:
+    """FR-DATA-208/209: Classify symbols and expose supported categories."""
+    _header("Stage 10: Market Classification - Evidence and Manifest (FR-DATA-208/209)")
+    asset_class = classify_symbol("Forex\\Metals", "XAUUSD")
+    manifest = get_display_asset_classes()
+    print(_format_result(manifest))
+    print(f"Data -> classification={asset_class}, supported={manifest}")
+
+
+def fr_data_210_211() -> None:
+    """FR-DATA-210/211: Build and retrieve one bounded market-directory page."""
+    _header("Stage 11: Market Directory - Bounded Categorized Page (FR-DATA-210/211)")
+    request = build_market_directory_request(
+        source_id="mt5",
+        limit=5,
+        query="EUR",
+        request_id=generate_id("req"),
+    )
+    print(_format_result(request))
+    if not _provider_opted_in("mt5"):
+        print("Output Result -> ProviderOptedOut : ProviderOptedOut")
+        print("Data -> Skipped mt5: provider is disabled in settings.")
+        return
+    response = list_market_directory(request)
+    print(_format_result(response))
+    if response.status == "success" and response.data is not None:
+        print(f"Data -> MarketDirectory(rows={len(response.data.rows)})")
+
+
+def fr_data_212_213() -> None:
+    """FR-DATA-212/213: Build and retrieve exact-symbol quote evidence."""
+    _header(
+        "Stage 12: Explicit-Symbol Quotes - Caller-Bounded Evidence (FR-DATA-212/213)"
+    )
+    request = build_symbols_quote_request(
+        source_id="mt5",
+        symbols=("EURUSD", "XAUUSD"),
+        request_id=generate_id("req"),
+    )
+    print(_format_result(request))
+    if not _provider_opted_in("mt5"):
+        print("Output Result -> ProviderOptedOut : ProviderOptedOut")
+        print("Data -> Skipped mt5: provider is disabled in settings.")
+        return
+    response = get_symbols_quotes(request)
+    print(_format_result(response))
+    if response.status == "success" and response.data is not None:
+        print(f"Data -> ExactSymbolQuotes(rows={len(response.data.rows)})")
+
+
 def main() -> None:
     """Execute every functional-requirement demonstration."""
     with TemporaryDirectory(prefix="usage-market-data-") as directory:
         (Path(directory) / "data" / "raw").mkdir(parents=True, exist_ok=True)
-        db_file = Path(directory) / "usage.sqlite3"
         settings = build_data_settings(
-            database_url=f"sqlite:///{db_file.as_posix()}",
+            database_url="sqlite:///usage.sqlite3",
             data_dir=Path(directory),
             sqlite_busy_timeout_seconds=1.0,
             write_lock_lease_seconds=10.0,
@@ -310,7 +393,7 @@ def main() -> None:
         with data_settings_context(settings):
             run_data_migrations(generate_id("req"))
             print("=" * 80)
-            print("FEATURE: FEAT-DATA-02 - Market Data Retrieval")
+            print("FEATURE: FEAT-DATA-01 - Market Data Retrieval")
             print(
                 "PURPOSE: Retrieval request/result contracts and the market, tick, spread, symbol, metadata, availability, and volume operations"
             )
@@ -327,8 +410,12 @@ def main() -> None:
             fr_data_007_033()
             fr_data_035()
             fr_data_190()
+            fr_data_203_207()
+            fr_data_208_209()
+            fr_data_210_211()
+            fr_data_212_213()
             run_contract_support()
-            print("SUCCESS: FEAT-DATA-02 completed")
+            print("SUCCESS: FEAT-DATA-01 completed")
 
 
 if __name__ == "__main__":

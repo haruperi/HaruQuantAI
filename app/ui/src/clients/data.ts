@@ -1,6 +1,6 @@
 /**
  * Data client for symbol discovery, the market stream, governed dataset
- * preparation, and external import (5 operations).
+ * preparation, and external import (6 operations).
  *
  * The Data domain owns the exact row shape; the gateway returns it opaquely.
  * The client validates a minimal structural contract (opaque rows) and leaves
@@ -94,6 +94,15 @@ export const marketRowSchema = z.object({
   close: z.number().nullable(),
   change: z.number().nullable(),
   change_percent: z.number().nullable(),
+  /**
+   * API-composed technical overlays (Data's D1 bars plus Indicators'
+   * formulas). Present only when the request opted in via
+   * `includeTechnicals`; absent (not merely null) otherwise.
+   */
+  volatility: z.number().nullable().optional(),
+  adr: z.number().nullable().optional(),
+  range_percent_of_adr: z.number().nullable().optional(),
+  change_pips: z.number().nullable().optional(),
 });
 export type MarketRow = z.infer<typeof marketRowSchema>;
 
@@ -130,6 +139,40 @@ export function markets(
   if (params.cursor !== undefined) query.cursor = params.cursor;
   if (params.limit !== undefined) query.limit = params.limit;
   return request<MarketDirectory>(dataRoutes.markets, {
+    schema: marketDirectorySchema,
+    query,
+    ...options,
+  });
+}
+
+/** Optional parameters for {@link quotes}. */
+export interface QuotesParams {
+  /** Defaults to the configured runtime broker when omitted. */
+  sourceId?: string;
+  /**
+   * Compose each row with the API-owned Volatility/ADR/Range overlay.
+   * Opt-in: it costs a historical fetch and two indicator calculations per
+   * symbol, well above a plain quote.
+   */
+  includeTechnicals?: boolean;
+}
+
+/**
+ * Read categorized quotes for an explicit symbol list (requires `data:read`).
+ *
+ * Unlike `markets`, this never walks the full broker catalog — it enriches
+ * exactly the named symbols (e.g. one watchlist's contents), so cost scales
+ * with the list size, not the broker's universe.
+ */
+export function quotes(
+  symbols: string[],
+  params: QuotesParams = {},
+  options?: RequestOptions
+): Promise<ApiResponse<MarketDirectory>> {
+  const query: Record<string, QueryValue> = { symbols: symbols.join(",") };
+  if (params.sourceId !== undefined) query.source_id = params.sourceId;
+  if (params.includeTechnicals) query.include_technicals = "true";
+  return request<MarketDirectory>(dataRoutes.quotes, {
     schema: marketDirectorySchema,
     query,
     ...options,
@@ -212,6 +255,7 @@ export const data = {
   capabilities,
   symbols,
   markets,
+  quotes,
   stream,
   prepareDataset,
   importDialects,

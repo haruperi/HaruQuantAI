@@ -60,6 +60,7 @@ from app.services.api.middleware.deadlines import DeadlineMiddleware
 from app.services.api.middleware.envelope import get_canonical_envelope_middleware
 from app.services.api.middleware.rate_limits import RateLimitMiddleware
 from app.services.api.middleware.redaction import SecretRedactionMiddleware
+from app.services.api.middleware.runtime_settings import RuntimeSettingsMiddleware
 from app.services.api.routes import (
     agentic_router,
     auth_router,
@@ -80,6 +81,7 @@ from app.services.api.routes import (
     simulation_sessions_router,
     strategies_router,
     trading_router,
+    watchlists_router,
     workstation_router,
 )
 from app.services.api.streams import create_stream_connection_manager
@@ -106,6 +108,7 @@ _ROUTERS = (
     operator_router,
     observability_router,
     agentic_router,
+    watchlists_router,
     workstation_router,
 )
 
@@ -363,6 +366,7 @@ def create_app(
         ],
     )
     application.add_middleware(SecretRedactionMiddleware)
+    application.add_middleware(RuntimeSettingsMiddleware)
     application.add_middleware(
         RateLimitMiddleware,
         limits=settings.rate_limits_by_class,

@@ -201,6 +201,39 @@ def test_every_feature_has_module_documentation() -> None:
     assert not missing, f"Focused feature README files are missing: {missing}"
 
 
+def test_market_data_production_files_are_in_authoritative_inventory() -> None:
+    """Reconcile every FEAT-DATA-01 production file with the Data README."""
+    readme = DOMAIN_README.read_text(encoding="utf-8")
+    inventory = readme.split(
+        "### Authoritative current production-file inventory", maxsplit=1
+    )[1].split("### 4.1", maxsplit=1)[0]
+    market_data_root = DATA_ROOT / "market_data"
+    production_files = {
+        f"market_data/{path.name}" for path in market_data_root.glob("*.py")
+    }
+    missing = sorted(path for path in production_files if f"`{path}`" not in inventory)
+    assert not missing, f"Unregistered FEAT-DATA-01 production files: {missing}"
+
+
+def test_market_data_usage_covers_registered_added_surface() -> None:
+    """Keep the reconciled FEAT-DATA-01 operations in numbered usage evidence."""
+    usage = (
+        DATA_ROOT.parents[2] / "tests/data/usage/features/01_market_data.py"
+    ).read_text(encoding="utf-8")
+    required_operations = {
+        "build_market_directory_request",
+        "build_market_snapshot_request",
+        "build_symbols_quote_request",
+        "classify_symbol",
+        "get_display_asset_classes",
+        "get_market_snapshot",
+        "get_symbols_quotes",
+        "list_market_directory",
+    }
+    missing = sorted(name for name in required_operations if name not in usage)
+    assert not missing, f"FEAT-DATA-01 usage operations are missing: {missing}"
+
+
 def test_registered_features_have_exactly_one_numbered_usage_program() -> None:
     """Reconcile registry IDs, documented evidence, and numbered programs."""
     readme = DOMAIN_README.read_text(encoding="utf-8")

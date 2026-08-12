@@ -231,6 +231,206 @@ def finalize_idempotency_record(
     )
 
 
+def _execute_update_many(
+    statements: tuple[str, ...],
+    parameter_sets: tuple[tuple[object, ...], ...],
+    *,
+    request_id: str,
+) -> int:
+    """Execute several bounded API update statements as one transaction.
+
+    Args:
+        statements: Parameterized update statements.
+        parameter_sets: Bound parameters matching the statements.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Number of affected rows across every statement.
+
+    Raises:
+        IdentityError: If Data cannot confirm the transaction.
+    """
+    response = execute_transaction(
+        build_transaction_request(
+            plan=build_statement_plan(
+                statements=statements,
+                parameter_sets=parameter_sets,
+                max_rows=1,
+            ),
+            request_id=request_id,
+        )
+    )
+    if response.status != "success" or response.data is None:
+        raise IdentityError("IDENTITY_STORE_UNAVAILABLE")
+    result = cast("_TransactionResult", response.data)
+    return int(result.affected_rows)
+
+
+def rename_watchlist_record(
+    *,
+    watchlist_id: str,
+    account_id: str,
+    name: str,
+    updated_at: str,
+    request_id: str,
+) -> int:
+    """Rename one watchlist owned by the given account.
+
+    Args:
+        watchlist_id: Stable watchlist identifier.
+        account_id: Owning account identifier, enforced in the WHERE clause.
+        name: New display name, unique per account.
+        updated_at: ISO-formatted update instant.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Number of affected rows; 0 if not found, not owned, or name conflicts.
+
+    Raises:
+        IdentityError: If Data cannot confirm the transaction.
+    """
+    logger.debug("Renaming API watchlist persistence record")
+    return _execute_update(
+        "UPDATE api_watchlists SET name = ?, updated_at = ? "
+        "WHERE watchlist_id = ? AND account_id = ?",
+        (name, updated_at, watchlist_id, account_id),
+        request_id=request_id,
+    )
+
+
+def reorder_watchlists_record(
+    *,
+    account_id: str,
+    watchlist_id: str,
+    sort_order: int,
+    updated_at: str,
+    request_id: str,
+) -> int:
+    """Reposition one watchlist among the account's watchlist ordering.
+
+    Args:
+        account_id: Owning account identifier, enforced in the WHERE clause.
+        watchlist_id: Stable watchlist identifier.
+        sort_order: New display order.
+        updated_at: ISO-formatted update instant.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Number of affected rows; 0 if not found or not owned.
+
+    Raises:
+        IdentityError: If Data cannot confirm the transaction.
+    """
+    logger.debug("Reordering API watchlist persistence record")
+    return _execute_update(
+        "UPDATE api_watchlists SET sort_order = ?, updated_at = ? "
+        "WHERE watchlist_id = ? AND account_id = ?",
+        (sort_order, updated_at, watchlist_id, account_id),
+        request_id=request_id,
+    )
+
+
+def set_default_watchlist_record(
+    *,
+    account_id: str,
+    watchlist_id: str,
+    updated_at: str,
+    request_id: str,
+) -> int:
+    """Atomically move the account's default flag to one watchlist.
+
+    Clears any prior default before setting the new one so the partial
+    unique index (`at most one default per account`) is satisfied at every
+    intermediate statement, not only at commit.
+
+    Args:
+        account_id: Owning account identifier.
+        watchlist_id: Watchlist to become the account's default.
+        updated_at: ISO-formatted update instant.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Number of affected rows.
+
+    Raises:
+        IdentityError: If Data cannot confirm the transaction.
+    """
+    logger.debug("Updating API default-watchlist persistence assignment")
+    return _execute_update_many(
+        (
+            "UPDATE api_watchlists SET is_default = 0, updated_at = ? "
+            "WHERE account_id = ? AND is_default = 1 AND watchlist_id != ?",
+            "UPDATE api_watchlists SET is_default = 1, updated_at = ? "
+            "WHERE watchlist_id = ? AND account_id = ?",
+        ),
+        (
+            (updated_at, account_id, watchlist_id),
+            (updated_at, watchlist_id, account_id),
+        ),
+        request_id=request_id,
+    )
+
+
+def replace_watchlist_items_record(
+    *,
+    watchlist_id: str,
+    account_id: str,
+    items: tuple[tuple[str, str, int], ...],
+    updated_at: str,
+    request_id: str,
+) -> int:
+    """Atomically replace one watchlist's complete item list.
+
+    Args:
+        watchlist_id: Stable watchlist identifier.
+        account_id: Owning account identifier, enforced in the WHERE clause.
+        items: Ordered ``(source_id, symbol, sort_order)`` triples.
+        updated_at: ISO-formatted update instant.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Number of affected rows across the delete, inserts, and touch.
+
+    Raises:
+        IdentityError: If Data cannot confirm the transaction.
+    """
+    logger.debug("Replacing API watchlist item persistence records")
+    item_statement = (
+        "INSERT INTO api_watchlist_items "
+        "(watchlist_id, source_id, symbol, sort_order, created_at) "
+        "SELECT ?, ?, ?, ?, ? WHERE EXISTS "
+        "(SELECT 1 FROM api_watchlists WHERE watchlist_id = ? AND account_id = ?)"
+    )
+    statements: list[str] = [
+        "DELETE FROM api_watchlist_items WHERE watchlist_id = ? AND EXISTS "
+        "(SELECT 1 FROM api_watchlists WHERE watchlist_id = ? AND account_id = ?)",
+        *(item_statement for _ in items),
+        "UPDATE api_watchlists SET updated_at = ? "
+        "WHERE watchlist_id = ? AND account_id = ?",
+    ]
+    parameter_sets: list[tuple[object, ...]] = [
+        (watchlist_id, watchlist_id, account_id),
+        *(
+            (
+                watchlist_id,
+                source_id,
+                symbol,
+                sort_order,
+                updated_at,
+                watchlist_id,
+                account_id,
+            )
+            for source_id, symbol, sort_order in items
+        ),
+        (updated_at, watchlist_id, account_id),
+    ]
+    return _execute_update_many(
+        tuple(statements),
+        tuple(parameter_sets),
+        request_id=request_id,
+    )
+
+
 def update_settings_record(
     *,
     scope: str,
@@ -282,7 +482,11 @@ def update_settings_record(
 __all__ = [
     "consume_approval_record",
     "finalize_idempotency_record",
+    "rename_watchlist_record",
+    "reorder_watchlists_record",
+    "replace_watchlist_items_record",
     "revoke_session_record",
+    "set_default_watchlist_record",
     "update_account_last_login",
     "update_auth_failure_record",
     "update_credential_record",

@@ -354,6 +354,52 @@ _SETTINGS_UNIFICATION_CHECKSUM = hashlib.sha256(
     ).encode("utf-8")
 ).hexdigest()
 
+_WATCHLISTS_STATEMENTS = (
+    """
+    CREATE TABLE IF NOT EXISTS api_watchlists (
+        watchlist_id TEXT PRIMARY KEY,
+        account_id TEXT NOT NULL,
+        name TEXT NOT NULL CHECK (name <> ''),
+        is_default INTEGER NOT NULL CHECK (is_default IN (0, 1)),
+        sort_order INTEGER NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        UNIQUE (account_id, name),
+        FOREIGN KEY (account_id) REFERENCES api_accounts(user_id)
+            ON DELETE RESTRICT
+    ) STRICT
+    """.strip(),
+    # At most one default watchlist per account; enforced at the DB layer so
+    # the invariant holds even if application logic has a bug.
+    "CREATE UNIQUE INDEX IF NOT EXISTS idx_api_watchlists_one_default "
+    "ON api_watchlists(account_id) WHERE is_default = 1",
+    "CREATE INDEX IF NOT EXISTS idx_api_watchlists_account "
+    "ON api_watchlists(account_id)",
+    """
+    CREATE TABLE IF NOT EXISTS api_watchlist_items (
+        watchlist_id TEXT NOT NULL,
+        source_id TEXT NOT NULL,
+        symbol TEXT NOT NULL CHECK (symbol <> ''),
+        sort_order INTEGER NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (watchlist_id, source_id, symbol),
+        FOREIGN KEY (watchlist_id) REFERENCES api_watchlists(watchlist_id)
+            ON DELETE RESTRICT
+    ) STRICT, WITHOUT ROWID
+    """.strip(),
+    "CREATE INDEX IF NOT EXISTS idx_api_watchlist_items_watchlist "
+    "ON api_watchlist_items(watchlist_id)",
+)
+_WATCHLISTS_CHECKSUM = hashlib.sha256(
+    canonical_json(
+        {
+            "domain": "api",
+            "migration": "api-0007",
+            "sql": _WATCHLISTS_STATEMENTS,
+        }
+    ).encode("utf-8")
+).hexdigest()
+
 
 def get_api_migration_steps() -> tuple[object, ...]:
     """Return the immutable API migration manifest.
@@ -391,6 +437,12 @@ def get_api_migration_steps() -> tuple[object, ...]:
             migration_id="api-0006",
             checksum=_SETTINGS_UNIFICATION_CHECKSUM,
             statements=_SETTINGS_UNIFICATION_STATEMENTS,
+        ),
+        build_migration_step(
+            domain="api",
+            migration_id="api-0007",
+            checksum=_WATCHLISTS_CHECKSUM,
+            statements=_WATCHLISTS_STATEMENTS,
         ),
     )
 

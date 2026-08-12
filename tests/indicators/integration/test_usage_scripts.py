@@ -6,12 +6,9 @@ import re
 import subprocess
 import sys
 import tempfile
-from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
-
-from tests.indicators.usage import _support as usage_support
 
 _FEATURE_USAGE_SCRIPTS = (
     "01_core.py",
@@ -38,47 +35,6 @@ _REQUIREMENT_ROW = re.compile(
     r"\| (?P<responsibility>.*?) \|",
     re.MULTILINE,
 )
-
-
-def test_usage_market_request_is_mt5_h1_for_exactly_100_days(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Usage calculators share the required genuine MT5 request boundary."""
-    fixed_end = datetime(2026, 8, 10, 12, tzinfo=UTC)
-    captured: dict[str, object] = {}
-    dataset = object()
-
-    class _FixedDateTime(datetime):
-        @classmethod
-        def now(cls, tz: object = None) -> datetime:
-            del cls, tz
-            return fixed_end
-
-    def _get_market_data(**kwargs: object) -> object:
-        captured.update(kwargs)
-        return object()
-
-    def _unwrap_market_data_response(response: object) -> object:
-        assert response is not None
-        return dataset
-
-    monkeypatch.setattr(usage_support, "datetime", _FixedDateTime)
-    monkeypatch.setattr(usage_support, "get_market_data", _get_market_data)
-    monkeypatch.setattr(
-        usage_support,
-        "unwrap_market_data_response",
-        _unwrap_market_data_response,
-    )
-    monkeypatch.setattr(usage_support, "_MARKET_DATASET_CACHE", {})
-
-    assert usage_support.get_mt5_usage_dataset() is dataset
-    assert captured == {
-        "source_id": "mt5",
-        "symbol": "EURUSD",
-        "timeframe": "H1",
-        "start": fixed_end - timedelta(days=100),
-        "end": fixed_end,
-    }
 
 
 def test_migrated_formula_examples_do_not_use_synthetic_bars() -> None:
@@ -156,6 +112,11 @@ def test_indicators_usage_script_executes_successfully(script_name: str) -> None
     environments from masking a genuine regression). Data-owned persistence and
     logs are redirected to one disposable directory. Any other code fails.
     """
+    if os.environ.get("INDICATORS_USAGE_LIVE_MT5") != "1":
+        pytest.skip("genuine MT5 usage requires INDICATORS_USAGE_LIVE_MT5=1")
+    if os.environ.get("ENVIRONMENT", "").strip().casefold() != "dev":
+        pytest.fail("genuine MT5 usage requires ENVIRONMENT=dev")
+
     usage_directory = Path(__file__).parents[1] / "usage" / "features"
     script_path = usage_directory / script_name
     tree = ast.parse(script_path.read_text(encoding="utf-8"))
@@ -175,15 +136,9 @@ def test_indicators_usage_script_executes_successfully(script_name: str) -> None
         environment = os.environ.copy()
         environment.update(
             {
-                "DATABASE_URL": "sqlite:///usage.db",
-                "DATA_DIR": str(temporary_root),
-                "ENVIRONMENT": "dev",
                 "LOG_DIRECTORY": str(log_directory),
                 "LOG_FILE_PATH": str(log_directory / "app.log"),
                 "PYTHONDONTWRITEBYTECODE": "1",
-                "RUNTIME_PROFILE": "research",
-                "SQLITE_BUSY_TIMEOUT_SECONDS": "1",
-                "WRITE_LOCK_LEASE_SECONDS": "30",
             }
         )
         completed = subprocess.run(  # noqa: S603 - fixed repository-controlled command

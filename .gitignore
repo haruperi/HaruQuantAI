@@ -203,7 +203,6 @@ log_*.txt
 /data/
 !app/data/
 datasets/
-market_data/
 historical_data/
 
 # Backtest results and exports
@@ -417,7 +416,6 @@ log_*.txt
 # Market data directories
 /data/
 datasets/
-market_data/
 historical_data/
 
 # Backtest results and exports
@@ -614,7 +612,6 @@ log_*.txt
 # Market data directories
 /data/
 datasets/
-market_data/
 historical_data/
 
 # Backtest results and exports

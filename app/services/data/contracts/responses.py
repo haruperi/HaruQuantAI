@@ -169,6 +169,9 @@ _TRAITS: Mapping[str, OperationTraits] = {
     "data.market_data.list_market_directory": _traits(
         "low", read_only=True, requires_network=True
     ),
+    "data.market_data.get_symbols_quotes": _traits(
+        "low", read_only=True, requires_network=True
+    ),
     "data.market_data.get_data_availability": _traits(
         "low", read_only=True, requires_network=True
     ),

@@ -1,5 +1,5 @@
 /**
- * Frozen typed route contracts for the 82 registered backend-v1 operations.
+ * Frozen typed route contracts for the 87 registered backend-v1 operations.
  *
  * Source of truth: `app/services/api/contracts/catalog.py` (`_KNOWN_ROUTE_CONTRACTS`).
  * The drift test in `clients.contract.test.ts` asserts that this module
@@ -160,6 +160,41 @@ export const settingsRoutes = {
   }),
 } as const;
 
+// --- Watchlists (4) --------------------------------------------------------
+
+export const watchlistsRoutes = {
+  list: route({
+    id: "api.watchlists.list",
+    method: "GET",
+    path: "/api/v1/watchlists",
+    permission: "watchlists:read",
+  }),
+  create: route({
+    id: "api.watchlists.create",
+    method: "POST",
+    path: "/api/v1/watchlists",
+    permission: "watchlists:write",
+    sideEffect: "write",
+    idempotencyRequired: true,
+  }),
+  update: route({
+    id: "api.watchlists.update",
+    method: "PATCH",
+    path: "/api/v1/watchlists/{watchlist_id}",
+    permission: "watchlists:write",
+    sideEffect: "write",
+    idempotencyRequired: true,
+  }),
+  delete: route({
+    id: "api.watchlists.delete",
+    method: "DELETE",
+    path: "/api/v1/watchlists/{watchlist_id}",
+    permission: "watchlists:write",
+    sideEffect: "write",
+    idempotencyRequired: true,
+  }),
+} as const;
+
 // --- Data / symbol discovery + market stream (2) -------------------------
 
 export const dataRoutes = {
@@ -182,6 +217,12 @@ export const dataRoutes = {
     path: "/api/v1/data/markets",
     permission: "data:read",
     paginated: true,
+  }),
+  quotes: route({
+    id: "api.data.quotes",
+    method: "GET",
+    path: "/api/v1/data/quotes",
+    permission: "data:read",
   }),
   stream: route({
     id: "api.data.stream",
@@ -765,8 +806,13 @@ export const ROUTE_CONTRACTS = [
   settingsRoutes.manifest,
   settingsRoutes.credentials,
   settingsRoutes.updateCredential,
+  watchlistsRoutes.list,
+  watchlistsRoutes.create,
+  watchlistsRoutes.update,
+  watchlistsRoutes.delete,
   dataRoutes.symbols,
   dataRoutes.markets,
+  dataRoutes.quotes,
   dataRoutes.capabilities,
   dataRoutes.stream,
   indicatorsRoutes.catalogue,
@@ -840,7 +886,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 83;
+export const ROUTE_CONTRACT_COUNT = 88;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

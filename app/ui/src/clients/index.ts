@@ -1,13 +1,13 @@
 /**
  * Typed frontend client catalog.
  *
- * Aggregates the 17 focused domain clients into one `apiClients` object so
+ * Aggregates the 18 focused domain clients into one `apiClients` object so
  * callers import a single entry point:
  *
  *   import { apiClients, unwrapData, ApiClientError } from "@/clients";
  *   const { data } = await apiClients.health.liveness();
  *
- * The catalog exposes typed clients only for the 82 registered backend-v1
+ * The catalog exposes typed clients only for the 88 registered backend-v1
  * operations. No parallel generic helper exists; every call delegates through
  * the single `request` transport. The drift test asserts this catalog matches
  * the backend route inventory exactly.
@@ -43,12 +43,14 @@ export type {
   SystemSettings,
   UserSettings,
 } from "./settings";
+export type { Watchlist, WatchlistItem, WatchlistUpdate } from "./watchlists";
 export type {
   DataCapabilities,
   DataCapability,
   MarketDirectory as MarketDirectoryPage,
   MarketRow,
   MarketsQuery,
+  QuotesParams,
   StreamQuery,
   SymbolPage,
   SymbolRow,
@@ -110,6 +112,7 @@ export {
 import { auth } from "./auth";
 import { health } from "./health";
 import { settings } from "./settings";
+import { watchlists } from "./watchlists";
 import { data } from "./data";
 import { indicators } from "./indicators";
 import { strategies } from "./strategies";
@@ -132,6 +135,7 @@ export {
   auth,
   health,
   settings,
+  watchlists,
   data,
   indicators,
   strategies,
@@ -161,6 +165,7 @@ export const apiClients = {
   auth,
   health,
   settings,
+  watchlists,
   data,
   indicators,
   strategies,

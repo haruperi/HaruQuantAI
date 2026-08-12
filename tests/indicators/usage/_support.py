@@ -1,21 +1,10 @@
-# ruff: noqa: E402
 """Shared response helpers for Indicators usage evidence."""
 
 from __future__ import annotations
 
 import os
-import pathlib
-import tempfile
 from datetime import UTC, datetime, timedelta
 from typing import Any, TypeVar
-
-_data_dir = str(pathlib.Path(tempfile.gettempdir()) / "haruquant-data")
-pathlib.Path(_data_dir).mkdir(exist_ok=True, parents=True)
-os.environ.setdefault("DATA_DIR", _data_dir)
-os.environ.setdefault("DATABASE_URL", "sqlite:///usage.db")
-os.environ.setdefault("ENVIRONMENT", "dev")
-os.environ.setdefault("WRITE_LOCK_LEASE_SECONDS", "30")
-os.environ.setdefault("SQLITE_BUSY_TIMEOUT_SECONDS", "1")
 
 from app.services.data import get_market_data, to_ohlcv_dataframe, unwrap_data_response
 from app.services.indicators import get_indicator_result_values
@@ -24,6 +13,67 @@ _ResponseT = TypeVar("_ResponseT")
 MarketDataset = Any
 StandardResponse = Any
 _MARKET_DATASET_CACHE: dict[str, MarketDataset] = {}
+
+
+def _build_persisted_mt5_config(request_id: str) -> object:
+    """Resolve the authoritative database-backed MT5 configuration.
+
+    Args:
+        request_id: Canonical request identifier.
+
+    Returns:
+        Brokers-owned connection configuration.
+
+    Raises:
+        Exception: If persisted settings or credentials cannot be resolved.
+    """
+    from app.services.api import build_system_broker_connection_config
+
+    return build_system_broker_connection_config("mt5", request_id=request_id)
+
+
+def _resolve_mt5_usage_config(request_id: str) -> object:
+    """Resolve genuine MT5 configuration or fail closed without fallback.
+
+    Args:
+        request_id: Canonical request identifier.
+
+    Returns:
+        Verified database-backed MT5 connection configuration.
+
+    Raises:
+        SystemExit: If the environment or persisted configuration is unavailable.
+    """
+    if os.environ.get("ENVIRONMENT", "").strip().casefold() != "dev":
+        print("\nStatus: unavailable")
+        print("\nMessage: genuine MT5 usage requires ENVIRONMENT=dev")
+        print("\nData: None")
+        raise SystemExit(3)
+    try:
+        return _build_persisted_mt5_config(request_id)
+    except Exception as error:
+        print("\nStatus: unavailable")
+        print("\nMessage: persisted MT5 configuration is unavailable")
+        print("\nData: None")
+        raise SystemExit(3) from error
+
+
+def _resolve_usage_connection_config(broker_id: str, request_id: str) -> object:
+    """Resolve only the approved MT5 usage connection.
+
+    Args:
+        broker_id: Requested provider identifier.
+        request_id: Canonical request identifier.
+
+    Returns:
+        Verified database-backed MT5 configuration.
+
+    Raises:
+        ValueError: If a provider other than MT5 is requested.
+    """
+    if broker_id != "mt5":
+        raise ValueError("Indicators usage permits only the configured MT5 source")
+    return _resolve_mt5_usage_config(request_id)
 
 
 def get_mt5_usage_dataset(timeframe: str = "H1") -> MarketDataset:
@@ -41,81 +91,38 @@ def get_mt5_usage_dataset(timeframe: str = "H1") -> MarketDataset:
     """
     cache_key = f"mt5_eurusd_{timeframe.lower()}_100d"
     if cache_key not in _MARKET_DATASET_CACHE:
-        from app.services.api import (
-            build_system_broker_connection_config,
-            get_api_settings,
-            get_system_settings,
-            run_api_migrations,
-            store_system_credential,
-            update_system_settings,
-        )
-        from app.services.api.composition.runtime_settings import (
-            build_credential_key_set,
-        )
         from app.services.data import (
             data_provider_connection_resolver_context,
             data_provider_settings_context,
-            run_data_migrations,
         )
         from app.utils import generate_id, load_broker_provider_settings
 
+        req_id = generate_id("req")
+        mt5_config = _resolve_mt5_usage_config(req_id)
+        # Data's context-local enablement follows only after authoritative API
+        # composition has verified the persisted provider flag and credential slot.
         provider_settings = load_broker_provider_settings({"mt5_enabled": True})
-        with data_provider_settings_context(provider_settings):
-            req_id = generate_id("req")
-            run_api_migrations(req_id)
-            run_data_migrations(req_id)
-            sys_settings = get_system_settings(request_id=req_id)
-            if sys_settings.settings.get("MT5_ENABLED") != "true":
-                update_system_settings(
-                    actor_id="system",
-                    settings={**sys_settings.settings, "MT5_ENABLED": "true"},
-                    expected_version=sys_settings.version,
-                    request_id=req_id,
-                )
-            try:
-                mt5_config = build_system_broker_connection_config(
-                    "mt5",
-                    request_id=req_id,
-                )
-            except ValueError, KeyError, AttributeError, RuntimeError:
-                api_settings = get_api_settings()
-                key_set = build_credential_key_set(api_settings)
-                store_system_credential(
-                    "mt5",
-                    {
-                        "login": "123456",
-                        "password": "password",
-                        "server": "MetaQuotes-Demo",
-                    },
-                    key_set=key_set,
-                    active_key_id=next(iter(key_set.keys())),
-                    request_id=req_id,
-                )
-                mt5_config = build_system_broker_connection_config(
-                    "mt5",
-                    request_id=req_id,
-                )
-            with data_provider_connection_resolver_context(
+        with (
+            data_provider_settings_context(provider_settings),
+            data_provider_connection_resolver_context(
                 lambda broker_id, request_id: (
                     mt5_config
                     if broker_id == "mt5"
-                    else build_system_broker_connection_config(
-                        broker_id,
-                        request_id=request_id,
-                    )
+                    else _resolve_usage_connection_config(broker_id, request_id)
                 )
-            ):
-                end = datetime.now(UTC)
-                start = end - timedelta(days=100)
-                _MARKET_DATASET_CACHE[cache_key] = unwrap_market_data_response(
-                    get_market_data(
-                        source_id="mt5",
-                        symbol="EURUSD",
-                        timeframe=timeframe,
-                        start=start,
-                        end=end,
-                    )
+            ),
+        ):
+            end = datetime.now(UTC)
+            start = end - timedelta(days=100)
+            _MARKET_DATASET_CACHE[cache_key] = unwrap_market_data_response(
+                get_market_data(
+                    source_id="mt5",
+                    symbol="EURUSD",
+                    timeframe=timeframe,
+                    start=start,
+                    end=end,
                 )
+            )
     return _MARKET_DATASET_CACHE[cache_key]
 
 

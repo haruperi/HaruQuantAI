@@ -217,6 +217,5 @@ export const assetClasses = [
   'Commodities',
   'Indices',
   'Stocks',
-  'ETFs',
   'Cryptocurrencies'
 ];

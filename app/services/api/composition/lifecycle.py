@@ -12,6 +12,7 @@ from app.services.api.composition.broker_config import (
 )
 from app.services.api.composition.runtime_settings import (
     activate_runtime_logging,
+    build_runtime_data_provider_sources,
     build_runtime_provider_settings,
     load_runtime_settings_snapshot,
 )
@@ -79,16 +80,44 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
             provider_settings = build_runtime_provider_settings(
                 app.state.api_runtime_settings
             )
+
+            def _resolve_connection(broker_id: str, request_id: str) -> object:
+                """Resolve one broker connection config for the active session.
+
+                Returns:
+                    Composed broker connection configuration.
+                """
+                return build_system_broker_connection_config(
+                    broker_id,
+                    request_id=request_id,
+                )
+
+            enabled_sources = build_runtime_data_provider_sources(provider_settings)
+            merged_sources = tuple(
+                sorted(set(data_settings.data_provider_sources) | set(enabled_sources))
+            )
+            effective_data_settings = (
+                data_settings
+                if merged_sources == data_settings.data_provider_sources
+                else data_settings.model_copy(
+                    update={"data_provider_sources": merged_sources}
+                )
+            )
+            # Also cache on `app.state`: a ContextVar `.set()` here lives in the
+            # lifespan task and never propagates to per-request tasks, so
+            # `RuntimeSettingsMiddleware` re-enters these contexts on every
+            # request from these cached values. The lifespan-scoped context
+            # entries below remain useful for code that runs directly within
+            # startup (migrations, startup probes).
+            app.state.api_data_settings = effective_data_settings
+            app.state.api_data_provider_settings = provider_settings
+            app.state.api_data_provider_connection_resolver = _resolve_connection
+            settings_stack.enter_context(data_settings_context(effective_data_settings))
             settings_stack.enter_context(
                 data_provider_settings_context(provider_settings)
             )
             settings_stack.enter_context(
-                data_provider_connection_resolver_context(
-                    lambda broker_id, request_id: build_system_broker_connection_config(
-                        broker_id,
-                        request_id=request_id,
-                    )
-                )
+                data_provider_connection_resolver_context(_resolve_connection)
             )
         except (TypeError, ValueError) as error:
             app.state.api_ready = False

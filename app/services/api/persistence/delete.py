@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Protocol, cast
+
 from app.services.api.persistence import IdentityError
 from app.services.data import (
     build_statement_plan,
@@ -11,6 +13,12 @@ from app.services.data import (
 from app.utils import get_logger
 
 logger = get_logger(__name__)
+
+
+class _TransactionResult(Protocol):
+    """Fields consumed from Data's normalized transaction result."""
+
+    affected_rows: int
 
 
 def _execute_delete(
@@ -41,6 +49,73 @@ def _execute_delete(
     )
     if response.status != "success" or response.data is None:
         raise IdentityError("IDENTITY_STORE_UNAVAILABLE")
+
+
+def _execute_delete_many(
+    statements: tuple[str, ...],
+    parameter_sets: tuple[tuple[object, ...], ...],
+    *,
+    request_id: str,
+) -> int:
+    """Execute several bounded API delete statements as one transaction.
+
+    Args:
+        statements: Parameterized delete statements.
+        parameter_sets: Bound parameters matching the statements.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Number of affected rows across every statement.
+
+    Raises:
+        IdentityError: If Data cannot confirm the transaction.
+    """
+    response = execute_transaction(
+        build_transaction_request(
+            plan=build_statement_plan(
+                statements=statements,
+                parameter_sets=parameter_sets,
+                max_rows=1,
+            ),
+            request_id=request_id,
+        )
+    )
+    if response.status != "success" or response.data is None:
+        raise IdentityError("IDENTITY_STORE_UNAVAILABLE")
+    result = cast("_TransactionResult", response.data)
+    return int(result.affected_rows)
+
+
+def delete_watchlist_record(
+    *, watchlist_id: str, account_id: str, request_id: str
+) -> int:
+    """Delete one watchlist and its items, scoped to the owning account.
+
+    Args:
+        watchlist_id: Stable watchlist identifier.
+        account_id: Owning account identifier, enforced in the WHERE clause.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Number of affected rows; 0 if not found or not owned.
+
+    Raises:
+        IdentityError: If Data cannot confirm the transaction.
+    """
+    logger.debug("Deleting API watchlist and item persistence records")
+    return _execute_delete_many(
+        (
+            "DELETE FROM api_watchlist_items WHERE watchlist_id = ? AND EXISTS "
+            "(SELECT 1 FROM api_watchlists WHERE watchlist_id = ? "
+            "AND account_id = ?)",
+            "DELETE FROM api_watchlists WHERE watchlist_id = ? AND account_id = ?",
+        ),
+        (
+            (watchlist_id, watchlist_id, account_id),
+            (watchlist_id, account_id),
+        ),
+        request_id=request_id,
+    )
 
 
 def delete_auth_failure_record(username_hash: str, *, request_id: str) -> None:
@@ -79,4 +154,8 @@ def delete_idempotency_record(scope_key: str, *, request_id: str) -> None:
     )
 
 
-__all__ = ["delete_auth_failure_record", "delete_idempotency_record"]
+__all__ = [
+    "delete_auth_failure_record",
+    "delete_idempotency_record",
+    "delete_watchlist_record",
+]

@@ -5,10 +5,12 @@ from app.services.api.middleware.deadlines import DeadlineMiddleware
 from app.services.api.middleware.envelope import get_canonical_envelope_middleware
 from app.services.api.middleware.rate_limits import RateLimitMiddleware
 from app.services.api.middleware.redaction import build_secret_redaction_middleware
+from app.services.api.middleware.runtime_settings import RuntimeSettingsMiddleware
 
 __all__ = (
     "DeadlineMiddleware",
     "RateLimitMiddleware",
+    "RuntimeSettingsMiddleware",
     "build_request_context_middleware",
     "build_secret_redaction_middleware",
     "get_canonical_envelope_middleware",

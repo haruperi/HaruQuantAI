@@ -15,12 +15,12 @@ from typing import cast
 
 import pytest
 from app.services.data.contracts.records import OHLCVRecord
-from app.services.data.market_data import markets_directory as directory
+from app.services.data.market_data import directory_projection as projection
+from app.services.data.market_data import market_directory as directory
+from app.services.data.market_data import symbol_quotes as quotes
+from app.services.data.market_data.directory_contracts import MarketDirectoryRequest
 from app.services.data.market_data.level1 import Level1Snapshot
-from app.services.data.market_data.markets_directory import (
-    MarketDirectoryRequest,
-    list_market_directory,
-)
+from app.services.data.market_data.market_directory import list_market_directory
 from app.services.data.market_data.snapshot import MarketSnapshot
 from app.services.data.market_data.symbol_metadata import SymbolPage
 from app.utils import generate_id
@@ -152,8 +152,12 @@ def _snapshot(symbol: str) -> MarketSnapshot:
 def isolated_directory(monkeypatch: pytest.MonkeyPatch):
     """Replace the three Data public calls with pass-through stubs.
 
-    Individual tests override specific stubs to exercise failure modes.
+    Individual tests override specific stubs to exercise failure modes. Also
+    clears the in-process directory cache so one test's cached page can never
+    leak into the next test's assertions.
     """
+    directory._reset_directory_cache_for_tests()
+    quotes._reset_quote_cache_for_tests()
 
     def _fake_list_symbols(request: object) -> object:
         # SymbolPage.items must be deterministically sorted; mirror the broker
@@ -183,7 +187,7 @@ def isolated_directory(monkeypatch: pytest.MonkeyPatch):
         return _success(_snapshot(symbol))
 
     monkeypatch.setattr(directory, "list_symbols", _fake_list_symbols)
-    monkeypatch.setattr(directory, "get_market_snapshot", _fake_get_market_snapshot)
+    monkeypatch.setattr(projection, "get_market_snapshot", _fake_get_market_snapshot)
     # ``_fetch_symbol_metadata_raw`` imports get_symbol_metadata lazily; patch
     # the lazy import target inside symbol_discovery to avoid source contact.
     from app.services.data.market_data import symbol_discovery
@@ -210,12 +214,50 @@ def test_directory_classifies_and_projects_rows(isolated_directory: None) -> Non
     assert rows["XAUUSD"].asset_class == "Commodities"  # metal override
     assert rows["US500"].asset_class == "Indices"
     eur = rows["EURUSD"]
-    assert eur.last == pytest.approx(1.10)
+    assert eur.last == pytest.approx(1.0999)
     assert eur.bid == pytest.approx(1.0999)
     assert eur.open == pytest.approx(1.0950)
     assert eur.close == pytest.approx(1.1005)
-    assert eur.change == pytest.approx(1.10 - 1.0950)
-    assert eur.change_percent == pytest.approx((1.10 - 1.0950) / 1.0950 * 100.0)
+    assert eur.change == pytest.approx(1.0999 - 1.0950)
+    assert eur.change_percent == pytest.approx((1.0999 - 1.0950) / 1.0950 * 100.0)
+
+
+def test_directory_uses_bid_when_provider_last_trade_is_zero(
+    isolated_directory: None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """OTC zero last-trade values never mask a usable Level-1 bid."""
+    del isolated_directory
+
+    def _zero_last_snapshot(symbol: str) -> MarketSnapshot:
+        snapshot = _snapshot(symbol)
+        return snapshot.model_copy(
+            update={
+                "level1": _level1(
+                    symbol,
+                    bid=Decimal("1.2345"),
+                    ask=Decimal("1.2347"),
+                    last=Decimal(0),
+                )
+            }
+        )
+
+    def _fake_snapshot(
+        *, source_id: str, symbol: str, timeframe: str, request_id: str
+    ) -> object:
+        del source_id, timeframe, request_id
+        return _success(_zero_last_snapshot(symbol))
+
+    monkeypatch.setattr(projection, "get_market_snapshot", _fake_snapshot)
+
+    response = list_market_directory(
+        MarketDirectoryRequest(
+            source_id="mt5", limit=100, request_id=generate_id("req")
+        )
+    )
+
+    assert response.status == "success"
+    rows = {row.symbol: row for row in response.data.rows}
+    assert rows["EURUSD"].last == pytest.approx(1.2345)
 
 
 def test_directory_excludes_uncategorizable_symbols(
@@ -262,7 +304,7 @@ def test_directory_degrades_when_snapshot_fails(
     ) -> object:
         return _failure("SNAPSHOT_UNAVAILABLE")
 
-    monkeypatch.setattr(directory, "get_market_snapshot", _raise)
+    monkeypatch.setattr(projection, "get_market_snapshot", _raise)
 
     response = list_market_directory(
         MarketDirectoryRequest(
@@ -275,7 +317,7 @@ def test_directory_degrades_when_snapshot_fails(
     eur = rows["EURUSD"]
     assert eur.open is None  # OHLC comes from the snapshot
     assert eur.high is None
-    assert eur.last == pytest.approx(1.10)  # falls back to metadata quote
+    assert eur.last == pytest.approx(1.0999)  # falls back to metadata bid
 
 
 def test_directory_skips_symbol_when_metadata_fails(

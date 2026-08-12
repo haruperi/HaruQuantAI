@@ -2,7 +2,7 @@
 
 > **Specification location:** `app/services/api/README.md`
 > **Logical runtime packages:** FastAPI gateway at `app/services/api` plus Next.js frontend at `ui/` (per the `docs/PROJECT.md` registry), with canonical ASGI target `app.services.api.composition.application:app`; Next.js frontend at `ui/`
-> **Status:** `Complete` — all 20 registered features are implemented.
+> **Status:** `Complete` — all 21 registered features are implemented.
 > **Last updated:** `2026-08-07`
 
 > This README is the UI/API domain's **single source of truth** for final requirements,
@@ -127,6 +127,7 @@ connection, locking, and migration execution only.
 | Status | State / Store | Read access (via contract) | Migration definitions |
 |---|---|---|---|
 | Completed | User, normalized role/permission/binding authority, session, authentication-failure, settings, approval, and encrypted credential-reference state | UI/API package-root identity/settings/credential functions | `app/services/api/migrations/`; `app/services/api/persistence/` |
+| Completed | Account-owned named, ordered watchlists and their symbol items | UI/API package-root watchlist functions | `app/services/api/migrations/`; `app/services/api/persistence/` |
 | Completed | HTTP-idempotency reservations and terminal replay records | UI/API package-root replay/conflict functions | `app/services/api/migrations/`; `app/services/api/persistence/` |
 
 Browser sessions use opaque server-side identifiers in secure HttpOnly SameSite
@@ -201,9 +202,9 @@ invariant rather than outstanding scope.
 | Completed | `FEAT-API-04` Liveness and Readiness | `health/` | `get_liveness`, `get_readiness`, `check_clock_drift` | `FR-API-018`-`FR-API-019`, `FR-API-059` | `tests/api/usage/04_health.py` |
 | Completed | `FEAT-API-05` Operational Telemetry and Exposition | `observability/` | `record_metric`, `validate_metric_labels`, `build_metric_snapshot`, `export_prometheus_metrics`, `get_metrics`, `create_in_process_metric_sink` | `FR-API-060`â€“`FR-API-063` | `tests/api/usage/05_observability.py` |
 | Completed | `FEAT-API-06` Ordered Event Delivery | `streams/` | `normalize_stream_event`, `create_stream_manager` through the package root | `FR-API-020`–`FR-API-021` | `tests/api/usage/06_streams.py`; `tests/api/unit/test_streams.py` |
-| Completed | `FEAT-API-07` Thin HTTP Boundaries | `routes/` | Exactly 82 backend-v1 operations, including the bounded fourteen-feature Data capability catalogue, completed-run journal playback, live resumable what-if sessions, Portfolio definition registration/read, and administrator-managed system settings | `FR-API-022`–`FR-API-034`, `FR-API-056`, `FR-API-068`–`FR-API-072`, `FR-API-119` | `tests/api/usage/07_routes.py`; `tests/api/unit/test_route_catalog.py`; `tests/api/contracts/test_openapi_contract.py`; `tests/api/unit/test_data_routes.py` |
+| Completed | `FEAT-API-07` Thin HTTP Boundaries | `routes/` | Exactly 88 backend-v1 operations, including the bounded fourteen-feature Data capability catalogue, completed-run journal playback, live resumable what-if sessions, Portfolio definition registration/read, and administrator-managed system settings | `FR-API-022`–`FR-API-034`, `FR-API-056`, `FR-API-068`–`FR-API-072`, `FR-API-119` | `tests/api/usage/07_routes.py`; `tests/api/unit/test_route_catalog.py`; `tests/api/contracts/test_openapi_contract.py`; `tests/api/unit/test_data_routes.py` |
 | Completed | `FEAT-API-08` Canonical Application Lifecycle | `composition/` | `create_api_app`, dependency-bundle builders, exact twelve-provider graph, and canonical `app.services.api.composition.application:app` | `FR-API-035`–`FR-API-037`, `FR-API-058` | `tests/api/usage/08_composition.py`; `tests/api/unit/test_application.py`; `tests/api/unit/test_in_process_composition.py` |
-| Completed | `FEAT-API-09` Typed Frontend Transport | `ui/clients/` | `request`, `unwrapData`, `ApiClientError`, `openStream`, `apiClients` (18 focused clients covering all 82 operations, including the typed Data capability catalogue) | `FR-API-038`–`FR-API-041`, `FR-API-120` | `tests/api/usage/09_frontend_clients.ts`; `app/ui/src/clients/request.test.ts`; `app/ui/src/clients/clients.test.ts`; `app/ui/src/clients/clients.contract.test.ts` |
+| Completed | `FEAT-API-09` Typed Frontend Transport | `ui/clients/` | `request`, `unwrapData`, `ApiClientError`, `openStream`, `apiClients` (18 focused clients covering all 88 operations, including the typed Data capability catalogue) | `FR-API-038`–`FR-API-041`, `FR-API-120` | `tests/api/usage/09_frontend_clients.ts`; `app/ui/src/clients/request.test.ts`; `app/ui/src/clients/clients.test.ts`; `app/ui/src/clients/clients.contract.test.ts` |
 | Completed | `FEAT-API-10` Frontend Session and Page Context | `ui/context/` | `AuthProvider`, `useAuth`, `PageContextProvider`, `usePageContext`, `buildGovernedOptions`, `isGovernedFresh`, `consumeStream`, `StreamGapError`, `PageContextError`, `GovernedPreflightError` | `FR-API-042`–`FR-API-045` | `tests/api/usage/10_frontend_context.tsx`; `app/ui/src/context/{auth,page,governed,streams}.test.ts(x)` |
 | Completed | `FEAT-API-11` Workflow Presentation Components | `ui/components/workflow/` | `AppShell`, `DashboardView`, `DataWorkspace`, `StrategyWorkspace`, `SimulationView`, `RiskView`, `TradingView`, `ResearchWorkspace`, `PlaybackView` | `FR-API-046`–`FR-API-051`, `FR-API-121`–`FR-API-122` | `tests/api/usage/11_frontend_components.tsx`; `app/ui/src/components/workflow/*.test.tsx` |
 | Completed | `FEAT-API-12` Protected Workflow Pages | `ui/app/` | `AuthenticationPage` (at `/login`), `ProtectedLayout`, `WorkflowPage` | `FR-API-053`–`FR-API-055` | `tests/api/usage/12_frontend_pages.tsx`; `app/ui/src/app/{authentication-page,protected-layout,pages.contract}.test.tsx` |
@@ -215,6 +216,7 @@ invariant rather than outstanding scope.
 | Completed | `FEAT-API-18` Emergency and Recovery UX | `ui/src/features/emergency-ux/` | guarded emergency acknowledgement, checklist, and recovery presentation | `FR-API-102`..`FR-API-106` | `tests/api/usage/18_emergency_ux.tsx` |
 | Completed | `FEAT-API-19` Human-Factors and Alarm Model | `ui/src/features/human-factors/` | priority/root grouping, lifecycle state, accessible alerts, freshness and responsive layout | `FR-API-107`..`FR-API-112` | `tests/api/usage/19_human_factors.tsx` |
 | Completed | `FEAT-API-20` Training, Replay, and Qualification UX | `ui/src/features/training-ux/` | curriculum, replay/debrief, remediation, and fail-closed qualification display | `FR-API-113`..`FR-API-118` | `tests/api/usage/20_training_ux.tsx` |
+| Completed | `FEAT-API-21` Watchlists | `identity/watchlists.py`, `routes/watchlists.py`, `routes/market_overlays.py`, `ui/src/components/widgets/MarketsWidget.tsx` | Account-owned named, ordered symbol collections, explicit-symbol quote reads, and bounded progressive Markets-widget enrichment | `FR-API-123`–`FR-API-126` | `tests/api/integration/test_watchlists.py`; `tests/api/unit/test_data_routes.py`; `tests/api/unit/test_market_overlays.py`; `tests/api/unit/test_persistence_layout.py`; `app/ui/src/components/widgets/MarketsWidget.test.tsx` |
 
 #### Operational workstation requirements
 
@@ -238,7 +240,7 @@ invariant rather than outstanding scope.
 
 The owner selected Path 1: backend v1 exposes only capabilities that the canonical
 in-process application can compose and execute from existing package-root owner APIs.
-The public surface is exactly 82 HTTP operations across 77 unique paths. Simulation contributes its existing
+The public surface is exactly 88 HTTP operations across 81 unique paths. Simulation contributes its existing
 synchronous run/result routes, two completed-run journal playback operations, and five
 live what-if session operations; Optimization, Portfolio, and Agentic operations are
 composed where their current route contracts declare them. Only the duplicate
@@ -809,6 +811,7 @@ permission and governed-request decision.
 | Completed | `approvals.py` | Persist and atomically consume scoped distinct-principal approvals | `create_approval`, `consume_approval` | **Standard library:** `hashlib`, `datetime`<br>**Local:** Data public transactions |
 | Completed | `idempotency.py` | Reserve scoped request keys, retain terminal replay evidence for at least 24 hours, and run the one shared reserve-execute-finalize cycle used by every governed route | `reserve_idempotency_key`, `finalize_idempotency_key`, `run_idempotent_write`, `run_idempotent_write_async` | **Standard library:** `hashlib`, `datetime`<br>**Local:** Data public transactions |
 | Completed | `settings.py` | Persist versioned, secret-safe user and global system settings with optimistic concurrency | `get_user_settings`, `get_system_settings`, `update_user_settings`, `update_system_settings` | **Standard library:** `json`<br>**Local:** Data public transactions |
+| Completed | `watchlists.py` | Persist account-owned named, ordered symbol collections; seed the curated default watchlist on first read; enforce the one-default-per-account invariant and ownership on every mutation | `list_watchlists`, `create_watchlist`, `get_watchlist`, `rename_watchlist`, `replace_watchlist_items`, `set_default_watchlist`, `delete_watchlist` | **Standard library:** `datetime`<br>**Local:** Data public transactions |
 | Completed | `../migrations/definitions.py` | Declare immutable API-owned schema steps and apply the complete manifest through Data's migration boundary | `get_api_migration_steps`, `run_api_migrations` | **Local:** Data public migration functions |
 | Completed | `../persistence/` | Execute API-owned CRUD through the exact private `create.py`, `read.py`, `update.py`, and `delete.py` layout | Private standalone CRUD functions | **Local:** Data public transaction functions |
 
@@ -828,6 +831,7 @@ permission and governed-request decision.
 | Completed | `FR-API-075` | Persist user preferences and the global non-secret system document in one `api_settings` table keyed by derived scope and subject, while Utils remains stateless; after migrations, composition loads one immutable global snapshot, activates its validated `LOG_LEVEL`, and injects its approved provider values into Data/Brokers for the complete API lifespan. | `get_user_settings`, `get_system_settings`, `update_user_settings`, `update_system_settings`; internal `load_runtime_settings_snapshot`, `activate_runtime_logging`, `build_runtime_provider_settings` | Transactional persistence read/write; startup logging and provider configuration | `IdentityError`: unavailable store; startup failure for invalid runtime policy | **Usage:** `tests/api/usage/02_identity.py`<br>**Integration:** `tests/api/integration/test_auth_settings.py::test_login_settings_credentials_logout()`; `test_persisted_log_level_activates_after_migrations()`; `test_persisted_provider_settings_reach_data_composition()` |
 | Completed | `FR-API-076` | Migrate every legacy `api_user_settings` document into user scope with exact JSON, version, and timestamp preservation before dropping the legacy table; preserve immutable historical checksums. | `api-0006`, `run_api_migrations` | Schema migration | `DataError[SCHEMA_MIGRATION_FAILED]` | **Integration:** `tests/api/integration/test_settings_migration.py` |
 | Completed | `FR-API-077` | Default the canonical settings route to the authenticated user's derived subject and require `settings:admin` before any global-system read or update; reject secret-like or oversized keys and enforce optimistic versions in both scopes. | `settings.router`, scoped settings operations | Read-only; persistence write | Bounded 401/403/409/422/503 failures | **Integration:** `tests/api/integration/test_auth_settings.py::test_system_settings_route_requires_admin_permission()` |
+| Completed | `FR-API-123` | Persist account-owned named, ordered watchlists in normalized `api_watchlists`/`api_watchlist_items` tables with a partial-unique-index-enforced single default per account; idempotently seed a curated default watchlist on an account's first read; enforce ownership and name uniqueness on every rename, item replacement, default-promotion, and delete, and reject deleting the current default. | `list_watchlists`, `create_watchlist`, `get_watchlist`, `rename_watchlist`, `replace_watchlist_items`, `set_default_watchlist`, `delete_watchlist` | Transactional persistence read/write | `IdentityError`: not found, not owned, name conflict, limit exceeded, or default-undeletable | **Integration:** `tests/api/integration/test_watchlists.py` |
 
 **Configuration and Limits Manifest**
 
@@ -996,7 +1000,8 @@ stream subscription → standard envelope/event.
 | Completed | `health.py` | Public liveness and protected readiness HTTP boundary | `router` | **Required third-party:** FastAPI<br>**Local:** `health`, `identity` |
 | Completed | `observability.py` | Protected Prometheus exposition boundary | `router` | **Required third-party:** FastAPI<br>**Local:** `observability`, `identity` |
 | Completed | `settings.py` | Versioned optimistic settings boundary with terminal HTTP idempotency | `router` | **Required third-party:** FastAPI/Pydantic<br>**Local:** `identity`, `contracts` |
-| Completed | `data.py` | Bounded symbol discovery, governed dataset preparation, and governed external import | `router` | **Required third-party:** FastAPI<br>**Local:** `identity`, Data package-root API |
+| Completed | `watchlists.py` | Account-owned watchlist list/create/update/delete boundary with terminal HTTP idempotency on every mutation | `router` | **Required third-party:** FastAPI/Pydantic<br>**Local:** `identity`, `markets_source` |
+| Completed | `data.py` | Bounded symbol discovery, categorized market directory and explicit-symbol quotes, governed dataset preparation, and governed external import | `router` | **Required third-party:** FastAPI<br>**Local:** `identity`, Data package-root API |
 | Completed | `data_stream.py` | Authenticated SSE bridge over Data-owned MT5 market streams | `router` | **Required third-party:** FastAPI<br>**Local:** `identity`, `streams`, Data package-root API |
 | Completed | `strategies.py` | Strategy catalogue/version reads and governed mutations | `router` | **Required third-party:** FastAPI<br>**Local:** `identity`; Strategy package-root API |
 | Completed | `simulation.py` | Synchronous canonical/portfolio runs and durable result reads | `router` | Simulator package-root APIs and explicitly composed receiver-owned ports |
@@ -1034,6 +1039,9 @@ stream subscription → standard envelope/event.
 | Completed | `FR-API-070` | Cancel one reserved Agentic run under `agentic:cancel_run` with the deterministic `OPERATOR_CANCELLED` reason; cancellation never fabricates a terminal result. | `DELETE /api/v1/agentic/runs/{run_id}` | Agentic state transition; audit | Bounded 401/403/404/409/503 failures | **Unit:** `tests/api/unit/test_agentic_routes.py` |
 | Completed | `FR-API-071` | Record one authenticated human handoff approval under `agentic:approve_promotion`; the gateway records attestation and never itself authorizes a promotion. | `POST /api/v1/agentic/handoffs/approve`; `AgenticHandoffApprovalRequest` | Agentic approval persistence; audit | Bounded 401/403/409/422/503 failures | **Unit:** `tests/api/unit/test_agentic_routes.py` |
 | Completed | `FR-API-072` | Expose the two Agentic containment operations — agent quarantine and the firm-wide disable kill switch — under `agentic:operate`; Agentic remains the sole authority over its own runtime state. | `POST /api/v1/agentic/incidents/quarantine`; `POST /api/v1/agentic/disable`; `AgenticQuarantineRequest`, `AgenticDisableRequest` | Agentic containment state transition; audit | Bounded 401/403/422/503 failures | **Unit:** `tests/api/unit/test_agentic_routes.py` |
+| Completed | `FR-API-124` | Expose list/create/update/delete for the caller's watchlists. The gateway resolves the active runtime broker the same way the Markets route does — callers never name a `source_id` — and every mutation requires a bounded HTTP idempotency key; the update route applies rename, item-list replacement, and default-promotion independently within one request. | `watchlists.router: APIRouter` | Read-only; persistence read/write | Bounded 401/403/404/409/422/503 failures | **Integration:** `tests/api/integration/test_watchlists.py` |
+| Completed | `FR-API-125` | Expose categorized quotes for an explicit, caller-known symbol list (e.g. one watchlist's contents) without walking the source's full catalog, so cost scales with the list size rather than the broker's universe; shares the Markets route's gateway-envelope normalization. | `GET /api/v1/data/quotes?symbols=` | Read-only | Bounded 401/403/422/503 failures | **Unit:** `tests/api/unit/test_data_routes.py` |
+| Completed | `FR-API-126` | Populate each Markets-widget row from governed evidence using the widget usage contract: Level-1 bid with latest-D1-close fallback for Last Price; pip and percentage Change from the current D1 open; prior-settled 10-session annualized rolling volatility; prior-settled 10-session ADR in pips; current D1 high-minus-low and percentage of ADR; and current D1 Open/High/Low. The frontend requests the active watchlist in sequential batches of at most four symbols, renders each completed batch immediately, and displays an em dash for every unavailable leg instead of inventing a value. | `routes/market_overlays.py`; `ui/src/components/widgets/MarketsWidget.tsx` | Read-only Data and Indicators calls; bounded in-process cache | Unavailable provider, metadata, history, warmup, or indicator evidence remains nullable and never becomes synthetic market data | **Usage:** `tests/api/usage/widget/market.py`<br>**Unit:** `tests/api/unit/test_market_overlays.py`; `tests/api/unit/test_data_routes.py`; `app/ui/src/components/widgets/MarketsWidget.test.tsx` |
 
 #### Approved route contract inventory
 
@@ -1047,7 +1055,8 @@ CSRF for cookie-authenticated browser requests.
 |---|---|---|---|
 | `auth.py` | `POST /api/v1/auth/register`; `POST /api/v1/auth/login`; `GET /api/v1/auth/me`; `POST /api/v1/auth/logout` | Public credentials or UI/API-owned session | UI/API account/session read/write; `/me` returns only non-secret identity and expiry; opaque secure HttpOnly SameSite cookie for browsers, bearer for services; CSRF on cookie-authenticated state changes |
 | `settings.py` | `GET /api/v1/settings`; `PUT /api/v1/settings` | Authenticated owner; UI/API-owned state | Read/write; PUT durable HTTP idempotency required |
-| `data.py` | `GET /api/v1/data/symbols`; `POST /api/v1/data/datasets/prepare`; `GET /api/v1/data/imports/dialects`; `POST /api/v1/data/imports` | Authenticated; Data | Read-only bounded discovery and dialect read; governed preparation and import with required idempotency |
+| `watchlists.py` | `GET /api/v1/watchlists`; `POST /api/v1/watchlists`; `PATCH /api/v1/watchlists/{watchlist_id}`; `DELETE /api/v1/watchlists/{watchlist_id}` | Authenticated owner; UI/API-owned state | List seeds the default on first read; POST/PATCH/DELETE all require a durable HTTP idempotency key |
+| `data.py` | `GET /api/v1/data/symbols`; `GET /api/v1/data/markets`; `GET /api/v1/data/quotes`; `POST /api/v1/data/datasets/prepare`; `GET /api/v1/data/imports/dialects`; `POST /api/v1/data/imports` | Authenticated; Data | Read-only bounded discovery, full-catalog directory, and explicit-symbol quote reads; governed preparation and import with required idempotency |
 | `data_stream.py` | `GET /api/v1/data/stream?symbol=&mode=&timeframe=` | Authenticated `data:read`; Data owns acquisition and stream semantics | SSE transport bridge, quota admission, `Last-Event-ID`, and cleanup only |
 | `strategies.py` | `GET /api/v1/strategies`; `GET /api/v1/strategies/{strategy_id}/versions`; `POST /api/v1/strategies`; `PATCH /api/v1/strategies/{strategy_id}/parameters` | Authenticated exact permission; Strategy | Read-only catalogue/version evidence; governed mutations with required idempotency |
 | `research.py` | `POST /api/v1/research/run` | Authenticated researcher; Research | One bounded request returning registered Research evidence; internal profile/snapshot/artifact CRUD is absent |
@@ -1067,7 +1076,7 @@ declared by the Data owner, not route-locally. Live what-if sessions are bounded
 Simulator: at most 16 concurrent sessions, a 1800-second idle expiry, and at most 10,000
 ticks per step, refused at the route contract rather than at the engine.
 
-**Implementation notes:** backend v1 registers exactly 82 operations. Playback uses raw
+**Implementation notes:** backend v1 registers exactly 88 operations. Playback uses raw
 causative journal events (Option A); per-event equity reconstruction requires a
 separately approved enhancement. Live what-if results are advisory rather than recorded
 runs, and branching replays parent inputs on an independent engine so the parent is
@@ -1132,7 +1141,7 @@ feature folders. Required imports and required storage initialization never fail
 | Status | File group | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
 | Completed | `contracts.ts` | Zod schemas + inferred types mirroring `ApiResponse/ApiError/ApiMetadata` and the 21 stable error codes | `apiResponseSchema`, `apiMetadataSchema`, `apiErrorSchema`, `apiErrorCode`, `isApiSuccessResponse` | **Standard library:** None<br>**Required third-party:** `zod@^3.23.8`<br>**Local:** None |
-| Completed | `routes.ts` | Frozen typed `RouteContract` definitions for all 82 registered operations, plus the drift-test count | `ROUTE_CONTRACTS`, `ROUTE_CONTRACT_COUNT`, `ROUTE_CONTRACTS_BY_ID`, per-family route groups | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `contracts.ts` |
+| Completed | `routes.ts` | Frozen typed `RouteContract` definitions for all 88 registered operations, plus the drift-test count | `ROUTE_CONTRACTS`, `ROUTE_CONTRACT_COUNT`, `ROUTE_CONTRACTS_BY_ID`, per-family route groups | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `contracts.ts` |
 | Completed | `request.ts` | One transport primitive, typed errors, safe retry, stale metadata, governed options | `request`, `unwrapData`, `ApiClientError`, `resolveBaseUrl` | **Standard library:** browser `fetch` API, `crypto`, `URLSearchParams`<br>**Required third-party:** `zod@^3.23.8`<br>**Local:** `contracts.ts`, `routes.ts` |
 | Completed | Focused domain client files (`auth`, `health`, `settings`, `data`, `strategies`, `research`, `dashboards`, `operator`, `metrics`, `simulation`, `simulationSessions`, `risk`, `trading`, `portfolio`, `optimization`, `agentic`) plus `index.ts` | Map approved route groups to typed operations while exporting one catalog | `apiClients` | **Standard library:** None<br>**Required third-party:** `zod@^3.23.8`<br>**Local:** `request.ts`, `routes.ts` |
 
@@ -1141,7 +1150,7 @@ feature folders. Required imports and required storage initialization never fail
 | Completed | `FR-API-038` | Send typed requests with configured base URL, approved auth transport, canonical `req-<UUID4>` request IDs, trace IDs, safe JSON/204 parsing, contract validation, one opt-in transient GET retry, and stale metadata. | `request<T>(contract: RouteContract, options: RequestOptions) => Promise<ApiResponse<T>>` | External API call; telemetry | `ApiClientError`: typed HTTP/contract/transport failure | **Usage:** `tests/api/usage/09_frontend_clients.ts::testUsageRequest()`<br>**Unit:** `app/ui/src/clients/request.test.ts` |
 | Completed | `FR-API-039` | Expose only `data` from a successful envelope without creating another transport stack. | `unwrapData<T>(response: ApiResponse<T>) => T` | None | `ApiClientError`: response is not successful | **Usage:** `tests/api/usage/09_frontend_clients.ts::testUsageUnwrapData()`<br>**Unit:** `app/ui/src/clients/request.test.ts` |
 | Completed | `FR-API-040` | Carry status, code, request/trace IDs, retryability, and bounded details for frontend failures. | `ApiClientError extends Error` | None | None | **Usage:** `tests/api/usage/09_frontend_clients.ts::testUsageApiClientError()`<br>**Unit:** `app/ui/src/clients/request.test.ts` |
-| Completed | `FR-API-041` | Provide one catalog containing typed clients for all 82 registered operations across auth, health, settings, data, Strategy, Research, dashboards, operator, metrics, Simulation, playback, Risk, Trading, Portfolio, Optimization, and Agentic. | `apiClients: ApiClients` | External API call | `ApiClientError`: route contract fails | **Usage:** `tests/api/usage/09_frontend_clients.ts::testUsageFocusedClients()`<br>**Unit:** `app/ui/src/clients/clients.contract.test.ts`; `app/ui/src/clients/clients.test.ts` |
+| Completed | `FR-API-041` | Provide one catalog containing typed clients for all 88 registered operations across auth, health, settings, data, Strategy, Research, dashboards, operator, metrics, Simulation, playback, Risk, Trading, Portfolio, Optimization, and Agentic. | `apiClients: ApiClients` | External API call | `ApiClientError`: route contract fails | **Usage:** `tests/api/usage/09_frontend_clients.ts::testUsageFocusedClients()`<br>**Unit:** `app/ui/src/clients/clients.contract.test.ts`; `app/ui/src/clients/clients.test.ts` |
 
 **Configuration and Limits Manifest**
 
@@ -1404,6 +1413,47 @@ implements these four normalized RBAC relations. The old account claim JSON colu
 remain dormant compatibility fields because rebuilding the account baseline would
 require business attributes the current identity feature does not own.
 
+#### `api_watchlists` / `api_watchlist_items`
+
+```sql
+CREATE TABLE api_watchlists (
+    watchlist_id     TEXT    PRIMARY KEY,
+    account_id       TEXT    NOT NULL REFERENCES api_accounts(user_id) ON DELETE RESTRICT,
+    name             TEXT    NOT NULL CHECK (name <> ''),
+    is_default       INTEGER NOT NULL CHECK (is_default IN (0, 1)),
+    sort_order       INTEGER NOT NULL,
+    created_at       TEXT    NOT NULL,
+    updated_at       TEXT    NOT NULL,
+    UNIQUE (account_id, name)
+) STRICT;
+
+-- At most one default watchlist per account, enforced at the DB layer so the
+-- invariant holds even if application logic has a bug.
+CREATE UNIQUE INDEX idx_api_watchlists_one_default
+    ON api_watchlists(account_id) WHERE is_default = 1;
+CREATE INDEX idx_api_watchlists_account ON api_watchlists(account_id);
+
+CREATE TABLE api_watchlist_items (
+    watchlist_id     TEXT    NOT NULL REFERENCES api_watchlists(watchlist_id) ON DELETE RESTRICT,
+    source_id        TEXT    NOT NULL,
+    symbol           TEXT    NOT NULL CHECK (symbol <> ''),
+    sort_order       INTEGER NOT NULL,
+    created_at       TEXT    NOT NULL,
+    PRIMARY KEY (watchlist_id, source_id, symbol)
+) STRICT, WITHOUT ROWID;
+
+CREATE INDEX idx_api_watchlist_items_watchlist ON api_watchlist_items(watchlist_id);
+```
+
+`watchlist_id` is derived deterministically from `(account_id, name)` (`derive_stable_id("id",
+f"watchlist:{account_id}:{name}")`), the same pair the `UNIQUE` constraint already enforces, so
+seeding the curated default watchlist on an account's first read is naturally idempotent with no
+separate existence probe. Deleting a watchlist is a two-statement transaction (items, then the
+watchlist row) rather than `ON DELETE CASCADE`, matching this package's preference for explicit
+multi-statement transactions over relying on SQLite foreign-key cascade behavior. Every item
+carries its own `source_id` so a watchlist can in principle mix symbols from more than one
+provider, even though today's single-runtime-broker deployment only ever writes one.
+
 #### `api_keys`
 
 ```sql
@@ -1620,7 +1670,7 @@ because they are required before it can be reached.
 | Completed | `NFR-API-001` | Architecture | UI/API shall import only documented public cross-domain APIs, contain no domain calculations, and confine broker access to credential-safe composition. | Package-root import, persistence-layout, and exact-provider graph tests. |
 | Completed | `NFR-API-002` | Security | Protected endpoints require validated user/service context; governed writes require permission, audit, idempotency, fresh evidence, and approval when applicable. | `tests/api/nfr/test_nfr_002_security.py` |
 | Completed | `NFR-API-003` | Safety | Live/paper mutations cannot bypass Trading/Risk live flags, broker readiness, reconciliation, idempotency, audit, or kill-switch gates. Live is reachable only when the request names the deployment's configured `execution_route` **and** `allow_live_mutations` is set **and** a live `BrokerConnectionConfig` is composed; the boundary adds no live-only route, so there is one execution path to audit rather than two. | `tests/api/nfr/test_nfr_003_safety.py`; `tests/api/unit/test_trading_routes.py::test_live_execution_requires_explicit_enablement`; `tests/api/contracts/test_route_absence.py::test_no_separate_live_execution_surface_exists` |
-| Completed | `NFR-API-004` | Contracts | Non-stream responses use `ApiResponse`; streams use `StreamEvent`; API/UI drift fails CI. | Backend OpenAPI digest and operation inventory are frozen at 82 operations; the frontend declares the same 82 contracts and the drift test asserts id/method/path/permission parity (`app/ui/src/clients/clients.contract.test.ts`). |
+| Completed | `NFR-API-004` | Contracts | Non-stream responses use `ApiResponse`; streams use `StreamEvent`; API/UI drift fails CI. | Backend OpenAPI digest and operation inventory are frozen at 88 operations; the frontend declares the same 88 contracts and the drift test asserts id/method/path/permission parity (`app/ui/src/clients/clients.contract.test.ts`). |
 | Completed | `NFR-API-005` | Security | Logs, errors, traces, telemetry, examples, and screenshots contain no tokens, credentials, passwords, CSRF values, raw secrets, or private broker data. | `tests/api/nfr/test_nfr_005_redaction.py` |
 | Completed | `NFR-API-006` | Reliability | Required-route/dependency failures block startup/readiness; only explicitly optional routes degrade with a visible reason. | `tests/api/nfr/test_nfr_006_startup.py` |
 | Completed | `NFR-API-007` | Streaming | Disconnect stops delivery, releases resources, preserves authoritative owner state, and emits no later client events. | `tests/api/nfr/test_nfr_007_streaming.py` |
@@ -1631,7 +1681,7 @@ because they are required before it can be reached.
 | Completed | `NFR-API-012` | Timeouts | Non-stream endpoints complete or return a structured timeout within 30 seconds; no initial Simulation/Optimization async contract exists. | `tests/api/unit/middleware/test_policies.py:31` |
 | Completed | `NFR-API-013` | Resilience | Only opt-in idempotent reads retry once for classified transient failures; governed writes and unknown broker outcomes never retry blindly. | `tests/api/nfr/test_nfr_013_resilience.py` |
 | Completed | `NFR-API-014` | Imports | External dataset import is exposed as one governed write plus one dialect read, both delegating to Data's own parser, validator, and storage. The gateway never reads the source file and never selects a dialect. | `tests/api/unit/test_data_routes.py` |
-| Completed | `NFR-API-016` | Testing | Every public symbol has one usage example and unit test; every collaborative workflow has an integration test; coverage is at least 80%. | API-domain coverage is 82.19% (`pytest -o addopts='' tests/api --cov=app/services/api --cov-branch --cov-fail-under=80` passes with 236 tests); 17 numbered usage programs, 8 NFR suites, unit/integration/contract/absence tests across `tests/api/`. The frontend suite runs under `vitest`: 127 tests across 32 files, including the 81-contract drift test. |
+| Completed | `NFR-API-016` | Testing | Every public symbol has one usage example and unit test; every collaborative workflow has an integration test; coverage is at least 80%. | API-domain coverage is 82.19% (`pytest -o addopts='' tests/api --cov=app/services/api --cov-branch --cov-fail-under=80` passes with 236 tests); 17 numbered usage programs, 8 NFR suites, unit/integration/contract/absence tests across `tests/api/`. The frontend suite runs under `vitest`: 127 tests across 32 files, including the 88-contract drift test. |
 | Completed | `NFR-API-017` | Quality | Backend and frontend build, lint, format, type, contract, security, and targeted tests are runnable in CI. | `.github/workflows/ci.yml` runs `scripts/ci_check.py` (ruff format, ruff check, mypy, pytest) on every push/PR; frontend runs `tsc`, `vitest`, `next lint`, `next build`. |
 | Completed | `NFR-API-018` | Determinism | Contract registration, route ordering, cursor ordering, and idempotency conflict behavior are deterministic. | `tests/api/nfr/test_nfr_018_determinism.py` (registry order, size, OpenAPI paths + operation inventory deterministic across builds) |
 
@@ -1732,15 +1782,15 @@ created. During iterative work, run only tests associated with changed files.
 - [x] Every owned and consumed contract is version-compatible with its owner/consumer.
 - [x] UI/API owns no undocumented durable state and writes no other domain's state.
 - [x] Every route contract is registered and every frontend client maps to one
-  (82 backend operations, 82 frontend contracts, drift-tested both ways).
+  (88 backend operations, 88 frontend contracts, drift-tested both ways).
 - [x] All unit, integration, contract, usage, accessibility, security, and quality
   checks pass with at least 80% backend coverage (236 passed, 82.19% branch coverage;
   `ruff`, `ruff format`, and `mypy` clean across 78 source files; 225 Simulator tests
-  pass; frontend `vitest` includes the 82-contract
+  pass; frontend `vitest` includes the 88-contract
   drift test).
 - [x] No unresolved decision affects completed behavior.
 
-Current implementation status: `Completed` for backend v1 at 82 operations with matching
+Current implementation status: `Completed` for backend v1 at 88 operations with matching
 frontend parity, and no remaining capability gap. Every requirement, workflow, feature,
 and capability row is closed; nothing is `Partial`, `Missing`, or `Excluded`.
 

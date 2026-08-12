@@ -1,7 +1,7 @@
 /**
  * Drift test: the frontend client catalog mirrors the backend route inventory.
  *
- * Asserts that `ROUTE_CONTRACTS` in `routes.ts` contains exactly the 83
+ * Asserts that `ROUTE_CONTRACTS` in `routes.ts` contains exactly the 88
  * approved backend-v1 operations with the expected method/path/permission,
  * matching `app/services/api/contracts/catalog.py` (`_KNOWN_ROUTE_CONTRACTS`).
  * A backend route add/remove/rename must be reflected here or this test fails.
@@ -34,8 +34,13 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.settings.manifest", method: "GET", path: "/api/v1/settings/manifest", permission: "settings:admin" },
   { id: "api.settings.credentials.read", method: "GET", path: "/api/v1/settings/credentials", permission: "settings:admin" },
   { id: "api.settings.credentials.update", method: "PUT", path: "/api/v1/settings/credentials/{slot}", permission: "settings:admin" },
+  { id: "api.watchlists.list", method: "GET", path: "/api/v1/watchlists", permission: "watchlists:read" },
+  { id: "api.watchlists.create", method: "POST", path: "/api/v1/watchlists", permission: "watchlists:write" },
+  { id: "api.watchlists.update", method: "PATCH", path: "/api/v1/watchlists/{watchlist_id}", permission: "watchlists:write" },
+  { id: "api.watchlists.delete", method: "DELETE", path: "/api/v1/watchlists/{watchlist_id}", permission: "watchlists:write" },
   { id: "api.data.symbols", method: "GET", path: "/api/v1/data/symbols", permission: "data:read" },
   { id: "api.data.markets", method: "GET", path: "/api/v1/data/markets", permission: "data:read" },
+  { id: "api.data.quotes", method: "GET", path: "/api/v1/data/quotes", permission: "data:read" },
   { id: "api.data.capabilities", method: "GET", path: "/api/v1/data/capabilities", permission: "data:read" },
   { id: "api.data.stream", method: "GET", path: "/api/v1/data/stream", permission: "data:read" },
   { id: "api.indicators.list", method: "GET", path: "/api/v1/indicators", permission: "indicators:read" },
@@ -143,9 +148,9 @@ const EXPECTED: ReadonlyArray<{
 ];
 
 describe("clients match the backend route catalog", () => {
-  it("has exactly the approved 83 operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(83);
-    expect(ROUTE_CONTRACTS).toHaveLength(83);
+  it("has exactly the approved 88 operations", () => {
+    expect(ROUTE_CONTRACT_COUNT).toBe(88);
+    expect(ROUTE_CONTRACTS).toHaveLength(88);
   });
 
   it("matches every expected id, method, path, and permission", () => {

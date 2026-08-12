@@ -278,10 +278,14 @@ No experimental callable or Risk regime classifier is exported. Excluded capabil
 
 > **Workflow usage evidence:** Each completed workflow has one standalone
 > input-to-output program with README-aligned stages. Market-dependent programs read
-> genuine MT5 demo evidence through Data. Run all programs with
+> genuine MT5 demo evidence through Data using only the enabled, encrypted system
+> credential slot already stored in the configured database. Usage code never enables
+> MT5, writes credentials, or substitutes a fallback account/server; unavailable or
+> invalid persisted configuration fails closed. Run all programs with
 > `python tests/indicators/usage/workflows/run_all.py`. The pytest execution evidence
-> is deliberately opt-in with `INDICATORS_USAGE_LIVE_MT5=1`; ordinary CI never opens
-> a broker connection. This satisfies
+> is deliberately opt-in with `INDICATORS_USAGE_LIVE_MT5=1` and requires
+> `ENVIRONMENT=dev`; ordinary CI skips genuine subprocesses and opens no broker
+> connection. Only unit tests may replace the MT5 boundary with fakes. This satisfies
 > `NFR-INDI-011` and complements feature-level usage evidence.
 
 ### Workflow rank values
@@ -1570,7 +1574,7 @@ domain.
 | Completed | `NFR-INDI-008` | Data boundary | The package shall consume and propagate Data-owned provenance/quality/alignment evidence without implementing provider normalization, calendar, symbol-mapping, or quote-quality policy. | Producer-consumer contract tests |
 | Completed | `NFR-INDI-009` | Reliability | Validation, resource-limit, and calculation failures shall be atomic, deterministic, and fail closed; no partial official result is published. No raw upstream exception crosses the public port. External deadlines and cancellation remain orchestrator-owned. | Failure-injection tests; `tests/indicators/structural/test_large_input.py` (boundary guard coverage) and `tests/indicators/component/test_zigzag.py` |
 | Completed | `NFR-INDI-010` | Concurrency | Public calculations and registry reads shall be thread-safe through immutability and absence of shared mutable state. | `tests/indicators/structural/test_concurrency.py` (parallel checksum equality, shared-input immutability, parallel registry reads, immutable registry storage) |
-| Completed | `NFR-INDI-011` | Testing | Every `FR-INDI-*` shall have usage and unit coverage; formulas require approved hand-calculated golden fixtures and invariants/property tests. No absent historical implementation or third-party indicator library is normative. | Traceability and coverage audit |
+| Completed | `NFR-INDI-011` | Testing | Every `FR-INDI-*` shall have usage and unit coverage; formulas require approved hand-calculated golden fixtures and invariants/property tests. Provider-backed usage resolves only the enabled encrypted system credential slot from the configured database in `ENVIRONMENT=dev`, performs bounded read-only retrieval, and fails closed without mutating settings or credentials. Ordinary pytest skips genuine MT5 subprocesses unless `INDICATORS_USAGE_LIVE_MT5=1`; fake MT5 boundaries are unit-test-only. No absent historical implementation or third-party indicator library is normative. | `tests/indicators/unit/test_usage_support.py`; `tests/indicators/integration/test_usage_scripts.py`; traceability and coverage audit |
 | Completed | `NFR-INDI-012` | Coverage | The package shall maintain at least 80% statement and branch coverage, with all documented error paths exercised. | `pytest --cov`; 2026-07-24 measured branch-enabled coverage 91.71% over 1770 statements / 342 branches (151 passed) |
 | Completed | `NFR-INDI-013` | Dependencies | Runtime dependencies shall be direct project dependencies and locked at the approved baseline declared in `pyproject.toml`: Python `>=3.14`, pandas `==3.0.3`, and NumPy `==2.4.6`. No patch-level Python pin is declared, so any 3.14.x interpreter satisfies the baseline. | `pyproject.toml`, `uv.lock`, and dependency-version audit |
 | Completed | `NFR-INDI-014` | Security | Errors, manifests, and quality/provenance metadata shall exclude secrets and raw full input payloads; safe details are redacted before crossing the boundary. | Security/redaction tests |

@@ -71,6 +71,7 @@ from app.services.data.evidence.market_context_contracts import (
     MARKET_CONTEXT_SCHEMA,
     MarketContextRequest,
 )
+from app.services.data.market_data import asset_classifier as _asset_classifier
 from app.services.data.market_data import level1 as _level1
 from app.services.data.market_data import requests as _market_requests
 from app.services.data.market_data import snapshot as _snapshot
@@ -1501,3 +1502,12 @@ def build_market_snapshot_request(*args: Any, **kwargs: Any) -> Any:
         The result produced by the operation.
     """
     return _snapshot.MarketSnapshotRequest(*args, **kwargs)
+
+
+def get_display_asset_classes() -> tuple[str, ...]:
+    """Return the supported market-directory asset classes.
+
+    Returns:
+        Immutable ordered asset-class tokens.
+    """
+    return _asset_classifier.DISPLAY_ASSET_CLASSES

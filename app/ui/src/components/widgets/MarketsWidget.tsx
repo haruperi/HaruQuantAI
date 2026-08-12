@@ -3,17 +3,17 @@
 import React, { useEffect, useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import { assetClasses } from '../../mock/productsData';
-import { apiClients, unwrapData, type MarketRow } from '@/clients';
+import { apiClients, unwrapData, type MarketRow, type Watchlist } from '@/clients';
 import { MoreVertical, LineChart, AlignJustify, Layers } from 'lucide-react';
 
 /**
  * Derived display row built from a real market-directory row.
  *
- * The directory endpoint returns categorized symbols with Level-1 + latest
- * D1-bar evidence. Historical ATR(14) and ADR(10) are not part of the
- * directory surface yet, so Volatility/ADR/Range are nullable and render
- * an em-dash when absent. The fields that are populated (range, rangePct)
- * are derived from today's high/low.
+ * Volatility (annualized, %), ADR (10-session average daily range, in pips),
+ * and Range (today's range as % of that ADR) are API-composed overlays from
+ * Data's D1 bars plus Indicators' formulas, requested via
+ * `includeTechnicals`. Any leg may be `null` when a symbol lacks enough
+ * history; the table renders an em-dash for those.
  */
 interface DisplayRow {
   symbol: string;
@@ -22,6 +22,7 @@ interface DisplayRow {
   decimals: number;
   last: number | null;
   change: number | null;
+  changePips: number | null;
   changePercent: number | null;
   open: number | null;
   high: number | null;
@@ -33,7 +34,7 @@ interface DisplayRow {
   volatility: number | null;
 }
 
-/** Map one API row into a display row with derived intraday range. */
+/** Map one API row into a display row. */
 function toDisplayRow(row: MarketRow): DisplayRow {
   const high = row.high;
   const low = row.low;
@@ -45,17 +46,22 @@ function toDisplayRow(row: MarketRow): DisplayRow {
     decimals: row.digits ?? 2,
     last: row.last,
     change: row.change,
+    changePips: row.change_pips ?? null,
     changePercent: row.change_percent,
     open: row.open,
     high,
     low,
     volume: row.volume,
     range,
-    rangePct: range !== null && row.open ? (range / row.open) * 100 : null,
-    adr: null,
-    volatility: null,
+    rangePct: row.range_percent_of_adr ?? null,
+    adr: row.adr ?? null,
+    volatility: row.volatility ?? null,
   };
 }
+
+// Bound provider work and render each batch as soon as it resolves. Sequential
+// batches avoid opening concurrent broker sessions for large watchlists.
+const QUOTE_BATCH_SIZE = 4;
 
 export const MarketsWidget: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Forex');
@@ -65,31 +71,74 @@ export const MarketsWidget: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [errorMsg, setErrorMsg] = useState('');
 
+  const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
+  const [activeWatchlistId, setActiveWatchlistId] = useState<string | null>(null);
+
   const { openOrderTicket, submitOrder, oneClickTrading, addWidgetToWorkspace } = useTradingStore();
 
-  // Fetch the categorized market directory from the configured runtime broker
-  // on mount. The backend resolves the runtime broker when source_id is omitted,
-  // so this widget needs no broker identity of its own.
+  // Load the caller's watchlists on mount and select the account's default
+  // watchlist as the initial active one; the backend seeds it on first read,
+  // so this always resolves to at least one watchlist.
   useEffect(() => {
     let cancelled = false;
-    setStatus('loading');
-    void apiClients.data
-      .markets({ limit: 200 })
+    void apiClients.watchlists
+      .list()
       .then((response) => {
         if (cancelled) return;
-        const page = unwrapData(response);
-        setDirectory(page.rows.map(toDisplayRow));
-        setStatus('ready');
+        const lists = unwrapData(response);
+        setWatchlists(lists);
+        const defaultList = lists.find((item) => item.is_default) ?? lists[0];
+        setActiveWatchlistId(defaultList ? defaultList.watchlist_id : null);
       })
       .catch(() => {
         if (cancelled) return;
-        setErrorMsg('Unable to load markets from the runtime broker.');
+        setErrorMsg('Unable to load watchlists.');
         setStatus('error');
       });
     return () => {
       cancelled = true;
     };
   }, []);
+
+  const activeWatchlist = watchlists.find((item) => item.watchlist_id === activeWatchlistId) ?? null;
+  const activeSymbols = activeWatchlist ? activeWatchlist.items.map((item) => item.symbol) : [];
+
+  // Fetch quotes for exactly the active watchlist's symbols. Unlike the old
+  // limit=200 full-catalog fetch, this scales with the watchlist size (~56
+  // symbols by default) instead of the broker's entire universe.
+  useEffect(() => {
+    if (activeSymbols.length === 0) {
+      setDirectory([]);
+      if (activeWatchlistId !== null) setStatus('ready');
+      return;
+    }
+    let cancelled = false;
+    setStatus('loading');
+    setDirectory([]);
+
+    const loadBatches = async (): Promise<void> => {
+      try {
+        for (let index = 0; index < activeSymbols.length; index += QUOTE_BATCH_SIZE) {
+          const symbols = activeSymbols.slice(index, index + QUOTE_BATCH_SIZE);
+          const response = await apiClients.data.quotes(symbols, { includeTechnicals: true });
+          if (cancelled) return;
+          const page = unwrapData(response);
+          setDirectory((current) => [...current, ...page.rows.map(toDisplayRow)]);
+        }
+        if (!cancelled) setStatus('ready');
+      } catch {
+        if (cancelled) return;
+        setErrorMsg('Unable to load quotes for the active watchlist.');
+        setStatus('error');
+      }
+    };
+
+    void loadBatches();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeWatchlistId, activeSymbols.join(',')]);
 
   const filteredProducts = directory.filter((p) => p.assetClass === selectedCategory);
 
@@ -108,6 +157,24 @@ export const MarketsWidget: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Active Watchlist Selector */}
+      <div style={{ padding: '6px 10px', background: 'var(--cme-navy-dark)', borderBottom: '1px solid var(--cme-navy-border)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ fontWeight: 700, fontSize: '11px', color: 'var(--text-muted)' }}>WATCHLIST:</span>
+        <select
+          className="form-select"
+          value={activeWatchlistId ?? ''}
+          onChange={(e) => setActiveWatchlistId(e.target.value)}
+          style={{ padding: '2px 6px', fontSize: '11px' }}
+        >
+          {watchlists.map((item) => (
+            <option key={item.watchlist_id} value={item.watchlist_id}>
+              {item.name}
+              {item.is_default ? ' (default)' : ''}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Category Pills Bar */}
       <div className="category-pills">
         {assetClasses.map((cat) => (
@@ -140,13 +207,13 @@ export const MarketsWidget: React.FC = () => {
 
       {/* Main Markets Table */}
       <div style={{ flex: 1, overflow: 'auto' }}>
-        {status === 'loading' && (
+        {status === 'loading' && directory.length === 0 && (
           <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted, #718294)' }}>
-            Loading markets from the runtime broker…
+            Loading quotes for the active watchlist…
           </div>
         )}
         {status === 'error' && (
-          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--financial-negative, #ff4975)' }}>
+          <div role="alert" style={{ padding: '8px 24px', textAlign: 'center', color: 'var(--financial-negative, #ff4975)' }}>
             {errorMsg}
           </div>
         )}
@@ -155,20 +222,19 @@ export const MarketsWidget: React.FC = () => {
             No symbols available for {selectedCategory}.
           </div>
         )}
-        {status === 'ready' && sortedProducts.length > 0 && (
+        {directory.length > 0 && sortedProducts.length > 0 && (
         <table className="cme-table">
           <thead>
             <tr>
               <th>Name</th>
               <th>Last Price</th>
               <th>Change</th>
-              <th title="ATR(14) as a percentage of last price">Volatility</th>
+              <th title="Prior settled 10-session annualized rolling volatility">Volatility</th>
               <th title="Average daily range over the last 10 sessions">ADR</th>
               <th title="Today's high minus low, and how much of the ADR it has used">Range</th>
               <th>Open</th>
               <th>High</th>
               <th>Low</th>
-              <th>Volume</th>
               <th style={{ textAlign: 'center' }}>Actions</th>
             </tr>
           </thead>
@@ -177,14 +243,20 @@ export const MarketsWidget: React.FC = () => {
               const isUp = (p.change ?? 0) > 0;
               const isDown = (p.change ?? 0) < 0;
               const priceClass = isUp ? 'price-up' : isDown ? 'price-down' : 'price-flat';
+              const changePips =
+                p.changePips === null
+                  ? null
+                  : `${p.changePips >= 0 ? '+' : ''}${p.changePips.toFixed(1)}`;
+              const changePercent =
+                p.changePercent === null
+                  ? null
+                  : `${p.changePercent >= 0 ? '+' : ''}${p.changePercent.toFixed(2)}%`;
               const changeCell =
-                p.change === null || p.changePercent === null
+                changePips === null || changePercent === null
                   ? '—'
-                  : `${isUp ? '+' : ''}${p.change.toFixed(2)} (${p.changePercent.toFixed(2)}%)`;
+                  : `${changePips} (${changePercent})`;
               const rangePctCell =
                 p.rangePct === null ? '—' : `${p.rangePct.toFixed(0)}%`;
-              const volumeCell =
-                p.volume === null ? '—' : p.volume.toLocaleString();
 
               return (
                 <tr key={p.symbol}>
@@ -194,7 +266,9 @@ export const MarketsWidget: React.FC = () => {
                   <td style={{ fontFamily: 'var(--font-mono)' }}>
                     {p.volatility === null ? '—' : `${p.volatility.toFixed(2)}%`}
                   </td>
-                  <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.adr, p)}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)' }}>
+                    {p.adr === null ? '—' : `${p.adr.toFixed(1)} pips`}
+                  </td>
                   <td style={{ fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>
                     {fmt(p.range, p)}
                     <span className={`range-pct ${(p.rangePct ?? 0) >= 100 ? 'range-extended' : ''}`}>
@@ -204,7 +278,6 @@ export const MarketsWidget: React.FC = () => {
                   <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.open, p)}</td>
                   <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.high, p)}</td>
                   <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.low, p)}</td>
-                  <td style={{ fontFamily: 'var(--font-mono)' }}>{volumeCell}</td>
                   <td style={{ textAlign: 'center', position: 'relative' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                       <button

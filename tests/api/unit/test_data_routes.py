@@ -15,7 +15,7 @@ import pytest
 from app.services.api.composition import data_dependencies
 from app.services.api.identity import require_auth_context
 from app.services.api.routes import data
-from app.utils import create_auth_context, utc_now
+from app.utils import create_auth_context, generate_id, utc_now
 from fastapi import FastAPI
 
 from tests.api._support import get_json, post_json
@@ -434,3 +434,202 @@ def test_markets_forwards_explicit_source_id(
     response = client.get("/api/v1/data/markets?source_id=binance_spot")
     assert response.status_code == 200
     assert captured["override"] == "binance_spot"
+
+
+def test_quotes_requires_read_permission() -> None:
+    """The quotes route refuses callers without data:read permission."""
+    app = FastAPI()
+    app.include_router(data.router)
+    app.dependency_overrides[require_auth_context] = lambda: _auth(permissions=())
+    status_code, _body = get_json(
+        app, "/api/v1/data/quotes", query_string="symbols=EURUSD"
+    )
+    assert status_code == 403
+
+
+def test_quotes_requires_at_least_one_symbol() -> None:
+    """An empty symbols query is rejected before any Data delegation."""
+    status_code, body = get_json(
+        _markets_app(), "/api/v1/data/quotes", query_string="symbols="
+    )
+    assert status_code == 422
+    assert body["detail"] == "SYMBOLS_REQUIRED"
+
+
+def test_quotes_delegates_once_with_parsed_symbols(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The quotes route parses comma-separated symbols and delegates once to Data."""
+    from fastapi.testclient import TestClient
+
+    captured: dict[str, object] = {}
+
+    def _fake_resolve(
+        override: str | None = None, *, request_id: str | None = None
+    ) -> str:
+        captured["override"] = override
+        return "mt5"
+
+    def _fake_quotes(request: object) -> object:
+        captured["source_id"] = request.source_id
+        captured["symbols"] = request.symbols
+        return SimpleNamespace(
+            status="success",
+            data={
+                "source_id": "mt5",
+                "rows": [],
+                "limit": 2,
+                "next_cursor": None,
+                "revision": "1.0.0",
+                "generated_at": "2026-08-10T12:00:00Z",
+                "request_id": "req-1",
+            },
+            message="ok",
+            error=None,
+            metadata={},
+        )
+
+    monkeypatch.setattr(data, "resolve_runtime_source_id", _fake_resolve)
+    monkeypatch.setattr(data, "get_symbols_quotes", _fake_quotes)
+
+    client = TestClient(_markets_app(), raise_server_exceptions=True)
+    response = client.get("/api/v1/data/quotes?symbols=EURUSD, GBPUSD")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["data"]["source_id"] == "mt5"
+    assert captured["override"] is None
+    assert captured["source_id"] == "mt5"
+    assert captured["symbols"] == ("EURUSD", "GBPUSD")
+
+
+def test_quotes_merges_technical_overlays_when_requested(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """include_technicals=true merges the composed overlay into each row."""
+    from datetime import UTC, datetime
+
+    from app.services.api.routes import market_overlays
+    from app.services.data.market_data.directory_contracts import (
+        MarketDirectory,
+        MarketDirectoryRow,
+    )
+    from fastapi.testclient import TestClient
+
+    def _fake_resolve(
+        override: str | None = None, *, request_id: str | None = None
+    ) -> str:
+        return "mt5"
+
+    directory = MarketDirectory(
+        source_id="mt5",
+        rows=(
+            MarketDirectoryRow(
+                symbol="EURUSD",
+                name="EURUSD",
+                asset_class="Forex",
+                source_id="mt5",
+                digits=5,
+                last=1.1,
+                bid=1.1,
+                ask=1.1002,
+            ),
+        ),
+        limit=1,
+        next_cursor=None,
+        revision="1.0.0",
+        generated_at=datetime(2026, 8, 10, 12, tzinfo=UTC),
+        request_id=generate_id("req"),
+    )
+
+    def _fake_quotes(request: object) -> object:
+        return SimpleNamespace(
+            status="success", data=directory, message="ok", error=None, metadata={}
+        )
+
+    captured_overlay_calls: list[tuple[str, str]] = []
+
+    def _fake_overlay(
+        source_id: str, symbol: str, *, request_id: str | None = None
+    ) -> object:
+        captured_overlay_calls.append((source_id, symbol))
+        return market_overlays.TechnicalOverlay(
+            volatility_percent=5.5,
+            adr_pips=42.0,
+            range_percent_of_adr=61.0,
+            pip_size=0.0001,
+            open=1.09,
+            high=1.11,
+            low=1.08,
+        )
+
+    monkeypatch.setattr(data, "resolve_runtime_source_id", _fake_resolve)
+    monkeypatch.setattr(data, "get_symbols_quotes", _fake_quotes)
+    monkeypatch.setattr(data, "build_technical_overlay", _fake_overlay)
+
+    client = TestClient(_markets_app(), raise_server_exceptions=True)
+    response = client.get("/api/v1/data/quotes?symbols=EURUSD&include_technicals=true")
+
+    assert response.status_code == 200
+    row = response.json()["data"]["rows"][0]
+    assert row["volatility"] == 5.5
+    assert row["adr"] == 42.0
+    assert row["range_percent_of_adr"] == 61.0
+    assert row["open"] == 1.09
+    assert row["high"] == 1.11
+    assert row["low"] == 1.08
+    assert row["change"] == pytest.approx(0.01)
+    assert row["change_percent"] == pytest.approx(0.9174311926605506)
+    assert row["change_pips"] == pytest.approx(100.0)
+    assert captured_overlay_calls == [("mt5", "EURUSD")]
+
+
+def test_quotes_omits_technical_overlays_by_default(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Without include_technicals, the overlay composer is never called."""
+    from datetime import UTC, datetime
+
+    from app.services.data.market_data.directory_contracts import (
+        MarketDirectory,
+        MarketDirectoryRow,
+    )
+    from fastapi.testclient import TestClient
+
+    def _fake_resolve(
+        override: str | None = None, *, request_id: str | None = None
+    ) -> str:
+        return "mt5"
+
+    directory = MarketDirectory(
+        source_id="mt5",
+        rows=(
+            MarketDirectoryRow(
+                symbol="EURUSD", name="EURUSD", asset_class="Forex", source_id="mt5"
+            ),
+        ),
+        limit=1,
+        next_cursor=None,
+        revision="1.0.0",
+        generated_at=datetime(2026, 8, 10, 12, tzinfo=UTC),
+        request_id=generate_id("req"),
+    )
+
+    def _fake_quotes(request: object) -> object:
+        return SimpleNamespace(
+            status="success", data=directory, message="ok", error=None, metadata={}
+        )
+
+    def _unexpected_overlay(*args: object, **kwargs: object) -> object:
+        raise AssertionError("overlay composer must not run without opt-in")
+
+    monkeypatch.setattr(data, "resolve_runtime_source_id", _fake_resolve)
+    monkeypatch.setattr(data, "get_symbols_quotes", _fake_quotes)
+    monkeypatch.setattr(data, "build_technical_overlay", _unexpected_overlay)
+
+    client = TestClient(_markets_app(), raise_server_exceptions=True)
+    response = client.get("/api/v1/data/quotes?symbols=EURUSD")
+
+    assert response.status_code == 200
+    row = response.json()["data"]["rows"][0]
+    assert "volatility" not in row

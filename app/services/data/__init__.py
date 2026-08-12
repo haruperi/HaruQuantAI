@@ -103,6 +103,7 @@ from app.services.data._shared.operations import (
     get_data_error_manifest,
     get_data_migration_steps,
     get_default_minimum_impact,
+    get_display_asset_classes,
     get_forex_named_sessions,
     get_fx_conversion_evidence_schema,
     get_market_context_schema,
@@ -219,8 +220,8 @@ from app.services.data.integrity import (
     validate_symbol_metadata,
 )
 from app.services.data.market_data import (
-    DISPLAY_ASSET_CLASSES,
     build_market_directory_request,
+    build_symbols_quote_request,
     classify_symbol,
     discover_symbols,
     fetch_historical_volume,
@@ -233,6 +234,7 @@ from app.services.data.market_data import (
     get_market_snapshot,
     get_spread_data,
     get_symbol_metadata,
+    get_symbols_quotes,
     get_tick_data,
     inspect_availability,
     list_market_directory,
@@ -354,16 +356,6 @@ from app.services.data.transformation import (
     to_tick_dataframe,
 )
 
-
-def get_display_asset_classes() -> tuple[str, ...]:
-    """Return the canonical Markets-widget display asset classes.
-
-    Returns:
-        Immutable ordered display asset-class tokens.
-    """
-    return DISPLAY_ASSET_CLASSES
-
-
 __all__ = (
     "acquire_write_lock",
     "aggregate_flags",
@@ -456,6 +448,7 @@ __all__ = (
     "build_symbol_list_request",
     "build_symbol_metadata",
     "build_symbol_metadata_request",
+    "build_symbols_quote_request",
     "build_synthetic_request",
     "build_tick_record",
     "build_trade_payload",
@@ -560,6 +553,7 @@ __all__ = (
     "get_symbol_event_profile",
     "get_symbol_event_profiles",
     "get_symbol_metadata",
+    "get_symbols_quotes",
     "get_tick_data",
     "get_timeframe_manifest",
     "get_timeframe_spec",

@@ -384,10 +384,104 @@ def create_settings_record(
     return int(result.affected_rows)
 
 
+def create_watchlist_record(
+    *,
+    watchlist_id: str,
+    account_id: str,
+    name: str,
+    is_default: bool,
+    sort_order: int,
+    created_at: str,
+    request_id: str,
+) -> int:
+    """Create one watchlist row.
+
+    Args:
+        watchlist_id: Stable watchlist identifier.
+        account_id: Owning account identifier.
+        name: Display name, unique per account.
+        is_default: Whether this is the account's sole default watchlist.
+        sort_order: Display order among the account's watchlists.
+        created_at: ISO-formatted creation instant.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Number of affected rows; 0 if the account already has this name.
+
+    Raises:
+        IdentityError: If Data cannot confirm the transaction.
+    """
+    logger.debug("Creating API watchlist persistence record")
+    result = _execute_create(
+        (
+            "INSERT INTO api_watchlists "
+            "(watchlist_id, account_id, name, is_default, sort_order, "
+            "created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(account_id, name) DO NOTHING",
+        ),
+        (
+            (
+                watchlist_id,
+                account_id,
+                name,
+                int(is_default),
+                sort_order,
+                created_at,
+                created_at,
+            ),
+        ),
+        request_id=request_id,
+    )
+    return int(result.affected_rows)
+
+
+def create_watchlist_items(
+    *,
+    watchlist_id: str,
+    items: tuple[tuple[str, str, int], ...],
+    created_at: str,
+    request_id: str,
+) -> int:
+    """Bulk-insert one watchlist's items in a single transaction.
+
+    Args:
+        watchlist_id: Owning watchlist identifier.
+        items: Ordered ``(source_id, symbol, sort_order)`` triples.
+        created_at: ISO-formatted creation instant applied to every item.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Number of affected rows.
+
+    Raises:
+        IdentityError: If Data cannot confirm the transaction.
+    """
+    if not items:
+        return 0
+    logger.debug("Creating API watchlist item persistence records")
+    statement = (
+        "INSERT INTO api_watchlist_items "
+        "(watchlist_id, source_id, symbol, sort_order, created_at) "
+        "VALUES (?, ?, ?, ?, ?) "
+        "ON CONFLICT(watchlist_id, source_id, symbol) DO NOTHING"
+    )
+    result = _execute_create(
+        tuple(statement for _ in items),
+        tuple(
+            (watchlist_id, source_id, symbol, sort_order, created_at)
+            for source_id, symbol, sort_order in items
+        ),
+        request_id=request_id,
+    )
+    return int(result.affected_rows)
+
+
 __all__ = [
     "create_account_record",
     "create_approval_record",
     "create_idempotency_record",
     "create_settings_record",
+    "create_watchlist_items",
+    "create_watchlist_record",
     "replace_active_session_record",
 ]

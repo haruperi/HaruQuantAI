@@ -1,11 +1,13 @@
 """Typed registration, login, and logout HTTP routes."""
 
-from typing import TYPE_CHECKING, Annotated, NoReturn
+from functools import lru_cache
+from typing import TYPE_CHECKING, Annotated, Final, NoReturn
 
 from fastapi import APIRouter, Cookie, Header, HTTPException, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.services.api._settings import get_api_settings
+from app.services.api.contracts import ROUTE_CONTRACT_REGISTRY
 from app.services.api.identity import (
     IdentityError,
     authenticate_user,
@@ -26,6 +28,37 @@ router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
 _SESSION_COOKIE = "hq_session"
 _CSRF_COOKIE = "hq_csrf"
+
+# Permissions that grant control over safety-critical or platform-admin
+# surfaces. Self-registered accounts never receive these; only an explicit
+# administrative grant should.
+_ADMIN_ONLY_PERMISSIONS: Final[frozenset[str]] = frozenset(
+    {
+        "settings:admin",
+        "ops:approve",
+        "risk:kill_switch",
+        "agentic:approve_promotion",
+    }
+)
+
+
+@lru_cache(maxsize=1)
+def _default_self_registration_permissions() -> tuple[str, ...]:
+    """Return the non-admin permission baseline for self-registered accounts.
+
+    Derived from the route contract catalog so newly declared permissions are
+    granted automatically unless explicitly listed in `_ADMIN_ONLY_PERMISSIONS`.
+
+    Returns:
+        Deduplicated, sorted, non-admin permission keys.
+    """
+    granted = {
+        contract.permission
+        for contract in ROUTE_CONTRACT_REGISTRY.all()
+        if contract.permission is not None
+        and contract.permission not in _ADMIN_ONLY_PERMISSIONS
+    }
+    return tuple(sorted(granted))
 
 
 class _Credentials(BaseModel):
@@ -103,6 +136,7 @@ def _register(
             username=credentials.username,
             password=credentials.password,
             request_id=request_id,
+            permissions=_default_self_registration_permissions(),
             tenant_or_environment=(
                 "development" if settings.environment == "dev" else settings.environment
             ),

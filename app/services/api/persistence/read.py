@@ -69,6 +69,7 @@ def _read_rows(
     parameters: tuple[object, ...],
     *,
     request_id: str,
+    max_rows: int = 1,
 ) -> tuple[Mapping[str, object], ...]:
     """Execute one bounded API read through Data.
 
@@ -76,9 +77,11 @@ def _read_rows(
         statement: Parameterized read statement.
         parameters: Bound statement parameters.
         request_id: Canonical operation request identifier.
+        max_rows: Upper bound on rows returned; single-key lookups keep the
+            default of 1, multi-row listings pass an explicit bound.
 
     Returns:
-        Zero or one normalized database rows.
+        Zero or more normalized database rows, up to ``max_rows``.
 
     Raises:
         IdentityError: If Data cannot confirm the transaction.
@@ -88,7 +91,7 @@ def _read_rows(
             plan=build_statement_plan(
                 statements=(statement,),
                 parameter_sets=(parameters,),
-                max_rows=1,
+                max_rows=max_rows,
             ),
             request_id=request_id,
         )
@@ -293,6 +296,99 @@ def read_settings_record(
     )
 
 
+def read_watchlist_record(
+    watchlist_id: str, *, request_id: str
+) -> tuple[Mapping[str, object], ...]:
+    """Read one watchlist by id. Callers enforce account ownership.
+
+    Args:
+        watchlist_id: Stable watchlist identifier.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Zero or one normalized watchlist rows.
+    """
+    logger.debug("Reading API watchlist persistence record")
+    return _read_rows(
+        "SELECT watchlist_id, account_id, name, is_default, sort_order, "
+        "created_at, updated_at FROM api_watchlists WHERE watchlist_id = ?",
+        (watchlist_id,),
+        request_id=request_id,
+    )
+
+
+def read_watchlists_for_account(
+    account_id: str, *, request_id: str
+) -> tuple[Mapping[str, object], ...]:
+    """Read every watchlist owned by one account, in display order.
+
+    Args:
+        account_id: Owning account identifier.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Normalized watchlist rows, ordered by ``sort_order`` then creation.
+    """
+    logger.debug("Reading API account watchlist persistence records")
+    return _read_rows(
+        "SELECT watchlist_id, account_id, name, is_default, sort_order, "
+        "created_at, updated_at FROM api_watchlists WHERE account_id = ? "
+        "ORDER BY sort_order, created_at",
+        (account_id,),
+        request_id=request_id,
+        max_rows=200,
+    )
+
+
+def read_watchlist_items(
+    watchlist_id: str, *, request_id: str
+) -> tuple[Mapping[str, object], ...]:
+    """Read one watchlist's items, in display order.
+
+    Args:
+        watchlist_id: Stable watchlist identifier.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Normalized item rows, ordered by ``sort_order``.
+    """
+    logger.debug("Reading API watchlist item persistence records")
+    return _read_rows(
+        "SELECT watchlist_id, source_id, symbol, sort_order, created_at "
+        "FROM api_watchlist_items WHERE watchlist_id = ? ORDER BY sort_order",
+        (watchlist_id,),
+        request_id=request_id,
+        max_rows=1000,
+    )
+
+
+def read_watchlist_items_for_account(
+    account_id: str, *, request_id: str
+) -> tuple[Mapping[str, object], ...]:
+    """Read every item across every watchlist owned by one account.
+
+    A single joined read avoids one round-trip per watchlist; the caller
+    groups rows by ``watchlist_id``.
+
+    Args:
+        account_id: Owning account identifier.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Normalized item rows, ordered by watchlist then ``sort_order``.
+    """
+    logger.debug("Reading API account watchlist item persistence records")
+    return _read_rows(
+        "SELECT i.watchlist_id, i.source_id, i.symbol, i.sort_order, "
+        "i.created_at FROM api_watchlist_items AS i "
+        "JOIN api_watchlists AS w ON w.watchlist_id = i.watchlist_id "
+        "WHERE w.account_id = ? ORDER BY i.watchlist_id, i.sort_order",
+        (account_id,),
+        request_id=request_id,
+        max_rows=5000,
+    )
+
+
 __all__ = [
     "read_account_record",
     "read_approval_record",
@@ -303,4 +399,8 @@ __all__ = [
     "read_idempotency_record",
     "read_session_record",
     "read_settings_record",
+    "read_watchlist_items",
+    "read_watchlist_items_for_account",
+    "read_watchlist_record",
+    "read_watchlists_for_account",
 ]

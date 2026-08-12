@@ -34,6 +34,20 @@ _PROVIDER_SETTING_FIELDS = MappingProxyType(
     }
 )
 
+# Data source identifier -> `BrokerProviderSettings` enabled-flag attribute.
+# Mirrors Data's own provider capability keys (`app/services/data/sources/
+# composition.py::_PROVIDER_CAPABILITIES`) so a source only enters Data's
+# `data_provider_sources` allowlist once its DB-backed `*_ENABLED` flag is on.
+_DATA_SOURCE_ENABLED_FIELDS = MappingProxyType(
+    {
+        "mt5": "mt5_enabled",
+        "ctrader": "ctrader_enabled",
+        "binance_spot": "binance_enabled",
+        "dukascopy": "dukascopy_enabled",
+        "yahoo": "yahoo_enabled",
+    }
+)
+
 
 @dataclass(frozen=True, slots=True)
 class _RuntimeSettingsSnapshot:
@@ -136,6 +150,29 @@ def build_runtime_provider_settings(snapshot: object) -> object:
     return load_broker_provider_settings(explicit_values)
 
 
+def build_runtime_data_provider_sources(provider_settings: object) -> tuple[str, ...]:
+    """Derive the Data provider-source allowlist from enabled broker flags.
+
+    Completes the composition-root wiring so a Data source composes only once
+    its DB-backed platform flag (``MT5_ENABLED``, etc.) is enabled, matching
+    the same settings the System Settings UI edits.
+
+    Args:
+        provider_settings: Immutable provider settings from
+            ``build_runtime_provider_settings``.
+
+    Returns:
+        Sorted source identifiers whose platform flag is enabled.
+    """
+    return tuple(
+        sorted(
+            source_id
+            for source_id, field in _DATA_SOURCE_ENABLED_FIELDS.items()
+            if getattr(provider_settings, field, False)
+        )
+    )
+
+
 def get_runtime_setting(
     snapshot: object,
     key: str,
@@ -162,6 +199,7 @@ def get_runtime_setting(
 __all__ = (
     "activate_runtime_logging",
     "build_credential_key_set",
+    "build_runtime_data_provider_sources",
     "build_runtime_provider_settings",
     "get_runtime_setting",
     "load_runtime_settings_snapshot",
