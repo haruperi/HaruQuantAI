@@ -5,8 +5,8 @@ from pathlib import Path
 
 from app.services.api import build_research_run_request
 from app.services.api.identity import require_auth_context
-from app.services.api.routes.research import router as research_router
-from app.services.api.routes.strategies import router as strategies_router
+from app.services.api.workstation.research.routes import router as research_router
+from app.services.api.workstation.strategies.routes import router as strategies_router
 from app.services.data import build_data_settings, data_settings_context
 from app.services.strategy import register_strategy_version
 from fastapi import FastAPI

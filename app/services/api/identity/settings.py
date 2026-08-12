@@ -10,15 +10,15 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from app.services.api.identity.errors import IdentityError
+from app.services.api.identity.persistence import (
+    create_settings_record,
+    read_settings_record,
+    update_settings_record,
+)
 from app.services.api.identity.system_settings import (
     get_system_settings_manifest,
     system_settings_require_restart,
     validate_system_settings,
-)
-from app.services.api.persistence import (
-    create_settings_record,
-    read_settings_record,
-    update_settings_record,
 )
 from app.utils import canonical_json, is_sensitive_key, utc_now
 

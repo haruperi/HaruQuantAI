@@ -188,7 +188,7 @@ export type StreamEventType = z.infer<typeof streamEventType>;
  * Streaming event envelope.
  *
  * Mirrors `StreamEvent.v1` as served by the SSE bridge
- * (`app/services/api/routes/data_stream.py`). Each SSE frame carries `id`
+ * (`app/services/api/workstation/data/stream_routes.py`). Each SSE frame carries `id`
  * (sequence), `event` (event_type), and `data` (this JSON envelope).
  */
 export const streamEventSchema = z.object({

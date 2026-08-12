@@ -1,5 +1,5 @@
 /**
- * Bounded redacted page context (FR-API-043).
+ * Bounded redacted page context (FR-UI-007).
  *
  * Registers only bounded, redacted current-page entities and approved actions
  * for route-aware workflows. Mirrors the backend `PageContext.v1` contract:

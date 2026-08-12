@@ -1,5 +1,5 @@
 /**
- * Login/register access page (FR-API-053).
+ * Login/register access page (FR-UI-019).
  *
  * The access gate rendered at the dedicated `/login` route. Toggles between
  * login and register modes; calls `useAuth().login`/`register`; on success

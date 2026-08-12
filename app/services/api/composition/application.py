@@ -7,9 +7,6 @@ from typing import Any, cast
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.services.api._settings import ApiSettings, get_api_settings
-from app.services.api.composition.agentic_dependencies import build_agentic_source
-from app.services.api.composition.data_dependencies import build_dataset_source
 from app.services.api.composition.in_process import (
     build_in_process_graph,
     get_graph_closers,
@@ -17,12 +14,6 @@ from app.services.api.composition.in_process import (
     get_graph_probes,
 )
 from app.services.api.composition.lifecycle import lifespan
-from app.services.api.composition.live_simulation_dependencies import (
-    build_live_simulation_source,
-)
-from app.services.api.composition.optimization_dependencies import (
-    build_optimization_source,
-)
 from app.services.api.composition.owner_sources import (
     read_audit_events,
     read_dashboard_snapshot,
@@ -31,20 +22,9 @@ from app.services.api.composition.owner_sources import (
     read_trading_events,
     read_trading_session,
 )
-from app.services.api.composition.portfolio_dependencies import build_portfolio_source
-from app.services.api.composition.risk_dependencies import build_risk_command_source
 from app.services.api.composition.runtime_settings import build_credential_key_set
-from app.services.api.composition.simulation_dependencies import (
-    build_simulation_run_source,
-    build_simulation_session_source,
-)
-from app.services.api.composition.strategy_dependencies import (
-    build_strategy_mutation_source,
-)
-from app.services.api.composition.trading_dependencies import (
-    build_trading_mutation_source,
-)
 from app.services.api.contracts.catalog import create_canonical_route_contract_registry
+from app.services.api.health.routes import router as health_router
 from app.services.api.identity import (
     IdentityError,
     build_auth_context,
@@ -52,6 +32,7 @@ from app.services.api.identity import (
     validate_csrf,
     validate_session,
 )
+from app.services.api.identity.routes import router as auth_router
 from app.services.api.middleware.context import (
     CANONICAL_CONTEXT_STATE_KEY,
     RequestContextMiddleware,
@@ -61,30 +42,59 @@ from app.services.api.middleware.envelope import get_canonical_envelope_middlewa
 from app.services.api.middleware.rate_limits import RateLimitMiddleware
 from app.services.api.middleware.redaction import SecretRedactionMiddleware
 from app.services.api.middleware.runtime_settings import RuntimeSettingsMiddleware
-from app.services.api.routes import (
-    agentic_router,
-    auth_router,
-    dashboards_router,
-    data_router,
-    data_stream_router,
-    health_router,
-    indicators_router,
-    observability_router,
-    operator_router,
-    optimization_router,
-    portfolio_router,
-    research_router,
-    risk_router,
-    settings_router,
-    simulation_live_router,
-    simulation_router,
-    simulation_sessions_router,
-    strategies_router,
-    trading_router,
-    watchlists_router,
-    workstation_router,
+from app.services.api.observability.routes import router as observability_router
+from app.services.api.workstation.agentic.orchestration import build_agentic_source
+from app.services.api.workstation.agentic.routes import router as agentic_router
+from app.services.api.workstation.dashboards.routes import router as dashboards_router
+from app.services.api.workstation.data.orchestration import build_dataset_source
+from app.services.api.workstation.data.routes import router as data_router
+from app.services.api.workstation.data.stream_routes import router as data_stream_router
+from app.services.api.workstation.event_delivery.orchestration import (
+    create_stream_connection_manager,
 )
-from app.services.api.streams import create_stream_connection_manager
+from app.services.api.workstation.indicators.routes import router as indicators_router
+from app.services.api.workstation.markets.routes import router as markets_router
+from app.services.api.workstation.operational.routes import router as workstation_router
+from app.services.api.workstation.operator.routes import router as operator_router
+from app.services.api.workstation.optimization.orchestration import (
+    build_optimization_source,
+)
+from app.services.api.workstation.optimization.routes import (
+    router as optimization_router,
+)
+from app.services.api.workstation.portfolio.orchestration import build_portfolio_source
+from app.services.api.workstation.portfolio.routes import router as portfolio_router
+from app.services.api.workstation.research.routes import router as research_router
+from app.services.api.workstation.risk.orchestration import build_risk_command_source
+from app.services.api.workstation.risk.routes import router as risk_router
+from app.services.api.workstation.settings.bootstrap import (
+    ApiSettings,
+    get_api_settings,
+)
+from app.services.api.workstation.settings.routes import router as settings_router
+from app.services.api.workstation.simulation.live_orchestration import (
+    build_live_simulation_source,
+)
+from app.services.api.workstation.simulation.live_routes import (
+    router as simulation_live_router,
+)
+from app.services.api.workstation.simulation.orchestration import (
+    build_simulation_run_source,
+    build_simulation_session_source,
+)
+from app.services.api.workstation.simulation.routes import router as simulation_router
+from app.services.api.workstation.simulation.session_routes import (
+    router as simulation_sessions_router,
+)
+from app.services.api.workstation.strategies.orchestration import (
+    build_strategy_mutation_source,
+)
+from app.services.api.workstation.strategies.routes import router as strategies_router
+from app.services.api.workstation.trading.orchestration import (
+    build_trading_mutation_source,
+)
+from app.services.api.workstation.trading.routes import router as trading_router
+from app.services.api.workstation.watchlists.routes import router as watchlists_router
 from app.utils import generate_id, utc_now
 
 _SESSION_COOKIE = "hq_session"
@@ -92,6 +102,7 @@ _ROUTERS = (
     auth_router,
     health_router,
     indicators_router,
+    markets_router,
     settings_router,
     data_router,
     data_stream_router,

@@ -5,25 +5,26 @@ import inspect
 import re
 from pathlib import Path
 
-from app.services.api import persistence
+from app.services.api.identity import persistence as identity_persistence
+from app.services.api.workstation.watchlists import persistence as watchlist_persistence
 from app.utils import get_logger
 
 logger = get_logger(__name__)
 
 _API_ROOT = Path(__file__).parents[3] / "app" / "services" / "api"
-_PERSISTENCE_ROOT = _API_ROOT / "persistence"
+_PERSISTENCE_ROOTS = (
+    _API_ROOT / "identity" / "persistence",
+    _API_ROOT / "workstation" / "watchlists" / "persistence",
+)
 _EXPECTED_FILES = {"__init__.py", "create.py", "read.py", "update.py", "delete.py"}
-_EXPECTED_EXPORTS = {
+_IDENTITY_EXPORTS = {
     "consume_approval_record",
     "create_account_record",
     "create_approval_record",
     "create_idempotency_record",
     "create_settings_record",
-    "create_watchlist_items",
-    "create_watchlist_record",
     "delete_auth_failure_record",
     "delete_idempotency_record",
-    "delete_watchlist_record",
     "finalize_idempotency_record",
     "read_account_record",
     "read_approval_record",
@@ -34,20 +35,25 @@ _EXPECTED_EXPORTS = {
     "read_idempotency_record",
     "read_session_record",
     "read_settings_record",
+    "replace_active_session_record",
+    "revoke_session_record",
+    "update_account_last_login",
+    "update_auth_failure_record",
+    "update_credential_record",
+    "update_settings_record",
+}
+_WATCHLIST_EXPORTS = {
+    "create_watchlist_items",
+    "create_watchlist_record",
+    "delete_watchlist_record",
     "read_watchlist_items",
     "read_watchlist_items_for_account",
     "read_watchlist_record",
     "read_watchlists_for_account",
     "rename_watchlist_record",
     "reorder_watchlists_record",
-    "replace_active_session_record",
     "replace_watchlist_items_record",
-    "revoke_session_record",
     "set_default_watchlist_record",
-    "update_account_last_login",
-    "update_auth_failure_record",
-    "update_credential_record",
-    "update_settings_record",
 }
 _SQL_PATTERNS = (
     re.compile(r"^SELECT\s+.+\s+FROM\s+"),
@@ -60,27 +66,30 @@ _SQL_PATTERNS = (
 def test_persistence_package_has_exact_crud_layout() -> None:
     """Verify the private package has only its boundary and four CRUD modules."""
     logger.debug("Checking exact API persistence package layout")
-    assert {path.name for path in _PERSISTENCE_ROOT.glob("*.py")} == _EXPECTED_FILES
+    for root in _PERSISTENCE_ROOTS:
+        assert {path.name for path in root.glob("*.py")} == _EXPECTED_FILES
 
 
 def test_persistence_boundary_exports_only_crud_functions() -> None:
     """Verify the internal boundary exports the intended standalone functions."""
     logger.debug("Checking API persistence function exports")
-    assert set(persistence.__all__) == _EXPECTED_EXPORTS
-    assert all(
-        inspect.isfunction(getattr(persistence, name)) for name in persistence.__all__
+    boundaries = (
+        (identity_persistence, _IDENTITY_EXPORTS),
+        (watchlist_persistence, _WATCHLIST_EXPORTS),
     )
+    for boundary, expected in boundaries:
+        assert set(boundary.__all__) == expected
+        assert all(inspect.isfunction(getattr(boundary, name)) for name in expected)
 
 
 def test_api_sql_is_confined_to_persistence_and_migrations() -> None:
     """Verify API business modules contain no CRUD SQL or transaction calls."""
     logger.debug("Checking API SQL ownership boundary")
     violations: list[str] = []
-    migrations_root = _API_ROOT / "migrations"
     for path in _API_ROOT.rglob("*.py"):
         if (
-            _PERSISTENCE_ROOT in path.parents
-            or migrations_root in path.parents
+            any(root in path.parents for root in _PERSISTENCE_ROOTS)
+            or "migrations" in path.parts
             or path.name == "migrations.py"
         ):
             continue

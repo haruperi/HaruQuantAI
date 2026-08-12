@@ -1,4 +1,4 @@
-/** Unit tests for DashboardView (FR-API-047). */
+/** Unit tests for DashboardView (FR-UI-011). */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
@@ -36,7 +36,7 @@ function successEnvelope(data: unknown, opts: { stale?: boolean; staleReason?: s
 
 const realFetch = globalThis.fetch;
 
-describe("DashboardView — FR-API-047", () => {
+describe("DashboardView — FR-UI-011", () => {
   beforeEach(() => {
     globalThis.fetch = vi.fn(async () => successEnvelope({ ok: true }, { stale: true, staleReason: "cache cold" })) as unknown as typeof fetch;
   });

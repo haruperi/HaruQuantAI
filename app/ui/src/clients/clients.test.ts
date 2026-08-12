@@ -4,7 +4,7 @@
  * Each focused client (`auth`, `health`, `settings`, `data`, `strategies`,
  * `research`, `dashboards`, `operator`, `metrics`) delegates through the single
  * `request` transport. These tests prove each client is wired correctly and
- * exercises FR-API-041 (one catalog with typed clients for the 21 operations)
+ * exercises FR-UI-004 (one catalog with typed clients for the 21 operations)
  * across every family. A fake `fetch` is used; no network is touched.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Pages contract test (FR-API-055).
+ * Pages contract test (FR-UI-021).
  *
  * Asserts the workflow pages compose exclusively from public clients,
  * context, and workflow components — no deep domain imports, no direct
@@ -11,7 +11,7 @@ import { describe, expect, it } from "vitest";
 
 import { AuthenticationPage, ProtectedLayout, WorkflowPage } from "./index";
 
-describe("pages contract — FR-API-055", () => {
+describe("pages contract — FR-UI-021", () => {
   it("everyPageHasClientContract: all page exports are functions", () => {
     expect(typeof AuthenticationPage).toBe("function");
     expect(typeof ProtectedLayout).toBe("function");

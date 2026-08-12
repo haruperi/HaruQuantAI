@@ -1,5 +1,5 @@
 /**
- * Stream consumer with gap detection and authoritative recovery (FR-API-045).
+ * Stream consumer with gap detection and authoritative recovery (FR-UI-009).
  *
  * Wraps the low-level SSE transport (`clients/stream.ts`) with ordered-event
  * validation, heartbeat handling, terminal-error surfacing, cleanup on

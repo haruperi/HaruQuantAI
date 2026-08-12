@@ -1,4 +1,4 @@
-"""Tests for FEAT-API-14 workstation contracts."""
+"""Tests for FEAT-API-10 workstation contracts."""
 
 from datetime import UTC, datetime
 

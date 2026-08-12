@@ -1,5 +1,5 @@
 /**
- * Freshness-aware dashboard presentation (FR-API-047).
+ * Freshness-aware dashboard presentation (FR-UI-011).
  *
  * Fetches the six approved dashboard snapshots in parallel and renders a
  * freshness-aware grid (timestamp + stale warning per snapshot). Currency

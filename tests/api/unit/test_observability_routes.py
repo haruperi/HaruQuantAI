@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import pytest
 from app.services.api import create_in_process_metric_sink
 from app.services.api.identity import require_auth_context
-from app.services.api.routes import observability
+from app.services.api.observability import routes as observability
 from fastapi import FastAPI
 
 from tests.api._support import get_json

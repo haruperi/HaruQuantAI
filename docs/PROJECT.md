@@ -1,8 +1,8 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `Completed` — all 192 registered application features are implemented and verified; deployment and external-provider readiness remain separate runtime concerns.
-> **Last updated:** `2026-08-10`
+> **Status:** `In Progress` — of 230 registered application features, 213 are implemented and structurally reconciled (92.61%); 16 are `Pending` and 1 is `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Last updated:** `2026-08-12`
 
 > This document is the system-level source of truth.
 > It defines how domains fit together, how cross-domain workflows operate, which rules apply system-wide, and how the complete system is verified.
@@ -83,7 +83,7 @@ satisfied.
 - Formulation and dispatch of order intents across simulation, paper, and live routes, including reconciliation and emergency controls.
 - Deterministic historical backtesting and parameter optimization.
 - Performance analytics, reporting, and advisory research.
-- Authenticated user and service access through a single UI/API boundary.
+- Authenticated user and service access through the API, with user presentation owned by UI.
 
 ### System does not own
 
@@ -128,7 +128,8 @@ flowchart TD
     SYSTEM --> RES[[Research]]
     SYSTEM --> PORT[[Portfolio]]
     SYSTEM --> AGENTIC[[Agentic]]
-    SYSTEM --> UIAPI[[UI/API]]
+    SYSTEM --> API[[API]]
+    SYSTEM --> UI[[UI]]
 
     UTILS --> UTILS_CAP[Provide shared business-neutral infrastructure]
     BROKER --> BROKER_CAP[Provide direct passthrough connections to external broker and market-data provider platforms]
@@ -143,7 +144,8 @@ flowchart TD
     RES --> RES_CAP[Produce advisory insights from data]
     PORT --> PORT_CAP[Construct and govern multi-strategy portfolios]
     AGENTIC --> AGENTIC_CAP[Operate a governed multi-agent research and proposal firm]
-    UIAPI --> UIAPI_CAP[Expose the system to users and clients]
+    API --> API_CAP[Orchestrate authenticated backend access]
+    UI --> UI_CAP[Present the system to users]
 ```
 
 ### 2.1 Domain Registry
@@ -157,7 +159,7 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Inputs**: Raw log records, error conditions, audit payloads, bounded public-operation results, and environment settings.
 * **Outputs**: Structured and specialized logs, mapped/routed errors, prefixed IDs, canonical JSON, shared context/audit/response contracts, redacted values, and loaded settings.
 * **Owns**: Structured and bound-context logging, UTC time policy and formatting, monotonic execution-duration calculation, shared `AuthContext`, `AuditEvent`, and `StandardResponse[T]` contracts, shared base errors, immutable business-neutral error definitions and catalogue validation, injected error-event routing, ID generation, canonical serialization, explicit/process bootstrap settings models, and denylist-first redaction. Utils owns no repository configuration file or database state.
-* **Boundaries**: Owns no durable business state and makes no business decisions. It owns the shared response envelope but not the typed domain payload, completed business outcome, or domain error-code policy carried through that envelope. It does not own authentication, identity verification, password hashing, credential encryption or persistence, credential-reference resolution, encryption-key generation/storage/rotation, active-key selection, strategy logic, risk rules, broker operations, persistence, or any other domain contract base classes. UI/API's composition root owns the single-consumer credential-protection and resolution workflow.
+* **Boundaries**: Owns no durable business state and makes no business decisions. It owns the shared response envelope but not the typed domain payload, completed business outcome, or domain error-code policy carried through that envelope. It does not own authentication, identity verification, password hashing, credential encryption or persistence, credential-reference resolution, encryption-key generation/storage/rotation, active-key selection, strategy logic, risk rules, broker operations, persistence, or any other domain contract base classes. API's composition root owns the single-consumer credential-protection and resolution workflow.
 * **Key Limits**: No business decisions; no durable business state; secret redaction is denylist-first and case-insensitive before any persistence or emission.
 * **Documentation**: `app/utils/README.md`
 
@@ -165,7 +167,7 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 
 * **Package**: `app/services/brokers`
 * **Responsibility**: Provide a pure, thin passthrough layer over external broker/trading and market-data provider platform APIs — trading-capable platforms (MT5, cTrader, Binance Spot/Futures profiles) and read-only providers (Dukascopy, Yahoo Finance) — behind one canonical `BrokerAdapter` interface, with zero business logic. Every function in the system that requires a live connection to a broker or provider routes exclusively through this domain.
-* **Inputs**: Canonical broker requests (market data reads, account state reads, order mutations, execution-state reads, subscriptions), `BrokerConnectionConfig` constructed by an approved composition root with caller-selected environment and UI/API-resolved in-memory credentials. UI/API remains the interactive application composition root; Data's package-root retrieval facade may privately construct a read-only configuration for standalone calls. Trading may receive an injected capability-scoped adapter but does not resolve secrets or mutate its configuration.
+* **Inputs**: Canonical broker requests (market data reads, account state reads, order mutations, execution-state reads, subscriptions), `BrokerConnectionConfig` constructed by an approved composition root with caller-selected environment and API-resolved in-memory credentials. API remains the interactive application composition root; Data's package-root retrieval facade may privately construct a read-only configuration for standalone calls. Trading may receive an injected capability-scoped adapter but does not resolve secrets or mutate its configuration.
 * **Outputs**: Canonical DTOs preserving provider truth in Utils-owned
   `StandardResponse[T]`, Brokers-owned response extensions and error codes,
   streaming subscription events and connection lifecycle events (canonical event
@@ -246,7 +248,7 @@ the current input contract rather than represented by unusable stubs.
 * **Inputs**: Live/paper evaluation triggers, strategy references, route/profile configuration, runtime gate configuration, approved `RiskDecision`s with approval tokens, Risk-owned `ActionPolicyVerdict`s, and `KillSwitchState`.
 * **Outputs**: Function-built `OrderIntent`s, execution receipts / `TradeRecord`s, reconciliation results, and `OperationalEvent` monitoring/incident evidence. The package root exports standalone functions only; DTO classes, enum classes, and constants remain Trading-internal.
 * **Owns**: Live/paper runtime orchestration, broker-authoritative active order state, closed-position execution persistence, receipts and execution evidence, its own tables, schemas, and migration definitions, order intent formulation, client order IDs and idempotency, route-aware request packing, runtime gates, execution-broker/account/environment selection, broker dispatch after Risk clearance, reconciliation authority, execution monitoring, and emergency stop of in-flight execution. Trading does not persist tick-valued open positions or separate fill/order-transition projections.
-* **Boundaries**: Trading may coordinate Data, Indicators, Strategy, and Risk during a live/paper evaluation, but it does not own their decisions or business logic. Its execution phase begins only after receiving an approved `RiskDecision` and compatible `ActionPolicyVerdict`; it executes exactly the approved size. It enforces Risk's active kill-switch hierarchy by blocking new dispatches and attempting only truthful cancellation of pending/cancellable work. It resumes only after authorized clearance and reconciliation. It does not own signal creation, risk/action policy, approval reservations, backtest orchestration, broker connections/adapters, or secret storage (Brokers owns connections and adapters; credentials are resolved by the UI/API composition root and injected via `BrokerConnectionConfig`). Only Trading may invoke `BrokerAdapter` mutation operations, and only for approved broker mutations; it may also use adapter reads needed for execution and reconciliation. Paper and live share the same execution path and differ only by the environment/credentials carried in the injected `BrokerConnectionConfig`. Trading cannot approve its own risk decisions.
+* **Boundaries**: Trading may coordinate Data, Indicators, Strategy, and Risk during a live/paper evaluation, but it does not own their decisions or business logic. Its execution phase begins only after receiving an approved `RiskDecision` and compatible `ActionPolicyVerdict`; it executes exactly the approved size. It enforces Risk's active kill-switch hierarchy by blocking new dispatches and attempting only truthful cancellation of pending/cancellable work. It resumes only after authorized clearance and reconciliation. It does not own signal creation, risk/action policy, approval reservations, backtest orchestration, broker connections/adapters, or secret storage (Brokers owns connections and adapters; credentials are resolved by the API composition root and injected via `BrokerConnectionConfig`). Only Trading may invoke `BrokerAdapter` mutation operations, and only for approved broker mutations; it may also use adapter reads needed for execution and reconciliation. Paper and live share the same execution path and differ only by the environment/credentials carried in the injected `BrokerConnectionConfig`. Trading cannot approve its own risk decisions.
 * **Key Limits**: Live actions require valid approval tokens and volume constraints; `ALLOW_LIVE_MUTATIONS=false` blocks all live mutation by default; Decimal precision ≥ 28 digits with 8-decimal quantization; idempotency via SHA-256 over canonical JSON; broker operation timeout and check frequency limits; blind retries banned — unknown broker state freezes execution.
 * **Documentation**: `app/services/trading/README.md`
 
@@ -317,16 +319,28 @@ the current input contract rather than represented by unusable stubs.
 * **Status**: `Completed`. All 22 registered Agentic features are implemented. Provider availability, real-world evaluation, promotion, and cross-domain composition remain runtime evidence concerns and do not grant Agentic deterministic-domain authority.
 * **Documentation**: `app/agentic/README.md`
 
-#### 2.1.14 UI/API
+#### 2.1.14 API
 
-* **Package**: `app/services/api` (FastAPI gateway) + `app/ui/` (Next.js frontend) — one logical domain implemented by two deployable packages.
-* **Responsibility**: Expose the system to users and clients through authenticated HTTP interfaces and frontend views. Backend v1 delegates exactly 81 operations across 76 unique paths, including the governed Portfolio definition and allocation lifecycle, Strategy mutations, dataset preparation and external import, the Risk kill-switch command, the Agentic operator tier, completed-run Simulation journal playback, live resumable what-if sessions, and administrator-managed system settings, through composed owner-domain boundaries. The frontend declares the same 81 typed contracts and a drift test enforces parity.
-* **Inputs**: HTTP and SSE connections, client payloads, authenticated principals.
-* **Outputs**: HTTP responses, SSE events, views/DTOs, `AuthContext` propagated to downstream domains.
-* **Owns**: Routes, HTTP wrappers, frontend views and client stores, auth/authz enforcement, password hashing, credential encryption/persistence, active-key selection, composition-root credential-reference resolution, DTO translation, operational telemetry recording through explicitly injected sinks, metric-label hygiene, the Prometheus exposition surface, and clock-drift readiness diagnostics.
-* **Boundaries**: Pure presentation/delegation layer with zero inline trading, risk, strategy, analytics, research, or market-stream acquisition logic. The canonical backend-v1 graph binds owner-authored reads, synchronous Simulator operations, completed-run journal playback and live what-if sessions, and the registered Strategy, Data, Risk, Trading, Optimization, Portfolio, and Agentic bridges. No capability exclusion remains. Live Simulation what-if is composed over the Simulator's resumable engine; production-capital execution reuses the one Trading surface and is gated by deployment settings rather than by route absence; external import is built; and documentation file I/O was retired as withdrawn scope because no domain owns it. Two invariants stay enforced as route absence: the gateway owns no file I/O, and the duplicate operator-readiness and operator kill-switch routes stay rejected as second paths to capabilities the boundary already exposes exactly once. Operational telemetry and SSE handling are transport only. Encryption keys are supplied by deployment configuration; UI/API does not generate, persist, or rotate them.
-* **Key Limits**: List endpoints paginated; endpoint timeouts; preflight warnings expire.
+* **Package**: `app/services/api` — FastAPI gateway.
+* **Status**: Feature-folder migration completed. The registry contains 24 contiguous backend features; 23 are `Completed`, while the pre-existing Indicators catalogue boundary remains `Partial` pending its own requirement definition.
+* **Responsibility**: Expose owner-domain capabilities through authenticated HTTP and SSE boundaries, enforce transport/security policy, compose runtime dependencies, and translate owner results into stable external contracts.
+* **Inputs**: HTTP and SSE connections, client payloads, authenticated principals, and injected owner-domain public operations.
+* **Outputs**: HTTP responses, SSE events, boundary DTOs, and validated `AuthContext` propagated to downstream domains.
+* **Owns**: Routes, HTTP wrappers, authentication and authorization enforcement, password hashing, credential encryption/persistence, active-key selection, composition-root credential-reference resolution, DTO translation, operational telemetry transport, Prometheus exposition, clock-drift readiness diagnostics, and Settings-feature bootstrap configuration and API boundary limits.
+* **Boundaries**: Transport, security, composition, sequencing, and DTO assembly only. API owns no trading, risk, strategy, analytics, research, portfolio, market-data, indicator, or presentation calculation. Boundary-owned identity/session/idempotency state remains permitted; every workstation-facing gateway capability resides in a focused child feature folder under the non-feature `workstation/` namespace. API-level support is shared only when at least three registered features consume it.
+* **Key Limits**: List endpoints are bounded; endpoint deadlines apply; owner-domain errors remain authoritative and are translated without replacement policy.
 * **Documentation**: `app/services/api/README.md`
+
+#### 2.1.15 UI
+
+* **Package**: `app/ui` — Next.js frontend.
+* **Responsibility**: Present authenticated pages, widgets, workflows, warnings, and explicit unavailable states through the typed API boundary.
+* **Inputs**: API responses and streams, authenticated user interaction, and bounded local presentation state.
+* **Outputs**: Accessible pages, widgets, navigation, advisory preflight warnings, and typed API requests.
+* **Owns**: Frontend pages, layouts, widgets, typed clients, session/page context, interaction state, accessibility, formatting, and loading/empty/stale/error presentation.
+* **Boundaries**: UI never becomes authoritative for backend policy, safety, calculations, persistence, or execution. Client checks are advisory. `FEAT-UI-*` uses executable component/integration evidence instead of standalone usage programs. Markets and Watchlists reside in focused `src/features/markets/` and `src/features/watchlists/` folders.
+* **Key Limits**: No invented evidence; unavailable values remain explicit; governed actions remain backend-authorized.
+* **Documentation**: `app/ui/README.md`
 
 ### 2.2 Domain ownership rule
 
@@ -361,7 +375,8 @@ flowchart LR
     RES[[Research]]
     PORT[[Portfolio]]
     AGENTIC[[Agentic]]
-    UIAPI[[UI/API]]
+    API[[API]]
+    UI[[UI]]
 
     UTILS --> BROKER
     BROKER --> DATA
@@ -405,16 +420,17 @@ flowchart LR
     OPT --> AGENTIC
     RES --> AGENTIC
     PORT --> AGENTIC
-    AGENTIC --> UIAPI
-    ANA --> UIAPI
-    OPT --> UIAPI
-    RES --> UIAPI
-    PORT --> UIAPI
-    TRADE --> UIAPI
-    RISK --> UIAPI
-    SIM --> UIAPI
-    STRAT --> UIAPI
-    DATA --> UIAPI
+    AGENTIC --> API
+    ANA --> API
+    OPT --> API
+    RES --> API
+    PORT --> API
+    TRADE --> API
+    RISK --> API
+    SIM --> API
+    STRAT --> API
+    DATA --> API
+    API --> UI
 ```
 
 Utils is required by every domain; only the Utils → Brokers edge is drawn to keep the diagram readable.
@@ -433,21 +449,29 @@ Utils is required by every domain; only the Utils → Brokers edge is drawn to k
 - **Portfolio** consumes Data, Strategy, Risk, Trading, Simulation, and Analytics contracts to construct and activate multi-strategy allocations after Risk activates the authoritative risk-budget projection. Risk/Trading/Simulation receive only their own receiver-owned request contracts, so none imports Portfolio and no cycle is introduced.
 - **Optimization, Research, and Portfolio** share the highest computational level once their individual prerequisites are stable.
 - **Agentic** consumes public evidence and request/result contracts from Data, Indicators, Strategy, Risk, Trading, Simulation, Analytics, Optimization, Research, and Portfolio. It may submit typed receiver-owned requests through their public APIs, but it has no Brokers dependency and receives no privileged execution route. Read and proposal edges do not transfer authority: deterministic receivers validate and decide in full.
-- **UI/API** is the highest-dependency domain: it presents and delegates to selected public domain APIs (including Portfolio) and owns nothing computational.
+- **API** is the highest-dependency backend boundary: it authenticates, orchestrates, and delegates to selected public domain APIs while owning nothing computational.
+- **UI** depends only on API contracts and presents their results; it never imports service-domain implementation or becomes a deterministic-policy authority.
 
 No circular dependencies exist. Simulation and Analytics may be implemented concurrently: Simulation imports no Analytics code, and Analytics consumes its receiver-owned ledger mapping rather than Simulation implementation types. The sequencing edge `Simulation FR-SIM-033 → Analytics reports/allocation.py` is an integration-order constraint, not a package dependency cycle.
 
 ### Consolidated feature inventory
 
-The owning package READMEs collectively register exactly 205 canonical `FEAT-*`
+The owning package READMEs collectively register exactly 230 canonical `FEAT-*`
 features. No secondary programme or work-package identifier namespace is active.
 
 | Status | Count |
 | --- | ---: |
-| Completed | 205 |
-| Partial | 0 |
+| Completed | 213 |
+| Pending | 16 |
+| Partial | 1 |
 | Missing | 0 |
-| **Total** | **205** |
+| **Total** | **230** |
+
+The sixteen `Pending` features are `FEAT-UI-01`–`FEAT-UI-13`, `FEAT-UI-15`,
+`FEAT-UI-16`, and `FEAT-UI-17`, each awaiting requirement evidence or focused-folder
+ownership recorded in `app/ui/README.md`. They are the primary trading workspace and
+its enabling foundation, specified by `docs/dev/documentation.pdf`. The one `Partial`
+feature is `FEAT-API-15`, recorded in `app/services/api/README.md`.
 
 Feature descriptions, requirements, public APIs, persistence, and evidence remain
 authoritative only in the owning package README; this section is the system-level
@@ -467,12 +491,13 @@ count and domain index.
 9. Analytics
 10. Optimization, Research, and Portfolio (same level once individual prerequisites are stable)
 11. Agentic
-12. UI/API
+12. API
+13. UI
 ```
 
 ### Eventual implementation order
 
-Same as the documentation order. Optimization, Research, and Portfolio may be implemented in parallel once their declared prerequisites are stable. UI/API is implemented last, thin slices earlier if operator visibility is needed.
+Same as the documentation order. Optimization, Research, and Portfolio may be implemented in parallel once their declared prerequisites are stable. API is implemented after its backend dependencies, and UI follows the stable API contracts; thin visibility slices may arrive earlier.
 
 Agentic is implemented only after its complete end-state documentation and all
 required deterministic seams are approved. Its code follows the canonical
@@ -1058,7 +1083,7 @@ Document only contracts crossing domain or external-system boundaries.
   registrations. Utils-owned `StandardResponse v1`, the Brokers-owned error
   taxonomy, and `BrokerConnectionConfig v1` remain separately registered because
   they are independently exchanged at the boundary.
-- UI/API's external client envelope family (`ApiResponse[T]`, `ApiError`, `ApiMetadata`, `StreamEvent[T]`, `RouteContract`, `GovernedRequestContext`, `PageContext`, all `v1`) is owned and authoritatively defined in the UI/API README. These contracts cross only the external HTTP/stream client boundary, never a domain-to-domain boundary, and are therefore documented there rather than in this table.
+- API's external envelope family (`ApiResponse[T]`, `ApiError`, `ApiMetadata`, `StreamEvent[T]`, `RouteContract`, `GovernedRequestContext`, `PageContext`, all `v1`) is owned and authoritatively defined in the API README. UI owns its typed validators and presentation behavior in the UI README. These contracts cross only the external HTTP/stream client boundary, never a domain-to-domain boundary.
 - Risk-internal result types (`PositionSizingResult`, `RegimeAssessment`, `RiskReport`, and similar) never cross a domain boundary directly; their outcomes reach consumers only inside `RiskDecision v1` or UI/API-owned client DTOs adapted from registered contracts. `ScenarioResult v1` remains a Risk-owned advisory value with no registered cross-domain consumer.
 - `PortfolioPerformanceReport` remains Analytics-internal; cross-domain portfolio evidence uses the registered `PortfolioAllocationEvidence v1` contract. `StandardTradingEnvelope` is Trading-internal and UI/API adapts it into its external `ApiResponse` family.
 - External connection/channel contracts are owned by the domain that provides and controls the resource.
@@ -1322,7 +1347,7 @@ Tier 1 dimension definitions:
 | `GATE` | Package-Root Export Gate: `app/services/[DOMAIN]/__init__.py` declares a literal `__all__` and is the sole public boundary | `AGENTS.md` §1 |
 | `FUNC` | Function-Only Public API Surface: every `__all__` entry resolves to a standalone function, not a class or constant | `AGENTS.md` §1 |
 | `DEEP` | No Deep Cross-Domain Imports by production services, usage examples, workflow scripts, and integration tests | `AGENTS.md` §1 |
-| `ROOT` | Root-file Rule: package root holds only `__init__.py`, `_settings.py`, `_limits.py`, `py.typed` | `AGENTS.md` §1 |
+| `ROOT` | Root-file Rule: package root holds only explicitly permitted infrastructure; the API root production Python holds only `__init__.py`, while documentation and optional package metadata remain excluded from reconciliation | `AGENTS.md` §1 |
 | `USE` | One numbered usage program per registered feature | `AGENTS.md` §2, Section 11 |
 | `WFE` | One stage-labelled program per active `WF-[DOM]-NNN`, plus `run_all.py` | Section 11 |
 | `UT` | Unit tests present in the owning domain | Section 11 |
@@ -1336,15 +1361,15 @@ Tier 1 dimension definitions:
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | --- |
 | 0. System | - | - | - | [ ] | - | [ ] | [ ] | [ ] | [ ] | - | |
 | 1. Utils | - | - | - | OK | OK | OK | OK | OK | OK | - | CONTRACT `tests/utils/integration/test_auth_context_compatibility.py:53`; LOG `tests/utils/integration/test_structured_logging.py:18`; SAFE `app/utils/settings/models.py:258`; QUANT `tests/utils/integration/test_cross_process_determinism.py:9`; NFR `tests/utils/integration/test_structured_logging.py:54`, `app/utils/README.md:1298`; DOCS `app/utils/README.md:1178`, `docs/ARCHITECTURE.md:518`, `docs/CHANGELOG.md:5` |
-| 2. Brokers | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB/SCHEMA `app/services/brokers/migrations/definitions.py`, `app/services/brokers/README.md`; REACH `tests/brokers/unit/test_broker_channel_state.py`, `tests/brokers/unit/test_symbol_map_operations.py`; CONTRACT `tests/brokers/integration/test_operational_contract_transport.py`; LOG `tests/brokers/unit/test_observability.py`; SAFE `tests/brokers/unit/test_security.py`, `tests/brokers/unit/test_capability_policy.py`; QUANT `tests/brokers/unit/test_instrument_profiles.py`; NFR `tests/brokers/unit/test_performance.py`; DOCS `tests/brokers/unit/test_documentation_parity.py`, `app/services/brokers/README.md`; UI `app/services/api/routes/dashboards.py`, `app/ui/src/clients/dashboards.ts`, `app/ui/src/components/workflow/dashboard.tsx` |
-| 3. Data | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `tests/data/component/test_reclassified_slow_boundaries.py`, `tests/data/unit/test_persistence_migrations.py`; SCHEMA `tests/data/structural/test_schema_reconciliation.py`, `app/services/data/README.md`; REACH `tests/data/structural/test_catalog_table_reachability.py`; CONTRACT `tests/data/integration/test_contract_boundaries.py`; LOG `app/services/data/sources/composition.py`, `app/services/data/sources/broker_adapter.py`; SAFE `tests/data/unit/test_account_state.py`, `tests/data/unit/test_errors.py`; QUANT `tests/data/unit/test_synthetic.py`, `tests/data/component/test_tick_parquet.py`; NFR `tests/data/component/test_reclassified_slow_boundaries.py` and unit duration gate; DOCS `tests/data/structural/test_docstring_conformance.py`, `tests/data/structural/test_domain_audit.py`, `app/services/data/README.md`; UI `app/services/api/routes/data.py`, `app/ui/src/clients/data.ts`, `app/ui/src/components/workflow/data.tsx`, `app/ui/src/components/layout/WorkspaceGrid.tsx` |
-| 4. Indicators | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `app/services/indicators/migrations/definitions.py`, `app/services/api/composition/lifecycle.py`; SCHEMA `the owning package `README.md`; REACH zero current Indicators-owned tables after migration `002_remove_unused_indicator_support_schema`; CONTRACT `app/services/indicators/README.md`, `tests/indicators/unit/test_contracts.py`; LOG `app/services/indicators/migrations/definitions.py`, `app/services/indicators/core/registry.py`; SAFE `app/services/indicators/core/errors.py`, `tests/indicators/structural/test_import_boundaries.py`; QUANT `tests/indicators/unit/test_zigzag.py`, `app/services/indicators/README.md`; NFR `tests/indicators/unit/conftest.py`; DOCS `app/services/indicators/README.md`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`; UI `app/services/api/routes/indicators.py`, `app/ui/src/components/layout/WorkspaceGrid.tsx`, `app/ui/src/components/layout/Sidebar.tsx` |
+| 2. Brokers | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB/SCHEMA `app/services/brokers/migrations/definitions.py`, `app/services/brokers/README.md`; REACH `tests/brokers/unit/test_broker_channel_state.py`, `tests/brokers/unit/test_symbol_map_operations.py`; CONTRACT `tests/brokers/integration/test_operational_contract_transport.py`; LOG `tests/brokers/unit/test_observability.py`; SAFE `tests/brokers/unit/test_security.py`, `tests/brokers/unit/test_capability_policy.py`; QUANT `tests/brokers/unit/test_instrument_profiles.py`; NFR `tests/brokers/unit/test_performance.py`; DOCS `tests/brokers/unit/test_documentation_parity.py`, `app/services/brokers/README.md`; UI `app/services/api/workstation/dashboards/routes.py`, `app/ui/src/clients/dashboards.ts`, `app/ui/src/components/workflow/dashboard.tsx` |
+| 3. Data | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `tests/data/component/test_reclassified_slow_boundaries.py`, `tests/data/unit/test_persistence_migrations.py`; SCHEMA `tests/data/structural/test_schema_reconciliation.py`, `app/services/data/README.md`; REACH `tests/data/structural/test_catalog_table_reachability.py`; CONTRACT `tests/data/integration/test_contract_boundaries.py`; LOG `app/services/data/sources/composition.py`, `app/services/data/sources/broker_adapter.py`; SAFE `tests/data/unit/test_account_state.py`, `tests/data/unit/test_errors.py`; QUANT `tests/data/unit/test_synthetic.py`, `tests/data/component/test_tick_parquet.py`; NFR `tests/data/component/test_reclassified_slow_boundaries.py` and unit duration gate; DOCS `tests/data/structural/test_docstring_conformance.py`, `tests/data/structural/test_domain_audit.py`, `app/services/data/README.md`; UI `app/services/api/workstation/data/routes.py`, `app/ui/src/clients/data.ts`, `app/ui/src/components/workflow/data.tsx`, `app/ui/src/components/layout/WorkspaceGrid.tsx` |
+| 4. Indicators | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `app/services/indicators/migrations/definitions.py`, `app/services/api/composition/lifecycle.py`; SCHEMA `the owning package `README.md`; REACH zero current Indicators-owned tables after migration `002_remove_unused_indicator_support_schema`; CONTRACT `app/services/indicators/README.md`, `tests/indicators/unit/test_contracts.py`; LOG `app/services/indicators/migrations/definitions.py`, `app/services/indicators/core/registry.py`; SAFE `app/services/indicators/core/errors.py`, `tests/indicators/structural/test_import_boundaries.py`; QUANT `tests/indicators/unit/test_zigzag.py`, `app/services/indicators/README.md`; NFR `tests/indicators/unit/conftest.py`; DOCS `app/services/indicators/README.md`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`; UI `app/services/api/workstation/indicators/routes.py`, `app/ui/src/components/layout/WorkspaceGrid.tsx`, `app/ui/src/components/layout/Sidebar.tsx` |
 | 5. Strategy | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 6. Risk | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 7. Trading | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
-| 8. Simulator | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `app/services/simulator/migrations/definitions.py`, `app/services/api/composition/lifecycle.py`; SCHEMA `the owning package `README.md`; REACH `app/services/simulator/state/runtime.py`, `app/services/simulator/state/sessions.py`; CONTRACT `tests/simulator/integration/test_contract_compatibility.py`; LOG/SAFE/QUANT `app/services/simulator/README.md`; NFR `tests/simulator/unit/conftest.py`; DOCS `app/services/simulator/README.md`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`; UI `app/services/api/routes/simulation.py`, `app/ui/src/components/workflow/simulation.tsx` |
-| 9. Analytics | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `app/services/analytics/migrations/definitions.py`, `app/services/api/composition/lifecycle.py`; SCHEMA `the owning package `README.md`; REACH zero current Analytics-owned tables after guarded migration step `002`; CONTRACT `tests/analytics/integration/test_upstream_fixture_parity.py`; LOG/SAFE/QUANT `app/services/analytics/README.md`; NFR `tests/analytics/unit/conftest.py`; DOCS `app/services/analytics/README.md`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`; UI `app/services/api/routes/dashboards.py`, `app/ui/src/clients/dashboards.ts`, `app/ui/src/components/workflow/dashboard.tsx` |
-| 10. Optimization | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `app/services/optimization/migrations/definitions.py`, `app/services/api/composition/lifecycle.py`; SCHEMA `the owning package `README.md`; REACH `app/services/optimization/persistence/`, `tests/optimization/integration/test_relational_persistence.py`; CONTRACT/LOG/SAFE/QUANT `app/services/optimization/README.md`, `tests/optimization/integration/test_nonfunctional.py`; NFR `tests/optimization/unit/` (122 passed; slowest call 0.02s in the final no-coverage run); DOCS `app/services/optimization/README.md`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`; UI `app/services/api/routes/optimization.py`, `app/ui/src/components/workflow/optimization.tsx` |
+| 8. Simulator | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `app/services/simulator/migrations/definitions.py`, `app/services/api/composition/lifecycle.py`; SCHEMA `the owning package `README.md`; REACH `app/services/simulator/state/runtime.py`, `app/services/simulator/state/sessions.py`; CONTRACT `tests/simulator/integration/test_contract_compatibility.py`; LOG/SAFE/QUANT `app/services/simulator/README.md`; NFR `tests/simulator/unit/conftest.py`; DOCS `app/services/simulator/README.md`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`; UI `app/services/api/workstation/simulation/routes.py`, `app/ui/src/components/workflow/simulation.tsx` |
+| 9. Analytics | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `app/services/analytics/migrations/definitions.py`, `app/services/api/composition/lifecycle.py`; SCHEMA `the owning package `README.md`; REACH zero current Analytics-owned tables after guarded migration step `002`; CONTRACT `tests/analytics/integration/test_upstream_fixture_parity.py`; LOG/SAFE/QUANT `app/services/analytics/README.md`; NFR `tests/analytics/unit/conftest.py`; DOCS `app/services/analytics/README.md`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`; UI `app/services/api/workstation/dashboards/routes.py`, `app/ui/src/clients/dashboards.ts`, `app/ui/src/components/workflow/dashboard.tsx` |
+| 10. Optimization | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | DB `app/services/optimization/migrations/definitions.py`, `app/services/api/composition/lifecycle.py`; SCHEMA `the owning package `README.md`; REACH `app/services/optimization/persistence/`, `tests/optimization/integration/test_relational_persistence.py`; CONTRACT/LOG/SAFE/QUANT `app/services/optimization/README.md`, `tests/optimization/integration/test_nonfunctional.py`; NFR `tests/optimization/unit/` (122 passed; slowest call 0.02s in the final no-coverage run); DOCS `app/services/optimization/README.md`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`; UI `app/services/api/workstation/optimization/routes.py`, `app/ui/src/components/workflow/optimization.tsx` |
 | 11. Research | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 12. Portfolio | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |
 | 13. Agentic | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | |

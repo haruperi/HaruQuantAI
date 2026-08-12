@@ -3,17 +3,17 @@
 from pathlib import Path
 
 import pytest
-from app.services.api.identity import (
-    DEFAULT_WATCHLIST_SYMBOLS,
-    IdentityError,
-    create_watchlist,
-    delete_watchlist,
-    list_watchlists,
-    register_user,
-    rename_watchlist,
-    replace_watchlist_items,
+from app.services.api import (
+    create_account_watchlist,
+    delete_account_watchlist,
+    get_api_identity_error_type,
+    get_default_watchlist_symbols,
+    list_account_watchlists,
+    register_api_user,
+    rename_account_watchlist,
+    replace_account_watchlist_items,
     run_api_migrations,
-    set_default_watchlist,
+    set_default_account_watchlist,
 )
 from app.services.data import build_data_settings, data_settings_context
 from app.utils import generate_id
@@ -40,7 +40,7 @@ def _register(username: str) -> str:
     Returns:
         Registered account's stable user id.
     """
-    user = register_user(
+    user = register_api_user(
         username=username,
         password="bounded integration password",  # pragma: allowlist secret
         request_id=generate_id("req"),
@@ -57,7 +57,7 @@ def test_list_watchlists_seeds_default_on_first_read(tmp_path: Path) -> None:
         assert migration.status == "success"
         account_id = _register("wl-seed-user")
 
-        watchlists = list_watchlists(
+        watchlists = list_account_watchlists(
             account_id, source_id="mt5", request_id=generate_id("req")
         )
 
@@ -65,12 +65,12 @@ def test_list_watchlists_seeds_default_on_first_read(tmp_path: Path) -> None:
         assert watchlists[0].name == "default"
         assert watchlists[0].is_default
         assert [item.symbol for item in watchlists[0].items] == list(
-            DEFAULT_WATCHLIST_SYMBOLS
+            get_default_watchlist_symbols()
         )
         assert all(item.source_id == "mt5" for item in watchlists[0].items)
 
         # Re-listing must not duplicate the seed.
-        again = list_watchlists(
+        again = list_account_watchlists(
             account_id, source_id="mt5", request_id=generate_id("req")
         )
         assert len(again) == 1
@@ -83,16 +83,18 @@ def test_watchlist_crud_lifecycle(tmp_path: Path) -> None:
         migration = run_api_migrations(generate_id("req"))
         assert migration.status == "success"
         account_id = _register("wl-crud-user")
-        list_watchlists(account_id, source_id="mt5", request_id=generate_id("req"))
+        list_account_watchlists(
+            account_id, source_id="mt5", request_id=generate_id("req")
+        )
 
-        created = create_watchlist(
+        created = create_account_watchlist(
             account_id, "My Custom", request_id=generate_id("req")
         )
         assert created.name == "My Custom"
         assert not created.is_default
         assert created.items == ()
 
-        updated = replace_watchlist_items(
+        updated = replace_account_watchlist_items(
             created.watchlist_id,
             account_id,
             ("EURUSD", "GBPUSD", "XAUUSD"),
@@ -105,7 +107,7 @@ def test_watchlist_crud_lifecycle(tmp_path: Path) -> None:
             "XAUUSD",
         ]
 
-        renamed = rename_watchlist(
+        renamed = rename_account_watchlist(
             created.watchlist_id,
             account_id,
             "Renamed List",
@@ -118,12 +120,12 @@ def test_watchlist_crud_lifecycle(tmp_path: Path) -> None:
             "XAUUSD",
         ]
 
-        promoted = set_default_watchlist(
+        promoted = set_default_account_watchlist(
             created.watchlist_id, account_id, request_id=generate_id("req")
         )
         assert promoted.is_default
 
-        watchlists = list_watchlists(
+        watchlists = list_account_watchlists(
             account_id, source_id="mt5", request_id=generate_id("req")
         )
         defaults = [item for item in watchlists if item.is_default]
@@ -134,11 +136,11 @@ def test_watchlist_crud_lifecycle(tmp_path: Path) -> None:
             item for item in watchlists if item.watchlist_id != created.watchlist_id
         )
         assert not old_default.is_default
-        delete_watchlist(
+        delete_account_watchlist(
             old_default.watchlist_id, account_id, request_id=generate_id("req")
         )
 
-        remaining = list_watchlists(
+        remaining = list_account_watchlists(
             account_id, source_id="mt5", request_id=generate_id("req")
         )
         assert [item.watchlist_id for item in remaining] == [created.watchlist_id]
@@ -150,12 +152,14 @@ def test_cannot_delete_the_default_watchlist(tmp_path: Path) -> None:
         migration = run_api_migrations(generate_id("req"))
         assert migration.status == "success"
         account_id = _register("wl-guard-user")
-        watchlists = list_watchlists(
+        watchlists = list_account_watchlists(
             account_id, source_id="mt5", request_id=generate_id("req")
         )
 
-        with pytest.raises(IdentityError, match="WATCHLIST_DEFAULT_UNDELETABLE"):
-            delete_watchlist(
+        with pytest.raises(
+            get_api_identity_error_type(), match="WATCHLIST_DEFAULT_UNDELETABLE"
+        ):
+            delete_account_watchlist(
                 watchlists[0].watchlist_id, account_id, request_id=generate_id("req")
             )
 
@@ -167,25 +171,31 @@ def test_watchlist_name_conflict_and_ownership_isolation(tmp_path: Path) -> None
         assert migration.status == "success"
         owner_id = _register("wl-owner")
         other_id = _register("wl-stranger")
-        list_watchlists(owner_id, source_id="mt5", request_id=generate_id("req"))
+        list_account_watchlists(
+            owner_id, source_id="mt5", request_id=generate_id("req")
+        )
 
-        create_watchlist(owner_id, "Duplicate", request_id=generate_id("req"))
-        with pytest.raises(IdentityError, match="WATCHLIST_NAME_CONFLICT"):
-            create_watchlist(owner_id, "Duplicate", request_id=generate_id("req"))
+        create_account_watchlist(owner_id, "Duplicate", request_id=generate_id("req"))
+        with pytest.raises(
+            get_api_identity_error_type(), match="WATCHLIST_NAME_CONFLICT"
+        ):
+            create_account_watchlist(
+                owner_id, "Duplicate", request_id=generate_id("req")
+            )
 
-        owner_watchlists = list_watchlists(
+        owner_watchlists = list_account_watchlists(
             owner_id, source_id="mt5", request_id=generate_id("req")
         )
         target = next(item for item in owner_watchlists if item.name == "Duplicate")
 
-        with pytest.raises(IdentityError, match="WATCHLIST_NOT_FOUND"):
-            rename_watchlist(
+        with pytest.raises(get_api_identity_error_type(), match="WATCHLIST_NOT_FOUND"):
+            rename_account_watchlist(
                 target.watchlist_id,
                 other_id,
                 "Stolen",
                 request_id=generate_id("req"),
             )
-        with pytest.raises(IdentityError, match="WATCHLIST_NOT_FOUND"):
-            delete_watchlist(
+        with pytest.raises(get_api_identity_error_type(), match="WATCHLIST_NOT_FOUND"):
+            delete_account_watchlist(
                 target.watchlist_id, other_id, request_id=generate_id("req")
             )

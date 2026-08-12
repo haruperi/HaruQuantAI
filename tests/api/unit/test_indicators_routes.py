@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from app.services.api.identity import require_auth_context
-from app.services.api.routes.indicators import router
+from app.services.api.workstation.indicators.routes import router
 from fastapi import FastAPI
 
 from tests.api._support import get_json

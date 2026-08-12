@@ -3,7 +3,7 @@
  * `ApiClientError`).
  *
  * Every test uses a fake `fetch` so no network is touched. The cases mirror
- * the FR-API-038/039/040 acceptance unit names from the API README.
+ * the FR-UI-001/039/040 acceptance unit names from the API README.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -64,7 +64,7 @@ function envelope<T>(data: T): ApiResponse<T> {
   };
 }
 
-describe("request — FR-API-038 typed transport", () => {
+describe("request — FR-UI-001 typed transport", () => {
   let originalFetch: typeof globalThis.fetch;
 
   beforeEach(() => {
@@ -253,7 +253,7 @@ describe("request — FR-API-038 typed transport", () => {
   });
 });
 
-describe("unwrapData — FR-API-039", () => {
+describe("unwrapData — FR-UI-002", () => {
   it("returns data for a successful response", () => {
     const response = envelope({ count: 3 });
     expect(unwrapData(response)).toEqual({ count: 3 });
@@ -288,7 +288,7 @@ describe("unwrapData — FR-API-039", () => {
   });
 });
 
-describe("ApiClientError — FR-API-040", () => {
+describe("ApiClientError — FR-UI-003", () => {
   it("carries status, code, ids, retryability, and bounded details", () => {
     const error = new ApiClientError({
       message: "rate limited",

@@ -105,6 +105,7 @@ from app.services.indicators.volatility.ewma_volatility import ewma_volatility
 from app.services.indicators.volatility.garman_klass_volatility import (
     garman_klass_volatility,
 )
+from app.services.indicators.volatility.market_projection import project_market_overlay
 from app.services.indicators.volatility.market_speed import measure_market_speed
 from app.services.indicators.volatility.parkinson_volatility import (
     parkinson_volatility,
@@ -196,6 +197,7 @@ __all__ = (
     "pivots",
     "price_velocity",
     "price_volume_distribution",
+    "project_market_overlay",
     "project_structural_levels",
     "rectangle",
     "rogers_satchell_volatility",

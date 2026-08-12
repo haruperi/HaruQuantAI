@@ -1,4 +1,4 @@
-/** Unit tests for ResearchWorkspace (FR-API-051). */
+/** Unit tests for ResearchWorkspace (FR-UI-016). */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
@@ -35,7 +35,7 @@ function successEnvelope(data: unknown): Response {
 
 const realFetch = globalThis.fetch;
 
-describe("ResearchWorkspace — FR-API-051", () => {
+describe("ResearchWorkspace — FR-UI-016", () => {
   beforeEach(() => {
     globalThis.fetch = vi.fn(async () =>
       successEnvelope({ report_id: "r1", hypothesis: "momentum" })

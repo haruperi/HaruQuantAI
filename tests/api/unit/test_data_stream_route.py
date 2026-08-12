@@ -9,8 +9,11 @@ from datetime import UTC, datetime
 
 import pytest
 from app.services.api.identity import build_auth_context
-from app.services.api.routes import data_stream
-from app.services.api.routes.data_stream import _resume_sequence, _stream_market_data
+from app.services.api.workstation.data import stream_routes as data_stream
+from app.services.api.workstation.data.stream_routes import (
+    _resume_sequence,
+    _stream_market_data,
+)
 from app.utils import generate_id
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict

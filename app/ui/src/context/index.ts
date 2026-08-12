@@ -1,8 +1,8 @@
 /**
- * Frontend context layer barrel (FEAT-API-10, Section 4.10).
+ * Frontend context layer barrel (FEAT-UI-02, Section 4.10).
  *
  * Public surface for authenticated UI session, bounded page context, and
- * governed-write preflight. The stream consumer (FR-API-045) is deferred
+ * governed-write preflight. The stream consumer (FR-UI-009) is deferred
  * pending a backend stream route and is intentionally absent here.
  */
 

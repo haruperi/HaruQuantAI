@@ -1,5 +1,5 @@
 /**
- * Protected workflow pages barrel (FEAT-API-12, Section 4.12).
+ * Protected workflow pages barrel (FEAT-UI-04, Section 4.12).
  *
  * Access gate (`AuthenticationPage` at `/login`), protected layout, and
  * workflow page composing the single-page widget workspace from the public

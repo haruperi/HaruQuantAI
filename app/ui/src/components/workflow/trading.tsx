@@ -1,4 +1,4 @@
-/** Trading session and explicitly governed mutation controls (FR-API-050). */
+/** Trading session and explicitly governed mutation controls (FR-UI-015). */
 
 "use client";
 

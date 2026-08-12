@@ -1,4 +1,4 @@
-/** Unit tests for AppShell (FR-API-046). */
+/** Unit tests for AppShell (FR-UI-010). */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
@@ -20,7 +20,7 @@ function renderShell(children: ReactNode): ReturnType<typeof render> {
   return render(<AppShell><div data-testid="protected">{children}</div></AppShell>);
 }
 
-describe("AppShell — FR-API-046", () => {
+describe("AppShell — FR-UI-010", () => {
   beforeEach(() => {
     authStateMock.mockReset();
   });

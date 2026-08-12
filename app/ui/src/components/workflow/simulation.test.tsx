@@ -1,4 +1,4 @@
-/** Unit tests for SimulationView (FR-API-049). */
+/** Unit tests for SimulationView (FR-UI-013). */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
@@ -35,7 +35,7 @@ function successEnvelope(data: unknown): Response {
 
 const realFetch = globalThis.fetch;
 
-describe("SimulationView — FR-API-049", () => {
+describe("SimulationView — FR-UI-013", () => {
   beforeEach(() => {
     globalThis.fetch = vi.fn(async () =>
       successEnvelope({

@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict
 
 from app.services.api.identity.accounts import AuthenticatedUser
 from app.services.api.identity.errors import IdentityError
-from app.services.api.persistence import (
+from app.services.api.identity.persistence import (
     read_csrf_record,
     read_session_record,
     replace_active_session_record,

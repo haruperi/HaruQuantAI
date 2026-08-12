@@ -5,9 +5,9 @@ from typing import cast
 
 from pydantic import SecretStr
 
-from app.services.api._settings import get_api_settings
 from app.services.api.composition.runtime_settings import build_credential_key_set
 from app.services.api.identity import get_system_settings, resolve_credential_reference
+from app.services.api.workstation.settings.bootstrap import get_api_settings
 from app.services.brokers import build_broker_connection_config as _build_broker_config
 from app.utils import derive_stable_id, get_logger
 

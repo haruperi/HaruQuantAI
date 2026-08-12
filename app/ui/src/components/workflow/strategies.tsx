@@ -1,5 +1,5 @@
 /**
- * Registered strategy catalogue/version workflow presentation (FR-API-048).
+ * Registered strategy catalogue/version workflow presentation (FR-UI-012).
  *
  * Reads the strategy version catalogue via the typed client; selecting a row
  * fetches that strategy's version list. Mutation, raw import/export, and SQX

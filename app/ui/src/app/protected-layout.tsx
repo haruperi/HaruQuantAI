@@ -1,5 +1,5 @@
 /**
- * Protected layout (FR-API-054).
+ * Protected layout (FR-UI-020).
  *
  * Gates the widget workspace on an authenticated session. When the session is
  * loading, renders a spinner. When unauthenticated, redirects to `/login`

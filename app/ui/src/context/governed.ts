@@ -1,5 +1,5 @@
 /**
- * Governed-write preflight (FR-API-044).
+ * Governed-write preflight (FR-UI-008).
  *
  * Builds request options carrying idempotency-key and governance metadata for
  * governed writes, and blocks obviously incomplete or stale client context

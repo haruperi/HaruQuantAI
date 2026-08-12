@@ -1,4 +1,4 @@
-/** Unit tests for StrategyWorkspace (FR-API-048). */
+/** Unit tests for StrategyWorkspace (FR-UI-012). */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
@@ -35,7 +35,7 @@ function successEnvelope(data: unknown): Response {
 
 const realFetch = globalThis.fetch;
 
-describe("StrategyWorkspace — FR-API-048", () => {
+describe("StrategyWorkspace — FR-UI-012", () => {
   beforeEach(() => {
     globalThis.fetch = vi.fn(async () =>
       successEnvelope([{ id: "strat-1", name: "Momentum" }])

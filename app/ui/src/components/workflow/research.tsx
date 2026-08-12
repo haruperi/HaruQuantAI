@@ -1,5 +1,5 @@
 /**
- * Core Edge Lab research presentation (FR-API-051).
+ * Core Edge Lab research presentation (FR-UI-016).
  *
  * Runs an Edge Lab profile via the typed client and renders the advisory
  * `ResearchReport`. Research-internal profile/scorecard/snapshot sub-views are

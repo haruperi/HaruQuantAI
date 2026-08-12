@@ -16,7 +16,7 @@ from app.services.api.middleware import (
 from app.services.api.middleware import (
     build_secret_redaction_middleware as _build_secret_redaction_middleware,
 )
-from app.services.api.workstation import (
+from app.services.api.workstation.operational import (
     build_workstation_read_model,
     execute_workstation_command,
 )
@@ -41,13 +41,13 @@ if TYPE_CHECKING:
         Liveness,
         PageContext,
         Readiness,
-        ResearchRunRequest,
         RouteContract,
         StreamEvent,
     )
     from app.services.api.middleware.redaction import EventEmitter
     from app.services.api.observability.exposition import MetricSnapshot
     from app.services.api.observability.sinks import MetricSink
+    from app.services.api.workstation.research.schemas import ResearchRunRequest
 type AuthContext = Any
 
 __all__ = (
@@ -85,19 +85,24 @@ __all__ = (
     "build_workstation_read_model",
     "check_clock_drift",
     "consume_api_approval",
+    "create_account_watchlist",
     "create_api_app",
     "create_api_approval",
     "create_api_session",
     "create_in_process_metric_sink",
     "create_stream_manager",
+    "delete_account_watchlist",
     "deliver_critical_alert",
     "execute_workstation_command",
     "export_prometheus_metrics",
     "finalize_api_idempotency_key",
+    "get_account_watchlist",
+    "get_api_identity_error_type",
     "get_api_settings",
     "get_canonical_route_contract_registry",
     "get_credential_manifest",
     "get_critical_alert_error_type",
+    "get_default_watchlist_symbols",
     "get_legacy_settings_classification",
     "get_liveness",
     "get_metrics",
@@ -109,17 +114,21 @@ __all__ = (
     "get_system_settings_manifest",
     "get_user_settings",
     "hash_api_password",
+    "list_account_watchlists",
     "normalize_stream_event",
     "record_metric",
     "recover_api_session_identity",
     "register_api_user",
     "register_route_contract",
+    "rename_account_watchlist",
+    "replace_account_watchlist_items",
     "require_api_permission",
     "reserve_api_idempotency_key",
     "resolve_api_credential_reference",
     "resolve_system_credential_slot",
     "revoke_api_session",
     "run_api_migrations",
+    "set_default_account_watchlist",
     "store_api_credential",
     "store_system_credential",
     "update_system_settings",
@@ -193,7 +202,7 @@ def build_research_run_request(**values: object) -> ResearchRunRequest:
     Returns:
         The validated, bounded result.
     """
-    from app.services.api.contracts.models import ResearchRunRequest
+    from app.services.api.workstation.research.schemas import ResearchRunRequest
 
     return ResearchRunRequest.model_validate(values)
 
@@ -489,7 +498,7 @@ def build_api_settings(**values: object) -> object:
     Returns:
         Validated API settings.
     """
-    from app.services.api._settings import ApiSettings
+    from app.services.api.workstation.settings.bootstrap import ApiSettings
 
     return ApiSettings.model_validate(values)
 
@@ -500,7 +509,9 @@ def get_api_settings() -> object:
     Returns:
         Validated API settings.
     """
-    from app.services.api._settings import get_api_settings as _get_api_settings
+    from app.services.api.workstation.settings.bootstrap import (
+        get_api_settings as _get_api_settings,
+    )
 
     return _get_api_settings()
 
@@ -522,8 +533,8 @@ def create_api_app(
     Returns:
         Canonical FastAPI application.
     """
-    from app.services.api._settings import ApiSettings
     from app.services.api.composition import create_app
+    from app.services.api.workstation.settings.bootstrap import ApiSettings
 
     typed_config = config if isinstance(config, ApiSettings) else None
     return create_app(
@@ -953,7 +964,9 @@ def run_api_migrations(request_id: str) -> object:
     Returns:
         Data-owned migration response.
     """
-    from app.services.api.identity import run_api_migrations as _run_api_migrations
+    from app.services.api.composition.migrations import (
+        run_api_migrations as _run_api_migrations,
+    )
 
     return _run_api_migrations(request_id)
 
@@ -964,7 +977,7 @@ def create_stream_manager(**values: object) -> object:
     Returns:
         Internal stream manager through its function-only public factory.
     """
-    from app.services.api.streams import (
+    from app.services.api.workstation.event_delivery import (
         create_stream_connection_manager as _create_manager,
     )
 
@@ -977,7 +990,9 @@ def normalize_stream_event(event: object, trace: object) -> StreamEvent:
     Returns:
         Validated stream event.
     """
-    from app.services.api.streams import build_stream_event as _build_stream_event
+    from app.services.api.workstation.event_delivery import (
+        build_stream_event as _build_stream_event,
+    )
 
     return _build_stream_event(event, trace)
 
@@ -1070,3 +1085,116 @@ def validate_api_csrf(
         csrf_token,
         **cast("Any", values),
     )
+
+
+def get_default_watchlist_symbols() -> tuple[str, ...]:
+    """Return the immutable default-watchlist seed symbols."""
+    from app.services.api.workstation.watchlists import DEFAULT_WATCHLIST_SYMBOLS
+
+    return DEFAULT_WATCHLIST_SYMBOLS
+
+
+def get_api_identity_error_type() -> type[Exception]:
+    """Return the API identity error type without exporting a class."""
+    from app.services.api.identity import IdentityError
+
+    return IdentityError
+
+
+def list_account_watchlists(
+    account_id: str, *, source_id: str, request_id: str
+) -> tuple[object, ...]:
+    """List one account's watchlists through the API public boundary.
+
+    Returns:
+        Account-owned watchlists in display order.
+    """
+    from app.services.api.workstation.watchlists import list_watchlists
+
+    return cast(
+        "tuple[object, ...]",
+        list_watchlists(account_id, source_id=source_id, request_id=request_id),
+    )
+
+
+def get_account_watchlist(
+    watchlist_id: str, account_id: str, *, request_id: str
+) -> object:
+    """Return one account-owned watchlist."""
+    from app.services.api.workstation.watchlists import get_watchlist
+
+    return get_watchlist(watchlist_id, account_id, request_id=request_id)
+
+
+def create_account_watchlist(account_id: str, name: str, *, request_id: str) -> object:
+    """Create one account-owned watchlist.
+
+    Returns:
+        Created watchlist.
+    """
+    from app.services.api.workstation.watchlists import create_watchlist
+
+    return create_watchlist(account_id, name, request_id=request_id)
+
+
+def rename_account_watchlist(
+    watchlist_id: str,
+    account_id: str,
+    name: str,
+    *,
+    request_id: str,
+) -> object:
+    """Rename one account-owned watchlist.
+
+    Returns:
+        Renamed watchlist.
+    """
+    from app.services.api.workstation.watchlists import rename_watchlist
+
+    return rename_watchlist(watchlist_id, account_id, name, request_id=request_id)
+
+
+def set_default_account_watchlist(
+    watchlist_id: str, account_id: str, *, request_id: str
+) -> object:
+    """Promote one account-owned watchlist to the default.
+
+    Returns:
+        Updated default watchlist.
+    """
+    from app.services.api.workstation.watchlists import set_default_watchlist
+
+    return set_default_watchlist(watchlist_id, account_id, request_id=request_id)
+
+
+def replace_account_watchlist_items(
+    watchlist_id: str,
+    account_id: str,
+    symbols: tuple[str, ...],
+    *,
+    source_id: str,
+    request_id: str,
+) -> object:
+    """Replace one account-owned watchlist's ordered symbols.
+
+    Returns:
+        Updated watchlist.
+    """
+    from app.services.api.workstation.watchlists import replace_watchlist_items
+
+    return replace_watchlist_items(
+        watchlist_id,
+        account_id,
+        symbols,
+        source_id=source_id,
+        request_id=request_id,
+    )
+
+
+def delete_account_watchlist(
+    watchlist_id: str, account_id: str, *, request_id: str
+) -> None:
+    """Delete one non-default account watchlist."""
+    from app.services.api.workstation.watchlists import delete_watchlist
+
+    delete_watchlist(watchlist_id, account_id, request_id=request_id)

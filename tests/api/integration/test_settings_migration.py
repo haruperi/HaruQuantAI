@@ -4,7 +4,7 @@ import sqlite3
 from pathlib import Path
 
 from app.services.api import run_api_migrations
-from app.services.api.migrations import get_api_migration_steps
+from app.services.api.composition.migrations import get_api_migration_steps
 from app.services.data import (
     build_data_settings,
     build_migration_request,

@@ -12,7 +12,7 @@ from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.services.api.identity.errors import IdentityError
 from app.services.api.identity.passwords import hash_password, verify_password
-from app.services.api.persistence import (
+from app.services.api.identity.persistence import (
     create_account_record,
     delete_auth_failure_record,
     read_account_record,

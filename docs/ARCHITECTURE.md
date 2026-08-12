@@ -40,8 +40,8 @@
   emergency-response, and qualification evidence under additive migration 003;
   its existing calculations remain pure. Durable mutations are audit-event
   producers and corrections append rather than rewrite evidence.
-* UI/API owns `OperationalWorkstation v1`, the authenticated workstation read and
-  optimistic command routes, and the accessible workstation presentation. Human
+* API owns `OperationalWorkstation v1` plus the authenticated workstation read and
+  optimistic command routes; UI owns the accessible workstation presentation. Human
   API approval is attestation only; Risk-owned authorization remains authoritative,
   and owner handlers verify expected versions before mutation.
 * Strategy domain persistence is implemented and `Completed`: `app/services/strategy//` owns seven persistent runtime tables (`strategy_definitions`, `strategy_versions`, `strategy_configs`, `strategy_state`, `strategy_checkpoints`, `strategy_signals`, `strategy_mutations`) backed by applied migrations `0001_strategy_domain` and `0002_strategy_seven_table_runtime`, plus operational-planning tables (`strategy_profiles`, `strategy_playbooks`, `strategy_setup_evaluations`, `strategy_plans`, `strategy_automation_policy`, `strategy_lifecycle`) defined by additive migration `0003_strategy_operational_planning`. Schema migrations flow through the Strategy migration manifest (`run_strategy_migrations`), private CRUD in `app/services/strategy/persistence/` constructs SQL statements and delegates transaction execution to `app.services.data`, feature operations outside `persistence/` provide production reachability, and database bootstrap/population (`scripts/strategy/populate_strategy_database.py`) is restricted to an explicitly selected non-production environment (`ENVIRONMENT=dev`).
@@ -338,7 +338,7 @@
   validation, scoring, robustness, evidence, and Data-backed relational state.
   Its complete checksummed manifest runs through Data's ledger, lock, and
   transactional migration boundary; its two current tables are reached through
-  Optimization-owned CRUD builders. UI/API surfaces advisory evidence only and
+  Optimization-owned CRUD builders. API surfaces advisory evidence only and
   cannot automatically adopt parameters or place trades.
 * `app/services/research/` provides a completed sixteen-feature deterministic
   research baseline. In addition to bounded point-in-time intelligence,
@@ -356,11 +356,12 @@
 
 ### Workspace Directory Layout (Target)
 
-* `app/services/api/`: FastAPI application, routes, middleware, authentication/session/credential boundary, API composition, and channel-neutral critical operational alert delivery. Registered owner-backed operations include Trading session and governed submit/cancel/close routes alongside dashboard, audit-event, Trading operational-event, and Data market-stream sources. Its authenticated Data capability catalogue presents bounded metadata for all fourteen Data features without invoking providers, fabricating evidence, or duplicating Data policy. The stream route owns authentication, quota admission, SSE framing, and cleanup only; Data owns stream acquisition and cadence. Trading write routes compose exact owner requests and never replace Risk, kill-switch, approval, route, or reconciliation authority. UI/API owns user/session/unified user-and-system settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration. System Broker composition reads persisted enablement, resolves the approved encrypted credential slot in memory, and admits only fixed non-production targets.
+* `app/services/api/`: FastAPI transport, authentication/session/credential boundary, route orchestration, runtime composition, and channel-neutral critical operational alert delivery. It may authorize, sequence public owner-domain operations, translate errors, and assemble boundary DTOs; it may not calculate market, indicator, trading, risk, strategy, analytics, research, or portfolio values. API owns user/session/unified user-and-system settings/encrypted-credential/HTTP-idempotency schemas on Data infrastructure and constructs Brokers-owned connection configuration. The Settings feature owns both externally provisioned pre-database bootstrap configuration and API-wide boundary limits, distinctly from its persisted post-migration settings routes. The non-feature `workstation/` namespace groups every focused page/widget gateway feature. Routes, feature adapters, persistence, schema migrations, configuration, and limit policy remain in their owning feature; only coherent support consumed by at least three registered features remains shared at the API domain level. The API package root contains only its public `__init__.py` production-Python boundary.
+* `app/ui/`: Independent Next.js presentation domain owning pages, layouts, widgets, typed clients, session/page context, interaction state, accessibility, and explicit loading/empty/stale/unavailable/error presentation. UI depends on API contracts only and has no deterministic business-policy authority. `FEAT-UI-*` verification uses executable unit, component, integration, contract-parity, and browser evidence rather than standalone usage-example programs. Markets and Watchlists reside in focused `features/markets/` and `features/watchlists/` folders; other widgets live with their registered owning features.
 * `app/agentic/`: Approved top-level orchestration domain with one focused owning module per registered feature. Ten shared infrastructure features remain root packages for portable contracts/governance, Google ADK adaptation, durable orchestration, permissions, context/memory, bounded deliberation, lifecycle, operations, and public API. Twelve role-bearing feature modules are leaf packages under the namespace-only `agents/<department>/<agent_name>/` hierarchy; each owns `agent.py`, `prompt.md`, schemas, README, and only its declared optional files. Agentic submits untrusted typed requests only and has no direct execution path.
 * `app/`: Core domain modules (utils, brokers, data, indicators, strategy, risk, trading, simulator, analytics, optimization, research, portfolio, agentic, and API). Live-route execution is owned by Trading.
 * `data/`: SQLite databases, migration tracking, cache/log dumps, market/research assets.
-* `ui/`: Next.js frontend application environment.
+* `app/ui/`: Next.js frontend domain and deployable application environment.
 * `tests/`: Unit, integration, usage, and system contract test suites.
 * `scripts/`: DB initialization, migration runners, validation tools, operational utilities.
 * `docs/`: Documented project truth.
@@ -372,7 +373,8 @@ public domain APIs and may not bypass Risk, Trading, Data, or Brokers boundaries
 
 ```mermaid
 flowchart TD
-    CLIENT["UI / External clients"] --> API["UI/API Gateway / Identity / Access Control"]
+    UI["UI"] --> API["API Gateway / Identity / Access Control"]
+    CLIENT["External clients"] --> API
     API --> AGENTIC["Agentic Firm: governed research, deliberation and proposals"]
     API --> ORCH["Research / Optimization / Simulation / Analytics"]
     AGENTIC --> ORCH
@@ -427,7 +429,8 @@ Only `runtime/adk.py` may construct Google ADK objects.
 
 ```mermaid
 flowchart LR
-    OP["Authenticated operator"] --> API2["UI/API"]
+    OP["Authenticated operator"] --> UI2["UI"]
+    UI2 --> API2["API"]
     API2 --> AP["Agentic public API"]
     AP --> POL["Mandate + permission enforcement"]
     POL --> WF["Durable HaruQuantAI workflow state"]
@@ -461,12 +464,15 @@ checksum, lock, transaction, retention, and recovery rules.
 
 Data owns shared database connection, bounded transaction, locking, migration-ledger,
 backup, and recovery infrastructure. Each persistent domain owns the meaning of its
-records and keeps CRUD statement construction in one private
-`app/services/[DOMAIN]/persistence/` support package containing exactly
+records. CRUD shared by at least three registered features stays in one private
+`app/services/[DOMAIN]/persistence/` support package; otherwise it stays in the
+owning feature's private `persistence/` package. Either package contains exactly
 `__init__.py`, `create.py`, `read.py`, `update.py`, and `delete.py`. Atomic
 multi-statement operations are classified by domain effect and remain in one CRUD
 module. Unsupported verbs retain an empty module, while immutable schema definitions
-remain in the domain's separate `migrations/` support package. Domain feature modules
+remain in the corresponding domain- or feature-local `migrations/` support package.
+One composition entry point may aggregate feature manifests without changing their
+domain, migration identifiers, checksums, statements, or order. Domain feature modules
 retain authorization, validation, policy, orchestration, domain-model construction,
 and public response behavior and call persistence only through the private package
 boundary. Cross-domain persistence infrastructure is consumed only through
@@ -494,7 +500,7 @@ business authority:
 - Portfolio owns accounting state; Simulator owns simulated execution and replay state.
 - Analytics owns scoring and reporting; Optimization and Research own advisory evidence.
 - Agentic may explain or propose but cannot bypass deterministic owners.
-- UI/API presents and delegates without becoming a business authority.
+- API orchestrates and UI presents without either becoming a business authority.
 
 Provider absence, stale evidence, incompatible versions, or unknown state fails closed
 at the consuming feature boundary.
@@ -512,7 +518,7 @@ versions fail closed, and random draws depend only on explicit seed, stream name
 algorithm version, and draw index.
 
 * **Public Export Rule**: `app/utils/__init__.py` exposes only the approved shared surface through an explicit `__all__`. No fallback imports, shims, duplicate modules, or single-consumer helpers are permitted.
-* **Target Submodule Footprint**: shared contracts, errors, IDs, time, canonical serialization, redaction, typed bootstrap settings, and structured logging. `AppSettings` accepts explicit values and process environment only; repository configuration files are not runtime sources. Logging starts with the Utils-owned safe `INFO` bootstrap profile; after API migrations, UI/API reads the global document from `api_settings`, validates and activates `LOG_LEVEL`, translates only approved provider enablement/path values into an opaque Utils settings object, and installs it through Data's context-local public boundary for the complete API lifespan. Data, Brokers, and Utils never query API persistence. UI/API owns versioned global non-secret settings in `api_settings`, AES-GCM encrypted write-only provider credentials in `api_credentials`, typed manifests, validation, active-key selection, and startup snapshots. Deployment infrastructure exclusively owns the bootstrap values needed before SQLite or decryption is available: environment/runtime safety controls, database/path configuration, API origin/bind configuration, JWT signing material, and credential-encryption keys. Database-backed changes activate after a controlled restart so composition roots can inject one coherent snapshot into owning domains.
+* **Target Submodule Footprint**: shared contracts, errors, IDs, time, canonical serialization, redaction, typed bootstrap settings, and structured logging. `AppSettings` accepts explicit values and process environment only; repository configuration files are not runtime sources. Logging starts with the Utils-owned safe `INFO` bootstrap profile; after API migrations, API reads the global document from `api_settings`, validates and activates `LOG_LEVEL`, translates only approved provider enablement/path values into an opaque Utils settings object, and installs it through Data's context-local public boundary for the complete API lifespan. Data, Brokers, and Utils never query API persistence. API owns versioned global non-secret settings in `api_settings`, AES-GCM encrypted write-only provider credentials in `api_credentials`, typed manifests, validation, active-key selection, and startup snapshots. Deployment infrastructure exclusively owns the bootstrap values needed before SQLite or decryption is available: environment/runtime safety controls, database/path configuration, API origin/bind configuration, JWT signing material, and credential-encryption keys. Database-backed changes activate after a controlled restart so composition roots can inject one coherent snapshot into owning domains.
 * **Contract Ownership Rule**: Domain contract modules own their payload and business-outcome behavior locally. Utils owns only the shared five-field public-operation response envelope and business-neutral error-definition shape; domains do not inherit any other centralized contract base.
 
 ### Standard Public-Operation Response
@@ -576,7 +582,7 @@ render a system-wide catalogue without making Utils depend on a service domain.
 ```
 
 Required `AuditEvent v1` producers are Data, Strategy, Risk, Trading, Simulation,
-Optimization, Research, Portfolio, and UI/API. Brokers emits technical logs only;
+Optimization, Research, Portfolio, and API. Brokers emits technical logs only;
 Indicators and Analytics are pure/read-only, so their governed callers audit actions.
 
 ### Shared Authentication Context
@@ -624,7 +630,7 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
   tick-copy read without timeframe throttling; bar mode emits genuine closed bars at
   the selected canonical UTC boundary. Shared sequencing, heartbeat, bounded replay,
   explicit gap/backpressure failure, and producer cleanup remain Data behavior. The
-  UI/API route is only an authenticated SSE transport bridge.
+  API route is only an authenticated SSE transport bridge.
 - `MarketDataRequest.limit` is required to be positive, but OHLCV retrieval has no
   app-wide record-count ceiling. Tick and spread retrieval retain their governed
   limits; multi-million-record OHLCV ingestion remains the responsibility of the
@@ -734,7 +740,7 @@ Portfolio collaboration is contract-governed:
 * **Table Namespace Prefixes**: Each persistent domain uses an owner-specific singular-full-word namespace: `util_`, `broker_`, `data_`, `indicator_`, `strategy_`, `risk_`, `trading_`, `sim_`, `optimization_`, `research_`, `portfolio_`, `agentic_`, and `api_`. `sim_` is canonical for Simulator; its immutable manifest contains `sim_runs`, playback/secured `sim_sessions`, and hash-linked `sim_session_checkpoints`, while journals remain JSONL artifacts rather than tables. Analytics is read-only and has no current tables; its historical `analytics_` store is retired by complete-manifest migration step `002`. Exact current and target table names belong only in the owning domain README and migrations.
 * **Target vs Current Divergence**: A new table must conform to its owning README model. An existing table that diverges is documented in that README with an adoption tier, not silently migrated away. Closing a divergence requires an additive migration or explicit baseline-reset approval.
 * **Migration Invariance**: Database tracking updates via additive structure migrations. Modifying applied structural migrations is prohibited without an explicit baseline reset approval.
-* **Migration Definition Location**: Immutable schema definitions live in `app/services/<domain>/migrations/` — one migration package per domain, aggregating that domain's schema. Migrations are schema evolution, not CRUD, and remain outside the domain `persistence/` package. Sites that predate this rule are non-conformant. Relocation is an import-path refactor, not a ledger risk: a step checksum is computed over its ordered SQL statements only, and the ledger keys on `(domain, migration_id)`, so neither module path nor file name is an input. The invariants a move must preserve are the statement tuple byte-for-byte, including whitespace, and the literal `domain` and `migration_id` values.
+* **Migration Definition Location**: Immutable schema definitions live beside their owner in `app/services/<domain>/migrations/` or `app/services/<domain>/<feature>/migrations/`. A domain-level location requires at least three registered feature consumers; otherwise definitions are feature-local and a composition entry point aggregates the complete domain manifest. Migrations are schema evolution, not CRUD. Relocation is an import-path refactor, not a ledger risk: a step checksum is computed over its ordered SQL statements only, and the ledger keys on `(domain, migration_id)`, so neither module path nor file name is an input. A move must preserve the statement tuple byte-for-byte, including whitespace, and the literal `domain` and `migration_id` values.
 * **Normalise vs Payload**: A field becomes a typed column only when it is filtered or joined on, enforceable by a `CHECK` constraint, or part of a unique key. Everything else is carried in a single `*_json` payload validated by `json_valid`, with frequently queried inner keys exposed as indexed generated columns rather than promoted to real columns. This keeps constraint enforcement where it earns its cost while allowing payload evolution without an additive migration.
 
 ---
@@ -773,14 +779,14 @@ Portfolio collaboration is contract-governed:
 
 ### Critical Operational Alert Boundary
 
-Critical operational alerts are a focused UI/API delivery boundary, not a Notification
+Critical operational alerts are a focused API delivery boundary, not a Notification
 domain and not an execution-control authority:
 
 * The only approved triggers are a Risk-owned `KillSwitchState v1` transition to
   `active` and a Trading-owned critical `OperationalEvent v1` with
   `event_type="BROKER_STATE_UNKNOWN"` after the affected conflict scope is retry
   locked.
-* UI/API validates the authoritative source, derives one deterministic
+* API validates the authoritative source, derives one deterministic
   `CriticalOperationalAlert v1`, and performs one delivery attempt through an injected
   channel-neutral idempotent sink. The alert identifier is derived from the trigger,
   source schema, and immutable source identity/version, and is the sink's idempotency
@@ -788,22 +794,22 @@ domain and not an execution-control authority:
 * Alert content uses fixed trigger-specific templates and bounded, allowlisted,
   redacted facts. Arbitrary source payload forwarding, secrets, provider objects, and
   private broker state are forbidden.
-* The composition root passes Risk results and Trading events to UI/API-owned alert
-  functions. Risk and Trading never import UI/API, so the code dependency remains
+* The composition root passes Risk results and Trading events to API-owned alert
+  functions. Risk and Trading never import API, so the code dependency remains
   one-way and acyclic.
 * Construction or delivery failure produces a structured
   `CriticalAlertDeliveryResult` and a redacted error log. It never rolls back or clears
   Risk state, releases a Trading retry lock, changes execution truth, or permits a
   mutation.
 * Provider-specific channels, generic notifications, automatic retry queues,
-  acknowledgements, escalation policy, and UI/API-local mutable deduplication state are
+  acknowledgements, escalation policy, and API-local mutable deduplication state are
   outside the initial target.
 
 ### Core Security Mandates
 
 * Plaintext application passwords, live API keys, provider access configurations, and cryptographic seeds are classified as system secrets.
 * Redact sensitive patterns from execution dumps, trace events, log lines, and metrics payloads case-insensitively before persistence.
-* UI/API encrypts persisted credential material and selects from externally
+* API encrypts persisted credential material and selects from externally
   provisioned keys. It never generates, persists, or rotates encryption keys.
 
 ---
@@ -816,8 +822,8 @@ domain and not an execution-control authority:
 | **System Persistence** | `DATABASE_URL`, `DATA_DIR`, `ARTIFACT_DIR`, `DATA_CACHE_PATH` |
 | **Operational Protection** | `ALLOW_LIVE_MUTATIONS` (defaults to `false`), `RUNTIME_PROFILE`, `EXECUTION_ROUTE` |
 | **Structured Logging** | `LOG_LEVEL`, `LOG_RENDER` |
-| **Settings Loading** | Explicit values and process environment bootstrap only the values required before SQLite can open or credentials can decrypt. Logging uses safe `INFO` and providers remain disabled during that phase. After API migrations, UI/API loads the versioned global document, activates `LOG_LEVEL`, and injects its validated provider enablement/path snapshot into Data/Brokers for the API lifespan; provider secrets remain encrypted in `api_credentials` and are never returned through read APIs. All database-backed changes require a controlled restart. |
-| **Broker Integration** | Provider-neutral adapter selection/readiness plus adapter-specific settings; UI/API composition resolves credential references and injects Brokers-owned `BrokerConnectionConfig` instances. |
+| **Settings Loading** | Explicit values and process environment bootstrap only the values required before SQLite can open or credentials can decrypt. Logging uses safe `INFO` and providers remain disabled during that phase. After API migrations, API loads the versioned global document, activates `LOG_LEVEL`, and injects its validated provider enablement/path snapshot into Data/Brokers for the API lifespan; provider secrets remain encrypted in `api_credentials` and are never returned through read APIs. All database-backed changes require a controlled restart. |
+| **Broker Integration** | Provider-neutral adapter selection/readiness plus adapter-specific settings; API composition resolves credential references and injects Brokers-owned `BrokerConnectionConfig` instances. |
 
 ---
 
@@ -1165,7 +1171,7 @@ Applied to every table in this proposal without exception.
 | Money | `TEXT` holding a `decimal.Decimal` string. **Never `REAL`.** Per `ARCHITECTURE.md` L648. |
 | JSON | `TEXT` + `CHECK(json_valid(col))`, `*_json` suffix. |
 | Normalise vs. payload | **The hybrid rule (D9).** A field becomes a typed column only if it is (i) filtered or joined on, (ii) enforceable by a `CHECK`, or (iii) part of a unique key. Everything else stays in one `*_json` payload. Hot inner keys are exposed as indexed `GENERATED ALWAYS AS (json_extract(...)) VIRTUAL` columns rather than promoted to real columns. This keeps constraint enforcement where it earns its cost, without requiring an additive migration for every new parameter under the immutable ledger. |
-| Migration location | **`app/services/<domain>/migrations/` (D12).** One migration package per domain, aggregating that domain's schema definitions. Migrations are schema evolution, not CRUD, and stay outside the `persistence/` package. |
+| Migration location | **Owner-local migration package (D12).** Use `app/services/<domain>/migrations/` only for manifests shared by at least three registered features; otherwise use the owning feature's `migrations/` and aggregate through Composition. Migrations are schema evolution, not CRUD. |
 | Strictness | `STRICT` on all tables (matches `trading_*` and `agentic_*` precedent). |
 | Soft delete | `deleted_at TEXT` (nullable) on config tables. Never on financial records. |
 
@@ -1994,7 +2000,7 @@ tables for one job.
 | `sim_runs` | `sim_runs` | **Partially applied inspected database:** the ledger contains conformant `sim_runs` from `001_simulator_state_v1`; later immutable steps add playback/secured `sim_sessions` and hash-linked `sim_session_checkpoints`. The complete three-step manifest is owned by `run_simulator_migrations`, and required API startup fails closed if any step cannot be verified or applied. |
 | `agentic_traces` / `agentic_trace_spans` | `agentic_operations_traces` | Keep live name |
 | `agentic_workflow_checkpoints` (proposal) | same name, different columns | Keep live |
-| ~~`util_settings`~~ | `api_settings` + typed bootstrap settings | **Withdrawn.** Utils owns no tables; UI/API owns unified non-secret user/system documents while externally provisioned process values bootstrap the database; see [01](01_entity_specs_core.md) Domain 1 |
+| ~~`util_settings`~~ | `api_settings` + typed bootstrap settings | **Withdrawn.** Utils owns no tables; API owns unified non-secret user/system documents while externally provisioned process values bootstrap the database; see [01](01_entity_specs_core.md) Domain 1 |
 
 ---
 

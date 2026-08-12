@@ -12,9 +12,11 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
-from app.services.api.composition import data_dependencies
 from app.services.api.identity import require_auth_context
-from app.services.api.routes import data
+from app.services.api.workstation.data import orchestration as data_dependencies
+from app.services.api.workstation.data import routes as data
+from app.services.api.workstation.markets import orchestration as markets_orchestration
+from app.services.api.workstation.markets import routes as markets
 from app.utils import create_auth_context, generate_id, utc_now
 from fastapi import FastAPI
 
@@ -340,7 +342,7 @@ def _markets_app() -> FastAPI:
         Configured FastAPI application.
     """
     app = FastAPI()
-    app.include_router(data.router)
+    app.include_router(markets.router)
     app.dependency_overrides[require_auth_context] = lambda: _auth(
         permissions=("data:read",)
     )
@@ -350,7 +352,7 @@ def _markets_app() -> FastAPI:
 def test_markets_requires_read_permission() -> None:
     """The markets route refuses callers without data:read permission."""
     app = FastAPI()
-    app.include_router(data.router)
+    app.include_router(markets.router)
     app.dependency_overrides[require_auth_context] = lambda: _auth(permissions=())
     status_code, _body = get_json(app, "/api/v1/data/markets")
     assert status_code == 403
@@ -389,8 +391,10 @@ def test_markets_delegates_once_with_resolved_source(
             metadata={},
         )
 
-    monkeypatch.setattr(data, "resolve_runtime_source_id", _fake_resolve)
-    monkeypatch.setattr(data, "list_market_directory", _fake_directory)
+    monkeypatch.setattr(
+        markets_orchestration, "resolve_runtime_source_id", _fake_resolve
+    )
+    monkeypatch.setattr(markets_orchestration, "list_market_directory", _fake_directory)
 
     client = TestClient(_markets_app(), raise_server_exceptions=True)
     response = client.get("/api/v1/data/markets?limit=25")
@@ -417,9 +421,11 @@ def test_markets_forwards_explicit_source_id(
         captured["override"] = override
         return override or ""
 
-    monkeypatch.setattr(data, "resolve_runtime_source_id", _fake_resolve)
     monkeypatch.setattr(
-        data,
+        markets_orchestration, "resolve_runtime_source_id", _fake_resolve
+    )
+    monkeypatch.setattr(
+        markets_orchestration,
         "list_market_directory",
         lambda _request: SimpleNamespace(
             status="success",
@@ -439,7 +445,7 @@ def test_markets_forwards_explicit_source_id(
 def test_quotes_requires_read_permission() -> None:
     """The quotes route refuses callers without data:read permission."""
     app = FastAPI()
-    app.include_router(data.router)
+    app.include_router(markets.router)
     app.dependency_overrides[require_auth_context] = lambda: _auth(permissions=())
     status_code, _body = get_json(
         app, "/api/v1/data/quotes", query_string="symbols=EURUSD"
@@ -489,8 +495,10 @@ def test_quotes_delegates_once_with_parsed_symbols(
             metadata={},
         )
 
-    monkeypatch.setattr(data, "resolve_runtime_source_id", _fake_resolve)
-    monkeypatch.setattr(data, "get_symbols_quotes", _fake_quotes)
+    monkeypatch.setattr(
+        markets_orchestration, "resolve_runtime_source_id", _fake_resolve
+    )
+    monkeypatch.setattr(markets_orchestration, "get_symbols_quotes", _fake_quotes)
 
     client = TestClient(_markets_app(), raise_server_exceptions=True)
     response = client.get("/api/v1/data/quotes?symbols=EURUSD, GBPUSD")
@@ -509,7 +517,6 @@ def test_quotes_merges_technical_overlays_when_requested(
     """include_technicals=true merges the composed overlay into each row."""
     from datetime import UTC, datetime
 
-    from app.services.api.routes import market_overlays
     from app.services.data.market_data.directory_contracts import (
         MarketDirectory,
         MarketDirectoryRow,
@@ -550,22 +557,33 @@ def test_quotes_merges_technical_overlays_when_requested(
     captured_overlay_calls: list[tuple[str, str]] = []
 
     def _fake_overlay(
-        source_id: str, symbol: str, *, request_id: str | None = None
-    ) -> object:
+        source_id: str,
+        symbol: str,
+        *,
+        last_price: float | None,
+        request_id: str | None = None,
+    ) -> dict[str, float | None]:
         captured_overlay_calls.append((source_id, symbol))
-        return market_overlays.TechnicalOverlay(
-            volatility_percent=5.5,
-            adr_pips=42.0,
-            range_percent_of_adr=61.0,
-            pip_size=0.0001,
-            open=1.09,
-            high=1.11,
-            low=1.08,
-        )
+        assert last_price == pytest.approx(1.1)
+        return {
+            "volatility": 5.5,
+            "adr": 42.0,
+            "range_percent_of_adr": 61.0,
+            "open": 1.09,
+            "high": 1.11,
+            "low": 1.08,
+            "change": 0.01,
+            "change_percent": 0.9174311926605506,
+            "change_pips": 100.0,
+        }
 
-    monkeypatch.setattr(data, "resolve_runtime_source_id", _fake_resolve)
-    monkeypatch.setattr(data, "get_symbols_quotes", _fake_quotes)
-    monkeypatch.setattr(data, "build_technical_overlay", _fake_overlay)
+    monkeypatch.setattr(
+        markets_orchestration, "resolve_runtime_source_id", _fake_resolve
+    )
+    monkeypatch.setattr(markets_orchestration, "get_symbols_quotes", _fake_quotes)
+    monkeypatch.setattr(
+        markets_orchestration, "build_technical_evidence", _fake_overlay
+    )
 
     client = TestClient(_markets_app(), raise_server_exceptions=True)
     response = client.get("/api/v1/data/quotes?symbols=EURUSD&include_technicals=true")
@@ -623,9 +641,13 @@ def test_quotes_omits_technical_overlays_by_default(
     def _unexpected_overlay(*args: object, **kwargs: object) -> object:
         raise AssertionError("overlay composer must not run without opt-in")
 
-    monkeypatch.setattr(data, "resolve_runtime_source_id", _fake_resolve)
-    monkeypatch.setattr(data, "get_symbols_quotes", _fake_quotes)
-    monkeypatch.setattr(data, "build_technical_overlay", _unexpected_overlay)
+    monkeypatch.setattr(
+        markets_orchestration, "resolve_runtime_source_id", _fake_resolve
+    )
+    monkeypatch.setattr(markets_orchestration, "get_symbols_quotes", _fake_quotes)
+    monkeypatch.setattr(
+        markets_orchestration, "build_technical_evidence", _unexpected_overlay
+    )
 
     client = TestClient(_markets_app(), raise_server_exceptions=True)
     response = client.get("/api/v1/data/quotes?symbols=EURUSD")

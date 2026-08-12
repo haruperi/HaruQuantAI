@@ -1,5 +1,5 @@
 /**
- * Accessible auth-aware application shell (FR-API-046).
+ * Accessible auth-aware application shell (FR-UI-010).
  *
  * Wraps the widget workspace with session gating: shows a loading state while
  * the session is being recovered, a login prompt when unauthenticated, and the

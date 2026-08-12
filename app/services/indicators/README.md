@@ -127,7 +127,7 @@ reconciliation.
 | Completed | `FEAT-INDI-01` | Contracts, registry discovery, result projections, request validation, and closed-input enforcement | `core/` | `build_indicator_config`, `join_indicator_result`, `get_indicator_result_values`, `get_indicator_result_metadata`, `get_indicator`, `list_indicators`, `get_capability_matrix`, `get_warmup_requirement`, `validate_indicator`, `assert_closed_input` | `FR-INDI-001`â€“`FR-INDI-014`, `FR-INDI-039`â€“`FR-INDI-041` | `tests/indicators/usage/features/01_core.py` |
 | Completed | `FEAT-INDI-02` | Trend and moving-average calculation | `trend/` | `ema`, `sma`, `wma`, `hull_ma`, `bollinger_bands`, `adx`, `zigzag`, `measure_trend_strength`, `project_structural_levels` | `FR-INDI-015`â€“`FR-INDI-017`, `FR-INDI-023`â€“`FR-INDI-025`, `FR-INDI-035` | `tests/indicators/usage/features/02_trend.py` |
 | Completed | `FEAT-INDI-03` | Momentum oscillator calculation | `momentum/` | `rsi`, `williams_r` | `FR-INDI-021`â€“`FR-INDI-022` | `tests/indicators/usage/features/03_momentum.py` |
-| Completed | `FEAT-INDI-04` | Volatility and range calculation (spec `IND-VOL-01`..`10` fully migrated) | `volatility/` | `atr`, `atr_percent`, `adr`, `rolling_volatility`, `ewma_volatility`, `parkinson_volatility`, `garman_klass_volatility`, `rogers_satchell_volatility`, `bollinger_bandwidth`, `volatility_percentile`, `volatility_of_volatility`, `standard_deviation`, `measure_market_speed`, `measure_volatility_envelope` | `FR-INDI-018`â€“`FR-INDI-020`, `FR-INDI-026`, `FR-INDI-042`â€“`FR-INDI-049` | `tests/indicators/usage/features/04_volatility.py` |
+| Completed | `FEAT-INDI-04` | Volatility and range calculation (spec `IND-VOL-01`..`10` fully migrated) | `volatility/` | `atr`, `atr_percent`, `adr`, `rolling_volatility`, `ewma_volatility`, `parkinson_volatility`, `garman_klass_volatility`, `rogers_satchell_volatility`, `bollinger_bandwidth`, `volatility_percentile`, `volatility_of_volatility`, `standard_deviation`, `measure_market_speed`, `measure_volatility_envelope`, `project_market_overlay` | `FR-INDI-018`â€“`FR-INDI-020`, `FR-INDI-026`, `FR-INDI-042`â€“`FR-INDI-049`, `FR-INDI-085` | `tests/indicators/usage/features/04_volatility.py` |
 | Completed | `FEAT-INDI-05` | Volume-flow and price-volume calculation | `volume/` | `cmf`, `obv`, `mfi`, `price_volume_distribution`, `build_liquidity_snapshot`, `parse_liquidity_snapshot`, `measure_order_flow` | `FR-INDI-027`â€“`FR-INDI-030` | `tests/indicators/usage/features/05_volume.py` |
 | Completed | `FEAT-INDI-06` | Indicator snapshot contract | `snapshots/` | `build_indicator_snapshot`, `parse_indicator_snapshot` | `FR-INDI-036`â€“`FR-INDI-038` | `tests/indicators/usage/features/06_snapshots.py` |
 | Completed | `FEAT-INDI-07` | Structural levels and confirmed pivots | `structure/` | `pivots`, `donchian_channels`, `pivot_points`, `anchored_vwap`, `volume_profile`, `gaps`, `level_clustering` | `FR-INDI-055`â€“`FR-INDI-061` | `tests/indicators/usage/features/07_structure.py` |
@@ -203,6 +203,7 @@ correct.
 | `volatility/atr.py` | `FR-INDI-018` |
 | `volatility/adr.py` | `FR-INDI-019` |
 | `volatility/rolling_volatility.py` | `FR-INDI-020` |
+| `volatility/market_projection.py` | `FR-INDI-085` |
 | `momentum/rsi.py` | `FR-INDI-021` |
 | `momentum/williams_r.py` | `FR-INDI-022` |
 | `trend/wma.py` | `FR-INDI-023` |
@@ -219,7 +220,7 @@ correct.
 | `patterns/inside_bar.py` | `FR-INDI-034` |
 | `trend/zigzag.py` | `FR-INDI-035` |
 | Feature `__init__.py` files | No independent `FR-*`; re-export only their feature's assigned symbols. |
-| Root `__init__.py` | No independent `FR-*`; re-export only the approved `FR-INDI-001` through `FR-INDI-084` public functions and registered feature operations. |
+| Root `__init__.py` | No independent `FR-*`; re-export only the approved `FR-INDI-001` through `FR-INDI-085` public functions and registered feature operations. |
 | `README.md` | No implementation requirement; authoritative specification and evidence ledger. |
 
 ### Public import and API contract
@@ -1241,6 +1242,12 @@ do not reintroduce a combined `ranges.py`.
 **Implementation notes:** Implement only the approved log-return formula; a
 price-level standard deviation is non-conforming for this file (that formula
 now lives in `standard_deviation.py`).
+
+#### `market_projection.py` â€” Market Display Projection
+
+| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
+|---|---|---|---|---|---|---|
+| Completed | `FR-INDI-085` | Project prior-settled annualized volatility, ADR in broker pips, current range as a percentage of ADR, and current quote change from explicit Data-owned bars and broker precision. API may orchestrate this operation but may not reproduce its formulas. | `project_market_overlay(dataset: object, *, digits: int, point: float, last_price: float \| None) -> dict[str, float \| None]` | None | `ValueError`: invalid precision or insufficient settled bars | **Usage:** `tests/indicators/usage/features/04_volatility.py`<br>**Unit:** `tests/indicators/unit/test_market_projection.py` |
 
 #### `standard_deviation.py` â€” Standard Deviation
 

@@ -1,5 +1,5 @@
 /**
- * Unit tests for the stream consumer (FR-API-045).
+ * Unit tests for the stream consumer (FR-UI-009).
  *
  * The SSE transport is faked by stubbing `globalThis.fetch` with a ReadableStream
  * that emits canned SSE frames, so no network is touched.
@@ -54,7 +54,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("consumeStream — FR-API-045", () => {
+describe("consumeStream — FR-UI-009", () => {
   beforeEach(() => {
     // Keep NEXT_PUBLIC_API_URL empty so resolveBaseUrl returns "" (same-origin).
     delete process.env.NEXT_PUBLIC_API_URL;

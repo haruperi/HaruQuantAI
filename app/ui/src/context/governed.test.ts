@@ -1,5 +1,5 @@
 /**
- * Unit tests for governed-write preflight (FR-API-044).
+ * Unit tests for governed-write preflight (FR-UI-008).
  */
 
 import { describe, expect, it } from "vitest";
@@ -18,7 +18,7 @@ const complete = {
   evidenceId: "ev_1",
 };
 
-describe("buildGovernedOptions — FR-API-044", () => {
+describe("buildGovernedOptions — FR-UI-008", () => {
   it("builds options with an auto-generated idempotency key for a complete context", () => {
     const { options, context } = buildGovernedOptions(complete);
     expect(options.idempotencyKey).toEqual(expect.any(String));

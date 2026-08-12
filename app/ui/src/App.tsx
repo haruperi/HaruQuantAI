@@ -4,8 +4,8 @@ import React, { useEffect } from 'react';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
 import { WorkspaceGrid } from './components/layout/WorkspaceGrid';
-import { OrderTicketModal } from './components/widgets/OrderTicketModal';
-import { SystemSettingsModal } from './components/widgets/SystemSettingsModal';
+import { SystemSettingsModal } from './app/workstation/settings/SystemSettingsModal';
+import { OrderTicketModal } from './components/workflow';
 import { useTradingStore } from './store/useTradingStore';
 
 export function App(): React.JSX.Element {

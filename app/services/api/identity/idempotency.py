@@ -11,13 +11,15 @@ from typing import Literal
 from fastapi import HTTPException, status
 from pydantic import BaseModel, ConfigDict
 
-from app.services.api._limits import HTTP_IDEMPOTENCY_RETENTION_SECONDS
 from app.services.api.identity.errors import IdentityError
-from app.services.api.persistence import (
+from app.services.api.identity.persistence import (
     create_idempotency_record,
     delete_idempotency_record,
     finalize_idempotency_record,
     read_idempotency_record,
+)
+from app.services.api.workstation.settings.limits import (
+    HTTP_IDEMPOTENCY_RETENTION_SECONDS,
 )
 from app.utils import canonical_json, get_logger, utc_now
 

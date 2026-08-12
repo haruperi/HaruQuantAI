@@ -37,7 +37,7 @@ Verification of every claim below is by direct file read, not inference.
 **UI/API implementation**
 
 - `app/services/api/routes/*.py` (18 files), `app/services/api/composition/*.py` (13 files)
-- `app/services/api/_settings.py`
+- `app/services/api/workstation/settings/bootstrap.py`
 - `app/ui/src/{clients,context,components/workflow,app}/`
 - `tests/api/{unit,integration,contracts,nfr,usage}/`
 
@@ -102,8 +102,8 @@ approved scope.
 |---|---|
 | `WF-API-008` / `FR-API-027` deferred tier — live Simulation what-if | **Genuinely blocked upstream.** Simulator's 48 public exports contain playback only (`create_simulation_session`, `read_simulation_session`, `stream_simulation_session_frames`, `replay_journal`). `app/services/simulator/journal/playback.py` and `state/sessions.py` expose no session-mutation, what-if, or stateful-engine entry point. Closing this requires a **Simulator-domain plan**, not a UI/API plan. |
 | HTTP idempotency `Partial` (§5) | **Real.** Only `routes/settings.py` and `routes/simulation_sessions.py` call `reserve_idempotency_key`/`finalize_idempotency_key`. `agentic.py`, `optimization.py`, `portfolio.py`, `simulation.py`, `trading.py` reference the header but never reach the durable store. |
-| `RUNTIME_PROFILE` / `EXECUTION_ROUTE` / `ALLOW_LIVE_MUTATIONS` `Partial` | Settings-level validation exists (`app/services/api/_settings.py:36-39,148-151`); Trading-runtime consumption does not. |
-| `DATABASE_URL` / `DATA_DIR` `Missing` | Not declared in `app/services/api/_settings.py`; resolved implicitly through Data. Needs an explicit documented row. |
+| `RUNTIME_PROFILE` / `EXECUTION_ROUTE` / `ALLOW_LIVE_MUTATIONS` `Partial` | Settings-level validation exists (`app/services/api/workstation/settings/bootstrap.py`); Trading-runtime consumption does not. |
+| `DATABASE_URL` / `DATA_DIR` `Missing` | Not declared in `app/services/api/workstation/settings/bootstrap.py`; resolved implicitly through Data. Needs an explicit documented row. |
 | Production-capital execution | Blocked by policy, not capability — AGENTS.md §3 "No Live Action by Default". Must stay excluded. |
 | `NFR-API-014` imports, `NFR-API-015` documentation, `CAP-UI-019` | Owner scope decisions with no owner API gap. |
 | `FR-API-052` | Reserved numbering gap (Appendix R). Not a task. |
@@ -187,7 +187,7 @@ fails closed.
    Thread the validated `_settings.py` policy into `composition/trading_dependencies.py` so
    Trading routes read it at request time; a mismatched route fails closed.
 3. **`DATABASE_URL` / `DATA_DIR` (`Missing` → `Completed`).** Declare both explicitly in
-   `app/services/api/_settings.py`, sourced from the system manifest and passed to Data;
+   `app/services/api/workstation/settings/bootstrap.py`, sourced from the system manifest and passed to Data;
    UI/API never exposes a raw connection.
 
 ### W5 — Frontend parity (`NFR-API-004`, `CAP-UI-012`)

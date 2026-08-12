@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from pydantic import BaseModel, ConfigDict
 
 from app.services.api.identity.errors import IdentityError
-from app.services.api.persistence import (
+from app.services.api.identity.persistence import (
     consume_approval_record,
     create_approval_record,
     read_approval_record,

@@ -1,5 +1,5 @@
 /**
- * Unit tests for bounded page context (FR-API-043).
+ * Unit tests for bounded page context (FR-UI-007).
  *
  * The provider validates eagerly and synchronously during render, so invalid
  * input surfaces as a thrown `PageContextError`. Each case renders through a
@@ -30,7 +30,7 @@ function withProvider(
     PageContextProvider({ ...props, children });
 }
 
-describe("PageContextProvider — FR-API-043", () => {
+describe("PageContextProvider — FR-UI-007", () => {
   it("secretsAreRejected: rejects a sensitive-looking identifier", () => {
     expect(() =>
       renderHook(() => usePageContext(), {

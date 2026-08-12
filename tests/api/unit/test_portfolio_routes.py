@@ -16,13 +16,15 @@ from uuid import uuid4
 
 import pytest
 from app.services.api import build_api_settings
-from app.services.api.composition import portfolio_dependencies
-from app.services.api.contracts import (
+from app.services.api.identity import require_auth_context
+from app.services.api.workstation.portfolio import (
+    orchestration as portfolio_dependencies,
+)
+from app.services.api.workstation.portfolio import routes as portfolio
+from app.services.api.workstation.portfolio.schemas import (
     PortfolioConstructRequest,
     PortfolioDefinitionRequest,
 )
-from app.services.api.identity import require_auth_context
-from app.services.api.routes import portfolio
 from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI, HTTPException
 

@@ -1,5 +1,5 @@
 /**
- * Unit tests for AuthenticationPage (FR-API-053).
+ * Unit tests for AuthenticationPage (FR-UI-019).
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -37,7 +37,7 @@ function fillForm(username: string, password: string): HTMLElement {
   return document.querySelector('button[type="submit"]') as HTMLButtonElement;
 }
 
-describe("AuthenticationPage — FR-API-053", () => {
+describe("AuthenticationPage — FR-UI-019", () => {
   beforeEach(() => {
     loginMock.mockReset();
     registerMock.mockReset();

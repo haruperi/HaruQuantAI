@@ -1,5 +1,5 @@
 /**
- * Simulation backtest presentation (FR-API-049).
+ * Simulation backtest presentation (FR-UI-013).
  *
  * Two modes: run a synchronous backtest (`simulation.run`) and render the
  * result, or look up a stored result by run id (`simulation.result`). No

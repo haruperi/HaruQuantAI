@@ -12,15 +12,15 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from app.services.api.composition import agentic_dependencies
-from app.services.api.contracts import (
+from app.services.api.identity import require_auth_context
+from app.services.api.workstation.agentic import orchestration as agentic_dependencies
+from app.services.api.workstation.agentic import routes as agentic
+from app.services.api.workstation.agentic.schemas import (
     AgenticDisableRequest,
     AgenticHandoffApprovalRequest,
     AgenticQuarantineRequest,
     AgenticRunSubmitRequest,
 )
-from app.services.api.identity import require_auth_context
-from app.services.api.routes import agentic
 from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI, HTTPException
 

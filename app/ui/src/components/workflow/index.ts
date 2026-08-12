@@ -1,5 +1,5 @@
 /**
- * Workflow presentation components barrel (FEAT-API-11, Section 4.11).
+ * Workflow presentation components barrel (FEAT-UI-03, Section 4.11).
  *
  * Auth-aware shell plus freshness-aware dashboard, read-only strategy
  * catalogue, backtest simulation, risk state, trading session, and Edge Lab
@@ -46,3 +46,7 @@ export type { PlaybackViewProps } from "./playback";
 
 export { WhatIfView } from "./whatIf";
 export type { WhatIfViewProps } from "./whatIf";
+
+export { OrderTicketModal } from "./OrderTicketModal";
+export { PositionsWidget } from "./PositionsWidget";
+export { TradeLogWidget } from "./TradeLogWidget";

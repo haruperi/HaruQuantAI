@@ -1,4 +1,4 @@
-/** Unit tests for RiskView (FR-API-050 Risk). */
+/** Unit tests for RiskView (FR-UI-014). */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
@@ -36,7 +36,7 @@ function successEnvelope(data: unknown): Response {
 
 const realFetch = globalThis.fetch;
 
-describe("RiskView — FR-API-050 Risk", () => {
+describe("RiskView — FR-UI-014", () => {
   beforeEach(() => {
     callCount = 0;
     globalThis.fetch = vi.fn(async () => {

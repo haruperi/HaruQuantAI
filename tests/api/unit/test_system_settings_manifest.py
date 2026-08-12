@@ -3,7 +3,6 @@ from __future__ import annotations
 import base64
 
 import pytest
-from app.services.api._settings import ApiSettings
 from app.services.api.composition.runtime_settings import build_credential_key_set
 from app.services.api.identity import (
     IdentityError,
@@ -13,6 +12,7 @@ from app.services.api.identity import (
     validate_credential_material,
     validate_system_settings,
 )
+from app.services.api.workstation.settings.bootstrap import ApiSettings
 from pydantic import SecretStr
 
 _LEGACY_PATHS = {

@@ -3,16 +3,16 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import type { Widget } from '../../types/widget';
-import { MarketsWidget } from '../widgets/MarketsWidget';
-import { WatchlistWidget } from '../widgets/WatchlistWidget';
-import { ChartWidget } from '../widgets/ChartWidget';
-import { PriceLadderWidget } from '../widgets/PriceLadderWidget';
-import { OptionsGridWidget } from '../widgets/OptionsGridWidget';
-import { PositionsWidget } from '../widgets/PositionsWidget';
-import { TradeLogWidget } from '../widgets/TradeLogWidget';
-import { TradePlanWidget } from '../widgets/TradePlanWidget';
-import { EducationWidget } from '../widgets/EducationWidget';
-import { ChallengesWidget } from '../widgets/ChallengesWidget';
+import { MarketsWidget } from '../../features/markets';
+import { WatchlistWidget } from '../../features/watchlists';
+import {
+  ChartWidget,
+  OptionsGridWidget,
+  PriceLadderWidget,
+} from '../../features/instrument-panels';
+import { TradePlanWidget } from '../../features/planning';
+import { ChallengesWidget, EducationWidget } from '../../features/training-ux';
+import { PositionsWidget, TradeLogWidget } from '../workflow';
 import { DashboardView } from '../workflow/dashboard';
 import { DataWorkspace } from '../workflow/data';
 import { StrategyWorkspace } from '../workflow/strategies';

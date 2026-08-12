@@ -1,5 +1,5 @@
 /**
- * Unit tests for AuthProvider (FR-API-042).
+ * Unit tests for AuthProvider (FR-UI-006).
  *
  * Uses a fake `fetch` and `sessionStorage` so no network or real storage is
  * touched. React Testing Library renders a test consumer that reads the auth
@@ -142,7 +142,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("AuthProvider — FR-API-042", () => {
+describe("AuthProvider — FR-UI-006", () => {
   it("recovery with a valid session and stored identity → authenticated", async () => {
     window.sessionStorage.setItem(
       "hq:identity",

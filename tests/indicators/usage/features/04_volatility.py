@@ -17,6 +17,7 @@ from app.services.indicators import (
     measure_market_speed,
     measure_volatility_envelope,
     parkinson_volatility,
+    project_market_overlay,
     rogers_satchell_volatility,
     rolling_volatility,
     standard_deviation,
@@ -262,6 +263,15 @@ def main() -> None:
     fr_indi_047()
     fr_indi_048()
     fr_indi_049()
+    dataset = _dataset()
+    latest = dataset.records[-1]
+    projection = project_market_overlay(
+        dataset,
+        digits=5,
+        point=0.00001,
+        last_price=float(latest.close),
+    )
+    print_requirement_evidence("FR-INDI-085", actual_data=projection)
     speed = measure_market_speed(
         {
             "momentum": 1.0,

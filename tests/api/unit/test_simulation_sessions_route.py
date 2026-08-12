@@ -10,12 +10,14 @@ from types import SimpleNamespace
 
 import pytest
 from app.services.api.identity import build_auth_context
-from app.services.api.routes import simulation_sessions
-from app.services.api.routes.simulation_sessions import (
+from app.services.api.workstation.event_delivery import StreamLimitError
+from app.services.api.workstation.simulation import (
+    session_routes as simulation_sessions,
+)
+from app.services.api.workstation.simulation.session_routes import (
     _create_session,
     _stream_frames,
 )
-from app.services.api.streams import StreamLimitError
 from app.utils import generate_id
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict

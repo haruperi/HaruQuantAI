@@ -5,7 +5,7 @@
  * Events rather than the JSON envelope. This module provides the low-level
  * SSE reader: it opens a `fetch` connection, parses the `text/event-stream`
  * frames, and yields validated `StreamEvent` objects. Higher-level gap/reconnect
- * behaviour lives in `context/streams.ts` (`consumeStream`, FR-API-045).
+ * behaviour lives in `context/streams.ts` (`consumeStream`, FR-UI-009).
  */
 
 import { streamEventSchema, type StreamEvent } from "./contracts";

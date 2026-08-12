@@ -1,5 +1,5 @@
 /**
- * Authenticated UI session context (FR-API-042).
+ * Authenticated UI session context (FR-UI-006).
  *
  * Recovers the approved browser session on mount, protects layouts, and
  * clears/redirects on expiration without ever exposing credentials. The

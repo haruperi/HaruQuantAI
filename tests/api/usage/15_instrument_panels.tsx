@@ -1,1 +1,0 @@
-import React from "react"; import { renderToStaticMarkup } from "react-dom/server"; import { InstrumentPanels } from "../../../app/ui/src/features/instrument-panels"; function main(): void { console.log(renderToStaticMarkup(<InstrumentPanels values={[{label:"Market",value:"Open",freshness:"current"}]}/>)); } main();

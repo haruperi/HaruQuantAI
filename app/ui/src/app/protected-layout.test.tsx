@@ -1,5 +1,5 @@
 /**
- * Unit tests for ProtectedLayout (FR-API-054).
+ * Unit tests for ProtectedLayout (FR-UI-020).
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -37,7 +37,7 @@ function authValue(state: string) {
   };
 }
 
-describe("ProtectedLayout — FR-API-054", () => {
+describe("ProtectedLayout — FR-UI-020", () => {
   beforeEach(() => {
     authStateMock.mockReset();
     replaceMock.mockReset();

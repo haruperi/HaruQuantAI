@@ -12,13 +12,13 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from pydantic import BaseModel, ConfigDict, SecretStr
 
 from app.services.api.identity.errors import IdentityError
+from app.services.api.identity.persistence import (
+    read_credential_record,
+    update_credential_record,
+)
 from app.services.api.identity.system_settings import (
     get_credential_manifest,
     validate_credential_material,
-)
-from app.services.api.persistence import (
-    read_credential_record,
-    update_credential_record,
 )
 from app.utils import canonical_json, derive_stable_id, get_logger, utc_now
 

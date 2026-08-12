@@ -10,13 +10,13 @@ from app.services.analytics import run_analytics_migrations
 from app.services.api.composition.broker_config import (
     build_system_broker_connection_config,
 )
+from app.services.api.composition.migrations import run_api_migrations
 from app.services.api.composition.runtime_settings import (
     activate_runtime_logging,
     build_runtime_data_provider_sources,
     build_runtime_provider_settings,
     load_runtime_settings_snapshot,
 )
-from app.services.api.identity import run_api_migrations
 from app.services.brokers import run_broker_migrations
 from app.services.data import (
     build_data_settings,

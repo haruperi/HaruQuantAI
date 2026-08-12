@@ -1,5 +1,5 @@
 /**
- * Workflow page (FR-API-055).
+ * Workflow page (FR-UI-021).
  *
  * Composes the protected workspace exclusively from public clients, context,
  * and workflow components. This is the root route's framework entry: it wraps

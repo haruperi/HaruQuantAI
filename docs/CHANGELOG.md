@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+### Separate frontend ownership from the API gateway
+
+The Next.js application now has an independent UI feature authority and verification policy, while the API specification is limited to backend transport, security, composition, and orchestration.
+
+#### Changed (3)
+
+- Split the former UI/API registry into independently reconciled API and UI authorities with a UI-specific component-evidence exception.
+- Grouped focused Operational, Watchlists, and Markets API features under the non-feature Workstation namespace, standardized their route/schema/orchestration files, renumbered the API registry contiguously, classified legacy widgets, moved market calculations to Indicators, and made runtime-source resolution fail closed.
+- Dissolved the horizontal API routes, streams, persistence, and migrations packages and the root configuration/limits modules into focused Workstation, Settings, Identity, and Watchlists owners while preserving all HTTP operations, configuration policy, and immutable migration ledger inputs.
+
+#### Removed (1)
+
+- Removed ten redundant standalone frontend usage demonstrations in favor of executable UI unit, component, integration, and contract-parity evidence.
+
 ### Prevent automated Indicators usage from replacing MT5 credentials
 
 Indicators usage now resolves only the configured database-backed MT5 account,
@@ -61,7 +75,7 @@ Analytics, Portfolio, UI/API, and Utils notifications brought the registry to fu
 
 - Added immutable player journals, evidence-only behavioral and emergency-response analytics, and versioned qualification evaluation under `FEAT-ANLT-07` through `FEAT-ANLT-10` with additive Analytics migration `003_player_evidence_schema`.
 - Added Decimal valuation/P&L, margin and buying-power views, portfolio risk health, broker reconciliation, and balanced corporate-action/settlement postings under `FEAT-PORT-10` through `FEAT-PORT-12` with additive Portfolio migration `003_portfolio_operations_schema`.
-- Added the versioned operational workstation read model and optimistic command boundary under `FEAT-API-14`, including two authenticated HTTP operations and matching typed frontend transport.
+- Added the versioned operational workstation read model and optimistic command boundary under `FEAT-API-10`, including two authenticated HTTP operations and matching typed frontend transport.
 - Added accessible instrument, planning, workflow, emergency, alarm, training, replay, and qualification presentation capabilities under `FEAT-API-15` through `FEAT-API-20`.
 - Added `FEAT-UTIL-14`, a disabled-by-default unified Desktop, SMTP, Telegram, and Twilio notification service with operational templates and rate-limited orchestration.
 - Added an unnumbered supplemental Data usage catalogue that preserves all legacy monolithic example scenarios on the current fourteen-feature public boundaries.

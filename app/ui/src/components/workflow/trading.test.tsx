@@ -1,4 +1,4 @@
-/** Unit tests for TradingView (FR-API-050 Trading). */
+/** Unit tests for TradingView (FR-UI-015). */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -35,7 +35,7 @@ function successEnvelope(data: unknown): Response {
 
 const realFetch = globalThis.fetch;
 
-describe("TradingView — FR-API-050 Trading", () => {
+describe("TradingView — FR-UI-015", () => {
   beforeEach(() => {
     globalThis.fetch = vi.fn(async () =>
       successEnvelope({

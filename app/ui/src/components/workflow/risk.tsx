@@ -1,5 +1,5 @@
 /**
- * Risk state presentation (FR-API-050 Risk).
+ * Risk state presentation (FR-UI-014).
  *
  * Read-only view of the current kill-switch state and recent risk decisions.
  * No mutation controls — Risk remains the sole authority over its state.
