@@ -1,7 +1,7 @@
 # UI
 
 > **Package:** `app/ui/`
-> **Status:** `In Progress` — 24 registered UI features; 9 `Completed` and 15 `Pending`
+> **Status:** `In Progress` — 24 registered UI features; 10 `Completed` and 14 `Pending`
 > requirement coverage or focused-folder ownership.
 > **Last updated:** `2026-08-12`
 
@@ -152,7 +152,7 @@ app/ui/
 | Status | Feature | Owning module | Public surface | Requirements | Verification evidence |
 |---|---|---|---|---|---|
 | Completed | `FEAT-UI-01` Workspace Layout and Session Mode | `src/features/workspaces/` | Workspace and widget layout state, confirmation mode, account mode | `FR-UI-001`–`FR-UI-029` | `src/features/workspaces/store.test.ts` |
-| Pending | `FEAT-UI-02` Markets Widget | `src/features/markets/` | `MarketsWidget` through the feature barrel | `FR-UI-030`–`FR-UI-037` | `src/features/markets/MarketsWidget.test.tsx`; further evidence pending |
+| Completed | `FEAT-UI-02` Markets Widget | `src/features/markets/` | `MarketsWidget` through the feature barrel | `FR-UI-030`–`FR-UI-037` | `src/features/markets/MarketsWidget.test.tsx` |
 | Pending | `FEAT-UI-03` Watchlist Widget | `src/features/watchlists/` | `WatchlistWidget` through the feature barrel | `FR-UI-038`–`FR-UI-045` | `src/features/watchlists/WatchlistWidget.test.tsx`; further evidence pending |
 | Pending | `FEAT-UI-04` Charting Tools Widget | Target: `src/features/chart/`; current: `src/features/instrument-panels/ChartWidget.tsx` | `ChartWidget` | `FR-UI-046`–`FR-UI-054` | Pending evidence |
 | Pending | `FEAT-UI-05` Price Ladder Widget | Target: `src/features/price-ladder/`; current: `src/features/instrument-panels/PriceLadderWidget.tsx` | `PriceLadderWidget` | `FR-UI-055`–`FR-UI-062` | Pending evidence |
@@ -370,7 +370,7 @@ workspace-related field; see the feature's own `README.md` for that gap.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `MarketsWidget.tsx` | Bounded progressive market presentation | `MarketsWidget` | **Standard library:** browser APIs<br>**Required third-party:** React<br>**Local:** clients/data and watchlists |
+| Completed | `MarketsWidget.tsx` | Bounded progressive market-directory presentation, with an optional watchlist filter | `MarketsWidget` | **Standard library:** browser APIs<br>**Required third-party:** React<br>**Local:** clients/data, clients/watchlists, features/workspaces, store/useTradingStore |
 | Completed | `index.ts` | Sole public surface for the feature | `MarketsWidget` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `MarketsWidget.tsx` |
 
 | Status | Requirement ID | Responsibility | Component / Function / Type | Side Effects | Failure presentation | Usage / Test |
@@ -378,16 +378,18 @@ workspace-related field; see the feature's own `README.md` for that gap.
 | Completed | `FR-UI-030` | Present typed API market evidence without calculation. | `MarketsWidget` | External API call | Unavailable remains unavailable | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-031` | Use bounded batch reads and progressive rendering. | `MarketsWidget` | External API call; local state mutation | Completed batches remain visible | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-032` | Show explicit loading, error, formatting, and sort states. | `MarketsWidget` | Local state mutation | Em dash for unavailable legs | `src/features/markets/MarketsWidget.test.tsx` |
-| Pending | `FR-UI-033` | Present the tradable instrument directory for the configured runtime source only. | `MarketsWidget` | External API call | Non-tradable absent | Pending evidence |
-| Pending | `FR-UI-034` | Offer filtering of the directory by asset class. | `MarketsWidget` | Local state mutation | Empty filter truthful | Pending evidence |
-| Pending | `FR-UI-035` | Offer sorting by symbol, change, and volume with a stable tiebreak. | `MarketsWidget` | Local state mutation | Deterministic ordering | Pending evidence |
-| Pending | `FR-UI-036` | Offer a direct trade action per row that opens the order ticket pre-filled with that instrument. | `MarketsWidget` | Local state mutation | Ticket authority unchanged | Pending evidence |
-| Pending | `FR-UI-037` | Offer per-row actions targeting the chart, price ladder, and options surfaces at the selected instrument. | `MarketsWidget` | Navigation | Unavailable target disabled | Pending evidence |
+| Completed | `FR-UI-033` | Present the tradable instrument directory for the configured runtime source only. | `MarketsWidget` | External API call | Non-tradable absent | `src/features/markets/MarketsWidget.test.tsx` |
+| Completed | `FR-UI-034` | Offer filtering of the directory by asset class. | `MarketsWidget` | Local state mutation | Empty filter truthful | `src/features/markets/MarketsWidget.test.tsx` |
+| Completed | `FR-UI-035` | Offer sorting by symbol, change, and volume with a stable tiebreak. | `MarketsWidget` | Local state mutation | Deterministic ordering | `src/features/markets/MarketsWidget.test.tsx` |
+| Completed | `FR-UI-036` | Offer a direct trade action per row that opens the order ticket pre-filled with that instrument. | `MarketsWidget` | Local state mutation | Ticket authority unchanged | `src/features/markets/MarketsWidget.test.tsx` |
+| Completed | `FR-UI-037` | Offer per-row actions targeting the chart, price ladder, and options surfaces at the selected instrument. | `MarketsWidget` | Navigation | Unavailable target disabled | `src/features/markets/MarketsWidget.test.tsx` |
 
 ### Configuration and Limits Manifest
 
-The current bounded batch size is four symbols; the focused-folder migration must
-retain this limit and its tests without moving calculation into UI.
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Completed | `MARKETS_PAGE_SIZE` | `number` | `50` | Yes | directory fetch | Rows requested per page; matches the API's own default page size. |
+| Completed | `MARKETS_MAX_PAGES` | `number` | `4` | Yes | directory fetch | Bounded page count (200 rows max) so the widget never walks the full broker catalogue regardless of `next_cursor`. |
 
 ### 4.3 `src/features/watchlists/` — Watchlist Widget
 
@@ -1002,7 +1004,7 @@ following owner choices remain unresolved.
 | Decision | Detail |
 |---|---|
 | No owning backend domain for four surfaces | Options chains (`FEAT-UI-07`, and the options group `FR-UI-073`–`FR-UI-079` of `FEAT-UI-06`), learning content (`FEAT-UI-11`), and multi-participant challenges (`FEAT-UI-12`) have no owning service domain. `docs/PROJECT.md` retired documentation file I/O on the same ground. Each stays blocked until an owner is named or the scope is recorded as withdrawn. |
-| Fixture data reaches production modules | `src/mock/` is imported by `OptionsGridWidget.tsx`, `MarketsWidget.tsx`, `EducationWidget.tsx`, and `store/useTradingStore.ts`. Those surfaces can display values with no API origin, against `NFR-UI-007` and `AGENTS.md` §3 "No Invented Data". Blocks the affected features from reaching `Completed`. |
+| Fixture data reaches production modules | `src/mock/` is imported by `OptionsGridWidget.tsx`, `EducationWidget.tsx`, and `store/useTradingStore.ts` (`MarketsWidget.tsx` no longer imports it as of `FEAT-UI-02`). Those surfaces can display values with no API origin, against `NFR-UI-007` and `AGENTS.md` §3 "No Invented Data". Blocks the affected features from reaching `Completed`. |
 | Order-confirmation governance basis | Per owner decision the confirmation control behaves identically in simulation and live, differing only by environment switch. Recorded basis: the dialog is a client-side convenience, not a safety control, and `AGENTS.md` names backend Python as the sole policy-enforcement authority. Owner confirmation of this basis is outstanding. |
 | Two overlapping presentation paradigms | The primary widget workspace (`FEAT-UI-01`–`FEAT-UI-13`) and the layered cockpit features (`FEAT-UI-18`–`FEAT-UI-24`) both present market state and trading actions. The widget model is primary by owner decision; whether the cockpit layer converges into it or remains distinct is undecided. |
 | Ten registered folders do not yet exist | `FEAT-UI-04`–`FEAT-UI-13` register target paths whose code still resides in its previous location. Until the moves land, those features do not satisfy the one-feature-one-folder structure rule. `FEAT-UI-01` completed its move and is no longer in this set. |
@@ -1049,7 +1051,7 @@ uv run ruff format --check tests/ui/structural/test_feature_registry.py
 - [x] Completed module sections are arranged in dependency order.
 - [ ] Every registered feature owns one focused folder. Pending the `FEAT-UI-04`–`FEAT-UI-13` moves.
 - [x] Every completed functional requirement has focused automated evidence.
-- [ ] Every registered functional requirement has focused automated evidence. 87 requirements remain `Pending`.
+- [ ] Every registered functional requirement has focused automated evidence. 82 requirements remain `Pending`.
 - [ ] No production module imports fixture data (`NFR-UI-007`).
 - [x] Typed API clients have route-contract parity evidence.
 - [x] UI owns no durable state, business calculation, authorization, or broker connection.
