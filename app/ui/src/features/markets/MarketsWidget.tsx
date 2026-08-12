@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
+import { useWorkspaceStore } from '../workspaces';
 import { assetClasses } from '../../mock/productsData';
 import { apiClients, unwrapData, type MarketRow, type Watchlist } from '@/clients';
 import { MoreVertical, LineChart, AlignJustify, Layers } from 'lucide-react';
@@ -74,7 +75,8 @@ export const MarketsWidget: React.FC = () => {
   const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
   const [activeWatchlistId, setActiveWatchlistId] = useState<string | null>(null);
 
-  const { openOrderTicket, submitOrder, oneClickTrading, addWidgetToWorkspace } = useTradingStore();
+  const { openOrderTicket, submitOrder } = useTradingStore();
+  const { orderConfirmationRequired, addWidgetToWorkspace } = useWorkspaceStore();
 
   // Load the caller's watchlists on mount and select the account's default
   // watchlist as the initial active one; the backend seeds it on first read,
@@ -283,7 +285,7 @@ export const MarketsWidget: React.FC = () => {
                       <button
                         className="btn-cme btn-outline btn-sm"
                         onClick={() => {
-                          if (oneClickTrading) {
+                          if (!orderConfirmationRequired) {
                             submitOrder({ symbol: p.symbol, side: 'BUY', qty: 1, orderType: 'Market' });
                           } else {
                             openOrderTicket({ symbol: p.symbol, side: 'BUY', type: 'Market' });

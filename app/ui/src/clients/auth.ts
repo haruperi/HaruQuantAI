@@ -18,11 +18,20 @@ export interface Credentials {
   password: string;
 }
 
-/** Response data for register/login (backend returns this dict literal). */
+/**
+ * Response data for register/login (backend returns this dict literal).
+ *
+ * `runtime_profile` is optional: the backend's `AuthenticatedUser` model
+ * already carries it (`"research"|"simulation"|"paper"|"live"`), but no
+ * route returns it to the UI yet. It is declared here so account-mode
+ * presentation (FR-UI-016) starts working the moment a route adds it,
+ * without any further UI change; until then it is simply absent.
+ */
 export const sessionSchema = z.object({
   user_id: z.string().min(1),
   username: z.string().min(1),
   expires_at: z.string().min(1),
+  runtime_profile: z.string().optional(),
 });
 export type Session = z.infer<typeof sessionSchema>;
 

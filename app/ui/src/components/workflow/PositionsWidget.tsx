@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
+import { useWorkspaceStore } from '../../features/workspaces';
 
 export const PositionsWidget: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'positions' | 'orders'>('positions');
@@ -15,9 +16,9 @@ export const PositionsWidget: React.FC = () => {
     cancelAllOrders,
     cancelOrder,
     openOrderTicket,
-    submitOrder,
-    oneClickTrading
+    submitOrder
   } = useTradingStore();
+  const { orderConfirmationRequired } = useWorkspaceStore();
 
   const filteredOrders = orders.filter((o) => {
     if (ordFilter === 'Working') return o.status === 'Working';
@@ -119,7 +120,7 @@ export const PositionsWidget: React.FC = () => {
                           <button
                             className="btn-cme btn-outline btn-sm"
                             onClick={() => {
-                              if (oneClickTrading) {
+                              if (!orderConfirmationRequired) {
                                 submitOrder({ symbol: p.symbol, side: 'BUY', qty: 1, orderType: 'Market' });
                               } else {
                                 openOrderTicket({ symbol: p.symbol, side: 'BUY', type: 'Market' });

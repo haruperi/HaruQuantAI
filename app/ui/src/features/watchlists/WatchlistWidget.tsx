@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
+import { useWorkspaceStore } from '../workspaces';
 import { apiClients, unwrapData, type Watchlist, type MarketRow } from '@/clients';
 import {
   Plus,
@@ -41,7 +42,8 @@ function toDisplayRow(symbol: string, quote: MarketRow | undefined): DisplayRow 
 }
 
 export const WatchlistWidget: React.FC = () => {
-  const { openOrderTicket, submitOrder, oneClickTrading, addWidgetToWorkspace } = useTradingStore();
+  const { openOrderTicket, submitOrder } = useTradingStore();
+  const { orderConfirmationRequired, addWidgetToWorkspace } = useWorkspaceStore();
 
   const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -405,7 +407,7 @@ export const WatchlistWidget: React.FC = () => {
                         <button
                           className="btn-cme btn-outline btn-sm"
                           onClick={() => {
-                            if (oneClickTrading) {
+                            if (!orderConfirmationRequired) {
                               submitOrder({ symbol: p.symbol, side: 'BUY', qty: 1, orderType: 'Market' });
                             } else {
                               openOrderTicket({ symbol: p.symbol, side: 'BUY', type: 'Market' });

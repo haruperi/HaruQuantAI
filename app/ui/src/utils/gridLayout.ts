@@ -7,7 +7,7 @@
  * back against the preceding widgets, so empty space can never be occupied.
  */
 
-import type { GridRect, Widget } from "../types/widget";
+import type { GridRect, Widget } from "../features/workspaces/contracts";
 
 export const GRID_COLUMNS = 12;
 export const GRID_GAP = 8;

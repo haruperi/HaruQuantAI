@@ -1,7 +1,7 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `In Progress` — of 230 registered application features, 213 are implemented and structurally reconciled (92.61%); 16 are `Pending` and 1 is `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Status:** `In Progress` — of 230 registered application features, 214 are implemented and structurally reconciled (93.04%); 15 are `Pending` and 1 is `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
 > **Last updated:** `2026-08-12`
 
 > This document is the system-level source of truth.
@@ -461,13 +461,13 @@ features. No secondary programme or work-package identifier namespace is active.
 
 | Status | Count |
 | --- | ---: |
-| Completed | 213 |
-| Pending | 16 |
+| Completed | 214 |
+| Pending | 15 |
 | Partial | 1 |
 | Missing | 0 |
 | **Total** | **230** |
 
-The sixteen `Pending` features are `FEAT-UI-01`–`FEAT-UI-13`, `FEAT-UI-15`,
+The fifteen `Pending` features are `FEAT-UI-02`–`FEAT-UI-13`, `FEAT-UI-15`,
 `FEAT-UI-16`, and `FEAT-UI-17`, each awaiting requirement evidence or focused-folder
 ownership recorded in `app/ui/README.md`. They are the primary trading workspace and
 its enabling foundation, specified by `docs/dev/documentation.pdf`. The one `Partial`

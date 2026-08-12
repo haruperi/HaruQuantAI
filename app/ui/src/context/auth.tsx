@@ -33,6 +33,7 @@ import {
 } from "react";
 
 import { ApiClientError, apiClients } from "@/clients";
+import { useWorkspaceStore } from "@/features/workspaces";
 
 /** sessionStorage key for the non-secret identity metadata. */
 const IDENTITY_STORAGE_KEY = "hq:identity";
@@ -42,6 +43,8 @@ export interface AuthPrincipal {
   readonly user_id: string;
   readonly username: string;
   readonly expires_at: string;
+  /** API-authoritative environment; absent until a route returns it. See FR-UI-017. */
+  readonly runtime_profile?: string;
 }
 
 /** Authentication state machine. */
@@ -130,10 +133,12 @@ export function AuthProvider({ children }: PropsWithChildren): ReactNode {
           user_id: response.data.user_id,
           username: response.data.username,
           expires_at: response.data.expires_at,
+          runtime_profile: response.data.runtime_profile,
         };
         writeStoredIdentity(next);
         setPrincipal(next);
         setState("authenticated");
+        useWorkspaceStore.getState().setAccountModeFromRuntimeProfile(next.runtime_profile);
       } catch (cause) {
         if (cancelled || !mounted.current) return;
         // 401 => session expired/revoked. Any other failure is surfaced but
@@ -141,6 +146,7 @@ export function AuthProvider({ children }: PropsWithChildren): ReactNode {
         clearStoredIdentity();
         setPrincipal(null);
         setState("unauthenticated");
+        useWorkspaceStore.getState().setAccountModeFromRuntimeProfile(undefined);
         if (cause instanceof ApiClientError && cause.code !== "AUTHENTICATION_REQUIRED") {
           setError(cause.message);
         } else {
@@ -170,11 +176,13 @@ export function AuthProvider({ children }: PropsWithChildren): ReactNode {
         user_id: response.data.user_id,
         username: response.data.username,
         expires_at: response.data.expires_at,
+        runtime_profile: response.data.runtime_profile,
       };
       writeStoredIdentity(next);
       setPrincipal(next);
       setState("authenticated");
       setError(null);
+      useWorkspaceStore.getState().setAccountModeFromRuntimeProfile(next.runtime_profile);
       return next;
     },
     []
@@ -194,11 +202,13 @@ export function AuthProvider({ children }: PropsWithChildren): ReactNode {
         user_id: response.data.user_id,
         username: response.data.username,
         expires_at: response.data.expires_at,
+        runtime_profile: response.data.runtime_profile,
       };
       writeStoredIdentity(next);
       setPrincipal(next);
       setState("authenticated");
       setError(null);
+      useWorkspaceStore.getState().setAccountModeFromRuntimeProfile(next.runtime_profile);
       return next;
     },
     []
@@ -214,6 +224,7 @@ export function AuthProvider({ children }: PropsWithChildren): ReactNode {
       setPrincipal(null);
       setState("unauthenticated");
       setError(null);
+      useWorkspaceStore.getState().setAccountModeFromRuntimeProfile(undefined);
     }
   }, []);
 

@@ -5,7 +5,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 
 import { IndicatorWorkspace } from "./indicators";
 import { WorkspaceGrid } from "../layout/WorkspaceGrid";
-import { useTradingStore } from "../../store/useTradingStore";
+import { useWorkspaceStore } from "../../features/workspaces";
 
 function successEnvelope(data: unknown, route: string, operation: string): Response {
   return new Response(
@@ -107,7 +107,7 @@ describe("IndicatorWorkspace", () => {
 
   it("is reachable through WorkspaceGrid when rendering a widget of type indicators", async () => {
     // Set initial workspace with an indicators widget
-    useTradingStore.setState({
+    useWorkspaceStore.setState({
       activeWorkspaceId: 1,
       workspaces: [
         {

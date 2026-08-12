@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
+import { useWorkspaceStore } from '../workspaces';
 import type { OrderSide } from '../../types/market';
 import {
   PlusCircle,
@@ -559,7 +560,8 @@ interface Props {
 }
 
 export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
-  const { products, openOrderTicket, submitOrder, oneClickTrading, toggleExpandWidget, theme } = useTradingStore();
+  const { products, openOrderTicket, submitOrder, theme } = useTradingStore();
+  const { orderConfirmationRequired, toggleExpandWidget } = useWorkspaceStore();
   const targetProduct = products.find((p) => p.symbol === symbol) || products[0];
 
   // State Management for TradingView Toolbar Controls & Dropdowns
@@ -1546,7 +1548,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
   }, []);
 
   const handleQuickTrade = (side: OrderSide) => {
-    if (oneClickTrading) {
+    if (!orderConfirmationRequired) {
       submitOrder({ symbol: targetProduct.symbol, side, qty: Number(orderQty) || 1, orderType: 'Market' });
     } else {
       openOrderTicket({ symbol: targetProduct.symbol, side, type: 'Market' });

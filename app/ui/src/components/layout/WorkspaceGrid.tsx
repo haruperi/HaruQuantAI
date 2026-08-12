@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useTradingStore } from '../../store/useTradingStore';
-import type { Widget } from '../../types/widget';
+import { useWorkspaceStore, type Widget } from '../../features/workspaces';
 import { MarketsWidget } from '../../features/markets';
 import { WatchlistWidget } from '../../features/watchlists';
 import {
@@ -47,13 +46,19 @@ export const WorkspaceGrid: React.FC = () => {
     reorderWidgets,
     moveWidgetToCell,
     resizeWidget
-  } = useTradingStore();
+  } = useWorkspaceStore();
 
   const [draggedWidgetId, setDraggedWidgetId] = useState<string | number | null>(null);
   const [dropTargetId, setDropTargetId] = useState<string | number | null>(null);
   const [resizingWidgetId, setResizingWidgetId] = useState<string | number | null>(null);
   // Cell under the cursor while dragging over blank canvas, for the drop ghost.
   const [ghostCell, setGhostCell] = useState<{ col: number; row: number } | null>(null);
+
+  // Keyboard-operable equivalent of the pointer drag (FR-UI-007). Enter/Space
+  // on a widget's drag handle "picks it up"; arrow keys then swap it with the
+  // nearest widget in that direction; Enter/Escape drops/cancels.
+  const [pickedUpWidgetId, setPickedUpWidgetId] = useState<string | number | null>(null);
+  const [kbMessage, setKbMessage] = useState('');
 
   // Authoritative copy of the dragged id. `dataTransfer.getData()` is blocked
   // during dragover for security, and React state is stale inside native
@@ -68,6 +73,73 @@ export const WorkspaceGrid: React.FC = () => {
   const currentWorkspace = workspaces.find((w) => w.id == activeWorkspaceId) || workspaces[0];
   const expandedWidgetId = currentWorkspace.expandedWidgetId;
   const isExpanded = Boolean(expandedWidgetId);
+
+  /** Nearest widget in a compass direction from `widget`, by rectangle center. */
+  const findNeighbor = (widget: Widget, direction: 'up' | 'down' | 'left' | 'right'): Widget | null => {
+    const rect = rectOf(widget);
+    const cx = rect.col + rect.colSpan / 2;
+    const cy = rect.row + rect.rowSpan / 2;
+    let best: Widget | null = null;
+    let bestScore = Infinity;
+    for (const other of currentWorkspace.widgets) {
+      if (String(other.id) === String(widget.id)) continue;
+      const oRect = rectOf(other);
+      const dx = oRect.col + oRect.colSpan / 2 - cx;
+      const dy = oRect.row + oRect.rowSpan / 2 - cy;
+      const primary = direction === 'right' ? dx : direction === 'left' ? -dx : direction === 'down' ? dy : -dy;
+      const aligned = primary > 0;
+      if (!aligned) continue;
+      const cross = direction === 'left' || direction === 'right' ? Math.abs(dy) : Math.abs(dx);
+      const score = primary + cross * 0.25;
+      if (score < bestScore) {
+        bestScore = score;
+        best = other;
+      }
+    }
+    return best;
+  };
+
+  const handleHandleKeyDown = (e: React.KeyboardEvent, widget: Widget) => {
+    const isPicked = pickedUpWidgetId !== null && String(pickedUpWidgetId) === String(widget.id);
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (isPicked) {
+        setPickedUpWidgetId(null);
+        setKbMessage(`Dropped ${widget.title}.`);
+      } else {
+        setPickedUpWidgetId(widget.id);
+        setKbMessage(`Picked up ${widget.title}. Use arrow keys to move, Enter to drop, Escape to cancel.`);
+      }
+      return;
+    }
+    if (e.key === 'Escape' && isPicked) {
+      e.preventDefault();
+      setPickedUpWidgetId(null);
+      setKbMessage(`Cancelled moving ${widget.title}.`);
+      return;
+    }
+    if (!isPicked) return;
+    const direction =
+      e.key === 'ArrowUp' ? 'up' : e.key === 'ArrowDown' ? 'down' : e.key === 'ArrowLeft' ? 'left' : e.key === 'ArrowRight' ? 'right' : null;
+    if (!direction) return;
+    e.preventDefault();
+    const neighbor = findNeighbor(widget, direction);
+    if (neighbor) {
+      reorderWidgets(String(widget.id), String(neighbor.id));
+      setKbMessage(`Swapped ${widget.title} with ${neighbor.title}.`);
+    } else {
+      setKbMessage(`No widget to the ${direction}.`);
+    }
+  };
+
+  const handleResizeKeyDown = (e: React.KeyboardEvent, widget: Widget) => {
+    const rect = rectOf(widget);
+    const dCol = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    const dRow = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0;
+    if (dCol === 0 && dRow === 0) return;
+    e.preventDefault();
+    resizeWidget(widget.id, rect.colSpan + dCol, rect.rowSpan + dRow);
+  };
 
   const endDrag = useCallback(() => {
     draggedIdRef.current = null;
@@ -383,16 +455,26 @@ export const WorkspaceGrid: React.FC = () => {
         endDrag();
       }}
     >
+      {/* Announces keyboard-driven layout moves for screen reader users (FR-UI-007) */}
+      <div
+        role="status"
+        aria-live="polite"
+        style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}
+      >
+        {kbMessage}
+      </div>
+
       {currentWorkspace.widgets.map((w, idx) => {
         const isBeingDragged = String(draggedWidgetId) === String(w.id);
         const isTarget = String(dropTargetId) === String(w.id);
         const isResizing = String(resizingWidgetId) === String(w.id);
+        const isPickedUp = pickedUpWidgetId !== null && String(pickedUpWidgetId) === String(w.id);
         const rect = rectOf(w);
 
         return (
           <div
             key={w.id}
-            className={`widget-card ${draggedWidgetId && !isBeingDragged ? 'drag-candidate' : ''} ${isTarget ? 'drag-over-dark-gray' : ''} ${isBeingDragged ? 'is-dragging' : ''} ${isResizing ? 'is-resizing' : ''}`}
+            className={`widget-card ${draggedWidgetId && !isBeingDragged ? 'drag-candidate' : ''} ${isTarget ? 'drag-over-dark-gray' : ''} ${isBeingDragged ? 'is-dragging' : ''} ${isResizing ? 'is-resizing' : ''} ${isPickedUp ? 'is-dragging' : ''}`}
             style={{
               // Explicit placement: the widget sits exactly where it was put.
               gridColumn: `${rect.col} / span ${rect.colSpan}`,
@@ -431,12 +513,18 @@ export const WorkspaceGrid: React.FC = () => {
               <div
                 className="widget-product-code-tab"
                 draggable
+                tabIndex={0}
                 onDragStart={(e: React.DragEvent) => handleDragStart(e, w.id)}
                 onDragEnd={handleDragEnd}
+                onKeyDown={(e: React.KeyboardEvent) => handleHandleKeyDown(e, w)}
                 role="button"
-                aria-grabbed={isBeingDragged}
-                aria-label={`Drag ${w.title} (position ${idx + 1} of ${currentWorkspace.widgets.length}) to a new location`}
-                title="Click and hold to drag this widget onto another slot to swap, or onto empty space to send it to the end"
+                aria-grabbed={isBeingDragged || isPickedUp}
+                aria-label={
+                  isPickedUp
+                    ? `${w.title} picked up (position ${idx + 1} of ${currentWorkspace.widgets.length}). Use arrow keys to move, Enter to drop, Escape to cancel.`
+                    : `${w.title} (position ${idx + 1} of ${currentWorkspace.widgets.length}). Press Enter to pick up and move with arrow keys, or drag with a pointer.`
+                }
+                title="Click and hold to drag this widget onto another slot to swap, or onto empty space to send it to the end. Press Enter to move it with the keyboard instead."
               >
                 <GripHorizontal size={13} className="drag-grip-icon" />
                 <span className="product-title-text">{w.title}</span>
@@ -461,10 +549,12 @@ export const WorkspaceGrid: React.FC = () => {
             {/* Bottom-right corner grip: drag to resize across grid cells */}
             <div
               className="widget-resize-handle"
+              tabIndex={0}
               onPointerDown={(e: React.PointerEvent<HTMLDivElement>) => startResize(e, w)}
+              onKeyDown={(e: React.KeyboardEvent) => handleResizeKeyDown(e, w)}
               role="separator"
-              aria-label={`Resize ${w.title}. Currently ${w.colSpan || 6} of ${GRID_COLUMNS} columns wide.`}
-              title="Drag to resize this widget"
+              aria-label={`Resize ${w.title}. Currently ${w.colSpan || 6} of ${GRID_COLUMNS} columns wide. Use arrow keys to resize.`}
+              title="Drag to resize this widget, or use arrow keys"
             />
 
             {isResizing && (

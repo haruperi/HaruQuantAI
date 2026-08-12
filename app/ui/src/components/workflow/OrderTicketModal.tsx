@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
+import { useWorkspaceStore, selectOrderEntryDisabled } from '../../features/workspaces';
 import type { OrderSide, TicketOrderType } from '../../types/market';
 import { X, Plus, Minus } from 'lucide-react';
 
@@ -13,6 +14,7 @@ export const OrderTicketModal: React.FC = () => {
     products,
     submitOrder
   } = useTradingStore();
+  const orderEntryDisabled = useWorkspaceStore(selectOrderEntryDisabled);
 
   const [activeTab, setActiveTab] = useState<'futures' | 'options'>('futures');
   const [side, setSide] = useState<OrderSide>('BUY');
@@ -48,6 +50,7 @@ export const OrderTicketModal: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (orderEntryDisabled) return;
     submitOrder({
       symbol: targetProduct.symbol,
       side,
@@ -249,11 +252,19 @@ export const OrderTicketModal: React.FC = () => {
             </div>
           )}
 
+          {/* Account mode unresolved: fail closed rather than submit blind (FR-UI-021) */}
+          {orderEntryDisabled && (
+            <div role="alert" style={{ padding: '8px', fontSize: '11px', color: 'var(--cme-warning-yellow)', textAlign: 'center' }}>
+              Account mode is unknown - order entry is disabled until it resolves.
+            </div>
+          )}
+
           {/* Submit Action Button */}
           <button
             type="submit"
             className={`btn-cme ${isBuy ? 'btn-buy' : 'btn-sell'}`}
             style={{ width: '100%', padding: '10px', fontSize: '14px', fontWeight: 700, marginTop: '8px' }}
+            disabled={orderEntryDisabled}
           >
             {isBuy ? `BUY ${quantity} ${targetProduct.symbol}` : `SELL ${quantity} ${targetProduct.symbol}`}
           </button>

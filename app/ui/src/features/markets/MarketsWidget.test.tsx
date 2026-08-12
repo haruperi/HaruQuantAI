@@ -14,7 +14,12 @@ vi.mock('../../store/useTradingStore', () => ({
   useTradingStore: () => ({
     openOrderTicket: vi.fn(),
     submitOrder: vi.fn(),
-    oneClickTrading: false,
+  }),
+}));
+
+vi.mock('../workspaces', () => ({
+  useWorkspaceStore: () => ({
+    orderConfirmationRequired: true,
     addWidgetToWorkspace: vi.fn(),
   }),
 }));

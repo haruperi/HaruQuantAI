@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
-import type { WidgetType } from '../../types/widget';
+import { useWorkspaceStore, type WidgetType } from '../../features/workspaces';
 import {
   ChevronLeft,
   ChevronRight,
@@ -34,7 +34,8 @@ import {
 
 export const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { addWidgetToWorkspace, openSettings } = useTradingStore();
+  const { openSettings } = useTradingStore();
+  const { addWidgetToWorkspace } = useWorkspaceStore();
 
   const handleAddWidget = (type: string, title: string) => {
     addWidgetToWorkspace(type as WidgetType, title);

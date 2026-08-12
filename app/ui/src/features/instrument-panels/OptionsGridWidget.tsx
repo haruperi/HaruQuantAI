@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
+import { useWorkspaceStore } from '../workspaces';
 import { generateOptionsGrid } from '../../mock/optionsData';
 import type { OrderSide } from '../../types/market';
 
@@ -10,13 +11,14 @@ interface Props {
 }
 
 export const OptionsGridWidget: React.FC<Props> = ({ symbol = 'ESU5' }) => {
-  const { products, openOrderTicket, submitOrder, oneClickTrading } = useTradingStore();
+  const { products, openOrderTicket, submitOrder } = useTradingStore();
+  const { orderConfirmationRequired } = useWorkspaceStore();
   const targetProduct = products.find((p) => p.symbol === symbol) || products[0];
 
   const gridData = generateOptionsGrid(targetProduct.lastPrice);
 
   const handleCellClick = (strike: number, cp: string, side: OrderSide, price: number) => {
-    if (oneClickTrading) {
+    if (!orderConfirmationRequired) {
       submitOrder({
         symbol: targetProduct.symbol,
         side,

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
-import type { Workspace } from '../../types/widget';
+import { useWorkspaceStore, type Workspace } from '../../features/workspaces';
 import {
   ChevronLeft,
   Plus,
@@ -13,7 +13,8 @@ import {
   Pencil,
   Trash2,
   Check,
-  FileJson
+  FileJson,
+  RotateCcw
 } from 'lucide-react';
 import { apiClients, unwrapData } from '@/clients';
 import { formatClockAtOffset, localOffsetMinutes, parseUtcOffset } from './clock';
@@ -26,8 +27,12 @@ export const Header: React.FC = () => {
     margin,
     available,
     mode,
-    oneClickTrading,
-    toggleOneClickTrading,
+    resetBalance
+  } = useTradingStore();
+  const {
+    orderConfirmationRequired,
+    setOrderConfirmationRequired,
+    accountMode,
     workspaces,
     activeWorkspaceId,
     setActiveWorkspace,
@@ -37,7 +42,9 @@ export const Header: React.FC = () => {
     renameWorkspace,
     duplicateWorkspace,
     deleteWorkspace
-  } = useTradingStore();
+  } = useWorkspaceStore();
+
+  const [confirmingReset, setConfirmingReset] = useState(false);
 
   const [currentTime, setCurrentTime] = useState('');
   const [timeMismatch, setTimeMismatch] = useState(false);
@@ -176,6 +183,25 @@ export const Header: React.FC = () => {
 
         {/* Financial Metrics Status Bar */}
         <div className="account-metrics-bar">
+          {/* Account mode badge (FR-UI-016): live/simulation/unknown, always visible, never client-elected */}
+          <span
+            className="metric-item"
+            role="status"
+            title={
+              accountMode === 'unknown'
+                ? 'Account mode has not been confirmed by the server yet - order entry is disabled'
+                : `Account mode: ${accountMode}`
+            }
+            style={{
+              fontWeight: 700,
+              fontSize: '10px',
+              letterSpacing: '0.5px',
+              color: accountMode === 'live' ? '#ff4975' : accountMode === 'simulation' ? '#00e473' : '#8a99ad'
+            }}
+          >
+            {accountMode === 'live' ? 'LIVE' : accountMode === 'simulation' ? 'SIMULATION' : 'MODE UNKNOWN'}
+          </span>
+
           <div className="metric-item">
             <span className="metric-label">{isChallenge ? 'CHALLENGE FUNDS' : 'PRACTICE FUNDS'}</span>
             <span className="metric-value neutral">${displayFunds.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
@@ -198,31 +224,62 @@ export const Header: React.FC = () => {
             <span className="metric-value neutral">${available.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
           </div>
 
+          {/* Balance reset (FR-UI-020): simulation mode only, requires explicit confirmation */}
+          {accountMode === 'simulation' && !confirmingReset && (
+            <button
+              className="cme-metric-caret"
+              title="Reset simulated balance"
+              onClick={() => setConfirmingReset(true)}
+            >
+              <RotateCcw size={14} />
+            </button>
+          )}
+          {accountMode === 'simulation' && confirmingReset && (
+            <span className="metric-item" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ fontSize: '10px' }}>Reset balance?</span>
+              <button
+                className="btn-cme btn-outline btn-sm"
+                onClick={() => {
+                  resetBalance();
+                  setConfirmingReset(false);
+                  showWorkspaceToast('Simulated balance reset');
+                }}
+              >
+                Confirm
+              </button>
+              <button className="btn-cme btn-outline btn-sm" onClick={() => setConfirmingReset(false)}>
+                Cancel
+              </button>
+            </span>
+          )}
+
           <button className="cme-metric-caret" title="Collapse metrics">
             <ChevronLeft size={14} />
           </button>
         </div>
 
-        {/* Right Info, 1-Click Toggle & Profile Badge */}
+        {/* Right Info, Confirmation-Mode Toggle & Profile Badge */}
         <div className="cme-header-actions">
           <span className={`cme-clock-text${timeMismatch ? ' mismatch' : ''}`}>
             {currentTime}
           </span>
 
-          {/* 1-Click Toggle Pill (to the left of username) */}
+          {/* Order-confirmation mode toggle (FR-UI-011/013), always visible */}
           <div
-            className={`one-click-toggle ${oneClickTrading ? 'active-one-click' : ''}`}
+            className={`one-click-toggle ${!orderConfirmationRequired ? 'active-one-click' : ''}`}
             onClick={() => {
-              toggleOneClickTrading();
-              showWorkspaceToast(!oneClickTrading ? '⚡ 1-Click Trading ENABLED' : '1-Click Trading DISABLED');
+              setOrderConfirmationRequired(!orderConfirmationRequired);
+              showWorkspaceToast(orderConfirmationRequired ? '⚡ Order confirmation DISABLED' : 'Order confirmation ENABLED');
             }}
-            title={oneClickTrading ? '1-Click Trading ON (Immediate Order Execution)' : '1-Click Trading OFF (Shows Order Confirmation)'}
+            title={orderConfirmationRequired ? 'Order confirmation ON (every order shows a confirmation dialog)' : 'Order confirmation OFF (orders submit immediately)'}
           >
-            <div className={`cme-toggle-switch ${oneClickTrading ? 'active' : ''}`}>
+            <div className={`cme-toggle-switch ${!orderConfirmationRequired ? 'active' : ''}`}>
               <div className="cme-toggle-knob" />
             </div>
-            <span style={{ fontWeight: oneClickTrading ? 700 : 500, color: oneClickTrading ? '#00e473' : 'inherit' }}>1-Click</span>
-            <Info size={12} color={oneClickTrading ? "#00e473" : "#8a99ad"} />
+            <span style={{ fontWeight: !orderConfirmationRequired ? 700 : 500, color: !orderConfirmationRequired ? '#00e473' : 'inherit' }}>
+              {orderConfirmationRequired ? 'Confirm' : '1-Click'}
+            </span>
+            <Info size={12} color={!orderConfirmationRequired ? "#00e473" : "#8a99ad"} />
           </div>
 
           {/* User Profile Avatar & Name */}

@@ -1,7 +1,7 @@
 # UI
 
 > **Package:** `app/ui/`
-> **Status:** `In Progress` — 24 registered UI features; 8 `Completed` and 16 `Pending`
+> **Status:** `In Progress` — 24 registered UI features; 9 `Completed` and 15 `Pending`
 > requirement coverage or focused-folder ownership.
 > **Last updated:** `2026-08-12`
 
@@ -118,7 +118,7 @@ app/ui/
 ├── README.md
 ├── package.json
 └── src/
-    ├── features/workspaces/              # FEAT-UI-01 (target; currently src/store/)
+    ├── features/workspaces/              # FEAT-UI-01
     ├── features/markets/                 # FEAT-UI-02
     ├── features/watchlists/              # FEAT-UI-03
     ├── features/chart/                   # FEAT-UI-04 (target)
@@ -151,7 +151,7 @@ app/ui/
 
 | Status | Feature | Owning module | Public surface | Requirements | Verification evidence |
 |---|---|---|---|---|---|
-| Pending | `FEAT-UI-01` Workspace Layout and Session Mode | Target: `src/features/workspaces/`; current: `src/store/` | Workspace and widget layout state, confirmation mode, account mode | `FR-UI-001`–`FR-UI-029` | Pending evidence |
+| Completed | `FEAT-UI-01` Workspace Layout and Session Mode | `src/features/workspaces/` | Workspace and widget layout state, confirmation mode, account mode | `FR-UI-001`–`FR-UI-029` | `src/features/workspaces/store.test.ts` |
 | Pending | `FEAT-UI-02` Markets Widget | `src/features/markets/` | `MarketsWidget` through the feature barrel | `FR-UI-030`–`FR-UI-037` | `src/features/markets/MarketsWidget.test.tsx`; further evidence pending |
 | Pending | `FEAT-UI-03` Watchlist Widget | `src/features/watchlists/` | `WatchlistWidget` through the feature barrel | `FR-UI-038`–`FR-UI-045` | `src/features/watchlists/WatchlistWidget.test.tsx`; further evidence pending |
 | Pending | `FEAT-UI-04` Charting Tools Widget | Target: `src/features/chart/`; current: `src/features/instrument-panels/ChartWidget.tsx` | `ChartWidget` | `FR-UI-046`–`FR-UI-054` | Pending evidence |
@@ -307,55 +307,60 @@ integration, contract, or browser evidence.
 
 **Purpose:** Own non-authoritative workspace layout preference, order-confirmation mode, and account-mode presentation.
 
-**Target location:** `src/features/workspaces/`. Behaviour currently resides in
-`src/store/useTradingStore.ts` and `src/types/widget.ts`; the focused-folder move is
-approved separately and is not performed by this registration.
+**Location:** `src/features/workspaces/`. Migrated from the former
+`src/store/useTradingStore.ts` (trimmed to only the unrelated trading-engine
+state - orders, positions, trade log, practice/challenge balances - which
+remains out of this feature's scope) and `src/types/widget.ts` (deleted; its
+contents moved into `contracts.ts`). `accountMode` is derived exclusively from
+the authenticated identity's `runtime_profile` (`src/context/auth.tsx`) rather
+than through `clients/settings`, which has no
+workspace-related field; see the feature's own `README.md` for that gap.
 
 ### Files
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Pending | `contracts.ts` | Workspace and widget layout contracts | `Workspace`, `Widget`, `WidgetType` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None |
-| Pending | `store.ts` | Bounded layout, confirmation-mode, and account-mode state | workspace and mode actions | **Standard library:** localStorage<br>**Required third-party:** Zustand<br>**Local:** clients/settings |
-| Pending | `index.ts` | Sole public surface for the feature | feature barrel | **Standard library:** None<br>**Required third-party:** None<br>**Local:** store and contracts |
+| Completed | `contracts.ts` | Workspace and widget layout contracts | `Workspace`, `Widget`, `WidgetType`, `AccountMode` | **Standard library:** None<br>**Required third-party:** Zod<br>**Local:** None |
+| Completed | `store.ts` | Bounded layout, confirmation-mode, and account-mode state | `useWorkspaceStore`, `selectOrderEntryDisabled`, `mapRuntimeProfileToAccountMode` | **Standard library:** localStorage<br>**Required third-party:** Zustand<br>**Local:** utils/gridLayout, contracts |
+| Completed | `index.ts` | Sole public surface for the feature | feature barrel | **Standard library:** None<br>**Required third-party:** None<br>**Local:** store and contracts |
 
 | Status | Requirement ID | Responsibility | Component / Function / Type | Side Effects | Failure presentation | Usage / Test |
 |---|---|---|---|---|---|---|
-| Pending | `FR-UI-001` | Provide a default workspace on first authenticated load containing the registered default widget set. | `Workspace` | Local persistence | Default restored | Pending evidence |
-| Pending | `FR-UI-002` | Allow creation of named workspaces up to a bounded maximum, rejecting creation beyond the limit explicitly. | workspace actions | Local persistence | Limit message shown | Pending evidence |
-| Pending | `FR-UI-003` | Default an unnamed new workspace to a deterministic incrementing name. | workspace actions | Local persistence | Deterministic naming | Pending evidence |
-| Pending | `FR-UI-004` | Allow renaming, duplicating, and deleting a workspace; deleting the last remaining workspace is rejected. | workspace actions | Local persistence | Rejection explicit | Pending evidence |
-| Pending | `FR-UI-005` | Allow a workspace to be designated the default opened on next session start. | workspace actions | Local persistence | Default visible | Pending evidence |
-| Pending | `FR-UI-006` | Support relocating a widget within the grid by pointer drag, showing the target region before release. | `Widget` | Local persistence | Drop target visible | Pending evidence |
-| Pending | `FR-UI-007` | Provide an equivalent keyboard-operable path for every drag-and-drop layout action. | `Widget` | Local persistence | Keyboard path preserved | Pending evidence |
-| Pending | `FR-UI-008` | Support expanding one widget to fill the workspace and restoring it to its prior rectangle. | `Workspace` | Local persistence | Prior rectangle retained | Pending evidence |
-| Pending | `FR-UI-009` | Persist layout to browser-local storage only; layout is a client preference and never system state. | store | Local persistence | Non-authoritative | Pending evidence |
-| Pending | `FR-UI-010` | Restore a corrupt or unreadable persisted layout to the default workspace rather than failing to render. | store | Local persistence | Default restored | Pending evidence |
-| Pending | `FR-UI-011` | Provide an order-confirmation toggle that, when disabled, submits without the client-side confirmation dialog. | mode actions | Local state mutation | Mode always visible | Pending evidence |
-| Pending | `FR-UI-012` | Default the toggle to confirmation-required on every new session; the setting is never inherited silently. | mode actions | Local state mutation | Safe default | Pending evidence |
-| Pending | `FR-UI-013` | Present the active confirmation mode persistently in the shell. | mode actions | None | Mode always visible | Pending evidence |
-| Pending | `FR-UI-014` | Treat the toggle as presentation only; it never suppresses or pre-satisfies API authorization, approval, idempotency, governance, or kill-switch enforcement. | mode actions | None | API authority unchanged | Pending evidence |
-| Pending | `FR-UI-015` | Apply the toggle identically in simulation and live; the difference between modes is the environment switch, not a different order path. | mode actions | None | One order path | Pending evidence |
-| Pending | `FR-UI-016` | Present the active account mode — simulation or live — persistently and unambiguously. | mode actions | None | Mode always visible | Pending evidence |
-| Pending | `FR-UI-017` | Derive the mode from API-authoritative environment configuration; UI never elects the mode. | mode actions | External API call | No client election | Pending evidence |
-| Pending | `FR-UI-018` | Require an explicit confirmed action to change mode and re-establish session context afterwards. | mode actions | External API call | Confirmation required | Pending evidence |
-| Pending | `FR-UI-019` | Present simulated and live balances distinctly and never combine them in one total. | mode actions | None | No combined total | Pending evidence |
-| Pending | `FR-UI-020` | Offer a balance reset action in simulation mode only, with explicit confirmation. | mode actions | External API call | Absent in live mode | Pending evidence |
-| Pending | `FR-UI-021` | Fail closed when mode is unknown: present as unknown and disable order entry until resolved. | mode actions | None | Order entry disabled | Pending evidence |
-| Pending | `FR-UI-022` | Present the market-data delay applicable to the active mode where the API declares one. | mode actions | External API call | Unknown remains explicit | Pending evidence |
-| Pending | `FR-UI-023` | Present widget type and title from the registered widget-type set only. | `WidgetType` | None | Unknown type rejected | Pending evidence |
-| Pending | `FR-UI-024` | Reject a layout rectangle that would place a widget outside the bounded grid. | `Widget` | Local persistence | Rejection explicit | Pending evidence |
-| Pending | `FR-UI-025` | Preserve widget identity across reorder, duplicate, and restore operations. | `Widget` | Local persistence | Stable identity | Pending evidence |
-| Pending | `FR-UI-026` | Present an empty workspace explicitly rather than as a failed render. | `Workspace` | None | Empty state truthful | Pending evidence |
-| Pending | `FR-UI-027` | Never persist account, credential, or order state to browser-local storage. | store | Local persistence | Layout keys only | Pending evidence |
-| Pending | `FR-UI-028` | Expose workspace and mode state only through the feature barrel. | `index.ts` | None | No deep import | Pending evidence |
-| Pending | `FR-UI-029` | Import no fixture data; every displayed value is API-sourced or a labelled client preference. | store | None | No fixture import | Pending evidence |
+| Completed | `FR-UI-001` | Provide a default workspace on first authenticated load containing the registered default widget set. | `Workspace` | Local persistence | Default restored | `store.test.ts` |
+| Completed | `FR-UI-002` | Allow creation of named workspaces up to a bounded maximum, rejecting creation beyond the limit explicitly. | workspace actions | Local persistence | Limit message shown | `store.test.ts` |
+| Completed | `FR-UI-003` | Default an unnamed new workspace to a deterministic incrementing name. | workspace actions | Local persistence | Deterministic naming | `store.test.ts` |
+| Completed | `FR-UI-004` | Allow renaming, duplicating, and deleting a workspace; deleting the last remaining workspace is rejected. | workspace actions | Local persistence | Rejection explicit | `store.test.ts` |
+| Completed | `FR-UI-005` | Allow a workspace to be designated the default opened on next session start. | workspace actions | Local persistence | Default visible | `store.test.ts` |
+| Completed | `FR-UI-006` | Support relocating a widget within the grid by pointer drag, showing the target region before release. | `Widget` | Local persistence | Drop target visible | `store.test.ts`; `WorkspaceGrid.tsx` pointer-drag handlers |
+| Completed | `FR-UI-007` | Provide an equivalent keyboard-operable path for every drag-and-drop layout action. | `Widget` | Local persistence | Keyboard path preserved | `WorkspaceGrid.tsx` keyboard pickup/move/resize handlers |
+| Completed | `FR-UI-008` | Support expanding one widget to fill the workspace and restoring it to its prior rectangle. | `Workspace` | Local persistence | Prior rectangle retained | `store.test.ts` |
+| Completed | `FR-UI-009` | Persist layout to browser-local storage only; layout is a client preference and never system state. | store | Local persistence | Non-authoritative | `store.test.ts` |
+| Completed | `FR-UI-010` | Restore a corrupt or unreadable persisted layout to the default workspace rather than failing to render. | store | Local persistence | Default restored | `store.test.ts` |
+| Completed | `FR-UI-011` | Provide an order-confirmation toggle that, when disabled, submits without the client-side confirmation dialog. | mode actions | Local state mutation | Mode always visible | `store.test.ts` |
+| Completed | `FR-UI-012` | Default the toggle to confirmation-required on every new session; the setting is never inherited silently. | mode actions | Local state mutation | Safe default | `store.test.ts` |
+| Completed | `FR-UI-013` | Present the active confirmation mode persistently in the shell. | mode actions | None | Mode always visible | `Header.tsx` confirmation-mode toggle |
+| Completed | `FR-UI-014` | Treat the toggle as presentation only; it never suppresses or pre-satisfies API authorization, approval, idempotency, governance, or kill-switch enforcement. | mode actions | None | API authority unchanged | `store.test.ts` |
+| Completed | `FR-UI-015` | Apply the toggle identically in simulation and live; the difference between modes is the environment switch, not a different order path. | mode actions | None | One order path | `store.test.ts` |
+| Completed | `FR-UI-016` | Present the active account mode — simulation or live — persistently and unambiguously. | mode actions | None | Mode always visible | `Header.tsx` account-mode badge |
+| Completed | `FR-UI-017` | Derive the mode from API-authoritative environment configuration; UI never elects the mode. | mode actions | External API call | No client election | `store.test.ts`; `context/auth.tsx` |
+| Completed | `FR-UI-018` | Require an explicit confirmed action to change mode and re-establish session context afterwards. | mode actions | External API call | Confirmation required | `context/auth.tsx` (mode is re-derived only through the governed session-recovery/login/register flow) |
+| Completed | `FR-UI-019` | Present simulated and live balances distinctly and never combine them in one total. | mode actions | None | No combined total | `Header.tsx` (single balance figure per active mode) |
+| Completed | `FR-UI-020` | Offer a balance reset action in simulation mode only, with explicit confirmation. | mode actions | External API call | Absent in live mode | `Header.tsx` reset control |
+| Completed | `FR-UI-021` | Fail closed when mode is unknown: present as unknown and disable order entry until resolved. | mode actions | None | Order entry disabled | `store.test.ts`; `OrderTicketModal.tsx` |
+| Completed | `FR-UI-022` | Present the market-data delay applicable to the active mode where the API declares one. | mode actions | External API call | Unknown remains explicit | `marketDataDelaySeconds` field, undefined until the API supplies one |
+| Completed | `FR-UI-023` | Present widget type and title from the registered widget-type set only. | `WidgetType` | None | Unknown type rejected | `store.test.ts` |
+| Completed | `FR-UI-024` | Reject a layout rectangle that would place a widget outside the bounded grid. | `Widget` | Local persistence | Rejection explicit | `store.test.ts` |
+| Completed | `FR-UI-025` | Preserve widget identity across reorder, duplicate, and restore operations. | `Widget` | Local persistence | Stable identity | `store.test.ts` |
+| Completed | `FR-UI-026` | Present an empty workspace explicitly rather than as a failed render. | `Workspace` | None | Empty state truthful | `store.test.ts` |
+| Completed | `FR-UI-027` | Never persist account, credential, or order state to browser-local storage. | store | Local persistence | Layout keys only | `store.test.ts` |
+| Completed | `FR-UI-028` | Expose workspace and mode state only through the feature barrel. | `index.ts` | None | No deep import | Consumer files import only from `features/workspaces` |
+| Completed | `FR-UI-029` | Import no fixture data; every displayed value is API-sourced or a labelled client preference. | store | None | No fixture import | `store.test.ts` |
 
 ### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Pending | `MAX_CUSTOM_WORKSPACES` | `number` | `10` | Yes | workspace actions | Bounded custom workspace count. |
+| Completed | `MAX_CUSTOM_WORKSPACES` | `number` | `10` | Yes | workspace actions | Bounded custom workspace count. |
 
 ### 4.2 `src/features/markets/` — Markets Widget
 
@@ -1000,7 +1005,7 @@ following owner choices remain unresolved.
 | Fixture data reaches production modules | `src/mock/` is imported by `OptionsGridWidget.tsx`, `MarketsWidget.tsx`, `EducationWidget.tsx`, and `store/useTradingStore.ts`. Those surfaces can display values with no API origin, against `NFR-UI-007` and `AGENTS.md` §3 "No Invented Data". Blocks the affected features from reaching `Completed`. |
 | Order-confirmation governance basis | Per owner decision the confirmation control behaves identically in simulation and live, differing only by environment switch. Recorded basis: the dialog is a client-side convenience, not a safety control, and `AGENTS.md` names backend Python as the sole policy-enforcement authority. Owner confirmation of this basis is outstanding. |
 | Two overlapping presentation paradigms | The primary widget workspace (`FEAT-UI-01`–`FEAT-UI-13`) and the layered cockpit features (`FEAT-UI-18`–`FEAT-UI-24`) both present market state and trading actions. The widget model is primary by owner decision; whether the cockpit layer converges into it or remains distinct is undecided. |
-| Ten registered folders do not yet exist | `FEAT-UI-01` and `FEAT-UI-04`–`FEAT-UI-13` register target paths whose code still resides in its previous location. Until the moves land, those features do not satisfy the one-feature-one-folder structure rule. |
+| Ten registered folders do not yet exist | `FEAT-UI-04`–`FEAT-UI-13` register target paths whose code still resides in its previous location. Until the moves land, those features do not satisfy the one-feature-one-folder structure rule. `FEAT-UI-01` completed its move and is no longer in this set. |
 
 ---
 
@@ -1040,11 +1045,11 @@ uv run ruff format --check tests/ui/structural/test_feature_registry.py
 
 ### Package completion checklist
 
-- [ ] The final package tree matches Section 2. `FEAT-UI-14` still resides in `src/store/`.
+- [ ] The final package tree matches Section 2. `FEAT-UI-04`–`FEAT-UI-13` still reside in their previous locations.
 - [x] Completed module sections are arranged in dependency order.
-- [ ] Every registered feature owns one focused folder. Pending the `src/store/` move.
+- [ ] Every registered feature owns one focused folder. Pending the `FEAT-UI-04`–`FEAT-UI-13` moves.
 - [x] Every completed functional requirement has focused automated evidence.
-- [ ] Every registered functional requirement has focused automated evidence. 116 requirements remain `Pending`.
+- [ ] Every registered functional requirement has focused automated evidence. 87 requirements remain `Pending`.
 - [ ] No production module imports fixture data (`NFR-UI-007`).
 - [x] Typed API clients have route-contract parity evidence.
 - [x] UI owns no durable state, business calculation, authorization, or broker connection.
