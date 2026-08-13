@@ -108,7 +108,7 @@ def test_ui_evidence_exception_and_widget_ownership_are_documented() -> None:
     assert "Production UI is not verification evidence" in text
     owned_widgets = (
         "app/ui/src/features/training-ux/ChallengesWidget.tsx",
-        "app/ui/src/features/instrument-panels/ChartWidget.tsx",
+        "app/ui/src/features/chart/ChartWidget.tsx",
         "app/ui/src/features/training-ux/EducationWidget.tsx",
         "app/ui/src/features/instrument-panels/OptionsGridWidget.tsx",
         "app/ui/src/components/workflow/OrderTicketModal.tsx",

@@ -4,8 +4,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useWorkspaceStore, type Widget } from '../../features/workspaces';
 import { MarketsWidget } from '../../features/markets';
 import { WatchlistWidget } from '../../features/watchlists';
+import { ChartWidget } from '../../features/chart';
 import {
-  ChartWidget,
   OptionsGridWidget,
   PriceLadderWidget,
 } from '../../features/instrument-panels';
