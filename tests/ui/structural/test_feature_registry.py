@@ -64,13 +64,13 @@ def test_market_and_watchlist_ownership_is_reconciled() -> None:
     ui_registry = _registry(_UI_README)
 
     # The API registry stays fully reconciled; the UI records exactly the
-    # fourteen primary/foundation features (FEAT-UI-01-17) whose requirement
+    # thirteen primary/foundation features (FEAT-UI-01-17) whose requirement
     # coverage or focused-folder ownership is not yet evidenced. Naming them
     # keeps the ratchet: no feature can silently regress.
     assert "| Pending |" not in api_registry
     assert set(re.findall(r"\|\s*Pending\s*\|\s*`(FEAT-UI-\d{2})`", ui_registry)) == {
         f"FEAT-UI-{number:02d}" for number in range(1, 18)
-    } - {"FEAT-UI-01", "FEAT-UI-02", "FEAT-UI-14"}
+    } - {"FEAT-UI-01", "FEAT-UI-02", "FEAT-UI-03", "FEAT-UI-14"}
     assert "| `workstation/watchlists/` |" in api_registry
     assert "| `workstation/markets/` |" in api_registry
     assert "| `src/features/markets/` |" in ui_registry
@@ -200,12 +200,12 @@ def test_repository_feature_inventory_is_reconciled() -> None:
 
     assert len(feature_ids) == len(set(feature_ids)) == 230
     assert statuses.count("Completed") == 215
-    assert statuses.count("Pending") == 14
-    assert statuses.count("Partial") == 1
+    assert statuses.count("Pending") == 13
+    assert statuses.count("Partial") == 2
     project = _PROJECT_README.read_text(encoding="utf-8")
     assert "230 registered application features" in project
     assert "(93.48%)" in project
     assert "| Completed | 215 |" in project
-    assert "| Pending | 14 |" in project
-    assert "| Partial | 1 |" in project
+    assert "| Pending | 13 |" in project
+    assert "| Partial | 2 |" in project
     assert "| **Total** | **230** |" in project

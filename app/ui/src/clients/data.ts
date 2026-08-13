@@ -18,10 +18,21 @@ import { openStream, type StreamTransportOptions } from "./stream";
 export const symbolRowSchema = z.record(z.string(), z.unknown());
 export type SymbolRow = z.infer<typeof symbolRowSchema>;
 
-/** Symbol discovery page. */
+/**
+ * Symbol discovery page.
+ *
+ * Data returns provider-native symbol *names* here, not rows — this route is
+ * the cheap read (no quote or OHLC evidence), which is what makes walking the
+ * whole broker universe affordable. `next_cursor` is opaque and provider-owned;
+ * pass it back verbatim to get the following page.
+ */
 export const symbolPageSchema = z.object({
-  symbols: z.array(symbolRowSchema),
+  source_id: z.string().min(1),
+  items: z.array(z.string()),
+  limit: z.number().int().min(1),
   next_cursor: z.string().nullable().nullish(),
+  revision: z.string().min(1),
+  request_id: z.string().min(1),
 });
 export type SymbolPage = z.infer<typeof symbolPageSchema>;
 
@@ -126,6 +137,8 @@ export interface MarketsQuery {
   cursor?: string;
   /** Page size 1..200; defaults to the backend `API_DEFAULT_PAGE_SIZE`. */
   limit?: number;
+  /** Compose each row with the API-owned Volatility/ADR/Range overlay. */
+  includeTechnicals?: boolean;
 }
 
 /** Read the categorized market directory (requires `data:read`). */
@@ -138,6 +151,7 @@ export function markets(
   if (params.query !== undefined) query.query = params.query;
   if (params.cursor !== undefined) query.cursor = params.cursor;
   if (params.limit !== undefined) query.limit = params.limit;
+  if (params.includeTechnicals) query.include_technicals = "true";
   return request<MarketDirectory>(dataRoutes.markets, {
     schema: marketDirectorySchema,
     query,

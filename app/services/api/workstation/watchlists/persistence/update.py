@@ -1,6 +1,6 @@
 """Update operations for Watchlists-owned records."""
 
-from typing import Protocol, cast
+from typing import Final, Protocol, cast
 
 from app.services.api.identity import IdentityError
 from app.services.data import (
@@ -11,6 +11,8 @@ from app.services.data import (
 from app.utils import get_logger
 
 logger = get_logger(__name__)
+
+_ITEM_WITH_ASSET_CLASS_LEN: Final = 4
 
 
 class _TransactionResult(Protocol):
@@ -131,7 +133,7 @@ def replace_watchlist_items_record(
     *,
     watchlist_id: str,
     account_id: str,
-    items: tuple[tuple[str, str, int], ...],
+    items: tuple[tuple[str, str, int, str] | tuple[str, str, int], ...],
     updated_at: str,
     request_id: str,
 ) -> int:
@@ -143,8 +145,8 @@ def replace_watchlist_items_record(
     logger.debug("Replacing API watchlist item persistence records")
     item_statement = (
         "INSERT INTO api_watchlist_items "
-        "(watchlist_id, source_id, symbol, sort_order, created_at) "
-        "SELECT ?, ?, ?, ?, ? WHERE EXISTS "
+        "(watchlist_id, source_id, symbol, sort_order, asset_class, created_at) "
+        "SELECT ?, ?, ?, ?, ?, ? WHERE EXISTS "
         "(SELECT 1 FROM api_watchlists WHERE watchlist_id = ? AND account_id = ?)"
     )
     statements = (
@@ -159,14 +161,15 @@ def replace_watchlist_items_record(
         *(
             (
                 watchlist_id,
-                source_id,
-                symbol,
-                sort_order,
+                item[0],
+                item[1],
+                item[2],
+                item[3] if len(item) >= _ITEM_WITH_ASSET_CLASS_LEN else "",
                 updated_at,
                 watchlist_id,
                 account_id,
             )
-            for source_id, symbol, sort_order in items
+            for item in items
         ),
         (updated_at, watchlist_id, account_id),
     )
@@ -174,8 +177,35 @@ def replace_watchlist_items_record(
 
 
 __all__ = (
+    "backfill_empty_item_asset_classes_record",
     "rename_watchlist_record",
     "reorder_watchlists_record",
     "replace_watchlist_items_record",
     "set_default_watchlist_record",
 )
+
+
+def backfill_empty_item_asset_classes_record(
+    item_updates: tuple[tuple[str, str, str, str], ...],
+    *,
+    request_id: str,
+) -> int:
+    """Update empty asset_class columns in api_watchlist_items.
+
+    Args:
+        item_updates: Tuples of (asset_class, watchlist_id, source_id, symbol).
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Number of affected rows.
+    """
+    if not item_updates:
+        return 0
+    logger.debug("Backfilling API watchlist item asset_class records")
+    statement = (
+        "UPDATE api_watchlist_items SET asset_class = ? "
+        "WHERE watchlist_id = ? AND source_id = ? AND symbol = ? AND asset_class = ''"
+    )
+    statements = tuple(statement for _ in item_updates)
+    parameter_sets = item_updates
+    return _execute_update_many(statements, parameter_sets, request_id=request_id)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from app.services.data.sources.composition import (
+    close_data_provider_sessions,
     ensure_source,
     ensure_source_access,
     list_composable_sources,
@@ -23,6 +24,7 @@ from app.services.data.sources.registry import (
 
 __all__ = [
     "MarketDataSource",
+    "close_data_provider_sessions",
     "compute_source_trust_score",
     "ensure_source",
     "ensure_source_access",

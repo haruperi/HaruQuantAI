@@ -96,8 +96,9 @@ def read_watchlist_items(
     """
     logger.debug("Reading API watchlist item persistence records")
     return _read_rows(
-        "SELECT watchlist_id, source_id, symbol, sort_order, created_at "
-        "FROM api_watchlist_items WHERE watchlist_id = ? ORDER BY sort_order",
+        "SELECT watchlist_id, source_id, symbol, sort_order, asset_class, "
+        "created_at FROM api_watchlist_items WHERE watchlist_id = ? "
+        "ORDER BY sort_order",
         (watchlist_id,),
         request_id=request_id,
         max_rows=1000,
@@ -115,7 +116,7 @@ def read_watchlist_items_for_account(
     logger.debug("Reading API account watchlist item persistence records")
     return _read_rows(
         "SELECT i.watchlist_id, i.source_id, i.symbol, i.sort_order, "
-        "i.created_at FROM api_watchlist_items AS i "
+        "i.asset_class, i.created_at FROM api_watchlist_items AS i "
         "JOIN api_watchlists AS w ON w.watchlist_id = i.watchlist_id "
         "WHERE w.account_id = ? ORDER BY i.watchlist_id, i.sort_order",
         (account_id,),

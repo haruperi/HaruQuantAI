@@ -16,6 +16,7 @@ class WatchlistItem(BaseModel):
     source_id: str
     symbol: str
     sort_order: int
+    asset_class: str = ""
 
 
 class Watchlist(BaseModel):

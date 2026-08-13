@@ -1,8 +1,8 @@
-"""Dataset preparation bridge composition and route boundary tests.
+"""Data gateway symbol and dataset route boundary tests.
 
-Symbol discovery is covered by the pagination contract suite. These tests cover
-the governed dataset-preparation boundary: permission, idempotency, fail-closed
-composition, and the exact two-step Data delegation.
+Symbol tests cover canonical API-envelope projection over Data-owned discovery.
+Dataset tests cover the governed preparation boundary: permission, idempotency,
+fail-closed composition, and the exact two-step Data delegation.
 """
 
 from __future__ import annotations
@@ -96,6 +96,78 @@ def test_capability_catalog_surfaces_all_data_features() -> None:
     assert [item["feature_id"] for item in capabilities] == [
         f"FEAT-DATA-{index:02d}" for index in range(1, 15)
     ]
+
+
+def test_symbol_directory_returns_canonical_api_envelope(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Symbol discovery exposes the owner page directly with API metadata."""
+    page = {
+        "source_id": "mt5",
+        "items": ("EURUSD", "GBPUSD"),
+        "limit": 200,
+        "next_cursor": "200",
+        "revision": "1.0.0",
+        "request_id": "req-44444444-4444-4444-8444-444444444444",
+    }
+    monkeypatch.setattr(
+        data, "resolve_runtime_source_id", lambda *_args, **_kwargs: "mt5"
+    )
+    monkeypatch.setattr(
+        data,
+        "list_symbols",
+        lambda _request: SimpleNamespace(
+            status="success",
+            data=page,
+            error=None,
+        ),
+    )
+
+    status_code, body = get_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/symbols",
+        query_string="limit=200",
+    )
+
+    assert status_code == 200
+    assert body["status"] == "success"
+    assert body["data"]["items"] == ["EURUSD", "GBPUSD"]
+    assert "metadata" not in body["data"]
+    assert body["metadata"]["route"] == "/api/v1/data/symbols"
+    assert body["metadata"]["operation"] == "api.data.symbols"
+    assert body["metadata"]["next_cursor"] == "200"
+    assert body["metadata"]["page_size"] == 2
+
+
+def test_symbol_directory_translates_data_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A Data symbol failure remains explicit in a valid API error envelope."""
+    monkeypatch.setattr(
+        data, "resolve_runtime_source_id", lambda *_args, **_kwargs: "mt5"
+    )
+    monkeypatch.setattr(
+        data,
+        "list_symbols",
+        lambda _request: SimpleNamespace(
+            status="error",
+            data=None,
+            error=SimpleNamespace(
+                code="SOURCE_UNAVAILABLE",
+                message="Configured source is unavailable",
+                retryable=True,
+            ),
+        ),
+    )
+
+    status_code, body = get_json(_app(lambda *_args: None), "/api/v1/data/symbols")
+
+    assert status_code == 200
+    assert body["status"] == "error"
+    assert body["data"] is None
+    assert body["error"]["code"] == "UPSTREAM_UNAVAILABLE"
+    assert body["error"]["details"]["upstream_code"] == "SOURCE_UNAVAILABLE"
+    assert body["error"]["retryable"] is True
 
 
 def test_prepare_requires_idempotency_key() -> None:
@@ -397,7 +469,7 @@ def test_markets_delegates_once_with_resolved_source(
     monkeypatch.setattr(markets_orchestration, "list_market_directory", _fake_directory)
 
     client = TestClient(_markets_app(), raise_server_exceptions=True)
-    response = client.get("/api/v1/data/markets?limit=25")
+    response = client.get("/api/v1/data/markets?limit=25&include_technicals=false")
 
     assert response.status_code == 200
     body = response.json()

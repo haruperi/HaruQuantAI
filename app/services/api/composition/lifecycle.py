@@ -20,6 +20,7 @@ from app.services.api.composition.runtime_settings import (
 from app.services.brokers import run_broker_migrations
 from app.services.data import (
     build_data_settings,
+    close_data_provider_sessions,
     data_provider_connection_resolver_context,
     data_provider_settings_context,
     data_settings_context,
@@ -198,6 +199,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
         try:
             yield
         finally:
+            provider_close_result = close_data_provider_sessions(generate_id("req"))
+            if provider_close_result.status != "success":
+                logger.warning("Data provider-session shutdown failed")
             closers: tuple[Callable[[], Any], ...] = getattr(
                 app.state,
                 "api_owned_resource_closers",

@@ -67,6 +67,8 @@ class ApiSettings(BaseSettings):
     stream_max_connections_process: int = Field(default=100, ge=1, le=10_000)
     stream_resume_window: int = Field(default=256, ge=1, le=100_000)
     auth_transport: Literal["cookie_and_bearer"] = "cookie_and_bearer"
+    # Development mode auto login default
+    dev_auto_login: bool = True
     active_credential_key_id: str | None = None
     credential_encryption_key: SecretStr | None = None
     credential_key_refs: tuple[str, ...] = ()
@@ -135,18 +137,14 @@ class ApiSettings(BaseSettings):
             raise ValueError("ui_origins must be unique")
         return normalized
 
-    @model_validator(mode="after")
-    def _validate_cross_field_limits(self) -> ApiSettings:
-        """Validate related pagination, stream, and key-selection limits.
-
-        Returns:
-            Validated settings.
+    def _validate_execution_and_dev(self) -> None:
+        """Validate execution routes and development options.
 
         Raises:
-            ValueError: If cross-field invariants fail.
+            ValueError: If development or execution options are invalid.
         """
-        if self.api_default_page_size > self.api_max_page_size:
-            raise ValueError("default page size cannot exceed maximum")
+        if self.dev_auto_login and self.environment != "dev":
+            raise ValueError("dev_auto_login is allowed only in dev environment")
         expected_route = {
             "research": "none",
             "simulation": "sim",
@@ -157,6 +155,20 @@ class ApiSettings(BaseSettings):
             raise ValueError("runtime profile and execution route are incompatible")
         if self.execution_route == "live" and not self.allow_live_mutations:
             raise ValueError("live execution requires explicit mutation enablement")
+
+    @model_validator(mode="after")
+    def _validate_cross_field_limits(self) -> ApiSettings:
+        """Validate related pagination, stream, and key-selection limits.
+
+        Returns:
+            Validated settings.
+
+        Raises:
+            ValueError: If cross-field invariants fail.
+        """
+        self._validate_execution_and_dev()
+        if self.api_default_page_size > self.api_max_page_size:
+            raise ValueError("default page size cannot exceed maximum")
         if self.stream_heartbeat_timeout_seconds <= self.stream_heartbeat_seconds:
             raise ValueError("stream timeout must exceed heartbeat interval")
         if self.stream_max_connections_per_actor > self.stream_max_connections_process:

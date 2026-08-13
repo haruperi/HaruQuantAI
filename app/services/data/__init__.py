@@ -285,6 +285,7 @@ from app.services.data.runtime_stores import (
     run_runtime_store_migrations,
 )
 from app.services.data.sources import (
+    close_data_provider_sessions,
     compute_source_trust_score,
     ensure_source,
     ensure_source_access,
@@ -465,6 +466,7 @@ __all__ = (
     "classify_symbol",
     "clear_cache_entry",
     "clear_data_cache",
+    "close_data_provider_sessions",
     "compute_source_trust_score",
     "crawl_forexfactory_event_definitions",
     "create_backup",

@@ -1247,7 +1247,7 @@ now lives in `standard_deviation.py`).
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-INDI-085` | Project prior-settled annualized volatility, ADR in broker pips, current range as a percentage of ADR, and current quote change from explicit Data-owned bars and broker precision. API may orchestrate this operation but may not reproduce its formulas. | `project_market_overlay(dataset: object, *, digits: int, point: float, last_price: float \| None) -> dict[str, float \| None]` | None | `ValueError`: invalid precision or insufficient settled bars | **Usage:** `tests/indicators/usage/features/04_volatility.py`<br>**Unit:** `tests/indicators/unit/test_market_projection.py` |
+| Completed | `FR-INDI-085` | Project prior-settled 10-day annualized volatility, prior-settled 10-day ADR in broker pips, current D1 high-low range as a percentage of that ADR, and current quote change from explicit Data-owned bars and broker precision. API may orchestrate this operation but may not reproduce its formulas. | `project_market_overlay(dataset: object, *, digits: int, point: float, last_price: float \| None) -> dict[str, float \| None]` | None | `ValueError`: invalid precision or insufficient settled bars | **Usage:** `tests/api/usage/12_markets.py`; `tests/indicators/usage/features/04_volatility.py`<br>**Unit:** `tests/indicators/unit/test_market_projection.py::test_projection_matches_usage_example_with_real_dataset` |
 
 #### `standard_deviation.py` â€” Standard Deviation
 

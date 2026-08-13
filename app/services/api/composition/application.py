@@ -197,19 +197,23 @@ def _bearer_or_cookie(request: Request) -> str:
 
 
 def _resolve_auth_context(request: Request) -> object:
-    """Build authority only from a persisted validated session.
+    """Build authority from a persisted session or auto-login in dev mode.
 
     Returns:
         Utils-owned immutable authentication context.
 
     Raises:
-        HTTPException: If session validation fails.
+        HTTPException: If session validation fails and dev auto-login is inactive.
+        IdentityError: If session validation fails.
     """
+    settings: ApiSettings = (
+        getattr(request.app.state, "api_settings", None) or get_api_settings()
+    )
     context = getattr(request.state, CANONICAL_CONTEXT_STATE_KEY, None)
     request_id = str(getattr(context, "request_id", ""))
     correlation_id = str(getattr(context, "correlation_id", ""))
-    token = _bearer_or_cookie(request)
     try:
+        token = _bearer_or_cookie(request)
         user = validate_session(
             token,
             request_id=request_id,
@@ -221,7 +225,54 @@ def _resolve_auth_context(request: Request) -> object:
         }:
             csrf_token = request.headers.get("x-csrf-token", "")
             validate_csrf(token, csrf_token, request_id=request_id)
-    except IdentityError as error:
+        return build_auth_context(
+            principal={
+                "principal_id": user.user_id,
+                "principal_type": "USER",
+                "roles": user.roles,
+                "permissions": user.permissions,
+                "scopes": user.scopes,
+                "tenant_or_environment": user.tenant_or_environment,
+                "runtime_profile": user.runtime_profile,
+            },
+            trace={
+                "issued_at": utc_now(),
+                "request_id": request_id,
+                "workflow_id": generate_id("wf"),
+                "correlation_id": correlation_id,
+            },
+        )
+    except (HTTPException, IdentityError) as error:
+        if settings.environment == "dev" and settings.dev_auto_login:
+            route_contracts = create_canonical_route_contract_registry()
+            all_permissions = tuple(
+                sorted(
+                    {
+                        contract.permission
+                        for contract in route_contracts.all()
+                        if contract.permission is not None
+                    }
+                )
+            )
+            return build_auth_context(
+                principal={
+                    "principal_id": "usr_haruquantai",
+                    "principal_type": "USER",
+                    "roles": ("admin", "operator", "researcher"),
+                    "permissions": all_permissions,
+                    "scopes": ("*",),
+                    "tenant_or_environment": "development",
+                    "runtime_profile": settings.runtime_profile,
+                },
+                trace={
+                    "issued_at": utc_now(),
+                    "request_id": request_id,
+                    "workflow_id": generate_id("wf"),
+                    "correlation_id": correlation_id,
+                },
+            )
+        if isinstance(error, HTTPException):
+            raise
         code = (
             "CSRF_INVALID"
             if str(error) == "CSRF_INVALID"
@@ -235,23 +286,6 @@ def _resolve_auth_context(request: Request) -> object:
             ),
             detail=code,
         ) from error
-    return build_auth_context(
-        principal={
-            "principal_id": user.user_id,
-            "principal_type": "USER",
-            "roles": user.roles,
-            "permissions": user.permissions,
-            "scopes": user.scopes,
-            "tenant_or_environment": user.tenant_or_environment,
-            "runtime_profile": user.runtime_profile,
-        },
-        trace={
-            "issued_at": utc_now(),
-            "request_id": request_id,
-            "workflow_id": generate_id("wf"),
-            "correlation_id": correlation_id,
-        },
-    )
 
 
 def _request_auth_context(request: Request) -> object:

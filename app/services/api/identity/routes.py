@@ -203,11 +203,18 @@ def _me(request: Request) -> dict[str, object]:
         HTTPException: If the session is missing, expired, revoked, or inactive.
     """
     request_id = generate_id("req")
+    settings = getattr(request.app.state, "api_settings", None) or get_api_settings()
     token = request.cookies.get(_SESSION_COOKIE)
     authorization = request.headers.get("authorization", "")
     if token is None and authorization.startswith("Bearer "):
         token = authorization.removeprefix("Bearer ").strip()
     if not token:
+        if settings.environment == "dev" and settings.dev_auto_login:
+            return {
+                "user_id": "usr_haruquantai",
+                "username": "haruquantai",
+                "expires_at": "2099-01-01T00:00:00Z",
+            }
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="AUTHENTICATION_REQUIRED",
@@ -215,6 +222,12 @@ def _me(request: Request) -> dict[str, object]:
     try:
         identity = recover_session_identity(token, request_id=request_id)
     except IdentityError as error:
+        if settings.environment == "dev" and settings.dev_auto_login:
+            return {
+                "user_id": "usr_haruquantai",
+                "username": "haruquantai",
+                "expires_at": "2099-01-01T00:00:00Z",
+            }
         _raise_identity_http_error(error)
     return identity.model_dump(mode="json")
 

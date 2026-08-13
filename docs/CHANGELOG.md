@@ -2,6 +2,32 @@
 
 ## [Unreleased]
 
+### Verify watchlist symbols against the connected source
+
+The Watchlist widget now preloads the complete connected symbol directory and
+submits only exact provider-native instruments selected from that evidence.
+
+#### Changed (2)
+
+- Added bounded keyboard-accessible watchlist autocomplete, preserved provider casing and suffixes, and made MT5 symbol discovery fail closed when `symbols_total()` disagrees with `symbols_get()`.
+- Removed manual watchlist class controls, derived new-item classes from exact MT5 symbol metadata, and displayed the persisted class beside each symbol.
+
+#### Fixed (4)
+
+- Normalized the symbol-discovery result into the canonical API envelope so the typed UI client can load the complete connected-source directory.
+- Removed false `NOT TRADABLE` labels by checking watchlist membership against the complete in-memory connected-source universe instead of a bounded Markets page subset.
+- Reconciled ambiguous legacy watchlist classes such as `AUDCAD / Other` from exact runtime symbol metadata and persisted more-specific classifications.
+- Backfilled empty `asset_class` values on pre-existing watchlist items from exact connected-source metadata without modifying the immutable `api-0008` migration.
+
+### Keep cached MT5 reads on one persistent event loop
+
+Concurrent workstation reads now share one serialized MT5 event-loop owner, and
+API shutdown deterministically disconnects and releases the composed session.
+
+#### Fixed (1)
+
+- Prevented concurrent Markets and Watchlist reads from moving a cached MT5 adapter across disposable event loops and returning empty successful pages after canonical broker errors.
+
 ### Separate frontend ownership from the API gateway
 
 The Next.js application now has an independent UI feature authority and verification policy, while the API specification is limited to backend transport, security, composition, and orchestration.
@@ -35,9 +61,13 @@ missing-value presentation.
 
 - Reconciled `FEAT-DATA-01` directory, classification, composite-snapshot, and exact-symbol quote operations with focused modules, registered requirements, and numbered usage evidence.
 
-#### Fixed (1)
+#### Fixed (5)
 
 - Populated Markets-widget columns using the documented usage formulas, corrected OTC zero-last fallback to bid, and bounded active-watchlist loading to sequential four-symbol batches.
+- Corrected the Markets technical-evidence cache contract so valid MT5 D1 history supplies volatility, ADR, and range while current-quote fields are recomputed on every read.
+- Switched Markets technical history to MT5's bounded 40-bar position read so every sufficiently historied symbol receives overlay evidence without depending on a preloaded chart range.
+- Retried MT5's transient one-bar history synchronization response once without cache and cached only datasets sufficient for indicator warmup.
+- Selected exact symbols into terminal-local MT5 Market Watch before historical reads so non-preloaded instruments can expose their genuine chart history.
 
 ### Reorganize Strategy operational-planning features into focused modules
 

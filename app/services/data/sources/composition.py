@@ -34,6 +34,7 @@ from app.services.data.market_data.symbol_metadata import (
     SymbolMetadataRequest,
 )
 from app.services.data.persistence.migrations import run_data_migrations
+from app.services.data.sources.async_runtime import _PersistentAsyncRunner
 from app.services.data.sources.broker_adapter import ExternalMarketDataSource
 from app.services.data.sources.contracts import (
     SourceDescriptor,
@@ -176,6 +177,7 @@ class _LazyBrokerSession:
         """
         self._source_id = source_id
         self._adapter: Any | None = None
+        self._async_runner: _PersistentAsyncRunner | None = None
         self._lock = threading.RLock()
 
     def adapter(self, request_id: str) -> Any:  # noqa: ANN401
@@ -289,14 +291,24 @@ class _LazyBrokerSession:
             operation="create_broker_adapter",
             request_id=request_id,
         )
-        connect_result = _run(adapter.connect(), request_id)
+        runner = _PersistentAsyncRunner(thread_name="data-mt5-event-loop")
+        try:
+            connect_result = runner.run(adapter.connect())
+        except Exception:
+            runner.close()
+            raise
         if connect_result.error is not None:
+            try:
+                runner.run(adapter.disconnect())
+            finally:
+                runner.close()
             raise DataError(
                 "SOURCE_UNAVAILABLE",
                 safe_details={"operation": "connect"},
                 request_id=request_id,
             )
         self._adapter = adapter
+        self._async_runner = runner
         return adapter
 
     def _ctrader_adapter(
@@ -343,6 +355,18 @@ class _LazyBrokerSession:
         Raises:
             DataError: If connection or operation execution fails.
         """
+        if self._source_id == _MT5:
+            with self._lock:
+                self.adapter(request_id)
+                runner = self._async_runner
+                if runner is None:
+                    operation.close()
+                    raise DataError(
+                        "SOURCE_UNAVAILABLE",
+                        safe_details={"operation": "provider_runtime"},
+                        request_id=request_id,
+                    )
+                return runner.run(operation)
         if self._source_id not in _LOOP_BOUND_PROVIDERS:
             return _run(operation, request_id)
         with self._lock:
@@ -377,6 +401,35 @@ class _LazyBrokerSession:
                             logger.warning("Standalone provider disconnect failed")
 
             return _run(execute(), request_id)
+
+    def close(self, request_id: str) -> None:
+        """Disconnect and release this session's owned runtime resources.
+
+        Args:
+            request_id: Canonical shutdown request identity.
+        """
+        with self._lock:
+            adapter = self._adapter
+            runner = self._async_runner
+            self._adapter = None
+            self._async_runner = None
+            if adapter is None:
+                if runner is not None:
+                    runner.close()
+                return
+            if runner is not None:
+                try:
+                    result = runner.run(adapter.disconnect())
+                    if result.error is not None:
+                        logger.warning("MT5 provider disconnect returned an error")
+                finally:
+                    runner.close()
+                return
+            disconnect = getattr(adapter, "disconnect", None)
+            if callable(disconnect):
+                result = _run(disconnect(), request_id)
+                if result.error is not None:
+                    logger.warning("Provider disconnect returned an error")
 
     def _credential_free_adapter(
         self,
@@ -965,6 +1018,40 @@ def ensure_source_access(source_id: str, request_id: str) -> StandardResponse[No
     )
 
 
+def _close_data_provider_sessions_raw(request_id: str) -> None:
+    """Close every composed provider session in reverse registration order.
+
+    Args:
+        request_id: Canonical shutdown request identity.
+    """
+    with _lock:
+        sessions = tuple(reversed(tuple(_sessions.values())))
+        _sessions.clear()
+        _calendars.clear()
+    for session in sessions:
+        session.close(request_id)
+
+
+def close_data_provider_sessions(
+    request_id: str | None = None,
+) -> StandardResponse[None]:
+    """Disconnect and release all composed provider-session resources.
+
+    Args:
+        request_id: Optional canonical shutdown request identity.
+
+    Returns:
+        Standard response confirming provider-session shutdown.
+    """
+    resolved_request_id = request_id or generate_id("req")
+    return run_data_operation(
+        operation="data.sources.close_data_provider_sessions",
+        request_id=resolved_request_id,
+        start_time=data_start_time(),
+        raw=lambda: _close_data_provider_sessions_raw(resolved_request_id),
+    )
+
+
 def _resolve_realtime_session_raw(
     source_id: str,
     request_id: str,
@@ -1092,6 +1179,7 @@ def resolve_calendar(source_id: str, request_id: str) -> MarketCalendar:
 
 
 __all__ = [
+    "close_data_provider_sessions",
     "ensure_identity",
     "ensure_source",
     "ensure_source_access",

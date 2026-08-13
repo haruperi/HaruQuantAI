@@ -1,6 +1,7 @@
 """Integration evidence for UI/API-owned watchlist persistence and business logic."""
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from app.services.api import (
@@ -14,6 +15,9 @@ from app.services.api import (
     replace_account_watchlist_items,
     run_api_migrations,
     set_default_account_watchlist,
+)
+from app.services.api.workstation.watchlists import (
+    orchestration as watchlist_orchestration,
 )
 from app.services.data import build_data_settings, data_settings_context
 from app.utils import generate_id
@@ -144,6 +148,253 @@ def test_watchlist_crud_lifecycle(tmp_path: Path) -> None:
             account_id, source_id="mt5", request_id=generate_id("req")
         )
         assert [item.watchlist_id for item in remaining] == [created.watchlist_id]
+
+
+def test_runtime_update_persists_mt5_metadata_class_and_fails_closed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Runtime updates classify new symbols from MT5 metadata and retain them."""
+    with data_settings_context(_isolated_settings(tmp_path, "wl-metadata-class.db")):
+        migration = run_api_migrations(generate_id("req"))
+        assert migration.status == "success"
+        account_id = _register("wl-metadata-class-user")
+        created = create_account_watchlist(
+            account_id, "Metadata", request_id=generate_id("req")
+        )
+        metadata_calls: list[str] = []
+
+        monkeypatch.setattr(
+            watchlist_orchestration,
+            "resolve_runtime_source_id",
+            lambda _override, **_kwargs: "mt5",
+        )
+
+        def _metadata_response(request: SimpleNamespace) -> SimpleNamespace:
+            metadata_calls.append(str(request.symbol))
+            return SimpleNamespace(
+                status="success",
+                data=SimpleNamespace(
+                    path="Forex\\Majors",
+                    currency_base="EUR",
+                    currency_profit="USD",
+                    base_currency="EUR",
+                    quote_currency="USD",
+                ),
+            )
+
+        monkeypatch.setattr(
+            watchlist_orchestration, "get_symbol_metadata", _metadata_response
+        )
+        updated = watchlist_orchestration.update_watchlist(
+            created.watchlist_id,
+            account_id,
+            name=None,
+            symbols=("EURUSD",),
+            is_default=None,
+            request_id=generate_id("req"),
+        )
+        assert metadata_calls == ["EURUSD"]
+        assert [(item.symbol, item.asset_class) for item in updated.items] == [
+            ("EURUSD", "Forex")
+        ]
+
+        metadata_calls.clear()
+        reordered = watchlist_orchestration.update_watchlist(
+            created.watchlist_id,
+            account_id,
+            name=None,
+            symbols=("EURUSD",),
+            is_default=None,
+            request_id=generate_id("req"),
+        )
+        assert metadata_calls == []
+        assert reordered.items[0].asset_class == "Forex"
+
+        monkeypatch.setattr(
+            watchlist_orchestration,
+            "get_symbol_metadata",
+            lambda _request: SimpleNamespace(status="error", data=None),
+        )
+        with pytest.raises(
+            get_api_identity_error_type(),
+            match="WATCHLIST_SYMBOL_METADATA_UNAVAILABLE",
+        ):
+            watchlist_orchestration.update_watchlist(
+                created.watchlist_id,
+                account_id,
+                name=None,
+                symbols=("EURUSD", "UNKNOWN"),
+                is_default=None,
+                request_id=generate_id("req"),
+            )
+
+
+def test_runtime_list_reconciles_only_ambiguous_legacy_classes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Runtime listing repairs legacy Other values without blocking failures."""
+    with data_settings_context(_isolated_settings(tmp_path, "wl-reconcile-class.db")):
+        migration = run_api_migrations(generate_id("req"))
+        assert migration.status == "success"
+        account_id = _register("wl-reconcile-class-user")
+        created = create_account_watchlist(
+            account_id, "Legacy", request_id=generate_id("req")
+        )
+        legacy = replace_account_watchlist_items(
+            created.watchlist_id,
+            account_id,
+            ("UNKNOWN1", "EURUSD"),
+            source_id="mt5",
+            request_id=generate_id("req"),
+        )
+        assert [item.asset_class for item in legacy.items] == ["Other", "Forex"]
+
+        monkeypatch.setattr(
+            watchlist_orchestration,
+            "resolve_runtime_source_id",
+            lambda _override, **_kwargs: "mt5",
+        )
+        metadata_calls: list[str] = []
+
+        def _metadata_response(request: SimpleNamespace) -> SimpleNamespace:
+            metadata_calls.append(str(request.symbol))
+            if request.symbol == "UNKNOWN1":
+                return SimpleNamespace(
+                    status="success",
+                    data=SimpleNamespace(
+                        path="Forex\\Minors\\UNKNOWN1",
+                        currency_base="AUD",
+                        currency_profit="CAD",
+                        base_currency="AUD",
+                        quote_currency="CAD",
+                    ),
+                )
+            return SimpleNamespace(
+                status="success",
+                data=SimpleNamespace(
+                    path="Forex\\Majors",
+                    currency_base="EUR",
+                    currency_profit="USD",
+                    base_currency="EUR",
+                    quote_currency="USD",
+                ),
+            )
+
+        monkeypatch.setattr(
+            watchlist_orchestration, "get_symbol_metadata", _metadata_response
+        )
+        listed = watchlist_orchestration.list_runtime_watchlists(
+            account_id, request_id=generate_id("req")
+        )
+        assert metadata_calls == ["UNKNOWN1"]
+        assert [item.asset_class for item in listed[0].items] == ["Forex", "Forex"]
+
+        metadata_calls.clear()
+        watchlist_orchestration.list_runtime_watchlists(
+            account_id, request_id=generate_id("req")
+        )
+        assert metadata_calls == []
+
+        unavailable = create_account_watchlist(
+            account_id, "Unavailable", request_id=generate_id("req")
+        )
+        replace_account_watchlist_items(
+            unavailable.watchlist_id,
+            account_id,
+            ("ABC123",),
+            source_id="mt5",
+            request_id=generate_id("req"),
+        )
+        monkeypatch.setattr(
+            watchlist_orchestration,
+            "get_symbol_metadata",
+            lambda _request: SimpleNamespace(status="error", data=None),
+        )
+        preserved = watchlist_orchestration.list_runtime_watchlists(
+            account_id, request_id=generate_id("req")
+        )
+        unresolved = next(item for item in preserved if item.name == "Unavailable")
+        assert unresolved.items[0].asset_class == "Other"
+
+
+def test_runtime_list_backfills_raw_empty_class_before_returning(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A legacy empty database value is replaced by exact source metadata."""
+    with data_settings_context(_isolated_settings(tmp_path, "wl-empty-class.db")):
+        migration = run_api_migrations(generate_id("req"))
+        assert migration.status == "success"
+        account_id = _register("wl-empty-class-user")
+        created = create_account_watchlist(
+            account_id, "Legacy Empty", request_id=generate_id("req")
+        )
+        replace_account_watchlist_items(
+            created.watchlist_id,
+            account_id,
+            ("EURUSD",),
+            source_id="mt5",
+            request_id=generate_id("req"),
+        )
+
+        original_read = watchlist_orchestration.read_watchlist_items_for_account
+
+        def _legacy_rows(
+            requested_account_id: str, *, request_id: str
+        ) -> tuple[dict[str, object], ...]:
+            del requested_account_id, request_id
+            return (
+                {
+                    "watchlist_id": created.watchlist_id,
+                    "source_id": "mt5",
+                    "symbol": "EURUSD",
+                    "sort_order": 0,
+                    "asset_class": "",
+                },
+            )
+
+        monkeypatch.setattr(
+            watchlist_orchestration,
+            "read_watchlist_items_for_account",
+            _legacy_rows,
+        )
+        monkeypatch.setattr(
+            watchlist_orchestration,
+            "resolve_runtime_source_id",
+            lambda _override, **_kwargs: "mt5",
+        )
+        metadata_calls: list[str] = []
+
+        def _metadata_response(request: SimpleNamespace) -> SimpleNamespace:
+            metadata_calls.append(str(request.symbol))
+            return SimpleNamespace(
+                status="success",
+                data=SimpleNamespace(
+                    path="Stocks\\USA",
+                    currency_base="EUR",
+                    currency_profit="USD",
+                    base_currency="EUR",
+                    quote_currency="USD",
+                ),
+            )
+
+        monkeypatch.setattr(
+            watchlist_orchestration, "get_symbol_metadata", _metadata_response
+        )
+        backfilled = watchlist_orchestration.list_runtime_watchlists(
+            account_id, request_id=generate_id("req")
+        )
+        assert metadata_calls == ["EURUSD"]
+        assert backfilled[0].items[0].asset_class == "Stocks"
+
+        monkeypatch.setattr(
+            watchlist_orchestration,
+            "read_watchlist_items_for_account",
+            original_read,
+        )
+        persisted = list_account_watchlists(
+            account_id, source_id="mt5", request_id=generate_id("req")
+        )
+        assert persisted[0].items[0].asset_class == "Stocks"
 
 
 def test_cannot_delete_the_default_watchlist(tmp_path: Path) -> None:

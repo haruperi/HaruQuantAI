@@ -17,6 +17,7 @@ from app.services.data import (
     build_source_promotion_request,
     build_symbol_list_request,
     build_symbol_metadata_request,
+    close_data_provider_sessions,
     data_settings_context,
     discover_symbols,
     ensure_source,
@@ -195,6 +196,15 @@ def fr_data_115_116() -> None:
     print(_format_result(read_check))
 
 
+def fr_data_159() -> None:
+    """FR-DATA-159: Stage 6 — Close composed provider-session resources."""
+    _header("Stage 6: Provider Session Shutdown (FR-DATA-159)")
+    result = close_data_provider_sessions(generate_id("req"))
+    print(_format_result(result))
+    if result.status != "success":
+        raise RuntimeError("provider-session shutdown failed")
+
+
 def main() -> None:
     """Execute every functional-requirement demonstration."""
     with TemporaryDirectory() as temporary:
@@ -227,6 +237,7 @@ def main() -> None:
             fr_data_026_027()
             fr_data_115_116()
             run_research_source_support()
+            fr_data_159()
             print("SUCCESS: FEAT-DATA-10 completed")
 
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -53,11 +54,13 @@ def _unwrap(response):
 @pytest.fixture(autouse=True)
 def isolated_runtime() -> None:
     """Reset process-local facade composition state around every test."""
+    _runtime.close_data_provider_sessions(_REQ_ID)
     _reset_registry()
     _runtime._calendars.clear()
     _runtime._sessions.clear()
     _runtime._migrated_targets.clear()
     yield
+    _runtime.close_data_provider_sessions(_REQ_ID)
     _reset_registry()
     _runtime._calendars.clear()
     _runtime._sessions.clear()
@@ -256,6 +259,116 @@ def test_lazy_mt5_session_builds_connects_and_caches_adapter(
     assert get_broker_value_field(
         captured["config"], "environment"
     ) == get_broker_environment("demo")
+
+
+def test_lazy_mt5_session_serializes_concurrent_reads_on_one_event_loop(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Concurrent MT5 reads retain one loop from connect through disconnect."""
+    request_id = generate_id("req")
+
+    class _Adapter:
+        def __init__(self) -> None:
+            self.events: list[tuple[str, asyncio.AbstractEventLoop]] = []
+
+        async def connect(self) -> SimpleNamespace:
+            self.events.append(("connect", asyncio.get_running_loop()))
+            return SimpleNamespace(error=None)
+
+        async def read(self, value: int) -> int:
+            self.events.append(("read", asyncio.get_running_loop()))
+            await asyncio.sleep(0)
+            return value
+
+        async def disconnect(self) -> SimpleNamespace:
+            self.events.append(("disconnect", asyncio.get_running_loop()))
+            return SimpleNamespace(error=None)
+
+    adapter = _Adapter()
+    monkeypatch.setattr(
+        _runtime,
+        "get_data_provider_settings",
+        lambda: SimpleNamespace(mt5_enabled=True),
+    )
+    monkeypatch.setattr(
+        _runtime._LazyBrokerSession,
+        "_provider_config",
+        lambda *_args: SimpleNamespace(broker_id=get_broker_id("mt5")),
+    )
+    monkeypatch.setattr(
+        _runtime,
+        "create_broker_adapter",
+        lambda *_args: SimpleNamespace(error=None, data=adapter),
+    )
+    session = _runtime._LazyBrokerSession("mt5")
+    session.adapter(request_id)
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        values = tuple(
+            executor.map(
+                lambda value: session.run(adapter.read(value), request_id),
+                range(4),
+            )
+        )
+    session.close(request_id)
+    session.close(request_id)
+
+    assert values == (0, 1, 2, 3)
+    assert [name for name, _loop in adapter.events] == [
+        "connect",
+        "read",
+        "read",
+        "read",
+        "read",
+        "disconnect",
+    ]
+    assert len({id(loop) for _name, loop in adapter.events}) == 1
+
+
+def test_close_data_provider_sessions_releases_mt5_runtime(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The public shutdown boundary disconnects and clears composed sessions."""
+    request_id = generate_id("req")
+    disconnected: list[str] = []
+
+    class _Adapter:
+        async def connect(self) -> SimpleNamespace:
+            return SimpleNamespace(error=None)
+
+        async def disconnect(self) -> SimpleNamespace:
+            disconnected.append("mt5")
+            return SimpleNamespace(error=None)
+
+    adapter = _Adapter()
+    monkeypatch.setattr(
+        _runtime,
+        "get_data_provider_settings",
+        lambda: SimpleNamespace(mt5_enabled=True),
+    )
+    monkeypatch.setattr(
+        _runtime._LazyBrokerSession,
+        "_provider_config",
+        lambda *_args: SimpleNamespace(broker_id=get_broker_id("mt5")),
+    )
+    monkeypatch.setattr(
+        _runtime,
+        "create_broker_adapter",
+        lambda *_args: SimpleNamespace(error=None, data=adapter),
+    )
+    session = _runtime._LazyBrokerSession("mt5")
+    session.adapter(request_id)
+    _runtime._sessions["mt5"] = session
+
+    first = _runtime.close_data_provider_sessions(request_id)
+    second = _runtime.close_data_provider_sessions(request_id)
+
+    assert first.status == "success"
+    assert second.status == "success"
+    assert first.metadata.read_only is False
+    assert first.metadata.requires_network is True
+    assert disconnected == ["mt5"]
+    assert _runtime._sessions == {}
 
 
 def test_lazy_yahoo_session_uses_sandbox_and_explicit_probe(

@@ -553,9 +553,20 @@ def test_resolve_request_id_rejects_invalid_explicit() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_operation_registry_covers_141_candidates() -> None:
-    """The static registry carries the 141 qualifying Data operations."""
-    assert len(OPERATION_TRAITS) == 141
+def test_operation_registry_covers_143_candidates() -> None:
+    """The static registry carries the 143 qualifying Data operations."""
+    assert len(OPERATION_TRAITS) == 143
+
+
+def test_provider_session_shutdown_traits_are_exact() -> None:
+    """Provider shutdown declares external lifecycle effects without mutation."""
+    traits = OPERATION_TRAITS["data.sources.close_data_provider_sessions"]
+
+    assert traits.risk_level == "low"
+    assert traits.read_only is False
+    assert traits.writes_file is False
+    assert traits.modifies_database is False
+    assert traits.requires_network is True
 
 
 def test_every_trait_is_immutable_instance() -> None:

@@ -1,8 +1,8 @@
 # UI
 
 > **Package:** `app/ui/`
-> **Status:** `In Progress` — 24 registered UI features; 10 `Completed` and 14 `Pending`
-> requirement coverage or focused-folder ownership.
+> **Status:** `In Progress` — 24 registered UI features; 10 `Completed`, 13 `Pending`,
+> and 1 `Partial` requirement coverage or focused-folder ownership.
 > **Last updated:** `2026-08-12`
 
 > This README is the package's **single source of truth** for requirements, final
@@ -153,7 +153,7 @@ app/ui/
 |---|---|---|---|---|---|
 | Completed | `FEAT-UI-01` Workspace Layout and Session Mode | `src/features/workspaces/` | Workspace and widget layout state, confirmation mode, account mode | `FR-UI-001`–`FR-UI-029` | `src/features/workspaces/store.test.ts` |
 | Completed | `FEAT-UI-02` Markets Widget | `src/features/markets/` | `MarketsWidget` through the feature barrel | `FR-UI-030`–`FR-UI-037` | `src/features/markets/MarketsWidget.test.tsx` |
-| Pending | `FEAT-UI-03` Watchlist Widget | `src/features/watchlists/` | `WatchlistWidget` through the feature barrel | `FR-UI-038`–`FR-UI-045` | `src/features/watchlists/WatchlistWidget.test.tsx`; further evidence pending |
+| Partial | `FEAT-UI-03` Watchlist Widget | `src/features/watchlists/` | `WatchlistWidget` through the feature barrel | `FR-UI-038`–`FR-UI-045` | `src/features/watchlists/WatchlistWidget.test.tsx`; `FR-UI-043` list-level reorder blocked, see §6 |
 | Pending | `FEAT-UI-04` Charting Tools Widget | Target: `src/features/chart/`; current: `src/features/instrument-panels/ChartWidget.tsx` | `ChartWidget` | `FR-UI-046`–`FR-UI-054` | Pending evidence |
 | Pending | `FEAT-UI-05` Price Ladder Widget | Target: `src/features/price-ladder/`; current: `src/features/instrument-panels/PriceLadderWidget.tsx` | `PriceLadderWidget` | `FR-UI-055`–`FR-UI-062` | Pending evidence |
 | Pending | `FEAT-UI-06` Order Ticket | Target: `src/features/order-ticket/`; current: `src/components/workflow/OrderTicketModal.tsx` | `OrderTicketModal` (futures and options tabs) | `FR-UI-063`–`FR-UI-079` | Pending evidence |
@@ -375,7 +375,7 @@ workspace-related field; see the feature's own `README.md` for that gap.
 
 | Status | Requirement ID | Responsibility | Component / Function / Type | Side Effects | Failure presentation | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-UI-030` | Present typed API market evidence without calculation. | `MarketsWidget` | External API call | Unavailable remains unavailable | `src/features/markets/MarketsWidget.test.tsx` |
+| Completed | `FR-UI-030` | Present typed API market evidence without calculation; format every populated symbol's annualized volatility as a percentage, ADR in pips, and range as a percentage of ADR. | `MarketsWidget` | External API call | Unavailable remains unavailable | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-031` | Use bounded batch reads and progressive rendering. | `MarketsWidget` | External API call; local state mutation | Completed batches remain visible | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-032` | Show explicit loading, error, formatting, and sort states. | `MarketsWidget` | Local state mutation | Em dash for unavailable legs | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-033` | Present the tradable instrument directory for the configured runtime source only. | `MarketsWidget` | External API call | Non-tradable absent | `src/features/markets/MarketsWidget.test.tsx` |
@@ -399,7 +399,8 @@ workspace-related field; see the feature's own `README.md` for that gap.
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Completed | `WatchlistWidget.tsx` | Account watchlist interaction | `WatchlistWidget` | **Standard library:** browser APIs<br>**Required third-party:** React<br>**Local:** clients/watchlists |
+| Completed | `WatchlistWidget.tsx` | Account watchlist interaction with source-backed symbol selection | `WatchlistWidget` | **Standard library:** browser APIs<br>**Required third-party:** React<br>**Local:** clients/watchlists, clients/data, features/workspaces, store/useTradingStore, symbolUniverse |
+| Completed | `symbolUniverse.ts` | Load the complete provider symbol directory once into memory, rank bounded suggestions, and resolve exact provider-native values | `loadSymbolUniverse`, `resetSymbolUniverse`, `filterSymbols`, `resolveSourceSymbol` | **Standard library:** browser runtime<br>**Required third-party:** None<br>**Local:** clients/data |
 | Completed | `index.ts` | Sole public surface for the feature | `WatchlistWidget` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `WatchlistWidget.tsx` |
 
 | Status | Requirement ID | Responsibility | Component / Function / Type | Side Effects | Failure presentation | Usage / Test |
@@ -407,15 +408,22 @@ workspace-related field; see the feature's own `README.md` for that gap.
 | Completed | `FR-UI-038` | Present lists and explicit default/current selection. | `WatchlistWidget` | External API call; local state mutation | Empty/error state | `src/features/watchlists/WatchlistWidget.test.tsx` |
 | Completed | `FR-UI-039` | Submit CRUD/item actions only after explicit user intent. | `WatchlistWidget` | External API call | API rejection visible | `src/features/watchlists/WatchlistWidget.test.tsx` |
 | Completed | `FR-UI-040` | Surface validation, authorization, conflict, and unavailable outcomes. | `WatchlistWidget` | None | Never invent success | `src/features/watchlists/WatchlistWidget.test.tsx` |
-| Pending | `FR-UI-041` | Allow selecting an entire asset class to add all of its available instruments in one action. | `WatchlistWidget` | External API call | Partial add reported | Pending evidence |
-| Pending | `FR-UI-042` | Permit membership beyond the tradable set and mark non-tradable entries as not tradable. | `WatchlistWidget` | None | Non-tradable labelled | Pending evidence |
-| Pending | `FR-UI-043` | Rename, reorder, and delete lists and add or remove symbols through registered operations only. | `WatchlistWidget` | External API call | API rejection visible | Pending evidence |
-| Pending | `FR-UI-044` | Sort rows by any displayed column with a stable tiebreak. | `WatchlistWidget` | Local state mutation | Deterministic ordering | Pending evidence |
-| Pending | `FR-UI-045` | Present quote columns with freshness and an explicit unknown state. | `WatchlistWidget` | External API call | Unknown remains explicit | Pending evidence |
+| Completed | `FR-UI-041` | Remove manual asset-class controls and display the backend-persisted class automatically derived from the selected connected-source symbol metadata. | `WatchlistWidget` | External API response | Missing class remains explicit as unavailable | `src/features/watchlists/WatchlistWidget.test.tsx`; `src/clients/clients.test.ts` |
+| Completed | `FR-UI-042` | Permit membership beyond the tradable set and mark an entry non-tradable only when its exact provider-native symbol is absent from the complete connected-source universe already held in memory. | `WatchlistWidget` | In-memory source-universe read | Loading or unavailable universe never produces a false non-tradable label | `src/features/watchlists/WatchlistWidget.test.tsx` |
+| Partial | `FR-UI-043` | Rename, reorder, and delete lists and add or remove symbols through registered operations only. Symbol addition shall preload the connected source's complete symbol directory, offer prefix-first and substring suggestions, preserve the exact provider-native value, and fail closed unless the candidate uniquely matches that in-memory directory. | `WatchlistWidget`, `loadSymbolUniverse`, `filterSymbols`, `resolveSourceSymbol` | External API call; local in-memory cache | API rejection or unavailable symbol evidence visible | `src/features/watchlists/WatchlistWidget.test.tsx`; list-level reorder blocked, see §6 |
+| Completed | `FR-UI-044` | Sort rows by any displayed column with a stable tiebreak. | `WatchlistWidget` | Local state mutation | Deterministic ordering | `src/features/watchlists/WatchlistWidget.test.tsx` |
+| Completed | `FR-UI-045` | Present quote columns with freshness and an explicit unknown state. | `WatchlistWidget` | External API call | Unknown remains explicit | `src/features/watchlists/WatchlistWidget.test.tsx` |
 
 ### Configuration and Limits Manifest
 
-None; API contracts own mutation and idempotency limits.
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Completed | `DIRECTORY_PAGE_SIZE` / `DIRECTORY_MAX_PAGES` | `number` | `50` / `4` | Yes | tradability + bulk-add-by-class | Same bounded/capped directory read as `MarketsWidget` (§4.2); never walks the full broker catalogue. |
+| Completed | `QUOTE_STALE_AFTER_SECONDS` | `number` | `30` | Yes | freshness display | Age past which a fetched quote renders `stale` rather than `current`. |
+| Completed | `PAGE_SIZE` / `MAX_PAGES` | `number` | `200` / `100` | Yes | source symbol preload | Walk at most 20,000 source symbols through the existing bounded cursor route, sharing one in-flight load and retaining the completed directory in browser memory. |
+| Completed | `MAX_SUGGESTIONS` | `number` | `50` | Yes | symbol autocomplete | Bound the rendered prefix-first and substring-match suggestion list. |
+
+Mutation and idempotency limits otherwise remain owned by the API contracts.
 
 ### 4.4 `src/features/chart/` — Charting Tools Widget
 
@@ -1007,6 +1015,7 @@ following owner choices remain unresolved.
 | Fixture data reaches production modules | `src/mock/` is imported by `OptionsGridWidget.tsx`, `EducationWidget.tsx`, and `store/useTradingStore.ts` (`MarketsWidget.tsx` no longer imports it as of `FEAT-UI-02`). Those surfaces can display values with no API origin, against `NFR-UI-007` and `AGENTS.md` §3 "No Invented Data". Blocks the affected features from reaching `Completed`. |
 | Order-confirmation governance basis | Per owner decision the confirmation control behaves identically in simulation and live, differing only by environment switch. Recorded basis: the dialog is a client-side convenience, not a safety control, and `AGENTS.md` names backend Python as the sole policy-enforcement authority. Owner confirmation of this basis is outstanding. |
 | Two overlapping presentation paradigms | The primary widget workspace (`FEAT-UI-01`–`FEAT-UI-13`) and the layered cockpit features (`FEAT-UI-18`–`FEAT-UI-24`) both present market state and trading actions. The widget model is primary by owner decision; whether the cockpit layer converges into it or remains distinct is undecided. |
+| No backend field for watchlist-collection ordering | `FR-UI-043` requires list reorder "through registered operations only." Symbol-within-a-list reorder is real (`update()`'s `symbols` field is a full ordered replacement); reordering the watchlists themselves has no backing field - the backend's `_WatchlistUpdate` body (`app/services/api/workstation/watchlists/schemas.py`) only carries `name`/`symbols`/`is_default`, and `extra="forbid"` rejects anything else. `FEAT-UI-03` stays `Partial` on this one requirement until the backend adds a settable `sort_order`. |
 | Ten registered folders do not yet exist | `FEAT-UI-04`–`FEAT-UI-13` register target paths whose code still resides in its previous location. Until the moves land, those features do not satisfy the one-feature-one-folder structure rule. `FEAT-UI-01` completed its move and is no longer in this set. |
 
 ---
@@ -1051,7 +1060,7 @@ uv run ruff format --check tests/ui/structural/test_feature_registry.py
 - [x] Completed module sections are arranged in dependency order.
 - [ ] Every registered feature owns one focused folder. Pending the `FEAT-UI-04`–`FEAT-UI-13` moves.
 - [x] Every completed functional requirement has focused automated evidence.
-- [ ] Every registered functional requirement has focused automated evidence. 82 requirements remain `Pending`.
+- [ ] Every registered functional requirement has focused automated evidence. 77 requirements remain `Pending` (plus one `Partial`: `FR-UI-043`).
 - [ ] No production module imports fixture data (`NFR-UI-007`).
 - [x] Typed API clients have route-contract parity evidence.
 - [x] UI owns no durable state, business calculation, authorization, or broker connection.

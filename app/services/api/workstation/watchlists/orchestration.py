@@ -28,6 +28,11 @@ from app.services.api.workstation.watchlists.persistence import (
     set_default_watchlist_record,
 )
 from app.services.api.workstation.watchlists.schemas import Watchlist, WatchlistItem
+from app.services.data import (
+    build_symbol_metadata_request,
+    classify_symbol,
+    get_symbol_metadata,
+)
 from app.utils import derive_stable_id, get_logger, utc_now
 
 logger = get_logger(__name__)
@@ -36,6 +41,7 @@ _MAX_WATCHLISTS_PER_ACCOUNT: Final = 20
 _MAX_ITEMS_PER_WATCHLIST: Final = 200
 _MAX_NAME_LENGTH: Final = 64
 _DEFAULT_WATCHLIST_NAME: Final = "default"
+_UNAVAILABLE_METADATA_VALUE: Final = "Attribute is not available with this broker."
 
 # Curated seed content for every account's initial "default" watchlist, in
 # the exact broker-native symbols the operator trades. Grouped by asset class
@@ -117,7 +123,28 @@ def list_runtime_watchlists(
         Account-owned watchlists in display order.
     """
     source_id = resolve_runtime_source_id(None, request_id=request_id)
-    return list_watchlists(account_id, source_id=source_id, request_id=request_id)
+    watchlists = list_watchlists(account_id, source_id=source_id, request_id=request_id)
+    persisted_items = read_watchlist_items_for_account(
+        account_id, request_id=request_id
+    )
+    empty_classes_by_watchlist: dict[str, set[str]] = {}
+    for row in persisted_items:
+        if str(row.get("asset_class") or "").strip():
+            continue
+        empty_classes_by_watchlist.setdefault(str(row["watchlist_id"]), set()).add(
+            str(row["symbol"])
+        )
+    return tuple(
+        _reconcile_runtime_asset_classes(
+            watchlist,
+            source_id=source_id,
+            request_id=request_id,
+            empty_class_symbols=frozenset(
+                empty_classes_by_watchlist.get(watchlist.watchlist_id, set())
+            ),
+        )
+        for watchlist in watchlists
+    )
 
 
 def update_watchlist(
@@ -149,16 +176,181 @@ def update_watchlist(
         )
     if symbols is not None:
         source_id = resolve_runtime_source_id(None, request_id=request_id)
-        current = replace_watchlist_items(
+        asset_classes = _resolve_runtime_asset_classes(
+            current,
+            symbols,
+            source_id=source_id,
+            request_id=request_id,
+        )
+        current = _replace_watchlist_items(
             watchlist_id,
             account_id,
             symbols,
             source_id=source_id,
             request_id=request_id,
+            asset_classes=asset_classes,
         )
     if is_default:
         current = set_default_watchlist(watchlist_id, account_id, request_id=request_id)
     return current
+
+
+def _metadata_text(value: object) -> str | None:
+    """Return usable broker metadata text or explicit missingness.
+
+    Args:
+        value: Normalized metadata field value.
+
+    Returns:
+        Trimmed metadata text, or ``None`` when the provider omitted it.
+    """
+    text = str(value or "").strip()
+    if not text or text == _UNAVAILABLE_METADATA_VALUE:
+        return None
+    return text
+
+
+def _resolve_runtime_asset_classes(
+    current: Watchlist,
+    symbols: tuple[str, ...],
+    *,
+    source_id: str,
+    request_id: str,
+) -> dict[str, str]:
+    """Resolve classes for new symbols from exact runtime broker metadata.
+
+    Existing persisted classifications are retained so reorder and removal do
+    not introduce unnecessary external reads. Every newly added symbol must
+    have readable, classifiable metadata from the connected source.
+
+    Args:
+        current: Watchlist state before the requested replacement.
+        symbols: Complete requested symbol order.
+        source_id: Active runtime Data source identifier.
+        request_id: Canonical request identifier.
+
+    Returns:
+        Complete symbol-to-class mapping for the replacement.
+
+    Raises:
+        IdentityError: If metadata for a newly added symbol is unavailable or
+            cannot be classified from the broker-owned metadata.
+    """
+    resolved = {
+        item.symbol: item.asset_class
+        for item in current.items
+        if item.source_id == source_id and item.asset_class.strip()
+    }
+    for symbol in symbols:
+        if symbol in resolved:
+            continue
+        asset_class = _read_runtime_asset_class(
+            symbol,
+            source_id=source_id,
+            request_id=request_id,
+        )
+        if asset_class == "Other":
+            logger.error("Watchlist symbol class is unavailable")
+            raise IdentityError("WATCHLIST_SYMBOL_CLASS_UNAVAILABLE")
+        resolved[symbol] = asset_class
+    return {symbol: resolved[symbol] for symbol in symbols}
+
+
+def _read_runtime_asset_class(symbol: str, *, source_id: str, request_id: str) -> str:
+    """Read and classify one exact symbol from the runtime source.
+
+    Args:
+        symbol: Exact provider-native symbol.
+        source_id: Active runtime Data source identifier.
+        request_id: Canonical request identifier.
+
+    Returns:
+        Normalized display asset class, including the legitimate ``Other``
+        catch-all when the source metadata remains inconclusive.
+
+    Raises:
+        IdentityError: If source metadata is unavailable.
+    """
+    response = get_symbol_metadata(
+        build_symbol_metadata_request(
+            source_id=source_id,
+            symbol=symbol,
+            request_id=request_id,
+        )
+    )
+    metadata = response.data
+    if response.status != "success" or metadata is None:
+        logger.error("Watchlist symbol metadata is unavailable")
+        raise IdentityError("WATCHLIST_SYMBOL_METADATA_UNAVAILABLE")
+    return classify_symbol(
+        _metadata_text(metadata.path),
+        symbol=symbol,
+        currency_base=_metadata_text(metadata.currency_base) or metadata.base_currency,
+        currency_profit=(
+            _metadata_text(metadata.currency_profit) or metadata.quote_currency
+        ),
+    )
+
+
+def _reconcile_runtime_asset_classes(
+    watchlist: Watchlist,
+    *,
+    source_id: str,
+    request_id: str,
+    empty_class_symbols: frozenset[str],
+) -> Watchlist:
+    """Persist source-derived corrections for legacy item classes.
+
+    Migration ``api-0008`` initialized existing rows with an empty value, while
+    ``Other`` was historically produced without source metadata. A runtime list
+    read rechecks both cases and atomically persists successful classifications.
+    Unavailable metadata leaves the existing watchlist readable and unchanged.
+
+    Args:
+        watchlist: Persisted account watchlist projected for the caller.
+        source_id: Active runtime Data source identifier.
+        request_id: Canonical request identifier.
+        empty_class_symbols: Symbols whose raw persisted class is empty. Their
+            projected watchlist value may contain a compatibility fallback.
+
+    Returns:
+        Original watchlist when no correction is available, otherwise the
+        refreshed watchlist containing persisted corrections.
+    """
+    if not watchlist.items or any(
+        item.source_id != source_id for item in watchlist.items
+    ):
+        return watchlist
+    asset_classes = {item.symbol: item.asset_class for item in watchlist.items}
+    corrected = False
+    for item in watchlist.items:
+        was_empty = item.symbol in empty_class_symbols
+        if not was_empty and item.asset_class != "Other":
+            continue
+        try:
+            asset_class = _read_runtime_asset_class(
+                item.symbol,
+                source_id=source_id,
+                request_id=request_id,
+            )
+        except IdentityError:
+            logger.warning("Preserving ambiguous watchlist class")
+            continue
+        if asset_class == "Other" and not was_empty:
+            continue
+        asset_classes[item.symbol] = asset_class
+        corrected = True
+    if not corrected:
+        return watchlist
+    logger.info("Persisting source-derived watchlist class corrections")
+    return _replace_watchlist_items(
+        watchlist.watchlist_id,
+        watchlist.account_id,
+        tuple(item.symbol for item in watchlist.items),
+        source_id=source_id,
+        request_id=request_id,
+        asset_classes=asset_classes,
+    )
 
 
 def _group_items_by_watchlist(
@@ -174,11 +366,16 @@ def _group_items_by_watchlist(
     """
     grouped: dict[str, list[WatchlistItem]] = {}
     for row in rows:
+        symbol = str(row["symbol"])
+        asset_class = str(row.get("asset_class") or "") or classify_symbol(
+            None, symbol=symbol
+        )
         grouped.setdefault(str(row["watchlist_id"]), []).append(
             WatchlistItem(
                 source_id=str(row["source_id"]),
-                symbol=str(row["symbol"]),
+                symbol=symbol,
                 sort_order=int(str(row["sort_order"])),
+                asset_class=asset_class,
             )
         )
     return grouped
@@ -226,7 +423,7 @@ def _ensure_default_watchlist(
         return
     logger.info("Seeded default watchlist for account")
     items = tuple(
-        (source_id, symbol, index)
+        (source_id, symbol, index, classify_symbol(None, symbol=symbol))
         for index, symbol in enumerate(DEFAULT_WATCHLIST_SYMBOLS)
     )
     create_watchlist_items(
@@ -404,10 +601,54 @@ def replace_watchlist_items(
     Raises:
         IdentityError: If the watchlist is not found or not owned.
     """
+    return _replace_watchlist_items(
+        watchlist_id,
+        account_id,
+        symbols,
+        source_id=source_id,
+        request_id=request_id,
+        asset_classes=None,
+    )
+
+
+def _replace_watchlist_items(
+    watchlist_id: str,
+    account_id: str,
+    symbols: tuple[str, ...],
+    *,
+    source_id: str,
+    request_id: str,
+    asset_classes: Mapping[str, str] | None,
+) -> Watchlist:
+    """Persist a validated replacement with optional source-derived classes.
+
+    Args:
+        watchlist_id: Stable watchlist identifier.
+        account_id: Authenticated owning account.
+        symbols: Complete replacement symbol list, in display order.
+        source_id: Data source identifier for the items.
+        request_id: Canonical request identifier.
+        asset_classes: Complete source-derived class mapping when invoked from
+            the runtime API path; ``None`` preserves the public service's
+            deterministic compatibility behavior.
+
+    Returns:
+        The watchlist with its replaced items.
+    """
     validated_symbols = _validate_symbols(symbols)
     now = utc_now().isoformat()
     items = tuple(
-        (source_id, symbol, index) for index, symbol in enumerate(validated_symbols)
+        (
+            source_id,
+            symbol,
+            index,
+            (
+                asset_classes[symbol]
+                if asset_classes is not None
+                else classify_symbol(None, symbol=symbol)
+            ),
+        )
+        for index, symbol in enumerate(validated_symbols)
     )
     # Ownership is checked by the following read, not this statement's
     # affected-row count: an empty replacement legitimately reports 0 rows
@@ -457,14 +698,21 @@ def _items_from_rows(
     Returns:
         Validated items in persisted order.
     """
-    return tuple(
-        WatchlistItem(
-            source_id=str(row["source_id"]),
-            symbol=str(row["symbol"]),
-            sort_order=int(str(row["sort_order"])),
+    items: list[WatchlistItem] = []
+    for row in rows:
+        symbol = str(row["symbol"])
+        asset_class = str(row.get("asset_class") or "") or classify_symbol(
+            None, symbol=symbol
         )
-        for row in rows
-    )
+        items.append(
+            WatchlistItem(
+                source_id=str(row["source_id"]),
+                symbol=symbol,
+                sort_order=int(str(row["sort_order"])),
+                asset_class=asset_class,
+            )
+        )
+    return tuple(items)
 
 
 __all__ = (

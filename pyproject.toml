@@ -37,6 +37,7 @@ dependencies = [
     # `AdkRuntime` port in `app/agentic/runtime/adk.py`; no ADK object crosses
     # the Agentic public boundary. Requires the `requests` override below.
     "google-adk>=2.5.0",
+    "tqdm>=4.70.0",
 ]
 
 [tool.ruff]

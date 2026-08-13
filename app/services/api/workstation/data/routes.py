@@ -8,7 +8,7 @@ then persist — and returns Data's own storage manifest. The gateway holds no
 dataset, chooses no storage location, and never substitutes a provider result.
 """
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
@@ -24,6 +24,7 @@ from app.services.api.workstation.data.schemas import (
     DatasetImportRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     DatasetPrepareRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
+from app.services.api.workstation.markets import resolve_runtime_source_id
 from app.services.api.workstation.settings.limits import (
     API_DEFAULT_PAGE_SIZE,
     API_MAX_PAGE_SIZE,
@@ -55,6 +56,63 @@ _DATA_CAPABILITIES = (
     ("FEAT-DATA-13", "Runtime Stores", "namespaced durable runtime state"),
     ("FEAT-DATA-14", "Replay", "availability-gated replay packages"),
 )
+
+
+def _build_symbol_directory_response(response: object, *, request_id: str) -> object:
+    """Normalize one Data symbol result into the canonical API envelope.
+
+    Args:
+        response: Data-owned standard response from symbol discovery.
+        request_id: Canonical API request identifier.
+
+    Returns:
+        Canonical API response carrying the Data-owned symbol page directly.
+    """
+    response_status = str(getattr(response, "status", "error"))
+    data_payload = getattr(response, "data", None)
+    upstream_error = getattr(response, "error", None)
+    gateway_error = None
+    if response_status != "success":
+        gateway_error = {
+            "code": "UPSTREAM_UNAVAILABLE",
+            "message": str(
+                getattr(upstream_error, "message", "Symbol directory unavailable")
+            ),
+            "details": {
+                "upstream_code": str(getattr(upstream_error, "code", "UNKNOWN_ERROR"))
+            },
+            "retryable": bool(getattr(upstream_error, "retryable", False)),
+            "request_id": request_id,
+            "trace_id": None,
+        }
+    if isinstance(data_payload, Mapping):
+        items = data_payload.get("items", ())
+        next_cursor = data_payload.get("next_cursor")
+    else:
+        items = getattr(data_payload, "items", ()) if data_payload is not None else ()
+        next_cursor = (
+            getattr(data_payload, "next_cursor", None)
+            if data_payload is not None
+            else None
+        )
+    return build_api_response(
+        status=response_status,
+        message=(
+            "Symbol directory retrieved"
+            if response_status == "success"
+            else "Symbol directory unavailable"
+        ),
+        data=data_payload,
+        error=gateway_error,
+        metadata=build_api_metadata(
+            request_id=request_id,
+            route="/api/v1/data/symbols",
+            operation="api.data.symbols",
+            side_effect="read",
+            next_cursor=next_cursor,
+            page_size=len(items),
+        ),
+    )
 
 
 def _dataset_source() -> _DatasetSource:
@@ -125,14 +183,22 @@ def _list_symbols(
         Data-owned symbol page response.
     """
     require_permission(context, "data:read")
+    request_id = generate_id("req")
+    # Data requires an explicit source. An omitted source_id must resolve to the
+    # configured runtime broker here: reaching the request model as None fails
+    # outside Data's error boundary, which surfaces as a 500 rather than a
+    # typed error.
     request = build_symbol_list_request(
-        source_id=source_id,
+        source_id=resolve_runtime_source_id(source_id, request_id=request_id),
         query=query,
         cursor=cursor,
         limit=limit,
-        request_id=generate_id("req"),
+        request_id=request_id,
     )
-    return list_symbols(request)
+    return _build_symbol_directory_response(
+        list_symbols(request),
+        request_id=request_id,
+    )
 
 
 @router.post("/datasets/prepare", response_model=None)

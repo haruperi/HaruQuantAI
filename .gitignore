@@ -11,6 +11,7 @@ __pycache__/
 *$py.class
 .tmp_pytest_runtime/
 .tmp_pytest_*/
+.claude/
 tests/_tmp_pytest/
 tests/_tmp_pytest_run/
 pytest-cache-files-*/

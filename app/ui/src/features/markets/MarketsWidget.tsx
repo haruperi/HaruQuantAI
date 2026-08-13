@@ -6,6 +6,8 @@ import { useWorkspaceStore } from '../workspaces';
 import { apiClients, unwrapData, type MarketRow, type Watchlist } from '@/clients';
 import { MoreVertical, LineChart, AlignJustify, Layers } from 'lucide-react';
 
+import { CmeProgressBar } from '../../components/common/CmeProgressBar';
+
 // Fixed classification (not sourced from src/mock/ - that would reintroduce
 // fixture data into a production module, NFR-UI-007). A class with nothing
 // in the directory is a legitimate, truthfully-empty filter (FR-UI-034),
@@ -15,11 +17,9 @@ const MARKET_CATEGORIES = ['Forex', 'Commodities', 'Indices', 'Stocks', 'Cryptoc
 /**
  * Derived display row built from a real market-directory row.
  *
- * `apiClients.data.markets()` never composes Indicators-owned technical
- * overlays (volatility/ADR/range/change-in-pips) - that projection only runs
- * when a caller opts in via `quotes(..., { includeTechnicals: true })`, which
- * this directory browse deliberately doesn't do (FR-UI-030: no client-side
- * calculation, and no field this widget can't get straight from the API).
+ * Both directory and explicit-watchlist reads opt in to Indicators-owned
+ * technical overlays. The widget only formats the API evidence and performs
+ * no market calculations (FR-UI-030).
  */
 interface DisplayRow {
   symbol: string;
@@ -29,6 +29,10 @@ interface DisplayRow {
   last: number | null;
   change: number | null;
   changePercent: number | null;
+  changePips: number | null;
+  volatility: number | null;
+  adr: number | null;
+  range: number | null;
   open: number | null;
   high: number | null;
   low: number | null;
@@ -45,6 +49,10 @@ function toDisplayRow(row: MarketRow): DisplayRow {
     last: row.last,
     change: row.change,
     changePercent: row.change_percent,
+    changePips: row.change_pips ?? null,
+    volatility: row.volatility ?? null,
+    adr: row.adr ?? null,
+    range: row.range_percent_of_adr ?? null,
     open: row.open,
     high: row.high,
     low: row.low,
@@ -59,15 +67,20 @@ function toDisplayRow(row: MarketRow): DisplayRow {
 const MARKETS_PAGE_SIZE = 50;
 const MARKETS_MAX_PAGES = 4;
 
-type SortKey = 'Symbol' | 'Change' | 'Volume';
+type SortKey = 'Symbol' | 'Change' | 'Volatility' | 'ADR' | 'Range';
 
 export const MarketsWidget: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Forex');
-  const [sortBy, setSortBy] = useState<SortKey>('Volume');
+  const [sortBy, setSortBy] = useState<SortKey>('Symbol');
   const [activeMenuSymbol, setActiveMenuSymbol] = useState<string | null>(null);
   const [directory, setDirectory] = useState<DisplayRow[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [errorMsg, setErrorMsg] = useState('');
+  const [loadProgress, setLoadProgress] = useState<{ value: number; max: number; label: string }>({
+    value: 0,
+    max: 100,
+    label: 'Loading market directory…',
+  });
 
   const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
   // null = no watchlist filter ("All Instruments"); the directory itself
@@ -76,6 +89,8 @@ export const MarketsWidget: React.FC = () => {
 
   const { openOrderTicket, submitOrder } = useTradingStore();
   const { orderConfirmationRequired, addWidgetToWorkspace } = useWorkspaceStore();
+
+  const [watchlistsLoaded, setWatchlistsLoaded] = useState(false);
 
   // Load the caller's watchlists for the optional quick-filter selector
   // below. This is additive to the directory fetch, not a replacement for
@@ -87,39 +102,104 @@ export const MarketsWidget: React.FC = () => {
       .list()
       .then((response) => {
         if (cancelled) return;
-        setWatchlists(unwrapData(response));
+        const list = unwrapData(response);
+        setWatchlists(list);
+        const defaultWl =
+          list.find((w) => w.is_default) ??
+          list.find((w) => w.name.toLowerCase() === 'default') ??
+          list[0];
+        if (defaultWl) {
+          setActiveWatchlistId(defaultWl.watchlist_id);
+        }
       })
       .catch(() => {
         // Non-fatal: the watchlist filter is just unavailable, the directory
         // still loads and renders normally.
+      })
+      .finally(() => {
+        if (!cancelled) setWatchlistsLoaded(true);
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  // Load the tradable instrument directory for the configured runtime source
-  // (source_id is never passed - the backend resolves the configured
-  // default; the UI never elects it, same rule as account mode). Pages are
-  // appended as they resolve so the table fills in progressively.
+  const activeWatchlist =
+    watchlists.find((item) => item.watchlist_id === activeWatchlistId) ??
+    watchlists.find((item) => item.is_default) ??
+    watchlists[0] ??
+    null;
+
+  // Load quotes with technical overlays for symbols in the active watchlist,
+  // matching the calculation in tests/api/usage/12_markets.py.
   useEffect(() => {
+    if (!watchlistsLoaded) return;
     let cancelled = false;
     setStatus('loading');
     setDirectory([]);
     setErrorMsg('');
+    setLoadProgress({ value: 5, max: 100, label: 'Connecting to market directory…' });
 
-    const loadPages = async (): Promise<void> => {
+    const loadData = async (): Promise<void> => {
       try {
-        let cursor: string | undefined;
-        for (let page = 0; page < MARKETS_MAX_PAGES; page++) {
-          const response = await apiClients.data.markets({ limit: MARKETS_PAGE_SIZE, cursor });
-          if (cancelled) return;
-          const directoryPage = unwrapData(response);
-          setDirectory((current) => [...current, ...directoryPage.rows.map(toDisplayRow)]);
-          if (!directoryPage.next_cursor) break;
-          cursor = directoryPage.next_cursor;
+        if (activeWatchlist && activeWatchlist.items.length > 0) {
+          const symbols = activeWatchlist.items.map((item) => item.symbol);
+          const BATCH_SIZE = 3;
+          const totalBatches = Math.ceil(symbols.length / BATCH_SIZE);
+
+          for (let b = 0; b < totalBatches; b++) {
+            const batchSymbols = symbols.slice(b * BATCH_SIZE, (b + 1) * BATCH_SIZE);
+            const startPct = Math.round((b / totalBatches) * 100);
+            setLoadProgress({
+              value: Math.max(startPct, 10),
+              max: 100,
+              label: `Loading quotes (${b + 1} of ${totalBatches} batches)…`,
+            });
+
+            const response = await apiClients.data.quotes(batchSymbols, { includeTechnicals: true });
+            if (cancelled) return;
+            const directoryPage = unwrapData(response);
+            const batchRows = directoryPage.rows.map(toDisplayRow);
+
+            setDirectory((current) => [...current, ...batchRows]);
+            const endPct = Math.round(((b + 1) / totalBatches) * 100);
+            setLoadProgress({
+              value: endPct,
+              max: 100,
+              label: `Loaded batch ${b + 1} of ${totalBatches} (${endPct}%)`,
+            });
+          }
+          if (!cancelled) setStatus('ready');
+        } else {
+          let cursor: string | undefined;
+          for (let page = 0; page < MARKETS_MAX_PAGES; page++) {
+            const startPct = Math.round((page / MARKETS_MAX_PAGES) * 100);
+            setLoadProgress({
+              value: Math.max(startPct, 15),
+              max: 100,
+              label: `Loading market directory (Page ${page + 1} of ${MARKETS_MAX_PAGES})…`,
+            });
+
+            const response = await apiClients.data.markets({ limit: MARKETS_PAGE_SIZE, cursor, includeTechnicals: true });
+            if (cancelled) return;
+            const directoryPage = unwrapData(response);
+            setDirectory((current) => [...current, ...directoryPage.rows.map(toDisplayRow)]);
+
+            const endPct = Math.round(((page + 1) / MARKETS_MAX_PAGES) * 100);
+            setLoadProgress({
+              value: endPct,
+              max: 100,
+              label: `Loaded Page ${page + 1} of ${MARKETS_MAX_PAGES} (${endPct}%)`,
+            });
+
+            if (!directoryPage.next_cursor) {
+              setLoadProgress({ value: 100, max: 100, label: 'Loaded all symbols (100%)' });
+              break;
+            }
+            cursor = directoryPage.next_cursor;
+          }
+          if (!cancelled) setStatus('ready');
         }
-        if (!cancelled) setStatus('ready');
       } catch {
         if (cancelled) return;
         setErrorMsg('Unable to load the market directory.');
@@ -127,33 +207,73 @@ export const MarketsWidget: React.FC = () => {
       }
     };
 
-    void loadPages();
+    void loadData();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [watchlistsLoaded, activeWatchlistId, activeWatchlist]);
 
-  const activeWatchlist = watchlists.find((item) => item.watchlist_id === activeWatchlistId) ?? null;
   const watchlistSymbols = activeWatchlist ? new Set(activeWatchlist.items.map((item) => item.symbol)) : null;
+
+  // Build category set dynamically from active watchlist items & directory map
+  const activeCategories = React.useMemo(() => {
+    if (!activeWatchlist || activeWatchlist.items.length === 0) {
+      return MARKET_CATEGORIES;
+    }
+    const directoryClassBySymbol = new Map(directory.map((d) => [d.symbol, d.assetClass]));
+    const categorySet = new Set<string>();
+    for (const item of activeWatchlist.items) {
+      const cls = item.asset_class || directoryClassBySymbol.get(item.symbol);
+      if (cls && cls !== 'Other') {
+        categorySet.add(cls);
+      }
+    }
+    const filtered = MARKET_CATEGORIES.filter((cat) => categorySet.has(cat));
+    return filtered.length > 0 ? filtered : MARKET_CATEGORIES;
+  }, [activeWatchlist, directory]);
+
+  // Keep selectedCategory synced with activeCategories
+  useEffect(() => {
+    if (activeCategories.length > 0 && !activeCategories.includes(selectedCategory)) {
+      setSelectedCategory(activeCategories[0]);
+    }
+  }, [activeCategories, selectedCategory]);
 
   const filteredProducts = directory.filter(
     (p) => p.assetClass === selectedCategory && (!watchlistSymbols || watchlistSymbols.has(p.symbol))
   );
 
-  // Symbol/Change/Volume per FR-UI-035; every ordering falls back to a
-  // symbol tiebreak so equal values render deterministically rather than
-  // relying on incidental array order.
+  // Symbol/Change/Volatility/ADR/Range sorting with a stable symbol tiebreak.
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    const primary =
-      sortBy === 'Volume'
-        ? (b.volume ?? -1) - (a.volume ?? -1)
-        : sortBy === 'Change'
-          ? Math.abs(b.changePercent ?? 0) - Math.abs(a.changePercent ?? 0)
-          : a.symbol.localeCompare(b.symbol);
+    let primary = 0;
+    if (sortBy === 'Change') {
+      primary = Math.abs(b.changePercent ?? 0) - Math.abs(a.changePercent ?? 0);
+    } else if (sortBy === 'Volatility') {
+      primary = (b.volatility ?? -1) - (a.volatility ?? -1);
+    } else if (sortBy === 'ADR') {
+      primary = (b.adr ?? -1) - (a.adr ?? -1);
+    } else if (sortBy === 'Range') {
+      const rangeA = a.range ?? (a.high !== null && a.low !== null ? a.high - a.low : -1);
+      const rangeB = b.range ?? (b.high !== null && b.low !== null ? b.high - b.low : -1);
+      primary = rangeB - rangeA;
+    } else {
+      primary = a.symbol.localeCompare(b.symbol);
+    }
     return primary !== 0 ? primary : a.symbol.localeCompare(b.symbol);
   });
 
-  /** Format a nullable numeric cell, or an em-dash when evidence is absent. */
+  function getRangeColor(range: number | null | undefined): string | undefined {
+  if (range === null || range === undefined || Number.isNaN(range)) {
+    return undefined;
+  }
+  if (range <= 40) return '#00e473';  // Green
+  if (range <= 60) return '#29b6f6';  // Blue
+  if (range <= 80) return '#ffca28';  // Yellow
+  if (range <= 100) return '#ff9800'; // Orange
+  return '#ff003d';                    // Red (> 100)
+}
+
+/** Format a nullable numeric cell, or an em-dash when evidence is absent. */
   const fmt = (value: number | null, p: DisplayRow): string =>
     value === null || value === undefined || Number.isNaN(value) ? '—' : value.toFixed(p.decimals ?? 2);
 
@@ -165,10 +285,9 @@ export const MarketsWidget: React.FC = () => {
         <select
           className="form-select"
           value={activeWatchlistId ?? ''}
-          onChange={(e) => setActiveWatchlistId(e.target.value || null)}
+          onChange={(e) => setActiveWatchlistId(e.target.value)}
           style={{ padding: '2px 6px', fontSize: '11px' }}
         >
-          <option value="">All Instruments</option>
           {watchlists.map((item) => (
             <option key={item.watchlist_id} value={item.watchlist_id}>
               {item.name}
@@ -180,7 +299,7 @@ export const MarketsWidget: React.FC = () => {
 
       {/* Category Pills Bar */}
       <div className="category-pills">
-        {MARKET_CATEGORIES.map((cat) => (
+        {activeCategories.map((cat) => (
           <div
             key={cat}
             className={`category-pill ${cat === selectedCategory ? 'active' : ''}`}
@@ -192,24 +311,34 @@ export const MarketsWidget: React.FC = () => {
       </div>
 
       {/* Sub-header Sort Dropdown */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '6px 10px', background: 'var(--cme-navy-dark)', borderBottom: '1px solid var(--cme-navy-border)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px', padding: '6px 10px', background: 'var(--cme-navy-dark)', borderBottom: '1px solid var(--cme-navy-border)' }}>
+        <span style={{ fontWeight: 700, fontSize: '11px', color: 'var(--text-muted)' }}>Sort By:</span>
         <select
           className="form-select"
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortKey)}
           style={{ padding: '2px 8px', fontSize: '11px' }}
         >
-          <option value="Volume">Sort by Volume</option>
-          <option value="Change">Sort by Change %</option>
-          <option value="Symbol">Sort by Symbol</option>
+          <option value="Symbol">Symbol</option>
+          <option value="Change">Change</option>
+          <option value="Volatility">Volatility</option>
+          <option value="ADR">ADR</option>
+          <option value="Range">Range</option>
         </select>
       </div>
 
       {/* Main Markets Table */}
       <div style={{ flex: 1, overflow: 'auto' }}>
-        {status === 'loading' && directory.length === 0 && (
-          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted, #718294)' }}>
-            Loading the market directory…
+        {status === 'loading' && (
+          <div style={{ padding: directory.length === 0 ? '32px 24px' : '10px 16px', maxWidth: directory.length === 0 ? '480px' : '100%', margin: directory.length === 0 ? '0 auto' : '0' }}>
+            <CmeProgressBar
+              value={loadProgress.value}
+              max={loadProgress.max}
+              label={loadProgress.label}
+              subtext={`${loadProgress.value}%`}
+              variant="blue"
+              height={directory.length === 0 ? 10 : 6}
+            />
           </div>
         )}
         {status === 'error' && (
@@ -226,9 +355,12 @@ export const MarketsWidget: React.FC = () => {
         <table className="cme-table">
           <thead>
             <tr>
-              <th>Name</th>
+              <th>Symbol</th>
               <th>Last Price</th>
               <th>Change</th>
+              <th>Volatility</th>
+              <th>ADR</th>
+              <th>Range</th>
               <th>Open</th>
               <th>High</th>
               <th>Low</th>
@@ -237,19 +369,50 @@ export const MarketsWidget: React.FC = () => {
           </thead>
           <tbody>
             {sortedProducts.map((p) => {
-              const isUp = (p.change ?? 0) > 0;
-              const isDown = (p.change ?? 0) < 0;
+              const changeVal = p.changePercent ?? p.changePips ?? p.change ?? 0;
+              const isUp = changeVal > 0;
+              const isDown = changeVal < 0;
               const priceClass = isUp ? 'price-up' : isDown ? 'price-down' : 'price-flat';
+
+              const pipsOrChangeStr =
+                p.changePips !== null && p.changePips !== undefined
+                  ? `${p.changePips > 0 ? '+' : ''}${p.changePips.toFixed(1)}`
+                  : p.change !== null && p.change !== undefined
+                    ? `${p.change > 0 ? '+' : ''}${p.change.toFixed(p.decimals)}`
+                    : '';
+
+              const percentStr =
+                p.changePercent !== null && p.changePercent !== undefined
+                  ? ` (${p.changePercent > 0 ? '+' : ''}${p.changePercent.toFixed(2)}%)`
+                  : '';
+
               const changeCell =
-                p.change === null || p.changePercent === null
+                (p.change === null || p.change === undefined) &&
+                (p.changePercent === null || p.changePercent === undefined) &&
+                (p.changePips === null || p.changePips === undefined)
                   ? '—'
-                  : `${isUp ? '+' : ''}${p.change.toFixed(p.decimals)} (${p.changePercent >= 0 ? '+' : ''}${p.changePercent.toFixed(2)}%)`;
+                  : `${pipsOrChangeStr}${percentStr}`;
+
+              const volCell = p.volatility !== null && p.volatility !== undefined ? `${(p.volatility * 100).toFixed(2)}%` : '—';
+              const adrCell = p.adr !== null && p.adr !== undefined ? p.adr.toFixed(1) : '—';
+              const rangeCell = p.range !== null && p.range !== undefined ? `${p.range.toFixed(1)}%` : '—';
+
+              const changeColor = isUp
+                ? 'var(--financial-positive, #00e473)'
+                : isDown
+                  ? 'var(--financial-negative, #ff003d)'
+                  : 'var(--text-white, #ffffff)';
+
+              const rangeColor = getRangeColor(p.range);
 
               return (
                 <tr key={p.symbol}>
-                  <td style={{ fontWeight: 600 }}>{p.name}</td>
-                  <td className={priceClass}>{fmt(p.last, p)}</td>
-                  <td className={priceClass}>{changeCell}</td>
+                  <td style={{ fontWeight: 600 }}>{p.symbol}</td>
+                  <td className={priceClass} style={{ color: changeColor }}>{fmt(p.last, p)}</td>
+                  <td className={priceClass} style={{ color: changeColor, fontWeight: 600 }}>{changeCell}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)' }}>{volCell}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)' }}>{adrCell}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)', color: rangeColor, fontWeight: rangeColor ? 600 : 'normal' }}>{rangeCell}</td>
                   <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.open, p)}</td>
                   <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.high, p)}</td>
                   <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.low, p)}</td>

@@ -5,8 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MarketsWidget } from './MarketsWidget';
 
-const { marketsMock, listMock, openOrderTicketMock, submitOrderMock, addWidgetToWorkspaceMock } = vi.hoisted(() => ({
+const { marketsMock, quotesMock, listMock, openOrderTicketMock, submitOrderMock, addWidgetToWorkspaceMock } = vi.hoisted(() => ({
   marketsMock: vi.fn(),
+  quotesMock: vi.fn(),
   listMock: vi.fn(),
   openOrderTicketMock: vi.fn(),
   submitOrderMock: vi.fn(),
@@ -32,7 +33,7 @@ vi.mock('../workspaces', () => ({
 
 vi.mock('@/clients', () => ({
   apiClients: {
-    data: { markets: marketsMock },
+    data: { markets: marketsMock, quotes: quotesMock },
     watchlists: { list: listMock },
   },
   unwrapData: (response: { data: unknown }) => response.data,
@@ -92,6 +93,7 @@ describe('MarketsWidget', () => {
   beforeEach(() => {
     orderConfirmationRequired = true;
     listMock.mockResolvedValue({ data: [] });
+    quotesMock.mockResolvedValue(directoryPage([marketRow()], null));
   });
 
   afterEach(() => {
@@ -105,7 +107,7 @@ describe('MarketsWidget', () => {
     render(<MarketsWidget />);
     await screen.findByText('EURUSD');
 
-    expect(marketsMock).toHaveBeenCalledWith({ limit: 50, cursor: undefined });
+    expect(marketsMock).toHaveBeenCalledWith({ limit: 50, cursor: undefined, includeTechnicals: true });
     const [params] = marketsMock.mock.calls[0];
     expect(params).not.toHaveProperty('source_id');
   });
@@ -170,39 +172,87 @@ describe('MarketsWidget', () => {
     await waitFor(() => expect(screen.getByText('No symbols available for Forex.')).toBeTruthy());
   });
 
-  it('filters the directory to the selected watchlist, restoring the watchlist selector', async () => {
+  it('filters the directory to the selected watchlist, defaulting to the default watchlist on load', async () => {
     listMock.mockResolvedValue({
-      data: [watchlist({ watchlist_id: 'wl-1', name: 'My Forex List', items: [{ source_id: 'mt5', symbol: 'EURUSD', sort_order: 0 }] })],
+      data: [
+        watchlist({ watchlist_id: 'wl-1', name: 'Default List', is_default: true, items: [{ source_id: 'mt5', symbol: 'EURUSD', sort_order: 0 }] }),
+        watchlist({ watchlist_id: 'wl-2', name: 'Cable List', is_default: false, items: [{ source_id: 'mt5', symbol: 'GBPUSD', sort_order: 0 }] }),
+      ],
     });
-    marketsMock.mockResolvedValue(
-      directoryPage(
-        [
-          marketRow({ symbol: 'EURUSD', name: 'EURUSD', asset_class: 'Forex' }),
-          marketRow({ symbol: 'GBPUSD', name: 'GBPUSD', asset_class: 'Forex' }),
-        ],
-        null
-      )
-    );
+    quotesMock.mockImplementation((symbols: string[]) => {
+      if (symbols.includes('EURUSD')) {
+        return Promise.resolve(directoryPage([marketRow({ symbol: 'EURUSD', name: 'EURUSD', asset_class: 'Forex' })], null));
+      }
+      return Promise.resolve(directoryPage([marketRow({ symbol: 'GBPUSD', name: 'GBPUSD', asset_class: 'Forex' })], null));
+    });
 
     render(<MarketsWidget />);
     await screen.findByText('EURUSD');
-    // No watchlist selected by default: the whole (category-filtered) directory shows.
-    expect(screen.getByText('GBPUSD')).toBeTruthy();
 
-    await screen.findByText('My Forex List');
-    fireEvent.change(screen.getByDisplayValue('All Instruments'), { target: { value: 'wl-1' } });
-
+    // Default watchlist is selected automatically on load; GBPUSD (not in wl-1) is filtered out.
+    await screen.findByText('Default List (default)');
     await waitFor(() => expect(screen.queryByText('GBPUSD')).toBeNull());
     expect(screen.getByText('EURUSD')).toBeTruthy();
+    expect(screen.queryByText('All Instruments')).toBeNull();
+
+    // Selecting another watchlist ("Cable List") filters to its symbols.
+    fireEvent.change(screen.getByDisplayValue('Default List (default)'), { target: { value: 'wl-2' } });
+    await waitFor(() => expect(screen.getByText('GBPUSD')).toBeTruthy());
+    expect(screen.queryByText('EURUSD')).toBeNull();
   });
 
-  it('sorts by Symbol, Change, and Volume with a stable symbol tiebreak (FR-UI-035)', async () => {
+  it('dynamically renders asset class tabs according to the active watchlist', async () => {
+    listMock.mockResolvedValue({
+      data: [
+        watchlist({
+          watchlist_id: 'wl-single',
+          name: 'Forex Only',
+          is_default: true,
+          items: [{ source_id: 'mt5', symbol: 'EURUSD', asset_class: 'Forex', sort_order: 0 }],
+        }),
+        watchlist({
+          watchlist_id: 'wl-multi',
+          name: 'Multi Asset',
+          is_default: false,
+          items: [
+            { source_id: 'mt5', symbol: 'EURUSD', asset_class: 'Forex', sort_order: 0 },
+            { source_id: 'mt5', symbol: 'XAUUSD', asset_class: 'Commodities', sort_order: 1 },
+          ],
+        }),
+      ],
+    });
+    quotesMock.mockImplementation((symbols: string[]) => {
+      const rows = [];
+      if (symbols.includes('EURUSD')) rows.push(marketRow({ symbol: 'EURUSD', name: 'EURUSD', asset_class: 'Forex' }));
+      if (symbols.includes('XAUUSD')) rows.push(marketRow({ symbol: 'XAUUSD', name: 'XAUUSD', asset_class: 'Commodities' }));
+      return Promise.resolve(directoryPage(rows, null));
+    });
+
+    render(<MarketsWidget />);
+    await screen.findByText('EURUSD');
+
+    // For single-class watchlist, only the Forex category pill tab is rendered.
+    expect(screen.getByText('Forex')).toBeTruthy();
+    expect(screen.queryByText('Commodities')).toBeNull();
+
+    // Switching to multi-class watchlist renders both Forex and Commodities tabs.
+    fireEvent.change(screen.getByDisplayValue('Forex Only (default)'), { target: { value: 'wl-multi' } });
+    await waitFor(() => expect(screen.getByText('Commodities')).toBeTruthy());
+    expect(screen.getByText('Forex')).toBeTruthy();
+
+    // Clicking Commodities tab filters displayed symbols to Commodities.
+    fireEvent.click(screen.getByText('Commodities'));
+    await waitFor(() => expect(screen.getByText('XAUUSD')).toBeTruthy());
+    expect(screen.queryByText('EURUSD')).toBeNull();
+  });
+
+  it('sorts by Symbol, Change, Volatility, ADR, and Range with a stable symbol tiebreak (FR-UI-035)', async () => {
     marketsMock.mockResolvedValue(
       directoryPage(
         [
-          marketRow({ symbol: 'NZDCAD', name: 'NZDCAD', volume: 100, change: 0.001, change_percent: 0.1 }),
-          marketRow({ symbol: 'AUDCAD', name: 'AUDCAD', volume: 100, change: 0.002, change_percent: 0.2 }),
-          marketRow({ symbol: 'GBPCAD', name: 'GBPCAD', volume: 500, change: -0.05, change_percent: -0.9 }),
+          marketRow({ symbol: 'NZDCAD', name: 'NZDCAD', change_percent: 0.1, volatility: 0.001, adr: 0.005, high: 1.1, low: 1.05 }),
+          marketRow({ symbol: 'AUDCAD', name: 'AUDCAD', change_percent: 0.2, volatility: 0.003, adr: 0.002, high: 1.2, low: 1.05 }),
+          marketRow({ symbol: 'GBPCAD', name: 'GBPCAD', change_percent: -0.9, volatility: 0.002, adr: 0.01, high: 1.3, low: 1.0 }),
         ],
         null
       )
@@ -213,16 +263,53 @@ describe('MarketsWidget', () => {
 
     const symbolCellsInOrder = () => screen.getAllByRole('row').slice(1).map((row) => row.textContent ?? '');
 
-    // Default sort is Volume; AUDCAD/NZDCAD tie at 100 and must tiebreak
-    // alphabetically (AUDCAD before NZDCAD), both behind GBPCAD's 500.
+    // Default sort is Symbol
     let rows = symbolCellsInOrder();
-    expect(rows[0]).toContain('GBPCAD');
-    expect(rows[1]).toContain('AUDCAD');
-    expect(rows[2]).toContain('NZDCAD');
-
-    fireEvent.change(screen.getByDisplayValue('Sort by Volume'), { target: { value: 'Symbol' } });
-    rows = symbolCellsInOrder();
     expect(rows.map((r) => r.slice(0, 6))).toEqual(['AUDCAD', 'GBPCAD', 'NZDCAD']);
+
+    // Sort by Change (GBPCAD |-0.9%| > AUDCAD |0.2%| > NZDCAD |0.1%|)
+    fireEvent.change(screen.getByDisplayValue('Symbol'), { target: { value: 'Change' } });
+    rows = symbolCellsInOrder();
+    expect(rows[0]).toContain('GBPCAD');
+
+    // Sort by Volatility (AUDCAD 0.003 > GBPCAD 0.002 > NZDCAD 0.001)
+    fireEvent.change(screen.getByDisplayValue('Change'), { target: { value: 'Volatility' } });
+    rows = symbolCellsInOrder();
+    expect(rows[0]).toContain('AUDCAD');
+
+    // Sort by ADR (GBPCAD 0.01 > NZDCAD 0.005 > AUDCAD 0.002)
+    fireEvent.change(screen.getByDisplayValue('Volatility'), { target: { value: 'ADR' } });
+    rows = symbolCellsInOrder();
+    expect(rows[0]).toContain('GBPCAD');
+
+    // Sort by Range (GBPCAD 0.3 > AUDCAD 0.15 > NZDCAD 0.05)
+    fireEvent.change(screen.getByDisplayValue('ADR'), { target: { value: 'Range' } });
+    rows = symbolCellsInOrder();
+    expect(rows[0]).toContain('GBPCAD');
+  });
+
+  it('applies color-coding to the Range column according to threshold rules', async () => {
+    marketsMock.mockResolvedValue(
+      directoryPage(
+        [
+          marketRow({ symbol: 'SYM1', name: 'SYM1', range_percent_of_adr: 35.0 }),   // Green <= 40 Safe
+          marketRow({ symbol: 'SYM2', name: 'SYM2', range_percent_of_adr: 55.0 }),   // Blue <= 60 Mandatory
+          marketRow({ symbol: 'SYM3', name: 'SYM3', range_percent_of_adr: 75.0 }),   // Yellow <= 80 Caution
+          marketRow({ symbol: 'SYM4', name: 'SYM4', range_percent_of_adr: 95.0 }),   // Orange <= 100 Warning
+          marketRow({ symbol: 'SYM5', name: 'SYM5', range_percent_of_adr: 115.0 }),  // Red > 100 Danger
+        ],
+        null
+      )
+    );
+
+    render(<MarketsWidget />);
+    await screen.findByText('35.0%');
+
+    expect(screen.getByText('35.0%').style.color).toBe('rgb(0, 228, 115)');   // #00e473
+    expect(screen.getByText('55.0%').style.color).toBe('rgb(41, 182, 246)');   // #29b6f6
+    expect(screen.getByText('75.0%').style.color).toBe('rgb(255, 202, 40)');   // #ffca28
+    expect(screen.getByText('95.0%').style.color).toBe('rgb(255, 152, 0)');    // #ff9800
+    expect(screen.getByText('115.0%').style.color).toBe('rgb(255, 0, 61)');   // #ff003d
   });
 
   it('TRADE opens the confirmation ticket when confirmation is required, else submits directly (FR-UI-036)', async () => {
@@ -276,5 +363,33 @@ describe('MarketsWidget', () => {
     await screen.findByText('EURUSD');
 
     expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+  });
+
+  it('formats populated volatility, ADR, and range evidence from the API', async () => {
+    marketsMock.mockResolvedValue(
+      directoryPage(
+        [
+          marketRow({ volatility: 0.125, adr: 50, range_percent_of_adr: 60 }),
+          marketRow({
+            symbol: 'AUDCAD',
+            volatility: 0.0825,
+            adr: 44.4,
+            range_percent_of_adr: 72.1,
+          }),
+        ],
+        null
+      )
+    );
+
+    render(<MarketsWidget />);
+    await screen.findByText('EURUSD');
+    await screen.findByText('AUDCAD');
+
+    expect(screen.getByText('12.50%')).toBeTruthy();
+    expect(screen.getByText('50.0')).toBeTruthy();
+    expect(screen.getByText('60.0%')).toBeTruthy();
+    expect(screen.getByText('8.25%')).toBeTruthy();
+    expect(screen.getByText('44.4')).toBeTruthy();
+    expect(screen.getByText('72.1%')).toBeTruthy();
   });
 });

@@ -212,9 +212,10 @@ Folders are ordered from lowest to highest dependency.
 | Completed | `FEAT-UTIL-12` Idempotency Primitives                           | `idempotency/`   | Exact declarations: Section 4.13                       | Section 4.13 functional requirements | `tests/utils/usage/features/13_idempotency.py`        |
 | Completed | `FEAT-UTIL-13` Deterministic Random Streams                     | `random_streams/` | Exact declarations: Section 4.14                      | Section 4.14 functional requirements | `tests/utils/usage/features/14_random_streams.py`     |
 | Completed | `FEAT-UTIL-14` Unified Notification Service                     | `notifications/` | Exact declarations: Section 4.15                       | `FR-UTL-089` through `FR-UTL-096` | `tests/utils/usage/features/15_notifications.py`      |
+| Completed | `FEAT-UTIL-15` Progress Tracking Models & Callbacks             | `progress/`      | Exact declarations: Section 4.16                       | `FR-UTL-097` and `FR-UTL-098`     | `tests/utils/usage/features/16_progress.py`           |
 
-Fifteen features are registered: `FEAT-UTIL-00` through `FEAT-UTIL-14`. All
-fifteen are `Completed`, package-root exported, and covered by exactly one
+Sixteen features are registered: `FEAT-UTIL-00` through `FEAT-UTIL-15`. All
+sixteen are `Completed`, package-root exported, and covered by exactly one
 standalone numbered usage program. Shared validation exceptions remain private;
 consumers construct them through the function-only `create_validation_error`
 boundary when a shared exception instance is required.
@@ -288,14 +289,17 @@ utils/
 |-- random_streams/         # FEAT-UTIL-13
     |-- __init__.py
 |   `-- streams.py
-`-- notifications/         # FEAT-UTIL-14
+|-- notifications/         # FEAT-UTIL-14
+|   |-- __init__.py
+|   |-- desktop.py
+|   |-- email.py
+|   |-- telegram.py
+|   |-- sms.py
+|   |-- manager.py
+|   `-- templates.py
+`-- progress/              # FEAT-UTIL-15
     |-- __init__.py
-    |-- desktop.py
-    |-- email.py
-    |-- telegram.py
-    |-- sms.py
-    |-- manager.py
-    `-- templates.py
+    `-- progress.py
 ```
 
 The five target folders are approved but do not exist. They are created only when
@@ -1033,6 +1037,15 @@ The feature and workflow usage programs are explicit real-operation evidence: th
 run only in a verified non-production environment, resolve API-owned database
 settings and encrypted credentials in memory, send one labelled test message per
 enabled channel, and fail closed when any required switch or destination is absent.
+
+---
+
+### 4.16 `progress/` — Progress Tracking Models & Callbacks
+
+`FEAT-UTIL-15` provides normalized progress dictionaries, step counters, and callback adapters for domain execution loops and UI progress streams: `create_progress_snapshot` and `make_progress_callback`.
+
+- `FR-UTL-097`: calculate bounded percentages, complete flags, and status snapshots.
+- `FR-UTL-098`: generate thread-safe step update callback functions for iterative loops.
 
 ## 5. Package-Wide Requirements and Shared Configuration
 

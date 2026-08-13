@@ -24,6 +24,7 @@ def _list_markets(
     query: str | None = None,
     cursor: str | None = None,
     limit: Annotated[int, Query(ge=1, le=API_MAX_PAGE_SIZE)] = API_DEFAULT_PAGE_SIZE,
+    include_technicals: bool = True,
 ) -> object:
     """Delegate the categorized market-directory read to Data.
 
@@ -33,6 +34,7 @@ def _list_markets(
         query: Optional symbol search.
         cursor: Optional pagination cursor.
         limit: Bounded page size.
+        include_technicals: Whether to include Indicators projections.
 
     Returns:
         Gateway market-directory response.
@@ -44,6 +46,7 @@ def _list_markets(
         query=query,
         cursor=cursor,
         limit=limit,
+        include_technicals=include_technicals,
         request_id=request_id,
     )
 

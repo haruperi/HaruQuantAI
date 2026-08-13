@@ -1,6 +1,6 @@
 """Create operations for Watchlists-owned records."""
 
-from typing import Protocol, cast
+from typing import Final, Protocol, cast
 
 from app.services.api.identity import IdentityError
 from app.services.data import (
@@ -87,10 +87,13 @@ def create_watchlist_record(
     )
 
 
+_ITEM_WITH_ASSET_CLASS_LEN: Final = 4
+
+
 def create_watchlist_items(
     *,
     watchlist_id: str,
-    items: tuple[tuple[str, str, int], ...],
+    items: tuple[tuple[str, str, int, str] | tuple[str, str, int], ...],
     created_at: str,
     request_id: str,
 ) -> int:
@@ -104,15 +107,22 @@ def create_watchlist_items(
     logger.debug("Creating API watchlist item persistence records")
     statement = (
         "INSERT INTO api_watchlist_items "
-        "(watchlist_id, source_id, symbol, sort_order, created_at) "
-        "VALUES (?, ?, ?, ?, ?) "
+        "(watchlist_id, source_id, symbol, sort_order, asset_class, created_at) "
+        "VALUES (?, ?, ?, ?, ?, ?) "
         "ON CONFLICT(watchlist_id, source_id, symbol) DO NOTHING"
     )
     return _execute_create(
         tuple(statement for _ in items),
         tuple(
-            (watchlist_id, source_id, symbol, sort_order, created_at)
-            for source_id, symbol, sort_order in items
+            (
+                watchlist_id,
+                item[0],
+                item[1],
+                item[2],
+                item[3] if len(item) >= _ITEM_WITH_ASSET_CLASS_LEN else "",
+                created_at,
+            )
+            for item in items
         ),
         request_id=request_id,
     )

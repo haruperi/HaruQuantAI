@@ -55,6 +55,10 @@ from app.utils.notifications import (
     render_notification_template,
     send_notification,
 )
+from app.utils.progress import (
+    create_progress_snapshot,
+    make_progress_callback,
+)
 from app.utils.random_streams import (
     derive_random_stream,
     get_stream_identity,
@@ -158,6 +162,7 @@ __all__ = (
     "create_audit_event",
     "create_auth_context",
     "create_notification_manager",
+    "create_progress_snapshot",
     "create_validation_error",
     "derive_idempotency_key",
     "derive_random_stream",
@@ -198,6 +203,7 @@ __all__ = (
     "load_profile_document",
     "load_settings",
     "log_info",
+    "make_progress_callback",
     "map_exception",
     "next_choice",
     "next_int",

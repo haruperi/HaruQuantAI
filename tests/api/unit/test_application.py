@@ -49,6 +49,11 @@ def _stub_lifecycle_storage_dependencies(monkeypatch: pytest.MonkeyPatch) -> Non
     )
     monkeypatch.setattr(lifecycle, "activate_runtime_logging", lambda _: None)
     monkeypatch.setattr(
+        lifecycle,
+        "close_data_provider_sessions",
+        lambda _: SimpleNamespace(status="success"),
+    )
+    monkeypatch.setattr(
         lifecycle, "build_runtime_provider_settings", lambda _: object()
     )
 
@@ -208,7 +213,7 @@ def test_runtime_profile_and_execution_route_fail_closed() -> None:
 
 def test_canonical_app_fails_closed_before_owner_delegation() -> None:
     """Protected and idempotent routes reject incomplete boundary evidence."""
-    app = create_api_app(build_api_settings())
+    app = create_api_app(build_api_settings(dev_auto_login=False))
     auth_status, auth_body = get_json(app, "/api/v1/health/readiness")
     assert auth_status == 401
     assert auth_body["status"] == "error"
@@ -480,3 +485,70 @@ def test_in_process_owned_resources_close_in_reverse_order(
 
     asyncio.run(enter_lifespan())
     assert closed == ["second", "first"]
+
+
+def test_lifespan_closes_data_sessions_before_graph_resources(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Release lifespan-composed Data sessions before graph dependencies."""
+    monkeypatch.setattr(
+        lifecycle,
+        "run_api_migrations",
+        lambda _: SimpleNamespace(status="success", data=object()),
+    )
+    closed: list[str] = []
+    monkeypatch.setattr(
+        lifecycle,
+        "close_data_provider_sessions",
+        lambda _: closed.append("data") or SimpleNamespace(status="success"),
+    )
+    graph = build_in_process_api_graph(
+        _in_process_providers(),
+        owned_resource_closers=(lambda: closed.append("graph"),),
+    )
+    app = create_api_app(build_api_settings(), in_process_graph=graph)
+
+    async def enter_lifespan() -> None:
+        async with lifecycle.lifespan(app):
+            assert app.state.api_ready is True
+
+    import asyncio
+
+    asyncio.run(enter_lifespan())
+    assert closed == ["data", "graph"]
+
+
+def test_dev_auto_login_bypasses_auth_in_dev_mode() -> None:
+    """Dev auto-login authenticates requests seamlessly in dev environment."""
+    config = build_api_settings(environment="dev", dev_auto_login=True)
+    app = create_api_app(config)
+    readiness_status, readiness_body = get_json(app, "/api/v1/health/readiness")
+    assert readiness_status == 200
+    assert readiness_body["status"] == "success"
+
+    me_status, me_body = get_json(app, "/api/v1/auth/me")
+    assert me_status == 200
+    assert me_body["data"]["user_id"] == "usr_haruquantai"
+    assert me_body["data"]["username"] == "haruquantai"
+
+
+def test_dev_auto_login_forbidden_outside_dev_environment() -> None:
+    """Settings validation rejects dev_auto_login in non-dev environments."""
+    with pytest.raises(
+        ValueError, match="dev_auto_login is allowed only in dev environment"
+    ):
+        build_api_settings(
+            environment="production",
+            runtime_profile="research",
+            execution_route="none",
+            dev_auto_login=True,
+        )
+
+
+def test_dev_auto_login_can_be_disabled_in_dev_mode() -> None:
+    """Explicitly disabling dev_auto_login in dev environment enforces 401 checks."""
+    config = build_api_settings(environment="dev", dev_auto_login=False)
+    app = create_api_app(config)
+    status_code, body = get_json(app, "/api/v1/health/readiness")
+    assert status_code == 401
+    assert body["error"]["code"] == "AUTHENTICATION_REQUIRED"

@@ -19,6 +19,7 @@ export const watchlistItemSchema = z.object({
   source_id: z.string().min(1),
   symbol: z.string().min(1),
   sort_order: z.number().int(),
+  asset_class: z.string().min(1),
 });
 export type WatchlistItem = z.infer<typeof watchlistItemSchema>;
 

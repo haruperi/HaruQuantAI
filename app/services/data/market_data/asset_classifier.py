@@ -143,6 +143,16 @@ def _classify_by_symbol(symbol: str | None) -> str | None:
     return None
 
 
+def _classify_by_path(path: str | None) -> str | None:
+    """Inspect path segments for matching keywords."""
+    segments = _clean_segments(path)
+    for segment in segments:
+        for keyword, asset_class in _PATH_KEYWORDS.items():
+            if keyword in segment:
+                return asset_class
+    return None
+
+
 def classify_symbol(
     path: str | None,
     symbol: str | None,
@@ -151,36 +161,37 @@ def classify_symbol(
 ) -> str:
     r"""Map broker grouping evidence to one display asset class.
 
-    The classifier prefers the venue grouping path (most reliable), then falls
-    back to symbol-name heuristics. Physical metals are always reclassified to
-    ``Commodities`` regardless of grouping, since MT5 commonly groups
-    ``XAUUSD`` under Forex. Cryptocurrency symbols are forced to
-    ``Cryptocurrencies`` ahead of the FX heuristic so a pair like ``BTCJPY``
-    is not mistaken for a yen FX pair.
+    The classifier prefers the venue grouping path (most reliable), extracting
+    the leading directory segment (e.g. ``"Forex"`` from ``"Forex\\EURJPY"``)
+    when present, then falls back to symbol-name heuristics. Physical metals
+    and cryptocurrencies retain safety overrides so spot metals (e.g. ``XAUUSD``)
+    and cryptos are never mis-bucketed if a broker places them under an FX folder.
 
     Args:
-        path: Broker grouping path (e.g. ``"Forex\\Majors\\EURUSD"``), or None.
-        symbol: Broker-native symbol string (e.g. ``"EURUSD"``), or None.
-        currency_base: Optional base currency hint (unused by current
-            heuristics but accepted for forward compatibility).
-        currency_profit: Optional quote/profit currency hint (unused by
-            current heuristics but accepted for forward compatibility).
+        path: Broker grouping path (e.g. ``"Forex\\EURJPY"``), or None.
+        symbol: Broker-native symbol string (e.g. ``"EURJPY"``), or None.
+        currency_base: Optional base currency hint.
+        currency_profit: Optional quote/profit currency hint.
 
     Returns:
         One of the seven tokens in ``DISPLAY_ASSET_CLASSES`` or ``OTHER``.
     """
     del currency_base, currency_profit  # forward-compat inputs, not yet needed
 
-    # Symbol-level overrides take precedence over path so a metal spot or a
-    # crypto pair is never mis-bucketed by a Forex grouping.
+    if symbol:
+        upper = symbol.upper()
+        if upper in _METAL_SPOT_SYMBOLS:
+            return COMMODITIES
+        if upper.startswith(("BTC", "ETH", "LTC")):
+            return CRYPTOCURRENCIES
+
+    path_class = _classify_by_path(path)
+    if path_class is not None:
+        return path_class
+
     symbol_class = _classify_by_symbol(symbol)
     if symbol_class is not None:
         return symbol_class
-
-    for segment in _clean_segments(path):
-        for keyword, asset_class in _PATH_KEYWORDS.items():
-            if keyword in segment:
-                return asset_class
 
     return OTHER
 

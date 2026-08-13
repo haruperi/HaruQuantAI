@@ -40,6 +40,22 @@ def test_map_symbol_preserves_exact_provider_values() -> None:
     assert symbol.provider_metadata["trade_mode"] == "FULL"
 
 
+def test_map_symbol_preserves_path_attribute() -> None:
+    """MT5 native path attribute is preserved in provider_metadata for asset classification."""
+    symbol = _map_symbol(
+        _record(
+            name="EURJPY",
+            digits=3,
+            volume_step=0.01,
+            volume_min=0.01,
+            volume_max=100,
+            path="Forex\\EURJPY",
+        )
+    )
+    assert symbol.provider_symbol == "EURJPY"
+    assert symbol.provider_metadata["path"] == "Forex\\EURJPY"
+
+
 def test_map_quote_preserves_bid_ask_last() -> None:
     """Genuine MT5 tick fields map to a canonical quote."""
     quote = _map_quote(

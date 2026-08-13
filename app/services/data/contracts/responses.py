@@ -281,6 +281,9 @@ _TRAITS: Mapping[str, OperationTraits] = {
     # FEAT-DATA-10 - Data Source Governance.
     "data.sources.ensure_source": _traits("low", read_only=False),
     "data.sources.ensure_source_access": _traits("low", read_only=False),
+    "data.sources.close_data_provider_sessions": _traits(
+        "low", read_only=False, requires_network=True
+    ),
     "data.sources.evaluate_source_policy": _traits("low", read_only=True),
     "data.sources.compute_source_trust_score": _traits("low", read_only=True),
     "data.sources.get_source_descriptor": _traits("low", read_only=True),

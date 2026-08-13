@@ -1,7 +1,7 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `In Progress` — of 230 registered application features, 215 are implemented and structurally reconciled (93.48%); 14 are `Pending` and 1 is `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Status:** `In Progress` — of 230 registered application features, 215 are implemented and structurally reconciled (93.48%); 13 are `Pending` and 2 are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
 > **Last updated:** `2026-08-12`
 
 > This document is the system-level source of truth.
@@ -462,16 +462,17 @@ features. No secondary programme or work-package identifier namespace is active.
 | Status | Count |
 | --- | ---: |
 | Completed | 215 |
-| Pending | 14 |
-| Partial | 1 |
+| Pending | 13 |
+| Partial | 2 |
 | Missing | 0 |
 | **Total** | **230** |
 
-The fourteen `Pending` features are `FEAT-UI-03`–`FEAT-UI-13`, `FEAT-UI-15`,
+The thirteen `Pending` features are `FEAT-UI-04`–`FEAT-UI-13`, `FEAT-UI-15`,
 `FEAT-UI-16`, and `FEAT-UI-17`, each awaiting requirement evidence or focused-folder
 ownership recorded in `app/ui/README.md`. They are the primary trading workspace and
-its enabling foundation, specified by `docs/dev/documentation.pdf`. The one `Partial`
-feature is `FEAT-API-15`, recorded in `app/services/api/README.md`.
+its enabling foundation, specified by `docs/dev/documentation.pdf`. The two `Partial`
+features are `FEAT-API-15` (`app/services/api/README.md`) and `FEAT-UI-03`
+(`app/ui/README.md`, blocked on one requirement needing a backend field).
 
 Feature descriptions, requirements, public APIs, persistence, and evidence remain
 authoritative only in the owning package README; this section is the system-level

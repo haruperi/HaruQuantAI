@@ -28,6 +28,7 @@ from app.services.brokers.canonical_contracts import (
     StandardResponse,
 )
 from app.services.brokers.canonical_contracts.protocols import (
+    _ProviderResponseError,
     _RequestValidationError,
     _UnsupportedAdapterBase,
 )
@@ -64,6 +65,32 @@ def _provider_ticket(value: str) -> int:
         return int(value)
     except (TypeError, ValueError) as error:
         raise _RequestValidationError("MT5 ticket must be an integer") from error
+
+
+def _symbol_offset(value: str | None) -> int:
+    """Parse one caller-supplied symbol-page cursor into a universe offset.
+
+    Args:
+        value: Opaque cursor previously issued by this adapter, or ``None`` for
+            the first page.
+
+    Returns:
+        Zero-based offset into the deterministically ordered symbol universe.
+
+    Raises:
+        _RequestValidationError: If the cursor was not issued by this adapter.
+            Raised before transmission so a malformed cursor is never reported
+            as an empty universe.
+    """
+    if value is None:
+        return 0
+    try:
+        offset = int(value)
+    except (TypeError, ValueError) as error:
+        raise _RequestValidationError("MT5 symbol cursor must be an integer") from error
+    if offset < 0:
+        raise _RequestValidationError("MT5 symbol cursor must not be negative")
+    return offset
 
 
 from app.services.brokers.metatrader.calculations import (  # noqa: E402
@@ -222,22 +249,55 @@ class MT5BrokerAdapter(
 
         Raises:
             ValueError: If the requested limit is not positive.
+            _ProviderResponseError: If MT5 returns missing or incomplete symbol
+                evidence.
         """
-        del cursor
         if limit is None or limit <= 0:
             raise ValueError("positive symbol limit is required")
+        offset = _symbol_offset(cursor)
         values = (
             await self._transport.call("symbols_get", query)
             if query
             else await self._transport.call("symbols_get")
         )
-        items = tuple(_map_symbol(value) for value in (values or ())[:limit])
+        if values is None:
+            raise _ProviderResponseError("MT5 symbols_get returned no evidence")
+        # MT5 returns the universe in terminal order, which is not stable across
+        # calls. Ordering by provider symbol before slicing is what makes a
+        # cursor address the same window on every request, so a caller can walk
+        # the complete universe without repeating or skipping instruments.
+        ordered = tuple(
+            sorted(values or (), key=lambda value: str(_field(value, "name")))
+        )
+        window = ordered[offset : offset + limit]
+        remaining = len(ordered) > offset + limit
+        provider_metadata: dict[str, object] = {
+            "offset": offset,
+            "matched_count": len(ordered),
+        }
+        if not query:
+            # symbols_total is the terminal's own count of the whole universe.
+            # It is only comparable to `matched_count` on an unfiltered read,
+            # so a filtered page never claims to describe the universe.
+            total = await self._transport.call("symbols_total")
+            if (
+                not isinstance(total, int)
+                or isinstance(total, bool)
+                or total < 0
+                or total != len(ordered)
+            ):
+                raise _ProviderResponseError(
+                    "MT5 symbols_total does not match symbols_get"
+                )
+            provider_metadata["symbols_total"] = total
         return self._result(
             BrokerCapabilityId.GET_SYMBOLS,
             data=BrokerPage(
-                items=items,
+                items=tuple(_map_symbol(value) for value in window),
                 limit=limit,
-                truncated=bool(values) and len(values) > limit,
+                next_cursor=str(offset + limit) if remaining else None,
+                truncated=remaining,
+                provider_metadata=provider_metadata,
             ),
         )
 
@@ -444,12 +504,21 @@ class MT5BrokerAdapter(
             )
         except KeyError as error:
             raise ValueError("unsupported MT5 timeframe") from error
+        # MT5 exposes complete chart history only after the symbol is present
+        # in Market Watch. This changes terminal-local selection state only.
+        if not await self._transport.call("symbol_select", symbol, True):
+            return self._error(
+                BrokerCapabilityId.GET_HISTORICAL_BARS,
+                BrokerErrorCode.BROKER_SYMBOL_NOT_FOUND,
+            )
         if start is None or end is None:
+            # MT5 position zero is the current bar; bounded latest-bar reads
+            # include it so consumers can calculate the current session range.
             values = await self._transport.call(
                 "copy_rates_from_pos",
                 symbol,
                 provider_timeframe,
-                1,
+                0,
                 limit,
             )
         else:

@@ -1181,17 +1181,20 @@ body {
   color: var(--text-white);
 }
 
-.price-up {
-  color: var(--financial-positive);
+.price-up,
+.cme-table td.price-up {
+  color: var(--financial-positive) !important;
   font-family: var(--font-canvas);
 }
 
-.price-down {
-  color: var(--financial-negative);
+.price-down,
+.cme-table td.price-down {
+  color: var(--financial-negative) !important;
   font-family: var(--font-canvas);
 }
 
-.price-flat {
+.price-flat,
+.cme-table td.price-flat {
   color: var(--text-white);
   font-family: var(--font-canvas);
 }
@@ -2056,4 +2059,11 @@ body {
 .toggle-option.active.default {
   background: var(--cme-blue-primary);
   color: #fff;
+}
+
+/* Progress Bar Shimmer Keyframes */
+@keyframes cmeShimmer {
+  0% { opacity: 0.6; }
+  50% { opacity: 1.0; }
+  100% { opacity: 0.6; }
 }

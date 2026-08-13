@@ -14,6 +14,7 @@ _EXPECTED_EXPORTS = {
     "configure_logging",
     "create_audit_event",
     "create_auth_context",
+    "create_progress_snapshot",
     "create_validation_error",
     "derive_stable_id",
     "error_response",
@@ -83,6 +84,7 @@ _EXPECTED_EXPORTS.update(
         "is_reservation_expired",
         "is_terminal_state",
         "load_profile_document",
+        "make_progress_callback",
         "next_choice",
         "next_int",
         "next_sequence",
@@ -249,6 +251,10 @@ _EXPECTED_USAGE_CALLS = {
         "register_notification_template",
         "render_notification_template",
         "send_notification",
+    },
+    "16_progress.py": {
+        "create_progress_snapshot",
+        "make_progress_callback",
     },
 }
 

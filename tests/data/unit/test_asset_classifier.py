@@ -24,6 +24,10 @@ from app.services.data.market_data.asset_classifier import (
 class TestPathClassification:
     """Grouping-path keyword matching."""
 
+    def test_forex_symbol_info_path(self) -> None:
+        assert classify_symbol("Forex\\EURJPY", "EURJPY") == FOREX
+        assert classify_symbol("Forex\\EURUSD", "EURUSD") == FOREX
+
     def test_forex_path_backslash(self) -> None:
         assert classify_symbol("Forex\\Majors\\EURUSD", "EURUSD") == FOREX
 

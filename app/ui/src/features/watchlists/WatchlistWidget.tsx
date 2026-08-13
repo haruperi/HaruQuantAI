@@ -1,59 +1,36 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useTradingStore } from '../../store/useTradingStore';
+import React, { useEffect, useRef, useState } from 'react';
 import { useWorkspaceStore } from '../workspaces';
-import { apiClients, unwrapData, type Watchlist, type MarketRow } from '@/clients';
+import { apiClients, unwrapData, type Watchlist } from '@/clients';
+import {
+  filterSymbols,
+  loadSymbolUniverse,
+  resolveSourceSymbol,
+} from './symbolUniverse';
 import {
   Plus,
   Trash2,
   Star,
   Pencil,
   X,
-  MoreVertical,
-  LineChart,
-  AlignJustify,
-  Layers,
+  ChevronUp,
+  ChevronDown,
+  ArrowUp,
+  ArrowDown,
+  Info,
 } from 'lucide-react';
 
-/** Merge one watchlist item with its live quote, if loaded yet. */
-interface DisplayRow {
-  symbol: string;
-  name: string;
-  last: number | null;
-  change: number | null;
-  changePercent: number | null;
-  open: number | null;
-  high: number | null;
-  low: number | null;
-}
-
-function toDisplayRow(symbol: string, quote: MarketRow | undefined): DisplayRow {
-  return {
-    symbol,
-    name: quote?.name ?? symbol,
-    last: quote?.last ?? null,
-    change: quote?.change ?? null,
-    changePercent: quote?.change_percent ?? null,
-    open: quote?.open ?? null,
-    high: quote?.high ?? null,
-    low: quote?.low ?? null,
-  };
-}
+type SortDirection = 'asc' | 'desc';
 
 export const WatchlistWidget: React.FC = () => {
-  const { openOrderTicket, submitOrder } = useTradingStore();
-  const { orderConfirmationRequired, addWidgetToWorkspace } = useWorkspaceStore();
+  const { addWidgetToWorkspace } = useWorkspaceStore();
 
   const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const [quotesBySymbol, setQuotesBySymbol] = useState<Record<string, MarketRow>>({});
-  const [quotesLoading, setQuotesLoading] = useState(false);
-
-  const [activeMenuSymbol, setActiveMenuSymbol] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [renaming, setRenaming] = useState(false);
@@ -61,8 +38,16 @@ export const WatchlistWidget: React.FC = () => {
   const [newSymbol, setNewSymbol] = useState('');
   const [mutating, setMutating] = useState(false);
 
-  // Fetch the caller's watchlists on mount. The backend seeds a curated
-  // "default" watchlist on first read, so this always returns at least one.
+  const [sortBySymbol, setSortBySymbol] = useState<SortDirection | null>(null);
+
+  const [universe, setUniverse] = useState<string[]>([]);
+  const [universeStatus, setUniverseStatus] = useState<'loading' | 'ready' | 'error'>(
+    'loading'
+  );
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [highlight, setHighlight] = useState(-1);
+  const suggestionIdPrefix = useRef(`symbol-suggestion-${Math.random().toString(36).slice(2, 8)}`);
+
   useEffect(() => {
     let cancelled = false;
     setStatus('loading');
@@ -86,39 +71,28 @@ export const WatchlistWidget: React.FC = () => {
     };
   }, []);
 
-  const selected = watchlists.find((item) => item.watchlist_id === selectedId) ?? null;
-  const symbols = selected ? selected.items.map((item) => item.symbol) : [];
-
-  // Fetch live quotes for exactly the selected watchlist's symbols whenever
-  // the selection or its item list changes.
   useEffect(() => {
-    if (symbols.length === 0) {
-      setQuotesBySymbol({});
-      return;
-    }
     let cancelled = false;
-    setQuotesLoading(true);
-    void apiClients.data
-      .quotes(symbols)
-      .then((response) => {
+    void loadSymbolUniverse()
+      .then((symbols) => {
         if (cancelled) return;
-        const page = unwrapData(response);
-        const bySymbol: Record<string, MarketRow> = {};
-        for (const row of page.rows) bySymbol[row.symbol] = row;
-        setQuotesBySymbol(bySymbol);
+        setUniverse(symbols);
+        setUniverseStatus('ready');
       })
       .catch(() => {
         if (cancelled) return;
-        setQuotesBySymbol({});
-      })
-      .finally(() => {
-        if (!cancelled) setQuotesLoading(false);
+        setUniverseStatus('error');
+        setErrorMsg('Symbol directory unavailable. Cannot verify instruments.');
       });
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId, symbols.join(',')]);
+  }, []);
+
+  const tradableSymbols = new Set(universe);
+
+  const selected = watchlists.find((item) => item.watchlist_id === selectedId) ?? null;
+  const symbols = selected ? selected.items.map((item) => item.symbol) : [];
 
   const replaceWatchlist = (updated: Watchlist) => {
     setWatchlists((prev) =>
@@ -195,9 +169,24 @@ export const WatchlistWidget: React.FC = () => {
       .finally(() => setMutating(false));
   };
 
-  const handleAddSymbol = () => {
-    const symbol = newSymbol.trim().toUpperCase();
-    if (!selected || !symbol || mutating) return;
+  const closeSuggestions = () => {
+    setSuggestOpen(false);
+    setHighlight(-1);
+  };
+
+  const addSymbol = (candidate: string) => {
+    if (!selected || mutating) return;
+    if (universeStatus !== 'ready') {
+      setErrorMsg('Symbol directory unavailable. Cannot verify this instrument.');
+      return;
+    }
+    const symbol = resolveSourceSymbol(universe, candidate);
+    if (!symbol) {
+      setErrorMsg('Select an exact symbol from the connected source.');
+      return;
+    }
+    setErrorMsg('');
+    closeSuggestions();
     if (symbols.includes(symbol)) {
       setNewSymbol('');
       return;
@@ -213,6 +202,8 @@ export const WatchlistWidget: React.FC = () => {
       .finally(() => setMutating(false));
   };
 
+  const handleAddSymbol = () => addSymbol(newSymbol);
+
   const handleRemoveSymbol = (symbol: string) => {
     if (!selected || mutating) return;
     setMutating(true);
@@ -225,22 +216,98 @@ export const WatchlistWidget: React.FC = () => {
       .finally(() => setMutating(false));
   };
 
-  const rows = symbols.map((symbol) => toDisplayRow(symbol, quotesBySymbol[symbol]));
+  const moveSymbol = (symbol: string, direction: 'up' | 'down') => {
+    if (!selected || mutating) return;
+    const index = symbols.indexOf(symbol);
+    const target = direction === 'up' ? index - 1 : index + 1;
+    if (index === -1 || target < 0 || target >= symbols.length) return;
+    const reordered = [...symbols];
+    [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+    setMutating(true);
+    void apiClients.watchlists
+      .update(selected.watchlist_id, { symbols: reordered })
+      .then((response) => replaceWatchlist(unwrapData(response)))
+      .catch(() => setErrorMsg('Unable to reorder symbols.'))
+      .finally(() => setMutating(false));
+  };
 
-  const fmt = (value: number | null): string => (value === null ? '—' : value.toFixed(5));
+  const toggleSortSymbol = () => {
+    if (sortBySymbol === null) {
+      setSortBySymbol('asc');
+    } else if (sortBySymbol === 'asc') {
+      setSortBySymbol('desc');
+    } else {
+      setSortBySymbol(null);
+    }
+  };
+
+  const suggestions = suggestOpen
+    ? filterSymbols(universe, newSymbol).filter((symbol) => !symbols.includes(symbol))
+    : [];
+
+  const handleSymbolKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (!suggestOpen) {
+        setSuggestOpen(true);
+        return;
+      }
+      setHighlight((prev) => (suggestions.length === 0 ? -1 : (prev + 1) % suggestions.length));
+      return;
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setHighlight((prev) =>
+        suggestions.length === 0 ? -1 : prev <= 0 ? suggestions.length - 1 : prev - 1
+      );
+      return;
+    }
+    if (event.key === 'Escape') {
+      closeSuggestions();
+      return;
+    }
+    if (event.key === 'Tab' && suggestions.length > 0) {
+      event.preventDefault();
+      setNewSymbol(
+        highlight >= 0 && suggestions[highlight]
+          ? suggestions[highlight]
+          : suggestions[0]
+      );
+      closeSuggestions();
+      return;
+    }
+    if (event.key === 'Enter') {
+      // A highlighted suggestion wins over the raw text, so completing and
+      // committing is one keystroke rather than two.
+      addSymbol(highlight >= 0 && suggestions[highlight] ? suggestions[highlight] : newSymbol);
+    }
+  };
+
+  const displaySymbols =
+    sortBySymbol === null
+      ? symbols
+      : [...symbols].sort((a, b) =>
+          sortBySymbol === 'asc' ? a.localeCompare(b) : b.localeCompare(a)
+        );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Watchlist Top Header Controls */}
-      <div style={{ padding: '8px 12px', background: 'var(--cme-navy-dark)', borderBottom: '1px solid var(--cme-navy-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontWeight: 700, fontSize: '11px', color: 'var(--text-muted)' }}>WATCHLIST:</span>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'var(--cme-navy-dark, #0b1426)', color: 'var(--text-primary, #e2e8f0)', fontFamily: 'var(--font-sans, inherit)' }}>
+      {/* Top Header Controls */}
+      <div style={{ padding: '12px 16px', background: 'var(--cme-navy-surface, #132238)', borderBottom: '1px solid var(--cme-navy-border, #1e3a5f)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <h2 style={{ fontSize: '15px', fontWeight: 700, margin: 0, color: '#ffffff', letterSpacing: '0.02em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            NEW WATCHLIST
+          </h2>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted, #718294)' }}>
+            WATCHLIST:
+          </span>
           {!renaming && (
             <select
               className="form-select"
+              aria-label="Select watchlist"
               value={selectedId ?? ''}
               onChange={(e) => setSelectedId(e.target.value)}
-              style={{ padding: '2px 6px', fontSize: '11px' }}
+              style={{ padding: '4px 8px', fontSize: '12px', minWidth: '130px' }}
             >
               {watchlists.map((item) => (
                 <option key={item.watchlist_id} value={item.watchlist_id}>
@@ -251,7 +318,7 @@ export const WatchlistWidget: React.FC = () => {
             </select>
           )}
           {renaming && (
-            <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <input
                 className="form-select"
                 autoFocus
@@ -261,73 +328,149 @@ export const WatchlistWidget: React.FC = () => {
                   if (e.key === 'Enter') handleRename();
                   if (e.key === 'Escape') setRenaming(false);
                 }}
-                style={{ padding: '2px 6px', fontSize: '11px', width: '140px' }}
+                style={{ padding: '3px 6px', fontSize: '12px', width: '130px' }}
               />
               <button className="btn-cme btn-primary btn-sm" onClick={handleRename} disabled={mutating}>
                 Save
               </button>
-            </>
+            </div>
           )}
           {selected && !renaming && (
-            <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <button
                 className="btn-cme btn-outline btn-sm"
                 title="Rename watchlist"
-                style={{ padding: '2px 4px' }}
+                style={{ padding: '3px 6px' }}
                 onClick={() => {
                   setRenameValue(selected.name);
                   setRenaming(true);
                 }}
               >
-                <Pencil size={12} />
+                <Pencil size={13} />
               </button>
               <button
                 className="btn-cme btn-outline btn-sm"
                 title={selected.is_default ? 'Already the default' : 'Set as default'}
-                style={{ padding: '2px 4px', opacity: selected.is_default ? 0.4 : 1 }}
+                style={{ padding: '3px 6px', opacity: selected.is_default ? 0.4 : 1 }}
                 disabled={selected.is_default || mutating}
                 onClick={handleSetDefault}
               >
-                <Star size={12} />
+                <Star size={13} />
               </button>
               <button
                 className="btn-cme btn-outline btn-sm"
                 title={selected.is_default ? 'Cannot delete the default watchlist' : 'Delete watchlist'}
-                style={{ padding: '2px 4px', opacity: selected.is_default ? 0.4 : 1 }}
+                style={{ padding: '3px 6px', opacity: selected.is_default ? 0.4 : 1 }}
                 disabled={selected.is_default || mutating}
                 onClick={handleDelete}
               >
-                <Trash2 size={12} />
+                <Trash2 size={13} />
               </button>
-            </>
+            </div>
           )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Action Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           {selected && (
             <>
-              <input
-                className="form-select"
-                placeholder="Add symbol…"
-                value={newSymbol}
-                onChange={(e) => setNewSymbol(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleAddSymbol();
-                }}
-                style={{ padding: '2px 6px', fontSize: '11px', width: '100px' }}
-              />
-              <button className="btn-cme btn-outline btn-sm" onClick={handleAddSymbol} disabled={mutating}>
-                <Plus size={12} /> ADD
+              <div style={{ position: 'relative' }}>
+                <input
+                  className="form-select"
+                  placeholder="Add symbol…"
+                  aria-label="Add symbol"
+                  role="combobox"
+                  aria-expanded={suggestions.length > 0}
+                  aria-controls={`${suggestionIdPrefix.current}-listbox`}
+                  aria-autocomplete="list"
+                  aria-activedescendant={
+                    highlight >= 0 ? `${suggestionIdPrefix.current}-${highlight}` : undefined
+                  }
+                  autoComplete="off"
+                  value={newSymbol}
+                  title={
+                    universeStatus === 'ready'
+                      ? `${universe.length} instruments available from the connected source`
+                      : universeStatus === 'error'
+                        ? 'Instrument universe unavailable'
+                        : 'Loading the instrument universe…'
+                  }
+                  onChange={(e) => {
+                    setNewSymbol(e.target.value);
+                    setSuggestOpen(true);
+                    setHighlight(-1);
+                  }}
+                  onFocus={() => setSuggestOpen(true)}
+                  onBlur={() => window.setTimeout(closeSuggestions, 0)}
+                  onKeyDown={handleSymbolKeyDown}
+                  style={{ padding: '3px 6px', fontSize: '11px', width: '100px' }}
+                />
+                {suggestions.length > 0 && (
+                  <ul
+                    id={`${suggestionIdPrefix.current}-listbox`}
+                    role="listbox"
+                    aria-label="Symbol suggestions"
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 2px)',
+                      left: 0,
+                      zIndex: 30,
+                      margin: 0,
+                      padding: '2px',
+                      listStyle: 'none',
+                      minWidth: '150px',
+                      maxHeight: '220px',
+                      overflowY: 'auto',
+                      background: 'var(--cme-navy-surface, #132238)',
+                      border: '1px solid var(--cme-navy-border, #1e3a5f)',
+                      borderRadius: '4px',
+                      boxShadow: '0 6px 18px rgba(0, 0, 0, 0.45)',
+                    }}
+                  >
+                    {suggestions.map((symbol, index) => (
+                      <li
+                        key={symbol}
+                        id={`${suggestionIdPrefix.current}-${index}`}
+                        role="option"
+                        aria-selected={index === highlight}
+                        // mousedown, not click: blur would close the list first.
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          addSymbol(symbol);
+                        }}
+                        onMouseEnter={() => setHighlight(index)}
+                        style={{
+                          padding: '4px 8px',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          borderRadius: '3px',
+                          color:
+                            index === highlight
+                              ? '#ffffff'
+                              : 'var(--text-primary, #e2e8f0)',
+                          backgroundColor:
+                            index === highlight ? 'rgba(0, 163, 255, 0.18)' : 'transparent',
+                        }}
+                      >
+                        {symbol}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <button className="btn-cme btn-outline btn-sm" onClick={handleAddSymbol} disabled={mutating || universeStatus !== 'ready'} style={{ fontSize: '11px' }}>
+                <Plus size={13} /> ADD
               </button>
             </>
           )}
           {!creating && (
-            <button className="btn-cme btn-primary btn-sm" onClick={() => setCreating(true)}>
-              <Plus size={12} /> CREATE NEW
+            <button className="btn-cme btn-primary btn-sm" onClick={() => setCreating(true)} style={{ fontSize: '11px', fontWeight: 600 }}>
+              <Plus size={13} /> CREATE NEW
             </button>
           )}
           {creating && (
-            <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <input
                 className="form-select"
                 autoFocus
@@ -338,139 +481,193 @@ export const WatchlistWidget: React.FC = () => {
                   if (e.key === 'Enter') handleCreate();
                   if (e.key === 'Escape') setCreating(false);
                 }}
-                style={{ padding: '2px 6px', fontSize: '11px', width: '140px' }}
+                style={{ padding: '3px 6px', fontSize: '11px', width: '130px' }}
               />
               <button className="btn-cme btn-primary btn-sm" onClick={handleCreate} disabled={mutating}>
                 Save
               </button>
-            </>
+            </div>
           )}
         </div>
       </div>
 
       {errorMsg && (
-        <div style={{ padding: '4px 12px', color: 'var(--financial-negative, #ff4975)', fontSize: '11px' }}>
+        <div role="alert" style={{ padding: '6px 16px', color: 'var(--financial-negative, #ff4975)', fontSize: '12px', backgroundColor: 'rgba(255, 73, 117, 0.1)', borderBottom: '1px solid rgba(255, 73, 117, 0.2)' }}>
           {errorMsg}
         </div>
       )}
+      {/* Main Content Area */}
+      <div style={{ flex: 1, overflow: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-      {/* Main Watchlist Items Table */}
-      <div style={{ flex: 1, overflow: 'auto' }}>
-        {status === 'loading' && (
-          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted, #718294)' }}>
-            Loading watchlists…
+        {/* SECTION 1: Your Watchlists */}
+        <div style={{ background: 'var(--cme-navy-surface, #132238)', border: '1px solid var(--cme-navy-border, #1e3a5f)', borderRadius: '6px', padding: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <h3 style={{ fontSize: '13px', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '6px', color: '#ffffff' }}>
+              Your Watchlist <Info size={13} style={{ color: 'var(--text-muted, #718294)', cursor: 'pointer' }} />
+            </h3>
           </div>
-        )}
-        {status === 'error' && (
-          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--financial-negative, #ff4975)' }}>
-            {errorMsg}
-          </div>
-        )}
-        {status === 'ready' && rows.length === 0 && (
-          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted, #718294)' }}>
-            No symbols in this watchlist. Add one above.
-          </div>
-        )}
-        {status === 'ready' && rows.length > 0 && (
-          <table className="cme-table">
-            <thead>
-              <tr>
-                <th>Symbol</th>
-                <th>Last Price</th>
-                <th>Change</th>
-                <th>Open</th>
-                <th>High</th>
-                <th>Low</th>
-                <th style={{ textAlign: 'center' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((p) => {
-                const isUp = (p.change ?? 0) > 0;
-                const isDown = (p.change ?? 0) < 0;
-                const priceClass = isUp ? 'price-up' : isDown ? 'price-down' : 'price-flat';
-                const changeCell =
-                  p.change === null || p.changePercent === null
-                    ? '—'
-                    : `${isUp ? '+' : ''}${p.change.toFixed(5)} (${p.changePercent.toFixed(2)}%)`;
 
-                return (
-                  <tr key={p.symbol}>
-                    <td style={{ fontWeight: 600, color: 'var(--cme-blue-bright)' }}>{p.symbol}</td>
-                    <td className={priceClass}>{fmt(p.last)}</td>
-                    <td className={priceClass}>{quotesLoading ? '…' : changeCell}</td>
-                    <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.open)}</td>
-                    <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.high)}</td>
-                    <td style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.low)}</td>
-                    <td style={{ textAlign: 'center', position: 'relative' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                        <button
-                          className="btn-cme btn-outline btn-sm"
-                          onClick={() => {
-                            if (!orderConfirmationRequired) {
-                              submitOrder({ symbol: p.symbol, side: 'BUY', qty: 1, orderType: 'Market' });
-                            } else {
-                              openOrderTicket({ symbol: p.symbol, side: 'BUY', type: 'Market' });
-                            }
-                          }}
-                        >
-                          TRADE
-                        </button>
-                        <button
-                          className="btn-cme btn-outline btn-sm"
-                          style={{ padding: '2px 4px' }}
-                          onClick={() => setActiveMenuSymbol(activeMenuSymbol === p.symbol ? null : p.symbol)}
-                        >
-                          <MoreVertical size={14} />
-                        </button>
-                        <button
-                          className="btn-cme btn-outline btn-sm"
-                          title="Remove from watchlist"
-                          style={{ padding: '2px 4px' }}
-                          onClick={() => handleRemoveSymbol(p.symbol)}
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
+          {status === 'loading' && (
+            <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted, #718294)', fontSize: '12px' }}>
+              Loading watchlists…
+            </div>
+          )}
+          {status === 'error' && (
+            <div style={{ padding: '16px', textAlign: 'center', color: 'var(--financial-negative, #ff4975)', fontSize: '12px' }}>
+              {errorMsg}
+            </div>
+          )}
+          {status === 'ready' && watchlists.length === 0 && (
+            <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted, #718294)', border: '1px dashed var(--cme-navy-border, #1e3a5f)', borderRadius: '4px' }}>
+              <p style={{ margin: '0 0 12px 0', fontSize: '13px' }}>You currently have no Watchlists created</p>
+              <button className="btn-cme btn-primary btn-sm" onClick={() => setCreating(true)}>
+                CREATE NEW
+              </button>
+            </div>
+          )}
 
-                      {activeMenuSymbol === p.symbol && (
-                        <div className="markets-row-menu">
-                          <div
-                            className="sidebar-menu-item"
-                            onClick={() => {
-                              addWidgetToWorkspace('chart', `${p.symbol} Chart`, p.symbol);
-                              setActiveMenuSymbol(null);
-                            }}
+          {status === 'ready' && watchlists.length > 0 && selected && (
+            <div>
+              {/* Watchlists Tab / Pills */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px', borderBottom: '1px solid var(--cme-navy-border, #1e3a5f)', paddingBottom: '10px' }}>
+                {watchlists.map((wl) => {
+                  const isSelected = wl.watchlist_id === selectedId;
+                  return (
+                    <button
+                      key={wl.watchlist_id}
+                      onClick={() => setSelectedId(wl.watchlist_id)}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        fontWeight: isSelected ? 700 : 500,
+                        borderRadius: '4px',
+                        border: isSelected ? '1px solid var(--cme-blue-bright, #00a3ff)' : '1px solid var(--cme-navy-border, #1e3a5f)',
+                        backgroundColor: isSelected ? 'rgba(0, 163, 255, 0.15)' : 'transparent',
+                        color: isSelected ? '#ffffff' : 'var(--text-muted, #718294)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', border: isSelected ? '2px solid var(--cme-blue-bright, #00a3ff)' : '1px solid var(--text-muted)', backgroundColor: isSelected ? 'var(--cme-blue-bright, #00a3ff)' : 'transparent' }} />
+                      {wl.name}
+                      {wl.is_default && <span style={{ fontSize: '10px', color: '#f0b429' }}>★</span>}
+                      <span style={{ fontSize: '10px', opacity: 0.7, backgroundColor: 'rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '1px 5px' }}>
+                        {wl.items.length}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Symbol Cards / List */}
+              {displaySymbols.length === 0 ? (
+                <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted, #718294)', fontSize: '12px' }}>
+                  No symbols in this watchlist. Add one using the controls above.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {/* Table structure preserved for semantic sorting/testing assertions (FR-UI-043/044) */}
+                  <table className="cme-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr>
+                        <th style={{ padding: '4px 8px', textAlign: 'left' }}>
+                          <button
+                            className="btn-cme btn-outline btn-sm"
+                            onClick={toggleSortSymbol}
+                            style={{ padding: '2px 6px', fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                            title="Sort by Symbol"
                           >
-                            <LineChart size={14} /> Chart
-                          </div>
-                          <div
-                            className="sidebar-menu-item"
-                            onClick={() => {
-                              addWidgetToWorkspace('priceLadder', `${p.symbol} DOM`, p.symbol);
-                              setActiveMenuSymbol(null);
-                            }}
-                          >
-                            <AlignJustify size={14} /> Price Ladder
-                          </div>
-                          <div
-                            className="sidebar-menu-item"
-                            onClick={() => {
-                              addWidgetToWorkspace('optionsGrid', `${p.symbol} Options`, p.symbol);
-                              setActiveMenuSymbol(null);
-                            }}
-                          >
-                            <Layers size={14} /> Options
-                          </div>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
+                            Symbol
+                            {sortBySymbol && (sortBySymbol === 'asc' ? <ChevronUp size={11} /> : <ChevronDown size={11} />)}
+                          </button>
+                        </th>
+                        <th style={{ padding: '4px 8px', textAlign: 'left' }}>Class</th>
+                        <th style={{ padding: '4px 8px', textAlign: 'right' }}>Management</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {displaySymbols.map((symbol) => {
+                        const notTradable =
+                          universeStatus === 'ready' && !tradableSymbols.has(symbol);
+                        const assetClass =
+                          selected.items.find((item) => item.symbol === symbol)?.asset_class ||
+                          'Unavailable';
+                        const index = symbols.indexOf(symbol);
+                        const reorderDisabled = mutating || sortBySymbol !== null;
+
+                        return (
+                          <tr key={symbol} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                            <td style={{ padding: '8px 10px', fontWeight: 600, color: 'var(--cme-blue-bright, #00a3ff)', fontSize: '13px' }}>
+                              {symbol}
+                              {notTradable && (
+                                <span
+                                  style={{ marginLeft: '8px', fontSize: '9px', fontWeight: 700, color: 'var(--cme-warning-yellow, #f0b429)', border: '1px solid var(--cme-warning-yellow, #f0b429)', borderRadius: '3px', padding: '1px 4px' }}
+                                  title="Not found in the tradable instrument directory"
+                                >
+                                  NOT TRADABLE
+                                </span>
+                              )}
+                            </td>
+                            <td style={{ padding: '8px 10px', fontSize: '12px' }}>
+                              {assetClass}
+                            </td>
+                            <td style={{ padding: '8px 10px', textAlign: 'right' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                                <button
+                                  className="btn-cme btn-outline btn-sm"
+                                  style={{ padding: '2px 6px' }}
+                                  title="Move up"
+                                  disabled={reorderDisabled || index <= 0}
+                                  onClick={() => moveSymbol(symbol, 'up')}
+                                >
+                                  <ArrowUp size={12} />
+                                </button>
+                                <button
+                                  className="btn-cme btn-outline btn-sm"
+                                  style={{ padding: '2px 6px' }}
+                                  title="Move down"
+                                  disabled={reorderDisabled || index >= symbols.length - 1}
+                                  onClick={() => moveSymbol(symbol, 'down')}
+                                >
+                                  <ArrowDown size={12} />
+                                </button>
+                                <button
+                                  className="btn-cme btn-outline btn-sm"
+                                  title="Remove from watchlist"
+                                  style={{ padding: '2px 6px' }}
+                                  onClick={() => handleRemoveSymbol(symbol)}
+                                >
+                                  <X size={13} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Footer Controls */}
+      <div style={{ padding: '12px 16px', background: 'var(--cme-navy-surface, #132238)', borderTop: '1px solid var(--cme-navy-border, #1e3a5f)', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
+        <button className="btn-cme btn-outline btn-sm" style={{ padding: '6px 14px', fontSize: '11px', fontWeight: 600 }}>
+          SAVE A COPY
+        </button>
+        <button
+          className="btn-cme btn-primary btn-sm"
+          onClick={() => addWidgetToWorkspace('watchlist', selected?.name ?? 'Watchlist')}
+          style={{ padding: '6px 14px', fontSize: '11px', fontWeight: 600 }}
+        >
+          ADD TO WORKSPACE
+        </button>
       </div>
     </div>
   );

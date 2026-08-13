@@ -51,6 +51,49 @@ _WATCHLISTS_CHECKSUM = hashlib.sha256(
 ).hexdigest()
 
 
+_WATCHLISTS_0008_STATEMENTS = (
+    "ALTER TABLE api_watchlist_items ADD COLUMN asset_class TEXT NOT NULL DEFAULT ''",
+)
+_WATCHLISTS_0008_CHECKSUM = hashlib.sha256(
+    canonical_json(
+        {
+            "domain": "api",
+            "migration": "api-0008",
+            "sql": _WATCHLISTS_0008_STATEMENTS,
+        }
+    ).encode("utf-8")
+).hexdigest()
+
+
+_WATCHLISTS_0009_STATEMENTS = (
+    "UPDATE api_watchlist_items SET asset_class = 'Forex' WHERE asset_class = '' AND "
+    "symbol IN ('AUDCAD', 'AUDCHF', 'AUDJPY', 'AUDNZD', 'AUDUSD', 'CADCHF', 'CADJPY', "
+    "'CHFJPY', 'EURAUD', 'EURCAD', 'EURCHF', 'EURGBP', 'EURJPY', 'EURNZD', 'EURUSD', "
+    "'GBPAUD', 'GBPCAD', 'GBPCHF', 'GBPJPY', 'GBPNZD', 'GBPUSD', 'NZDCAD', 'NZDCHF', "
+    "'NZDJPY', 'NZDUSD', 'USDCHF', 'USDCAD', 'USDJPY')",
+    "UPDATE api_watchlist_items SET asset_class = 'Commodities' WHERE asset_class = '' "
+    "AND symbol IN ('XAUUSD', 'XAUEUR', 'XAUGBP', 'XAUJPY', 'XAUAUD', 'XAUCHF', "
+    "'XAGUSD', 'XPDUSD', 'XPTUSD', 'Copper', 'SpotBrent', 'SpotCrude', 'NatGas', "
+    "'Gasoline')",
+    "UPDATE api_watchlist_items SET asset_class = 'Indices' WHERE asset_class = '' "
+    "AND symbol IN ('US500', 'US30', 'UK100', 'GER40', 'NAS100', 'JPN225', 'USDX', "
+    "'EURX', 'JPYX')",
+    "UPDATE api_watchlist_items SET asset_class = 'Stocks' WHERE asset_class = '' "
+    "AND symbol IN ('AMZN.US-24', 'AAPL.US-24')",
+    "UPDATE api_watchlist_items SET asset_class = 'Cryptocurrencies' "
+    "WHERE asset_class = '' AND symbol IN ('BTCUSD', 'ETHUSD', 'LTCUSD')",
+)
+_WATCHLISTS_0009_CHECKSUM = hashlib.sha256(
+    canonical_json(
+        {
+            "domain": "api",
+            "migration": "api-0009",
+            "sql": _WATCHLISTS_0009_STATEMENTS,
+        }
+    ).encode("utf-8")
+).hexdigest()
+
+
 def get_watchlist_migration_steps() -> tuple[object, ...]:
     """Return the immutable Watchlists migration definitions."""
     return (
@@ -59,6 +102,18 @@ def get_watchlist_migration_steps() -> tuple[object, ...]:
             migration_id="api-0007",
             checksum=_WATCHLISTS_CHECKSUM,
             statements=_WATCHLISTS_STATEMENTS,
+        ),
+        build_migration_step(
+            domain="api",
+            migration_id="api-0008",
+            checksum=_WATCHLISTS_0008_CHECKSUM,
+            statements=_WATCHLISTS_0008_STATEMENTS,
+        ),
+        build_migration_step(
+            domain="api",
+            migration_id="api-0009",
+            checksum=_WATCHLISTS_0009_CHECKSUM,
+            statements=_WATCHLISTS_0009_STATEMENTS,
         ),
     )
 

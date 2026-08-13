@@ -109,7 +109,16 @@ class _FakeTransport:
                 else None
             ),
             "version": "5.0.0",
+            # Deliberately not in alphabetical order: the adapter is what
+            # imposes the deterministic ordering a cursor depends on.
             "symbols_get": (
+                {
+                    "name": "GBPUSD",
+                    "digits": 5,
+                    "volume_step": 0.01,
+                    "volume_min": 0.01,
+                    "volume_max": 100,
+                },
                 {
                     "name": "EURUSD",
                     "digits": 5,
@@ -117,7 +126,15 @@ class _FakeTransport:
                     "volume_min": 0.01,
                     "volume_max": 100,
                 },
+                {
+                    "name": "XAUUSD",
+                    "digits": 2,
+                    "volume_step": 0.01,
+                    "volume_min": 0.01,
+                    "volume_max": 100,
+                },
             ),
+            "symbols_total": 3,
             "symbol_select": True,
             "symbol_info_tick": {
                 "time": now,
@@ -354,6 +371,87 @@ def test_adapter_get_symbols_and_ping() -> None:
     asyncio.run(exercise())
 
 
+def test_adapter_get_symbols_walks_the_complete_universe() -> None:
+    """A cursor walk returns every symbol exactly once in a stable order."""
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport(verified=True))
+
+    async def exercise() -> None:
+        await adapter.connect()
+        first = await adapter.get_symbols(limit=2)
+        assert first.data is not None
+        assert [item.provider_symbol for item in first.data.items] == [
+            "EURUSD",
+            "GBPUSD",
+        ]
+        assert first.data.truncated is True
+        assert first.data.next_cursor == "2"
+        assert first.data.provider_metadata["symbols_total"] == 3
+
+        second = await adapter.get_symbols(limit=2, cursor=first.data.next_cursor)
+        assert second.data is not None
+        assert [item.provider_symbol for item in second.data.items] == ["XAUUSD"]
+        assert second.data.truncated is False
+        assert second.data.next_cursor is None
+
+    asyncio.run(exercise())
+
+
+def test_adapter_get_symbols_rejects_a_foreign_cursor() -> None:
+    """A cursor this adapter never issued fails instead of silently restarting."""
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport(verified=True))
+
+    async def exercise() -> None:
+        await adapter.connect()
+        result = await adapter.get_symbols(limit=2, cursor="not-an-offset")
+        assert result.error is not None
+        assert result.error.code == BrokerErrorCode.BROKER_REQUEST_INVALID.value
+
+    asyncio.run(exercise())
+
+
+@pytest.mark.parametrize("symbols_total", [None, True, -1, 2])
+def test_adapter_get_symbols_rejects_invalid_universe_count(
+    symbols_total: object,
+) -> None:
+    """Unfiltered discovery requires a valid count matching symbols_get."""
+
+    class _InvalidCountTransport(_FakeTransport):
+        async def call(self, name: str, *args: object, **kwargs: object) -> object:
+            if name == "symbols_total":
+                return symbols_total
+            return await super().call(name, *args, **kwargs)
+
+    adapter = MT5BrokerAdapter(_config(), transport=_InvalidCountTransport())
+
+    async def exercise() -> None:
+        await adapter.connect()
+        result = await adapter.get_symbols(limit=2)
+        assert result.error is not None
+        assert result.error.code == BrokerErrorCode.BROKER_RESPONSE_INVALID.value
+
+    asyncio.run(exercise())
+
+
+def test_adapter_get_symbols_rejects_missing_symbol_records() -> None:
+    """A missing symbols_get payload cannot masquerade as an empty universe."""
+
+    class _MissingSymbolsTransport(_FakeTransport):
+        async def call(self, name: str, *args: object, **kwargs: object) -> object:
+            if name == "symbols_get":
+                return None
+            return await super().call(name, *args, **kwargs)
+
+    adapter = MT5BrokerAdapter(_config(), transport=_MissingSymbolsTransport())
+
+    async def exercise() -> None:
+        await adapter.connect()
+        result = await adapter.get_symbols(limit=2)
+        assert result.error is not None
+        assert result.error.code == BrokerErrorCode.BROKER_RESPONSE_INVALID.value
+
+    asyncio.run(exercise())
+
+
 def test_adapter_select_symbol_reports_not_found() -> None:
     """A rejected symbol selection returns the exact not-found error."""
 
@@ -439,7 +537,25 @@ def test_adapter_bounds_numpy_tick_pages_without_ambiguous_truth_checks() -> Non
 
 def test_adapter_get_latest_ticks_bars_and_spread() -> None:
     """Omitted ranges retrieve bounded recent MT5 evidence."""
-    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport(verified=True))
+
+    class _RecordingTransport(_FakeTransport):
+        """Record the native bounded-bar request."""
+
+        def __init__(self) -> None:
+            super().__init__(verified=True)
+            self.bar_call: tuple[object, ...] | None = None
+            self.history_calls: list[tuple[str, tuple[object, ...]]] = []
+
+        async def call(self, name: str, *args: object, **kwargs: object) -> object:
+            """Capture bar arguments and delegate the fake response."""
+            if name in {"symbol_select", "copy_rates_from_pos"}:
+                self.history_calls.append((name, args))
+            if name == "copy_rates_from_pos":
+                self.bar_call = args
+            return await super().call(name, *args, **kwargs)
+
+    transport = _RecordingTransport()
+    adapter = MT5BrokerAdapter(_config(), transport=transport)
 
     async def exercise() -> None:
         await adapter.connect()
@@ -456,9 +572,45 @@ def test_adapter_get_latest_ticks_bars_and_spread() -> None:
         assert (
             bars.data.items[0].closing_timestamp > bars.data.items[0].opening_timestamp
         )
+        assert transport.bar_call == ("EURUSD", 1, 0, 10)
+        assert transport.history_calls == [
+            ("symbol_select", ("EURUSD", True)),
+            ("copy_rates_from_pos", ("EURUSD", 1, 0, 10)),
+        ]
         spread = await adapter.get_spread("EURUSD")
         assert spread.data is not None
         assert str(spread.data) == "0.0002"
+
+    asyncio.run(exercise())
+
+
+def test_adapter_historical_bars_fail_closed_when_selection_is_rejected() -> None:
+    """Rejected Market Watch selection never proceeds to a history read."""
+
+    class _RejectingHistoryTransport(_FakeTransport):
+        """Reject symbol selection and record whether rates were requested."""
+
+        def __init__(self) -> None:
+            super().__init__(verified=True)
+            self.rates_requested = False
+
+        async def call(self, name: str, *args: object, **kwargs: object) -> object:
+            """Return the provider rejection and track forbidden continuation."""
+            if name == "symbol_select":
+                return False
+            if name == "copy_rates_from_pos":
+                self.rates_requested = True
+            return await super().call(name, *args, **kwargs)
+
+    transport = _RejectingHistoryTransport()
+    adapter = MT5BrokerAdapter(_config(), transport=transport)
+
+    async def exercise() -> None:
+        await adapter.connect()
+        result = await adapter.get_historical_bars("UNKNOWN", "D1", limit=40)
+        assert result.error is not None
+        assert result.error.code == BrokerErrorCode.BROKER_SYMBOL_NOT_FOUND.value
+        assert not transport.rates_requested
 
     asyncio.run(exercise())
 

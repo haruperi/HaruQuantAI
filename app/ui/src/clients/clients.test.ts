@@ -11,6 +11,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { apiClients, unwrapData } from "./index";
+import { watchlistSchema } from "./watchlists";
 
 /** Build a JSON success envelope response. */
 function success(data: unknown, status = 200): Response {
@@ -176,10 +177,17 @@ describe("settings client", () => {
 describe("data client", () => {
   it("symbols forwards query params and returns a page", async () => {
     const calls = fakeFetch(() =>
-      success({ symbols: [{ symbol: "ESU5" }], next_cursor: null })
+      success({
+        source_id: "mt5",
+        items: ["ESU5"],
+        limit: 10,
+        next_cursor: null,
+        revision: "1.0.0",
+        request_id: "req-1",
+      })
     );
     const res = await apiClients.data.symbols({ limit: 10, query: "ES" });
-    expect(unwrapData(res).symbols).toHaveLength(1);
+    expect(unwrapData(res).items).toEqual(["ESU5"]);
     const init = calls[0] as RequestInit;
     expect(init.method).toBe("GET");
     const url = (calls[0] as RequestInit & { url?: string });
@@ -296,5 +304,29 @@ describe("metrics client", () => {
     const res = await apiClients.metrics.scrape();
     expect(res.status).toBe("success");
     expect(res.data).toContain("# HELP x");
+  });
+});
+
+describe("watchlists client contract", () => {
+  it("requires the backend-derived class on every watchlist item", () => {
+    const parsed = watchlistSchema.parse({
+      watchlist_id: "wl-1",
+      account_id: "acct-1",
+      name: "default",
+      is_default: true,
+      sort_order: 0,
+      items: [
+        {
+          source_id: "mt5",
+          symbol: "EURUSD",
+          sort_order: 0,
+          asset_class: "Forex",
+        },
+      ],
+      created_at: "2026-08-13T00:00:00Z",
+      updated_at: "2026-08-13T00:00:00Z",
+    });
+
+    expect(parsed.items[0].asset_class).toBe("Forex");
   });
 });
