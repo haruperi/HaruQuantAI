@@ -95,6 +95,7 @@ class _WatchlistUpdate(BaseModel):
     name: str | None = None
     symbols: tuple[str, ...] | None = None
     is_default: bool | None = None
+    sort_order: int | None = None
 
 
 __all__ = ("Watchlist", "WatchlistItem")

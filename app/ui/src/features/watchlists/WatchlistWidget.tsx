@@ -283,6 +283,19 @@ export const WatchlistWidget: React.FC = () => {
     }
   };
 
+  const handleReorderList = (direction: 'up' | 'down') => {
+    if (!selected || mutating) return;
+    const index = watchlists.findIndex((w) => w.watchlist_id === selected.watchlist_id);
+    const target = direction === 'up' ? index - 1 : index + 1;
+    if (index === -1 || target < 0 || target >= watchlists.length) return;
+    setMutating(true);
+    void apiClients.watchlists
+      .update(selected.watchlist_id, { sort_order: target })
+      .then((response) => replaceWatchlist(unwrapData(response)))
+      .catch(() => setErrorMsg('Unable to reorder watchlist.'))
+      .finally(() => setMutating(false));
+  };
+
   const displaySymbols =
     sortBySymbol === null
       ? symbols
@@ -347,6 +360,26 @@ export const WatchlistWidget: React.FC = () => {
                 }}
               >
                 <Pencil size={13} />
+              </button>
+              <button
+                className="btn-cme btn-outline btn-sm"
+                title="Move watchlist up"
+                aria-label="Move watchlist up"
+                style={{ padding: '3px 6px' }}
+                disabled={mutating || watchlists.findIndex((w) => w.watchlist_id === selected.watchlist_id) === 0}
+                onClick={() => handleReorderList('up')}
+              >
+                <ArrowUp size={13} />
+              </button>
+              <button
+                className="btn-cme btn-outline btn-sm"
+                title="Move watchlist down"
+                aria-label="Move watchlist down"
+                style={{ padding: '3px 6px' }}
+                disabled={mutating || watchlists.findIndex((w) => w.watchlist_id === selected.watchlist_id) === watchlists.length - 1}
+                onClick={() => handleReorderList('down')}
+              >
+                <ArrowDown size={13} />
               </button>
               <button
                 className="btn-cme btn-outline btn-sm"

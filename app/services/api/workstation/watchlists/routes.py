@@ -172,6 +172,7 @@ def _update_watchlist(
             name=body.name,
             symbols=body.symbols,
             is_default=body.is_default,
+            sort_order=body.sort_order,
             request_id=request_id,
         )
         finalize_idempotency_key(

@@ -24,6 +24,7 @@ from app.services.api.workstation.watchlists.persistence import (
     read_watchlist_record,
     read_watchlists_for_account,
     rename_watchlist_record,
+    reorder_watchlists_record,
     replace_watchlist_items_record,
     set_default_watchlist_record,
 )
@@ -154,6 +155,7 @@ def update_watchlist(
     name: str | None,
     symbols: tuple[str, ...] | None,
     is_default: bool | None,
+    sort_order: int | None = None,
     request_id: str,
 ) -> Watchlist:
     """Apply the independently optional watchlist update operations in order.
@@ -164,6 +166,7 @@ def update_watchlist(
         name: Optional replacement name.
         symbols: Optional replacement ordered symbols.
         is_default: Whether to promote the watchlist to default.
+        sort_order: Optional replacement display order position.
         request_id: Canonical request identifier.
 
     Returns:
@@ -173,6 +176,10 @@ def update_watchlist(
     if name is not None:
         current = rename_watchlist(
             watchlist_id, account_id, name, request_id=request_id
+        )
+    if sort_order is not None:
+        current = reorder_watchlist(
+            watchlist_id, account_id, sort_order, request_id=request_id
         )
     if symbols is not None:
         source_id = resolve_runtime_source_id(None, request_id=request_id)
@@ -542,6 +549,39 @@ def rename_watchlist(
         watchlist_id=watchlist_id,
         account_id=account_id,
         name=validated_name,
+        updated_at=now,
+        request_id=request_id,
+    )
+    if affected == 0:
+        raise IdentityError("WATCHLIST_NOT_FOUND")
+    return get_watchlist(watchlist_id, account_id, request_id=request_id)
+
+
+def reorder_watchlist(
+    watchlist_id: str, account_id: str, sort_order: int, *, request_id: str
+) -> Watchlist:
+    """Reposition one watchlist owned by the given account.
+
+    Args:
+        watchlist_id: Target watchlist identity.
+        account_id: Owning account identifier.
+        sort_order: Zero-based display order position.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        The updated watchlist with its current items.
+
+    Raises:
+        IdentityError: If the watchlist is not found or not owned.
+        ValueError: If sort_order is negative.
+    """
+    if sort_order < 0:
+        raise ValueError("sort_order cannot be negative")
+    now = utc_now().isoformat()
+    affected = reorder_watchlists_record(
+        account_id=account_id,
+        watchlist_id=watchlist_id,
+        sort_order=sort_order,
         updated_at=now,
         request_id=request_id,
     )

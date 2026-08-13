@@ -60,19 +60,20 @@ export function create(
   });
 }
 
-/** Partial update: rename, replace items, and/or promote to default. */
+/** Partial update: rename, replace items, promote to default, or reorder. */
 export interface WatchlistUpdate {
   name?: string;
   symbols?: string[];
   is_default?: boolean;
+  sort_order?: number;
 }
 
 /**
  * Update one watchlist (requires `watchlists:write`).
  *
  * Every present field applies independently in one request: renaming,
- * replacing the complete ordered item list, and promoting to the account's
- * default may all be combined.
+ * replacing the complete ordered item list, promoting to the account's
+ * default, and updating display sort order may all be combined.
  */
 export function update(
   watchlistId: string,

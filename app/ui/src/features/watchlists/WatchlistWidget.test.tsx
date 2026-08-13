@@ -1,6 +1,6 @@
 /** Focused unit evidence for Watchlists (FEAT-UI-03), FR-UI-038 through FR-UI-044. */
 
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { WatchlistWidget } from './WatchlistWidget';
@@ -231,6 +231,24 @@ describe('WatchlistWidget', () => {
     await waitFor(() =>
       expect(updateMock).toHaveBeenCalledWith('wl-default', { symbols: ['GBPUSD', 'EURUSD'] })
     );
+  });
+
+  it('reorders watchlists through the registered update operation (FR-UI-043)', async () => {
+    listMock.mockResolvedValue({
+      data: [
+        { ...defaultList, watchlist_id: 'wl_1', name: 'List One', sort_order: 0 },
+        { ...defaultList, watchlist_id: 'wl_2', name: 'List Two', sort_order: 1 },
+      ],
+    });
+
+    render(<WatchlistWidget />);
+    await screen.findByText('List One');
+
+    await act(async () => {
+      fireEvent.click(screen.getByTitle('Move watchlist down'));
+    });
+
+    expect(updateMock).toHaveBeenCalledWith('wl_1', { sort_order: 1 });
   });
 
   it('sorts by symbol column with a stable tiebreak (FR-UI-044)', async () => {

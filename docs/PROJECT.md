@@ -1,7 +1,7 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `In Progress` — of 230 registered application features, 215 are implemented and structurally reconciled (93.48%); 13 are `Pending` and 2 are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Status:** `In Progress` — of 231 registered application features, 217 are implemented and structurally reconciled (93.94%); 13 are `Pending` and 1 is `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
 > **Last updated:** `2026-08-12`
 
 > This document is the system-level source of truth.
