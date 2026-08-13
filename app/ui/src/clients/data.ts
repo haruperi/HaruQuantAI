@@ -193,6 +193,89 @@ export function quotes(
   });
 }
 
+/**
+ * Canonical timeframe keys Data can serve.
+ *
+ * Restated from the backend's accepted query domain so the UI never offers a
+ * timeframe the broker has no bars for.
+ */
+export const BAR_TIMEFRAMES = [
+  "M1",
+  "M5",
+  "M15",
+  "M30",
+  "H1",
+  "H4",
+  "D1",
+  "W1",
+  "MN1",
+] as const;
+export type BarTimeframe = (typeof BAR_TIMEFRAMES)[number];
+
+/** One broker-owned OHLCV bar. `time` is an ISO-8601 UTC bar-open instant. */
+export const barSchema = z.object({
+  time: z.string().nullable(),
+  open: z.number().nullable(),
+  high: z.number().nullable(),
+  low: z.number().nullable(),
+  close: z.number().nullable(),
+  volume: z.number().nullable(),
+});
+export type Bar = z.infer<typeof barSchema>;
+
+/** Ordered bar history for one symbol and timeframe (Data-owned values). */
+export const barSeriesSchema = z.object({
+  source_id: z.string().min(1),
+  symbol: z.string().min(1),
+  timeframe: z.string().min(1),
+  bars: z.array(barSchema),
+  count: z.number().int().min(0),
+  start: z.string().nullable(),
+  end: z.string().nullable(),
+  cache_status: z.string(),
+  request_id: z.string().min(1),
+});
+export type BarSeries = z.infer<typeof barSeriesSchema>;
+
+/** Query parameters for {@link bars}. */
+export interface BarsQuery {
+  symbol: string;
+  /** Canonical timeframe key; defaults to `H1` at the backend. */
+  timeframe?: BarTimeframe;
+  /** Most-recent bar count, 1..20000; defaults to 500 at the backend. */
+  limit?: number;
+  /** Defaults to the configured runtime broker when omitted. */
+  sourceId?: string;
+  /** Optional ISO-8601 inclusive window start. */
+  start?: string;
+  /** Optional ISO-8601 inclusive window end. */
+  end?: string;
+}
+
+/**
+ * Read broker bar history for one symbol (requires `data:read`).
+ *
+ * The series is whatever the runtime broker holds — an unavailable provider
+ * returns an error envelope rather than a generated fallback, so a chart never
+ * renders invented history as real.
+ */
+export function bars(
+  params: BarsQuery,
+  options?: RequestOptions
+): Promise<ApiResponse<BarSeries>> {
+  const query: Record<string, QueryValue> = { symbol: params.symbol };
+  if (params.timeframe !== undefined) query.timeframe = params.timeframe;
+  if (params.limit !== undefined) query.limit = params.limit;
+  if (params.sourceId !== undefined) query.source_id = params.sourceId;
+  if (params.start !== undefined) query.start = params.start;
+  if (params.end !== undefined) query.end = params.end;
+  return request<BarSeries>(dataRoutes.bars, {
+    schema: barSeriesSchema,
+    query,
+    ...options,
+  });
+}
+
 /** Query parameters for the SSE market stream. */
 export interface StreamQuery {
   symbol: string;
@@ -270,6 +353,7 @@ export const data = {
   symbols,
   markets,
   quotes,
+  bars,
   stream,
   prepareDataset,
   importDialects,

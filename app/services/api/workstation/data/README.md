@@ -15,7 +15,27 @@ the feature's distinct resource lifecycle.
 
 ## Requirements
 
-- FR-API-024, FR-API-033, and FR-API-119.
+- FR-API-024, FR-API-033, FR-API-119, and FR-API-127.
+
+## Bar history
+
+`GET /api/v1/data/bars` is the Chart widget's only source of price history.
+It resolves the configured runtime broker, delegates one bounded
+`get_market_data` read to Data, and projects the returned OHLCV records as
+JSON numbers with ISO-8601 UTC bar-open instants.
+
+Three properties are deliberate:
+
+- **The timeframe domain is closed.** `schemas.BarTimeframe` restates Data's
+  canonical manifest, so a key the broker has no bars for is refused with 422
+  at the boundary rather than surfacing as an `UNSUPPORTED_TIMEFRAME` failure.
+- **Bars are read uncached.** A chart's newest bar changes on every tick; a
+  cached window would render as a frozen market.
+- **An unavailable series stays unavailable.** MT5 can return only its current
+  bar while synchronizing a symbol, which triggers exactly one retry. Beyond
+  that, an empty or failed provider read is returned as an error or empty
+  envelope. The gateway never substitutes generated prices, because a chart
+  cannot distinguish invented history from real history.
 
 ## Dependencies
 

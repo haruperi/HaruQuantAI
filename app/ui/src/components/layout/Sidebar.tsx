@@ -63,7 +63,7 @@ export const Sidebar: React.FC = () => {
           {!isCollapsed && <span>Watchlists</span>}
         </div>
 
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('chart', 'ESU6 Chart')}>
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('chart', 'EURUSD Chart')}>
           <LineChart size={15} />
           {!isCollapsed && <span>Chart</span>}
         </div>

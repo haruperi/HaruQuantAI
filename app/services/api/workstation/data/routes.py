@@ -1,14 +1,15 @@
-"""Authenticated symbol discovery, market directory, dataset preparation, and import.
+"""Authenticated symbol discovery, bar history, dataset preparation, and import.
 
-Symbol discovery is a bounded cursor-paginated read. The market directory
-delegates once to Data's categorized directory builder (which composes symbol
-listing, metadata, and snapshot reads) and is rendered by the Markets widget.
-Dataset preparation is a governed write that delegates twice to Data — fetch,
-then persist — and returns Data's own storage manifest. The gateway holds no
-dataset, chooses no storage location, and never substitutes a provider result.
+Symbol discovery is a bounded cursor-paginated read. Bar history is a bounded
+read of Data-owned OHLCV records for one symbol and timeframe, and is what the
+Chart widget renders. Dataset preparation is a governed write that delegates
+twice to Data — fetch, then persist — and returns Data's own storage manifest.
+The gateway holds no dataset, chooses no storage location, and never
+substitutes a provider result.
 """
 
 from collections.abc import Callable, Mapping
+from datetime import datetime
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
@@ -20,13 +21,17 @@ from app.services.api.identity import (
     require_permission,
     run_idempotent_write,
 )
+from app.services.api.workstation.data import orchestration
 from app.services.api.workstation.data.schemas import (
+    BarTimeframe,  # noqa: TC001 - FastAPI resolves runtime annotations.
     DatasetImportRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     DatasetPrepareRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
 from app.services.api.workstation.markets import resolve_runtime_source_id
 from app.services.api.workstation.settings.limits import (
+    API_DEFAULT_BAR_COUNT,
     API_DEFAULT_PAGE_SIZE,
+    API_MAX_BAR_COUNT,
     API_MAX_PAGE_SIZE,
 )
 from app.services.data import (
@@ -197,6 +202,55 @@ def _list_symbols(
     )
     return _build_symbol_directory_response(
         list_symbols(request),
+        request_id=request_id,
+    )
+
+
+@router.get("/bars", response_model=None)
+def _get_bars(
+    context: Annotated[AuthContext, Depends(require_auth_context)],
+    symbol: Annotated[str, Query(min_length=1, max_length=128)],
+    timeframe: BarTimeframe = "H1",
+    limit: Annotated[
+        int,
+        Query(ge=1, le=API_MAX_BAR_COUNT),
+    ] = API_DEFAULT_BAR_COUNT,
+    source_id: str | None = None,
+    start: datetime | None = None,
+    end: datetime | None = None,
+) -> object:
+    """Delegate one bounded bar-history read to Data.
+
+    Args:
+        context: Authenticated API request context.
+        symbol: Broker-native symbol to chart.
+        timeframe: Canonical timeframe key from Data's manifest.
+        limit: Bounded number of most-recent bars.
+        source_id: Optional explicit Data provider.
+        start: Optional inclusive window start.
+        end: Optional inclusive window end.
+
+    Returns:
+        Gateway bar-series response.
+
+    Raises:
+        HTTPException: If the caller lacks Data read permission, or if the
+            requested window is inverted.
+    """
+    require_permission(context, "data:read")
+    if start is not None and end is not None and end <= start:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="BAR_WINDOW_INVALID",
+        )
+    request_id = generate_id("req")
+    return orchestration.orchestrate_bars(
+        symbol=symbol.strip(),
+        timeframe=timeframe,
+        limit=limit,
+        source_id=source_id,
+        start=start,
+        end=end,
         request_id=request_id,
     )
 

@@ -224,6 +224,12 @@ export const dataRoutes = {
     path: "/api/v1/data/quotes",
     permission: "data:read",
   }),
+  bars: route({
+    id: "api.data.bars",
+    method: "GET",
+    path: "/api/v1/data/bars",
+    permission: "data:read",
+  }),
   stream: route({
     id: "api.data.stream",
     method: "GET",
@@ -813,6 +819,7 @@ export const ROUTE_CONTRACTS = [
   dataRoutes.symbols,
   dataRoutes.markets,
   dataRoutes.quotes,
+  dataRoutes.bars,
   dataRoutes.capabilities,
   dataRoutes.stream,
   indicatorsRoutes.catalogue,
@@ -886,7 +893,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 88;
+export const ROUTE_CONTRACT_COUNT = 89;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

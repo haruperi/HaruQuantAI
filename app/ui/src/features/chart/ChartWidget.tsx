@@ -1,9 +1,22 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import {
+  apiClients,
+  BAR_TIMEFRAMES,
+  unwrapData,
+  type BarSeries,
+  type BarTimeframe,
+  type MarketRow,
+} from '../../clients';
 import { useTradingStore } from '../../store/useTradingStore';
 import { useWorkspaceStore } from '../workspaces';
-import type { OrderSide } from '../../types/market';
+import type { OrderSide, Product } from '../../types/market';
+import {
+  filterSymbols,
+  loadSymbolUniverse,
+  resolveSourceSymbol,
+} from '../watchlists/symbolUniverse';
 import {
   PlusCircle,
   Slash,
@@ -90,7 +103,7 @@ const drawPolyline = (ctx: CanvasRenderingContext2D, points: { x: number; y: num
   ctx.stroke();
 };
 
-const renderDrawingShape = (ctx: CanvasRenderingContext2D, shape: any, chartWidth: number, chartHeight: number, _priceMin: number, priceRange: number, priceMax: number) => {
+const renderDrawingShape = (ctx: CanvasRenderingContext2D, shape: any, chartWidth: number, chartHeight: number, _priceMin: number, priceRange: number, priceMax: number, symbolDigits: number = 2) => {
   if (!shape) return;
   const { tool, startX, startY, endX, endY, text, emoji, points = [] } = shape;
   const color = shape.color || '#3cc8ff';
@@ -158,7 +171,7 @@ const renderDrawingShape = (ctx: CanvasRenderingContext2D, shape: any, chartWidt
     ctx.fillStyle = diff >= 0 ? '#00e473' : '#ff003d';
     ctx.font = 'bold 10px "Segoe UI", Roboto, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(`${diff >= 0 ? '+' : ''}${diff.toFixed(2)} (${pct.toFixed(2)}%)`, midX, midY + 1);
+    ctx.fillText(`${diff >= 0 ? '+' : ''}${diff.toFixed(symbolDigits)} (${pct.toFixed(2)}%)`, midX, midY + 1);
   } else if (tool === 'horizontalline') {
     ctx.beginPath();
     ctx.moveTo(0, startY);
@@ -248,7 +261,7 @@ const renderDrawingShape = (ctx: CanvasRenderingContext2D, shape: any, chartWidt
       ctx.fillStyle = lvl.color;
       ctx.font = 'bold 10px "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText(`${lvl.ratio} (${lvlPrice.toFixed(2)})`, startX + 4, ly - 3);
+      ctx.fillText(`${lvl.ratio} (${lvlPrice.toFixed(symbolDigits)})`, startX + 4, ly - 3);
     });
 
     // Draw Blue Circular Anchor Dots
@@ -392,10 +405,10 @@ const renderDrawingShape = (ctx: CanvasRenderingContext2D, shape: any, chartWidt
     const priceEnd = priceMax - (endY / chartHeight) * priceRange;
     const bars = Math.max(1, Math.round(Math.abs(w) / 12));
     const label = tool === 'pricerange'
-      ? `${(priceEnd - priceStart).toFixed(2)} (${(((priceEnd - priceStart) / priceStart) * 100).toFixed(2)}%)`
+      ? `${(priceEnd - priceStart).toFixed(symbolDigits)} (${(((priceEnd - priceStart) / priceStart) * 100).toFixed(2)}%)`
       : tool === 'daterange'
         ? `${bars} bars`
-        : `${bars} bars, ${(priceEnd - priceStart).toFixed(2)}`;
+        : `${bars} bars, ${(priceEnd - priceStart).toFixed(symbolDigits)}`;
     ctx.fillStyle = '#112b4a';
     ctx.fillRect((startX + endX) / 2 - 55, (startY + endY) / 2 - 12, 110, 24);
     ctx.fillStyle = '#ffffff';
@@ -554,27 +567,298 @@ const renderDrawingShape = (ctx: CanvasRenderingContext2D, shape: any, chartWidt
   ctx.restore();
 };
 
+export interface BarData {
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  /** ISO-8601 UTC bar-open instant exactly as the broker reported it. */
+  timestamp: string;
+  /** Time-axis label derived from `timestamp` for the active timeframe. */
+  time: string;
+}
+
+/**
+ * Timeframes the runtime broker can serve, grouped for the toolbar menu.
+ *
+ * These are Data's canonical keys, so the value the user picks is the value
+ * sent to the broker — there is no intermediate label the backend would reject.
+ */
+const TIMEFRAME_LABELS: Record<BarTimeframe, string> = {
+  M1: '1 minute',
+  M5: '5 minutes',
+  M15: '15 minutes',
+  M30: '30 minutes',
+  H1: '1 hour',
+  H4: '4 hours',
+  D1: '1 day',
+  W1: '1 week',
+  MN1: '1 month',
+};
+
+const TIMEFRAME_GROUPS: Record<BarTimeframe, 'MINUTES' | 'HOURS' | 'DAYS'> = {
+  M1: 'MINUTES',
+  M5: 'MINUTES',
+  M15: 'MINUTES',
+  M30: 'MINUTES',
+  H1: 'HOURS',
+  H4: 'HOURS',
+  D1: 'DAYS',
+  W1: 'DAYS',
+  MN1: 'DAYS',
+};
+
+const TIMEFRAME_MENU = (['MINUTES', 'HOURS', 'DAYS'] as const).map((heading) => ({
+  heading,
+  items: BAR_TIMEFRAMES.filter((key) => TIMEFRAME_GROUPS[key] === heading).map((key) => ({
+    key,
+    label: TIMEFRAME_LABELS[key],
+  })),
+}));
+
+const INTRADAY_TIMEFRAMES = new Set<BarTimeframe>(['M1', 'M5', 'M15', 'M30', 'H1', 'H4']);
+
+/**
+ * Extremes of one bar field, without spreading the array into `Math.min/max`.
+ *
+ * A spread passes one argument per element, which overflows the call stack at
+ * roughly 130k arguments — and a backtest-scale window is well past that
+ * (MT5 holds 178k H1 bars for USDJPY alone), so the spread form would throw
+ * before drawing a single candle.
+ */
+export function barExtent(
+  bars: BarData[],
+  from: number,
+  to: number
+): { min: number; max: number } {
+  let min = Infinity;
+  let max = -Infinity;
+  for (let i = from; i < to; i++) {
+    const bar = bars[i];
+    if (bar.low < min) min = bar.low;
+    if (bar.high > max) max = bar.high;
+  }
+  return { min, max };
+}
+
+/** Largest volume across a bar range, spread-free for the same reason. */
+export function maxVolume(bars: BarData[], from: number, to: number): number {
+  let max = 0;
+  for (let i = from; i < to; i++) {
+    if (bars[i].volume > max) max = bars[i].volume;
+  }
+  return max || 1;
+}
+
+/** Label one bar-open instant for the time axis of the active timeframe. */
+function formatBarLabel(timestamp: string, timeframe: BarTimeframe): string {
+  const at = new Date(timestamp);
+  if (Number.isNaN(at.getTime())) return '';
+  return INTRADAY_TIMEFRAMES.has(timeframe)
+    ? at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+    : at.toISOString().split('T')[0];
+}
+
+/**
+ * Project one broker bar series into the shape the canvas renders.
+ *
+ * A bar missing any OHLC value is dropped rather than defaulted: a zero close
+ * would collapse the price scale and read as a real crash.
+ */
+function toChartBars(series: BarSeries | null | undefined, timeframe: BarTimeframe): BarData[] {
+  if (!series) return [];
+  return series.bars.reduce<BarData[]>((rows, bar) => {
+    if (
+      bar.time === null ||
+      bar.open === null ||
+      bar.high === null ||
+      bar.low === null ||
+      bar.close === null
+    ) {
+      return rows;
+    }
+    rows.push({
+      open: bar.open,
+      high: bar.high,
+      low: bar.low,
+      close: bar.close,
+      volume: bar.volume ?? 0,
+      timestamp: bar.time,
+      time: formatBarLabel(bar.time, timeframe),
+    });
+    return rows;
+  }, []);
+}
+
 interface Props {
   symbol?: string;
   widgetId?: string;
 }
 
-export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
+export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) => {
   const { products, openOrderTicket, submitOrder, theme } = useTradingStore();
-  const { orderConfirmationRequired, toggleExpandWidget } = useWorkspaceStore();
-  const targetProduct = products.find((p) => p.symbol === symbol) || products[0];
+  const { orderConfirmationRequired, toggleExpandWidget, setWidgetSymbol } = useWorkspaceStore();
+
+  const [activeSymbol, setActiveSymbol] = useState(symbol);
+  const [searchQuery, setSearchQuery] = useState(symbol);
+  const [activeMarketRow, setActiveMarketRow] = useState<MarketRow | null>(null);
+
+  const targetProduct: Product = useMemo(
+    () =>
+      products.find((p) => p.symbol === activeSymbol) || {
+        symbol: activeSymbol,
+        name: activeSymbol,
+        adr10: 0,
+        atr14: 0,
+        decimals: 2,
+        assetClass: 'Futures',
+        contractMonth: '',
+        lastPrice: 0,
+        change: 0,
+        changePercent: 0,
+        open: 0,
+        priorSettle: 0,
+        high: 0,
+        low: 0,
+        volume: 0,
+        bid: 0,
+        ask: 0,
+      },
+    [products, activeSymbol]
+  );
+
+  const symbolDigits = useMemo(() => {
+    if (typeof activeMarketRow?.digits === 'number' && activeMarketRow.digits >= 0) {
+      return activeMarketRow.digits;
+    }
+    if (typeof targetProduct?.decimals === 'number' && targetProduct.decimals >= 0 && targetProduct.decimals !== 2) {
+      return targetProduct.decimals;
+    }
+    const upper = activeSymbol.toUpperCase();
+    if (upper.includes('JPY')) return 3;
+    if (
+      upper.includes('USD') ||
+      upper.includes('EUR') ||
+      upper.includes('GBP') ||
+      upper.includes('AUD') ||
+      upper.includes('CAD') ||
+      upper.includes('CHF')
+    ) {
+      return 5;
+    }
+    return 2;
+  }, [activeMarketRow, targetProduct, activeSymbol]);
+
+  const [universe, setUniverse] = useState<string[]>([]);
+  const [universeStatus, setUniverseStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [highlight, setHighlight] = useState(-1);
+  const suggestionIdPrefix = useRef(`chart-symbol-suggestion-${Math.random().toString(36).slice(2, 8)}`);
+
+  useEffect(() => {
+    setActiveSymbol(symbol);
+    setSearchQuery(symbol);
+  }, [symbol]);
+
+  // Report the charted symbol back to the workspace so the widget heading and
+  // its persisted symbol follow the chart instead of naming whatever it was
+  // created with.
+  useEffect(() => {
+    if (!widgetId) return;
+    setWidgetSymbol(widgetId, activeSymbol);
+  }, [widgetId, activeSymbol, setWidgetSymbol]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadSymbolUniverse()
+      .then((symbols) => {
+        if (cancelled) return;
+        setUniverse(symbols);
+        setUniverseStatus('ready');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setUniverseStatus('error');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const closeSuggestions = () => {
+    setSuggestOpen(false);
+    setHighlight(-1);
+  };
+
+  const selectSymbol = (candidate: string) => {
+    const resolved = resolveSourceSymbol(universe, candidate) ?? candidate.trim().toUpperCase();
+    if (resolved) {
+      setActiveSymbol(resolved);
+      setSearchQuery(resolved);
+    }
+    closeSuggestions();
+  };
+
+  const suggestions = suggestOpen ? filterSymbols(universe, searchQuery) : [];
+
+  const handleSymbolKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setSuggestOpen(true);
+      setHighlight((prev) => (suggestions.length === 0 ? -1 : (prev + 1) % suggestions.length));
+      return;
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setHighlight((prev) =>
+        suggestions.length === 0 ? -1 : prev <= 0 ? suggestions.length - 1 : prev - 1
+      );
+      return;
+    }
+    if (event.key === 'Escape') {
+      closeSuggestions();
+      return;
+    }
+    if (event.key === 'Tab' && suggestions.length > 0) {
+      event.preventDefault();
+      const choice = highlight >= 0 && suggestions[highlight] ? suggestions[highlight] : suggestions[0];
+      selectSymbol(choice);
+      return;
+    }
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const choice = highlight >= 0 && suggestions[highlight] ? suggestions[highlight] : searchQuery;
+      selectSymbol(choice);
+    }
+  };
+
+  // Range By Controls ("Bars" or "Date")
+  // Bounded by the backend's API_MAX_BAR_COUNT. The upper end exists for
+  // backtest-scale reads (ten years of M5 is roughly 750k bars), not because
+  // a million candles are legible at once.
+  const BAR_COUNT_OPTIONS = [
+    100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000,
+  ];
+  const [rangeBy, setRangeBy] = useState<'Bars' | 'Date'>('Bars');
+  const [barCount, setBarCount] = useState<number>(100);
+  const [dateFrom, setDateFrom] = useState<string>(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return d.toISOString().split('T')[0];
+  });
+  const [dateTo, setDateTo] = useState<string>(() => new Date().toISOString().split('T')[0]);
 
   // State Management for TradingView Toolbar Controls & Dropdowns
-  const [timeframe, setTimeframe] = useState('5m');
+  const [timeframe, setTimeframe] = useState<BarTimeframe>('H1');
   const [chartType, setChartType] = useState('Candles');
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null); // 'timeframe' | 'chartStyle' | 'indicators' | 'layoutGrid' | null
   const [activeTool, setActiveTool] = useState('crosshair');
   const [isAveragePriceOn, setIsAveragePriceOn] = useState(true);
-  const [selectedIndicators, setSelectedIndicators] = useState(['EMA', 'Volume']);
+  const [selectedIndicators, setSelectedIndicators] = useState<string[]>([]);
   const [indicatorSearchQuery, setIndicatorSearchQuery] = useState('');
-  const [starredItems, setStarredItems] = useState(['5m', 'Candles', 'EMA', 'Volume']);
+  const [starredItems, setStarredItems] = useState(['H1', 'Candles', 'EMA', 'Volume']);
   const [showVolumeLegend, setShowVolumeLegend] = useState(true);
-  const [searchQuery, setSearchQuery] = useState(symbol);
 
   // Sync Controls (Multi-Chart Layout Dropdown)
   const [syncSymbol, setSyncSymbol] = useState(false);
@@ -716,39 +1000,95 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
     }
   };
 
-  // Generate Candlestick Historical Data
-  const [candles, setCandles] = useState(() => {
-    const data = [];
-    let price = targetProduct.lastPrice - 20;
-    const now = new Date();
-    for (let i = 60; i >= 0; i--) {
-      const open = price;
-      const change = (Math.random() - 0.48) * 4;
-      const close = parseFloat((open + change).toFixed(2));
-      const high = parseFloat((Math.max(open, close) + Math.random() * 2.5).toFixed(2));
-      const low = parseFloat((Math.min(open, close) - Math.random() * 2.5).toFixed(2));
-      const volume = Math.floor(Math.random() * 1200) + 100;
-      const time = new Date(now.getTime() - i * 5 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-      data.push({ open, high, low, close, volume, time });
-      price = close;
-    }
-    return data;
-  });
-
-  // Sync latest price in real time
+  // Symbol precision and quote evidence from the connected runtime broker.
+  // Kept separate from the bar read so a quote failure never blanks the chart.
   useEffect(() => {
+    let cancelled = false;
+    void apiClients.data
+      .quotes([activeSymbol])
+      .then((response) => {
+        if (cancelled) return;
+        const matched = unwrapData(response)?.rows?.find((r) => r.symbol === activeSymbol);
+        setActiveMarketRow(matched ? (matched as unknown as MarketRow) : null);
+      })
+      .catch(() => {
+        if (!cancelled) setActiveMarketRow(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeSymbol]);
+
+  // Historical bars from the connected runtime broker (MT5) via the Data domain.
+  const [candles, setCandles] = useState<BarData[]>([]);
+  const [isLoadingBars, setIsLoadingBars] = useState(true);
+  const [barsError, setBarsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoadingBars(true);
+    setBarsError(null);
+
+    async function fetchBars() {
+      try {
+        const response = await apiClients.data.bars({
+          symbol: activeSymbol,
+          timeframe,
+          ...(rangeBy === 'Bars'
+            ? { limit: barCount }
+            : {
+                start: `${dateFrom}T00:00:00Z`,
+                end: `${dateTo}T23:59:59Z`,
+              }),
+        });
+        if (cancelled) return;
+
+        const rows = toChartBars(unwrapData(response), timeframe);
+        setCandles(rows);
+        // An empty series is reported, never papered over: the broker having no
+        // history for this symbol and timeframe is real information.
+        setBarsError(
+          rows.length === 0 ? `No ${timeframe} bars available for ${activeSymbol}` : null
+        );
+        anchorToLatestRef.current = true;
+        setPanOffset(0);
+      } catch (error) {
+        if (cancelled) return;
+        setCandles([]);
+        setBarsError(error instanceof Error ? error.message : 'Bars unavailable');
+      } finally {
+        if (!cancelled) setIsLoadingBars(false);
+      }
+    }
+
+    void fetchBars();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeSymbol, timeframe, rangeBy, barCount, dateFrom, dateTo]);
+
+  // Extend the forming bar with the live quote. A zero price means the product
+  // is not quoted yet, and must not overwrite a real close.
+  useEffect(() => {
+    const lastPrice = targetProduct.lastPrice;
+    if (!(lastPrice > 0)) return;
     setCandles((prev) => {
       if (!prev.length) return prev;
       const last = { ...prev[prev.length - 1] };
-      last.close = targetProduct.lastPrice;
-      last.high = Math.max(last.high, targetProduct.lastPrice);
-      last.low = Math.min(last.low, targetProduct.lastPrice);
+      last.close = lastPrice;
+      last.high = Math.max(last.high, lastPrice);
+      last.low = Math.min(last.low, lastPrice);
       return [...prev.slice(0, -1), last];
     });
   }, [targetProduct.lastPrice]);
 
   // Chart Panning / Moving State
   const [panOffset, setPanOffset] = useState(0);
+  // A freshly loaded series opens on its most recent bars. Starting at offset 0
+  // shows the oldest instead, which is unnoticeable at 100 bars and useless at
+  // backtest scale — a ten-year window would open ten years in the past.
+  const anchorToLatestRef = useRef(true);
   const [isPanning, setIsPanning] = useState(false);
   const isPanningRef = useRef(false);
   const panStartRef = useRef(0);
@@ -772,8 +1112,37 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
     const chartWidth = width - paddingRight;
     const chartHeight = height - paddingBottom;
 
-    const priceMin = Math.min(...candles.map((c) => c.low)) - 1.5;
-    const priceMax = Math.max(...candles.map((c) => c.high)) + 1.5;
+    const visibleBarsTarget = 60;
+    const candleWidth = Math.max(6, (chartWidth / Math.min(candles.length, visibleBarsTarget)) * zoomLevel);
+
+    // Calculate viewport visible candle range based on panOffset and candleWidth
+    const visibleStartIndex = Math.max(0, Math.floor(-panOffset / candleWidth));
+    const visibleEndIndex = Math.min(candles.length, Math.ceil((chartWidth - panOffset) / candleWidth));
+    const hasVisibleRange = visibleEndIndex > visibleStartIndex;
+    const scaleFrom = hasVisibleRange ? visibleStartIndex : 0;
+    const scaleTo = hasVisibleRange ? visibleEndIndex : candles.length;
+
+    // Only bars inside the clipped viewport can appear, so the draw loops walk
+    // this window rather than the whole series. At backtest scale the
+    // difference is ~60 canvas operations instead of a million per frame.
+    const drawStart = scaleFrom;
+    const drawEnd = scaleTo;
+
+    // Geometry is only known here, so the anchor is resolved on the first
+    // paint of a new series and then handed back to normal panning.
+    if (anchorToLatestRef.current) {
+      anchorToLatestRef.current = false;
+      const latest = Math.min(0, chartWidth - candles.length * candleWidth);
+      if (latest !== panOffset) {
+        setPanOffset(latest);
+        return;
+      }
+    }
+
+    const { min: rawMinPrice, max: rawMaxPrice } = barExtent(candles, scaleFrom, scaleTo);
+    const pricePadding = (rawMaxPrice - rawMinPrice) * 0.08 || 0.001;
+    const priceMin = rawMinPrice - pricePadding;
+    const priceMax = rawMaxPrice + pricePadding;
     const priceRange = priceMax - priceMin || 1;
 
     const isLight = theme === 'light';
@@ -796,8 +1165,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
       ctx.stroke();
     }
 
-    const candleWidth = (chartWidth / candles.length) * zoomLevel;
-    const timeStepX = Math.floor(candles.length / 8);
+    const timeStepX = Math.max(1, Math.floor(Math.max(1, visibleEndIndex - visibleStartIndex) / 8));
 
     // Move the time-based chart content while keeping the price axis and
     // crosshair anchored to the canvas viewport.
@@ -1169,9 +1537,10 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
       });
     } else {
       // Handles: 'Bars', 'Candles', 'Hollow candles', 'Volume candles', 'HLC bars'
-      const maxVol = Math.max(...candles.map((c) => c.volume)) || 1;
+      const maxVol = maxVolume(candles, drawStart, drawEnd);
 
-      candles.forEach((c, idx) => {
+      for (let idx = drawStart; idx < drawEnd; idx++) {
+        const c = candles[idx];
         const x = idx * candleWidth + candleWidth / 2;
         const isGreen = c.close >= c.open;
 
@@ -1218,11 +1587,12 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
             ctx.fillRect(x - bodyW / 2, bodyTop, bodyW, bodyHeight);
           }
         }
-      });
+      }
     }
 
     // Volume & Time Axis Labels
-    candles.forEach((c, idx) => {
+    for (let idx = drawStart; idx < drawEnd; idx++) {
+      const c = candles[idx];
       const x = idx * candleWidth + candleWidth / 2;
       const isGreen = c.close >= c.open;
 
@@ -1238,20 +1608,20 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
         ctx.textAlign = 'center';
         ctx.fillText(c.time, x, height - 10);
       }
-    });
+    }
 
     // 3. EMA Indicator Line
     if (!isIndicatorsHidden && selectedIndicators.includes('EMA')) {
       ctx.beginPath();
       ctx.strokeStyle = '#FF9800';
       ctx.lineWidth = 1.5;
-      candles.forEach((c, idx) => {
+      for (let idx = drawStart; idx < drawEnd; idx++) {
         const x = idx * candleWidth + candleWidth / 2;
-        const emaVal = c.close * 0.998;
+        const emaVal = candles[idx].close * 0.998;
         const y = chartHeight - ((emaVal - priceMin) / priceRange) * chartHeight;
-        if (idx === 0) ctx.moveTo(x, y);
+        if (idx === drawStart) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
-      });
+      }
       ctx.stroke();
     }
 
@@ -1289,7 +1659,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
     for (let i = 0; i <= 8; i++) {
       const pVal = priceMin + (priceRange * i) / 8;
       const y = chartHeight - (i / 8) * chartHeight;
-      ctx.fillText(pVal.toFixed(2), chartWidth + 8, y + 4);
+      ctx.fillText(pVal.toFixed(symbolDigits), chartWidth + 8, y + 4);
     }
 
     // Current Price Badge
@@ -1297,7 +1667,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
     ctx.fillRect(chartWidth, currentY - 10, paddingRight, 20);
     ctx.fillStyle = isUp ? '#081d37' : '#ffffff';
     ctx.font = 'bold 10px "Segoe UI", Roboto, Arial, sans-serif';
-    ctx.fillText(`${symbol} ${lastCandle.close.toFixed(2)}`, chartWidth + 4, currentY + 3);
+    ctx.fillText(`${activeSymbol} ${lastCandle?.close ? lastCandle.close.toFixed(symbolDigits) : (0).toFixed(symbolDigits)}`, chartWidth + 4, currentY + 3);
 
     // Drawings
     if (!isDrawingsHidden) {
@@ -1308,11 +1678,11 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
       ctx.translate(panOffset, 0);
 
       drawings.forEach((shape) => {
-        renderDrawingShape(ctx, shape, chartWidth, chartHeight, priceMin, priceRange, priceMax);
+        renderDrawingShape(ctx, shape, chartWidth, chartHeight, priceMin, priceRange, priceMax, symbolDigits);
       });
 
       if (currentLine) {
-        renderDrawingShape(ctx, currentLine, chartWidth, chartHeight, priceMin, priceRange, priceMax);
+        renderDrawingShape(ctx, currentLine, chartWidth, chartHeight, priceMin, priceRange, priceMax, symbolDigits);
       }
 
       ctx.restore();
@@ -1357,7 +1727,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
       ctx.fillRect(chartWidth, crosshairPos.y - 9, paddingRight, 18);
       ctx.fillStyle = '#ffffff';
       ctx.font = '10px "Trebuchet MS", Roboto, Arial, sans-serif';
-      ctx.fillText(hoverPrice.toFixed(2), chartWidth + 8, crosshairPos.y + 4);
+      ctx.fillText(hoverPrice.toFixed(symbolDigits), chartWidth + 8, crosshairPos.y + 4);
 
       const hoverCandleIdx = Math.floor((crosshairPos.x - panOffset) / candleWidth);
       if (candles[hoverCandleIdx]) {
@@ -1369,7 +1739,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
         ctx.fillText(hoverTime, crosshairPos.x, chartHeight + 13);
       }
     }
-  }, [candles, chartType, selectedIndicators, targetProduct.lastPrice, drawings, currentLine, crosshairPos, isDrawingsHidden, isIndicatorsHidden, theme, cursorMode, panOffset, zoomLevel]);
+  }, [candles, chartType, selectedIndicators, targetProduct.lastPrice, drawings, currentLine, crosshairPos, isDrawingsHidden, isIndicatorsHidden, theme, cursorMode, panOffset, zoomLevel, symbolDigits, activeSymbol]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -1385,12 +1755,13 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
     }
 
     if (isMagnetOn && candles.length) {
-      const candleWidth = ((canvas.width - 68) / candles.length) * zoomLevel;
+      const candleWidth = Math.max(6, ((canvas.width - 68) / Math.min(candles.length, 60)) * zoomLevel);
       const candleIdx = Math.max(0, Math.min(candles.length - 1, Math.floor(chartX / candleWidth)));
       const c = candles[candleIdx];
       if (c) {
-        const priceMin = Math.min(...candles.map((cand) => cand.low)) - 1.5;
-        const priceMax = Math.max(...candles.map((cand) => cand.high)) + 1.5;
+        const { min: priceLo, max: priceHi } = barExtent(candles, 0, candles.length);
+        const priceMin = priceLo - 1.5;
+        const priceMax = priceHi + 1.5;
         const priceRange = priceMax - priceMin || 1;
         const chartHeight = canvas.height - 30;
         const snapPrice = c.close;
@@ -1480,12 +1851,13 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
     // A specific drawing tool is active (e.g. trendline, fib, rectangle, etc.) -> Draw new shape!
     if (isLocked) return;
     if (isMagnetOn && candles.length) {
-      const candleWidth = ((canvas.width - 68) / candles.length) * zoomLevel;
+      const candleWidth = Math.max(6, ((canvas.width - 68) / Math.min(candles.length, 60)) * zoomLevel);
       const candleIdx = Math.max(0, Math.min(candles.length - 1, Math.floor(chartX / candleWidth)));
       const c = candles[candleIdx];
       if (c) {
-        const priceMin = Math.min(...candles.map((cand) => cand.low)) - 1.5;
-        const priceMax = Math.max(...candles.map((cand) => cand.high)) + 1.5;
+        const { min: priceLo, max: priceHi } = barExtent(candles, 0, candles.length);
+        const priceMin = priceLo - 1.5;
+        const priceMax = priceHi + 1.5;
         const priceRange = priceMax - priceMin || 1;
         const chartHeight = canvas.height - 30;
         const snapY = chartHeight - ((c.close - priceMin) / priceRange) * chartHeight;
@@ -1591,7 +1963,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
     >
       {/* 1. TOP TOOLBAR matching Reference Screenshot */}
       <div className="tv-toolbar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+        <div className="tv-toolbar-group" style={{ gap: '3px' }}>
           {/* (+) Plus Circle Icon */}
           <button className="tv-btn-clean" onClick={() => toggleDropdown('indicators')} title="Add Symbol / Comparison">
             <PlusCircle size={16} color="#ffffff" />
@@ -1599,7 +1971,94 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
 
           <div className="tv-toolbar-divider" />
 
-          {/* Timeframe (5m) Text Button */}
+          {/* 1. Symbol Search Pill Box [ 🔍 ESU6 ] with Symbol Universe Autocomplete */}
+          <div className="tv-search-pill-box" style={{ position: 'relative' }}>
+            <Search size={12} color="#ffffff" />
+            <input
+              type="text"
+              value={searchQuery}
+              role="combobox"
+              aria-label="Symbol search"
+              aria-expanded={suggestions.length > 0}
+              aria-controls={`${suggestionIdPrefix.current}-listbox`}
+              aria-autocomplete="list"
+              aria-activedescendant={
+                highlight >= 0 ? `${suggestionIdPrefix.current}-${highlight}` : undefined
+              }
+              autoComplete="off"
+              title={
+                universeStatus === 'ready'
+                  ? `${universe.length} instruments available from connected runtime broker`
+                  : universeStatus === 'error'
+                    ? 'Instrument universe unavailable'
+                    : 'Loading instrument universe…'
+              }
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSuggestOpen(true);
+                setHighlight(-1);
+              }}
+              onFocus={() => setSuggestOpen(true)}
+              onBlur={() => window.setTimeout(closeSuggestions, 150)}
+              onKeyDown={handleSymbolKeyDown}
+              // Content sizing fallback for browsers without `field-sizing`.
+              // Ignored where that is supported, which measures glyphs exactly.
+              size={Math.max(7, searchQuery.length + 1)}
+              className="tv-search-input-field"
+            />
+            {suggestions.length > 0 && (
+              <ul
+                id={`${suggestionIdPrefix.current}-listbox`}
+                role="listbox"
+                aria-label="Symbol suggestions"
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 4px)',
+                  left: 0,
+                  zIndex: 100,
+                  margin: 0,
+                  padding: '4px',
+                  listStyle: 'none',
+                  minWidth: '160px',
+                  maxHeight: '220px',
+                  overflowY: 'auto',
+                  background: 'var(--cme-navy-surface, #132238)',
+                  border: '1px solid var(--cme-navy-border, #1e3a5f)',
+                  borderRadius: '4px',
+                  boxShadow: '0 6px 18px rgba(0, 0, 0, 0.45)',
+                }}
+              >
+                {suggestions.map((item, index) => (
+                  <li
+                    key={item}
+                    id={`${suggestionIdPrefix.current}-${index}`}
+                    role="option"
+                    aria-selected={index === highlight}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      selectSymbol(item);
+                    }}
+                    onMouseEnter={() => setHighlight(index)}
+                    style={{
+                      padding: '5px 10px',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      borderRadius: '3px',
+                      color: index === highlight ? '#ffffff' : 'var(--text-primary, #e2e8f0)',
+                      background: index === highlight ? 'var(--cme-navy-active, #1e3a5f)' : 'transparent',
+                    }}
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="tv-toolbar-divider" />
+
+          {/* 2. Timeframe Dropdown */}
           <div style={{ position: 'relative' }}>
             <button
               className="tv-btn-clean"
@@ -1611,72 +2070,124 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
             {/* Timeframe Dropdown Menu */}
             {activeDropdown === 'timeframe' && (
               <div className="tv-dropdown" style={{ width: '180px' }} onClick={(e) => e.stopPropagation()}>
-                <div className="tv-dropdown-section-header">MINUTES <ChevronUp size={12} /></div>
-                {['1 minute', '3 minutes', '5 minutes', '10 minutes', '15 minutes', '30 minutes'].map((m) => {
-                  const val = m.replace(' minutes', 'm').replace(' minute', 'm');
-                  const isSelected = timeframe === val;
-                  return (
-                    <div
-                      key={m}
-                      className={`tv-dropdown-item ${isSelected ? 'active' : ''}`}
-                      onClick={() => { setTimeframe(val); setActiveDropdown(null); }}
-                    >
-                      <span>{m}</span>
-                      <Star
-                        size={13}
-                        className={`tv-star-icon ${starredItems.includes(val) ? 'starred' : ''}`}
-                        onClick={(e) => toggleStar(val, e)}
-                      />
-                    </div>
-                  );
-                })}
-
-                <div className="tv-dropdown-section-header">HOURS <ChevronUp size={12} /></div>
-                {['1 hour', '2 hours', '4 hours'].map((h) => {
-                  const val = h.replace(' hours', 'h').replace(' hour', 'h');
-                  const isSelected = timeframe === val;
-                  return (
-                    <div
-                      key={h}
-                      className={`tv-dropdown-item ${isSelected ? 'active' : ''}`}
-                      onClick={() => { setTimeframe(val); setActiveDropdown(null); }}
-                    >
-                      <span>{h}</span>
-                      <Star
-                        size={13}
-                        className={`tv-star-icon ${starredItems.includes(val) ? 'starred' : ''}`}
-                        onClick={(e) => toggleStar(val, e)}
-                      />
-                    </div>
-                  );
-                })}
-
-                <div className="tv-dropdown-section-header">DAYS <ChevronUp size={12} /></div>
-                {['1 day', '1 week', '1 month'].map((d) => {
-                  const val = d.includes('day') ? '1D' : d.includes('week') ? '1W' : '1M';
-                  const isSelected = timeframe === val;
-                  return (
-                    <div
-                      key={d}
-                      className={`tv-dropdown-item ${isSelected ? 'active' : ''}`}
-                      onClick={() => { setTimeframe(val); setActiveDropdown(null); }}
-                    >
-                      <span>{d}</span>
-                      <Star
-                        size={13}
-                        className={`tv-star-icon ${starredItems.includes(val) ? 'starred' : ''}`}
-                        onClick={(e) => toggleStar(val, e)}
-                      />
-                    </div>
-                  );
-                })}
+                {TIMEFRAME_MENU.map((group) => (
+                  <React.Fragment key={group.heading}>
+                    <div className="tv-dropdown-section-header">{group.heading} <ChevronUp size={12} /></div>
+                    {group.items.map(({ label, key }) => (
+                      <div
+                        key={key}
+                        className={`tv-dropdown-item ${timeframe === key ? 'active' : ''}`}
+                        onClick={() => { setTimeframe(key); setActiveDropdown(null); }}
+                      >
+                        <span>{label}</span>
+                        <Star
+                          size={13}
+                          className={`tv-star-icon ${starredItems.includes(key) ? 'starred' : ''}`}
+                          onClick={(e) => toggleStar(key, e)}
+                        />
+                      </div>
+                    ))}
+                  </React.Fragment>
+                ))}
               </div>
             )}
           </div>
 
           <div className="tv-toolbar-divider" />
 
-          {/* Chart Style Dropdown Icon */}
+          {/* 3. Range By Section (Bars vs Date) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted, #718294)' }}>
+              Range By
+            </span>
+            <select
+              value={rangeBy}
+              onChange={(e) => setRangeBy(e.target.value as 'Bars' | 'Date')}
+              aria-label="Range By"
+              style={{
+                background: 'var(--cme-navy-dark, #0b1426)',
+                color: 'var(--text-primary, #e2e8f0)',
+                border: '1px solid var(--cme-navy-border, #1e3a5f)',
+                borderRadius: '4px',
+                padding: '2px 6px',
+                fontSize: '11px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                outline: 'none',
+              }}
+            >
+              <option value="Bars">Bars</option>
+              <option value="Date">Date</option>
+            </select>
+
+            {/* Child Section based on Range By selection */}
+            {rangeBy === 'Bars' ? (
+              <select
+                value={barCount}
+                onChange={(e) => setBarCount(Number(e.target.value))}
+                aria-label="Bar Count"
+                style={{
+                  background: 'var(--cme-navy-dark, #0b1426)',
+                  color: 'var(--text-primary, #e2e8f0)',
+                  border: '1px solid var(--cme-navy-border, #1e3a5f)',
+                  borderRadius: '4px',
+                  padding: '2px 6px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  outline: 'none',
+                }}
+              >
+                {BAR_COUNT_OPTIONS.map((count) => (
+                  <option key={count} value={count}>
+                    {count.toLocaleString()}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  aria-label="Date From"
+                  style={{
+                    background: 'var(--cme-navy-dark, #0b1426)',
+                    color: 'var(--text-primary, #e2e8f0)',
+                    border: '1px solid var(--cme-navy-border, #1e3a5f)',
+                    borderRadius: '4px',
+                    padding: '2px 6px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    outline: 'none',
+                    colorScheme: 'dark',
+                  }}
+                />
+                <span style={{ fontSize: '11px', color: 'var(--text-muted, #718294)' }}>to</span>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  aria-label="Date To"
+                  style={{
+                    background: 'var(--cme-navy-dark, #0b1426)',
+                    color: 'var(--text-primary, #e2e8f0)',
+                    border: '1px solid var(--cme-navy-border, #1e3a5f)',
+                    borderRadius: '4px',
+                    padding: '2px 6px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    outline: 'none',
+                    colorScheme: 'dark',
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="tv-toolbar-divider" />
+
+          {/* 4. Chart Style Dropdown Icon */}
           <div style={{ position: 'relative' }}>
             <button
               className="tv-btn-clean"
@@ -1715,7 +2226,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
 
           <div className="tv-toolbar-divider" />
 
-          {/* fx Indicators Button */}
+          {/* 5. fx Indicators Button */}
           <button
             className="tv-btn-clean"
             onClick={(e) => { e.stopPropagation(); toggleDropdown('indicators'); }}
@@ -1723,19 +2234,6 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
             <span className="tv-fx-icon">f<sub>x</sub></span>
             <span>Indicators</span>
           </button>
-
-          <div className="tv-toolbar-divider" />
-
-          {/* Search Box Pill [ 🔍 ESU6 ] */}
-          <div className="tv-search-pill-box">
-            <Search size={12} color="#ffffff" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="tv-search-input-field"
-            />
-          </div>
 
           <div className="tv-toolbar-divider" />
 
@@ -1759,7 +2257,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
         </div>
 
         {/* Right Controls Bar & Multi-Chart Layout Picker */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <div className="tv-toolbar-group" style={{ gap: '4px' }}>
           {/* Multi-Chart Grid Layout Dropdown */}
           <div style={{ position: 'relative' }}>
             <button
@@ -1819,6 +2317,21 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
           </button>
 
           <div className="tv-toolbar-divider" />
+
+          {isLoadingBars && (
+            <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, padding: '0 4px' }}>
+              Loading {timeframe} bars…
+            </span>
+          )}
+
+          {!isLoadingBars && barsError && (
+            <span
+              title={barsError}
+              style={{ fontSize: '10px', color: 'var(--cme-sell-red, #ff003d)', fontWeight: 600, padding: '0 4px' }}
+            >
+              {barsError}
+            </span>
+          )}
 
           <button className="tv-btn-clean" title="Take Snapshot">
             <Camera size={15} color="#ffffff" />
@@ -2446,17 +2959,17 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
         {/* Top-Left Overlay Legend */}
         <div className="tv-overlay-legend">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', fontWeight: 600 }}>
-            <span style={{ color: 'var(--text-white)', fontWeight: 700 }}>{symbol} • {timeframe.replace('m', '')} • HaruQuantAI</span>
+            <span style={{ color: 'var(--text-white)', fontWeight: 700 }}>{activeSymbol} • {timeframe.replace('m', '')} • HaruQuantAI</span>
             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00C853' }} />
 
             <span style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: '#00C853', fontWeight: 600 }}>
-              O <span style={{ color: '#00C853' }}>{currentOHLC.open?.toFixed(2) || '7,548.25'}</span> H <span style={{ color: '#00C853' }}>{currentOHLC.high?.toFixed(2) || '7,552.75'}</span> L <span style={{ color: '#00C853' }}>{currentOHLC.low?.toFixed(2) || '7,547.75'}</span> C <span style={{ color: '#00C853' }}>{currentOHLC.close?.toFixed(2) || '7,552.50'}</span> +4.25 (+0.06%)
+              O <span style={{ color: '#00C853' }}>{currentOHLC.open !== undefined ? currentOHLC.open.toFixed(symbolDigits) : (0).toFixed(symbolDigits)}</span> H <span style={{ color: '#00C853' }}>{currentOHLC.high !== undefined ? currentOHLC.high.toFixed(symbolDigits) : (0).toFixed(symbolDigits)}</span> L <span style={{ color: '#00C853' }}>{currentOHLC.low !== undefined ? currentOHLC.low.toFixed(symbolDigits) : (0).toFixed(symbolDigits)}</span> C <span style={{ color: '#00C853' }}>{currentOHLC.close !== undefined ? currentOHLC.close.toFixed(symbolDigits) : (0).toFixed(symbolDigits)}</span>
             </span>
           </div>
 
           {!arePositionsHidden && <div className="tv-buy-sell-boxes">
             <div className="tv-order-box buy" onClick={() => handleQuickTrade('BUY')}>
-              <span style={{ fontSize: '13px', fontWeight: 400, lineHeight: '16px' }}>{targetProduct.ask ? targetProduct.ask.toFixed(2) : '7,552.75'}</span>
+              <span style={{ fontSize: '13px', fontWeight: 400, lineHeight: '16px' }}>{targetProduct.ask ? targetProduct.ask.toFixed(symbolDigits) : (currentOHLC.close || 0).toFixed(symbolDigits)}</span>
               <span style={{ fontSize: '11px', fontWeight: 400, lineHeight: '12px' }}>BUY</span>
             </div>
 
@@ -2470,7 +2983,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'ESU6', widgetId }) => {
             </div>
 
             <div className="tv-order-box sell" onClick={() => handleQuickTrade('SELL')}>
-              <span style={{ fontSize: '13px', fontWeight: 400, lineHeight: '16px' }}>{targetProduct.bid ? targetProduct.bid.toFixed(2) : '7,552.25'}</span>
+              <span style={{ fontSize: '13px', fontWeight: 400, lineHeight: '16px' }}>{targetProduct.bid ? targetProduct.bid.toFixed(symbolDigits) : (currentOHLC.close || 0).toFixed(symbolDigits)}</span>
               <span style={{ fontSize: '11px', fontWeight: 400, lineHeight: '12px' }}>SELL</span>
             </div>
           </div>}

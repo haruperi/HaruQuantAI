@@ -16,7 +16,7 @@ export const useTradingStore = create<TradingStoreState>((set) => ({
 
   // Market Quotes Data
   products: initialProducts,
-  selectedSymbol: 'ESU5',
+  selectedSymbol: 'EURUSD',
 
   // Trading State: Orders, Positions, Trade Log
   orders: [

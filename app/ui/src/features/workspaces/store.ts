@@ -33,6 +33,18 @@ import {
 /** Loose id comparison replaced with an explicit string coercion everywhere. */
 const sameId = (a: string | number, b: string | number | null): boolean => String(a) === String(b);
 
+/**
+ * Title convention for widgets whose heading names the instrument they show.
+ *
+ * These match the seeded widget titles exactly, which is what lets
+ * `setWidgetSymbol` tell a conventional title apart from a custom one.
+ */
+const SYMBOL_TITLE_SUFFIX: Partial<Record<WidgetType, string>> = {
+  chart: "Chart",
+  priceLadder: "DOM",
+  optionsGrid: "Options",
+};
+
 /** Maps the backend's `runtime_profile` to the UI's account-mode presentation. Never guesses. */
 export function mapRuntimeProfileToAccountMode(profile?: string): AccountMode {
   switch (profile) {
@@ -54,7 +66,7 @@ const DEFAULT_WORKSPACES: Workspace[] = [
     expandedWidgetId: null,
     widgets: [
       { id: "markets-1", type: "markets", title: "Markets", col: 1, row: 1, colSpan: 6, rowSpan: 2 },
-      { id: "chart-1", type: "chart", title: "ESU5 Chart", symbol: "ESU5", col: 7, row: 1, colSpan: 6, rowSpan: 2 },
+      { id: "chart-1", type: "chart", title: "EURUSD Chart", symbol: "EURUSD", col: 7, row: 1, colSpan: 6, rowSpan: 2 },
       { id: "ladder-1", type: "priceLadder", title: "ESU5 DOM", symbol: "ESU5", col: 1, row: 3, colSpan: 4, rowSpan: 2 },
       { id: "positions-1", type: "positions", title: "Positions & Orders", col: 5, row: 3, colSpan: 8, rowSpan: 2 },
     ],
@@ -101,6 +113,7 @@ export interface WorkspaceStoreState {
   moveWidgetToCell: (widgetId: string, col: number, row: number) => void;
   resizeWidget: (widgetId: string, colSpan: number, rowSpan: number) => void;
   addWidgetToWorkspace: (widgetType: WidgetType, customTitle?: string, symbol?: string) => void;
+  setWidgetSymbol: (widgetId: string, symbol: string) => void;
   removeWidget: (widgetId: string) => void;
 
   // Order-confirmation actions
@@ -215,7 +228,7 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
             name: `New Workspace-${nextNum}`,
             widgets: [
               { id: `markets-${newId}`, type: "markets", title: "Markets", colSpan: 6, rowSpan: 2 },
-              { id: `chart-${newId}`, type: "chart", title: "ESU5 Chart", symbol: "ESU5", colSpan: 6, rowSpan: 2 },
+              { id: `chart-${newId}`, type: "chart", title: "EURUSD Chart", symbol: "EURUSD", colSpan: 6, rowSpan: 2 },
             ],
             expandedWidgetId: null,
           };
@@ -350,7 +363,7 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
           };
         }),
 
-      addWidgetToWorkspace: (widgetType, customTitle, symbol = "ESU5") =>
+      addWidgetToWorkspace: (widgetType, customTitle, symbol = "EURUSD") =>
         set((state) => ({
           workspaces: state.workspaces.map((ws) => {
             if (!sameId(ws.id, state.activeWorkspaceId)) return ws;
@@ -360,6 +373,49 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
             return { ...ws, widgets: [...ws.widgets, newWidget] };
           }),
         })),
+
+      /**
+       * Record the symbol a symbol-bound widget is currently showing.
+       *
+       * Widgets own their active symbol internally, so without this the stored
+       * `symbol` and `title` keep describing whatever the widget was created
+       * with — a chart moved to GBPJPY still reads "EURUSD Chart" and reopens
+       * on EURUSD. The title is only regenerated while it still matches the
+       * convention for the previous symbol, so a deliberately custom title
+       * (see `addWidgetToWorkspace`) is never overwritten.
+       */
+      setWidgetSymbol: (widgetId, symbol) =>
+        set((state) => {
+          const next = symbol.trim().toUpperCase();
+          if (!next) return state;
+
+          const activeWs = state.workspaces.find((ws) => sameId(ws.id, state.activeWorkspaceId));
+          const widget = activeWs?.widgets.find((w) => sameId(w.id, widgetId));
+          if (!widget || widget.symbol === next) return state;
+
+          const suffix = SYMBOL_TITLE_SUFFIX[widget.type];
+          const retitle =
+            suffix !== undefined && widget.title === `${widget.symbol} ${suffix}`;
+
+          return {
+            workspaces: state.workspaces.map((ws) =>
+              sameId(ws.id, state.activeWorkspaceId)
+                ? {
+                    ...ws,
+                    widgets: ws.widgets.map((w) =>
+                      sameId(w.id, widgetId)
+                        ? {
+                            ...w,
+                            symbol: next,
+                            title: retitle ? `${next} ${suffix}` : w.title,
+                          }
+                        : w
+                    ),
+                  }
+                : ws
+            ),
+          };
+        }),
 
       removeWidget: (widgetId) =>
         set((state) => ({
@@ -390,7 +446,7 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         if (!parsed.success) return currentState;
         return { ...currentState, ...parsed.data };
       },
-      version: 1,
+      version: 2,
     }
   )
 );

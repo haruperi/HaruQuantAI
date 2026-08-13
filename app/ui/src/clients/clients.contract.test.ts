@@ -41,6 +41,7 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.data.symbols", method: "GET", path: "/api/v1/data/symbols", permission: "data:read" },
   { id: "api.data.markets", method: "GET", path: "/api/v1/data/markets", permission: "data:read" },
   { id: "api.data.quotes", method: "GET", path: "/api/v1/data/quotes", permission: "data:read" },
+  { id: "api.data.bars", method: "GET", path: "/api/v1/data/bars", permission: "data:read" },
   { id: "api.data.capabilities", method: "GET", path: "/api/v1/data/capabilities", permission: "data:read" },
   { id: "api.data.stream", method: "GET", path: "/api/v1/data/stream", permission: "data:read" },
   { id: "api.indicators.list", method: "GET", path: "/api/v1/indicators", permission: "indicators:read" },
@@ -148,9 +149,9 @@ const EXPECTED: ReadonlyArray<{
 ];
 
 describe("clients match the backend route catalog", () => {
-  it("has exactly the approved 88 operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(88);
-    expect(ROUTE_CONTRACTS).toHaveLength(88);
+  it("has exactly the approved 89 operations", () => {
+    expect(ROUTE_CONTRACT_COUNT).toBe(89);
+    expect(ROUTE_CONTRACTS).toHaveLength(89);
   });
 
   it("matches every expected id, method, path, and permission", () => {

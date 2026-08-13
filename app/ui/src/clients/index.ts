@@ -45,6 +45,10 @@ export type {
 } from "./settings";
 export type { Watchlist, WatchlistItem, WatchlistUpdate } from "./watchlists";
 export type {
+  Bar,
+  BarSeries,
+  BarTimeframe,
+  BarsQuery,
   DataCapabilities,
   DataCapability,
   MarketDirectory as MarketDirectoryPage,
@@ -56,6 +60,7 @@ export type {
   SymbolRow,
   SymbolsQuery,
 } from "./data";
+export { BAR_TIMEFRAMES } from "./data";
 export { openStream } from "./stream";
 export type { StreamTransportOptions } from "./stream";
 export type { StrategyCatalogue, StrategyVersion } from "./strategies";

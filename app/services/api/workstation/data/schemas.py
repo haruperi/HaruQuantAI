@@ -1,9 +1,18 @@
-"""Data gateway request schemas."""
+"""Data gateway request schemas and owner-response projections."""
 
 from collections.abc import Mapping
-from typing import Literal
+from decimal import Decimal
+from typing import Final, Literal
 
+from app.services.api import build_api_metadata, build_api_response
 from app.services.api.contracts.models import _BaseApiContract
+
+# Data's canonical timeframe manifest, restated here as the accepted query
+# domain so an unsupported key is refused at the boundary with a 422 rather
+# than reaching Data as an UNSUPPORTED_TIMEFRAME failure.
+type BarTimeframe = Literal["M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN1"]
+
+BAR_TIMEFRAMES: Final = ("M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN1")
 
 
 class DatasetPrepareRequest(_BaseApiContract):
@@ -38,7 +47,123 @@ class DatasetImportRequest(_BaseApiContract):
     payload: Mapping[str, object]
 
 
+def _number(value: object) -> float | None:
+    """Project one Data-owned decimal price or volume as a JSON number.
+
+    Data returns exact ``Decimal`` values under the ``decimal_string``
+    precision policy. A chart plots pixels, so the transport carries plain
+    numbers; the exactness that matters downstream stays with Data.
+
+    Args:
+        value: Decimal, numeric, or absent record field.
+
+    Returns:
+        Finite float, or ``None`` when the field carries no value.
+    """
+    if value is None:
+        return None
+    if isinstance(value, Decimal | int | float):
+        return float(value)
+    return None
+
+
+def _project_bar(record: object) -> dict[str, object]:
+    """Project one canonical OHLCV record into the chart transport shape.
+
+    Args:
+        record: Data-owned ``OHLCVRecord``.
+
+    Returns:
+        Bar mapping carrying the UTC open time and OHLCV values.
+    """
+    timestamp = getattr(record, "timestamp", None)
+    return {
+        "time": timestamp.isoformat() if timestamp is not None else None,
+        "open": _number(getattr(record, "open", None)),
+        "high": _number(getattr(record, "high", None)),
+        "low": _number(getattr(record, "low", None)),
+        "close": _number(getattr(record, "close", None)),
+        "volume": _number(getattr(record, "volume", None)),
+    }
+
+
+def build_bar_series_response(
+    response: object,
+    *,
+    source_id: str,
+    symbol: str,
+    timeframe: str,
+    request_id: str,
+) -> object:
+    """Normalize one Data bar dataset into the canonical API envelope.
+
+    A failed or empty owner read stays explicit: the gateway never substitutes
+    generated bars for a provider result a chart would render as real history.
+
+    Args:
+        response: Data standard response carrying a ``MarketDataset``.
+        source_id: Resolved Data provider identifier.
+        symbol: Broker-native symbol the caller requested.
+        timeframe: Canonical timeframe the caller requested.
+        request_id: Canonical API request identifier.
+
+    Returns:
+        Validated API response envelope carrying the ordered bar series.
+    """
+    response_status = str(getattr(response, "status", "error"))
+    dataset = getattr(response, "data", None)
+    upstream_error = getattr(response, "error", None)
+
+    gateway_error = None
+    if response_status != "success":
+        gateway_error = {
+            "code": "UPSTREAM_UNAVAILABLE",
+            "message": str(getattr(upstream_error, "message", "Bars unavailable")),
+            "details": {
+                "upstream_code": str(getattr(upstream_error, "code", "UNKNOWN_ERROR"))
+            },
+            "retryable": bool(getattr(upstream_error, "retryable", False)),
+            "request_id": request_id,
+            "trace_id": None,
+        }
+
+    data_payload = None
+    if dataset is not None:
+        records = tuple(getattr(dataset, "records", ()))
+        start = getattr(dataset, "start", None)
+        end = getattr(dataset, "end", None)
+        data_payload = {
+            "source_id": source_id,
+            "symbol": str(getattr(dataset, "symbol", symbol)),
+            "timeframe": str(getattr(dataset, "timeframe", timeframe) or timeframe),
+            "bars": [_project_bar(record) for record in records],
+            "count": len(records),
+            "start": start.isoformat() if start is not None else None,
+            "end": end.isoformat() if end is not None else None,
+            "cache_status": str(getattr(dataset, "cache_status", "not_used")),
+            "request_id": request_id,
+        }
+
+    return build_api_response(
+        status=response_status,
+        message=(
+            "Bars retrieved" if response_status == "success" else "Bars unavailable"
+        ),
+        data=data_payload,
+        error=gateway_error,
+        metadata=build_api_metadata(
+            request_id=request_id,
+            route="/api/v1/data/bars",
+            operation="api.data.bars",
+            side_effect="read",
+        ),
+    )
+
+
 __all__ = (
+    "BAR_TIMEFRAMES",
+    "BarTimeframe",
     "DatasetImportRequest",
     "DatasetPrepareRequest",
+    "build_bar_series_response",
 )

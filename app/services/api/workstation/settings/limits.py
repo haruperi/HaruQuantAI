@@ -7,6 +7,12 @@ from typing import Final
 
 API_DEFAULT_PAGE_SIZE: Final = 50
 API_MAX_PAGE_SIZE: Final = 200
+# Bar history is not a paginated directory read: one chart request asks for a
+# contiguous window, so it carries its own bound rather than the page size.
+# The ceiling is sized for backtest-scale reads — ten years of M5 is roughly
+# 750k bars — not for what a chart can legibly draw at once.
+API_DEFAULT_BAR_COUNT: Final = 500
+API_MAX_BAR_COUNT: Final = 1_000_000
 API_ENDPOINT_TIMEOUT_SECONDS: Final = 30.0
 PREFLIGHT_WARNING_TTL_SECONDS: Final = 30.0
 HTTP_IDEMPOTENCY_RETENTION_SECONDS: Final = 86_400

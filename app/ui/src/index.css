@@ -1406,8 +1406,15 @@ body {
    TRADINGVIEW CHART WIDGET CUSTOM STYLES
    ========================================================================== */
 .tv-toolbar {
-  height: 38px;
-  flex: 0 0 38px;
+  /* Wraps to a second row when the widget is too narrow for every control.
+     The toolbar is what yields under pressure — squeezing the controls
+     instead would just move the clipping somewhere less visible. Overflow
+     scrolling is deliberately not used here: it would establish a clipping
+     context and cut off the symbol autocomplete, which drops below this bar. */
+  min-height: 38px;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  row-gap: 2px;
   background: var(--tv-bg);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
@@ -1419,6 +1426,15 @@ body {
   font-size: 14px;
   font-weight: 400;
   user-select: none;
+}
+
+/* Each side of the toolbar wraps internally too, so a long run of controls
+   reflows instead of overflowing its half. */
+.tv-toolbar-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 2px;
 }
 
 .tv-toolbar-divider {
@@ -1467,6 +1483,9 @@ body {
   background: transparent;
   padding: 0 8px;
   height: 30px;
+  /* The symbol names the chart, so this box never gives up width to its
+     neighbours; the toolbar wraps instead. */
+  flex-shrink: 0;
 }
 
 .tv-search-input-field {
@@ -1475,9 +1494,25 @@ body {
   color: #ffffff;
   font-size: 14px;
   font-weight: 400;
-  width: 45px;
+  /* Sizes to the symbol it holds: a short pair takes no more toolbar room
+     than it needs, and a long name is never cut. A fixed width could only
+     ever be right for one length — 45px clipped 1615 of the broker's 1729
+     instrument names, and any single value wide enough for the longest
+     (SKHYNIX.KR-PERP) would waste that space on every EURUSD.
+
+     `field-sizing` measures the real glyphs. Where it is unsupported
+     (Firefox today) the input's `size` attribute, kept in step with the
+     value, approximates the same result — hence `width: auto`, which both
+     paths need. */
+  field-sizing: content;
+  width: auto;
+  /* Usable when empty; bounded so a pathological name cannot crowd out the
+     rest of the toolbar. Past the bound, ellipsis beats a half-drawn glyph. */
+  min-width: 7ch;
+  max-width: 22ch;
   outline: none;
   text-transform: uppercase;
+  text-overflow: ellipsis;
   font-family: var(--font-sans);
 }
 

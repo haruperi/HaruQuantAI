@@ -288,12 +288,17 @@ def test_http_session_cookies_and_csrf_logout(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Preserve browser cookies while enveloping authentication responses."""
+    """Preserve browser cookies while enveloping authentication responses.
+
+    Auto-login is disabled here so the post-logout assertion tests the session
+    lifecycle: with the dev bypass on, a logged-out caller is silently handed a
+    substitute principal and `/auth/me` never reports 401.
+    """
     monkeypatch.setenv("DATABASE_URL", "sqlite:///api-http-identity.db")
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("SQLITE_BUSY_TIMEOUT_SECONDS", "1.0")
     monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "10.0")
-    app = create_api_app(build_api_settings())
+    app = create_api_app(build_api_settings(dev_auto_login=False))
     with TestClient(app) as client:
         registered = client.post(
             "/api/v1/auth/register",

@@ -170,6 +170,246 @@ def test_symbol_directory_translates_data_failure(
     assert body["error"]["retryable"] is True
 
 
+# --- Bar history (FR-API-126) -------------------------------------------------
+
+
+def _bar(index: int) -> SimpleNamespace:
+    """Build one canonical OHLCV record stand-in.
+
+    Args:
+        index: Sequence position used to vary the bar deterministically.
+
+    Returns:
+        Record exposing the fields the bar projection reads.
+    """
+    from datetime import UTC, datetime, timedelta
+    from decimal import Decimal
+
+    return SimpleNamespace(
+        timestamp=datetime(2026, 8, 13, tzinfo=UTC) + timedelta(hours=index),
+        open=Decimal("1.1000") + Decimal(index) * Decimal("0.0010"),
+        high=Decimal("1.1020") + Decimal(index) * Decimal("0.0010"),
+        low=Decimal("1.0990") + Decimal(index) * Decimal("0.0010"),
+        close=Decimal("1.1010") + Decimal(index) * Decimal("0.0010"),
+        volume=Decimal(100 + index),
+    )
+
+
+def _dataset(count: int) -> SimpleNamespace:
+    """Build one Data-owned bar dataset stand-in.
+
+    Args:
+        count: Number of records the dataset carries.
+
+    Returns:
+        Dataset exposing the fields the bar projection reads.
+    """
+    records = tuple(_bar(index) for index in range(count))
+    return SimpleNamespace(
+        symbol="EURUSD",
+        timeframe="H1",
+        records=records,
+        start=records[0].timestamp,
+        end=records[-1].timestamp,
+        cache_status="not_used",
+    )
+
+
+def test_bars_requires_read_permission() -> None:
+    """The bars route refuses callers without data:read permission."""
+    app = FastAPI()
+    app.include_router(data.router)
+    app.dependency_overrides[require_auth_context] = lambda: _auth(permissions=())
+    status_code, _body = get_json(
+        app, "/api/v1/data/bars", query_string="symbol=EURUSD"
+    )
+    assert status_code == 403
+
+
+def test_bars_project_owner_records_as_numbers(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The route returns Data's ordered bars in the canonical API envelope."""
+    monkeypatch.setattr(
+        data_dependencies, "resolve_runtime_source_id", lambda *_a, **_kw: "mt5"
+    )
+    monkeypatch.setattr(
+        data_dependencies,
+        "get_market_data",
+        lambda _request: SimpleNamespace(
+            status="success", data=_dataset(3), error=None
+        ),
+    )
+
+    status_code, body = get_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/bars",
+        query_string="symbol=EURUSD&timeframe=H1&limit=3",
+    )
+
+    assert status_code == 200
+    assert body["status"] == "success"
+    payload = body["data"]
+    assert payload["source_id"] == "mt5"
+    assert payload["symbol"] == "EURUSD"
+    assert payload["timeframe"] == "H1"
+    assert payload["count"] == 3
+    assert len(payload["bars"]) == 3
+    first = payload["bars"][0]
+    assert first["time"] == "2026-08-13T00:00:00+00:00"
+    assert first["open"] == pytest.approx(1.1000)
+    assert first["high"] == pytest.approx(1.1020)
+    assert first["low"] == pytest.approx(1.0990)
+    assert first["close"] == pytest.approx(1.1010)
+    assert first["volume"] == pytest.approx(100.0)
+    assert body["metadata"]["route"] == "/api/v1/data/bars"
+    assert body["metadata"]["operation"] == "api.data.bars"
+
+
+def test_bars_forward_the_resolved_source_and_bounded_request(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The route resolves the runtime broker and asks Data for fresh bars."""
+    captured: dict[str, object] = {}
+
+    def _fake_resolve(
+        override: str | None = None, *, request_id: str | None = None
+    ) -> str:
+        captured["override"] = override
+        return override or "mt5"
+
+    def _fake_get(request: object) -> object:
+        captured["source_id"] = request.source_id
+        captured["symbol"] = request.symbol
+        captured["data_kind"] = request.data_kind
+        captured["timeframe"] = request.timeframe
+        captured["limit"] = request.limit
+        captured["use_cache"] = request.use_cache
+        return SimpleNamespace(status="success", data=_dataset(2), error=None)
+
+    monkeypatch.setattr(data_dependencies, "resolve_runtime_source_id", _fake_resolve)
+    monkeypatch.setattr(data_dependencies, "get_market_data", _fake_get)
+
+    status_code, _body = get_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/bars",
+        query_string="symbol=GBPUSD&timeframe=M15&limit=250",
+    )
+
+    assert status_code == 200
+    assert captured["override"] is None
+    assert captured["source_id"] == "mt5"
+    assert captured["symbol"] == "GBPUSD"
+    assert captured["data_kind"] == "bars"
+    assert captured["timeframe"] == "M15"
+    assert captured["limit"] == 250
+    # A chart must never render a cached window as the live market.
+    assert captured["use_cache"] is False
+
+
+def test_bars_reject_a_timeframe_outside_the_owner_manifest() -> None:
+    """A timeframe Data cannot serve is refused at the boundary."""
+    status_code, _body = get_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/bars",
+        query_string="symbol=EURUSD&timeframe=H3",
+    )
+    assert status_code == 422
+
+
+def test_bars_reject_an_inverted_window() -> None:
+    """An end at or before start never reaches Data."""
+    status_code, body = get_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/bars",
+        query_string=(
+            "symbol=EURUSD&start=2026-08-13T00:00:00Z&end=2026-08-12T00:00:00Z"
+        ),
+    )
+    assert status_code == 422
+    assert body["detail"] == "BAR_WINDOW_INVALID"
+
+
+def test_bars_reject_a_count_above_the_bound() -> None:
+    """The chart cannot ask for an unbounded history over HTTP.
+
+    The ceiling accommodates backtest-scale reads (ten years of M5 is roughly
+    750k bars), so the bound is asserted at its edge rather than at a value a
+    chart would realistically request.
+    """
+    status_code, _body = get_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/bars",
+        query_string="symbol=EURUSD&limit=1000001",
+    )
+    assert status_code == 422
+
+
+def test_bars_translate_a_data_failure_without_substituting_bars(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An unavailable provider stays explicit; the gateway invents no history."""
+    monkeypatch.setattr(
+        data_dependencies, "resolve_runtime_source_id", lambda *_a, **_kw: "mt5"
+    )
+    monkeypatch.setattr(
+        data_dependencies,
+        "get_market_data",
+        lambda _request: SimpleNamespace(
+            status="error",
+            data=None,
+            error=SimpleNamespace(
+                code="SOURCE_UNAVAILABLE",
+                message="Configured source is unavailable",
+                retryable=True,
+            ),
+        ),
+    )
+
+    status_code, body = get_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/bars",
+        query_string="symbol=EURUSD",
+    )
+
+    assert status_code == 200
+    assert body["status"] == "error"
+    assert body["data"] is None
+    assert body["error"]["code"] == "UPSTREAM_UNAVAILABLE"
+    assert body["error"]["details"]["upstream_code"] == "SOURCE_UNAVAILABLE"
+    assert body["error"]["retryable"] is True
+
+
+def test_bars_retry_once_through_an_mt5_history_warm_up(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A single warm-up bar triggers exactly one retry for the real window."""
+    responses = [
+        SimpleNamespace(status="success", data=_dataset(1), error=None),
+        SimpleNamespace(status="success", data=_dataset(4), error=None),
+    ]
+    calls: list[object] = []
+
+    def _fake_get(request: object) -> object:
+        calls.append(request)
+        return responses[min(len(calls) - 1, len(responses) - 1)]
+
+    monkeypatch.setattr(
+        data_dependencies, "resolve_runtime_source_id", lambda *_a, **_kw: "mt5"
+    )
+    monkeypatch.setattr(data_dependencies, "get_market_data", _fake_get)
+
+    status_code, body = get_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/bars",
+        query_string="symbol=EURUSD&limit=4",
+    )
+
+    assert status_code == 200
+    assert len(calls) == 2
+    assert body["data"]["count"] == 4
+
+
 def test_prepare_requires_idempotency_key() -> None:
     """Preparation without an idempotency key never reaches Data."""
 

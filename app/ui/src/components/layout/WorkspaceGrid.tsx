@@ -288,7 +288,7 @@ export const WorkspaceGrid: React.FC = () => {
       case 'watchlist':
         return <WatchlistWidget />;
       case 'chart':
-        return <ChartWidget symbol={widget.symbol || 'ESU5'} widgetId={widget.id} />;
+        return <ChartWidget symbol={widget.symbol || 'EURUSD'} widgetId={widget.id} />;
       case 'priceLadder':
         return <PriceLadderWidget symbol={widget.symbol || 'ESU5'} />;
       case 'optionsGrid':

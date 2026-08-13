@@ -273,3 +273,72 @@ describe("FR-UI-029 no fixture data", () => {
     expect(contractsSource).not.toMatch(/from ['"].*\/mock\//);
   });
 });
+
+describe("symbol-bound widget headings follow the charted symbol", () => {
+  it("retitles and repoints a chart widget when its symbol changes", () => {
+    useWorkspaceStore.getState().setWidgetSymbol("chart-1", "GBPJPY");
+
+    const widget = useWorkspaceStore
+      .getState()
+      .workspaces.find((w) => w.id === 1)!
+      .widgets.find((w) => w.id === "chart-1")!;
+
+    expect(widget.symbol).toBe("GBPJPY");
+    expect(widget.title).toBe("GBPJPY Chart");
+  });
+
+  it("normalizes case and whitespace, and ignores a blank symbol", () => {
+    useWorkspaceStore.getState().setWidgetSymbol("chart-1", "  gbpusd  ");
+    const after = () =>
+      useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!
+        .widgets.find((w) => w.id === "chart-1")!;
+    expect(after().symbol).toBe("GBPUSD");
+
+    useWorkspaceStore.getState().setWidgetSymbol("chart-1", "   ");
+    expect(after().symbol).toBe("GBPUSD");
+    expect(after().title).toBe("GBPUSD Chart");
+  });
+
+  it("applies each widget type's own naming convention", () => {
+    useWorkspaceStore.getState().setWidgetSymbol("ladder-1", "NQZ5");
+    const widget = useWorkspaceStore
+      .getState()
+      .workspaces.find((w) => w.id === 1)!
+      .widgets.find((w) => w.id === "ladder-1")!;
+    expect(widget.title).toBe("NQZ5 DOM");
+  });
+
+  it("never overwrites a title the user chose rather than the convention", () => {
+    useWorkspaceStore.setState((state) => ({
+      workspaces: state.workspaces.map((ws) =>
+        ws.id === 1
+          ? {
+              ...ws,
+              widgets: ws.widgets.map((w) =>
+                w.id === "chart-1" ? { ...w, title: "Morning scalps" } : w
+              ),
+            }
+          : ws
+      ),
+    }));
+
+    useWorkspaceStore.getState().setWidgetSymbol("chart-1", "GBPJPY");
+
+    const widget = useWorkspaceStore
+      .getState()
+      .workspaces.find((w) => w.id === 1)!
+      .widgets.find((w) => w.id === "chart-1")!;
+    expect(widget.title).toBe("Morning scalps");
+    expect(widget.symbol).toBe("GBPJPY");
+  });
+
+  it("leaves a widget with no symbol convention untouched", () => {
+    useWorkspaceStore.getState().setWidgetSymbol("positions-1", "EURUSD");
+    const widget = useWorkspaceStore
+      .getState()
+      .workspaces.find((w) => w.id === 1)!
+      .widgets.find((w) => w.id === "positions-1")!;
+    expect(widget.title).toBe("Positions & Orders");
+    expect(widget.symbol).toBe("EURUSD");
+  });
+});

@@ -19,17 +19,23 @@ runtime: Data owns its own connection, storage, and locking infrastructure.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
+from app.services.api.workstation.data.schemas import build_bar_series_response
+from app.services.api.workstation.markets import resolve_runtime_source_id
 from app.services.data import (
     build_dataset_save_request,
     build_external_import_request,
     build_market_data_request,
     describe_import_dialects,
     fetch_market_dataset,
+    get_market_data,
     import_external_dataset,
     save_dataset,
 )
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 type AuthContext = Any
 type _DataOperation = Callable[..., object]
@@ -82,4 +88,116 @@ def build_dataset_source() -> _DataOperation:
     return _operation
 
 
-__all__ = ("build_dataset_source",)
+def _bar_request(
+    *,
+    source_id: str,
+    symbol: str,
+    timeframe: str,
+    limit: int,
+    start: datetime | None,
+    end: datetime | None,
+    request_id: str,
+) -> object:
+    """Build one bounded Data bar-history request.
+
+    Args:
+        source_id: Resolved Data provider identifier.
+        symbol: Broker-native symbol.
+        timeframe: Canonical timeframe key.
+        limit: Bounded bar count.
+        start: Optional inclusive window start.
+        end: Optional inclusive window end.
+        request_id: Canonical request identifier.
+
+    Returns:
+        Validated Data-owned market-data request.
+    """
+    return build_market_data_request(
+        source_id=source_id,
+        symbol=symbol,
+        data_kind="bars",
+        timeframe=timeframe,
+        start=start,
+        end=end,
+        limit=limit,
+        # A chart is a live view: its newest bar changes on every tick, so a
+        # cached window would render as a frozen market.
+        use_cache=False,
+        quality_failure_behavior="warn",
+        workflow_context="research",
+        precision_policy="decimal_string",
+        request_id=request_id,
+    )
+
+
+def orchestrate_bars(
+    *,
+    symbol: str,
+    timeframe: str,
+    limit: int,
+    source_id: str | None,
+    start: datetime | None,
+    end: datetime | None,
+    request_id: str,
+) -> object:
+    """Delegate one bounded bar-history read to Data.
+
+    Args:
+        symbol: Broker-native symbol requested by the caller.
+        timeframe: Canonical timeframe key.
+        limit: Bounded bar count.
+        source_id: Optional explicit Data provider.
+        start: Optional inclusive window start.
+        end: Optional inclusive window end.
+        request_id: Canonical request identifier.
+
+    Returns:
+        Normalized API bar-series response.
+    """
+    resolved_source_id = resolve_runtime_source_id(source_id, request_id=request_id)
+    request = _bar_request(
+        source_id=resolved_source_id,
+        symbol=symbol,
+        timeframe=timeframe,
+        limit=limit,
+        start=start,
+        end=end,
+        request_id=request_id,
+    )
+    response = get_market_data(cast("Any", request))
+
+    dataset = getattr(response, "data", None)
+    if (
+        getattr(response, "status", None) == "success"
+        and dataset is not None
+        and len(getattr(dataset, "records", ())) <= 1
+        and limit > 1
+    ):
+        # MT5 can return only its current bar while it synchronizes a symbol's
+        # history. One retry reads the synchronized window; a genuinely short
+        # history simply returns the same result.
+        response = get_market_data(
+            cast(
+                "Any",
+                _bar_request(
+                    source_id=resolved_source_id,
+                    symbol=symbol,
+                    timeframe=timeframe,
+                    limit=limit,
+                    start=start,
+                    end=end,
+                    request_id=request_id,
+                ),
+            )
+        )
+
+    return build_bar_series_response(
+        response,
+        source_id=resolved_source_id,
+        symbol=symbol,
+        timeframe=timeframe,
+        request_id=request_id,
+    )
+
+
+__all__ = ("build_dataset_source", "orchestrate_bars")

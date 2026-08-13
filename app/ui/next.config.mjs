@@ -7,6 +7,13 @@ const backendUrl = process.env.BACKEND_URL ?? "http://127.0.0.1:8000";
 
 const nextConfig = {
   reactStrictMode: true,
+  // Backtest-scale bar reads are genuinely slow at the broker: a million M1
+  // bars takes MT5 about three minutes to return. The rewrite proxy's 30s
+  // default aborts those with a 500 that looks like a gateway fault, so it is
+  // raised past the slowest read the Chart widget can ask for.
+  experimental: {
+    proxyTimeout: 600_000,
+  },
   async rewrites() {
     return [
       {

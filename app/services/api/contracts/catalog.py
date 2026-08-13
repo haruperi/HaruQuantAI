@@ -302,6 +302,13 @@ _KNOWN_ROUTE_CONTRACTS: tuple[RouteContract, ...] = (
         "data:read",
     ),
     _contract(
+        "api.data.bars",
+        "GET",
+        "/api/v1/data/bars",
+        "data",
+        "data:read",
+    ),
+    _contract(
         "api.data.capabilities",
         "GET",
         "/api/v1/data/capabilities",

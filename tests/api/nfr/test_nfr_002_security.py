@@ -32,13 +32,22 @@ def _providers() -> dict[str, object]:
 
 @pytest.fixture
 def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[misc]
-    """Build the canonical in-process app with a stub owner graph."""
+    """Build the canonical in-process app with a stub owner graph.
+
+    `dev_auto_login` defaults to on and, in a dev environment, substitutes a
+    full-permission principal whenever session validation fails. That bypass is
+    a separate feature with its own containment test below; leaving it enabled
+    here would mean these assertions never reach the gate they exist to verify.
+    """
     monkeypatch.setenv("DATABASE_URL", "sqlite:///nfr-002-security.db")
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("SQLITE_BUSY_TIMEOUT_SECONDS", "1.0")
     monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "10.0")
     graph = build_in_process_api_graph(_providers())
-    app = create_api_app(build_api_settings(), in_process_graph=graph)
+    app = create_api_app(
+        build_api_settings(dev_auto_login=False),
+        in_process_graph=graph,
+    )
     with TestClient(app) as c:
         yield c
 
@@ -114,3 +123,38 @@ class TestNfrApi002Security:
         )
         assert response.status_code == 403
         assert response.json()["error"]["code"] == "AUTHORIZATION_DENIED"
+
+    @staticmethod
+    @pytest.mark.parametrize("environment", ["test", "staging", "production"])
+    def test_dev_auto_login_cannot_be_enabled_outside_dev(environment: str) -> None:
+        """The full-permission dev bypass is refused by any non-dev settings build.
+
+        Auto-login substitutes a principal holding every permission in the route
+        registry. Its only containment is this environment constraint, so the
+        constraint itself is pinned rather than assumed.
+        """
+        with pytest.raises(ValueError, match="dev_auto_login"):
+            build_api_settings(environment=environment, dev_auto_login=True)
+
+    @staticmethod
+    def test_dev_auto_login_admits_an_unauthenticated_caller_in_dev(
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Document the bypass's real effect: no session still reaches a route.
+
+        This is deliberate local-development behaviour, not a gate failure. It
+        is asserted so that turning the default off becomes a visible decision
+        rather than a silent one.
+        """
+        monkeypatch.setenv("DATABASE_URL", "sqlite:///nfr-002-security.db")
+        monkeypatch.setenv("DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("SQLITE_BUSY_TIMEOUT_SECONDS", "1.0")
+        monkeypatch.setenv("WRITE_LOCK_LEASE_SECONDS", "10.0")
+        graph = build_in_process_api_graph(_providers())
+        app = create_api_app(
+            build_api_settings(environment="dev", dev_auto_login=True),
+            in_process_graph=graph,
+        )
+        with TestClient(app) as bypassed:
+            assert bypassed.get("/api/v1/settings").status_code == 200
