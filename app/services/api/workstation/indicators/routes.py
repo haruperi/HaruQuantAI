@@ -1,19 +1,31 @@
 """Authenticated read-only Indicators catalogue and spec routes."""
 
 from collections.abc import Mapping
+from datetime import datetime
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
+from app.services.api import build_api_metadata, build_api_response
 from app.services.api.identity import (
     require_auth_context,
     require_permission,
 )
+from app.services.api.workstation.data.schemas import BarTimeframe  # noqa: TC001
+from app.services.api.workstation.indicators.orchestration import (
+    orchestrate_indicator_series,
+)
+from app.services.api.workstation.indicators.schemas import (
+    ChartIndicatorId,  # noqa: TC001
+    IndicatorSource,  # noqa: TC001
+)
+from app.services.api.workstation.settings.limits import API_MAX_BAR_COUNT
 from app.services.indicators import (
     get_capability_matrix,
     get_indicator,
     list_indicators,
 )
+from app.utils import generate_id
 
 type AuthContext = Any
 
@@ -41,20 +53,56 @@ def _to_jsonable(obj: object) -> object:
     return obj
 
 
-def _format_response(response: object) -> object:
-    """Ensure StandardResponse data field contains only JSON-serializable types.
+def _format_response(
+    response: object,
+    *,
+    route: str,
+    operation: str,
+) -> object:
+    """Project an Indicators owner response into the canonical API envelope.
 
     Args:
         response: Response envelope to format.
+        route: Canonical HTTP route template.
+        operation: Registered API operation identifier.
 
     Returns:
-        Formatted response envelope with JSON-serializable data payload.
+        Canonical API response with a JSON-serializable owner payload.
     """
-    if hasattr(response, "data") and response.data is not None:
-        data = response.data
-        if hasattr(response, "model_copy"):
-            return response.model_copy(update={"data": _to_jsonable(data)})
-    return response
+    owner_status = str(getattr(response, "status", "error"))
+    owner_data = getattr(response, "data", None)
+    owner_error = getattr(response, "error", None)
+    request_id = generate_id("req")
+    succeeded = owner_status == "success" and owner_data is not None
+    return build_api_response(
+        status="success" if succeeded else "error",
+        message=(
+            str(getattr(response, "message", "Indicators request completed"))
+            if succeeded
+            else "Indicator unavailable"
+        ),
+        data=_to_jsonable(owner_data) if succeeded else None,
+        error=(
+            None
+            if succeeded
+            else {
+                "code": "NOT_FOUND",
+                "message": str(
+                    getattr(owner_error, "message", "Indicator unavailable")
+                ),
+                "details": {},
+                "retryable": False,
+                "request_id": request_id,
+                "trace_id": None,
+            }
+        ),
+        metadata=build_api_metadata(
+            request_id=request_id,
+            route=route,
+            operation=operation,
+            side_effect="read",
+        ),
+    )
 
 
 @router.get("", response_model=None)
@@ -63,7 +111,11 @@ def _list_indicator_catalogue(
 ) -> object:
     """Return the registered Indicators catalogue."""
     require_permission(context, "indicators:read")
-    return _format_response(list_indicators())
+    return _format_response(
+        list_indicators(),
+        route="/api/v1/indicators",
+        operation="api.indicators.list",
+    )
 
 
 @router.get("/capabilities", response_model=None)
@@ -72,7 +124,40 @@ def _get_indicator_capabilities(
 ) -> object:
     """Return the Indicators capability matrix."""
     require_permission(context, "indicators:read")
-    return _format_response(get_capability_matrix())
+    return _format_response(
+        get_capability_matrix(),
+        route="/api/v1/indicators/capabilities",
+        operation="api.indicators.capabilities",
+    )
+
+
+@router.get("/{indicator_id}/series", response_model=None)
+def _get_indicator_series(
+    indicator_id: ChartIndicatorId,
+    context: Annotated[AuthContext, Depends(require_auth_context)],
+    symbol: Annotated[str, Query(min_length=1, max_length=128)],
+    timeframe: BarTimeframe = "H1",
+    period: Annotated[int, Query(ge=2, le=10_000)] = 14,
+    source: IndicatorSource = "close",
+    limit: Annotated[int, Query(ge=2, le=API_MAX_BAR_COUNT)] = 500,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    source_id: str | None = None,
+) -> object:
+    """Return one Indicators-owned chart series over uncached Data bars."""
+    require_permission(context, "indicators:read")
+    return orchestrate_indicator_series(
+        indicator_id=indicator_id,
+        symbol=symbol,
+        timeframe=timeframe,
+        period=period,
+        source=source,
+        limit=limit,
+        start=start,
+        end=end,
+        source_id=source_id,
+        request_id=generate_id("req"),
+    )
 
 
 @router.get("/{indicator_id}", response_model=None)
@@ -82,7 +167,11 @@ def _get_indicator_spec(
 ) -> object:
     """Return one registered indicator specification."""
     require_permission(context, "indicators:read")
-    return _format_response(get_indicator(indicator_id))
+    return _format_response(
+        get_indicator(indicator_id),
+        route="/api/v1/indicators/{indicator_id}",
+        operation="api.indicators.get_spec",
+    )
 
 
 __all__ = ("router",)

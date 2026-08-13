@@ -307,6 +307,44 @@ describe("metrics client", () => {
   });
 });
 
+describe("indicators client", () => {
+  it("requests a typed EMA series with explicit calculation parameters", async () => {
+    const fetchMock = vi.fn(async (_input: RequestInfo | URL) =>
+      success({
+        indicator_id: "ema",
+        name: "Exponential Moving Average",
+        symbol: "EURUSD",
+        timeframe: "H1",
+        source_id: "mt5",
+        parameters: { period: 20, source: "close" },
+        points: [{ time: "2026-08-13T09:00:00+00:00", value: null, unavailable_reason: "warmup" }],
+        count: 1,
+        valid_count: 0,
+        availability: "insufficient_history",
+        unavailable_reason: "warmup",
+        indicator_version: "1.0.0",
+        formula_version: "1.0.0",
+        request_id: "req-indicator",
+      })
+    );
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    const response = await apiClients.indicators.series({
+      indicatorId: "ema",
+      symbol: "EURUSD",
+      timeframe: "H1",
+      period: 20,
+      source: "close",
+      limit: 100,
+    });
+
+    expect(unwrapData(response).parameters).toEqual({ period: 20, source: "close" });
+    expect(String(fetchMock.mock.calls[0][0])).toContain(
+      "/api/v1/indicators/ema/series?symbol=EURUSD&timeframe=H1&period=20&source=close&limit=100"
+    );
+  });
+});
+
 describe("watchlists client contract", () => {
   it("requires the backend-derived class on every watchlist item", () => {
     const parsed = watchlistSchema.parse({

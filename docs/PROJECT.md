@@ -1,7 +1,7 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `In Progress` — of 231 registered application features, 217 are implemented and structurally reconciled (93.94%); 13 are `Pending` and 1 is `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Status:** `In Progress` — of 231 registered application features, 218 are implemented and structurally reconciled (94.37%); 12 are `Pending` and 1 is `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
 > **Last updated:** `2026-08-12`
 
 > This document is the system-level source of truth.
@@ -322,7 +322,7 @@ the current input contract rather than represented by unusable stubs.
 #### 2.1.14 API
 
 * **Package**: `app/services/api` — FastAPI gateway.
-* **Status**: Feature-folder migration completed. The registry contains 24 contiguous backend features; 23 are `Completed`, while the pre-existing Indicators catalogue boundary remains `Partial` pending its own requirement definition.
+* **Status**: `Completed`. The registry contains 24 contiguous backend features, including the Indicators catalogue and chart-series boundary.
 * **Responsibility**: Expose owner-domain capabilities through authenticated HTTP and SSE boundaries, enforce transport/security policy, compose runtime dependencies, and translate owner results into stable external contracts.
 * **Inputs**: HTTP and SSE connections, client payloads, authenticated principals, and injected owner-domain public operations.
 * **Outputs**: HTTP responses, SSE events, boundary DTOs, and validated `AuthContext` propagated to downstream domains.
@@ -456,23 +456,23 @@ No circular dependencies exist. Simulation and Analytics may be implemented conc
 
 ### Consolidated feature inventory
 
-The owning package READMEs collectively register exactly 230 canonical `FEAT-*`
+The owning package READMEs collectively register exactly 231 canonical `FEAT-*`
 features. No secondary programme or work-package identifier namespace is active.
 
 | Status | Count |
 | --- | ---: |
-| Completed | 215 |
-| Pending | 13 |
-| Partial | 2 |
+| Completed | 218 |
+| Pending | 12 |
+| Partial | 1 |
 | Missing | 0 |
-| **Total** | **230** |
+| **Total** | **231** |
 
-The thirteen `Pending` features are `FEAT-UI-04`–`FEAT-UI-13`, `FEAT-UI-15`,
+The twelve `Pending` features are `FEAT-UI-05`–`FEAT-UI-13`, `FEAT-UI-15`,
 `FEAT-UI-16`, and `FEAT-UI-17`, each awaiting requirement evidence or focused-folder
 ownership recorded in `app/ui/README.md`. They are the primary trading workspace and
-its enabling foundation, specified by `docs/dev/documentation.pdf`. The two `Partial`
-features are `FEAT-API-15` (`app/services/api/README.md`) and `FEAT-UI-03`
-(`app/ui/README.md`, blocked on one requirement needing a backend field).
+its enabling foundation, specified by `docs/dev/documentation.pdf`. The one `Partial`
+feature is `FEAT-UI-04` (`app/ui/README.md`), whose remaining chart requirements
+await focused evidence.
 
 Feature descriptions, requirements, public APIs, persistence, and evidence remain
 authoritative only in the owning package README; this section is the system-level

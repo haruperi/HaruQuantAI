@@ -242,7 +242,7 @@ export interface BarsQuery {
   symbol: string;
   /** Canonical timeframe key; defaults to `H1` at the backend. */
   timeframe?: BarTimeframe;
-  /** Most-recent bar count, 1..20000; defaults to 500 at the backend. */
+  /** Most-recent bar count, 1..1,000,000; defaults to 500 at the backend. */
   limit?: number;
   /** Defaults to the configured runtime broker when omitted. */
   sourceId?: string;

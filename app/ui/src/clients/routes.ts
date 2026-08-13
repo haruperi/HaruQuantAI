@@ -767,7 +767,7 @@ export const agenticRoutes = {
   }),
 } as const;
 
-// --- Indicators (3) ------------------------------------------------------
+// --- Indicators (4) ------------------------------------------------------
 
 export const indicatorsRoutes = {
   catalogue: route({
@@ -786,6 +786,12 @@ export const indicatorsRoutes = {
     id: "api.indicators.get_spec",
     method: "GET",
     path: "/api/v1/indicators/{indicator_id}",
+    permission: "indicators:read",
+  }),
+  series: route({
+    id: "api.indicators.series",
+    method: "GET",
+    path: "/api/v1/indicators/{indicator_id}/series",
     permission: "indicators:read",
   }),
 } as const;
@@ -825,6 +831,7 @@ export const ROUTE_CONTRACTS = [
   indicatorsRoutes.catalogue,
   indicatorsRoutes.capabilities,
   indicatorsRoutes.spec,
+  indicatorsRoutes.series,
   strategiesRoutes.catalogue,
   strategiesRoutes.versions,
   researchRoutes.run,
@@ -893,7 +900,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 89;
+export const ROUTE_CONTRACT_COUNT = 90;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

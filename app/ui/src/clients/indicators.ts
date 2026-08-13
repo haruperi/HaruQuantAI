@@ -53,6 +53,46 @@ export type IndicatorCapability = z.infer<typeof indicatorCapabilitySchema>;
 export const capabilityMatrixSchema = z.array(indicatorCapabilitySchema);
 export type CapabilityMatrix = z.infer<typeof capabilityMatrixSchema>;
 
+/** One timestamp-aligned indicator value; null is authoritative warm-up. */
+export const indicatorPointSchema = z.object({
+  time: z.string(),
+  value: z.number().nullable(),
+  unavailable_reason: z.string().nullable(),
+});
+
+/** Indicators-owned chart series with the exact calculation parameters. */
+export const indicatorSeriesSchema = z.object({
+  indicator_id: z.enum(["ema", "rsi"]),
+  name: z.string(),
+  symbol: z.string(),
+  timeframe: z.string(),
+  source_id: z.string(),
+  parameters: z.object({
+    period: z.number().int().min(2),
+    source: z.enum(["open", "high", "low", "close"]),
+  }),
+  points: z.array(indicatorPointSchema),
+  count: z.number().int().nonnegative(),
+  valid_count: z.number().int().nonnegative(),
+  availability: z.enum(["available", "insufficient_history"]),
+  unavailable_reason: z.string().nullable(),
+  indicator_version: z.string(),
+  formula_version: z.string(),
+  request_id: z.string(),
+});
+export type IndicatorSeries = z.infer<typeof indicatorSeriesSchema>;
+
+export interface IndicatorSeriesQuery {
+  indicatorId: "ema" | "rsi";
+  symbol: string;
+  timeframe: string;
+  period: number;
+  source?: "open" | "high" | "low" | "close";
+  limit: number;
+  start?: string;
+  end?: string;
+}
+
 /** Read the full indicator catalogue (requires `indicators:read`). */
 export function catalogue(
   options?: RequestOptions
@@ -85,4 +125,25 @@ export function getSpec(
   });
 }
 
-export const indicators = { catalogue, capabilities, getSpec };
+/** Calculate one chart series through the workstation Indicators boundary. */
+export function series(
+  query: IndicatorSeriesQuery,
+  options?: RequestOptions
+): Promise<ApiResponse<IndicatorSeries>> {
+  return request<IndicatorSeries>(indicatorsRoutes.series, {
+    schema: indicatorSeriesSchema,
+    pathParams: { indicator_id: query.indicatorId },
+    query: {
+      symbol: query.symbol,
+      timeframe: query.timeframe,
+      period: query.period,
+      source: query.source ?? "close",
+      limit: query.limit,
+      start: query.start,
+      end: query.end,
+    },
+    ...options,
+  });
+}
+
+export const indicators = { catalogue, capabilities, getSpec, series };

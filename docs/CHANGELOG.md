@@ -2,6 +2,37 @@
 
 ## [Unreleased]
 
+### Complete the Charting Tools widget
+
+Chart annotations, appearance controls, missing-bar evidence, and maximum-scale rendering now satisfy the remaining registered chart requirements.
+
+#### Added (1)
+
+- Added validated versioned instrument-scoped browser persistence for non-authoritative chart drawings.
+
+#### Changed (2)
+
+- Kept chart appearance controls presentation-only without refetching or replacing Data-owned bars.
+- Bounded all chart and indicator rendering work to the clipped viewport at the registered 1,000,000-bar maximum while retaining the latest bar.
+
+#### Fixed (1)
+
+- Presented invalid slots and timeframe discontinuities as explicit gap regions and broke continuous price and indicator paths across missing bars.
+
+### Serve chart indicators through the Indicators boundary
+
+EMA overlays and RSI panels now consume timestamp-aligned owner calculations
+instead of deriving indicator values in the browser.
+
+#### Added (1)
+
+- Added an authenticated uncached EMA/RSI chart-series route with visible parameters, explicit warm-up unavailability, and catalogue-backed indicator discovery that disables formulas without a chart-series contract.
+
+#### Fixed (2)
+
+- Normalized Indicators catalogue, capability, and specification reads into the canonical API envelope so contract validation no longer hides registered indicators from the chart popup.
+- Anchored RSI panel timestamps to the chart's shared horizontal pan and zoom viewport so panel values remain aligned with their source candles.
+
 ### Verify watchlist symbols against the connected source
 
 The Watchlist widget now preloads the complete connected symbol directory and

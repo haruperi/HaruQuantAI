@@ -154,7 +154,7 @@ app/ui/
 | Completed | `FEAT-UI-01` Workspace Layout and Session Mode | `src/features/workspaces/` | Workspace and widget layout state, confirmation mode, account mode | `FR-UI-001`–`FR-UI-029` | `src/features/workspaces/store.test.ts` |
 | Completed | `FEAT-UI-02` Markets Widget | `src/features/markets/` | `MarketsWidget` through the feature barrel | `FR-UI-030`–`FR-UI-037` | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FEAT-UI-03` Watchlist Widget | `src/features/watchlists/` | `WatchlistWidget` through the feature barrel | `FR-UI-038`–`FR-UI-045` | `src/features/watchlists/WatchlistWidget.test.tsx` |
-| Partial | `FEAT-UI-04` Charting Tools Widget | `src/features/chart/` | `ChartWidget` | `FR-UI-046`–`FR-UI-054` (`FR-UI-046`–`FR-UI-047` completed) | `src/features/chart/ChartWidget.test.tsx`; further evidence pending |
+| Partial | `FEAT-UI-04` Charting Tools Widget | `src/features/chart/` | `ChartWidget` | `FR-UI-046`–`FR-UI-054` (`FR-UI-046`–`FR-UI-050` completed) | `src/features/chart/ChartWidget.test.tsx`; further evidence pending |
 | Pending | `FEAT-UI-05` Price Ladder Widget | Target: `src/features/price-ladder/`; current: `src/features/instrument-panels/PriceLadderWidget.tsx` | `PriceLadderWidget` | `FR-UI-055`–`FR-UI-062` | Pending evidence |
 | Pending | `FEAT-UI-06` Order Ticket | Target: `src/features/order-ticket/`; current: `src/components/workflow/OrderTicketModal.tsx` | `OrderTicketModal` (futures and options tabs) | `FR-UI-063`–`FR-UI-079` | Pending evidence |
 | Pending | `FEAT-UI-07` Options Grid Widget | Target: `src/features/options-grid/`; current: `src/features/instrument-panels/OptionsGridWidget.tsx` | `OptionsGridWidget` | `FR-UI-080`–`FR-UI-084` | Pending evidence; blocked on an owning backend domain |
@@ -440,17 +440,21 @@ Mutation and idempotency limits otherwise remain owned by the API contracts.
 | ------- | -------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------- | -------------------- | ----------------------------- | ---------------- |
 | Completed | `FR-UI-046`  | Present a price chart for a selected instrument and timeframe from Data-owned bars read through `GET /api/v1/data/bars`; the widget generates no prices of its own, and an unavailable or empty broker series is reported rather than filled in. | `ChartWidget`, `apiClients.data.bars` | External API call    | Unavailable series explicit   | `src/features/chart/ChartWidget.test.tsx` |
 | Completed | `FR-UI-047`  | Offer exactly Data's canonical timeframe manifest (`M1`–`MN1`) and preserve the selection per widget instance; a timeframe the broker cannot serve is never offered. | `ChartWidget`, `BAR_TIMEFRAMES` | Local state mutation | Unsupported timeframe absent  | `src/features/chart/ChartWidget.test.tsx` |
-| Pending | `FR-UI-048`  | Overlay Indicators-owned values only; the widget performs no indicator arithmetic.                                   | `ChartWidget`             | External API call    | No derived series             | Pending evidence |
-| Pending | `FR-UI-049`  | Present each overlay with the parameters used to compute it.                                                         | `ChartWidget`             | None                 | Parameters visible            | Pending evidence |
-| Pending | `FR-UI-050`  | Present an indicator as unavailable when history is insufficient rather than rendering a partial series as complete. | `ChartWidget`             | None                 | Warm-up gap explicit          | Pending evidence |
-| Pending | `FR-UI-051`  | Provide drawing tools whose annotations persist per instrument as a client-side preference.                          | `ChartWidget`             | Local persistence    | Annotations non-authoritative | Pending evidence |
-| Pending | `FR-UI-052`  | Provide chart appearance controls that never alter underlying data.                                                  | `ChartWidget`             | Local state mutation | Data unchanged                | Pending evidence |
-| Pending | `FR-UI-053`  | Present a gap or missing-bar region explicitly rather than interpolating across it.                                  | `ChartWidget`             | None                 | No interpolation              | Pending evidence |
-| Pending | `FR-UI-054`  | Remain responsive at the registered maximum bar count, degrading detail rather than dropping the latest bar.         | `ChartWidget`             | None                 | Latest bar retained           | Pending evidence |
+| Completed | `FR-UI-048`  | Discover indicators from the authenticated Indicators catalogue and overlay only Indicators-owned values; the widget performs no indicator arithmetic. EMA and RSI are chart-enabled, RSI panel timestamps share the chart's pan/zoom viewport, and other registered indicators remain visibly unavailable until they gain a series contract. | `ChartWidget`, `apiClients.indicators.catalogue`, `apiClients.indicators.series` | External API call | No derived or mock series | `src/features/chart/ChartWidget.test.tsx` |
+| Completed | `FR-UI-049`  | Present each overlay with the parameters used to compute it.                                                         | `ChartWidget`             | None                 | Parameters visible            | `src/features/chart/ChartWidget.test.tsx` |
+| Completed | `FR-UI-050`  | Present an indicator as unavailable when history is insufficient rather than rendering a partial series as complete. | `ChartWidget`             | None                 | Warm-up gap explicit          | `src/features/chart/ChartWidget.test.tsx` |
+| Completed | `FR-UI-051`  | Provide drawing tools whose annotations persist per instrument as a validated, versioned client-side preference. | `ChartWidget` | Local persistence | Malformed or unavailable browser storage fails open with empty non-authoritative annotations | `src/features/chart/ChartWidget.test.tsx` |
+| Completed | `FR-UI-052`  | Provide chart appearance controls that mutate rendering state without refetching or replacing underlying Data-owned bars. | `ChartWidget` | Local state mutation | Data unchanged | `src/features/chart/ChartWidget.test.tsx` |
+| Completed | `FR-UI-053`  | Detect invalid slots and timeframe discontinuities, present the missing-bar count and visible gap region, and break continuous price and indicator paths rather than interpolating across it. | `ChartWidget`, `toChartBars` | None | No interpolation | `src/features/chart/ChartWidget.test.tsx` |
+| Completed | `FR-UI-054`  | Remain responsive at the registered 1,000,000-bar maximum by indexing owner series once and degrading every render loop to the clipped viewport without dropping the latest bar. | `ChartWidget`, `visibleBarRange` | None | Latest bar retained | `src/features/chart/ChartWidget.test.tsx` |
 
 ### Configuration and Limits Manifest
 
-None; chart limits follow the registered Data and Indicators contracts.
+| Status | Key | Type | Default | Operator Configurable | Used By | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Completed | `haruquantai.chart.drawings.v1:{symbol}` | browser-local JSON array | `[]` | Yes | drawing annotations | Versioned, instrument-scoped, validated client preference; never market-data or execution authority. |
+
+Chart bar-count limits follow the registered Data contract; the current maximum is 1,000,000 bars.
 
 ### 4.5 `src/features/price-ladder/` — Price Ladder Widget
 
@@ -1056,7 +1060,7 @@ uv run ruff format --check tests/ui/structural/test_feature_registry.py
 - [X] Completed module sections are arranged in dependency order.
 - [ ] Every registered feature owns one focused folder. Pending the `FEAT-UI-05`–`FEAT-UI-13` moves.
 - [X] Every completed functional requirement has focused automated evidence.
-- [ ] Every registered functional requirement has focused automated evidence. 76 requirements remain `Pending`.
+- [ ] Every registered functional requirement has focused automated evidence. 73 requirements remain `Pending`.
 - [ ] No production module imports fixture data (`NFR-UI-007`).
 - [X] Typed API clients have route-contract parity evidence.
 - [X] UI owns no durable state, business calculation, authorization, or broker connection.

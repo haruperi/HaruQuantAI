@@ -24,7 +24,8 @@ def main() -> None:
         for item in get_canonical_route_contract_registry().all()
     }
     assert operations <= declarations
-    assert len(operations) >= 3
+    assert ("GET", "/api/v1/indicators/{indicator_id}/series") in operations
+    assert len(operations) >= 4
     print({"feature": "indicators", "operations": len(operations)})
 
 

@@ -70,7 +70,7 @@ def test_market_and_watchlist_ownership_is_reconciled() -> None:
     assert "| Pending |" not in api_registry
     assert set(re.findall(r"\|\s*Pending\s*\|\s*`(FEAT-UI-\d{2})`", ui_registry)) == {
         f"FEAT-UI-{number:02d}" for number in range(1, 18)
-    } - {"FEAT-UI-01", "FEAT-UI-02", "FEAT-UI-03", "FEAT-UI-14"}
+    } - {"FEAT-UI-01", "FEAT-UI-02", "FEAT-UI-03", "FEAT-UI-04", "FEAT-UI-14"}
     assert "| `workstation/watchlists/` |" in api_registry
     assert "| `workstation/markets/` |" in api_registry
     assert "| `src/features/markets/` |" in ui_registry
@@ -199,9 +199,9 @@ def test_repository_feature_inventory_is_reconciled() -> None:
         feature_ids.extend(feature_id for _status, feature_id in rows)
 
     assert len(feature_ids) == len(set(feature_ids)) == 231
-    assert statuses.count("Completed") == 217
-    assert statuses.count("Pending") == 13
+    assert statuses.count("Completed") == 218
+    assert statuses.count("Pending") == 12
     assert statuses.count("Partial") == 1
     project = _PROJECT_README.read_text(encoding="utf-8")
     assert "231 registered application features" in project
-    assert "(93.94%)" in project
+    assert "(94.37%)" in project

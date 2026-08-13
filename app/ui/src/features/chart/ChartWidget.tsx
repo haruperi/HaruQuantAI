@@ -7,6 +7,8 @@ import {
   unwrapData,
   type BarSeries,
   type BarTimeframe,
+  type IndicatorSeries,
+  type IndicatorSpec,
   type MarketRow,
 } from '../../clients';
 import { useTradingStore } from '../../store/useTradingStore';
@@ -577,6 +579,29 @@ export interface BarData {
   timestamp: string;
   /** Time-axis label derived from `timestamp` for the active timeframe. */
   time: string;
+  /** Count of broker bar slots missing immediately before this bar. */
+  missingBarsBefore?: number;
+}
+
+export interface VisibleBarRange {
+  start: number;
+  end: number;
+}
+
+/** Bound chart work to the clipped viewport while retaining the newest bar. */
+export function visibleBarRange(
+  barCount: number,
+  plotWidth: number,
+  candleWidth: number,
+  panOffset: number
+): VisibleBarRange {
+  const start = Math.max(0, Math.floor(-panOffset / candleWidth));
+  const end = Math.min(barCount, Math.ceil((plotWidth - panOffset) / candleWidth));
+  if (end > start) return { start, end };
+  const capacity = Math.min(barCount, Math.ceil(plotWidth / candleWidth) + 1);
+  return panOffset >= plotWidth
+    ? { start: 0, end: capacity }
+    : { start: Math.max(0, barCount - capacity), end: barCount };
 }
 
 /**
@@ -618,6 +643,18 @@ const TIMEFRAME_MENU = (['MINUTES', 'HOURS', 'DAYS'] as const).map((heading) => 
 }));
 
 const INTRADAY_TIMEFRAMES = new Set<BarTimeframe>(['M1', 'M5', 'M15', 'M30', 'H1', 'H4']);
+const TIMEFRAME_MILLISECONDS: Record<BarTimeframe, number> = {
+  M1: 60_000,
+  M5: 300_000,
+  M15: 900_000,
+  M30: 1_800_000,
+  H1: 3_600_000,
+  H4: 14_400_000,
+  D1: 86_400_000,
+  W1: 604_800_000,
+  // Month lengths vary; this is used only as a conservative discontinuity threshold.
+  MN1: 2_419_200_000,
+};
 
 /**
  * Extremes of one bar field, without spreading the array into `Math.min/max`.
@@ -666,8 +703,10 @@ function formatBarLabel(timestamp: string, timeframe: BarTimeframe): string {
  * A bar missing any OHLC value is dropped rather than defaulted: a zero close
  * would collapse the price scale and read as a real crash.
  */
-function toChartBars(series: BarSeries | null | undefined, timeframe: BarTimeframe): BarData[] {
+export function toChartBars(series: BarSeries | null | undefined, timeframe: BarTimeframe): BarData[] {
   if (!series) return [];
+  let invalidSlots = 0;
+  let previousTimestamp: number | null = null;
   return series.bars.reduce<BarData[]>((rows, bar) => {
     if (
       bar.time === null ||
@@ -676,8 +715,16 @@ function toChartBars(series: BarSeries | null | undefined, timeframe: BarTimefra
       bar.low === null ||
       bar.close === null
     ) {
+      invalidSlots += 1;
       return rows;
     }
+    const timestamp = new Date(bar.time).getTime();
+    const interval = TIMEFRAME_MILLISECONDS[timeframe];
+    const inferredMissing =
+      previousTimestamp !== null && Number.isFinite(timestamp)
+        ? Math.max(0, Math.round((timestamp - previousTimestamp) / interval) - 1)
+        : 0;
+    const missingBarsBefore = Math.max(invalidSlots, inferredMissing);
     rows.push({
       open: bar.open,
       high: bar.high,
@@ -686,9 +733,52 @@ function toChartBars(series: BarSeries | null | undefined, timeframe: BarTimefra
       volume: bar.volume ?? 0,
       timestamp: bar.time,
       time: formatBarLabel(bar.time, timeframe),
+      ...(missingBarsBefore > 0 ? { missingBarsBefore } : {}),
     });
+    invalidSlots = 0;
+    previousTimestamp = Number.isFinite(timestamp) ? timestamp : null;
     return rows;
   }, []);
+}
+
+const DRAWING_STORAGE_PREFIX = 'haruquantai.chart.drawings.v1';
+
+function drawingStorageKey(symbol: string): string {
+  return `${DRAWING_STORAGE_PREFIX}:${symbol}`;
+}
+
+function isStoredDrawing(value: unknown): value is Record<string, unknown> {
+  if (typeof value !== 'object' || value === null) return false;
+  const drawing = value as Record<string, unknown>;
+  return (
+    (typeof drawing.id === 'string' || typeof drawing.id === 'number') &&
+    typeof drawing.tool === 'string' &&
+    typeof drawing.startX === 'number' &&
+    typeof drawing.startY === 'number' &&
+    typeof drawing.endX === 'number' &&
+    typeof drawing.endY === 'number'
+  );
+}
+
+function loadStoredDrawings(symbol: string): any[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(drawingStorageKey(symbol));
+    if (raw === null) return [];
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.every(isStoredDrawing) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function storeDrawings(symbol: string, drawings: any[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(drawingStorageKey(symbol), JSON.stringify(drawings));
+  } catch {
+    // Browser preferences are best-effort and never chart-data authority.
+  }
 }
 
 interface Props {
@@ -856,9 +946,19 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
   const [activeTool, setActiveTool] = useState('crosshair');
   const [isAveragePriceOn, setIsAveragePriceOn] = useState(true);
   const [selectedIndicators, setSelectedIndicators] = useState<string[]>([]);
+  const [indicatorSeries, setIndicatorSeries] = useState<Partial<Record<'ema' | 'rsi', IndicatorSeries>>>({});
+  const [indicatorErrors, setIndicatorErrors] = useState<Partial<Record<'ema' | 'rsi', string>>>({});
+  const [loadingIndicators, setLoadingIndicators] = useState<Set<'ema' | 'rsi'>>(new Set());
   const [indicatorSearchQuery, setIndicatorSearchQuery] = useState('');
-  const [starredItems, setStarredItems] = useState(['H1', 'Candles', 'EMA', 'Volume']);
+  const [starredItems, setStarredItems] = useState(['H1', 'Candles']);
+  const [indicatorCatalogue, setIndicatorCatalogue] = useState<IndicatorSpec[]>([]);
+  const [catalogueStatus, setCatalogueStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [showVolumeLegend, setShowVolumeLegend] = useState(true);
+  const [panOffset, setPanOffset] = useState(0);
+  const [chartPlotWidth, setChartPlotWidth] = useState(632);
+  const [isPanning, setIsPanning] = useState(false);
+  const isPanningRef = useRef(false);
+  const panStartRef = useRef(0);
 
   // Sync Controls (Multi-Chart Layout Dropdown)
   const [syncSymbol, setSyncSymbol] = useState(false);
@@ -883,9 +983,28 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
   const [isIndicatorsHidden, setIsIndicatorsHidden] = useState(false);
   const [arePositionsHidden, setArePositionsHidden] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const [drawings, setDrawings] = useState<any[]>([]);
+  const [drawings, setDrawings] = useState<any[]>(() => loadStoredDrawings(symbol));
+  const drawingsSymbolRef = useRef(symbol);
+  const skipDrawingPersistRef = useRef(false);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentLine, setCurrentLine] = useState<any | null>(null);
+
+  useEffect(() => {
+    if (drawingsSymbolRef.current === activeSymbol) return;
+    drawingsSymbolRef.current = activeSymbol;
+    skipDrawingPersistRef.current = true;
+    setSelectedDrawingId(null);
+    setDrawings(loadStoredDrawings(activeSymbol));
+  }, [activeSymbol]);
+
+  useEffect(() => {
+    if (drawingsSymbolRef.current !== activeSymbol) return;
+    if (skipDrawingPersistRef.current) {
+      skipDrawingPersistRef.current = false;
+      return;
+    }
+    storeDrawings(activeSymbol, drawings);
+  }, [activeSymbol, drawings]);
 
   // Quantity Stepper for Buy/Sell Overlay
   const [orderQty, setOrderQty] = useState('1');
@@ -1068,6 +1187,131 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
     };
   }, [activeSymbol, timeframe, rangeBy, barCount, dateFrom, dateTo]);
 
+  useEffect(() => {
+    const requested: ['ema' | 'rsi', number][] = [];
+    if (selectedIndicators.includes('ema')) requested.push(['ema', 20]);
+    if (selectedIndicators.includes('rsi')) requested.push(['rsi', 14]);
+    const requestedIds = new Set(requested.map(([indicatorId]) => indicatorId));
+    setIndicatorSeries((current) =>
+      Object.fromEntries(Object.entries(current).filter(([key]) => requestedIds.has(key as 'ema' | 'rsi')))
+    );
+    setIndicatorErrors((current) =>
+      Object.fromEntries(Object.entries(current).filter(([key]) => requestedIds.has(key as 'ema' | 'rsi')))
+    );
+    if (requested.length === 0) {
+      setLoadingIndicators(new Set());
+      return;
+    }
+
+    let cancelled = false;
+    setLoadingIndicators(new Set(requestedIds));
+    for (const [indicatorId, period] of requested) {
+      void apiClients.indicators
+        .series({
+          indicatorId,
+          symbol: activeSymbol,
+          timeframe,
+          period,
+          source: 'close',
+          limit: rangeBy === 'Bars' ? barCount : Math.max(candles.length, period + 1),
+          ...(rangeBy === 'Date'
+            ? {
+                start: `${dateFrom}T00:00:00Z`,
+                end: `${dateTo}T23:59:59Z`,
+              }
+            : {}),
+        })
+        .then((response) => {
+          if (cancelled) return;
+          const series = unwrapData(response);
+          setIndicatorSeries((current) => ({ ...current, [indicatorId]: series }));
+          setIndicatorErrors((current) => ({ ...current, [indicatorId]: undefined }));
+        })
+        .catch((error) => {
+          if (cancelled) return;
+          setIndicatorSeries((current) => ({ ...current, [indicatorId]: undefined }));
+          setIndicatorErrors((current) => ({
+            ...current,
+            [indicatorId]: error instanceof Error ? error.message : 'Indicator unavailable',
+          }));
+        })
+        .finally(() => {
+          if (cancelled) return;
+          setLoadingIndicators((current) => {
+            const next = new Set(current);
+            next.delete(indicatorId);
+            return next;
+          });
+        });
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [activeSymbol, timeframe, rangeBy, barCount, dateFrom, dateTo, candles.length, selectedIndicators]);
+
+  useEffect(() => {
+    if (activeDropdown !== 'indicators') return;
+    let cancelled = false;
+    setCatalogueStatus('loading');
+    void apiClients.indicators
+      .catalogue()
+      .then((response) => {
+        if (cancelled) return;
+        setIndicatorCatalogue(unwrapData(response));
+        setCatalogueStatus('ready');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setIndicatorCatalogue([]);
+        setCatalogueStatus('error');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeDropdown]);
+
+  const emaByTime = useMemo(
+    () => new Map(indicatorSeries.ema?.points.map((point) => [point.time, point.value]) ?? []),
+    [indicatorSeries.ema]
+  );
+  const rsiByTime = useMemo(
+    () => new Map(indicatorSeries.rsi?.points.map((point) => [point.time, point.value]) ?? []),
+    [indicatorSeries.rsi]
+  );
+  const missingBarCount = useMemo(
+    () => candles.reduce((count, candle) => count + (candle.missingBarsBefore ?? 0), 0),
+    [candles]
+  );
+
+  const rsiSegments = useMemo(() => {
+    const segments: { x: number; y: number }[][] = [];
+    let segment: { x: number; y: number }[] = [];
+    const candleWidth = Math.max(
+      6,
+      (chartPlotWidth / Math.min(Math.max(candles.length, 1), 60)) * zoomLevel
+    );
+    const range = visibleBarRange(candles.length, chartPlotWidth, candleWidth, panOffset);
+    for (let candleIndex = range.start; candleIndex < range.end; candleIndex++) {
+      const candle = candles[candleIndex];
+      const value = rsiByTime.get(candle.timestamp);
+      if (value === null || value === undefined) {
+        if (segment.length) segments.push(segment);
+        segment = [];
+        continue;
+      }
+      if (candle.missingBarsBefore && segment.length) {
+        segments.push(segment);
+        segment = [];
+      }
+      segment.push({
+        x: candleIndex * candleWidth + candleWidth / 2 + panOffset,
+        y: 100 - value,
+      });
+    }
+    if (segment.length) segments.push(segment);
+    return segments;
+  }, [candles, chartPlotWidth, panOffset, rsiByTime, zoomLevel]);
+
   // Extend the forming bar with the live quote. A zero price means the product
   // is not quoted yet, and must not overwrite a real close.
   useEffect(() => {
@@ -1084,15 +1328,10 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
   }, [targetProduct.lastPrice]);
 
   // Chart Panning / Moving State
-  const [panOffset, setPanOffset] = useState(0);
   // A freshly loaded series opens on its most recent bars. Starting at offset 0
   // shows the oldest instead, which is unnoticeable at 100 bars and useless at
   // backtest scale — a ten-year window would open ten years in the past.
   const anchorToLatestRef = useRef(true);
-  const [isPanning, setIsPanning] = useState(false);
-  const isPanningRef = useRef(false);
-  const panStartRef = useRef(0);
-
   // Main Canvas Render Loop
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -1102,7 +1341,8 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
     const container = canvas.parentElement;
     if (!container) return;
     const width = canvas.width = container.clientWidth || 700;
-    const height = canvas.height = container.clientHeight || 400;
+    const rsiPanelHeight = selectedIndicators.includes('rsi') ? 120 : 0;
+    const height = canvas.height = Math.max(120, (container.clientHeight || 400) - rsiPanelHeight);
 
     ctx.clearRect(0, 0, width, height);
     if (!candles.length) return;
@@ -1111,13 +1351,15 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
     const paddingBottom = 28;
     const chartWidth = width - paddingRight;
     const chartHeight = height - paddingBottom;
+    if (chartWidth !== chartPlotWidth) setChartPlotWidth(chartWidth);
 
     const visibleBarsTarget = 60;
     const candleWidth = Math.max(6, (chartWidth / Math.min(candles.length, visibleBarsTarget)) * zoomLevel);
 
     // Calculate viewport visible candle range based on panOffset and candleWidth
-    const visibleStartIndex = Math.max(0, Math.floor(-panOffset / candleWidth));
-    const visibleEndIndex = Math.min(candles.length, Math.ceil((chartWidth - panOffset) / candleWidth));
+    const visibleRange = visibleBarRange(candles.length, chartWidth, candleWidth, panOffset);
+    const visibleStartIndex = visibleRange.start;
+    const visibleEndIndex = visibleRange.end;
     const hasVisibleRange = visibleEndIndex > visibleStartIndex;
     const scaleFrom = hasVisibleRange ? visibleStartIndex : 0;
     const scaleTo = hasVisibleRange ? visibleEndIndex : candles.length;
@@ -1127,6 +1369,10 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
     // difference is ~60 canvas operations instead of a million per frame.
     const drawStart = scaleFrom;
     const drawEnd = scaleTo;
+    const visibleEntries = candles
+      .slice(drawStart, drawEnd)
+      .map((candle, localIndex) => ({ candle, index: drawStart + localIndex }));
+    const visibleCandles = visibleEntries.map(({ candle }) => candle);
 
     // Geometry is only known here, so the anchor is resolved on the first
     // paint of a new series and then handed back to normal panning.
@@ -1175,7 +1421,8 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
     ctx.clip();
     ctx.translate(panOffset, 0);
 
-    for (let i = timeStepX; i < candles.length; i += timeStepX) {
+    const firstGridIndex = Math.ceil(drawStart / timeStepX) * timeStepX;
+    for (let i = firstGridIndex; i < drawEnd; i += timeStepX) {
       const x = i * candleWidth;
       ctx.beginPath();
       ctx.moveTo(x, 0);
@@ -1184,15 +1431,32 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
     }
     ctx.setLineDash([]);
 
+    // Broker gaps remain visible and break every continuous series path.
+    visibleEntries.forEach(({ candle, index }) => {
+      if (!candle.missingBarsBefore) return;
+      const gapWidth = Math.max(6, Math.min(candleWidth, 24));
+      const x = index * candleWidth - gapWidth / 2;
+      ctx.fillStyle = 'rgba(255, 193, 7, 0.16)';
+      ctx.fillRect(x, 0, gapWidth, chartHeight);
+      ctx.strokeStyle = '#ffc107';
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(index * candleWidth, 0);
+      ctx.lineTo(index * candleWidth, chartHeight);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
     // 2. Render Candlesticks / Styles (Supports all 18 Chart Types)
     if (chartType === 'Line' || chartType === 'Line with markers' || chartType === 'Step line') {
       ctx.strokeStyle = upColor;
       ctx.lineWidth = 2;
       ctx.beginPath();
-      candles.forEach((c, idx) => {
+      let drawingLine = false;
+      visibleEntries.forEach(({ candle: c, index: idx }) => {
         const x = idx * candleWidth + candleWidth / 2;
         const yClose = chartHeight - ((c.close - priceMin) / priceRange) * chartHeight;
-        if (idx === 0) {
+        if (!drawingLine || c.missingBarsBefore) {
           ctx.moveTo(x, yClose);
         } else if (chartType === 'Step line') {
           const prevYClose = chartHeight - ((candles[idx - 1].close - priceMin) / priceRange) * chartHeight;
@@ -1201,11 +1465,12 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
         } else {
           ctx.lineTo(x, yClose);
         }
+        drawingLine = true;
       });
       ctx.stroke();
 
       if (chartType === 'Line with markers') {
-        candles.forEach((c, idx) => {
+        visibleEntries.forEach(({ candle: c, index: idx }) => {
           const x = idx * candleWidth + candleWidth / 2;
           const yClose = chartHeight - ((c.close - priceMin) / priceRange) * chartHeight;
           ctx.beginPath();
@@ -1219,64 +1484,32 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
       }
     } else if (chartType === 'Area' || chartType === 'HLC area') {
       if (chartType === 'HLC area') {
-        // High-Low Shaded Area Band
-        ctx.beginPath();
-        candles.forEach((c, idx) => {
-          const x = idx * candleWidth + candleWidth / 2;
-          const yHigh = chartHeight - ((c.high - priceMin) / priceRange) * chartHeight;
-          if (idx === 0) ctx.moveTo(x, yHigh);
-          else ctx.lineTo(x, yHigh);
+        ['high', 'low', 'close'].forEach((field) => {
+          ctx.beginPath();
+          ctx.strokeStyle = field === 'close' ? upColor : 'rgba(0, 200, 83, 0.35)';
+          ctx.lineWidth = field === 'close' ? 2 : 1;
+          let drawingBand = false;
+          visibleEntries.forEach(({ candle, index }) => {
+            const value = candle[field as 'high' | 'low' | 'close'];
+            const x = index * candleWidth + candleWidth / 2;
+            const y = chartHeight - ((value - priceMin) / priceRange) * chartHeight;
+            if (!drawingBand || candle.missingBarsBefore) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+            drawingBand = true;
+          });
+          ctx.stroke();
         });
-        for (let idx = candles.length - 1; idx >= 0; idx--) {
-          const c = candles[idx];
-          const x = idx * candleWidth + candleWidth / 2;
-          const yLow = chartHeight - ((c.low - priceMin) / priceRange) * chartHeight;
-          ctx.lineTo(x, yLow);
-        }
-        ctx.closePath();
-        ctx.fillStyle = 'rgba(0, 200, 83, 0.15)';
-        ctx.fill();
-
-        // Stroke Close Line
-        ctx.beginPath();
-        ctx.strokeStyle = upColor;
-        ctx.lineWidth = 2;
-        candles.forEach((c, idx) => {
-          const x = idx * candleWidth + candleWidth / 2;
-          const yClose = chartHeight - ((c.close - priceMin) / priceRange) * chartHeight;
-          if (idx === 0) ctx.moveTo(x, yClose);
-          else ctx.lineTo(x, yClose);
-        });
-        ctx.stroke();
       } else {
-        // Area Chart with gradient fill and top stroke line
-        ctx.beginPath();
-        const firstX = candleWidth / 2;
-        const lastX = (candles.length - 1) * candleWidth + candleWidth / 2;
-        candles.forEach((c, idx) => {
-          const x = idx * candleWidth + candleWidth / 2;
-          const yClose = chartHeight - ((c.close - priceMin) / priceRange) * chartHeight;
-          if (idx === 0) ctx.moveTo(x, yClose);
-          else ctx.lineTo(x, yClose);
-        });
-        ctx.lineTo(lastX, chartHeight);
-        ctx.lineTo(firstX, chartHeight);
-        ctx.closePath();
-
-        const grad = ctx.createLinearGradient(0, 0, 0, chartHeight);
-        grad.addColorStop(0, 'rgba(0, 200, 83, 0.35)');
-        grad.addColorStop(1, 'rgba(0, 200, 83, 0.01)');
-        ctx.fillStyle = grad;
-        ctx.fill();
-
         ctx.beginPath();
         ctx.strokeStyle = upColor;
         ctx.lineWidth = 2;
-        candles.forEach((c, idx) => {
-          const x = idx * candleWidth + candleWidth / 2;
-          const yClose = chartHeight - ((c.close - priceMin) / priceRange) * chartHeight;
-          if (idx === 0) ctx.moveTo(x, yClose);
+        let drawingArea = false;
+        visibleEntries.forEach(({ candle, index }) => {
+          const x = index * candleWidth + candleWidth / 2;
+          const yClose = chartHeight - ((candle.close - priceMin) / priceRange) * chartHeight;
+          if (!drawingArea || candle.missingBarsBefore) ctx.moveTo(x, yClose);
           else ctx.lineTo(x, yClose);
+          drawingArea = true;
         });
         ctx.stroke();
       }
@@ -1293,7 +1526,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
       ctx.stroke();
       ctx.setLineDash([]);
 
-      candles.forEach((c, idx) => {
+      visibleEntries.forEach(({ candle: c, index: idx }) => {
         const x = idx * candleWidth + candleWidth / 2;
         const yClose = chartHeight - ((c.close - priceMin) / priceRange) * chartHeight;
         const isAbove = c.close >= baselineVal;
@@ -1311,7 +1544,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
         ctx.stroke();
       });
     } else if (chartType === 'Columns') {
-      candles.forEach((c, idx) => {
+      visibleEntries.forEach(({ candle: c, index: idx }) => {
         const x = idx * candleWidth + candleWidth / 2;
         const isGreen = c.close >= c.open;
         const yClose = chartHeight - ((c.close - priceMin) / priceRange) * chartHeight;
@@ -1321,7 +1554,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
         ctx.fillRect(x - colW / 2, yClose, colW, chartHeight - yClose);
       });
     } else if (chartType === 'High-low') {
-      candles.forEach((c, idx) => {
+      visibleEntries.forEach(({ candle: c, index: idx }) => {
         const x = idx * candleWidth + candleWidth / 2;
         const isGreen = c.close >= c.open;
         const yHigh = chartHeight - ((c.high - priceMin) / priceRange) * chartHeight;
@@ -1332,17 +1565,17 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
         ctx.fillRect(x - barW / 2, yHigh, barW, Math.max(2, yLow - yHigh));
       });
     } else if (chartType === 'Heikin Ashi') {
-      const haData: { haOpen: number; haHigh: number; haLow: number; haClose: number }[] = [];
-      candles.forEach((c, idx) => {
+      const haData: { haOpen: number; haHigh: number; haLow: number; haClose: number; index: number }[] = [];
+      visibleEntries.forEach(({ candle: c, index }, localIndex) => {
         const haClose = (c.open + c.high + c.low + c.close) / 4;
-        const haOpen = idx === 0 ? (c.open + c.close) / 2 : (haData[idx - 1].haOpen + haData[idx - 1].haClose) / 2;
+        const haOpen = localIndex === 0 ? (c.open + c.close) / 2 : (haData[localIndex - 1].haOpen + haData[localIndex - 1].haClose) / 2;
         const haHigh = Math.max(c.high, haOpen, haClose);
         const haLow = Math.min(c.low, haOpen, haClose);
-        haData.push({ haOpen, haHigh, haLow, haClose });
+        haData.push({ haOpen, haHigh, haLow, haClose, index });
       });
 
-      haData.forEach((ha, idx) => {
-        const x = idx * candleWidth + candleWidth / 2;
+      haData.forEach((ha) => {
+        const x = ha.index * candleWidth + candleWidth / 2;
         const isGreen = ha.haClose >= ha.haOpen;
 
         const yOpen = chartHeight - ((ha.haOpen - priceMin) / priceRange) * chartHeight;
@@ -1365,9 +1598,9 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
     } else if (chartType === 'Renko') {
       const brickSize = Math.max(0.5, (priceMax - priceMin) / 20);
       const bricks: { open: number; close: number; isUp: boolean }[] = [];
-      let currentPrice = candles[0].close;
+      let currentPrice = visibleCandles[0].close;
 
-      candles.forEach((c) => {
+      visibleCandles.forEach((c) => {
         let diff = c.close - currentPrice;
         while (Math.abs(diff) >= brickSize) {
           const isUp = diff > 0;
@@ -1379,11 +1612,11 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
         }
       });
 
-      const displayBricks = bricks.length > 0 ? bricks : [{ open: candles[0].open, close: candles[0].close, isUp: candles[0].close >= candles[0].open }];
+      const displayBricks = bricks.length > 0 ? bricks : [{ open: visibleCandles[0].open, close: visibleCandles[0].close, isUp: visibleCandles[0].close >= visibleCandles[0].open }];
       const brickW = chartWidth / displayBricks.length;
 
       displayBricks.forEach((b, idx) => {
-        const x = idx * brickW + brickW / 2;
+        const x = -panOffset + idx * brickW + brickW / 2;
         const yOpen = chartHeight - ((b.open - priceMin) / priceRange) * chartHeight;
         const yClose = chartHeight - ((b.close - priceMin) / priceRange) * chartHeight;
         const top = Math.min(yOpen, yClose);
@@ -1396,7 +1629,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
       });
     } else if (chartType === 'Line break') {
       const linesData: { open: number; close: number; isUp: boolean }[] = [];
-      candles.forEach((c, idx) => {
+      visibleCandles.forEach((c, idx) => {
         if (idx === 0) {
           linesData.push({ open: c.open, close: c.close, isUp: c.close >= c.open });
         } else {
@@ -1414,7 +1647,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
 
       const blockW = chartWidth / (linesData.length || 1);
       linesData.forEach((l, idx) => {
-        const x = idx * blockW + blockW / 2;
+        const x = -panOffset + idx * blockW + blockW / 2;
         const yOpen = chartHeight - ((l.open - priceMin) / priceRange) * chartHeight;
         const yClose = chartHeight - ((l.close - priceMin) / priceRange) * chartHeight;
         const top = Math.min(yOpen, yClose);
@@ -1427,11 +1660,12 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
       const revAmount = Math.max(0.5, (priceMax - priceMin) / 15);
       let direction = 1;
       let isYang = true;
-      let peak = candles[0].close;
-      let trough = candles[0].close;
-      const kagiPoints = [{ x: candleWidth / 2, price: candles[0].close, isYang: true }];
+      let peak = visibleCandles[0].close;
+      let trough = visibleCandles[0].close;
+      const firstVisibleIndex = visibleEntries[0].index;
+      const kagiPoints = [{ x: firstVisibleIndex * candleWidth + candleWidth / 2, price: visibleCandles[0].close, isYang: true }];
 
-      candles.forEach((c, idx) => {
+      visibleEntries.forEach(({ candle: c, index: idx }) => {
         const x = idx * candleWidth + candleWidth / 2;
         if (direction === 1) {
           if (c.close > peak) {
@@ -1463,7 +1697,8 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
           }
         }
       });
-      kagiPoints.push({ x: chartWidth - candleWidth / 2, price: candles[candles.length - 1].close, isYang });
+      const lastVisible = visibleEntries[visibleEntries.length - 1];
+      kagiPoints.push({ x: lastVisible.index * candleWidth + candleWidth / 2, price: lastVisible.candle.close, isYang });
 
       for (let i = 1; i < kagiPoints.length; i++) {
         const prev = kagiPoints[i - 1];
@@ -1484,9 +1719,9 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
       const boxSize = Math.max(0.4, (priceMax - priceMin) / 15);
       const cols: { isX: boolean; boxes: number[] }[] = [];
       let curCol: { isX: boolean; boxes: number[] } = { isX: true, boxes: [] };
-      let lastPrice = candles[0].close;
+      let lastPrice = visibleCandles[0].close;
 
-      candles.forEach((c) => {
+      visibleCandles.forEach((c) => {
         const diff = c.close - lastPrice;
         if (Math.abs(diff) >= boxSize) {
           const boxesCount = Math.floor(Math.abs(diff) / boxSize);
@@ -1514,7 +1749,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
 
       const colW = chartWidth / (cols.length || 1);
       cols.forEach((col, cIdx) => {
-        const x = cIdx * colW + colW / 2;
+        const x = -panOffset + cIdx * colW + colW / 2;
         col.boxes.forEach((pVal) => {
           const y = chartHeight - ((pVal - priceMin) / priceRange) * chartHeight;
           if (col.isX) {
@@ -1596,7 +1831,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
       const x = idx * candleWidth + candleWidth / 2;
       const isGreen = c.close >= c.open;
 
-      if (!isIndicatorsHidden && selectedIndicators.includes('Volume')) {
+      if (!isIndicatorsHidden && selectedIndicators.includes('volume')) {
         const volHeight = (c.volume / 2000) * (chartHeight * 0.22);
         ctx.fillStyle = isGreen ? 'rgba(0, 200, 83, 0.35)' : 'rgba(229, 57, 53, 0.35)';
         ctx.fillRect(x - candleWidth * 0.35, chartHeight - volHeight, candleWidth * 0.7, volHeight);
@@ -1610,17 +1845,23 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
       }
     }
 
-    // 3. EMA Indicator Line
-    if (!isIndicatorsHidden && selectedIndicators.includes('EMA')) {
+    // 3. Indicators-owned EMA line; null warm-up points break the path.
+    if (!isIndicatorsHidden && selectedIndicators.includes('ema') && indicatorSeries.ema) {
       ctx.beginPath();
       ctx.strokeStyle = '#FF9800';
       ctx.lineWidth = 1.5;
+      let drawingSegment = false;
       for (let idx = drawStart; idx < drawEnd; idx++) {
         const x = idx * candleWidth + candleWidth / 2;
-        const emaVal = candles[idx].close * 0.998;
+        const emaVal = emaByTime.get(candles[idx].timestamp);
+        if (candles[idx].missingBarsBefore || emaVal === null || emaVal === undefined) {
+          drawingSegment = false;
+          if (emaVal === null || emaVal === undefined) continue;
+        }
         const y = chartHeight - ((emaVal - priceMin) / priceRange) * chartHeight;
-        if (idx === drawStart) ctx.moveTo(x, y);
+        if (!drawingSegment) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
+        drawingSegment = true;
       }
       ctx.stroke();
     }
@@ -1739,7 +1980,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
         ctx.fillText(hoverTime, crosshairPos.x, chartHeight + 13);
       }
     }
-  }, [candles, chartType, selectedIndicators, targetProduct.lastPrice, drawings, currentLine, crosshairPos, isDrawingsHidden, isIndicatorsHidden, theme, cursorMode, panOffset, zoomLevel, symbolDigits, activeSymbol]);
+  }, [candles, chartType, selectedIndicators, indicatorSeries.ema, emaByTime, targetProduct.lastPrice, drawings, currentLine, crosshairPos, isDrawingsHidden, isIndicatorsHidden, theme, cursorMode, panOffset, zoomLevel, symbolDigits, activeSymbol, chartPlotWidth]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -1929,31 +2170,8 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
 
   const currentOHLC = candles[candles.length - 1] || {};
 
-  // Indicators Master List matching Image 3
-  const masterIndicatorsList = [
-    '52 Week High/Low',
-    'Accelerator Oscillator',
-    'Accumulation/Distribution',
-    'Accumulative Swing Index',
-    'Advance/Decline',
-    'Arnaud Legoux Moving Average',
-    'Aroon',
-    'Average Directional Index',
-    'Average Price',
-    'Average True Range',
-    'Awesome Oscillator',
-    'Balance of Power',
-    'Bollinger Bands',
-    'Bollinger Bands %B',
-    'EMA (Exponential Moving Average)',
-    'MA (Moving Average)',
-    'MACD',
-    'RSI',
-    'Volume'
-  ];
-
-  const filteredIndicators = masterIndicatorsList.filter((i) =>
-    i.toLowerCase().includes(indicatorSearchQuery.toLowerCase())
+  const filteredIndicators = indicatorCatalogue.filter((indicator) =>
+    `${indicator.indicator_id} ${indicator.name}`.toLowerCase().includes(indicatorSearchQuery.toLowerCase())
   );
 
   return (
@@ -2988,7 +3206,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
             </div>
           </div>}
 
-          {!isIndicatorsHidden && selectedIndicators.includes('Volume') && (
+          {!isIndicatorsHidden && selectedIndicators.includes('volume') && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--cme-sell-red)', fontWeight: 600 }}>
               <span>Volume {currentOHLC.volume || 16}</span>
               <button
@@ -3239,21 +3457,71 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
             </div>
           )}
 
+          {missingBarCount > 0 && (
+            <div
+              role="status"
+              data-testid="chart-gap-status"
+              style={{ position: 'absolute', top: 4, right: 76, zIndex: 2, fontSize: '10px', color: '#ffc107', fontWeight: 600 }}
+            >
+              {missingBarCount} missing {missingBarCount === 1 ? 'bar' : 'bars'} shown as gaps
+            </div>
+          )}
           <canvas
             ref={canvasRef}
             data-testid="chart-canvas"
             data-pan-offset={panOffset}
             data-zoom-level={zoomLevel}
+            data-chart-type={chartType}
             onMouseMove={handleMouseMove}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
             style={{
               width: '100%',
-              height: '100%',
+              height: selectedIndicators.includes('rsi') ? 'calc(100% - 120px)' : '100%',
               display: 'block',
               cursor: isPanning ? 'grabbing' : ['crosshair', 'select'].includes(activeTool) ? 'grab' : 'default'
             }}
           />
+          {!isIndicatorsHidden && selectedIndicators.includes('rsi') && (
+            <section
+              aria-label="RSI indicator panel"
+              data-testid="rsi-panel"
+              style={{ height: '120px', borderTop: '1px solid var(--border-color)', position: 'relative', background: 'var(--cme-navy-dark, #0b1426)' }}
+            >
+              <div style={{ position: 'absolute', top: 4, left: 8, zIndex: 1, fontSize: '11px', color: '#b39ddb', fontWeight: 600 }}>
+                RSI · period 14 · close
+                {loadingIndicators.has('rsi') && ' · Loading'}
+                {indicatorSeries.rsi?.availability === 'insufficient_history' && ' · Unavailable: insufficient history (warmup)'}
+                {indicatorErrors.rsi && ` · Unavailable: ${indicatorErrors.rsi}`}
+              </div>
+              <svg role="img" aria-label="RSI series" viewBox={`0 0 ${chartPlotWidth} 100`} preserveAspectRatio="none" style={{ width: 'calc(100% - 68px)', height: '100%', overflow: 'hidden' }}>
+                <line x1="0" y1="30" x2={chartPlotWidth} y2="30" stroke="#5c6b7a" strokeDasharray="2 2" vectorEffect="non-scaling-stroke" />
+                <line x1="0" y1="70" x2={chartPlotWidth} y2="70" stroke="#5c6b7a" strokeDasharray="2 2" vectorEffect="non-scaling-stroke" />
+                {rsiSegments.map((segment, index) => (
+                  <polyline
+                    key={index}
+                    data-testid="rsi-segment"
+                    points={segment.map((point) => `${point.x},${point.y}`).join(' ')}
+                    fill="none"
+                    stroke="#b39ddb"
+                    strokeWidth="1.5"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                ))}
+              </svg>
+              <span style={{ position: 'absolute', right: 4, top: '27%', fontSize: 9, color: '#718294' }}>70</span>
+              <span style={{ position: 'absolute', right: 4, top: '67%', fontSize: 9, color: '#718294' }}>30</span>
+            </section>
+          )}
+          {!isIndicatorsHidden && selectedIndicators.includes('ema') && (
+            <div style={{ position: 'absolute', top: 4, left: 8, zIndex: 1, fontSize: '11px', color: '#ff9800', fontWeight: 600 }}>
+              EMA · period 20 · close
+              {loadingIndicators.has('ema') && ' · Loading'}
+              {indicatorSeries.ema?.availability === 'insufficient_history' &&
+                ' · Unavailable: insufficient history (warmup)'}
+              {indicatorErrors.ema && ` · Unavailable: ${indicatorErrors.ema}`}
+            </div>
+          )}
         </div>
       </div>
 
@@ -3304,30 +3572,48 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
             </div>
 
             <div style={{ flex: 1, overflowY: 'auto' }}>
-              {filteredIndicators.map((ind) => {
-                const isSelected = selectedIndicators.includes(ind);
-                const isStarred = starredItems.includes(ind);
+              {catalogueStatus === 'loading' && (
+                <div role="status" style={{ padding: '14px', color: 'var(--text-muted-grey)' }}>
+                  Loading registered indicatorsâ€¦
+                </div>
+              )}
+              {catalogueStatus === 'error' && (
+                <div role="alert" style={{ padding: '14px', color: 'var(--cme-sell-red)' }}>
+                  Indicator catalogue unavailable
+                </div>
+              )}
+              {catalogueStatus === 'ready' && filteredIndicators.length === 0 && (
+                <div style={{ padding: '14px', color: 'var(--text-muted-grey)' }}>
+                  No registered indicators found
+                </div>
+              )}
+              {catalogueStatus === 'ready' && filteredIndicators.map((indicator) => {
+                const indicatorId = indicator.indicator_id;
+                const isChartEnabled = indicatorId === 'ema' || indicatorId === 'rsi';
+                const isSelected = selectedIndicators.includes(indicatorId);
                 return (
-                  <div
-                    key={ind}
+                  <button
+                    type="button"
+                    key={indicatorId}
                     className={`tv-dropdown-item ${isSelected ? 'active' : ''}`}
+                    disabled={!isChartEnabled}
                     onClick={() => {
-                      if (isSelected) setSelectedIndicators(selectedIndicators.filter((i) => i !== ind));
-                      else setSelectedIndicators([...selectedIndicators, ind]);
+                      if (isSelected) setSelectedIndicators(selectedIndicators.filter((id) => id !== indicatorId));
+                      else setSelectedIndicators([...selectedIndicators, indicatorId]);
                     }}
-                    style={{ padding: '8px 14px' }}
+                    style={{ padding: '8px 14px', width: '100%', border: 0, opacity: isChartEnabled ? 1 : 0.6 }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <Star
-                        size={14}
-                        className={`tv-star-icon ${isStarred ? 'starred' : ''}`}
-                        onClick={(e) => toggleStar(ind, e)}
-                      />
-                      <span>{ind}</span>
+                      <span style={{ textAlign: 'left' }}>
+                        <span style={{ display: 'block' }}>{indicator.name}</span>
+                        <span style={{ display: 'block', fontSize: '9px', color: 'var(--text-muted-grey)' }}>
+                          {indicatorId} · v{indicator.indicator_version}
+                        </span>
+                      </span>
                     </div>
-
+                    {!isChartEnabled && <span style={{ fontSize: '9px' }}>Not chart-enabled yet</span>}
                     {isSelected && <Check size={14} color="var(--cme-blue-bright)" />}
-                  </div>
+                  </button>
                 );
               })}
             </div>

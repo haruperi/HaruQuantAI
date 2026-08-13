@@ -3,7 +3,14 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ChartWidget, barExtent, maxVolume, type BarData } from './ChartWidget';
+import {
+  ChartWidget,
+  barExtent,
+  maxVolume,
+  toChartBars,
+  visibleBarRange,
+  type BarData,
+} from './ChartWidget';
 import { BAR_TIMEFRAMES } from '../../clients';
 import { resetSymbolUniverse } from '../watchlists/symbolUniverse';
 
@@ -13,6 +20,8 @@ const {
   symbolsMock,
   quotesMock,
   barsMock,
+  indicatorSeriesMock,
+  indicatorCatalogueMock,
   setWidgetSymbolMock,
 } = vi.hoisted(() => ({
   openOrderTicketMock: vi.fn(),
@@ -20,8 +29,12 @@ const {
   symbolsMock: vi.fn(),
   quotesMock: vi.fn(),
   barsMock: vi.fn(),
+  indicatorSeriesMock: vi.fn(),
+  indicatorCatalogueMock: vi.fn(),
   setWidgetSymbolMock: vi.fn(),
 }));
+
+const localPreferences = new Map<string, string>();
 
 vi.mock('../../store/useTradingStore', () => ({
   useTradingStore: () => ({
@@ -54,6 +67,11 @@ vi.mock('@/clients', async (importOriginal) => {
         symbols: symbolsMock,
         quotes: quotesMock,
         bars: barsMock,
+      },
+      indicators: {
+        ...actual.apiClients.indicators,
+        catalogue: indicatorCatalogueMock,
+        series: indicatorSeriesMock,
       },
     },
     unwrapData: (response: { data: unknown }) => response.data,
@@ -100,8 +118,70 @@ function symbolPage(items: string[], nextCursor: string | null): { data: unknown
   };
 }
 
+function indicatorSeries(
+  indicatorId: 'ema' | 'rsi',
+  values: (number | null)[],
+  period: number
+): { data: unknown } {
+  const validCount = values.filter((value) => value !== null).length;
+  return {
+    data: {
+      indicator_id: indicatorId,
+      name: indicatorId === 'ema' ? 'Exponential Moving Average' : 'Relative Strength Index',
+      symbol: 'EURUSD',
+      timeframe: 'H1',
+      source_id: 'mt5',
+      parameters: { period, source: 'close' },
+      points: values.map((value, index) => ({
+        time: `2026-08-13T${String(9 + index).padStart(2, '0')}:00:00+00:00`,
+        value,
+        unavailable_reason: value === null ? 'warmup' : null,
+      })),
+      count: values.length,
+      valid_count: validCount,
+      availability: validCount ? 'available' : 'insufficient_history',
+      unavailable_reason: validCount ? null : 'warmup',
+      indicator_version: '1.0.0',
+      formula_version: '1.0.0',
+      request_id: 'req-indicator',
+    },
+  };
+}
+
+function indicatorSpec(indicatorId: string, name: string): Record<string, unknown> {
+  return {
+    indicator_id: indicatorId,
+    name,
+    indicator_version: '1.0.0',
+    formula_version: '1.0.0',
+    tier: 'core_mvp',
+    required_columns: ['source'],
+    parameter_schema: {},
+    output_templates: [`${indicatorId}_{period}`],
+    warmup_policy: 'period',
+    vectorized: true,
+    multi_symbol: false,
+    multi_timeframe: false,
+    import_path: `app.services.indicators.${indicatorId}`,
+    stability: 'stable',
+    workflow_eligibility: ['research'],
+  };
+}
+
 describe('ChartWidget — FR-UI-046 Symbol Universe Autocomplete & Bar Fetching', () => {
   beforeEach(() => {
+    localPreferences.clear();
+    Object.defineProperty(window, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem: vi.fn((key: string) => localPreferences.get(key) ?? null),
+        setItem: vi.fn((key: string, value: string) => localPreferences.set(key, value)),
+        removeItem: vi.fn((key: string) => localPreferences.delete(key)),
+        clear: vi.fn(() => localPreferences.clear()),
+        key: vi.fn((index: number) => [...localPreferences.keys()][index] ?? null),
+        get length() { return localPreferences.size; },
+      },
+    });
     resetSymbolUniverse();
     symbolsMock.mockReset();
     quotesMock.mockReset();
@@ -378,6 +458,24 @@ describe('ChartWidget — FR-UI-046 Symbol Universe Autocomplete & Bar Fetching'
     const offeredLabels = Array.from(document.querySelectorAll('.tv-dropdown-item')).map(
       (item) => item.textContent?.trim()
     );
+    indicatorSeriesMock.mockReset();
+    indicatorSeriesMock.mockImplementation(({ indicatorId, period }) =>
+      Promise.resolve(
+        indicatorSeries(
+          indicatorId,
+          indicatorId === 'ema' ? [null, 1.086] : [null, 52],
+          period
+        )
+      )
+    );
+    indicatorCatalogueMock.mockReset();
+    indicatorCatalogueMock.mockResolvedValue({
+      data: [
+        indicatorSpec('ema', 'Exponential Moving Average'),
+        indicatorSpec('rsi', 'Relative Strength Index'),
+        indicatorSpec('macd', 'Moving Average Convergence Divergence'),
+      ],
+    });
 
     expect(offeredLabels).toEqual(BAR_TIMEFRAMES.map((key) => expectedLabels[key]));
   });
@@ -479,6 +577,222 @@ describe('ChartWidget — FR-UI-046 Symbol Universe Autocomplete & Bar Fetching'
     await waitFor(() => {
       expect(screen.getByText(/GBPJPY • H1 • HaruQuantAI/i)).toBeInTheDocument();
     });
+  });
+
+  it('fetches and presents Indicators-owned EMA with authoritative parameters', async () => {
+    render(<ChartWidget symbol="EURUSD" />);
+    await waitFor(() => expect(barsMock).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByRole('button', { name: /Indicators/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Exponential Moving Average/ }));
+
+    await waitFor(() => {
+      expect(indicatorSeriesMock).toHaveBeenCalledWith({
+        indicatorId: 'ema',
+        symbol: 'EURUSD',
+        timeframe: 'H1',
+        period: 20,
+        source: 'close',
+        limit: 100,
+      });
+    });
+    expect(await screen.findByText('EMA · period 20 · close')).toBeInTheDocument();
+  });
+
+  it('renders RSI in a separate panel without joining across warm-up values', async () => {
+    barsMock.mockResolvedValueOnce(
+      barSeries([
+        { time: '2026-08-13T09:00:00+00:00', open: 1.085, high: 1.0862, low: 1.0844, close: 1.0858, volume: 940 },
+        { time: '2026-08-13T10:00:00+00:00', open: 1.0858, high: 1.0871, low: 1.0851, close: 1.0866, volume: 1120 },
+        { time: '2026-08-13T11:00:00+00:00', open: 1.0866, high: 1.088, low: 1.086, close: 1.0874, volume: 1050 },
+        { time: '2026-08-13T12:00:00+00:00', open: 1.0874, high: 1.0884, low: 1.0868, close: 1.0879, volume: 980 },
+      ])
+    );
+    indicatorSeriesMock.mockResolvedValueOnce(indicatorSeries('rsi', [null, null, 45, 55], 14));
+    render(<ChartWidget symbol="EURUSD" />);
+    await waitFor(() => expect(barsMock).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByRole('button', { name: /Indicators/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Relative Strength Index/ }));
+
+    expect(await screen.findByText('RSI · period 14 · close')).toBeInTheDocument();
+    expect(screen.getByTestId('rsi-panel')).toBeInTheDocument();
+    expect(screen.getAllByTestId('rsi-segment')).toHaveLength(1);
+    expect(screen.getByText('70')).toBeInTheDocument();
+    expect(screen.getByText('30')).toBeInTheDocument();
+  });
+
+  it('anchors RSI timestamps to the same horizontal pan transform as chart bars', async () => {
+    indicatorSeriesMock.mockResolvedValueOnce(indicatorSeries('rsi', [45, 50], 14));
+    render(<ChartWidget symbol="EURUSD" />);
+    await waitFor(() => expect(barsMock).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByRole('button', { name: /Indicators/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Relative Strength Index/ }));
+
+    const segment = await screen.findByTestId('rsi-segment');
+    const before = segment.getAttribute('points');
+    const canvas = screen.getByTestId('chart-canvas');
+    fireEvent.mouseDown(canvas, { clientX: 100, clientY: 80 });
+    fireEvent.mouseMove(canvas, { clientX: 140, clientY: 80 });
+    fireEvent.mouseUp(canvas);
+
+    await waitFor(() => expect(segment.getAttribute('points')).not.toBe(before));
+    expect(Number(canvas.getAttribute('data-pan-offset'))).toBe(40);
+  });
+
+  it('reports wholly insufficient indicator history instead of presenting completion', async () => {
+    indicatorSeriesMock.mockResolvedValueOnce(indicatorSeries('rsi', [null, null], 14));
+    render(<ChartWidget symbol="EURUSD" />);
+    await waitFor(() => expect(barsMock).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByRole('button', { name: /Indicators/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Relative Strength Index/ }));
+
+    expect(
+      await screen.findByText(/Unavailable: insufficient history \(warmup\)/)
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId('rsi-segment')).not.toBeInTheDocument();
+  });
+
+  it('loads the real indicator catalogue when the fx Indicators modal opens', async () => {
+    render(<ChartWidget symbol="EURUSD" />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Indicators/ }));
+
+    await waitFor(() => expect(indicatorCatalogueMock).toHaveBeenCalled());
+    expect(
+      await screen.findByRole('button', { name: /Exponential Moving Average/ })
+    ).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Relative Strength Index/ })).toBeEnabled();
+    expect(
+      screen.getByRole('button', { name: /Moving Average Convergence Divergence/ })
+    ).toBeDisabled();
+    expect(screen.queryByText('52 Week High/Low')).not.toBeInTheDocument();
+  });
+
+  it('searches owner catalogue names and reports no matches truthfully', async () => {
+    render(<ChartWidget symbol="EURUSD" />);
+    fireEvent.click(screen.getByRole('button', { name: /Indicators/ }));
+    await screen.findByRole('button', { name: /Exponential Moving Average/ });
+
+    fireEvent.change(screen.getByPlaceholderText('Search indicator script name...'), {
+      target: { value: 'relative strength' },
+    });
+    expect(screen.getByRole('button', { name: /Relative Strength Index/ })).toBeEnabled();
+    expect(
+      screen.queryByRole('button', { name: /Exponential Moving Average/ })
+    ).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText('Search indicator script name...'), {
+      target: { value: 'not registered' },
+    });
+    expect(screen.getByText('No registered indicators found')).toBeInTheDocument();
+  });
+
+  it('reports an unavailable indicator catalogue instead of showing mock entries', async () => {
+    indicatorCatalogueMock.mockRejectedValueOnce(new Error('Catalogue unavailable'));
+    render(<ChartWidget symbol="EURUSD" />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Indicators/ }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Indicator catalogue unavailable');
+    expect(screen.queryByText('EMA')).not.toBeInTheDocument();
+  });
+
+  describe('FR-UI-051 through FR-UI-054 completion', () => {
+  it('persists drawings as an instrument-scoped client preference', async () => {
+    const first = render(<ChartWidget symbol="EURUSD" />);
+    await waitFor(() => expect(barsMock).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByTitle('Lines & Channels'));
+    fireEvent.click(screen.getByText('Trend Line'));
+    const canvas = screen.getByTestId('chart-canvas');
+    fireEvent.mouseDown(canvas, { clientX: 100, clientY: 80 });
+    fireEvent.mouseMove(canvas, { clientX: 180, clientY: 130 });
+    fireEvent.mouseUp(canvas);
+
+    const storageKey = 'haruquantai.chart.drawings.v1:EURUSD';
+    await waitFor(() => expect(JSON.parse(localPreferences.get(storageKey) ?? '[]')).toHaveLength(1));
+    expect(localPreferences.has('haruquantai.chart.drawings.v1:GBPJPY')).toBe(false);
+
+    first.unmount();
+    render(<ChartWidget symbol="EURUSD" />);
+    fireEvent.click(screen.getByTitle('Undo'));
+    await waitFor(() => expect(localPreferences.get(storageKey)).toBe('[]'));
+  });
+
+  it('fails safely when stored drawing preferences are malformed', () => {
+    localPreferences.set('haruquantai.chart.drawings.v1:EURUSD', '{not-json');
+    expect(() => render(<ChartWidget symbol="EURUSD" />)).not.toThrow();
+  });
+
+  it('restores and mutates only the selected instrument drawing partition', async () => {
+    const drawing = {
+      id: 'gbp-line',
+      tool: 'trendline',
+      startX: 10,
+      startY: 20,
+      endX: 50,
+      endY: 60,
+    };
+    localPreferences.set('haruquantai.chart.drawings.v1:EURUSD', JSON.stringify([drawing]));
+    localPreferences.set(
+      'haruquantai.chart.drawings.v1:GBPJPY',
+      JSON.stringify([drawing, { ...drawing, id: 'gbp-line-2' }])
+    );
+
+    render(<ChartWidget symbol="GBPJPY" />);
+    fireEvent.click(screen.getByTitle('Undo'));
+
+    await waitFor(() =>
+      expect(JSON.parse(localPreferences.get('haruquantai.chart.drawings.v1:GBPJPY') ?? '[]'))
+        .toHaveLength(1)
+    );
+    expect(JSON.parse(localPreferences.get('haruquantai.chart.drawings.v1:EURUSD') ?? '[]'))
+      .toHaveLength(1);
+  });
+
+  it('changes chart appearance without refetching or replacing bar data', async () => {
+    render(<ChartWidget symbol="EURUSD" />);
+    await waitFor(() => expect(barsMock).toHaveBeenCalled());
+    const callsBeforeAppearanceChange = barsMock.mock.calls.length;
+
+    fireEvent.click(screen.getByTitle('Chart Style: Candles'));
+    fireEvent.click(screen.getByText('Line', { selector: 'span' }));
+
+    expect(screen.getByTestId('chart-canvas')).toHaveAttribute('data-chart-type', 'Line');
+    expect(barsMock).toHaveBeenCalledTimes(callsBeforeAppearanceChange);
+  });
+
+  it('marks timestamp discontinuities and presents the missing-bar count', async () => {
+    const response = barSeries([
+      { time: '2026-08-13T09:00:00+00:00', open: 1, high: 2, low: 0.5, close: 1.5, volume: 10 },
+      { time: '2026-08-13T11:00:00+00:00', open: 1.5, high: 2.5, low: 1, close: 2, volume: 12 },
+    ]);
+    const projected = toChartBars(response.data as any, 'H1');
+    expect(projected[1].missingBarsBefore).toBe(1);
+    barsMock.mockResolvedValueOnce(response);
+
+    render(<ChartWidget symbol="EURUSD" />);
+    expect(await screen.findByTestId('chart-gap-status')).toHaveTextContent(
+      '1 missing bar shown as gaps'
+    );
+  });
+
+  it('keeps the latest bar in a bounded viewport at the one-million-bar maximum', () => {
+    const barCount = 1_000_000;
+    const plotWidth = 600;
+    const candleWidth = 10;
+    const latestOffset = plotWidth - barCount * candleWidth;
+    const range = visibleBarRange(barCount, plotWidth, candleWidth, latestOffset);
+
+    expect(range.end).toBe(barCount);
+    expect(range.end - range.start).toBe(60);
+    const beyondHistory = visibleBarRange(barCount, plotWidth, candleWidth, -20_000_000);
+    expect(beyondHistory.end).toBe(barCount);
+    expect(beyondHistory.end - beyondHistory.start).toBeLessThanOrEqual(61);
+  });
   });
 });
 

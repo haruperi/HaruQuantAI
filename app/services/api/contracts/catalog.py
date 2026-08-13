@@ -872,6 +872,13 @@ _KNOWN_ROUTE_CONTRACTS: tuple[RouteContract, ...] = (
         "indicators:read",
     ),
     _contract(
+        "api.indicators.series",
+        "GET",
+        "/api/v1/indicators/{indicator_id}/series",
+        "indicators",
+        "indicators:read",
+    ),
+    _contract(
         "api.workstation.read",
         "GET",
         "/api/v1/workstation",
