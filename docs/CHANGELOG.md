@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+### Register the bounded sim⇄live parity architecture
+
+The documentation authorities now record the approved parity programme's
+dependency direction, maturity ladder, certificate model, evidence ownership, and
+failure taxonomy before any programme code changes.
+
+#### Changed (5)
+
+- Recorded the acyclic dependency direction `Simulation → Trading → Brokers` plus `Simulation → Brokers` (read/factory through the Brokers-owned simulation authority port) with Simulation as a read/factory consumer of Brokers and Trading remaining the only application-mutation caller.
+- Registered the L1–L4 maturity ladder with distinct expiring L5-Demo and L5-Live certificates, the versioned MT5-FX-only Parity Envelope v1 concept, the market-observability and initial-authority-state identity rules, and the certificate invalidation policy.
+- Recorded the three parity failure classes (mirrored domain failures, fail-closed Simulation-integrity failures, seeded/journalled infrastructure injections) and the Brokers-current versus Data-historical provider-specification evidence ownership.
+- Registered the four Pending Simulation features `FEAT-SIM-15`–`18` plus the declared Brokers, Data, and Trading parity-programme boundaries, the request v2/async operation with preserved v1/sync deprecation windows, and superseded all pre-programme numerical performance results.
+- Folded `sim-as-broker-adapter-decision.md`, `simulator-backtest-pipeline.md`, and `trading-execution-pipeline.md` into the owning authorities and deleted them; `sim-live-parity-register.md` and the implementation plan remain reference-only until the claimed certificate is complete.
+
 ### Route live MT5 presentation through the MQL5 TCP bridge
 
 Live market presentation now receives atomic one-second multi-symbol snapshots

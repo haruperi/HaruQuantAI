@@ -1,8 +1,8 @@
 # Trading
 
 > **Package:** `app/services/trading`
-> **Status:** `Completed` — all 11 registered features (`FEAT-TRD-01`..`11`) are implemented with Trading-scoped verification and usage evidence.
-> **Last updated:** `2026-08-07`
+> **Status:** `Completed` — all 11 registered features (`FEAT-TRD-01`..`11`) are implemented with Trading-scoped verification and usage evidence. The declared sim⇄live parity-programme designs (see "Sim⇄live parity programme boundaries"; `FR-TRD-085`–`FR-TRD-113`) are Proposed until their owning programme phases implement them.
+> **Last updated:** `2026-08-14`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -123,6 +123,49 @@ filtering. This support directory is not a separately registered feature.
 | Completed | Closed positions, receipts, and execution projections      | Analytics, Portfolio, and UI/API via `TradeRecord` / `ExecutionReceipt` | `migrations/definitions.py` |
 | Completed | Idempotency reservations and canonical-material versions  | Trading only                                                             | `migrations/definitions.py` |
 | Completed | Reconciliation runs, authority transitions, and incidents | UI/API via `TradeRecord`; Risk via audit evidence where required         | `migrations/definitions.py` |
+
+### Sim⇄live parity programme boundaries
+
+The approved sim⇄live parity programme (`docs/dev/sim-live-parity-implementation-plan.md`)
+declares the following Trading designs. None is implemented in the current registry; each
+lands with its owning requirement (`FR-TRD-085`–`FR-TRD-113`) in the programme's phases.
+
+- **Paired gate taxonomy.** Business and risk gates are route-independent: `sim`, `paper`,
+  and `live` traverse the same gate roles, order, inputs, and outcomes through one action
+  path and one response classifier. Route-specific *safety* gates (live-mutation
+  authorization, live-transport checks) remain explicit and are compared against their own
+  route policy rather than forced to share an identifier; `sim` never inherits live
+  mutation authorization, and no business gate is skipped conditionally on route.
+- **Order-policy v1/v2 migration.** Trading will add versioned request/order-intent v2
+  contracts with required, independent `fill_policy` (`FOK|IOC|RETURN|BOC`) and
+  `time_policy` (`GTC|DAY|SPECIFIED|SPECIFIED_DAY`) plus aware-UTC expiration where
+  required, validated against the typed provider specification snapshot. No
+  provider-derived default becomes caller intent. V1 parsing remains inside a declared
+  release window; a v1 request lacking a policy dimension fails closed unless an
+  explicitly named, versioned legacy-compatibility profile supplies it, and that legacy
+  path is excluded from the parity envelope.
+- **Simulation authority consumption.** Simulation will consume Trading through one
+  public approved-request builder and the public mutation verbs; it never constructs
+  `OrderIntent` directly and never copies private Trading state. Authority for the `sim`
+  route is injected through the Brokers root boundary (the simulation broker channel),
+  replacing the injected `simulation_dispatch` callback; the route changes only authority
+  transport and the declared safety gates.
+- **Async deadline port.** `run_live_evaluation_cycle` remains the single public
+  evaluation path; its deadline authority will be an injected port. Live and paper use
+  monotonic wall time; Simulation supplies scheduler time. Neutral outcomes and timeout
+  evidence keep identical semantic shape on every route, and no production dependency
+  construction may default the port.
+- **Certification prerequisite — complete initial authority evidence.** A parity
+  certification requires either an exclusive account interval or complete ordered
+  evidence for every foreign/manual order, deal, balance, credit, and correction; missing
+  activity invalidates the comparison. A foreign exposure without valid ownership remains
+  orphaned and blocks affected mutations.
+- **Crash/reconciliation and in-flight kill-switch behavior.** Crash recovery restarts
+  from the last durable watermark and converges to authority state without repeating a
+  mutation whose outcome is unknown. Kill-switch activation before submission, in flight,
+  during a partial fill, while disconnected, and during recovery produces the registered
+  fail-closed state: new mutations are blocked and only truthful cancellation/recovery
+  proceeds.
 
 ### Four-level structure
 
@@ -703,6 +746,88 @@ the typed live gate, plan builder, idempotency reservation, pre-audit, and
 response classifier against in-memory dependencies. Its virtual positions,
 authority responses, reconciliation state, and closed-position data are teaching
 inputs—not broker observations, database records, fills, or performance claims.
+
+#### Route gate delta, dispatch classification, and safety invariants
+
+Folded from `docs/dev/trading-execution-pipeline.md` (deleted 2026-08-14); the
+implementation owners are `actions/orders.py`, `live/gates.py`,
+`routing/dispatcher.py`, `routing/responses.py`, and
+`reconciliation/authority.py`.
+
+**Sim vs live/paper — exactly which gates differ.** Common validation, the
+unresolved-scope retry lock, action-policy validation, risk-authority and token
+validation, kill-switch hierarchy validation, idempotency reservation, and
+`build_execution_plan` run identically on every route. The `sim` route
+additionally skips exactly: session started/admission enabled, the full readiness
+assessment (a `_passed_readiness` synthesized-pass records the bypass as
+route-caused, not accidental), pre-mutation audit, `reconciliation_ready`, and
+`validate_adapter_capability`; its response envelope always sets
+`places_trade=False` and `requires_network=False`. A `duplicate_completed`
+reservation on the sim path returns a success envelope with
+`legacy_status="duplicate_completed"`, while the live gate returns
+`dispatch_allowed: False` with the receipt ID.
+
+**Broker-selection cross-rules (`_validate_broker_selection`).** Connection and
+adapter must both be present, the connection enabled, `intent.provider_id` must
+match the connection, `route == "live"` requires environment `"live"` and
+`route == "paper"` forbids it, and the adapter must declare contract `v1` /
+`brokers.adapter.v1`. `modify_order` may not change `time_in_force` or
+`expiration` (the verified Brokers modification contract has no such field).
+Sim and broker authority are mutually exclusive: supplying both dispatch inputs
+is `SCOPE_MISMATCH` in both directions.
+
+**Conservative dispatch classification.** Uncertainty is never optimism:
+`timed_out`, `ambiguous`, `rate_limited`, any malformed response, a
+success-without-provider-order-ID, and every error code outside the explicit
+rejection set (auth/authorization/symbol/account/order/position not found,
+request invalid/rejected, market closed, insufficient margin/funds) all become
+`unknown_outcome` with `reconciliation_required=True`; `retry_safe` is always
+`False` on the dispatch path. Numbers parse strictly (no `bool`/`float`, finite,
+non-negative); timestamps are aware UTC with zero offset.
+
+**Unknown-outcome resolution transitions.** Reconciliation compares the authority
+snapshot against the projection by canonical-JSON equality over class-prefixed
+keys, classifying `missing_internal`, `missing_authority`, `mismatched`, and
+`stale_authority` findings (missing-internal or mismatched is `critical`). Any
+unresolved scope transitions `retry_locked` (`retry_allowed=False`); a clean
+compare with a pre-recorded `approved_retry` transitions `approved_retry`
+(`retry_allowed=True`); a clean compare without one transitions
+`resolved_no_retry`. `retry_locked` also emits the critical
+`BROKER_STATE_UNKNOWN` operational event. There is no blind retry anywhere in
+the package.
+
+**Evaluation-cycle specifics.** `run_live_evaluation_cycle` wraps the whole cycle
+in one workflow timeout and re-checks the budget immediately before mutation —
+either expiry emits `WORKFLOW_TIMEOUT` so the cycle can never dispatch after its
+budget. A neutral strategy result is a normal read-only success. Broker targets
+resolve from Trading's own state (never the strategy) and require exactly one
+match; zero or many is `RECONCILIATION_REQUIRED`.
+
+**Safety invariants.**
+
+1. Trading never resizes: `approved_volume = risk_approved_volume =
+   request.quantity = decision.approved_size`, re-checked at the readiness gate,
+   authority gate, plan builder, and again inside `SimTrader`.
+2. The send attempt is durable before the mutation is sent and stays unresolved
+   until a known outcome is recorded.
+3. One unresolved attempt freezes the whole authority scope.
+4. Uncertainty is always `unknown_outcome`; `retry_safe` is `False` on dispatch.
+5. No blind retry: clearing a lock needs reconciliation agreement; retrying
+   needs a pre-recorded `approved_retry`.
+6. Live requires the explicit `allow_live_mutations` flag; paper self-enables;
+   sim never touches a broker.
+7. Route and environment are cross-checked twice — at session start and again at
+   dispatch.
+8. Sim and broker authority are mutually exclusive in both directions.
+9. Pre-mutation audit is fail-closed on live/paper (`AUDIT_FAILED` stops
+   dispatch).
+10. Payloads are redacted; the idempotency key persists only as a SHA-256 hash;
+    config rejects any `is_sensitive_key`.
+11. All identities are deterministic hashes (`client_order_id`,
+    `idempotency_hash`, `receipt_id`, every `event_id`, `record_id`,
+    `report_id`, `resolution_id`).
+12. Current positions are memory-only; a durable projection carrying position
+    bodies is rejected outright.
 
 ### Workflow rank values
 

@@ -5,8 +5,8 @@ The Simulation error catalogue uses only the Utils-owned `TRANSIENT`,
 categories. An unconfirmed persistence result is non-retryable.
 
 > **Package:** `app/services/simulator`
-> **Status:** `Completed` — all 14 registered features, `FEAT-SIM-01`..`14`, are implemented and verified.
-> **Last updated:** `2026-08-09`
+> **Status:** `Completed` for `FEAT-SIM-01`..`14`; the four sim⇄live parity-programme features `FEAT-SIM-15`..`18` are registered as `Pending` (see "Sim⇄live parity programme registration").
+> **Last updated:** `2026-08-14`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -56,6 +56,7 @@ Contract definitions must match the name, version, and owner recorded in `docs/P
 | Status    | Contract                        | Version | Counterparty                                                        | Purpose                                                                                                                                                                                                                                                                                        |
 | --------- | ------------------------------- | ------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Completed | `SimulationBacktestRequestV1` | `v1`  | UI/API; Optimization submits via its internal backtest-adapter port | Receive the exact reference-based synchronous request defined in `docs/PROJECT.md` §5. Optimization owns and implements its own internal backtest-adapter port against Simulation's public `run_backtest`. Simulation imports nothing from Optimization and defines no adapter of its own. |
+| Pending | `SimulationBacktestRequestV2` | `v2`  | UI/API; Optimization via its internal backtest-adapter port | Parity-programme request with bound execution identity: required execution-model reference/hash, separate source/tick lineage hashes, market-evidence class, decision-instant policy, provider-specification revision set, complete initial-authority-state hash, certification target (`demo`/`live`), and explicit `close_open_positions_at_end`; its config hash covers every execution-affecting field and excludes trace IDs and itself. `run_backtest_async` is the v2-native operation; the retained synchronous `run_backtest` bridge fails closed inside a running event loop. V1 and the synchronous bridge remain valid inside their declared deprecation window. |
 | Completed | `SimulationResult`            | `v1`  | Analytics, Optimization, UI/API                                     | Publish a deterministic completed backtest outcome containing run/config/data/engine identities, simulated fills, journal and artifact references, accounting totals, diagnostics, and realism disclosures. Incomplete runs are never published.                                               |
 | Completed | `PortfolioBacktestRequestV1`  | `v1`  | Portfolio submits; Simulation receives                              | Receive one self-contained Simulation-owned projection of an immutable Portfolio candidate, with scalar values, ordered components, identifiers, versions, references, and hashes only. Defined by `FR-SIM-032`.                                                                              |
 | Completed | `PortfolioSimulationResult`   | `v1`  | Portfolio, Analytics, UI/API                                        | Publish complete component and aggregate journals, risk-budget history, metrics/artifact references, and reproducibility identity.                                                                                                                                                             |
@@ -114,6 +115,45 @@ publication. This support directory is not a separately registered feature.
 | Completed | Artifact manifest and checksums                                                 | Analytics, Optimization, Portfolio, UI/API through the applicable `SimulationResult` / `PortfolioSimulationResult`                 | Artifact schema under `reporting/`                                                                                                         |
 
 Incomplete, failed, or diagnostic-failed runs may retain bounded diagnostic evidence but must not be published as completed `SimulationResult` records.
+
+### Sim⇄live parity programme registration
+
+The approved sim⇄live parity programme (`docs/dev/sim-live-parity-implementation-plan.md`)
+converges `sim`, `paper`, and `live` on one Trading orchestration with an injected
+authority boundary. Dependency direction is `Simulation → Trading → Brokers` plus
+`Simulation → Brokers` (read/factory through the Brokers-owned simulation authority
+port); Brokers imports no Simulation symbol, and Simulation keeps matching, accounting,
+scheduling, calibration, and journals.
+
+- **Maturity ladder.** No implementation phase may claim parity. The programme proves
+  **L1** mutation-path convergence, **L2** evaluation-path convergence, **L3**
+  account/order semantics, and **L4** execution realism in order; only a completed
+  **L5 certificate** recorded in an immutable **Parity Envelope** may make a bounded
+  parity claim. The system-level ladder lives in `docs/PROJECT.md` §3.
+- **L5-Demo and L5-Live are distinct certificates.** Demo evidence certifies
+  sim-vs-demo only and never implies live-account parity; live scope stays locked
+  until owner-supplied sanitized live evidence passes the same mandatory gates.
+- **Engine comparability.** Simulation enters Trading through its public approved-request
+  builder and public mutation verbs and never constructs `OrderIntent` directly; the
+  deterministic execution scheduler (`FEAT-SIM-15`) owns the only simulated clock and
+  event pump; the effective-dated calculation model (`FEAT-SIM-16`) makes canonical
+  execution provider-call-free; every stochastic component must be calibrated from
+  eligible evidence (`FEAT-SIM-17`) or is excluded from canonical execution.
+- **Evidence eligibility.** Canonical execution rejects approximation, fallback,
+  staleness, uncovered specification intervals, and envelope-external modes. Genuine
+  bid/ask tick evidence is mandatory for path-sensitive parity; derived OHLC paths are
+  research-only unless a registered invariant is proven path-independent; required
+  clock edges that are unobserved exclude the affected latency claims rather than
+  collapsing timestamps.
+- **Certificate invalidation.** A parity certificate is a revocable lease bound to the
+  complete initial authority state (balances, margin, positions, orders, protections,
+  ownership, transaction watermark, accrued costs) and expires or invalidates on build,
+  contract, code/config identity, specification, source/tick model, calibration-validity,
+  or detected-drift changes. The comparator (`FEAT-SIM-18`) enforces this.
+- **Superseded numerical results.** Every pre-programme runtime, peak-memory, or other
+  numerical performance result recorded in this README or its tests is **superseded** by
+  the programme's published one-year M1 and bounded multi-symbol incremental performance
+  and memory budgets (`FR-SIM-241`) and is not canonical performance evidence.
 
 ### Four-level structure
 
@@ -193,6 +233,17 @@ Module folders and files are ordered from lowest dependency to highest dependenc
 | Completed | `FEAT-SIM-12` Execution Realism Models | `realism/` | latency profile, queue model, slippage and market impact, cancel/replace race, data/execution-view separation, fill calibration | `FR-SIM-118`..`FR-SIM-123` | `tests/simulator/usage/features/12_realism.py` |
 | Completed | `FEAT-SIM-13` Session Recovery | `recovery/` | canonical replay identity, recovery state machine, durable checkpoints, practice branching, scored anti-rewind, integrity failure and explicit rearm | `FR-SIM-124`..`FR-SIM-128` | `tests/simulator/usage/features/13_recovery.py` |
 | Completed | `FEAT-SIM-14` Alert Lifecycle | `alerts/` | `AlertEvent v1`, latched lifecycle, root-cause grouping, perception timestamp, emergency-control availability | `FR-SIM-129`..`FR-SIM-133` | `tests/simulator/usage/features/14_alerts.py` |
+| Pending | `FEAT-SIM-15` Deterministic Execution Scheduler | `scheduler/` | Scheduler creation, event scheduling/cancellation, bounded state inspection, single-event and conditional pumping, serialize/restore | `FR-SIM-194`, `FR-SIM-199`–`FR-SIM-204` | `tests/simulator/usage/features/15_scheduler.py` (Phase 5) |
+| Pending | `FEAT-SIM-16` Effective-Dated Calculation Model | `calculations/` | Exact-Decimal FX conversion, profit and margin calculation over effective-dated specification revisions, offline conformance artifacts, model identity | `FR-SIM-137`–`FR-SIM-145`, `FR-SIM-210`–`FR-SIM-214` | `tests/simulator/usage/features/16_calculations.py` (Phase 13b) |
+| Pending | `FEAT-SIM-17` Empirical Execution Calibration | `calibration/` | Immutable evidence partitioning, M1 spread and evidenced execution-component fits, artifact validation, temporal eligibility | `FR-SIM-181`–`FR-SIM-186`, `FR-SIM-224`–`FR-SIM-227` | `tests/simulator/usage/features/17_calibration.py` (Phase 19) |
+| Pending | `FEAT-SIM-18` Parity Comparison | `parity/` | Versioned parity envelope, evidence normalizer, relationship-preserving comparator, maturity ladder publication | `FR-SIM-187`–`FR-SIM-193`, `FR-SIM-236`–`FR-SIM-239` | `tests/simulator/usage/features/18_parity.py` (Phase 2) |
+
+The four `Pending` features are registered by the approved sim⇄live parity programme
+(`docs/dev/sim-live-parity-implementation-plan.md`); each is implemented, tested, and
+evidenced in its owning programme phase noted above and may not be claimed complete
+before that phase's gate passes. The registration of `FEAT-SIM-15` is the separately
+approved requirement that admits the `scheduler/` module folder under the structure
+rules in Section 2.
 
 The Simulation feature IDs follow the numbered standalone usage programs.
 
@@ -822,6 +873,86 @@ outside the run that produced it.
 
 **Integration test:**
 `tests/simulator/unit/test_workflow_usage_parity.py::test_simulator_workflow_registry_has_one_complete_program_each()`
+
+### Canonical backtest pipeline walkthrough
+
+Folded from `docs/dev/simulator-backtest-pipeline.md` (deleted 2026-08-14); the
+implementation owner is `run/orchestrator.py` with the feature modules below.
+
+**Composition — exactly eleven injected ports.** `build_simulation_run_dependencies`
+requires exactly these callable ports, no more and no fewer, else `ValueError`:
+`audit` (Data audit persistence), `market_data` (source `MarketDataset`),
+`tick_series` (Data-owned tick `MarketDataset`), `indicators` (`IndicatorSeries`),
+`strategy` (`TradeIntent` tuple), `risk` (`RiskDecision` tuple), `order_intents`
+(Trading `OrderIntent` tuple), `execution_profile`, `symbol_specification`,
+`cost_model`, and `fx_evidence` (`FXConversionEvidence`). Nothing on the run path
+imports Data, Indicators, Strategy, Risk, or Trading directly.
+
+**Preparation (`prepare_run_context`), strict order.** Load market data → generate
+tick series → validate market data (zero staleness tolerance, approved tick models,
+checksum/coverage/lookahead/monotonic/OHLC/spread gates returning
+`ValidatedMarketDataEvidence`) → build the tick timeline (every record a real
+bid/ask tick; derived ticks must carry `source_bar_time`, `tick_index_in_bar`,
+`bar_phase`; monotonic sequences) → reject an empty timeline → create the
+`JournalWriter` and write `run_started` with `{config_hash, data_hash,
+engine_version}` → resolve specification, cost model, and execution profile →
+construct `AccountLedger` and `EventDrivenExecutionEngine` → run the signal chain
+through the injected ports → sort intents by `(created_at, client_order_id)`. The
+signal chain reads the **source bar dataset** while execution runs against the
+**tick timeline**; the data view and the execution view are deliberately separate.
+
+**Per-tick execution order (`execute_tick`), fixed.** 1. monotonicity guard on
+timestamp and sequence; 2. session gate (a tick outside every session interval is
+journalled `tick_outside_session` and skipped, not fatal); 3. pre-fill excursion
+observation and mark-to-market; 4. protective exits — exit price is `bid` for BUY
+and `ask` for SELL, and a same-tick SL/TP conflict resolves by
+`SAME_TICK_PRIORITY = ("STOP_LOSS", "TAKE_PROFIT", "PENDING_ACTIVATION")` so
+stop-loss wins; 5. pending-order sweep (timing validation rejects lookahead,
+expired intents cancel, `match_order` evaluates trigger/price/gap/liquidity/fill
+policy without ever resizing an approved volume); 6. post-fill excursion
+re-observation; 7. equity observation appended; 8. the tick's receipts returned.
+`advance_run_timeline(..., start_index=, max_ticks=)` drives the identical engine
+in bounded increments — a run completed in N calls is byte-identical to a
+single-call run, which is what live what-if sessions use.
+
+**Ledger application (`AccountLedger.apply_fill`).** Volumes normalize against
+min/max/step; costs are debits (commission per lot per side, swap per crossed
+rollover with weekday multipliers); OPEN requires the margin delta to fit free
+margin else `SIM_INSUFFICIENT_MARGIN`; CLOSE requires the released margin to fit
+the used margin else `SIM_ACCOUNT_INVARIANT_BROKEN`; the completed result asserts
+`net_profit == final_balance − initial_balance`.
+
+**Journal vocabulary and verification.** Event types are exactly `run_started`,
+`order_accepted`, `tick_outside_session`, `fill_proposed`, `order_outcome`,
+`position_close_proposed`, `run_completed`. Every append canonicalizes, hashes
+(`previous_hash` chain, genesis = 64 zeros), and validates contiguity; group
+commit fsyncs every 100 events; `finalize()` re-reads and re-validates every line
+and atomically renames `journal.jsonl.partial` to `journal.jsonl`. `replay_journal`
+verifies sequence continuity, hash linkage, and the genesis `run_started` payload;
+any break is `SIM_CHECKPOINT_INCOMPATIBLE`.
+
+**Terminal liquidation and artifacts.** After the timeline is exhausted, every
+open position closes at the final observed tick's bid/ask with
+`exit_reason="REQUESTED"`, disclosed as a limitation in the result. Artifacts
+(`journal.jsonl`, `result.json`, `report.md`, `manifest.json`) publish under
+`<artifact_root>/<run_id>/` with tmp-write + fsync + atomic rename, and the
+manifest `created_at` is the final tick timestamp — never wall clock.
+
+**Determinism guarantees.** The same `request_hash` reproduces the same run
+because `run_id` derives from the request hash; intents are deterministically
+sorted; receipt IDs are `sha256({intent_id, status, sequence})`; artifact
+timestamps are the final tick; `canonical_json`/`canonical_digest` and
+`Decimal` with `ROUND_HALF_EVEN` are used throughout; there is no network, wall
+clock, or RNG on the execution path; Data owns tick derivation; and the journal
+hash chain makes any divergence detectable by replay.
+
+**Variant paths.** `run_fast_research` computes only mid-quote returns (no
+ledger, engine, journal, fills, artifacts, or promotion evidence);
+`run_portfolio_backtest` runs N components through the same single-run path and
+reconciles them in `PortfolioAggregateLedger`; Optimization injects
+`run_backtest` itself as its internal backtest-adapter port. A failed or
+incomplete run is never published as a `SimulationResult`; partial journals are
+never promoted.
 
 ---
 

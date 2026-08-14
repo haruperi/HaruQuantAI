@@ -173,7 +173,7 @@ Domains are listed in dependency order, from lowest dependency to highest depend
   streaming subscription events and connection lifecycle events (canonical event
   DTOs), capability/feature-flag reports, and connection/session status.
 * **Owns**: Per-platform adapter implementations, the broker registry/factory (`create_broker_adapter`; adapter instances are created via the registry and owned by the caller), connection/session lifecycle mechanics (state machine, keep-alives, transport reconnects), translation of provider-native symbol/request values into provider API calls, canonical DTO and error mapping (unenriched), capability discovery, and transport-level flow control (rate-limit throttling, bounded backpressure, and the adapter-local closed/open/half-open circuit breaker specified by the Brokers README).
-* **Boundaries**: Pure passthrough with zero business logic — no business validation (structural/transport validation only), no risk checks, no decision-making, no data enrichment, no business retry/replay (transport-level flow control and connection recovery are permitted; mutations are never retried), and no state management beyond the live session (no durable state). Owns no credential vault and performs no credential persistence, encryption, or database access; approved composition roots resolve settings before constructing `BrokerConnectionConfig`, and only resolved secret values live in memory for the adapter lifecycle. Data owns canonical market identity, friendly names, and every provider/cross-provider alias mapping; Brokers accepts and reports exact provider-native symbol strings only and owns no alias resolution. Brokers does not normalize into `MarketDataset` / `AccountStateSnapshot` and never leaks raw SDK objects across its boundary. Only Trading may invoke mutation operations; Data's use is strictly read-only; Risk and all other domains have no Brokers dependency. The read/write split is enforced by capability-trait scoping (`MarketDataProvider`, `TradeExecutionProvider`, `AccountProvider`, `CalculationProvider`).
+* **Boundaries**: Pure passthrough with zero business logic — no business validation (structural/transport validation only), no risk checks, no decision-making, no data enrichment, no business retry/replay (transport-level flow control and connection recovery are permitted; mutations are never retried), and no state management beyond the live session (no durable state). Owns no credential vault and performs no credential persistence, encryption, or database access; approved composition roots resolve settings before constructing `BrokerConnectionConfig`, and only resolved secret values live in memory for the adapter lifecycle. Data owns canonical market identity, friendly names, and every provider/cross-provider alias mapping; Brokers accepts and reports exact provider-native symbol strings only and owns no alias resolution. Brokers does not normalize into `MarketDataset` / `AccountStateSnapshot` and never leaks raw SDK objects across its boundary. Only Trading may invoke application mutation operations; Data's use is strictly read-only; Simulation is a read/factory consumer that constructs and drives the Brokers-owned simulation broker channel through an injected, structurally typed authority port; Risk and all other domains have no Brokers dependency. The read/write split is enforced by capability-trait scoping (`MarketDataProvider`, `TradeExecutionProvider`, `AccountProvider`, `CalculationProvider`).
 * **Key Limits**: Sole live-connectivity path to any broker/provider; connection, scope, or permission failure fails closed; mutations are never retried — uncertain outcomes return `BROKER_UNKNOWN_OUTCOME`; unsupported capabilities return `BROKER_CAPABILITY_UNSUPPORTED` deterministically; an open adapter-local transport circuit returns `BROKER_CIRCUIT_OPEN` without a provider call; no path returns a synthetic substitute.
 * **Status**: `Completed`. Eleven focused Brokers features are implemented: instrument profiles, capability metadata, five direct provider channels, reconciliation, environment isolation, event normalization, and conformance. Provider release policy and production authorization remain separate runtime gates.
 * **Documentation**: `app/services/brokers/README.md`
@@ -259,7 +259,7 @@ the current input contract rather than represented by unusable stubs.
 * **Inputs**: Historical datasets from Data, order intents via the Trading `sim` route, vetted strategy registry references, backtest configuration.
   * **Outputs**: `StandardResponse[SimulationResult]`, `StandardResponse[PortfolioSimulationResult]`, `MissionDefinition v1`, `ReplayIdentity v1`, scenario/realism provider evidence, secured checkpoints, and simulated `AlertEvent v1` evidence.
   * **Owns**: Simulation results and artifacts persistence, its own tables/schemas/migrations, the historical backtest loop (`Data → Indicators → Strategy → Risk → Trading(sim) → Simulation fills`), simulation-only modes and actual-state checklists, scenario triggers and injected events, execution-realism models, canonical replay identity, secured-session recovery, and simulated alert lifecycle.
-  * **Boundaries**: No live side effects. Ordinary live what-if state remains in memory; only explicitly secured durable sessions receive checkpoint recovery. Simulator does not own live broker channels/adapters, external alert delivery, or arbitrary strategy code execution.
+  * **Boundaries**: No live side effects. Ordinary live what-if state remains in memory; only explicitly secured durable sessions receive checkpoint recovery. Simulator does not own live broker channels/adapters — through the approved sim⇄live parity programme it consumes Brokers read/factory operations through the Brokers-owned simulation authority port, and Brokers imports no Simulation symbol — nor external alert delivery, or arbitrary strategy code execution.
 * **Key Limits**: Initial balance must be positive; only vetted registry references accepted (no raw code); deterministic replay required; public operations return Utils-owned `StandardResponse[T]` with raw producer values in `data` and structured `SIM_*` errors in `error`. The synchronous public run receives an explicit Simulation-owned dependency bundle, uses the request as the sole request-id authority, and binds Trading's sim route to one injected `SimTrader.submit_order` instance. Official execution has no ambient clock, implicit execution model, inferred session calendar, or module-global active engine.
 * **Documentation**: `app/services/simulator/README.md`
 
@@ -443,7 +443,8 @@ Utils is required by every domain; only the Utils → Brokers edge is drawn to k
 - **Indicators** consume normalized Data output. **Strategy** consumes Data and Indicators.
 - **Risk** consumes Strategy proposals and Data account snapshots; it must be independent of Trading so that execution can never influence approval.
 - **Trading** orchestrates live/paper evaluation by invoking the public APIs of Data, Indicators, Strategy, and Risk. It owns execution only after Risk approval and is the single execution owner for `sim`, `paper`, and `live` routes; broker mutations are dispatched through the Brokers domain's canonical `BrokerAdapter` (mutation operations are Trading-only).
-- **Simulation** replays history through the Trading `sim` route, so it sits above Trading. Since it orchestrates the historical backtest loop, it depends directly on `Data`, `Indicators`, `Strategy`, `Risk`, and `Trading`.
+- **Simulation** replays history through the Trading `sim` route, so it sits above Trading. Since it orchestrates the historical backtest loop, it depends directly on `Data`, `Indicators`, `Strategy`, `Risk`, and `Trading`. The sim⇄live parity programme additionally fixes the direction `Simulation → Trading → Brokers` plus `Simulation → Brokers`: Simulation is a read/factory consumer of Brokers (it constructs and drives the Brokers-owned simulation broker channel through an injected, structurally typed authority port), while all application mutation operations remain Trading-only. Brokers imports no Simulation symbol, and the dependency graph remains acyclic.
+- **Specification evidence ownership** (parity programme): Brokers owns the typed *current* provider specification snapshot — current observation only, never inventing historical effective bounds. Data owns immutable effective-dated historical specification revisions with point-in-time reads and coverage proof. Simulation owns historical execution behavior and never interprets raw provider metadata or backdates current evidence.
 - **Analytics** consumes an Analytics-owned closed-trade projection emitted by Trading or Simulation plus benchmarks from Data. It imports neither producer implementation; only `reports/allocation.py` waits for the Simulation-owned `PortfolioSimulationResult v1` producer fixture.
 - **Optimization** consumes Data, Strategy, Simulation, and Analytics to drive bounded search and scoring. **Research** consumes Data and Analytics public metric contracts.
 - **Portfolio** consumes Data, Strategy, Risk, Trading, Simulation, and Analytics contracts to construct and activate multi-strategy allocations after Risk activates the authoritative risk-budget projection. Risk/Trading/Simulation receive only their own receiver-owned request contracts, so none imports Portfolio and no cycle is introduced.
@@ -454,23 +455,83 @@ Utils is required by every domain; only the Utils → Brokers edge is drawn to k
 
 No circular dependencies exist. Simulation and Analytics may be implemented concurrently: Simulation imports no Analytics code, and Analytics consumes its receiver-owned ledger mapping rather than Simulation implementation types. The sequencing edge `Simulation FR-SIM-033 → Analytics reports/allocation.py` is an integration-order constraint, not a package dependency cycle.
 
+### Sim⇄Live Parity Programme (system level)
+
+`sim`, `paper`, and `live` use the same Trading orchestration and differ only at an injected
+authority boundary. Simulation reproduces MT5 terminology, validation, state transitions,
+retcodes, accounting, and provider-shaped evidence for every operation admitted by the active
+**Parity Envelope** — a versioned, falsifiable certification matrix of provider, environment,
+server/account mode, symbol specification revision, order operation, execution model,
+market-evidence class, initial authority state, and evidence sources. `paper` names only the
+explicitly declared non-production provider environment inside that envelope; it is not a
+synonym for Simulation or live-account execution. Anything outside the matrix fails canonical
+eligibility; it is never silently approximated.
+
+Parity Envelope v1 targets **MT5 FX only**. cTrader, Binance, non-FX instruments, corporate
+actions, exchange auctions, multi-account behavior, and any broker/account/build without
+admitted evidence are excluded. Parity certifies execution behavior, not strategy
+profitability or equality across different market histories.
+
+**Maturity ladder.** No implementation phase may claim parity; only the corresponding
+completed L5 certificate may make the bounded claim recorded in its immutable envelope:
+
+| Rung | Claim |
+|---|---|
+| **L1 · Mutation-path convergence** | Equivalent business/risk gates and the same authority boundary are traversed; route-specific safety gates remain explicit |
+| **L2 · Evaluation-path convergence** | Indicators, Strategy, and Risk evaluate incrementally against evolving point-in-time state using the same Trading cycle |
+| **L3 · Account/order semantics** | Verified account, margin, order, deal, protection, and position behavior matches within the admitted matrix |
+| **L4 · Execution realism** | Every stochastic component is calibrated from eligible evidence or excluded from canonical execution |
+| **L5-Demo · Bounded demo certification** | Every common gate and the mandatory independent MT5-demo differential gate pass for the published demo envelope |
+| **L5-Live · Bounded live certification** | Every common gate and the mandatory independent sanitized live-account differential gate pass for the published live envelope |
+
+**L5-Demo and L5-Live are distinct certificates.** Demo evidence may certify sim-vs-demo only;
+L5-Demo never implies L5-Live. A parity certificate is a revocable lease: build, contract,
+code/config identity, specification, source/tick model, calibration validity, or detected-drift
+changes invalidate the affected certificate, and an expired or invalidated certificate confers
+no parity claim.
+
+**Market-evidence observability** bounds every claim: genuine bid/ask ticks are required for
+path-sensitive parity; a derived OHLC path is research-only unless a registered invariant is
+proven path-independent. **Initial authority state** binds execution identity: a certified run
+hashes balances, margin, positions, orders, protections, ownership, transaction watermark, and
+accrued costs; the account interval is exclusive or every foreign/manual event is replayed.
+
+**Failure taxonomy.** Parity failures fall into exactly three classes:
+
+1. **Mirrored domain failures** — the simulated provider outcome must mirror the target
+   broker's verified behavior exactly (retcodes, state transitions, accounting).
+2. **Fail-closed Simulation-integrity failures** — when no verified provider evidence exists,
+   Simulation fails closed and the affected path is excluded from the canonical envelope; it
+   never invents an approximation.
+3. **Seeded/journalled infrastructure injections** — timeouts, unknown outcomes, disconnects,
+   and transport faults exist in simulation only through the explicitly seeded and journalled
+   scenario/fault-injection engine.
+
+Feature internals, requirement rows, and evidence remain authoritative in the owning package
+READMEs (`app/services/simulator/README.md` and the Brokers/Data/Trading registries); the
+executable programme is `docs/dev/sim-live-parity-implementation-plan.md`.
+
 ### Consolidated feature inventory
 
-The owning package READMEs collectively register exactly 232 canonical `FEAT-*`
+The owning package READMEs collectively register exactly 236 canonical `FEAT-*`
 features. No secondary programme or work-package identifier namespace is active.
 
 | Status | Count |
 | --- | ---: |
 | Completed | 220 |
-| Pending | 12 |
+| Pending | 16 |
 | Partial | 0 |
 | Missing | 0 |
-| **Total** | **232** |
+| **Total** | **236** |
 
-The twelve `Pending` features are `FEAT-UI-05`–`FEAT-UI-13`, `FEAT-UI-15`,
+The sixteen `Pending` features are `FEAT-UI-05`–`FEAT-UI-13`, `FEAT-UI-15`,
 `FEAT-UI-16`, and `FEAT-UI-17`, each awaiting requirement evidence or focused-folder
-ownership recorded in `app/ui/README.md`. They are the primary trading workspace and
-its enabling foundation, specified by `docs/dev/documentation.pdf`.
+ownership recorded in `app/ui/README.md` — they are the primary trading workspace and
+its enabling foundation, specified by `docs/dev/documentation.pdf` — plus the four
+sim⇄live parity-programme Simulation features `FEAT-SIM-15` (Deterministic Execution
+Scheduler), `FEAT-SIM-16` (Effective-Dated Calculation Model), `FEAT-SIM-17` (Empirical
+Execution Calibration), and `FEAT-SIM-18` (Parity Comparison), registered as Pending in
+`app/services/simulator/README.md`.
 
 Feature descriptions, requirements, public APIs, persistence, and evidence remain
 authoritative only in the owning package README; this section is the system-level
@@ -1028,6 +1089,8 @@ Document only contracts crossing domain or external-system boundaries.
 | Completed   | `ExecutionEvidenceReport`                | `v1`  | `Trading`      | `Trading`                                                                              | `Analytics, Portfolio, UI/API`                                                                                                                                                 | Immutable stored execution, readiness, reconciliation, incident, warning, and unresolved-action evidence                                                                                                                                                              | `contract_version="v1"`, `schema_id="trading.execution_evidence_report.v1"`, exact stored evidence and trace metadata                                                                                                                                                          | Missing or inconsistent stored evidence fails closed; Trading never computes Analytics metrics                                                                                                |
 | Completed   | `SimulationResult`                       | `v1`  | `Simulation`   | `Simulation`                                                                           | `Analytics, Optimization, UI/API`                                                                                                                                              | Deterministic backtest outcome                                                                                                                                                                                                                                        | run ID, config hash, journals, fills, closed-trade ledger, initial balance, account currency, artifact manifest                                                                                                                                                                                                                            | Structured`SIM_*` errors; incomplete runs are not published                                                                                                                                 |
 | Completed   | `SimulationBacktestRequestV1`            | `v1`  | `Simulation`   | `UI/API`; `Optimization` via its internal backtest-adapter port                      | `Simulation`                                                                                                                                                                   | Exact reference-based synchronous backtest request                                                                                                                                                                                                                    | contract version/schema ID, trace IDs, strategy/data references and versions, bounded parameters, FX symbols/timeframe/UTC range, positive initial balance, execution/Risk references and versions,`simulation` profile, `sim` route, config hash                              | Unknown fields, unsafe objects, incompatible versions/references, invalid UTC range/balance, or non-deterministic configuration are rejected before execution with structured`SIM_*` errors |
+| Pending     | `SimulationBacktestRequestV2`            | `v2`  | `Simulation`   | `UI/API`; `Optimization` via its internal backtest-adapter port                      | `Simulation`                                                                                                                                                                   | Reference-based backtest request with bound execution identity for parity-eligible canonical runs; `run_backtest_async` is the v2-native operation and the retained synchronous `run_backtest` bridge fails closed inside a running event loop                                                                                                            | every V1 execution-affecting field plus required execution-model reference/hash, separate source/tick lineage hashes, market-evidence class, decision-instant policy, provider-specification revision set, complete initial-authority-state hash, certification target (`demo`/`live`), explicit `close_open_positions_at_end`; config hash covers all execution-affecting fields and excludes trace IDs and itself | Missing execution-identity evidence, relabelled demo evidence as live, retroactive current snapshots, or running-loop sync misuse are rejected with structured `SIM_*` errors; V1/sync remain valid inside their declared deprecation window |
+| Pending     | `ParityEnvelope` / parity certificate   | `v1`  | `Simulation`   | `Simulation`                                                                          | `Trading, Brokers, Data, UI/API (published scope only)`                                                                                                                        | Versioned falsifiable certification matrix bounding every sim⇄live parity claim; L5-Demo and L5-Live are distinct expiring certificates                                                                                                                               | scope (`demo`/`live`), provider/environment/server mode, admitted symbol/specification revisions and intervals, market-evidence class, initial-authority-state hash, operation/fill/time modes, calibration identities and holdout hashes, tolerances and aggregate economic-error budgets, ignored-field registry, issued-at/valid-through and invalidation triggers | Work outside the matrix fails canonical eligibility; certificate invalidates on build, contract, code/config identity, specification, source/tick model, calibration-validity, or detected-drift change; an invalidated certificate confers no parity claim |
 | Completed | `PerformanceReport`                      | `v1`  | `Analytics`    | `Analytics`                                                                            | `UI/API, Research, Optimization, Portfolio`                                                                                                                                    | Read-only metric sections, caveats, quality flags, lineage, and hashes                                                                                                                                                                                                                            | contract version, schema ID, report ID, metric set, caveat metadata                                                                                                                                                                                                                | Missing FX or benchmark data returns an explicit validation failure or caveat according to the metric contract                                                                                |
 | Completed | `DashboardPayload`                       | `v1`  | `Analytics`    | `Analytics`                                                                            | `UI/API`                                                                                                                                                                       | Bounded, versioned chart/table projection of a validated`PerformanceReport` for presentation; no UI rendering logic                                                                                                                                                 | contract version, schema ID, chart/table sections, section statuses, warnings, units, truncation metadata                                                                                                                                                                          | Non-finite values or exceeded point limits return a structured validation error; payload is never partially emitted                                                                           |
 | Completed | `OptimizationResult`                     | `v1`  | `Optimization` | `Optimization`                                                                         | `UI/API`                                                                                                                                                                       | Advisory ranked parameter candidates and diagnostics                                                                                                                                                                                                                  | search ID, reproducibility hash, ranked candidates, diagnostics                                                                                                                                                                                                                    | Invalid or unbounded input rejected before search                                                                                                                                             |

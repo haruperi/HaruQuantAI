@@ -413,6 +413,17 @@ kill-switch authority, order tool, or direct execution route. Agent-authored cod
 reaches Indicators or Strategy only through the governed promotion and
 receiver-registration workflow.
 
+**Sim⇄live parity dependency note.** The approved parity programme fixes the
+execution dependency direction `Simulation → Trading → Brokers` plus
+`Simulation → Brokers`. Simulation is a read/factory consumer of Brokers: it
+constructs and drives the Brokers-owned simulation broker channel through an
+injected, structurally typed authority port, while every application mutation
+operation remains Trading-only. Brokers imports no Simulation symbol, provider
+translation stays in Brokers, and matching/accounting/scheduling/journaling stay in
+Simulation. Specification evidence is split by observation time: Brokers owns the
+typed current provider specification snapshot (current observation only) and Data
+owns immutable effective-dated historical revisions; the graph stays acyclic.
+
 ### Agentic Runtime and Trust Boundaries
 
 Google ADK 2.x provides the in-process graph, dynamic, collaborative, task, session,
@@ -777,6 +788,22 @@ Portfolio collaboration is contract-governed:
 * **Portfolio Activation Baseline**: Simulation-profile activation is automatic only within explicit simulation policy. Paper/live activation requires human approval plus current Risk authorization. Active kill switches block activation and rebalance.
 * **Allocation Safety Baseline**: Capital weights are Portfolio metadata; Risk budgets are authoritative. Existing over-budget exposure creates a Risk-reviewed reduce-only plan, and the system never opens a position solely to match a target weight.
 
+### Sim⇄Live Parity Failure Taxonomy
+
+Parity-programme failures fall into exactly three classes:
+
+1. **Mirrored domain failures** — the simulated provider outcome must mirror the
+   target broker's verified behavior exactly (retcodes, state transitions,
+   accounting); any verified divergence is a parity defect.
+2. **Fail-closed Simulation-integrity failures** — where no verified provider
+   evidence exists, Simulation fails closed and the affected path is excluded from
+   the canonical envelope; it never substitutes an approximation, fallback, or
+   invented default.
+3. **Seeded/journalled infrastructure injections** — timeouts, unknown outcomes,
+   disconnects, delivery gaps, and transport faults appear in simulation only
+   through the explicitly seeded and journalled scenario/fault-injection engine;
+   they are never produced spontaneously.
+
 ### Operational Logging Boundary
 
 * Governed external I/O, persistence, lifecycle/state transitions, and classified
@@ -1005,7 +1032,7 @@ declare a foreign key into a domain that transitively depends on it.
 | **L1 Ingress** | Brokers, Data | External world → canonical storage. |
 | **L2 Derivation** | Indicators | Deterministic transforms of L1. Fully recomputable. |
 | **L3 Decision** | Strategy, Risk | Intent generation and mandatory admission control. |
-| **L4 Execution** | Trading, Simulator | Live and simulated order lifecycle. Simulator mirrors Trading's shape exactly. |
+| **L4 Execution** | Trading, Simulator | Live and simulated order lifecycle. Simulator mirrors Trading's shape exactly; dependency direction is `Simulation → Trading → Brokers` plus `Simulation → Brokers` (read/factory only), and Brokers imports no Simulation symbol. |
 | **L5 Aggregation** | Portfolio, Analytics | Position rollup and performance measurement. |
 | **L6 Search** | Optimization, Research | Offline exploration over L5 outputs. |
 | **L7 Orchestration** | Agentic | Reads everything through governed tools; writes only its own namespace. |
@@ -1105,6 +1132,23 @@ counterparts, differing only in prefix and the addition of `run_id`.
 live rows diverge structurally, every metric needs two implementations and the two
 drift apart — which is precisely how backtest overfitting hides. Parity is a
 correctness control, not convenience.
+
+**Programme-level parity model.** This table-level mirroring is the storage-shape
+precursor of the approved sim⇄live parity programme, which extends parity from
+schema shape to verified execution behavior. `sim`, `paper`, and `live` share one
+Trading orchestration and differ only at an injected authority boundary. Claims are
+bounded by a versioned **Parity Envelope** (v1 targets MT5 FX only) and mature
+through a ladder: **L1** mutation-path convergence, **L2** evaluation-path
+convergence, **L3** account/order semantics, **L4** execution realism. No
+implementation phase may claim parity; only a completed **L5 certificate** may, and
+**L5-Demo** and **L5-Live** are distinct certificates — demo evidence certifies
+sim-vs-demo only and never implies live-account parity. A certificate is a revocable
+lease that expires or invalidates when its bound build, contract, code/config
+identity, specification, source/tick model, calibration validity, or detected drift
+changes. Genuine bid/ask tick evidence is mandatory for path-sensitive parity;
+derived OHLC paths are research-only unless a registered invariant is proven
+path-independent. The system-level record lives in `docs/PROJECT.md` §3 and the
+executable programme in `docs/dev/sim-live-parity-implementation-plan.md`.
 
 ---
 

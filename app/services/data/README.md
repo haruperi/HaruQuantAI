@@ -6,8 +6,8 @@ The official weekly-calendar synchronization accepts optional aware-UTC
 uses the runtime UTC clock.
 
 > **Package:** `app/services/data`
-> **Status:** `Completed` — all 14 registered features (`FEAT-DATA-01`..`14`) are implemented. Canonical Level-2 state remains an extension requirement of `FEAT-DATA-10`, while Brokers retains provider-specific order-book transport.
-> **Last updated:** `2026-08-10`
+> **Status:** `Completed` — all 14 registered features (`FEAT-DATA-01`..`14`) are implemented. Canonical Level-2 state remains an extension requirement of `FEAT-DATA-10`, while Brokers retains provider-specific order-book transport. The declared sim⇄live parity-programme extension of `FEAT-DATA-02` (provider-specification revisions, `FR-DATA-214`–`216`) is Proposed until Phase 4b implements it.
+> **Last updated:** `2026-08-14`
 
 > This README is the package's **single source of truth** for requirements,
 > final structure, implementation sequence, progress, usage examples, and tests.
@@ -91,6 +91,35 @@ execution decision.
   the complete licence model; see `Explicit exclusions`.
 - Implicit conversion of foreign file formats on read. `load_dataset` requires a
   Data-written manifest; foreign artifacts enter only through explicit import.
+
+### Sim⇄live parity programme boundaries
+
+The approved sim⇄live parity programme (`docs/dev/sim-live-parity-implementation-plan.md`)
+declares the following Data ownership rules. The provider-specification extension is a
+design registration until the programme's Phase 4b implements it.
+
+- **Effective-dated provider-specification history.** Brokers owns the typed *current*
+  provider specification snapshot; Data (through the `FEAT-DATA-02` extension) owns the
+  immutable effective-dated history of those snapshots. Revisions persist with snapshot
+  checksum, provider/server/environment/account digest, symbol, observed/effective
+  bounds, provenance, and payload. The first observation begins no earlier than its
+  verified `observed_at`; a subsequent revision closes the prior interval;
+  owner-supplied historical evidence may declare an earlier boundary only with source
+  provenance and checksum. Overlap, backdating, checksum mutation, and update/delete of
+  immutable evidence are rejected, gaps stay gaps, and point-in-time/interval reads
+  return exact revision sets with complete-coverage proof.
+- **Weekly sessions do not prove dated exceptions.** MT5 sessions without a Python
+  session operation use Data's explicit revisioned weekly definitions. A weekly
+  definition cannot certify broker holidays, maintenance windows, or one-off closures:
+  an interval that may contain an exceptional closure and has no dated evidence covering
+  it is outside the canonical parity envelope. The Python adapter never claims to supply
+  session evidence it does not have.
+- **Level-2 ownership stays open.** `OD-DATA-01` (Level-2 order-book ownership) remains
+  unresolved and is not resolved or implied by this registration; pathwise queue-position
+  parity stays excluded while it is open.
+- **Data never grants trading authority.** No Data read, dataset, specification revision,
+  or session definition authorizes an order, a mutation, or an execution decision;
+  authority remains with Trading after Risk approval.
 
 ### Shared contracts
 
@@ -209,7 +238,7 @@ operations are support packages excluded from the feature count.
 | --------- | -------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 
 | Completed | `FEAT-DATA-01` Market Data | `market_data/` | `build_level1_snapshot_request`, `build_market_data_request`, `build_market_directory_request`, `build_market_snapshot_request`, `build_symbols_quote_request`, `build_symbol_list_request`, `build_symbol_metadata_request`, `classify_symbol`, `get_data_availability`, `get_display_asset_classes`, `get_historical_volume`, `get_level1_snapshot`, `get_market_data`, `get_market_snapshot`, `get_spread_data`, `get_symbol_metadata`, `get_symbols_quotes`, `get_tick_data`, `list_market_directory`, and `list_symbols`; internal typed contracts cover requests, normalized datasets, symbol metadata, snapshots, directories, and quote rows | `FR-DATA-006`–`007`, `030`–`035`, `039`, `103`–`104`, `107`, `190`–`191`, `203`, `206`, and `207`–`213` | `tests/data/usage/features/01_market_data.py` |
-| Completed | `FEAT-DATA-02` Dataset Lifecycle | `datasets/` | Loading, manifests, hashing, compatibility, cataloging, and reference evidence | Existing dataset and catalog requirements, including `FR-DATA-101`–`107`, `143`, `161`–`167`, and `198`–`199` | `tests/data/usage/features/02_datasets.py` |
+| Completed | `FEAT-DATA-02` Dataset Lifecycle | `datasets/` | Loading, manifests, hashing, compatibility, cataloging, and reference evidence. Declared parity-programme extension: immutable provider-specification revision persistence — registration of one revision, non-overlapping effective intervals with supersession, and point-in-time/bounded-interval retrieval with complete-coverage proof and provenance | Existing dataset and catalog requirements, including `FR-DATA-101`–`107`, `143`, `161`–`167`, and `198`–`199`; parity extension `FR-DATA-214`–`216` (Proposed; implemented in the parity programme's Phase 4b) | `tests/data/usage/features/02_datasets.py` |
 | Completed | `FEAT-DATA-03` Synthetic Data | `synthetic_data/` | Seeded synthetic bars and ticks with explicit provenance | Existing synthetic-generation requirements | `tests/data/usage/features/03_synthetic_data.py` |
 | Completed | `FEAT-DATA-04` Transformation | `transformation/` | Tick derivation, aggregation, closed-bar construction, resampling, and tabular projections | `FR-DATA-036`–`038`, `080`–`090`, and transformation portions of `FR-DATA-200`–`202` | `tests/data/usage/features/04_transformation.py` |
 | Completed | `FEAT-DATA-05` Alignment | `alignment/` | Backward-only multi-symbol and multi-timeframe alignment | Alignment portions of `FR-DATA-200`–`202` | `tests/data/usage/features/05_alignment.py` |

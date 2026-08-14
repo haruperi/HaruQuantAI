@@ -376,17 +376,22 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff and mypy do not apply; all documentation validation commands passed.
-- [ ] Usage execution does not apply to this documentation-only phase.
-- [ ] Code-domain test gates do not apply; the documentation gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+**Phase status: Completed — 2026-08-14.**
+
+- [x] Approval matched this exact phase/subphase. (Owner approved Phase 1 documentation-only unit; the executed scope matches the manifest at `docs/dev/sim-live-parity-implementation-plan.md:295-311`; phase record at `docs/CHANGELOG.md:5-21`.)
+- [x] Only the local file and documentation manifests changed. (Seven authorities edited and three dev documents deleted exactly as the manifest lists; `git status --short` shows only those paths. A transient owner-side working-tree edit to this plan file (stray `` `--no-verify` `` lines plus markdown table reformatting) was reverted on owner instruction before Phase 2; it was not Phase 1 work.)
+- [x] Every listed FR has final `path:line` implementation and test evidence. (Phase 1 allocates no implemented FR — requirement-to-usage allocation is `None` at `docs/dev/sim-live-parity-implementation-plan.md:335-337`; new requirements registered as Proposed only: `app/services/simulator/README.md:236-239`, `app/services/data/README.md:241`, `app/services/trading/README.md:131`.)
+- [x] Only verified package-root/public dependency contracts were used. (No code or dependency contract consumed; documentation-only phase.)
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes. (Not applicable — documentation-only; validation surface is the documentation searches, `git diff --check` (clean), and `git status --short` per `docs/dev/sim-live-parity-implementation-plan.md:350-360`.)
+- [x] Ruff and mypy do not apply; all documentation validation commands passed. (Parity-term searches matched at `docs/PROJECT.md:458-521`, `docs/ARCHITECTURE.md:417-425,791,1035,1136`; `## [Unreleased]` confirmed at `docs/CHANGELOG.md:3`.)
+- [x] Usage execution does not apply to this documentation-only phase.
+- [x] Code-domain test gates do not apply; the documentation gate passed. (Cross-references and feature counts reconcile at `docs/PROJECT.md:516-530` — 236 features, 220 Completed / 16 Pending.)
+- [x] README, changelog, and listed system documents reconciled. (Registrations: `app/services/brokers/README.md:8,178-206`, `app/services/data/README.md:9,95-124,241`, `app/services/trading/README.md:4,127-167,750-862`, `app/services/simulator/README.md:8,119-152,236-239,877-953`, `docs/PROJECT.md:458-521,1092-1093`, `docs/ARCHITECTURE.md:417-425,791,1035,1136`, `docs/CHANGELOG.md:5-21`.)
+- [x] STOP conditions and rollback path were rechecked. (No STOP triggered; rollback path unchanged at `docs/dev/sim-live-parity-implementation-plan.md:331-333`.)
+- [x] Commit remains unauthorized, or its separately authorized hash is recorded. (Owner separately authorized the Phase 1 commit on 2026-08-14; committed with the proposed message `docs: register bounded sim-live parity architecture` — hash recorded post-commit below.)
+  - Commit hash: pending post-commit record.
+
+**Fold record (1f):** `docs/dev/sim-as-broker-adapter-decision.md` → `docs/PROJECT.md` §2.1.2/§2.1.8/§3 + `docs/ARCHITECTURE.md` dependency note/taxonomy + `app/services/brokers/README.md:178-206` (incl. clock-injection prerequisite); `docs/dev/simulator-backtest-pipeline.md` → `app/services/simulator/README.md:877-953`; `docs/dev/trading-execution-pipeline.md` → `app/services/trading/README.md:750-862`. `sim-live-parity-register.md` and this plan are retained reference-only per Phase 1f.
 
 # Phase 2 · Parity envelope and relationship-preserving comparator
 
