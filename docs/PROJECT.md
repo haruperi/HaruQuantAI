@@ -518,20 +518,21 @@ features. No secondary programme or work-package identifier namespace is active.
 
 | Status | Count |
 | --- | ---: |
-| Completed | 220 |
-| Pending | 16 |
+| Completed | 221 |
+| Pending | 15 |
 | Partial | 0 |
 | Missing | 0 |
 | **Total** | **236** |
 
-The sixteen `Pending` features are `FEAT-UI-05`–`FEAT-UI-13`, `FEAT-UI-15`,
+The fifteen `Pending` features are `FEAT-UI-05`–`FEAT-UI-13`, `FEAT-UI-15`,
 `FEAT-UI-16`, and `FEAT-UI-17`, each awaiting requirement evidence or focused-folder
 ownership recorded in `app/ui/README.md` — they are the primary trading workspace and
-its enabling foundation, specified by `docs/dev/documentation.pdf` — plus the four
-sim⇄live parity-programme Simulation features `FEAT-SIM-15` (Deterministic Execution
-Scheduler), `FEAT-SIM-16` (Effective-Dated Calculation Model), `FEAT-SIM-17` (Empirical
-Execution Calibration), and `FEAT-SIM-18` (Parity Comparison), registered as Pending in
-`app/services/simulator/README.md`.
+its enabling foundation, specified by `docs/dev/documentation.pdf` — plus the three
+remaining sim⇄live parity-programme Simulation features `FEAT-SIM-15` (Deterministic
+Execution Scheduler), `FEAT-SIM-16` (Effective-Dated Calculation Model), and
+`FEAT-SIM-17` (Empirical Execution Calibration), registered as Pending in
+`app/services/simulator/README.md`; `FEAT-SIM-18` (Parity Comparison) completed with
+the programme's Phase 2.
 
 Feature descriptions, requirements, public APIs, persistence, and evidence remain
 authoritative only in the owning package README; this section is the system-level

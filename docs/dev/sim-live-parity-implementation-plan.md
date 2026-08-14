@@ -389,7 +389,7 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] README, changelog, and listed system documents reconciled. (Registrations: `app/services/brokers/README.md:8,178-206`, `app/services/data/README.md:9,95-124,241`, `app/services/trading/README.md:4,127-167,750-862`, `app/services/simulator/README.md:8,119-152,236-239,877-953`, `docs/PROJECT.md:458-521,1092-1093`, `docs/ARCHITECTURE.md:417-425,791,1035,1136`, `docs/CHANGELOG.md:5-21`.)
 - [x] STOP conditions and rollback path were rechecked. (No STOP triggered; rollback path unchanged at `docs/dev/sim-live-parity-implementation-plan.md:331-333`.)
 - [x] Commit remains unauthorized, or its separately authorized hash is recorded. (Owner separately authorized the Phase 1 commit on 2026-08-14; committed with the proposed message `docs: register bounded sim-live parity architecture` — hash recorded post-commit below.)
-  - Commit hash: pending post-commit record.
+  - Commit hash: `0a255098b33b934dfd08f7de8aedc559e1d749c5` (all pre-commit hooks passed; 11 manifest files).
 
 **Fold record (1f):** `docs/dev/sim-as-broker-adapter-decision.md` → `docs/PROJECT.md` §2.1.2/§2.1.8/§3 + `docs/ARCHITECTURE.md` dependency note/taxonomy + `app/services/brokers/README.md:178-206` (incl. clock-injection prerequisite); `docs/dev/simulator-backtest-pipeline.md` → `app/services/simulator/README.md:877-953`; `docs/dev/trading-execution-pipeline.md` → `app/services/trading/README.md:750-862`. `sim-live-parity-register.md` and this plan are retained reference-only per Phase 1f.
 
@@ -617,17 +617,20 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff format/check and mypy passed for every owning domain.
-- [ ] Every local usage program executed directly and passed.
-- [ ] Every owning-domain phase gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+**Phase status: Completed — 2026-08-14.**
+
+- [x] Approval matched this exact phase/subphase. (Owner standalone `APPROVED: EXECUTE` for Phase 2 simulator unit, following the recorded dry run.)
+- [x] Only the local file and documentation manifests changed. (Created `app/services/simulator/parity/{README.md,__init__.py,contracts.py,envelope.py,normalize.py,compare.py}` and the seven named test files plus `tests/simulator/usage/features/18_parity.py`; edited only `app/services/simulator/__init__.py`, `app/services/simulator/README.md`, `docs/CHANGELOG.md`, `docs/PROJECT.md`, and `tests/simulator/unit/test_public_api.py` (expected-export list maintenance anticipated by the dry-run risk register); plan-file edits are this checklist plus the prior Phase 1 hash record only.)
+- [x] Every listed FR has final `path:line` implementation and test evidence. (`FR-SIM-187`–`FR-SIM-193`, `FR-SIM-236`–`FR-SIM-239` rows at `app/services/simulator/README.md:1705-1720`; implementation at `app/services/simulator/parity/envelope.py:302`, `app/services/simulator/parity/normalize.py`, `app/services/simulator/parity/compare.py:459`; usage functions `fr_sim_187`–`fr_sim_193`, `fr_sim_236`–`fr_sim_239` at `tests/simulator/usage/features/18_parity.py`.)
+- [x] Only verified package-root/public dependency contracts were used. (Utils `canonical_json`/`canonical_digest`/`get_logger`; simulator-internal error catalogue codes only; no Trading/Brokers production import.)
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes. (`uv run pytest <7 named files>` → 36 passed in 0.18s; standing regressions `test_paired_semantic_evidence_passes_envelope`, `test_relationship_mutation_fails_parity`, `test_unregistered_ignored_field_is_rejected`, `test_demo_evidence_cannot_claim_live_scope`, `test_certificate_invalidates_when_bound_identity_changes`, `test_cold_runs_from_fresh_roots_are_identical` all present and passing.)
+- [x] Ruff format/check and mypy passed for every owning domain. (`ruff format --check` 178 files clean; `ruff check` All checks passed; `mypy app/services/simulator` no issues in 80 files.)
+- [x] Every local usage program executed directly and passed. (`uv run python tests/simulator/usage/features/18_parity.py` → 11 SUCCESS lines.)
+- [x] Every owning-domain phase gate passed. (`uv run pytest tests/simulator` → 323 passed; the global 80% coverage floor reports on subset runs by pre-existing configuration and fails identically on the unmodified baseline — verified by stash at 27.89% — so it is not a Phase 2 regression.)
+- [x] README, changelog, and listed system documents reconciled. (Feature row flipped to Completed at `app/services/simulator/README.md:239`; new §4.18 at `:1705`; `app/services/simulator/parity/README.md` registered; consolidated inventory 221 Completed / 15 Pending at `docs/PROJECT.md:516-530`; one Added(4) block at `docs/CHANGELOG.md:5-21`.)
+- [x] STOP conditions and rollback path were rechecked. (No STOP occurred; envelope v1 publishes exact zero tolerances and marks distributional invariants `not_certified: awaiting calibration evidence` rather than inventing thresholds; rollback per plan §Phase 2 Rollback.)
+- [x] Commit remains unauthorized, or its separately authorized hash is recorded. (Owner separately authorized the Phase 2 commit on 2026-08-14; committed with the proposed message `feat(simulator): add parity envelope and comparator` — hash recorded post-commit below.)
+  - Commit hash: pending post-commit record.
 
 # Phase 3 · Execution-model design registration
 

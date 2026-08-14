@@ -522,6 +522,80 @@ def get_report_schema_version() -> str:
     return REPORT_SCHEMA_VERSION
 
 
+def get_parity_envelope(version: str = "v1") -> Mapping[str, object]:
+    """Return the published versioned Parity Envelope mapping.
+
+    Args:
+        version: Envelope version identifier; ``v1`` is the only published
+            version of the MT5-FX demo matrix.
+
+    Returns:
+        Read-only envelope mapping (scope, invariants, route gate policies,
+        ignored-field registry, initial authority state, validity, aggregate
+        economic-error budget, invalidation triggers).
+
+    Raises:
+        SimulationError: If the version is unknown.
+    """
+    operation = _operation("app.services.simulator.parity", "get_parity_envelope")
+    return cast("Mapping[str, object]", operation(version))
+
+
+def get_parity_maturity_ladder() -> tuple[Mapping[str, object], ...]:
+    """Return the published L1 through L5-Demo/L5-Live maturity ladder."""
+    operation = _operation(
+        "app.services.simulator.parity", "get_parity_maturity_ladder"
+    )
+    return cast("tuple[Mapping[str, object], ...]", operation())
+
+
+def normalize_parity_evidence(
+    evidence: Mapping[str, object], envelope: Mapping[str, object]
+) -> dict[str, object]:
+    """Normalize one side's parity evidence under a published envelope.
+
+    Args:
+        evidence: JSON-safe evidence mapping for one route execution.
+        envelope: Envelope mapping from ``get_parity_envelope``.
+
+    Returns:
+        Normalized evidence mapping with the alpha-renamed relationship
+        graph, causal edges, ambiguous same-timestamp groups, identifier
+        map, and canonical digest.
+
+    Raises:
+        SimulationError: On malformed evidence, scope mismatch, or a broken
+            identifier reference.
+    """
+    operation = _operation("app.services.simulator.parity", "normalize_parity_evidence")
+    return cast("dict[str, object]", operation(evidence, envelope))
+
+
+def compare_parity_evidence(
+    left: Mapping[str, object],
+    right: Mapping[str, object],
+    envelope: Mapping[str, object],
+) -> Mapping[str, object]:
+    """Compare left and right route evidence under one published envelope.
+
+    Args:
+        left: JSON-safe evidence mapping for the simulated route execution.
+        right: JSON-safe evidence mapping for the paired provider execution.
+        envelope: Envelope mapping from ``get_parity_envelope``.
+
+    Returns:
+        Read-only comparison mapping with pass flag, certificate
+        scope/version, per-invariant results, relationship map, aggregate
+        economic error, and deterministic ordered failures.
+
+    Raises:
+        SimulationError: On malformed evidence, envelope scope violation, or
+            a broken identifier reference.
+    """
+    operation = _operation("app.services.simulator.parity", "compare_parity_evidence")
+    return cast("Mapping[str, object]", operation(left, right, envelope))
+
+
 def get_same_tick_priority() -> tuple[str, ...]:
     """Return the deterministic same-tick execution priority."""
     from app.services.simulator.execution import SAME_TICK_PRIORITY
@@ -1202,6 +1276,7 @@ __all__: tuple[str, ...] = (
     "calculate_portfolio_backtest_config_hash",
     "calculate_simulation_backtest_config_hash",
     "close_live_simulation_session",
+    "compare_parity_evidence",
     "complete_simulation_mission",
     "convert_fx_amount",
     "create_live_simulation_session",
@@ -1220,6 +1295,8 @@ __all__: tuple[str, ...] = (
     "get_approved_tick_models",
     "get_canonical_artifact_types",
     "get_journal_policy",
+    "get_parity_envelope",
+    "get_parity_maturity_ladder",
     "get_report_schema_version",
     "get_same_tick_priority",
     "get_scenario_templates",
@@ -1235,6 +1312,7 @@ __all__: tuple[str, ...] = (
     "is_simulation_value",
     "load_recovery_checkpoints",
     "match_order",
+    "normalize_parity_evidence",
     "normalize_volume",
     "order_injected_events",
     "persist_recovery_checkpoint",

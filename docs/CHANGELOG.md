@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Add the parity envelope and relationship-preserving comparator
+
+Simulation now publishes the versioned Parity Envelope v1, the alpha-renaming
+evidence normalizer, and the comparator that every later maturity gate
+certifies through (`FEAT-SIM-18`, programme Phase 2).
+
+#### Added (4)
+
+- Added the versioned Parity Envelope v1 (MT5-FX demo scope) with typed exact-structural, bounded-numeric, and distributional invariants, an explicit ignored-field registry, validity interval, aggregate economic-error budget, and invalidation triggers.
+- Added relationship-preserving evidence normalization that alpha-renames order/deal/position/receipt/event/posting identifiers in encounter order while preserving cardinality, foreign keys, causal edges, and evidenced partial orders.
+- Added the parity comparator with per-invariant tolerances, signed ledger-conservation checks, route-specific safety-gate policy comparison, and certificate scope/expiry/identity invalidation.
+- Added the published L1–L4 maturity ladder with distinct L5-Demo and L5-Live certificates.
+
 ### Register the bounded sim⇄live parity architecture
 
 The documentation authorities now record the approved parity programme's

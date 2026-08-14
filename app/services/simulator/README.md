@@ -5,7 +5,7 @@ The Simulation error catalogue uses only the Utils-owned `TRANSIENT`,
 categories. An unconfirmed persistence result is non-retryable.
 
 > **Package:** `app/services/simulator`
-> **Status:** `Completed` for `FEAT-SIM-01`..`14`; the four sim⇄live parity-programme features `FEAT-SIM-15`..`18` are registered as `Pending` (see "Sim⇄live parity programme registration").
+> **Status:** `Completed` for `FEAT-SIM-01`..`14` and `FEAT-SIM-18` (parity, programme Phase 2); the sim⇄live parity-programme features `FEAT-SIM-15`..`17` remain `Pending` (see "Sim⇄live parity programme registration").
 > **Last updated:** `2026-08-14`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -236,14 +236,16 @@ Module folders and files are ordered from lowest dependency to highest dependenc
 | Pending | `FEAT-SIM-15` Deterministic Execution Scheduler | `scheduler/` | Scheduler creation, event scheduling/cancellation, bounded state inspection, single-event and conditional pumping, serialize/restore | `FR-SIM-194`, `FR-SIM-199`–`FR-SIM-204` | `tests/simulator/usage/features/15_scheduler.py` (Phase 5) |
 | Pending | `FEAT-SIM-16` Effective-Dated Calculation Model | `calculations/` | Exact-Decimal FX conversion, profit and margin calculation over effective-dated specification revisions, offline conformance artifacts, model identity | `FR-SIM-137`–`FR-SIM-145`, `FR-SIM-210`–`FR-SIM-214` | `tests/simulator/usage/features/16_calculations.py` (Phase 13b) |
 | Pending | `FEAT-SIM-17` Empirical Execution Calibration | `calibration/` | Immutable evidence partitioning, M1 spread and evidenced execution-component fits, artifact validation, temporal eligibility | `FR-SIM-181`–`FR-SIM-186`, `FR-SIM-224`–`FR-SIM-227` | `tests/simulator/usage/features/17_calibration.py` (Phase 19) |
-| Pending | `FEAT-SIM-18` Parity Comparison | `parity/` | Versioned parity envelope, evidence normalizer, relationship-preserving comparator, maturity ladder publication | `FR-SIM-187`–`FR-SIM-193`, `FR-SIM-236`–`FR-SIM-239` | `tests/simulator/usage/features/18_parity.py` (Phase 2) |
+| Completed | `FEAT-SIM-18` Parity Comparison | `parity/` | `get_parity_envelope`, `get_parity_maturity_ladder`, `normalize_parity_evidence`, `compare_parity_evidence` | `FR-SIM-187`–`FR-SIM-193`, `FR-SIM-236`–`FR-SIM-239` | `tests/simulator/usage/features/18_parity.py` |
 
 The four `Pending` features are registered by the approved sim⇄live parity programme
 (`docs/dev/sim-live-parity-implementation-plan.md`); each is implemented, tested, and
 evidenced in its owning programme phase noted above and may not be claimed complete
 before that phase's gate passes. The registration of `FEAT-SIM-15` is the separately
 approved requirement that admits the `scheduler/` module folder under the structure
-rules in Section 2.
+rules in Section 2. `FEAT-SIM-18` is **Completed** as of programme Phase 2 (2026-08-14):
+see `app/services/simulator/parity/README.md` for the feature registration, evidence
+schema, envelope v1 content, and the six standing-regression test node IDs.
 
 The Simulation feature IDs follow the numbered standalone usage programs.
 
@@ -1699,6 +1701,25 @@ Their column definitions are omitted here rather than carried as unbuilt DDL; th
 | Completed | `FR-SIM-131` | Simulator shall group derivative alert symptoms under deterministic root-cause incidents with stable severity, observation-time, and identity ordering. | `group_simulation_alerts` | None | None | **Usage:** `tests/simulator/usage/features/14_alerts.py::fr_sim_131()` **Unit:** `tests/simulator/unit/test_alerts.py` |
 | Completed | `FR-SIM-132` | Simulator shall preserve the first player perception timestamp separately from causal and venue timing for fair response-time scoring. | `build_simulation_alert` | None | Validation error | **Usage:** `tests/simulator/usage/features/14_alerts.py::fr_sim_132()` **Unit:** `tests/simulator/unit/test_alerts.py` |
 | Completed | `FR-SIM-133` | Simulator shall keep cancel, close, reduce, and kill-switch controls available during lock states while blocking risk-increasing and unknown actions. | `evaluate_emergency_controls` | None | Fail closed | **Usage:** `tests/simulator/usage/features/14_alerts.py::fr_sim_133()` **Unit:** `tests/simulator/unit/test_alerts.py` |
+
+### 4.18 `parity/` — Parity Comparison (programme Phase 2)
+
+Requirement rows, evidence schema, envelope v1 content, and evidence paths are
+authoritative in `app/services/simulator/parity/README.md`.
+
+| Status | Requirement ID | Responsibility | Public operations | Side effects | Failure | Verification |
+| --- | --- | --- | --- | --- | --- | --- |
+| Completed | `FR-SIM-187` | Typed invariant groups (exact structural, bounded numeric, distributional) with metric, unit, tolerance/statistical test, minimum coverage, and aggregation rule. | `get_parity_envelope` | None | `SIM_INVALID_CONFIG` | **Usage:** `tests/simulator/usage/features/18_parity.py::fr_sim_187()` **Unit:** `tests/simulator/unit/test_parity_envelope.py` |
+| Completed | `FR-SIM-188` | Versioned normalizer registry: ignored fields are explicit envelope entries; unknown fields fail closed. | `normalize_parity_evidence` | None | `SIM_INVALID_CONFIG` | **Usage:** `::fr_sim_188()` **Unit:** `tests/simulator/unit/test_parity_normalizer.py` |
+| Completed | `FR-SIM-189` | Cold re-execution from fresh stores/artifact roots is identical through canonical normalization digests. | `normalize_parity_evidence` | None | `SIM_INVALID_CONFIG` | **Usage:** `::fr_sim_189()` **Integration:** `tests/simulator/integration/test_cold_determinism.py::test_cold_runs_from_fresh_roots_are_identical` |
+| Completed | `FR-SIM-190` | Execution identity and complete initial-authority-state hash bind into run identity; changes invalidate the certificate. | `compare_parity_evidence` | None | `SIM_INTEGRITY_FAILURE` | **Usage:** `::fr_sim_190()` **Integration:** `tests/simulator/integration/test_parity_envelope_rejection.py::test_certificate_invalidates_when_bound_identity_changes` |
+| Completed | `FR-SIM-191` | Approximation, fallback, staleness, and uncovered behavior are rejected for canonical parity comparison. | `compare_parity_evidence` | None | Fail closed | **Usage:** `::fr_sim_191()` **Unit:** `tests/simulator/unit/test_parity_compare.py` |
+| Completed | `FR-SIM-192` | Signed ledger conservation is asserted against the posting equation on every comparison. | `compare_parity_evidence` | None | Fail closed | **Usage:** `::fr_sim_192()` **Unit:** `tests/simulator/unit/test_parity_compare.py::test_ledger_conservation_violation_fails` |
+| Completed | `FR-SIM-193` | The L1–L5-Demo/L5-Live maturity ladder is published with distinct certificates. | `get_parity_maturity_ladder` | None | None | **Usage:** `::fr_sim_193()` **Unit:** `tests/simulator/unit/test_parity_envelope.py::test_maturity_ladder_publishes_distinct_certificates` |
+| Completed | `FR-SIM-236` | The versioned envelope matrix (evidence class, certificate scope, thresholds, validity interval) is published. | `get_parity_envelope` | None | `SIM_INVALID_CONFIG` | **Usage:** `::fr_sim_236()` **Unit:** `tests/simulator/unit/test_parity_envelope.py` |
+| Completed | `FR-SIM-237` | Work outside the envelope is rejected and stale certificates invalidate. | `compare_parity_evidence` | None | `SIM_INVALID_CONFIG` | **Usage:** `::fr_sim_237()` **Integration:** `tests/simulator/integration/test_parity_envelope_rejection.py::test_demo_evidence_cannot_claim_live_scope` |
+| Completed | `FR-SIM-238` | Identifier cardinality, foreign keys, and causal edges are preserved under alpha-renaming. | `normalize_parity_evidence` | None | `SIM_INTEGRITY_FAILURE` | **Usage:** `::fr_sim_238()` **Integration:** `tests/simulator/integration/test_parity_relationships.py::test_relationship_mutation_fails_parity` |
+| Completed | `FR-SIM-239` | Economic time, evidenced partial order, and duration semantics are preserved and drift is detected. | `normalize_parity_evidence` | None | `SIM_INVALID_CONFIG` | **Usage:** `::fr_sim_239()` **Unit:** `tests/simulator/unit/test_parity_normalizer.py` |
 
 ---
 
