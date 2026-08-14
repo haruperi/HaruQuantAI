@@ -630,7 +630,7 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] README, changelog, and listed system documents reconciled. (Feature row flipped to Completed at `app/services/simulator/README.md:239`; new §4.18 at `:1705`; `app/services/simulator/parity/README.md` registered; consolidated inventory 221 Completed / 15 Pending at `docs/PROJECT.md:516-530`; one Added(4) block at `docs/CHANGELOG.md:5-21`.)
 - [x] STOP conditions and rollback path were rechecked. (No STOP occurred; envelope v1 publishes exact zero tolerances and marks distributional invariants `not_certified: awaiting calibration evidence` rather than inventing thresholds; rollback per plan §Phase 2 Rollback.)
 - [x] Commit remains unauthorized, or its separately authorized hash is recorded. (Owner separately authorized the Phase 2 commit on 2026-08-14; committed with the proposed message `feat(simulator): add parity envelope and comparator` — hash recorded post-commit below.)
-  - Commit hash: pending post-commit record.
+  - Commit hash: `cb036dfa7668152e87bf22f99554e83f59d86419` (all pre-commit hooks passed; 20 manifest files).
 
 # Phase 3 · Execution-model design registration
 
@@ -819,17 +819,20 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff and mypy do not apply; all documentation validation commands passed.
-- [ ] Usage execution does not apply to this documentation-only phase.
-- [ ] Code-domain test gates do not apply; the documentation gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+**Per-unit status:** 3a Completed 2026-08-14 (owner standalone approval; `SimulationAuthorityPort` protocol design, method-signature table, isolation rules, lifecycle contract, and `FR-BRK-172` Phase-10a binding registered at `app/services/brokers/README.md:190-241`; validation `git diff --check` clean, `rg` term search matched, one-file scope proven by `git status --short`). 3b Completed 2026-08-14 (owner standalone approval; public approved-request builder, paired gate taxonomy, injected deadline port, route/profile compatibility, and status handoff registered at `app/services/trading/README.md:170-235`; `FR-TRD-093`–`096`, `FR-TRD-113` Proposed; validation clean). 3c Completed 2026-08-14 (owner standalone approval; scheduler ownership, async orchestration, request v2 identity, terminal-close policy, journal finalization, internal deterministic event order with tie-breaking rules, provider causal-order precedence, and status handoff registered at `app/services/simulator/README.md:158-235`; `FR-SIM-194`–`199` Proposed; validation clean). All three units complete; phase checklist ticked below.
+
+- [x] Approval matched this exact phase/subphase. (Each unit 3a/3b/3c received its own standalone owner approval before its README was edited.)
+- [x] Only the local file and documentation manifests changed. (Exactly the three owning READMEs across the three units plus this plan file; no Python/test/migration/dependency file changed.)
+- [x] Every listed FR has final `path:line` implementation and test evidence. (Phase 3 allocates no implemented FR — `FR-BRK-172`, `FR-TRD-093`–`096`/`113`, `FR-SIM-194`–`199` registered as Proposed with owning-phase handoffs at `app/services/brokers/README.md:190-241`, `app/services/trading/README.md:170-235`, `app/services/simulator/README.md:158-235`.)
+- [x] Only verified package-root/public dependency contracts were used. (No code or dependency contract consumed; documentation-only phase.)
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes. (Not applicable — documentation-only; per-unit validation surface is the `rg` searches, `git diff --check` (clean per unit), and `git status --short` scope proofs.)
+- [x] Ruff and mypy do not apply; all documentation validation commands passed.
+- [x] Usage execution does not apply to this documentation-only phase.
+- [x] Code-domain test gates do not apply; the documentation gate passed. (Dependency graph acyclic on paper: port/builder/deadline/scheduler designs reference no reverse import; per-phase consumer migrations documented.)
+- [x] README, changelog, and listed system documents reconciled. (No changelog entry listed for Phase 3 units; system documents already carry the programme architecture from Phase 1.)
+- [x] STOP conditions and rollback path were rechecked. (No STOP triggered; rollback is per-unit `git checkout -- <unit README>` plus this plan record.)
+- [x] Commit remains unauthorized, or its separately authorized hash is recorded. (Owner separately authorized a single combined Phase 3 commit on 2026-08-14 in place of the three per-unit boundaries; committed with a combined message derived from the per-unit texts — hash recorded post-commit below.)
+  - Commit hash: pending post-commit record.
 
 # Phase 4 · Contract foundations
 

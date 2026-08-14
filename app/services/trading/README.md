@@ -167,6 +167,76 @@ lands with its owning requirement (`FR-TRD-085`–`FR-TRD-113`) in the programme
   fail-closed state: new mutations are blocked and only truthful cancellation/recovery
   proceeds.
 
+### Converged execution contracts — declared design (programme Phase 3b)
+
+This is a design registration only: no Python file changes here, and
+`FR-TRD-093`–`096` plus `FR-TRD-113` remain **Proposed** until their owning
+phases implement them with tests and usage evidence.
+
+**Public approved-request builder — `FR-TRD-093` (implemented in Phase 14a).**
+One package-root standalone function (working name
+`build_approved_trading_request`), extracted from the existing private
+`_approved_request` runtime logic (`actions/runtime.py`) so the seam has a
+verified behavior baseline. It consumes Strategy `TradeIntent` lineage, the
+Risk decision package (decision plus approval token), and
+`TradingDependencies` evidence reads, and returns one immutable validated
+`TradingRequest`. It refuses to build unless Risk genuinely approved: decision
+state `APPROVE`, `intent_id` match, `approved_size` present and equal to the
+request quantity, a live token, and unexpired windows;
+`valid_until = min(decision.expires_at, token.expires_at)`. Both the live
+evaluation cycle and the Simulation bridge invoke this one function;
+Simulation never copies the private helper, never reconstructs intents, and
+receives the built request as opaque lineage.
+
+**Paired gate taxonomy — `FR-TRD-094` (implemented in Phase 14a).** The
+sim-vs-live gate delta is formalized as two declared lists. *Business/risk
+gates* — common validation, the unresolved-scope retry lock, action-policy
+validation, risk-authority and token validation, kill-switch hierarchy
+validation, idempotency reservation, and execution-plan build — are
+route-independent and compared by the Phase 2 parity comparator's
+`gate.business_risk_sequence` invariant. *Route-specific safety gates* —
+session started/admission, the full readiness assessment, pre-mutation audit,
+`reconciliation_ready`, and adapter-capability validation — remain explicit
+per route and are compared against their declared route policy
+(`gate.route_safety_policy` invariant), never forced to share identifiers
+with business gates. No business gate may be skipped conditionally on route,
+and `sim` never inherits live-mutation authorization.
+
+**Injected deadline port — `FR-TRD-095` (implemented in Phase 15a).**
+`run_live_evaluation_cycle` remains the single public evaluation path; its
+direct `asyncio.timeout` wall-clock authority is replaced by an injected
+private async deadline context factory (new `actions/deadlines.py`). Live and
+paper construct it from monotonic wall time; Simulation supplies scheduler
+time. Neutral outcomes and timeout evidence keep an identical semantic shape
+on every route, and no production `TradingDependencies` construction may
+default the port.
+
+**Simulation authority consumption and route/profile compatibility —
+`FR-TRD-096` (implemented in Phase 10b) and `FR-TRD-113` (implemented in
+Phase 14a).** The `sim` route requires the `SIMULATION` broker environment and
+every other route forbids it (Phase 10b). The injected `simulation_dispatch`
+callback is removed only after the Brokers-root simulation channel becomes
+the sim authority boundary (Phase 14a), preserving the existing
+mutual-exclusion `SCOPE_MISMATCH` semantics in both directions. Route/profile
+pairs remain the `P-SYS-002` table (`simulation`→`sim`, `paper`→`paper`,
+`live`→`live`; an incompatible pair fails closed at initialization). The
+v1→v2 order-policy migration above is owned by Phase 6a; until then the
+builder targets `TradingRequest v1` fields exactly as they exist today.
+
+**Status handoff.** `FR-TRD-096` → Phase 10b; `FR-TRD-093`, `FR-TRD-094`,
+`FR-TRD-113` → Phase 14a; `FR-TRD-095` → Phase 15a. The implementing phase
+flips each row to `Completed` with local usage evidence and allocates no
+second requirement.
+
+**Binding test specifications (created by the owning phases, not here).**
+Phase 10b creates `tests/trading/unit/routing/test_simulation_route_selection.py`;
+Phase 14a creates `tests/trading/unit/actions/test_approved_request_builder.py`,
+`tests/trading/integration/test_two_route_action_convergence.py`, and
+`tests/trading/integration/test_simulation_session_lifecycle.py` (containing
+the standing regression `test_simulation_lifecycle_shape_matches_live_fixture`);
+Phase 15a creates `tests/trading/unit/actions/test_deadline_port.py` and
+`tests/trading/integration/test_evaluation_deadline_equivalence.py`.
+
 ### Four-level structure
 
 | Code level                          | Represents                         |

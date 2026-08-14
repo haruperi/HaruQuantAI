@@ -187,6 +187,60 @@ The approved sim⇄live parity programme (`docs/dev/sim-live-parity-implementati
 - **Clock-injection prerequisite.** MT5 mapping timestamp sites (including `_map_quote`/`_map_tick` in `metatrader/mapping.py`) currently read the ambient UTC clock. Before the simulation adapter reuses MT5 mapping, every such site must accept an injected clock with the live aware-UTC clock as its default (programme Phase 11a); simulated reads then bind simulated observation time instead of wall-clock time.
 - **Capability-intersection rule.** Parity capability is the published intersection between the provider's verified operations and the simulation adapter's admitted surface. The intersection may tighten with each envelope version; missing MT5 operations are never falsely advertised as mirrored or normalized away, and an unsupported read or mutation is never returned as an empty success.
 
+### `SimulationAuthorityPort` — declared protocol design (programme Phase 3a; implemented as `FR-BRK-172` in Phase 10a)
+
+This is a design registration only: no Python file changes here, and `FR-BRK-172`
+remains **Proposed** until Phase 10a implements it with tests and usage evidence
+(extended by Phase 11b reads, Phase 12 mutations, and Phase 17b deals).
+
+**Identity and isolation.** `SimulationAuthorityPort` is a Brokers-owned
+structural `typing.Protocol` (`@runtime_checkable`) defined inside
+`app/services/brokers/`. It references no Simulation symbol — no import, no
+string annotation, no naming convention from `app.services.simulator` — and
+Brokers imports nothing from Simulation in either direction of the contract.
+Any object satisfying the structure (including test doubles) is an acceptable
+port instance; Simulation constructs and injects the implementation. The port
+carries an injected simulated clock; no method may read an ambient wall clock,
+and no method carries matching, accounting, sizing, or any business semantics —
+the port is a delegation surface only.
+
+**Method signatures.** Names, arguments, and result envelopes mirror the
+canonical `BrokerAdapter` surface in `canonical_contracts/protocols.py` verbatim
+so the simulation adapter reuses the same live MT5 mapping and
+standard-response classification path:
+
+| Group | Port methods (canonical signatures) | Returns | Implemented in |
+| --- | --- | --- | --- |
+| Admitted reads | `get_symbols`, `get_symbol_info(symbol)`, `get_quote(symbol)`, `get_spread(symbol)`, `get_ticks(...)`, `get_historical_bars(...)`, `get_account_info()`, `get_balances()`, `get_permissions()`, `get_positions(filter, cursor, limit)`, `get_position(position_id)`, `get_orders(filter, cursor, limit)`, `get_order(order_id)`, `list_order_history(start, end, symbol, cursor, limit)` | Canonical `StandardResponse[...]` DTO values whose ledger numbers arrive **already authoritative** from the authority and are mapped, never recomputed; every read binds source sequence, provider observation time, receive/availability time, and the injected simulated clock | Phase 11b |
+| Specification projection | `get_symbol_info(symbol)` is backed by the Phase 4a typed **current** provider specification snapshot, never by raw MT5 metadata | `BrokerSymbolInfo` | Phase 11b |
+| Mutations | `check_order(BrokerOrderRequest)`, `place_order(BrokerOrderRequest)`, `modify_order(BrokerOrderModificationRequest)`, `cancel_order(order_id, client_request_id=None)`, `modify_position(BrokerPositionModificationRequest)`, `close_position(BrokerPositionCloseRequest)`, `reduce_position(BrokerPositionReductionRequest)` | An MT5 `OrderSendResult`-shaped internal payload that the adapter maps through the same live MT5 mapping and classification; only verified retcode/error pairs are mapped | Phase 12 |
+| Deal surface | `list_deal_history(start, end, symbol, cursor, limit)`, `get_deal(deal_id)`, `list_account_transactions(start, end, cursor, limit)` | Canonical page/deal/transaction values over bounded ranges only | Phase 17b |
+| Lifecycle | `connect()`, `disconnect()`, `reconnect()`, `is_connected()`, `get_connection_status()`, `ping()`, `connection_events()`, plus the one sim-specific extension `finalize_session()` for run-scoped teardown | Canonical lifecycle states, statuses, and event streams | Phase 10a |
+
+**Explicitly not on the port.** `get_trading_sessions` (MT5 sessions come from
+Data's explicit revisioned weekly definitions — programme decision D9);
+`subscribe_*`/`unsubscribe` streaming operations (the simulation channel has no
+provider stream); `replace_order` and `attach_protection` (outside the admitted
+MT5 mirroring surface until evidenced); and every `CalculationProvider`
+operation (the Phase 13b local calculation model replaces provider calls —
+decision D5). Unsupported operations return canonical
+`BROKER_CAPABILITY_UNSUPPORTED` and never an empty success.
+
+**Lifecycle state contract.** Port-backed adapter states mirror the admitted
+canonical lifecycle (`DISCONNECTED`, `CONNECTING`, `READY`, `DEGRADED`,
+`CLOSING`, `FAILED`); mutations are blocked while disconnected; connection
+events are deterministic and port-supplied; `finalize_session()` completes
+run-scoped teardown without external side effects.
+
+**Binding test specifications (created by the owning phases, not here).**
+Phase 10a creates `tests/brokers/unit/simulation/test_simulation_lifecycle.py`,
+`tests/brokers/unit/simulation/test_simulation_isolation.py` (containing the
+standing regression `test_simulation_adapter_import_graph_is_acyclic`),
+`tests/brokers/integration/test_simulation_factory.py`,
+`tests/brokers/integration/test_simulation_conformance.py`, and
+`tests/brokers/usage/features/17_simulation.py`; Phases 11b/12/17b add their
+named read, mutation, and deal tests to the same feature.
+
 ### Four-level structure
 
 | Code level                          | Represents                                                                   |

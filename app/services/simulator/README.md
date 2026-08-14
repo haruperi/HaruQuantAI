@@ -155,6 +155,86 @@ scheduling, calibration, and journals.
   the programme's published one-year M1 and bounded multi-symbol incremental performance
   and memory budgets (`FR-SIM-241`) and is not canonical performance evidence.
 
+### Declared deterministic execution model (programme Phase 3c)
+
+This is a design registration only: no Python file changes here, and
+`FR-SIM-194`–`FR-SIM-199` remain **Proposed** until their owning phases
+implement them with tests and usage evidence.
+
+**Scheduler ownership — `FR-SIM-194` (implemented in Phase 5).** `FEAT-SIM-15`
+owns the only simulated clock and event pump. The async run owns exactly one
+scheduler pump task; evaluation tasks enqueue commands and await futures; the
+pump selects the next deterministic event, advances simulated time, invokes
+the bounded handler, and resolves or faults the future. There is a real
+coroutine `await` but no wall-clock sleep and no provider wait; a
+deterministic `run_until_complete` path supports the retained synchronous
+bridge.
+
+**Internal deterministic event order — `FR-SIM-199` (implemented in Phase 5).**
+The fixed stage order within one simulated instant is:
+
+```text
+command arrival → tick arrival → rollover accrual/posting → mark-to-market
+→ protective-trigger evaluation → match evaluation → stop-out evaluation → response delivery
+```
+
+This extends today's per-tick order (session gate, excursions, protective
+exits, pending sweep; see the canonical pipeline walkthrough) with command
+arrival, rollover, and stop-out stages owned by Phases 5, 7, and 16.
+Identical-timestamp ordering uses **event-priority → canonical symbol order →
+source sequence → stable monotonic scheduler sequence**. This is Simulation's
+reproducibility rule, not presumed MT5 truth.
+
+**Provider causal-order precedence.** Provider-observed causal edges override
+comparison assumptions; the parity comparator's ambiguous same-timestamp
+groups and causal-edge invariants are the comparison counterpart.
+Cancel-vs-fill, modify-vs-fill, protection-vs-close, disconnect-vs-response,
+and simultaneous cross-symbol margin races require evidenced ordering or
+remain outside the envelope — never an invented provider sequence.
+
+**Async orchestration — `FR-SIM-195` (implemented in Phase 14b).** The run
+orchestrator becomes async (`run_backtest_async`, owned by Phase 4c) and
+drives Trading's public cycle through the scheduler; the eleven-port
+dependency bundle shape is unchanged unless a later approved phase widens it.
+
+**Request v2 identity — `FR-SIM-196` (implemented in Phase 4c).** Bound by the
+`SimulationBacktestRequestV2` registration in the Shared Contracts table
+(execution-model/config hash, source/tick lineage hashes, complete
+initial-authority-state hash, certification target, explicit
+`close_open_positions_at_end`).
+
+**Terminal-close policy — `FR-SIM-197` (implemented in Phase 14b).**
+End-of-run liquidation becomes the explicit `close_open_positions_at_end`
+hashed request policy routed through Trading's public verbs; today's
+unconditional close-at-final-tick remains the disclosed V1 limitation until
+then.
+
+**Journal finalization — `FR-SIM-198` (implemented in Phase 14b).** The
+hash-chained journal gains the new event categories (authority deals,
+protection triggers, terminal liquidation, foreign-activity replay) with
+unchanged genesis and verification rules; the vocabulary extension is
+additive.
+
+**Status handoff.** `FR-SIM-196` → Phase 4c; `FR-SIM-194`, `FR-SIM-199` →
+Phase 5; `FR-SIM-195`, `FR-SIM-197`, `FR-SIM-198` → Phase 14b. The
+implementing phase flips each row to `Completed` with local usage evidence
+and allocates no second requirement.
+
+**Binding test specifications (created by the owning phases, not here).**
+Phase 5 creates `tests/simulator/unit/test_scheduler_queue.py`,
+`test_scheduler_clock.py`, `test_scheduler_pump.py`, `test_scheduler_state.py`,
+`tests/simulator/integration/test_scheduler_total_order.py` (standing
+regression `test_scheduler_total_order_is_cross_process_stable`),
+`tests/simulator/integration/test_scheduler_resume.py` (standing regression
+`test_scheduler_resume_preserves_event_and_result_order`), and
+`tests/simulator/usage/features/15_scheduler.py`; Phase 4c creates
+`tests/simulator/unit/test_run_request_v2.py`; Phase 14b creates
+`tests/simulator/integration/test_trading_cutover.py`,
+`test_initial_authority_state.py` (standing regression
+`test_initial_authority_hash_binds_both_routes`),
+`test_terminal_liquidation_policy.py`, and `test_foreign_activity_guard.py`
+(standing regression `test_missing_external_activity_blocks_certification`).
+
 ### Four-level structure
 
 | Code level                          | Represents                         |
