@@ -161,6 +161,14 @@ from app.services.brokers.instrument_profiles.symbols import (
 from app.services.brokers.metatrader.health import (
     record_metatrader_health_checkpoint,
 )
+from app.services.brokers.metatrader.snapshot_gateway import (
+    acquire_metatrader_snapshot_symbols,
+    get_metatrader_snapshot_gateway_status,
+    release_metatrader_snapshot_symbols,
+    start_metatrader_snapshot_gateway,
+    stop_metatrader_snapshot_gateway,
+    stream_metatrader_snapshots,
+)
 from app.services.brokers.migrations.public import run_broker_migrations
 from app.services.brokers.reconciliation.checkpoints import (
     get_broker_route_recovery,
@@ -175,6 +183,7 @@ from app.services.brokers.reconciliation.public import (
 from app.services.brokers.yahoo.health import record_yahoo_health_checkpoint
 
 __all__ = (
+    "acquire_metatrader_snapshot_symbols",
     "attach_broker_protection",
     "build_broker_account_snapshot",
     "build_broker_connection_config",
@@ -255,6 +264,7 @@ __all__ = (
     "get_broker_trading_sessions",
     "get_broker_uncertainty",
     "get_broker_value_field",
+    "get_metatrader_snapshot_gateway_status",
     "get_registered_brokers",
     "is_broker_connected",
     "is_broker_connection_enabled",
@@ -288,6 +298,7 @@ __all__ = (
     "refresh_broker_session",
     "register_broker_environment_permission",
     "register_broker_symbol_mapping",
+    "release_metatrader_snapshot_symbols",
     "replace_broker_order",
     "resolve_broker_canonical_symbol",
     "resolve_broker_provider_symbol",
@@ -297,6 +308,9 @@ __all__ = (
     "select_broker_account",
     "select_broker_symbol",
     "set_fake_broker_error",
+    "start_metatrader_snapshot_gateway",
+    "stop_metatrader_snapshot_gateway",
+    "stream_metatrader_snapshots",
     "subscribe_broker_bars",
     "subscribe_broker_order_book",
     "subscribe_broker_quotes",

@@ -15,7 +15,6 @@ from app.services.data.market_events.contracts import (
     MarketStreamEvent,
     MarketStreamRequest,
 )
-from app.services.data.market_events.mt5_bars import iter_mt5_closed_bars
 from app.services.data.market_events.mt5_ticks import iter_mt5_ticks
 from app.services.data.time_sessions.timeframes import _get_timeframe_spec_raw
 from app.utils import generate_id, get_logger
@@ -162,9 +161,9 @@ class _StreamHub:
                 symbol=self.request.symbol,
                 request_id=self.request.request_id,
             )
-        return iter_mt5_closed_bars(
-            symbol=self.request.symbol,
-            timeframe=self.request.timeframe,
+        raise DataError(
+            "UNSUPPORTED_OPERATION",
+            safe_details={"operation": "market_stream_mode"},
             request_id=self.request.request_id,
         )
 

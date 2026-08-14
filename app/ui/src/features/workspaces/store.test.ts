@@ -216,6 +216,7 @@ describe("FR-UI-023 widget type is from the registered set only", () => {
   it("accepts a registered widget type and rejects an unregistered one", () => {
     const base = { id: "w-1", title: "Markets", colSpan: 6, rowSpan: 2 };
     expect(widgetSchema.safeParse({ ...base, type: "markets" }).success).toBe(true);
+    expect(widgetSchema.safeParse({ ...base, type: "marketTicks" }).success).toBe(true);
     expect(widgetSchema.safeParse({ ...base, type: "not-a-real-widget" }).success).toBe(false);
   });
 });

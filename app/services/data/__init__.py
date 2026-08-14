@@ -241,6 +241,7 @@ from app.services.data.market_data import (
     list_symbols,
 )
 from app.services.data.market_events import (
+    build_market_snapshot_stream_request,
     build_market_stream_request,
     ingest_feed_event,
     read_feed_status,
@@ -248,6 +249,7 @@ from app.services.data.market_events import (
     reconnect_feed,
     start_internal_feed,
     stream_market_data,
+    stream_market_snapshots,
 )
 from app.services.data.market_events.status import get_feed_status
 from app.services.data.persistence import (
@@ -418,6 +420,7 @@ __all__ = (
     "build_market_hours_request",
     "build_market_schedule",
     "build_market_snapshot_request",
+    "build_market_snapshot_stream_request",
     "build_market_stream_request",
     "build_migration_request",
     "build_migration_step",
@@ -642,6 +645,7 @@ __all__ = (
     "start_internal_feed",
     "stop_data_update_job",
     "stream_market_data",
+    "stream_market_snapshots",
     "stream_replay_events",
     "summarize_quality_remediation",
     "sync_catalog_reference",

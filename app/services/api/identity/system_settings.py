@@ -83,6 +83,65 @@ _SYSTEM_DEFINITIONS = (
         "Local MT5 terminal executable path.",
     ),
     _SystemSettingDefinition(
+        "MT5_SNAPSHOT_HOST",
+        "settings.mt5.snapshot.host",
+        "MT5 snapshot host",
+        "Local interface used by the authenticated MT5 snapshot listener.",
+    ),
+    _SystemSettingDefinition(
+        "MT5_SNAPSHOT_PORT",
+        "settings.mt5.snapshot.port",
+        "MT5 snapshot port",
+        "TCP port used by the authenticated MT5 snapshot listener.",
+        value_kind="integer",
+        minimum=1,
+        maximum=65_535,
+    ),
+    _SystemSettingDefinition(
+        "MT5_SNAPSHOT_CONNECT_TIMEOUT_MS",
+        "settings.mt5.snapshot.connect_timeout_ms",
+        "MT5 connection timeout",
+        "EA connection timeout in milliseconds, retained for configuration parity.",
+        value_kind="integer",
+        minimum=100,
+        maximum=60_000,
+    ),
+    _SystemSettingDefinition(
+        "MT5_SNAPSHOT_INTERVAL_SECONDS",
+        "settings.mt5.snapshot.interval_seconds",
+        "MT5 snapshot interval",
+        "Expected interval between complete multi-symbol snapshots.",
+        value_kind="integer",
+        minimum=1,
+        maximum=3_600,
+    ),
+    _SystemSettingDefinition(
+        "MT5_SNAPSHOT_SOURCE_ID",
+        "settings.mt5.snapshot.source_id",
+        "MT5 snapshot source",
+        "Exact source identity declared by the bridge EA.",
+    ),
+    _SystemSettingDefinition(
+        "MT5_SNAPSHOT_SYMBOLS",
+        "settings.mt5.snapshot.symbols",
+        "MT5 bootstrap symbols",
+        "Comma-separated broker-native fallback used before runtime demand is applied.",
+    ),
+    _SystemSettingDefinition(
+        "MT5_PIP_SIZES",
+        "settings.mt5.pip_sizes",
+        "MT5 pip sizes",
+        "Comma-separated broker-symbol pip sizes, for example "
+        "EURUSD=0.0001,XAUUSD=0.1.",
+    ),
+    _SystemSettingDefinition(
+        "MT5_SNAPSHOT_LOG_SNAPSHOTS",
+        "settings.mt5.snapshot.log_snapshots",
+        "Log MT5 snapshots",
+        "Enable bounded snapshot lifecycle logging without quote or secret payloads.",
+        value_kind="boolean",
+    ),
+    _SystemSettingDefinition(
         "CTRADER_ENABLED",
         "settings.ctrader.enabled",
         "Enable cTrader",
@@ -342,6 +401,13 @@ _BOOTSTRAP_BINDINGS = MappingProxyType(
 )
 
 _CREDENTIAL_DEFINITIONS = (
+    _CredentialDefinition(
+        "mt5_snapshot_bridge",
+        "MT5 Snapshot Bridge",
+        MappingProxyType(
+            {"auth_token": "settings.mt5.snapshot.auth_token"}
+        ),  # pragma: allowlist secret
+    ),
     _CredentialDefinition(
         "mt5",
         "MetaTrader 5",

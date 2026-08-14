@@ -4,11 +4,18 @@ Focused workstation API feature. It authenticates and authorizes requests,
 delegates through verified owner-domain public contracts, translates bounded
 errors, and performs no owner-domain or presentation calculations.
 
+For live MT5 presentation it exposes authenticated single-symbol and
+multi-symbol SSE transports over Data-owned one-second TCP snapshots. Broker
+source identity is preserved in every snapshot payload alongside sequence, gap,
+freshness, and quote evidence. Brokers owns socket acquisition; Data owns symbol filtering, canonical mapping,
+sequencing, and stale evidence.
+
 ## Files
 
 - `routes.py`: thin FastAPI transport boundary.
 - `schemas.py`: feature-local request and response schemas.
 - `orchestration.py`: dependency composition and owner delegation.
+- `stream_routes.py`: quota-bound SSE transport for TCP-originated live quotes.
 
 Additional focused route or persistence modules are listed here when required by
 the feature's distinct resource lifecycle.

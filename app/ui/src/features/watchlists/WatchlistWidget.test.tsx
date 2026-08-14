@@ -4,6 +4,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { WatchlistWidget } from './WatchlistWidget';
+import { WATCHLISTS_CHANGED_EVENT } from './watchlistEvents';
 import { resetSymbolUniverse } from './symbolUniverse';
 
 const { createMock, listMock, quotesMock, removeMock, symbolsMock, updateMock } =
@@ -318,6 +319,8 @@ describe('WatchlistWidget', () => {
   });
 
   it('adds the symbol chosen from the suggestion list', async () => {
+    const changed = vi.fn();
+    window.addEventListener(WATCHLISTS_CHANGED_EVENT, changed);
     render(<WatchlistWidget />);
     await screen.findByText('EURUSD');
     await waitFor(() => expect(symbolsMock).toHaveBeenCalled());
@@ -328,6 +331,8 @@ describe('WatchlistWidget', () => {
     await waitFor(() =>
       expect(updateMock).toHaveBeenCalledWith('wl-default', { symbols: ['EURUSD', 'GBPUSD'] })
     );
+    expect(changed).toHaveBeenCalledTimes(1);
+    window.removeEventListener(WATCHLISTS_CHANGED_EVENT, changed);
     expect(querySuggestionList()).toBeNull();
   });
 

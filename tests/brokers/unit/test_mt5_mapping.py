@@ -1,6 +1,7 @@
 """MT5 payload/native-error mapping tests."""
 
 from datetime import UTC, datetime
+from decimal import Decimal
 
 import numpy as np
 from app.services.brokers.canonical_contracts import BrokerErrorCode
@@ -28,6 +29,7 @@ def test_map_symbol_preserves_exact_provider_values() -> None:
         _record(
             name="EURUSD",
             digits=5,
+            point=0.00001,
             volume_step=0.01,
             volume_min=0.01,
             volume_max=100,
@@ -35,6 +37,7 @@ def test_map_symbol_preserves_exact_provider_values() -> None:
     )
     assert symbol.provider_symbol == "EURUSD"
     assert symbol.price_precision == 5
+    assert symbol.price_step == Decimal("0.00001")
     assert str(symbol.quantity_step) == "0.01"
     assert symbol.provider_metadata["digits"] == 5
     assert symbol.provider_metadata["trade_mode"] == "FULL"
@@ -46,6 +49,7 @@ def test_map_symbol_preserves_path_attribute() -> None:
         _record(
             name="EURJPY",
             digits=3,
+            point=0.001,
             volume_step=0.01,
             volume_min=0.01,
             volume_max=100,

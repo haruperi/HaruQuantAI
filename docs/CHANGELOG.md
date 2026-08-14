@@ -2,6 +2,41 @@
 
 ## [Unreleased]
 
+### Route live MT5 presentation through the MQL5 TCP bridge
+
+Live market presentation now receives atomic one-second multi-symbol snapshots
+from one persistent MT5 socket instead of serial Python-package polling.
+
+The listener connection settings now load from global System Settings and its
+authentication token is stored through the encrypted write-only credential
+boundary rather than requiring a terminal environment variable.
+
+#### Added (4)
+
+- Added the versioned bounded `HaruQuantSnapshotBridge.mq5` JSON-lines producer and local TCP receiver with explicit lifecycle, ordering, framing, and health evidence.
+- Added a Data-owned 1–200-symbol snapshot stream and authenticated SSE gateway route with API/frontend contract parity.
+- Added live TCP Bid-as-Last, spread, and freshness presentation to Markets and live quote presentation to Charting Tools.
+- Added a playground-equivalent Market Ticks diagnostic widget that exposes configured-symbol SSE connectivity, sequence gaps, quote age, and freshness.
+
+#### Changed (8)
+
+- Replaced the MT5 Python-package tick poller with one-second TCP snapshot consumption while retaining the package for non-streaming control and historical reads.
+- Retired live closed-bar polling; charts retain genuine historical bars and never fabricate complete OHLCV from sampled snapshots.
+- Replaced the Markets Bid and Ask columns with owner-supplied Spread and encoded live, stale, or not-live quote status through accessible green, yellow, or red Trade text.
+- Presented Markets spread as integer MT5 points and added per-symbol whole-second Age from genuine TCP quote time, leaving initial HTTP-only age unavailable.
+- Replaced the fixed EA symbol feed with a bounded revisioned demand union that follows active snapshot consumers and successful watchlist edits, reconciles after reconnect, and releases unused symbols after a grace period.
+- Sequenced Markets initialization so all MT5 history/calculation batches complete before a visible 10-second settling interval and the first TCP snapshot subscription.
+- Paused EA quote reads and snapshot payloads immediately when the final visible browser consumer releases demand, retaining only an idle control heartbeat and resuming after acknowledged non-empty demand.
+- Sequenced Chart initialization through authoritative bars and a 10-second settling interval, limited Bid ticks to the forming candle, and returned to authoritative bars and indicators at every timeframe rollover.
+
+#### Fixed (5)
+
+- Preserved the Data-owned MT5 source identity in every browser snapshot event instead of presenting it as unknown.
+- Corrected Markets ADR and change-pip conversion to prefer explicit symbol overrides and otherwise use ten genuine MT5 symbol points per pip, preventing commodity points from being mislabeled and avoiding blank ADR when symbol info is available.
+- Preserved non-pip Markets technical evidence when a symbol has no explicit pip-size convention, and prevented quote snapshots from replacing initialized technical fields.
+- Ordered MT5 composite snapshots so history-driven symbol selection completes before the initial Level-1 quote, removing first-load Last Price and Spread races.
+- Prevented Chart rollover from repeatedly reopening its one-symbol SSE connection while MT5 still exposes the prior bar bucket; bounded delayed bar reads now gate stream resumption on authoritative target-bar availability.
+
 ### Complete the Charting Tools widget
 
 Chart annotations, appearance controls, missing-bar evidence, and maximum-scale rendering now satisfy the remaining registered chart requirements.

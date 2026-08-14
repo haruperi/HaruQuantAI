@@ -279,9 +279,28 @@ export function bars(
 /** Query parameters for the SSE market stream. */
 export interface StreamQuery {
   symbol: string;
-  mode: "bars" | "ticks";
+  mode: "ticks";
   timeframe: string;
   source_id?: "mt5";
+}
+
+/** One latest-value quote received from the MT5 bridge EA. */
+export interface SnapshotQuote {
+  symbol: string;
+  time: string;
+  bid: string;
+  ask: string;
+  last: string | null;
+  spread: string;
+  digits: number;
+}
+
+/** Validated shape carried inside a snapshot stream event payload. */
+export interface SnapshotPayload {
+  quotes: SnapshotQuote[];
+  stale: boolean;
+  gap: number;
+  kind: "snapshot";
 }
 
 /**
@@ -301,6 +320,20 @@ export function stream(
   };
   if (params.source_id !== undefined) query.source_id = params.source_id;
   return openStream(dataRoutes.stream, { query, ...options });
+}
+
+/** Open one authenticated multi-symbol MT5 snapshot stream. */
+export function snapshotStream(
+  symbols: string[],
+  options?: Omit<StreamTransportOptions, "query">
+): AsyncIterable<StreamEvent> {
+  if (symbols.length === 0 || symbols.length > 200) {
+    throw new Error("snapshot stream requires 1..200 symbols");
+  }
+  return openStream(dataRoutes.snapshotStream, {
+    query: { symbols: symbols.join(",") },
+    ...options,
+  });
 }
 
 /** Aggregated data client. */
@@ -355,6 +388,7 @@ export const data = {
   quotes,
   bars,
   stream,
+  snapshotStream,
   prepareDataset,
   importDialects,
   importDataset,

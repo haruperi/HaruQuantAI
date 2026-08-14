@@ -275,6 +275,7 @@ class SymbolMetadata(_SymbolContract):
     quote_currency: str | None = None
     digits: int | None = None
     price_step: Decimal | None = None
+    pip_size: Decimal | None = None
     quantity_step: Decimal | None = None
     timezone: str | None = None
     source_id: str
@@ -446,7 +447,7 @@ class SymbolMetadata(_SymbolContract):
             raise ValueError("digits must be non-negative")
         return value
 
-    @field_validator("price_step", "quantity_step")
+    @field_validator("price_step", "pip_size", "quantity_step")
     @classmethod
     def _validate_steps(cls, value: Decimal | None) -> Decimal | None:
         """Validate one DATA value or contract invariant.
@@ -493,7 +494,7 @@ class SymbolMetadata(_SymbolContract):
         logger.debug("Running DATA function: _validate_missing_fields")
         return _unique_texts(value)
 
-    @field_serializer("price_step", "quantity_step", when_used="json")
+    @field_serializer("price_step", "pip_size", "quantity_step", when_used="json")
     def _serialize_decimal(self, value: Decimal | None) -> str | None:
         """Serialize one DATA contract value deterministically.
 

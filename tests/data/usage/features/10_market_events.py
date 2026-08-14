@@ -21,6 +21,7 @@ from app.services.data import (
     build_feed_config,
     build_feed_status_request,
     build_halt_payload,
+    build_market_snapshot_stream_request,
     build_market_stream_request,
     build_raw_feed_event,
     build_reconnect_policy,
@@ -32,6 +33,7 @@ from app.services.data import (
     run_data_migrations,
     start_internal_feed,
     stream_market_data,
+    stream_market_snapshots,
 )
 from app.utils import generate_id
 
@@ -147,23 +149,29 @@ def fr_data_048() -> None:
 
 
 def fr_data_154_157() -> None:
-    """FR-DATA-154..157: Build both MT5 stream modes through Data's API."""
-    _header("Stage 4: Data-Owned MT5 Tick and Closed-Bar Streams")
+    """FR-DATA-154..157: Build TCP-only MT5 snapshot streams."""
+    _header("Stage 4: Data-Owned MT5 TCP Snapshot Streams")
 
     async def demonstrate() -> None:
-        """Construct both streams without opening a live provider in usage CI."""
-        for mode, timeframe in (("ticks", "M1"), ("bars", "H1")):
-            request = build_market_stream_request(
-                source_id="mt5",
-                symbol="EURUSD",
-                mode=mode,
-                timeframe=timeframe,
-                request_id=generate_id("req"),
-            )
-            print(_format_result(request))
-            stream = stream_market_data(request)
-            await cast("AsyncGenerator[object]", stream).aclose()
-            print(f"Data -> MarketStream(mode={mode}, timeframe={timeframe})")
+        """Construct streams without opening a live producer in usage CI."""
+        request = build_market_stream_request(
+            source_id="mt5",
+            symbol="EURUSD",
+            mode="ticks",
+            timeframe="M1",
+            request_id=generate_id("req"),
+        )
+        print(_format_result(request))
+        stream = stream_market_data(request)
+        await cast("AsyncGenerator[object]", stream).aclose()
+        snapshot_request = build_market_snapshot_stream_request(
+            symbols=("EURUSD", "GBPUSD"),
+            request_id=generate_id("req"),
+        )
+        print(_format_result(snapshot_request))
+        snapshots = stream_market_snapshots(snapshot_request)
+        await cast("AsyncGenerator[object]", snapshots).aclose()
+        print("Data -> MarketStream(mode=ticks, cadence=one-second-tcp)")
 
     asyncio.run(demonstrate())
 

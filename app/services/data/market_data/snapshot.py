@@ -93,14 +93,6 @@ def _get_market_snapshot_raw(request: MarketSnapshotRequest) -> MarketSnapshot:
         Bounded market snapshot for one symbol.
     """
     logger.info("Composing market snapshot for %s", request.symbol)
-    level1 = _get_level1_snapshot_raw(
-        Level1SnapshotRequest(
-            source_id=request.source_id,
-            symbol=request.symbol,
-            request_id=request.request_id,
-        )
-    )
-
     bar_request = MarketDataRequest(
         source_id=request.source_id,
         symbol=request.symbol,
@@ -132,6 +124,17 @@ def _get_market_snapshot_raw(request: MarketSnapshotRequest) -> MarketSnapshot:
             "No latest bar evidence available for market snapshot of %s",
             request.symbol,
         )
+
+    # MT5's historical-bar boundary selects the symbol into Market Watch before
+    # reading. Complete that synchronization step first so the following
+    # genuine Level-1 read cannot race an unselected first-time symbol.
+    level1 = _get_level1_snapshot_raw(
+        Level1SnapshotRequest(
+            source_id=request.source_id,
+            symbol=request.symbol,
+            request_id=request.request_id,
+        )
+    )
 
     return MarketSnapshot(
         symbol=request.symbol,

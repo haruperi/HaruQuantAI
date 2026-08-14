@@ -35,7 +35,8 @@ def test_technical_evidence_fetches_then_delegates(
         nonlocal metadata_calls
         metadata_calls += 1
         return SimpleNamespace(
-            status="success", data=SimpleNamespace(digits=5, point=0.00001)
+            status="success",
+            data=SimpleNamespace(digits=5, point=0.00001, pip_size=0.0001),
         )
 
     def _market_data(_request: object) -> object:
@@ -53,12 +54,12 @@ def test_technical_evidence_fetches_then_delegates(
         "get_market_data",
         _market_data,
     )
-    calls: list[tuple[object, int, float, float | None]] = []
+    calls: list[tuple[object, float, float | None]] = []
 
     def _project(
-        evidence: object, *, digits: int, point: float, last_price: float | None
+        evidence: object, *, pip_size: float, last_price: float | None
     ) -> dict[str, float | None]:
-        calls.append((evidence, digits, point, last_price))
+        calls.append((evidence, pip_size, last_price))
         return {"change": None if last_price is None else last_price - 1.0}
 
     monkeypatch.setattr(orchestration, "project_market_overlay", _project)
@@ -72,7 +73,7 @@ def test_technical_evidence_fetches_then_delegates(
 
     assert first["change"] == pytest.approx(0.1)
     assert second["change"] == pytest.approx(0.2)
-    assert calls == [(dataset, 5, 0.00001, 1.1), (dataset, 5, 0.00001, 1.2)]
+    assert calls == [(dataset, 0.0001, 1.1), (dataset, 0.0001, 1.2)]
     assert metadata_calls == 1
     assert market_data_calls == 1
     assert market_request["timeframe"] == "D1"
@@ -116,6 +117,87 @@ def test_technical_evidence_does_not_invent_missing_metadata(
     )
 
 
+def test_pip_size_uses_exact_broker_symbol_configuration(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An explicit XAUUSD convention is read without digit inference."""
+    monkeypatch.setattr(
+        orchestration,
+        "get_system_settings",
+        lambda **_values: SimpleNamespace(
+            settings={"MT5_PIP_SIZES": "EURUSD=0.0001,XAUUSD=0.1"}
+        ),
+    )
+
+    assert orchestration._pip_size(
+        SimpleNamespace(pip_size=None),
+        symbol="XAUUSD",
+        request_id="req-1",
+    ) == pytest.approx(0.1)
+
+
+@pytest.mark.parametrize(
+    ("point", "expected"),
+    [(0.00001, 0.0001), (0.001, 0.01), (0.01, 0.1)],
+)
+def test_pip_size_uses_genuine_mt5_point_without_digit_rules(
+    monkeypatch: pytest.MonkeyPatch,
+    point: float,
+    expected: float,
+) -> None:
+    """Forex, JPY, and XAU use ten genuine broker points per pip."""
+    monkeypatch.setattr(
+        orchestration,
+        "get_system_settings",
+        lambda **_values: SimpleNamespace(settings={}),
+    )
+
+    assert orchestration._pip_size(
+        SimpleNamespace(price_step=point, point=point, pip_size=None),
+        symbol="XAUUSD",
+        request_id="req-1",
+    ) == pytest.approx(expected)
+
+
+def test_pip_size_prefers_exact_override_to_mt5_point(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A declared per-symbol convention overrides the ten-point default."""
+    monkeypatch.setattr(
+        orchestration,
+        "get_system_settings",
+        lambda **_values: SimpleNamespace(settings={"MT5_PIP_SIZES": "XAUUSD=0.5"}),
+    )
+
+    assert orchestration._pip_size(
+        SimpleNamespace(price_step=0.01, point=0.01, pip_size=None),
+        symbol="XAUUSD",
+        request_id="req-1",
+    ) == pytest.approx(0.5)
+
+
+@pytest.mark.parametrize("point", [0, -0.01, "invalid"])
+def test_pip_size_rejects_invalid_mt5_point(
+    monkeypatch: pytest.MonkeyPatch,
+    point: object,
+) -> None:
+    """Missing or invalid provider precision never becomes a fabricated pip."""
+    monkeypatch.setattr(
+        orchestration,
+        "get_system_settings",
+        lambda **_values: SimpleNamespace(settings={}),
+    )
+
+    assert (
+        orchestration._pip_size(
+            SimpleNamespace(price_step=point, point=point, pip_size=None),
+            symbol="XAUUSD",
+            request_id="req-1",
+        )
+        is None
+    )
+
+
 def test_technical_evidence_retries_short_history_and_caches_only_warmup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -152,7 +234,8 @@ def test_technical_evidence_retries_short_history_and_caches_only_warmup(
         orchestration,
         "get_symbol_metadata",
         lambda _request: SimpleNamespace(
-            status="success", data=SimpleNamespace(digits=5, point=0.00001)
+            status="success",
+            data=SimpleNamespace(digits=5, point=0.00001, pip_size=0.0001),
         ),
     )
     monkeypatch.setattr(orchestration, "get_market_data", _market_data)

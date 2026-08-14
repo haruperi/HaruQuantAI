@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useWorkspaceStore, type Widget } from '../../features/workspaces';
 import { MarketsWidget } from '../../features/markets';
+import { MarketTicksTableWidget } from '../../features/market-ticks';
 import { WatchlistWidget } from '../../features/watchlists';
 import { ChartWidget } from '../../features/chart';
 import {
@@ -285,6 +286,8 @@ export const WorkspaceGrid: React.FC = () => {
     switch (widget.type) {
       case 'markets':
         return <MarketsWidget />;
+      case 'marketTicks':
+        return <MarketTicksTableWidget />;
       case 'watchlist':
         return <WatchlistWidget />;
       case 'chart':

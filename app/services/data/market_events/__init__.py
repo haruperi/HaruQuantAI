@@ -7,6 +7,10 @@ from app.services.data.market_events.buffer import (
     reconcile_feed_gap,
     start_internal_feed,
 )
+from app.services.data.market_events.mt5_snapshots import (
+    build_market_snapshot_stream_request,
+    stream_market_snapshots,
+)
 from app.services.data.market_events.reconnection import reconnect_feed
 from app.services.data.market_events.status import read_feed_status
 from app.services.data.market_events.subscriptions import (
@@ -15,6 +19,7 @@ from app.services.data.market_events.subscriptions import (
 )
 
 __all__ = [
+    "build_market_snapshot_stream_request",
     "build_market_stream_request",
     "ingest_feed_event",
     "read_feed_status",
@@ -22,4 +27,5 @@ __all__ = [
     "reconnect_feed",
     "start_internal_feed",
     "stream_market_data",
+    "stream_market_snapshots",
 ]

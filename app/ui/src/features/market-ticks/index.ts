@@ -1,0 +1,1 @@
+export { MarketTicksTableWidget } from "./MarketTicksTableWidget";

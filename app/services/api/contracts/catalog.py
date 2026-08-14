@@ -325,6 +325,15 @@ _KNOWN_ROUTE_CONTRACTS: tuple[RouteContract, ...] = (
         response_contract="StreamEvent.v1",
     ),
     _contract(
+        "api.data.snapshot_stream",
+        "GET",
+        "/api/v1/data/snapshot-stream",
+        "data",
+        "data:read",
+        side_effect=RouteSideEffect.STREAM,
+        response_contract="StreamEvent.v1",
+    ),
+    _contract(
         "api.strategies.catalogue",
         "GET",
         "/api/v1/strategies",

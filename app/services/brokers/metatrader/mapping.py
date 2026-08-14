@@ -178,6 +178,7 @@ def _map_symbol(value: object) -> BrokerSymbolInfo:
         price_unit="quote_currency",
         quantity_unit="lots",
         price_precision=digits,
+        price_step=Decimal(str(point)),
         quantity_step=Decimal(str(_field(value, "volume_step"))),
         min_quantity=Decimal(str(_field(value, "volume_min"))),
         max_quantity=Decimal(str(_field(value, "volume_max"))),

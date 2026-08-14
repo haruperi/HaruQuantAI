@@ -626,11 +626,22 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
   and source readiness/licence/promotion policy belong in
   `app.services.data.sources`.
 - Real-time market acquisition and subscription semantics belong in
-  `app.services.data.market_events`. MT5 tick mode polls the verified Brokers
-  tick-copy read without timeframe throttling; bar mode emits genuine closed bars at
-  the selected canonical UTC boundary. Shared sequencing, heartbeat, bounded replay,
-  explicit gap/backpressure failure, and producer cleanup remain Data behavior. The
-  API route is only an authenticated SSE transport bridge.
+  `app.services.data.market_events`. MT5 snapshot consumers acquire and release exact
+  symbol demand through the Brokers package-root boundary. Brokers owns the bounded
+  reference-counted union and revisioned bidirectional MQL5 TCP protocol; the EA
+  publishes only the latest acknowledged complete set. An acknowledged empty union
+  pauses EA quote reads and snapshot payloads immediately while a bounded heartbeat
+  retains the control connection; non-empty acknowledged demand resumes publication.
+  Data owns canonical mapping,
+  freshness, filtering, sequencing, explicit gap/backpressure failure, and consumer
+  cleanup. Live bar polling remains unsupported; genuine historical bars bootstrap
+  charts. Chart snapshot ticks are ephemeral intrabar presentation: Bid may extend
+  only the current authoritative bar's High, Low, and Close. A timeframe rollover
+  always returns to the historical-bar boundary for the new bar and overlays. If
+  MT5 still returns the prior bucket, the chart keeps SSE closed and performs
+  bounded delayed authoritative reads rather than reconnecting on every tick. No
+  client synthesizes or persists an OHLCV bar. The API route is only an authenticated
+  SSE transport bridge.
 - `MarketDataRequest.limit` is required to be positive, but OHLCV retrieval has no
   app-wide record-count ceiling. Tick and spread retrieval retain their governed
   limits; multi-million-record OHLCV ingestion remains the responsibility of the

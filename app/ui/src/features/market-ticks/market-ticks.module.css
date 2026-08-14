@@ -1,0 +1,21 @@
+.panel { overflow: hidden; height: 100%; color: #e7edf5; background: rgba(15, 22, 31, .92); }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px 20px; border-bottom: 1px solid #243142; }
+.toolbar h2 { margin: 0; font-size: 1rem; }
+.toolbar p { margin: 6px 0 0; color: #93a4b7; font-size: .8rem; }
+.badge, .state { display: inline-flex; padding: 5px 9px; border-radius: 999px; font-size: .7rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.badge { border: 1px solid #34475d; }
+.connected, .live { color: #96ebbd; background: rgba(37, 140, 83, .18); }
+.connecting { color: #f7d58a; background: rgba(185, 125, 20, .18); }
+.disconnected, .unavailable, .stale { color: #ffacac; background: rgba(181, 53, 53, .18); }
+.error { margin: 14px 20px 0; padding: 10px 12px; border: 1px solid rgba(219, 86, 86, .45); border-radius: 8px; color: #ffb2b2; background: rgba(112, 31, 31, .22); }
+.sourceSummary { padding: 14px 20px; border-bottom: 1px solid #243142; }
+.sourceCard { max-width: 300px; padding: 10px 12px; border: 1px solid #29394d; border-radius: 10px; background: #111a25; }
+.sourceCard div { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sourceCard small { display: block; margin-top: 6px; color: #8fa0b3; }
+.tableScroll { overflow: auto; }
+.table { width: 100%; border-collapse: collapse; white-space: nowrap; font-size: .78rem; }
+.table th, .table td { padding: 11px 13px; border-bottom: 1px solid #1e2a39; text-align: left; }
+.table th { color: #8fa0b3; background: #0f1721; font-size: .68rem; letter-spacing: .06em; text-transform: uppercase; }
+.number { text-align: right !important; font-variant-numeric: tabular-nums; }
+.symbol { font-weight: 760; letter-spacing: .03em; }
+.empty { padding: 32px !important; color: #8fa0b3; text-align: center !important; }

@@ -11,7 +11,6 @@ from app.services.indicators.volatility.rolling_volatility import rolling_volati
 _ADR_PERIOD = 10
 _VOLATILITY_PERIOD = 10
 _ANNUALIZATION_FACTOR = 252.0
-_FRACTIONAL_PIP_DIGITS = frozenset({3, 5})
 _PRIOR_VALUE_MIN_LENGTH = 2
 
 
@@ -51,16 +50,14 @@ def _prior_value(result: object) -> float | None:
 def project_market_overlay(
     dataset: object,
     *,
-    digits: int,
-    point: float,
+    pip_size: float | None,
     last_price: float | None,
 ) -> dict[str, float | None]:
     """Project a market row from settled volatility and price evidence.
 
     Args:
         dataset: Data-owned market dataset accepted by public indicators.
-        digits: Broker quote precision.
-        point: Broker point size in price units.
+        pip_size: Explicit broker-symbol pip size in price units, when known.
         last_price: Current quote price, when available.
 
     Returns:
@@ -69,8 +66,8 @@ def project_market_overlay(
     Raises:
         ValueError: If quote precision or dataset evidence is invalid.
     """
-    if point <= 0:
-        raise ValueError("point must be positive")
+    if pip_size is not None and pip_size <= 0:
+        raise ValueError("pip_size must be positive")
     records = cast("tuple[Any, ...]", getattr(dataset, "records", ()))
     if len(records) < _ADR_PERIOD + 2:
         raise ValueError("insufficient settled bars")
@@ -79,7 +76,6 @@ def project_market_overlay(
     open_price = float(latest.open)
     high = float(latest.high)
     low = float(latest.low)
-    pip_size = point * 10.0 if digits in _FRACTIONAL_PIP_DIGITS else point
     volatility_raw = _prior_value(
         rolling_volatility(
             cast("Any", dataset),
@@ -100,9 +96,15 @@ def project_market_overlay(
             if change is not None and open_price != 0
             else None
         ),
-        "change_pips": change / pip_size if change is not None else None,
+        "change_pips": (
+            change / pip_size if change is not None and pip_size is not None else None
+        ),
         "volatility": volatility_raw,
-        "adr": round(adr_raw / pip_size, 1) if adr_raw and adr_raw > 0 else None,
+        "adr": (
+            round(adr_raw / pip_size, 1)
+            if adr_raw and adr_raw > 0 and pip_size is not None
+            else None
+        ),
         "range_percent_of_adr": (
             round(((high - low) / adr_raw) * 100.0, 1)
             if adr_raw and adr_raw > 0

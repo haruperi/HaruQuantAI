@@ -1,13 +1,15 @@
 /** Focused unit evidence for Markets (FEAT-UI-02), FR-UI-030 through FR-UI-037. */
 
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MarketsWidget } from './MarketsWidget';
+import { WATCHLISTS_CHANGED_EVENT } from '../watchlists/watchlistEvents';
 
-const { marketsMock, quotesMock, listMock, openOrderTicketMock, submitOrderMock, addWidgetToWorkspaceMock } = vi.hoisted(() => ({
+const { marketsMock, quotesMock, snapshotStreamMock, listMock, openOrderTicketMock, submitOrderMock, addWidgetToWorkspaceMock } = vi.hoisted(() => ({
   marketsMock: vi.fn(),
   quotesMock: vi.fn(),
+  snapshotStreamMock: vi.fn(),
   listMock: vi.fn(),
   openOrderTicketMock: vi.fn(),
   submitOrderMock: vi.fn(),
@@ -33,7 +35,7 @@ vi.mock('../workspaces', () => ({
 
 vi.mock('@/clients', () => ({
   apiClients: {
-    data: { markets: marketsMock, quotes: quotesMock },
+    data: { markets: marketsMock, quotes: quotesMock, snapshotStream: snapshotStreamMock },
     watchlists: { list: listMock },
   },
   unwrapData: (response: { data: unknown }) => response.data,
@@ -94,9 +96,11 @@ describe('MarketsWidget', () => {
     orderConfirmationRequired = true;
     listMock.mockResolvedValue({ data: [] });
     quotesMock.mockResolvedValue(directoryPage([marketRow()], null));
+    snapshotStreamMock.mockImplementation(async function* () {});
   });
 
   afterEach(() => {
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
     cleanup();
     vi.clearAllMocks();
   });
@@ -104,7 +108,7 @@ describe('MarketsWidget', () => {
   it('reads the market directory, not a watchlist, with no client-elected source_id (FR-UI-033)', async () => {
     marketsMock.mockResolvedValue(directoryPage([marketRow()], null));
 
-    render(<MarketsWidget />);
+    render(<MarketsWidget streamSettlingMs={0} />);
     await screen.findByText('EURUSD');
 
     expect(marketsMock).toHaveBeenCalledWith({ limit: 50, cursor: undefined, includeTechnicals: true });
@@ -122,20 +126,65 @@ describe('MarketsWidget', () => {
       )
     );
 
-    render(<MarketsWidget />);
+    render(<MarketsWidget streamSettlingMs={0} />);
     await waitFor(() => expect(marketsMock).toHaveBeenCalledTimes(4));
 
-    // Give the (already-resolved) 4th page a tick to flush into state, then
-    // confirm a 5th page was never requested despite next_cursor never being null.
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    // Wait for the zero-duration injected settling clock to flush, then confirm
+    // a 5th page was never requested despite next_cursor never being null.
+    await waitFor(() => expect(snapshotStreamMock).toHaveBeenCalledTimes(1));
     expect(marketsMock).toHaveBeenCalledTimes(4);
     expect(screen.getAllByRole('row').length).toBeGreaterThan(1); // header + >=1 data row
+  });
+
+  it('starts streaming only after initial loading and the settling delay', async () => {
+    let resolveMarkets!: (value: { data: unknown }) => void;
+    marketsMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveMarkets = resolve;
+      })
+    );
+
+    render(<MarketsWidget streamSettlingMs={50} />);
+    expect(snapshotStreamMock).not.toHaveBeenCalled();
+
+    resolveMarkets(directoryPage([marketRow()], null));
+    await screen.findByText('EURUSD');
+    expect(screen.getByText(/Streaming starts in/)).toBeInTheDocument();
+    expect(snapshotStreamMock).not.toHaveBeenCalled();
+
+    await waitFor(() => expect(snapshotStreamMock).toHaveBeenCalledTimes(1));
+  });
+
+  it('pauses when hidden and resumes without reloading initial market data', async () => {
+    marketsMock.mockResolvedValue(directoryPage([marketRow()], null));
+    snapshotStreamMock.mockImplementation(
+      (_symbols: string[], options: { signal: AbortSignal }) => (async function* () {
+        await new Promise<void>((resolve) => {
+          options.signal.addEventListener('abort', () => resolve(), { once: true });
+        });
+      })()
+    );
+
+    render(<MarketsWidget streamSettlingMs={0} />);
+    await waitFor(() => expect(snapshotStreamMock).toHaveBeenCalledTimes(1));
+
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });
+    fireEvent(document, new Event('visibilitychange'));
+    await waitFor(() => {
+      const firstSignal = snapshotStreamMock.mock.calls[0][1].signal as AbortSignal;
+      expect(firstSignal.aborted).toBe(true);
+    });
+
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
+    fireEvent(document, new Event('visibilitychange'));
+    await waitFor(() => expect(snapshotStreamMock).toHaveBeenCalledTimes(2));
+    expect(marketsMock).toHaveBeenCalledTimes(1);
   });
 
   it('surfaces a load failure explicitly rather than an empty table (FR-UI-032)', async () => {
     marketsMock.mockRejectedValue(new Error('network'));
 
-    render(<MarketsWidget />);
+    render(<MarketsWidget streamSettlingMs={0} />);
     await screen.findByRole('alert');
     expect(screen.getByRole('alert').textContent).toMatch(/unable to load/i);
   });
@@ -151,7 +200,7 @@ describe('MarketsWidget', () => {
       )
     );
 
-    render(<MarketsWidget />);
+    render(<MarketsWidget streamSettlingMs={0} />);
     // Default category is Forex, so EURUSD is visible and XAUUSD is filtered out.
     await screen.findByText('EURUSD');
     expect(screen.queryByText('XAUUSD')).toBeNull();
@@ -168,7 +217,7 @@ describe('MarketsWidget', () => {
   it('shows an explicit empty state rather than a silently blank table when a filter matches nothing (FR-UI-034)', async () => {
     marketsMock.mockResolvedValue(directoryPage([], null));
 
-    render(<MarketsWidget />);
+    render(<MarketsWidget streamSettlingMs={0} />);
     await waitFor(() => expect(screen.getByText('No symbols available for Forex.')).toBeTruthy());
   });
 
@@ -246,6 +295,29 @@ describe('MarketsWidget', () => {
     expect(screen.queryByText('EURUSD')).toBeNull();
   });
 
+  it('reloads demand when another widget changes the active watchlist (FR-UI-192)', async () => {
+    listMock
+      .mockResolvedValueOnce({
+        data: [watchlist({ items: [{ source_id: 'mt5', symbol: 'EURUSD', sort_order: 0 }] })],
+      })
+      .mockResolvedValueOnce({
+        data: [watchlist({ items: [{ source_id: 'mt5', symbol: 'GBPUSD', sort_order: 0 }] })],
+      });
+    quotesMock.mockImplementation((symbols: string[]) =>
+      Promise.resolve(directoryPage(symbols.map((symbol) => marketRow({ symbol, name: symbol })), null))
+    );
+    render(<MarketsWidget streamSettlingMs={0} />);
+    await screen.findByText('EURUSD');
+
+    window.dispatchEvent(new Event(WATCHLISTS_CHANGED_EVENT));
+
+    await screen.findByText('GBPUSD');
+    await waitFor(() => expect(snapshotStreamMock).toHaveBeenLastCalledWith(
+      ['GBPUSD'],
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    ));
+  });
+
   it('sorts by Symbol, Change, Volatility, ADR, and Range with a stable symbol tiebreak (FR-UI-035)', async () => {
     marketsMock.mockResolvedValue(
       directoryPage(
@@ -310,6 +382,120 @@ describe('MarketsWidget', () => {
     expect(screen.getByText('75.0%').style.color).toBe('rgb(255, 202, 40)');   // #ffca28
     expect(screen.getByText('95.0%').style.color).toBe('rgb(255, 152, 0)');    // #ff9800
     expect(screen.getByText('115.0%').style.color).toBe('rgb(255, 0, 61)');   // #ff003d
+  });
+
+  it('shows Bid as Last Price, unavailable initial Age, and Spread in integer points (FR-UI-030)', async () => {
+    marketsMock.mockResolvedValue(directoryPage([marketRow({ last: 9.99999 })], null));
+
+    render(<MarketsWidget />);
+    const row = (await screen.findByText('EURUSD')).closest('tr');
+    expect(row).not.toBeNull();
+
+    const cells = within(row!).getAllByRole('cell');
+    expect(cells[1]).toHaveTextContent('1.10490');
+    expect(cells[2]).toHaveTextContent('—');
+    expect(cells[3]).toHaveTextContent('20');
+    const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
+    expect(headers.slice(0, 4)).toEqual(['Symbol', 'Last Price', 'Age', 'Spread']);
+    expect(screen.getByRole('columnheader', { name: 'Spread' })).toBeInTheDocument();
+    expect(screen.queryByRole('columnheader', { name: 'Bid' })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: 'Ask' })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: 'Status' })).toBeNull();
+  });
+
+  it('converts three-digit spread evidence to integer MT5 points (FR-UI-030)', async () => {
+    marketsMock.mockResolvedValue(
+      directoryPage([marketRow({ symbol: 'USDJPY', name: 'USDJPY', digits: 3, spread: 0.006 })], null)
+    );
+
+    render(<MarketsWidget />);
+    const row = (await screen.findByText('USDJPY')).closest('tr');
+    expect(within(row!).getAllByRole('cell')[3]).toHaveTextContent('6');
+  });
+
+  it('keeps invalid live quote time explicit (FR-UI-030)', async () => {
+    marketsMock.mockResolvedValue(directoryPage([marketRow()], null));
+    snapshotStreamMock.mockImplementation((_symbols: string[], options: { signal: AbortSignal }) => (async function* () {
+      yield {
+        sequence: 1,
+        payload: {
+          quotes: [{ symbol: 'EURUSD', bid: '1.20001', ask: '1.20002', spread: '0.00001', digits: 5, time: 'invalid' }],
+          stale: false,
+          gap: 0,
+        },
+      };
+      await new Promise<void>((resolve) => options.signal.addEventListener('abort', () => resolve(), { once: true }));
+    })());
+
+    render(<MarketsWidget streamSettlingMs={0} />);
+    const liveButton = await screen.findByRole('button', { name: 'Trade EURUSD; quote status: live' });
+    const cells = within(liveButton.closest('tr')!).getAllByRole('cell');
+    expect(cells[2]).toHaveTextContent('—');
+    expect(cells[3]).toHaveTextContent('1');
+  });
+
+  it('keeps unavailable initial spread explicit (FR-UI-030)', async () => {
+    marketsMock.mockResolvedValue(directoryPage([marketRow({ spread: null })], null));
+    render(<MarketsWidget />);
+    const row = (await screen.findByText('EURUSD')).closest('tr');
+    expect(within(row!).getAllByRole('cell')[3]).toHaveTextContent('—');
+  });
+
+  it('colors Trade green for live, yellow for stale, and red when not live (FR-UI-030/036)', async () => {
+    marketsMock.mockResolvedValue(directoryPage([marketRow()], null));
+    snapshotStreamMock.mockImplementation((_symbols: string[], options: { signal: AbortSignal }) => (async function* () {
+      yield {
+        sequence: 1,
+        payload: {
+          quotes: [{
+            symbol: 'EURUSD',
+            bid: '1.20001',
+            ask: '1.20007',
+            spread: '0.00006',
+            digits: 5,
+            time: new Date(Date.now() - 6_000).toISOString(),
+          }],
+          stale: false,
+          gap: 0,
+        },
+      };
+      await new Promise<void>((resolve) => options.signal.addEventListener('abort', () => resolve(), { once: true }));
+    })());
+
+    const liveView = render(<MarketsWidget streamSettlingMs={0} />);
+    const liveButton = await screen.findByRole('button', { name: 'Trade EURUSD; quote status: live' });
+    expect(liveButton.style.color).toBe('rgb(0, 228, 115)');
+    expect(screen.getByText('1.20001')).toBeInTheDocument();
+    const liveRow = screen.getByText('EURUSD').closest('tr');
+    const liveCells = within(liveRow!).getAllByRole('cell');
+    expect(liveCells[2]).toHaveTextContent('6s');
+    expect(liveCells[3]).toHaveTextContent('6');
+    expect(liveCells[4]).toHaveTextContent('+0.00500 (+0.45%)');
+    expect(liveCells[8]).toHaveTextContent('1.10000');
+    expect(liveCells[9]).toHaveTextContent('1.10800');
+    expect(liveCells[10]).toHaveTextContent('1.10500');
+    liveView.unmount();
+
+    snapshotStreamMock.mockImplementation((_symbols: string[], options: { signal: AbortSignal }) => (async function* () {
+      yield {
+        sequence: 2,
+        payload: {
+          quotes: [{ symbol: 'EURUSD', bid: '1.20002', ask: '1.20004', spread: '0.00002' }],
+          stale: true,
+          gap: 0,
+        },
+      };
+      await new Promise<void>((resolve) => options.signal.addEventListener('abort', () => resolve(), { once: true }));
+    })());
+    const staleView = render(<MarketsWidget streamSettlingMs={0} />);
+    const staleButton = await screen.findByRole('button', { name: 'Trade EURUSD; quote status: stale' });
+    expect(staleButton.style.color).toBe('rgb(255, 202, 40)');
+    staleView.unmount();
+
+    snapshotStreamMock.mockImplementation(async function* () {});
+    render(<MarketsWidget streamSettlingMs={0} />);
+    const offlineButton = await screen.findByRole('button', { name: 'Trade EURUSD; quote status: not live' });
+    expect(offlineButton.style.color).toBe('rgb(255, 0, 61)');
   });
 
   it('TRADE opens the confirmation ticket when confirmation is required, else submits directly (FR-UI-036)', async () => {

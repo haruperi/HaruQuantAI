@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   apiClients,
   BAR_TIMEFRAMES,
@@ -655,6 +655,62 @@ const TIMEFRAME_MILLISECONDS: Record<BarTimeframe, number> = {
   // Month lengths vary; this is used only as a conservative discontinuity threshold.
   MN1: 2_419_200_000,
 };
+const CHART_STREAM_SETTLING_SECONDS = 10;
+const ROLLOVER_FETCH_DELAY_MS = 1_000;
+const ROLLOVER_RETRY_DELAY_MS = 2_000;
+const MAX_ROLLOVER_RETRIES = 15;
+const MAX_TIMER_CHUNK_MS = 86_400_000;
+const WEEK_ANCHOR_UTC_MS = Date.UTC(1970, 0, 5);
+
+/** Return the canonical UTC opening instant containing one timestamp. */
+export function barBucketStart(timestamp: number, timeframe: BarTimeframe): number {
+  if (timeframe === 'MN1') {
+    const value = new Date(timestamp);
+    return Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), 1);
+  }
+  if (timeframe === 'W1') {
+    return WEEK_ANCHOR_UTC_MS
+      + Math.floor((timestamp - WEEK_ANCHOR_UTC_MS) / TIMEFRAME_MILLISECONDS.W1)
+      * TIMEFRAME_MILLISECONDS.W1;
+  }
+  const interval = TIMEFRAME_MILLISECONDS[timeframe];
+  return Math.floor(timestamp / interval) * interval;
+}
+
+/** Return the next canonical UTC boundary after one timestamp. */
+export function nextBarBoundary(timestamp: number, timeframe: BarTimeframe): number {
+  const start = barBucketStart(timestamp, timeframe);
+  if (timeframe === 'MN1') {
+    const value = new Date(start);
+    return Date.UTC(value.getUTCFullYear(), value.getUTCMonth() + 1, 1);
+  }
+  return start + TIMEFRAME_MILLISECONDS[timeframe];
+}
+
+/** Update only the forming authoritative candle with one same-bucket Bid tick. */
+export function applyTickToCurrentBar(
+  bars: BarData[],
+  bid: number,
+  tickTimestamp: number,
+  timeframe: BarTimeframe
+): BarData[] {
+  if (!bars.length || !(bid > 0) || !Number.isFinite(tickTimestamp)) return bars;
+  const last = bars[bars.length - 1];
+  const lastTimestamp = Date.parse(last.timestamp);
+  if (
+    !Number.isFinite(lastTimestamp)
+    || barBucketStart(lastTimestamp, timeframe) !== barBucketStart(tickTimestamp, timeframe)
+  ) {
+    return bars;
+  }
+  const updated = {
+    ...last,
+    high: Math.max(last.high, bid),
+    low: Math.min(last.low, bid),
+    close: bid,
+  };
+  return [...bars.slice(0, -1), updated];
+}
 
 /**
  * Extremes of one bar field, without spreading the array into `Math.min/max`.
@@ -784,9 +840,21 @@ function storeDrawings(symbol: string, drawings: any[]): void {
 interface Props {
   symbol?: string;
   widgetId?: string;
+  /** Production defaults to 10 seconds; tests may inject a shorter clock. */
+  streamSettlingMs?: number;
+  /** Allow tests to shorten the small post-boundary provider allowance. */
+  rolloverFetchDelayMs?: number;
+  /** Allow tests to shorten retries while MT5 exposes the newly opened bar. */
+  rolloverRetryDelayMs?: number;
 }
 
-export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) => {
+export const ChartWidget: React.FC<Props> = ({
+  symbol = 'EURUSD',
+  widgetId,
+  streamSettlingMs = CHART_STREAM_SETTLING_SECONDS * 1_000,
+  rolloverFetchDelayMs = ROLLOVER_FETCH_DELAY_MS,
+  rolloverRetryDelayMs = ROLLOVER_RETRY_DELAY_MS,
+}) => {
   const { products, openOrderTicket, submitOrder, theme } = useTradingStore();
   const { orderConfirmationRequired, toggleExpandWidget, setWidgetSymbol } = useWorkspaceStore();
 
@@ -1142,10 +1210,55 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
   const [candles, setCandles] = useState<BarData[]>([]);
   const [isLoadingBars, setIsLoadingBars] = useState(true);
   const [barsError, setBarsError] = useState<string | null>(null);
+  const [barPhase, setBarPhase] = useState<'loading' | 'settling' | 'ready' | 'refreshing' | 'error'>('loading');
+  const [settlingSeconds, setSettlingSeconds] = useState(CHART_STREAM_SETTLING_SECONDS);
+  const [barRefreshVersion, setBarRefreshVersion] = useState(0);
+  const [barEvidenceRevision, setBarEvidenceRevision] = useState(0);
+  const [isDocumentVisible, setIsDocumentVisible] = useState(
+    () => document.visibilityState === 'visible'
+  );
+  const loadedConfigurationRef = useRef<string | null>(null);
+  const latestBarTimestampRef = useRef<string | null>(null);
+  const authoritativeBucketRef = useRef<number | null>(null);
+  const rolloverPendingRef = useRef(false);
+  const rolloverTargetBucketRef = useRef<number | null>(null);
+  const rolloverRetryCountRef = useRef(0);
+
+  const barConfigurationKey = useMemo(
+    () => [activeSymbol, timeframe, rangeBy, barCount, dateFrom, dateTo].join('|'),
+    [activeSymbol, timeframe, rangeBy, barCount, dateFrom, dateTo]
+  );
+  const isLiveRange = rangeBy === 'Bars' || dateTo >= new Date().toISOString().split('T')[0];
+
+  const requestRolloverRefresh = useCallback((targetBucket: number): void => {
+    if (rolloverPendingRef.current) return;
+    rolloverPendingRef.current = true;
+    rolloverTargetBucketRef.current = Math.max(
+      rolloverTargetBucketRef.current ?? targetBucket,
+      targetBucket
+    );
+    rolloverRetryCountRef.current = 0;
+    setBarPhase('refreshing');
+    setBarRefreshVersion((current) => current + 1);
+  }, []);
+
+  useEffect(() => {
+    const handleVisibilityChange = (): void => {
+      setIsDocumentVisible(document.visibilityState === 'visible');
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
+    const isInitialConfiguration = loadedConfigurationRef.current !== barConfigurationKey;
+    if (isInitialConfiguration) {
+      rolloverTargetBucketRef.current = null;
+      rolloverRetryCountRef.current = 0;
+    }
     setIsLoadingBars(true);
+    setBarPhase(isInitialConfiguration ? 'loading' : 'refreshing');
     setBarsError(null);
 
     async function fetchBars() {
@@ -1163,20 +1276,52 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
         if (cancelled) return;
 
         const rows = toChartBars(unwrapData(response), timeframe);
+        if (rows.length === 0) {
+          if (isInitialConfiguration) setCandles([]);
+          setBarsError(`No ${timeframe} bars available for ${activeSymbol}`);
+          setBarPhase('error');
+          return;
+        }
         setCandles(rows);
-        // An empty series is reported, never papered over: the broker having no
-        // history for this symbol and timeframe is real information.
-        setBarsError(
-          rows.length === 0 ? `No ${timeframe} bars available for ${activeSymbol}` : null
-        );
+        latestBarTimestampRef.current = rows.at(-1)?.timestamp ?? null;
+        authoritativeBucketRef.current = barBucketStart(Date.now(), timeframe);
+        loadedConfigurationRef.current = barConfigurationKey;
+        const latestBarTimestamp = Date.parse(rows.at(-1)?.timestamp ?? '');
+        const rolloverTarget = rolloverTargetBucketRef.current;
+        if (
+          !isInitialConfiguration
+          && rolloverTarget !== null
+          && (
+            !Number.isFinite(latestBarTimestamp)
+            || barBucketStart(latestBarTimestamp, timeframe) < rolloverTarget
+          )
+        ) {
+          rolloverRetryCountRef.current += 1;
+          if (rolloverRetryCountRef.current >= MAX_ROLLOVER_RETRIES) {
+            setBarsError(`The new ${timeframe} bar is not available from MT5 yet`);
+            setBarPhase('error');
+          } else {
+            setBarPhase('refreshing');
+          }
+          return;
+        }
+        rolloverTargetBucketRef.current = null;
+        rolloverRetryCountRef.current = 0;
+        setBarEvidenceRevision((current) => current + 1);
+        setBarsError(null);
         anchorToLatestRef.current = true;
         setPanOffset(0);
+        setBarPhase(isInitialConfiguration ? 'settling' : 'ready');
       } catch (error) {
         if (cancelled) return;
-        setCandles([]);
+        if (isInitialConfiguration) setCandles([]);
         setBarsError(error instanceof Error ? error.message : 'Bars unavailable');
+        setBarPhase('error');
       } finally {
-        if (!cancelled) setIsLoadingBars(false);
+        if (!cancelled) {
+          setIsLoadingBars(false);
+          rolloverPendingRef.current = false;
+        }
       }
     }
 
@@ -1185,7 +1330,131 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
     return () => {
       cancelled = true;
     };
-  }, [activeSymbol, timeframe, rangeBy, barCount, dateFrom, dateTo]);
+  }, [activeSymbol, timeframe, rangeBy, barCount, dateFrom, dateTo, barConfigurationKey, barRefreshVersion]);
+
+  // MT5 can briefly continue returning the closed bar after a boundary. Keep
+  // SSE closed and retry only the authoritative bar read, with a hard ceiling.
+  useEffect(() => {
+    if (
+      barPhase !== 'refreshing'
+      || isLoadingBars
+      || !isDocumentVisible
+      || rolloverTargetBucketRef.current === null
+      || rolloverRetryCountRef.current >= MAX_ROLLOVER_RETRIES
+    ) return;
+    const timerId = window.setTimeout(
+      () => setBarRefreshVersion((current) => current + 1),
+      rolloverRetryDelayMs
+    );
+    return () => window.clearTimeout(timerId);
+  }, [barConfigurationKey, barPhase, isDocumentVisible, isLoadingBars, rolloverRetryDelayMs]);
+
+  // Initial/configuration loads have the same explicit separation as Markets.
+  // Rollover refreshes resume immediately after authoritative bars are installed.
+  useEffect(() => {
+    if (barPhase !== 'settling') return;
+    const startedAt = Date.now();
+    const configuredSeconds = Math.ceil(streamSettlingMs / 1_000);
+    const updateCountdown = (): void => {
+      const elapsedSeconds = Math.floor((Date.now() - startedAt) / 1_000);
+      setSettlingSeconds(Math.max(0, configuredSeconds - elapsedSeconds));
+    };
+    updateCountdown();
+    const intervalId = window.setInterval(updateCountdown, 1_000);
+    const timeoutId = window.setTimeout(() => {
+      window.clearInterval(intervalId);
+      setSettlingSeconds(0);
+      setBarPhase('ready');
+    }, streamSettlingMs);
+    return () => {
+      window.clearInterval(intervalId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [barPhase, streamSettlingMs]);
+
+  // Timers are presentation lifecycle only. Hidden charts release their stream
+  // and check for a missed boundary before resuming when visible again.
+  useEffect(() => {
+    if (
+      !isDocumentVisible
+      || barPhase !== 'ready'
+      || !isLiveRange
+      || loadedConfigurationRef.current !== barConfigurationKey
+    ) return;
+    const authoritativeBucket = authoritativeBucketRef.current;
+    if (
+      authoritativeBucket !== null
+      && barBucketStart(Date.now(), timeframe) > authoritativeBucket
+    ) {
+      requestRolloverRefresh(barBucketStart(Date.now(), timeframe));
+      return;
+    }
+
+    const boundary = nextBarBoundary(Date.now(), timeframe) + rolloverFetchDelayMs;
+    let timerId: number | null = null;
+    const waitForBoundary = (): void => {
+      const remaining = boundary - Date.now();
+      if (remaining <= 0) {
+        requestRolloverRefresh(barBucketStart(Date.now(), timeframe));
+        return;
+      }
+      timerId = window.setTimeout(waitForBoundary, Math.min(remaining, MAX_TIMER_CHUNK_MS));
+    };
+    waitForBoundary();
+    return () => {
+      if (timerId !== null) window.clearTimeout(timerId);
+    };
+  }, [barConfigurationKey, barPhase, isDocumentVisible, isLiveRange, requestRolloverRefresh, rolloverFetchDelayMs, timeframe]);
+
+  // Live ticks may extend only the latest authoritative bar. A tick in a newer
+  // bucket requests a broker refetch instead of constructing a candle locally.
+  useEffect(() => {
+    if (
+      !isDocumentVisible
+      || barPhase !== 'ready'
+      || !isLiveRange
+      || loadedConfigurationRef.current !== barConfigurationKey
+      || !latestBarTimestampRef.current
+    ) return;
+    const controller = new AbortController();
+    const consumeQuote = async (): Promise<void> => {
+      try {
+        for await (const event of apiClients.data.snapshotStream(
+          [activeSymbol],
+          { signal: controller.signal }
+        )) {
+          const raw = Array.isArray(event.payload?.quotes) ? event.payload.quotes[0] : null;
+          if (typeof raw !== 'object' || raw === null) continue;
+          const quote = raw as Record<string, unknown>;
+          if (quote.symbol !== activeSymbol) continue;
+          const bid = Number(quote.bid);
+          const ask = Number(quote.ask);
+          const tickTimestamp = typeof quote.time === 'string' ? Date.parse(quote.time) : NaN;
+          if (!(bid > 0) || !Number.isFinite(ask) || !Number.isFinite(tickTimestamp)) continue;
+          const latestTimestamp = Date.parse(latestBarTimestampRef.current ?? '');
+          if (
+            !Number.isFinite(latestTimestamp)
+            || barBucketStart(tickTimestamp, timeframe) !== barBucketStart(latestTimestamp, timeframe)
+          ) {
+            requestRolloverRefresh(barBucketStart(tickTimestamp, timeframe));
+            continue;
+          }
+          setCandles((current) => applyTickToCurrentBar(current, bid, tickTimestamp, timeframe));
+          setActiveMarketRow((current) => current ? {
+            ...current,
+            bid,
+            ask,
+            last: bid,
+            spread: ask - bid,
+          } : current);
+        }
+      } catch {
+        // Authoritative bars remain visible when the optional live stream ends.
+      }
+    };
+    void consumeQuote();
+    return () => controller.abort();
+  }, [activeSymbol, barConfigurationKey, barPhase, isDocumentVisible, isLiveRange, requestRolloverRefresh, timeframe]);
 
   useEffect(() => {
     const requested: ['ema' | 'rsi', number][] = [];
@@ -1247,7 +1516,7 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
     return () => {
       cancelled = true;
     };
-  }, [activeSymbol, timeframe, rangeBy, barCount, dateFrom, dateTo, candles.length, selectedIndicators]);
+  }, [activeSymbol, timeframe, rangeBy, barCount, dateFrom, dateTo, candles.length, selectedIndicators, barEvidenceRevision]);
 
   useEffect(() => {
     if (activeDropdown !== 'indicators') return;
@@ -1311,21 +1580,6 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
     if (segment.length) segments.push(segment);
     return segments;
   }, [candles, chartPlotWidth, panOffset, rsiByTime, zoomLevel]);
-
-  // Extend the forming bar with the live quote. A zero price means the product
-  // is not quoted yet, and must not overwrite a real close.
-  useEffect(() => {
-    const lastPrice = targetProduct.lastPrice;
-    if (!(lastPrice > 0)) return;
-    setCandles((prev) => {
-      if (!prev.length) return prev;
-      const last = { ...prev[prev.length - 1] };
-      last.close = lastPrice;
-      last.high = Math.max(last.high, lastPrice);
-      last.low = Math.min(last.low, lastPrice);
-      return [...prev.slice(0, -1), last];
-    });
-  }, [targetProduct.lastPrice]);
 
   // Chart Panning / Moving State
   // A freshly loaded series opens on its most recent bars. Starting at offset 0
@@ -2539,6 +2793,18 @@ export const ChartWidget: React.FC<Props> = ({ symbol = 'EURUSD', widgetId }) =>
           {isLoadingBars && (
             <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, padding: '0 4px' }}>
               Loading {timeframe} bars…
+            </span>
+          )}
+
+          {!isLoadingBars && barPhase === 'settling' && (
+            <span style={{ fontSize: '10px', color: 'var(--cme-blue-cyan, #3cc8ff)', fontWeight: 600, padding: '0 4px' }}>
+              Initial bars loaded. Streaming starts in {settlingSeconds}s
+            </span>
+          )}
+
+          {!isLoadingBars && barPhase === 'refreshing' && (
+            <span style={{ fontSize: '10px', color: 'var(--cme-blue-cyan, #3cc8ff)', fontWeight: 600, padding: '0 4px' }}>
+              Waiting for authoritative {timeframe} bar…
             </span>
           )}
 

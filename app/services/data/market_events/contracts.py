@@ -513,7 +513,7 @@ class MarketStreamRequest(_Contract):
 
     source_id: str
     symbol: str
-    mode: Literal["bars", "ticks"]
+    mode: Literal["ticks"]
     timeframe: str
     request_id: str
     resume_after: int | None = None
@@ -812,7 +812,7 @@ class MarketStreamEvent(_Contract):
         "gap",
         "error",
     ]
-    mode: Literal["bars", "ticks"]
+    mode: Literal["ticks"]
     source_id: str
     symbol: str
     timeframe: str

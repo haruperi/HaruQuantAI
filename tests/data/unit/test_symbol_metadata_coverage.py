@@ -80,6 +80,18 @@ def test_symbol_metadata_invalid_digits_and_step() -> None:
 
     with pytest.raises(DataError):
         SymbolMetadata(
+            canonical_symbol="XAUUSD",
+            provider_symbol="XAUUSD",
+            asset_class="commodity",
+            source_id="mt5",
+            revision="v1",
+            retrieved_at=_NOW,
+            pip_size=Decimal(0),
+            request_id=_REQ_ID,
+        )
+
+    with pytest.raises(DataError):
+        SymbolMetadata(
             canonical_symbol="EURUSD",
             provider_symbol="EURUSD",
             asset_class="forex",

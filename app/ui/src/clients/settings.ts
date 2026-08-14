@@ -56,7 +56,7 @@ const credentialWriteResultSchema = z.object({
   configured: z.literal(true),
   version: z.number().int().positive(),
   updated_at: z.string().min(1),
-  restart_required: z.literal(true),
+  activation: z.literal("restart_required"),
 });
 
 /** Update request body (backend `_SettingsUpdate`). */

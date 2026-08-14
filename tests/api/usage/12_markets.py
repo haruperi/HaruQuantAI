@@ -70,11 +70,10 @@ def _get_symbol_row(symbol: str) -> pd.Series | None:
     if (
         meta_response.status == "success"
         and meta_response.data is not None
-        and getattr(meta_response.data, "point", None) is not None
-        and isinstance(meta_response.data.point, (int, float))
+        and getattr(meta_response.data, "pip_size", None) is not None
+        and isinstance(meta_response.data.pip_size, (int, float, str))
     ):
-        point = float(meta_response.data.point)
-        pip_size = point * 10.0
+        pip_size = float(meta_response.data.pip_size)
     else:
         return None
 

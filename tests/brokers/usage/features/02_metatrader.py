@@ -14,17 +14,41 @@ from _support import (
     require_success,
 )
 from app.services.brokers import (
+    acquire_metatrader_snapshot_symbols,
     disconnect_broker,
     get_broker_connection_status,
     get_broker_last_error,
     get_broker_server_time,
     get_broker_value_field,
+    get_metatrader_snapshot_gateway_status,
     is_broker_connected,
     ping_broker,
     reconnect_broker,
     refresh_broker_session,
+    release_metatrader_snapshot_symbols,
     supports_broker_capability,
 )
+
+
+async def fr_brokers_152_to_158_snapshot_symbol_demand() -> None:
+    """FR-BRK-152..158: Exercise connected revisioned snapshot demand."""
+    _header("Stage 4: Revisioned MT5 Snapshot Symbol Demand (FR-BRK-152..158)")
+    status = get_metatrader_snapshot_gateway_status()
+    print(_format_result(status))
+    if not status["connected"]:
+        print("Data -> snapshot_gateway='not_connected'; demand exercise skipped")
+        return
+    consumer_id = await acquire_metatrader_snapshot_symbols(("EURUSD",))
+    try:
+        applied = get_metatrader_snapshot_gateway_status()
+        assert applied["applied_symbol_count"] >= 1
+        print(
+            "Data -> "
+            f"desired_revision={applied['desired_revision']}, "
+            f"applied_revision={applied['applied_revision']}"
+        )
+    finally:
+        await release_metatrader_snapshot_symbols(consumer_id)
 
 
 def _feature_header(title: str) -> None:
@@ -144,6 +168,8 @@ async def _run() -> None:
 
         # Stage 3: Verified session & account info output
         await fr_brokers_052_to_056_verified_account_info(adapter)
+
+        await fr_brokers_152_to_158_snapshot_symbol_demand()
 
 
 def main() -> None:

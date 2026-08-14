@@ -1,7 +1,7 @@
 # UI
 
 > **Package:** `app/ui/`
-> **Status:** `In Progress` — 24 registered UI features; 10 `Completed`, 13 `Pending`,
+> **Status:** `In Progress` — 25 registered UI features; 11 `Completed`, 13 `Pending`,
 > and 1 `Partial` requirement coverage or focused-folder ownership.
 > **Last updated:** `2026-08-12`
 
@@ -87,7 +87,9 @@ workspace and its widgets are the primary UI and are registered first
 (`FEAT-UI-01`–`FEAT-UI-13`). Foundation modules (`FEAT-UI-14`–`FEAT-UI-17`) exist to
 enable that primary UI. Every other surface, including the trading-cockpit features
 traced in `docs/dev/trading-cockpit/`, is registered as an additive layer on top
-(`FEAT-UI-18`–`FEAT-UI-24`) and never as the owner of a primary widget.
+(`FEAT-UI-18`–`FEAT-UI-24`) and never as the owner of a primary widget. The
+focused `FEAT-UI-25` diagnostic widget isolates the MT5 snapshot presentation
+path without replacing any primary widget.
 
 ### Package capability map
 
@@ -142,6 +144,7 @@ app/ui/
     ├── features/emergency-ux/            # FEAT-UI-22
     ├── features/human-factors/           # FEAT-UI-23
     ├── features/training-ux/             # FEAT-UI-24
+    ├── features/market-ticks/            # FEAT-UI-25
     ├── types/                            # support: shared types
     ├── utils/                            # support: shared helpers
     └── mock/                             # support: test-only fixtures
@@ -152,9 +155,9 @@ app/ui/
 | Status | Feature | Owning module | Public surface | Requirements | Verification evidence |
 |---|---|---|---|---|---|
 | Completed | `FEAT-UI-01` Workspace Layout and Session Mode | `src/features/workspaces/` | Workspace and widget layout state, confirmation mode, account mode | `FR-UI-001`–`FR-UI-029` | `src/features/workspaces/store.test.ts` |
-| Completed | `FEAT-UI-02` Markets Widget | `src/features/markets/` | `MarketsWidget` through the feature barrel | `FR-UI-030`–`FR-UI-037` | `src/features/markets/MarketsWidget.test.tsx` |
-| Completed | `FEAT-UI-03` Watchlist Widget | `src/features/watchlists/` | `WatchlistWidget` through the feature barrel | `FR-UI-038`–`FR-UI-045` | `src/features/watchlists/WatchlistWidget.test.tsx` |
-| Partial | `FEAT-UI-04` Charting Tools Widget | `src/features/chart/` | `ChartWidget` | `FR-UI-046`–`FR-UI-054` (`FR-UI-046`–`FR-UI-050` completed) | `src/features/chart/ChartWidget.test.tsx`; further evidence pending |
+| Completed | `FEAT-UI-02` Markets Widget | `src/features/markets/` | `MarketsWidget` through the feature barrel | `FR-UI-030`–`FR-UI-037`; `FR-UI-192`–`FR-UI-193` | `src/features/markets/MarketsWidget.test.tsx` |
+| Completed | `FEAT-UI-03` Watchlist Widget | `src/features/watchlists/` | `WatchlistWidget` through the feature barrel | `FR-UI-038`–`FR-UI-045`; `FR-UI-192` | `src/features/watchlists/WatchlistWidget.test.tsx` |
+| Completed | `FEAT-UI-04` Charting Tools Widget | `src/features/chart/` | `ChartWidget` | `FR-UI-046`–`FR-UI-054`; `FR-UI-194` | `src/features/chart/ChartWidget.test.tsx` |
 | Pending | `FEAT-UI-05` Price Ladder Widget | Target: `src/features/price-ladder/`; current: `src/features/instrument-panels/PriceLadderWidget.tsx` | `PriceLadderWidget` | `FR-UI-055`–`FR-UI-062` | Pending evidence |
 | Pending | `FEAT-UI-06` Order Ticket | Target: `src/features/order-ticket/`; current: `src/components/workflow/OrderTicketModal.tsx` | `OrderTicketModal` (futures and options tabs) | `FR-UI-063`–`FR-UI-079` | Pending evidence |
 | Pending | `FEAT-UI-07` Options Grid Widget | Target: `src/features/options-grid/`; current: `src/features/instrument-panels/OptionsGridWidget.tsx` | `OptionsGridWidget` | `FR-UI-080`–`FR-UI-084` | Pending evidence; blocked on an owning backend domain |
@@ -175,6 +178,7 @@ app/ui/
 | Completed | `FEAT-UI-22` Emergency and Recovery UX                | `src/features/emergency-ux/`                                                                              | `EmergencyPanel`, `EmergencyStep`                                           | `FR-UI-169`–`FR-UI-173` | `src/features/emergency-ux/components.test.tsx`                                                      |
 | Completed | `FEAT-UI-23` Human-Factors and Alarm Model            | `src/features/human-factors/`                                                                             | `AlarmModel`, `Alarm`                                                       | `FR-UI-174`–`FR-UI-179` | `src/features/human-factors/components.test.tsx`                                                     |
 | Completed | `FEAT-UI-24` Training, Replay, and Qualification UX   | `src/features/training-ux/`                                                                               | `TrainingPanel`, `QualificationView`                                        | `FR-UI-180`–`FR-UI-185` | `src/features/training-ux/components.test.tsx`                                                       |
+| Completed | `FEAT-UI-25` MT5 Market Ticks Diagnostic Widget       | `src/features/market-ticks/`                                                                              | `MarketTicksTableWidget`                                                     | `FR-UI-186`–`FR-UI-191`; `FR-UI-193` | `src/features/market-ticks/MarketTicksTableWidget.test.tsx`, `useMarketSnapshots.test.tsx`           |
 
 **Primary UI.** `FEAT-UI-01`–`FEAT-UI-13` are the trading workspace and widgets
 specified by `docs/dev/documentation.pdf`. `FEAT-UI-14`–`FEAT-UI-17` are the foundation
@@ -375,13 +379,13 @@ workspace-related field; see the feature's own `README.md` for that gap.
 
 | Status    | Requirement ID | Responsibility                                                                                                                                                               | Component / Function / Type | Side Effects                            | Failure presentation             | Usage / Test                                    |
 | --------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | --------------------------------------- | -------------------------------- | ----------------------------------------------- |
-| Completed | `FR-UI-030`  | Present typed API market evidence without calculation; format every populated symbol's annualized volatility as a percentage, ADR in pips, and range as a percentage of ADR. | `MarketsWidget`           | External API call                       | Unavailable remains unavailable  | `src/features/markets/MarketsWidget.test.tsx` |
+| Completed | `FR-UI-030`  | Present typed API market evidence without market calculation; format every populated symbol's annualized volatility as a percentage, ADR in pips, and range as a percentage of ADR, then present owner-supplied Bid as Last Price, convert raw spread into integer MT5 points using provider precision, show per-symbol whole-second Age from genuine TCP quote time, and preserve explicit live, stale, or not-live evidence from one authenticated snapshot stream. All sequential HTTP history/calculation batches must finish before a visible 10-second settling interval begins; streaming starts only after that interval and may update quote-only fields without replacing initialized technical evidence. Initial HTTP rows and invalid quote times retain unavailable Age. | `MarketsWidget`           | Sequential external API calls followed by one stream | Unavailable remains unavailable | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-031`  | Use bounded batch reads and progressive rendering.                                                                                                                           | `MarketsWidget`           | External API call; local state mutation | Completed batches remain visible | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-032`  | Show explicit loading, error, formatting, and sort states.                                                                                                                   | `MarketsWidget`           | Local state mutation                    | Em dash for unavailable legs     | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-033`  | Present the tradable instrument directory for the configured runtime source only.                                                                                            | `MarketsWidget`           | External API call                       | Non-tradable absent              | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-034`  | Offer filtering of the directory by asset class.                                                                                                                             | `MarketsWidget`           | Local state mutation                    | Empty filter truthful            | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-035`  | Offer sorting by symbol, change, and volume with a stable tiebreak.                                                                                                          | `MarketsWidget`           | Local state mutation                    | Deterministic ordering           | `src/features/markets/MarketsWidget.test.tsx` |
-| Completed | `FR-UI-036`  | Offer a direct trade action per row that opens the order ticket pre-filled with that instrument.                                                                             | `MarketsWidget`           | Local state mutation                    | Ticket authority unchanged       | `src/features/markets/MarketsWidget.test.tsx` |
+| Completed | `FR-UI-036`  | Offer a direct trade action per row that opens the order ticket pre-filled with that instrument while its text and accessible label present green live, yellow stale, or red not-live quote status without changing trading authority. | `MarketsWidget`           | Local state mutation                    | Ticket authority unchanged       | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-037`  | Offer per-row actions targeting the chart, price ladder, and options surfaces at the selected instrument.                                                                    | `MarketsWidget`           | Navigation                              | Unavailable target disabled      | `src/features/markets/MarketsWidget.test.tsx` |
 
 ### Configuration and Limits Manifest
@@ -438,7 +442,7 @@ Mutation and idempotency limits otherwise remain owned by the API contracts.
 
 | Status  | Requirement ID | Responsibility                                                                                                       | Component / Function / Type | Side Effects         | Failure presentation          | Usage / Test     |
 | ------- | -------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------- | -------------------- | ----------------------------- | ---------------- |
-| Completed | `FR-UI-046`  | Present a price chart for a selected instrument and timeframe from Data-owned bars read through `GET /api/v1/data/bars`; the widget generates no prices of its own, and an unavailable or empty broker series is reported rather than filled in. | `ChartWidget`, `apiClients.data.bars` | External API call    | Unavailable series explicit   | `src/features/chart/ChartWidget.test.tsx` |
+| Completed | `FR-UI-046`  | Present a price chart for a selected instrument and timeframe from Data-owned bars read through `GET /api/v1/data/bars`; after authoritative initialization, one-symbol MT5 TCP Bid ticks may update only the current bar's High, Low, and Close. Open, volume, timestamp, prior bars, and new-bar creation remain Data-owned. | `ChartWidget`, `apiClients.data.bars`, `apiClients.data.snapshotStream` | External API call and stream | Unavailable history explicit; live disconnect preserves history | `src/features/chart/ChartWidget.test.tsx` |
 | Completed | `FR-UI-047`  | Offer exactly Data's canonical timeframe manifest (`M1`–`MN1`) and preserve the selection per widget instance; a timeframe the broker cannot serve is never offered. | `ChartWidget`, `BAR_TIMEFRAMES` | Local state mutation | Unsupported timeframe absent  | `src/features/chart/ChartWidget.test.tsx` |
 | Completed | `FR-UI-048`  | Discover indicators from the authenticated Indicators catalogue and overlay only Indicators-owned values; the widget performs no indicator arithmetic. EMA and RSI are chart-enabled, RSI panel timestamps share the chart's pan/zoom viewport, and other registered indicators remain visibly unavailable until they gain a series contract. | `ChartWidget`, `apiClients.indicators.catalogue`, `apiClients.indicators.series` | External API call | No derived or mock series | `src/features/chart/ChartWidget.test.tsx` |
 | Completed | `FR-UI-049`  | Present each overlay with the parameters used to compute it.                                                         | `ChartWidget`             | None                 | Parameters visible            | `src/features/chart/ChartWidget.test.tsx` |
@@ -447,6 +451,7 @@ Mutation and idempotency limits otherwise remain owned by the API contracts.
 | Completed | `FR-UI-052`  | Provide chart appearance controls that mutate rendering state without refetching or replacing underlying Data-owned bars. | `ChartWidget` | Local state mutation | Data unchanged | `src/features/chart/ChartWidget.test.tsx` |
 | Completed | `FR-UI-053`  | Detect invalid slots and timeframe discontinuities, present the missing-bar count and visible gap region, and break continuous price and indicator paths rather than interpolating across it. | `ChartWidget`, `toChartBars` | None | No interpolation | `src/features/chart/ChartWidget.test.tsx` |
 | Completed | `FR-UI-054`  | Remain responsive at the registered 1,000,000-bar maximum by indexing owner series once and degrading every render loop to the clipped viewport without dropping the latest bar. | `ChartWidget`, `visibleBarRange` | None | Latest bar retained | `src/features/chart/ChartWidget.test.tsx` |
+| Completed | `FR-UI-194`  | Complete every initial or configuration-driven bar read before a visible 10-second settling interval and live subscription. At a canonical timeframe boundary, after a hidden-page missed boundary, or upon a newer-bucket tick, abort live projection and resume only after the authoritative read contains the target bucket; while MT5 still returns the prior bucket, keep SSE closed and use bounded delayed bar retries without synthesizing a candle or repeating the initial delay. | `ChartWidget`, `barBucketStart`, `nextBarBoundary`, `applyTickToCurrentBar` | Timers, external API calls, and one SSE stream | Historical bars remain visible; delayed or failed rollover is explicit | `src/features/chart/ChartWidget.test.tsx` |
 
 ### Configuration and Limits Manifest
 
@@ -976,6 +981,31 @@ None.
 ### Configuration and Limits Manifest
 
 None.
+
+---
+
+### 4.25 `src/features/market-ticks/` — MT5 Market Ticks Diagnostic Widget
+
+**Purpose:** Isolate the complete MT5 TCP-to-browser presentation path with a
+playground-equivalent table while retaining HaruQuantAI's authenticated typed SSE
+boundary.
+
+| Status | Requirement ID | Responsibility | Component / Function / Type | Side Effects | Failure presentation | Usage / Test |
+| --- | --- | --- | --- | --- | --- | --- |
+| Completed | `FR-UI-186` | Read broker-native symbols from `MT5_SNAPSHOT_SYMBOLS`. | `useMarketSnapshots` | Authenticated settings read | Missing configuration explicit | hook test |
+| Completed | `FR-UI-187` | Consume only the typed authenticated snapshot stream and apply atomic events. | `useMarketSnapshots` | SSE read | Transport failure explicit | hook test |
+| Completed | `FR-UI-188` | Present source, sequence, gaps, quote values, spread, broker time, age, and freshness. | `MarketTicksTableWidget` | None | Missing values remain unavailable | component test |
+| Completed | `FR-UI-189` | Present connecting, connected, disconnected, stale, clock-skew, empty, and unavailable states. | `MarketTicksTableWidget` | None | Explicit badges and alert | component test |
+| Completed | `FR-UI-190` | Reconnect with bounded exponential backoff and release streams and timers on unmount. | `useMarketSnapshots` | Timer and abort lifecycle | Disconnected state | hook test |
+| Completed | `FR-UI-191` | Register the diagnostic as an optional workspace widget without changing defaults. | Workspace contracts, grid, sidebar | Workspace layout state | Registered-type validation | workspace/component tests |
+| Completed | `FR-UI-192` | Notify independently mounted Markets widgets after successful watchlist mutations so they reload authoritative symbols and replace their snapshot demand without a page refresh. | `watchlistEvents.ts`; `WatchlistWidget`; `MarketsWidget` | Browser-local invalidation event without payload | Failed mutations emit no event | Markets and Watchlist component tests |
+| Completed | `FR-UI-193` | Abort live MT5 snapshot streams when their widget unmounts or the browser document becomes hidden, and reconnect when visible without repeating Markets' initial historical-data phase. | `MarketsWidget`; `useMarketSnapshots` | SSE abort and visibility listener | Paused state remains explicit | Markets and Market Ticks hook tests |
+
+### Configuration and Limits Manifest
+
+- Symbol authority: persisted non-secret `MT5_SNAPSHOT_SYMBOLS` system setting.
+- Initial retry: 1 second; maximum retry: 10 seconds.
+- Stale presentation threshold: 5 seconds, aligned with the Data snapshot owner.
 
 ---
 

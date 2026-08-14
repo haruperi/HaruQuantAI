@@ -109,6 +109,8 @@ def test_legacy_configuration_paths_are_exhaustively_classified() -> None:
 def test_system_manifest_is_unique_and_secret_free() -> None:
     manifest = get_system_settings_manifest()
     keys = [str(item["key"]) for item in manifest]
+    assert "MT5_SNAPSHOT_HOST" in keys
+    assert "MT5_SNAPSHOT_SYMBOLS" in keys
 
     assert len(keys) == len(set(keys))
     assert "DATABASE_URL" not in keys
@@ -124,6 +126,7 @@ def test_system_settings_reject_unknown_and_invalid_values() -> None:
 
 def test_credential_slots_require_the_exact_write_only_field_set() -> None:
     slots = {str(item["slot"]): item for item in get_credential_manifest()}
+    assert slots["mt5_snapshot_bridge"]["fields"] == ("auth_token",)
 
     assert "openai" in slots
     assert validate_credential_material(

@@ -14,10 +14,16 @@ from app.services.api.composition.migrations import run_api_migrations
 from app.services.api.composition.runtime_settings import (
     activate_runtime_logging,
     build_runtime_data_provider_sources,
+    build_runtime_mt5_snapshot_gateway_config,
     build_runtime_provider_settings,
     load_runtime_settings_snapshot,
 )
-from app.services.brokers import run_broker_migrations
+from app.services.api.identity import IdentityError
+from app.services.brokers import (
+    run_broker_migrations,
+    start_metatrader_snapshot_gateway,
+    stop_metatrader_snapshot_gateway,
+)
 from app.services.data import (
     build_data_settings,
     close_data_provider_sessions,
@@ -47,7 +53,7 @@ class _MigrationResponse(Protocol):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912, PLR0915
-    """Initialize required storage and close gateway-owned resources.
+    """Initialize required storage and database-configured gateway resources.
 
     Args:
         app: Canonical FastAPI application.
@@ -137,6 +143,18 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
         if brokers_result.status != "success" or brokers_result.data is None:
             app.state.api_ready = False
             raise StartupError("BROKERS_STORAGE_INITIALIZATION_FAILED")
+        snapshot_gateway_started = False
+        try:
+            gateway_config = build_runtime_mt5_snapshot_gateway_config(
+                app.state.api_runtime_settings,
+                key_set=app.state.api_credential_key_set,
+                request_id=generate_id("req"),
+            )
+            if gateway_config is not None:
+                await start_metatrader_snapshot_gateway(**gateway_config)
+                snapshot_gateway_started = True
+        except IdentityError, OSError, TypeError, ValueError:
+            logger.exception("Optional MT5 snapshot gateway unavailable")
         simulator_result = cast(
             "_MigrationResponse",
             run_simulator_migrations(generate_id("req")),
@@ -199,6 +217,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
         try:
             yield
         finally:
+            if snapshot_gateway_started:
+                await stop_metatrader_snapshot_gateway()
             provider_close_result = close_data_provider_sessions(generate_id("req"))
             if provider_close_result.status != "success":
                 logger.warning("Data provider-session shutdown failed")

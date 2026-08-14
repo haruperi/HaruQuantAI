@@ -1,12 +1,15 @@
 /** Focused unit evidence for Charting Tools Widget, FR-UI-046 and FR-UI-047. */
 
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   ChartWidget,
+  applyTickToCurrentBar,
+  barBucketStart,
   barExtent,
   maxVolume,
+  nextBarBoundary,
   toChartBars,
   visibleBarRange,
   type BarData,
@@ -20,6 +23,7 @@ const {
   symbolsMock,
   quotesMock,
   barsMock,
+  snapshotStreamMock,
   indicatorSeriesMock,
   indicatorCatalogueMock,
   setWidgetSymbolMock,
@@ -29,6 +33,7 @@ const {
   symbolsMock: vi.fn(),
   quotesMock: vi.fn(),
   barsMock: vi.fn(),
+  snapshotStreamMock: vi.fn(),
   indicatorSeriesMock: vi.fn(),
   indicatorCatalogueMock: vi.fn(),
   setWidgetSymbolMock: vi.fn(),
@@ -67,6 +72,7 @@ vi.mock('@/clients', async (importOriginal) => {
         symbols: symbolsMock,
         quotes: quotesMock,
         bars: barsMock,
+        snapshotStream: snapshotStreamMock,
       },
       indicators: {
         ...actual.apiClients.indicators,
@@ -202,6 +208,9 @@ describe('ChartWidget — FR-UI-046 Symbol Universe Autocomplete & Bar Fetching'
         { time: '2026-08-13T10:00:00+00:00', open: 1.0858, high: 1.0871, low: 1.0851, close: 1.0866, volume: 1120 },
       ])
     );
+    snapshotStreamMock.mockReset();
+    snapshotStreamMock.mockImplementation(async function* () {});
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
     openOrderTicketMock.mockReset();
     submitOrderMock.mockReset();
 
@@ -240,7 +249,167 @@ describe('ChartWidget — FR-UI-046 Symbol Universe Autocomplete & Bar Fetching'
   });
 
   afterEach(() => {
+    vi.useRealTimers();
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
     resetSymbolUniverse();
+  });
+
+  it('uses canonical UTC buckets including real calendar-month boundaries', () => {
+    const january = Date.parse('2026-01-31T23:59:59Z');
+    expect(barBucketStart(january, 'MN1')).toBe(Date.parse('2026-01-01T00:00:00Z'));
+    expect(nextBarBoundary(january, 'MN1')).toBe(Date.parse('2026-02-01T00:00:00Z'));
+    expect(nextBarBoundary(Date.parse('2026-08-13T10:15:00Z'), 'H1'))
+      .toBe(Date.parse('2026-08-13T11:00:00Z'));
+  });
+
+  it('updates only High Low and Close for a same-bucket Bid tick', () => {
+    const bars: BarData[] = [{
+      timestamp: '2026-08-13T10:00:00Z',
+      time: '10:00',
+      open: 1.1,
+      high: 1.2,
+      low: 1.0,
+      close: 1.15,
+      volume: 99,
+    }];
+    const updated = applyTickToCurrentBar(
+      bars,
+      1.25,
+      Date.parse('2026-08-13T10:30:00Z'),
+      'H1'
+    );
+
+    expect(updated[0]).toMatchObject({
+      timestamp: bars[0].timestamp,
+      open: 1.1,
+      high: 1.25,
+      low: 1.0,
+      close: 1.25,
+      volume: 99,
+    });
+    expect(applyTickToCurrentBar(
+      bars,
+      1.3,
+      Date.parse('2026-08-13T11:00:00Z'),
+      'H1'
+    )).toBe(bars);
+  });
+
+  it('loads bars completely, waits, and then streams only the chart symbol', async () => {
+    let resolveBars!: (value: { data: unknown }) => void;
+    barsMock.mockReturnValue(new Promise((resolve) => { resolveBars = resolve; }));
+
+    render(<ChartWidget symbol="EURUSD" streamSettlingMs={50} />);
+    expect(snapshotStreamMock).not.toHaveBeenCalled();
+
+    resolveBars(barSeries([
+      { time: new Date(barBucketStart(Date.now(), 'H1')).toISOString(), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+    ]));
+    expect(await screen.findByText(/Initial bars loaded\. Streaming starts in/)).toBeInTheDocument();
+    expect(snapshotStreamMock).not.toHaveBeenCalled();
+
+    await waitFor(() => expect(snapshotStreamMock).toHaveBeenCalledWith(
+      ['EURUSD'],
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    ));
+  });
+
+  it('uses a newer-bucket tick to refetch authoritative bars instead of creating a candle', async () => {
+    const currentStart = barBucketStart(Date.now(), 'H1');
+    const currentBars = barSeries([
+      { time: new Date(currentStart).toISOString(), open: 1, high: 1.1, low: 0.9, close: 1, volume: 10 },
+    ]);
+    barsMock.mockResolvedValueOnce(currentBars)
+      .mockResolvedValueOnce(currentBars)
+      .mockResolvedValue(barSeries([
+      { time: new Date(nextBarBoundary(currentStart, 'H1')).toISOString(), open: 1.2, high: 1.2, low: 1.2, close: 1.2, volume: 1 },
+    ]));
+    snapshotStreamMock.mockImplementation(
+      (_symbols: string[], options: { signal: AbortSignal }) => (async function* () {
+        yield {
+          sequence: 1,
+          payload: {
+            quotes: [{
+              symbol: 'EURUSD',
+              bid: 1.2,
+              ask: 1.21,
+              time: new Date(nextBarBoundary(currentStart, 'H1') + 1_000).toISOString(),
+            }],
+          },
+        };
+        await new Promise<void>((resolve) => options.signal.addEventListener('abort', () => resolve(), { once: true }));
+      })()
+    );
+
+    render(
+      <ChartWidget
+        symbol="EURUSD"
+        streamSettlingMs={0}
+        rolloverFetchDelayMs={60_000}
+        rolloverRetryDelayMs={25}
+      />
+    );
+
+    await waitFor(() => expect(barsMock).toHaveBeenCalledTimes(2));
+    expect(snapshotStreamMock).toHaveBeenCalledTimes(1);
+    expect(await screen.findByText('Waiting for authoritative H1 bar…')).toBeInTheDocument();
+    await waitFor(() => expect(barsMock).toHaveBeenCalledTimes(3));
+    await waitFor(() => expect(snapshotStreamMock).toHaveBeenCalledTimes(2));
+    expect((snapshotStreamMock.mock.calls[0][1].signal as AbortSignal).aborted).toBe(true);
+  });
+
+  it('refetches authoritative H1 bars when the active bar timer closes', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-13T10:59:58Z'));
+    barsMock.mockResolvedValue(barSeries([
+      { time: '2026-08-13T10:00:00Z', open: 1, high: 1.1, low: 0.9, close: 1, volume: 10 },
+    ]));
+
+    const view = render(
+      <ChartWidget symbol="EURUSD" streamSettlingMs={0} rolloverFetchDelayMs={0} />
+    );
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(barsMock).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2_000);
+    });
+    expect(barsMock).toHaveBeenCalledTimes(2);
+    view.unmount();
+  });
+
+  it('releases while hidden and refetches a missed boundary before resuming', async () => {
+    const currentStart = barBucketStart(Date.now(), 'H1');
+    const nowMock = vi.spyOn(Date, 'now').mockReturnValue(currentStart + 30 * 60_000);
+    barsMock.mockResolvedValueOnce(barSeries([
+      { time: new Date(currentStart).toISOString(), open: 1, high: 1.1, low: 0.9, close: 1, volume: 10 },
+    ])).mockResolvedValue(barSeries([
+      { time: new Date(nextBarBoundary(currentStart, 'H1')).toISOString(), open: 1.2, high: 1.2, low: 1.2, close: 1.2, volume: 1 },
+    ]));
+    snapshotStreamMock.mockImplementation(
+      (_symbols: string[], options: { signal: AbortSignal }) => (async function* () {
+        await new Promise<void>((resolve) => options.signal.addEventListener('abort', () => resolve(), { once: true }));
+      })()
+    );
+
+    render(<ChartWidget symbol="EURUSD" streamSettlingMs={0} />);
+    await waitFor(() => expect(snapshotStreamMock).toHaveBeenCalledTimes(1));
+
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });
+    act(() => document.dispatchEvent(new Event('visibilitychange')));
+    await waitFor(() => {
+      const signal = snapshotStreamMock.mock.calls[0][1].signal as AbortSignal;
+      expect(signal.aborted).toBe(true);
+    });
+
+    nowMock.mockReturnValue(nextBarBoundary(currentStart, 'H1') + 2_000);
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
+    act(() => document.dispatchEvent(new Event('visibilitychange')));
+    await waitFor(() => expect(barsMock).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(snapshotStreamMock).toHaveBeenCalledTimes(2));
+    nowMock.mockRestore();
   });
 
   it('initializes with default settings: EURUSD, H1, Bars 100 with no indicators', () => {
@@ -608,6 +777,8 @@ describe('ChartWidget — FR-UI-046 Symbol Universe Autocomplete & Bar Fetching'
         { time: '2026-08-13T12:00:00+00:00', open: 1.0874, high: 1.0884, low: 1.0868, close: 1.0879, volume: 980 },
       ])
     );
+    snapshotStreamMock.mockReset();
+    snapshotStreamMock.mockImplementation(async function* () {});
     indicatorSeriesMock.mockResolvedValueOnce(indicatorSeries('rsi', [null, null, 45, 55], 14));
     render(<ChartWidget symbol="EURUSD" />);
     await waitFor(() => expect(barsMock).toHaveBeenCalled());

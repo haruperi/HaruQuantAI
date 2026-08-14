@@ -1,7 +1,7 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `In Progress` — of 231 registered application features, 218 are implemented and structurally reconciled (94.37%); 12 are `Pending` and 1 is `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Status:** `In Progress` — of 232 registered application features, 220 are implemented and structurally reconciled (94.83%); 12 are `Pending` and none are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
 > **Last updated:** `2026-08-12`
 
 > This document is the system-level source of truth.
@@ -183,10 +183,10 @@ Domains are listed in dependency order, from lowest dependency to highest depend
 * **Package**: `app/services/data`
 * **Responsibility**: Acquire, normalize, store, and serve trusted market data, read-only broker/account state, and governed point-in-time research-source documents. All broker/provider access is read-only and flows through the Brokers domain's canonical read capabilities.
 * **Inputs**: Package-root retrieval arguments or typed Data requests, Broker/provider reads, historical files, admitted CSV/Parquet artifacts, backfill commands, and licensed filing/transcript/macro/news/approved alternative source records.
-* **Outputs**: Normalized bars/ticks (`MarketDataset`), ordered MT5 tick or closed-bar stream events, account/broker state snapshots (`AccountStateSnapshot`), storage state, detached analytical projections, and opaque point-in-time research-source/query evidence values.
+* **Outputs**: Normalized bars/ticks (`MarketDataset`), ordered one-second MT5 TCP latest-value snapshot events, account/broker state snapshots (`AccountStateSnapshot`), storage state, detached analytical projections, and opaque point-in-time research-source/query evidence values.
 * **Owns**: Historical market and account data storage/persistence, durable audit storage, shared database infrastructure, connections, locking, SQLite migration execution framework, real-time acquisition cadence and feed handling, shared stream sequencing/fan-out/resume/backpressure policy, data-source selection and cross-provider fallback policy, every provider/cross-provider alias mapping plus canonical and friendly market identity, conversion of those identities to exact provider-native symbols before a Brokers call, normalization of raw broker/provider reads into `MarketDataset` / `AccountStateSnapshot`, multi-timeframe alignment, deterministic series-level market-data quality inspection producing scored issue, severity, and remediation evidence, and deterministic tick-series derivation from real bar or tick evidence under approved tick and spread models (distinct from GBM synthetic generation, which is fixtures-only and never reaches an official simulation run).
 * **Boundaries**: Foundation layer with no trading decision logic. Brokers continues to own provider adapter implementations and connection/session mechanics. Data's package-root retrieval facade may privately and lazily compose a read-only adapter through the Brokers factory from Utils-loaded settings; manual adapter/source injection remains supported. Data does not expose that composition, invoke broker mutations, own strategy logic, backtest engines, sizing formulas, order dispatch, or other domains' tables, artifact schemas, and migration definitions (each domain owns its tables, artifact schemas, and migration definitions, utilizing the shared execution framework). Raw provider DataFrames, sockets, DB sessions, credentials, adapters, and provider SDK objects never cross its boundary. Data may explicitly project canonical bar or tick `MarketDataset` evidence into detached analytical DataFrames whose exact columns, missingness, units, and precision-loss boundaries are fixed in the Data README; the canonical dataset remains authoritative evidence.
-* **Key Limits**: Backfill chunks must be bounded and checkpointed; exclusive path-scoped write locks (`CONCURRENT_WRITE_LOCKED` on conflict); no-lookahead alignment by default; all broker/provider access is read-only and routed through Brokers. MT5 tick mode is independent of display timeframe and fails explicitly if a saturated read prevents proof of completeness; bar mode publishes closed bars only at the selected timeframe boundary. Quality evidence attached to a `MarketDataset` must be computed from the actual records; a constant or unexamined quality score is never emitted.
+* **Key Limits**: Backfill chunks must be bounded and checkpointed; exclusive path-scoped write locks (`CONCURRENT_WRITE_LOCKED` on conflict); no-lookahead alignment by default; all broker/provider access is read-only and routed through Brokers. MT5 live presentation accepts a global union of 1–200 exact actively demanded symbols from revisioned one-second MQL5 TCP snapshots and never claims intermediate-tick completeness. Data acquires/releases demand through Brokers; the gateway restores the union after reconnect and admits only the EA-acknowledged revision. The MT5 Python package remains limited to non-streaming control/history reads, and sampled snapshots are never presented as complete OHLCV bars. Quality evidence attached to a `MarketDataset` must be computed from the actual records; a constant or unexamined quality score is never emitted.
 * **Market-time authority**: Data owns broker-independent market-hour evaluation. Brokers supplies provider-authored symbol sessions (including cTrader weekly intervals and holidays); exchange-traded instruments require an explicit exchange calendar identifier; providers without a session API may use only an explicit revisioned weekly definition. Named Sydney/Tokyo/London/New York sessions are analytical liquidity labels and never establish tradability or order authority.
 * **Module structure**: All fourteen registered features are complete. Point-in-time source evidence is owned by `FEAT-DATA-09`, artifact/reference catalog operations by `FEAT-DATA-02`, runtime persistence adapters by `FEAT-DATA-13`, and replay packages by `FEAT-DATA-14`. Each registered feature owns exactly one folder and one standalone usage program. Historical interpretation remains owned by Research/Agentic.
 * **Documentation**: `app/services/data/README.md`
@@ -456,23 +456,21 @@ No circular dependencies exist. Simulation and Analytics may be implemented conc
 
 ### Consolidated feature inventory
 
-The owning package READMEs collectively register exactly 231 canonical `FEAT-*`
+The owning package READMEs collectively register exactly 232 canonical `FEAT-*`
 features. No secondary programme or work-package identifier namespace is active.
 
 | Status | Count |
 | --- | ---: |
-| Completed | 218 |
+| Completed | 220 |
 | Pending | 12 |
-| Partial | 1 |
+| Partial | 0 |
 | Missing | 0 |
-| **Total** | **231** |
+| **Total** | **232** |
 
 The twelve `Pending` features are `FEAT-UI-05`–`FEAT-UI-13`, `FEAT-UI-15`,
 `FEAT-UI-16`, and `FEAT-UI-17`, each awaiting requirement evidence or focused-folder
 ownership recorded in `app/ui/README.md`. They are the primary trading workspace and
-its enabling foundation, specified by `docs/dev/documentation.pdf`. The one `Partial`
-feature is `FEAT-UI-04` (`app/ui/README.md`), whose remaining chart requirements
-await focused evidence.
+its enabling foundation, specified by `docs/dev/documentation.pdf`.
 
 Feature descriptions, requirements, public APIs, persistence, and evidence remain
 authoritative only in the owning package README; this section is the system-level
@@ -1304,7 +1302,7 @@ The audit matrix is the system-level record of per-domain conformance.
 | 12. Portfolio | Domain package | `app/services/portfolio` |
 | 13. Agentic | Orchestration domain package | `app/agentic` |
 | 14. UI-API | Domain package | `app/services/api` |
-| 15. UI | Frontend application | `app/ui` |
+| 15. UI | Frontend application (25 registered features, including the focused MT5 snapshot diagnostic widget) | `app/ui` |
 
 #### Status legend
 

@@ -267,8 +267,7 @@ def main() -> None:
     latest = dataset.records[-1]
     projection = project_market_overlay(
         dataset,
-        digits=5,
-        point=0.00001,
+        pip_size=0.0001,
         last_price=float(latest.close),
     )
     print_requirement_evidence("FR-INDI-085", actual_data=projection)

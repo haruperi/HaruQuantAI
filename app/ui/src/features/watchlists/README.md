@@ -18,6 +18,9 @@ Data symbol route once per browser document, shares concurrent loads, ranks
 bounded suggestions, and never exposes a second UI public surface.
 The same complete universe is the sole authority for the `NOT TRADABLE` tag;
 the bounded Markets projection is not used as a membership directory.
+Successful mutations emit one browser-local invalidation event so independently
+mounted Markets widgets reload authoritative watchlist data and replace their
+snapshot demand. The event contains no symbols or account data.
 
 ## Verification
 

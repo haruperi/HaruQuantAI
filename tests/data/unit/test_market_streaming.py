@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 import asyncio
-from collections import Counter
 from collections.abc import AsyncGenerator
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from types import SimpleNamespace
-from typing import Any, cast
+from typing import Any
 
 import pytest
 from app.services.data import (
@@ -26,12 +24,6 @@ from app.services.data.market_events.contracts import (
     MarketStreamEvent,
     MarketStreamRequest,
 )
-from app.services.data.market_events.mt5_bars import _BarLike, _seconds_until_boundary
-from app.services.data.market_events.mt5_ticks import (
-    _signature,
-    _TickLike,
-    _unseen_ticks,
-)
 from app.services.data.market_events.subscriptions import (
     _HUBS,
     _admit_hub,
@@ -41,24 +33,6 @@ from app.services.data.market_events.subscriptions import (
 from app.utils import generate_id
 
 _NOW = datetime(2026, 8, 3, 12, tzinfo=UTC)
-
-
-def _tick(timestamp: datetime, bid: str) -> _TickLike:
-    """Return one structural Brokers-tick fixture."""
-    return cast(
-        "_TickLike",
-        SimpleNamespace(
-            symbol="EURUSD",
-            event_timestamp=timestamp,
-            provider_receipt_timestamp=timestamp,
-            price_unit="quote_currency",
-            bid=Decimal(bid),
-            ask=Decimal(bid) + Decimal("0.0001"),
-            last_price=None,
-            bid_quantity=None,
-            ask_quantity=None,
-        ),
-    )
 
 
 def _record(second: int) -> TickRecord:
@@ -76,52 +50,26 @@ def _record(second: int) -> TickRecord:
     )
 
 
-def _bar(opening: datetime, close: str) -> _BarLike:
-    """Return one structural closed Brokers-bar fixture."""
-    return cast(
-        "_BarLike",
-        SimpleNamespace(
-            symbol="EURUSD",
-            opening_timestamp=opening,
-            closing_timestamp=opening + timedelta(minutes=1),
-            open=Decimal("1.1000"),
-            high=Decimal("1.1010"),
-            low=Decimal("1.0990"),
-            close=Decimal(close),
-            price_unit="quote_currency",
-            quantity_unit="lots",
-            trade_volume=Decimal(10),
-            tick_volume=Decimal(25),
-            spread=Decimal("0.0001"),
-            spread_unit="quote_currency",
-        ),
-    )
-
-
-class _Session:
-    """Execute fake Brokers coroutines with the production thread boundary."""
-
-    def adapter(self, _request_id: str) -> object:
-        """Return one inert adapter identity."""
-        return object()
-
-    def run(self, operation: Any, _request_id: str) -> object:
-        """Complete one fake broker operation in the worker thread."""
-        return asyncio.run(operation)
-
-
 def test_stream_request_validates_mode_source_and_timeframe() -> None:
-    """Both stream modes accept canonical timeframes and reject unknown ones."""
-    for mode in ("bars", "ticks"):
-        request = build_market_stream_request(
+    """TCP snapshot mode accepts presentation timeframes and rejects bar mode."""
+    request = build_market_stream_request(
+        source_id="mt5",
+        symbol="EURUSD",
+        mode="ticks",
+        timeframe="M5",
+        request_id=generate_id("req"),
+    )
+    assert request.mode == "ticks"
+    assert request.timeframe == "M5"
+
+    with pytest.raises(DataError, match="INVALID_INPUT"):
+        build_market_stream_request(
             source_id="mt5",
             symbol="EURUSD",
-            mode=mode,
+            mode="bars",
             timeframe="M5",
             request_id=generate_id("req"),
         )
-        assert request.mode == mode
-        assert request.timeframe == "M5"
 
     with pytest.raises(DataError, match="UNSUPPORTED_TIMEFRAME"):
         build_market_stream_request(
@@ -133,64 +81,42 @@ def test_stream_request_validates_mode_source_and_timeframe() -> None:
         )
 
 
-@pytest.mark.parametrize(
-    ("now", "timeframe", "expected"),
-    [
-        (datetime(2026, 8, 3, 12, 0, 30, tzinfo=UTC), "M1", 30.0),
-        (datetime(2026, 8, 3, 12, 3, tzinfo=UTC), "M5", 120.0),
-        (datetime(2026, 8, 3, 12, 15, tzinfo=UTC), "H1", 2700.0),
-    ],
-)
-def test_bar_mode_waits_for_exact_utc_timeframe_boundary(
-    now: datetime,
-    timeframe: str,
-    expected: float,
-) -> None:
-    """M1, M5, and H1 polling aligns with their next close boundary."""
-    assert _seconds_until_boundary(now, timeframe) == expected
-
-
-def test_tick_overlap_deduplication_preserves_real_multiplicity() -> None:
-    """Overlap is removed without collapsing distinct identical MT5 ticks."""
-    first = _tick(_NOW, "1.1000")
-    duplicate_value = _tick(_NOW, "1.1000")
-    next_tick = _tick(_NOW + timedelta(milliseconds=1), "1.1001")
-    prior = Counter({_signature(first): 1})
-
-    unseen, cursor, counts = _unseen_ticks(
-        (first, duplicate_value, next_tick),
-        _NOW,
-        prior,
-    )
-
-    assert unseen == (duplicate_value, next_tick)
-    assert cursor == next_tick.event_timestamp
-    assert counts[_signature(next_tick)] == 1
-
-
-def test_mt5_tick_producer_reads_current_then_every_new_tick(
+def test_mt5_tick_producer_uses_tcp_snapshots_without_python_calls(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Tick mode maps current and overlapping MT5 pages without duplication."""
+    """Tick mode maps one requested quote from each TCP snapshot."""
 
     async def scenario() -> None:
-        first = _tick(_NOW, "1.1000")
-        second = _tick(_NOW + timedelta(milliseconds=1), "1.1001")
-        pages = [
-            SimpleNamespace(error=None, data=SimpleNamespace(items=(first,))),
-            SimpleNamespace(error=None, data=SimpleNamespace(items=(first, second))),
-        ]
+        released: list[str] = []
 
-        def read_ticks(*_args: object, **_kwargs: object) -> object:
-            async def result() -> object:
-                return pages.pop(0)
+        async def acquire(_symbols: tuple[str, ...]) -> str:
+            return "tick-consumer"
 
-            return result()
+        async def release(consumer_id: str) -> None:
+            released.append(consumer_id)
 
-        monkeypatch.setattr(
-            mt5_ticks, "_resolve_realtime_session_raw", lambda *_: _Session()
-        )
-        monkeypatch.setattr(mt5_ticks, "get_broker_ticks", read_ticks)
+        async def snapshots() -> AsyncGenerator[dict[str, object]]:
+            for sequence, bid in enumerate(("1.1000", "1.1001")):
+                yield {
+                    "sequence": sequence,
+                    "received_at": _NOW + timedelta(seconds=sequence),
+                    "quotes": (
+                        {
+                            "symbol": "EURUSD",
+                            "time_msc": int(
+                                (_NOW + timedelta(seconds=sequence)).timestamp() * 1_000
+                            ),
+                            "bid": Decimal(bid),
+                            "ask": Decimal(bid) + Decimal("0.0001"),
+                            "last": None,
+                            "volume": 1,
+                        },
+                    ),
+                }
+
+        monkeypatch.setattr(mt5_ticks, "stream_metatrader_snapshots", snapshots)
+        monkeypatch.setattr(mt5_ticks, "acquire_metatrader_snapshot_symbols", acquire)
+        monkeypatch.setattr(mt5_ticks, "release_metatrader_snapshot_symbols", release)
         stream = mt5_ticks.iter_mt5_ticks(
             symbol="EURUSD",
             request_id=generate_id("req"),
@@ -201,51 +127,43 @@ def test_mt5_tick_producer_reads_current_then_every_new_tick(
 
         assert current.bid == Decimal("1.1000")
         assert following.bid == Decimal("1.1001")
-        assert not pages
+        assert current.source_revision == "mt5-tcp-snapshot-v2"
+        assert released == ["tick-consumer"]
 
     asyncio.run(scenario())
 
 
-def test_mt5_bar_producer_emits_only_newly_closed_bars(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Bar mode maps the latest closed bar and the next timeframe close."""
+def test_mt5_live_bar_producer_is_retired() -> None:
+    """Live bars cannot silently fall back to Python polling or invented OHLCV."""
 
     async def scenario() -> None:
-        first = _bar(_NOW - timedelta(minutes=1), "1.1005")
-        second = _bar(_NOW, "1.1007")
-        pages = [
-            SimpleNamespace(error=None, data=SimpleNamespace(items=(first,))),
-            SimpleNamespace(error=None, data=SimpleNamespace(items=(second,))),
-        ]
-
-        def read_bars(*_args: object, **_kwargs: object) -> object:
-            async def result() -> object:
-                return pages.pop(0)
-
-            return result()
-
-        async def no_wait(_seconds: float) -> None:
-            return None
-
-        monkeypatch.setattr(
-            mt5_bars, "_resolve_realtime_session_raw", lambda *_: _Session()
-        )
-        monkeypatch.setattr(mt5_bars, "get_broker_historical_bars", read_bars)
-        monkeypatch.setattr(mt5_bars.asyncio, "sleep", no_wait)
         stream = mt5_bars.iter_mt5_closed_bars(
             symbol="EURUSD",
             timeframe="M1",
             request_id=generate_id("req"),
         )
-        current = await asyncio.wait_for(anext(stream), timeout=1)
-        following = await asyncio.wait_for(anext(stream), timeout=1)
-        await stream.aclose()
+        with pytest.raises(DataError, match="UNSUPPORTED_OPERATION"):
+            await anext(stream)
 
-        assert current.close == Decimal("1.1005")
-        assert following.close == Decimal("1.1007")
-        assert following.available_at == second.closing_timestamp
-        assert not pages
+    asyncio.run(scenario())
+
+
+def test_mt5_tick_producer_fails_when_symbol_demand_is_rejected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A chart-only symbol is never presented live before EA acknowledgment."""
+
+    async def reject(_symbols: tuple[str, ...]) -> str:
+        raise ValueError("rejected")
+
+    async def scenario() -> None:
+        monkeypatch.setattr(mt5_ticks, "acquire_metatrader_snapshot_symbols", reject)
+        stream = mt5_ticks.iter_mt5_ticks(
+            symbol="UNKNOWN",
+            request_id=generate_id("req"),
+        )
+        with pytest.raises(DataError, match="SOURCE_UNAVAILABLE"):
+            await anext(stream)
 
     asyncio.run(scenario())
 
@@ -401,12 +319,12 @@ def test_resume_outside_retained_window_fails_closed() -> None:
         request = MarketStreamRequest(
             source_id="mt5",
             symbol="EURUSD",
-            mode="bars",
+            mode="ticks",
             timeframe="M5",
             request_id=generate_id("req"),
         )
         hub = _StreamHub(request)
-        hub.history.append(hub._event("bar", payload=_record(1)))
+        hub.history.append(hub._event("tick", payload=_record(1)))
         with pytest.raises(DataError, match="STATE_RECOVERY_FAILED"):
             await hub.subscribe("stale", 10)
 

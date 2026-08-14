@@ -67,7 +67,7 @@ def test_projection_owns_volatility_adr_pip_and_change_formulas(
     )
 
     result = market_projection.project_market_overlay(
-        _dataset(), digits=5, point=0.00001, last_price=1.107
+        _dataset(), pip_size=0.0001, last_price=1.107
     )
 
     assert result["volatility"] == pytest.approx(0.125)
@@ -77,12 +77,64 @@ def test_projection_owns_volatility_adr_pip_and_change_formulas(
     assert result["change_pips"] == pytest.approx(20.0)
 
 
-def test_projection_rejects_invalid_point() -> None:
+def test_projection_rejects_invalid_pip_size() -> None:
     """Non-positive quote precision fails explicitly."""
-    with pytest.raises(ValueError, match="point must be positive"):
+    with pytest.raises(ValueError, match="pip_size must be positive"):
         market_projection.project_market_overlay(
-            _dataset(), digits=5, point=0.0, last_price=None
+            _dataset(), pip_size=0.0, last_price=None
         )
+
+
+def test_projection_preserves_non_pip_evidence_without_pip_size(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Missing pip convention suppresses only pip-denominated fields."""
+    monkeypatch.setattr(
+        market_projection,
+        "rolling_volatility",
+        lambda *_args, **_kwargs: _response((0.0,) * 10 + (0.125, 0.25)),
+    )
+    monkeypatch.setattr(
+        market_projection,
+        "adr",
+        lambda *_args, **_kwargs: _response((0.0,) * 10 + (0.005, 0.006)),
+    )
+
+    result = market_projection.project_market_overlay(
+        _dataset(), pip_size=None, last_price=1.107
+    )
+
+    assert result["open"] == pytest.approx(1.105)
+    assert result["high"] == pytest.approx(1.108)
+    assert result["low"] == pytest.approx(1.105)
+    assert result["change"] == pytest.approx(0.002)
+    assert result["change_percent"] is not None
+    assert result["volatility"] == pytest.approx(0.125)
+    assert result["range_percent_of_adr"] == pytest.approx(60.0)
+    assert result["adr"] is None
+    assert result["change_pips"] is None
+
+
+def test_projection_uses_explicit_xauusd_pip_size(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Commodity ADR uses its declared pip size rather than quote points."""
+    monkeypatch.setattr(
+        market_projection,
+        "rolling_volatility",
+        lambda *_args, **_kwargs: _response((0.0,) * 10 + (0.125, 0.25)),
+    )
+    monkeypatch.setattr(
+        market_projection,
+        "adr",
+        lambda *_args, **_kwargs: _response((0.0,) * 10 + (98.731, 90.0)),
+    )
+
+    result = market_projection.project_market_overlay(
+        _dataset(), pip_size=0.1, last_price=1.107
+    )
+
+    assert result["adr"] == pytest.approx(987.3)
 
 
 def test_projection_matches_usage_example_with_real_dataset() -> None:
@@ -135,7 +187,7 @@ def test_projection_matches_usage_example_with_real_dataset() -> None:
     )
 
     result = market_projection.project_market_overlay(
-        dataset, digits=5, point=0.00001, last_price=float(records[-1].close)
+        dataset, pip_size=0.0001, last_price=float(records[-1].close)
     )
 
     assert result["volatility"] is not None

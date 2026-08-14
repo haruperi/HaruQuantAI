@@ -238,6 +238,14 @@ export const dataRoutes = {
     sideEffect: "stream",
     stream: true,
   }),
+  snapshotStream: route({
+    id: "api.data.snapshot_stream",
+    method: "GET",
+    path: "/api/v1/data/snapshot-stream",
+    permission: "data:read",
+    sideEffect: "stream",
+    stream: true,
+  }),
   prepareDataset: route({
     id: "api.data.prepare_dataset",
     method: "POST",
@@ -828,6 +836,7 @@ export const ROUTE_CONTRACTS = [
   dataRoutes.bars,
   dataRoutes.capabilities,
   dataRoutes.stream,
+  dataRoutes.snapshotStream,
   indicatorsRoutes.catalogue,
   indicatorsRoutes.capabilities,
   indicatorsRoutes.spec,
@@ -900,7 +909,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 90;
+export const ROUTE_CONTRACT_COUNT = 91;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

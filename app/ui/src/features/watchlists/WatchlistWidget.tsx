@@ -8,6 +8,7 @@ import {
   loadSymbolUniverse,
   resolveSourceSymbol,
 } from './symbolUniverse';
+import { emitWatchlistsChanged } from './watchlistEvents';
 import {
   Plus,
   Trash2,
@@ -98,6 +99,7 @@ export const WatchlistWidget: React.FC = () => {
     setWatchlists((prev) =>
       prev.map((item) => (item.watchlist_id === updated.watchlist_id ? updated : item))
     );
+    emitWatchlistsChanged();
   };
 
   const handleCreate = () => {
@@ -112,6 +114,7 @@ export const WatchlistWidget: React.FC = () => {
         setSelectedId(created.watchlist_id);
         setNewListName('');
         setCreating(false);
+        emitWatchlistsChanged();
       })
       .catch(() => {
         setErrorMsg('Unable to create watchlist.');
@@ -164,6 +167,7 @@ export const WatchlistWidget: React.FC = () => {
           setSelectedId(fallback ? fallback.watchlist_id : null);
           return remaining;
         });
+        emitWatchlistsChanged();
       })
       .catch(() => setErrorMsg('Unable to delete watchlist.'))
       .finally(() => setMutating(false));

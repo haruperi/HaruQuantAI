@@ -69,6 +69,38 @@ def test_get_market_snapshot_composes_level1_and_latest_bar(
     assert response.data.latest_bar.close == Decimal("1.1001")  # type: ignore[attr-defined]
 
 
+def test_get_market_snapshot_synchronizes_history_before_level1(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """MT5 symbol selection/history completes before the first quote read."""
+    from app.services.data.sources import composition
+
+    calls: list[str] = []
+    monkeypatch.setattr(composition, "ensure_storage", lambda *_args: None)
+    monkeypatch.setattr(composition, "ensure_identity", lambda *_args: None)
+
+    def _history(_request: object) -> SimpleNamespace:
+        calls.append("history")
+        return _fake_bar_dataset()
+
+    def _level1(request: object) -> Level1Snapshot:
+        calls.append("level1")
+        return _fake_level1(request)
+
+    monkeypatch.setattr(snapshot, "_fetch_market_dataset_raw", _history)
+    monkeypatch.setattr(snapshot, "_get_level1_snapshot_raw", _level1)
+
+    response = get_market_snapshot(
+        source_id="mt5",
+        symbol="XAUUSD",
+        timeframe="D1",
+        request_id=generate_id("req"),
+    )
+
+    assert response.status == "success"
+    assert calls == ["history", "level1"]
+
+
 def test_get_market_snapshot_supports_direct_keywords(
     isolated_snapshot: None,
 ) -> None:

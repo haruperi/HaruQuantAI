@@ -7,11 +7,15 @@ import binascii
 from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
-from app.services.api.identity import get_system_settings
+from app.services.api.identity import (
+    get_system_settings,
+    resolve_credential_reference,
+)
 from app.utils import (
     configure_logging,
+    derive_stable_id,
     get_logger,
     load_broker_provider_settings,
     load_settings,
@@ -55,6 +59,18 @@ class _RuntimeSettingsSnapshot:
 
     values: Mapping[str, str]
     version: int
+
+
+class _Mt5SnapshotGatewayConfig(TypedDict):
+    """Typed in-memory configuration passed to the Brokers listener."""
+
+    host: str
+    port: int
+    auth_token: str
+    source_id: str
+    interval_seconds: int
+    symbols: tuple[str, ...]
+    log_snapshots: bool
 
 
 def build_credential_key_set(settings: ApiSettings) -> Mapping[str, bytes]:
@@ -196,10 +212,76 @@ def get_runtime_setting(
     return snapshot.values.get(key, default)
 
 
+def build_runtime_mt5_snapshot_gateway_config(
+    snapshot: object,
+    *,
+    key_set: Mapping[str, bytes],
+    request_id: str,
+) -> _Mt5SnapshotGatewayConfig | None:
+    """Build the authenticated MT5 snapshot listener configuration.
+
+    Args:
+        snapshot: Snapshot created by ``load_runtime_settings_snapshot``.
+        key_set: Externally provisioned credential-decryption keys.
+        request_id: Canonical startup request identifier.
+
+    Returns:
+        Validated configuration values, or ``None`` when not configured.
+
+    Raises:
+        IdentityError: If encrypted credential resolution fails.
+        TypeError: If the runtime snapshot is invalid.
+        ValueError: If persisted bootstrap-symbol configuration is invalid.
+    """
+    if not isinstance(snapshot, _RuntimeSettingsSnapshot):
+        raise TypeError("runtime settings snapshot is invalid")
+    required = {
+        "host": snapshot.values.get("MT5_SNAPSHOT_HOST"),
+        "port": snapshot.values.get("MT5_SNAPSHOT_PORT"),
+        "interval_seconds": snapshot.values.get("MT5_SNAPSHOT_INTERVAL_SECONDS"),
+        "source_id": snapshot.values.get("MT5_SNAPSHOT_SOURCE_ID"),
+        "symbols": snapshot.values.get("MT5_SNAPSHOT_SYMBOLS"),
+    }
+    if not any(required.values()):
+        return None
+    if any(value is None for value in required.values()):
+        raise ValueError("MT5 snapshot gateway settings are incomplete")
+    symbols = tuple(symbol.strip() for symbol in str(required["symbols"]).split(","))
+    if not symbols or any(not symbol for symbol in symbols):
+        raise ValueError("MT5 snapshot symbols are invalid")
+    reference_id = derive_stable_id(
+        "id",
+        "api-credential:system:mt5_snapshot_bridge",
+    )
+    material = resolve_credential_reference(
+        f"secret://{reference_id}",
+        owner_id="system",
+        key_set=key_set,
+        request_id=request_id,
+    )
+    token = material.get("auth_token")
+    if token is None:
+        raise ValueError("MT5 snapshot credential is incomplete")
+    return _Mt5SnapshotGatewayConfig(
+        host=str(required["host"]),
+        port=int(str(required["port"])),
+        auth_token=token.get_secret_value(),
+        source_id=str(required["source_id"]),
+        interval_seconds=int(str(required["interval_seconds"])),
+        symbols=symbols,
+        log_snapshots=snapshot.values.get(
+            "MT5_SNAPSHOT_LOG_SNAPSHOTS",
+            "false",
+        )
+        == "true",
+    )
+
+
 __all__ = (
     "activate_runtime_logging",
     "build_credential_key_set",
     "build_runtime_data_provider_sources",
+    "build_runtime_mt5_snapshot_gateway_config",
     "build_runtime_provider_settings",
     "get_runtime_setting",
     "load_runtime_settings_snapshot",

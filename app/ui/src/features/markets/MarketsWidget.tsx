@@ -7,6 +7,7 @@ import { apiClients, unwrapData, type MarketRow, type Watchlist } from '@/client
 import { MoreVertical, LineChart, AlignJustify, Layers } from 'lucide-react';
 
 import { CmeProgressBar } from '../../components/common/CmeProgressBar';
+import { WATCHLISTS_CHANGED_EVENT } from '../watchlists/watchlistEvents';
 
 // Fixed classification (not sourced from src/mock/ - that would reintroduce
 // fixture data into a production module, NFR-UI-007). A class with nothing
@@ -26,7 +27,10 @@ interface DisplayRow {
   name: string;
   assetClass: string;
   decimals: number;
-  last: number | null;
+  bid: number | null;
+  spread: number | null;
+  quoteTime: string | null;
+  quoteStatus: 'live' | 'stale' | 'not_live';
   change: number | null;
   changePercent: number | null;
   changePips: number | null;
@@ -46,7 +50,10 @@ function toDisplayRow(row: MarketRow): DisplayRow {
     name: row.name,
     assetClass: row.asset_class,
     decimals: row.digits ?? 2,
-    last: row.last,
+    bid: row.bid,
+    spread: row.spread,
+    quoteTime: null,
+    quoteStatus: 'not_live',
     change: row.change,
     changePercent: row.change_percent,
     changePips: row.change_pips ?? null,
@@ -66,15 +73,27 @@ function toDisplayRow(row: MarketRow): DisplayRow {
 // (see WatchlistWidget) already avoids at a smaller scale.
 const MARKETS_PAGE_SIZE = 50;
 const MARKETS_MAX_PAGES = 4;
+const STREAM_SETTLING_SECONDS = 10;
 
 type SortKey = 'Symbol' | 'Change' | 'Volatility' | 'ADR' | 'Range';
 
-export const MarketsWidget: React.FC = () => {
+interface MarketsWidgetProps {
+  /** Production defaults to 10 seconds; tests may inject a shorter clock. */
+  streamSettlingMs?: number;
+}
+
+export const MarketsWidget: React.FC<MarketsWidgetProps> = ({
+  streamSettlingMs = STREAM_SETTLING_SECONDS * 1_000,
+}) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Forex');
   const [sortBy, setSortBy] = useState<SortKey>('Symbol');
   const [activeMenuSymbol, setActiveMenuSymbol] = useState<string | null>(null);
   const [directory, setDirectory] = useState<DisplayRow[]>([]);
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'settling' | 'ready' | 'error'>('loading');
+  const [settlingSeconds, setSettlingSeconds] = useState(STREAM_SETTLING_SECONDS);
+  const [isDocumentVisible, setIsDocumentVisible] = useState(
+    () => document.visibilityState === 'visible'
+  );
   const [errorMsg, setErrorMsg] = useState('');
   const [loadProgress, setLoadProgress] = useState<{ value: number; max: number; label: string }>({
     value: 0,
@@ -92,25 +111,35 @@ export const MarketsWidget: React.FC = () => {
 
   const [watchlistsLoaded, setWatchlistsLoaded] = useState(false);
 
+  useEffect(() => {
+    const handleVisibilityChange = (): void => {
+      setIsDocumentVisible(document.visibilityState === 'visible');
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   // Load the caller's watchlists for the optional quick-filter selector
   // below. This is additive to the directory fetch, not a replacement for
   // it - Markets keeps presenting the tradable directory (FR-UI-033) even
   // when no watchlist is selected.
   useEffect(() => {
     let cancelled = false;
-    void apiClients.watchlists
-      .list()
-      .then((response) => {
+    const loadWatchlists = () => {
+      void apiClients.watchlists.list().then((response) => {
         if (cancelled) return;
         const list = unwrapData(response);
         setWatchlists(list);
-        const defaultWl =
-          list.find((w) => w.is_default) ??
-          list.find((w) => w.name.toLowerCase() === 'default') ??
-          list[0];
-        if (defaultWl) {
-          setActiveWatchlistId(defaultWl.watchlist_id);
-        }
+        setActiveWatchlistId((current) => {
+          if (current && list.some((watchlist) => watchlist.watchlist_id === current)) {
+            return current;
+          }
+          const defaultWl =
+            list.find((w) => w.is_default) ??
+            list.find((w) => w.name.toLowerCase() === 'default') ??
+            list[0];
+          return defaultWl?.watchlist_id ?? null;
+        });
       })
       .catch(() => {
         // Non-fatal: the watchlist filter is just unavailable, the directory
@@ -119,8 +148,12 @@ export const MarketsWidget: React.FC = () => {
       .finally(() => {
         if (!cancelled) setWatchlistsLoaded(true);
       });
+    };
+    loadWatchlists();
+    window.addEventListener(WATCHLISTS_CHANGED_EVENT, loadWatchlists);
     return () => {
       cancelled = true;
+      window.removeEventListener(WATCHLISTS_CHANGED_EVENT, loadWatchlists);
     };
   }, []);
 
@@ -136,6 +169,7 @@ export const MarketsWidget: React.FC = () => {
     if (!watchlistsLoaded) return;
     let cancelled = false;
     setStatus('loading');
+    setSettlingSeconds(STREAM_SETTLING_SECONDS);
     setDirectory([]);
     setErrorMsg('');
     setLoadProgress({ value: 5, max: 100, label: 'Connecting to market directory…' });
@@ -169,7 +203,7 @@ export const MarketsWidget: React.FC = () => {
               label: `Loaded batch ${b + 1} of ${totalBatches} (${endPct}%)`,
             });
           }
-          if (!cancelled) setStatus('ready');
+          if (!cancelled) setStatus('settling');
         } else {
           let cursor: string | undefined;
           for (let page = 0; page < MARKETS_MAX_PAGES; page++) {
@@ -198,7 +232,7 @@ export const MarketsWidget: React.FC = () => {
             }
             cursor = directoryPage.next_cursor;
           }
-          if (!cancelled) setStatus('ready');
+          if (!cancelled) setStatus('settling');
         }
       } catch {
         if (cancelled) return;
@@ -212,6 +246,99 @@ export const MarketsWidget: React.FC = () => {
       cancelled = true;
     };
   }, [watchlistsLoaded, activeWatchlistId, activeWatchlist]);
+
+  const snapshotSymbols = directory.map((row) => row.symbol).sort().join(',');
+
+  // Keep the Python-package history/calculation phase and TCP streaming phase
+  // temporally isolated. The timer is cancelled whenever the loaded symbol set
+  // changes, so an obsolete watchlist can never start a late stream.
+  useEffect(() => {
+    if (status !== 'settling') return;
+    const startedAt = Date.now();
+    const configuredSeconds = Math.ceil(streamSettlingMs / 1_000);
+    const updateCountdown = (): void => {
+      const elapsedSeconds = Math.floor((Date.now() - startedAt) / 1_000);
+      setSettlingSeconds(Math.max(0, configuredSeconds - elapsedSeconds));
+    };
+    updateCountdown();
+    const intervalId = window.setInterval(updateCountdown, 1_000);
+    const timeoutId = window.setTimeout(() => {
+      window.clearInterval(intervalId);
+      setSettlingSeconds(0);
+      setStatus('ready');
+    }, streamSettlingMs);
+    return () => {
+      window.clearInterval(intervalId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [snapshotSymbols, status, streamSettlingMs]);
+
+  // One TCP-originated SSE connection updates every loaded row atomically.
+  // REST remains authoritative for metadata and technical overlays.
+  useEffect(() => {
+    // Progressive pages change `snapshotSymbols` repeatedly. Waiting for the
+    // bounded directory read to finish prevents abort/reopen churn from
+    // exhausting the API stream-connection quota before the final subscription.
+    if (status !== 'ready' || !snapshotSymbols || !isDocumentVisible) return;
+    const controller = new AbortController();
+
+    const consumeSnapshots = async (): Promise<void> => {
+      try {
+        for await (const event of apiClients.data.snapshotStream(
+          snapshotSymbols.split(','),
+          { signal: controller.signal }
+        )) {
+          const payload = event.payload;
+          if (!payload || !Array.isArray(payload.quotes)) continue;
+          const updates = new Map<string, { bid: number; ask: number; spread: number; digits: number | null; quoteTime: string | null }>();
+          for (const raw of payload.quotes) {
+            if (typeof raw !== 'object' || raw === null) continue;
+            const quote = raw as Record<string, unknown>;
+            const symbol = typeof quote.symbol === 'string' ? quote.symbol : '';
+            const bid = Number(quote.bid);
+            const ask = Number(quote.ask);
+            const spread = Number(quote.spread);
+            const digits = Number(quote.digits);
+            const quoteTime = typeof quote.time === 'string' && Number.isFinite(Date.parse(quote.time))
+              ? quote.time
+              : null;
+            if (symbol && Number.isFinite(bid) && Number.isFinite(ask) && Number.isFinite(spread)) {
+              updates.set(symbol, {
+                bid,
+                ask,
+                spread,
+                digits: Number.isInteger(digits) && digits >= 0 ? digits : null,
+                quoteTime,
+              });
+            }
+          }
+          const stale = payload.stale === true || Number(payload.gap ?? 0) > 0;
+          setDirectory((current) => current.map((row) => {
+            const quote = updates.get(row.symbol);
+            if (!quote) return row;
+            return {
+              ...row,
+              bid: quote.bid,
+              spread: quote.spread,
+              decimals: quote.digits ?? row.decimals,
+              quoteTime: quote.quoteTime,
+              quoteStatus: stale ? 'stale' : 'live',
+            };
+          }));
+        }
+        if (!controller.signal.aborted) {
+          setDirectory((current) => current.map((row) => ({ ...row, quoteStatus: 'not_live' })));
+        }
+      } catch {
+        if (!controller.signal.aborted) {
+          setDirectory((current) => current.map((row) => ({ ...row, quoteStatus: 'not_live' })));
+        }
+      }
+    };
+
+    void consumeSnapshots();
+    return () => controller.abort();
+  }, [isDocumentVisible, snapshotSymbols, status]);
 
   const watchlistSymbols = activeWatchlist ? new Set(activeWatchlist.items.map((item) => item.symbol)) : null;
 
@@ -277,6 +404,18 @@ export const MarketsWidget: React.FC = () => {
   const fmt = (value: number | null, p: DisplayRow): string =>
     value === null || value === undefined || Number.isNaN(value) ? '—' : value.toFixed(p.decimals ?? 2);
 
+  const fmtSpreadPoints = (p: DisplayRow): string =>
+    p.spread === null || !Number.isFinite(p.spread)
+      ? '—'
+      : Math.round(p.spread * 10 ** p.decimals).toString();
+
+  const fmtAge = (quoteTime: string | null): string => {
+    if (quoteTime === null) return '—';
+    const timestamp = Date.parse(quoteTime);
+    if (!Number.isFinite(timestamp)) return '—';
+    return `${Math.max(0, Math.round((Date.now() - timestamp) / 1_000))}s`;
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Active Watchlist Filter */}
@@ -329,13 +468,15 @@ export const MarketsWidget: React.FC = () => {
 
       {/* Main Markets Table */}
       <div style={{ flex: 1, overflow: 'auto' }}>
-        {status === 'loading' && (
+        {(status === 'loading' || status === 'settling') && (
           <div style={{ padding: directory.length === 0 ? '32px 24px' : '10px 16px', maxWidth: directory.length === 0 ? '480px' : '100%', margin: directory.length === 0 ? '0 auto' : '0' }}>
             <CmeProgressBar
               value={loadProgress.value}
               max={loadProgress.max}
-              label={loadProgress.label}
-              subtext={`${loadProgress.value}%`}
+              label={status === 'settling'
+                ? `Initial data loaded. Streaming starts in ${settlingSeconds}s`
+                : loadProgress.label}
+              subtext={status === 'settling' ? '100%' : `${loadProgress.value}%`}
               variant="blue"
               height={directory.length === 0 ? 10 : 6}
             />
@@ -357,6 +498,8 @@ export const MarketsWidget: React.FC = () => {
             <tr>
               <th>Symbol</th>
               <th>Last Price</th>
+              <th>Age</th>
+              <th>Spread</th>
               <th>Change</th>
               <th>Volatility</th>
               <th>ADR</th>
@@ -404,11 +547,19 @@ export const MarketsWidget: React.FC = () => {
                   : 'var(--text-white, #ffffff)';
 
               const rangeColor = getRangeColor(p.range);
+              const tradeStatusColor = p.quoteStatus === 'live'
+                ? '#00e473'
+                : p.quoteStatus === 'stale'
+                  ? '#ffca28'
+                  : '#ff003d';
+              const tradeStatusLabel = p.quoteStatus === 'not_live' ? 'not live' : p.quoteStatus;
 
               return (
                 <tr key={p.symbol}>
                   <td style={{ fontWeight: 600 }}>{p.symbol}</td>
-                  <td className={priceClass} style={{ color: changeColor }}>{fmt(p.last, p)}</td>
+                  <td className={priceClass} title={`Quote status: ${tradeStatusLabel}`} style={{ color: changeColor }}>{fmt(p.bid, p)}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)' }}>{fmtAge(p.quoteTime)}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)' }}>{fmtSpreadPoints(p)}</td>
                   <td className={priceClass} style={{ color: changeColor, fontWeight: 600 }}>{changeCell}</td>
                   <td style={{ fontFamily: 'var(--font-mono)' }}>{volCell}</td>
                   <td style={{ fontFamily: 'var(--font-mono)' }}>{adrCell}</td>
@@ -420,6 +571,9 @@ export const MarketsWidget: React.FC = () => {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                       <button
                         className="btn-cme btn-outline btn-sm"
+                        aria-label={`Trade ${p.symbol}; quote status: ${tradeStatusLabel}`}
+                        title={`Quote status: ${tradeStatusLabel}`}
+                        style={{ color: tradeStatusColor }}
                         onClick={() => {
                           if (!orderConfirmationRequired) {
                             submitOrder({ symbol: p.symbol, side: 'BUY', qty: 1, orderType: 'Market' });

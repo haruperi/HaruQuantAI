@@ -29,7 +29,7 @@ _MINIMUM_OVERLAY_BARS: Final = 12
 _CACHE_TTL_SECONDS: Final = 300.0
 _cache_lock: Final = threading.Lock()
 type _TechnicalCacheKey = tuple[str, str]
-type _TechnicalCacheEntry = tuple[float, object, int, float]
+type _TechnicalCacheEntry = tuple[float, object, int, float, float | None]
 _cache: dict[_TechnicalCacheKey, _TechnicalCacheEntry] = {}
 
 
@@ -38,6 +38,8 @@ class _QuoteMetadata(Protocol):
 
     digits: Any
     point: Any
+    price_step: Any
+    pip_size: Any
 
 
 _BROKER_TO_SOURCE: Final = MappingProxyType(
@@ -107,6 +109,63 @@ def _quote_precision(metadata: object) -> tuple[int, float]:
     return digits, point
 
 
+def _positive_float(value: object, *, multiplier: float = 1.0) -> float | None:
+    """Return a positive provider value with an optional multiplier.
+
+    Args:
+        value: Candidate provider or configuration value.
+        multiplier: Conversion multiplier.
+
+    Returns:
+        Converted positive value, or ``None`` when invalid.
+    """
+    try:
+        numeric = float(cast("Any", value))
+    except TypeError, ValueError:
+        return None
+    converted = numeric * multiplier
+    return converted if converted > 0 else None
+
+
+def _pip_size(metadata: object, *, symbol: str, request_id: str | None) -> float | None:
+    """Resolve pip size from overrides or genuine MT5 symbol point evidence.
+
+    Args:
+        metadata: Data-owned symbol metadata.
+        symbol: Exact broker-native symbol.
+        request_id: Canonical request identifier for the settings read.
+
+    Returns:
+        Positive pip size, or ``None`` when genuine precision is unavailable.
+    """
+    raw_value = getattr(metadata, "pip_size", None)
+    if raw_value is not None:
+        return _positive_float(raw_value)
+
+    trace_id = request_id if request_id is not None else generate_id("req")
+    configured = get_system_settings(request_id=trace_id).settings.get(
+        "MT5_PIP_SIZES", ""
+    )
+    entries = str(configured).split(",")
+    configured_sizes = {
+        name.strip(): size.strip()
+        for entry in entries
+        if "=" in entry
+        for name, size in (entry.split("=", 1),)
+        if name.strip() and size.strip()
+    }
+    configured_value = configured_sizes.get(symbol)
+    if configured_value is not None:
+        return _positive_float(configured_value)
+
+    raw_point = getattr(metadata, "price_step", None)
+    if raw_point is None:
+        raw_point = getattr(metadata, "point", None)
+    if raw_point is None:
+        return None
+    return _positive_float(raw_point, multiplier=10.0)
+
+
 def _history_is_sufficient(dataset: object) -> bool:
     """Return whether a dataset can warm up the Markets indicators.
 
@@ -143,11 +202,12 @@ def build_technical_evidence(
     dataset: object | None = None
     digits: int | None = None
     point: float | None = None
+    pip_size: float | None = None
 
     with _cache_lock:
         cached = _cache.get(key)
         if cached is not None and now - cached[0] < _CACHE_TTL_SECONDS:
-            _, dataset, digits, point = cached
+            _, dataset, digits, point, pip_size = cached
 
     if dataset is None or digits is None or point is None:
         trace_id = request_id if request_id is not None else generate_id("req")
@@ -205,9 +265,14 @@ def build_technical_evidence(
                 dataset = data_response.data
                 metadata = metadata_response.data
                 digits, point = _quote_precision(metadata)
+                pip_size = _pip_size(
+                    metadata,
+                    symbol=symbol,
+                    request_id=trace_id,
+                )
 
                 with _cache_lock:
-                    _cache[key] = (now, dataset, digits, point)
+                    _cache[key] = (now, dataset, digits, point, pip_size)
         except Exception:  # noqa: BLE001 - optional evidence degrades to unavailable
             logger.warning("Markets technical evidence fetch was unavailable")
 
@@ -217,8 +282,7 @@ def build_technical_evidence(
     try:
         return project_market_overlay(
             dataset,
-            digits=digits,
-            point=point,
+            pip_size=pip_size,
             last_price=last_price,
         )
     except Exception:  # noqa: BLE001 - optional evidence degrades to unavailable

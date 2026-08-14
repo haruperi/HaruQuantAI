@@ -58,6 +58,11 @@ export const Sidebar: React.FC = () => {
           {!isCollapsed && <span>Markets</span>}
         </div>
 
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('marketTicks', 'Market Ticks Test')}>
+          <Globe size={15} />
+          {!isCollapsed && <span>Market Ticks Test</span>}
+        </div>
+
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('watchlist', 'Watchlists')}>
           <Bookmark size={15} />
           {!isCollapsed && <span>Watchlists</span>}

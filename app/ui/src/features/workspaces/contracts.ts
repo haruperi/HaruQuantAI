@@ -11,6 +11,7 @@ import { z } from "zod";
 
 export const WIDGET_TYPES = [
   "markets",
+  "marketTicks",
   "watchlist",
   "chart",
   "priceLadder",
