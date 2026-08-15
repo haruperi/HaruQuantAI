@@ -5,7 +5,7 @@ The immutable Broker error catalogue uses only the Utils-owned `TRANSIENT`,
 categories. Ambiguous mutation outcomes remain non-retryable `UNKNOWN_STATE`.
 
 > **Package:** `app/services/brokers`
-> **Status:** `Completed` — twelve focused features (`FEAT-BRK-00`..`10`, `FEAT-BRK-18`) are implemented with package-root APIs, tests, and numbered usage evidence. The declared sim⇄live parity-programme boundaries (see "Sim⇄live parity programme boundaries") are design registrations only until their owning programme phases implement them.
+> **Status:** `Completed` — thirteen focused features (`FEAT-BRK-00`..`10`, `FEAT-BRK-17`, `FEAT-BRK-18`) are implemented with package-root APIs, tests, and numbered usage evidence. Later sim⇄live parity-programme extensions remain allocated to their owning phases.
 > **Last updated:** `2026-08-15`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -189,9 +189,8 @@ The approved sim⇄live parity programme (`docs/dev/sim-live-parity-implementati
 
 ### `SimulationAuthorityPort` — declared protocol design (programme Phase 3a; implemented as `FR-BRK-172` in Phase 10a)
 
-This is a design registration only: no Python file changes here, and `FR-BRK-172`
-remains **Proposed** until Phase 10a implements it with tests and usage evidence
-(extended by Phase 11b reads, Phase 12 mutations, and Phase 17b deals).
+Phase 10a implements this protocol and its lifecycle subset as `FR-BRK-172`;
+Phase 11b extends admitted reads, Phase 12 mutations, and Phase 17b deals.
 
 **Identity and isolation.** `SimulationAuthorityPort` is a Brokers-owned
 structural `typing.Protocol` (`@runtime_checkable`) defined inside
@@ -307,9 +306,10 @@ The tree below defines the final layout. The following table is the sole normati
 | Completed | `FEAT-BRK-08` Simulation and Live Isolation | `environment_guards/` | Default-deny provider/account/environment permissions | `FR-BRK-139`, `FR-BRK-150` | `tests/brokers/usage/features/08_environment_guards.py` |
 | Completed | `FEAT-BRK-09` Broker Event Normalization | `events/` | Ordered, deduplicated event envelopes and source checkpoints | `FR-BRK-151` | `tests/brokers/usage/features/09_events.py` |
 | Completed | `FEAT-BRK-10` Adapter Contract Test Kit | `conformance/` | Reusable conformance suite and deterministic adapter fixture | `FR-BRK-109` | `tests/brokers/usage/features/10_conformance.py` |
+| Completed | `FEAT-BRK-17` Simulation Broker Channel | `simulation/` | Exact `sim`/`simulation` factory, socket-free authority injection, canonical lifecycle/finalization, and capability intersection | `FR-BRK-167`–`FR-BRK-172` | `tests/brokers/usage/features/17_simulation.py` |
 | Completed | `FEAT-BRK-18` Provider Specification Snapshots | `specifications/` | `build_provider_specification_snapshot`, `parse_provider_specification_snapshot`, `dump_provider_specification_snapshot`, `get_provider_specification_snapshot_field`, `verify_provider_specification_snapshot`, `get_broker_provider_specification` | `FR-BRK-159`–`FR-BRK-163` | `tests/brokers/usage/features/18_specifications.py` |
 
-Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private focused files; unreleased writes remain unreachable through public release policy. The registry holds **twelve** completed features, `FEAT-BRK-00` through `FEAT-BRK-10` plus `FEAT-BRK-18` (provider specification snapshots, parity-programme Phase 4a). IDs `FEAT-BRK-11` through `FEAT-BRK-16` are retired from current-state registration after their behavior moved into provider channels, Events, Reconciliation, and Conformance. `canonical_contracts/` and `_shared/` are documented non-feature support and own no independent feature behavior.
+Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private focused files; unreleased writes remain unreachable through public release policy. The registry holds **thirteen** completed features, `FEAT-BRK-00` through `FEAT-BRK-10`, `FEAT-BRK-17`, and `FEAT-BRK-18`. IDs `FEAT-BRK-11` through `FEAT-BRK-16` are retired from current-state registration after their behavior moved into provider channels, Events, Reconciliation, and Conformance. `canonical_contracts/` and `_shared/` are documented non-feature support and own no independent feature behavior.
 
 #### Explicit order-policy v2 requirements
 
@@ -323,6 +323,23 @@ before transport because the verified snapshot vocabulary does not admit it.
 | Completed | `FR-BRK-164` Brokers shall accept immutable order request v2 with independent fill/time policy and conditional aware-UTC expiration. | `build_broker_order_request_v2` | `app/services/brokers/canonical_contracts/models.py`; `tests/brokers/integration/test_order_policy_v2_adapter.py`; `tests/brokers/usage/features/02_metatrader.py::fr_brk_164()` |
 | Completed | `FR-BRK-165` MT5 shall map fill and time policies through independent verified constant tables and never substitute a symbol preference. | MT5 order command mapping | `app/services/brokers/metatrader/commands.py`; `tests/brokers/unit/test_order_policy_v2_mapping.py`; `tests/brokers/usage/features/02_metatrader.py::fr_brk_165()` |
 | Completed | `FR-BRK-166` Unsupported/tampered combinations shall fail before transport while v1 remains available in the shared release window. | Provider-bound v2 factory | `app/services/brokers/canonical_contracts/public.py`; `tests/brokers/unit/test_order_policy_v2_mapping.py`; `tests/brokers/usage/features/02_metatrader.py::fr_brk_166()` |
+
+#### Simulation channel requirements
+
+| Status | Requirement | Public contract | Evidence |
+| --- | --- | --- | --- |
+| Completed | `FR-BRK-167` Brokers shall register stable `sim` and `simulation` identities. | `get_broker_id`, `get_broker_environment` | `app/services/brokers/canonical_contracts/enums.py`; `tests/brokers/unit/simulation/test_simulation_isolation.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_167()` |
+| Completed | `FR-BRK-168` The factory shall admit only the exact simulation identity/environment pair with an injected authority. | `create_simulation_broker_adapter` | `app/services/brokers/_shared/factory.py`; `tests/brokers/integration/test_simulation_factory.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_168()` |
+| Completed | `FR-BRK-169` Brokers shall publish an exhaustive, fail-closed simulation capability intersection. | `get_broker_capability_catalogue` | `app/services/brokers/capabilities/matrix.py`; `tests/brokers/integration/test_simulation_conformance.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_169()` |
+| Completed | `FR-BRK-170` The simulation channel shall mirror connect, disconnect, reconnect, ping/status, ordered events, and run finalization while blocking session-required behavior when disconnected. | canonical lifecycle functions; `finalize_simulation_broker_session` | `app/services/brokers/simulation/adapter.py`; `tests/brokers/unit/simulation/test_simulation_lifecycle.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_170()` |
+| Completed | `FR-BRK-171` The simulation channel shall open no socket, require no credentials, and import no Simulation symbol. | `create_simulation_broker_adapter` | `app/services/brokers/simulation/adapter.py`; `tests/brokers/unit/simulation/test_simulation_isolation.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_171()` |
+| Completed | `FR-BRK-172` Brokers shall own a structural authority protocol with canonical adapter signatures and run finalization, while owning no matching or accounting. | `SimulationAuthorityPort` (private contract) | `app/services/brokers/simulation/contracts.py`; `tests/brokers/integration/test_simulation_factory.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_172()` |
+
+The Phase-10a simulation intersection is exactly `connect`, `disconnect`,
+`reconnect`, `is_connected`, `get_connection_status`, `ping`, `get_last_error`,
+`connection_events`, `get_feature_flags`, and `supports`. Every other canonical
+operation is declared unavailable and returns `BROKER_CAPABILITY_UNSUPPORTED`;
+later phases may extend this list only with their own requirement evidence.
 
 | Order | Feature                    | File order                                                                                                                                        |
 | ----: | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -353,7 +370,7 @@ lives in `_shared/public.py`; fake-adapter controls live in
 
 ```text
 brokers/
-├── __init__.py                         # Function-Only Public Surface (116 standalone functions in __all__)
+├── __init__.py                         # Function-Only Public Surface (143 standalone functions in __all__)
 ├── README.md
 ├── canonical_contracts/                # Non-feature support — shared enums, DTOs, responses, protocols
 │   ├── __init__.py

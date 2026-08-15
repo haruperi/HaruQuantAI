@@ -24,6 +24,7 @@ _EXPECTED_BROKERS = (
     "binance_coin_m_futures",
     "dukascopy",
     "yahoo",
+    "sim",
 )
 
 

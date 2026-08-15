@@ -13,6 +13,7 @@ class BrokerId(StrEnum):
     BINANCE_COIN_M_FUTURES = "binance_coin_m_futures"
     DUKASCOPY = "dukascopy"
     YAHOO = "yahoo"
+    SIM = "sim"
 
 
 class BrokerEnvironment(StrEnum):
@@ -22,6 +23,7 @@ class BrokerEnvironment(StrEnum):
     DEMO = "demo"
     TESTNET = "testnet"
     SANDBOX = "sandbox"
+    SIMULATION = "simulation"
 
 
 class BrokerConnectionState(StrEnum):

@@ -111,3 +111,40 @@ def create_configured_fake_broker_adapter(
         for capability, fixture in (fixtures or {}).items()
     }
     return FakeBrokerAdapter(config, capabilities, fixtures=mapped_fixtures)
+
+
+async def run_broker_adapter_conformance(
+    *,
+    adapter: object,
+    broker_id: str,
+    environment: str,
+    unsupported_capability_id: str,
+    unsupported_operation: str,
+) -> dict[str, object]:
+    """Run canonical adapter conformance through the package-root boundary.
+
+    Args:
+        adapter: Opaque canonical adapter under test.
+        broker_id: Exact broker identity.
+        environment: Exact broker environment.
+        unsupported_capability_id: Capability used to prove fail-closed gating.
+        unsupported_operation: Method used to prove unsupported behavior.
+
+    Returns:
+        Deterministic conformance verdict mapping.
+
+    Raises:
+        TypeError: If ``adapter`` does not satisfy the canonical protocol.
+    """
+    from app.services.brokers.canonical_contracts.protocols import BrokerAdapter
+    from app.services.brokers.conformance.suite import run_adapter_conformance
+
+    if not isinstance(adapter, BrokerAdapter):
+        raise TypeError("adapter must satisfy BrokerAdapter")
+    return await run_adapter_conformance(
+        adapter=adapter,
+        broker_id=broker_id,
+        environment=environment,
+        unsupported_capability=BrokerCapabilityId(unsupported_capability_id),
+        unsupported_operation=unsupported_operation,
+    )

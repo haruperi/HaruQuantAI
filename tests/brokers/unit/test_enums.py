@@ -19,16 +19,18 @@ def test_broker_id_has_exact_profiles() -> None:
         "binance_coin_m_futures",
         "dukascopy",
         "yahoo",
+        "sim",
     }
 
 
 def test_environment_has_no_live_default() -> None:
-    """Environment is an explicit four-value contract."""
+    """Environment is an explicit five-value contract."""
     assert tuple(BrokerEnvironment) == (
         BrokerEnvironment.LIVE,
         BrokerEnvironment.DEMO,
         BrokerEnvironment.TESTNET,
         BrokerEnvironment.SANDBOX,
+        BrokerEnvironment.SIMULATION,
     )
 
 

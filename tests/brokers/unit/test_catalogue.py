@@ -141,6 +141,20 @@ def _expected_cells() -> dict[tuple[BrokerId, BrokerCapabilityId], str]:
             operation = BrokerCapabilityId(name)
             for broker, value in zip(_MATRIX_COLUMNS, row, strict=True):
                 cells[(broker, operation)] = value
+    simulation = {
+        BrokerCapabilityId.CONNECT,
+        BrokerCapabilityId.DISCONNECT,
+        BrokerCapabilityId.RECONNECT,
+        BrokerCapabilityId.IS_CONNECTED,
+        BrokerCapabilityId.GET_CONNECTION_STATUS,
+        BrokerCapabilityId.PING,
+        BrokerCapabilityId.GET_LAST_ERROR,
+        BrokerCapabilityId.CONNECTION_EVENTS,
+        BrokerCapabilityId.GET_FEATURE_FLAGS,
+        BrokerCapabilityId.SUPPORTS,
+    }
+    for operation in BrokerCapabilityId:
+        cells[(BrokerId.SIM, operation)] = "A" if operation in simulation else "U"
     return cells
 
 

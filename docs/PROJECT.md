@@ -34,8 +34,9 @@ satisfied.
 - `app/utils/` implements the shared v1 contracts, errors, identifiers, UTC,
   canonical serialization, redaction/security helpers, settings, and logging.
 - `app/services/brokers/` is a completed implementation baseline. The canonical
-  contracts, capability matrix, runtime safety, provider channels, and deterministic
-  conformance kit implement `FEAT-BRK-00`-`FEAT-BRK-10`. MT5/cTrader execution-state,
+  contracts, capability matrix, runtime safety, provider channels, deterministic
+  conformance kit, and socket-free simulation channel implement `FEAT-BRK-00`-`FEAT-BRK-10`
+  plus `FEAT-BRK-17` and `FEAT-BRK-18`. MT5/cTrader execution-state,
   calculation, and mutation bodies are present; cTrader/Binance streams and
   cTrader market data are present; Dukascopy maps direct provider BID candles without local OHLC derivation.
   Release remains fail-closed: `capabilities/matrix.py` releases only the verified

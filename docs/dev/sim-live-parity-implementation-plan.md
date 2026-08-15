@@ -2176,6 +2176,8 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
+**Per-unit status:** 10a Completed 2026-08-15 under the owner's goal-wide standalone approval. `FEAT-BRK-17` now registers exact `sim`/`simulation` identity and factory selection (`app/services/brokers/canonical_contracts/enums.py:15`, `app/services/brokers/_shared/factory.py:49`), the Brokers-owned structural port (`app/services/brokers/simulation/contracts.py:11`), lifecycle/finalization delegation (`app/services/brokers/simulation/adapter.py:23`, `app/services/brokers/simulation/public.py:34`), and the exhaustive Phase-10a intersection (`app/services/brokers/capabilities/matrix.py:129`). `FR-BRK-167`–`172` usage evidence is `tests/brokers/usage/features/17_simulation.py:50-84`; focused evidence is `tests/brokers/unit/simulation/test_simulation_lifecycle.py:41`, `tests/brokers/unit/simulation/test_simulation_isolation.py:9`, `tests/brokers/integration/test_simulation_factory.py:29`, and `tests/brokers/integration/test_simulation_conformance.py:31`. Targeted behavior passed 12 tests; direct usage passed; Ruff format/check and Brokers mypy passed. The literal focused pytest command passed all 12 behaviors but exited 1 because repository-wide `--cov=app --cov-fail-under=80` measures the entire application on a four-file subset (3.82%); the identical command with `--no-cov` passed. After exhaustive-map reconciliation, the full Brokers behavioral gate reports 596 passed, 3 credential skips, and 9 pre-existing MT5 mutation-release/mock/docstring failures unrelated to 10a. The plan's prose says “five new tests” but names exactly four test files; implementation followed the exact four-path manifest. No socket, credentials, Simulator import, matching, or accounting entered Brokers; rollback remains removal of the simulation feature/evidence plus enum, map, factory, conformance, and root-export entries. Unit 10b remains pending, so the combined Phase-10 checklist stays open.
+
 - [ ] Approval matched this exact phase/subphase.
 - [ ] Only the local file and documentation manifests changed.
 - [ ] Every listed FR has final `path:line` implementation and test evidence.
@@ -2191,6 +2193,8 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 # Phase 11 · Clock-safe simulation reads
 
 **Domain:** brokers. **Requirements:** `FR-BRK-173` … `181`.
+
+Unit 10a commit hash: `a18849f066b89e80f0d97e09beecf207fb16bcb0` (exact prescribed message; all hooks passed).
 
 First, under its own approved sub-phase, inject a clock into all ten MT5 mapping timestamp sites,
 defaulting to the live clock. Then implement the Simulation adapter's admitted read intersection:

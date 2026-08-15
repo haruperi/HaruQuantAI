@@ -129,6 +129,7 @@ from app.services.brokers.capabilities.matrix import (
 from app.services.brokers.conformance.public import (
     create_configured_fake_broker_adapter,
     create_fake_broker_adapter,
+    run_broker_adapter_conformance,
     set_fake_broker_error,
 )
 from app.services.brokers.ctrader.health import record_ctrader_health_checkpoint
@@ -181,6 +182,10 @@ from app.services.brokers.reconciliation.public import (
     parse_broker_failover_decision,
     parse_broker_route_plan,
 )
+from app.services.brokers.simulation.public import (
+    create_simulation_broker_adapter,
+    finalize_simulation_broker_session,
+)
 from app.services.brokers.specifications.public import (
     build_provider_specification_snapshot,
     dump_provider_specification_snapshot,
@@ -227,10 +232,12 @@ __all__ = (
     "create_configured_fake_broker_adapter",
     "create_connected_broker",
     "create_fake_broker_adapter",
+    "create_simulation_broker_adapter",
     "disable_broker_symbol_mapping",
     "disconnect_broker",
     "dump_provider_specification_snapshot",
     "enforce_no_blind_resubmission",
+    "finalize_simulation_broker_session",
     "get_broker_account_info",
     "get_broker_adapter_contract_version",
     "get_broker_adapter_schema_id",
@@ -319,6 +326,7 @@ __all__ = (
     "resolve_broker_provider_symbol",
     "resolve_broker_provider_symbol_as_of",
     "resolve_provider_connection_config",
+    "run_broker_adapter_conformance",
     "run_broker_migrations",
     "select_broker_account",
     "select_broker_symbol",

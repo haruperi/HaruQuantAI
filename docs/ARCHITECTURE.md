@@ -425,6 +425,11 @@ translation stays in Brokers, and matching/accounting/scheduling/journaling stay
 Simulation. Specification evidence is split by observation time: Brokers owns the
 typed current provider specification snapshot (current observation only) and Data
 owns immutable effective-dated historical revisions; the graph stays acyclic.
+The channel has one exact identity pair (`sim`, `simulation`), opens no socket,
+requires no credential or endpoint, and delegates canonical connection lifecycle,
+events, and run finalization through the injected authority. Its capability matrix
+is an explicit intersection: anything not admitted returns
+`BROKER_CAPABILITY_UNSUPPORTED`, never an empty synthetic success.
 The current snapshot is implemented as `ProviderSpecificationSnapshot v1`
 (`FEAT-BRK-18`, parity-programme Phase 4a): it binds execution/order/filling/
 expiration/GTC modes, stops/freeze levels, directional volume limits,

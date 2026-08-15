@@ -126,6 +126,18 @@ _MT5 = _COMMON_TARGETS | {
     BrokerCapabilityId.CALCULATE_PROFIT,
     BrokerCapabilityId.GET_PROVIDER_SPECIFICATION,
 }
+_SIMULATION = {
+    BrokerCapabilityId.CONNECT,
+    BrokerCapabilityId.DISCONNECT,
+    BrokerCapabilityId.RECONNECT,
+    BrokerCapabilityId.IS_CONNECTED,
+    BrokerCapabilityId.GET_CONNECTION_STATUS,
+    BrokerCapabilityId.PING,
+    BrokerCapabilityId.GET_LAST_ERROR,
+    BrokerCapabilityId.CONNECTION_EVENTS,
+    BrokerCapabilityId.GET_FEATURE_FLAGS,
+    BrokerCapabilityId.SUPPORTS,
+}
 _CTRADER = _COMMON_TARGETS | {
     BrokerCapabilityId.PING,
     BrokerCapabilityId.GET_PLATFORM_INFO,
@@ -189,6 +201,7 @@ _IMPLEMENTED: Mapping[BrokerId, frozenset[BrokerCapabilityId]] = MappingProxyTyp
         BrokerId.BINANCE_COIN_M_FUTURES: frozenset(),
         BrokerId.DUKASCOPY: frozenset(_DUKASCOPY),
         BrokerId.YAHOO: frozenset(_YAHOO),
+        BrokerId.SIM: frozenset(_SIMULATION),
     }
 )
 
@@ -201,6 +214,7 @@ _TARGETS: Mapping[BrokerId, set[BrokerCapabilityId]] = MappingProxyType(
         BrokerId.BINANCE_COIN_M_FUTURES: set(),
         BrokerId.DUKASCOPY: _DUKASCOPY,
         BrokerId.YAHOO: _YAHOO,
+        BrokerId.SIM: _SIMULATION,
     }
 )
 
@@ -225,6 +239,7 @@ _RELEASED: Mapping[BrokerId, frozenset[BrokerCapabilityId]] = MappingProxyType(
         ),
         BrokerId.DUKASCOPY: frozenset(_IMPLEMENTED[BrokerId.DUKASCOPY] - _WRITE),
         BrokerId.YAHOO: frozenset({BrokerCapabilityId.GET_HISTORICAL_BARS}),
+        BrokerId.SIM: frozenset(_SIMULATION),
     }
 )
 
@@ -259,6 +274,10 @@ _READ_EVIDENCE: Mapping[BrokerId, tuple[str, ...]] = MappingProxyType(
             "tests/brokers/unit/test_yahoo_transport.py",
             "tests/brokers/unit/test_yahoo_mapping.py",
             "tests/brokers/unit/test_yahoo_adapter.py",
+        ),
+        BrokerId.SIM: (
+            "tests/brokers/unit/simulation/test_simulation_lifecycle.py",
+            "tests/brokers/integration/test_simulation_conformance.py",
         ),
     }
 )

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Add a socket-free simulation broker channel
+
+Brokers now exposes the exact `sim`/`simulation` in-process route through an injected structural authority and the canonical adapter lifecycle (Phase 10a).
+
+#### Added (1)
+
+- Added exact simulation factory selection, lifecycle/finalization delegation, capability intersection, canonical conformance, and strict socket/credential/import isolation.
+
 ### Bind source and tick lineage
 
 Simulator now proves independent source/tick identities, market-evidence class, clock coverage, and decision-time eligibility before parity admission (Phase 9).
