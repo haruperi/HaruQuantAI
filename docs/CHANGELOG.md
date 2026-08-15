@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Add clock-safe simulation reads
+
+The simulation Broker channel now exposes its approved authoritative read intersection with explicit time, sequence, staleness, gap, and session-revision evidence (Phase 11b).
+
+#### Added (1)
+
+- Added fail-closed socket-free symbol, specification, market, account, position, order, permission, and revision-bound session reads without recomputation.
+
 ### Make MT5 mapping clocks injectable
 
 Brokers now captures all ten MT5 observation-owned mapping timestamps through a validated injected UTC clock while retaining the live UTC default (Phase 11a).

@@ -137,6 +137,22 @@ _SIMULATION = {
     BrokerCapabilityId.CONNECTION_EVENTS,
     BrokerCapabilityId.GET_FEATURE_FLAGS,
     BrokerCapabilityId.SUPPORTS,
+    BrokerCapabilityId.GET_SYMBOLS,
+    BrokerCapabilityId.GET_SYMBOL_INFO,
+    BrokerCapabilityId.GET_PROVIDER_SPECIFICATION,
+    BrokerCapabilityId.GET_TRADING_SESSIONS,
+    BrokerCapabilityId.GET_QUOTE,
+    BrokerCapabilityId.GET_SPREAD,
+    BrokerCapabilityId.GET_TICKS,
+    BrokerCapabilityId.GET_HISTORICAL_BARS,
+    BrokerCapabilityId.GET_PERMISSIONS,
+    BrokerCapabilityId.GET_ACCOUNT_INFO,
+    BrokerCapabilityId.GET_BALANCES,
+    BrokerCapabilityId.GET_POSITIONS,
+    BrokerCapabilityId.GET_POSITION,
+    BrokerCapabilityId.GET_ORDERS,
+    BrokerCapabilityId.GET_ORDER,
+    BrokerCapabilityId.LIST_ORDER_HISTORY,
 }
 _CTRADER = _COMMON_TARGETS | {
     BrokerCapabilityId.PING,
@@ -277,7 +293,11 @@ _READ_EVIDENCE: Mapping[BrokerId, tuple[str, ...]] = MappingProxyType(
         ),
         BrokerId.SIM: (
             "tests/brokers/unit/simulation/test_simulation_lifecycle.py",
+            "tests/brokers/unit/simulation/test_simulation_reads.py",
+            "tests/brokers/unit/simulation/test_simulation_read_time.py",
             "tests/brokers/integration/test_simulation_conformance.py",
+            "tests/brokers/integration/test_simulation_read_conformance.py",
+            "tests/brokers/integration/test_simulation_delivery_gaps.py",
         ),
     }
 )

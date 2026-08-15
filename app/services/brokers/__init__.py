@@ -183,6 +183,7 @@ from app.services.brokers.reconciliation.public import (
     parse_broker_route_plan,
 )
 from app.services.brokers.simulation.public import (
+    build_simulation_read_envelope,
     create_simulation_broker_adapter,
     finalize_simulation_broker_session,
 )
@@ -220,6 +221,7 @@ __all__ = (
     "build_broker_value",
     "build_instrument_venue_profile",
     "build_provider_specification_snapshot",
+    "build_simulation_read_envelope",
     "calculate_broker_margin",
     "calculate_broker_profit",
     "cancel_broker_order",

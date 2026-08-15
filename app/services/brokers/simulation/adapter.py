@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
-from typing import TYPE_CHECKING, cast, override
+import inspect
+from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
+from datetime import datetime, timedelta
+from types import MappingProxyType
+from typing import TYPE_CHECKING, Any, cast, override
 
 from app.services.brokers._shared.base import _UnsupportedAdapterBase
 from app.services.brokers.canonical_contracts import (
@@ -14,6 +17,10 @@ from app.services.brokers.canonical_contracts import (
     BrokerConnectionStatus,
     StandardResponse,
 )
+from app.services.brokers.canonical_contracts.enums import BrokerErrorCode
+from app.services.brokers.canonical_contracts.models import BrokerError
+from app.services.brokers.canonical_contracts.protocols import BrokerAdapter
+from app.services.brokers.simulation.contracts import SimulationReadEnvelope
 from app.services.brokers.simulation.lifecycle import lifecycle_state_from_response
 
 if TYPE_CHECKING:
@@ -51,6 +58,119 @@ class SimulationBrokerAdapter(_UnsupportedAdapterBase):
             raise TypeError("authority_port must satisfy SimulationAuthorityPort")
         super().__init__(config)
         self._authority = cast("SimulationAuthorityPort", authority_port)
+        self._last_read_sequence: dict[tuple[str, str], int] = {}
+
+    @staticmethod
+    def _validate_time(value: datetime, name: str) -> None:
+        """Require one aware zero-offset UTC timestamp.
+
+        Args:
+            value: Timestamp supplied by the authority.
+            name: Stable field name for diagnostics.
+
+        Raises:
+            ValueError: If the timestamp is naive or non-UTC.
+        """
+        if value.tzinfo is None or value.utcoffset() != timedelta(0):
+            message = f"{name} must be aware UTC"
+            raise ValueError(message)
+
+    def _read_error(
+        self, operation: BrokerCapabilityId, reason: str
+    ) -> StandardResponse[Any]:
+        """Return a fail-closed delivery-evidence error.
+
+        Args:
+            operation: Read capability that could not be proven clean.
+            reason: Bounded non-sensitive failure reason.
+
+        Returns:
+            Canonical Brokers error response.
+        """
+        error = BrokerError(
+            code=BrokerErrorCode.BROKER_RESPONSE_INVALID,
+            message=f"Simulation {operation.value} authority evidence is invalid",
+            capability=operation,
+            details={"delivery_state": reason},
+        )
+        self._last_error = error
+        return self._result(operation, error=error)
+
+    async def _delegate_read(  # noqa: C901, PLR0911 - explicit evidence failures.
+        self, operation: BrokerCapabilityId, arguments: Mapping[str, object]
+    ) -> StandardResponse[Any]:
+        """Validate and project one authority-owned canonical read.
+
+        Args:
+            operation: Admitted canonical read operation.
+            arguments: Public invocation arguments.
+
+        Returns:
+            Exact canonical payload or a fail-closed delivery error.
+        """
+        if self._state is not BrokerConnectionState.READY:
+            return self._not_connected(operation)
+        read = getattr(self._authority, "read", None)
+        if not callable(read):
+            return self._read_error(operation, "authority_read_unbound")
+        try:
+            envelope = await read(operation, MappingProxyType(dict(arguments)))
+            if not isinstance(envelope, SimulationReadEnvelope):
+                return self._read_error(operation, "invalid_envelope")
+            for name in ("observed_at", "received_at", "available_at", "simulated_at"):
+                self._validate_time(getattr(envelope, name), name)
+            if envelope.source_sequence < 0:
+                return self._read_error(operation, "invalid_sequence")
+            if (
+                operation is BrokerCapabilityId.GET_TRADING_SESSIONS
+                and not envelope.session_revision
+            ):
+                return self._read_error(operation, "exceptional_session_unproven")
+            if not (
+                envelope.observed_at
+                <= envelope.received_at
+                <= envelope.available_at
+                <= envelope.simulated_at
+            ):
+                return self._read_error(operation, "future_or_reversed_time")
+            if (
+                envelope.stale
+                or envelope.gap
+                or envelope.duplicate
+                or envelope.out_of_order
+            ):
+                states = (
+                    name
+                    for name in ("stale", "gap", "duplicate", "out_of_order")
+                    if getattr(envelope, name)
+                )
+                return self._read_error(operation, "+".join(states))
+            key = (operation.value, repr(tuple(sorted(arguments.items()))))
+            previous = self._last_read_sequence.get(key)
+            if previous is not None and envelope.source_sequence != previous + 1:
+                reason = (
+                    "duplicate_or_out_of_order"
+                    if envelope.source_sequence <= previous
+                    else "missing_sequence"
+                )
+                return self._read_error(operation, reason)
+            self._last_read_sequence[key] = envelope.source_sequence
+            return self._result(
+                operation,
+                data=envelope.payload,
+                provider_metadata={
+                    "source_sequence": envelope.source_sequence,
+                    "observed_at": envelope.observed_at.isoformat(),
+                    "received_at": envelope.received_at.isoformat(),
+                    "available_at": envelope.available_at.isoformat(),
+                    "simulated_at": envelope.simulated_at.isoformat(),
+                    "session_revision": envelope.session_revision,
+                    "stale": False,
+                    "gap": False,
+                },
+            )
+        except Exception as error:  # noqa: BLE001 - public boundary normalization.
+            return self._exception_result(operation, error)
 
     async def _delegate_lifecycle(self, operation: str) -> StandardResponse[object]:
         """Delegate and synchronize one lifecycle operation.
@@ -165,6 +285,74 @@ class SimulationBrokerAdapter(_UnsupportedAdapterBase):
             "StandardResponse[None]",
             await self._delegate_lifecycle("finalize_session"),
         )
+
+
+_ADMITTED_READS = frozenset(
+    {
+        BrokerCapabilityId.GET_SYMBOLS,
+        BrokerCapabilityId.GET_SYMBOL_INFO,
+        BrokerCapabilityId.GET_PROVIDER_SPECIFICATION,
+        BrokerCapabilityId.GET_TRADING_SESSIONS,
+        BrokerCapabilityId.GET_QUOTE,
+        BrokerCapabilityId.GET_SPREAD,
+        BrokerCapabilityId.GET_TICKS,
+        BrokerCapabilityId.GET_HISTORICAL_BARS,
+        BrokerCapabilityId.GET_PERMISSIONS,
+        BrokerCapabilityId.GET_ACCOUNT_INFO,
+        BrokerCapabilityId.GET_BALANCES,
+        BrokerCapabilityId.GET_POSITIONS,
+        BrokerCapabilityId.GET_POSITION,
+        BrokerCapabilityId.GET_ORDERS,
+        BrokerCapabilityId.GET_ORDER,
+        BrokerCapabilityId.LIST_ORDER_HISTORY,
+    }
+)
+
+
+def _make_read_method(
+    operation: BrokerCapabilityId,
+) -> Callable[..., Awaitable[StandardResponse[Any]]]:
+    """Create one protocol-signature-preserving read delegate.
+
+    Args:
+        operation: Canonical admitted read.
+
+    Returns:
+        Asynchronous adapter method.
+    """
+    protocol_method = getattr(BrokerAdapter, operation.value)
+    signature = inspect.signature(protocol_method)
+
+    async def _method(
+        self: SimulationBrokerAdapter, *args: object, **kwargs: object
+    ) -> StandardResponse[Any]:
+        """Delegate one authority-owned simulation read.
+
+        Args:
+            self: Simulation adapter receiving the read.
+            *args: Positional canonical operation arguments.
+            **kwargs: Keyword canonical operation arguments.
+
+        Returns:
+            Exact authority payload or a fail-closed canonical error.
+        """
+        bound = signature.bind(self, *args, **kwargs)
+        arguments = dict(bound.arguments)
+        arguments.pop("self", None)
+        return await self._delegate_read(operation, arguments)
+
+    _method.__name__ = operation.value
+    _method.__annotations__ = dict(protocol_method.__annotations__)
+    _method.__signature__ = signature  # type: ignore[attr-defined]
+    return _method
+
+
+for _read_operation in _ADMITTED_READS:
+    setattr(
+        SimulationBrokerAdapter,
+        _read_operation.value,
+        _make_read_method(_read_operation),
+    )
 
 
 __all__ = ("SimulationBrokerAdapter",)
