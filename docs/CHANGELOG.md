@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Add effective-dated simulation calculations
+
+Simulation now performs exact effective-dated MT5-FX profit, margin, and account-currency calculations and validates model-bound offline conformance artifacts (Phase 13b).
+
+#### Added (1)
+
+- Added fail-closed Decimal calculations, provider rounding, Data-evidenced FX conversion, model identity, and request-v2 calculation artifact binding.
+
 ### Add calculation conformance evidence
 
 Brokers now preserves complete MT5 projected-account check evidence and validates bounded checksummed offline calculation fixtures (Phase 13a).

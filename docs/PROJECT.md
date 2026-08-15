@@ -519,18 +519,17 @@ features. No secondary programme or work-package identifier namespace is active.
 
 | Status | Count |
 | --- | ---: |
-| Completed | 223 |
-| Pending | 14 |
+| Completed | 224 |
+| Pending | 13 |
 | Partial | 0 |
 | Missing | 0 |
 | **Total** | **237** |
 
-The fourteen `Pending` features are `FEAT-UI-05`–`FEAT-UI-13`, `FEAT-UI-15`,
+The thirteen `Pending` features are `FEAT-UI-05`–`FEAT-UI-13`, `FEAT-UI-15`,
 `FEAT-UI-16`, and `FEAT-UI-17`, each awaiting requirement evidence or focused-folder
 ownership recorded in `app/ui/README.md` — they are the primary trading workspace and
-its enabling foundation, specified by `docs/dev/documentation.pdf` — plus the two
-remaining sim⇄live parity-programme Simulation features `FEAT-SIM-16` (Effective-Dated Calculation Model) and
-`FEAT-SIM-17` (Empirical Execution Calibration), registered as Pending in
+its enabling foundation, specified by `docs/dev/documentation.pdf` — plus the remaining
+sim⇄live parity-programme Simulation feature `FEAT-SIM-17` (Empirical Execution Calibration), registered as Pending in
 `app/services/simulator/README.md`; `FEAT-SIM-18` (Parity Comparison) completed with
 the programme's Phase 2.
 

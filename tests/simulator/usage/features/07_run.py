@@ -126,6 +126,8 @@ def _build_request_v2(dataset: object) -> object:
         {
             "execution_model_ref": "execution-model-v1",
             "execution_model_hash": "e" * 64,
+            "calculation_model_hash": "a" * 64,
+            "calculation_artifact_checksum": "b" * 64,
             "source_lineage_hash": "f" * 64,
             "tick_lineage_hash": "1" * 64,
             "market_evidence_class": "genuine_bid_ask_ticks",

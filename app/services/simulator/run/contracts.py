@@ -314,6 +314,8 @@ class SimulationBacktestRequestV2(SimulationBacktestRequestV1):
     )
     execution_model_ref: str
     execution_model_hash: str
+    calculation_model_hash: str
+    calculation_artifact_checksum: str
     source_lineage_hash: str
     tick_lineage_hash: str
     market_evidence_class: Literal[
@@ -356,6 +358,8 @@ class SimulationBacktestRequestV2(SimulationBacktestRequestV1):
         )(payload)
 
     @field_validator(
+        "calculation_artifact_checksum",
+        "calculation_model_hash",
         "execution_model_hash",
         "source_lineage_hash",
         "tick_lineage_hash",

@@ -889,6 +889,104 @@ def calculate_margin(*args: object, **kwargs: object) -> StandardResponse[object
     )(*args, **kwargs)
 
 
+def calculate_fx_profit(*args: object, **kwargs: object) -> StandardResponse[object]:
+    """Calculate effective-dated exact FX profit."""
+    return _guarded(
+        _operation("app.services.simulator.calculations", "calculate_fx_profit"),
+        operation="simulation.calculations.calculate_fx_profit",
+        risk_level="low",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def calculate_planned_margin(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Calculate effective-dated incremental planned margin."""
+    return _guarded(
+        _operation("app.services.simulator.calculations", "calculate_planned_margin"),
+        operation="simulation.calculations.calculate_planned_margin",
+        risk_level="low",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def calculate_total_margin(*args: object, **kwargs: object) -> StandardResponse[object]:
+    """Calculate effective-dated total margin."""
+    return _guarded(
+        _operation("app.services.simulator.calculations", "calculate_total_margin"),
+        operation="simulation.calculations.calculate_total_margin",
+        risk_level="low",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def convert_account_currency(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Convert and round one amount with Data-owned FX evidence."""
+    return _guarded(
+        _operation("app.services.simulator.calculations", "convert_account_currency"),
+        operation="simulation.calculations.convert_account_currency",
+        risk_level="low",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def load_calculation_conformance_artifact(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Load one checksummed offline calculation artifact."""
+    return _guarded(
+        _operation(
+            "app.services.simulator.calculations",
+            "load_calculation_conformance_artifact",
+        ),
+        operation="simulation.calculations.load_conformance_artifact",
+        risk_level="low",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def run_offline_calculation_conformance(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Run exact provider-disabled calculation conformance."""
+    return _guarded(
+        _operation(
+            "app.services.simulator.calculations",
+            "run_offline_calculation_conformance",
+        ),
+        operation="simulation.calculations.run_offline_conformance",
+        risk_level="low",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def get_calculation_model_identity() -> StandardResponse[object]:
+    """Return stable calculation model identity."""
+    return _guarded(
+        _operation(
+            "app.services.simulator.calculations", "get_calculation_model_identity"
+        ),
+        operation="simulation.calculations.get_model_identity",
+        risk_level="none",
+        read_only=True,
+    )()
+
+
+def get_supported_calculation_modes() -> StandardResponse[object]:
+    """Return exact admitted calculation modes."""
+    return _guarded(
+        _operation(
+            "app.services.simulator.calculations", "get_supported_calculation_modes"
+        ),
+        operation="simulation.calculations.get_supported_modes",
+        risk_level="none",
+        read_only=True,
+    )()
+
+
 def convert_fx_amount(*args: object, **kwargs: object) -> StandardResponse[object]:
     """Convert an amount using verified Data-owned FX evidence."""
     return _guarded(
@@ -1477,15 +1575,19 @@ __all__: tuple[str, ...] = (
     "build_transaction_posting",
     "bypass_simulation_checklist_step",
     "calculate_execution_costs",
+    "calculate_fx_profit",
     "calculate_margin",
+    "calculate_planned_margin",
     "calculate_portfolio_backtest_config_hash",
     "calculate_rollover_swap",
     "calculate_simulation_backtest_config_hash",
     "calculate_simulation_backtest_v2_config_hash",
+    "calculate_total_margin",
     "cancel_simulation_event",
     "close_live_simulation_session",
     "compare_parity_evidence",
     "complete_simulation_mission",
+    "convert_account_currency",
     "convert_fx_amount",
     "create_live_simulation_session",
     "create_recovery_checkpoint",
@@ -1503,6 +1605,7 @@ __all__: tuple[str, ...] = (
     "execute_simulation_state_store_operation",
     "explicitly_rearm_simulation_session",
     "get_approved_tick_models",
+    "get_calculation_model_identity",
     "get_canonical_artifact_types",
     "get_journal_policy",
     "get_parity_envelope",
@@ -1518,9 +1621,11 @@ __all__: tuple[str, ...] = (
     "get_simulation_value_field",
     "get_simulation_value_fields",
     "get_supported_asset_classes",
+    "get_supported_calculation_modes",
     "get_supported_fill_policies",
     "group_simulation_alerts",
     "is_simulation_value",
+    "load_calculation_conformance_artifact",
     "load_recovery_checkpoints",
     "match_order",
     "normalize_parity_evidence",
@@ -1546,6 +1651,7 @@ __all__: tuple[str, ...] = (
     "run_backtest",
     "run_backtest_async",
     "run_fast_research",
+    "run_offline_calculation_conformance",
     "run_portfolio_backtest",
     "run_simulation_scheduler_until_complete",
     "run_simulator_migrations",

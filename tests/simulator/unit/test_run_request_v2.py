@@ -35,6 +35,8 @@ def _payload() -> dict[str, object]:
         {
             "execution_model_ref": "execution-model-v1",
             "execution_model_hash": "e" * 64,
+            "calculation_model_hash": "a" * 64,
+            "calculation_artifact_checksum": "b" * 64,
             "source_lineage_hash": "f" * 64,
             "tick_lineage_hash": "1" * 64,
             "market_evidence_class": "genuine_bid_ask_ticks",
@@ -87,6 +89,8 @@ def test_fr_sim_196_v2_binds_complete_execution_identity() -> None:
     assert result["contract_version"] == "v2"
     assert result["schema_id"] == "simulation.backtest_request.v2"
     assert result["decision_instant_policy"] == "point_in_time_available_at"
+    assert result["calculation_model_hash"] == "a" * 64
+    assert result["calculation_artifact_checksum"] == "b" * 64
 
 
 @pytest.mark.parametrize(
@@ -94,6 +98,8 @@ def test_fr_sim_196_v2_binds_complete_execution_identity() -> None:
     [
         ("execution_model_ref", "execution-model-v2"),
         ("execution_model_hash", "5" * 64),
+        ("calculation_model_hash", "9" * 64),
+        ("calculation_artifact_checksum", "a" * 64),
         ("source_lineage_hash", "6" * 64),
         ("tick_lineage_hash", "7" * 64),
         ("market_evidence_class", "depth_supported_ticks"),
