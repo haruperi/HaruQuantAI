@@ -8,7 +8,7 @@ import asyncio
 from collections.abc import Mapping
 from datetime import datetime
 from hashlib import sha256
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import ValidationError as PydanticValidationError
 
@@ -19,6 +19,12 @@ from app.services.trading.contracts import (
     TradingError,
     TradingRequest,
     TradingRoute,
+)
+from app.services.trading.contracts.models import (
+    FillPolicy,
+    JsonValue,
+    TimePolicy,
+    TradingRequestV2,
 )
 from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.monitoring import OperationalEvent, emit_runtime_event
@@ -34,7 +40,6 @@ if TYPE_CHECKING:
     RiskDecisionPackage = Any
     create_trade_intent_value = Any
     from app.services.trading.actions.dependencies import TradingDependencies
-    from app.services.trading.contracts.models import JsonValue
 
 _ACTION_BY_INTENT = {
     "OPEN": "submit_order",
@@ -164,12 +169,12 @@ def _state_target(
     return None, target, projection.version
 
 
-def _approved_request(
+def build_approved_trading_request(
     intent: create_trade_intent_value,
     decision: RiskDecisionPackage,
     deps: TradingDependencies,
     evidence: Mapping[str, JsonValue],
-) -> TradingRequest:
+) -> TradingRequestV2:
     """Build one canonical request from immutable Strategy and Risk lineage.
 
     Args:
@@ -179,7 +184,7 @@ def _approved_request(
         evidence: Workflow references that carry no approval authority.
 
     Returns:
-        Complete canonical Trading request.
+        Complete canonical Trading request v2.
 
     Raises:
         TradingError: If Risk approval or lineage is incomplete.
@@ -198,9 +203,27 @@ def _approved_request(
         )
     route = _route(deps)
     provider_id = _provider_id(deps)
-    _, symbol_info = deps.symbol_capability_source(route, provider_id, intent.symbol)
+    capability, symbol_info = deps.symbol_capability_source(
+        route, provider_id, intent.symbol
+    )
+    fill_policy = _required_text(evidence, "fill_policy")
+    time_policy = _required_text(evidence, "time_policy")
+    filling_modes = capability.get("filling_modes")
+    expiration_modes = capability.get("expiration_modes")
+    specification_checksum = capability.get("provider_specification_checksum")
+    if (
+        not isinstance(filling_modes, list)
+        or fill_policy not in filling_modes
+        or not isinstance(expiration_modes, list)
+        or time_policy not in expiration_modes
+        or not isinstance(specification_checksum, str)
+    ):
+        raise TradingError(
+            "INVALID_REQUEST",
+            "Approved order policies lack exact provider capability evidence",
+        )
     action = _ACTION_BY_INTENT[intent.intent_type]
-    request = TradingRequest(
+    request = TradingRequestV2(
         request_id=decision.request_id,
         workflow_id=decision.workflow_id,
         correlation_id=decision.correlation_id,
@@ -226,7 +249,10 @@ def _approved_request(
         stop_price=intent.stop_price,
         stop_loss=intent.stop_loss,
         take_profit=intent.take_profit,
-        time_in_force=intent.time_in_force,
+        time_in_force=None,
+        fill_policy=cast("FillPolicy", fill_policy),
+        time_policy=cast("TimePolicy", time_policy),
+        provider_specification_checksum=specification_checksum,
         expiration=intent.expiration,
         risk_decision_id=decision.decision_id,
         action_policy_verdict_id=_required_text(evidence, "action_policy_verdict_id"),
@@ -257,7 +283,7 @@ def _approved_request(
         "expected_version": version,
     }
     try:
-        return TradingRequest.model_validate(material)
+        return TradingRequestV2.model_validate(material)
     except PydanticValidationError as error:
         raise TradingError(
             "INVALID_REQUEST", "Derived evaluation request is invalid"
@@ -353,7 +379,7 @@ async def _run_live_evaluation_cycle_value(
                     extensions={"redaction_applied": True},
                 )
             decision = await deps.risk_source(intent, account, market_context, evidence)
-            request = _approved_request(intent, decision, deps, evidence)
+            request = build_approved_trading_request(intent, decision, deps, evidence)
             _check_timeout(deps, started_at, evidence)
             return await _execute_request(request, deps, evidence)
     except TimeoutError as error:
@@ -386,4 +412,4 @@ async def run_live_evaluation_cycle(
         )
 
 
-__all__ = ["run_live_evaluation_cycle"]
+__all__ = ["build_approved_trading_request", "run_live_evaluation_cycle"]

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Converge Trading mutation routing
+
+Trading now builds provider-bound approved requests once and routes simulation and broker mutations through the same action, Brokers adapter, and response-classification path (Phase 14a).
+
+#### Changed (1)
+
+- Removed the private simulation dispatch callback, added socket-free Simulation session lifecycle support, and retained only declared route-specific safety gates.
+
 ### Add effective-dated simulation calculations
 
 Simulation now performs exact effective-dated MT5-FX profit, margin, and account-currency calculations and validates model-bound offline conformance artifacts (Phase 13b).

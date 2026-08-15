@@ -17,6 +17,7 @@ from app.services.trading.contracts import (
     TradingRequest,
 )
 from app.services.trading.contracts.errors import _redacted_envelope_data
+from app.services.trading.contracts.models import JsonValue, OrderIntentV2
 from app.services.trading.contracts.responses import (
     error_trading_response,
     success_trading_response,
@@ -53,7 +54,6 @@ logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.trading.actions.dependencies import TradingDependencies
-    from app.services.trading.contracts.models import JsonValue
 
 
 def _envelope(
@@ -420,7 +420,11 @@ def _intent_from_gate(
     intent = data.get("intent")
     if not isinstance(intent, dict):
         raise TradingError("MALFORMED_RECEIPT", "Live gate omitted order intent")
-    parsed = OrderIntent.model_validate(intent)
+    parsed = (
+        OrderIntentV2.model_validate(intent)
+        if intent.get("contract_version") == "v2"
+        else OrderIntent.model_validate(intent)
+    )
     if parsed.request_id != request.request_id:
         raise TradingError("SCOPE_MISMATCH", "Live gate intent mismatches request")
     return parsed
@@ -508,7 +512,6 @@ async def _execute_request(
         intent,
         deps.connection,
         deps.broker_adapter,
-        deps.simulation_dispatch,
         operation_timeout_seconds=deps.broker_operation_timeout_seconds,
         clock=deps.clock,
     )

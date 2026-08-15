@@ -23,9 +23,13 @@ from app.services.trading.actions.positions import (
     reduce_exposure,
 )
 from app.services.trading.actions.rebalance import execute_portfolio_rebalance
-from app.services.trading.actions.runtime import run_live_evaluation_cycle
+from app.services.trading.actions.runtime import (
+    build_approved_trading_request,
+    run_live_evaluation_cycle,
+)
 
 __all__ = [
+    "build_approved_trading_request",
     "cancel_all_orders",
     "cancel_order",
     "clear_kill_switch",

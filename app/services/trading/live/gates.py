@@ -90,9 +90,11 @@ async def _evaluate_live_gate_value(  # noqa: C901, PLR0912
         TradingError: At the first mandatory gate failure.
     """
     logger.info("Evaluating canonical live gate for %s", request.request_id)
-    if request.contract_version != "v1" or request.schema_id != (
-        "trading.trading_request.v1"
-    ):
+    compatible_schemas = {
+        ("v1", "trading.trading_request.v1"),
+        ("v2", "trading.trading_request.v2"),
+    }
+    if (request.contract_version, request.schema_id) not in compatible_schemas:
         raise TradingError("INVALID_REQUEST", "Trading request schema is incompatible")
     now = session.now()
     if not session.started or request.valid_until <= now:

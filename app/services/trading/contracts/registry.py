@@ -98,6 +98,7 @@ _PUBLIC_FUNCTION_NAMES = (
     "verify_protective_order_coverage",
     "apply_execution_event",
     "assess_execution_readiness",
+    "build_approved_trading_request",
     "build_broker_state_unknown_event",
     "build_execution_plan",
     "build_trading_report",

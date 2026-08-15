@@ -5,6 +5,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 import pytest
+from app.services.brokers import get_broker_error_code
 from app.services.trading.actions import (
     cancel_all_orders,
     close_all_positions,
@@ -28,6 +29,7 @@ from tests.trading.unit.actions.test_dependencies import (
     policy,
     request,
 )
+from tests.trading.unit.routing.test_dispatcher import _ErrorAdapter
 
 
 @pytest.fixture
@@ -144,7 +146,14 @@ def test_derived_child_is_revalidated_before_dispatch() -> None:
 async def test_cancel_all_preserves_uncertain_results() -> None:
     """Bulk cancel reports uncertainty and skips already-filled work."""
     deps = emergency_dependencies("cancel_all_orders")
-    deps = replace(deps, simulation_dispatch=unknown_dispatch)
+    deps = replace(
+        deps,
+        broker_adapter=_ErrorAdapter(
+            get_broker_error_code("BROKER_RATE_LIMITED"),
+            broker="sim",
+            environment="simulation",
+        ),
+    )
     outcome = await cancel_all_orders(request(action="cancel_all_orders"), deps)
     assert outcome.status == "success"
     assert outcome.metadata.extensions["legacy_status"] == "partial"

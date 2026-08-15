@@ -3,7 +3,7 @@
 # ruff: noqa: BLE001 - the authority boundary normalizes provider failures.
 
 import asyncio
-from collections.abc import Awaitable, Callable, Mapping
+from collections.abc import Callable, Mapping
 from datetime import datetime
 from decimal import Decimal
 from hashlib import sha256
@@ -288,7 +288,13 @@ def _validate_broker_selection(
         raise TradingError("SERVICE_UNAVAILABLE", "Broker authority is unavailable")
     if not is_broker_connection_enabled(connection):
         raise TradingError("GATE_BLOCKED", "Broker provider is disabled")
-    if intent.provider_id != get_broker_connection_id(connection):
+    expected_provider = get_broker_connection_id(connection)
+    if intent.route.value == "sim":
+        if intent.provider_id not in {None, expected_provider}:
+            raise TradingError(
+                "SCOPE_MISMATCH", "Broker provider does not match intent"
+            )
+    elif intent.provider_id != expected_provider:
         raise TradingError("SCOPE_MISMATCH", "Broker provider does not match intent")
     if (
         intent.route.value == "live"
@@ -506,14 +512,10 @@ def _validate_dispatch_policy(operation_timeout_seconds: Decimal) -> None:
         raise TradingError("CONFIGURATION_INVALID", "Dispatch timeout is invalid")
 
 
-async def _dispatch_order_intent_value(  # noqa: C901, PLR0912
+async def _dispatch_order_intent_value(
     intent: OrderIntent,
     connection: BrokerConnection | None,
     broker_adapter: BrokerAdapter | None,
-    simulation_dispatch: Callable[
-        [OrderIntent], Awaitable[StandardResponse[ExecutionReceipt] | ExecutionReceipt]
-    ]
-    | None,
     *,
     operation_timeout_seconds: Decimal,
     clock: Callable[[], datetime],
@@ -523,8 +525,7 @@ async def _dispatch_order_intent_value(  # noqa: C901, PLR0912
     Args:
         intent: Complete deterministic executable intent.
         connection: Broker connection material for paper/live, otherwise ``None``.
-        broker_adapter: Broker mutation authority for paper/live, otherwise ``None``.
-        simulation_dispatch: Simulation mutation callback for sim, otherwise ``None``.
+        broker_adapter: Broker mutation authority for the selected route.
         operation_timeout_seconds: Validated exact Broker operation timeout.
         clock: Injected aware UTC receipt clock.
 
@@ -540,47 +541,6 @@ async def _dispatch_order_intent_value(  # noqa: C901, PLR0912
     )
     _validate_dispatch_policy(operation_timeout_seconds)
     _validate_route_environment(intent, connection)
-    if intent.route.value == "sim":
-        if simulation_dispatch is None:
-            raise TradingError("SERVICE_UNAVAILABLE", "Simulation authority is absent")
-        if broker_adapter is not None:
-            raise TradingError(
-                "SCOPE_MISMATCH", "Sim callback received mutation adapter prematurely"
-            )
-        try:
-            async with asyncio.timeout(float(operation_timeout_seconds)):
-                simulation_response = await simulation_dispatch(intent)
-        except TimeoutError:
-            return _timeout_receipt(intent, clock())
-        except TradingError:
-            raise
-        except Exception:
-            return _uncertain_failure_receipt(intent, clock())
-        if isinstance(simulation_response, ExecutionReceipt):
-            receipt = simulation_response
-        elif simulation_response.status != "success" or not isinstance(
-            simulation_response.data, ExecutionReceipt
-        ):
-            raise TradingError(
-                "MALFORMED_RECEIPT", "Simulation returned an unsuccessful response"
-            )
-        else:
-            receipt = simulation_response.data
-        if (
-            receipt.client_order_id != intent.client_order_id
-            or receipt.intent_id != intent.source_intent_id
-            or receipt.route != intent.route
-            or receipt.request_id != intent.request_id
-            or receipt.correlation_id != intent.correlation_id
-        ):
-            raise TradingError(
-                "MALFORMED_RECEIPT", "Simulation receipt scope mismatches"
-            )
-        return receipt
-    if simulation_dispatch is not None:
-        raise TradingError(
-            "SCOPE_MISMATCH", "Broker dispatch received Simulation authority"
-        )
     selected_connection, selected_adapter = _validate_broker_selection(
         intent,
         connection,
@@ -619,10 +579,6 @@ async def dispatch_order_intent(
     intent: OrderIntent,
     connection: BrokerConnection | None,
     broker_adapter: BrokerAdapter | None,
-    simulation_dispatch: Callable[
-        [OrderIntent], Awaitable[StandardResponse[ExecutionReceipt] | ExecutionReceipt]
-    ]
-    | None,
     *,
     operation_timeout_seconds: Decimal,
     clock: Callable[[], datetime],
@@ -632,8 +588,7 @@ async def dispatch_order_intent(
     Args:
         intent: Complete deterministic executable intent.
         connection: Broker connection material for paper/live routes.
-        broker_adapter: Broker mutation authority for paper/live routes.
-        simulation_dispatch: Simulation mutation callback for sim routes.
+        broker_adapter: Broker mutation authority for the selected route.
         operation_timeout_seconds: Validated exact Broker operation timeout.
         clock: Injected aware UTC receipt clock.
 
@@ -645,7 +600,6 @@ async def dispatch_order_intent(
             intent,
             connection,
             broker_adapter,
-            simulation_dispatch,
             operation_timeout_seconds=operation_timeout_seconds,
             clock=clock,
         )

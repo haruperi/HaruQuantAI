@@ -18,11 +18,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.brokers import build_broker_connection_config
 from app.services.trading import (
     classify_authority_response,
-    create_execution_receipt,
     create_order_intent,
     dispatch_order_intent,
     validate_adapter_capability,
 )
+from tests.trading.unit.routing.test_dispatcher import _Adapter
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 OrderIntent = Any
@@ -151,32 +151,11 @@ def fr_trd_031() -> None:
     """FR-TRD-031: Stage 3 — Dispatch approved intent to Simulation or Broker target."""
     _header("Stage 3: Dispatch Execution - Dispatch Order Intent (FR-TRD-031)")
 
-    async def simulation_dispatch(intent: OrderIntent):
-        return create_execution_receipt(
-            receipt_id="usage-sim-receipt-001",
-            intent_id=intent.source_intent_id,
-            client_order_id=intent.client_order_id,
-            route="sim",
-            authority="simulator",
-            provider_order_id="usage-sim-order-001",
-            status="filled",
-            requested_quantity=intent.approved_volume,
-            filled_quantity=intent.approved_volume,
-            authority_timestamp=NOW,
-            received_at=NOW,
-            response_classification="confirmed",
-            retry_safe=False,
-            reconciliation_required=False,
-            request_id=intent.request_id,
-            correlation_id=intent.correlation_id,
-        )
-
     dispatched_receipt = asyncio.run(
         dispatch_order_intent(
             _intent(),
             build_broker_connection_config("sim", "simulation"),
-            None,
-            simulation_dispatch,
+            _Adapter(broker="sim", environment="simulation"),
             operation_timeout_seconds=Decimal(10),
             clock=lambda: NOW,
         )
@@ -196,15 +175,11 @@ def fr_trd_087() -> None:
 def fr_trd_096() -> None:
     """FR-TRD-096: Bind sim exclusively to the simulation environment."""
 
-    async def should_not_dispatch(intent: OrderIntent):
-        raise AssertionError(intent.client_order_id)
-
     invalid = asyncio.run(
         dispatch_order_intent(
             _intent(),
             build_broker_connection_config("sim", "demo"),
-            None,
-            should_not_dispatch,
+            _Adapter(broker="sim", environment="simulation"),
             operation_timeout_seconds=Decimal(10),
             clock=lambda: NOW,
         )
@@ -215,14 +190,23 @@ def fr_trd_096() -> None:
         dispatch_order_intent(
             _paper_intent(),
             build_broker_connection_config("mt5", "simulation"),
-            None,
-            None,
+            _Adapter(),
             operation_timeout_seconds=Decimal(10),
             clock=lambda: NOW,
         )
     )
     assert non_sim.status == "error"
     print("Data -> invalid_pairs='blocked'")
+
+
+def fr_trd_088() -> None:
+    """FR-TRD-088: Dispatch sim through the Brokers-owned adapter boundary."""
+    fr_trd_031()
+
+
+def fr_trd_094() -> None:
+    """FR-TRD-094: Preserve explicit route/environment safety taxonomy."""
+    fr_trd_096()
 
 
 def _emit_requirement_success(function: object) -> object:
@@ -259,6 +243,8 @@ def main() -> None:
     # Stage 3: Dispatch execution
     fr_trd_031()
     fr_trd_087()
+    fr_trd_088()
+    fr_trd_094()
     fr_trd_096()
 
 

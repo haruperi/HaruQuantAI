@@ -9,8 +9,6 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Protocol
 
 from app.services.trading.contracts import (
-    ExecutionReceipt,
-    OrderIntent,
     PortfolioRebalanceExecutionRequest,
     TradingError,
     TradingRequest,
@@ -57,9 +55,6 @@ class _BrokerSymbolInfo(Protocol):
 
 
 type SymbolCapability = tuple[Mapping[str, JsonValue], _BrokerSymbolInfo]
-type SimulationDispatch = Callable[
-    [OrderIntent], Awaitable[StandardResponse[ExecutionReceipt]]
-]
 type AccountStateSource = Callable[[TradingRequest], AccountStateSnapshot]
 type SymbolCapabilitySource = Callable[
     [TradingRoute, str | None, str], SymbolCapability
@@ -121,7 +116,6 @@ class TradingDependencies:
         store: Trading-owned state persistence port.
         connection: Composition-created Broker connection for paper/live.
         broker_adapter: Injected asynchronous Broker adapter for paper/live.
-        simulation_dispatch: Injected Simulation mutation port for sim.
         live_session: Stateful live/paper gate owner.
         clock: Aware UTC clock.
         idempotency_retention_seconds: Required positive reservation lifetime.
@@ -153,7 +147,6 @@ class TradingDependencies:
     store: TradingStateStore
     connection: BrokerConnection | None
     broker_adapter: BrokerAdapter | None
-    simulation_dispatch: SimulationDispatch | None
     live_session: LiveSession | None
     clock: Callable[[], datetime]
     idempotency_retention_seconds: int

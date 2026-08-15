@@ -1,6 +1,7 @@
 """Function-only public boundary for the complete Trading domain."""
 
 from app.services.trading.actions import (
+    build_approved_trading_request,
     cancel_all_orders,
     cancel_order,
     clear_kill_switch,
@@ -140,6 +141,7 @@ __all__: tuple[str, ...] = (
     "apply_order_fill",
     "assess_execution_readiness",
     "assign_trade_ownership",
+    "build_approved_trading_request",
     "build_broker_state_unknown_event",
     "build_economic_execution_event",
     "build_execution_audit_record",

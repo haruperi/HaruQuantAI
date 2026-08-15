@@ -96,7 +96,6 @@ async def test_cycle_submits_intent_and_never_sizes() -> None:
         deps,
         connection=connection,
         broker_adapter=cast("object", adapter),
-        simulation_dispatch=None,
         live_session=session,
     )
 

@@ -51,7 +51,9 @@ def evidence() -> dict[str, object]:
         "correlation_id": "cor-33333333-3333-4333-8333-333333333333",
         "account_id": "account-001",
         "action_policy_verdict_id": "policy-001",
-        "canonical_material_version": "v1",
+        "canonical_material_version": "v2",
+        "fill_policy": "FOK",
+        "time_policy": "GTC",
     }
 
 

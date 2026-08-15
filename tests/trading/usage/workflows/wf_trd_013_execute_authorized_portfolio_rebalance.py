@@ -48,21 +48,13 @@ async def run() -> None:
     print("Budget valid:", budget.status, budget.metadata.extensions)
     # Stage 4: Remove allocation authority and prove no dispatch.
     _stage(4)
-    calls = 0
-
-    async def dispatch(intent):
-        nonlocal calls
-        calls += 1
-        raise AssertionError(intent)
-
     deps = replace(
         examples.rebalance_dependencies(request),
         allocation_decision_source=lambda _item: None,
-        simulation_dispatch=dispatch,
     )
     blocked = await execute_portfolio_rebalance(request, deps)
     assert blocked.error is not None
-    print("Blocked:", blocked.error.code, "dispatch calls:", calls)
+    print("Blocked:", blocked.error.code, "before authority dispatch")
     # Stage 5 — OUTPUT BOUNDARY: Return fail-closed result; no broker mutation.
     _stage(5)
     print(

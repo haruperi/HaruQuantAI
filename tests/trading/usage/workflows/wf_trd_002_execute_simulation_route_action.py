@@ -64,7 +64,6 @@ async def run() -> None:
         intent,
         dependencies.connection,
         dependencies.broker_adapter,
-        dependencies.simulation_dispatch,
         operation_timeout_seconds=dependencies.broker_operation_timeout_seconds,
         clock=dependencies.clock,
     )

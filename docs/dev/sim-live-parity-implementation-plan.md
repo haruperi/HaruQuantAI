@@ -2725,7 +2725,7 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] Every owning-domain phase behavior gate passed. Evidence: 676 Brokers baseline with documented pre-existing failures; 432 Simulator tests passed with `--no-cov`.
 - [x] README, changelog, and listed system documents reconciled. Evidence: owning READMEs, changelog, project index, and this plan.
 - [x] STOP conditions and rollback path were rechecked. Evidence: per-unit scope/rollback records above.
-- [x] Commit remains unauthorized, or its separately authorized hash is recorded. Evidence: owner goal-wide commit authorization; Unit 13a hash above and Unit 13b hash will be reconciled in Unit 14a.
+- [x] Commit remains unauthorized, or its separately authorized hash is recorded. Evidence: owner goal-wide commit authorization; Unit 13a hash above and Unit 13b committed as `c657b2a91dd333055d8a13c2f5e7e1c735ae4b85` with the exact prescribed message.
 
 # Phase 14 · Trading cutover — L1
 
@@ -2926,19 +2926,23 @@ refactor(simulator): cut over to Trading execution
 Commit execution is not authorized by phase approval. After separate commit authorization, stage only
 the phase manifest, verify `git diff --cached --name-only`, and use the applicable message verbatim.
 
+**Per-unit status:** 14a Completed 2026-08-16 under the owner's goal-wide standalone approval. `FR-TRD-088`–`094` and `FR-TRD-113` converge approved simulation and broker mutations on the same Trading action and Brokers adapter/response-classification boundary at `app/services/trading/actions/orders.py:433` and `app/services/trading/routing/dispatcher.py:515`; the private callback and dispatcher route branch are absent. The root builder at `app/services/trading/actions/runtime.py:172` returns provider-bound request v2 material without inventing policy dimensions, with alpha-renamed trace/economic identity evidence at `tests/trading/unit/actions/test_approved_request_builder.py:28` and `tests/trading/unit/actions/test_approved_request_builder.py:43`. Exact route authority validation and the sole adapter invocation are at `app/services/trading/routing/dispatcher.py:268` and `app/services/trading/routing/dispatcher.py:371`, with paired route classification and private-import/callback absence at `tests/trading/integration/test_two_route_action_convergence.py:35` and `tests/trading/integration/test_two_route_action_convergence.py:45`. Simulation lifecycle configuration/start/stop is at `app/services/trading/live/config.py:108`, `app/services/trading/live/session.py:509`, and `app/services/trading/live/session.py:633`, proven socket-free at `tests/trading/integration/test_simulation_session_lifecycle.py:69`. Required usage functions are at `tests/trading/usage/features/04_routing.py:202`, `tests/trading/usage/features/04_routing.py:207`, `tests/trading/usage/features/07_live.py:198`, and `tests/trading/usage/features/08_actions.py:307`–`333`; all three programs passed directly. Ruff format/check and full Trading mypy passed. The three exact test files passed all five behaviors; their literal command exited 1 only because repository-wide subset coverage was 18.32%, while its behavioral rerun passed with `--no-cov`. The complete Trading behavior gate passed 258 tests with one credential-dependent MT5 demo skip. The bounded blocker correction made the Phase-6a v2 contract effective in the extracted builder, required explicit fill/time policies plus the provider checksum, admitted v2 through the existing live gate, and preserved v2 when parsing gate intent evidence. No Strategy/Risk decision, live authorization meaning, Simulator production file, or provider transport policy changed. Rollback restores the callback dependency and dispatcher branch, removes the builder/export and Simulation lifecycle admission, reverts migrated callers/tests/usages/documents, and reruns the same Trading gates.
+
 ### Completion checklist
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff format/check and mypy passed for every owning domain.
-- [ ] Every local usage program executed directly and passed.
-- [ ] Every owning-domain phase gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+- [x] Approval matched this exact phase/subphase. Evidence: owner goal-wide standalone approval and Unit 14a status above.
+- [x] Only the local file and documentation manifests changed. Evidence: Trading production/tests/usages plus the exact README, architecture, changelog, and plan manifests.
+- [x] Every listed FR has final `path:line` implementation and test evidence. Evidence: Unit 14a status and owning README requirement rows.
+- [x] Only verified package-root/public dependency contracts were used. Evidence: Simulation authority is injected through Brokers; Trading imports no Simulator production symbol.
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes. Evidence: five tests passed behavior; literal coverage-only exit recorded above.
+- [x] Ruff format/check and mypy passed for every owning domain. Evidence: Trading commands passed.
+- [x] Every local usage program executed directly and passed. Evidence: usages 04, 07, and 08 passed.
+- [x] Every owning-domain phase gate passed. Evidence: 258 Trading behaviors passed; one credential skip recorded.
+- [x] README, changelog, and listed system documents reconciled. Evidence: exact Unit 14a documentation manifest plus this plan.
+- [x] STOP conditions and rollback path were rechecked. Evidence: bounded v2 blocker correction and rollback record above.
+- [x] Commit remains unauthorized, or its separately authorized hash is recorded. Evidence: owner goal-wide commit authorization; hash will be reconciled in Unit 14b.
+
+**Literal full-gate note:** The Unit 14a `uv run pytest tests/trading` command passed 258 behaviors with one credential-dependent MT5 demo skip and exited 1 only on repository-wide coverage of 22.15%; its complete `--no-cov` behavior counterpart passed.
 
 # Phase 15 · Incremental evaluation — L2
 

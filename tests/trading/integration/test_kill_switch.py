@@ -7,6 +7,7 @@ from types import SimpleNamespace
 from typing import cast
 
 import pytest
+from app.services.brokers import get_broker_error_code
 from app.services.data import build_account_order, build_account_state_snapshot
 from app.services.risk import (
     create_action_policy_verdict,
@@ -37,8 +38,8 @@ from tests.trading.conftest import (
     symbol_capability,
     trading_dependencies,
     trading_request,
-    unknown_dispatch,
 )
+from tests.trading.unit.routing.test_dispatcher import _ErrorAdapter
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 ActionPolicyVerdict = object
@@ -174,7 +175,6 @@ def _paper_emergency_dependencies(adapter: CountingAdapter):
         trading_dependencies(store=store),
         connection=connection,
         broker_adapter=cast("object", adapter),
-        simulation_dispatch=None,
         live_session=session,
         account_state_source=lambda _request: _paper_account(),
         action_policy_source=_emergency_policy,
@@ -201,7 +201,11 @@ async def test_kill_switch_blocks_and_reports_partial_emergency_results() -> Non
     assert blocked_result.error.code == "KILL_SWITCH_ACTIVE"
     emergency = replace(
         emergency_dependencies("cancel_all_orders"),
-        simulation_dispatch=unknown_dispatch,
+        broker_adapter=_ErrorAdapter(
+            get_broker_error_code("BROKER_RATE_LIMITED"),
+            broker="sim",
+            environment="simulation",
+        ),
     )
     assert (
         await cancel_all_orders(trading_request(action="cancel_all_orders"), emergency)

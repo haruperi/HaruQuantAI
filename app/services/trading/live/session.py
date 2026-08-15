@@ -425,7 +425,11 @@ class LiveSession:
                 and self._config is not None
                 and self._config.execution_route == "live"
             ),
-            requires_network=not operation.endswith(".status"),
+            requires_network=(
+                not operation.endswith(".status")
+                and self._config is not None
+                and self._config.execution_route in {"paper", "live"}
+            ),
             legacy_status=status,
             extensions={
                 "route": self._config.execution_route if self._config else None
@@ -542,7 +546,8 @@ class LiveSession:
                 data=self._status_data(),
             )
         mutation_requested = (
-            self.config.execution_route == "paper" or self.config.allow_live_mutations
+            self.config.execution_route in {"sim", "paper"}
+            or self.config.allow_live_mutations
         )
         self._admission_enabled = mutation_requested
         self._health = "ready" if mutation_requested else "package_only"

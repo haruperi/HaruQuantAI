@@ -3,7 +3,6 @@
 # ruff: noqa: INP001
 
 import asyncio
-from collections.abc import Awaitable, Callable
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -54,14 +53,12 @@ async def dispatch_order_intent(
     intent: OrderIntent,
     connection: object | None,
     broker_adapter: object | None,
-    simulation_dispatch: Callable[[OrderIntent], Awaitable[ExecutionReceipt]] | None,
 ) -> ExecutionReceipt:
     """Invoke the public dispatcher with explicit deterministic runtime policy."""
     result = await _dispatch_order_intent(
         intent,
         connection,
         broker_adapter,
-        simulation_dispatch,
         operation_timeout_seconds=Decimal(10),
         clock=lambda: NOW,
     )
@@ -160,11 +157,13 @@ class _Adapter:
     contract_version = "v1"
     schema_id = "brokers.adapter.v1"
 
-    def __init__(self) -> None:
+    def __init__(self, *, broker: str = "mt5", environment: str = "demo") -> None:
         """Initialize observable mutation evidence."""
         self.calls = 0
         self.request: object | None = None
         self.mutations: list[object] = []
+        self.broker = broker
+        self.environment = environment
 
     def _order_result(
         self,
@@ -173,10 +172,10 @@ class _Adapter:
         """Build one acknowledged Broker order result."""
         return broker_response(
             operation,
-            broker=get_broker_id("mt5"),
+            broker=get_broker_id(self.broker),
             request_id=BROKER_REQUEST_ID,
             timestamp=NOW,
-            environment=get_broker_environment("demo"),
+            environment=get_broker_environment(self.environment),
             adapter_version="test-v1",
             data=build_broker_value(
                 "order_result",
@@ -225,10 +224,10 @@ class _Adapter:
         self.mutations.append(request)
         return broker_response(
             get_broker_capability_id("modify_position"),
-            broker=get_broker_id("mt5"),
+            broker=get_broker_id(self.broker),
             request_id=BROKER_REQUEST_ID,
             timestamp=NOW,
-            environment=get_broker_environment("demo"),
+            environment=get_broker_environment(self.environment),
             adapter_version="test-v1",
             data=build_broker_value(
                 "position",
@@ -254,9 +253,11 @@ class _Adapter:
 class _ErrorAdapter(_Adapter):
     """Test adapter returning one canonical Broker failure."""
 
-    def __init__(self, code: object) -> None:
+    def __init__(
+        self, code: object, *, broker: str = "mt5", environment: str = "demo"
+    ) -> None:
         """Initialize the selected Broker failure code."""
-        super().__init__()
+        super().__init__(broker=broker, environment=environment)
         self.code = code
 
     async def place_order(
@@ -266,17 +267,29 @@ class _ErrorAdapter(_Adapter):
         """Return one explicit or ambiguous Broker failure."""
         self.calls += 1
         self.mutations.append(request)
+        return self._error_result(get_broker_capability_id("place_order"))
+
+    def _error_result(self, operation: object) -> StandardResponse[object]:
+        """Return one selected canonical Broker failure."""
         return broker_response(
-            get_broker_capability_id("place_order"),
-            broker=get_broker_id("mt5"),
+            operation,
+            broker=get_broker_id(self.broker),
             request_id=BROKER_REQUEST_ID,
             timestamp=NOW,
-            environment=get_broker_environment("demo"),
+            environment=get_broker_environment(self.environment),
             adapter_version="test-v1",
             error=build_broker_value(
                 "error", code=self.code, message="Redacted Broker failure"
             ),
         )
+
+    async def cancel_order(
+        self, order_id: str, client_request_id: str | None = None
+    ) -> StandardResponse[object]:
+        """Return the selected failure for cancellation."""
+        self.calls += 1
+        self.mutations.append((order_id, client_request_id))
+        return self._error_result(get_broker_capability_id("cancel_order"))
 
 
 class _TimeoutAdapter(_Adapter):
@@ -312,7 +325,6 @@ def test_dispatch_has_single_mutation_boundary() -> None:
             _intent(),
             _connection(),
             adapter,
-            None,
         )
     )
     assert adapter.calls == 1
@@ -337,7 +349,6 @@ def test_dispatch_has_single_mutation_boundary() -> None:
                 _intent(action=action),
                 _connection(),
                 adapter,
-                None,
             )
         )
     assert (
@@ -364,7 +375,6 @@ def test_dispatch_has_single_mutation_boundary() -> None:
             _intent(),
             _connection(),
             rejected_adapter,
-            None,
         )
     )
     assert rejected_receipt.status == "rejected"
@@ -376,7 +386,6 @@ def test_dispatch_has_single_mutation_boundary() -> None:
             _intent(),
             _connection(),
             limited_adapter,
-            None,
             operation_timeout_seconds=Decimal(10),
             clock=lambda: NOW,
         )
@@ -387,38 +396,14 @@ def test_dispatch_has_single_mutation_boundary() -> None:
     assert limited_response.error.code == "UNKNOWN_OUTCOME"
     assert limited_response.metadata.extensions["legacy_status"] == "unknown_outcome"
 
-    simulation_calls = 0
-
-    async def simulation_dispatch(intent: OrderIntent) -> ExecutionReceipt:
-        """Return one canonical simulated fill."""
-        nonlocal simulation_calls
-        simulation_calls += 1
-        return ExecutionReceipt(
-            receipt_id="sim-receipt-001",
-            intent_id=intent.source_intent_id,
-            client_order_id=intent.client_order_id,
-            route="sim",
-            authority="simulator",
-            provider_order_id="sim-order-001",
-            status="filled",
-            requested_quantity=intent.approved_volume,
-            filled_quantity=intent.approved_volume,
-            authority_timestamp=NOW,
-            received_at=NOW,
-            response_classification="confirmed",
-            retry_safe=False,
-            reconciliation_required=False,
-            request_id=intent.request_id,
-            correlation_id=intent.correlation_id,
-        )
-
+    simulation_adapter = _Adapter(broker="sim", environment="simulation")
     sim_receipt = asyncio.run(
         dispatch_order_intent(
-            _intent(route="sim"), _sim_connection(), None, simulation_dispatch
+            _intent(route="sim"), _sim_connection(), simulation_adapter
         )
     )
-    assert simulation_calls == 1
-    assert sim_receipt.status == "filled"
+    assert simulation_adapter.calls == 1
+    assert sim_receipt.status == "accepted"
 
 
 def test_dispatch_rejects_mismatched_authority_selection() -> None:
@@ -426,30 +411,15 @@ def test_dispatch_rejects_mismatched_authority_selection() -> None:
     adapter = _Adapter()
     broker = adapter
     with pytest.raises(TradingError):
-        asyncio.run(dispatch_order_intent(_intent(route="sim"), None, None, None))
+        asyncio.run(dispatch_order_intent(_intent(route="sim"), None, None))
     with pytest.raises(TradingError):
-        asyncio.run(dispatch_order_intent(_intent(), None, None, None))
+        asyncio.run(dispatch_order_intent(_intent(), None, None))
     with pytest.raises(TradingError):
         asyncio.run(
             dispatch_order_intent(
                 _intent(route="sim"),
                 _connection(),
                 broker,
-                None,
-            )
-        )
-
-    async def unused_simulation(intent: OrderIntent) -> ExecutionReceipt:
-        """Fail if a mismatched callback is ever invoked."""
-        raise AssertionError(intent.client_order_id)
-
-    with pytest.raises(TradingError):
-        asyncio.run(
-            dispatch_order_intent(
-                _intent(),
-                _connection(),
-                broker,
-                unused_simulation,
             )
         )
     with pytest.raises(TradingError):
@@ -458,7 +428,6 @@ def test_dispatch_rejects_mismatched_authority_selection() -> None:
                 _intent(),
                 replace(_connection(), provider_enabled=False),
                 broker,
-                None,
             )
         )
     with pytest.raises(TradingError):
@@ -467,7 +436,6 @@ def test_dispatch_rejects_mismatched_authority_selection() -> None:
                 _intent(),
                 replace(_connection(), broker_id=get_broker_id("ctrader")),
                 broker,
-                None,
             )
         )
     with pytest.raises(TradingError):
@@ -476,7 +444,6 @@ def test_dispatch_rejects_mismatched_authority_selection() -> None:
                 _intent(route="live"),
                 _connection(),
                 broker,
-                None,
             )
         )
     with pytest.raises(TradingError):
@@ -485,7 +452,6 @@ def test_dispatch_rejects_mismatched_authority_selection() -> None:
                 _intent(),
                 replace(_connection(), environment=get_broker_environment("live")),
                 broker,
-                None,
             )
         )
 
@@ -501,7 +467,6 @@ def test_timeout_replay_has_deterministic_receipt_identity() -> None:
             _intent(),
             _connection(),
             _TimeoutAdapter(),
-            None,
             operation_timeout_seconds=Decimal("0.001"),
             clock=lambda: NOW,
         )
@@ -520,7 +485,6 @@ def test_provider_exception_becomes_redacted_unknown_receipt() -> None:
             _intent(),
             _connection(),
             _RaisingAdapter(),
-            None,
             operation_timeout_seconds=Decimal(10),
             clock=lambda: NOW,
         )

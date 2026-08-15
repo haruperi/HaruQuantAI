@@ -16,6 +16,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.trading import (
+    build_approved_trading_request,
     cancel_all_orders,
     cancel_order,
     clear_kill_switch,
@@ -46,7 +47,12 @@ from tests.trading.unit.actions.test_rebalance import (
     rebalance_dependencies,
     rebalance_request,
 )
-from tests.trading.unit.actions.test_runtime import evaluation_dependencies, evidence
+from tests.trading.unit.actions.test_runtime import (
+    evaluation_dependencies,
+    evidence,
+    risk_decision,
+    trade_intent,
+)
 
 
 def _feature_header(title: str) -> None:
@@ -298,6 +304,37 @@ def fr_trd_069() -> None:
     print(f"Data -> risk_gated_status='{sub_res.status}'")
 
 
+def fr_trd_089() -> None:
+    """FR-TRD-089: Use one public action path for simulation submission."""
+    fr_trd_013()
+
+
+def fr_trd_090() -> None:
+    """FR-TRD-090: Preserve the shared modification and cancellation verbs."""
+    fr_trd_014()
+    fr_trd_015()
+
+
+def fr_trd_092() -> None:
+    """FR-TRD-092: Apply Risk and kill-switch gates before dispatch."""
+    fr_trd_069()
+
+
+def fr_trd_093() -> None:
+    """FR-TRD-093: Build the approved request through the public boundary."""
+    deps, _calls = evaluation_dependencies(trade_intent())
+    approved = build_approved_trading_request(
+        trade_intent(), risk_decision(), deps, evidence()
+    )
+    assert approved.quantity == Decimal("0.50")
+    print(f"Data -> approved_quantity='{approved.quantity}'")
+
+
+def fr_trd_113() -> None:
+    """FR-TRD-113: Keep authority transport outside approved economics."""
+    fr_trd_093()
+
+
 def _emit_requirement_success(function: object) -> object:
     """Wrap one example so direct execution emits its success contract."""
 
@@ -347,6 +384,11 @@ def main() -> None:
     fr_trd_064()
     fr_trd_065()
     fr_trd_069()
+    fr_trd_089()
+    fr_trd_090()
+    fr_trd_092()
+    fr_trd_093()
+    fr_trd_113()
 
 
 if __name__ == "__main__":

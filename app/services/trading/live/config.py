@@ -105,10 +105,10 @@ class _LiveRuntimeConfig(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid", populate_by_name=True)
 
-    runtime_profile: Literal["paper", "live"] = Field(
+    runtime_profile: Literal["sim", "paper", "live"] = Field(
         validation_alias=AliasChoices("RUNTIME_PROFILE", "runtime_profile")
     )
-    execution_route: Literal["paper", "live"] = Field(
+    execution_route: Literal["sim", "paper", "live"] = Field(
         validation_alias=AliasChoices("EXECUTION_ROUTE", "execution_route")
     )
     allow_live_mutations: bool = Field(

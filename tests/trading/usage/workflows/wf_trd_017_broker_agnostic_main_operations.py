@@ -61,7 +61,7 @@ Target = Literal["sim", "mt5", "ctrader"]
 
 # Change only this line to select the execution target. Broker targets still
 # require verified non-production settings and explicit mutation opt-in.
-EXECUTION_TARGET: Target = "mt5"
+EXECUTION_TARGET: Target = "sim"
 
 WORKFLOW_ID = "WF-TRD-017"
 STAGES = (
@@ -1066,7 +1066,6 @@ def _dependencies(
             broker_adapter=context.adapter,
             connection=context.connection,
             account_state_source=_fresh_account_state,
-            simulation_dispatch=None,
         )
     return deps
 

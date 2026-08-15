@@ -125,7 +125,6 @@ async def test_live_dispatch_completes_single_broker_mutation() -> None:
         trading_dependencies(store=store),
         connection=broker_connection(),
         broker_adapter=cast("object", adapter),
-        simulation_dispatch=None,
         live_session=session,
     )
 
@@ -149,7 +148,6 @@ async def test_live_dispatch_completes_single_broker_mutation() -> None:
         trading_dependencies(store=MemoryStore()),
         connection=broker_connection(),
         broker_adapter=cast("object", blocked_adapter),
-        simulation_dispatch=None,
         live_session=blocked_session,
     )
     blocked = await submit_order(request, blocked_deps)

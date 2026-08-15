@@ -49,10 +49,7 @@ async def run() -> None:
     print("Blocked:", blocked.error.code, blocked.error.details)
     # Stage 3: Emergency control uses governed Simulation authority.
     _stage(3)
-    emergency = replace(
-        examples.emergency_dependencies("cancel_all_orders"),
-        simulation_dispatch=examples.unknown_dispatch,
-    )
+    emergency = examples.emergency_dependencies("cancel_all_orders")
     # Stage 4: Preserve partial/uncertain children.
     _stage(4)
     outcome = await cancel_all_orders(

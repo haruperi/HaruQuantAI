@@ -12,5 +12,5 @@ async def test_sim_dispatch_uses_simulation_authority() -> None:
     outcome = await submit_order(trading_request(), trading_dependencies())
     assert outcome.status == "success"
     assert outcome.data is not None
-    assert outcome.data.authority == "simulation"
+    assert outcome.data.authority == "sim"
     assert outcome.data.route.value == "sim"

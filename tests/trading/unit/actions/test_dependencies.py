@@ -24,8 +24,6 @@ from app.services.risk import (
 from app.services.trading import create_trading_dependencies
 from app.services.trading.actions import TradingDependencies
 from app.services.trading.contracts import (
-    ExecutionReceipt,
-    OrderIntent,
     PortfolioRebalanceExecutionRequest,
     TradingError,
     TradingRequest,
@@ -40,6 +38,8 @@ from app.services.trading.state import (
     set_execution_position,
 )
 from app.utils import get_logger
+
+from tests.trading.unit.routing.test_dispatcher import _Adapter
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 ActionPolicyVerdict = object
@@ -354,6 +354,9 @@ def symbol_capability(route, provider_id, symbol):
             "reduce_exposure",
         ],
         "supported_order_types": ["MARKET", "LIMIT", "STOP", "STOP_LIMIT"],
+        "filling_modes": ["FOK", "IOC", "RETURN"],
+        "expiration_modes": ["GTC", "DAY", "SPECIFIED", "SPECIFIED_DAY"],
+        "provider_specification_checksum": "b" * 64,
         "quantity_unit": "lots",
         "security_profile": "approved",
         "operation_timeout_seconds": "10",
@@ -374,28 +377,6 @@ def symbol_capability(route, provider_id, symbol):
         price_step=Decimal("0.0001"),
     )
     return capability, info
-
-
-async def simulation_dispatch(intent: OrderIntent) -> ExecutionReceipt:
-    """Return one accepted Simulation authority receipt."""
-    return ExecutionReceipt(
-        receipt_id=f"receipt-{intent.request_id}",
-        intent_id=intent.source_intent_id,
-        client_order_id=intent.client_order_id,
-        route=intent.route,
-        authority="simulation",
-        provider_order_id="sim-order-001",
-        status="accepted",
-        requested_quantity=intent.approved_volume,
-        filled_quantity=Decimal(0),
-        authority_timestamp=NOW,
-        received_at=NOW,
-        response_classification="accepted",
-        retry_safe=False,
-        reconciliation_required=False,
-        request_id=intent.request_id,
-        correlation_id=intent.correlation_id,
-    )
 
 
 def rebalance_action_resolver(
@@ -462,8 +443,7 @@ def dependencies(
     return TradingDependencies(
         store=memory,
         connection=build_broker_connection_config("sim", "simulation"),
-        broker_adapter=None,
-        simulation_dispatch=simulation_dispatch,
+        broker_adapter=_Adapter(broker="sim", environment="simulation"),
         live_session=None,
         clock=lambda: NOW,
         idempotency_retention_seconds=600,
@@ -540,7 +520,8 @@ def test_dependencies_have_no_import_side_effect() -> None:
     assert deps.connection.environment == "simulation"
     assert deps.connection.credentials is None
     assert deps.connection.endpoint is None
-    assert deps.broker_adapter is None
+    assert deps.broker_adapter is not None
+    assert deps.broker_adapter.calls == 0
 
 
 def test_dependencies_are_immutable() -> None:

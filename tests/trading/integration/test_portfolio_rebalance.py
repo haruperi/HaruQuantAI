@@ -1,6 +1,5 @@
 """Negative workflow integration for governed portfolio rebalance execution."""
 
-# ruff: noqa: PLR0915
 from dataclasses import replace
 from datetime import timedelta
 
@@ -22,24 +21,19 @@ from tests.trading.conftest import (
     rebalance_dependencies,
     rebalance_request,
 )
+from tests.trading.unit.routing.test_dispatcher import _Adapter
 
 
 @pytest.mark.anyio
 async def test_rebalance_cannot_bypass_risk_or_open_to_match_weight() -> None:
     """Reject absent Risk, mismatched budget, opening actions, and tampering."""
     item = rebalance_request()
-    dispatch_calls = 0
-
-    async def counted_dispatch(intent):
-        """Count any forbidden Simulation dispatch attempt."""
-        nonlocal dispatch_calls
-        dispatch_calls += 1
-        raise AssertionError(intent.client_order_id)
+    adapter = _Adapter(broker="sim", environment="simulation")
 
     missing = replace(
         rebalance_dependencies(item),
         allocation_decision_source=lambda _request: None,
-        simulation_dispatch=counted_dispatch,
+        broker_adapter=adapter,
     )
     missing_result = await execute_portfolio_rebalance(item, missing)
     assert missing_result.status == "error"
@@ -52,7 +46,7 @@ async def test_rebalance_cannot_bypass_risk_or_open_to_match_weight() -> None:
     expired_deps = replace(
         rebalance_dependencies(item),
         allocation_decision_source=lambda _request: expired,
-        simulation_dispatch=counted_dispatch,
+        broker_adapter=adapter,
     )
     expired_result = await execute_portfolio_rebalance(item, expired_deps)
     assert expired_result.status == "error"
@@ -66,14 +60,13 @@ async def test_rebalance_cannot_bypass_risk_or_open_to_match_weight() -> None:
     rejected_deps = replace(
         rebalance_dependencies(item),
         allocation_decision_source=lambda _request: rejected,
-        simulation_dispatch=counted_dispatch,
+        broker_adapter=adapter,
     )
     rejected_result = await execute_portfolio_rebalance(item, rejected_deps)
     assert rejected_result.status == "error"
     assert rejected_result.error is not None
     assert rejected_result.error.code == "BUDGET_BLOCKED"
-    assert dispatch_calls == 0
-    assert missing.broker_adapter is None
+    assert adapter.calls == 0
 
     budget_data = rebalance_budget(item).model_dump(mode="python")
     budget_data.update({"plan_id": "wrong-plan", "plan_hash": "b" * 64})

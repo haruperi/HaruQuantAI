@@ -11,6 +11,7 @@ import pytest
 from app.services.brokers import build_broker_connection_config
 from app.services.trading.contracts import ExecutionReceipt, OrderIntent, TradingError
 from app.services.trading.routing.dispatcher import _dispatch_order_intent_value
+from tests.trading.unit.routing.test_dispatcher import _Adapter
 
 NOW = datetime(2026, 8, 15, tzinfo=UTC)
 
@@ -52,35 +53,6 @@ def _intent(route: str = "sim") -> OrderIntent:
     )
 
 
-async def _simulation_dispatch(intent: OrderIntent) -> ExecutionReceipt:
-    """Return a scope-matching deterministic simulation receipt.
-
-    Args:
-        intent: Dispatched intent.
-
-    Returns:
-        Confirmed simulated receipt.
-    """
-    return ExecutionReceipt(
-        receipt_id="receipt-route-selection",
-        intent_id=intent.source_intent_id,
-        client_order_id=intent.client_order_id,
-        route="sim",
-        authority="simulation",
-        provider_order_id="sim-order-route-selection",
-        status="filled",
-        requested_quantity=intent.approved_volume,
-        filled_quantity=intent.approved_volume,
-        authority_timestamp=NOW,
-        received_at=NOW,
-        response_classification="confirmed",
-        retry_safe=False,
-        reconciliation_required=False,
-        request_id=intent.request_id,
-        correlation_id=intent.correlation_id,
-    )
-
-
 def _dispatch(intent: OrderIntent, connection: object) -> ExecutionReceipt:
     """Dispatch with deterministic runtime policy.
 
@@ -95,8 +67,7 @@ def _dispatch(intent: OrderIntent, connection: object) -> ExecutionReceipt:
         _dispatch_order_intent_value(
             intent,
             connection,
-            None,
-            _simulation_dispatch,
+            _Adapter(broker="sim", environment="simulation"),
             operation_timeout_seconds=Decimal(1),
             clock=lambda: NOW,
         )
@@ -106,7 +77,7 @@ def _dispatch(intent: OrderIntent, connection: object) -> ExecutionReceipt:
 def test_sim_route_requires_exact_simulation_pair() -> None:
     """The exact sim/simulation pair dispatches once."""
     connection = build_broker_connection_config("sim", "simulation")
-    assert _dispatch(_intent(), connection).status == "filled"
+    assert _dispatch(_intent(), connection).status == "accepted"
 
 
 @pytest.mark.parametrize("environment", ["live", "demo", "testnet", "sandbox"])

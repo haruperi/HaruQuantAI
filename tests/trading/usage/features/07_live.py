@@ -195,6 +195,12 @@ def fr_trd_036() -> None:
     print(f"Data -> status='{gate_res.status}'")
 
 
+def fr_trd_091() -> None:
+    """FR-TRD-091: Apply the governed session lifecycle to route admission."""
+    fr_trd_033()
+    fr_trd_035()
+
+
 def _emit_requirement_success(function: object) -> object:
     """Wrap one example so direct execution emits its success contract."""
 
@@ -228,6 +234,7 @@ def main() -> None:
     # Stage 2: Startup reconciliation & Gate evaluation
     fr_trd_033()
     fr_trd_036()
+    fr_trd_091()
 
     # Stage 3: Status reporting & Graceful shutdown
     fr_trd_034()
