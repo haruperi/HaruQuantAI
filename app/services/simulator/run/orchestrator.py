@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
@@ -653,12 +654,12 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - governed lifecycle.
         ) from error
 
 
-def run_backtest(
+async def run_backtest_async(
     request: SimulationBacktestRequestV1,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
 ) -> SimulationResult:
-    """Execute and publish one governed deterministic canonical FX run.
+    """Execute and publish one governed deterministic canonical FX run asynchronously.
 
     Args:
         request: Exact receiver-owned backtest request.
@@ -685,4 +686,27 @@ def run_backtest(
     return result
 
 
-__all__ = ["run_backtest"]
+def run_backtest(
+    request: SimulationBacktestRequestV1,
+    auth_context: AuthContext,
+    dependencies: SimulationRunDependencies,
+) -> SimulationResult:
+    """Execute the async run bridge outside an active event loop.
+
+    Returns:
+        Completed canonical result.
+
+    Raises:
+        SimulationError: If called inside an active event loop.
+    """
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(run_backtest_async(request, auth_context, dependencies))
+    raise SimulationError(
+        "SIM_UNSUPPORTED_OPERATION",
+        "Synchronous backtest cannot run inside an active event loop",
+    )
+
+
+__all__ = ["run_backtest", "run_backtest_async"]

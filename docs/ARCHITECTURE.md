@@ -437,6 +437,13 @@ immutable checksummed revisions under half-open UTC effective intervals. A
 successor closes the prior interval atomically; point-in-time and bounded reads
 must prove complete coverage and never backdate a current observation without
 explicit owner-supplied provenance (`FR-DATA-214`–`216`).
+Simulation binds that history into `SimulationBacktestRequestV2` without
+importing Data or Brokers types: immutable revision reference projections must
+continuously cover the run interval and match its demo/live certification
+target. V2 configuration identity also covers execution-model, independent
+source/tick lineage, market-evidence class, point-in-time availability policy,
+complete initial authority state, and terminal-close policy. The V2-native
+async operation retains a synchronous bridge only outside an active event loop.
 
 ### Agentic Runtime and Trust Boundaries
 

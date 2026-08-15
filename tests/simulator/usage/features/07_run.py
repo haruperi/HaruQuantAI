@@ -5,6 +5,7 @@ Demonstrates FEAT-SIM-07 running official backtests, portfolio backtests, fast r
 
 from __future__ import annotations
 
+import asyncio
 import sys
 import tempfile
 from datetime import timedelta
@@ -18,8 +19,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.simulator import (
     calculate_portfolio_backtest_config_hash,
     calculate_simulation_backtest_config_hash,
+    calculate_simulation_backtest_v2_config_hash,
     create_simulation_value,
     run_backtest,
+    run_backtest_async,
     run_fast_research,
     run_portfolio_backtest,
     unwrap_simulation_response,
@@ -111,6 +114,47 @@ def _build_request(
         operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
     )
     return create_simulation_value("SimulationBacktestRequestV1", **payload)
+
+
+def _build_request_v2(dataset: object) -> object:
+    """Build one parity-identity V2 request through the public API."""
+    payload = dict(_build_request(dataset).model_dump(mode="python", warnings=False))
+    payload.pop("contract_version")
+    payload.pop("schema_id")
+    payload.pop("config_hash")
+    payload.update(
+        {
+            "execution_model_ref": "execution-model-v1",
+            "execution_model_hash": "e" * 64,
+            "source_lineage_hash": "f" * 64,
+            "tick_lineage_hash": "1" * 64,
+            "market_evidence_class": "genuine_bid_ask_ticks",
+            "decision_instant_policy": "point_in_time_available_at",
+            "provider_specification_revisions": (
+                {
+                    "revision_id": "revision-1",
+                    "checksum": "2" * 64,
+                    "provider": "mt5",
+                    "server": "demo-server",
+                    "environment": "demo",
+                    "account_digest": "3" * 64,
+                    "symbol": "EURUSD",
+                    "observed_at": dataset.start,
+                    "effective_from": dataset.start,
+                    "effective_to": None,
+                    "historical_provenance": None,
+                },
+            ),
+            "initial_authority_state_hash": "4" * 64,
+            "certification_target": "demo",
+            "close_open_positions_at_end": True,
+        }
+    )
+    payload["config_hash"] = unwrap_simulation_response(
+        calculate_simulation_backtest_v2_config_hash(payload),
+        operation="usage.request_v2.calculate_config_hash",
+    )
+    return create_simulation_value("SimulationBacktestRequestV2", **payload)
 
 
 def _build_portfolio_request(
@@ -275,6 +319,69 @@ def fr_sim_031() -> None:
         print(f"Data -> canonical={result.canonical}")
 
 
+def fr_sim_196() -> None:
+    """FR-SIM-196: Bind complete execution identity in request V2."""
+    _header("Request V2 Execution Identity (FR-SIM-196)")
+    request = _build_request_v2(live_tick_dataset())
+    print(_format_result(request))
+    print(f"Data -> schema='{request.schema_id}'")
+
+
+def fr_sim_231() -> None:
+    """FR-SIM-231: Construct the complete frozen V2 request."""
+    _header("Complete Backtest Request V2 (FR-SIM-231)")
+    request = _build_request_v2(live_tick_dataset())
+    print(_format_result(request))
+    print(f"Data -> revisions={len(request.provider_specification_revisions)}")
+
+
+def fr_sim_232() -> None:
+    """FR-SIM-232: Bind execution model and initial authority state."""
+    _header("Execution and Initial-State Identity (FR-SIM-232)")
+    request = _build_request_v2(live_tick_dataset())
+    print(f"Data -> execution_model='{request.execution_model_ref}'")
+    print(f"Data -> initial_state_hash='{request.initial_authority_state_hash}'")
+
+
+def fr_sim_233() -> None:
+    """FR-SIM-233: Bind separate source and tick lineage."""
+    _header("Source and Tick Lineage (FR-SIM-233)")
+    request = _build_request_v2(live_tick_dataset())
+    print(f"Data -> market_evidence='{request.market_evidence_class}'")
+    print(
+        f"Data -> source/tick distinct={request.source_lineage_hash != request.tick_lineage_hash}"
+    )
+
+
+def fr_sim_234() -> None:
+    """FR-SIM-234: Bind certificate target and terminal-close policy."""
+    _header("Certification and Terminal-Close Policy (FR-SIM-234)")
+    request = _build_request_v2(live_tick_dataset())
+    print(f"Data -> target='{request.certification_target}'")
+    print(f"Data -> close_open_positions={request.close_open_positions_at_end}")
+
+
+def fr_sim_235() -> None:
+    """FR-SIM-235: Execute the V2-native asynchronous operation."""
+    _header("V2 Async Compatibility (FR-SIM-235)")
+    dataset = live_tick_dataset()
+    request = _build_request_v2(dataset)
+
+    async def execute() -> object:
+        """Execute one bounded V2 run."""
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            return await run_backtest_async(
+                request,
+                authority(request),
+                dependencies(Path(tmp_dir), dataset),
+            )
+
+    response = asyncio.run(execute())
+    result = unwrap_simulation_response(response, operation="usage.run_backtest_async")
+    print(_format_result(response))
+    print(f"Data -> async_status='{result.status}'")
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -294,6 +401,12 @@ def main() -> None:
     fr_sim_030()
     fr_sim_034()
     fr_sim_031()
+    fr_sim_196()
+    fr_sim_231()
+    fr_sim_232()
+    fr_sim_233()
+    fr_sim_234()
+    fr_sim_235()
 
 
 if __name__ == "__main__":

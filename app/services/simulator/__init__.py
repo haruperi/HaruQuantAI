@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+from collections.abc import Awaitable, Callable, Mapping
 from importlib import import_module
 from typing import Any, Literal, Protocol, cast
 
@@ -68,6 +68,10 @@ _VALUE_TYPES: Mapping[str, tuple[str, str]] = {
     "SimulationBacktestRequestV1": (
         "app.services.simulator.run",
         "SimulationBacktestRequestV1",
+    ),
+    "SimulationBacktestRequestV2": (
+        "app.services.simulator.run",
+        "SimulationBacktestRequestV2",
     ),
     "SimulationResult": ("app.services.simulator.reporting", "SimulationResult"),
     "SymbolSpecification": (
@@ -138,6 +142,31 @@ def _guarded[**P, T](
     return cast(
         "Callable[P, StandardResponse[T]]",
         guard_operation(
+            function,
+            operation=operation,
+            risk_level=risk_level,
+            read_only=read_only,
+            writes_file=writes_file,
+            modifies_database=modifies_database,
+        ),
+    )
+
+
+def _guarded_async[**P, T](
+    function: Callable[P, Awaitable[T]],
+    *,
+    operation: str,
+    risk_level: RiskLevel,
+    read_only: bool,
+    writes_file: bool = False,
+    modifies_database: bool = False,
+) -> Callable[P, Awaitable[StandardResponse[T]]]:
+    """Return one canonical guarded asynchronous Simulation operation."""
+    from app.services.simulator.errors import guard_async_operation
+
+    return cast(
+        "Callable[P, Awaitable[StandardResponse[T]]]",
+        guard_async_operation(
             function,
             operation=operation,
             risk_level=risk_level,
@@ -478,6 +507,14 @@ def calculate_simulation_backtest_config_hash(
     return cast("StandardResponse[str]", model.calculate_config_hash(payload))
 
 
+def calculate_simulation_backtest_v2_config_hash(
+    payload: Mapping[str, object],
+) -> StandardResponse[str]:
+    """Calculate the complete V2 execution configuration hash."""
+    model = _resolve(_VALUE_TYPES, "SimulationBacktestRequestV2")
+    return cast("StandardResponse[str]", model.calculate_config_hash(payload))
+
+
 def calculate_portfolio_backtest_config_hash(
     payload: Mapping[str, object],
 ) -> StandardResponse[str]:
@@ -793,6 +830,23 @@ def run_backtest(*args: object, **kwargs: object) -> StandardResponse[object]:
     return _guarded(
         _operation("app.services.simulator.run", "run_backtest"),
         operation="simulation.run.run_backtest",
+        risk_level="medium",
+        read_only=False,
+        writes_file=True,
+    )(*args, **kwargs)
+
+
+async def run_backtest_async(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Run one governed canonical Simulation backtest asynchronously."""
+    operation = cast(
+        "Callable[..., Awaitable[object]]",
+        _operation("app.services.simulator.run", "run_backtest_async"),
+    )
+    return await _guarded_async(
+        operation,
+        operation="simulation.run.run_backtest_async",
         risk_level="medium",
         read_only=False,
         writes_file=True,
@@ -1275,6 +1329,7 @@ __all__: tuple[str, ...] = (
     "calculate_margin",
     "calculate_portfolio_backtest_config_hash",
     "calculate_simulation_backtest_config_hash",
+    "calculate_simulation_backtest_v2_config_hash",
     "close_live_simulation_session",
     "compare_parity_evidence",
     "complete_simulation_mission",
@@ -1329,6 +1384,7 @@ __all__: tuple[str, ...] = (
     "resolve_idempotent_run",
     "restore_simulation_session",
     "run_backtest",
+    "run_backtest_async",
     "run_fast_research",
     "run_portfolio_backtest",
     "run_simulator_migrations",

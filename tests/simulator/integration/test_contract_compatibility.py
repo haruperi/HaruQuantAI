@@ -1,4 +1,4 @@
-"""Producer/consumer compatibility tests for Simulation-owned v1 contracts.
+"""Producer/consumer compatibility tests for Simulation-owned contracts.
 
 `docs/PROJECT.md` §5 registers `SimulationBacktestRequestV1`, `SimulationResult`,
 `PortfolioBacktestRequestV1`, and `PortfolioSimulationResult` as Simulation-owned.
@@ -6,8 +6,20 @@ These tests prove the published shapes match what the registered consumers read,
 rather than asserting parity in a comment.
 """
 
+import runpy
+from datetime import datetime
 from decimal import Decimal
+from pathlib import Path
 
+from app.services.brokers import dump_provider_specification_snapshot
+from app.services.data import (
+    build_data_settings,
+    data_settings_context,
+    get_provider_specification_revision,
+    register_provider_specification_revision,
+    run_data_migrations,
+    unwrap_data_response,
+)
 from app.services.simulator import (
     create_simulation_value,
     get_simulation_value_field,
@@ -18,6 +30,7 @@ from app.utils import get_logger
 from tests.simulator.component.test_orchestrator import _dataset, _request
 from tests.simulator.component.test_portfolio_run import _portfolio_request
 from tests.simulator.unit.test_reporting_contracts import _result
+from tests.simulator.unit.test_run_request_v2 import _build, _payload, _rehash
 
 logger = get_logger(__name__)
 
@@ -101,3 +114,76 @@ def test_simulation_result_publishes_the_registered_core_schema() -> None:
         "artifact_manifest_ref",
     }
     assert required <= set(get_simulation_value_fields("SimulationResult"))
+
+
+def test_request_v2_matches_the_registered_execution_identity_schema() -> None:
+    """FR-SIM-231: PROJECT and the producer expose the same V2 identity."""
+    required = {
+        "execution_model_ref",
+        "execution_model_hash",
+        "source_lineage_hash",
+        "tick_lineage_hash",
+        "market_evidence_class",
+        "decision_instant_policy",
+        "provider_specification_revisions",
+        "initial_authority_state_hash",
+        "certification_target",
+        "close_open_positions_at_end",
+    }
+    assert required <= set(get_simulation_value_fields("SimulationBacktestRequestV2"))
+
+
+def test_request_v2_binds_broker_snapshot_persisted_point_in_time(
+    tmp_path: Path,
+) -> None:
+    """Phase 4 integration gate binds public Brokers and Data evidence into V2."""
+    script = Path("tests/brokers/usage/features/18_specifications.py")
+    snapshot = runpy.run_path(str(script))["_snapshot"]()
+    dumped = dump_provider_specification_snapshot(snapshot)
+    settings = build_data_settings(
+        database_url="sqlite:///phase-4c.sqlite3",
+        data_dir=tmp_path,
+        sqlite_busy_timeout_seconds=0.1,
+        write_lock_lease_seconds=30,
+    )
+    with data_settings_context(settings):
+        request_id = "req-44444444-4444-4444-8444-444444444444"
+        unwrap_data_response(
+            run_data_migrations(request_id),
+            operation="test.phase_4c.migrate",
+            request_id=request_id,
+        )
+        register_provider_specification_revision(
+            dumped,
+            effective_from=_request(_dataset(request_id)).start,
+            historical_provenance={"source": "owner-approved-broker-snapshot"},
+            request_id=request_id,
+        )
+        exact = get_provider_specification_revision(
+            provider=str(dumped["broker"]),
+            server=str(dumped["server"]),
+            environment=str(dumped["environment"]),
+            account_digest=str(dumped["account_digest"]),
+            symbol=str(dumped["provider_symbol"]),
+            as_of=_request(_dataset(request_id)).start,
+            request_id=request_id,
+        )
+    payload = _payload()
+    binding = {
+        "revision_id": exact["revision_id"],
+        "checksum": exact["snapshot_checksum"],
+        "provider": exact["broker"],
+        "server": exact["server"],
+        "environment": exact["environment"],
+        "account_digest": exact["account_digest"],
+        "symbol": exact["provider_symbol"],
+        "observed_at": datetime.fromisoformat(str(exact["observed_at"])),
+        "effective_from": datetime.fromisoformat(str(exact["effective_from"])),
+        "effective_to": None
+        if exact["effective_to"] is None
+        else datetime.fromisoformat(str(exact["effective_to"])),
+        "historical_provenance": exact["historical_provenance"],
+    }
+    payload["provider_specification_revisions"] = (binding,)
+    _rehash(payload)
+    assert get_simulation_value_field(_build(payload), "certification_target") == "demo"

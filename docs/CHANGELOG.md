@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Add backtest request V2 execution identity
+
+Simulation now binds complete parity execution identity into an asynchronous-native
+backtest request while retaining the declared V1 compatibility window (`FEAT-SIM-07`, Phase 4c).
+
+#### Added (1)
+
+- Added checksummed request V2 identity for execution model, source/tick lineage, provider-revision coverage, initial authority state, certification target, terminal-close policy, and a fail-closed synchronous bridge.
+
 ### Add effective-dated provider specification history
 
 Data now persists immutable provider-specification revisions and proves exact

@@ -1033,6 +1033,7 @@ usage, rerun replay/compatibility tests.
 
 - **EDIT:** `app/services/simulator/README.md`
 - **EDIT:** `docs/CHANGELOG.md`
+- **EDIT:** `docs/PROJECT.md`
 - **EDIT:** `docs/ARCHITECTURE.md`
 
 Every completed FR/checklist row receives final `path:line` evidence. Where listed, the changelog
@@ -1148,6 +1149,21 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] STOP conditions and rollback path were rechecked. (No migration ID was modified, overlap is rejected through atomic close-and-insert persistence, and no Brokers type crosses the Data boundary; rollback removes migration 010 only while unapplied, otherwise requires a new forward migration.)
 - [x] Commit remains unauthorized, or its separately authorized hash is recorded. (Owner separately authorized the unit 4b commit and correction plan `4b-C1`; the commit uses the exact proposed message below, with its self-referential hash deferred to a later authorized plan record.)
   - Commit hash: pending post-commit record.
+
+**Unit 4c status: Completed — 2026-08-15.**
+
+- [x] Approval matched this exact phase/subphase. (Owner standalone `APPROVED: EXECUTE` approved dry run `4c-DR2` with the recommended V2 schema, provider-revision binding, minimal coroutine bridge, and PROJECT manifest correction.)
+- [x] Only the local file and documentation manifests changed. (Created `tests/simulator/unit/test_run_request_v2.py`; edited Simulator run contracts/orchestrator/package exports, public/export and contract integration evidence, usage 07, Simulator README, PROJECT, ARCHITECTURE, CHANGELOG, and this plan record. State, persistence, journal, reporting, Data, Brokers, and Trading production files were untouched.)
+- [x] Every listed FR has final `path:line` implementation and test evidence. (`FR-SIM-196`, `FR-SIM-231`–`235` rows at `app/services/simulator/README.md:1574-1579`; provider binding and V2 contract at `app/services/simulator/run/contracts.py:238` and `:308`; async/sync operations at `app/services/simulator/run/orchestrator.py:657` and `:689`; unit evidence at `tests/simulator/unit/test_run_request_v2.py:84-157`; usage functions at `tests/simulator/usage/features/07_run.py:322-365`.)
+- [x] Only verified package-root/public dependency contracts were used. (V2 embeds frozen scalar/reference projections rather than Data/Brokers types; the offline integration gate builds a Brokers snapshot and persists/reads it through the Brokers and Data package roots before binding the detached revision into V2.)
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes. (V2/run/public/orchestrator/replay/compatibility/official/cold-identity set → 72 passed in 4.38s; expanded V2 field/identity unit evidence → 17 passed in 1.51s; Brokers→Data→Simulation compatibility gate → 7 passed in 1.16s.)
+- [x] Ruff format/check and mypy passed for every owning domain. (`ruff format` reconciled the approved Simulator/test files; `ruff check` all checks passed; `mypy app/services/simulator` no issues in 80 source files.)
+- [x] Every local usage program executed directly and passed. (`uv run python tests/simulator/usage/features/07_run.py` exited 0 and executed `fr_sim_196()`, `fr_sim_231()`–`fr_sim_235()` through package-root operations.)
+- [x] Every owning-domain phase gate passed for the Phase 4c behavior surface. (`uv run pytest --no-cov -p no:cacheprovider tests/simulator -q` → 342 passed in 30.15s. The literal configured command `uv run pytest tests/simulator -q` ran the then-current 339-test set successfully but exited 1 because repository-wide aggregate coverage was 28.82%, below the global 80% floor; this unchanged whole-application coverage configuration is recorded rather than bypassed.)
+- [x] README, changelog, and listed system documents reconciled. (Completed V2 shared contract at `app/services/simulator/README.md:59` and `docs/PROJECT.md:1094`; architecture binding at `docs/ARCHITECTURE.md:440`; Unreleased entry at `docs/CHANGELOG.md:5`; Phase 4c documentation manifest now includes PROJECT.)
+- [x] STOP conditions and rollback path were rechecked. (Every V2 field has an authoritative owner, hashing uses canonical SHA-256 and excludes only trace/hash fields, V1 remains valid, running-loop sync misuse fails closed, and immutable terminal rows are unchanged. Rollback removes V2/async exports/tests/usage and restores the V1 synchronous entry point.)
+- [x] Commit remains unauthorized, or its separately authorized hash is recorded. (Commit remains unauthorized; exact proposed message is `feat(simulator): add backtest request v2`.)
+  - Commit hash: pending owner authorization.
 
 # Phase 5 · Deterministic execution scheduler
 

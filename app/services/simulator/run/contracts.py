@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Literal, Protocol
+from typing import TYPE_CHECKING, Any, Literal, Protocol, Self, override
 
 from pydantic import (
     BaseModel,
@@ -29,6 +29,7 @@ type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 logger = get_logger(__name__)
+_SHA256_HEX_LENGTH = 64
 
 if TYPE_CHECKING:
     FXConversionEvidence = Any
@@ -228,6 +229,193 @@ class SimulationBacktestRequestV1(BaseModel):
             raise ValueError("Official simulation request must be canonical")
         if self.runtime_profile == "fast_research" and self.canonical:
             raise ValueError("Fast research request cannot be canonical")
+        payload = self.model_dump(mode="python", warnings=False)
+        if self.config_hash != _hash_material(payload):
+            raise ValueError("config_hash does not match request material")
+        return self
+
+
+class ProviderSpecificationRevisionBinding(BaseModel):
+    """Immutable provider-revision identity bound into a V2 request."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    revision_id: str
+    checksum: str
+    provider: str
+    server: str
+    environment: Literal["demo", "live"]
+    account_digest: str
+    symbol: str
+    observed_at: datetime
+    effective_from: datetime
+    effective_to: datetime | None = None
+    historical_provenance: Mapping[str, JsonParameter] | None = None
+
+    @field_validator("checksum", "account_digest")
+    @classmethod
+    def _validate_digest(cls, value: str) -> str:
+        """Validate a lowercase SHA-256 digest.
+
+        Returns:
+            Validated digest.
+
+        Raises:
+            ValueError: If the digest is malformed.
+        """
+        if len(value) != _SHA256_HEX_LENGTH or any(
+            character not in "0123456789abcdef" for character in value
+        ):
+            raise ValueError("provider revision digests must be lowercase SHA-256")
+        return value
+
+    @field_validator("observed_at", "effective_from", "effective_to")
+    @classmethod
+    def _validate_utc(cls, value: datetime | None) -> datetime | None:
+        """Require aware UTC provider-revision bounds.
+
+        Returns:
+            Validated timestamp or ``None``.
+
+        Raises:
+            ValueError: If a timestamp is not aware UTC.
+        """
+        if value is not None and (
+            value.tzinfo is None or value.utcoffset() != timedelta(0)
+        ):
+            raise ValueError("provider revision times must be aware UTC")
+        return value
+
+    @model_validator(mode="after")
+    def _validate_interval(self) -> Self:
+        """Validate interval order and provenance-backed history.
+
+        Returns:
+            Validated binding.
+
+        Raises:
+            ValueError: If bounds or provenance are invalid.
+        """
+        if self.effective_to is not None and self.effective_to <= self.effective_from:
+            raise ValueError("provider revision interval must be positive")
+        if self.effective_from < self.observed_at and not self.historical_provenance:
+            raise ValueError("historical provider revision requires provenance")
+        if self.historical_provenance is not None:
+            canonical_json(self.historical_provenance)
+        return self
+
+
+class SimulationBacktestRequestV2(SimulationBacktestRequestV1):
+    """Parity-eligible backtest request with complete execution identity."""
+
+    contract_version: Literal["v2"] = "v2"  # type: ignore[assignment]
+    schema_id: Literal["simulation.backtest_request.v2"] = (
+        "simulation.backtest_request.v2"  # type: ignore[assignment]
+    )
+    execution_model_ref: str
+    execution_model_hash: str
+    source_lineage_hash: str
+    tick_lineage_hash: str
+    market_evidence_class: Literal[
+        "genuine_bid_ask_ticks", "depth_supported_ticks", "derived_bar_model"
+    ]
+    decision_instant_policy: Literal["point_in_time_available_at"]
+    provider_specification_revisions: tuple[ProviderSpecificationRevisionBinding, ...]
+    initial_authority_state_hash: str
+    certification_target: Literal["demo", "live"]
+    close_open_positions_at_end: bool
+
+    @classmethod
+    @override
+    def calculate_config_hash(
+        cls, payload: Mapping[str, object]
+    ) -> StandardResponse[str]:
+        """Calculate the complete V2 execution configuration hash.
+
+        Returns:
+            Standard response containing the lowercase SHA-256 digest.
+        """
+
+        def calculate(value: Mapping[str, object]) -> str:
+            material = dict(value)
+            material.setdefault("contract_version", "v2")
+            material.setdefault("schema_id", "simulation.backtest_request.v2")
+            return _hash_material(material)
+
+        return guard_operation(
+            calculate,
+            operation="simulation.run.simulation_backtest_request_v2.calculate_config_hash",
+            risk_level="low",
+            read_only=True,
+        )(payload)
+
+    @field_validator(
+        "execution_model_hash",
+        "source_lineage_hash",
+        "tick_lineage_hash",
+        "initial_authority_state_hash",
+    )
+    @classmethod
+    def _validate_identity_digest(cls, value: str) -> str:
+        """Validate one lowercase SHA-256 execution-identity digest.
+
+        Returns:
+            Validated digest.
+
+        Raises:
+            ValueError: If the digest is malformed.
+        """
+        if len(value) != _SHA256_HEX_LENGTH or any(
+            character not in "0123456789abcdef" for character in value
+        ):
+            raise ValueError("execution identity hashes must be lowercase SHA-256")
+        return value
+
+    @model_validator(mode="after")
+    def _validate_execution_identity(self) -> Self:  # noqa: C901
+        """Require ordered continuous matching provider revision coverage.
+
+        Returns:
+            Validated V2 request.
+
+        Raises:
+            ValueError: If execution identity or coverage is invalid.
+        """
+        revisions = self.provider_specification_revisions
+        if not revisions:
+            raise ValueError("provider specification revisions are required")
+        identities = tuple(revision.revision_id for revision in revisions)
+        if len(set(identities)) != len(identities):
+            raise ValueError("provider specification revisions must be unique")
+        ordered = tuple(
+            sorted(
+                revisions,
+                key=lambda revision: (
+                    revision.provider,
+                    revision.server,
+                    revision.environment,
+                    revision.account_digest,
+                    revision.symbol,
+                    revision.effective_from,
+                ),
+            )
+        )
+        if revisions != ordered:
+            raise ValueError("provider specification revisions must be canonical")
+        for index, revision in enumerate(revisions):
+            if revision.symbol != self.symbol:
+                raise ValueError("provider revision symbol does not match request")
+            if revision.environment != self.certification_target:
+                raise ValueError(
+                    "provider revision cannot be relabelled across targets"
+                )
+            if index and revisions[index - 1].effective_to != revision.effective_from:
+                raise ValueError("provider revision coverage contains a gap or overlap")
+        if revisions[0].effective_from > self.start:
+            raise ValueError("provider revision coverage starts after the request")
+        final_bound = revisions[-1].effective_to
+        if final_bound is not None and final_bound < self.end:
+            raise ValueError("provider revision coverage ends before the request")
         payload = self.model_dump(mode="python", warnings=False)
         if self.config_hash != _hash_material(payload):
             raise ValueError("config_hash does not match request material")
@@ -469,5 +657,6 @@ __all__ = [
     "PortfolioBacktestRequestV1",
     "PortfolioComponentRequest",
     "SimulationBacktestRequestV1",
+    "SimulationBacktestRequestV2",
     "SimulationRunDependencies",
 ]
