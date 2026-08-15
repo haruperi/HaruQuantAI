@@ -27,9 +27,12 @@ from app.services.brokers import (
     create_simulation_broker_adapter,
     finalize_simulation_broker_session,
     get_broker_capability_catalogue,
+    get_broker_deal,
     get_broker_environment,
     get_broker_id,
     get_broker_value_field,
+    list_broker_account_transactions,
+    list_broker_deal_history,
 )
 
 
@@ -55,9 +58,38 @@ class _UsageAuthority:
 
     async def read(self, operation: object, arguments: Mapping[str, object]) -> object:
         """Return exact canonical fixture values with simulated-time evidence."""
-        del arguments
         self.read_count += 1
         name = str(operation)
+        now = datetime(2024, 1, 2, 12, tzinfo=UTC)
+        deal = build_broker_value(
+            "deal",
+            deal_id="deal-1",
+            order_id="order-1",
+            position_id="position-1",
+            symbol="EURUSD",
+            side="BUY",
+            quantity=Decimal("1.00"),
+            quantity_unit="lots",
+            price=Decimal("1.2345"),
+            partial=False,
+            fee=Decimal("-0.50"),
+            fee_currency="USD",
+            provider_timestamp=now,
+            retrieved_at=now,
+            entry="DEAL_ENTRY_IN",
+            reason="EXPERT",
+        )
+        transaction = build_broker_value(
+            "account_transaction",
+            transaction_id="transaction-1",
+            transaction_type="COMMISSION",
+            asset="ACCOUNT",
+            currency="USD",
+            amount=Decimal("-0.50"),
+            provider_timestamp=now,
+            retrieved_at=now,
+            provider_metadata={"source_sequence": 1},
+        )
         payloads: dict[str, object] = {
             "get_symbols": ("EURUSD",),
             "get_symbol_info": "EURUSD-specification-shape",
@@ -67,8 +99,14 @@ class _UsageAuthority:
             "get_account_info": {"equity": Decimal("1000.00")},
             "get_positions": ("position-1",),
             "get_orders": ("order-1",),
+            "list_deal_history": build_broker_value(
+                "page", items=(deal,), limit=arguments.get("limit", 10)
+            ),
+            "get_deal": deal if arguments.get("deal_id") == "deal-1" else None,
+            "list_account_transactions": build_broker_value(
+                "page", items=(transaction,), limit=arguments.get("limit", 10)
+            ),
         }
-        now = datetime(2024, 1, 2, 12, tzinfo=UTC)
         return build_simulation_read_envelope(
             payload=payloads[name],
             source_sequence=0,
@@ -221,12 +259,9 @@ async def fr_brk_179() -> None:
 
 
 async def fr_brk_180() -> None:
-    """Demonstrate revision-bound sessions and unsupported deal reads."""
+    """Demonstrate revision-bound sessions."""
     adapter, _ = await _read_values()
     assert (await adapter.get_trading_sessions("EURUSD")).status == "success"  # type: ignore[attr-defined]
-    assert (
-        await adapter.get_deal("deal-1")
-    ).error.code == "BROKER_CAPABILITY_UNSUPPORTED"  # type: ignore[attr-defined,union-attr]
 
 
 async def fr_brk_181() -> None:
@@ -348,6 +383,39 @@ async def fr_brk_189() -> None:
     assert get_broker_value_field(request, "time_policy") == "GTC"
 
 
+async def fr_brk_194() -> None:
+    """FR-BRK-194: Read bounded provider-shaped Simulation deal history."""
+    adapter, _ = await _read_values()
+    result = await list_broker_deal_history(
+        adapter,
+        datetime(2024, 1, 2, 11, tzinfo=UTC),
+        datetime(2024, 1, 2, 13, tzinfo=UTC),
+        limit=10,
+    )
+    items = get_broker_value_field(result.data, "items")
+    assert get_broker_value_field(items[0], "order_id") == "order-1"
+
+
+async def fr_brk_195() -> None:
+    """FR-BRK-195: Read one exact Simulation authority deal."""
+    adapter, _ = await _read_values()
+    result = await get_broker_deal(adapter, "deal-1")
+    assert get_broker_value_field(result.data, "position_id") == "position-1"
+
+
+async def fr_brk_196() -> None:
+    """FR-BRK-196: Read bounded signed account transactions."""
+    adapter, _ = await _read_values()
+    result = await list_broker_account_transactions(
+        adapter,
+        datetime(2024, 1, 2, 11, tzinfo=UTC),
+        datetime(2024, 1, 2, 13, tzinfo=UTC),
+        limit=10,
+    )
+    items = get_broker_value_field(result.data, "items")
+    assert get_broker_value_field(items[0], "amount") == Decimal("-0.50")
+
+
 async def _run() -> None:
     fr_brk_167()
     fr_brk_168()
@@ -371,6 +439,9 @@ async def _run() -> None:
     await fr_brk_187()
     await fr_brk_188()
     await fr_brk_189()
+    await fr_brk_194()
+    await fr_brk_195()
+    await fr_brk_196()
 
 
 def main() -> None:

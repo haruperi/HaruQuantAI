@@ -13,7 +13,9 @@ recalculates account, position, or order values and never silently sorts deliver
 
 Admitted reads cover symbols/current specification, revision-bound trading
 sessions, quotes/spreads/ticks/bars, permissions, account/balances, positions,
-open orders, and order history. Deal and transaction reads remain unsupported.
+open orders, order history, bounded deal history, exact deal lookup, and bounded
+account transactions. History values preserve authority-owned linkage, entry,
+reason, fee/sign, time, sequence, and pagination evidence without recomputation.
 Weekly sessions alone do not certify dated exceptions. Admitted mutations cover
 check/place/modify/cancel order and modify/reduce/close position. Each delegates
 one immutable request through a request-bound provider-shaped envelope, reuses

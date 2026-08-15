@@ -10,15 +10,18 @@ from typing import TYPE_CHECKING, Any, cast, override
 
 from app.services.brokers._shared.base import _UnsupportedAdapterBase
 from app.services.brokers.canonical_contracts import (
+    BrokerAccountTransaction,
     BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerConnectionEvent,
     BrokerConnectionState,
     BrokerConnectionStatus,
+    BrokerDeal,
     BrokerOrderCheck,
     BrokerOrderModificationRequest,
     BrokerOrderRequest,
     BrokerOrderResult,
+    BrokerPage,
     BrokerPosition,
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
@@ -43,6 +46,8 @@ from app.services.brokers.simulation.lifecycle import lifecycle_state_from_respo
 
 if TYPE_CHECKING:
     from app.services.brokers.simulation.contracts import SimulationAuthorityPort
+
+_MAX_HISTORY_PAGE_SIZE = 1000
 
 
 class SimulationBrokerAdapter(_UnsupportedAdapterBase):
@@ -115,7 +120,120 @@ class SimulationBrokerAdapter(_UnsupportedAdapterBase):
         self._last_error = error
         return self._result(operation, error=error)
 
-    async def _delegate_read(  # noqa: C901, PLR0911 - explicit evidence failures.
+    def _deal_not_found(self, deal_id: str) -> StandardResponse[Any]:
+        """Return the canonical missing-deal result without authority invention.
+
+        Args:
+            deal_id: Exact authority identity that was not found.
+
+        Returns:
+            Canonical missing-deal response.
+        """
+        error = BrokerError(
+            code=BrokerErrorCode.BROKER_DEAL_NOT_FOUND,
+            message="Simulation authority did not find the requested deal",
+            capability=BrokerCapabilityId.GET_DEAL,
+            details={"deal_id": deal_id},
+        )
+        self._last_error = error
+        return self._result(BrokerCapabilityId.GET_DEAL, error=error)
+
+    @staticmethod
+    def _valid_history_arguments(
+        operation: BrokerCapabilityId, arguments: Mapping[str, object]
+    ) -> bool:
+        """Return whether a history request is explicitly bounded and UTC.
+
+        Args:
+            operation: History operation being validated.
+            arguments: Exact caller-supplied arguments.
+
+        Returns:
+            Whether the arguments satisfy the bounded-history contract.
+        """
+        if operation is BrokerCapabilityId.GET_DEAL:
+            deal_id = arguments.get("deal_id")
+            return isinstance(deal_id, str) and bool(deal_id.strip())
+        start = arguments.get("start")
+        end = arguments.get("end")
+        limit = arguments.get("limit")
+        return (
+            isinstance(start, datetime)
+            and isinstance(end, datetime)
+            and start.tzinfo is not None
+            and end.tzinfo is not None
+            and start.utcoffset() == timedelta(0)
+            and end.utcoffset() == timedelta(0)
+            and start < end
+            and isinstance(limit, int)
+            and not isinstance(limit, bool)
+            and 0 < limit <= _MAX_HISTORY_PAGE_SIZE
+        )
+
+    @staticmethod
+    def _valid_history_payload(  # noqa: PLR0911 - each contract fault fails closed.
+        operation: BrokerCapabilityId,
+        payload: object,
+        arguments: Mapping[str, object],
+    ) -> bool:
+        """Validate canonical type, bounds, ordering, and referential fields.
+
+        Args:
+            operation: History operation being validated.
+            payload: Exact authority payload.
+            arguments: Validated invocation arguments.
+
+        Returns:
+            Whether the authority payload proves the requested history contract.
+        """
+        if operation is BrokerCapabilityId.GET_DEAL:
+            return (
+                isinstance(payload, BrokerDeal)
+                and payload.deal_id == arguments.get("deal_id")
+                and payload.order_id is not None
+                and payload.position_id is not None
+                and payload.entry is not None
+                and payload.reason is not None
+                and payload.provider_timestamp is not None
+            )
+        if not isinstance(payload, BrokerPage):
+            return False
+        expected_type = (
+            BrokerDeal
+            if operation is BrokerCapabilityId.LIST_DEAL_HISTORY
+            else BrokerAccountTransaction
+        )
+        if any(not isinstance(item, expected_type) for item in payload.items):
+            return False
+        if operation is BrokerCapabilityId.LIST_DEAL_HISTORY and any(
+            not isinstance(item, BrokerDeal)
+            or item.order_id is None
+            or item.position_id is None
+            or item.entry is None
+            or item.reason is None
+            or item.provider_timestamp is None
+            for item in payload.items
+        ):
+            return False
+        start = cast("datetime", arguments["start"])
+        end = cast("datetime", arguments["end"])
+        timestamps = tuple(item.provider_timestamp for item in payload.items)
+        if any(
+            timestamp is None or not start <= timestamp < end
+            for timestamp in timestamps
+        ):
+            return False
+        if timestamps != tuple(sorted(timestamps)):
+            return False
+        symbol = arguments.get("symbol")
+        if symbol is not None and any(
+            not isinstance(item, BrokerDeal) or item.symbol != symbol
+            for item in payload.items
+        ):
+            return False
+        return payload.limit == arguments.get("limit")
+
+    async def _delegate_read(  # noqa: C901, PLR0911, PLR0912 - explicit failures.
         self, operation: BrokerCapabilityId, arguments: Mapping[str, object]
     ) -> StandardResponse[Any]:
         """Validate and project one authority-owned canonical read.
@@ -129,6 +247,15 @@ class SimulationBrokerAdapter(_UnsupportedAdapterBase):
         """
         if self._state is not BrokerConnectionState.READY:
             return self._not_connected(operation)
+        history_operations = {
+            BrokerCapabilityId.LIST_DEAL_HISTORY,
+            BrokerCapabilityId.GET_DEAL,
+            BrokerCapabilityId.LIST_ACCOUNT_TRANSACTIONS,
+        }
+        if operation in history_operations and not self._valid_history_arguments(
+            operation, arguments
+        ):
+            return self._read_error(operation, "unbounded_or_invalid_history_request")
         read = getattr(self._authority, "read", None)
         if not callable(read):
             return self._read_error(operation, "authority_read_unbound")
@@ -136,6 +263,12 @@ class SimulationBrokerAdapter(_UnsupportedAdapterBase):
             envelope = await read(operation, MappingProxyType(dict(arguments)))
             if not isinstance(envelope, SimulationReadEnvelope):
                 return self._read_error(operation, "invalid_envelope")
+            if operation is BrokerCapabilityId.GET_DEAL and envelope.payload is None:
+                return self._deal_not_found(str(arguments["deal_id"]))
+            if operation in history_operations and not self._valid_history_payload(
+                operation, envelope.payload, arguments
+            ):
+                return self._read_error(operation, "invalid_history_payload")
             for name in ("observed_at", "received_at", "available_at", "simulated_at"):
                 self._validate_time(getattr(envelope, name), name)
             if envelope.source_sequence < 0:
@@ -675,6 +808,9 @@ _ADMITTED_READS = frozenset(
         BrokerCapabilityId.GET_ORDERS,
         BrokerCapabilityId.GET_ORDER,
         BrokerCapabilityId.LIST_ORDER_HISTORY,
+        BrokerCapabilityId.LIST_DEAL_HISTORY,
+        BrokerCapabilityId.GET_DEAL,
+        BrokerCapabilityId.LIST_ACCOUNT_TRANSACTIONS,
     }
 )
 

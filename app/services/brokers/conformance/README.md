@@ -11,3 +11,7 @@ specification checksum, terminal build, and a canonical SHA-256 checksum.
 `ENVIRONMENT=dev` plus Broker `demo` pair. It is never imported or called by
 the default conformance suite. Collection requires separate execution approval;
 normal tests and usage validate sanitized offline artifacts only.
+
+Simulation conformance additionally reconciles the released bounded deal-history,
+exact-deal, and account-transaction capabilities with the protocol, adapter,
+delivery-evidence rules, and capability catalogue.

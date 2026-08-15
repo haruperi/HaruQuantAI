@@ -40,8 +40,8 @@ def test_simulation_adapter_passes_canonical_conformance() -> None:
             adapter=adapter,
             broker_id="sim",
             environment="simulation",
-            unsupported_capability_id="get_deal",
-            unsupported_operation="get_deal",
+            unsupported_capability_id="refresh_session",
+            unsupported_operation="refresh_session",
         )
         assert verdict["aggregate_verdict"] == "PASSED"
 
@@ -66,11 +66,11 @@ def test_simulation_capability_manifest_is_exhaustive_and_bounded() -> None:
         for item in capabilities
         if item.capability == get_broker_capability_id("get_quote")
     )
-    unsupported = next(
+    deal = next(
         item
         for item in capabilities
         if item.capability == get_broker_capability_id("get_deal")
     )
     assert ping.availability == "AVAILABLE"
     assert quote.availability == "AVAILABLE"
-    assert unsupported.availability == "UNAVAILABLE"
+    assert deal.availability == "AVAILABLE"

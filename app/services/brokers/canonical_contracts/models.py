@@ -1309,6 +1309,8 @@ class BrokerDeal(_Schema):
     fee: Decimal | None = None
     fee_currency: str | None = None
     provider_timestamp: datetime | None = None
+    entry: Literal["DEAL_ENTRY_IN", "DEAL_ENTRY_OUT", "DEAL_ENTRY_INOUT"] | None = None
+    reason: str | None = None
 
     def __post_init__(self) -> None:
         """Validate the immutable BrokerDeal invariants."""
@@ -1319,6 +1321,8 @@ class BrokerDeal(_Schema):
         _optional_text(self.order_id, "order_id")
         _optional_text(self.position_id, "position_id")
         _optional_text(self.fee_currency, "fee_currency")
+        _optional_text(self.entry, "entry")
+        _optional_text(self.reason, "reason")
         _positive(self.quantity, "quantity")
         _finite(self.price, "price")
         _finite(self.fee, "fee")

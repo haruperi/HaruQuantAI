@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Expose simulation deal history
+
+Brokers now exposes bounded Simulation deal, exact-deal, and account-transaction authority reads (Phase 17b).
+
+#### Added (1)
+
+- Added fail-closed deal and transaction reads that preserve canonical linkage, entry/reason, fee signs, timestamps, sequencing, and pagination without recomputation.
+
 ### Complete order and deal lifecycle
 
 Simulation now emits deterministic provider-shaped order, deal, position, protection, transaction, and race evidence (Phase 17a).

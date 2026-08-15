@@ -1534,17 +1534,17 @@ the direct usage emitted SUCCESS for all three new FR functions before the exist
 connection failed with `BROKER_CONNECTION_FAILED`. The bounded recommendation is to retain the
 transport-free Phase 6b evidence and not weaken credentials/readiness or mutate external demo state.
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff format/check and mypy passed for every owning domain.
-- [ ] Every local usage program executed directly and passed.
-- [ ] Every owning-domain phase gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+- [x] Approval matched this exact phase/subphase.
+- [x] Only the local file and documentation manifests changed.
+- [x] Every listed FR has final `path:line` implementation and test evidence.
+- [x] Only verified package-root/public dependency contracts were used.
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes.
+- [x] Ruff format/check and mypy passed for every owning domain.
+- [x] Every local usage program executed directly and passed.
+- [x] Every owning-domain phase gate passed, or an unrelated pre-existing gate failure is recorded below.
+- [x] README, changelog, and listed system documents reconciled.
+- [x] STOP conditions and rollback path were rechecked.
+- [x] Commit is authorized goal-wide; exact-message hashes are recorded per unit.
 
 # Phase 7 · Signed transaction ledger and swap behavior
 
@@ -3494,7 +3494,21 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] Owning-domain behavior gate passed. Evidence: `uv run pytest -q --no-cov tests/simulator` passed 467 tests; the literal coverage-enabled command passed the same 467 behaviors and exited 1 only because repository-wide subset coverage was 29.72%, below the global 80% floor.
 - [x] README and changelog are reconciled. Evidence: `app/services/simulator/README.md`, `docs/CHANGELOG.md`.
 - [x] Rollback was reviewed. Evidence: remove `execution/lifecycle.py` and five exact tests; restore engine/matching/exports/usage/docs; rerun the literal Unit 17a commands.
-- [x] Commit is authorized goal-wide; the exact Unit 17a message will be used and reconciled in Unit 17b.
+- [x] Exact Unit 17a commit recorded: `e6d763d8301e0d45a7f8cc7c6b0ba8cfa7a98d4b`.
+
+### Unit 17b completion evidence
+
+- [x] Approval matched Unit 17b. Evidence: owner goal-wide `APPROVED: EXECUTE` and dry run `17b-DR1`.
+- [x] `FR-BRK-194` preserves bounded half-open deal pages, exact order/position linkage, entry/reason, fees, timestamps, ordering, filtering, pagination, and authority delivery evidence without recomputation. Evidence: `app/services/brokers/simulation/adapter.py:142`, `app/services/brokers/simulation/adapter.py:174`, `tests/brokers/unit/simulation/test_simulation_deals.py:41`, `tests/brokers/usage/features/17_simulation.py:386`.
+- [x] `FR-BRK-195` preserves exact deal identity and returns canonical not-found without invention. Evidence: `app/services/brokers/simulation/adapter.py:123`, `tests/brokers/unit/simulation/test_simulation_deals.py:64`, `tests/brokers/integration/test_simulation_deal_conformance.py:23`, `tests/brokers/usage/features/17_simulation.py:399`.
+- [x] `FR-BRK-196` preserves bounded transaction type, signed amount, timestamps, ordering, pagination, and delivery evidence. Evidence: `app/services/brokers/simulation/adapter.py:174`, `tests/brokers/unit/simulation/test_simulation_transactions.py:37`, `tests/brokers/usage/features/17_simulation.py:406`.
+- [x] Capability, protocol, adapter, and conformance declarations reconcile. Evidence: `app/services/brokers/capabilities/matrix.py:154`, `tests/brokers/unit/test_catalogue.py:150`, `tests/brokers/integration/test_simulation_conformance.py:53`, `tests/brokers/integration/test_simulation_deal_conformance.py:23`.
+- [x] The bounded blocker was resolved by admitting only explicit injected-authority reads and failing closed for absent identity, unbounded/non-UTC ranges, invalid linkage/type/order/filter/limit, stale/gapped/duplicate/out-of-order delivery, or unavailable sessions. No Simulator internals or external IO entered Brokers.
+- [x] Targeted behavior and quality gates passed. Evidence: exact three phase files passed all 4 behaviors and exited 1 only because the repository-wide subset coverage was 3.85%, below the global 80% floor; the same files plus the reconciled prior read-conformance test passed 6/6 with `--no-cov`; Ruff format/check passed; mypy passed 102 source files; direct usage 17 passed.
+- [x] Owning-domain behavior was rechecked. Evidence: `uv run pytest -q --no-cov tests/brokers` passed 680 tests with 3 credential skips; the literal coverage-enabled command reproduced the same three pre-existing failures and 680 passing behaviors, then also reported 16.51% repository-wide subset coverage below the global 80% floor. The remaining failures are outside Unit 17b: one package-wide docstring audit over MT5 snapshot/specification helpers and two stale MT5 mutation mock sequences. All Phase-17b reconciliation failures found on the first gate run were corrected and their focused tests pass.
+- [x] README and changelog are reconciled. Evidence: `app/services/brokers/README.md`, `app/services/brokers/simulation/README.md`, `app/services/brokers/conformance/README.md`, `docs/CHANGELOG.md`.
+- [x] Rollback was reviewed. Evidence: remove the three exact tests; restore Simulation adapter/model/matrix/conformance/usage/docs edits; rerun the literal Unit 17b commands and the catalogue/import-boundary checks.
+- [x] Commit is authorized goal-wide; the exact Unit 17b message will be used below.
 
 # Phase 18 · Simulation position reconciliation — L3
 

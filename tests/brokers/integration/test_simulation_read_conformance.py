@@ -17,8 +17,8 @@ from tests.brokers.unit.simulation.test_simulation_reads import (
 )
 
 
-def test_read_manifest_and_unsupported_deal_surface_are_exact() -> None:
-    """Admitted reads are available while deal/transaction reads stay unavailable."""
+def test_read_manifest_includes_deal_and_transaction_surface() -> None:
+    """The completed Simulation history reads are published as available."""
 
     async def exercise() -> None:
         catalogue = get_broker_capability_catalogue().data
@@ -26,11 +26,7 @@ def test_read_manifest_and_unsupported_deal_surface_are_exact() -> None:
         by_id = {item.capability: item for item in catalogue[get_broker_id("sim")]}
         assert by_id[get_broker_capability_id("get_quote")].availability == "AVAILABLE"
         for name in ("list_deal_history", "get_deal", "list_account_transactions"):
-            assert by_id[get_broker_capability_id(name)].availability == "UNAVAILABLE"
-        adapter = make_adapter(ReadAuthority([envelope("unused")]))
-        await adapter.connect()  # type: ignore[attr-defined]
-        result = await adapter.get_deal("deal-1")  # type: ignore[attr-defined]
-        assert result.error.code == "BROKER_CAPABILITY_UNSUPPORTED"
+            assert by_id[get_broker_capability_id(name)].availability == "AVAILABLE"
 
     asyncio.run(exercise())
 
