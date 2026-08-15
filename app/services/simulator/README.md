@@ -5,7 +5,7 @@ The Simulation error catalogue uses only the Utils-owned `TRANSIENT`,
 categories. An unconfirmed persistence result is non-retryable.
 
 > **Package:** `app/services/simulator`
-> **Status:** `Completed` for `FEAT-SIM-01`..`14` and `FEAT-SIM-18` (parity, programme Phase 2); the sim⇄live parity-programme features `FEAT-SIM-15`..`17` remain `Pending` (see "Sim⇄live parity programme registration").
+> **Status:** `Completed` for `FEAT-SIM-01`..`15` and `FEAT-SIM-18`; the sim⇄live parity-programme features `FEAT-SIM-16`..`17` remain `Pending` (see "Sim⇄live parity programme registration").
 > **Last updated:** `2026-08-14`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -313,7 +313,7 @@ Module folders and files are ordered from lowest dependency to highest dependenc
 | Completed | `FEAT-SIM-12` Execution Realism Models | `realism/` | latency profile, queue model, slippage and market impact, cancel/replace race, data/execution-view separation, fill calibration | `FR-SIM-118`..`FR-SIM-123` | `tests/simulator/usage/features/12_realism.py` |
 | Completed | `FEAT-SIM-13` Session Recovery | `recovery/` | canonical replay identity, recovery state machine, durable checkpoints, practice branching, scored anti-rewind, integrity failure and explicit rearm | `FR-SIM-124`..`FR-SIM-128` | `tests/simulator/usage/features/13_recovery.py` |
 | Completed | `FEAT-SIM-14` Alert Lifecycle | `alerts/` | `AlertEvent v1`, latched lifecycle, root-cause grouping, perception timestamp, emergency-control availability | `FR-SIM-129`..`FR-SIM-133` | `tests/simulator/usage/features/14_alerts.py` |
-| Pending | `FEAT-SIM-15` Deterministic Execution Scheduler | `scheduler/` | Scheduler creation, event scheduling/cancellation, bounded state inspection, single-event and conditional pumping, serialize/restore | `FR-SIM-194`, `FR-SIM-199`–`FR-SIM-204` | `tests/simulator/usage/features/15_scheduler.py` (Phase 5) |
+| Completed | `FEAT-SIM-15` Deterministic Execution Scheduler | `scheduler/` | Scheduler creation, event scheduling/cancellation, bounded state inspection, single-event and conditional pumping, serialize/restore | `FR-SIM-194`, `FR-SIM-199`–`FR-SIM-204` | `tests/simulator/usage/features/15_scheduler.py` |
 | Pending | `FEAT-SIM-16` Effective-Dated Calculation Model | `calculations/` | Exact-Decimal FX conversion, profit and margin calculation over effective-dated specification revisions, offline conformance artifacts, model identity | `FR-SIM-137`–`FR-SIM-145`, `FR-SIM-210`–`FR-SIM-214` | `tests/simulator/usage/features/16_calculations.py` (Phase 13b) |
 | Pending | `FEAT-SIM-17` Empirical Execution Calibration | `calibration/` | Immutable evidence partitioning, M1 spread and evidenced execution-component fits, artifact validation, temporal eligibility | `FR-SIM-181`–`FR-SIM-186`, `FR-SIM-224`–`FR-SIM-227` | `tests/simulator/usage/features/17_calibration.py` (Phase 19) |
 | Completed | `FEAT-SIM-18` Parity Comparison | `parity/` | `get_parity_envelope`, `get_parity_maturity_ladder`, `normalize_parity_evidence`, `compare_parity_evidence` | `FR-SIM-187`–`FR-SIM-193`, `FR-SIM-236`–`FR-SIM-239` | `tests/simulator/usage/features/18_parity.py` |
@@ -1846,6 +1846,18 @@ constructed, so adding a failure path adds a catalog row first.
 
 ## 6. Open Decisions
 
+### Deterministic execution scheduler requirements
+
+| Status | Requirement | Contract | Evidence |
+| --- | --- | --- | --- |
+| Completed | `FR-SIM-194` Simulator shall own one deterministic scheduler authority and simulated clock per run. | Opaque scheduler creation and shutdown through the package root. | `app/services/simulator/scheduler/pump.py`; `tests/simulator/unit/test_scheduler_pump.py`; `tests/simulator/usage/features/15_scheduler.py::fr_sim_194()` |
+| Completed | `FR-SIM-199` Simulator shall apply the declared internal event-stage order without claiming provider order. | Stable priority precedes symbol and source sequence. | `app/services/simulator/scheduler/contracts.py`; `tests/simulator/unit/test_scheduler_queue.py`; `tests/simulator/usage/features/15_scheduler.py::fr_sim_199()` |
+| Completed | `FR-SIM-200` Simulator shall reject unknown priority and duplicate identity and order queued events by the canonical total-order key. | Heap queue with monotonic scheduler sequence. | `app/services/simulator/scheduler/queue.py`; `tests/simulator/unit/test_scheduler_queue.py`; `tests/simulator/usage/features/15_scheduler.py::fr_sim_200()` |
+| Completed | `FR-SIM-201` Simulator shall advance only an explicit aware-UTC simulated clock and never read ambient time. | Monotonic explicit clock advancement. | `app/services/simulator/scheduler/clock.py`; `tests/simulator/unit/test_scheduler_clock.py`; `tests/simulator/usage/features/15_scheduler.py::fr_sim_201()` |
+| Completed | `FR-SIM-202` Scheduled synchronous or asynchronous handlers shall resolve awaited results through the single event pump. | Awaitable handler resolution without wall-clock waits. | `app/services/simulator/scheduler/pump.py`; `tests/simulator/unit/test_scheduler_pump.py`; `tests/simulator/usage/features/15_scheduler.py::fr_sim_202()` |
+| Completed | `FR-SIM-203` The bounded pump shall define deterministic cancellation, handler failure, empty-queue, nested-submission, and shutdown behavior. | Single-event and selected-result pumping. | `app/services/simulator/scheduler/pump.py`; `tests/simulator/unit/test_scheduler_pump.py`; `tests/simulator/usage/features/15_scheduler.py::fr_sim_203()` |
+| Completed | `FR-SIM-204` Scheduler state shall serialize without live runtime objects and restore pending event identity through injected handlers. | JSON-safe state codec and resume. | `app/services/simulator/scheduler/state.py`; `tests/simulator/integration/test_scheduler_resume.py`; `tests/simulator/usage/features/15_scheduler.py::fr_sim_204()` |
+
 No unresolved Simulator owner decisions remain. Simulator owns `ReplayIdentity v1`;
 Strategy consumes it as lineage while retaining its strategy-specific manifest. All
 four mode policies are complete and simulation-only, resolving the former sequencing
@@ -1912,7 +1924,7 @@ During iterative implementation, run only the specific files associated with the
 - [X] No raw code, live adapter, broker SDK, credential resolution, network call, or live mutation is reachable. Evidence: `tests/simulator/integration/test_strategy_security.py:10`.
 - [X] Every `FR-SIM-*` has one usage example and at least one unit test; every workflow has an integration test. Evidence: `tests/simulator/integration/test_official_backtest.py:78`.
 - [X] Golden, replay, persistence-failure, security, boundary, and import-safety tests pass. Evidence: `tests/simulator/integration/test_replay.py:23`.
-- [X] Simulator tests, fourteen standalone feature programs, and all 11 registered workflows pass; each production file and the aggregate package meet the required coverage gate, and every unit test remains below 100 ms. Evidence: `tests/simulator/integration/test_usage_scripts.py`; `tests/simulator/unit/conftest.py`.
+- [X] Simulator tests, fifteen standalone feature programs, and all 11 registered workflows pass; each production file and the aggregate package meet the required coverage gate, and every unit test remains below 100 ms. Evidence: `tests/simulator/integration/test_usage_scripts.py`; `tests/simulator/unit/conftest.py`.
 - [X] Every raised code exists in `SIM_ERROR_CATALOG`, and every catalog code has a fail-closed raise path. Evidence: `app/services/simulator/errors/catalog.py`.
 - [X] Bound `SimTrader.submit_order` is assignable to Trading's injected `Callable[[OrderIntent], Awaitable[ExecutionReceipt]]` port. Evidence: `app/services/simulator/execution/trader.py:28`.
 - [X] No module imports `app.services.data.storage.*` or `app.services.optimization.*`. Evidence: `tests/simulator/unit/test_state.py:12`.

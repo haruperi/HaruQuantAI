@@ -683,6 +683,89 @@ def get_supported_fill_policies() -> tuple[str, ...]:
     return SUPPORTED_FILL_POLICIES
 
 
+def create_simulation_scheduler(*args: object, **kwargs: object) -> object:
+    """Create one opaque deterministic execution scheduler."""
+    return _operation("app.services.simulator.scheduler", "create_scheduler")(
+        *args, **kwargs
+    )
+
+
+def schedule_simulation_event(*args: object, **kwargs: object) -> str:
+    """Schedule one deterministic event and return its identity."""
+    return cast(
+        "str",
+        _operation("app.services.simulator.scheduler", "schedule_event")(
+            *args, **kwargs
+        ),
+    )
+
+
+def cancel_simulation_event(*args: object, **kwargs: object) -> bool:
+    """Cancel one pending deterministic event."""
+    return cast(
+        "bool",
+        _operation("app.services.simulator.scheduler", "cancel_event")(*args, **kwargs),
+    )
+
+
+def get_simulation_scheduler_state(
+    *args: object, **kwargs: object
+) -> Mapping[str, object]:
+    """Return bounded detached scheduler state."""
+    return cast(
+        "Mapping[str, object]",
+        _operation("app.services.simulator.scheduler", "get_scheduler_state")(
+            *args, **kwargs
+        ),
+    )
+
+
+async def pump_simulation_scheduler_once(*args: object, **kwargs: object) -> str:
+    """Pump one deterministic scheduler event."""
+    operation = cast(
+        "Callable[..., Awaitable[str]]",
+        _operation("app.services.simulator.scheduler", "pump_scheduler_once"),
+    )
+    return await operation(*args, **kwargs)
+
+
+async def run_simulation_scheduler_until_complete(
+    *args: object, **kwargs: object
+) -> object:
+    """Pump deterministically until one selected event resolves."""
+    operation = cast(
+        "Callable[..., Awaitable[object]]",
+        _operation("app.services.simulator.scheduler", "run_scheduler_until_complete"),
+    )
+    return await operation(*args, **kwargs)
+
+
+def serialize_simulation_scheduler(
+    *args: object, **kwargs: object
+) -> Mapping[str, object]:
+    """Serialize deterministic scheduler state without runtime objects."""
+    return cast(
+        "Mapping[str, object]",
+        _operation("app.services.simulator.scheduler", "serialize_scheduler")(
+            *args, **kwargs
+        ),
+    )
+
+
+def restore_simulation_scheduler(*args: object, **kwargs: object) -> object:
+    """Restore scheduler state with an explicit handler registry."""
+    return _operation("app.services.simulator.scheduler", "restore_scheduler")(
+        *args, **kwargs
+    )
+
+
+def shutdown_simulation_scheduler(*args: object, **kwargs: object) -> None:
+    """Shut down one deterministic scheduler."""
+    _operation("app.services.simulator.scheduler", "shutdown_scheduler")(
+        *args, **kwargs
+    )
+
+
 def build_artifact_manifest(
     *args: object, **kwargs: object
 ) -> StandardResponse[object]:
@@ -1330,6 +1413,7 @@ __all__: tuple[str, ...] = (
     "calculate_portfolio_backtest_config_hash",
     "calculate_simulation_backtest_config_hash",
     "calculate_simulation_backtest_v2_config_hash",
+    "cancel_simulation_event",
     "close_live_simulation_session",
     "compare_parity_evidence",
     "complete_simulation_mission",
@@ -1337,6 +1421,7 @@ __all__: tuple[str, ...] = (
     "create_live_simulation_session",
     "create_recovery_checkpoint",
     "create_simulation_handle",
+    "create_simulation_scheduler",
     "create_simulation_session",
     "create_simulation_value",
     "dump_simulation_value",
@@ -1359,6 +1444,7 @@ __all__: tuple[str, ...] = (
     "get_simulation_migrations",
     "get_simulation_mode_policy",
     "get_simulation_result",
+    "get_simulation_scheduler_state",
     "get_simulation_value_field",
     "get_simulation_value_fields",
     "get_supported_asset_classes",
@@ -1376,19 +1462,25 @@ __all__: tuple[str, ...] = (
     "price_realistic_execution",
     "project_execution_views",
     "project_latency_timestamps",
+    "pump_simulation_scheduler_once",
     "read_live_simulation_state",
     "read_simulation_session",
     "replay_journal",
     "reset_live_simulation_sessions",
     "resolve_cancel_replace_race",
     "resolve_idempotent_run",
+    "restore_simulation_scheduler",
     "restore_simulation_session",
     "run_backtest",
     "run_backtest_async",
     "run_fast_research",
     "run_portfolio_backtest",
+    "run_simulation_scheduler_until_complete",
     "run_simulator_migrations",
+    "schedule_simulation_event",
     "secure_simulation_session",
+    "serialize_simulation_scheduler",
+    "shutdown_simulation_scheduler",
     "simulate_queue_fill",
     "start_simulation_checklist",
     "step_live_simulation",

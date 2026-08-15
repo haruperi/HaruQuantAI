@@ -1,8 +1,8 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `In Progress` — of 232 registered application features, 220 are implemented and structurally reconciled (94.83%); 12 are `Pending` and none are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
-> **Last updated:** `2026-08-12`
+> **Status:** `In Progress` — of 237 registered application features, 223 are implemented and structurally reconciled (94.09%); 14 are `Pending` and none are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Last updated:** `2026-08-15`
 
 > This document is the system-level source of truth.
 > It defines how domains fit together, how cross-domain workflows operate, which rules apply system-wide, and how the complete system is verified.
@@ -518,18 +518,17 @@ features. No secondary programme or work-package identifier namespace is active.
 
 | Status | Count |
 | --- | ---: |
-| Completed | 222 |
-| Pending | 15 |
+| Completed | 223 |
+| Pending | 14 |
 | Partial | 0 |
 | Missing | 0 |
 | **Total** | **237** |
 
-The fifteen `Pending` features are `FEAT-UI-05`–`FEAT-UI-13`, `FEAT-UI-15`,
+The fourteen `Pending` features are `FEAT-UI-05`–`FEAT-UI-13`, `FEAT-UI-15`,
 `FEAT-UI-16`, and `FEAT-UI-17`, each awaiting requirement evidence or focused-folder
 ownership recorded in `app/ui/README.md` — they are the primary trading workspace and
-its enabling foundation, specified by `docs/dev/documentation.pdf` — plus the three
-remaining sim⇄live parity-programme Simulation features `FEAT-SIM-15` (Deterministic
-Execution Scheduler), `FEAT-SIM-16` (Effective-Dated Calculation Model), and
+its enabling foundation, specified by `docs/dev/documentation.pdf` — plus the two
+remaining sim⇄live parity-programme Simulation features `FEAT-SIM-16` (Effective-Dated Calculation Model) and
 `FEAT-SIM-17` (Empirical Execution Calibration), registered as Pending in
 `app/services/simulator/README.md`; `FEAT-SIM-18` (Parity Comparison) completed with
 the programme's Phase 2.

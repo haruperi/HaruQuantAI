@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Add deterministic simulation scheduling
+
+Simulation now owns one serializable simulated clock and deterministic event pump (`FEAT-SIM-15`, Phase 5).
+
+#### Added (1)
+
+- Added canonical priority-queue ordering, bounded async result pumping, fail-closed cancellation and failure behavior, and pending-event state restoration without wall-clock waits.
+
 ### Add backtest request V2 execution identity
 
 Simulation now binds complete parity execution identity into an asynchronous-native

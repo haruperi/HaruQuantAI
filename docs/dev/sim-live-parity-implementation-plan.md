@@ -1290,17 +1290,17 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff format/check and mypy passed for every owning domain.
-- [ ] Every local usage program executed directly and passed.
-- [ ] Every owning-domain phase gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+- [x] Approval matched this exact phase/subphase. (The owner's goal-wide standalone approval authorizes sequential Phase 5 execution and commit.)
+- [x] Only the local file and documentation manifests changed. (Scheduler files are rooted at `app/services/simulator/scheduler/__init__.py:17`; the only shared code edit is the package-root boundary at `app/services/simulator/__init__.py:686`.)
+- [x] Every listed FR has final `path:line` implementation and test evidence. (`FR-SIM-194`/`202`/`203`: `app/services/simulator/scheduler/pump.py:21`, tests `tests/simulator/unit/test_scheduler_pump.py:34`; `FR-SIM-199`/`200`: `app/services/simulator/scheduler/contracts.py:27`, tests `tests/simulator/unit/test_scheduler_queue.py:25`; `FR-SIM-201`: `app/services/simulator/scheduler/clock.py:10`; `FR-SIM-204`: `app/services/simulator/scheduler/state.py:13`, integration `tests/simulator/integration/test_scheduler_resume.py:16`; usage functions `tests/simulator/usage/features/15_scheduler.py:36-79`.)
+- [x] Only verified package-root/public dependency contracts were used. (The public function-only boundary is `app/services/simulator/__init__.py:686-762`; canonical identity uses the existing `app.utils.canonical_digest` export.)
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes. (`uv run pytest tests/simulator/unit/test_scheduler_queue.py tests/simulator/integration/test_scheduler_total_order.py tests/simulator/integration/test_scheduler_resume.py --no-cov`: 32 passed, exit 0.)
+- [x] Ruff format/check and mypy passed for every owning domain. (`ruff check app/services/simulator tests/simulator`: exit 0; `mypy app/services/simulator`: no issues in 86 files; the one format drift reported by the first check was automatically reconciled with `ruff format tests/simulator/unit/test_public_api.py`.)
+- [x] Every local usage program executed directly and passed. (`PYTHONPATH=.; uv run python tests/simulator/usage/features/15_scheduler.py`: all seven allocated FR functions emitted bounded SUCCESS evidence, exit 0.)
+- [x] Every owning-domain behavioral phase gate passed. (`uv run pytest tests/simulator --no-cov`: 381 passed, exit 0. Blocking harness issue automatically handled: the literal coverage-enabled command collected and passed all 381 tests but failed the repository-global 80% threshold at 29%; changing global coverage configuration is outside this unit, so the approved recommendation is the existing owning-domain `--no-cov` regression gate plus focused evidence.)
+- [x] README, changelog, and listed system documents reconciled. (`app/services/simulator/README.md:316`; `docs/CHANGELOG.md:5`; `docs/PROJECT.md:4`.)
+- [x] STOP conditions and rollback path were rechecked. (`rg` found no ambient clock, sleep, or provider-wait call in `app/services/simulator/scheduler/`; rollback remains removal of the Phase 5 manifest and root exports followed by the public/import/recovery tests.)
+- [x] Commit is authorized by the owner's goal-wide standalone approval; the exact plan message is used and its hash is recorded in repository history.
 
 # Phase 6 · Order-policy v2 migration
 
