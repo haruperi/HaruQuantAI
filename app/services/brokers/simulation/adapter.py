@@ -15,12 +15,30 @@ from app.services.brokers.canonical_contracts import (
     BrokerConnectionEvent,
     BrokerConnectionState,
     BrokerConnectionStatus,
+    BrokerOrderCheck,
+    BrokerOrderModificationRequest,
+    BrokerOrderRequest,
+    BrokerOrderResult,
+    BrokerPosition,
+    BrokerPositionCloseRequest,
+    BrokerPositionModificationRequest,
     StandardResponse,
 )
 from app.services.brokers.canonical_contracts.enums import BrokerErrorCode
-from app.services.brokers.canonical_contracts.models import BrokerError
+from app.services.brokers.canonical_contracts.models import (
+    BrokerError,
+    BrokerPositionReductionRequest,
+)
 from app.services.brokers.canonical_contracts.protocols import BrokerAdapter
-from app.services.brokers.simulation.contracts import SimulationReadEnvelope
+from app.services.brokers.metatrader.mapping import (
+    _map_error_code,
+    _map_order_check,
+    _map_order_result,
+)
+from app.services.brokers.simulation.contracts import (
+    SimulationMutationEnvelope,
+    SimulationReadEnvelope,
+)
 from app.services.brokers.simulation.lifecycle import lifecycle_state_from_response
 
 if TYPE_CHECKING:
@@ -59,6 +77,7 @@ class SimulationBrokerAdapter(_UnsupportedAdapterBase):
         super().__init__(config)
         self._authority = cast("SimulationAuthorityPort", authority_port)
         self._last_read_sequence: dict[tuple[str, str], int] = {}
+        self._mutation_keys: set[str] = set()
 
     @staticmethod
     def _validate_time(value: datetime, name: str) -> None:
@@ -284,6 +303,357 @@ class SimulationBrokerAdapter(_UnsupportedAdapterBase):
         return cast(
             "StandardResponse[None]",
             await self._delegate_lifecycle("finalize_session"),
+        )
+
+    @staticmethod
+    def _provider_retcode(value: object) -> int:
+        """Return an exact integer retcode from one provider-shaped payload.
+
+        Args:
+            value: MT5-shaped mapping or record.
+
+        Returns:
+            Provider retcode.
+
+        Raises:
+            TypeError: If the payload has no valid integer retcode.
+        """
+        candidate = (
+            value.get("retcode")
+            if isinstance(value, dict)
+            else getattr(value, "retcode", None)
+        )
+        if isinstance(candidate, bool) or not isinstance(candidate, int):
+            raise TypeError("simulation mutation retcode must be an integer")
+        return candidate
+
+    def _mutation_error(
+        self,
+        operation: BrokerCapabilityId,
+        code: BrokerErrorCode,
+        reason: str,
+        *,
+        provider_code: str | None = None,
+    ) -> StandardResponse[Any]:
+        """Return one bounded deterministic mutation error.
+
+        Args:
+            operation: Canonical mutation capability.
+            code: Verified canonical error classification.
+            reason: Bounded failure reason.
+            provider_code: Optional verified native retcode.
+
+        Returns:
+            Canonical error response.
+        """
+        error = BrokerError(
+            code=code,
+            message=f"Simulation {operation.value} rejected",
+            provider_code=provider_code,
+            capability=operation,
+            details={"mutation_state": reason},
+        )
+        self._last_error = error
+        return self._result(operation, error=error)
+
+    @staticmethod
+    def _idempotency_key(request: object) -> str | None:
+        """Return an explicit caller idempotency identity when supplied.
+
+        Args:
+            request: Canonical request or cancel argument tuple.
+
+        Returns:
+            Explicit key, or ``None``.
+        """
+        if isinstance(request, tuple):
+            candidate = request[1] if len(request) > 1 else None
+        else:
+            candidate = getattr(request, "idempotency_key", None) or getattr(
+                request, "client_request_id", None
+            )
+        return candidate if isinstance(candidate, str) and candidate else None
+
+    async def _delegate_mutation(  # noqa: C901, PLR0911, PLR0912
+        self,
+        operation: BrokerCapabilityId,
+        request: object,
+        *,
+        check_only: bool = False,
+        position_result: bool = False,
+    ) -> StandardResponse[Any]:
+        """Delegate once and classify one provider-shaped authority result.
+
+        Args:
+            operation: Canonical mutation capability.
+            request: Exact immutable request or cancel argument tuple.
+            check_only: Whether to use MT5 order-check mapping.
+            position_result: Whether an exact projected position is required.
+
+        Returns:
+            Canonical mapped result or deterministic fail-closed error.
+        """
+        if self._state is not BrokerConnectionState.READY:
+            return self._not_connected(operation)
+        if (
+            self._config.broker_id.value != "sim"
+            or self._config.environment.value != "simulation"
+        ):
+            return self._mutation_error(
+                operation,
+                BrokerErrorCode.BROKER_CONFIGURATION_INVALID,
+                "route_mismatch",
+            )
+        if (
+            isinstance(request, BrokerOrderRequest)
+            and request.environment != self._config.environment
+        ):
+            return self._mutation_error(
+                operation,
+                BrokerErrorCode.BROKER_REQUEST_INVALID,
+                "target_environment_mismatch",
+            )
+        key = self._idempotency_key(request)
+        if key is not None and key in self._mutation_keys:
+            return self._mutation_error(
+                operation,
+                BrokerErrorCode.BROKER_REQUEST_REJECTED,
+                "duplicate_idempotency_key",
+            )
+        mutate = getattr(self._authority, "mutate", None)
+        if not callable(mutate):
+            return self._mutation_error(
+                operation,
+                BrokerErrorCode.BROKER_RESPONSE_INVALID,
+                "authority_mutation_unbound",
+            )
+        try:
+            envelope = await mutate(operation, request)
+        except TimeoutError:
+            return self._mutation_error(
+                operation,
+                BrokerErrorCode.BROKER_RESPONSE_INVALID,
+                "unseeded_timeout",
+            )
+        except Exception as error:  # noqa: BLE001 - public boundary normalization.
+            return self._mutation_error(
+                operation,
+                BrokerErrorCode.BROKER_RESPONSE_INVALID,
+                type(error).__name__,
+            )
+        if not isinstance(envelope, SimulationMutationEnvelope):
+            return self._mutation_error(
+                operation, BrokerErrorCode.BROKER_RESPONSE_INVALID, "invalid_envelope"
+            )
+        try:
+            self._validate_time(envelope.simulated_at, "simulated_at")
+        except ValueError:
+            return self._mutation_error(
+                operation, BrokerErrorCode.BROKER_RESPONSE_INVALID, "invalid_clock"
+            )
+        if envelope.seeded_fault:
+            return self._mutation_error(
+                operation,
+                BrokerErrorCode.BROKER_RESPONSE_INVALID,
+                "phase_20_fault_not_admitted",
+            )
+        if envelope.request_echo != request:
+            return self._mutation_error(
+                operation, BrokerErrorCode.BROKER_REQUEST_INVALID, "request_tamper"
+            )
+        try:
+            retcode = self._provider_retcode(envelope.provider_result)
+        except TypeError:
+            return self._mutation_error(
+                operation, BrokerErrorCode.BROKER_RESPONSE_INVALID, "malformed_result"
+            )
+        verified = {
+            0,
+            10006,
+            10007,
+            10008,
+            10009,
+            10010,
+            10013,
+            10014,
+            10015,
+            10016,
+            10017,
+            10018,
+            10019,
+            10021,
+            10022,
+            10025,
+            10030,
+            10031,
+            10032,
+            10033,
+            10034,
+            10035,
+            10038,
+        }
+        if retcode not in verified or (check_only and retcode != 0):
+            if retcode not in verified:
+                return self._mutation_error(
+                    operation,
+                    BrokerErrorCode.BROKER_RESPONSE_INVALID,
+                    "unverified_retcode",
+                    provider_code=str(retcode),
+                )
+            return self._mutation_error(
+                operation,
+                _map_error_code(retcode),
+                "provider_rejection",
+                provider_code=str(retcode),
+            )
+        if check_only:
+            if key is not None:
+                self._mutation_keys.add(key)
+            return self._result(
+                operation, data=_map_order_check(envelope.provider_result)
+            )
+        mapped = _map_order_result(
+            envelope.provider_result, clock=lambda: envelope.simulated_at
+        )
+        if mapped.outcome not in {"ACCEPTED", "PARTIAL"}:
+            return self._mutation_error(
+                operation,
+                _map_error_code(retcode),
+                "provider_rejection",
+                provider_code=str(retcode),
+            )
+        if position_result:
+            if not isinstance(envelope.projected_position, BrokerPosition):
+                return self._mutation_error(
+                    operation,
+                    BrokerErrorCode.BROKER_RESPONSE_INVALID,
+                    "projected_position_missing",
+                )
+            data: object = envelope.projected_position
+        else:
+            data = mapped
+        if key is not None:
+            self._mutation_keys.add(key)
+        return self._result(operation, data=data)
+
+    async def check_order(
+        self, request: BrokerOrderRequest
+    ) -> StandardResponse[BrokerOrderCheck]:
+        """Validate one exact order through the injected authority.
+
+        Args:
+            request: Immutable canonical order request.
+
+        Returns:
+            Canonical provider order-check result.
+        """
+        return cast(
+            "StandardResponse[BrokerOrderCheck]",
+            await self._delegate_mutation(
+                BrokerCapabilityId.CHECK_ORDER, request, check_only=True
+            ),
+        )
+
+    async def place_order(
+        self, request: BrokerOrderRequest
+    ) -> StandardResponse[BrokerOrderResult]:
+        """Place one exact order through the injected authority.
+
+        Args:
+            request: Immutable canonical order request.
+
+        Returns:
+            Canonical provider acknowledgement.
+        """
+        return cast(
+            "StandardResponse[BrokerOrderResult]",
+            await self._delegate_mutation(BrokerCapabilityId.PLACE_ORDER, request),
+        )
+
+    async def modify_order(
+        self, request: BrokerOrderModificationRequest
+    ) -> StandardResponse[BrokerOrderResult]:
+        """Modify one exact order through the injected authority.
+
+        Args:
+            request: Immutable canonical order modification.
+
+        Returns:
+            Canonical provider acknowledgement.
+        """
+        return cast(
+            "StandardResponse[BrokerOrderResult]",
+            await self._delegate_mutation(BrokerCapabilityId.MODIFY_ORDER, request),
+        )
+
+    async def cancel_order(
+        self, order_id: str, client_request_id: str | None = None
+    ) -> StandardResponse[BrokerOrderResult]:
+        """Cancel one exact order through the injected authority.
+
+        Args:
+            order_id: Exact target order identity.
+            client_request_id: Optional caller idempotency identity.
+
+        Returns:
+            Canonical provider acknowledgement.
+        """
+        request = (order_id, client_request_id)
+        return cast(
+            "StandardResponse[BrokerOrderResult]",
+            await self._delegate_mutation(BrokerCapabilityId.CANCEL_ORDER, request),
+        )
+
+    async def modify_position(
+        self, request: BrokerPositionModificationRequest
+    ) -> StandardResponse[BrokerPosition]:
+        """Modify one exact position through the injected authority.
+
+        Args:
+            request: Immutable position modification.
+
+        Returns:
+            Exact authority-projected post-mutation position.
+        """
+        return cast(
+            "StandardResponse[BrokerPosition]",
+            await self._delegate_mutation(
+                BrokerCapabilityId.MODIFY_POSITION,
+                request,
+                position_result=True,
+            ),
+        )
+
+    async def close_position(
+        self, request: BrokerPositionCloseRequest
+    ) -> StandardResponse[BrokerOrderResult]:
+        """Close one exact position through the injected authority.
+
+        Args:
+            request: Immutable position close request.
+
+        Returns:
+            Canonical provider acknowledgement.
+        """
+        return cast(
+            "StandardResponse[BrokerOrderResult]",
+            await self._delegate_mutation(BrokerCapabilityId.CLOSE_POSITION, request),
+        )
+
+    async def reduce_position(
+        self, request: BrokerPositionReductionRequest
+    ) -> StandardResponse[BrokerOrderResult]:
+        """Reduce one exact position through the injected authority.
+
+        Args:
+            request: Immutable position reduction request.
+
+        Returns:
+            Canonical provider acknowledgement.
+        """
+        return cast(
+            "StandardResponse[BrokerOrderResult]",
+            await self._delegate_mutation(BrokerCapabilityId.REDUCE_POSITION, request),
         )
 
 

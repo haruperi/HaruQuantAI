@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import sys
+import uuid
 from collections.abc import Mapping
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -15,6 +16,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 import _support  # noqa: F401
 from app.services.brokers import (
     build_broker_connection_config,
+    build_broker_order_modification_request,
+    build_broker_position_close_request,
+    build_broker_position_modification_request,
+    build_broker_position_reduce_request,
+    build_broker_value,
+    build_simulation_mutation_envelope,
     build_simulation_read_envelope,
     create_configured_fake_broker_adapter,
     create_simulation_broker_adapter,
@@ -22,6 +29,7 @@ from app.services.brokers import (
     get_broker_capability_catalogue,
     get_broker_environment,
     get_broker_id,
+    get_broker_value_field,
 )
 
 
@@ -31,6 +39,8 @@ class _UsageAuthority:
     def __init__(self, target: object) -> None:
         self._target = target
         self.read_count = 0
+        self.mutation_count = 0
+        self.mutation_retcode = 10009
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self._target, name)
@@ -67,6 +77,39 @@ class _UsageAuthority:
             available_at=now,
             simulated_at=now,
             session_revision="revision-3" if name == "get_trading_sessions" else None,
+        )
+
+    async def mutate(self, operation: object, request: object) -> object:
+        """Return one exact request-bound provider-shaped mutation result."""
+        self.mutation_count += 1
+        now = datetime(2024, 1, 2, 12, tzinfo=UTC)
+        retcode = 0 if str(operation) == "check_order" else self.mutation_retcode
+        projected_position = None
+        if str(operation) == "modify_position":
+            projected_position = build_broker_value(
+                "position",
+                position_id="position-1",
+                symbol="EURUSD",
+                side="LONG",
+                quantity=Decimal("1.00"),
+                quantity_unit="lots",
+                retrieved_at=now,
+                state="OPEN",
+                stop_loss=Decimal("1.20"),
+            )
+        return build_simulation_mutation_envelope(
+            provider_result={
+                "retcode": retcode,
+                "order": 41,
+                "deal": 42,
+                "volume": "1.00",
+                "price": "1.2345",
+                "comment": "usage fixture",
+                "margin": "12.50",
+            },
+            request_echo=request,
+            simulated_at=now,
+            projected_position=projected_position,
         )
 
 
@@ -196,6 +239,115 @@ async def fr_brk_181() -> None:
     assert authority.read_count == 1
 
 
+def _order_request() -> object:
+    """Return one immutable simulation order request."""
+    return build_broker_value(
+        "order_request",
+        symbol="EURUSD",
+        side="BUY",
+        order_type="MARKET",
+        quantity=Decimal("1.00"),
+        quantity_unit="lots",
+        environment=get_broker_environment("simulation"),
+        client_request_id=f"req-{uuid.uuid4()}",
+    )
+
+
+async def _mutation_values() -> tuple[object, _UsageAuthority]:
+    """Return one connected mutation adapter and authority."""
+    _, authority, adapter = _values()
+    assert isinstance(authority, _UsageAuthority)
+    assert (await adapter.connect()).status == "success"  # type: ignore[attr-defined]
+    return adapter, authority
+
+
+async def fr_brk_182() -> None:
+    """Demonstrate the exact simulation route and request echo guard."""
+    adapter, authority = await _mutation_values()
+    request = _order_request()
+    assert (await adapter.place_order(request)).status == "success"  # type: ignore[attr-defined]
+    assert authority.mutation_count == 1
+
+
+def fr_brk_183() -> None:
+    """Demonstrate the provider-shaped mutation envelope boundary."""
+    now = datetime(2024, 1, 2, 12, tzinfo=UTC)
+    assert build_simulation_mutation_envelope(
+        provider_result={"retcode": 10009},
+        request_echo=_order_request(),
+        simulated_at=now,
+    )
+
+
+async def fr_brk_184() -> None:
+    """Demonstrate verified provider rejection classification."""
+    adapter, authority = await _mutation_values()
+    authority.mutation_retcode = 10006
+    result = await adapter.place_order(_order_request())  # type: ignore[attr-defined]
+    assert result.status == "error"
+    assert result.error.code == "BROKER_REQUEST_REJECTED"
+
+
+async def fr_brk_185() -> None:
+    """Demonstrate deterministic acknowledgement without spontaneous ambiguity."""
+    adapter, _ = await _mutation_values()
+    result = await adapter.place_order(_order_request())  # type: ignore[attr-defined]
+    assert result.data.outcome == "ACCEPTED"
+
+
+async def fr_brk_186() -> None:
+    """Demonstrate all admitted order mutations."""
+    adapter, authority = await _mutation_values()
+    assert (await adapter.check_order(_order_request())).status == "success"  # type: ignore[attr-defined]
+    assert (await adapter.place_order(_order_request())).status == "success"  # type: ignore[attr-defined]
+    modify = build_broker_order_modification_request("41", quantity="0.75")
+    assert (await adapter.modify_order(modify)).status == "success"  # type: ignore[attr-defined]
+    assert (await adapter.cancel_order("41", "cancel-usage-1")).status == "success"  # type: ignore[attr-defined]
+    assert authority.mutation_count == 4
+
+
+async def fr_brk_187() -> None:
+    """Demonstrate all admitted position mutations."""
+    adapter, authority = await _mutation_values()
+    modify = build_broker_position_modification_request("position-1", stop_loss="1.20")
+    reduce = build_broker_position_reduce_request(
+        "position-1", "0.25", "lots", "reduce-usage-1"
+    )
+    close = build_broker_position_close_request("position-1", "0.75", "lots")
+    assert (await adapter.modify_position(modify)).status == "success"  # type: ignore[attr-defined]
+    assert (await adapter.reduce_position(reduce)).status == "success"  # type: ignore[attr-defined]
+    assert (await adapter.close_position(close)).status == "success"  # type: ignore[attr-defined]
+    assert authority.mutation_count == 3
+
+
+async def fr_brk_188() -> None:
+    """Demonstrate that the adapter delegates one mutation without accounting."""
+    adapter, authority = await _mutation_values()
+    await adapter.place_order(_order_request())  # type: ignore[attr-defined]
+    assert authority.mutation_count == 1
+    assert authority.read_count == 0
+
+
+async def fr_brk_189() -> None:
+    """Demonstrate exact v2 fill/time-policy fidelity."""
+    request = build_broker_value(
+        "order_request_v2",
+        symbol="EURUSD",
+        side="BUY",
+        order_type="MARKET",
+        quantity=Decimal("0.75"),
+        quantity_unit="lots",
+        environment=get_broker_environment("simulation"),
+        fill_policy="RETURN",
+        time_policy="GTC",
+        provider_specification_checksum="a" * 64,
+    )
+    adapter, _ = await _mutation_values()
+    assert (await adapter.place_order(request)).status == "success"  # type: ignore[attr-defined]
+    assert get_broker_value_field(request, "fill_policy") == "RETURN"
+    assert get_broker_value_field(request, "time_policy") == "GTC"
+
+
 async def _run() -> None:
     fr_brk_167()
     fr_brk_168()
@@ -211,6 +363,14 @@ async def _run() -> None:
     await fr_brk_179()
     await fr_brk_180()
     await fr_brk_181()
+    await fr_brk_182()
+    fr_brk_183()
+    await fr_brk_184()
+    await fr_brk_185()
+    await fr_brk_186()
+    await fr_brk_187()
+    await fr_brk_188()
+    await fr_brk_189()
 
 
 def main() -> None:

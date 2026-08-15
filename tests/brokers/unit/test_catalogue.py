@@ -168,9 +168,31 @@ def _expected_cells() -> dict[tuple[BrokerId, BrokerCapabilityId], str]:
         BrokerCapabilityId.GET_ORDERS,
         BrokerCapabilityId.GET_ORDER,
         BrokerCapabilityId.LIST_ORDER_HISTORY,
+        BrokerCapabilityId.CHECK_ORDER,
+        BrokerCapabilityId.PLACE_ORDER,
+        BrokerCapabilityId.MODIFY_ORDER,
+        BrokerCapabilityId.CANCEL_ORDER,
+        BrokerCapabilityId.MODIFY_POSITION,
+        BrokerCapabilityId.REDUCE_POSITION,
+        BrokerCapabilityId.CLOSE_POSITION,
     }
     for operation in BrokerCapabilityId:
-        cells[(BrokerId.SIM, operation)] = "A" if operation in simulation else "U"
+        cells[(BrokerId.SIM, operation)] = (
+            "W"
+            if operation
+            in {
+                BrokerCapabilityId.CHECK_ORDER,
+                BrokerCapabilityId.PLACE_ORDER,
+                BrokerCapabilityId.MODIFY_ORDER,
+                BrokerCapabilityId.CANCEL_ORDER,
+                BrokerCapabilityId.MODIFY_POSITION,
+                BrokerCapabilityId.REDUCE_POSITION,
+                BrokerCapabilityId.CLOSE_POSITION,
+            }
+            else "A"
+            if operation in simulation
+            else "U"
+        )
     return cells
 
 
@@ -377,6 +399,7 @@ def test_session_mutating_operations_are_not_declared_pure_reads() -> None:
         BrokerCapabilityId.MODIFY_ORDER,
         BrokerCapabilityId.CANCEL_ORDER,
         BrokerCapabilityId.MODIFY_POSITION,
+        BrokerCapabilityId.REDUCE_POSITION,
         BrokerCapabilityId.CLOSE_POSITION,
     ],
 )
@@ -385,7 +408,7 @@ def test_every_order_mutation_is_declared_write_everywhere(
 ) -> None:
     """The write gate permits only evidence-backed MT5 sandbox operations."""
     catalogue = _catalogue()
-    released = {
+    mt5_released = {
         BrokerCapabilityId.CHECK_ORDER,
         BrokerCapabilityId.PLACE_ORDER,
         BrokerCapabilityId.CANCEL_ORDER,
@@ -394,10 +417,23 @@ def test_every_order_mutation_is_declared_write_everywhere(
     for broker, entries in catalogue.items():
         entry = next(item for item in entries if item.capability == operation)
         assert entry.access_mode == "WRITE"
-        if broker is BrokerId.MT5 and operation in released:
+        simulation_released = {
+            BrokerCapabilityId.CHECK_ORDER,
+            BrokerCapabilityId.PLACE_ORDER,
+            BrokerCapabilityId.MODIFY_ORDER,
+            BrokerCapabilityId.CANCEL_ORDER,
+            BrokerCapabilityId.MODIFY_POSITION,
+            BrokerCapabilityId.REDUCE_POSITION,
+            BrokerCapabilityId.CLOSE_POSITION,
+        }
+        if broker is BrokerId.MT5 and operation in mt5_released:
             assert entry.availability == "AVAILABLE"
             assert entry.verification_status == "TESTED_SANDBOX"
             assert entry.release_approval_reference == "FR-BRK-010:MT5_DEMO_ONLY"
+        elif broker is BrokerId.SIM and operation in simulation_released:
+            assert entry.availability == "AVAILABLE"
+            assert entry.verification_status == "TESTED_SANDBOX"
+            assert entry.release_approval_reference == "FR-BRK-182:SIMULATION_ONLY"
         else:
             assert entry.availability == "UNAVAILABLE"
 

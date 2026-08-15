@@ -131,19 +131,27 @@ def test_broker_capability_accepts_declared_traits() -> None:
     assert capability.sandbox_availability == "AVAILABLE"
 
 
-def test_attach_protection_and_reduce_position_are_unavailable_in_catalogue() -> None:
-    """The two new write capabilities are fail-closed UNAVAILABLE everywhere."""
+def test_safe_write_capabilities_follow_released_profile_evidence() -> None:
+    """Protection stays unavailable while Simulation releases reduction."""
     response = get_broker_capability_catalogue()
     assert response.status == "success"
     catalogue = response.data
     for broker_entries in catalogue.values():
         for entry in broker_entries:
-            if entry.capability in {
-                BrokerCapabilityId.ATTACH_PROTECTION,
-                BrokerCapabilityId.REDUCE_POSITION,
-            }:
+            if entry.capability is BrokerCapabilityId.ATTACH_PROTECTION:
                 assert entry.availability == "UNAVAILABLE"
                 assert entry.implementation_status == "NOT_IMPLEMENTED"
+                assert entry.access_mode == "WRITE"
+            if entry.capability is BrokerCapabilityId.REDUCE_POSITION:
+                expected = entry.release_approval_reference == (
+                    "FR-BRK-182:SIMULATION_ONLY"
+                )
+                assert entry.availability == (
+                    "AVAILABLE" if expected else "UNAVAILABLE"
+                )
+                assert entry.implementation_status == (
+                    "IMPLEMENTED" if expected else "NOT_IMPLEMENTED"
+                )
                 assert entry.access_mode == "WRITE"
 
 

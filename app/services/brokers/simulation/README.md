@@ -14,6 +14,10 @@ recalculates account, position, or order values and never silently sorts deliver
 Admitted reads cover symbols/current specification, revision-bound trading
 sessions, quotes/spreads/ticks/bars, permissions, account/balances, positions,
 open orders, and order history. Deal and transaction reads remain unsupported.
-Weekly sessions alone do not certify dated exceptions. Mutations remain unavailable
-until their owning phase, and every unadmitted operation returns
-`BROKER_CAPABILITY_UNSUPPORTED`.
+Weekly sessions alone do not certify dated exceptions. Admitted mutations cover
+check/place/modify/cancel order and modify/reduce/close position. Each delegates
+one immutable request through a request-bound provider-shaped envelope, reuses
+the verified MT5 retcode/mapping path, and rejects route, environment, tamper,
+duplicate-idempotency, malformed-result, and unseeded-timeout evidence. The
+adapter never matches, fills, accounts, or derives position state. Every other
+unadmitted operation returns `BROKER_CAPABILITY_UNSUPPORTED`.

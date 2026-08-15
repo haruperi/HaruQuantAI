@@ -72,9 +72,7 @@ _WRITE = {
 _MT5_DEMO_RELEASED_WRITES = {
     BrokerCapabilityId.CHECK_ORDER,
     BrokerCapabilityId.PLACE_ORDER,
-    BrokerCapabilityId.MODIFY_ORDER,
     BrokerCapabilityId.CANCEL_ORDER,
-    BrokerCapabilityId.MODIFY_POSITION,
     BrokerCapabilityId.CLOSE_POSITION,
 }
 # Operations that mutate provider watch-list or session subscription state
@@ -153,6 +151,13 @@ _SIMULATION = {
     BrokerCapabilityId.GET_ORDERS,
     BrokerCapabilityId.GET_ORDER,
     BrokerCapabilityId.LIST_ORDER_HISTORY,
+    BrokerCapabilityId.CHECK_ORDER,
+    BrokerCapabilityId.PLACE_ORDER,
+    BrokerCapabilityId.MODIFY_ORDER,
+    BrokerCapabilityId.CANCEL_ORDER,
+    BrokerCapabilityId.MODIFY_POSITION,
+    BrokerCapabilityId.CLOSE_POSITION,
+    BrokerCapabilityId.REDUCE_POSITION,
 }
 _CTRADER = _COMMON_TARGETS | {
     BrokerCapabilityId.PING,
@@ -298,6 +303,10 @@ _READ_EVIDENCE: Mapping[BrokerId, tuple[str, ...]] = MappingProxyType(
             "tests/brokers/integration/test_simulation_conformance.py",
             "tests/brokers/integration/test_simulation_read_conformance.py",
             "tests/brokers/integration/test_simulation_delivery_gaps.py",
+            "tests/brokers/unit/simulation/test_simulation_order_mutations.py",
+            "tests/brokers/unit/simulation/test_simulation_position_mutations.py",
+            "tests/brokers/unit/simulation/test_simulation_retcode_mapping.py",
+            "tests/brokers/integration/test_simulation_mutation_conformance.py",
         ),
     }
 )
@@ -309,6 +318,7 @@ _MT5_DEMO_WRITE_EVIDENCE = (
     "tests/brokers/integration/test_mt5_demo_mutations.py",
 )
 _MT5_DEMO_WRITE_APPROVAL = "FR-BRK-010:MT5_DEMO_ONLY"
+_SIMULATION_WRITE_APPROVAL = "FR-BRK-182:SIMULATION_ONLY"
 
 # The adapter's own verification act. `connect` establishes and verifies the
 # session and `is_connected` reads local/provider session state, so both remain
@@ -423,6 +433,7 @@ def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapabi
         "AVAILABLE" if available else "UNAVAILABLE"
     )
     is_demo_write = broker is BrokerId.MT5 and operation in _WRITE and released
+    is_simulation_write = broker is BrokerId.SIM and operation in _WRITE and released
     evidence = (
         _MT5_DEMO_WRITE_EVIDENCE
         if is_demo_write
@@ -445,9 +456,17 @@ def _capability(broker: BrokerId, operation: BrokerCapabilityId) -> BrokerCapabi
         verification_status="TESTED_SANDBOX" if released else "NOT_TESTED",
         verification_evidence=evidence,
         release_approval_reference=(
-            _MT5_DEMO_WRITE_APPROVAL if is_demo_write else None
+            _MT5_DEMO_WRITE_APPROVAL
+            if is_demo_write
+            else _SIMULATION_WRITE_APPROVAL
+            if is_simulation_write
+            else None
         ),
-        execution_model="LOCAL" if operation in _LOCAL else "PROVIDER_CALL",
+        execution_model=(
+            "LOCAL"
+            if broker is BrokerId.SIM or operation in _LOCAL
+            else "PROVIDER_CALL"
+        ),
         reason=(
             None
             if available

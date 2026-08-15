@@ -21,6 +21,7 @@ from app.services.brokers.canonical_contracts.enums import (
     BrokerConnectionState,
     BrokerEnvironment,
     BrokerErrorCode,
+    BrokerId,
 )
 from app.services.brokers.canonical_contracts.models import (
     BrokerConnectionConfig,
@@ -117,6 +118,7 @@ class _UnsupportedAdapterBase:
                 if item.capability in self._MUTATION_OPERATIONS
                 and item.availability == "AVAILABLE"
                 and config.environment is not BrokerEnvironment.DEMO
+                and config.broker_id is not BrokerId.SIM
                 else item
             )
             for item in catalogue

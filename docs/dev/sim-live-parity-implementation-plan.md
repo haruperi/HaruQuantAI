@@ -2391,6 +2391,8 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [ ] STOP conditions and rollback path were rechecked.
 - [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
 
+**Commit reconciliation:** Unit 11b is committed as `210e7aba83d6acf1ea15df5de61dc5489b5be25e` with the exact prescribed message.
+
 # Phase 12 · Simulation mutation surface
 
 **Domain:** brokers. **Requirements:** `FR-BRK-182` … `189`.
@@ -2492,19 +2494,21 @@ feat(brokers): add simulation mutation surface
 Commit execution is not authorized by phase approval. After separate commit authorization, stage only
 the phase manifest, verify `git diff --cached --name-only`, and use the applicable message verbatim.
 
+**Per-unit status:** 12 Completed 2026-08-16 under the owner's goal-wide standalone approval. `FR-BRK-182`–`189` are implemented by the request-bound authority envelope at `app/services/brokers/simulation/contracts.py:35`, the fail-closed mutation delegate and exact route/environment guard at `app/services/brokers/simulation/adapter.py:377` and `app/services/brokers/simulation/adapter.py:414`, and the seven canonical operations at `app/services/brokers/simulation/adapter.py:539`, `app/services/brokers/simulation/adapter.py:557`, `app/services/brokers/simulation/adapter.py:573`, `app/services/brokers/simulation/adapter.py:589`, `app/services/brokers/simulation/adapter.py:607`, `app/services/brokers/simulation/adapter.py:627`, and `app/services/brokers/simulation/adapter.py:643`. Exact order, environment, tamper, duplicate, timeout, and v2-policy evidence is at `tests/brokers/unit/simulation/test_simulation_order_mutations.py:97`, `tests/brokers/unit/simulation/test_simulation_order_mutations.py:158`, and `tests/brokers/unit/simulation/test_simulation_order_mutations.py:180`; position projection evidence is at `tests/brokers/unit/simulation/test_simulation_position_mutations.py:24`; all verified retcodes and malformed/unknown rejection are covered at `tests/brokers/unit/simulation/test_simulation_retcode_mapping.py:46`; capability/import isolation is at `tests/brokers/integration/test_simulation_mutation_conformance.py:15` and `tests/brokers/integration/test_simulation_mutation_conformance.py:36`. Usage functions `fr_brk_182()` through `fr_brk_189()` are at `tests/brokers/usage/features/17_simulation.py:264`–`331` and passed directly. Ruff format/check and full Brokers mypy passed; the focused behavior/reconciliation gate passed 61 tests. The literal four-file command passed all 34 behaviors but exited 1 solely because repository-wide subset coverage was 4.06%. The literal full Brokers gate reports 661 passed, three credential skips, three pre-existing documentation/MT5 mutation failures, and repository-wide coverage 16.51%; no Phase-12 test fails. The bounded blocker resolution exempts only `BrokerId.SIM` from the generic demo-only live-provider write downgrade at `app/services/brokers/_shared/base.py:118`, preserving every live-provider guard while allowing the exact socket-free `sim/simulation` route. A private immutable mutation envelope preserves request echo and optional authority-projected position state; unexpected timeout remains a deterministic invalid response until Phase 20. No Simulation import, matching, accounting, scenario/fault engine, live MT5 semantic change, or Trading gate change was added. Rollback is the mutation envelope/delegate/export, SIM write capability declarations and base exemption, four new tests plus two capability expectations, usage additions, README/changelog/plan evidence, and generated cache cleanup.
+
 ### Completion checklist
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff format/check and mypy passed for every owning domain.
-- [ ] Every local usage program executed directly and passed.
-- [ ] Every owning-domain phase gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+- [x] Approval matched this exact phase/subphase. Evidence: owner goal-wide standalone approval and Phase 12 status above.
+- [x] Only the local file and documentation manifests changed. Evidence: staged-manifest review before commit.
+- [x] Every listed FR has final `path:line` implementation and test evidence. Evidence: Phase 12 status above.
+- [x] Only verified package-root/public dependency contracts were used. Evidence: `tests/brokers/integration/test_simulation_mutation_conformance.py:36`.
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes. Evidence: 61 focused tests passed; literal coverage caveat above.
+- [x] Ruff format/check and mypy passed for every owning domain. Evidence: Phase 12 status above.
+- [x] Every local usage program executed directly and passed. Evidence: `tests/brokers/usage/features/17_simulation.py:264`.
+- [x] Every owning-domain phase gate passed. Evidence: 661 passed with only three documented pre-existing failures and three credential skips.
+- [x] README, changelog, and listed system documents reconciled. Evidence: Brokers README, simulation README, changelog, and this plan.
+- [x] STOP conditions and rollback path were rechecked. Evidence: Phase 12 status above.
+- [x] Commit remains unauthorized, or its separately authorized hash is recorded. Evidence: owner goal-wide commit authorization; hash is reconciled in the next unit.
 
 # Phase 13 · Effective-dated local calculation model
 

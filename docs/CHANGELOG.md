@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Add the simulation mutation surface
+
+The simulation Broker channel now delegates its approved order and position mutation intersection through request-bound authority envelopes and the verified MT5 mapping path (Phase 12).
+
+#### Added (1)
+
+- Added exact route, tamper, idempotency, retcode, ambiguity, projected-position, and v2-policy guards without adapter-owned matching or accounting.
+
 ### Add clock-safe simulation reads
 
 The simulation Broker channel now exposes its approved authoritative read intersection with explicit time, sequence, staleness, gap, and session-revision evidence (Phase 11b).

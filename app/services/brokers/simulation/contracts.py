@@ -31,6 +31,17 @@ class SimulationReadEnvelope:
     session_revision: str | None = None
 
 
+@dataclass(frozen=True, slots=True, kw_only=True)
+class SimulationMutationEnvelope:
+    """Authority result bound to the exact immutable mutation request."""
+
+    provider_result: object
+    request_echo: object
+    simulated_at: datetime
+    projected_position: object | None = None
+    seeded_fault: bool = False
+
+
 @runtime_checkable
 class SimulationAuthorityPort(BrokerAdapter, Protocol):
     """Brokers-owned delegation surface implemented by an injected authority."""
@@ -59,5 +70,25 @@ class SimulationAuthorityPort(BrokerAdapter, Protocol):
         """
         ...
 
+    async def mutate(
+        self,
+        operation: BrokerCapabilityId,
+        request: object,
+    ) -> SimulationMutationEnvelope:
+        """Return one provider-shaped mutation acknowledgement.
 
-__all__ = ("SimulationAuthorityPort", "SimulationReadEnvelope")
+        Args:
+            operation: Admitted canonical mutation capability.
+            request: Exact immutable canonical request or argument tuple.
+
+        Returns:
+            Provider-shaped result bound to the unchanged request.
+        """
+        ...
+
+
+__all__ = (
+    "SimulationAuthorityPort",
+    "SimulationMutationEnvelope",
+    "SimulationReadEnvelope",
+)

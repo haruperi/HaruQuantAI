@@ -11,7 +11,39 @@ from app.services.brokers.canonical_contracts import (
     StandardResponse,
 )
 from app.services.brokers.simulation.adapter import SimulationBrokerAdapter
-from app.services.brokers.simulation.contracts import SimulationReadEnvelope
+from app.services.brokers.simulation.contracts import (
+    SimulationMutationEnvelope,
+    SimulationReadEnvelope,
+)
+
+
+def build_simulation_mutation_envelope(
+    *,
+    provider_result: object,
+    request_echo: object,
+    simulated_at: datetime,
+    projected_position: object | None = None,
+    seeded_fault: bool = False,
+) -> object:
+    """Build one request-bound provider-shaped mutation envelope.
+
+    Args:
+        provider_result: MT5 OrderCheckResult/OrderSendResult-shaped payload.
+        request_echo: Exact immutable request received by the authority.
+        simulated_at: Injected aware-UTC mutation observation time.
+        projected_position: Exact post-mutation position for modify-position.
+        seeded_fault: Phase-20-only explicit ambiguity marker.
+
+    Returns:
+        Opaque Brokers-owned mutation envelope.
+    """
+    return SimulationMutationEnvelope(
+        provider_result=provider_result,
+        request_echo=request_echo,
+        simulated_at=simulated_at,
+        projected_position=projected_position,
+        seeded_fault=seeded_fault,
+    )
 
 
 def build_simulation_read_envelope(
@@ -101,6 +133,7 @@ async def finalize_simulation_broker_session(
 
 
 __all__ = (
+    "build_simulation_mutation_envelope",
     "build_simulation_read_envelope",
     "create_simulation_broker_adapter",
     "finalize_simulation_broker_session",
