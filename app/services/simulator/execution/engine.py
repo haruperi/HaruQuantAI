@@ -15,6 +15,10 @@ from app.services.simulator.errors import (
     operation_guard,
     unwrap_simulation_response,
 )
+from app.services.simulator.execution.lifecycle import (
+    build_lifecycle_deal,
+    deterministic_lifecycle_ticket,
+)
 from app.services.simulator.execution.matching import (
     evaluate_protective_exit,
     match_order,
@@ -85,6 +89,28 @@ def _receipt_id(intent: OrderIntent, status: str, sequence: int) -> str:
         }
     )
     return f"sim-receipt-{sha256(material.encode('utf-8')).hexdigest()}"
+
+
+def _opening_deal_id(intent: OrderIntent, tick: Tick) -> str:
+    """Return the deal ticket shared by receipt and lifecycle projection.
+
+    Args:
+        intent: Causal Trading intent.
+        tick: Authority fill tick.
+
+    Returns:
+        Deterministic provider-shaped deal ticket.
+    """
+    return deterministic_lifecycle_ticket(
+        "deal",
+        {
+            "order_id": f"sim-order-{intent.client_order_id}",
+            "position_id": f"sim-position-{intent.client_order_id}",
+            "entry": "DEAL_ENTRY_IN",
+            "source_sequence": tick.sequence,
+            "occurred_at": tick.timestamp,
+        },
+    )
 
 
 class EventDrivenExecutionEngine:
@@ -273,11 +299,7 @@ class EventDrivenExecutionEngine:
             Trading-owned execution receipt.
         """
         logger.debug("Constructing Simulation receipt with status %s", status)
-        deal_ids = (
-            (f"sim-deal-{intent.client_order_id}-{tick.sequence}",)
-            if filled > 0
-            else ()
-        )
+        deal_ids = (_opening_deal_id(intent, tick),) if filled > 0 else ()
         return create_execution_receipt(
             receipt_id=_receipt_id(intent, status, tick.sequence),
             intent_id=intent.source_intent_id,
@@ -431,6 +453,19 @@ class EventDrivenExecutionEngine:
                 "mae": Decimal(0),
                 "mfe": Decimal(0),
             }
+            deal = build_lifecycle_deal(
+                order_id=f"sim-order-{intent.client_order_id}",
+                position_id=position_id,
+                side=str(intent.side),
+                quantity=match.filled_quantity,
+                price=match.execution_price,
+                entry="DEAL_ENTRY_IN",
+                reason="EXPERT",
+                occurred_at=tick.timestamp,
+                source_sequence=tick.sequence,
+                fee_evidence=costs,
+            )
+            self._deals.append(MappingProxyType(dict(deal)))
         receipt_status: ReceiptStatus = match.status
         receipt = self._receipt(
             intent,
@@ -449,7 +484,6 @@ class EventDrivenExecutionEngine:
             operation="simulation.execution.event_driven_execution_engine._apply_match",
         )
         self._orders[intent.client_order_id] = receipt
-        self._deals.append(receipt)
         return receipt
 
     def _observe_excursions(self, tick: Tick) -> None:
@@ -570,28 +604,31 @@ class EventDrivenExecutionEngine:
             del self._positions[position_id]
         else:
             position["volume"] = remaining
-        deal_material = canonical_json(
+        close_order_id = deterministic_lifecycle_ticket(
+            "order",
             {
                 "position_id": position_id,
                 "quantity": quantity,
-                "sequence": tick.sequence,
-                "reason": exit_reason,
-            }
-        )
-        deal_id = f"sim-deal-{sha256(deal_material.encode('utf-8')).hexdigest()}"
-        deal = MappingProxyType(
-            {
-                "deal_id": deal_id,
-                "position_id": position_id,
-                "quantity": quantity,
-                "price": exit_price,
-                "gross_profit": gross_profit,
-                "event_category": "authority_deal",
-                "exit_reason": exit_reason,
-                "occurred_at": tick.timestamp,
                 "source_sequence": tick.sequence,
-            }
+                "reason": exit_reason,
+            },
         )
+        lifecycle_deal = build_lifecycle_deal(
+            order_id=close_order_id,
+            position_id=position_id,
+            side="SELL" if side == "BUY" else "BUY",
+            quantity=quantity,
+            price=exit_price,
+            entry="DEAL_ENTRY_OUT",
+            reason=exit_reason,
+            occurred_at=tick.timestamp,
+            source_sequence=tick.sequence,
+            fee_evidence={
+                **costs,
+                "gross_profit": gross_profit,
+            },
+        )
+        deal = MappingProxyType(dict(lifecycle_deal))
         self._deals.append(deal)
         unwrap_simulation_response(
             self._journal.append(
@@ -718,7 +755,16 @@ class EventDrivenExecutionEngine:
                 self._pending[order_id] = (intent, match.stop_limit_armed)
                 continue
             outcomes.append(self._apply_match(intent, match, tick))
-            del self._pending[order_id]
+            if match.remainder_quantity > 0:
+                residual = intent.model_copy(
+                    update={
+                        "approved_volume": match.remainder_quantity,
+                        "risk_approved_volume": match.remainder_quantity,
+                    }
+                )
+                self._pending[order_id] = (residual, match.stop_limit_armed)
+            else:
+                del self._pending[order_id]
         self._observe_excursions(tick)
         account = unwrap_simulation_response(
             self._ledger.snapshot(),

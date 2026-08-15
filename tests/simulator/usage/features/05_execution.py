@@ -17,14 +17,20 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.simulator import (
+    build_lifecycle_deal,
+    build_protection_projection,
     calculate_rollover_swap,
     create_simulation_handle,
     create_simulation_value,
+    describe_lifecycle_race,
+    deterministic_lifecycle_ticket,
     evaluate_protective_exit,
     execute_simulation_handle_operation,
     is_provider_session_open,
     match_order,
     price_order,
+    resolve_fill_remainder,
+    resolve_order_expiration,
     schedule_simulation_rollover,
     unwrap_simulation_response,
     validate_provider_order,
@@ -454,6 +460,109 @@ def fr_sim_156() -> None:
     fr_sim_155()
 
 
+def fr_sim_163() -> None:
+    """FR-SIM-163: Resolve evidenced provider time-policy expiration."""
+    expiration = _value(
+        resolve_order_expiration(
+            policy="DAY",
+            submitted_at=NOW,
+            specified_at=None,
+            session_closes=(NOW.replace(hour=17),),
+        )
+    )
+    print(f"Data -> expiration='{expiration}'")
+
+
+def fr_sim_164() -> None:
+    """FR-SIM-164: Resolve all admitted fill policies deterministically."""
+    result = _value(
+        resolve_fill_remainder(
+            policy="IOC",
+            requested=Decimal(2),
+            available=Decimal(1),
+            remainder_evidenced=False,
+        )
+    )
+    print(f"Data -> fill_status='{result['status']}'")  # type: ignore[index]
+
+
+def fr_sim_165() -> None:
+    """FR-SIM-165: Preserve only an evidenced RETURN residual."""
+    result = _value(
+        resolve_fill_remainder(
+            policy="RETURN",
+            requested=Decimal(2),
+            available=Decimal(1),
+            remainder_evidenced=True,
+        )
+    )
+    print(f"Data -> remainder='{result['remaining']}'")  # type: ignore[index]
+
+
+def fr_sim_166() -> None:
+    """FR-SIM-166: Link deterministic order/deal/position tickets."""
+    ticket = _value(deterministic_lifecycle_ticket("order", {"intent_id": "intent-1"}))
+    deal = _value(
+        build_lifecycle_deal(
+            order_id=str(ticket),
+            position_id="position-1",
+            side="BUY",
+            quantity=Decimal(1),
+            price=Decimal("1.1"),
+            entry="DEAL_ENTRY_IN",
+            reason="EXPERT",
+            occurred_at=NOW,
+            source_sequence=1,
+            fee_evidence={"commission": Decimal(0)},
+        )
+    )
+    print(f"Data -> deal_id='{deal['deal_id']}'")  # type: ignore[index]
+
+
+def fr_sim_167() -> None:
+    """FR-SIM-167: Expose protection fields and OCO, not pending orders."""
+    protection = _value(
+        build_protection_projection(
+            position_id="position-1",
+            stop_loss=Decimal("1.09"),
+            take_profit=Decimal("1.12"),
+            triggered_reason="STOP_LOSS",
+        )
+    )
+    print(
+        f"Data -> protection_pending='{protection['exposed_as_pending_order']}'"  # type: ignore[index]
+    )
+
+
+def fr_sim_168() -> None:
+    """FR-SIM-168: Carry fee and account-transaction causal evidence."""
+    fr_sim_166()
+
+
+def fr_sim_169() -> None:
+    """FR-SIM-169: Preserve ordered or concurrent lifecycle races."""
+    relation = _value(
+        describe_lifecycle_race(
+            left_event_id="cancel",
+            right_event_id="fill",
+            left_at=NOW,
+            right_at=NOW,
+            evidenced_predecessor=None,
+        )
+    )
+    print(f"Data -> race_relation='{relation['relation']}'")  # type: ignore[index]
+
+
+def fr_sim_170() -> None:
+    """FR-SIM-170: Keep lifecycle identity stable across resume boundaries."""
+    first = _value(deterministic_lifecycle_ticket("deal", {"boundary": "fill-applied"}))
+    second = _value(
+        deterministic_lifecycle_ticket("deal", {"boundary": "fill-applied"})
+    )
+    assert first == second
+    print(f"Data -> resumed_ticket='{first}'")
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -492,6 +601,14 @@ def main() -> None:
     fr_sim_154()
     fr_sim_155()
     fr_sim_156()
+    fr_sim_163()
+    fr_sim_164()
+    fr_sim_165()
+    fr_sim_166()
+    fr_sim_167()
+    fr_sim_168()
+    fr_sim_169()
+    fr_sim_170()
 
 
 if __name__ == "__main__":

@@ -1150,6 +1150,76 @@ def validate_provider_order(
     )(*args, **kwargs)
 
 
+def build_lifecycle_deal(*args: object, **kwargs: object) -> StandardResponse[object]:
+    """Build one deterministic order/position-linked authority deal."""
+    return _guarded(
+        _operation("app.services.simulator.execution", "build_lifecycle_deal"),
+        operation="simulation.execution.build_lifecycle_deal",
+        risk_level="medium",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def build_protection_projection(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Build internal-only protection and OCO lifecycle evidence."""
+    return _guarded(
+        _operation("app.services.simulator.execution", "build_protection_projection"),
+        operation="simulation.execution.build_protection_projection",
+        risk_level="medium",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def describe_lifecycle_race(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Describe an evidenced lifecycle causal edge or concurrency relation."""
+    return _guarded(
+        _operation("app.services.simulator.execution", "describe_lifecycle_race"),
+        operation="simulation.execution.describe_lifecycle_race",
+        risk_level="medium",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def deterministic_lifecycle_ticket(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Derive one deterministic lifecycle ticket from canonical evidence."""
+    return _guarded(
+        _operation(
+            "app.services.simulator.execution", "deterministic_lifecycle_ticket"
+        ),
+        operation="simulation.execution.deterministic_lifecycle_ticket",
+        risk_level="medium",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def resolve_fill_remainder(*args: object, **kwargs: object) -> StandardResponse[object]:
+    """Resolve FOK, IOC, RETURN, or BOC lifecycle quantities."""
+    return _guarded(
+        _operation("app.services.simulator.execution", "resolve_fill_remainder"),
+        operation="simulation.execution.resolve_fill_remainder",
+        risk_level="medium",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def resolve_order_expiration(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Resolve one evidenced provider time-policy expiration."""
+    return _guarded(
+        _operation("app.services.simulator.execution", "resolve_order_expiration"),
+        operation="simulation.execution.resolve_order_expiration",
+        risk_level="medium",
+        read_only=True,
+    )(*args, **kwargs)
+
+
 async def run_backtest_async(
     *args: object, **kwargs: object
 ) -> StandardResponse[object]:
@@ -1643,9 +1713,11 @@ __all__: tuple[str, ...] = (
     "build_injected_event",
     "build_json_report",
     "build_latency_profile",
+    "build_lifecycle_deal",
     "build_markdown_report",
     "build_mission_definition",
     "build_point_in_time_dataset",
+    "build_protection_projection",
     "build_queue_model",
     "build_replay_identity",
     "build_scenario_evidence_provider",
@@ -1678,6 +1750,8 @@ __all__: tuple[str, ...] = (
     "create_simulation_session",
     "create_simulation_value",
     "create_transaction_ledger",
+    "describe_lifecycle_race",
+    "deterministic_lifecycle_ticket",
     "dump_simulation_value",
     "evaluate_emergency_controls",
     "evaluate_protective_exit",
@@ -1730,7 +1804,9 @@ __all__: tuple[str, ...] = (
     "replay_journal",
     "reset_live_simulation_sessions",
     "resolve_cancel_replace_race",
+    "resolve_fill_remainder",
     "resolve_idempotent_run",
+    "resolve_order_expiration",
     "restore_simulation_scheduler",
     "restore_simulation_session",
     "restore_transaction_ledger",

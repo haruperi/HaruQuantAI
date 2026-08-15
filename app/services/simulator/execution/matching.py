@@ -4,11 +4,12 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict
 
 from app.services.simulator.errors import SimulationError
+from app.services.simulator.execution.lifecycle import resolve_fill_remainder
 from app.services.simulator.execution.pricing import ExecutionProfile, price_order
 from app.utils import get_logger
 
@@ -19,7 +20,7 @@ if TYPE_CHECKING:
 
     OrderIntent = Any
 
-SUPPORTED_FILL_POLICIES = ("FOK", "IOC")
+SUPPORTED_FILL_POLICIES = ("FOK", "IOC", "RETURN", "BOC")
 SAME_TICK_PRIORITY = ("STOP_LOSS", "TAKE_PROFIT", "PENDING_ACTIVATION")
 _EXPECTED_PRIORITY_COUNT = len(SAME_TICK_PRIORITY)
 
@@ -35,6 +36,7 @@ class MatchResult(BaseModel):
     cancelled_quantity: Decimal
     execution_price: Decimal | None
     stop_limit_armed: bool
+    remainder_quantity: Decimal = Decimal(0)
 
 
 def _resolve_same_tick_priority(detected: Sequence[str]) -> str | None:
@@ -205,7 +207,7 @@ def match_order(
     """
     logger.info("Matching Simulation order %s", intent.client_order_id)
     _resolve_same_tick_priority(())
-    policy = intent.time_in_force
+    policy = getattr(intent, "fill_policy", None) or intent.time_in_force
     if policy not in SUPPORTED_FILL_POLICIES:
         raise SimulationError(
             "SIM_UNSUPPORTED_FILL_POLICY", "Fill policy is unsupported"
@@ -230,25 +232,19 @@ def match_order(
             raise SimulationError(
                 "SIM_GAP_UNCROSSABLE", "Trigger gap exceeds approved maximum"
             )
-    available = min(intent.approved_volume, _available_quantity(intent, tick, profile))
-    if policy == "FOK" and available < intent.approved_volume:
-        return MatchResult(
-            status="cancelled",
-            requested_quantity=intent.approved_volume,
-            filled_quantity=Decimal(0),
-            cancelled_quantity=intent.approved_volume,
-            execution_price=None,
-            stop_limit_armed=armed,
-        )
-    filled = available
-    cancelled = intent.approved_volume - filled
-    status: Literal["filled", "partial", "cancelled"]
-    if filled == intent.approved_volume:
-        status = "filled"
-    elif filled > 0:
-        status = "partial"
-    else:
-        status = "cancelled"
+    resolution = resolve_fill_remainder(
+        policy=policy,
+        requested=intent.approved_volume,
+        available=_available_quantity(intent, tick, profile),
+        remainder_evidenced=policy == "RETURN",
+    )
+    filled = cast("Decimal", resolution["filled"])
+    cancelled = cast("Decimal", resolution["cancelled"])
+    remainder = cast("Decimal", resolution["remaining"])
+    status = cast(
+        'Literal["pending", "filled", "partial", "cancelled"]',
+        resolution["status"],
+    )
     return MatchResult(
         status=status,
         requested_quantity=intent.approved_volume,
@@ -256,6 +252,7 @@ def match_order(
         cancelled_quantity=cancelled,
         execution_price=execution_price if filled > 0 else None,
         stop_limit_armed=armed,
+        remainder_quantity=remainder,
     )
 
 

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Complete order and deal lifecycle
+
+Simulation now emits deterministic provider-shaped order, deal, position, protection, transaction, and race evidence (Phase 17a).
+
+#### Added (1)
+
+- Added evidenced expiration/fill policies, partial remainders, linked `DEAL_ENTRY_*` records, internal OCO protection, causal transactions, race partial orders, and recovery-stable tickets.
+
 ### Mirror MT5 account and provider semantics
 
 Simulation now enforces effective provider revisions, account modes, and target-evidenced stop-out policy (Phase 16).

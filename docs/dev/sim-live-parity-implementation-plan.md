@@ -3289,7 +3289,7 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] Owning-domain behavior gate passed. Evidence: `uv run pytest -q --no-cov tests/simulator` passed 461 tests; the literal coverage-enabled command passed the same 461 behaviors and exited 1 only because repository-wide subset coverage was 29.65%, below the global 80% floor.
 - [x] README and changelog were reconciled. Evidence: `app/services/simulator/README.md`, `docs/CHANGELOG.md`.
 - [x] STOP conditions and rollback path were rechecked. Evidence: no dated exception or liquidation priority is guessed; rollback removes the two Phase 16 modules and five named tests, restores engine/run dependency/usage/docs changes, and reruns the literal Phase 16 commands.
-- [x] Commit is authorized by the owner goal-wide execution instruction; the exact prescribed Unit 16 commit message will be used and its hash reconciled in Unit 17a.
+- [x] Unit 16 is committed as `3c6c924e24897338726fef67bdb914facbd0db4b` with the exact prescribed message.
 
 # Phase 17 · Order, deal, protection, and transaction lifecycle
 
@@ -3481,6 +3481,20 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [ ] README, changelog, and listed system documents reconciled.
 - [ ] STOP conditions and rollback path were rechecked.
 - [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+
+### Unit 17a completion evidence
+
+- [x] Approval matched Unit 17a. Evidence: owner goal-wide `APPROVED: EXECUTE` and dry run `17a-DR1`.
+- [x] `FR-SIM-163`–`165` have expiration/fill/remainder implementation, test, and usage evidence. Evidence: `app/services/simulator/execution/lifecycle.py:34`, `app/services/simulator/execution/lifecycle.py:90`, `app/services/simulator/execution/matching.py:235`, `app/services/simulator/execution/engine.py:758`, `tests/simulator/unit/test_order_lifecycle.py:15`, `tests/simulator/usage/features/05_execution.py:463`.
+- [x] `FR-SIM-166`–`168` have deterministic linkage, protection, transaction, engine, test, and usage evidence. Evidence: `app/services/simulator/execution/lifecycle.py:16`, `app/services/simulator/execution/lifecycle.py:149`, `app/services/simulator/execution/lifecycle.py:217`, `app/services/simulator/execution/engine.py:456`, `app/services/simulator/execution/engine.py:616`, `app/services/simulator/accounting/transactions.py:23`, `tests/simulator/unit/test_deal_lifecycle.py:10`, `tests/simulator/unit/test_protection_lifecycle.py:8`, `tests/simulator/usage/features/05_execution.py:502`.
+- [x] `FR-SIM-169`–`170` have partial-order and durable-resume implementation, test, and usage evidence. Evidence: `app/services/simulator/execution/lifecycle.py:258`, `app/services/simulator/recovery/checkpoints.py:56`, `tests/simulator/integration/test_lifecycle_races.py:8`, `tests/simulator/integration/test_lifecycle_resume.py:14`, `tests/simulator/usage/features/05_execution.py:542`.
+- [x] The bounded blocker was resolved without invented provider facts. Evidence: execution receipts are no longer stored as deals; deterministic provider-shaped deal mappings carry order/position/entry/reason/fee/time/sequence linkage; same-time races without causal evidence are explicitly `CONCURRENT`; protections set `exposed_as_pending_order=False`.
+- [x] Existing scheduler, transaction, state, journal, and recovery contracts were reused where already complete. Evidence: scheduler priorities already encode the required total order; transaction postings already carry causal IDs; journal accepts canonical lifecycle mappings; recovery checkpoints hash and restore the complete state payload. No duplicate state schema was introduced.
+- [x] Targeted behavior and quality gates passed. Evidence: the five exact phase files passed all 6 behaviors and exited 1 only on the repository-wide 18.39% coverage floor; Ruff passed; mypy passed 99 source files; direct usage 05 passed.
+- [x] Owning-domain behavior gate passed. Evidence: `uv run pytest -q --no-cov tests/simulator` passed 467 tests; the literal coverage-enabled command passed the same 467 behaviors and exited 1 only because repository-wide subset coverage was 29.72%, below the global 80% floor.
+- [x] README and changelog are reconciled. Evidence: `app/services/simulator/README.md`, `docs/CHANGELOG.md`.
+- [x] Rollback was reviewed. Evidence: remove `execution/lifecycle.py` and five exact tests; restore engine/matching/exports/usage/docs; rerun the literal Unit 17a commands.
+- [x] Commit is authorized goal-wide; the exact Unit 17a message will be used and reconciled in Unit 17b.
 
 # Phase 18 · Simulation position reconciliation — L3
 
