@@ -217,6 +217,44 @@ def test_fr_sim_235_async_success_and_running_loop_sync_failure(
             del value
             return ()
 
+        def load_provider_specification_revisions(
+            self, value: object
+        ) -> dict[str, object]:
+            """Return complete Data-shaped request-bound revision evidence."""
+            binding = value.provider_specification_revisions[0]  # type: ignore[attr-defined]
+            return {
+                "complete_coverage": True,
+                "revisions": (
+                    {
+                        "revision_id": binding.revision_id,
+                        "broker": binding.provider,
+                        "server": binding.server,
+                        "environment": binding.environment,
+                        "account_digest": binding.account_digest,
+                        "provider_symbol": binding.symbol,
+                        "snapshot_checksum": binding.checksum,
+                        "effective_from": binding.effective_from,
+                        "effective_to": binding.effective_to,
+                        "payload": {
+                            "trade_mode": "FULL",
+                            "filling_modes": ("FOK",),
+                            "execution_mode": "MARKET",
+                            "directional_volume_limit": "100",
+                            "point": "0.00001",
+                            "stops_level_points": 0,
+                            "freeze_level_points": 0,
+                            "weekly_sessions": {
+                                str(day): (("00:00", "23:59:59.999999"),)
+                                for day in range(7)
+                            },
+                            "dated_exceptions": {},
+                            "exception_coverage": (),
+                            "exception_coverage_required": False,
+                        },
+                    },
+                ),
+            }
+
         def build_approved_requests(self, *_args: object) -> tuple[object, ...]:
             """Return no approved request for the fixture's neutral strategy."""
             return ()

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Mirror MT5 account and provider semantics
+
+Simulation now enforces effective provider revisions, account modes, and target-evidenced stop-out policy (Phase 16).
+
+#### Added (1)
+
+- Added stops/freeze, trade/execution/filling, directional-volume, dated-session, netting/hedging, margin-call, and post-swap stop-out semantics.
+
 ### Run incremental point-in-time evaluation
 
 Canonical Simulation v2 now evaluates each scheduler instant through bounded evidence and the shared Trading-cycle composition (Phase 15b).

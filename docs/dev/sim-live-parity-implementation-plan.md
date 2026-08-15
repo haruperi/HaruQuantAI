@@ -2402,7 +2402,7 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] Public API, usage, README, and changelog are reconciled. Evidence: `app/services/simulator/__init__.py:1073`, `tests/simulator/usage/features/07_run.py:461`, `app/services/simulator/README.md`, `docs/CHANGELOG.md`.
 - [x] Ruff and mypy passed for Simulator. Evidence: Ruff passed; mypy passed 96 source files.
 - [x] Rollback was reviewed. Evidence: remove `run/evaluation.py`, four tests and exports; restore dependency/orchestrator/usage/docs edits; rerun Simulator gates.
-- [x] Unit 15a hash reconciled as `0f8a7d27`; Unit 15b hash will be recorded in Phase 16.
+- [x] Unit 15a hash reconciled as `0f8a7d27`; Unit 15b hash reconciled as `03d326f8`.
 
 **Unit 15b validation note:** the literal four-file command passed all 6 behaviors and exited 1 only on the repository-wide 19.06% coverage floor. The literal full Simulator command passed all behavior after its three in-scope fixture/registry corrections and exited on the repository-wide 29.50% coverage floor; its full `--no-cov` behavioral counterpart passed all 452 tests.
 
@@ -3264,17 +3264,32 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff format/check and mypy passed for every owning domain.
-- [ ] Every local usage program executed directly and passed.
-- [ ] Every owning-domain phase gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+- [x] Approval matched this exact phase/subphase.
+- [x] Only the local file and documentation manifests changed.
+- [x] Every listed FR has final `path:line` implementation and test evidence.
+- [x] Only verified package-root/public dependency contracts were used.
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes.
+- [x] Ruff format/check and mypy passed for every owning domain.
+- [x] Every local usage program executed directly and passed.
+- [x] Every owning-domain phase gate passed.
+- [x] README, changelog, and listed system documents reconciled.
+- [x] STOP conditions and rollback path were rechecked.
+- [x] Commit is authorized goal-wide; exact-message commit pending below.
+
+### Unit 16 completion evidence
+
+- [x] Approval matched Unit 16. Evidence: owner goal-wide `APPROVED: EXECUTE` and dry run `16-DR1`.
+- [x] `FR-SIM-151`–`156` have implementation, engine-integration, test, and usage evidence. Evidence: `app/services/simulator/execution/provider_semantics.py:34`, `app/services/simulator/execution/provider_semantics.py:63`, `app/services/simulator/execution/provider_semantics.py:113`, `app/services/simulator/execution/engine.py:313`, `tests/simulator/component/test_engine.py:313`, `tests/simulator/unit/test_provider_semantics.py:31`, `tests/simulator/integration/test_session_semantics.py:20`, `tests/simulator/usage/features/05_execution.py:423`.
+- [x] `FR-SIM-157`–`162` have implementation, test, and usage evidence. Evidence: `app/services/simulator/accounting/stop_out.py:9`, `app/services/simulator/accounting/stop_out.py:41`, `app/services/simulator/accounting/stop_out.py:69`, `tests/simulator/integration/test_account_modes.py:8`, `tests/simulator/integration/test_post_swap_stop_out.py:11`, `tests/simulator/unit/test_stop_out.py:37`, `tests/simulator/usage/features/04_accounting.py:312`.
+- [x] Only verified package-root dependency contracts were used. Evidence: `app/services/simulator/run/contracts.py:688`, `app/services/simulator/run/dependencies.py:93`, `app/services/simulator/run/orchestrator.py:62`; Data-shaped interval evidence is identity/checksum matched to the frozen v2 request before engine construction.
+- [x] Automatic blocker resolution is documented. Evidence: the partial implementation used non-contract payload names; the bounded recommendation replaced them with Brokers/Data snapshot names `directional_volume_limit`, `stops_level_points`, and `freeze_level_points`, added the explicit Data revision port, and failed canonical v2 closed on absent/mismatched coverage. Existing generic journal/recovery contracts were reused because they already preserve arbitrary engine events and immutable snapshots; no duplicate provider-specific state schema was introduced.
+- [x] Targeted behavioral tests passed. Evidence: the five literal phase files passed all 8 behaviors; the literal command exited 1 only on the repository-wide 17.79% coverage floor.
+- [x] Ruff format/check and mypy passed for Simulator. Evidence: Ruff passed; mypy passed 98 source files.
+- [x] Both local usage programs passed directly. Evidence: `uv run python tests/simulator/usage/features/04_accounting.py`; `uv run python tests/simulator/usage/features/05_execution.py`.
+- [x] Owning-domain behavior gate passed. Evidence: `uv run pytest -q --no-cov tests/simulator` passed 461 tests; the literal coverage-enabled command passed the same 461 behaviors and exited 1 only because repository-wide subset coverage was 29.65%, below the global 80% floor.
+- [x] README and changelog were reconciled. Evidence: `app/services/simulator/README.md`, `docs/CHANGELOG.md`.
+- [x] STOP conditions and rollback path were rechecked. Evidence: no dated exception or liquidation priority is guessed; rollback removes the two Phase 16 modules and five named tests, restores engine/run dependency/usage/docs changes, and reruns the literal Phase 16 commands.
+- [x] Commit is authorized by the owner goal-wide execution instruction; the exact prescribed Unit 16 commit message will be used and its hash reconciled in Unit 17a.
 
 # Phase 17 · Order, deal, protection, and transaction lifecycle
 

@@ -59,6 +59,54 @@ if TYPE_CHECKING:
 _ENGINE_VERSION = "simulation-engine-v1"
 
 
+def _validated_provider_revisions(
+    request: SimulationBacktestRequestV2,
+    evidence: object,
+) -> tuple[Mapping[str, object], ...]:
+    """Validate Data-returned revision material against request-bound identity.
+
+    Args:
+        request: Canonical v2 request carrying immutable revision bindings.
+        evidence: Data interval response with explicit complete coverage.
+
+    Returns:
+        Ordered detached revisions admitted for authority-time selection.
+
+    Raises:
+        ValueError: If coverage, payload shape, identity, or checksum differs.
+    """
+    if (
+        not isinstance(evidence, Mapping)
+        or evidence.get("complete_coverage") is not True
+    ):
+        raise ValueError("provider revision interval lacks complete coverage")
+    raw = evidence.get("revisions")
+    if not isinstance(raw, tuple) or any(not isinstance(row, Mapping) for row in raw):
+        raise ValueError("provider revision material is malformed")
+    revisions = cast("tuple[Mapping[str, object], ...]", raw)
+    if len(revisions) != len(request.provider_specification_revisions):
+        raise ValueError("provider revision material does not match request bindings")
+    admitted: list[Mapping[str, object]] = []
+    for binding, revision in zip(
+        request.provider_specification_revisions, revisions, strict=True
+    ):
+        expected = {
+            "revision_id": binding.revision_id,
+            "broker": binding.provider,
+            "server": binding.server,
+            "environment": binding.environment,
+            "account_digest": binding.account_digest,
+            "provider_symbol": binding.symbol,
+            "snapshot_checksum": binding.checksum,
+            "effective_from": binding.effective_from,
+            "effective_to": binding.effective_to,
+        }
+        if any(revision.get(name) != value for name, value in expected.items()):
+            raise ValueError("provider revision identity differs from request binding")
+        admitted.append({**revision, "complete_coverage": True})
+    return tuple(admitted)
+
+
 def _canonical_hash(value: object) -> str:
     """Hash one deterministic JSON-safe value.
 
@@ -365,7 +413,16 @@ def prepare_run_context(
         specification,
         cost_model,
     )
-    engine = EventDrivenExecutionEngine(ledger, writer, profile, _ENGINE_VERSION)
+    provider_revisions: tuple[Mapping[str, object], ...] = ()
+    if isinstance(request, SimulationBacktestRequestV2):
+        provider_evidence = unwrap_simulation_response(
+            dependencies.load_provider_specification_revisions(request),
+            operation="simulation.run.load_provider_specification_revisions",
+        )
+        provider_revisions = _validated_provider_revisions(request, provider_evidence)
+    engine = EventDrivenExecutionEngine(
+        ledger, writer, profile, _ENGINE_VERSION, provider_revisions
+    )
     approved_requests: tuple[object, ...] = ()
     if isinstance(request, SimulationBacktestRequestV2):
         snapshot = unwrap_simulation_response(

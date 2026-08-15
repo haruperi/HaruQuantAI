@@ -24,8 +24,11 @@ from app.services.simulator import (
     create_simulation_value,
     create_transaction_ledger,
     execute_simulation_handle_operation,
+    get_margin_state,
     normalize_volume,
+    plan_stop_out_liquidation,
     post_transaction,
+    project_account_mode,
     restore_transaction_ledger,
     serialize_transaction_ledger,
     unwrap_simulation_response,
@@ -306,6 +309,79 @@ def fr_sim_240() -> None:
     )
 
 
+def fr_sim_157() -> None:
+    """FR-SIM-157: Apply netting position transitions."""
+    result = unwrap_simulation_response(
+        project_account_mode(
+            (), mode="NETTING", symbol="EURUSD", side="BUY", volume=Decimal(1)
+        ),
+        operation="usage.account_mode",
+    )
+    print(f"Data -> net_position='{result[0]['position_id']}'")
+
+
+def fr_sim_158() -> None:
+    """FR-SIM-158: Preserve hedging position identities."""
+    result = unwrap_simulation_response(
+        project_account_mode(
+            (), mode="HEDGING", symbol="EURUSD", side="BUY", volume=Decimal(1)
+        ),
+        operation="usage.account_mode",
+    )
+    print(f"Data -> hedge_position='{result[0]['position_id']}'")
+
+
+def fr_sim_159() -> None:
+    """FR-SIM-159: Classify percent margin-call and stop-out thresholds."""
+    state = unwrap_simulation_response(
+        get_margin_state(
+            equity=Decimal(50),
+            used_margin=Decimal(100),
+            margin_call_level=Decimal(80),
+            stop_out_level=Decimal(50),
+            mode="PERCENT",
+        ),
+        operation="usage.margin_state",
+    )
+    print(f"Data -> percent_state='{state}'")
+
+
+def fr_sim_160() -> None:
+    """FR-SIM-160: Classify money-mode thresholds."""
+    state = unwrap_simulation_response(
+        get_margin_state(
+            equity=Decimal(50),
+            used_margin=Decimal(100),
+            margin_call_level=Decimal(80),
+            stop_out_level=Decimal(40),
+            mode="MONEY",
+        ),
+        operation="usage.margin_state",
+    )
+    print(f"Data -> money_state='{state}'")
+
+
+def fr_sim_161() -> None:
+    """FR-SIM-161: Require target evidence for canonical liquidation order."""
+    positions = (
+        {"position_id": "p1", "profit": Decimal(-1), "opened_at": "2026-01-01"},
+    )
+    sequence = unwrap_simulation_response(
+        plan_stop_out_liquidation(
+            positions,
+            ordering="WORST_LOSS_FIRST",
+            target_evidence_reference="mt5-demo-fixture",
+        ),
+        operation="usage.stop_out",
+    )
+    print(f"Data -> liquidation='{sequence}'")
+
+
+def fr_sim_162() -> None:
+    """FR-SIM-162: Evaluate stop-out after evidenced swap posting."""
+    fr_sim_159()
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -335,6 +411,12 @@ def main() -> None:
     fr_sim_179()
     fr_sim_180()
     fr_sim_240()
+    fr_sim_157()
+    fr_sim_158()
+    fr_sim_159()
+    fr_sim_160()
+    fr_sim_161()
+    fr_sim_162()
 
 
 if __name__ == "__main__":

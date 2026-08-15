@@ -37,6 +37,7 @@ class _SimulationDependencies:
     initial_authority_state_port: _Port | None = None
     account_activity_port: _Port | None = None
     point_in_time_cycle_port: _Port | None = None
+    provider_revisions_port: _Port | None = None
 
     def persist_audit_event(self, event: object) -> object:
         """Persist one bounded audit event through the supplied Data port."""
@@ -88,6 +89,18 @@ class _SimulationDependencies:
     def resolve_fx_evidence(self, evidence_ids: tuple[str, ...]) -> object:
         """Resolve exact Data-owned FX evidence identifiers."""
         return self.fx_evidence_port(evidence_ids)
+
+    def load_provider_specification_revisions(self, request: object) -> object:
+        """Load complete effective revisions through Data's public operation.
+
+        Raises:
+            ValueError: If canonical v2 composition omitted the Data port.
+        """
+        if self.provider_revisions_port is None:
+            raise ValueError(
+                "provider_revisions port is required for canonical v2 runs"
+            )
+        return self.provider_revisions_port(request)
 
     def build_approved_requests(
         self,
@@ -219,6 +232,7 @@ def build_simulation_run_dependencies(
         "initial_authority_state",
         "account_activity",
         "point_in_time_cycle",
+        "provider_revisions",
     )
     if not isinstance(state_store, SimulationStateStore):
         raise TypeError("state_store must implement SimulationStateStore")
@@ -249,6 +263,7 @@ def build_simulation_run_dependencies(
         initial_authority_state_port=ports.get("initial_authority_state"),
         account_activity_port=ports.get("account_activity"),
         point_in_time_cycle_port=ports.get("point_in_time_cycle"),
+        provider_revisions_port=ports.get("provider_revisions"),
     )
 
 

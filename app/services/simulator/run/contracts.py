@@ -685,6 +685,12 @@ class SimulationRunDependencies(Protocol):
         """Load complete ordered foreign/manual activity evidence."""
         ...
 
+    def load_provider_specification_revisions(
+        self, request: SimulationBacktestRequestV2
+    ) -> StandardResponse[Mapping[str, object]]:
+        """Load complete Data-owned effective provider revisions for the run."""
+        ...
+
     async def evaluate_point_in_time_cycle(
         self,
         dataset: MarketDataset,

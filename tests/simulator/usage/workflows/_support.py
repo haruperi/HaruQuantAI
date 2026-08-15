@@ -644,6 +644,44 @@ class WorkflowSimulationDependencies:
         del request
         return ()
 
+    def load_provider_specification_revisions(
+        self, request: object
+    ) -> Mapping[str, object]:
+        """Return request-bound Data-shaped provider revision evidence."""
+        binding = request.provider_specification_revisions[0]
+        payload = {
+            "filling_modes": ("FOK", "IOC", "RETURN"),
+            "execution_mode": "MARKET",
+            "trade_mode": "FULL",
+            "stops_level_points": 0,
+            "freeze_level_points": 0,
+            "directional_volume_limit": "100",
+            "point": "0.00001",
+            "weekly_sessions": {
+                str(day): (("00:00:00", "23:59:59.999999"),) for day in range(7)
+            },
+            "dated_exceptions": {},
+            "exception_coverage": (),
+            "exception_coverage_required": False,
+        }
+        return {
+            "complete_coverage": True,
+            "revisions": (
+                {
+                    "revision_id": binding.revision_id,
+                    "broker": binding.provider,
+                    "server": binding.server,
+                    "environment": binding.environment,
+                    "account_digest": binding.account_digest,
+                    "provider_symbol": binding.symbol,
+                    "snapshot_checksum": binding.checksum,
+                    "effective_from": binding.effective_from,
+                    "effective_to": binding.effective_to,
+                    "payload": payload,
+                },
+            ),
+        }
+
     def build_approved_requests(
         self,
         intents: tuple[object, ...],

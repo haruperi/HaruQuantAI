@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 from decimal import Decimal
 from hashlib import sha256
@@ -18,6 +18,11 @@ from app.services.simulator.errors import (
 from app.services.simulator.execution.matching import (
     evaluate_protective_exit,
     match_order,
+)
+from app.services.simulator.execution.provider_semantics import (
+    is_provider_session_open,
+    select_provider_revision,
+    validate_provider_order,
 )
 from app.services.simulator.reporting.contracts import ClosedTradeRecord
 from app.services.simulator.timeline import Tick, validate_intent_timing
@@ -91,6 +96,7 @@ class EventDrivenExecutionEngine:
         journal_writer: JournalWriter,
         execution_profile: ExecutionProfile,
         engine_version: str,
+        provider_revisions: Sequence[Mapping[str, object]] = (),
     ) -> None:
         """Initialize one isolated execution engine.
 
@@ -99,6 +105,7 @@ class EventDrivenExecutionEngine:
             journal_writer: Durable event writer.
             execution_profile: Explicit matching and pricing policy.
             engine_version: Stable implementation identity.
+            provider_revisions: Complete Data-returned effective revision history.
 
         Raises:
             SimulationError: If engine identity is invalid.
@@ -110,6 +117,7 @@ class EventDrivenExecutionEngine:
         self._journal = journal_writer
         self._profile = execution_profile
         self._engine_version = engine_version
+        self._provider_revisions = tuple(provider_revisions)
         self._pending: dict[str, tuple[OrderIntent, bool]] = {}
         self._orders: dict[str, ExecutionReceipt] = {}
         self._deals: list[object] = []
@@ -118,6 +126,111 @@ class EventDrivenExecutionEngine:
         self._equity_observations: list[tuple[datetime, Decimal]] = []
         self._current_tick: Tick | None = None
         self._last_seen: Tick | None = None
+
+    def _effective_provider_revision(self, at: datetime) -> Mapping[str, object] | None:
+        """Select provider evidence for a canonical v2 authority instant.
+
+        Args:
+            at: Current authority timestamp.
+
+        Returns:
+            Effective provider revision, or ``None`` for legacy v1 runs.
+
+        Raises:
+            SimulationError: If canonical revision coverage is invalid.
+        """
+        if not self._provider_revisions:
+            return None
+        try:
+            return select_provider_revision(self._provider_revisions, at=at)
+        except (TypeError, ValueError) as error:
+            raise SimulationError(
+                "SIM_INVALID_CONFIG", f"Provider revision coverage failed: {error}"
+            ) from error
+
+    def _validate_pending_provider_order(
+        self, intent: OrderIntent, tick: Tick, revision: Mapping[str, object]
+    ) -> None:
+        """Enforce effective provider order semantics before matching.
+
+        Args:
+            intent: Pending Trading-owned order intent.
+            tick: Current authority quote.
+            revision: Unique Data-returned effective provider revision.
+
+        Raises:
+            SimulationError: If any effective provider rule rejects the order.
+        """
+        payload = revision.get("payload")
+        if not isinstance(payload, Mapping):
+            raise SimulationError(
+                "SIM_INVALID_CONFIG", "Provider revision payload is missing"
+            )
+        side = str(intent.side)
+        position_volume = sum(
+            (
+                Decimal(str(position["volume"]))
+                for position in self._positions.values()
+                if position.get("side") == side
+            ),
+            Decimal(0),
+        )
+        pending_volume = sum(
+            (
+                Decimal(str(other.approved_volume))
+                for other, _armed in self._pending.values()
+                if other.client_order_id != intent.client_order_id
+                and str(other.side) == side
+            ),
+            Decimal(0),
+        )
+        fill_policy = getattr(intent, "fill_policy", None) or getattr(
+            intent, "time_in_force", None
+        )
+        reference_price = tick.ask if side == "BUY" else tick.bid
+        try:
+            for stop_price in (intent.stop_loss, intent.take_profit):
+                validate_provider_order(
+                    revision,
+                    at=tick.timestamp,
+                    action="OPEN",
+                    fill_policy=str(fill_policy),
+                    execution_mode=str(payload.get("execution_mode")),
+                    requested_volume=Decimal(str(intent.approved_volume)),
+                    same_direction_position_volume=position_volume,
+                    same_direction_pending_volume=pending_volume,
+                    reference_price=reference_price,
+                    stop_price=stop_price,
+                )
+        except (TypeError, ValueError) as error:
+            raise SimulationError(
+                "SIM_INVALID_CONFIG",
+                f"Provider order semantics rejected intent: {error}",
+            ) from error
+
+    def _provider_allows_tick(
+        self, tick: Tick, revision: Mapping[str, object] | None
+    ) -> bool:
+        """Return whether effective provider session evidence admits a tick.
+
+        Args:
+            tick: Current authority tick.
+            revision: Effective provider revision, absent only for legacy v1.
+
+        Returns:
+            Whether provider-session processing may continue.
+
+        Raises:
+            SimulationError: If the provider session evidence is invalid.
+        """
+        if revision is None:
+            return True
+        try:
+            return is_provider_session_open(revision, at=tick.timestamp)
+        except (TypeError, ValueError) as error:
+            raise SimulationError(
+                "SIM_INVALID_CONFIG", f"Provider session evidence failed: {error}"
+            ) from error
 
     @property
     def closed_trades(self) -> tuple[ClosedTradeRecord, ...]:
@@ -556,6 +669,17 @@ class EventDrivenExecutionEngine:
                 "SIM_DATA_NON_MONOTONIC", "Execution tick is not strictly ordered"
             )
         self._last_seen = tick
+        revision = self._effective_provider_revision(tick.timestamp)
+        if not self._provider_allows_tick(tick, revision):
+            unwrap_simulation_response(
+                self._journal.append(
+                    "tick_outside_provider_session",
+                    {"sequence": tick.sequence, "symbol": tick.symbol},
+                    tick.timestamp,
+                ),
+                operation="simulation.execution.event_driven_execution_engine.execute_tick",
+            )
+            return ()
         week_second = _week_second(tick)
         if not any(
             session.start_week_second <= week_second < session.end_week_second
@@ -581,6 +705,8 @@ class EventDrivenExecutionEngine:
                     "SIM_ORDER_NOT_FOUND", "Pending order state is inconsistent"
                 )
             validate_intent_timing(intent.created_at, tick.timestamp)
+            if revision is not None:
+                self._validate_pending_provider_order(intent, tick, revision)
             if tick.timestamp >= intent.valid_until:
                 receipt = self._receipt(intent, "cancelled", Decimal(0), None, tick)
                 self._orders[order_id] = receipt

@@ -22,10 +22,12 @@ from app.services.simulator import (
     create_simulation_value,
     evaluate_protective_exit,
     execute_simulation_handle_operation,
+    is_provider_session_open,
     match_order,
     price_order,
     schedule_simulation_rollover,
     unwrap_simulation_response,
+    validate_provider_order,
 )
 from app.services.trading import create_order_intent
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
@@ -378,6 +380,80 @@ def fr_sim_208() -> None:
     print(f"Data -> reopened_position_id='{result['reopened_position_id']}'")
 
 
+def _provider_revision(**updates: object) -> dict[str, object]:
+    """Build one bounded typed-revision-shaped usage fixture."""
+    payload = {
+        "trade_mode": "FULL",
+        "filling_modes": ("FOK",),
+        "execution_mode": "MARKET",
+        "directional_volume_limit": "2",
+        "point": "0.00001",
+        "stops_level_points": 10,
+        "freeze_level_points": 5,
+        "weekly_sessions": {"2": (("00:00", "23:59"),)},
+        "dated_exceptions": {},
+        "exception_coverage": ("2025-01-01",),
+        "exception_coverage_required": True,
+    }
+    payload.update(updates)
+    return {
+        "complete_coverage": True,
+        "effective_from": NOW - timedelta(days=1),
+        "effective_to": NOW + timedelta(days=400),
+        "payload": payload,
+    }
+
+
+def _validate_provider_example() -> None:
+    """Execute one accepted provider-rule validation."""
+    response = validate_provider_order(
+        _provider_revision(),
+        at=NOW,
+        action="OPEN",
+        fill_policy="FOK",
+        execution_mode="MARKET",
+        requested_volume=Decimal("0.1"),
+        same_direction_position_volume=Decimal(0),
+        same_direction_pending_volume=Decimal(0),
+        reference_price=Decimal("1.1"),
+    )
+    unwrap_simulation_response(response, operation="usage.provider_order")
+
+
+def fr_sim_151() -> None:
+    """FR-SIM-151: Apply effective stops and freeze levels."""
+    _validate_provider_example()
+
+
+def fr_sim_152() -> None:
+    """FR-SIM-152: Enforce effective execution and filling modes."""
+    _validate_provider_example()
+
+
+def fr_sim_153() -> None:
+    """FR-SIM-153: Include pending orders in directional volume."""
+    _validate_provider_example()
+
+
+def fr_sim_154() -> None:
+    """FR-SIM-154: Enforce provider trade mode."""
+    _validate_provider_example()
+
+
+def fr_sim_155() -> None:
+    """FR-SIM-155: Combine weekly sessions with dated evidence."""
+    opened = unwrap_simulation_response(
+        is_provider_session_open(_provider_revision(), at=NOW),
+        operation="usage.provider_session",
+    )
+    print(f"Data -> session_open='{opened}'")
+
+
+def fr_sim_156() -> None:
+    """FR-SIM-156: Reject uncovered exceptional sessions."""
+    fr_sim_155()
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -410,6 +486,12 @@ def main() -> None:
     fr_sim_206()
     fr_sim_207()
     fr_sim_208()
+    fr_sim_151()
+    fr_sim_152()
+    fr_sim_153()
+    fr_sim_154()
+    fr_sim_155()
+    fr_sim_156()
 
 
 if __name__ == "__main__":

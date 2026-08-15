@@ -1094,6 +1094,62 @@ def build_point_in_time_dataset(
     )(*args, **kwargs)
 
 
+def get_margin_state(*args: object, **kwargs: object) -> StandardResponse[object]:
+    """Classify the effective provider margin-call and stop-out state."""
+    return _guarded(
+        _operation("app.services.simulator.accounting", "get_margin_state"),
+        operation="simulation.accounting.get_margin_state",
+        risk_level="medium",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def plan_stop_out_liquidation(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Plan one target-evidenced deterministic stop-out sequence."""
+    return _guarded(
+        _operation("app.services.simulator.accounting", "plan_stop_out_liquidation"),
+        operation="simulation.accounting.plan_stop_out_liquidation",
+        risk_level="high",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def project_account_mode(*args: object, **kwargs: object) -> StandardResponse[object]:
+    """Project one netting or hedging position transition."""
+    return _guarded(
+        _operation("app.services.simulator.accounting", "project_account_mode"),
+        operation="simulation.accounting.project_account_mode",
+        risk_level="medium",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def is_provider_session_open(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Evaluate weekly and dated provider-session evidence."""
+    return _guarded(
+        _operation("app.services.simulator.execution", "is_provider_session_open"),
+        operation="simulation.execution.is_provider_session_open",
+        risk_level="medium",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def validate_provider_order(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Validate an order against its effective provider revision."""
+    return _guarded(
+        _operation("app.services.simulator.execution", "validate_provider_order"),
+        operation="simulation.execution.validate_provider_order",
+        risk_level="high",
+        read_only=True,
+    )(*args, **kwargs)
+
+
 async def run_backtest_async(
     *args: object, **kwargs: object
 ) -> StandardResponse[object]:
@@ -1634,6 +1690,7 @@ __all__: tuple[str, ...] = (
     "get_calculation_model_identity",
     "get_canonical_artifact_types",
     "get_journal_policy",
+    "get_margin_state",
     "get_parity_envelope",
     "get_parity_maturity_ladder",
     "get_report_schema_version",
@@ -1650,6 +1707,7 @@ __all__: tuple[str, ...] = (
     "get_supported_calculation_modes",
     "get_supported_fill_policies",
     "group_simulation_alerts",
+    "is_provider_session_open",
     "is_simulation_value",
     "load_calculation_conformance_artifact",
     "load_recovery_checkpoints",
@@ -1659,9 +1717,11 @@ __all__: tuple[str, ...] = (
     "order_injected_events",
     "persist_recovery_checkpoint",
     "persist_recovery_state",
+    "plan_stop_out_liquidation",
     "post_transaction",
     "price_order",
     "price_realistic_execution",
+    "project_account_mode",
     "project_execution_views",
     "project_latency_timestamps",
     "pump_simulation_scheduler_once",
@@ -1699,6 +1759,7 @@ __all__: tuple[str, ...] = (
     "validate_market_data",
     "validate_market_evidence_lineage",
     "validate_phase_one_scope",
+    "validate_provider_order",
     "validate_run_inputs",
     "verify_recovery_checkpoints",
 )

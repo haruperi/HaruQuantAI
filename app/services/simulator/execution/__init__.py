@@ -13,6 +13,10 @@ from app.services.simulator.execution.pricing import (
     SessionInterval,
     price_order,
 )
+from app.services.simulator.execution.provider_semantics import (
+    is_provider_session_open,
+    validate_provider_order,
+)
 from app.services.simulator.execution.trader import SimTrader
 
 __all__ = [
@@ -24,6 +28,8 @@ __all__ = [
     "SessionInterval",
     "SimTrader",
     "evaluate_protective_exit",
+    "is_provider_session_open",
     "match_order",
     "price_order",
+    "validate_provider_order",
 ]

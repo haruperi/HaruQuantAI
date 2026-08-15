@@ -1,5 +1,6 @@
 """Unit tests for the canonical Simulation tick engine."""
 
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -31,7 +32,11 @@ def _value(response: object) -> object:
     return unwrap_simulation_response(response, operation="test.engine")
 
 
-def _engine(tmp_path: Path, suffix: str) -> EventDrivenExecutionEngine:
+def _engine(
+    tmp_path: Path,
+    suffix: str,
+    provider_revisions: Sequence[Mapping[str, object]] = (),
+) -> EventDrivenExecutionEngine:
     """Build one isolated deterministic engine."""
     store = SqliteSimulationStateStore(tmp_path / f"{suffix}.db", tmp_path / suffix)
     writer = JournalWriter(store, f"run-{suffix}", "req-test", "cor-test")
@@ -67,7 +72,31 @@ def _engine(tmp_path: Path, suffix: str) -> EventDrivenExecutionEngine:
         participation_rate=Decimal(0),
         sessions=(SessionInterval(start_week_second=0, end_week_second=604_800),),
     )
-    return EventDrivenExecutionEngine(ledger, writer, profile, "v1")
+    return EventDrivenExecutionEngine(ledger, writer, profile, "v1", provider_revisions)
+
+
+def _provider_revision(**payload_updates: object) -> Mapping[str, object]:
+    """Return complete provider evidence effective for the engine fixture."""
+    payload: dict[str, object] = {
+        "trade_mode": "FULL",
+        "filling_modes": ("FOK",),
+        "execution_mode": "MARKET",
+        "directional_volume_limit": "100",
+        "point": "0.00001",
+        "stops_level_points": 0,
+        "freeze_level_points": 0,
+        "weekly_sessions": {"2": (("00:00", "23:59"),)},
+        "dated_exceptions": {},
+        "exception_coverage": ("2025-01-01",),
+        "exception_coverage_required": True,
+    }
+    payload.update(payload_updates)
+    return {
+        "complete_coverage": True,
+        "effective_from": datetime(2025, 1, 1, tzinfo=UTC),
+        "effective_to": datetime(2025, 1, 2, tzinfo=UTC),
+        "payload": payload,
+    }
 
 
 def _intent() -> OrderIntent:
@@ -279,3 +308,23 @@ def test_pre_tick_submission_invents_no_price(tmp_path: Path) -> None:
     assert receipt.average_price is None
     assert receipt.status == "accepted"
     assert receipt.authority_timestamp == datetime(2025, 1, 1, tzinfo=UTC)
+
+
+def test_effective_provider_revision_enforces_session_and_order(tmp_path: Path) -> None:
+    """Canonical engine matching consumes effective Data revision semantics."""
+    closed = _engine(
+        tmp_path,
+        "provider-closed",
+        (_provider_revision(dated_exceptions={"2025-01-01": None}),),
+    )
+    _value(closed.submit_order(_intent()))
+    assert _value(closed.execute_tick(_tick())) == ()
+
+    disabled = _engine(
+        tmp_path,
+        "provider-disabled",
+        (_provider_revision(trade_mode="DISABLED"),),
+    )
+    _value(disabled.submit_order(_intent()))
+    with pytest.raises(SimulationError, match="trade mode"):
+        _value(disabled.execute_tick(_tick()))

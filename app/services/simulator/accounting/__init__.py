@@ -14,6 +14,11 @@ from app.services.simulator.accounting.calculations import (
     validate_fx_evidence,
 )
 from app.services.simulator.accounting.ledger import AccountLedger, LedgerFill
+from app.services.simulator.accounting.stop_out import (
+    get_margin_state,
+    plan_stop_out_liquidation,
+    project_account_mode,
+)
 from app.services.simulator.accounting.swap import (
     calculate_swap_rollover,
     schedule_rollover,
@@ -71,8 +76,11 @@ __all__ = [
     "calculate_swap_rollover",
     "convert_fx_amount",
     "create_transaction_ledger",
+    "get_margin_state",
     "normalize_volume",
+    "plan_stop_out_liquidation",
     "post_transaction",
+    "project_account_mode",
     "restore_transaction_ledger",
     "schedule_rollover",
     "serialize_transaction_ledger",
