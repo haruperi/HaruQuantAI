@@ -350,7 +350,7 @@ def test_runtime_timeout_emits_operational_evidence() -> None:
 
 def test_runtime_helpers_fail_closed_on_missing_boundary_evidence() -> None:
     """Missing route, connection, and lineage text fail before orchestration."""
-    deps = dependencies()
+    deps = replace(dependencies(), connection=None)
     with pytest.raises(TradingError, match="INVALID_REQUEST"):
         runtime_module._required_text({}, "action_policy_verdict_id")
     with pytest.raises(TradingError, match="SERVICE_UNAVAILABLE"):

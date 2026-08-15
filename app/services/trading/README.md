@@ -170,7 +170,7 @@ remaining design lands with its owning requirement (`FR-TRD-085`–`FR-TRD-113`)
 ### Converged execution contracts — declared design (programme Phase 3b)
 
 This is a design registration only: no Python file changes here, and
-`FR-TRD-093`–`096` plus `FR-TRD-113` remain **Proposed** until their owning
+`FR-TRD-093`–`095` plus `FR-TRD-113` remain **Proposed** until their owning
 phases implement them with tests and usage evidence.
 
 **Public approved-request builder — `FR-TRD-093` (implemented in Phase 14a).**
@@ -212,7 +212,7 @@ on every route, and no production `TradingDependencies` construction may
 default the port.
 
 **Simulation authority consumption and route/profile compatibility —
-`FR-TRD-096` (implemented in Phase 10b) and `FR-TRD-113` (implemented in
+`FR-TRD-096` (completed in Phase 10b) and `FR-TRD-113` (implemented in
 Phase 14a).** The `sim` route requires the `SIMULATION` broker environment and
 every other route forbids it (Phase 10b). The injected `simulation_dispatch`
 callback is removed only after the Brokers-root simulation channel becomes
@@ -223,7 +223,7 @@ pairs remain the `P-SYS-002` table (`simulation`→`sim`, `paper`→`paper`,
 v1→v2 order-policy migration above is owned by Phase 6a; until then the
 builder targets `TradingRequest v1` fields exactly as they exist today.
 
-**Status handoff.** `FR-TRD-096` → Phase 10b; `FR-TRD-093`, `FR-TRD-094`,
+**Status handoff.** `FR-TRD-096` was completed in Phase 10b; `FR-TRD-093`, `FR-TRD-094`,
 `FR-TRD-113` → Phase 14a; `FR-TRD-095` → Phase 15a. The implementing phase
 flips each row to `Completed` with local usage evidence and allocates no
 second requirement.
@@ -837,14 +837,14 @@ reservation on the sim path returns a success envelope with
 `legacy_status="duplicate_completed"`, while the live gate returns
 `dispatch_allowed: False` with the receipt ID.
 
-**Broker-selection cross-rules (`_validate_broker_selection`).** Connection and
+**Broker-selection cross-rules (`_validate_route_environment`, `_validate_broker_selection`).** The sim route requires an enabled `sim` / `simulation` connection descriptor while retaining the injected mutation callback until Phase 14a; every other route forbids `simulation`. Connection and
 adapter must both be present, the connection enabled, `intent.provider_id` must
 match the connection, `route == "live"` requires environment `"live"` and
 `route == "paper"` forbids it, and the adapter must declare contract `v1` /
 `brokers.adapter.v1`. `modify_order` may not change `time_in_force` or
 `expiration` (the verified Brokers modification contract has no such field).
-Sim and broker authority are mutually exclusive: supplying both dispatch inputs
-is `SCOPE_MISMATCH` in both directions.
+The sim callback and a Broker mutation adapter remain mutually exclusive;
+supplying both is `SCOPE_MISMATCH`.
 
 **Conservative dispatch classification.** Uncertainty is never optimism:
 `timed_out`, `ambiguous`, `rate_limited`, any malformed response, a
@@ -885,10 +885,10 @@ match; zero or many is `RECONCILIATION_REQUIRED`.
 5. No blind retry: clearing a lock needs reconciliation agreement; retrying
    needs a pre-recorded `approved_retry`.
 6. Live requires the explicit `allow_live_mutations` flag; paper self-enables;
-   sim never touches a broker.
+   sim carries only the Brokers-owned in-process connection descriptor and opens no external connection.
 7. Route and environment are cross-checked twice — at session start and again at
    dispatch.
-8. Sim and broker authority are mutually exclusive in both directions.
+8. The sim callback and Broker mutation adapter are mutually exclusive.
 9. Pre-mutation audit is fail-closed on live/paper (`AUDIT_FAILED` stops
    dispatch).
 10. Payloads are redacted; the idempotency key persists only as a SHA-256 hash;
@@ -1672,6 +1672,9 @@ SQL `NULL`; fill execution time comes from authority evidence rather than receip
 | Completed | `FR-TRD-029` | The system shall reject adapters lacking approved provider, API/schema, action, intent order-type, security, timeout, malformed-response, rate-limit, retry, and redaction declarations.                                                                                                                                                                                                                                                                                                 | `validate_adapter_capability(intent: OrderIntent, capability: Mapping[str, JsonValue]) -> StandardResponse[None]`                                                                                                                                                                                                                 | None                                            | `TradingError`: incompatible/unsafe adapter or unsupported order type                                     | **Usage:** `tests/trading/usage/features/04_routing.py::fr_trd_029()`**Unit:** `tests/trading/unit/routing/test_capabilities.py::test_missing_security_contract_blocks()`    |
 | Completed | `FR-TRD-030` | The system shall classify malformed success, timeout, and ambiguous/rate-limited mutation conservatively with retry delay/safety evidence.                                                                                                                                                                                                                                                                                                                                               | `classify_authority_response(raw: JsonValue, capability: Mapping[str, JsonValue]) -> StandardResponse[ExecutionReceipt]`                                                                                                                                                                                                          | None                                            | `TradingError`: response cannot be safely represented                                                     | **Usage:** `tests/trading/usage/features/04_routing.py::fr_trd_030()`**Unit:** `tests/trading/unit/routing/test_responses.py::test_malformed_success_is_unknown_outcome()`   |
 | Completed | `FR-TRD-031` | The system shall dispatch exactly one approved intent to Simulation for sim or adapt it into the matching receiver-owned Brokers mutation DTO for paper/live. Broker environment/account reference come only from injected`BrokerConnectionConfig`; order type/unit/instructions come only from `OrderIntent`; target order/position identities come only from Trading state carried by the intent; timeout and receipt time come from validated injected policy/clock dependencies. | `async dispatch_order_intent(intent: OrderIntent, connection: BrokerConnectionConfig \| None, broker_adapter: BrokerAdapter \| None, simulation_dispatch: Callable[[OrderIntent], Awaitable[ExecutionReceipt]] \| None, *, operation_timeout_seconds: Decimal, clock: Callable[[], datetime]) -> StandardResponse[ExecutionReceipt]` | Broker mutation or external Simulation mutation | `TradingError`: authority unavailable, connection/target absent, gate absent, timeout, or unsafe response | **Usage:** `tests/trading/usage/features/04_routing.py::fr_trd_031()`**Unit:** `tests/trading/unit/routing/test_dispatcher.py::test_dispatch_has_single_mutation_boundary()` |
+
+| Completed | `FR-TRD-087` | The dispatcher shall select exactly one enabled route authority and reject absent, disabled, or cross-route material before mutation. | `dispatch_order_intent` | None before validated dispatch | `TradingError`: unavailable, disabled, or scope mismatch | **Usage:** `tests/trading/usage/features/04_routing.py::fr_trd_087()` **Unit:** `tests/trading/unit/routing/test_simulation_route_selection.py` |
+| Completed | `FR-TRD-096` | The `sim` route shall require the exact Brokers `sim` / `simulation` connection identity; paper and live shall forbid `simulation`. The callback remains the mutation authority until Phase 14a. | `dispatch_order_intent` | None before validated dispatch | `TradingError`: route/environment mismatch | **Usage:** `tests/trading/usage/features/04_routing.py::fr_trd_096()` **Unit:** `tests/trading/unit/routing/test_simulation_route_selection.py` |
 
 **Rules:** No provider SDK or Broker class import; paper and live share this path and differ only by facts read through Broker root getter functions. The dispatch path is `async`: Broker root mutation functions and the injected simulation callback are awaited. No synchronous bridge (e.g., `asyncio.run`) is permitted inside a live event loop.
 **Implementation notes:** Implement a single broker mutation boundary and response classification; obtain the broker via the injected Brokers `BrokerAdapter` (mutation traits) — no broker resolver access — and provide Simulation dispatch through an injected callable.

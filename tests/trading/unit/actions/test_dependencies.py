@@ -9,7 +9,7 @@ from decimal import Decimal
 from typing import Any, Literal, cast
 
 import pytest
-from app.services.brokers import build_broker_value
+from app.services.brokers import build_broker_connection_config, build_broker_value
 from app.services.data import (
     build_account_order,
     build_account_state_snapshot,
@@ -461,7 +461,7 @@ def dependencies(
 
     return TradingDependencies(
         store=memory,
-        connection=None,
+        connection=build_broker_connection_config("sim", "simulation"),
         broker_adapter=None,
         simulation_dispatch=simulation_dispatch,
         live_session=None,
@@ -535,7 +535,11 @@ def execution_store() -> MemoryStore:
 def test_dependencies_have_no_import_side_effect() -> None:
     """Dependency construction does not create routes, stores, or secrets."""
     deps = dependencies()
-    assert deps.connection is None
+    assert deps.connection is not None
+    assert deps.connection.broker_id == "sim"
+    assert deps.connection.environment == "simulation"
+    assert deps.connection.credentials is None
+    assert deps.connection.endpoint is None
     assert deps.broker_adapter is None
 
 

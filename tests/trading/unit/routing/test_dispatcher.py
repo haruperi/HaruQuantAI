@@ -1,6 +1,7 @@
 """Unit tests for the sole asynchronous Trading dispatch boundary."""
 
 # ruff: noqa: INP001
+
 import asyncio
 from collections.abc import Awaitable, Callable
 from dataclasses import replace
@@ -141,6 +142,15 @@ def _connection() -> object:
         circuit_recovery_timeout_sec=30,
         circuit_half_open_max_calls=1,
         account_reference="broker-account-001",
+    )
+
+
+def _sim_connection() -> object:
+    """Build the exact enabled simulation Broker connection material."""
+    return build_broker_connection_config(
+        broker_id="sim",
+        environment="simulation",
+        provider_enabled=True,
     )
 
 
@@ -403,7 +413,9 @@ def test_dispatch_has_single_mutation_boundary() -> None:
         )
 
     sim_receipt = asyncio.run(
-        dispatch_order_intent(_intent(route="sim"), None, None, simulation_dispatch)
+        dispatch_order_intent(
+            _intent(route="sim"), _sim_connection(), None, simulation_dispatch
+        )
     )
     assert simulation_calls == 1
     assert sim_receipt.status == "filled"

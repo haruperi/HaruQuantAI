@@ -307,6 +307,45 @@ def _validate_broker_selection(
     return connection, broker_adapter
 
 
+def _validate_route_environment(
+    intent: OrderIntent, connection: BrokerConnection | None
+) -> None:
+    """Validate the exact route-to-Broker-environment pairing.
+
+    Phase 10b retains the simulation callback until Phase 14a, but requires its
+    Brokers-owned connection identity now so no route can alias an environment.
+
+    Args:
+        intent: Executable intent selecting one exact route.
+        connection: Injected resolved Broker connection material.
+
+    Raises:
+        TradingError: If route identity, environment, or enablement mismatches.
+    """
+    if intent.route.value == "sim":
+        if connection is None:
+            raise TradingError(
+                "SERVICE_UNAVAILABLE", "Simulation Broker route is unavailable"
+            )
+        if not is_broker_connection_enabled(connection):
+            raise TradingError("GATE_BLOCKED", "Simulation Broker route is disabled")
+        if (
+            get_broker_connection_id(connection) != "sim"
+            or get_broker_connection_environment(connection) != "simulation"
+        ):
+            raise TradingError(
+                "SCOPE_MISMATCH", "Sim route requires sim/simulation authority"
+            )
+        return
+    if (
+        connection is not None
+        and get_broker_connection_environment(connection) == "simulation"
+    ):
+        raise TradingError(
+            "SCOPE_MISMATCH", "Simulation environment is exclusive to sim route"
+        )
+
+
 def _validate_order_modification_fields(intent: OrderIntent) -> None:
     """Reject fields absent from the verified Brokers modification contract.
 
@@ -500,12 +539,13 @@ async def _dispatch_order_intent_value(  # noqa: C901, PLR0912
         "Dispatching Trading intent %s via %s", intent.client_order_id, intent.route
     )
     _validate_dispatch_policy(operation_timeout_seconds)
+    _validate_route_environment(intent, connection)
     if intent.route.value == "sim":
         if simulation_dispatch is None:
             raise TradingError("SERVICE_UNAVAILABLE", "Simulation authority is absent")
-        if connection is not None or broker_adapter is not None:
+        if broker_adapter is not None:
             raise TradingError(
-                "SCOPE_MISMATCH", "Sim dispatch received Broker authority"
+                "SCOPE_MISMATCH", "Sim callback received mutation adapter prematurely"
             )
         try:
             async with asyncio.timeout(float(operation_timeout_seconds)):

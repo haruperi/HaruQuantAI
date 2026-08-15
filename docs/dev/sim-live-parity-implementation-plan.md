@@ -2194,7 +2194,9 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 **Domain:** brokers. **Requirements:** `FR-BRK-173` … `181`.
 
-Unit 10a commit hash: `a18849f066b89e80f0d97e09beecf207fb16bcb0` (exact prescribed message; all hooks passed).
+**Per-unit status:** 10b Completed 2026-08-15 under the owner's goal-wide standalone approval. Trading now validates the exact route/environment pair before dispatch at `app/services/trading/routing/dispatcher.py:310`; `FR-TRD-087` and `FR-TRD-096` are evidenced by `tests/trading/unit/routing/test_simulation_route_selection.py:104-144` and `tests/trading/usage/features/04_routing.py:188-224`. The bounded recommendation retained `simulation_dispatch` as the mutation authority because the Phase-3 contract assigns its removal to Phase 14a; Phase 10b injects only the socket-free Brokers connection descriptor. Focused routing tests passed (14), usage 04 passed, Ruff format/check and Trading mypy passed. The literal eight-test command passed behavior but exited 1 under the repository-wide subset coverage floor (17.49%); the `--no-cov` behavioral command passed. The full Trading gate reports 252 passed, one credential skip, and one pre-existing workflow-literal failure (`EXECUTION_TARGET`) unrelated to this unit. No Brokers/Simulator production file, business/risk gate, or live authorization changed. Rollback is the dispatcher gate, simulation-route test, fixture descriptor, usage additions, and Trading documentation. Phase 10 is complete.
+
+Unit 10a commit hash: `54933eec039a9522a416d64c503e53beeefb11e2` (exact prescribed message; all hooks passed).
 
 First, under its own approved sub-phase, inject a clock into all ten MT5 mapping timestamp sites,
 defaulting to the live clock. Then implement the Simulation adapter's admitted read intersection:

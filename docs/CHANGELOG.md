@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Route simulation through the Broker identity boundary
+
+Trading now admits the sim route only with the exact Brokers `sim`/`simulation` connection descriptor and forbids that environment everywhere else (Phase 10b).
+
+#### Changed (1)
+
+- Added fail-closed route/environment selection before dispatch while retaining the simulation callback until its Phase-14a authority migration.
+
 ### Add a socket-free simulation broker channel
 
 Brokers now exposes the exact `sim`/`simulation` in-process route through an injected structural authority and the canonical adapter lifecycle (Phase 10a).

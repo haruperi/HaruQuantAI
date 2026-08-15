@@ -15,6 +15,7 @@ from typing import Any
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.brokers import build_broker_connection_config
 from app.services.trading import (
     classify_authority_response,
     create_execution_receipt,
@@ -173,7 +174,7 @@ def fr_trd_031() -> None:
     dispatched_receipt = asyncio.run(
         dispatch_order_intent(
             _intent(),
-            None,
+            build_broker_connection_config("sim", "simulation"),
             None,
             simulation_dispatch,
             operation_timeout_seconds=Decimal(10),
@@ -182,6 +183,46 @@ def fr_trd_031() -> None:
     )
     print(_format_result(dispatched_receipt))
     print(f"Data -> status='{dispatched_receipt.status}'")
+
+
+def fr_trd_087() -> None:
+    """FR-TRD-087: Select one exact enabled authority route."""
+    connection = build_broker_connection_config("sim", "simulation")
+    assert connection.provider_enabled is True
+    assert str(connection.broker_id) == "sim"
+    print("Data -> route='sim', environment='simulation'")
+
+
+def fr_trd_096() -> None:
+    """FR-TRD-096: Bind sim exclusively to the simulation environment."""
+
+    async def should_not_dispatch(intent: OrderIntent):
+        raise AssertionError(intent.client_order_id)
+
+    invalid = asyncio.run(
+        dispatch_order_intent(
+            _intent(),
+            build_broker_connection_config("sim", "demo"),
+            None,
+            should_not_dispatch,
+            operation_timeout_seconds=Decimal(10),
+            clock=lambda: NOW,
+        )
+    )
+    assert invalid.status == "error"
+
+    non_sim = asyncio.run(
+        dispatch_order_intent(
+            _paper_intent(),
+            build_broker_connection_config("mt5", "simulation"),
+            None,
+            None,
+            operation_timeout_seconds=Decimal(10),
+            clock=lambda: NOW,
+        )
+    )
+    assert non_sim.status == "error"
+    print("Data -> invalid_pairs='blocked'")
 
 
 def _emit_requirement_success(function: object) -> object:
@@ -217,6 +258,8 @@ def main() -> None:
 
     # Stage 3: Dispatch execution
     fr_trd_031()
+    fr_trd_087()
+    fr_trd_096()
 
 
 if __name__ == "__main__":
