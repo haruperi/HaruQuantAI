@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Add explicit Trading order policies
+
+Trading request and executable-intent v2 now preserve independent fill and lifetime policy against an exact provider-specification revision (Phase 6a).
+
+#### Added (1)
+
+- Added immutable policy-v2 factories, conditional UTC expiration, provider-capability rejection, v2 execution-plan preservation, and explicitly labelled parity-ineligible legacy conversion.
+
 ### Add deterministic simulation scheduling
 
 Simulation now owns one serializable simulated clock and deterministic event pump (`FEAT-SIM-15`, Phase 5).

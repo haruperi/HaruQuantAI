@@ -1506,6 +1506,21 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
+**Per-unit status:** 6a Completed 2026-08-15 under the owner's goal-wide standalone approval.
+Trading request/intent v2 requires independent policies, exact provider-revision compatibility,
+conditional UTC expiration, immutable construction, and explicitly labelled parity-ineligible v1
+conversion (`app/services/trading/contracts/models.py:959`,
+`app/services/trading/contracts/factories.py:108`). The v2 execution-plan producer preserves both
+dimensions (`app/services/trading/validation/plans.py:126`); focused evidence passed 40/40 and direct
+usage passed all allocated functions (`tests/trading/usage/features/01_contracts.py:387-463`).
+Automatic blocker resolution: the existing live evaluation builder still receives only Strategy's
+legacy combined `time_in_force` and no exact provider snapshot. Inventing a fill policy would violate
+the phase contract, so the bounded recommendation retains that declared v1 producer during the
+release window; v2 construction fails closed unless both caller policies and an exact snapshot are
+available. The full Trading behavioral run passed 233 tests, with one configured MT5-demo skip and
+one unrelated pre-existing workflow-literal assertion (`EXECUTION_TARGET`) failure; neither was
+changed because workflow configuration is outside Unit 6a. Unit 6b remains Pending.
+
 - [ ] Approval matched this exact phase/subphase.
 - [ ] Only the local file and documentation manifests changed.
 - [ ] Every listed FR has final `path:line` implementation and test evidence.

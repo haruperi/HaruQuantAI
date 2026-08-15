@@ -1,7 +1,7 @@
 # Trading
 
 > **Package:** `app/services/trading`
-> **Status:** `Completed` — all 11 registered features (`FEAT-TRD-01`..`11`) are implemented with Trading-scoped verification and usage evidence. The declared sim⇄live parity-programme designs (see "Sim⇄live parity programme boundaries"; `FR-TRD-085`–`FR-TRD-113`) are Proposed until their owning programme phases implement them.
+> **Status:** `Completed` — all 11 registered features (`FEAT-TRD-01`..`11`) are implemented with Trading-scoped verification and usage evidence. Order-policy v2 (`FR-TRD-097`–`100`, `FR-TRD-112`) is implemented; the other declared sim⇄live parity-programme requirements remain Proposed until their owning phases.
 > **Last updated:** `2026-08-14`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -127,8 +127,8 @@ filtering. This support directory is not a separately registered feature.
 ### Sim⇄live parity programme boundaries
 
 The approved sim⇄live parity programme (`docs/dev/sim-live-parity-implementation-plan.md`)
-declares the following Trading designs. None is implemented in the current registry; each
-lands with its owning requirement (`FR-TRD-085`–`FR-TRD-113`) in the programme's phases.
+declares the following Trading designs. Order-policy v2 is implemented in Phase 6a; each
+remaining design lands with its owning requirement (`FR-TRD-085`–`FR-TRD-113`) in the programme's phases.
 
 - **Paired gate taxonomy.** Business and risk gates are route-independent: `sim`, `paper`,
   and `live` traverse the same gate roles, order, inputs, and outcomes through one action
@@ -136,7 +136,7 @@ lands with its owning requirement (`FR-TRD-085`–`FR-TRD-113`) in the programme
   authorization, live-transport checks) remain explicit and are compared against their own
   route policy rather than forced to share an identifier; `sim` never inherits live
   mutation authorization, and no business gate is skipped conditionally on route.
-- **Order-policy v1/v2 migration.** Trading will add versioned request/order-intent v2
+- **Order-policy v1/v2 migration (implemented).** Trading owns versioned request/order-intent v2
   contracts with required, independent `fill_policy` (`FOK|IOC|RETURN|BOC`) and
   `time_policy` (`GTC|DAY|SPECIFIED|SPECIFIED_DAY`) plus aware-UTC expiration where
   required, validated against the typed provider specification snapshot. No
@@ -295,7 +295,7 @@ Modules and files are ordered from lowest dependency to highest dependency.
 
 | Status    | Feature                                             | Owning module       | Public API and contracts                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Requirements                        | Usage evidence                                        |
 | --------- | --------------------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ----------------------------------------------------- |
-| Completed | `FEAT-TRD-01` Canonical Contracts and Registries  | `contracts/`      | `build_order_intent`, `parse_order_intent`, `get_trading_contract_version`, `get_trading_route`, `create_trading_request`, `create_order_intent`, `create_execution_receipt`, `create_trade_record`, `create_portfolio_rebalance_execution_request`, `create_execution_evidence_report`, `create_trading_error`, `is_trading_error`, `is_execution_receipt`, `map_trading_error`, `redact_trading_payload`, `get_public_contracts`, `create_trading_action_draft`; exact declarations and fields: Section 4.1 | Section 4.1 functional requirements | `tests/trading/usage/features/01_contracts.py`      |
+| Completed | `FEAT-TRD-01` Canonical Contracts and Registries  | `contracts/`      | Existing v1 API plus `create_trading_request_v2`, `create_order_intent_v2`, and `create_legacy_compatible_trading_request`; exact declarations and fields: Section 4.1 | Section 4.1 functional requirements including `FR-TRD-097`–`100`, `FR-TRD-112` | `tests/trading/usage/features/01_contracts.py`      |
 | Completed | `FEAT-TRD-02` State and Deterministic Projections | `state/`          | Existing state API plus `create_order_lifecycle`, `transition_order_lifecycle`, `create_fill_aggregate`, `apply_order_fill`, and `get_fill_residual`; exact declarations: Section 4.2 | Section 4.2 functional requirements | `tests/trading/usage/features/02_state.py` |
 | Completed | `FEAT-TRD-03` Validation, Readiness, and Plans    | `validation/`     | `create_readiness_assessment`, `create_route_snapshot`, `assess_execution_readiness`, `build_execution_plan`, `get_route_snapshot`, `validate_order_request`; exact declarations: Section 4.3                                                                                                                                                                                                                                                                                       | Section 4.3 functional requirements | `tests/trading/usage/features/03_validation.py`     |
 | Completed | `FEAT-TRD-04` Authority Selection and Dispatch    | `routing/`        | `classify_authority_response`, `dispatch_order_intent`, `validate_adapter_capability`; exact declarations: Section 4.4                                                                                                                                                                                                                                                                                                                                                                    | Section 4.4 functional requirements | `tests/trading/usage/features/04_routing.py`        |
@@ -1445,6 +1445,20 @@ evidence fails closed. Cleanup runs in `finally`.
 This section is the implementation plan. Modules, files, and requirements are in dependency order.
 
 ### 4.1 `contracts/` — Canonical contracts and registries
+
+Order-policy v2 keeps fill and lifetime intent independent and binds both to one exact
+Brokers-owned provider-specification checksum. `BOC` is part of the Trading vocabulary but
+fails closed unless the bound provider snapshot supports it. V1 remains readable only through
+the unchanged v1 factories or the explicitly named `trading-order-policy-legacy-v1` conversion;
+converted material is labelled `legacy_compatibility=true` and canonical-parity-ineligible.
+
+| Status | Requirement | Public contract | Evidence |
+| --- | --- | --- | --- |
+| Completed | `FR-TRD-097` Trading shall require independent `fill_policy` and `time_policy` on request v2. | `create_trading_request_v2` | `app/services/trading/contracts/models.py`; `tests/trading/unit/contracts/test_order_policy_v2.py`; `tests/trading/usage/features/01_contracts.py::fr_trd_097()` |
+| Completed | `FR-TRD-098` Trading shall validate both policies against the exact opaque provider-specification revision without deriving defaults. | `create_trading_request_v2` | `app/services/trading/contracts/factories.py`; `tests/trading/unit/contracts/test_order_policy_v2.py`; `tests/trading/usage/features/01_contracts.py::fr_trd_098()` |
+| Completed | `FR-TRD-099` `SPECIFIED` and `SPECIFIED_DAY` shall require future aware-UTC expiration; `GTC` and `DAY` shall reject expiration. | Request/intent v2 validation | `app/services/trading/contracts/models.py`; `tests/trading/unit/contracts/test_order_policy_v2.py`; `tests/trading/usage/features/01_contracts.py::fr_trd_099()` |
+| Completed | `FR-TRD-100` V1 compatibility shall require an explicit versioned profile and remain excluded from canonical parity. | `create_legacy_compatible_trading_request` | `app/services/trading/contracts/factories.py`; `tests/trading/unit/contracts/test_order_policy_v2.py`; `tests/trading/usage/features/01_contracts.py::fr_trd_100()` |
+| Completed | `FR-TRD-112` Trading execution-plan production shall preserve both v2 policy dimensions and the provider revision. | `create_order_intent_v2`, `build_execution_plan` | `app/services/trading/validation/plans.py`; `tests/trading/integration/test_order_policy_v2_producers.py`; `tests/trading/usage/features/01_contracts.py::fr_trd_112()` |
 
 **Purpose:** Define the one JSON-safe, Decimal-safe, UTC contract family, finite error taxonomy, and typed Python public API.
 

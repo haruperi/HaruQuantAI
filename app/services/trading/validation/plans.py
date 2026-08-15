@@ -4,6 +4,7 @@ from hashlib import sha256
 from typing import Any, Literal
 
 from app.services.trading.contracts import OrderIntent, TradingError, TradingRequest
+from app.services.trading.contracts.models import OrderIntentV2, TradingRequestV2
 from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.validation.readiness import (
     ReadinessAssessment,  # noqa: TC001 - runtime annotation and model resolution
@@ -88,40 +89,50 @@ def _build_execution_plan_value(
             }
         ).encode("utf-8")
     ).hexdigest()
-    return OrderIntent(
-        client_order_id=f"trd-{client_order_digest}",
-        request_id=request.request_id,
-        workflow_id=request.workflow_id,
-        correlation_id=request.correlation_id,
-        route=request.route,
-        provider_id=request.provider_id,
-        account_id=request.account_id,
-        strategy_id=request.strategy_id,
-        strategy_version=request.strategy_version,
-        source_intent_id=request.intent_id,
-        symbol=request.symbol,
-        action=request.action,
-        side=request.side,
-        order_type=request.order_type,
-        quantity_unit=request.quantity_unit,
-        approved_volume=request.quantity,
-        risk_approved_volume=request.quantity,
-        price=request.price,
-        stop_price=request.stop_price,
-        stop_loss=request.stop_loss,
-        take_profit=request.take_profit,
-        time_in_force=request.time_in_force,
-        expiration=request.expiration,
-        target_broker_order_id=request.target_broker_order_id,
-        target_broker_position_id=request.target_broker_position_id,
-        idempotency_hash=digest,
-        canonical_material_version=request.canonical_material_version,
-        risk_decision_id=request.risk_decision_id,
-        action_policy_verdict_id=request.action_policy_verdict_id,
-        approval_token_ref=request.approval_token_ref,
-        created_at=request.system_time,
-        valid_until=request.valid_until,
-    )
+    intent_values: dict[str, object] = {
+        "client_order_id": f"trd-{client_order_digest}",
+        "request_id": request.request_id,
+        "workflow_id": request.workflow_id,
+        "correlation_id": request.correlation_id,
+        "route": request.route,
+        "provider_id": request.provider_id,
+        "account_id": request.account_id,
+        "strategy_id": request.strategy_id,
+        "strategy_version": request.strategy_version,
+        "source_intent_id": request.intent_id,
+        "symbol": request.symbol,
+        "action": request.action,
+        "side": request.side,
+        "order_type": request.order_type,
+        "quantity_unit": request.quantity_unit,
+        "approved_volume": request.quantity,
+        "risk_approved_volume": request.quantity,
+        "price": request.price,
+        "stop_price": request.stop_price,
+        "stop_loss": request.stop_loss,
+        "take_profit": request.take_profit,
+        "time_in_force": request.time_in_force,
+        "expiration": request.expiration,
+        "target_broker_order_id": request.target_broker_order_id,
+        "target_broker_position_id": request.target_broker_position_id,
+        "idempotency_hash": digest,
+        "canonical_material_version": request.canonical_material_version,
+        "risk_decision_id": request.risk_decision_id,
+        "action_policy_verdict_id": request.action_policy_verdict_id,
+        "approval_token_ref": request.approval_token_ref,
+        "created_at": request.system_time,
+        "valid_until": request.valid_until,
+    }
+    if isinstance(request, TradingRequestV2):
+        intent_values.update(
+            fill_policy=request.fill_policy,
+            time_policy=request.time_policy,
+            provider_specification_checksum=request.provider_specification_checksum,
+            legacy_compatibility=request.legacy_compatibility,
+            canonical_parity_eligible=request.canonical_parity_eligible,
+        )
+        return OrderIntentV2.model_validate(intent_values)
+    return OrderIntent.model_validate(intent_values)
 
 
 def build_execution_plan(

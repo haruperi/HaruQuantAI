@@ -51,6 +51,8 @@ type TradingAction = Literal[
 ]
 type OrderType = Literal["MARKET", "LIMIT", "STOP", "STOP_LIMIT"]
 type TimeInForce = Literal["GTC", "IOC", "FOK", "GTD", "DAY"]
+type FillPolicy = Literal["FOK", "IOC", "RETURN", "BOC"]
+type TimePolicy = Literal["GTC", "DAY", "SPECIFIED", "SPECIFIED_DAY"]
 
 _SHA256_HEX_LENGTH = 64
 _DECIMAL_PRECISION = 28
@@ -233,6 +235,46 @@ def _validate_expiration_shape(
     if expiration is not None and expiration <= start_time:
         message = f"expiration must be later than {subject} start"
         raise ValueError(message)
+
+
+def _validate_policy_expiration(
+    time_policy: TimePolicy,
+    expiration: datetime | None,
+    start_time: datetime,
+    subject: str,
+) -> None:
+    """Validate v2 expiration without deriving caller intent.
+
+    Args:
+        time_policy: Explicit v2 lifetime policy.
+        expiration: Explicit UTC expiry when required.
+        start_time: Earliest permitted expiry instant.
+        subject: Contract name used in diagnostics.
+
+    Raises:
+        ValueError: If expiration is missing, contradictory, or not future UTC.
+    """
+    requires_expiration = time_policy in {"SPECIFIED", "SPECIFIED_DAY"}
+    if requires_expiration != (expiration is not None):
+        message = f"{time_policy} {subject} expiration shape is invalid"
+        raise ValueError(message)
+    if expiration is not None:
+        _validate_utc(expiration, "expiration")
+        if expiration <= start_time:
+            message = f"expiration must be later than {subject} start"
+            raise ValueError(message)
+
+
+def _validate_sha256(value: str) -> None:
+    """Validate one lowercase SHA-256 provider revision.
+
+    Raises:
+        ValueError: If the revision is not lowercase SHA-256 hexadecimal.
+    """
+    if len(value) != _SHA256_HEX_LENGTH or any(
+        character not in "0123456789abcdef" for character in value
+    ):
+        raise ValueError("provider specification checksum must be lowercase SHA-256")
 
 
 def _validate_intent_targets(
@@ -623,12 +665,13 @@ class TradingRequest(_TradingModel):
             raise ValueError("paper/live requests require provider_id")
         if self.valid_until <= self.system_time:
             raise ValueError("valid_until must be later than system_time")
-        _validate_expiration_shape(
-            self.time_in_force,
-            self.expiration,
-            self.system_time,
-            "requests",
-        )
+        if self.contract_version == "v1":
+            _validate_expiration_shape(
+                self.time_in_force,
+                self.expiration,
+                self.system_time,
+                "requests",
+            )
         _validate_execution_price_shape(
             self.order_type,
             self.price,
@@ -892,12 +935,13 @@ class OrderIntent(_TradingModel):
             raise ValueError("paper/live intent requires provider_id")
         if self.valid_until <= self.created_at:
             raise ValueError("intent validity must end after creation")
-        _validate_expiration_shape(
-            self.time_in_force,
-            self.expiration,
-            self.created_at,
-            "intents",
-        )
+        if self.contract_version == "v1":
+            _validate_expiration_shape(
+                self.time_in_force,
+                self.expiration,
+                self.created_at,
+                "intents",
+            )
         _validate_execution_price_shape(
             self.order_type,
             self.price,
@@ -909,6 +953,70 @@ class OrderIntent(_TradingModel):
             self.target_broker_order_id,
             self.target_broker_position_id,
         )
+        return self
+
+
+class TradingRequestV2(TradingRequest):
+    """Trading request with independent provider-bound order policies."""
+
+    contract_version: Literal["v2"] = "v2"  # type: ignore[assignment]
+    schema_id: Literal["trading.trading_request.v2"] = "trading.trading_request.v2"  # type: ignore[assignment]
+    fill_policy: FillPolicy
+    time_policy: TimePolicy
+    provider_specification_checksum: str
+    legacy_compatibility: bool = False
+    canonical_parity_eligible: bool = True
+
+    @model_validator(mode="after")
+    def _validate_v2_policy(self) -> Self:
+        """Validate independent lifetime and canonical-eligibility semantics.
+
+        Returns:
+            Validated request.
+
+        Raises:
+            ValueError: If legacy or expiration semantics conflict.
+        """
+        if self.time_in_force is not None:
+            raise ValueError("v2 request cannot carry legacy time_in_force")
+        _validate_policy_expiration(
+            self.time_policy, self.expiration, self.system_time, "request"
+        )
+        _validate_sha256(self.provider_specification_checksum)
+        if self.canonical_parity_eligible == self.legacy_compatibility:
+            raise ValueError("legacy compatibility must be parity-ineligible")
+        return self
+
+
+class OrderIntentV2(OrderIntent):
+    """Executable order intent with independent provider-bound policies."""
+
+    contract_version: Literal["v2"] = "v2"  # type: ignore[assignment]
+    schema_id: Literal["trading.order_intent.v2"] = "trading.order_intent.v2"  # type: ignore[assignment]
+    fill_policy: FillPolicy
+    time_policy: TimePolicy
+    provider_specification_checksum: str
+    legacy_compatibility: bool = False
+    canonical_parity_eligible: bool = True
+
+    @model_validator(mode="after")
+    def _validate_v2_policy(self) -> Self:
+        """Validate independent lifetime and canonical-eligibility semantics.
+
+        Returns:
+            Validated intent.
+
+        Raises:
+            ValueError: If legacy or expiration semantics conflict.
+        """
+        if self.time_in_force is not None:
+            raise ValueError("v2 intent cannot carry legacy time_in_force")
+        _validate_policy_expiration(
+            self.time_policy, self.expiration, self.created_at, "intent"
+        )
+        _validate_sha256(self.provider_specification_checksum)
+        if self.canonical_parity_eligible == self.legacy_compatibility:
+            raise ValueError("legacy compatibility must be parity-ineligible")
         return self
 
 

@@ -28,6 +28,7 @@
 * Tooling configured: `ruff` (full rule set), `mypy`, `pytest`, `pre-commit` (hygiene checks, ruff, ruff-format, detect-secrets, mypy).
 * Code present: `app/` package with implemented service modules under `app/services/`, including Trading as the surviving live-route runtime and broker-dispatch owner.
 * The retired Live service has been folded into `app/services/trading/`; live execution remains a runtime route/mode, not a standalone service package.
+* Trading order request/intent v2 separates caller-approved fill policy from lifetime policy, binds both to a Brokers-owned provider-specification checksum, and forbids provider-derived intent defaults; explicitly profiled v1 conversion is labelled legacy and excluded from canonical parity.
 * `app/services/api/README.md` defines the approved gateway/UI boundary and state ownership. Backend v1 exposes registered owner-backed operations, including server-side session identity recovery, an authenticated SSE bridge over Data-owned MT5 streams, Risk reads/commands, and Trading session plus governed submit/cancel/close routes. Trading mutations require complete authority evidence, idempotency, the configured paper/live route, and all owner-side safety gates; live remains disabled by default.
 * Portfolio is implemented and `Completed`: `app.services.portfolio` is its sole
   public boundary, exposes standalone functions only, and coordinates genuine

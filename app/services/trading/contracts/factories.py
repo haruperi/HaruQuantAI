@@ -13,9 +13,11 @@ from app.services.trading.contracts.models import (
     ExecutionReceipt,
     JsonValue,
     OrderIntent,
+    OrderIntentV2,
     PortfolioRebalanceExecutionRequest,
     TradeRecord,
     TradingRequest,
+    TradingRequestV2,
     TradingRoute,
 )
 from app.utils import canonical_json, to_json_safe
@@ -64,6 +66,116 @@ def create_order_intent(**values: object) -> OrderIntent:
         Validated internal order intent.
     """
     return OrderIntent.model_validate(values)
+
+
+def _validate_provider_policies(
+    provider_specification: object,
+    fill_policy: object,
+    time_policy: object,
+) -> str:
+    """Validate explicit policies against one exact opaque provider revision.
+
+    Returns:
+        Exact provider-specification checksum.
+
+    Raises:
+        TypeError: If provider revision evidence has an invalid type.
+        ValueError: If either policy is unsupported.
+    """
+    from app.services.brokers import get_provider_specification_snapshot_field
+
+    filling_modes = get_provider_specification_snapshot_field(
+        provider_specification, "filling_modes"
+    )
+    expiration_modes = get_provider_specification_snapshot_field(
+        provider_specification, "expiration_modes"
+    )
+    checksum = get_provider_specification_snapshot_field(
+        provider_specification, "checksum"
+    )
+    if not isinstance(filling_modes, (tuple, list)) or fill_policy not in filling_modes:
+        raise ValueError("fill_policy is unsupported by provider specification")
+    if (
+        not isinstance(expiration_modes, (tuple, list))
+        or time_policy not in expiration_modes
+    ):
+        raise ValueError("time_policy is unsupported by provider specification")
+    if not isinstance(checksum, str):
+        raise TypeError("provider specification checksum is invalid")
+    return checksum
+
+
+def create_trading_request_v2(
+    *, provider_specification: object, **values: object
+) -> TradingRequestV2:
+    """Construct a provider-bound Trading request v2.
+
+    Args:
+        provider_specification: Exact opaque Brokers snapshot revision.
+        **values: Complete v2 request fields including both policy dimensions.
+
+    Returns:
+        Immutable validated Trading request v2.
+    """
+    checksum = _validate_provider_policies(
+        provider_specification, values.get("fill_policy"), values.get("time_policy")
+    )
+    return TradingRequestV2.model_validate(
+        {**values, "provider_specification_checksum": checksum}
+    )
+
+
+def create_order_intent_v2(
+    *, provider_specification: object, **values: object
+) -> OrderIntentV2:
+    """Construct a provider-bound executable order intent v2.
+
+    Returns:
+        Immutable validated order intent v2.
+    """
+    checksum = _validate_provider_policies(
+        provider_specification, values.get("fill_policy"), values.get("time_policy")
+    )
+    return OrderIntentV2.model_validate(
+        {**values, "provider_specification_checksum": checksum}
+    )
+
+
+_LEGACY_POLICY_PROFILES = {
+    "trading-order-policy-legacy-v1": ("FOK", "GTC"),
+}
+
+
+def create_legacy_compatible_trading_request(
+    *,
+    legacy_profile_version: str,
+    provider_specification: object,
+    **values: object,
+) -> TradingRequestV2:
+    """Decode v1 material only through an explicit parity-ineligible profile.
+
+    Returns:
+        Labelled parity-ineligible v2 request.
+
+    Raises:
+        ValueError: If the named legacy profile is unknown.
+    """
+    try:
+        fill_policy, time_policy = _LEGACY_POLICY_PROFILES[legacy_profile_version]
+    except KeyError as error:
+        raise ValueError("unknown legacy order-policy profile") from error
+    material = dict(values)
+    material.pop("contract_version", None)
+    material.pop("schema_id", None)
+    material.pop("time_in_force", None)
+    return create_trading_request_v2(
+        provider_specification=provider_specification,
+        **material,
+        fill_policy=fill_policy,
+        time_policy=time_policy,
+        legacy_compatibility=True,
+        canonical_parity_eligible=False,
+    )
 
 
 def build_order_intent(**values: object) -> dict[str, JsonValue]:

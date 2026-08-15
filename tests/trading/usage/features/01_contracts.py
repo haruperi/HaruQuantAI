@@ -10,19 +10,23 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.brokers import build_provider_specification_snapshot
 from app.services.trading import (
     create_execution_receipt,
+    create_legacy_compatible_trading_request,
     create_order_intent,
+    create_order_intent_v2,
     create_portfolio_rebalance_execution_request,
     create_trade_record,
     create_trading_action_draft,
     create_trading_error,
     create_trading_request,
+    create_trading_request_v2,
     get_public_contracts,
     get_trading_contract_version,
     get_trading_route,
@@ -37,6 +41,58 @@ from app.utils import (
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 ExecutionReceipt = Any
+
+
+class _SymbolInfo(NamedTuple):
+    """Minimal verified MT5-shaped provider specification fixture."""
+
+    name: object = "EURUSD"
+    digits: object = 5
+    point: object = 0.00001
+    filling_mode: object = 3
+    order_mode: object = 15
+    expiration_mode: object = 15
+    order_gtc_mode: object = 0
+    trade_exemode: object = 2
+    trade_mode: object = 4
+    trade_calc_mode: object = 0
+    swap_mode: object = 1
+    swap_rollover3days: object = 3
+    trade_stops_level: object = 0
+    trade_freeze_level: object = 0
+    volume_min: object = 0.01
+    volume_max: object = 100.0
+    volume_step: object = 0.01
+    volume_limit: object = 0.0
+    trade_tick_size: object = 0.00001
+    trade_tick_value: object = 1.0
+    trade_tick_value_profit: object = 1.0
+    trade_tick_value_loss: object = 1.0
+    trade_contract_size: object = 100000.0
+    currency_base: object = "EUR"
+    currency_profit: object = "USD"
+    currency_margin: object = "USD"
+    margin_initial: object = 0.0
+    margin_maintenance: object = 0.0
+    margin_hedged: object = 100000.0
+    margin_hedged_use_leg: object = False
+    swap_long: object = -0.2
+    swap_short: object = -1.2
+
+
+def _provider_specification() -> object:
+    """Build one transport-free typed provider snapshot through Brokers."""
+    return build_provider_specification_snapshot(
+        symbol_info=_SymbolInfo(),
+        broker="mt5",
+        server="DemoServer",
+        account_id="usage-account-001",
+        environment="demo",
+        terminal_build="4410",
+        source_revision="mt5:4410",
+        observed_at=NOW,
+        account_info=None,
+    )
 
 
 def _feature_header(title: str) -> None:
@@ -328,6 +384,84 @@ def fr_trd_066() -> None:
     print(f"Data -> version='{version}'")
 
 
+def fr_trd_097() -> None:
+    """FR-TRD-097: construct a request with independent fill and time policy."""
+    request = create_trading_request_v2(
+        provider_specification=_provider_specification(),
+        fill_policy="FOK",
+        time_policy="GTC",
+        **_request_data(),
+    )
+    print("Data ->", request.contract_version, request.fill_policy, request.time_policy)
+
+
+def fr_trd_098() -> None:
+    """FR-TRD-098: bind policies to the exact provider revision."""
+    request = create_trading_request_v2(
+        provider_specification=_provider_specification(),
+        fill_policy="IOC",
+        time_policy="DAY",
+        **_request_data(),
+    )
+    print("Data -> provider_revision", request.provider_specification_checksum[:12])
+
+
+def fr_trd_099() -> None:
+    """FR-TRD-099: preserve explicit UTC SPECIFIED_DAY expiration."""
+    request = create_trading_request_v2(
+        provider_specification=_provider_specification(),
+        fill_policy="FOK",
+        time_policy="SPECIFIED_DAY",
+        expiration=NOW + timedelta(days=1),
+        **_request_data(),
+    )
+    print("Data -> expiration", request.expiration.isoformat())
+
+
+def fr_trd_100() -> None:
+    """FR-TRD-100: label explicit v1 compatibility as parity-ineligible."""
+    request = create_legacy_compatible_trading_request(
+        legacy_profile_version="trading-order-policy-legacy-v1",
+        provider_specification=_provider_specification(),
+        **_request_data(),
+    )
+    print("Data -> legacy", request.legacy_compatibility)
+
+
+def fr_trd_112() -> None:
+    """FR-TRD-112: construct an executable v2 intent with both policies."""
+    intent = create_order_intent_v2(
+        provider_specification=_provider_specification(),
+        fill_policy="IOC",
+        time_policy="GTC",
+        client_order_id="trd-usage-v2",
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        workflow_id="wf-22222222-2222-4222-8222-222222222222",
+        correlation_id="cor-33333333-3333-4333-8333-333333333333",
+        route="sim",
+        provider_id=None,
+        account_id="usage-account-001",
+        strategy_id="usage-strategy-001",
+        strategy_version="v1",
+        source_intent_id="usage-source-intent-v2",
+        symbol="EURUSD",
+        action="submit_order",
+        side="BUY",
+        order_type="MARKET",
+        quantity_unit="units",
+        approved_volume=Decimal(1),
+        risk_approved_volume=Decimal(1),
+        idempotency_hash="c" * 64,
+        canonical_material_version="v2",
+        risk_decision_id="usage-risk-001",
+        action_policy_verdict_id="usage-verdict-001",
+        approval_token_ref="usage-approval-001",
+        created_at=NOW,
+        valid_until=NOW + timedelta(minutes=5),
+    )
+    print("Data ->", intent.contract_version, intent.fill_policy, intent.time_policy)
+
+
 def _emit_requirement_success(function: object) -> object:
     """Wrap one example so direct execution emits its success contract."""
 
@@ -359,6 +493,11 @@ def main() -> None:
     fr_trd_001()
     fr_trd_012()
     fr_trd_066()
+    fr_trd_097()
+    fr_trd_098()
+    fr_trd_099()
+    fr_trd_100()
+    fr_trd_112()
 
     # Stage 2: Fail-closed validation & Error handling
     fr_trd_002()

@@ -7,6 +7,7 @@ from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 from app.services.trading.contracts import TradingError, TradingRequest
+from app.services.trading.contracts.models import TradingRequestV2
 from app.services.trading.contracts.responses import success_trading_response
 from app.utils import get_logger
 
@@ -286,6 +287,24 @@ def _validate_symbol_capability(
             "Quantity unit does not match validated instrument metadata",
             trace_context={"request_id": request.request_id},
         )
+    if isinstance(request, TradingRequestV2):
+        filling_modes = symbol_capability.get("filling_modes")
+        expiration_modes = symbol_capability.get("expiration_modes")
+        specification_checksum = symbol_capability.get(
+            "provider_specification_checksum"
+        )
+        if (
+            not isinstance(filling_modes, list)
+            or request.fill_policy not in filling_modes
+            or not isinstance(expiration_modes, list)
+            or request.time_policy not in expiration_modes
+            or specification_checksum != request.provider_specification_checksum
+        ):
+            raise TradingError(
+                "VALIDATION_FAILED",
+                "Order policies do not match the bound provider specification",
+                trace_context={"request_id": request.request_id},
+            )
 
 
 def _validate_order_request_value(
