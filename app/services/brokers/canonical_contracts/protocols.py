@@ -559,6 +559,22 @@ class AccountProvider(Protocol):
         """
         ...
 
+    async def get_provider_specification(self, symbol: str) -> StandardResponse[Any]:
+        """Return one typed current provider specification snapshot.
+
+        The payload is the internal canonical
+        ``ProviderSpecificationSnapshot`` DTO (current observation only;
+        identity, provenance, and checksum bound). Missing required provider
+        fields fail closed.
+
+        Args:
+            symbol: Value supplied to the operation.
+
+        Returns:
+            The operation result.
+        """
+        ...
+
 
 @runtime_checkable
 class TradeExecutionProvider(Protocol):

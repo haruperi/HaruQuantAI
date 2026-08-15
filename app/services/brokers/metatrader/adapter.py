@@ -5,7 +5,7 @@ from __future__ import annotations
 # ruff: noqa: A002 - public protocol signatures are normative.
 from datetime import UTC, datetime
 from decimal import Decimal
-from typing import override
+from typing import TYPE_CHECKING, override
 
 from app.services.brokers.canonical_contracts import (
     BrokerAccountInfo,
@@ -45,6 +45,14 @@ from app.services.brokers.metatrader.mapping import (
     _optional,
 )
 from app.services.brokers.metatrader.transport import _MT5Transport
+from app.services.brokers.specifications.build import (
+    build_provider_specification_snapshot,
+)
+
+if TYPE_CHECKING:
+    from app.services.brokers.specifications.contracts import (
+        ProviderSpecificationSnapshot,
+    )
 
 
 def _provider_ticket(value: str) -> int:
@@ -317,6 +325,48 @@ class MT5BrokerAdapter(
                 BrokerErrorCode.BROKER_SYMBOL_NOT_FOUND,
             )
         return self._result(BrokerCapabilityId.GET_SYMBOL_INFO, data=_map_symbol(value))
+
+    async def get_provider_specification(
+        self, symbol: str
+    ) -> StandardResponse[ProviderSpecificationSnapshot]:
+        """Return one typed current provider specification snapshot.
+
+        Reads ``symbol_info``, ``account_info``, and ``terminal_info`` in one
+        observation and delegates to the fail-closed feature builder. The
+        snapshot is current observation only and never carries effective
+        bounds; missing required provider fields fail closed.
+
+        Args:
+            symbol: Exact provider-native symbol string.
+
+        Returns:
+            StandardResponse[ProviderSpecificationSnapshot]: The operation
+            result.
+        """
+        operation = BrokerCapabilityId.GET_PROVIDER_SPECIFICATION
+        symbol_value = await self._transport.call("symbol_info", symbol)
+        if symbol_value is None:
+            return self._error(operation, BrokerErrorCode.BROKER_SYMBOL_NOT_FOUND)
+        account_value = await self._transport.call("account_info")
+        terminal_value = await self._transport.call("terminal_info")
+        credentials = self._config.credentials or {}
+        try:
+            snapshot = build_provider_specification_snapshot(
+                symbol_value,
+                broker=str(self._config.broker_id.value),
+                server=credentials["server"].get_secret_value(),
+                account_id=str(self._config.account_reference),
+                environment=str(self._config.environment.value),
+                terminal_build=str(_optional(terminal_value, "build") or "unknown"),
+                source_revision="mt5:"
+                + str(_optional(terminal_value, "build") or "unknown"),
+                observed_at=datetime.now(UTC),
+                retrieval_provenance="metatrader.symbol_info+account_info+terminal_info",
+                account_info=account_value,
+            )
+        except ValueError:
+            return self._error(operation, BrokerErrorCode.BROKER_RESPONSE_INVALID)
+        return self._result(operation, data=snapshot)
 
     async def select_symbol(
         self, symbol: str, enabled: bool = True

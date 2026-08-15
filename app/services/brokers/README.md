@@ -5,8 +5,8 @@ The immutable Broker error catalogue uses only the Utils-owned `TRANSIENT`,
 categories. Ambiguous mutation outcomes remain non-retryable `UNKNOWN_STATE`.
 
 > **Package:** `app/services/brokers`
-> **Status:** `Completed` — eleven focused features (`FEAT-BRK-00`..`10`) are implemented with package-root APIs, tests, and numbered usage evidence. The declared sim⇄live parity-programme boundaries (see "Sim⇄live parity programme boundaries") are design registrations only until their owning programme phases implement them.
-> **Last updated:** `2026-08-14`
+> **Status:** `Completed` — twelve focused features (`FEAT-BRK-00`..`10`, `FEAT-BRK-18`) are implemented with package-root APIs, tests, and numbered usage evidence. The declared sim⇄live parity-programme boundaries (see "Sim⇄live parity programme boundaries") are design registrations only until their owning programme phases implement them.
+> **Last updated:** `2026-08-15`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -307,8 +307,9 @@ The tree below defines the final layout. The following table is the sole normati
 | Completed | `FEAT-BRK-08` Simulation and Live Isolation | `environment_guards/` | Default-deny provider/account/environment permissions | `FR-BRK-139`, `FR-BRK-150` | `tests/brokers/usage/features/08_environment_guards.py` |
 | Completed | `FEAT-BRK-09` Broker Event Normalization | `events/` | Ordered, deduplicated event envelopes and source checkpoints | `FR-BRK-151` | `tests/brokers/usage/features/09_events.py` |
 | Completed | `FEAT-BRK-10` Adapter Contract Test Kit | `conformance/` | Reusable conformance suite and deterministic adapter fixture | `FR-BRK-109` | `tests/brokers/usage/features/10_conformance.py` |
+| Completed | `FEAT-BRK-18` Provider Specification Snapshots | `specifications/` | `build_provider_specification_snapshot`, `parse_provider_specification_snapshot`, `dump_provider_specification_snapshot`, `get_provider_specification_snapshot_field`, `verify_provider_specification_snapshot`, `get_broker_provider_specification` | `FR-BRK-159`–`FR-BRK-163` | `tests/brokers/usage/features/18_specifications.py` |
 
-Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private focused files; unreleased writes remain unreachable through public release policy. The registry holds **eleven** completed features, `FEAT-BRK-00` through `FEAT-BRK-10`. IDs `FEAT-BRK-11` through `FEAT-BRK-16` are retired from current-state registration after their behavior moved into provider channels, Events, Reconciliation, and Conformance. `canonical_contracts/` and `_shared/` are documented non-feature support and own no independent feature behavior.
+Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private focused files; unreleased writes remain unreachable through public release policy. The registry holds **twelve** completed features, `FEAT-BRK-00` through `FEAT-BRK-10` plus `FEAT-BRK-18` (provider specification snapshots, parity-programme Phase 4a). IDs `FEAT-BRK-11` through `FEAT-BRK-16` are retired from current-state registration after their behavior moved into provider channels, Events, Reconciliation, and Conformance. `canonical_contracts/` and `_shared/` are documented non-feature support and own no independent feature behavior.
 
 | Order | Feature                    | File order                                                                                                                                        |
 | ----: | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1138,7 +1139,7 @@ These are returned in `StandardResponse.error`, never raised as expected domain 
 - `BrokerEnvironment`: `LIVE="live"`, `DEMO="demo"`, `TESTNET="testnet"`, `SANDBOX="sandbox"`.
 - `BrokerConnectionState`: `DISCONNECTED="disconnected"`, `CONNECTING="connecting"`, `READY="ready"`, `DEGRADED="degraded"`, `CLOSING="closing"`, `FAILED="failed"`.
 - `BrokerErrorCode`: every exact `BROKER_*` identifier in the Canonical error conditions table, including `BROKER_CIRCUIT_OPEN`, is both the member name and serialized value.
-- `BrokerCapabilityId`: one lowercase member value for every protocol operation: `connect`, `disconnect`, `reconnect`, `is_connected`, `get_connection_status`, `ping`, `refresh_session`, `get_server_time`, `get_last_error`, `connection_events`, `get_symbols`, `get_symbol_info`, `select_symbol`, `get_market_status`, `get_trading_sessions`, `get_quote`, `get_ticks`, `get_historical_bars`, `get_order_book`, `get_spread`, `subscribe_quotes`, `subscribe_bars`, `subscribe_order_book`, `unsubscribe`, `list_subscriptions`, `get_feature_flags`, `supports`, `get_platform_info`, `get_permissions`, `list_accounts`, `select_account`, `get_account_info`, `get_balances`, `list_assets`, `get_asset_info`, `get_positions`, `get_position`, `get_orders`, `get_order`, `list_order_history`, `list_deal_history`, `get_deal`, `list_account_transactions`, `check_order`, `place_order`, `modify_order`, `cancel_order`, `modify_position`, `close_position`, `replace_order`, `calculate_margin`, `calculate_profit`, and `get_commission_estimate`.
+- `BrokerCapabilityId`: one lowercase member value for every protocol operation: `connect`, `disconnect`, `reconnect`, `is_connected`, `get_connection_status`, `ping`, `refresh_session`, `get_server_time`, `get_last_error`, `connection_events`, `get_symbols`, `get_symbol_info`, `select_symbol`, `get_market_status`, `get_trading_sessions`, `get_quote`, `get_ticks`, `get_historical_bars`, `get_order_book`, `get_spread`, `subscribe_quotes`, `subscribe_bars`, `subscribe_order_book`, `unsubscribe`, `list_subscriptions`, `get_feature_flags`, `supports`, `get_platform_info`, `get_permissions`, `list_accounts`, `select_account`, `get_account_info`, `get_balances`, `list_assets`, `get_asset_info`, `get_positions`, `get_position`, `get_orders`, `get_order`, `list_order_history`, `list_deal_history`, `get_deal`, `list_account_transactions`, `check_order`, `place_order`, `modify_order`, `cancel_order`, `modify_position`, `close_position`, `replace_order`, `calculate_margin`, `calculate_profit`, `get_commission_estimate`, and `get_provider_specification`.
 
 **Normative non-enum literal vocabulary:** market status `OPEN`, `CLOSED`, `HALTED`, `UNKNOWN`; tick type `TRADE`, `QUOTE`, `BLOCK`, `UNKNOWN`; position side `LONG`, `SHORT`, `UNKNOWN`; order/deal side `BUY`, `SELL`, `UNKNOWN`; order type `MARKET`, `LIMIT`, `STOP`, `STOP_LIMIT`, `TRAILING_STOP`, `UNKNOWN`; order state `PENDING`, `ACCEPTED`, `PARTIALLY_FILLED`, `FILLED`, `CANCELLED`, `REJECTED`, `EXPIRED`, `UNKNOWN`; position state `OPEN`, `CLOSED`, `UNKNOWN`; time in force `GTC`, `IOC`, `FOK`, `GTD`, `DAY`, `UNKNOWN`; account transaction type `DEPOSIT`, `WITHDRAWAL`, `FEE`, `COMMISSION`, `SWAP`, `INTEREST`, `TRANSFER`, `ADJUSTMENT`, `UNKNOWN`. Provider values outside these vocabularies map to `UNKNOWN` while their redacted native value remains in provider metadata.
 
@@ -1391,6 +1392,7 @@ No capability-matrix-specific setting exists. The composition root derives `Brok
 | `get_symbols`, `get_symbol_info`, `get_ticks`                                                                                                                                                                                                                        |  A  |    A    |      A      |           U           |     A     |   U   |
 | `get_quote`, `get_spread`                                                                                                                                                                                                                                              |  A  |    A    |      A      |           U           |     U     |   U   |
 | `get_positions`, `get_orders`, `list_order_history`, `list_deal_history`, `calculate_margin`, `calculate_profit`                                                                                                                                               |  A  |    A    |      U      |           U           |     U     |   U   |
+| `get_provider_specification`                                                                                                                                                                                                                                             |  A  |    U    |      U      |           U           |     U     |   U   |
 | `select_symbol`, `get_permissions`, `get_account_info`, `get_balances`, `get_position`, `get_order`, `get_deal`, `list_account_transactions`                                                                                                               |  A  |    U    |      U      |           U           |     U     |   U   |
 | `subscribe_quotes`                                                                                                                                                                                                                                                       |  U  |    A    |      A      |           U           |     U     |   U   |
 | `get_server_time`, `get_market_status`, `get_order_book`, `subscribe_bars`, `subscribe_order_book`                                                                                                                                                               |  U  |    U    |      A      |           U           |     U     |   U   |
@@ -1884,6 +1886,26 @@ eligibility, settlement, halt state, lifecycle state, and trading eligibility.
 The feature owns no additional table. Profile evidence remains immutable and
 in memory. Mapping administration remains in `instrument_profiles/mappings.py`, while
 the identity reads used by profiles are owned here.
+
+### 4.13 `specifications/` — Provider Specification Snapshots
+
+**Feature:** `FEAT-BRK-18` (parity-programme Phase 4a). The module README
+(`app/services/brokers/specifications/README.md`) is authoritative for the
+contract surface; requirement evidence:
+
+| Status | Requirement ID | Responsibility | Verification |
+| --- | --- | --- | --- |
+| Completed | `FR-BRK-159` | Typed current snapshot covering execution/order/filling/expiration/GTC modes, stops/freeze, directional volume limit, calculation mode, margin/swap evidence, instrument scalars, and account permission evidence. | **Usage:** `tests/brokers/usage/features/18_specifications.py::fr_brokers_159()` **Unit:** `tests/brokers/unit/test_provider_specifications.py` |
+| Completed | `FR-BRK-160` | Snapshot binds broker/server/redacted account digest/environment/terminal build/source revision, aware-UTC `observed_at`, retrieval provenance, and a canonical SHA-256 checksum. | **Usage:** `::fr_brokers_160()` **Unit:** `::test_fr_brokers_160_binds_source_and_observation_identity` |
+| Completed | `FR-BRK-161` | Every required provider field fails closed when absent, non-finite, or outside the verified vocabulary; unverified account permissions stay explicit exclusions. | **Usage:** `::fr_brokers_161()` **Unit:** `::test_fr_brokers_161_missing_required_field_fails_closed`, `::test_fr_brokers_161_non_finite_numeric_fails_closed` |
+| Completed | `FR-BRK-162` | Dynamic commission/fee evidence stays a separate typed evidence reference; no static symbol rate is guessed. | **Usage:** `::fr_brokers_162()` **Unit:** `::test_fr_brokers_162_keeps_cost_evidence_separate_and_typed` |
+| Completed | `FR-BRK-163` | The snapshot states current observation only; no effective bounds exist and parse rejects them. | **Usage:** `::fr_brokers_163()` **Unit:** `::test_fr_brokers_163_snapshot_is_current_observation_only` **Integration:** `tests/brokers/integration/test_provider_specification_contract.py` |
+
+The adapter read (`BrokerCapabilityId.GET_PROVIDER_SPECIFICATION`) is
+implemented and released for MT5; the deterministic conformance fake carries
+the capability automatically. Evidence fields the upstream Python contract
+does not expose (stop-out mode, FIFO) are recorded as `unverified` and fail
+closed on canonical paths rather than being invented.
 
 
 ---

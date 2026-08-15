@@ -44,10 +44,11 @@ def test_error_codes_cover_accepted_failures() -> None:
 
 
 def test_capabilities_match_protocol_methods() -> None:
-    """The complete operation manifest contains 55 unique values.
+    """The complete operation manifest contains 56 unique values.
 
     The application Phase 0 safe-order-command port (``feature``)
-    added ``attach_protection`` and ``reduce_position`` to the 53 prior values.
+    added ``attach_protection`` and ``reduce_position`` to the 53 prior
+    values; parity-programme Phase 4a added ``get_provider_specification``.
     """
-    assert len(BrokerCapabilityId) == 55
-    assert len({item.value for item in BrokerCapabilityId}) == 55
+    assert len(BrokerCapabilityId) == 56
+    assert len({item.value for item in BrokerCapabilityId}) == 56

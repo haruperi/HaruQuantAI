@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+### Add typed current provider specification snapshots
+
+Brokers now publishes the versioned current specification observation the
+parity programme certifies against (`FEAT-BRK-18`, programme Phase 4a).
+
+#### Added (3)
+
+- Added the immutable `ProviderSpecificationSnapshot v1` binding execution/order/filling/expiration/GTC modes, stops/freeze levels, directional volume limits, calculation mode, margin and swap evidence, instrument scalars, and account permission evidence to one provider/server/account/environment observation with a canonical checksum and current-only validity.
+- Added the fail-closed MT5 mapping with verified bit-flag vocabularies, explicit unverified-exclusion handling for fields the upstream contract lacks, and a separate typed dynamic cost-evidence reference.
+- Added the released `GET_PROVIDER_SPECIFICATION` adapter capability for MT5 plus six package-root functions to build, parse, dump, verify, and read snapshots.
+
 ### Add the parity envelope and relationship-preserving comparator
 
 Simulation now publishes the versioned Parity Envelope v1, the alpha-renaming

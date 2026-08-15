@@ -180,6 +180,14 @@ from app.services.brokers.reconciliation.public import (
     parse_broker_failover_decision,
     parse_broker_route_plan,
 )
+from app.services.brokers.specifications.public import (
+    build_provider_specification_snapshot,
+    dump_provider_specification_snapshot,
+    get_broker_provider_specification,
+    get_provider_specification_snapshot_field,
+    parse_provider_specification_snapshot,
+    verify_provider_specification_snapshot,
+)
 from app.services.brokers.yahoo.health import record_yahoo_health_checkpoint
 
 __all__ = (
@@ -204,6 +212,7 @@ __all__ = (
     "build_broker_unknown_result",
     "build_broker_value",
     "build_instrument_venue_profile",
+    "build_provider_specification_snapshot",
     "calculate_broker_margin",
     "calculate_broker_profit",
     "cancel_broker_order",
@@ -218,6 +227,7 @@ __all__ = (
     "create_fake_broker_adapter",
     "disable_broker_symbol_mapping",
     "disconnect_broker",
+    "dump_provider_specification_snapshot",
     "enforce_no_blind_resubmission",
     "get_broker_account_info",
     "get_broker_adapter_contract_version",
@@ -253,6 +263,7 @@ __all__ = (
     "get_broker_platform_info",
     "get_broker_position",
     "get_broker_positions",
+    "get_broker_provider_specification",
     "get_broker_quote",
     "get_broker_resubmission_policy",
     "get_broker_route_recovery",
@@ -265,6 +276,7 @@ __all__ = (
     "get_broker_uncertainty",
     "get_broker_value_field",
     "get_metatrader_snapshot_gateway_status",
+    "get_provider_specification_snapshot_field",
     "get_registered_brokers",
     "is_broker_connected",
     "is_broker_connection_enabled",
@@ -284,6 +296,7 @@ __all__ = (
     "parse_broker_reconciliation_snapshot",
     "parse_broker_route_plan",
     "parse_instrument_venue_profile",
+    "parse_provider_specification_snapshot",
     "ping_broker",
     "place_broker_order",
     "reconnect_broker",
@@ -316,4 +329,5 @@ __all__ = (
     "subscribe_broker_quotes",
     "supports_broker_capability",
     "unsubscribe_broker",
+    "verify_provider_specification_snapshot",
 )

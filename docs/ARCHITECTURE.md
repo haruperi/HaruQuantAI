@@ -423,6 +423,14 @@ translation stays in Brokers, and matching/accounting/scheduling/journaling stay
 Simulation. Specification evidence is split by observation time: Brokers owns the
 typed current provider specification snapshot (current observation only) and Data
 owns immutable effective-dated historical revisions; the graph stays acyclic.
+The current snapshot is implemented as `ProviderSpecificationSnapshot v1`
+(`FEAT-BRK-18`, parity-programme Phase 4a): it binds execution/order/filling/
+expiration/GTC modes, stops/freeze levels, directional volume limits,
+calculation mode, margin and swap evidence, instrument scalars, and account
+permission evidence to one provider/server/redacted-account/environment
+observation with a canonical checksum, fails closed on missing provider
+fields, keeps dynamic cost evidence as a separate typed reference, and
+exposes no effective bounds.
 
 ### Agentic Runtime and Trust Boundaries
 

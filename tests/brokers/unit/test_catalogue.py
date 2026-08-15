@@ -62,6 +62,7 @@ _NORMATIVE_MATRIX: tuple[tuple[tuple[str, ...], tuple[str, ...]], ...] = (
         ),
         ("A", "A", "U", "U", "U", "U", "U"),
     ),
+    (("get_provider_specification",), ("A", "U", "U", "U", "U", "U", "U")),
     (
         (
             "select_symbol",

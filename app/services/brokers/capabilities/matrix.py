@@ -124,6 +124,7 @@ _MT5 = _COMMON_TARGETS | {
     BrokerCapabilityId.CLOSE_POSITION,
     BrokerCapabilityId.CALCULATE_MARGIN,
     BrokerCapabilityId.CALCULATE_PROFIT,
+    BrokerCapabilityId.GET_PROVIDER_SPECIFICATION,
 }
 _CTRADER = _COMMON_TARGETS | {
     BrokerCapabilityId.PING,
@@ -235,6 +236,8 @@ _READ_EVIDENCE: Mapping[BrokerId, tuple[str, ...]] = MappingProxyType(
             "tests/brokers/unit/test_mt5_mapping.py",
             "tests/brokers/unit/test_mt5_adapter.py",
             "tests/brokers/integration/test_provider_contracts.py",
+            "tests/brokers/unit/test_provider_specifications.py",
+            "tests/brokers/integration/test_provider_specification_contract.py",
         ),
         BrokerId.CTRADER: (
             "tests/brokers/unit/test_ctrader_network.py",

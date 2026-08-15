@@ -155,3 +155,4 @@ class BrokerCapabilityId(StrEnum):
     CALCULATE_MARGIN = "calculate_margin"
     CALCULATE_PROFIT = "calculate_profit"
     GET_COMMISSION_ESTIMATE = "get_commission_estimate"
+    GET_PROVIDER_SPECIFICATION = "get_provider_specification"

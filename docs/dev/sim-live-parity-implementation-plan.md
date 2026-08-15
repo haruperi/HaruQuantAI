@@ -832,7 +832,7 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] README, changelog, and listed system documents reconciled. (No changelog entry listed for Phase 3 units; system documents already carry the programme architecture from Phase 1.)
 - [x] STOP conditions and rollback path were rechecked. (No STOP triggered; rollback is per-unit `git checkout -- <unit README>` plus this plan record.)
 - [x] Commit remains unauthorized, or its separately authorized hash is recorded. (Owner separately authorized a single combined Phase 3 commit on 2026-08-14 in place of the three per-unit boundaries; committed with a combined message derived from the per-unit texts — hash recorded post-commit below.)
-  - Commit hash: pending post-commit record.
+  - Commit hash: `0c9b6b7492368f8c317106e114b5ca8701278a85` (all pre-commit hooks passed; 4 files: the three owning READMEs plus this plan record).
 
 # Phase 4 · Contract foundations
 
@@ -1119,17 +1119,20 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff format/check and mypy passed for every owning domain.
-- [ ] Every local usage program executed directly and passed.
-- [ ] Every owning-domain phase gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+**Unit 4a status: Completed — 2026-08-15.**
+
+- [x] Approval matched this exact phase/subphase. (Owner standalone `APPROVED: EXECUTE` for unit 4a brokers following the recorded dry run.)
+- [x] Only the local file and documentation manifests changed. (Created `app/services/brokers/specifications/{README.md,__init__.py,contracts.py,build.py,public.py}`, `tests/brokers/unit/test_provider_specifications.py`, `tests/brokers/integration/test_provider_specification_contract.py`, `tests/brokers/usage/features/18_specifications.py`; edited the declared canonical enums/protocols, capability matrix, MT5 adapter, brokers root `__init__`/README, docs/CHANGELOG/PROJECT/ARCHITECTURE per the 4a documentation manifest, and same-feature registry tests (`test_catalogue`, `test_enums`, `test_documentation_parity`, `test_usage_parity`) anticipated by the dry-run risk register; plan-file edits are this checklist record only.)
+- [x] Every listed FR has final `path:line` implementation and test evidence. (`FR-BRK-159`–`163` rows at `app/services/brokers/README.md` §4.13; implementation at `app/services/brokers/specifications/contracts.py:273`, `build.py:452`, `app/services/brokers/metatrader/adapter.py:329`; usage functions `fr_brokers_159()`–`fr_brokers_163()` at `tests/brokers/usage/features/18_specifications.py`.)
+- [x] Only verified package-root/public dependency contracts were used. (Upstream `symbol_info()`/`account_info()`/`terminal_info()` field lists verified against the official MetaTrader5 documentation; in-repo verified `swap_mode`/`filling_mode`/`trade_mode` mappings reused; Utils canonical JSON/digest.)
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes. (`uv run pytest tests/brokers/unit/test_provider_specifications.py tests/brokers/integration/test_provider_specification_contract.py` → 21 passed in 0.46s.)
+- [x] Ruff format/check and mypy passed for every owning domain. (`ruff format --check` 210 files clean; `ruff check` All checks passed; `mypy app/services/brokers` no issues in 96 files.)
+- [x] Every local usage program executed directly and passed. (`uv run python tests/brokers/usage/features/18_specifications.py` → 5 SUCCESS lines.)
+- [x] Every owning-domain phase gate passed. (`uv run pytest tests/brokers` → 571 passed, 3 skipped; the 8 remaining failures were verified by `git stash` to fail identically on the unmodified baseline — catalogue ×3, broker discovery ×1, documentation docstring sections ×1, mt5 adapter enumeration ×1, mt5 mutations coverage ×2 — so they are pre-existing and not 4a regressions; one transient Dukascopy network flake did not recur.)
+- [x] README, changelog, and listed system documents reconciled. (Registry row + §4.13 + counts twelve at `app/services/brokers/README.md`; §5 contract row and count 237/222/15 at `docs/PROJECT.md`; ARCHITECTURE.md snapshot note; CHANGELOG Added(3) block.)
+- [x] STOP conditions and rollback path were rechecked. (No STOP occurred; account-permission fields absent from the upstream contract are explicit `unverified` exclusions rather than inventions; rollback per plan §4a.)
+- [x] Commit remains unauthorized, or its separately authorized hash is recorded. (Owner separately authorized the 4a commit on 2026-08-15; committed with the proposed message `feat(brokers): add provider specification snapshots` — hash recorded post-commit below.)
+  - Commit hash: pending post-commit record.
 
 # Phase 5 · Deterministic execution scheduler
 
