@@ -24,6 +24,7 @@ from app.services.trading import (
     create_execution_position,
     create_execution_position_store,
     create_idempotency_reservation,
+    create_position_authority_event,
     create_trading_event,
     create_trading_projection,
     create_trading_request,
@@ -32,6 +33,7 @@ from app.services.trading import (
     get_trading_migrations,
     get_trading_schema_version,
     reconcile_execution_position_receipt,
+    reconcile_position_authority_event,
     reserve_idempotency,
     restore_execution_position_store,
     run_trading_migrations,
@@ -632,6 +634,33 @@ def fr_trd_103() -> None:
     print(f"Data -> restored_position_sequence={state.source_sequence}")
 
 
+def fr_trd_107() -> None:
+    """FR-TRD-107: Both routes use one deal-position transition algorithm."""
+    snapshots = []
+    for route in ("sim", "live"):
+        store = create_execution_position_store()
+        for sequence, quantity in ((0, Decimal(1)), (1, Decimal(0))):
+            event = create_position_authority_event(
+                event_id=f"{route}-usage-{sequence}",
+                route=route,
+                account_id="usage-account",
+                authority_id=f"{route}-authority",
+                deal_id=f"usage-deal-{sequence}",
+                position_id="usage-position",
+                symbol="EURUSD",
+                side="LONG",
+                state="FLAT" if quantity == 0 else "OPEN",
+                quantity=quantity,
+                source_sequence=sequence,
+                available_at=NOW,
+                reason="ORDER",
+            )
+            reconcile_position_authority_event(store, event)
+        snapshots.append(get_execution_position_snapshot(store))
+    assert snapshots[0] == snapshots[1]
+    print(f"Data -> paired_route_projection={snapshots[0]}")
+
+
 def _emit_requirement_success(function: object) -> object:
     """Wrap one example so direct execution emits its success contract."""
 
@@ -681,6 +710,7 @@ def main() -> None:
     fr_trd_101()
     fr_trd_102()
     fr_trd_103()
+    fr_trd_107()
 
     # Stage 2: Idempotency check & Validation
     fr_trd_039()

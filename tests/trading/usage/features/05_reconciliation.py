@@ -17,10 +17,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.trading import (
     compare_authority_state,
     create_authority_snapshot,
+    create_execution_position_store,
     create_execution_receipt,
+    create_position_authority_event,
     create_trading_event,
     create_trading_projection,
+    reconcile_position_authority_event,
     resolve_unknown_outcome,
+    restore_execution_position_store,
+    serialize_execution_position_store,
 )
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
@@ -224,6 +229,55 @@ def fr_trd_062() -> None:
     )
 
 
+def _position_event(sequence: int) -> object:
+    """Build one complete usage authority event."""
+    return create_position_authority_event(
+        event_id=f"usage-event-{sequence}",
+        route="sim",
+        account_id="usage-account",
+        authority_id="simulator",
+        deal_id=f"usage-deal-{sequence}",
+        position_id="usage-position",
+        symbol="EURUSD",
+        side="LONG",
+        state="OPEN",
+        quantity=Decimal(1),
+        source_sequence=sequence,
+        available_at=NOW,
+        reason="ORDER",
+    )
+
+
+def fr_trd_108() -> None:
+    """FR-TRD-108: Duplicate and late authority events do not reapply."""
+    store = create_execution_position_store()
+    event = _position_event(5)
+    assert reconcile_position_authority_event(store, event)["disposition"] == "APPLIED"
+    assert (
+        reconcile_position_authority_event(store, event)["disposition"] == "DUPLICATE"
+    )
+    assert (
+        reconcile_position_authority_event(store, _position_event(4))["disposition"]
+        == "LATE"
+    )
+    print("Data -> authority_ordering=duplicate_and_late_suppressed")
+
+
+def fr_trd_110() -> None:
+    """FR-TRD-110: Restored watermark prevents duplicate mutation."""
+    store = create_execution_position_store()
+    event = _position_event(7)
+    reconcile_position_authority_event(store, event)
+    restored = restore_execution_position_store(
+        serialize_execution_position_store(store)
+    )
+    assert (
+        reconcile_position_authority_event(restored, event)["disposition"]
+        == "DUPLICATE"
+    )
+    print("Data -> restored_watermark=duplicate_suppressed")
+
+
 def _emit_requirement_success(function: object) -> object:
     """Wrap one example so direct execution emits its success contract."""
 
@@ -261,6 +315,8 @@ def main() -> None:
     fr_trd_045()
     fr_trd_061()
     fr_trd_062()
+    fr_trd_108()
+    fr_trd_110()
 
 
 if __name__ == "__main__":

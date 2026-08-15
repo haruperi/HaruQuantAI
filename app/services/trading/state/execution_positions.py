@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta
 from decimal import Decimal
 from threading import RLock
 from typing import Any, Literal, Self, cast
@@ -124,7 +125,63 @@ class _ExecutionPositionStore:
         """Initialize empty process-local position dictionary and lock."""
         self._positions: dict[str, _ExecutionPosition] = {}
         self._receipt_positions: dict[str, str] = {}
+        self._authority_watermarks: dict[str, tuple[int, str]] = {}
+        self._deal_positions: dict[str, str] = {}
         self._lock = RLock()
+
+
+class _PositionAuthorityEvent(BaseModel):
+    """Immutable route-neutral deal and position authority event."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid", allow_inf_nan=False)
+
+    event_id: str
+    route: Literal["sim", "paper", "live"]
+    account_id: str
+    authority_id: str
+    deal_id: str
+    position_id: str
+    symbol: str
+    side: Literal["LONG", "SHORT", "UNKNOWN"]
+    state: Literal["OPEN", "FLAT"]
+    quantity: Decimal
+    source_sequence: int
+    available_at: datetime
+    reason: Literal["ORDER", "MODIFICATION", "PROTECTION", "LIQUIDATION", "REVERSAL"]
+    activity_origin: Literal["owned", "foreign", "manual"] = "owned"
+
+    @model_validator(mode="after")
+    def _validate_event(self) -> Self:
+        """Validate complete authority identity, ordering, and exposure evidence.
+
+        Returns:
+            Validated authority event.
+
+        Raises:
+            ValueError: If identity, quantity, sequence, time, or state conflicts.
+        """
+        identities = (
+            self.event_id,
+            self.account_id,
+            self.authority_id,
+            self.deal_id,
+            self.position_id,
+            self.symbol,
+        )
+        if any(not value or value != value.strip() for value in identities):
+            raise ValueError("authority event identity must be non-empty and trimmed")
+        if self.source_sequence < 0:
+            raise ValueError("authority event sequence must be non-negative")
+        if (
+            self.available_at.tzinfo is None
+            or self.available_at.utcoffset() != timedelta(0)
+        ):
+            raise ValueError("authority event availability must be aware UTC")
+        if not self.quantity.is_finite() or self.quantity < 0:
+            raise ValueError("authority event quantity must be finite and non-negative")
+        if (self.state == "FLAT") != (self.quantity == 0):
+            raise ValueError("authority event state conflicts with quantity")
+        return self
 
 
 def create_execution_position_store() -> object:
@@ -134,6 +191,144 @@ def create_execution_position_store() -> object:
         Opaque in-memory store for dependency injection.
     """
     return _ExecutionPositionStore()
+
+
+def create_position_authority_event(**values: object) -> object:
+    """Create one validated route-neutral authority event.
+
+    Args:
+        **values: Complete deal, position, sequence, and availability evidence.
+
+    Returns:
+        Opaque immutable authority-event value.
+    """
+    return _PositionAuthorityEvent.model_validate(values)
+
+
+def _authority_scope(event: _PositionAuthorityEvent) -> str:
+    """Return one stable route/account/authority watermark key.
+
+    Args:
+        event: Validated authority event.
+
+    Returns:
+        Stable scoped watermark identity.
+    """
+    return f"{event.route}:{event.account_id}:{event.authority_id}"
+
+
+def get_position_authority_watermark(
+    store: object, scope: str
+) -> dict[str, object] | None:
+    """Return the last durable event watermark for one exact scope.
+
+    Args:
+        store: Execution-position store instance.
+        scope: Route/account/authority scope returned in reconciliation results.
+
+    Returns:
+        Detached sequence/event watermark, or ``None`` before the first event.
+
+    Raises:
+        TradingError: If the store or scope is invalid.
+    """
+    if not isinstance(store, _ExecutionPositionStore) or not scope.strip():
+        raise TradingError("INVALID_REQUEST", "Authority watermark request is invalid")
+    with store._lock:
+        watermark = store._authority_watermarks.get(scope)
+        if watermark is None:
+            return None
+        return {"source_sequence": watermark[0], "event_id": watermark[1]}
+
+
+def reconcile_position_authority_event(
+    store: object,
+    event: object,
+    *,
+    ownership_registry: object | None = None,
+) -> dict[str, object]:
+    """Atomically reconcile one authority event and advance its watermark.
+
+    Args:
+        store: Execution-position store instance.
+        event: Validated route-neutral authority event.
+        ownership_registry: Registry used to prove foreign/manual ownership.
+
+    Returns:
+        Detached deterministic disposition, scope, watermark, and position data.
+
+    Raises:
+        TradingError: If inputs conflict, evidence is missing, or a forward gap
+            prevents safe projection.
+    """
+    if not isinstance(store, _ExecutionPositionStore) or not isinstance(
+        event, _PositionAuthorityEvent
+    ):
+        raise TradingError("INVALID_REQUEST", "Position authority event is invalid")
+    scope = _authority_scope(event)
+    with store._lock:
+        watermark = store._authority_watermarks.get(scope)
+        if watermark is not None:
+            sequence, event_id = watermark
+            if event.source_sequence < sequence:
+                return {"disposition": "LATE", "scope": scope, "watermark": sequence}
+            if event.source_sequence == sequence:
+                if event.event_id != event_id:
+                    raise TradingError(
+                        "RECONCILIATION_REQUIRED",
+                        "Authority sequence identity conflicts with durable watermark",
+                    )
+                return {
+                    "disposition": "DUPLICATE",
+                    "scope": scope,
+                    "watermark": sequence,
+                }
+            if event.source_sequence != sequence + 1:
+                raise TradingError(
+                    "RECONCILIATION_REQUIRED",
+                    "Authority event sequence contains a forward gap",
+                )
+        correlated = store._deal_positions.get(event.deal_id)
+        if correlated is not None and correlated != event.position_id:
+            raise TradingError(
+                "RECONCILIATION_REQUIRED",
+                "Authority deal conflicts with its durable position correlation",
+            )
+        orphaned = False
+        if event.activity_origin != "owned":
+            from app.services.trading.trade_ownership import detect_orphaned_trade
+
+            orphaned = ownership_registry is None or detect_orphaned_trade(
+                ownership_registry, event.position_id
+            )
+        current = store._positions.get(event.position_id)
+        version = 0 if current is None else current.version + 1
+        projected = _ExecutionPosition(
+            position_id=event.position_id,
+            account_id=event.account_id,
+            symbol=event.symbol,
+            broker_position_id=event.position_id,
+            side=event.side,
+            state="UNKNOWN" if orphaned else event.state,
+            quantity=event.quantity,
+            source_sequence=event.source_sequence,
+            version=version,
+            unknown_reason=(
+                "foreign/manual exposure has no valid ownership" if orphaned else None
+            ),
+        )
+        store._positions[event.position_id] = projected
+        store._deal_positions[event.deal_id] = event.position_id
+        store._authority_watermarks[scope] = (
+            event.source_sequence,
+            event.event_id,
+        )
+        return {
+            "disposition": "ORPHAN_BLOCKED" if orphaned else "APPLIED",
+            "scope": scope,
+            "watermark": event.source_sequence,
+            "position": projected.model_dump(mode="json"),
+        }
 
 
 def create_execution_position(**values: object) -> object:
@@ -298,7 +493,46 @@ def serialize_execution_position_store(store: object) -> dict[str, object]:
                 for identity, position in sorted(store._positions.items())
             },
             "receipt_positions": dict(sorted(store._receipt_positions.items())),
+            "authority_watermarks": {
+                scope: {"source_sequence": value[0], "event_id": value[1]}
+                for scope, value in sorted(store._authority_watermarks.items())
+            },
+            "deal_positions": dict(sorted(store._deal_positions.items())),
         }
+
+
+def _restore_authority_watermarks(
+    values: dict[object, object],
+) -> dict[str, tuple[int, str]]:
+    """Validate serialized authority watermarks before restoring state.
+
+    Args:
+        values: Candidate serialized watermark mappings.
+
+    Returns:
+        Validated scope-to-sequence/event mapping.
+
+    Raises:
+        TypeError: If a watermark container has an invalid type.
+        ValueError: If any watermark is incomplete or invalid.
+    """
+    restored: dict[str, tuple[int, str]] = {}
+    for raw_scope, raw_value in values.items():
+        if not isinstance(raw_scope, str) or not isinstance(raw_value, dict):
+            raise TypeError("authority watermark is invalid")
+        sequence = raw_value.get("source_sequence")
+        event_id = raw_value.get("event_id")
+        if (
+            not raw_scope
+            or not isinstance(sequence, int)
+            or isinstance(sequence, bool)
+            or sequence < 0
+            or not isinstance(event_id, str)
+            or not event_id
+        ):
+            raise ValueError("authority watermark is invalid")
+        restored[raw_scope] = (sequence, event_id)
+    return restored
 
 
 def restore_execution_position_store(state: dict[str, object]) -> object:
@@ -315,7 +549,14 @@ def restore_execution_position_store(state: dict[str, object]) -> object:
     """
     positions = state.get("positions")
     watermarks = state.get("receipt_positions")
-    if not isinstance(positions, dict) or not isinstance(watermarks, dict):
+    authority_watermarks = state.get("authority_watermarks", {})
+    deal_positions = state.get("deal_positions", {})
+    if (
+        not isinstance(positions, dict)
+        or not isinstance(watermarks, dict)
+        or not isinstance(authority_watermarks, dict)
+        or not isinstance(deal_positions, dict)
+    ):
         raise TradingError("INVALID_REQUEST", "Execution-position state is invalid")
     store = _ExecutionPositionStore()
     try:
@@ -326,6 +567,13 @@ def restore_execution_position_store(state: dict[str, object]) -> object:
         store._receipt_positions = {
             str(receipt_id): str(position_id)
             for receipt_id, position_id in watermarks.items()
+        }
+        store._authority_watermarks = _restore_authority_watermarks(
+            authority_watermarks
+        )
+        store._deal_positions = {
+            str(deal_id): str(position_id)
+            for deal_id, position_id in deal_positions.items()
         }
     except (TypeError, ValueError) as error:
         raise TradingError(
@@ -510,9 +758,12 @@ async def reconcile_execution_position_receipt(  # noqa: C901, PLR0911
 __all__ = [
     "create_execution_position",
     "create_execution_position_store",
+    "create_position_authority_event",
     "get_execution_position",
     "get_execution_position_snapshot",
+    "get_position_authority_watermark",
     "reconcile_execution_position_receipt",
+    "reconcile_position_authority_event",
     "restore_execution_position_store",
     "serialize_execution_position_store",
     "set_execution_position",

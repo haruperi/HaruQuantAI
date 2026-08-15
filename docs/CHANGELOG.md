@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Reconcile positions consistently across routes
+
+Trading now applies one authority-event ordering and position-reconciliation algorithm to Simulation, paper, and live routes (Phase 18a).
+
+#### Fixed (1)
+
+- Fixed route divergence by atomically coupling deal-position projection, sequence/event watermark, restart deduplication, and fail-closed foreign/manual orphan handling.
+
 ### Expose simulation deal history
 
 Brokers now exposes bounded Simulation deal, exact-deal, and account-transaction authority reads (Phase 17b).

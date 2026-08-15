@@ -3508,7 +3508,7 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] Owning-domain behavior was rechecked. Evidence: `uv run pytest -q --no-cov tests/brokers` passed 680 tests with 3 credential skips; the literal coverage-enabled command reproduced the same three pre-existing failures and 680 passing behaviors, then also reported 16.51% repository-wide subset coverage below the global 80% floor. The remaining failures are outside Unit 17b: one package-wide docstring audit over MT5 snapshot/specification helpers and two stale MT5 mutation mock sequences. All Phase-17b reconciliation failures found on the first gate run were corrected and their focused tests pass.
 - [x] README and changelog are reconciled. Evidence: `app/services/brokers/README.md`, `app/services/brokers/simulation/README.md`, `app/services/brokers/conformance/README.md`, `docs/CHANGELOG.md`.
 - [x] Rollback was reviewed. Evidence: remove the three exact tests; restore Simulation adapter/model/matrix/conformance/usage/docs edits; rerun the literal Unit 17b commands and the catalogue/import-boundary checks.
-- [x] Commit is authorized goal-wide; the exact Unit 17b message will be used below.
+- [x] Exact Unit 17b commit recorded: `e9be8e75d2845a6d66785401a57f5749a1c85649`.
 
 # Phase 18 · Simulation position reconciliation — L3
 
@@ -3695,6 +3695,21 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [ ] README, changelog, and listed system documents reconciled.
 - [ ] STOP conditions and rollback path were rechecked.
 - [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+
+### Unit 18a completion evidence
+
+- [x] Approval matched Unit 18a. Evidence: owner goal-wide `APPROVED: EXECUTE` and dry run `18a-DR1`.
+- [x] `FR-TRD-107` uses one immutable event contract and one projection algorithm for Simulation, paper, and live, preserving deal-position correlation across modify/reduce/full-close/reversal/protection/liquidation and many-to-one activity. Evidence: `app/services/trading/state/execution_positions.py:133`, `app/services/trading/state/execution_positions.py:244`, `tests/trading/integration/test_two_route_position_reconciliation.py:35`, `tests/trading/usage/features/02_state.py:637`.
+- [x] `FR-TRD-108` suppresses exact duplicate/late events and blocks forward gaps or conflicting same-sequence identity without advancing state. Evidence: `app/services/trading/state/execution_positions.py:270`, `tests/trading/unit/reconciliation/test_authority_event_ordering.py:36`, `tests/trading/usage/features/05_reconciliation.py:251`.
+- [x] `FR-TRD-109` records unowned foreign/manual exposure as blocking `UNKNOWN`/`ORPHAN_BLOCKED` and never assigns ownership. Evidence: `app/services/trading/state/execution_positions.py:302`, `tests/trading/integration/test_foreign_orphan_block.py:37`, `tests/trading/usage/features/11_trade_ownership.py:55`.
+- [x] `FR-TRD-110` serializes/restores positions, deal correlation, and sequence/event watermarks together; exact replay after restart is a duplicate with no second projection. Evidence: `app/services/trading/state/execution_positions.py:496`, `app/services/trading/state/execution_positions.py:504`, `tests/trading/integration/test_reconciliation_restart.py:16`, `tests/trading/usage/features/05_reconciliation.py:266`.
+- [x] The bounded blocker was resolved without a parallel database schema: the existing locked execution-position checkpoint owner now carries validated per-scope watermarks and deal correlations in the same serialized state. Forward gaps/conflicts fail closed; foreign/manual exposure is never auto-owned.
+- [x] Targeted and regression behavior passed. Evidence: four exact files passed 4/4 with `--no-cov`; Phase-8 correlation/state/restart/ownership/actions/reconciliation regressions passed 38/38; the literal focused command passed all 4 behaviors and exited 1 only because repository-wide subset coverage was 17.28%, below the global 80% floor.
+- [x] Quality and usage gates passed. Evidence: Ruff format/check passed 187 files; mypy passed 71 source files; usages 02, 05, and 11 executed directly and emitted `FR-TRD-107`–`110` success/data evidence.
+- [x] Owning-domain behavior gate passed. Evidence: `uv run pytest -q --no-cov tests/trading` passed 268 tests with one credential-gated MT5 demo skip; the literal coverage-enabled command passed the same 268 behaviors with the same skip and exited 1 only because repository-wide subset coverage was 22.08%, below the global 80% floor.
+- [x] README, public catalog, changelog, and usage registry reconcile. Evidence: `app/services/trading/README.md`, `app/services/trading/contracts/registry.py`, `docs/CHANGELOG.md`, `tests/trading/integration/test_usage_scripts.py`, `tests/trading/unit/contracts/test_registry.py`.
+- [x] Rollback was reviewed. Evidence: remove the four exact tests; restore state event/watermark functions, exports/catalog, three usages, README/changelog/plan; rerun the literal Unit 18a commands and Phase-8 correlation/restart tests.
+- [x] Commit is authorized goal-wide; the exact Unit 18a message will be used below.
 
 # Phase 19 · Empirical calibration
 
