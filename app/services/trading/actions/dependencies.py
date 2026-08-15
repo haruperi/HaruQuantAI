@@ -36,6 +36,7 @@ type StandardResponse[T] = Any
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
+    from app.services.trading.actions.deadlines import EvaluationDeadlineFactory
     from app.services.trading.live import LiveSession
     from app.services.trading.monitoring import OperationalEvent
     from app.services.trading.state import TradingStateStore
@@ -142,6 +143,7 @@ class TradingDependencies:
         child_risk_decision_source: Exact per-child emergency Risk authority.
         execution_risk_decision_source: Exact per-request Simulation Risk authority.
         execution_positions: Process-local Trading execution-position state.
+        evaluation_deadline_factory: Route-owned async evaluation deadline.
     """
 
     store: TradingStateStore
@@ -172,6 +174,7 @@ class TradingDependencies:
     risk_source: RiskSource
     child_risk_decision_source: ChildRiskDecisionSource
     execution_risk_decision_source: ExecutionRiskDecisionSource
+    evaluation_deadline_factory: EvaluationDeadlineFactory
     execution_positions: object = field(default_factory=create_execution_position_store)
 
     def __post_init__(self) -> None:
@@ -203,6 +206,7 @@ class TradingDependencies:
             self.risk_source,
             self.child_risk_decision_source,
             self.execution_risk_decision_source,
+            self.evaluation_deadline_factory,
             self.execution_positions,
         )
         if any(dependency is None for dependency in required):

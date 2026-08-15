@@ -8,6 +8,7 @@ from app.services.trading.actions.controls import (
     sync_positions,
     trigger_kill_switch,
 )
+from app.services.trading.actions.deadlines import create_monotonic_deadline_factory
 from app.services.trading.actions.dependencies import (
     TradingDependencies as TradingDependencies,
 )
@@ -35,6 +36,7 @@ __all__ = [
     "clear_kill_switch",
     "close_all_positions",
     "close_position",
+    "create_monotonic_deadline_factory",
     "create_trading_dependencies",
     "evaluate_trading_permissions",
     "execute_portfolio_rebalance",

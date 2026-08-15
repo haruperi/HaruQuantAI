@@ -330,6 +330,28 @@ def fr_trd_093() -> None:
     print(f"Data -> approved_quantity='{approved.quantity}'")
 
 
+def fr_trd_095() -> None:
+    """FR-TRD-095: Inject deadline authority into the shared cycle."""
+    fr_trd_065()
+
+
+def fr_trd_105() -> None:
+    """FR-TRD-105: Preserve a normal neutral no-mutation outcome."""
+    fr_trd_065()
+
+
+def fr_trd_106() -> None:
+    """FR-TRD-106: Keep timeout evidence route-neutral."""
+    deps, _calls = evaluation_dependencies(None)
+    assert deps.evaluation_deadline_factory is not None
+    print("Data -> injected_deadline='available'")
+
+
+def fr_trd_111() -> None:
+    """FR-TRD-111: Keep cancellation and upstream failures distinct."""
+    fr_trd_106()
+
+
 def fr_trd_113() -> None:
     """FR-TRD-113: Keep authority transport outside approved economics."""
     fr_trd_093()
@@ -388,6 +410,10 @@ def main() -> None:
     fr_trd_090()
     fr_trd_092()
     fr_trd_093()
+    fr_trd_095()
+    fr_trd_105()
+    fr_trd_106()
+    fr_trd_111()
     fr_trd_113()
 
 

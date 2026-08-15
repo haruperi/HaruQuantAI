@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.brokers import build_broker_connection_config
 from app.services.trading import (
     create_live_session,
+    create_monotonic_deadline_factory,
     create_trading_request,
     evaluate_live_gate,
     get_live_session_status,
@@ -201,6 +202,19 @@ def fr_trd_091() -> None:
     fr_trd_035()
 
 
+def fr_trd_104() -> None:
+    """FR-TRD-104: Construct the live/paper deadline from monotonic time."""
+
+    async def demonstrate() -> None:
+        loop = asyncio.get_running_loop()
+        factory = create_monotonic_deadline_factory(loop.time)
+        async with factory(Decimal(1), {"route": "paper"}):
+            await asyncio.sleep(0)
+
+    asyncio.run(demonstrate())
+    print("Data -> monotonic_deadline='completed'")
+
+
 def _emit_requirement_success(function: object) -> object:
     """Wrap one example so direct execution emits its success contract."""
 
@@ -235,6 +249,7 @@ def main() -> None:
     fr_trd_033()
     fr_trd_036()
     fr_trd_091()
+    fr_trd_104()
 
     # Stage 3: Status reporting & Graceful shutdown
     fr_trd_034()

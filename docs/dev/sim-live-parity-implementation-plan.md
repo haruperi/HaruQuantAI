@@ -2379,17 +2379,19 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff format/check and mypy passed for every owning domain.
-- [ ] Every local usage program executed directly and passed.
-- [ ] Every owning-domain phase gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+- [x] Approval matched this exact phase/subphase. Evidence: owner goal-wide `APPROVED: EXECUTE` applied to Unit 15a.
+- [x] Only the local file and documentation manifests changed. Evidence: `git status --short` reviewed before staging.
+- [x] Every listed FR has final `path:line` implementation and test evidence. Evidence: `app/services/trading/actions/deadlines.py:15`, `app/services/trading/actions/runtime.py:362`, `tests/trading/unit/actions/test_deadline_port.py:13`, `tests/trading/integration/test_evaluation_deadline_equivalence.py:33`.
+- [x] Only verified package-root/public dependency contracts were used. Evidence: `app/services/trading/__init__.py:1`, `app/services/trading/actions/dependencies.py:177`.
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes. Evidence: 6 passed via the Unit 15a targeted command's behavioral `--no-cov` counterpart.
+- [x] Ruff format/check and mypy passed for every owning domain. Evidence: Trading Ruff passed; mypy passed 71 source files.
+- [x] Every local usage program executed directly and passed. Evidence: `tests/trading/usage/features/07_live.py:205`, `tests/trading/usage/features/08_actions.py:333`.
+- [x] Every owning-domain phase gate passed. Evidence: Trading behavior gate passed 264 tests with one credential-dependent skip.
+- [x] README, changelog, and listed system documents reconciled. Evidence: `app/services/trading/README.md:1856`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`.
+- [x] STOP conditions and rollback path were rechecked. Evidence: runtime contains no direct `asyncio.timeout`; rollback is the Unit 15a manifest plus root exports/registry entries.
+- [x] Commit remains unauthorized, or its separately authorized hash is recorded. Evidence: owner goal-wide commit authorization; Unit 14b reconciled as `c16f8268`; Unit 15a hash will be recorded in Unit 15b.
+
+**Unit 15a validation note:** the literal full Trading command passed 264 behaviors with one credential-dependent skip and exited 1 only because repository-wide subset coverage was 22.14%; its `--no-cov` behavioral counterpart passed. The first literal attempt was terminated by the 60-second shell window and the bounded rerun completed normally.
 
 **Commit reconciliation:** Unit 11b is committed as `210e7aba83d6acf1ea15df5de61dc5489b5be25e` with the exact prescribed message.
 

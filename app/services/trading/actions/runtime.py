@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import asyncio
 from collections.abc import Mapping
 from datetime import datetime
 from hashlib import sha256
@@ -358,9 +357,9 @@ async def _run_live_evaluation_cycle_value(
     started_at = deps.clock()
     if deps.live_session is None:
         raise TradingError("SERVICE_UNAVAILABLE", "Live session is absent")
-    timeout_seconds = float(deps.live_session.config.live_workflow_timeout_seconds)
+    timeout_seconds = deps.live_session.config.live_workflow_timeout_seconds
     try:
-        async with asyncio.timeout(timeout_seconds):
+        async with deps.evaluation_deadline_factory(timeout_seconds, evidence):
             dataset = await deps.market_data_source(evidence)
             account = await deps.evaluation_account_source(evidence)
             market_context = await deps.market_context_source(dataset, evidence)

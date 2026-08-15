@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Inject evaluation deadlines
+
+Trading evaluation now receives route-owned deadline authority while preserving one public cycle and route-neutral results (Phase 15a).
+
+#### Changed (1)
+
+- Replaced the evaluation runtime's ambient timeout with a required injected deadline port and monotonic paper/live adapter.
+
 ### Cut Simulation over to Trading execution
 
 Canonical simulation v2 runs now await approved Trading requests/actions, share one hashed initial authority snapshot, and enforce explicit terminal and account-activity policy (Phase 14b).

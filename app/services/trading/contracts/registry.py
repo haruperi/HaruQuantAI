@@ -130,6 +130,7 @@ _PUBLIC_FUNCTION_NAMES = (
     "create_trade_record",
     "create_trading_action_draft",
     "create_trading_dependencies",
+    "create_monotonic_deadline_factory",
     "create_trading_error",
     "create_trading_event",
     "create_trading_projection",

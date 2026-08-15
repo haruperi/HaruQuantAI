@@ -3,6 +3,7 @@
 # ruff: noqa: ARG005
 from __future__ import annotations
 
+import asyncio
 from dataclasses import FrozenInstanceError
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -23,6 +24,7 @@ from app.services.risk import (
 )
 from app.services.trading import create_trading_dependencies
 from app.services.trading.actions import TradingDependencies
+from app.services.trading.actions.deadlines import create_monotonic_deadline_factory
 from app.services.trading.contracts import (
     PortfolioRebalanceExecutionRequest,
     TradingError,
@@ -473,6 +475,9 @@ def dependencies(
         risk_source=unavailable,
         child_risk_decision_source=lambda item: None,
         execution_risk_decision_source=risk_decision,
+        evaluation_deadline_factory=create_monotonic_deadline_factory(
+            lambda: asyncio.get_running_loop().time()
+        ),
         execution_positions=getattr(
             memory, "execution_positions", create_execution_position_store()
         ),
