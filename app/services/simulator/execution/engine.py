@@ -112,7 +112,7 @@ class EventDrivenExecutionEngine:
         self._engine_version = engine_version
         self._pending: dict[str, tuple[OrderIntent, bool]] = {}
         self._orders: dict[str, ExecutionReceipt] = {}
-        self._deals: list[ExecutionReceipt] = []
+        self._deals: list[object] = []
         self._positions: dict[str, dict[str, object]] = {}
         self._closed_trades: list[ClosedTradeRecord] = []
         self._equity_observations: list[tuple[datetime, Decimal]] = []
@@ -457,16 +457,39 @@ class EventDrivenExecutionEngine:
             del self._positions[position_id]
         else:
             position["volume"] = remaining
-        return MappingProxyType(
+        deal_material = canonical_json(
             {
                 "position_id": position_id,
                 "quantity": quantity,
-                "exit_price": exit_price,
-                "gross_profit": gross_profit,
-                "exit_reason": exit_reason,
-                "closed_at": tick.timestamp,
+                "sequence": tick.sequence,
+                "reason": exit_reason,
             }
         )
+        deal_id = f"sim-deal-{sha256(deal_material.encode('utf-8')).hexdigest()}"
+        deal = MappingProxyType(
+            {
+                "deal_id": deal_id,
+                "position_id": position_id,
+                "quantity": quantity,
+                "price": exit_price,
+                "gross_profit": gross_profit,
+                "event_category": "authority_deal",
+                "exit_reason": exit_reason,
+                "occurred_at": tick.timestamp,
+                "source_sequence": tick.sequence,
+            }
+        )
+        self._deals.append(deal)
+        unwrap_simulation_response(
+            self._journal.append(
+                "authority_deal",
+                dict(deal),
+                tick.timestamp,
+                position_id,
+            ),
+            operation="simulation.execution.event_driven_execution_engine._close",
+        )
+        return deal
 
     def _apply_protective_exits(self, tick: Tick) -> None:
         """Close every open position whose stop or target crossed this tick.
@@ -482,6 +505,19 @@ class EventDrivenExecutionEngine:
             exit_reason = evaluate_protective_exit(position, tick)
             if exit_reason is None:
                 continue
+            unwrap_simulation_response(
+                self._journal.append(
+                    "protection_trigger",
+                    {
+                        "position_id": position_id,
+                        "trigger": exit_reason,
+                        "source_sequence": tick.sequence,
+                    },
+                    tick.timestamp,
+                    position_id,
+                ),
+                operation="simulation.execution.event_driven_execution_engine._apply_protective_exits",
+            )
             self._close(
                 position_id,
                 Decimal(str(position["volume"])),

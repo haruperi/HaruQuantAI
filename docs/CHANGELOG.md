@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Cut Simulation over to Trading execution
+
+Canonical simulation v2 runs now await approved Trading requests/actions, share one hashed initial authority snapshot, and enforce explicit terminal and account-activity policy (Phase 14b).
+
+#### Changed (1)
+
+- Added run-scoped async mutation, authority-deal protection evidence, policy-bound liquidation, and fail-closed exclusive/replayed account-activity admission while retaining labelled v1 compatibility.
+
 ### Converge Trading mutation routing
 
 Trading now builds provider-bound approved requests once and routes simulation and broker mutations through the same action, Brokers adapter, and response-classification path (Phase 14a).

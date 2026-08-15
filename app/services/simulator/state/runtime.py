@@ -25,10 +25,94 @@ from app.services.simulator.reporting.contracts import (
     PortfolioSimulationResult,
     SimulationResult,
 )
-from app.utils import canonical_json, get_logger
+from app.utils import canonical_digest, canonical_json, get_logger
 
 logger = get_logger(__name__)
 type RunStatus = Literal["started", "completed", "failed"]
+
+
+def validate_initial_authority_state(
+    snapshot: Mapping[str, object],
+    *,
+    expected_hash: str,
+    account_currency: str,
+    initial_balance: object,
+) -> Mapping[str, object]:
+    """Validate one complete shared initial Trading/Simulation authority snapshot.
+
+    Args:
+        snapshot: Complete authority account, order, position, deal, and
+            ownership facts.
+        expected_hash: Request-bound canonical snapshot digest.
+        account_currency: Required run account currency.
+        initial_balance: Required exact run opening balance.
+
+    Returns:
+        The validated snapshot without transformation.
+
+    Raises:
+        SimulationError: If completeness, identity, or account facts disagree.
+    """
+    required = {"account", "orders", "positions", "deals", "ownership"}
+    if set(snapshot) != required or canonical_digest(snapshot) != expected_hash:
+        raise SimulationError(
+            "SIM_CHECKPOINT_INCOMPATIBLE",
+            "Initial authority snapshot is incomplete or has the wrong identity",
+        )
+    account = snapshot["account"]
+    if not isinstance(account, Mapping) or (
+        account.get("currency") != account_currency
+        or str(account.get("balance")) != str(initial_balance)
+    ):
+        raise SimulationError(
+            "SIM_CHECKPOINT_INCOMPATIBLE",
+            "Initial Trading and Simulation account facts disagree",
+        )
+    for name in ("orders", "positions", "deals"):
+        if not isinstance(snapshot[name], (tuple, list)):
+            raise SimulationError(
+                "SIM_CHECKPOINT_INCOMPATIBLE",
+                "Initial authority collections must be ordered",
+            )
+    return snapshot
+
+
+def validate_account_activity_ownership(
+    ownership: object,
+    activity: tuple[Mapping[str, object], ...],
+) -> None:
+    """Require an exclusive account interval or complete ordered activity replay.
+
+    Args:
+        ownership: Initial snapshot ownership declaration.
+        activity: Every foreign/manual account activity event in source order.
+
+    Raises:
+        SimulationError: If ownership or replay evidence is missing or discontinuous.
+    """
+    if not isinstance(ownership, Mapping):
+        raise SimulationError("SIM_INVALID_CONFIG", "Account ownership is unknown")
+    mode = ownership.get("mode")
+    if mode == "exclusive":
+        if activity:
+            raise SimulationError(
+                "SIM_INVALID_CONFIG",
+                "Exclusive account evidence conflicts with foreign activity",
+            )
+        return
+    if mode != "replay" or not activity:
+        raise SimulationError(
+            "SIM_INVALID_CONFIG",
+            "Non-exclusive account activity requires a complete replay",
+        )
+    for expected, event in enumerate(activity, start=1):
+        if event.get("source_sequence") != expected or not isinstance(
+            event.get("event_type"), str
+        ):
+            raise SimulationError(
+                "SIM_DATA_NON_MONOTONIC",
+                "Foreign account activity replay contains a gap",
+            )
 
 
 def _decode_result(payload: str) -> object:
@@ -439,4 +523,8 @@ def build_simulation_state_store(*, artifact_root: Path) -> object:
     return _DurableSimulationStateStore(artifact_root)
 
 
-__all__ = ("build_simulation_state_store",)
+__all__ = (
+    "build_simulation_state_store",
+    "validate_account_activity_ownership",
+    "validate_initial_authority_state",
+)

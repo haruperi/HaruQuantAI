@@ -25,7 +25,11 @@ from app.services.data import (
     unwrap_data_response,
 )
 from app.services.indicators import sma
-from app.services.risk import create_risk_decision_package, get_decision_state
+from app.services.risk import (
+    create_risk_approval_token,
+    create_risk_decision_package,
+    get_decision_state,
+)
 from app.services.simulator import (
     calculate_portfolio_backtest_config_hash,
     calculate_simulation_backtest_config_hash,
@@ -36,7 +40,7 @@ from app.services.simulator import (
     unwrap_simulation_response,
 )
 from app.services.strategy import create_strategy_decision
-from app.services.trading import create_order_intent
+from app.services.trading import build_approved_trading_request, create_order_intent
 from app.utils import (
     canonical_digest,
     canonical_json,
@@ -486,6 +490,8 @@ class WorkflowSimulationDependencies:
             str(indicator.values[indicator.output_columns[0]].dropna().iloc[-1])
         )
         side = "BUY" if latest_close >= latest_sma else "SELL"
+        if getattr(request, "contract_version", "v1") == "v2":
+            return ()
         return (
             create_strategy_decision(
                 decision_id=f"decision-{request.request_id}",
@@ -518,13 +524,33 @@ class WorkflowSimulationDependencies:
         self, intents: tuple[object, ...], request: object
     ) -> tuple[object, ...]:
         """Approve a bounded size with Risk-owned evidence."""
+        if not intents:
+            return ()
         decision = intents[0]
         requested_size = Decimal(str(decision.quantity_hint))
         approved_size = min(requested_size, Decimal("0.01"))
+        intent_id = getattr(decision, "intent_id", decision.decision_id)
+        token = None
+        if getattr(request, "contract_version", "v1") == "v2":
+            token = create_risk_approval_token(
+                token_id=f"token-{request.request_id}",
+                decision_id=f"risk-{request.request_id}",
+                config_hash=request.risk_policy_hash,
+                action="submit_order",
+                scope={"account_id": "workflow-simulation"},
+                approver_id="simulation-risk",
+                issued_at=request.start - timedelta(seconds=1),
+                expires_at=request.end + timedelta(days=1),
+                nonce=f"nonce-{request.request_id}",
+                signature="simulation-fixture-signature",
+                request_id=request.request_id,
+                workflow_id=request.workflow_id,
+                correlation_id=request.correlation_id,
+            )
         return (
             create_risk_decision_package(
                 decision_id=f"risk-{request.request_id}",
-                intent_id=decision.decision_id,
+                intent_id=intent_id,
                 state=get_decision_state("APPROVE"),
                 requested_size=requested_size,
                 approved_size=approved_size,
@@ -537,7 +563,7 @@ class WorkflowSimulationDependencies:
                 recommendations=(),
                 issued_at=request.start - timedelta(seconds=1),
                 expires_at=request.end + timedelta(days=1),
-                token=None,
+                token=token,
                 request_id=request.request_id,
                 workflow_id=request.workflow_id,
                 correlation_id=request.correlation_id,
@@ -586,6 +612,71 @@ class WorkflowSimulationDependencies:
                 valid_until=request.end + timedelta(days=1),
             ),
         )
+
+    def load_initial_authority_state(self, request: object) -> Mapping[str, object]:
+        """Return one complete empty authority snapshot for a fresh run."""
+        return {
+            "account": {
+                "balance": request.initial_balance,
+                "currency": request.account_currency,
+            },
+            "orders": (),
+            "positions": (),
+            "deals": (),
+            "ownership": {"mode": "exclusive"},
+        }
+
+    def load_account_activity(self, request: object) -> tuple[object, ...]:
+        """Return no foreign activity under the exclusive interval proof."""
+        del request
+        return ()
+
+    def build_approved_requests(
+        self,
+        intents: tuple[object, ...],
+        decisions: tuple[object, ...],
+        request: object,
+    ) -> tuple[object, ...]:
+        """Require aligned Strategy/Risk lineage before Trading request build."""
+        from dataclasses import replace
+        from types import SimpleNamespace
+
+        from tests.trading.unit.actions.test_dependencies import dependencies
+
+        if len(intents) != len(decisions):
+            raise ValueError("Strategy/Risk lineage must align exactly")
+        trading_dependencies = replace(
+            dependencies(),
+            clock=lambda: request.start - timedelta(seconds=1),
+            live_session=SimpleNamespace(config=SimpleNamespace(execution_route="sim")),
+        )
+        evidence = {
+            "account_id": "workflow-simulation",
+            "action_policy_verdict_id": "simulation-risk-approved",
+            "canonical_material_version": "v2",
+            "fill_policy": "FOK",
+            "time_policy": "GTC",
+        }
+        return tuple(
+            build_approved_trading_request(
+                intent, decision, trading_dependencies, evidence
+            )
+            for intent, decision in zip(intents, decisions, strict=True)
+        )
+
+    async def execute_trading_action(
+        self, approved_request: object, engine: object, request: object
+    ) -> object:
+        """Reject an unavailable mutation composition in this neutral fixture."""
+        del approved_request, engine, request
+        raise ValueError("neutral fixture cannot execute a Trading mutation")
+
+    async def execute_terminal_action(
+        self, position: Mapping[str, object], engine: object, request: object
+    ) -> object:
+        """Reject terminal work because the neutral fixture has no positions."""
+        del position, engine, request
+        raise ValueError("neutral fixture cannot execute terminal liquidation")
 
     def _strategy_side(self, decision_id: str, request: object) -> str:
         """Recalculate the observable Strategy side for Trading composition."""

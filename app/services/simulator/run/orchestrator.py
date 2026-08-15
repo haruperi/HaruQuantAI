@@ -27,6 +27,11 @@ from app.services.simulator.reporting import (
     build_markdown_report,
 )
 from app.services.simulator.run.audit import emit_simulation_audit
+from app.services.simulator.run.contracts import SimulationBacktestRequestV2
+from app.services.simulator.state.runtime import (
+    validate_account_activity_ownership,
+    validate_initial_authority_state,
+)
 from app.services.simulator.timeline import APPROVED_TICK_MODELS, build_tick_timeline
 from app.services.simulator.validation import (
     validate_market_data,
@@ -280,6 +285,7 @@ class RunContext:
     profile: Any
     engine: Any
     order_intents: tuple[OrderIntent, ...]
+    approved_requests: tuple[object, ...] = ()
 
 
 def prepare_run_context(
@@ -370,16 +376,51 @@ def prepare_run_context(
         dependencies.review_risk(strategy_intents, request),
         operation="simulation.run.review_risk",
     )
-    approved_order_intents: tuple[OrderIntent, ...] = unwrap_simulation_response(
-        dependencies.build_order_intents(risk_decisions, request),
-        operation="simulation.run.build_order_intents",
-    )
-    order_intents = tuple(
-        sorted(
-            approved_order_intents,
-            key=lambda item: (item.created_at, item.client_order_id),
+    approved_requests: tuple[object, ...] = ()
+    if isinstance(request, SimulationBacktestRequestV2):
+        snapshot = unwrap_simulation_response(
+            dependencies.load_initial_authority_state(request),
+            operation="simulation.run.load_initial_authority_state",
         )
-    )
+        validated_snapshot = validate_initial_authority_state(
+            snapshot,
+            expected_hash=request.initial_authority_state_hash,
+            account_currency=request.account_currency,
+            initial_balance=request.initial_balance,
+        )
+        activity = unwrap_simulation_response(
+            dependencies.load_account_activity(request),
+            operation="simulation.run.load_account_activity",
+        )
+        validate_account_activity_ownership(
+            validated_snapshot["ownership"], tuple(activity)
+        )
+        approved_requests = tuple(
+            sorted(
+                unwrap_simulation_response(
+                    dependencies.build_approved_requests(
+                        strategy_intents, risk_decisions, request
+                    ),
+                    operation="simulation.run.build_approved_requests",
+                ),
+                key=lambda item: (
+                    cast("Any", item).system_time,
+                    cast("Any", item).request_id,
+                ),
+            )
+        )
+        order_intents: tuple[OrderIntent, ...] = ()
+    else:
+        approved_order_intents: tuple[OrderIntent, ...] = unwrap_simulation_response(
+            dependencies.build_order_intents(risk_decisions, request),
+            operation="simulation.run.build_order_intents",
+        )
+        order_intents = tuple(
+            sorted(
+                approved_order_intents,
+                key=lambda item: (item.created_at, item.client_order_id),
+            )
+        )
     return RunContext(
         timeline=timeline,
         evidence=evidence,
@@ -388,7 +429,84 @@ def prepare_run_context(
         profile=profile,
         engine=engine,
         order_intents=order_intents,
+        approved_requests=approved_requests,
     )
+
+
+async def advance_trading_timeline(
+    dependencies: SimulationRunDependencies,
+    request: SimulationBacktestRequestV2,
+    engine: object,
+    timeline: tuple[Tick, ...],
+    unsent: list[object],
+    receipts: list[object],
+) -> None:
+    """Advance canonical v2 commands through public Trading actions.
+
+    Args:
+        dependencies: Run-scoped public owner-domain composition.
+        request: Complete canonical v2 request.
+        engine: Isolated Simulation authority.
+        timeline: Complete deterministic tick sequence.
+        unsent: Approved Trading requests, drained in place.
+        receipts: Authority results, appended in place.
+    """
+    for tick in timeline:
+        receipts.extend(
+            cast(
+                "Iterable[object]",
+                unwrap_simulation_response(
+                    cast("Any", engine).execute_tick(tick),
+                    operation="simulation.run.engine_execute_tick",
+                ),
+            )
+        )
+        while unsent and cast("Any", unsent[0]).system_time <= tick.timestamp:
+            result = await dependencies.execute_trading_action(
+                unsent.pop(0), engine, request
+            )
+            receipts.append(
+                unwrap_simulation_response(
+                    result, operation="simulation.run.execute_trading_action"
+                )
+            )
+
+
+async def finalize_open_positions(
+    request: SimulationBacktestRequestV1,
+    dependencies: SimulationRunDependencies,
+    engine: object,
+    positions: Iterable[Mapping[str, object]],
+) -> int:
+    """Apply the versioned terminal-liquidation policy through its owner.
+
+    Args:
+        request: Exact run request and hashed terminal policy.
+        dependencies: Run-scoped public owner-domain composition.
+        engine: Isolated Simulation authority.
+        positions: Complete final open-position projection.
+
+    Returns:
+        Count of positions explicitly liquidated.
+    """
+    material = tuple(positions)
+    if isinstance(request, SimulationBacktestRequestV2):
+        if not request.close_open_positions_at_end:
+            return 0
+        for position in material:
+            unwrap_simulation_response(
+                await dependencies.execute_terminal_action(position, engine, request),
+                operation="simulation.run.execute_terminal_action",
+            )
+        return len(material)
+    for position in material:
+        unwrap_simulation_response(
+            cast("Any", engine).close_position(
+                str(position["position_id"]), cast("Decimal", position["volume"])
+            ),
+            operation="simulation.run.engine_close_position",
+        )
+    return len(material)
 
 
 def submit_orders_before(
@@ -473,7 +591,7 @@ def advance_run_timeline(
     return index
 
 
-def _run_backtest_with_evidence(  # noqa: PLR0915 - governed lifecycle.
+async def _run_backtest_with_evidence_async(  # noqa: PLR0915
     request: SimulationBacktestRequestV1,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
@@ -567,22 +685,26 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - governed lifecycle.
         profile = context.profile
         engine = context.engine
         order_intents = context.order_intents
-        unsent = list(order_intents)
         receipts: list[object] = []
-        submit_orders_before(engine, unsent, receipts, timeline[0].timestamp)
-        advance_run_timeline(engine, timeline, unsent, receipts)
+        if isinstance(request, SimulationBacktestRequestV2):
+            await advance_trading_timeline(
+                dependencies,
+                request,
+                engine,
+                timeline,
+                list(context.approved_requests),
+                receipts,
+            )
+        else:
+            unsent = list(order_intents)
+            submit_orders_before(engine, unsent, receipts, timeline[0].timestamp)
+            advance_run_timeline(engine, timeline, unsent, receipts)
         terminal_state = unwrap_simulation_response(
             engine.snapshot(),
             operation="simulation.run.engine_snapshot",
         )
         positions = cast("Iterable[Mapping[str, object]]", terminal_state["positions"])
-        for position in positions:
-            unwrap_simulation_response(
-                engine.close_position(
-                    str(position["position_id"]), cast("Decimal", position["volume"])
-                ),
-                operation="simulation.run.engine_close_position",
-            )
+        await finalize_open_positions(request, dependencies, engine, positions)
         unwrap_simulation_response(
             writer.append(
                 "run_completed",
@@ -654,6 +776,31 @@ def _run_backtest_with_evidence(  # noqa: PLR0915 - governed lifecycle.
         ) from error
 
 
+def _run_backtest_with_evidence(
+    request: SimulationBacktestRequestV1,
+    auth_context: AuthContext,
+    dependencies: SimulationRunDependencies,
+) -> tuple[SimulationResult, tuple[tuple[datetime, Decimal], ...]]:
+    """Retain the synchronous internal bridge for legacy portfolio orchestration.
+
+    Returns:
+        Completed result and internal equity evidence.
+
+    Raises:
+        SimulationError: If invoked from an active event loop.
+    """
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(
+            _run_backtest_with_evidence_async(request, auth_context, dependencies)
+        )
+    raise SimulationError(
+        "SIM_UNSUPPORTED_OPERATION",
+        "Synchronous evidence bridge cannot run inside an active event loop",
+    )
+
+
 async def run_backtest_async(
     request: SimulationBacktestRequestV1,
     auth_context: AuthContext,
@@ -673,7 +820,9 @@ async def run_backtest_async(
         SimulationError: For any controlled or safely mapped run failure.
     """
     try:
-        result, _ = _run_backtest_with_evidence(request, auth_context, dependencies)
+        result, _ = await _run_backtest_with_evidence_async(
+            request, auth_context, dependencies
+        )
     except SimulationError:
         emit_simulation_audit(
             dependencies,

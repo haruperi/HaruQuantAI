@@ -31,6 +31,11 @@ class _SimulationDependencies:
     symbol_specification_port: _Port
     cost_model_port: _Port
     fx_evidence_port: _Port
+    approved_requests_port: _Port | None = None
+    trading_action_port: _Port | None = None
+    terminal_action_port: _Port | None = None
+    initial_authority_state_port: _Port | None = None
+    account_activity_port: _Port | None = None
 
     def persist_audit_event(self, event: object) -> object:
         """Persist one bounded audit event through the supplied Data port."""
@@ -83,6 +88,75 @@ class _SimulationDependencies:
         """Resolve exact Data-owned FX evidence identifiers."""
         return self.fx_evidence_port(evidence_ids)
 
+    def build_approved_requests(
+        self,
+        intents: tuple[object, ...],
+        decisions: tuple[object, ...],
+        request: object,
+    ) -> object:
+        """Build request v2 values through the injected Trading root operation.
+
+        Raises:
+            ValueError: If canonical v2 composition is absent.
+        """
+        if self.approved_requests_port is None:
+            raise ValueError("approved_requests port is required for canonical v2 runs")
+        return self.approved_requests_port(intents, decisions, request)
+
+    async def execute_trading_action(
+        self, approved_request: object, engine: object, request: object
+    ) -> object:
+        """Await one public Trading action against the run-scoped authority.
+
+        Raises:
+            TypeError: If the port result is not awaitable.
+            ValueError: If canonical v2 composition is absent.
+        """
+        if self.trading_action_port is None:
+            raise ValueError("trading_action port is required for canonical v2 runs")
+        result = self.trading_action_port(approved_request, engine, request)
+        if not hasattr(result, "__await__"):
+            raise TypeError("trading_action port must return an awaitable")
+        return await result
+
+    async def execute_terminal_action(
+        self, position: Mapping[str, object], engine: object, request: object
+    ) -> object:
+        """Await one Risk-authorized public Trading terminal-close action.
+
+        Raises:
+            TypeError: If the port result is not awaitable.
+            ValueError: If terminal composition is absent.
+        """
+        if self.terminal_action_port is None:
+            raise ValueError(
+                "terminal_action port is required for terminal liquidation"
+            )
+        result = self.terminal_action_port(position, engine, request)
+        if not hasattr(result, "__await__"):
+            raise TypeError("terminal_action port must return an awaitable")
+        return await result
+
+    def load_initial_authority_state(self, request: object) -> object:
+        """Load the one complete snapshot shared by Trading and Simulation.
+
+        Raises:
+            ValueError: If canonical v2 composition is absent.
+        """
+        if self.initial_authority_state_port is None:
+            raise ValueError("initial_authority_state port is required for v2 runs")
+        return self.initial_authority_state_port(request)
+
+    def load_account_activity(self, request: object) -> object:
+        """Load every ordered foreign/manual activity event for the run interval.
+
+        Raises:
+            ValueError: If canonical v2 composition is absent.
+        """
+        if self.account_activity_port is None:
+            raise ValueError("account_activity port is required for v2 runs")
+        return self.account_activity_port(request)
+
 
 def build_simulation_run_dependencies(
     *,
@@ -119,11 +193,20 @@ def build_simulation_run_dependencies(
         "cost_model",
         "fx_evidence",
     )
+    optional = (
+        "approved_requests",
+        "trading_action",
+        "terminal_action",
+        "initial_authority_state",
+        "account_activity",
+    )
     if not isinstance(state_store, SimulationStateStore):
         raise TypeError("state_store must implement SimulationStateStore")
-    if tuple(sorted(ports)) != tuple(sorted(required)):
+    if not set(required).issubset(ports) or not set(ports).issubset(
+        {*required, *optional}
+    ):
         raise ValueError("ports must match the canonical Simulation dependency set")
-    if any(not callable(ports[name]) for name in required):
+    if any(not callable(ports[name]) for name in ports):
         raise ValueError("Simulation dependency ports must be callable")
     return _SimulationDependencies(
         state_store=state_store,
@@ -140,6 +223,11 @@ def build_simulation_run_dependencies(
         symbol_specification_port=ports["symbol_specification"],
         cost_model_port=ports["cost_model"],
         fx_evidence_port=ports["fx_evidence"],
+        approved_requests_port=ports.get("approved_requests"),
+        trading_action_port=ports.get("trading_action"),
+        terminal_action_port=ports.get("terminal_action"),
+        initial_authority_state_port=ports.get("initial_authority_state"),
+        account_activity_port=ports.get("account_activity"),
     )
 
 

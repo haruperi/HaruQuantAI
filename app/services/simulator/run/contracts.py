@@ -646,6 +646,45 @@ class SimulationRunDependencies(Protocol):
         """Pack approved Risk decisions through Trading's public boundary."""
         ...
 
+    def build_approved_requests(
+        self,
+        intents: tuple[create_trade_intent_value, ...],
+        decisions: tuple[RiskDecisionPackage, ...],
+        request: SimulationBacktestRequestV2,
+    ) -> StandardResponse[tuple[object, ...]]:
+        """Invoke Trading's public approved-request builder for canonical v2 runs."""
+        ...
+
+    async def execute_trading_action(
+        self,
+        approved_request: object,
+        engine: object,
+        request: SimulationBacktestRequestV2,
+    ) -> StandardResponse[object]:
+        """Execute one approved request through a public Trading action."""
+        ...
+
+    async def execute_terminal_action(
+        self,
+        position: Mapping[str, object],
+        engine: object,
+        request: SimulationBacktestRequestV2,
+    ) -> StandardResponse[object]:
+        """Execute one Risk-authorized terminal close through Trading."""
+        ...
+
+    def load_initial_authority_state(
+        self, request: SimulationBacktestRequestV2
+    ) -> StandardResponse[Mapping[str, object]]:
+        """Load one complete initial authority snapshot for both projections."""
+        ...
+
+    def load_account_activity(
+        self, request: SimulationBacktestRequestV2
+    ) -> StandardResponse[tuple[Mapping[str, object], ...]]:
+        """Load complete ordered foreign/manual activity evidence."""
+        ...
+
     def resolve_execution_profile(
         self, request: SimulationBacktestRequestV1
     ) -> StandardResponse[ExecutionProfile]:

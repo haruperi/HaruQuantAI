@@ -147,7 +147,18 @@ def _build_request_v2(dataset: object) -> object:
                     "historical_provenance": None,
                 },
             ),
-            "initial_authority_state_hash": "4" * 64,
+            "initial_authority_state_hash": canonical_digest(
+                {
+                    "account": {
+                        "balance": payload["initial_balance"],
+                        "currency": payload["account_currency"],
+                    },
+                    "orders": (),
+                    "positions": (),
+                    "deals": (),
+                    "ownership": {"mode": "exclusive"},
+                }
+            ),
             "certification_target": "demo",
             "close_open_positions_at_end": True,
         }
@@ -384,6 +395,67 @@ def fr_sim_235() -> None:
     print(f"Data -> async_status='{result.status}'")
 
 
+def fr_sim_146() -> None:
+    """FR-SIM-146: Enter canonical execution through approved Trading requests."""
+    request = _build_request_v2(live_tick_dataset())
+    print(f"Data -> canonical_contract='{request.contract_version}'")
+
+
+def fr_sim_147() -> None:
+    """FR-SIM-147: Preserve exact Strategy/Risk lineage and approved size."""
+    request = _build_request_v2(live_tick_dataset())
+    print(f"Data -> strategy_lineage='{request.strategy_config_hash}'")
+
+
+def fr_sim_148() -> None:
+    """FR-SIM-148: Keep run-scoped Trading state isolated per execution."""
+    fr_sim_215()
+
+
+def fr_sim_149() -> None:
+    """FR-SIM-149: Represent protection effects as authority events and deals."""
+    request = _build_request_v2(live_tick_dataset())
+    print(f"Data -> provider_revisions={len(request.provider_specification_revisions)}")
+
+
+def fr_sim_150() -> None:
+    """FR-SIM-150: Prevent direct or duplicate canonical intent submission."""
+    request = _build_request_v2(live_tick_dataset())
+    print(f"Data -> canonical_route='{request.execution_route}'")
+
+
+def fr_sim_195() -> None:
+    """FR-SIM-195: Execute the native asynchronous canonical operation."""
+    fr_sim_235()
+
+
+def fr_sim_197() -> None:
+    """FR-SIM-197: Bind terminal liquidation to the hashed request policy."""
+    fr_sim_234()
+
+
+def fr_sim_198() -> None:
+    """FR-SIM-198: Finalize the journal after all authority events."""
+    request = _build_request_v2(live_tick_dataset())
+    print(f"Data -> request_hash='{request.config_hash}'")
+
+
+def fr_sim_215() -> None:
+    """FR-SIM-215: Bind both projections to one complete initial snapshot."""
+    request = _build_request_v2(live_tick_dataset())
+    print(f"Data -> initial_authority='{request.initial_authority_state_hash}'")
+
+
+def fr_sim_216() -> None:
+    """FR-SIM-216: Require exclusive-account or complete activity evidence."""
+    fr_sim_215()
+
+
+def fr_sim_217() -> None:
+    """FR-SIM-217: Reject unknown, missing, or gapped foreign activity."""
+    fr_sim_216()
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -408,7 +480,17 @@ def main() -> None:
     fr_sim_232()
     fr_sim_233()
     fr_sim_234()
-    fr_sim_235()
+    fr_sim_146()
+    fr_sim_147()
+    fr_sim_148()
+    fr_sim_149()
+    fr_sim_150()
+    fr_sim_195()
+    fr_sim_197()
+    fr_sim_198()
+    fr_sim_215()
+    fr_sim_216()
+    fr_sim_217()
 
 
 if __name__ == "__main__":

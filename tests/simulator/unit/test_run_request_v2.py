@@ -15,6 +15,7 @@ from app.services.simulator import (
     run_backtest_async,
     unwrap_simulation_response,
 )
+from app.utils import canonical_digest
 
 from tests.simulator.component.test_orchestrator import (
     FakeDependencies,
@@ -56,7 +57,18 @@ def _payload() -> dict[str, object]:
                     "historical_provenance": None,
                 },
             ),
-            "initial_authority_state_hash": "4" * 64,
+            "initial_authority_state_hash": canonical_digest(
+                {
+                    "account": {
+                        "balance": payload["initial_balance"],
+                        "currency": payload["account_currency"],
+                    },
+                    "orders": (),
+                    "positions": (),
+                    "deals": (),
+                    "ownership": {"mode": "exclusive"},
+                }
+            ),
             "certification_target": "demo",
             "close_open_positions_at_end": True,
         }
@@ -183,7 +195,33 @@ def test_fr_sim_235_async_success_and_running_loop_sync_failure(
     """FR-SIM-235: async succeeds and sync fails inside a running loop."""
     dataset = _dataset("req-55555555-5555-4555-8555-555555555555")
     request = _build()
-    dependencies = FakeDependencies(tmp_path, dataset)
+
+    class V2Dependencies(FakeDependencies):
+        """Add complete neutral v2 authority composition to the base fixture."""
+
+        def load_initial_authority_state(self, value: object) -> dict[str, object]:
+            """Return the exact request-bound empty authority snapshot."""
+            return {
+                "account": {
+                    "balance": value.initial_balance,  # type: ignore[attr-defined]
+                    "currency": value.account_currency,  # type: ignore[attr-defined]
+                },
+                "orders": (),
+                "positions": (),
+                "deals": (),
+                "ownership": {"mode": "exclusive"},
+            }
+
+        def load_account_activity(self, value: object) -> tuple[object, ...]:
+            """Return no foreign activity for the exclusive interval."""
+            del value
+            return ()
+
+        def build_approved_requests(self, *_args: object) -> tuple[object, ...]:
+            """Return no approved request for the fixture's neutral strategy."""
+            return ()
+
+    dependencies = V2Dependencies(tmp_path, dataset)
 
     async def exercise() -> None:
         response = await run_backtest_async(request, _auth(request), dependencies)

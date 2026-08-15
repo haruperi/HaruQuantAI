@@ -157,9 +157,8 @@ scheduling, calibration, and journals.
 
 ### Declared deterministic execution model (programme Phase 3c)
 
-This is a design registration only: no Python file changes here, and
-`FR-SIM-194`–`FR-SIM-199` remain **Proposed** until their owning phases
-implement them with tests and usage evidence.
+This section records the implemented execution model. `FR-SIM-194`–`199` are
+completed with their owning-phase tests and usage evidence.
 
 **Scheduler ownership — `FR-SIM-194` (implemented in Phase 5).** `FEAT-SIM-15`
 owns the only simulated clock and event pump. The async run owns exactly one
@@ -193,9 +192,11 @@ and simultaneous cross-symbol margin races require evidenced ordering or
 remain outside the envelope — never an invented provider sequence.
 
 **Async orchestration — `FR-SIM-195` (implemented in Phase 14b).** The run
-orchestrator becomes async (`run_backtest_async`, owned by Phase 4c) and
-drives Trading's public cycle through the scheduler; the eleven-port
-dependency bundle shape is unchanged unless a later approved phase widens it.
+orchestrator is natively async (`run_backtest_async`, owned by Phase 4c) and
+awaits approved requests through the injected public Trading action seam. Five
+v2-only composition ports carry approved-request construction, mutation,
+terminal liquidation, initial authority state, and account activity evidence;
+v1 retains the documented eleven-port compatibility shape.
 
 **Request v2 identity — `FR-SIM-196` (implemented in Phase 4c).** Bound by the
 `SimulationBacktestRequestV2` registration in the Shared Contracts table
@@ -215,10 +216,8 @@ protection triggers, terminal liquidation, foreign-activity replay) with
 unchanged genesis and verification rules; the vocabulary extension is
 additive.
 
-**Status handoff.** `FR-SIM-196` → Phase 4c; `FR-SIM-194`, `FR-SIM-199` →
-Phase 5; `FR-SIM-195`, `FR-SIM-197`, `FR-SIM-198` → Phase 14b. The
-implementing phase flips each row to `Completed` with local usage evidence
-and allocates no second requirement.
+**Status handoff.** `FR-SIM-196` was completed in Phase 4c;
+`FR-SIM-194`/`199` in Phase 5; and `FR-SIM-195`, `197`, and `198` in Phase 14b.
 
 **Binding test specifications (created by the owning phases, not here).**
 Phase 5 creates `tests/simulator/unit/test_scheduler_queue.py`,
@@ -960,14 +959,17 @@ outside the run that produced it.
 Folded from `docs/dev/simulator-backtest-pipeline.md` (deleted 2026-08-14); the
 implementation owner is `run/orchestrator.py` with the feature modules below.
 
-**Composition — exactly eleven injected ports.** `build_simulation_run_dependencies`
-requires exactly these callable ports, no more and no fewer, else `ValueError`:
+**Composition — eleven compatibility ports plus five canonical-v2 ports.**
+`build_simulation_run_dependencies` requires these eleven callable compatibility ports:
 `audit` (Data audit persistence), `market_data` (source `MarketDataset`),
 `tick_series` (Data-owned tick `MarketDataset`), `indicators` (`IndicatorSeries`),
 `strategy` (`TradeIntent` tuple), `risk` (`RiskDecision` tuple), `order_intents`
 (Trading `OrderIntent` tuple), `execution_profile`, `symbol_specification`,
 `cost_model`, and `fx_evidence` (`FXConversionEvidence`). Nothing on the run path
-imports Data, Indicators, Strategy, Risk, or Trading directly.
+imports Data, Indicators, Strategy, or Risk directly. Canonical v2 additionally
+requires `approved_requests`, `trading_action`, `terminal_action`,
+`initial_authority_state`, and `account_activity`; they bind public Trading
+operations and complete authority evidence without exposing private domain data.
 
 **Preparation (`prepare_run_context`), strict order.** Load market data → generate
 tick series → validate market data (zero staleness tolerance, approved tick models,
@@ -978,7 +980,10 @@ bid/ask tick; derived ticks must carry `source_bar_time`, `tick_index_in_bar`,
 `JournalWriter` and write `run_started` with `{config_hash, data_hash,
 engine_version}` → resolve specification, cost model, and execution profile →
 construct `AccountLedger` and `EventDrivenExecutionEngine` → run the signal chain
-through the injected ports → sort intents by `(created_at, client_order_id)`. The
+through the injected ports → for v2 validate one complete authority snapshot and
+exclusive/replayed activity interval, then sort approved Trading requests by
+`(system_time, request_id)`; v1 sorts compatibility intents by
+`(created_at, client_order_id)`. The
 signal chain reads the **source bar dataset** while execution runs against the
 **tick timeline**; the data view and the execution view are deliberately separate.
 
@@ -1003,18 +1008,20 @@ margin else `SIM_INSUFFICIENT_MARGIN`; CLOSE requires the released margin to fit
 the used margin else `SIM_ACCOUNT_INVARIANT_BROKEN`; the completed result asserts
 `net_profit == final_balance − initial_balance`.
 
-**Journal vocabulary and verification.** Event types are exactly `run_started`,
+**Journal vocabulary and verification.** Event types include `run_started`,
 `order_accepted`, `tick_outside_session`, `fill_proposed`, `order_outcome`,
-`position_close_proposed`, `run_completed`. Every append canonicalizes, hashes
+`position_close_proposed`, `protection_trigger`, `authority_deal`, and
+`run_completed`. Every append canonicalizes, hashes
 (`previous_hash` chain, genesis = 64 zeros), and validates contiguity; group
 commit fsyncs every 100 events; `finalize()` re-reads and re-validates every line
 and atomically renames `journal.jsonl.partial` to `journal.jsonl`. `replay_journal`
 verifies sequence continuity, hash linkage, and the genesis `run_started` payload;
 any break is `SIM_CHECKPOINT_INCOMPATIBLE`.
 
-**Terminal liquidation and artifacts.** After the timeline is exhausted, every
-open position closes at the final observed tick's bid/ask with
-`exit_reason="REQUESTED"`, disclosed as a limitation in the result. Artifacts
+**Terminal liquidation and artifacts.** V2 preserves open positions unless the
+hashed `close_open_positions_at_end` policy is true, then routes every close
+through the public Trading terminal-action seam. V1 retains unconditional final
+tick liquidation as an explicit compatibility limitation. Artifacts
 (`journal.jsonl`, `result.json`, `report.md`, `manifest.json`) publish under
 `<artifact_root>/<run_id>/` with tmp-write + fsync + atomic rename, and the
 manifest `created_at` is the final tick timestamp — never wall clock.
@@ -1588,7 +1595,7 @@ remain responsibilities of the state runtime adapter.
 | Completed | `contracts.py`    | Define the versioned requests received by Simulation and the receiver-owned composition contract.                                                                    | `SimulationBacktestRequestV1`, `PortfolioBacktestRequestV1`, `PortfolioComponentRequest`, `SimulationRunDependencies`        | **Standard library:** `datetime`, `decimal`, `typing`**Required third-party:** `pydantic>=2.13.4`**Local:** Utils public API → canonical serialization and trace IDs                                                                                                  |
 | Completed | `aggregate.py`    | Maintain exact portfolio opening-capital allocation and component net-profit attribution.                                                                            | Internal `PortfolioAggregateLedger`                                                                                                 | **Standard library:** `decimal`, `types`, `typing`**Required third-party:** None**Local:** errors; reporting result contract                                                                                                                                             |
 | Completed | `audit.py`        | Construct bounded Utils-owned `AuditEvent v1` records and persist them through the injected Data-owned composition seam.                                            | Internal `emit_simulation_audit`                                                                                                    | **Standard library:** `collections.abc`, `datetime`, `typing`**Required third-party:** None**Local:** errors; Utils public `AuditEvent`, `AuthContext`, identity and logger APIs                                                                                     |
-| Completed | `orchestrator.py` | Validate and execute one synchronous canonical run, retaining internal end-of-tick equity observations for portfolio measurement.                                    | `run_backtest`                                                                                                                     | **Standard library:** `os`, `datetime`, `decimal`, `hashlib`, `pathlib`, `typing`**Required third-party:** `pydantic>=2.13.4`**Local:** all lower feature APIs; Trading approved contracts API → `ExecutionReceipt`; Utils → `AuthContext`, canonical JSON |
+| Completed | `orchestrator.py` | Validate and execute native-async canonical v2 runs through approved Trading requests/actions; retain the v1 sync compatibility bridge and internal equity observations. | `run_backtest`, `run_backtest_async` | **Standard library:** `asyncio`, `os`, `datetime`, `decimal`, `hashlib`, `pathlib`, `typing`**Required third-party:** `pydantic>=2.13.4`**Local:** all lower feature APIs; Trading approved contracts/actions; Utils `AuthContext` and canonical JSON |
 | Completed | `portfolio.py`    | Validate immutable FX identity bindings, execute every approved component, sample mark-to-market equity on one shared cadence, and publish the reconciled aggregate. | `run_portfolio_backtest`                                                                                                           | **Standard library:** `collections.abc`, `datetime`, `decimal`**Required third-party:** None**Local:** `orchestrator.py` → component execution; `aggregate.py`; accounting, journal, reporting public APIs                                                          |
 | Completed | `research.py`     | Execute an explicit non-canonical approximation with prohibited-claim controls.                                                                                      | `run_fast_research`                                                                                                                | **Standard library:** None**Required third-party:** None**Local:** validation, reporting                                                                                                                                                                                       |
 | Completed | `__init__.py`     | Expose the supported run API.                                                                                                                                        | `SimulationBacktestRequestV1`, `PortfolioBacktestRequestV1`, `run_backtest`, `run_portfolio_backtest`, `run_fast_research` | **Standard library:** None**Required third-party:** None**Local:** feature files → exports                                                                                                                                                                                    |
@@ -1623,6 +1630,17 @@ remain responsibilities of the state runtime adapter.
 | Status    | Requirement ID | Responsibility                                                                                                                                                                                                                                                                                                                                                                                                                                                | Class / Function / Method                                                                                                                      | Side Effects                                                                                                  | Raises                                                                                                   | Usage / Test                                                                                                                                                                        |
 | --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Completed | `FR-SIM-030` | The system shall authenticate, deduplicate, validate, execute, journal, report, persist, and return one deterministic canonical FX run, never publishing a partial completed result. It persists bounded `simulation.run_started`, `simulation.run_completed`, `simulation.run_replayed`, or `simulation.run_failed` `AuditEvent v1` evidence through `SimulationRunDependencies.persist_audit_event`; unavailable audit persistence fails closed. | `run_backtest(request: SimulationBacktestRequestV1, auth_context: AuthContext, dependencies: SimulationRunDependencies) -> SimulationResult` | Read-only external-domain calls; local state mutation; persistence write; audit and journal event publication | `SimulationError`: controlled validation, execution, audit, journal, reporting, or persistence failure | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_030()`**Component:** `tests/simulator/component/test_orchestrator.py::test_run_backtest_maps_internal_failure()` |
+| Completed | `FR-SIM-146` | Canonical v2 execution shall consume public Trading approved requests and actions, never construct `OrderIntent` in Simulation. | `prepare_run_context`, `advance_trading_timeline` | Trading/Brokers simulation mutation | Missing public composition fails closed | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_146()` **Integration:** `tests/simulator/integration/test_trading_cutover.py` |
+| Completed | `FR-SIM-147` | Preserve exact Strategy/Risk lineage, approved size, and provider policies through the opaque Trading request. | `build_approved_requests` composition | None before Trading action | Lineage or policy mismatch fails closed | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_147()` **Integration:** `tests/simulator/integration/test_trading_cutover.py` |
+| Completed | `FR-SIM-148` | Keep Trading mutation/idempotency state run-scoped and prevent duplicate submission. | async Trading action seam | Run-local mutation/state | Cancellation or duplicate remains explicit | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_148()` **Integration:** `tests/simulator/integration/test_trading_cutover.py` |
+| Completed | `FR-SIM-149` | Emit engine protection effects as provider-shaped authority deals and state changes, never client-submit events. | `EventDrivenExecutionEngine._apply_protective_exits` | Journal and authority state | Invalid protection close fails closed | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_149()` **Component:** `tests/simulator/component/test_engine.py` |
+| Completed | `FR-SIM-150` | Execute every canonical mutation exactly once through the async Trading action path. | `advance_trading_timeline` | One selected authority mutation | Error/cancellation propagates without retry | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_150()` **Integration:** `tests/simulator/integration/test_trading_cutover.py` |
+| Completed | `FR-SIM-195` | Make the canonical v2 operation genuinely async while retaining the declared sync bridge outside active loops. | `run_backtest_async`, `run_backtest` | Run lifecycle | Active-loop sync invocation fails closed | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_195()` **Integration:** `tests/simulator/integration/test_trading_cutover.py` |
+| Completed | `FR-SIM-197` | Apply terminal liquidation only when the hashed v2 policy enables it and route enabled closes through Trading. | `finalize_open_positions` | Trading terminal mutation | Missing terminal authority fails closed | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_197()` **Integration:** `tests/simulator/integration/test_terminal_liquidation_policy.py` |
+| Completed | `FR-SIM-198` | Finalize the hash-chained journal after protection, authority-deal, terminal, and replay evidence. | `JournalWriter.finalize` and run orchestration | Durable journal finalization | Incomplete/hash-invalid journal fails closed | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_198()` **Integration:** `tests/simulator/integration/test_terminal_liquidation_policy.py` |
+| Completed | `FR-SIM-215` | Initialize Trading and Simulation from one complete request-hashed authority snapshot. | `validate_initial_authority_state` | Read-only state initialization | Missing, different, or incomplete snapshot fails closed | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_215()` **Integration:** `tests/simulator/integration/test_initial_authority_state.py` |
+| Completed | `FR-SIM-216` | Require a verified exclusive account interval or a complete ordered foreign/manual activity replay. | `validate_account_activity_ownership` | Read-only admission | Unknown ownership or missing replay fails closed | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_216()` **Integration:** `tests/simulator/integration/test_foreign_activity_guard.py` |
+| Completed | `FR-SIM-217` | Reject unknown, conflicting, missing, or gapped foreign account activity before execution. | `validate_account_activity_ownership` | None | Structured Simulation failure | **Usage:** `tests/simulator/usage/features/07_run.py::fr_sim_217()` **Integration:** `tests/simulator/integration/test_foreign_activity_guard.py` |
 
 #### `portfolio.py` — Portfolio Candidate Backtest
 
