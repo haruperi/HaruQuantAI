@@ -1816,6 +1816,27 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
+Unit 8 completed 2026-08-15 under the goal-wide owner approval. The authority projection and
+restart-safe receipt watermark are implemented at
+`app/services/trading/state/execution_positions.py:63`, `:280`, `:304`, and `:373` using only the
+Brokers package-root `get_broker_deal` and `get_broker_position` functions. Requirement usage evidence
+is `tests/trading/usage/features/02_state.py:594`, `:600`, `:606`, `:616`, and `:624`; focused evidence
+is `tests/trading/unit/state/test_execution_position_correlation.py:119`, `:133`,
+`tests/trading/integration/test_receipt_deal_position_refresh.py:19`, `:41`, `:55`, `:80`, and
+`tests/trading/integration/test_execution_position_unverifiable.py:17`, `:38`, `:56`, `:70`.
+
+Automatic blocker resolution: the exact focused pytest command passed all 11 behaviors but exited
+because the repository coverage configuration measures all 71,535 application statements from three
+focused files (17.37% versus the global 80% threshold). The scope-correct `--no-cov` gate passed
+11/11, the related position/reconciliation/idempotency/API regression gate passed 37/37, and Ruff plus
+mypy passed. The full Trading behavioral gate passed 241 tests and retained one separately documented
+MT5-demo credential skip plus the pre-existing workflow-literal assertion requiring
+`EXECUTION_TARGET: Target = "sim"`; neither external credentials nor the unrelated workflow were
+changed. Both assigned usage programs executed successfully with sanitized offline fixtures only.
+The listed action/reconciliation/idempotency owners required no behavioral edit: position verbs already
+consult the execution-position store and reject `UNKNOWN`, while the new state owner performs the
+deal/snapshot read and restart-safe deduplication without duplicating those established policies.
+
 - [ ] Approval matched this exact phase/subphase.
 - [ ] Only the local file and documentation manifests changed.
 - [ ] Every listed FR has final `path:line` implementation and test evidence.

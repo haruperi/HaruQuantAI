@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Reconcile live execution positions from authority deals
+
+Trading now derives execution-position state from verified Broker deals and position snapshots rather than durable receipt payloads (Phase 8).
+
+#### Fixed (1)
+
+- Added restart-safe receipt correlation, netting/closure/reversal refresh, and fail-closed `UNKNOWN` position guards for missing or disagreeing authority evidence.
+
 ### Add signed transaction ledger and rollover swap
 
 Simulator now conserves evidence-backed signed account transactions and calculates broker-server rollover swap modes without guessed posting evidence (Phase 7).

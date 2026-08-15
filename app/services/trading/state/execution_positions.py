@@ -6,10 +6,11 @@ from __future__ import annotations
 
 from decimal import Decimal
 from threading import RLock
-from typing import Any, Literal, Self
+from typing import Any, Literal, Self, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from app.services.brokers import get_broker_deal, get_broker_position
 from app.services.trading.contracts import TradingError
 from app.utils import get_logger
 
@@ -68,6 +69,7 @@ class _ExecutionPosition(BaseModel):
     account_id: str
     symbol: str
     broker_position_id: str
+    side: Literal["LONG", "SHORT", "UNKNOWN"] = "UNKNOWN"
     state: PositionState
     quantity: Decimal
     average_entry_price: Decimal | None = None
@@ -121,6 +123,7 @@ class _ExecutionPositionStore:
     def __init__(self) -> None:
         """Initialize empty process-local position dictionary and lock."""
         self._positions: dict[str, _ExecutionPosition] = {}
+        self._receipt_positions: dict[str, str] = {}
         self._lock = RLock()
 
 
@@ -274,11 +277,244 @@ def get_execution_position_snapshot(store: object) -> dict[str, Any]:
         }
 
 
+def serialize_execution_position_store(store: object) -> dict[str, object]:
+    """Serialize authoritative positions and receipt watermarks for restart.
+
+    Args:
+        store: Execution-position store instance.
+
+    Returns:
+        JSON-safe deterministic store state.
+
+    Raises:
+        TradingError: If the store is invalid.
+    """
+    if not isinstance(store, _ExecutionPositionStore):
+        raise TradingError("INVALID_REQUEST", "Execution-position store is invalid")
+    with store._lock:
+        return {
+            "positions": {
+                identity: position.model_dump(mode="json")
+                for identity, position in sorted(store._positions.items())
+            },
+            "receipt_positions": dict(sorted(store._receipt_positions.items())),
+        }
+
+
+def restore_execution_position_store(state: dict[str, object]) -> object:
+    """Restore restart-safe position state through current validators.
+
+    Args:
+        state: Serialized state returned by ``serialize_execution_position_store``.
+
+    Returns:
+        Restored opaque execution-position store.
+
+    Raises:
+        TradingError: If serialized state is malformed.
+    """
+    positions = state.get("positions")
+    watermarks = state.get("receipt_positions")
+    if not isinstance(positions, dict) or not isinstance(watermarks, dict):
+        raise TradingError("INVALID_REQUEST", "Execution-position state is invalid")
+    store = _ExecutionPositionStore()
+    try:
+        store._positions = {
+            str(identity): _ExecutionPosition.model_validate(value)
+            for identity, value in positions.items()
+        }
+        store._receipt_positions = {
+            str(receipt_id): str(position_id)
+            for receipt_id, position_id in watermarks.items()
+        }
+    except (TypeError, ValueError) as error:
+        raise TradingError(
+            "INVALID_REQUEST", "Execution-position state is invalid"
+        ) from error
+    return store
+
+
+def _unknown_position(
+    store: _ExecutionPositionStore,
+    *,
+    receipt_id: str,
+    account_id: str,
+    symbol: str,
+    reason: str,
+    position_id: str | None = None,
+) -> _ExecutionPosition:
+    """Atomically retain an unverifiable receipt as blocking UNKNOWN state.
+
+    Returns:
+        Stored blocking position state.
+    """
+    identity = position_id or store._receipt_positions.get(
+        receipt_id, f"receipt-{receipt_id}"
+    )
+    current = store._positions.get(identity)
+    position = _ExecutionPosition(
+        position_id=identity,
+        account_id=account_id,
+        symbol=symbol,
+        broker_position_id=identity,
+        side="UNKNOWN" if current is None else current.side,
+        state="UNKNOWN",
+        quantity=Decimal(0) if current is None else current.quantity,
+        average_entry_price=None if current is None else current.average_entry_price,
+        source_sequence=0 if current is None else current.source_sequence + 1,
+        version=0 if current is None else current.version + 1,
+        unknown_reason=reason,
+    )
+    store._positions[identity] = position
+    store._receipt_positions[receipt_id] = identity
+    return position
+
+
+async def reconcile_execution_position_receipt(  # noqa: C901, PLR0911
+    receipt: object,
+    store: object,
+    broker_adapter: object,
+    *,
+    account_id: str,
+    symbol: str,
+) -> object:
+    """Correlate one durable receipt through Broker deals and position authority.
+
+    Args:
+        receipt: Trading ``ExecutionReceipt`` carrying provider deal identifiers.
+        store: Process-local execution-position store.
+        broker_adapter: Injected Brokers adapter instance.
+        account_id: Exact authority account identifier.
+        symbol: Expected canonical symbol.
+
+    Returns:
+        Verified OPEN/FLAT position, or a blocking UNKNOWN position.
+
+    Raises:
+        TradingError: If inputs are not valid Trading/Brokers contract values.
+    """
+    if not isinstance(store, _ExecutionPositionStore):
+        raise TradingError("INVALID_REQUEST", "Execution-position store is invalid")
+    receipt_id = getattr(receipt, "receipt_id", None)
+    deal_ids = getattr(receipt, "provider_deal_ids", None)
+    if not isinstance(receipt_id, str) or not receipt_id:
+        raise TradingError("INVALID_REQUEST", "Durable receipt identity is required")
+    with store._lock:
+        prior_identity = store._receipt_positions.get(receipt_id)
+        if prior_identity is not None:
+            return store._positions[prior_identity]
+    if not isinstance(deal_ids, tuple) or not deal_ids:
+        with store._lock:
+            return _unknown_position(
+                store,
+                receipt_id=receipt_id,
+                account_id=account_id,
+                symbol=symbol,
+                reason="receipt has no provider deal identity",
+            )
+
+    position_ids: set[str] = set()
+    for deal_id in deal_ids:
+        response = await get_broker_deal(cast("Any", broker_adapter), deal_id)
+        deal = getattr(response, "data", None)
+        position_id = getattr(deal, "position_id", None)
+        if getattr(response, "status", None) != "success" or not position_id:
+            with store._lock:
+                return _unknown_position(
+                    store,
+                    receipt_id=receipt_id,
+                    account_id=account_id,
+                    symbol=symbol,
+                    reason="provider deal cannot be verified",
+                )
+        position_ids.add(position_id)
+    if len(position_ids) != 1:
+        with store._lock:
+            return _unknown_position(
+                store,
+                receipt_id=receipt_id,
+                account_id=account_id,
+                symbol=symbol,
+                reason="receipt deals disagree on position authority",
+            )
+
+    broker_position_id = next(iter(position_ids))
+    response = await get_broker_position(
+        cast("Any", broker_adapter), broker_position_id
+    )
+    authority = getattr(response, "data", None)
+    source_sequence = getattr(authority, "source_sequence", None)
+    if (
+        getattr(response, "status", None) != "success"
+        or authority is None
+        or getattr(authority, "position_id", None) != broker_position_id
+        or getattr(authority, "symbol", None) != symbol
+        or not isinstance(source_sequence, int)
+    ):
+        with store._lock:
+            return _unknown_position(
+                store,
+                receipt_id=receipt_id,
+                account_id=account_id,
+                symbol=symbol,
+                reason="position authority snapshot is incomplete or disagrees",
+                position_id=broker_position_id,
+            )
+    state: PositionState = (
+        "OPEN" if getattr(authority, "state", None) == "OPEN" else "FLAT"
+    )
+    side = getattr(authority, "side", None)
+    quantity = getattr(authority, "quantity", None)
+    if (
+        not isinstance(quantity, Decimal)
+        or side not in {"LONG", "SHORT", "UNKNOWN"}
+        or (state == "FLAT" and quantity != 0)
+    ):
+        with store._lock:
+            return _unknown_position(
+                store,
+                receipt_id=receipt_id,
+                account_id=account_id,
+                symbol=symbol,
+                reason="position authority quantity is invalid",
+                position_id=broker_position_id,
+            )
+    verified = _ExecutionPosition(
+        position_id=broker_position_id,
+        account_id=account_id,
+        symbol=symbol,
+        broker_position_id=broker_position_id,
+        side=side,
+        state=state,
+        quantity=quantity,
+        average_entry_price=getattr(authority, "open_price", None),
+        source_sequence=source_sequence,
+        version=source_sequence,
+    )
+    with store._lock:
+        current = store._positions.get(broker_position_id)
+        if current is not None and source_sequence < current.source_sequence:
+            return _unknown_position(
+                store,
+                receipt_id=receipt_id,
+                account_id=account_id,
+                symbol=symbol,
+                reason="position authority sequence regressed",
+                position_id=broker_position_id,
+            )
+        store._positions[broker_position_id] = verified
+        store._receipt_positions[receipt_id] = broker_position_id
+        return verified
+
+
 __all__ = [
     "create_execution_position",
     "create_execution_position_store",
     "get_execution_position",
     "get_execution_position_snapshot",
+    "reconcile_execution_position_receipt",
+    "restore_execution_position_store",
+    "serialize_execution_position_store",
     "set_execution_position",
     "transition_execution_position",
 ]

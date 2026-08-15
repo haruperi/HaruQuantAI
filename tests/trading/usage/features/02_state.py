@@ -5,16 +5,19 @@ Demonstrates FEAT-TRD-02 Trading state stores, idempotency, and projections.
 
 from __future__ import annotations
 
+import asyncio
 import sys
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from types import SimpleNamespace
 from typing import Any, Literal
 
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.services.brokers import build_broker_value
 from app.services.data import build_data_settings, data_settings_context
 from app.services.trading import (
     apply_execution_event,
@@ -28,8 +31,11 @@ from app.services.trading import (
     get_execution_position_snapshot,
     get_trading_migrations,
     get_trading_schema_version,
+    reconcile_execution_position_receipt,
     reserve_idempotency,
+    restore_execution_position_store,
     run_trading_migrations,
+    serialize_execution_position_store,
     set_execution_position,
     transition_execution_position,
 )
@@ -498,6 +504,134 @@ def fr_trd_084() -> None:
     )
 
 
+class _AuthorityAdapter:
+    """Sanitized offline Broker deal/position authority fixture."""
+
+    def __init__(self, *, closed: bool = False) -> None:
+        """Configure whether the authority position is open or closed."""
+        self.closed = closed
+        self.calls: list[str] = []
+
+    async def get_deal(self, deal_id: str) -> object:
+        """Return one evidence-backed provider deal."""
+        self.calls.append(deal_id)
+        return SimpleNamespace(
+            status="success",
+            data=build_broker_value(
+                "deal",
+                deal_id=deal_id,
+                symbol="EURUSD",
+                side="BUY",
+                quantity=Decimal(1),
+                quantity_unit="lot",
+                price=Decimal("1.10"),
+                partial=False,
+                retrieved_at=NOW,
+                position_id="broker-position-usage",
+            ),
+        )
+
+    async def get_position(self, position_id: str) -> object:
+        """Return the authoritative current provider position."""
+        return SimpleNamespace(
+            status="success",
+            data=build_broker_value(
+                "position",
+                position_id=position_id,
+                symbol="EURUSD",
+                side="LONG",
+                quantity=Decimal(0) if self.closed else Decimal(1),
+                quantity_unit="lot",
+                retrieved_at=NOW,
+                state="CLOSED" if self.closed else "OPEN",
+                open_price=None if self.closed else Decimal("1.10"),
+                source_sequence=9,
+            ),
+        )
+
+
+def _durable_receipt(receipt_id: str, deal_ids: tuple[str, ...]) -> object:
+    """Build one immutable durable receipt fixture."""
+    from app.services.trading import create_execution_receipt
+
+    return create_execution_receipt(
+        receipt_id=receipt_id,
+        intent_id=f"intent-{receipt_id}",
+        client_order_id=f"client-{receipt_id}",
+        route="live",
+        authority="mt5",
+        provider_order_id=f"order-{receipt_id}",
+        provider_deal_ids=deal_ids,
+        status="filled",
+        requested_quantity=Decimal(1),
+        filled_quantity=Decimal(1),
+        average_price=Decimal("1.10"),
+        authority_timestamp=NOW,
+        received_at=NOW,
+        response_classification="accepted",
+        retry_safe=False,
+        reconciliation_required=True,
+        request_id="req-11111111-1111-4111-8111-111111111111",
+        correlation_id="cor-11111111-1111-4111-8111-111111111111",
+    )
+
+
+def _refresh(
+    store: object, receipt_id: str, deals: tuple[str, ...], *, closed: bool = False
+) -> object:
+    """Run one offline authoritative position refresh."""
+    return asyncio.run(
+        reconcile_execution_position_receipt(
+            _durable_receipt(receipt_id, deals),
+            store,
+            _AuthorityAdapter(closed=closed),
+            account_id="usage-account-001",
+            symbol="EURUSD",
+        )
+    )
+
+
+def fr_trd_085() -> None:
+    """FR-TRD-085: Refresh exposure only after a durable receipt."""
+    state = _refresh(create_execution_position_store(), "receipt-085", ("deal-085",))
+    print(f"Data -> durable_refresh_state={state.state}")
+
+
+def fr_trd_086() -> None:
+    """FR-TRD-086: Missing deal authority converges to blocking UNKNOWN."""
+    state = _refresh(create_execution_position_store(), "receipt-086", ())
+    print(f"Data -> unverifiable_state={state.state}")
+
+
+def fr_trd_101() -> None:
+    """FR-TRD-101: Many deal identities correlate to one net position."""
+    state = _refresh(
+        create_execution_position_store(),
+        "receipt-101",
+        ("deal-101-a", "deal-101-b"),
+    )
+    print(f"Data -> net_position_id={state.position_id}")
+
+
+def fr_trd_102() -> None:
+    """FR-TRD-102: Full closure is accepted only from closed authority."""
+    state = _refresh(
+        create_execution_position_store(), "receipt-102", ("deal-102",), closed=True
+    )
+    print(f"Data -> closed_authority_state={state.state}")
+
+
+def fr_trd_103() -> None:
+    """FR-TRD-103: Receipt watermark survives deterministic restart."""
+    store = create_execution_position_store()
+    _refresh(store, "receipt-103", ("deal-103",))
+    restored = restore_execution_position_store(
+        serialize_execution_position_store(store)
+    )
+    state = _refresh(restored, "receipt-103", ("deal-103",))
+    print(f"Data -> restored_position_sequence={state.source_sequence}")
+
+
 def _emit_requirement_success(function: object) -> object:
     """Wrap one example so direct execution emits its success contract."""
 
@@ -542,6 +676,11 @@ def main() -> None:
     fr_trd_076()
     fr_trd_077()
     fr_trd_084()
+    fr_trd_085()
+    fr_trd_086()
+    fr_trd_101()
+    fr_trd_102()
+    fr_trd_103()
 
     # Stage 2: Idempotency check & Validation
     fr_trd_039()

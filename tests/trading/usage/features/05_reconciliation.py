@@ -1,6 +1,6 @@
 """Executable Trading reconciliation usage example.
 
-Demonstrates FEAT-TRD-05 authority snapshots and reconciliation.
+Demonstrates FEAT-TRD-05 authority snapshots and reconciliation after execution-position refresh.
 """
 
 from __future__ import annotations
