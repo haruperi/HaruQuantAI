@@ -1,4 +1,8 @@
-"""Deterministic adapter fixture for the conformance feature."""
+"""Deterministic adapter fixture for the conformance feature.
+
+Calculation fixtures enter only as validated immutable payloads; this fake
+never invokes the separately guarded provider collector.
+"""
 
 from __future__ import annotations
 

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Add calculation conformance evidence
+
+Brokers now preserves complete MT5 projected-account check evidence and validates bounded checksummed offline calculation fixtures (Phase 13a).
+
+#### Added (1)
+
+- Added specification-bound Decimal projections and a separately guarded dev/demo fixture collector that remains unreachable from default conformance runs.
+
 ### Add the simulation mutation surface
 
 The simulation Broker channel now delegates its approved order and position mutation intersection through request-bound authority envelopes and the verified MT5 mapping path (Phase 12).

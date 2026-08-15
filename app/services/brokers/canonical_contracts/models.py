@@ -1557,6 +1557,17 @@ class BrokerOrderCheck(_Schema):
     provider_code: str | None = None
     provider_message: str | None = None
     estimated_margin: Decimal | None = None
+    projected_balance: Decimal | None = None
+    projected_equity: Decimal | None = None
+    projected_profit: Decimal | None = None
+    projected_margin: Decimal | None = None
+    projected_free_margin: Decimal | None = None
+    projected_margin_level: Decimal | None = None
+    environment: BrokerEnvironment | None = None
+    account_digest: str | None = None
+    provider_specification_checksum: str | None = None
+    terminal_build: str | None = None
+    observed_at: datetime | None = None
     warnings: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -1570,6 +1581,58 @@ class BrokerOrderCheck(_Schema):
         _optional_text(self.provider_code, "provider_code")
         _optional_text(self.provider_message, "provider_message")
         _finite(self.estimated_margin, "estimated_margin")
+        for name in (
+            "projected_balance",
+            "projected_equity",
+            "projected_profit",
+            "projected_margin",
+            "projected_free_margin",
+            "projected_margin_level",
+        ):
+            _finite(getattr(self, name), name)
+        _optional_text(self.account_digest, "account_digest")
+        _optional_text(
+            self.provider_specification_checksum,
+            "provider_specification_checksum",
+        )
+        _optional_text(self.terminal_build, "terminal_build")
+        identity_fields = (
+            self.environment,
+            self.account_digest,
+            self.provider_specification_checksum,
+            self.terminal_build,
+            self.observed_at,
+        )
+        projected_fields = (
+            self.projected_balance,
+            self.projected_equity,
+            self.projected_profit,
+            self.projected_margin,
+            self.projected_free_margin,
+            self.projected_margin_level,
+        )
+        if any(value is not None for value in identity_fields) and (
+            any(value is None for value in identity_fields)
+            or any(value is None for value in projected_fields)
+        ):
+            raise ValueError(
+                "order check calculation evidence requires complete identity "
+                "and projections"
+            )
+        if self.account_digest is not None and (
+            len(self.account_digest) != _SHA256_HEX_LENGTH
+            or any(c not in "0123456789abcdef" for c in self.account_digest)
+        ):
+            raise ValueError("account_digest must be SHA-256")
+        if self.provider_specification_checksum is not None and (
+            len(self.provider_specification_checksum) != _SHA256_HEX_LENGTH
+            or any(
+                c not in "0123456789abcdef"
+                for c in self.provider_specification_checksum
+            )
+        ):
+            raise ValueError("provider_specification_checksum must be SHA-256")
+        _utc(self.observed_at, "observed_at")
         for warning in self.warnings:
             _text(warning, "warning")
 

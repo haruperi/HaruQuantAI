@@ -11,6 +11,9 @@ The suite is independent of any specific provider SDK: it operates against the
 canonical ``BrokerAdapter`` contract surface and the deterministic
 ``FakeBrokerAdapter`` so it can be applied to every enabled route without a
 live connection.
+
+The default suite is provider-disabled by construction: it neither imports nor
+invokes the separately approved calculation-fixture collector.
 """
 
 from __future__ import annotations

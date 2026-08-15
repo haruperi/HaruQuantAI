@@ -121,8 +121,12 @@ def test_check_order_coverage() -> None:
         provider = FakeMT5Mutations()
         mock_response = MagicMock()
         mock_response.retcode = 10009
+        mock_response.balance = 1000.0
+        mock_response.equity = 1010.0
+        mock_response.profit = 10.0
         mock_response.margin = 150.0
         mock_response.margin_free = 1000.0
+        mock_response.margin_level = 673.33
         mock_response.comment = "OK"
         provider._transport.call.return_value = mock_response
 

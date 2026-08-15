@@ -12,6 +12,7 @@ from app.services.brokers.canonical_contracts import (
     BrokerBalance,
     BrokerBar,
     BrokerDeal,
+    BrokerEnvironment,
     BrokerErrorCode,
     BrokerOrder,
     BrokerOrderCheck,
@@ -725,11 +726,24 @@ def _map_transaction(
     )
 
 
-def _map_order_check(value: object) -> BrokerOrderCheck:
+def _map_order_check(
+    value: object,
+    *,
+    environment: BrokerEnvironment | None = None,
+    account_digest: str | None = None,
+    provider_specification_checksum: str | None = None,
+    terminal_build: str | None = None,
+    observed_at: datetime | None = None,
+) -> BrokerOrderCheck:
     """Map an MT5 pre-submission order check.
 
     Args:
         value: Value supplied to the operation.
+        environment: Bound canonical Broker environment.
+        account_digest: Redacted account identity digest.
+        provider_specification_checksum: Bound specification checksum.
+        terminal_build: Bound provider terminal build.
+        observed_at: Aware-UTC specification observation time.
 
     Returns:
         Canonical non-final order check.
@@ -748,6 +762,41 @@ def _map_order_check(value: object) -> BrokerOrderCheck:
             if _optional(value, "margin") is not None
             else None
         ),
+        projected_balance=(
+            Decimal(str(_optional(value, "balance")))
+            if _optional(value, "balance") is not None
+            else None
+        ),
+        projected_equity=(
+            Decimal(str(_optional(value, "equity")))
+            if _optional(value, "equity") is not None
+            else None
+        ),
+        projected_profit=(
+            Decimal(str(_optional(value, "profit")))
+            if _optional(value, "profit") is not None
+            else None
+        ),
+        projected_margin=(
+            Decimal(str(_optional(value, "margin")))
+            if _optional(value, "margin") is not None
+            else None
+        ),
+        projected_free_margin=(
+            Decimal(str(_optional(value, "margin_free")))
+            if _optional(value, "margin_free") is not None
+            else None
+        ),
+        projected_margin_level=(
+            Decimal(str(_optional(value, "margin_level")))
+            if _optional(value, "margin_level") is not None
+            else None
+        ),
+        environment=environment,
+        account_digest=account_digest,
+        provider_specification_checksum=provider_specification_checksum,
+        terminal_build=terminal_build,
+        observed_at=observed_at,
     )
 
 

@@ -1,6 +1,7 @@
 """Public adapter conformance and deterministic fixture operations."""
 
 from collections.abc import Mapping
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from app.services.brokers.canonical_contracts.enums import (
@@ -14,6 +15,8 @@ from app.services.brokers.canonical_contracts.models import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
+
     from app.services.brokers.canonical_contracts.responses import StandardResponse
 
 
@@ -147,4 +150,101 @@ async def run_broker_adapter_conformance(
         environment=environment,
         unsupported_capability=BrokerCapabilityId(unsupported_capability_id),
         unsupported_operation=unsupported_operation,
+    )
+
+
+def build_broker_calculation_fixture(**fields: object) -> object:
+    """Build one immutable sanitized calculation fixture.
+
+    Args:
+        **fields: Complete bounded fixture fields.
+
+    Returns:
+        Opaque checksummed fixture.
+
+    Raises:
+        TypeError: If field types are invalid.
+        ValueError: If fixture invariants are invalid.
+    """
+    from app.services.brokers.conformance.fixtures import build_calculation_fixture
+
+    return build_calculation_fixture(**fields)
+
+
+def dump_broker_calculation_fixture(value: object) -> dict[str, object]:
+    """Dump one verified fixture to canonical JSON-safe fields.
+
+    Args:
+        value: Opaque calculation fixture.
+
+    Returns:
+        Canonical fixture mapping.
+
+    Raises:
+        TypeError: If value is not a fixture.
+        ValueError: If checksum verification fails.
+    """
+    from app.services.brokers.conformance.fixtures import dump_calculation_fixture
+
+    return dump_calculation_fixture(value)
+
+
+def parse_broker_calculation_fixture(value: Mapping[str, object]) -> object:
+    """Parse and verify one canonical calculation fixture mapping.
+
+    Args:
+        value: Canonical JSON-safe fixture mapping.
+
+    Returns:
+        Opaque immutable fixture.
+
+    Raises:
+        ValueError: If fields or checksum are invalid.
+    """
+    from app.services.brokers.conformance.fixtures import parse_calculation_fixture
+
+    return parse_calculation_fixture(value)
+
+
+async def collect_broker_calculation_fixture(
+    *,
+    app_environment: str,
+    broker_environment: str,
+    account_id: str,
+    provider_specification_checksum: str,
+    terminal_build: str,
+    observed_at: datetime,
+    inputs: Mapping[str, object],
+    provider_call: Callable[[], Awaitable[Mapping[str, object]]],
+) -> object:
+    """Collect one separately approved dev/demo provider fixture.
+
+    Args:
+        app_environment: Application environment, required to be ``dev``.
+        broker_environment: Provider environment, required to be ``demo``.
+        account_id: Raw account identity digested before artifact construction.
+        provider_specification_checksum: Bound provider-specification checksum.
+        terminal_build: Bound terminal build.
+        observed_at: Aware-UTC observation time.
+        inputs: Sanitized calculation inputs.
+        provider_call: Separately approved asynchronous provider invocation.
+
+    Returns:
+        Opaque sanitized checksummed fixture.
+
+    Raises:
+        PermissionError: If the dev/demo guard fails.
+        ValueError: If identity or fixture evidence is invalid.
+    """
+    from app.services.brokers.conformance.fixtures import collect_calculation_fixture
+
+    return await collect_calculation_fixture(
+        app_environment=app_environment,
+        broker_environment=broker_environment,
+        account_id=account_id,
+        provider_specification_checksum=provider_specification_checksum,
+        terminal_build=terminal_build,
+        observed_at=observed_at,
+        inputs=inputs,
+        provider_call=provider_call,
     )

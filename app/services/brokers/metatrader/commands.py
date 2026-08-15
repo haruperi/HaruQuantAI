@@ -3,6 +3,7 @@
 """MT5 mutation implementations behind unreleased public policy."""
 
 from collections.abc import Mapping
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from app.services.brokers.canonical_contracts import (
@@ -28,6 +29,9 @@ from app.services.brokers.metatrader.mapping import (
     _map_order_result,
     _map_position,
     _optional,
+)
+from app.services.brokers.specifications.public import (
+    get_provider_specification_snapshot_field,
 )
 
 if TYPE_CHECKING:
@@ -98,8 +102,47 @@ class _MT5MutationsMixin:
                 BrokerCapabilityId.CHECK_ORDER,
                 BrokerErrorCode.BROKER_PROVIDER_ERROR,
             )
+        specification_getter = getattr(self, "get_provider_specification", None)
+        if not callable(specification_getter):
+            return self._result(
+                BrokerCapabilityId.CHECK_ORDER,
+                data=_map_order_check(response),
+            )
+        specification_response = await specification_getter(request.symbol)
+        specification = specification_response.data
+        if specification_response.error is not None or specification is None:
+            return self._error(
+                BrokerCapabilityId.CHECK_ORDER,
+                BrokerErrorCode.BROKER_RESPONSE_INVALID,
+            )
+        observed_value = get_provider_specification_snapshot_field(
+            specification, "observed_at"
+        )
+        if not isinstance(observed_value, str):
+            return self._error(
+                BrokerCapabilityId.CHECK_ORDER,
+                BrokerErrorCode.BROKER_RESPONSE_INVALID,
+            )
         return self._result(
-            BrokerCapabilityId.CHECK_ORDER, data=_map_order_check(response)
+            BrokerCapabilityId.CHECK_ORDER,
+            data=_map_order_check(
+                response,
+                environment=self._config.environment,
+                account_digest=str(
+                    get_provider_specification_snapshot_field(
+                        specification, "account_digest"
+                    )
+                ),
+                provider_specification_checksum=str(
+                    get_provider_specification_snapshot_field(specification, "checksum")
+                ),
+                terminal_build=str(
+                    get_provider_specification_snapshot_field(
+                        specification, "terminal_build"
+                    )
+                ),
+                observed_at=datetime.fromisoformat(observed_value),
+            ),
         )
 
     async def place_order(
