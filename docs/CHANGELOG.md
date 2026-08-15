@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Make MT5 mapping clocks injectable
+
+Brokers now captures all ten MT5 observation-owned mapping timestamps through a validated injected UTC clock while retaining the live UTC default (Phase 11a).
+
+#### Changed (1)
+
+- Added one-call-per-payload fixed-clock mapping support with explicit naive/non-UTC rejection and unchanged provider timestamp semantics.
+
 ### Route simulation through the Broker identity boundary
 
 Trading now admits the sim route only with the exact Brokers `sim`/`simulation` connection descriptor and forbids that environment everywhere else (Phase 10b).

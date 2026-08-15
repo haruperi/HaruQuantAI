@@ -124,6 +124,14 @@ def fr_brk_166() -> None:
     print("SUCCESS FR-BRK-166", checksum[:12])
 
 
+def fr_brk_173() -> None:
+    """FR-BRK-173: retain an aware UTC observation domain at the Broker boundary."""
+    observed_at = get_broker_value_field(_specification(), "observed_at")
+    assert isinstance(observed_at, datetime)
+    assert observed_at.tzinfo is UTC
+    print("SUCCESS FR-BRK-173", observed_at.isoformat())
+
+
 async def fr_brokers_152_to_158_snapshot_symbol_demand() -> None:
     """FR-BRK-152..158: Exercise connected revisioned snapshot demand."""
     _header("Stage 4: Revisioned MT5 Snapshot Symbol Demand (FR-BRK-152..158)")
@@ -259,6 +267,7 @@ async def _run() -> None:
     fr_brk_164()
     fr_brk_165()
     fr_brk_166()
+    fr_brk_173()
 
     async with real_session("mt5") as adapter:
         # Stage 1 & 2: Connection config & session recovery

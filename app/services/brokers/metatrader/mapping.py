@@ -1,6 +1,7 @@
 """MetaTrader provider payload to canonical DTO mapping."""
 
 # ruff: noqa: ANN401, PLR2004 - SDK records and native retcodes are provider-defined.
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any, cast
@@ -21,6 +22,38 @@ from app.services.brokers.canonical_contracts import (
     BrokerSymbolInfo,
     BrokerTick,
 )
+
+type Clock = Callable[[], datetime]
+
+
+def _live_clock() -> datetime:
+    """Return the current aware UTC observation time.
+
+    Returns:
+        Current aware UTC datetime.
+    """
+    return datetime.now(UTC)
+
+
+def _observation_time(clock: Clock) -> datetime:
+    """Capture and validate one observation-owned timestamp.
+
+    Args:
+        clock: Injected clock called exactly once for one provider payload.
+
+    Returns:
+        Aware zero-offset UTC observation time.
+
+    Raises:
+        ValueError: If the clock returns a naive or non-UTC datetime.
+        TypeError: If the clock does not return a datetime.
+    """
+    moment = clock()
+    if not isinstance(moment, datetime):
+        raise TypeError("mapping clock must return datetime")
+    if moment.tzinfo is None or moment.utcoffset() != timedelta(0):
+        raise ValueError("mapping clock must return aware UTC")
+    return moment
 
 
 def _field(value: object, name: str) -> Any:
@@ -186,12 +219,15 @@ def _map_symbol(value: object) -> BrokerSymbolInfo:
     )
 
 
-def _map_quote(value: object, symbol: str) -> BrokerQuote:
+def _map_quote(
+    value: object, symbol: str, *, clock: Clock = _live_clock
+) -> BrokerQuote:
     """Map only genuine MT5 quote fields.
 
     Args:
         value: Value supplied to the operation.
         symbol: Value supplied to the operation.
+        clock: Observation clock called once for this payload.
 
     Returns:
         Canonical quote evidence.
@@ -203,7 +239,7 @@ def _map_quote(value: object, symbol: str) -> BrokerQuote:
         symbol=symbol,
         price_unit="quote_currency",
         quantity_unit="lots",
-        retrieved_at=datetime.now(UTC),
+        retrieved_at=_observation_time(clock),
         bid=bid or None,
         ask=ask or None,
         last_price=last or None,
@@ -211,12 +247,13 @@ def _map_quote(value: object, symbol: str) -> BrokerQuote:
     )
 
 
-def _map_tick(value: object, symbol: str) -> BrokerTick:
+def _map_tick(value: object, symbol: str, *, clock: Clock = _live_clock) -> BrokerTick:
     """Map map tick.
 
     Args:
         value: Value supplied to the operation.
         symbol: Value supplied to the operation.
+        clock: Observation clock called once for this payload.
 
     Returns:
         The operation result.
@@ -229,7 +266,7 @@ def _map_tick(value: object, symbol: str) -> BrokerTick:
     return BrokerTick(
         symbol=symbol,
         event_timestamp=timestamp,
-        provider_receipt_timestamp=datetime.now(UTC),
+        provider_receipt_timestamp=_observation_time(clock),
         price_unit="quote_currency",
         quantity_unit="lots",
         tick_type="UNKNOWN",
@@ -307,11 +344,12 @@ def _map_bar(value: object, symbol: str, timeframe: str) -> BrokerBar:
     )
 
 
-def _map_account(value: object) -> BrokerAccountInfo:
+def _map_account(value: object, *, clock: Clock = _live_clock) -> BrokerAccountInfo:
     """Map direct MT5 account state.
 
     Args:
         value: Value supplied to the operation.
+        clock: Observation clock called once for this payload.
 
     Returns:
         Canonical account information.
@@ -389,7 +427,7 @@ def _map_account(value: object) -> BrokerAccountInfo:
 
     return BrokerAccountInfo(
         account_id=str(_field(value, "login")),
-        retrieved_at=datetime.now(UTC),
+        retrieved_at=_observation_time(clock),
         account_reference_redacted="***",
         currency=currency,
         balance=balance,
@@ -400,11 +438,12 @@ def _map_account(value: object) -> BrokerAccountInfo:
     )
 
 
-def _map_position(value: object) -> BrokerPosition:
+def _map_position(value: object, *, clock: Clock = _live_clock) -> BrokerPosition:
     """Map direct MT5 position state.
 
     Args:
         value: Value supplied to the operation.
+        clock: Observation clock called once for this payload.
 
     Returns:
         Canonical open-position information.
@@ -428,7 +467,7 @@ def _map_position(value: object) -> BrokerPosition:
         side=cast("Any", side),
         quantity=Decimal(str(_field(value, "volume"))),
         quantity_unit="lots",
-        retrieved_at=datetime.now(UTC),
+        retrieved_at=_observation_time(clock),
         state="OPEN",
         ownership_ref=f"mt5-magic:{int(magic)}" if magic is not None else None,
         open_price=Decimal(str(_field(value, "price_open"))),
@@ -440,12 +479,15 @@ def _map_position(value: object) -> BrokerPosition:
     )
 
 
-def _map_permissions(account: object, terminal: object) -> BrokerPermissions:
+def _map_permissions(
+    account: object, terminal: object, *, clock: Clock = _live_clock
+) -> BrokerPermissions:
     """Map only permission fields reported by the terminal and account.
 
     Args:
         account: Value supplied to the operation.
         terminal: Value supplied to the operation.
+        clock: Observation clock called once for this payload.
 
     Returns:
         Canonical provider-reported permissions.
@@ -460,7 +502,7 @@ def _map_permissions(account: object, terminal: object) -> BrokerPermissions:
     if connected is None and account is not None:
         connected = True
     return BrokerPermissions(
-        observed_at=datetime.now(UTC),
+        observed_at=_observation_time(clock),
         market_data_read=bool(connected) if connected is not None else None,
         account_read=True,
         trade_write=(
@@ -480,11 +522,12 @@ def _map_permissions(account: object, terminal: object) -> BrokerPermissions:
     )
 
 
-def _map_balance(value: object) -> BrokerBalance:
+def _map_balance(value: object, *, clock: Clock = _live_clock) -> BrokerBalance:
     """Map the MT5 account-currency balance without inventing availability.
 
     Args:
         value: Value supplied to the operation.
+        clock: Observation clock called once for this payload.
 
     Returns:
         Canonical account-currency balance.
@@ -493,7 +536,7 @@ def _map_balance(value: object) -> BrokerBalance:
     return BrokerBalance(
         asset=currency,
         unit=currency,
-        retrieved_at=datetime.now(UTC),
+        retrieved_at=_observation_time(clock),
         total=Decimal(str(_field(value, "balance"))),
     )
 
@@ -514,11 +557,12 @@ def _side(type_code: int) -> str:
     return "UNKNOWN"
 
 
-def _map_order(value: object) -> BrokerOrder:
+def _map_order(value: object, *, clock: Clock = _live_clock) -> BrokerOrder:
     """Map one MT5 active or historical order.
 
     Args:
         value: Value supplied to the operation.
+        clock: Observation clock called once for this payload.
 
     Returns:
         Canonical order state.
@@ -560,7 +604,7 @@ def _map_order(value: object) -> BrokerOrder:
         filled=quantity - remaining,
         remaining=remaining,
         quantity_unit="lots",
-        retrieved_at=datetime.now(UTC),
+        retrieved_at=_observation_time(clock),
         price=(
             Decimal(str(_optional(value, "price_open")))
             if _optional(value, "price_open") is not None
@@ -582,11 +626,12 @@ def _map_order(value: object) -> BrokerOrder:
     )
 
 
-def _map_deal(value: object) -> BrokerDeal:
+def _map_deal(value: object, *, clock: Clock = _live_clock) -> BrokerDeal:
     """Map one MT5 execution deal.
 
     Args:
         value: Value supplied to the operation.
+        clock: Observation clock called once for this payload.
 
     Returns:
         Canonical provider deal.
@@ -614,18 +659,21 @@ def _map_deal(value: object) -> BrokerDeal:
         quantity_unit="lots",
         price=Decimal(str(_field(value, "price"))),
         partial=bool(_optional(value, "entry") == 2),
-        retrieved_at=datetime.now(UTC),
+        retrieved_at=_observation_time(clock),
         fee=fee or None,
         provider_timestamp=_time(value),
     )
 
 
-def _map_transaction(value: object, currency: str) -> BrokerAccountTransaction:
+def _map_transaction(
+    value: object, currency: str, *, clock: Clock = _live_clock
+) -> BrokerAccountTransaction:
     """Map one non-trade MT5 deal as an account transaction.
 
     Args:
         value: Provider deal payload.
         currency: Verified account currency.
+        clock: Observation clock called once for this payload.
 
     Returns:
         Canonical account transaction.
@@ -669,7 +717,7 @@ def _map_transaction(value: object, currency: str) -> BrokerAccountTransaction:
         currency=currency,
         amount=amount,
         provider_timestamp=_time(value),
-        retrieved_at=datetime.now(UTC),
+        retrieved_at=_observation_time(clock),
         provider_metadata={
             "reason": _optional(value, "reason"),
             "native_transaction_type": type_code,
@@ -703,11 +751,14 @@ def _map_order_check(value: object) -> BrokerOrderCheck:
     )
 
 
-def _map_order_result(value: object) -> BrokerOrderResult:
+def _map_order_result(
+    value: object, *, clock: Clock = _live_clock
+) -> BrokerOrderResult:
     """Map one acknowledged MT5 order-send response.
 
     Args:
         value: Value supplied to the operation.
+        clock: Observation clock called once for this payload.
 
     Returns:
         Canonical explicit mutation outcome.
@@ -724,7 +775,7 @@ def _map_order_result(value: object) -> BrokerOrderResult:
     return BrokerOrderResult(
         acknowledged=True,
         outcome="PARTIAL" if partial else ("ACCEPTED" if accepted else "REJECTED"),
-        retrieved_at=datetime.now(UTC),
+        retrieved_at=_observation_time(clock),
         order_id=order_id,
         deal_ids=(str(deal),) if deal else (),
         filled_quantity=Decimal(0) if pending_acknowledgement else volume,
