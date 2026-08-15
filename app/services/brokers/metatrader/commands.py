@@ -17,6 +17,7 @@ from app.services.brokers.canonical_contracts import (
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
 )
+from app.services.brokers.canonical_contracts.models import BrokerOrderRequestV2
 from app.services.brokers.canonical_contracts.protocols import (
     _RequestValidationError,
 )
@@ -291,6 +292,9 @@ class _MT5MutationsMixin:
 
         Returns:
             Documented MT5 order-request fields.
+
+        Raises:
+            _RequestValidationError: If a v2 policy cannot map to verified MT5.
         """
         suffix: str = request.side
         if request.order_type != "MARKET":
@@ -337,7 +341,25 @@ class _MT5MutationsMixin:
             native["comment"] = request.comment
         if request.expiration is not None:
             native["expiration"] = int(request.expiration.timestamp())
-        if "type_filling" not in native:
+        if isinstance(request, BrokerOrderRequestV2):
+            fill_constant = {
+                "FOK": "ORDER_FILLING_FOK",
+                "IOC": "ORDER_FILLING_IOC",
+                "RETURN": "ORDER_FILLING_RETURN",
+            }.get(request.fill_policy)
+            if fill_constant is None:
+                raise _RequestValidationError(
+                    "MT5 does not admit the requested fill policy"
+                )
+            time_constant = {
+                "GTC": "ORDER_TIME_GTC",
+                "DAY": "ORDER_TIME_DAY",
+                "SPECIFIED": "ORDER_TIME_SPECIFIED",
+                "SPECIFIED_DAY": "ORDER_TIME_SPECIFIED_DAY",
+            }[request.time_policy]
+            native["type_filling"] = await self._transport.constant(fill_constant)
+            native["type_time"] = await self._transport.constant(time_constant)
+        elif "type_filling" not in native:
             info = await self._transport.call("symbol_info", request.symbol)
             if info is not None:
                 filling_flags = int(_field(info, "filling_mode"))

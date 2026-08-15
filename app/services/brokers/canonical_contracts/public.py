@@ -33,6 +33,7 @@ from app.services.brokers.canonical_contracts.models import (
     BrokerOrderFilter,
     BrokerOrderModificationRequest,
     BrokerOrderRequest,
+    BrokerOrderRequestV2,
     BrokerOrderResult,
     BrokerPage,
     BrokerPermissions,
@@ -69,6 +70,7 @@ _BROKER_VALUE_TYPES: Mapping[str, type[object]] = {
     "order_filter": BrokerOrderFilter,
     "order_modification_request": BrokerOrderModificationRequest,
     "order_request": BrokerOrderRequest,
+    "order_request_v2": BrokerOrderRequestV2,
     "order_result": BrokerOrderResult,
     "page": BrokerPage,
     "permissions": BrokerPermissions,
@@ -105,6 +107,52 @@ def build_broker_value(value_type: str, /, **fields: object) -> object:
         message = f"Unsupported Broker value type: {value_type}"
         raise ValueError(message)
     return target(**fields)
+
+
+def build_broker_order_request_v2(
+    *, provider_specification: object, **fields: object
+) -> object:
+    """Build one exact provider-bound Broker order request v2.
+
+    Args:
+        provider_specification: Opaque Brokers-owned specification snapshot.
+        **fields: Complete v2 order fields including independent policies.
+
+    Returns:
+        Immutable opaque Broker order request v2.
+
+    Raises:
+        TypeError: If revision evidence has an invalid type.
+        ValueError: If a policy is unsupported by the bound revision.
+    """
+    from app.services.brokers.specifications.public import (
+        get_provider_specification_snapshot_field,
+    )
+
+    fill_policy = fields.get("fill_policy")
+    time_policy = fields.get("time_policy")
+    filling_modes = get_provider_specification_snapshot_field(
+        provider_specification, "filling_modes"
+    )
+    expiration_modes = get_provider_specification_snapshot_field(
+        provider_specification, "expiration_modes"
+    )
+    if not isinstance(filling_modes, (tuple, list)) or fill_policy not in filling_modes:
+        raise ValueError("fill_policy is unsupported by provider specification")
+    if (
+        not isinstance(expiration_modes, (tuple, list))
+        or time_policy not in expiration_modes
+    ):
+        raise ValueError("time_policy is unsupported by provider specification")
+    checksum = get_provider_specification_snapshot_field(
+        provider_specification, "checksum"
+    )
+    if not isinstance(checksum, str):
+        raise TypeError("provider specification checksum is invalid")
+    return BrokerOrderRequestV2(
+        **fields,  # type: ignore[arg-type]
+        provider_specification_checksum=checksum,
+    )
 
 
 def get_broker_value_field(value: object, field_name: str) -> object:

@@ -2,8 +2,10 @@
 
 import asyncio
 import sys
+from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
@@ -15,6 +17,8 @@ from _support import (
 )
 from app.services.brokers import (
     acquire_metatrader_snapshot_symbols,
+    build_broker_order_request_v2,
+    build_provider_specification_snapshot,
     disconnect_broker,
     get_broker_connection_status,
     get_broker_last_error,
@@ -28,6 +32,96 @@ from app.services.brokers import (
     release_metatrader_snapshot_symbols,
     supports_broker_capability,
 )
+
+
+class _SymbolInfo(NamedTuple):
+    """Minimal verified MT5-shaped provider snapshot fixture."""
+
+    name: object = "EURUSD"
+    digits: object = 5
+    point: object = 0.00001
+    filling_mode: object = 3
+    order_mode: object = 15
+    expiration_mode: object = 15
+    order_gtc_mode: object = 0
+    trade_exemode: object = 2
+    trade_mode: object = 4
+    trade_calc_mode: object = 0
+    swap_mode: object = 1
+    swap_rollover3days: object = 3
+    trade_stops_level: object = 0
+    trade_freeze_level: object = 0
+    volume_min: object = 0.01
+    volume_max: object = 100.0
+    volume_step: object = 0.01
+    volume_limit: object = 0.0
+    trade_tick_size: object = 0.00001
+    trade_tick_value: object = 1.0
+    trade_tick_value_profit: object = 1.0
+    trade_tick_value_loss: object = 1.0
+    trade_contract_size: object = 100000.0
+    currency_base: object = "EUR"
+    currency_profit: object = "USD"
+    currency_margin: object = "USD"
+    margin_initial: object = 0.0
+    margin_maintenance: object = 0.0
+    margin_hedged: object = 100000.0
+    margin_hedged_use_leg: object = False
+    swap_long: object = -0.2
+    swap_short: object = -1.2
+
+
+def _specification() -> object:
+    """Build transport-free provider specification evidence."""
+    return build_provider_specification_snapshot(
+        symbol_info=_SymbolInfo(),
+        broker="mt5",
+        server="DemoServer",
+        account_id="usage-account",
+        environment="demo",
+        terminal_build="4410",
+        source_revision="mt5:4410",
+        observed_at=datetime(2026, 8, 15, tzinfo=UTC),
+        account_info=None,
+    )
+
+
+def _v2_request(time_policy: str = "GTC") -> object:
+    """Build one opaque order request v2 through the Brokers root."""
+    fields: dict[str, object] = {
+        "symbol": "EURUSD",
+        "side": "BUY",
+        "order_type": "MARKET",
+        "quantity": Decimal(1),
+        "quantity_unit": "lots",
+        "environment": "demo",
+        "fill_policy": "IOC",
+        "time_policy": time_policy,
+    }
+    if time_policy == "SPECIFIED_DAY":
+        fields["expiration"] = datetime(2026, 8, 16, tzinfo=UTC)
+    return build_broker_order_request_v2(
+        provider_specification=_specification(), **fields
+    )
+
+
+def fr_brk_164() -> None:
+    """FR-BRK-164: construct a v2 request with two explicit policies."""
+    request = _v2_request()
+    print("SUCCESS FR-BRK-164", get_broker_value_field(request, "contract_version"))
+
+
+def fr_brk_165() -> None:
+    """FR-BRK-165: preserve SPECIFIED_DAY expiration independently."""
+    request = _v2_request("SPECIFIED_DAY")
+    print("SUCCESS FR-BRK-165", get_broker_value_field(request, "time_policy"))
+
+
+def fr_brk_166() -> None:
+    """FR-BRK-166: expose the exact provider revision binding."""
+    request = _v2_request()
+    checksum = str(get_broker_value_field(request, "provider_specification_checksum"))
+    print("SUCCESS FR-BRK-166", checksum[:12])
 
 
 async def fr_brokers_152_to_158_snapshot_symbol_demand() -> None:
@@ -161,6 +255,10 @@ async def _run() -> None:
         "-> terminal connection & login\n"
         "-> verified session & account info"
     )
+
+    fr_brk_164()
+    fr_brk_165()
+    fr_brk_166()
 
     async with real_session("mt5") as adapter:
         # Stage 1 & 2: Connection config & session recovery

@@ -298,7 +298,7 @@ The tree below defines the final layout. The following table is the sole normati
 | --------- | --------------------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------- |
 | Completed | `FEAT-BRK-00` Instrument and Venue Profiles | `instrument_profiles/` | `build_instrument_venue_profile`, `parse_instrument_venue_profile`, and current/reverse/as-of symbol resolution | `FR-BRK-142`–`FR-BRK-144`, `FR-BRK-147` | `tests/brokers/usage/features/00_instrument_profiles.py` |
 | Completed | `FEAT-BRK-01` Adapter Capability Matrix | `capabilities/` | `get_broker_capability_catalogue`; socket-free `get_broker_dashboard_snapshot` | `FR-BRK-010`, `FR-BRK-011`, `FR-BRK-103`, `FR-BRK-133` | `tests/brokers/usage/features/01_capabilities.py` |
-| Completed | `FEAT-BRK-02` MetaTrader Direct Broker Channel | `metatrader/` | Direct health, snapshots, streams, calculations, commands, and revisioned snapshot-symbol demand | MetaTrader requirements in Sections 4.3 and 4.10; `FR-BRK-152`–`FR-BRK-158` | `tests/brokers/usage/features/02_metatrader.py` |
+| Completed | `FEAT-BRK-02` MetaTrader Direct Broker Channel | `metatrader/` | Direct health, snapshots, streams, calculations, commands, revisioned snapshot-symbol demand, and explicit v2 order-policy mapping through `build_broker_order_request_v2` | MetaTrader requirements in Sections 4.3 and 4.10; `FR-BRK-152`–`FR-BRK-158`, `FR-BRK-164`–`FR-BRK-166` | `tests/brokers/usage/features/02_metatrader.py` |
 | Completed | `FEAT-BRK-03` cTrader Direct Broker Channel | `ctrader/` | Direct health, snapshots, streams, calculations, and commands | cTrader requirements in Sections 4.4 and 4.10 | `tests/brokers/usage/features/03_ctrader.py` |
 | Completed | `FEAT-BRK-04` Binance Direct Broker Channel | `binance/` | Direct health, snapshots, streams, and explicit command exclusions | Binance requirements in Sections 4.5 and 4.10 | `tests/brokers/usage/features/04_binance.py` |
 | Completed | `FEAT-BRK-05` Dukascopy Direct Broker Channel | `dukascopy/` | Direct health, tick/bar snapshots, and explicit command exclusions | Dukascopy requirements in Sections 4.6 and 4.10 | `tests/brokers/usage/features/05_dukascopy.py` |
@@ -310,6 +310,19 @@ The tree below defines the final layout. The following table is the sole normati
 | Completed | `FEAT-BRK-18` Provider Specification Snapshots | `specifications/` | `build_provider_specification_snapshot`, `parse_provider_specification_snapshot`, `dump_provider_specification_snapshot`, `get_provider_specification_snapshot_field`, `verify_provider_specification_snapshot`, `get_broker_provider_specification` | `FR-BRK-159`–`FR-BRK-163` | `tests/brokers/usage/features/18_specifications.py` |
 
 Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private focused files; unreleased writes remain unreachable through public release policy. The registry holds **twelve** completed features, `FEAT-BRK-00` through `FEAT-BRK-10` plus `FEAT-BRK-18` (provider specification snapshots, parity-programme Phase 4a). IDs `FEAT-BRK-11` through `FEAT-BRK-16` are retired from current-state registration after their behavior moved into provider channels, Events, Reconciliation, and Conformance. `canonical_contracts/` and `_shared/` are documented non-feature support and own no independent feature behavior.
+
+#### Explicit order-policy v2 requirements
+
+Broker order request v2 preserves Trading's independent fill and lifetime dimensions and binds
+them to the exact provider-specification checksum. V1 remains available during the declared
+migration window. The MT5 v2 path never substitutes symbol defaults; unsupported `BOC` fails
+before transport because the verified snapshot vocabulary does not admit it.
+
+| Status | Requirement | Public contract | Evidence |
+| --- | --- | --- | --- |
+| Completed | `FR-BRK-164` Brokers shall accept immutable order request v2 with independent fill/time policy and conditional aware-UTC expiration. | `build_broker_order_request_v2` | `app/services/brokers/canonical_contracts/models.py`; `tests/brokers/integration/test_order_policy_v2_adapter.py`; `tests/brokers/usage/features/02_metatrader.py::fr_brk_164()` |
+| Completed | `FR-BRK-165` MT5 shall map fill and time policies through independent verified constant tables and never substitute a symbol preference. | MT5 order command mapping | `app/services/brokers/metatrader/commands.py`; `tests/brokers/unit/test_order_policy_v2_mapping.py`; `tests/brokers/usage/features/02_metatrader.py::fr_brk_165()` |
+| Completed | `FR-BRK-166` Unsupported/tampered combinations shall fail before transport while v1 remains available in the shared release window. | Provider-bound v2 factory | `app/services/brokers/canonical_contracts/public.py`; `tests/brokers/unit/test_order_policy_v2_mapping.py`; `tests/brokers/usage/features/02_metatrader.py::fr_brk_166()` |
 
 | Order | Feature                    | File order                                                                                                                                        |
 | ----: | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |

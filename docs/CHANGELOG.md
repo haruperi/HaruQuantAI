@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Map explicit MT5 order policies
+
+Brokers now preserves independent fill and lifetime policy from canonical request v2 into verified MT5 command fields (Phase 6b).
+
+#### Changed (1)
+
+- Added provider-bound Broker order request v2 with independent `type_filling`/`type_time` mapping, conditional UTC expiration, unsupported-combination rejection, and no symbol-default substitution.
+
 ### Add explicit Trading order policies
 
 Trading request and executable-intent v2 now preserve independent fill and lifetime policy against an exact provider-specification revision (Phase 6a).

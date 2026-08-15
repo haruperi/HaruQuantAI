@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
 from types import MappingProxyType
-from typing import ClassVar, Literal, cast
+from typing import ClassVar, Literal, cast, override
 
 from pydantic import SecretStr
 
@@ -24,6 +24,8 @@ from app.utils import (
     redact_text_value,
     validate_id,
 )
+
+_SHA256_HEX_LENGTH = 64
 
 
 def _text(value: str, name: str) -> None:
@@ -1443,11 +1445,12 @@ class BrokerOrderRequest(_Schema):
             _positive(self.stop_price, "stop_price")
 
         # Time-in-force vs expiration matrix (REV-BRK-005)
-        if self.time_in_force == "GTD":
-            if self.expiration is None:
-                raise ValueError("GTD order requires expiration datetime")
-        elif self.expiration is not None:
-            raise ValueError("Only GTD orders may specify expiration datetime")
+        if self.contract_version == "v1":
+            if self.time_in_force == "GTD":
+                if self.expiration is None:
+                    raise ValueError("GTD order requires expiration datetime")
+            elif self.expiration is not None:
+                raise ValueError("Only GTD orders may specify expiration datetime")
 
         if self.deviation_points is not None and self.deviation_points < 0:
             raise ValueError("deviation_points must not be negative")
@@ -1461,6 +1464,40 @@ class BrokerOrderRequest(_Schema):
             "comment",
         ):
             _optional_text(getattr(self, name), name)
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class BrokerOrderRequestV2(BrokerOrderRequest):
+    """Provider-bound order request with independent explicit policies."""
+
+    CONTRACT_VERSION: ClassVar[str] = "v2"
+    SCHEMA_ID: ClassVar[str] = "brokers.order_request.v2"
+    fill_policy: Literal["FOK", "IOC", "RETURN", "BOC"]
+    time_policy: Literal["GTC", "DAY", "SPECIFIED", "SPECIFIED_DAY"]
+    provider_specification_checksum: str
+    legacy_compatibility: bool = False
+
+    @override
+    def __post_init__(self) -> None:
+        """Validate v2 policy and expiration semantics.
+
+        Raises:
+            ValueError: If a policy, revision, or expiration is invalid.
+        """
+        super(BrokerOrderRequestV2, self).__post_init__()
+        _choice(self.fill_policy, {"FOK", "IOC", "RETURN", "BOC"}, "fill_policy")
+        _choice(
+            self.time_policy,
+            {"GTC", "DAY", "SPECIFIED", "SPECIFIED_DAY"},
+            "time_policy",
+        )
+        if len(self.provider_specification_checksum) != _SHA256_HEX_LENGTH:
+            raise ValueError("provider specification checksum must be SHA-256")
+        requires_expiration = self.time_policy in {"SPECIFIED", "SPECIFIED_DAY"}
+        if requires_expiration != (self.expiration is not None):
+            raise ValueError("v2 order expiration shape is invalid")
+        if self.time_in_force is not None:
+            raise ValueError("v2 order cannot carry legacy time_in_force")
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

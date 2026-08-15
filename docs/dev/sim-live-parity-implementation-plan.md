@@ -1521,6 +1521,19 @@ available. The full Trading behavioral run passed 233 tests, with one configured
 one unrelated pre-existing workflow-literal assertion (`EXECUTION_TARGET`) failure; neither was
 changed because workflow configuration is outside Unit 6a. Unit 6b remains Pending.
 
+6b Completed 2026-08-15 under the same goal-wide approval. Broker order request v2 is bound to
+the exact provider revision at `app/services/brokers/canonical_contracts/public.py:112`; immutable
+policy/expiration rules live at `app/services/brokers/canonical_contracts/models.py:1470`; independent
+MT5 fields map at `app/services/brokers/metatrader/commands.py:344`. Focused evidence passed 14/14
+(`tests/brokers/unit/test_order_policy_v2_mapping.py:67`,
+`tests/brokers/integration/test_order_policy_v2_adapter.py:14`). Automatic blocker resolutions:
+the full Brokers gate passed 585 tests but retains eight unrelated failures (stale modify capability
+availability expectations, pre-existing documentation-parity docstrings, and legacy mutation-mock
+sequencing) plus three credential skips, so those were recorded and left outside 6b;
+the direct usage emitted SUCCESS for all three new FR functions before the existing genuine demo
+connection failed with `BROKER_CONNECTION_FAILED`. The bounded recommendation is to retain the
+transport-free Phase 6b evidence and not weaken credentials/readiness or mutate external demo state.
+
 - [ ] Approval matched this exact phase/subphase.
 - [ ] Only the local file and documentation manifests changed.
 - [ ] Every listed FR has final `path:line` implementation and test evidence.
