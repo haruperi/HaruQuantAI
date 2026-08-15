@@ -320,6 +320,9 @@ class SimulationBacktestRequestV2(SimulationBacktestRequestV1):
         "genuine_bid_ask_ticks", "depth_supported_ticks", "derived_bar_model"
     ]
     decision_instant_policy: Literal["point_in_time_available_at"]
+    market_evidence_eligible: bool = False
+    required_clock_edges: tuple[str, ...] = ()
+    evidenced_clock_edges: tuple[str, ...] = ()
     provider_specification_revisions: tuple[ProviderSpecificationRevisionBinding, ...]
     initial_authority_state_hash: str
     certification_target: Literal["demo", "live"]
@@ -340,6 +343,9 @@ class SimulationBacktestRequestV2(SimulationBacktestRequestV1):
             material = dict(value)
             material.setdefault("contract_version", "v2")
             material.setdefault("schema_id", "simulation.backtest_request.v2")
+            material.setdefault("market_evidence_eligible", False)
+            material.setdefault("required_clock_edges", ())
+            material.setdefault("evidenced_clock_edges", ())
             return _hash_material(material)
 
         return guard_operation(
@@ -372,7 +378,7 @@ class SimulationBacktestRequestV2(SimulationBacktestRequestV1):
         return value
 
     @model_validator(mode="after")
-    def _validate_execution_identity(self) -> Self:  # noqa: C901
+    def _validate_execution_identity(self) -> Self:  # noqa: C901, PLR0912
         """Require ordered continuous matching provider revision coverage.
 
         Returns:
@@ -381,6 +387,19 @@ class SimulationBacktestRequestV2(SimulationBacktestRequestV1):
         Raises:
             ValueError: If execution identity or coverage is invalid.
         """
+        if self.required_clock_edges != tuple(sorted(set(self.required_clock_edges))):
+            raise ValueError("required clock edges must be ordered and unique")
+        if self.evidenced_clock_edges != tuple(
+            sorted(set(self.evidenced_clock_edges))
+        ) or not set(self.evidenced_clock_edges).issubset(
+            set(self.required_clock_edges)
+        ):
+            raise ValueError("evidenced clock edges must be an ordered required subset")
+        if self.market_evidence_eligible and (
+            self.market_evidence_class == "derived_bar_model"
+            or self.evidenced_clock_edges != self.required_clock_edges
+        ):
+            raise ValueError("market evidence eligibility is not proven")
         revisions = self.provider_specification_revisions
         if not revisions:
             raise ValueError("provider specification revisions are required")

@@ -136,6 +136,7 @@ _EXPECTED: dict[str, tuple[str, ...]] = {
         "validate_fx_evidence",
         "validate_intent_timing",
         "validate_market_data",
+        "validate_market_evidence_lineage",
         "validate_phase_one_scope",
         "validate_run_inputs",
         "verify_recovery_checkpoints",
@@ -204,6 +205,7 @@ _EXPECTED: dict[str, tuple[str, ...]] = {
     "app.services.simulator.validation": (
         "SUPPORTED_ASSET_CLASSES",
         "validate_market_data",
+        "validate_market_evidence_lineage",
         "validate_phase_one_scope",
         "validate_run_inputs",
     ),

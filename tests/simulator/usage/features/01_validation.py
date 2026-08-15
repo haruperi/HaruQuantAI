@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.data import (
     build_data_quality_report,
     build_market_dataset,
+    build_ohlcv_record,
     build_tick_record,
 )
 from app.services.simulator import (
@@ -25,6 +26,7 @@ from app.services.simulator import (
     dump_simulation_value,
     unwrap_simulation_response,
     validate_market_data,
+    validate_market_evidence_lineage,
     validate_phase_one_scope,
     validate_run_inputs,
 )
@@ -129,6 +131,54 @@ def _context(dataset: object) -> object:
     )
 
 
+def _source_dataset() -> object:
+    """Build one valid Data-owned source-bar dataset."""
+    instant = datetime(2025, 1, 2, 12, tzinfo=UTC)
+    available = instant + timedelta(minutes=1)
+    record = build_ohlcv_record(
+        timestamp=instant,
+        source="fixture",
+        source_symbol="EURUSD",
+        available_at=available,
+        open=Decimal("1.10000"),
+        high=Decimal("1.10100"),
+        low=Decimal("1.09900"),
+        close=Decimal("1.10050"),
+        volume=Decimal(10),
+        price_unit="quote",
+        volume_unit="ticks",
+    )
+    quality = build_data_quality_report(
+        quality_status="perfect",
+        quality_decision="accepted",
+        quality_score=Decimal(100),
+        record_count=1,
+        checked_count=1,
+        truncated=False,
+        sample_limit=1,
+        schema_version="v1",
+        generated_at=available,
+    )
+    return build_market_dataset(
+        normalization_version="v1",
+        data_kind="bars",
+        symbol="EURUSD",
+        timeframe="M1",
+        records=(record,),
+        start=instant,
+        end=instant,
+        available_at=available,
+        record_count=1,
+        quality_report=quality,
+        source_metadata={"source": "fixture"},
+        license_metadata={"license": "test"},
+        cache_status="not_used",
+        workflow_context="backtest",
+        precision_policy="decimal_string",
+        request_id="req-22222222-2222-4222-8222-222222222222",
+    )
+
+
 def fr_sim_001() -> None:
     """
     FR-SIM-001: Stage 2 — Validate run request structure and strategy references.
@@ -195,6 +245,50 @@ def fr_sim_002() -> None:
     print(f"Data -> validated_evidence={dump_simulation_value(evidence)}")
 
 
+def fr_sim_136() -> None:
+    """FR-SIM-136: Validate source and tick integrity with separate hashes."""
+    ticks = _dataset()
+    decision = ticks.available_at + timedelta(minutes=1)
+    response = validate_market_evidence_lineage(
+        _source_dataset(),
+        ticks,
+        decision_instant=decision,
+        runtime_profile="simulation",
+        path_sensitive=True,
+        required_clock_edges=("availability", "decision"),
+        clock_edges={"availability": ticks.available_at, "decision": decision},
+    )
+    evidence = _value(response)
+    print(_format_result(response))
+    print(
+        f"Data -> source_hash={evidence.source_lineage_hash}, tick_hash={evidence.tick_lineage_hash}"
+    )
+
+
+def fr_sim_209() -> None:
+    """FR-SIM-209: Bind evidence class and explicit clock-edge eligibility."""
+    ticks = _dataset()
+    decision = ticks.available_at + timedelta(minutes=1)
+    response = validate_market_evidence_lineage(
+        _source_dataset(),
+        ticks,
+        decision_instant=decision,
+        runtime_profile="simulation",
+        path_sensitive=True,
+        required_clock_edges=("acknowledgement", "availability", "decision"),
+        clock_edges={
+            "acknowledgement": None,
+            "availability": ticks.available_at,
+            "decision": decision,
+        },
+    )
+    evidence = _value(response)
+    print(_format_result(response))
+    print(
+        f"Data -> class={evidence.market_evidence_class}, eligible={evidence.parity_eligible}, missing={evidence.missing_clock_edges}"
+    )
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -212,6 +306,8 @@ def main() -> None:
 
     # Stage 3: Data Quality Gate Evidence
     fr_sim_002()
+    fr_sim_136()
+    fr_sim_209()
 
 
 if __name__ == "__main__":

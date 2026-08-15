@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from datetime import datetime
-from typing import Any
+from datetime import datetime, timedelta
+from decimal import Decimal
+from typing import Any, Literal
 
 from app.services.data import is_ohlcv_record, is_tick_record
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.validation.contracts import (
     MarketDataValidationContext,
+    MarketEvidenceLineage,
     ValidatedMarketDataEvidence,
 )
 from app.utils import canonical_digest, canonical_json, get_logger
@@ -154,12 +156,40 @@ def _validate_records(dataset: MarketDataset) -> None:
         SimulationError: If record evidence is invalid.
     """
     logger.debug("Validating Simulation market-data records")
+    if dataset.record_count != len(dataset.records) or not dataset.records:
+        _raise(
+            "SIM_DATA_COVERAGE_INSUFFICIENT", "Dataset record coverage is incomplete"
+        )
     timestamps = tuple(record.timestamp for record in dataset.records)
     if timestamps != tuple(sorted(timestamps)):
         _raise("SIM_DATA_NON_MONOTONIC", "Dataset timestamps are not monotonic")
     if len(set(timestamps)) != len(timestamps):
         _raise("SIM_DATA_DUPLICATE_TIMESTAMP", "Dataset timestamps are not unique")
     for record in dataset.records:
+        if any(
+            value.tzinfo is None or value.utcoffset() != timedelta(0)
+            for value in (record.timestamp, record.available_at)
+        ):
+            _raise("SIM_DATA_SCHEMA_INVALID", "Record timestamps must be aware UTC")
+        numeric = tuple(
+            getattr(record, field, None)
+            for field in (
+                "open",
+                "high",
+                "low",
+                "close",
+                "bid",
+                "ask",
+                "last",
+                "volume",
+            )
+        )
+        if any(
+            value is not None
+            and (not isinstance(value, Decimal) or not value.is_finite())
+            for value in numeric
+        ):
+            _raise("SIM_DATA_SCHEMA_INVALID", "Record numerics must be finite Decimal")
         if is_ohlcv_record(record) and not (
             record.low <= record.open <= record.high
             and record.low <= record.close <= record.high
@@ -216,9 +246,102 @@ def validate_market_data(
     )
 
 
+def validate_market_evidence_lineage(  # noqa: C901, PLR0912
+    source_dataset: MarketDataset,
+    tick_dataset: MarketDataset,
+    *,
+    decision_instant: datetime,
+    runtime_profile: str,
+    path_sensitive: bool,
+    required_clock_edges: tuple[str, ...],
+    clock_edges: Mapping[str, datetime | None],
+) -> MarketEvidenceLineage:
+    """Validate source/tick lineage and point-in-time parity eligibility.
+
+    Args:
+        source_dataset: Data-owned source bars or genuine tick dataset.
+        tick_dataset: Data-owned tick evidence after any derivation.
+        decision_instant: Exact simulated decision timestamp.
+        runtime_profile: ``simulation`` or ``fast_research``.
+        path_sensitive: Whether the requested behavior depends on intrabar order.
+        required_clock_edges: Predeclared clock edges required by the envelope.
+        clock_edges: Evidenced edge timestamps; absence remains explicit.
+
+    Returns:
+        Immutable independent hashes, classification, coverage, and eligibility.
+
+    Raises:
+        SimulationError: If lineage, availability, classification, or timing fails.
+    """
+    if decision_instant.tzinfo is None or decision_instant.utcoffset() != timedelta(0):
+        _raise("SIM_INVALID_CONFIG", "Decision instant must be aware UTC")
+    if runtime_profile not in {"simulation", "fast_research"}:
+        _raise("SIM_UNSUPPORTED_OPERATION", "Runtime profile is unsupported")
+    if not source_dataset.records or not tick_dataset.records:
+        _raise("SIM_DATA_COVERAGE_INSUFFICIENT", "Lineage datasets cannot be empty")
+    _validate_records(source_dataset)
+    _validate_records(tick_dataset)
+    for dataset in (source_dataset, tick_dataset):
+        if dataset.available_at > decision_instant or any(
+            record.available_at > decision_instant for record in dataset.records
+        ):
+            _raise("SIM_LOOKAHEAD_DETECTED", "Market evidence is not yet available")
+
+    model = str(tick_dataset.source_metadata.get("tick_generation_model", ""))
+    declared_class = tick_dataset.source_metadata.get("market_evidence_class")
+    evidence_class: Literal[
+        "genuine_bid_ask_ticks", "depth_supported_ticks", "derived_bar_model"
+    ]
+    if declared_class == "depth_supported_ticks":
+        evidence_class = "depth_supported_ticks"
+    elif model == "real":
+        evidence_class = "genuine_bid_ask_ticks"
+    elif model:
+        evidence_class = "derived_bar_model"
+    else:
+        _raise("SIM_UNSUPPORTED_TICK_MODEL", "Tick lineage model is missing")
+    if any(
+        not is_tick_record(record) or record.bid is None or record.ask is None
+        for record in tick_dataset.records
+    ):
+        _raise("SIM_SPREAD_MISSING", "Tick lineage requires bid and ask evidence")
+    if path_sensitive and evidence_class == "derived_bar_model":
+        _raise(
+            "SIM_UNSUPPORTED_TICK_MODEL",
+            "Derived-bar evidence is not pathwise parity eligible",
+        )
+    if evidence_class == "derived_bar_model" and runtime_profile != "fast_research":
+        _raise(
+            "SIM_UNSUPPORTED_TICK_MODEL",
+            "Derived-bar evidence requires fast research or a registered invariant",
+        )
+
+    if required_clock_edges != tuple(sorted(set(required_clock_edges))):
+        _raise("SIM_INVALID_CONFIG", "Required clock edges must be ordered and unique")
+    evidenced: list[str] = []
+    for name, value in sorted(clock_edges.items()):
+        if value is None:
+            continue
+        if value.tzinfo is None or value.utcoffset() != timedelta(0):
+            _raise("SIM_INVALID_CONFIG", "Clock-edge timestamps must be aware UTC")
+        evidenced.append(name)
+    missing = tuple(edge for edge in required_clock_edges if edge not in evidenced)
+    return MarketEvidenceLineage(
+        source_lineage_hash=_dataset_hash(source_dataset),
+        tick_lineage_hash=_dataset_hash(tick_dataset),
+        market_evidence_class=evidence_class,
+        tick_model=model,
+        decision_instant=decision_instant,
+        evidenced_clock_edges=tuple(evidenced),
+        missing_clock_edges=missing,
+        parity_eligible=not missing,
+    )
+
+
 __all__ = [
     "SUPPORTED_ASSET_CLASSES",
     "validate_market_data",
+    "validate_market_evidence_lineage",
     "validate_phase_one_scope",
     "validate_run_inputs",
 ]

@@ -1958,6 +1958,23 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
+Unit 9 completed 2026-08-15 under the goal-wide owner approval. Immutable lineage evidence,
+source/tick validation, and request-v2 identity binding are implemented at
+`app/services/simulator/validation/contracts.py:122`,
+`app/services/simulator/validation/validate.py:249`, and
+`app/services/simulator/run/contracts.py:308`. Usage evidence is
+`tests/simulator/usage/features/01_validation.py:248` and `:268`; focused evidence is
+`tests/simulator/unit/test_market_evidence_lineage.py:125`, `:134`, `:141`, `:157`, `:196` and
+`tests/simulator/integration/test_decision_instant_eligibility.py:18`, `:28`, `:48`, `:55`.
+
+Automatic blocker resolution: the literal focused pytest command passed all 14 behaviors but exited
+because global coverage measures all 71,628 application statements from two focused files (19.30%
+versus the global 80% threshold). The scope-correct focused gate passed 14/14, related validation,
+timeline, request-v2, orchestrator, and API regressions passed 104/104, and the full Simulator
+behavioral gate passed 419/419. Ruff, mypy, and usage 01 passed. No availability timestamp was inferred,
+no source/tick ordering was normalized before hashing, and missing clock edges explicitly remove
+eligibility rather than synthesizing evidence. Data ingestion and historical timestamps were untouched.
+
 - [ ] Approval matched this exact phase/subphase.
 - [ ] Only the local file and documentation manifests changed.
 - [ ] Every listed FR has final `path:line` implementation and test evidence.

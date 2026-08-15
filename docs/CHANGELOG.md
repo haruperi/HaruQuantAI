@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Bind source and tick lineage
+
+Simulator now proves independent source/tick identities, market-evidence class, clock coverage, and decision-time eligibility before parity admission (Phase 9).
+
+#### Fixed (1)
+
+- Added fail-closed source/tick integrity and lookahead validation, derived-path exclusion, and request-v2 eligibility identity fields.
+
 ### Reconcile live execution positions from authority deals
 
 Trading now derives execution-position state from verified Broker deals and position snapshots rather than durable receipt payloads (Phase 8).

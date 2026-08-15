@@ -41,6 +41,10 @@ _VALUE_TYPES: Mapping[str, tuple[str, str]] = {
         "app.services.simulator.validation.contracts",
         "MarketDataValidationContext",
     ),
+    "MarketEvidenceLineage": (
+        "app.services.simulator.validation.contracts",
+        "MarketEvidenceLineage",
+    ),
     "MatchResult": ("app.services.simulator.execution", "MatchResult"),
     "PortfolioBacktestRequestV1": (
         "app.services.simulator.run",
@@ -1054,6 +1058,20 @@ def validate_market_data(*args: object, **kwargs: object) -> StandardResponse[ob
     )(*args, **kwargs)
 
 
+def validate_market_evidence_lineage(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Validate independent source/tick lineage and decision-time eligibility."""
+    return _guarded(
+        _operation(
+            "app.services.simulator.validation", "validate_market_evidence_lineage"
+        ),
+        operation="simulation.validation.validate_market_evidence_lineage",
+        risk_level="low",
+        read_only=True,
+    )(*args, **kwargs)
+
+
 def validate_phase_one_scope(
     *args: object, **kwargs: object
 ) -> StandardResponse[object]:
@@ -1547,6 +1565,7 @@ __all__: tuple[str, ...] = (
     "validate_fx_evidence",
     "validate_intent_timing",
     "validate_market_data",
+    "validate_market_evidence_lineage",
     "validate_phase_one_scope",
     "validate_run_inputs",
     "verify_recovery_checkpoints",
