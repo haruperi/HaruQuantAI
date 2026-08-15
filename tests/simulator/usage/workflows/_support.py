@@ -570,6 +570,19 @@ class WorkflowSimulationDependencies:
             ),
         )
 
+    async def evaluate_point_in_time_cycle(
+        self, dataset: object, decision_at: object, engine: object, request: object
+    ) -> object:
+        """Return the workflow's neutral v2 cycle from bounded evidence.
+
+        Raises:
+            ValueError: If future evidence crosses the composition boundary.
+        """
+        del engine, request
+        if any(record.available_at > decision_at for record in dataset.records):
+            raise ValueError("future evidence reached the evaluation cycle")
+        return {"mutation_performed": False, "decision_at": decision_at.isoformat()}
+
     def build_order_intents(
         self, decisions: tuple[object, ...], request: object
     ) -> tuple[object, ...]:

@@ -36,6 +36,7 @@ class _SimulationDependencies:
     terminal_action_port: _Port | None = None
     initial_authority_state_port: _Port | None = None
     account_activity_port: _Port | None = None
+    point_in_time_cycle_port: _Port | None = None
 
     def persist_audit_event(self, event: object) -> object:
         """Persist one bounded audit event through the supplied Data port."""
@@ -157,6 +158,24 @@ class _SimulationDependencies:
             raise ValueError("account_activity port is required for v2 runs")
         return self.account_activity_port(request)
 
+    async def evaluate_point_in_time_cycle(
+        self, dataset: object, decision_at: object, engine: object, request: object
+    ) -> object:
+        """Invoke the shared Trading cycle for one scheduler instant.
+
+        Raises:
+            ValueError: If canonical point-in-time composition is absent.
+            TypeError: If the injected cycle is not asynchronous.
+        """
+        if self.point_in_time_cycle_port is None:
+            raise ValueError(
+                "point_in_time_cycle port is required for canonical v2 runs"
+            )
+        result = self.point_in_time_cycle_port(dataset, decision_at, engine, request)
+        if not hasattr(result, "__await__"):
+            raise TypeError("point_in_time_cycle port must return an awaitable")
+        return await result
+
 
 def build_simulation_run_dependencies(
     *,
@@ -199,6 +218,7 @@ def build_simulation_run_dependencies(
         "terminal_action",
         "initial_authority_state",
         "account_activity",
+        "point_in_time_cycle",
     )
     if not isinstance(state_store, SimulationStateStore):
         raise TypeError("state_store must implement SimulationStateStore")
@@ -228,6 +248,7 @@ def build_simulation_run_dependencies(
         terminal_action_port=ports.get("terminal_action"),
         initial_authority_state_port=ports.get("initial_authority_state"),
         account_activity_port=ports.get("account_activity"),
+        point_in_time_cycle_port=ports.get("point_in_time_cycle"),
     )
 
 

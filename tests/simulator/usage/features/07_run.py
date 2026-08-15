@@ -17,6 +17,8 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.simulator import (
+    build_evaluation_latency,
+    build_point_in_time_dataset,
     calculate_portfolio_backtest_config_hash,
     calculate_simulation_backtest_config_hash,
     calculate_simulation_backtest_v2_config_hash,
@@ -456,6 +458,46 @@ def fr_sim_217() -> None:
     fr_sim_216()
 
 
+def fr_sim_218() -> None:
+    """FR-SIM-218: Bound each decision to scheduler-visible evidence."""
+    dataset = live_tick_dataset()
+    visible = unwrap_simulation_response(
+        build_point_in_time_dataset(dataset, dataset.records[0].available_at),
+        operation="usage.build_point_in_time_dataset",
+    )
+    print(f"Data -> visible_records='{visible.record_count}'")
+
+
+def fr_sim_219() -> None:
+    """FR-SIM-219: Evaluate incrementally through the shared Trading cycle."""
+    fr_sim_218()
+
+
+def fr_sim_220() -> None:
+    """FR-SIM-220: Exclude evidence unavailable at the decision instant."""
+    fr_sim_218()
+
+
+def fr_sim_221() -> None:
+    """FR-SIM-221: Use scheduler time for evaluation timing evidence."""
+    dataset = live_tick_dataset()
+    instant = dataset.records[0].available_at
+    latency = unwrap_simulation_response(
+        build_evaluation_latency(instant, instant),
+        operation="usage.build_evaluation_latency",
+    )
+    print(f"Data -> scheduler_latency='{latency}'")
+
+
+def fr_sim_222() -> None:
+    """FR-SIM-222: Omit latency when a scheduler clock edge is absent."""
+    latency = unwrap_simulation_response(
+        build_evaluation_latency(None, None),
+        operation="usage.build_evaluation_latency",
+    )
+    print(f"Data -> missing_edge_latency='{latency}'")
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -491,6 +533,11 @@ def main() -> None:
     fr_sim_215()
     fr_sim_216()
     fr_sim_217()
+    fr_sim_218()
+    fr_sim_219()
+    fr_sim_220()
+    fr_sim_221()
+    fr_sim_222()
 
 
 if __name__ == "__main__":

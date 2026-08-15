@@ -221,6 +221,10 @@ def test_fr_sim_235_async_success_and_running_loop_sync_failure(
             """Return no approved request for the fixture's neutral strategy."""
             return ()
 
+        async def evaluate_point_in_time_cycle(self, *_args: object) -> dict[str, bool]:
+            """Return one neutral shared-cycle result per visible instant."""
+            return {"mutation_performed": False}
+
     dependencies = V2Dependencies(tmp_path, dataset)
 
     async def exercise() -> None:

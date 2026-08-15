@@ -685,6 +685,16 @@ class SimulationRunDependencies(Protocol):
         """Load complete ordered foreign/manual activity evidence."""
         ...
 
+    async def evaluate_point_in_time_cycle(
+        self,
+        dataset: MarketDataset,
+        decision_at: datetime,
+        engine: object,
+        request: SimulationBacktestRequestV2,
+    ) -> StandardResponse[object]:
+        """Invoke Trading's shared evaluation cycle at scheduler time."""
+        ...
+
     def resolve_execution_profile(
         self, request: SimulationBacktestRequestV1
     ) -> StandardResponse[ExecutionProfile]:

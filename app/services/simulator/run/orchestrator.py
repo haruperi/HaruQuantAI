@@ -28,6 +28,7 @@ from app.services.simulator.reporting import (
 )
 from app.services.simulator.run.audit import emit_simulation_audit
 from app.services.simulator.run.contracts import SimulationBacktestRequestV2
+from app.services.simulator.run.evaluation import run_point_in_time_evaluation
 from app.services.simulator.state.runtime import (
     validate_account_activity_ownership,
     validate_initial_authority_state,
@@ -279,6 +280,7 @@ class RunContext:
     """
 
     timeline: tuple[Tick, ...]
+    source_dataset: Any
     evidence: Any
     writer: Any
     ledger: AccountLedger
@@ -364,18 +366,6 @@ def prepare_run_context(
         cost_model,
     )
     engine = EventDrivenExecutionEngine(ledger, writer, profile, _ENGINE_VERSION)
-    indicators = unwrap_simulation_response(
-        dependencies.calculate_indicators(source_dataset, request),
-        operation="simulation.run.calculate_indicators",
-    )
-    strategy_intents = unwrap_simulation_response(
-        dependencies.evaluate_strategy(source_dataset, indicators, request),
-        operation="simulation.run.evaluate_strategy",
-    )
-    risk_decisions = unwrap_simulation_response(
-        dependencies.review_risk(strategy_intents, request),
-        operation="simulation.run.review_risk",
-    )
     approved_requests: tuple[object, ...] = ()
     if isinstance(request, SimulationBacktestRequestV2):
         snapshot = unwrap_simulation_response(
@@ -395,22 +385,20 @@ def prepare_run_context(
         validate_account_activity_ownership(
             validated_snapshot["ownership"], tuple(activity)
         )
-        approved_requests = tuple(
-            sorted(
-                unwrap_simulation_response(
-                    dependencies.build_approved_requests(
-                        strategy_intents, risk_decisions, request
-                    ),
-                    operation="simulation.run.build_approved_requests",
-                ),
-                key=lambda item: (
-                    cast("Any", item).system_time,
-                    cast("Any", item).request_id,
-                ),
-            )
-        )
         order_intents: tuple[OrderIntent, ...] = ()
     else:
+        indicators = unwrap_simulation_response(
+            dependencies.calculate_indicators(source_dataset, request),
+            operation="simulation.run.calculate_indicators",
+        )
+        strategy_intents = unwrap_simulation_response(
+            dependencies.evaluate_strategy(source_dataset, indicators, request),
+            operation="simulation.run.evaluate_strategy",
+        )
+        risk_decisions = unwrap_simulation_response(
+            dependencies.review_risk(strategy_intents, request),
+            operation="simulation.run.review_risk",
+        )
         approved_order_intents: tuple[OrderIntent, ...] = unwrap_simulation_response(
             dependencies.build_order_intents(risk_decisions, request),
             operation="simulation.run.build_order_intents",
@@ -423,6 +411,7 @@ def prepare_run_context(
         )
     return RunContext(
         timeline=timeline,
+        source_dataset=source_dataset,
         evidence=evidence,
         writer=writer,
         ledger=ledger,
@@ -440,6 +429,7 @@ async def advance_trading_timeline(
     timeline: tuple[Tick, ...],
     unsent: list[object],
     receipts: list[object],
+    source_dataset: object | None = None,
 ) -> None:
     """Advance canonical v2 commands through public Trading actions.
 
@@ -450,6 +440,10 @@ async def advance_trading_timeline(
         timeline: Complete deterministic tick sequence.
         unsent: Approved Trading requests, drained in place.
         receipts: Authority results, appended in place.
+        source_dataset: Complete immutable evidence to filter at each instant.
+
+    Raises:
+        ValueError: If point-in-time evidence or composition is invalid.
     """
     for tick in timeline:
         receipts.extend(
@@ -461,6 +455,26 @@ async def advance_trading_timeline(
                 ),
             )
         )
+        if source_dataset is not None:
+            try:
+                outcome = await run_point_in_time_evaluation(
+                    source_dataset,
+                    tick.timestamp,
+                    lambda visible, decision_at: (
+                        dependencies.evaluate_point_in_time_cycle(
+                            visible, decision_at, engine, request
+                        )
+                    ),
+                )
+            except ValueError as error:
+                if str(error) == "no market evidence is available at decision_at":
+                    continue
+                raise
+            receipts.append(
+                unwrap_simulation_response(
+                    outcome, operation="simulation.run.evaluate_point_in_time_cycle"
+                )
+            )
         while unsent and cast("Any", unsent[0]).system_time <= tick.timestamp:
             result = await dependencies.execute_trading_action(
                 unsent.pop(0), engine, request
@@ -694,6 +708,7 @@ async def _run_backtest_with_evidence_async(  # noqa: PLR0915
                 timeline,
                 list(context.approved_requests),
                 receipts,
+                context.source_dataset,
             )
         else:
             unsent = list(order_intents)

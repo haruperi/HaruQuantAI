@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Run incremental point-in-time evaluation
+
+Canonical Simulation v2 now evaluates each scheduler instant through bounded evidence and the shared Trading-cycle composition (Phase 15b).
+
+#### Changed (1)
+
+- Removed whole-run v2 decision precomputation, excluded future records structurally, and omitted latency when scheduler clock-edge evidence is incomplete.
+
 ### Inject evaluation deadlines
 
 Trading evaluation now receives route-owned deadline authority while preserving one public cycle and route-neutral results (Phase 15a).

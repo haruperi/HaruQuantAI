@@ -2393,6 +2393,19 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 **Unit 15a validation note:** the literal full Trading command passed 264 behaviors with one credential-dependent skip and exited 1 only because repository-wide subset coverage was 22.14%; its `--no-cov` behavioral counterpart passed. The first literal attempt was terminated by the 60-second shell window and the bounded rerun completed normally.
 
+### Unit 15b completion evidence
+
+- [x] Approval matched Unit 15b. Evidence: owner goal-wide `APPROVED: EXECUTE`.
+- [x] `FR-SIM-218`–`222` have implementation and test evidence. Evidence: `app/services/simulator/run/evaluation.py:13`, `app/services/simulator/run/orchestrator.py:425`, `tests/simulator/unit/test_point_in_time_evaluation.py:12`, `tests/simulator/integration/test_incremental_trading_cycle.py:14`, `tests/simulator/integration/test_no_future_reads.py:11`, `tests/simulator/integration/test_latency_clock_edges.py:13`.
+- [x] Canonical v2 evaluates incrementally and v1 compatibility remains bounded. Evidence: `app/services/simulator/run/orchestrator.py:425`; full Simulator behavior gate passed.
+- [x] Future records are structurally excluded and missing clock edges omit latency. Evidence: `app/services/simulator/run/evaluation.py:13`, `app/services/simulator/run/evaluation.py:48`.
+- [x] Public API, usage, README, and changelog are reconciled. Evidence: `app/services/simulator/__init__.py:1073`, `tests/simulator/usage/features/07_run.py:461`, `app/services/simulator/README.md`, `docs/CHANGELOG.md`.
+- [x] Ruff and mypy passed for Simulator. Evidence: Ruff passed; mypy passed 96 source files.
+- [x] Rollback was reviewed. Evidence: remove `run/evaluation.py`, four tests and exports; restore dependency/orchestrator/usage/docs edits; rerun Simulator gates.
+- [x] Unit 15a hash reconciled as `0f8a7d27`; Unit 15b hash will be recorded in Phase 16.
+
+**Unit 15b validation note:** the literal four-file command passed all 6 behaviors and exited 1 only on the repository-wide 19.06% coverage floor. The literal full Simulator command passed all behavior after its three in-scope fixture/registry corrections and exited on the repository-wide 29.50% coverage floor; its full `--no-cov` behavioral counterpart passed all 452 tests.
+
 **Commit reconciliation:** Unit 11b is committed as `210e7aba83d6acf1ea15df5de61dc5489b5be25e` with the exact prescribed message.
 
 # Phase 12 · Simulation mutation surface

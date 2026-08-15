@@ -1070,6 +1070,30 @@ def run_backtest(*args: object, **kwargs: object) -> StandardResponse[object]:
     )(*args, **kwargs)
 
 
+def build_evaluation_latency(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Build scheduler-clock evaluation latency when both edges exist."""
+    return _guarded(
+        _operation("app.services.simulator.run", "build_evaluation_latency"),
+        operation="simulation.run.build_evaluation_latency",
+        risk_level="low",
+        read_only=True,
+    )(*args, **kwargs)
+
+
+def build_point_in_time_dataset(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
+    """Build one Data contract bounded by a scheduler decision instant."""
+    return _guarded(
+        _operation("app.services.simulator.run", "build_point_in_time_dataset"),
+        operation="simulation.run.build_point_in_time_dataset",
+        risk_level="low",
+        read_only=True,
+    )(*args, **kwargs)
+
+
 async def run_backtest_async(
     *args: object, **kwargs: object
 ) -> StandardResponse[object]:
@@ -1558,12 +1582,14 @@ __all__: tuple[str, ...] = (
     "branch_recovery_checkpoint",
     "build_artifact_manifest",
     "build_checklist_definition",
+    "build_evaluation_latency",
     "build_fill_model_provider",
     "build_injected_event",
     "build_json_report",
     "build_latency_profile",
     "build_markdown_report",
     "build_mission_definition",
+    "build_point_in_time_dataset",
     "build_queue_model",
     "build_replay_identity",
     "build_scenario_evidence_provider",
