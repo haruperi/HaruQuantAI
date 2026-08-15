@@ -1,9 +1,12 @@
 """Contracts for loading an approved local CSV or Parquet dataset."""
 
+from collections.abc import Mapping
+from datetime import UTC, datetime
 from pathlib import Path
+from types import MappingProxyType
 from typing import Literal
 
-from pydantic import field_validator
+from pydantic import ConfigDict, field_serializer, field_validator
 
 from app.services.data.contracts._base import TracedOpenContract
 
@@ -58,6 +61,76 @@ class ManifestCompatibility(TracedOpenContract):
 
     compatible: bool
     reasons: tuple[str, ...] = ()
+
+
+class _ProviderSpecificationRevision(TracedOpenContract):
+    """Immutable effective-dated provider-specification evidence."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    revision_id: str
+    broker: str
+    server: str
+    environment: str
+    account_digest: str
+    provider_symbol: str
+    snapshot_checksum: str
+    observed_at: datetime
+    effective_from: datetime
+    effective_to: datetime | None
+    retrieval_provenance: str
+    historical_provenance: Mapping[str, object] | None
+    payload: Mapping[str, object]
+    supersedes_revision_id: str | None
+
+    @field_validator("observed_at", "effective_from", "effective_to")
+    @classmethod
+    def _utc(cls, value: datetime | None) -> datetime | None:
+        """Normalize one timestamp to aware UTC.
+
+        Args:
+            value: Timestamp or absence.
+
+        Returns:
+            Normalized timestamp or absence.
+
+        Raises:
+            ValueError: If the timestamp is naive.
+        """
+        if value is None:
+            return None
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("provider revision timestamps must be aware")
+        return value.astimezone(UTC)
+
+    @field_validator("payload", "historical_provenance", mode="after")
+    @classmethod
+    def _freeze_mapping(
+        cls, value: Mapping[str, object] | None
+    ) -> Mapping[str, object] | None:
+        """Freeze caller-owned mappings.
+
+        Args:
+            value: Mapping or absence.
+
+        Returns:
+            Immutable defensive copy or absence.
+        """
+        return None if value is None else MappingProxyType(dict(value))
+
+    @field_serializer("payload", "historical_provenance", when_used="json")
+    def _serialize_mapping(
+        self, value: Mapping[str, object] | None
+    ) -> dict[str, object] | None:
+        """Serialize immutable mappings.
+
+        Args:
+            value: Mapping or absence.
+
+        Returns:
+            JSON-safe mutable copy or absence.
+        """
+        return None if value is None else dict(value)
 
 
 __all__ = ["DatasetLoadRequest", "ManifestCompatibility"]

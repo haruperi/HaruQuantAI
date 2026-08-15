@@ -431,6 +431,12 @@ permission evidence to one provider/server/redacted-account/environment
 observation with a canonical checksum, fails closed on missing provider
 fields, keeps dynamic cost evidence as a separate typed reference, and
 exposes no effective bounds.
+Data implements the historical half of this boundary through `FEAT-DATA-02`:
+canonical snapshot mappings are stored without a Brokers type dependency as
+immutable checksummed revisions under half-open UTC effective intervals. A
+successor closes the prior interval atomically; point-in-time and bounded reads
+must prove complete coverage and never backdate a current observation without
+explicit owner-supplied provenance (`FR-DATA-214`–`216`).
 
 ### Agentic Runtime and Trust Boundaries
 

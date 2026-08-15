@@ -14,6 +14,7 @@ def test_every_declared_data_table_has_a_public_application_trigger() -> None:
         Path("app/services/data/migrations/economic_event_definitions.py"),
         Path("app/services/data/migrations/research_sources.py"),
         Path("app/services/data/migrations/runtime_stores.py"),
+        Path("app/services/data/datasets/migrations/definitions.py"),
         Path("app/services/data/persistence/migrations.py"),
         Path("app/services/data/persistence/locking.py"),
     )

@@ -14,6 +14,15 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
+_INSERT_PROVIDER_SPECIFICATION_REVISION = """
+INSERT INTO data_provider_specification_revisions (
+    revision_id, broker, server, environment, account_digest, provider_symbol,
+    snapshot_checksum, observed_at, effective_from, effective_to,
+    retrieval_provenance, historical_provenance_json, payload_json,
+    supersedes_revision_id, request_id, created_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+""".strip()
+
 _UPSERT_CATALOG_SYMBOL = """
 INSERT INTO data_symbols (
     symbol_id, canonical_symbol, asset_class, base_currency, quote_currency,
@@ -432,6 +441,7 @@ __all__ = [
     "create_catalog_reference_records",
     "create_feed_record",
     "create_fetch_log_record",
+    "create_provider_specification_revision",
     "create_quality_event_record",
     "create_research_observation_record",
     "create_research_source_record",
@@ -570,4 +580,24 @@ def create_quality_event_record(
     logger.debug("Creating Data quality-event record")
     return _execute_create(
         (_INSERT_QUALITY_EVENT,), (parameters,), request_id=request_id
+    )
+
+
+def create_provider_specification_revision(
+    parameters: tuple[Any, ...], *, request_id: str
+) -> TransactionResult:
+    """Insert one immutable provider-specification revision.
+
+    Args:
+        parameters: Ordered revision column values.
+        request_id: Caller trace identity.
+
+    Returns:
+        Committed transaction evidence.
+    """
+    logger.info("Registering initial provider specification revision")
+    return _execute_create(
+        (_INSERT_PROVIDER_SPECIFICATION_REVISION,),
+        (parameters,),
+        request_id=request_id,
     )

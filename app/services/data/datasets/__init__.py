@@ -3,11 +3,14 @@
 from app.services.data.datasets.catalog import (
     get_catalog_evidence,
     get_catalog_table_lifecycles,
+    get_provider_specification_revision,
+    get_provider_specification_revisions,
     get_verified_research_source,
     reconcile_data_catalog,
     record_catalog_fetch,
     record_catalog_quality_event,
     register_catalog_artifact,
+    register_provider_specification_revision,
     sync_catalog_reference,
 )
 from app.services.data.datasets.contracts import (
@@ -27,6 +30,8 @@ __all__ = [
     "ManifestCompatibility",
     "get_catalog_evidence",
     "get_catalog_table_lifecycles",
+    "get_provider_specification_revision",
+    "get_provider_specification_revisions",
     "get_verified_research_source",
     "load_csv",
     "load_dataset",
@@ -36,6 +41,7 @@ __all__ = [
     "record_catalog_fetch",
     "record_catalog_quality_event",
     "register_catalog_artifact",
+    "register_provider_specification_revision",
     "sync_catalog_reference",
     "verify_manifest_compatibility",
 ]

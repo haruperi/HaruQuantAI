@@ -154,6 +154,8 @@ from app.services.data.data_jobs.job import (
 from app.services.data.datasets import (
     get_catalog_evidence,
     get_catalog_table_lifecycles,
+    get_provider_specification_revision,
+    get_provider_specification_revisions,
     get_verified_research_source,
     load_csv,
     load_dataset,
@@ -163,6 +165,7 @@ from app.services.data.datasets import (
     record_catalog_fetch,
     record_catalog_quality_event,
     register_catalog_artifact,
+    register_provider_specification_revision,
     sync_catalog_reference,
     verify_manifest_compatibility,
 )
@@ -547,6 +550,8 @@ __all__ = (
     "get_operation_traits",
     "get_persisted_events",
     "get_precision_policies",
+    "get_provider_specification_revision",
+    "get_provider_specification_revisions",
     "get_quality_policy",
     "get_quality_sample_limit",
     "get_read_only_broker_methods",
@@ -619,6 +624,7 @@ __all__ = (
     "record_catalog_quality_event",
     "recover_update_jobs",
     "register_catalog_artifact",
+    "register_provider_specification_revision",
     "register_source",
     "register_source_policy",
     "require_utc",

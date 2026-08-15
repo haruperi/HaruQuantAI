@@ -717,6 +717,9 @@ __all__ = [
     "read_latest_research_observation_record",
     "read_latest_research_source_record",
     "read_prepared_backfill_records",
+    "read_provider_specification_revision_as_of",
+    "read_provider_specification_revision_interval",
+    "read_provider_specification_revisions",
     "read_recent_source_attempt_records",
     "read_research_observation_records",
     "read_research_source_records",
@@ -957,4 +960,101 @@ WHERE source_id = ? AND parser_version = ?
         (source_id, parser_version),
         request_id=request_id,
         max_rows=1,
+    )
+
+
+def read_provider_specification_revisions(
+    identity: tuple[str, str, str, str, str],
+    *,
+    request_id: str,
+    limit: int = 1000,
+) -> TransactionResult:
+    """Read ordered immutable revisions for one exact provider identity.
+
+    Args:
+        identity: Broker, server, environment, account digest, and symbol.
+        request_id: Caller trace identity.
+        limit: Maximum returned revisions.
+
+    Returns:
+        Detached ordered revision rows.
+    """
+    statement = """
+SELECT revision_id, broker, server, environment, account_digest, provider_symbol,
+       snapshot_checksum, observed_at, effective_from, effective_to,
+       retrieval_provenance, historical_provenance_json, payload_json,
+       supersedes_revision_id
+FROM data_provider_specification_revisions
+WHERE broker = ? AND server = ? AND environment = ?
+  AND account_digest = ? AND provider_symbol = ?
+ORDER BY effective_from
+""".strip()
+    return _execute_read(statement, identity, request_id=request_id, max_rows=limit)
+
+
+def read_provider_specification_revision_as_of(
+    identity: tuple[str, str, str, str, str],
+    as_of: str,
+    *,
+    request_id: str,
+) -> TransactionResult:
+    """Read the unique revision covering one instant.
+
+    Args:
+        identity: Broker, server, environment, account digest, and symbol.
+        as_of: Canonical UTC instant.
+        request_id: Caller trace identity.
+
+    Returns:
+        Zero or one detached revision row.
+    """
+    statement = """
+SELECT revision_id, broker, server, environment, account_digest, provider_symbol,
+       snapshot_checksum, observed_at, effective_from, effective_to,
+       retrieval_provenance, historical_provenance_json, payload_json,
+       supersedes_revision_id
+FROM data_provider_specification_revisions
+WHERE broker = ? AND server = ? AND environment = ?
+  AND account_digest = ? AND provider_symbol = ?
+  AND effective_from <= ? AND (effective_to IS NULL OR ? < effective_to)
+ORDER BY effective_from
+""".strip()
+    return _execute_read(
+        statement, (*identity, as_of, as_of), request_id=request_id, max_rows=2
+    )
+
+
+def read_provider_specification_revision_interval(
+    identity: tuple[str, str, str, str, str],
+    start: str,
+    end: str,
+    *,
+    request_id: str,
+    limit: int = 1000,
+) -> TransactionResult:
+    """Read revisions overlapping one half-open interval.
+
+    Args:
+        identity: Broker, server, environment, account digest, and symbol.
+        start: Inclusive canonical UTC lower bound.
+        end: Exclusive canonical UTC upper bound.
+        request_id: Caller trace identity.
+        limit: Maximum returned revisions.
+
+    Returns:
+        Detached ordered overlapping revisions.
+    """
+    statement = """
+SELECT revision_id, broker, server, environment, account_digest, provider_symbol,
+       snapshot_checksum, observed_at, effective_from, effective_to,
+       retrieval_provenance, historical_provenance_json, payload_json,
+       supersedes_revision_id
+FROM data_provider_specification_revisions
+WHERE broker = ? AND server = ? AND environment = ?
+  AND account_digest = ? AND provider_symbol = ?
+  AND effective_from < ? AND (effective_to IS NULL OR effective_to > ?)
+ORDER BY effective_from
+""".strip()
+    return _execute_read(
+        statement, (*identity, end, start), request_id=request_id, max_rows=limit
     )

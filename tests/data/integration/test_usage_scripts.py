@@ -89,6 +89,6 @@ def test_supplemental_legacy_feature_catalog_executes() -> None:
     assert completed.returncode == 0, (
         f"features.py failed\nstdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
     )
-    assert "legacy Data scenarios directly" in completed.stdout
+    assert "Data scenarios directly" in completed.stdout
     assert "registered feature count remains 14" in completed.stdout
     assert "Traceback" not in completed.stdout

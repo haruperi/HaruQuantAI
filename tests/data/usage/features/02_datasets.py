@@ -1,10 +1,10 @@
 # ruff: noqa: BLE001
-"""Demonstrate FEAT-DATA-03 local CSV and Parquet dataset loading."""
+"""Demonstrate FEAT-DATA-02 dataset lifecycle and revision history."""
 
 from __future__ import annotations
 
 import sys
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -21,17 +21,21 @@ from app.services.data import (
     build_synthetic_request,
     data_settings_context,
     generate_synthetic_bars,
+    get_provider_specification_revision,
+    get_provider_specification_revisions,
     load_csv,
     load_local_dataset,
     load_parquet,
+    register_provider_specification_revision,
     run_data_migrations,
     save_market_data,
     to_ohlcv_dataframe,
 )
-from app.utils import generate_id
+from app.utils import canonical_digest, generate_id
 
 _CSV_PATH = Path("data/raw/EURUSD_H1.csv")
 _PARQUET_PATH = Path("data/raw/EURUSD_H1.parquet")
+_SPEC_OBSERVED = datetime(2026, 8, 15, 10, tzinfo=UTC)
 
 
 def _header(title: str) -> None:
@@ -177,6 +181,70 @@ def fr_data_017_018_governed() -> None:
         print(f"Data -> Exception({exc})")
 
 
+def _provider_snapshot(observed_at: datetime, revision: str) -> dict[str, object]:
+    """Return one bounded canonical provider snapshot mapping."""
+    payload: dict[str, object] = {
+        "broker": "mt5",
+        "server": "demo-server",
+        "environment": "demo",
+        "account_digest": "a" * 64,
+        "provider_symbol": "EURUSD",
+        "terminal_build": "5000",
+        "source_revision": revision,
+        "observed_at": observed_at.isoformat(),
+        "retrieval_provenance": "sanitized-demo-fixture",
+    }
+    payload["checksum"] = canonical_digest(payload)
+    return payload
+
+
+def fr_data_214() -> None:
+    """FR-DATA-214: Persist one immutable checksummed specification revision."""
+    _header("Provider Specification Revision Registration (FR-DATA-214)")
+    result = register_provider_specification_revision(
+        _provider_snapshot(_SPEC_OBSERVED, "r1"), request_id=generate_id("req")
+    )
+    print(_format_result(result))
+    print(f"Data -> revision={result['revision_id']}")
+
+
+def fr_data_215() -> None:
+    """FR-DATA-215: Supersede the open revision without overlap."""
+    _header("Atomic Provider Specification Supersession (FR-DATA-215)")
+    observed_at = _SPEC_OBSERVED + timedelta(hours=1)
+    result = register_provider_specification_revision(
+        _provider_snapshot(observed_at, "r2"), request_id=generate_id("req")
+    )
+    print(_format_result(result))
+    print(f"Data -> supersedes={result['supersedes_revision_id']}")
+
+
+def fr_data_216() -> None:
+    """FR-DATA-216: Retrieve exact as-of and bounded coverage evidence."""
+    _header("Point-in-Time Provider Specification Coverage (FR-DATA-216)")
+    request_id = generate_id("req")
+    identity = {
+        "provider": "mt5",
+        "server": "demo-server",
+        "environment": "demo",
+        "account_digest": "a" * 64,
+        "symbol": "EURUSD",
+        "request_id": request_id,
+    }
+    point = get_provider_specification_revision(**identity, as_of=_SPEC_OBSERVED)
+    interval = get_provider_specification_revisions(
+        **identity,
+        interval_start=_SPEC_OBSERVED,
+        interval_end=_SPEC_OBSERVED + timedelta(hours=2),
+    )
+    print(_format_result(point))
+    print(
+        "Data -> "
+        f"as_of_covered={point['complete_coverage']}, "
+        f"interval_revisions={len(interval['revisions'])}"
+    )
+
+
 def main() -> None:
     """Execute every functional-requirement demonstration."""
     with TemporaryDirectory(prefix="usage-local-data-") as directory:
@@ -190,7 +258,7 @@ def main() -> None:
         with data_settings_context(settings):
             run_data_migrations(generate_id("req"))
             print("=" * 80)
-            print("FEATURE: FEAT-DATA-03 - Local Dataset Loading")
+            print("FEATURE: FEAT-DATA-02 - Dataset Lifecycle")
             print(
                 "PURPOSE: DatasetLoadRequest, manifest verification, CSV/Parquet loaders, and load_local_dataset"
             )
@@ -203,7 +271,10 @@ def main() -> None:
             fr_data_017_csv()
             fr_data_017_parquet()
             fr_data_017_018_governed()
-            print("SUCCESS: FEAT-DATA-03 completed")
+            fr_data_214()
+            fr_data_215()
+            fr_data_216()
+            print("SUCCESS: FEAT-DATA-02 completed")
     run_persistence_support()
     run_catalog_support()
 

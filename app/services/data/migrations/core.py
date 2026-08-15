@@ -15,6 +15,9 @@ from __future__ import annotations
 
 import hashlib
 
+from app.services.data.datasets.migrations import (
+    PROVIDER_SPECIFICATION_MIGRATION_STEP,
+)
 from app.services.data.migrations.data_jobs import DATA_JOBS_ENVIRONMENT_MIGRATION_STEP
 from app.services.data.migrations.economic_calendar import (
     ECONOMIC_CALENDAR_V2_MIGRATION_STEP,
@@ -455,4 +458,5 @@ DATA_MIGRATION_STEPS = (
     ECONOMIC_CALENDAR_V2_MIGRATION_STEP,
     DATA_JOBS_ENVIRONMENT_MIGRATION_STEP,
     ECONOMIC_EVENT_DEFINITIONS_MIGRATION_STEP,
+    PROVIDER_SPECIFICATION_MIGRATION_STEP,
 )

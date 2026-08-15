@@ -10,6 +10,9 @@ import re
 import sqlite3
 
 import pytest
+from app.services.data.datasets.migrations import (
+    PROVIDER_SPECIFICATION_MIGRATION_STEP,
+)
 from app.services.data.migrations.core import _CATALOG_SCHEMA_STATEMENTS
 
 _NOW = "2026-08-03T00:00:00.000Z"
@@ -256,3 +259,11 @@ def test_only_verification_state_is_not_manifest_derived():
     index_local = {"verify_state", "verified_at"}
     assert index_local < columns
     assert len(columns - index_local) > 0
+
+
+def test_provider_specification_history_schema_is_immutable_and_indexed() -> None:
+    """FR-DATA-214 stores immutable revisions with an interval lookup index."""
+    schema = "\n".join(PROVIDER_SPECIFICATION_MIGRATION_STEP.statements)
+    assert "CREATE TABLE IF NOT EXISTS data_provider_specification_revisions" in schema
+    assert "UNIQUE (snapshot_checksum)" in schema
+    assert "idx_data_provider_specification_identity_interval" in schema

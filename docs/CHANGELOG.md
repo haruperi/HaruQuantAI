@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Add effective-dated provider specification history
+
+Data now persists immutable provider-specification revisions and proves exact
+point-in-time coverage for the parity programme (`FEAT-DATA-02`, Phase 4b).
+
+#### Added (1)
+
+- Added checksummed half-open provider-specification revisions with atomic supersession, provenance-gated historical bounds, and fail-closed as-of and bounded-interval coverage reads.
+
 ### Add typed current provider specification snapshots
 
 Brokers now publishes the versioned current specification observation the

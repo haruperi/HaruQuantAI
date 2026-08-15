@@ -99,7 +99,7 @@ def test_catalog_reconciliation_rejects_invalid_limit() -> None:
 
 def test_catalog_lifecycle_inventory_and_reference_validation() -> None:
     """Lifecycle evidence is complete and blank identities fail closed."""
-    assert len(get_catalog_table_lifecycles()) == 23
+    assert len(get_catalog_table_lifecycles()) == 24
     with pytest.raises(DataError):
         sync_catalog_reference(
             provider_code="",

@@ -14,6 +14,20 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
+_CLOSE_PROVIDER_SPECIFICATION_REVISION = """
+UPDATE data_provider_specification_revisions
+SET effective_to = ?
+WHERE revision_id = ? AND effective_to IS NULL AND effective_from < ?
+""".strip()
+_INSERT_PROVIDER_SPECIFICATION_REVISION = """
+INSERT INTO data_provider_specification_revisions (
+    revision_id, broker, server, environment, account_digest, provider_symbol,
+    snapshot_checksum, observed_at, effective_from, effective_to,
+    retrieval_provenance, historical_provenance_json, payload_json,
+    supersedes_revision_id, request_id, created_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+""".strip()
+
 _PUT_CACHE_ENTRY = """
 INSERT OR REPLACE INTO data_cache (
     key, dataset_json, created_at, expires_at, source_revision,
@@ -667,6 +681,36 @@ def update_runtime_transition_records(
     )
 
 
+def update_provider_specification_revision(
+    previous_revision_id: str,
+    effective_from: str,
+    parameters: tuple[Any, ...],
+    *,
+    request_id: str,
+) -> TransactionResult:
+    """Atomically close one revision and insert its immutable successor.
+
+    Args:
+        previous_revision_id: Open revision being superseded.
+        effective_from: Successor's inclusive effective instant.
+        parameters: Ordered successor column values.
+        request_id: Caller trace identity.
+
+    Returns:
+        Committed two-statement transaction evidence.
+    """
+    logger.info("Superseding provider specification revision")
+    return _execute_update(
+        (
+            _CLOSE_PROVIDER_SPECIFICATION_REVISION,
+            _INSERT_PROVIDER_SPECIFICATION_REVISION,
+        ),
+        ((effective_from, previous_revision_id, effective_from), parameters),
+        request_id=request_id,
+        max_rows=2,
+    )
+
+
 __all__ = [
     "reconcile_economic_event_definition_records",
     "update_backfill_failure",
@@ -683,6 +727,7 @@ __all__ = [
     "update_job_run_success",
     "update_job_start",
     "update_job_stop",
+    "update_provider_specification_revision",
     "update_runtime_compare_and_swap_record",
     "update_runtime_transition_records",
     "update_runtime_upsert_record",

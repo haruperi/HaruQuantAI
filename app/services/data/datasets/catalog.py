@@ -16,17 +16,22 @@ from app.services.data.persistence import (
     create_catalog_artifact_records,
     create_catalog_reference_records,
     create_fetch_log_record,
+    create_provider_specification_revision,
     create_quality_event_record,
     read_catalog_coverage,
     read_catalog_event_records,
     read_catalog_files_for_range,
     read_catalog_reference_records,
     read_catalog_unverified_count,
+    read_provider_specification_revision_as_of,
+    read_provider_specification_revision_interval,
+    read_provider_specification_revisions,
     read_verified_research_source_record,
+    update_provider_specification_revision,
 )
 from app.services.data.persistence.contracts import StorageManifest
 from app.services.data.persistence.dataset_writer import resolve_data_root
-from app.utils import get_logger, utc_now
+from app.utils import canonical_digest, canonical_json, get_logger, utc_now
 
 logger = get_logger(__name__)
 
@@ -35,6 +40,44 @@ if TYPE_CHECKING:
 
 _MAX_TEXT_LENGTH = 256
 _MAX_CATALOG_ROWS = 1000
+_SHA256_HEX_LENGTH = 64
+_SNAPSHOT_IDENTITY_FIELDS = (
+    "broker",
+    "server",
+    "environment",
+    "account_digest",
+    "provider_symbol",
+)
+
+
+def _provider_identity(
+    broker: str,
+    server: str,
+    environment: str,
+    account_digest: str,
+    provider_symbol: str,
+) -> tuple[str, str, str, str, str]:
+    """Validate and return one exact provider-specification identity.
+
+    Args:
+        broker: Broker/provider identity.
+        server: Provider server identity.
+        environment: Exact provider environment.
+        account_digest: Redacted account digest.
+        provider_symbol: Exact provider symbol.
+
+    Returns:
+        Validated fixed-width identity tuple.
+    """
+    values = (broker, server, environment, account_digest, provider_symbol)
+    return (
+        _text(values[0], _SNAPSHOT_IDENTITY_FIELDS[0]),
+        _text(values[1], _SNAPSHOT_IDENTITY_FIELDS[1]),
+        _text(values[2], _SNAPSHOT_IDENTITY_FIELDS[2]),
+        _text(values[3], _SNAPSHOT_IDENTITY_FIELDS[3]),
+        _text(values[4], _SNAPSHOT_IDENTITY_FIELDS[4]),
+    )
+
 
 _CATALOG_TABLE_LIFECYCLES: Mapping[str, tuple[str, ...]] = {
     "data_audit_events": ("persist_audit_event", "query_audit_events"),
@@ -56,6 +99,11 @@ _CATALOG_TABLE_LIFECYCLES: Mapping[str, tuple[str, ...]] = {
     "data_market_sessions": ("sync_catalog_reference", "get_catalog_evidence"),
     "data_migration_ledger": ("run_data_migrations",),
     "data_partition_files": ("register_catalog_artifact", "get_catalog_evidence"),
+    "data_provider_specification_revisions": (
+        "register_provider_specification_revision",
+        "get_provider_specification_revision",
+        "get_provider_specification_revisions",
+    ),
     "data_providers": ("sync_catalog_reference", "get_catalog_evidence"),
     "data_quality_events": ("record_catalog_quality_event", "get_catalog_evidence"),
     "data_research_observations": (
@@ -123,6 +171,235 @@ def _timestamp(value: datetime) -> str:
     if value.tzinfo is None or value.utcoffset() is None:
         raise DataError("INVALID_INPUT", safe_details={"field": "timestamp"})
     return value.astimezone(UTC).isoformat()
+
+
+def _snapshot_material(
+    snapshot: Mapping[str, object], request_id: str
+) -> tuple[dict[str, object], tuple[str, str, str, str, str], datetime]:
+    """Validate one opaque Brokers snapshot mapping for persistence.
+
+    Args:
+        snapshot: Canonical JSON-safe snapshot mapping.
+        request_id: Caller trace identity.
+
+    Returns:
+        Defensive payload, exact identity, and observation time.
+
+    Raises:
+        DataError: If required identity, timestamp, or checksum evidence is invalid.
+    """
+    payload = dict(snapshot)
+    try:
+        identity = _provider_identity(
+            *(str(payload[field]) for field in _SNAPSHOT_IDENTITY_FIELDS)
+        )
+        checksum = _text(str(payload["checksum"]), "checksum")
+        observed_at = datetime.fromisoformat(str(payload["observed_at"]))
+        _text(str(payload["retrieval_provenance"]), "retrieval_provenance")
+    except (KeyError, TypeError, ValueError) as error:
+        raise DataError("INVALID_INPUT", request_id=request_id) from error
+    if (
+        len(checksum) != _SHA256_HEX_LENGTH
+        or canonical_digest(
+            {key: value for key, value in payload.items() if key != "checksum"}
+        )
+        != checksum
+    ):
+        raise DataError("DATA_QUALITY_FAILED", request_id=request_id)
+    if observed_at.tzinfo is None or observed_at.utcoffset() is None:
+        raise DataError("INVALID_INPUT", request_id=request_id)
+    return payload, identity, observed_at.astimezone(UTC)
+
+
+def _revision_row(row: Mapping[str, object]) -> dict[str, object]:
+    """Decode one detached persistence row.
+
+    Args:
+        row: Normalized SQLite row.
+
+    Returns:
+        JSON-safe revision evidence.
+    """
+    result = dict(row)
+    result["payload"] = json.loads(str(result.pop("payload_json")))
+    provenance = result.pop("historical_provenance_json")
+    result["historical_provenance"] = (
+        None if provenance is None else json.loads(str(provenance))
+    )
+    return result
+
+
+def register_provider_specification_revision(
+    snapshot: Mapping[str, object],
+    *,
+    effective_from: datetime | None = None,
+    historical_provenance: Mapping[str, object] | None = None,
+    request_id: str,
+) -> dict[str, object]:
+    """Register one immutable effective-dated provider specification.
+
+    Args:
+        snapshot: Canonical Brokers snapshot mapping.
+        effective_from: Optional verified inclusive effective instant.
+        historical_provenance: Required provenance for a pre-observation boundary.
+        request_id: Caller trace identity.
+
+    Returns:
+        Detached registered revision evidence.
+
+    Raises:
+        DataError: If identity, chronology, checksum, overlap, or immutability fails.
+    """
+    logger.info("Registering provider specification revision")
+    payload, identity, observed_at = _snapshot_material(snapshot, request_id)
+    start = observed_at if effective_from is None else effective_from
+    if start.tzinfo is None or start.utcoffset() is None:
+        raise DataError("INVALID_INPUT", request_id=request_id)
+    start = start.astimezone(UTC)
+    if start < observed_at and not historical_provenance:
+        raise DataError("POLICY_BLOCKED", request_id=request_id)
+    existing = read_provider_specification_revisions(
+        identity, request_id=request_id
+    ).rows
+    checksum = str(payload["checksum"])
+    matching = [row for row in existing if row["snapshot_checksum"] == checksum]
+    if matching:
+        if str(matching[0]["payload_json"]) != canonical_json(payload):
+            raise DataError("DATA_QUALITY_FAILED", request_id=request_id)
+        return _revision_row(matching[0])
+    if existing and start <= datetime.fromisoformat(
+        str(existing[-1]["effective_from"])
+    ):
+        raise DataError("VALIDATION_FAILED", request_id=request_id)
+    previous_id = None if not existing else str(existing[-1]["revision_id"])
+    start_text = _timestamp(start)
+    observed_text = _timestamp(observed_at)
+    revision_id = "provider-spec-" + canonical_digest(
+        {"identity": identity, "effective_from": start_text, "checksum": checksum}
+    )
+    created_at = _timestamp(utc_now())
+    parameters = (
+        revision_id,
+        *identity,
+        checksum,
+        observed_text,
+        start_text,
+        None,
+        str(payload["retrieval_provenance"]),
+        None
+        if historical_provenance is None
+        else canonical_json(dict(historical_provenance)),
+        canonical_json(payload),
+        previous_id,
+        request_id,
+        created_at,
+    )
+    if previous_id is None:
+        create_provider_specification_revision(parameters, request_id=request_id)
+    else:
+        update_provider_specification_revision(
+            previous_id, start_text, parameters, request_id=request_id
+        )
+    row = read_provider_specification_revision_as_of(
+        identity, start_text, request_id=request_id
+    ).rows
+    if len(row) != 1:
+        raise DataError("DATABASE_ERROR", request_id=request_id)
+    return _revision_row(row[0])
+
+
+def get_provider_specification_revision(
+    *,
+    provider: str,
+    server: str,
+    environment: str,
+    account_digest: str,
+    symbol: str,
+    as_of: datetime,
+    request_id: str,
+) -> dict[str, object]:
+    """Return the unique provider specification covering one instant.
+
+    Args:
+        provider: Broker/provider identity.
+        server: Provider server identity.
+        environment: Exact provider environment.
+        account_digest: Redacted account digest.
+        symbol: Exact provider symbol.
+        as_of: Point-in-time query instant.
+        request_id: Caller trace identity.
+
+    Returns:
+        Detached revision evidence with complete coverage.
+
+    Raises:
+        DataError: If the instant is invalid or uncovered.
+    """
+    identity = _provider_identity(provider, server, environment, account_digest, symbol)
+    rows = read_provider_specification_revision_as_of(
+        identity, _timestamp(as_of), request_id=request_id
+    ).rows
+    if len(rows) != 1:
+        raise DataError("DATA_NOT_FOUND", request_id=request_id)
+    return {**_revision_row(rows[0]), "complete_coverage": True}
+
+
+def get_provider_specification_revisions(
+    *,
+    provider: str,
+    server: str,
+    environment: str,
+    account_digest: str,
+    symbol: str,
+    interval_start: datetime,
+    interval_end: datetime,
+    request_id: str,
+) -> dict[str, object]:
+    """Return revisions proving complete coverage of a bounded interval.
+
+    Args:
+        provider: Broker/provider identity.
+        server: Provider server identity.
+        environment: Exact provider environment.
+        account_digest: Redacted account digest.
+        symbol: Exact provider symbol.
+        interval_start: Inclusive query bound.
+        interval_end: Exclusive query bound.
+        request_id: Caller trace identity.
+
+    Returns:
+        Ordered detached revisions and explicit coverage proof.
+
+    Raises:
+        DataError: If bounds are invalid or coverage contains a gap.
+    """
+    start_text = _timestamp(interval_start)
+    end_text = _timestamp(interval_end)
+    if interval_start >= interval_end:
+        raise DataError("INVALID_INPUT", request_id=request_id)
+    identity = _provider_identity(provider, server, environment, account_digest, symbol)
+    rows = read_provider_specification_revision_interval(
+        identity, start_text, end_text, request_id=request_id
+    ).rows
+    if not rows or str(rows[0]["effective_from"]) > start_text:
+        raise DataError("DATA_NOT_FOUND", request_id=request_id)
+    cursor = start_text
+    for row in rows:
+        if str(row["effective_from"]) > cursor:
+            raise DataError("DATA_NOT_FOUND", request_id=request_id)
+        effective_to = row["effective_to"]
+        if effective_to is None:
+            cursor = end_text
+            break
+        cursor = max(cursor, str(effective_to))
+    if cursor < end_text:
+        raise DataError("DATA_NOT_FOUND", request_id=request_id)
+    return {
+        "interval_start": start_text,
+        "interval_end": end_text,
+        "complete_coverage": True,
+        "revisions": tuple(_revision_row(row) for row in rows),
+    }
 
 
 def sync_catalog_reference(
@@ -481,10 +758,13 @@ def reconcile_data_catalog(*, request_id: str, max_files: int = 1000) -> dict[st
 __all__ = (
     "get_catalog_evidence",
     "get_catalog_table_lifecycles",
+    "get_provider_specification_revision",
+    "get_provider_specification_revisions",
     "get_verified_research_source",
     "reconcile_data_catalog",
     "record_catalog_fetch",
     "record_catalog_quality_event",
     "register_catalog_artifact",
+    "register_provider_specification_revision",
     "sync_catalog_reference",
 )
