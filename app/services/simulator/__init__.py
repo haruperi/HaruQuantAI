@@ -683,6 +683,55 @@ def get_supported_fill_policies() -> tuple[str, ...]:
     return SUPPORTED_FILL_POLICIES
 
 
+def build_transaction_posting(**fields: object) -> object:
+    """Build one immutable signed account-currency posting."""
+    return _operation("app.services.simulator.accounting", "build_transaction_posting")(
+        **fields
+    )
+
+
+def create_transaction_ledger(initial_balance: object, account_currency: str) -> object:
+    """Create one opaque conserved transaction ledger."""
+    return _operation("app.services.simulator.accounting", "create_transaction_ledger")(
+        initial_balance, account_currency
+    )
+
+
+def post_transaction(ledger: object, posting: object) -> dict[str, object]:
+    """Atomically apply one transaction posting."""
+    return _operation("app.services.simulator.accounting", "post_transaction")(
+        ledger, posting
+    )  # type: ignore[return-value]
+
+
+def serialize_transaction_ledger(ledger: object) -> dict[str, object]:
+    """Serialize complete transaction-ledger state."""
+    return _operation(
+        "app.services.simulator.accounting", "serialize_transaction_ledger"
+    )(ledger)  # type: ignore[return-value]
+
+
+def restore_transaction_ledger(state: dict[str, object]) -> object:
+    """Restore complete transaction-ledger state."""
+    return _operation(
+        "app.services.simulator.accounting", "restore_transaction_ledger"
+    )(state)
+
+
+def calculate_rollover_swap(**fields: object) -> dict[str, object]:
+    """Calculate one evidence-bound server rollover swap effect."""
+    return _operation("app.services.simulator.accounting", "calculate_swap_rollover")(
+        **fields
+    )  # type: ignore[return-value]
+
+
+def schedule_simulation_rollover(*args: object, **kwargs: object) -> object:
+    """Schedule the next broker-server rollover instant."""
+    return _operation("app.services.simulator.accounting", "schedule_rollover")(
+        *args, **kwargs
+    )
+
+
 def create_simulation_scheduler(*args: object, **kwargs: object) -> object:
     """Create one opaque deterministic execution scheduler."""
     return _operation("app.services.simulator.scheduler", "create_scheduler")(
@@ -1407,10 +1456,12 @@ __all__: tuple[str, ...] = (
     "build_simulation_run_dependencies",
     "build_simulation_state_store",
     "build_tick_timeline",
+    "build_transaction_posting",
     "bypass_simulation_checklist_step",
     "calculate_execution_costs",
     "calculate_margin",
     "calculate_portfolio_backtest_config_hash",
+    "calculate_rollover_swap",
     "calculate_simulation_backtest_config_hash",
     "calculate_simulation_backtest_v2_config_hash",
     "cancel_simulation_event",
@@ -1424,6 +1475,7 @@ __all__: tuple[str, ...] = (
     "create_simulation_scheduler",
     "create_simulation_session",
     "create_simulation_value",
+    "create_transaction_ledger",
     "dump_simulation_value",
     "evaluate_emergency_controls",
     "evaluate_protective_exit",
@@ -1458,6 +1510,7 @@ __all__: tuple[str, ...] = (
     "order_injected_events",
     "persist_recovery_checkpoint",
     "persist_recovery_state",
+    "post_transaction",
     "price_order",
     "price_realistic_execution",
     "project_execution_views",
@@ -1471,6 +1524,7 @@ __all__: tuple[str, ...] = (
     "resolve_idempotent_run",
     "restore_simulation_scheduler",
     "restore_simulation_session",
+    "restore_transaction_ledger",
     "run_backtest",
     "run_backtest_async",
     "run_fast_research",
@@ -1478,8 +1532,10 @@ __all__: tuple[str, ...] = (
     "run_simulation_scheduler_until_complete",
     "run_simulator_migrations",
     "schedule_simulation_event",
+    "schedule_simulation_rollover",
     "secure_simulation_session",
     "serialize_simulation_scheduler",
+    "serialize_transaction_ledger",
     "shutdown_simulation_scheduler",
     "simulate_queue_fill",
     "start_simulation_checklist",

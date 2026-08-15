@@ -16,13 +16,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.data import build_fx_conversion_evidence, build_fx_rate_leg
 from app.services.simulator import (
+    build_transaction_posting,
     calculate_execution_costs,
     calculate_margin,
     convert_fx_amount,
     create_simulation_handle,
     create_simulation_value,
+    create_transaction_ledger,
     execute_simulation_handle_operation,
     normalize_volume,
+    post_transaction,
+    restore_transaction_ledger,
+    serialize_transaction_ledger,
     unwrap_simulation_response,
     validate_fx_evidence,
 )
@@ -259,6 +264,48 @@ def fr_sim_042() -> None:
     )
 
 
+def _posting(kind: str, amount: Decimal, sequence: int) -> object:
+    """Build one fixed evidence-backed transaction posting."""
+    instant = datetime(2026, 8, 12, sequence, tzinfo=UTC)
+    return build_transaction_posting(
+        economic_at=instant,
+        source_at=instant,
+        account_currency="USD",
+        amount=amount,
+        kind=kind,
+        source_sequence=sequence,
+        evidence_reference=f"provider-ledger-fixture:{sequence}",
+        causal_deal_id=f"deal-{sequence}",
+    )
+
+
+def fr_sim_179() -> None:
+    """FR-SIM-179: Post named account transactions to the signed ledger."""
+    ledger = create_transaction_ledger(Decimal(1000), "USD")
+    snapshot = post_transaction(ledger, _posting("profit", Decimal(25), 1))
+    print(f"Data -> named_transaction_balance={snapshot['balance']}")
+
+
+def fr_sim_180() -> None:
+    """FR-SIM-180: Bind dynamic costs to explicit provider evidence."""
+    ledger = create_transaction_ledger(Decimal(1000), "USD")
+    posting = _posting("commission", Decimal("-2.50"), 1)
+    snapshot = post_transaction(ledger, posting)
+    evidence = snapshot["postings"][0]["evidence_reference"]
+    print(f"Data -> provider_cost_evidence='{evidence}'")
+
+
+def fr_sim_240() -> None:
+    """FR-SIM-240: Preserve signs and conservation through cold restore."""
+    ledger = create_transaction_ledger(Decimal(1000), "USD")
+    post_transaction(ledger, _posting("withdrawal", Decimal(-10), 1))
+    restored = restore_transaction_ledger(serialize_transaction_ledger(ledger))
+    snapshot = serialize_transaction_ledger(restored)
+    print(
+        f"Data -> signed_balance={snapshot['balance']}, conservation={snapshot['conservation']}"
+    )
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -283,6 +330,11 @@ def main() -> None:
     fr_sim_011()
     fr_sim_012()
     fr_sim_042()
+
+    # Stage 4: Evidence-backed signed transaction ledger
+    fr_sim_179()
+    fr_sim_180()
+    fr_sim_240()
 
 
 if __name__ == "__main__":

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Add signed transaction ledger and rollover swap
+
+Simulator now conserves evidence-backed signed account transactions and calculates broker-server rollover swap modes without guessed posting evidence (Phase 7).
+
+#### Added (1)
+
+- Added deterministic signed transaction posting/restore and timezone-aware swap accrual, evidenced balance posting, and REOPEN identity semantics.
+
 ### Map explicit MT5 order policies
 
 Brokers now preserves independent fill and lifetime policy from canonical request v2 into verified MT5 command fields (Phase 6b).

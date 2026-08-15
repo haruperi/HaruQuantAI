@@ -17,12 +17,14 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.simulator import (
+    calculate_rollover_swap,
     create_simulation_handle,
     create_simulation_value,
     evaluate_protective_exit,
     execute_simulation_handle_operation,
     match_order,
     price_order,
+    schedule_simulation_rollover,
     unwrap_simulation_response,
 )
 from app.services.trading import create_order_intent
@@ -312,6 +314,70 @@ def fr_sim_023() -> None:
         )
 
 
+def _swap_fields() -> dict[str, object]:
+    """Return one complete deterministic rollover fixture."""
+    return {
+        "rollover_at": datetime(2026, 8, 12, tzinfo=UTC),
+        "server_timezone": "Europe/London",
+        "side": "LONG",
+        "volume": Decimal(2),
+        "rate": Decimal("-0.50"),
+        "weekday_ratios": {day: Decimal(3 if day == 2 else 1) for day in range(7)},
+        "unit": "ACCOUNT_CURRENCY",
+        "point_value": None,
+        "fx_rate": None,
+        "position_id": "position-rollover",
+    }
+
+
+def fr_sim_134() -> None:
+    """FR-SIM-134: Schedule the next rollover in broker-server time."""
+    rollover = schedule_simulation_rollover(
+        datetime(2026, 6, 1, tzinfo=UTC), "Europe/London", hour=2
+    )
+    print(f"Data -> next_server_rollover='{rollover.isoformat()}'")
+
+
+def fr_sim_135() -> None:
+    """FR-SIM-135: Accrue exact signed position swap at rollover."""
+    result = calculate_rollover_swap(**_swap_fields(), posting_mode="ACCRUAL_ONLY")
+    print(f"Data -> accrued_swap={result['accrued_amount']}")
+
+
+def fr_sim_205() -> None:
+    """FR-SIM-205: Apply the effective server-weekday multiplier."""
+    result = calculate_rollover_swap(**_swap_fields(), posting_mode="ACCRUAL_ONLY")
+    print(f"Data -> weekday={result['weekday']}, multiplier={result['multiplier']}")
+
+
+def fr_sim_206() -> None:
+    """FR-SIM-206: Convert provider swap units using explicit evidence."""
+    fields = _swap_fields()
+    fields.update(unit="POINTS", point_value=Decimal("0.0001"))
+    result = calculate_rollover_swap(**fields, posting_mode="ACCRUAL_ONLY")
+    print(f"Data -> point_swap={result['accrued_amount']}")
+
+
+def fr_sim_207() -> None:
+    """FR-SIM-207: Enable balance posting only with target evidence."""
+    result = calculate_rollover_swap(
+        **_swap_fields(),
+        posting_mode="BALANCE_POSTING",
+        posting_evidence_reference="provider-swap-deal-fixture",
+    )
+    print(f"Data -> balance_posted={result['balance_posted']}")
+
+
+def fr_sim_208() -> None:
+    """FR-SIM-208: Derive new position and deal identities for REOPEN."""
+    result = calculate_rollover_swap(
+        **_swap_fields(),
+        posting_mode="REOPEN",
+        posting_evidence_reference="provider-reopen-fixture",
+    )
+    print(f"Data -> reopened_position_id='{result['reopened_position_id']}'")
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -336,6 +402,14 @@ def main() -> None:
     fr_sim_038()
     fr_sim_022()
     fr_sim_023()
+
+    # Stage 4: Broker-server rollover and swap modes
+    fr_sim_134()
+    fr_sim_135()
+    fr_sim_205()
+    fr_sim_206()
+    fr_sim_207()
+    fr_sim_208()
 
 
 if __name__ == "__main__":

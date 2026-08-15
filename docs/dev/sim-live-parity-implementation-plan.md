@@ -1673,6 +1673,28 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
+Unit 7 completed 2026-08-15 under the goal-wide owner approval. Signed posting contracts and
+conservation are implemented at `app/services/simulator/accounting/transactions.py:32` and
+`app/services/simulator/accounting/transactions.py:75`; rollover scheduling and evidenced swap modes
+are implemented at `app/services/simulator/accounting/swap.py:17` and
+`app/services/simulator/accounting/swap.py:36`. Requirement usage evidence is
+`tests/simulator/usage/features/04_accounting.py:282`, `:289`, `:298` and
+`tests/simulator/usage/features/05_execution.py:333`, `:341`, `:347`, `:353`, `:361`, `:371`;
+unit/integration evidence is `tests/simulator/unit/test_transaction_ledger.py:47`, `:57`,
+`tests/simulator/unit/test_swap_rollover.py:13`, `:33`, `:58`,
+`tests/simulator/integration/test_rollover_accounting.py:12`, and
+`tests/simulator/integration/test_ledger_conservation.py:12`.
+
+Automatic blocker resolution: legacy fill records lack the authority evidence and source sequence
+required for canonical transaction posting. The bounded recommendation keeps the new ledger and
+rollover behavior as explicit evidence-bearing root operations until a later execution phase supplies
+verified fields; no guessed evidence was introduced, and post-swap stop-out ordering remains deferred
+to Phase 16. Focused behavioral validation passed 58/58 including the API surface; the four exact
+phase files passed 24/24, while the repository's literal targeted command exited only because global
+coverage collection measures all 71,461 application statements from four focused files (1.72% versus
+the global 80% threshold). The scope-correct `--no-cov` gate passed, Simulator Ruff and mypy passed,
+both usage programs passed, and the full Simulator behavioral gate passed 405/405.
+
 - [ ] Approval matched this exact phase/subphase.
 - [ ] Only the local file and documentation manifests changed.
 - [ ] Every listed FR has final `path:line` implementation and test evidence.
