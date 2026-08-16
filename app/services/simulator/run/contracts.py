@@ -317,6 +317,7 @@ class SimulationBacktestRequestV2(SimulationBacktestRequestV1):
     calculation_model_hash: str
     calculation_artifact_checksum: str
     calibration_artifact_checksum: str
+    realism_stream_identity_hash: str
     source_lineage_hash: str
     tick_lineage_hash: str
     market_evidence_class: Literal[
@@ -361,6 +362,7 @@ class SimulationBacktestRequestV2(SimulationBacktestRequestV1):
     @field_validator(
         "calculation_artifact_checksum",
         "calibration_artifact_checksum",
+        "realism_stream_identity_hash",
         "calculation_model_hash",
         "execution_model_hash",
         "source_lineage_hash",

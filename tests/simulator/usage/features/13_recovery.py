@@ -16,12 +16,14 @@ from app.services.simulator import (
     build_replay_identity,
     build_simulation_state_store,
     create_recovery_checkpoint,
+    create_simulation_recovery_state,
     create_simulation_session,
     execute_simulation_state_store_operation,
     explicitly_rearm_simulation_session,
     load_recovery_checkpoints,
     persist_recovery_checkpoint,
     persist_recovery_state,
+    recover_simulation_unknown_outcome,
     restore_simulation_session,
     run_simulator_migrations,
     secure_simulation_session,
@@ -181,8 +183,16 @@ def fr_sim_128() -> None:
     restored = restore_simulation_session(
         (checkpoint,), expected_replay_id=checkpoint.replay_identity.replay_id
     )
+    uncertain = create_simulation_recovery_state(
+        command_id="usage-command",
+        crash_point="after_response_receipt",
+        outcome="unknown",
+    )
+    converged = recover_simulation_unknown_outcome(
+        uncertain, authority_query=lambda _command_id: "accepted"
+    )
     print(
-        f"SUCCESS: FR-SIM-128 integrity verified; Data -> valid={valid}, exposure_blocked={restored['exposure_blocked']}"
+        f"SUCCESS: FR-SIM-128 integrity verified; Data -> valid={valid}, exposure_blocked={restored['exposure_blocked']}, unknown_outcome={converged['outcome']}"
     )
 
 

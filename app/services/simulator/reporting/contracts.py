@@ -317,6 +317,9 @@ class RealismDisclosure(_Contract):
     data_quality: str
     assumptions: tuple[str, ...]
     limitations: tuple[str, ...]
+    calibration_artifact_checksum: str | None = None
+    realism_stream_identity_hash: str | None = None
+    fault_scenario_ids: tuple[str, ...] = ()
 
 
 class SimulationResult(_Contract):

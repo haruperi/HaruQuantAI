@@ -39,6 +39,7 @@ def _payload() -> dict[str, object]:
             "calculation_model_hash": "a" * 64,
             "calculation_artifact_checksum": "b" * 64,
             "calibration_artifact_checksum": "c" * 64,
+            "realism_stream_identity_hash": "d" * 64,
             "source_lineage_hash": "f" * 64,
             "tick_lineage_hash": "1" * 64,
             "market_evidence_class": "genuine_bid_ask_ticks",
@@ -105,6 +106,7 @@ def test_fr_sim_196_v2_binds_complete_execution_identity() -> None:
     assert result["calculation_model_hash"] == "a" * 64
     assert result["calculation_artifact_checksum"] == "b" * 64
     assert result["calibration_artifact_checksum"] == "c" * 64
+    assert result["realism_stream_identity_hash"] == "d" * 64
 
 
 @pytest.mark.parametrize(
@@ -115,6 +117,7 @@ def test_fr_sim_196_v2_binds_complete_execution_identity() -> None:
         ("calculation_model_hash", "9" * 64),
         ("calculation_artifact_checksum", "a" * 64),
         ("calibration_artifact_checksum", "d" * 64),
+        ("realism_stream_identity_hash", "e" * 64),
         ("source_lineage_hash", "6" * 64),
         ("tick_lineage_hash", "7" * 64),
         ("market_evidence_class", "depth_supported_ticks"),

@@ -6,9 +6,29 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime
+from decimal import Decimal
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from app.services.simulator.realism.random_streams import sample, serialize
+
+_FAULT_TYPES = frozenset(
+    {
+        "timeout",
+        "ambiguous_response",
+        "rate_limit",
+        "malformed_success",
+        "disconnect",
+        "reconnect",
+        "stale_delivery",
+        "gapped_delivery",
+        "duplicate_delivery",
+        "late_delivery",
+        "out_of_order_delivery",
+    }
+)
+_SHA256_LENGTH = 64
 
 
 class InjectedEvent(BaseModel):
@@ -113,9 +133,66 @@ def build_injected_event(**fields: object) -> InjectedEvent:
     return InjectedEvent.model_validate(fields)
 
 
+def build_seeded_fault_event(
+    *,
+    stream: object,
+    fault_type: str,
+    probability: Decimal,
+    occurred_at: datetime,
+    artifact_checksum: str,
+) -> InjectedEvent | None:
+    """Create a seeded transport/delivery/lifecycle fault in the scenario engine.
+
+    Args:
+        stream: Concern-specific deterministic fault stream.
+        fault_type: Registered fault vocabulary.
+        probability: Exact occurrence probability in ``[0, 1]``.
+        occurred_at: Aware causal/effective/venue/perception instant.
+        artifact_checksum: Exact calibration artifact identity.
+
+    Returns:
+        Injected fault or ``None`` when the deterministic draw does not trigger.
+
+    Raises:
+        ValueError: If fault type, probability, or artifact identity is invalid.
+    """
+    if fault_type not in _FAULT_TYPES:
+        raise ValueError("fault type is not scenario-owned")
+    if not probability.is_finite() or probability < 0 or probability > 1:
+        raise ValueError("fault probability must be in [0, 1]")
+    if (
+        len(artifact_checksum) != _SHA256_LENGTH
+        or artifact_checksum != artifact_checksum.lower()
+        or any(character not in "0123456789abcdef" for character in artifact_checksum)
+    ):
+        raise ValueError("fault calibration checksum is invalid")
+    draw = sample(stream)
+    if draw >= probability:
+        return None
+    state = serialize(stream)
+    return InjectedEvent(
+        event_id=f"fault-{fault_type}-{state['counter']}",
+        event_type=fault_type,
+        priority=9_000,
+        causative_at=occurred_at,
+        effective_at=occurred_at,
+        venue_at=occurred_at,
+        perceived_at=occurred_at,
+        suspends_normal_transitions=True,
+        payload={
+            "artifact_checksum": artifact_checksum,
+            "stream_id": state["stream_id"],
+            "stream_counter": state["counter"],
+            "draw": str(draw),
+            "journal_event_type": "seeded_scenario_fault",
+        },
+    )
+
+
 __all__ = [
     "InjectedEvent",
     "MissionDefinition",
     "build_injected_event",
     "build_mission_definition",
+    "build_seeded_fault_event",
 ]

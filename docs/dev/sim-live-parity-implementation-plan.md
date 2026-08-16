@@ -3886,6 +3886,7 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] README, project feature inventory, changelog, feature README, request identity, public surface, and usage evidence reconcile. Evidence: `app/services/simulator/README.md`, `app/services/simulator/calibration/README.md`, `docs/PROJECT.md`, `docs/CHANGELOG.md`, `tests/simulator/unit/test_public_api.py`.
 - [x] Rollback was reviewed. Evidence: remove `calibration/`, six exact test modules, usage 17, root exports, V2 calibration checksum and its fixtures; restore README/project/changelog/plan; rerun the literal Unit 19 commands and request/parity/public-contract regressions.
 - [x] Commit is authorized goal-wide; the exact Unit 19 message will be used below.
+- [x] Exact Unit 19 commit recorded: `f52dc91d3ae220d5b82230115b3d89afcfa43aa6`.
 
 # Phase 20 · Seeded stochastic execution realism — L4
 
@@ -4028,17 +4029,36 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff format/check and mypy passed for every owning domain.
-- [ ] Every local usage program executed directly and passed.
-- [ ] Every owning-domain phase gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+- [x] Approval matched this exact phase/subphase.
+- [x] Only the local file and documentation manifests changed.
+- [x] Every listed FR has final `path:line` implementation and test evidence.
+- [x] Only verified package-root/public dependency contracts were used.
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes.
+- [x] Ruff format/check and mypy passed for every owning domain.
+- [x] Every local usage program executed directly and passed.
+- [x] Every owning-domain phase gate passed.
+- [x] README, changelog, and listed system documents reconciled.
+- [x] STOP conditions and rollback path were rechecked.
+- [x] Commit remains unauthorized, or its separately authorized hash is recorded.
+
+### Unit 20 completion evidence
+
+- [x] Approval matched Unit 20. Evidence: owner goal-wide `APPROVED: EXECUTE`, dry run `20-DR1`, and bounded correction `20-DR1Δ1`.
+- [x] `FR-SIM-171`–`FR-SIM-175`, `FR-SIM-177`, and `FR-SIM-228` admit and sample only exact-scope, unexpired, checksummed calibration; pathwise Level-2 queue and exploratory canonical admission fail closed. Evidence: `app/services/simulator/realism/providers.py:58`, `app/services/simulator/realism/providers.py:129`, `tests/simulator/unit/test_calibrated_realism.py:110`, `tests/simulator/unit/test_calibrated_realism.py:130`, `tests/simulator/usage/features/12_realism.py:201`.
+- [x] `FR-SIM-176` pins `sha256-counter-u256-v1`, canonical economic configuration, concern isolation, trace-field exclusion, golden vectors, cross-process identity, and exact counter serialization. Evidence: `app/services/simulator/realism/random_streams.py:57`, `app/services/simulator/realism/random_streams.py:84`, `app/services/simulator/realism/random_streams.py:98`, `app/services/simulator/realism/random_streams.py:125`, `tests/simulator/unit/test_random_streams.py:12`.
+- [x] `FR-SIM-178` schedules a complete calibrated sample under deterministic match/response priority with artifact, component, draw, value, and journal identity. Evidence: `app/services/simulator/scheduler/__init__.py:43`, `tests/simulator/unit/test_calibrated_realism.py:157`, `tests/simulator/usage/features/12_realism.py:240`.
+- [x] `FR-SIM-229` confines seeded timeout, ambiguity, rate-limit, malformed-response, delivery, and connection-lifecycle faults to the scenario engine with exact stream/artifact journal evidence. Evidence: `app/services/simulator/scenarios/contracts.py:136`, `tests/simulator/unit/test_seeded_faults.py:10`, `tests/simulator/usage/features/12_realism.py:250`.
+- [x] `FR-SIM-230` registers all seven durable crash points, authority-query convergence without repeat mutation, accepted/not-found resolution, unresolved blocking, and in-flight kill-switch blocking. Evidence: `app/services/simulator/realism/crash_points.py:26`, `app/services/simulator/realism/crash_points.py:48`, `tests/simulator/integration/test_crash_boundary_recovery.py:10`, `tests/simulator/integration/test_crash_boundary_recovery.py:27`, `tests/simulator/integration/test_unknown_outcome_recovery.py:11`, `tests/simulator/usage/features/15_scheduler.py:98`.
+- [x] `FR-SIM-241` enforces the auto-resolved published budgets: 370,000 annual M1 draws within 5.0 seconds and 64 MiB RSS growth, plus 100,000 draws across ten symbols within 2.0 seconds and 64 MiB. Evidence: `app/services/simulator/realism/random_streams.py:133`, `tests/simulator/performance/test_annual_m1_budget.py:77`, `tests/simulator/usage/features/12_realism.py:264`. Measured on Python 3.14.3 / Windows 11 / Intel Family 6 Model 189: 0.826 seconds and 0.031 MiB annual; 0.226 seconds and 0 MiB multi-symbol; dataset hashes `6557d559892c85840fd06801d93efc05d35487f62c09036aa3416bd3fb92896e` and `e8477e12050235f84a50f48c5f6f8014c4e52a95fe8fb7d708f1ec99684bb112`.
+- [x] `FR-SIM-242` checkpoints and restores bound concern streams with exact counters while preserving scheduler event order. Evidence: `app/services/simulator/scheduler/state.py:32`, `app/services/simulator/scheduler/state.py:72`, `tests/simulator/integration/test_realism_resume.py:16`, `tests/simulator/usage/features/15_scheduler.py:111`.
+- [x] Request, reporting, and checklist identity disclose the calibration checksum, realism-stream identity, fault scenarios, and canonical calibration policy. Evidence: `app/services/simulator/run/contracts.py:319`, `app/services/simulator/reporting/contracts.py:320`, `app/services/simulator/checklists/policies.py:78`.
+- [x] Standing no-lookahead and untouched-holdout guards exist under the exact certification node IDs. Evidence: `tests/simulator/unit/calibration/test_temporal_eligibility.py::test_future_regime_evidence_is_ineligible`, `tests/simulator/integration/test_calibration_holdout_isolation.py::test_certification_holdout_never_enters_fit_or_threshold_selection`.
+- [x] The missing numeric performance specification was automatically resolved using the bounded recommendation in `20-DR1Δ1`; the budgets and measured machine evidence are published above and in the owning README. No calibration/holdout bytes, provider IO, global RNG, or disclosure label was changed.
+- [x] Targeted behavior passed 16/16, including the exact standing guards; the literal seven-file command passed 14/14 behaviors and exited 1 solely because repository-wide subset coverage was 2%, below the global 80% floor.
+- [x] Ruff format/check passed 264 files and mypy passed 108 Simulator source files. Usages 11, 12, 13, and 15 executed directly and passed.
+- [x] Owning-domain behavior passed 500/500 with `--no-cov`; the literal coverage-enabled gate also passed 500/500 behaviors and exited 1 solely because repository-wide coverage was 30.13%, below the global 80% floor.
+- [x] README, module READMEs, changelog, request/report/checklist contracts, public surface, and plan evidence reconcile. Rollback removes the two realism modules and seven exact tests, reverts consumers/usages/docs/identity fields, clears generated caches, and reruns the literal Unit 20 commands plus public/request/calibration/parity regressions.
+- [x] Commit is authorized goal-wide; the exact Unit 20 message will be used below and its hash reconciled in the next plan record.
 
 ## Part 2 · Programme certification — L5-Demo and L5-Live
 

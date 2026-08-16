@@ -1544,6 +1544,163 @@ def build_fill_model_provider(*args: object, **kwargs: object) -> object:
     )
 
 
+def create_realism_stream(*args: object, **kwargs: object) -> object:
+    """Create one pinned concern-specific deterministic stream."""
+    return _call_feature(
+        "app.services.simulator.realism", "create_realism_stream", *args, **kwargs
+    )
+
+
+def sample_realism_stream(*args: object, **kwargs: object) -> object:
+    """Draw once from a deterministic realism stream."""
+    return _call_feature(
+        "app.services.simulator.realism", "sample_realism_stream", *args, **kwargs
+    )
+
+
+def serialize_realism_stream(*args: object, **kwargs: object) -> Mapping[str, object]:
+    """Serialize exact realism generator identity and counter."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.realism",
+            "serialize_realism_stream",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def restore_realism_stream(*args: object, **kwargs: object) -> object:
+    """Restore one verified realism stream state."""
+    return _call_feature(
+        "app.services.simulator.realism", "restore_realism_stream", *args, **kwargs
+    )
+
+
+def get_realism_stream_identity(
+    *args: object, **kwargs: object
+) -> Mapping[str, object]:
+    """Return pinned stream algorithm identity and golden vectors."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.realism",
+            "get_realism_stream_identity",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def get_realism_performance_budgets(
+    *args: object, **kwargs: object
+) -> Mapping[str, object]:
+    """Return published annual-M1 and multi-symbol realism budgets."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.realism",
+            "get_realism_performance_budgets",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def admit_calibrated_realism(*args: object, **kwargs: object) -> object:
+    """Admit one exact applicable calibration into execution realism."""
+    return _call_feature(
+        "app.services.simulator.realism",
+        "admit_calibrated_realism",
+        *args,
+        **kwargs,
+    )
+
+
+def sample_calibrated_realism(*args: object, **kwargs: object) -> Mapping[str, object]:
+    """Sample one calibrated component with journal evidence."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.realism",
+            "sample_calibrated_realism",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def get_simulation_crash_points(*args: object, **kwargs: object) -> tuple[str, ...]:
+    """Return every registered deterministic crash boundary."""
+    return cast(
+        "tuple[str, ...]",
+        _call_feature(
+            "app.services.simulator.realism",
+            "get_simulation_crash_points",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def create_simulation_recovery_state(
+    *args: object, **kwargs: object
+) -> Mapping[str, object]:
+    """Create one immutable unknown-outcome crash recovery state."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.realism",
+            "create_recovery_state",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def recover_simulation_unknown_outcome(
+    *args: object, **kwargs: object
+) -> Mapping[str, object]:
+    """Converge by authority query without repeating an uncertain mutation."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.realism",
+            "recover_unknown_outcome",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def bind_realism_stream_to_scheduler(*args: object, **kwargs: object) -> None:
+    """Bind one realism stream into exact scheduler checkpoint state."""
+    _call_feature(
+        "app.services.simulator.scheduler", "bind_realism_stream", *args, **kwargs
+    )
+
+
+def schedule_calibrated_realism_event(*args: object, **kwargs: object) -> str:
+    """Schedule one admitted calibrated sample deterministically."""
+    return cast(
+        "str",
+        _call_feature(
+            "app.services.simulator.scheduler",
+            "schedule_calibrated_realism_event",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def build_seeded_fault_event(*args: object, **kwargs: object) -> object:
+    """Create a deterministic calibrated fault through the scenario engine."""
+    return _call_feature(
+        "app.services.simulator.scenarios", "build_seeded_fault_event", *args, **kwargs
+    )
+
+
 def partition_calibration_evidence(*args: object, **kwargs: object) -> object:
     """Partition eligible execution evidence before empirical fitting."""
     return _call_feature(
@@ -1784,6 +1941,8 @@ def evaluate_emergency_controls(*args: object, **kwargs: object) -> Mapping[str,
 
 
 __all__: tuple[str, ...] = (
+    "admit_calibrated_realism",
+    "bind_realism_stream_to_scheduler",
     "branch_live_simulation",
     "branch_recovery_checkpoint",
     "build_artifact_manifest",
@@ -1802,6 +1961,7 @@ __all__: tuple[str, ...] = (
     "build_replay_identity",
     "build_scenario_evidence_provider",
     "build_scenario_provider",
+    "build_seeded_fault_event",
     "build_simulation_alert",
     "build_simulation_run_dependencies",
     "build_simulation_state_store",
@@ -1824,8 +1984,10 @@ __all__: tuple[str, ...] = (
     "convert_account_currency",
     "convert_fx_amount",
     "create_live_simulation_session",
+    "create_realism_stream",
     "create_recovery_checkpoint",
     "create_simulation_handle",
+    "create_simulation_recovery_state",
     "create_simulation_scheduler",
     "create_simulation_session",
     "create_simulation_value",
@@ -1851,9 +2013,12 @@ __all__: tuple[str, ...] = (
     "get_margin_state",
     "get_parity_envelope",
     "get_parity_maturity_ladder",
+    "get_realism_performance_budgets",
+    "get_realism_stream_identity",
     "get_report_schema_version",
     "get_same_tick_priority",
     "get_scenario_templates",
+    "get_simulation_crash_points",
     "get_simulation_error_catalog",
     "get_simulation_migrations",
     "get_simulation_mode_policy",
@@ -1887,12 +2052,14 @@ __all__: tuple[str, ...] = (
     "pump_simulation_scheduler_once",
     "read_live_simulation_state",
     "read_simulation_session",
+    "recover_simulation_unknown_outcome",
     "replay_journal",
     "reset_live_simulation_sessions",
     "resolve_cancel_replace_race",
     "resolve_fill_remainder",
     "resolve_idempotent_run",
     "resolve_order_expiration",
+    "restore_realism_stream",
     "restore_simulation_scheduler",
     "restore_simulation_session",
     "restore_transaction_ledger",
@@ -1903,9 +2070,13 @@ __all__: tuple[str, ...] = (
     "run_portfolio_backtest",
     "run_simulation_scheduler_until_complete",
     "run_simulator_migrations",
+    "sample_calibrated_realism",
+    "sample_realism_stream",
+    "schedule_calibrated_realism_event",
     "schedule_simulation_event",
     "schedule_simulation_rollover",
     "secure_simulation_session",
+    "serialize_realism_stream",
     "serialize_simulation_scheduler",
     "serialize_transaction_ledger",
     "shutdown_simulation_scheduler",

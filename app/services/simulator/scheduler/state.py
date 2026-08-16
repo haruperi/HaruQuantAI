@@ -7,6 +7,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import datetime
 
+from app.services.simulator.realism.random_streams import restore, serialize
 from app.services.simulator.scheduler.pump import _DeterministicScheduler, _Handler
 
 
@@ -31,6 +32,10 @@ def _serialize_scheduler(scheduler: _DeterministicScheduler) -> dict[str, object
             for event in sorted(scheduler.events.values(), key=lambda item: item.key)
         ),
         "results": dict(scheduler.results),
+        "realism_streams": {
+            concern: serialize(stream)
+            for concern, stream in sorted(scheduler.realism_streams.items())
+        },
     }
 
 
@@ -67,6 +72,13 @@ def _restore_scheduler(
         scheduler.next_sequence, int(str(state["next_sequence"]))
     )
     scheduler.shutdown = bool(state.get("shutdown", False))
+    streams = state.get("realism_streams", {})
+    if not isinstance(streams, Mapping):
+        raise TypeError("scheduler realism stream state is invalid")
+    for concern, stream_state in streams.items():
+        if not isinstance(stream_state, Mapping):
+            raise TypeError("scheduler realism stream entry is invalid")
+        scheduler.bind_realism_stream(str(concern), restore(stream_state))
     return scheduler
 
 

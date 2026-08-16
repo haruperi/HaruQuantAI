@@ -2,6 +2,7 @@
 
 import sys
 from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
@@ -11,6 +12,8 @@ from app.services.simulator import (
     build_mission_definition,
     build_scenario_evidence_provider,
     build_scenario_provider,
+    build_seeded_fault_event,
+    create_realism_stream,
     evaluate_scenario_triggers,
     get_scenario_templates,
     order_injected_events,
@@ -107,6 +110,20 @@ def fr_sim_117() -> None:
     )
 
 
+def fr_sim_229() -> None:
+    """FR-SIM-229: Scenario alone creates seeded infrastructure faults."""
+    event = build_seeded_fault_event(
+        stream=create_realism_stream({"seed": 42}, "fault"),
+        fault_type="disconnect",
+        probability=Decimal(1),
+        occurred_at=datetime.now(UTC),
+        artifact_checksum="a" * 64,
+    )
+    print(
+        f"SUCCESS: FR-SIM-229 seeded fault; Data -> {event.event_type if event else 'none'}"
+    )
+
+
 def main() -> None:
     """Run every FEAT-SIM-11 requirement demonstration."""
     print("FEATURE: FEAT-SIM-11 — Scenario Engine")
@@ -117,6 +134,7 @@ def main() -> None:
     fr_sim_115()
     fr_sim_116()
     fr_sim_117()
+    fr_sim_229()
 
 
 if __name__ == "__main__":

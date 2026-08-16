@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+from dataclasses import dataclass
 from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -71,6 +73,19 @@ class RealisticExecutionResult(BaseModel):
     slippage_points: Decimal = Field(ge=0)
     impact_points: Decimal = Field(ge=0)
     total_latency_ms: Decimal = Field(ge=0)
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class _CalibratedRealism:
+    """Private admitted calibration and applicability projection."""
+
+    artifact_checksum: str
+    component: str
+    environment: str
+    symbol: str
+    parameters: Mapping[str, str]
+    exclusions: tuple[str, ...]
+    canonical: bool
 
 
 def build_latency_profile(**fields: object) -> LatencyProfile:

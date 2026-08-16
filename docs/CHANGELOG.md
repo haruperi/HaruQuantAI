@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Add seeded execution realism and recovery
+
+Simulator now schedules calibrated stochastic realism with deterministic resume and crash recovery (Phase 20).
+
+#### Added (1)
+
+- Added pinned concern streams, calibrated component admission, scenario-owned faults, seven crash boundaries, authority-query recovery, exact scheduler resume, and enforced annual M1/multi-symbol budgets.
+
 ### Calibrate execution from governed evidence
 
 Simulator now publishes immutable, leakage-safe empirical calibration artifacts (Phase 19).

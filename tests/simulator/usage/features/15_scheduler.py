@@ -1,14 +1,23 @@
 """Standalone usage evidence for FEAT-SIM-15 deterministic scheduling."""
 
 import asyncio
+import sys
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.simulator import (
+    bind_realism_stream_to_scheduler,
     cancel_simulation_event,
+    create_realism_stream,
+    create_simulation_recovery_state,
     create_simulation_scheduler,
     get_simulation_scheduler_state,
+    recover_simulation_unknown_outcome,
     restore_simulation_scheduler,
     run_simulation_scheduler_until_complete,
+    sample_realism_stream,
     schedule_simulation_event,
     serialize_simulation_scheduler,
 )
@@ -86,6 +95,35 @@ def fr_sim_204() -> None:
     print("SUCCESS FR-SIM-204", len(state["events"]))
 
 
+def fr_sim_230() -> None:
+    """FR-SIM-230: recover unknown outcomes without duplicate mutation."""
+    state = create_simulation_recovery_state(
+        command_id="usage-command",
+        crash_point="after_response_receipt",
+        outcome="unknown",
+    )
+    result = recover_simulation_unknown_outcome(
+        state, authority_query=lambda _command_id: "accepted"
+    )
+    print("SUCCESS FR-SIM-230", result["mutation_attempts"], result["outcome"])
+
+
+def fr_sim_242() -> None:
+    """FR-SIM-242: serialize and restore exact scheduler RNG/counter state."""
+    scheduler, _event_id = _fixture()
+    stream = create_realism_stream({"seed": 17, "symbol": "EURUSD"}, "latency")
+    bind_realism_stream_to_scheduler(scheduler, "latency", stream)
+    sample_realism_stream(stream)
+    state = serialize_simulation_scheduler(scheduler)
+    restored = restore_simulation_scheduler(
+        state, {"double": lambda payload: int(payload["value"]) * 2}
+    )
+    print(
+        "SUCCESS FR-SIM-242",
+        serialize_simulation_scheduler(restored)["realism_streams"],
+    )
+
+
 def main() -> None:
     """Execute every scheduler requirement through package-root functions."""
     for function in (
@@ -96,6 +134,8 @@ def main() -> None:
         fr_sim_202,
         fr_sim_203,
         fr_sim_204,
+        fr_sim_230,
+        fr_sim_242,
     ):
         function()
 

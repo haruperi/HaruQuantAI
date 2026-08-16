@@ -10,6 +10,7 @@ from dataclasses import replace
 from datetime import datetime
 from typing import cast
 
+from app.services.simulator.realism.random_streams import serialize
 from app.services.simulator.scheduler.clock import _SimulatedClock
 from app.services.simulator.scheduler.contracts import _ScheduledEvent
 from app.services.simulator.scheduler.queue import _EventQueue
@@ -32,6 +33,14 @@ class _DeterministicScheduler:
         self.source_identities: set[tuple[datetime, str, str, int]] = set()
         self.next_sequence = 0
         self.shutdown = False
+        self.realism_streams: dict[str, object] = {}
+
+    def bind_realism_stream(self, concern: str, stream: object) -> None:
+        """Bind one unique serializable concern stream to scheduler state."""
+        state = serialize(stream)
+        if concern != state["concern"] or concern in self.realism_streams:
+            raise ValueError("scheduler realism concern binding is invalid")
+        self.realism_streams[concern] = stream
 
     def schedule(
         self,

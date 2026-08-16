@@ -28,6 +28,14 @@ def test_late_availability_and_source_mismatch_fail_closed() -> None:
         )
 
 
+def test_future_regime_evidence_is_ineligible() -> None:
+    """FR-SIM-225: future-available regime evidence cannot enter a fit."""
+    with pytest.raises(ValueError, match="late availability"):
+        partition_calibration_evidence(
+            evidence(late=True), evaluation_start=NOW, source_identity=SOURCE
+        )
+
+
 def test_retrospective_fit_is_explicitly_exploratory_only() -> None:
     """FR-SIM-225: late evidence is admitted only under retrospective labelling."""
     partitions = partition_calibration_evidence(

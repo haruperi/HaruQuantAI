@@ -131,6 +131,7 @@ def _build_request_v2(dataset: object) -> object:
             "calculation_model_hash": "a" * 64,
             "calculation_artifact_checksum": "b" * 64,
             "calibration_artifact_checksum": "c" * 64,
+            "realism_stream_identity_hash": "d" * 64,
             "source_lineage_hash": "f" * 64,
             "tick_lineage_hash": "1" * 64,
             "market_evidence_class": "genuine_bid_ask_ticks",

@@ -71,7 +71,14 @@ def get_simulation_mode_policy(mode: SimulationMode) -> Mapping[str, object]:
         policy = dict(_MODE_POLICIES[mode])
     except KeyError as error:
         raise ValueError("unsupported simulation mode") from error
-    policy.update({"route": "sim", "live_route_allowed": False})
+    policy.update(
+        {
+            "route": "sim",
+            "live_route_allowed": False,
+            "canonical_realism_requires_calibration": True,
+            "fault_event_owner": "scenario",
+        }
+    )
     return MappingProxyType(policy)
 
 
