@@ -22,7 +22,7 @@ from app.services.simulator.run.aggregate import PortfolioAggregateLedger
 from app.services.simulator.run.audit import emit_simulation_audit
 from app.services.simulator.run.orchestrator import (
     _canonical_hash,
-    _run_backtest_with_evidence,
+    _run_backtest_with_evidence_async,
     _write_completed_text,
 )
 from app.utils import canonical_digest, canonical_json, get_logger
@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
     from app.services.simulator.reporting import SimulationResult
     from app.services.simulator.run.contracts import (
-        PortfolioBacktestRequestV1,
+        PortfolioBacktestRequest,
         SimulationRunDependencies,
     )
 
@@ -154,7 +154,7 @@ def _component_return_series(
 
 
 def _validate_fx_lineage(
-    request: PortfolioBacktestRequestV1,
+    request: PortfolioBacktestRequest,
     dependencies: SimulationRunDependencies,
 ) -> None:
     """Resolve and freshness-validate every referenced FX evidence identifier.
@@ -204,7 +204,7 @@ def _validate_fx_lineage(
 
 
 def _reconcile(
-    request: PortfolioBacktestRequestV1,
+    request: PortfolioBacktestRequest,
     results: tuple[SimulationResult, ...],
     aggregate_net_profit: Decimal,
 ) -> tuple[PortfolioComponentResult, ...]:
@@ -259,8 +259,8 @@ def _reconcile(
     return tuple(rows)
 
 
-def _run_portfolio_backtest(
-    request: PortfolioBacktestRequestV1,
+async def _run_portfolio_backtest(
+    request: PortfolioBacktestRequest,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
 ) -> PortfolioSimulationResult:
@@ -298,7 +298,10 @@ def _run_portfolio_backtest(
             }
         )
         try:
-            component_result, component_equity = _run_backtest_with_evidence(
+            (
+                component_result,
+                component_equity,
+            ) = await _run_backtest_with_evidence_async(
                 child,
                 child_auth,
                 dependencies,
@@ -463,8 +466,8 @@ def _run_portfolio_backtest(
     return result
 
 
-def run_portfolio_backtest(
-    request: PortfolioBacktestRequestV1,
+async def run_portfolio_backtest(
+    request: PortfolioBacktestRequest,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
 ) -> PortfolioSimulationResult:
@@ -489,7 +492,7 @@ def run_portfolio_backtest(
         {"portfolio_id": request.portfolio_id},
     )
     try:
-        result = _run_portfolio_backtest(request, auth_context, dependencies)
+        result = await _run_portfolio_backtest(request, auth_context, dependencies)
         dependencies.state_store.record_idempotency(
             request.request_id,
             result.request_hash,

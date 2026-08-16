@@ -1,8 +1,7 @@
-"""Official synchronous governed Simulation backtest orchestration."""
+"""Official asynchronous governed Simulation backtest orchestration."""
 
 from __future__ import annotations
 
-import asyncio
 import os
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
@@ -27,7 +26,6 @@ from app.services.simulator.reporting import (
     build_markdown_report,
 )
 from app.services.simulator.run.audit import emit_simulation_audit
-from app.services.simulator.run.contracts import SimulationBacktestRequestV2
 from app.services.simulator.run.evaluation import run_point_in_time_evaluation
 from app.services.simulator.state.runtime import (
     validate_account_activity_ownership,
@@ -43,6 +41,12 @@ from app.services.simulator.validation.contracts import MarketDataValidationCont
 from app.services.trading import create_execution_receipt, is_execution_receipt
 from app.utils import canonical_digest, canonical_json, get_logger
 
+if TYPE_CHECKING:
+    from app.services.simulator.run.contracts import (
+        FastResearchRequest,
+        SimulationBacktestRequest,
+    )
+
 type AuthContext = Any
 ExecutionReceipt = Any
 OrderIntent = Any
@@ -51,7 +55,6 @@ logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.run.contracts import (
-        SimulationBacktestRequestV1,
         SimulationRunDependencies,
     )
     from app.services.simulator.timeline import Tick
@@ -60,7 +63,7 @@ _ENGINE_VERSION = "simulation-engine-v1"
 
 
 def _validated_provider_revisions(
-    request: SimulationBacktestRequestV2,
+    request: SimulationBacktestRequest,
     evidence: object,
 ) -> tuple[Mapping[str, object], ...]:
     """Validate Data-returned revision material against request-bound identity.
@@ -120,7 +123,10 @@ def _canonical_hash(value: object) -> str:
     return canonical_digest(value)
 
 
-def _validate_auth(request: SimulationBacktestRequestV1, auth: AuthContext) -> None:
+def _validate_auth(
+    request: SimulationBacktestRequest | FastResearchRequest,
+    auth: AuthContext,
+) -> None:
     """Validate authentication trace and simulation scope.
 
     Args:
@@ -171,7 +177,7 @@ def _write_completed_text(path: Path, text: str) -> None:
 
 
 def _completed_result(
-    request: SimulationBacktestRequestV1,
+    request: SimulationBacktestRequest,
     request_hash: str,
     run_id: str,
     journal_ref: str,
@@ -339,7 +345,7 @@ class RunContext:
 
 
 def prepare_run_context(
-    request: SimulationBacktestRequestV1,
+    request: SimulationBacktestRequest,
     dependencies: SimulationRunDependencies,
     run_id: str,
 ) -> RunContext:
@@ -413,59 +419,33 @@ def prepare_run_context(
         specification,
         cost_model,
     )
-    provider_revisions: tuple[Mapping[str, object], ...] = ()
-    if isinstance(request, SimulationBacktestRequestV2):
-        provider_evidence = unwrap_simulation_response(
-            dependencies.load_provider_specification_revisions(request),
-            operation="simulation.run.load_provider_specification_revisions",
-        )
-        provider_revisions = _validated_provider_revisions(request, provider_evidence)
+    provider_evidence = unwrap_simulation_response(
+        dependencies.load_provider_specification_revisions(request),
+        operation="simulation.run.load_provider_specification_revisions",
+    )
+    provider_revisions = _validated_provider_revisions(request, provider_evidence)
     engine = EventDrivenExecutionEngine(
         ledger, writer, profile, _ENGINE_VERSION, provider_revisions
     )
+    snapshot = unwrap_simulation_response(
+        dependencies.load_initial_authority_state(request),
+        operation="simulation.run.load_initial_authority_state",
+    )
+    validated_snapshot = validate_initial_authority_state(
+        snapshot,
+        expected_hash=request.initial_authority_state_hash,
+        account_currency=request.account_currency,
+        initial_balance=request.initial_balance,
+    )
+    activity = unwrap_simulation_response(
+        dependencies.load_account_activity(request),
+        operation="simulation.run.load_account_activity",
+    )
+    validate_account_activity_ownership(
+        validated_snapshot["ownership"], tuple(activity)
+    )
+    order_intents: tuple[OrderIntent, ...] = ()
     approved_requests: tuple[object, ...] = ()
-    if isinstance(request, SimulationBacktestRequestV2):
-        snapshot = unwrap_simulation_response(
-            dependencies.load_initial_authority_state(request),
-            operation="simulation.run.load_initial_authority_state",
-        )
-        validated_snapshot = validate_initial_authority_state(
-            snapshot,
-            expected_hash=request.initial_authority_state_hash,
-            account_currency=request.account_currency,
-            initial_balance=request.initial_balance,
-        )
-        activity = unwrap_simulation_response(
-            dependencies.load_account_activity(request),
-            operation="simulation.run.load_account_activity",
-        )
-        validate_account_activity_ownership(
-            validated_snapshot["ownership"], tuple(activity)
-        )
-        order_intents: tuple[OrderIntent, ...] = ()
-    else:
-        indicators = unwrap_simulation_response(
-            dependencies.calculate_indicators(source_dataset, request),
-            operation="simulation.run.calculate_indicators",
-        )
-        strategy_intents = unwrap_simulation_response(
-            dependencies.evaluate_strategy(source_dataset, indicators, request),
-            operation="simulation.run.evaluate_strategy",
-        )
-        risk_decisions = unwrap_simulation_response(
-            dependencies.review_risk(strategy_intents, request),
-            operation="simulation.run.review_risk",
-        )
-        approved_order_intents: tuple[OrderIntent, ...] = unwrap_simulation_response(
-            dependencies.build_order_intents(risk_decisions, request),
-            operation="simulation.run.build_order_intents",
-        )
-        order_intents = tuple(
-            sorted(
-                approved_order_intents,
-                key=lambda item: (item.created_at, item.client_order_id),
-            )
-        )
     return RunContext(
         timeline=timeline,
         source_dataset=source_dataset,
@@ -481,7 +461,7 @@ def prepare_run_context(
 
 async def advance_trading_timeline(
     dependencies: SimulationRunDependencies,
-    request: SimulationBacktestRequestV2,
+    request: SimulationBacktestRequest,
     engine: object,
     timeline: tuple[Tick, ...],
     unsent: list[object],
@@ -544,7 +524,7 @@ async def advance_trading_timeline(
 
 
 async def finalize_open_positions(
-    request: SimulationBacktestRequestV1,
+    request: SimulationBacktestRequest,
     dependencies: SimulationRunDependencies,
     engine: object,
     positions: Iterable[Mapping[str, object]],
@@ -561,21 +541,12 @@ async def finalize_open_positions(
         Count of positions explicitly liquidated.
     """
     material = tuple(positions)
-    if isinstance(request, SimulationBacktestRequestV2):
-        if not request.close_open_positions_at_end:
-            return 0
-        for position in material:
-            unwrap_simulation_response(
-                await dependencies.execute_terminal_action(position, engine, request),
-                operation="simulation.run.execute_terminal_action",
-            )
-        return len(material)
+    if not request.close_open_positions_at_end:
+        return 0
     for position in material:
         unwrap_simulation_response(
-            cast("Any", engine).close_position(
-                str(position["position_id"]), cast("Decimal", position["volume"])
-            ),
-            operation="simulation.run.engine_close_position",
+            await dependencies.execute_terminal_action(position, engine, request),
+            operation="simulation.run.execute_terminal_action",
         )
     return len(material)
 
@@ -663,7 +634,7 @@ def advance_run_timeline(
 
 
 async def _run_backtest_with_evidence_async(  # noqa: PLR0915
-    request: SimulationBacktestRequestV1,
+    request: SimulationBacktestRequest,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
 ) -> tuple[SimulationResult, tuple[tuple[datetime, Decimal], ...]]:
@@ -755,22 +726,16 @@ async def _run_backtest_with_evidence_async(  # noqa: PLR0915
         ledger = context.ledger
         profile = context.profile
         engine = context.engine
-        order_intents = context.order_intents
         receipts: list[object] = []
-        if isinstance(request, SimulationBacktestRequestV2):
-            await advance_trading_timeline(
-                dependencies,
-                request,
-                engine,
-                timeline,
-                list(context.approved_requests),
-                receipts,
-                context.source_dataset,
-            )
-        else:
-            unsent = list(order_intents)
-            submit_orders_before(engine, unsent, receipts, timeline[0].timestamp)
-            advance_run_timeline(engine, timeline, unsent, receipts)
+        await advance_trading_timeline(
+            dependencies,
+            request,
+            engine,
+            timeline,
+            list(context.approved_requests),
+            receipts,
+            context.source_dataset,
+        )
         terminal_state = unwrap_simulation_response(
             engine.snapshot(),
             operation="simulation.run.engine_snapshot",
@@ -848,33 +813,8 @@ async def _run_backtest_with_evidence_async(  # noqa: PLR0915
         ) from error
 
 
-def _run_backtest_with_evidence(
-    request: SimulationBacktestRequestV1,
-    auth_context: AuthContext,
-    dependencies: SimulationRunDependencies,
-) -> tuple[SimulationResult, tuple[tuple[datetime, Decimal], ...]]:
-    """Retain the synchronous internal bridge for legacy portfolio orchestration.
-
-    Returns:
-        Completed result and internal equity evidence.
-
-    Raises:
-        SimulationError: If invoked from an active event loop.
-    """
-    try:
-        asyncio.get_running_loop()
-    except RuntimeError:
-        return asyncio.run(
-            _run_backtest_with_evidence_async(request, auth_context, dependencies)
-        )
-    raise SimulationError(
-        "SIM_UNSUPPORTED_OPERATION",
-        "Synchronous evidence bridge cannot run inside an active event loop",
-    )
-
-
 async def run_backtest_async(
-    request: SimulationBacktestRequestV1,
+    request: SimulationBacktestRequest,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
 ) -> SimulationResult:
@@ -907,27 +847,4 @@ async def run_backtest_async(
     return result
 
 
-def run_backtest(
-    request: SimulationBacktestRequestV1,
-    auth_context: AuthContext,
-    dependencies: SimulationRunDependencies,
-) -> SimulationResult:
-    """Execute the async run bridge outside an active event loop.
-
-    Returns:
-        Completed canonical result.
-
-    Raises:
-        SimulationError: If called inside an active event loop.
-    """
-    try:
-        asyncio.get_running_loop()
-    except RuntimeError:
-        return asyncio.run(run_backtest_async(request, auth_context, dependencies))
-    raise SimulationError(
-        "SIM_UNSUPPORTED_OPERATION",
-        "Synchronous backtest cannot run inside an active event loop",
-    )
-
-
-__all__ = ["run_backtest", "run_backtest_async"]
+__all__ = ["run_backtest_async"]

@@ -44,7 +44,7 @@ from app.utils import canonical_json, derive_stable_id, get_logger, utc_now
 
 if TYPE_CHECKING:
     from app.services.simulator.run.contracts import (
-        SimulationBacktestRequestV1,
+        SimulationBacktestRequest,
         SimulationRunDependencies,
     )
 
@@ -76,7 +76,7 @@ class _LiveSession:
         self,
         session_id: str,
         run_id: str,
-        request: SimulationBacktestRequestV1,
+        request: SimulationBacktestRequest,
         context: RunContext,
         *,
         branch_of: str | None = None,
@@ -204,7 +204,7 @@ def _project(session: _LiveSession) -> Mapping[str, object]:
 
 
 def create_live_simulation_session(
-    request: SimulationBacktestRequestV1,
+    request: SimulationBacktestRequest,
     dependencies: SimulationRunDependencies,
     *,
     request_id: str,
@@ -378,8 +378,8 @@ def branch_live_simulation(
 
 
 def _apply_overrides(
-    request: SimulationBacktestRequestV1, overrides: Mapping[str, object]
-) -> SimulationBacktestRequestV1:
+    request: SimulationBacktestRequest, overrides: Mapping[str, object]
+) -> SimulationBacktestRequest:
     """Build one overridden copy of a receiver-owned request.
 
     Args:

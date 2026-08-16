@@ -46,9 +46,9 @@ _VALUE_TYPES: Mapping[str, tuple[str, str]] = {
         "MarketEvidenceLineage",
     ),
     "MatchResult": ("app.services.simulator.execution", "MatchResult"),
-    "PortfolioBacktestRequestV1": (
+    "PortfolioBacktestRequest": (
         "app.services.simulator.run",
-        "PortfolioBacktestRequestV1",
+        "PortfolioBacktestRequest",
     ),
     "PortfolioComponentRequest": (
         "app.services.simulator.run",
@@ -69,13 +69,13 @@ _VALUE_TYPES: Mapping[str, tuple[str, str]] = {
         "RiskBudgetHistoryRow",
     ),
     "SessionInterval": ("app.services.simulator.execution", "SessionInterval"),
-    "SimulationBacktestRequestV1": (
+    "FastResearchRequest": (
         "app.services.simulator.run",
-        "SimulationBacktestRequestV1",
+        "FastResearchRequest",
     ),
-    "SimulationBacktestRequestV2": (
+    "SimulationBacktestRequest": (
         "app.services.simulator.run",
-        "SimulationBacktestRequestV2",
+        "SimulationBacktestRequest",
     ),
     "SimulationResult": ("app.services.simulator.reporting", "SimulationResult"),
     "SymbolSpecification": (
@@ -230,7 +230,7 @@ def build_simulation_run_dependencies(**values: object) -> object:
         **values: Exact state, artifact, policy, and public owner ports.
 
     Returns:
-        Opaque dependency bundle accepted by ``run_backtest``.
+        Opaque dependency bundle accepted by ``run_backtest_async``.
     """
     builder = _operation(
         "app.services.simulator.run.dependencies",
@@ -507,15 +507,15 @@ def calculate_simulation_backtest_config_hash(
     payload: Mapping[str, object],
 ) -> StandardResponse[str]:
     """Calculate the canonical Simulation backtest configuration hash."""
-    model = _resolve(_VALUE_TYPES, "SimulationBacktestRequestV1")
+    model = _resolve(_VALUE_TYPES, "SimulationBacktestRequest")
     return cast("StandardResponse[str]", model.calculate_config_hash(payload))
 
 
-def calculate_simulation_backtest_v2_config_hash(
+def calculate_fast_research_config_hash(
     payload: Mapping[str, object],
 ) -> StandardResponse[str]:
-    """Calculate the complete V2 execution configuration hash."""
-    model = _resolve(_VALUE_TYPES, "SimulationBacktestRequestV2")
+    """Calculate the explicitly non-canonical research configuration hash."""
+    model = _resolve(_VALUE_TYPES, "FastResearchRequest")
     return cast("StandardResponse[str]", model.calculate_config_hash(payload))
 
 
@@ -523,7 +523,7 @@ def calculate_portfolio_backtest_config_hash(
     payload: Mapping[str, object],
 ) -> StandardResponse[str]:
     """Calculate the canonical portfolio backtest configuration hash."""
-    model = _resolve(_VALUE_TYPES, "PortfolioBacktestRequestV1")
+    model = _resolve(_VALUE_TYPES, "PortfolioBacktestRequest")
     return cast("StandardResponse[str]", model.calculate_config_hash(payload))
 
 
@@ -1059,17 +1059,6 @@ def resolve_idempotent_run(*args: object, **kwargs: object) -> StandardResponse[
     )(*args, **kwargs)
 
 
-def run_backtest(*args: object, **kwargs: object) -> StandardResponse[object]:
-    """Run one governed canonical Simulation backtest."""
-    return _guarded(
-        _operation("app.services.simulator.run", "run_backtest"),
-        operation="simulation.run.run_backtest",
-        risk_level="medium",
-        read_only=False,
-        writes_file=True,
-    )(*args, **kwargs)
-
-
 def build_evaluation_latency(
     *args: object, **kwargs: object
 ) -> StandardResponse[object]:
@@ -1248,10 +1237,16 @@ def run_fast_research(*args: object, **kwargs: object) -> StandardResponse[objec
     )(*args, **kwargs)
 
 
-def run_portfolio_backtest(*args: object, **kwargs: object) -> StandardResponse[object]:
+async def run_portfolio_backtest(
+    *args: object, **kwargs: object
+) -> StandardResponse[object]:
     """Run one governed portfolio simulation."""
-    return _guarded(
+    operation = cast(
+        "Callable[..., Awaitable[object]]",
         _operation("app.services.simulator.run", "run_portfolio_backtest"),
+    )
+    return await _guarded_async(
+        operation,
         operation="simulation.run.run_portfolio_backtest",
         risk_level="high",
         read_only=False,
@@ -1969,13 +1964,13 @@ __all__: tuple[str, ...] = (
     "build_transaction_posting",
     "bypass_simulation_checklist_step",
     "calculate_execution_costs",
+    "calculate_fast_research_config_hash",
     "calculate_fx_profit",
     "calculate_margin",
     "calculate_planned_margin",
     "calculate_portfolio_backtest_config_hash",
     "calculate_rollover_swap",
     "calculate_simulation_backtest_config_hash",
-    "calculate_simulation_backtest_v2_config_hash",
     "calculate_total_margin",
     "cancel_simulation_event",
     "close_live_simulation_session",
@@ -2063,7 +2058,6 @@ __all__: tuple[str, ...] = (
     "restore_simulation_scheduler",
     "restore_simulation_session",
     "restore_transaction_ledger",
-    "run_backtest",
     "run_backtest_async",
     "run_fast_research",
     "run_offline_calculation_conformance",

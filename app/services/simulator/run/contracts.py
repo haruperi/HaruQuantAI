@@ -73,15 +73,11 @@ def _hash_material(payload: Mapping[str, object]) -> str:
     return canonical_digest(material)
 
 
-class SimulationBacktestRequestV1(BaseModel):
-    """Exact reference-based synchronous FX backtest request version 1."""
+class _SimulationRequestBase(BaseModel):
+    """Private fields and validation shared by Simulation run requests."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    contract_version: Literal["v1"] = "v1"
-    schema_id: Literal["simulation.backtest_request.v1"] = (
-        "simulation.backtest_request.v1"
-    )
     request_id: str
     workflow_id: str
     correlation_id: str
@@ -110,9 +106,7 @@ class SimulationBacktestRequestV1(BaseModel):
     account_currency: str
     asset_class: Literal["FX"]
     seed: int
-    runtime_profile: Literal["simulation", "fast_research"]
     execution_route: Literal["sim"]
-    canonical: bool
     config_hash: str
 
     @classmethod
@@ -127,17 +121,15 @@ class SimulationBacktestRequestV1(BaseModel):
         Returns:
             Lowercase SHA-256 configuration digest.
         """
-        logger.debug("Calculating SimulationBacktestRequestV1 config hash")
+        logger.debug("Calculating Simulation request config hash")
 
         def calculate(value: Mapping[str, object]) -> str:
             material = dict(value)
-            material.setdefault("contract_version", "v1")
-            material.setdefault("schema_id", "simulation.backtest_request.v1")
             return _hash_material(material)
 
         return guard_operation(
             calculate,
-            operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
+            operation="simulation.run.simulation_request.calculate_config_hash",
             risk_level="low",
             read_only=True,
         )(payload)
@@ -213,7 +205,7 @@ class SimulationBacktestRequestV1(BaseModel):
         return dict(value)
 
     @model_validator(mode="after")
-    def _validate_request(self) -> SimulationBacktestRequestV1:
+    def _validate_request(self) -> Self:
         """Validate range, profile, and configuration identity.
 
         Returns:
@@ -225,10 +217,6 @@ class SimulationBacktestRequestV1(BaseModel):
         logger.debug("Validating Simulation backtest request relationships")
         if self.end < self.start:
             raise ValueError("Backtest end must not precede start")
-        if self.runtime_profile == "simulation" and not self.canonical:
-            raise ValueError("Official simulation request must be canonical")
-        if self.runtime_profile == "fast_research" and self.canonical:
-            raise ValueError("Fast research request cannot be canonical")
         payload = self.model_dump(mode="python", warnings=False)
         if self.config_hash != _hash_material(payload):
             raise ValueError("config_hash does not match request material")
@@ -305,13 +293,52 @@ class ProviderSpecificationRevisionBinding(BaseModel):
         return self
 
 
-class SimulationBacktestRequestV2(SimulationBacktestRequestV1):
-    """Parity-eligible backtest request with complete execution identity."""
+class FastResearchRequest(_SimulationRequestBase):
+    """Explicitly non-canonical approximate research request."""
 
-    contract_version: Literal["v2"] = "v2"  # type: ignore[assignment]
-    schema_id: Literal["simulation.backtest_request.v2"] = (
-        "simulation.backtest_request.v2"  # type: ignore[assignment]
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["simulation.fast_research_request.v1"] = (
+        "simulation.fast_research_request.v1"
     )
+    runtime_profile: Literal["fast_research"] = "fast_research"
+    canonical: Literal[False] = False
+
+    @classmethod
+    @override
+    def calculate_config_hash(
+        cls, payload: Mapping[str, object]
+    ) -> StandardResponse[str]:
+        """Calculate the non-canonical research configuration hash.
+
+        Returns:
+            A standard response containing the canonical configuration hash.
+        """
+
+        def calculate(value: Mapping[str, object]) -> str:
+            material = dict(value)
+            material.setdefault("contract_version", "v1")
+            material.setdefault("schema_id", "simulation.fast_research_request.v1")
+            material.setdefault("runtime_profile", "fast_research")
+            material.setdefault("canonical", False)
+            return _hash_material(material)
+
+        return guard_operation(
+            calculate,
+            operation="simulation.run.fast_research_request.calculate_config_hash",
+            risk_level="low",
+            read_only=True,
+        )(payload)
+
+
+class SimulationBacktestRequest(_SimulationRequestBase):
+    """Canonical parity-eligible request with complete execution identity."""
+
+    contract_version: Literal["v2"] = "v2"
+    schema_id: Literal["simulation.backtest_request.v2"] = (
+        "simulation.backtest_request.v2"
+    )
+    runtime_profile: Literal["simulation"] = "simulation"
+    canonical: Literal[True] = True
     execution_model_ref: str
     execution_model_hash: str
     calculation_model_hash: str
@@ -354,7 +381,7 @@ class SimulationBacktestRequestV2(SimulationBacktestRequestV1):
 
         return guard_operation(
             calculate,
-            operation="simulation.run.simulation_backtest_request_v2.calculate_config_hash",
+            operation="simulation.run.simulation_backtest_request.calculate_config_hash",
             risk_level="low",
             read_only=True,
         )(payload)
@@ -459,11 +486,11 @@ class PortfolioComponentRequest(BaseModel):
     risk_budget: Decimal
     risk_decision_id: str
     metrics_ref: str
-    backtest_request: SimulationBacktestRequestV1
+    backtest_request: SimulationBacktestRequest
 
 
-class PortfolioBacktestRequestV1(BaseModel):
-    """Self-contained receiver-owned portfolio candidate request version 1."""
+class PortfolioBacktestRequest(BaseModel):
+    """Self-contained receiver-owned portfolio candidate request."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -504,7 +531,7 @@ class PortfolioBacktestRequestV1(BaseModel):
         Returns:
             Lowercase SHA-256 digest.
         """
-        logger.debug("Calculating PortfolioBacktestRequestV1 config hash")
+        logger.debug("Calculating PortfolioBacktestRequest config hash")
 
         def calculate(value: Mapping[str, object]) -> str:
             material = dict(value)
@@ -562,7 +589,7 @@ class PortfolioBacktestRequestV1(BaseModel):
                 )
 
     @model_validator(mode="after")
-    def _validate_portfolio(self) -> PortfolioBacktestRequestV1:
+    def _validate_portfolio(self) -> Self:
         """Validate portfolio relationships and configuration identity.
 
         Returns:
@@ -608,19 +635,19 @@ class SimulationRunDependencies(Protocol):
         ...
 
     def load_market_data(
-        self, request: SimulationBacktestRequestV1
+        self, request: _SimulationRequestBase
     ) -> StandardResponse[MarketDataset]:
         """Load the immutable referenced Data dataset."""
         ...
 
     def generate_tick_series(
-        self, dataset: MarketDataset, request: SimulationBacktestRequestV1
+        self, dataset: MarketDataset, request: _SimulationRequestBase
     ) -> StandardResponse[MarketDataset]:
         """Invoke Data's official real-evidence tick generator."""
         ...
 
     def calculate_indicators(
-        self, dataset: MarketDataset, request: SimulationBacktestRequestV1
+        self, dataset: MarketDataset, request: _SimulationRequestBase
     ) -> StandardResponse[tuple[Any, ...]]:
         """Calculate point-in-time Indicator evidence."""
         ...
@@ -629,7 +656,7 @@ class SimulationRunDependencies(Protocol):
         self,
         dataset: MarketDataset,
         indicators: tuple[Any, ...],
-        request: SimulationBacktestRequestV1,
+        request: _SimulationRequestBase,
     ) -> StandardResponse[tuple[create_trade_intent_value, ...]]:
         """Evaluate a registered Strategy against supplied evidence."""
         ...
@@ -637,7 +664,7 @@ class SimulationRunDependencies(Protocol):
     def review_risk(
         self,
         intents: tuple[create_trade_intent_value, ...],
-        request: SimulationBacktestRequestV1,
+        request: _SimulationRequestBase,
     ) -> StandardResponse[tuple[RiskDecisionPackage, ...]]:
         """Review Strategy proposals under the referenced sim policy."""
         ...
@@ -645,7 +672,7 @@ class SimulationRunDependencies(Protocol):
     def build_order_intents(
         self,
         decisions: tuple[RiskDecisionPackage, ...],
-        request: SimulationBacktestRequestV1,
+        request: _SimulationRequestBase,
     ) -> StandardResponse[tuple[OrderIntent, ...]]:
         """Pack approved Risk decisions through Trading's public boundary."""
         ...
@@ -654,7 +681,7 @@ class SimulationRunDependencies(Protocol):
         self,
         intents: tuple[create_trade_intent_value, ...],
         decisions: tuple[RiskDecisionPackage, ...],
-        request: SimulationBacktestRequestV2,
+        request: SimulationBacktestRequest,
     ) -> StandardResponse[tuple[object, ...]]:
         """Invoke Trading's public approved-request builder for canonical v2 runs."""
         ...
@@ -663,7 +690,7 @@ class SimulationRunDependencies(Protocol):
         self,
         approved_request: object,
         engine: object,
-        request: SimulationBacktestRequestV2,
+        request: SimulationBacktestRequest,
     ) -> StandardResponse[object]:
         """Execute one approved request through a public Trading action."""
         ...
@@ -672,25 +699,25 @@ class SimulationRunDependencies(Protocol):
         self,
         position: Mapping[str, object],
         engine: object,
-        request: SimulationBacktestRequestV2,
+        request: SimulationBacktestRequest,
     ) -> StandardResponse[object]:
         """Execute one Risk-authorized terminal close through Trading."""
         ...
 
     def load_initial_authority_state(
-        self, request: SimulationBacktestRequestV2
+        self, request: SimulationBacktestRequest
     ) -> StandardResponse[Mapping[str, object]]:
         """Load one complete initial authority snapshot for both projections."""
         ...
 
     def load_account_activity(
-        self, request: SimulationBacktestRequestV2
+        self, request: SimulationBacktestRequest
     ) -> StandardResponse[tuple[Mapping[str, object], ...]]:
         """Load complete ordered foreign/manual activity evidence."""
         ...
 
     def load_provider_specification_revisions(
-        self, request: SimulationBacktestRequestV2
+        self, request: SimulationBacktestRequest
     ) -> StandardResponse[Mapping[str, object]]:
         """Load complete Data-owned effective provider revisions for the run."""
         ...
@@ -700,25 +727,25 @@ class SimulationRunDependencies(Protocol):
         dataset: MarketDataset,
         decision_at: datetime,
         engine: object,
-        request: SimulationBacktestRequestV2,
+        request: SimulationBacktestRequest,
     ) -> StandardResponse[object]:
         """Invoke Trading's shared evaluation cycle at scheduler time."""
         ...
 
     def resolve_execution_profile(
-        self, request: SimulationBacktestRequestV1
+        self, request: _SimulationRequestBase
     ) -> StandardResponse[ExecutionProfile]:
         """Resolve the exact referenced execution profile."""
         ...
 
     def resolve_symbol_specification(
-        self, request: SimulationBacktestRequestV1
+        self, request: _SimulationRequestBase
     ) -> StandardResponse[SymbolSpecification]:
         """Resolve approved symbol constraints."""
         ...
 
     def resolve_cost_model(
-        self, request: SimulationBacktestRequestV1
+        self, request: _SimulationRequestBase
     ) -> StandardResponse[ExecutionCostModel]:
         """Resolve the exact referenced cost model."""
         ...
@@ -736,9 +763,9 @@ class SimulationRunDependencies(Protocol):
 
 
 __all__ = [
-    "PortfolioBacktestRequestV1",
+    "FastResearchRequest",
+    "PortfolioBacktestRequest",
     "PortfolioComponentRequest",
-    "SimulationBacktestRequestV1",
-    "SimulationBacktestRequestV2",
+    "SimulationBacktestRequest",
     "SimulationRunDependencies",
 ]

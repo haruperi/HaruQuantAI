@@ -22,13 +22,13 @@ logger = get_logger(__name__)
 
 if TYPE_CHECKING:
     from app.services.simulator.run.contracts import (
-        SimulationBacktestRequestV1,
+        FastResearchRequest,
         SimulationRunDependencies,
     )
 
 
 def _run_fast_research(
-    request: SimulationBacktestRequestV1,
+    request: FastResearchRequest,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
 ) -> FastResearchResult:
@@ -91,7 +91,7 @@ def _run_fast_research(
 
 
 def run_fast_research(
-    request: SimulationBacktestRequestV1,
+    request: FastResearchRequest,
     auth_context: AuthContext,
     dependencies: SimulationRunDependencies,
 ) -> FastResearchResult:

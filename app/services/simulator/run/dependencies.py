@@ -206,7 +206,7 @@ def build_simulation_run_dependencies(
         ports: Exact owner-operation mapping required by a canonical run.
 
     Returns:
-        Opaque dependency bundle accepted by ``run_backtest``.
+        Opaque dependency bundle accepted by ``run_backtest_async``.
 
     Raises:
         TypeError: If the supplied state store does not implement its protocol.
