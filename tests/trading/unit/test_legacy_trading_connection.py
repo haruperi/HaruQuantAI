@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import importlib.util
 import sys
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
 from typing import Any
@@ -64,6 +66,59 @@ def test_sim_connection_is_ready_without_provider_resolution(
     assert "Authority:          Deterministic Simulation" in output
     assert "Environment:        simulation" in output
     assert "Virtual:            Yes" in output
+
+
+def test_selected_symbol_drives_every_virtual_symbol_identity() -> None:
+    """Require one configured symbol to flow through every virtual fixture."""
+    module = LEGACY_MODULE
+    selected_symbol = "TESTUSD"
+    original_symbol = module.ctx.symbol
+    module.ctx.symbol = selected_symbol
+    try:
+        order_page = module._virtual_order_page()
+        assert order_page["items"][0]["symbol"] == selected_symbol
+
+        output = StringIO()
+        with redirect_stdout(output):
+            module.example_04_symbol()
+            module.example_05_position()
+            module.example_07_history_order()
+            module.example_08_history_deal()
+            module.example_09_open_position()
+            module.example_14_pending_orders()
+        rendered = output.getvalue()
+        assert selected_symbol in rendered
+        assert "EURUSD" not in rendered
+        assert "GBPUSD" not in rendered
+        assert "BTCUSD" not in rendered
+    finally:
+        module.ctx.symbol = original_symbol
+
+
+def test_default_symbol_has_one_declaration_and_no_competing_literal() -> None:
+    """Require all legacy symbol identity to originate from ``SYMBOL``."""
+    source = LEGACY_SCRIPT.read_text(encoding="utf-8")
+    assert 'SYMBOL = "BTCUSD"' in source
+    assert source.count('"BTCUSD"') == 1
+    assert '"EURUSD"' not in source
+    assert '"GBPUSD"' not in source
+
+
+def test_virtual_simulation_fixtures_do_not_claim_demo_identity(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Require local fallback identity to remain Simulation-scoped."""
+    module = LEGACY_MODULE
+    module.ctx.target = "sim"
+    module.ctx.adapter = None
+    module.example_02_terminal()
+    module.example_03_account()
+
+    output = capsys.readouterr().out
+    assert "Environment:        simulation" in output
+    assert "Simulation Account" in output
+    assert "Simulation Authority" in output
+    assert "demo" not in output.lower()
 
 
 def test_provider_session_uses_explicit_resolved_environment(

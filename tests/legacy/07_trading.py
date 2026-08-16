@@ -66,6 +66,7 @@ from app.utils import generate_id, load_broker_provider_settings
 
 Target = Literal["sim", "mt5", "ctrader"]
 EXECUTION_TARGET: Target = "sim"
+SYMBOL = "BTCUSD"
 
 
 @dataclass
@@ -93,7 +94,7 @@ ctx = OperationsContext(
     store=None,
     connected=False,
     account_id="acc-001",
-    symbol="GBPUSD",
+    symbol=SYMBOL,
     position_id="pos-001",
     order_id="ord-001",
 )
@@ -657,7 +658,7 @@ def _virtual_order_page() -> dict[str, object]:
             {
                 "order_id": "order-001",
                 "client_order_id": "virtual-client-order-001",
-                "symbol": "EURUSD",
+                "symbol": ctx.symbol,
                 "side": "BUY",
                 "order_type": "LIMIT",
                 "state": "PENDING",
@@ -1023,7 +1024,7 @@ def example_02_terminal() -> None:
             "broker_id": ctx.target,
             "provider_name": "Virtual Provider",
             "product_profile": "simulation",
-            "environment": "demo",
+            "environment": "simulation",
             "api_or_terminal_version": "v1.0.0",
             "observed_at": datetime.now(UTC),
             "name": "Virtual Terminal",
@@ -1060,16 +1061,17 @@ def example_03_account() -> None:
 
     _render_account(
         {
-            "account_id": "demo-acc-1001",
+            "account_id": "sim-account-1001",
             "login": "10001",
-            "name": "Demo Account",
-            "server": "VirtualServer-Demo",
-            "company": "HaruQuant Demo",
+            "name": "Simulation Account",
+            "server": "Simulation Authority",
+            "company": "HaruQuantAI",
             "currency": "USD",
             "leverage": 100,
-            "account_reference_redacted": "demo-***-1001",
+            "account_reference_redacted": "sim-***-1001",
             "status": "ACTIVE",
-            "trade_mode": "DEMO",
+            "trade_mode": "SIMULATION",
+            "trade_mode_description": "Simulation account",
             "margin_mode": "HEDGING",
             "trade_allowed": True,
             "trade_expert": True,
@@ -1121,9 +1123,11 @@ def example_04_symbol() -> None:
             "digits": 5,
             "point": 0.00001,
             "tick_size": 0.00001,
-            "product_profile": "spot_forex",
-            "base_asset": "GBP",
-            "quote_asset": "USD",
+            "product_profile": "simulation",
+            # Virtual evidence does not infer asset decomposition from a
+            # provider symbol; genuine adapters supply authoritative metadata.
+            "base_asset": "N/A",
+            "quote_asset": "N/A",
             "bid": 1.27500,
             "ask": 1.27520,
             "last": 1.27510,
@@ -1245,7 +1249,7 @@ def example_07_history_order() -> None:
                     "quantity_unit": "lots",
                     "price": Decimal("1.27500"),
                     "time_in_force": "IOC",
-                    "product_profile": "spot_forex",
+                    "product_profile": "simulation",
                     "retrieved_at": datetime.now(UTC),
                 },
             )

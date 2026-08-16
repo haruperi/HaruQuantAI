@@ -4,11 +4,11 @@
 
 ### Correct legacy three-route connection composition
 
-The legacy Trading example now initializes Simulation without provider credentials or sockets and derives provider session routing from the explicit configured environment.
+The legacy Trading example now initializes Simulation without provider credentials or sockets, derives provider session routing from the explicit configured environment, and drives every symbol identity from one setting.
 
 #### Fixed (1)
 
-- Corrected `tests/legacy/07_trading.py` so `sim` reports deterministic local readiness while MT5 and cTrader retain governed non-production provider composition.
+- Corrected `tests/legacy/07_trading.py` so `sim` reports deterministic local readiness, MT5 and cTrader retain governed non-production provider composition, virtual fixtures remain Simulation-scoped, and one `SYMBOL` setting controls every symbol identity; generated Data bytecode caches are no longer tracked.
 
 ### Publish bounded MT5 operational parity
 
