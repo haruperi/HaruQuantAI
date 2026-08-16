@@ -409,6 +409,13 @@ _CREDENTIAL_DEFINITIONS = (
         ),  # pragma: allowlist secret
     ),
     _CredentialDefinition(
+        "risk_approval_signing",
+        "Risk Approval Token Signing Key",
+        MappingProxyType(
+            {"signing_key": "settings.risk.approval_signing_key"}
+        ),  # pragma: allowlist secret
+    ),
+    _CredentialDefinition(
         "mt5",
         "MetaTrader 5",
         MappingProxyType(

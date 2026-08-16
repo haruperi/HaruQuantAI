@@ -35,7 +35,10 @@ def test_provider_manifest_is_exact_and_deterministic() -> None:
         "simulation.run_source",
         "simulation.session_source",
         "strategy.mutation_source",
+        "trading.cancel_all_preflight_source",
+        "trading.cancel_order_preflight_source",
         "trading.mutation_source",
+        "trading.preflight_source",
         "trading.session_source",
     )
     assert len(set(names)) == len(names)

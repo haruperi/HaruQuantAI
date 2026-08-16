@@ -486,13 +486,108 @@ def create_policy_version(
     return True
 
 
+def create_capacity_reservation(
+    *,
+    reservation_key: str,
+    account_id: str,
+    strategy_id: str,
+    symbol: str,
+    requested_notional: str,
+    expires_at: str,
+    request_id: str,
+    correlation_id: str,
+    created_at: str,
+) -> None:
+    """Insert one capacity reservation or verify an idempotent replay.
+
+    Raises:
+        ValueError: If the reservation key conflicts with different material.
+    """
+    result = _execute(
+        (
+            "INSERT INTO risk_capacity_reservations "
+            "(reservation_key, account_id, strategy_id, symbol, "
+            "requested_notional, expires_at, request_id, correlation_id, "
+            "created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(reservation_key) DO UPDATE SET "
+            "reservation_key=excluded.reservation_key "
+            "WHERE risk_capacity_reservations.account_id=excluded.account_id "
+            "AND risk_capacity_reservations.strategy_id=excluded.strategy_id "
+            "AND risk_capacity_reservations.symbol=excluded.symbol "
+            "AND risk_capacity_reservations.requested_notional="
+            "excluded.requested_notional",
+        ),
+        (
+            (
+                reservation_key,
+                account_id,
+                strategy_id,
+                symbol,
+                requested_notional,
+                expires_at,
+                request_id,
+                correlation_id,
+                created_at,
+                created_at,
+            ),
+        ),
+        request_id=request_id,
+    )
+    if result.affected_rows != 1:
+        raise ValueError("Risk capacity reservation identity conflict")
+
+
+def create_equity_history_record(
+    *,
+    account_id: str,
+    inception_equity: str,
+    peak_equity: str,
+    day_start_equity: str,
+    day_start_date: str,
+    request_id: str,
+    correlation_id: str,
+    created_at: str,
+) -> bool:
+    """Insert one account's initial equity-history row if absent.
+
+    Returns:
+        True if this call created the row; False if a row already existed.
+    """
+    result = _execute(
+        (
+            "INSERT INTO risk_equity_history "
+            "(account_id, inception_equity, peak_equity, day_start_equity, "
+            "day_start_date, request_id, correlation_id, created_at, updated_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(account_id) DO NOTHING",
+        ),
+        (
+            (
+                account_id,
+                inception_equity,
+                peak_equity,
+                day_start_equity,
+                day_start_date,
+                request_id,
+                correlation_id,
+                created_at,
+                created_at,
+            ),
+        ),
+        request_id=request_id,
+    )
+    return result.affected_rows == 1
+
+
 __all__ = [
     "create_active_allocation_record",
     "create_allocation_review_record",
     "create_approval_state_record",
     "create_audit_record",
+    "create_capacity_reservation",
     "create_decision_record",
     "create_eligibility_record",
+    "create_equity_history_record",
     "create_policy_version",
     "create_risk_runtime_store",
 ]

@@ -270,6 +270,7 @@ Folders and files are ordered from lowest dependency to highest dependency. This
 | Completed | `FEAT-STR-17` Exit and Management Plan | `management_plan/` | `build_exit_plan`, `parse_exit_plan`, `build_exit_plan_handoff` | `FR-STR-057`–`059` | `tests/strategy/usage/features/17_management_plan.py` |
 | Completed | `FEAT-STR-18` Automation Mode Policy | `automation/` | `evaluate_automation_mode` | `FR-STR-078`–`079` | `tests/strategy/usage/features/18_automation.py` |
 | Completed | `FEAT-STR-19` Strategy Lifecycle Governance | `lifecycle/` | `govern_strategy_lifecycle` | `FR-STR-080`–`082` | `tests/strategy/usage/features/19_lifecycle.py` |
+| Completed | `FEAT-STR-20` Discretionary Manual Order Identity | `discretionary/` | Registered Strategy identity so a human-initiated order can carry a genuine `TradeIntent`; `register_discretionary_strategy`, `get_discretionary_strategy_id`, `strategy_version_for` | `FR-STR-083`–`085` | `tests/strategy/usage/features/20_discretionary.py` |
 
 ```text
 app/services/strategy/
@@ -388,6 +389,10 @@ app/services/strategy/
 ├── lifecycle/                          # FEAT-STR-19 strategy lifecycle governance
 │   ├── __init__.py
 │   ├── README.md
+├── discretionary/                      # FEAT-STR-20 discretionary manual order identity
+│   ├── __init__.py
+│   ├── module.py                       # No signal generation; identity target only
+│   └── registration.py                 # register_discretionary_strategy
 │   └── governance.py                   # Draft/test/approve/suspend/retire
 ├── persistence/                        # Private non-feature CRUD support
 │   ├── __init__.py                     # Internal CRUD export boundary
@@ -1723,6 +1728,9 @@ values. Deep imports from Strategy feature packages are not supported.
 | Completed | `FR-STR-076`–`FR-STR-077` | Hold a version-exact expectancy reference; absent, failed, or mismatched Research provider returns `NOT_ELIGIBLE`. | `app/services/strategy/profiles/expectancy.py`; `tests/strategy/unit/test_operational_contracts.py` |
 | Completed | `FR-STR-078`–`FR-STR-079` | Validate automation modes subordinate to Risk/Trading interlocks and sim-only routing. | `app/services/strategy/automation/policy.py`; `tests/strategy/unit/test_operational_contracts.py` |
 | Completed | `FR-STR-080`–`FR-STR-082` | Validate lifecycle transitions and produce append-only mutation evidence without changing historical version identity. | `app/services/strategy/lifecycle/governance.py`; `tests/strategy/usage/features/19_lifecycle.py` |
+| Completed | `FR-STR-083` | Register one immutable Discretionary Manual Order strategy version per Trading-reachable route environment (`PAPER`, `LIVE`), idempotently, through the standard `register_strategy_version` registry gate — no bypass of registration, lifecycle-approval, or module-root checks. | `app/services/strategy/discretionary/registration.py`; `tests/strategy/usage/features/20_discretionary.py` |
+| Completed | `FR-STR-084` | Own no signal-generation code and declare no `supported_hooks`; the registered identity module documents that the trading decision is made by the authenticated human operator, never by Strategy computation. | `app/services/strategy/discretionary/module.py`; `tests/strategy/usage/features/20_discretionary.py` |
+| Completed | `FR-STR-085` | Expose the registered strategy identity and its exact per-environment version through function-only public accessors. | `get_discretionary_strategy_id`; `strategy_version_for`; `tests/strategy/usage/features/20_discretionary.py` |
 
 ### Initial limitations and deferrals
 

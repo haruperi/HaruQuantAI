@@ -29,6 +29,7 @@ from app.services.risk.audit import (
     persist_risk_decision,
     verify_risk_audit_chain,
 )
+from app.services.risk.capacity import build_risk_capacity_guard
 from app.services.risk.config import (
     build_personal_account_risk_config,
     build_prop_firm_risk_config,
@@ -85,6 +86,10 @@ from app.services.risk.governor import (
     review_trade_risk,
     run_portfolio_risk_governor,
 )
+from app.services.risk.governor.manual_preflight import (
+    review_cancel_authorization,
+    review_manual_order,
+)
 from app.services.risk.kill_switch import (
     apply_kill_switch_command,
     check_risk_kill_switch,
@@ -138,6 +143,7 @@ __all__ = (
     "build_portfolio_risk_snapshot",
     "build_prop_firm_risk_config",
     "build_risk_approval_state_store",
+    "build_risk_capacity_guard",
     "build_risk_state_store",
     "build_stop_validation",
     "calculate_planned_risk_reward",
@@ -208,6 +214,8 @@ __all__ = (
     "resolve_effective_rules",
     "revalidate_risk_decision",
     "review_allocation_proposal",
+    "review_cancel_authorization",
+    "review_manual_order",
     "review_strategy_admission",
     "review_trade_risk",
     "revoke_risk_approval_scope",

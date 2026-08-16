@@ -45,6 +45,13 @@ from app.services.strategy.diagnostics import (
 )
 from app.services.strategy.diagnostics.errors import get_strategy_error_code
 from app.services.strategy.diagnostics.factories import create_strategy_diagnostics
+from app.services.strategy.discretionary import (
+    get_discretionary_strategy_id,
+    register_discretionary_strategy,
+)
+from app.services.strategy.discretionary import (
+    strategy_version_for as discretionary_strategy_version_for,
+)
 from app.services.strategy.evaluators.factory import create_strategy_evaluator
 from app.services.strategy.event import (
     commit_strategy_runtime_state,
@@ -192,6 +199,7 @@ __all__ = (
     "create_trade_intent_value",
     "create_validated_strategy_config",
     "create_validated_strategy_ref",
+    "discretionary_strategy_version_for",
     "ensure_strategy_storage",
     "evaluate_and_record_strategy_signals",
     "evaluate_automation_mode",
@@ -200,6 +208,7 @@ __all__ = (
     "evaluate_strategy_proposal",
     "evaluate_strategy_signals",
     "export_strategy_diagnostics",
+    "get_discretionary_strategy_id",
     "get_strategy_definition",
     "get_strategy_environment",
     "get_strategy_error_catalog",
@@ -236,6 +245,7 @@ __all__ = (
     "persist_strategy_profile",
     "persist_trade_plan",
     "record_strategy_signals",
+    "register_discretionary_strategy",
     "register_strategy_version",
     "resolve_strategy_config",
     "run_event_strategy_hook",

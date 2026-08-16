@@ -394,6 +394,41 @@ def _checksum(statements: tuple[str, ...]) -> str:
     return hashlib.sha256("\n".join(statements).encode("utf-8")).hexdigest()
 
 
+_STATEMENTS_0004 = (
+    """CREATE TABLE IF NOT EXISTS risk_capacity_reservations (
+        reservation_key TEXT PRIMARY KEY,
+        account_id TEXT NOT NULL,
+        strategy_id TEXT NOT NULL,
+        symbol TEXT NOT NULL,
+        requested_notional TEXT NOT NULL,
+        expires_at TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+    ) STRICT""",
+    (
+        "CREATE INDEX IF NOT EXISTS idx_risk_capacity_expiry "
+        "ON risk_capacity_reservations(expires_at)"
+    ),
+    (
+        "CREATE INDEX IF NOT EXISTS idx_risk_capacity_scope "
+        "ON risk_capacity_reservations(account_id, strategy_id, symbol)"
+    ),
+    """CREATE TABLE IF NOT EXISTS risk_equity_history (
+        account_id TEXT PRIMARY KEY,
+        inception_equity TEXT NOT NULL,
+        peak_equity TEXT NOT NULL,
+        day_start_equity TEXT NOT NULL,
+        day_start_date TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+    ) STRICT""",
+)
+
+
 _RISK_MIGRATION_STEPS = (
     build_migration_step(
         domain="risk",
@@ -412,6 +447,12 @@ _RISK_MIGRATION_STEPS = (
         migration_id="risk-0003-route-vocabulary",
         checksum=_checksum(_STATEMENTS_0003),
         statements=_STATEMENTS_0003,
+    ),
+    build_migration_step(
+        domain="risk",
+        migration_id="risk-0004-manual-order-preflight",
+        checksum=_checksum(_STATEMENTS_0004),
+        statements=_STATEMENTS_0004,
     ),
 )
 

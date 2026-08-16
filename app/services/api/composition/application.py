@@ -91,7 +91,10 @@ from app.services.api.workstation.strategies.orchestration import (
 )
 from app.services.api.workstation.strategies.routes import router as strategies_router
 from app.services.api.workstation.trading.orchestration import (
+    build_trading_cancel_all_preflight_source,
+    build_trading_cancel_order_preflight_source,
     build_trading_mutation_source,
+    build_trading_preflight_source,
 )
 from app.services.api.workstation.trading.routes import router as trading_router
 from app.services.api.workstation.watchlists.routes import router as watchlists_router
@@ -167,9 +170,16 @@ def _build_canonical_graph(
             "strategy.mutation_source": build_strategy_mutation_source(
                 strategy_dependencies
             ),
+            "trading.cancel_all_preflight_source": (
+                build_trading_cancel_all_preflight_source()
+            ),
+            "trading.cancel_order_preflight_source": (
+                build_trading_cancel_order_preflight_source()
+            ),
             "trading.mutation_source": build_trading_mutation_source(
                 trading_dependencies, runtime_policy=settings
             ),
+            "trading.preflight_source": build_trading_preflight_source(),
             "trading.session_source": read_trading_session,
         }
     )

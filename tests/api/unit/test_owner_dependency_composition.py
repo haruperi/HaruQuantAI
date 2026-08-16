@@ -72,6 +72,28 @@ def test_trading_source_converts_and_delegates(
     assert asyncio.run(source("submit_order", boundary, object())) is expected
 
 
+def test_trading_source_dispatches_cancel_all_orders(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The bridge routes the bulk cancel-all action to Trading's own function."""
+    converted = object()
+    expected = object()
+    monkeypatch.setattr(
+        trading_dependencies,
+        "create_trading_request",
+        lambda **_: converted,
+    )
+
+    async def cancel_all(request: object, dependencies: object) -> object:
+        assert (request, dependencies) == (converted, "dependencies")
+        return expected
+
+    monkeypatch.setattr(trading_dependencies, "cancel_all_orders", cancel_all)
+    source = trading_dependencies.build_trading_mutation_source("dependencies")
+    boundary = SimpleNamespace(model_dump=lambda **_: {"action": "cancel_all_orders"})
+    assert asyncio.run(source("cancel_all_orders", boundary, object())) is expected
+
+
 def test_broker_session_rejects_production_before_credentials() -> None:
     """Production broker connections remain outside the approved runtime boundary."""
     with pytest.raises(ValueError, match="production broker environments"):

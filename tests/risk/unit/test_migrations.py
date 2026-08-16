@@ -18,7 +18,7 @@ _RISK_TABLES = (
 
 def test_migration_definition_is_stable_and_complete() -> None:
     """Register ordered checksummed migrations covering all Risk durable state."""
-    assert len(_RISK_MIGRATION_STEPS) == 3
+    assert len(_RISK_MIGRATION_STEPS) == 4
     step1 = _RISK_MIGRATION_STEPS[0]
     assert step1.domain == "risk"
     assert step1.migration_id == "risk-0001-initial-state"
@@ -53,6 +53,18 @@ def test_migration_definition_is_stable_and_complete() -> None:
         == hashlib.sha256("\n".join(step3.statements).encode("utf-8")).hexdigest()
     )
     assert "'demo'" in " ".join(step3.statements)
+
+    step4 = _RISK_MIGRATION_STEPS[3]
+    assert step4.domain == "risk"
+    assert step4.migration_id == "risk-0004-manual-order-preflight"
+    assert (
+        step4.checksum
+        == hashlib.sha256("\n".join(step4.statements).encode("utf-8")).hexdigest()
+    )
+    sql4 = " ".join(step4.statements)
+    assert "risk_capacity_reservations" in sql4
+    assert "risk_equity_history" in sql4
+    assert sql4.count("STRICT") == 2
 
 
 def test_every_risk_table_is_strict_and_audited() -> None:

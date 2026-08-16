@@ -22,7 +22,10 @@ from app.services.api.workstation.simulation.session_routes import (
 )
 from app.services.api.workstation.strategies.routes import _strategy_mutation_source
 from app.services.api.workstation.trading.routes import (
+    _trading_cancel_all_preflight_source,
+    _trading_cancel_order_preflight_source,
     _trading_mutation_source,
+    _trading_preflight_source,
     _trading_session_source,
 )
 
@@ -42,7 +45,10 @@ _ROUTE_DEPENDENCIES: Mapping[str, Callable[..., object]] = MappingProxyType(
         "simulation.run_source": _simulation_run_source,
         "simulation.session_source": _simulation_session_source,
         "strategy.mutation_source": _strategy_mutation_source,
+        "trading.cancel_all_preflight_source": _trading_cancel_all_preflight_source,
+        "trading.cancel_order_preflight_source": _trading_cancel_order_preflight_source,
         "trading.mutation_source": _trading_mutation_source,
+        "trading.preflight_source": _trading_preflight_source,
         "trading.session_source": _trading_session_source,
     }
 )

@@ -43,6 +43,7 @@ _FEATURE_REQUIREMENTS = {
     "management_plan": ("17_management_plan.py", {57, 58, 59}),
     "automation": ("18_automation.py", {78, 79}),
     "lifecycle": ("19_lifecycle.py", {80, 81, 82}),
+    "discretionary": ("20_discretionary.py", {83, 84, 85}),
 }
 
 
@@ -103,7 +104,7 @@ def test_every_requirement_has_one_feature_local_demonstration() -> None:
         duplicates = observed & actual
         assert not duplicates, f"duplicate FR demonstrations: {duplicates}"
         observed.update(actual)
-    assert observed == set(range(1, 83))
+    assert observed == set(range(1, 86))
 
 
 def test_usage_programs_import_domain_dependencies_from_package_roots() -> None:

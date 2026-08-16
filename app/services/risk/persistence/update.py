@@ -227,8 +227,43 @@ def update_kill_switch_with_audit(
     return result.affected_rows >= _COMPOUND_WRITE_ROWS
 
 
+def update_equity_history_record(
+    *,
+    account_id: str,
+    peak_equity: str,
+    day_start_equity: str,
+    day_start_date: str,
+    updated_at: str,
+    expected_revision: str,
+) -> None:
+    """Compare and swap one account's tracked peak/day-start equity.
+
+    Raises:
+        ValueError: If the stored update token no longer matches.
+    """
+    result = _execute(
+        (
+            "UPDATE risk_equity_history SET peak_equity=?, day_start_equity=?, "
+            "day_start_date=?, updated_at=? WHERE account_id=? AND updated_at=?",
+        ),
+        (
+            (
+                peak_equity,
+                day_start_equity,
+                day_start_date,
+                updated_at,
+                account_id,
+                expected_revision,
+            ),
+        ),
+    )
+    if result.affected_rows != 1:
+        raise ValueError("Risk equity history revision conflict")
+
+
 __all__ = [
     "update_active_allocation_record",
     "update_approval_state_record",
+    "update_equity_history_record",
     "update_kill_switch_with_audit",
 ]

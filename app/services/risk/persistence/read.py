@@ -220,9 +220,50 @@ def read_policy_version(config_hash: str) -> Mapping[str, object] | None:
     )
 
 
+def read_active_capacity_reservations(
+    account_id: str,
+    strategy_id: str,
+    symbol: str,
+    *,
+    now: str,
+) -> tuple[Mapping[str, object], ...]:
+    """Read every unexpired capacity reservation for one exact scope.
+
+    Returns:
+        Ordered active reservation rows, oldest first.
+    """
+    return _execute(
+        (
+            "SELECT reservation_key, requested_notional, expires_at "
+            "FROM risk_capacity_reservations "
+            "WHERE account_id=? AND strategy_id=? AND symbol=? AND expires_at>? "
+            "ORDER BY created_at ASC LIMIT 100",
+        ),
+        ((account_id, strategy_id, symbol, now),),
+        max_rows=100,
+    ).rows
+
+
+def read_equity_history_record(
+    account_id: str,
+) -> Mapping[str, object] | None:
+    """Read one account's equity-history row.
+
+    Returns:
+        Stored row mapping or ``None``.
+    """
+    return _one_row(
+        "SELECT account_id, inception_equity, peak_equity, day_start_equity, "
+        "day_start_date, updated_at "
+        "FROM risk_equity_history WHERE account_id=?",
+        (account_id,),
+    )
+
+
 __all__ = [
     "read_active_allocation_record",
     "read_active_allocation_record_with_revision",
+    "read_active_capacity_reservations",
     "read_approval_index_records",
     "read_approval_state_record",
     "read_approval_state_record_with_revision",
@@ -230,6 +271,7 @@ __all__ = [
     "read_audit_records",
     "read_decision_record",
     "read_decision_records",
+    "read_equity_history_record",
     "read_kill_switch_record",
     "read_policy_version",
 ]

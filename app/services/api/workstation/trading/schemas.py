@@ -59,4 +59,110 @@ class TradingMutationRequest(_BaseApiContract):
     redaction_applied: Literal[True] = True
 
 
-__all__ = ("TradingMutationRequest",)
+class OrderPreflightRequest(_BaseApiContract):
+    """One candidate human-initiated order submitted for Risk review only.
+
+    Carries no governance IDs — a preflight call produces them; it never
+    consumes them.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["trading.order_preflight_request.v1"] = (
+        "trading.order_preflight_request.v1"
+    )
+    request_id: str
+    workflow_id: str
+    correlation_id: str
+    route: Literal["paper", "live"]
+    account_id: str
+    portfolio_id: str | None = None
+    symbol: str
+    side: Literal["BUY", "SELL"]
+    order_type: Literal["MARKET", "LIMIT", "STOP", "STOP_LIMIT"]
+    quantity: Decimal
+    current_price: Decimal
+    stop_distance: Decimal | None = None
+    idempotency_key: str
+
+
+class OrderPreflightResponse(_BaseApiContract):
+    """The real Risk decision and (when approved) policy verdict produced."""
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["trading.order_preflight_response.v1"] = (
+        "trading.order_preflight_response.v1"
+    )
+    state: str
+    risk_decision_id: str
+    action_policy_verdict_id: str | None
+    approval_token_ref: str | None
+    reasons: tuple[str, ...]
+    expires_at: datetime
+
+
+class CancelOrderPreflightRequest(_BaseApiContract):
+    """One candidate single-order cancellation submitted for Risk review only.
+
+    Carries no governance IDs — a preflight call produces them; it never
+    consumes them.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["trading.cancel_order_preflight_request.v1"] = (
+        "trading.cancel_order_preflight_request.v1"
+    )
+    request_id: str
+    workflow_id: str
+    correlation_id: str
+    route: Literal["paper", "live"]
+    account_id: str
+    portfolio_id: str | None = None
+    representative_symbol: str
+    target_broker_order_id: str
+    idempotency_key: str
+
+
+class CancelAllPreflightRequest(_BaseApiContract):
+    """One candidate bulk cancel-all-orders action submitted for Risk review.
+
+    Carries no governance IDs — a preflight call produces them; it never
+    consumes them.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["trading.cancel_all_preflight_request.v1"] = (
+        "trading.cancel_all_preflight_request.v1"
+    )
+    request_id: str
+    workflow_id: str
+    correlation_id: str
+    route: Literal["paper", "live"]
+    account_id: str
+    portfolio_id: str | None = None
+    representative_symbol: str
+    idempotency_key: str
+
+
+class CancelAllPreflightResponse(_BaseApiContract):
+    """The real Risk decision and (when approved) bulk policy verdict produced."""
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["trading.cancel_all_preflight_response.v1"] = (
+        "trading.cancel_all_preflight_response.v1"
+    )
+    state: str
+    risk_decision_id: str
+    action_policy_verdict_id: str | None
+    approval_token_ref: str | None
+    reasons: tuple[str, ...]
+    expires_at: datetime
+
+
+__all__ = (
+    "CancelAllPreflightRequest",
+    "CancelAllPreflightResponse",
+    "CancelOrderPreflightRequest",
+    "OrderPreflightRequest",
+    "OrderPreflightResponse",
+    "TradingMutationRequest",
+)

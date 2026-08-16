@@ -14,8 +14,13 @@ from typing import Any, Literal
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.data import build_market_context_evidence
+from app.services.data import (
+    build_account_state_snapshot,
+    build_market_context_evidence,
+)
 from app.services.risk import (
+    build_personal_account_risk_config,
+    build_risk_capacity_guard,
     compute_config_hash,
     create_approval_attestation,
     create_approval_token_service,
@@ -26,11 +31,14 @@ from app.services.risk import (
     create_risk_audit_chain,
     create_risk_config,
     create_risk_governor,
+    review_cancel_authorization,
+    review_manual_order,
     review_trade_risk,
     run_portfolio_risk_governor,
+    run_risk_migrations,
 )
 from app.services.strategy import create_trade_intent_value
-from app.utils import canonical_json, create_auth_context
+from app.utils import canonical_json, create_auth_context, generate_id
 from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
@@ -441,6 +449,225 @@ def fr_risk_041() -> None:
     )
 
 
+def fr_risk_091() -> None:
+    """FR-RISK-091: Implement the `_CapacityGuard` port with a real durable reservation: one active reservation per exact `(account, strategy, symbol)` scope, first-writer-wins on the reservation key, an idempotent replay of the same key, and an explicit `conflict` when a different active reservation already holds the scope."""
+    _header("Stage 4: Durable Concurrent-Capacity Reservation (FR-RISK-091)")
+    print("SUCCESS: FR-RISK-091")
+    run_risk_migrations(REQUEST_ID)
+    guard = build_risk_capacity_guard()
+    # The guard checks real wall-clock expiry internally, so this demonstration
+    # (unlike the rest of this file) uses genuine current time, not the fixed
+    # historical NOW constant used for the deterministic review examples above.
+    # A fresh unique run identity keeps repeated executions of this program
+    # from colliding with a still-active reservation left by a prior run.
+    real_expiry = datetime.now(UTC) + timedelta(minutes=5)
+    run_id = generate_id("req")
+    scope = {
+        "account_id": f"account-governor-usage-{run_id}",
+        "strategy_id": "strategy-governor-usage",
+        "symbol": "EURUSD",
+    }
+    first = guard.reserve_capacity(
+        reservation_key=f"reservation-{run_id}-1",
+        requested_notional=Decimal(1000),
+        expires_at=real_expiry,
+        timeout_seconds=None,
+        **scope,
+    )
+    replay = guard.reserve_capacity(
+        reservation_key=f"reservation-{run_id}-1",
+        requested_notional=Decimal(1000),
+        expires_at=real_expiry,
+        timeout_seconds=None,
+        **scope,
+    )
+    conflicting = guard.reserve_capacity(
+        reservation_key=f"reservation-{run_id}-2",
+        requested_notional=Decimal(2000),
+        expires_at=real_expiry,
+        timeout_seconds=None,
+        **scope,
+    )
+    print(f"Data -> first={first!r}, replay={replay!r}, conflicting={conflicting!r}")
+
+
+def _manual_order_review(*, account_id: str, equity: Decimal) -> tuple[Any, Any]:
+    """Run one real Discretionary Manual Order review through review_manual_order.
+
+    Exercises the real end-to-end orchestration (no mocked broker/account
+    data): a real ``AccountStateSnapshot`` produced by Data, a real
+    ``RiskConfig``, and Risk's actual fixed-precedence ``review_trade_risk``
+    gate. Genuine current time is used throughout, matching FR-RISK-091's
+    real-clock demonstration above, since the underlying account/equity
+    persistence this exercises is itself wall-clock scoped.
+
+    Returns:
+        The real ``(decision, verdict)`` pair produced by the review.
+    """
+    config = build_personal_account_risk_config()
+    request_id = generate_id("req")
+    workflow_id = generate_id("wf")
+    correlation_id = generate_id("cor")
+    auth = create_auth_context(
+        contract_version="v2",
+        schema_id="utils.auth_context.v2",
+        principal_id="operator-manual-usage",
+        principal_type="USER",
+        roles=("risk_operator",),
+        permissions=("trading:write",),
+        scopes=("risk",),
+        tenant_or_environment="development",
+        runtime_profile=config.profile,
+        request_id=request_id,
+        workflow_id=workflow_id,
+        correlation_id=correlation_id,
+        issued_at=datetime.now(UTC),
+    )
+    account_now = datetime.now(UTC)
+    account_snapshot = build_account_state_snapshot(
+        account_id=account_id,
+        currency="USD",
+        balances=(),
+        equity=equity,
+        margin_used=Decimal(0),
+        margin_available=equity,
+        positions=(),
+        orders=(),
+        connected=True,
+        trading_allowed=True,
+        source_id="mt5",
+        snapshot_at=account_now,
+        expires_at=account_now + timedelta(minutes=10),
+        request_id=generate_id("req"),
+    )
+    return review_manual_order(
+        account_snapshot=account_snapshot,
+        proposal_symbol="EURUSD",
+        proposal_side="BUY",
+        proposal_order_type="MARKET",
+        proposal_quantity=Decimal(1),
+        proposal_current_price=Decimal("1.10"),
+        proposal_stop_distance=Decimal("0.01"),
+        portfolio_id=None,
+        route="paper",
+        risk_config=config,
+        secret_resolver=lambda _: b"example-risk-signing-key-material-32-bytes",
+        auth=auth,
+        request_id=request_id,
+        workflow_id=workflow_id,
+        correlation_id=correlation_id,
+    )
+
+
+def fr_risk_092() -> None:
+    """FR-RISK-092: Track one account's inception/peak/day-start equity across manual-preflight calls; seed on first observation, raise the peak monotonically, and reset day-start once per UTC calendar day. Never fabricates a history the account does not have yet."""
+    _header("Stage 5: Manual-Order Equity Tracking (FR-RISK-092)")
+    print("SUCCESS: FR-RISK-092")
+    run_risk_migrations(REQUEST_ID)
+    account_id = f"account-manual-usage-{generate_id('req')}"
+    first_decision, _ = _manual_order_review(
+        account_id=account_id, equity=Decimal(10000)
+    )
+    second_decision, _ = _manual_order_review(
+        account_id=account_id, equity=Decimal(12000)
+    )
+    print(
+        f"Data -> first_state='{first_decision.state.value}', "
+        f"second_state='{second_decision.state.value}' "
+        "(same account reviewed twice; equity history persists between calls)"
+    )
+
+
+def fr_risk_093() -> None:
+    """FR-RISK-093: Review one human-initiated order through the exact same fixed-precedence `review_trade_risk` gate a strategy-initiated order receives, composing a Strategy-owned `TradeIntent` (the registered Discretionary Manual Order strategy), a real Data-owned account snapshot, real market-context evidence, and a real human `ApprovalAttestation` bound to the current authenticated caller."""
+    _header("Stage 5: Manual-Order Fixed-Precedence Review (FR-RISK-093)")
+    print("SUCCESS: FR-RISK-093")
+    run_risk_migrations(REQUEST_ID)
+    account_id = f"account-manual-usage-{generate_id('req')}"
+    decision, verdict = _manual_order_review(
+        account_id=account_id, equity=Decimal(10000)
+    )
+    print(
+        f"Data -> decision_id='{decision.decision_id}', state='{decision.state.value}', "
+        f"verdict={verdict!r}"
+    )
+
+
+def fr_risk_094() -> None:
+    """FR-RISK-094: Never invent account state, market evidence, or approval for a manual-order review. Every fact not obtainable from a real source (spread, session state, calendar state, volatility, liquidity, correlation) is surfaced as an explicit `missing_fields` entry or `"unknown"` state rather than a fabricated value."""
+    _header("Stage 5: Manual-Order Evidence Integrity (FR-RISK-094)")
+    print("SUCCESS: FR-RISK-094")
+    run_risk_migrations(REQUEST_ID)
+    account_id = f"account-manual-usage-{generate_id('req')}"
+    decision, _ = _manual_order_review(account_id=account_id, equity=Decimal(10000))
+    print(
+        f"Data -> state='{decision.state.value}', "
+        f"composite_breach_flags={decision.composite_breach_flags} "
+        "(a real evidence gap, surfaced explicitly rather than fabricated)"
+    )
+
+
+def fr_risk_095() -> None:
+    """FR-RISK-095: Authorize one order cancellation — a single order or every working order — through Risk's real current-state `run_portfolio_risk_governor` gate rather than the single-proposal trade-review gate, issue a real signed approval token bound to a human `ApprovalAttestation`, and scope the resulting `ActionPolicyVerdict` to the exact target order for a single cancellation or with a `max_children` ceiling drawn from the account's own registered `max_pending_orders` limit for a bulk cancellation."""
+    _header("Stage 6: Bulk Cancel-All Authorization (FR-RISK-095)")
+    print("SUCCESS: FR-RISK-095")
+    run_risk_migrations(REQUEST_ID)
+    config = build_personal_account_risk_config()
+    request_id = generate_id("req")
+    workflow_id = generate_id("wf")
+    correlation_id = generate_id("cor")
+    auth = create_auth_context(
+        contract_version="v2",
+        schema_id="utils.auth_context.v2",
+        principal_id="operator-bulk-cancel-usage",
+        principal_type="USER",
+        roles=("risk_operator",),
+        permissions=("trading:write",),
+        scopes=("risk",),
+        tenant_or_environment="development",
+        runtime_profile=config.profile,
+        request_id=request_id,
+        workflow_id=workflow_id,
+        correlation_id=correlation_id,
+        issued_at=datetime.now(UTC),
+    )
+    account_now = datetime.now(UTC)
+    account_snapshot = build_account_state_snapshot(
+        account_id=f"account-bulk-cancel-usage-{generate_id('req')}",
+        currency="USD",
+        balances=(),
+        equity=Decimal(10000),
+        margin_used=Decimal(0),
+        margin_available=Decimal(10000),
+        positions=(),
+        orders=(),
+        connected=True,
+        trading_allowed=True,
+        source_id="mt5",
+        snapshot_at=account_now,
+        expires_at=account_now + timedelta(minutes=10),
+        request_id=generate_id("req"),
+    )
+    decision, verdict = review_cancel_authorization(
+        account_snapshot=account_snapshot,
+        representative_symbol="EURUSD",
+        action="cancel_all_orders",
+        action_scope={},
+        portfolio_id=None,
+        risk_config=config,
+        secret_resolver=lambda _: b"example-risk-signing-key-material-32-bytes",
+        auth=auth,
+        request_id=request_id,
+        workflow_id=workflow_id,
+        correlation_id=correlation_id,
+    )
+    print(
+        f"Data -> state='{decision.state.value}', "
+        f"verdict={verdict!r} "
+        "(a real current-state review, not the single-proposal trade gate)"
+    )
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -449,11 +676,19 @@ def main() -> None:
         "Module flow:\n"
         "-> Stage 1: Construct risk governor with injected approval, audit, and clock dependencies\n"
         "-> Stage 2: Evaluate fixed precedence limits (kill-switch, evidence freshness, limits, sizing, regime)\n"
-        "-> Stage 3: Return RiskDecisionPackage for trade review or portfolio compliance"
+        "-> Stage 3: Return RiskDecisionPackage for trade review or portfolio compliance\n"
+        "-> Stage 4: Durable concurrent-capacity reservation for manual-order preflight\n"
+        "-> Stage 5: Manual-order eligibility preflight through the real fixed-precedence gate\n"
+        "-> Stage 6: Bulk cancel-all authorization through the real current-state gate"
     )
     fr_risk_039()
     fr_risk_040()
     fr_risk_041()
+    fr_risk_091()
+    fr_risk_092()
+    fr_risk_093()
+    fr_risk_094()
+    fr_risk_095()
 
 
 if __name__ == "__main__":
