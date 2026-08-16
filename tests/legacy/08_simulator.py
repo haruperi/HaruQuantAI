@@ -11,6 +11,7 @@ Example 6: Simulation Reporting Schemas & Canonical Artifact Types
 from __future__ import annotations
 
 import argparse
+import asyncio
 import sys
 import tempfile
 from collections.abc import Iterator
@@ -34,6 +35,7 @@ from app.services.data import (
 from app.services.simulator import (
     build_latency_profile,
     calculate_execution_costs,
+    calculate_fast_research_config_hash,
     calculate_portfolio_backtest_config_hash,
     calculate_simulation_backtest_config_hash,
     create_simulation_value,
@@ -44,7 +46,7 @@ from app.services.simulator import (
     get_simulation_mode_policy,
     get_supported_fill_policies,
     price_realistic_execution,
-    run_backtest,
+    run_backtest_async,
     run_fast_research,
     run_portfolio_backtest,
     unwrap_simulation_response,
@@ -65,6 +67,9 @@ from tests.simulator.usage.workflows._support import (
 
 _START = datetime(2026, 8, 1, tzinfo=UTC)
 _END = _START + timedelta(hours=1000)
+SYMBOL = "EURUSD"
+TIMEFRAME = "H1"
+BAR_LIMIT = 100
 _PROVIDER_FIELDS = {
     "MT5_ENABLED": "mt5_enabled",
     "MT5_TERMINAL_PATH": "mt5_terminal_path",
@@ -139,7 +144,7 @@ def _provider_runtime_context(*, offline: bool) -> Iterator[bool]:
         yield True
 
 
-def _get_dataset(*, timeframe: str = "H1", limit: int = 100) -> Any:
+def _get_dataset(*, timeframe: str = TIMEFRAME, limit: int = BAR_LIMIT) -> Any:
     """Retrieve MT5 market dataset through the Data public API.
 
     Args:
@@ -151,7 +156,7 @@ def _get_dataset(*, timeframe: str = "H1", limit: int = 100) -> Any:
     """
     req = build_market_data_request(
         source_id="mt5",
-        symbol="EURUSD",
+        symbol=SYMBOL,
         data_kind="bars",
         timeframe=timeframe,
         start=_START,
@@ -185,7 +190,7 @@ def _build_backtest_request(
     runtime_profile: str = "simulation",
     canonical: bool = True,
 ) -> Any:
-    """Build a valid SimulationBacktestRequestV1 using create_simulation_value."""
+    """Build a canonical official or explicitly non-canonical research request."""
     req_id = generate_id("req")
     wf_id = generate_id("wf")
     cor_id = generate_id("cor")
@@ -200,7 +205,7 @@ def _build_backtest_request(
         "strategy_version": "v1",
         "strategy_config_ref": "strategy-config",
         "strategy_config_hash": "a" * 64,
-        "data_ref": "dataset-mt5-eurusd",
+        "data_ref": f"mt5:{dataset.symbol}:{dataset.timeframe}",
         "data_version": "v1",
         "data_hash": canonical_digest(
             dataset.model_dump(mode="python", warnings=False)
@@ -216,8 +221,8 @@ def _build_backtest_request(
         "risk_policy_ref": "risk-policy",
         "risk_policy_version": "v1",
         "risk_policy_hash": "d" * 64,
-        "symbol": "EURUSD",
-        "timeframe": "H1",
+        "symbol": dataset.symbol,
+        "timeframe": dataset.timeframe,
         "start": start,
         "end": end,
         "parameters": {"period": 14},
@@ -229,26 +234,73 @@ def _build_backtest_request(
         "execution_route": "sim",
         "canonical": canonical,
     }
+    value_type = "FastResearchRequest"
+    hash_operation = calculate_fast_research_config_hash
+    if canonical:
+        payload.update(
+            {
+                "execution_model_ref": "execution-model-v1",
+                "execution_model_hash": "e" * 64,
+                "calculation_model_hash": "f" * 64,
+                "calculation_artifact_checksum": "1" * 64,
+                "calibration_artifact_checksum": "2" * 64,
+                "realism_stream_identity_hash": "3" * 64,
+                "source_lineage_hash": "4" * 64,
+                "tick_lineage_hash": "5" * 64,
+                "market_evidence_class": "genuine_bid_ask_ticks",
+                "decision_instant_policy": "point_in_time_available_at",
+                "provider_specification_revisions": (
+                    {
+                        "revision_id": "revision-1",
+                        "checksum": "6" * 64,
+                        "provider": "mt5",
+                        "server": "demo-server",
+                        "environment": "demo",
+                        "account_digest": "7" * 64,
+                        "symbol": dataset.symbol,
+                        "observed_at": start,
+                        "effective_from": start,
+                        "effective_to": None,
+                        "historical_provenance": None,
+                    },
+                ),
+                "initial_authority_state_hash": canonical_digest(
+                    {
+                        "account": {
+                            "balance": Decimal("10000.00"),
+                            "currency": "USD",
+                        },
+                        "orders": (),
+                        "positions": (),
+                        "deals": (),
+                        "ownership": {"mode": "exclusive"},
+                    }
+                ),
+                "certification_target": "demo",
+                "close_open_positions_at_end": True,
+            }
+        )
+        value_type = "SimulationBacktestRequest"
+        hash_operation = calculate_simulation_backtest_config_hash
     payload["config_hash"] = unwrap_simulation_response(
-        calculate_simulation_backtest_config_hash(payload),
-        operation="calculate_simulation_backtest_config_hash",
+        hash_operation(payload),
+        operation="calculate_backtest_config_hash",
     )
-    return create_simulation_value("SimulationBacktestRequestV1", **payload)
+    return create_simulation_value(value_type, **payload)
 
 
 def example_02_fast_research_simulation() -> None:
     """Demonstrate fast research simulation run with real MT5 market dataset context."""
     _header("Example 2: Fast Research Simulation (with MT5 EURUSD H1 data)")
 
-    dataset = _get_dataset(timeframe="H1", limit=100)
+    dataset = _get_dataset()
     if dataset is None:
-        print("Market dataset offline -> Using synthetic tick dataset context")
+        print("Market dataset offline -> Using bounded fixture tick dataset context")
         dataset = live_tick_dataset()
     else:
         print(
-            f"Retrieved {len(dataset.records)} MT5 EURUSD H1 bars for fast research simulation"
+            f"Retrieved {len(dataset.records)} MT5 {SYMBOL} {TIMEFRAME} bars for fast research simulation"
         )
-        dataset = live_tick_dataset()
 
     request = _build_backtest_request(
         dataset, runtime_profile="fast_research", canonical=False
@@ -262,7 +314,7 @@ def example_02_fast_research_simulation() -> None:
 
 
 def example_03_single_asset_backtest_run() -> None:
-    """Demonstrate official synchronous single-asset backtest run."""
+    """Demonstrate the canonical asynchronous single-asset backtest run."""
     _header("Example 3: Official Single-Asset Backtest Run & Result Inspection")
 
     dataset = live_tick_dataset()
@@ -271,9 +323,9 @@ def example_03_single_asset_backtest_run() -> None:
     )
     with tempfile.TemporaryDirectory() as tmp_dir:
         deps = dependencies(Path(tmp_dir), dataset)
-        resp = run_backtest(request, authority(request), deps)
-        result = unwrap_simulation_response(resp, operation="run_backtest")
-        print(f"Official Single-Asset Backtest Status: {resp.status}")
+        response = asyncio.run(run_backtest_async(request, authority(request), deps))
+        result = unwrap_simulation_response(response, operation="run_backtest_async")
+        print(f"Official Single-Asset Backtest Status: {response.status}")
         print(f"  Result Schema ID: {result.schema_id}")
         print(f"  Run ID: {result.run_id}")
         print(f"  Engine Version: {result.engine_version}")
@@ -365,7 +417,7 @@ def example_05_portfolio_backtest_simulation() -> None:
         calculate_portfolio_backtest_config_hash(payload),
         operation="calculate_portfolio_backtest_config_hash",
     )
-    port_req = create_simulation_value("PortfolioBacktestRequestV1", **payload)
+    port_req = create_simulation_value("PortfolioBacktestRequest", **payload)
 
     auth = create_auth_context(
         contract_version="v1",
@@ -384,9 +436,9 @@ def example_05_portfolio_backtest_simulation() -> None:
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         deps = dependencies(Path(tmp_dir), dataset)
-        resp = run_portfolio_backtest(port_req, auth, deps)
-        unwrap_simulation_response(resp, operation="run_portfolio_backtest")
-        print(f"Portfolio Backtest Simulation Status: {resp.status}")
+        response = asyncio.run(run_portfolio_backtest(port_req, auth, deps))
+        unwrap_simulation_response(response, operation="run_portfolio_backtest")
+        print(f"Portfolio Backtest Simulation Status: {response.status}")
 
 
 def example_06_simulation_reporting_and_checklist() -> None:

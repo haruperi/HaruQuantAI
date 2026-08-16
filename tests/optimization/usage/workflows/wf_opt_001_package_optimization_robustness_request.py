@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 
@@ -52,7 +53,7 @@ def main() -> None:
 
     # Stage 3 — Run the applicable bounded advisory public operation.
     _stage(3)
-    optimization_result = run_parameter_sweep(validated_search, adapter)
+    optimization_result = asyncio.run(run_parameter_sweep(validated_search, adapter))
     robustness_result = run_robustness_analysis(robustness, max_simulations=5)
     assert optimization_result.data is not None
     assert robustness_result.data is not None

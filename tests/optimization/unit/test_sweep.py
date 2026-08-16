@@ -1,5 +1,7 @@
 """Tests for bounded search orchestration."""
 
+import asyncio
+
 import pytest
 from app.services.optimization.contracts import OptimizationError
 from app.services.optimization.search import run_bounded_search, select_top_candidates
@@ -11,12 +13,14 @@ from tests.optimization.unit.test_search_contracts import search_request
 def test_bounded_sweep_checkpoints_every_candidate() -> None:
     """Every terminal candidate advances the checkpoint callback once."""
     checkpoints = []
-    summary = run_bounded_search(
-        search_request(),
-        FakeAdapter(),
-        checkpoint=lambda index, result: checkpoints.append(
-            (index, result.candidate_hash)
-        ),
+    summary = asyncio.run(
+        run_bounded_search(
+            search_request(),
+            FakeAdapter(),
+            checkpoint=lambda index, result: checkpoints.append(
+                (index, result.candidate_hash)
+            ),
+        )
     )
     assert len(checkpoints) == len(summary.candidates)
     assert summary.best_candidate_hash is not None
@@ -30,7 +34,7 @@ class FailingAdapter:
     engine_version = "v1"
     deterministic = True
 
-    def execute(self, request):
+    async def execute(self, request):
         """Raise a controlled candidate execution failure."""
         del request
         raise OptimizationError("OPT_EXECUTION_FAILED", "FIXTURE_FAILURE")
@@ -38,14 +42,14 @@ class FailingAdapter:
 
 def test_run_bounded_search_preserves_failed_candidates() -> None:
     """Failed executions remain explicit candidate evidence."""
-    summary = run_bounded_search(search_request(), FailingAdapter())
+    summary = asyncio.run(run_bounded_search(search_request(), FailingAdapter()))
     assert summary.best_candidate_hash is None
     assert all(item.state == "failed" for item in summary.candidates)
 
 
 def test_select_top_candidates_preserves_order() -> None:
     """Top selection preserves canonical score ranking."""
-    summary = run_bounded_search(search_request(), FakeAdapter())
+    summary = asyncio.run(run_bounded_search(search_request(), FakeAdapter()))
     selected = select_top_candidates(summary, 2)
     assert len(selected) == 2
     with pytest.raises(ValueError, match="positive"):

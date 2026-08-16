@@ -1,5 +1,6 @@
 """Tests for all official Optimization public operations."""
 
+import asyncio
 from decimal import Decimal
 from typing import Any
 
@@ -49,21 +50,27 @@ def _data(response: Any) -> object:
 
 def test_run_parameter_sweep_returns_advisory_result() -> None:
     """Public sweep delegates search and evidence assembly."""
-    result = _data(run_parameter_sweep(search_request(), FakeAdapter()))
+    result = _data(asyncio.run(run_parameter_sweep(search_request(), FakeAdapter())))
     assert result.schema_id == "optimization.result.v1"
 
 
 def test_run_walk_forward_optimization_returns_fold_evidence() -> None:
     """Public WFA delegates the canonical walk-forward workflow."""
-    result = _data(run_walk_forward_optimization(walk_forward_request(), FakeAdapter()))
+    result = _data(
+        asyncio.run(
+            run_walk_forward_optimization(walk_forward_request(), FakeAdapter())
+        )
+    )
     assert result.diagnostics["walk_forward"] is not None
 
 
 def test_run_walk_forward_matrix_is_bounded_and_ordered() -> None:
     """Public matrix preserves request ordering within its cap."""
     result = _data(
-        run_walk_forward_matrix(
-            (walk_forward_request(),), FakeAdapter(), max_requests=1
+        asyncio.run(
+            run_walk_forward_matrix(
+                (walk_forward_request(),), FakeAdapter(), max_requests=1
+            )
         )
     )
     assert len(result) == 1
@@ -144,7 +151,7 @@ def test_build_optimization_handoff_delegates_canonical_assembly() -> None:
 
 def test_public_boundary_returns_catalogued_error_response() -> None:
     """Invalid public requests become safe standard error responses."""
-    response = run_walk_forward_matrix((), FakeAdapter(), max_requests=1)
+    response = asyncio.run(run_walk_forward_matrix((), FakeAdapter(), max_requests=1))
     assert response.status == "error"
     assert response.data is None
     assert response.error is not None

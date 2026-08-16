@@ -5,6 +5,7 @@ Demonstrates FEAT-SIM-09 simulation result construction, trade records, artifact
 
 from __future__ import annotations
 
+import asyncio
 import sys
 import tempfile
 from datetime import UTC, datetime, timedelta
@@ -22,7 +23,7 @@ from app.services.simulator import (
     build_markdown_report,
     create_simulation_value,
     get_simulation_value_field,
-    run_backtest,
+    run_backtest_async,
     unwrap_simulation_response,
 )
 from tests.simulator.usage.workflows._support import (
@@ -66,10 +67,12 @@ def _result() -> object:
     request = backtest_request(dataset)
     with tempfile.TemporaryDirectory(prefix="sim-reporting-") as directory:
         return _value(
-            run_backtest(
-                request,
-                authority(request),
-                dependencies(Path(directory), dataset),
+            asyncio.run(
+                run_backtest_async(
+                    request,
+                    authority(request),
+                    dependencies(Path(directory), dataset),
+                )
             )
         )
 

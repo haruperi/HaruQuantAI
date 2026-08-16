@@ -1,5 +1,6 @@
 """Workflow integration test for all-or-nothing portfolio simulation."""
 
+import asyncio
 from decimal import Decimal
 from pathlib import Path
 
@@ -34,7 +35,9 @@ def test_portfolio_candidate_publishes_reconciled_aggregate(tmp_path: Path) -> N
     dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
     dependencies = FakeDependencies(tmp_path, dataset)
     result = unwrap_simulation_response(
-        run_portfolio_backtest(request, _portfolio_auth(request), dependencies),
+        asyncio.run(
+            run_portfolio_backtest(request, _portfolio_auth(request), dependencies)
+        ),
         operation="test.portfolio.run_portfolio_backtest",
     )
     assert result.status == "completed"

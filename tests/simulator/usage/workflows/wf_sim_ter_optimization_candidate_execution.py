@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import asyncio
 import sys
 import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from app.services.simulator import run_backtest, unwrap_simulation_response
+from app.services.simulator import run_backtest_async, unwrap_simulation_response
 from tests.simulator.usage.workflows._support import (
     authority,
     backtest_request,
@@ -18,8 +19,8 @@ from tests.simulator.usage.workflows._support import (
 
 WORKFLOW_ID = "WF-SIM-TER"
 STAGES = (
-    "Receive the bounded Optimization candidate as SimulationBacktestRequestV1.",
-    "Execute it through the ordinary canonical run_backtest() path.",
+    "Receive the bounded Optimization candidate as SimulationBacktestRequest.",
+    "Execute it through the canonical run_backtest_async() path.",
     "Preserve immutable result and provenance without ranking or promotion.",
     "Return SimulationResult to the Optimization adapter boundary.",
 )
@@ -37,19 +38,21 @@ def main() -> None:
     print(f"{WORKFLOW_ID} — Optimization Candidate Execution")
     print("INPUT BOUNDARY — Optimization candidate plus genuine MT5 provenance")
 
-    # Stage 1 — Receive the bounded Optimization candidate as SimulationBacktestRequestV1.
+    # Stage 1 — Receive the bounded Optimization candidate as SimulationBacktestRequest.
     _stage(1)
     dataset = live_tick_dataset()
     request = backtest_request(dataset)
 
-    # Stage 2 — Execute it through the ordinary canonical run_backtest() path.
+    # Stage 2 — Execute it through the canonical run_backtest_async() path.
     _stage(2)
     with tempfile.TemporaryDirectory(prefix="wf-sim-003-") as directory:
         result = unwrap_simulation_response(
-            run_backtest(
-                request,
-                authority(request),
-                dependencies(Path(directory), dataset),
+            asyncio.run(
+                run_backtest_async(
+                    request,
+                    authority(request),
+                    dependencies(Path(directory), dataset),
+                )
             ),
             operation="simulation.workflow.wf_sim_003.run_backtest",
         )

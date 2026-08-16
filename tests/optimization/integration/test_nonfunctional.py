@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import ast
+import asyncio
 import logging
 import re
 import subprocess
@@ -88,13 +89,13 @@ def test_deterministic_replay_and_serialization() -> None:
     logger.debug("Testing Optimization deterministic replay and JSON serialization")
     first = build_optimization_evidence(
         evidence_request(
-            search=run_bounded_search(search_request(), FakeAdapter()),
+            search=asyncio.run(run_bounded_search(search_request(), FakeAdapter())),
             chart_data={"objective": [1.0]},
         )
     )
     second = build_optimization_evidence(
         evidence_request(
-            search=run_bounded_search(search_request(), FakeAdapter()),
+            search=asyncio.run(run_bounded_search(search_request(), FakeAdapter())),
             chart_data={"objective": [1.0]},
         )
     )
@@ -126,7 +127,7 @@ def test_structured_observability_events_are_redacted() -> None:
     collector, domain_logger, previous_level = _capture_records()
     try:
         request = search_request()
-        summary = run_bounded_search(request, FakeAdapter())
+        summary = asyncio.run(run_bounded_search(request, FakeAdapter()))
         with pytest.raises(ValueError, match="configured cap"):
             tuple(
                 iter_grid_candidates(
@@ -190,13 +191,13 @@ def test_trace_utc_compatibility_and_persistence_truth() -> None:
             """Initialize an empty captured request sequence."""
             self.requests = []
 
-        def execute(self, request):
+        async def execute(self, request):
             """Capture and delegate deterministic execution."""
             self.requests.append(request)
-            return super().execute(request)
+            return await super().execute(request)
 
     adapter = CapturingAdapter()
-    summary = run_bounded_search(search_request(), adapter)
+    summary = asyncio.run(run_bounded_search(search_request(), adapter))
     assert len({item.request_id for item in adapter.requests}) == len(adapter.requests)
     assert all(
         item.workflow_id == search_request().workflow_id for item in adapter.requests

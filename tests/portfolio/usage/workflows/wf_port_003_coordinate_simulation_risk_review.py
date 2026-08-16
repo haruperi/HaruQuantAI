@@ -15,7 +15,7 @@ from tests.portfolio.usage.workflows._support import (
 
 WORKFLOW_ID = "WF-PORT-003"
 STAGES = (
-    "Receive candidate, validated evidence, and PortfolioBacktestRequestV1.",
+    "Receive candidate, validated evidence, and PortfolioBacktestRequest.",
     "Revalidate Simulation request against candidate and evidence lineage.",
     "Submit the receiver-owned request and verify Simulation result.",
     "Build and submit the receiver-owned Risk review request.",

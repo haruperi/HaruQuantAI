@@ -7,7 +7,7 @@ import pytest
 from app.services.simulator.errors import unwrap_simulation_response
 from app.services.simulator.reporting import ReturnObservation
 from app.services.simulator.run import (
-    PortfolioBacktestRequestV1,
+    PortfolioBacktestRequest,
     PortfolioComponentRequest,
 )
 from app.utils import canonical_digest
@@ -69,10 +69,10 @@ def test_portfolio_request_is_self_contained() -> None:
         "execution_route": "sim",
     }
     payload["config_hash"] = unwrap_simulation_response(
-        PortfolioBacktestRequestV1.calculate_config_hash(payload),
+        PortfolioBacktestRequest.calculate_config_hash(payload),
         operation="simulation.run.portfolio_backtest_request_v1.calculate_config_hash",
     )
-    request = PortfolioBacktestRequestV1.model_validate(payload)
+    request = PortfolioBacktestRequest.model_validate(payload)
     assert request.components[0].backtest_request is not None
 
 

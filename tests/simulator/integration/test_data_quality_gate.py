@@ -1,10 +1,11 @@
 """Workflow integration test for fail-closed market-data quality gating."""
 
+import asyncio
 from pathlib import Path
 
 import pytest
 from app.services.simulator import (
-    run_backtest,
+    run_backtest_async,
     unwrap_simulation_response,
 )
 from app.utils import get_logger
@@ -35,7 +36,7 @@ def test_rejected_data_quality_prevents_result_publication(tmp_path: Path) -> No
     dependencies = FakeDependencies(tmp_path, dataset)
     with pytest.raises(Exception, match="quality") as captured:
         unwrap_simulation_response(
-            run_backtest(request, _auth(request), dependencies),
+            asyncio.run(run_backtest_async(request, _auth(request), dependencies)),
             operation="test.data_quality.run_backtest",
         )
     assert captured.value.code == "SIM_DATA_SCHEMA_INVALID"

@@ -1,6 +1,8 @@
 """Integration test for complete Optimization evidence assembly."""
 
 # ruff: noqa: INP001
+import asyncio
+
 from app.services.optimization import (
     assess_strategy_robustness,
     build_optimization_evidence,
@@ -22,9 +24,9 @@ def test_complete_evidence_workflow_is_ready_only_with_all_baselines() -> None:
     monte_carlo = run_monte_carlo(monte_carlo_request(), max_simulations=5)
     request = evidence_request().model_copy(
         update={
-            "search": run_bounded_search(search_request(), adapter),
-            "walk_forward": run_walk_forward_validation(
-                walk_forward_request(), adapter
+            "search": asyncio.run(run_bounded_search(search_request(), adapter)),
+            "walk_forward": asyncio.run(
+                run_walk_forward_validation(walk_forward_request(), adapter)
             ),
             "monte_carlo": monte_carlo,
             "robustness": assess_strategy_robustness(

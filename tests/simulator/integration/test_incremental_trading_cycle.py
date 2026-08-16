@@ -1,7 +1,7 @@
 """Integration tests for incremental Simulation-to-Trading evaluation."""
 
 import pytest
-from app.services.simulator.run.contracts import SimulationBacktestRequestV2
+from app.services.simulator.run.contracts import SimulationBacktestRequest
 from app.services.simulator.run.orchestrator import advance_trading_timeline
 from app.services.simulator.timeline import build_tick_timeline
 
@@ -38,7 +38,7 @@ async def test_incremental_cycle_matches_captured_trace() -> None:
     receipts: list[object] = []
     await advance_trading_timeline(
         Dependencies(),
-        SimulationBacktestRequestV2.model_construct(),
+        SimulationBacktestRequest.model_construct(),
         Engine(),
         build_tick_timeline(dataset),
         [],

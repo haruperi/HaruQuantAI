@@ -97,7 +97,7 @@ def test_registered_system_contracts_have_explicit_versions():
     assert rows
     assert all(re.fullmatch(r"`v\d+`", row[2]) for row in rows)
     assert any(
-        row[1] == "`SimulationBacktestRequestV2`" and row[2] == "`v2`" for row in rows
+        row[1] == "`SimulationBacktestRequest`" and row[2] == "`v2`" for row in rows
     )
 
 

@@ -1,5 +1,6 @@
 """Tests for the Optimization execution adapter."""
 
+import asyncio
 from datetime import UTC, datetime
 from types import SimpleNamespace
 
@@ -27,7 +28,7 @@ class FakeAdapter:
     engine_version = "v1"
     deterministic = True
 
-    def execute(self, request):
+    async def execute(self, request):
         """Return matching measured evidence."""
         return EngineOptimizationResult(
             candidate_hash=request.candidate_hash,
@@ -64,7 +65,9 @@ def test_execute_candidate_fails_closed_on_version_mismatch() -> None:
     adapter = FakeAdapter()
     adapter.engine_version = "v2"
     with pytest.raises(OptimizationError) as captured:
-        execute_candidate(execution_request(), adapter, deterministic_only=True)
+        asyncio.run(
+            execute_candidate(execution_request(), adapter, deterministic_only=True)
+        )
     assert captured.value.code == "OPT_ADAPTER_INCOMPATIBLE"
 
 
@@ -72,7 +75,7 @@ def test_simulation_adapter_packages_exact_public_request(mocker) -> None:
     """Concrete adapter constructs the receiver-owned Simulation request."""
     captured = {}
 
-    def runner(request, auth_context, dependencies):
+    async def runner(request, auth_context, dependencies):
         captured["request"] = request
         captured["auth"] = auth_context
         captured["dependencies"] = dependencies
@@ -115,7 +118,9 @@ def test_simulation_adapter_packages_exact_public_request(mocker) -> None:
         engine_version="v1",
         simulation_runner=runner,
     )
-    result = execute_candidate(execution_request(), adapter, deterministic_only=True)
+    result = asyncio.run(
+        execute_candidate(execution_request(), adapter, deterministic_only=True)
+    )
     assert captured["request"].parameters == {"period": 14}
     assert captured["request"].risk_policy_hash == "e" * 64
     assert result.analytics_report.schema_id == "analytics.performance_report.v1"

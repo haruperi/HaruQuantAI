@@ -22,7 +22,7 @@ from tests.simulator.usage.workflows._support import (
 
 WORKFLOW_ID = "WF-SIM-SEC"
 STAGES = (
-    "Receive PortfolioBacktestRequestV1 with immutable candidate and MT5 Data/FX lineage.",
+    "Receive PortfolioBacktestRequest with immutable candidate and MT5 Data/FX lineage.",
     "Validate component allocations, versions, hashes, range, seed, and config hash.",
     "Execute every component through the ordinary deterministic Simulation path.",
     "Reconcile component and aggregate journals and account evidence.",
@@ -40,9 +40,9 @@ def _stage(number: int) -> None:
 def main() -> None:
     """Execute the documented portfolio-backtest workflow."""
     print(f"{WORKFLOW_ID} — Portfolio Backtest")
-    print("INPUT BOUNDARY — PortfolioBacktestRequestV1 and genuine MT5 evidence")
+    print("INPUT BOUNDARY — PortfolioBacktestRequest and genuine MT5 evidence")
 
-    # Stage 1 — Receive PortfolioBacktestRequestV1 with immutable candidate and MT5 Data/FX lineage.
+    # Stage 1 — Receive PortfolioBacktestRequest with immutable candidate and MT5 Data/FX lineage.
     _stage(1)
     dataset = live_tick_dataset()
     request, auth = portfolio_request(dataset)

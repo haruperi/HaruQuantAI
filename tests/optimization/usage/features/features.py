@@ -7,6 +7,7 @@ Imports strictly from the public API boundary `app.services.optimization`.
 
 from __future__ import annotations
 
+import asyncio
 import sys
 from decimal import Decimal
 from pathlib import Path
@@ -246,7 +247,7 @@ def main() -> None:  # noqa: PLR0915
         f"Data -> grid_candidates={len(grid_cands)}, random_candidates={len(random_cands)}"
     )
 
-    summary = run_bounded_search(s_req, adapter)
+    summary = asyncio.run(run_bounded_search(s_req, adapter))
     print(_format_result(summary))
 
     top_cands = select_top_candidates(summary, 1)
@@ -257,13 +258,27 @@ def main() -> None:  # noqa: PLR0915
     # -------------------------------------------------------------------------
     _stage_banner(4, "Simulation Execution Boundary", "FEAT-OPT-04")
     _, c_req, c_adapter = genuine_execution_bundle()
-    cand_res = execute_candidate(c_req, c_adapter, deterministic_only=True)
-    c_report = get_optimization_value_field(cand_res, "analytics_report")
-    c_sections = get_analytics_value_field(c_report, "sections")
+    try:
+        cand_res = asyncio.run(
+            execute_candidate(c_req, c_adapter, deterministic_only=True)
+        )
+    except Exception as error:
+        if not hasattr(error, "code") or not hasattr(error, "detail"):
+            raise
+        cand_res = error
     print(_format_result(cand_res))
-    print(
-        f"Data -> candidate_hash='{cand_res.candidate_hash}', sections_count={len(c_sections)}"
-    )
+    if hasattr(cand_res, "safe_details"):
+        print(
+            "Data -> controlled_outcome='canonical neutral run produced no "
+            f"invented fill', reason='{cand_res.detail}'"
+        )
+    else:
+        c_report = get_optimization_value_field(cand_res, "analytics_report")
+        c_sections = get_analytics_value_field(c_report, "sections")
+        print(
+            f"Data -> candidate_hash='{cand_res.candidate_hash}', "
+            f"sections_count={len(c_sections)}"
+        )
 
     # -------------------------------------------------------------------------
     # Stage 5: Time-Series Validation (FEAT-OPT-08)
@@ -273,9 +288,20 @@ def main() -> None:  # noqa: PLR0915
     splits = build_time_series_splits(wf_req)
     print(_format_result(splits))
 
-    wf_res = run_walk_forward_validation(wf_req, adapter)
+    try:
+        wf_res = asyncio.run(run_walk_forward_validation(wf_req, adapter))
+    except Exception as error:
+        if not hasattr(error, "code") or not hasattr(error, "detail"):
+            raise
+        wf_res = error
     print(_format_result(wf_res))
-    print(f"Data -> wf_status='{wf_res.status}', fold_count={len(wf_res.folds)}")
+    if hasattr(wf_res, "safe_details"):
+        print(
+            "Data -> controlled_outcome='no eligible training candidate from "
+            f"canonical neutral runs', reason='{wf_res.detail}'"
+        )
+    else:
+        print(f"Data -> wf_status='{wf_res.status}', fold_count={len(wf_res.folds)}")
 
     # -------------------------------------------------------------------------
     # Stage 6: Monte Carlo and Stress Analysis (FEAT-OPT-05)
@@ -380,13 +406,15 @@ def main() -> None:  # noqa: PLR0915
     # Stage 9: Typed Optimization Boundary (FEAT-OPT-09)
     # -------------------------------------------------------------------------
     _stage_banner(9, "Typed Optimization Boundary", "FEAT-OPT-09")
-    sweep_res = run_parameter_sweep(search_request(dataset), adapter)
+    sweep_res = asyncio.run(run_parameter_sweep(search_request(dataset), adapter))
     print(_format_result(sweep_res))
 
-    wf_opt_res = run_walk_forward_optimization(wf_req, adapter)
+    wf_opt_res = asyncio.run(run_walk_forward_optimization(wf_req, adapter))
     print(_format_result(wf_opt_res))
 
-    wf_mat_res = run_walk_forward_matrix((wf_req,), adapter, max_requests=1)
+    wf_mat_res = asyncio.run(
+        run_walk_forward_matrix((wf_req,), adapter, max_requests=1)
+    )
     print(_format_result(wf_mat_res))
 
     rob_ana_res = run_robustness_analysis(

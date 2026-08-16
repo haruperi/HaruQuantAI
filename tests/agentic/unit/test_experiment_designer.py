@@ -568,7 +568,7 @@ def test_the_package_constructs_no_simulation_request_or_result() -> None:
     # There is no site at which Agentic could author either contract.
     for module in ("agent.py", "tools.py", "schemas.py", "repository.py"):
         source = (PROMPT_PATH.parent / module).read_text(encoding="utf-8")
-        assert "SimulationBacktestRequestV1" not in source, module
+        assert "SimulationBacktestRequest" not in source, module
         assert "SimulationResult" not in source, module
         assert "run_backtest(" not in source, module
 

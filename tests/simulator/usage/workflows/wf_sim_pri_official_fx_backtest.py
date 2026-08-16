@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import sys
 import tempfile
 from datetime import timedelta
@@ -13,7 +14,7 @@ from app.services.simulator import (
     build_tick_timeline,
     create_simulation_value,
     dump_simulation_value,
-    run_backtest,
+    run_backtest_async,
     unwrap_simulation_response,
     validate_market_data,
     validate_run_inputs,
@@ -47,7 +48,7 @@ def _stage(number: int) -> None:
 def main() -> None:
     """Execute the documented official-backtest workflow."""
     print(f"{WORKFLOW_ID} — Official FX Backtest")
-    print("INPUT BOUNDARY — SimulationBacktestRequestV1 and genuine MT5 evidence")
+    print("INPUT BOUNDARY — SimulationBacktestRequest and genuine MT5 evidence")
     input_ticks = live_tick_dataset()
     request = backtest_request(input_ticks)
 
@@ -100,10 +101,12 @@ def main() -> None:
     _stage(6)
     with tempfile.TemporaryDirectory(prefix="wf-sim-001-run-") as directory:
         result = unwrap_simulation_response(
-            run_backtest(
-                request,
-                auth,
-                dependencies(Path(directory), input_ticks),
+            asyncio.run(
+                run_backtest_async(
+                    request,
+                    auth,
+                    dependencies(Path(directory), input_ticks),
+                )
             ),
             operation="simulation.workflow.wf_sim_001.run_backtest",
         )

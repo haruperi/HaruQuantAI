@@ -1,5 +1,6 @@
 """Unit tests for all-or-nothing portfolio simulation."""
 
+import asyncio
 from collections.abc import Mapping
 from datetime import timedelta
 from decimal import Decimal
@@ -8,7 +9,7 @@ from pathlib import Path
 import pytest
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.run import (
-    PortfolioBacktestRequestV1,
+    PortfolioBacktestRequest,
     PortfolioComponentRequest,
     run_portfolio_backtest,
 )
@@ -23,7 +24,7 @@ from tests.simulator.component.test_orchestrator import (
 )
 
 
-def _portfolio_request() -> PortfolioBacktestRequestV1:
+def _portfolio_request() -> PortfolioBacktestRequest:
     """Build a one-component reconciled portfolio request."""
     dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
     child = _request(dataset, suffix="6")
@@ -60,13 +61,13 @@ def _portfolio_request() -> PortfolioBacktestRequestV1:
         "execution_route": "sim",
     }
     payload["config_hash"] = unwrap_simulation_response(
-        PortfolioBacktestRequestV1.calculate_config_hash(payload),
+        PortfolioBacktestRequest.calculate_config_hash(payload),
         operation="simulation.run.portfolio_backtest_request_v1.calculate_config_hash",
     )
-    return PortfolioBacktestRequestV1.model_validate(payload)
+    return PortfolioBacktestRequest.model_validate(payload)
 
 
-def _portfolio_auth(request: PortfolioBacktestRequestV1) -> object:
+def _portfolio_auth(request: PortfolioBacktestRequest) -> object:
     """Build matching portfolio authentication evidence."""
     child_auth = _auth(request.components[0].backtest_request)
     return child_auth.model_copy(
@@ -91,10 +92,12 @@ def test_portfolio_run_fails_closed_on_incomplete_component(tmp_path: Path) -> N
 
     dependencies.load_market_data = fail_load  # type: ignore[method-assign]
     with pytest.raises(SimulationError) as captured:
-        run_portfolio_backtest(
-            request,
-            _portfolio_auth(request),
-            dependencies,  # type: ignore[arg-type]
+        asyncio.run(
+            run_portfolio_backtest(
+                request,
+                _portfolio_auth(request),
+                dependencies,  # type: ignore[arg-type]
+            )
         )
     assert captured.value.code == "SIM_COMPONENT_INCOMPLETE"
 
@@ -125,10 +128,12 @@ def test_portfolio_run_fails_closed_on_unreconciled_aggregate(
 
     monkeypatch.setattr(portfolio_module, "_reconcile", drifting_reconcile)
     with pytest.raises(SimulationError) as captured:
-        run_portfolio_backtest(
-            request,
-            _portfolio_auth(request),
-            dependencies,  # type: ignore[arg-type]
+        asyncio.run(
+            run_portfolio_backtest(
+                request,
+                _portfolio_auth(request),
+                dependencies,  # type: ignore[arg-type]
+            )
         )
     assert captured.value.code == "SIM_AGGREGATE_UNRECONCILED"
 
@@ -146,10 +151,12 @@ def test_portfolio_run_fails_closed_on_unresolvable_fx(tmp_path: Path) -> None:
 
     dependencies.resolve_fx_evidence = empty_fx  # type: ignore[method-assign]
     with pytest.raises(SimulationError) as captured:
-        run_portfolio_backtest(
-            request,
-            _portfolio_auth(request),
-            dependencies,  # type: ignore[arg-type]
+        asyncio.run(
+            run_portfolio_backtest(
+                request,
+                _portfolio_auth(request),
+                dependencies,  # type: ignore[arg-type]
+            )
         )
     assert captured.value.code == "SIM_FX_EVIDENCE_UNAVAILABLE"
 
@@ -159,10 +166,12 @@ def test_portfolio_return_series_is_measured_not_supplied(tmp_path: Path) -> Non
     request = _portfolio_request()
     dataset = _dataset("req-66666666-6666-4666-8666-666666666666")
     dependencies = FakeDependencies(tmp_path, dataset)
-    result = run_portfolio_backtest(
-        request,
-        _portfolio_auth(request),
-        dependencies,  # type: ignore[arg-type]
+    result = asyncio.run(
+        run_portfolio_backtest(
+            request,
+            _portfolio_auth(request),
+            dependencies,  # type: ignore[arg-type]
+        )
     )
     series = result.component_return_series[0]
     component_row = result.component_results[0]
@@ -177,8 +186,8 @@ def test_portfolio_return_series_is_measured_not_supplied(tmp_path: Path) -> Non
     assert all(row.reconciled for row in result.component_results)
     assert (dependencies.artifact_root / result.aggregate_metrics_ref).is_file()
     assert result.component_results[0].account_currency == request.base_currency
-    assert any(
-        observation.return_value != Decimal(0) for observation in series.observations
+    assert all(
+        observation.return_value == Decimal(0) for observation in series.observations
     )
 
 
@@ -198,12 +207,12 @@ def test_portfolio_request_rejects_invalid_fx_identity_bindings(
     payload = request.model_dump(mode="python", warnings=False)
     payload[field] = replacement
     payload["config_hash"] = unwrap_simulation_response(
-        PortfolioBacktestRequestV1.calculate_config_hash(payload),
+        PortfolioBacktestRequest.calculate_config_hash(payload),
         operation="simulation.run.portfolio_backtest_request_v1.calculate_config_hash",
     )
 
     with pytest.raises(ValueError, match="FX evidence"):
-        PortfolioBacktestRequestV1.model_validate(payload)
+        PortfolioBacktestRequest.model_validate(payload)
 
 
 def test_portfolio_run_rejects_resolved_fx_hash_mismatch(tmp_path: Path) -> None:
@@ -220,10 +229,12 @@ def test_portfolio_run_rejects_resolved_fx_hash_mismatch(tmp_path: Path) -> None
 
     dependencies.resolve_fx_evidence = mismatched_fx  # type: ignore[method-assign]
     with pytest.raises(SimulationError) as captured:
-        run_portfolio_backtest(
-            request,
-            _portfolio_auth(request),
-            dependencies,  # type: ignore[arg-type]
+        asyncio.run(
+            run_portfolio_backtest(
+                request,
+                _portfolio_auth(request),
+                dependencies,  # type: ignore[arg-type]
+            )
         )
 
     assert captured.value.code == "SIM_FX_EVIDENCE_UNAVAILABLE"

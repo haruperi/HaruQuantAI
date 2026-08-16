@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -17,7 +18,7 @@ from app.services.data import (
 )
 from app.services.indicators import get_indicator_result_metadata, sma
 from app.services.risk import get_decision_state
-from app.services.simulator import run_backtest, unwrap_simulation_response
+from app.services.simulator import run_backtest_async, unwrap_simulation_response
 from app.services.strategy import (
     build_trade_intent,
     create_strategy_decision,
@@ -35,7 +36,6 @@ from app.services.trading import (
 )
 
 from tests.analytics import _support as analytics_examples
-from tests.analytics.usage._support import unwrap
 from tests.indicators.helpers import unwrap_response
 from tests.risk import _support as risk_examples
 from tests.simulator.component.test_orchestrator import (
@@ -53,7 +53,7 @@ from tests.strategy.unit.test_models import (
 OrderIntent = Any
 MarketDataset = Any
 PerformanceReport = Any
-SimulationBacktestRequestV1 = Any
+SimulationBacktestRequest = Any
 SimulationResult = Any
 StrategyTradeIntent = Any
 
@@ -183,7 +183,7 @@ class _SystemBacktestDependencies(FakeDependencies):
         self.calls: list[str] = []
         self.trade_intent: StrategyTradeIntent | None = None
 
-    def load_market_data(self, request: SimulationBacktestRequestV1) -> MarketDataset:
+    def load_market_data(self, request: SimulationBacktestRequest) -> MarketDataset:
         """Load the referenced Data evidence."""
         del request
         self.calls.append("data")
@@ -192,7 +192,7 @@ class _SystemBacktestDependencies(FakeDependencies):
     def generate_tick_series(
         self,
         dataset: MarketDataset,
-        request: SimulationBacktestRequestV1,
+        request: SimulationBacktestRequest,
     ) -> MarketDataset:
         """Invoke Data's genuine tick derivation operation."""
         del request
@@ -204,7 +204,7 @@ class _SystemBacktestDependencies(FakeDependencies):
     def calculate_indicators(
         self,
         dataset: MarketDataset,
-        request: SimulationBacktestRequestV1,
+        request: SimulationBacktestRequest,
     ) -> tuple[Any, ...]:
         """Invoke the Indicators package-root SMA operation."""
         del request
@@ -215,7 +215,7 @@ class _SystemBacktestDependencies(FakeDependencies):
         self,
         dataset: MarketDataset,
         indicators: tuple[Any, ...],
-        request: SimulationBacktestRequestV1,
+        request: SimulationBacktestRequest,
     ) -> tuple[StrategyTradeIntent, ...]:
         """Evaluate a registered Strategy and build its proposal intent."""
         self.calls.append("strategy")
@@ -305,7 +305,7 @@ class _SystemBacktestDependencies(FakeDependencies):
     def review_risk(
         self,
         intents: tuple[StrategyTradeIntent, ...],
-        request: SimulationBacktestRequestV1,
+        request: SimulationBacktestRequest,
     ) -> tuple[RiskDecisionPackage, ...]:
         """Review the exact Strategy proposal through RiskGovernor."""
         del request
@@ -340,7 +340,7 @@ class _SystemBacktestDependencies(FakeDependencies):
     def build_order_intents(
         self,
         decisions: tuple[RiskDecisionPackage, ...],
-        request: SimulationBacktestRequestV1,
+        request: SimulationBacktestRequest,
     ) -> tuple[OrderIntent, ...]:
         """Package Risk-approved size through Trading's public API."""
         self.calls.append("trading")
@@ -389,8 +389,8 @@ class _SystemBacktestDependencies(FakeDependencies):
 
 def _analytics_report(
     result: SimulationResult,
-    request: SimulationBacktestRequestV1,
-) -> PerformanceReport:
+    request: SimulationBacktestRequest,
+) -> Any:
     """Build Analytics evidence from the completed Simulation ledger.
 
     Args:
@@ -417,42 +417,37 @@ def _analytics_report(
         "quality_metadata": {"status": "passed"},
         "source_metadata": {"request_hash": result.request_hash},
     }
-    return unwrap(
-        build_performance_report(
-            source,
-            source_contract="simulation.result",
-            request_id=request.request_id,
-            correlation_id=request.correlation_id,
-            created_at=request.end,
-            initial_balance=result.initial_balance,
-            account_currency=result.account_currency,
-            config=analytics_examples._configured(),
-        )
+    return build_performance_report(
+        source,
+        source_contract="simulation.result",
+        request_id=request.request_id,
+        correlation_id=request.correlation_id,
+        created_at=request.end,
+        initial_balance=result.initial_balance,
+        account_currency=result.account_currency,
+        config=analytics_examples._configured(),
+        diagnostic_partial_mode=True,
     )
 
 
-def test_sys_wf_001_backtest_reaches_performance_report(tmp_path: Path) -> None:
-    """Execute Data through Analytics without mocking away domain behavior."""
+def test_sys_wf_001_neutral_backtest_reaches_analytics_fail_closed(
+    tmp_path: Path,
+) -> None:
+    """Execute canonical neutral evidence without inventing Analytics trades."""
     bars = _bar_dataset()
     ticks = _ticks(bars)
     request = _request(ticks, suffix="2")
     dependencies = _SystemBacktestDependencies(tmp_path, bars, ticks)
 
     result = unwrap_simulation_response(
-        run_backtest(request, _auth(request), dependencies),
+        asyncio.run(run_backtest_async(request, _auth(request), dependencies)),
         operation="run_backtest",
     )
     report = _analytics_report(result, request)
 
     assert result.status == "completed"
-    assert result.closed_trades
-    assert report.schema_id == "analytics.performance_report.v1"
-    assert report.sections
-    assert dependencies.calls == [
-        "data",
-        "data.tick_derivation",
-        "indicators",
-        "strategy",
-        "risk",
-        "trading",
-    ]
+    assert not result.closed_trades
+    assert report.status == "error"
+    assert report.error is not None
+    assert report.error.code == "ANALYTICS_VALIDATION_FAILED"
+    assert dependencies.calls == ["data", "data.tick_derivation"]

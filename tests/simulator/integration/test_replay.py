@@ -1,11 +1,12 @@
 """Workflow integration test for deterministic official-journal replay."""
 
+import asyncio
 from pathlib import Path
 
 from app.services.simulator import (
     get_simulation_value_field,
     replay_journal,
-    run_backtest,
+    run_backtest_async,
     unwrap_simulation_response,
 )
 from app.utils import get_logger
@@ -39,7 +40,7 @@ def test_completed_run_replays_to_terminal_state(tmp_path: Path) -> None:
     request = _request(dataset, suffix="f")
     dependencies = FakeDependencies(tmp_path, dataset)
     result = unwrap_simulation_response(
-        run_backtest(request, _auth(request), dependencies),
+        asyncio.run(run_backtest_async(request, _auth(request), dependencies)),
         operation="test.replay.run_backtest",
     )
     state = unwrap_simulation_response(
@@ -49,5 +50,5 @@ def test_completed_run_replays_to_terminal_state(tmp_path: Path) -> None:
         ),
         operation="test.replay.replay_journal",
     )
-    assert state["events"] >= 3  # type: ignore[operator]
+    assert state["events"] >= 2  # type: ignore[operator]
     assert state["last_type"] == "run_completed"

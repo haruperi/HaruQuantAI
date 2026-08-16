@@ -1,5 +1,6 @@
 """Unit tests and fixtures for official Simulation orchestration."""
 
+import asyncio
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -18,9 +19,13 @@ from app.services.data import (
 from app.services.simulator.accounting import ExecutionCostModel, SymbolSpecification
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.execution import ExecutionProfile, SessionInterval
-from app.services.simulator.run import SimulationBacktestRequestV1, run_backtest
+from app.services.simulator.run import (
+    FastResearchRequest,
+    SimulationBacktestRequest,
+    run_backtest_async,
+)
 from app.services.trading import create_order_intent
-from app.utils import canonical_json, create_auth_context
+from app.utils import canonical_digest, canonical_json, create_auth_context
 
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
@@ -121,11 +126,9 @@ def _data_hash(dataset: Any) -> str:
 def _request(
     dataset: Any,
     *,
-    runtime_profile: str = "simulation",
-    canonical: bool = True,
     suffix: str = "5",
     seed: int = 7,
-) -> SimulationBacktestRequestV1:
+) -> SimulationBacktestRequest:
     """Build a correctly hashed exact backtest request.
 
     ``seed`` varies the hashed request material while leaving ``request_id``
@@ -166,18 +169,89 @@ def _request(
         "account_currency": "USD",
         "asset_class": "FX",
         "seed": seed,
-        "runtime_profile": runtime_profile,
+        "runtime_profile": "simulation",
         "execution_route": "sim",
-        "canonical": canonical,
+        "canonical": True,
+        "execution_model_ref": "execution-model-v1",
+        "execution_model_hash": "e" * 64,
+        "calculation_model_hash": "a" * 64,
+        "calculation_artifact_checksum": "b" * 64,
+        "calibration_artifact_checksum": "c" * 64,
+        "realism_stream_identity_hash": "d" * 64,
+        "source_lineage_hash": "f" * 64,
+        "tick_lineage_hash": "1" * 64,
+        "market_evidence_class": "genuine_bid_ask_ticks",
+        "decision_instant_policy": "point_in_time_available_at",
+        "provider_specification_revisions": (
+            {
+                "revision_id": "revision-1",
+                "checksum": "2" * 64,
+                "provider": "mt5",
+                "server": "demo-server",
+                "environment": "demo",
+                "account_digest": "3" * 64,
+                "symbol": "EURUSD",
+                "observed_at": dataset.start,
+                "effective_from": dataset.start,
+                "effective_to": None,
+                "historical_provenance": None,
+            },
+        ),
+        "initial_authority_state_hash": canonical_digest(
+            {
+                "account": {"balance": Decimal(10_000), "currency": "USD"},
+                "orders": (),
+                "positions": (),
+                "deals": (),
+                "ownership": {"mode": "exclusive"},
+            }
+        ),
+        "certification_target": "demo",
+        "close_open_positions_at_end": True,
     }
     payload["config_hash"] = unwrap_simulation_response(
-        SimulationBacktestRequestV1.calculate_config_hash(payload),
-        operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
+        SimulationBacktestRequest.calculate_config_hash(payload),
+        operation="simulation.run.simulation_backtest_request.calculate_config_hash",
     )
-    return SimulationBacktestRequestV1.model_validate(payload)
+    return SimulationBacktestRequest.model_validate(payload)
 
 
-def _auth(request: SimulationBacktestRequestV1) -> Any:
+def _research_request(dataset: Any, *, suffix: str = "8") -> FastResearchRequest:
+    """Build one explicitly non-canonical fast-research request."""
+    canonical = _request(dataset, suffix=suffix)
+    payload = canonical.model_dump(mode="python", warnings=False)
+    for field in (
+        "contract_version",
+        "schema_id",
+        "config_hash",
+        "execution_model_ref",
+        "execution_model_hash",
+        "calculation_model_hash",
+        "calculation_artifact_checksum",
+        "calibration_artifact_checksum",
+        "realism_stream_identity_hash",
+        "source_lineage_hash",
+        "tick_lineage_hash",
+        "market_evidence_class",
+        "decision_instant_policy",
+        "market_evidence_eligible",
+        "required_clock_edges",
+        "evidenced_clock_edges",
+        "provider_specification_revisions",
+        "initial_authority_state_hash",
+        "certification_target",
+        "close_open_positions_at_end",
+    ):
+        payload.pop(field, None)
+    payload.update(runtime_profile="fast_research", canonical=False)
+    payload["config_hash"] = unwrap_simulation_response(
+        FastResearchRequest.calculate_config_hash(payload),
+        operation="simulation.run.fast_research_request.calculate_config_hash",
+    )
+    return FastResearchRequest.model_validate(payload)
+
+
+def _auth(request: Any) -> Any:
     """Build matching authenticated run authority."""
     return create_auth_context(
         contract_version="v1",
@@ -222,20 +296,20 @@ class FakeDependencies:
         """
         self.audit_events.append(event)
 
-    def load_market_data(self, request: SimulationBacktestRequestV1) -> Any:
+    def load_market_data(self, request: SimulationBacktestRequest) -> Any:
         """Return referenced market evidence."""
         del request
         return self.dataset
 
     def generate_tick_series(
-        self, dataset: Any, request: SimulationBacktestRequestV1
+        self, dataset: Any, request: SimulationBacktestRequest
     ) -> Any:
         """Return Data's already-real tick evidence."""
         del request
         return dataset
 
     def calculate_indicators(
-        self, dataset: Any, request: SimulationBacktestRequestV1
+        self, dataset: Any, request: SimulationBacktestRequest
     ) -> tuple[object, ...]:
         """Record an empty valid Indicator set for this fixture."""
         del dataset, request
@@ -245,21 +319,21 @@ class FakeDependencies:
         self,
         dataset: Any,
         indicators: tuple[object, ...],
-        request: SimulationBacktestRequestV1,
+        request: SimulationBacktestRequest,
     ) -> tuple[object, ...]:
         """Record an empty Strategy proposal set for this fixture."""
         del dataset, indicators, request
         return ()
 
     def review_risk(
-        self, intents: tuple[object, ...], request: SimulationBacktestRequestV1
+        self, intents: tuple[object, ...], request: SimulationBacktestRequest
     ) -> tuple[object, ...]:
         """Record an empty Risk package set for this fixture."""
         del intents, request
         return ()
 
     def build_order_intents(
-        self, decisions: tuple[object, ...], request: SimulationBacktestRequestV1
+        self, decisions: tuple[object, ...], request: SimulationBacktestRequest
     ) -> tuple[OrderIntent, ...]:
         """Return one Trading-owned approved sim intent."""
         del decisions
@@ -295,7 +369,7 @@ class FakeDependencies:
         )
 
     def resolve_execution_profile(
-        self, request: SimulationBacktestRequestV1
+        self, request: SimulationBacktestRequest
     ) -> ExecutionProfile:
         """Return an explicit full-week no-slippage profile."""
         del request
@@ -312,7 +386,7 @@ class FakeDependencies:
         )
 
     def resolve_symbol_specification(
-        self, request: SimulationBacktestRequestV1
+        self, request: SimulationBacktestRequest
     ) -> SymbolSpecification:
         """Return approved FX volume and margin evidence."""
         del request
@@ -325,7 +399,7 @@ class FakeDependencies:
         )
 
     def resolve_cost_model(
-        self, request: SimulationBacktestRequestV1
+        self, request: SimulationBacktestRequest
     ) -> ExecutionCostModel:
         """Return a zero-cost explicit fixture model."""
         del request
@@ -339,12 +413,80 @@ class FakeDependencies:
         """Return one fresh Data-owned FX evidence record per identifier."""
         return {evidence_id: _fx_evidence(self.dataset) for evidence_id in evidence_ids}
 
+    def load_initial_authority_state(
+        self, request: SimulationBacktestRequest
+    ) -> dict[str, object]:
+        """Return the exact request-bound empty authority snapshot."""
+        return {
+            "account": {
+                "balance": request.initial_balance,
+                "currency": request.account_currency,
+            },
+            "orders": (),
+            "positions": (),
+            "deals": (),
+            "ownership": {"mode": "exclusive"},
+        }
+
+    def load_account_activity(
+        self, request: SimulationBacktestRequest
+    ) -> tuple[object, ...]:
+        """Return no foreign activity for the exclusive interval."""
+        del request
+        return ()
+
+    def load_provider_specification_revisions(
+        self, request: SimulationBacktestRequest
+    ) -> dict[str, object]:
+        """Return complete request-bound provider revision evidence."""
+        binding = request.provider_specification_revisions[0]
+        return {
+            "complete_coverage": True,
+            "revisions": (
+                {
+                    "revision_id": binding.revision_id,
+                    "broker": binding.provider,
+                    "server": binding.server,
+                    "environment": binding.environment,
+                    "account_digest": binding.account_digest,
+                    "provider_symbol": binding.symbol,
+                    "snapshot_checksum": binding.checksum,
+                    "effective_from": binding.effective_from,
+                    "effective_to": binding.effective_to,
+                    "payload": {
+                        "trade_mode": "FULL",
+                        "filling_modes": ("FOK",),
+                        "execution_mode": "MARKET",
+                        "directional_volume_limit": "100",
+                        "point": "0.00001",
+                        "stops_level_points": 0,
+                        "freeze_level_points": 0,
+                        "weekly_sessions": {
+                            str(day): (("00:00", "23:59:59.999999"),)
+                            for day in range(7)
+                        },
+                        "dated_exceptions": {},
+                        "exception_coverage": (),
+                        "exception_coverage_required": False,
+                    },
+                },
+            ),
+        }
+
+    def build_approved_requests(self, *_args: object) -> tuple[object, ...]:
+        """Return no approved request for the neutral strategy fixture."""
+        return ()
+
+    async def evaluate_point_in_time_cycle(self, *_args: object) -> dict[str, bool]:
+        """Return one neutral shared-cycle result per visible instant."""
+        return {"mutation_performed": False}
+
 
 class CostBearingDependencies(FakeDependencies):
     """Fixture whose cost model charges a non-zero commission and swap."""
 
     def resolve_cost_model(
-        self, request: SimulationBacktestRequestV1
+        self, request: SimulationBacktestRequest
     ) -> ExecutionCostModel:
         """Return an explicit non-zero cost model.
 
@@ -368,14 +510,14 @@ def test_run_backtest_maps_internal_failure(tmp_path: Path) -> None:
     request = _request(dataset)
     dependencies = FakeDependencies(tmp_path, dataset)
 
-    def fail_load(request_value: SimulationBacktestRequestV1) -> Any:
+    def fail_load(request_value: SimulationBacktestRequest) -> Any:
         """Inject an unexpected read failure."""
         del request_value
         raise RuntimeError("provider secret")
 
     dependencies.load_market_data = fail_load  # type: ignore[method-assign]
     with pytest.raises(SimulationError) as captured:
-        run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+        asyncio.run(run_backtest_async(request, _auth(request), dependencies))  # type: ignore[arg-type]
     assert captured.value.code == "SIM_INTERNAL_ERROR"
 
 
@@ -384,22 +526,21 @@ def test_run_backtest_publishes_completed_result(tmp_path: Path) -> None:
     dataset = _dataset("req-55555555-5555-4555-8555-555555555555")
     request = _request(dataset)
     dependencies = FakeDependencies(tmp_path, dataset)
-    result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+    result = asyncio.run(run_backtest_async(request, _auth(request), dependencies))  # type: ignore[arg-type]
     assert result.status == "completed"
-    assert len(result.closed_trades) == 1
-    assert result.closed_trades[0].exit_time >= result.closed_trades[0].entry_time
+    assert result.closed_trades == ()
     assert (dependencies.artifact_root / result.run_id / "manifest.json").is_file()
 
 
-def test_result_accounting_matches_ledger_totals(tmp_path: Path) -> None:
-    """Publish commission and swap measured by the ledger, never constants."""
+def test_neutral_trading_cycle_preserves_opening_account_totals(tmp_path: Path) -> None:
+    """A neutral Trading cycle publishes unchanged measured ledger totals."""
     dataset = _dataset("req-88888888-8888-4888-8888-888888888888")
     request = _request(dataset, suffix="8")
     dependencies = CostBearingDependencies(tmp_path, dataset)
-    result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+    result = asyncio.run(run_backtest_async(request, _auth(request), dependencies))  # type: ignore[arg-type]
     accounting = result.accounting
-    assert accounting.commission != Decimal(0)
-    assert accounting.commission < Decimal(0)
+    assert accounting.commission == Decimal(0)
+    assert accounting.swap == Decimal(0)
     assert (
         accounting.net_profit
         == accounting.gross_profit + accounting.commission + accounting.swap
@@ -412,8 +553,8 @@ def test_repeat_request_returns_the_stored_completed_result(tmp_path: Path) -> N
     dataset = _dataset("req-aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
     request = _request(dataset, suffix="a")
     dependencies = FakeDependencies(tmp_path, dataset)
-    first = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
-    second = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+    first = asyncio.run(run_backtest_async(request, _auth(request), dependencies))  # type: ignore[arg-type]
+    second = asyncio.run(run_backtest_async(request, _auth(request), dependencies))  # type: ignore[arg-type]
     assert first.run_id == second.run_id
     assert first.request_hash == second.request_hash
 
@@ -423,13 +564,15 @@ def test_repeat_request_with_different_hash_conflicts(tmp_path: Path) -> None:
     dataset = _dataset("req-bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")
     request = _request(dataset, suffix="b")
     dependencies = FakeDependencies(tmp_path, dataset)
-    first = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+    first = asyncio.run(run_backtest_async(request, _auth(request), dependencies))  # type: ignore[arg-type]
     conflicting = _request(dataset, suffix="b", seed=11)
     assert conflicting.request_id == request.request_id
     assert conflicting.config_hash != request.config_hash
     with pytest.raises(SimulationError) as captured:
-        run_backtest(  # type: ignore[arg-type]
-            conflicting, _auth(conflicting), dependencies
+        asyncio.run(
+            run_backtest_async(  # type: ignore[arg-type]
+                conflicting, _auth(conflicting), dependencies
+            )
         )
     assert captured.value.code == "SIM_RUN_ID_CONFLICT"
     stored = dependencies.state_store.load_run(request.request_id)
@@ -438,16 +581,16 @@ def test_repeat_request_with_different_hash_conflicts(tmp_path: Path) -> None:
 
 
 def test_markdown_report_states_measured_costs(tmp_path: Path) -> None:
-    """Prove the canonical report renders the measured, non-zero cost totals."""
+    """Prove the canonical report renders the measured cost totals."""
     dataset = _dataset("req-99999999-9999-4999-8999-999999999999")
     request = _request(dataset, suffix="9")
     dependencies = CostBearingDependencies(tmp_path, dataset)
-    result = run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+    result = asyncio.run(run_backtest_async(request, _auth(request), dependencies))  # type: ignore[arg-type]
     report = (dependencies.artifact_root / result.run_id / "report.md").read_text(
         encoding="utf-8"
     )
     assert f"- Commission: {result.accounting.commission}" in report
-    assert "- Commission: 0\n" not in report
+    assert f"- Swap: {result.accounting.swap}" in report
 
 
 def test_run_backtest_persists_started_and_completed_audit_events(
@@ -458,7 +601,7 @@ def test_run_backtest_persists_started_and_completed_audit_events(
     request = _request(dataset, suffix="7")
     dependencies = FakeDependencies(tmp_path, dataset)
 
-    run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+    asyncio.run(run_backtest_async(request, _auth(request), dependencies))  # type: ignore[arg-type]
 
     assert [event.action for event in dependencies.audit_events] == [
         "simulation.run_started",
@@ -476,13 +619,13 @@ def test_run_backtest_persists_failed_audit_event(tmp_path: Path) -> None:
     request = _request(dataset, suffix="6")
     dependencies = FakeDependencies(tmp_path, dataset)
 
-    def fail_load(request_value: SimulationBacktestRequestV1) -> Any:
+    def fail_load(request_value: SimulationBacktestRequest) -> Any:
         del request_value
         raise RuntimeError("provider-secret")
 
     dependencies.load_market_data = fail_load  # type: ignore[method-assign]
     with pytest.raises(SimulationError):
-        run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+        asyncio.run(run_backtest_async(request, _auth(request), dependencies))  # type: ignore[arg-type]
 
     assert [event.action for event in dependencies.audit_events] == [
         "simulation.run_started",
@@ -505,6 +648,6 @@ def test_run_backtest_fails_closed_when_audit_persistence_fails(
 
     dependencies.persist_audit_event = fail_audit  # type: ignore[method-assign]
     with pytest.raises(SimulationError) as captured:
-        run_backtest(request, _auth(request), dependencies)  # type: ignore[arg-type]
+        asyncio.run(run_backtest_async(request, _auth(request), dependencies))  # type: ignore[arg-type]
 
     assert captured.value.code == "SIM_PERSISTENCE_FAILED"

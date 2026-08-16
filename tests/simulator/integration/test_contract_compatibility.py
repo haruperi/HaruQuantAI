@@ -1,7 +1,7 @@
 """Producer/consumer compatibility tests for Simulation-owned contracts.
 
-`docs/PROJECT.md` §5 registers `SimulationBacktestRequestV1`, `SimulationResult`,
-`PortfolioBacktestRequestV1`, and `PortfolioSimulationResult` as Simulation-owned.
+`docs/PROJECT.md` §5 registers `SimulationBacktestRequest`, `SimulationResult`,
+`PortfolioBacktestRequest`, and `PortfolioSimulationResult` as Simulation-owned.
 These tests prove the published shapes match what the registered consumers read,
 rather than asserting parity in a comment.
 """
@@ -88,11 +88,13 @@ def test_owned_contracts_expose_separate_version_and_schema_identity() -> None:
     logger.info("Testing Simulation contract version and schema identity")
     dataset = _dataset("req-55555555-5555-4555-8555-555555555555")
     for value, schema_id in (
-        (_request(dataset), "simulation.backtest_request.v1"),
+        (_request(dataset), "simulation.backtest_request.v2"),
         (_result(), "simulation.result.v1"),
         (_portfolio_request(), "simulation.portfolio_backtest_request.v1"),
     ):
-        assert get_simulation_value_field(value, "contract_version") == "v1"
+        assert get_simulation_value_field(value, "contract_version") == (
+            "v2" if schema_id == "simulation.backtest_request.v2" else "v1"
+        )
         assert get_simulation_value_field(value, "schema_id") == schema_id
     assert {
         "contract_version",
@@ -130,7 +132,7 @@ def test_request_v2_matches_the_registered_execution_identity_schema() -> None:
         "certification_target",
         "close_open_positions_at_end",
     }
-    assert required <= set(get_simulation_value_fields("SimulationBacktestRequestV2"))
+    assert required <= set(get_simulation_value_fields("SimulationBacktestRequest"))
 
 
 def test_request_v2_binds_broker_snapshot_persisted_point_in_time(

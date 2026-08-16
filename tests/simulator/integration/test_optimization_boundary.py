@@ -1,8 +1,9 @@
 """Workflow integration test for the Optimization adapter boundary."""
 
+import asyncio
 from pathlib import Path
 
-from app.services.simulator import run_backtest, unwrap_simulation_response
+from app.services.simulator import run_backtest_async, unwrap_simulation_response
 from app.utils import get_logger
 
 from tests.simulator.component.test_orchestrator import (
@@ -22,11 +23,11 @@ def test_external_adapter_can_call_stable_simulation_port(tmp_path: Path) -> Non
     request = _request(dataset, suffix="d")
     dependencies = FakeDependencies(tmp_path, dataset)
     first = unwrap_simulation_response(
-        run_backtest(request, _auth(request), dependencies),
+        asyncio.run(run_backtest_async(request, _auth(request), dependencies)),
         operation="test.optimization.run_backtest",
     )
     second = unwrap_simulation_response(
-        run_backtest(request, _auth(request), dependencies),
+        asyncio.run(run_backtest_async(request, _auth(request), dependencies)),
         operation="test.optimization.run_backtest",
     )
     assert first == second

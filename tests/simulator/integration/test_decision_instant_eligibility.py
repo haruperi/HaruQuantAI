@@ -3,7 +3,7 @@
 from datetime import timedelta
 
 from app.services.simulator import (
-    calculate_simulation_backtest_v2_config_hash,
+    calculate_simulation_backtest_config_hash,
     validate_market_evidence_lineage,
 )
 
@@ -62,8 +62,8 @@ def test_request_v2_hash_binds_eligibility_and_clock_coverage() -> None:
         "required_clock_edges": ("availability", "decision"),
         "evidenced_clock_edges": ("availability",),
     }
-    incomplete = calculate_simulation_backtest_v2_config_hash(base).data
-    complete = calculate_simulation_backtest_v2_config_hash(
+    incomplete = calculate_simulation_backtest_config_hash(base).data
+    complete = calculate_simulation_backtest_config_hash(
         {
             **base,
             "market_evidence_eligible": True,

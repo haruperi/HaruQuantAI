@@ -1,6 +1,8 @@
 """Integration test for the official Optimization boundary."""
 
 # ruff: noqa: INP001
+import asyncio
+
 from app.services.optimization import (
     compare_optimization_runs,
     get_official_optimization_tools,
@@ -12,7 +14,7 @@ from tests.optimization.unit.test_sweep import FakeAdapter
 
 def test_public_boundary_runs_and_compares_advisory_results() -> None:
     """Official operations orchestrate existing capabilities end to end."""
-    first_response = run_parameter_sweep(search_request(), FakeAdapter())
+    first_response = asyncio.run(run_parameter_sweep(search_request(), FakeAdapter()))
     assert first_response.data is not None
     first = first_response.data
     second = first.model_copy(update={"search_id": "search-two"})

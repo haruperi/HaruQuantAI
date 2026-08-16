@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 
@@ -94,15 +95,17 @@ def main() -> None:
 
     # Stage 4 — Execute one version-compatible candidate through the injected adapter.
     _stage(4)
-    execution = execute_candidate(
-        candidate_request,
-        adapter,
-        deterministic_only=True,
+    execution = asyncio.run(
+        execute_candidate(
+            candidate_request,
+            adapter,
+            deterministic_only=True,
+        )
     )
 
     # Stage 5 — Run the bounded search and return deterministic SearchSummary evidence.
     _stage(5)
-    summary = run_bounded_search(request, adapter)
+    summary = asyncio.run(run_bounded_search(request, adapter))
     print("Generated/accepted/random:", len(grid), len(accepted), len(random))
     print(
         "Execution evidence:",

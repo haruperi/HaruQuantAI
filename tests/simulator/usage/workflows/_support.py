@@ -31,6 +31,7 @@ from app.services.risk import (
     get_decision_state,
 )
 from app.services.simulator import (
+    calculate_fast_research_config_hash,
     calculate_portfolio_backtest_config_hash,
     calculate_simulation_backtest_config_hash,
     create_simulation_handle,
@@ -358,11 +359,59 @@ def backtest_request(
         "execution_route": "sim",
         "canonical": canonical,
     }
-    payload["config_hash"] = unwrap_simulation_response(
-        calculate_simulation_backtest_config_hash(payload),
-        operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
+    value_type = "FastResearchRequest"
+    if runtime_profile == "simulation":
+        payload.update(
+            {
+                "execution_model_ref": "execution-model-v1",
+                "execution_model_hash": "e" * 64,
+                "calculation_model_hash": "a" * 64,
+                "calculation_artifact_checksum": "b" * 64,
+                "calibration_artifact_checksum": "c" * 64,
+                "realism_stream_identity_hash": "d" * 64,
+                "source_lineage_hash": "f" * 64,
+                "tick_lineage_hash": "1" * 64,
+                "market_evidence_class": "genuine_bid_ask_ticks",
+                "decision_instant_policy": "point_in_time_available_at",
+                "provider_specification_revisions": (
+                    {
+                        "revision_id": "revision-1",
+                        "checksum": "2" * 64,
+                        "provider": "mt5",
+                        "server": "demo-server",
+                        "environment": "demo",
+                        "account_digest": "3" * 64,
+                        "symbol": dataset.symbol,
+                        "observed_at": dataset.start,
+                        "effective_from": dataset.start,
+                        "effective_to": None,
+                        "historical_provenance": None,
+                    },
+                ),
+                "initial_authority_state_hash": canonical_digest(
+                    {
+                        "account": {"balance": Decimal(10_000), "currency": "USD"},
+                        "orders": (),
+                        "positions": (),
+                        "deals": (),
+                        "ownership": {"mode": "exclusive"},
+                    }
+                ),
+                "certification_target": "demo",
+                "close_open_positions_at_end": True,
+            }
+        )
+        value_type = "SimulationBacktestRequest"
+    hash_operation = (
+        calculate_simulation_backtest_config_hash
+        if runtime_profile == "simulation"
+        else calculate_fast_research_config_hash
     )
-    return create_simulation_value("SimulationBacktestRequestV1", **payload)
+    payload["config_hash"] = unwrap_simulation_response(
+        hash_operation(payload),
+        operation="simulation.run.request.calculate_config_hash",
+    )
+    return create_simulation_value(value_type, **payload)
 
 
 def authority(request: object) -> object:
@@ -843,7 +892,7 @@ def portfolio_request(
         calculate_portfolio_backtest_config_hash(payload),
         operation="simulation.run.portfolio_backtest_request_v1.calculate_config_hash",
     )
-    request = create_simulation_value("PortfolioBacktestRequestV1", **payload)
+    request = create_simulation_value("PortfolioBacktestRequest", **payload)
     auth = create_auth_context(
         principal_id="simulator-workflow",
         principal_type="SERVICE_ACCOUNT",

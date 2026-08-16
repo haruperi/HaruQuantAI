@@ -777,7 +777,7 @@ def simulation_request(candidate: PortfolioConstructionResult) -> object:
         calculate_portfolio_backtest_config_hash(payload),
         operation="portfolio.workflow.calculate_simulation_hash",
     )
-    request = create_simulation_value("PortfolioBacktestRequestV1", **payload)
+    request = create_simulation_value("PortfolioBacktestRequest", **payload)
     auth = create_auth_context(
         principal_id="portfolio-workflow",
         principal_type="SERVICE_ACCOUNT",

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any
@@ -20,7 +21,7 @@ from app.services.simulator import (
     dump_simulation_value,
     unwrap_simulation_response,
 )
-from app.utils import get_logger
+from app.utils import canonical_digest, get_logger
 
 from tests.portfolio.unit.test_allocation import (
     _activator,
@@ -37,7 +38,7 @@ from tests.portfolio.unit.test_repository import FakePortfolioStore
 from tests.portfolio.unit.test_workflows import _unused
 
 AuditEvent = Any
-PortfolioBacktestRequestV1 = Any
+PortfolioBacktestRequest = Any
 PortfolioConstructionRequest = Any
 PortfolioConstructionResult = Any
 PortfolioSettings = Any
@@ -123,6 +124,45 @@ def test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts(
             "runtime_profile": "simulation",
             "execution_route": "sim",
             "canonical": True,
+            "execution_model_ref": "execution-model-v1",
+            "execution_model_hash": "6" * 64,
+            "calculation_model_hash": "7" * 64,
+            "calculation_artifact_checksum": "8" * 64,
+            "calibration_artifact_checksum": "9" * 64,
+            "realism_stream_identity_hash": "a" * 64,
+            "source_lineage_hash": "b" * 64,
+            "tick_lineage_hash": "c" * 64,
+            "market_evidence_class": "genuine_bid_ask_ticks",
+            "decision_instant_policy": "point_in_time_available_at",
+            "provider_specification_revisions": (
+                {
+                    "revision_id": "revision-1",
+                    "checksum": "d" * 64,
+                    "provider": "mt5",
+                    "server": "demo-server",
+                    "environment": "demo",
+                    "account_digest": "e" * 64,
+                    "symbol": "EURUSD",
+                    "observed_at": portfolio_now - timedelta(minutes=1),
+                    "effective_from": portfolio_now - timedelta(minutes=1),
+                    "effective_to": None,
+                    "historical_provenance": None,
+                },
+            ),
+            "initial_authority_state_hash": canonical_digest(
+                {
+                    "account": {
+                        "balance": Decimal(1000) * row.capital_weight,
+                        "currency": "USD",
+                    },
+                    "orders": (),
+                    "positions": (),
+                    "deals": (),
+                    "ownership": {"mode": "exclusive"},
+                }
+            ),
+            "certification_target": "demo",
+            "close_open_positions_at_end": True,
         }
         request_fields["config_hash"] = unwrap_simulation_response(
             calculate_simulation_backtest_config_hash(request_fields),
@@ -136,7 +176,7 @@ def test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts(
                 "risk_decision_id": f"eligibility-{row.component_id}",
                 "metrics_ref": f"analytics-{row.component_id}",
                 "backtest_request": create_simulation_value(
-                    "SimulationBacktestRequestV1",
+                    "SimulationBacktestRequest",
                     **request_fields,
                 ),
             }
@@ -179,7 +219,7 @@ def test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts(
         operation="calculate portfolio backtest config hash",
     )
     simulation_request = create_simulation_value(
-        "PortfolioBacktestRequestV1",
+        "PortfolioBacktestRequest",
         **portfolio_request_fields,
     )
 
@@ -206,7 +246,7 @@ def test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts(
             {"component-a": 30, "component-b": 30},
         )
 
-    def simulation_runner(_request: PortfolioBacktestRequestV1):
+    async def simulation_runner(_request: PortfolioBacktestRequest):
         """Return a completed Simulation result for the exact candidate."""
         logger.info("Running activation Simulation receiver fake")
         return _simulation(candidate, portfolio_now)
@@ -253,12 +293,14 @@ def test_activation_chain_uses_receiver_owned_simulation_and_risk_contracts(
         repository,
         dependencies,
     )
-    review = execute_portfolio_handle_operation(
-        service,
-        "coordinate_review",
-        candidate,
-        simulation_request,
-        evidence,
+    review = asyncio.run(
+        execute_portfolio_handle_operation(
+            service,
+            "coordinate_review",
+            candidate,
+            simulation_request,
+            evidence,
+        )
     )
     active = execute_portfolio_handle_operation(
         service,

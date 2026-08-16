@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import sqlite3
 import tempfile
@@ -152,6 +153,44 @@ def execution_context(dataset: object | None = None) -> object:
         engine_type="event_driven",
         engine_version="v1",
         module_version="v1",
+        execution_model_ref="execution-model-v1",
+        execution_model_hash="3" * 64,
+        calculation_model_hash="4" * 64,
+        calculation_artifact_checksum="5" * 64,
+        calibration_artifact_checksum="6" * 64,
+        realism_stream_identity_hash="7" * 64,
+        source_lineage_hash="8" * 64,
+        tick_lineage_hash="9" * 64,
+        market_evidence_class="genuine_bid_ask_ticks",
+        market_evidence_eligible=True,
+        required_clock_edges=(),
+        evidenced_clock_edges=(),
+        provider_specification_revisions=(
+            {
+                "revision_id": "revision-1",
+                "checksum": "a" * 64,
+                "provider": "mt5",
+                "server": "demo-server",
+                "environment": "demo",
+                "account_digest": "b" * 64,
+                "symbol": symbol,
+                "observed_at": start,
+                "effective_from": start,
+                "effective_to": None,
+                "historical_provenance": None,
+            },
+        ),
+        initial_authority_state_hash=canonical_digest(
+            {
+                "account": {"balance": Decimal(10_000), "currency": "USD"},
+                "orders": (),
+                "positions": (),
+                "deals": (),
+                "ownership": {"mode": "exclusive"},
+            }
+        ),
+        certification_target="demo",
+        close_open_positions_at_end=True,
     )
 
 
@@ -330,7 +369,7 @@ def genuine_search_summary() -> tuple[object, object]:
         workflow_id=generate_id("wf"),
         correlation_id=generate_id("cor"),
     )
-    return run_bounded_search(request, adapter), adapter
+    return asyncio.run(run_bounded_search(request, adapter)), adapter
 
 
 def evidence_request(search: object | None = None) -> object:

@@ -5,6 +5,7 @@ Demonstrates FEAT-OPT-03 candidate generation, grid search, random sampling, and
 
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 from typing import Any
@@ -101,11 +102,14 @@ def fr_opt_021() -> None:
     _header("Stage 3: Search Execution - Run Bounded Search (FR-OPT-021)")
     dataset, _, adapter = genuine_execution_bundle()
     req = search_request(dataset)
-    summary = run_bounded_search(req, adapter)
+    summary = asyncio.run(run_bounded_search(req, adapter))
     print(_format_result(summary))
-    print(
-        f"Data -> search_id='{summary.search_id}', best_candidate='{summary.best_candidate_hash[:8]}...'"
+    best_candidate = (
+        f"{summary.best_candidate_hash[:8]}..."
+        if summary.best_candidate_hash is not None
+        else "none (canonical neutral run produced no invented fill)"
     )
+    print(f"Data -> search_id='{summary.search_id}', best_candidate='{best_candidate}'")
 
 
 def fr_opt_022() -> None:
@@ -116,7 +120,7 @@ def fr_opt_022() -> None:
     _header("Stage 3: Top Selection - Select Top Candidates (FR-OPT-022)")
     dataset, _, adapter = genuine_execution_bundle()
     req = search_request(dataset)
-    summary = run_bounded_search(req, adapter)
+    summary = asyncio.run(run_bounded_search(req, adapter))
     top_candidates = select_top_candidates(summary, 1)
     print(_format_result(top_candidates))
     print(f"Data -> top_candidates_count={len(top_candidates)}")

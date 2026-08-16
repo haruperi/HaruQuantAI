@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 
@@ -53,16 +54,18 @@ def main() -> None:
 
     # Stage 3 — Run bounded train-window search and execute a candidate out of sample.
     _stage(3)
-    search = run_bounded_search(request.search, adapter)
-    candidate = execute_candidate(
-        candidate_request,
-        adapter,
-        deterministic_only=True,
+    search = asyncio.run(run_bounded_search(request.search, adapter))
+    candidate = asyncio.run(
+        execute_candidate(
+            candidate_request,
+            adapter,
+            deterministic_only=True,
+        )
     )
 
     # Stage 4 — Run walk-forward validation and return fold and aggregate degradation evidence.
     _stage(4)
-    result = run_walk_forward_validation(request, adapter)
+    result = asyncio.run(run_walk_forward_validation(request, adapter))
     print("Search/candidate:", search.search_id, candidate.candidate_hash)
     print("OUTPUT BOUNDARY — typed walk-forward evidence:", len(folds), result.status)
 

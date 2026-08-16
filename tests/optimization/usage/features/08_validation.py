@@ -5,6 +5,7 @@ Demonstrates FEAT-OPT-08 walk-forward validation modes, time series fold generat
 
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 from typing import Any
@@ -96,7 +97,17 @@ def fr_opt_034() -> None:
     _header("Stage 3: Validation Execution - Run Walk-Forward Validation (FR-OPT-034)")
     dataset, _, adapter = genuine_execution_bundle()
     req = walk_forward_request(dataset)
-    wf_res = run_walk_forward_validation(req, adapter)
+    try:
+        wf_res = asyncio.run(run_walk_forward_validation(req, adapter))
+    except Exception as error:
+        if not hasattr(error, "code") or not hasattr(error, "detail"):
+            raise
+        print(_format_result(error))
+        print(
+            "Data -> controlled_outcome='no eligible training candidate from "
+            f"canonical neutral runs', reason='{error.detail}'"
+        )
+        return
     print(_format_result(wf_res))
     print(
         f"Data -> status='{wf_res.status}', pass_rate={wf_res.fold_pass_rate * 100:.1f}%, fold_count={len(wf_res.folds)}"

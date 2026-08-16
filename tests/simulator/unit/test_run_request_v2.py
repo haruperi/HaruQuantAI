@@ -8,10 +8,9 @@ from pathlib import Path
 
 import pytest
 from app.services.simulator import (
-    calculate_simulation_backtest_v2_config_hash,
+    calculate_simulation_backtest_config_hash,
     create_simulation_value,
     dump_simulation_value,
-    run_backtest,
     run_backtest_async,
     unwrap_simulation_response,
 )
@@ -76,7 +75,7 @@ def _payload() -> dict[str, object]:
         }
     )
     payload["config_hash"] = unwrap_simulation_response(
-        calculate_simulation_backtest_v2_config_hash(payload),
+        calculate_simulation_backtest_config_hash(payload),
         operation="test.request_v2.calculate_hash",
     )
     return payload
@@ -85,14 +84,14 @@ def _payload() -> dict[str, object]:
 def _build(payload: dict[str, object] | None = None) -> object:
     """Build one opaque V2 request."""
     return create_simulation_value(
-        "SimulationBacktestRequestV2", **(payload or _payload())
+        "SimulationBacktestRequest", **(payload or _payload())
     )
 
 
 def _rehash(payload: dict[str, object]) -> None:
     """Replace a payload's V2 configuration hash in place."""
     payload["config_hash"] = unwrap_simulation_response(
-        calculate_simulation_backtest_v2_config_hash(payload),
+        calculate_simulation_backtest_config_hash(payload),
         operation="test.request_v2.calculate_hash",
     )
 
@@ -195,7 +194,7 @@ def test_fr_sim_231_revision_gap_and_retroactive_claim_fail_closed() -> None:
         _build(payload)
 
 
-def test_fr_sim_235_async_success_and_running_loop_sync_failure(
+def test_fr_sim_235_async_is_the_only_official_operation(
     tmp_path: Path,
 ) -> None:
     """FR-SIM-235: async succeeds and sync fails inside a running loop."""
@@ -271,14 +270,8 @@ def test_fr_sim_235_async_success_and_running_loop_sync_failure(
 
     dependencies = V2Dependencies(tmp_path, dataset)
 
-    async def exercise() -> None:
-        response = await run_backtest_async(request, _auth(request), dependencies)
-        unwrap_simulation_response(response, operation="test.request_v2.async")
-        sync_response = run_backtest(request, _auth(request), dependencies)
-        with pytest.raises(Exception, match="active event loop"):
-            unwrap_simulation_response(sync_response, operation="test.request_v2.sync")
-
-    asyncio.run(exercise())
+    response = asyncio.run(run_backtest_async(request, _auth(request), dependencies))
+    unwrap_simulation_response(response, operation="test.request.async")
 
 
 def test_fr_sim_196_cold_v2_identity_is_stable() -> None:

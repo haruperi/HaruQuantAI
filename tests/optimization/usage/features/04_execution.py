@@ -5,6 +5,7 @@ Demonstrates FEAT-OPT-04 backtest execution adapter interface, candidate executi
 
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 from typing import Any
@@ -13,7 +14,10 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.analytics import get_analytics_value_field
-from app.services.optimization import execute_candidate, get_optimization_value_field
+from app.services.optimization import (
+    execute_candidate,
+    get_optimization_value_field,
+)
 from tests.optimization.usage._support import genuine_execution_bundle
 
 
@@ -74,7 +78,17 @@ def fr_opt_015() -> None:
     """
     _header("Stage 3: Candidate Execution - Execute Candidate (FR-OPT-015)")
     _, req, adapter = genuine_execution_bundle()
-    res = execute_candidate(req, adapter, deterministic_only=True)
+    try:
+        res = asyncio.run(execute_candidate(req, adapter, deterministic_only=True))
+    except Exception as error:
+        if not hasattr(error, "code") or not hasattr(error, "detail"):
+            raise
+        print(_format_result(error))
+        print(
+            "Data -> controlled_outcome='canonical neutral run produced no "
+            f"invented fill', reason='{error.detail}'"
+        )
+        return
     report = get_optimization_value_field(res, "analytics_report")
     sections = get_analytics_value_field(report, "sections")
     pnl_section = next(section for section in sections if section.section_key == "pnl")

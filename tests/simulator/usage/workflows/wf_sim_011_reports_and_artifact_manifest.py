@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import sys
 import tempfile
 from pathlib import Path
@@ -14,7 +15,7 @@ from app.services.simulator import (
     build_markdown_report,
     dump_simulation_value,
     get_simulation_value_field,
-    run_backtest,
+    run_backtest_async,
     unwrap_simulation_response,
 )
 from tests.simulator.usage.workflows._support import (
@@ -51,7 +52,7 @@ def main() -> None:
         root = Path(directory)
         deps = dependencies(root, dataset)
         result = unwrap_simulation_response(
-            run_backtest(request, authority(request), deps),
+            asyncio.run(run_backtest_async(request, authority(request), deps)),
             operation="simulation.workflow.wf_sim_011.run_backtest",
         )
         # Stage 2 — Read the completed run artifacts from the isolated artifact root.

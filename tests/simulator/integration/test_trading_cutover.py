@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from types import SimpleNamespace
 
 import pytest
-from app.services.simulator.run.contracts import SimulationBacktestRequestV2
+from app.services.simulator.run.contracts import SimulationBacktestRequest
 from app.services.simulator.run.orchestrator import advance_trading_timeline
 
 NOW = datetime(2026, 8, 16, tzinfo=UTC)
@@ -37,7 +37,7 @@ async def test_v2_requests_enter_only_through_async_trading_action() -> None:
             calls.append((approved, engine, request))
             return {"status": "accepted"}
 
-    request = SimulationBacktestRequestV2.model_construct()
+    request = SimulationBacktestRequest.model_construct()
     approved = SimpleNamespace(system_time=NOW, request_id="request-1")
     tick = SimpleNamespace(timestamp=NOW)
     engine = _Engine()
@@ -78,7 +78,7 @@ async def test_trading_action_cancellation_propagates_without_duplicate_mutation
     with pytest.raises(TimeoutError, match="cancelled"):
         await advance_trading_timeline(
             Dependencies(),  # type: ignore[arg-type]
-            SimulationBacktestRequestV2.model_construct(),
+            SimulationBacktestRequest.model_construct(),
             _Engine(),
             (SimpleNamespace(timestamp=NOW),),
             [approved],

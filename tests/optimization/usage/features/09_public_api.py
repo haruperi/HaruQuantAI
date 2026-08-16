@@ -5,6 +5,7 @@ Demonstrates FEAT-OPT-09 parameter sweeps, walk-forward optimization, robustness
 
 from __future__ import annotations
 
+import asyncio
 import sys
 from decimal import Decimal
 from pathlib import Path
@@ -71,7 +72,7 @@ def fr_opt_056() -> None:
     """
     _header("Stage 3: Parameter Sweep - Run Parameter Sweep (FR-OPT-056)")
     dataset, _, adapter = genuine_execution_bundle()
-    sweep_response = run_parameter_sweep(search_request(dataset), adapter)
+    sweep_response = asyncio.run(run_parameter_sweep(search_request(dataset), adapter))
     sweep_res = sweep_response.data
     print(_format_result(sweep_response))
     print(
@@ -87,9 +88,11 @@ def fr_opt_057() -> None:
     _header("Stage 3: WFA Execution - Run Walk-Forward Optimization (FR-OPT-057)")
     dataset, _, adapter = genuine_execution_bundle()
     request = walk_forward_request(dataset)
-    wf_response = run_walk_forward_optimization(request, adapter)
+    wf_response = asyncio.run(run_walk_forward_optimization(request, adapter))
     wf_res = wf_response.data
-    matrix_response = run_walk_forward_matrix((request,), adapter, max_requests=1)
+    matrix_response = asyncio.run(
+        run_walk_forward_matrix((request,), adapter, max_requests=1)
+    )
     matrix_res = matrix_response.data
     print(_format_result(wf_response))
     print(

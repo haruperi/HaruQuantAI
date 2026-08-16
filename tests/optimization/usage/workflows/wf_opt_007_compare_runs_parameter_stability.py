@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 
@@ -57,8 +58,8 @@ def main() -> None:
 
     # Stage 2 — Execute both searches through the real Simulator and Analytics adapter.
     _stage(2)
-    first_response = run_parameter_sweep(grid_request, adapter)
-    second_response = run_parameter_sweep(random_request, adapter)
+    first_response = asyncio.run(run_parameter_sweep(grid_request, adapter))
+    second_response = asyncio.run(run_parameter_sweep(random_request, adapter))
     if first_response.data is None or second_response.data is None:
         raise RuntimeError(
             f"Optimization comparison inputs failed: "

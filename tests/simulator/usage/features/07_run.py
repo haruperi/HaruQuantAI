@@ -19,11 +19,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.simulator import (
     build_evaluation_latency,
     build_point_in_time_dataset,
+    calculate_fast_research_config_hash,
     calculate_portfolio_backtest_config_hash,
     calculate_simulation_backtest_config_hash,
-    calculate_simulation_backtest_v2_config_hash,
     create_simulation_value,
-    run_backtest,
     run_backtest_async,
     run_fast_research,
     run_portfolio_backtest,
@@ -111,11 +110,59 @@ def _build_request(
         "execution_route": "sim",
         "canonical": canonical,
     }
-    payload["config_hash"] = unwrap_simulation_response(
-        calculate_simulation_backtest_config_hash(payload),
-        operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
+    value_type = "FastResearchRequest"
+    if runtime_profile == "simulation":
+        payload.update(
+            {
+                "execution_model_ref": "execution-model-v1",
+                "execution_model_hash": "e" * 64,
+                "calculation_model_hash": "a" * 64,
+                "calculation_artifact_checksum": "b" * 64,
+                "calibration_artifact_checksum": "c" * 64,
+                "realism_stream_identity_hash": "d" * 64,
+                "source_lineage_hash": "f" * 64,
+                "tick_lineage_hash": "1" * 64,
+                "market_evidence_class": "genuine_bid_ask_ticks",
+                "decision_instant_policy": "point_in_time_available_at",
+                "provider_specification_revisions": (
+                    {
+                        "revision_id": "revision-1",
+                        "checksum": "2" * 64,
+                        "provider": "mt5",
+                        "server": "demo-server",
+                        "environment": "demo",
+                        "account_digest": "3" * 64,
+                        "symbol": "EURUSD",
+                        "observed_at": dataset.start,
+                        "effective_from": dataset.start,
+                        "effective_to": None,
+                        "historical_provenance": None,
+                    },
+                ),
+                "initial_authority_state_hash": canonical_digest(
+                    {
+                        "account": {"balance": Decimal(10_000), "currency": "USD"},
+                        "orders": (),
+                        "positions": (),
+                        "deals": (),
+                        "ownership": {"mode": "exclusive"},
+                    }
+                ),
+                "certification_target": "demo",
+                "close_open_positions_at_end": True,
+            }
+        )
+        value_type = "SimulationBacktestRequest"
+    hash_operation = (
+        calculate_simulation_backtest_config_hash
+        if runtime_profile == "simulation"
+        else calculate_fast_research_config_hash
     )
-    return create_simulation_value("SimulationBacktestRequestV1", **payload)
+    payload["config_hash"] = unwrap_simulation_response(
+        hash_operation(payload),
+        operation="simulation.run.request.calculate_config_hash",
+    )
+    return create_simulation_value(value_type, **payload)
 
 
 def _build_request_v2(dataset: object) -> object:
@@ -168,10 +215,10 @@ def _build_request_v2(dataset: object) -> object:
         }
     )
     payload["config_hash"] = unwrap_simulation_response(
-        calculate_simulation_backtest_v2_config_hash(payload),
+        calculate_simulation_backtest_config_hash(payload),
         operation="usage.request_v2.calculate_config_hash",
     )
-    return create_simulation_value("SimulationBacktestRequestV2", **payload)
+    return create_simulation_value("SimulationBacktestRequest", **payload)
 
 
 def _build_portfolio_request(
@@ -223,7 +270,7 @@ def _build_portfolio_request(
         calculate_portfolio_backtest_config_hash(payload),
         operation="simulation.run.portfolio_backtest_request_v1.calculate_config_hash",
     )
-    port_req = create_simulation_value("PortfolioBacktestRequestV1", **payload)
+    port_req = create_simulation_value("PortfolioBacktestRequest", **payload)
 
     auth = create_auth_context(
         contract_version="v1",
@@ -244,11 +291,11 @@ def _build_portfolio_request(
 
 def fr_sim_029() -> None:
     """
-    FR-SIM-029: Stage 1 — Construct SimulationBacktestRequestV1 request envelope.
+    FR-SIM-029: Stage 1 — Construct the canonical request envelope.
 
-    The system shall expose the exact `docs/PROJECT.md` §5 request for one synchronous bounded FX run, with separate contract version/schema ID, immutable Strategy/Data/Simulation/Risk references, JSON-safe parameters, symbol/timeframe/UTC range, positive initial balance, trace IDs, simulation profile/route, config hash, and no raw code/provider objects/inline data.
+    The system shall expose the canonical bounded FX request, with contract version/schema ID, immutable Strategy/Data/Simulation/Risk references, complete execution identity, JSON-safe parameters, symbol/timeframe/UTC range, positive initial balance, trace IDs, simulation profile/route, config hash, and no raw code/provider objects/inline data.
     """
-    _header("Stage 1: Request Envelope - SimulationBacktestRequestV1 (FR-SIM-029)")
+    _header("Stage 1: Request Envelope - SimulationBacktestRequest (FR-SIM-029)")
     request = _build_request(live_tick_dataset())
     print(_format_result(request))
     print(
@@ -257,12 +304,12 @@ def fr_sim_029() -> None:
 
 
 def fr_sim_032() -> None:
-    """FR-SIM-032: Stage 1 — Construct PortfolioBacktestRequestV1 request envelope.
+    """FR-SIM-032: Stage 1 — Construct PortfolioBacktestRequest request envelope.
 
-    The system shall expose `PortfolioBacktestRequestV1` with
+    The system shall expose `PortfolioBacktestRequest` with
     `contract_version="v1"`, `schema_id="simulation.portfolio_backtest_request.v1"`,
-    portfolio and construction-result identifiers and versions, ordered component
-    allocations, exact Strategy/Data/FX/execution/Risk references and versions,
+    portfolio and construction-result identifiers and versions, ordered canonical
+    component requests, exact Strategy/Data/FX/execution/Risk references and versions,
     bounded UTC range, explicit seed, positive initial balance,
     `runtime_profile="simulation"`, `execution_route="sim"`, and a SHA-256 config
     hash. Every FX evidence ID is positionally bound to an explicit `v1`
@@ -273,7 +320,7 @@ def fr_sim_032() -> None:
     Portfolio-owned contract type, and carries no caller-supplied measurement
     series.
     """
-    _header("Stage 1: Portfolio Request - PortfolioBacktestRequestV1 (FR-SIM-032)")
+    _header("Stage 1: Portfolio Request - PortfolioBacktestRequest (FR-SIM-032)")
     request, _ = _build_portfolio_request(live_tick_dataset())
     print(_format_result(request))
     print(
@@ -292,7 +339,9 @@ def fr_sim_030() -> None:
     request = _build_request(dataset)
     with tempfile.TemporaryDirectory() as tmp_dir:
         run_dependencies = dependencies(Path(tmp_dir), dataset)
-        resp = run_backtest(request, authority(request), run_dependencies)
+        resp = asyncio.run(
+            run_backtest_async(request, authority(request), run_dependencies)
+        )
         result = unwrap_simulation_response(resp, operation="usage.run_backtest")
         print(_format_result(resp))
         print(f"Data -> run_status='{resp.status}', result_schema='{result.schema_id}'")
@@ -302,14 +351,14 @@ def fr_sim_034() -> None:
     """
     FR-SIM-034: Stage 3 — Orchestrate portfolio candidate backtest run.
 
-    The system shall execute every component of an approved portfolio candidate through the ordinary deterministic simulation path, maintain one aggregate account ledger and the Risk-owned budget history, and publish `PortfolioSimulationResult v1` only when every component and the aggregate journal reconcile. Reconciliation is arithmetic and falsifiable: exact allocated opening capital equals portfolio opening capital, aggregate net profit equals the exact sum of component net profit, and aggregate component count equals the request. Component returns are sampled from each engine's actual end-of-tick mark-to-market equity observations on one shared 30-point UTC cadence; open-position price movement is included and closed-trade reconstruction is forbidden. Every resolved FX evidence object must match its request-bound version and canonical hash before freshness validation. The run persists bounded portfolio start/completion/failure audit evidence.
+    The system shall asynchronously execute every component of an approved portfolio candidate through the ordinary deterministic simulation path, maintain one aggregate account ledger and the Risk-owned budget history, and publish `PortfolioSimulationResult v1` only when every component and the aggregate journal reconcile. Reconciliation is arithmetic and falsifiable: exact allocated opening capital equals portfolio opening capital, aggregate net profit equals the exact sum of component net profit, and aggregate component count equals the request. Component returns are sampled from each engine's actual end-of-tick mark-to-market equity observations on one shared 30-point UTC cadence; open-position price movement is included and closed-trade reconstruction is forbidden. Every resolved FX evidence object must match its request-bound version and canonical hash before freshness validation. The run persists bounded portfolio start/completion/failure audit evidence.
     """
     _header("Stage 3: Portfolio Run - Orchestrate Portfolio Backtest (FR-SIM-034)")
     dataset = live_tick_dataset()
     request, auth = _build_portfolio_request(dataset)
     with tempfile.TemporaryDirectory() as tmp_dir:
         run_dependencies = dependencies(Path(tmp_dir), dataset)
-        resp = run_portfolio_backtest(request, auth, run_dependencies)
+        resp = asyncio.run(run_portfolio_backtest(request, auth, run_dependencies))
         unwrap_simulation_response(resp, operation="usage.run_portfolio_backtest")
         print(_format_result(resp))
         print(f"Data -> portfolio_run_status='{resp.status}'")

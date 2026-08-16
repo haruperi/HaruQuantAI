@@ -25,13 +25,15 @@ def test_simulation_source_converts_and_delegates(
     )
     monkeypatch.setattr(
         simulation_dependencies,
-        "run_backtest",
-        lambda request, auth, dependencies: (request, auth, dependencies, expected),
+        "run_backtest_async",
+        lambda request, auth, dependencies: _return_async(
+            (request, auth, dependencies, expected)
+        ),
     )
     source = simulation_dependencies.build_simulation_run_source("dependencies")
     boundary = SimpleNamespace(model_dump=lambda **_: {"request_id": "request-1"})
-    result = source("run", boundary, "auth")
-    assert calls == [("SimulationBacktestRequestV1", {"request_id": "request-1"})]
+    result = asyncio.run(source("run", boundary, "auth"))
+    assert calls == [("SimulationBacktestRequest", {"request_id": "request-1"})]
     assert result == (converted, "auth", "dependencies", expected)
 
 
@@ -40,7 +42,12 @@ def test_simulation_source_fails_closed_without_dependencies() -> None:
     source = simulation_dependencies.build_simulation_run_source(None)
     boundary = SimpleNamespace(model_dump=lambda **_: {})
     with pytest.raises(RuntimeError, match="SIMULATION_RUNTIME_UNAVAILABLE"):
-        source("run", boundary, object())
+        asyncio.run(source("run", boundary, object()))
+
+
+async def _return_async(value: object) -> object:
+    """Return one value through a genuine coroutine."""
+    return value
 
 
 def test_trading_source_converts_and_delegates(

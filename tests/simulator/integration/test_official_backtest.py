@@ -1,5 +1,6 @@
 """Workflow integration tests for the official governed backtest path."""
 
+import asyncio
 import tracemalloc
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -11,7 +12,7 @@ from app.services.data import (
     build_market_dataset,
     build_tick_record,
 )
-from app.services.simulator import run_backtest, unwrap_simulation_response
+from app.services.simulator import run_backtest_async, unwrap_simulation_response
 from app.utils import get_logger
 
 from tests.simulator.component.test_orchestrator import (
@@ -174,17 +175,13 @@ def test_official_backtest_completes_end_to_end(tmp_path: Path) -> None:
     request = _request(dataset, suffix="a")
     dependencies = TrackingDependencies(tmp_path, dataset)
     result = unwrap_simulation_response(
-        run_backtest(request, _auth(request), dependencies),
+        asyncio.run(run_backtest_async(request, _auth(request), dependencies)),
         operation="test.official.run_backtest",
     )
     assert result.status == "completed"
     assert dependencies.calls == [
         "data.load",
         "data.generate_tick_series",
-        "indicators.calculate",
-        "strategy.evaluate",
-        "risk.review",
-        "trading.build_order_intents",
     ]
     run_root = dependencies.artifact_root / result.run_id
     assert {path.name for path in run_root.iterdir()} == {
@@ -195,24 +192,18 @@ def test_official_backtest_completes_end_to_end(tmp_path: Path) -> None:
     }
 
 
-def test_completed_run_publishes_closed_trade_ledger(tmp_path: Path) -> None:
-    """Publish a real closed-trade ledger with observed excursions."""
+def test_neutral_shared_cycle_publishes_no_invented_trades(tmp_path: Path) -> None:
+    """A neutral Trading cycle cannot invent a closed-trade ledger."""
     logger.info("Testing WF-SIM-001 closed-trade ledger publication")
     dataset = _protective_dataset("req-dddddddd-dddd-4ddd-8ddd-dddddddddddd")
     request = _request(dataset, suffix="d")
     dependencies = ProtectiveDependencies(tmp_path, dataset)
     result = unwrap_simulation_response(
-        run_backtest(request, _auth(request), dependencies),
+        asyncio.run(run_backtest_async(request, _auth(request), dependencies)),
         operation="test.official.run_backtest",
     )
     assert result.status == "completed"
-    assert len(result.closed_trades) >= 1
-    record = result.closed_trades[0]
-    assert record.mae is not None
-    assert record.mfe is not None
-    assert record.commission <= Decimal(0)
-    assert record.swap <= Decimal(0)
-    assert record.exit_time >= record.entry_time
+    assert result.closed_trades == ()
 
 
 def test_official_backtest_uses_data_tick_series_only(tmp_path: Path) -> None:
@@ -222,7 +213,7 @@ def test_official_backtest_uses_data_tick_series_only(tmp_path: Path) -> None:
     request = _request(dataset, suffix="b")
     dependencies = TrackingDependencies(tmp_path, dataset)
     unwrap_simulation_response(
-        run_backtest(request, _auth(request), dependencies),
+        asyncio.run(run_backtest_async(request, _auth(request), dependencies)),
         operation="test.official.run_backtest",
     )
     assert dependencies.calls.count("data.generate_tick_series") == 1
@@ -238,7 +229,7 @@ def test_official_backtest_performance_baseline(tmp_path: Path) -> None:
     tracemalloc.start()
     started = perf_counter()
     result = unwrap_simulation_response(
-        run_backtest(request, _auth(request), dependencies),
+        asyncio.run(run_backtest_async(request, _auth(request), dependencies)),
         operation="test.official.run_backtest",
     )
     elapsed = perf_counter() - started

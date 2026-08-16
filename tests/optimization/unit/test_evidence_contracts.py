@@ -1,5 +1,7 @@
 """Tests for versioned Optimization evidence contracts."""
 
+import asyncio
+
 import pytest
 from app.services.optimization.evidence import (
     EvidenceAssemblyRequest,
@@ -17,7 +19,7 @@ from tests.optimization.unit.test_sweep import FakeAdapter
 def evidence_request(**overrides: object) -> EvidenceAssemblyRequest:
     """Build valid baseline supplied search evidence."""
     payload: dict[str, object] = {
-        "search": run_bounded_search(search_request(), FakeAdapter()),
+        "search": asyncio.run(run_bounded_search(search_request(), FakeAdapter())),
         "chart_data": {"objective": [1.0]},
         "audit_references": ("audit-1",),
     }

@@ -8,19 +8,14 @@ from tests.simulator.component.test_orchestrator import (
     FakeDependencies,
     _auth,
     _dataset,
-    _request,
+    _research_request,
 )
 
 
 def test_fast_research_cannot_claim_canonical(tmp_path: Path) -> None:
     """Return the distinct non-canonical result without official evidence."""
     dataset = _dataset("req-88888888-8888-4888-8888-888888888888")
-    request = _request(
-        dataset,
-        runtime_profile="fast_research",
-        canonical=False,
-        suffix="8",
-    )
+    request = _research_request(dataset, suffix="8")
     result = run_fast_research(
         request,
         _auth(request),
