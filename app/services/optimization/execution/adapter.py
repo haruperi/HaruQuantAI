@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Awaitable, Callable, Iterable, Mapping
 from decimal import Decimal
 from typing import Any, cast
 
@@ -23,7 +23,7 @@ from app.services.simulator import (
     dump_simulation_value,
     get_simulation_value_field,
     is_simulation_value,
-    run_backtest,
+    run_backtest_async,
 )
 from app.utils import get_logger, get_standard_response_type
 
@@ -37,7 +37,7 @@ logger = get_logger(__name__)
 
 type SimulationRunner = Callable[
     [object, AuthContext, SimulationRunDependencies],
-    object,
+    Awaitable[object],
 ]
 
 
@@ -153,7 +153,7 @@ class SimulationAnalyticsBacktestAdapter:
         analytics_config: AnalyticsRunConfig,
         engine_type: str,
         engine_version: str,
-        simulation_runner: SimulationRunner = run_backtest,
+        simulation_runner: SimulationRunner = run_backtest_async,
     ) -> None:
         """Initialize the injected public-contract adapter.
 
@@ -173,7 +173,9 @@ class SimulationAnalyticsBacktestAdapter:
         self.engine_type = engine_type
         self.engine_version = engine_version
 
-    def execute(self, request: BacktestExecutionRequest) -> EngineOptimizationResult:
+    async def execute(
+        self, request: BacktestExecutionRequest
+    ) -> EngineOptimizationResult:
         """Package, execute, and measure one deterministic candidate.
 
         Args:
@@ -219,19 +221,38 @@ class SimulationAnalyticsBacktestAdapter:
             "runtime_profile": context.runtime_profile,
             "execution_route": "sim",
             "canonical": context.canonical,
+            "execution_model_ref": context.execution_model_ref,
+            "execution_model_hash": context.execution_model_hash,
+            "calculation_model_hash": context.calculation_model_hash,
+            "calculation_artifact_checksum": context.calculation_artifact_checksum,
+            "calibration_artifact_checksum": context.calibration_artifact_checksum,
+            "realism_stream_identity_hash": context.realism_stream_identity_hash,
+            "source_lineage_hash": context.source_lineage_hash,
+            "tick_lineage_hash": context.tick_lineage_hash,
+            "market_evidence_class": context.market_evidence_class,
+            "market_evidence_eligible": context.market_evidence_eligible,
+            "decision_instant_policy": "point_in_time_available_at",
+            "required_clock_edges": context.required_clock_edges,
+            "evidenced_clock_edges": context.evidenced_clock_edges,
+            "provider_specification_revisions": (
+                context.provider_specification_revisions
+            ),
+            "initial_authority_state_hash": context.initial_authority_state_hash,
+            "certification_target": context.certification_target,
+            "close_open_positions_at_end": context.close_open_positions_at_end,
         }
         payload["config_hash"] = str(
             _unwrap_upstream_response(
                 calculate_simulation_backtest_config_hash(payload),
                 predicate=lambda value: isinstance(value, str),
-                operation="simulation.run.simulation_backtest_request_v1.calculate_config_hash",
+                operation="simulation.run.simulation_backtest_request.calculate_config_hash",
                 candidate_hash=request.candidate_hash,
             )
         )
         started = time.monotonic()
         try:
             simulation_request = create_simulation_value(
-                "SimulationBacktestRequestV1", **payload
+                "SimulationBacktestRequest", **payload
             )
             candidate_auth = self._auth_context.model_copy(
                 update={
@@ -241,7 +262,7 @@ class SimulationAnalyticsBacktestAdapter:
                 }
             )
             simulation_result: object = _unwrap_upstream_response(
-                self._simulation_runner(
+                await self._simulation_runner(
                     simulation_request,
                     candidate_auth,
                     self._simulation_dependencies,
@@ -296,7 +317,7 @@ class SimulationAnalyticsBacktestAdapter:
         )
 
 
-def execute_candidate(
+async def execute_candidate(
     request: BacktestExecutionRequest,
     adapter: BacktestExecutionAdapter,
     *,
@@ -327,7 +348,7 @@ def execute_candidate(
             "OPT_ADAPTER_INCOMPATIBLE",
             "EXECUTION_CONTRACT_MISMATCH",
         )
-    result = adapter.execute(request)
+    result = await adapter.execute(request)
     if (
         result.candidate_hash != request.candidate_hash
         or result.engine_type != context.engine_type

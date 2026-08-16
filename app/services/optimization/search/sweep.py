@@ -110,7 +110,7 @@ def _deterministic_execution_id(prefix: str, parent_id: str, index: int) -> str:
     return f"{prefix}-{part1}-{part2}-{part3}-{part4}-{part5}"
 
 
-def run_bounded_search(
+async def run_bounded_search(
     request: SearchRequest,
     adapter: BacktestExecutionAdapter,
     *,
@@ -187,7 +187,7 @@ def run_bounded_search(
             context=context,
         )
         try:
-            measured = execute_candidate(
+            measured = await execute_candidate(
                 execution_request,
                 adapter,
                 deterministic_only=deterministic_only,

@@ -40,7 +40,7 @@ def _utility(value: float, direction: ObjectiveDirection) -> float:
     return value if direction is ObjectiveDirection.MAXIMIZE else -value
 
 
-def run_walk_forward_validation(
+async def run_walk_forward_validation(
     request: WalkForwardRequest,
     adapter: BacktestExecutionAdapter,
     *,
@@ -73,7 +73,7 @@ def run_walk_forward_validation(
                 "request_id": generate_id("req"),
             }
         )
-        summary = run_bounded_search(
+        summary = await run_bounded_search(
             train_search,
             adapter,
             deterministic_only=deterministic_only,
@@ -104,7 +104,7 @@ def run_walk_forward_validation(
             correlation_id=request.search.correlation_id,
             context=test_context,
         )
-        measured = execute_candidate(
+        measured = await execute_candidate(
             test_request,
             adapter,
             deterministic_only=deterministic_only,

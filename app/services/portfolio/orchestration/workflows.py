@@ -56,7 +56,7 @@ KillSwitchState = Any
 StandardTradingEnvelope = Any
 StrategyOperationalEligibilityDecision = Any
 PortfolioRebalanceExecutionRequest = Any
-PortfolioBacktestRequestV1 = Any
+PortfolioBacktestRequest = Any
 PortfolioSimulationResult = Any
 PortfolioAllocationEvidence = Any
 PortfolioRebalanceMeasurementEvidence = Any
@@ -124,7 +124,7 @@ type ConstructionEvidenceSource = Callable[
     [PortfolioConstructionRequest], ConstructionEvidenceInputs
 ]
 type SimulationRunner = Callable[
-    [PortfolioBacktestRequestV1], PortfolioSimulationResult
+    [PortfolioBacktestRequest], Awaitable[PortfolioSimulationResult]
 ]
 type RiskReviewer = Callable[[AllocationReviewRequest], AllocationRiskDecision]
 type KillSwitchSource = Callable[[Mapping[str, str]], Sequence[KillSwitchState]]
@@ -384,10 +384,10 @@ class PortfolioWorkflowService:
         )
         return persisted, evidence
 
-    def coordinate_review(
+    async def coordinate_review(
         self,
         candidate: PortfolioConstructionResult,
-        simulation_request: PortfolioBacktestRequestV1,
+        simulation_request: PortfolioBacktestRequest,
         evidence: ValidatedConstructionEvidence,
         *,
         approval_refs: tuple[str, ...] = (),
@@ -409,7 +409,7 @@ class PortfolioWorkflowService:
         logger.info("Coordinating Portfolio Simulation and Risk review")
         self._validate_simulation_request(candidate, simulation_request)
         try:
-            simulation = self._deps.simulation_runner(simulation_request)
+            simulation = await self._deps.simulation_runner(simulation_request)
         except Exception as error:
             raise PortfolioError("PORT_DEPENDENCY_FAILED", "SIMULATION") from error
         risk_request = self._construction_review_request(
@@ -460,7 +460,7 @@ class PortfolioWorkflowService:
     def _validate_simulation_request(
         self,
         candidate: PortfolioConstructionResult,
-        request: PortfolioBacktestRequestV1,
+        request: PortfolioBacktestRequest,
     ) -> None:
         """Validate a caller-supplied Simulation-owned request binding.
 

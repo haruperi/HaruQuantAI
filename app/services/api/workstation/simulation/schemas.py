@@ -27,7 +27,7 @@ class SimulationSessionCreateRequest(_BaseApiContract):
 
 
 class SimulationRunRequest(_BaseApiContract):
-    """Exact API projection of ``SimulationBacktestRequestV1``."""
+    """Exact API projection of ``SimulationBacktestRequest``."""
 
     contract_version: Literal["v1"] = "v1"
     schema_id: Literal["simulation.backtest_request.v1"] = (
@@ -79,7 +79,7 @@ class PortfolioComponentRunRequest(_BaseApiContract):
 
 
 class PortfolioSimulationRunRequest(_BaseApiContract):
-    """Exact API projection of ``PortfolioBacktestRequestV1``."""
+    """Exact API projection of ``PortfolioBacktestRequest``."""
 
     contract_version: Literal["v1"] = "v1"
     schema_id: Literal["simulation.portfolio_backtest_request.v1"] = (

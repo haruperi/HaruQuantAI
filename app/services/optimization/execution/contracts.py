@@ -6,7 +6,7 @@ import math
 from collections.abc import Mapping
 from datetime import datetime
 from decimal import Decimal
-from typing import Literal, Protocol
+from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -54,6 +54,24 @@ class BacktestExecutionContext(BaseModel):
     engine_type: str
     engine_version: str
     module_version: str
+    execution_model_ref: str
+    execution_model_hash: str
+    calculation_model_hash: str
+    calculation_artifact_checksum: str
+    calibration_artifact_checksum: str
+    realism_stream_identity_hash: str
+    source_lineage_hash: str
+    tick_lineage_hash: str
+    market_evidence_class: Literal[
+        "genuine_bid_ask_ticks", "depth_supported_ticks", "derived_bar_model"
+    ]
+    market_evidence_eligible: bool
+    required_clock_edges: tuple[str, ...]
+    evidenced_clock_edges: tuple[str, ...]
+    provider_specification_revisions: tuple[Mapping[str, Any], ...]
+    initial_authority_state_hash: str
+    certification_target: Literal["demo", "live"]
+    close_open_positions_at_end: bool
 
     @model_validator(mode="after")
     def _validate_context(self) -> BacktestExecutionContext:
@@ -84,6 +102,7 @@ class BacktestExecutionContext(BaseModel):
             self.engine_type,
             self.engine_version,
             self.module_version,
+            self.execution_model_ref,
         )
         if any(not value or value != value.strip() for value in text_fields):
             raise ValueError("execution context text fields must be non-empty")
@@ -96,6 +115,14 @@ class BacktestExecutionContext(BaseModel):
             self.cost_model_hash,
             self.realism_hash,
             self.objective_hash,
+            self.execution_model_hash,
+            self.calculation_model_hash,
+            self.calculation_artifact_checksum,
+            self.calibration_artifact_checksum,
+            self.realism_stream_identity_hash,
+            self.source_lineage_hash,
+            self.tick_lineage_hash,
+            self.initial_authority_state_hash,
         )
         if any(
             len(value) != _SHA256_HEX_LENGTH
@@ -202,7 +229,7 @@ class EngineOptimizationResult(BaseModel):
 
 
 class BacktestExecutionAdapter(Protocol):
-    """Receiver-owned synchronous candidate execution port."""
+    """Receiver-owned asynchronous candidate execution port."""
 
     contract_version: str
     schema_id: str
@@ -210,7 +237,7 @@ class BacktestExecutionAdapter(Protocol):
     engine_version: str
     deterministic: bool
 
-    def execute(
+    async def execute(
         self,
         request: BacktestExecutionRequest,  # noqa: ARG002
     ) -> EngineOptimizationResult:

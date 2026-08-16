@@ -20,6 +20,7 @@ from app.services.api.identity import (
     require_auth_context,
     require_human_permission,
     run_idempotent_write,
+    run_idempotent_write_async,
 )
 from app.services.api.workstation.optimization.schemas import (
     OptimizationCompareRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
@@ -36,7 +37,7 @@ from app.services.api.workstation.optimization.schemas import (
 from app.utils import generate_id
 
 type AuthContext = Any
-type _OptimizationSource = Callable[..., object]
+type _OptimizationSource = Callable[..., Any]
 
 router = APIRouter(prefix="/api/v1/optimization", tags=["optimization"])
 _MAX_IDEMPOTENCY_KEY_LENGTH = 200
@@ -95,7 +96,7 @@ def _translate(error: RuntimeError) -> NoReturn:
 
 
 @router.post("/parameter-sweep", response_model=None)
-def _run_parameter_sweep(
+async def _run_parameter_sweep(
     request: OptimizationParameterSweepRequest,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_OptimizationSource, Depends(_optimization_source)],
@@ -114,7 +115,7 @@ def _run_parameter_sweep(
     require_human_permission(auth, "optimization:run")
     key = _require_idempotency(idempotency_key)
     try:
-        return run_idempotent_write(
+        return await run_idempotent_write_async(
             principal_id=auth.principal_id,
             method="POST",
             route="/api/v1/optimization/parameter-sweep",
@@ -128,7 +129,7 @@ def _run_parameter_sweep(
 
 
 @router.post("/walk-forward", response_model=None)
-def _run_walk_forward(
+async def _run_walk_forward(
     request: OptimizationWalkForwardRequest,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_OptimizationSource, Depends(_optimization_source)],
@@ -147,7 +148,7 @@ def _run_walk_forward(
     require_human_permission(auth, "optimization:run")
     key = _require_idempotency(idempotency_key)
     try:
-        return run_idempotent_write(
+        return await run_idempotent_write_async(
             principal_id=auth.principal_id,
             method="POST",
             route="/api/v1/optimization/walk-forward",
@@ -161,7 +162,7 @@ def _run_walk_forward(
 
 
 @router.post("/walk-forward-matrix", response_model=None)
-def _run_walk_forward_matrix(
+async def _run_walk_forward_matrix(
     request: OptimizationWalkForwardMatrixRequest,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_OptimizationSource, Depends(_optimization_source)],
@@ -180,7 +181,7 @@ def _run_walk_forward_matrix(
     require_human_permission(auth, "optimization:run")
     key = _require_idempotency(idempotency_key)
     try:
-        return run_idempotent_write(
+        return await run_idempotent_write_async(
             principal_id=auth.principal_id,
             method="POST",
             route="/api/v1/optimization/walk-forward-matrix",

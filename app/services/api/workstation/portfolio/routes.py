@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable
-from typing import Annotated, Any
+from typing import Annotated, Any, cast
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 
@@ -31,6 +31,7 @@ from app.services.api.identity import (
     require_auth_context,
     require_human_permission,
     run_idempotent_write,
+    run_idempotent_write_async,
 )
 from app.services.api.workstation.portfolio.schemas import (
     PortfolioActivationRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
@@ -238,8 +239,34 @@ def _delegate(source: _PortfolioSource, operation: str, *args: object) -> object
         ) from error
 
 
+async def _delegate_async(
+    source: _PortfolioSource, operation: str, *args: object
+) -> object:
+    """Await one Portfolio operation and translate unavailable sentinels.
+
+    Returns:
+        The Portfolio-owned operation result.
+
+    Raises:
+        HTTPException: If Portfolio reports a known unavailable condition.
+        RuntimeError: If Portfolio reports an unexpected runtime failure.
+    """
+    try:
+        return await cast("Any", source(operation, *args))
+    except RuntimeError as error:
+        if str(error) not in {
+            "PORTFOLIO_RUNTIME_UNAVAILABLE",
+            "PORTFOLIO_ALLOCATION_UNAVAILABLE",
+        }:
+            raise
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(error),
+        ) from error
+
+
 @router.post("/{portfolio_id}/activate", response_model=None)
-def _activate(
+async def _activate(
     portfolio_id: str,
     request: PortfolioActivationRequest,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
@@ -258,19 +285,19 @@ def _activate(
     require_human_permission(auth, "portfolio:activate")
     key = _require_idempotency(idempotency_key)
     _require_matching_portfolio(portfolio_id, request.construction.portfolio_id)
-    return run_idempotent_write(
+    return await run_idempotent_write_async(
         principal_id=auth.principal_id,
         method="POST",
         route="/api/v1/portfolio/{portfolio_id}/activate",
         key=key,
         request_material=request.model_dump(mode="json"),
         request_id=generate_id("req"),
-        operation=lambda: _delegate(source, "activate", request, auth, key),
+        operation=lambda: _delegate_async(source, "activate", request, auth, key),
     )
 
 
 @router.post("/{portfolio_id}/rollback", response_model=None)
-def _rollback(
+async def _rollback(
     portfolio_id: str,
     request: PortfolioRollbackRequest,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
@@ -289,14 +316,14 @@ def _rollback(
     require_human_permission(auth, "portfolio:activate")
     key = _require_idempotency(idempotency_key)
     _require_matching_portfolio(portfolio_id, request.construction.portfolio_id)
-    return run_idempotent_write(
+    return await run_idempotent_write_async(
         principal_id=auth.principal_id,
         method="POST",
         route="/api/v1/portfolio/{portfolio_id}/rollback",
         key=key,
         request_material=request.model_dump(mode="json"),
         request_id=generate_id("req"),
-        operation=lambda: _delegate(source, "rollback", request, auth, key),
+        operation=lambda: _delegate_async(source, "rollback", request, auth, key),
     )
 
 

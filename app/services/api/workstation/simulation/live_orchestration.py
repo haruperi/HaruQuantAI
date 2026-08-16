@@ -116,7 +116,7 @@ def _run_request(boundary_request: object) -> object:
     """
     payload = cast("Any", boundary_request).model_dump(mode="python", warnings=False)
     return create_simulation_value(
-        "SimulationBacktestRequestV1", **cast("dict[str, object]", payload)
+        "SimulationBacktestRequest", **cast("dict[str, object]", payload)
     )
 
 

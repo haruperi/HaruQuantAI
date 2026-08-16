@@ -300,7 +300,7 @@ def _construction_request(boundary_request: object) -> object:
     )
 
 
-def _activation(
+async def _activation(
     service: object,
     workflows: object | None,
     operation: str,
@@ -339,15 +339,18 @@ def _activation(
         execute_portfolio_handle_operation(workflows, "construct", request),
     )
     simulation_request = create_simulation_value(
-        "PortfolioBacktestRequestV1", **_dump(boundary.simulation)
+        "PortfolioBacktestRequest", **_dump(boundary.simulation)
     )
-    review = execute_portfolio_handle_operation(
-        workflows,
-        "coordinate_review",
-        candidate,
-        simulation_request,
-        evidence,
-        approval_refs=tuple(boundary.approval_refs),
+    review = await cast(
+        "Any",
+        execute_portfolio_handle_operation(
+            workflows,
+            "coordinate_review",
+            candidate,
+            simulation_request,
+            evidence,
+            approval_refs=tuple(boundary.approval_refs),
+        ),
     )
     attestation = _risk_value("approval_attestation", boundary.approval_attestation)
     validation = _risk_value("approval_validation", boundary.approval_validation)

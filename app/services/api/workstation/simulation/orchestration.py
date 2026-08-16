@@ -1,8 +1,8 @@
-"""Composition of synchronous Simulator execution behind the API boundary."""
+"""Composition of asynchronous Simulator execution behind the API boundary."""
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator, Callable, Mapping
+from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
 from pathlib import Path
 from typing import Any, Literal, cast
 
@@ -11,7 +11,7 @@ from app.services.simulator import (
     build_simulation_state_store,
     create_simulation_session,
     create_simulation_value,
-    run_backtest,
+    run_backtest_async,
     run_portfolio_backtest,
     stream_simulation_session_frames,
     to_simulation_error_payload,
@@ -20,7 +20,7 @@ from app.services.simulator import (
 
 type AuthContext = Any
 type _RunOperation = Callable[
-    [Literal["run", "portfolio-run"], object, AuthContext], object
+    [Literal["run", "portfolio-run"], object, AuthContext], Awaitable[object]
 ]
 type _SessionOperation = Callable[..., object]
 
@@ -60,7 +60,7 @@ def build_simulation_run_source(dependencies: object | None) -> _RunOperation:
         Route operation that validates API DTOs through Simulator-owned contracts.
     """
 
-    def _run(
+    async def _run(
         operation: Literal["run", "portfolio-run"],
         boundary_request: object,
         auth: AuthContext,
@@ -79,10 +79,10 @@ def build_simulation_run_source(dependencies: object | None) -> _RunOperation:
             mode="python", warnings=False
         )
         if operation == "run":
-            request = create_simulation_value("SimulationBacktestRequestV1", **payload)
-            return run_backtest(request, auth, dependencies)
-        request = create_simulation_value("PortfolioBacktestRequestV1", **payload)
-        return run_portfolio_backtest(request, auth, dependencies)
+            request = create_simulation_value("SimulationBacktestRequest", **payload)
+            return await run_backtest_async(request, auth, dependencies)
+        request = create_simulation_value("PortfolioBacktestRequest", **payload)
+        return await run_portfolio_backtest(request, auth, dependencies)
 
     return _run
 

@@ -326,7 +326,102 @@ def _optimization_boundary(
     return decorate
 
 
-def _run_parameter_sweep(
+def _optimization_async_boundary(
+    *, risk_level: RiskLevel, requires_network: bool
+) -> Callable[[Callable[_P, Any]], Callable[_P, Any]]:
+    """Create the response boundary for an asynchronous operation.
+
+    Returns:
+        A decorator that publishes one standard async response boundary.
+    """
+
+    def decorate(function: Callable[_P, Any]) -> Callable[_P, Any]:
+        """Wrap one raw async Optimization operation.
+
+        Returns:
+            The decorated asynchronous operation.
+        """
+
+        @functools.wraps(function)
+        async def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> StandardResponse[Any]:
+            """Await one operation and return its standard response.
+
+            Returns:
+                The standard Optimization response.
+            """
+            started = time.perf_counter_ns()
+
+            def response_metadata() -> ResponseMetadata:
+                return _metadata(
+                    function,
+                    args,
+                    kwargs,
+                    started,
+                    risk_level=risk_level,
+                    requires_network=requires_network,
+                )
+
+            try:
+                raw_result = await function(*args, **kwargs)
+            except OptimizationError as error:
+                details: dict[str, JsonValue] = {"detail": error.detail}
+                details.update(
+                    {
+                        key: cast("JsonValue", value)
+                        for key, value in error.safe_details.items()
+                    }
+                )
+                definition = OPTIMIZATION_ERROR_CATALOG[error.code]
+                return error_response(
+                    code=error.code,
+                    details=details,
+                    message=definition.description,
+                    metadata=response_metadata(),
+                    catalog=cast("Any", OPTIMIZATION_ERROR_CATALOG),
+                )
+            except ValueError as error:
+                return error_response(
+                    code="OPT_INVALID_REQUEST",
+                    details={
+                        "detail": "INVALID_REQUEST",
+                        "failure_type": type(error).__name__,
+                    },
+                    message=OPTIMIZATION_ERROR_CATALOG[
+                        "OPT_INVALID_REQUEST"
+                    ].description,
+                    metadata=response_metadata(),
+                    catalog=cast("Any", OPTIMIZATION_ERROR_CATALOG),
+                )
+            except Exception as error:
+                logger.exception(
+                    "Unexpected %s escaped Optimization operation %s",
+                    type(error).__name__,
+                    function.__name__,
+                )
+                return error_response(
+                    code="OPT_INTERNAL_ERROR",
+                    details={
+                        "operation": function.__name__,
+                        "failure_type": type(error).__name__,
+                    },
+                    message=OPTIMIZATION_ERROR_CATALOG[
+                        "OPT_INTERNAL_ERROR"
+                    ].description,
+                    metadata=response_metadata(),
+                    catalog=cast("Any", OPTIMIZATION_ERROR_CATALOG),
+                )
+            return success_response(
+                raw_result,
+                message=f"{function.__name__} completed successfully",
+                metadata=response_metadata(),
+            )
+
+        return wrapper
+
+    return decorate
+
+
+async def _run_parameter_sweep(
     request: SearchRequest,
     adapter: BacktestExecutionAdapter,
     *,
@@ -338,11 +433,11 @@ def _run_parameter_sweep(
         Raw assembled Optimization evidence.
     """
     logger.info("Running Optimization public parameter sweep")
-    summary = run_bounded_search(_with_request_id(request, request_id), adapter)
+    summary = await run_bounded_search(_with_request_id(request, request_id), adapter)
     return build_optimization_evidence(EvidenceAssemblyRequest(search=summary))
 
 
-def _run_walk_forward_optimization(
+async def _run_walk_forward_optimization(
     request: WalkForwardRequest,
     adapter: BacktestExecutionAdapter,
     *,
@@ -356,14 +451,14 @@ def _run_walk_forward_optimization(
     logger.info("Running Optimization public walk-forward optimization")
     search = _with_request_id(request.search, request_id)
     normalized = request.model_copy(update={"search": search})
-    summary = run_bounded_search(search, adapter)
-    walk_forward = run_walk_forward_validation(normalized, adapter)
+    summary = await run_bounded_search(search, adapter)
+    walk_forward = await run_walk_forward_validation(normalized, adapter)
     return build_optimization_evidence(
         EvidenceAssemblyRequest(search=summary, walk_forward=walk_forward)
     )
 
 
-def _run_walk_forward_matrix(
+async def _run_walk_forward_matrix(
     requests: Sequence[WalkForwardRequest],
     adapter: BacktestExecutionAdapter,
     *,
@@ -378,7 +473,10 @@ def _run_walk_forward_matrix(
     logger.info("Running bounded Optimization walk-forward matrix")
     values = validate_walk_forward_matrix(requests, max_requests=max_requests)
     validate_request_id(request_id)
-    return tuple(_run_walk_forward_optimization(item, adapter) for item in values)
+    results = []
+    for item in values:
+        results.append(await _run_walk_forward_optimization(item, adapter))
+    return tuple(results)
 
 
 def _run_robustness_analysis(
@@ -581,8 +679,8 @@ def _with_request_id(request: SearchRequest, request_id: str | None) -> SearchRe
     )
 
 
-@_optimization_boundary(risk_level="medium", requires_network=True)
-def run_parameter_sweep(
+@_optimization_async_boundary(risk_level="medium", requires_network=True)
+async def run_parameter_sweep(
     request: SearchRequest,
     adapter: BacktestExecutionAdapter,
     *,
@@ -593,11 +691,11 @@ def run_parameter_sweep(
     Returns:
         Standard response containing raw Optimization evidence.
     """
-    return _run_parameter_sweep(request, adapter, request_id=request_id)
+    return await _run_parameter_sweep(request, adapter, request_id=request_id)
 
 
-@_optimization_boundary(risk_level="medium", requires_network=True)
-def run_walk_forward_optimization(
+@_optimization_async_boundary(risk_level="medium", requires_network=True)
+async def run_walk_forward_optimization(
     request: WalkForwardRequest,
     adapter: BacktestExecutionAdapter,
     *,
@@ -608,11 +706,11 @@ def run_walk_forward_optimization(
     Returns:
         Standard response containing raw Optimization evidence.
     """
-    return _run_walk_forward_optimization(request, adapter, request_id=request_id)
+    return await _run_walk_forward_optimization(request, adapter, request_id=request_id)
 
 
-@_optimization_boundary(risk_level="medium", requires_network=True)
-def run_walk_forward_matrix(
+@_optimization_async_boundary(risk_level="medium", requires_network=True)
+async def run_walk_forward_matrix(
     requests: Sequence[WalkForwardRequest],
     adapter: BacktestExecutionAdapter,
     *,
@@ -624,7 +722,7 @@ def run_walk_forward_matrix(
     Returns:
         Standard response containing ordered raw Optimization evidence.
     """
-    return _run_walk_forward_matrix(
+    return await _run_walk_forward_matrix(
         requests,
         adapter,
         max_requests=max_requests,
