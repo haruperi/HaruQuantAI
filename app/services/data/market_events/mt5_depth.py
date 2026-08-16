@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncIterator, Mapping
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -19,6 +20,7 @@ from app.services.data.contracts import DataError
 _MAX_SYMBOLS = 200
 _MAX_SYMBOL_LENGTH = 128
 _STALE_AFTER_SECONDS = 5.0
+_FIRST_EVENT_TIMEOUT_SECONDS = 5.0
 
 
 class _DepthRequest(BaseModel):
@@ -138,6 +140,23 @@ def _normalized_levels(
     )
 
 
+async def _next_book(
+    source: AsyncIterator[Mapping[str, object]],
+) -> Mapping[str, object] | None:
+    """Read the next upstream book frame, treating exhaustion as ``None``.
+
+    Args:
+        source: Active gateway book iterator.
+
+    Returns:
+        The next raw book frame, or ``None`` once the source is exhausted.
+    """
+    try:
+        return await anext(source)
+    except StopAsyncIteration:
+        return None
+
+
 async def stream_market_depth(request: object) -> AsyncIterator[object]:
     """Yield atomic one-second Depth-of-Market reads filtered to requested symbols.
 
@@ -146,6 +165,11 @@ async def stream_market_depth(request: object) -> AsyncIterator[object]:
     levels; a subscribed symbol with zero current resting levels is a genuine
     empty book, not an error.
 
+    The wait for the first delivered event is bounded. Upstream silence, or
+    book frames that never mention a requested symbol, fail the stream
+    explicitly rather than holding the consumer open indefinitely. Once an
+    event has been delivered the stream follows the upstream cadence again.
+
     Args:
         request: Value returned by ``build_market_depth_stream_request``.
 
@@ -153,7 +177,8 @@ async def stream_market_depth(request: object) -> AsyncIterator[object]:
         Canonical immutable depth events.
 
     Raises:
-        DataError: If the request type or upstream book read is invalid.
+        DataError: If the request type or upstream book read is invalid, or if
+            no requested symbol produces an event within the first-read bound.
     """
     if not isinstance(request, _DepthRequest):
         raise DataError("INVALID_INPUT", safe_details={"contract": "depth"})
@@ -166,8 +191,25 @@ async def stream_market_depth(request: object) -> AsyncIterator[object]:
             safe_details={"operation": "mt5_symbol_demand"},
             request_id=request.request_id,
         ) from error
+    source = stream_metatrader_book_snapshots()
+    deadline = asyncio.get_running_loop().time() + _FIRST_EVENT_TIMEOUT_SECONDS
+    delivered = False
     try:
-        async for book in stream_metatrader_book_snapshots():
+        while True:
+            try:
+                if delivered:
+                    book = await _next_book(source)
+                else:
+                    async with asyncio.timeout_at(deadline):
+                        book = await _next_book(source)
+            except TimeoutError as error:
+                raise DataError(
+                    "SOURCE_UNAVAILABLE",
+                    safe_details={"operation": "mt5_depth_first_read"},
+                    request_id=request.request_id,
+                ) from error
+            if book is None:
+                return
             sequence = cast("int", book["sequence"])
             if request.resume_after is not None and sequence <= request.resume_after:
                 continue
@@ -196,6 +238,7 @@ async def stream_market_depth(request: object) -> AsyncIterator[object]:
             )
             if not filtered and not filtered_errors:
                 continue
+            delivered = True
             age_seconds = max(0.0, (datetime.now(UTC) - received_at).total_seconds())
             yield _DepthEvent(
                 sequence=sequence,

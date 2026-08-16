@@ -178,6 +178,55 @@ def test_gateway_rejects_a_book_with_an_undeclared_symbol() -> None:
     asyncio.run(scenario())
 
 
+def test_gateway_book_stream_first_read_is_bounded(monkeypatch) -> None:
+    """A book subscriber the producer never feeds fails instead of hanging."""
+
+    async def scenario() -> None:
+        monkeypatch.setattr(
+            snapshot_gateway,
+            "_BOOK_FIRST_READ_TIMEOUT_SECONDS",
+            0.05,
+        )
+        gateway = snapshot_gateway._SnapshotGateway()
+        stream = gateway.stream_books()
+
+        with pytest.raises(TimeoutError):
+            await anext(stream)
+        # The abandoned subscriber must not linger on the fan-out set.
+        assert gateway.book_subscribers == set()
+
+    asyncio.run(scenario())
+
+
+def test_gateway_book_stream_delivers_within_the_first_read_bound() -> None:
+    """A producer that publishes in time still streams normally."""
+
+    async def scenario() -> None:
+        gateway = snapshot_gateway._SnapshotGateway()
+        gateway.applied_symbols = ("EURUSD",)
+        gateway.applied_revision = 1
+        stream = gateway.stream_books()
+        reader = asyncio.ensure_future(anext(stream))
+        await asyncio.sleep(0)
+
+        await gateway._publish_book(
+            {
+                "revision": 1,
+                "sequence": 1,
+                "books": (
+                    {"symbol": "EURUSD", "book_depth": 10, "bids": (), "asks": ()},
+                ),
+                "errors": (),
+            },
+            {"source_id": "mt5-terminal-1", "interval_seconds": 1},
+        )
+        first = await reader
+        assert first["sequence"] == 1
+        await stream.aclose()
+
+    asyncio.run(scenario())
+
+
 def test_gateway_retains_shared_demand_during_partial_release(monkeypatch) -> None:
     """Releasing one consumer cannot pause symbols required by another."""
 

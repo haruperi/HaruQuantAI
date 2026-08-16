@@ -25,6 +25,7 @@ _QUEUE_SIZE = 8
 _HELLO_TIMEOUT_SECONDS = 3.0
 _IDLE_TIMEOUT_SECONDS = 5.0
 _SYMBOL_ACK_TIMEOUT_SECONDS = 5.0
+_BOOK_FIRST_READ_TIMEOUT_SECONDS = 5.0
 _SYMBOL_RELEASE_GRACE_SECONDS = 30.0
 _MAX_DEMANDED_SYMBOLS = 200
 
@@ -171,17 +172,26 @@ class _SnapshotGateway:
     async def stream_books(self) -> AsyncIterator[Mapping[str, object]]:
         """Yield validated Depth-of-Market reads to one bounded subscriber.
 
+        The first read is bounded. A producer that never publishes a book frame
+        — a stale EA, a paused revision, or a broker outage — must fail the
+        subscriber explicitly instead of holding it open forever.
+
         Yields:
             Immutable book mappings.
+
+        Raises:
+            TimeoutError: If no book frame arrives before the first-read bound.
         """
         queue: asyncio.Queue[Mapping[str, object] | None] = asyncio.Queue(_QUEUE_SIZE)
         self.book_subscribers.add(queue)
         try:
-            while True:
-                book = await queue.get()
-                if book is None:
-                    return
+            book = await asyncio.wait_for(
+                queue.get(),
+                timeout=_BOOK_FIRST_READ_TIMEOUT_SECONDS,
+            )
+            while book is not None:
                 yield book
+                book = await queue.get()
         finally:
             self.book_subscribers.discard(queue)
 
@@ -659,6 +669,9 @@ async def stream_metatrader_book_snapshots() -> AsyncIterator[Mapping[str, objec
 
     Yields:
         Immutable book mappings.
+
+    Raises:
+        TimeoutError: If no book frame arrives before the first-read bound.
     """
     async for book in _GATEWAY.stream_books():
         yield book

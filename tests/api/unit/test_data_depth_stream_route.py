@@ -11,6 +11,7 @@ import pytest
 from app.services.api.identity import build_auth_context
 from app.services.api.workstation.data import stream_routes
 from app.services.api.workstation.data.stream_routes import _stream_market_depth
+from app.services.data.contracts import DataError
 from app.utils import generate_id
 from fastapi import FastAPI
 from pydantic import BaseModel, ConfigDict
@@ -114,6 +115,51 @@ def test_depth_route_preserves_atomic_books_and_releases_quota(
         assert document["payload"]["kind"] == "depth"
         assert document["payload"]["source_id"] == "pepperstone-demo"
         assert document["payload"]["books"][0]["symbol"] == "EURUSD"
+        assert manager.opened == manager.closed == 1
+
+    asyncio.run(scenario())
+
+
+def test_depth_route_surfaces_a_bounded_source_failure_and_releases_quota(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An upstream depth stream that never delivers fails the route, not hangs it."""
+
+    async def source(_request: object) -> AsyncGenerator[_DepthEvent]:
+        raise DataError(
+            "SOURCE_UNAVAILABLE",
+            safe_details={"operation": "mt5_depth_first_read"},
+        )
+        yield _DepthEvent()  # pragma: no cover - unreachable generator marker
+
+    async def scenario() -> None:
+        monkeypatch.setattr(stream_routes, "stream_market_depth", source)
+        application = FastAPI()
+        manager = _Manager()
+        application.state.api_stream_connection_manager = manager
+        request = Request(
+            {
+                "type": "http",
+                "method": "GET",
+                "path": "/api/v1/data/depth-stream",
+                "headers": (),
+                "app": application,
+            }
+        )
+        response = await _stream_market_depth(
+            request=request,
+            context=_context(),
+            symbols="EURUSD",
+            last_event_id=None,
+        )
+
+        with pytest.raises(DataError) as failure:
+            await asyncio.wait_for(
+                anext(response.body_iterator),
+                timeout=5.0,
+            )
+
+        assert failure.value.code == "SOURCE_UNAVAILABLE"
         assert manager.opened == manager.closed == 1
 
     asyncio.run(scenario())
