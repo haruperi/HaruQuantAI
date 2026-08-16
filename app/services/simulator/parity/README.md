@@ -45,6 +45,11 @@ response shapes, lifecycle/linkage, event causality, risk/route gates, ledger co
 and route-tagged persistence. It explicitly excludes spreads, latency, fills, liquidity, slippage,
 execution-price distributions, calibration transfer, and performance. Live evidence cannot be
 substituted into the demo evidence slot, and demo empirical artifacts cannot be relabelled live.
+The v2 comparator projects receipts to requested quantity, status, response classification,
+retry safety, and reconciliation requirements; events to their category sequence; and
+order/deal/position evidence to identifier topology plus causal edges. Empirical quantities,
+prices, profits, timestamps, fills, and latency remain outside v2 while v1 comparison behavior is
+unchanged.
 
 ## Evidence mapping schema
 

@@ -237,6 +237,30 @@ def test_relationship_mutation_fails_parity() -> None:
     assert any("order.linkage_graph" in f for f in result["failures"])
 
 
+def test_relationship_mutation_fails_v2_operational_parity() -> None:
+    """V2 rejects a changed order/deal/position relationship topology."""
+    left, right = paired_evidence()
+    mutated_positions: list[Any] = list(right["positions"])  # type: ignore[call-overload]
+    mutated_positions.append(
+        {
+            "position_id": "MT-POS-10",
+            "symbol": "EURUSD",
+            "side": "LONG",
+            "quantity": "0.1",
+            "state": "OPEN",
+            "profit": "0",
+            "opened_at": "2026-08-20T11:00:01+00:00",
+        }
+    )
+    mutated_deals: list[Any] = list(right["deals"])  # type: ignore[call-overload]
+    mutated_deals[0] = {**mutated_deals[0], "position_id": "MT-POS-10"}
+    right["positions"] = tuple(mutated_positions)  # type: ignore[assignment]
+    right["deals"] = tuple(mutated_deals)  # type: ignore[assignment]
+    result = compare_parity_evidence(left, right, get_parity_envelope("v2"))
+    assert result["passed"] is False
+    assert any("order.linkage_graph" in f for f in result["failures"])
+
+
 def test_causal_edge_mutation_fails_parity() -> None:
     """A dropped causal edge between paired events fails the comparison."""
     left, right = paired_evidence()
@@ -244,6 +268,17 @@ def test_causal_edge_mutation_fails_parity() -> None:
     mutated_events[1] = {**mutated_events[1], "causes": ()}
     right["events"] = tuple(mutated_events)  # type: ignore[assignment]
     result = compare_parity_evidence(left, right, _ENVELOPE)
+    assert result["passed"] is False
+    assert any("causal.evidenced_partial_order" in f for f in result["failures"])
+
+
+def test_causal_edge_mutation_fails_v2_operational_parity() -> None:
+    """V2 rejects a dropped evidenced causal edge."""
+    left, right = paired_evidence()
+    mutated_events: list[Any] = list(right["events"])  # type: ignore[call-overload]
+    mutated_events[1] = {**mutated_events[1], "causes": ()}
+    right["events"] = tuple(mutated_events)  # type: ignore[assignment]
+    result = compare_parity_evidence(left, right, get_parity_envelope("v2"))
     assert result["passed"] is False
     assert any("causal.evidenced_partial_order" in f for f in result["failures"])
 

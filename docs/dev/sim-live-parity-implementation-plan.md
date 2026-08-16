@@ -4176,9 +4176,11 @@ suite passed 5,911 with 21 explicit external-provider skips and 87.61% coverage.
 
 **Certificate-input status:** no `artifacts/sim_live_parity` bundle root, certificate ID, immutable
 independent demo operational holdout, complete certificate initial-authority/account-activity
-manifest, or exact certificate validity inputs exist in the repository. The environment confirms MT5
-demo credentials and genuine MT5 usage are not configured. Envelope v2 therefore publishes the
-certificate contract and exclusions but does not invent or issue a certificate. Publication requires
+manifest, or exact certificate validity inputs exist in the repository. Encrypted MT5 demo
+credentials are available through the system credential slot, and a bounded BTCUSD demo mutation
+was reconciled and removed on 2026-08-16; this connectivity check is not the independent certificate
+holdout. Envelope v2 therefore publishes the certificate contract and exclusions but does not invent
+or issue a certificate. Publication requires
 an immutable, sanitized, provenance-verified MT5-demo operational evidence package with its
 certificate ID, target build, provider/account-mode digest, admitted operational intervals,
 exclusive-account proof or complete foreign/manual activity replay, authority-state/watermark,
@@ -4214,6 +4216,21 @@ Focused parity/bundle behavior passed 11 tests; Ruff and targeted mypy passed. E
 `Enforce the exact reproducible nine-member L5 operational bundle.`,
 `Bind demo evidence, shared MT5 semantics, empirical exclusions, and secret-free collection scope.`,
 and `Reject normalized-evidence or checksum tampering without issuing synthetic evidence.`
+
+**Operational-comparator blocker resolution: Completed — 2026-08-16.** Dry run 24 found that v2
+declared empirical time, fill, price, quantity, profit, and latency observations out of scope while
+three exact invariants still reused v1's complete structural views. The bounded recommendation keeps
+v1 byte-for-byte behavior and gives v2 explicit projections: event categories, receipt request and
+response-classification semantics, relationship topology, and evidenced causal edges. Empirical
+drift now passes only v2, while lifecycle, response-classification, linkage, and causal mutations
+remain fail-closed. Evidence:
+`app/services/simulator/parity/compare.py:44`,
+`tests/simulator/integration/test_semantic_parity.py:41`, and
+`tests/simulator/integration/test_parity_relationships.py:240`. Exact commit:
+`fix(simulator): compare only certified operational semantics` with body bullets
+`Preserve Envelope v1 comparison behavior while narrowing v2 to declared operational views.`,
+`Exclude empirical time, fill, price, quantity, profit, and latency observations from v2 structural invariants.`,
+and `Prove v2 still rejects lifecycle, classification, linkage, and causal mutations.`
 
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
@@ -4267,7 +4284,8 @@ requires the same gates. An invalidated or expired certificate confers no parity
 
 - [ ] Dependency graph is acyclic; Brokers imports no Simulation symbol.
 - [ ] Paired semantic comparison passes without a real network session.
-- [ ] Identifier relationship mutation and economic-time drift are detected by the comparator.
+- [ ] Identifier relationship mutation is detected by both envelopes; v1 detects economic-time drift,
+      while v2 excludes empirical time observations from its operational claim.
 - [ ] Exact, bounded numeric, and distributional invariants use registered metrics; aggregate economic
       drift cannot pass by exhausting many individual tolerances.
 - [ ] Scheduler internal total order, pump, cancellation, resume, and multi-symbol determinism pass

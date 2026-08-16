@@ -16,7 +16,7 @@ Parity Envelope v2 separates deterministic MT5 operational semantics from route-
 
 #### Changed (1)
 
-- Published one demo-evidenced L5-MT5-Operational contract for semantics shared by demo and live routes, with explicit exclusions preventing empirical evidence or calibration from transferring between routes, plus a reproducible nine-member certificate-bundle integrity gate.
+- Published one demo-evidenced L5-MT5-Operational contract for semantics shared by demo and live routes, with explicit comparator projections and exclusions preventing empirical evidence or calibration from transferring between routes, plus a reproducible nine-member certificate-bundle integrity gate.
 
 ### Standardize execution route terminology
 

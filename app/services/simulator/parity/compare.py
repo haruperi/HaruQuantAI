@@ -41,6 +41,40 @@ def _structural_view(normalized: NormalizedEvidence) -> dict[str, object]:
     return normalized.comparable()
 
 
+def _operational_receipt_view(
+    normalized: NormalizedEvidence,
+) -> tuple[dict[str, object], ...]:
+    """Return v2 request and response-classification semantics only."""
+    return tuple(
+        {
+            "requested_quantity": str(receipt.requested_quantity),
+            "status": receipt.status,
+            "response_classification": receipt.response_classification,
+            "retry_safe": receipt.retry_safe,
+            "reconciliation_required": receipt.reconciliation_required,
+        }
+        for receipt in normalized.receipts
+    )
+
+
+def _operational_linkage_view(normalized: NormalizedEvidence) -> dict[str, object]:
+    """Return v2 identifier topology without empirical economic observations."""
+    return {
+        "deals": tuple(
+            {
+                "deal_id": deal.deal_id,
+                "order_id": deal.order_id,
+                "position_id": deal.position_id,
+                "entry": deal.entry,
+                "reason": deal.reason,
+            }
+            for deal in normalized.deals
+        ),
+        "positions": tuple(position.position_id for position in normalized.positions),
+        "causal_edges": normalized.causal_edges,
+    }
+
+
 def _mean(values: tuple[Decimal, ...]) -> Decimal:
     """Return the arithmetic mean of non-empty Decimal samples."""
     return sum(values, Decimal(0)) / Decimal(len(values))
@@ -123,18 +157,35 @@ class _Comparator:
         """Compare every exact-structural invariant view field."""
         left_view = _structural_view(self._left)
         right_view = _structural_view(self._right)
+        operational = self._envelope.operational_applicability is not None
         structural_targets: dict[str, tuple[object, object]] = {
             "gate.business_risk_sequence": (
                 self._left.business_gates(),
                 self._right.business_gates(),
             ),
             "event.category_sequence": (
-                left_view["events"],
-                right_view["events"],
+                (
+                    tuple(event.event_type for event in self._left.events)
+                    if operational
+                    else left_view["events"]
+                ),
+                (
+                    tuple(event.event_type for event in self._right.events)
+                    if operational
+                    else right_view["events"]
+                ),
             ),
             "receipt.status_classification": (
-                left_view["receipts"],
-                right_view["receipts"],
+                (
+                    _operational_receipt_view(self._left)
+                    if operational
+                    else left_view["receipts"]
+                ),
+                (
+                    _operational_receipt_view(self._right)
+                    if operational
+                    else right_view["receipts"]
+                ),
             ),
         }
         for spec in self._envelope.invariants:
@@ -175,8 +226,16 @@ class _Comparator:
                 )
                 continue
             if spec.invariant_id == "order.linkage_graph":
-                left_graph = self._left.relationship_map()
-                right_graph = self._right.relationship_map()
+                left_graph = (
+                    _operational_linkage_view(self._left)
+                    if operational
+                    else self._left.relationship_map()
+                )
+                right_graph = (
+                    _operational_linkage_view(self._right)
+                    if operational
+                    else self._right.relationship_map()
+                )
                 equal = (
                     left_graph["deals"] == right_graph["deals"]
                     and left_graph["positions"] == right_graph["positions"]
@@ -196,9 +255,9 @@ class _Comparator:
                 )
                 continue
             if spec.invariant_id == "causal.evidenced_partial_order":
-                equal = (
-                    self._left.causal_edges == self._right.causal_edges
-                    and self._left.ambiguous_time_groups
+                equal = self._left.causal_edges == self._right.causal_edges and (
+                    operational
+                    or self._left.ambiguous_time_groups
                     == self._right.ambiguous_time_groups
                 )
                 self._record(
