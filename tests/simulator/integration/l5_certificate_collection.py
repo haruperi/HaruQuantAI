@@ -267,6 +267,35 @@ def build_collector_provider_settings(system_values: Mapping[str, object]) -> ob
     )
 
 
+def build_mt5_credential_mapping(
+    slot: Mapping[str, object], terminal_setting: object
+) -> dict[str, object]:
+    """Build the Broker credential map without removing redaction wrappers.
+
+    Args:
+        slot: Encrypted database credential-slot fields.
+        terminal_setting: Secret-redacting configured terminal value.
+
+    Returns:
+        Named non-empty SecretStr-compatible credential mapping.
+
+    Raises:
+        RuntimeError: If a required credential is absent or malformed.
+    """
+    values = {
+        "login": slot.get("login"),
+        "password": slot.get("password"),
+        "server": slot.get("server"),
+        "terminal_path": terminal_setting,
+    }
+    for name, value in values.items():
+        getter = getattr(value, "get_secret_value", None)
+        if not callable(getter) or not getter():
+            message = f"encrypted MT5 {name} is absent or malformed"
+            raise RuntimeError(message)
+    return values
+
+
 def _read_json(path: Path) -> dict[str, object]:
     """Read one JSON object from a bundle member.
 
@@ -828,16 +857,13 @@ async def _collect(args: argparse.Namespace) -> Path:
     args.output = validate_collection_output(
         args.output, args.certificate_id, workspace_root=Path.cwd()
     )
-    terminal = require_terminal_executable(provider_settings.mt5_terminal_path)
+    require_terminal_executable(provider_settings.mt5_terminal_path)
     slot = resolve_system_credential_slot("mt5", request_id=generate_id("req"))
     if not all(slot.get(name) for name in ("login", "password", "server")):
         raise RuntimeError("encrypted MT5 credential slot is incomplete")
-    credentials: dict[str, object] = {
-        "login": slot["login"],
-        "password": slot["password"],
-        "server": slot["server"],
-    }
-    credentials["terminal_path"] = terminal
+    credentials = build_mt5_credential_mapping(
+        slot, provider_settings.mt5_terminal_path
+    )
     account_reference = _required_secret_text(slot["login"], "login")
     config = build_broker_connection_config(
         "mt5",

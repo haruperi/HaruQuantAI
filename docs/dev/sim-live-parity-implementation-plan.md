@@ -4308,6 +4308,20 @@ Evidence: `tests/simulator/integration/l5_certificate_collection.py:241` and
 `Inject the explicit demo route into the immutable broker-provider settings model.`, and
 `Remove unsupported process-environment discovery from certificate collection.`
 
+**Fourth collection attempt: Failed before provider access — 2026-08-16.** The approved Dry Run 30
+retry resolved database configuration and credential lookup, then failed while constructing the
+canonical Broker connection config because every credential-map value must remain a named non-empty
+`SecretStr`; the collector had replaced the redacting terminal setting with a validated `Path`. It
+created no adapter/socket, mutation, or artifact. Correction `30DR1Δ1` validates the ephemeral
+unwrapped path but passes the original redacting wrapper into the Broker contract and tests that all
+four credential-map values retain that type. Evidence:
+`tests/simulator/integration/l5_certificate_collection.py:270` and
+`tests/simulator/integration/test_l5_certificate_collection.py:137`. Exact commit:
+`fix(parity): preserve terminal credential wrapper` with body bullets
+`Validate the configured MT5 terminal without replacing its redacting wrapper.`,
+`Pass only named non-empty SecretStr values into the Broker credential map.`, and
+`Record the pre-adapter contract failure without issuing evidence.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write

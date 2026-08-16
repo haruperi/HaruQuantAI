@@ -17,6 +17,7 @@ from tests.simulator.integration.l5_certificate_collection import (
     _required_secret_text,
     _strip_collection_only,
     build_collector_provider_settings,
+    build_mt5_credential_mapping,
     require_terminal_executable,
     validate_authority_interval,
     validate_collection_output,
@@ -131,6 +132,22 @@ def test_provider_settings_are_composed_from_database_system_values(
         )
     with pytest.raises(RuntimeError, match="absent"):
         build_collector_provider_settings({"MT5_ENABLED": "true"})
+
+
+def test_broker_credential_mapping_preserves_every_secret_wrapper() -> None:
+    """Broker configuration receives only named non-empty SecretStr values."""
+    slot = {
+        "login": SecretStr("subject"),  # pragma: allowlist secret
+        "password": SecretStr("credential"),  # pragma: allowlist secret
+        "server": SecretStr("provider"),  # pragma: allowlist secret
+    }
+    terminal = SecretStr("terminal.exe")  # pragma: allowlist secret
+    credentials = build_mt5_credential_mapping(slot, terminal)
+    assert set(credentials) == {"login", "password", "server", "terminal_path"}
+    assert all(isinstance(value, SecretStr) for value in credentials.values())
+    assert credentials["terminal_path"] is terminal
+    with pytest.raises(RuntimeError, match="absent or malformed"):
+        build_mt5_credential_mapping({**slot, "password": None}, terminal)
 
 
 def test_collection_output_is_confined_to_exact_artifact_identity(
