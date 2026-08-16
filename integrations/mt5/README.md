@@ -1,8 +1,9 @@
 # HaruQuantAI MT5 Snapshot Bridge
 
 The tested `TickBridge.mq5` publishes one read-only, multi-symbol
-quote snapshot per second to HaruQuantAI's local TCP receiver. It does not
-accept orders, credentials, or account mutations.
+quote snapshot and one read-only, multi-symbol Depth-of-Market (DOM) book per
+second to HaruQuantAI's local TCP receiver. It does not accept orders,
+credentials, or account mutations.
 
 ## Install
 
@@ -36,3 +37,30 @@ never included in API responses or logs.
 `InpAuthToken` intentionally has no source-code default: paste the same rotated
 token configured in HaruQuantAI into the EA Inputs dialog. Update the backend and
 EA together because protocol v1 and v2 are intentionally incompatible.
+
+## Depth-of-Market (book) frames
+
+Immediately after each snapshot, the EA sends one `book` frame carrying every
+acknowledged symbol's current Depth-of-Market read, using its own independent
+sequence counter. For each symbol the EA calls `MarketBookAdd` once when the
+symbol is applied (and `MarketBookRelease` once when it is dropped or on
+`OnDeinit`), then reads `MarketBookGet` once per timer tick — the MT5 Python
+and MQL5 APIs are pull-based here, not event-driven, so this bridge polls at
+the same one-second cadence as quotes rather than reacting to `OnBookEvent`.
+
+Not every broker or symbol publishes a book. A symbol whose `MarketBookAdd`
+failed is reported in the frame's `errors` array (`code: 0`), never as a
+synthesized empty book; a subscribed symbol with zero current resting orders
+is reported as a genuine empty book (`bids: []`, `asks: []`). Each symbol
+entry also carries `book_depth`, the broker's own `SYMBOL_TICKS_BOOKDEPTH`
+value — `0` means this broker does not publish a queue for that symbol at
+all, and callers should treat depth as permanently unavailable for it rather
+than retrying. Levels are bounded to 50 per side. Only `BOOK_TYPE_BUY` and
+`BOOK_TYPE_SELL` price levels are reported; broker-published market-order
+queue volume (`BOOK_TYPE_BUY_MARKET`/`BOOK_TYPE_SELL_MARKET`) has no price
+level to attach to and is not currently modeled.
+
+Forex/CFD Depth-of-Market is broker-local, not a global order book — it
+reflects only the liquidity this broker chooses to publish, which may be its
+own client flow, an aggregated liquidity-provider feed, or nothing at all.
+Present it to end users as "Broker DOM," not as a global market order book.

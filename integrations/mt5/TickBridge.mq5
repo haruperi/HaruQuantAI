@@ -1,5 +1,5 @@
 #property copyright "HaruQuantAI"
-#property version   "2.00"
+#property version   "2.01"
 #property strict
 
 input string InpServerHost       = "127.0.0.1";
@@ -11,10 +11,14 @@ input string InpAuthToken        = "";
 input string InpSymbols          = "EURUSD,GBPUSD,USDJPY,XAUUSD";
 input bool   InpLogSnapshots     = false;
 
+#define BOOK_MAX_LEVELS 50
+
 int    g_socket = INVALID_HANDLE;
 ulong  g_sequence = 0;
+ulong  g_book_sequence = 0;
 ulong  g_revision = 0;
 string g_symbols[];
+bool   g_book_subscribed[];
 string g_receive_buffer = "";
 ulong  g_last_heartbeat_ms = 0;
 
@@ -53,7 +57,18 @@ int OnInit()
 void OnDeinit(const int reason)
   {
    EventKillTimer();
+   ReleaseAllBooks();
    CloseSocket();
+  }
+
+//+------------------------------------------------------------------+
+//| Release every currently held Depth-of-Market subscription         |
+//+------------------------------------------------------------------+
+void ReleaseAllBooks()
+  {
+   for(int index = 0; index < ArraySize(g_symbols); index++)
+      if(g_book_subscribed[index])
+         MarketBookRelease(g_symbols[index]);
   }
 
 //+------------------------------------------------------------------+
@@ -99,6 +114,16 @@ void OnTimer()
    if(InpLogSnapshots)
       PrintFormat("Sent MT5 snapshot %I64u for %d symbols",
                   g_sequence, ArraySize(g_symbols));
+
+   const ulong next_book_sequence = g_book_sequence + 1;
+   const string book_message = BuildBookJson(next_book_sequence);
+   if(!SendLine(book_message))
+     {
+      PrintFormat("Book send failed. Error %d", GetLastError());
+      CloseSocket();
+      return;
+     }
+   g_book_sequence = next_book_sequence;
   }
 
 //+------------------------------------------------------------------+
@@ -136,7 +161,15 @@ bool ParseSymbols()
         }
       const int size = ArraySize(g_symbols);
       ArrayResize(g_symbols, size + 1);
+      ArrayResize(g_book_subscribed, size + 1);
       g_symbols[size] = symbol;
+      // A failed MarketBookAdd means this broker/symbol publishes no book;
+      // BuildBookJson reports it as an explicit per-symbol error, never a
+      // synthesized empty book.
+      g_book_subscribed[size] = MarketBookAdd(symbol);
+      if(!g_book_subscribed[size])
+         PrintFormat("MarketBookAdd unavailable for %s. Error %d",
+                     symbol, GetLastError());
      }
 
    if(ArraySize(g_symbols) == 0)
@@ -316,6 +349,98 @@ string BuildSnapshotJson(const ulong sequence)
   }
 
 //+------------------------------------------------------------------+
+//| Build one Depth-of-Market read per subscribed symbol              |
+//| A symbol whose MarketBookAdd failed (unsupported by this broker)  |
+//| is reported as an explicit error, never a synthesized empty book. |
+//| A subscribed symbol with zero current resting levels is a genuine |
+//| empty book, reported as empty bids/asks, not an error.            |
+//+------------------------------------------------------------------+
+string BuildBookJson(const ulong sequence)
+  {
+   string books = "[";
+   string errors = "[";
+   bool first_book = true;
+   bool first_error = true;
+
+   for(int index = 0; index < ArraySize(g_symbols); index++)
+     {
+      const string symbol = g_symbols[index];
+      if(!g_book_subscribed[index])
+        {
+         if(!first_error)
+            errors += ",";
+         errors += "{\"symbol\":\"" + JsonEscape(symbol) + "\",\"code\":0}";
+         first_error = false;
+         continue;
+        }
+
+      MqlBookInfo book[];
+      ResetLastError();
+      if(!MarketBookGet(symbol, book))
+        {
+         if(!first_error)
+            errors += ",";
+         errors += "{\"symbol\":\"" + JsonEscape(symbol) +
+                   "\",\"code\":" + IntegerToString(GetLastError()) + "}";
+         first_error = false;
+         continue;
+        }
+
+      const int digits = (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);
+      const int book_depth = (int)SymbolInfoInteger(symbol, SYMBOL_TICKS_BOOKDEPTH);
+      string bids = "[";
+      string asks = "[";
+      bool first_bid = true;
+      bool first_ask = true;
+      int bid_count = 0;
+      int ask_count = 0;
+      for(int level = 0; level < ArraySize(book); level++)
+        {
+         const double volume = book[level].volume_real > 0.0
+            ? book[level].volume_real
+            : (double)book[level].volume;
+         if(book[level].type == BOOK_TYPE_BUY && bid_count < BOOK_MAX_LEVELS)
+           {
+            if(!first_bid)
+               bids += ",";
+            bids += "{\"price\":" + DoubleToString(book[level].price, digits) +
+                    ",\"volume\":" + DoubleToString(volume, 8) + "}";
+            first_bid = false;
+            bid_count++;
+           }
+         else if(book[level].type == BOOK_TYPE_SELL && ask_count < BOOK_MAX_LEVELS)
+           {
+            if(!first_ask)
+               asks += ",";
+            asks += "{\"price\":" + DoubleToString(book[level].price, digits) +
+                    ",\"volume\":" + DoubleToString(volume, 8) + "}";
+            first_ask = false;
+            ask_count++;
+           }
+        }
+      bids += "]";
+      asks += "]";
+
+      if(!first_book)
+         books += ",";
+      books += "{\"symbol\":\"" + JsonEscape(symbol) + "\","
+               "\"book_depth\":" + IntegerToString(book_depth) + ","
+               "\"bids\":" + bids + ","
+               "\"asks\":" + asks + "}";
+      first_book = false;
+     }
+
+   books += "]";
+   errors += "]";
+   return "{\"type\":\"book\","
+          "\"protocol\":\"haruquant.mt5.snapshot.v2\","
+          "\"sequence\":" + StringFormat("%I64u", sequence) + ","
+          "\"revision\":" + StringFormat("%I64u", g_revision) + ","
+          "\"books\":" + books + ","
+          "\"errors\":" + errors + "}";
+  }
+
+//+------------------------------------------------------------------+
 //| Drain and apply complete newline-delimited subscription commands  |
 //+------------------------------------------------------------------+
 bool ProcessCommands()
@@ -396,6 +521,7 @@ bool ApplySetSymbols(const string message)
      }
 
    string applied[];
+   bool   applied_book[];
    string rejected_symbols[];
    int rejected_codes[];
    for(int index = 0; index < ArraySize(requested); index++)
@@ -405,7 +531,12 @@ bool ApplySetSymbols(const string message)
         {
          const int size = ArraySize(applied);
          ArrayResize(applied, size + 1);
+         ArrayResize(applied_book, size + 1);
          applied[size] = requested[index];
+         applied_book[size] = MarketBookAdd(requested[index]);
+         if(!applied_book[size])
+            PrintFormat("MarketBookAdd unavailable for %s. Error %d",
+                        requested[index], GetLastError());
         }
       else
         {
@@ -423,10 +554,16 @@ bool ApplySetSymbols(const string message)
          if(g_symbols[index] == applied[requested_index])
             retained = true;
       if(!retained)
+        {
+         if(g_book_subscribed[index])
+            MarketBookRelease(g_symbols[index]);
          SymbolSelect(g_symbols[index], false);
+        }
      }
    ArrayResize(g_symbols, ArraySize(applied));
    ArrayCopy(g_symbols, applied);
+   ArrayResize(g_book_subscribed, ArraySize(applied_book));
+   ArrayCopy(g_book_subscribed, applied_book);
    g_revision = revision;
    return SendLine(BuildSymbolsAppliedJson(rejected_symbols, rejected_codes));
   }

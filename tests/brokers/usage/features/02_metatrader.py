@@ -30,6 +30,7 @@ from app.services.brokers import (
     reconnect_broker,
     refresh_broker_session,
     release_metatrader_snapshot_symbols,
+    stream_metatrader_book_snapshots,
     supports_broker_capability,
 )
 
@@ -149,6 +150,34 @@ async def fr_brokers_152_to_158_snapshot_symbol_demand() -> None:
             f"desired_revision={applied['desired_revision']}, "
             f"applied_revision={applied['applied_revision']}"
         )
+    finally:
+        await release_metatrader_snapshot_symbols(consumer_id)
+
+
+async def fr_brokers_159_to_161_book_reads() -> None:
+    """FR-BRK-159..161: Exercise Depth-of-Market reads over the shared demand pool."""
+    _header("Stage 5: Depth-of-Market Reads (FR-BRK-159..161)")
+    status = get_metatrader_snapshot_gateway_status()
+    print(_format_result(status))
+    if not status["connected"]:
+        print("Data -> snapshot_gateway='not_connected'; book exercise skipped")
+        return
+    consumer_id = await acquire_metatrader_snapshot_symbols(("EURUSD",))
+    try:
+        applied = get_metatrader_snapshot_gateway_status()
+        print(
+            "Data -> "
+            f"book_subscribers={applied['book_subscribers']}, "
+            f"last_book_sequence={applied['last_book_sequence']}"
+        )
+        try:
+            book = await asyncio.wait_for(
+                anext(stream_metatrader_book_snapshots()), timeout=5.0
+            )
+            symbols = [entry["symbol"] for entry in book["books"]]
+            print(f"Data -> book_symbols={symbols}")
+        except TimeoutError:
+            print("Data -> book_read='no_frame_within_timeout'; exercise skipped")
     finally:
         await release_metatrader_snapshot_symbols(consumer_id)
 
@@ -277,6 +306,8 @@ async def _run() -> None:
         await fr_brokers_052_to_056_verified_account_info(adapter)
 
         await fr_brokers_152_to_158_snapshot_symbol_demand()
+
+        await fr_brokers_159_to_161_book_reads()
 
 
 def main() -> None:

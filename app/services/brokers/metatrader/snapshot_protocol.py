@@ -14,6 +14,7 @@ _MAX_SYMBOLS = 1_000
 _MAX_SYMBOL_LENGTH = 64
 _MAX_INTERVAL_SECONDS = 3_600
 _MAX_DIGITS = 16
+_MAX_BOOK_LEVELS = 50
 
 
 def parse_snapshot_frame(frame: bytes) -> Mapping[str, object]:
@@ -46,6 +47,8 @@ def parse_snapshot_frame(frame: bytes) -> Mapping[str, object]:
         return _parse_hello(payload)
     if message_type == "snapshot":
         return _parse_snapshot(payload)
+    if message_type == "book":
+        return _parse_book(payload)
     if message_type == "symbols_applied":
         return _parse_symbols_applied(payload)
     if message_type == "heartbeat":
@@ -178,6 +181,116 @@ def _parse_snapshot(payload: Mapping[str, object]) -> Mapping[str, object]:
             "errors": errors,
         }
     )
+
+
+def _parse_book(payload: Mapping[str, object]) -> Mapping[str, object]:
+    """Validate one multi-symbol Depth-of-Market read.
+
+    Args:
+        payload: Decoded book object.
+
+    Returns:
+        Immutable normalized book.
+
+    Raises:
+        TypeError: If a field has an invalid type.
+        ValueError: If a field violates protocol bounds.
+    """
+    _require_exact_keys(
+        payload,
+        {"type", "protocol", "sequence", "revision", "books", "errors"},
+    )
+    sequence = _integer(payload.get("sequence"), "sequence")
+    revision = _integer(payload.get("revision"), "revision")
+    if sequence <= 0:
+        raise ValueError("book sequence must be positive")
+    if revision <= 0:
+        raise ValueError("book revision must be positive")
+    raw_books = payload.get("books")
+    raw_errors = payload.get("errors")
+    if not isinstance(raw_books, list) or len(raw_books) > _MAX_SYMBOLS:
+        raise TypeError("books must be a bounded array")
+    if not isinstance(raw_errors, list) or len(raw_errors) > _MAX_SYMBOLS:
+        raise TypeError("errors must be a bounded array")
+    books = tuple(_parse_book_entry(value) for value in raw_books)
+    errors = tuple(_parse_symbol_error(value) for value in raw_errors)
+    book_symbols = tuple(str(value["symbol"]) for value in books)
+    error_symbols = tuple(str(value["symbol"]) for value in errors)
+    if len(book_symbols) != len(set(book_symbols)):
+        raise ValueError("book symbols must be unique")
+    if len(error_symbols) != len(set(error_symbols)):
+        raise ValueError("book error symbols must be unique")
+    if set(book_symbols) & set(error_symbols):
+        raise ValueError("a symbol cannot be both book and error")
+    return MappingProxyType(
+        {
+            "type": "book",
+            "protocol": _WIRE_PROTOCOL,
+            "sequence": sequence,
+            "revision": revision,
+            "books": books,
+            "errors": errors,
+        }
+    )
+
+
+def _parse_book_entry(value: object) -> Mapping[str, object]:
+    """Normalize one symbol's Depth-of-Market read.
+
+    Args:
+        value: Decoded book-entry candidate.
+
+    Returns:
+        Immutable book-entry mapping.
+
+    Raises:
+        TypeError: If the entry is not an object.
+        ValueError: If a field violates its bound.
+    """
+    if not isinstance(value, dict):
+        raise TypeError("book entry must be an object")
+    _require_exact_keys(value, {"symbol", "book_depth", "bids", "asks"})
+    symbol = _text(value.get("symbol"), "symbol", _MAX_SYMBOL_LENGTH)
+    book_depth = _integer(value.get("book_depth"), "book_depth")
+    if book_depth < 0:
+        raise ValueError("book_depth must be non-negative")
+    raw_bids = value.get("bids")
+    raw_asks = value.get("asks")
+    if not isinstance(raw_bids, list) or len(raw_bids) > _MAX_BOOK_LEVELS:
+        raise TypeError("bids must be a bounded array")
+    if not isinstance(raw_asks, list) or len(raw_asks) > _MAX_BOOK_LEVELS:
+        raise TypeError("asks must be a bounded array")
+    return MappingProxyType(
+        {
+            "symbol": symbol,
+            "book_depth": book_depth,
+            "bids": tuple(_parse_book_level(level) for level in raw_bids),
+            "asks": tuple(_parse_book_level(level) for level in raw_asks),
+        }
+    )
+
+
+def _parse_book_level(value: object) -> Mapping[str, object]:
+    """Normalize one Depth-of-Market price level.
+
+    Args:
+        value: Decoded level candidate.
+
+    Returns:
+        Immutable level mapping.
+
+    Raises:
+        TypeError: If the level is not an object.
+        ValueError: If price or volume is not strictly positive.
+    """
+    if not isinstance(value, dict):
+        raise TypeError("book level must be an object")
+    _require_exact_keys(value, {"price", "volume"})
+    price = _decimal(value.get("price"), "price")
+    volume = _decimal(value.get("volume"), "volume")
+    if price <= 0 or volume <= 0:
+        raise ValueError("book level price and volume must be positive")
+    return MappingProxyType({"price": price, "volume": volume})
 
 
 def _parse_symbols_applied(payload: Mapping[str, object]) -> Mapping[str, object]:

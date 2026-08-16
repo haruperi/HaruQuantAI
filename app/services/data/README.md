@@ -6,7 +6,7 @@ The official weekly-calendar synchronization accepts optional aware-UTC
 uses the runtime UTC clock.
 
 > **Package:** `app/services/data`
-> **Status:** `Completed` — all 14 registered features (`FEAT-DATA-01`..`14`) are implemented. Canonical Level-2 state remains an extension requirement of `FEAT-DATA-10`, while Brokers retains provider-specific order-book transport. The sim⇄live parity-programme extension of `FEAT-DATA-02` now implements immutable provider-specification revisions (`FR-DATA-214`–`216`).
+> **Status:** `Completed` — all 14 registered features (`FEAT-DATA-01`..`14`) are implemented. The sim⇄live parity-programme extension of `FEAT-DATA-02` now implements immutable provider-specification revisions (`FR-DATA-214`–`216`). Canonical Depth-of-Market state is implemented as an extension of `FEAT-DATA-10` (`FR-DATA-217`–`219`); Brokers/MetaTrader produces normalized book reads and Data owns the canonical multi-symbol depth stream (`OD-DATA-01`, resolved in Section 6).
 > **Last updated:** `2026-08-14`
 
 > This README is the package's **single source of truth** for requirements,
@@ -246,7 +246,7 @@ operations are support packages excluded from the feature count.
 | Completed | `FEAT-DATA-07` Time and Sessions | `time_sessions/` | UTC policy, schedules, sessions, halts, reopenings, and roll windows | `FR-DATA-034`, `117`–`122`, and `194`–`195` | `tests/data/usage/features/07_time_sessions.py` |
 | Completed | `FEAT-DATA-08` Economic Calendar | `economic_calendar/` | Point-in-time events, revisions, visibility, coverage, and restrictions | `FR-DATA-095`–`099`, `123`–`129`, `168`–`180`, and `192`–`193` | `tests/data/usage/features/08_economic_calendar.py` |
 | Completed | `FEAT-DATA-09` Sources | `sources/` | Governance, licensing, trust, retrieval, normalization, and research observations | `FR-DATA-022`–`029`, `101`–`104`, `130`–`145`, `159`, and `204` | `tests/data/usage/features/09_sources.py` |
-| Completed | `FEAT-DATA-10` Market Events | `market_events/` | Canonical market events, live streams, feed state, and reconnection | `FR-DATA-046`–`048`, `154`–`157`, and `184`–`189` | `tests/data/usage/features/10_market_events.py` |
+| Completed | `FEAT-DATA-10` Market Events | `market_events/` | Canonical market events, live streams, feed state, reconnection, and Depth-of-Market reads | `FR-DATA-046`–`048`, `154`–`157`, `184`–`189`, and `217`–`219` | `tests/data/usage/features/10_market_events.py` |
 | Completed | `FEAT-DATA-11` Data Jobs | `data_jobs/` | Scheduling, backfills, recovery, and bounded execution state | Existing job requirements, including `FR-DATA-174` | `tests/data/usage/features/11_data_jobs.py` |
 | Completed | `FEAT-DATA-12` Evidence | `evidence/` | Market, FX, account, and authorized audit evidence | Existing evidence and audit requirements, including `FR-DATA-008`, `014`–`021`, `028`, `076`–`079`, and `105`–`106` | `tests/data/usage/features/12_evidence.py` |
 | Completed | `FEAT-DATA-13` Runtime Stores | `runtime_stores/` | Namespaced cross-domain state and atomic transitions | `FR-DATA-146`–`150` | `tests/data/usage/features/13_runtime_stores.py` |
@@ -2332,19 +2332,26 @@ See the authoritative current production-file inventory at the start of Section 
 | Completed | `FR-DATA-187` | Unified `MarketEvent v1`: a `halt` family carrying a typed `HaltPayload` (reason, optional expected resumption time). | `build_halt_payload(**values) -> HaltPayload` | None | Validation error | **Usage:** `tests/data/usage/features/10_market_events.py::fr_data_184_189()` **Unit:** `tests/data/unit/test_market_streaming.py` |
 | Completed | `FR-DATA-188` | Unified `MarketEvent v1`: an `auction` family carrying a typed `AuctionPayload` (reference price, matched size, imbalance) for open/close auction state. | `build_auction_payload(**values) -> AuctionPayload` | None | Validation error | **Usage:** `tests/data/usage/features/10_market_events.py::fr_data_184_189()` **Unit:** `tests/data/unit/test_market_streaming.py` |
 | Completed | `FR-DATA-189` | Unified `MarketEvent v1`: a `corporate_action` family carrying a typed `CorporateActionPayload` (split/dividend/merger/symbol_change type, effective date, optional ratio); `MarketStreamEvent` rejects a payload that does not match its declared event family and rejects a missing payload for any of the eight market-payload event families. | `MarketStreamEvent(event_type=..., payload=...)` (internal shape validator) | None | Validation error | **Usage:** `tests/data/usage/features/10_market_events.py::fr_data_184_189()` **Unit:** `tests/data/unit/test_market_streaming.py` |
+| Completed | `FR-DATA-217` | Construct a bounded multi-symbol Depth-of-Market stream request (unique broker-native symbols, trimmed request identity, non-negative optional resume cursor), mirroring the existing snapshot-stream request shape. | `build_market_depth_stream_request(**values) -> object` | None | Contract validation error | **Usage:** `tests/data/usage/features/10_market_events.py::fr_data_217_219()` **Unit:** `tests/data/unit/test_market_depth_streaming.py` |
+| Completed | `FR-DATA-218` | Yield atomic one-second Depth-of-Market reads filtered to requested symbols from the MT5 bridge; mark an event stale after 5 seconds of age and surface upstream sequence gaps explicitly rather than silently reordering. | `stream_market_depth(request) -> AsyncIterator[object]` | Read-only; acquires bounded MT5 symbol demand | `DataError[INVALID_INPUT \| SOURCE_UNAVAILABLE]` | **Usage:** `tests/data/usage/features/10_market_events.py::fr_data_217_219()` **Unit:** `tests/data/unit/test_market_depth_streaming.py` |
+| Completed | `FR-DATA-219` | Never synthesize a price level or resting quantity the broker did not publish. A symbol whose EA-side book subscription failed surfaces as an explicit per-symbol error; a subscribed symbol reporting zero current resting levels remains a genuine empty book, not an error. | `stream_market_depth(request) -> AsyncIterator[object]` | None | Explicit per-symbol error entry | **Usage:** `tests/data/usage/features/10_market_events.py::fr_data_217_219()` **Unit:** `tests/data/unit/test_market_depth_streaming.py` |
 
 **Implementation notes:** MT5's verified Python integration is pull-based: it exposes
 tick-copy and bar-copy reads, not a provider callback/WebSocket. Data therefore polls
 through the Brokers public read boundary and never invents a WebSocket transport. Do
 not add a composite health score. Numeric buffer, heartbeat, and reconnect values are
-bounded implementation policy.
+bounded implementation policy. Depth-of-Market (`FR-DATA-217`–`219`) is broker-local
+liquidity, not a global order book, and follows the same pull-based polling shape as
+snapshot quotes rather than the `depth` `MarketStreamEvent` family (`FR-DATA-185`),
+which remains the general single-symbol ordered-stream contract for a future
+per-symbol depth kind on `/api/v1/data/stream`.
 
 ### Feature usage examples
 
 `tests/data/usage/features/10_market_events.py` demonstrates `FR-DATA-046` through
 `FR-DATA-048`, `FR-DATA-154` through `FR-DATA-157`, `FR-DATA-184` through
-`FR-DATA-189`, and `FR-DATA-190` through `FR-DATA-191` (the capability
-specification).
+`FR-DATA-189`, `FR-DATA-190` through `FR-DATA-191` (the capability
+specification), and `FR-DATA-217` through `FR-DATA-219`.
 
 ---
 
@@ -3218,7 +3225,7 @@ their owning manifests.
 
 These are unresolved owner choices raised by the approved capability audit. They are recorded here, not resolved by this documentation task.
 
-- **OD-DATA-01 — Level-2 order-book ownership.** The feature model assigns L2 order-book state to Data (`LOW` confidence), but the only order-book model in the repository is Brokers' `BrokerOrderBook` (`app/services/brokers/contracts/models.py:941`). The owner must decide whether Data owns a new `OrderBookSnapshot` contract and Brokers consumes it, or Brokers retains L2 and the capability model is amended. Re-investigate before implementing.
+- **OD-DATA-01 — Level-2 order-book ownership. Resolved.** Data owns the canonical multi-symbol Depth-of-Market stream (`FR-DATA-217`–`219`, `market_events/mt5_depth.py`), consistent with the domain split used everywhere else: Brokers owns provider-specific transport, Data owns canonical unified evidence. Brokers/MetaTrader produces normalized per-symbol book reads over the existing authenticated EA bridge (`FR-BRK-159`–`161`) and Data filters/streams them; Data defines no new `OrderBookSnapshot` contract of its own. This resolution is scoped to the MT5 bridge's polled, flat per-tick book. Brokers' existing `BrokerOrderBook` (`app/services/brokers/canonical_contracts/models.py:1024`, `FR-BRK-025`) is unaffected and remains the appropriate model for a provider with a genuine snapshot/delta, sequence-and-checksum-tracked order-book feed (e.g. `subscribe_broker_order_book` for cTrader/Binance) — a different shape from MT5's polled read.
 - **OD-DATA-02 — Normalized account snapshot ownership.** Data owns and exports `AccountStateSnapshot`, while Brokers publishes the distinct `BrokerAccountSnapshot v1`. Paired with Brokers `OD-BRK-01`, the owner must decide whether to retain both names or migrate normalized account-state ownership and consumers.
 
 ---

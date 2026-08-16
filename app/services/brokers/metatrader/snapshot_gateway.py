@@ -37,7 +37,9 @@ class _SnapshotGateway:
         self.server: asyncio.Server | None = None
         self.producer: asyncio.StreamWriter | None = None
         self.subscribers: set[asyncio.Queue[Mapping[str, object] | None]] = set()
+        self.book_subscribers: set[asyncio.Queue[Mapping[str, object] | None]] = set()
         self.last_sequence: int | None = None
+        self.last_book_sequence: int | None = None
         self.last_received_at: datetime | None = None
         self.source_id: str | None = None
         self.auth_token: str | None = None
@@ -124,6 +126,10 @@ class _SnapshotGateway:
             with suppress(asyncio.QueueFull):
                 queue.put_nowait(None)
         self.subscribers.clear()
+        for queue in tuple(self.book_subscribers):
+            with suppress(asyncio.QueueFull):
+                queue.put_nowait(None)
+        self.book_subscribers.clear()
         for task in self.release_tasks.values():
             task.cancel()
         if self.release_tasks:
@@ -136,6 +142,7 @@ class _SnapshotGateway:
         self.applied_revision = 0
         self.runtime_authoritative = False
         self.last_sequence = None
+        self.last_book_sequence = None
         self.last_received_at = None
         self.source_id = None
         self.auth_token = None
@@ -161,6 +168,23 @@ class _SnapshotGateway:
         finally:
             self.subscribers.discard(queue)
 
+    async def stream_books(self) -> AsyncIterator[Mapping[str, object]]:
+        """Yield validated Depth-of-Market reads to one bounded subscriber.
+
+        Yields:
+            Immutable book mappings.
+        """
+        queue: asyncio.Queue[Mapping[str, object] | None] = asyncio.Queue(_QUEUE_SIZE)
+        self.book_subscribers.add(queue)
+        try:
+            while True:
+                book = await queue.get()
+                if book is None:
+                    return
+                yield book
+        finally:
+            self.book_subscribers.discard(queue)
+
     async def handle_producer(
         self,
         reader: asyncio.StreamReader,
@@ -180,6 +204,7 @@ class _SnapshotGateway:
         # Sequence identity is scoped to one EA connection; an EA restart begins
         # again at zero and must not be mistaken for an eternal duplicate.
         self.last_sequence = None
+        self.last_book_sequence = None
         logger.info("MT5 snapshot producer connection opened")
         try:
             hello = await self._read_hello(reader)
@@ -270,6 +295,9 @@ class _SnapshotGateway:
             if snapshot["type"] == "heartbeat":
                 self._accept_heartbeat(snapshot)
                 continue
+            if snapshot["type"] == "book":
+                await self._publish_book(snapshot, hello)
+                continue
             if snapshot["type"] != "snapshot":
                 raise ValueError("unsupported producer frame")
             await self._publish_snapshot(snapshot, hello)
@@ -327,6 +355,55 @@ class _SnapshotGateway:
             "symbols": self.applied_symbols,
         }
         for queue in tuple(self.subscribers):
+            if queue.full():
+                queue.get_nowait()
+            queue.put_nowait(published)
+
+    async def _publish_book(
+        self,
+        book: Mapping[str, object],
+        hello: Mapping[str, object],
+    ) -> None:
+        """Validate ordering and fan out one acknowledged Depth-of-Market read.
+
+        Args:
+            book: Raw decoded ``book`` frame payload.
+            hello: Most recent decoded ``hello`` handshake payload.
+
+        Raises:
+            ValueError: If revision, symbols, or ordering are invalid.
+        """
+        if book["revision"] != self.applied_revision:
+            raise ValueError("book revision is not acknowledged")
+        declared_symbols = set(self.applied_symbols)
+        frame_symbols = {
+            str(item["symbol"])
+            for key in ("books", "errors")
+            for item in cast("tuple[Mapping[str, object], ...]", book[key])
+        }
+        if not frame_symbols.issubset(declared_symbols):
+            raise ValueError("book contains an undeclared symbol")
+        sequence = cast("int", book["sequence"])
+        if self.last_book_sequence is not None and sequence <= self.last_book_sequence:
+            logger.warning("Ignoring duplicate or out-of-order MT5 book")
+            return
+        gap = (
+            0
+            if self.last_book_sequence is None
+            else max(0, sequence - self.last_book_sequence - 1)
+        )
+        if gap:
+            logger.warning("MT5 book sequence gap detected: %s", gap)
+        self.last_book_sequence = sequence
+        published = {
+            **book,
+            "gap": gap,
+            "received_at": datetime.now(UTC),
+            "source_id": hello["source_id"],
+            "interval_seconds": hello["interval_seconds"],
+            "symbols": self.applied_symbols,
+        }
+        for queue in tuple(self.book_subscribers):
             if queue.full():
                 queue.get_nowait()
             queue.put_nowait(published)
@@ -513,9 +590,11 @@ class _SnapshotGateway:
             "listening": self.server is not None,
             "connected": self.producer is not None,
             "last_sequence": self.last_sequence,
+            "last_book_sequence": self.last_book_sequence,
             "last_received_at": self.last_received_at,
             "source_id": self.source_id,
             "subscribers": len(self.subscribers),
+            "book_subscribers": len(self.book_subscribers),
             "desired_revision": self.desired_revision,
             "applied_revision": self.applied_revision,
             "desired_symbol_count": len(self.desired_symbols),
@@ -575,6 +654,16 @@ async def stream_metatrader_snapshots() -> AsyncIterator[Mapping[str, object]]:
         yield snapshot
 
 
+async def stream_metatrader_book_snapshots() -> AsyncIterator[Mapping[str, object]]:
+    """Yield validated Depth-of-Market reads from the active MT5 producer.
+
+    Yields:
+        Immutable book mappings.
+    """
+    async for book in _GATEWAY.stream_books():
+        yield book
+
+
 async def acquire_metatrader_snapshot_symbols(symbols: tuple[str, ...]) -> str:
     """Acquire a bounded MT5 symbol demand.
 
@@ -611,5 +700,6 @@ __all__ = [
     "release_metatrader_snapshot_symbols",
     "start_metatrader_snapshot_gateway",
     "stop_metatrader_snapshot_gateway",
+    "stream_metatrader_book_snapshots",
     "stream_metatrader_snapshots",
 ]

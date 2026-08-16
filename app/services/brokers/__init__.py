@@ -173,6 +173,7 @@ from app.services.brokers.metatrader.snapshot_gateway import (
     release_metatrader_snapshot_symbols,
     start_metatrader_snapshot_gateway,
     stop_metatrader_snapshot_gateway,
+    stream_metatrader_book_snapshots,
     stream_metatrader_snapshots,
 )
 from app.services.brokers.migrations.public import run_broker_migrations
@@ -345,6 +346,7 @@ __all__ = (
     "set_fake_broker_error",
     "start_metatrader_snapshot_gateway",
     "stop_metatrader_snapshot_gateway",
+    "stream_metatrader_book_snapshots",
     "stream_metatrader_snapshots",
     "subscribe_broker_bars",
     "subscribe_broker_order_book",

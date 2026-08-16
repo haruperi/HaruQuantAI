@@ -6,6 +6,7 @@ import asyncio
 import json
 from collections.abc import Mapping
 
+import pytest
 from app.services.brokers.metatrader import snapshot_gateway
 
 
@@ -99,6 +100,80 @@ def test_gateway_reconciles_revisioned_symbol_demand(monkeypatch) -> None:
             {"revision": gateway.applied_revision, "type": "heartbeat"}
         )
         assert queue.empty()
+
+    asyncio.run(scenario())
+
+
+def test_gateway_publishes_book_reads_independently_of_snapshots() -> None:
+    """Book frames use their own sequence/gap tracking, separate from quotes."""
+
+    async def scenario() -> None:
+        gateway = snapshot_gateway._SnapshotGateway()
+        gateway.applied_symbols = ("EURUSD",)
+        gateway.applied_revision = 1
+        hello: Mapping[str, object] = {
+            "source_id": "mt5-terminal-1",
+            "interval_seconds": 1,
+        }
+        queue: asyncio.Queue[Mapping[str, object] | None] = asyncio.Queue()
+        gateway.book_subscribers.add(queue)
+
+        await gateway._publish_book(
+            {
+                "revision": 1,
+                "sequence": 1,
+                "books": (
+                    {"symbol": "EURUSD", "book_depth": 10, "bids": (), "asks": ()},
+                ),
+                "errors": (),
+            },
+            hello,
+        )
+        first = queue.get_nowait()
+        assert first["gap"] == 0
+        assert gateway.last_book_sequence == 1
+
+        await gateway._publish_book(
+            {
+                "revision": 1,
+                "sequence": 3,
+                "books": (
+                    {"symbol": "EURUSD", "book_depth": 10, "bids": (), "asks": ()},
+                ),
+                "errors": (),
+            },
+            hello,
+        )
+        second = queue.get_nowait()
+        assert second["gap"] == 1
+        # Book sequencing is fully independent of quote-snapshot sequencing.
+        assert gateway.last_sequence is None
+
+    asyncio.run(scenario())
+
+
+def test_gateway_rejects_a_book_with_an_undeclared_symbol() -> None:
+    async def scenario() -> None:
+        gateway = snapshot_gateway._SnapshotGateway()
+        gateway.applied_symbols = ("EURUSD",)
+        gateway.applied_revision = 1
+        with pytest.raises(ValueError, match="undeclared symbol"):
+            await gateway._publish_book(
+                {
+                    "revision": 1,
+                    "sequence": 1,
+                    "books": (
+                        {
+                            "symbol": "XAUUSD",
+                            "book_depth": 10,
+                            "bids": (),
+                            "asks": (),
+                        },
+                    ),
+                    "errors": (),
+                },
+                {"source_id": "mt5-terminal-1", "interval_seconds": 1},
+            )
 
     asyncio.run(scenario())
 

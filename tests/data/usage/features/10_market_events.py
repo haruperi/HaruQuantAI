@@ -21,6 +21,7 @@ from app.services.data import (
     build_feed_config,
     build_feed_status_request,
     build_halt_payload,
+    build_market_depth_stream_request,
     build_market_snapshot_stream_request,
     build_market_stream_request,
     build_raw_feed_event,
@@ -33,6 +34,7 @@ from app.services.data import (
     run_data_migrations,
     start_internal_feed,
     stream_market_data,
+    stream_market_depth,
     stream_market_snapshots,
 )
 from app.utils import generate_id
@@ -212,6 +214,27 @@ def fr_data_184_189() -> None:
     )
 
 
+def fr_data_217_219() -> None:
+    """FR-DATA-217..219: Build a TCP-only MT5 multi-symbol Depth-of-Market stream."""
+    _header("Stage 6: Data-Owned MT5 TCP Depth-of-Market Stream")
+
+    async def demonstrate() -> None:
+        """Construct the depth stream without opening a live producer in usage CI."""
+        depth_request = build_market_depth_stream_request(
+            symbols=("EURUSD", "GBPUSD"),
+            request_id=generate_id("req"),
+        )
+        print(_format_result(depth_request))
+        depth = stream_market_depth(depth_request)
+        await cast("AsyncGenerator[object]", depth).aclose()
+        print(
+            "Data -> DepthOfMarketStream(cadence=one-second-tcp, "
+            "unavailable_book=explicit_error, empty_book=genuine)"
+        )
+
+    asyncio.run(demonstrate())
+
+
 def main() -> None:
     """Execute every functional-requirement demonstration."""
     with TemporaryDirectory(prefix="usage-feeds-") as directory:
@@ -248,6 +271,7 @@ def main() -> None:
             fr_data_048()
             fr_data_154_157()
             fr_data_184_189()
+            fr_data_217_219()
             print("SUCCESS: FEAT-DATA-12 completed")
 
 
