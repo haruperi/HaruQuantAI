@@ -137,7 +137,7 @@ class EventDrivenExecutionEngine:
         journal_writer: JournalWriter,
         execution_profile: ExecutionProfile,
         engine_version: str,
-        provider_revisions: Sequence[Mapping[str, object]] = (),
+        provider_revisions: Sequence[Mapping[str, object]],
     ) -> None:
         """Initialize one isolated execution engine.
 
@@ -154,6 +154,10 @@ class EventDrivenExecutionEngine:
         logger.info("Initializing EventDrivenExecutionEngine %s", engine_version)
         if not engine_version or engine_version != engine_version.strip():
             raise SimulationError("SIM_INVALID_CONFIG", "Engine version is invalid")
+        if not provider_revisions:
+            raise SimulationError(
+                "SIM_INVALID_CONFIG", "Provider revision evidence is required"
+            )
         self._ledger = ledger
         self._journal = journal_writer
         self._profile = execution_profile
@@ -168,20 +172,18 @@ class EventDrivenExecutionEngine:
         self._current_tick: Tick | None = None
         self._last_seen: Tick | None = None
 
-    def _effective_provider_revision(self, at: datetime) -> Mapping[str, object] | None:
-        """Select provider evidence for a canonical v2 authority instant.
+    def _effective_provider_revision(self, at: datetime) -> Mapping[str, object]:
+        """Select provider evidence for a canonical authority instant.
 
         Args:
             at: Current authority timestamp.
 
         Returns:
-            Effective provider revision, or ``None`` for legacy v1 runs.
+            Effective provider revision.
 
         Raises:
             SimulationError: If canonical revision coverage is invalid.
         """
-        if not self._provider_revisions:
-            return None
         try:
             return select_provider_revision(self._provider_revisions, at=at)
         except (TypeError, ValueError) as error:
@@ -249,14 +251,12 @@ class EventDrivenExecutionEngine:
                 f"Provider order semantics rejected intent: {error}",
             ) from error
 
-    def _provider_allows_tick(
-        self, tick: Tick, revision: Mapping[str, object] | None
-    ) -> bool:
+    def _provider_allows_tick(self, tick: Tick, revision: Mapping[str, object]) -> bool:
         """Return whether effective provider session evidence admits a tick.
 
         Args:
             tick: Current authority tick.
-            revision: Effective provider revision, absent only for legacy v1.
+            revision: Effective provider revision.
 
         Returns:
             Whether provider-session processing may continue.
@@ -264,8 +264,6 @@ class EventDrivenExecutionEngine:
         Raises:
             SimulationError: If the provider session evidence is invalid.
         """
-        if revision is None:
-            return True
         try:
             return is_provider_session_open(revision, at=tick.timestamp)
         except (TypeError, ValueError) as error:
@@ -798,8 +796,7 @@ class EventDrivenExecutionEngine:
                     "SIM_ORDER_NOT_FOUND", "Pending order state is inconsistent"
                 )
             validate_intent_timing(intent.created_at, tick.timestamp)
-            if revision is not None:
-                self._validate_pending_provider_order(intent, tick, revision)
+            self._validate_pending_provider_order(intent, tick, revision)
             if tick.timestamp >= intent.valid_until:
                 receipt = self._receipt(intent, "cancelled", Decimal(0), None, tick)
                 self._orders[order_id] = receipt

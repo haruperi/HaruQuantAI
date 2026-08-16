@@ -139,6 +139,28 @@ def _profile() -> object:
     )
 
 
+def _provider_revision() -> dict[str, object]:
+    """Build complete provider evidence for the usage authority interval."""
+    return {
+        "complete_coverage": True,
+        "effective_from": NOW,
+        "effective_to": NOW + timedelta(days=1),
+        "payload": {
+            "trade_mode": "FULL",
+            "filling_modes": ("FOK",),
+            "execution_mode": "MARKET",
+            "directional_volume_limit": "100",
+            "point": "0.00001",
+            "stops_level_points": 0,
+            "freeze_level_points": 0,
+            "weekly_sessions": {"2": (("00:00", "23:59"),)},
+            "dated_exceptions": {},
+            "exception_coverage": ("2025-01-01",),
+            "exception_coverage_required": True,
+        },
+    }
+
+
 def _engine(tmp_path: Path, suffix: str) -> object:
     """Build execution engine."""
     store = SqliteSimulationStateStore(tmp_path / f"{suffix}.db", tmp_path / suffix)
@@ -172,7 +194,12 @@ def _engine(tmp_path: Path, suffix: str) -> object:
         ),
     )
     return create_simulation_handle(
-        "EventDrivenExecutionEngine", ledger, writer, _profile(), "v1"
+        "EventDrivenExecutionEngine",
+        ledger,
+        writer,
+        _profile(),
+        "v1",
+        (_provider_revision(),),
     )
 
 
@@ -224,7 +251,7 @@ def fr_sim_020() -> None:
     """
     FR-SIM-020: Stage 3 — Process canonical tick through EventDrivenExecutionEngine.
 
-    The system shall process one canonical tick at a time, enforce timing and state transitions, apply fills through the ledger, append journal events, maintain per-open-position maximum adverse and favourable excursion so that `mae` and `mfe` are observed rather than reconstructed, and retain immutable end-of-tick mark-to-market equity observations for portfolio measurement. Each tick evaluates every open position for a protective exit before pending orders are matched, closes triggered positions through the ledger, and records one `ClosedTradeRecord` per terminal close carrying the excursions observed during execution.
+    The system shall process one canonical tick at a time, require non-empty effective provider-revision history, enforce provider sessions and order semantics plus timing and state transitions, apply fills through the ledger, append journal events, maintain per-open-position maximum adverse and favourable excursion so that `mae` and `mfe` are observed rather than reconstructed, and retain immutable end-of-tick mark-to-market equity observations for portfolio measurement. Each tick evaluates every open position for a protective exit before pending orders are matched, closes triggered positions through the ledger, and records one `ClosedTradeRecord` per terminal close carrying the excursions observed during execution.
     """
     _header("Stage 3: Engine Execution - Execute Tick (FR-SIM-020)")
     with tempfile.TemporaryDirectory() as tmp_dir:

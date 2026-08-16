@@ -452,7 +452,9 @@ continuously cover the run interval and match its demo/live certification
 target. V2 configuration identity also covers execution-model, independent
 source/tick lineage, market-evidence class, point-in-time availability policy,
 complete initial authority state, and terminal-close policy. The V2-native
-async operation retains a synchronous bridge only outside an active event loop.
+async operation has no synchronous bridge, and execution-engine construction
+requires non-empty effective provider-revision history so provider session and
+order semantics cannot be bypassed.
 
 ### Agentic Runtime and Trust Boundaries
 

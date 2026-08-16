@@ -6,9 +6,10 @@
 
 Canonical single-asset and portfolio backtests now use one complete asynchronous request path, while fast research retains a separate explicitly non-canonical contract.
 
-#### Changed (1)
+#### Changed (2)
 
 - Removed the pre-release V1 canonical request and synchronous bridge, renamed the parity request and portfolio projection canonically, and migrated Optimization, Portfolio, API, tests, and usage evidence to async execution.
+- Removed the execution engine's empty provider-revision compatibility bypass; canonical engine construction now requires effective revision evidence and always enforces provider sessions and order semantics.
 
 ### Correct legacy three-route connection composition
 

@@ -282,8 +282,33 @@ def workflow_engine(root: Path, dataset: object) -> object:
     ledger = create_simulation_handle(
         "AccountLedger", Decimal(10_000), "USD", specification, costs
     )
+    provider_revision = {
+        "complete_coverage": True,
+        "effective_from": dataset.start,
+        "effective_to": dataset.end + timedelta(microseconds=1),
+        "payload": {
+            "trade_mode": "FULL",
+            "filling_modes": ("FOK", "IOC", "RETURN"),
+            "execution_mode": "MARKET",
+            "directional_volume_limit": "100",
+            "point": "0.00001",
+            "stops_level_points": 0,
+            "freeze_level_points": 0,
+            "weekly_sessions": {
+                str(day): (("00:00:00", "23:59:59.999999"),) for day in range(7)
+            },
+            "dated_exceptions": {},
+            "exception_coverage": (),
+            "exception_coverage_required": False,
+        },
+    }
     return create_simulation_handle(
-        "EventDrivenExecutionEngine", ledger, writer, execution_profile(), "v1"
+        "EventDrivenExecutionEngine",
+        ledger,
+        writer,
+        execution_profile(),
+        "v1",
+        (provider_revision,),
     )
 
 

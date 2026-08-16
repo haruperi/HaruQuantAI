@@ -35,7 +35,7 @@ def _value(response: object) -> object:
 def _engine(
     tmp_path: Path,
     suffix: str,
-    provider_revisions: Sequence[Mapping[str, object]] = (),
+    provider_revisions: Sequence[Mapping[str, object]] | None = None,
 ) -> EventDrivenExecutionEngine:
     """Build one isolated deterministic engine."""
     store = SqliteSimulationStateStore(tmp_path / f"{suffix}.db", tmp_path / suffix)
@@ -72,7 +72,10 @@ def _engine(
         participation_rate=Decimal(0),
         sessions=(SessionInterval(start_week_second=0, end_week_second=604_800),),
     )
-    return EventDrivenExecutionEngine(ledger, writer, profile, "v1", provider_revisions)
+    revisions = (
+        (_provider_revision(),) if provider_revisions is None else provider_revisions
+    )
+    return EventDrivenExecutionEngine(ledger, writer, profile, "v1", revisions)
 
 
 def _provider_revision(**payload_updates: object) -> Mapping[str, object]:
@@ -152,6 +155,13 @@ def test_execute_tick_is_deterministic(tmp_path: Path) -> None:
     first.submit_order(_intent())
     second.submit_order(_intent())
     assert _value(first.execute_tick(_tick())) == _value(second.execute_tick(_tick()))
+
+
+def test_engine_rejects_empty_provider_revision_history(tmp_path: Path) -> None:
+    """Fail closed when canonical provider evidence is absent."""
+    with pytest.raises(SimulationError, match="Provider revision evidence") as captured:
+        _engine(tmp_path, "missing-provider-revisions", ())
+    assert captured.value.code == "SIM_INVALID_CONFIG"
 
 
 def test_execute_tick_rejects_missing_order_state(tmp_path: Path) -> None:
@@ -295,7 +305,9 @@ def test_tick_outside_session_is_skipped_not_fatal(tmp_path: Path) -> None:
         participation_rate=Decimal(0),
         sessions=(SessionInterval(start_week_second=0, end_week_second=60),),
     )
-    engine = EventDrivenExecutionEngine(ledger, writer, profile, "v1")
+    engine = EventDrivenExecutionEngine(
+        ledger, writer, profile, "v1", (_provider_revision(),)
+    )
     engine.submit_order(_intent())
     assert _value(engine.execute_tick(_tick())) == ()
     assert not _value(engine.snapshot())["positions"]
