@@ -4246,6 +4246,25 @@ route-tagging semantics and confers no FX, crypto, or other asset-specific empir
 `Preserve Envelope v1's MT5-FX empirical scope.`,
 `Declare Envelope v2 as a multi-asset operational-contract scope without empirical transfer.`, and
 `Bind generated certificate manifests to the exact v2 asset scope.`
+Committed as `32ec359c`.
+
+**Collector blocker resolution: Completed — 2026-08-16.** Dry run 26 found that the existing
+credential-gated demo mutation test proves cleanup but cannot produce the complete paired,
+reproducible Part-2 evidence bundle; manually composing missing evidence would violate the
+no-invented-data rule. The bounded recommendation adds a directly executable collector whose
+provider path is inert under pytest and requires explicit dev/demo/BTCUSD authorization. It reads
+the encrypted system credential slot, verifies provider-reported demo classification and write
+permission, captures complete secret-free authority state plus interval histories, executes paired
+Simulation and MT5 far-limit submit/cancel operations, rejects foreign activity or incomplete
+cleanup, confines output beneath the generated artifact root, and writes and revalidates exactly
+nine deterministic members. Offline tests cover every safety boundary without a provider call.
+Evidence: `tests/simulator/integration/l5_certificate_collection.py:167`,
+`tests/simulator/integration/test_l5_certificate_collection.py:67`, and
+`tests/simulator/integration/test_l5_certificate_bundle.py:55`. Exact commit:
+`test(parity): add reproducible demo certificate collector` with body bullets
+`Build paired sim and MT5-demo operational evidence without serializing credentials.`,
+`Fail closed on unsafe environment, foreign activity, incomplete cleanup, or scope drift.`, and
+`Generate the exact deterministic certificate bundle for a separately approved run.`
 
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and

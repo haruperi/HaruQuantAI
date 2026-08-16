@@ -106,5 +106,15 @@ alpha-equivalent evidence from cold re-execution hashes identically.
 - Certificate bundle integrity:
   `test_l5_certificate_bundle.py::test_l5_certificate_bundle_schema_and_checksums_reproduce`
   / `::test_l5_certificate_bundle_rejects_tampered_evidence`.
+- Genuine collection support:
+  `tests/simulator/integration/l5_certificate_collection.py` is a directly executable,
+  separately authorized dev/demo program. It confines output beneath
+  `artifacts/sim_live_parity`, obtains credentials only from the encrypted system slot, requires
+  provider-reported demo classification, captures complete before/after authority and interval
+  history, exercises paired Simulation and MT5 pending-order submit/cancel lifecycles, fails on
+  foreign activity or incomplete cleanup, redacts account/server identity to digests, and writes
+  the exact validated nine-member bundle. Its offline safety evidence is
+  `tests/simulator/integration/test_l5_certificate_collection.py`; pytest never invokes the
+  provider path.
 - Usage: `tests/simulator/usage/features/18_parity.py`
   (`fr_sim_187`–`fr_sim_193`, `fr_sim_236`–`fr_sim_239`)
