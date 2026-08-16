@@ -25,7 +25,7 @@ from pydantic import ValidationError
 def test_unknown_envelope_version_fails_closed() -> None:
     """FR-SIM-236: an unknown envelope version is rejected, never approximated."""
     with pytest.raises(SimulationError) as raised:
-        get_parity_envelope("v2")
+        get_parity_envelope("v9")
     assert raised.value.code == "SIM_INVALID_CONFIG"
 
 
@@ -50,17 +50,32 @@ def test_envelope_v1_publishes_complete_matrix() -> None:
     assert envelope["ignored_fields"]
     assert envelope["invalidation_triggers"]
     assert Decimal(envelope["aggregate_economic_error_budget"]) == Decimal(0)
+    assert "operational_applicability" not in envelope
 
 
-def test_maturity_ladder_publishes_distinct_certificates() -> None:
-    """FR-SIM-193: the ladder publishes six rungs with distinct L5 certificates."""
+def test_envelope_v2_certifies_only_shared_mt5_operational_semantics() -> None:
+    """FR-SIM-236: v2 separates shared semantics from empirical claims."""
+    envelope = get_parity_envelope("v2")
+    applicability = envelope["operational_applicability"]
+    assert applicability["evidence_route"] == "demo"
+    assert applicability["provider_routes"] == ["demo", "live"]
+    assert "latency_distribution" in applicability["excluded_empirical_claims"]
+    invariant_ids = {invariant["invariant_id"] for invariant in envelope["invariants"]}
+    assert "order.lifecycle_state" in invariant_ids
+    assert "ledger.conservation" in invariant_ids
+    assert "latency.submission_to_ack" not in invariant_ids
+    assert "slippage.points" not in invariant_ids
+    assert "deal.execution_price" not in invariant_ids
+
+
+def test_maturity_ladder_publishes_one_operational_certificate() -> None:
+    """FR-SIM-193: the ladder publishes one bounded MT5 operational L5 rung."""
     ladder = get_parity_maturity_ladder()
     rungs = [rung["rung"] for rung in ladder]
-    assert rungs == ["L1", "L2", "L3", "L4", "L5-Demo", "L5-Live"]
-    demo = ladder[4]["claim"]
-    live = ladder[5]["claim"]
-    assert demo != live
-    assert "L5-Demo never implies L5-Live" in live
+    assert rungs == ["L1", "L2", "L3", "L4", "L5-MT5-Operational"]
+    claim = ladder[4]["claim"]
+    assert "shared by demo and live" in claim
+    assert "empirical market behavior remains route-scoped" in claim
 
 
 def _minimal_envelope(

@@ -1170,9 +1170,10 @@ Trading orchestration and differ only at an injected authority boundary. Claims 
 bounded by a versioned **Parity Envelope** (v1 targets MT5 FX only) and mature
 through a ladder: **L1** mutation-path convergence, **L2** evaluation-path
 convergence, **L3** account/order semantics, **L4** execution realism. No
-implementation phase may claim parity; only a completed **L5 certificate** may, and
-**L5-Demo** and **L5-Live** are distinct certificates — demo evidence certifies
-sim-vs-demo only and never implies live-account parity. A certificate is a revocable
+implementation phase may claim parity; only a completed **L5 certificate** may. The
+single **L5-MT5-Operational** certificate uses verified demo evidence for deterministic
+MT5 semantics shared by demo and live credential routes. It does not transfer empirical
+spread, latency, fill, liquidity, slippage, calibration, or performance claims. A certificate is a revocable
 lease that expires or invalidates when its bound build, contract, code/config
 identity, specification, source/tick model, calibration validity, or detected drift
 changes. Genuine bid/ask tick evidence is mandatory for path-sensitive parity;

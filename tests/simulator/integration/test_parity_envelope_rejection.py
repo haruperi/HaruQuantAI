@@ -24,13 +24,25 @@ def test_unregistered_ignored_field_is_rejected() -> None:
 
 
 def test_demo_evidence_cannot_claim_live_scope() -> None:
-    """Standing regression: demo evidence never claims the live envelope."""
+    """Standing regression: demo empirical evidence cannot be relabelled live."""
     left, right = paired_evidence()
     relabelled = {**left, "certificate_target": "live"}
     with pytest.raises(SimulationError) as raised:
         compare_parity_evidence(relabelled, right, _ENVELOPE)
     assert raised.value.code == "SIM_INVALID_CONFIG"
     assert "live" in raised.value.message
+
+
+def test_v2_operational_applicability_does_not_accept_live_evidence() -> None:
+    """V2 live applicability is semantic metadata, not evidence relabelling."""
+    left, right = paired_evidence()
+    relabelled = {**left, "certificate_target": "live"}
+    with pytest.raises(SimulationError):
+        compare_parity_evidence(
+            relabelled,
+            right,
+            get_parity_envelope("v2"),
+        )
 
 
 def test_certificate_invalidates_when_bound_identity_changes() -> None:

@@ -14,8 +14,8 @@ certificate may make the bounded claim recorded in its immutable envelope.
 All operations are exposed only through `app.services.simulator`:
 
 - `get_parity_envelope(version="v1")` — published envelope mapping.
-- `get_parity_maturity_ladder()` — the L1–L4 rungs plus distinct L5-Demo and
-  L5-Live certificates.
+- `get_parity_maturity_ladder()` — the L1–L4 rungs plus one bounded
+  L5-MT5-Operational certificate.
 - `normalize_parity_evidence(evidence, envelope)` — alpha-renamed,
   relationship-preserving normalized view with a canonical digest.
 - `compare_parity_evidence(left, right, envelope)` — per-invariant results,
@@ -36,6 +36,15 @@ tolerance (exact `Decimal` equality); the aggregate economic-error budget is
 coverage but are **excluded from the certified claim** (`not_certified`)
 until `FEAT-SIM-17` publishes calibrated artifacts — no threshold is ever
 invented. Expanding or tightening the matrix requires a new envelope version.
+
+## Envelope v2
+
+Uses verified MT5 demo operational traces as the evidence route and declares applicability to
+the `demo` and `live` provider routes only for their shared deterministic contracts: request and
+response shapes, lifecycle/linkage, event causality, risk/route gates, ledger conservation rules,
+and route-tagged persistence. It explicitly excludes spreads, latency, fills, liquidity, slippage,
+execution-price distributions, calibration transfer, and performance. Live evidence cannot be
+substituted into the demo evidence slot, and demo empirical artifacts cannot be relabelled live.
 
 ## Evidence mapping schema
 

@@ -130,9 +130,9 @@ scheduling, calibration, and journals.
   account/order semantics, and **L4** execution realism in order; only a completed
   **L5 certificate** recorded in an immutable **Parity Envelope** may make a bounded
   parity claim. The system-level ladder lives in `docs/PROJECT.md` §3.
-- **L5-Demo and L5-Live are distinct certificates.** Demo evidence certifies
-  sim-vs-demo only and never implies live-account parity; live scope stays locked
-  until owner-supplied sanitized live evidence passes the same mandatory gates.
+- **L5-MT5-Operational is one bounded certificate.** Verified demo evidence certifies
+  only the deterministic MT5 contracts shared by demo and live credential routes;
+  empirical observations and calibration remain route- and provenance-scoped.
 - **Engine comparability.** Simulation enters Trading through its public approved-request
   builder and public mutation verbs and never constructs `OrderIntent` directly; the
   deterministic execution scheduler (`FEAT-SIM-15`) owns the only simulated clock and
@@ -1921,7 +1921,7 @@ authoritative in `app/services/simulator/parity/README.md`.
 | Completed | `FR-SIM-190` | Execution identity and complete initial-authority-state hash bind into run identity; changes invalidate the certificate. | `compare_parity_evidence` | None | `SIM_INTEGRITY_FAILURE` | **Usage:** `::fr_sim_190()` **Integration:** `tests/simulator/integration/test_parity_envelope_rejection.py::test_certificate_invalidates_when_bound_identity_changes` |
 | Completed | `FR-SIM-191` | Approximation, fallback, staleness, and uncovered behavior are rejected for canonical parity comparison. | `compare_parity_evidence` | None | Fail closed | **Usage:** `::fr_sim_191()` **Unit:** `tests/simulator/unit/test_parity_compare.py` |
 | Completed | `FR-SIM-192` | Signed ledger conservation is asserted against the posting equation on every comparison. | `compare_parity_evidence` | None | Fail closed | **Usage:** `::fr_sim_192()` **Unit:** `tests/simulator/unit/test_parity_compare.py::test_ledger_conservation_violation_fails` |
-| Completed | `FR-SIM-193` | The L1–L5-Demo/L5-Live maturity ladder is published with distinct certificates. | `get_parity_maturity_ladder` | None | None | **Usage:** `::fr_sim_193()` **Unit:** `tests/simulator/unit/test_parity_envelope.py::test_maturity_ladder_publishes_distinct_certificates` |
+| Completed | `FR-SIM-193` | The L1–L5-MT5-Operational maturity ladder publishes one demo-evidenced certificate for only the deterministic MT5 semantics shared by demo/live credential routes. | `get_parity_maturity_ladder` | None | None | **Usage:** `::fr_sim_193()` **Unit:** `tests/simulator/unit/test_parity_envelope.py::test_maturity_ladder_publishes_one_operational_certificate` |
 | Completed | `FR-SIM-236` | The versioned envelope matrix (evidence class, certificate scope, thresholds, validity interval) is published. | `get_parity_envelope` | None | `SIM_INVALID_CONFIG` | **Usage:** `::fr_sim_236()` **Unit:** `tests/simulator/unit/test_parity_envelope.py` |
 | Completed | `FR-SIM-237` | Work outside the envelope is rejected and stale certificates invalidate. | `compare_parity_evidence` | None | `SIM_INVALID_CONFIG` | **Usage:** `::fr_sim_237()` **Integration:** `tests/simulator/integration/test_parity_envelope_rejection.py::test_demo_evidence_cannot_claim_live_scope` |
 | Completed | `FR-SIM-238` | Identifier cardinality, foreign keys, and causal edges are preserved under alpha-renaming. | `normalize_parity_evidence` | None | `SIM_INTEGRITY_FAILURE` | **Usage:** `::fr_sim_238()` **Integration:** `tests/simulator/integration/test_parity_relationships.py::test_relationship_mutation_fails_parity` |

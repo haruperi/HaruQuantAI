@@ -150,6 +150,29 @@ class ParityCertificateScope(_FrozenModel):
     evidence_sources: tuple[str, ...]
 
 
+class ParityOperationalApplicability(_FrozenModel):
+    """Shared MT5 semantics certified from an explicitly named evidence route.
+
+    This declaration never extends empirical observations across routes. It
+    identifies only the provider operations whose deterministic contracts are
+    shared by demo and live credential sessions.
+    """
+
+    evidence_route: Literal["demo"]
+    provider_routes: tuple[Literal["demo", "live"], ...]
+    certified_semantics: tuple[str, ...]
+    excluded_empirical_claims: tuple[str, ...]
+
+    @field_validator("provider_routes")
+    @classmethod
+    def _exact_provider_routes(
+        cls, value: tuple[Literal["demo", "live"], ...]
+    ) -> tuple[Literal["demo", "live"], ...]:
+        if value != ("demo", "live"):
+            raise ValueError("operational applicability must cover demo and live")
+        return value
+
+
 class ParityValidityInterval(_FrozenModel):
     """Certificate lease window; expiry invalidates every bound claim."""
 
@@ -187,7 +210,7 @@ class ParityInitialAuthorityState(_FrozenModel):
 
 
 class ParityEnvelopeModel(_FrozenModel):
-    """The immutable versioned Parity Envelope (v1 seeds MT5-FX demo scope)."""
+    """An immutable versioned Parity Envelope."""
 
     envelope_version: str
     certificate_scope: ParityCertificateScope
@@ -199,6 +222,7 @@ class ParityEnvelopeModel(_FrozenModel):
     aggregate_economic_error_budget: Decimal
     account_currency: str
     invalidation_triggers: tuple[str, ...]
+    operational_applicability: ParityOperationalApplicability | None = None
 
     @field_validator("aggregate_economic_error_budget", mode="before")
     @classmethod
@@ -756,6 +780,7 @@ __all__ = [
     "ParityInitialAuthorityState",
     "ParityInvariantKind",
     "ParityInvariantSpec",
+    "ParityOperationalApplicability",
     "ParityRouteGatePolicy",
     "ParityValidityInterval",
 ]

@@ -1,4 +1,4 @@
-# Implementation Plan · Sim ⇄ Live Parity — Revision 7
+# Implementation Plan · Sim ⇄ Live Parity — Revision 8
 
 **Purpose:** the single executable programme for converging simulation, demo, and live execution
 inside an explicitly certified parity envelope.
@@ -34,6 +34,9 @@ and exact standalone approval before files in that phase may change.
   requirements, usage functions, commands, documentation, commit messages, rollback, and completion
   evidence now live beside the corresponding design; the detached packet appendix and its navigation
   indirection are removed without changing R5/R6 behavior or scope.
+- **R8** records the owner's route and certification correction: `sim`, `demo`, and `live` are the
+  only explicit routes; one demo-evidenced L5 certificate covers only deterministic MT5 operational
+  semantics shared by demo and live; empirical claims never transfer between routes.
 
 ---
 
@@ -76,11 +79,27 @@ migration bytes, explicit forward-translation SQL, and tests proving rejection/t
 reverts this C1 commit and, for an already-applied database, requires a separately authorized
 forward corrective migration rather than rewriting ledger history.
 
+**C2 status: Completed — 2026-08-16.** Parity Envelope v1 remains byte/shape compatible while v2
+publishes the demo evidence route, demo/live operational applicability, admitted deterministic
+invariants, and explicit empirical exclusions at `app/services/simulator/parity/envelope.py:230` and
+`app/services/simulator/parity/contracts.py:153`. The maturity ladder now contains one bounded
+L5-MT5-Operational rung at `app/services/simulator/parity/envelope.py:328`. Unit and integration
+guards preserve v1, reject empirical relabelling, and prove that v2 excludes latency, slippage, and
+execution-price distributions at `tests/simulator/unit/test_parity_envelope.py:28`,
+`tests/simulator/integration/test_semantic_parity.py:27`, and
+`tests/simulator/integration/test_parity_envelope_rejection.py:36`. Verification: 36 focused parity
+tests passed; usage 18 passed; all 503 Simulator tests passed; Ruff format/check passed; mypy passed
+108 Simulator source files; and `git diff --check` passed. Automatic blocker resolution: genuine MT5
+demo credentials and an immutable operational holdout are unavailable, so no certificate bundle or
+empirical result was invented. Envelope v2 and its certificate schema are complete; actual issuance
+remains an evidence operation requiring a separately approved, provenance-verified demo package.
+Rollback reverts this C2 commit only; v1 remains the compatibility envelope throughout.
+
 ### 0.1 Goal and scope
 
 `sim`, `demo`, and `live` use the same Trading orchestration and differ only at an injected authority
 boundary. Simulation reproduces MT5 terminology, validation, state transitions, retcodes, accounting,
-and provider-shaped evidence for every operation admitted by the active **Parity Envelope v1**.
+and provider-shaped evidence for every operation admitted by a published parity envelope.
 `demo` means only the explicitly named non-production provider environment in that envelope; it is
 not a synonym for either Simulation or live-account execution.
 
@@ -89,7 +108,9 @@ over a versioned matrix of provider, environment, server/account mode, symbol sp
 order operation, execution model, market-evidence class, initial authority state, and evidence
 sources. Anything outside that matrix fails canonical eligibility; it is never silently approximated.
 
-Parity Envelope v1 targets MT5 FX only. cTrader, Binance, non-FX instruments, corporate actions,
+Parity Envelope v1 preserves the original MT5-FX empirical matrix. Parity Envelope v2 adds only the
+shared deterministic MT5 operational contract and explicit empirical exclusions. cTrader, Binance,
+non-FX instruments, corporate actions,
 exchange auctions, multi-account behavior, and any broker/account/build without admitted evidence are
 excluded. Parity certifies execution behavior, not strategy profitability or equality across different
 market histories.
@@ -105,8 +126,7 @@ the bounded claim recorded in its immutable envelope. Each earlier rung proves o
 | **L2 · Evaluation-path convergence** | Phase 15 | Indicators, Strategy, and Risk evaluate incrementally against evolving point-in-time state using the same Trading cycle |
 | **L3 · Account/order semantics** | Phases 16–18 | Verified account, margin, order, deal, protection, and position behavior matches within the admitted matrix |
 | **L4 · Execution realism** | Phases 19–20 | Every stochastic component is calibrated from eligible evidence or excluded from canonical execution |
-| **L5-Demo · Bounded demo certification** | Demo-scope programme completion | Every common gate and the mandatory independent MT5-demo differential gate pass for the published demo envelope |
-| **L5-Live · Bounded live certification** | Separate live-evidence extension | Every common gate and the mandatory independent sanitized live-account differential gate pass for the published live envelope; L5-Demo never implies L5-Live |
+| **L5-MT5-Operational · Shared operational certification** | Verified MT5-demo operational evidence | Every common gate and the admitted deterministic operational invariants pass; the certificate applies to semantics shared by MT5 demo and live credential routes, while all empirical behavior remains route-scoped |
 
 ### 0.3 Mandatory process rules
 
@@ -124,9 +144,9 @@ the bounded claim recorded in its immutable envelope. Each earlier rung proves o
 8. Resolved decisions become ordinary requirements in owning READMEs; no standalone ADR is created.
 9. Real integrations are demo/non-production only and require the separately approved integration
    operation. Default tests use bounded, sanitized, immutable fixtures.
-10. No repository operation collects production evidence. L5-Live consumes only owner-supplied,
-    sanitized, immutable evidence whose provenance and scope can be verified without a production
-    mutation or connection.
+10. No repository operation collects production evidence. L5-MT5-Operational consumes verified,
+    sanitized, immutable MT5-demo operational evidence and never extends spread, latency, fill,
+    liquidity, slippage, execution-price, calibration, profitability, or performance claims to live.
 
 ### 0.4 Standard validation
 
@@ -158,7 +178,7 @@ network access, mutable wall-clock time, or a real broker session.
 | **D8** | Capability parity is a published intersection that can tighten by envelope version | Missing MT5 operations are not falsely advertised or normalized away |
 | **D9** | MT5 sessions without a Python operation use Data-owned explicit revisioned weekly definitions | The Python adapter never claims to supply unavailable session evidence; intervals with unverified holiday, maintenance, or exceptional-closure overrides are excluded |
 | **D10** | Calibration distinguishes source availability, ingestion, training, effective, and evaluation time | Prospective canonical execution rejects future-trained or retrospectively backdated evidence |
-| **D11** | L5-Demo and L5-Live are separate certificates | Demo evidence may certify sim-vs-demo only; canonical live-account scope stays locked until owner-supplied sanitized live evidence passes the same mandatory gates |
+| **D11** | One L5-MT5-Operational certificate covers shared MT5 operational semantics | Verified demo evidence may certify deterministic request/response, lifecycle, relationship, event, gate, ledger, and route-tagging semantics for demo and live credential routes; empirical behavior and calibration remain route-scoped and require evidence from the route claimed |
 | **D12** | Market-evidence observability bounds every claim | Genuine bid/ask ticks are required for path-sensitive parity; a derived OHLC path is research-only unless the registered invariant is proven path-independent |
 | **D13** | Execution identity binds complete initial authority state | A certified run hashes balances, margin, positions, orders, protections, ownership, transaction watermark, and accrued costs; the account is exclusive or every foreign/manual event is replayed |
 | **D14** | Scheduler order and provider causal order are distinct | The scheduler remains deterministic, but provider-ambiguous races are compared as evidenced partial orders or excluded rather than assigned invented provider truth |
@@ -271,7 +291,7 @@ Update `docs/PROJECT.md` and `docs/ARCHITECTURE.md`:
   operations.
 - Brokers owns current provider translation, Data owns effective-dated history, and Simulation owns
   historical execution behavior.
-- Register the L1–L4 ladder, distinct L5-Demo/L5-Live certificates, and Parity Envelope v1 concept.
+- Register the L1–L4 ladder, one L5-MT5-Operational certificate, and Parity Envelope v1 concept.
 - Record the three failure classes: mirrored domain failures, fail-closed Simulation-integrity
   failures, and seeded/journalled infrastructure injections.
 - Record the MT5-FX v1 scope, market-observability boundary, initial-authority-state identity,
@@ -300,7 +320,7 @@ certification prerequisite, plus crash/reconciliation and in-flight kill-switch 
 
 ### 1e · Simulation README
 
-Register the maturity ladder, request v2, engine comparability, L5-Demo/L5-Live separation, evidence
+Register the maturity ladder, request v2, engine comparability, L5-MT5-Operational scope, evidence
 eligibility, certificate invalidation, and the four new features. Every pre-programme numerical
 result is marked superseded.
 
@@ -311,7 +331,8 @@ Fold `simulator-backtest-pipeline.md` and `trading-execution-pipeline.md` into o
 Keep `sim-live-parity-register.md` reference-only until the claimed certificate is complete; its
 dashboard count is not authoritative. Keep this implementation plan until the claimed L5 certificate
 is complete; an
-L5-Demo completion must not delete evidence that the L5-Live goal remains open.
+L5-MT5-Operational completion must not imply any live empirical, calibration, profitability, or
+performance claim.
 
 **Gate:** documentation cross-references and feature counts reconcile; no implementation file changes.
 
@@ -350,7 +371,7 @@ feature contracts, APIs, FR rows, modules, tests, and usage remain in owning REA
 **Commands:**
 
 ```powershell
-rg -n "Simulation.*Brokers|L5-Demo|L5-Live|Parity Envelope" docs/PROJECT.md docs/ARCHITECTURE.md
+rg -n "Simulation.*Brokers|L5-MT5-Operational|Parity Envelope" docs/PROJECT.md docs/ARCHITECTURE.md
 rg -n "FEAT-(BRK|DATA|TRD|SIM)-|FR-(BRK|DATA|TRD|SIM)-" app/services/brokers/README.md app/services/data/README.md app/services/trading/README.md app/services/simulator/README.md
 rg -n "^## \[Unreleased\]|^### (Added|Changed|Deprecated|Removed|Fixed|Security)" docs/CHANGELOG.md
 git diff --check -- docs/PROJECT.md docs/ARCHITECTURE.md docs/CHANGELOG.md app/services/brokers/README.md app/services/data/README.md app/services/trading/README.md app/services/simulator/README.md
@@ -358,7 +379,7 @@ git status --short
 ```
 
 **Gate and checklist:** authority precedence unchanged; acyclic dependency recorded; Brokers-current
-and Data-historical specification ownership recorded; L5-Demo/L5-Live scope recorded; three source
+and Data-historical specification ownership recorded; L5-MT5-Operational scope recorded; three source
 documents deleted only after their surviving content is located in authorities; every completed item
 ends with `path:line` evidence.
 
@@ -4098,14 +4119,15 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] Commit is authorized goal-wide; the exact Unit 20 message will be used below and its hash reconciled in the next plan record.
 - [x] Exact Unit 20 commit recorded: `e9477918` with the prescribed message.
 
-## Part 2 · Programme certification — L5-Demo and L5-Live
+## Part 2 · Programme certification — L5-MT5-Operational
 
 ### Certification execution specification
 
 **Outcome:** create a reproducible certificate bundle; this certification phase changes no production behavior.
 
-**Approval unit:** each certificate scope/run requires separate owner approval. **Prerequisite:** all
-phase gates for the declared maturity level. Demo approval never authorizes live collection or scope.
+**Approval unit:** each certificate run requires separate owner approval. **Prerequisite:** all phase
+gates for the declared maturity level. Demo approval never authorizes live collection, mutation, or
+an empirical live claim.
 
 **Certification preflight status (2026-08-16):** L1–L4 offline prerequisites are green, but no
 certificate is published. Correction plan `CERT-DR1Δ1` restored the twelve missing exact standing
@@ -4119,19 +4141,18 @@ Data 932 passed/2 opt-in external-provider skips; Trading 268 passed/1 inherited
 Simulator 500 passed; usage 18 passed; Ruff passed 1,050 files; mypy passed 442 source files; default
 suite passed 5,911 with 21 explicit external-provider skips and 87.61% coverage.
 
-**Active STOP — missing non-inventable certificate inputs:** no
-`artifacts/sim_live_parity` bundle root, certificate ID, immutable independent demo holdout, sanitized
-live-account holdout, complete certificate initial-authority/account-activity manifest, or exact
-certificate validity inputs exist in the repository. The environment confirms MT5 demo credentials
-and genuine MT5 usage are not configured. The bounded recommendation is for the owner to supply an
-immutable, sanitized, provenance-verified offline evidence package for each desired scope with its
-certificate ID, target build, exact provider/server/account-mode digest, admitted symbol/specification
-intervals, genuine tick and clock-edge coverage, exclusive-account proof or complete foreign/manual
-activity replay, authority-state/watermark, conformance/calibration partition hashes and validity,
-predeclared thresholds/error budget, and issued/valid-through interval. Demo and live packages remain
-separate; demo cannot substitute for live. No bundle, schema test, parity status, maturity claim,
-holdout evaluation, provider connection, or production mutation was created while these inputs are
-absent.
+**Certificate-input status:** no `artifacts/sim_live_parity` bundle root, certificate ID, immutable
+independent demo operational holdout, complete certificate initial-authority/account-activity
+manifest, or exact certificate validity inputs exist in the repository. The environment confirms MT5
+demo credentials and genuine MT5 usage are not configured. Envelope v2 therefore publishes the
+certificate contract and exclusions but does not invent or issue a certificate. Publication requires
+an immutable, sanitized, provenance-verified MT5-demo operational evidence package with its
+certificate ID, target build, provider/account-mode digest, admitted operational intervals,
+exclusive-account proof or complete foreign/manual activity replay, authority-state/watermark,
+predeclared operational invariants, and issued/valid-through interval. Live evidence is not required
+for shared MT5 operational semantics. Any later live empirical claim requires separate live-route
+evidence and is outside L5-MT5-Operational. No holdout evaluation, provider connection, production
+mutation, or empirical transfer is authorized while these inputs are absent.
 
 **Correction commit for `CERT-DR1Δ1`:** use exactly
 `test(parity): repair certification prerequisites` with body bullets
@@ -4167,12 +4188,12 @@ verifying its resolved path is under `artifacts/sim_live_parity`; revert README 
 Proposed documentation commit after successful owner-reviewed publication:
 `docs: publish bounded <demo|live> parity certificate`.
 
-### Parity Envelope v1 publication
+### Parity Envelope v2 publication
 
 Publish one immutable manifest containing:
 
-- certificate scope (`demo` or `live`), provider, environment, server/account mode, allowed evidence
-  source, and target build;
+- evidence route (`demo`), applicable provider routes (`demo` and `live`), provider, environment,
+  server/account mode, allowed evidence source, and target build;
 - admitted symbol/specification revisions and effective intervals;
 - MT5-FX scope and explicit provider, asset-class, corporate-action, auction, and multi-account
   exclusions;
@@ -4183,14 +4204,15 @@ Publish one immutable manifest containing:
 - capability intersection;
 - verified swap-posting, stop-out, causal-order, weekly-session, and dated-session-exception policies,
   or explicit exclusion of paths requiring them;
-- calculation/calibration identities, immutable calibration/validation/certification partition hashes,
-  predeclared metrics, tolerances, sample/coverage thresholds, and aggregate economic-error budgets;
+- predeclared exact operational invariants for request/response contracts, lifecycle and relationships,
+  events and causality, gates, ledger conservation, and route-tag persistence;
 - comparator/normalizer version, invariant classes, allowed route-specific fields, and ignored-field
   registry;
 - evidence fixture hashes, collection environment, and provenance;
 - issued-at, valid-through, and deterministic invalidation triggers for provider/build, contract,
   code/config identity, specification, source/tick model, calibration validity, and detected drift;
-- performance envelope.
+- explicit exclusions for every empirical spread, latency, fill, liquidity, slippage, execution-price,
+  calibration, profitability, and performance claim.
 
 No `Pending` item may be silently included. Expanding the matrix creates a new envelope version and
 requires the same gates. An invalidated or expired certificate confers no parity claim.
@@ -4243,28 +4265,21 @@ requires the same gates. An invalidated or expired certificate confers no parity
 - [ ] Default full suite, Ruff, mypy, usage programs, and 80% coverage floor pass without credentials.
 - [ ] `simulation_dispatch` is absent and legacy v1/sync deprecations match their declared windows.
 
-### L5-Demo acceptance
+### L5-MT5-Operational acceptance
 
-- [ ] All common acceptance criteria pass for one explicitly published MT5-demo envelope.
-- [ ] A mandatory independent demo certification holdout passes the predeclared differential gates.
+- [ ] All common operational acceptance criteria pass for one explicitly published Envelope v2.
+- [ ] A mandatory independent MT5-demo operational holdout passes the predeclared exact invariants.
 - [ ] Demo fixture collection, if needed, occurred only under a separately approved non-production
       operation; the default suite replays immutable sanitized evidence offline.
-- [ ] The certificate and every report state `sim-vs-demo`; no API, document, or release text calls it
-      live-account parity.
+- [ ] The manifest records `demo` as the evidence route and `demo` plus `live` as the provider routes
+      to which the shared deterministic MT5 operational semantics apply.
+- [ ] No server-name convention is used to infer route; the configured route remains authoritative.
+- [ ] No distributional invariant or empirical spread, latency, fill, liquidity, slippage,
+      execution-price, calibration, profitability, or performance claim appears in the certificate.
+- [ ] The standing demo-to-live guard continues to reject relabelled empirical evidence.
 
-L5-Demo completes only the demo-scoped programme. It does not close the L5-Live goal.
-
-### L5-Live acceptance
-
-- [ ] All common acceptance criteria pass for one explicitly published MT5 live-account envelope.
-- [ ] A mandatory independent sanitized live-account certification holdout passes the same
-      predeclared differential gates; demo evidence is not a substitute.
-- [ ] Evidence is owner-supplied, immutable, provenance-verified, and consumable without any repository
-      production connection or mutation.
-- [ ] Every live-specific execution, cost, liquidity, account, and session behavior claimed by the
-      envelope is covered; uncovered behavior remains excluded.
-
-Until these criteria pass, L5-Live remains open even when L5-Demo is valid.
+Completion closes L5-MT5-Operational only for the operational semantics and exclusions recorded in
+the immutable Envelope v2 certificate. It does not confer any live empirical claim.
 
 ### Standing regression guards
 
@@ -4307,7 +4322,7 @@ After all acceptance criteria for the claimed certificate pass:
 2. Reconcile feature counts: Brokers **thirteen**, Data **fourteen**, Simulation **eighteen**,
    Trading **eleven**.
 3. Delete `sim-live-parity-register.md` and this implementation plan only after their surviving
-   content, certificate scope, and any still-open L5-Live goal are folded into authorities.
+   content and certificate scope are folded into authorities.
 4. Remove resolved Open Decisions; preserve no decision-history ledger.
 5. Aggregate the Unreleased changelog only when the owner publishes a release.
 6. Remove v1 order contracts or the synchronous bridge only in a separately approved release after
@@ -4316,11 +4331,11 @@ After all acceptance criteria for the claimed certificate pass:
 ### Proposed release summary
 
 ```text
-feat(trading-simulator): certify bounded simulation and <demo|live> execution parity
+feat(trading-simulator): certify bounded shared mt5 operational parity
 
 - Converge Simulation and the named Trading authority route on one orchestration path.
 - Add versioned provider evidence, deterministic scheduling, local calculation conformance,
   incremental evaluation, complete order/deal accounting, and calibrated realism.
-- Publish an explicitly scoped Parity Envelope v1 certificate and fail canonical execution closed
-  outside verified or still-valid evidence.
+- Publish an explicitly scoped Parity Envelope v2 certificate for shared MT5 operational semantics;
+  keep every empirical claim route-scoped and fail closed outside verified, still-valid evidence.
 ```

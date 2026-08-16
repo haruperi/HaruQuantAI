@@ -272,10 +272,10 @@ def fr_sim_192() -> None:
 
 
 def fr_sim_193() -> None:
-    """FR-SIM-193: Simulator shall publish the L1 through L5-Demo/L5-Live maturity ladder with distinct certificates."""
+    """FR-SIM-193: Simulator shall publish one bounded L5 certificate for shared MT5 operational semantics."""
     ladder = get_parity_maturity_ladder()
     rungs = [rung["rung"] for rung in ladder]
-    assert rungs == ["L1", "L2", "L3", "L4", "L5-Demo", "L5-Live"]
+    assert rungs == ["L1", "L2", "L3", "L4", "L5-MT5-Operational"]
     print(f"SUCCESS: FR-SIM-193 ladder published -> {rungs}")
 
 

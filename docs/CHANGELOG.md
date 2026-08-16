@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Define shared MT5 operational certification
+
+Parity Envelope v2 separates deterministic MT5 operational semantics from route-specific empirical behavior.
+
+#### Changed (1)
+
+- Published one demo-evidenced L5-MT5-Operational contract for semantics shared by demo and live routes, with explicit exclusions preventing empirical evidence or calibration from transferring between routes.
+
 ### Standardize execution route terminology
 
 The system now names its three execution routes consistently as sim, demo, and live.
@@ -250,7 +258,7 @@ certifies through (`FEAT-SIM-18`, programme Phase 2).
 - Added the versioned Parity Envelope v1 (MT5-FX demo scope) with typed exact-structural, bounded-numeric, and distributional invariants, an explicit ignored-field registry, validity interval, aggregate economic-error budget, and invalidation triggers.
 - Added relationship-preserving evidence normalization that alpha-renames order/deal/position/receipt/event/posting identifiers in encounter order while preserving cardinality, foreign keys, causal edges, and evidenced partial orders.
 - Added the parity comparator with per-invariant tolerances, signed ledger-conservation checks, route-specific safety-gate policy comparison, and certificate scope/expiry/identity invalidation.
-- Added the published L1–L4 maturity ladder with distinct L5-Demo and L5-Live certificates.
+- Added the published L1–L4 maturity ladder and bounded L5-MT5-Operational certificate.
 
 ### Register the bounded sim⇄live parity architecture
 
@@ -261,7 +269,7 @@ failure taxonomy before any programme code changes.
 #### Changed (5)
 
 - Recorded the acyclic dependency direction `Simulation → Trading → Brokers` plus `Simulation → Brokers` (read/factory through the Brokers-owned simulation authority port) with Simulation as a read/factory consumer of Brokers and Trading remaining the only application-mutation caller.
-- Registered the L1–L4 maturity ladder with distinct expiring L5-Demo and L5-Live certificates, the versioned MT5-FX-only Parity Envelope v1 concept, the market-observability and initial-authority-state identity rules, and the certificate invalidation policy.
+- Registered the L1–L4 maturity ladder with an expiring L5-MT5-Operational certificate, the versioned MT5-FX-only Parity Envelope concept, the market-observability and initial-authority-state identity rules, and the certificate invalidation policy.
 - Recorded the three parity failure classes (mirrored domain failures, fail-closed Simulation-integrity failures, seeded/journalled infrastructure injections) and the Brokers-current versus Data-historical provider-specification evidence ownership.
 - Registered the four Pending Simulation features `FEAT-SIM-15`–`18` plus the declared Brokers, Data, and Trading parity-programme boundaries, the request v2/async operation with preserved v1/sync deprecation windows, and superseded all pre-programme numerical performance results.
 - Folded `sim-as-broker-adapter-decision.md`, `simulator-backtest-pipeline.md`, and `trading-execution-pipeline.md` into the owning authorities and deleted them; `sim-live-parity-register.md` and the implementation plan remain reference-only until the claimed certificate is complete.

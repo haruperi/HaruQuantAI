@@ -583,7 +583,7 @@ def get_parity_envelope(version: str = "v1") -> Mapping[str, object]:
 
 
 def get_parity_maturity_ladder() -> tuple[Mapping[str, object], ...]:
-    """Return the published L1 through L5-Demo/L5-Live maturity ladder."""
+    """Return the published L1 through L5-MT5-Operational maturity ladder."""
     operation = _operation(
         "app.services.simulator.parity", "get_parity_maturity_ladder"
     )

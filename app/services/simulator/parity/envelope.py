@@ -4,10 +4,10 @@ The envelope is the falsifiable certification matrix: provider, environment,
 server/account mode, symbol specification revisions, order operations,
 execution model, market-evidence class, initial authority state, and evidence
 sources (plan §0.1). Anything outside the matrix fails canonical eligibility;
-it is never silently approximated. Envelope v1 seeds the MT5-FX demo scope with
-exact (zero-tolerance) numeric rules; distributional invariants whose
-calibration evidence has not been published by `FEAT-SIM-17` are registered
-with ``awaiting_calibration_evidence`` and can never pass a comparison.
+it is never silently approximated. Envelope v1 preserves the original MT5-FX
+demo scope, including empirical invariants. Envelope v2 admits only shared MT5
+operational semantics evidenced on demo and explicitly excludes empirical
+transfer to live.
 """
 
 from __future__ import annotations
@@ -25,6 +25,7 @@ from app.services.simulator.parity.contracts import (
     ParityInitialAuthorityState,
     ParityInvariantKind,
     ParityInvariantSpec,
+    ParityOperationalApplicability,
     ParityRouteGatePolicy,
     ParityValidityInterval,
 )
@@ -226,7 +227,65 @@ _ENVELOPE_V1 = ParityEnvelopeModel(
     ),
 )
 
-_ENVELOPES: Mapping[str, ParityEnvelopeModel] = {"v1": _ENVELOPE_V1}
+_OPERATIONAL_INVARIANT_IDS = frozenset(
+    {
+        "gate.business_risk_sequence",
+        "gate.route_safety_policy",
+        "order.lifecycle_state",
+        "order.linkage_graph",
+        "receipt.status_classification",
+        "event.category_sequence",
+        "causal.evidenced_partial_order",
+        "ledger.conservation",
+    }
+)
+
+_ENVELOPE_V2 = _ENVELOPE_V1.model_copy(
+    update={
+        "envelope_version": "v2",
+        "certificate_scope": _ENVELOPE_V1.certificate_scope.model_copy(
+            update={
+                "market_evidence_class": "operational_contract_trace",
+                "evidence_sources": (
+                    "verified_mt5_demo_operational_trace",
+                    "paired_simulation_operational_trace",
+                ),
+            }
+        ),
+        "invariants": tuple(
+            invariant
+            for invariant in _ENVELOPE_V1.invariants
+            if invariant.invariant_id in _OPERATIONAL_INVARIANT_IDS
+        ),
+        "operational_applicability": ParityOperationalApplicability(
+            evidence_route="demo",
+            provider_routes=("demo", "live"),
+            certified_semantics=(
+                "order_request_and_response_contracts",
+                "order_lifecycle_and_relationships",
+                "event_categories_and_causality",
+                "risk_and_route_gate_semantics",
+                "ledger_conservation_and_accounting_rules",
+                "persistence_identity_and_route_tagging",
+            ),
+            excluded_empirical_claims=(
+                "spread_distribution",
+                "latency_distribution",
+                "fill_distribution",
+                "liquidity_distribution",
+                "slippage_distribution",
+                "execution_price_distribution",
+                "calibration_transfer",
+                "profitability_or_performance",
+            ),
+        ),
+    }
+)
+
+_ENVELOPES: Mapping[str, ParityEnvelopeModel] = {
+    "v1": _ENVELOPE_V1,
+    "v2": _ENVELOPE_V2,
+}
 
 _MATURITY_LADDER: tuple[dict[str, object], ...] = (
     {
@@ -266,22 +325,13 @@ _MATURITY_LADDER: tuple[dict[str, object], ...] = (
         ),
     },
     {
-        "rung": "L5-Demo",
-        "name": "bounded_demo_certification",
-        "delivered_by": "demo_scope_programme_completion",
+        "rung": "L5-MT5-Operational",
+        "name": "shared_mt5_operational_semantics",
+        "delivered_by": "verified_demo_operational_evidence",
         "claim": (
-            "Every common gate and the mandatory independent MT5-demo"
-            " differential gate pass for the published demo envelope"
-        ),
-    },
-    {
-        "rung": "L5-Live",
-        "name": "bounded_live_certification",
-        "delivered_by": "separate_live_evidence_extension",
-        "claim": (
-            "Every common gate and the mandatory independent sanitized"
-            " live-account differential gate pass for the published live"
-            " envelope; L5-Demo never implies L5-Live"
+            "Verified demo evidence certifies only the MT5 operational"
+            " semantics shared by demo and live credential routes; empirical"
+            " market behavior remains route-scoped"
         ),
     },
 )
@@ -296,15 +346,17 @@ def _envelope_mapping(envelope: ParityEnvelopeModel) -> dict[str, object]:
     Returns:
         Immutable-shaped public mapping (the caller wraps it read-only).
     """
-    return envelope.model_dump(mode="json")
+    mapping = envelope.model_dump(mode="json")
+    if envelope.operational_applicability is None:
+        mapping.pop("operational_applicability", None)
+    return mapping
 
 
 def get_parity_envelope(version: str = "v1") -> Mapping[str, object]:
     """Return the published Parity Envelope for one version.
 
     Args:
-        version: Envelope version identifier; ``v1`` is the only published
-            version of the MT5-FX demo matrix.
+        version: Published envelope version identifier.
 
     Returns:
         Read-only envelope mapping containing certificate scope, invariants,
@@ -350,7 +402,7 @@ def load_parity_envelope(version: str = "v1") -> ParityEnvelopeModel:
 
 
 def get_parity_maturity_ladder() -> tuple[Mapping[str, object], ...]:
-    """Return the published L1 through L5-Demo/L5-Live maturity ladder.
+    """Return the published L1 through L5 MT5-operational maturity ladder.
 
     Returns:
         Tuple of read-only rung mappings. No implementation phase may claim

@@ -27,6 +27,18 @@ def test_paired_semantic_evidence_passes_envelope() -> None:
     assert "ledger.conservation" in invariant_ids
 
 
+def test_demo_evidence_certifies_v2_shared_operational_semantics_only() -> None:
+    """Demo traces may pass v2 without creating an empirical live claim."""
+    left, right = paired_evidence()
+    result = compare_parity_evidence(left, right, get_parity_envelope("v2"))
+    assert result["passed"] is True, result["failures"]
+    assert result["envelope_version"] == "v2"
+    invariant_ids = {invariant["invariant_id"] for invariant in result["invariants"]}
+    assert "order.lifecycle_state" in invariant_ids
+    assert "latency.submission_to_ack" not in invariant_ids
+    assert "slippage.points" not in invariant_ids
+
+
 def test_route_safety_gates_compared_against_declared_policy() -> None:
     """Route-specific safety gates must match their declared route policy."""
     left, right = paired_evidence()
