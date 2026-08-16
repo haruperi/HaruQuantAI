@@ -56,6 +56,10 @@ def test_envelope_v1_publishes_complete_matrix() -> None:
 def test_envelope_v2_certifies_only_shared_mt5_operational_semantics() -> None:
     """FR-SIM-236: v2 separates shared semantics from empirical claims."""
     envelope = get_parity_envelope("v2")
+    assert (
+        envelope["certificate_scope"]["asset_class"]
+        == "MULTI_ASSET_OPERATIONAL_CONTRACT"
+    )
     applicability = envelope["operational_applicability"]
     assert applicability["evidence_route"] == "demo"
     assert applicability["provider_routes"] == ["demo", "live"]

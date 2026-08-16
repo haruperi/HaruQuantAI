@@ -4231,6 +4231,21 @@ remain fail-closed. Evidence:
 `Preserve Envelope v1 comparison behavior while narrowing v2 to declared operational views.`,
 `Exclude empirical time, fill, price, quantity, profit, and latency observations from v2 structural invariants.`,
 and `Prove v2 still rejects lifecycle, classification, linkage, and causal mutations.`
+Committed as `275cf071`.
+
+**Asset-scope blocker resolution: Completed — 2026-08-16.** Dry run 25 found that Envelope v2
+inherited v1's `FX` asset class even though its certified MT5 provider contracts are asset-neutral
+and the approved Sunday demo collection must use BTCUSD. The bounded recommendation preserves v1's
+MT5-FX empirical scope and declares v2 as `MULTI_ASSET_OPERATIONAL_CONTRACT`; this permits an admitted
+symbol to evidence only request/response, lifecycle, relationship, event, gate, ledger, and
+route-tagging semantics and confers no FX, crypto, or other asset-specific empirical claim. Evidence:
+`app/services/simulator/parity/envelope.py:248`,
+`tests/simulator/unit/test_parity_envelope.py:61`, and
+`tests/simulator/integration/test_l5_certificate_bundle.py:90`. Exact commit:
+`fix(simulator): make operational certificate asset-neutral` with body bullets
+`Preserve Envelope v1's MT5-FX empirical scope.`,
+`Declare Envelope v2 as a multi-asset operational-contract scope without empirical transfer.`, and
+`Bind generated certificate manifests to the exact v2 asset scope.`
 
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
@@ -4258,8 +4273,8 @@ Publish one immutable manifest containing:
 - evidence route (`demo`), applicable provider routes (`demo` and `live`), provider, environment,
   server/account mode, allowed evidence source, and target build;
 - admitted symbol/specification revisions and effective intervals;
-- MT5-FX scope and explicit provider, asset-class, corporate-action, auction, and multi-account
-  exclusions;
+- asset-neutral MT5 operational-contract scope and explicit provider, asset-specific empirical,
+  corporate-action, auction, and multi-account exclusions;
 - market-evidence class, tick model/resolution, bid/ask and depth availability, and clock-edge coverage;
 - complete initial-authority-state hash, account exclusivity policy or foreign/manual activity replay
   coverage, and last reconciled transaction/deal watermark;

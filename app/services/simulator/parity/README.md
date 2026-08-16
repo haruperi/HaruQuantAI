@@ -45,6 +45,9 @@ response shapes, lifecycle/linkage, event causality, risk/route gates, ledger co
 and route-tagged persistence. It explicitly excludes spreads, latency, fills, liquidity, slippage,
 execution-price distributions, calibration transfer, and performance. Live evidence cannot be
 substituted into the demo evidence slot, and demo empirical artifacts cannot be relabelled live.
+Its `MULTI_ASSET_OPERATIONAL_CONTRACT` asset scope permits an admitted MT5 symbol to evidence only
+these asset-neutral provider contracts. It does not transfer FX, crypto, or other asset-specific
+market or execution behavior. Envelope v1 remains the MT5-FX empirical matrix.
 The v2 comparator projects receipts to requested quantity, status, response classification,
 retry safety, and reconciliation requirements; events to their category sequence; and
 order/deal/position evidence to identifier topology plus causal edges. Empirical quantities,

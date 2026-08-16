@@ -87,10 +87,16 @@ def _has_sensitive_key(value: object) -> bool:
     return False
 
 
-def _validate_manifest(manifest: Mapping[str, object], applicability: object) -> None:
+def _validate_manifest(
+    manifest: Mapping[str, object], envelope: Mapping[str, object]
+) -> None:
     """Validate manifest identity, applicability, and exclusions."""
+    applicability = envelope.get("operational_applicability")
+    scope = envelope.get("certificate_scope")
     if not isinstance(applicability, Mapping):
         raise TypeError("Envelope v2 operational applicability is malformed")
+    if not isinstance(scope, Mapping):
+        raise TypeError("Envelope v2 certificate scope is malformed")
     expected = {
         "schema_version": "l5-mt5-operational-certificate.v1",
         "envelope_version": "v2",
@@ -98,6 +104,7 @@ def _validate_manifest(manifest: Mapping[str, object], applicability: object) ->
         "provider_routes": applicability["provider_routes"],
         "certified_semantics": applicability["certified_semantics"],
         "excluded_empirical_claims": applicability["excluded_empirical_claims"],
+        "asset_class": scope["asset_class"],
         "status": "valid",
     }
     if any(manifest.get(key) != value for key, value in expected.items()):
@@ -170,9 +177,7 @@ def validate_l5_certificate_bundle(bundle: Path) -> None:
     if members != _BUNDLE_FILES:
         raise ValueError("certificate bundle members are incomplete or unexpected")
     envelope = get_parity_envelope("v2")
-    _validate_manifest(
-        _json(bundle / "manifest.json"), envelope["operational_applicability"]
-    )
+    _validate_manifest(_json(bundle / "manifest.json"), envelope)
     _validate_evidence(bundle, envelope)
     _validate_environment(bundle)
     _validate_checksums(bundle)
@@ -225,6 +230,7 @@ def _synthetic_schema_fixture(bundle: Path) -> None:
             "provider_routes": applicability["provider_routes"],
             "certified_semantics": applicability["certified_semantics"],
             "excluded_empirical_claims": applicability["excluded_empirical_claims"],
+            "asset_class": envelope["certificate_scope"]["asset_class"],
             "status": "valid",
             "test_fixture_only": True,
         },

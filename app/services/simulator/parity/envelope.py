@@ -245,6 +245,7 @@ _ENVELOPE_V2 = _ENVELOPE_V1.model_copy(
         "envelope_version": "v2",
         "certificate_scope": _ENVELOPE_V1.certificate_scope.model_copy(
             update={
+                "asset_class": "MULTI_ASSET_OPERATIONAL_CONTRACT",
                 "market_evidence_class": "operational_contract_trace",
                 "evidence_sources": (
                     "verified_mt5_demo_operational_trace",
