@@ -183,6 +183,9 @@ def _parse_snapshot(payload: Mapping[str, object]) -> Mapping[str, object]:
 def _parse_symbols_applied(payload: Mapping[str, object]) -> Mapping[str, object]:
     """Validate one EA acknowledgment of a complete desired symbol set.
 
+    Args:
+        payload: Decoded protocol payload.
+
     Returns:
         Immutable normalized acknowledgment.
 
@@ -246,6 +249,10 @@ def _parse_heartbeat(payload: Mapping[str, object]) -> Mapping[str, object]:
 
 def _symbols(value: object, *, allow_empty: bool) -> tuple[str, ...]:
     """Validate one bounded unique symbol array.
+
+    Args:
+        value: Raw decoded symbol array.
+        allow_empty: Whether an empty array is valid.
 
     Returns:
         Normalized symbol tuple.

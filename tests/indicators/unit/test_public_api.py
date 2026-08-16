@@ -75,6 +75,7 @@ _EXPECTED_ROOT_ALL = (
     "pivots",
     "price_velocity",
     "price_volume_distribution",
+    "project_market_overlay",
     "project_structural_levels",
     "rectangle",
     "rogers_satchell_volatility",

@@ -131,7 +131,7 @@ def test_fr_sim_136_hashes_source_and_ticks_independently() -> None:
     assert first.market_evidence_class == "genuine_bid_ask_ticks"
 
 
-def test_derived_bar_path_is_rejected_for_path_sensitive_parity() -> None:
+def test_path_sensitive_parity_requires_genuine_ticks() -> None:
     """Derived OHLC paths cannot certify path-dependent execution behavior."""
     result = _validate(source_dataset(), tick_dataset(model="ohlc_m1"))
     assert result.status == "error"

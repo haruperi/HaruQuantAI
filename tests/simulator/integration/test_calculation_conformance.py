@@ -25,7 +25,7 @@ def artifact(actual: str = "100.00") -> dict[str, object]:
     return {**material, "checksum": hashlib.sha256(payload.encode()).hexdigest()}
 
 
-def test_offline_conformance_passes_exact_fixture_without_network() -> None:
+def test_all_admitted_provider_fixtures_match_exactly() -> None:
     """Exact fixture equality produces a model/artifact-bound pass."""
     loaded = unwrap_simulation_response(
         load_calculation_conformance_artifact(artifact()),

@@ -45,6 +45,7 @@ def _stage(number: int) -> None:
 
 def main() -> None:
     """Execute discovery, metadata, and availability."""
+    print("INPUT BOUNDARY — exact MT5 provider identity and bounded symbol query")
     print(f"{WORKFLOW_ID} — Symbol Discovery, Metadata, Availability")
     with tempfile.TemporaryDirectory(prefix="wf-data-009-") as directory:
         root = Path(directory)

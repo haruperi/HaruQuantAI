@@ -79,6 +79,7 @@ class _StreamHub:
 
         Returns:
             The result produced by the operation.
+
         """
         return (
             self.request.source_id,
@@ -155,6 +156,9 @@ class _StreamHub:
 
         Returns:
             The result produced by the operation.
+
+        Raises:
+            DataError: If the requested stream mode is unsupported.
         """
         if self.request.mode == "ticks":
             return iter_mt5_ticks(

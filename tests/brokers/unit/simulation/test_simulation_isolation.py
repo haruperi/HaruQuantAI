@@ -15,7 +15,7 @@ def test_simulation_adapter_import_graph_is_acyclic() -> None:
         ast.parse(source)
 
 
-def test_simulation_config_requires_no_credentials_or_endpoint() -> None:
+def test_simulation_adapter_opens_no_socket() -> None:
     """The in-process channel is configured without transport material."""
     config = build_broker_connection_config("sim", "simulation")
     assert config.credentials is None

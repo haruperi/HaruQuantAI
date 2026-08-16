@@ -28,7 +28,7 @@ def test_dated_closure_overrides_weekly_session() -> None:
     assert not is_provider_session_open(_revision(payload), at=NOW)
 
 
-def test_missing_exception_evidence_is_noncanonical() -> None:
+def test_missing_dated_session_exception_blocks_canonical_execution() -> None:
     """A possible exceptional interval without dated proof fails closed."""
     payload = {
         "weekly_sessions": {"0": (("09:00", "17:00"),)},

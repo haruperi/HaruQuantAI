@@ -12,7 +12,7 @@ from app.services.simulator import (
 )
 
 
-def test_cold_restore_is_byte_equivalent_and_conserved() -> None:
+def test_signed_ledger_conserves_after_every_posting() -> None:
     """Every restored posting and total is identical to the source state."""
     ledger = create_transaction_ledger(Decimal(100), "USD")
     for sequence, (kind, amount) in enumerate(

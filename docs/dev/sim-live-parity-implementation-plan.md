@@ -4059,6 +4059,7 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] Owning-domain behavior passed 500/500 with `--no-cov`; the literal coverage-enabled gate also passed 500/500 behaviors and exited 1 solely because repository-wide coverage was 30.13%, below the global 80% floor.
 - [x] README, module READMEs, changelog, request/report/checklist contracts, public surface, and plan evidence reconcile. Rollback removes the two realism modules and seven exact tests, reverts consumers/usages/docs/identity fields, clears generated caches, and reruns the literal Unit 20 commands plus public/request/calibration/parity regressions.
 - [x] Commit is authorized goal-wide; the exact Unit 20 message will be used below and its hash reconciled in the next plan record.
+- [x] Exact Unit 20 commit recorded: `e9477918` with the prescribed message.
 
 ## Part 2 · Programme certification — L5-Demo and L5-Live
 
@@ -4068,6 +4069,38 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 **Approval unit:** each certificate scope/run requires separate owner approval. **Prerequisite:** all
 phase gates for the declared maturity level. Demo approval never authorizes live collection or scope.
+
+**Certification preflight status (2026-08-16):** L1–L4 offline prerequisites are green, but no
+certificate is published. Correction plan `CERT-DR1Δ1` restored the twelve missing exact standing
+guard names without weakening their assertions; all 27 prescribed nodes pass as 30 parametrized
+cases. Automatically resolved repository blockers added missing Brokers/Data Google-style docstring
+sections, corrected stale MT5 mutation mock sequencing, restored Data workflow input-boundary evidence,
+reconciled the already-registered Indicators `FR-INDI-085` API/usage, updated Strategy's built-in
+dependency identity to the current `uv.lock`, admitted explicit versioned v1/v2 system-contract rows,
+and reconciled the 238-feature inventory. Evidence: Brokers 683 passed/3 external-credential skips;
+Data 932 passed/2 opt-in external-provider skips; Trading 268 passed/1 inherited credential skip;
+Simulator 500 passed; usage 18 passed; Ruff passed 1,050 files; mypy passed 442 source files; default
+suite passed 5,911 with 21 explicit external-provider skips and 87.61% coverage.
+
+**Active STOP — missing non-inventable certificate inputs:** no
+`artifacts/sim_live_parity` bundle root, certificate ID, immutable independent demo holdout, sanitized
+live-account holdout, complete certificate initial-authority/account-activity manifest, or exact
+certificate validity inputs exist in the repository. The environment confirms MT5 demo credentials
+and genuine MT5 usage are not configured. The bounded recommendation is for the owner to supply an
+immutable, sanitized, provenance-verified offline evidence package for each desired scope with its
+certificate ID, target build, exact provider/server/account-mode digest, admitted symbol/specification
+intervals, genuine tick and clock-edge coverage, exclusive-account proof or complete foreign/manual
+activity replay, authority-state/watermark, conformance/calibration partition hashes and validity,
+predeclared thresholds/error budget, and issued/valid-through interval. Demo and live packages remain
+separate; demo cannot substitute for live. No bundle, schema test, parity status, maturity claim,
+holdout evaluation, provider connection, or production mutation was created while these inputs are
+absent.
+
+**Correction commit for `CERT-DR1Δ1`:** use exactly
+`test(parity): repair certification prerequisites` with body bullets
+`Restore every prescribed standing regression node without weakening coverage.`,
+`Reconcile offline documentation, workflow, lock, contract, and feature gates.`, and
+`Pass all owning-domain gates and the 5,932-test default collection at 87.61% coverage.`
 
 **Read first:** Part 2; envelope v1; parity feature README; every phase gate/evidence row; applicable
 calibration/conformance artifacts; complete initial-authority-state manifest; environment safety rules.

@@ -258,7 +258,7 @@ def test_modify_position_coverage() -> None:
         mock_send = _make_mt5_send_res(10009)
         mock_pos = _make_mt5_pos(54321)
 
-        provider._transport.call.side_effect = [mock_send, (mock_pos,)]
+        provider._transport.call.side_effect = [(mock_pos,), mock_send, (mock_pos,)]
 
         req = BrokerPositionModificationRequest(
             position_id="54321",
@@ -269,19 +269,18 @@ def test_modify_position_coverage() -> None:
         assert res.error is None
 
         # Test None response
-        provider._transport.call.side_effect = None
-        provider._transport.call.return_value = None
+        provider._transport.call.side_effect = [(mock_pos,), None]
         res_none = await provider.modify_position(req)
         assert res_none.error is not None
 
         # Test rejection response (retcode != 10009)
         mock_rej = _make_mt5_send_res(10013)  # Invalid request
-        provider._transport.call.return_value = mock_rej
+        provider._transport.call.side_effect = [(mock_pos,), mock_rej]
         res_rej = await provider.modify_position(req)
         assert res_rej.error is not None
 
         # Test missing position response
-        provider._transport.call.side_effect = [mock_send, ()]
+        provider._transport.call.side_effect = [()]
         res_empty = await provider.modify_position(req)
         assert res_empty.error is not None
 
@@ -296,7 +295,7 @@ def test_close_position_coverage() -> None:
         mock_pos = _make_mt5_pos(54321, pos_type=0)
         mock_send = _make_mt5_send_res(10009)
 
-        provider._transport.call.side_effect = [(mock_pos,), mock_send]
+        provider._transport.call.side_effect = [(mock_pos,), None, None, mock_send]
 
         req = BrokerPositionCloseRequest(
             position_id="54321",

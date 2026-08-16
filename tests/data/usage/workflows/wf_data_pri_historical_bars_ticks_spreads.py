@@ -75,6 +75,7 @@ def _stage(number: int) -> None:
 
 def main() -> None:  # noqa: PLR0915
     """Execute the documented historical retrieval workflow."""
+    print("INPUT BOUNDARY — bounded EURUSD UTC requests and typed Data settings")
     print(f"{WORKFLOW_ID} — Historical Bars, Ticks, and Spreads")
     with tempfile.TemporaryDirectory(prefix="wf-data-pri-") as directory:
         raw_dir = Path(directory) / "data" / "raw"

@@ -136,6 +136,9 @@ def _decimal(value: object, name: str) -> Decimal:
 def _decimal_or_none(value: object) -> Decimal | None:
     """Convert one optional raw numeric field to a Decimal when present.
 
+    Args:
+        value: Raw optional provider value.
+
     Returns:
         The parsed finite Decimal, or None when the value is absent.
     """
@@ -207,6 +210,10 @@ def _index_name(value: int, table: tuple[str, ...], name: str, unknown: str) -> 
 
 def _flag_names(mask: int, flags: tuple[tuple[int, str], ...]) -> tuple[str, ...]:
     """Expand one verified provider bit mask into sorted mode names.
+
+    Args:
+        mask: Provider bit mask.
+        flags: Verified bit-to-name pairs.
 
     Returns:
         Sorted tuple of admitted mode names for the set bits.
@@ -388,6 +395,9 @@ def _convert_field(name: str, raw: object) -> object:
 def _optional_str(value: object) -> str | None:
     """Return one optional dumped value as text.
 
+    Args:
+        value: Optional dumped value.
+
     Returns:
         The stringified value, or None when absent.
     """
@@ -396,6 +406,9 @@ def _optional_str(value: object) -> str | None:
 
 def _convert_permissions(raw: object) -> ProviderAccountPermissions:
     """Convert one dumped account-permission block.
+
+    Args:
+        raw: Raw dumped permission block.
 
     Returns:
         The validated permission block.
@@ -431,6 +444,9 @@ def _convert_permissions(raw: object) -> ProviderAccountPermissions:
 
 def _convert_cost_evidence(raw: object) -> ProviderCostEvidenceReference | None:
     """Convert one dumped cost-evidence reference.
+
+    Args:
+        raw: Raw dumped evidence reference.
 
     Returns:
         The typed reference, or None when the dump carried no evidence.

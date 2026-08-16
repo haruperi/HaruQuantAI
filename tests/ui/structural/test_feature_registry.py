@@ -198,10 +198,10 @@ def test_repository_feature_inventory_is_reconciled() -> None:
         statuses.extend(status for status, _feature_id in rows)
         feature_ids.extend(feature_id for _status, feature_id in rows)
 
-    assert len(feature_ids) == len(set(feature_ids)) == 232
-    assert statuses.count("Completed") == 220
+    assert len(feature_ids) == len(set(feature_ids)) == 238
+    assert statuses.count("Completed") == 226
     assert statuses.count("Pending") == 12
     assert statuses.count("Partial") == 0
     project = _PROJECT_README.read_text(encoding="utf-8")
-    assert "232 registered application features" in project
-    assert "(94.83%)" in project
+    assert "238 registered application features" in project
+    assert "(94.96%)" in project

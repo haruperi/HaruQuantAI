@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
 logger = get_logger(__name__)
 
-_DEPENDENCY_HASH = "8ace32aa212299c27a9b67c9fc9b4c5f9a1fcbdc426504e88341c2766a200d60"  # pragma: allowlist secret  # noqa: E501
+_DEPENDENCY_HASH = "195aaf3639445f171bdd4750734edd197d71b4d7819a9f4c181329521eafb48b"  # pragma: allowlist secret  # noqa: E501
 
 
 class _BuiltinStrategyDescriptor(BaseModel):

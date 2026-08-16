@@ -228,6 +228,18 @@ def fr_indi_049() -> None:
     print_requirement_evidence("FR-INDI-049", actual_data=values)
 
 
+def fr_indi_085() -> None:
+    """FR-INDI-085: Project prior-settled volatility and market overlays."""
+    dataset = _dataset()
+    latest = dataset.records[-1]
+    projection = project_market_overlay(
+        dataset,
+        pip_size=0.0001,
+        last_price=float(latest.close),
+    )
+    print_requirement_evidence("FR-INDI-085", actual_data=projection)
+
+
 def main() -> None:
     """Run every volatility requirement demonstration."""
     _feature_header(
@@ -263,14 +275,7 @@ def main() -> None:
     fr_indi_047()
     fr_indi_048()
     fr_indi_049()
-    dataset = _dataset()
-    latest = dataset.records[-1]
-    projection = project_market_overlay(
-        dataset,
-        pip_size=0.0001,
-        last_price=float(latest.close),
-    )
-    print_requirement_evidence("FR-INDI-085", actual_data=projection)
+    fr_indi_085()
     speed = measure_market_speed(
         {
             "momentum": 1.0,

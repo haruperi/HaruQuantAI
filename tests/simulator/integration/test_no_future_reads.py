@@ -7,7 +7,7 @@ from tests.simulator.unit.test_timeline import _dataset
 
 
 @pytest.mark.anyio
-async def test_cycle_receives_no_future_records() -> None:
+async def test_no_dependency_returns_future_available_evidence() -> None:
     """The owner composition receives a physically bounded Data contract."""
     dataset = _dataset()
 

@@ -19,7 +19,7 @@ def _snapshot() -> dict[str, object]:
     }
 
 
-def test_same_complete_snapshot_initializes_both_projection_identities() -> None:
+def test_initial_authority_hash_binds_both_routes() -> None:
     """The exact request-bound snapshot is returned without reconstruction."""
     snapshot = _snapshot()
     validated = validate_initial_authority_state(

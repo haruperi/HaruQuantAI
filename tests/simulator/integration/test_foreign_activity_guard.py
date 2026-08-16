@@ -36,7 +36,7 @@ def test_nonexclusive_interval_accepts_complete_ordered_replay() -> None:
         ),
     ],
 )
-def test_unknown_missing_gapped_or_conflicting_activity_fails_closed(
+def test_missing_external_activity_blocks_certification(
     ownership: object, activity: tuple[dict[str, object], ...]
 ) -> None:
     """Incomplete activity evidence never enters the parity envelope."""

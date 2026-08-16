@@ -67,6 +67,15 @@ class _SnapshotGateway:
     ) -> None:
         """Start the configured local listener once.
 
+        Args:
+            host: Loopback listener host.
+            port: Bounded listener port.
+            auth_token: In-memory producer authentication token.
+            source_id: Expected producer identity.
+            interval_seconds: Expected snapshot interval.
+            symbols: Initial exact provider-symbol set.
+            log_snapshots: Whether to log bounded snapshot counts.
+
         Raises:
             ValueError: If configured host or port is invalid.
             OSError: If the listener cannot bind.
@@ -272,6 +281,10 @@ class _SnapshotGateway:
     ) -> None:
         """Validate ordering and fan out one acknowledged snapshot.
 
+        Args:
+            snapshot: Validated snapshot protocol frame.
+            hello: Authenticated producer declaration.
+
         Raises:
             ValueError: If revision, symbols, or ordering are invalid.
         """
@@ -321,6 +334,9 @@ class _SnapshotGateway:
     async def acquire_symbols(self, symbols: tuple[str, ...]) -> str:
         """Register one consumer and wait for the EA to apply its symbols.
 
+        Args:
+            symbols: Exact unique provider symbols demanded by the consumer.
+
         Returns:
             Opaque consumer identifier.
 
@@ -367,6 +383,9 @@ class _SnapshotGateway:
     def _require_applied(self, symbols: tuple[str, ...]) -> None:
         """Require the acknowledged set to cover one consumer demand.
 
+        Args:
+            symbols: Exact symbols that must be acknowledged.
+
         Raises:
             ValueError: If the EA rejected any demanded symbol.
         """
@@ -374,7 +393,11 @@ class _SnapshotGateway:
             raise ValueError("MT5 rejected one or more demanded symbols")
 
     async def release_symbols(self, consumer_id: str) -> None:
-        """Release one consumer after a bounded anti-churn grace period."""
+        """Release one consumer after a bounded anti-churn grace period.
+
+        Args:
+            consumer_id: Opaque identifier returned by ``acquire_symbols``.
+        """
         if consumer_id not in self.symbol_consumers:
             return
         previous = self.release_tasks.pop(consumer_id, None)
@@ -444,6 +467,9 @@ class _SnapshotGateway:
 
     async def _accept_symbols_applied(self, message: Mapping[str, object]) -> None:
         """Accept only the acknowledgment for the current desired revision.
+
+        Args:
+            message: Validated symbols-applied protocol frame.
 
         Raises:
             ValueError: If acknowledgment ordering or coverage is invalid.
@@ -552,6 +578,9 @@ async def stream_metatrader_snapshots() -> AsyncIterator[Mapping[str, object]]:
 async def acquire_metatrader_snapshot_symbols(symbols: tuple[str, ...]) -> str:
     """Acquire a bounded MT5 symbol demand.
 
+    Args:
+        symbols: Exact unique provider symbols demanded by the consumer.
+
     Returns:
         Opaque consumer identifier.
     """
@@ -559,7 +588,11 @@ async def acquire_metatrader_snapshot_symbols(symbols: tuple[str, ...]) -> str:
 
 
 async def release_metatrader_snapshot_symbols(consumer_id: str) -> None:
-    """Release one previously acquired MT5 symbol demand idempotently."""
+    """Release one previously acquired MT5 symbol demand idempotently.
+
+    Args:
+        consumer_id: Opaque identifier returned by symbol acquisition.
+    """
     await _GATEWAY.release_symbols(consumer_id)
 
 

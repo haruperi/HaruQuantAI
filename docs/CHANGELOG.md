@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Repair parity certification prerequisites
+
+Repository-wide offline certification prerequisites now reconcile with the current public contracts and registries.
+
+#### Fixed (1)
+
+- Fixed prescribed parity guard names, broker/data documentation gates, Data workflow boundaries, Indicators API/usage parity, Strategy lock identity, explicit contract versions, and the 238-feature inventory.
+
 ### Add seeded execution realism and recovery
 
 Simulator now schedules calibrated stochastic realism with deterministic resume and crash recovery (Phase 20).

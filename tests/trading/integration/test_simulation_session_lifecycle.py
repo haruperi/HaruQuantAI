@@ -66,7 +66,7 @@ def _config() -> dict[str, object]:
 
 
 @pytest.mark.anyio
-async def test_simulation_connect_status_disconnect_finalize_without_network() -> None:
+async def test_simulation_lifecycle_shape_matches_live_fixture() -> None:
     """Simulation lifecycle admits mutations without live authorization or network."""
     session = _session()
     evidence = {

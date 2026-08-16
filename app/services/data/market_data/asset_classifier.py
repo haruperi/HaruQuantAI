@@ -144,7 +144,14 @@ def _classify_by_symbol(symbol: str | None) -> str | None:
 
 
 def _classify_by_path(path: str | None) -> str | None:
-    """Inspect path segments for matching keywords."""
+    """Inspect path segments for matching keywords.
+
+    Args:
+        path: Optional broker grouping path.
+
+    Returns:
+        Matched display asset class, or ``None``.
+    """
     segments = _clean_segments(path)
     for segment in segments:
         for keyword, asset_class in _PATH_KEYWORDS.items():

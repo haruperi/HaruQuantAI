@@ -134,7 +134,12 @@ def _require_utc(value: datetime, name: str) -> None:
 
 
 def _optional_utc(value: datetime | None, name: str) -> None:
-    """Validate an optional aware-UTC timestamp."""
+    """Validate an optional aware-UTC timestamp.
+
+    Args:
+        value: Optional timestamp.
+        name: Field name for an error message.
+    """
     if value is not None:
         _require_utc(value, name)
 
@@ -156,6 +161,10 @@ def _require_finite(value: Decimal | None, name: str) -> None:
 
 def _optional_finite(value: Decimal | None, name: str) -> None:
     """Validate optional finite decimal evidence.
+
+    Args:
+        value: Optional decimal evidence.
+        name: Field name for an error message.
 
     Raises:
         ValueError: If the value is present and not finite.

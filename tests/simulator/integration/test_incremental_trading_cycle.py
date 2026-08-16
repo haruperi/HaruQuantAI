@@ -9,7 +9,7 @@ from tests.simulator.unit.test_timeline import _dataset
 
 
 @pytest.mark.anyio
-async def test_each_tick_invokes_one_point_in_time_cycle_after_execution() -> None:
+async def test_incremental_cycle_matches_captured_trace() -> None:
     """Prior tick effects are visible before the next decision is evaluated."""
     calls: list[tuple[int, int]] = []
 

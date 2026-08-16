@@ -1,5 +1,6 @@
 import ast
 import importlib
+import re
 from pathlib import Path
 
 import pytest
@@ -81,7 +82,7 @@ def test_shared_contract_classes_keep_version_and_schema_identity_together():
             }, f"{path}:{node.lineno} must define contract_version and schema_id"
 
 
-def test_registered_system_contracts_have_explicit_v1_versions():
+def test_registered_system_contracts_have_explicit_versions():
     project = (_REPOSITORY_ROOT / "docs" / "PROJECT.md").read_text(
         encoding="utf-8",
     )
@@ -94,7 +95,10 @@ def test_registered_system_contracts_have_explicit_v1_versions():
     ]
 
     assert rows
-    assert all(row[2] == "`v1`" for row in rows)
+    assert all(re.fullmatch(r"`v\d+`", row[2]) for row in rows)
+    assert any(
+        row[1] == "`SimulationBacktestRequestV2`" and row[2] == "`v2`" for row in rows
+    )
 
 
 def _domain_for_path(path: Path) -> str | None:

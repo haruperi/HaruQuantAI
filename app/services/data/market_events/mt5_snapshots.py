@@ -33,7 +33,17 @@ class _SnapshotRequest(BaseModel):
     @field_validator("symbols")
     @classmethod
     def _validate_symbols(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        """Normalize unique broker-native symbols while preserving order."""
+        """Normalize unique broker-native symbols while preserving order.
+
+        Args:
+            value: Requested exact provider symbols.
+
+        Returns:
+            Trimmed unique symbol tuple.
+
+        Raises:
+            ValueError: If count, text bounds, or uniqueness is invalid.
+        """
         normalized = tuple(symbol.strip() for symbol in value)
         if not 1 <= len(normalized) <= _MAX_SYMBOLS:
             raise ValueError("snapshot symbol count is outside bounds")
@@ -46,7 +56,17 @@ class _SnapshotRequest(BaseModel):
     @field_validator("request_id")
     @classmethod
     def _validate_request_id(cls, value: str) -> str:
-        """Require one trimmed request identity."""
+        """Require one trimmed request identity.
+
+        Args:
+            value: Requested correlation identity.
+
+        Returns:
+            Validated request identity.
+
+        Raises:
+            ValueError: If the identity is empty or untrimmed.
+        """
         if not value or value != value.strip():
             raise ValueError("request_id must be trimmed")
         return value
@@ -54,7 +74,17 @@ class _SnapshotRequest(BaseModel):
     @field_validator("resume_after")
     @classmethod
     def _validate_resume(cls, value: int | None) -> int | None:
-        """Require a non-negative optional producer sequence."""
+        """Require a non-negative optional producer sequence.
+
+        Args:
+            value: Optional last-consumed producer sequence.
+
+        Returns:
+            Validated optional sequence.
+
+        Raises:
+            ValueError: If the sequence is negative.
+        """
         if value is not None and value < 0:
             raise ValueError("resume_after must be non-negative")
         return value

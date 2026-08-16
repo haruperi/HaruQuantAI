@@ -28,7 +28,7 @@ class _Authority:
         return await self._target.is_connected()  # type: ignore[attr-defined, no-any-return]
 
 
-def test_simulation_adapter_passes_canonical_conformance() -> None:
+def test_simulation_adapter_passes_admitted_intersection() -> None:
     """Simulation retains the canonical schema and fail-closed surface."""
 
     async def exercise() -> None:

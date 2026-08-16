@@ -5,7 +5,7 @@ from datetime import UTC, datetime, timedelta
 from app.services.simulator.execution.lifecycle import describe_lifecycle_race
 
 
-def test_ordered_and_ambiguous_lifecycle_races_are_distinct() -> None:
+def test_ambiguous_concurrent_authority_order_is_not_invented() -> None:
     """All named race classes preserve evidence without invented sequence."""
     now = datetime(2026, 8, 17, tzinfo=UTC)
     for left, right in (
