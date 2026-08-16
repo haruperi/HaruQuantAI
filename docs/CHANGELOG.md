@@ -14,10 +14,11 @@ Provider specification snapshots now retain MT5's observed non-weekday rollover 
 
 Parity Envelope v2 separates deterministic MT5 operational semantics from route-specific empirical behavior.
 
-#### Changed (2)
+#### Changed (3)
 
 - Published one demo-evidenced, asset-neutral L5-MT5-Operational contract for semantics shared by demo and live routes, with explicit comparator projections and exclusions preventing asset-specific empirical evidence or calibration from transferring between routes, plus a reproducible secret-safe collector and nine-member certificate-bundle integrity gate.
 - Completed the generated certificate manifest contract with exact specification intervals, authority and account-mode evidence, capability and policy scope, comparator registries, provenance digests, and deterministic invalidation bindings; incomplete or tampered publication fields now fail closed.
+- Separated the application source/configuration identity from the observed MT5 provider build, bound complete pre-run order/deal/account-transaction watermarks into initial authority, rejected truncated history, and kept generated commands repository-relative and workstation-neutral.
 
 ### Standardize execution route terminology
 

@@ -12,7 +12,9 @@ import argparse
 import asyncio
 import hashlib
 import json
+import shlex
 import sys
+import tomllib
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import ROUND_DOWN, Decimal
@@ -46,6 +48,7 @@ from app.services.brokers import (
     get_broker_quote,
     get_broker_symbol_info,
     get_broker_value_field,
+    list_broker_account_transactions,
     list_broker_deal_history,
     list_broker_order_history,
     place_broker_order,
@@ -93,7 +96,8 @@ _MANIFEST_REQUIRED_KEYS = frozenset(
         "provider",
         "environment",
         "server_account_mode",
-        "target_build",
+        "application_build",
+        "provider_build",
         "allowed_evidence_sources",
         "certified_semantics",
         "excluded_empirical_claims",
@@ -134,7 +138,17 @@ _CAPABILITY_INTERSECTION = (
     "pending_order_cancel",
     "active_order_and_position_read",
     "bounded_order_and_deal_history_read",
+    "bounded_account_transaction_history_read",
 )
+_APPLICATION_SOURCE_SUFFIXES = frozenset(
+    {".css", ".html", ".js", ".json", ".py", ".toml", ".ts", ".tsx", ".yaml", ".yml"}
+)
+_REQUIRED_BUILD_INPUTS = (
+    "pyproject.toml",
+    "uv.lock",
+    "tests/simulator/integration/l5_certificate_collection.py",
+)
+_HISTORY_EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
 
 
 def _json_safe(value: object) -> object:
@@ -194,8 +208,120 @@ def _items(response: object) -> tuple[object, ...]:
     if _field(response, "status") != "success":
         raise RuntimeError("authority page read failed")
     data = _field(response, "data")
+    if _field(data, "truncated", False) is True:
+        raise RuntimeError("authority history page is truncated")
     values = _field(data, "items", ())
     return tuple(values)  # type: ignore[arg-type]
+
+
+def build_application_identity(workspace_root: Path) -> dict[str, object]:
+    """Hash the exact backend source/configuration bytes used by collection.
+
+    Documentation and generated artifacts are deliberately outside this build
+    identity so the later publication-only commit does not invalidate an
+    otherwise unchanged runtime. Untracked source files under ``app`` remain
+    included and therefore cannot silently escape the binding.
+
+    Args:
+        workspace_root: Repository root containing ``app`` and project locks.
+
+    Returns:
+        Application version, deterministic source count, and SHA-256 identity.
+
+    Raises:
+        RuntimeError: If required build inputs are absent or no source exists.
+        TypeError: If the project version is not a non-empty string.
+    """
+    root = workspace_root.resolve()
+    required = tuple(root / relative for relative in _REQUIRED_BUILD_INPUTS)
+    if any(not path.is_file() for path in required):
+        raise RuntimeError("application build inputs are incomplete")
+    source_paths = tuple(
+        sorted(
+            (
+                path
+                for path in (root / "app").rglob("*")
+                if path.is_file()
+                and "__pycache__" not in path.parts
+                and path.suffix.lower() in _APPLICATION_SOURCE_SUFFIXES
+            ),
+            key=lambda path: path.relative_to(root).as_posix(),
+        )
+    )
+    if not source_paths:
+        raise RuntimeError("application source tree is absent")
+    paths = (*source_paths, *required)
+    entries = tuple(
+        {
+            "path": path.relative_to(root).as_posix(),
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        }
+        for path in paths
+    )
+    project = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
+    version = project.get("project", {}).get("version")
+    if not isinstance(version, str) or not version:
+        raise TypeError("application project version is malformed")
+    return {
+        "version": version,
+        "source_file_count": len(entries),
+        "source_config_digest": _hash(entries),
+    }
+
+
+def build_authority_watermark(
+    *,
+    orders: Sequence[object],
+    deals: Sequence[object],
+    transactions: Sequence[object],
+) -> dict[str, object]:
+    """Build a secret-safe latest-authority watermark for three histories.
+
+    Args:
+        orders: Complete bounded pre-run order history.
+        deals: Complete bounded pre-run trade-deal history.
+        transactions: Complete bounded pre-run non-trade transaction history.
+
+    Returns:
+        Counts and digested latest identities with provider timestamps.
+
+    Raises:
+        RuntimeError: If a historical item lacks its authority identity or
+            provider timestamp.
+    """
+
+    def latest(
+        values: Sequence[object], *, identity_field: str
+    ) -> dict[str, object] | None:
+        candidates: list[tuple[str, str]] = []
+        for value in values:
+            identity = _field(value, identity_field)
+            timestamp = _field(value, "provider_timestamp")
+            if not identity or not isinstance(timestamp, datetime):
+                raise RuntimeError("authority watermark item is incomplete")
+            candidates.append((timestamp.astimezone(UTC).isoformat(), str(identity)))
+        if not candidates:
+            return None
+        provider_timestamp, identity = max(candidates)
+        return {
+            "identity_digest": _hash(identity),
+            "provider_timestamp": provider_timestamp,
+        }
+
+    return {
+        "orders": {
+            "count": len(orders),
+            "latest": latest(orders, identity_field="order_id"),
+        },
+        "deals": {
+            "count": len(deals),
+            "latest": latest(deals, identity_field="deal_id"),
+        },
+        "transactions": {
+            "count": len(transactions),
+            "latest": latest(transactions, identity_field="transaction_id"),
+        },
+    }
 
 
 def _project(value: object, names: tuple[str, ...]) -> dict[str, object]:
@@ -381,6 +507,9 @@ def build_certificate_manifest(
     left: Mapping[str, object],
     right: Mapping[str, object],
     environment: Mapping[str, object],
+    application_build: Mapping[str, object],
+    provider_build: str,
+    authority_watermark: Mapping[str, object],
     account_modes: Mapping[str, object],
     issued_at: datetime,
 ) -> dict[str, object]:
@@ -395,6 +524,9 @@ def build_certificate_manifest(
         left: Simulation operational evidence.
         right: MT5 demo operational evidence.
         environment: Secret-free provider/build identity.
+        application_build: Exact application source/configuration identity.
+        provider_build: Observed MT5 terminal/API build.
+        authority_watermark: Complete pre-run history watermark.
         account_modes: Observed provider account and margin modes.
         issued_at: Certificate issue time.
 
@@ -426,6 +558,9 @@ def build_certificate_manifest(
     if not comparison.get("passed") or comparison.get("certificate_invalidated"):
         raise ValueError("certificate evidence does not pass Envelope v2")
     environment_hash = _hash(environment)
+    build_identity_hash = _hash(
+        {"application": application_build, "provider": provider_build}
+    )
     specification_hash = _hash(specification)
     evidence_hashes = {"left": _hash(left), "right": _hash(right)}
     comparison_hash = _hash(comparison)
@@ -435,9 +570,11 @@ def build_certificate_manifest(
     identity_hash = _hash(identity)
     invalidation_triggers = tuple(envelope["invalidation_triggers"])
     invalidation_bindings = {
-        "build_identity_change": environment_hash,
+        "build_identity_change": build_identity_hash,
         "contract_change": _hash(envelope),
-        "code_or_config_identity_change": identity_hash,
+        "code_or_config_identity_change": _hash(
+            {"application": application_build, "execution": identity_hash}
+        ),
         "specification_revision_change": specification_hash,
         "source_or_tick_model_change": _hash(
             {
@@ -462,7 +599,8 @@ def build_certificate_manifest(
         "provider": scope["provider"],
         "environment": "dev",
         "server_account_mode": scope["server_account_mode"],
-        "target_build": environment.get("target_build"),
+        "application_build": _json_safe(application_build),
+        "provider_build": provider_build,
         "allowed_evidence_sources": scope["evidence_sources"],
         "certified_semantics": applicability["certified_semantics"],
         "excluded_empirical_claims": applicability["excluded_empirical_claims"],
@@ -491,7 +629,8 @@ def build_certificate_manifest(
             "foreign_activity_event_count": left_state.get(
                 "foreign_activity_event_count"
             ),
-            "last_reconciled_transaction_deal_watermark": interval_end.isoformat(),
+            "last_reconciled_authority_watermark": _json_safe(authority_watermark),
+            "authority_watermark_digest": _hash(authority_watermark),
         },
         "operation_modes": {
             "operations": ("check_order", "place_order", "cancel_order"),
@@ -606,12 +745,26 @@ def validate_l5_certificate_bundle(bundle: Path) -> None:
         raise ValueError("certificate environment must identify dev/MT5/demo")
     if environment.get("secret_free") is not True:
         raise ValueError("certificate environment lacks secret-free attestation")
+    application_build = manifest.get("application_build")
+    provider_build = manifest.get("provider_build")
     if (
         not manifest.get("certificate_id")
-        or not environment.get("target_build")
-        or manifest.get("target_build") != environment.get("target_build")
+        or not isinstance(application_build, Mapping)
+        or set(application_build)
+        != {"version", "source_file_count", "source_config_digest"}
+        or not application_build.get("version")
+        or not isinstance(application_build.get("source_file_count"), int)
+        or int(application_build["source_file_count"]) <= 0
+        or not isinstance(application_build.get("source_config_digest"), str)
+        or len(str(application_build["source_config_digest"])) != _SHA256_HEX_LENGTH
+        or not provider_build
+        or provider_build != environment.get("provider_build")
     ):
-        raise ValueError("certificate target build is not bound to environment")
+        raise ValueError("certificate application/provider build binding differs")
+    if manifest.get("test_fixture_only") is not True and application_build != (
+        build_application_identity(Path.cwd())
+    ):
+        raise ValueError("certificate application build no longer matches source")
     specifications = manifest.get("admitted_specifications")
     if not isinstance(specifications, list) or len(specifications) != 1:
         raise ValueError("certificate must admit exactly one specification interval")
@@ -655,13 +808,34 @@ def validate_l5_certificate_bundle(bundle: Path) -> None:
         initial_authority, Mapping
     ):
         raise TypeError("certificate initial-authority binding is malformed")
+    watermark = initial_authority.get("last_reconciled_authority_watermark")
+    if not isinstance(watermark, Mapping) or set(watermark) != {
+        "orders",
+        "deals",
+        "transactions",
+    }:
+        raise ValueError("certificate authority watermark is incomplete")
+    for category in watermark.values():
+        if not isinstance(category, Mapping) or set(category) != {"count", "latest"}:
+            raise ValueError("certificate authority watermark category is malformed")
+        count = category.get("count")
+        latest = category.get("latest")
+        if not isinstance(count, int) or count < 0:
+            raise ValueError("certificate authority watermark count is malformed")
+        if (count == 0) != (latest is None):
+            raise ValueError("certificate authority watermark latest item differs")
+        if latest is not None and (
+            not isinstance(latest, Mapping)
+            or set(latest) != {"identity_digest", "provider_timestamp"}
+            or len(str(latest.get("identity_digest"))) != _SHA256_HEX_LENGTH
+        ):
+            raise ValueError("certificate authority watermark latest item is malformed")
     expected_authority = {
         "state_hash": left_state.get("state_hash"),
         "exclusive_account": left_state.get("exclusive_account"),
         "foreign_activity_event_count": left_state.get("foreign_activity_event_count"),
-        "last_reconciled_transaction_deal_watermark": specification.get(
-            "effective_through"
-        ),
+        "last_reconciled_authority_watermark": watermark,
+        "authority_watermark_digest": _hash(watermark),
     }
     if initial_authority != expected_authority or left_state != right.get(
         "initial_authority_state"
@@ -732,9 +906,13 @@ def validate_l5_certificate_bundle(bundle: Path) -> None:
     if manifest.get("evidence_provenance") != expected_provenance:
         raise ValueError("certificate evidence provenance differs")
     expected_bindings = {
-        "build_identity_change": _hash(environment),
+        "build_identity_change": _hash(
+            {"application": application_build, "provider": provider_build}
+        ),
         "contract_change": _hash(envelope),
-        "code_or_config_identity_change": _hash(identity),
+        "code_or_config_identity_change": _hash(
+            {"application": application_build, "execution": _hash(identity)}
+        ),
         "specification_revision_change": _hash(observed_fields),
         "source_or_tick_model_change": _hash(
             {
@@ -755,6 +933,21 @@ def validate_l5_certificate_bundle(bundle: Path) -> None:
     commands = (bundle / "commands.txt").read_text(encoding="utf-8").lower()
     if any(fragment in commands for fragment in _SENSITIVE_FRAGMENTS):
         raise ValueError("certificate commands contain sensitive material")
+    command_lines = commands.splitlines()
+    if not command_lines:
+        raise ValueError("certificate command ledger is empty")
+    arguments = shlex.split(command_lines[0])
+    try:
+        output_argument = arguments[arguments.index("--output") + 1]
+    except (ValueError, IndexError) as exc:
+        raise ValueError("certificate collection command lacks output") from exc
+    expected_suffix = f"/{manifest['certificate_id']}"
+    if (
+        Path(output_argument).is_absolute()
+        or ".." in Path(output_argument).parts
+        or not output_argument.replace("\\", "/").endswith(expected_suffix)
+    ):
+        raise ValueError("certificate command output is not repository-relative")
     expected_checksums = [
         f"{_file_digest(bundle / name)}  {name}" for name in sorted(_HASHED_FILES)
     ]
@@ -851,6 +1044,30 @@ def validate_collection_output(
     return resolved
 
 
+def build_collection_command(*, certificate_id: str, symbol: str, output: Path) -> str:
+    """Build one reproducible credential-free relative collector invocation.
+
+    Args:
+        certificate_id: Exact immutable certificate identifier.
+        symbol: Exact admitted provider symbol.
+        output: Repository-relative generated artifact directory.
+
+    Returns:
+        Canonical direct-execution command without workstation identity.
+
+    Raises:
+        RuntimeError: If the output is absolute, escapes its relative root, or
+            does not end in the certificate identifier.
+    """
+    if output.is_absolute() or ".." in output.parts or output.name != certificate_id:
+        raise RuntimeError("certificate command output must be repository-relative")
+    return (
+        "uv run python tests/simulator/integration/l5_certificate_collection.py "
+        f"--execute-demo --symbol {symbol} "
+        f"--certificate-id {certificate_id} --output {output.as_posix()}"
+    )
+
+
 def validate_authority_interval(
     *,
     initial: Mapping[str, object],
@@ -858,6 +1075,7 @@ def validate_authority_interval(
     created_order_id: str,
     observed_order_ids: set[str],
     observed_deal_count: int,
+    observed_transaction_count: int,
 ) -> None:
     """Require exact cleanup and absence of foreign interval activity.
 
@@ -867,6 +1085,8 @@ def validate_authority_interval(
         created_order_id: Only order identity authorized for this run.
         observed_order_ids: Complete bounded order-history identities.
         observed_deal_count: Complete bounded deal-history cardinality.
+        observed_transaction_count: Complete bounded non-trade transaction
+            cardinality.
 
     Raises:
         RuntimeError: If cleanup is incomplete or foreign/manual activity was
@@ -876,7 +1096,11 @@ def validate_authority_interval(
         raise RuntimeError(
             "MT5 authority state did not reconcile exactly after cleanup"
         )
-    if observed_order_ids - {created_order_id} or observed_deal_count:
+    if (
+        observed_order_ids - {created_order_id}
+        or observed_deal_count
+        or observed_transaction_count
+    ):
         raise RuntimeError("foreign/manual activity occurred during collection")
 
 
@@ -1218,6 +1442,8 @@ async def _collect(args: argparse.Namespace) -> Path:
         TypeError: If a public contract returns a malformed shape.
     """
     settings = load_settings()
+    requested_output = args.output
+    application_build = build_application_identity(Path.cwd())
     system_record = get_system_settings(request_id=generate_id("req"))
     system_values = _field(system_record, "settings")
     if not isinstance(system_values, Mapping):
@@ -1274,8 +1500,28 @@ async def _collect(args: argparse.Namespace) -> Path:
         )
         if _field(permissions, "trade_write") is not True:
             raise RuntimeError("MT5 demo account lacks trade-write permission")
-        initial = await _state(demo)
         started = datetime.now(UTC) - timedelta(seconds=1)
+        initial = await _state(demo)
+        pre_orders = _items(
+            await list_broker_order_history(
+                demo, _HISTORY_EPOCH, started, limit=_STATE_LIMIT
+            )
+        )
+        pre_deals = _items(
+            await list_broker_deal_history(
+                demo, _HISTORY_EPOCH, started, limit=_STATE_LIMIT
+            )
+        )
+        pre_transactions = _items(
+            await list_broker_account_transactions(
+                demo, _HISTORY_EPOCH, started, limit=_STATE_LIMIT
+            )
+        )
+        authority_watermark = build_authority_watermark(
+            orders=pre_orders,
+            deals=pre_deals,
+            transactions=pre_transactions,
+        )
         symbol_info = _success_data(
             await get_broker_symbol_info(demo, args.symbol), "get_broker_symbol_info"
         )
@@ -1336,6 +1582,11 @@ async def _collect(args: argparse.Namespace) -> Path:
         deal_history = _items(
             await list_broker_deal_history(demo, started, finished, limit=_STATE_LIMIT)
         )
+        transaction_history = _items(
+            await list_broker_account_transactions(
+                demo, started, finished, limit=_STATE_LIMIT
+            )
+        )
         validate_authority_interval(
             initial=initial,
             final=final,
@@ -1344,8 +1595,11 @@ async def _collect(args: argparse.Namespace) -> Path:
                 str(_field(item, "order_id")) for item in order_history
             },
             observed_deal_count=len(deal_history),
+            observed_transaction_count=len(transaction_history),
         )
-        state_hash = _hash(initial)
+        state_hash = _hash(
+            {"authority_state": initial, "authority_watermark": authority_watermark}
+        )
         platform = _success_data(
             await get_broker_platform_info(demo), "get_broker_platform_info"
         )
@@ -1372,7 +1626,13 @@ async def _collect(args: argparse.Namespace) -> Path:
         identity_hash = _hash(identity_seed)
         identity = {
             "execution_model_hash": identity_hash,
-            "config_hash": _hash({"route_contract": "sim-demo", "symbol": args.symbol}),
+            "config_hash": _hash(
+                {
+                    "route_contract": "sim-demo",
+                    "symbol": args.symbol,
+                    "application_build": application_build,
+                }
+            ),
             "source_lineage_hash": _hash(identity_seed["specification"]),
             "tick_lineage_hash": _hash(
                 {"symbol": args.symbol, "bid": bid, "observed": "collection_interval"}
@@ -1410,14 +1670,14 @@ async def _collect(args: argparse.Namespace) -> Path:
                 account=account,
             )
         )
-        target_build = str(
+        provider_build = str(
             _field(platform, "build", _field(platform, "api_or_terminal_version"))
         )
         environment = {
             "environment": "dev",
             "provider": "mt5",
             "route": "demo",
-            "target_build": target_build,
+            "provider_build": provider_build,
             "server_digest": _hash(str(slot["server"])),
             "subject_digest": _hash(str(slot["login"])),
             "secret_free": True,
@@ -1431,17 +1691,19 @@ async def _collect(args: argparse.Namespace) -> Path:
             left=left,
             right=right,
             environment=environment,
+            application_build=application_build,
+            provider_build=provider_build,
+            authority_watermark=authority_watermark,
             account_modes={
                 name: account.get(name)
                 for name in ("trade_mode", "margin_mode", "margin_so_mode")
             },
             issued_at=datetime.now(UTC),
         )
-        command = (
-            "uv run python tests/simulator/integration/l5_certificate_collection.py "
-            f"--execute-demo --symbol {args.symbol} "
-            f"--certificate-id {args.certificate_id} "
-            f"--output {args.output.as_posix()}"
+        command = build_collection_command(
+            certificate_id=args.certificate_id,
+            symbol=args.symbol,
+            output=requested_output,
         )
         write_certificate_bundle(
             args.output,

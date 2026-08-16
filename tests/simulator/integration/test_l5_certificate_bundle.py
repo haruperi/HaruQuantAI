@@ -10,6 +10,7 @@ import pytest
 
 from tests.simulator.integration.l5_certificate_collection import (
     build_certificate_manifest,
+    build_collection_command,
     validate_l5_certificate_bundle,
     write_certificate_bundle,
 )
@@ -23,7 +24,7 @@ def _synthetic_schema_fixture(bundle: Path) -> None:
         "environment": "dev",
         "provider": "mt5",
         "route": "demo",
-        "target_build": "schema-fixture",
+        "provider_build": "schema-fixture",
         "server_digest": "a" * 64,
         "subject_digest": "b" * 64,
         "secret_free": True,
@@ -38,6 +39,17 @@ def _synthetic_schema_fixture(bundle: Path) -> None:
         left=left,
         right=right,
         environment=environment,
+        application_build={
+            "version": "2.2.11",
+            "source_file_count": 3,
+            "source_config_digest": "c" * 64,
+        },
+        provider_build="schema-fixture",
+        authority_watermark={
+            "orders": {"count": 0, "latest": None},
+            "deals": {"count": 0, "latest": None},
+            "transactions": {"count": 0, "latest": None},
+        },
         account_modes={
             "trade_mode": "demo",
             "margin_mode": "netting",
@@ -52,7 +64,14 @@ def _synthetic_schema_fixture(bundle: Path) -> None:
         left=left,
         right=right,
         environment=environment,
-        command="schema fixture; no provider operation",
+        command=build_collection_command(
+            certificate_id="schema-fixture-not-a-certificate",
+            symbol="EURUSD",
+            output=Path(
+                "artifacts/sim_live_parity/mt5-operational/v2/"
+                "schema-fixture-not-a-certificate"
+            ),
+        ),
     )
 
 
@@ -116,4 +135,72 @@ def test_l5_certificate_bundle_rejects_invalidation_binding_tampering(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     with pytest.raises(ValueError, match="invalidation bindings"):
+        validate_l5_certificate_bundle(bundle)
+
+
+def test_l5_certificate_bundle_rejects_provider_build_substitution(
+    tmp_path: Path,
+) -> None:
+    """The observed provider build cannot replace the application build."""
+    bundle = tmp_path / "bundle"
+    _synthetic_schema_fixture(bundle)
+    manifest_path = bundle / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["provider_build"] = "different-provider-build"
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="application/provider build"):
+        validate_l5_certificate_bundle(bundle)
+
+
+def test_l5_certificate_bundle_rejects_application_build_tampering(
+    tmp_path: Path,
+) -> None:
+    """Changed application source identity invalidates its trigger binding."""
+    bundle = tmp_path / "bundle"
+    _synthetic_schema_fixture(bundle)
+    manifest_path = bundle / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["application_build"]["source_config_digest"] = "0" * 64
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="invalidation bindings"):
+        validate_l5_certificate_bundle(bundle)
+
+
+def test_l5_certificate_bundle_rejects_timestamp_only_watermark(
+    tmp_path: Path,
+) -> None:
+    """Wall-clock time alone is not reconciled order/deal/transaction authority."""
+    bundle = tmp_path / "bundle"
+    _synthetic_schema_fixture(bundle)
+    manifest_path = bundle / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["initial_authority"]["last_reconciled_authority_watermark"] = (
+        "2026-08-16T00:00:00+00:00"
+    )
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="watermark is incomplete"):
+        validate_l5_certificate_bundle(bundle)
+
+
+def test_l5_certificate_bundle_rejects_absolute_collection_command(
+    tmp_path: Path,
+) -> None:
+    """Workstation-specific absolute output paths cannot enter evidence."""
+    bundle = tmp_path / "bundle"
+    _synthetic_schema_fixture(bundle)
+    commands = bundle / "commands.txt"
+    commands.write_text(
+        "uv run python tests/simulator/integration/l5_certificate_collection.py "
+        "--execute-demo --symbol BTCUSD --certificate-id "
+        "schema-fixture-not-a-certificate --output "
+        "C:/private/workspace/schema-fixture-not-a-certificate\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="repository-relative"):
         validate_l5_certificate_bundle(bundle)

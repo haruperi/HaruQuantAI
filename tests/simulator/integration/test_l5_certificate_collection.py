@@ -6,6 +6,7 @@ import json
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from app.services.simulator import compare_parity_evidence, get_parity_envelope
@@ -14,9 +15,13 @@ from pydantic import SecretStr
 from tests.simulator.integration.l5_certificate_collection import (
     _evidence,
     _has_sensitive_key,
+    _items,
     _required_secret_text,
     _strip_collection_only,
+    build_application_identity,
+    build_authority_watermark,
     build_certificate_manifest,
+    build_collection_command,
     build_collector_provider_settings,
     build_mt5_credential_mapping,
     require_terminal_executable,
@@ -175,6 +180,7 @@ def test_authority_interval_requires_cleanup_and_no_foreign_activity() -> None:
         created_order_id="own-order",
         observed_order_ids={"own-order"},
         observed_deal_count=0,
+        observed_transaction_count=0,
     )
     with pytest.raises(RuntimeError, match="reconcile"):
         validate_authority_interval(
@@ -183,6 +189,7 @@ def test_authority_interval_requires_cleanup_and_no_foreign_activity() -> None:
             created_order_id="own-order",
             observed_order_ids={"own-order"},
             observed_deal_count=0,
+            observed_transaction_count=0,
         )
     with pytest.raises(RuntimeError, match="foreign/manual"):
         validate_authority_interval(
@@ -191,6 +198,87 @@ def test_authority_interval_requires_cleanup_and_no_foreign_activity() -> None:
             created_order_id="own-order",
             observed_order_ids={"own-order", "foreign-order"},
             observed_deal_count=0,
+            observed_transaction_count=0,
+        )
+    with pytest.raises(RuntimeError, match="foreign/manual"):
+        validate_authority_interval(
+            initial=state,
+            final=state,
+            created_order_id="own-order",
+            observed_order_ids={"own-order"},
+            observed_deal_count=0,
+            observed_transaction_count=1,
+        )
+
+
+def test_application_identity_binds_source_and_config_but_not_docs(
+    tmp_path: Path,
+) -> None:
+    """Runtime identity changes for source bytes, not publication prose."""
+    app = tmp_path / "app"
+    app.mkdir()
+    source = app / "runtime.py"
+    source.write_text('VALUE = "first"\n', encoding="utf-8")
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "fixture"\nversion = "1.0.0"\n', encoding="utf-8"
+    )
+    (tmp_path / "uv.lock").write_text("fixture-lock\n", encoding="utf-8")
+    collector = tmp_path / "tests" / "simulator" / "integration"
+    collector.mkdir(parents=True)
+    (collector / "l5_certificate_collection.py").write_text(
+        'COLLECTOR_VERSION = "fixture"\n', encoding="utf-8"
+    )
+    first = build_application_identity(tmp_path)
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    (docs / "README.md").write_text("publication only\n", encoding="utf-8")
+    assert build_application_identity(tmp_path) == first
+    source.write_text('VALUE = "second"\n', encoding="utf-8")
+    assert build_application_identity(tmp_path) != first
+
+
+def test_authority_watermark_covers_all_histories_without_raw_ids() -> None:
+    """Orders, deals, and non-trade transactions bind their latest authority."""
+    earlier = datetime(2026, 8, 15, tzinfo=UTC)
+    later = earlier + timedelta(seconds=1)
+    watermark = build_authority_watermark(
+        orders=(
+            SimpleNamespace(order_id="order-1", provider_timestamp=earlier),
+            SimpleNamespace(order_id="order-2", provider_timestamp=later),
+        ),
+        deals=(SimpleNamespace(deal_id="deal-1", provider_timestamp=earlier),),
+        transactions=(
+            SimpleNamespace(transaction_id="balance-1", provider_timestamp=earlier),
+        ),
+    )
+    assert watermark["orders"]["count"] == 2  # type: ignore[index]
+    assert watermark["orders"]["latest"]["provider_timestamp"] == (  # type: ignore[index]
+        later.isoformat()
+    )
+    assert "order-2" not in json.dumps(watermark, sort_keys=True)
+
+
+def test_truncated_authority_history_fails_closed() -> None:
+    """A page that cannot prove complete history is never a watermark input."""
+    response = SimpleNamespace(
+        status="success", data=SimpleNamespace(items=(), truncated=True)
+    )
+    with pytest.raises(RuntimeError, match="truncated"):
+        _items(response)
+
+
+def test_collection_command_is_relative_and_reproducible() -> None:
+    """Command evidence contains no workstation-specific absolute path."""
+    relative = Path("artifacts/sim_live_parity/mt5-operational/v2/cert-1")
+    command = build_collection_command(
+        certificate_id="cert-1", symbol="BTCUSD", output=relative
+    )
+    assert command.endswith(f"--output {relative.as_posix()}")
+    with pytest.raises(RuntimeError, match="repository-relative"):
+        build_collection_command(
+            certificate_id="cert-1",
+            symbol="BTCUSD",
+            output=Path("C:/private/workspace/cert-1"),
         )
 
 
@@ -202,7 +290,7 @@ def test_bundle_writer_is_deterministic_and_secret_free(tmp_path: Path) -> None:
         "environment": "dev",
         "provider": "mt5",
         "route": "demo",
-        "target_build": "offline-fixture",
+        "provider_build": "offline-fixture",
         "server_digest": "a" * 64,
         "subject_digest": "b" * 64,
         "secret_free": True,
@@ -217,6 +305,17 @@ def test_bundle_writer_is_deterministic_and_secret_free(tmp_path: Path) -> None:
         left=left,
         right=right,
         environment=environment,
+        application_build={
+            "version": "2.2.11",
+            "source_file_count": 3,
+            "source_config_digest": "c" * 64,
+        },
+        provider_build="offline-fixture",
+        authority_watermark={
+            "orders": {"count": 0, "latest": None},
+            "deals": {"count": 0, "latest": None},
+            "transactions": {"count": 0, "latest": None},
+        },
         account_modes={
             "trade_mode": "demo",
             "margin_mode": "netting",
@@ -231,7 +330,13 @@ def test_bundle_writer_is_deterministic_and_secret_free(tmp_path: Path) -> None:
         left=left,
         right=right,
         environment=environment,
-        command="offline collector fixture",
+        command=build_collection_command(
+            certificate_id="offline-collector-fixture",
+            symbol="EURUSD",
+            output=Path(
+                "artifacts/sim_live_parity/mt5-operational/v2/offline-collector-fixture"
+            ),
+        ),
     )
     validate_l5_certificate_bundle(bundle)
     assert len(tuple(bundle.iterdir())) == 9

@@ -4336,14 +4336,14 @@ empirical claim was issued.
 **Publication-manifest correction `CERT-DR32` — 2026-08-16.** The approved bounded recommendation
 does not retrofit the provisional bundle. It introduces the v2 generated-manifest schema and binds
 every required field to Envelope v2, both evidence payloads, the observed specification interval,
-the complete initial-authority hash and reconciliation watermark, observed account modes, the exact
+the declared initial-authority hash and then-current reconciliation field, observed account modes, the exact
 exercised capability intersection, included/excluded policy paths, comparator and ignored-field
 registries, secret-free collection provenance, and every registered invalidation trigger. Missing,
 unexpected, mismatched, or tampered publication fields fail closed. Evidence:
-`tests/simulator/integration/l5_certificate_collection.py:374`,
-`tests/simulator/integration/l5_certificate_collection.py:540`,
-`tests/simulator/integration/test_l5_certificate_bundle.py:90`, and
-`tests/simulator/integration/test_l5_certificate_bundle.py:106`. Ruff passed the three correction
+`tests/simulator/integration/l5_certificate_collection.py:500`,
+`tests/simulator/integration/l5_certificate_collection.py:679`,
+`tests/simulator/integration/test_l5_certificate_bundle.py:109`, and
+`tests/simulator/integration/test_l5_certificate_bundle.py:125`. Ruff passed the three correction
 files; targeted mypy passed three source files; collector/bundle tests passed 22 in 0.85 seconds;
 the complete Simulator suite passed 530 in 54.87 seconds; usage 18 passed; and a fresh Python process
 reproduced and accepted the complete fixture bundle. The earlier targeted invocation without
@@ -4355,6 +4355,44 @@ the corrected command uses `--no-cov`, while the already completed serial full-s
 `Bind every required publication field to envelope, evidence, and environment identity.`,
 `Reject missing, mismatched, or tampered certificate provenance and invalidation data.`, and
 `Record the provisional bundle as unpublished pending a new approved demo run.`
+
+**Sixth collection attempt: Operationally successful but unpublished — 2026-08-16.** The separately
+approved Dry Run 33 generated
+`artifacts/sim_live_parity/mt5-operational/v2/l5-mt5-operational-btcusd-20260816-02` after the MT5
+provider reported demo mode. The paired Simulation/demo `BTCUSD` check/place/cancel trace passed,
+the exact pending order was cancelled, initial and final account/order/position state reconciled,
+the bounded interval contained only the owned order and no deal, and MT5 disconnected cleanly. The
+v2 manifest contained all thirty declared fields, all eight invalidation triggers had bindings, the
+comparison passed with zero failures and no invalidation, and the exact nine members were secret-free.
+Offline gates passed: collector/bundle 22, all standing guards 30, Simulator 530, current serial full
+suite 5,946 with 21 explicit skips, 88% coverage, Simulator Ruff/mypy/usage 18, and repository mypy
+2,810 source files. Publication audit nevertheless stopped finalization: `target_build` held the MT5
+terminal build rather than application source identity, and the claimed authority watermark was an
+interval-end timestamp rather than reconciled pre-run order/deal/transaction authority bound into
+the initial-state hash. The bundle remains ignored, uncommitted, provisional, and unmodified after
+generation; no maturity or live empirical claim was issued.
+
+**Build/watermark correction `CERT-DR34` — 2026-08-16.** The approved recommendation keeps application
+version plus a digest of actual backend source, project configuration, dependency lock, and collector
+bytes distinct from the observed MT5 provider build; documentation-only publication does not alter
+that runtime identity. Before mutation, the collector reads complete non-truncated order, trade-deal,
+and non-trade account-transaction history, publishes only digested latest identities and provider
+times, and hashes that watermark with the complete account/order/position snapshot. The post-run
+guard now rejects balance, credit, correction, or other non-trade transactions as foreign activity.
+Absolute or escaping output paths are rejected from generated command evidence. Evidence:
+`tests/simulator/integration/l5_certificate_collection.py:217`,
+`tests/simulator/integration/l5_certificate_collection.py:272`,
+`tests/simulator/integration/test_l5_certificate_collection.py:214`,
+`tests/simulator/integration/test_l5_certificate_collection.py:240`,
+`tests/simulator/integration/test_l5_certificate_bundle.py:141`,
+`tests/simulator/integration/test_l5_certificate_bundle.py:173`, and
+`tests/simulator/integration/test_l5_certificate_bundle.py:191`. Ruff and targeted mypy passed three
+files; collector/bundle tests passed 30 in 0.89 seconds; Simulator passed 538 in 29.99 seconds; usage
+18 passed; and a fresh Python process reproduced the complete fixture. Exact commit:
+`fix(parity): bind certificate build and authority watermark` with body bullets
+`Separate application source identity from the observed MT5 provider build.`,
+`Bind the genuine pre-run order and transaction/deal watermark into initial authority.`, and
+`Keep generated command evidence relative, reproducible, and secret-safe.`
 
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
