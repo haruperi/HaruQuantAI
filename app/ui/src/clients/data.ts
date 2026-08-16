@@ -336,6 +336,20 @@ export function snapshotStream(
   });
 }
 
+/** Open one authenticated multi-symbol MT5 Depth-of-Market stream. */
+export function depthStream(
+  symbols: string[],
+  options?: Omit<StreamTransportOptions, "query">
+): AsyncIterable<StreamEvent> {
+  if (symbols.length === 0 || symbols.length > 200) {
+    throw new Error("depth stream requires 1..200 symbols");
+  }
+  return openStream(dataRoutes.depthStream, {
+    query: { symbols: symbols.join(",") },
+    ...options,
+  });
+}
+
 /** Aggregated data client. */
 /**
  * Fetch and persist one market dataset through Data (requires `data:write`).
@@ -389,6 +403,7 @@ export const data = {
   bars,
   stream,
   snapshotStream,
+  depthStream,
   prepareDataset,
   importDialects,
   importDataset,

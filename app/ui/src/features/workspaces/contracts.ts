@@ -41,6 +41,8 @@ export interface Widget {
   type: WidgetType;
   title: string;
   symbol?: string;
+  /** Real Trading account identifier, for widgets that read or submit real orders. */
+  accountId?: string;
   col?: number;
   row?: number;
   colSpan: number;
@@ -75,6 +77,7 @@ export const widgetSchema: z.ZodType<Widget> = z.object({
   type: z.enum(WIDGET_TYPES),
   title: z.string(),
   symbol: z.string().optional(),
+  accountId: z.string().optional(),
   col: z.number().optional(),
   row: z.number().optional(),
   colSpan: z.number(),

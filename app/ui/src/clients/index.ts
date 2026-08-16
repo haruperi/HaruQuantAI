@@ -88,11 +88,17 @@ export type {
   RiskDecisionsQuery,
 } from "./risk";
 export type {
+  CancelAllPreflightInput,
+  CancelOrderPreflightInput,
   ExecutionReceipt,
+  OrderPreflightInput,
+  RiskPreflightResponse,
   SubmitOrderInput,
   TradingMutationInput,
   TradingProjection,
+  WorkingOrder,
 } from "./trading";
+export { listWorkingOrders } from "./trading";
 export type { PortfolioDefinitionBody, PortfolioRecord } from "./portfolio";
 
 export type {

@@ -246,6 +246,14 @@ export const dataRoutes = {
     sideEffect: "stream",
     stream: true,
   }),
+  depthStream: route({
+    id: "api.data.depth_stream",
+    method: "GET",
+    path: "/api/v1/data/depth-stream",
+    permission: "data:read",
+    sideEffect: "stream",
+    stream: true,
+  }),
   prepareDataset: route({
     id: "api.data.prepare_dataset",
     method: "POST",
@@ -452,7 +460,7 @@ export const riskRoutes = {
   }),
 } as const;
 
-// --- Trading session (4) -------------------------------------------------
+// --- Trading session (8) -------------------------------------------------
 
 export const tradingRoutes = {
   session: route({
@@ -460,6 +468,14 @@ export const tradingRoutes = {
     method: "GET",
     path: "/api/v1/trading/session",
     permission: "trading:read",
+  }),
+  preflightOrder: route({
+    id: "api.trading.preflight_order",
+    method: "POST",
+    path: "/api/v1/trading/orders/preflight",
+    permission: "trading:write",
+    sideEffect: "write",
+    idempotencyRequired: true,
   }),
   submitOrder: route({
     id: "api.trading.submit_order",
@@ -483,6 +499,31 @@ export const tradingRoutes = {
     id: "api.trading.close_position",
     method: "POST",
     path: "/api/v1/trading/positions/{position_id}/close",
+    permission: "trading:write",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  cancelOrderPreflight: route({
+    id: "api.trading.cancel_order_preflight",
+    method: "POST",
+    path: "/api/v1/trading/orders/{order_id}/preflight",
+    permission: "trading:write",
+    sideEffect: "write",
+    idempotencyRequired: true,
+  }),
+  cancelAllPreflight: route({
+    id: "api.trading.cancel_all_preflight",
+    method: "POST",
+    path: "/api/v1/trading/orders/cancel-all/preflight",
+    permission: "trading:write",
+    sideEffect: "write",
+    idempotencyRequired: true,
+  }),
+  cancelAllOrders: route({
+    id: "api.trading.cancel_all_orders",
+    method: "POST",
+    path: "/api/v1/trading/orders/cancel-all",
     permission: "trading:write",
     sideEffect: "governed_write",
     governed: true,
@@ -837,6 +878,7 @@ export const ROUTE_CONTRACTS = [
   dataRoutes.capabilities,
   dataRoutes.stream,
   dataRoutes.snapshotStream,
+  dataRoutes.depthStream,
   indicatorsRoutes.catalogue,
   indicatorsRoutes.capabilities,
   indicatorsRoutes.spec,
@@ -860,6 +902,7 @@ export const ROUTE_CONTRACTS = [
   riskRoutes.killSwitch,
   riskRoutes.decisions,
   tradingRoutes.session,
+  tradingRoutes.preflightOrder,
   tradingRoutes.submitOrder,
   tradingRoutes.cancelOrder,
   tradingRoutes.closePosition,
@@ -909,7 +952,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 91;
+export const ROUTE_CONTRACT_COUNT = 96;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

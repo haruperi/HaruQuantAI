@@ -6,10 +6,8 @@ import { MarketsWidget } from '../../features/markets';
 import { MarketTicksTableWidget } from '../../features/market-ticks';
 import { WatchlistWidget } from '../../features/watchlists';
 import { ChartWidget } from '../../features/chart';
-import {
-  OptionsGridWidget,
-  PriceLadderWidget,
-} from '../../features/instrument-panels';
+import { OptionsGridWidget } from '../../features/instrument-panels';
+import { PriceLadderWidget } from '../../features/price-ladder';
 import { TradePlanWidget } from '../../features/planning';
 import { ChallengesWidget, EducationWidget } from '../../features/training-ux';
 import { PositionsWidget, TradeLogWidget } from '../workflow';
@@ -293,7 +291,7 @@ export const WorkspaceGrid: React.FC = () => {
       case 'chart':
         return <ChartWidget symbol={widget.symbol || 'EURUSD'} widgetId={widget.id} />;
       case 'priceLadder':
-        return <PriceLadderWidget symbol={widget.symbol || 'ESU5'} />;
+        return <PriceLadderWidget symbol={widget.symbol} accountId={widget.accountId} />;
       case 'optionsGrid':
         return <OptionsGridWidget symbol={widget.symbol || 'ESU5'} />;
       case 'positions':

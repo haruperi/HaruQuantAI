@@ -1,7 +1,7 @@
 /**
  * Drift test: the frontend client catalog mirrors the backend route inventory.
  *
- * Asserts that `ROUTE_CONTRACTS` in `routes.ts` contains exactly the 91
+ * Asserts that `ROUTE_CONTRACTS` in `routes.ts` contains exactly the 93
  * approved backend-v1 operations with the expected method/path/permission,
  * matching `app/services/api/contracts/catalog.py` (`_KNOWN_ROUTE_CONTRACTS`).
  * A backend route add/remove/rename must be reflected here or this test fails.
@@ -45,6 +45,7 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.data.capabilities", method: "GET", path: "/api/v1/data/capabilities", permission: "data:read" },
   { id: "api.data.stream", method: "GET", path: "/api/v1/data/stream", permission: "data:read" },
   { id: "api.data.snapshot_stream", method: "GET", path: "/api/v1/data/snapshot-stream", permission: "data:read" },
+  { id: "api.data.depth_stream", method: "GET", path: "/api/v1/data/depth-stream", permission: "data:read" },
   { id: "api.indicators.list", method: "GET", path: "/api/v1/indicators", permission: "indicators:read" },
   { id: "api.indicators.capabilities", method: "GET", path: "/api/v1/indicators/capabilities", permission: "indicators:read" },
   { id: "api.indicators.get_spec", method: "GET", path: "/api/v1/indicators/{indicator_id}", permission: "indicators:read" },
@@ -102,6 +103,7 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.risk.kill_switch", method: "GET", path: "/api/v1/risk/kill-switch", permission: "risk:read" },
   { id: "api.risk.decisions", method: "GET", path: "/api/v1/risk/decisions", permission: "risk:read" },
   { id: "api.trading.session", method: "GET", path: "/api/v1/trading/session", permission: "trading:read" },
+  { id: "api.trading.preflight_order", method: "POST", path: "/api/v1/trading/orders/preflight", permission: "trading:write" },
   { id: "api.trading.submit_order", method: "POST", path: "/api/v1/trading/orders", permission: "trading:write" },
   { id: "api.trading.cancel_order", method: "DELETE", path: "/api/v1/trading/orders/{order_id}", permission: "trading:write" },
   { id: "api.trading.close_position", method: "POST", path: "/api/v1/trading/positions/{position_id}/close", permission: "trading:write" },
@@ -151,9 +153,9 @@ const EXPECTED: ReadonlyArray<{
 ];
 
 describe("clients match the backend route catalog", () => {
-  it("has exactly the approved 91 operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(91);
-    expect(ROUTE_CONTRACTS).toHaveLength(91);
+  it("has exactly the approved 93 operations", () => {
+    expect(ROUTE_CONTRACT_COUNT).toBe(96);
+    expect(ROUTE_CONTRACTS).toHaveLength(93);
   });
 
   it("matches every expected id, method, path, and permission", () => {

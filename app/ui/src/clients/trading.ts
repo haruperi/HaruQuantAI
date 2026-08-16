@@ -18,6 +18,38 @@ import { request, type RequestOptions } from "./request";
 export const tradingProjectionSchema = z.record(z.string(), z.unknown());
 export type TradingProjection = z.infer<typeof tradingProjectionSchema>;
 
+/**
+ * One real working order, exactly as Trading's own state projection reports
+ * it — the submitted intent plus whatever the broker has acknowledged so far.
+ * `broker_order_id` is present only once a receipt has arrived; an order
+ * without it cannot yet be targeted by `DELETE /orders/{order_id}`.
+ */
+export const workingOrderSchema = z.object({
+  request_id: z.string(),
+  intent: z.object({
+    client_order_id: z.string(),
+    symbol: z.string(),
+    side: z.enum(["BUY", "SELL"]),
+    order_type: z.enum(["MARKET", "LIMIT", "STOP", "STOP_LIMIT"]),
+    approved_volume: z.union([z.string(), z.number()]),
+    price: z.union([z.string(), z.number()]).nullable().optional(),
+  }),
+  broker_order_id: z.string().optional(),
+});
+export type WorkingOrder = z.infer<typeof workingOrderSchema>;
+
+/** Extract every real working order Trading's session projection reports. */
+export function listWorkingOrders(projection: TradingProjection): WorkingOrder[] {
+  const raw = projection.orders;
+  if (typeof raw !== "object" || raw === null) return [];
+  const orders: WorkingOrder[] = [];
+  for (const value of Object.values(raw as Record<string, unknown>)) {
+    const parsed = workingOrderSchema.safeParse(value);
+    if (parsed.success) orders.push(parsed.data);
+  }
+  return orders;
+}
+
 /** Execution receipt (opaque; Trading-owned `ExecutionReceipt.v1`). */
 export const executionReceiptSchema = z.record(z.string(), z.unknown());
 export type ExecutionReceipt = z.infer<typeof executionReceiptSchema>;
@@ -70,6 +102,109 @@ export interface TradingMutationInput {
 
 export type SubmitOrderInput = TradingMutationInput;
 
+/** Real Risk decision/verdict pair the API gateway itself produces and owns. */
+export const riskPreflightResponseSchema = z.object({
+  state: z.string(),
+  risk_decision_id: z.string(),
+  action_policy_verdict_id: z.string().nullable(),
+  approval_token_ref: z.string().nullable(),
+  reasons: z.array(z.string()),
+  expires_at: z.string(),
+});
+export type RiskPreflightResponse = z.infer<typeof riskPreflightResponseSchema>;
+
+/** Exact API projection of `trading.order_preflight_request.v1`. */
+export interface OrderPreflightInput {
+  request_id: string;
+  workflow_id: string;
+  correlation_id: string;
+  route: "paper" | "live";
+  account_id: string;
+  portfolio_id?: string | null;
+  symbol: string;
+  side: "BUY" | "SELL";
+  order_type: "MARKET" | "LIMIT" | "STOP" | "STOP_LIMIT";
+  quantity: string | number;
+  current_price: string | number;
+  stop_distance?: string | number | null;
+  idempotency_key: string;
+}
+
+/** Exact API projection of `trading.cancel_all_preflight_request.v1`. */
+export interface CancelAllPreflightInput {
+  request_id: string;
+  workflow_id: string;
+  correlation_id: string;
+  route: "paper" | "live";
+  account_id: string;
+  portfolio_id?: string | null;
+  representative_symbol: string;
+  idempotency_key: string;
+}
+
+/** Exact API projection of `trading.cancel_order_preflight_request.v1`. */
+export interface CancelOrderPreflightInput {
+  request_id: string;
+  workflow_id: string;
+  correlation_id: string;
+  route: "paper" | "live";
+  account_id: string;
+  portfolio_id?: string | null;
+  representative_symbol: string;
+  target_broker_order_id: string;
+  idempotency_key: string;
+}
+
+/** Review one candidate order through Risk's real gate (requires `trading:write`). */
+export function preflightOrder(
+  input: OrderPreflightInput,
+  options?: RequestOptions
+): Promise<ApiResponse<RiskPreflightResponse>> {
+  return request<RiskPreflightResponse>(tradingRoutes.preflightOrder, {
+    schema: riskPreflightResponseSchema,
+    body: input,
+    ...options,
+  });
+}
+
+/** Authorize one order's cancellation through Risk's real gate (requires `trading:write`). */
+export function preflightCancelOrder(
+  orderId: string,
+  input: CancelOrderPreflightInput,
+  options?: RequestOptions
+): Promise<ApiResponse<RiskPreflightResponse>> {
+  return request<RiskPreflightResponse>(tradingRoutes.cancelOrderPreflight, {
+    schema: riskPreflightResponseSchema,
+    pathParams: { order_id: orderId },
+    body: input,
+    ...options,
+  });
+}
+
+/** Authorize a bulk cancel-all through Risk's real gate (requires `trading:write`). */
+export function preflightCancelAllOrders(
+  input: CancelAllPreflightInput,
+  options?: RequestOptions
+): Promise<ApiResponse<RiskPreflightResponse>> {
+  return request<RiskPreflightResponse>(tradingRoutes.cancelAllPreflight, {
+    schema: riskPreflightResponseSchema,
+    body: input,
+    ...options,
+  });
+}
+
+/** Cancel every eligible governed order (requires `trading:write`; governed + idempotent). */
+export function cancelAllOrders(
+  input: TradingMutationInput,
+  options?: RequestOptions
+): Promise<ApiResponse<ExecutionReceipt>> {
+  return request<ExecutionReceipt>(tradingRoutes.cancelAllOrders, {
+    schema: executionReceiptSchema,
+    body: input,
+    ...options,
+  });
+}
+
 /** Read the aggregate trading session (requires `trading:read`). */
 export function session(
   options?: RequestOptions
@@ -121,4 +256,13 @@ export function closePosition(
 }
 
 /** Aggregated trading client. */
-export const trading = { session, submitOrder, cancelOrder, closePosition };
+export const trading = {
+  session,
+  preflightOrder,
+  submitOrder,
+  preflightCancelOrder,
+  cancelOrder,
+  closePosition,
+  preflightCancelAllOrders,
+  cancelAllOrders,
+};

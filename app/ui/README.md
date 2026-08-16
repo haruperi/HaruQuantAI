@@ -124,7 +124,7 @@ app/ui/
     ├── features/markets/                 # FEAT-UI-02
     ├── features/watchlists/              # FEAT-UI-03
     ├── features/chart/                   # FEAT-UI-04
-    ├── features/price-ladder/            # FEAT-UI-05 (target)
+    ├── features/price-ladder/            # FEAT-UI-05
     ├── features/order-ticket/            # FEAT-UI-06 (target)
     ├── features/options-grid/            # FEAT-UI-07 (target)
     ├── features/trade-log/               # FEAT-UI-08 (target)
@@ -158,7 +158,7 @@ app/ui/
 | Completed | `FEAT-UI-02` Markets Widget | `src/features/markets/` | `MarketsWidget` through the feature barrel | `FR-UI-030`–`FR-UI-037`; `FR-UI-192`–`FR-UI-193` | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FEAT-UI-03` Watchlist Widget | `src/features/watchlists/` | `WatchlistWidget` through the feature barrel | `FR-UI-038`–`FR-UI-045`; `FR-UI-192` | `src/features/watchlists/WatchlistWidget.test.tsx` |
 | Completed | `FEAT-UI-04` Charting Tools Widget | `src/features/chart/` | `ChartWidget` | `FR-UI-046`–`FR-UI-054`; `FR-UI-194` | `src/features/chart/ChartWidget.test.tsx` |
-| Pending | `FEAT-UI-05` Price Ladder Widget | Target: `src/features/price-ladder/`; current: `src/features/instrument-panels/PriceLadderWidget.tsx` | `PriceLadderWidget` | `FR-UI-055`–`FR-UI-062` | Pending evidence |
+| Completed | `FEAT-UI-05` Price Ladder Widget | `src/features/price-ladder/` | `PriceLadderWidget` | `FR-UI-055`–`FR-UI-062` | `src/features/price-ladder/PriceLadderWidget.test.tsx`; `useDepthStream.test.tsx` |
 | Pending | `FEAT-UI-06` Order Ticket | Target: `src/features/order-ticket/`; current: `src/components/workflow/OrderTicketModal.tsx` | `OrderTicketModal` (futures and options tabs) | `FR-UI-063`–`FR-UI-079` | Pending evidence |
 | Pending | `FEAT-UI-07` Options Grid Widget | Target: `src/features/options-grid/`; current: `src/features/instrument-panels/OptionsGridWidget.tsx` | `OptionsGridWidget` | `FR-UI-080`–`FR-UI-084` | Pending evidence; blocked on an owning backend domain |
 | Pending | `FEAT-UI-08` Trade Log Widget | Target: `src/features/trade-log/`; current: `src/components/workflow/TradeLogWidget.tsx` | `TradeLogWidget` | `FR-UI-085`–`FR-UI-089` | Pending evidence |
@@ -463,28 +463,30 @@ Chart bar-count limits follow the registered Data contract; the current maximum 
 
 ### 4.5 `src/features/price-ladder/` — Price Ladder Widget
 
-**Purpose:** Present depth of market and ladder-initiated order interaction.
+**Purpose:** Present real Depth-of-Market and ladder-initiated order interaction.
 
-**Target location:** `src/features/price-ladder/`. The widget currently resides inside
-`src/features/instrument-panels/`; the move is approved separately.
+**Files:**
 
-### Files
+| Status    | File                      | Responsibility                                            | Key exports           | Dependencies                                                                                                                   |
+| --------- | ------------------------- | --------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Completed | `PriceLadderWidget.tsx` | Real depth presentation, real order submission/cancellation, and ladder order interaction | `PriceLadderWidget` | **Standard library:** browser APIs**Required third-party:** React, lucide-react**Local:** `clients` (data/trading), `context` (governed), `workspaces`, `useDepthStream.ts` |
+| Completed | `useDepthStream.ts`     | Real authenticated SSE Depth-of-Market consumption for one symbol | `useDepthStream`, `DepthBookView`, `DepthLevel` | **Standard library:** browser APIs**Required third-party:** React**Local:** `clients` |
+| Completed | `index.ts`              | Sole public surface for the feature                       | `PriceLadderWidget` | **Standard library:** None**Required third-party:** None**Local:** `PriceLadderWidget.tsx`                 |
 
-| Status  | File                      | Responsibility                                            | Key exports           | Dependencies                                                                                                                   |
-| ------- | ------------------------- | --------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Pending | `PriceLadderWidget.tsx` | Depth-of-market presentation and ladder order interaction | `PriceLadderWidget` | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/data and clients/trading |
-| Pending | `index.ts`              | Sole public surface for the feature                       | `PriceLadderWidget` | **Standard library:** None**Required third-party:** None**Local:** `PriceLadderWidget.tsx`                 |
+| Status    | Requirement ID | Responsibility                                                                                         | Component / Function / Type | Side Effects         | Failure presentation         | Usage / Test     |
+| --------- | -------------- | ------------------------------------------------------------------------------------------------------ | --------------------------- | -------------------- | ---------------------------- | ---------------- |
+| Completed | `FR-UI-055`  | Present bid and ask price levels with resting quantity for the selected instrument, sourced from the real `api.data.depth_stream` SSE feed. | `PriceLadderWidget`; `useDepthStream` | External API call    | Unavailable depth explicit (connecting/disconnected/unavailable status; per-symbol book error surfaced, never a blank row) | `PriceLadderWidget.test.tsx`; `useDepthStream.test.tsx` |
+| Completed | `FR-UI-056`  | Present depth from the market-data feed only; the ladder row set is the real union of the book's own bid/ask price levels — nothing the feed does not provide is synthesized. | `PriceLadderWidget`       | None                 | No synthesized levels        | `PriceLadderWidget.test.tsx` |
+| Completed | `FR-UI-057`  | Provide a configurable default order quantity and order type (MARKET/LIMIT) for ladder-initiated orders. | `PriceLadderWidget`       | Local state mutation | Defaults visible             | `PriceLadderWidget.test.tsx` |
+| Completed | `FR-UI-058`  | Open an order ticket pre-filled with the price level activated by the operator, handed off to the host via `onOpenTicket`; the ladder owns no ticket UI itself. | `PriceLadderWidget`       | Local state mutation | Ticket authority unchanged   | `PriceLadderWidget.test.tsx` |
+| Completed | `FR-UI-059`  | Present the operator's real working orders (from `TradingProjection.orders`) against their price levels. | `PriceLadderWidget`       | External API call    | Unknown remains explicit (a refresh failure keeps the last known real orders rather than clearing to an invented empty state) | `PriceLadderWidget.test.tsx` |
+| Completed | `FR-UI-060`  | Offer cancellation of an individual working order (gated until the order carries a real `broker_order_id`) and a separate bounded cancel-all action, both authorized through Risk's real preflight gate before mutation. | `PriceLadderWidget`       | External API call    | API rejection visible; a declined preflight blocks the mutation call entirely | `PriceLadderWidget.test.tsx` |
+| Completed | `FR-UI-061`  | Require explicit confirmation for cancel-all regardless of the active confirmation mode. | `PriceLadderWidget`       | External API call    | Confirmation always required | `PriceLadderWidget.test.tsx` |
+| Completed | `FR-UI-062`  | Provide a re-center action reachable by both keyboard (Spacebar) and pointer (button). | `PriceLadderWidget`       | Local state mutation | Keyboard path preserved      | `PriceLadderWidget.test.tsx` |
 
-| Status  | Requirement ID | Responsibility                                                                                         | Component / Function / Type | Side Effects         | Failure presentation         | Usage / Test     |
-| ------- | -------------- | ------------------------------------------------------------------------------------------------------ | --------------------------- | -------------------- | ---------------------------- | ---------------- |
-| Pending | `FR-UI-055`  | Present bid and ask price levels with resting quantity for the selected instrument.                    | `PriceLadderWidget`       | External API call    | Unavailable depth explicit   | Pending evidence |
-| Pending | `FR-UI-056`  | Present depth from the market-data feed only; aggregate nothing the feed does not provide.             | `PriceLadderWidget`       | None                 | No synthesized levels        | Pending evidence |
-| Pending | `FR-UI-057`  | Provide a configurable default order quantity and order type for ladder-initiated orders.              | `PriceLadderWidget`       | Local state mutation | Defaults visible             | Pending evidence |
-| Pending | `FR-UI-058`  | Open an order ticket pre-filled with the price level activated by the operator.                        | `PriceLadderWidget`       | Local state mutation | Ticket authority unchanged   | Pending evidence |
-| Pending | `FR-UI-059`  | Present the operator's working orders against their price levels.                                      | `PriceLadderWidget`       | External API call    | Unknown remains explicit     | Pending evidence |
-| Pending | `FR-UI-060`  | Offer cancellation of an individual working order at a level and a separate bounded cancel-all action. | `PriceLadderWidget`       | External API call    | API rejection visible        | Pending evidence |
-| Pending | `FR-UI-061`  | Require explicit confirmation for cancel-all regardless of the active confirmation mode.               | `PriceLadderWidget`       | External API call    | Confirmation always required | Pending evidence |
-| Pending | `FR-UI-062`  | Provide a re-center action reachable by both keyboard and pointer.                                     | `PriceLadderWidget`       | Local state mutation | Keyboard path preserved      | Pending evidence |
+**Real backend dependencies added to support this feature:** `GET /api/v1/data/depth-stream` (FR-API-129); `POST /api/v1/trading/orders/preflight` (FR-API-130); `POST /api/v1/trading/orders/{order_id}/preflight` (FR-API-133); `POST /api/v1/trading/orders/cancel-all/preflight` (FR-API-131); `POST /api/v1/trading/orders/cancel-all` (FR-API-132); Risk's `review_manual_order`/`review_cancel_authorization` (FR-RISK-093/095).
+
+**Known gap:** the widget accepts an `accountId` prop (mirroring the existing per-widget `symbol` config); depth still renders without one, but every order/cancel action stays disabled until a real Trading account is configured for that widget instance. No app-wide "current account" concept exists yet.
 
 ### Configuration and Limits Manifest
 
@@ -1046,7 +1048,7 @@ following owner choices remain unresolved.
 | Fixture data reaches production modules    | `src/mock/` is imported by `OptionsGridWidget.tsx`, `EducationWidget.tsx`, and `store/useTradingStore.ts` (`MarketsWidget.tsx` no longer imports it as of `FEAT-UI-02`). Those surfaces can display values with no API origin, against `NFR-UI-007` and `AGENTS.md` §3 "No Invented Data". Blocks the affected features from reaching `Completed`.               |
 | Order-confirmation governance basis        | Per owner decision the confirmation control behaves identically in simulation and live, differing only by environment switch. Recorded basis: the dialog is a client-side convenience, not a safety control, and`AGENTS.md` names backend Python as the sole policy-enforcement authority. Owner confirmation of this basis is outstanding.                                       |
 | Two overlapping presentation paradigms     | The primary widget workspace (`FEAT-UI-01`–`FEAT-UI-13`) and the layered cockpit features (`FEAT-UI-18`–`FEAT-UI-24`) both present market state and trading actions. The widget model is primary by owner decision; whether the cockpit layer converges into it or remains distinct is undecided.                                                                         |
-| Nine registered folders do not yet exist   | `FEAT-UI-05`–`FEAT-UI-13` register target paths whose code still resides in its previous location. Until the moves land, those features do not satisfy the one-feature-one-folder structure rule. `FEAT-UI-01`, `FEAT-UI-02`, `FEAT-UI-03`, and `FEAT-UI-04` completed their moves and are no longer in this set.                                                      |
+| Eight registered folders do not yet exist   | `FEAT-UI-06`–`FEAT-UI-13` register target paths whose code still resides in its previous location. Until the moves land, those features do not satisfy the one-feature-one-folder structure rule. `FEAT-UI-01`, `FEAT-UI-02`, `FEAT-UI-03`, `FEAT-UI-04`, and `FEAT-UI-05` completed their moves and are no longer in this set.                                                      |
 
 ---
 
@@ -1086,11 +1088,11 @@ uv run ruff format --check tests/ui/structural/test_feature_registry.py
 
 ### Package completion checklist
 
-- [ ] The final package tree matches Section 2. `FEAT-UI-05`–`FEAT-UI-13` still reside in their previous locations.
+- [ ] The final package tree matches Section 2. `FEAT-UI-06`–`FEAT-UI-13` still reside in their previous locations.
 - [X] Completed module sections are arranged in dependency order.
-- [ ] Every registered feature owns one focused folder. Pending the `FEAT-UI-05`–`FEAT-UI-13` moves.
+- [ ] Every registered feature owns one focused folder. Pending the `FEAT-UI-06`–`FEAT-UI-13` moves.
 - [X] Every completed functional requirement has focused automated evidence.
-- [ ] Every registered functional requirement has focused automated evidence. 73 requirements remain `Pending`.
+- [ ] Every registered functional requirement has focused automated evidence. 70 requirements remain `Pending`.
 - [ ] No production module imports fixture data (`NFR-UI-007`).
 - [X] Typed API clients have route-contract parity evidence.
 - [X] UI owns no durable state, business calculation, authorization, or broker connection.
