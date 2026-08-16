@@ -10,6 +10,10 @@ Generated operational certificates can now bind every mandatory offline publicat
 
 - Added an offline, fail-closed certificate finalizer that runs exact audit commands, rejects findings or drift, and recomputes checksums atomically.
 
+#### Fixed (1)
+
+- Bootstrapped repository-local imports for directly executable certificate validation and scan modes.
+
 ### Bound certificate authority-history collection
 
 MT5 certificate preflight now collects complete authority history through deterministic calendar windows before any mutation.

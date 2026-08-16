@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -309,3 +311,31 @@ def test_finalized_ledger_rejects_failed_or_changed_commands(tmp_path: Path) -> 
     )
     with pytest.raises(ValueError, match="differs"):
         validate_finalized_command_ledger(bundle, root)
+
+
+def test_finalizer_inert_modes_execute_from_a_fresh_process(tmp_path: Path) -> None:
+    """Direct validation and scanning bootstrap repository-local imports."""
+    bundle = tmp_path / "bundle"
+    _synthetic_schema_fixture(bundle)
+    repository_root = Path(__file__).resolve().parents[3]
+    script = "tests/simulator/integration/l5_certificate_finalize.py"
+    uv_executable = shutil.which("uv")
+    assert uv_executable is not None
+    for mode in ("--validate-only", "--scan-only"):
+        result = subprocess.run(  # noqa: S603 - exact repository test command.
+            (
+                uv_executable,
+                "run",
+                "python",
+                script,
+                mode,
+                "--bundle",
+                str(bundle),
+            ),
+            cwd=repository_root,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        assert result.returncode == 0, result.stderr

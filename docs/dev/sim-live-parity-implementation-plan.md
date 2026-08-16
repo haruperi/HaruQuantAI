@@ -4527,6 +4527,20 @@ and fails on any finding without placing sensitive vocabulary in the immutable l
 `Recompute bundle checksums only after every audit command passes.`, and
 `Reject incomplete, unsafe, failed, or repeated certificate finalization.`
 
+**Finalizer entry-point correction `CERT-DR39Δ2` — 2026-08-16.** The first approved offline
+finalization invocation failed before reading or modifying `-04` because the directly executed
+finalizer did not bootstrap the repository root before importing its local validation helper. The
+candidate retained its original one-line command ledger and reproduced successfully afterward. The
+approved correction adds the same explicit repository-root bootstrap used by the collector and
+proves both inert `--validate-only` and `--scan-only` modes in fresh subprocesses. Evidence:
+`tests/simulator/integration/l5_certificate_finalize.py:15` and
+`tests/simulator/integration/test_l5_certificate_bundle.py:316`. Focused finalizer/collector tests
+passed 40 in 4.86 seconds; Ruff, Ruff format, and mypy passed. Exact commit:
+`fix(parity): make certificate finalizer directly executable` with body bullets
+`Bootstrap the repository root before importing certificate validation helpers.`,
+`Prove validate-only and scan-only modes run from a fresh process.`, and
+`Preserve the unmodified candidate when entry-point setup fails.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write

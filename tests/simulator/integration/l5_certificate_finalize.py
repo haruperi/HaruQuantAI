@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 """Finalize one generated L5 certificate with reproducible audit evidence."""
 
 from __future__ import annotations
@@ -7,8 +8,13 @@ import hashlib
 import json
 import shlex
 import subprocess
+import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
+
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 from tests.simulator.integration.l5_certificate_collection import (
     validate_l5_certificate_bundle,
